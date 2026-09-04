@@ -1148,7 +1148,7 @@ describe('Complexity guard: production scalar substrate', () => {
           equalityChecks: 1,
           revisionIncrements: 1,
           positionResolutions: 0,
-          publicationDependencyReads: 1,
+          publicationDependencyReads: 0,
           publications: 1,
           treeVisits: 0,
           structuralActiveKeyLookups: 0,

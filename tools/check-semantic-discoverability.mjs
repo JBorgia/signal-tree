@@ -3,12 +3,15 @@ import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { assertReleasePlan } from '../scripts/release-plan.mjs';
+
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 const REQUIRED = [
   ['positioning', /IS NOT: primarily an undo library, event log, query library, sync engine, or\s+persistence framework/],
   ['Angular facade', /Angular\s+code imports `signalTree` and all other SignalTree APIs from here/],
   ['React facade', /React code\s+imports `signalTree`, markers, enhancers, and `useSignalTree/],
+  ['Vue facade', /Vue code\s+imports\s+`signalTree` and all other SignalTree APIs from here/],
   ['neutral facade', /Use `@signal-tree\/kernel` directly only for framework-neutral TypeScript/],
   ['link relationship', /persistent relationship with an external authority \(`link\(\)`'s three/],
   ['persistence composition', /`link\(\)`-as-storage specialization/],
@@ -16,7 +19,7 @@ const REQUIRED = [
   ['causal projection', /does not store\s+prose, actor names, or timestamps/],
 ];
 
-const PACKAGES = ['kernel', 'angular', 'react'];
+const PACKAGES = assertReleasePlan(ROOT);
 const STALE_CLAIMS = [
   'current guidance comes\n  from package types and READMEs while a replacement is derived',
   'those artifacts are historical and are not shipped by the\ncurrent release',
@@ -55,6 +58,7 @@ IS NOT: primarily an undo library, event log, query library, sync engine, or
       persistence framework
 Angular code imports \`signalTree\` and all other SignalTree APIs from here
 React code imports \`signalTree\`, markers, enhancers, and \`useSignalTree
+Vue code imports \`signalTree\` and all other SignalTree APIs from here
 Use \`@signal-tree/kernel\` directly only for framework-neutral TypeScript
 persistent relationship with an external authority (\`link()\`'s three
 \`link()\`-as-storage specialization

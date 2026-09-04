@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
   "source": "apps/demo/src/app/pages/architecture-overview/architecture-diagrams.ts",
-  "sourceSha256": "a2a6092c6de144a40cbabbc7de16c9edf05f75900aba322f5b6dabc38446343f",
+  "sourceSha256": "ce7d03c9c6569d5cf1883cada96a4ffa9fb9fc5c0129b69724c9dbb22a0a8415",
   "diagrams": [
     {
       "id": "system-boundary",
       "eyebrow": "01 · System boundary",
       "title": "SignalTree in one picture",
       "takeaway": "Frameworks realize canonical truth; the kernel remains the state authority.",
-      "description": "Application policy chooses the work. Angular and React connect that work to their observation runtimes. The framework-neutral kernel owns the state and causal model beneath both.",
+      "description": "Application policy chooses the work. Framework realizations connect that work to their observation runtimes. The framework-neutral kernel owns the state and causal model beneath them.",
       "plainLanguage": "Your app decides what should happen, the framework updates the screen, and SignalTree keeps the one official answer underneath.",
-      "realWorldExample": "A shopper changes an item quantity. The checkout rule accepts the change, SignalTree stores it, and Angular or React redraws the total.",
+      "realWorldExample": "A shopper changes an item quantity. The checkout rule accepts the change, SignalTree stores it, and the application’s framework realization redraws the total.",
       "financialImpact": "If the screen and store keep separate answers, a shopper can see one total and be charged another. One authority keeps those numbers together.",
       "desktopViewBox": "0 0 1040 720",
       "mobileViewBox": "0 0 360 720",
@@ -43,7 +43,7 @@
         {
           "id": "realization",
           "title": [
-            "Angular / React",
+            "Framework",
             "realization"
           ],
           "detail": [
@@ -143,22 +143,23 @@
       ],
       "checks": [
         "The framework layer is observation and realization, not a second store.",
-        "The kernel contract contains no Angular or React runtime dependency."
+        "The kernel contract contains no framework runtime dependency."
       ],
       "evidence": [
         "packages/kernel/src/adapter.ts",
         "packages/angular/src/index.ts",
-        "packages/react/src/use-signal-tree.ts"
+        "packages/react/src/use-signal-tree.ts",
+        "packages/vue/src/index.ts"
       ]
     },
     {
       "id": "package-ownership",
       "eyebrow": "02 · Package ownership",
-      "title": "Three public entry surfaces, one semantic authority",
+      "title": "Four public packages, one semantic authority",
       "takeaway": "Applications import their framework facade; framework-neutral code imports the kernel.",
-      "description": "Angular and React add native observation and lifecycle integration around the same kernel types and runtime. The adapter subpath exists for realization authors, not ordinary application imports.",
+      "description": "Framework packages add native observation and lifecycle integration around the same kernel types and runtime. The adapter subpath exists for observation-adapter authors, not ordinary application imports.",
       "plainLanguage": "Choose the package that matches your app. It includes the shared SignalTree engine plus the connection your framework needs.",
-      "realWorldExample": "An Angular checkout imports only @signal-tree/angular. A framework-free pricing library imports only @signal-tree/kernel.",
+      "realWorldExample": "An Angular checkout imports @signal-tree/angular, a Vue dispatch screen imports @signal-tree/vue, and a framework-free pricing library imports @signal-tree/kernel.",
       "financialImpact": "One import path avoids duplicate integration code and competing state copies, reducing maintenance work and costly checkout defects.",
       "desktopViewBox": "0 0 1040 500",
       "mobileViewBox": "0 0 360 590",
@@ -169,23 +170,23 @@
             "@signal-tree/angular"
           ],
           "detail": [
-            "Angular signals · DI · DestroyRef"
+            "Angular observation · DI · DestroyRef"
           ],
           "mobileTitle": [
             "@signal-tree/",
             "angular"
           ],
           "mobileDetail": [
-            "Angular signals",
+            "Angular observation",
             "DI · DestroyRef"
           ],
           "tone": "framework",
           "position": {
             "desktop": {
               "x": 35,
-              "y": 45,
+              "y": 35,
               "width": 285,
-              "height": 105
+              "height": 85
             },
             "mobile": {
               "x": 12,
@@ -216,13 +217,46 @@
           "position": {
             "desktop": {
               "x": 35,
-              "y": 195,
+              "y": 140,
               "width": 285,
-              "height": 105
+              "height": 85
             },
             "mobile": {
               "x": 184,
               "y": 20,
+              "width": 164,
+              "height": 105
+            }
+          },
+          "code": true
+        },
+        {
+          "id": "vue",
+          "title": [
+            "@signal-tree/vue"
+          ],
+          "detail": [
+            "direct Vue dependency observation"
+          ],
+          "mobileTitle": [
+            "@signal-tree/",
+            "vue"
+          ],
+          "mobileDetail": [
+            "direct Vue",
+            "observation"
+          ],
+          "tone": "framework",
+          "position": {
+            "desktop": {
+              "x": 35,
+              "y": 245,
+              "width": 285,
+              "height": 85
+            },
+            "mobile": {
+              "x": 12,
+              "y": 355,
               "width": 164,
               "height": 105
             }
@@ -242,13 +276,13 @@
           "position": {
             "desktop": {
               "x": 35,
-              "y": 345,
+              "y": 350,
               "width": 285,
-              "height": 105
+              "height": 85
             },
             "mobile": {
-              "x": 12,
-              "y": 410,
+              "x": 184,
+              "y": 355,
               "width": 164,
               "height": 105
             }
@@ -264,6 +298,10 @@
             "state · identity · causal turns",
             "Link · restoration · invalidation"
           ],
+          "mobileTitle": [
+            "@signal-tree/",
+            "kernel"
+          ],
           "tone": "kernel",
           "position": {
             "desktop": {
@@ -273,9 +311,9 @@
               "height": 190
             },
             "mobile": {
-              "x": 24,
-              "y": 195,
-              "width": 312,
+              "x": 98,
+              "y": 170,
+              "width": 164,
               "height": 140
             }
           },
@@ -298,8 +336,8 @@
               "height": 80
             },
             "mobile": {
-              "x": 184,
-              "y": 410,
+              "x": 98,
+              "y": 485,
               "width": 164,
               "height": 80
             }
@@ -323,6 +361,13 @@
           "direction": "forward"
         },
         {
+          "id": "vue-kernel",
+          "from": "vue",
+          "to": "kernel-package",
+          "label": "forwards + observes",
+          "direction": "forward"
+        },
+        {
           "id": "neutral-kernel",
           "from": "neutral-libraries",
           "to": "kernel-package",
@@ -339,7 +384,7 @@
         }
       ],
       "checks": [
-        "The current package set is kernel, Angular, and React; v15 is not a single-package release.",
+        "The current package set is kernel, Angular, React, and Vue.",
         "Framework packages do not create independent state authority.",
         "Bounded owners release resources with destroy(); Angular defineStore binds that to DestroyRef."
       ],
@@ -347,15 +392,16 @@
         "scripts/release-plan.mjs",
         "packages/kernel/src/adapter.ts",
         "packages/angular/src/lib/define-store.ts",
-        "packages/react/src/use-signal-tree.ts"
+        "packages/react/src/use-signal-tree.ts",
+        "packages/vue/src/lib/vue-observation.ts"
       ]
     },
     {
       "id": "accessor-grammar",
       "eyebrow": "03 · Public state grammar",
       "title": "The API follows the shape of the location",
-      "takeaway": "Root and branch accessors are callable in both directions; leaves retain their reactive cell API.",
-      "description": "The controller itself is not callable. Its root $ accessor and branch accessors support read, whole-value replacement, and updater calls. Leaf signals read with () and write with set() or update(). EntityMap exposes collection operations.",
+      "takeaway": "Root and branch accessors use collision-free callable writes; leaves use the universal location API.",
+      "description": "The controller itself is not callable. Its root $ accessor and branch accessors support read, whole-value replacement, and updater calls, preserving user keys named set or update. Leaf locations read with () and write with set() or update(). EntityMap exposes collection operations.",
       "plainLanguage": "The way you read or change state matches what you are touching: the whole tree, one object, one simple value, or a keyed collection.",
       "realWorldExample": "A checkout replaces a complete shipping address, increments an item quantity, and looks up products by ID through their matching APIs.",
       "financialImpact": "The type system catches accidental partial replacements that could erase an address field, drop an item, or calculate an order from incomplete data.",
@@ -419,7 +465,7 @@
         {
           "id": "leaf",
           "title": [
-            "Leaf signal"
+            "Leaf location"
           ],
           "detail": [
             "tree.$.count()",

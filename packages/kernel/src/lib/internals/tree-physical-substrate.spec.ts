@@ -4,7 +4,7 @@ import {
   createReactiveTestRealization,
   observeReactiveTestValue,
 } from '../../reactive-test-realization';
-import { bindSignalTreeRealization } from '../signal-tree';
+import { createSignalTreeFactory } from '../signal-tree';
 import type { ISignalTree } from '../types';
 
 import { getOwnedPositionIds } from './owned-mutation';
@@ -12,7 +12,7 @@ import { getTreeScalarSlotRuntime } from './tree-scalar-slot-port';
 
 describe('tree physical substrate', () => {
   const testRealization = createReactiveTestRealization();
-  const signalTree = bindSignalTreeRealization(testRealization);
+  const signalTree = createSignalTreeFactory(testRealization);
 
   // ⚠️ TITLE CORRECTED. This read "…on the public signalTree path BY DEFAULT",
   // which its own fixture contradicts — it explicitly passes
@@ -95,9 +95,9 @@ describe('tree physical substrate', () => {
       throw new Error('Expected scalar slot runtime on public signalTree path');
     }
 
-    const snapshot = testRealization.derived.createDerived(() => tree.$.a());
+    const snapshot = testRealization.locations.createDerived(() => tree.$.a());
     let reads = 0;
-    const observed = testRealization.derived.createDerived(() => {
+    const observed = testRealization.locations.createDerived(() => {
       reads++;
       return snapshot();
     });

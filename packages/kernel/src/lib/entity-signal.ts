@@ -1,6 +1,8 @@
-import { NEUTRAL_CELL_RUNTIME } from './internals/cell-runtime';
-import { NEUTRAL_DERIVED_RUNTIME } from './internals/derived-runtime';
 import type { ReadableCell, WritableCell } from './internals/cell-runtime';
+import {
+  NEUTRAL_LOCATION_RUNTIME,
+  type LocationRuntime,
+} from './internals/location-runtime';
 import { deepClone } from './internals/utilities/deep-clone';
 
 import {
@@ -30,9 +32,6 @@ import { getActiveWriteContext } from '../lib/write-context';
 import { recordProductionSubstrateStat } from './internals/production-substrate-stats';
 import { defineEntityProjectionSeed } from './internals/entity-projection-seed';
 import { markOwnerInvalidated } from './internals/owner-invalidation-port';
-import { markSnapshotDirty } from './internals/snapshot-authority';
-import type { CellRuntime } from './internals/cell-runtime';
-import type { DerivedRuntime } from './internals/derived-runtime';
 import type { MutationCaptureRuntime } from './internals/mutation-capture-runtime';
 import type {
   CollectionTransitionTarget,
@@ -295,8 +294,7 @@ export function createEntitySignal<
      * observer was therefore blind to every authored collection change.
      */
     ownerId?: number;
-    cellRuntime?: CellRuntime;
-    derivedRuntime?: DerivedRuntime;
+    locationRuntime?: LocationRuntime;
     /**
      * Whether anything in this tree could restore a subject after it retires.
      *
@@ -311,8 +309,7 @@ export function createEntitySignal<
     hasRestorationAuthority?: boolean;
   }
 ): EntitySignal<E, K> {
-  const cellRuntime = options?.cellRuntime ?? NEUTRAL_CELL_RUNTIME;
-  const derivedRuntime = options?.derivedRuntime ?? NEUTRAL_DERIVED_RUNTIME;
+  const locations = options?.locationRuntime ?? NEUTRAL_LOCATION_RUNTIME;
   // ==================
   // CLOSURE STATE (no `this` needed)
   // ==================
@@ -340,8 +337,11 @@ export function createEntitySignal<
    * computed caches them until the next mutation — so a grid that reads `all()`
    * once per frame pays once per frame instead of once per write.
    */
-  const version = cellRuntime.createCell(0);
-  const snapshotOwner: { node?: object } = {};
+  const version = locations.createCell(0);
+  const pendingEntitySignalValues = new Map<
+    WritableCell<E | undefined>,
+    E | undefined
+  >();
 
   const createVersionedProjection = <TValue>(
     compute: () => TValue
@@ -349,7 +349,7 @@ export function createEntitySignal<
     let projectedVersion = -1;
     let initialized = false;
     let value: TValue;
-    return derivedRuntime.createDerived(() => {
+    return locations.createDerived(() => {
       const currentVersion = version();
       if (!initialized || projectedVersion !== currentVersion) {
         value = compute();
@@ -914,7 +914,7 @@ export function createEntitySignal<
   }
 
   /** Active-entity selection. See the `activeId`/`activeEntity` accessors. */
-  const activeIdSignal = cellRuntime.createCell<K | undefined>(undefined);
+  const activeIdSignal = locations.createCell<K | undefined>(undefined);
   let cachedActiveEntity: ReadableCell<E | undefined> | undefined;
 
   /**
@@ -952,12 +952,12 @@ export function createEntitySignal<
   function getEntitySignal(id: K): WritableCell<E | undefined> {
     const subjectId = resolveSubjectId(id);
     if (subjectId === undefined) {
-      return cellRuntime.createCell<E | undefined>(getProjectedEntity(id));
+      return locations.createCell<E | undefined>(getProjectedEntity(id));
     }
 
     let s = entitySignals.get(subjectId);
     if (!s) {
-      s = cellRuntime.createCell<E | undefined>(valueStore.backingForSubject(subjectId));
+      s = locations.createCell<E | undefined>(valueStore.backingForSubject(subjectId));
       entitySignals.set(subjectId, s);
     }
     return s;
@@ -966,7 +966,7 @@ export function createEntitySignal<
   function getSubjectStateSignal(subjectId: number): WritableCell<number> {
     let s = subjectStateSignals.get(subjectId);
     if (!s) {
-      s = cellRuntime.createCell(0);
+      s = locations.createCell(0);
       subjectStateSignals.set(subjectId, s);
     }
     return s;
@@ -1371,7 +1371,7 @@ export function createEntitySignal<
     }
 
     const s = entitySignals.get(subjectId);
-    if (s) s.set(valueStore.backingForSubject(subjectId));
+    if (s) pendingEntitySignalValues.set(s, valueStore.backingForSubject(subjectId));
   }
 
   /**
@@ -1381,7 +1381,8 @@ export function createEntitySignal<
    * restore of the same subject re-publishes through the same signal.
    */
   function tombstoneSubjectSignal(subjectId: number): void {
-    entitySignals.get(subjectId)?.set(undefined);
+    const signal = entitySignals.get(subjectId);
+    if (signal) pendingEntitySignalValues.set(signal, undefined);
   }
 
   // TOMBSTONE: `resetEntitySignals()` — a bulk `forEach(set(undefined))` +
@@ -1489,9 +1490,15 @@ export function createEntitySignal<
 
   /** Mark the collection dirty. O(1) — see the `version` docs above. */
   function updateSignals(): void {
-    version.update((v) => v + 1);
-    if (snapshotOwner.node) markSnapshotDirty(snapshotOwner.node);
-    markOwnerInvalidated(ownerId);
+    const pending = [...pendingEntitySignalValues];
+    pendingEntitySignalValues.clear();
+    locations.runInvalidationGroup(() => {
+      for (const [signal, value] of pending) {
+        signal.set(value);
+      }
+      version.update((v) => v + 1);
+      markOwnerInvalidated(ownerId);
+    });
   }
 
   function createEntityNode(subjectId: number, initialKey: K, entity: E): EntityNode<E> {
@@ -1570,13 +1577,11 @@ export function createEntitySignal<
       return undefined;
     }) as unknown as EntityNode<E>;
 
-    // Field properties: Option B+ computed-based shim.
-    // Each field returns a getDerivedRuntime().createDerived(() => field_value) with .set()/.update()/.asReadonly()
-    // attached so that isSignal() returns true and toObservable() works.
-    // Writes delegate to api.updateOne which runs interceptors and tap handlers.
+    // Field locations derive their read from the subject-owned entity location.
+    // Writes delegate to api.updateOne so interceptors and tap handlers still run.
     for (const key of Object.keys(entity)) {
       const fieldKey = key as keyof E;
-      const fieldSignal = derivedRuntime.createDerived(() => entitySig()?.[fieldKey]);
+      const fieldSignal = locations.createDerived(() => entitySig()?.[fieldKey]);
 
       Object.assign(fieldSignal, {
         set: (value: E[typeof fieldKey]) => {
@@ -1983,7 +1988,7 @@ export function createEntitySignal<
      * that row changes — which is what `byId` exists for.
      */
     get activeEntity(): ReadableCell<E | undefined> {
-      return (cachedActiveEntity ??= derivedRuntime.createDerived(() => {
+      return (cachedActiveEntity ??= locations.createDerived(() => {
         const id = activeIdSignal();
         if (id === undefined) return undefined;
         return getEntitySignal(id)();
@@ -2011,7 +2016,7 @@ export function createEntitySignal<
 
     // Bare canonical name (the `.isEmpty` alias was removed in v11).
     get empty(): ReadableCell<boolean> {
-      return (cachedEmpty ??= derivedRuntime.createDerived(() => countSignal() === 0));
+      return (cachedEmpty ??= locations.createDerived(() => countSignal() === 0));
     },
 
     where(predicate: (entity: E) => boolean): ReadableCell<E[]> {
@@ -3501,7 +3506,6 @@ export function createEntitySignal<
       return (target as unknown as Record<string | symbol, unknown>)[prop];
     },
   });
-  snapshotOwner.node = proxy as object;
   return proxy;
 }
 

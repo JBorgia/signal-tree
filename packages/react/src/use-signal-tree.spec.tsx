@@ -2,7 +2,7 @@ import { act, render, screen } from '@testing-library/react';
 import { StrictMode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { signalTree } from '@signal-tree/kernel';
+import { entityMap, signalTree } from '@signal-tree/kernel';
 import { useSignalTree } from './use-signal-tree';
 
 const settleKernel = async (): Promise<void> => {
@@ -11,7 +11,22 @@ const settleKernel = async (): Promise<void> => {
 
 describe('useSignalTree', () => {
   it('observes a selected canonical location without materializing the root', async () => {
-    const tree = signalTree({ count: 1, unrelated: 0 });
+    let collectionComparisons = 0;
+    const tree = signalTree({
+      count: 1,
+      unrelated: 0,
+      rows: entityMap<{ id: number; value: number }, number>({
+        selectId: (row) => row.id,
+        sortComparer: (left, right) => {
+          collectionComparisons += 1;
+          return left.id - right.id;
+        },
+      }),
+    });
+    tree.$.rows.addMany([
+      { id: 2, value: 2 },
+      { id: 1, value: 1 },
+    ]);
     let selectedReads = 0;
     let renders = 0;
 
@@ -27,6 +42,7 @@ describe('useSignalTree', () => {
     render(<SelectedCount />);
     const initialRenders = renders;
     const initialReads = selectedReads;
+    collectionComparisons = 0;
 
     await act(async () => {
       tree.$.unrelated.set(1);
@@ -35,6 +51,7 @@ describe('useSignalTree', () => {
 
     expect(selectedReads).toBeGreaterThan(initialReads);
     expect(renders).toBe(initialRenders);
+    expect(collectionComparisons).toBe(0);
 
     await act(async () => {
       tree.$.count.set(2);

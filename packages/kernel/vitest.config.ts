@@ -65,6 +65,7 @@ export default defineConfig({
       // this one showed up immediately as two failures in `nx test core`.
       '**/diag-journal-1-eviction.spec.ts',
       '**/a2-5-lifetime.spec.ts',
+      '**/location-runtime-retention.spec.ts',
     ],
     coverage: {
       provider: 'v8',

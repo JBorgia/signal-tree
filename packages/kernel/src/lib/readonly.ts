@@ -1,7 +1,6 @@
 import type {
-  CarrierKind,
-  EntitySignalOf,
-  ISignalTreeOf,
+  EntitySignal,
+  ISignalTree,
   ReadonlyOf,
 } from './types';
 import type { ReadableCell } from './internals/cell-runtime';
@@ -74,9 +73,8 @@ export interface ReadonlyNodeAccessor<T> {
 }
 
 /**
- * Extra members deep-merged INTO a marker node by `.derived()` (e.g.
- * `.derived($ => ({ plants: { total: computed(…) } }))` where `plants` is a
- * loading `entityMap`). The marker dispatch rows re-sign the node to a
+ * Extra members deep-merged INTO a marker node by a configured `derived:`
+ * declaration. The marker dispatch rows re-sign the node to a
  * Pick-allowlist view, which on its own would silently swallow those
  * intersection extras (the readonly×merged-derived gap) — so every marker row
  * intersects its readonly marker view with the {@link ReadonlyView}-mapped
@@ -86,12 +84,12 @@ export interface ReadonlyNodeAccessor<T> {
  * contract. Resolves to `unknown` (identity under `&`) when there are no extras,
  * so marker-only nodes keep types exactly equal to their views.
  */
-type ReadonlyExtras<N, Base, C extends CarrierKind> = keyof Omit<
+type ReadonlyExtras<N, Base> = keyof Omit<
   N,
   keyof Base
 > extends never
   ? unknown
-  : ReadonlyViewOf<Omit<N, keyof Base>, C>;
+  : ReadonlyView<Omit<N, keyof Base>>;
 
 /**
  * The effective parameter tuple of a callable. For an overloaded
@@ -111,17 +109,15 @@ type EffectiveParameters<T> = T extends (...args: infer P) => unknown
  * `Signal` leaves, no write call signatures and no leaf `.set`/`.update`.
  * Mirrors `EntityNode`'s branch/array/leaf shape exactly.
  */
-type ReadonlyEntityNodeOf<E, C extends CarrierKind> = {
+type ReadonlyEntityNode<E> = {
   (): E;
 } & {
   readonly [P in keyof E]: E[P] extends object
     ? E[P] extends readonly unknown[]
-      ? ReadonlyOf<C, E[P]>
-      : ReadonlyEntityNodeOf<E[P], C>
-    : ReadonlyOf<C, E[P]>;
+      ? ReadonlyOf<E[P]>
+      : ReadonlyEntityNode<E[P]>
+    : ReadonlyOf<E[P]>;
 };
-
-export type ReadonlyEntityNode<E> = ReadonlyEntityNodeOf<E, 'cell'>;
 
 /**
  * Read-only view of {@link EntitySignal}: query surface only. `byId`/
@@ -129,15 +125,14 @@ export type ReadonlyEntityNode<E> = ReadonlyEntityNodeOf<E, 'cell'>;
  * surface returns a deep-writable `EntityNode`, which would leak the write
  * path through a "readonly" view (RFC 0004 §3 V-P2).
  */
-type ReadonlyEntitySignalOf<
+type ReadonlyEntitySignal<
   E,
-  K extends string | number,
-  C extends CarrierKind
-> = PickReaders<EntitySignalOf<E, K, C>, (typeof ENTITY_READERS)[number]> & {
+  K extends string | number
+> = PickReaders<EntitySignal<E, K>, (typeof ENTITY_READERS)[number]> & {
   /** Re-signed: same node at runtime, typed without write reachability. */
-  byId(id: K): ReadonlyEntityNodeOf<E, C> | undefined;
+  byId(id: K): ReadonlyEntityNode<E> | undefined;
   /** Re-signed: same node at runtime, typed without write reachability. */
-  byIdOrFail(id: K): ReadonlyEntityNodeOf<E, C>;
+  byIdOrFail(id: K): ReadonlyEntityNode<E>;
 };
 
 // =============================================================================
@@ -148,8 +143,8 @@ type ReadonlyEntitySignalOf<
  * Per-member dispatch for {@link ReadonlyView}.
  *
  * ORDER IS LOAD-BEARING — these surfaces structurally overlap:
- * - Every marker row intersects {@link ReadonlyExtras} so derived state
- *   deep-merged INTO the marker node (`.derived($ => ({ plants: { total } }))`)
+ * - Every marker row intersects {@link ReadonlyExtras} so configured derived
+ *   state deep-merged INTO the marker node
  *   survives the Pick-allowlist re-signing instead of being swallowed.
  * - Marker surfaces come first: every marker signal is callable and/or
  *   structurally satisfies `NodeAccessor` (a single `(): T` call signature
@@ -177,30 +172,29 @@ type ReadonlyEntitySignalOf<
  * is the maintained guard (RFC 0004 §3 V-P2). Add a row + fixture line for
  * every new marker.
  */
-type ReadonlyNodeView<T, C extends CarrierKind> = T extends EntitySignalOf<
+type ReadonlyNodeView<T> = T extends EntitySignal<
   infer E,
-  infer K extends string | number,
-  C
+  infer K extends string | number
 >
-  ? ReadonlyEntitySignalOf<E, K, C> &
-      ReadonlyExtras<T, EntitySignalOf<E, K, C>, C>
+  ? ReadonlyEntitySignal<E, K> &
+      ReadonlyExtras<T, EntitySignal<E, K>>
   : T extends WritableLeaf<infer V>
-  ? ReadonlyOf<C, V>
+  ? ReadonlyOf<V>
   : T extends NodeAccessor<infer U>
   ? EffectiveParameters<T> extends []
     ? T extends ReadableCell<infer V>
-      ? ReadonlyOf<C, V>
+      ? ReadonlyOf<V>
       : T
-    : ReadonlyNodeAccessor<U> & ReadonlyViewOf<T, C>
+    : ReadonlyNodeAccessor<U> & ReadonlyView<T>
   : // ⚠️ ORDER: `NodeAccessor` MUST be tested before `ReadableCell`.
   // The call-grammar check above keeps a foreign zero-argument reader from
   // being captured as a branch while preserving real accessors here.
   //
   //     REMOVING A NOMINAL BRAND MAKES STRUCTURAL ORDER LOAD-BEARING.
   T extends ReadableCell<infer V>
-  ? ReadonlyOf<C, V>
+  ? ReadonlyOf<V>
   : T extends object
-  ? ReadonlyViewOf<T, C>
+  ? ReadonlyView<T>
   : T;
 
 /**
@@ -214,12 +208,9 @@ type ReadonlyNodeView<T, C extends CarrierKind> = T extends EntitySignalOf<
  * - derived `Signal`s pass through; `linked()` `WritableSignal`s narrow to `Signal`
  * - marker surfaces → their `Readonly*` views (reader allowlists above)
  */
-export type ReadonlyViewOf<T, C extends CarrierKind> = {
-  readonly [K in keyof T]: ReadonlyNodeView<T[K], C>;
+export type ReadonlyView<T> = {
+  readonly [K in keyof T]: ReadonlyNodeView<T[K]>;
 };
-
-/** PUBLIC kernel spelling, bound to the neutral carrier. */
-export type ReadonlyView<T> = ReadonlyViewOf<T, 'cell'>;
 
 /**
  * The read-only store surface: read-only `$` plus the zero-arg snapshot read
@@ -236,19 +227,13 @@ export type ReadonlyView<T> = ReadonlyViewOf<T, 'cell'>;
  * @typeParam TSource - the raw source state type (snapshot shape)
  * @typeParam TAccum - the accumulated `$` type; defaults to `TreeNode<TSource>`
  */
-export interface ReadonlyStoreOf<TSource, TAccum, C extends CarrierKind> {
+export interface ReadonlyStore<TSource, TAccum = TreeNode<TSource>> {
   /** Root snapshot read — the write overloads are not offered. */
-  readonly $: ReadonlyNodeAccessor<TSource> & ReadonlyViewOf<TAccum, C>;
+  readonly $: ReadonlyNodeAccessor<TSource> & ReadonlyView<TAccum>;
   /** Whether this tree has been destroyed. */
-  readonly destroyed: ReadonlyOf<C, boolean>;
+  readonly destroyed: ReadonlyOf<boolean>;
   destroy(): void;
 }
-
-/** PUBLIC kernel spelling. `@signal-tree/angular` binds `'angular'`. */
-export type ReadonlyStore<
-  TSource,
-  TAccum = TreeNode<TSource>
-> = ReadonlyStoreOf<TSource, TAccum, 'cell'>;
 
 // =============================================================================
 // asReadonly()
@@ -265,8 +250,10 @@ export type ReadonlyStore<
  *
  * @example
  * ```ts
- * const tree = signalTree({ count: 0 })
- *   .derived(($) => ({ doubled: computed(() => $.count() * 2) }));
+ * const tree = signalTree(
+ *   { count: 0 },
+ *   { derived: ($) => ({ doubled: () => $.count() * 2 }) }
+ * );
  *
  * const reader = asReadonly(tree);
  * reader.$.count();        // ✅ read
@@ -280,9 +267,9 @@ export type ReadonlyStore<
  * being pinned to the kernel's `'cell'`. Pinned, an Angular consumer calling
  * `asReadonly(tree)` got a store whose leaves typed as `ReadableCell`.
  */
-export function asReadonly<TSource, TAccum, C extends CarrierKind = 'cell'>(
-  tree: ISignalTreeOf<TSource, C, TAccum>
-): ReadonlyStoreOf<TSource, TAccum, C>;
+export function asReadonly<TSource, TAccum>(
+  tree: ISignalTree<TSource, TAccum>
+): ReadonlyStore<TSource, TAccum>;
 export function asReadonly(tree: object): object {
   return tree;
 }

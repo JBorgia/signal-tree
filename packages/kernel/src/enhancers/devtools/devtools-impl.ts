@@ -1,7 +1,7 @@
 declare const ngDevMode: boolean | undefined;
 import type { ReadableCell } from '../../lib/internals/cell-runtime';
-import { NEUTRAL_CELL_RUNTIME } from '../../lib/internals/cell-runtime';
-import { getTreeRealization } from '../../lib/internals/tree-realization';
+import { NEUTRAL_LOCATION_RUNTIME } from '../../lib/internals/location-runtime';
+import { getLocationRuntime } from '../../lib/internals/location-runtime';
 import { rootAuthorityFor } from '../../lib/internals/root-source';
 
 import { applyState } from '../../lib/utils';
@@ -263,7 +263,9 @@ function createNoopLogger(): CompositionLogger {
 }
 
 function createModularMetrics(tree: object) {
-  const metricsSignal = (getTreeRealization(tree)?.cell ?? NEUTRAL_CELL_RUNTIME).createCell<ModularPerformanceMetrics>({
+  const metricsSignal = (
+    getLocationRuntime(tree) ?? NEUTRAL_LOCATION_RUNTIME
+  ).createCell<ModularPerformanceMetrics>({
     totalUpdates: 0,
     moduleUpdates: {},
     modulePerformance: {},

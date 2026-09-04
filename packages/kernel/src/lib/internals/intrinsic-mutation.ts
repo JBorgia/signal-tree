@@ -16,11 +16,17 @@ export function registerIntrinsicMutationSource(node: object): void {
 export function observeIntrinsicMutations<T>(
   node: object,
   observer: IntrinsicMutationObserver<T>
-): boolean {
+): (() => void) | undefined {
   const source = SOURCES.get(node);
-  if (!source) return false;
-  source.observer = observer as IntrinsicMutationObserver<unknown>;
-  return true;
+  if (!source) return undefined;
+  const installed = observer as IntrinsicMutationObserver<unknown>;
+  source.observer = installed;
+  let active = true;
+  return () => {
+    if (!active) return;
+    active = false;
+    if (source.observer === installed) source.observer = undefined;
+  };
 }
 
 export function getIntrinsicMutationObserver<T>(

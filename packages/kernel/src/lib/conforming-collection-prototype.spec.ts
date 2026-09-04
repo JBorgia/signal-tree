@@ -4,11 +4,11 @@ import { describe, expect, it } from 'vitest';
 import { createReactiveTestRealization } from '../reactive-test-realization';
 import { restoration } from '../enhancers/restoration/restoration';
 import type { ReadableCell } from './internals/cell-runtime';
-import { bindSignalTreeRealization } from './signal-tree';
+import { createSignalTreeFactory } from './signal-tree';
 
 const testRealization = createReactiveTestRealization();
-const signalTree = bindSignalTreeRealization(testRealization);
-const computed = testRealization.derived.createDerived;
+const signalTree = createSignalTreeFactory(testRealization);
+const computed = testRealization.locations.createDerived;
 
 /**
  * THE CONFORMING-COLLECTION PROTOTYPE — the uncontaminated experiment.

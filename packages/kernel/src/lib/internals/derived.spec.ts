@@ -1,15 +1,30 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createReactiveTestRealization } from '../../reactive-test-realization';
 import { batching } from '../../enhancers/batching/batching';
 import { devTools } from '../../enhancers/devtools/devtools';
 import { signalTree } from '../signal-tree';
 
-const computed = createReactiveTestRealization().derived.createDerived;
 import { entityMap } from '../types';
 
 describe('derived() marker pattern', () => {
   describe('basic derived state', () => {
+    it('warns when a derived location overwrites source state in development', () => {
+      const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      try {
+        const tree = signalTree(
+          { count: 1 },
+          { derived: () => ({ count: () => 2 }) }
+        );
+
+        expect(tree.$.count()).toBe(2);
+        expect(warning).toHaveBeenCalledWith(
+          expect.stringContaining('Derived location "count" overwrites source state')
+        );
+      } finally {
+        warning.mockRestore();
+      }
+    });
+
     it('should create derived computed signals from source state', () => {
       interface CounterState {
         count: number;
@@ -273,7 +288,7 @@ describe('derived() marker pattern', () => {
         { name: 'test' },
         {
           derived: ($) => ({
-            upper: computed(() => $.name().toUpperCase()),
+            upper: () => $.name().toUpperCase(),
           }),
         }
       );
@@ -292,7 +307,7 @@ describe('derived() marker pattern', () => {
         { count: 0 },
         {
           enhancers: [batching()],
-          derived: ($) => ({ doubled: computed(() => $.count() * 2) }),
+          derived: ($) => ({ doubled: () => $.count() * 2 }),
         }
       );
 
@@ -303,22 +318,20 @@ describe('derived() marker pattern', () => {
     });
   });
 
-  describe('mixed derived and computed', () => {
-    it('should work alongside regular computed signals', () => {
+  describe('multiple derived recipes', () => {
+    it('realizes each recipe as a readonly location', () => {
       const tree = signalTree(
         { value: 10 },
         {
           derived: ($) => ({
-            // derived() marker
-            markerDerived: computed(() => $.value() + 1),
-            // Regular computed (should also work)
-            regularComputed: computed(() => $.value() + 2),
+            plusOne: () => $.value() + 1,
+            plusTwo: () => $.value() + 2,
           }),
         }
       );
 
-      expect(tree.$.markerDerived()).toBe(11);
-      expect(tree.$.regularComputed()).toBe(12);
+      expect(tree.$.plusOne()).toBe(11);
+      expect(tree.$.plusTwo()).toBe(12);
     });
   });
 
@@ -328,8 +341,8 @@ describe('derived() marker pattern', () => {
         { base: 2 },
         {
           derived: ($) => {
-            const doubled = computed(() => $.base() * 2);
-            return { doubled, quadrupled: computed(() => doubled() * 2) };
+            const doubled = () => $.base() * 2;
+            return { doubled, quadrupled: () => doubled() * 2 };
           },
         }
       );
@@ -344,10 +357,10 @@ describe('derived() marker pattern', () => {
         {
           derived: ($) => ({
             stats: {
-              count: computed(() => $.items().length),
-              sum: computed(() =>
+              count: () => $.items().length,
+              sum: () =>
                 $.items().reduce((a: number, b: number) => a + b, 0)
-              ),
+              ,
             },
           }),
         }
@@ -865,7 +878,7 @@ describe('derived() marker pattern', () => {
           devTools({ enabled: false }) as never,
           probe as never,
         ],
-        derived: ($) => ({ doubled: computed(() => $.count() * 2) }),
+        derived: ($) => ({ doubled: () => $.count() * 2 }),
       }
     );
 
@@ -897,7 +910,7 @@ describe('derived() marker pattern', () => {
             { count: i },
             {
               derived: ($) => ({
-                doubled: computed(() => $.count() * 2),
+                doubled: () => $.count() * 2,
               }),
             }
           );
@@ -940,10 +953,10 @@ describe('derived() marker pattern', () => {
           },
           {
             derived: ($) => ({
-              doubledRelated: computed(() => {
+              doubledRelated: () => {
                 derivedCallCount++;
                 return $.relatedValue() * 2;
-              }),
+              },
             }),
           }
         );
@@ -975,7 +988,7 @@ describe('derived() marker pattern', () => {
           >;
           for (let d = 0; d < chainDepth; d++) {
             derived.push(($) => ({
-              [`level${d}`]: computed(() => $['base']() + d),
+              [`level${d}`]: () => $['base']() + d,
             }));
           }
           const builder = signalTree({ base: i }, { derived } as never);

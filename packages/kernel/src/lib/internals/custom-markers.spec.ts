@@ -10,8 +10,8 @@ import {
 } from './materialize-markers';
 
 const testRealization = createReactiveTestRealization();
-const computed = testRealization.derived.createDerived;
-const signal = testRealization.cell.createCell;
+const computed = testRealization.locations.createDerived;
+const signal = testRealization.locations.createCell;
 
 /**
  * Custom Marker Registration Tests

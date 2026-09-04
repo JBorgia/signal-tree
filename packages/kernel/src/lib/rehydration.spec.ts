@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { createReactiveTestRealization } from '../reactive-test-realization';
 import { entityMap } from './types';
 import { signalTree } from './signal-tree';
-
-const computed = createReactiveTestRealization().derived.createDerived;
 import { applyState, unwrap } from './utils';
 
 /**
@@ -30,7 +27,7 @@ describe('snapshots carry state, not derived views', () => {
       { a: 2, b: 3 },
       {
         derived: ($) => ({
-          sum: computed(() => $.a() + $.b()),
+          sum: () => $.a() + $.b(),
         }),
       }
     );
@@ -42,7 +39,7 @@ describe('snapshots carry state, not derived views', () => {
       { a: 2, b: 3 },
       {
         derived: ($) => ({
-          sum: computed(() => $.a() + $.b()),
+          sum: () => $.a() + $.b(),
         }),
       }
     );
@@ -52,7 +49,7 @@ describe('snapshots carry state, not derived views', () => {
       { a: 0, b: 0 },
       {
         derived: ($) => ({
-          sum: computed(() => $.a() + $.b()),
+          sum: () => $.a() + $.b(),
         }),
       }
     );

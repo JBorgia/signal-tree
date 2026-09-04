@@ -2,7 +2,7 @@
 // observing a kernel law through Angular computed made these assertions
 // carrier-dependent. Angular REALIZATION assertions live in
 // `entity-signal-angular-realization.spec.ts`.
-import { NEUTRAL_DERIVED_RUNTIME } from './internals/derived-runtime';
+import { NEUTRAL_LOCATION_RUNTIME } from './internals/location-runtime';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createEntitySignal, planEntitySubjectReclamation } from './entity-signal';
@@ -400,11 +400,11 @@ describe('entity subject physical inventory', () => {
 
     let rowRuns = 0;
     let nameRuns = 0;
-    const observedRow = NEUTRAL_DERIVED_RUNTIME.createDerived(() => {
+    const observedRow = NEUTRAL_LOCATION_RUNTIME.createDerived(() => {
       rowRuns++;
       return heldRow()?.name ?? 'absent';
     });
-    const observedName = NEUTRAL_DERIVED_RUNTIME.createDerived(() => {
+    const observedName = NEUTRAL_LOCATION_RUNTIME.createDerived(() => {
       nameRuns++;
       return heldName() ?? 'absent';
     });
@@ -470,7 +470,7 @@ describe('entity subject physical inventory', () => {
     }
 
     let nameRuns = 0;
-    const observedName = NEUTRAL_DERIVED_RUNTIME.createDerived(() => {
+    const observedName = NEUTRAL_LOCATION_RUNTIME.createDerived(() => {
       nameRuns++;
       return heldName() ?? 'absent';
     });

@@ -6,7 +6,7 @@
 
 **Engineering whitepaper - RC1 cut: August 30, 2026**
 
-**Document status:** RC1 engineering whitepaper. The v15 public API and construction/access surface are frozen. Candidate source `4020b7dd` has one constructor (`signalTree(initialState, config?)`), one recursive `$` facade, and one singular `config.derived` factory. The public package graph is `@signal-tree/kernel`, `@signal-tree/angular`, and `@signal-tree/react`; kernel-only utilities now live under kernel internals rather than a private workspace package. The complete release matrix is green; later sections retain the chronology of hypotheses that were subsequently retired or moved across the package boundary.
+**Document status:** RC1 engineering whitepaper. The v15 public API and construction/access surface are frozen. Candidate source `4020b7dd` has one constructor (`signalTree(initialState, config?)`), one recursive `$` facade, and one singular `config.derived` factory. The public package graph is `@signal-tree/kernel`, `@signal-tree/angular`, `@signal-tree/react`, and `@signal-tree/vue`; kernel-only utilities now live under kernel internals rather than a private workspace package. The complete release matrix is green; later sections retain the chronology of hypotheses that were subsequently retired or moved across the package boundary.
 
 > This paper is reconstructed from the v15 engineering record: code audits, commit history, decision documents, benchmark outputs, falsification probes, type-contract tests, GC tests, and the latest lifecycle discriminator. The separately supplied `Signaltree15.pdf` was explicitly excluded as a source.
 
@@ -1820,7 +1820,7 @@ This is more than syntax. A production tree with no time travel now gets a truth
 
 ## 25.3 Derived state
 
-Chained `.derived()` remains supported under its existing finalization rules. When configuration is already being supplied, derived state can also be declared in config so the full construction shape is visible together. Enhancers are applied before derived realization.
+Fluent `.derived()` is not part of the v15 surface. Declare derived state through `config.derived` so the full construction shape is visible together. Enhancers are applied before derived realization.
 
 ## 25.4 Late enhancer attachment is intentionally impossible
 
@@ -2113,9 +2113,9 @@ The v15 lesson is to characterize the missing semantic capability before choosin
 
 ## 31.3 Framework-neutral extraction
 
-The physical/causal separation makes a future framework-neutral kernel plausible. That does not require publishing a new kernel package in v15. Internal architectural separability and public package separability are different commitments.
+The physical/causal separation supports the published framework-neutral kernel. Internal architectural separability and public package separability remain different commitments.
 
-If future product demand justifies React/Vue/vanilla adapters, v15's ownership rule - truth separated from Angular observation - reduces the amount of redesign required.
+The React and Vue facades demonstrate v15's ownership rule: kernel truth remains separate from framework observation.
 
 ## 31.4 History ownership unification or adapters
 

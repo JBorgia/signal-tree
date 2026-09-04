@@ -24,11 +24,19 @@ import ts from 'typescript';
 export const stripComments = (s) =>
   s.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
 
-export const detectPublicValueExports = (src) =>
-  [...stripComments(src).matchAll(/^export \{\s*([^}]+?)\s*\} from/gms)]
+export const detectPublicValueExports = (src) => {
+  const clean = stripComments(src);
+  const fromClauses = [...clean.matchAll(/^export \{\s*([^}]+?)\s*\} from/gms)]
     .flatMap((m) => m[1].split(',').map((s) => s.trim()))
     .filter((s) => s && !s.startsWith('type '))
     .map((s) => s.split(/\s+as\s+/).pop().trim());
+  const directDeclarations = [
+    ...clean.matchAll(
+      /^export\s+(?:async\s+)?(?:function|class|const|let|var)\s+([A-Za-z_$][\w$]*)/gm
+    ),
+  ].map((match) => match[1]);
+  return [...fromClauses, ...directDeclarations];
+};
 
 /**
  * ⚠️ TWO SPELLINGS, NOT ONE. A public type reaches the barrel either as a whole
@@ -295,10 +303,11 @@ export const detectMarkerFactoryPaths = (paths) => paths.filter((p) => p.include
 export const FAMILIES = [
   {
     family: 'publicValueExport',
-    mutate: { find: String.raw`^export \{\s*([^}]+?)\s*\} from`, replace: String.raw`^export \{ NEVERMATCH \} from` },
+    mutate: { find: 'return [...fromClauses, ...directDeclarations];', replace: 'return [];' },
     positives: [
       ['plain', () => detectPublicValueExports(FIXTURE.barrel), 'plantedValue'],
       ['aliased', () => detectPublicValueExports(FIXTURE.barrel), 'plantedAlias'],
+      ['direct function', () => detectPublicValueExports(FIXTURE.module), 'publishPlanted'],
     ],
     negatives: [
       ['line-commented export', () => detectPublicValueExports(FIXTURE.barrel), 'notAnExport'],

@@ -5,10 +5,7 @@
  *
  * MOVED from the kernel by GREENFIELD-V15-SURFACE-0.
  *
- * These rows assert that readonly views narrow to Angular `Signal`s, and they
- * construct their inputs with Angular `linkedSignal`/`computed`. Both are
- * Angular facts: the kernel's readonly view is carrier-NEUTRAL and narrows to
- * `ReadableCell`. The assertions are true here, where the carrier is bound.
+ * These rows assert that readonly views expose universal readonly locations.
  */
 /**
  * TYPE-TEST HARNESS — compile-time only (see marker-resolution.typing.spec.ts
@@ -23,30 +20,26 @@
  * marker, mirroring marker-resolution.typing.spec.ts.
  *
  * Asserts, over `asReadonly(tree)`:
- *  (a) derived computeds SURVIVE readonly exposure (RFC 0004 F1) and
- *      `linkedSignal()` WritableSignals narrow to `Signal`;
+ *  (a) derived locations SURVIVE readonly exposure (RFC 0004 F1);
  *  (b) leaf `.set`/`.update` and branch write call signatures are not
  *      reachable;
  *  (c) entity mutators (`upsertOne`, …) and loader triggers (`load`,
  *      `refresh`, `invalidate`) are not reachable; `byId` is re-signed to a
  *      read-only entity node;
  *  (e) marker reader members remain readable, with
- *      `WritableSignal` readers (e.g. `status.state`) demoted to plain
- *      `Signal`s.
+ *      writable readers demoted to readonly locations.
  * ((d) — plain-object factory with `expose: 'readonly'` is a compile error —
  * lives in define-store.typing.spec.ts next to the overloads it gates.)
  */
-import {
-  linkedSignal,
-  computed,
-  type Signal,
-  type WritableSignal,
-} from '@angular/core';
-
 import { entityMap, signalTree } from '../index';
 import type {} from '../index';
 import { asReadonly } from '../index';
-import type { SignalTree, NodeAccessor } from '../index';
+import type {
+  Location,
+  NodeAccessor,
+  ReadonlyLocation,
+  SignalTree,
+} from '../index';
 
 // --- compile-time assertion helpers -----------------------------------------
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
@@ -77,10 +70,10 @@ const tree = signalTree(
   },
   {
     derived: ($) => ({
-      doubled: computed(() => $.count() * 2),
-      draft: linkedSignal(() => $.count()),
-      group: { total: computed(() => $.count() + 1) },
-      plants: { total: computed(() => $.plants.count()) },
+      doubled: () => $.count() * 2,
+      draft: () => $.count(),
+      group: { total: () => $.count() + 1 },
+      plants: { total: () => $.plants.count() },
     }),
   }
 );
@@ -97,8 +90,8 @@ type ROPlants = RO$['plants'];
 type ROEntityNode = NonNullable<ReturnType<ROUsers['byId']>>;
 
 export type _ReadonlyCallGrammarControls = [
-  Expect<Equal<EffectiveParameters<Signal<number>>, []>>,
-  Expect<Equal<EffectiveParameters<WritableSignal<number>>, []>>,
+  Expect<Equal<EffectiveParameters<ReadonlyLocation<number>>, []>>,
+  Expect<Equal<EffectiveParameters<Location<number>>, []>>,
   Expect<
     Equal<
       EffectiveParameters<typeof realAccessor> extends [] ? true : false,
@@ -115,17 +108,17 @@ export type _ReadonlyCallGrammarControls = [
 
 export type _ReadonlyViewChecks = [
   // ---------------------------------------------------------------------------
-  // (a) derived layers survive; a WritableSignal narrows
+  // (a) derived layers survive as readonly locations
   // ---------------------------------------------------------------------------
-  Expect<Equal<RO$['doubled'], Signal<number>>>,
-  Expect<Equal<RO$['draft'], Signal<number>>>, // WritableSignal → Signal
-  Expect<Equal<RO$['group']['total'], Signal<number>>>, // derived-only group recurses
+  Expect<Equal<RO$['doubled'], ReadonlyLocation<number>>>,
+  Expect<Equal<RO$['draft'], ReadonlyLocation<number>>>,
+  Expect<Equal<RO$['group']['total'], ReadonlyLocation<number>>>,
 
   // ---------------------------------------------------------------------------
   // (b) leaves and branches: reads only
   // ---------------------------------------------------------------------------
-  Expect<Equal<RO$['count'], Signal<number>>>,
-  Expect<Equal<RO$['selectedId'], Signal<number | null>>>,
+  Expect<Equal<RO$['count'], ReadonlyLocation<number>>>,
+  Expect<Equal<RO$['selectedId'], ReadonlyLocation<number | null>>>,
   Expect<NotOffered<RO$['count'], 'set'>>,
   Expect<NotOffered<RO$['count'], 'update'>>,
   // Branch accessor keeps only the zero-arg read call signature…
@@ -134,8 +127,8 @@ export type _ReadonlyViewChecks = [
     Equal<ReturnType<RO$['branch']>, { leaf: string; deep: { n: number } }>
   >,
   // …and its children recurse into the readonly view.
-  Expect<Equal<RO$['branch']['leaf'], Signal<string>>>,
-  Expect<Equal<RO$['branch']['deep']['n'], Signal<number>>>,
+  Expect<Equal<RO$['branch']['leaf'], ReadonlyLocation<string>>>,
+  Expect<Equal<RO$['branch']['deep']['n'], ReadonlyLocation<number>>>,
   // Root snapshot read stays on `$`; write overloads are gone.
   Expect<Equal<Parameters<RO$>, []>>,
   // No write-adjacent tree API on the readonly store.
@@ -143,13 +136,13 @@ export type _ReadonlyViewChecks = [
   Expect<NotOffered<RO, 'bind'>>,
   Expect<NotOffered<RO, 'updateAndReport'>>,
   Expect<NotOffered<RO, 'registerCleanup'>>,
-  Expect<Equal<RO['destroyed'], Signal<boolean>>>,
+  Expect<Equal<RO['destroyed'], ReadonlyLocation<boolean>>>,
 
   // ---------------------------------------------------------------------------
   // (c) entityMap: queries readable, mutators not offered, byId re-signed
   // ---------------------------------------------------------------------------
-  Expect<Equal<ROUsers['all'], Signal<User[]>>>,
-  Expect<Equal<ROUsers['empty'], Signal<boolean>>>,
+  Expect<Equal<ROUsers['all'], ReadonlyLocation<User[]>>>,
+  Expect<Equal<ROUsers['empty'], ReadonlyLocation<boolean>>>,
   Expect<NotOffered<ROUsers, 'addOne'>>,
   Expect<NotOffered<ROUsers, 'upsertOne'>>,
   Expect<NotOffered<ROUsers, 'updateWhere'>>,
@@ -163,19 +156,19 @@ export type _ReadonlyViewChecks = [
   // name in GREENFIELD-V15-SURFACE-0, but the BEHAVIOUR it guarded — a readonly
   // entity node offers reads and not writes — is still public, so the row was
   // rewritten rather than dropped.
-  Expect<Equal<ROEntityNode['name'], Signal<string>>>,
+  Expect<Equal<ROEntityNode['name'], ReadonlyLocation<string>>>,
   Expect<NotOffered<ROEntityNode['name'], 'set'>>,
-  Expect<Equal<ROEntityNode['name'], Signal<string>>>,
-  Expect<Equal<ROEntityNode['tags'], Signal<string[]>>>, // arrays stay atomic
-  Expect<Equal<ROEntityNode['address']['city'], Signal<string>>>,
+  Expect<Equal<ROEntityNode['name'], ReadonlyLocation<string>>>,
+  Expect<Equal<ROEntityNode['tags'], ReadonlyLocation<string[]>>>,
+  Expect<Equal<ROEntityNode['address']['city'], ReadonlyLocation<string>>>,
   Expect<Equal<Parameters<ROEntityNode>, []>>, // write call overloads gone
   Expect<NotOffered<ROEntityNode['name'], 'set'>>,
 
   // derived merged INTO a marker node survives the readonly view
-  // (readonly×merged-derived gap, M3): the extra key is kept as a Signal…
-  Expect<Equal<ROPlants['total'], Signal<number>>>,
+  // (readonly×merged-derived gap, M3): the extra key is kept as a location…
+  Expect<Equal<ROPlants['total'], ReadonlyLocation<number>>>,
   // …the marker's own readers remain readable…
-  Expect<Equal<ROPlants['all'], Signal<User[]>>>,
+  Expect<Equal<ROPlants['all'], ReadonlyLocation<User[]>>>,
   // …and the mutators/triggers are still not offered.
   Expect<NotOffered<ROPlants, 'upsertOne'>>,
   Expect<NotOffered<ROPlants, 'setAll'>>
@@ -213,7 +206,7 @@ export type _ReadonlyViewChecks = [
 declare const minimal: SignalTree<{ n: number }>;
 const roMinimal = asReadonly(minimal);
 export type _ReadonlyMinimalChecks = [
-  Expect<Equal<(typeof roMinimal)['$']['n'], Signal<number>>>,
+  Expect<Equal<(typeof roMinimal)['$']['n'], ReadonlyLocation<number>>>,
   Expect<NotOffered<(typeof roMinimal)['$']['n'], 'set'>>
 ];
 
@@ -236,10 +229,10 @@ type ROStock = (typeof roSlice)['$']['stock'];
 
 export type _ReadonlySliceChecks = [
   // 1. slices are present and correctly typed through the readonly view
-  Expect<Equal<ROStock['names'], Signal<string[]>>>,
-  Expect<Equal<ROStock['total'], Signal<number>>>,
+  Expect<Equal<ROStock['names'], ReadonlyLocation<string[]>>>,
+  Expect<Equal<ROStock['total'], ReadonlyLocation<number>>>,
   // the ordinary read surface still comes through
-  Expect<Equal<ROStock['all'], Signal<User[]>>>,
+  Expect<Equal<ROStock['all'], ReadonlyLocation<User[]>>>,
   // 2. writes remain unreachable — the slice did not defeat the narrowing
   Expect<NotOffered<ROStock, 'addOne'>>,
   Expect<NotOffered<ROStock, 'upsertOne'>>,

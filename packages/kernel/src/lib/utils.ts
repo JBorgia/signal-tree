@@ -2,8 +2,6 @@
 // the split rebinds them per package. No Angular VALUE remains in kernel utils.
 import type { ReadableCell } from './internals/cell-runtime';
 import { isTreeCell, markTreeCell } from './internals/cell-identity';
-import { NEUTRAL_MATERIALIZATION_REALIZATION } from './internals/materialization-realization';
-import { getTreeRealization } from './internals/tree-realization';
 import {
   bindSnapshotParent,
   isSnapshotNode,
@@ -26,14 +24,7 @@ import {
  * reactive" — the conflation that `isAnySignal` died of. Local to this file
  * because these walkers are its only users.
  */
-function isReactiveStateValue(value: unknown, owner: unknown = value): boolean {
-  if (isTreeCell(value)) return true;
-  if (typeof value !== 'function') return false;
-  return (
-    getTreeRealization(owner)?.materialization.isReactiveNode(value) ??
-    NEUTRAL_MATERIALIZATION_REALIZATION.isReactiveNode(value)
-  );
-}
+const isReactiveStateValue = isTreeCell;
 import { deepEqual } from './internals/utilities/deep-equal';
 import { isBuiltInObject } from './internals/utilities/is-built-in-object';
 import { dormantKeys, hasDormantMembers } from './internals/member-membership';
@@ -203,9 +194,9 @@ function isMemoisable(node: object): boolean {
  * The previous mechanism deleted the memo from its WeakMap. That changes what a
  * FUTURE caller receives and does nothing to a consumer already depending on the
  * old computed. Measured on a plain static tree: after `box({keep})` omitted
- * `drop`, a held `getDerivedRuntime().createDerived(() => box())` still reported `{keep, drop}` while
- * `drop()` correctly returned `undefined` — two observable answers to whether
- * `drop` exists.
+ * `drop`, a held readonly location derived from `box()` still reported
+ * `{keep, drop}` while `drop()` correctly returned `undefined` — two observable
+ * answers to whether `drop` exists.
  *
  * ⚠️ ALLOCATED AT FIRST MATERIALIZATION, NOT AT FIRST TRANSITION. Allocating on
  * the first membership change cannot work: a consumer established earlier never

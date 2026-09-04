@@ -49,9 +49,14 @@ const findForbiddenPublicGuidance = (text, file) =>
     (phrase) => ({ file, phrase })
   );
 
-// Count JSDoc block openers. Line comments are deliberately not counted:
-// declarations carry doc blocks, not `//` notes.
-const countJsdoc = (text) => (text.match(/\/\*\*/g) ?? []).length;
+// Count normalized UNIQUE JSDoc blocks. The kernel has two public declaration
+// entrypoints, and a type re-exported by both must not count as two documented
+// contracts. Line comments are deliberately excluded: declarations carry doc
+// blocks, not `//` notes.
+const extractJsdocBlocks = (text) => {
+  const blocks = text.match(/\/\*\*[\s\S]*?\*\//g) ?? [];
+  return blocks.map((block) => block.replace(/\s+/g, ' ').trim());
+};
 
 const collect = async (pattern) => {
   const out = [];
@@ -65,22 +70,24 @@ async function measure(pkg) {
     ...(await collect(`dist/packages/${pkg}/src/**/*.d.ts`)),
     ...(await collect(`dist/packages/${pkg}/dist/**/*.d.ts`)),
   ];
-  let srcDocs = 0;
+  const srcBlocks = new Set();
   for (const f of srcFiles) {
     if (f.endsWith('.spec.ts')) continue;
-    srcDocs += countJsdoc(await readFile(f, 'utf8'));
+    for (const block of extractJsdocBlocks(await readFile(f, 'utf8'))) {
+      srcBlocks.add(block);
+    }
   }
-  let dtsDocs = 0;
+  const dtsBlocks = new Set();
   const staleGuidance = [];
   for (const f of dtsFiles) {
     const text = await readFile(f, 'utf8');
-    dtsDocs += countJsdoc(text);
+    for (const block of extractJsdocBlocks(text)) dtsBlocks.add(block);
     staleGuidance.push(...findForbiddenPublicGuidance(text, f));
   }
   return {
     pkg,
-    srcDocs,
-    dtsDocs,
+    srcDocs: srcBlocks.size,
+    dtsDocs: dtsBlocks.size,
     dtsFiles: dtsFiles.length,
     staleGuidance,
   };
@@ -109,7 +116,7 @@ for (const pkg of PACKAGES) {
 //     that way: the first version of this gate reported BLIND.
 const FLOOR = 0.5;
 const BUNDLED_DOC_BASELINE = {
-  kernel: 243,
+  kernel: 157,
 };
 
 const retainedDocumentationRatio = (srcDocs, dtsDocs) =>
@@ -180,7 +187,7 @@ if (SELF_TEST) {
 // --- the real check --------------------------------------------------------
 const documentationFailures = [];
 const guidanceFailures = [];
-console.log('package      src JSDoc   shipped .d.ts JSDoc   retained   files');
+console.log('package      unique src   unique shipped .d.ts   retained   files');
 console.log('─'.repeat(64));
 for (const r of rows) {
   r.ratio = retainedDocumentationRatio(r.srcDocs, r.dtsDocs);

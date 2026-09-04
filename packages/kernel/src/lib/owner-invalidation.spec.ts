@@ -5,6 +5,10 @@ import { transactions } from '../enhancers/transactions/transactions';
 import { restoration } from '../enhancers/restoration/restoration';
 import { batching } from '../enhancers/batching/batching';
 import { entityMap } from './markers/entity-map';
+import {
+  openCommitScope,
+  settleCommitScope,
+} from './internals/commit-consequence';
 import { ownerInvalidationStateForTesting } from './internals/owner-invalidation';
 import { observationStateForTesting } from './internals/observation-substrate';
 import { signalTree } from './signal-tree';
@@ -309,6 +313,27 @@ describe('OWNER INVALIDATION LAW', () => {
     pending.rollback();
     await flush();
     expect(seen).toEqual([0]);
+
+    cleanup();
+    tree.destroy();
+  });
+
+  it('does not reschedule owner invalidation through a newly opened commit scope', async () => {
+    const tree = signalTree({ value: 0 });
+    const callback = vi.fn();
+    const cleanup = observeOwnerInvalidation(tree, callback);
+    const owner = {};
+
+    tree.$.value.set(1);
+    openCommitScope(owner, 1, tree.$);
+    tree.$.value.set(2);
+    await flush();
+
+    expect(callback).not.toHaveBeenCalled();
+
+    settleCommitScope(owner, 1, 'commit');
+    await flush();
+    expect(callback).toHaveBeenCalledTimes(1);
 
     cleanup();
     tree.destroy();

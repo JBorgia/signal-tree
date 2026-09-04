@@ -19,24 +19,25 @@ while the packages shipped 13.x. Don't reintroduce it; link the changelog instea
 - Recursive typing with deep nesting and accurate type inference
 - Generated exact-leaf inference proofs for every selectable demo depth from 1 through 40
 - Memory efficiency via proportional causal history and explicit ownership lifetimes
-- Three focused packages with strong TypeScript support
+- Four focused packages with strong TypeScript support
 - Extensible via the declared `enhancers` set
 
 ## Core capabilities
 
-- Hierarchical signal trees with type-safe access and updates
-- Framework-neutral causal semantics realized by Angular and React packages
+- Hierarchical location trees with type-safe access and updates
+- Framework-neutral causal semantics observed by Angular, React, and Vue packages
 - Deterministic resource release through `destroy()`
 - Tree-shakeable: unused enhancers are eliminated by modern bundlers
 
 ## Package ecosystem
 
-SignalTree 15 has three public packages:
+SignalTree 15 has four public packages:
 
 - **`@signal-tree/kernel`**: framework-neutral state, EntityMap, links,
   restoration, batching, transactions, and DevTools
-- **`@signal-tree/angular`**: Angular-native realization and `defineStore`
+- **`@signal-tree/angular`**: Angular observation, `defineStore`, and native-signal bridging
 - **`@signal-tree/react`**: owner-bound React observation
+- **`@signal-tree/vue`**: direct Vue dependency observation
 
 ## Technical specifications
 
@@ -44,8 +45,8 @@ SignalTree 15 has three public packages:
 - Browser: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
 - Tree-shakeable, own code only, gzip (measured by
   `tools/check-bundle-budget.mjs`, esbuild + minify, Angular/RxJS external).
-  Production budgets are 9.7 KB for a bare tree and 21.7 KB with EntityMap;
-  development budgets are 11.9 KB and 24.4 KB. The generator reports current
+  Production budgets are 9.8 KB for a bare tree and 21.7 KB with EntityMap;
+  development budgets are 12.0 KB and 24.4 KB. The generator reports current
   measured values and enforces both ceilings; see
   [dropping dev code](performance/dropping-dev-code.md).
 - Performance targets: operations maintain sub‑millisecond times across common depths

@@ -2,7 +2,7 @@
   <img src="apps/demo/public/signaltree-mark-192.png" alt="SignalTree ST leaf mark" width="120" height="120" />
   <h1>SignalTree</h1>
   <p><strong>Framework-neutral causal application state</strong></p>
-  <p>State as shape. Consequential transitions. Signals at every path.</p>
+  <p>State as shape. Consequential transitions. Locations at every path.</p>
 
   <p>
     <a href="https://jborgia.github.io/signaltree/" target="_blank"><strong>Live Demo</strong></a>
@@ -17,7 +17,7 @@
 
 ## SignalTree is not @ngrx/signals
 
-**Different library, different author, different package** — the `@signal-tree/*` scope (hyphenated; not under `@ngrx/`). Angular apps install [`@signal-tree/angular`](packages/angular/README.md); React apps install [`@signal-tree/react`](packages/react/README.md); framework-neutral libraries use [`@signal-tree/kernel`](packages/kernel/README.md). A framework package is the complete application facade: import SignalTree APIs through it rather than mixing framework and kernel imports. It's a typed reactive store where **your state literal is the API**: no `withState` / `withMethods` / `withComputed` wrappers, no actions, no reducers. You read and write any path directly — `tree.$.user.name()` to read, `tree.$.user.name.set(v)` to write — at any depth. If a doc or AI agent conflated this with NgRx SignalStore, that's the confusion to drop first; see [SignalTree vs NgRx SignalStore](docs/compare/ngrx-signalstore.md).
+**Different library, different author, different package** — the `@signal-tree/*` scope (hyphenated; not under `@ngrx/`). Angular apps install [`@signal-tree/angular`](packages/angular/README.md); React apps install [`@signal-tree/react`](packages/react/README.md); Vue apps install [`@signal-tree/vue`](packages/vue/README.md); framework-neutral libraries use [`@signal-tree/kernel`](packages/kernel/README.md). A framework package is the complete application facade: import SignalTree APIs through it rather than mixing framework and kernel imports. It's a typed reactive store where **your state literal is the API**: no `withState` / `withMethods` / `withComputed` wrappers, no actions, no reducers. You read and write any path directly — `tree.$.user.name()` to read, `tree.$.user.name.set(v)` to write — at any depth. If a doc or AI agent conflated this with NgRx SignalStore, that's the confusion to drop first; see [SignalTree vs NgRx SignalStore](docs/compare/ngrx-signalstore.md).
 
 > **On `@signaltree/*` (no hyphen)?** That is the pre-15 line and it stops at
 > 14.1.1. See [Migration `@signaltree/*` → `@signal-tree/*` (v15)](docs/guides/migration-v14-v15.md).
@@ -35,7 +35,7 @@ The capabilities applications opt into remain composable:
 
 - **`entityMap()`** → normalized collections with O(1) lookups and reactive CRUD
 - **`updateAndReport()`** → a changed-paths report for partial server-payload sync, audit trails, and targeted persistence
-- **`derived`** → one computed-state factory deep-merged at any path
+- **`derived`** → one recipe factory, memoized as readonly locations at any path
 - **`restoration()`** → optional undo/redo over explicitly designated authored turns
 
 ### Use SignalTree if you need
@@ -54,7 +54,7 @@ without overwriting newer external truth. Most applications need not enable it.
 
 For anything beyond a prototype, wrap the tree in a service and expose **`$` reads + Ops methods**: declare computed state in `signalTree(..., { derived })` and use `@Injectable` Ops services for writes and async. See [Recommended Architecture](docs/architecture/signaltree-architecture-guide.md#recommended-architecture-tldr).
 
-For components that should only ever read the store, `asReadonly(tree)` narrows the tree to a `ReadonlyStore` — read-only `$` over the tree's full accumulated type (leaf `Signal` reads, configured derived computeds preserved, `linkedSignal()` narrowed to `Signal`) plus `destroy()`/`destroyed`. Marker surfaces are genuinely narrowed to per-marker reader allowlists: entity mutators (`upsertOne`, `removeWhere`, …) are not offered on the readonly type, and `byId()` is re-signed to a read-only entity node (deep `Signal` leaves, no `.set`). `defineStore(factory, { expose: 'readonly' })` is sugar over the same view for injected stores. This is a compile-time narrowing only — the same runtime object, no runtime guard — so it stops the type system from _offering_ a write, not a determined `as any`; pair it with a separate Ops service for the write path.
+For components that should only ever read the store, `asReadonly(tree)` narrows the tree to a `ReadonlyStore` — read-only `$` over the tree's full accumulated type, including configured derived locations, plus `destroy()`/`destroyed`. Marker surfaces are genuinely narrowed to per-marker reader allowlists: entity mutators (`upsertOne`, `removeWhere`, …) are not offered on the readonly type, and `byId()` is re-signed to a read-only entity node (deep `ReadonlyLocation` leaves, no `.set`). `defineStore(factory, { expose: 'readonly' })` is sugar over the same view for injected stores. This is a compile-time narrowing only — the same runtime object, no runtime guard — so it stops the type system from _offering_ a write, not a determined `as any`; pair it with a separate Ops service for the write path.
 
 ## When to Use SignalTree
 
@@ -64,7 +64,7 @@ whole tree.** Two questions decide whether that trade is in your favour.
 
 **1. How many live consumers are bound _below the top level_, and how often do you write?**
 
-Only leaves are signals, so a write goes to one leaf and dirties only that leaf's consumers. An
+Each leaf is a location, so a write goes to one leaf and dirties only that leaf's consumers. An
 immutable store re-runs subscriber projections on emission and filters downstream.
 [`tools/bench-state-scale.mjs`](tools/bench-state-scale.mjs) compares SignalTree
 with `@ngrx/signals` on separate state-size and consumer axes. SignalTree's leaf
@@ -195,7 +195,12 @@ and the reproducible harness for the evidence behind that experiment.
 
 ## Mental Model
 
-A SignalTree turns a plain JSON object into a tree of Angular signals. Each leaf becomes a `WritableSignal`. Reads and writes use the same shape as any Angular signal — `node()` to read, `.set()` / `.update()` to write. Markers, enhancers, and derived state add capability on top, but they layer onto that base.
+A SignalTree turns a plain JSON object into a tree of kernel-owned locations.
+Leaves read with `node()` and write with `.set()` / `.update()`. Root and branch
+accessors stay callable for whole-value replacement and updater derivation so
+user keys named `set`, `update`, `peek`, `subscribe`, or `asReadonly` remain
+ordinary dot paths. Framework facades observe the same locations without
+becoming another state authority.
 
 ```typescript
 import { signalTree } from '@signal-tree/angular';
@@ -205,7 +210,7 @@ const store = signalTree({
   settings: { theme: 'dark' },
 });
 
-// Read — just call it, like any signal
+// Read — call the location
 store.$.user.name(); // 'Alice'
 
 // Write — set or update a leaf, or update the whole tree
@@ -230,16 +235,22 @@ npm install @signal-tree/kernel
 
 # React application
 npm install @signal-tree/react
+
+# Vue application
+npm install @signal-tree/vue
 ```
 
 `@signal-tree/angular` requires Angular 20, 21, or 22 (see `peerDependencies` in
 [`packages/angular/package.json`](packages/angular/package.json)). Import
-`signalTree` and everything else from `@signal-tree/angular` in Angular code —
-its leaves are native Angular signals (`isSignal()` is `true`, so `toObservable`,
-`model()`, and `input()` accept them). The kernel's neutral cells are not
-interchangeable with `WritableSignal`. React code likewise imports `signalTree`,
-enhancers, markers, and `useSignalTree` from `@signal-tree/react`; import from
-`@signal-tree/kernel` directly only in framework-neutral TypeScript.
+`signalTree` and everything else from `@signal-tree/angular` in Angular code.
+Locations remain kernel-owned and are not Angular `Signal` objects; direct reads
+participate in Angular dependency tracking, and `toWritableSignal()` is the
+explicit bridge for APIs that require a native `WritableSignal`. React code
+likewise imports `signalTree`, enhancers, markers, and `useSignalTree` from
+`@signal-tree/react`. Vue code imports from `@signal-tree/vue`; direct location
+reads participate in Vue tracking, while Vue's writable `computed` adapts a
+location for `v-model`. Import from `@signal-tree/kernel` directly only in
+framework-neutral TypeScript.
 
 ## Entity Collections
 
@@ -260,11 +271,11 @@ store.$.users.addOne({ id: 3, name: 'Carol' });
 store.$.users.updateOne(1, { name: 'Alice V2' });
 store.$.users.removeOne(2);
 
-// Reactive queries — all return signals
-store.$.users.all(); // Signal<User[]>
-store.$.users.byId(1); // EntityNode<User> | undefined — callable accessor with per-field signals
-store.$.users.count(); // Signal<number>
-store.$.users.where((u) => u.active); // Signal<User[]>
+// Reactive queries — all return readonly locations
+store.$.users.all(); // User[]
+store.$.users.byId(1); // EntityNode<User> | undefined — callable accessor with per-field locations
+store.$.users.count(); // number
+store.$.users.where((u) => u.active); // ReadonlyLocation<User[]>
 ```
 
 Additional methods: `addMany`, `upsertOne`, `upsertMany`, `updateMany`, `updateWhere`, `replaceOne` (O(1) outright replacement — `updateOne` spreads and cannot remove a key), `removeMany`, `removeWhere`, `clear`, `has`, `ids`, `find`, `prependOne`/`prependMany` (insert at the head without invalidating any row), `changeId(from, to)` (in-place id migration preserving position and held `byId()` handles), and active-entity tracking: `activeId`/`activeEntity` reads plus `setActiveId`/`clearActiveId` — `activeEntity` resolves through `byId`, so it is O(1) and invalidates only when that row changes.
@@ -303,12 +314,12 @@ lands results via `external()`).
 
 A SignalTree store is composed from four distinct, type-safe mechanisms — each handles one concern, rather than funneling everything through a single primitive:
 
-| Concern           | Mechanism                                                                                                                                    | Example                                                                 |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| **State shape**   | the constructor object — state _is_ the JSON, including plain state and surviving markers like `entityMap`                                   | `signalTree({ users: entityMap<User>() })`                              |
-| **Derived state** | one config-level `derived` factory — computed signals deep-merged at any path                                                                | `signalTree(state, { derived: $ => ({ activeCount: computed(...) }) })` |
-| **Capabilities**  | the `enhancers` config array — construction-time capabilities; low-level `Enhancer` functions are accepted, but no helper/metadata SDK ships | `signalTree(state, { enhancers: [batching(), devTools()] })`            |
-| **Actions**       | a plain `@Injectable` Ops service that writes to tree paths — reads (`tree.$`) stay decoupled from writes                                    | `ops.users.select(id)`                                                  |
+| Concern           | Mechanism                                                                                                                                    | Example                                                                         |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| **State shape**   | the constructor object — state _is_ the JSON, including plain state and surviving markers like `entityMap`                                   | `signalTree({ users: entityMap<User>() })`                                      |
+| **Derived state** | one config-level `derived` factory — zero-argument recipes memoized as readonly locations at any path                                        | `signalTree(state, { derived: $ => ({ activeCount: () => $.users.count() }) })` |
+| **Capabilities**  | the `enhancers` config array — construction-time capabilities; low-level `Enhancer` functions are accepted, but no helper/metadata SDK ships | `signalTree(state, { enhancers: [batching(), devTools()] })`                    |
+| **Actions**       | a plain `@Injectable` Ops service that writes to tree paths — reads (`tree.$`) stay decoupled from writes                                    | `ops.users.select(id)`                                                          |
 
 This deliberately splits across four purpose-built tools what NgRx SignalStore unifies under one `with*` composition primitive (`withState` / `withComputed` / `withMethods` / `signalStoreFeature`). The closest analog to NgRx's reusable-feature primitive (`signalStoreFeature` / `withFeature`) is the `enhancers` array; state, derived state, and actions live in the other three mechanisms. For an honest, axis-by-axis comparison — including where NgRx wins — see [docs/compare/ngrx-signalstore.md](docs/compare/ngrx-signalstore.md).
 
@@ -368,8 +379,8 @@ store.$.activeUserCount(); // reactive, type-safe
 
 ## Callable Syntax
 
-The tree is a controller; `$` is its root state location. Leaves remain Angular
-signals.
+The tree is a controller; `$` is its root state location. Leaves are
+kernel-owned universal locations in every framework facade.
 
 A **root or branch location** is SignalTree's own accessor, so it is callable
 for reads, whole-value replacement, and updater derivation:
@@ -384,9 +395,8 @@ store.$((current) => ({
 }));
 ```
 
-A **leaf** is a real `WritableSignal`. Calling an Angular signal is a **read** —
-it returns the value and ignores any argument — so leaves are written the
-ordinary way:
+A **leaf** is a universal `Location`. Calling it is a read; leaf writes use the
+one explicit write grammar:
 
 ```typescript
 store.$.user.name(); // read
@@ -398,17 +408,17 @@ store.$.count.update((n) => n + 1); // transform
 > `store.$.user.name('Bob')`, and the `@signaltree/callable-syntax` transform
 > was meant to rewrite it to `.set()`. It could not run inside an Angular app at
 > all, so that call type-checked and then **silently did nothing**. Both the
-> overloads and the package are gone; it is now a compile error. Leaves stay
-> real Angular signals on purpose — `isSignal()` must keep returning `true` for
-> `toObservable`, `model()`/`input()` and everything else that guards on it.
+> overloads and the package are gone; it is now a compile error. Leaves are
+> universal locations; use the framework package's explicit bridge when an API
+> requires a native framework primitive.
 
 ## Subpath Imports
 
 Application code imports everything from one entry point — `@signal-tree/angular`
-(Angular), `@signal-tree/kernel` (framework-neutral), or `@signal-tree/react`
-(React). The kernel additionally exposes `@signal-tree/kernel/adapter`, the
-framework-neutral realization SDK; it is for authoring a runtime binding, not
-for application code.
+(Angular), `@signal-tree/kernel` (framework-neutral), `@signal-tree/react`
+(React), or `@signal-tree/vue` (Vue). The kernel additionally exposes
+`@signal-tree/kernel/adapter`, the framework-neutral observation SDK; it is for
+authoring a runtime binding, not for application code.
 
 > ⚠️ **This section used to teach three app-facing subpaths** —
 > `@signal-tree/kernel/security`, `@signal-tree/kernel/edit-session` and
@@ -441,7 +451,7 @@ Every tree has deterministic cleanup. `destroy()` runs every registered cleanup 
 
 ```typescript
 const store = signalTree({ data: null }, { enhancers: [batching(), devTools()] });
-store.destroyed(); // Signal<boolean> — false
+store.destroyed(); // false
 
 store.destroy();
 store.destroyed(); // true — all enhancer resources cleaned up
@@ -455,8 +465,9 @@ store.registerCleanup(() => ws.close());
 | Package                | Purpose                                                                                                                                                                         |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@signal-tree/kernel`  | Framework-neutral tree, EntityMap, causal turns, links, `restoration()`, `transactions()`, `batching()`, `devTools()`. Plus `@signal-tree/kernel/adapter`, the realization SDK. |
-| `@signal-tree/angular` | The Angular realization — native Angular signals at every leaf. **Angular apps use this**; it re-exports the kernel's semantic API and adds `defineStore`.                      |
+| `@signal-tree/angular` | Angular observation for universal locations. **Angular apps use this**; it re-exports the kernel API and adds `defineStore` and `toWritableSignal`.                             |
 | `@signal-tree/react`   | Owner-bound React observation through selector projections (`useSignalTree`).                                                                                                   |
+| `@signal-tree/vue`     | Vue dependency observation for direct universal-location reads.                                                                                                                 |
 
 There is no `@signal-tree/ng-forms`, `/events`, `/realtime`, `/schema`,
 `/guardrails`, or persistence package in v15 — those capabilities are
@@ -498,7 +509,7 @@ const tree = signalTree(initialState, config);
 
 // Read
 tree.$(); // Full state snapshot
-tree.$.path.to.leaf(); // Leaf signal value
+tree.$.path.to.leaf(); // Leaf location value
 
 // Write
 tree.$(nextState); // Replace the whole state

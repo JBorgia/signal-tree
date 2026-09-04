@@ -12,7 +12,6 @@
  * the root was needed to make that call produce native Angular cells.
  */
 import { describe, expect, it } from 'vitest';
-import { isSignal } from '@angular/core';
 import { entityMap, signalTree } from '../index';
 
 describe('@signal-tree/angular public root', () => {
@@ -23,14 +22,15 @@ describe('@signal-tree/angular public root', () => {
     api.addOne({ id: 1, name: 'Ada' });
 
     const row = api.byIdOrFail(1);
-    expect(isSignal(row.name)).toBe(true);
-    expect(isSignal(row.name.asReadonly())).toBe(true);
-    expect(isSignal(api.empty)).toBe(true);
+    expect(typeof row.name).toBe('function');
+    expect(row.name.asReadonly()).toBe(row.name);
+    expect(typeof api.empty).toBe('function');
   });
 
-  it('ordinary leaves are native Angular signals through the root', () => {
+  it('ordinary leaves are universal locations through the root', () => {
     const tree = signalTree({ count: 0 });
-    expect(isSignal(tree.$.count)).toBe(true);
+    expect(typeof tree.$.count.peek).toBe('function');
+    expect(typeof tree.$.count.subscribe).toBe('function');
     tree.$.count.set(3);
     expect(tree.$.count()).toBe(3);
   });

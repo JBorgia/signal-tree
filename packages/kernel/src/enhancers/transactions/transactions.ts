@@ -62,7 +62,7 @@ import { isTraversableNode } from '../../lib/utils';
 import { getActiveWriteContext, withWriteContext } from '../../lib/write-context';
 import { visitTree } from '../../lib/internals/visit-tree';
 import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-port';
-import { getTreeRealization } from '../../lib/internals/tree-realization';
+import { getLocationRuntime } from '../../lib/internals/location-runtime';
 
 type TurnEffectBase = {
   position: number;
@@ -1312,9 +1312,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
       scalarBinding
     );
     const apply = () => prepared.install();
-    const scalarRealization = getTreeRealization(tree.$)?.scalarLeaf;
-    if (scalarRealization) {
-      scalarRealization.runInvalidationGroup(apply);
+    const locations = getLocationRuntime(tree.$);
+    if (locations) {
+      locations.runInvalidationGroup(apply);
     } else {
       apply();
     }
@@ -1631,75 +1631,86 @@ export function getOrCreateInternalTransactionRuntime<T>(
       let primaryError: unknown;
       let cleanupError: unknown;
 
-      try {
-        withWriteContext(
-          {
-            ...(activeMeta ?? {}),
-            transactionId,
-            transactionOwner: transactionOwnerToken,
-          },
-          fn
-        );
-      } catch (error) {
-        primaryError = error;
-        notifier?.flushSync();
-        const { effects, baselineValues, orderDeltas } =
-          drainTransactionRollbackInput(transactionId);
-        const rollbackSubjectIds = effects
-          .map((effect) => effect.subject)
-          .filter((subjectId): subjectId is number => subjectId !== undefined);
-        // Starts true: "nothing to reverse" is a rollback that succeeded
-        // trivially, NOT a refusal. Only the port throwing means nothing was
-        // compensated.
-        let compensated = true;
+      const executeTransaction = (): void => {
         try {
-          if (effects.length > 0 || orderDeltas.length > 0) {
+          withWriteContext(
+            {
+              ...(activeMeta ?? {}),
+              transactionId,
+              transactionOwner: transactionOwnerToken,
+            },
+            fn
+          );
+        } catch (error) {
+          primaryError = error;
+          notifier?.flushSync();
+          const { effects, baselineValues, orderDeltas } =
+            drainTransactionRollbackInput(transactionId);
+          const rollbackSubjectIds = effects
+            .map((effect) => effect.subject)
+            .filter((subjectId): subjectId is number => subjectId !== undefined);
+          // Starts true: "nothing to reverse" is a rollback that succeeded
+          // trivially, NOT a refusal. Only the port throwing means nothing was
+          // compensated.
+          let compensated = true;
+          try {
+            if (effects.length > 0 || orderDeltas.length > 0) {
+              try {
+                rollbackPendingEffectsThroughRealizationPort(
+                  transactionId,
+                  effects,
+                  baselineValues,
+                  orderDeltas,
+                  error
+                );
+              } catch (refusal) {
+                compensated = false;
+                throw refusal;
+              }
+            }
+          } finally {
             try {
-              rollbackPendingEffectsThroughRealizationPort(
+              // Settle AFTER compensation, but UNCONDITIONALLY. Late, so consumers
+              // released by this scope observe the RESTORED state rather than the
+              // doomed one. In a `finally`, because compensation is fallible — it
+              // throws SignalTreeRollbackError on a conservative refusal, which is
+              // a supported fail-closed contract, not an edge case. Skipping the
+              // settle there left the scope open forever, and since nothing can
+              // ever settle it afterwards, autoSave was wedged for the life of the
+              // tree: post-commit silently degraded to never-commit.
+              //
+              // The OUTCOME depends on whether compensation actually applied, which
+              // a bare `finally` cannot see. Refused (or nothing to reverse) means
+              // the authored effects are still the live authoritative state, so
+              // their consequences must FLUSH; discarding them would make durable
+              // truth disagree with live truth to honour a reversal that did not
+              // happen. This is the same rule the plan-level door already applies.
+              settleCommitScope(
+                transactionOwnerToken,
                 transactionId,
-                effects,
-                baselineValues,
-                orderDeltas,
-                error
+                compensated ? 'discard' : 'commit'
               );
-            } catch (refusal) {
-              compensated = false;
-              throw refusal;
+              forgetUnclaimedDescriptorSubjects(
+                rollbackSubjectIds,
+                descriptorOwnersBefore
+              );
+            } finally {
+              lifecycleChannel.announce({
+                kind: 'rolled-back',
+                owner: transactionOwnerToken,
+                id: transactionId,
+              });
             }
           }
-        } finally {
-          try {
-            // Settle AFTER compensation, but UNCONDITIONALLY. Late, so consumers
-          // released by this scope observe the RESTORED state rather than the
-          // doomed one. In a `finally`, because compensation is fallible — it
-          // throws SignalTreeRollbackError on a conservative refusal, which is
-          // a supported fail-closed contract, not an edge case. Skipping the
-          // settle there left the scope open forever, and since nothing can
-          // ever settle it afterwards, autoSave was wedged for the life of the
-          // tree: post-commit silently degraded to never-commit.
-          //
-          // The OUTCOME depends on whether compensation actually applied, which
-          // a bare `finally` cannot see. Refused (or nothing to reverse) means
-          // the authored effects are still the live authoritative state, so
-          // their consequences must FLUSH; discarding them would make durable
-          // truth disagree with live truth to honour a reversal that did not
-          // happen. This is the same rule the plan-level door already applies.
-            settleCommitScope(
-              transactionOwnerToken,
-              transactionId,
-              compensated ? 'discard' : 'commit'
-            );
-            forgetUnclaimedDescriptorSubjects(
-              rollbackSubjectIds,
-              descriptorOwnersBefore
-            );
-          } finally {
-            lifecycleChannel.announce({
-              kind: 'rolled-back',
-              owner: transactionOwnerToken,
-              id: transactionId,
-            });
-          }
+        }
+      };
+
+      try {
+        const locationRuntime = getLocationRuntime(tree.$);
+        if (locationRuntime) {
+          locationRuntime.runInvalidationGroup(executeTransaction);
+        } else {
+          executeTransaction();
         }
       } finally {
         try {

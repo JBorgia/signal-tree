@@ -57,7 +57,7 @@ export const AppTree = defineStore(
 ```
 
 - Do not use `.with()` or fluent `.derived()` calls.
-- Compose dependent computeds through local variables in the one factory.
+- Compose dependent zero-argument recipes through local variables in the one factory.
 - An external derived factory can type `$` with `TreeNode<State>`.
 - The `Enhancer` function type remains available for advanced composition, but
   no public helper, dependency-metadata, or custom-marker authoring SDK ships.
@@ -74,8 +74,9 @@ export const AppTree = defineStore(
 - Read the full snapshot: `tree.$()`.
 - There is no separate `.state` or `.unwrap()` accessor.
 
-Leaves are native Angular signals. Calling a leaf with an argument is not a
-write.
+Leaves are universal locations. Calling a leaf with an argument is not a write;
+use `.set(value)` or `.update(fn)`. In Angular, direct reads participate in
+dependency tracking without making the location an Angular `Signal`.
 
 ## EntityMap
 

@@ -1,13 +1,11 @@
 {
-  "total": 238,
+  "total": 233,
   "files": {
     "packages/kernel/src/enhancers/batching/batching.spec.ts": 4,
     "packages/kernel/src/enhancers/devtools/devtools.spec.ts": 4,
     "packages/kernel/src/enhancers/enhancer-cleanup.spec.ts": 1,
     "packages/kernel/src/enhancers/restoration/restoration.spec.ts": 20,
     "packages/kernel/src/enhancers/transactions/transactions.spec.ts": 12,
-    "packages/kernel/src/lib/declaration-extensibility-e0.spec.ts": 4,
-    "packages/kernel/src/lib/declaration-extensibility-e5-fork.spec.ts": 1,
     "packages/kernel/src/lib/enhancer-accumulation-survival.spec.ts": 1,
     "packages/kernel/src/lib/entity-array-diagnostic.spec.ts": 5,
     "packages/kernel/src/lib/entity-bare-array-hydrate.spec.ts": 5,

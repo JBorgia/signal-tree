@@ -7,8 +7,8 @@
       {
         "name": "AccessibleNode",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -16,8 +16,8 @@
       {
         "name": "AddManyOptions",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -25,8 +25,8 @@
       {
         "name": "AddOptions",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -35,7 +35,7 @@
         "name": "asReadonly",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/readonly.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -44,7 +44,7 @@
         "name": "batching",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/enhancers/batching/batching.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -52,8 +52,8 @@
       {
         "name": "BatchingConfig",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/batching/batching.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -61,8 +61,8 @@
       {
         "name": "BatchingMethods",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/batching/batching.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -70,8 +70,8 @@
       {
         "name": "ComputedSliceConfig",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -79,8 +79,8 @@
       {
         "name": "DefaultKey",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -107,7 +107,7 @@
         "name": "devTools",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/enhancers/devtools/devtools.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -115,8 +115,8 @@
       {
         "name": "DevToolsConfig",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -124,8 +124,8 @@
       {
         "name": "DevToolsDebugSession",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/devtools/devtools.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -133,8 +133,8 @@
       {
         "name": "DevToolsLogEntry",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/devtools/devtools.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -142,8 +142,8 @@
       {
         "name": "DevToolsMethods",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/devtools/devtools.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -151,8 +151,8 @@
       {
         "name": "Enhancer",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/enhancer-types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -160,8 +160,8 @@
       {
         "name": "EnhancerCleanup",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -169,8 +169,8 @@
       {
         "name": "EnhancerWithMeta",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/enhancer-types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -178,8 +178,8 @@
       {
         "name": "EntityConfig",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -188,7 +188,7 @@
         "name": "entityMap",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -196,8 +196,8 @@
       {
         "name": "EntityMapBuilder",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -205,8 +205,8 @@
       {
         "name": "EntityMapComputedSlices",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -214,8 +214,8 @@
       {
         "name": "EntityMapMarker",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -223,8 +223,8 @@
       {
         "name": "EntityMapMarkerWithSlices",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -233,7 +233,7 @@
         "name": "EntityNode",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/angular/src/index.ts",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -242,7 +242,7 @@
         "name": "EntitySignal",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/angular/src/index.ts",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -251,7 +251,7 @@
         "name": "EntitySignalWithSlices",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/angular/src/index.ts",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -260,7 +260,7 @@
         "name": "external",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/external.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -269,7 +269,7 @@
         "name": "link",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/link.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -277,8 +277,8 @@
       {
         "name": "Link",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/link.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -286,17 +286,26 @@
       {
         "name": "LinkEndpoint",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/link.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
       },
       {
+        "name": "Location",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/cell-runtime.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
         "name": "MutationOptions",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -304,8 +313,8 @@
       {
         "name": "NodeAccessor",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/node-accessor.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -314,16 +323,16 @@
         "name": "onTreeError",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/internals/error-reporter.ts",
         "angularInDecl": false,
         "angularInType": false,
-        "internalDecl": false
+        "internalDecl": true
       },
       {
         "name": "PendingTransaction",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -331,17 +340,26 @@
       {
         "name": "Primitive",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
       },
       {
+        "name": "ReadonlyLocation",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/cell-runtime.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
         "name": "ReadonlyStore",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/angular/src/index.ts",
+        "declFile": "packages/kernel/src/lib/readonly.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -350,7 +368,7 @@
         "name": "restoration",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/enhancers/restoration/restoration.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -358,8 +376,8 @@
       {
         "name": "RestorationConfig",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -367,8 +385,8 @@
       {
         "name": "RestorationHistoryEntry",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/restoration/restoration.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -376,8 +394,8 @@
       {
         "name": "RestorationMethods",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/restoration/restoration.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -395,7 +413,7 @@
         "name": "SignalTree",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/angular/src/index.ts",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -404,7 +422,7 @@
         "name": "SignalTreeRollbackError",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -421,8 +439,8 @@
       {
         "name": "TransactionMethods",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -431,7 +449,7 @@
         "name": "transactions",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -439,8 +457,8 @@
       {
         "name": "TreeCapability",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/enhancer-types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -448,8 +466,8 @@
       {
         "name": "TreeConfig",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -457,26 +475,26 @@
       {
         "name": "TreeErrorEvent",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/error-reporter.ts",
         "angularInDecl": false,
         "angularInType": false,
-        "internalDecl": false
+        "internalDecl": true
       },
       {
         "name": "TreeId",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/position-registry.ts",
         "angularInDecl": false,
         "angularInType": false,
-        "internalDecl": false
+        "internalDecl": true
       },
       {
         "name": "TreeNode",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/angular/src/index.ts",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -485,7 +503,7 @@
         "name": "undoable",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/undoable.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -494,7 +512,7 @@
         "name": "WritableLeaf",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/angular/src/index.ts",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -715,6 +733,15 @@
         "internalDecl": false
       },
       {
+        "name": "EntityNode",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "EntitySignal",
         "subpath": ".",
         "kind": "type-only",
@@ -769,6 +796,15 @@
         "internalDecl": false
       },
       {
+        "name": "Location",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/cell-runtime.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
         "name": "MutationOptions",
         "subpath": ".",
         "kind": "type-only",
@@ -812,6 +848,15 @@
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
+      },
+      {
+        "name": "ReadonlyLocation",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/cell-runtime.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
       },
       {
         "name": "ReadonlyStore",
@@ -967,15 +1012,6 @@
         "internalDecl": false
       },
       {
-        "name": "CellRuntime",
-        "subpath": "./adapter",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/internals/cell-runtime.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": true
-      },
-      {
         "name": "createSignalTreeFactory",
         "subpath": "./adapter",
         "kind": "runtime",
@@ -985,73 +1021,28 @@
         "internalDecl": false
       },
       {
-        "name": "DerivedRuntime",
+        "name": "ISignalTree",
         "subpath": "./adapter",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/internals/derived-runtime.ts",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "isNodeAccessor",
+        "subpath": "./adapter",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/internals/node-shape.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": true
       },
       {
-        "name": "EntityNodeOf",
+        "name": "ObservationAdapter",
         "subpath": "./adapter",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EntitySignalOf",
-        "subpath": "./adapter",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EntitySignalWithSlicesOf",
-        "subpath": "./adapter",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ISignalTreeOf",
-        "subpath": "./adapter",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "LeafCarriers",
-        "subpath": "./adapter",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/adapter.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "LeafOf",
-        "subpath": "./adapter",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "MaterializationRealization",
-        "subpath": "./adapter",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/internals/materialization-realization.ts",
+        "declFile": "packages/kernel/src/lib/internals/observation-adapter.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": true
@@ -1060,7 +1051,7 @@
         "name": "ObservationToken",
         "subpath": "./adapter",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/internals/scalar-leaf-realization.ts",
+        "declFile": "packages/kernel/src/lib/internals/observation-adapter.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": true
@@ -1075,15 +1066,6 @@
         "internalDecl": false
       },
       {
-        "name": "ReadableCell",
-        "subpath": "./adapter",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/internals/cell-runtime.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": true
-      },
-      {
         "name": "readCanonicalSnapshot",
         "subpath": "./adapter",
         "kind": "runtime",
@@ -1093,73 +1075,19 @@
         "internalDecl": false
       },
       {
-        "name": "ReadonlyStoreOf",
-        "subpath": "./adapter",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/readonly.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ReadonlyViewOf",
-        "subpath": "./adapter",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/readonly.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ScalarLeafRealization",
-        "subpath": "./adapter",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/internals/scalar-leaf-realization.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": true
-      },
-      {
-        "name": "SignalTreeFactoryOf",
+        "name": "SignalTreeFactory",
         "subpath": "./adapter",
         "kind": "type-only",
         "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
-      },
-      {
-        "name": "TreeNodeOf",
-        "subpath": "./adapter",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "TreeRealization",
-        "subpath": "./adapter",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/internals/tree-realization.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": true
       },
       {
         "name": "withRestorationDesignation",
         "subpath": "./adapter",
         "kind": "runtime",
         "declFile": "packages/kernel/src/lib/internals/restoration-eligibility.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": true
-      },
-      {
-        "name": "WritableCell",
-        "subpath": "./adapter",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/internals/cell-runtime.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": true
@@ -1174,8 +1102,8 @@
       {
         "name": "AccessibleNode",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1183,8 +1111,8 @@
       {
         "name": "AddManyOptions",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1192,8 +1120,8 @@
       {
         "name": "AddOptions",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1202,7 +1130,7 @@
         "name": "asReadonly",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/readonly.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1211,7 +1139,7 @@
         "name": "batching",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/enhancers/batching/batching.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1219,8 +1147,8 @@
       {
         "name": "BatchingConfig",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/batching/batching.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1228,8 +1156,8 @@
       {
         "name": "BatchingMethods",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/batching/batching.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1237,8 +1165,8 @@
       {
         "name": "ComputedSliceConfig",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1246,8 +1174,8 @@
       {
         "name": "DefaultKey",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1256,7 +1184,7 @@
         "name": "devTools",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/enhancers/devtools/devtools.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1264,8 +1192,8 @@
       {
         "name": "DevToolsConfig",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1273,8 +1201,8 @@
       {
         "name": "DevToolsDebugSession",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/devtools/devtools.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1282,8 +1210,8 @@
       {
         "name": "DevToolsLogEntry",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/devtools/devtools.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1291,8 +1219,8 @@
       {
         "name": "DevToolsMethods",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/devtools/devtools.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1300,8 +1228,8 @@
       {
         "name": "Enhancer",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/enhancer-types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1309,8 +1237,8 @@
       {
         "name": "EnhancerCleanup",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1318,8 +1246,8 @@
       {
         "name": "EnhancerWithMeta",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/enhancer-types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1327,8 +1255,8 @@
       {
         "name": "EntityConfig",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1337,7 +1265,7 @@
         "name": "entityMap",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1345,8 +1273,8 @@
       {
         "name": "EntityMapBuilder",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1354,8 +1282,8 @@
       {
         "name": "EntityMapComputedSlices",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1363,8 +1291,8 @@
       {
         "name": "EntityMapMarker",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1372,8 +1300,17 @@
       {
         "name": "EntityMapMarkerWithSlices",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntityNode",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1381,8 +1318,8 @@
       {
         "name": "EntitySignal",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1390,8 +1327,8 @@
       {
         "name": "EntitySignalWithSlices",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1400,7 +1337,7 @@
         "name": "external",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/external.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1409,7 +1346,7 @@
         "name": "link",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/link.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1417,8 +1354,8 @@
       {
         "name": "Link",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/link.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1426,17 +1363,26 @@
       {
         "name": "LinkEndpoint",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/link.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
       },
       {
+        "name": "Location",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/cell-runtime.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
         "name": "MutationOptions",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1444,8 +1390,8 @@
       {
         "name": "NodeAccessor",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/node-accessor.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1454,16 +1400,16 @@
         "name": "onTreeError",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/internals/error-reporter.ts",
         "angularInDecl": false,
         "angularInType": false,
-        "internalDecl": false
+        "internalDecl": true
       },
       {
         "name": "PendingTransaction",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1471,17 +1417,26 @@
       {
         "name": "Primitive",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
       },
       {
+        "name": "ReadonlyLocation",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/cell-runtime.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
         "name": "ReadonlyStore",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/readonly.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1490,7 +1445,16 @@
         "name": "restoration",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/enhancers/restoration/restoration.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "RestorationConfig",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1498,8 +1462,8 @@
       {
         "name": "RestorationHistoryEntry",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/restoration/restoration.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1507,8 +1471,8 @@
       {
         "name": "RestorationMethods",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/restoration/restoration.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1517,7 +1481,7 @@
         "name": "signalTree",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/signal-tree.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1525,8 +1489,8 @@
       {
         "name": "SignalTree",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1535,7 +1499,7 @@
         "name": "SignalTreeRollbackError",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1543,8 +1507,8 @@
       {
         "name": "TransactionMethods",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1553,7 +1517,7 @@
         "name": "transactions",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1561,8 +1525,8 @@
       {
         "name": "TreeCapability",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/enhancer-types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1570,8 +1534,8 @@
       {
         "name": "TreeConfig",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1579,26 +1543,26 @@
       {
         "name": "TreeErrorEvent",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/error-reporter.ts",
         "angularInDecl": false,
         "angularInType": false,
-        "internalDecl": false
+        "internalDecl": true
       },
       {
         "name": "TreeId",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/position-registry.ts",
         "angularInDecl": false,
         "angularInType": false,
-        "internalDecl": false
+        "internalDecl": true
       },
       {
         "name": "TreeNode",
         "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1607,7 +1571,7 @@
         "name": "undoable",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/undoable.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1624,8 +1588,501 @@
       {
         "name": "WritableLeaf",
         "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      }
+    ]
+  },
+  "vue": {
+    "entrypoints": [
+      "."
+    ],
+    "symbols": [
+      {
+        "name": "AccessibleNode",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "AddManyOptions",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "AddOptions",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "asReadonly",
+        "subpath": ".",
         "kind": "runtime",
-        "declFile": "(unresolved)",
+        "declFile": "packages/kernel/src/lib/readonly.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "batching",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/enhancers/batching/batching.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "BatchingConfig",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/batching/batching.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "BatchingMethods",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/batching/batching.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "ComputedSliceConfig",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "DefaultKey",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "devTools",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/enhancers/devtools/devtools.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "DevToolsConfig",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "DevToolsDebugSession",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/devtools/devtools.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "DevToolsLogEntry",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/devtools/devtools.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "DevToolsMethods",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/devtools/devtools.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "Enhancer",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/enhancer-types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EnhancerCleanup",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EnhancerWithMeta",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/enhancer-types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntityConfig",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "entityMap",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntityMapBuilder",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntityMapComputedSlices",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntityMapMarker",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntityMapMarkerWithSlices",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntityNode",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntitySignal",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntitySignalWithSlices",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "external",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/external.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "link",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/link.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "Link",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/link.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "LinkEndpoint",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/link.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "Location",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/cell-runtime.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "MutationOptions",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "NodeAccessor",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/node-accessor.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "onTreeError",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/internals/error-reporter.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "PendingTransaction",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "Primitive",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "ReadonlyLocation",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/cell-runtime.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "ReadonlyStore",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/readonly.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "restoration",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/enhancers/restoration/restoration.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "RestorationConfig",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "RestorationHistoryEntry",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/restoration/restoration.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "RestorationMethods",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/restoration/restoration.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "signalTree",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/vue/src/index.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "SignalTree",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "SignalTreeRollbackError",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TransactionMethods",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "transactions",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TreeCapability",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/enhancer-types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TreeConfig",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TreeErrorEvent",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/error-reporter.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "TreeId",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/position-registry.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "TreeNode",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "undoable",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/undoable.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "WritableLeaf",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false

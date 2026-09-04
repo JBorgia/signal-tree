@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { createReactiveTestRealization } from '../reactive-test-realization';
-import { bindSignalTreeRealization } from './signal-tree';
+import { createSignalTreeFactory } from './signal-tree';
 import {
   materializeMember,
   ordinaryBranch,
@@ -10,8 +10,8 @@ import {
 import { getOwnedPositionIds } from './internals/owned-metadata';
 
 const testRealization = createReactiveTestRealization();
-const signalTree = bindSignalTreeRealization(testRealization);
-const computed = testRealization.derived.createDerived;
+const signalTree = createSignalTreeFactory(testRealization);
+const computed = testRealization.locations.createDerived;
 
 /**
  * `DYN-MATERIALIZE-REACTIVATION-0` — re-adding a removed dynamic member

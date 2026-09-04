@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createReactiveTestRealization } from '../reactive-test-realization';
 import { acquireScalarProjection, EXTERNAL_ACQUISITION } from './internals/acquire-projection';
-import { bindSignalTreeRealization, signalTree } from './signal-tree';
+import { createSignalTreeFactory, signalTree } from './signal-tree';
 import { getOwnedPositionIds } from './internals/owned-mutation';
 import { getPositionRegistry } from './internals/position-registry';
 import {
@@ -12,8 +12,8 @@ import {
 } from './internals/production-substrate-stats';
 
 const testRealization = createReactiveTestRealization();
-const reactiveSignalTree = bindSignalTreeRealization(testRealization);
-const computed = testRealization.derived.createDerived;
+const reactiveSignalTree = createSignalTreeFactory(testRealization);
+const computed = testRealization.locations.createDerived;
 
 /**
  * C5-WHOLE-VALUE-MEMBERSHIP — GREENFIELD-BRANCH-WRITE-0.
@@ -483,32 +483,8 @@ describe('whole-value membership', () => {
   });
 });
 
-/**
- * ⚠️ PUBLIC-BOUNDARY CARRIER RULE.
- *
- * Every carrier above opts into `capabilities: ['causal-runtime']`, which proves
- * the CANONICAL SUBSTRATE MECHANISM and nothing about the contract a caller of
- * plain `signalTree(...)` actually gets. A default tree has NO scalar slot
- * runtime — its leaves are plain Angular signals whose reads cannot consult the
- * membership authority — so this suite is expected RED until the C6 Angular
- * handoff makes the kernel path the default adapter.
- *
- * It is written now, and left failing-by-skip rather than deleted, because the
- * alternative is discovering at C8 that the public surface never carried the
- * contract the kernel proved.
- */
 describe('whole-value membership — PUBLIC DEFAULT PATH', () => {
-  // ⚠️ EXPECTED-FAILURE CARRIER, NOT A SKIPPED ONE.
-  //
-  //     A BASELINE NOTHING VERIFIES IS A MEMO, NOT A GATE.
-  //
-  // An earlier revision gated this behind `const DEFAULT_PATH_CARRIES_MEMBERSHIP
-  // = false` and `it.skip`. That made the gap visible in prose while evaluating
-  // nothing, and it relied on somebody remembering to flip a boolean at C6.
-  // `it.fails` executes the target contract every run: the day the default path
-  // starts honouring membership, THIS SUITE TURNS RED because the qualifier has
-  // expired, and the failure names its own fix.
-  it.fails('PUBLIC DEFAULT: a plain signalTree carries whole-value membership', () => {
+  it('PUBLIC DEFAULT: a plain signalTree carries whole-value membership', () => {
     const tree = signalTree({ user: { name: 'Ada', age: 42 as number | undefined } });
 
     const parent = computed(() => tree.$.user());

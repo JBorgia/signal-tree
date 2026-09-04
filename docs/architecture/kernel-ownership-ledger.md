@@ -151,15 +151,20 @@ Owners: `KERNEL` · `FRAMEWORK-ADAPTER` · `OPTIONAL-CAPABILITY` ·
 | `public:SignalTreeRollbackError` | publicValue | rollback signalling | OPTIONAL-CAPABILITY | CONVERGED |
 | `public:asReadonly` | publicValue | readonly projection | KERNEL | CONVERGED |
 | `public:batching` | publicValue | explicit application-facing capability: batch(), coalesce(), hasPendingNotifications(), flushNotifications(). Owner settled; the representation is the named BATCHING-OWNERSHIP-0 action — NOT a generic review | OPTIONAL-CAPABILITY | REIMPLEMENT |
+| `public:createSignalTreeFactory` | publicValue | binds a neutral observation adapter to canonical tree construction | KERNEL | CONVERGED |
 | `public:devTools` | publicValue | ngDevMode-gated inspection (+0.07 KB prod) | DIAGNOSTIC | CONVERGED |
 | `public:entityMap` | publicValue | ordered typed-key collection. H-B semantics retained; the representation is the named ENTITY-REPRESENTATION-OWNERSHIP-0 action — NOT a generic review | DOMAIN-SPECIALIZATION | REIMPLEMENT |
 | `public:external` | publicValue | non-authored ingress (C4) | KERNEL | CONVERGED |
+| `public:isNodeAccessor` | publicValue | kernel-owned branch identity guard exposed to adapters for collision-free location dispatch | KERNEL | CONVERGED |
 | `public:link` | publicValue | external reconciliation (+4.10 KB) | OPTIONAL-CAPABILITY | CONVERGED |
+| `public:observeOwnerInvalidation` | publicValue | adapter port for coherent owner-level invalidation | KERNEL | CONVERGED |
 | `public:onTreeError` | publicValue | tree error boundary | KERNEL | CONVERGED |
+| `public:readCanonicalSnapshot` | publicValue | adapter read of kernel-owned canonical whole-tree truth | KERNEL | CONVERGED |
 | `public:restoration` | publicValue | history/undo consumer (+14.38 KB) | OPTIONAL-CAPABILITY | CONVERGED |
 | `public:signalTree` | publicValue | kernel construction | KERNEL | CONVERGED |
 | `public:transactions` | publicValue | causal turn grouping (+14.50 KB) | OPTIONAL-CAPABILITY | CONVERGED |
 | `public:undoable` | publicValue | restoration eligibility marker | OPTIONAL-CAPABILITY | CONVERGED |
+| `public:withRestorationDesignation` | publicValue | semantic ingress for framework-owned authored restoration intent | OPTIONAL-CAPABILITY | CONVERGED |
 | `public-type:AccessibleNode` | publicType | structural constraint used by the recursive mapper | KERNEL | CONVERGED |
 | `public-type:AddManyOptions` | publicType | entity bulk insert positioning options | DOMAIN-SPECIALIZATION | CONVERGED |
 | `public-type:AddOptions` | publicType | entity insert positioning options | DOMAIN-SPECIALIZATION | CONVERGED |
@@ -179,19 +184,26 @@ Owners: `KERNEL` · `FRAMEWORK-ADAPTER` · `OPTIONAL-CAPABILITY` ·
 | `public-type:EntityMapComputedSlices` | publicType | computed-slice declaration for entityMap | DOMAIN-SPECIALIZATION | CONVERGED |
 | `public-type:EntityMapMarker` | publicType | entityMap marker contract; consumed by signal-tree/utils | DOMAIN-SPECIALIZATION | CONVERGED |
 | `public-type:EntityMapMarkerWithSlices` | publicType | marker contract with computed slices | DOMAIN-SPECIALIZATION | CONVERGED |
+| `public-type:EntityNode` | publicType | entity subject node projected through universal locations | DOMAIN-SPECIALIZATION | CONVERGED |
 | `public-type:EntitySignal` | publicType | entity collection contract; kernel-coupled by utils/readonly/link/merge-derived — representation tracked by ENTITY-REPRESENTATION-OWNERSHIP-0, not by this row | DOMAIN-SPECIALIZATION | CONVERGED |
 | `public-type:EntitySignalWithSlices` | publicType | entity contract with computed slices | DOMAIN-SPECIALIZATION | CONVERGED |
+| `public-type:ISignalTree` | publicType | the tree contract itself; does NOT name any capability method bag — callers compose `SignalTree<T> & BatchingMethods` | KERNEL | CONVERGED |
 | `public-type:Link` | publicType | external reconciliation contract (frozen public surface) | OPTIONAL-CAPABILITY | CONVERGED |
 | `public-type:LinkEndpoint` | publicType | link endpoint contract (frozen public surface) | OPTIONAL-CAPABILITY | CONVERGED |
+| `public-type:Location` | publicType | universal writable location contract | KERNEL | CONVERGED |
 | `public-type:MutationOptions` | publicType | ?? not yet ruled (publicType) | UNKNOWN | REVIEW |
 | `public-type:NodeAccessor` | publicType | callable accessor contract | KERNEL | CONVERGED |
+| `public-type:ObservationAdapter` | publicType | neutral adapter port for framework observation of kernel truth | KERNEL | CONVERGED |
+| `public-type:ObservationToken` | publicType | neutral dependency-token port used by ObservationAdapter | KERNEL | CONVERGED |
 | `public-type:PendingTransaction` | publicType | declared in its owner module since TYPE-BARREL-CONVERGENCE-0; re-exported from the package root, one declaration authority | OPTIONAL-CAPABILITY | CONVERGED |
 | `public-type:Primitive` | publicType | type-level machinery for the recursive mapper | KERNEL | CONVERGED |
+| `public-type:ReadonlyLocation` | publicType | universal readable and subscribable location contract | KERNEL | CONVERGED |
 | `public-type:ReadonlyStore` | publicType | readonly projection type surface; same owner as the already-ruled public:asReadonly | KERNEL | CONVERGED |
 | `public-type:RestorationConfig` | publicType | ?? not yet ruled (publicType) | UNKNOWN | REVIEW |
 | `public-type:RestorationHistoryEntry` | publicType | declared in its owner module since TYPE-BARREL-CONVERGENCE-0; re-exported from the package root, one declaration authority | OPTIONAL-CAPABILITY | CONVERGED |
 | `public-type:RestorationMethods` | publicType | declared in its owner module since TYPE-BARREL-CONVERGENCE-0; re-exported from the package root, one declaration authority | OPTIONAL-CAPABILITY | CONVERGED |
 | `public-type:SignalTree` | publicType | public alias of the tree contract | KERNEL | CONVERGED |
+| `public-type:SignalTreeFactory` | publicType | canonical construction overload set shared by every facade | KERNEL | CONVERGED |
 | `public-type:TransactionMethods` | publicType | declared in its owner module since TYPE-BARREL-CONVERGENCE-0; re-exported from the package root, one declaration authority | OPTIONAL-CAPABILITY | CONVERGED |
 | `public-type:TreeCapability` | publicType | ?? not yet ruled (publicType) | UNKNOWN | REVIEW |
 | `public-type:TreeConfig` | publicType | construction surface | KERNEL | CONVERGED |
@@ -201,7 +213,7 @@ Owners: `KERNEL` · `FRAMEWORK-ADAPTER` · `OPTIONAL-CAPABILITY` ·
 | `public-type:WritableLeaf` | publicType | ?? not yet ruled (publicType) | UNKNOWN | REVIEW |
 | `subpath:.` | subpath | the package root entry point | KERNEL | CONVERGED |
 | `subpath:./package.json` | subpath | packaging hygiene; required by tooling that resolves the manifest | KERNEL | CONVERGED |
-| `subpath:./adapter` | subpath | ?? not yet ruled (subpath) | UNKNOWN | REVIEW |
+| `subpath:./adapter` | subpath | minimal SDK for framework observation adapters and semantic ingress | KERNEL | CONVERGED |
 | `config:useShallowComparison` | config | read at signal-tree.ts:1539 — leaf equality policy | KERNEL | CONVERGED |
 | `config:debugMode` | config | gates two development-only log statements and nothing else; TreeConfig is the correct surface because they fire without devTools() installed | DIAGNOSTIC | CONVERGED |
 | `config:enhancers` | config | read at signal-tree.ts:2047 — the enhancer application list, the whole declarative construction contract | KERNEL | CONVERGED |
@@ -228,6 +240,8 @@ Owners: `KERNEL` · `FRAMEWORK-ADAPTER` · `OPTIONAL-CAPABILITY` ·
 | `state:enhancers/devtools/devtools.ts:ngDevMode` | moduleState | EXPLICIT: build-tool global declaration | FRAMEWORK-ADAPTER | CONVERGED |
 | `state:enhancers/devtools/devtools.ts:devToolsImpl` | moduleState | EXPLICIT: lazily-held devTools implementation | DIAGNOSTIC | CONVERGED |
 | `state:enhancers/restoration/restoration.ts:ngDevMode` | moduleState | ?? not yet ruled (moduleState, uninitialised) | UNKNOWN | REVIEW |
+| `state:enhancers/restoration/restoration.ts:process` | moduleState | optional Node environment input to restoration consistency diagnostics | OPTIONAL-CAPABILITY | CONVERGED |
+| `state:enhancers/restoration/restoration.ts:RUN_RESTORATION_CONSISTENCY_CHECKS` | moduleState | resolved restoration consistency-check policy | OPTIONAL-CAPABILITY | CONVERGED |
 | `state:enhancers/restoration/restoration.ts:withRestoration` | moduleState | EXPLICIT: the restoration enhancer itself | OPTIONAL-CAPABILITY | CONVERGED |
 | `state:enhancers/serialization/constants.ts:TYPE_MARKERS` | moduleState | EXPLICIT: serialization type markers, read at 27 sites | OPTIONAL-CAPABILITY | CONVERGED |
 | `state:enhancers/serialization/serialization.ts:ngDevMode` | moduleState | EXPLICIT: build-tool global declaration | FRAMEWORK-ADAPTER | CONVERGED |
@@ -256,8 +270,8 @@ Owners: `KERNEL` · `FRAMEWORK-ADAPTER` · `OPTIONAL-CAPABILITY` ·
 | `state:lib/path-notifier.ts:globalPathNotifier` | moduleState | EXPLICIT: delivery engine singleton, installed through the port and never linked by the bare kernel | OPTIONAL-CAPABILITY | CONVERGED |
 | `state:lib/readonly-readers.ts:ENTITY_READERS` | moduleState | EXPLICIT: entity-aware reader table for the readonly projection | DOMAIN-SPECIALIZATION | CONVERGED |
 | `state:lib/signal-tree.ts:isWritableCell` | moduleState | ?? not yet ruled (moduleState, function) | UNKNOWN | REVIEW |
+| `state:lib/signal-tree.ts:readWritableCell` | moduleState | non-tracking kernel read through Location.peek with structural fallback | KERNEL | CONVERGED |
 | `state:lib/signal-tree.ts:ngDevMode` | moduleState | ?? not yet ruled (moduleState, uninitialised) | UNKNOWN | REVIEW |
-| `state:lib/signal-tree.ts:NODE_ACCESSOR_SYMBOL` | moduleState | EXPLICIT: read by isNodeAccessor/makeNodeAccessor/create/createBuilder — the accessor protocol | KERNEL | CONVERGED |
 | `state:lib/signal-tree.ts:ENTITY_ARRAY_MIN_LENGTH` | moduleState | EXPLICIT: read only by warnEntityArrayLeaf — a dev warning heuristic threshold | DIAGNOSTIC | CONVERGED |
 | `state:lib/signal-tree.ts:ENTITY_ARRAY_SAMPLE` | moduleState | EXPLICIT: read only by warnEntityArrayLeaf/warnMarkerInContainer — dev warning sampling | DIAGNOSTIC | CONVERGED |
 | `state:lib/signal-tree.ts:ENTITY_ID_KEYS` | moduleState | EXPLICIT: read only by warnEntityArrayLeaf — dev warning id-key heuristic | DIAGNOSTIC | CONVERGED |
@@ -269,8 +283,9 @@ Owners: `KERNEL` · `FRAMEWORK-ADAPTER` · `OPTIONAL-CAPABILITY` ·
 | `state:lib/signal-tree.ts:warnedNoopPaths` | moduleState | EXPLICIT: read by recursiveUpdate behind an ngDevMode guard — warn-once dedupe that cannot grow in a shipped build | DIAGNOSTIC | CONVERGED |
 | `state:lib/signal-tree.ts:warnedNoopCopyPaths` | moduleState | EXPLICIT: warn-once dedupe behind the same ngDevMode guard | DIAGNOSTIC | CONVERGED |
 | `state:lib/signal-tree.ts:signalTree` | moduleState | ?? not yet ruled (moduleState, AsExpression) | UNKNOWN | REVIEW |
-| `state:lib/signal-tree.ts:bindSignalTreeRealization` | moduleState | ?? not yet ruled (moduleState, function) | UNKNOWN | REVIEW |
+| `state:lib/signal-tree.ts:createSignalTreeFactory` | moduleState | construction-bound factory creator for one observation adapter | KERNEL | CONVERGED |
 | `state:lib/types.ts:ENTITY_MAP_BRAND` | moduleState | EXPLICIT: the entityMap marker brand | DOMAIN-SPECIALIZATION | CONVERGED |
+| `state:lib/utils.ts:isReactiveStateValue` | moduleState | kernel tree-cell classifier used by snapshot and unwrap traversal | KERNEL | CONVERGED |
 | `state:lib/utils.ts:ngDevMode` | moduleState | EXPLICIT: the build-tool global declaration used to gate dev-only code | FRAMEWORK-ADAPTER | CONVERGED |
 | `state:lib/utils.ts:DERIVED_STAMP` | moduleState | EXPLICIT: derived-slice stamp key | KERNEL | CONVERGED |
 | `state:lib/write-context.ts:activeContext` | moduleState | EXPLICIT: ambient authored-write context | KERNEL | CONVERGED |
@@ -278,19 +293,26 @@ Owners: `KERNEL` · `FRAMEWORK-ADAPTER` · `OPTIONAL-CAPABILITY` ·
 | `state:lib/write-participation.ts:isInspectionWrite` | moduleState | EXPLICIT: inspection-write predicate, read by 7 modules | KERNEL | CONVERGED |
 | `state:lib/internals/acquire-projection.ts:isRealizableSubject` | moduleState | EXPLICIT: realizability predicate for acquisition | KERNEL | CONVERGED |
 | `state:lib/internals/acquire-projection.ts:EXTERNAL_ACQUISITION` | moduleState | EXPLICIT: external acquisition descriptor | KERNEL | CONVERGED |
-| `state:lib/internals/cell-identity.ts:CELL_MARK` | moduleState | ?? not yet ruled (moduleState, Symbol()) | UNKNOWN | REVIEW |
-| `state:lib/internals/cell-runtime.ts:NEUTRAL_CELL_RUNTIME` | moduleState | ?? not yet ruled (moduleState, object literal) | UNKNOWN | REVIEW |
+| `state:lib/internals/cell-identity.ts:CELL_MARK` | moduleState | nominal identity for runtime-minted and explicitly adopted universal locations | KERNEL | CONVERGED |
 | `state:lib/internals/commit-consequence.ts:scopesByOwner` | moduleState | EXPLICIT: read by openCommitScope/deferCommitConsequence/settleCommitScope | KERNEL | CONVERGED |
 | `state:lib/internals/commit-consequence.ts:openScopesByKey` | moduleState | EXPLICIT: read by hasOpen/openCommitScope/settleCommitScope | KERNEL | CONVERGED |
 | `state:lib/internals/commit-consequence.ts:settleListenersByKey` | moduleState | EXPLICIT: read by settleCommitScope/onCommitScopesSettled | KERNEL | CONVERGED |
 | `state:lib/internals/commit-consequence.ts:heldByKey` | moduleState | EXPLICIT: read by scheduleDurableConsequence/settleCommitScope | KERNEL | CONVERGED |
-| `state:lib/internals/derived-runtime.ts:NEUTRAL_DERIVED_RUNTIME` | moduleState | ?? not yet ruled (moduleState, object literal) | UNKNOWN | REVIEW |
 | `state:lib/internals/enhancer-requirements.ts:describe` | moduleState | EXPLICIT: requirement description for construction-time validation messages | KERNEL | CONVERGED |
 | `state:lib/internals/entity-projection-seed.ts:SEED` | moduleState | EXPLICIT: entity projection seed key | DOMAIN-SPECIALIZATION | CONVERGED |
 | `state:lib/internals/error-reporter.ts:ngDevMode` | moduleState | ?? not yet ruled (moduleState, uninitialised) | UNKNOWN | REVIEW |
 | `state:lib/internals/error-reporter.ts:listeners` | moduleState | EXPLICIT: onTreeError listener set — the frozen tree error boundary | KERNEL | CONVERGED |
 | `state:lib/internals/intrinsic-mutation.ts:SOURCES` | moduleState | ?? not yet ruled (moduleState, new WeakMap) | UNKNOWN | REVIEW |
-| `state:lib/internals/materialization-realization.ts:NEUTRAL_MATERIALIZATION_REALIZATION` | moduleState | ?? not yet ruled (moduleState, object literal) | UNKNOWN | REVIEW |
+| `state:lib/internals/location-runtime.ts:activeConsumer` | moduleState | active kernel derived-location dependency consumer | KERNEL | CONVERGED |
+| `state:lib/internals/location-runtime.ts:publicationDepth` | moduleState | nested kernel publication depth for coherent derived settlement | KERNEL | CONVERGED |
+| `state:lib/internals/location-runtime.ts:pendingConsumers` | moduleState | pending kernel derived consumers awaiting dependency-ordered settlement | KERNEL | CONVERGED |
+| `state:lib/internals/location-runtime.ts:dependencyFinalizer` | moduleState | releases weak reverse dependency edges when derived locations are collected | KERNEL | CONVERGED |
+| `state:lib/internals/location-runtime.ts:flushConsumers` | moduleState | dependency-ordered settlement of pending kernel derived locations | KERNEL | CONVERGED |
+| `state:lib/internals/location-runtime.ts:notifyObservers` | moduleState | delivers framework invalidation and vanilla listeners without observer starvation | KERNEL | CONVERGED |
+| `state:lib/internals/location-runtime.ts:trackDependency` | moduleState | records kernel location dependencies and delegates only outer observation | KERNEL | CONVERGED |
+| `state:lib/internals/location-runtime.ts:notifyDependents` | moduleState | invalidates kernel dependency consumers after committed truth changes | KERNEL | CONVERGED |
+| `state:lib/internals/location-runtime.ts:NODE_LOCATION_RUNTIMES` | moduleState | tree-node association with its construction-bound kernel location runtime | KERNEL | CONVERGED |
+| `state:lib/internals/location-runtime.ts:NEUTRAL_LOCATION_RUNTIME` | moduleState | framework-free default location runtime | KERNEL | CONVERGED |
 | `state:lib/internals/materialize-markers.ts:ngDevMode` | moduleState | ?? not yet ruled (moduleState, uninitialised) | UNKNOWN | REVIEW |
 | `state:lib/internals/materialize-markers.ts:PROCESSOR_STAMP` | moduleState | EXPLICIT: read by getNodeProcessor/materializeMarkers | KERNEL | CONVERGED |
 | `state:lib/internals/materialize-markers.ts:MARKER_PROCESSORS` | moduleState | EXPLICIT: read by isRegisteredMarker/registerProcessor/materializeMarkers | KERNEL | CONVERGED |
@@ -307,7 +329,7 @@ Owners: `KERNEL` · `FRAMEWORK-ADAPTER` · `OPTIONAL-CAPABILITY` ·
 | `state:lib/internals/mutation-capture-runtime.ts:MUTATION_CAPTURE_RUNTIME` | moduleState | EXPLICIT: capture runtime attachment key | KERNEL | CONVERGED |
 | `state:lib/internals/node-shape.ts:CALLABLE_SIGNAL_SYMBOL` | moduleState | EXPLICIT: callable-signal protocol key | KERNEL | CONVERGED |
 | `state:lib/internals/node-shape.ts:NODE_STORE_SYMBOL` | moduleState | ?? not yet ruled (moduleState, Symbol.for()) | UNKNOWN | REVIEW |
-| `state:lib/internals/observation-substrate.ts:ARM` | moduleState | EXPLICIT: read by installDormantObservation/claimLeaf | KERNEL | CONVERGED |
+| `state:lib/internals/observation-adapter.ts:NEUTRAL_OBSERVATION_ADAPTER` | moduleState | neutral implementation of the framework-observation port | KERNEL | CONVERGED |
 | `state:lib/internals/observation-substrate.ts:OBSERVATION` | moduleState | EXPLICIT: read by installDormantObservation/claimLeaf | KERNEL | CONVERGED |
 | `state:lib/internals/owned-metadata.ts:OWNED_NODE_METADATA` | moduleState | EXPLICIT: read by getOwnedPositionIds/getOwnedOwnerPath/getOwnedOwnerId/hasIntrinsicMutationEmitter | KERNEL | CONVERGED |
 | `state:lib/internals/owner-invalidation-port.ts:dispatch` | moduleState | ?? not yet ruled (moduleState, uninitialised) | UNKNOWN | REVIEW |
@@ -325,7 +347,6 @@ Owners: `KERNEL` · `FRAMEWORK-ADAPTER` · `OPTIONAL-CAPABILITY` ·
 | `state:lib/internals/restoration-eligibility.ts:designated` | moduleState | EXPLICIT: restoration designation flag | OPTIONAL-CAPABILITY | CONVERGED |
 | `state:lib/internals/root-source.ts:ROOT_AUTHORITIES` | moduleState | ?? not yet ruled (moduleState, new WeakMap) | UNKNOWN | REVIEW |
 | `state:lib/internals/runtime-tree-plan.ts:RESTORATION_CAPABILITIES` | moduleState | EXPLICIT: capability set a restoration request implies, consumed by the build plan | KERNEL | CONVERGED |
-| `state:lib/internals/scalar-leaf-realization.ts:NEUTRAL_SCALAR_LEAF_REALIZATION` | moduleState | ?? not yet ruled (moduleState, object literal) | UNKNOWN | REVIEW |
 | `state:lib/internals/snapshot-authority.ts:ngDevMode` | moduleState | ?? not yet ruled (moduleState, uninitialised) | UNKNOWN | REVIEW |
 | `state:lib/internals/snapshot-authority.ts:MATERIALIZED` | moduleState | ?? not yet ruled (moduleState, new WeakMap) | UNKNOWN | REVIEW |
 | `state:lib/internals/snapshot-authority.ts:SNAPSHOT_PARENT` | moduleState | ?? not yet ruled (moduleState, new WeakMap) | UNKNOWN | REVIEW |
@@ -335,13 +356,9 @@ Owners: `KERNEL` · `FRAMEWORK-ADAPTER` · `OPTIONAL-CAPABILITY` ·
 | `state:lib/internals/subject-reclamation-sink.ts:SUBJECT_PHYSICAL_OWNERS_SYMBOL` | moduleState | EXPLICIT: physical owner registry key for reclamation | OPTIONAL-CAPABILITY | CONVERGED |
 | `state:lib/internals/subject-reclamation-sink.ts:SUBJECT_RECLAMATION_SINK_SYMBOL` | moduleState | EXPLICIT: reclamation sink attachment key | OPTIONAL-CAPABILITY | CONVERGED |
 | `state:lib/internals/subject-restoration-claims.ts:SUBJECT_RESTORATION_CLAIMS_SYMBOL` | moduleState | EXPLICIT: tree-scoped restoration claim index key | OPTIONAL-CAPABILITY | CONVERGED |
-| `state:lib/internals/tracking-suppression.ts:NEUTRAL_TRACKING_SUPPRESSION` | moduleState | ?? not yet ruled (moduleState, function) | UNKNOWN | REVIEW |
 | `state:lib/internals/tree-capabilities.ts:TREE_CAPABILITY_ORDER` | moduleState | EXPLICIT: capability ordering table | KERNEL | CONVERGED |
 | `state:lib/internals/tree-capabilities.ts:TREE_CAPABILITY_DEPENDENCIES` | moduleState | EXPLICIT: capability implication table | KERNEL | CONVERGED |
 | `state:lib/internals/tree-capabilities.ts:canonicalizeCapabilities` | moduleState | EXPLICIT: capability set canonicalization for the build plan | KERNEL | CONVERGED |
-| `state:lib/internals/tree-location.ts:FUNCTION_VALUE` | moduleState | EXPLICIT: callable-value marker for the location grammar | KERNEL | CONVERGED |
-| `state:lib/internals/tree-realization.ts:NEUTRAL_TREE_REALIZATION` | moduleState | ?? not yet ruled (moduleState, Object.freeze()) | UNKNOWN | REVIEW |
-| `state:lib/internals/tree-realization.ts:TREE_REALIZATIONS` | moduleState | ?? not yet ruled (moduleState, new WeakMap) | UNKNOWN | REVIEW |
 | `state:lib/internals/tree-scalar-slot-port.ts:TREE_SCALAR_SLOT_RUNTIME` | moduleState | ?? not yet ruled (moduleState, Symbol.for()) | UNKNOWN | REVIEW |
 | `state:lib/internals/causal-runtime/confirmed-redo.ts:defaultDependencies` | moduleState | EXPLICIT: default dependency bag for confirmed redo | OPTIONAL-CAPABILITY | CONVERGED |
 | `state:lib/internals/causal-runtime/confirmed-undo.ts:defaultDependencies` | moduleState | EXPLICIT: read by undoConfirmedAt — default dependency bag for confirmed undo | OPTIONAL-CAPABILITY | CONVERGED |
@@ -413,9 +430,9 @@ Owners: `KERNEL` · `FRAMEWORK-ADAPTER` · `OPTIONAL-CAPABILITY` ·
 | `symbol:SignalTree:TransactionLifecycleOwnerPresent` | structuralSymbol | transactions() owner-presence flag key | OPTIONAL-CAPABILITY | CONVERGED |
 | `symbol:SignalTree:TreeRealizationDescriptors` | structuralSymbol | causal replay descriptor store key | OPTIONAL-CAPABILITY | CONVERGED |
 | `symbol:SignalTree:TreeRealizationPort` | structuralSymbol | causal replay port key | OPTIONAL-CAPABILITY | CONVERGED |
-| `orphan:adapter.ts:readCanonicalSnapshot` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
 | `orphan:enhancers/devtools/devtools.ts:fullDevTools` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
 | `orphan:enhancers/devtools/devtools.ts:productionDevTools` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
+| `orphan:enhancers/restoration/restoration.ts:shouldRunRestorationConsistencyChecks` | orphanExport | restoration consistency-check policy with focused test consumers | OPTIONAL-CAPABILITY | CONVERGED |
 | `orphan:enhancers/restoration/restoration.ts:enableRestoration` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
 | `orphan:enhancers/serialization/serialization.ts:applySerialization` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
 | `orphan:enhancers/transactions/transactions.ts:getOrCreateInternalTransactionRuntime` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
@@ -437,10 +454,6 @@ Owners: `KERNEL` · `FRAMEWORK-ADAPTER` · `OPTIONAL-CAPABILITY` ·
 | `orphan:lib/internals/production-substrate-stats.ts:resetProductionSubstrateStatsForTesting` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
 | `orphan:lib/internals/subject-restoration-claims.ts:createSubjectRestorationClaims` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
 | `orphan:lib/internals/tree-capabilities.ts:assertTreeCapabilityGraphAcyclic` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
-| `orphan:lib/internals/tree-location.ts:asValue` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
-| `orphan:lib/internals/tree-location.ts:isFunctionValue` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
-| `orphan:lib/internals/tree-location.ts:createScalarLocation` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
-| `orphan:lib/internals/tree-location.ts:acquireScalarLocation` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
 | `orphan:lib/internals/causal-runtime/confirmed-redo.ts:redoConfirmedAt` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
 | `orphan:lib/internals/causal-runtime/confirmed-undo.ts:undoConfirmedAt` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
 | `orphan:lib/internals/causal-runtime/greenfield-transactions.ts:createGreenfieldTransactionDraft` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
@@ -462,38 +475,34 @@ Owners: `KERNEL` · `FRAMEWORK-ADAPTER` · `OPTIONAL-CAPABILITY` ·
 | `orphan:lib/physical/subject-record-target.ts:preparePhysicalSubjectForget` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
 | `orphan:lib/physical/subject-record-target.ts:preparePhysicalSubjectForgets` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
 | `orphan:lib/physical/subject-record-target.ts:assertPhysicalSubjectSlots` | orphanExport | reached only by specs — deliberate seam | TEST-SEAM | CONVERGED |
-| `bare-module:core/lib/signal-tree.ts` | bareModule | NOT split for diagnostics: its 32 ngDevMode guards are dev-only and its Angular coupling belongs to the kernel job itself (signal/isSignal/untracked/computed), so the fix is the C6 realization boundary, not file surgery | KERNEL | REIMPLEMENT |
-| `bare-module:core/lib/internals/materialize-markers.ts` | bareModule | DIAGNOSTIC + KERNEL co-location with NO runtime Angular import and 8 ngDevMode-guarded sites; co-location alone is not a defect and no cost or coupling discriminator says otherwise | KERNEL | CONVERGED |
-| `bare-module:core/lib/internals/tree-scalar-leaf-runtime.ts` | bareModule | ?? not yet ruled (bareModule, 1988 B in bare) | UNKNOWN | REVIEW |
+| `bare-module:core/lib/signal-tree.ts` | bareModule | universal LocationRuntime replaced framework signal/isSignal/untracked/computed dependencies | KERNEL | CONVERGED |
+| `bare-module:core/lib/internals/location-runtime.ts` | bareModule | kernel-owned location values, dependency graph, equality and publication; bare-required and framework-free | KERNEL | CONVERGED |
 | `bare-module:core/lib/internals/tree-scalar-slot-runtime.ts` | bareModule | BM-A: lib/internals/tree-scalar-slot-runtime.ts has no separately adjudicated job beyond kernel construction; the bare tree requires it | KERNEL | CONVERGED |
-| `bare-module:core/lib/utils.ts` | bareModule | SPLIT HELD: emits runtime signal/computed/isSignal AND Angular DI (effect, Injector, runInInjectionContext). The DI work is a genuinely different job from the bare-required kernel utilities beside it — a dependency boundary, not aesthetics | KERNEL | SPLIT |
+| `bare-module:core/lib/internals/materialize-markers.ts` | bareModule | DIAGNOSTIC + KERNEL co-location with NO runtime Angular import and 8 ngDevMode-guarded sites; co-location alone is not a defect and no cost or coupling discriminator says otherwise | KERNEL | CONVERGED |
 | `bare-module:core/lib/constants.ts` | bareModule | DEV-ENV: no runtime Angular import; the mix is build/dev policy (ngDevMode) feeding diagnostic message tables. Fix the S4 convergence point, then re-evaluate — do not split first | KERNEL | REIMPLEMENT |
-| `bare-module:core/lib/internals/owned-mutation.ts` | bareModule | BM-A: every adjudicated job in lib/internals/owned-mutation.ts is KERNEL; the bare tree requires it | KERNEL | REIMPLEMENT |
+| `bare-module:core/lib/utils.ts` | bareModule | framework observation and Angular DI moved to facade packages; this module now contains only kernel traversal and snapshot utilities | KERNEL | CONVERGED |
+| `bare-module:core/lib/internals/owned-mutation.ts` | bareModule | intrinsic location mutation capture replaced framework tracking suppression | KERNEL | CONVERGED |
 | `bare-module:core/lib/internals/utilities/deep-equal.ts` | bareModule | BM-A: kernel-internal equality utility required by the bare tree | KERNEL | CONVERGED |
 | `bare-module:core/enhancers/index.ts` | bareModule | BM-A: enhancers/index.ts has no separately adjudicated job beyond kernel construction; the bare tree requires it | KERNEL | CONVERGED |
+| `bare-module:core/lib/internals/tree-scalar-leaf-runtime.ts` | bareModule | ?? not yet ruled (bareModule, 1386 B in bare) | UNKNOWN | REVIEW |
 | `bare-module:core/lib/internals/member-membership.ts` | bareModule | BM-A: every adjudicated job in lib/internals/member-membership.ts is KERNEL; the bare tree requires it | KERNEL | CONVERGED |
 | `bare-module:core/lib/internals/utilities/is-built-in-object.ts` | bareModule | BM-A: kernel-internal built-in-object utility required by the bare tree | KERNEL | CONVERGED |
-| `bare-module:core/lib/internals/snapshot-authority.ts` | bareModule | ?? not yet ruled (bareModule, 819 B in bare) | UNKNOWN | REVIEW |
 | `bare-module:core/lib/internals/tree-capabilities.ts` | bareModule | BM-A: every adjudicated job in lib/internals/tree-capabilities.ts is KERNEL; the bare tree requires it | KERNEL | CONVERGED |
-| `bare-module:core/lib/internals/merge-derived.ts` | bareModule | NOT split: its only runtime framework coupling is isSignal, which the neutral isReactiveNode contract should absorb — re-evaluate after S2b | KERNEL | REIMPLEMENT |
 | `bare-module:core/lib/internals/position-registry.ts` | bareModule | BM-A: every adjudicated job in lib/internals/position-registry.ts is KERNEL; the bare tree requires it | KERNEL | CONVERGED |
-| `bare-module:core/lib/internals/observation-substrate.ts` | bareModule | BM-A: every adjudicated job in lib/internals/observation-substrate.ts is KERNEL; the bare tree requires it | KERNEL | CONVERGED |
+| `bare-module:core/lib/internals/merge-derived.ts` | bareModule | derived recipes are realized by the kernel LocationRuntime with no framework predicate | KERNEL | CONVERGED |
+| `bare-module:core/lib/internals/snapshot-authority.ts` | bareModule | ?? not yet ruled (bareModule, 576 B in bare) | UNKNOWN | REVIEW |
 | `bare-module:core/lib/internals/mutation-capture-runtime.ts` | bareModule | BM-A: every adjudicated job in lib/internals/mutation-capture-runtime.ts is KERNEL; the bare tree requires it | KERNEL | CONVERGED |
 | `bare-module:core/lib/internals/node-shape.ts` | bareModule | BM-A: every adjudicated job in lib/internals/node-shape.ts is KERNEL; the bare tree requires it | KERNEL | CONVERGED |
+| `bare-module:core/lib/internals/intrinsic-mutation.ts` | bareModule | ?? not yet ruled (bareModule, 223 B in bare) | UNKNOWN | REVIEW |
 | `bare-module:core/lib/internals/owned-metadata.ts` | bareModule | BM-A: every adjudicated job in lib/internals/owned-metadata.ts is KERNEL; the bare tree requires it | KERNEL | CONVERGED |
 | `bare-module:core/lib/internals/physical-commit-clock.ts` | bareModule | BM-A: every adjudicated job in lib/internals/physical-commit-clock.ts is KERNEL; the bare tree requires it | KERNEL | CONVERGED |
-| `bare-module:core/lib/internals/cell-identity.ts` | bareModule | ?? not yet ruled (bareModule, 192 B in bare) | UNKNOWN | REVIEW |
-| `bare-module:core/lib/internals/tree-realization.ts` | bareModule | ?? not yet ruled (bareModule, 181 B in bare) | UNKNOWN | REVIEW |
-| `bare-module:core/lib/internals/scalar-leaf-realization.ts` | bareModule | ?? not yet ruled (bareModule, 176 B in bare) | UNKNOWN | REVIEW |
+| `bare-module:core/lib/internals/cell-identity.ts` | bareModule | ?? not yet ruled (bareModule, 191 B in bare) | UNKNOWN | REVIEW |
 | `bare-module:core/lib/internals/tree-scalar-slot-port.ts` | bareModule | ?? not yet ruled (bareModule, 170 B in bare) | UNKNOWN | REVIEW |
-| `bare-module:core/lib/internals/cell-runtime.ts` | bareModule | BM-A: the neutral leaf-carrier contract; bare-required and imports no framework | KERNEL | CONVERGED |
-| `bare-module:core/lib/internals/intrinsic-mutation.ts` | bareModule | ?? not yet ruled (bareModule, 152 B in bare) | UNKNOWN | REVIEW |
 | `bare-module:core/lib/internals/runtime-tree-plan.ts` | bareModule | BM-A: every adjudicated job in lib/internals/runtime-tree-plan.ts is KERNEL; the bare tree requires it | KERNEL | CONVERGED |
 | `bare-module:core/lib/internals/path-observation-port.ts` | bareModule | BM-A: every adjudicated job in lib/internals/path-observation-port.ts is KERNEL; the bare tree requires it | KERNEL | CONVERGED |
+| `bare-module:core/lib/internals/observation-substrate.ts` | bareModule | BM-A: every adjudicated job in lib/internals/observation-substrate.ts is KERNEL; the bare tree requires it | KERNEL | CONVERGED |
 | `bare-module:core/lib/internals/owner-invalidation-port.ts` | bareModule | ?? not yet ruled (bareModule, 97 B in bare) | UNKNOWN | REVIEW |
+| `bare-module:core/lib/internals/observation-adapter.ts` | bareModule | neutral framework-observation port required by kernel-owned locations; implementation remains framework-owned | KERNEL | CONVERGED |
 | `bare-module:core/lib/internals/root-source.ts` | bareModule | BM-A: every adjudicated job in lib/internals/root-source.ts is KERNEL; the bare tree requires it | KERNEL | CONVERGED |
 | `bare-module:core/lib/enhancer-types.ts` | bareModule | BM-A: every adjudicated job in lib/enhancer-types.ts is KERNEL; the bare tree requires it | KERNEL | CONVERGED |
-| `bare-module:core/lib/internals/derived-runtime.ts` | bareModule | ?? not yet ruled (bareModule, 36 B in bare) | UNKNOWN | REVIEW |
 | `bare-module:core/lib/write-context.ts` | bareModule | BM-A: every adjudicated job in lib/write-context.ts is KERNEL; the bare tree requires it | KERNEL | CONVERGED |
-| `bare-module:core/lib/internals/materialization-realization.ts` | bareModule | BM-C: every adjudicated job in lib/internals/materialization-realization.ts is framework runtime yet it is bare-reachable — the C6 handoff | FRAMEWORK-ADAPTER | REIMPLEMENT |
-| `bare-module:core/lib/internals/tracking-suppression.ts` | bareModule | BM-A: the neutral suppression port; bare-required and imports no framework | KERNEL | CONVERGED |

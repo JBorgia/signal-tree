@@ -1,8 +1,9 @@
-import type {
-  ReadableCell,
-  WritableCell,
-} from './lib/internals/cell-runtime';
-import type { TreeRealization } from './lib/internals/tree-realization';
+import type { ReadableCell } from './lib/internals/cell-runtime';
+import {
+  createLocationRuntime,
+  type LocationRuntime,
+} from './lib/internals/location-runtime';
+import type { ObservationAdapter } from './lib/internals/observation-adapter';
 
 interface DependencyConsumer {
   level: number;
@@ -15,7 +16,6 @@ interface DependencySource {
 }
 
 let activeConsumer: DependencyConsumer | undefined;
-const reactiveNodes = new WeakSet<object>();
 let invalidationGroupDepth = 0;
 const pendingConsumers = new Set<DependencyConsumer>();
 
@@ -66,67 +66,12 @@ const runInvalidationGroup = (run: () => void): void => {
   }
 };
 
-const createWritable = <T>(
-  initial: T,
-  equal: (left: T, right: T) => boolean = Object.is
-): WritableCell<T> => {
-  let value = initial;
-  const source: DependencySource = { consumers: new Set(), level: 0 };
-  const cell = (() => {
-    observe(source);
-    return value;
-  }) as WritableCell<T>;
-  const write = (next: T): void => {
-    if (equal(value, next)) return;
-    value = next;
-    invalidate(source);
-  };
-  cell.set = write;
-  cell.update = (update) => write(update(value));
-  cell.asReadonly = () => cell;
-  reactiveNodes.add(cell);
-  return cell;
+export type ReactiveTestRealization = ObservationAdapter & {
+  readonly locations: LocationRuntime;
 };
 
-const createDerived = <T>(compute: () => T): ReadableCell<T> => {
-  let initialized = false;
-  let value: T;
-  const source: DependencySource = { consumers: new Set(), level: 1 };
-  const recompute = (): void => {
-    const previousConsumer = activeConsumer;
-    activeConsumer = consumer;
-    try {
-      const next = compute();
-      const changed = initialized && !Object.is(value, next);
-      value = next;
-      initialized = true;
-      source.level = consumer.level;
-      if (changed) invalidate(source);
-    } finally {
-      activeConsumer = previousConsumer;
-    }
-  };
-  const consumer: DependencyConsumer = {
-    level: 1,
-    invalidate: recompute,
-  };
-  const derived = () => {
-    observe(source);
-    if (!initialized) recompute();
-    return value;
-  };
-  reactiveNodes.add(derived);
-  return derived;
-};
-
-export const createReactiveTestRealization = (): TreeRealization => ({
-  cell: { createCell: createWritable },
-  derived: { createDerived },
-  materialization: {
-    isReactiveNode: (node) =>
-      typeof node === 'function' && reactiveNodes.has(node),
-  },
-  scalarLeaf: {
+export const createReactiveTestRealization = (): ReactiveTestRealization => {
+  const observation: ObservationAdapter = {
     createToken: () => {
       const source: DependencySource = { consumers: new Set(), level: 0 };
       return {
@@ -134,25 +79,13 @@ export const createReactiveTestRealization = (): TreeRealization => ({
         invalidate: () => invalidate(source),
       };
     },
-    createLeaf: <T,>(compute: () => T): WritableCell<T> => {
-      const leaf = createDerived(compute) as WritableCell<T>;
-      leaf.set = () => undefined;
-      leaf.update = () => undefined;
-      leaf.asReadonly = () => leaf;
-      return leaf;
-    },
     runInvalidationGroup,
-  },
-  suppressTracking: (run) => {
-    const previous = activeConsumer;
-    activeConsumer = undefined;
-    try {
-      return run();
-    } finally {
-      activeConsumer = previous;
-    }
-  },
-});
+  };
+  return {
+    ...observation,
+    locations: createLocationRuntime(observation),
+  };
+};
 
 export const observeReactiveTestValue = <T>(
   read: () => T,

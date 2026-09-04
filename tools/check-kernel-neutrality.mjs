@@ -32,7 +32,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 
 const SRC = resolve('packages/kernel/src');
 const DIST = resolve('dist/packages/kernel');
-const FRAMEWORK_IMPORT = /(?:from\s*|import\s*\(\s*)['"](@angular\/[^'"]+|react(?:\/[^'"]*)?)['"]/g;
+const FRAMEWORK_IMPORT = /(?:from\s*|import\s*\(\s*)['"](@angular\/[^'"]+|react(?:\/[^'"]*)?|vue(?:\/[^'"]*)?|svelte(?:\/[^'"]*)?|solid-js(?:\/[^'"]*)?|preact(?:\/[^'"]*)?)['"]/g;
 
 /**
  * Modules declared framework-neutral. Adding a root here is a CLAIM that its
@@ -41,7 +41,7 @@ const FRAMEWORK_IMPORT = /(?:from\s*|import\s*\(\s*)['"](@angular\/[^'"]+|react(
  */
 const NEUTRAL_ROOTS = [
   'lib/internals/tree-scalar-slot-runtime.ts',
-  'lib/internals/tree-location.ts',
+  'lib/internals/location-runtime.ts',
   'lib/internals/position-registry.ts',
   'lib/internals/physical-commit-clock.ts',
   'lib/mutation-types.ts',
@@ -72,7 +72,7 @@ function closure(entry) {
   return seen;
 }
 
-const tainted = (file) => /@angular\//.test(readFileSync(file, 'utf8'));
+const tainted = (file) => frameworkImports(readFileSync(file, 'utf8')).length > 0;
 
 function filesUnder(root) {
   if (!existsSync(root)) return [];
@@ -129,22 +129,28 @@ function violations(roots) {
 if (process.argv.includes('--self-test')) {
   const angular = frameworkImports("import type { Signal } from '@angular/core';");
   const react = frameworkImports("const x = import('react/jsx-runtime');");
+  const vue = frameworkImports("import { shallowRef } from 'vue';");
   const neutral = frameworkImports("import { signalTree } from './signal-tree';");
-  if (angular.length !== 1 || react.length !== 1 || neutral.length !== 0) {
+  if (
+    angular.length !== 1 ||
+    react.length !== 1 ||
+    vue.length !== 1 ||
+    neutral.length !== 0
+  ) {
     console.error(
       '✗ SELF-TEST FAILED: framework import detection did not distinguish ' +
-        'Angular, React, and neutral imports.'
+        'Angular, React, Vue, and neutral imports.'
     );
     process.exit(1);
   }
-  console.log('✓ self-test: Angular and React imports detected; neutral import accepted.');
+  console.log('✓ self-test: framework imports detected; neutral import accepted.');
   process.exit(0);
 }
 
 const found = violations(NEUTRAL_ROOTS);
 const frameworkFound = productionFrameworkViolations();
 if (found.length > 0 || frameworkFound.length > 0) {
-  console.error('✗ KERNEL NEUTRALITY VIOLATED — a declared-neutral root reaches @angular/* through its type closure:\n');
+  console.error('✗ KERNEL NEUTRALITY VIOLATED — a declared-neutral root reaches a framework through its type closure:\n');
   for (const v of found) {
     if (v.missing) console.error(`  ${v.root}\n      MISSING — declared neutral but does not exist`);
     else console.error(`  ${v.root}\n      reaches  ${v.member}`);
@@ -157,5 +163,5 @@ if (found.length > 0 || frameworkFound.length > 0) {
   process.exit(1);
 }
 console.log(
-  `✓ ${NEUTRAL_ROOTS.length} neutral roots plus all kernel production source/build artifacts — no Angular or React imports.`
+  `✓ ${NEUTRAL_ROOTS.length} neutral roots plus all kernel production source/build artifacts — no framework imports.`
 );

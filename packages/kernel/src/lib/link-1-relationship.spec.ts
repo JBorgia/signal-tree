@@ -16,8 +16,8 @@ import { transactions } from '../enhancers/transactions/transactions';
 import { withWriteContext } from './write-context';
 
 const testRealization = createReactiveTestRealization();
-const computed = testRealization.derived.createDerived;
-const signal = testRealization.cell.createCell;
+const computed = testRealization.locations.createDerived;
+const signal = testRealization.locations.createCell;
 
 /**
  * LINK-1 — can ONE tiny relationship primitive stay correct when the

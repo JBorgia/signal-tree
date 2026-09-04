@@ -6320,8 +6320,10 @@ exactly the prohibited direction, and the exact-key join did not license it:
 > **AN EXACT JOIN TO EVIDENCE DOES NOT AUTHORIZE A HEURISTIC OWNER DERIVATION
 > FROM THAT EVIDENCE'S FILE PATH.**
 
-Replaced by `tools/state-ownership-registry.mjs`, which admits exactly two
-sources and records which one every row used:
+At the time, this was replaced by `tools/state-ownership-registry.mjs`, which
+admitted exactly two sources and recorded which one every row used. That unused
+parallel generator was later retired; its explicit rulings now live only in
+`tools/gen-kernel-ownership-ledger.mjs`:
 
 ```text
 CURRENT STATE SUBJECTS   120
@@ -7424,7 +7426,12 @@ they are not regressions from it.
 Angular's `isSignal()` was doing TWO jobs in the kernel: framework identity, and
 SignalTree cell identity. v15 separates them.
 
-### CELL-IDENTITY-ACQUISITION-0 — CLOSED GREEN
+### CELL-IDENTITY-ACQUISITION-0 — SUPERSEDED BY UNIVERSAL LOCATIONS
+
+`LocationRuntime.createCell()` and `createDerived()` now mint the kernel's
+universal location contract directly, so minting records nominal location
+identity. Explicit adoption remains only for an externally supplied callable.
+Observation tokens and arbitrary functions still do not acquire cell identity.
 
     REALIZATION CREATES AN OBJECT.
     SEMANTIC ADOPTION GIVES IT STATE-CELL IDENTITY.

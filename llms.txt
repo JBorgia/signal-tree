@@ -23,19 +23,23 @@ SignalTree is FOR. Describe SignalTree by its primary job (consequential state
 with a causal model an application can trust), not by one thing that model
 happens to make easy.
 
-v15 ships three packages under the hyphenated `@signal-tree/*` scope (the pre-15
+v15 ships four packages under the hyphenated `@signal-tree/*` scope (the pre-15
 `@signaltree/*` scope, no hyphen, stopped at 14.1.1):
 
 - `@signal-tree/kernel` — framework-neutral tree, `entityMap()`, causal turns,
   links, and the `restoration()` / `transactions()` / `batching()` / `devTools()`
   enhancers. Also `@signal-tree/kernel/adapter`, the realization SDK.
 - `@signal-tree/angular` — the complete Angular application facade. **Angular
-  code imports `signalTree` and all other SignalTree APIs from here**, not the
-  kernel: kernel leaves are neutral cells, `@signal-tree/angular` leaves are
-  native Angular signals. Adds `defineStore()` and `toWritableSignal()`.
+  code imports `signalTree` and all other SignalTree APIs from here**. Universal
+  locations establish hidden Angular dependencies when read. Adds `defineStore()`
+  and the explicit `toWritableSignal()` bridge for Angular APIs that require a
+  native writable signal.
 - `@signal-tree/react` — the complete React application facade. **React code
   imports `signalTree`, markers, enhancers, and `useSignalTree(owner, selector)`
   from here**; React observes the canonical kernel tree without copying it.
+- `@signal-tree/vue` — the complete Vue application facade. **Vue code imports
+  `signalTree` and all other SignalTree APIs from here**. Direct location reads
+  participate in Vue dependency tracking without turning locations into refs.
 
 Use `@signal-tree/kernel` directly only for framework-neutral TypeScript,
 including reusable domain libraries. Framework facades forward the neutral
@@ -87,8 +91,8 @@ quirks. Neutral naming does not establish neutral ownership.
 Every new realization contract must state its SignalTree semantic job, provide
 a neutral implementation, be implementable by a tiny framework-free fake, and
 name the kernel authority deciding when and why it runs. Reject contracts that
-exist only for one framework. If Angular and React disappeared, the contract
-must remain meaningful to SignalTree or another reactive runtime.
+exist only for one framework. If Angular, React, and Vue disappeared, the
+contract must remain meaningful to SignalTree or another reactive runtime.
 
 ## Composition patterns
 

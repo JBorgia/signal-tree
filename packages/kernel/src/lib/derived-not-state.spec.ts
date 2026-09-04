@@ -1,40 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { entityMap } from './types';
-import { bindSignalTreeRealization, signalTree } from './signal-tree';
-import { NEUTRAL_TREE_REALIZATION } from './internals/tree-realization';
-
-const FAKE_REACTIVE = Symbol('fake-reactive');
-
-type FakeWritable<T> = {
-  (): T;
-  set(value: T): void;
-  update(update: (value: T) => T): void;
-  asReadonly(): () => T;
-  readonly [FAKE_REACTIVE]: true;
-};
-
-const fakeWritable = <T,>(initial: T): FakeWritable<T> => {
-  let value = initial;
-  const cell = (() => value) as FakeWritable<T>;
-  cell.set = (next) => {
-    value = next;
-  };
-  cell.update = (update) => cell.set(update(value));
-  cell.asReadonly = () => cell;
-  Object.defineProperty(cell, FAKE_REACTIVE, { value: true });
-  return cell;
-};
-
-const fakeSignalTree = bindSignalTreeRealization({
-  ...NEUTRAL_TREE_REALIZATION,
-  cell: { createCell: fakeWritable },
-  materialization: {
-    isReactiveNode: (value) =>
-      typeof value === 'function' &&
-      (value as Partial<FakeWritable<unknown>>)[FAKE_REACTIVE] === true,
-  },
-});
+import { signalTree } from './signal-tree';
 
 /**
  * A DERIVED VALUE IS NOT STATE, AT ANY TOUCH ORDER.
@@ -140,26 +107,6 @@ describe('derived state never reaches a snapshot', () => {
     tree.$.rows.setAll([{ id: 1 }]);
 
     expect(tree.$()).toEqual({ rows: { all: [{ id: 1 }] }, n: 1 });
-  });
-
-  it('a recognized writable value in derived() stays writable but is not snapshot state', () => {
-    // Writable carrier capability does not change configured-derived
-    // ownership. The location remains available under `$`, while NaturalValue
-    // snapshots continue to contain source and marker state only.
-    const tree = fakeSignalTree(
-      { a: 1 },
-      {
-        derived: () => ({
-          manual: fakeWritable(42),
-        }),
-      }
-    );
-    void tree.$;
-
-    expect(tree.$.manual()).toBe(42);
-    tree.$.manual.set(7);
-    expect(tree.$.manual()).toBe(7);
-    expect(tree.$()).toEqual({ a: 1 });
   });
 
   it('a snapshot round-trips and the derived recomputes from it', () => {

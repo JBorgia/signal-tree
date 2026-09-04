@@ -3,8 +3,8 @@ import {
   getOrCreateSubjectRestorationClaims,
   type RestorationClaimOwner,
 } from '../../lib/internals/subject-restoration-claims';
-import { NEUTRAL_CELL_RUNTIME } from '../../lib/internals/cell-runtime';
-import { getTreeRealization } from '../../lib/internals/tree-realization';
+import { NEUTRAL_LOCATION_RUNTIME } from '../../lib/internals/location-runtime';
+import { getLocationRuntime } from '../../lib/internals/location-runtime';
 import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-port';
 import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
 import { rootAuthorityFor } from '../../lib/internals/root-source';
@@ -527,10 +527,11 @@ class RestorationManager<T> {
     private restoreStateFn?: (state: T) => void,
     private applyEffectsFn?: (applications: DirectedTurnApplication[]) => void
   ) {
-    const cellRuntime = getTreeRealization(tree)?.cell ?? NEUTRAL_CELL_RUNTIME;
-    this.indexSignal = cellRuntime.createCell(-1);
-    this.historyVersion = cellRuntime.createCell(0);
-    this.frontierVersion = cellRuntime.createCell(0);
+    const locations =
+      getLocationRuntime(tree) ?? NEUTRAL_LOCATION_RUNTIME;
+    this.indexSignal = locations.createCell(-1);
+    this.historyVersion = locations.createCell(0);
+    this.frontierVersion = locations.createCell(0);
     this.maxHistorySize = normaliseMaxHistorySize(config.maxHistorySize);
   }
 
@@ -2483,9 +2484,9 @@ export function restoration(
               },
               () => prepared.install()
             );
-          const scalarRealization = getTreeRealization(tree.$)?.scalarLeaf;
-          if (scalarRealization) {
-            scalarRealization.runInvalidationGroup(apply);
+          const locations = getLocationRuntime(tree.$);
+          if (locations) {
+            locations.runInvalidationGroup(apply);
           } else {
             apply();
           }

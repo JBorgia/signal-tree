@@ -110,6 +110,19 @@ describe('auto-batching in signalTree callable', () => {
     expect(tree.$.data.y()).toBe(2);
   });
 
+  it('location subscribers observe only the completed branch value', () => {
+    const tree = signalTree({ pair: { left: 0, right: 0 } });
+    const seen: Array<{ left: number; right: number }> = [];
+    const unsubscribe = tree.$.pair.left.subscribe(() => {
+      seen.push(tree.$.pair());
+    });
+
+    tree.$.pair({ left: 1, right: 1 });
+
+    expect(seen).toEqual([{ left: 1, right: 1 }]);
+    unsubscribe();
+  });
+
   it('an updater argument writes the value it returns', () => {
     const tree = signalTree({
       data: { x: 1, y: 2 },

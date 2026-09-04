@@ -152,7 +152,7 @@ describe('SignalTree reactivity contract', () => {
         { a: 0, b: 0 },
         {
           derived: ($) => ({
-            da: computed(() => $.a() * 2),
+            da: () => $.a() * 2,
           }),
         }
       );
