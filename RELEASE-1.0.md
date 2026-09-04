@@ -18,16 +18,33 @@ publication, restoration, and explicit owner teardown remain intact. Obsolete
 carrier specialization, framework-owned scalar realization, duplicate derived
 runtime, tracking suppression, and tree-location wrappers are deleted.
 
+`CALLABLE-LOCATIONS-0` is **CLOSED IN SOURCE** at `81780c4e`. Root, branch,
+terminal, and EntityMap field locations now share one grammar: `location()`
+reads, `location(value)` replaces, and `location(updater)` derives. `leaf(value)`
+ends topology explicitly and disambiguates callable data. Canonical locations
+have no `.set()` / `.update()` methods; framework-native writable identity is an
+explicit adapter view, never another state authority.
+
 This breaking architecture correction supersedes the former clean-clone
-technical-readiness checkpoint. Current ordinary evidence is green: strict
-source and public typecheck; kernel `259` files / `2,169` passing tests; Angular
-`92`; React `6`; Vue `4`; demo `145`; React reference `16`; spec-type ratchet at
-`233` known diagnostics with none worse; lint `19/19` with zero errors; forced-GC
-retention; `55/55` fast gates; all five slow non-release runtime gates; packed
-consumer typecheck under `bundler` and `node16`; facade runtime identity;
-architecture assets; production demo build; and bundle budgets at `9.77/9.8 KB`
-bare and `21.65/21.7 KB` EntityMap production gzip. Independent final review
-found no blocker.
+technical-readiness checkpoint. Current ordinary evidence is green under the
+canonical Node `24.3.0` runtime in `.nvmrc`: strict source and public typecheck;
+kernel `260` files / `2,177` passing tests plus two expected failures; Angular
+`95`; React `6`; Vue `4`; demo `145`; React reference `16`; spec-type ratchet at
+`223` known diagnostics with none worse; lint with zero errors and no warning
+budget growth; forced-GC retention; `55/55` fast gates; `7/7` ordinary slow
+gates; `24/24` declared artifact entries; packed consumer typecheck under
+`bundler` and `node16`; facade runtime identity; `34` current architecture
+assets; production package and demo builds; numeric claims `146/146`; and bundle
+budgets at `9.93/10.0 KB` bare and `21.97/22.1 KB` EntityMap production gzip.
+Independent final review found no blocker.
+
+The controlled `84837fb3` method-form versus callable-location benchmark used
+mirrored persistent workers, 30 paired samples, five warmups, and an identical-
+current A/A control. Read, derivation, and construction intervals cross zero and
+support no change claim. Scalar replacement measured `+7.4%`, about `+4.4 ns`,
+with a paired p10-p90 interval of `+3.7%` to `+10.5%`; the corresponding A/A
+interval was `-4.1%` to `+1.4%`. Raw samples and worker assignments are tracked
+under `apps/demo/public/benchmarks/`.
 
 The full release-only matrix, exact candidate, registry write, tag, and publish
 remain intentionally unrun. They belong to the next explicitly authorized final
@@ -12434,10 +12451,10 @@ Must complete BEFORE retyping the 132 Angular-shaped public type sites.
         tree                  controller, non-callable
         location()            READ
         location(fn)          DERIVE
-        location(mark(fn))    REPLACE the callable AS DATA
+        location(leaf(fn))    REPLACE the callable AS DATA
         the root tree.$ uses the SAME location grammar
 [x] canonical location object owned by the KERNEL, not a WritableSignal
-[x] Angular WritableSignal = explicit adapter view (spelling NOT yet frozen)
+[x] Angular WritableSignal = explicit `toWritableSignal(location)` adapter view
 [x] resolve function-valued-state disambiguation   FUNCTION-AS-STATE-0 = FNS-A
 [x] branch object write semantics                      RULED — whole-value T
 ```
@@ -12506,57 +12523,56 @@ function-as-data disambiguation is settled.
 
 ```text
 C1 REAL LOCATION SUBJECT
-   [ ] implement kernel Location<T> over the neutral scalar runtime
-   [ ] move the §B discriminator onto the REAL subject — cases 1–8, the
+   [x] implement kernel Location<T> over the neutral scalar runtime — 81780c4e
+   [x] move the §B discriminator onto the REAL subject — cases 1–8, the
        historical-inference mutation, the wrong-authority-ingress mutation
-   [ ] do NOT create another prototype carrier
+   [x] do NOT create another prototype carrier
 
 C2 TYPE CONTRACT
-   [ ] author strictness preserved: User rejects a partial; Partial<User>
+   [x] author strictness preserved: User rejects a partial; Partial<User>
        accepts one; { name; age? } keeps name required; entity Row same grammar
-   [ ] ordinary-value overload excludes callables AND constructors
-   [ ] NOTFN-GREENFIELD-DISPOSITION — prove an independent author-facing job or
-       DELETE. Expected: delete public NotFn, use an internal exclusion type.
+   [x] ordinary-value overload excludes callables AND constructors
+   [x] NOTFN-GREENFIELD-DISPOSITION — public NotFn deleted; exclusion is internal
 
 C3 MARKER PUBLIC SURFACE
-   [ ] smallest author-facing spelling for "this callable is DATA"
-   [ ] no global augmentation, no transform, no Angular dep, no persistent
+   [x] `leaf(value)` is the smallest author-facing terminal/callable-data spelling
+   [x] no global augmentation, no transform, no Angular dep, no persistent
        wrapper, no second assignment verb; good inference for callbacks,
        constructors, null unions, updater-shaped stored functions
 
 C4 NON-AUTHORED INGRESS
-   [ ] explicit realization/acquisition entrance taking raw values and
+   [x] explicit realization/acquisition entrance taking raw values and
        preserving the caller's known causal class
-   [ ] the three bind-branch partial-acquisition cases relocate here
-   [ ] NOT location(partialPayload), NOT location(rawFunction)
-   [ ] not public unless a public consumer proves it belongs there
+   [x] the three bind-branch partial-acquisition cases relocate here
+   [x] NOT location(partialPayload), NOT location(rawFunction)
+   [x] adapter-only export exists only where Angular proves the ingress need
 
 C5 REMOVE INCUMBENT CALLABLE SEMANTICS
-  [x] retire NodeAccessor Partial<T> callable + merging updater — 1495f713
-  [x] retire incumbent tree(); migrate the root to tree.$ — 1495f713
-     [x] merge carrier contradicted; strict whole-value and explicit runtime
-      permissiveness controls retained — 1495f713
-  [x] fixture-only callers migrate to complete values or explicit runtime probes,
-    assertions unchanged — 1495f713
+   [x] retire NodeAccessor Partial<T> callable + merging updater — 1495f713
+   [x] retire incumbent tree(); migrate the root to tree.$ — 1495f713
+       [x] merge carrier contradicted; strict whole-value and explicit runtime
+           permissiveness controls retained — 1495f713
+   [x] fixture-only callers migrate to complete values or explicit runtime probes,
+       assertions unchanged — 1495f713
 
 C6 ANGULAR HANDOFF
-   [ ] move the Angular scalar publication adapter, the WritableSignal view, the
+   [x] move the Angular scalar publication adapter, the WritableSignal view, the
        DI/lifecycle facade, toWritableSignal, Angular memo/invalidation
-   [ ] kernel stays neutral under the existing closure gate
-   [ ] do NOT make Angular signal identity canonical again to ease migration
+   [x] kernel stays neutral under the existing closure gate
+   [x] do NOT make Angular signal identity canonical again to ease migration
 
 C7 ENTITY DISCRIMINATOR — CLOSURE EVIDENCE, NOT PLANNING EVIDENCE
-   [ ] real entity path through a NON-Angular publication adapter: neutral
+   [x] real entity path through a NON-Angular publication adapter: neutral
        physical truth, structural/value mutation, commit/publication result,
        non-Angular observation, same semantic result as the Angular view
-   [ ] required before GREENFIELD-FRAMEWORK-HANDOFF-0 closes
+   [x] required before GREENFIELD-FRAMEWORK-HANDOFF-0 closes
 
 C8 SURFACE REVIEW — before regenerating the baseline
-   [ ] NotFn disposition · marker spelling · Angular bridge spelling
-   [ ] no duplicate mutation verbs
-   [ ] no leaked SlotIndex / revision / frame / internal marker types
-   [ ] no incumbent tree() · no WritableSignal as canonical location
-   [ ] THEN regenerate the baseline for the ACTUAL greenfield surface and
+   [x] NotFn disposition · `leaf` spelling · `toWritableSignal` bridge spelling
+   [x] no duplicate mutation verbs
+   [x] no leaked SlotIndex / revision / frame / internal marker types
+   [x] no incumbent tree() · no WritableSignal as canonical location
+   [x] regenerate the baseline for the ACTUAL greenfield surface and
        rerun the C/D/E release gates
 ```
 
@@ -12577,25 +12593,26 @@ The spike's vanilla-adapter proof covered **scalars only**. Before the handoff c
 called closed — not merely before planning:
 
 ```text
-[ ] one entity vertical slice through neutral stores + neutral commit +
+[x] one entity vertical slice through neutral stores + neutral commit +
     a vanilla publication adapter, yielding the SAME semantic result as Angular
 ```
 
 ### E. DELETE INCUMBENT REPRESENTATION
 
 ```text
-[ ] delete incumbent `tree()`
-[ ] delete Angular-owned leaf representation from the kernel
-[ ] compiler-drive the fallout
+[x] delete incumbent `tree()`
+[x] delete Angular-owned leaf representation from the kernel
+[x] compiler-drive the fallout
 ```
 
 Then, before any RC:
 
 ```text
-[ ] exhaustive public API review of the GREENFIELD surface
-[ ] regenerate `tools/api-baseline.json` for the ACTUAL 1.0 surface
-[ ] prove package/type closure on that artifact
-[ ] rerun Phase 3/4/5 gates against the greenfield artifact
+[x] exhaustive public API review of the GREENFIELD surface
+[x] regenerate `tools/api-baseline.json` for the ACTUAL 1.0 surface
+[x] prove package/type closure on that artifact
+[x] rerun ordinary Phase 3/4/5 gates against the greenfield artifact
+[ ] rerun release-only gates against the exact final candidate
 ```
 
 ⚠️ **GATES C/D/E DO NOT CARRY OVER AUTOMATICALLY.** Their TOOLING stays valid;
@@ -12841,18 +12858,30 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
       browser, and development policy probes; release gates `74/74`; release-
       inclusive mutation proofs `74/74` with zero unproven, blind, or errored
       gates; final independent review clean.
-    - [x] **Kernel-owned universal locations and first-party Vue facade
-      (`5efeb7f5`).** Canonical values, dependency propagation, equality,
-      subscriptions, derived memoization, and grouped publication moved behind
-      the framework-neutral location runtime. Angular, React, and Vue retain one
-      facade import each and observe the same nominal locations without creating
-      another state authority. Transaction and EntityMap publication are
-      coherent; failed derived reads retry; owner invalidation waits through
-      reopened commit scopes; `updateAndReport` preserves its shallow
-      `Partial<T>` scope; arbitrary dot-path keys remain legal; computed
-      EntityMap slices expose full `ReadonlyLocation`; packed facade identities
-      and both strict module-resolution modes are mutation-proven. Validation is
-      recorded under Current Phase above. Final RC verification remains owed.
+  - [x] **Kernel-owned universal locations and first-party Vue facade
+        (`5efeb7f5`).** Canonical values, dependency propagation, equality,
+        subscriptions, derived memoization, and grouped publication moved behind
+        the framework-neutral location runtime. Angular, React, and Vue retain one
+        facade import each and observe the same nominal locations without creating
+        another state authority. Transaction and EntityMap publication are
+        coherent; failed derived reads retry; owner invalidation waits through
+        reopened commit scopes; `updateAndReport` preserves its shallow
+        `Partial<T>` scope; arbitrary dot-path keys remain legal; computed
+        EntityMap slices expose full `ReadonlyLocation`; packed facade identities
+        and both strict module-resolution modes are mutation-proven. Validation is
+        recorded under Current Phase above. Final RC verification remains owed.
+  - [x] **Uniform callable location grammar and explicit terminal topology
+        (`81780c4e`).** Root, branch, terminal, and EntityMap field locations use
+        the same read/replace/derive calls; `leaf(value)` marks an explicit
+        topology boundary and callable data; canonical `.set()` / `.update()` are
+        removed. Raw realization, restoration, serialization, Link, adapter, and
+        DevTools ingress preserve known mutation semantics without re-entering
+        authored disambiguation. Angular, React, Vue, the complete demo, live docs,
+        generated architecture assets, tools, and strict consumers are migrated.
+        The controlled historical comparison finds no clear read, derivation, or
+        construction change and measures scalar replacement at about `+4.4 ns`.
+        Ordinary validation is recorded under Current Phase; exact-candidate
+        release-only verification remains owed.
 - [ ] publish `1.0.0`
 - [ ] verify npm/docs/install instructions from scratch
 - [ ] post-release operational readiness
