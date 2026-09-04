@@ -38,6 +38,11 @@
             "output": "assets/docs/react"
           },
           {
+            "glob": "README.md",
+            "input": "packages/vue",
+            "output": "assets/docs/vue"
+          },
+          {
             "glob": "composition-recipes.md",
             "input": "docs/guides",
             "output": "assets/docs/guides"

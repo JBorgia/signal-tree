@@ -168,8 +168,13 @@ const TARGETS = {
     // `check-devmode-foldable` is green, so the strings provably do not ship.
     // That is the condition this file's own guidance states for a dev bump; a
     // prod change would have been a regression to fix instead.
-    devKB: 11.9,
-    prodKB: 9.7,
+    // Universal locations add vanilla subscriptions, coherent grouped
+    // publication, exception-safe settlement, and weak reverse dependency
+    // edges so abandoned derived recipes collect. After removing duplicate
+    // dispatch and notification code, the generator measures 9.76KB prod and
+    // 11.91KB dev. Raised by 0.1KB rather than weakening those invariants.
+    devKB: 12.0,
+    prodKB: 9.8,
     code: `
       import { signalTree } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, user: { name: 'a' } });

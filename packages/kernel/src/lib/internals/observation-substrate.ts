@@ -4,6 +4,7 @@ import { emitOwnedMutation } from './owned-mutation';
 import { getOwnedOwnerPath } from './owned-metadata';
 import { getPositionRegistry } from './position-registry';
 import { isTraversableNode } from './node-shape';
+import { observeIntrinsicMutations } from './intrinsic-mutation';
 
 /**
  * THE DORMANT OBSERVATION SUBSTRATE.
@@ -42,26 +43,14 @@ import { isTraversableNode } from './node-shape';
  * publish twice.
  */
 
-/** Module-private. Deliberately not a discoverable `__`-prefixed string. */
-const ARM = Symbol('signaltree.observationArm');
-
-type Arm = (before: unknown, after: unknown, intent: 'replace' | 'derive') => void;
-type ArmSlot = (arm: Arm | null) => void;
-
 /**
- * Deliberately only what is NOT already reachable from the leaf.
- *
- * `slot`, `registry` and `ownerPath` were cached here originally and are
- * duplicates: the arm slot lives on the leaf under `ARM`, and the registry and
- * owner path were attached during materialization. Reading them at claim time —
- * a rare operation — instead of retaining them per leaf costs nothing and
- * removes bookkeeping paid by every ordinary leaf whether or not it is ever
- * observed. RETAINED-MEMORY-0 / MEM-D.
+ * Deliberately only what is not already reachable from the location.
  */
 type LeafObservation = {
   claims: number;
   /** Allocated on first activation, retained for the source's lifetime. */
   positionId: number | undefined;
+  releaseMutationObserver: () => void;
 };
 
 const OBSERVATION = new WeakMap<object, LeafObservation>();
@@ -74,37 +63,11 @@ const OBSERVATION = new WeakMap<object, LeafObservation>();
  * for the leaf's lifetime.
  */
 export function installDormantObservation<T>(leaf: WritableCell<T>): void {
-  const rawSet = leaf.set.bind(leaf);
-  const rawUpdate = leaf.update.bind(leaf);
-  let arm: Arm | null = null;
-
-  Object.defineProperty(leaf, ARM, {
-    value: ((next: Arm | null) => void (arm = next)) satisfies ArmSlot,
-    enumerable: false,
-    configurable: true,
+  OBSERVATION.set(leaf as object, {
+    claims: 0,
+    positionId: undefined,
+    releaseMutationObserver: () => undefined,
   });
-
-  leaf.set = (value: T) => {
-    if (arm === null) {
-      rawSet(value);
-      return;
-    }
-    const before = leaf();
-    rawSet(value);
-    arm(before, leaf(), 'replace');
-  };
-
-  leaf.update = (updater: (value: T) => T) => {
-    if (arm === null) {
-      rawUpdate(updater);
-      return;
-    }
-    const before = leaf();
-    rawUpdate(updater);
-    arm(before, leaf(), 'derive');
-  };
-
-  OBSERVATION.set(leaf as object, { claims: 0, positionId: undefined });
 }
 
 /** Claim observation for one leaf, or `undefined` if it is not one. */
@@ -112,42 +75,25 @@ function claimLeaf(node: object): (() => void) | undefined {
   const state = OBSERVATION.get(node);
   if (!state) return undefined;
 
-  // Read at CLAIM time rather than retained per leaf — see LeafObservation.
-  const slot = (node as Record<symbol, ArmSlot>)[ARM];
   const registry = getPositionRegistry(node);
   const ownerPath = getOwnedOwnerPath(node);
-  if (!slot || !registry || ownerPath === undefined) return undefined;
+  if (!registry || ownerPath === undefined) return undefined;
 
   if (state.claims === 0) {
     if (state.positionId === undefined) {
       state.positionId = registry.allocate();
     }
     const positionIds = [state.positionId];
-    slot((before, after, intent) => {
-      if (Object.is(before, after)) return;
-      emitOwnedMutation(
-        // ⚠️ `path` IS THE OWNER PATH HERE, DELIBERATELY. This site reports the
-        // mutation AT the owning node's address, which is why it read
-        // `{ path: ownerPath, ownerPath }` — the same value supplied twice for
-        // two different reasons. With `OwnedMutationOptions.ownerPath` deleted
-        // (ME-B) the surviving argument still carries the owner address; what
-        // went away is the duplicate, not the semantics.
-        { path: ownerPath, positionIds, ownerId: registry.id },
-        before,
-        after,
-        // ⚠️ INTENT IS DERIVED FROM THE OPERATION, never fixed. `transactions`
-        // branches on `mutationIntent === 'replace'` and both it and
-        // `restoration` accumulate through `combineScalarMutationIntent`, where
-        // replace DOMINATES derive — so reporting an `update()` as a replace
-        // propagates rather than cancelling.
-        // ⚠️ THIS SITE USED TO ALSO PASS A `kind` OF
-        // `intent === 'replace' ? 'set' : 'update'` — computed FROM the intent
-        // beside it. A field derived from its own neighbour at the producer
-        // carries no independent fact, which is why nothing downstream ever
-        // read it. Deleted with `MutationEnvelope.kind` in 15.0.
-        intent
-      );
-    });
+    state.releaseMutationObserver =
+      observeIntrinsicMutations(node, (mutation) => {
+        if (!mutation.changed) return;
+        emitOwnedMutation(
+          { path: ownerPath, positionIds, ownerId: registry.id },
+          mutation.before,
+          mutation.after,
+          mutation.intent
+        );
+      }) ?? (() => undefined);
   }
   state.claims++;
 
@@ -156,7 +102,10 @@ function claimLeaf(node: object): (() => void) | undefined {
     if (released) return; // dispose is idempotent
     released = true;
     state.claims--;
-    if (state.claims === 0) slot(null);
+    if (state.claims === 0) {
+      state.releaseMutationObserver();
+      state.releaseMutationObserver = () => undefined;
+    }
   };
 }
 

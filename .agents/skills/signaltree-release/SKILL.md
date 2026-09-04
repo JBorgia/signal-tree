@@ -52,7 +52,7 @@ These are not in the loop rules and have each cost a session before:
 ## Independent review
 
 At a phase boundary — before you mark a gate satisfied — dispatch the
-[`release-reviewer`](../../agents/release-reviewer.md) subagent against HEAD. It is
+[`release-reviewer`](../../../.claude/agents/release-reviewer.md) subagent against HEAD. It is
 read-only and has its own context, so its audit does not consume this conversation.
 
 Give it: the phase, the gate you are claiming, and the commits in the slice. Take its

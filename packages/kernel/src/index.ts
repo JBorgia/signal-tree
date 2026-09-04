@@ -16,15 +16,8 @@
 export { signalTree } from './lib/signal-tree';
 
 /**
- * Wrap a tree factory in an injectable Angular service (the idiomatic Angular
- * DI pattern for a tree; comparable to NgRx SignalStore's `signalStore()`).
- * @see {@link defineStore}
- */
-
-/**
  * Type-only read-only narrowing of a tree — same runtime object, no write
- * path offered on the type. The primary readonly surface;
- * `defineStore(factory, { expose: 'readonly' })` is sugar over the same view.
+ * path offered on the type. The primary readonly surface.
  * @see {@link asReadonly}
  */
 export {
@@ -50,6 +43,8 @@ export type {
   SignalTree,
   TreeNode,
   WritableLeaf,
+  Location,
+  ReadonlyLocation,
   AccessibleNode,
   NodeAccessor,
   Primitive,
@@ -66,6 +61,7 @@ export type {
 
   // Entity types
   EntitySignal,
+  EntityNode,
   EntityMapMarker,
   AddOptions,
   AddManyOptions,

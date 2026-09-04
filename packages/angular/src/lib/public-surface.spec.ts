@@ -36,6 +36,44 @@ const flush = async () => {
 describe('PUBLIC CARRIER — toWritableSignal is reachable from @signal-tree/angular', () => {
   type Model = { name: string };
 
+  it('adapts a leaf without creating another state authority', async () => {
+    @Component({ standalone: true, template: '' })
+    class Host {
+      private readonly injector = inject(Injector);
+      readonly tree = signalTree({ name: 'Ada' });
+      readonly model = toWritableSignal(this.tree.$.name, this.injector);
+    }
+
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const host = fixture.componentInstance;
+
+    host.model.set('Grace');
+    expect(host.tree.$.name()).toBe('Grace');
+
+    host.tree.$.name.set('Lin');
+    TestBed.flushEffects();
+    await flush();
+    expect(host.model()).toBe('Lin');
+  });
+
+  it('adapts a branch whose state contains a set key', () => {
+    @Component({ standalone: true, template: '' })
+    class Host {
+      private readonly injector = inject(Injector);
+      readonly tree = signalTree({ nested: { set: 1, value: 1 } });
+      readonly model = toWritableSignal(this.tree.$.nested, this.injector);
+    }
+
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const host = fixture.componentInstance;
+
+    host.model.set({ set: 2, value: 2 });
+
+    expect(host.tree.$.nested()).toEqual({ set: 2, value: 2 });
+  });
+
   it('a form built through the PUBLIC route makes an edit restoration-eligible', async () => {
     @Component({ standalone: true, template: '' })
     class Host {

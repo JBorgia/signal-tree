@@ -4,9 +4,9 @@ import {
   createReactiveTestRealization,
   observeReactiveTestValue,
 } from '../reactive-test-realization';
-import { bindSignalTreeRealization } from './signal-tree';
+import { createSignalTreeFactory } from './signal-tree';
 
-const signalTree = bindSignalTreeRealization(
+const signalTree = createSignalTreeFactory(
   createReactiveTestRealization()
 );
 
@@ -23,6 +23,21 @@ const signalTree = bindSignalTreeRealization(
  * path for every `set()` it attempted rather than every `set()` that landed.
  */
 describe('updateAndReport — reports only what landed', () => {
+  it('preserves omitted top-level members but replaces each included branch', () => {
+    const tree = signalTree({
+      untouched: { value: 1 },
+      edited: { keep: 1, omit: 2 } as { keep: number; omit?: number },
+    });
+
+    const changed = tree.updateAndReport({ edited: { keep: 3 } });
+
+    expect(changed).toEqual(['edited.keep']);
+    expect(tree.$()).toEqual({
+      untouched: { value: 1 },
+      edited: { keep: 3 },
+    });
+  });
+
   it('reports nothing for a deep-equal array leaf (new reference)', () => {
     const tree = signalTree({ users: [{ id: 1, name: 'Ada' }] });
     const before = tree.$.users();

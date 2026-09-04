@@ -8,8 +8,10 @@
  *
  * The law it protects is FUNCTION-AS-STATE: a function stored as state stays a
  * function value through snapshot and apply. A structural test cannot decide
- * this — `() => 42` with a `.set` bolted on is shape-identical to a leaf — so
- * identity is RECORDED at creation, never inferred.
+ * this — `() => 42` with a `.set` bolted on is shape-identical to a leaf.
+ * LocationRuntime therefore records identity when it mints a universal
+ * location. Externally supplied derived callables are marked explicitly at
+ * their adoption boundary.
  *
  *     A MARKER SHOULD CLASSIFY ONE FACT. DO NOT TURN DERIVED PROVENANCE INTO
  *     GENERAL CELL IDENTITY.
@@ -18,11 +20,10 @@
  * writable source leaf is a cell but not derived, so one marker cannot mean
  * both.
  *
- * WHY A WEAK REGISTRY, NOT A PROPERTY. Registration leaves the cell object
- * physically untouched, which keeps S1's native-cell identity exact: the object
- * Angular made is the object SignalTree hands out, with no added own property
- * to perturb hidden classes, allocation size, or `@angular/core` interop. A
- * WeakSet also releases retired cells rather than pinning them.
+ * WHY A PRIVATE NON-ENUMERABLE SYMBOL. It gives runtime-minted locations nominal
+ * identity without wrapping them or leaking into snapshots and object walks.
+ * The accepted symbol carrier has flat retained memory and preserves object
+ * identity across every framework facade.
  *
  *     MEASURE THE HOT REPRESENTATION BEFORE SUBSTITUTING IT.
  *
@@ -44,26 +45,8 @@ export function markTreeCell<T extends object>(cell: T): T {
 }
 
 /**
- * True for a callable SignalTree treats as a cell.
- *
- * Two sources, and the split matters:
- *
- *   REGISTERED   a cell some semantic authority in this kernel acquired. This
- *                is the only question asked about the kernel's OWN state, and
- *                it needs no framework.
- *
- *   FOREIGN      a reactive value the CONSUMER created and stored as state
- *                (`signal()` / `computed()` held in a tree). The kernel cannot
- *                recognise a foreign framework object, and it should not try:
- *                only the adapter knows its own values. Such objects exist ONLY
- *                when an adapter is installed, so consulting it here degrades
- *                to `false` with no framework and stays correct.
- *
- * This is NOT the kernel asking an adapter whether its own state exists — the
- * failure that cost 151 tests. Registered cells never reach the second clause.
- */
-/**
- * True ONLY for a callable a SignalTree authority explicitly acquired.
+ * True only for a callable minted or explicitly adopted as a SignalTree
+ * location.
  *
  * Deliberately narrow, and deliberately framework-blind. A consumer-created
  * `signal()` stored as state is FOREIGN REACTIVE STATE, not a SignalTree cell —
@@ -71,7 +54,8 @@ export function markTreeCell<T extends object>(cell: T): T {
  * exists to remove. Walkers that need "cell OR foreign reactive" combine the
  * two facts at their own boundary; this module never asks an adapter anything.
  *
- *     OWNED/ACQUIRED CELL   recorded here, needs no framework
+ *     KERNEL LOCATION       recorded here, needs no framework
+ *     ADOPTED DERIVED       explicitly recorded at the ownership boundary
  *     FOREIGN REACTIVE      adapter's knowledge, asked elsewhere
  *     FUNCTION-AS-STATE     neither — ordinary data
  */

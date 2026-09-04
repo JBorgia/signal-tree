@@ -57,10 +57,10 @@ contract:
    rendering, hooks, dependency injection, context, scheduling, primitive
    identity detection, or compatibility with one framework primitive.
 
-Ask two questions. If Angular and React disappeared, would the contract still
+Ask two questions. If Angular, React, and Vue disappeared, would the contract still
 describe a meaningful SignalTree requirement or useful port for another
-reactive runtime? Could Solid, Vue, Preact, Svelte, or a tiny fake implement it
-naturally without pretending to be Angular or React? A neutral name alone is
+reactive runtime? Could Solid, Preact, Svelte, or a tiny fake implement it
+naturally without pretending to be one of those frameworks? A neutral name alone is
 not evidence of neutral ownership. Vanilla need not use every adapter port;
 the kernel must own the semantic question the port answers.
 
@@ -232,10 +232,10 @@ pnpm nx build demo --configuration=production
 
 | Target                | Prod budget | Dev budget |
 | --------------------- | ----------- | ---------- |
-| `signaltree-bare`     | 9.7 KB      | 11.9 KB    |
+| `signaltree-bare`     | 9.8 KB      | 12.0 KB    |
 | `signaltree-entities` | 21.7 KB     | 24.4 KB    |
 
-The authoritative gzip gate is [`tools/check-bundle-budget.mjs`](tools/check-bundle-budget.mjs) — the single source of truth for library size claims; every other doc's numbers must trace back to it. Current measured (own-code only; `@angular`/`rxjs`/`tslib` external): bare `signalTree` **9.56 KB** prod (budget 9.7), a tree using a plain `entityMap()` **21.49 KB** prod (budget 21.7). The v15 cost is attributed in the gate's own comments: the causal runtime and entity identity kernel are reachable from the default construction path, and declarative construction puts the enhancer resolver on every tree's mandatory path (+0.47 KB, a design cost — read the gate before bumping). Check with `node tools/check-bundle-budget.mjs`.
+The authoritative gzip gate is [`tools/check-bundle-budget.mjs`](tools/check-bundle-budget.mjs) — the single source of truth for library size claims; every other doc's numbers must trace back to it. Current measured (own-code only; framework peers and `tslib` external): bare `signalTree` **9.76 KB** prod (budget 9.8), a tree using a plain `entityMap()` **21.62 KB** prod (budget 21.7). The v15 cost is attributed in the gate's own comments: universal locations own subscriptions, coherent publication, exception-safe settlement, and collectible derived dependencies; declarative construction also puts the enhancer resolver on every tree's mandatory path. Check with `node tools/check-bundle-budget.mjs`.
 
 ### Validation pipeline
 
@@ -302,6 +302,7 @@ Use one SignalTree import root for application code:
 
 - Angular applications: `@signal-tree/angular`
 - React applications: `@signal-tree/react`
+- Vue applications: `@signal-tree/vue`
 - Framework-neutral TypeScript and reusable libraries: `@signal-tree/kernel`
 
 The framework packages are complete application facades over the neutral

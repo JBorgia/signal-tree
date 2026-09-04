@@ -121,7 +121,7 @@ export class V15BenchmarksComponent {
       currentCost:
         'This is a compatibility constraint, not a performance benefit. A denser or faster substrate must preserve the inferred read/write types.',
       evidence: [
-        'packages/kernel/src/carrier-propagation.typing.spec.ts',
+        'packages/kernel/src/lib/signal-tree-type-matrix.typing.spec.ts',
         'packages/kernel/src/enhancers/transactions/transactions-contract.typing.spec.ts',
       ],
     },

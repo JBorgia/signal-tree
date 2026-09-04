@@ -64,7 +64,12 @@ function entryPoints(pkg) {
   return out;
 }
 
-/** Exported names of a declaration file, following its re-export edges. */
+const ENTRYPOINTS = new Map();
+for (const pkg of readdirSync(join(ROOT, 'dist/packages'))) {
+  for (const [spec, file] of entryPoints(pkg)) ENTRYPOINTS.set(spec, file);
+}
+
+/** Exported names of a declaration file, following local and package re-exports. */
 function exportsOf(file, seen = new Set(), out = new Set()) {
   if (!file || seen.has(file) || !existsSync(file)) return out;
   seen.add(file);
@@ -98,6 +103,8 @@ function exportsOf(file, seen = new Set(), out = new Set()) {
             exportsOf(c, seen, out);
             break;
           }
+      } else if (spec && ENTRYPOINTS.has(spec)) {
+        exportsOf(ENTRYPOINTS.get(spec), seen, out);
       }
     }
   }
@@ -105,10 +112,7 @@ function exportsOf(file, seen = new Set(), out = new Set()) {
 }
 
 const SURFACE = new Map();
-for (const pkg of readdirSync(join(ROOT, 'dist/packages'))) {
-  for (const [spec, file] of entryPoints(pkg))
-    SURFACE.set(spec, exportsOf(file));
-}
+for (const [spec, file] of ENTRYPOINTS) SURFACE.set(spec, exportsOf(file));
 if (SURFACE.size === 0) {
   console.error('✗ no built packages found — run `npm run build:all` first.');
   process.exit(1);

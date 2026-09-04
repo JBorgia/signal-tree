@@ -11,8 +11,46 @@ import {
 } from './tree-scalar-slot-runtime';
 import { getTreeScalarSlotRuntime } from './tree-scalar-slot-port';
 import { createTreeScalarLeafRuntime as createTreeScalarSlotRuntime } from './tree-scalar-leaf-runtime';
+import { observeIntrinsicMutations } from './intrinsic-mutation';
 
 describe('tree scalar slot runtime', () => {
+  it('exposes a framework-independent subscribable scalar location', () => {
+    const runtime = createTreeScalarSlotRuntime(undefined);
+    const location = runtime.createLeaf('A', Object.is) as {
+      (): string;
+      set(value: string): void;
+      update(update: (value: string) => string): void;
+      peek(): string;
+      subscribe(listener: () => void): () => void;
+    };
+    const values: string[] = [];
+    const unsubscribe = location.subscribe(() => values.push(location.peek()));
+
+    expect(location.peek()).toBe('A');
+    location.set('B');
+    location.set('B');
+    location.update((value) => `${value}2`);
+    unsubscribe();
+    location.set('C');
+
+    expect(location()).toBe('C');
+    expect(values).toEqual(['B', 'B2']);
+  });
+
+  it('publishes committed truth even when an intrinsic observer throws', () => {
+    const runtime = createTreeScalarSlotRuntime(undefined);
+    const location = runtime.createLeaf<string>('A', Object.is);
+    const seen: string[] = [];
+    observeIntrinsicMutations(location, () => {
+      throw new Error('observer exploded');
+    });
+    location.subscribe(() => seen.push(location.peek()));
+
+    expect(() => location.set('B')).not.toThrow();
+    expect(location.peek()).toBe('B');
+    expect(seen).toEqual(['B']);
+  });
+
   it('keeps the same PositionId bound to the same SlotIndex across scalar writes', () => {
     const tree = signalTree(
       { profile: { name: 'Alice', enabled: true } },

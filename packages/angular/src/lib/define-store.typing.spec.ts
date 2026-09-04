@@ -4,7 +4,7 @@
  *
  * Asserts `defineStore(factory, { expose: 'readonly' })` narrows the injected
  * type to `ReadonlyStore<T, A>` over the builder's ACCUMULATED type — derived
- * computeds survive, no `.set`/`.update`/branch-write call signature is
+ * derived locations survive, no `.set`/`.update`/branch-write call signature is
  * reachable — while the default (no `expose`) overload keeps the factory's
  * real return type unchanged. This is a type-only narrowing (see
  * `ReadonlyStore`'s own docs); this file only checks the STATIC type, not
@@ -21,11 +21,9 @@
  *    F1). It is now parameterized over the builder's accumulated type.
  * Keep this file up to date if `signalTree()`'s return type ever changes.
  */
-import { computed, type Signal } from '@angular/core';
-
 import { signalTree } from '../index';
 import { defineStore } from '../index';
-import type { ReadonlyStore } from '../index';
+import type { ReadonlyLocation, ReadonlyStore } from '../index';
 import type { WritableLeaf, TreeNode } from '../index';
 
 // --- compile-time assertion helpers -----------------------------------------
@@ -50,7 +48,7 @@ const ReadonlyDerivedStore = defineStore(
   () =>
     signalTree(counterState, {
       derived: ($) => ({
-        doubled: computed(() => $.count() * 2),
+        doubled: () => $.count() * 2,
       }),
     }),
   { expose: 'readonly' }
@@ -89,8 +87,10 @@ export type _DefineStoreTypeChecks = [
     >
   >,
 
-  // F1: derived computeds SURVIVE readonly exposure through defineStore.
-  Expect<Equal<ReadonlyDerivedInjected['$']['doubled'], Signal<number>>>,
+  // F1: derived locations SURVIVE readonly exposure through defineStore.
+  Expect<
+    Equal<ReadonlyDerivedInjected['$']['doubled'], ReadonlyLocation<number>>
+  >,
   Expect<
     Equal<
       'set' extends keyof ReadonlyDerivedInjected['$']['count'] ? true : false,

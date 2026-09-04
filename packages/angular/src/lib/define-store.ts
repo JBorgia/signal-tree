@@ -1,26 +1,9 @@
 import { DestroyRef, inject, Injectable, type Type } from '@angular/core';
 
-// Bound to Angular's carrier, not imported from the kernel. `defineStore` is an
-// ANGULAR API: its injected store must report native Angular signals. Importing
-// the kernel's neutral aliases made `defineStore(..., 'readonly')` return a store
-// whose leaves typed as ReadableCell — the same carrier lie the star export had.
-// Imported from the binders rather than `../index` to avoid a cycle.
 import type {
-  ISignalTreeOf,
-  ReadonlyStoreOf,
-  TreeNodeOf,
+  ISignalTree,
 } from '@signal-tree/kernel/adapter';
-
-type ReadonlyStore<T, TAccum = TreeNodeOf<T, 'angular'>> = ReadonlyStoreOf<
-  T,
-  TAccum,
-  'angular'
->;
-type AngularSignalTree<T, TAccum = TreeNodeOf<T, 'angular'>> = ISignalTreeOf<
-  T,
-  'angular',
-  TAccum
->;
+import type { ReadonlyStore } from '@signal-tree/kernel';
 
 /**
  * Config for {@link defineStore}.
@@ -70,7 +53,7 @@ export interface DefineStoreConfig {
  *
  * @example
  * ```ts
- * import { signalTree, defineStore } from '@signal-tree/kernel';
+ * import { signalTree, defineStore } from '@signal-tree/angular';
  *
  * export const CounterStore = defineStore(() =>
  *   signalTree({ count: 0 })
@@ -120,7 +103,7 @@ export interface DefineStoreConfig {
 //    a silently-unnarrowed store (RFC 0004 F2 / §5 rule 4: silent-inert is
 //    the priority defect class).
 export function defineStore<T, A>(
-  factory: () => AngularSignalTree<T, A>,
+  factory: () => ISignalTree<T, A>,
   config: DefineStoreConfig & { expose: 'readonly' }
 ): Type<ReadonlyStore<T, A>>;
 /**

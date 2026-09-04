@@ -2,7 +2,7 @@ import { undoable } from '../lib/undoable';
 
 import { createReactiveTestRealization } from '../reactive-test-realization';
 import { entityMap, restoration, signalTree } from '../index';
-import { bindSignalTreeRealization } from './signal-tree';
+import { createSignalTreeFactory } from './signal-tree';
 import { getWriteParticipation } from './write-participation';
 import { withWriteContext } from './write-context';
 import {
@@ -12,8 +12,8 @@ import {
 } from './path-notifier';
 
 const testRealization = createReactiveTestRealization();
-const reactiveSignalTree = bindSignalTreeRealization(testRealization);
-const computed = testRealization.derived.createDerived;
+const reactiveSignalTree = createSignalTreeFactory(testRealization);
+const computed = testRealization.locations.createDerived;
 
 /**
  * MUT-1 — EVIDENCE. What distinguishes a physical change that merely REALIZES

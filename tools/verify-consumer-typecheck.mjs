@@ -35,8 +35,10 @@ import {
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
+import { assertReleasePlan } from '../scripts/release-plan.mjs';
+
 const ROOT = process.cwd();
-const PACKAGE_NAMES = ['kernel', 'angular', 'react'];
+const PACKAGE_NAMES = assertReleasePlan(ROOT);
 const suppliedTarballs = process.argv
   .filter((arg) => arg.startsWith('--tarball='))
   .map((arg) => resolve(ROOT, arg.slice('--tarball='.length)));
@@ -110,15 +112,17 @@ import {
   entityMap,
   restoration,
   batching,
+  type ReadonlyLocation,
 } from '@signal-tree/kernel';
 import { createSignalTreeFactory } from '@signal-tree/kernel/adapter';
-import { Signal } from '@angular/core';
 import {
   defineStore,
   entityMap as angularEntityMap,
   signalTree as angularSignalTree,
 } from '@signal-tree/angular';
 import { useSignalTree } from '@signal-tree/react';
+import { computed, type ComputedRef } from 'vue';
+import { signalTree as vueSignalTree } from '@signal-tree/vue';
 
 type User = { id: number; name: string; version: number };
 
@@ -128,7 +132,8 @@ const tree = signalTree(
   {
     count: 0,
     user: { name: 'Ada', age: 36 },
-    users: entityMap<User, number>({ selectId: (u: User) => u.id }),
+    users: entityMap<User, number>({ selectId: (u: User) => u.id })
+      .computed('names', (all) => all.map((user) => user.name)),
   },
   { enhancers: [restoration(), batching()] }
 );
@@ -137,6 +142,10 @@ const tree = signalTree(
 const n: number = tree.$.count();
 const whole: { count: number } = tree.$() as { count: number };
 const rows: User[] = tree.$.users.all();
+const names: ReadonlyLocation<string[]> = tree.$.users.names;
+const currentNames: string[] = names.peek();
+const unsubscribeNames = names.subscribe(() => undefined);
+unsubscribeNames();
 
 // Leaf writes — .set()/.update(), NOT leaf(value)
 tree.$.count.set(5);
@@ -151,20 +160,28 @@ tree.$.users.addOne({ id: 1, name: 'a', version: 1 });
 tree.$.users.updateOne(1, { name: 'b' });
 
 // Angular realization: the root entity marker and adapter factory declarations
-// must share marker identity, so entity APIs remain available and read surfaces
-// are native Angular signals in a packed consumer.
+// must share marker identity, so entity APIs remain available through universal
+// locations in a packed consumer.
 const angularTree = angularSignalTree({
   users: angularEntityMap<User, number>({ selectId: (u: User) => u.id }),
 });
-const angularUsers: Signal<User[]> = angularTree.$.users.all;
+const angularUsers: ReadonlyLocation<User[]> = angularTree.$.users.all;
 angularTree.$.users.setAll([]);
+
+// Vue observes the same universal location contract through its own dependency
+// graph; the tree does not become a Vue ref or duplicate state.
+const vueTree = vueSignalTree(
+  { count: 1 },
+  { derived: ($) => ({ doubled: () => $.count() * 2 }) }
+);
+const vueDoubled: ComputedRef<number> = computed(() => vueTree.$.doubled());
 
 // Enhancer methods
 tree.undo();
 tree.redo();
 tree.batch(() => tree.$.count.set(0));
 
-export const _used = [n, whole, rows, angularUsers, createSignalTreeFactory, defineStore, useSignalTree];
+export const _used = [n, whole, rows, names, currentNames, angularUsers, vueDoubled, createSignalTreeFactory, defineStore, useSignalTree];
 `;
 writeFileSync(join(proj, 'src', 'main.ts'), SAMPLE);
 
@@ -172,6 +189,8 @@ const FACADE_IDENTITY_PROBE = `
 import * as kernel from '@signal-tree/kernel';
 import * as angular from '@signal-tree/angular';
 import * as react from '@signal-tree/react';
+import * as vue from '@signal-tree/vue';
+import { computed as vueComputed } from 'vue';
 
 const sharedRuntimeSymbols = [
   'entityMap',
@@ -187,8 +206,9 @@ const sharedRuntimeSymbols = [
   'SignalTreeRollbackError',
 ];
 
-for (const packageName of ['angular', 'react']) {
-  const facade = packageName === 'angular' ? angular : react;
+const facades = { angular, react, vue };
+for (const packageName of ['angular', 'react', 'vue']) {
+  const facade = facades[packageName];
   for (const symbol of sharedRuntimeSymbols) {
     if (facade[symbol] !== kernel[symbol]) {
       throw new Error(
@@ -201,6 +221,19 @@ for (const packageName of ['angular', 'react']) {
 if (react.signalTree !== kernel.signalTree) {
   throw new Error('@signal-tree/react does not forward kernel signalTree by identity.');
 }
+if (angular.signalTree === kernel.signalTree) {
+  throw new Error('@signal-tree/angular silently fell back to neutral construction.');
+}
+if (vue.signalTree === kernel.signalTree) {
+  throw new Error('@signal-tree/vue silently fell back to neutral construction.');
+}
+const vueTree = vue.signalTree({ count: 1 });
+const vueDoubled = vueComputed(() => vueTree.$.count() * 2);
+vueTree.$.count.set(2);
+if (vueDoubled.value !== 4) {
+  throw new Error('@signal-tree/vue did not observe a direct location write.');
+}
+vueTree.destroy();
 `;
 writeFileSync(join(proj, 'src', 'facade-identity.mjs'), FACADE_IDENTITY_PROBE);
 
@@ -218,6 +251,7 @@ execFileSync(
     'rxjs@^7.0.0',
     'react@^19.0.0',
     '@types/react@^19.0.0',
+    'vue@^3.5.0',
     'typescript@^5.6.0',
   ],
   { cwd: proj, stdio: 'pipe' }

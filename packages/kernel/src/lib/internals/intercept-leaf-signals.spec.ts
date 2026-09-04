@@ -7,7 +7,7 @@ import { interceptLeafSignals } from './intercept-leaf-signals';
 import { withWriteContext } from '../write-context';
 import type { WriteMetadata } from '../types';
 
-const signal = createReactiveTestRealization().cell.createCell;
+const signal = createReactiveTestRealization().locations.createCell;
 
 interface Captured {
   path: string;

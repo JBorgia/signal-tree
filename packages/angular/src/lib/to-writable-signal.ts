@@ -5,13 +5,16 @@ import {
   signal,
   type WritableSignal,
 } from '@angular/core';
-import type { NodeAccessor } from '@signal-tree/kernel';
+import type { Location, NodeAccessor } from '@signal-tree/kernel';
 // Restoration designation comes through the adapter SDK, not a deep import.
 // See the ruling note at the bottom of `@signal-tree/kernel/adapter`.
-import { withRestorationDesignation } from '@signal-tree/kernel/adapter';
+import {
+  isNodeAccessor,
+  withRestorationDesignation,
+} from '@signal-tree/kernel/adapter';
 
 /**
- * Converts a NodeAccessor (SignalTree slice or whole tree) into a WritableSignal
+ * Converts a writable SignalTree branch or leaf into a WritableSignal
  * for use with any API that expects a `WritableSignal` — e.g. as an Angular
  * Signal Forms model, or the value fed to `SignalFormControl`. (Note: Angular
  * has no `FormControl.connect(signal)` API — see `signalForm()` for the
@@ -40,12 +43,12 @@ import { withRestorationDesignation } from '@signal-tree/kernel/adapter';
  * // Convert a slice to a WritableSignal (e.g. a Signal Forms model)
  * const userSignal = toWritableSignal(tree.$.user);
  *
- * // Leaves are already WritableSignal - no conversion needed
- * const nameSignal = tree.$.user.name; // ✅ Already a WritableSignal
+ * // Adapt a leaf only when an Angular API requires native signal identity
+ * const nameSignal = toWritableSignal(tree.$.user.name);
  * ```
  */
 export function toWritableSignal<T>(
-  node: NodeAccessor<T>,
+  node: NodeAccessor<T> | Location<T>,
   injector?: unknown,
   options?: {
     /**
@@ -100,17 +103,21 @@ export function toWritableSignal<T>(
 
   // Override set to write back to the NodeAccessor, then update local signal
   sig.set = (value: T) => {
+    const write = () => {
+      if (isNodeAccessor(node)) (node as NodeAccessor<T>)(value);
+      else (node as Location<T>).set(value);
+    };
     if (options?.undoable) {
       // Synchronous by construction with the write itself, which is what the
       // designation contract requires. Measured: the directive's write happens
       // inside the DOM dispatch, so there is no scheduling gap to lose it in.
       withRestorationDesignation(() => {
-        node(value);
+        write();
       });
     } else {
-      node(value);
+      write();
     }
-    originalSet(value);
+    originalSet(node());
   };
 
   // Override update to write back using set pathway

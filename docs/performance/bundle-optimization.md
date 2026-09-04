@@ -10,8 +10,8 @@ Measured with `node tools/size-report.mjs` and budgeted by
 
 | scenario                   | prod (ships) | dev (diagnostics) | prod/dev budget   |
 | -------------------------- | ------------ | ----------------- | ----------------- |
-| bare `signalTree`          | 9.56 KB      | 11.73 KB          | 9.7 KB / 11.9 KB  |
-| `signalTree` + `entityMap` | 21.49 KB     | 24.18 KB          | 21.7 KB / 24.4 KB |
+| bare `signalTree`          | 9.76 KB      | 11.91 KB          | 9.8 KB / 12.0 KB  |
+| `signalTree` + `entityMap` | 21.62 KB     | 24.26 KB          | 21.7 KB / 24.4 KB |
 
 Prod and dev are budgeted separately because the dev diagnostics fold away
 under `ngDevMode: false`. The `devmode-foldable` gate proves they actually do,

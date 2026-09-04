@@ -63,6 +63,17 @@ const patch = (path: string, value: unknown): Root => {
   ) as Root;
 };
 
+const applyTargetedWrite = (
+  tree: ReturnType<typeof signalTree<{ a: number; b: number }>>,
+  update: Root
+): void => {
+  for (const [path] of Object.entries(update)) {
+    const value = get(update, path);
+    const location = tree.$[path as 'a' | 'b'];
+    location.set(value as number);
+  }
+};
+
 interface Turn {
   id: string;
   before: Root;
@@ -99,7 +110,9 @@ describe('E2 / P1 — unrelated later truth', () => {
 
     tree.$.b.set(1); // independent later truth
 
-    for (const p of undoTurn(history[0], tree.$() as Root)) tree.$(p as never);
+    for (const update of undoTurn(history[0], tree.$() as Root)) {
+      applyTargetedWrite(tree, update);
+    }
 
     expect(tree.$.a()).toBe(0); // reverted
     expect(tree.$.b()).toBe(1); // SURVIVES

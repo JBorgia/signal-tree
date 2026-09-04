@@ -4,15 +4,20 @@
       "SignalTreeRollbackError",
       "asReadonly",
       "batching",
+      "createSignalTreeFactory",
       "devTools",
       "entityMap",
       "external",
+      "isNodeAccessor",
       "link",
+      "observeOwnerInvalidation",
       "onTreeError",
+      "readCanonicalSnapshot",
       "restoration",
       "signalTree",
       "transactions",
-      "undoable"
+      "undoable",
+      "withRestorationDesignation"
     ],
     "rootTypeExports": [
       "AccessibleNode",
@@ -34,19 +39,26 @@
       "EntityMapComputedSlices",
       "EntityMapMarker",
       "EntityMapMarkerWithSlices",
+      "EntityNode",
       "EntitySignal",
       "EntitySignalWithSlices",
+      "ISignalTree",
       "Link",
       "LinkEndpoint",
+      "Location",
       "MutationOptions",
       "NodeAccessor",
+      "ObservationAdapter",
+      "ObservationToken",
       "PendingTransaction",
       "Primitive",
+      "ReadonlyLocation",
       "ReadonlyStore",
       "RestorationConfig",
       "RestorationHistoryEntry",
       "RestorationMethods",
       "SignalTree",
+      "SignalTreeFactory",
       "TransactionMethods",
       "TreeCapability",
       "TreeConfig",
@@ -175,6 +187,24 @@
       "kind": "const",
       "init": "uninitialised",
       "ambient": true,
+      "immutablePrimitive": false,
+      "mutableCandidate": true
+    },
+    {
+      "file": "packages/kernel/src/enhancers/restoration/restoration.ts",
+      "name": "process",
+      "kind": "const",
+      "init": "uninitialised",
+      "ambient": true,
+      "immutablePrimitive": false,
+      "mutableCandidate": true
+    },
+    {
+      "file": "packages/kernel/src/enhancers/restoration/restoration.ts",
+      "name": "RUN_RESTORATION_CONSISTENCY_CHECKS",
+      "kind": "const",
+      "init": "shouldRunRestorationConsistencyChecks()",
+      "ambient": false,
       "immutablePrimitive": false,
       "mutableCandidate": true
     },
@@ -432,19 +462,19 @@
     },
     {
       "file": "packages/kernel/src/lib/signal-tree.ts",
-      "name": "ngDevMode",
+      "name": "readWritableCell",
       "kind": "const",
-      "init": "uninitialised",
-      "ambient": true,
+      "init": "function",
+      "ambient": false,
       "immutablePrimitive": false,
       "mutableCandidate": true
     },
     {
       "file": "packages/kernel/src/lib/signal-tree.ts",
-      "name": "NODE_ACCESSOR_SYMBOL",
+      "name": "ngDevMode",
       "kind": "const",
-      "init": "Symbol.for()",
-      "ambient": false,
+      "init": "uninitialised",
+      "ambient": true,
       "immutablePrimitive": false,
       "mutableCandidate": true
     },
@@ -549,7 +579,7 @@
     },
     {
       "file": "packages/kernel/src/lib/signal-tree.ts",
-      "name": "bindSignalTreeRealization",
+      "name": "createSignalTreeFactory",
       "kind": "const",
       "init": "function",
       "ambient": false,
@@ -562,6 +592,15 @@
       "kind": "const",
       "init": "uninitialised",
       "ambient": true,
+      "immutablePrimitive": false,
+      "mutableCandidate": true
+    },
+    {
+      "file": "packages/kernel/src/lib/utils.ts",
+      "name": "isReactiveStateValue",
+      "kind": "const",
+      "init": "Identifier",
+      "ambient": false,
       "immutablePrimitive": false,
       "mutableCandidate": true
     },
@@ -638,15 +677,6 @@
       "mutableCandidate": true
     },
     {
-      "file": "packages/kernel/src/lib/internals/cell-runtime.ts",
-      "name": "NEUTRAL_CELL_RUNTIME",
-      "kind": "const",
-      "init": "object literal",
-      "ambient": false,
-      "immutablePrimitive": false,
-      "mutableCandidate": true
-    },
-    {
       "file": "packages/kernel/src/lib/internals/commit-consequence.ts",
       "name": "scopesByOwner",
       "kind": "const",
@@ -678,15 +708,6 @@
       "name": "heldByKey",
       "kind": "const",
       "init": "new WeakMap",
-      "ambient": false,
-      "immutablePrimitive": false,
-      "mutableCandidate": true
-    },
-    {
-      "file": "packages/kernel/src/lib/internals/derived-runtime.ts",
-      "name": "NEUTRAL_DERIVED_RUNTIME",
-      "kind": "const",
-      "init": "object literal",
       "ambient": false,
       "immutablePrimitive": false,
       "mutableCandidate": true
@@ -737,10 +758,91 @@
       "mutableCandidate": true
     },
     {
-      "file": "packages/kernel/src/lib/internals/materialization-realization.ts",
-      "name": "NEUTRAL_MATERIALIZATION_REALIZATION",
+      "file": "packages/kernel/src/lib/internals/location-runtime.ts",
+      "name": "activeConsumer",
+      "kind": "let",
+      "init": "uninitialised",
+      "ambient": false,
+      "immutablePrimitive": false,
+      "mutableCandidate": true
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/location-runtime.ts",
+      "name": "publicationDepth",
+      "kind": "let",
+      "init": "literal 0",
+      "ambient": false,
+      "immutablePrimitive": false,
+      "mutableCandidate": true
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/location-runtime.ts",
+      "name": "pendingConsumers",
       "kind": "const",
-      "init": "object literal",
+      "init": "new Set",
+      "ambient": false,
+      "immutablePrimitive": false,
+      "mutableCandidate": true
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/location-runtime.ts",
+      "name": "dependencyFinalizer",
+      "kind": "const",
+      "init": "new FinalizationRegistry",
+      "ambient": false,
+      "immutablePrimitive": false,
+      "mutableCandidate": true
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/location-runtime.ts",
+      "name": "flushConsumers",
+      "kind": "const",
+      "init": "function",
+      "ambient": false,
+      "immutablePrimitive": false,
+      "mutableCandidate": true
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/location-runtime.ts",
+      "name": "notifyObservers",
+      "kind": "const",
+      "init": "function",
+      "ambient": false,
+      "immutablePrimitive": false,
+      "mutableCandidate": true
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/location-runtime.ts",
+      "name": "trackDependency",
+      "kind": "const",
+      "init": "function",
+      "ambient": false,
+      "immutablePrimitive": false,
+      "mutableCandidate": true
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/location-runtime.ts",
+      "name": "notifyDependents",
+      "kind": "const",
+      "init": "function",
+      "ambient": false,
+      "immutablePrimitive": false,
+      "mutableCandidate": true
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/location-runtime.ts",
+      "name": "NODE_LOCATION_RUNTIMES",
+      "kind": "const",
+      "init": "new WeakMap",
+      "ambient": false,
+      "immutablePrimitive": false,
+      "mutableCandidate": true
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/location-runtime.ts",
+      "name": "NEUTRAL_LOCATION_RUNTIME",
+      "kind": "const",
+      "init": "createLocationRuntime()",
       "ambient": false,
       "immutablePrimitive": false,
       "mutableCandidate": true
@@ -890,10 +992,10 @@
       "mutableCandidate": true
     },
     {
-      "file": "packages/kernel/src/lib/internals/observation-substrate.ts",
-      "name": "ARM",
+      "file": "packages/kernel/src/lib/internals/observation-adapter.ts",
+      "name": "NEUTRAL_OBSERVATION_ADAPTER",
       "kind": "const",
-      "init": "Symbol()",
+      "init": "object literal",
       "ambient": false,
       "immutablePrimitive": false,
       "mutableCandidate": true
@@ -1052,15 +1154,6 @@
       "mutableCandidate": true
     },
     {
-      "file": "packages/kernel/src/lib/internals/scalar-leaf-realization.ts",
-      "name": "NEUTRAL_SCALAR_LEAF_REALIZATION",
-      "kind": "const",
-      "init": "object literal",
-      "ambient": false,
-      "immutablePrimitive": false,
-      "mutableCandidate": true
-    },
-    {
       "file": "packages/kernel/src/lib/internals/snapshot-authority.ts",
       "name": "ngDevMode",
       "kind": "const",
@@ -1142,15 +1235,6 @@
       "mutableCandidate": true
     },
     {
-      "file": "packages/kernel/src/lib/internals/tracking-suppression.ts",
-      "name": "NEUTRAL_TRACKING_SUPPRESSION",
-      "kind": "const",
-      "init": "function",
-      "ambient": false,
-      "immutablePrimitive": false,
-      "mutableCandidate": true
-    },
-    {
       "file": "packages/kernel/src/lib/internals/tree-capabilities.ts",
       "name": "TREE_CAPABILITY_ORDER",
       "kind": "const",
@@ -1173,33 +1257,6 @@
       "name": "canonicalizeCapabilities",
       "kind": "const",
       "init": "function",
-      "ambient": false,
-      "immutablePrimitive": false,
-      "mutableCandidate": true
-    },
-    {
-      "file": "packages/kernel/src/lib/internals/tree-location.ts",
-      "name": "FUNCTION_VALUE",
-      "kind": "const",
-      "init": "Symbol()",
-      "ambient": false,
-      "immutablePrimitive": false,
-      "mutableCandidate": true
-    },
-    {
-      "file": "packages/kernel/src/lib/internals/tree-realization.ts",
-      "name": "NEUTRAL_TREE_REALIZATION",
-      "kind": "const",
-      "init": "Object.freeze()",
-      "ambient": false,
-      "immutablePrimitive": false,
-      "mutableCandidate": true
-    },
-    {
-      "file": "packages/kernel/src/lib/internals/tree-realization.ts",
-      "name": "TREE_REALIZATIONS",
-      "kind": "const",
-      "init": "new WeakMap",
       "ambient": false,
       "immutablePrimitive": false,
       "mutableCandidate": true
@@ -1506,13 +1563,6 @@
   "angularImports": [],
   "internalExportsWithoutProductionConsumer": [
     {
-      "file": "packages/kernel/src/adapter.ts",
-      "fn": "readCanonicalSnapshot",
-      "specConsumers": 2,
-      "referencedInFile": 0,
-      "reachedBy": "specs-only"
-    },
-    {
       "file": "packages/kernel/src/enhancers/devtools/devtools.ts",
       "fn": "fullDevTools",
       "specConsumers": 1,
@@ -1524,6 +1574,13 @@
       "fn": "productionDevTools",
       "specConsumers": 1,
       "referencedInFile": 0,
+      "reachedBy": "specs-only"
+    },
+    {
+      "file": "packages/kernel/src/enhancers/restoration/restoration.ts",
+      "fn": "shouldRunRestorationConsistencyChecks",
+      "specConsumers": 1,
+      "referencedInFile": 1,
       "reachedBy": "specs-only"
     },
     {
@@ -1641,21 +1698,21 @@
     {
       "file": "packages/kernel/src/lib/internals/production-substrate-stats.ts",
       "fn": "installProductionSubstrateStatsForTesting",
-      "specConsumers": 3,
+      "specConsumers": 4,
       "referencedInFile": 0,
       "reachedBy": "specs-only"
     },
     {
       "file": "packages/kernel/src/lib/internals/production-substrate-stats.ts",
       "fn": "clearProductionSubstrateStatsForTesting",
-      "specConsumers": 3,
+      "specConsumers": 4,
       "referencedInFile": 0,
       "reachedBy": "specs-only"
     },
     {
       "file": "packages/kernel/src/lib/internals/production-substrate-stats.ts",
       "fn": "resetProductionSubstrateStatsForTesting",
-      "specConsumers": 3,
+      "specConsumers": 4,
       "referencedInFile": 0,
       "reachedBy": "specs-only"
     },
@@ -1671,34 +1728,6 @@
       "fn": "assertTreeCapabilityGraphAcyclic",
       "specConsumers": 1,
       "referencedInFile": 1,
-      "reachedBy": "specs-only"
-    },
-    {
-      "file": "packages/kernel/src/lib/internals/tree-location.ts",
-      "fn": "asValue",
-      "specConsumers": 2,
-      "referencedInFile": 1,
-      "reachedBy": "specs-only"
-    },
-    {
-      "file": "packages/kernel/src/lib/internals/tree-location.ts",
-      "fn": "isFunctionValue",
-      "specConsumers": 1,
-      "referencedInFile": 1,
-      "reachedBy": "specs-only"
-    },
-    {
-      "file": "packages/kernel/src/lib/internals/tree-location.ts",
-      "fn": "createScalarLocation",
-      "specConsumers": 1,
-      "referencedInFile": 0,
-      "reachedBy": "specs-only"
-    },
-    {
-      "file": "packages/kernel/src/lib/internals/tree-location.ts",
-      "fn": "acquireScalarLocation",
-      "specConsumers": 1,
-      "referencedInFile": 0,
       "reachedBy": "specs-only"
     },
     {
@@ -1854,31 +1883,25 @@
       "module": "signal-tree.js",
       "path": "dist/packages/kernel/dist/lib/signal-tree.js",
       "subject": "core/lib/signal-tree.ts",
-      "bytes": 7904
+      "bytes": 6744
     },
     {
-      "module": "materialize-markers.js",
-      "path": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
-      "subject": "core/lib/internals/materialize-markers.ts",
-      "bytes": 2201
-    },
-    {
-      "module": "tree-scalar-leaf-runtime.js",
-      "path": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
-      "subject": "core/lib/internals/tree-scalar-leaf-runtime.ts",
-      "bytes": 1988
+      "module": "location-runtime.js",
+      "path": "dist/packages/kernel/dist/lib/internals/location-runtime.js",
+      "subject": "core/lib/internals/location-runtime.ts",
+      "bytes": 2571
     },
     {
       "module": "tree-scalar-slot-runtime.js",
       "path": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
       "subject": "core/lib/internals/tree-scalar-slot-runtime.ts",
-      "bytes": 1889
+      "bytes": 1861
     },
     {
-      "module": "utils.js",
-      "path": "dist/packages/kernel/dist/lib/utils.js",
-      "subject": "core/lib/utils.ts",
-      "bytes": 1684
+      "module": "materialize-markers.js",
+      "path": "dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+      "subject": "core/lib/internals/materialize-markers.ts",
+      "bytes": 1830
     },
     {
       "module": "constants.js",
@@ -1887,10 +1910,16 @@
       "bytes": 1669
     },
     {
+      "module": "utils.js",
+      "path": "dist/packages/kernel/dist/lib/utils.js",
+      "subject": "core/lib/utils.ts",
+      "bytes": 1576
+    },
+    {
       "module": "owned-mutation.js",
       "path": "dist/packages/kernel/dist/lib/internals/owned-mutation.js",
       "subject": "core/lib/internals/owned-mutation.ts",
-      "bytes": 1568
+      "bytes": 1524
     },
     {
       "module": "deep-equal.js",
@@ -1905,6 +1934,12 @@
       "bytes": 1397
     },
     {
+      "module": "tree-scalar-leaf-runtime.js",
+      "path": "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+      "subject": "core/lib/internals/tree-scalar-leaf-runtime.ts",
+      "bytes": 1386
+    },
+    {
       "module": "member-membership.js",
       "path": "dist/packages/kernel/dist/lib/internals/member-membership.js",
       "subject": "core/lib/internals/member-membership.ts",
@@ -1917,22 +1952,10 @@
       "bytes": 1074
     },
     {
-      "module": "snapshot-authority.js",
-      "path": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
-      "subject": "core/lib/internals/snapshot-authority.ts",
-      "bytes": 819
-    },
-    {
       "module": "tree-capabilities.js",
       "path": "dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
       "subject": "core/lib/internals/tree-capabilities.ts",
       "bytes": 800
-    },
-    {
-      "module": "merge-derived.js",
-      "path": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
-      "subject": "core/lib/internals/merge-derived.ts",
-      "bytes": 742
     },
     {
       "module": "position-registry.js",
@@ -1941,10 +1964,16 @@
       "bytes": 608
     },
     {
-      "module": "observation-substrate.js",
-      "path": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
-      "subject": "core/lib/internals/observation-substrate.ts",
-      "bytes": 379
+      "module": "merge-derived.js",
+      "path": "dist/packages/kernel/dist/lib/internals/merge-derived.js",
+      "subject": "core/lib/internals/merge-derived.ts",
+      "bytes": 580
+    },
+    {
+      "module": "snapshot-authority.js",
+      "path": "dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+      "subject": "core/lib/internals/snapshot-authority.ts",
+      "bytes": 576
     },
     {
       "module": "mutation-capture-runtime.js",
@@ -1956,7 +1985,13 @@
       "module": "node-shape.js",
       "path": "dist/packages/kernel/dist/lib/internals/node-shape.js",
       "subject": "core/lib/internals/node-shape.ts",
-      "bytes": 284
+      "bytes": 282
+    },
+    {
+      "module": "intrinsic-mutation.js",
+      "path": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+      "subject": "core/lib/internals/intrinsic-mutation.ts",
+      "bytes": 223
     },
     {
       "module": "owned-metadata.js",
@@ -1974,37 +2009,13 @@
       "module": "cell-identity.js",
       "path": "dist/packages/kernel/dist/lib/internals/cell-identity.js",
       "subject": "core/lib/internals/cell-identity.ts",
-      "bytes": 192
-    },
-    {
-      "module": "tree-realization.js",
-      "path": "dist/packages/kernel/dist/lib/internals/tree-realization.js",
-      "subject": "core/lib/internals/tree-realization.ts",
-      "bytes": 181
-    },
-    {
-      "module": "scalar-leaf-realization.js",
-      "path": "dist/packages/kernel/dist/lib/internals/scalar-leaf-realization.js",
-      "subject": "core/lib/internals/scalar-leaf-realization.ts",
-      "bytes": 176
+      "bytes": 191
     },
     {
       "module": "tree-scalar-slot-port.js",
       "path": "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
       "subject": "core/lib/internals/tree-scalar-slot-port.ts",
       "bytes": 170
-    },
-    {
-      "module": "cell-runtime.js",
-      "path": "dist/packages/kernel/dist/lib/internals/cell-runtime.js",
-      "subject": "core/lib/internals/cell-runtime.ts",
-      "bytes": 156
-    },
-    {
-      "module": "intrinsic-mutation.js",
-      "path": "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
-      "subject": "core/lib/internals/intrinsic-mutation.ts",
-      "bytes": 152
     },
     {
       "module": "runtime-tree-plan.js",
@@ -2019,10 +2030,22 @@
       "bytes": 136
     },
     {
+      "module": "observation-substrate.js",
+      "path": "dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+      "subject": "core/lib/internals/observation-substrate.ts",
+      "bytes": 104
+    },
+    {
       "module": "owner-invalidation-port.js",
       "path": "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
       "subject": "core/lib/internals/owner-invalidation-port.ts",
       "bytes": 97
+    },
+    {
+      "module": "observation-adapter.js",
+      "path": "dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+      "subject": "core/lib/internals/observation-adapter.ts",
+      "bytes": 89
     },
     {
       "module": "root-source.js",
@@ -2037,28 +2060,10 @@
       "bytes": 42
     },
     {
-      "module": "derived-runtime.js",
-      "path": "dist/packages/kernel/dist/lib/internals/derived-runtime.js",
-      "subject": "core/lib/internals/derived-runtime.ts",
-      "bytes": 36
-    },
-    {
       "module": "write-context.js",
       "path": "dist/packages/kernel/dist/lib/write-context.js",
       "subject": "core/lib/write-context.ts",
       "bytes": 31
-    },
-    {
-      "module": "materialization-realization.js",
-      "path": "dist/packages/kernel/dist/lib/internals/materialization-realization.js",
-      "subject": "core/lib/internals/materialization-realization.ts",
-      "bytes": 30
-    },
-    {
-      "module": "tracking-suppression.js",
-      "path": "dist/packages/kernel/dist/lib/internals/tracking-suppression.js",
-      "subject": "core/lib/internals/tracking-suppression.ts",
-      "bytes": 13
     }
   ],
   "subjects": [
@@ -2076,6 +2081,10 @@
     },
     {
       "category": "publicValue",
+      "key": "public:createSignalTreeFactory"
+    },
+    {
+      "category": "publicValue",
       "key": "public:devTools"
     },
     {
@@ -2088,11 +2097,23 @@
     },
     {
       "category": "publicValue",
+      "key": "public:isNodeAccessor"
+    },
+    {
+      "category": "publicValue",
       "key": "public:link"
     },
     {
       "category": "publicValue",
+      "key": "public:observeOwnerInvalidation"
+    },
+    {
+      "category": "publicValue",
       "key": "public:onTreeError"
+    },
+    {
+      "category": "publicValue",
+      "key": "public:readCanonicalSnapshot"
     },
     {
       "category": "publicValue",
@@ -2109,6 +2130,10 @@
     {
       "category": "publicValue",
       "key": "public:undoable"
+    },
+    {
+      "category": "publicValue",
+      "key": "public:withRestorationDesignation"
     },
     {
       "category": "publicType",
@@ -2188,11 +2213,19 @@
     },
     {
       "category": "publicType",
+      "key": "public-type:EntityNode"
+    },
+    {
+      "category": "publicType",
       "key": "public-type:EntitySignal"
     },
     {
       "category": "publicType",
       "key": "public-type:EntitySignalWithSlices"
+    },
+    {
+      "category": "publicType",
+      "key": "public-type:ISignalTree"
     },
     {
       "category": "publicType",
@@ -2204,6 +2237,10 @@
     },
     {
       "category": "publicType",
+      "key": "public-type:Location"
+    },
+    {
+      "category": "publicType",
       "key": "public-type:MutationOptions"
     },
     {
@@ -2212,11 +2249,23 @@
     },
     {
       "category": "publicType",
+      "key": "public-type:ObservationAdapter"
+    },
+    {
+      "category": "publicType",
+      "key": "public-type:ObservationToken"
+    },
+    {
+      "category": "publicType",
       "key": "public-type:PendingTransaction"
     },
     {
       "category": "publicType",
       "key": "public-type:Primitive"
+    },
+    {
+      "category": "publicType",
+      "key": "public-type:ReadonlyLocation"
     },
     {
       "category": "publicType",
@@ -2237,6 +2286,10 @@
     {
       "category": "publicType",
       "key": "public-type:SignalTree"
+    },
+    {
+      "category": "publicType",
+      "key": "public-type:SignalTreeFactory"
     },
     {
       "category": "publicType",
@@ -2394,6 +2447,16 @@
     },
     {
       "category": "moduleState",
+      "key": "state:enhancers/restoration/restoration.ts:process",
+      "init": "uninitialised"
+    },
+    {
+      "category": "moduleState",
+      "key": "state:enhancers/restoration/restoration.ts:RUN_RESTORATION_CONSISTENCY_CHECKS",
+      "init": "shouldRunRestorationConsistencyChecks()"
+    },
+    {
+      "category": "moduleState",
       "key": "state:enhancers/restoration/restoration.ts:withRestoration",
       "init": "Object.assign()"
     },
@@ -2534,13 +2597,13 @@
     },
     {
       "category": "moduleState",
-      "key": "state:lib/signal-tree.ts:ngDevMode",
-      "init": "uninitialised"
+      "key": "state:lib/signal-tree.ts:readWritableCell",
+      "init": "function"
     },
     {
       "category": "moduleState",
-      "key": "state:lib/signal-tree.ts:NODE_ACCESSOR_SYMBOL",
-      "init": "Symbol.for()"
+      "key": "state:lib/signal-tree.ts:ngDevMode",
+      "init": "uninitialised"
     },
     {
       "category": "moduleState",
@@ -2599,13 +2662,18 @@
     },
     {
       "category": "moduleState",
-      "key": "state:lib/signal-tree.ts:bindSignalTreeRealization",
+      "key": "state:lib/signal-tree.ts:createSignalTreeFactory",
       "init": "function"
     },
     {
       "category": "moduleState",
       "key": "state:lib/types.ts:ENTITY_MAP_BRAND",
       "init": "uninitialised"
+    },
+    {
+      "category": "moduleState",
+      "key": "state:lib/utils.ts:isReactiveStateValue",
+      "init": "Identifier"
     },
     {
       "category": "moduleState",
@@ -2649,11 +2717,6 @@
     },
     {
       "category": "moduleState",
-      "key": "state:lib/internals/cell-runtime.ts:NEUTRAL_CELL_RUNTIME",
-      "init": "object literal"
-    },
-    {
-      "category": "moduleState",
       "key": "state:lib/internals/commit-consequence.ts:scopesByOwner",
       "init": "new WeakMap"
     },
@@ -2671,11 +2734,6 @@
       "category": "moduleState",
       "key": "state:lib/internals/commit-consequence.ts:heldByKey",
       "init": "new WeakMap"
-    },
-    {
-      "category": "moduleState",
-      "key": "state:lib/internals/derived-runtime.ts:NEUTRAL_DERIVED_RUNTIME",
-      "init": "object literal"
     },
     {
       "category": "moduleState",
@@ -2704,8 +2762,53 @@
     },
     {
       "category": "moduleState",
-      "key": "state:lib/internals/materialization-realization.ts:NEUTRAL_MATERIALIZATION_REALIZATION",
-      "init": "object literal"
+      "key": "state:lib/internals/location-runtime.ts:activeConsumer",
+      "init": "uninitialised"
+    },
+    {
+      "category": "moduleState",
+      "key": "state:lib/internals/location-runtime.ts:publicationDepth",
+      "init": "literal 0"
+    },
+    {
+      "category": "moduleState",
+      "key": "state:lib/internals/location-runtime.ts:pendingConsumers",
+      "init": "new Set"
+    },
+    {
+      "category": "moduleState",
+      "key": "state:lib/internals/location-runtime.ts:dependencyFinalizer",
+      "init": "new FinalizationRegistry"
+    },
+    {
+      "category": "moduleState",
+      "key": "state:lib/internals/location-runtime.ts:flushConsumers",
+      "init": "function"
+    },
+    {
+      "category": "moduleState",
+      "key": "state:lib/internals/location-runtime.ts:notifyObservers",
+      "init": "function"
+    },
+    {
+      "category": "moduleState",
+      "key": "state:lib/internals/location-runtime.ts:trackDependency",
+      "init": "function"
+    },
+    {
+      "category": "moduleState",
+      "key": "state:lib/internals/location-runtime.ts:notifyDependents",
+      "init": "function"
+    },
+    {
+      "category": "moduleState",
+      "key": "state:lib/internals/location-runtime.ts:NODE_LOCATION_RUNTIMES",
+      "init": "new WeakMap"
+    },
+    {
+      "category": "moduleState",
+      "key": "state:lib/internals/location-runtime.ts:NEUTRAL_LOCATION_RUNTIME",
+      "init": "createLocationRuntime()"
     },
     {
       "category": "moduleState",
@@ -2789,8 +2892,8 @@
     },
     {
       "category": "moduleState",
-      "key": "state:lib/internals/observation-substrate.ts:ARM",
-      "init": "Symbol()"
+      "key": "state:lib/internals/observation-adapter.ts:NEUTRAL_OBSERVATION_ADAPTER",
+      "init": "object literal"
     },
     {
       "category": "moduleState",
@@ -2879,11 +2982,6 @@
     },
     {
       "category": "moduleState",
-      "key": "state:lib/internals/scalar-leaf-realization.ts:NEUTRAL_SCALAR_LEAF_REALIZATION",
-      "init": "object literal"
-    },
-    {
-      "category": "moduleState",
       "key": "state:lib/internals/snapshot-authority.ts:ngDevMode",
       "init": "uninitialised"
     },
@@ -2929,11 +3027,6 @@
     },
     {
       "category": "moduleState",
-      "key": "state:lib/internals/tracking-suppression.ts:NEUTRAL_TRACKING_SUPPRESSION",
-      "init": "function"
-    },
-    {
-      "category": "moduleState",
       "key": "state:lib/internals/tree-capabilities.ts:TREE_CAPABILITY_ORDER",
       "init": "array literal"
     },
@@ -2946,21 +3039,6 @@
       "category": "moduleState",
       "key": "state:lib/internals/tree-capabilities.ts:canonicalizeCapabilities",
       "init": "function"
-    },
-    {
-      "category": "moduleState",
-      "key": "state:lib/internals/tree-location.ts:FUNCTION_VALUE",
-      "init": "Symbol()"
-    },
-    {
-      "category": "moduleState",
-      "key": "state:lib/internals/tree-realization.ts:NEUTRAL_TREE_REALIZATION",
-      "init": "Object.freeze()"
-    },
-    {
-      "category": "moduleState",
-      "key": "state:lib/internals/tree-realization.ts:TREE_REALIZATIONS",
-      "init": "new WeakMap"
     },
     {
       "category": "moduleState",
@@ -3262,17 +3340,17 @@
     },
     {
       "category": "orphanExport",
-      "key": "orphan:adapter.ts:readCanonicalSnapshot",
-      "reachedBy": "specs-only"
-    },
-    {
-      "category": "orphanExport",
       "key": "orphan:enhancers/devtools/devtools.ts:fullDevTools",
       "reachedBy": "specs-only"
     },
     {
       "category": "orphanExport",
       "key": "orphan:enhancers/devtools/devtools.ts:productionDevTools",
+      "reachedBy": "specs-only"
+    },
+    {
+      "category": "orphanExport",
+      "key": "orphan:enhancers/restoration/restoration.ts:shouldRunRestorationConsistencyChecks",
       "reachedBy": "specs-only"
     },
     {
@@ -3378,26 +3456,6 @@
     {
       "category": "orphanExport",
       "key": "orphan:lib/internals/tree-capabilities.ts:assertTreeCapabilityGraphAcyclic",
-      "reachedBy": "specs-only"
-    },
-    {
-      "category": "orphanExport",
-      "key": "orphan:lib/internals/tree-location.ts:asValue",
-      "reachedBy": "specs-only"
-    },
-    {
-      "category": "orphanExport",
-      "key": "orphan:lib/internals/tree-location.ts:isFunctionValue",
-      "reachedBy": "specs-only"
-    },
-    {
-      "category": "orphanExport",
-      "key": "orphan:lib/internals/tree-location.ts:createScalarLocation",
-      "reachedBy": "specs-only"
-    },
-    {
-      "category": "orphanExport",
-      "key": "orphan:lib/internals/tree-location.ts:acquireScalarLocation",
       "reachedBy": "specs-only"
     },
     {
@@ -3508,27 +3566,22 @@
     {
       "category": "bareModule",
       "key": "bare-module:core/lib/signal-tree.ts",
-      "bytes": 7904
+      "bytes": 6744
     },
     {
       "category": "bareModule",
-      "key": "bare-module:core/lib/internals/materialize-markers.ts",
-      "bytes": 2201
-    },
-    {
-      "category": "bareModule",
-      "key": "bare-module:core/lib/internals/tree-scalar-leaf-runtime.ts",
-      "bytes": 1988
+      "key": "bare-module:core/lib/internals/location-runtime.ts",
+      "bytes": 2571
     },
     {
       "category": "bareModule",
       "key": "bare-module:core/lib/internals/tree-scalar-slot-runtime.ts",
-      "bytes": 1889
+      "bytes": 1861
     },
     {
       "category": "bareModule",
-      "key": "bare-module:core/lib/utils.ts",
-      "bytes": 1684
+      "key": "bare-module:core/lib/internals/materialize-markers.ts",
+      "bytes": 1830
     },
     {
       "category": "bareModule",
@@ -3537,8 +3590,13 @@
     },
     {
       "category": "bareModule",
+      "key": "bare-module:core/lib/utils.ts",
+      "bytes": 1576
+    },
+    {
+      "category": "bareModule",
       "key": "bare-module:core/lib/internals/owned-mutation.ts",
-      "bytes": 1568
+      "bytes": 1524
     },
     {
       "category": "bareModule",
@@ -3552,6 +3610,11 @@
     },
     {
       "category": "bareModule",
+      "key": "bare-module:core/lib/internals/tree-scalar-leaf-runtime.ts",
+      "bytes": 1386
+    },
+    {
+      "category": "bareModule",
       "key": "bare-module:core/lib/internals/member-membership.ts",
       "bytes": 1280
     },
@@ -3562,18 +3625,8 @@
     },
     {
       "category": "bareModule",
-      "key": "bare-module:core/lib/internals/snapshot-authority.ts",
-      "bytes": 819
-    },
-    {
-      "category": "bareModule",
       "key": "bare-module:core/lib/internals/tree-capabilities.ts",
       "bytes": 800
-    },
-    {
-      "category": "bareModule",
-      "key": "bare-module:core/lib/internals/merge-derived.ts",
-      "bytes": 742
     },
     {
       "category": "bareModule",
@@ -3582,8 +3635,13 @@
     },
     {
       "category": "bareModule",
-      "key": "bare-module:core/lib/internals/observation-substrate.ts",
-      "bytes": 379
+      "key": "bare-module:core/lib/internals/merge-derived.ts",
+      "bytes": 580
+    },
+    {
+      "category": "bareModule",
+      "key": "bare-module:core/lib/internals/snapshot-authority.ts",
+      "bytes": 576
     },
     {
       "category": "bareModule",
@@ -3593,7 +3651,12 @@
     {
       "category": "bareModule",
       "key": "bare-module:core/lib/internals/node-shape.ts",
-      "bytes": 284
+      "bytes": 282
+    },
+    {
+      "category": "bareModule",
+      "key": "bare-module:core/lib/internals/intrinsic-mutation.ts",
+      "bytes": 223
     },
     {
       "category": "bareModule",
@@ -3608,32 +3671,12 @@
     {
       "category": "bareModule",
       "key": "bare-module:core/lib/internals/cell-identity.ts",
-      "bytes": 192
-    },
-    {
-      "category": "bareModule",
-      "key": "bare-module:core/lib/internals/tree-realization.ts",
-      "bytes": 181
-    },
-    {
-      "category": "bareModule",
-      "key": "bare-module:core/lib/internals/scalar-leaf-realization.ts",
-      "bytes": 176
+      "bytes": 191
     },
     {
       "category": "bareModule",
       "key": "bare-module:core/lib/internals/tree-scalar-slot-port.ts",
       "bytes": 170
-    },
-    {
-      "category": "bareModule",
-      "key": "bare-module:core/lib/internals/cell-runtime.ts",
-      "bytes": 156
-    },
-    {
-      "category": "bareModule",
-      "key": "bare-module:core/lib/internals/intrinsic-mutation.ts",
-      "bytes": 152
     },
     {
       "category": "bareModule",
@@ -3647,8 +3690,18 @@
     },
     {
       "category": "bareModule",
+      "key": "bare-module:core/lib/internals/observation-substrate.ts",
+      "bytes": 104
+    },
+    {
+      "category": "bareModule",
       "key": "bare-module:core/lib/internals/owner-invalidation-port.ts",
       "bytes": 97
+    },
+    {
+      "category": "bareModule",
+      "key": "bare-module:core/lib/internals/observation-adapter.ts",
+      "bytes": 89
     },
     {
       "category": "bareModule",
@@ -3662,23 +3715,8 @@
     },
     {
       "category": "bareModule",
-      "key": "bare-module:core/lib/internals/derived-runtime.ts",
-      "bytes": 36
-    },
-    {
-      "category": "bareModule",
       "key": "bare-module:core/lib/write-context.ts",
       "bytes": 31
-    },
-    {
-      "category": "bareModule",
-      "key": "bare-module:core/lib/internals/materialization-realization.ts",
-      "bytes": 30
-    },
-    {
-      "category": "bareModule",
-      "key": "bare-module:core/lib/internals/tracking-suppression.ts",
-      "bytes": 13
     }
   ],
   "nonSubjects": [

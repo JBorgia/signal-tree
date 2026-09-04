@@ -67,6 +67,25 @@ describe('transactions enhancer', () => {
     expect(store.__transactions.getPendingTurnCount()).toBe(0);
   });
 
+  it('publishes a transaction callback as one coherent location state', () => {
+    const store = signalTree(
+      { left: 0, right: 0 },
+      { enhancers: [transactions()] }
+    );
+    const seen: Array<readonly [number, number]> = [];
+    const unsubscribe = store.$.left.subscribe(() => {
+      seen.push([store.$.left(), store.$.right()]);
+    });
+
+    store.transaction(() => {
+      store.$.left.set(1);
+      store.$.right.set(1);
+    });
+
+    expect(seen).toEqual([[1, 1]]);
+    unsubscribe();
+  });
+
   it('rolls back a pending optimistic transaction without reverting later confirmed work', async () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();

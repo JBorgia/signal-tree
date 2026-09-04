@@ -7,7 +7,7 @@ import {
 } from '../../../reactive-test-realization';
 import { entityMap } from '../../markers/entity-map';
 import { getPathNotifier, resetPathNotifier } from '../../path-notifier';
-import { bindSignalTreeRealization, signalTree } from '../../signal-tree';
+import { createSignalTreeFactory, signalTree } from '../../signal-tree';
 import type { ISignalTree, WriteMetadata } from '../../types';
 import { restoration } from '../../../enhancers/restoration/restoration';
 import { transactions } from '../../../enhancers/transactions/transactions';
@@ -23,7 +23,6 @@ import {
 } from '../production-substrate-stats';
 import { getPhysicalCommitClock } from '../physical-commit-clock';
 import { getTreeScalarSlotRuntime } from '../tree-scalar-slot-port';
-import { getTreeRealization } from '../tree-realization';
 
 import { createTransactionCaptureBridge } from './transaction-capture-bridge';
 import {
@@ -33,8 +32,8 @@ import {
 } from './tree-realization-adapter';
 
 const testRealization = createReactiveTestRealization();
-const reactiveSignalTree = bindSignalTreeRealization(testRealization);
-const computed = testRealization.derived.createDerived;
+const reactiveSignalTree = createSignalTreeFactory(testRealization);
+const computed = testRealization.locations.createDerived;
 
 function createMockStorage(): Storage {
   const store = new Map<string, string>();
@@ -680,9 +679,6 @@ describe('tree realization adapter', () => {
           tree: tree as unknown as ISignalTree<object>,
           descriptors,
         });
-        expect(getTreeRealization(tree.$)?.scalarLeaf).toBe(
-          testRealization.scalarLeaf
-        );
         const observedValues: string[] = [];
         const observed = observeReactiveTestValue(
           () => `${tree.$.users.ids()[0]}|${nameLeaf()}`,

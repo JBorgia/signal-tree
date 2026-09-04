@@ -49,8 +49,8 @@ import { signalTree } from './signal-tree';
 import type { NodeAccessor } from './node-accessor';
 
 const testRealization = createReactiveTestRealization();
-const computed = testRealization.derived.createDerived;
-const signal = testRealization.cell.createCell;
+const computed = testRealization.locations.createDerived;
+const signal = testRealization.locations.createCell;
 
 const tree = signalTree({
   leaf: 'l0',

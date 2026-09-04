@@ -29,7 +29,7 @@ pnpm run publish:dry-run
 ```
 
 This builds, validates, packs, and executes `npm publish --dry-run` for all
-three packages. It creates no tag, commit, push, or registry version.
+four packages. It creates no tag, commit, push, or registry version.
 
 ## Authentication
 

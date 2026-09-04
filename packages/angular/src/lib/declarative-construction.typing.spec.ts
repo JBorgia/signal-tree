@@ -1,6 +1,9 @@
-import { computed, type Signal, type WritableSignal } from '@angular/core';
-
-import { restoration, signalTree } from '../index';
+import {
+  restoration,
+  signalTree,
+  type Location,
+  type ReadonlyLocation,
+} from '../index';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() =>
   T extends B ? 1 : 2
@@ -14,33 +17,33 @@ const tree = signalTree(
   {
     enhancers: [restoration()],
     derived: ($) => {
-      const doubled = computed(() => $.count() * 2);
-      const summary = computed(() => `${$.nested.label()}:${doubled()}`);
+      const doubled = () => $.count() * 2;
+      const summary = () => `${$.nested.label()}:${doubled()}`;
       return {
         doubled,
         summary,
-        length: computed(() => summary().length),
+        length: () => summary().length,
       };
     },
   }
 );
-const nativeLeaf: WritableSignal<number> = tree.$.count;
-const nativeDerived: Signal<number> = tree.$.doubled;
-void [nativeLeaf, nativeDerived];
+const sourceLeaf: Location<number> = tree.$.count;
+const derivedLocation: ReadonlyLocation<number> = tree.$.doubled;
+void [sourceLeaf, derivedLocation];
 
 export type _DeclarativeConstructionChecks = [
-  Expect<Equal<(typeof tree)['$']['doubled'], Signal<number>>>,
-  Expect<Equal<(typeof tree)['$']['summary'], Signal<string>>>,
-  Expect<Equal<(typeof tree)['$']['length'], Signal<number>>>,
+  Expect<Equal<(typeof tree)['$']['doubled'], ReadonlyLocation<number>>>,
+  Expect<Equal<(typeof tree)['$']['summary'], ReadonlyLocation<string>>>,
+  Expect<Equal<(typeof tree)['$']['length'], ReadonlyLocation<number>>>,
   Expect<Equal<(typeof tree)['canUndo'], () => boolean>>,
   Expect<NotOffered<typeof tree, 'derived'>>,
   Expect<NotOffered<typeof tree, 'state'>>
 ];
 
 // @ts-expect-error positional derived factories are not a v15 construction path
-signalTree({ count: 1 }, ($) => ({ doubled: computed(() => $.count() * 2) }));
+signalTree({ count: 1 }, ($) => ({ doubled: () => $.count() * 2 }));
 
 // @ts-expect-error fluent derived construction is not part of the v15 tree contract
 signalTree({ count: 1 }).derived(($) => ({
-  doubled: computed(() => $.count() * 2),
+  doubled: () => $.count() * 2,
 }));

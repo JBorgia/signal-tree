@@ -2,11 +2,10 @@ import { describe, expect, it } from 'vitest';
 
 import { createReactiveTestRealization } from '../reactive-test-realization';
 import { entityMap } from '../index';
-import { bindSignalTreeRealization } from './signal-tree';
+import { createSignalTreeFactory } from './signal-tree';
 
 const testRealization = createReactiveTestRealization();
-const signalTree = bindSignalTreeRealization(testRealization);
-const computed = testRealization.derived.createDerived;
+const signalTree = createSignalTreeFactory(testRealization);
 
 /**
  * DERIVATION — SERIALIZATION, FROM ZERO.
@@ -129,7 +128,7 @@ describe('S-2 — derived must not be externalized', () => {
       { a: 2, b: 3 },
       {
         derived: ($) => ({
-          sum: computed(() => $.a() + $.b()),
+          sum: () => $.a() + $.b(),
         }),
       }
     );

@@ -70,7 +70,7 @@ export class PostOps {
 const DERIVED_SOURCE = `// store/tree/app-tree.ts — one derived factory at construction
 const tree = signalTree(createBaseState(), {
   derived: ($) => {
-    const filteredPosts = computed(() => {
+    const filteredPosts = () => {
       const search = $.posts.filters.search().toLowerCase();
       const published = $.posts.filters.published();
       return $.posts.entities.all().filter((post) => {
@@ -78,10 +78,10 @@ const tree = signalTree(createBaseState(), {
         return !search || post.title.toLowerCase().includes(search)
                        || post.content.toLowerCase().includes(search);
       });
-    });
+    };
     return {
       posts: { filtered: filteredPosts },
-      ui: { filteredCount: computed(() => filteredPosts().length) },
+      ui: { filteredCount: () => filteredPosts().length },
     };
   },
 });`;
@@ -96,7 +96,7 @@ const APP_TREE = signalTree(
     count: 0,
     history: [] as number[],
   },
-  { derived: ($) => ({ doubled: computed(() => $.count() * 2) }) }
+  { derived: ($) => ({ doubled: () => $.count() * 2 }) }
 );
 
 // WRITE — mutations go through an ops service.

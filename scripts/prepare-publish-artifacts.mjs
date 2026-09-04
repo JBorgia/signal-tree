@@ -11,22 +11,14 @@
  *   node scripts/prepare-publish-artifacts.mjs --verify-only
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { assertReleasePlan } from './release-plan.mjs';
+
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const PACKAGES = readdirSync(join(ROOT, 'packages'), { withFileTypes: true })
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name)
-  .filter((pkg) => {
-    const manifest = join(ROOT, 'packages', pkg, 'package.json');
-    return (
-      existsSync(manifest) &&
-      JSON.parse(readFileSync(manifest, 'utf8')).private !== true
-    );
-  })
-  .sort();
+const PACKAGES = assertReleasePlan(ROOT);
 
 function run(label, argv) {
   process.stdout.write(`  · ${label} ... `);

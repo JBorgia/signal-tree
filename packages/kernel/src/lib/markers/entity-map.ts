@@ -1,5 +1,5 @@
 import { definePositionRegistry } from '../internals/position-registry';
-import type { CarrierKind, EntitySignalOf, ReadonlyOf } from '../types';
+import type { EntitySignal, ReadonlyLocation } from '../types';
 
 import { createEntitySignal } from '../entity-signal';
 import {
@@ -74,21 +74,13 @@ export interface EntityMapMarkerWithSlices<
 /**
  * EntitySignal extended with computed slices
  */
-export type EntitySignalWithSlicesOf<
-  E,
-  K extends string | number,
-  Slices extends Record<string, unknown>,
-  C extends CarrierKind
-> = EntitySignalOf<E, K, C> & {
-  [P in keyof Slices]: ReadonlyOf<C, Slices[P]>;
-};
-
-/** PUBLIC kernel spelling. Carrier bound to the neutral cell. */
 export type EntitySignalWithSlices<
   E,
   K extends string | number,
   Slices extends Record<string, unknown>
-> = EntitySignalWithSlicesOf<E, K, Slices, 'cell'>;
+> = EntitySignal<E, K> & {
+  [P in keyof Slices]: ReadonlyLocation<Slices[P]>;
+};
 
 /**
  * Builder for chainable computed slices on a plain entityMap.
@@ -108,7 +100,7 @@ export interface EntityMapBuilder<
    * ```typescript
    * entityMap<Listing>()
    *   .computed('active', all => all.filter(l => l.status === 'active'))
-   * // Access: tree.$.listings.active() // ReadableCell<Listing[]>
+  * // Access: tree.$.listings.active() // ReadonlyLocation<Listing[]>
    * ```
    */
   computed<N extends string, R>(
@@ -268,8 +260,7 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
             subjectMetadataEnabled: hasMutationCapture,
             positionMetadataEnabled: hasPositionTopology,
             ownerId: context.positionRegistry.id,
-            cellRuntime: context.cellRuntime,
-            derivedRuntime: context.derivedRuntime,
+            locationRuntime: context.locationRuntime,
             // Immutable for the life of the tree — see RuntimeTreePlan. False
             // is what lets the retirement boundary release a retired subject's
             // value backing immediately.
@@ -303,7 +294,7 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
         const slices = marker.__computedSlices;
         if (slices) {
           for (const [name, sliceConfig] of Object.entries(slices)) {
-            const computedSignal = context.derivedRuntime.createDerived(() =>
+            const computedSignal = context.locationRuntime.createDerived(() =>
               sliceConfig.compute(entitySignal.all())
             );
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

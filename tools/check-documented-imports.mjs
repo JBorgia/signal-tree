@@ -52,6 +52,7 @@ const LIVE_DOCS = [
   'packages/kernel/ENHANCERS.md',
   'packages/angular/README.md',
   'packages/react/README.md',
+  'packages/vue/README.md',
   'docs/guides',
   'docs/ai',
   'docs/overview.md',

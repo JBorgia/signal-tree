@@ -7,7 +7,7 @@ import { registerMarkerProcessor } from './internals/materialize-markers';
 import { signalTree } from './signal-tree';
 import { unwrap } from './utils';
 
-const signal = createReactiveTestRealization().cell.createCell;
+const signal = createReactiveTestRealization().locations.createCell;
 
 /**
  * ONE BUILDER.

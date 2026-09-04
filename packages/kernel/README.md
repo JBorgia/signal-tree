@@ -277,10 +277,10 @@ The package publishes two code entry points:
 - `@signal-tree/kernel`
 - `@signal-tree/kernel/adapter`
 
-The adapter entry point is the framework-neutral realization SDK. It is not a
+The adapter entry point is the framework-neutral observation SDK. It is not a
 compatibility layer or an application convenience surface.
 
-- `createSignalTreeFactory(realization)` binds a framework realization to tree
+- `createSignalTreeFactory(observation)` binds framework observation to tree
   construction.
 - `observeOwnerInvalidation(owner, callback)` wakes a framework observer so it
   can reread canonical truth.
@@ -288,9 +288,10 @@ compatibility layer or an application convenience surface.
 - `withRestorationDesignation(callback)` identifies framework-originated user
   writes that are eligible for restoration.
 
-A `ScalarLeafRealization` supplies `runInvalidationGroup(run)` so transactions
-and restoration can apply all scalar changes before framework observers are
-notified. It is an adapter coherence contract, not an application batching API.
+An `ObservationAdapter` supplies dependency tokens and
+`runInvalidationGroup(run)` so transactions and restoration can apply all
+changes before framework observers are notified. It never owns or mirrors
+location state.
 
 ## License
 

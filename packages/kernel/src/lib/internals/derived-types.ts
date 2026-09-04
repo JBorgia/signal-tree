@@ -1,5 +1,4 @@
-import type { ReadableCell, WritableCell } from './cell-runtime';
-import type { CarrierKind, LeafOf, ReadonlyOf } from '../types';
+import type { ReadonlyLocation } from './cell-runtime';
 
 /**
  * Derived State Type Utilities
@@ -12,21 +11,14 @@ import type { CarrierKind, LeafOf, ReadonlyOf } from '../types';
 // =============================================================================
 
 /**
- * Converts a derived state definition into its signal representation.
- * - WritableCell<T> → WritableCell<T> (preserved — e.g. `linked()`, so `.set()` type-checks)
- * - ReadableCell<T> → ReadableCell<T> (pass through unchanged)
- * - Objects → Recursive processing
- *
- * NOTE: WritableSignal is checked BEFORE Signal because it extends Signal —
- * checking Signal first would widen `linked()`/`linkedSignal()` results to
- * read-only and break `$.x.set()`.
+ * Converts zero-argument computation recipes into readonly locations and
+ * recursively maps nested derived namespaces. Derived state has one runtime
+ * authority: SignalTree evaluates and memoizes each recipe. A callable supplied
+ * by a framework is still treated as a recipe; its writable surface is never
+ * inherited by the resulting location.
  */
-export type ProcessDerivedOf<T, C extends CarrierKind> = T extends WritableCell<
-  infer W
->
-  ? LeafOf<W, C>
-  : T extends ReadableCell<infer S>
-  ? ReadonlyOf<C, S>
+export type ProcessDerivedOf<T> = T extends (...args: never[]) => infer R
+  ? ReadonlyLocation<R>
   : T extends object
-  ? { [P in keyof T]: ProcessDerivedOf<T[P], C> }
+  ? { [P in keyof T]: ProcessDerivedOf<T[P]> }
   : never;

@@ -52,8 +52,10 @@ There is no second construction phase and no late enhancement API.
 `@signal-tree/kernel` because it contains the core API.
 
 **Correction:** Construct Angular trees through `@signal-tree/angular`. It
-realizes kernel semantics with native Angular signals and owns Angular DI and
-lifecycle integration. Use the kernel directly for framework-neutral runtimes.
+binds kernel-owned locations to Angular dependency tracking and owns Angular DI
+and lifecycle integration. Use `toWritableSignal()` only when an Angular API
+requires native signal identity. Use the kernel directly for framework-neutral
+runtimes.
 
 ```typescript
 import { defineStore, signalTree } from '@signal-tree/angular';
@@ -139,7 +141,8 @@ requirement. It is not a general form-state dependency.
 **Correction:** Root and branch locations are SignalTree accessors. They support
 whole-value reads, assignments, and updater functions. A value call is never a
 patch; derive a patched value through the updater form. Leaves remain native
-framework signals: call to read, use `.set()` or `.update()` to write.
+kernel locations: call to read, use `.set()` or `.update()` to write. Framework
+facades connect those same locations to their native dependency graphs.
 
 ```typescript
 tree.$.user();
@@ -204,11 +207,12 @@ trees remain the caller's responsibility.
 **Claim:** Historical names such as core, events, guardrails, ng-forms, storage,
 or time-travel can still be installed or imported for missing capabilities.
 
-**Correction:** SignalTree 15 has three public packages:
+**Correction:** SignalTree 15 has four public packages:
 
 - `@signal-tree/kernel`
 - `@signal-tree/angular`
 - `@signal-tree/react`
+- `@signal-tree/vue`
 
 Use package manifests and emitted types as the source of truth. A retired name
 in migration history does not imply a compatibility package.

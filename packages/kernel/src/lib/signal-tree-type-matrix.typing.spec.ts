@@ -65,7 +65,10 @@
  * a complete causal model without neutralizing the reported cause and
  * re-measuring.
  */
-import type { ReadableCell } from './internals/cell-runtime';
+import type {
+  ReadableCell,
+  ReadonlyLocation,
+} from './internals/cell-runtime';
 
 import { entityMap, signalTree } from '../index';
 import type {
@@ -212,7 +215,7 @@ rootTree.$.user.set({ name: 'Bob', age: 1, address: { city: 'x' } });
 // ============================================================================
 export type _LifecycleSurface = [
   Expect<Equal<(typeof rootTree)['destroy'], () => void>>,
-  Expect<Equal<(typeof rootTree)['destroyed'], ReadableCell<boolean>>>,
+  Expect<Equal<(typeof rootTree)['destroyed'], ReadonlyLocation<boolean>>>,
   Expect<Equal<(typeof rootTree)['registerCleanup'], (fn: () => void) => void>>,
   Expect<
     Equal<
@@ -307,7 +310,12 @@ const builtEntities = signalTree({
 });
 export type _BuiltEntities = [
   Expect<Equal<(typeof builtEntities)['$']['users'], EntitySignal<User, number>>>,
-  Expect<Equal<(typeof builtEntities)['$']['users']['all'], ReadableCell<User[]>>>,
+  Expect<
+    Equal<
+      (typeof builtEntities)['$']['users']['all'],
+      ReadonlyLocation<User[]>
+    >
+  >,
   Expect<Equal<(typeof builtEntities)['$']['count'], WritableLeaf<number>>>
 ];
 
