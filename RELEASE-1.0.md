@@ -34,11 +34,19 @@ carrier algebras are separate, packed declarations compile under `bundler` and
 `node16`, and the complete native realization runtimes are reachable only from
 `@signal-tree/kernel/adapter`, so neutral consumers do not ship them.
 
+`FRAMEWORK-NATIVE-CARRIER-AUDIT-0` is **CLOSED IN SOURCE** at `63900634`.
+Synchronous Vue observers now see one coherent root, transaction, EntityMap, or
+restoration state; grouped publication remains dependency-scoped, including a
+100-derived unrelated-work control. Native Angular/Vue `link()` values and the
+`AccessibleNode` / `EntitySignalWithSlices` aliases are truthful in packed
+declarations, ordinary branches may still own `all` / `setAll` keys, and Vue's
+type-only readonly view no longer promises an intrinsic `ComputedRef` runtime.
+
 This breaking architecture correction supersedes the former clean-clone
 technical-readiness checkpoint. Current ordinary evidence is green under the
 canonical Node `24.3.0` runtime in `.nvmrc`: strict source and public typecheck;
-kernel `2,177` passing tests plus two expected failures; Angular `99` passing / `3`
-skipped; React `6`; Vue `6`; demo `145` passing / `4` skipped; lint with zero
+kernel `2,178` passing tests plus two expected failures; Angular `99` passing / `3`
+skipped; React `6`; Vue `13`; demo `145` passing / `4` skipped; lint with zero
 errors and no warning-budget growth; forced-GC retention; `55/55` fast gates and
 `63/63` ordinary gates; `24/24` declared artifact entries; packed consumer
 typecheck under `bundler` and `node16`; facade runtime identity; `34` current
@@ -2931,10 +2939,8 @@ Run the authoritative ladder before checkpointing a release slice.
 
 ## Workspace Dirt Not Owned By Release Tasks
 
-The release checkpoint excludes this unrelated edit:
-
-- `.nvmrc` — user/formatter-owned newline-only change; excluded from
-  `7ab2e82d` and the release-ledger checkpoint.
+**The list is empty.** The user-owned `63900634` checkpoint included the former
+`.nvmrc` newline-only edit; no release-agent commit rewrote it.
 
 - ~~`eslint.config.mjs`~~ — committed alone at `e5fe21e7` (the `@nx/rollup`
   build-tooling allowlist entry, and a `no-empty-function` exemption for
@@ -12905,6 +12911,22 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
         package suites, strict typecheck, lint, production package/demo builds,
         digest-pinned CPU and forced-GC memory harnesses, `55/55` fast gates,
         `63/63` ordinary gates, and independent review with no blocker. Exact-
+        candidate release-only verification remains owed.
+  - [x] **Framework-native carrier release audit (`63900634`).** Synchronous Vue
+        publication is coherent for root replacement, transactions, EntityMap
+        `setAll`, and undo without invalidating 100 unrelated observed derived
+        carriers. Nested groups drain every queued invalidation and preserve the
+        original mutation error. Native scalar/EntityMap `link()` inference,
+        facade-bound `AccessibleNode` / `EntitySignalWithSlices`, and the
+        distinction between intrinsic `ComputedRef` values and type-only
+        readonly `Ref` views are pinned in source and packed consumers. Live
+        bundle figures were refreshed from the authoritative generator. Exact
+        committed HEAD passed Vue `13/13`, kernel `2,178` plus two expected
+        failures, Angular `99` passing / `3` skipped, React `6/6`, demo `145`
+        passing / `4` skipped, strict typecheck, all lints, four production package
+        builds, packed `bundler` / `node16` consumers, numeric claims `176/176`,
+        API and release-claim gates, `55/55` fast gates, and `63/63` ordinary
+        gates. Independent release review found no source blocker. Exact-
         candidate release-only verification remains owed.
 - [ ] publish `1.0.0`
 - [ ] verify npm/docs/install instructions from scratch
