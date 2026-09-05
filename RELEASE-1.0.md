@@ -42,6 +42,16 @@ restoration state; grouped publication remains dependency-scoped, including a
 declarations, ordinary branches may still own `all` / `setAll` keys, and Vue's
 type-only readonly view no longer promises an intrinsic `ComputedRef` runtime.
 
+`FINAL-RC-VERSION-RESUME-0` is **CLOSED** at `8e84d0f1`. The superseded
+pre-carrier `v15.0.0` tag remains immutable and was never published to npm, but
+it left workspace manifests at `15.0.0`; the former `release:rc` derivation
+would therefore have produced the wrong line, `15.0.1-rc.0`. Preparation now
+uses authoritative remote tags, resumes the highest same-base RC as
+`15.0.0-rc.13`, ignores local-only tags, and requires explicit dated changelog
+reclassification. Derivation/changelog self-tests, script lint, publication
+architecture and authorization gates, both mutation proofs, and independent
+review are green.
+
 This breaking architecture correction supersedes the former clean-clone
 technical-readiness checkpoint. Current ordinary evidence is green under the
 canonical Node `24.3.0` runtime in `.nvmrc`: strict source and public typecheck;
