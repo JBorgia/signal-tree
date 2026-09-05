@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { globSync } from 'node:fs';
 
@@ -28,6 +29,19 @@ const expectedScripts = {
   'release:major': './scripts/release.sh major',
 };
 const violations = [];
+
+for (const script of [
+  'scripts/release-version.mjs',
+  'scripts/finalize-changelog.mjs',
+]) {
+  try {
+    execFileSync(process.execPath, [script, '--self-test'], {
+      stdio: 'pipe',
+    });
+  } catch {
+    violations.push(`${script}#self-test`);
+  }
+}
 
 for (const [file, expected] of expectedFiles) {
   if (readFileSync(file, 'utf8') !== expected) violations.push(file);
