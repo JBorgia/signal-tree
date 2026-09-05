@@ -12974,6 +12974,22 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
         gates `64/64`; mutation proofs `64/64`; workflow syntax validation;
         independent release review found no blocker. RC15 exact-candidate
         verification and registry proof remain owed; GA is not authorized.
+  - [x] **RC16 React SSR source closure (`1b150355`).** RC15 passed its exact-tag
+        workflow, published all four packages under npm's `rc` dist-tag, and
+        matched the immutable candidate's four SHA-512 values in canonical
+        `kernel → angular → react → vue` order. Clean registry tarballs passed
+        facade identity and strict `bundler` / `node16` consumers. The required
+        post-registry semantic smoke then falsified React SSR with
+        `Missing getServerSnapshot`; RC15 remains immutable and published but is
+        superseded. `useSignalTree()` now supplies the canonical selector as the
+        server snapshot, with source and packed `react-dom/server` regression
+        coverage plus the mutation-proven `react-ssr-facade` release gate.
+        Validation: React `7/7`; strict typecheck; React lint/build; README and
+        documented-import checks; packed runtime and dual-resolver consumers;
+        clean packaged semantic-smoke overlay; fast gates `57/57`; ordinary
+        gates `65/65`; mutation proofs `65/65`; browser routes `127/127`;
+        independent release review found no blocker. RC16 exact-candidate and
+        post-registry verification remain owed; v3 stays on RC12 until then.
 - [ ] publish `1.0.0`
 - [ ] verify npm/docs/install instructions from scratch
 - [ ] post-release operational readiness
