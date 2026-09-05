@@ -8,7 +8,7 @@
         "name": "AccessibleNode",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
+        "declFile": "packages/angular/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -251,7 +251,7 @@
         "name": "EntitySignalWithSlices",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
+        "declFile": "packages/angular/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1066,6 +1066,15 @@
         "internalDecl": false
       },
       {
+        "name": "AccessibleNodeOf",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "createSignalTreeFactory",
         "subpath": "./adapter",
         "kind": "runtime",
@@ -1214,6 +1223,15 @@
         "subpath": "./adapter",
         "kind": "type-only",
         "declFile": "packages/kernel/src/lib/readonly.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "ReadonlyViewLeafCarriers",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/adapter.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1803,7 +1821,7 @@
         "name": "AccessibleNode",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
+        "declFile": "packages/vue/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -2028,7 +2046,7 @@
         "name": "EntitySignalWithSlices",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
+        "declFile": "packages/vue/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false

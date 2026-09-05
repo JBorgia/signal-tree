@@ -1,4 +1,8 @@
-import type { LeafCarriers, ReadonlyLeafCarriers } from '../adapter';
+import type {
+  LeafCarriers,
+  ReadonlyLeafCarriers,
+  ReadonlyViewLeafCarriers,
+} from '../adapter';
 
 export type { Location, ReadonlyLocation } from './internals/cell-runtime';
 
@@ -176,7 +180,8 @@ type ApplyComputedSlices<
  * Universal recursive shape law shared by every framework facade.
  */
 export type CarrierKind = keyof LeafCarriers<unknown> &
-  keyof ReadonlyLeafCarriers<unknown>;
+  keyof ReadonlyLeafCarriers<unknown> &
+  keyof ReadonlyViewLeafCarriers<unknown>;
 export type LeafOf<T, C extends CarrierKind> = LeafCarriers<T>[C];
 
 export type TreeNodeOf<T, C extends CarrierKind> = {
@@ -239,6 +244,11 @@ export type ReadonlyOf<
   T,
   C extends CarrierKind = 'location'
 > = ReadonlyLeafCarriers<T>[C];
+
+export type ReadonlyViewLeafOf<
+  T,
+  C extends CarrierKind = 'location'
+> = ReadonlyViewLeafCarriers<T>[C];
 
 /**
  * The universal tree contract shared by every framework facade.
@@ -998,7 +1008,12 @@ type PathInterceptor = (
  */
 export type WritableLeaf<T> = LeafOf<T, 'location'>;
 
-export type AccessibleNode<T> = NodeAccessor<T> & TreeNode<T>;
+export type AccessibleNodeOf<
+  T,
+  C extends CarrierKind
+> = NodeAccessor<T> & TreeNodeOf<T, C>;
+
+export type AccessibleNode<T> = AccessibleNodeOf<T, 'location'>;
 
 // Removed v5 legacy helper types to reduce public surface area in v6
 

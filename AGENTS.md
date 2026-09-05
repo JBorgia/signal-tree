@@ -235,7 +235,7 @@ pnpm nx build demo --configuration=production
 | `signaltree-bare`     | 10.0 KB     | 12.2 KB    |
 | `signaltree-entities` | 22.1 KB     | 24.8 KB    |
 
-The authoritative gzip gate is [`tools/check-bundle-budget.mjs`](tools/check-bundle-budget.mjs) — the single source of truth for library size claims; every other doc's numbers must trace back to it. Current measured (own-code only; framework peers and `tslib` external): bare `signalTree` **9.93 KB** prod (budget 10.0), a tree using a plain `entityMap()` **21.97 KB** prod (budget 22.1). The v15 cost is attributed in the gate's own comments: universal callable locations own subscriptions, coherent publication, exception-safe settlement, collectible derived dependencies, terminal topology, and callable EntityMap fields; declarative construction also puts the enhancer resolver on every tree's mandatory path. Check with `node tools/check-bundle-budget.mjs`.
+The authoritative gzip gate is [`tools/check-bundle-budget.mjs`](tools/check-bundle-budget.mjs) — the single source of truth for library size claims; every other doc's numbers must trace back to it. Current measured (own-code only; framework peers and `tslib` external): bare `signalTree` **9.95 KB** prod (budget 10.0), a tree using a plain `entityMap()` **22.01 KB** prod (budget 22.1). The v15 cost is attributed in the gate's own comments: universal callable locations own subscriptions, coherent publication, exception-safe settlement, collectible derived dependencies, terminal topology, and callable EntityMap fields; declarative construction also puts the enhancer resolver on every tree's mandatory path. Check with `node tools/check-bundle-budget.mjs`.
 
 ### Validation pipeline
 

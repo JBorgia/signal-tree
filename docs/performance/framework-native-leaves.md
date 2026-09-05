@@ -41,18 +41,18 @@ the artifact roots and provenance recorded in the raw JSON.
 
 Node v24.3.0 on macOS arm64:
 
-| Operation               | Universal |    Native | Paired median |   Paired p10-p90 | Native A/A p10-p90 | Reading                  |
-| ----------------------- | --------: | --------: | ------------: | ---------------: | -----------------: | ------------------------ |
-| Scalar read             |  14.55 ns |   3.29 ns |        -77.3% | -77.7% to -76.8% |     -0.5% to +1.0% | Clear native improvement |
-| Scalar replacement      |  62.83 ns |  41.99 ns |        -33.3% | -38.5% to -31.0% |     -8.4% to +4.5% | Clear native improvement |
-| Scalar derivation       |  70.60 ns |  43.17 ns |        -39.0% | -43.2% to -36.0% |     -4.6% to +4.1% | Clear native improvement |
-| Angular fan-out 1       | 122.79 ns |  75.53 ns |        -37.0% | -41.0% to -30.9% |     -8.6% to +6.6% | Clear native improvement |
-| Angular fan-out 10      | 475.54 ns | 350.50 ns |        -27.3% | -28.9% to -23.3% |     -1.9% to +1.9% | Clear native improvement |
-| Angular fan-out 100     |   4.23 us |   3.10 us |        -27.5% | -28.8% to -23.9% |     -6.2% to +9.3% | Clear native improvement |
-| Derived chain, depth 10 | 434.72 ns | 366.47 ns |        -15.5% |  -21.8% to -7.8% |     -2.2% to +4.6% | Clear native improvement |
-| Derived diamond         | 193.91 ns | 162.33 ns |        -20.7% | -26.9% to -10.7% |   -16.3% to +19.7% | Overlaps control         |
-| Construct 10 leaves     |  17.23 us |  19.61 us |         +9.8% |  -0.7% to +20.5% |    -11.5% to +6.8% | Inconclusive             |
-| Construct 100 leaves    | 108.83 us | 128.43 us |        +17.5% |  +9.9% to +32.4% |     -4.0% to +3.7% | Clear native overhead    |
+| Operation               | Universal |    Native | Paired median |    Paired p10-p90 | Native A/A p10-p90 | Reading                   |
+| ----------------------- | --------: | --------: | ------------: | ----------------: | -----------------: | ------------------------- |
+| Scalar read             |  14.55 ns |   3.29 ns |        -77.3% |  -77.7% to -76.8% |     -0.5% to +1.0% | Clear native improvement  |
+| Scalar replacement      |  62.83 ns |  41.99 ns |        -33.3% |  -38.5% to -31.0% |     -8.4% to +4.5% | Clear native improvement  |
+| Scalar derivation       |  70.60 ns |  43.17 ns |        -39.0% |  -43.2% to -36.0% |     -4.6% to +4.1% | Clear native improvement  |
+| Angular fan-out 1       | 122.79 ns |  75.53 ns |        -37.0% |  -41.0% to -30.9% |     -8.6% to +6.6% | Clear native improvement  |
+| Angular fan-out 10      | 475.54 ns | 350.50 ns |        -27.3% |  -28.9% to -23.3% |     -1.9% to +1.9% | Clear native improvement  |
+| Angular fan-out 100     |   4.23 us |   3.10 us |        -27.5% |  -28.8% to -23.9% |     -6.2% to +9.3% | Clear native improvement  |
+| Derived chain, depth 10 | 434.72 ns | 366.47 ns |        -15.5% |   -21.8% to -7.8% |     -2.2% to +4.6% | Clear native improvement  |
+| Derived diamond         | 193.91 ns | 162.33 ns |        -20.7% |  -26.9% to -10.7% |   -16.3% to +19.7% | Overlaps control          |
+| Construct 10 leaves     |  17.23 us |  19.61 us |         +9.8% |   -0.7% to +20.5% |    -11.5% to +6.8% | Inconclusive              |
+| Construct 100 leaves    | 108.83 us | 128.43 us |        +17.5% |   +9.9% to +32.4% |     -4.0% to +3.7% | Clear native overhead     |
 | Construct 1,000 leaves  |   1.83 ms |   2.45 ms |        +30.8% | +19.39% to +44.1% |  -12.3% to +19.38% | Clears control by 0.01 pp |
 
 Native realization wins the repeated application hot paths. Large-tree

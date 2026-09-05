@@ -43,6 +43,10 @@ export interface ReadonlyLeafCarriers<T> {
   location: ReadonlyLocation<T>;
 }
 
+export interface ReadonlyViewLeafCarriers<T> {
+  location: ReadonlyLocation<T>;
+}
+
 interface OwnerInvalidationTarget {
   readonly $: object;
   readonly destroyed: () => boolean;
@@ -122,6 +126,7 @@ export { replaceLocation } from './lib/internals/location-runtime';
 export { withRestorationDesignation } from './lib/internals/restoration-eligibility';
 
 export type {
+  AccessibleNodeOf,
   EntityNodeOf,
   EntitySignalOf,
   ISignalTree,

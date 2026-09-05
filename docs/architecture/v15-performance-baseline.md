@@ -157,8 +157,8 @@ shape and absolute values, not one ratio from the smoke size.
 
 | target                | prod gzip |  budget |
 | --------------------- | --------: | ------: |
-| `signaltree-bare`     |   9.93 KB | 10.0 KB |
-| `signaltree-entities` |  21.97 KB | 22.1 KB |
+| `signaltree-bare`     |   9.95 KB | 10.0 KB |
+| `signaltree-entities` |  22.01 KB | 22.1 KB |
 
 Bare grew 0.47 KB in 15.0 and it is a design cost, not a diagnostic: declaring
 enhancers puts the resolver and the configuration validator on every tree

@@ -41,30 +41,32 @@ export function createNativeLocationRuntime(
   };
 
   const runInvalidationGroup = (run: () => void): void => {
-    let failure: unknown;
-    let hasFailure = false;
-    invalidationGroupDepth += 1;
-    try {
-      run();
-    } catch (error) {
-      failure = error;
-      hasFailure = true;
-    } finally {
-      invalidationGroupDepth -= 1;
-      if (invalidationGroupDepth === 0 && groupedPublishers.size > 0) {
-        const publishers = [...groupedPublishers];
-        groupedPublishers.clear();
-        try {
-          deliver(publishers);
-        } catch (error) {
-          if (!hasFailure) {
-            failure = error;
-            hasFailure = true;
+    observation.runInvalidationGroup(() => {
+      let failure: unknown;
+      let hasFailure = false;
+      invalidationGroupDepth += 1;
+      try {
+        run();
+      } catch (error) {
+        failure = error;
+        hasFailure = true;
+      } finally {
+        invalidationGroupDepth -= 1;
+        if (invalidationGroupDepth === 0 && groupedPublishers.size > 0) {
+          const publishers = [...groupedPublishers];
+          groupedPublishers.clear();
+          try {
+            deliver(publishers);
+          } catch (error) {
+            if (!hasFailure) {
+              failure = error;
+              hasFailure = true;
+            }
           }
         }
       }
-    }
-    if (hasFailure) throw failure;
+      if (hasFailure) throw failure;
+    });
   };
 
   const createWritable = <T>(

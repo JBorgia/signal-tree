@@ -12793,9 +12793,9 @@ delay `GATE F` or GA without a concrete release falsifier.
       ESLint, kernel typing, diagnostics, `git diff --check`, and independent
       review passed.
 - [x] **Final public API review.** The former greenfield API froze at
-  `75c003c2`; `FRAMEWORK-NATIVE-CARRIERS-0` deliberately superseded its leaf
-  carrier types at `7ab2e82d`. The API baseline, release claims, package
-  exports, and strict packed declarations are green for the replacement.
+      `75c003c2`; `FRAMEWORK-NATIVE-CARRIERS-0` deliberately superseded its leaf
+      carrier types at `7ab2e82d`. The API baseline, release claims, package
+      exports, and strict packed declarations are green for the replacement.
 
 Exit condition: `GATE F` — **SATISFIED at `109595e6`**
 
@@ -12880,32 +12880,32 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
       browser, and development policy probes; release gates `74/74`; release-
       inclusive mutation proofs `74/74` with zero unproven, blind, or errored
       gates; final independent review clean.
-    - [x] **Kernel-owned universal locations and first-party Vue facade
-      (`5efeb7f5`; framework identity superseded by `7ab2e82d`).** Canonical
-      values, equality, revisions, dependency propagation, subscriptions,
-      derived memoization, and grouped publication remain behind the neutral
-      location runtime. The experiment's claim that every facade should expose
-      the same nominal location did not survive the native-carrier falsifiers.
-    - [x] **Callable kernel/root/branch grammar and explicit terminal topology
-      (`81780c4e`; narrowed by `7ab2e82d`).** Neutral locations plus root and
-      object branches retain read/replace/derive call syntax; `leaf(value)`
-      marks topology and callable data. Framework terminal leaves now use their
-      native writable APIs. The digest-pinned historical comparison finds no
-      clear read, derivation, or construction change and measures scalar
-      replacement at about `+4.1 ns`.
-    - [x] **Framework-native leaf carriers with kernel authority (`7ab2e82d`).**
-      Angular exposes `WritableSignal` / `Signal`, Vue exposes `Ref` /
-      `ComputedRef`, and React remains hook-native. Direct carrier identity,
-      batching interception, kernel snapshots, causal intent, EntityMap
-      projections, Vue `watch` / `unref` / `toValue` / `isReadonly`, strict
-      packed declarations, architecture assets, and full demo migration are
-      covered. HYBRID-A was rejected by preregistered CPU and density criteria;
-      the selected direct carrier preserves the unobserved `1,934 B/leaf`
-      density while materially improving Angular hot paths. Validation:
-      package suites, strict typecheck, lint, production package/demo builds,
-      digest-pinned CPU and forced-GC memory harnesses, `55/55` fast gates,
-      `63/63` ordinary gates, and independent review with no blocker. Exact-
-      candidate release-only verification remains owed.
+  - [x] **Kernel-owned universal locations and first-party Vue facade
+        (`5efeb7f5`; framework identity superseded by `7ab2e82d`).** Canonical
+        values, equality, revisions, dependency propagation, subscriptions,
+        derived memoization, and grouped publication remain behind the neutral
+        location runtime. The experiment's claim that every facade should expose
+        the same nominal location did not survive the native-carrier falsifiers.
+  - [x] **Callable kernel/root/branch grammar and explicit terminal topology
+        (`81780c4e`; narrowed by `7ab2e82d`).** Neutral locations plus root and
+        object branches retain read/replace/derive call syntax; `leaf(value)`
+        marks topology and callable data. Framework terminal leaves now use their
+        native writable APIs. The digest-pinned historical comparison finds no
+        clear read, derivation, or construction change and measures scalar
+        replacement at about `+4.1 ns`.
+  - [x] **Framework-native leaf carriers with kernel authority (`7ab2e82d`).**
+        Angular exposes `WritableSignal` / `Signal`, Vue exposes `Ref` /
+        `ComputedRef`, and React remains hook-native. Direct carrier identity,
+        batching interception, kernel snapshots, causal intent, EntityMap
+        projections, Vue `watch` / `unref` / `toValue` / `isReadonly`, strict
+        packed declarations, architecture assets, and full demo migration are
+        covered. HYBRID-A was rejected by preregistered CPU and density criteria;
+        the selected direct carrier preserves the unobserved `1,934 B/leaf`
+        density while materially improving Angular hot paths. Validation:
+        package suites, strict typecheck, lint, production package/demo builds,
+        digest-pinned CPU and forced-GC memory harnesses, `55/55` fast gates,
+        `63/63` ordinary gates, and independent review with no blocker. Exact-
+        candidate release-only verification remains owed.
 - [ ] publish `1.0.0`
 - [ ] verify npm/docs/install instructions from scratch
 - [ ] post-release operational readiness

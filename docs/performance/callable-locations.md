@@ -45,12 +45,12 @@ that its work landed and destroys its trees.
 
 Node v24.3.0 on macOS arm64:
 
-| Operation          | `84837fb3` methods | Callable locations | Paired median delta |  Paired p10-p90 | Reading                       |
-| ------------------ | -----------------: | -----------------: | ------------------: | --------------: | ----------------------------- |
-| Scalar read        |           10.75 ns |           10.72 ns |               -0.7% |  -1.7% to +1.8% | No clear difference           |
-| Scalar replacement |           58.62 ns |           62.77 ns |               +6.6% |  +3.4% to +9.9% | Measured overhead in this run |
-| Scalar derivation  |           67.78 ns |           67.04 ns |               -1.0% |  -5.4% to +1.9% | No clear difference           |
-| Tree construction  |           11.58 us |           11.47 us |               -1.2% |  -7.7% to +5.1% | No clear difference           |
+| Operation          | `84837fb3` methods | Callable locations | Paired median delta | Paired p10-p90 | Reading                       |
+| ------------------ | -----------------: | -----------------: | ------------------: | -------------: | ----------------------------- |
+| Scalar read        |           10.75 ns |           10.72 ns |               -0.7% | -1.7% to +1.8% | No clear difference           |
+| Scalar replacement |           58.62 ns |           62.77 ns |               +6.6% | +3.4% to +9.9% | Measured overhead in this run |
+| Scalar derivation  |           67.78 ns |           67.04 ns |               -1.0% | -5.4% to +1.9% | No clear difference           |
+| Tree construction  |           11.58 us |           11.47 us |               -1.2% | -7.7% to +5.1% | No clear difference           |
 
 The one supported comparison claim is scalar replacement: the `81780c4e` build
 measured about 4.1 ns slower in this run. The experiment did not isolate the
