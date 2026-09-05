@@ -1,3 +1,13 @@
+## Unreleased (15.0.0-rc.15)
+
+- **The production demo passes the complete mobile route-smoke matrix.**
+  Responsive benchmark result grids no longer retain desktop minimum widths,
+  the deep-typing heading no longer forces an incoherent line break, and mobile
+  architecture connector labels remain inside their intended gaps.
+- **GitHub RC releases are always marked as prereleases.** The release workflow
+  derives prerelease metadata from the tag, and a mutation-proven gate rejects
+  a workflow that would expose an RC as a stable GitHub release.
+
 ## 15.0.0-rc.14 (2026-09-05)
 
 - **Release mutation proofs track the current architecture.** Kernel-neutrality,

@@ -71,6 +71,15 @@ if (
   violations.push('.github/workflows/publish.yml');
 }
 
+const releaseWorkflow = readFileSync('.github/workflows/release.yml', 'utf8');
+if (
+  !releaseWorkflow.includes(
+    "prerelease: ${{ contains(needs.verify.outputs.tag_name, '-') }}"
+  )
+) {
+  violations.push('.github/workflows/release.yml#prerelease-metadata');
+}
+
 for (const file of [
   ...globSync('scripts/**/*.sh'),
   ...globSync('.github/workflows/*.{yml,yaml}'),
@@ -98,4 +107,6 @@ if (violations.length > 0) {
   );
   process.exit(1);
 }
-console.log('Every registry publication path uses publish-candidate.mjs.');
+console.log(
+  'Registry publication is canonical and prerelease metadata is enforced.'
+);
