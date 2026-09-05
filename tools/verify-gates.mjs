@@ -1314,6 +1314,18 @@ const GATES = [
     },
   },
   {
+    name: 'react-ssr-facade',
+    covers:
+      'the packed React facade supplies a canonical server snapshot to useSyncExternalStore',
+    cmd: ['node', 'tools/verify-consumer-typecheck.mjs'],
+    needsBuild: true,
+    mutation: {
+      file: 'dist/packages/react/dist/use-signal-tree.js',
+      find: 'useSyncExternalStore(subscribe,getSnapshot,getSnapshot)',
+      replace: 'useSyncExternalStore(subscribe,getSnapshot)',
+    },
+  },
+  {
     name: 'bundle-budget',
     covers: 'built package sizes stay inside their budgets',
     cmd: ['node', 'tools/check-bundle-budget.mjs'],

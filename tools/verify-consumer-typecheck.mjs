@@ -239,6 +239,8 @@ import * as angular from '@signal-tree/angular';
 import * as react from '@signal-tree/react';
 import * as vue from '@signal-tree/vue';
 import { isSignal } from '@angular/core';
+import { createElement } from 'react';
+import { renderToString } from 'react-dom/server';
 import { isRef } from 'vue';
 
 const sharedRuntimeSymbols = [
@@ -270,6 +272,16 @@ for (const packageName of ['angular', 'react', 'vue']) {
 if (react.signalTree !== kernel.signalTree) {
   throw new Error('@signal-tree/react does not forward kernel signalTree by identity.');
 }
+const reactTree = react.signalTree({ count: 1 });
+const ReactCounter = () => createElement(
+  'output',
+  null,
+  react.useSignalTree(reactTree, ($) => $.count())
+);
+if (!renderToString(createElement(ReactCounter)).includes('>1</output>')) {
+  throw new Error('@signal-tree/react did not provide a canonical server snapshot.');
+}
+reactTree.destroy();
 if (angular.signalTree === kernel.signalTree) {
   throw new Error('@signal-tree/angular silently fell back to neutral construction.');
 }
@@ -314,7 +326,9 @@ execFileSync(
     `@angular/core@${process.env['NG_VERSION'] || '^22.0.0'}`,
     'rxjs@^7.0.0',
     'react@^19.0.0',
+    'react-dom@^19.0.0',
     '@types/react@^19.0.0',
+    '@types/react-dom@^19.0.0',
     'vue@^3.5.0',
     'typescript@^5.6.0',
   ],

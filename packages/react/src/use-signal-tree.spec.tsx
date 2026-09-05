@@ -1,5 +1,6 @@
 import { act, render, screen } from '@testing-library/react';
 import { StrictMode } from 'react';
+import { renderToString } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
 import { entityMap, signalTree } from '@signal-tree/kernel';
@@ -131,6 +132,20 @@ describe('useSignalTree', () => {
 
     rendered.rerender(<Selection field="label" />);
     expect(screen.getByText('one')).toBeTruthy();
+    tree.destroy();
+  });
+
+  it('reads canonical state during server rendering', () => {
+    const tree = signalTree({ count: 1 });
+
+    function Count() {
+      const count = useSignalTree(tree, ($) => $.count());
+      return <output>{count}</output>;
+    }
+
+    expect(renderToString(<Count />)).toContain('>1</output>');
+    tree.$.count(2);
+    expect(renderToString(<Count />)).toContain('>2</output>');
     tree.destroy();
   });
 
