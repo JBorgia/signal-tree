@@ -105,5 +105,6 @@ jobs:
         with:
           generate_release_notes: true
           tag_name: ${{ needs.verify.outputs.tag_name }}
+          prerelease: ${{ contains(needs.verify.outputs.tag_name, '-') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

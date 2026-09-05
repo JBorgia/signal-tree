@@ -1378,6 +1378,16 @@ const GATES = [
     },
   },
   {
+    name: 'release-prerelease-metadata',
+    covers: 'prerelease tags create GitHub releases marked as prereleases',
+    cmd: ['node', 'scripts/verify-publish-architecture.mjs'],
+    mutation: {
+      file: '.github/workflows/release.yml',
+      find: "          prerelease: ${{ contains(needs.verify.outputs.tag_name, '-') }}",
+      replace: '          prerelease: false',
+    },
+  },
+  {
     name: 'release-plan',
     covers:
       'the canonical release set matches publishable manifests and orders kernel before adapters',
