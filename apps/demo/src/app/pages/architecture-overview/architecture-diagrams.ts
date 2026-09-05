@@ -199,14 +199,20 @@ export const PACKAGE_OWNERSHIP_DIAGRAM: ArchitectureDiagramSpec = {
       'angular-kernel',
       'angular',
       'kernel-package',
-      'native signal realization'
+      'native signal realization',
+      { labelOffset: { mobile: [0, 0] } }
     ),
-    edge('react-kernel', 'react', 'kernel-package', 'forwards + observes'),
-    edge('vue-kernel', 'vue', 'kernel-package', 'native ref realization'),
+    edge('react-kernel', 'react', 'kernel-package', 'forwards + observes', {
+      labelOffset: { mobile: [0, 0] },
+    }),
+    edge('vue-kernel', 'vue', 'kernel-package', 'native ref realization', {
+      labelOffset: { mobile: [0, 0] },
+    }),
     edge('neutral-kernel', 'neutral-libraries', 'kernel-package', 'imports'),
     edge('adapter-kernel', 'adapter', 'kernel-package', 'narrow contract', {
       direction: 'both',
       dashed: true,
+      labelOffset: { mobile: [0, -65] },
     }),
   ],
   checks: [

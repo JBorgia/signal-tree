@@ -1577,6 +1577,7 @@ button:disabled {
 
   .callable-result-header {
     position: absolute;
+    min-width: 0;
     width: 1px;
     height: 1px;
     padding: 0;
@@ -1588,6 +1589,15 @@ button:disabled {
   }
 
   .callable-result-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+  }
+
+  // The --memory compound selectors (0,2,0) outrank the bare mobile
+  // resets above, so the 52rem desktop min-width would otherwise keep
+  // the memory density table wider than the viewport. Match specificity.
+  .callable-result-table--memory .callable-result-header,
+  .callable-result-table--memory .callable-result-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     min-width: 0;
   }
