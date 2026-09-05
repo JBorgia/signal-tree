@@ -308,7 +308,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Documentation',
       description:
-        'SignalTree package documentation for the kernel, Angular, and React packages.',
+        'SignalTree package documentation for the kernel, Angular, React, and Vue packages.',
     },
   },
 

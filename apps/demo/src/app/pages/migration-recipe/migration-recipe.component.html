@@ -3,7 +3,7 @@
     <p class="page-eyebrow">SignalTree 15 migration</p>
     <h1>Move concepts, not syntax.</h1>
     <p class="lede">
-      SignalTree 15 has one construction grammar and three public packages. A
+      SignalTree 15 has one construction grammar and four public packages. A
       migration should preserve domain ownership while replacing store
       machinery, not recreate a legacy architecture behind new names.
     </p>
@@ -16,7 +16,8 @@
       <code>&#64;signal-tree/angular</code> owns Angular observation, injection,
       lifecycle, and explicit native-signal views. It installs
       <code>&#64;signal-tree/kernel</code> as an exact dependency. React observation lives in
-      <code>&#64;signal-tree/react</code>.
+      <code>&#64;signal-tree/react</code>, and Vue applications construct through
+      <code>&#64;signal-tree/vue</code>.
     </p>
   </section>
 

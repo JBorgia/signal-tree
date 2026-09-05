@@ -2,6 +2,7 @@ import sdk from '@stackblitz/sdk';
 
 import { Injectable } from '@angular/core';
 
+import { DEMO_LIBRARY_VERSIONS } from '../../../../library-versions';
 import type { StackblitzConfig } from './example.types';
 
 /**
@@ -21,7 +22,7 @@ export class StackblitzService {
   private readonly ngVersion = '^20.3.0';
 
   open(config: StackblitzConfig): void {
-    const files = { ...this.baseFiles(), ...config.files };
+    const files = { ...this.baseFiles(config.dependencies), ...config.files };
     sdk.openProject(
       {
         title: config.title,
@@ -37,7 +38,9 @@ export class StackblitzService {
   }
 
   /** The shared, runnable standalone-Angular scaffold every sandbox starts from. */
-  private baseFiles(): Record<string, string> {
+  private baseFiles(
+    dependencies: Record<string, string> = {}
+  ): Record<string, string> {
     return {
       'package.json': JSON.stringify(
         {
@@ -51,10 +54,11 @@ export class StackblitzService {
             '@angular/forms': this.ngVersion,
             '@angular/platform-browser': this.ngVersion,
             '@angular/router': this.ngVersion,
-            '@signal-tree/angular': '15.0.0-rc.1',
+            '@signal-tree/angular': DEMO_LIBRARY_VERSIONS['signaltree'],
             rxjs: '^7.8.0',
             tslib: '^2.6.0',
             'zone.js': '^0.15.0',
+            ...dependencies,
           },
           devDependencies: {
             '@angular/build': this.ngVersion,

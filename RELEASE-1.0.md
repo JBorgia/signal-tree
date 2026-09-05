@@ -52,6 +52,16 @@ reclassification. Derivation/changelog self-tests, script lint, publication
 architecture and authorization gates, both mutation proofs, and independent
 review are green.
 
+`15.0.0-rc.13` is **IMMUTABLE / NOT PUBLISHED** at `4b3c114a`. Local release
+preparation passed `74/74`, created four validated candidate tarballs in
+`kernel -> angular -> react -> vue` order, and pushed a verified signed tag.
+Tagged GitHub run `33986219645` passed the complete `74/74` production matrix,
+then correctly blocked release creation at the mutation matrix: `59/63` proved,
+while kernel-neutrality, C6 Angular realization, release claims, and declaration
+docs used stale anchors and remained green under mutation. No GitHub release or
+npm write occurred. The four proof repairs and the complete live docs/demo
+currency pass earn RC14; rc.13 is not moved or reused.
+
 This breaking architecture correction supersedes the former clean-clone
 technical-readiness checkpoint. Current ordinary evidence is green under the
 canonical Node `24.3.0` runtime in `.nvmrc`: strict source and public typecheck;
@@ -12938,6 +12948,17 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
         API and release-claim gates, `55/55` fast gates, and `63/63` ordinary
         gates. Independent release review found no source blocker. Exact-
         candidate release-only verification remains owed.
+  - [x] **RC13 mutation-proof and documentation closure.** Tagged RC13 passed
+        all 74 production gates and failed closed on four stale proof anchors.
+        The replacements target direct framework contamination, native Angular
+        publication, the live `replaceLocation` release claim, and the measured
+        kernel declaration-doc baseline. All four now fail under mutation and
+        pass restored. A complete live README/docs/demo audit found no remaining
+        current API or architecture drift; current version displays and
+        StackBlitz dependencies are generated, Vue is present in the package and
+        AI surfaces, demo tests/lint/production build pass, and 34 architecture
+        assets remain current. Historical RC1 records remain explicitly
+        historical. RC14 exact-candidate verification is next.
 - [ ] publish `1.0.0`
 - [ ] verify npm/docs/install instructions from scratch
 - [ ] post-release operational readiness

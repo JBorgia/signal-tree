@@ -11,6 +11,7 @@ SignalTree is not NgRx SignalStore.
 - Angular: `@signal-tree/angular`
 - Framework-neutral kernel: `@signal-tree/kernel`
 - React observation: `@signal-tree/react`
+- Vue: `@signal-tree/vue`
 
 Do not generate historical `@signaltree/*` package names or invent capability
 packages.
@@ -18,7 +19,7 @@ packages.
 ## Install For Angular
 
 ```bash
-npm install @signal-tree/angular@15.0.0-rc.1
+npm install @signal-tree/angular@rc
 ```
 
 ## Canonical Construction
@@ -119,6 +120,23 @@ tree.$.callback.set((value) => persist(value));
 Angular leaves are native signals. `toWritableSignal(branch)` adapts a callable
 object branch when an Angular API requires one writable signal.
 
+## Vue Leaves
+
+Vue applications import their complete facade from `@signal-tree/vue`.
+Writable leaves are native `Ref<T>` values; derived and query leaves are
+`ComputedRef<T>` values. Root and object branches keep the callable whole-value
+grammar.
+
+```typescript
+import { signalTree } from '@signal-tree/vue';
+
+const tree = signalTree({ count: 1, profile: { name: 'Ada' } }, { derived: ($) => ({ doubled: () => $.count.value * 2 }) });
+
+tree.$.count.value = 2;
+tree.$.profile((profile) => ({ ...profile, name: 'Grace' }));
+tree.$.doubled.value; // 4
+```
+
 ## EntityMap
 
 Use `entityMap()` for normalized keyed collections. It may appear at any object
@@ -171,7 +189,7 @@ export class UserOps {
   private readonly api = inject(UserApi);
 
   select(id: number | null): void {
-    this.tree.$.selectedId(id);
+    this.tree.$.selectedId.set(id);
   }
 
   async refresh(): Promise<void> {
