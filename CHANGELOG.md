@@ -1,4 +1,4 @@
-## Unreleased (15.0.0-rc.15)
+## 15.0.0-rc.15 (2026-09-05)
 
 - **The production demo passes the complete mobile route-smoke matrix.**
   Responsive benchmark result grids no longer retain desktop minimum widths,
