@@ -27,5 +27,5 @@ export function useSignalTree<TRoot extends object, TSelected>(
   );
   const getSnapshot = useCallback(() => selector(owner.$), [owner, selector]);
 
-  return useSyncExternalStore(subscribe, getSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }

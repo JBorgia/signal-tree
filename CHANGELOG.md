@@ -1,3 +1,10 @@
+## Unreleased (15.0.0-rc.16)
+
+- **React selectors render canonical state on the server.** `useSignalTree()`
+  now supplies `useSyncExternalStore` with a server snapshot reader, so React
+  SSR no longer throws `Missing getServerSnapshot`; server reads and later
+  client subscriptions use the same selector over kernel truth.
+
 ## 15.0.0-rc.15 (2026-09-05)
 
 - **The production demo passes the complete mobile route-smoke matrix.**
