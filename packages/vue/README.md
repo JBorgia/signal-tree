@@ -1,7 +1,7 @@
 # `@signal-tree/vue`
 
-Vue observation for SignalTree. State remains owned by the framework-neutral
-kernel; this package lets Vue track direct dot-path reads.
+Vue-native SignalTree realization. State remains owned by the framework-neutral
+kernel; terminal leaves are Vue refs and derived values are computed refs.
 
 ## Install
 
@@ -17,24 +17,21 @@ The canonical v15 model and composition guidance ships with this package as
 ## Use
 
 ```ts
-import { computed } from 'vue';
 import { signalTree } from '@signal-tree/vue';
 
-const tree = signalTree({ profile: { name: 'Ada' } });
-const name = computed(() => tree.$.profile.name());
+const tree = signalTree(
+  { profile: { name: 'Ada' } },
+  {
+    derived: ($) => ({
+      greeting: () => `Hello, ${$.profile.name.value}`,
+    }),
+  }
+);
 
-tree.$.profile.name('Grace');
+tree.$.profile.name.value = 'Grace';
+console.log(tree.$.greeting.value); // Hello, Grace
 ```
 
-Locations are not Vue refs. For a Vue API such as `v-model` that requires a
-writable ref, use Vue's native writable `computed`:
-
-```ts
-const nameModel = computed({
-  get: () => tree.$.profile.name(),
-  set: (value: string) => tree.$.profile.name(value),
-});
-```
-
-This keeps one state authority and one write grammar while Vue owns only its
-observation boundary.
+The ref can be passed directly to `watch()`, `computed()`, or `v-model`.
+Object branches and the root `$` remain callable whole-value accessors. Vue owns
+dependency tracking; the kernel remains the only state and write authority.

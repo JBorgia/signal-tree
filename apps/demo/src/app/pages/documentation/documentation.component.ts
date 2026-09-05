@@ -53,7 +53,7 @@ export class DocumentationComponent implements OnInit {
     {
       id: 'angular',
       name: '@signal-tree/angular',
-      description: 'Angular observation, defineStore, and explicit native-signal bridging',
+      description: 'Native Angular signal leaves, defineStore, and DestroyRef cleanup',
       readmePath: 'assets/docs/angular/README.md',
     },
     {
@@ -65,7 +65,7 @@ export class DocumentationComponent implements OnInit {
     {
       id: 'vue',
       name: '@signal-tree/vue',
-      description: 'Vue dependency observation for direct universal-location reads',
+      description: 'Native Vue ref leaves over kernel-owned state',
       readmePath: 'assets/docs/vue/README.md',
     },
     {

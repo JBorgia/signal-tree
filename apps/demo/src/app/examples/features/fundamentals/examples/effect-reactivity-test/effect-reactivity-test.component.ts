@@ -180,7 +180,7 @@ export class EffectReactivityTestComponent {
     console.log(
       `\n>>> UPDATING SignalTree $.loading.state: ${current} -> ${next}`
     );
-    this.store.$.loading.state(next);
+    this.store.$.loading.state.set(next);
     console.log(
       `>>> After set, $.loading.state() = ${this.store.$.loading.state()}`
     );
@@ -229,7 +229,7 @@ export class EffectReactivityTestComponent {
 
     // Step 1: Set loading state
     console.log('Step 1: Setting loading state to "loading"');
-    this.store.$.loading.state('loading');
+    this.store.$.loading.state.set('loading');
 
     // Step 2: Wait for "API response"
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -244,7 +244,7 @@ export class EffectReactivityTestComponent {
 
     // Step 4: Set loaded state
     console.log('Step 3: Setting loading state to "loaded"');
-    this.store.$.loading.state('loaded');
+    this.store.$.loading.state.set('loaded');
 
     console.log('>>> DATA LOAD COMPLETE');
     console.log(

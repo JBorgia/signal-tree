@@ -3,6 +3,7 @@ import type { SignalTreeFactory } from './types';
 
 import {
   bindLocationRuntime,
+  createLocationRuntime,
   isWritableLocation,
   replaceLocation,
   type LocationRuntime,
@@ -32,9 +33,7 @@ const isWritableCell = (
   typeof (v as { set?: unknown }).set === 'function';
 
 const readWritableCell = <T>(cell: Location<T> | WritableCell<T>): T =>
-  'peek' in cell && typeof cell.peek === 'function'
-    ? cell.peek()
-    : cell();
+  'peek' in cell && typeof cell.peek === 'function' ? cell.peek() : cell();
 
 import { SIGNAL_TREE_MESSAGES } from './constants';
 import { resolveEnhancerOrder } from '../enhancers';
@@ -90,10 +89,7 @@ import {
 import type { MaterializationContext } from './internals/materialize-markers';
 import { applyDerivedFactory } from './internals/merge-derived';
 import { hydrateMarkerNode } from './internals/materialize-markers';
-import {
-  isLeafDefinition,
-  leafDefinitionValue,
-} from './leaf';
+import { isLeafDefinition, leafDefinitionValue } from './leaf';
 import {
   deepEqual,
   isBuiltInObject,
@@ -468,7 +464,8 @@ function makeNodeAccessor<T>(
   }.node as NodeAccessor<T>;
 
   self.accessor = accessor;
-  (accessor as unknown as Record<symbol, boolean>)[CALLABLE_SIGNAL_SYMBOL] = true;
+  (accessor as unknown as Record<symbol, boolean>)[CALLABLE_SIGNAL_SYMBOL] =
+    true;
   Object.defineProperty(accessor, NODE_STORE_SYMBOL, {
     value: store,
     enumerable: false,
@@ -1051,8 +1048,7 @@ function recursiveUpdate(
         // is exactly the no-op case (and Object.is(NaN, NaN) makes that
         // indistinguishable). "The leaf no longer holds what it held" is the
         // question actually being asked.
-        if (!Object.is(readWritableCell(sig), current))
-          out.push(childPath);
+        if (!Object.is(readWritableCell(sig), current)) out.push(childPath);
       }
     }
     // ST2005 — attempted and REVERTED, deliberately. Recorded here so the
@@ -1290,10 +1286,7 @@ function createSignalStore<T>(
       );
     }
 
-    return materializationContext.locationRuntime.createCell(
-      value,
-      equal
-    );
+    return materializationContext.locationRuntime.createCell(value, equal);
   };
 
   // Primitives, null, undefined
@@ -1358,13 +1351,8 @@ function createSignalStore<T>(
   )) {
     const childPath = path ? `${path}.${key}` : key;
     const terminal = isLeafDefinition(definedValue);
-    const value = terminal
-      ? leafDefinitionValue(definedValue)
-      : definedValue;
-    if (
-      terminal &&
-      (isEntityMapMarker(value) || isRegisteredMarker(value))
-    ) {
+    const value = terminal ? leafDefinitionValue(definedValue) : definedValue;
+    if (terminal && (isEntityMapMarker(value) || isRegisteredMarker(value))) {
       throw new Error(
         `SignalTree: leaf() cannot wrap a semantic marker at "${childPath}".`
       );
@@ -1453,11 +1441,7 @@ function createSignalStore<T>(
         typeof ngDevMode === 'undefined' || ngDevMode
           ? leafEqual(equalityFn, childPath)
           : equalityFn;
-      const leaf = createLeafSignal(
-        value,
-        childPositionIds,
-        equal
-      );
+      const leaf = createLeafSignal(value, childPositionIds, equal);
       finalizeLeafSignal(
         leaf,
         childPath,
@@ -1484,11 +1468,7 @@ function createSignalStore<T>(
         typeof ngDevMode === 'undefined' || ngDevMode
           ? leafEqual(equalityFn, childPath)
           : equalityFn;
-      const leaf = createLeafSignal(
-        value,
-        childPositionIds,
-        equal
-      );
+      const leaf = createLeafSignal(value, childPositionIds, equal);
       finalizeLeafSignal(
         leaf,
         childPath,
@@ -1562,7 +1542,13 @@ function create<T extends object>(
   config: TreeConfig,
   materializationContext: MaterializationContext,
   buildPlan: TreeBuildPlan,
-  captureRuntime: MutationCaptureRuntime = createMutationCaptureRuntime()
+  captureRuntime: MutationCaptureRuntime = createMutationCaptureRuntime(),
+  createScalarLeafRuntime: (
+    physicalCommitClock:
+      | ReturnType<typeof createPhysicalCommitClock>
+      | undefined,
+    locations: LocationRuntime
+  ) => TreeScalarLeafRuntime = createTreeScalarLeafRuntime
 ): TreeConstructionResult<T> {
   if (initialState === null || initialState === undefined) {
     throw new Error(SIGNAL_TREE_MESSAGES.NULL_OR_UNDEFINED);
@@ -1571,7 +1557,7 @@ function create<T extends object>(
   const equalityFn = createEqualityFn(config.useShallowComparison ?? false);
 
   // Create signal store
-  const scalarSlotRuntime = createTreeScalarLeafRuntime(
+  const scalarSlotRuntime = createScalarLeafRuntime(
     materializationContext.physicalCommitClock,
     materializationContext.locationRuntime
   );
@@ -1691,8 +1677,14 @@ function create<T extends object>(
   const tree = {} as ISignalTree<T>;
 
   bindLocationRuntime(tree as object, materializationContext.locationRuntime);
-  bindLocationRuntime(signalState as object, materializationContext.locationRuntime);
-  bindLocationRuntime(rootAccessor as object, materializationContext.locationRuntime);
+  bindLocationRuntime(
+    signalState as object,
+    materializationContext.locationRuntime
+  );
+  bindLocationRuntime(
+    rootAccessor as object,
+    materializationContext.locationRuntime
+  );
 
   (tree as unknown as Record<symbol, MutationCaptureRuntime>)[
     MUTATION_CAPTURE_RUNTIME
@@ -1949,7 +1941,16 @@ function applyEnhancers<T extends object>(
 function signalTreeImpl<T extends object>(
   initialState: T,
   config: TreeConfig = {},
-  observation: ObservationAdapter = NEUTRAL_OBSERVATION_ADAPTER
+  observation: ObservationAdapter = NEUTRAL_OBSERVATION_ADAPTER,
+  createScalarLeafRuntime: (
+    physicalCommitClock:
+      | ReturnType<typeof createPhysicalCommitClock>
+      | undefined,
+    locations: LocationRuntime
+  ) => TreeScalarLeafRuntime = createTreeScalarLeafRuntime,
+  createLocations: (
+    observation: ObservationAdapter
+  ) => LocationRuntime = createLocationRuntime
 ): ISignalTree<T> {
   // CONFIGURE -> FINALIZE. The whole enhancer set is known here, so the plan
   // can be truthful. Incremental composition had to materialize before the
@@ -1971,7 +1972,7 @@ function signalTreeImpl<T extends object>(
     buildPlan.has('position-topology'),
     (capability) => buildPlan.has(capability),
     physicalCommitClock,
-    observation
+    createLocations(observation)
   );
   materializationContext.mutationCaptureRuntime = captureRuntime;
 
@@ -1980,7 +1981,8 @@ function signalTreeImpl<T extends object>(
     config,
     materializationContext,
     buildPlan,
-    captureRuntime
+    captureRuntime,
+    createScalarLeafRuntime
   );
   let tree: ISignalTree<T> = constructed.tree;
   const authority = constructed.authority;
@@ -2139,13 +2141,31 @@ export const signalTree: SignalTreeFactory =
 
 /** @internal CBR discriminator: package binding without application config. */
 export const createSignalTreeFactory = (
-  observation: ObservationAdapter = NEUTRAL_OBSERVATION_ADAPTER
+  observation: ObservationAdapter = NEUTRAL_OBSERVATION_ADAPTER,
+  createScalarLeafRuntime: (
+    physicalCommitClock:
+      | ReturnType<typeof createPhysicalCommitClock>
+      | undefined,
+    locations: LocationRuntime
+  ) => TreeScalarLeafRuntime = createTreeScalarLeafRuntime,
+  createLocations: (
+    observation: ObservationAdapter
+  ) => LocationRuntime = createLocationRuntime
 ): SignalTreeFactory => {
   const boundObservation: ObservationAdapter = {
     createToken: observation.createToken.bind(observation),
-    runInvalidationGroup:
-      observation.runInvalidationGroup.bind(observation),
+    createWritableCell: observation.createWritableCell?.bind(observation),
+    createWritableProjection:
+      observation.createWritableProjection?.bind(observation),
+    createReadonlyCell: observation.createReadonlyCell?.bind(observation),
+    runInvalidationGroup: observation.runInvalidationGroup.bind(observation),
   };
   return ((initialState: object, config?: TreeConfig) =>
-    signalTreeImpl(initialState, config, boundObservation)) as SignalTreeFactory;
+    signalTreeImpl(
+      initialState,
+      config,
+      boundObservation,
+      createScalarLeafRuntime,
+      createLocations
+    )) as SignalTreeFactory;
 };

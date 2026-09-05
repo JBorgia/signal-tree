@@ -166,14 +166,14 @@ export class RestorationDemoComponent {
 
   markJobLoaded() {
     this.designateMarker(
-      () => this.markerTree.$.job('LOADED'),
+      () => this.markerTree.$.job.set('LOADED'),
       'job → LOADED'
     );
   }
 
   markJobFailed() {
     this.designateMarker(
-      () => this.markerTree.$.job('ERROR'),
+      () => this.markerTree.$.job.set('ERROR'),
       'job → ERROR'
     );
   }
@@ -257,20 +257,20 @@ export class RestorationDemoComponent {
 
   // Counter actions
   increment() {
-    this.designate(() => this.counter((value) => value + 1));
+    this.designate(() => this.counter.update((value) => value + 1));
   }
 
   decrement() {
-    this.designate(() => this.counter((value) => value - 1));
+    this.designate(() => this.counter.update((value) => value - 1));
   }
 
   reset() {
-    this.designate(() => this.counter(0));
+    this.designate(() => this.counter.set(0));
   }
 
   // Message actions
   updateMessage(value: string) {
-    this.designate(() => this.message(value));
+    this.designate(() => this.message.set(value));
   }
 
   // Todo actions
@@ -291,7 +291,7 @@ export class RestorationDemoComponent {
     // It does NOT create a turn boundary: anything else written in this same
     // tick belongs to the same operation and reverses with it.
     this.designate(() =>
-      this.todos((todos) => [...todos, newTodo])
+      this.todos.update((todos) => [...todos, newTodo])
     );
     this.newTodoText = '';
   }
@@ -319,14 +319,14 @@ export class RestorationDemoComponent {
     ];
 
     external(() => {
-      this.todos(serverTodos);
+      this.todos.set(serverTodos);
     });
     this.queueRestorationStateRefresh();
   }
 
   toggleTodo(id: number) {
     this.designate(() =>
-      this.todos((todos) =>
+      this.todos.update((todos) =>
         todos.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
         )
@@ -336,7 +336,7 @@ export class RestorationDemoComponent {
 
   deleteTodo(id: number) {
     this.designate(() =>
-      this.todos((todos) => todos.filter((todo) => todo.id !== id))
+      this.todos.update((todos) => todos.filter((todo) => todo.id !== id))
     );
   }
 
@@ -402,32 +402,32 @@ export class RestorationDemoComponent {
 
     // Create a sequence of actions with delays for better history visualization
     this.scheduleSample(() => {
-      this.designate(() => this.message('Starting demo...'));
+      this.designate(() => this.message.set('Starting demo...'));
     }, 100);
 
     this.scheduleSample(() => {
-      this.designate(() => this.counter(1));
+      this.designate(() => this.counter.set(1));
     }, 200);
 
     this.scheduleSample(() => {
       this.designate(() =>
-        this.todos([
+        this.todos.set([
           { id: Date.now(), title: 'First task', completed: false },
         ])
       );
     }, 300);
 
     this.scheduleSample(() => {
-      this.designate(() => this.counter(5));
+      this.designate(() => this.counter.set(5));
     }, 400);
 
     this.scheduleSample(() => {
-      this.designate(() => this.message('Making more changes...'));
+      this.designate(() => this.message.set('Making more changes...'));
     }, 500);
 
     this.scheduleSample(() => {
       this.designate(() =>
-        this.todos((todos) => [
+        this.todos.update((todos) => [
           ...todos,
           { id: Date.now() + 1, title: 'Second task', completed: false },
         ])
@@ -435,12 +435,12 @@ export class RestorationDemoComponent {
     }, 600);
 
     this.scheduleSample(() => {
-      this.designate(() => this.counter(10));
+      this.designate(() => this.counter.set(10));
     }, 700);
 
     this.scheduleSample(() => {
       this.designate(() =>
-        this.todos((todos) =>
+        this.todos.update((todos) =>
           todos.map((todo, index) =>
             index === 0 ? { ...todo, completed: true } : todo
           )
@@ -450,12 +450,12 @@ export class RestorationDemoComponent {
 
     this.scheduleSample(() => {
       this.designate(() =>
-        this.message('Demo complete. Try undo and redo now.')
+        this.message.set('Demo complete. Try undo and redo now.')
       );
     }, 900);
 
     this.scheduleSample(() => {
-      this.designate(() => this.counter(15));
+      this.designate(() => this.counter.set(15));
     }, 1000);
   }
 

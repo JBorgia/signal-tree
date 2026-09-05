@@ -1,6 +1,7 @@
 import {
   effect,
   Injector,
+  isSignal,
   runInInjectionContext,
   signal,
   type WritableSignal,
@@ -15,25 +16,29 @@ import {
 } from '@signal-tree/kernel/adapter';
 
 /**
- * Converts a writable SignalTree branch or leaf into a WritableSignal
- * for use with any API that expects a `WritableSignal` — e.g. as an Angular
+ * Converts a writable SignalTree branch into a WritableSignal, or returns an
+ * Angular-native leaf unchanged, for use with any API that expects a
+ * `WritableSignal` — e.g. as an Angular
  * Signal Forms model, or the value fed to `SignalFormControl`. (Note: Angular
  * has no `FormControl.connect(signal)` API — see `signalForm()` for the
  * signal-native forms bridge.)
  *
- * Creates a two-way binding between the NodeAccessor and a WritableSignal:
+ * Branch adaptation creates a two-way binding between the NodeAccessor and a
+ * WritableSignal:
  * - Reads all leaf values from the NodeAccessor and exposes them as a signal
  * - Writes to the WritableSignal update the underlying NodeAccessor
  *
- * **Important**: This function uses `effect()` internally for synchronization, which requires
- * an injection context. It can be called in:
+ * **Important**: Branch adaptation and `{ undoable: true }` wrappers use
+ * `effect()` internally for synchronization, which requires an injection
+ * context. Passing an ordinary native leaf without options returns it directly
+ * and needs no injection context. This function can be called in:
  * - Component/directive/pipe class field initializers
  * - Component/directive/pipe constructors
  * - Functions called from within an injection context
  *
  * @template T - The type of the node value
- * @param node - The NodeAccessor to convert (can be a slice or whole tree)
- * @returns A WritableSignal that stays in sync with the NodeAccessor
+ * @param node - The branch accessor or writable leaf to expose
+ * @returns The native leaf or a WritableSignal synchronized with the branch
  *
  * @example
  * ```typescript
@@ -44,12 +49,12 @@ import {
  * // Convert a slice to a WritableSignal (e.g. a Signal Forms model)
  * const userSignal = toWritableSignal(tree.$.user);
  *
- * // Adapt a leaf only when an Angular API requires native signal identity
+ * // A leaf is already native; this returns the same object.
  * const nameSignal = toWritableSignal(tree.$.user.name);
  * ```
  */
 export function toWritableSignal<T>(
-  node: NodeAccessor<T> | Location<T>,
+  node: NodeAccessor<T> | Location<T> | WritableSignal<T>,
   injector?: unknown,
   options?: {
     /**
@@ -77,6 +82,10 @@ export function toWritableSignal<T>(
     undoable?: boolean;
   }
 ): WritableSignal<T> {
+  if (isSignal(node) && !options?.undoable) {
+    return node as WritableSignal<T>;
+  }
+
   // Create a signal initialized with the current node value
   const sig = signal(node());
 
@@ -116,7 +125,8 @@ export function toWritableSignal<T>(
 
   sig.set = (value: T) => {
     applyWrite(() => {
-      if (isNodeAccessor(node)) (node as NodeAccessor<T>)(value);
+      if (isSignal(node)) (node as WritableSignal<T>).set(value);
+      else if (isNodeAccessor(node)) (node as NodeAccessor<T>)(value);
       else replaceLocation(node as Location<T>, value);
     });
   };
@@ -125,7 +135,8 @@ export function toWritableSignal<T>(
   // truth and preserves derive intent; the mirror effect may not have flushed.
   sig.update = (updater: (current: T) => T) => {
     applyWrite(() => {
-      if (isNodeAccessor(node)) (node as NodeAccessor<T>)(updater);
+      if (isSignal(node)) (node as WritableSignal<T>).update(updater);
+      else if (isNodeAccessor(node)) (node as NodeAccessor<T>)(updater);
       else (node as Location<T>)(updater);
     });
   };

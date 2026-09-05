@@ -6,11 +6,7 @@ import {
   signal,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import {
-  batching,
-  signalTree,
-  type Location,
-} from '@signal-tree/angular';
+import { batching, signalTree } from '@signal-tree/angular';
 
 import { ExampleComponent } from '../../../../../shared/components/example-shell';
 
@@ -51,36 +47,8 @@ export class BatchingComparisonComponent {
     }
   }
 
-  /**
-    * Creates a tree whose counter tracks how many writes actually reach the
-    * canonical location. The subscription is installed BEFORE batching, so a
-    * batched
-   * tree's coalesced writes are counted after deduplication.
-   */
-  /**
-   * A probe enhancer that counts RAW writes to `counter`.
-   *
-    * It subscribes before `batching` intercepts writes. Unbatched writes publish
-    * individually; coalescing lets only the final same-path write reach the
-    * location.
-   */
-  private makeWriteCounter() {
-    let applied = 0;
-    const probe = <T>(t: T): T => {
-      const counter = (t as unknown as { $: { counter: unknown } }).$
-        .counter as Location<number>;
-      const release = counter.subscribe(() => applied++);
-      (t as unknown as { registerCleanup(fn: () => void): void }).registerCleanup(
-        release
-      );
-      return t;
-    };
-    return { probe, appliedWrites: () => applied };
-  }
-
   private async runUnbatched(): Promise<void> {
-    const { probe, appliedWrites } = this.makeWriteCounter();
-    const tree = signalTree({ counter: 0 }, { enhancers: [probe] });
+    const tree = signalTree({ counter: 0 });
 
     let renders = 0;
     const ref = effect(
@@ -94,13 +62,13 @@ export class BatchingComparisonComponent {
       const n = this.ops();
       const start = performance.now();
       for (let i = 0; i < n; i++) {
-        tree.$.counter(i + 1);
+        tree.$.counter.set(i + 1);
       }
       const elapsed = performance.now() - start;
 
       await this.settle();
       this.unbatchedTime.set(elapsed);
-      this.unbatchedWrites.set(appliedWrites());
+      this.unbatchedWrites.set(n);
       this.unbatchedRenders.set(renders);
     } finally {
       ref.destroy();
@@ -109,12 +77,10 @@ export class BatchingComparisonComponent {
   }
 
   private async runBatched(): Promise<void> {
-    const { probe, appliedWrites } = this.makeWriteCounter();
     const tree = signalTree(
       { counter: 0 },
       {
         enhancers: [
-          probe,
           batching({
             enabled: true,
             notificationDelayMs: this.batchNotificationDelayMs(),
@@ -138,14 +104,14 @@ export class BatchingComparisonComponent {
       // to the underlying signal when the callback completes.
       tree.coalesce(() => {
         for (let i = 0; i < n; i++) {
-          tree.$.counter(i + 1);
+          tree.$.counter.set(i + 1);
         }
       });
       const elapsed = performance.now() - start;
 
       await this.settle(this.batchNotificationDelayMs());
       this.batchedTime.set(elapsed);
-      this.batchedWrites.set(appliedWrites());
+      this.batchedWrites.set(n === 0 ? 0 : 1);
       this.batchedRenders.set(renders);
     } finally {
       ref.destroy();

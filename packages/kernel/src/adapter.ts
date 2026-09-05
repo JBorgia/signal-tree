@@ -29,6 +29,19 @@
 import { acquireObservation } from './lib/internals/observation-substrate';
 import { observeOwnerInvalidationInternal } from './lib/internals/owner-invalidation';
 import { readCanonicalSnapshotInternal } from './lib/internals/canonical-snapshot';
+import { createNativeLocationRuntime } from './lib/internals/native-location-realization';
+import { createNativeTreeScalarLeafRuntime } from './lib/internals/native-tree-scalar-leaf-runtime';
+import { NEUTRAL_OBSERVATION_ADAPTER } from './lib/internals/observation-adapter';
+import { createSignalTreeFactory as createKernelSignalTreeFactory } from './lib/signal-tree';
+import type { Location, ReadonlyLocation } from './lib/internals/cell-runtime';
+
+export interface LeafCarriers<T> {
+  location: Location<T>;
+}
+
+export interface ReadonlyLeafCarriers<T> {
+  location: ReadonlyLocation<T>;
+}
 
 interface OwnerInvalidationTarget {
   readonly $: object;
@@ -45,10 +58,8 @@ export function observeOwnerInvalidation(
   owner: OwnerInvalidationTarget,
   callback: () => void
 ): () => void {
-  return observeOwnerInvalidationInternal(
-    owner,
-    callback,
-    () => acquireObservation(owner.$)
+  return observeOwnerInvalidationInternal(owner, callback, () =>
+    acquireObservation(owner.$)
   );
 }
 
@@ -59,9 +70,7 @@ export function observeOwnerInvalidation(
  * Pair this read with `observeOwnerInvalidation` when adapting an external
  * observation runtime.
  */
-export function readCanonicalSnapshot<T>(
-  owner: { readonly $: object }
-): T {
+export function readCanonicalSnapshot<T>(owner: { readonly $: object }): T {
   return readCanonicalSnapshotInternal<T>(owner);
 }
 
@@ -69,7 +78,25 @@ export type {
   ObservationAdapter,
   ObservationToken,
 } from './lib/internals/observation-adapter';
-export { createSignalTreeFactory } from './lib/signal-tree';
+export const createSignalTreeFactory = (
+  observation: import('./lib/internals/observation-adapter').ObservationAdapter = NEUTRAL_OBSERVATION_ADAPTER
+): import('./lib/types').SignalTreeFactory => {
+  const hasNativeCarrier = Boolean(
+    observation.createWritableCell &&
+      observation.createWritableProjection &&
+      observation.createReadonlyCell
+  );
+  return createKernelSignalTreeFactory(
+    observation,
+    hasNativeCarrier
+      ? (physicalCommitClock) =>
+          createNativeTreeScalarLeafRuntime(physicalCommitClock, observation)
+      : undefined,
+    hasNativeCarrier
+      ? () => createNativeLocationRuntime(observation)
+      : undefined
+  );
+};
 export { replaceLocation } from './lib/internals/location-runtime';
 
 /**
@@ -94,5 +121,21 @@ export { replaceLocation } from './lib/internals/location-runtime';
  */
 export { withRestorationDesignation } from './lib/internals/restoration-eligibility';
 
-export type { ISignalTree, SignalTreeFactory } from './lib/types';
+export type {
+  EntityNodeOf,
+  EntitySignalOf,
+  ISignalTree,
+  ISignalTreeOf,
+  LeafOf,
+  SignalTreeFactory,
+  SignalTreeFactoryOf,
+  TreeNodeOf,
+} from './lib/types';
+export type { EntitySignalWithSlicesOf } from './lib/markers/entity-map';
+export type {
+  ReadonlyEntityNodeOf,
+  ReadonlyEntitySignalOf,
+  ReadonlyStoreOf,
+  ReadonlyViewOf,
+} from './lib/readonly';
 export { isNodeAccessor } from './lib/internals/node-shape';

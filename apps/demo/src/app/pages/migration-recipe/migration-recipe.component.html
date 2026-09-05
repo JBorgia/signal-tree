@@ -114,7 +114,7 @@ export class UserOps &#123;
   private readonly tree = inject(AppTree);
 
   select(id: number | null): void &#123;
-    this.tree.$.selectedId(id);
+    this.tree.$.selectedId.set(id);
   &#125;
 
   rename(id: number, name: string): void &#123;

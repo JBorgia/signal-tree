@@ -46,10 +46,7 @@ class ScalarSlotPublication {
 
   constructor(private readonly locations: LocationRuntime) {}
 
-  bind(
-    slotIndex: SlotIndex,
-    binding: WritableLocationBinding<unknown>
-  ): void {
+  bind(slotIndex: SlotIndex, binding: WritableLocationBinding<unknown>): void {
     this.bindings[slotIndex] = binding;
   }
 
@@ -94,7 +91,10 @@ class ScalarSlotMutationFrameOrchestrator implements ScalarSlotMutationFrame {
     this.frame.discard();
   }
 
-  commit(options?: { advanceRevision?: boolean; publish?: boolean }): ScalarSlotCommitResult {
+  commit(options?: {
+    advanceRevision?: boolean;
+    publish?: boolean;
+  }): ScalarSlotCommitResult {
     const result = this.frame.commit({
       advanceRevision: options?.advanceRevision,
     });
@@ -162,17 +162,17 @@ export function createTreeScalarLeafRuntime(
         locations,
         slotIndex
       );
-      publication.bind(
-        slotIndex,
-        binding as WritableLocationBinding<unknown>
-      );
+      publication.bind(slotIndex, binding as WritableLocationBinding<unknown>);
       if (positionId !== undefined) {
         leafByPositionId.set(positionId, leaf as Location<unknown>);
       }
       return leaf;
     },
     beginFrame(): ScalarSlotMutationFrame {
-      return new ScalarSlotMutationFrameOrchestrator(kernel.beginFrame(), publication);
+      return new ScalarSlotMutationFrameOrchestrator(
+        kernel.beginFrame(),
+        publication
+      );
     },
     runInvalidationGroup(run: () => void): void {
       locations.runInvalidationGroup(run);
@@ -197,4 +197,3 @@ export function createTreeScalarLeafRuntime(
     },
   };
 }
-

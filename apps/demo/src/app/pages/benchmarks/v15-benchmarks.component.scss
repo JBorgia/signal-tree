@@ -1209,6 +1209,12 @@ button:disabled {
   min-width: 66rem;
 }
 
+.callable-result-table--memory .callable-result-header,
+.callable-result-table--memory .callable-result-row {
+  grid-template-columns: minmax(11rem, 1.1fr) repeat(4, minmax(9rem, 1fr));
+  min-width: 52rem;
+}
+
 .callable-result-header {
   color: var(--color-neutral-600);
   font-family: var(--font-family-mono);

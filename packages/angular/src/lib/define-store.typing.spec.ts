@@ -21,9 +21,10 @@
  *    F1). It is now parameterized over the builder's accumulated type.
  * Keep this file up to date if `signalTree()`'s return type ever changes.
  */
+import type { Signal } from '@angular/core';
 import { signalTree } from '../index';
 import { defineStore } from '../index';
-import type { ReadonlyLocation, ReadonlyStore } from '../index';
+import type { ReadonlyStore } from '../index';
 import type { WritableLeaf, TreeNode } from '../index';
 
 // --- compile-time assertion helpers -----------------------------------------
@@ -88,9 +89,7 @@ export type _DefineStoreTypeChecks = [
   >,
 
   // F1: derived locations SURVIVE readonly exposure through defineStore.
-  Expect<
-    Equal<ReadonlyDerivedInjected['$']['doubled'], ReadonlyLocation<number>>
-  >,
+  Expect<Equal<ReadonlyDerivedInjected['$']['doubled'], Signal<number>>>,
   Expect<
     Equal<
       'set' extends keyof ReadonlyDerivedInjected['$']['count'] ? true : false,

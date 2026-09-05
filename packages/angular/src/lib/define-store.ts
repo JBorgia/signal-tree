@@ -1,9 +1,9 @@
 import { DestroyRef, inject, Injectable, type Type } from '@angular/core';
 
 import type {
-  ISignalTree,
+  ISignalTreeOf,
+  ReadonlyStoreOf,
 } from '@signal-tree/kernel/adapter';
-import type { ReadonlyStore } from '@signal-tree/kernel';
 
 /**
  * Config for {@link defineStore}.
@@ -103,9 +103,9 @@ export interface DefineStoreConfig {
 //    a silently-unnarrowed store (RFC 0004 F2 / §5 rule 4: silent-inert is
 //    the priority defect class).
 export function defineStore<T, A>(
-  factory: () => ISignalTree<T, A>,
+  factory: () => ISignalTreeOf<T, 'angular', A>,
   config: DefineStoreConfig & { expose: 'readonly' }
-): Type<ReadonlyStore<T, A>>;
+): Type<ReadonlyStoreOf<T, A, 'angular'>>;
 /**
  * Fallback overload. `expose?: undefined` means a config variable WIDENED to
  * {@link DefineStoreConfig} matches neither overload — pass a config object

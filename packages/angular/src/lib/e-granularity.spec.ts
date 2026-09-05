@@ -28,7 +28,7 @@ describe('E — is granular observation obtainable without a collection primitiv
     expect(watchA()).toBe(1);
     const afterFirst = runs;
 
-    tree.$.rows([
+    tree.$.rows.set([
       { id: 'a', n: 1 },
       { id: 'b', n: 99 },
     ]);
@@ -53,7 +53,7 @@ describe('E — is granular observation obtainable without a collection primitiv
     expect(watchA()).toBe(1);
     const afterFirst = runs;
 
-    tree.$.rows.b.n(99);
+    tree.$.rows.b.n.set(99);
     watchA();
 
     expect(runs).toBe(afterFirst);

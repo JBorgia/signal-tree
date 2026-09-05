@@ -67,17 +67,18 @@ export const AppTree = defineStore(
 `$` is the state facade.
 
 - Read a leaf: `tree.$.user.name()`.
-- Replace a leaf: `tree.$.user.name(value)`.
-- Derive a leaf: `tree.$.user.name((current) => next)`.
+- Replace an Angular leaf: `tree.$.user.name.set(value)`.
+- Derive an Angular leaf: `tree.$.user.name.update((current) => next)`.
 - Read a branch: `tree.$.user()`.
 - Replace a branch: `tree.$.user(value)`.
 - Update a branch: `tree.$.user((current) => next)`.
 - Read the full snapshot: `tree.$()`.
 - There is no separate `.state` or `.unwrap()` accessor.
 
-Root, branch, and terminal leaves are universal locations with the same callable
-grammar. In Angular, direct reads participate in dependency tracking without
-making the location an Angular `Signal`.
+Root and object branches retain the callable whole-value grammar. Angular
+terminal leaves are native signals; Vue terminal leaves are refs; neutral
+kernel and React leaves are callable locations. Every write still enters kernel
+semantics.
 
 Use `leaf(value)` when a plain object should remain one atomic terminal instead
 of becoming a branch. Callable data always needs the wrapper, including when it
@@ -89,12 +90,13 @@ const tree = signalTree({
   onSave: leaf((id: number) => console.log(id)),
 });
 
-tree.$.bounds({ min: 10, max: 90 });
-tree.$.onSave(leaf((id) => persist(id)));
+tree.$.bounds.set({ min: 10, max: 90 });
+tree.$.onSave.set((id) => persist(id));
 ```
 
-Use `toWritableSignal(location)` only at an Angular API boundary that requires
-native `WritableSignal` identity; the returned view has `.set()` and `.update()`.
+Use `toWritableSignal(branch)` when an Angular API requires one writable signal
+for an object branch. Passing an ordinary leaf without options returns the same
+native signal.
 
 ## EntityMap
 

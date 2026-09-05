@@ -1,4 +1,4 @@
-import type { ReadonlyLocation } from './cell-runtime';
+import type { CarrierKind, ReadonlyOf } from '../types';
 
 /**
  * Derived State Type Utilities
@@ -17,8 +17,11 @@ import type { ReadonlyLocation } from './cell-runtime';
  * by a framework is still treated as a recipe; its writable surface is never
  * inherited by the resulting location.
  */
-export type ProcessDerivedOf<T> = T extends (...args: never[]) => infer R
-  ? ReadonlyLocation<R>
+export type ProcessDerivedOf<
+  T,
+  C extends CarrierKind = 'location'
+> = T extends (...args: never[]) => infer R
+  ? ReadonlyOf<R, C>
   : T extends object
-  ? { [P in keyof T]: ProcessDerivedOf<T[P]> }
+  ? { [P in keyof T]: ProcessDerivedOf<T[P], C> }
   : never;

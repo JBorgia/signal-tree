@@ -10,17 +10,18 @@ This directory contains comprehensive examples demonstrating SignalTree usage pa
 
 The one syntax reference. Every write goes through the API that actually works:
 
-- `tree.$.prop('value')` — replace a leaf
-- `tree.$.prop(fn)` — derive a leaf
+- `tree.$.prop.set('value')` — replace an Angular leaf
+- `tree.$.prop.update(fn)` — derive an Angular leaf
 - `tree.$.branch({ ... })` — replace a complete branch value
 - `tree.$({ ... })` — replace the complete root value
 - `tree.$(current => ({ ...current, changed }))` — derive the next root value
 
 Nothing to install; nothing to configure.
 
-> **v15 callable locations are kernel behavior.** This is not the retired
-> `@signaltree/callable-syntax` build transform. The same runtime object reads,
-> replaces, and derives without framework-specific write methods.
+> **Root and branch calls are kernel behavior.** Terminal leaves use the
+> application facade's native carrier: Angular `Signal`s, Vue refs, and kernel
+> locations. This is unrelated to the retired `@signaltree/callable-syntax`
+> build transform.
 
 Use `leaf(value)` when a plain object should remain terminal instead of becoming
 a branch, or when a callable is data rather than an updater:
@@ -31,8 +32,8 @@ const tree = signalTree({
   callback: leaf((value: number) => console.log(value)),
 });
 
-tree.$.range({ start: 5, end: 15 });
-tree.$.callback(leaf((value) => console.info(value)));
+tree.$.range.set({ start: 5, end: 15 });
+tree.$.callback.set((value) => console.info(value));
 ```
 
 ## Example Categories
@@ -89,18 +90,17 @@ npx ts-node apps/demo/src/app/sanity-checks/standard-syntax-examples.ts
 
 ## What is callable, and what is not
 
-This is the whole rule: the tree is a controller and every state location uses
-the same callable grammar. `leaf(value)` controls topology; framework-native
-signals are explicit adapter views.
+The tree is a controller. Root and object branches use the kernel's callable
+whole-value grammar. `leaf(value)` controls topology; terminal values use the
+active facade's native leaf carrier.
 
-| Target     | Canonical shape        | Read             | Write                                    |
-| ---------- | ---------------------- | ---------------- | ---------------------------------------- |
-| **Root**   | root location          | `tree.$()`       | `tree.$(value)` / `tree.$(fn)`           |
-| **Branch** | branch location        | `tree.$.user()`  | `tree.$.user(value)` / `tree.$.user(fn)` |
-| **Leaf**   | terminal `Location<T>` | `tree.$.count()` | `tree.$.count(5)` / `tree.$.count(fn)`   |
+| Target     | Canonical shape             | Read             | Write                                             |
+| ---------- | --------------------------- | ---------------- | ------------------------------------------------- |
+| **Root**   | root location               | `tree.$()`       | `tree.$(value)` / `tree.$(fn)`                    |
+| **Branch** | branch location             | `tree.$.user()`  | `tree.$.user(value)` / `tree.$.user(fn)`          |
+| **Leaf**   | Angular `WritableSignal<T>` | `tree.$.count()` | `tree.$.count.set(5)` / `tree.$.count.update(fn)` |
 
-Calling a location with no argument reads it. Calling it with a complete value
-replaces it. Calling it with an updater derives the next value. A callable value
-is wrapped for that invocation as `location(leaf(callable))`, so argument shape
-never has to guess intent. Angular code that specifically needs a
-`WritableSignal` creates an explicit `toWritableSignal(location)` view.
+Calling a root or branch with no argument reads it; a complete value replaces
+it, and an updater derives the next value. Angular terminal leaves are already
+native `WritableSignal`s. Callable data needs `leaf()` only when declaring
+topology; `.set(callable)` is unambiguous at write time.

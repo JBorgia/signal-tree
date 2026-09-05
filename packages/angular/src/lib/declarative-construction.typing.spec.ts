@@ -1,12 +1,9 @@
-import {
-  restoration,
-  signalTree,
-  type Location,
-  type ReadonlyLocation,
-} from '../index';
+import { restoration, signalTree, type WritableLeaf } from '../index';
+import type { Signal } from '@angular/core';
 
-type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() =>
-  T extends B ? 1 : 2
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
+  ? 1
+  : 2
   ? true
   : false;
 type Expect<T extends true> = T;
@@ -27,14 +24,14 @@ const tree = signalTree(
     },
   }
 );
-const sourceLeaf: Location<number> = tree.$.count;
-const derivedLocation: ReadonlyLocation<number> = tree.$.doubled;
+const sourceLeaf: WritableLeaf<number> = tree.$.count;
+const derivedLocation: Signal<number> = tree.$.doubled;
 void [sourceLeaf, derivedLocation];
 
 export type _DeclarativeConstructionChecks = [
-  Expect<Equal<(typeof tree)['$']['doubled'], ReadonlyLocation<number>>>,
-  Expect<Equal<(typeof tree)['$']['summary'], ReadonlyLocation<string>>>,
-  Expect<Equal<(typeof tree)['$']['length'], ReadonlyLocation<number>>>,
+  Expect<Equal<(typeof tree)['$']['doubled'], Signal<number>>>,
+  Expect<Equal<(typeof tree)['$']['summary'], Signal<string>>>,
+  Expect<Equal<(typeof tree)['$']['length'], Signal<number>>>,
   Expect<Equal<(typeof tree)['canUndo'], () => boolean>>,
   Expect<NotOffered<typeof tree, 'derived'>>,
   Expect<NotOffered<typeof tree, 'state'>>

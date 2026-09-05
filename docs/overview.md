@@ -35,9 +35,9 @@ SignalTree 15 has four public packages:
 
 - **`@signal-tree/kernel`**: framework-neutral state, EntityMap, links,
   restoration, batching, transactions, and DevTools
-- **`@signal-tree/angular`**: Angular observation, `defineStore`, and native-signal bridging
+- **`@signal-tree/angular`**: native Angular signal leaves and `defineStore`
 - **`@signal-tree/react`**: owner-bound React observation
-- **`@signal-tree/vue`**: direct Vue dependency observation
+- **`@signal-tree/vue`**: native Vue ref leaves and computed derivations
 
 ## Technical specifications
 
@@ -75,8 +75,9 @@ the generator while the absolutes barely shift. That is the same instability the
 ST2018 multiplier was deleted for; quoting a midpoint here would have repeated
 the mistake one section after documenting it. The tool prints the spread.
 
-A direct leaf write (`tree.$.a.b.c(v)`) does not walk the path at all and
-measures at timer resolution, so the tool reports it but declines to quote it.
+A direct Angular leaf write (`tree.$.a.b.c.set(v)`) does not walk the path at
+all and measures at timer resolution, so the tool reports it but declines to
+quote it.
 
 > Replaced a "Performance targets (Sept 2025)" table for 14.0.0. It claimed
 > 0.041 / 0.061 / 0.092 / 0.104 ms at these depths and **nothing in the repo

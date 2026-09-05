@@ -85,7 +85,7 @@ describe('ANG-V0-A — computed over published truth tracks every write form', (
     expect(result().issues).toEqual([]);
     expect(runs).toBe(1);
 
-    tree.$.user.name('A');
+    tree.$.user.name.set('A');
 
     expect(result().issues.map((i) => i.message)).toEqual(['too short']);
     expect(runs).toBe(2);
@@ -129,7 +129,7 @@ describe('ANG-V0-A — computed over published truth tracks every write form', (
     const result = computed(() => validateUser(tree.$().user));
     expect(result().issues).toEqual([]);
 
-    tree.$.user.name('C');
+    tree.$.user.name.set('C');
 
     expect(result().issues.map((i) => i.message)).toEqual(['too short']);
   });
@@ -139,7 +139,7 @@ describe('ANG-V0-A — computed over published truth tracks every write form', (
     const nameOk = computed(() => tree.$.user.name().length >= 2);
     expect(nameOk()).toBe(true);
 
-    tree.$.user.name('D');
+    tree.$.user.name.set('D');
 
     expect(nameOk()).toBe(false);
   });
@@ -163,8 +163,8 @@ describe('ANG-V0-B — precision of the null', () => {
     result();
     expect(runs).toBe(1);
 
-    tree.$.other.untouched('y');
-    tree.$.count(99);
+    tree.$.other.untouched.set('y');
+    tree.$.count.set(99);
     result();
 
     expect(runs).toBe(1);
@@ -204,7 +204,7 @@ describe('ANG-V0-B — precision of the null', () => {
     ageErr();
     expect([nameRuns, ageRuns]).toEqual([1, 1]);
 
-    tree.$.user.age(-5);
+    tree.$.user.age.set(-5);
     nameErr();
     ageErr();
 
@@ -253,9 +253,9 @@ describe('ANG-V0-C — async validation owned entirely by the consumer', () => {
     TestBed.tick();
 
     // W1 then W2, before either resolves.
-    tree.$.user.name('first');
+    tree.$.user.name.set('first');
     TestBed.tick();
-    tree.$.user.name('second');
+    tree.$.user.name.set('second');
     TestBed.tick();
 
     expect(resolvers.length).toBe(3); // initial + W1 + W2
@@ -291,7 +291,7 @@ describe('ANG-V0-C — async validation owned entirely by the consumer', () => {
     TestBed.tick();
 
     expect(settled()).toBe(false);
-    tree.$.user.age(7);
+    tree.$.user.age.set(7);
     TestBed.tick();
     expect(inFlight()).toBe(2);
 
@@ -351,7 +351,7 @@ describe('ANG-V0-D — is any truth change invisible to the pull surface?', () =
       return 1;
     });
     constant();
-    tree.$.user.name('zzz');
+    tree.$.user.name.set('zzz');
     constant();
     expect(runs).toBe(1);
   });
@@ -374,7 +374,7 @@ describe('ANG-V0-E — root snapshot as the validated value', () => {
       return tree.$();
     });
     snap();
-    tree.$.user.name('Q');
+    tree.$.user.name.set('Q');
     expect(snap().user.name).toBe('Q');
     expect(runs).toBe(2);
   });

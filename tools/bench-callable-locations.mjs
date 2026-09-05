@@ -23,6 +23,14 @@ const argument = (name, fallback) => {
   return index === -1 ? fallback : process.argv[index + 1];
 };
 
+const sourceArgument = (name) => {
+  const value = argument(name, '');
+  if (!value || value.startsWith('--') || !/\bsha256:[a-f\d]{64}\b/.test(value)) {
+    throw new Error(`Provide ${name} with a full SHA-256 digest`);
+  }
+  return value;
+};
+
 const positiveInteger = (name, fallback) => {
   const value = Number(argument(name, fallback));
   if (!Number.isSafeInteger(value) || value < 1) {
@@ -71,11 +79,13 @@ const arms = {
   a: {
     label: argument('--a-label', 'pre-callable methods'),
     path: aInputPath,
+    source: sourceArgument('--a-source'),
     syntax: syntax('--a-syntax', 'methods'),
   },
   b: {
     label: argument('--b-label', 'callable locations'),
     path: bInputPath,
+    source: sourceArgument('--b-source'),
     syntax: syntax('--b-syntax', 'callable'),
   },
 };

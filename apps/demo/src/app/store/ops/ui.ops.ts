@@ -13,10 +13,10 @@ export class UiOps {
   private readonly _$ = inject(APP_TREE).$;
 
   toggleTheme(): void {
-    this._$.ui.theme((t) => (t === 'light' ? 'dark' : 'light'));
+    this._$.ui.theme.update((t) => (t === 'light' ? 'dark' : 'light'));
   }
 
   toggleSidebar(): void {
-    this._$.ui.sidebarOpen((open) => !open);
+    this._$.ui.sidebarOpen.update((open) => !open);
   }
 }

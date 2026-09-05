@@ -19,8 +19,8 @@ describe('defineStore()', () => {
     expect(store.$.user.name()).toBe('a');
 
     // Per-leaf writes
-    store.$.count(5);
-    store.$.user.name('b');
+    store.$.count.set(5);
+    store.$.user.name.set('b');
     expect(store.$.count()).toBe(5);
     expect(store.$.user.name()).toBe('b');
 

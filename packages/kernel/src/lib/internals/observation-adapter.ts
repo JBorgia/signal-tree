@@ -1,3 +1,5 @@
+import type { ReadableCell, WritableCell } from './cell-runtime';
+
 /** A framework-owned dependency token for kernel-owned locations. */
 export interface ObservationToken {
   /** Establish a dependency from the current framework computation. */
@@ -15,6 +17,16 @@ export interface ObservationToken {
  */
 export interface ObservationAdapter {
   createToken(): ObservationToken;
+  createWritableCell?<T>(read: () => T): {
+    readonly cell: WritableCell<T>;
+    readonly token: ObservationToken;
+    readonly peek: () => T;
+  };
+  createWritableProjection?<T>(compute: () => T): {
+    readonly cell: WritableCell<T>;
+    readonly peek: () => T;
+  };
+  createReadonlyCell?<T>(compute: () => T): ReadableCell<T>;
   runInvalidationGroup(run: () => void): void;
 }
 

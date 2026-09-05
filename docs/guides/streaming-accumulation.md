@@ -37,14 +37,14 @@ const chat = signalTree({
 });
 
 async function ask(prompt: string) {
-  chat.$.reply('');
-  chat.$.streaming(true);
+  chat.$.reply.set('');
+  chat.$.streaming.set(true);
   try {
     for await (const chunk of llm.stream(prompt)) {
-      chat.$.reply((text) => text + chunk);
+      chat.$.reply.update((text) => text + chunk);
     }
   } finally {
-    chat.$.streaming(false);
+    chat.$.streaming.set(false);
   }
 }
 ```
@@ -69,19 +69,19 @@ const chat = signalTree({
 async function ask(prompt: string) {
   chat.$.controller()?.abort();
   const controller = new AbortController();
-  chat.$.controller(controller);
-  chat.$.reply('');
-  chat.$.streaming(true);
+  chat.$.controller.set(controller);
+  chat.$.reply.set('');
+  chat.$.streaming.set(true);
   try {
     for await (const chunk of llm.stream(prompt, {
       signal: controller.signal,
     })) {
-      chat.$.reply((text) => text + chunk);
+      chat.$.reply.update((text) => text + chunk);
     }
   } catch (err) {
     if ((err as Error).name !== 'AbortError') throw err;
   } finally {
-    chat.$.streaming(false);
+    chat.$.streaming.set(false);
   }
 }
 
@@ -103,11 +103,11 @@ const chat = signalTree({
 async function ask(prompt: string) {
   const id = crypto.randomUUID();
   chat.$.messages.addOne({ id, role: 'user', text: prompt });
-  chat.$.draft('');
-  chat.$.streaming(true);
+  chat.$.draft.set('');
+  chat.$.streaming.set(true);
 
   for await (const chunk of llm.stream(prompt)) {
-    chat.$.draft((text) => text + chunk);
+    chat.$.draft.update((text) => text + chunk);
   }
 
   chat.$.messages.addOne({
@@ -115,8 +115,8 @@ async function ask(prompt: string) {
     role: 'assistant',
     text: chat.$.draft(),
   });
-  chat.$.draft('');
-  chat.$.streaming(false);
+  chat.$.draft.set('');
+  chat.$.streaming.set(false);
 }
 ```
 

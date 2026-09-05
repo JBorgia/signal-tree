@@ -1,7 +1,4 @@
-import type {
-  Location,
-  ReadonlyLocation,
-} from './internals/cell-runtime';
+import type { LeafCarriers, ReadonlyLeafCarriers } from '../adapter';
 
 export type { Location, ReadonlyLocation } from './internals/cell-runtime';
 
@@ -126,14 +123,19 @@ type LiteralKeys<S> = keyof {
  * Declared here rather than reusing `EntitySignalWithSlices` because
  * `markers/entity-map.ts` imports from this file — the dependency runs one way.
  */
-type ApplyComputedSlices<TMarker, TBase> = TMarker extends {
+type ApplyComputedSlices<
+  TMarker,
+  TBase,
+  C extends CarrierKind
+> = TMarker extends {
   __sliceTypes?: infer S;
 }
   ? [LiteralKeys<NonNullable<S>>] extends [never]
     ? TBase
     : TBase & {
-        readonly [P in LiteralKeys<NonNullable<S>>]: ReadonlyLocation<
-          NonNullable<S>[P]
+        readonly [P in LiteralKeys<NonNullable<S>>]: ReadonlyOf<
+          NonNullable<S>[P],
+          C
         >;
       }
   : TBase;
@@ -173,15 +175,19 @@ type ApplyComputedSlices<TMarker, TBase> = TMarker extends {
 /**
  * Universal recursive shape law shared by every framework facade.
  */
-export type TreeNode<T> = {
+export type CarrierKind = keyof LeafCarriers<unknown> &
+  keyof ReadonlyLeafCarriers<unknown>;
+export type LeafOf<T, C extends CarrierKind> = LeafCarriers<T>[C];
+
+export type TreeNodeOf<T, C extends CarrierKind> = {
   [K in keyof T]: T[K] extends LeafDefinition<infer Value>
-    ? Location<Value>
+    ? LeafOf<Value, C>
     : T[K] extends EntityMapMarker<infer E, infer Key>
-    ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
+    ? ApplyComputedSlices<T[K], EntitySignalOf<E, Key, C>, C>
     : T[K] extends Primitive
-    ? Location<T[K]>
+    ? LeafOf<T[K], C>
     : T[K] extends readonly unknown[]
-    ? Location<T[K]>
+    ? LeafOf<T[K], C>
     : T[K] extends
         | Date
         | RegExp
@@ -189,11 +195,13 @@ export type TreeNode<T> = {
         | Set<unknown>
         | Error
         | ((...args: unknown[]) => unknown)
-    ? Location<T[K]> // Built-in objects → treat as atomic values
+    ? LeafOf<T[K], C> // Built-in objects → treat as atomic values
     : T[K] extends object
-    ? NodeAccessor<ResolveLeafDefinitions<T[K]>> & TreeNode<T[K]>
-    : Location<T[K]>;
+    ? NodeAccessor<ResolveLeafDefinitions<T[K]>> & TreeNodeOf<T[K], C>
+    : LeafOf<T[K], C>;
 };
+
+export type TreeNode<T> = TreeNodeOf<T, 'location'>;
 
 export type ResolveLeafDefinitions<T> = T extends LeafDefinition<infer Value>
   ? Value
@@ -227,7 +235,10 @@ export type ResolveLeafDefinitions<T> = T extends LeafDefinition<infer Value>
 /**
  * The readonly projection of a universal location.
  */
-export type ReadonlyOf<T> = ReadonlyLocation<T>;
+export type ReadonlyOf<
+  T,
+  C extends CarrierKind = 'location'
+> = ReadonlyLeafCarriers<T>[C];
 
 /**
  * The universal tree contract shared by every framework facade.
@@ -239,9 +250,10 @@ export type ReadonlyOf<T> = ReadonlyLocation<T>;
  * descendants is not a public contract; implementations may reuse them to
  * materialize snapshots cheaply.
  */
-export interface ISignalTree<
+export interface ISignalTreeOf<
   T,
-  TAccum = TreeNode<T>
+  C extends CarrierKind,
+  TAccum = TreeNodeOf<T, C>
 > {
   /** Canonical root state accessor: read, whole-value replace, or derive. */
   readonly $: NodeAccessor<T> & TAccum;
@@ -265,20 +277,20 @@ export interface ISignalTree<
    */
   destroy(): void;
   /** Whether this tree has been destroyed. */
-  readonly destroyed: ReadonlyLocation<boolean>;
+  readonly destroyed: ReadonlyOf<boolean, C>;
   /**
    * Register a cleanup function to be called when the tree is destroyed.
    * Enhancers should use this to release resources (intervals, subscriptions, etc.).
    */
   registerCleanup(fn: EnhancerCleanup): void;
   /**
-  * Apply a partial update and return the dot-paths of locations that
+   * Apply a partial update and return the dot-paths of locations that
    * actually changed.
    *
-  * "Actually changed" is literal: a path appears only if the location
-  * accepted the write. Values that are ref-equal to the current value are
-  * skipped before replacement, and values that are a NEW reference but
-  * DEEP-EQUAL are rejected by the location's own equality policy — a re-fetched server
+   * "Actually changed" is literal: a path appears only if the location
+   * accepted the write. Values that are ref-equal to the current value are
+   * skipped before replacement, and values that are a NEW reference but
+   * DEEP-EQUAL are rejected by the location's own equality policy — a re-fetched server
    * payload that matches what you already hold reports `[]`, not every key
    * in the payload.
    *
@@ -295,6 +307,12 @@ export interface ISignalTree<
   // Allow enhancers to attach runtime methods — consumers should cast to the
   // specific enhanced shape they expect (e.g. `SignalTree<T> & BatchingMethods<T>`).
 }
+
+export type ISignalTree<T, TAccum = TreeNode<T>> = ISignalTreeOf<
+  T,
+  'location',
+  TAccum
+>;
 
 /** Cleanup function returned or registered by enhancers. */
 export type EnhancerCleanup = () => void;
@@ -673,17 +691,19 @@ export interface InterceptHandlers<E, K extends string | number> {
 /**
  * Entity node with deep signal access
  */
-export type EntityNode<E> = {
+export type EntityNodeOf<E, C extends CarrierKind> = {
   (): E;
   (value: E): void;
   (updater: (current: E) => E): void;
 } & {
   [P in keyof E]: E[P] extends object
     ? E[P] extends readonly unknown[]
-      ? Location<E[P]>
-      : EntityNode<E[P]>
-    : Location<E[P]>;
+      ? LeafOf<E[P], C>
+      : EntityNodeOf<E[P], C>
+    : LeafOf<E[P], C>;
 };
+
+export type EntityNode<E> = EntityNodeOf<E, 'location'>;
 
 /**
  * EntitySignal provides reactive entity collection management.
@@ -697,33 +717,34 @@ export type EntityNode<E> = {
  * carrier changes here: EntityMap identity, membership, ordering, selection,
  * changeId and bulk semantics are untouched, as is the runtime.
  */
-export interface EntitySignal<
+export interface EntitySignalOf<
   E,
-  K extends string | number = string
+  K extends string | number,
+  C extends CarrierKind
 > {
   // Explicit access
-  byId(id: K): EntityNode<E> | undefined;
-  byIdOrFail(id: K): EntityNode<E>;
+  byId(id: K): EntityNodeOf<E, C> | undefined;
+  byIdOrFail(id: K): EntityNodeOf<E, C>;
 
   // Queries (readonly properties returning signals)
-  readonly all: ReadonlyLocation<E[]>;
-  readonly count: ReadonlyLocation<number>;
-  readonly ids: ReadonlyLocation<K[]>;
-  has(id: K): ReadonlyLocation<boolean>;
+  readonly all: ReadonlyOf<E[], C>;
+  readonly count: ReadonlyOf<number, C>;
+  readonly ids: ReadonlyOf<K[], C>;
+  has(id: K): ReadonlyOf<boolean, C>;
   /**
    * True when the collection has no entities. v10.3 canonical name —
    * aligns with FormControl-style bare-boolean accessors used across
    * `status` / `form` / `asyncSource` markers.
    */
-  readonly empty: ReadonlyLocation<boolean>;
+  readonly empty: ReadonlyOf<boolean, C>;
   /**
    * The collection as a `ReadonlyMap`, keyed by id. Renamed from `map` in 14.1.1 —
    * `map` read as a projection beside `all()`, which is what `.map(fn)` means to
    * every JS developer.
    */
-  readonly asMap: ReadonlyLocation<ReadonlyMap<K, E>>;
-  where(predicate: (entity: E) => boolean): ReadonlyLocation<E[]>;
-  find(predicate: (entity: E) => boolean): ReadonlyLocation<E | undefined>;
+  readonly asMap: ReadonlyOf<ReadonlyMap<K, E>, C>;
+  where(predicate: (entity: E) => boolean): ReadonlyOf<E[], C>;
+  find(predicate: (entity: E) => boolean): ReadonlyOf<E | undefined, C>;
 
   // Active entity — the master/detail primitive.
   //
@@ -732,8 +753,8 @@ export interface EntitySignal<
   // `activeEntity` resolves through `byId`, so it is O(1) and invalidates only
   // when THAT row changes — finer-grained than the filtered-stream versions the
   // other libraries offer.
-  readonly activeId: ReadonlyLocation<K | undefined>;
-  readonly activeEntity: ReadonlyLocation<E | undefined>;
+  readonly activeId: ReadonlyOf<K | undefined, C>;
+  readonly activeEntity: ReadonlyOf<E | undefined, C>;
   setActiveId(id: K | undefined): void;
   clearActiveId(): void;
 
@@ -782,6 +803,11 @@ export interface EntitySignal<
   tap(handlers: TapHandlers<E, K>): () => void;
   intercept(handlers: InterceptHandlers<E, K>): () => void;
 }
+
+export type EntitySignal<
+  E,
+  K extends string | number = string
+> = EntitySignalOf<E, K, 'location'>;
 
 /**
  * @deprecated The old EntityHelpers interface is deprecated and will be removed in v6.0.
@@ -887,7 +913,7 @@ export interface DevToolsConfig {
  */
 export type DeepEntityAwareTreeNode<T> = {
   [K in keyof T]: T[K] extends EntityMapMarker<infer E, infer Key>
-    ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
+    ? ApplyComputedSlices<T[K], EntitySignal<E, Key>, 'location'>
     : T[K] extends object
     ? DeepEntityAwareTreeNode<T[K]>
     : WritableLeaf<T[K]>;
@@ -902,7 +928,7 @@ export type DeepEntityAwareTreeNode<T> = {
  */
 export type EntityAwareTreeNode<T> = {
   [K in keyof T]: T[K] extends EntityMapMarker<infer E, infer Key>
-    ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
+    ? ApplyComputedSlices<T[K], EntitySignal<E, Key>, 'location'>
     : WritableLeaf<T[K]>;
 };
 
@@ -970,7 +996,7 @@ type PathInterceptor = (
  * Compatibility alias for the public writable location shared by every
  * framework package. New declarations should prefer `Location<T>`.
  */
-export type WritableLeaf<T> = Location<T>;
+export type WritableLeaf<T> = LeafOf<T, 'location'>;
 
 export type AccessibleNode<T> = NodeAccessor<T> & TreeNode<T>;
 
@@ -1029,7 +1055,7 @@ import type { ProcessDerivedOf } from './internals/derived-types';
 import type { Enhancer } from '../enhancers/types';
 import type { AccumulatedEnhancerAdditions } from './enhancer-types';
 
-export interface SignalTreeFactory {
+export interface SignalTreeFactoryOf<C extends CarrierKind> {
   <
     T extends object,
     TDerived extends object,
@@ -1038,11 +1064,12 @@ export interface SignalTreeFactory {
     initialState: T,
     config: Omit<TreeConfig, 'enhancers' | 'derived'> & {
       enhancers?: E;
-      derived: ($: TreeNode<T>) => TDerived;
+      derived: ($: TreeNodeOf<T, C>) => TDerived;
     }
-  ): ISignalTree<
+  ): ISignalTreeOf<
     ResolveLeafDefinitions<T>,
-    TreeNode<T> & ProcessDerivedOf<TDerived>
+    C,
+    TreeNodeOf<T, C> & ProcessDerivedOf<TDerived, C>
   > &
     AccumulatedEnhancerAdditions<E>;
   <T extends object, const E extends readonly Enhancer<unknown>[]>(
@@ -1051,7 +1078,7 @@ export interface SignalTreeFactory {
       enhancers: E;
       derived?: never;
     }
-  ): ISignalTree<ResolveLeafDefinitions<T>, TreeNode<T>> &
+  ): ISignalTreeOf<ResolveLeafDefinitions<T>, C, TreeNodeOf<T, C>> &
     AccumulatedEnhancerAdditions<E>;
   <T extends object>(
     initialState: T,
@@ -1059,5 +1086,7 @@ export interface SignalTreeFactory {
       enhancers?: never;
       derived?: never;
     }
-  ): ISignalTree<ResolveLeafDefinitions<T>, TreeNode<T>>;
+  ): ISignalTreeOf<ResolveLeafDefinitions<T>, C, TreeNodeOf<T, C>>;
 }
+
+export type SignalTreeFactory = SignalTreeFactoryOf<'location'>;

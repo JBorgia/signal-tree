@@ -29,8 +29,8 @@
  *     reader fan-out on the collection signals (it pins write-path cost,
  *     caching, and snapshot semantics).
  */
-import { computed, signal } from '@angular/core';
-import { entityMap, signalTree, type Location } from '@signal-tree/angular';
+import { computed, signal, type WritableSignal } from '@angular/core';
+import { entityMap, signalTree } from '@signal-tree/angular';
 
 const N = 100;
 const TARGET = 42; // the single index we mutate
@@ -58,17 +58,14 @@ describe('granular-reactivity fan-out', () => {
     const initial: Record<string, { v: number }> = {};
     for (let i = 0; i < N; i++) initial[`n${i}`] = { v: 0 };
     const tree = signalTree({ nodes: initial });
-    const nodes = tree.$.nodes as Record<
-      string,
-      { v: Location<number> }
-    >;
+    const nodes = tree.$.nodes as Record<string, { v: WritableSignal<number> }>;
 
     const { counters, readAll } = instrument((i) => nodes[`n${i}`].v());
 
     readAll(); // prime
     expect(counters.every((c) => c === 1)).toBe(true);
 
-    nodes[`n${TARGET}`].v(999); // touch exactly one leaf
+    nodes[`n${TARGET}`].v.set(999); // touch exactly one leaf
     readAll();
 
     expect(counters[TARGET]).toBe(2); // touched leaf recomputed

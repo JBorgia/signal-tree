@@ -20,7 +20,7 @@ export class UserOps {
   // ── Mutations ──────────────────────────────────────────────────────────────
 
   setSelected(userId: Nullable<number>): void {
-    this._$.users.selectedId(userId);
+    this._$.users.selectedId.set(userId);
   }
 
   upsert(user: User): void {
@@ -30,15 +30,15 @@ export class UserOps {
   remove(userId: number): void {
     this._$.users.entities.removeOne(userId);
     if (this._$.users.selectedId() === userId) {
-      this._$.users.selectedId(null);
+      this._$.users.selectedId.set(null);
     }
   }
 
   clear(): void {
     this._$.users.entities.clear();
-    this._$.users.selectedId(null);
-    this._$.users.loading.state(LoadingState.NotLoaded);
-    this._$.users.loading.error(null);
+    this._$.users.selectedId.set(null);
+    this._$.users.loading.state.set(LoadingState.NotLoaded);
+    this._$.users.loading.error.set(null);
   }
 
   // ── Async ──────────────────────────────────────────────────────────────────
@@ -59,17 +59,17 @@ export class UserOps {
   // ── Internals ──────────────────────────────────────────────────────────────
 
   private _setLoading(): void {
-    this._$.users.loading.state(LoadingState.Loading);
-    this._$.users.loading.error(null);
+    this._$.users.loading.state.set(LoadingState.Loading);
+    this._$.users.loading.error.set(null);
   }
 
   private _setLoaded(): void {
-    this._$.users.loading.state(LoadingState.Loaded);
+    this._$.users.loading.state.set(LoadingState.Loaded);
   }
 
   private _setError(err: unknown): void {
-    this._$.users.loading.state(LoadingState.Error);
-    this._$.users.loading.error(
+    this._$.users.loading.state.set(LoadingState.Error);
+    this._$.users.loading.error.set(
       err instanceof Error ? err.message : 'Failed to load users'
     );
   }

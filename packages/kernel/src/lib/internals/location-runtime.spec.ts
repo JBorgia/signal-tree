@@ -200,4 +200,5 @@ describe('LocationRuntime', () => {
     expect('set' in location).toBe(false);
     expect('update' in location).toBe(false);
   });
+
 });

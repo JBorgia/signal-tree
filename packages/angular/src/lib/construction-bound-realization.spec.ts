@@ -1,26 +1,29 @@
-import { entityMap, signalTree as neutralSignalTree } from '@signal-tree/kernel';
+import {
+  entityMap,
+  signalTree as neutralSignalTree,
+} from '@signal-tree/kernel';
+import { isSignal } from '@angular/core';
 
 import { signalTree as angularSignalTree } from '../index';
 
 type Row = { id: string; value: number };
 
 describe('construction-bound Angular realization', () => {
-  it('realizes tree leaves and derived recipes as universal locations', () => {
+  it('realizes tree leaves and derived recipes as native Angular signals', () => {
     const tree = angularSignalTree(
       { count: 1 },
       { derived: ($) => ({ doubled: () => $.count() * 2 }) }
     );
 
-    expect(typeof tree.$.count.peek).toBe('function');
-    expect(typeof tree.$.count.subscribe).toBe('function');
-    expect(typeof tree.$.doubled).toBe('function');
+    expect(isSignal(tree.$.count)).toBe(true);
+    expect(isSignal(tree.$.doubled)).toBe(true);
 
-    tree.$.count(2);
+    tree.$.count.set(2);
     expect(tree.$.doubled()).toBe(4);
     tree.destroy();
   });
 
-  it('realizes EntityMap fields and readonly projections as locations', () => {
+  it('realizes EntityMap fields and readonly projections as signals', () => {
     const tree = angularSignalTree({
       rows: entityMap<{ id: string; value: number }, string>({
         selectId: (row) => row.id,
@@ -29,8 +32,8 @@ describe('construction-bound Angular realization', () => {
     tree.$.rows.addOne({ id: 'a', value: 1 });
     const value = tree.$.rows.byIdOrFail('a').value;
 
-    expect(typeof value).toBe('function');
-    expect(value.asReadonly()).toBe(value);
+    expect(isSignal(value)).toBe(true);
+    expect(isSignal(value.asReadonly())).toBe(true);
     expect(value.asReadonly()()).toBe(1);
     tree.destroy();
   });
@@ -71,15 +74,21 @@ describe('construction-bound Angular realization', () => {
     angularAfter.$.rows.addOne({ id: 'a2', value: 3 });
 
     expect(typeof neutralBefore.$.rows.byIdOrFail('n').value).toBe('function');
-    expect(typeof neutralBefore.$.rows.where((row) => row.value > 0)).toBe('function');
+    expect(typeof neutralBefore.$.rows.where((row) => row.value > 0)).toBe(
+      'function'
+    );
     expect(typeof neutralAfter.$.count).toBe('function');
     expect(typeof angular.$.count).toBe('function');
     expect(typeof angular.$.doubled).toBe('function');
     expect(typeof angular.$.quadrupled).toBe('function');
     expect(typeof angular.$.rows.byIdOrFail('a').value).toBe('function');
-    expect(typeof angular.$.rows.where((row) => row.value > 0)).toBe('function');
+    expect(typeof angular.$.rows.where((row) => row.value > 0)).toBe(
+      'function'
+    );
     expect(typeof angularAfter.$.rows.byIdOrFail('a2').value).toBe('function');
-    expect(typeof angularAfter.$.rows.where((row) => row.value > 0)).toBe('function');
+    expect(typeof angularAfter.$.rows.where((row) => row.value > 0)).toBe(
+      'function'
+    );
     expect(angular.$.quadrupled()).toBe(4);
 
     neutralBefore.destroy();

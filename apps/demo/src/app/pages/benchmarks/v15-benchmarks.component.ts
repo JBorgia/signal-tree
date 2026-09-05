@@ -27,8 +27,9 @@ import {
   V15_BENCHMARK_SOURCE_URLS,
   V15BenchmarkSuite,
 } from './v15-benchmark.workloads';
-import { CALLABLE_LOCATION_AA_BENCHMARK } from './callable-locations-aa.generated';
-import { CALLABLE_LOCATION_BENCHMARK } from './callable-locations.generated';
+import { ANGULAR_NATIVE_AA_BENCHMARK } from './angular-native-aa.generated';
+import { ANGULAR_NATIVE_MEMORY_BENCHMARK } from './angular-native-memory.generated';
+import { ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK } from './angular-native-vs-universal.generated';
 
 type BenchmarkMode = 'quick' | 'steady';
 type SignalTreeProfileArmId = 'signaltree-angular' | 'signaltree-kernel';
@@ -57,10 +58,10 @@ interface SteadyStateProfile {
   readonly cohortSize: number;
 }
 
-interface CallableLocationComparisonRow {
+interface AngularLeafComparisonRow {
   readonly operation: string;
-  readonly previous: string;
-  readonly current: string;
+  readonly universal: string;
+  readonly native: string;
   readonly pairedDelta: string;
   readonly pairedRange: string;
   readonly controlRange: string;
@@ -68,11 +69,26 @@ interface CallableLocationComparisonRow {
   readonly interpretation: string;
 }
 
-const CALLABLE_OPERATION_LABELS = {
+interface AngularLeafMemoryRow {
+  readonly observation: string;
+  readonly universal: string;
+  readonly native: string;
+  readonly delta: string;
+  readonly collection: string;
+}
+
+const ANGULAR_LEAF_OPERATION_LABELS = {
   'scalar-read': 'Scalar read',
   'scalar-replace': 'Scalar replacement',
   'scalar-derive': 'Scalar derivation',
-  'tree-construction': 'Tree construction',
+  'angular-fanout-1': 'Angular fan-out 1',
+  'angular-fanout-10': 'Angular fan-out 10',
+  'angular-fanout-100': 'Angular fan-out 100',
+  'angular-chain-10': 'Derived chain depth 10',
+  'angular-diamond': 'Derived diamond',
+  'construction-10': 'Construct 10 leaves',
+  'construction-100': 'Construct 100 leaves',
+  'construction-1000': 'Construct 1,000 leaves',
 } as const;
 
 const formatNanoseconds = (value: number): string =>
@@ -86,9 +102,9 @@ const formatPercent = (value: number): string =>
 const formatPercentRange = (low: number, high: number): string =>
   `${formatPercent(low)} to ${formatPercent(high)}`;
 
-const createCallableLocationRows = (): readonly CallableLocationComparisonRow[] =>
-  CALLABLE_LOCATION_BENCHMARK.results.map((result) => {
-    const control = CALLABLE_LOCATION_AA_BENCHMARK.results.find(
+const createAngularLeafRows = (): readonly AngularLeafComparisonRow[] =>
+  ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.results.map((result) => {
+    const control = ANGULAR_NATIVE_AA_BENCHMARK.results.find(
       (candidate) => candidate.operation === result.operation
     );
     if (!control) {
@@ -96,16 +112,18 @@ const createCallableLocationRows = (): readonly CallableLocationComparisonRow[] 
     }
 
     const disposition =
-      result.pairedDeltaPct.p10 > 0
-        ? 'overhead'
-        : result.pairedDeltaPct.p90 < 0
+      result.pairedDeltaPct.p90 < 0 &&
+      result.pairedDeltaPct.p90 < control.pairedDeltaPct.p10
         ? 'improvement'
+        : result.pairedDeltaPct.p10 > 0 &&
+          result.pairedDeltaPct.p10 > control.pairedDeltaPct.p90
+        ? 'overhead'
         : 'neutral';
 
     return {
-      operation: CALLABLE_OPERATION_LABELS[result.operation],
-      previous: formatNanoseconds(result.a.medianNsPerOperation),
-      current: formatNanoseconds(result.b.medianNsPerOperation),
+      operation: ANGULAR_LEAF_OPERATION_LABELS[result.operation],
+      universal: formatNanoseconds(result.aNs),
+      native: formatNanoseconds(result.bNs),
       pairedDelta: formatPercent(result.pairedDeltaPct.median),
       pairedRange: formatPercentRange(
         result.pairedDeltaPct.p10,
@@ -118,12 +136,47 @@ const createCallableLocationRows = (): readonly CallableLocationComparisonRow[] 
       disposition,
       interpretation:
         disposition === 'overhead'
-          ? 'Measured overhead in this run'
+          ? 'Clear native overhead'
           : disposition === 'improvement'
-          ? 'Measured improvement in this run'
-          : 'No clear difference',
+          ? 'Clear native improvement'
+          : 'Inconclusive against A/A control',
     };
   });
+
+const createAngularLeafMemoryRows = (): readonly AngularLeafMemoryRow[] => {
+  const universalLabel = ANGULAR_NATIVE_MEMORY_BENCHMARK.arms[0].label;
+  const nativeLabel = ANGULAR_NATIVE_MEMORY_BENCHMARK.arms[1].label;
+  return [0, ANGULAR_NATIVE_MEMORY_BENCHMARK.config.observedCount].map(
+    (observedCount) => {
+      const universal = ANGULAR_NATIVE_MEMORY_BENCHMARK.results.find(
+        (result) =>
+          result.label === universalLabel &&
+          result.observedCount === observedCount
+      );
+      const native = ANGULAR_NATIVE_MEMORY_BENCHMARK.results.find(
+        (result) =>
+          result.label === nativeLabel && result.observedCount === observedCount
+      );
+      if (!universal || !native) {
+        throw new Error(`Missing Angular leaf memory row for ${observedCount}`);
+      }
+      const delta = native.bytesPerLeaf - universal.bytesPerLeaf;
+      return {
+        observation:
+          observedCount === 0
+            ? '100k leaves, unobserved'
+            : `100k leaves, ${observedCount / 1_000}k observed`,
+        universal: `${universal.retainedMB.toFixed(3)} MB · ${universal.bytesPerLeaf} B/leaf`,
+        native: `${native.retainedMB.toFixed(3)} MB · ${native.bytesPerLeaf} B/leaf`,
+        delta: `${delta > 0 ? '+' : ''}${delta} B/leaf`,
+        collection:
+          universal.collectable && native.collectable
+            ? 'Both collectible'
+            : 'Collection failure',
+      };
+    }
+  );
+};
 
 const RECURRING_PROFILES: readonly {
   readonly workloadId: RecurringWorkloadId;
@@ -182,15 +235,16 @@ export class V15BenchmarksComponent {
   readonly isDevBuild = isDevMode();
   readonly benchmarkSourcePaths = V15_BENCHMARK_SOURCE_PATHS;
   readonly benchmarkSourceUrls = V15_BENCHMARK_SOURCE_URLS;
-  readonly callableLocationRows = createCallableLocationRows();
-  readonly callableLocationBenchmark = {
-    method: CALLABLE_LOCATION_BENCHMARK.method,
-    samples: CALLABLE_LOCATION_BENCHMARK.config.samples,
-    warmups: CALLABLE_LOCATION_BENCHMARK.config.warmups,
-    trials: CALLABLE_LOCATION_BENCHMARK.config.trialsPerArm,
-    previous: CALLABLE_LOCATION_BENCHMARK.arms.a.label,
-    current: CALLABLE_LOCATION_BENCHMARK.arms.b.label,
-    runtime: `${CALLABLE_LOCATION_BENCHMARK.runtime.node} / ${CALLABLE_LOCATION_BENCHMARK.runtime.platform}-${CALLABLE_LOCATION_BENCHMARK.runtime.architecture}`,
+  readonly angularLeafRows = createAngularLeafRows();
+  readonly angularLeafMemoryRows = createAngularLeafMemoryRows();
+  readonly angularLeafBenchmark = {
+    method: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.method,
+    samples: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.config.samples,
+    warmups: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.config.warmups,
+    trials: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.config.trials,
+    universal: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.arms.a.label,
+    native: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.arms.b.label,
+    runtime: `${ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.runtime.node} / ${ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.runtime.platform}-${ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.runtime.architecture}`,
   };
   readonly valueFoundations: readonly ValueFoundation[] = [
     {

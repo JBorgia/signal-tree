@@ -14,10 +14,10 @@ describe('EntityMap Angular composition nulls', () => {
       { id: 'a', n: 1 },
       { id: 'b', n: 2 },
     ]);
-    tree.$.order(['a', 'b']);
+    tree.$.order.set(['a', 'b']);
 
     tree.$.rows.addOne({ id: 'z', n: 0 });
-    tree.$.order((order) => ['z', ...order]);
+    tree.$.order.update((order) => ['z', ...order]);
 
     const ordered = computed(() =>
       tree.$.order()
@@ -26,7 +26,7 @@ describe('EntityMap Angular composition nulls', () => {
     );
     expect(ordered().map((row) => row?.id)).toEqual(['z', 'a', 'b']);
 
-    tree.$.order(['b', 'z', 'a']);
+    tree.$.order.set(['b', 'z', 'a']);
     expect(ordered().map((row) => row?.id)).toEqual(['b', 'z', 'a']);
   });
 
