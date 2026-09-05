@@ -10,41 +10,60 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 Current phase: `Phase 7 — PRE-GA CLOSURE / FINAL RC VERIFICATION OWED`
 
-`UNIVERSAL-LOCATIONS-0` is **CLOSED IN SOURCE** at `5efeb7f5`. The canonical
-reactive value is now a kernel-owned `Location` / `ReadonlyLocation`; Angular,
-React, and Vue observe that truth through construction-bound adapters. Dot-path
-DX, whole-value root/branch grammar, EntityMap identity, causal turns, grouped
-publication, restoration, and explicit owner teardown remain intact. Obsolete
-carrier specialization, framework-owned scalar realization, duplicate derived
-runtime, tracking suppression, and tree-location wrappers are deleted.
+`UNIVERSAL-LOCATIONS-0` closed the kernel-authority question at `5efeb7f5`, but
+its universal first-party leaf-identity conclusion is **SUPERSEDED** by
+`FRAMEWORK-NATIVE-CARRIERS-0` at `7ab2e82d`. The kernel still owns canonical
+values, equality, revisions, positions, EntityMap identity, causal turns,
+transactions, restoration, grouped publication, snapshots, and explicit owner
+teardown. Framework carriers perform dependency tracking and native API
+realization only; they do not create another state authority.
 
-`CALLABLE-LOCATIONS-0` is **CLOSED IN SOURCE** at `81780c4e`. Root, branch,
-terminal, and EntityMap field locations now share one grammar: `location()`
-reads, `location(value)` replaces, and `location(updater)` derives. `leaf(value)`
-ends topology explicitly and disambiguates callable data. Canonical locations
-have no `.set()` / `.update()` methods; framework-native writable identity is an
-explicit adapter view, never another state authority.
+`CALLABLE-LOCATIONS-0` is **CLOSED / NARROWED** at `81780c4e` and `7ab2e82d`.
+Neutral kernel locations plus root and object branches retain one grammar:
+`location()` reads, `location(value)` replaces, and `location(updater)` derives.
+`leaf(value)` ends topology explicitly and disambiguates callable data. Angular
+terminal and EntityMap leaves instead expose native `.set()` / `.update()`
+methods; Vue leaves expose `.value`; React observes neutral locations through
+`useSignalTree`.
+
+`FRAMEWORK-NATIVE-CARRIERS-0` is **CLOSED IN SOURCE** at `7ab2e82d`. Angular
+writable leaves are `WritableSignal<T>` and derived/query leaves are `Signal<T>`;
+Vue writable leaves are `Ref<T>` and derived/query leaves are `ComputedRef<T>`;
+React remains hook-native over neutral kernel locations. Writable and readonly
+carrier algebras are separate, packed declarations compile under `bundler` and
+`node16`, and the complete native realization runtimes are reachable only from
+`@signal-tree/kernel/adapter`, so neutral consumers do not ship them.
 
 This breaking architecture correction supersedes the former clean-clone
 technical-readiness checkpoint. Current ordinary evidence is green under the
 canonical Node `24.3.0` runtime in `.nvmrc`: strict source and public typecheck;
-kernel `260` files / `2,177` passing tests plus two expected failures; Angular
-`95`; React `6`; Vue `4`; demo `145`; React reference `16`; spec-type ratchet at
-`223` known diagnostics with none worse; lint with zero errors and no warning
-budget growth; forced-GC retention; `55/55` fast gates; `7/7` ordinary slow
-gates; `24/24` declared artifact entries; packed consumer typecheck under
-`bundler` and `node16`; facade runtime identity; `34` current architecture
-assets; production package and demo builds; numeric claims `146/146`; and bundle
-budgets at `9.93/10.0 KB` bare and `21.97/22.1 KB` EntityMap production gzip.
-Independent final review found no blocker.
+kernel `2,177` passing tests plus two expected failures; Angular `99` passing / `3`
+skipped; React `6`; Vue `6`; demo `145` passing / `4` skipped; lint with zero
+errors and no warning-budget growth; forced-GC retention; `55/55` fast gates and
+`63/63` ordinary gates; `24/24` declared artifact entries; packed consumer
+typecheck under `bundler` and `node16`; facade runtime identity; `34` current
+architecture assets; production package and demo builds; numeric claims
+`176/176`; and bundle budgets at `9.95/10.0 KB` bare and `22.01/22.1 KB`
+EntityMap production gzip. Independent final review found no blocker.
 
 The controlled `84837fb3` method-form versus callable-location benchmark used
 mirrored persistent workers, 30 paired samples, five warmups, and an identical-
 current A/A control. Read, derivation, and construction intervals cross zero and
-support no change claim. Scalar replacement measured `+7.4%`, about `+4.4 ns`,
-with a paired p10-p90 interval of `+3.7%` to `+10.5%`; the corresponding A/A
-interval was `-4.1%` to `+1.4%`. Raw samples and worker assignments are tracked
-under `apps/demo/public/benchmarks/`.
+support no change claim. Scalar replacement measured `+6.6%`, about `+4.1 ns`,
+with a paired p10-p90 interval of `+3.4%` to `+9.9%`; the corresponding A/A
+interval was `-4.3%` to `+0.1%`. Both arms are independently installed tarballs
+pinned by commit and full SHA-256 in the tracked raw samples.
+
+The Angular-specific native-carrier comparison uses the same mirrored,
+operation-isolated protocol against packed artifacts. Native leaves improve
+scalar read by `77.3%`, replacement by `33.3%`, derivation by `39.0%`, fan-out
+by `27.3-37.0%`, and a depth-10 chain by `15.5%`; the diamond overlaps the A/A
+control. Construction is inconclusive at 10 leaves and slower by `17.5%` at 100
+and `30.8%` at 1,000. Forced-GC density remains `1,934 B/leaf` unobserved for
+both designs; after 10,000 observed leaves the native carrier remains
+`1,934 B/leaf` versus `2,005 B/leaf`, and every sampled tree/leaf collects after
+`destroy()`. These measurements select Angular's carrier only; they make no Vue
+or React performance claim.
 
 The full release-only matrix, exact candidate, registry write, tag, and publish
 remain intentionally unrun. They belong to the next explicitly authorized final
@@ -2912,7 +2931,10 @@ Run the authoritative ladder before checkpointing a release slice.
 
 ## Workspace Dirt Not Owned By Release Tasks
 
-**Both former entries are cleared. The list is empty.**
+The release checkpoint excludes this unrelated edit:
+
+- `.nvmrc` — user/formatter-owned newline-only change; excluded from
+  `7ab2e82d` and the release-ledger checkpoint.
 
 - ~~`eslint.config.mjs`~~ — committed alone at `e5fe21e7` (the `@nx/rollup`
   build-tooling allowlist entry, and a `no-empty-function` exemption for
@@ -12770,10 +12792,10 @@ delay `GATE F` or GA without a concrete release falsifier.
       returned by the configured set rather than a deleted chain. Prettier,
       ESLint, kernel typing, diagnostics, `git diff --check`, and independent
       review passed.
-- [x] **Final public API review.** The greenfield API is frozen at
-      `75c003c2`; `tools/api-baseline.json`, release claims, public
-      dispositions, package exports, and strict packed declarations are green.
-      No later stabilization work changed the public API.
+- [x] **Final public API review.** The former greenfield API froze at
+  `75c003c2`; `FRAMEWORK-NATIVE-CARRIERS-0` deliberately superseded its leaf
+  carrier types at `7ab2e82d`. The API baseline, release claims, package
+  exports, and strict packed declarations are green for the replacement.
 
 Exit condition: `GATE F` — **SATISFIED at `109595e6`**
 
@@ -12858,35 +12880,40 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
       browser, and development policy probes; release gates `74/74`; release-
       inclusive mutation proofs `74/74` with zero unproven, blind, or errored
       gates; final independent review clean.
-  - [x] **Kernel-owned universal locations and first-party Vue facade
-        (`5efeb7f5`).** Canonical values, dependency propagation, equality,
-        subscriptions, derived memoization, and grouped publication moved behind
-        the framework-neutral location runtime. Angular, React, and Vue retain one
-        facade import each and observe the same nominal locations without creating
-        another state authority. Transaction and EntityMap publication are
-        coherent; failed derived reads retry; owner invalidation waits through
-        reopened commit scopes; `updateAndReport` preserves its shallow
-        `Partial<T>` scope; arbitrary dot-path keys remain legal; computed
-        EntityMap slices expose full `ReadonlyLocation`; packed facade identities
-        and both strict module-resolution modes are mutation-proven. Validation is
-        recorded under Current Phase above. Final RC verification remains owed.
-  - [x] **Uniform callable location grammar and explicit terminal topology
-        (`81780c4e`).** Root, branch, terminal, and EntityMap field locations use
-        the same read/replace/derive calls; `leaf(value)` marks an explicit
-        topology boundary and callable data; canonical `.set()` / `.update()` are
-        removed. Raw realization, restoration, serialization, Link, adapter, and
-        DevTools ingress preserve known mutation semantics without re-entering
-        authored disambiguation. Angular, React, Vue, the complete demo, live docs,
-        generated architecture assets, tools, and strict consumers are migrated.
-        The controlled historical comparison finds no clear read, derivation, or
-        construction change and measures scalar replacement at about `+4.4 ns`.
-        Ordinary validation is recorded under Current Phase; exact-candidate
-        release-only verification remains owed.
+    - [x] **Kernel-owned universal locations and first-party Vue facade
+      (`5efeb7f5`; framework identity superseded by `7ab2e82d`).** Canonical
+      values, equality, revisions, dependency propagation, subscriptions,
+      derived memoization, and grouped publication remain behind the neutral
+      location runtime. The experiment's claim that every facade should expose
+      the same nominal location did not survive the native-carrier falsifiers.
+    - [x] **Callable kernel/root/branch grammar and explicit terminal topology
+      (`81780c4e`; narrowed by `7ab2e82d`).** Neutral locations plus root and
+      object branches retain read/replace/derive call syntax; `leaf(value)`
+      marks topology and callable data. Framework terminal leaves now use their
+      native writable APIs. The digest-pinned historical comparison finds no
+      clear read, derivation, or construction change and measures scalar
+      replacement at about `+4.1 ns`.
+    - [x] **Framework-native leaf carriers with kernel authority (`7ab2e82d`).**
+      Angular exposes `WritableSignal` / `Signal`, Vue exposes `Ref` /
+      `ComputedRef`, and React remains hook-native. Direct carrier identity,
+      batching interception, kernel snapshots, causal intent, EntityMap
+      projections, Vue `watch` / `unref` / `toValue` / `isReadonly`, strict
+      packed declarations, architecture assets, and full demo migration are
+      covered. HYBRID-A was rejected by preregistered CPU and density criteria;
+      the selected direct carrier preserves the unobserved `1,934 B/leaf`
+      density while materially improving Angular hot paths. Validation:
+      package suites, strict typecheck, lint, production package/demo builds,
+      digest-pinned CPU and forced-GC memory harnesses, `55/55` fast gates,
+      `63/63` ordinary gates, and independent review with no blocker. Exact-
+      candidate release-only verification remains owed.
 - [ ] publish `1.0.0`
 - [ ] verify npm/docs/install instructions from scratch
 - [ ] post-release operational readiness
 
-Technical readiness disposition: **CLOSED — human GA decision required.**
+Technical readiness disposition: **REOPENED ONLY FOR FINAL RC VERIFICATION.**
+The source/API decision is closed; the exact candidate, release-only matrix,
+registry write, and post-publication consumer proof remain owed. Human GA
+disposition follows that evidence.
 
 Exit condition: `GATE G` remains open until an explicitly authorized official
 release and post-publication verification.
