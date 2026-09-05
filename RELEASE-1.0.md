@@ -12948,7 +12948,7 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
         API and release-claim gates, `55/55` fast gates, and `63/63` ordinary
         gates. Independent release review found no source blocker. Exact-
         candidate release-only verification remains owed.
-  - [x] **RC13 mutation-proof and documentation closure.** Tagged RC13 passed
+  - [x] **RC13 mutation-proof and documentation closure (`6db0e7df`).** Tagged RC13 passed
         all 74 production gates and failed closed on four stale proof anchors.
         The replacements target direct framework contamination, native Angular
         publication, the live `replaceLocation` release claim, and the measured
