@@ -1,3 +1,15 @@
+## Unreleased (15.0.0-rc.14)
+
+- **Release mutation proofs track the current architecture.** Kernel-neutrality,
+  Angular carrier observation, release-claim coverage, and declaration-doc
+  mutations now break live mechanisms and current baselines instead of stale
+  pre-carrier anchors. Tagged CI must prove all registered gates can fail before
+  creating the GitHub release or allowing publication.
+- **Current documentation and demo sandboxes follow the candidate version.**
+  StackBlitz manifests and the What's New surface read generated version data,
+  the AI guide installs the `rc` channel and teaches Vue refs, and the docs index
+  includes all four published packages.
+
 ## 15.0.0-rc.13 (2026-09-05)
 
 - **Framework facades expose native leaves without moving state authority.**

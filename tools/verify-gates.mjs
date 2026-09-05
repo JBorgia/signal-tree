@@ -380,7 +380,10 @@ const GATES = [
     mutation: {
       file: 'packages/kernel/src/lib/internals/physical-commit-clock.ts',
       find: "import { isTraversableNode } from './node-shape';",
-      replace: "import { isTraversableNode } from '../utils';",
+      replace:
+        "import { isTraversableNode } from './node-shape';\n" +
+        "import type { Signal } from '@angular/core';\n" +
+        'export type __GateKernelTaint = Signal<unknown>;',
     },
   },
   {
@@ -495,8 +498,8 @@ const GATES = [
     ],
     mutation: {
       file: 'packages/angular/src/lib/observation-adapter.ts',
-      find: '      observe: () => void revision(),',
-      replace: '      observe: () => undefined,',
+      find: '        invalidate: () => publish(read()),',
+      replace: '        invalidate: () => undefined,',
     },
   },
   {
@@ -538,22 +541,20 @@ const GATES = [
     // Deleting a shipped capability from a live claim surface must fail. Chosen
     // over a synthetic export because it reproduces the ACTUAL defect: the API
     // is fine, the claim surface is the thing that went stale.
-    // The mutation must name a symbol that is IN THE CURRENT DELTA, or it proves
-    // nothing: the gate only inspects what this release added, so blanking a
-    // symbol from an older release is invisible to it. `prependOne` shipped in
-    // 14.0.0, which sat outside the window, so the previous mutation targeted
-    // a symbol outside the window and the harness correctly reported this gate
-    // BLIND. runInvalidationGroup is in the RC1-to-v15 delta and appears once
-    // in the kernel README. The production gate's base advances with each RC,
-    // so its proof pins that historical delta.
+    // mutation must name a VALUE in the current delta, not a member of a type
+    // newly exported in the same release: members of newly exported types are
+    // deliberately outside this gate's diff. `replaceLocation` is a current
+    // adapter value and CHANGELOG claim, so deleting that claim is observable.
+    // The production gate's base advances with each RC, while this proof pins
+    // the known RC1-to-v15 delta.
     mutationCmd: [
       'node',
       'tools/check-release-claims.mjs',
       '--base=v15.0.0-rc.1',
     ],
     mutation: {
-      file: 'packages/kernel/README.md',
-      find: 'runInvalidationGroup',
+      file: 'CHANGELOG.md',
+      find: '`replaceLocation`',
       replace: '__gateRemovedFromPriming',
     },
   },
@@ -1202,8 +1203,8 @@ const GATES = [
     // loss without rewarding duplicate re-exports across entrypoints.
     mutation: {
       file: 'tools/check-declaration-docs.mjs',
-      find: 'kernel: 157,',
-      replace: 'kernel: 158,',
+      find: 'kernel: 168,',
+      replace: 'kernel: 169,',
     },
   },
   {

@@ -116,7 +116,7 @@ for (const pkg of PACKAGES) {
 //     that way: the first version of this gate reported BLIND.
 const FLOOR = 0.5;
 const BUNDLED_DOC_BASELINE = {
-  kernel: 157,
+  kernel: 168,
 };
 
 const retainedDocumentationRatio = (srcDocs, dtsDocs) =>

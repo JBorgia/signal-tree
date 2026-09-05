@@ -11,8 +11,8 @@ Use one tree for an application state authority unless a shorter ownership
 boundary justifies another tree.
 
 1. Construct Angular trees through `@signal-tree/angular`, React trees through
-   `@signal-tree/react`, and framework-neutral trees through
-   `@signal-tree/kernel`.
+   `@signal-tree/react`, Vue trees through `@signal-tree/vue`, and
+   framework-neutral trees through `@signal-tree/kernel`.
 2. Declare state, all enhancers, and one derived factory in the initial
    `signalTree(...)` call.
 3. Let components read a read-only `$` facade.
@@ -32,6 +32,7 @@ persistence enhancer, form package, or framework-neutral global installation.
 | `@signal-tree/kernel`  | Framework-neutral state, EntityMap, links, restoration, transactions, batching, and DevTools |
 | `@signal-tree/angular` | Angular signal realization, `defineStore`, and Angular interop                               |
 | `@signal-tree/react`   | React owner-bound observation                                                                |
+| `@signal-tree/vue`     | Vue ref realization and computed derived/query values                                        |
 
 Applications should import construction from their framework package. The
 kernel remains appropriate for framework-neutral runtimes, libraries, and tiny
