@@ -1,4 +1,4 @@
-## Unreleased (15.0.0-rc.16)
+## 15.0.0-rc.16 (2026-09-05)
 
 - **React selectors render canonical state on the server.** `useSignalTree()`
   now supplies `useSyncExternalStore` with a server snapshot reader, so React
