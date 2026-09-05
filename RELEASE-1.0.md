@@ -12959,6 +12959,21 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
         AI surfaces, demo tests/lint/production build pass, and 34 architecture
         assets remain current. Historical RC1 records remain explicitly
         historical. RC14 exact-candidate verification is next.
+  - [x] **RC15 browser and release-metadata closure (`807bbbe2`,
+        `a752d54f`).** RC14 passed tagged CI and was published under npm's `rc`
+        dist-tag, but the complete production route-smoke matrix subsequently
+        falsified its mobile demo layout and GitHub exposed its release as
+        stable metadata. RC14 remains immutable and is superseded. The demo now
+        passes all `127/127` desktop/mobile browser checks: benchmark grids shed
+        desktop minimum widths, deep-typing copy no longer forces an incoherent
+        break, and mobile architecture labels remain in their intended gaps.
+        GitHub release creation derives `prerelease` from the tag, and the new
+        `release-prerelease-metadata` gate rejects a hardcoded stable release.
+        Validation: production demo build; focused browser checks `28/28`;
+        complete route-smoke matrix `127/127`; fast gates `56/56`; ordinary
+        gates `64/64`; mutation proofs `64/64`; workflow syntax validation;
+        independent release review found no blocker. RC15 exact-candidate
+        verification and registry proof remain owed; GA is not authorized.
 - [ ] publish `1.0.0`
 - [ ] verify npm/docs/install instructions from scratch
 - [ ] post-release operational readiness
