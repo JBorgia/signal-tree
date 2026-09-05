@@ -111,6 +111,7 @@ import {
   signalTree,
   entityMap,
   leaf,
+  link,
   restoration,
   batching,
   type ReadonlyLocation,
@@ -120,11 +121,19 @@ import {
   defineStore,
   entityMap as angularEntityMap,
   signalTree as angularSignalTree,
+  type AccessibleNode as AngularAccessibleNode,
+  type EntitySignalWithSlices as AngularEntitySignalWithSlices,
 } from '@signal-tree/angular';
 import type { Signal as AngularSignal, WritableSignal } from '@angular/core';
 import { useSignalTree } from '@signal-tree/react';
 import type { ComputedRef, Ref } from 'vue';
-import { signalTree as vueSignalTree } from '@signal-tree/vue';
+import {
+  asReadonly as vueAsReadonly,
+  entityMap as vueEntityMap,
+  signalTree as vueSignalTree,
+  type AccessibleNode as VueAccessibleNode,
+  type EntitySignalWithSlices as VueEntitySignalWithSlices,
+} from '@signal-tree/vue';
 
 type User = { id: number; name: string; version: number };
 
@@ -169,21 +178,51 @@ tree.$.users.updateOne(1, { name: 'b' });
 // EntityMap methods and kernel semantic authority remain intact.
 const angularTree = angularSignalTree({
   count: 0,
-  users: angularEntityMap<User, number>({ selectId: (u: User) => u.id }),
+  profile: { name: 'Ada' },
+  users: angularEntityMap<User, number>({ selectId: (u: User) => u.id })
+    .computed('names', (users) => users.map((user) => user.name)),
 });
 const angularCount: WritableSignal<number> = angularTree.$.count;
 const angularUsers: AngularSignal<User[]> = angularTree.$.users.all;
+const angularProfile: AngularAccessibleNode<{ name: string }> = angularTree.$.profile;
+const angularSlicedUsers: AngularEntitySignalWithSlices<
+  User,
+  number,
+  { names: string[] }
+> = angularTree.$.users;
 angularCount.set(1);
 angularTree.$.users.setAll([]);
+link(angularTree.$.count, { set: (value) => void value.toFixed() });
+link(angularTree.$.users, { set: (value) => void value[0]?.name });
+void [angularProfile, angularSlicedUsers];
 
 // Vue leaves and derived values use native Ref contracts over kernel truth.
 const vueTree = vueSignalTree(
-  { count: 1 },
+  {
+    count: 1,
+    profile: { name: 'Ada' },
+    users: vueEntityMap<User, number>({ selectId: (u: User) => u.id })
+      .computed('names', (users) => users.map((user) => user.name)),
+  },
   { derived: ($) => ({ doubled: () => $.count.value * 2 }) }
 );
 const vueCount: Ref<number> = vueTree.$.count;
 const vueDoubled: ComputedRef<number> = vueTree.$.doubled;
+const vueProfile: VueAccessibleNode<{ name: string }> = vueTree.$.profile;
+const vueSlicedUsers: VueEntitySignalWithSlices<
+  User,
+  number,
+  { names: string[] }
+> = vueTree.$.users;
+const vueReader = vueAsReadonly(vueTree);
+const vueReadonlyCount: Readonly<Ref<number>> = vueReader.$.count;
 vueCount.value = 2;
+link(vueTree.$.count, { set: (value) => void value.toFixed() });
+link(vueTree.$.users, { set: (value) => void value[0]?.name });
+void [vueProfile, vueSlicedUsers];
+void vueReadonlyCount.value;
+// @ts-expect-error a type-only readonly view of a writable Ref is not ComputedRef
+void vueReader.$.count.effect;
 
 // Enhancer methods
 tree.undo();

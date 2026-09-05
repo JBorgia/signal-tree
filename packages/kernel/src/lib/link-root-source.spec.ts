@@ -125,6 +125,21 @@ describe('link(tree.$) on an ordinary tree', () => {
     expect(got[got.length - 1]).toEqual({ a: 1, b: { c: 5 } });
   });
 
+  it('does not mistake ordinary all/setAll branch keys for an EntityMap', async () => {
+    const tree = signalTree({
+      payload: { all: 1, setAll: 2, other: 3 },
+    });
+    await flush();
+    const got: Array<{ all: number; setAll: number; other: number }> = [];
+    const l = track(link(tree.$.payload, { set: (value) => void got.push(value) }));
+
+    tree.$.payload({ all: 4, setAll: 5, other: 6 });
+    await flush();
+    await l.settled();
+
+    expect(got[got.length - 1]).toEqual({ all: 4, setAll: 5, other: 6 });
+  });
+
   it('R8 a COLLECTION inside the root publishes canonically', async () => {
     // The integration point with the repaired nested-collection projection.
     const tree = signalTree({

@@ -4,8 +4,10 @@ import { ANGULAR_OBSERVATION_ADAPTER } from './lib/observation-adapter.js';
 import { createSignalTreeFactory } from '@signal-tree/kernel/adapter';
 import { asReadonly as kernelAsReadonly } from '@signal-tree/kernel';
 import type {
+  AccessibleNodeOf,
   EntityNodeOf,
   EntitySignalOf,
+  EntitySignalWithSlicesOf,
   ISignalTreeOf,
   LeafOf,
   ReadonlyStoreOf,
@@ -21,6 +23,7 @@ export const signalTree =
 
 export type TreeNode<T> = TreeNodeOf<T, 'angular'>;
 export type WritableLeaf<T> = LeafOf<T, 'angular'>;
+export type AccessibleNode<T> = AccessibleNodeOf<T, 'angular'>;
 export type ISignalTree<T, TAccum = TreeNode<T>> = ISignalTreeOf<
   T,
   'angular',
@@ -32,6 +35,11 @@ export type EntitySignal<
   E,
   K extends string | number = string
 > = EntitySignalOf<E, K, 'angular'>;
+export type EntitySignalWithSlices<
+  E,
+  K extends string | number,
+  Slices extends Record<string, unknown>
+> = EntitySignalWithSlicesOf<E, K, Slices, 'angular'>;
 export type ReadonlyView<T> = ReadonlyViewOf<T, 'angular'>;
 export type ReadonlyStore<
   TSource,

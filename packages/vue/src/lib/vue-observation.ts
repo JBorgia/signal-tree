@@ -1,4 +1,9 @@
-import { computed, shallowRef, triggerRef, type ShallowRef } from 'vue';
+import {
+  computed,
+  shallowRef,
+  triggerRef,
+  type ComputedRef,
+} from 'vue';
 
 import type {
   ObservationAdapter,
@@ -9,6 +14,7 @@ interface VueReadonlyCell<T> {
   (): T;
   readonly value: T;
   readonly __v_isRef: true;
+  readonly effect: ComputedRef<T>['effect'];
 }
 
 interface VueWritableCell<T> extends VueReadonlyCell<T> {
@@ -18,15 +24,19 @@ interface VueWritableCell<T> extends VueReadonlyCell<T> {
   asReadonly(): VueReadonlyCell<T>;
 }
 
-const createReadonlyCell = <T>(read: () => T): VueReadonlyCell<T> => {
-  const cell = (() => read()) as VueReadonlyCell<T>;
+const wrapReadonlyCell = <T>(source: ComputedRef<T>): VueReadonlyCell<T> => {
+  const cell = (() => source.value) as VueReadonlyCell<T>;
   Object.defineProperties(cell, {
     __v_isRef: { value: true },
     __v_isReadonly: { value: true },
-    value: { get: read },
+    effect: { value: source.effect },
+    value: { get: () => source.value },
   });
   return cell;
 };
+
+const createReadonlyCell = <T>(read: () => T): VueReadonlyCell<T> =>
+  wrapReadonlyCell(computed(read));
 
 const createWritableCell = <T>(read: () => T): VueWritableCell<T> => {
   const cell = (() => read()) as VueWritableCell<T>;
@@ -44,52 +54,87 @@ const createWritableCell = <T>(read: () => T): VueWritableCell<T> => {
   return cell;
 };
 
-export const VUE_OBSERVATION_ADAPTER: ObservationAdapter = {
-  createToken(): ObservationToken {
+export const createVueObservationAdapter = (): ObservationAdapter => {
+  let invalidationGroupDepth = 0;
+  const pendingInvalidations = new Set<() => void>();
+
+  const scheduleInvalidation = (invalidate: () => void): void => {
+    if (invalidationGroupDepth > 0) {
+      pendingInvalidations.add(invalidate);
+      return;
+    }
+    invalidate();
+  };
+
+  const createObservationToken = (): ObservationToken => {
     const revision = shallowRef(0);
+    const invalidate = () => triggerRef(revision);
     return {
       observe: () => void revision.value,
-      invalidate: () => {
-        triggerRef(revision);
-      },
+      invalidate: () => scheduleInvalidation(invalidate),
     };
-  },
+  };
 
-  createWritableCell: <T>(read: () => T) => {
-    let published = read();
-    const state = shallowRef(published) as ShallowRef<T>;
-    const publish = (value: T): void => {
-      if (Object.is(published, value)) {
-        triggerRef(state);
-        return;
+  return {
+    createToken: createObservationToken,
+
+    createWritableCell: <T>(read: () => T) => {
+      let published = read();
+      const revision = shallowRef(0);
+      const invalidate = () => triggerRef(revision);
+      return {
+        cell: createWritableCell(() => {
+          void revision.value;
+          return published;
+        }),
+        peek: read,
+        token: {
+          observe: () => void revision.value,
+          invalidate: () => {
+            published = read();
+            scheduleInvalidation(invalidate);
+          },
+        },
+      };
+    },
+
+    createWritableProjection: <T>(computeValue: () => T) => ({
+      cell: createWritableCell(computeValue),
+      peek: computeValue,
+    }),
+
+    createReadonlyCell: <T>(computeValue: () => T) => {
+      const source = computed(computeValue);
+      return wrapReadonlyCell(source);
+    },
+
+    runInvalidationGroup(run): void {
+      let failure: unknown;
+      let hasFailure = false;
+      invalidationGroupDepth += 1;
+      try {
+        run();
+      } catch (error) {
+        failure = error;
+        hasFailure = true;
+      } finally {
+        invalidationGroupDepth -= 1;
+        if (invalidationGroupDepth === 0 && pendingInvalidations.size > 0) {
+          const invalidations = [...pendingInvalidations];
+          pendingInvalidations.clear();
+          for (const invalidate of invalidations) {
+            try {
+              invalidate();
+            } catch (error) {
+              if (!hasFailure) {
+                failure = error;
+                hasFailure = true;
+              }
+            }
+          }
+        }
       }
-      published = value;
-      state.value = value;
-    };
-    return {
-      cell: createWritableCell(() => state.value),
-      peek: read,
-      token: {
-        observe: () => void state.value,
-        invalidate: () => publish(read()),
-      },
-    };
-  },
-
-  createWritableProjection: <T>(computeValue: () => T) => {
-    const source = computed(computeValue);
-    return {
-      cell: createWritableCell(() => source.value),
-      peek: () => source.value,
-    };
-  },
-
-  createReadonlyCell: <T>(computeValue: () => T) => {
-    const source = computed(computeValue);
-    return createReadonlyCell(() => source.value);
-  },
-
-  runInvalidationGroup(run): void {
-    run();
-  },
+      if (hasFailure) throw failure;
+    },
+  };
 };

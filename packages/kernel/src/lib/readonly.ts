@@ -4,6 +4,7 @@ import type {
   ISignalTreeOf,
   LeafOf,
   ReadonlyOf,
+  ReadonlyViewLeafOf,
 } from './types';
 import type { ReadableCell } from './internals/cell-runtime';
 
@@ -116,9 +117,9 @@ export type ReadonlyEntityNodeOf<E, C extends CarrierKind> = {
 } & {
   readonly [P in keyof E]: E[P] extends object
     ? E[P] extends readonly unknown[]
-      ? ReadonlyOf<E[P], C>
+      ? ReadonlyViewLeafOf<E[P], C>
       : ReadonlyEntityNodeOf<E[P], C>
-    : ReadonlyOf<E[P], C>;
+    : ReadonlyViewLeafOf<E[P], C>;
 };
 
 /**
@@ -182,8 +183,10 @@ type ReadonlyNodeView<T, C extends CarrierKind> = T extends EntitySignalOf<
 >
   ? ReadonlyEntitySignalOf<E, K, C> &
       ReadonlyExtras<T, EntitySignalOf<E, K, C>, C>
-  : T extends LeafOf<infer V, C>
+  : T extends ReadonlyOf<infer V, C>
   ? ReadonlyOf<V, C>
+  : T extends LeafOf<infer V, C>
+  ? ReadonlyViewLeafOf<V, C>
   : T extends NodeAccessor<infer U>
   ? EffectiveParameters<T> extends []
     ? T extends ReadableCell<infer V>

@@ -9,8 +9,10 @@ import './lib/carrier.js';
 import { asReadonly as kernelAsReadonly } from '@signal-tree/kernel';
 import {
   createSignalTreeFactory,
+  type AccessibleNodeOf,
   type EntityNodeOf,
   type EntitySignalOf,
+  type EntitySignalWithSlicesOf,
   type ISignalTreeOf,
   type LeafOf,
   type ReadonlyStoreOf,
@@ -19,15 +21,20 @@ import {
   type TreeNodeOf,
 } from '@signal-tree/kernel/adapter';
 
-import { VUE_OBSERVATION_ADAPTER } from './lib/vue-observation.js';
+import { createVueObservationAdapter } from './lib/vue-observation.js';
 
 /** Construct a SignalTree whose leaves are native Vue refs. */
-export const signalTree = createSignalTreeFactory(
-  VUE_OBSERVATION_ADAPTER
-) as unknown as SignalTreeFactoryOf<'vue'>;
+export const signalTree = ((initialState: object, config?: unknown) =>
+  (
+    createSignalTreeFactory(createVueObservationAdapter()) as (
+      state: object,
+      options?: unknown
+    ) => unknown
+  )(initialState, config)) as SignalTreeFactoryOf<'vue'>;
 
 export type TreeNode<T> = TreeNodeOf<T, 'vue'>;
 export type WritableLeaf<T> = LeafOf<T, 'vue'>;
+export type AccessibleNode<T> = AccessibleNodeOf<T, 'vue'>;
 export type ISignalTree<T, TAccum = TreeNode<T>> = ISignalTreeOf<
   T,
   'vue',
@@ -39,6 +46,11 @@ export type EntitySignal<
   E,
   K extends string | number = string
 > = EntitySignalOf<E, K, 'vue'>;
+export type EntitySignalWithSlices<
+  E,
+  K extends string | number,
+  Slices extends Record<string, unknown>
+> = EntitySignalWithSlicesOf<E, K, Slices, 'vue'>;
 export type ReadonlyView<T> = ReadonlyViewOf<T, 'vue'>;
 export type ReadonlyStore<
   TSource,

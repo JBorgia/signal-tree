@@ -1637,8 +1637,8 @@ Current performance documentation records approximately:
 
 | target          | production gzip |  budget |
 | --------------- | --------------: | ------: |
-| bare SignalTree |         9.93 KB | 10.0 KB |
-| entity-enabled  |        21.97 KB | 22.1 KB |
+| bare SignalTree |         9.95 KB | 10.0 KB |
+| entity-enabled  |        22.01 KB | 22.1 KB |
 
 ![Figure 24. Measured production gzip versus v15 budgets](figures/fig24_bundle_budget.png)
 

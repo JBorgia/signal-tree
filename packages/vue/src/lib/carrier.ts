@@ -10,4 +10,8 @@ declare module '@signal-tree/kernel/adapter' {
   interface ReadonlyLeafCarriers<T> {
     vue: ComputedRef<T>;
   }
+
+  interface ReadonlyViewLeafCarriers<T> {
+    vue: Readonly<Ref<T>>;
+  }
 }

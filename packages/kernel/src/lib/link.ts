@@ -18,11 +18,13 @@ import {
   type EntityEgressProjection,
 } from './internals/entity-egress-projection';
 import { applyAtRelativePath } from './internals/source-mutation';
-import { isTraversableNode } from './internals/node-shape';
+import {
+  isNodeAccessor,
+  isTraversableNode,
+} from './internals/node-shape';
 import { getRootTree } from './internals/root-source';
 import { scheduleDurableConsequence } from './internals/commit-consequence';
 import type { EntityMapBuilder } from './markers/entity-map';
-import type { EntitySignal } from './types';
 import type { NodeAccessor } from './node-accessor';
 
 /**
@@ -98,13 +100,20 @@ export interface Link {
  * infers `v: Row[]` with no explicit generic.
  */
 export type NaturalValue<S> =
-  S extends EntitySignal<infer R, infer _K>
-    ? R[]
-    : S extends Location<infer T>
+  S extends Location<infer T>
+    ? T
+    : S extends NodeAccessor<infer T>
       ? T
-      : S extends NodeAccessor<infer T>
-        ? T
-        : never;
+      : S extends {
+    readonly all: unknown;
+    setAll(...args: infer Args): unknown;
+  }
+        ? Args[0]
+        : S extends () => infer T
+          ? T
+          : S extends { readonly value: infer T }
+            ? T
+            : never;
 
 /**
  * Does this declared value still contain a CONSTRUCTION MARKER?
@@ -182,6 +191,14 @@ function accessorsFor<T>(x: unknown): {
     return {
       read: () => rootTree.read() as T,
       write: (v: T) => rootTree.replace(v),
+      collection: false,
+    };
+  }
+
+  if (isNodeAccessor(x)) {
+    return {
+      read: () => x() as T,
+      write: (value: T) => x(value),
       collection: false,
     };
   }

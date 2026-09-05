@@ -13,4 +13,8 @@ declare module '@signal-tree/kernel/adapter' {
   interface ReadonlyLeafCarriers<T> {
     angular: Signal<T>;
   }
+
+  interface ReadonlyViewLeafCarriers<T> {
+    angular: Signal<T>;
+  }
 }
