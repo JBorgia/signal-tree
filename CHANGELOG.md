@@ -1,4 +1,4 @@
-## Unreleased (15.0.0-rc.14)
+## 15.0.0-rc.14 (2026-09-05)
 
 - **Release mutation proofs track the current architecture.** Kernel-neutrality,
   Angular carrier observation, release-claim coverage, and declaration-doc

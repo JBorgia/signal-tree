@@ -1,6 +1,6 @@
 {
   "name": "@signal-tree/vue",
-  "version": "15.0.0-rc.13",
+  "version": "15.0.0-rc.14",
   "description": "Vue observation for SignalTree.",
   "license": "Apache-2.0",
   "type": "module",
