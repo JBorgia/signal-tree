@@ -49,7 +49,7 @@ export class PostOps {
   private readonly _$ = inject(APP_TREE).$;
 
   setSearch(term: string): void {
-    this._$.posts.filters.search(term);
+    this._$.posts.filters.search.set(term);
   }
 
   // Business rule enforced in ops — not the component, not the tree.
@@ -103,8 +103,8 @@ const APP_TREE = signalTree(
 @Injectable({ providedIn: 'root' })
 class CounterOps {
   private $ = APP_TREE.$;
-  increment() { this.$.count((count) => count + 1); }
-  reset() { this.$.count(0); }
+  increment() { this.$.count.update((count) => count + 1); }
+  reset() { this.$.count.set(0); }
 }
 
 @Component({
@@ -125,7 +125,7 @@ export class AppComponent {
     // REACT — the state change IS the event. No actions, no dispatch.
     effect(() => {
       const n = this.$.count();
-      this.$.history((history) => [...history, n].slice(-5));
+      this.$.history.update((history) => [...history, n].slice(-5));
     });
   }
 }`;

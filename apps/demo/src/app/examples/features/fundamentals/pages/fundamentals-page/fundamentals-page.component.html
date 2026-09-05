@@ -29,7 +29,7 @@
       <article class="sequence-step">
         <span class="step-index">02</span>
         <h3>Read through <code>$</code></h3>
-        <p>Root, branch, and terminal locations are callable reactive values.</p>
+        <p>Root and branch accessors are callable; terminal leaves are native Angular signals.</p>
         <dl class="live-values">
           <div>
             <dt>tree.$.cart()</dt>
@@ -44,10 +44,10 @@
 
       <article class="sequence-step sequence-step--interactive">
         <span class="step-index">03</span>
-        <h3>Write through the same locations</h3>
+        <h3>Write through native leaf signals</h3>
         <p>
-          Pass a complete value to replace it, or pass an updater function to
-          derive the next value.
+          Use <code>.set()</code> to replace a leaf, or <code>.update()</code>
+          to derive its next value. Branches retain whole-value call syntax.
         </p>
         <div class="write-controls">
           <button type="button" (click)="removeItem()">Remove item</button>

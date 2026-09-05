@@ -21,7 +21,7 @@ export class PostOps {
   // ── Mutations ──────────────────────────────────────────────────────────────
 
   setSelected(postId: Nullable<number>): void {
-    this._$.posts.selectedId(postId);
+    this._$.posts.selectedId.set(postId);
   }
 
   upsert(post: Post): void {
@@ -33,12 +33,12 @@ export class PostOps {
   }
 
   setSearch(term: string): void {
-    this._$.posts.filters.search(term);
+    this._$.posts.filters.search.set(term);
   }
 
   togglePublishedFilter(): void {
     const current = this._$.posts.filters.published();
-    this._$.posts.filters.published(current === true ? null : true);
+    this._$.posts.filters.published.set(current === true ? null : true);
   }
 
   // ── Async ──────────────────────────────────────────────────────────────────
@@ -66,7 +66,7 @@ export class PostOps {
 
     const author = this._$.users.entities.byId(post.authorId)?.();
     if (author?.role !== 'admin') {
-      this._$.posts.loading.error('Only admins can publish posts');
+      this._$.posts.loading.error.set('Only admins can publish posts');
       return of(void 0);
     }
 
@@ -74,7 +74,7 @@ export class PostOps {
       tap((updated) => this._$.posts.entities.upsertOne(updated)),
       map(() => void 0),
       catchError((err) => {
-        this._$.posts.loading.error(
+        this._$.posts.loading.error.set(
           err instanceof Error ? err.message : 'Publish failed'
         );
         return of(void 0);
@@ -85,17 +85,17 @@ export class PostOps {
   // ── Internals ──────────────────────────────────────────────────────────────
 
   private _setLoading(): void {
-    this._$.posts.loading.state(LoadingState.Loading);
-    this._$.posts.loading.error(null);
+    this._$.posts.loading.state.set(LoadingState.Loading);
+    this._$.posts.loading.error.set(null);
   }
 
   private _setLoaded(): void {
-    this._$.posts.loading.state(LoadingState.Loaded);
+    this._$.posts.loading.state.set(LoadingState.Loaded);
   }
 
   private _setError(err: unknown): void {
-    this._$.posts.loading.state(LoadingState.Error);
-    this._$.posts.loading.error(
+    this._$.posts.loading.state.set(LoadingState.Error);
+    this._$.posts.loading.error.set(
       err instanceof Error ? err.message : 'Failed to load posts'
     );
   }

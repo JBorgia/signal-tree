@@ -134,22 +134,22 @@ as ordinary application state.
 `restoration()` is appropriate only when undo/redo history is a product
 requirement. It is not a general form-state dependency.
 
-## Myth 8: Leaves Need Framework-Specific Write Methods
+## Myth 8: Framework-Native Leaves Create A Second State Authority
 
-**Claim:** Root and branch accessors are callable, but terminal leaves require
-`.set()` or `.update()` from a framework primitive.
+**Claim:** If an Angular leaf is a `WritableSignal` or a Vue leaf is a `Ref`, the
+framework must own a duplicate copy of SignalTree state.
 
-**Correction:** Root, branch, and terminal locations all use the same kernel
-grammar: call with no arguments to read, a complete value to replace, or an
-updater to derive. A value call is never a patch. Framework facades connect
-those same locations to native dependency graphs without changing their API.
+**Correction:** Carrier identity and semantic authority are separate. The
+framework primitive tracks dependencies; kernel slots own canonical values,
+equality, revisions, transactions, restoration, and publication timing. Native
+`.set()`/`.update()` or `.value =` writes enter those kernel paths.
 
 ```typescript
 tree.$.user();
 tree.$.user({ name: 'Grace', active: true });
 tree.$.user.name();
-tree.$.user.name('Grace');
-tree.$.user.name((name) => name.toUpperCase());
+tree.$.user.name.set('Grace');
+tree.$.user.name.update((name) => name.toUpperCase());
 ```
 
 `leaf(value)` controls where topology stops. It keeps an object atomic instead
@@ -161,12 +161,12 @@ const tree = signalTree({
   onSave: leaf((id: string) => console.log(id)),
 });
 
-tree.$.bounds({ min: 10, max: 90 });
-tree.$.onSave(leaf((id) => persist(id)));
+tree.$.bounds.set({ min: 10, max: 90 });
+tree.$.onSave.set((id) => persist(id));
 ```
 
-Angular's `toWritableSignal(location)` creates an explicit native view when an
-Angular API requires `.set()` and `.update()`.
+`toWritableSignal()` adapts a callable object branch when an Angular API needs
+one writable signal. Ordinary Angular leaves already have native identity.
 
 ## Myth 9: SignalTree Has A Separate `.state` Property
 

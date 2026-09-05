@@ -73,14 +73,17 @@ describe('V15BenchmarksComponent', () => {
     expect(rendered).toContain('Valtio');
     expect(rendered).not.toContain('One-time cost');
     expect(rendered).toContain('Recurring work is the product benchmark');
-    expect(rendered).toContain('Callable location cost');
+    expect(rendered).toContain('Angular leaf realization');
     expect(rendered).toContain('Scalar replacement');
-    expect(rendered).toContain('Measured overhead in this run');
-    expect(rendered).toContain('No clear difference');
+    expect(rendered).toContain('Clear native improvement');
+    expect(rendered).toContain('Clear native overhead');
+    expect(rendered).toContain('Inconclusive against A/A control');
+    expect(rendered).toContain('100k leaves, 10k observed');
+    expect(rendered).toContain('Both collectible');
     expect(rendered).toContain('Raw comparison JSON');
     expect(
       fixture.nativeElement.querySelectorAll('.callable-result-row')
-    ).toHaveLength(4);
+    ).toHaveLength(13);
     expect(rendered).toContain(
       'Initialization is a budget, not an optimization target'
     );

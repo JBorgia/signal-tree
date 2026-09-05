@@ -35,7 +35,7 @@
         "name": "asReadonly",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "packages/kernel/src/lib/readonly.ts",
+        "declFile": "packages/angular/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -233,7 +233,7 @@
         "name": "EntityNode",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
+        "declFile": "packages/angular/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -242,7 +242,7 @@
         "name": "EntitySignal",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
+        "declFile": "packages/angular/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -261,6 +261,15 @@
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/kernel/src/lib/external.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "ISignalTree",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/angular/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -377,7 +386,16 @@
         "name": "ReadonlyStore",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/readonly.ts",
+        "declFile": "packages/angular/src/index.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "ReadonlyView",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/angular/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -431,7 +449,7 @@
         "name": "SignalTree",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
+        "declFile": "packages/angular/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -512,7 +530,7 @@
         "name": "TreeNode",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
+        "declFile": "packages/angular/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -530,7 +548,7 @@
         "name": "WritableLeaf",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
+        "declFile": "packages/angular/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1051,13 +1069,49 @@
         "name": "createSignalTreeFactory",
         "subpath": "./adapter",
         "kind": "runtime",
-        "declFile": "packages/kernel/src/lib/signal-tree.ts",
+        "declFile": "packages/kernel/src/adapter.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntityNodeOf",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntitySignalOf",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntitySignalWithSlicesOf",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/markers/entity-map.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
       },
       {
         "name": "ISignalTree",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "ISignalTreeOf",
         "subpath": "./adapter",
         "kind": "type-only",
         "declFile": "packages/kernel/src/lib/types.ts",
@@ -1073,6 +1127,24 @@
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": true
+      },
+      {
+        "name": "LeafCarriers",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/adapter.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "LeafOf",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
       },
       {
         "name": "ObservationAdapter",
@@ -1111,6 +1183,51 @@
         "internalDecl": false
       },
       {
+        "name": "ReadonlyEntityNodeOf",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/readonly.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "ReadonlyEntitySignalOf",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/readonly.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "ReadonlyLeafCarriers",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/adapter.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "ReadonlyStoreOf",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/readonly.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "ReadonlyViewOf",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/readonly.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "replaceLocation",
         "subpath": "./adapter",
         "kind": "runtime",
@@ -1121,6 +1238,24 @@
       },
       {
         "name": "SignalTreeFactory",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "SignalTreeFactoryOf",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TreeNodeOf",
         "subpath": "./adapter",
         "kind": "type-only",
         "declFile": "packages/kernel/src/lib/types.ts",
@@ -1695,7 +1830,7 @@
         "name": "asReadonly",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "packages/kernel/src/lib/readonly.ts",
+        "declFile": "packages/vue/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1875,7 +2010,7 @@
         "name": "EntityNode",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
+        "declFile": "packages/vue/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1884,7 +2019,7 @@
         "name": "EntitySignal",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
+        "declFile": "packages/vue/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1903,6 +2038,15 @@
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/kernel/src/lib/external.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "ISignalTree",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/vue/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -2019,7 +2163,16 @@
         "name": "ReadonlyStore",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/readonly.ts",
+        "declFile": "packages/vue/src/index.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "ReadonlyView",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/vue/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -2073,7 +2226,7 @@
         "name": "SignalTree",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
+        "declFile": "packages/vue/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -2145,7 +2298,7 @@
         "name": "TreeNode",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
+        "declFile": "packages/vue/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -2163,7 +2316,7 @@
         "name": "WritableLeaf",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
+        "declFile": "packages/vue/src/index.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false

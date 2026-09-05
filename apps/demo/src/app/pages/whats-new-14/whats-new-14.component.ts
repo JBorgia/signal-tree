@@ -246,11 +246,11 @@ export class WhatsNew14Component {
         )
       );
       granularConsumers.forEach((c) => c());
-      for (let w = 0; w < 20; w++) granular.$['k0'](w);
+      for (let w = 0; w < 20; w++) granular.$['k0'].set(w);
       granularConsumers.forEach((c) => c());
 
       const g0 = performance.now();
-      for (let w = 0; w < WRITES; w++) granular.$['k0'](w);
+      for (let w = 0; w < WRITES; w++) granular.$['k0'].set(w);
       granularConsumers.forEach((c) => c());
       const granularMs = performance.now() - g0;
 

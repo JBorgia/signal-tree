@@ -2,14 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  isSignal,
   OnDestroy,
   signal,
+  type WritableSignal,
 } from '@angular/core';
-import {
-  signalTree,
-  type Location,
-  type SignalTree,
-} from '@signal-tree/angular';
+import { signalTree, type SignalTree } from '@signal-tree/angular';
 
 import {
   DEEP_TYPING_BRANCH_SEGMENTS,
@@ -29,9 +27,9 @@ interface DeepTypingResultValue {
 
 interface DeepTypingResultNode {
   (): DeepTypingResultValue;
-  readonly status: Location<DeepTypingStatus>;
-  readonly revision: Location<number>;
-  readonly owner: Location<string>;
+  readonly status: WritableSignal<DeepTypingStatus>;
+  readonly revision: WritableSignal<number>;
+  readonly owner: WritableSignal<string>;
 }
 
 interface RuntimeProof {
@@ -78,11 +76,10 @@ const propertyAt = (value: unknown, property: string): unknown => {
   return (value as Record<string, unknown>)[property];
 };
 
-const isLocation = (value: unknown): boolean =>
-  typeof value === 'function' &&
-  typeof propertyAt(value, 'peek') === 'function' &&
-  typeof propertyAt(value, 'subscribe') === 'function' &&
-  typeof propertyAt(value, 'asReadonly') === 'function';
+const isWritableSignal = (value: unknown): value is WritableSignal<unknown> =>
+  isSignal(value) &&
+  typeof propertyAt(value, 'set') === 'function' &&
+  typeof propertyAt(value, 'update') === 'function';
 
 const resolveResult = (
   tree: SignalTree<Record<string, unknown>>,
@@ -95,9 +92,9 @@ const resolveResult = (
 
   if (
     typeof current !== 'function' ||
-    !isLocation(propertyAt(current, 'status')) ||
-    !isLocation(propertyAt(current, 'revision')) ||
-    !isLocation(propertyAt(current, 'owner'))
+    !isWritableSignal(propertyAt(current, 'status')) ||
+    !isWritableSignal(propertyAt(current, 'revision')) ||
+    !isWritableSignal(propertyAt(current, 'owner'))
   ) {
     throw new Error('Generated deepest branch is not a writable result node');
   }
@@ -121,15 +118,15 @@ const createRuntimeProof = (depth: DeepTypingCompiledDepth): RuntimeProof => {
       throw new Error('Generated deepest branch failed its initial read');
     }
 
-    result.status('review');
-    result.revision((revision) => revision + 1);
+    result.status.set('review');
+    result.revision.update((revision) => revision + 1);
     const snapshot = result();
     if (snapshot.status !== 'review' || snapshot.revision !== 2) {
       throw new Error('Generated deepest branch failed its write test');
     }
 
-    result.status('ready');
-    result.revision(1);
+    result.status.set('ready');
+    result.revision.set(1);
     const resetSnapshot = result();
     if (
       resetSnapshot.status !== 'ready' ||
@@ -187,7 +184,7 @@ export class ExtremeDepthComponent implements OnDestroy {
     () => `const status = tree.$.${this.path()}.status();`
   );
   readonly updateExample = computed(
-    () => `tree.$.${this.path()}.status('review');`
+    () => `tree.$.${this.path()}.status.set('review');`
   );
 
   setDepthInput(value: string): void {
@@ -210,15 +207,15 @@ export class ExtremeDepthComponent implements OnDestroy {
 
   toggleStatus(): void {
     const result = this.result();
-    result.status((status) => (status === 'ready' ? 'review' : 'ready'));
-    result.revision((revision) => revision + 1);
-    this.lastOperation.set('status and revision callable writes completed');
+    result.status.update((status) => (status === 'ready' ? 'review' : 'ready'));
+    result.revision.update((revision) => revision + 1);
+    this.lastOperation.set('status and revision signal writes completed');
   }
 
   reset(): void {
     const result = this.result();
-    result.status('ready');
-    result.revision(1);
+    result.status.set('ready');
+    result.revision.set(1);
     this.lastOperation.set('Deep result reset');
   }
 

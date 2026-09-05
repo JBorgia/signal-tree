@@ -8,16 +8,16 @@ Use `batching()` when you make **multiple writes in one synchronous turn** and w
 
 ```typescript
 // Without batching: each location write triggers a notification
-tree.$.firstName('Alice');
-tree.$.lastName('Smith');
-tree.$.age(30);
+tree.$.firstName.set('Alice');
+tree.$.lastName.set('Smith');
+tree.$.age.set(30);
 // → 3 notifications
 
 // With batching: notifications are coalesced
 const tree = signalTree(state, { enhancers: [batching()] });
-tree.$.firstName('Alice');
-tree.$.lastName('Smith');
-tree.$.age(30);
+tree.$.firstName.set('Alice');
+tree.$.lastName.set('Smith');
+tree.$.age.set(30);
 // → 1 notification (coalesced)
 ```
 
@@ -65,7 +65,7 @@ const s3 = tree.$.users.where((u) => u.active);
 ```typescript
 // ❌ Don't benchmark like this — it's not how Angular apps behave
 for (let i = 0; i < 100000; i++) {
-  tree.$.counter(i);
+  tree.$.counter.set(i);
 }
 ```
 

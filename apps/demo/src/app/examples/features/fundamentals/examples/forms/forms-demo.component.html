@@ -14,8 +14,8 @@
           id="username"
           type="text"
           [ngModel]="username()"
-          (ngModelChange)="username($event)"
-          (blur)="usernameTouched(true)"
+          (ngModelChange)="username.set($event)"
+          (blur)="usernameTouched.set(true)"
           [class.invalid]="usernameTouched() && !usernameValid()"
           [class.valid]="usernameTouched() && usernameValid()"
           placeholder="Enter username (3-20 chars, alphanumeric)"
@@ -38,8 +38,8 @@
           id="email"
           type="email"
           [ngModel]="email()"
-          (ngModelChange)="email($event)"
-          (blur)="emailTouched(true)"
+          (ngModelChange)="email.set($event)"
+          (blur)="emailTouched.set(true)"
           [class.invalid]="emailTouched() && !emailValid()"
           [class.valid]="emailTouched() && emailValid()"
           placeholder="your.email@example.com"
@@ -60,8 +60,8 @@
           id="password"
           type="password"
           [ngModel]="password()"
-          (ngModelChange)="password($event)"
-          (blur)="passwordTouched(true)"
+          (ngModelChange)="password.set($event)"
+          (blur)="passwordTouched.set(true)"
           [class.invalid]="passwordTouched() && !passwordValid()"
           [class.valid]="passwordTouched() && passwordValid()"
           placeholder="Enter a strong password"
@@ -78,7 +78,10 @@
               [style.background]="getPasswordStrengthColor()"
             ></div>
           </div>
-          <span class="strength-text" [style.color]="getPasswordStrengthColor()">
+          <span
+            class="strength-text"
+            [style.color]="getPasswordStrengthColor()"
+          >
             {{ getPasswordStrengthText() }}
           </span>
         </div>
@@ -96,8 +99,8 @@
           id="confirmPassword"
           type="password"
           [ngModel]="confirmPassword()"
-          (ngModelChange)="confirmPassword($event)"
-          (blur)="confirmPasswordTouched(true)"
+          (ngModelChange)="confirmPassword.set($event)"
+          (blur)="confirmPasswordTouched.set(true)"
           [class.invalid]="confirmPasswordTouched() && !passwordsMatch()"
           [class.valid]="confirmPasswordTouched() && passwordsMatch()"
           placeholder="Re-enter your password"
@@ -117,7 +120,7 @@
           <input
             type="checkbox"
             [ngModel]="agreeToTerms()"
-            (ngModelChange)="agreeToTerms($event)"
+            (ngModelChange)="agreeToTerms.set($event)"
             name="agreeToTerms"
             class="checkbox-input"
           />

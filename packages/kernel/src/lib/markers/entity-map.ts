@@ -1,17 +1,14 @@
 import { definePositionRegistry } from '../internals/position-registry';
-import type { EntitySignal, ReadonlyLocation } from '../types';
+import type { CarrierKind, EntitySignalOf, ReadonlyOf } from '../types';
 
 import { createEntitySignal } from '../entity-signal';
-import {
-  registerBuiltinMarkerProcessor,
-} from '../internals/materialize-markers';
+import { registerBuiltinMarkerProcessor } from '../internals/materialize-markers';
 import { isEntityMapMarker } from '../utils';
 
 // Build-time dev flag. Declared locally rather than inherited from
 // `@angular/core`'s ambient types: it is a bundler convention, not a framework
 // API, and the kernel's declarations must not depend on Angular for it.
 declare const ngDevMode: boolean | undefined;
-
 
 // Re-export isEntityMapMarker for convenience
 export { isEntityMapMarker };
@@ -34,10 +31,7 @@ export { isEntityMapMarker };
  * this is the reclaim RFC 0005 was staged to earn.)
  */
 
-import type {
-  EntityConfig,
-  EntityMapMarker,
-} from '../types';
+import type { EntityConfig, EntityMapMarker } from '../types';
 
 // =============================================================================
 // COMPUTED SLICE TYPES
@@ -74,13 +68,20 @@ export interface EntityMapMarkerWithSlices<
 /**
  * EntitySignal extended with computed slices
  */
+export type EntitySignalWithSlicesOf<
+  E,
+  K extends string | number,
+  Slices extends Record<string, unknown>,
+  C extends CarrierKind
+> = EntitySignalOf<E, K, C> & {
+  [P in keyof Slices]: ReadonlyOf<Slices[P], C>;
+};
+
 export type EntitySignalWithSlices<
   E,
   K extends string | number,
   Slices extends Record<string, unknown>
-> = EntitySignal<E, K> & {
-  [P in keyof Slices]: ReadonlyLocation<Slices[P]>;
-};
+> = EntitySignalWithSlicesOf<E, K, Slices, 'location'>;
 
 /**
  * Builder for chainable computed slices on a plain entityMap.
@@ -100,7 +101,7 @@ export interface EntityMapBuilder<
    * ```typescript
    * entityMap<Listing>()
    *   .computed('active', all => all.filter(l => l.status === 'active'))
-  * // Access: tree.$.listings.active() // ReadonlyLocation<Listing[]>
+   * // Access: tree.$.listings.active() // ReadonlyLocation<Listing[]>
    * ```
    */
   computed<N extends string, R>(
@@ -225,184 +226,182 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
   // `entityMap()` call. If that ever becomes measurable, hoist the callback —
   // do not reintroduce duplicate mutable state.
   registerBuiltinMarkerProcessor(
-      isEntityMapMarker as (value: unknown) => value is InternalMarker,
-      (marker, notifier, path, context, parentPositionId) => {
-        const cfg = marker.__entityMapConfig ?? {};
-        const hasPositionTopology = context.hasCapability('position-topology');
-        const hasMutationCapture = context.hasCapability('mutation-capture');
-        const entitySignal = createEntitySignal(
-          cfg as EntityConfig<Record<string, unknown>, string | number>,
-          notifier,
-          path,
-          {
-            physicalCommitClock: context.physicalCommitClock,
-            mutationCaptureRuntime: context.mutationCaptureRuntime,
-            // ADDRESS-REPAIR-1. The collection's own position is allocated
-            // here, and `path` IS its canonical address — both facts are known
-            // at exactly this point and nowhere later. Registering them makes
-            // every downstream consumer able to ASK which collection owns a
-            // position instead of guessing from a path's dot shape, which
-            // REALIZATION-ADDRESS-0 measured wrong for every nested case.
-            positionIdAllocator: hasPositionTopology
-              ? () => {
-                  const positionId =
-                    context.allocatePositionId(parentPositionId);
-                  if (positionId !== undefined) {
-                    context.positionRegistry.registerCollectionPath(
-                      positionId,
-                      path
-                    );
-                  }
-                  return positionId;
+    isEntityMapMarker as (value: unknown) => value is InternalMarker,
+    (marker, notifier, path, context, parentPositionId) => {
+      const cfg = marker.__entityMapConfig ?? {};
+      const hasPositionTopology = context.hasCapability('position-topology');
+      const hasMutationCapture = context.hasCapability('mutation-capture');
+      const entitySignal = createEntitySignal(
+        cfg as EntityConfig<Record<string, unknown>, string | number>,
+        notifier,
+        path,
+        {
+          physicalCommitClock: context.physicalCommitClock,
+          mutationCaptureRuntime: context.mutationCaptureRuntime,
+          // ADDRESS-REPAIR-1. The collection's own position is allocated
+          // here, and `path` IS its canonical address — both facts are known
+          // at exactly this point and nowhere later. Registering them makes
+          // every downstream consumer able to ASK which collection owns a
+          // position instead of guessing from a path's dot shape, which
+          // REALIZATION-ADDRESS-0 measured wrong for every nested case.
+          positionIdAllocator: hasPositionTopology
+            ? () => {
+                const positionId = context.allocatePositionId(parentPositionId);
+                if (positionId !== undefined) {
+                  context.positionRegistry.registerCollectionPath(
+                    positionId,
+                    path
+                  );
                 }
-              : () => undefined,
-            ownerMetadataEnabled: hasMutationCapture,
-            subjectMetadataEnabled: hasMutationCapture,
-            positionMetadataEnabled: hasPositionTopology,
-            ownerId: context.positionRegistry.id,
-            locationRuntime: context.locationRuntime,
-            // Immutable for the life of the tree — see RuntimeTreePlan. False
-            // is what lets the retirement boundary release a retired subject's
-            // value backing immediately.
-            hasRestorationAuthority:
-              context.runtimeTreePlan.hasRestorationAuthority,
+                return positionId;
+              }
+            : () => undefined,
+          ownerMetadataEnabled: hasMutationCapture,
+          subjectMetadataEnabled: hasMutationCapture,
+          positionMetadataEnabled: hasPositionTopology,
+          ownerId: context.positionRegistry.id,
+          locationRuntime: context.locationRuntime,
+          // Immutable for the life of the tree — see RuntimeTreePlan. False
+          // is what lets the retirement boundary release a retired subject's
+          // value backing immediately.
+          hasRestorationAuthority:
+            context.runtimeTreePlan.hasRestorationAuthority,
+        }
+      );
+
+      // OWNER-LOCATION-0. Same reason as `stored()`: a marker builds its own
+      // node, so the registry the leaf/branch sites attach in
+      // `signal-tree.ts` never reaches it. A collection is an addressable
+      // position — positionId, ownerPath, and restoration reverses it
+      // independently — and must be able to name its owning tree.
+      definePositionRegistry(
+        entitySignal as unknown as object,
+        context.positionRegistry
+      );
+
+      // Register as a reclamation target, but ONLY when something in this
+      // tree can restore. Without restoration authority the retirement
+      // boundary already releases everything at the moment of retirement, so
+      // a sink would have nothing to offer and the list would just pin the
+      // collection.
+      if (context.runtimeTreePlan.hasRestorationAuthority) {
+        context.physicalOwners.push(
+          entitySignal as unknown as (typeof context.physicalOwners)[number]
+        );
+      }
+
+      // Computed slices
+      const slices = marker.__computedSlices;
+      if (slices) {
+        for (const [name, sliceConfig] of Object.entries(slices)) {
+          const computedSignal = context.locationRuntime.createDerived(() =>
+            sliceConfig.compute(entitySignal.all())
+          );
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (entitySignal as any)[name] = computedSignal;
+        }
+      }
+
+      return entitySignal;
+    },
+    {
+      // STATE: the entities. `ids`, `count`, `empty` and `map` are all
+      // derived from `all` — and `map` is a JS `Map`, which JSON cannot
+      // represent, so it used to serialise as `{}`: a snapshot claiming the
+      // collection was EMPTY while holding 10,000 entities.
+      snapshot: (node) => ({ all: node.all() }),
+
+      hydrate: (node, value) => {
+        // ⚠️ NOTHING DECLINES HYDRATION ANY MORE, and that is the whole
+        // finding rather than a side effect. The decline here was
+        // loader-conditional — `typeof node.load === 'function'`, and `load`
+        // was attached only by the `loader()` feature. With loader deleted the
+        // predicate can never be true, so the branch was dead the moment its
+        // one producer went.
+        //
+        // M4 traced this trajectory already: `hydrate` had two implementers,
+        // `asyncSource` and `entityMap`; asyncSource's deletion left one, and
+        // loader's leaves ZERO declining paths. "A source-owning marker
+        // declines rehydration" is not an invariant that lost its carrier —
+        // it is a rule with no subject, because no marker in core owns an
+        // external source. Relationships do, and a relationship is `link()`.
+        //
+        // The RFC 0014 contrast — `transfer` accepts what `rehydrate`
+        // declines — is retired with it: both modes now accept.
+
+        if (value === null || typeof value !== 'object') return;
+        // A BARE ARRAY is a valid payload, not a malformed one.
+        //
+        // `tree.$({ rows: [...] })` is what a person or an AI writes to seed or
+        // reset a collection, and it used to half-apply: sibling leaves in the
+        // same payload took their values while the collection silently kept
+        // its old contents. In dev that emitted ST2024; in production it did
+        // nothing at all, which is the worst version of this — a partial
+        // hydrate is harder to notice than a failed one, because the parts
+        // that DID apply make it look like it worked.
+        //
+        // Accepting it is unambiguous. An entityMap SNAPSHOT always emits
+        // `{ all: [...] }`, so a bare array can never be mistaken for the
+        // snapshot shape, and no other payload this processor accepts is an
+        // array. The `all` wrapper stays the canonical round-trip form; this
+        // only stops the hand-written form from being silently dropped.
+        const all = Array.isArray(value)
+          ? value
+          : (value as { all?: unknown }).all;
+        if (Array.isArray(all)) {
+          // DIFF FIRST, `setAll` only as a fallback.
+          //
+          // `setAll` rebuilds the storage map, the id index and every
+          // per-entity signal — O(collection) on EVERY restore. Measured at
+          // 10k entities that is 3.62 ms per undo, and it is why undo/redo
+          // over a large collection was ~150x slower than an immutable-root
+          // history, which restores by swapping one reference.
+          //
+          // A snapshot SHARES its entity objects with the live tree —
+          // measured 499/500 identical after a single-entity change — so a
+          // reference walk finds exactly the rows that moved. Undoing one
+          // edit then costs one `updateOne` (~6 us) instead of a full
+          // `setAll` (~3.62 ms).
+          //
+          // The fast path is taken only when the id sequence is IDENTICAL,
+          // in order. Any add, removal or reorder falls back to `setAll`,
+          // because those change the index and the ordering guarantees that
+          // `setAll` exists to maintain.
+          const incoming = all as E[];
+          const current = node.all();
+          let diffed = false;
+
+          if (current.length === incoming.length) {
+            // Reference walk. `upsertOne` resolves the id with the node's OWN
+            // selectId, so this needs no access to the marker config.
+            const changed: E[] = [];
+            for (let i = 0; i < incoming.length; i++) {
+              if (current[i] !== incoming[i]) changed.push(incoming[i]);
+            }
+            if (changed.length < incoming.length) {
+              for (const entity of changed) node.upsertOne(entity as never);
+              // Guard against id divergence: if any incoming entity carried a
+              // DIFFERENT id than the row it replaced, upsert added rather
+              // than replaced and the count moved. Repair with the full
+              // rebuild rather than leave a half-applied restore — this is the
+              // one place a wrong shortcut would silently corrupt state.
+              diffed = node.count() === incoming.length;
+            }
           }
-        );
 
-        // OWNER-LOCATION-0. Same reason as `stored()`: a marker builds its own
-        // node, so the registry the leaf/branch sites attach in
-        // `signal-tree.ts` never reaches it. A collection is an addressable
-        // position — positionId, ownerPath, and restoration reverses it
-        // independently — and must be able to name its owning tree.
-        definePositionRegistry(
-          entitySignal as unknown as object,
-          context.positionRegistry
-        );
-
-        // Register as a reclamation target, but ONLY when something in this
-        // tree can restore. Without restoration authority the retirement
-        // boundary already releases everything at the moment of retirement, so
-        // a sink would have nothing to offer and the list would just pin the
-        // collection.
-        if (context.runtimeTreePlan.hasRestorationAuthority) {
-          context.physicalOwners.push(
-            entitySignal as unknown as (typeof context.physicalOwners)[number]
+          if (!diffed) node.setAll(incoming as never[]);
+        } else if (typeof ngDevMode === 'undefined' || ngDevMode) {
+          console.warn(
+            `SignalTree: entityMap hydrate ignored a payload with no ` +
+              `\`all\` array. The collection was left unchanged. This is a ` +
+              `PAYLOAD problem, not a registration one — a pre-2.0.0 ` +
+              `snapshot emitted \`map\`, which JSON renders as \`{}\`, so the ` +
+              `entities were never in it. [ST2024]`
           );
         }
-
-        // Computed slices
-        const slices = marker.__computedSlices;
-        if (slices) {
-          for (const [name, sliceConfig] of Object.entries(slices)) {
-            const computedSignal = context.locationRuntime.createDerived(() =>
-              sliceConfig.compute(entitySignal.all())
-            );
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (entitySignal as any)[name] = computedSignal;
-          }
-        }
-
-
-        return entitySignal;
       },
-      {
-        // STATE: the entities. `ids`, `count`, `empty` and `map` are all
-        // derived from `all` — and `map` is a JS `Map`, which JSON cannot
-        // represent, so it used to serialise as `{}`: a snapshot claiming the
-        // collection was EMPTY while holding 10,000 entities.
-        snapshot: (node) => ({ all: node.all() }),
-
-        hydrate: (node, value) => {
-          // ⚠️ NOTHING DECLINES HYDRATION ANY MORE, and that is the whole
-          // finding rather than a side effect. The decline here was
-          // loader-conditional — `typeof node.load === 'function'`, and `load`
-          // was attached only by the `loader()` feature. With loader deleted the
-          // predicate can never be true, so the branch was dead the moment its
-          // one producer went.
-          //
-          // M4 traced this trajectory already: `hydrate` had two implementers,
-          // `asyncSource` and `entityMap`; asyncSource's deletion left one, and
-          // loader's leaves ZERO declining paths. "A source-owning marker
-          // declines rehydration" is not an invariant that lost its carrier —
-          // it is a rule with no subject, because no marker in core owns an
-          // external source. Relationships do, and a relationship is `link()`.
-          //
-          // The RFC 0014 contrast — `transfer` accepts what `rehydrate`
-          // declines — is retired with it: both modes now accept.
-
-          if (value === null || typeof value !== 'object') return;
-          // A BARE ARRAY is a valid payload, not a malformed one.
-          //
-          // `tree.$({ rows: [...] })` is what a person or an AI writes to seed or
-          // reset a collection, and it used to half-apply: sibling leaves in the
-          // same payload took their values while the collection silently kept
-          // its old contents. In dev that emitted ST2024; in production it did
-          // nothing at all, which is the worst version of this — a partial
-          // hydrate is harder to notice than a failed one, because the parts
-          // that DID apply make it look like it worked.
-          //
-          // Accepting it is unambiguous. An entityMap SNAPSHOT always emits
-          // `{ all: [...] }`, so a bare array can never be mistaken for the
-          // snapshot shape, and no other payload this processor accepts is an
-          // array. The `all` wrapper stays the canonical round-trip form; this
-          // only stops the hand-written form from being silently dropped.
-          const all = Array.isArray(value)
-            ? value
-            : (value as { all?: unknown }).all;
-          if (Array.isArray(all)) {
-            // DIFF FIRST, `setAll` only as a fallback.
-            //
-            // `setAll` rebuilds the storage map, the id index and every
-            // per-entity signal — O(collection) on EVERY restore. Measured at
-            // 10k entities that is 3.62 ms per undo, and it is why undo/redo
-            // over a large collection was ~150x slower than an immutable-root
-            // history, which restores by swapping one reference.
-            //
-            // A snapshot SHARES its entity objects with the live tree —
-            // measured 499/500 identical after a single-entity change — so a
-            // reference walk finds exactly the rows that moved. Undoing one
-            // edit then costs one `updateOne` (~6 us) instead of a full
-            // `setAll` (~3.62 ms).
-            //
-            // The fast path is taken only when the id sequence is IDENTICAL,
-            // in order. Any add, removal or reorder falls back to `setAll`,
-            // because those change the index and the ordering guarantees that
-            // `setAll` exists to maintain.
-            const incoming = all as E[];
-            const current = node.all();
-            let diffed = false;
-
-            if (current.length === incoming.length) {
-              // Reference walk. `upsertOne` resolves the id with the node's OWN
-              // selectId, so this needs no access to the marker config.
-              const changed: E[] = [];
-              for (let i = 0; i < incoming.length; i++) {
-                if (current[i] !== incoming[i]) changed.push(incoming[i]);
-              }
-              if (changed.length < incoming.length) {
-                for (const entity of changed) node.upsertOne(entity as never);
-                // Guard against id divergence: if any incoming entity carried a
-                // DIFFERENT id than the row it replaced, upsert added rather
-                // than replaced and the count moved. Repair with the full
-                // rebuild rather than leave a half-applied restore — this is the
-                // one place a wrong shortcut would silently corrupt state.
-                diffed = node.count() === incoming.length;
-              }
-            }
-
-            if (!diffed) node.setAll(incoming as never[]);
-          } else if (typeof ngDevMode === 'undefined' || ngDevMode) {
-            console.warn(
-              `SignalTree: entityMap hydrate ignored a payload with no ` +
-                `\`all\` array. The collection was left unchanged. This is a ` +
-                `PAYLOAD problem, not a registration one — a pre-2.0.0 ` +
-                `snapshot emitted \`map\`, which JSON renders as \`{}\`, so the ` +
-                `entities were never in it. [ST2024]`
-            );
-          }
-        },
-      }
-    );
+    }
+  );
 
   const slices: EntityMapComputedSlices<E> = {};
 

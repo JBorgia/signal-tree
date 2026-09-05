@@ -1,7 +1,4 @@
-import type {
-  Location,
-  ReadableCell,
-} from './internals/cell-runtime';
+import type { Location, ReadableCell } from './internals/cell-runtime';
 import {
   createWritableProjection,
   deriveLocation,
@@ -27,9 +24,7 @@ import {
   type AcquiredSubjectHandle,
   type SubjectLifetimeRecord,
 } from './physical/structural-store';
-import {
-  defineOwnedOwnerPath,
-} from './internals/owned-mutation';
+import { defineOwnedOwnerPath } from './internals/owned-mutation';
 import type { PhysicalCommitClock } from './internals/physical-commit-clock';
 // Only `notify` is ever called on this — the neutral port contract, not the
 // delivery engine's full surface.
@@ -93,12 +88,9 @@ function setEntityPositionIdAllocatorForTesting(
 // ⚠️ NOT EXPORTED. Used only inside this module; the `export` was surplus.
 // (ORPHAN sweep, 15.0. Same-file-only proves the EXPORT is unnecessary — it says
 // nothing about who owns the code, and this code is live.)
-function setEntityPositionIdNotifyEnabledForTesting(
-  enabled = true
-): void {
+function setEntityPositionIdNotifyEnabledForTesting(enabled = true): void {
   entityPositionIdNotifyEnabled = enabled;
 }
-
 
 export type EntitySubjectPhysicalInventory<K extends string | number> = {
   subjectId: number;
@@ -112,10 +104,10 @@ export type EntitySubjectPhysicalInventory<K extends string | number> = {
   fieldFacadesMaterialized: readonly string[];
   positionIds: readonly PositionId[] | undefined;
   retainedValueBacking:
-  | {
-    kind: 'retained-entity-signal';
-  }
-  | undefined;
+    | {
+        kind: 'retained-entity-signal';
+      }
+    | undefined;
 };
 
 export type EntitySubjectReclamationResource =
@@ -411,7 +403,9 @@ export function createEntitySignal<
     publish(options?: { advancePhysicalRevision?: boolean }): void;
   } {
     if (positionId === undefined || target.owner !== positionId) {
-      throw new Error('Collection transition target owner does not match the binding');
+      throw new Error(
+        'Collection transition target owner does not match the binding'
+      );
     }
 
     const currentSubjects = new Map<number, { key: K; value: E }>();
@@ -473,7 +467,7 @@ export function createEntitySignal<
         },
       ])
     );
-    const publications = [...affectedSubjects].map((subjectId) => {
+    const subjectChanges = [...affectedSubjects].map((subjectId) => {
       const before = currentSubjects.get(subjectId);
       const after = preparedBySubject.get(subjectId);
       return {
@@ -495,7 +489,7 @@ export function createEntitySignal<
         valueStore.installPreparedTargetValues(valueTarget);
       },
       publish(options): void {
-        for (const publication of publications) {
+        for (const publication of subjectChanges) {
           if (publication.valueSignal) {
             replaceLocation(publication.valueSignal, publication.afterValue);
           }
@@ -518,20 +512,20 @@ export function createEntitySignal<
                   ...publication.targetNeighbors,
                 }
               : publication.afterKey === undefined
-                ? {
-                    kind: 'remove',
-                    subject: publication.subjectId,
-                    key,
-                    value: publication.beforeValue,
-                  }
-                : publication.beforeKey !== publication.afterKey
-                  ? {
-                      kind: 'rekey',
-                      subject: publication.subjectId,
-                      beforeKey: publication.beforeKey,
-                      afterKey: publication.afterKey,
-                    }
-                  : undefined;
+              ? {
+                  kind: 'remove',
+                  subject: publication.subjectId,
+                  key,
+                  value: publication.beforeValue,
+                }
+              : publication.beforeKey !== publication.afterKey
+              ? {
+                  kind: 'rekey',
+                  subject: publication.subjectId,
+                  beforeKey: publication.beforeKey,
+                  afterKey: publication.afterKey,
+                }
+              : undefined;
           pathNotifier.notify(
             `${basePath}.${String(key)}`,
             publication.afterValue,
@@ -561,11 +555,14 @@ export function createEntitySignal<
     }
     const subjects = structuralStore.activeKeysSnapshot().map((key) => {
       const subject = structuralStore.subjectIdForKey(key);
-      const value = subject === undefined
-        ? undefined
-        : valueStore.backingForSubject(subject);
+      const value =
+        subject === undefined
+          ? undefined
+          : valueStore.backingForSubject(subject);
       if (subject === undefined || value === undefined) {
-        throw new Error('Collection transition source is missing active subject truth');
+        throw new Error(
+          'Collection transition source is missing active subject truth'
+        );
       }
       return { subject, key, value };
     });
@@ -605,18 +602,20 @@ export function createEntitySignal<
       ? allSignal().map((e) => selectId(e))
       : [...structuralStore.activeKeysSnapshot()];
   });
-  const mapSignal: ReadableCell<ReadonlyMap<K, E>> = createVersionedProjection(() => {
-    // Still a copy: callers may hold the result across mutations and must not
-    // see it change underneath them. But it is paid on read, not on write.
-    return new Map(getProjectedEntries());
-  });
+  const mapSignal: ReadableCell<ReadonlyMap<K, E>> = createVersionedProjection(
+    () => {
+      // Still a copy: callers may hold the result across mutations and must not
+      // see it change underneath them. But it is paid on read, not on write.
+      return new Map(getProjectedEntries());
+    }
+  );
 
   /**
    * Per-entity signals — the body-granular reactivity layer.
    *
-  * Each entity that is read via `byId()`/node access gets its own
-  * `Location<E | undefined>`. Per-entity field reads and `node()` depend ONLY
-  * on this location, not on the whole-collection `mapSignal`, so
+   * Each entity that is read via `byId()`/node access gets its own
+   * `Location<E | undefined>`. Per-entity field reads and `node()` depend ONLY
+   * on this location, not on the whole-collection `mapSignal`, so
    * updating one entity dirties only that entity's readers (fan-out 1) instead
    * of every entity's computeds (fan-out N). Collection queries (`all`, `map`,
    * `count`, `ids`, `where`, `find`, computed slices) still depend on the
@@ -646,7 +645,10 @@ export function createEntitySignal<
   let lastSubjectIds: number[] | undefined;
 
   type PendingStructuralEffect = StructuralEffect;
-  type PendingAddStructuralEffect = Extract<PendingStructuralEffect, { kind: 'add' }>;
+  type PendingAddStructuralEffect = Extract<
+    PendingStructuralEffect,
+    { kind: 'add' }
+  >;
 
   /**
    * The ambient write context, ALWAYS carrying this collection's owning tree.
@@ -746,20 +748,23 @@ export function createEntitySignal<
     );
     console.warn(
       `SignalTree: \`${method}()\` received ${window.count} DIFFERENT functions ` +
-      `with identical source in ${Math.round(now - window.start)}ms ` +
-      `(~${perSecond}/second) — a rate only change detection produces. ` +
-      `Results are memoised per predicate IDENTITY, so an inline arrow misses ` +
-      `the cache every cycle and re-scans the collection: measured at 75x a ` +
-      `hoisted predicate over 1,000 entities. Hoist it to a stable reference ` +
-      `(a class field or module constant) and call ` +
-      `\`${method}(thePredicate)()\`. Source: ${source.slice(0, 80)} [ST2026]`
+        `with identical source in ${Math.round(now - window.start)}ms ` +
+        `(~${perSecond}/second) — a rate only change detection produces. ` +
+        `Results are memoised per predicate IDENTITY, so an inline arrow misses ` +
+        `the cache every cycle and re-scans the collection: measured at 75x a ` +
+        `hoisted predicate over 1,000 entities. Hoist it to a stable reference ` +
+        `(a class field or module constant) and call ` +
+        `\`${method}(thePredicate)()\`. Source: ${source.slice(0, 80)} [ST2026]`
     );
   }
 
   /** Subjects that have moved to a new key and must not fall back to the old one. */
   const rekeyedSubjects = new Set<number>();
 
-  function planRekey(from: K, to: K): {
+  function planRekey(
+    from: K,
+    to: K
+  ): {
     commit(options?: { advancePhysicalRevision?: boolean }): void;
     publish(metaOverride?: WriteMetadata): void;
   } {
@@ -967,7 +972,9 @@ export function createEntitySignal<
 
     let s = entitySignals.get(subjectId);
     if (!s) {
-      s = locations.createCell<E | undefined>(valueStore.backingForSubject(subjectId));
+      s = locations.createCell<E | undefined>(
+        valueStore.backingForSubject(subjectId)
+      );
       entitySignals.set(subjectId, s);
     }
     return s;
@@ -1079,7 +1086,9 @@ export function createEntitySignal<
     const state = resolveSubjectState(subjectId);
     if (state && !state.restoreAllowed) {
       throw new Error(
-        `Subject ${String(subjectId)} has retired backing and cannot be restored.`
+        `Subject ${String(
+          subjectId
+        )} has retired backing and cannot be restored.`
       );
     }
 
@@ -1130,7 +1139,9 @@ export function createEntitySignal<
     const existingState = resolveSubjectState(subjectId);
     if (existingState) {
       throw new Error(
-        `Subject ${String(subjectId)} already exists and cannot be realized as fresh.`
+        `Subject ${String(
+          subjectId
+        )} already exists and cannot be realized as fresh.`
       );
     }
 
@@ -1262,7 +1273,9 @@ export function createEntitySignal<
     }
   }
 
-  function assertSynchronousInterceptors(handlers: InterceptHandlers<E, K>): void {
+  function assertSynchronousInterceptors(
+    handlers: InterceptHandlers<E, K>
+  ): void {
     assertSynchronousInterceptorFunction(handlers.onAdd, 'onAdd');
     assertSynchronousInterceptorFunction(handlers.onUpdate, 'onUpdate');
     assertSynchronousInterceptorFunction(handlers.onRemove, 'onRemove');
@@ -1328,7 +1341,9 @@ export function createEntitySignal<
     const transformedEntity = interceptAddedEntity(entity);
     const subjectId = structuralStore.planFreshSubjectIds(1)[0];
     if (subjectId === undefined) {
-      throw new Error(`Fresh subject planning for ${String(id)} did not produce an id.`);
+      throw new Error(
+        `Fresh subject planning for ${String(id)} did not produce an id.`
+      );
     }
 
     const frame = createEntityMutationFrame();
@@ -1346,7 +1361,9 @@ export function createEntitySignal<
       key: id,
       value: deepClone(transformedEntity),
       beforeSubject:
-        previousLastKey === undefined ? undefined : allocateSubjectId(previousLastKey),
+        previousLastKey === undefined
+          ? undefined
+          : allocateSubjectId(previousLastKey),
     };
     lastSubjectIds = [subjectId];
     invalidateNodeCache(id);
@@ -1382,7 +1399,8 @@ export function createEntitySignal<
     }
 
     const s = entitySignals.get(subjectId);
-    if (s) pendingEntitySignalValues.set(s, valueStore.backingForSubject(subjectId));
+    if (s)
+      pendingEntitySignalValues.set(s, valueStore.backingForSubject(subjectId));
   }
 
   /**
@@ -1435,12 +1453,12 @@ export function createEntitySignal<
   const nodeFinalizer =
     typeof FinalizationRegistry === 'function'
       ? new FinalizationRegistry<number>((subjectId) => {
-        // Only drop the slot if it is still the dead ref — a later byId()
-        // may already have installed a live replacement.
-        if (nodeCache.get(subjectId)?.deref() === undefined) {
-          nodeCache.delete(subjectId);
-        }
-      })
+          // Only drop the slot if it is still the dead ref — a later byId()
+          // may already have installed a live replacement.
+          if (nodeCache.get(subjectId)?.deref() === undefined) {
+            nodeCache.delete(subjectId);
+          }
+        })
       : null;
 
   function invalidateNodeCache(id: K): void {
@@ -1477,13 +1495,14 @@ export function createEntitySignal<
     ) {
       warnedMissingId = true;
       console.warn(
-        `SignalTree entityMap${basePath ? ` at "${basePath}"` : ''
+        `SignalTree entityMap${
+          basePath ? ` at "${basePath}"` : ''
         }: an entity ` +
-        `resolved to id=${String(
-          id
-        )}. Entities need a stable key — give them ` +
-        `an \`id\` field or pass entityMap({ selectId: (e) => e.yourKey }). ` +
-        `Without it, entities collide under a single key. [ST2001]`
+          `resolved to id=${String(
+            id
+          )}. Entities need a stable key — give them ` +
+          `an \`id\` field or pass entityMap({ selectId: (e) => e.yourKey }). ` +
+          `Without it, entities collide under a single key. [ST2001]`
       );
     }
     return id;
@@ -1512,7 +1531,11 @@ export function createEntitySignal<
     });
   }
 
-  function createEntityNode(subjectId: number, initialKey: K, entity: E): EntityNode<E> {
+  function createEntityNode(
+    subjectId: number,
+    initialKey: K,
+    entity: E
+  ): EntityNode<E> {
     // Entity-level callable:
     //   node()           → reads current entity (reactive via mapSignal)
     //   node(value)      → full entity REPLACE (throws if entity removed)
@@ -1588,21 +1611,24 @@ export function createEntitySignal<
       return undefined;
     }) as unknown as EntityNode<E>;
 
-    // Field locations derive their read from the subject-owned entity location.
+    // Field projections derive their read from the subject-owned entity location.
     // Writes delegate to api.updateOne so interceptors and tap handlers still run.
     for (const key of Object.keys(entity)) {
       const fieldKey = key as keyof E;
-      const fieldRead = locations.createDerived(() => entitySig()?.[fieldKey]);
-      const fieldSignal = createWritableProjection(
-        fieldRead,
-        (value: E[typeof fieldKey] | undefined) => {
-          const key = currentKey();
-          if (key === undefined) {
-            throw new Error(`Entity with subject ${String(subjectId)} not found`);
-          }
-          api.updateOne(key, { [fieldKey]: value } as Partial<E>);
+      const computeField = () => entitySig()?.[fieldKey];
+      const writeField = (value: E[typeof fieldKey] | undefined) => {
+        const key = currentKey();
+        if (key === undefined) {
+          throw new Error(`Entity with subject ${String(subjectId)} not found`);
         }
-      );
+        api.updateOne(key, { [fieldKey]: value } as Partial<E>);
+      };
+      const fieldSignal = locations.createWritableProjection
+        ? locations.createWritableProjection(computeField, writeField)
+        : createWritableProjection(
+            locations.createDerived(computeField),
+            writeField
+          );
 
       if (ownerMetadataEnabled) {
         Object.defineProperty(fieldSignal, '__ownerPath', {
@@ -1666,9 +1692,12 @@ export function createEntitySignal<
     const fieldFacadesMaterialized =
       node === undefined
         ? []
-        : Object.keys(node as Record<string, unknown>).filter((key) =>
-          typeof (node as Record<string, unknown>)[key] === 'function'
-        ).sort((left, right) => left.localeCompare(right));
+        : Object.keys(node as Record<string, unknown>)
+            .filter(
+              (key) =>
+                typeof (node as Record<string, unknown>)[key] === 'function'
+            )
+            .sort((left, right) => left.localeCompare(right));
 
     return {
       subjectId,
@@ -1722,22 +1751,33 @@ export function createEntitySignal<
     const state = resolveSubjectState(prepared.subjectId);
     if (prepared.expectedLifetime !== 'tombstoned') {
       throw new Error(
-        `Prepared reclamation for subject ${String(prepared.subjectId)} has an unsupported expected lifetime.`
+        `Prepared reclamation for subject ${String(
+          prepared.subjectId
+        )} has an unsupported expected lifetime.`
       );
     }
     if (!state) {
       throw new Error(
-        `Prepared reclamation for subject ${String(prepared.subjectId)} no longer matches active lifetime state.`
+        `Prepared reclamation for subject ${String(
+          prepared.subjectId
+        )} no longer matches active lifetime state.`
       );
     }
-    if (getSubjectRevision(prepared.subjectId) !== prepared.expectedSubjectRevision) {
+    if (
+      getSubjectRevision(prepared.subjectId) !==
+      prepared.expectedSubjectRevision
+    ) {
       throw new Error(
-        `Prepared reclamation for subject ${String(prepared.subjectId)} is stale.`
+        `Prepared reclamation for subject ${String(
+          prepared.subjectId
+        )} is stale.`
       );
     }
     if (state.active) {
       throw new Error(
-        `Prepared reclamation for subject ${String(prepared.subjectId)} no longer matches active lifetime state.`
+        `Prepared reclamation for subject ${String(
+          prepared.subjectId
+        )} no longer matches active lifetime state.`
       );
     }
 
@@ -1886,11 +1926,15 @@ export function createEntitySignal<
     // nobody read has none.
   }
 
-  function retireSubjectRetainedValueBackingForTesting(subjectId: number): void {
+  function retireSubjectRetainedValueBackingForTesting(
+    subjectId: number
+  ): void {
     const subjectState = resolveSubjectState(subjectId);
     if (!subjectState || subjectState.active) {
       throw new Error(
-        `Subject ${String(subjectId)} must be tombstoned before retiring retained value backing.`
+        `Subject ${String(
+          subjectId
+        )} must be tombstoned before retiring retained value backing.`
       );
     }
 
@@ -2015,7 +2059,9 @@ export function createEntitySignal<
 
     // Bare canonical name (the `.isEmpty` alias was removed in v11).
     get empty(): ReadableCell<boolean> {
-      return (cachedEmpty ??= locations.createDerived(() => countSignal() === 0));
+      return (cachedEmpty ??= locations.createDerived(
+        () => countSignal() === 0
+      ));
     },
 
     where(predicate: (entity: E) => boolean): ReadableCell<E[]> {
@@ -2147,11 +2193,11 @@ export function createEntitySignal<
      * keyed by the old id moves together: storage (keeping list position), the
      * per-entity signal, the node cache, and the active-entity selection.
      *
-    * Held row/field references follow the rekey by SUBJECT identity rather than
-    * by the old key. The old lookup disappears, but already-materialized row
-    * state, metadata, and field signals remain attached to the same subject.
-    * That keeps list position, active selection, and row-local reactivity while
-    * still allowing the freed id to be reused by a different subject.
+     * Held row/field references follow the rekey by SUBJECT identity rather than
+     * by the old key. The old lookup disappears, but already-materialized row
+     * state, metadata, and field signals remain attached to the same subject.
+     * That keeps list position, active selection, and row-local reactivity while
+     * still allowing the freed id to be reused by a different subject.
      */
     changeId(from: K, to: K): void {
       const planned = planRekey(from, to);
@@ -2193,16 +2239,20 @@ export function createEntitySignal<
         existingSubjectId,
       }));
       const plannedFreshSubjectIds = structuralStore.planFreshSubjectIds(
-        stagedAdds.filter(({ existingSubjectId }) => existingSubjectId === undefined).length
+        stagedAdds.filter(
+          ({ existingSubjectId }) => existingSubjectId === undefined
+        ).length
       );
       let plannedFreshIndex = 0;
-      const preparedAdds = stagedAdds.map(({ id, entity, existingSubjectId }) => ({
-        id,
-        entity,
-        existingSubjectId,
-        subjectId:
-          existingSubjectId ?? plannedFreshSubjectIds[plannedFreshIndex++],
-      }));
+      const preparedAdds = stagedAdds.map(
+        ({ id, entity, existingSubjectId }) => ({
+          id,
+          entity,
+          existingSubjectId,
+          subjectId:
+            existingSubjectId ?? plannedFreshSubjectIds[plannedFreshIndex++],
+        })
+      );
 
       const frame = createEntityMutationFrame();
       for (const {
@@ -2239,10 +2289,7 @@ export function createEntitySignal<
       const processedIds: K[] = [];
       const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
 
-      for (const {
-        entity: transformedEntity,
-        id,
-      } of preparedAdds) {
+      for (const { entity: transformedEntity, id } of preparedAdds) {
         const subjectId = subjectIdsByKey.get(id);
         if (subjectId === undefined) {
           throw new Error(`Entity with id ${String(id)} has no subject id`);
@@ -2268,7 +2315,9 @@ export function createEntitySignal<
       // Notify PathNotifier for each processed entity
       for (let i = 0; i < addedEntities.length; i++) {
         const { id, entity } = addedEntities[i];
-        const beforeKey = previousKeys.at(i + previousKeys.length - addedEntities.length);
+        const beforeKey = previousKeys.at(
+          i + previousKeys.length - addedEntities.length
+        );
         pathNotifier.notify(
           `${basePath}.${String(id)}`,
           entity,
@@ -2282,7 +2331,9 @@ export function createEntitySignal<
             key: id,
             value: deepClone(entity),
             beforeSubject:
-              beforeKey === undefined ? undefined : allocateSubjectId(beforeKey),
+              beforeKey === undefined
+                ? undefined
+                : allocateSubjectId(beforeKey),
           })
         );
       }
@@ -2680,7 +2731,9 @@ export function createEntitySignal<
         });
       }
 
-      const subjectIdsForWrite = preparedRemovals.map(({ subjectId }) => subjectId);
+      const subjectIdsForWrite = preparedRemovals.map(
+        ({ subjectId }) => subjectId
+      );
       lastSubjectIds = subjectIdsForWrite;
 
       const frame = createEntityMutationFrame();
@@ -2712,12 +2765,7 @@ export function createEntitySignal<
 
       // Notify PathNotifier for each removed entity
       for (let i = 0; i < preparedRemovals.length; i++) {
-        const {
-          id,
-          entity,
-          beforeSubject,
-          afterSubject,
-        } = preparedRemovals[i];
+        const { id, entity, beforeSubject, afterSubject } = preparedRemovals[i];
         pathNotifier.notify(
           `${basePath}.${String(id)}`,
           undefined,
@@ -2776,7 +2824,8 @@ export function createEntitySignal<
 
       // Separate adds from updates
       const toAdd: Array<{ entity: E; id: K }> = [];
-      const toUpdate: Array<{ entity: E; id: K; prev: E; subjectId: number }> = [];
+      const toUpdate: Array<{ entity: E; id: K; prev: E; subjectId: number }> =
+        [];
 
       for (const entity of entities) {
         const id = deriveId(entity, opts);
@@ -2808,7 +2857,9 @@ export function createEntitySignal<
         };
       });
 
-      const freshSubjectIds = commitFreshSubjects(stagedAdds.map(({ id }) => id));
+      const freshSubjectIds = commitFreshSubjects(
+        stagedAdds.map(({ id }) => id)
+      );
       const addedSubjectIdsByKey = new Map<K, number>();
       for (let i = 0; i < stagedAdds.length; i++) {
         addedSubjectIdsByKey.set(stagedAdds[i].id, freshSubjectIds[i]);
@@ -2843,15 +2894,28 @@ export function createEntitySignal<
       } of stagedUpdates) {
         valueStore.retainSubjectValue(subjectId, finalUpdated);
         syncEntitySignal(id);
-        updatedEntities.push({ id, subjectId, prev, finalUpdated, transformedChanges });
+        updatedEntities.push({
+          id,
+          subjectId,
+          prev,
+          finalUpdated,
+          transformedChanges,
+        });
       }
 
       // Single signal update after all entities are processed
       updateSignals();
 
-      const addedSubjectIdsForWrite = addedEntities.map(({ subjectId }) => subjectId);
-      const updatedSubjectIdsForWrite = updatedEntities.map(({ subjectId }) => subjectId);
-      lastSubjectIds = [...addedSubjectIdsForWrite, ...updatedSubjectIdsForWrite];
+      const addedSubjectIdsForWrite = addedEntities.map(
+        ({ subjectId }) => subjectId
+      );
+      const updatedSubjectIdsForWrite = updatedEntities.map(
+        ({ subjectId }) => subjectId
+      );
+      lastSubjectIds = [
+        ...addedSubjectIdsForWrite,
+        ...updatedSubjectIdsForWrite,
+      ];
 
       // Notify PathNotifier for added entities
       for (let i = 0; i < addedEntities.length; i++) {
@@ -2997,27 +3061,29 @@ export function createEntitySignal<
         const id = deriveId(entity, opts);
         const transformedEntity = currentIds.has(id)
           ? (() => {
-            let replacement = entity;
-            for (const handler of interceptHandlers) {
-              const ctx: InterceptContext<Partial<E>> = {
-                block: (reason?: string) => {
-                  throw new Error(
-                    `Cannot replace entity: ${reason || 'blocked by interceptor'}`
-                  );
-                },
-                transform: (value: Partial<E>) => {
-                  replacement = value as E;
-                },
-                blocked: false,
-                blockReason: undefined,
-              };
-              assertSynchronousInterceptorResult(
-                handler.onUpdate?.(id, entity as Partial<E>, ctx),
-                'onUpdate'
-              );
-            }
-            return replacement;
-          })()
+              let replacement = entity;
+              for (const handler of interceptHandlers) {
+                const ctx: InterceptContext<Partial<E>> = {
+                  block: (reason?: string) => {
+                    throw new Error(
+                      `Cannot replace entity: ${
+                        reason || 'blocked by interceptor'
+                      }`
+                    );
+                  },
+                  transform: (value: Partial<E>) => {
+                    replacement = value as E;
+                  },
+                  blocked: false,
+                  blockReason: undefined,
+                };
+                assertSynchronousInterceptorResult(
+                  handler.onUpdate?.(id, entity as Partial<E>, ctx),
+                  'onUpdate'
+                );
+              }
+              return replacement;
+            })()
           : interceptAddedEntity(entity);
 
         if (!stagedIncomingById.has(id)) {
@@ -3097,7 +3163,9 @@ export function createEntitySignal<
         stagedIncomingIds.map((id, index) => [id, index] as const)
       );
 
-      const freshSubjectIds = commitFreshSubjects(stagedAdds.map(({ id }) => id));
+      const freshSubjectIds = commitFreshSubjects(
+        stagedAdds.map(({ id }) => id)
+      );
       const freshSubjectIdsByKey = new Map<K, number>();
       for (let index = 0; index < stagedAdds.length; index += 1) {
         freshSubjectIdsByKey.set(stagedAdds[index].id, freshSubjectIds[index]);
@@ -3113,7 +3181,10 @@ export function createEntitySignal<
 
           for (let index = currentIndex - 1; index >= 0; index -= 1) {
             const neighborId = currentEntries[index]?.[0];
-            if (neighborId !== undefined && survivingOriginalIds.has(neighborId)) {
+            if (
+              neighborId !== undefined &&
+              survivingOriginalIds.has(neighborId)
+            ) {
               beforeSubject = resolveSubjectId(neighborId);
               break;
             }
@@ -3125,7 +3196,10 @@ export function createEntitySignal<
             index += 1
           ) {
             const neighborId = currentEntries[index]?.[0];
-            if (neighborId !== undefined && survivingOriginalIds.has(neighborId)) {
+            if (
+              neighborId !== undefined &&
+              survivingOriginalIds.has(neighborId)
+            ) {
               afterSubject = resolveSubjectId(neighborId);
               break;
             }
@@ -3188,7 +3262,9 @@ export function createEntitySignal<
       if (
         positionId !== undefined &&
         beforeSubjects.length === afterSubjects.length &&
-        beforeSubjects.every((subjectId) => afterSubjects.includes(subjectId)) &&
+        beforeSubjects.every((subjectId) =>
+          afterSubjects.includes(subjectId)
+        ) &&
         beforeSubjects.some(
           (subjectId, index) => subjectId !== afterSubjects[index]
         )
@@ -3204,47 +3280,49 @@ export function createEntitySignal<
         });
       }
 
-      const stagedAddStructuralEffects = stagedAdds.map(({ id, entity }, index) => {
-        const subjectId = addedSubjectIds[index];
-        const finalIndex = finalIndexById.get(id) ?? -1;
-        let beforeSubject: number | undefined;
-        let afterSubject: number | undefined;
+      const stagedAddStructuralEffects = stagedAdds.map(
+        ({ id, entity }, index) => {
+          const subjectId = addedSubjectIds[index];
+          const finalIndex = finalIndexById.get(id) ?? -1;
+          let beforeSubject: number | undefined;
+          let afterSubject: number | undefined;
 
-        for (let cursor = finalIndex - 1; cursor >= 0; cursor -= 1) {
-          const neighborId = stagedIncomingIds[cursor];
-          if (neighborId === undefined) {
-            continue;
+          for (let cursor = finalIndex - 1; cursor >= 0; cursor -= 1) {
+            const neighborId = stagedIncomingIds[cursor];
+            if (neighborId === undefined) {
+              continue;
+            }
+            beforeSubject = resolveSubjectId(neighborId);
+            if (beforeSubject !== undefined) {
+              break;
+            }
           }
-          beforeSubject = resolveSubjectId(neighborId);
-          if (beforeSubject !== undefined) {
-            break;
+
+          for (
+            let cursor = finalIndex + 1;
+            cursor < stagedIncomingIds.length;
+            cursor += 1
+          ) {
+            const neighborId = stagedIncomingIds[cursor];
+            if (neighborId === undefined) {
+              continue;
+            }
+            afterSubject = resolveSubjectId(neighborId);
+            if (afterSubject !== undefined) {
+              break;
+            }
           }
+
+          return {
+            kind: 'add' as const,
+            subject: subjectId,
+            key: id,
+            value: deepClone(entity),
+            beforeSubject,
+            afterSubject,
+          };
         }
-
-        for (
-          let cursor = finalIndex + 1;
-          cursor < stagedIncomingIds.length;
-          cursor += 1
-        ) {
-          const neighborId = stagedIncomingIds[cursor];
-          if (neighborId === undefined) {
-            continue;
-          }
-          afterSubject = resolveSubjectId(neighborId);
-          if (afterSubject !== undefined) {
-            break;
-          }
-        }
-
-        return {
-          kind: 'add' as const,
-          subject: subjectId,
-          key: id,
-          value: deepClone(entity),
-          beforeSubject,
-          afterSubject,
-        };
-      });
+      );
 
       updateSignals();
 
@@ -3451,7 +3529,9 @@ export function createEntitySignal<
       options: EntitySubjectReclamationPlanningOptions
     ) => {
       const inventory = inspectSubjectResources(subjectId);
-      return inventory ? planEntitySubjectReclamation(inventory, options) : undefined;
+      return inventory
+        ? planEntitySubjectReclamation(inventory, options)
+        : undefined;
     },
     enumerable: false,
     configurable: true,
@@ -3498,7 +3578,7 @@ export function createEntitySignal<
         warnedWrongMethods.add(prop);
         console.warn(
           `SignalTree entityMap has no \`.${prop}()\`. Did you mean: ` +
-          `${WRONG_ENTITY_METHODS[prop]}? [ST2002]`
+            `${WRONG_ENTITY_METHODS[prop]}? [ST2002]`
         );
       }
       // All other access goes directly to api
@@ -3508,13 +3588,21 @@ export function createEntitySignal<
   return proxy;
 }
 
-Object.defineProperty(createEntitySignal, '__setPositionIdAllocatorForTesting', {
-  value: setEntityPositionIdAllocatorForTesting,
-  enumerable: false,
-  configurable: true,
-});
-Object.defineProperty(createEntitySignal, '__setPositionIdNotifyEnabledForTesting', {
-  value: setEntityPositionIdNotifyEnabledForTesting,
-  enumerable: false,
-  configurable: true,
-});
+Object.defineProperty(
+  createEntitySignal,
+  '__setPositionIdAllocatorForTesting',
+  {
+    value: setEntityPositionIdAllocatorForTesting,
+    enumerable: false,
+    configurable: true,
+  }
+);
+Object.defineProperty(
+  createEntitySignal,
+  '__setPositionIdNotifyEnabledForTesting',
+  {
+    value: setEntityPositionIdNotifyEnabledForTesting,
+    enumerable: false,
+    configurable: true,
+  }
+);

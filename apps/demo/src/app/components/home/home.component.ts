@@ -109,23 +109,23 @@ tree.$.profile(current => ({
 }));                                   // update branch
 
 tree.$.count();                        // read leaf
-tree.$.count(5);                       // replace leaf
-tree.$.count(n => n + 1);              // update leaf
+tree.$.count.set(5);                   // replace leaf
+tree.$.count.update(n => n + 1);       // derive leaf
 
-tree.$.range({ start: 5, end: 15 });   // replace terminal object
-tree.$.onCount(leaf((count) => {        // replace callable data
+tree.$.range.set({ start: 5, end: 15 }); // replace terminal object
+tree.$.onCount.set((count) => {         // replace callable data
   console.info(count);
-}));`,
+});`,
     },
     {
       label: 'causal-writes.ts',
       language: 'typescript',
       source: `import { external, undoable } from '@signal-tree/angular';
 
-tree.$.count(1);                       // authored, undesignated
+tree.$.count.set(1);                   // authored, undesignated
 
 undoable(() => {
-  tree.$.profile.role('architect');
+  tree.$.profile.role.set('architect');
 });                                   // authored + restoration-designated
 
 const profile = await api.loadProfile();

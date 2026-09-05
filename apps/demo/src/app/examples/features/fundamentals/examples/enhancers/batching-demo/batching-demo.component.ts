@@ -170,25 +170,25 @@ export class BatchingDemoComponent implements OnDestroy {
 
   private restoreInitialState(): void {
     this.tree.batch(() => {
-      this.alice.postCount(4);
-      this.bob.postCount(2);
-      this.featuredPost.authorId(ALICE_ID);
+      this.alice.postCount.set(4);
+      this.bob.postCount.set(2);
+      this.featuredPost.authorId.set(ALICE_ID);
     });
     this.tree.flushNotifications();
   }
 
   private decrementAlice(): void {
-    this.alice.postCount((count) => count - 1);
+    this.alice.postCount.update((count) => count - 1);
     this.writesPerformed.update((count) => count + 1);
   }
 
   private incrementBob(): void {
-    this.bob.postCount((count) => count + 1);
+    this.bob.postCount.update((count) => count + 1);
     this.writesPerformed.update((count) => count + 1);
   }
 
   private transferPost(): void {
-    this.featuredPost.authorId(BOB_ID);
+    this.featuredPost.authorId.set(BOB_ID);
     this.writesPerformed.update((count) => count + 1);
   }
 

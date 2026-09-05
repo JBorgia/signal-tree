@@ -53,7 +53,7 @@ describe('PUBLIC CARRIER — toWritableSignal is reachable from @signal-tree/ang
     host.model.set('Grace');
     expect(host.tree.$.name()).toBe('Grace');
 
-    host.tree.$.name('Lin');
+    host.tree.$.name.set('Lin');
     TestBed.flushEffects();
     await flush();
     expect(host.model()).toBe('Lin');
@@ -71,7 +71,7 @@ describe('PUBLIC CARRIER — toWritableSignal is reachable from @signal-tree/ang
     fixture.detectChanges();
     const host = fixture.componentInstance;
 
-    host.tree.$.count(5);
+    host.tree.$.count.set(5);
     host.model.update((current) => current + 1);
 
     expect(host.tree.$.count()).toBe(6);
@@ -82,17 +82,14 @@ describe('PUBLIC CARRIER — toWritableSignal is reachable from @signal-tree/ang
     @Component({ standalone: true, template: '' })
     class Host {
       private readonly injector = inject(Injector);
-      readonly tree = signalTree(
-        { count: 0 },
-        { enhancers: [transactions()] }
-      );
+      readonly tree = signalTree({ count: 0 }, { enhancers: [transactions()] });
       readonly model = toWritableSignal(this.tree.$.count, this.injector);
     }
 
     const fixture = TestBed.createComponent(Host);
     fixture.detectChanges();
     const host = fixture.componentInstance;
-    const pending = host.tree.transaction(() => host.tree.$.count(1));
+    const pending = host.tree.transaction(() => host.tree.$.count.set(1));
 
     host.model.update((current) => current + 1);
     await flush();
@@ -105,17 +102,14 @@ describe('PUBLIC CARRIER — toWritableSignal is reachable from @signal-tree/ang
     @Component({ standalone: true, template: '' })
     class Host {
       private readonly injector = inject(Injector);
-      readonly tree = signalTree(
-        { count: 0 },
-        { enhancers: [transactions()] }
-      );
+      readonly tree = signalTree({ count: 0 }, { enhancers: [transactions()] });
       readonly model = toWritableSignal(this.tree.$.count, this.injector);
     }
 
     const fixture = TestBed.createComponent(Host);
     fixture.detectChanges();
     const host = fixture.componentInstance;
-    const pending = host.tree.transaction(() => host.tree.$.count(1));
+    const pending = host.tree.transaction(() => host.tree.$.count.set(1));
 
     host.model.set(2);
     await flush();
@@ -189,14 +183,14 @@ describe('PUBLIC CARRIER — toWritableSignal is reachable from @signal-tree/ang
     await flush();
     const before = tree.getRestorationHistory().length;
 
-    tree.$.editForm.name('plain');
+    tree.$.editForm.name.set('plain');
     await flush();
 
     expect(tree.getRestorationHistory().length).toBe(before);
 
     // ...and the same write DOES record when designated, so the mechanism is
     // provably exercised in both directions.
-    undoable(() => tree.$.editForm.name('designated'));
+    undoable(() => tree.$.editForm.name.set('designated'));
     await flush();
     expect(tree.getRestorationHistory().length).toBeGreaterThan(before);
   });
@@ -237,7 +231,7 @@ describe('PUBLIC CARRIER — defineStore (Angular package) provides a tree throu
     // providedIn: 'root' means one instance for the injector.
     expect(a).toBe(b);
     expect(a.$.n()).toBe(1);
-    a.$.n(2);
+    a.$.n.set(2);
     expect(a.$.n()).toBe(2);
   });
 });

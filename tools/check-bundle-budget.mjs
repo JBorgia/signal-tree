@@ -184,6 +184,12 @@ const TARGETS = {
     // +158, leaf +133, intrinsic observers +35, offset by owned-mutation -268
     // and scalar-runtime -126. This is the callable contract, not an optional
     // module leak.
+    // Framework-native leaf realization now lives behind the adapter entry.
+    // The first implementation left its native branches in the mandatory
+    // location/scalar modules and measured 10.80KB prod / 12.95KB dev here.
+    // Splitting complete kernel-owned native runtimes behind `kernel/adapter`
+    // restores the neutral floor to 9.95KB prod / 12.10KB dev without changing
+    // Angular or Vue semantics.
     devKB: 12.2,
     prodKB: 10.0,
     code: `
@@ -345,6 +351,9 @@ const TARGETS = {
     // identity. With the shared callable kernel included, the measured floor is
     // 21.96KB prod / 24.60KB dev. The ceilings retain narrow headroom without
     // weakening field identity, raw ingress, or terminal topology.
+    // Carrier-specific query and field realizations move that floor to 22.01KB
+    // prod / 24.66KB dev after adapter-only runtime splitting; the native
+    // implementation remains absent from neutral bundles.
     devKB: 24.8,
     prodKB: 22.1,
     code: `

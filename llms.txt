@@ -30,24 +30,24 @@ v15 ships four packages under the hyphenated `@signal-tree/*` scope (the pre-15
   links, and the `restoration()` / `transactions()` / `batching()` / `devTools()`
   enhancers. Also `@signal-tree/kernel/adapter`, the realization SDK.
 - `@signal-tree/angular` — the complete Angular application facade. **Angular
-  code imports `signalTree` and all other SignalTree APIs from here**. Universal
-  locations establish hidden Angular dependencies when read. Adds `defineStore()`
-  and the explicit `toWritableSignal()` bridge for Angular APIs that require a
-  native writable signal.
+  code imports `signalTree` and all other SignalTree APIs from here**. Terminal
+  state leaves are native `WritableSignal<T>` values and derived leaves are
+  native `Signal<T>` values. Adds `defineStore()` and `toWritableSignal()` for
+  adapting callable object branches or designating form ingress.
 - `@signal-tree/react` — the complete React application facade. **React code
   imports `signalTree`, markers, enhancers, and `useSignalTree(owner, selector)`
   from here**; React observes the canonical kernel tree without copying it.
 - `@signal-tree/vue` — the complete Vue application facade. **Vue code imports
-  `signalTree` and all other SignalTree APIs from here**. Direct location reads
-  participate in Vue dependency tracking without turning locations into refs.
+  `signalTree` and all other SignalTree APIs from here**. Terminal state leaves
+  are native `Ref<T>` values and derived leaves are `ComputedRef<T>` values.
 
 Use `@signal-tree/kernel` directly only for framework-neutral TypeScript,
 including reusable domain libraries. Framework facades forward the neutral
 kernel surface by canonical identity; they do not duplicate semantic authority.
 
-## Location grammar and terminal values
+## Accessor grammar and terminal values
 
-Every canonical state location uses one callable grammar:
+The neutral kernel exposes callable locations:
 
 ```typescript
 location();                       // read
@@ -55,11 +55,22 @@ location(nextValue);              // replace the complete value
 location((current) => nextValue); // derive the next complete value
 ```
 
-This grammar applies at the root (`tree.$`), branches, scalar leaves, array
-leaves, and EntityMap fields. Canonical locations do not expose `.set()` or
-`.update()`. Angular code uses `toWritableSignal(location)` only when an Angular
-API requires native `WritableSignal` identity; Vue adapts a location with a
-writable `computed` when an API requires a ref.
+The root (`tree.$`) and object branches keep this callable whole-value grammar
+in every facade. Terminal values use the framework's native carrier:
+
+```typescript
+angularTree.$.count();
+angularTree.$.count.set(5);
+angularTree.$.count.update((count) => count + 1);
+
+vueTree.$.count.value;
+vueTree.$.count.value = 5;
+```
+
+React has no persistent signal primitive, so `@signal-tree/react` keeps neutral
+locations and observes selected state through `useSignalTree(owner, selector)`.
+EntityMap query and field leaves follow the same carrier rule; EntityMap command
+methods such as `setAll()` and `updateOne()` do not change.
 
 Plain objects normally become traversable branches. `leaf(value)` explicitly
 ends topology so an object remains one atomic location. Callable values always
@@ -71,8 +82,8 @@ const tree = signalTree({
   callback: leaf((value: number) => console.log(value)),
 });
 
-tree.$.range({ start: 5, end: 15 });
-tree.$.callback(leaf((value) => persist(value)));
+angularTree.$.range.set({ start: 5, end: 15 });
+angularTree.$.callback.set((value) => persist(value));
 ```
 
 The wrapper is consumed at construction or invocation and never enters state,

@@ -104,7 +104,7 @@ store.selected();
 SignalTree exposes path-addressed reads and writes:
 
 ```typescript
-tree.$.selectedId(42);
+tree.$.selectedId.set(42);
 tree.$.selected();
 ```
 

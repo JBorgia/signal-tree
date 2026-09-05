@@ -121,8 +121,9 @@ import {
   entityMap as angularEntityMap,
   signalTree as angularSignalTree,
 } from '@signal-tree/angular';
+import type { Signal as AngularSignal, WritableSignal } from '@angular/core';
 import { useSignalTree } from '@signal-tree/react';
-import { computed, type ComputedRef } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 import { signalTree as vueSignalTree } from '@signal-tree/vue';
 
 type User = { id: number; name: string; version: number };
@@ -150,7 +151,7 @@ const currentNames: string[] = names.peek();
 const unsubscribeNames = names.subscribe(() => undefined);
 unsubscribeNames();
 
-// Every location uses the same callable read/replace/derive grammar.
+// Neutral kernel locations use callable read/replace/derive grammar.
 tree.$.count(5);
 tree.$.count((count: number) => count + 1);
 tree.$.bounds({ min: 1, max: 9 });
@@ -164,29 +165,32 @@ tree.$((current) => ({ ...current, count: 9 }));
 tree.$.users.addOne({ id: 1, name: 'a', version: 1 });
 tree.$.users.updateOne(1, { name: 'b' });
 
-// Angular realization: the root entity marker and adapter factory declarations
-// must share marker identity, so entity APIs remain available through universal
-// locations in a packed consumer.
+// Angular leaves and readonly projections use native Angular signal types while
+// EntityMap methods and kernel semantic authority remain intact.
 const angularTree = angularSignalTree({
+  count: 0,
   users: angularEntityMap<User, number>({ selectId: (u: User) => u.id }),
 });
-const angularUsers: ReadonlyLocation<User[]> = angularTree.$.users.all;
+const angularCount: WritableSignal<number> = angularTree.$.count;
+const angularUsers: AngularSignal<User[]> = angularTree.$.users.all;
+angularCount.set(1);
 angularTree.$.users.setAll([]);
 
-// Vue observes the same universal location contract through its own dependency
-// graph; the tree does not become a Vue ref or duplicate state.
+// Vue leaves and derived values use native Ref contracts over kernel truth.
 const vueTree = vueSignalTree(
   { count: 1 },
-  { derived: ($) => ({ doubled: () => $.count() * 2 }) }
+  { derived: ($) => ({ doubled: () => $.count.value * 2 }) }
 );
-const vueDoubled: ComputedRef<number> = computed(() => vueTree.$.doubled());
+const vueCount: Ref<number> = vueTree.$.count;
+const vueDoubled: ComputedRef<number> = vueTree.$.doubled;
+vueCount.value = 2;
 
 // Enhancer methods
 tree.undo();
 tree.redo();
 tree.batch(() => tree.$.count(0));
 
-export const _used = [n, whole, rows, names, currentNames, angularUsers, vueDoubled, createSignalTreeFactory, defineStore, useSignalTree];
+export const _used = [n, whole, rows, names, currentNames, angularCount, angularUsers, vueCount, vueDoubled, createSignalTreeFactory, defineStore, useSignalTree];
 `;
 writeFileSync(join(proj, 'src', 'main.ts'), SAMPLE);
 
@@ -195,7 +199,8 @@ import * as kernel from '@signal-tree/kernel';
 import * as angular from '@signal-tree/angular';
 import * as react from '@signal-tree/react';
 import * as vue from '@signal-tree/vue';
-import { computed as vueComputed } from 'vue';
+import { isSignal } from '@angular/core';
+import { isRef } from 'vue';
 
 const sharedRuntimeSymbols = [
   'entityMap',
@@ -232,11 +237,26 @@ if (angular.signalTree === kernel.signalTree) {
 if (vue.signalTree === kernel.signalTree) {
   throw new Error('@signal-tree/vue silently fell back to neutral construction.');
 }
-const vueTree = vue.signalTree({ count: 1 });
-const vueDoubled = vueComputed(() => vueTree.$.count() * 2);
-vueTree.$.count(2);
-if (vueDoubled.value !== 4) {
-  throw new Error('@signal-tree/vue did not observe a direct location write.');
+const angularTree = angular.signalTree({ count: 1 });
+if (!isSignal(angularTree.$.count)) {
+  throw new Error('@signal-tree/angular did not expose a native signal leaf.');
+}
+angularTree.$.count.set(2);
+if (angularTree.$.count() !== 2) {
+  throw new Error('@signal-tree/angular did not route a native signal write.');
+}
+angularTree.destroy();
+
+const vueTree = vue.signalTree(
+  { count: 1 },
+  { derived: ($) => ({ doubled: () => $.count.value * 2 }) }
+);
+if (!isRef(vueTree.$.count) || !isRef(vueTree.$.doubled)) {
+  throw new Error('@signal-tree/vue did not expose native ref leaves.');
+}
+vueTree.$.count.value = 2;
+if (vueTree.$.doubled.value !== 4) {
+  throw new Error('@signal-tree/vue did not route a native ref write.');
 }
 vueTree.destroy();
 `;

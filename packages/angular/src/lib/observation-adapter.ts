@@ -1,4 +1,4 @@
-import { signal } from '@angular/core';
+import { computed, linkedSignal, signal, untracked } from '@angular/core';
 
 import type {
   ObservationAdapter,
@@ -12,6 +12,29 @@ export const ANGULAR_OBSERVATION_ADAPTER: ObservationAdapter = {
     return {
       observe: () => void revision(),
       invalidate: () => revision.update((value) => value + 1),
+    };
+  },
+
+  createWritableCell: <T,>(read: () => T) => {
+    const cell = signal(read());
+    const publish = cell.set.bind(cell);
+    return {
+      cell,
+      peek: read,
+      token: {
+        observe: () => void cell(),
+        invalidate: () => publish(read()),
+      },
+    };
+  },
+
+  createReadonlyCell: <T,>(compute: () => T) => computed(compute),
+
+  createWritableProjection: <T,>(compute: () => T) => {
+    const cell = linkedSignal(compute);
+    return {
+      cell,
+      peek: () => untracked(cell),
     };
   },
 

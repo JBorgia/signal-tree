@@ -56,9 +56,12 @@ const store = signalTree(
 );
 
 // Path-based updates surface automatically in Redux DevTools.
-store.$.counter((counter) => counter + 1);
-store.$.user.name('Jane Doe');
-store.$.todos((todos) => [...todos, { id: 1, text: 'New', completed: false }]);`;
+store.$.counter.update((counter) => counter + 1);
+store.$.user.name.set('Jane Doe');
+store.$.todos.update((todos) => [
+  ...todos,
+  { id: 1, text: 'New', completed: false },
+]);`;
 
 @Component({
   selector: 'app-devtools-demo',
@@ -125,35 +128,35 @@ export class DevtoolsDemoComponent {
 
   // Counter actions
   increment() {
-    this.store.$.counter((c) => c + 1);
+    this.store.$.counter.update((c) => c + 1);
     this.lastAction = 'Increment counter';
   }
 
   decrement() {
-    this.store.$.counter((c) => c - 1);
+    this.store.$.counter.update((c) => c - 1);
     this.lastAction = 'Decrement counter';
   }
 
   reset() {
-    this.store.$.counter(0);
+    this.store.$.counter.set(0);
     this.lastAction = 'Reset counter';
   }
 
   // User actions
   updateUserName(event: Event) {
     const target = event.target as HTMLInputElement;
-    this.store.$.user.name(target.value);
+    this.store.$.user.name.set(target.value);
     this.lastAction = 'Update user name';
   }
 
   updateUserEmail(event: Event) {
     const target = event.target as HTMLInputElement;
-    this.store.$.user.email(target.value);
+    this.store.$.user.email.set(target.value);
     this.lastAction = 'Update user email';
   }
 
   toggleNotifications() {
-    this.store.$.user.preferences.notifications((n) => !n);
+    this.store.$.user.preferences.notifications.update((n) => !n);
     this.lastAction = 'Toggle notifications';
   }
 
@@ -165,7 +168,7 @@ export class DevtoolsDemoComponent {
         text: this.newTodoText.trim(),
         completed: false,
       };
-      this.store.$.todos((todos) => [...todos, newTodo]);
+      this.store.$.todos.update((todos) => [...todos, newTodo]);
       this.newTodoText = '';
       this.lastAction = 'Add todo';
     }
@@ -186,12 +189,12 @@ export class DevtoolsDemoComponent {
       completed: false,
     }));
 
-    this.store.$.todos((todos) => [...todos, ...newTodos]);
+    this.store.$.todos.update((todos) => [...todos, ...newTodos]);
     this.lastAction = 'Add multiple todos';
   }
 
   toggleTodo(id: number) {
-    this.store.$.todos((todos) =>
+    this.store.$.todos.update((todos) =>
       todos.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
       )
@@ -200,7 +203,7 @@ export class DevtoolsDemoComponent {
   }
 
   removeTodo(id: number) {
-    this.store.$.todos((todos) =>
+    this.store.$.todos.update((todos) =>
       todos.filter((todo) => todo.id !== id)
     );
     this.lastAction = 'Remove todo';
@@ -250,13 +253,13 @@ export class DevtoolsDemoComponent {
     const snapshot = this.snapshots[index];
     if (snapshot) {
       // Restore the entire state
-      this.store.$.counter(snapshot.state.counter);
-      this.store.$.user.name(snapshot.state.user.name);
-      this.store.$.user.email(snapshot.state.user.email);
-      this.store.$.user.preferences.notifications(
+      this.store.$.counter.set(snapshot.state.counter);
+      this.store.$.user.name.set(snapshot.state.user.name);
+      this.store.$.user.email.set(snapshot.state.user.email);
+      this.store.$.user.preferences.notifications.set(
         snapshot.state.user.preferences.notifications
       );
-      this.store.$.todos(snapshot.state.todos);
+      this.store.$.todos.set(snapshot.state.todos);
       this.lastAction = `Restored snapshot #${index + 1}`;
     }
   }

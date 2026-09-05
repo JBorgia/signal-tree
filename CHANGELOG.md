@@ -1,5 +1,17 @@
 ## 15.0.0 (2026-09-03)
 
+- **Framework facades expose native leaves without moving state authority.**
+  Angular state leaves are `WritableSignal` values and derived/query leaves are
+  `Signal` values; Vue exposes `Ref` and `ComputedRef`; React remains
+  selector/hook-native over neutral kernel locations. Root and object branches
+  retain callable whole-value access. Kernel slots still own values, equality,
+  revisions, transactions, restoration, EntityMap identity, and publication.
+- **The adapter SDK carries framework realization types and semantic ingress.**
+  Carrier-parametric tree/entity/readonly types let each facade publish truthful
+  declarations, and `replaceLocation` lets integration code route a neutral
+  location replacement through kernel semantics. Native realization runtime is
+  reachable through `@signal-tree/kernel/adapter` and tree-shakes out of neutral
+  consumers.
 - **Restoration history is state-only.** `RestorationHistoryEntry` no longer
   exposes `timestamp`, `action`, or arbitrary `payload`, and restoration no
   longer accepts presentation-label/payload configuration. Human and AI

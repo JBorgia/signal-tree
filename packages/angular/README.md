@@ -1,8 +1,8 @@
 # `@signal-tree/angular`
 
-Angular observation for SignalTree. State, locations, entity behavior, and
-causal semantics remain in `@signal-tree/kernel`; hidden Angular tokens make
-direct location reads reactive in templates and `computed()`.
+Angular-native SignalTree realization. State, identity, entity behavior, and
+causal semantics remain in `@signal-tree/kernel`; terminal leaves are native
+Angular signals and work directly in templates and `computed()`.
 
 ## Semantic Guidance
 
@@ -57,18 +57,25 @@ reader.$.selectedName();
 
 There is one construction grammar: state, enhancers, and one derived factory are
 declared together in `signalTree(...)`. Derived values are zero-argument recipes
-that SignalTree memoizes as universal readonly locations.
+that SignalTree memoizes as native readonly Angular signals.
 
-Use `defineStore` for Angular dependency injection and `toWritableSignal` when a
-location must cross an Angular writable-signal boundary. Canonical writes stay
-callable; the explicit view has native Angular methods:
+Use `defineStore` for Angular dependency injection. State leaves already have
+native Angular signal identity and methods:
 
 ```ts
-tree.$.selectedId(42);
+tree.$.selectedId.set(42);
+tree.$.selectedId.update((id) => (id ?? 0) + 1);
+```
 
-const selectedIdSignal = toWritableSignal(tree.$.selectedId);
-selectedIdSignal.set(7);
-selectedIdSignal.update((id) => id + 1);
+`toWritableSignal()` remains useful for adapting a callable root or object
+branch to APIs such as Signal Forms. Passing an ordinary leaf without options
+returns that same `WritableSignal`; `{ undoable: true }` creates a distinct
+ingress that designates writes for restoration:
+
+```ts
+const profileModel = toWritableSignal(tree.$.profile, injector, {
+  undoable: true,
+});
 ```
 
 Application components

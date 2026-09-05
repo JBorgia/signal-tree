@@ -38,9 +38,9 @@ describe('ArchitectureOverviewComponent', () => {
     expect(text).toContain('tree.$(next)');
     expect(text).toContain('tree.$(current => next)');
     expect(text).toContain('tree.$.profile(next)');
-    expect(text).toContain('location() / location(next)');
-    expect(text).toContain('location(current => next)');
-    expect(text).toContain('location(leaf(callback))');
+    expect(text).toContain('kernel: location() / location(next)');
+    expect(text).toContain('Angular: signal() / .set() / .update()');
+    expect(text).toContain('Vue: ref.value / ref.value = next');
   });
 
   it('does not repeat superseded or unsupported marketing claims', () => {

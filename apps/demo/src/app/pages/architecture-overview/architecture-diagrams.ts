@@ -123,7 +123,7 @@ export const PACKAGE_OWNERSHIP_DIAGRAM: ArchitectureDiagramSpec = {
   takeaway:
     'Applications import their framework facade; framework-neutral code imports the kernel.',
   description:
-    'Framework packages add native observation and lifecycle integration around the same kernel types and runtime. The adapter subpath exists for observation-adapter authors, not ordinary application imports.',
+    'Framework packages expose native leaf carriers over the same kernel state and causal runtime. The adapter subpath exists for realization authors, not ordinary application imports.',
   plainLanguage:
     'Choose the package that matches your app. It includes the shared SignalTree engine plus the connection your framework needs.',
   realWorldExample:
@@ -136,13 +136,13 @@ export const PACKAGE_OWNERSHIP_DIAGRAM: ArchitectureDiagramSpec = {
     node(
       'angular',
       ['@signal-tree/angular'],
-      ['Angular observation · DI · DestroyRef'],
+      ['Signal leaves · DI · DestroyRef'],
       'framework',
       box(35, 35, 285, 85),
       box(12, 20, 164, 105),
       true,
       ['@signal-tree/', 'angular'],
-      ['Angular observation', 'DI · DestroyRef']
+      ['Angular signals', 'DI · DestroyRef']
     ),
     node(
       'react',
@@ -158,13 +158,13 @@ export const PACKAGE_OWNERSHIP_DIAGRAM: ArchitectureDiagramSpec = {
     node(
       'vue',
       ['@signal-tree/vue'],
-      ['direct Vue dependency observation'],
+      ['Ref leaves · computed derivations'],
       'framework',
       box(35, 245, 285, 85),
       box(12, 355, 164, 105),
       true,
       ['@signal-tree/', 'vue'],
-      ['direct Vue', 'observation']
+      ['Vue refs', 'computed derivations']
     ),
     node(
       'neutral-libraries',
@@ -195,9 +195,14 @@ export const PACKAGE_OWNERSHIP_DIAGRAM: ArchitectureDiagramSpec = {
     ),
   ],
   edges: [
-    edge('angular-kernel', 'angular', 'kernel-package', 'forwards + realizes'),
+    edge(
+      'angular-kernel',
+      'angular',
+      'kernel-package',
+      'native signal realization'
+    ),
     edge('react-kernel', 'react', 'kernel-package', 'forwards + observes'),
-    edge('vue-kernel', 'vue', 'kernel-package', 'forwards + observes'),
+    edge('vue-kernel', 'vue', 'kernel-package', 'native ref realization'),
     edge('neutral-kernel', 'neutral-libraries', 'kernel-package', 'imports'),
     edge('adapter-kernel', 'adapter', 'kernel-package', 'narrow contract', {
       direction: 'both',
@@ -221,11 +226,11 @@ export const PACKAGE_OWNERSHIP_DIAGRAM: ArchitectureDiagramSpec = {
 export const ACCESSOR_GRAMMAR_DIAGRAM: ArchitectureDiagramSpec = {
   id: 'accessor-grammar',
   eyebrow: '03 · Public state grammar',
-  title: 'The API follows the shape of the location',
+  title: 'Structure is stable; leaves fit the framework',
   takeaway:
-    'Root, branches, and terminal leaves share one callable grammar; leaf(value) declares where topology stops.',
+    'Root and branches keep dot-path call syntax; terminal values use each facade’s native carrier.',
   description:
-    'The controller itself is not callable. Its root $, branch accessors, and terminal locations support read, whole-value replacement, and updater calls. leaf(value) makes an object or callable terminal instead of traversable; wrapping a callable again at write time distinguishes data from an updater. EntityMap exposes collection operations.',
+    'The controller itself is not callable. Its root $ and branch accessors support read, whole-value replacement, and updater calls. Angular leaves are signals, Vue leaves are refs, and neutral kernel leaves are callable locations. leaf(value) makes an object or callable terminal instead of traversable. EntityMap exposes collection operations with framework-native query and field carriers.',
   plainLanguage:
     'The way you read or change state matches what you are touching: the whole tree, one object, one simple value, or a keyed collection.',
   realWorldExample:
@@ -259,12 +264,12 @@ export const ACCESSOR_GRAMMAR_DIAGRAM: ArchitectureDiagramSpec = {
     ),
     node(
       'leaf',
-      ['Terminal location'],
+      ['Terminal leaf'],
       [
         'leaf({ start, end })',
-        'location() / location(next)',
-        'location(current => next)',
-        'location(leaf(callback))',
+        'kernel: location() / location(next)',
+        'Angular: signal() / .set() / .update()',
+        'Vue: ref.value / ref.value = next',
       ],
       'framework',
       box(525, 70, 235, 295),
@@ -274,7 +279,7 @@ export const ACCESSOR_GRAMMAR_DIAGRAM: ArchitectureDiagramSpec = {
     node(
       'entity-map',
       ['EntityMap collection'],
-      ['rows.all()', 'rows.setAll(next)', 'rows.changeId(from, to)'],
+      ['rows.all: native readonly leaf', 'rows.setAll(next)', 'rows.changeId(from, to)'],
       'identity',
       box(775, 70, 240, 295),
       box(24, 680, 312, 195),
@@ -285,8 +290,8 @@ export const ACCESSOR_GRAMMAR_DIAGRAM: ArchitectureDiagramSpec = {
   checks: [
     'tree is a controller and is not callable.',
     'A branch call replaces a whole branch value; partial objects do not compile.',
-    'Terminal leaves use the same read, replace, and derive grammar.',
-    'leaf(callable) distinguishes callable data from an updater.',
+    'Terminal leaves use the facade’s native reactive carrier.',
+    'leaf(callable) declares callable data without changing branch syntax.',
   ],
   evidence: [
     'packages/kernel/src/lib/callable-contract.typing.spec.ts',

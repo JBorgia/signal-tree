@@ -1,12 +1,7 @@
 import { effect, Injector, runInInjectionContext } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import {
-  entityMap,
-  restoration,
-  signalTree,
-  transactions,
-} from '../index';
+import { entityMap, restoration, signalTree, transactions } from '../index';
 
 const flush = async () => {
   for (let i = 0; i < 6; i++) await Promise.resolve();
@@ -35,9 +30,7 @@ describe('Angular demarcation', () => {
     });
     TestBed.tick();
 
-    const pending = tree.transaction(() =>
-      tree.$.theme('speculative')
-    );
+    const pending = tree.transaction(() => tree.$.theme.set('speculative'));
     TestBed.tick();
     await flush();
 

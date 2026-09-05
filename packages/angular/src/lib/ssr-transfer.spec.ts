@@ -31,8 +31,8 @@ const makeTree = () =>
 describe('C3 — server → TransferState → client', () => {
   it('THE RECIPE: round-trips plain state across two tree instances', () => {
     const server = makeTree();
-    server.$.user.name('Ada');
-    server.$.counter(7);
+    server.$.user.name.set('Ada');
+    server.$.counter.set(7);
     const ts = new TransferState();
     ts.set(KEY, server.serialize());
 
@@ -63,7 +63,7 @@ describe('C3 — server → TransferState → client', () => {
 
   it('the payload is a plain JSON string TransferState can hold', () => {
     const server = makeTree();
-    server.$.user.name('Ada');
+    server.$.user.name.set('Ada');
     const json = server.serialize();
     expect(typeof json).toBe('string');
     expect(() => JSON.parse(json)).not.toThrow();

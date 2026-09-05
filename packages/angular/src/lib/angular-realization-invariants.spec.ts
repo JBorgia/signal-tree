@@ -4,6 +4,7 @@ import {
   isSignal,
   provideZonelessChangeDetection,
   untracked,
+  type WritableSignal,
 } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
@@ -11,16 +12,16 @@ import { entityMap, signalTree } from '../index';
 
 const causal = () =>
   signalTree({ a: 1, b: 2 }, { capabilities: ['causal-runtime'] });
+const native = <T>(value: unknown): WritableSignal<T> =>
+  value as WritableSignal<T>;
 
 describe('Angular realization invariants', () => {
-  it('uses stable kernel-owned locations for ordinary leaves', () => {
+  it('uses stable native Angular carriers for ordinary leaves', () => {
     TestBed.configureTestingModule({});
     const tree = signalTree({ a: 1, nested: { b: 2 } });
 
-    expect(isSignal(tree.$.a)).toBe(false);
-    expect('set' in tree.$.a).toBe(false);
-    expect(typeof tree.$.a.peek).toBe('function');
-    expect(typeof tree.$.a.subscribe).toBe('function');
+    expect(isSignal(tree.$.a)).toBe(true);
+    expect('set' in tree.$.a).toBe(true);
     expect(tree.$.a()).toBe(1);
     expect(tree.$.a).toBe(tree.$.a);
     expect(tree.$.nested).toBe(tree.$.nested);
@@ -39,7 +40,7 @@ describe('Angular realization invariants', () => {
 
     expect(doubled()).toBe(2);
     const before = runs;
-    tree.$.a(5);
+    native<number>(tree.$.a).set(5);
     expect(doubled()).toBe(10);
     expect(runs).toBeGreaterThan(before);
     tree.destroy();
@@ -57,13 +58,13 @@ describe('Angular realization invariants', () => {
     tree.destroy();
   });
 
-  it('uses one stable kernel-owned location per causal scalar leaf', () => {
+  it('uses one stable native carrier per causal scalar leaf', () => {
     TestBed.configureTestingModule({});
     const tree = causal();
     const leaf = tree.$.a;
 
-    expect(isSignal(leaf)).toBe(false);
-    expect('set' in leaf).toBe(false);
+    expect(isSignal(leaf)).toBe(true);
+    expect('set' in leaf).toBe(true);
     expect(tree.$.a).toBe(leaf);
     expect(tree.$.a).not.toBe(tree.$.b);
     untracked(() => tree.$.a());
@@ -92,7 +93,7 @@ describe('Angular realization invariants', () => {
     await fixture.whenStable();
     expect(fixture.nativeElement.textContent.trim()).toBe('0');
 
-    fixture.componentInstance.tree.$.count(1);
+    native<number>(fixture.componentInstance.tree.$.count).set(1);
     await fixture.whenStable();
 
     expect(fixture.nativeElement.textContent.trim()).toBe('1');
@@ -110,7 +111,7 @@ describe('Angular realization invariants', () => {
 
     expect(untracked(() => doubled())).toBe(2);
     const before = runs;
-    tree.$.a(5);
+    native<number>(tree.$.a).set(5);
     expect(untracked(() => doubled())).toBe(10);
     expect(runs).toBeGreaterThan(before);
     tree.destroy();
@@ -131,7 +132,7 @@ describe('Angular realization invariants', () => {
   it('keeps branches as SignalTree accessors rather than Angular signals', () => {
     const tree = signalTree({ count: 0, user: { name: 'x' } });
 
-    expect(isSignal(tree.$.count)).toBe(false);
+    expect(isSignal(tree.$.count)).toBe(true);
     expect(isSignal(tree.$.user)).toBe(false);
     tree.destroy();
   });
@@ -144,7 +145,7 @@ describe('Angular realization invariants', () => {
       plain: 1,
     });
 
-    expect(isSignal(tree.$.plain)).toBe(false);
+    expect(isSignal(tree.$.plain)).toBe(true);
     expect(isSignal(tree.$.rows as never)).toBe(false);
     expect(typeof tree.$.rows).toBe('object');
     tree.destroy();

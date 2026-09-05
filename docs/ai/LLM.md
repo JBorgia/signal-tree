@@ -85,10 +85,10 @@ For an external derived factory, type `$` with `TreeNode<State>` from
 `$` is the state facade.
 
 ```typescript
-// Every location: call to read, replace, or derive.
+// Angular leaves: call to read; use native signal methods to write.
 tree.$.filter();
-tree.$.filter('active');
-tree.$.filter((filter) => filter.trim());
+tree.$.filter.set('active');
+tree.$.filter.update((filter) => filter.trim());
 
 // Branch: call with no argument to read; pass a value or updater to write.
 tree.$.profile();
@@ -112,12 +112,12 @@ const tree = signalTree({
   callback: leaf((value: number) => console.log(value)),
 });
 
-tree.$.range({ start: 5, end: 15 });
-tree.$.callback(leaf((value) => persist(value)));
+tree.$.range.set({ start: 5, end: 15 });
+tree.$.callback.set((value) => persist(value));
 ```
 
-Angular's `toWritableSignal(location)` is an explicit native-signal adapter.
-Only that returned view uses Angular's `.set()` and `.update()` methods.
+Angular leaves are native signals. `toWritableSignal(branch)` adapts a callable
+object branch when an Angular API requires one writable signal.
 
 ## EntityMap
 
@@ -218,7 +218,7 @@ Declare capabilities in `enhancers`:
 ```typescript
 const tree = signalTree({ title: '' }, { enhancers: [restoration({ maxHistorySize: 50 })] });
 
-undoable(() => tree.$.title('Draft'));
+undoable(() => tree.$.title.set('Draft'));
 tree.undo();
 tree.redo();
 ```
@@ -269,7 +269,7 @@ Every tree owns resources until `destroy()` runs.
 ```typescript
 const tree = signalTree({ value: 1 });
 try {
-  tree.$.value(2);
+  tree.$.value.set(2);
 } finally {
   tree.destroy();
 }
@@ -283,8 +283,8 @@ try {
   capabilities that are not in current package types.
 - `tree.update`, `tree.unwrap`, `tree.effect`, or `tree.subscribe`.
 - One-argument `entityMap.updateOne(entity)`; use `updateOne(id, changes)`.
-- Canonical `.set()` or `.update()` calls; invoke locations with values or updaters.
-- Bare callable state; declare and replace it with `leaf(callable)`.
+- Callable writes on Angular leaves; use `.set()` or `.update()`.
+- Bare callable state at construction; declare it with `leaf(callable)`.
 - Multiple trees without distinct state authority and lifetime ownership.
 
 ## Historical Note

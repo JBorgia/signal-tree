@@ -124,7 +124,7 @@ default and no per-marker option is needed.
 // 15.0 — the collection is outside the undo stack because nothing designated it
 signalTree({ rows: entityMap({ selectId: (r: Row) => r.id }) }, { enhancers: [restoration()] });
 
-undoable(() => tree.$.draft.title('edited')); // THIS is reversible
+undoable(() => tree.$.draft.title.set('edited')); // THIS is reversible
 tree.$.rows.setAll(serverRows); // this is not
 ```
 

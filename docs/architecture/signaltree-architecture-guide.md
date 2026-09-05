@@ -96,9 +96,9 @@ that set.
 
 ### Read
 
-Components read from `$`. Root, branch, and terminal locations share one
-callable grammar; framework facades make those reads observable without changing
-their canonical identity.
+Components read from `$`. Root and object branches are callable whole-value
+accessors. Terminal leaves use the facade's native carrier: Angular signals,
+Vue refs, or neutral kernel locations.
 
 ```typescript
 const selected = tree.$.selected();
@@ -124,7 +124,7 @@ export class TicketOps {
   private readonly api = inject(TicketApi);
 
   select(id: number | null): void {
-    this.tree.$.selectedId(id);
+    this.tree.$.selectedId.set(id);
   }
 
   async refresh(): Promise<void> {

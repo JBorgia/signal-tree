@@ -338,19 +338,19 @@ const tree = signalTree({
 });
 
 const name = tree.$.user.profile.name();
-tree.$.user.profile.name('Grace');
+tree.$.user.profile.name.set('Grace');
 ```
 
 The public hierarchy is tree-shaped even though the reactive dependency topology is a graph. Derived computations may depend on multiple branches; one leaf may have many consumers. "Tree" is therefore a product and state-namespace description, not a graph-theoretic claim about all runtime dependencies.
 
-## 3.2 Topology is explicit and the location grammar is uniform
+## 3.2 Topology is explicit and leaf carriers are framework-native
 
 The v15 type-characterization matrix protects four related rules:
 
-- root, branch, and terminal locations all read, replace, and derive through the same callable object;
-- a plain object becomes a structurally navigable branch whose fields are locations;
+- root and object branches read, replace, and derive through callable accessors;
+- a plain object becomes a structurally navigable branch whose fields use the active facade's leaf carrier;
 - `leaf(value)` explicitly terminates topology for atomic objects and callable data;
-- framework packages observe kernel-owned locations rather than replacing them with framework primitives.
+- Angular exposes signals, Vue exposes refs, and React observes neutral locations through selectors without transferring state authority out of the kernel.
 
 This is exactly the sort of type semantic that can disappear during API cleanup while every runtime test remains green. The type matrix therefore uses exact type equality and negative controls, not broad assignability alone.
 

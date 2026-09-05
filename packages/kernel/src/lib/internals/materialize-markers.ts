@@ -8,10 +8,7 @@ import {
   createLocationRuntime,
   type LocationRuntime,
 } from './location-runtime';
-import {
-  NEUTRAL_OBSERVATION_ADAPTER,
-  type ObservationAdapter,
-} from './observation-adapter';
+import { NEUTRAL_OBSERVATION_ADAPTER } from './observation-adapter';
 import { isTreeCell } from './cell-identity';
 import { createRuntimeTreePlan } from './runtime-tree-plan';
 import type { RuntimeTreePlan } from './runtime-tree-plan';
@@ -134,10 +131,11 @@ export function createMaterializationContext(
   hasCapability: (capability: TreeCapability) => boolean = (capability) =>
     capability === 'position-topology' ? positionTopologyEnabled : true,
   physicalCommitClock?: PhysicalCommitClock,
-  observation: ObservationAdapter = NEUTRAL_OBSERVATION_ADAPTER
+  locationRuntime: LocationRuntime = createLocationRuntime(
+    NEUTRAL_OBSERVATION_ADAPTER
+  )
 ): MaterializationContext {
   const positionRegistry = createPositionRegistry();
-  const locationRuntime = createLocationRuntime(observation);
   return {
     locationRuntime,
     positionRegistry,
@@ -479,10 +477,7 @@ function warnUndeclaredMarker(): void {
  */
 const warnedWriteOnly = new WeakSet<object>();
 
-function warnWriteOnlyMarker(
-  processor: MarkerProcessor,
-  node: unknown
-): void {
+function warnWriteOnlyMarker(processor: MarkerProcessor, node: unknown): void {
   if (typeof ngDevMode !== 'undefined' && !ngDevMode) return;
   if (!processor.snapshot || processor.hydrate) return;
   // Exactly what `recursiveUpdate` falls through to. If that can write the
@@ -934,7 +929,10 @@ export function materializeMarkers(
           // it cannot reach a string-key walk; the `SignalTree:` prefix keeps
           // it out of the symbol walk too.
           if (isTraversableNode(materialized)) {
-            bindLocationRuntime(materialized as object, context.locationRuntime);
+            bindLocationRuntime(
+              materialized as object,
+              context.locationRuntime
+            );
             Object.defineProperty(materialized, PROCESSOR_STAMP, {
               value: processor,
               enumerable: false,
@@ -980,10 +978,7 @@ export function materializeMarkers(
       if (isNodeAccessor(value)) {
         // NodeAccessor - recurse to find nested markers
         materializeMarkers(value, notifier, currentPath, context, authority);
-      } else if (
-        typeof value === 'object' &&
-        !Array.isArray(value)
-      ) {
+      } else if (typeof value === 'object' && !Array.isArray(value)) {
         // Plain object - recurse
         materializeMarkers(value, notifier, currentPath, context, authority);
       }

@@ -89,8 +89,8 @@ const tree = signalTree({
   firmware: leaf<FirmwareDto>({ version: '1.0', channel: 'stable' }),
 });
 
-tree.$.firmware(dto);
-tree.$.firmware((firmware) => ({ ...firmware, version: '1.1' }));
+tree.$.firmware.set(dto);
+tree.$.firmware.update((firmware) => ({ ...firmware, version: '1.1' }));
 ```
 
 Callable values always use `leaf()` because an unwrapped function argument is the

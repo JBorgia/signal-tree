@@ -8,7 +8,7 @@
 
 - **Creation cost**: Time to create a signalTree vs creating equivalent individual signals
 - **Read cost**: Time to read a value through `tree.$.path()` vs `mySignal()`
-- **Write cost**: Time to write through `tree.$.path(value)` vs `mySignal.set()`
+- **Write cost**: Time to write through `tree.$.path.set(value)` vs `mySignal.set()`
 - **Deep access**: How overhead scales with nesting depth
 
 ### Enhancer overhead

@@ -1,0 +1,348 @@
+{
+  "schemaVersion": 1,
+  "method": "isolated-process-forced-gc-angular-leaf-memory-v1",
+  "runtime": {
+    "node": "v24.3.0",
+    "platform": "darwin",
+    "architecture": "arm64"
+  },
+  "config": {
+    "samples": 5,
+    "leafCount": 100000,
+    "observedCount": 10000
+  },
+  "arms": [
+    {
+      "label": "a8c34b2a universal Angular locations",
+      "mode": "location",
+      "source": "git:a8c34b2a; angular sha256:9169d009ca1d90dee777f87291001377ca00a0a4673ac68ec1e868385c0ad433; kernel sha256:f5ade269f1a661083506b663e655c27d7deb58bd99de5a4df9b6c439dbf60c95"
+    },
+    {
+      "label": "production native Angular signals",
+      "mode": "native",
+      "source": "candidate tarballs; angular sha256:667daf3d09081b089d902925505c080c4b5a71bbffa824d4f0da10cb6ca5c928; kernel sha256:e3f511a42e66d4bcc23b554c9b635558c8d187e838c8ef4ff9fcccfd99ae1ba1"
+    }
+  ],
+  "results": [
+    {
+      "label": "a8c34b2a universal Angular locations",
+      "leafCount": 100000,
+      "observedCount": 0,
+      "retainedMB": 184.462,
+      "bytesPerLeaf": 1934,
+      "collectable": true,
+      "samples": [
+        {
+          "consumerRoot": "/tmp/signaltree-bench-universal-consumer",
+          "mode": "location",
+          "leafCount": 100000,
+          "observedCount": 0,
+          "retainedBytes": 193422168,
+          "retainedMB": 184.462,
+          "bytesPerLeaf": 1934,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-universal-consumer",
+          "mode": "location",
+          "leafCount": 100000,
+          "observedCount": 0,
+          "retainedBytes": 193422168,
+          "retainedMB": 184.462,
+          "bytesPerLeaf": 1934,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-universal-consumer",
+          "mode": "location",
+          "leafCount": 100000,
+          "observedCount": 0,
+          "retainedBytes": 193422168,
+          "retainedMB": 184.462,
+          "bytesPerLeaf": 1934,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-universal-consumer",
+          "mode": "location",
+          "leafCount": 100000,
+          "observedCount": 0,
+          "retainedBytes": 193422168,
+          "retainedMB": 184.462,
+          "bytesPerLeaf": 1934,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-universal-consumer",
+          "mode": "location",
+          "leafCount": 100000,
+          "observedCount": 0,
+          "retainedBytes": 193422768,
+          "retainedMB": 184.462,
+          "bytesPerLeaf": 1934,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        }
+      ]
+    },
+    {
+      "label": "production native Angular signals",
+      "leafCount": 100000,
+      "observedCount": 0,
+      "retainedMB": 184.472,
+      "bytesPerLeaf": 1934,
+      "collectable": true,
+      "samples": [
+        {
+          "consumerRoot": "/tmp/signaltree-bench-native-consumer",
+          "mode": "native",
+          "leafCount": 100000,
+          "observedCount": 0,
+          "retainedBytes": 193433032,
+          "retainedMB": 184.472,
+          "bytesPerLeaf": 1934,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-native-consumer",
+          "mode": "native",
+          "leafCount": 100000,
+          "observedCount": 0,
+          "retainedBytes": 193432440,
+          "retainedMB": 184.472,
+          "bytesPerLeaf": 1934,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-native-consumer",
+          "mode": "native",
+          "leafCount": 100000,
+          "observedCount": 0,
+          "retainedBytes": 193432864,
+          "retainedMB": 184.472,
+          "bytesPerLeaf": 1934,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-native-consumer",
+          "mode": "native",
+          "leafCount": 100000,
+          "observedCount": 0,
+          "retainedBytes": 193431224,
+          "retainedMB": 184.47,
+          "bytesPerLeaf": 1934,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-native-consumer",
+          "mode": "native",
+          "leafCount": 100000,
+          "observedCount": 0,
+          "retainedBytes": 193436072,
+          "retainedMB": 184.475,
+          "bytesPerLeaf": 1934,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        }
+      ]
+    },
+    {
+      "label": "a8c34b2a universal Angular locations",
+      "leafCount": 100000,
+      "observedCount": 10000,
+      "retainedMB": 191.207,
+      "bytesPerLeaf": 2005,
+      "collectable": true,
+      "samples": [
+        {
+          "consumerRoot": "/tmp/signaltree-bench-universal-consumer",
+          "mode": "location",
+          "leafCount": 100000,
+          "observedCount": 10000,
+          "retainedBytes": 200495072,
+          "retainedMB": 191.207,
+          "bytesPerLeaf": 2005,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-universal-consumer",
+          "mode": "location",
+          "leafCount": 100000,
+          "observedCount": 10000,
+          "retainedBytes": 200493712,
+          "retainedMB": 191.206,
+          "bytesPerLeaf": 2005,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-universal-consumer",
+          "mode": "location",
+          "leafCount": 100000,
+          "observedCount": 10000,
+          "retainedBytes": 200495072,
+          "retainedMB": 191.207,
+          "bytesPerLeaf": 2005,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-universal-consumer",
+          "mode": "location",
+          "leafCount": 100000,
+          "observedCount": 10000,
+          "retainedBytes": 200493136,
+          "retainedMB": 191.205,
+          "bytesPerLeaf": 2005,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-universal-consumer",
+          "mode": "location",
+          "leafCount": 100000,
+          "observedCount": 10000,
+          "retainedBytes": 200495984,
+          "retainedMB": 191.208,
+          "bytesPerLeaf": 2005,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        }
+      ]
+    },
+    {
+      "label": "production native Angular signals",
+      "leafCount": 100000,
+      "observedCount": 10000,
+      "retainedMB": 184.476,
+      "bytesPerLeaf": 1934,
+      "collectable": true,
+      "samples": [
+        {
+          "consumerRoot": "/tmp/signaltree-bench-native-consumer",
+          "mode": "native",
+          "leafCount": 100000,
+          "observedCount": 10000,
+          "retainedBytes": 193437008,
+          "retainedMB": 184.476,
+          "bytesPerLeaf": 1934,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-native-consumer",
+          "mode": "native",
+          "leafCount": 100000,
+          "observedCount": 10000,
+          "retainedBytes": 193437496,
+          "retainedMB": 184.476,
+          "bytesPerLeaf": 1934,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-native-consumer",
+          "mode": "native",
+          "leafCount": 100000,
+          "observedCount": 10000,
+          "retainedBytes": 193437176,
+          "retainedMB": 184.476,
+          "bytesPerLeaf": 1934,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-native-consumer",
+          "mode": "native",
+          "leafCount": 100000,
+          "observedCount": 10000,
+          "retainedBytes": 193437312,
+          "retainedMB": 184.476,
+          "bytesPerLeaf": 1934,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        },
+        {
+          "consumerRoot": "/tmp/signaltree-bench-native-consumer",
+          "mode": "native",
+          "leafCount": 100000,
+          "observedCount": 10000,
+          "retainedBytes": 193437664,
+          "retainedMB": 184.477,
+          "bytesPerLeaf": 1934,
+          "collectable": {
+            "tree": true,
+            "leaf": true,
+            "native": null
+          }
+        }
+      ]
+    }
+  ]
+}

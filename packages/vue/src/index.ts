@@ -1,21 +1,52 @@
 /**
- * `@signal-tree/vue` provides Vue observation over kernel-owned locations.
+ * `@signal-tree/vue` provides Vue-native refs over kernel-owned state.
  *
- * Direct location reads participate in Vue dependency tracking while values,
- * writes, equality, subscriptions, and derived state remain kernel-owned.
+ * Values, writes, equality, and causal semantics remain kernel-owned.
  *
  * @packageDocumentation
  */
+import './lib/carrier.js';
+import { asReadonly as kernelAsReadonly } from '@signal-tree/kernel';
 import {
   createSignalTreeFactory,
-  type SignalTreeFactory,
+  type EntityNodeOf,
+  type EntitySignalOf,
+  type ISignalTreeOf,
+  type LeafOf,
+  type ReadonlyStoreOf,
+  type ReadonlyViewOf,
+  type SignalTreeFactoryOf,
+  type TreeNodeOf,
 } from '@signal-tree/kernel/adapter';
 
 import { VUE_OBSERVATION_ADAPTER } from './lib/vue-observation.js';
 
-/** Construct a SignalTree whose direct location reads are observable by Vue. */
+/** Construct a SignalTree whose leaves are native Vue refs. */
 export const signalTree = createSignalTreeFactory(
   VUE_OBSERVATION_ADAPTER
-) as SignalTreeFactory;
+) as unknown as SignalTreeFactoryOf<'vue'>;
+
+export type TreeNode<T> = TreeNodeOf<T, 'vue'>;
+export type WritableLeaf<T> = LeafOf<T, 'vue'>;
+export type ISignalTree<T, TAccum = TreeNode<T>> = ISignalTreeOf<
+  T,
+  'vue',
+  TAccum
+>;
+export type SignalTree<T> = ISignalTree<T>;
+export type EntityNode<E> = EntityNodeOf<E, 'vue'>;
+export type EntitySignal<
+  E,
+  K extends string | number = string
+> = EntitySignalOf<E, K, 'vue'>;
+export type ReadonlyView<T> = ReadonlyViewOf<T, 'vue'>;
+export type ReadonlyStore<
+  TSource,
+  TAccum = TreeNode<TSource>
+> = ReadonlyStoreOf<TSource, TAccum, 'vue'>;
+
+export const asReadonly = kernelAsReadonly as <TSource, TAccum>(
+  tree: ISignalTreeOf<TSource, 'vue', TAccum>
+) => ReadonlyStoreOf<TSource, TAccum, 'vue'>;
 
 export * from '@signal-tree/kernel';

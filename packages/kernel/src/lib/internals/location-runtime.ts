@@ -1,12 +1,6 @@
 import { markTreeCell } from './cell-identity';
-import {
-  isLeafDefinition,
-  leafDefinitionValue,
-} from '../leaf';
-import type {
-  Location,
-  ReadonlyLocation,
-} from './cell-runtime';
+import { isLeafDefinition, leafDefinitionValue } from '../leaf';
+import type { Location, ReadonlyLocation } from './cell-runtime';
 import type {
   ObservationAdapter,
   ObservationToken,
@@ -80,9 +74,32 @@ export function deriveLocation<T>(
   writableLocationBinding(location).derive(update);
 }
 
+export function registerWritableLocationBinding<T>(
+  binding: WritableLocationBinding<T>
+): void {
+  WRITABLE_LOCATION_BINDINGS.set(
+    binding.location as object,
+    binding as WritableLocationBinding<unknown>
+  );
+}
+
 export type LocationWriteOperation<T> =
   | { readonly intent: 'replace'; readonly value: T }
   | { readonly intent: 'derive'; readonly update: (current: T) => T };
+
+const synchronizeNativeWriters = <T>(
+  binding: WritableLocationBinding<T>
+): void => {
+  const cell = binding.location as unknown as {
+    set?: (value: T) => void;
+    update?: (update: (current: T) => T) => void;
+  };
+  if (typeof cell.set !== 'function' || typeof cell.update !== 'function') {
+    return;
+  }
+  cell.set = binding.replace;
+  cell.update = binding.derive;
+};
 
 export function interceptLocationWrites<T>(
   location: Location<T>,
@@ -98,6 +115,7 @@ export function interceptLocationWrites<T>(
     intercept({ intent: 'derive', update }, () => previousDerive(update));
   binding.replace = wrappedReplace;
   binding.derive = wrappedDerive;
+  synchronizeNativeWriters(binding);
 
   let active = true;
   return () => {
@@ -105,6 +123,7 @@ export function interceptLocationWrites<T>(
     active = false;
     if (binding.replace === wrappedReplace) binding.replace = previousReplace;
     if (binding.derive === wrappedDerive) binding.derive = previousDerive;
+    synchronizeNativeWriters(binding);
   };
 }
 
@@ -112,7 +131,7 @@ export function createWritableProjection<T>(
   source: ReadonlyLocation<T>,
   write: (value: T, intent: 'replace' | 'derive') => void
 ): Location<T> {
-  const location = markTreeCell((function (value?: unknown) {
+  const location = markTreeCell(function (value?: unknown) {
     if (arguments.length === 0) return source();
     if (typeof value === 'function') {
       binding.derive(value as (current: T) => T);
@@ -122,7 +141,7 @@ export function createWritableProjection<T>(
       binding.replace(value as T);
     }
     return undefined;
-  }) as Location<T>);
+  } as Location<T>);
   registerIntrinsicMutationSource(location as object);
 
   const binding: WritableLocationBinding<T> = {
@@ -257,6 +276,10 @@ export interface LocationRuntime {
     read: () => T,
     write: (value: T, intent: 'replace' | 'derive') => boolean
   ): WritableLocationBinding<T>;
+  createWritableProjection?<T>(
+    compute: () => T,
+    write: (value: T, intent: 'replace' | 'derive') => void
+  ): Location<T>;
   publish(publishers: readonly LocationPublisher[]): void;
   runInvalidationGroup(run: () => void): void;
 }
@@ -270,9 +293,7 @@ export function bindLocationRuntime(
   NODE_LOCATION_RUNTIMES.set(node, runtime);
 }
 
-export function getLocationRuntime(
-  node: object
-): LocationRuntime | undefined {
+export function getLocationRuntime(node: object): LocationRuntime | undefined {
   return NODE_LOCATION_RUNTIMES.get(node);
 }
 
@@ -345,15 +366,14 @@ export function createLocationRuntime(
   ): WritableLocationBinding<T> => {
     let observationToken: ObservationToken | undefined;
     const listeners = new Set<() => void>();
+    const token = () => (observationToken ??= realization.createToken());
     const node: DependencyNode = {
       consumers: new Set(),
       level: 0,
       version: 0,
       refresh: () => undefined,
     };
-    const token = () =>
-      (observationToken ??= realization.createToken());
-    const location = markTreeCell((function (value?: unknown) {
+    const location = markTreeCell(function (value?: unknown) {
       if (arguments.length === 0) {
         trackDependency(node, token);
         return read();
@@ -367,7 +387,7 @@ export function createLocationRuntime(
         binding.replace(value as T);
       }
       return undefined;
-    }) as Location<T>);
+    } as Location<T>);
     registerIntrinsicMutationSource(location as object);
     const binding: WritableLocationBinding<T> = {
       location,
@@ -406,10 +426,7 @@ export function createLocationRuntime(
         if (changed) publish([binding]);
       },
     };
-    WRITABLE_LOCATION_BINDINGS.set(
-      location as object,
-      binding as WritableLocationBinding<unknown>
-    );
+    registerWritableLocationBinding(binding);
 
     location.peek = read;
     location.subscribe = (listener) => {
@@ -449,8 +466,7 @@ export function createLocationRuntime(
       version: 0,
       refresh: () => undefined,
     };
-    const token = () =>
-      (observationToken ??= realization.createToken());
+    const token = () => (observationToken ??= realization.createToken());
     const consumer: DependencyConsumer = {
       dependencies: new Map(),
       level: 1,
@@ -466,7 +482,10 @@ export function createLocationRuntime(
         }
         dirty = true;
         notifyDependents(node);
-        if (listeners.size > 0 || (hasReactiveObservation && observationToken)) {
+        if (
+          listeners.size > 0 ||
+          (hasReactiveObservation && observationToken)
+        ) {
           pendingConsumers.add(consumer);
         }
       },

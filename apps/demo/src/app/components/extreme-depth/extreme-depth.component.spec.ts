@@ -16,7 +16,7 @@ describe('ExtremeDepthComponent', () => {
     expect(component.pathSegments()).toHaveLength(15);
     expect(component.pathSegments().at(-1)).toBe('result');
     expect(component.compilerChecks).toEqual({
-      exactLocation: true,
+      exactLeafCarrier: true,
       isAny: false,
     });
   });

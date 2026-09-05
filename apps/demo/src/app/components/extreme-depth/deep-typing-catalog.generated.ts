@@ -12,7 +12,7 @@ export type DeepTypingCompiledDepth =
 export const DEEP_TYPING_MIN_DEPTH: DeepTypingCompiledDepth = 1;
 export const DEEP_TYPING_MAX_DEPTH: DeepTypingCompiledDepth = 40;
 export const DEEP_TYPING_COMPILER_CHECKS = {
-  exactLocation: true,
+  exactLeafCarrier: true,
   isAny: false,
 } as const;
 export const DEEP_TYPING_BRANCH_SEGMENTS = [

@@ -1,21 +1,20 @@
-import { computed, type ComputedRef } from 'vue';
+import { computed, type ComputedRef, type Ref } from 'vue';
 
-import {
-  signalTree,
-  type Location,
-  type ReadonlyLocation,
-} from '../index';
+import { signalTree } from '../index';
 
 const tree = signalTree(
   { count: 1 },
-  { derived: ($) => ({ doubled: () => $.count() * 2 }) }
+  { derived: ($) => ({ doubled: () => $.count.value * 2 }) }
 );
 
-const count: Location<number> = tree.$.count;
-const doubled: ReadonlyLocation<number> = tree.$.doubled;
-const vueProjection: ComputedRef<number> = computed(() => doubled());
+const count: Ref<number> = tree.$.count;
+const doubled: ComputedRef<number> = tree.$.doubled;
+const vueProjection: ComputedRef<number> = computed(() => doubled.value);
 
-count(vueProjection.value);
+count.value = vueProjection.value;
 
-// @ts-expect-error derived locations do not expose writes
-doubled.set(4);
+// @ts-expect-error derived refs do not expose writes
+doubled.value = 4;
+
+// @ts-expect-error Vue leaves use native `.value` access, not call syntax
+tree.$.count();
