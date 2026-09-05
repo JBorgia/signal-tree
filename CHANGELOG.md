@@ -1,4 +1,4 @@
-## 15.0.0 (2026-09-03)
+## 15.0.0-rc.13 (2026-09-05)
 
 - **Framework facades expose native leaves without moving state authority.**
   Angular state leaves are `WritableSignal` values and derived/query leaves are
