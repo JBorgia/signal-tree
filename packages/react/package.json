@@ -1,6 +1,6 @@
 {
   "name": "@signal-tree/react",
-  "version": "15.0.0-rc.13",
+  "version": "15.0.0-rc.14",
   "description": "React observation for SignalTree.",
   "license": "Apache-2.0",
   "type": "module",

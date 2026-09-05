@@ -6,7 +6,7 @@
 
 Use this index to navigate the documentation.
 
-**Current prerelease:** 15.0.0-rc.13 See [CHANGELOG](../CHANGELOG.md).
+**Current prerelease:** 15.0.0-rc.14 See [CHANGELOG](../CHANGELOG.md).
 
 ---
 
