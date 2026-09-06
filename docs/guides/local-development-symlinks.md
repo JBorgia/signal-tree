@@ -94,7 +94,7 @@ Both have a `Symbol(SIGNAL)`, but they are **different symbol instances**.
 pnpm remove @signal-tree/kernel
 
 # Install from npm registry
-pnpm add @signal-tree/kernel@5.1.2
+pnpm add @signal-tree/kernel
 ```
 
 When installed from npm, the package files exist directly in the consumer's `node_modules/`, so `@angular/core` imports resolve from the consumer's `node_modules/` - ensuring a single Angular instance.

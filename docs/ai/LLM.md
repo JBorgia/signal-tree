@@ -19,7 +19,7 @@ packages.
 ## Install For Angular
 
 ```bash
-npm install @signal-tree/angular@rc
+npm install @signal-tree/angular
 ```
 
 ## Canonical Construction
