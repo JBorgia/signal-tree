@@ -151,7 +151,6 @@
     "@angular/core": "22.0.7",
     "@angular/forms": "22.0.7",
     "@angular/platform-browser": "22.0.7",
-    "@angular/platform-browser-dynamic": "22.0.7",
     "@angular/router": "22.0.7",
     "@datorama/akita": "^8.0.1",
     "@ngrx/effects": "21.1.1",
@@ -161,18 +160,15 @@
     "@ngxs/store": "^20.1.0",
     "@reduxjs/toolkit": "2.12.0",
     "@stackblitz/sdk": "^1.11.1",
-    "echarts": "^6.1.0",
     "highlight.js": "^11.11.1",
     "lodash": "^4.17.21",
     "lodash-es": "^4.18.1",
     "marked": "^16.4.2",
-    "ngx-echarts": "^20.0.2",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "rxjs": "~7.8.2",
     "vue": "^3.5.42",
-    "zod": "^3.25.76",
-    "zone.js": "0.16.2"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@analogjs/vite-plugin-angular": "2.6.3",
@@ -182,6 +178,7 @@
     "@angular/cli": "22.0.7",
     "@angular/compiler-cli": "22.0.7",
     "@angular/language-service": "22.0.7",
+    "@angular/platform-browser-dynamic": "22.0.7",
     "@babel/generator": "^7.28.5",
     "@babel/parser": "^7.28.5",
     "@babel/traverse": "^7.28.5",
@@ -257,7 +254,8 @@
     "verdaccio": "6.8.0",
     "vite": "^6.4.3",
     "vite-tsconfig-paths": "5.1.4",
-    "vitest": "4.1.9"
+    "vitest": "4.1.9",
+    "zone.js": "0.16.2"
   },
   "pnpm": {
     "overrides": {
