@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Every reference a live doc makes must resolve — paths, and package names in
- * install instructions.
+ * Every reference a live doc makes must resolve — paths, package names, and
+ * explicit versions or dist-tags in install instructions.
  *
  * ## Why this exists
  *
@@ -48,10 +48,11 @@
  * sweep of the npm-facing surfaces. `readme-apis` cannot catch it, because a
  * package name is not a symbol.
  *
- * So every `@signaltree/*` named in an `npm install` line on a live surface must
- * be a directory under `packages/` whose manifest is not `private`. That rules
- * out removed packages, including the former private `@signaltree/shared`,
- * which was never on the registry.
+ * So every `@signal-tree/*` named in an install line on a live surface must be a
+ * directory under `packages/` whose manifest is not `private`. An explicit
+ * range must include that manifest's version, and an explicit dist-tag must
+ * match its release channel (`latest` for stable, prerelease identifier for an
+ * RC). That rules out removed/private packages and stale channel instructions.
  *
  *   node tools/check-doc-links.mjs
  *   node tools/check-doc-links.mjs --list        # every link it can see
@@ -60,6 +61,7 @@
 import { readFileSync, existsSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import semver from 'semver';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -135,9 +137,9 @@ function walk(dir, out = []) {
   return out;
 }
 
-/** Publishable `@signal-tree/*` names, from the manifests npm reads. */
+/** Publishable `@signal-tree/*` names and versions, from the manifests npm reads. */
 function publishable() {
-  const out = new Set();
+  const out = new Map();
   for (const e of readdirSync(join(ROOT, 'packages'), {
     withFileTypes: true,
   })) {
@@ -145,14 +147,18 @@ function publishable() {
     const m = join(ROOT, 'packages', e.name, 'package.json');
     if (!existsSync(m)) continue;
     const j = JSON.parse(readFileSync(m, 'utf8'));
-    if (!j.private && j.name) out.add(j.name);
+    if (!j.private && j.name && j.version) out.set(j.name, j.version);
   }
   return out;
 }
 
-/** `@signal-tree/*` names in install instructions that cannot be installed. */
+function expectedDistTag(version) {
+  return semver.prerelease(version)?.[0]?.toString() ?? 'latest';
+}
+
+/** `@signal-tree/*` install instructions that are unavailable or stale. */
 export function scanInstalls() {
-  const ok = publishable();
+  const packages = publishable();
   const bad = [];
   for (const abs of walk(ROOT)) {
     const rel = relative(ROOT, abs);
@@ -175,8 +181,44 @@ export function scanInstalls() {
       }
       if (!inFence) return;
       if (!/\b(npm|pnpm|yarn|bun)\s+(install|add)\b/.test(line)) return;
-      for (const m of line.matchAll(/@signal-tree\/[a-z0-9-]+/g)) {
-        if (!ok.has(m[0])) bad.push({ file: rel, line: i + 1, pkg: m[0] });
+      for (const match of line.matchAll(
+        /(@signal-tree\/[a-z0-9-]+)(?:@([^\s"'`;|&)]+))?/g
+      )) {
+        const [, pkg, specifier] = match;
+        const version = packages.get(pkg);
+        if (!version) {
+          bad.push({
+            file: rel,
+            line: i + 1,
+            install: match[0],
+            reason: 'package is not publishable',
+          });
+          continue;
+        }
+        if (!specifier) continue;
+
+        const range = semver.validRange(specifier);
+        if (range) {
+          if (!semver.satisfies(version, range, { includePrerelease: true })) {
+            bad.push({
+              file: rel,
+              line: i + 1,
+              install: match[0],
+              reason: `range excludes current package version ${version}`,
+            });
+          }
+          continue;
+        }
+
+        const expected = expectedDistTag(version);
+        if (specifier !== expected) {
+          bad.push({
+            file: rel,
+            line: i + 1,
+            install: match[0],
+            reason: `dist-tag @${specifier} is stale; current release uses @${expected}`,
+          });
+        }
       }
     });
   }
@@ -216,26 +258,37 @@ export function scan() {
 const argv = process.argv.slice(2);
 
 if (argv.includes('--self-test')) {
-  // Break the exact thing the gate claims to watch: add a link to a file that
-  // is not there, in a surface the gate reads. A gate that stays green against
-  // its own mutation is not a gate.
+  // Break both things the gate claims to watch: add a missing link and a stale
+  // dist-tag to a live surface. A gate that stays green is not a gate.
   const probeFile = join(ROOT, 'docs', '__link_gate_probe__.md');
+  const probeVersion = publishable().get('@signal-tree/angular');
+  if (!probeVersion) throw new Error('Angular package unavailable for probe');
+  const wrongTag = expectedDistTag(probeVersion) === 'latest' ? 'rc' : 'latest';
   writeFileSync(
     probeFile,
-    '# probe\n\nSee [nothing](./definitely-not-a-real-file-9f3a.md).\n'
+    '# probe\n\nSee [nothing](./definitely-not-a-real-file-9f3a.md).\n\n' +
+      `\`\`\`bash\nnpm install @signal-tree/angular@${wrongTag}\n\`\`\`\n`
   );
-  let caught;
+  let caughtLink;
+  let caughtInstall;
   try {
-    caught = scan().some(
+    caughtLink = scan().some(
       (l) => l.file.includes('__link_gate_probe__') && !l.ok
+    );
+    caughtInstall = scanInstalls().some((install) =>
+      install.file.includes('__link_gate_probe__')
     );
   } finally {
     const { unlinkSync } = await import('node:fs');
     unlinkSync(probeFile);
   }
   const clean = scan().every((l) => l.ok) && scanInstalls().length === 0;
-  if (!caught) {
+  if (!caughtLink) {
     console.error('❌ self-test: the gate did NOT flag a broken link.');
+    process.exit(1);
+  }
+  if (!caughtInstall) {
+    console.error('❌ self-test: the gate did NOT flag a stale dist-tag.');
     process.exit(1);
   }
   if (!clean) {
@@ -246,8 +299,8 @@ if (argv.includes('--self-test')) {
     process.exit(1);
   }
   console.log(
-    '\n✅ self-test: a link to a missing file is flagged, and the repo is ' +
-      'clean without the probe.'
+    '\n✅ self-test: a missing link and stale dist-tag are flagged, and the ' +
+      'repo is clean without the probe.'
   );
   process.exit(0);
 }
@@ -274,7 +327,7 @@ console.log(
 if (broken.length === 0 && badInstalls.length === 0) {
   console.log(
     '✅ every relative link resolves and every install instruction names a ' +
-      'publishable package. (docs/archive/** and CHANGELOG.md are ' +
+      'publishable, current package. (docs/archive/** and CHANGELOG.md are ' +
       'point-in-time and excluded.)'
   );
   process.exit(0);
@@ -282,14 +335,16 @@ if (broken.length === 0 && badInstalls.length === 0) {
 
 if (badInstalls.length > 0) {
   console.error(
-    `\n❌ ${badInstalls.length} install instruction(s) name a package that ` +
-      `cannot be installed:\n`
+    `\n❌ ${badInstalls.length} install instruction(s) are unavailable or ` +
+      `stale:\n`
   );
   for (const b of badInstalls)
-    console.error(`   ${b.file}:${b.line}  ->  ${b.pkg}`);
+    console.error(
+      `   ${b.file}:${b.line}  ->  ${b.install} (${b.reason})`
+    );
   console.error(
-    `\n   Either the package was removed (drop the instruction) or it is ` +
-      `private and was never published.\n`
+    `\n   Use a publishable package and omit an explicit version when the ` +
+      `current release is intended.\n`
   );
 }
 if (broken.length === 0) process.exit(1);
