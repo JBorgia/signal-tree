@@ -57,7 +57,6 @@ export class StackblitzService {
             '@signal-tree/angular': DEMO_LIBRARY_VERSIONS['signaltree'],
             rxjs: '^7.8.0',
             tslib: '^2.6.0',
-            'zone.js': '^0.15.0',
             ...dependencies,
           },
           devDependencies: {
@@ -122,11 +121,14 @@ export class StackblitzService {
         null,
         2
       ),
-      'src/main.ts': `import { bootstrapApplication } from '@angular/platform-browser';
+      'src/main.ts': `import { provideZonelessChangeDetection } from '@angular/core';
+    import { bootstrapApplication } from '@angular/platform-browser';
 
 import { AppComponent } from './app/app.component';
 
-bootstrapApplication(AppComponent).catch((err) => console.error(err));
+    bootstrapApplication(AppComponent, {
+      providers: [provideZonelessChangeDetection()],
+    }).catch((err) => console.error(err));
 `,
       'src/index.html': `<app-root></app-root>`,
       'src/styles.css': `body { font-family: system-ui, sans-serif; margin: 2rem; }`,
