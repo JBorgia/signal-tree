@@ -27,7 +27,7 @@ describe('WhyCausalityComponent', () => {
     expect(text).toContain('SignalTree ships the integrated model');
     expect(text).toContain('Three public incidents. Three causal seams');
     expect(text).toContain(
-      "What are you losing that you don't even know about"
+      "What don't you know?"
     );
     expect(text).not.toContain('the only library');
     expect(text).not.toContain('impossible for every other library');
