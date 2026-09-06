@@ -49,6 +49,19 @@ describe('HomeComponent', () => {
     ).toBe(true);
   });
 
+  it('identifies v15 as a rewrite and preserves the v14 site', () => {
+    const fixture = TestBed.createComponent(HomeComponent);
+    fixture.detectChanges();
+    const text = renderedText(fixture.nativeElement);
+    const legacyLink = fixture.nativeElement.querySelector(
+      '.rewrite-note a'
+    ) as HTMLAnchorElement | null;
+
+    expect(text).toContain('Version 15 is a ground-up causal rewrite');
+    expect(text).toContain('historical guidance');
+    expect(legacyLink?.getAttribute('href')).toBe('/v14/');
+  });
+
   it('does not repeat unsupported performance or selector claims', () => {
     const fixture = TestBed.createComponent(HomeComponent);
     fixture.detectChanges();
