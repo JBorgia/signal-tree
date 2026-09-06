@@ -107,6 +107,10 @@
   gap: 0.55rem;
 }
 
+.actions-card .button-group + .button-group {
+  margin-top: 0.55rem;
+}
+
 .input-group {
   margin-bottom: 0.8rem;
 }
