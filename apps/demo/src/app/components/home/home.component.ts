@@ -48,6 +48,14 @@ export class HomeComponent {
       action: 'Open the architecture',
     },
     {
+      eyebrow: 'Evaluating strategic value',
+      title: 'See why causality compounds',
+      description:
+        'Compare equal snapshots with different histories, then trace the value through recovery, synchronization, and AI execution.',
+      route: '/why-causality',
+      action: 'Explore the causal advantage',
+    },
+    {
       eyebrow: 'Ready to build',
       title: 'Work through examples',
       description:
@@ -69,13 +77,15 @@ export class HomeComponent {
     {
       name: '@signal-tree/angular',
       role: 'Angular applications',
-      detail: 'Native signals, dependency injection, and injector-bound cleanup.',
+      detail:
+        'Native signals, dependency injection, and injector-bound cleanup.',
       package: 'angular',
     },
     {
       name: '@signal-tree/kernel',
       role: 'Framework-neutral code',
-      detail: 'State, identity, causal turns, restoration, transactions, and Link.',
+      detail:
+        'State, identity, causal turns, restoration, transactions, and Link.',
       package: 'kernel',
     },
     {

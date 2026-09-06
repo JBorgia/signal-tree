@@ -20,6 +20,18 @@ export const appRoutes: Route[] = [
         'Evaluate SignalTree in five minutes: the mental model, a side-by-side comparison with NgRx, the recommended architecture, and where to go next.',
     },
   },
+  {
+    path: 'why-causality',
+    loadComponent: () =>
+      import('./pages/why-causality/why-causality.component').then(
+        (c) => c.WhyCausalityComponent
+      ),
+    data: {
+      title: 'Why causality matters',
+      description:
+        'Why causal state has business value: reliable recovery, coherent operations, stable identity, external authority, and AI-ready application truth.',
+    },
+  },
 
   {
     path: 'whats-new-14',

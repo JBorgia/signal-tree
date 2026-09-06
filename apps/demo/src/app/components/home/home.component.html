@@ -10,9 +10,11 @@
           in one model without making a framework realization another store.
         </p>
         <div class="hero-actions">
-          <a routerLink="/start" class="action action-primary">Start building</a>
-          <a routerLink="/architecture-overview" class="action action-secondary">
-            Explore the architecture
+          <a routerLink="/start" class="action action-primary"
+            >Start building</a
+          >
+          <a routerLink="/why-causality" class="action action-secondary">
+            Why causality matters
           </a>
         </div>
       </div>
@@ -73,18 +75,23 @@
 
       <div class="path-grid">
         @for (path of paths; track path.title) {
-          <article class="path-card">
-            <p class="path-eyebrow">{{ path.eyebrow }}</p>
-            <h3>{{ path.title }}</h3>
-            <p>{{ path.description }}</p>
-            <a [routerLink]="path.route">{{ path.action }} <span aria-hidden="true">→</span></a>
-          </article>
+        <article class="path-card">
+          <p class="path-eyebrow">{{ path.eyebrow }}</p>
+          <h3>{{ path.title }}</h3>
+          <p>{{ path.description }}</p>
+          <a [routerLink]="path.route"
+            >{{ path.action }} <span aria-hidden="true">→</span></a
+          >
+        </article>
         }
       </div>
     </div>
   </section>
 
-  <section class="home-section home-section-ink" aria-labelledby="grammar-title">
+  <section
+    class="home-section home-section-ink"
+    aria-labelledby="grammar-title"
+  >
     <div class="content-shell grammar-layout">
       <div class="grammar-copy">
         <p class="section-kicker">The public state grammar</p>
@@ -117,17 +124,19 @@
 
       <div class="package-list">
         @for (entry of packages; track entry.name; let index = $index) {
-          <article class="package-row">
-            <span class="package-index">0{{ index + 1 }}</span>
-            <div>
-              <h3><code>{{ entry.name }}</code></h3>
-              <p class="package-role">{{ entry.role }}</p>
-            </div>
-            <p>{{ entry.detail }}</p>
-            <a routerLink="/docs" [queryParams]="{ package: entry.package }">
-              Read docs <span aria-hidden="true">→</span>
-            </a>
-          </article>
+        <article class="package-row">
+          <span class="package-index">0{{ index + 1 }}</span>
+          <div>
+            <h3>
+              <code>{{ entry.name }}</code>
+            </h3>
+            <p class="package-role">{{ entry.role }}</p>
+          </div>
+          <p>{{ entry.detail }}</p>
+          <a routerLink="/docs" [queryParams]="{ package: entry.package }">
+            Read docs <span aria-hidden="true">→</span>
+          </a>
+        </article>
         }
       </div>
     </div>
@@ -137,7 +146,9 @@
     <div class="content-shell closing-inner">
       <div>
         <p>Build from verified semantics</p>
-        <h2>Start with one tree. Add only the capabilities the product needs.</h2>
+        <h2>
+          Start with one tree. Add only the capabilities the product needs.
+        </h2>
       </div>
       <a routerLink="/start" class="action action-primary">Take the tour</a>
     </div>

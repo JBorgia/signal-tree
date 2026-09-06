@@ -48,6 +48,12 @@ export class NavigationComponent {
           route: '/start',
         },
         {
+          id: 'causality',
+          title: 'Why causality',
+          description: 'The business value of state that retains meaning',
+          route: '/why-causality',
+        },
+        {
           id: 'architecture',
           title: 'Architecture',
           description: 'Verified ownership, causality, identity, and Link',

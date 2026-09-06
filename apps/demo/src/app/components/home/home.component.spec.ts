@@ -26,8 +26,27 @@ describe('HomeComponent', () => {
     expect(text).toContain('Authored work');
     expect(text).toContain('External truth');
     expect(text).toContain('Framework-native observation');
+    expect(text).toContain('See why causality compounds');
     expect(mark?.getAttribute('src')).toBe('/signaltree-mark.png');
     expect(mark?.getAttribute('alt')).toBe('SignalTree');
+  });
+
+  it('promotes the causal value case from the first viewport', () => {
+    const fixture = TestBed.createComponent(HomeComponent);
+    fixture.detectChanges();
+    const links = Array.from(
+      fixture.nativeElement.querySelectorAll(
+        'a'
+      ) as NodeListOf<HTMLAnchorElement>
+    );
+
+    expect(
+      links.some(
+        (link) =>
+          link.getAttribute('href') === '/why-causality' &&
+          link.textContent?.includes('Why causality matters')
+      )
+    ).toBe(true);
   });
 
   it('does not repeat unsupported performance or selector claims', () => {
