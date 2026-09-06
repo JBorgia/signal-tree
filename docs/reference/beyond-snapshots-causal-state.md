@@ -15,46 +15,51 @@
 
 ## Abstract
 
-Most application state systems are optimized to answer one question: what is
-true now? That question is necessary, but it is not always sufficient. Two
-operations can produce the same final value while requiring different decisions
-about undo, synchronization, authorization, recovery, identity, or what an
-automated agent may do next. Once an application discards the distinction, no
-selector, audit formatter, or language model can reconstruct it from the final
-snapshot with certainty.
+Most application state systems are very good at answering one question: what is
+true now? That sounds complete until two operations arrive at the same value and
+the application is still expected to know whether it may undo it, synchronize
+it, trust it, recover it, or let an automated agent act on it. At that point the
+value is no longer the entire answer. The path into it matters, and once that
+path has been thrown away, no selector, better-formatted log, or sufficiently
+confident language model can recover it from the snapshot with certainty.
 
-SignalTree 15 is a framework-neutral state kernel built around that boundary. It
-keeps canonical state, structural identity, causal turns, authored versus
-external participation, restoration, pending transactions, external
-relationships, settlement, and lifecycle under one semantic authority. Angular,
-React, and Vue realize observation using their native primitives without becoming
-additional stores.
+SignalTree 15 starts from that less comfortable premise. It is a
+framework-neutral state kernel that keeps canonical state, structural identity,
+causal turns, authored and external participation, restoration, pending
+transactions, external relationships, settlement, and lifecycle under one
+semantic authority. Angular, React, and Vue still observe state through their
+native primitives (because asking every framework to pretend it is some other
+framework would solve the wrong problem), but none becomes a second store.
 
 This paper develops the information-loss argument behind causal application
-state, describes the shipped SignalTree architecture, and connects its technical
-properties to business outcomes. Three public incidents are examined as bounded
-counterfactuals: Knight Capital's 2012 trading failure, Citibank's unintended
-2020 Revlon loan payment, and GitHub's 2018 multi-region database incident. The
-paper does not attribute any incident to a missing client-state library. It asks
-a narrower question: when an application owns the next decision, which facts
-must remain available for policy to make that decision safely?
+state, describes the SignalTree architecture that resulted from it, and then
+asks what any of this changes for an actual business. It examines Knight
+Capital's 2012 trading failure, Citibank's unintended 2020 Revlon loan payment,
+and GitHub's 2018 multi-region database incident, but does so as bounded
+counterfactual analysis rather than attribution. None of those systems used
+SignalTree, and no client-state library would have repaired their infrastructure,
+governance, or operational failures. The useful question is narrower: when an
+application does own the next decision, which facts must still exist for its
+policy to make that decision safely?
 
-The result is not a claim that causality is unique to SignalTree. A team can
-assemble the same responsibilities around another state container. SignalTree's
-claim is that these responsibilities should share one authority and one
-settlement model rather than being reconstructed independently in undo stacks,
-entity adapters, synchronization effects, framework wrappers, logs, and AI
-prompts.
+Nor is the result a claim that causality is unique to SignalTree. A team can
+assemble the same responsibilities around another state container, just as it
+can build its own undo stack, entity identity system, synchronization layer,
+framework adapters, audit journal, and AI receipts. SignalTree's claim is that
+those responsibilities work better when they share one authority and one
+settlement model instead of meeting for the first time at the point where
+something has already gone wrong.
 
 ---
 
 ## Executive Summary
 
-A snapshot describes a value. A business operation also has origin, scope,
-identity, participation, and a point at which its consequences are settled.
-Those facts affect what may be reversed, what may be sent outside the process,
-which object a retained reference means, and whether a later operation is still
-safe.
+A snapshot describes a value, which is often all a screen needs. A business
+operation, however, also has an origin, a scope, an identity, a way it
+participates in the application, and some point at which its consequences become
+settled. Those facts decide what may be reversed, what may be sent outside the
+process, which object a retained reference still means, and whether the next
+operation is safe or merely looks safe from where the application is standing.
 
 SignalTree 15 addresses this problem through one integrated model:
 
@@ -78,10 +83,11 @@ SignalTree 15 addresses this problem through one integrated model:
    or AI explanations from causal facts without storing generated prose as the
    authority for what happened.
 
-The business value is not "more metadata." It is fewer places where different
-subsystems quietly invent different answers to the same question. Recovery,
-synchronization, audit, UI rendering, and autonomous execution can agree because
-they start from the same distinctions.
+The business value is not "more metadata," because more metadata is not much of
+a business case. The value is having fewer places where recovery,
+synchronization, audit, rendering, and autonomous execution quietly invent
+different answers to the same question, each of them internally reasonable and
+all of them incompatible once they have to work together.
 
 The maximum claim is narrower than necessity. Separate application-owned
 journals, identity registries, operation groupers, and observation coordinators
@@ -92,11 +98,13 @@ provides facts for policy; it does not become the policy authority. This paper
 does not establish that integration is the only possible architecture or the
 cheapest choice for every application.
 
-The cost is real. Causal structure consumes code and memory. Explicit
-classification asks developers to state where authority changes. Bounded-life
-trees must be destroyed. Teams that only need a few local signals should use a
-simpler tool. The argument for SignalTree begins where the cost of reconstructing
-meaning exceeds the cost of preserving it.
+The cost is real. Causal structure consumes code and memory, explicit
+classification requires developers to say where authority changes, and a tree
+with a bounded lifetime must actually be destroyed when that lifetime ends. A
+team that needs three local signals and nothing more should use three local
+signals. The argument for SignalTree begins where the application keeps rebuilding
+meaning around its state (usually in several places and under several names) and
+the cost of that reconstruction exceeds the cost of preserving the meaning once.
 
 ---
 
@@ -209,10 +217,13 @@ ordered history across services. Those are different problems.[^lamport]
 
 # 2. Why the Missing Information Becomes Business Cost
 
-The immediate symptom of a missing causal fact is usually small: an undo button
-reverts too much, a component renders an intermediate value, or a retry sends the
-same command again. The business cost appears when that local ambiguity crosses a
-boundary.
+The first sign that a causal fact is missing is rarely dramatic. An undo button
+reverts a little too much, a component briefly renders a value that should never
+have existed on its own, or a retry sends the same command twice and somebody
+adds a guard for it. Each problem looks local, and each local fix can appear
+reasonable. The business cost arrives later, when that ambiguity crosses a
+boundary and the system on the other side has no reason to know which meaning
+the application intended.
 
 | Missing distinction                   | Local failure                                                             | Business exposure                                                      |
 | ------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
@@ -225,16 +236,19 @@ boundary.
 
 ## 2.1 Causality compounds
 
-The same preserved distinction can serve several capabilities. External origin
-can keep a server refresh out of undo history, prevent a pending rollback from
-discarding realized truth, and make an audit projection honest. Stable subject
-identity can support point updates, held references, restoration, and UI
-observation. A settlement boundary can coordinate rendering, persistence, and
-egress.
+The same preserved distinction can solve several problems that would otherwise
+be assigned to different teams. External origin can keep a server refresh out of
+undo history, prevent a pending rollback from discarding realized truth, and
+make an audit projection honest. Stable subject identity can support point
+updates, retained references, restoration, and UI observation. A settlement
+boundary can coordinate rendering, persistence, and egress without each one
+inventing its own definition of "done."
 
-That reuse is the economic argument. The value does not come from attaching more
-fields to every write. It comes from deciding each fact once and letting every
-dependent capability consume the same answer.
+That reuse is the economic argument. The value does not come from attaching a
+larger envelope to every write and congratulating the system for having more
+data. It comes from deciding a meaningful fact once, at the point where the fact
+still exists, and allowing every dependent capability to consume the same
+answer.
 
 ## 2.2 Why hand-rolled layers leave holes
 
@@ -248,16 +262,18 @@ A team can add these capabilities independently:
 - framework-specific stores;
 - AI transcripts and generated explanations.
 
-Each layer can be correct in isolation and still disagree at the seams. The undo
-stack may call a server refresh "user work." The entity adapter may use a current
-key where history needs lifetime identity. Persistence may observe half of a
-multi-field operation. A React mirror may disagree with the Angular source from
-which it was copied. An AI explanation may be fluent while describing the wrong
-operation boundary.
+None of these additions is inherently wrong, and a capable team can make every
+one of them work. The trouble is that they can all be correct in isolation and
+still disagree where they meet. The undo stack calls a server refresh "user
+work." The entity adapter uses the current key where history needs the original
+membership. Persistence sees the first half of a multi-field operation. A React
+mirror disagrees with the Angular source from which it was copied. The AI writes
+a perfectly coherent explanation of the wrong operation boundary.
 
-The failure is not that teams cannot build these systems. They can. The failure
-is paying repeatedly to reconstruct facts that were available only when the
-write occurred.
+The failure, then, is not that teams are incapable of building causal software
+without SignalTree. It is that they pay repeatedly to reconstruct facts that
+were available when the write occurred, and they usually discover the missing
+piece only after two individually sensible systems are asked to agree.
 
 ---
 
@@ -704,9 +720,11 @@ policy available at the point where the application owns a decision.
 
 ## 7.1 Method and boundary
 
-The following systems did not use SignalTree. Public postmortems and legal
-records rarely expose enough implementation detail to diagnose a missing state
-abstraction. Each case is therefore divided into four parts:
+The following systems did not use SignalTree, and presenting their losses as
+evidence that they should have would be both easy and wrong. Public postmortems
+and legal records rarely expose enough implementation detail to diagnose a
+missing state abstraction, particularly from outside the organization and years
+after the fact. Each case is therefore divided into four parts:
 
 1. what the public record establishes;
 2. the application-state question it raises;
@@ -714,6 +732,8 @@ abstraction. Each case is therefore divided into four parts:
 4. what SignalTree could not have prevented.
 
 The incidents are not endorsements, customer stories, or causal attributions.
+They are examples of the point at which a value stopped being enough to explain
+what the system should do next.
 
 ## 7.2 Knight Capital: action continued after the market had answered
 
@@ -835,9 +855,11 @@ application that owns a subsequent decision.
 
 ## 7.5 What these incidents establish together
 
-They do not establish that causal client state prevents catastrophic incidents.
-They establish something more modest and useful: expensive failures often cross
-boundaries where values alone are not enough.
+Taken together, these incidents do not establish that causal client state
+prevents catastrophic failures. They establish something more modest and, for
+an application designer, more useful: expensive failures often pass through a
+point where every value is technically valid and the relationship between those
+values is not.
 
 - Knight Capital needed controls to relate intent, generated action,
   acknowledgement, and aggregate exposure.
@@ -848,20 +870,26 @@ boundaries where values alone are not enough.
 
 When application policy owns a decision at one of those boundaries, preserving
 the relevant distinction is a precondition for making the policy enforceable.
+When it does not own the decision, preserving more state may improve the
+explanation, but it does not create control where none exists.
 
 ---
 
 # 8. Constructed Business Scenarios
 
-The following scenarios are hypothetical. They show realistic ways the same
-causal model affects ordinary business systems without borrowing the scale or
-authority of a public incident.
+The following scenarios are hypothetical, but the work in them is intentionally
+ordinary: a dispatcher changes a route, a store reserves inventory, and an AI
+assistant recommends an approval. None needs a spectacular failure to matter.
+They show how the same causal model affects day-to-day business systems without
+borrowing the scale or authority of a public incident.
 
 ## 8.1 Logistics: an AI-assisted route replan
 
-A dispatch platform has a route with thirty stops. A traffic service reports a
-closure. An optimization model proposes moving three deliveries, a dispatcher
-accepts two, and one driver has already acknowledged the original sequence.
+A dispatch platform has a route with thirty stops when a traffic service reports
+a closure. An optimization model proposes moving three deliveries, a dispatcher
+accepts two of them, and one driver has already acknowledged the original
+sequence. By the time the screen shows the final route, four different
+authorities have participated and only one of them actually chose the plan.
 
 ### Snapshot-only failure
 
@@ -882,9 +910,10 @@ traffic report as authored work.
 
 ### Business effect
 
-Customer windows, driver instructions, and support history can refer to the same
-stop even after the route moves. An operator can reverse the authored plan
-without claiming to reverse traffic or a driver's acknowledgement.
+Customer windows, driver instructions, and support history can continue to refer
+to the same stop after the route moves. More importantly, the dispatcher can
+reverse the plan they authored without the software pretending that they also
+reversed the road closure or withdrew the driver's acknowledgement.
 
 ### Boundary
 
@@ -895,7 +924,10 @@ infrastructure, and operational concerns.
 ## 8.2 Commerce: inventory reservation under delayed supplier events
 
 An order reserves two units while a supplier feed reports replenishment. One
-supplier event is duplicated; another arrives out of order.
+supplier event is duplicated, another arrives out of order, and the resulting
+quantity still happens to look reasonable. This is exactly the sort of failure
+that survives a dashboard check because the number is plausible even when the
+history that produced it is not.
 
 ### Snapshot-only failure
 
@@ -927,8 +959,9 @@ place to represent and use those facts.
 ## 8.3 AI operations: recommendation is not authorization
 
 An AI assistant reviews a purchase request using current budget, vendor status,
-and policy. It proposes approval. A human rejects the recommendation, the budget
-changes later, and a second reviewer approves the request.
+and policy, then recommends approval. A human rejects it, the budget changes
+later, and a second reviewer approves the same request. The final state is
+simple. Explaining honestly how it became final is not.
 
 ### Snapshot-only failure
 
@@ -962,8 +995,10 @@ those systems can operate.
 # 9. AI Raises the Price of Missing Causality
 
 An automated agent can read more state, make more related writes, retry faster,
-and explain itself more convincingly than a human operator. Those capabilities
-increase both usefulness and blast radius.
+and explain itself more convincingly than a human operator. That is why it is
+useful. It is also why the old habit of treating a final snapshot as a complete
+record becomes more dangerous: the agent can cross several boundaries before a
+person has even seen the first one.
 
 A safe application flow separates five things:
 
@@ -988,16 +1023,19 @@ flowchart LR
 
 ## 9.1 The agent should not become the state authority
 
-The model may propose an operation. Application code should translate an
-accepted proposal into a typed command, evaluate policy, and apply one explicit
-state operation. The model's text is input to that process, not the commit log.
+The model may propose an operation, but a proposal is not an authorization simply
+because it is detailed, formatted, and persuasive. Application code should
+translate an accepted proposal into a typed command, evaluate policy, and apply
+one explicit state operation. The model's text is input to that process, not the
+commit log and certainly not proof that the operation was allowed.
 
 ## 9.2 Receipts matter more than explanations
 
-An explanation can say "the refund succeeded" before a payment provider has
-accepted it. The state model should keep requested work, pending work, and
+An explanation can say "the refund succeeded" before the payment provider has
+accepted anything, and it can say so in language polished enough that a person
+believes it. The state model should keep requested work, pending work, and the
 external receipt distinct. The explanation can then be regenerated from facts
-that survived.
+that survived instead of being trusted because it sounded finished.
 
 ## 9.3 Retry must preserve operation identity
 
@@ -1034,8 +1072,10 @@ that decides whether to proceed.
 
 # 10. The Honest Competitive Position
 
-Can another library support causal application state? Yes, by implementing the
-same class of responsibilities.
+Can another library support causal application state? Of course. Software is not
+made impossible by choosing a different package; the responsibilities simply
+have to live somewhere, and the interesting question is whether they share a
+model or meet later through application code.
 
 | Approach                    | What it naturally provides                                 | What must be added for this model                                                                                                       |
 | --------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1047,8 +1087,11 @@ same class of responsibilities.
 | Logs and distributed traces | Retrospective evidence about execution                     | Mutation authority and behavior that acts on causal facts before the next decision                                                      |
 
 These categories compose. A SignalTree application can use an event-sourced
-backend, a workflow engine, OpenTelemetry, and a CRDT. SignalTree does not replace
-them. It addresses the state semantics inside one application ownership boundary.
+backend, a workflow engine, OpenTelemetry, and a CRDT (and, in a sufficiently
+complicated system, may use all four). SignalTree does not replace them. It
+addresses the state semantics inside one application ownership boundary, which
+is smaller than a distributed system and still large enough for meaning to get
+lost.
 
 The defensible product claim is therefore not exclusivity:
 
@@ -1246,23 +1289,29 @@ SignalTree is one implementation of that requirement.
 
 # 14. Conclusion
 
-Reactive state made values observable. Modern applications need the meaning of
-some transitions to remain observable too.
+Reactive state made values observable, which was an enormous improvement over
+manually keeping every dependent view in sync. Modern applications have simply
+reached the next version of the same problem: some transitions carry meaning
+that also needs to remain observable.
 
-The reason is practical. A person and a server can produce the same status. One
-allocation and two unrelated assignments can produce the same inventory. A
-reordered subject and a replacement can produce the same array. A pending local
-operation and a settled external effect can produce the same screen. The next
-valid action can differ even when the snapshot does not.
+A person and a server can produce the same status. One allocation and two
+unrelated assignments can produce the same inventory. A reordered subject and a
+replacement can produce the same array. A pending local operation and a settled
+external effect can produce the same screen. Everything can look right and the
+next valid action can still be different.
 
-SignalTree 15 treats that problem as architecture. State, identity, causal
-turns, external authority, restoration, pending transactions, settlement, and
-framework observation meet under one kernel-owned model. The application still
-owns policy. Infrastructure still owns durability and distributed truth. Humans
-still own judgment.
+SignalTree 15 treats that problem as architecture rather than as a collection of
+features added around a store. State, identity, causal turns, external authority,
+restoration, pending transactions, settlement, and framework observation meet
+under one kernel-owned model. The application still owns policy, infrastructure
+still owns durability and distributed truth, and humans still own judgment
+(which is fortunate, because none of those responsibilities becomes optional
+when the state model improves).
 
-The integrated model does not make failure impossible. It makes fewer decisions
-depend on facts the application already threw away.
+The integrated model does not make failure impossible. It does something less
+dramatic and more useful: it makes fewer decisions depend on facts the
+application already threw away, and fewer teams rediscover those facts only
+after they need them.
 
 That leaves the question every state architecture should answer:
 
