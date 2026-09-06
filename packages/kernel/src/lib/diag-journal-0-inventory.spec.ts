@@ -67,9 +67,9 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
     await flush();
     const { seen, off } = observe();
 
-    tree.$.n.set(1); // ordinary: zero restoration history
+    tree.$.n(1); // ordinary: zero restoration history
     await flush();
-    undoable(() => tree.$.n.set(2)); // designated
+    undoable(() => tree.$.n(2)); // designated
     await flush();
     off();
 
@@ -88,7 +88,7 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
     const { seen, off } = observe();
 
     withWriteContext({ intent: 'system', participation: 'realized' }, () => {
-      tree.$.n.set(9);
+      tree.$.n(9);
     });
     await flush();
     off();
@@ -101,7 +101,7 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
   it('CASE 7 — REPAIRED: a restoration carries its own origin', async () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await flush();
 
     const { seen, off } = observe();
@@ -158,8 +158,8 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
 
     // Two writes, one tick — one causal turn.
     undoable(() => {
-      tree.$.a.set(1);
-      tree.$.b.set(1);
+      tree.$.a(1);
+      tree.$.b(1);
     });
     await flush();
     off();

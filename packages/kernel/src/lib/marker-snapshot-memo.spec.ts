@@ -48,7 +48,7 @@ describe('stability', () => {
     const tree = mk();
     const before = tree.$().rows;
 
-    tree.$.unrelated.set(1);
+    tree.$.unrelated(1);
 
     expect(tree.$().rows).toBe(before);
   });
@@ -57,7 +57,7 @@ describe('stability', () => {
     const tree = mk();
     const before = tree.$().rows;
 
-    for (let i = 0; i < 50; i++) tree.$.unrelated.set(i);
+    for (let i = 0; i < 50; i++) tree.$.unrelated(i);
 
     expect(tree.$().rows).toBe(before);
   });

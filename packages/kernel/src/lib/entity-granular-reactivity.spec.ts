@@ -20,6 +20,7 @@ function makeRows() {
     updateOne: (id: number, patch: Partial<Row>) => void;
     removeOne: (id: number) => void;
     byId: (id: number) => { v: () => number | undefined } | undefined;
+    all: (() => Row[]) & { subscribe(listener: () => void): () => void };
   };
 }
 
@@ -39,6 +40,22 @@ function acquireExistingHandle(rows: InternalHandleRows, id: number) {
 }
 
 describe('entityMap granular reactivity', () => {
+  it('publishes a field and collection projection as one coherent state', () => {
+    const tree = signalTree({ rows: entityMap<Row, number>() });
+    tree.$.rows.addOne({ id: 1, v: 1 });
+    tree.$.rows.all();
+    const field = tree.$.rows.byIdOrFail(1).v;
+    const seen: Array<{ field: number; projected: number }> = [];
+    const unsubscribe = field.subscribe(() => {
+      seen.push({ field: field(), projected: tree.$.rows.all()[0].v });
+    });
+
+    tree.$.rows.updateOne(1, { v: 2 });
+
+    expect(seen).toEqual([{ field: 2, projected: 2 }]);
+    unsubscribe();
+  });
+
   it('removal releases the entity: held reference reads undefined, byId absent', () => {
     const rows = makeRows();
     rows.addOne({ id: 1, v: 5 });

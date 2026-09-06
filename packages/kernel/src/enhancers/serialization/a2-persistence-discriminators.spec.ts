@@ -43,7 +43,7 @@ describe('A2 discriminators against the SHIPPED persistence enhancer', () => {
     await flush();
     writes.length = 0;
 
-    const p = tree.transaction(() => { tree.$.prefs.theme.set('OPTIMISTIC'); });
+    const p = tree.transaction(() => { tree.$.prefs.theme('OPTIMISTIC'); });
     await flush();
     const midWrites = writes.filter(w => w.includes('OPTIMISTIC')).length;
     p.rollback();
@@ -65,7 +65,7 @@ describe('A2 discriminators against the SHIPPED persistence enhancer', () => {
     await flush();
     writes.length = 0;
 
-    tree.$.prefs.theme.set('changed-just-before-background');
+    tree.$.prefs.theme('changed-just-before-background');
     await flush();
     const beforeDrain = writes.length;
 
@@ -101,7 +101,7 @@ describe('A2 discriminators against the SHIPPED persistence enhancer', () => {
       { enhancers: [persistence({ key: 'k4', storage: adapter, debounceMs: 0 })] }
     ) as any;
     await flush();
-    tree.$.prefs.theme.set('light');
+    tree.$.prefs.theme('light');
     await flush();
     const payload = store.get('k4') ?? '';
     // WHOLE-TREE, and this is the real gap against the production need.

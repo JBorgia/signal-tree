@@ -17,6 +17,7 @@ export default defineConfig({
     include: [
       'src/lib/internals/diagnostics/diag-journal-1-eviction.spec.ts',
       'src/enhancers/serialization/a2-5-lifetime.spec.ts',
+      'src/lib/internals/location-runtime-retention.spec.ts',
     ],
   },
   define: { __DEV__: true },

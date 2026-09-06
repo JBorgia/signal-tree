@@ -23,10 +23,13 @@
  *
  *   1. total growth at 3x the retirements must not exceed 2x the total at 1x
  *      (a linear regime gives ~3x; the slack absorbs noise, not a slope)
- *   2. per-retired must stay inside +/-20 B at BOTH points
+ *   2. the incremental growth between the two points must not exceed 20 B per
+ *      additional retired subject
  *
- * Condition 2 alone would pass a small constant leak; condition 1 alone is
- * unstable when both totals sit in the noise. Together they say "flat".
+ * Condition 2 removes fixed runtime/JIT cost from the slope calculation while
+ * still catching a small linear leak that condition 1's ratio can miss.
+ * Each endpoint is the median of three isolated processes so one GC/JIT outlier
+ * cannot decide the result.
  *
  * ## Before you raise the tolerance
  *
@@ -48,7 +51,21 @@ const ARM = 'no-history-reads';
 const LOW_ROUNDS = 50;
 const HIGH_ROUNDS = 150;
 const MAX_GROWTH_RATIO = 2;
-const MAX_BYTES_PER_RETIRED = 20;
+const MAX_SLOPE_BYTES_PER_RETIRED = 20;
+const BYTES_PER_MB = 1024 * 1024;
+const SAMPLES_PER_POINT = 3;
+
+function median(values) {
+  const ordered = [...values].sort((a, b) => a - b);
+  return ordered[Math.floor(ordered.length / 2)];
+}
+
+function incrementalSlope(low, high) {
+  return Math.round(
+    ((high.growthMB - low.growthMB) * BYTES_PER_MB) /
+      (high.retiredSubjects - low.retiredSubjects)
+  );
+}
 
 function judge(low, high) {
   const problems = [];
@@ -63,14 +80,12 @@ function judge(low, high) {
     );
   }
 
-  for (const point of [low, high]) {
-    if (Math.abs(point.bytesPerRetiredSubject) > MAX_BYTES_PER_RETIRED) {
-      problems.push(
-        `${point.retiredSubjects} retired subjects cost ` +
-          `${point.bytesPerRetiredSubject} B each, over the ` +
-          `+/-${MAX_BYTES_PER_RETIRED} B flat band`
-      );
-    }
+  const slope = incrementalSlope(low, high);
+  if (slope > MAX_SLOPE_BYTES_PER_RETIRED) {
+    problems.push(
+      `incremental growth was ${slope} B per additional retired subject, ` +
+        `over the ${MAX_SLOPE_BYTES_PER_RETIRED} B flat-growth ceiling`
+    );
   }
 
   return problems;
@@ -88,6 +103,15 @@ if (process.argv.includes('--self-test')) {
     { growthMB: 0.3, retiredSubjects: 50_000, bytesPerRetiredSubject: 6 },
     { growthMB: -0.83, retiredSubjects: 150_000, bytesPerRetiredSubject: -6 }
   );
+  const fixedRuntimeCost = judge(
+    { growthMB: 4.1, retiredSubjects: 50_000, bytesPerRetiredSubject: 86 },
+    { growthMB: 3.5, retiredSubjects: 150_000, bytesPerRetiredSubject: 24 }
+  );
+  const shallowLinear = judge(
+    { growthMB: 4, retiredSubjects: 50_000, bytesPerRetiredSubject: 84 },
+    { growthMB: 6.5, retiredSubjects: 150_000, bytesPerRetiredSubject: 45 }
+  );
+  const outlierMedian = median([4.17, 16.17, 4.18]);
 
   if (linear.length === 0) {
     console.error(
@@ -104,8 +128,29 @@ if (process.argv.includes('--self-test')) {
     );
     process.exit(1);
   }
+  if (fixedRuntimeCost.length > 0) {
+    console.error(
+      `\n❌ self-test: the checker REJECTED bounded fixed runtime cost:\n  ${fixedRuntimeCost.join(
+        '\n  '
+      )}`
+    );
+    process.exit(1);
+  }
+  if (shallowLinear.length === 0) {
+    console.error(
+      '\n❌ self-test: the checker ACCEPTED a shallow linear slope hidden ' +
+        'beneath fixed runtime cost.'
+    );
+    process.exit(1);
+  }
+  if (outlierMedian !== 4.18) {
+    console.error(
+      `\n❌ self-test: endpoint median retained an isolated outlier (${outlierMedian}).`
+    );
+    process.exit(1);
+  }
   console.log(
-    '✅ self-test: rejects the pre-fix linear table, accepts the flat one.'
+    '✅ self-test: rejects linear slopes and accepts flat totals with fixed runtime cost.'
   );
   process.exit(0);
 }
@@ -124,12 +169,23 @@ if (!existsSync(BENCH)) {
 }
 
 const runArm = (rounds) => {
-  const out = execFileSync(
-    process.execPath,
-    ['--expose-gc', BENCH, '--arm', ARM, '--rounds', String(rounds)],
-    { encoding: 'utf8' }
-  );
-  return JSON.parse(out.trim().split('\n').at(-1));
+  const samples = Array.from({ length: SAMPLES_PER_POINT }, () => {
+    const out = execFileSync(
+      process.execPath,
+      ['--expose-gc', BENCH, '--arm', ARM, '--rounds', String(rounds)],
+      { encoding: 'utf8' }
+    );
+    return JSON.parse(out.trim().split('\n').at(-1));
+  });
+  const growthMB = median(samples.map((sample) => sample.growthMB));
+  return {
+    ...samples[0],
+    growthMB,
+    bytesPerRetiredSubject: Math.round(
+      (growthMB * BYTES_PER_MB) / samples[0].retiredSubjects
+    ),
+    sampleGrowthMB: samples.map((sample) => sample.growthMB),
+  };
 };
 
 console.log(
@@ -144,7 +200,8 @@ for (const point of [low, high]) {
   console.log(
     `  ${String(point.retiredSubjects).padStart(7)} retired   ` +
       `${String(point.growthMB).padStart(7)} MB   ` +
-      `${String(point.bytesPerRetiredSubject).padStart(5)} B/retired`
+      `${String(point.bytesPerRetiredSubject).padStart(5)} B/retired   ` +
+      `[${point.sampleGrowthMB.join(', ')} MB]`
   );
 }
 
@@ -161,5 +218,6 @@ if (problems.length > 0) {
 
 console.log(
   '\n✅ no measurable slope: 3x the retirements did not scale the total, and ' +
-    `both points are inside +/-${MAX_BYTES_PER_RETIRED} B/retired.`
+    `incremental growth is ${incrementalSlope(low, high)} B/retired ` +
+    `(ceiling ${MAX_SLOPE_BYTES_PER_RETIRED} B).`
 );

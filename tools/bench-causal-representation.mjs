@@ -61,7 +61,7 @@ const row = (id, value = id) => ({ id, value });
 
 const addIndependentScalarTurns = async (tree, count) => {
   for (let value = 1; value <= count; value++) {
-    undoable(() => tree.$.value.set(value));
+    undoable(() => tree.$.value(value));
     await flush();
   }
 };
@@ -139,7 +139,7 @@ const ARMS = {
     label: 'ordinary undesignated scalar write',
     create: () => scalarTree(),
     run: async (tree) => {
-      tree.$.value.set(1);
+      tree.$.value(1);
       await flush();
       if (tree.$.value() !== 1 || tree.getRestorationHistory().length !== 0) {
         throw new Error('A0 postcondition failed');
@@ -150,7 +150,7 @@ const ARMS = {
     label: 'external scalar realization',
     create: () => scalarTree(),
     run: async (tree) => {
-      external(() => tree.$.value.set(1));
+      external(() => tree.$.value(1));
       await flush();
       if (tree.$.value() !== 1 || tree.getRestorationHistory().length !== 0) {
         throw new Error('A1 postcondition failed');
@@ -161,7 +161,7 @@ const ARMS = {
     label: 'one designated scalar turn',
     create: () => scalarTree(),
     run: async (tree) => {
-      undoable(() => tree.$.value.set(1));
+      undoable(() => tree.$.value(1));
       await flush();
       if (tree.$.value() !== 1 || tree.getRestorationHistory().length !== 1) {
         throw new Error('B0 postcondition failed');
@@ -173,8 +173,8 @@ const ARMS = {
     create: () => scalarTree(),
     run: async (tree) => {
       undoable(() => {
-        tree.$.value.set(1);
-        tree.$.second.set(2);
+        tree.$.value(1);
+        tree.$.second(2);
       });
       await flush();
       if (tree.getRestorationHistory().length !== 1 || tree.$.second() !== 2) {
@@ -225,7 +225,7 @@ const ARMS = {
     create: () => rowsTree(),
     run: async (tree) => {
       undoable(() => {
-        tree.$.value.set(1);
+        tree.$.value(1);
         tree.$.rows.addOne(row('mixed'));
       });
       await flush();
@@ -287,7 +287,7 @@ const ARMS = {
     label: 'undo one scalar turn',
     create: () => scalarTree(),
     setup: async (tree) => {
-      undoable(() => tree.$.value.set(1));
+      undoable(() => tree.$.value(1));
       await flush();
     },
     run: async (tree) => {
@@ -313,7 +313,7 @@ const ARMS = {
     label: 'redo scalar turn',
     create: () => scalarTree(),
     setup: async (tree) => {
-      undoable(() => tree.$.value.set(1));
+      undoable(() => tree.$.value(1));
       await flush();
       tree.undo();
       await flush();
@@ -328,7 +328,7 @@ const ARMS = {
     label: 'public history projection of one turn',
     create: () => scalarTree(),
     setup: async (tree) => {
-      undoable(() => tree.$.value.set(1));
+      undoable(() => tree.$.value(1));
       await flush();
     },
     run: async (tree) => {

@@ -13,9 +13,9 @@ describe('restoration behavior', () => {
       { enhancers: [restoration()] }
     );
 
-    undoable(() => enhanced.$.count.set(1));
+    undoable(() => enhanced.$.count(1));
     await flush();
-    undoable(() => enhanced.$.text.set('hello'));
+    undoable(() => enhanced.$.text('hello'));
     await flush();
 
     expect(enhanced.canUndo()).toBe(true);

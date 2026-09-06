@@ -80,7 +80,7 @@ describe('the snapshot shape is unaffected', () => {
     const snapshot = tree.$();
 
     tree.$.rows.addOne({ id: 3, v: 3 });
-    tree.$.n.set(99);
+    tree.$.n(99);
     tree.$(snapshot);
 
     expect(tree.$.rows.all().map((r) => r.id)).toEqual([1, 2]);

@@ -2,8 +2,10 @@
 // the split rebinds them per package. No Angular VALUE remains in kernel utils.
 import type { ReadableCell } from './internals/cell-runtime';
 import { isTreeCell, markTreeCell } from './internals/cell-identity';
-import { NEUTRAL_MATERIALIZATION_REALIZATION } from './internals/materialization-realization';
-import { getTreeRealization } from './internals/tree-realization';
+import {
+  isWritableLocation,
+  replaceLocation,
+} from './internals/location-runtime';
 import {
   bindSnapshotParent,
   isSnapshotNode,
@@ -26,14 +28,7 @@ import {
  * reactive" — the conflation that `isAnySignal` died of. Local to this file
  * because these walkers are its only users.
  */
-function isReactiveStateValue(value: unknown, owner: unknown = value): boolean {
-  if (isTreeCell(value)) return true;
-  if (typeof value !== 'function') return false;
-  return (
-    getTreeRealization(owner)?.materialization.isReactiveNode(value) ??
-    NEUTRAL_MATERIALIZATION_REALIZATION.isReactiveNode(value)
-  );
-}
+const isReactiveStateValue = isTreeCell;
 import { deepEqual } from './internals/utilities/deep-equal';
 import { isBuiltInObject } from './internals/utilities/is-built-in-object';
 import { dormantKeys, hasDormantMembers } from './internals/member-membership';
@@ -137,7 +132,7 @@ import type { NodeAccessor, TreeNode } from './types';
  * Checks if a value is a non-null object or function — the permissive
  * "can this have own enumerable children worth recursing into" test that
  * every hand-written tree walker in this codebase needs. Node accessors and
- * leaf signals are callable (`typeof === 'function'`); plain nested state
+ * locations are callable (`typeof === 'function'`); plain nested state
  * literals are plain objects (`typeof === 'object'`) — a walker that only
  * accepts one of the two silently skips half the tree.
  *
@@ -203,9 +198,9 @@ function isMemoisable(node: object): boolean {
  * The previous mechanism deleted the memo from its WeakMap. That changes what a
  * FUTURE caller receives and does nothing to a consumer already depending on the
  * old computed. Measured on a plain static tree: after `box({keep})` omitted
- * `drop`, a held `getDerivedRuntime().createDerived(() => box())` still reported `{keep, drop}` while
- * `drop()` correctly returned `undefined` — two observable answers to whether
- * `drop` exists.
+ * `drop`, a held readonly location derived from `box()` still reported
+ * `{keep, drop}` while `drop()` correctly returned `undefined` — two observable
+ * answers to whether `drop` exists.
  *
  * ⚠️ ALLOCATED AT FIRST MATERIALIZATION, NOT AT FIRST TRANSITION. Allocating on
  * the first membership change cannot work: a consumer established earlier never
@@ -395,8 +390,8 @@ function buildFromStore<T>(node: object): T {
 
     const value = (node as Record<string, unknown>)[key];
 
-    // NOTE: there was a name-based skip for `set`/`update` here. A leaf signal
-    // IS a function, so it dropped state stored under those keys — `set` and
+    // NOTE: there was a name-based skip for `set`/`update` here. A location IS
+    // a function, so it dropped state stored under those keys — `set` and
     // `update` are ordinary words (permission sets, an `update` timestamp) and
     // they vanished from every snapshot, every persisted payload and every
     // structuredClone, silently. The general plain-function skip below already
@@ -674,7 +669,13 @@ export function applyState<T>(stateNode: TreeNode<T>, snapshot: T): void {
     // was built to catch, and did.
     if (hydrateMarkerNode(target, val, 'restore')) continue;
 
-    if (isNodeAccessor(target)) {
+    if (isWritableLocation(target)) {
+      try {
+        replaceLocation(target, val);
+      } catch {
+        // ignore
+      }
+    } else if (isNodeAccessor(target)) {
       if (val && typeof val === 'object') {
         try {
           applyState(
@@ -696,15 +697,9 @@ export function applyState<T>(stateNode: TreeNode<T>, snapshot: T): void {
         }
       }
     } else if (isReactiveStateValue(target)) {
-      try {
-        (target as CallableTarget).set?.(val);
-      } catch {
-        try {
-          (target as CallableTarget)(val);
-        } catch {
-          // ignore
-        }
-      }
+      // Readonly derived state is recomputed from source truth and is not a
+      // replay target.
+      continue;
     } else if (
       target &&
       typeof target === 'object' &&

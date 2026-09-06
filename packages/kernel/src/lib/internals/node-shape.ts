@@ -54,6 +54,7 @@ export function isNodeAccessor(
   value: unknown
 ): value is NodeAccessor<unknown> {
   return (
-    typeof value === 'function' && !!value && CALLABLE_SIGNAL_SYMBOL in value
+    typeof value === 'function' &&
+    (value as unknown as Record<symbol, unknown>)[CALLABLE_SIGNAL_SYMBOL] === true
   );
 }

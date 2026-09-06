@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { interceptLocationWrites } from './internals/location-runtime';
 import { signalTree } from './signal-tree';
 
 describe('updateAndReport + ref-equality short-circuit', () => {
@@ -27,20 +28,25 @@ describe('updateAndReport + ref-equality short-circuit', () => {
     expect(changed).toEqual([]);
   });
 
-  it('skips signal.set() when incoming value is ref-equal', () => {
+  it('skips the location write when incoming value is ref-equal', () => {
     const tree = signalTree({ count: 0 });
-    const sig = tree.$.count as unknown as {
-      set: (v: unknown) => void;
-    };
-    const setSpy = vi.spyOn(sig, 'set');
+    const writeSpy = vi.fn();
+    const release = interceptLocationWrites(
+      tree.$.count,
+      (_operation, proceed) => {
+        writeSpy();
+        proceed();
+      }
+    );
 
     // Same value: should be skipped
     tree.$({ count: 0 });
-    expect(setSpy).not.toHaveBeenCalled();
+    expect(writeSpy).not.toHaveBeenCalled();
 
     // Different value: should fire
     tree.$({ count: 1 });
-    expect(setSpy).toHaveBeenCalledTimes(1);
+    expect(writeSpy).toHaveBeenCalledTimes(1);
+    release();
   });
 
   it('updateAndReport accepts an updater function', () => {

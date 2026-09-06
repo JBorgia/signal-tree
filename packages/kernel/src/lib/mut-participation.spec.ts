@@ -2,7 +2,7 @@ import { undoable } from '../lib/undoable';
 
 import { createReactiveTestRealization } from '../reactive-test-realization';
 import { entityMap, restoration, signalTree } from '../index';
-import { bindSignalTreeRealization } from './signal-tree';
+import { createSignalTreeFactory } from './signal-tree';
 import { getWriteParticipation } from './write-participation';
 import { withWriteContext } from './write-context';
 import {
@@ -12,8 +12,8 @@ import {
 } from './path-notifier';
 
 const testRealization = createReactiveTestRealization();
-const reactiveSignalTree = bindSignalTreeRealization(testRealization);
-const computed = testRealization.derived.createDerived;
+const reactiveSignalTree = createSignalTreeFactory(testRealization);
+const computed = testRealization.locations.createDerived;
 
 /**
  * MUT-1 — EVIDENCE. What distinguishes a physical change that merely REALIZES
@@ -84,7 +84,7 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
   it('ORDINARY LEAF WRITE — the reference case', async () => {
     const r = await probe(plain, (t) => {
       undoable(() =>
-        (t as unknown as { $: { a: { n: { set(v: number): void } } } }).$.a.n.set(
+        (t as unknown as { $: { a: { n(value: number): void } } }).$.a.n(
           2
         )
       );
@@ -193,7 +193,7 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
     );
     const seen = computed(() => tree.$.a.n());
     expect(seen()).toBe(1);
-    undoable(() => tree.$.a.n.set(9));
+    undoable(() => tree.$.a.n(9));
     expect(seen()).toBe(9);
   });
 });
@@ -210,7 +210,7 @@ describe('MUT-1 CONTROL — is notification a property of the WRITE or of an ENH
       notified.push(String(path))
     );
 
-    undoable(() => tree.$.a.n.set(2));
+    undoable(() => tree.$.a.n(2));
     await tick();
     off();
 
@@ -228,7 +228,7 @@ describe('MUT-1 CONTROL — is notification a property of the WRITE or of an ENH
       notified.push(String(path))
     );
 
-    undoable(() => tree.$.a.n.set(2));
+    undoable(() => tree.$.a.n(2));
     await tick();
     off();
 
@@ -274,7 +274,7 @@ describe('MUT-1 — which WRITE PATHS reach the notifier?', () => {
   it('DIRECT leaf .set()', async () => {
     const r = await capture((t) => {
       undoable(() =>
-        (t as unknown as { $: { a: { n: { set(v: number): void } } } }).$.a.n.set(
+        (t as unknown as { $: { a: { n(value: number): void } } }).$.a.n(
           2
         )
       );
@@ -310,10 +310,8 @@ describe('MUT-1 — which WRITE PATHS reach the notifier?', () => {
 
 describe('MUT-1 — the interceptLeafSignals docblock, tested verbatim', () => {
   /**
-   * Its stated premise: "SignalTree's recursive update pipeline writes to leaf
-   * signals directly without invoking PathNotifier ... a direct call like
-   * `tree.$.user.profile.name.set(x)` never produces a PathNotifier event by
-   * itself."
+  * Its stated premise: direct location writes do not invoke PathNotifier by
+  * themselves, so the intrinsic mutation channel must bridge them.
    */
   it('the exact shape the docblock names', async () => {
     resetPathNotifier();
@@ -326,7 +324,7 @@ describe('MUT-1 — the interceptLeafSignals docblock, tested verbatim', () => {
       notified.push(String(path))
     );
 
-    undoable(() => tree.$.user.profile.name.set('b'));
+    undoable(() => tree.$.user.profile.name('b'));
     await tick();
     off();
 
@@ -395,7 +393,7 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
     // Deliberately NOT designated. This test's subject is the METADATA an
     // observer receives, not restoration, so it needs no undoable() — and
     // leaving it undesignated is what preserves the original finding below.
-    tree.$.a.n.set(2);
+    tree.$.a.n(2);
     await tick();
     off();
 
@@ -411,7 +409,7 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
     await tick();
     const { seen, off } = capture();
 
-    undoable(() => tree.$.a.n.set(2));
+    undoable(() => tree.$.a.n(2));
     await tick();
     off();
 
@@ -431,7 +429,7 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
     resetPathNotifier();
     const tree = signalTree({ a: { n: 1 } }, { enhancers: [restoration()] });
     await tick();
-    undoable(() => tree.$.a.n.set(2));
+    undoable(() => tree.$.a.n(2));
     await tick();
 
     const { seen, off } = capture();
@@ -494,7 +492,7 @@ describe('MUT-2 — is the authored/realized marking SYMMETRIC?', () => {
     resetPathNotifier();
     const tree = signalTree({ a: { n: 1 } }, { enhancers: [restoration()] });
     await tick();
-    undoable(() => tree.$.a.n.set(2));
+    undoable(() => tree.$.a.n(2));
     await tick();
     tree.undo();
     await tick();
@@ -520,7 +518,7 @@ describe('MUT-2 — is the authored/realized marking SYMMETRIC?', () => {
     await tick();
 
     const { seen, off } = capture();
-    undoable(() => tree.$.a.n.set(2));
+    undoable(() => tree.$.a.n(2));
     await tick();
     off();
 
@@ -593,7 +591,7 @@ describe('MUT-2B — does OMITTING the realization stamp manufacture authorship?
     const before = tree.getRestorationHistory().length;
 
     withWriteContext(meta as never, () => {
-      undoable(() => tree.$.a.n.set(1));
+      undoable(() => tree.$.a.n(1));
     });
     await tick();
 
@@ -635,10 +633,10 @@ describe('MUT-2B CONTROL LADDER — is it the FIELD or merely the CONTEXT?', () 
     await tick();
     const before = tree.getRestorationHistory().length;
     if (meta === null) {
-      undoable(() => tree.$.a.n.set(1));
+      undoable(() => tree.$.a.n(1));
     } else {
       withWriteContext(meta as never, () => {
-        undoable(() => tree.$.a.n.set(1));
+        undoable(() => tree.$.a.n(1));
       });
     }
     await tick();
@@ -674,7 +672,7 @@ describe('MUT-2C — is realization FORGEABLE from ordinary authoring code?', ()
     const before = tree.getRestorationHistory().length;
 
     withWriteContext({ participation: 'realized' } as never, () => {
-      undoable(() => tree.$.balance.set(1_000_000));
+      undoable(() => tree.$.balance(1_000_000));
     });
     await tick();
 
@@ -690,7 +688,7 @@ describe('MUT-2C — is realization FORGEABLE from ordinary authoring code?', ()
     await tick();
     const before = tree.getRestorationHistory().length;
 
-    undoable(() => tree.$.balance.set(1_000_000));
+    undoable(() => tree.$.balance(1_000_000));
     await tick();
 
     expect(tree.$.balance()).toBe(1_000_000);

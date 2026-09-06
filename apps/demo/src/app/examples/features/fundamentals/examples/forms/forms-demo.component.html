@@ -13,7 +13,8 @@
         <input
           id="username"
           type="text"
-          [(ngModel)]="username"
+          [ngModel]="username()"
+          (ngModelChange)="username.set($event)"
           (blur)="usernameTouched.set(true)"
           [class.invalid]="usernameTouched() && !usernameValid()"
           [class.valid]="usernameTouched() && usernameValid()"
@@ -36,7 +37,8 @@
         <input
           id="email"
           type="email"
-          [(ngModel)]="email"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
           (blur)="emailTouched.set(true)"
           [class.invalid]="emailTouched() && !emailValid()"
           [class.valid]="emailTouched() && emailValid()"
@@ -57,7 +59,8 @@
         <input
           id="password"
           type="password"
-          [(ngModel)]="password"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
           (blur)="passwordTouched.set(true)"
           [class.invalid]="passwordTouched() && !passwordValid()"
           [class.valid]="passwordTouched() && passwordValid()"
@@ -75,7 +78,10 @@
               [style.background]="getPasswordStrengthColor()"
             ></div>
           </div>
-          <span class="strength-text" [style.color]="getPasswordStrengthColor()">
+          <span
+            class="strength-text"
+            [style.color]="getPasswordStrengthColor()"
+          >
             {{ getPasswordStrengthText() }}
           </span>
         </div>
@@ -92,7 +98,8 @@
         <input
           id="confirmPassword"
           type="password"
-          [(ngModel)]="confirmPassword"
+          [ngModel]="confirmPassword()"
+          (ngModelChange)="confirmPassword.set($event)"
           (blur)="confirmPasswordTouched.set(true)"
           [class.invalid]="confirmPasswordTouched() && !passwordsMatch()"
           [class.valid]="confirmPasswordTouched() && passwordsMatch()"
@@ -112,7 +119,8 @@
         <label class="checkbox-label">
           <input
             type="checkbox"
-            [(ngModel)]="agreeToTerms"
+            [ngModel]="agreeToTerms()"
+            (ngModelChange)="agreeToTerms.set($event)"
             name="agreeToTerms"
             class="checkbox-input"
           />

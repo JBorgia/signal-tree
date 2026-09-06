@@ -131,7 +131,7 @@ describe('notifier ownership invariant', () => {
         owners.push((meta as { ownerId?: number } | undefined)?.ownerId);
       }
     );
-    a.$.scalar.set(1);
+    a.$.scalar(1);
     await flush();
     off();
     void b;

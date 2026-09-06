@@ -92,19 +92,19 @@ const arm = async (options: {
 
   let payload: { marker: string } | null = { marker: 'evict-me' };
   const ref = new WeakRef(payload);
-  tree.$.payload.set(payload);
+  tree.$.payload(payload);
   await flush();
 
   // Every reference outside the journal is gone, the tree's own included.
   payload = null;
-  tree.$.payload.set(null);
+  tree.$.payload(null);
   await flush();
 
   for (let i = 0; i < options.fillersAfter; i++) {
-    tree.$.payload.set({ marker: `filler-${i}` });
+    tree.$.payload({ marker: `filler-${i}` });
     await flush();
   }
-  tree.$.payload.set(null);
+  tree.$.payload(null);
   await flush();
 
   const retainedTurns = journal?.turns().length ?? 0;

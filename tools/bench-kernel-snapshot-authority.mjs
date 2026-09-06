@@ -58,7 +58,7 @@ if (arm === 'unread' || arm === 'read') {
   const shallowNs = timeWrites(() => {
     const tree = signalTree({ value: 0 });
     return {
-      write: (value) => tree.$.value.set(value),
+      write: (value) => tree.$.value(value),
       read: () => tree.$(),
       destroy: () => tree.destroy(),
     };
@@ -69,7 +69,7 @@ if (arm === 'unread' || arm === 'read') {
     let leaf = tree.$;
     for (let depth = 0; depth < 50; depth++) leaf = leaf.child;
     return {
-      write: (value) => leaf.value.set(value),
+      write: (value) => leaf.value(value),
       read: () => tree.$(),
       destroy: () => tree.destroy(),
     };
@@ -82,7 +82,7 @@ if (arm === 'unread' || arm === 'read') {
     let writes = 0;
     return {
       write: (value) => {
-        leaf.value.set(value);
+        leaf.value(value);
         writes++;
         if (writes === 100) {
           void tree.$();

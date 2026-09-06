@@ -11,9 +11,14 @@ describe('NavigationComponent', () => {
       'advanced',
       'archive',
     ]);
-    expect(component.sections.map((section) => section.items.map((item) => item.route))).toEqual([
+    expect(
+      component.sections.map((section) =>
+        section.items.map((item) => item.route)
+      )
+    ).toEqual([
       [
         '/start',
+        '/why-causality',
         '/architecture-overview',
         '/examples/fundamentals',
         '/migrate',
@@ -26,23 +31,19 @@ describe('NavigationComponent', () => {
         '/external-truth',
       ],
       ['/docs', '/docs', '/docs'],
-      [
-        '/benchmarks',
-        '/devtools',
-        '/deep-typing',
-        '/architecture-overview',
-      ],
+      ['/benchmarks', '/devtools', '/deep-typing', '/architecture-overview'],
       ['/legacy-changelog', '/realistic-benchmark-history'],
     ]);
 
     const links = component.sections.flatMap((section) => section.items);
     expect(
-      component.sections.find((section) => section.id === 'frameworks')?.items
-        .map((item) => item.queryParams?.['package'])
+      component.sections
+        .find((section) => section.id === 'frameworks')
+        ?.items.map((item) => item.queryParams?.['package'])
     ).toEqual(['angular', 'react', 'kernel']);
-    expect(
-      links.find((item) => item.id === 'state-derived')?.fragment
-    ).toBe('signals-basics');
+    expect(links.find((item) => item.id === 'state-derived')?.fragment).toBe(
+      'signals-basics'
+    );
     expect(links.some((item) => item.route === '/markers')).toBe(false);
   });
 

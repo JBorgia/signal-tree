@@ -75,7 +75,7 @@
  * mistaken for a consequence of this branch.
  */
 import { entityMap } from './types';
-import type { WritableCell } from './internals/cell-runtime';
+import type { Location } from './internals/cell-runtime';
 import type { EntitySignal } from './types';
 import type { NodeAccessor } from './node-accessor';
 import { signalTree } from './signal-tree';
@@ -93,9 +93,9 @@ const tree = signalTree({
 type NaturalValue<S> =
   S extends EntitySignal<infer R, infer _K>
     ? R[]
-    : S extends NodeAccessor<infer T>
+    : S extends Location<infer T>
       ? T
-      : S extends WritableCell<infer T>
+      : S extends NodeAccessor<infer T>
         ? T
         : never;
 

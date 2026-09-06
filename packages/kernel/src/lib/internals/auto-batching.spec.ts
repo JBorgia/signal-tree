@@ -31,7 +31,7 @@ describe('auto-batching in signalTree callable', () => {
     });
 
     // Primitives use .set() method, not callable
-    tree.$.count.set(1);
+    tree.$.count(1);
 
     expect(tree.$.count()).toBe(1);
   });
@@ -42,7 +42,7 @@ describe('auto-batching in signalTree callable', () => {
     });
 
     // Arrays use .set() method for full replacement
-    tree.$.items.set(['x', 'y', 'z']);
+    tree.$.items(['x', 'y', 'z']);
     expect(tree.$.items()).toEqual(['x', 'y', 'z']);
   });
 
@@ -108,6 +108,19 @@ describe('auto-batching in signalTree callable', () => {
     tree.$.data({ x: 5, y: 2 });
     expect(tree.$.data.x()).toBe(5);
     expect(tree.$.data.y()).toBe(2);
+  });
+
+  it('location subscribers observe only the completed branch value', () => {
+    const tree = signalTree({ pair: { left: 0, right: 0 } });
+    const seen: Array<{ left: number; right: number }> = [];
+    const unsubscribe = tree.$.pair.left.subscribe(() => {
+      seen.push(tree.$.pair());
+    });
+
+    tree.$.pair({ left: 1, right: 1 });
+
+    expect(seen).toEqual([{ left: 1, right: 1 }]);
+    unsubscribe();
   });
 
   it('an updater argument writes the value it returns', () => {

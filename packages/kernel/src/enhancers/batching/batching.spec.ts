@@ -1,59 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { signalTree } from '../../lib/signal-tree';
+import { interceptLocationWrites } from '../../lib/internals/location-runtime';
 import { batching, batchingWithConfig } from './batching';
 
-// Helper to create a basic mock tree for unit tests
-function createMockTree() {
-  const state = { count: 0, name: '' } as Record<string, any>;
-
-  const root = function (...args: any[]) {
-    if (args.length === 0) return state;
-    const arg = args[0];
-    if (typeof arg === 'function') {
-      const res = arg(state);
-      if (res && typeof res === 'object') Object.assign(state, res);
-      return;
-    }
-    if (typeof arg === 'object') {
-      Object.assign(state, arg);
-      return;
-    }
-  } as any;
-  const tree = {} as any;
-
-  // Create signal-like accessors for state properties
-  tree.state = {
-    count: {
-      set: (v: number) => {
-        state.count = v;
-      },
-      update: (fn: (v: number) => number) => {
-        state.count = fn(state.count);
-      },
-    },
-    name: {
-      set: (v: string) => {
-        state.name = v;
-      },
-      update: (fn: (v: string) => string) => {
-        state.name = fn(state.name);
-      },
-    },
-  };
-  for (const [key, value] of Object.entries(tree.state)) {
-    Object.defineProperty(root, key, {
-      value,
-      enumerable: true,
-      configurable: true,
-      writable: true,
-    });
-  }
-  tree.$ = root;
-  tree.destroy = () => void 0;
-
-  return tree as any;
-}
+const createMockTree = () => signalTree({ count: 0, name: '' });
 
 describe('batching enhancer', () => {
   // ==========================================
@@ -77,7 +28,7 @@ describe('batching enhancer', () => {
       const tree = createMockTree();
       const enhanced = batching()(tree);
 
-      enhanced.$.count.set(5);
+      enhanced.$.count(5);
 
       // Value should be updated immediately - no waiting
       expect(tree.$()).toEqual({ count: 5, name: '' });
@@ -87,7 +38,7 @@ describe('batching enhancer', () => {
       const tree = createMockTree();
       const enhanced = batching()(tree);
 
-      enhanced.$.count.update((c: number) => c + 10);
+      enhanced.$.count((c: number) => c + 10);
 
       // Value should be updated immediately - no waiting
       expect(tree.$()).toEqual({ count: 10, name: '' });
@@ -98,33 +49,20 @@ describe('batching enhancer', () => {
       const enhanced = batching()(tree);
 
       // Write then immediately read - this is the critical pattern
-      enhanced.$.count.set(42);
+      enhanced.$.count(42);
       const value = tree.$().count;
 
       expect(value).toBe(42); // Immediate, no waiting!
     });
 
     it('should work with nested object updates', () => {
-      const nestedState = {
+      const tree = signalTree({
         user: { name: 'Alice', settings: { theme: 'light' } },
-      };
-      const tree = createMockTree();
-      Object.assign(tree.$(), nestedState);
-
-      // Create nested signal-like structure
-      tree.$.user = {
-        settings: {
-          theme: {
-            set: (v: string) => {
-              tree.$().user.settings.theme = v;
-            },
-          },
-        },
-      };
+      });
 
       const enhanced = batching()(tree);
 
-      enhanced.$.user.settings.theme.set('dark');
+      enhanced.$.user.settings.theme('dark');
 
       expect(tree.$().user.settings.theme).toBe('dark');
     });
@@ -140,10 +78,10 @@ describe('batching enhancer', () => {
       const enhanced = batching()(tree) as any;
 
       enhanced.batch(() => {
-        enhanced.$.count.set(1);
+        enhanced.$.count(1);
         expect(tree.$().count).toBe(1); // Immediate!
 
-        enhanced.$.name.set('test');
+        enhanced.$.name('test');
         expect(tree.$().name).toBe('test'); // Immediate!
       });
 
@@ -155,10 +93,10 @@ describe('batching enhancer', () => {
       const enhanced = batching()(tree) as any;
 
       enhanced.batch(() => {
-        enhanced.$.count.set(1);
+        enhanced.$.count(1);
 
         enhanced.batch(() => {
-          enhanced.$.name.set('nested');
+          enhanced.$.name('nested');
           expect(tree.$().name).toBe('nested'); // Immediate even in nested batch
         });
 
@@ -173,7 +111,7 @@ describe('batching enhancer', () => {
 
       expect(() => {
         enhanced.batch(() => {
-          enhanced.$.count.set(5);
+          enhanced.$.count(5);
           throw new Error('test error');
         });
       }).toThrow('test error');
@@ -193,20 +131,20 @@ describe('batching enhancer', () => {
       let writeCount = 0;
 
       // Track writes
-      const originalSet = tree.$.count.set;
-      tree.$.count.set = (v: number) => {
+      const release = interceptLocationWrites(tree.$.count, (_operation, proceed) => {
         writeCount++;
-        originalSet(v);
-      };
+        proceed();
+      });
+      tree.registerCleanup(release);
 
       const enhanced = batching()(tree) as any;
 
       enhanced.coalesce(() => {
-        enhanced.$.count.set(1);
-        enhanced.$.count.set(2);
-        enhanced.$.count.set(3);
-        enhanced.$.count.set(4);
-        enhanced.$.count.set(5);
+        enhanced.$.count(1);
+        enhanced.$.count(2);
+        enhanced.$.count(3);
+        enhanced.$.count(4);
+        enhanced.$.count(5);
       });
 
       expect(tree.$().count).toBe(5);
@@ -218,12 +156,12 @@ describe('batching enhancer', () => {
       const enhanced = batching()(tree) as any;
 
       enhanced.coalesce(() => {
-        enhanced.$.count.set(1);
-        enhanced.$.name.set('a');
-        enhanced.$.count.set(2);
-        enhanced.$.name.set('b');
-        enhanced.$.count.set(3);
-        enhanced.$.name.set('c');
+        enhanced.$.count(1);
+        enhanced.$.name('a');
+        enhanced.$.count(2);
+        enhanced.$.name('b');
+        enhanced.$.count(3);
+        enhanced.$.name('c');
       });
 
       expect(tree.$().count).toBe(3);
@@ -240,12 +178,12 @@ describe('batching enhancer', () => {
       const tree = createMockTree();
       const enhanced = batching({ enabled: false })(tree) as any;
 
-      enhanced.$.count.set(5);
+      enhanced.$.count(5);
       expect(tree.$().count).toBe(5);
 
       // batch() should still work (passthrough)
       enhanced.batch(() => {
-        enhanced.$.count.set(10);
+        enhanced.$.count(10);
       });
       expect(tree.$().count).toBe(10);
     });
@@ -278,7 +216,7 @@ describe('batching enhancer', () => {
         notified = true;
       };
 
-      enhanced.$.count.set(5);
+      enhanced.$.count(5);
 
       // Value is immediate
       expect(tree.$().count).toBe(5);
@@ -303,7 +241,7 @@ describe('batching enhancer', () => {
         notified = true;
       };
 
-      enhanced.$.count.set(5);
+      enhanced.$.count(5);
       expect(tree.$().count).toBe(5);
 
       // With default (notificationDelayMs: 0), notification should happen on microtask
@@ -323,7 +261,7 @@ describe('batching enhancer', () => {
 
       expect(enhanced.hasPendingNotifications()).toBe(false);
 
-      enhanced.$.count.set(5);
+      enhanced.$.count(5);
 
       expect(enhanced.hasPendingNotifications()).toBe(true);
     });
@@ -337,7 +275,7 @@ describe('batching enhancer', () => {
         notified = true;
       };
 
-      enhanced.$.count.set(5);
+      enhanced.$.count(5);
       expect(notified).toBe(false);
 
       enhanced.flushNotifications();
@@ -389,14 +327,11 @@ describe('batching enhancer', () => {
   // ==========================================
 
   describe('enhancer chain', () => {
-    it('should preserve .with() if available on tree', () => {
+    it('should preserve root accessor identity', () => {
       const tree = createMockTree();
-      tree.with = (enhancer: any) => enhancer(tree);
 
       const enhanced = batching()(tree);
 
-      // The enhanced tree should still have with() if it was on original
-      // This is implementation-dependent
       expect(enhanced.$ === tree.$).toBe(true);
     });
   });
@@ -410,9 +345,9 @@ describe('coalesce() + update() — no wall-clock data loss (14.1.1)', () => {
   it('three +1 updaters in one coalesce apply all three', () => {
     const tree = signalTree({ n: 0 }, { enhancers: [batching()] });
     tree.coalesce(() => {
-      tree.$.n.update((v) => v + 1);
-      tree.$.n.update((v) => v + 1);
-      tree.$.n.update((v) => v + 1);
+      tree.$.n((v) => v + 1);
+      tree.$.n((v) => v + 1);
+      tree.$.n((v) => v + 1);
     });
     expect(tree.$.n()).toBe(3);
   });
@@ -426,9 +361,9 @@ describe('coalesce() + update() — no wall-clock data loss (14.1.1)', () => {
     };
     const tree = signalTree({ n: 0 }, { enhancers: [batching()] });
     tree.coalesce(() => {
-      tree.$.n.update((v) => v + 1);
+      tree.$.n((v) => v + 1);
       spin(2);
-      tree.$.n.update((v) => v + 1);
+      tree.$.n((v) => v + 1);
     });
     expect(tree.$.n()).toBe(2);
   });
@@ -437,9 +372,9 @@ describe('coalesce() + update() — no wall-clock data loss (14.1.1)', () => {
   it('set still coalesces to the final value', () => {
     const tree = signalTree({ q: '' }, { enhancers: [batching()] });
     tree.coalesce(() => {
-      tree.$.q.set('h');
-      tree.$.q.set('he');
-      tree.$.q.set('hel');
+      tree.$.q('h');
+      tree.$.q('he');
+      tree.$.q('hel');
     });
     expect(tree.$.q()).toBe('hel');
   });
@@ -449,8 +384,8 @@ describe('coalesce() + update() — no wall-clock data loss (14.1.1)', () => {
   it('an updater observes a pending coalesced set on the same path', () => {
     const tree = signalTree({ n: 0 }, { enhancers: [batching()] });
     tree.coalesce(() => {
-      tree.$.n.set(10);
-      tree.$.n.update((v) => v + 1);
+      tree.$.n(10);
+      tree.$.n((v) => v + 1);
     });
     expect(tree.$.n()).toBe(11);
   });

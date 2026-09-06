@@ -14,26 +14,27 @@
  *     basename collision shipped stale STUB barrels for realtime/ng-forms/
  *     guardrails — they resolved fine, so the resolution-only smoke passed.
  *
- * esbuild resolves `export *` chains through relative files and elides
- * type-only exports on the TS side, so both sides yield comparable
- * runtime-export lists. Star re-exports from EXTERNAL specifiers are opaque
- * on both sides equally (none exist today in any barrel).
+ * esbuild resolves relative `export *` chains and elides type-only exports on
+ * the TS side. Framework facades also star-export the external kernel package;
+ * those names are opaque here on both sides and are verified by the packed
+ * facade-identity and consumer-typecheck gate.
  *
  * Wired into: scripts/pre-publish-validation.sh (step 7b) and
  * .github/workflows/validate.yml. Exit non-zero on any failure.
  */
 import { build } from 'esbuild';
+import { RELEASE_PACKAGES } from '../scripts/release-plan.mjs';
 
-const PKGS = [
-  'kernel',
-  'angular',
-  'react',
-];
+const PKGS = RELEASE_PACKAGES;
 const ROOT = new URL('..', import.meta.url).pathname;
 const NM = `${ROOT}node_modules`;
 // Externalize ambient peers + sibling @signaltree packages + heavy build-time deps.
 const EXTERNAL = [
   '@angular/*',
+  'react',
+  'react/*',
+  'vue',
+  'vue/*',
   'rxjs',
   'rxjs/*',
   'tslib',

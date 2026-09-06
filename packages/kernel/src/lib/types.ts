@@ -1,8 +1,14 @@
-import type { LeafCarriers } from '../adapter';
-import type { ReadableCell, WritableCell } from './internals/cell-runtime';
+import type {
+  LeafCarriers,
+  ReadonlyLeafCarriers,
+  ReadonlyViewLeafCarriers,
+} from '../adapter';
+
+export type { Location, ReadonlyLocation } from './internals/cell-runtime';
 
 import type { WriteMetadata } from './mutation-types';
 import type { NodeAccessor } from './node-accessor';
+import type { CallableSyntax, LeafDefinition } from './leaf';
 
 import type { EnhancerWithMeta, TreeCapability } from './enhancer-types';
 
@@ -55,8 +61,6 @@ export type Primitive =
   | bigint
   | symbol;
 
-export type NotFn<T> = T extends (...args: unknown[]) => unknown ? never : T;
-
 // NOTE: A `declare module '@angular/core'` augmentation that added callable
 // overloads to Angular's `WritableCell<T>` previously lived here. It was
 // removed because it is a *global* augmentation: importing anything from
@@ -71,47 +75,19 @@ export type NotFn<T> = T extends (...args: unknown[]) => unknown ? never : T;
 // supported way to make a raw Angular signal callable-as-setter.
 
 /**
- * A branch (non-leaf) node in the tree.
+ * Every canonical SignalTree location has one callable grammar:
  *
- * ## READ THIS BEFORE "FIXING" ANYTHING THAT TOUCHES NODES
+ * | operation | spelling |
+ * |---|---|
+ * | read | `location()` |
+ * | replace | `location(value)` |
+ * | derive from current | `location(current => next)` |
+ * | replace with callable data | `location(leaf(callable))` |
  *
- * The single fact that explains SignalTree's shape:
- * **only LEAVES are Angular signals.** A node is not a signal at all — it is a
- * plain function built by `makeNodeAccessor` with its child keys hung off it
- * as properties.
- *
- * That gives the two halves of the tree different, deliberate surfaces:
- *
- * | | leaf (`WritableCell<T>`) | node (`NodeAccessor<T>`) |
- * |---|---|---|
- * | read | `leaf()` | `node()` — unwraps the whole subtree |
- * | write a value | `leaf.set(v)` | `node({ partial })` — deep merge |
- * | write from current | `leaf.update(fn)` | `node(fn)` — fn gets the unwrapped value |
- * | has `.set` / `.update` | yes | **no — and it needs none** |
- *
- * Nodes are callable *by nature*: the three signatures below are the complete
- * write surface, and `node({ a: 1 })` merges — keys you don't pass are left
- * untouched, at every depth. Leaves are the opposite: calling a leaf with an
- * argument does **nothing at all**, because an Angular signal getter ignores
- * extra arguments.
- *
- * As of 14.0.0 that is a COMPILE ERROR rather than a silent no-op:
- * `WritableLeaf` no longer declares setter overloads.
- * `@signaltree/callable-syntax` used to promise the leaf form via a build
- * transform and was deleted — it could not run inside an Angular app at all.
- *
- * Two mistakes this comment exists to prevent:
- *
- * 1. **Do not add `.set()`/`.update()` to `NodeAccessor`.** It is not a
- *    missing feature. The call signatures already do both writes, and adding
- *    methods would collide with any state key literally named `set`/`update`.
- * 2. **Do not describe node call-syntax as depending on a build transform,** or
- *    as something to avoid. It is core behaviour and needs zero build tooling.
- *    (A transform once existed for LEAF calls only; it is gone.)
- *
- * Runtime, if you want to confirm rather than trust this comment:
- * `typeof node === 'function'`, `node.set === undefined`,
- * `node.update === undefined`, while `leaf.set` / `leaf.update` are functions.
+ * Branch writes replace a complete value; they do not infer a partial merge.
+ * There are deliberately no `.set()` or `.update()` methods because state may
+ * legally contain keys with those names. `leaf(value)` marks a terminal
+ * topology boundary and disambiguates callable data from an updater.
  */
 /**
  * The literal (declared) keys of `S`, discarding any `string`/`number` index
@@ -151,14 +127,19 @@ type LiteralKeys<S> = keyof {
  * Declared here rather than reusing `EntitySignalWithSlices` because
  * `markers/entity-map.ts` imports from this file — the dependency runs one way.
  */
-type ApplyComputedSlices<TMarker, TBase> = TMarker extends {
+type ApplyComputedSlices<
+  TMarker,
+  TBase,
+  C extends CarrierKind
+> = TMarker extends {
   __sliceTypes?: infer S;
 }
   ? [LiteralKeys<NonNullable<S>>] extends [never]
     ? TBase
     : TBase & {
-        readonly [P in LiteralKeys<NonNullable<S>>]: ReadableCell<
-          NonNullable<S>[P]
+        readonly [P in LiteralKeys<NonNullable<S>>]: ReadonlyOf<
+          NonNullable<S>[P],
+          C
         >;
       }
   : TBase;
@@ -196,14 +177,18 @@ type ApplyComputedSlices<TMarker, TBase> = TMarker extends {
  * CANNOT carry dynamic keys, not on proving the type should stop promising them.
  */
 /**
- * INTERNAL carrier-parametric shape law. Exported at module scope so the
- * package's own specializations and falsifiers can name it; deliberately NOT
- * re-exported from the barrel, which is the sole entrypoint (`exports` declares
- * only "." and "./package.json"), so consumers cannot reach it.
+ * Universal recursive shape law shared by every framework facade.
  */
+export type CarrierKind = keyof LeafCarriers<unknown> &
+  keyof ReadonlyLeafCarriers<unknown> &
+  keyof ReadonlyViewLeafCarriers<unknown>;
+export type LeafOf<T, C extends CarrierKind> = LeafCarriers<T>[C];
+
 export type TreeNodeOf<T, C extends CarrierKind> = {
-  [K in keyof T]: T[K] extends EntityMapMarker<infer E, infer Key>
-    ? ApplyComputedSlices<T[K], EntitySignalOf<E, Key, C>>
+  [K in keyof T]: T[K] extends LeafDefinition<infer Value>
+    ? LeafOf<Value, C>
+    : T[K] extends EntityMapMarker<infer E, infer Key>
+    ? ApplyComputedSlices<T[K], EntitySignalOf<E, Key, C>, C>
     : T[K] extends Primitive
     ? LeafOf<T[K], C>
     : T[K] extends readonly unknown[]
@@ -217,9 +202,29 @@ export type TreeNodeOf<T, C extends CarrierKind> = {
         | ((...args: unknown[]) => unknown)
     ? LeafOf<T[K], C> // Built-in objects → treat as atomic values
     : T[K] extends object
-    ? NodeAccessor<T[K]> & TreeNodeOf<T[K], C>
+    ? NodeAccessor<ResolveLeafDefinitions<T[K]>> & TreeNodeOf<T[K], C>
     : LeafOf<T[K], C>;
 };
+
+export type TreeNode<T> = TreeNodeOf<T, 'location'>;
+
+export type ResolveLeafDefinitions<T> = T extends LeafDefinition<infer Value>
+  ? Value
+  : T extends EntityMapMarker<infer _Entity, infer _Key>
+  ? T
+  : T extends readonly unknown[]
+  ? T
+  : T extends
+      | Date
+      | RegExp
+      | Map<unknown, unknown>
+      | Set<unknown>
+      | Error
+      | CallableSyntax
+  ? T
+  : T extends object
+  ? { [K in keyof T]: ResolveLeafDefinitions<T[K]> }
+  : T;
 
 // NOTE: The read-only view types (`ReadonlyView`, `ReadonlyStore`,
 // `ReadonlyNodeAccessor`, the per-marker `Readonly*Signal` views and their
@@ -233,29 +238,20 @@ export type TreeNodeOf<T, C extends CarrierKind> = {
 // v6: primary runtime tree type is `SignalTree<T>`; a deprecated alias
 // `SignalTree<T>` is provided at the end of this file for compatibility.
 /**
- * The readable projection of a carrier, derived from the carrier itself.
- * `AngularLeaf.asReadonly()` returns `Signal<T>`; `NeutralLeaf.asReadonly()`
- * returns `ReadableCell<T>` — so the read-only side needs no second registry
- * and no extra adapter export.
+ * The readonly projection of a universal location.
  */
-export type ReadonlyOf<K extends CarrierKind, T> = LeafOf<T, K> extends {
-  asReadonly(): infer R;
-}
-  ? R
-  : never;
+export type ReadonlyOf<
+  T,
+  C extends CarrierKind = 'location'
+> = ReadonlyLeafCarriers<T>[C];
+
+export type ReadonlyViewLeafOf<
+  T,
+  C extends CarrierKind = 'location'
+> = ReadonlyViewLeafCarriers<T>[C];
 
 /**
- * The tree contract, parametric over the carrier. INTERNAL.
- *
- * TYPE-A-PACKAGE-BINDING-0. Binding at `TreeNode` was not enough: `signalTree`'s
- * RETURN type fixed the carrier before the Angular package could choose one, so
- * `export * from '@signal-tree/kernel'` handed Angular neutral declarations.
- * Each package binds this once instead:
- *
- *     @signal-tree/kernel    ISignalTree<T> = ISignalTreeOf<T, 'cell'>
- *     @signal-tree/angular   ISignalTree<T> = ISignalTreeOf<T, 'angular'>
- *
- * Ordinary users never write a carrier: both roots expose `ISignalTree<T>`.
+ * The universal tree contract shared by every framework facade.
  * The canonical whole-tree NaturalValue reader returns the correct committed
  * snapshot. Repeated reads return the same root object while committed truth is
  * unchanged. The greenfield tree controller is non-callable; its root `$`
@@ -266,8 +262,8 @@ export type ReadonlyOf<K extends CarrierKind, T> = LeafOf<T, K> extends {
  */
 export interface ISignalTreeOf<
   T,
-  K extends CarrierKind,
-  TAccum = TreeNodeOf<T, K>
+  C extends CarrierKind,
+  TAccum = TreeNodeOf<T, C>
 > {
   /** Canonical root state accessor: read, whole-value replace, or derive. */
   readonly $: NodeAccessor<T> & TAccum;
@@ -291,20 +287,20 @@ export interface ISignalTreeOf<
    */
   destroy(): void;
   /** Whether this tree has been destroyed. */
-  readonly destroyed: ReadonlyOf<K, boolean>;
+  readonly destroyed: ReadonlyOf<boolean, C>;
   /**
    * Register a cleanup function to be called when the tree is destroyed.
    * Enhancers should use this to release resources (intervals, subscriptions, etc.).
    */
   registerCleanup(fn: EnhancerCleanup): void;
   /**
-   * Apply a partial update and return the dot-paths of leaf signals that
+   * Apply a partial update and return the dot-paths of locations that
    * actually changed.
    *
-   * "Actually changed" is literal: a path appears only if the leaf signal
+   * "Actually changed" is literal: a path appears only if the location
    * accepted the write. Values that are ref-equal to the current value are
-   * skipped before the `set()`, and values that are a NEW reference but
-   * DEEP-EQUAL are rejected by the leaf's own `equal` — a re-fetched server
+   * skipped before replacement, and values that are a NEW reference but
+   * DEEP-EQUAL are rejected by the location's own equality policy — a re-fetched server
    * payload that matches what you already hold reports `[]`, not every key
    * in the payload.
    *
@@ -322,8 +318,11 @@ export interface ISignalTreeOf<
   // specific enhanced shape they expect (e.g. `SignalTree<T> & BatchingMethods<T>`).
 }
 
-/** PUBLIC kernel tree contract. One parameter; carrier bound here. */
-export type ISignalTree<T> = ISignalTreeOf<T, 'cell'>;
+export type ISignalTree<T, TAccum = TreeNode<T>> = ISignalTreeOf<
+  T,
+  'location',
+  TAccum
+>;
 
 /** Cleanup function returned or registered by enhancers. */
 export type EnhancerCleanup = () => void;
@@ -714,8 +713,7 @@ export type EntityNodeOf<E, C extends CarrierKind> = {
     : LeafOf<E[P], C>;
 };
 
-/** PUBLIC kernel entity node. Carrier bound to the neutral cell. */
-export type EntityNode<E> = EntityNodeOf<E, 'cell'>;
+export type EntityNode<E> = EntityNodeOf<E, 'location'>;
 
 /**
  * EntitySignal provides reactive entity collection management.
@@ -739,24 +737,24 @@ export interface EntitySignalOf<
   byIdOrFail(id: K): EntityNodeOf<E, C>;
 
   // Queries (readonly properties returning signals)
-  readonly all: ReadonlyOf<C, E[]>;
-  readonly count: ReadonlyOf<C, number>;
-  readonly ids: ReadonlyOf<C, K[]>;
-  has(id: K): ReadonlyOf<C, boolean>;
+  readonly all: ReadonlyOf<E[], C>;
+  readonly count: ReadonlyOf<number, C>;
+  readonly ids: ReadonlyOf<K[], C>;
+  has(id: K): ReadonlyOf<boolean, C>;
   /**
    * True when the collection has no entities. v10.3 canonical name —
    * aligns with FormControl-style bare-boolean accessors used across
    * `status` / `form` / `asyncSource` markers.
    */
-  readonly empty: ReadonlyOf<C, boolean>;
+  readonly empty: ReadonlyOf<boolean, C>;
   /**
    * The collection as a `ReadonlyMap`, keyed by id. Renamed from `map` in 14.1.1 —
    * `map` read as a projection beside `all()`, which is what `.map(fn)` means to
    * every JS developer.
    */
-  readonly asMap: ReadonlyOf<C, ReadonlyMap<K, E>>;
-  where(predicate: (entity: E) => boolean): ReadonlyOf<C, E[]>;
-  find(predicate: (entity: E) => boolean): ReadonlyOf<C, E | undefined>;
+  readonly asMap: ReadonlyOf<ReadonlyMap<K, E>, C>;
+  where(predicate: (entity: E) => boolean): ReadonlyOf<E[], C>;
+  find(predicate: (entity: E) => boolean): ReadonlyOf<E | undefined, C>;
 
   // Active entity — the master/detail primitive.
   //
@@ -765,8 +763,8 @@ export interface EntitySignalOf<
   // `activeEntity` resolves through `byId`, so it is O(1) and invalidates only
   // when THAT row changes — finer-grained than the filtered-stream versions the
   // other libraries offer.
-  readonly activeId: ReadonlyOf<C, K | undefined>;
-  readonly activeEntity: ReadonlyOf<C, E | undefined>;
+  readonly activeId: ReadonlyOf<K | undefined, C>;
+  readonly activeEntity: ReadonlyOf<E | undefined, C>;
   setActiveId(id: K | undefined): void;
   clearActiveId(): void;
 
@@ -816,11 +814,10 @@ export interface EntitySignalOf<
   intercept(handlers: InterceptHandlers<E, K>): () => void;
 }
 
-/** PUBLIC kernel entity contract. Carrier bound to the neutral cell. */
 export type EntitySignal<
   E,
   K extends string | number = string
-> = EntitySignalOf<E, K, 'cell'>;
+> = EntitySignalOf<E, K, 'location'>;
 
 /**
  * @deprecated The old EntityHelpers interface is deprecated and will be removed in v6.0.
@@ -926,7 +923,7 @@ export interface DevToolsConfig {
  */
 export type DeepEntityAwareTreeNode<T> = {
   [K in keyof T]: T[K] extends EntityMapMarker<infer E, infer Key>
-    ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
+    ? ApplyComputedSlices<T[K], EntitySignal<E, Key>, 'location'>
     : T[K] extends object
     ? DeepEntityAwareTreeNode<T[K]>
     : WritableLeaf<T[K]>;
@@ -941,7 +938,7 @@ export type DeepEntityAwareTreeNode<T> = {
  */
 export type EntityAwareTreeNode<T> = {
   [K in keyof T]: T[K] extends EntityMapMarker<infer E, infer Key>
-    ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
+    ? ApplyComputedSlices<T[K], EntitySignal<E, Key>, 'location'>
     : WritableLeaf<T[K]>;
 };
 
@@ -1005,120 +1002,18 @@ type PathInterceptor = (
 // These are intentionally simple aliases or fallbacks to keep the public API stable
 // while allowing internal refactors of the type system.
 
-// `WritableLeaf<T>` is declared as an interface (not an
-// intersection) so TypeScript's overload-resolution picks the getter
-// `(): T` first when `ReadableCell<T>` inference walks the call signatures —
-// e.g. for `toObservable(tree.$.x)`. Prior to 9.2.0 the global
-// `declare module '@angular/core'` augmentation in core also added
-// these overloads to the base `WritableCell<T>` and incidentally
-// masked the ordering issue; the interface form makes the contract
-// self-contained.
-export interface AngularLeaf<T> extends WritableCell<T> {
-  (): T;
-  // ⚠️ 14.0.0 — THE SETTER OVERLOADS ARE GONE. They typed a call that did
-  // nothing.
-  //
-  //   (value: NotFn<T>): void;
-  //   (updater: (current: T) => T): void;
-  //
-  // A LEAF IS A REAL ANGULAR SIGNAL. Calling one is a READ; it returns the
-  // value and discards the argument. Measured: `tree.$.count(5)` on a leaf
-  // holding 0 left it at 0, silently. The same expression one level up —
-  // `tree.$.user({ name: 'Bob' })` — DOES work, because a branch is our own
-  // accessor and we own its call semantics. So the type promised a uniformity
-  // the runtime never had, and the failure was invisible at both compile time
-  // and run time.
-  //
-  // `@signaltree/callable-syntax` existed to close that gap by rewriting
-  // `leaf(v)` to `leaf.set(v)` at build time. It cannot be delivered to an
-  // Angular app at all (RFC 0008 §4, verified against a real build:
-  // `@angular/build:application` exposes no `plugins`; `codePlugins` runs after
-  // ngtsc has claimed every `.ts` — a probe received ZERO files; ngtsc's
-  // transformer list is hardcoded; ts-patch goes inert under `isolatedModules`).
-  // Angular is this library's primary audience, so for most users these
-  // overloads could never have become true.
-  //
-  // The alternative — wrap every leaf so the call really sets — was measured
-  // and rejected. Cost was not the problem (~4% on a set+get, inside noise);
-  // IDENTITY was: a wrapper is not a signal. `isSignal(wrapper)` is `false` and
-  // `Symbol(SIGNAL)` is absent, so `toObservable`, `model()`/`input()` interop
-  // and every third-party tool that guards on `isSignal` would break. Trading
-  // that for call-site sugar is a bad trade, and "leaves are real Angular
-  // signals" is the interop guarantee the whole design rests on.
-  //
-  // Write a leaf with `.set()` / `.update()`. Branches stay callable.
-}
-
 /**
- * The neutral twin of `AngularLeaf`. Same call/write surface, no framework.
- *
- * PACKAGE-LEAF-TYPE-SEAM-0 — outcome **TYPE-A**. `@signal-tree/kernel` and
- * `@signal-tree/angular` need DIFFERENT TRUTHFUL leaf types over the SAME tree
- * semantics, so the shape law below is parametric over a carrier KIND while the
- * two specializations stay ordinary interfaces.
- *
- * Measured, and the reason this is not a rename:
- *
- *     Angular WritableCell<T>  ->  WritableCell<T>   assignable
- *     WritableCell<T>  ->  Angular WritableCell<T>   NOT assignable
- *                                   (missing [SIGNAL], [WRITABLE_SIGNAL])
- *
- * So the kernel CANNOT publish `WritableCell` under the Angular name without
- * silently breaking every consumer that passes a leaf to `toObservable`,
- * `input()`, or `@ngrx/signals` — the exact interop guarantee the comment above
- * says the design rests on, and the failure that deleted
- * `@signaltree/callable-syntax` in 14.0.0.
- *
- *     A NEUTRAL CARRIER MUST NOT CLAIM A FRAMEWORK'S BRANDING.
+ * Compatibility alias for the public writable location shared by every
+ * framework package. New declarations should prefer `Location<T>`.
  */
-export interface NeutralLeaf<T> extends WritableCell<T> {
-  (): T;
-}
+export type WritableLeaf<T> = LeafOf<T, 'location'>;
 
-/**
- * The carrier registry. Adding a runtime means adding one entry here, not a
- * second tree model.
- */
-// The registry is declared in `../adapter` so framework packages can merge
-// their own carrier into it (TA-B). The kernel only consumes it.
-export type CarrierKind = keyof LeafCarriers<unknown>;
+export type AccessibleNodeOf<
+  T,
+  C extends CarrierKind
+> = NodeAccessor<T> & TreeNodeOf<T, C>;
 
-/**
- * The ordinary leaf, resolved against a carrier.
- *
- * The default keeps every existing annotation — `WritableLeaf<T>` —
- * meaning exactly what it meant before, so this parameter is INVISIBLE to
- * ordinary code. Users never write a carrier: each package binds it once and
- * `signalTree()` infers the rest.
- *
- *     THE PRODUCT API MUST NOT BECOME SOPHISTICATED BECAUSE THE IMPLEMENTATION
- *     NEEDED A SEAM.
- */
-/** INTERNAL. See `TreeNodeOf`. Not re-exported from the barrel. */
-export type LeafOf<T, K extends CarrierKind> = LeafCarriers<T>[K];
-
-/**
- * PUBLIC tree shape. ONE type parameter: the consumer's state.
- *
- * TYPE-A-PUBLIC-SURFACE-0 — the carrier lives on `TreeNodeOf`, which is NOT
- * exported. Each package binds it once:
- *
- *     @signal-tree/kernel    TreeNode<T> = TreeNodeOf<T, 'cell'>     <- bound here
- *     @signal-tree/angular   TreeNode<T> = TreeNodeOf<T, 'angular'>
- *
- *     DEFAULTED IMPLEMENTATION COMPLEXITY IS STILL PUBLIC COMPLEXITY IF IT
- *     APPEARS IN THE DECLARATION.
- *
- * A defaulted second parameter was REJECTED: it made the carrier ignorable, not
- * private, and `TreeNode<State, 'cell'>` would have typechecked in application
- * code. Carrier selection is a packaging decision, never a consumer decision.
- */
-export type TreeNode<T> = TreeNodeOf<T, 'cell'>;
-
-/** PUBLIC leaf type. One parameter, for the same reason as `TreeNode`. */
-export type WritableLeaf<T> = LeafOf<T, 'cell'>;
-
-export type AccessibleNode<T> = NodeAccessor<T> & TreeNode<T>;
+export type AccessibleNode<T> = AccessibleNodeOf<T, 'location'>;
 
 // Removed v5 legacy helper types to reduce public surface area in v6
 
@@ -1170,29 +1065,12 @@ export type SignalTree<T> = ISignalTree<T>;
 // If a tree guard is wanted, write it against the v15 shape — `$`, `state`,
 // `destroy`, callable — and demonstrate it, like every other barrel export.
 
-/**
- * The `signalTree` FACTORY, parametric over the carrier. INTERNAL / adapter-only.
- *
- * TYPE-A-PACKAGE-BINDING-0 — the last binding point. `ISignalTreeOf` was not
- * sufficient: `signalTree` is a 5-overload function whose declared return types
- * already name a bound tree, so a package cannot re-bind the carrier with a type
- * alias. The overloads are mirrored here with `TreeNodeOf<T, K>` substituted, so
- * a package binds ONE name and the whole surface follows:
- *
- *     @signal-tree/kernel    signalTree: SignalTreeFactoryOf<'cell'>
- *     @signal-tree/angular   signalTree: SignalTreeFactoryOf<'angular'>
- *
- * The runtime function is the SAME kernel implementation in both packages. This
- * changes only what each package DECLARES it returns, which is legitimate
- * because the Angular package is the thing that installed the Angular
- * realization — a fact already proven at runtime by S1 and by the root
- * initialization control.
- */
+/** Canonical tree-construction overloads shared by every framework facade. */
 import type { ProcessDerivedOf } from './internals/derived-types';
 import type { Enhancer } from '../enhancers/types';
 import type { AccumulatedEnhancerAdditions } from './enhancer-types';
 
-export interface SignalTreeFactoryOf<K extends CarrierKind> {
+export interface SignalTreeFactoryOf<C extends CarrierKind> {
   <
     T extends object,
     TDerived extends object,
@@ -1201,9 +1079,13 @@ export interface SignalTreeFactoryOf<K extends CarrierKind> {
     initialState: T,
     config: Omit<TreeConfig, 'enhancers' | 'derived'> & {
       enhancers?: E;
-      derived: ($: TreeNodeOf<T, K>) => TDerived;
+      derived: ($: TreeNodeOf<T, C>) => TDerived;
     }
-  ): ISignalTreeOf<T, K, TreeNodeOf<T, K> & ProcessDerivedOf<TDerived, K>> &
+  ): ISignalTreeOf<
+    ResolveLeafDefinitions<T>,
+    C,
+    TreeNodeOf<T, C> & ProcessDerivedOf<TDerived, C>
+  > &
     AccumulatedEnhancerAdditions<E>;
   <T extends object, const E extends readonly Enhancer<unknown>[]>(
     initialState: T,
@@ -1211,12 +1093,15 @@ export interface SignalTreeFactoryOf<K extends CarrierKind> {
       enhancers: E;
       derived?: never;
     }
-  ): ISignalTreeOf<T, K> & AccumulatedEnhancerAdditions<E>;
+  ): ISignalTreeOf<ResolveLeafDefinitions<T>, C, TreeNodeOf<T, C>> &
+    AccumulatedEnhancerAdditions<E>;
   <T extends object>(
     initialState: T,
     config?: Omit<TreeConfig, 'enhancers' | 'derived'> & {
       enhancers?: never;
       derived?: never;
     }
-  ): ISignalTreeOf<T, K>;
+  ): ISignalTreeOf<ResolveLeafDefinitions<T>, C, TreeNodeOf<T, C>>;
 }
+
+export type SignalTreeFactory = SignalTreeFactoryOf<'location'>;

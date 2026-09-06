@@ -58,7 +58,7 @@ describe('S3-RECOVER: the historical n/rows corruption', () => {
 
     // The authored change the comment describes: n 2 -> 3, rows 2 -> 3.
     undoable(() => {
-      tree.$.n.set(3);
+      tree.$.n(3);
       tree.$.rows.addOne({ id: 3 });
     });
     await settle();

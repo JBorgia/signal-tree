@@ -33,7 +33,10 @@ type Rows = {
 };
 
 type Store = {
-  $: { rows: Rows; n: { (): number; set(v: number): void } };
+  $: {
+    rows: Rows;
+    n: { (value: number): void; (update: (current: number) => number): void; (): number };
+  };
   transaction(fn: () => void): { confirm(): void; rollback(): void };
   undo(): void;
 };
@@ -74,7 +77,7 @@ describe('DIAG-JOURNAL-1 F7: retained records hold no live SignalTree handles', 
     await flush();
     undoable(() => tree.$.rows.updateOne('a', { name: 'Renamed' }));
     await flush();
-    const pending = tree.transaction(() => tree.$.n.set(3));
+    const pending = tree.transaction(() => tree.$.n(3));
     await flush();
     pending.rollback();
     await flush();
@@ -122,7 +125,7 @@ describe('DIAG-JOURNAL-1 F7: retained records hold no live SignalTree handles', 
     const tree = makeTree();
     await flush();
     const journal = createDiagnosticJournal(tree as unknown as object);
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await flush();
 
     const values = journal.turns().flatMap((t) => reachable(t));

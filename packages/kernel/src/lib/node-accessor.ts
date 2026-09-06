@@ -1,6 +1,7 @@
 /**
  * A branch node in the tree: a plain callable object with child keys hung off
- * it. Leaves are Angular signals; branch nodes are not.
+ * it. Leaves are universal locations; branch nodes use a collision-free
+ * callable write grammar so child keys may use location-method names.
  */
 export interface NodeAccessor<T> {
   /** Read: unwraps this node and everything under it. */

@@ -1,9 +1,17 @@
-import { computed, type Signal, type WritableSignal } from '@angular/core';
+import {
+  entityMap,
+  link,
+  restoration,
+  signalTree,
+  type AccessibleNode,
+  type EntitySignalWithSlices,
+  type WritableLeaf,
+} from '../index';
+import type { Signal } from '@angular/core';
 
-import { restoration, signalTree } from '../index';
-
-type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() =>
-  T extends B ? 1 : 2
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
+  ? 1
+  : 2
   ? true
   : false;
 type Expect<T extends true> = T;
@@ -14,19 +22,19 @@ const tree = signalTree(
   {
     enhancers: [restoration()],
     derived: ($) => {
-      const doubled = computed(() => $.count() * 2);
-      const summary = computed(() => `${$.nested.label()}:${doubled()}`);
+      const doubled = () => $.count() * 2;
+      const summary = () => `${$.nested.label()}:${doubled()}`;
       return {
         doubled,
         summary,
-        length: computed(() => summary().length),
+        length: () => summary().length,
       };
     },
   }
 );
-const nativeLeaf: WritableSignal<number> = tree.$.count;
-const nativeDerived: Signal<number> = tree.$.doubled;
-void [nativeLeaf, nativeDerived];
+const sourceLeaf: WritableLeaf<number> = tree.$.count;
+const derivedLocation: Signal<number> = tree.$.doubled;
+void [sourceLeaf, derivedLocation];
 
 export type _DeclarativeConstructionChecks = [
   Expect<Equal<(typeof tree)['$']['doubled'], Signal<number>>>,
@@ -38,9 +46,33 @@ export type _DeclarativeConstructionChecks = [
 ];
 
 // @ts-expect-error positional derived factories are not a v15 construction path
-signalTree({ count: 1 }, ($) => ({ doubled: computed(() => $.count() * 2) }));
+signalTree({ count: 1 }, ($) => ({ doubled: () => $.count() * 2 }));
 
 // @ts-expect-error fluent derived construction is not part of the v15 tree contract
 signalTree({ count: 1 }).derived(($) => ({
-  doubled: computed(() => $.count() * 2),
+  doubled: () => $.count() * 2,
 }));
+
+const linkTree = signalTree({
+  count: 1,
+  rows: entityMap<{ id: string; name: string }, string>(),
+});
+
+link(linkTree.$.count, { set: (value) => void value.toFixed() });
+link(linkTree.$.rows, { set: (value) => void value[0]?.name });
+
+const accessibleNode: AccessibleNode<{ label: string }> = tree.$.nested;
+void accessibleNode;
+
+const slicedTree = signalTree({
+  rows: entityMap<{ id: string; name: string }, string>().computed(
+    'names',
+    (rows) => rows.map((row) => row.name)
+  ),
+});
+const slicedRows: EntitySignalWithSlices<
+  { id: string; name: string },
+  string,
+  { names: string[] }
+> = slicedTree.$.rows;
+void slicedRows;

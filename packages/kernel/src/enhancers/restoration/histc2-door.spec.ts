@@ -62,7 +62,7 @@ describe('HIST-C2 door: turn-level eligibility', () => {
     const tree = makeTree();
     await flush();
 
-    tree.$.document.title.set('edited');
+    tree.$.document.title('edited');
     await flush();
 
     expect(turns(tree)).toBe(0);
@@ -74,7 +74,7 @@ describe('HIST-C2 door: turn-level eligibility', () => {
     const tree = makeTree();
     await flush();
 
-    undoable(() => tree.$.document.title.set('edited'));
+    undoable(() => tree.$.document.title('edited'));
     await flush();
 
     expect(turns(tree)).toBe(1);
@@ -90,9 +90,9 @@ describe('HIST-C2 door: turn-level eligibility', () => {
     await flush();
 
     undoable(() => {
-      tree.$.document.title.set('t');
-      tree.$.document.body.set('b');
-      tree.$.ui.panel.set('inspector');
+      tree.$.document.title('t');
+      tree.$.document.body('b');
+      tree.$.ui.panel('inspector');
     });
     await flush();
 
@@ -111,8 +111,8 @@ describe('HIST-C2 door: turn-level eligibility', () => {
 
     // One tick, therefore one causal turn. The designation is inside; the
     // second write is outside it but inside the same turn.
-    undoable(() => tree.$.document.title.set('edited'));
-    tree.$.ui.panel.set('inspector');
+    undoable(() => tree.$.document.title('edited'));
+    tree.$.ui.panel('inspector');
     await flush();
 
     expect(turns(tree)).toBe(1);
@@ -132,8 +132,8 @@ describe('HIST-C2 door: turn-level eligibility', () => {
     const tree = signalTree({ a: 1, b: 2 }, { enhancers: [ttDesignated()] });
     await flush();
 
-    undoable(() => tree.$.a.set(10));
-    undoable(() => tree.$.b.set(20));
+    undoable(() => tree.$.a(10));
+    undoable(() => tree.$.b(20));
     await flush();
 
     // THE FINDING, recorded rather than preferred: the scope is an ELIGIBILITY
@@ -159,8 +159,8 @@ describe('HIST-C2 door: turn-level eligibility', () => {
     undoable(() => {
       tree
         .transaction(() => {
-          tree.$.document.title.set('edited');
-          tree.$.ui.panel.set('inspector');
+          tree.$.document.title('edited');
+          tree.$.ui.panel('inspector');
         })
         .confirm();
     });
@@ -182,7 +182,7 @@ describe('HIST-C2 door: turn-level eligibility', () => {
 
     tree
       .transaction(() => {
-        tree.$.document.title.set('edited');
+        tree.$.document.title('edited');
       })
       .confirm();
     await flush();
@@ -199,7 +199,7 @@ describe('HIST-C2 door: turn-level eligibility', () => {
 
     undoable(() => {
       withWriteContext({ intent: 'system', participation: 'realized' }, () => {
-        tree.$.document.title.set('from-server');
+        tree.$.document.title('from-server');
       });
     });
     await flush();
@@ -214,7 +214,7 @@ describe('HIST-C2 door: turn-level eligibility', () => {
     const tree = makeTree();
     await flush();
 
-    undoable(() => tree.$.document.title.set('edited'));
+    undoable(() => tree.$.document.title('edited'));
     await flush();
     expect(turns(tree)).toBe(1);
 
@@ -233,9 +233,9 @@ describe('HIST-C2 door: turn-level eligibility', () => {
 
     undoable(() => {
       undoable(() => {
-        tree.$.document.title.set('inner');
+        tree.$.document.title('inner');
       });
-      tree.$.document.body.set('outer');
+      tree.$.document.body('outer');
     });
     await flush();
 
@@ -288,7 +288,7 @@ describe('HIST-C2 door: the cost claim and the async contract', () => {
     expect(() =>
       undoable(async () => {
         await Promise.resolve();
-        tree.$.document.title.set('never-designated');
+        tree.$.document.title('never-designated');
       })
     ).toThrow(/ST1033/);
   });

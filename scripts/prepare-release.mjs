@@ -2,9 +2,13 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import semver from 'semver';
 
 import { assertReleasePlan } from './release-plan.mjs';
+import {
+  deriveReleaseVersion,
+  parseRemoteTagNames,
+  updateCurrentReleaseClaim,
+} from './release-version.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const releaseType = process.argv[2] ?? 'patch';
@@ -30,7 +34,7 @@ if (output('git', ['status', '--porcelain'])) {
 }
 const branch = output('git', ['branch', '--show-current']);
 if (!branch) throw new Error('Release preparation requires a named branch');
-run('git', ['fetch', 'origin']);
+run('git', ['fetch', 'origin', '--tags', '--force']);
 if (output('git', ['rev-list', '--left-right', '--count', `origin/${branch}...HEAD`]) !== '0\t0') {
   throw new Error(`Local ${branch} must exactly match origin/${branch}`);
 }
@@ -59,10 +63,14 @@ const originals = new Map(
   releaseOwnedPaths.map((filePath) => [filePath, readFileSync(filePath, 'utf8')])
 );
 const current = JSON.parse(readFileSync(manifestPaths[0], 'utf8')).version;
-const next =
-  releaseType === 'rc'
-    ? semver.inc(current, 'prerelease', 'rc')
-    : semver.inc(current, releaseType);
+const tags = parseRemoteTagNames(
+  output('git', ['ls-remote', '--tags', '--refs', 'origin'])
+);
+const { version: next, resumeFrom } = deriveReleaseVersion(
+  current,
+  releaseType,
+  tags
+);
 if (!next) throw new Error(`Cannot derive ${releaseType} version from ${current}`);
 if (output('git', ['tag', '--list', `v${next}`])) {
   throw new Error(`Tag v${next} already exists`);
@@ -74,21 +82,17 @@ try {
     writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
   }
   run('node', ['tools/generate-version-env.cjs']);
-  run('node', [
+  const finalizeArgs = [
     'scripts/finalize-changelog.mjs',
     next,
     '--date',
     new Date().toISOString().slice(0, 10),
-  ]);
+  ];
+  if (resumeFrom) finalizeArgs.push('--resume-from', resumeFrom);
+  run('node', finalizeArgs);
   const docsReadmePath = join(ROOT, 'docs', 'README.md');
   const docsReadme = readFileSync(docsReadmePath, 'utf8');
-  const updatedDocsReadme = docsReadme.replace(
-    /(\*\*Current prerelease:\*\*\s+)\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?/,
-    `$1${next}`
-  );
-  if (updatedDocsReadme === docsReadme) {
-    throw new Error('docs/README.md has no current prerelease claim to update');
-  }
+  const updatedDocsReadme = updateCurrentReleaseClaim(docsReadme, next);
   writeFileSync(docsReadmePath, updatedDocsReadme);
   run('npm', ['run', 'gates', '--', '--release']);
   run('git', ['add', ...releaseOwnedPathspecs]);

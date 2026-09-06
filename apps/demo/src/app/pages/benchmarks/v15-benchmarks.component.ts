@@ -27,6 +27,9 @@ import {
   V15_BENCHMARK_SOURCE_URLS,
   V15BenchmarkSuite,
 } from './v15-benchmark.workloads';
+import { ANGULAR_NATIVE_AA_BENCHMARK } from './angular-native-aa.generated';
+import { ANGULAR_NATIVE_MEMORY_BENCHMARK } from './angular-native-memory.generated';
+import { ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK } from './angular-native-vs-universal.generated';
 
 type BenchmarkMode = 'quick' | 'steady';
 type SignalTreeProfileArmId = 'signaltree-angular' | 'signaltree-kernel';
@@ -54,6 +57,126 @@ interface SteadyStateProfile {
   readonly position: number;
   readonly cohortSize: number;
 }
+
+interface AngularLeafComparisonRow {
+  readonly operation: string;
+  readonly universal: string;
+  readonly native: string;
+  readonly pairedDelta: string;
+  readonly pairedRange: string;
+  readonly controlRange: string;
+  readonly disposition: 'overhead' | 'improvement' | 'neutral';
+  readonly interpretation: string;
+}
+
+interface AngularLeafMemoryRow {
+  readonly observation: string;
+  readonly universal: string;
+  readonly native: string;
+  readonly delta: string;
+  readonly collection: string;
+}
+
+const ANGULAR_LEAF_OPERATION_LABELS = {
+  'scalar-read': 'Scalar read',
+  'scalar-replace': 'Scalar replacement',
+  'scalar-derive': 'Scalar derivation',
+  'angular-fanout-1': 'Angular fan-out 1',
+  'angular-fanout-10': 'Angular fan-out 10',
+  'angular-fanout-100': 'Angular fan-out 100',
+  'angular-chain-10': 'Derived chain depth 10',
+  'angular-diamond': 'Derived diamond',
+  'construction-10': 'Construct 10 leaves',
+  'construction-100': 'Construct 100 leaves',
+  'construction-1000': 'Construct 1,000 leaves',
+} as const;
+
+const formatNanoseconds = (value: number): string =>
+  value < 1_000
+    ? `${value.toFixed(2)} ns`
+    : `${(value / 1_000).toFixed(2)} us`;
+
+const formatPercent = (value: number): string =>
+  `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
+
+const formatPercentRange = (low: number, high: number): string =>
+  `${formatPercent(low)} to ${formatPercent(high)}`;
+
+const createAngularLeafRows = (): readonly AngularLeafComparisonRow[] =>
+  ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.results.map((result) => {
+    const control = ANGULAR_NATIVE_AA_BENCHMARK.results.find(
+      (candidate) => candidate.operation === result.operation
+    );
+    if (!control) {
+      throw new Error(`Missing A/A control for ${result.operation}`);
+    }
+
+    const disposition =
+      result.pairedDeltaPct.p90 < 0 &&
+      result.pairedDeltaPct.p90 < control.pairedDeltaPct.p10
+        ? 'improvement'
+        : result.pairedDeltaPct.p10 > 0 &&
+          result.pairedDeltaPct.p10 > control.pairedDeltaPct.p90
+        ? 'overhead'
+        : 'neutral';
+
+    return {
+      operation: ANGULAR_LEAF_OPERATION_LABELS[result.operation],
+      universal: formatNanoseconds(result.aNs),
+      native: formatNanoseconds(result.bNs),
+      pairedDelta: formatPercent(result.pairedDeltaPct.median),
+      pairedRange: formatPercentRange(
+        result.pairedDeltaPct.p10,
+        result.pairedDeltaPct.p90
+      ),
+      controlRange: formatPercentRange(
+        control.pairedDeltaPct.p10,
+        control.pairedDeltaPct.p90
+      ),
+      disposition,
+      interpretation:
+        disposition === 'overhead'
+          ? 'Clear native overhead'
+          : disposition === 'improvement'
+          ? 'Clear native improvement'
+          : 'Inconclusive against A/A control',
+    };
+  });
+
+const createAngularLeafMemoryRows = (): readonly AngularLeafMemoryRow[] => {
+  const universalLabel = ANGULAR_NATIVE_MEMORY_BENCHMARK.arms[0].label;
+  const nativeLabel = ANGULAR_NATIVE_MEMORY_BENCHMARK.arms[1].label;
+  return [0, ANGULAR_NATIVE_MEMORY_BENCHMARK.config.observedCount].map(
+    (observedCount) => {
+      const universal = ANGULAR_NATIVE_MEMORY_BENCHMARK.results.find(
+        (result) =>
+          result.label === universalLabel &&
+          result.observedCount === observedCount
+      );
+      const native = ANGULAR_NATIVE_MEMORY_BENCHMARK.results.find(
+        (result) =>
+          result.label === nativeLabel && result.observedCount === observedCount
+      );
+      if (!universal || !native) {
+        throw new Error(`Missing Angular leaf memory row for ${observedCount}`);
+      }
+      const delta = native.bytesPerLeaf - universal.bytesPerLeaf;
+      return {
+        observation:
+          observedCount === 0
+            ? '100k leaves, unobserved'
+            : `100k leaves, ${observedCount / 1_000}k observed`,
+        universal: `${universal.retainedMB.toFixed(3)} MB · ${universal.bytesPerLeaf} B/leaf`,
+        native: `${native.retainedMB.toFixed(3)} MB · ${native.bytesPerLeaf} B/leaf`,
+        delta: `${delta > 0 ? '+' : ''}${delta} B/leaf`,
+        collection:
+          universal.collectable && native.collectable
+            ? 'Both collectible'
+            : 'Collection failure',
+      };
+    }
+  );
+};
 
 const RECURRING_PROFILES: readonly {
   readonly workloadId: RecurringWorkloadId;
@@ -112,6 +235,17 @@ export class V15BenchmarksComponent {
   readonly isDevBuild = isDevMode();
   readonly benchmarkSourcePaths = V15_BENCHMARK_SOURCE_PATHS;
   readonly benchmarkSourceUrls = V15_BENCHMARK_SOURCE_URLS;
+  readonly angularLeafRows = createAngularLeafRows();
+  readonly angularLeafMemoryRows = createAngularLeafMemoryRows();
+  readonly angularLeafBenchmark = {
+    method: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.method,
+    samples: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.config.samples,
+    warmups: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.config.warmups,
+    trials: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.config.trials,
+    universal: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.arms.a.label,
+    native: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.arms.b.label,
+    runtime: `${ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.runtime.node} / ${ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.runtime.platform}-${ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.runtime.architecture}`,
+  };
   readonly valueFoundations: readonly ValueFoundation[] = [
     {
       status: 'Public contract',
@@ -121,7 +255,7 @@ export class V15BenchmarksComponent {
       currentCost:
         'This is a compatibility constraint, not a performance benefit. A denser or faster substrate must preserve the inferred read/write types.',
       evidence: [
-        'packages/kernel/src/carrier-propagation.typing.spec.ts',
+        'packages/kernel/src/lib/signal-tree-type-matrix.typing.spec.ts',
         'packages/kernel/src/enhancers/transactions/transactions-contract.typing.spec.ts',
       ],
     },

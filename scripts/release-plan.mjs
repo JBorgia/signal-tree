@@ -1,7 +1,12 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
-export const RELEASE_PACKAGES = Object.freeze(['kernel', 'angular', 'react']);
+export const RELEASE_PACKAGES = Object.freeze([
+  'kernel',
+  'angular',
+  'react',
+  'vue',
+]);
 
 export function assertReleasePlan(root = process.cwd()) {
   if (RELEASE_PACKAGES[0] !== 'kernel') {

@@ -27,17 +27,17 @@ function createInlineTree() {
     },
     {
       derived: ($) => {
-        const selectedUser = computed(() => {
+        const selectedUser = () => {
           const id = $.selectedUserId();
           return id != null ? $.users.byId(id)?.() ?? null : null;
-        });
+        };
         return {
           selectedUser,
-          isAdmin: computed(() => selectedUser()?.role === 'admin'),
-          displayName: computed(() => {
+          isAdmin: () => selectedUser()?.role === 'admin',
+          displayName: () => {
             const user = selectedUser();
             return user ? `${user.name} (${user.email})` : 'No user selected';
-          }),
+          },
         };
       },
     }
@@ -49,7 +49,7 @@ function createInlineTree() {
 // =============================================================================
 
 /**
- * Larger applications can extract ordinary signal-producing helpers while
+ * Larger applications can extract ordinary computation helpers while
  * keeping one derived factory at the construction site.
  */
 
@@ -68,28 +68,28 @@ function createExternalBaseState() {
 type ExternalState = ReturnType<typeof createExternalBaseState>;
 
 const externalDerived = ($: TreeNode<ExternalState>) => {
-  const selectedProduct = computed(() => {
+  const selectedProduct = () => {
     const id = $.selectedProductId();
     return id != null ? $.products.byId(id)?.() ?? null : null;
-  });
-  const cartTotal = computed(() => {
+  };
+  const cartTotal = () => {
     return $.cart
       .items()
       .reduce(
         (sum: number, item: CartItem) => sum + item.price * item.quantity,
         0
       );
-  });
+  };
   return {
     selectedProduct,
     cartTotal,
-    isSelectedInCart: computed(() => {
+    isSelectedInCart: () => {
       const product = selectedProduct();
       return product
         ? $.cart.items().some((item: CartItem) => item.productId === product.id)
         : false;
-    }),
-    formattedTotal: computed(() => `$${cartTotal().toFixed(2)}`),
+    },
+    formattedTotal: () => `$${cartTotal().toFixed(2)}`,
   };
 };
 
@@ -132,7 +132,7 @@ interface CartItem {
         <h4>💡 Key Point</h4>
         <p>
           Declare one derived factory in <code>signalTree</code>. Compose its
-          values with local <code>computed</code> references.
+          values with local computation recipes.
         </p>
       </div>
 

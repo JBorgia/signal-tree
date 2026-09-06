@@ -47,7 +47,7 @@ describe('NOTIFIER-SCOPE-0: what does a second tree do to restoration history?',
     const a = signalTree({ solo: 'a0' }, { enhancers: [restoration()] });
     await flush();
 
-    undoable(() => a.$.solo.set('a1'));
+    undoable(() => a.$.solo('a1'));
     await flush();
 
     expect(a.canUndo()).toBe(true);
@@ -60,7 +60,7 @@ describe('NOTIFIER-SCOPE-0: what does a second tree do to restoration history?',
     const b = signalTree({ shared: 'b0' }, { enhancers: [restoration()] });
     await flush();
 
-    undoable(() => a.$.shared.set('a1'));
+    undoable(() => a.$.shared('a1'));
     await flush();
 
     const bBefore = b.$.shared();
@@ -94,8 +94,8 @@ describe('NOTIFIER-SCOPE-0: what does a second tree do to restoration history?',
 
     // Both writes land in the SAME notifier flush, which is the condition that
     // makes path-string coalescing observable.
-    undoable(() => a.$.dup.set('a1'));
-    undoable(() => b.$.dup.set('b1'));
+    undoable(() => a.$.dup('a1'));
+    undoable(() => b.$.dup('b1'));
     await flush();
 
     const aUndo = a.canUndo();
@@ -122,7 +122,7 @@ describe('NOTIFIER-SCOPE-0: what does it do to transaction compensation?', () =>
     );
     await flush();
 
-    const p = a.transaction(() => a.$.only.set('a1'));
+    const p = a.transaction(() => a.$.only('a1'));
     await flush();
     p.rollback();
     await flush();
@@ -149,8 +149,8 @@ describe('NOTIFIER-SCOPE-0: what does it do to transaction compensation?', () =>
     );
     await flush();
 
-    const pa = a.transaction(() => a.$.tx.set('a1'));
-    b.$.tx.set('b1'); // ordinary committed work on an unrelated tree
+    const pa = a.transaction(() => a.$.tx('a1'));
+    b.$.tx('b1'); // ordinary committed work on an unrelated tree
     await flush();
 
     pa.rollback();

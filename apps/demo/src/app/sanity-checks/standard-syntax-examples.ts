@@ -106,12 +106,7 @@ stateTree.$.ui.error.set(null);
 // Simulate data loading
 setTimeout(() => {
   stateTree.$.ui.loading.set(false);
-  // Demo-local narrow cast to allow .set() on optional data node
-  (
-    stateTree.$.ui.data as unknown as {
-      set: (v: { results: string[] }) => void;
-    }
-  ).set({ results: ['item1', 'item2', 'item3'] });
+  stateTree.$.ui.data.set({ results: ['item1', 'item2', 'item3'] });
 }, 100);
 
 // Update filters based on conditions
@@ -177,18 +172,12 @@ performanceTree.$.analytics.events.update((current) => [
 performanceTree.$.analytics.sessions.update((current) => current + 1);
 
 // ==============================================
-// Example 7: What IS callable — branches and the root
+// Example 7: Callable branches with native Angular leaves
 // ==============================================
 //
-// Every write above goes through `.set()` / `.update()` because those targets
-// are LEAVES, and a leaf is a real Angular signal: calling one is a read.
-//
-// A BRANCH is not a signal — it is SignalTree's own accessor — so it is
-// callable in both directions, and so is the root. This is the whole of the
-// callable surface. (Through 13.x the types also permitted `leaf(value)`, via
-// the `@signaltree/callable-syntax` build transform. It silently did nothing in
-// Angular apps, where that transform cannot run at all, and the overloads were
-// removed in 14.0.0.)
+// Root and object branches read and write complete values through call syntax.
+// Terminal leaves are native Angular signals. Use `leaf(value)` at construction
+// when an object or callable should terminate the dot-path topology.
 
 const callableTree = signalTree({
   user: {

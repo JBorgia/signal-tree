@@ -55,7 +55,7 @@ describe('restoration origin: the five falsifiers', () => {
   it('1 — undo() publishes facts with source "restoration"', async () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await flush();
 
     const { seen, off } = observe();
@@ -73,7 +73,7 @@ describe('restoration origin: the five falsifiers', () => {
   it('2 — redo() does the same', async () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await flush();
     tree.undo();
     await flush();
@@ -93,7 +93,7 @@ describe('restoration origin: the five falsifiers', () => {
 
     const { seen, off } = observe();
     withWriteContext({ intent: 'system', participation: 'realized' }, () => {
-      tree.$.n.set(9);
+      tree.$.n(9);
     });
     await flush();
     off();
@@ -107,7 +107,7 @@ describe('restoration origin: the five falsifiers', () => {
   it('4 — restoration creates no new history and does not admit itself', async () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await flush();
     const afterAuthored = tree.getRestorationHistory().length;
 
@@ -121,11 +121,11 @@ describe('restoration origin: the five falsifiers', () => {
   it('5 — P0-C is unchanged: later external truth still blocks the undo', async () => {
     const tree = signalTree({ doc: { title: 'v1' } }, { enhancers: [restoration()] });
     await flush();
-    undoable(() => tree.$.doc.title.set('A'));
+    undoable(() => tree.$.doc.title('A'));
     await flush();
 
     withWriteContext({ intent: 'system', participation: 'realized' }, () => {
-      tree.$.doc.title.set('SERVER');
+      tree.$.doc.title('SERVER');
     });
     await flush();
 
@@ -139,9 +139,9 @@ describe('restoration origin: the five falsifiers', () => {
     await flush();
 
     const { seen, off } = observe();
-    tree.$.n.set(1);
+    tree.$.n(1);
     await flush();
-    undoable(() => tree.$.n.set(2));
+    undoable(() => tree.$.n(2));
     await flush();
     off();
 

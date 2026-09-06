@@ -77,8 +77,8 @@ describe('TURN-FEED-0.1: two transaction owners on one tree', () => {
     // buckets live per-tree in per-enhancer closures, so this is the case that
     // would break a truly global numeric key — and it does not, because nothing
     // is global.
-    const a = undoable(() => treeA.transaction(() => treeA.$.n.set(1)));
-    const b = undoable(() => treeB.transaction(() => treeB.$.n.set(2)));
+    const a = undoable(() => treeA.transaction(() => treeA.$.n(1)));
+    const b = undoable(() => treeB.transaction(() => treeB.$.n(2)));
     await flush();
     a.confirm();
     b.confirm();
@@ -115,8 +115,8 @@ describe('MATRIX-CLOSE S5: the invariant that makes a bare id sufficient', () =>
       if (e.kind === 'opened') seenB.push({ id: e.id, owner: e.owner });
     });
 
-    a.transaction(() => a.$.n.set(1)).confirm();
-    b.transaction(() => b.$.n.set(1)).confirm();
+    a.transaction(() => a.$.n(1)).confirm();
+    b.transaction(() => b.$.n(1)).confirm();
     await flush();
     offA();
     offB();
@@ -149,7 +149,7 @@ describe('MATRIX-CLOSE S5: the invariant that makes a bare id sufficient', () =>
     const off = getTransactionLifecycleChannel(tree as object).subscribe((e) => {
       owners.push(e.owner);
     });
-    tree.transaction(() => tree.$.n.set(1)).confirm();
+    tree.transaction(() => tree.$.n(1)).confirm();
     await flush();
     off();
 

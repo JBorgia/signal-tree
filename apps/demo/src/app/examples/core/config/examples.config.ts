@@ -10,6 +10,7 @@ import { SignalsExamplesComponent } from '../../features/fundamentals/examples/s
 import { RestorationDemoComponent } from '../../features/fundamentals/examples/restoration/restoration-demo.component';
 import { WhatsNewComponent } from '../../features/fundamentals/examples/whats-new/whats-new.component';
 
+import { SIGNALTREE_CORE_VERSION } from '../../../version';
 import type { ExampleMeta } from '../models';
 
 const FUNDAMENTALS_ROUTE = '/examples/fundamentals';
@@ -225,8 +226,7 @@ export const EXAMPLES_REGISTRY: ExampleMeta[] = [
   {
     id: 'whats-new',
     title: "What's New",
-    description:
-      'SignalTree 15.0.0-rc.1 — construction-bound realization, undoable() designation, transactions(), and the @signal-tree package reset. Pre-15 history moved to the Legacy changelog page.',
+    description: `SignalTree ${SIGNALTREE_CORE_VERSION} — framework-native carriers over kernel-owned state, construction-bound realization, undoable() designation, transactions(), and the @signal-tree package reset. Pre-15 history moved to the Legacy changelog page.`,
     category: 'General',
     focusAreas: ['news', 'changelog'],
     functionalUse: ['release-notes'],

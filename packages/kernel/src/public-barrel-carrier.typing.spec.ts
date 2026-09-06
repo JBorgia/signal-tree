@@ -38,8 +38,8 @@ export const _leaf: number = ro.$.a();
 export const _nested: string = ro.$.b.c();
 
 /** Authored mutation is unavailable. */
-// @ts-expect-error — a readonly projection must not offer `.set`
-ro.$.a.set(2);
+// @ts-expect-error — a readonly projection must not accept a replacement
+ro.$.a(2);
 
 // ── the ALTERNATIVE row was REMOVED ───────────────────────────────────────
 // It compared `asReadonly()` against a `ReadonlyView<typeof tree>` ANNOTATION.

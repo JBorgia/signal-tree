@@ -143,7 +143,7 @@ describe('RESTORATION-POSITION-CAPTURE-0', () => {
 
     const pending = tree.transaction(() =>
       undoable(() => {
-        tree.$.count.set(1);
+        tree.$.count(1);
         tree.$.rows.setAll([
           { id: 'c', value: 3 },
           { id: 'b', value: 2 },
@@ -185,7 +185,7 @@ describe('RESTORATION-POSITION-CAPTURE-0', () => {
     await flush();
 
     const pending = tree.transaction(() => {
-      tree.$.count.set(1);
+      tree.$.count(1);
       tree.$.rows.setAll([
         { id: 'c', value: 3 },
         { id: 'b', value: 2 },

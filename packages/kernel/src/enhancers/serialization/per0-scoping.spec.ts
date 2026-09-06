@@ -22,7 +22,7 @@ describe('PER-0: can the CURRENT form serve the production need?', () => {
       { enhancers: [persistence({ key: 'whole', storage: adapter, debounceMs: 0 })] }
     ) as any;
     await settle();
-    tree.$.prefs.theme.set('light');
+    tree.$.prefs.theme('light');
     await settle();
     const payload = store.get('whole') ?? '';
     console.log(`PER0-SCOPE persistsSecret=${payload.includes('do-not-persist')} bytes=${payload.length}`);
@@ -41,7 +41,7 @@ describe('PER-0: can the CURRENT form serve the production need?', () => {
         ] }
       ) as any;
       await settle();
-      tree.$.prefs.theme.set('light');
+      tree.$.prefs.theme('light');
       await settle();
       console.log(`PER0-MULTI aWrote=${!!a.store.get('k-a')} bWrote=${!!b.store.get('k-b')} sameContent=${a.store.get('k-a') === b.store.get('k-b')}`);
     } catch (e) { err = (e as Error).message.replace(/\s+/g, " ").slice(0, 220); }

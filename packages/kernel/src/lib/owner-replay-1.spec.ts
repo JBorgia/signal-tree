@@ -81,7 +81,7 @@ describe('OWNER-REPLAY-1: every delivered mutation names its owner', () => {
 
     const { seen, off } = record();
 
-    undoable(() => tree.$.n.set(2)); // authored
+    undoable(() => tree.$.n(2)); // authored
     await flush();
     tree.undo(); // restoration replay
     await flush();
@@ -89,9 +89,9 @@ describe('OWNER-REPLAY-1: every delivered mutation names its owner', () => {
     // authored turn and its reversal makes the undo refuse with ST1034 — P0-C
     // protecting acquired truth, exactly as LINK-0 measured. Sequencing it here
     // keeps this test on ITS question, which is namespace propagation.
-    external(() => tree.$.n.set(3));
+    external(() => tree.$.n(3));
     await flush();
-    const p = tree.transaction(() => tree.$.n.set(9));
+    const p = tree.transaction(() => tree.$.n(9));
     await flush();
     p.rollback(); // rollback compensation
     await flush();
@@ -121,11 +121,11 @@ describe('OWNER-REPLAY-1: every delivered mutation names its owner', () => {
     expect(idA).not.toBe(idB);
 
     const { seen, off } = record();
-    undoable(() => a.$.n.set(2));
+    undoable(() => a.$.n(2));
     await flush();
     a.undo();
     await flush();
-    undoable(() => b.$.n.set(5));
+    undoable(() => b.$.n(5));
     await flush();
     b.undo();
     await flush();
@@ -155,9 +155,9 @@ describe('OWNER-REPLAY-1: every delivered mutation names its owner', () => {
       }
     );
 
-    undoable(() => a.$.n.set(2));
+    undoable(() => a.$.n(2));
     await flush();
-    undoable(() => b.$.n.set(99)); // tree B's noise must not appear
+    undoable(() => b.$.n(99)); // tree B's noise must not appear
     await flush();
     a.undo();
     await flush();

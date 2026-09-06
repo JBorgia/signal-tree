@@ -11,8 +11,8 @@ what the tree uses:
 
 | scenario          | dev      | prod     | dropped     |
 | ----------------- | -------- | -------- | ----------- |
-| bare `signalTree` | 11.73 KB | 9.56 KB  | **2.17 KB** |
-| + `entityMap`     | 24.18 KB | 21.49 KB | **2.69 KB** |
+| bare `signalTree` | 12.10 KB | 9.95 KB  | **2.15 KB** |
+| + `entityMap`     | 24.66 KB | 22.01 KB | **2.65 KB** |
 
 Reproduce with `node tools/check-bundle-budget.mjs`, which measures both
 columns. This section previously said 0.8–1.2 KB, which understated it by

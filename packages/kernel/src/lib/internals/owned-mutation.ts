@@ -1,4 +1,4 @@
-import type { WritableCell } from './cell-runtime';
+import type { Location } from './cell-runtime';
 
 import type { MutationCaptureRuntime } from './mutation-capture-runtime';
 import { hasPathObservers, pathObservation } from './path-observation-port';
@@ -11,8 +11,8 @@ import {
 } from './owned-metadata';
 
 // The READ side of owned-node metadata is framework-neutral and lives in
-// owned-metadata.ts; this file keeps the write side, which needs untracked().
-// Re-exported so the public surface is unchanged.
+// owned-metadata.ts; this file keeps the write side. Re-exported so the public
+// surface is unchanged.
 export {
   getOwnedPositionIds,
   getOwnedSubjectIds,
@@ -21,10 +21,6 @@ export {
   hasIntrinsicMutationEmitter,
 } from './owned-metadata';
 import { getActiveWriteContext } from '../write-context';
-import {
-  NEUTRAL_TRACKING_SUPPRESSION,
-  type TrackingSuppression,
-} from './tracking-suppression';
 import { markOwnerInvalidated } from './owner-invalidation-port';
 import { observeIntrinsicMutations } from './intrinsic-mutation';
 
@@ -39,7 +35,6 @@ type OwnedMutationOptions = {
   ownerId?: number;
   metadataStorage?: OwnedMetadataStorage;
   captureRuntime?: MutationCaptureRuntime;
-  suppressTracking?: TrackingSuppression;
 };
 
 type OwnedWriteHooks<TValue> = {
@@ -225,25 +220,8 @@ export function emitOwnedMutation(
   );
 }
 
-export function runOwnedMutation<TValue>(
-  read: () => TValue,
-  apply: () => void,
-  options: OwnedMutationOptions,
-  mutationIntent: OwnedMutationIntent,
-  suppressTracking: TrackingSuppression = NEUTRAL_TRACKING_SUPPRESSION
-): { before: TValue; after: TValue; changed: boolean } {
-  const before = suppressTracking(read);
-  apply();
-  const after = suppressTracking(read);
-  const changed = !Object.is(before, after);
-  if (changed) {
-    emitOwnedMutation(options, before, after, mutationIntent);
-  }
-  return { before, after, changed };
-}
-
 export function wrapOwnedWritableSignal<TValue>(
-  leaf: WritableCell<TValue>,
+  leaf: Location<TValue>,
   options: OwnedMutationOptions,
   hooks: OwnedWriteHooks<TValue> = {}
 ): void {
@@ -261,8 +239,9 @@ export function wrapOwnedWritableSignal<TValue>(
   defineOwnedOwnerPath(leaf as object, options.path, metadataStorage);
   defineIntrinsicMutationEmitter(leaf as object, metadataStorage);
 
-  if (
-    observeIntrinsicMutations<TValue>(leaf as object, (mutation) => {
+  const releaseIntrinsicObserver = observeIntrinsicMutations<TValue>(
+    leaf as object,
+    (mutation) => {
       if (mutation.changed) {
         emitOwnedMutation(
           options,
@@ -285,35 +264,9 @@ export function wrapOwnedWritableSignal<TValue>(
           mutation.changed
         );
       }
-    })
-  ) {
-    return;
+    }
+  );
+  if (!releaseIntrinsicObserver) {
+    throw new Error('SignalTree location has no intrinsic mutation source');
   }
-
-  const originalSet = leaf.set.bind(leaf);
-  const originalUpdate = leaf.update.bind(leaf);
-
-  leaf.set = (value: TValue) => {
-    const { before, after, changed } = runOwnedMutation(
-      leaf,
-      () => originalSet(value),
-      options,
-      'replace',
-      options.suppressTracking
-    );
-
-    hooks.afterSet?.(value, before, after, changed);
-  };
-
-  leaf.update = (updater: (value: TValue) => TValue) => {
-    const { before, after, changed } = runOwnedMutation(
-      leaf,
-      () => originalUpdate(updater),
-      options,
-      'derive',
-      options.suppressTracking
-    );
-
-    hooks.afterUpdate?.(before, after, changed);
-  };
 }

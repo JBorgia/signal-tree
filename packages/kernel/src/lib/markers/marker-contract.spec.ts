@@ -4,7 +4,7 @@ import { createReactiveTestRealization } from '../../reactive-test-realization';
 import { registerMarkerProcessor } from '../internals/materialize-markers';
 import { signalTree } from '../signal-tree';
 
-const signal = createReactiveTestRealization().cell.createCell;
+const signal = createReactiveTestRealization().locations.createCell;
 
 /**
  * Every marker must say what of it is state.

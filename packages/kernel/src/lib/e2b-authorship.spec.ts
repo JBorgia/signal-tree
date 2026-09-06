@@ -86,12 +86,12 @@ describe('E2-B / ABA — value equality is not causal ownership', () => {
     const tree = signalTree({ x: 'A' });
 
     const before = tree.$() as Root;
-    tree.$.x.set('B'); // T1 authors B
+    tree.$.x('B'); // T1 authors B
     const T1: Turn = { id: 'T1', before, after: tree.$() as Root };
 
     // Later surviving work. It moves the position away and then back.
-    tree.$.x.set('C');
-    tree.$.x.set('B'); // <- authored by LATER work, not by T1
+    tree.$.x('C');
+    tree.$.x('B'); // <- authored by LATER work, not by T1
 
     expect(tree.$.x()).toBe('B');
 
@@ -115,9 +115,9 @@ describe('E2-B / ABA — value equality is not causal ownership', () => {
     // The snapshot null cannot reach this conclusion, because the information it
     // needs — WHO wrote the current value — is not in the values.
     const tree = signalTree({ x: 'A' });
-    tree.$.x.set('B');
-    tree.$.x.set('C');
-    tree.$.x.set('B');
+    tree.$.x('B');
+    tree.$.x('C');
+    tree.$.x('B');
     expect(tree.$.x()).toBe('B'); // the state undo T1 must leave alone
   });
 });
@@ -131,11 +131,11 @@ describe('E2-B / nested clobber — the "~10 lines" repair loses siblings', () =
     const history: Turn[] = [];
 
     let before = tree.$() as Root;
-    tree.$.profile.name.set('n2'); // T1, speculative
+    tree.$.profile.name('n2'); // T1, speculative
     history.push({ id: 'T1', before, after: tree.$() as Root });
 
     before = tree.$() as Root;
-    tree.$.profile.name.set('n3'); // T2, confirmed
+    tree.$.profile.name('n3'); // T2, confirmed
     history.push({ id: 'T2', before, after: tree.$() as Root });
 
     // The P3 repair, VERBATIM: spread `patch()` over the retained root.

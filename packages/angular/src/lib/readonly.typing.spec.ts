@@ -5,10 +5,7 @@
  *
  * MOVED from the kernel by GREENFIELD-V15-SURFACE-0.
  *
- * These rows assert that readonly views narrow to Angular `Signal`s, and they
- * construct their inputs with Angular `linkedSignal`/`computed`. Both are
- * Angular facts: the kernel's readonly view is carrier-NEUTRAL and narrows to
- * `ReadableCell`. The assertions are true here, where the carrier is bound.
+ * These rows assert that readonly views expose native Angular signals.
  */
 /**
  * TYPE-TEST HARNESS — compile-time only (see marker-resolution.typing.spec.ts
@@ -23,30 +20,27 @@
  * marker, mirroring marker-resolution.typing.spec.ts.
  *
  * Asserts, over `asReadonly(tree)`:
- *  (a) derived computeds SURVIVE readonly exposure (RFC 0004 F1) and
- *      `linkedSignal()` WritableSignals narrow to `Signal`;
+ *  (a) derived locations SURVIVE readonly exposure (RFC 0004 F1);
  *  (b) leaf `.set`/`.update` and branch write call signatures are not
  *      reachable;
  *  (c) entity mutators (`upsertOne`, …) and loader triggers (`load`,
  *      `refresh`, `invalidate`) are not reachable; `byId` is re-signed to a
  *      read-only entity node;
  *  (e) marker reader members remain readable, with
- *      `WritableSignal` readers (e.g. `status.state`) demoted to plain
- *      `Signal`s.
+ *      writable readers demoted to readonly signals.
  * ((d) — plain-object factory with `expose: 'readonly'` is a compile error —
  * lives in define-store.typing.spec.ts next to the overloads it gates.)
  */
-import {
-  linkedSignal,
-  computed,
-  type Signal,
-  type WritableSignal,
-} from '@angular/core';
-
+import type { Signal } from '@angular/core';
 import { entityMap, signalTree } from '../index';
 import type {} from '../index';
 import { asReadonly } from '../index';
-import type { SignalTree, NodeAccessor } from '../index';
+import type {
+  Location,
+  NodeAccessor,
+  ReadonlyLocation,
+  SignalTree,
+} from '../index';
 
 // --- compile-time assertion helpers -----------------------------------------
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
@@ -77,10 +71,10 @@ const tree = signalTree(
   },
   {
     derived: ($) => ({
-      doubled: computed(() => $.count() * 2),
-      draft: linkedSignal(() => $.count()),
-      group: { total: computed(() => $.count() + 1) },
-      plants: { total: computed(() => $.plants.count()) },
+      doubled: () => $.count() * 2,
+      draft: () => $.count(),
+      group: { total: () => $.count() + 1 },
+      plants: { total: () => $.plants.count() },
     }),
   }
 );
@@ -97,8 +91,8 @@ type ROPlants = RO$['plants'];
 type ROEntityNode = NonNullable<ReturnType<ROUsers['byId']>>;
 
 export type _ReadonlyCallGrammarControls = [
-  Expect<Equal<EffectiveParameters<Signal<number>>, []>>,
-  Expect<Equal<EffectiveParameters<WritableSignal<number>>, []>>,
+  Expect<Equal<EffectiveParameters<ReadonlyLocation<number>>, []>>,
+  Expect<Equal<EffectiveParameters<Location<number>>, []>>,
   Expect<
     Equal<
       EffectiveParameters<typeof realAccessor> extends [] ? true : false,
@@ -115,11 +109,11 @@ export type _ReadonlyCallGrammarControls = [
 
 export type _ReadonlyViewChecks = [
   // ---------------------------------------------------------------------------
-  // (a) derived layers survive; a WritableSignal narrows
+  // (a) derived layers survive as readonly signals
   // ---------------------------------------------------------------------------
   Expect<Equal<RO$['doubled'], Signal<number>>>,
-  Expect<Equal<RO$['draft'], Signal<number>>>, // WritableSignal → Signal
-  Expect<Equal<RO$['group']['total'], Signal<number>>>, // derived-only group recurses
+  Expect<Equal<RO$['draft'], Signal<number>>>,
+  Expect<Equal<RO$['group']['total'], Signal<number>>>,
 
   // ---------------------------------------------------------------------------
   // (b) leaves and branches: reads only
@@ -166,13 +160,13 @@ export type _ReadonlyViewChecks = [
   Expect<Equal<ROEntityNode['name'], Signal<string>>>,
   Expect<NotOffered<ROEntityNode['name'], 'set'>>,
   Expect<Equal<ROEntityNode['name'], Signal<string>>>,
-  Expect<Equal<ROEntityNode['tags'], Signal<string[]>>>, // arrays stay atomic
+  Expect<Equal<ROEntityNode['tags'], Signal<string[]>>>,
   Expect<Equal<ROEntityNode['address']['city'], Signal<string>>>,
   Expect<Equal<Parameters<ROEntityNode>, []>>, // write call overloads gone
   Expect<NotOffered<ROEntityNode['name'], 'set'>>,
 
   // derived merged INTO a marker node survives the readonly view
-  // (readonly×merged-derived gap, M3): the extra key is kept as a Signal…
+  // (readonly×merged-derived gap, M3): the extra key is kept as a location…
   Expect<Equal<ROPlants['total'], Signal<number>>>,
   // …the marker's own readers remain readable…
   Expect<Equal<ROPlants['all'], Signal<User[]>>>,

@@ -3,10 +3,10 @@ import type { WriteMetadata } from './mutation-types';
 /**
  * Ambient write-context channel for tagging tree writes with `WriteMetadata`.
  *
- * Enhancers (guardrails, validation, devtools) observe writes via leaf
- * interceptors but Angular's `WritableSignal.set(value)` signature cannot be
- * widened to carry metadata. This module provides a synchronous ambient
- * channel that the leaf-interceptor captures at write time.
+ * Enhancers (guardrails, validation, devtools) observe writes via location
+ * interceptors, but the canonical `location(value)` signature does not carry
+ * metadata. This module provides a synchronous ambient channel that the
+ * interceptor captures at write time.
  *
  * Internal callers tag a batch of writes with intent, and internal observers
  * can read that active context while processing leaf writes.
@@ -17,16 +17,16 @@ import type { WriteMetadata } from './mutation-types';
  * boundaries**. This is correct:
  *
  * ```ts
- * withWriteContext({ intent: 'hydrate' }, () => tree.$.x.set(value));
+ * withWriteContext({ intent: 'hydrate' }, () => tree.$.x(value));
  * ```
  *
  * This is wrong — the `await` yields control, and the context is restored
- * before the second `set` runs:
+ * before the location write runs:
  *
  * ```ts
  * withWriteContext({ intent: 'hydrate' }, async () => {
  *   await fetch('/api/state');     // context restored to previous frame here
- *   tree.$.x.set(value);           // runs with NO context
+ *   tree.$.x(value);               // runs with NO context
  * });
  * ```
  *
@@ -34,7 +34,7 @@ import type { WriteMetadata } from './mutation-types';
  *
  * ```ts
  * const data = await fetch('/api/state');
- * withWriteContext({ intent: 'hydrate' }, () => tree.$.x.set(data));
+ * withWriteContext({ intent: 'hydrate' }, () => tree.$.x(data));
  * ```
  *
  * ## Multi-tree / SSR

@@ -6,10 +6,7 @@ import { signalTree } from '../index';
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 const makeTree = () =>
-  signalTree(
-    { n: 0 },
-    { enhancers: [restoration({ maxHistorySize: 10 })] }
-  );
+  signalTree({ n: 0 }, { enhancers: [restoration({ maxHistorySize: 10 })] });
 
 describe('Angular restoration observation', () => {
   it('canUndo flips false to true when the first entry is recorded', async () => {

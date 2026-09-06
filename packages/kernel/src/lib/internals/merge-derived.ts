@@ -1,10 +1,5 @@
-import type { ReadableCell } from './cell-runtime';
-
-import {
-  NEUTRAL_MATERIALIZATION_REALIZATION,
-  type MaterializationRealization,
-} from './materialization-realization';
-import type { TreeRealization } from './tree-realization';
+import type { LocationRuntime } from './location-runtime';
+import { isTreeCell } from './cell-identity';
 
 import { stampDerived } from '../utils';
 
@@ -55,43 +50,7 @@ import { stampDerived } from '../utils';
 /** Record with string keys and unknown values */
 type AnyRecord = Record<string, unknown>;
 
-// =============================================================================
-// TYPE GUARDS
-// =============================================================================
-
-/**
- * Is this value a reactive node of the INSTALLED realization?
- *
- * ⚠️ THIS USED TO CALL ANGULAR'S `isSignal` DIRECTLY, and the substitution is
- * not merely a rename — it changes what happens when no realization is
- * installed. The old call always answered; this one answers `false`, because
- * with no realization there are, by definition, no reactive nodes.
- *
- * For `materialize-markers` that same degradation is documented as "the
- * conservative direction: the walk treats the node as ordinary data". HERE the
- * identical degradation is the OPPOSITE of conservative — a caller-supplied
- * `computed()` treated as ordinary data is silently DROPPED, which this file
- * calls "historically the single most expensive failure mode".
- *
- *     THE SAME DEGRADATION IS NOT EQUALLY SAFE FOR EVERY CONSUMER OF A
- *     CONTRACT. SAFE-FAILURE DIRECTION IS PART OF THE SEMANTICS.
- *
- * Measured: with the realization uninstalled, this substitution turns 4 failing
- * carriers into 8 — `derived-after-tree-call` and `derived-not-state` join the
- * two documented degradations. The scenario is incoherent in practice (a caller
- * passing Angular `computed()` into a tree with no Angular realization), but it
- * is a real coupling of correctness to installation and is recorded rather than
- * discovered later.
- */
 declare const ngDevMode: boolean | undefined;
-
-function isSignalLike(
-  value: unknown,
-  realization: MaterializationRealization =
-    NEUTRAL_MATERIALIZATION_REALIZATION
-): value is ReadableCell<unknown> {
-  return realization.isReactiveNode(value);
-}
 
 // =============================================================================
 // PATH UTILITIES
@@ -174,7 +133,7 @@ function mergeDerivedState(
   $: AnyRecord,
   derivedDef: unknown,
   path = '',
-  realization?: TreeRealization
+  locations?: LocationRuntime
 ): void {
   if (!derivedDef || typeof derivedDef !== 'object') {
     return;
@@ -192,28 +151,19 @@ function mergeDerivedState(
     //
     // Sharing the word "derived" is what kept this alive: the live feature's
     // name made the dead marker look load-bearing.
-    if (isSignalLike(value, realization?.materialization)) {
-      // Already a signal (computed, signal, etc.) - add directly
+    if (typeof value === 'function' && locations) {
       const target = ensurePathAndGetTarget($, path);
-
-      // Check for collision with existing signal
       if (
         key in target &&
-        isSignalLike(target[key], realization?.materialization)
+        (typeof ngDevMode === 'undefined' || ngDevMode)
       ) {
-        if (typeof ngDevMode === 'undefined' || ngDevMode) {
-          console.warn(
-            `SignalTree: Derived signal "${currentPath}" overwrites source signal. ` +
-              `Consider using a different key to avoid confusion.`
-          );
-        }
+        console.warn(
+          `SignalTree: Derived location "${currentPath}" overwrites source state. ` +
+            `Consider using a different key to avoid confusion.`
+        );
       }
-
-      target[key] = stampDerived(value);
-    } else if (typeof value === 'function' && realization) {
-      const target = ensurePathAndGetTarget($, path);
       target[key] = stampDerived(
-        realization.derived.createDerived(value as () => unknown)
+        locations.createDerived(value as () => unknown)
       );
     } else if (typeof value === 'object' && value !== null) {
       // =========================================================================
@@ -231,9 +181,7 @@ function mergeDerivedState(
       // Ensure nested object exists in target (create if new path)
       if (!(key in target)) {
         target[key] = {};
-      } else if (
-        isSignalLike(target[key], realization?.materialization)
-      ) {
+      } else if (isTreeCell(target[key])) {
         // Target is a signal - can't merge object into it
         throw new Error(
           `SignalTree: Cannot merge derived object into "${currentPath}" ` +
@@ -246,7 +194,7 @@ function mergeDerivedState(
       // Recurse into nested object - this preserves existing properties
       // while adding new derived signals. The key insight is that target[key]
       // still references the ORIGINAL object from the source tree.
-      mergeDerivedState($, value, currentPath, realization);
+      mergeDerivedState($, value, currentPath, locations);
     } else if (typeof ngDevMode === 'undefined' || ngDevMode) {
       // Anything else is silently dropped — historically the single most
       // expensive failure mode in this file, because a dropped derived value
@@ -265,7 +213,7 @@ function mergeDerivedState(
 export function applyDerivedFactory(
   $: AnyRecord,
   factory: ($: AnyRecord) => object,
-  realization?: TreeRealization
+  locations?: LocationRuntime
 ): void {
-  mergeDerivedState($, factory($), '', realization);
+  mergeDerivedState($, factory($), '', locations);
 }

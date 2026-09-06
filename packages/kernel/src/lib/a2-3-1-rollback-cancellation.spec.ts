@@ -97,7 +97,9 @@ const persistedTree = (adapter: StorageAdapter, key: string) =>
       ],
     }
   ) as unknown as {
-    $: { theme: { (): string; set(v: string): void } };
+    $: {
+      theme: { (value: string): void; (update: (current: string) => string): void; (): string };
+    };
     transaction: (fn: () => void) => { confirm(): void; rollback(): void };
   };
 
@@ -107,7 +109,7 @@ describe('A2-3.1 on the SHIPPING tree-scoped surface', () => {
     const tree = persistedTree(rec.adapter, 'a2-3-1-rollback');
 
     const pending = tree.transaction(() => {
-      tree.$.theme.set('dark');
+      tree.$.theme('dark');
     });
     await settleTimers();
     expect(rec.payloads).toEqual([]); // deferred while unsettled
@@ -127,7 +129,7 @@ describe('A2-3.1 on the SHIPPING tree-scoped surface', () => {
     const tree = persistedTree(rec.adapter, 'a2-3-1-confirm');
 
     const pending = tree.transaction(() => {
-      tree.$.theme.set('dark');
+      tree.$.theme('dark');
     });
     await settleTimers();
     expect(rec.payloads).toEqual([]);
@@ -164,7 +166,7 @@ describe('A2-3.1 discriminator: arm-time vs run-time value capture', () => {
     await flush();
 
     const pending = tree.transaction(() => {
-      tree.$.theme.set('dark');
+      tree.$.theme('dark');
     });
     await flush();
 
@@ -267,7 +269,7 @@ describe('A2-3.1 withdrawal: a post-construction seam, with run-time capture', (
     });
 
     const pending = tree.transaction(() => {
-      tree.$.theme.set('dark');
+      tree.$.theme('dark');
     });
     await flush();
     const duringPending = [...durable];

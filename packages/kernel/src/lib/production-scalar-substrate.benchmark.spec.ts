@@ -3,7 +3,7 @@ import { undoable } from '../lib/undoable';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import type { WritableCell } from './internals/cell-runtime';
+import type { Location } from './internals/cell-runtime';
 import { restoration } from '../enhancers/restoration/restoration';
 import { entityMap } from './markers/entity-map';
 import { EntityMutationFrame } from './physical/entity-mutation-frame';
@@ -38,7 +38,7 @@ const MEASURE_RUNS = 3;
 const TIMING_RATIO_LIMIT = 40;
 const MAX_FRAME_WIDTH = FRAME_WIDTHS[FRAME_WIDTHS.length - 1];
 
-type ScalarLeaf = WritableCell<number>;
+type ScalarLeaf = Location<number>;
 
 type ScalarTimingOperation =
   | 'compiled-read'
@@ -270,7 +270,7 @@ function createScalarHarness(size: number): ScalarHarness {
     targetSlot,
     frameSlots,
     readTarget: () => targetLeaf(),
-    setTarget: (value) => targetLeaf.set(value),
+    setTarget: (value) => targetLeaf(value),
     commitFrame: (width, seed) => {
       const frame = runtime.beginFrame();
       for (let index = 0; index < width; index++) {
@@ -1148,7 +1148,7 @@ describe('Complexity guard: production scalar substrate', () => {
           equalityChecks: 1,
           revisionIncrements: 1,
           positionResolutions: 0,
-          publicationDependencyReads: 1,
+          publicationDependencyReads: 0,
           publications: 1,
           treeVisits: 0,
           structuralActiveKeyLookups: 0,

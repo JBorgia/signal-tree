@@ -3,6 +3,10 @@
 **Date:** 2026-08-30  
 **Status:** RC1 live; public API frozen; commercialization experiments next.
 
+> **Historical RC1 snapshot.** This document preserves the directives and
+> evidence available at RC1. For the current package/API contract, use the root
+> README, package READMEs, `llms.txt`, and `RELEASE-1.0.md`.
+
 ## 1. Current authority
 
 SignalTree `15.0.0-rc.1` is published as:

@@ -159,7 +159,7 @@ describe('OWNER-REPLAY-2: DevTools inspection', () => {
     const owner = getPositionRegistry(tree.$)?.id;
     const { seen, off } = record();
 
-    asDevtools(() => tree.$.n.set(42));
+    asDevtools(() => tree.$.n(42));
     await flush();
     off();
 

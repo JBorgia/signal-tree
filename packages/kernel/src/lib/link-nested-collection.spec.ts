@@ -103,7 +103,7 @@ describe('a collection nested under a branch Link', () => {
     const { tree, l, last } = await branchLink();
     tree.$.dashboard.rows.addOne({ id: 1, n: 'a' });
     await flush();
-    tree.$.dashboard.title.set('renamed');
+    tree.$.dashboard.title('renamed');
     await flush();
     await l.settled();
     expect(last()).toEqual({
@@ -160,7 +160,7 @@ describe('a collection nested under a branch Link', () => {
     expect(got.length).toBe(beforeInspection); // inspection alone publishes nothing
 
     // A later UNRELATED authored write must not carry the scrub outward.
-    tree.$.dashboard.title.set('renamed');
+    tree.$.dashboard.title('renamed');
     await flush();
     await l.settled();
     expect(last()).toEqual({

@@ -8,10 +8,9 @@ import { restoration } from './restoration';
 /**
  * Direct leaf writes must land in history.
  *
- * `tree.$.a.b.set(x)` goes straight to a leaf signal — it does not pass through
- * the root callable that restoration wraps. If history does not see it, undo
- * silently cannot restore it, which is the worst kind of failure for an undo
- * feature: it appears to work and quietly loses writes.
+ * `tree.$.a.b(x)` writes straight to its location — it does not pass through
+ * the root location that restoration wraps. If history does not see it, undo
+ * silently cannot restore it.
  *
  * `interceptLeafSignals` routes those writes through the PathNotifier so the
  * flush hook records them. These tests pin that, because it is invisible from
@@ -20,15 +19,15 @@ import { restoration } from './restoration';
 describe('restoration records direct leaf writes', () => {
   const flush = () => new Promise((r) => setTimeout(r, 0));
 
-  it('undo restores a direct leaf .set()', async () => {
+  it('undo restores a direct leaf replacement', async () => {
     const tree = signalTree(
       { user: { profile: { name: 'a' } } },
       { enhancers: [restoration()] }
     );
 
-    undoable(() => tree.$.user.profile.name.set('b'));
+    undoable(() => tree.$.user.profile.name('b'));
     await flush();
-    undoable(() => tree.$.user.profile.name.set('c'));
+    undoable(() => tree.$.user.profile.name('c'));
     await flush();
     expect(tree.$().user.profile.name).toBe('c');
 
@@ -36,12 +35,12 @@ describe('restoration records direct leaf writes', () => {
     expect(tree.$().user.profile.name).toBe('b');
   });
 
-  it('undo restores a direct leaf .update()', async () => {
+  it('undo restores a direct leaf updater', async () => {
     const tree = signalTree({ count: 0 }, { enhancers: [restoration()] });
 
-    undoable(() => tree.$.count.update((n) => n + 1));
+    undoable(() => tree.$.count((n) => n + 1));
     await flush();
-    undoable(() => tree.$.count.update((n) => n + 1));
+    undoable(() => tree.$.count((n) => n + 1));
     await flush();
     expect(tree.$().count).toBe(2);
 
@@ -55,7 +54,7 @@ describe('restoration records direct leaf writes', () => {
       { enhancers: [restoration()] }
     );
 
-    undoable(() => tree.$.a.b.c.d.set(2));
+    undoable(() => tree.$.a.b.c.d(2));
     await flush();
     expect(tree.$().a.b.c.d).toBe(2);
 
@@ -66,7 +65,7 @@ describe('restoration records direct leaf writes', () => {
   it('redo replays a leaf write that undo rolled back', async () => {
     const tree = signalTree({ n: 1 }, { enhancers: [restoration()] });
 
-    undoable(() => tree.$.n.set(2));
+    undoable(() => tree.$.n(2));
     await flush();
     tree.undo();
     expect(tree.$().n).toBe(1);
@@ -78,9 +77,9 @@ describe('restoration records direct leaf writes', () => {
   it('does not grow history while restoring', async () => {
     const tree = signalTree({ n: 1 }, { enhancers: [restoration()] });
 
-    undoable(() => tree.$.n.set(2));
+    undoable(() => tree.$.n(2));
     await flush();
-    undoable(() => tree.$.n.set(3));
+    undoable(() => tree.$.n(3));
     await flush();
     const before = tree.getRestorationHistory().length;
 

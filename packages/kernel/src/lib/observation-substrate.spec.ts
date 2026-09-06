@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import type { WritableCell } from './internals/cell-runtime';
+import type { Location } from './internals/cell-runtime';
 
 import { getPathNotifier, resetPathNotifier } from './path-notifier';
 import { link, type Link } from './link';
@@ -34,11 +34,11 @@ describe('activation lifecycle', () => {
 
     const tree = signalTree({ x: 0 });
     await flush();
-    const leaf = tree.$.x as unknown as WritableCell<number>;
-    const heldSet = leaf.set.bind(leaf);
+    const leaf = tree.$.x;
+    const heldWrite = leaf;
 
     expect(state(leaf).claims).toBe(0);
-    heldSet(1);
+    heldWrite(1);
     await flush();
     expect(pubs).toEqual([]); // dormant: writes, publishes nothing
     expect(tree.$.x()).toBe(1);
@@ -49,7 +49,7 @@ describe('activation lifecycle', () => {
     const firstPosition = state(leaf).positionId;
     expect(firstPosition).toBeDefined();
 
-    heldSet(2);
+    heldWrite(2);
     await flush();
     await la.settled();
     expect(a).toEqual([2]);
@@ -58,7 +58,7 @@ describe('activation lifecycle', () => {
     expect(state(leaf).claims).toBe(0);
 
     pubs.length = 0;
-    heldSet(3);
+    heldWrite(3);
     await flush();
     expect(pubs).toEqual([]); // dormant again
     expect(tree.$.x()).toBe(3);
@@ -67,7 +67,7 @@ describe('activation lifecycle', () => {
     const lc = track(link(tree.$.x, { set: (v: number) => void c.push(v) }));
     // POS-A: one identity for the source's lifetime, across arm/disarm/rearm.
     expect(state(leaf).positionId).toBe(firstPosition);
-    heldSet(4);
+    heldWrite(4);
     await flush();
     await lc.settled();
     expect(c).toEqual([4]);
@@ -96,10 +96,10 @@ describe('claims compose by physical leaf', () => {
 
     const tree = signalTree({ settings: { theme: 'light', units: 'metric' } });
     await flush();
-    const theme = tree.$.settings.theme as unknown as WritableCell<string>;
-    const units = tree.$.settings.units as unknown as WritableCell<string>;
-    const heldTheme = theme.set.bind(theme);
-    const heldUnits = units.set.bind(units);
+    const theme = tree.$.settings.theme;
+    const units = tree.$.settings.units;
+    const heldTheme = theme;
+    const heldUnits = units;
 
     const a: unknown[] = [];
     const b: string[] = [];
@@ -159,7 +159,7 @@ describe('claims compose by physical leaf', () => {
     lb.dispose();
     expect(state(tree.$.settings.theme).claims).toBe(1);
 
-    tree.$.settings.theme.set('dark');
+    tree.$.settings.theme('dark');
     await flush();
     await la.settled();
     expect(a[a.length - 1]).toEqual({ theme: 'dark', units: 'metric' });
@@ -195,7 +195,7 @@ describe('construction and cleanup', () => {
   it('disposing during an unresolved send releases and silences the source', async () => {
     const tree = signalTree({ x: 0 });
     await flush();
-    const leaf = tree.$.x as unknown as WritableCell<number>;
+    const leaf = tree.$.x;
     const sends: number[] = [];
     let release!: () => void;
     let opened!: () => void;
@@ -211,7 +211,7 @@ describe('construction and cleanup', () => {
       },
     });
 
-    leaf.set(1);
+    leaf(1);
     await flush();
     await inFlight;
     l.dispose();
@@ -219,7 +219,7 @@ describe('construction and cleanup', () => {
     await flush();
 
     expect(state(leaf).claims).toBe(0);
-    leaf.set(2);
+    leaf(2);
     await flush();
     expect(sends).toEqual([1]);
     expect(tree.$.x()).toBe(2);
@@ -234,7 +234,7 @@ describe('metadata fidelity', () => {
   } as const;
   const REALIZED = { intent: 'system', origin: 'external', participation: 'realized' } as const;
 
-  async function observe(run: (leaf: WritableCell<number>) => void) {
+  async function observe(run: (leaf: Location<number>) => void) {
     resetPathNotifier();
     const rows: Array<Record<string, unknown>> = [];
     const off = getPathNotifier().subscribe(
@@ -253,7 +253,7 @@ describe('metadata fidelity', () => {
     await flush();
     const l = track(link(tree.$.x, { set: () => undefined }));
     rows.length = 0;
-    run(tree.$.x as unknown as WritableCell<number>);
+    run(tree.$.x);
     await flush();
     await l.settled();
     off();
@@ -267,29 +267,29 @@ describe('metadata fidelity', () => {
     // `mutationIntent`, both declare `causal-runtime`, and that implies
     // `mutation-capture` — whose own interception replaces this substrate
     // entirely. So this asserts carriage, not a live behavioural dependency.
-    expect((await observe((l) => l.set(1)))['intent']).toBe('replace');
-    expect((await observe((l) => l.update((v) => v + 1)))['intent']).toBe('derive');
+    expect((await observe((location) => location(1)))['intent']).toBe('replace');
+    expect((await observe((location) => location((value) => value + 1)))['intent']).toBe('derive');
   });
 
   it('path, ownerPath and before/after are reported', async () => {
-    const row = await observe((l) => l.set(42));
+    const row = await observe((location) => location(42));
     expect(row).toMatchObject({ path: 'x', ownerPath: 'x', before: 0, after: 42 });
   });
 
   it('participation is transported, with authored represented by ABSENCE', async () => {
-    expect((await observe((l) => l.set(1)))['participation']).toBeNull();
+    expect((await observe((location) => location(1)))['participation']).toBeNull();
     expect(
-      (await observe((l) => withWriteContext(INSPECTION, () => l.set(1))))['participation']
+      (await observe((location) => withWriteContext(INSPECTION, () => location(1))))['participation']
     ).toBe('inspection');
     expect(
-      (await observe((l) => withWriteContext(REALIZED, () => l.set(1))))['participation']
+      (await observe((location) => withWriteContext(REALIZED, () => location(1))))['participation']
     ).toBe('realized');
   });
 
   it('devtools ORIGIN without inspection participation stays non-inspection', async () => {
     // Guards the rejected "devtools origin means inspection" predicate.
     const row = await observe((l) =>
-      withWriteContext({ intent: 'system', origin: 'devtools' }, () => l.set(1))
+      withWriteContext({ intent: 'system', origin: 'devtools' }, () => l(1))
     );
     expect(row['origin']).toBe('devtools');
     expect(row['participation']).toBeNull();

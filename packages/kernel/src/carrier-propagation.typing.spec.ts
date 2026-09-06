@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { signalTree, entityMap, asReadonly } from './index';
-import type { ReadableCell, WritableCell } from './lib/internals/cell-runtime';
+import type { Location, ReadableCell } from './lib/internals/cell-runtime';
 
 interface Row {
   id: number;
@@ -18,9 +18,9 @@ interface Row {
 describe('PCP — kernel public transformations stay neutral', () => {
   it('construction: top-level AND nested leaves are neutral cells', () => {
     const t = signalTree({ count: 0, branch: { leaf: 'a', deep: { n: 1 } } });
-    const top: WritableCell<number> = t.$.count;
-    const nested: WritableCell<string> = t.$.branch.leaf;
-    const deep: WritableCell<number> = t.$.branch.deep.n;
+    const top: Location<number> = t.$.count;
+    const nested: Location<string> = t.$.branch.leaf;
+    const deep: Location<number> = t.$.branch.deep.n;
     const destroyed: ReadableCell<boolean> = t.destroyed;
     expect([top, nested, deep, destroyed].length).toBe(4);
   });
@@ -44,7 +44,7 @@ describe('PCP — kernel public transformations stay neutral', () => {
     rows.addOne({ id: 1, name: 'Ada', tags: [] });
     const empty: ReadableCell<boolean> = rows.empty;
     const all: ReadableCell<Row[]> = rows.all;
-    const field: WritableCell<string> = rows.byIdOrFail(1).name;
+    const field: Location<string> = rows.byIdOrFail(1).name;
     const ro: ReadableCell<string> = rows.byIdOrFail(1).name.asReadonly();
     expect([empty, all, field, ro].length).toBe(4);
   });

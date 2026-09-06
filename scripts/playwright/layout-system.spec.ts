@@ -117,30 +117,35 @@ test('full-width bands align their inner content to the shared gutter', async ({
 
   for (const [route, selector] of [
     ['/', '.hero-inner'],
+    ['/why-causality', '.causality-hero'],
     ['/architecture-overview', '.architecture-hero'],
   ] as const) {
     await page.goto(route, { waitUntil: 'load' });
-    const alignment = await page.locator(selector).first().evaluate((element) => {
-      const main = document.querySelector('main');
-      if (!main) throw new Error('Missing main element');
-      const mainBox = main.getBoundingClientRect();
-      const box = element.getBoundingClientRect();
-      const style = getComputedStyle(element);
-      const probe = document.createElement('div');
-      probe.style.cssText =
-        'position:fixed;visibility:hidden;width:var(--layout-gutter)';
-      document.body.appendChild(probe);
-      const gutter = probe.getBoundingClientRect().width;
-      probe.remove();
-      const leftContentEdge = box.left + Number.parseFloat(style.paddingLeft);
-      const rightContentEdge = box.right - Number.parseFloat(style.paddingRight);
+    const alignment = await page
+      .locator(selector)
+      .first()
+      .evaluate((element) => {
+        const main = document.querySelector('main');
+        if (!main) throw new Error('Missing main element');
+        const mainBox = main.getBoundingClientRect();
+        const box = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        const probe = document.createElement('div');
+        probe.style.cssText =
+          'position:fixed;visibility:hidden;width:var(--layout-gutter)';
+        document.body.appendChild(probe);
+        const gutter = probe.getBoundingClientRect().width;
+        probe.remove();
+        const leftContentEdge = box.left + Number.parseFloat(style.paddingLeft);
+        const rightContentEdge =
+          box.right - Number.parseFloat(style.paddingRight);
 
-      return {
-        expectedGap: gutter,
-        leftGap: leftContentEdge - mainBox.left,
-        rightGap: mainBox.right - rightContentEdge,
-      };
-    });
+        return {
+          expectedGap: gutter,
+          leftGap: leftContentEdge - mainBox.left,
+          rightGap: mainBox.right - rightContentEdge,
+        };
+      });
 
     expect(alignment.leftGap).toBeCloseTo(alignment.expectedGap, 0);
     expect(alignment.rightGap).toBeCloseTo(alignment.expectedGap, 0);
@@ -172,5 +177,24 @@ test('architecture hero is content-driven and reveals the opening section', asyn
 
     expect(geometry.minHeight).toBe('0px');
     expect(geometry.openingTop).toBeLessThan(viewport.height);
+  }
+});
+
+test('causality hero reveals the page index across viewports', async ({
+  page,
+}) => {
+  for (const viewport of [
+    { width: 1440, height: 900 },
+    { width: 910, height: 768 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/why-causality', { waitUntil: 'load' });
+
+    const indexTop = await page
+      .locator('.page-index')
+      .evaluate((index) => Math.round(index.getBoundingClientRect().top));
+
+    expect(indexTop).toBeLessThan(viewport.height);
   }
 });

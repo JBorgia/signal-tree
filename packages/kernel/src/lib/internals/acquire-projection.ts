@@ -1,5 +1,9 @@
 import type { WriteMetadata } from '../mutation-types';
 import { withWriteContext } from '../write-context';
+import {
+  isWritableLocation,
+  replaceLocation,
+} from './location-runtime';
 
 /**
  * NON-AUTHORED FLAT-SCALAR INGRESS — §C / C4.
@@ -47,13 +51,6 @@ import { withWriteContext } from '../write-context';
  * atomic multi-leaf acquisition" or "independent commits".
  */
 
-/** The minimum a subject must expose to be realized. Structural, not nominal. */
-type RealizableSubject = { set(value: never): void };
-
-const isRealizableSubject = (value: unknown): value is RealizableSubject =>
-  typeof value === 'function' &&
-  typeof (value as { set?: unknown }).set === 'function';
-
 /**
  * Realize exactly the subjects the payload supplies.
  *
@@ -76,16 +73,14 @@ export function acquireScalarProjection<T extends Record<string, unknown>>(
     // no diagnostic, no recursion. Adding one here would invent a contract the
     // carriers do not prove and would collide with the existing unknown-key
     // diagnostics that `traversal-diagnostics` owns.
-    if (!isRealizableSubject(subject)) {
+    if (!isWritableLocation(subject)) {
       continue;
     }
 
     // ONE CONTEXT PER SUBJECT. Opened and closed around this single write, so
     // the provenance cannot outlive the subject it describes.
     withWriteContext(meta, () => {
-      (subject as { set(value: unknown): void }).set(
-        (payload as Record<string, unknown>)[key]
-      );
+      replaceLocation(subject, (payload as Record<string, unknown>)[key]);
     });
     realized.push(key);
   }

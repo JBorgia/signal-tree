@@ -28,8 +28,7 @@ reply: '' as string, // written from streamTokens() through external()
 
 ## The pattern
 
-A plain leaf plus a loop. The leaf is a `WritableSignal`, so `update()` is the
-accumulator:
+A plain terminal location plus a loop. The updater call is the accumulator:
 
 ```ts
 const chat = signalTree({
@@ -50,8 +49,9 @@ async function ask(prompt: string) {
 }
 ```
 
-That is the whole thing. `chat.$.reply` is a signal, so templates track it,
-`computed()` derives from it, and — because it is an ordinary leaf — it is
+That is the whole thing. `chat.$.reply` is a location, so framework adapters
+track it, `computed()` derives from it in Angular, and — because it is an
+ordinary terminal — it is
 captured by `restoration()` and included in `tree.$()`. Application-owned
 persistence may serialize that value without a marker contract to satisfy.
 
@@ -63,7 +63,7 @@ Hold the controller in a plain leaf too:
 const chat = signalTree({
   reply: '',
   streaming: false,
-  controller: null as AbortController | null,
+  controller: leaf<AbortController | null>(null),
 });
 
 async function ask(prompt: string) {
@@ -132,10 +132,10 @@ Identical shape — only the producer changes:
 const feed = signalTree({ events: [] as FeedEvent[], connected: false });
 
 const source = new EventSource('/api/feed');
-source.onopen = () => feed.$.connected.set(true);
-source.onerror = () => feed.$.connected.set(false);
+source.onopen = () => feed.$.connected(true);
+source.onerror = () => feed.$.connected(false);
 source.onmessage = (e) => {
-  feed.$.events.update((list) => [...list, JSON.parse(e.data)]);
+  feed.$.events((list) => [...list, JSON.parse(e.data)]);
 };
 ```
 
@@ -154,8 +154,8 @@ Every marker has to earn those individually — and the four bugs behind
 
 **Accumulation is not one policy.** Concatenating strings, appending to a list,
 merging partial objects and reducing to a running total are all "accumulate",
-and a marker has to pick or grow an options bag. `update()` is the accumulator,
-and it is already general.
+and a marker has to pick or grow an options bag. The updater call is already a
+general accumulator.
 
 **Streams are not restorable.** A half-received stream cannot be resumed from a
 snapshot — the connection is gone. That is why the removed marker could capture

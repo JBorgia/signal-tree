@@ -43,7 +43,7 @@ describe('incremental materialisation', () => {
   it('shares untouched subtrees and replaces touched ones', () => {
     const tree = signalTree(grid(3, 3), { capabilities: ['causal-runtime'] });
     const before = tree.$();
-    tree.$.r1.c1.set(42);
+    tree.$.r1.c1(42);
     const after = tree.$();
 
     expect(after).not.toBe(before);
@@ -55,9 +55,9 @@ describe('incremental materialisation', () => {
   it('still observes every write', () => {
     const tree = signalTree(grid(3, 3), { capabilities: ['causal-runtime'] });
     tree.$();
-    tree.$.r1.c1.set(42);
+    tree.$.r1.c1(42);
     expect(tree.$().r1.c1).toBe(42);
-    tree.$.r0.c0.set(7);
+    tree.$.r0.c0(7);
     expect(tree.$().r0.c0).toBe(7);
     expect(tree.$().r1.c1).toBe(42);
   });
@@ -68,7 +68,7 @@ describe('incremental materialisation', () => {
       { capabilities: ['causal-runtime'] }
     );
     const before = tree.$();
-    tree.$.a.x.set(1); // same value — equality short-circuits
+    tree.$.a.x(1); // same value — equality short-circuits
     expect(tree.$()).toBe(before);
   });
 
@@ -78,7 +78,7 @@ describe('incremental materialisation', () => {
       { capabilities: ['causal-runtime'] }
     );
     const snapshot = tree.$();
-    tree.$.cfg.list.set([9]);
+    tree.$.cfg.list([9]);
 
     expect(snapshot.cfg.list).toEqual([1, 2, 3]);
     expect(tree.$().cfg.list).toEqual([9]);
@@ -103,7 +103,7 @@ describe('incremental materialisation', () => {
       { capabilities: ['causal-runtime'] }
     );
     const before = tree.$();
-    tree.$.a.b.c.d.e.set(2);
+    tree.$.a.b.c.d.e(2);
     const after = tree.$();
 
     expect(after.a.b.c.d.e).toBe(2);
@@ -135,7 +135,7 @@ describe('incremental materialisation', () => {
     tree.$();
 
     const dirtyAll = () => {
-      for (let r = 0; r < 60; r++) tree.$['r' + r]['c0'].set(Math.random());
+      for (let r = 0; r < 60; r++) tree.$['r' + r]['c0'](Math.random());
     };
 
     // BEST OF THREE, not one sample. This assertion FLAKED under load (11.67ms
@@ -187,7 +187,7 @@ describe('incremental materialisation', () => {
   it('rebuilds only the touched row of a wide grid', () => {
     const tree = signalTree(grid(50, 50), { capabilities: ['causal-runtime'] });
     const before = tree.$();
-    tree.$.r25.c25.set(999);
+    tree.$.r25.c25(999);
     const after = tree.$();
 
     const shared = Object.keys(after).filter(

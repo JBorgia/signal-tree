@@ -143,7 +143,7 @@ release_provenance_ok() {
 # Release-managed manifests, EXACTLY the packages release-packages.sh publishes.
 # Deliberately excludes any other package.json — the old
 # `packages/[^/]+/package.json` wildcard tolerated dirt in non-released manifests.
-RELEASE_MANAGED_ALLOWLIST='^(package\.json|CHANGELOG\.md|packages/(kernel|angular|react)/package\.json|apps/demo/src/app/(version|library-versions)\.ts)$'
+RELEASE_MANAGED_ALLOWLIST='^(package\.json|CHANGELOG\.md|packages/(kernel|angular|react|vue)/package\.json|apps/demo/src/app/(version|library-versions)\.ts)$'
 
 if [ -z "$(git status --porcelain)" ]; then
     print_success "Working directory is clean"
@@ -183,7 +183,7 @@ print_header "3. Type Checking"
 print_step "Running TypeScript compiler checks"
 # Type checking happens during build, so we'll verify TypeScript configs exist
 TYPECHECK_PASSED=true
-for package in kernel angular react; do
+for package in kernel angular react vue; do
     TSCONFIG="./packages/$package/tsconfig.json"
     if [ ! -f "$TSCONFIG" ]; then
         print_error "Missing tsconfig.json for $package"
@@ -265,7 +265,7 @@ else
     exit 1
 fi
 
-REMAINING_BUILD_PACKAGES="angular,react"
+REMAINING_BUILD_PACKAGES="angular,react,vue"
 if NX_DAEMON=false npx nx run-many -t build --projects=$REMAINING_BUILD_PACKAGES --configuration=production 2>&1 | tee /tmp/build.log; then
     print_success "All public packages built successfully"
 else

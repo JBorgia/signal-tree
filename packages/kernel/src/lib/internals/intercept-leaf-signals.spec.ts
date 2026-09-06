@@ -7,7 +7,7 @@ import { interceptLeafSignals } from './intercept-leaf-signals';
 import { withWriteContext } from '../write-context';
 import type { WriteMetadata } from '../types';
 
-const signal = createReactiveTestRealization().cell.createCell;
+const signal = createReactiveTestRealization().locations.createCell;
 
 interface Captured {
   path: string;
@@ -43,7 +43,7 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     const restore = interceptLeafSignals(tree, onWrite);
 
     withWriteContext({ intent: 'hydrate', origin: 'external' }, () => {
-      tree.count.set(1);
+      tree.count(1);
     });
 
     expect(list).toHaveLength(1);
@@ -66,7 +66,7 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     const restore = interceptLeafSignals(tree, onWrite);
 
     withWriteContext({ intent: 'user' }, () => {
-      tree.count.update((c) => c + 1);
+      tree.count((c) => c + 1);
     });
 
     expect(list).toHaveLength(1);
@@ -86,7 +86,7 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     const { list, onWrite } = captureWrites();
     const restore = interceptLeafSignals(tree, onWrite);
 
-    tree.count.set(5); // no context
+    tree.count(5); // no context
 
     expect(list).toHaveLength(1);
     expect(list[0].meta).toEqual({ mutationIntent: 'replace' });
@@ -112,7 +112,7 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     const restore = interceptLeafSignals(tree.$, onWrite);
 
     tree.$.rows.addOne({ id: 1, name: 'A' });
-    tree.$.theme.set('dark');
+    tree.$.theme('dark');
 
     expect(list.map((entry) => entry.ownerPath)).toEqual(['rows']);
     expect(list.map((entry) => entry.path)).toEqual(['rows']);
@@ -126,8 +126,8 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     const restore = interceptLeafSignals(tree, onWrite);
 
     withWriteContext({ intent: 'bulk' }, () => {
-      tree.a.set(1);
-      tree.b.set(2);
+      tree.a(1);
+      tree.b(2);
     });
 
     expect(list).toHaveLength(2);
@@ -149,9 +149,9 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     const restore = interceptLeafSignals(tree, onWrite);
 
     withWriteContext({ intent: 'hydrate' }, () => {
-      tree.a.set(1); // captures `hydrate`
+      tree.a(1); // captures `hydrate`
       withWriteContext({ intent: 'user' }, () => {
-        tree.b.set(2); // captures `user`
+        tree.b(2); // captures `user`
       });
     });
 
@@ -174,7 +174,7 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     const restore = interceptLeafSignals(tree, onWrite);
 
     withWriteContext({ intent: 'user' }, () => {
-      tree.count.set(7); // no change
+      tree.count(7); // no change
     });
 
     expect(list).toHaveLength(0);
@@ -191,7 +191,7 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     const restore = interceptLeafSignals(tree, onWrite);
 
     withWriteContext({ intent: 'user' }, () => {
-      tree.count.set(1);
+      tree.count(1);
     });
 
     expect(calls).toHaveLength(1);
@@ -204,13 +204,13 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     const { list, onWrite } = captureWrites();
     const restore = interceptLeafSignals(tree, onWrite);
 
-    tree.count.set(1);
+    tree.count(1);
     expect(list).toHaveLength(1);
 
     restore();
 
     // After restore, writes are no longer intercepted.
-    tree.count.set(2);
+    tree.count(2);
     expect(list).toHaveLength(1);
     expect(tree.count()).toBe(2);
   });

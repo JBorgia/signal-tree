@@ -43,6 +43,6 @@ describe('StartHereComponent', () => {
   it('NgRx vs SignalTree comparison panes both render their code samples', () => {
     const text = fixture.nativeElement.textContent as string;
     expect(text).toContain('createReducer');
-    expect(text).toContain('counterTree.$.count.update');
+    expect(text).toContain('counterTree.$.count.update((count) => count + 1)');
   });
 });

@@ -16,6 +16,7 @@ export default defineConfig({
     'route-smoke.spec.ts',
     'architecture-connectors.spec.ts',
     'benchmarks.spec.ts',
+    'demo-production-bundle.spec.ts',
     'hover-language.spec.ts',
     'mobile-layout.spec.ts',
     'layout-system.spec.ts',

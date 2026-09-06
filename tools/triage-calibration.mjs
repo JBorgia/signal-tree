@@ -27,10 +27,10 @@ const by = new Map(rows.map((r) => [`${r.file}::${r.name}`, r]));
 const MUST_ESCALATE = [
   ['lib/internals/path-observation-port.ts::runtime', 'the reset-divergence defect'],
   ['lib/path-notifier.ts::globalPathNotifier', 'the other half of that pair'],
-  ['lib/internals/materialization-realization.ts::installed', 'framework installation authority'],
+  ['lib/internals/location-runtime.ts::activeConsumer', 'universal dependency-tracking authority'],
   ['lib/internals/materialize-markers.ts::applyMemberValue', 'installed cycle seam'],
   ['lib/internals/production-substrate-stats.ts::activeStats', 'resembled batchDepth until traced'],
-  ['lib/utils.ts::MATERIALIZED', 'cache whose correctness is invalidation'],
+  ['lib/internals/snapshot-authority.ts::MATERIALIZED', 'cache whose correctness is invalidation'],
   ['lib/internals/materialize-markers.ts::MARKER_PROCESSORS', 'monotonic capability registry'],
 ];
 
@@ -45,7 +45,11 @@ let bad = 0;
 console.log('must ESCALATE (never FAST-LANE):');
 for (const [key, why] of MUST_ESCALATE) {
   const r = by.get(key);
-  if (!r) { console.log(`  skip  ${key} — no longer a subject (deleted?)`); continue; }
+  if (!r) {
+    bad++;
+    console.log(`  FAIL  missing      ${key} — calibration subject disappeared`);
+    continue;
+  }
   const ok = r.lane !== 'FAST-LANE';
   if (!ok) bad++;
   console.log(`  ${ok ? 'pass' : 'FAIL'}  ${r.lane.padEnd(12)} ${key.split('::')[1].padEnd(22)} ${why}`);
@@ -53,7 +57,11 @@ for (const [key, why] of MUST_ESCALATE) {
 console.log('\nmust NOT be DEEP on lexical grounds:');
 for (const [key, why] of MUST_NOT_DEEP) {
   const r = by.get(key);
-  if (!r) { console.log(`  skip  ${key} — no longer a subject`); continue; }
+  if (!r) {
+    bad++;
+    console.log(`  FAIL  missing      ${key} — calibration subject disappeared`);
+    continue;
+  }
   const ok = r.lane !== 'DEEP';
   if (!ok) bad++;
   console.log(`  ${ok ? 'pass' : 'FAIL'}  ${r.lane.padEnd(12)} ${key.split('::')[1].padEnd(38)} ${why}`);

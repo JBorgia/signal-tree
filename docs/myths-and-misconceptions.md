@@ -52,8 +52,10 @@ There is no second construction phase and no late enhancement API.
 `@signal-tree/kernel` because it contains the core API.
 
 **Correction:** Construct Angular trees through `@signal-tree/angular`. It
-realizes kernel semantics with native Angular signals and owns Angular DI and
-lifecycle integration. Use the kernel directly for framework-neutral runtimes.
+binds kernel-owned locations to Angular dependency tracking and owns Angular DI
+and lifecycle integration. Use `toWritableSignal()` only when an Angular API
+requires native signal identity. Use the kernel directly for framework-neutral
+runtimes.
 
 ```typescript
 import { defineStore, signalTree } from '@signal-tree/angular';
@@ -132,24 +134,39 @@ as ordinary application state.
 `restoration()` is appropriate only when undo/redo history is a product
 requirement. It is not a general form-state dependency.
 
-## Myth 8: Every `$` Location Has The Same Call Syntax
+## Myth 8: Framework-Native Leaves Create A Second State Authority
 
-**Claim:** Every location is callable for both reads and writes.
+**Claim:** If an Angular leaf is a `WritableSignal` or a Vue leaf is a `Ref`, the
+framework must own a duplicate copy of SignalTree state.
 
-**Correction:** Root and branch locations are SignalTree accessors. They support
-whole-value reads, assignments, and updater functions. A value call is never a
-patch; derive a patched value through the updater form. Leaves remain native
-framework signals: call to read, use `.set()` or `.update()` to write.
+**Correction:** Carrier identity and semantic authority are separate. The
+framework primitive tracks dependencies; kernel slots own canonical values,
+equality, revisions, transactions, restoration, and publication timing. Native
+`.set()`/`.update()` or `.value =` writes enter those kernel paths.
 
 ```typescript
 tree.$.user();
 tree.$.user({ name: 'Grace', active: true });
 tree.$.user.name();
 tree.$.user.name.set('Grace');
+tree.$.user.name.update((name) => name.toUpperCase());
 ```
 
-The old callable-leaf write transform was removed because the apparent write
-could type-check while doing nothing at runtime.
+`leaf(value)` controls where topology stops. It keeps an object atomic instead
+of traversable and disambiguates callable data from an updater:
+
+```typescript
+const tree = signalTree({
+  bounds: leaf({ min: 0, max: 100 }),
+  onSave: leaf((id: string) => console.log(id)),
+});
+
+tree.$.bounds.set({ min: 10, max: 90 });
+tree.$.onSave.set((id) => persist(id));
+```
+
+`toWritableSignal()` adapts a callable object branch when an Angular API needs
+one writable signal. Ordinary Angular leaves already have native identity.
 
 ## Myth 9: SignalTree Has A Separate `.state` Property
 
@@ -204,11 +221,12 @@ trees remain the caller's responsibility.
 **Claim:** Historical names such as core, events, guardrails, ng-forms, storage,
 or time-travel can still be installed or imported for missing capabilities.
 
-**Correction:** SignalTree 15 has three public packages:
+**Correction:** SignalTree 15 has four public packages:
 
 - `@signal-tree/kernel`
 - `@signal-tree/angular`
 - `@signal-tree/react`
+- `@signal-tree/vue`
 
 Use package manifests and emitted types as the source of truth. A retired name
 in migration history does not imply a compatibility package.

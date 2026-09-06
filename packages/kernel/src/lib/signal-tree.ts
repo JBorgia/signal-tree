@@ -1,60 +1,27 @@
-// TYPE-ONLY. The kernel names Angular's `WritableSignal` while this transitional
-// package still binds the Angular carrier publicly; the split rebinds it per
-// package. No Angular VALUE is imported here any more.
-import type { WritableCell } from './internals/cell-runtime';
-import type { ISignalTreeOf, SignalTreeFactoryOf } from './types';
+import type { Location, WritableCell } from './internals/cell-runtime';
+import type { SignalTreeFactory } from './types';
 
 import {
-  NEUTRAL_TRACKING_SUPPRESSION,
-  type TrackingSuppression,
-} from './internals/tracking-suppression';
-import { markTreeCell } from './internals/cell-identity';
+  bindLocationRuntime,
+  createLocationRuntime,
+  isWritableLocation,
+  replaceLocation,
+  type LocationRuntime,
+} from './internals/location-runtime';
 import {
-  bindTreeRealization,
-  NEUTRAL_TREE_REALIZATION,
-  snapshotTreeRealization,
-  type TreeRealization,
-  type TreeLazyRealization,
-} from './internals/tree-realization';
+  NEUTRAL_OBSERVATION_ADAPTER,
+  type ObservationAdapter,
+} from './internals/observation-adapter';
 
-// ⚠️ THE ANGULAR BINDING STAYS HERE FOR NOW — and that is a measured decision,
-// not inertia. It was moved to `internals/angular-realization.ts` and reverted:
-// isolating the INSTALL does not neutralize this module, which still imports
-// `signal` to create leaves and `isSignal` in `recursiveUpdate` for its own
-// work. The move therefore added a coupled module without removing coupling,
-// and the C6 ratchet failed it (10 -> 11).
-//
-//     CONCENTRATING A DEPENDENCY IS NOT REMOVING IT.
-//
-// The install moves out when S2b lands: once `isSignal` here becomes the
-// realization's `isReactiveNode`, and leaf creation goes through the cell
-// contract, this module stops importing Angular at all and the binding leaves
-// with nothing left behind.
 /**
- * Is this a reactive node of the installed realization?
- *
- * ⚠️ `isSignal` SURVIVES ONE SITE BELOW ON PURPOSE — the realization binding
- * itself. That call is Angular ANSWERING the question; these two are the kernel
- * ASKING it. Until the binding moves out (blocked on S1, since leaf creation
- * still calls Angular `signal`), this module stays runtime-coupled, and S2b-2
- * is deliberately NOT described as neutralizing it.
- */
-// ⚠️ IT MUST NARROW, NOT JUST ANSWER. Angular's `isSignal` is a type guard
-// (`value is Signal<unknown>`), so it was doing two jobs at once: the runtime
-// check AND the narrowing that lets `'set' in prop` compile. A plain `boolean`
-// broke the callers. The narrowing is deliberately to `object` — the weakest
-// thing that supports the membership test — rather than to a framework type,
-// because naming `Signal` here would reintroduce the coupling in the type
-// system while claiming to have removed it from the runtime.
-/**
- * A WRITABLE CELL IS A CALLABLE WITH `.set`, WHOEVER REALIZED IT.
+ * A writable location is a callable with `.set`.
  *
  * This replaced `isSignal(prop) && 'set' in prop` at the merge-write site. The
  * question there is about a leaf THE KERNEL CREATED, so it must be answerable by
  * the kernel alone — routing it through the realization made 151 tests fail when
  * no adapter was installed. Angular's `WritableSignal` and the kernel's own
- * plain carrier both satisfy this, which is exactly the point: the kernel checks
- * the SHAPE OF ITS OWN CONTRACT, not the identity of a framework.
+ * universal locations satisfy this directly: the kernel checks the shape of
+ * its own contract, not the identity of a framework.
  *
  *     THE KERNEL MUST NOT ASK AN OPTIONAL ADAPTER WHETHER ITS OWN STATE EXISTS.
  */
@@ -65,12 +32,8 @@ const isWritableCell = (
   'set' in (v as object) &&
   typeof (v as { set?: unknown }).set === 'function';
 
-// PHYSICAL-PACKAGE-SPLIT-0. The Angular binding that stood here — materialization,
-// tracking suppression, scalar leaf, derived and cell realizations — now lives in
-// `@signal-tree/angular`, installed when that package's entrypoint is evaluated.
-// It was DELETED rather than conditionalized: a kernel that can still install a
-// framework has not been separated from it. With no adapter installed the kernel
-// falls back to its own neutral carriers, which is a supported configuration.
+const readWritableCell = <T>(cell: Location<T> | WritableCell<T>): T =>
+  'peek' in cell && typeof cell.peek === 'function' ? cell.peek() : cell();
 
 import { SIGNAL_TREE_MESSAGES } from './constants';
 import { resolveEnhancerOrder } from '../enhancers';
@@ -113,7 +76,7 @@ import {
   type TreeScalarLeafRuntime,
 } from './internals/tree-scalar-slot-port';
 // Kernel-owned orchestration. The Angular edge is gone: the framework now
-// supplies only `ScalarLeafRealization`, installed with the binding below.
+// supplies only an observation adapter, installed with the binding below.
 import { createTreeScalarLeafRuntime } from './internals/tree-scalar-leaf-runtime';
 import {
   createPhysicalCommitClock,
@@ -126,6 +89,7 @@ import {
 import type { MaterializationContext } from './internals/materialize-markers';
 import { applyDerivedFactory } from './internals/merge-derived';
 import { hydrateMarkerNode } from './internals/materialize-markers';
+import { isLeafDefinition, leafDefinitionValue } from './leaf';
 import {
   deepEqual,
   isBuiltInObject,
@@ -134,11 +98,14 @@ import {
   unwrap,
 } from './utils';
 import {
-  markSnapshotDirty,
   markTreeStore,
   publishMembershipChange,
 } from './internals/snapshot-authority';
-import { NODE_STORE_SYMBOL } from './internals/node-shape';
+import {
+  CALLABLE_SIGNAL_SYMBOL,
+  isNodeAccessor,
+  NODE_STORE_SYMBOL,
+} from './internals/node-shape';
 
 import type {
   TreeNode,
@@ -158,11 +125,6 @@ import { ENHANCER_META } from './types';
 // a framework's ambient types: it is a bundler convention, not a framework
 // API, and the kernel's declarations must not depend on Angular for it.
 declare const ngDevMode: boolean | undefined;
-
-// =============================================================================
-// INTERNAL SYMBOLS
-// =============================================================================
-const NODE_ACCESSOR_SYMBOL = Symbol.for('SignalTree:NodeAccessor');
 
 /** ST2018 tuning — see warnEntityArrayLeaf(). */
 const ENTITY_ARRAY_MIN_LENGTH = 32;
@@ -218,13 +180,12 @@ function createTreeBuildPlan(
 // fundamentally different scalar storage implementations.
 
 function finalizeLeafSignal<TValue>(
-  leaf: WritableCell<TValue>,
+  leaf: Location<TValue>,
   path: string,
   positionIds: readonly number[] | undefined,
   buildPlan: TreeBuildPlan,
   captureRuntime: MutationCaptureRuntime,
-  registry?: PositionRegistry,
-  suppressTracking?: TrackingSuppression
+  registry?: PositionRegistry
 ): void {
   // A LOCATION MUST BE ABLE TO NAME ITS OWNER. Attaching the registry to the
   // leaf — not only to `tree` / `tree.$` — is what makes
@@ -246,7 +207,6 @@ function finalizeLeafSignal<TValue>(
       ownerId: registry?.id,
       metadataStorage: buildPlan.leafMetadataStorage,
       captureRuntime,
-      suppressTracking,
     });
     return;
   }
@@ -304,13 +264,6 @@ function materializeTreeMarkers<T extends object>(
 ): void {
   materializeMarkers(tree.$, undefined, [], materializationContext, authority);
   _recordTreeConstruction();
-}
-
-export function isNodeAccessor(value: unknown): value is NodeAccessor<unknown> {
-  return (
-    typeof value === 'function' &&
-    (value as unknown as Record<symbol, unknown>)[NODE_ACCESSOR_SYMBOL] === true
-  );
 }
 
 function isEntityMapMarker(
@@ -419,8 +372,7 @@ function makeNodeAccessor<T>(
   ownerPath?: string,
   positionIds?: readonly number[],
   registry?: PositionRegistry,
-  realization?: TreeLazyRealization,
-  suppressTracking?: TrackingSuppression
+  locations?: LocationRuntime
 ): NodeAccessor<T> {
   const isRoot = ownerPath === '';
   // Declared as a METHOD SHORTHAND, not `function () {}`, and this is
@@ -436,6 +388,10 @@ function makeNodeAccessor<T>(
   // Read INSIDE the method, which only runs after the assignment below — the
   // same box pattern the leaf uses, for the same reason.
   const self: { accessor?: NodeAccessor<T> } = {};
+  const applyGrouped = (run: () => void): void => {
+    if (locations) locations.runInvalidationGroup(run);
+    else run();
+  };
 
   const accessor = {
     node(arg?: unknown): T | void {
@@ -471,18 +427,11 @@ function makeNodeAccessor<T>(
         return materializeNode(store as object) as unknown as T;
       }
 
-      // UPDATE with function - auto-batch
+      let updates = arg;
       if (typeof arg === 'function') {
         const updater = arg as (current: T) => T;
         const current = unwrap(store) as T;
-        recursiveUpdate(
-          store,
-          updater(current),
-          undefined,
-          '',
-          suppressTracking
-        );
-        return;
+        updates = updater(current);
       }
 
       // WHOLE-VALUE ASSIGNMENT with an object - auto-batch.
@@ -508,18 +457,15 @@ function makeNodeAccessor<T>(
       // rather than throwing. No carrier proves a runtime rejection, and adding
       // one would invent a contract and could break untyped consumers — see the
       // C8 surface review for whether a dev-mode diagnostic is warranted.
-      if (typeof arg === 'object' && arg !== null && !Array.isArray(arg)) {
-        recursiveUpdate(store, arg as T, undefined, '', suppressTracking);
-        return;
-      }
-
-      // FULL SET with primitive/array - single value, no batch needed
-      recursiveUpdate(store, arg, undefined, '', suppressTracking);
+      applyGrouped(() => {
+        recursiveUpdate(store, updates, undefined, '');
+      });
     },
   }.node as NodeAccessor<T>;
 
   self.accessor = accessor;
-  (accessor as unknown as Record<symbol, boolean>)[NODE_ACCESSOR_SYMBOL] = true;
+  (accessor as unknown as Record<symbol, boolean>)[CALLABLE_SIGNAL_SYMBOL] =
+    true;
   Object.defineProperty(accessor, NODE_STORE_SYMBOL, {
     value: store,
     enumerable: false,
@@ -572,9 +518,9 @@ function makeNodeAccessor<T>(
     definePositionRegistry(store as object, registry);
     defineOwnedOwnerId(store as object, registry.id);
   }
-  if (realization) {
-    bindTreeRealization(accessor as object, realization);
-    bindTreeRealization(store as object, realization);
+  if (locations) {
+    bindLocationRuntime(accessor as object, locations);
+    bindLocationRuntime(store as object, locations);
   }
 
   return accessor;
@@ -864,8 +810,6 @@ function isLargeEnoughToMatter(value: object): boolean {
  * the per-leaf design was abandoned.
  */
 function republishMembers(parent: object, keys: readonly string[]): void {
-  if (keys.length > 0) markSnapshotDirty(parent);
-
   const runtime = getTreeScalarSlotRuntime(parent);
   if (!runtime) return;
 
@@ -969,7 +913,7 @@ function recursiveUpdate(
   updates: unknown,
   out?: string[],
   pathPrefix = '',
-  suppressTracking: TrackingSuppression = NEUTRAL_TRACKING_SUPPRESSION
+  reconcileMembership = true
 ): void {
   if (!updates || typeof updates !== 'object') return;
 
@@ -1031,28 +975,40 @@ function recursiveUpdate(
     // Line 1430 keeps the neutral predicate because its subject is a
     // CALLER-SUPPLIED value — the same question `merge-derived` asks. Same
     // function name, different semantic decision.
-    if (isWritableCell(prop)) {
-      const sig = prop as WritableCell<unknown>;
-      // NOTE: a function value is STORED, never invoked. Updaters are supported
-      // at branches and at the root, NOT at leaves — `tree.$.count.update(fn)`
-      // is the leaf form, mirroring Angular's own signal API.
-      //
-      // A previous revision tried to resolve leaf updaters, guarded on "the
-      // current value is not a function". That predicate is unknowable at
-      // runtime: the right question is whether the leaf's DECLARED TYPE is a
-      // function, and a leaf typed `null | (() => void)` sitting at `null` is
-      // the ordinary callback field. Assigning a handler to one then INVOKED it
-      // (running `() => this.submit()` at write time), stored its return value,
-      // and reported the path as landed; a class constructor threw out of the
-      // middle of the write loop, committing earlier keys and dropping later
-      // ones while reporting nothing. Strictly worse than the inert
-      // stored-function it replaced, so it is gone.
-      // Ref-equality short-circuit: skip the .set() entirely when the
-      // incoming value is identical to the current value. Saves the
-      // function-call + Angular's internal equality check + any glitch
-      // tracking. Wrapped in untracked() so reading the current value
-      // never accidentally creates a reactive dependency.
-      const current = suppressTracking(() => sig());
+    if (isNodeAccessor(prop)) {
+      if (typeof value === 'function') {
+        const updater = value as (current: unknown) => unknown;
+        value = updater(unwrap(prop));
+        const mergeable =
+          isTraversableNode(value) &&
+          typeof value !== 'function' &&
+          !isBuiltInObject(value) &&
+          !Array.isArray(value) &&
+          typeof (value as { then?: unknown }).then !== 'function';
+        if (!mergeable) {
+          warnDiscardedBranchWrite(childPath, value);
+          continue;
+        }
+      }
+      if (typeof value === 'function') {
+        warnDiscardedBranchWrite(childPath, value);
+      } else if (value && typeof value === 'object') {
+        recursiveUpdate(prop, value, out, childPath);
+      } else if (value === undefined) {
+        continue;
+      } else {
+        warnDiscardedBranchWrite(childPath, value);
+      }
+    } else if (isWritableLocation(prop) || isWritableCell(prop)) {
+      const sig = prop as Location<unknown> | WritableCell<unknown>;
+      // Recursive structural application already knows this is a replacement,
+      // so callable values are stored through the raw ingress rather than
+      // re-entering the authored grammar where a function means updater.
+      // Ref-equality short-circuit: skip the write entirely when the incoming
+      // value is identical to the current value. `peek()` asks the universal
+      // location for the value without enrolling the write path as a reactive
+      // consumer.
+      const current = readWritableCell(sig);
       if (current === value) {
         // Dev-mode footgun guard: a merge write whose value is reference-
         // identical to the current value is a no-op. For objects/arrays this
@@ -1076,7 +1032,8 @@ function recursiveUpdate(
         }
         continue;
       }
-      sig.set(value);
+      if (isWritableLocation(sig)) replaceLocation(sig, value);
+      else sig.set(value);
 
       if (out) {
         // Report only what LANDED. Leaves are created with a deep `equal`, so
@@ -1091,67 +1048,7 @@ function recursiveUpdate(
         // is exactly the no-op case (and Object.is(NaN, NaN) makes that
         // indistinguishable). "The leaf no longer holds what it held" is the
         // question actually being asked.
-        if (
-          !Object.is(
-            suppressTracking(() => sig()),
-            current
-          )
-        )
-          out.push(childPath);
-      }
-    } else if (isNodeAccessor(prop)) {
-      if (typeof value === 'function') {
-        // Updater function aimed at a BRANCH, e.g. tree.$({ user: u => ({...}) }).
-        // Resolve it here and recurse rather than handing it to the accessor:
-        // the accessor's own updater path drops `out` and `pathPrefix`, so the
-        // reported path was the branch ('user') instead of the leaves that
-        // changed ('user.name'), and a pure no-op updater still reported a
-        // change. Resolving here keeps one code path for reporting — and one
-        // code path for the discard diagnostic below, which the resolved value
-        // now falls through to. Without that, `u => null` and a forgotten
-        // `await` (an async updater returns a Promise, whose Object.entries is
-        // empty) were both SILENT no-ops.
-        const updater = value as (current: unknown) => unknown;
-        value = updater(unwrap(prop));
-        // Only a PLAIN object merges into a branch. Everything else an updater
-        // can return is a discard, and each used to be silent:
-        //   - a Promise, from a forgotten `await` — it IS an object, so
-        //     `Object.entries()` on it is empty and the whole write vanished.
-        //     A previous revision claimed to diagnose this and did not.
-        //   - a Date/Map/Set/array, which merge key-by-key into nonsense.
-        //   - `undefined`, which differs from a LITERAL `undefined` in the
-        //     payload: that legitimately means "no change" for an absent
-        //     optional key, whereas an updater returning it is a mistake.
-        const mergeable =
-          isTraversableNode(value) &&
-          typeof value !== 'function' &&
-          !isBuiltInObject(value) &&
-          !Array.isArray(value) &&
-          typeof (value as { then?: unknown }).then !== 'function';
-        if (!mergeable) {
-          warnDiscardedBranchWrite(childPath, value);
-          continue;
-        }
-      }
-      if (typeof value === 'function') {
-        // An updater that returned another function. Nothing sane to do.
-        warnDiscardedBranchWrite(childPath, value);
-      } else if (value && typeof value === 'object') {
-        recursiveUpdate(prop, value, out, childPath, suppressTracking);
-      } else if (value === undefined) {
-        // `{ user: undefined }` is type-legal for Partial<T> and is exactly what
-        // `{ ...defaults, ...patch }` produces for an absent optional key. It
-        // means "no change", so it is skipped WITHOUT a diagnostic — warning
-        // here cried wolf on correct, type-checked code.
-        continue;
-      } else {
-        // A primitive, null or undefined aimed at a BRANCH. This has always
-        // been discarded — the accessor forwards to recursiveUpdate, which
-        // returns immediately for a non-object — but the path was reported as
-        // changed anyway. That is the same defect the leaf branch above was
-        // fixed for, and it is the shape a server payload takes when it sends
-        // `null` for a whole object. Report nothing, and say why in dev.
-        warnDiscardedBranchWrite(childPath, value);
+        if (!Object.is(readWritableCell(sig), current)) out.push(childPath);
       }
     }
     // ST2005 — attempted and REVERTED, deliberately. Recorded here so the
@@ -1195,10 +1092,9 @@ function recursiveUpdate(
   // ── MEMBERSHIP RECONCILIATION — GREENFIELD-BRANCH-WRITE-0 ─────────────────
   //
   // A whole-value assignment states the COMPLETE next value of this location, so
-  // a key the value omits is not a member of it. Every caller of this function
-  // is an authored whole-value path (branch value/updater, nested descent, root,
-  // updateAndReport) — verified by caller audit — which is why membership lands
-  // here and only here.
+  // a key the value omits is not a member of it. Root and branch value/updater
+  // calls reconcile here. `updateAndReport` passes a Partial<T>, so it scopes the
+  // outer call only; an included branch still descends with whole-value semantics.
   //
   //     OMISSION IN A WHOLE VALUE CHANGES MEMBERSHIP.
   //     OMISSION IN A PROJECTION DEFINES SCOPE.
@@ -1215,6 +1111,8 @@ function recursiveUpdate(
   // Reactivation is handled by the supplied-key loop above having ALREADY
   // installed the value: REACTIVATION MUST CARRY THE SUPPLIED VALUE, because
   // re-enumerating alone resurrects the dormant retained one.
+  if (!reconcileMembership) return;
+
   const supplied = new Set(Object.keys(updates as Record<string, unknown>));
   const membershipChanged: string[] = [];
 
@@ -1258,7 +1156,7 @@ function recursiveUpdate(
  * it. In dev it wraps `base` to catch ST2027.
  *
  * Why here rather than in `recursiveUpdate`, where ST2003 lives: a direct
- * `tree.$.rows.set(v)` goes STRAIGHT to the Angular signal and never enters
+ * `tree.$.rows(v)` goes straight to the canonical location and never enters
  * `recursiveUpdate` at all. That is the most common write form, and it is the
  * one the corrupted benchmarks used — a diagnostic that only covers merge
  * writes would have missed the case that motivated it. The comparator is the
@@ -1342,13 +1240,7 @@ function materializeOrdinaryBranch(
     childPath,
     childPositionIds,
     materializationContext.positionRegistry,
-    {
-      cell: materializationContext.cellRuntime,
-      derived: materializationContext.derivedRuntime,
-      materialization: materializationContext.materializationRealization,
-      scalarLeaf: materializationContext.scalarLeafRealization,
-    },
-    materializationContext.suppressTracking
+    materializationContext.locationRuntime
   );
   // Membership reconciliation runs at EVERY branch, not just the root, so the
   // publication runtime has to be reachable from each branch accessor. One
@@ -1381,51 +1273,20 @@ function createSignalStore<T>(
 ): TreeNode<T> {
   const createLeafSignal = <TValue>(
     value: TValue,
-    leafPath: string,
     leafPositionIds: readonly number[] | undefined,
-    equal: (a: unknown, b: unknown) => boolean,
-    snapshotOwner?: object
-  ): WritableCell<TValue> => {
-    if (scalarSlotRuntime && leafPositionIds?.[0] !== undefined) {
-      // The port declares the neutral contract (`WritableCell`); the installed
-      // adapter realizes it with a native Angular signal. Same cast as the
-      // ordinary leaf path below — this file still binds the Angular carrier
-      // publicly until the package split rebinds it per package.
+    equal: (a: unknown, b: unknown) => boolean
+  ): Location<TValue> => {
+    if (scalarSlotRuntime) {
+      // The scalar substrate retains causal slot storage while exposing the
+      // same universal writable-location contract as ordinary leaves.
       return scalarSlotRuntime.createLeaf(
         value,
         equal as (current: TValue, next: TValue) => boolean,
-        leafPositionIds[0],
-        snapshotOwner
-      ) as unknown as WritableCell<TValue>;
+        leafPositionIds?.[0]
+      );
     }
 
-    // S1 — the ordinary leaf carrier comes from the installed realization when
-    // there is one. The Angular fallback stays until the package split makes the
-    // adapter structural: leaf allocation is the kernel's OWN state, and it must
-    // not become contingent on an optional installation (see line 941).
-    // ACQUISITION POINT: this cell is becoming a TREE LEAF, which is what
-    // makes it a SignalTree state cell. Internal cells from the same runtime
-    // (revisions, counters, metrics) never pass here and stay unclassified.
-    const leaf = markTreeCell(
-      materializationContext.cellRuntime.createCell(value, equal)
-    ) as unknown as WritableCell<TValue>;
-    if (snapshotOwner) {
-      const rawSet = leaf.set.bind(leaf);
-      const rawUpdate = leaf.update.bind(leaf);
-      leaf.set = (next) => {
-        const before = materializationContext.suppressTracking(() => leaf());
-        rawSet(next);
-        const after = materializationContext.suppressTracking(() => leaf());
-        if (!Object.is(before, after)) markSnapshotDirty(snapshotOwner);
-      };
-      leaf.update = (update) => {
-        const before = materializationContext.suppressTracking(() => leaf());
-        rawUpdate(update);
-        const after = materializationContext.suppressTracking(() => leaf());
-        if (!Object.is(before, after)) markSnapshotDirty(snapshotOwner);
-      };
-    }
-    return leaf;
+    return materializationContext.locationRuntime.createCell(value, equal);
   };
 
   // Primitives, null, undefined
@@ -1434,15 +1295,14 @@ function createSignalStore<T>(
       typeof ngDevMode === 'undefined' || ngDevMode
         ? leafEqual(equalityFn, path)
         : equalityFn;
-    const leaf = createLeafSignal(obj, path, positionIds, equal);
+    const leaf = createLeafSignal(obj, positionIds, equal);
     finalizeLeafSignal(
       leaf,
       path,
       positionIds,
       buildPlan,
       captureRuntime,
-      materializationContext.positionRegistry,
-      materializationContext.suppressTracking
+      materializationContext.positionRegistry
     );
     return leaf as unknown as TreeNode<T>;
   }
@@ -1453,15 +1313,14 @@ function createSignalStore<T>(
       typeof ngDevMode === 'undefined' || ngDevMode
         ? leafEqual(equalityFn, path)
         : equalityFn;
-    const leaf = createLeafSignal(obj, path, positionIds, equal);
+    const leaf = createLeafSignal(obj, positionIds, equal);
     finalizeLeafSignal(
       leaf,
       path,
       positionIds,
       buildPlan,
       captureRuntime,
-      materializationContext.positionRegistry,
-      materializationContext.suppressTracking
+      materializationContext.positionRegistry
     );
     return leaf as unknown as TreeNode<T>;
   }
@@ -1472,15 +1331,14 @@ function createSignalStore<T>(
       typeof ngDevMode === 'undefined' || ngDevMode
         ? leafEqual(equalityFn, path)
         : equalityFn;
-    const leaf = createLeafSignal(obj, path, positionIds, equal);
+    const leaf = createLeafSignal(obj, positionIds, equal);
     finalizeLeafSignal(
       leaf,
       path,
       positionIds,
       buildPlan,
       captureRuntime,
-      materializationContext.positionRegistry,
-      materializationContext.suppressTracking
+      materializationContext.positionRegistry
     );
     return leaf as unknown as TreeNode<T>;
   }
@@ -1488,8 +1346,17 @@ function createSignalStore<T>(
   // Regular object - recursive
   const store: Record<string, unknown> = {};
 
-  for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+  for (const [key, definedValue] of Object.entries(
+    obj as Record<string, unknown>
+  )) {
     const childPath = path ? `${path}.${key}` : key;
+    const terminal = isLeafDefinition(definedValue);
+    const value = terminal ? leafDefinitionValue(definedValue) : definedValue;
+    if (terminal && (isEntityMapMarker(value) || isRegisteredMarker(value))) {
+      throw new Error(
+        `SignalTree: leaf() cannot wrap a semantic marker at "${childPath}".`
+      );
+    }
     let childPositionIds: number[] | undefined;
     const getChildPositionIds = (): number[] | undefined => {
       if (!materializationContext.positionTopologyEnabled) {
@@ -1548,6 +1415,7 @@ function createSignalStore<T>(
     // This catches the common mistake of forgetting to register before tree creation
     if (typeof ngDevMode === 'undefined' || ngDevMode) {
       if (
+        !terminal &&
         value !== null &&
         typeof value === 'object' &&
         !Array.isArray(value) &&
@@ -1561,41 +1429,26 @@ function createSignalStore<T>(
       }
     }
 
-    // ⚠️ A CALLER-SUPPLIED reactive node is preserved as-is, never re-wrapped —
-    // and unlike the kernel's own leaves above, this one DOES route through the
-    // realization predicate. The subject is a value the caller made with their
-    // framework, which is the same question `merge-derived` asks of
-    // `.derived()`. With no realization installed there is, correctly, no such
-    // node to preserve.
-    if (
-      materializationContext.materializationRealization.isReactiveNode(value)
-    ) {
-      store[key] = value;
-      continue;
-    }
-
     // Null, undefined, primitives
-    if (value === null || value === undefined || typeof value !== 'object') {
+    if (
+      terminal ||
+      value === null ||
+      value === undefined ||
+      typeof value !== 'object'
+    ) {
       const childPositionIds = getChildPositionIds();
       const equal =
         typeof ngDevMode === 'undefined' || ngDevMode
           ? leafEqual(equalityFn, childPath)
           : equalityFn;
-      const leaf = createLeafSignal(
-        value,
-        childPath,
-        childPositionIds,
-        equal,
-        store
-      );
+      const leaf = createLeafSignal(value, childPositionIds, equal);
       finalizeLeafSignal(
         leaf,
         childPath,
         childPositionIds,
         buildPlan,
         captureRuntime,
-        materializationContext.positionRegistry,
-        materializationContext.suppressTracking
+        materializationContext.positionRegistry
       );
       store[key] = leaf;
       continue;
@@ -1615,21 +1468,14 @@ function createSignalStore<T>(
         typeof ngDevMode === 'undefined' || ngDevMode
           ? leafEqual(equalityFn, childPath)
           : equalityFn;
-      const leaf = createLeafSignal(
-        value,
-        childPath,
-        childPositionIds,
-        equal,
-        store
-      );
+      const leaf = createLeafSignal(value, childPositionIds, equal);
       finalizeLeafSignal(
         leaf,
         childPath,
         childPositionIds,
         buildPlan,
         captureRuntime,
-        materializationContext.positionRegistry,
-        materializationContext.suppressTracking
+        materializationContext.positionRegistry
       );
       store[key] = leaf;
       continue;
@@ -1696,7 +1542,13 @@ function create<T extends object>(
   config: TreeConfig,
   materializationContext: MaterializationContext,
   buildPlan: TreeBuildPlan,
-  captureRuntime: MutationCaptureRuntime = createMutationCaptureRuntime()
+  captureRuntime: MutationCaptureRuntime = createMutationCaptureRuntime(),
+  createScalarLeafRuntime: (
+    physicalCommitClock:
+      | ReturnType<typeof createPhysicalCommitClock>
+      | undefined,
+    locations: LocationRuntime
+  ) => TreeScalarLeafRuntime = createTreeScalarLeafRuntime
 ): TreeConstructionResult<T> {
   if (initialState === null || initialState === undefined) {
     throw new Error(SIGNAL_TREE_MESSAGES.NULL_OR_UNDEFINED);
@@ -1705,12 +1557,10 @@ function create<T extends object>(
   const equalityFn = createEqualityFn(config.useShallowComparison ?? false);
 
   // Create signal store
-  const scalarSlotRuntime = buildPlan.has('causal-runtime')
-    ? createTreeScalarLeafRuntime(
-        materializationContext.physicalCommitClock,
-        materializationContext.scalarLeafRealization
-      )
-    : undefined;
+  const scalarSlotRuntime = createScalarLeafRuntime(
+    materializationContext.physicalCommitClock,
+    materializationContext.locationRuntime
+  );
 
   /**
    * The canonical construction authority, for the marker DISPATCHER only.
@@ -1821,26 +1671,20 @@ function create<T extends object>(
     '',
     rootPositionIds,
     materializationContext.positionRegistry,
-    {
-      cell: materializationContext.cellRuntime,
-      derived: materializationContext.derivedRuntime,
-      materialization: materializationContext.materializationRealization,
-      scalarLeaf: materializationContext.scalarLeafRealization,
-    },
-    materializationContext.suppressTracking
+    materializationContext.locationRuntime
   );
 
   const tree = {} as ISignalTree<T>;
 
-  const lazyRealization = {
-    cell: materializationContext.cellRuntime,
-    derived: materializationContext.derivedRuntime,
-    materialization: materializationContext.materializationRealization,
-    scalarLeaf: materializationContext.scalarLeafRealization,
-  };
-  bindTreeRealization(tree as object, lazyRealization);
-  bindTreeRealization(signalState as object, lazyRealization);
-  bindTreeRealization(rootAccessor as object, lazyRealization);
+  bindLocationRuntime(tree as object, materializationContext.locationRuntime);
+  bindLocationRuntime(
+    signalState as object,
+    materializationContext.locationRuntime
+  );
+  bindLocationRuntime(
+    rootAccessor as object,
+    materializationContext.locationRuntime
+  );
 
   (tree as unknown as Record<symbol, MutationCaptureRuntime>)[
     MUTATION_CAPTURE_RUNTIME
@@ -1912,7 +1756,7 @@ function create<T extends object>(
 
   // Lifecycle: cleanup registry and destroyed flag
   const cleanupFns: Array<() => void> = [];
-  const destroyedSig = materializationContext.cellRuntime.createCell(false);
+  const destroyedSig = materializationContext.locationRuntime.createCell(false);
 
   // Add core properties
   Object.defineProperty(tree, '$', {
@@ -1926,7 +1770,7 @@ function create<T extends object>(
   Object.defineProperty(tree, 'destroy', {
     value: function (): void {
       if (destroyedSig()) return; // Already destroyed
-      destroyedSig.set(true);
+      replaceLocation(destroyedSig, true);
       terminateOwnerInvalidation(tree as object);
       // Run registered cleanup functions (enhancers, subscriptions, etc.)
       for (const fn of cleanupFns) {
@@ -1995,37 +1839,15 @@ function create<T extends object>(
     value: function (arg?: unknown): string[] {
       if (arguments.length === 0) return [];
       const out: string[] = [];
+      let updates = arg;
       if (typeof arg === 'function') {
         const updater = arg as (current: T) => T;
         const current = unwrap(signalState) as T;
-        recursiveUpdate(
-          signalState,
-          updater(current),
-          out,
-          '',
-          materializationContext.suppressTracking
-        );
-      } else if (
-        typeof arg === 'object' &&
-        arg !== null &&
-        !Array.isArray(arg)
-      ) {
-        recursiveUpdate(
-          signalState,
-          arg,
-          out,
-          '',
-          materializationContext.suppressTracking
-        );
-      } else {
-        recursiveUpdate(
-          signalState,
-          arg,
-          out,
-          '',
-          materializationContext.suppressTracking
-        );
+        updates = updater(current);
       }
+      materializationContext.locationRuntime.runInvalidationGroup(() => {
+        recursiveUpdate(signalState, updates, out, '', false);
+      });
       return out;
     },
     enumerable: false,
@@ -2119,7 +1941,16 @@ function applyEnhancers<T extends object>(
 function signalTreeImpl<T extends object>(
   initialState: T,
   config: TreeConfig = {},
-  realization: TreeRealization = NEUTRAL_TREE_REALIZATION
+  observation: ObservationAdapter = NEUTRAL_OBSERVATION_ADAPTER,
+  createScalarLeafRuntime: (
+    physicalCommitClock:
+      | ReturnType<typeof createPhysicalCommitClock>
+      | undefined,
+    locations: LocationRuntime
+  ) => TreeScalarLeafRuntime = createTreeScalarLeafRuntime,
+  createLocations: (
+    observation: ObservationAdapter
+  ) => LocationRuntime = createLocationRuntime
 ): ISignalTree<T> {
   // CONFIGURE -> FINALIZE. The whole enhancer set is known here, so the plan
   // can be truthful. Incremental composition had to materialize before the
@@ -2141,7 +1972,7 @@ function signalTreeImpl<T extends object>(
     buildPlan.has('position-topology'),
     (capability) => buildPlan.has(capability),
     physicalCommitClock,
-    realization
+    createLocations(observation)
   );
   materializationContext.mutationCaptureRuntime = captureRuntime;
 
@@ -2150,7 +1981,8 @@ function signalTreeImpl<T extends object>(
     config,
     materializationContext,
     buildPlan,
-    captureRuntime
+    captureRuntime,
+    createScalarLeafRuntime
   );
   let tree: ISignalTree<T> = constructed.tree;
   const authority = constructed.authority;
@@ -2227,7 +2059,7 @@ function createConfiguredTree<
   alreadyMaterialized = false,
   authority?: OrdinaryConstructionAuthority,
   derivedFactory?: ($: never) => object
-): ISignalTreeOf<TSource, 'cell', TAccum> {
+): ISignalTree<TSource, TAccum> {
   let isFinalized = false;
 
   let markersMaterialized = alreadyMaterialized;
@@ -2264,13 +2096,7 @@ function createConfiguredTree<
       applyDerivedFactory(
         baseTree.$ as Record<string, unknown>,
         derivedFactory as ($: Record<string, unknown>) => object,
-        {
-          cell: materializationContext.cellRuntime,
-          derived: materializationContext.derivedRuntime,
-          materialization: materializationContext.materializationRealization,
-          scalarLeaf: materializationContext.scalarLeafRealization,
-          suppressTracking: materializationContext.suppressTracking,
-        }
+        materializationContext.locationRuntime
       );
     }
   };
@@ -2304,26 +2130,42 @@ function createConfiguredTree<
     writable: false,
     configurable: true,
   });
-  return baseTree as unknown as ISignalTreeOf<TSource, 'cell', TAccum>;
+  return baseTree as unknown as ISignalTree<TSource, TAccum>;
 }
 
 /**
- * THE CANONICAL PUBLIC SIGNATURE LIVES IN `SignalTreeFactoryOf`.
- *
- * A prior implementation duplicated the public signatures here and in the
- * carrier-parametric factory type, creating two declaration authorities that
- * could drift. `SignalTreeFactoryOf<C>` is the sole signature authority; this
- * binds the implementation to the kernel carrier, while `@signal-tree/angular`
- * binds the same implementation to `'angular'`.
+ * The canonical public overload set lives in `SignalTreeFactory`.
  */
-export const signalTree: SignalTreeFactoryOf<'cell'> =
-  signalTreeImpl as unknown as SignalTreeFactoryOf<'cell'>;
+export const signalTree: SignalTreeFactory =
+  signalTreeImpl as unknown as SignalTreeFactory;
 
 /** @internal CBR discriminator: package binding without application config. */
-export const bindSignalTreeRealization = (
-  realization: TreeRealization = NEUTRAL_TREE_REALIZATION
-): SignalTreeFactoryOf<'cell'> => {
-  const bound = snapshotTreeRealization(realization);
+export const createSignalTreeFactory = (
+  observation: ObservationAdapter = NEUTRAL_OBSERVATION_ADAPTER,
+  createScalarLeafRuntime: (
+    physicalCommitClock:
+      | ReturnType<typeof createPhysicalCommitClock>
+      | undefined,
+    locations: LocationRuntime
+  ) => TreeScalarLeafRuntime = createTreeScalarLeafRuntime,
+  createLocations: (
+    observation: ObservationAdapter
+  ) => LocationRuntime = createLocationRuntime
+): SignalTreeFactory => {
+  const boundObservation: ObservationAdapter = {
+    createToken: observation.createToken.bind(observation),
+    createWritableCell: observation.createWritableCell?.bind(observation),
+    createWritableProjection:
+      observation.createWritableProjection?.bind(observation),
+    createReadonlyCell: observation.createReadonlyCell?.bind(observation),
+    runInvalidationGroup: observation.runInvalidationGroup.bind(observation),
+  };
   return ((initialState: object, config?: TreeConfig) =>
-    signalTreeImpl(initialState, config, bound)) as SignalTreeFactoryOf<'cell'>;
+    signalTreeImpl(
+      initialState,
+      config,
+      boundObservation,
+      createScalarLeafRuntime,
+      createLocations
+    )) as SignalTreeFactory;
 };

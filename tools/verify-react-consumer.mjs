@@ -93,7 +93,7 @@ if (rendered.root.findByType('output').children.join('') !== '1') {
 }
 
 await act(async () => {
-  tree.$.count.set(2);
+  tree.$.count(2);
   for (let index = 0; index < 4; index++) await Promise.resolve();
 });
 if (rendered.root.findByType('output').children.join('') !== '2') {

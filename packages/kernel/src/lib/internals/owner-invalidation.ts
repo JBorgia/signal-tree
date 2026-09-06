@@ -4,7 +4,6 @@ import {
   onCommitScopesSettled,
 } from './commit-consequence';
 import { installOwnerInvalidationDispatch } from './owner-invalidation-port';
-import { readCanonicalSnapshotInternal } from './canonical-snapshot';
 
 interface OwnerInvalidationTarget {
   readonly $: object;
@@ -106,6 +105,10 @@ function scheduleInvalidation(
   // settle before an adapter is told to reread externally visible truth.
   queueMicrotask(() => queueMicrotask(() => {
     if (!state.active || states?.get(ownerId) !== state) return;
+    if (hasOpenCommitScope(state.owner.$)) {
+      state.pending = false;
+      return;
+    }
     if (state.requested !== requested) {
       state.pending = false;
       scheduleInvalidation(ownerId, state);
@@ -113,7 +116,6 @@ function scheduleInvalidation(
     }
     state.pending = false;
     state.requested = 0;
-    readCanonicalSnapshotInternal(state.owner);
     for (const subscription of [...state.listeners]) {
       try {
         subscription.callback();

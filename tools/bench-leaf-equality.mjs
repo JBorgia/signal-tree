@@ -41,7 +41,7 @@ function readWholeState() {
   const tree = signalTree(buildWide(10_000));
   const leaf = tree.$.b0.f0;
   for (let i = 0; i < 50; i++) {
-    leaf.set(`w${i}`);
+    leaf(`w${i}`);
     sink += Object.keys(tree.$()).length;
   }
 
@@ -51,7 +51,7 @@ function readWholeState() {
     // Time `tree.$()` ALONE. An earlier version timed `Object.keys(tree.$())`,
     // which walks 1,000 branches and swamped the thing being measured — the
     // unchanged read came out at 15.8µs when the actual call is ~nanoseconds.
-    leaf.set(`x${r}`);
+    leaf(`x${r}`);
     let t = process.hrtime.bigint();
     const a = tree.$();
     afterWrite.push(Number(process.hrtime.bigint() - t) / 1000);

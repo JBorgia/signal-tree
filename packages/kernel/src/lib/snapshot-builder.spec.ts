@@ -7,7 +7,7 @@ import { registerMarkerProcessor } from './internals/materialize-markers';
 import { signalTree } from './signal-tree';
 import { unwrap } from './utils';
 
-const signal = createReactiveTestRealization().cell.createCell;
+const signal = createReactiveTestRealization().locations.createCell;
 
 /**
  * ONE BUILDER.
@@ -45,7 +45,7 @@ describe('one builder: snapshots do not depend on how a node is reached', () => 
 // finding: it started as `form()`, which stopped tripping ST2008 once markers
 // gained snapshot/hydrate; then a plain function, which is not a valid subject
 // at all (a function in the state literal becomes a leaf signal HOLDING a
-// function, which the signal branch happily emits); then `asyncSource()`, which
+// function, which the location branch happily emits); then `asyncSource()`, which
 // stopped tripping it once the async markers declared their own.
 //
 // Every built-in now declares. So the only way to reach ST2008 is a marker
@@ -61,7 +61,7 @@ registerMarkerProcessor(
     const s = signal((marker as { seed: number }).seed);
     // A callable with no `set`/`update`: neither signal nor accessor, and no
     // processor hook — the shape every walker must skip.
-    return Object.assign(() => s(), { bump: () => s.update((n) => n + 1) });
+    return Object.assign(() => s(), { bump: () => s((n) => n + 1) });
   }
 );
 
@@ -182,9 +182,9 @@ describe('one builder: the properties that made "build from the store" correct',
     const tree = signalTree(rows);
 
     const before = tree.$() as Record<string, unknown>;
-    (tree.$ as unknown as Record<string, { a: { set(v: number): void } }>)[
+    (tree.$ as unknown as Record<string, { a(value: number): void }>)[
       'r0'
-    ].a.set(999);
+    ].a(999);
     const after = tree.$() as Record<string, unknown>;
 
     expect(after).not.toBe(before); // the root rebuilt

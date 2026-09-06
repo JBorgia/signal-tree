@@ -38,7 +38,7 @@ const ENTRIES = {
     tree.$.users.addOne({ id: 1, name: 'a' });
     tree.$.users.updateOne(1, { name: 'b' });
     const c = computed(() => tree.$.count() * 2);
-    tree.$.count.set(1);
+    tree.$.count(1);
     globalThis.__sink = [c(), tree.$.users.all()];
   `,
   'ngrx-store': `

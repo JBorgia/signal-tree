@@ -108,6 +108,113 @@
     </aside>
   </section>
 
+  <section
+    class="callable-location-comparison"
+    aria-labelledby="callable-location-heading"
+  >
+    <header>
+      <div>
+        <p class="eyebrow">Universal vs framework-native</p>
+        <h2 id="callable-location-heading">Angular leaf realization</h2>
+      </div>
+      <p>
+        The superseded universal Angular facade at <code>a8c34b2a</code> and the
+        production native-signal facade run as packed builds in isolated
+        persistent workers. Samples are paired, call order alternates,
+        artifact-to-worker assignment is mirrored, and a native/native A/A run
+        exposes protocol noise.
+      </p>
+    </header>
+
+    <div class="callable-run-facts">
+      <span>{{ angularLeafBenchmark.samples }} paired samples</span>
+      <span>{{ angularLeafBenchmark.warmups }} warmups</span>
+      <span>{{ angularLeafBenchmark.trials }} trials per paired arm</span>
+      <span>Mirrored worker assignment</span>
+      <span>{{ angularLeafBenchmark.runtime }}</span>
+    </div>
+
+    <div
+      class="callable-result-table"
+      role="table"
+      aria-label="Universal versus native Angular leaf performance"
+    >
+      <div class="callable-result-header" role="row">
+        <span role="columnheader">Operation</span>
+        <span role="columnheader">Universal</span>
+        <span role="columnheader">Native</span>
+        <span role="columnheader">Paired median</span>
+        <span role="columnheader">Paired p10-p90</span>
+        <span role="columnheader">A/A p10-p90</span>
+        <span role="columnheader">Reading</span>
+      </div>
+      @for (row of angularLeafRows; track row.operation) {
+      <div
+        class="callable-result-row"
+        role="row"
+        [attr.data-disposition]="row.disposition"
+      >
+        <strong role="cell" data-label="Operation">{{ row.operation }}</strong>
+        <span role="cell" data-label="Universal">{{ row.universal }}</span>
+        <span role="cell" data-label="Native">{{ row.native }}</span>
+        <span role="cell" data-label="Paired median">{{ row.pairedDelta }}</span>
+        <span role="cell" data-label="Paired p10-p90">{{ row.pairedRange }}</span>
+        <span role="cell" data-label="A/A p10-p90">{{ row.controlRange }}</span>
+        <span role="cell" data-label="Reading">{{ row.interpretation }}</span>
+      </div>
+      }
+    </div>
+
+    <div
+      class="callable-result-table callable-result-table--memory"
+      role="table"
+      aria-label="Universal versus native Angular leaf retained memory"
+    >
+      <div class="callable-result-header" role="row">
+        <span role="columnheader">Density arm</span>
+        <span role="columnheader">Universal</span>
+        <span role="columnheader">Native</span>
+        <span role="columnheader">Native delta</span>
+        <span role="columnheader">After destroy</span>
+      </div>
+      @for (row of angularLeafMemoryRows; track row.observation) {
+      <div class="callable-result-row" role="row">
+        <strong role="cell" data-label="Density arm">{{ row.observation }}</strong>
+        <span role="cell" data-label="Universal">{{ row.universal }}</span>
+        <span role="cell" data-label="Native">{{ row.native }}</span>
+        <span role="cell" data-label="Native delta">{{ row.delta }}</span>
+        <span role="cell" data-label="After destroy">{{ row.collection }}</span>
+      </div>
+      }
+    </div>
+
+    <footer>
+      <p>
+        A row is called different only when its paired p10-p90 interval stays on
+        one side of zero and clears the A/A interval. Scalar paths, fan-out 1/10,
+        and the diamond are clear native wins; fan-out 100, chain depth 10, and
+        smaller construction rows remain inconclusive, while 1,000-leaf
+        construction is a clear loss.
+      </p>
+      <nav aria-label="Angular leaf benchmark evidence">
+        <a
+          [href]="repositorySourceUrl('tools/bench-angular-leaf-strategies.mjs')"
+          target="_blank"
+          rel="noreferrer"
+        >Harness source</a>
+        <a
+          [href]="repositorySourceUrl('docs/performance/framework-native-leaves.md')"
+          target="_blank"
+          rel="noreferrer"
+        >Method and interpretation</a>
+        <a href="benchmarks/angular-native-vs-universal.json">Raw comparison JSON</a>
+        <a href="benchmarks/angular-native-aa.json">Raw A/A JSON</a>
+        <a href="benchmarks/angular-native-memory.json">Raw memory JSON</a>
+        <a href="benchmarks/angular-native-vs-historical.json">Historical native JSON</a>
+      </nav>
+    </footer>
+  </section>
+
   <section class="run-bar" aria-labelledby="run-heading">
     <div>
       <p class="eyebrow">Measurement plan</p>

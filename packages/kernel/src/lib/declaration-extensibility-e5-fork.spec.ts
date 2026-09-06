@@ -1,41 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { undoable } from './undoable';
 
-import { bindSignalTreeRealization, signalTree } from './signal-tree';
-import { NEUTRAL_TREE_REALIZATION } from './internals/tree-realization';
+import { signalTree } from './signal-tree';
 import { restoration } from '../enhancers/restoration/restoration';
 import { transactions } from '../enhancers/transactions/transactions';
-
-const FAKE_REACTIVE = Symbol('fake-reactive');
-
-interface FakeWritable<T> {
-  (): T;
-  set(value: T): void;
-  update(update: (value: T) => T): void;
-  asReadonly(): () => T;
-  readonly [FAKE_REACTIVE]: true;
-}
-
-const fakeWritable = <T,>(initial: T): FakeWritable<T> => {
-  let value = initial;
-  const cell = (() => value) as FakeWritable<T>;
-  cell.set = (next) => {
-    value = next;
-  };
-  cell.update = (update) => cell.set(update(value));
-  cell.asReadonly = () => cell;
-  Object.defineProperty(cell, FAKE_REACTIVE, { value: true });
-  return cell;
-};
-
-const fakeSignalTree = bindSignalTreeRealization({
-  ...NEUTRAL_TREE_REALIZATION,
-  materialization: {
-    isReactiveNode: (value) =>
-      typeof value === 'function' &&
-      (value as Partial<FakeWritable<unknown>>)[FAKE_REACTIVE] === true,
-  },
-});
+import type { Location } from './internals/cell-runtime';
 
 /**
  * M1+M2-E5 — THE EQUIVALENCE FORK.
@@ -44,35 +13,18 @@ const fakeSignalTree = bindSignalTreeRealization({
  * result does NOT rescue compiler extensibility. So both candidate paths are run
  * against the SAME kernel properties.
  *
- *   PATH A  a prebuilt Angular signal preserved by the tree
- *   PATH B  ORDINARY canonical state, with the library API composed AROUND the
- *           tree's own accessor
- *
- * If B satisfies the properties even where A fails, then third-party compiler
- * extensibility has no survival evidence — the library abstraction is
- * obtainable without extending the declaration language at all.
+ * The surviving path is ordinary canonical state with library API composed
+ * around the tree's own universal location. Framework-native reactive objects
+ * are adapter views, not alternate state declarations.
  *
  * Rule 0n: 14.x's marker protocol is historical evidence only. Nothing here
  * tests "do custom markers work".
  */
 
-/* PATH A — the shape the E0 probe used. */
-interface CounterA extends FakeWritable<number> {
-  increment(): void;
-  doubled: () => number;
-}
-function makeCounterSignal(initial: number): CounterA {
-  const s = fakeWritable(initial) as CounterA;
-  s.increment = () => s.update((v) => v + 1);
-  s.doubled = () => s() * 2;
-  return s;
-}
-
-/* PATH B — library API composed around an ORDINARY canonical accessor. */
-function makeCounterApi(accessor: { (): number; set(v: number): void }) {
+function makeCounterApi(accessor: Location<number>) {
   return {
     read: () => accessor(),
-    increment: () => accessor.set(accessor() + 1),
+    increment: () => accessor(accessor() + 1),
     doubled: () => accessor() * 2,
   };
 }
@@ -83,24 +35,7 @@ const flush = async () => {
 };
 
 describe('E5 fork — canonical participation of the two candidate paths', () => {
-  it('PATH A: a preserved Angular signal is NOT captured by undo', async () => {
-    const tree = fakeSignalTree(
-      { counter: makeCounterSignal(10) },
-      { enhancers: [restoration()] }
-    );
-    undoable(() => (tree.$.counter as CounterA).increment());
-    await flush();
-    expect(tree.$.counter()).toBe(11);
-
-    tree.undo();
-    await flush();
-
-    // MEASURED: the write never became authored history, so undo cannot restore
-    // it. The value is reachable through the facade but is not canonical truth.
-    expect(tree.$.counter()).toBe(11);
-  });
-
-  it('PATH B: ordinary canonical state IS captured by undo', async () => {
+  it('ordinary canonical state is captured by undo', async () => {
     const tree = signalTree({ counter: 10 }, { enhancers: [restoration()] });
     const api = makeCounterApi(tree.$.counter);
 
@@ -116,7 +51,7 @@ describe('E5 fork — canonical participation of the two candidate paths', () =>
     expect(api.read()).toBe(10);
   });
 
-  it('PATH B: the library API composes derived values over canonical truth', () => {
+  it('the library API composes derived values over canonical truth', () => {
     const tree = signalTree({ counter: 4 });
     const api = makeCounterApi(tree.$.counter);
     expect(api.doubled()).toBe(8);
@@ -124,7 +59,7 @@ describe('E5 fork — canonical participation of the two candidate paths', () =>
     expect(api.doubled()).toBe(10);
   });
 
-  it('PATH B: writes roll back through the generic transaction kernel', () => {
+  it('writes roll back through the generic transaction kernel', () => {
     const tree = signalTree({ counter: 10 }, { enhancers: [transactions()] });
     const api = makeCounterApi(tree.$.counter);
 
@@ -138,7 +73,7 @@ describe('E5 fork — canonical participation of the two candidate paths', () =>
     expect(api.read()).toBe(10);
   });
 
-  it('PATH B: the value is ordinary canonical truth in the snapshot', () => {
+  it('the value is ordinary canonical truth in the snapshot', () => {
     const tree = signalTree({ counter: 7, other: 'x' });
     const api = makeCounterApi(tree.$.counter);
     api.increment();

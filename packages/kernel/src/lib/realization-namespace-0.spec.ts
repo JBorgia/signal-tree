@@ -108,7 +108,7 @@ type Rows = {
   all(): Row[];
 };
 type Tree = {
-  $: { data: Record<string, Rows>; scalar: { set(v: number): void } };
+  $: { data: Record<string, Rows>; scalar(value: number): void };
   transaction: (fn: () => void) => { rollback(): void };
 };
 
@@ -167,7 +167,7 @@ describe('REALIZATION-NAMESPACE-0: the discriminator matrix', () => {
     const a = nested();
     const b = nested();
     await flush();
-    b.$.scalar.set(7);
+    b.$.scalar(7);
     await flush();
     expect(await seedRemoveRollback(a)).toEqual({ threw: false, len: 1 });
   });

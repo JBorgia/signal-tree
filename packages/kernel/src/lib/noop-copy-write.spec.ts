@@ -37,7 +37,7 @@ describe('ST2027 — a deep-equal copy write is reported', () => {
     warn.mockClear();
 
     // A different array, structurally identical — the re-fetch shape.
-    tree.$.rows.set(bigArray());
+    tree.$.rows(bigArray());
 
     expect(fired()).toBe(1);
     expect(messages().join('\n')).toContain('changed NOTHING');
@@ -50,7 +50,7 @@ describe('ST2027 — a deep-equal copy write is reported', () => {
 
     const changed = bigArray();
     changed[10] = { id: 10, value: -1 };
-    tree.$.rows.set(changed);
+    tree.$.rows(changed);
 
     expect(fired()).toBe(0);
   });
@@ -60,24 +60,24 @@ describe('ST2027 — a deep-equal copy write is reported', () => {
     void tree.$;
     warn.mockClear();
 
-    tree.$.refCase.set(tree.$.refCase());
+    tree.$.refCase(tree.$.refCase());
 
     // The `a !== b` guard keeps ST2027 out of the reference case.
     expect(fired()).toBe(0);
   });
 
-  it('KNOWN GAP: a direct .set() of the same reference reports nothing', () => {
+  it('KNOWN GAP: a direct replacement of the same reference reports nothing', () => {
     // ST2003 covers the reference case, but it lives in `recursiveUpdate` and a
-    // direct `tree.$.x.set(v)` never goes there — it writes to the Angular
-    // signal directly. So the reference no-op is diagnosed for merge writes and
-    // silent for direct ones. ST2027 does not have this gap because it hooks
-    // the comparator, which every write funnels through. Pinned so the
-    // asymmetry is a known state rather than a surprise.
+    // direct `tree.$.x(v)` never goes there — it writes to the canonical
+    // location directly. So the reference no-op is diagnosed for structural
+    // writes and silent for direct ones. ST2027 does not have this gap because
+    // it hooks the comparator, which every write funnels through. Pinned so
+    // the asymmetry is a known state rather than a surprise.
     const tree = signalTree({ gapCase: bigArray() });
     void tree.$;
     warn.mockClear();
 
-    tree.$.gapCase.set(tree.$.gapCase());
+    tree.$.gapCase(tree.$.gapCase());
     expect(messages().join('\n')).not.toContain('ST2003');
 
     // The same no-op through a MERGE write is reported.
@@ -107,7 +107,7 @@ describe('ST2027 — a deep-equal copy write is reported', () => {
     void tree.$;
     warn.mockClear();
 
-    for (let i = 0; i < 5; i++) tree.$.dedupeCase.set(bigArray());
+    for (let i = 0; i < 5; i++) tree.$.dedupeCase(bigArray());
 
     expect(fired()).toBe(1);
   });

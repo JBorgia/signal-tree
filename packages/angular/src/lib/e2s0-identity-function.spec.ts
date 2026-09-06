@@ -1,4 +1,9 @@
-import { computed, signal, type Signal } from '@angular/core';
+import {
+  computed,
+  signal,
+  type Signal,
+  type WritableSignal,
+} from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from '../index';
@@ -45,7 +50,7 @@ function collectionBPrime(leaf: { (): Row[] }) {
 // B — keyed observation WITH invalidation, built from ordinary code: a per-key
 // generation counter. No SubjectId, no reclamation coordinator, no effect log.
 // ---------------------------------------------------------------------------
-function collectionB(leaf: { (): Row[]; set(v: Row[]): void }) {
+function collectionB(leaf: WritableSignal<Row[]>) {
   const generation = new Map<string, number>();
   // Generations must be REACTIVE. A first draft kept them in a bare Map and
   // short-circuited the read when the generation mismatched — so the computed

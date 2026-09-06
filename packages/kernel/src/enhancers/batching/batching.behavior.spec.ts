@@ -2,28 +2,11 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 
 import { batching } from './batching';
 import { signalTree } from '../../lib/signal-tree';
+import type { Location } from '../../lib/internals/cell-runtime';
+import { interceptLocationWrites } from '../../lib/internals/location-runtime';
 
 function createFakeTree(initial: any) {
-  let state = initial;
-  const tree: any = function (arg?: any) {
-    if (arguments.length === 0) return state;
-    if (typeof arg === 'function') state = arg(state);
-    else state = arg;
-  };
-
-  tree.bind = () => tree;
-
-  // Minimal node accessor shape used by the batching enhancer's write path
-  tree.state = {
-    count: {
-      set: (v: any) => {
-        state.count = v;
-      },
-    },
-  };
-  tree.$ = tree.state;
-
-  return tree as unknown as () => any;
+  return signalTree(initial) as any;
 }
 
 describe('batching behavior', () => {
@@ -43,10 +26,10 @@ describe('batching behavior', () => {
     const enhanced = batching()(tree as any) as any;
 
     // Update is applied immediately (synchronous!)
-    enhanced({ count: 1 });
+    enhanced.$({ count: 1 });
 
     // Value is already updated - no queue
-    expect(enhanced().count).toBe(1);
+    expect(enhanced.$().count).toBe(1);
   });
 
   it('tracks pending CD notifications via tree methods', () => {
@@ -56,10 +39,10 @@ describe('batching behavior', () => {
     expect(enhanced.hasPendingNotifications()).toBe(false);
 
     // Update via $.count.set() which wraps the setter
-    enhanced.$.count.set(5);
+    enhanced.$.count(5);
 
     // Value is updated immediately
-    expect(enhanced().count).toBe(5);
+    expect(enhanced.$().count).toBe(5);
 
     // But CD notification is pending
     expect(enhanced.hasPendingNotifications()).toBe(true);
@@ -86,13 +69,13 @@ describe('batching behavior', () => {
       ) as any;
 
       enhanced.batch(() => {
-        enhanced.$.count.set(1);
-        enhanced.$.count.set(2);
-        enhanced.$.count.set(3);
+        enhanced.$.count(1);
+        enhanced.$.count(2);
+        enhanced.$.count(3);
       });
 
       // Values update immediately inside batch
-      expect(enhanced().count).toBe(3);
+      expect(enhanced.$().count).toBe(3);
 
       // But only one notification scheduled
       vi.advanceTimersByTime(100);
@@ -109,16 +92,29 @@ describe('batching behavior', () => {
     // "Before the enhancer" is a probe enhancer declared ahead of `batching`,
     // since v15 builds the tree and its enhancers in one call — there is no
     // moment between them for the test to reach in.
+    const rejectCounterWrites = (failure: Error) =>
+      <TTree>(tree: TTree): TTree => {
+        const counter = (tree as unknown as { $: { counter: unknown } }).$
+          .counter as Location<number>;
+        const release = interceptLocationWrites(counter, () => {
+          throw failure;
+        });
+        (tree as unknown as { registerCleanup(fn: () => void): void }).registerCleanup(
+          release
+        );
+        return tree;
+      };
+
     it('coalesce() dedupes same-path writes down to one applied write', () => {
       let applied = 0;
       const countRawWrites = <TTree>(t: TTree): TTree => {
         const counter = (t as unknown as { $: { counter: unknown } }).$
-          .counter as unknown as { set(v: number): void };
-        const rawSet = counter.set.bind(counter);
-        counter.set = (v: number) => {
+          .counter as Location<number>;
+        const release = interceptLocationWrites(counter, (_operation, proceed) => {
           applied++;
-          rawSet(v);
-        };
+          proceed();
+        });
+        (t as unknown as { registerCleanup(fn: () => void): void }).registerCleanup(release);
         return t;
       };
 
@@ -132,11 +128,39 @@ describe('batching behavior', () => {
         }
       );
       tree.coalesce(() => {
-        for (let i = 0; i < 100; i++) tree.$.counter.set(i + 1);
+        for (let i = 0; i < 100; i++) tree.$.counter(i + 1);
       });
 
       expect(tree.$.counter()).toBe(100);
       expect(applied).toBe(1);
+    });
+
+    it('coalesce() propagates a deferred replacement failure', () => {
+      const failure = new Error('coalesced write failed');
+      const tree = signalTree(
+        { counter: 0 },
+        { enhancers: [rejectCounterWrites(failure), batching()] }
+      );
+
+      expect(() => tree.coalesce(() => tree.$.counter(1))).toThrow(failure);
+      expect(tree.$.counter()).toBe(0);
+    });
+
+    it('preserves the callback failure when its deferred replacement also fails', () => {
+      const callbackFailure = new Error('callback failed');
+      const writeFailure = new Error('coalesced write failed');
+      const tree = signalTree(
+        { counter: 0 },
+        { enhancers: [rejectCounterWrites(writeFailure), batching()] }
+      );
+
+      expect(() =>
+        tree.coalesce(() => {
+          tree.$.counter(1);
+          throw callbackFailure;
+        })
+      ).toThrow(callbackFailure);
+      expect(tree.$.counter()).toBe(0);
     });
 
     it('wraps nested leaf setters too', () => {
@@ -144,12 +168,12 @@ describe('batching behavior', () => {
       const countRawWrites = <TTree>(t: TTree): TTree => {
         const leaf = (t as unknown as { $: { a: { b: { value: unknown } } } })
           .$.a.b
-          .value as unknown as { set(v: number): void };
-        const rawSet = leaf.set.bind(leaf);
-        leaf.set = (v: number) => {
+          .value as Location<number>;
+        const release = interceptLocationWrites(leaf, (_operation, proceed) => {
           applied++;
-          rawSet(v);
-        };
+          proceed();
+        });
+        (t as unknown as { registerCleanup(fn: () => void): void }).registerCleanup(release);
         return t;
       };
 
@@ -163,9 +187,9 @@ describe('batching behavior', () => {
         }
       );
       tree.coalesce(() => {
-        tree.$.a.b.value.set(1);
-        tree.$.a.b.value.set(2);
-        tree.$.a.b.value.set(3);
+        tree.$.a.b.value(1);
+        tree.$.a.b.value(2);
+        tree.$.a.b.value(3);
       });
 
       expect(tree.$.a.b.value()).toBe(3);

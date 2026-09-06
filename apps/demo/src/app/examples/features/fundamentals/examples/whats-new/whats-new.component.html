@@ -1,15 +1,14 @@
 <div class="whats-new">
   <h2>🚀 What's New</h2>
 
-  <h3>
-    🧩 v15.0.0-rc.1 — the package and API reset (August 2026)
-  </h3>
+  <h3>🧩 v{{ version }} — the package and API reset</h3>
   <div class="release-highlights">
     <p>
-      The first public candidate for the v15 package and API reset. The
-      packages are now <code>&#64;signal-tree/kernel</code>,
+      The current public candidate for the v15 package and API reset. The
+      packages are <code>&#64;signal-tree/kernel</code>,
       <code>&#64;signal-tree/angular</code>, and
-      <code>&#64;signal-tree/react</code>.
+      <code>&#64;signal-tree/react</code>, and
+      <code>&#64;signal-tree/vue</code>.
     </p>
     <h4>💥 Breaking</h4>
     <ul>
@@ -52,6 +51,13 @@
     </ul>
     <h4>✨ New</h4>
     <ul>
+      <li>
+        <strong>Framework facades expose native reactive leaves.</strong>
+        Angular uses <code>WritableSignal</code>/<code>Signal</code>, Vue uses
+        <code>Ref</code>/<code>ComputedRef</code>, and React observes neutral
+        kernel locations with <code>useSignalTree</code>. Kernel state,
+        equality, transactions, restoration, and publication remain canonical.
+      </li>
       <li>
         <strong><code>&#64;signal-tree/react</code> ships.</strong>
         <code>useSignalTree(owner, selector)</code> subscribes to owner

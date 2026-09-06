@@ -158,7 +158,7 @@ describe('restoration claim boundary', () => {
     );
 
     for (let i = 1; i <= 6; i++) {
-      undoable(() => tree.$.count.set(i));
+      undoable(() => tree.$.count(i));
       await tick();
       await tick();
     }
@@ -167,7 +167,7 @@ describe('restoration claim boundary', () => {
     tree.undo();
     await tick();
 
-    undoable(() => tree.$.label.set('branched'));
+    undoable(() => tree.$.label('branched'));
     await tick();
     await tick();
 

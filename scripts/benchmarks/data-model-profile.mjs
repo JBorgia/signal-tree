@@ -29,10 +29,10 @@ import {
   undoable,
 } from '../../dist/packages/kernel/dist/index.js';
 import { createSignalTreeFactory } from '../../dist/packages/kernel/dist/adapter.js';
-import { ANGULAR_TREE_REALIZATION } from '../../dist/packages/angular/dist/lib/angular-realization.js';
+import { ANGULAR_OBSERVATION_ADAPTER } from '../../dist/packages/angular/dist/lib/observation-adapter.js';
 import { deepEqual } from '../../dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js';
 
-const angularSignalTree = createSignalTreeFactory(ANGULAR_TREE_REALIZATION);
+const angularSignalTree = createSignalTreeFactory(ANGULAR_OBSERVATION_ADAPTER);
 
 // ---------------------------------------------------------------- harness ---
 

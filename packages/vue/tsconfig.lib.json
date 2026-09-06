@@ -1,0 +1,31 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "../..",
+    "outDir": "../../dist/packages/vue/dist",
+    "declarationDir": "../../dist/packages/vue/dist",
+    "declaration": true,
+    "declarationMap": true,
+    "inlineSources": false,
+    "module": "ESNext",
+    "types": [
+      "node"
+    ],
+    "paths": {
+      "@signal-tree/kernel": [
+        "dist/packages/kernel/dist/index.d.ts"
+      ],
+      "@signal-tree/kernel/adapter": [
+        "dist/packages/kernel/dist/adapter.d.ts"
+      ]
+    }
+  },
+  "exclude": [
+    "src/**/*.spec.ts",
+    "src/**/*.typing.spec.ts",
+    "vitest.config.ts"
+  ],
+  "include": [
+    "src/**/*.ts"
+  ]
+}

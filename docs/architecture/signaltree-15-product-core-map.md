@@ -187,7 +187,7 @@ CHALLENGED    under reference-preserving update plus a memoised per-key computed
 
 ### P-F — typed reactive JSON shape
 
-> `tree.$.a.b.c()` reads, `.set(v)` writes where writable, TypeScript infers the
+> `tree.$.a.b.c()` reads, `tree.$.a.b.c(v)` writes where writable, TypeScript infers the
 > shape from the state literal, and the tree stays navigable by ordinary property
 > access.
 

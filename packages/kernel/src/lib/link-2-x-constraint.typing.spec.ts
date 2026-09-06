@@ -44,13 +44,13 @@
  * compile time.
  */
 import { createReactiveTestRealization } from '../reactive-test-realization';
-import type { WritableCell } from './internals/cell-runtime';
+import type { Location } from './internals/cell-runtime';
 import { signalTree } from './signal-tree';
 import type { NodeAccessor } from './node-accessor';
 
 const testRealization = createReactiveTestRealization();
-const computed = testRealization.derived.createDerived;
-const signal = testRealization.cell.createCell;
+const computed = testRealization.locations.createDerived;
+const signal = testRealization.locations.createCell;
 
 const tree = signalTree({
   leaf: 'l0',
@@ -65,14 +65,14 @@ const tree = signalTree({
  * callable nor settable — the NAMESPACE through which locations are reached,
  * not a location.
  */
-type LinkTarget<T> = NodeAccessor<T> | WritableCell<T>;
+type LinkTarget<T> = NodeAccessor<T> | Location<T>;
 
 declare function linkTarget<T>(x: LinkTarget<T>): void;
 
-// --- ACCEPTED: every writable location, despite three write spellings --------
+// --- ACCEPTED: every writable location through one callable grammar ---------
 linkTarget(tree.$); // root state location
-linkTarget(tree.$.settings); // branch — callable with a partial
-linkTarget(tree.$.leaf); // leaf — .set()
+linkTarget(tree.$.settings); // branch location
+linkTarget(tree.$.leaf); // leaf location
 linkTarget(tree.$.settings.theme); // nested leaf
 
 // --- THE CONTROLLER IS NOT A LOCATION ---------------------------------------

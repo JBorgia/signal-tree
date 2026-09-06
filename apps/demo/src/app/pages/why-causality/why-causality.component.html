@@ -1,0 +1,456 @@
+<main class="causality-page">
+  <header class="causality-hero">
+    <div class="hero-copy">
+      <p class="eyebrow">SignalTree causal state · why it matters</p>
+      <h1>Causality is the part of state that compounds.</h1>
+      <p class="hero-lede">
+        A snapshot tells you what is true now. Valuable software also needs to
+        know who decided, which writes belong together, what identity survived,
+        what came from outside, and what may be reversed.
+      </p>
+      <div class="hero-actions">
+        <a routerLink="/architecture-overview" class="action action-primary">
+          Inspect the architecture
+        </a>
+        <a routerLink="/examples/fundamentals" class="action action-secondary">
+          Run the examples
+        </a>
+      </div>
+    </div>
+
+    <div class="causal-ledger" aria-label="SignalTree causal state pipeline">
+      <div class="ledger-brand">
+        <img src="/signaltree-mark.png" alt="" data-brand-mark />
+        <span>SignalTree keeps the missing facts</span>
+      </div>
+      <ol>
+        <li>
+          <span>01</span>
+          <strong>Authority</strong>
+          <small>authored or external</small>
+        </li>
+        <li>
+          <span>02</span>
+          <strong>Turn</strong>
+          <small>one operation boundary</small>
+        </li>
+        <li>
+          <span>03</span>
+          <strong>Effects</strong>
+          <small>identity-aware changes</small>
+        </li>
+        <li>
+          <span>04</span>
+          <strong>Settlement</strong>
+          <small>one coherent publication</small>
+        </li>
+      </ol>
+      <p class="ledger-output">
+        <span>State</span>
+        <span>+ causal facts</span>
+        <strong>= actionable truth</strong>
+      </p>
+    </div>
+  </header>
+
+  <nav class="page-index" aria-label="Why causality sections">
+    <a routerLink="/why-causality" fragment="market-value">Market value</a>
+    <a routerLink="/why-causality" fragment="proof">The missing information</a>
+    <a routerLink="/why-causality" fragment="incident-ledger">Causal costs</a>
+    <a routerLink="/why-causality" fragment="integrated-system"
+      >SignalTree's system</a
+    >
+    <a routerLink="/why-causality" fragment="ai-future">AI-ready state</a>
+    <a routerLink="/why-causality" fragment="competitive-truth"
+      >The honest comparison</a
+    >
+  </nav>
+
+  <section
+    id="market-value"
+    class="page-band value-band"
+    aria-labelledby="value-title"
+  >
+    <div class="content-shell">
+      <header class="section-heading">
+        <p class="eyebrow">The economic case</p>
+        <h2 id="value-title">
+          State becomes more valuable when its meaning survives.
+        </h2>
+        <p>
+          Causality is not extra metadata for a debugger. It raises the ceiling
+          on recovery, synchronization, automation, auditability, and the speed
+          at which a team can safely change a product.
+        </p>
+      </header>
+
+      <div
+        class="value-table"
+        role="table"
+        aria-label="Business value of causal state"
+      >
+        <div class="value-table__header" role="row">
+          <span role="columnheader">Value surface</span>
+          <span role="columnheader">Snapshot-only systems</span>
+          <span role="columnheader">SignalTree's causal model</span>
+          <span role="columnheader">What compounds</span>
+        </div>
+        @for (row of valueRows; track row.signal) {
+        <article class="value-row" role="row">
+          <h3 role="cell">{{ row.signal }}</h3>
+          <p role="cell">{{ row.withoutCausality }}</p>
+          <p role="cell">{{ row.withSignalTree }}</p>
+          <strong role="cell">{{ row.value }}</strong>
+        </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="incident-ledger"
+    class="page-band incident-band"
+    aria-labelledby="incident-title"
+  >
+    <div class="content-shell">
+      <header class="section-heading">
+        <p class="eyebrow">When the missing facts become expensive</p>
+        <h2 id="incident-title">Three public incidents. Three causal seams.</h2>
+        <p>
+          The biggest losses rarely look like a bad scalar assignment. They
+          emerge when valid local states disagree about authority, completion,
+          identity, or whether an external effect should continue.
+        </p>
+      </header>
+
+      <aside class="incident-disclaimer">
+        <strong>Counterfactuals, not attribution.</strong>
+        <p>
+          These systems did not use SignalTree. SignalTree is not a market-risk
+          engine, banking rail, or database consensus protocol, and these are
+          not claims that it would have prevented each incident end to end. Each
+          story asks a narrower question: where an application owns a decision,
+          which causal fact could stop that local action from amplifying an
+          upstream fault?
+        </p>
+      </aside>
+
+      <div class="incident-list">
+        @for (incident of incidents; track incident.id; let index = $index) {
+        <article class="incident-story" [attr.data-tone]="incident.tone">
+          <div class="incident-story__scale">
+            <span>Case 0{{ index + 1 }}</span>
+            <p>{{ incident.context }}</p>
+            <strong>{{ incident.scale }}</strong>
+          </div>
+
+          <div class="incident-story__narrative">
+            <h3>{{ incident.title }}</h3>
+            <p class="incident-record">{{ incident.record }}</p>
+
+            <div class="incident-story__analysis">
+              <div>
+                <span>The causal gap</span>
+                <p>{{ incident.causalGap }}</p>
+              </div>
+              <div>
+                <span>The SignalTree counterfactual</span>
+                <p>{{ incident.counterfactual }}</p>
+              </div>
+              <div>
+                <span>The honest boundary</span>
+                <p>{{ incident.boundary }}</p>
+              </div>
+            </div>
+
+            <a
+              [href]="incident.sourceUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {{ incident.sourceLabel }} <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="proof"
+    class="page-band proof-band"
+    aria-labelledby="proof-title"
+  >
+    <div class="content-shell">
+      <header class="section-heading section-heading--light">
+        <p class="eyebrow">The information-theory limit</p>
+        <h2 id="proof-title">
+          The same snapshot can encode different business truth.
+        </h2>
+        <p>
+          Once a state container discards authority, operation boundaries, or
+          identity, no selector, log formatter, or AI model can recover the
+          missing fact with certainty. Choose a case and compare two histories
+          that end in the same value.
+        </p>
+      </header>
+
+      <fieldset class="scenario-picker">
+        <legend class="scenario-picker__legend">
+          Choose a causal ambiguity
+        </legend>
+        @for (scenario of scenarios; track scenario.id) {
+        <label
+          [class.scenario-picker__option--active]="
+            selectedScenarioId() === scenario.id
+          "
+        >
+          <input
+            type="radio"
+            name="causal-scenario"
+            [value]="scenario.id"
+            [checked]="selectedScenarioId() === scenario.id"
+            (change)="selectScenario(scenario.id)"
+          />
+          <span>{{ scenario.label }}</span>
+        </label>
+        }
+      </fieldset>
+
+      @if (selectedScenario(); as scenario) {
+      <div
+        class="scenario-panel"
+        role="region"
+        [id]="scenario.id + '-panel'"
+        [attr.aria-label]="scenario.label + ' causal comparison'"
+        tabindex="0"
+      >
+        <div class="snapshot-line">
+          <span>Shared final snapshot</span>
+          <code>{{ scenario.snapshot }}</code>
+        </div>
+
+        <div class="history-comparison">
+          <article>
+            <p class="history-label">History A</p>
+            <h3>{{ scenario.leftTitle }}</h3>
+            <ul>
+              @for (fact of scenario.leftFacts; track $index) {
+              <li>{{ fact }}</li>
+              }
+            </ul>
+          </article>
+          <div class="same-result" aria-hidden="true">
+            <span>same value</span>
+            <strong>≠</strong>
+            <span>same meaning</span>
+          </div>
+          <article>
+            <p class="history-label">History B</p>
+            <h3>{{ scenario.rightTitle }}</h3>
+            <ul>
+              @for (fact of scenario.rightFacts; track $index) {
+              <li>{{ fact }}</li>
+              }
+            </ul>
+          </article>
+        </div>
+
+        <aside class="scenario-verdict">
+          <p>{{ scenario.question }}</p>
+          <strong>{{ scenario.answer }}</strong>
+        </aside>
+      </div>
+      }
+    </div>
+  </section>
+
+  <section
+    class="page-band reconstruction-band"
+    aria-labelledby="reconstruction-title"
+  >
+    <div class="content-shell reconstruction-layout">
+      <div>
+        <p class="eyebrow">Why hand-rolled leaves holes</p>
+        <h2 id="reconstruction-title">
+          You cannot bolt causality onto facts you already discarded.
+        </h2>
+      </div>
+
+      <div class="reconstruction-copy">
+        <p>
+          Teams can add action logs, undo stacks, entity adapters, persistence
+          middleware, framework wrappers, and AI audit prose one at a time. The
+          holes appear where those systems disagree about identity, authority,
+          and when an operation is complete.
+        </p>
+        <div
+          class="loss-sequence"
+          aria-label="Information lost by snapshot-only state"
+        >
+          <span>intent</span>
+          <span>authority</span>
+          <span>turn boundary</span>
+          <span>subject identity</span>
+          <strong>snapshot</strong>
+        </div>
+        <p class="reconstruction-rule">
+          Two histories can produce one snapshot. Therefore the snapshot cannot
+          uniquely determine its history. The facts must be captured while the
+          operation is happening.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="integrated-system"
+    class="page-band capability-band"
+    aria-labelledby="capability-title"
+  >
+    <div class="content-shell">
+      <header class="section-heading">
+        <p class="eyebrow">The integrated advantage</p>
+        <h2 id="capability-title">
+          Not one unusual feature. One unusually complete model.
+        </h2>
+        <p>
+          Individual ingredients exist elsewhere. SignalTree's distinction is
+          that they share one kernel authority, so identity, turns, restoration,
+          synchronization, and framework observation cannot drift into competing
+          versions of truth.
+        </p>
+      </header>
+
+      <div class="capability-grid">
+        @for (capability of capabilities; track capability.index) {
+        <article class="capability" [attr.data-tone]="capability.tone">
+          <p class="capability-index">{{ capability.index }}</p>
+          <h3>{{ capability.title }}</h3>
+          <p>{{ capability.detail }}</p>
+          <strong>{{ capability.payoff }}</strong>
+        </article>
+        }
+      </div>
+
+      <div class="system-spine" aria-label="SignalTree ownership model">
+        <div>
+          <span>Product intent</span>
+          <small>policy · commands · external endpoints</small>
+        </div>
+        <strong aria-hidden="true">→</strong>
+        <div class="system-spine__kernel">
+          <span>SignalTree kernel</span>
+          <small>state · identity · turns · effects · settlement</small>
+        </div>
+        <strong aria-hidden="true">→</strong>
+        <div>
+          <span>Native realization</span>
+          <small>Angular signals · Vue refs · React selectors</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="ai-future" class="page-band ai-band" aria-labelledby="ai-title">
+    <div class="content-shell">
+      <header class="section-heading section-heading--light">
+        <p class="eyebrow">The next application boundary</p>
+        <h2 id="ai-title">AI raises the price of missing causality.</h2>
+        <p>
+          An agent can make many related writes, act from stale external input,
+          retry work, and explain itself convincingly. A chat transcript does
+          not make those actions coherent, attributable, or reversible.
+        </p>
+      </header>
+
+      <ol class="ai-flow">
+        @for (stage of aiStages; track stage.label; let index = $index) {
+        <li>
+          <span>0{{ index + 1 }} · {{ stage.label }}</span>
+          <h3>{{ stage.title }}</h3>
+          <p>{{ stage.detail }}</p>
+        </li>
+        }
+      </ol>
+
+      <div class="ai-thesis">
+        <div>
+          <p class="eyebrow">What AI needs from state</p>
+          <h3>Facts it can act on without guessing</h3>
+        </div>
+        <ul>
+          <li>Which authority produced this value?</li>
+          <li>Which changes belong to one operation?</li>
+          <li>Has that operation settled?</li>
+          <li>What subject survives this structural change?</li>
+          <li>Can the authored effect be safely restored?</li>
+          <li>Which explanation is a projection rather than truth?</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="competitive-truth"
+    class="page-band position-band"
+    aria-labelledby="position-title"
+  >
+    <div class="content-shell position-layout">
+      <div>
+        <p class="eyebrow">The honest competitive claim</p>
+        <h2 id="position-title">Can another library do this?</h2>
+      </div>
+      <div class="position-copy">
+        <p class="position-answer">
+          Yes—by adopting the same class of responsibilities.
+        </p>
+        <p>
+          A team can build stable identity, causal turns, external authority,
+          coherent publication, effect-based restoration, lifecycle ownership,
+          and native framework adapters around another state container. But when
+          those parts share one authority and one settlement model, the team has
+          built a causal state kernel around it.
+        </p>
+        <p>
+          That is the defensible difference: SignalTree ships the integrated
+          model. Hand-rolled alternatives pay for it repeatedly in glue code—or
+          leave gaps that only appear during undo, synchronization, SSR,
+          migration, incident response, and autonomous execution.
+        </p>
+        <blockquote>
+          SignalTree does not claim that causal software is impossible
+          elsewhere. It makes causal integrity the default architecture instead
+          of an application-wide reconstruction project.
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <section class="closing-band" aria-labelledby="closing-title">
+    <div class="content-shell closing-layout">
+      <div>
+        <p class="eyebrow">The cost you cannot query from a snapshot</p>
+        <h2 id="closing-title">
+          What are you losing that you don't even know about?
+        </h2>
+        <p class="closing-lede">
+          A dashboard can be green while its authority is stale. A payment can
+          validate while its intent is wrong. A retry can succeed twice. Keep
+          the facts that let people and agents tell the difference. SignalTree
+          preserves that evidence; application policy and human review still
+          decide what to do.
+        </p>
+      </div>
+      <div class="closing-actions">
+        <a routerLink="/start" class="action action-primary"
+          >Start with SignalTree</a
+        >
+        <a routerLink="/architecture-overview" class="action action-secondary">
+          See every boundary
+        </a>
+      </div>
+    </div>
+  </section>
+</main>

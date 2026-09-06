@@ -4,6 +4,8 @@
 
 set -e
 
+NODE_VERSION="$(tr -d '[:space:]' < .nvmrc)"
+
 echo "🚀 Setting up SignalTree Performance Comparison Site"
 
 # 1. Build production version
@@ -25,7 +27,7 @@ cat > dist/apps/demo/netlify.toml << EOF
   status = 200
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "$NODE_VERSION"
 
 [[headers]]
   for = "/*"

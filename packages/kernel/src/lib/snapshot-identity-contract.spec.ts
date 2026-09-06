@@ -23,10 +23,10 @@ describe('SNAPSHOT-IDENTITY-CONTRACT-0', () => {
     const first = read();
 
     expect(read()).toBe(first);
-    tree.$.count.set(1);
+    tree.$.count(1);
     expect(read()).toBe(first);
 
-    tree.$.count.set(2);
+    tree.$.count(2);
     expect(read()).not.toBe(first);
   });
 
@@ -38,9 +38,9 @@ describe('SNAPSHOT-IDENTITY-CONTRACT-0', () => {
     const initial = readCanonicalSnapshot<{ value: string }>(tree);
     const baseline = tree.getRestorationHistory().length;
 
-    undoable(() => tree.$.value.set('B'));
+    undoable(() => tree.$.value('B'));
     await flush();
-    undoable(() => tree.$.value.set('A'));
+    undoable(() => tree.$.value('A'));
     await flush();
 
     expect(readCanonicalSnapshot(tree)).toEqual(initial);
@@ -55,8 +55,8 @@ describe('SNAPSHOT-IDENTITY-CONTRACT-0', () => {
     const baseline = tree.getRestorationHistory().length;
 
     undoable(() => {
-      tree.$.value.set('B');
-      tree.$.value.set('A');
+      tree.$.value('B');
+      tree.$.value('A');
     });
     await flush();
 
@@ -80,9 +80,9 @@ describe('SNAPSHOT-IDENTITY-CONTRACT-0', () => {
       }
     );
 
-    external(() => tree.$.value.set('B'));
+    external(() => tree.$.value('B'));
     await flush();
-    external(() => tree.$.value.set('A'));
+    external(() => tree.$.value('A'));
     await flush();
     unsubscribe();
 
@@ -99,7 +99,7 @@ describe('SNAPSHOT-IDENTITY-CONTRACT-0', () => {
         left: { value: number };
         right: { value: number };
       }>(tree);
-      tree.$.left.value.set(3);
+      tree.$.left.value(3);
       const after = readCanonicalSnapshot<{
         left: { value: number };
         right: { value: number };

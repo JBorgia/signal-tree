@@ -127,8 +127,8 @@ describe('PERSISTENCE-DECOMPOSE-0 §8: speculative writes must NOT persist', () 
     const l = link(tree.$.settings, persistenceEndpoint<Settings>(be, 'k'));
 
     const p = tree.transaction(() => {
-      tree.$.settings.theme.set('A');
-      tree.$.settings.density.set(2);
+      tree.$.settings.theme('A');
+      tree.$.settings.density(2);
     });
     await flush();
     p.rollback();
@@ -165,8 +165,8 @@ describe('PERSISTENCE-DECOMPOSE-0 §8: speculative writes must NOT persist', () 
     const l = link(tree.$.settings, persistenceEndpoint<Settings>(be, 'k'));
 
     const p = tree.transaction(() => {
-      tree.$.settings.theme.set('B');
-      tree.$.settings.density.set(3);
+      tree.$.settings.theme('B');
+      tree.$.settings.density(3);
     });
     await flush();
     p.confirm();
@@ -185,7 +185,7 @@ describe('PERSISTENCE-DECOMPOSE-0 §8: speculative writes must NOT persist', () 
     await flush();
     const l = link(tree.$.settings, persistenceEndpoint<Settings>(be, 'k'));
 
-    tree.$.settings.theme.set('plain');
+    tree.$.settings.theme('plain');
     await flush();
     await l.settled();
 
@@ -208,7 +208,7 @@ describe('PERSISTENCE-DECOMPOSE-0 §9: settled() as a DURABILITY boundary', () =
       persistenceEndpoint<Settings>(be, 'k', { debounceMs: 30 })
     );
 
-    tree.$.settings.theme.set('debounced');
+    tree.$.settings.theme('debounced');
     await flush();
 
     // Not yet durable — the debounce is still pending.
@@ -235,11 +235,11 @@ describe('PERSISTENCE-DECOMPOSE-0 §9: settled() as a DURABILITY boundary', () =
       persistenceEndpoint<Settings>(be, 'k', { debounceMs: 25 })
     );
 
-    tree.$.settings.theme.set('A');
+    tree.$.settings.theme('A');
     await flush();
-    tree.$.settings.theme.set('B');
+    tree.$.settings.theme('B');
     await flush();
-    tree.$.settings.theme.set('C');
+    tree.$.settings.theme('C');
     await flush();
     await l.settled();
 
@@ -259,7 +259,7 @@ describe('PERSISTENCE-DECOMPOSE-0 §9: settled() as a DURABILITY boundary', () =
     const l = link(tree.$.settings, persistenceEndpoint<Settings>(be, 'k'));
 
     be.failWrites(true);
-    tree.$.settings.theme.set('doomed');
+    tree.$.settings.theme('doomed');
     await flush();
     await l.settled();
 
@@ -274,7 +274,7 @@ describe('PERSISTENCE-DECOMPOSE-0 §9: settled() as a DURABILITY boundary', () =
 
     // ⚠️ The queue survives — no permanently dead storage subsystem.
     be.failWrites(false);
-    tree.$.settings.theme.set('recovered');
+    tree.$.settings.theme('recovered');
     await flush();
     await l.settled();
     expect(JSON.parse(be.store.get('k') as string).theme).toBe('recovered');
@@ -301,7 +301,7 @@ describe('PERSISTENCE-DECOMPOSE-0 §11-12: codec and migration are endpoint-owne
       })
     );
 
-    tree.$.settings.theme.set('custom');
+    tree.$.settings.theme('custom');
     await flush();
     await l.settled();
 
@@ -454,8 +454,8 @@ describe('0B §3: a real codec ROUND-TRIPS inside the endpoint', () => {
     const writer = makeTree();
     await flush();
     const lw = link(writer.$.settings, codecEndpoint(be, 'k'));
-    writer.$.settings.theme.set('round');
-    writer.$.settings.density.set(7);
+    writer.$.settings.theme('round');
+    writer.$.settings.density(7);
     await flush();
     await lw.settled();
     lw.dispose();
@@ -521,7 +521,7 @@ describe('0B §7: disposal with a pending durable write', () => {
       persistenceEndpoint<Settings>(be, 'k', { debounceMs: 40 })
     );
 
-    tree.$.settings.theme.set('inflight');
+    tree.$.settings.theme('inflight');
     await flush();
     expect(be.store.size).toBe(0);
 
@@ -556,7 +556,7 @@ describe('0B §7: disposal with a pending durable write', () => {
       persistenceEndpoint<Settings>(be, 'k', { debounceMs: 40 })
     );
 
-    tree.$.settings.theme.set('safe');
+    tree.$.settings.theme('safe');
     await flush();
 
     await l.settled(); // <- the boundary
@@ -574,7 +574,7 @@ describe('0B §7: disposal with a pending durable write', () => {
       persistenceEndpoint<Settings>(be, 'k', { debounceMs: 60 })
     );
 
-    tree.$.settings.theme.set('pending');
+    tree.$.settings.theme('pending');
     await flush();
     const waiting = l.settled();
     l.dispose();
@@ -625,14 +625,14 @@ describe('0B §5: remove/clear decomposition and ordering', () => {
     const ep = removableEndpoint(be, 'k');
     const l = link(tree.$.settings, ep);
 
-    tree.$.settings.theme.set('persisted');
+    tree.$.settings.theme('persisted');
     await flush();
     await l.settled();
     expect(be.store.has('k')).toBe(true);
 
     // WRONG ORDER: administer storage, then reset state.
     ep.remove();
-    tree.$.settings.theme.set('light');
+    tree.$.settings.theme('light');
     await flush();
     await l.settled();
 
@@ -649,12 +649,12 @@ describe('0B §5: remove/clear decomposition and ordering', () => {
     const ep = removableEndpoint(be, 'k');
     const l = link(tree.$.settings, ep);
 
-    tree.$.settings.theme.set('persisted');
+    tree.$.settings.theme('persisted');
     await flush();
     await l.settled();
 
     // Reset state FIRST, let the relationship SETTLE, THEN administer storage.
-    tree.$.settings.theme.set('light');
+    tree.$.settings.theme('light');
     await flush();
     await l.settled();
     ep.remove();
@@ -667,7 +667,7 @@ describe('0B §5: remove/clear decomposition and ordering', () => {
     // persists again. An earlier version of this test called dispose() before
     // remove(), which achieves absence but ENDS persistence — semantically
     // WRONG, and it would have forced a relink into the migration recipe.
-    tree.$.settings.theme.set('after-clear');
+    tree.$.settings.theme('after-clear');
     await flush();
     await l.settled();
     expect(be.store.has('k')).toBe(true);
@@ -689,7 +689,7 @@ describe('0B §5: remove/clear decomposition and ordering', () => {
     await flush();
     const ep = removableEndpoint(be, 'k');
     const l = link(tree.$.settings, ep);
-    tree.$.settings.theme.set('x');
+    tree.$.settings.theme('x');
     await flush();
     await l.settled();
 
@@ -835,7 +835,7 @@ describe('0B §4: migration-failure clearing is adapter policy', () => {
  * ## The exact migration recipe — three steps, NO dispose, NO relink
  *
  * ```ts
- * tree.$.x.set(defaultValue);   // reset
+ * tree.$.x(defaultValue);       // reset
  * await persistence.settled();  // let the outbound send land
  * adapter.remove();             // THEN delete
  * ```
@@ -863,20 +863,20 @@ describe('PIN A: the clear() replacement keeps persisting', () => {
     const ep = removable(be, 'k');
     const l = link(tree.$.settings, { get: ep.get, set: ep.set });
 
-    tree.$.settings.theme.set('A');
+    tree.$.settings.theme('A');
     await flush();
     await l.settled();
     expect(be.store.has('k')).toBe(true);
 
     // the clear()
-    tree.$.settings.theme.set('light');
+    tree.$.settings.theme('light');
     await flush();
     await l.settled();
     ep.remove();
     expect(be.store.has('k')).toBe(false);
 
     // still live
-    tree.$.settings.theme.set('B');
+    tree.$.settings.theme('B');
     await flush();
     await l.settled();
     expect(JSON.parse(be.store.get('k') as string).theme).toBe('B');

@@ -6,7 +6,7 @@
 
 Use this index to navigate the documentation.
 
-**Current prerelease:** 15.0.0 See [CHANGELOG](../CHANGELOG.md).
+**Current release:** 15.0.0 See [CHANGELOG](../CHANGELOG.md).
 
 ---
 
@@ -60,6 +60,7 @@ Use this index to navigate the documentation.
 | [Kernel](../packages/kernel/README.md)   | `@signal-tree/kernel` — framework-neutral tree, EntityMap, enhancers     |
 | [Angular](../packages/angular/README.md) | `@signal-tree/angular` — the Angular realization (Angular apps use this) |
 | [React](../packages/react/README.md)     | `@signal-tree/react` — owner-bound React observation (`useSignalTree`)   |
+| [Vue](../packages/vue/README.md)         | `@signal-tree/vue` — native Vue refs over kernel-owned state             |
 
 Historical inter-version migration guides live in [Guides](#-guides); the
 [v15 migration guide](guides/migration-v14-v15.md) is the current target.

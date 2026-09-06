@@ -105,7 +105,7 @@ describe('LINK-0 PULL: an awaited read applied as external truth', () => {
 
     // The only viable shape: AWAIT OUTSIDE, APPLY INSIDE. See the ST1035 arm.
     const value = await Promise.resolve('l1');
-    external(() => tree.$.leaf.set(value));
+    external(() => tree.$.leaf(value));
     await flush();
 
     allExternal(drain(j));
@@ -158,7 +158,7 @@ describe('LINK-0 PULL: an awaited read applied as external truth', () => {
     // inside" a contract rather than a convention.
     expect(() =>
       (external as unknown as (fn: () => unknown) => unknown)(async () => {
-        tree.$.leaf.set('l1');
+        tree.$.leaf('l1');
       })
     ).toThrow(/ST1035/);
   });
@@ -187,7 +187,7 @@ describe('LINK-0 PUSH-IN: a pushed source crossing the boundary', () => {
     const tree = makeTree();
     await flush();
     const source = makeSource<string>();
-    const stop = source.subscribe((v) => external(() => tree.$.leaf.set(v)));
+    const stop = source.subscribe((v) => external(() => tree.$.leaf(v)));
 
     const j = createDiagnosticJournal(tree as object);
     source.emit('p1');
@@ -208,10 +208,10 @@ describe('LINK-0 PUSH-IN: a pushed source crossing the boundary', () => {
     const tree = makeTree();
     await flush();
     const source = makeSource<string>();
-    const stop = source.subscribe((v) => external(() => tree.$.leaf.set(v)));
+    const stop = source.subscribe((v) => external(() => tree.$.leaf(v)));
 
     const pending = tree.transaction(() => {
-      tree.$.settings.theme.set('speculative');
+      tree.$.settings.theme('speculative');
     });
     // A GPS fix does not become speculative by arriving while an unrelated
     // transaction happens to be open.
@@ -235,12 +235,12 @@ describe('LINK-0 PUSH-IN: a pushed source crossing the boundary', () => {
       const source = makeSource<string>();
       const stop = source.subscribe((v) =>
         mode === 'external'
-          ? external(() => tree.$.leaf.set(v))
-          : tree.$.leaf.set(v)
+          ? external(() => tree.$.leaf(v))
+          : tree.$.leaf(v)
       );
 
       const pending = tree.transaction(() => {
-        tree.$.leaf.set('speculative');
+        tree.$.leaf('speculative');
       });
       source.emit('from-source');
       await flush();
@@ -267,12 +267,12 @@ describe('LINK-0 PUSH-IN: a pushed source crossing the boundary', () => {
     const run = async (mode: 'authored' | 'external') => {
       const tree = makeTree();
       await flush();
-      undoable(() => tree.$.leaf.set('user-typed'));
+      undoable(() => tree.$.leaf('user-typed'));
       await flush();
 
       // A pushed value arrives at the same location, after the authored turn.
-      if (mode === 'external') external(() => tree.$.leaf.set('from-source'));
-      else tree.$.leaf.set('from-source');
+      if (mode === 'external') external(() => tree.$.leaf('from-source'));
+      else tree.$.leaf('from-source');
       await flush();
 
       let refused: string | undefined;
@@ -341,7 +341,7 @@ describe('LINK-0 PUSH-OUT: only settled state escapes, at every scope', () => {
     await flush();
     const out = outbound(s.tree, s.leaf);
 
-    const pending = s.tree.transaction(() => s.tree.$.leaf.set('doomed'));
+    const pending = s.tree.transaction(() => s.tree.$.leaf('doomed'));
     out.push();
     await flush();
     expect(out.sent).toEqual([]);
@@ -397,7 +397,7 @@ describe('LINK-0 PUSH-OUT: only settled state escapes, at every scope', () => {
     await flush();
     const out = outbound(s.tree, s.leaf);
 
-    const pending = s.tree.transaction(() => s.tree.$.leaf.set('kept'));
+    const pending = s.tree.transaction(() => s.tree.$.leaf('kept'));
     out.push();
     await flush();
     expect(out.sent).toEqual([]);

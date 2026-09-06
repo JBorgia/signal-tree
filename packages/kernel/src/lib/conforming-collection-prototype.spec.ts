@@ -3,12 +3,12 @@ import { describe, expect, it } from 'vitest';
 
 import { createReactiveTestRealization } from '../reactive-test-realization';
 import { restoration } from '../enhancers/restoration/restoration';
-import type { ReadableCell } from './internals/cell-runtime';
-import { bindSignalTreeRealization } from './signal-tree';
+import type { Location, ReadableCell } from './internals/cell-runtime';
+import { createSignalTreeFactory } from './signal-tree';
 
 const testRealization = createReactiveTestRealization();
-const signalTree = bindSignalTreeRealization(testRealization);
-const computed = testRealization.derived.createDerived;
+const signalTree = createSignalTreeFactory(testRealization);
+const computed = testRealization.locations.createDerived;
 
 /**
  * THE CONFORMING-COLLECTION PROTOTYPE — the uncontaminated experiment.
@@ -54,11 +54,7 @@ const tick = () => new Promise<void>((r) => setTimeout(r, 0));
  * value and Angular's default `Object.is` equality stops propagation there.
  * Downstream consumers of `byId('a')` never recompute.
  */
-function collectionOver(leaf: {
-  (): Row[];
-  set(v: Row[]): void;
-  update(fn: (c: Row[]) => Row[]): void;
-}) {
+function collectionOver(leaf: Location<Row[]>) {
   const byIdCache = new Map<string, ReadableCell<Row | undefined>>();
   return {
     all: (): Row[] => leaf(),
@@ -72,16 +68,16 @@ function collectionOver(leaf: {
       return s;
     },
     addOne(row: Row): void {
-      undoable(() => leaf.update((c) => [...c, row]));
+      undoable(() => leaf((current) => [...current, row]));
     },
     removeOne(id: string): void {
-      undoable(() => leaf.update((c) => c.filter((r) => r.id !== id)));
+      undoable(() => leaf((current) => current.filter((row) => row.id !== id)));
     },
     updateOne(id: string, changes: Partial<Row>): void {
       // Replaces ONLY the target member's object; every other reference is
       // carried across untouched. That is what preserves granularity.
-      leaf.update((c) =>
-        c.map((r) => (r.id === id ? { ...r, ...changes } : r))
+      leaf((current) =>
+        current.map((row) => (row.id === id ? { ...row, ...changes } : row))
       );
     },
   };

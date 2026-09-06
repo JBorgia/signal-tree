@@ -1,17 +1,10 @@
 #!/usr/bin/env node
 /**
- * C6 RATCHET — Angular runtime coupling may shrink, never grow.
+ * Angular runtime coupling gate for the framework-neutral kernel.
  *
- * The eventual closure target is zero `@angular/core` VALUE imports in
- * kernel-owned modules. That cannot be asserted today because `@signal-tree/kernel`
- * IS the Angular adapter for this release — the packaging split has not
- * happened. Asserting zero now would mean either a permanently red gate or a
- * gate switched off, and a gate that is normally red teaches people to ignore
- * it.
- *
- * So this ratchets instead, exactly like `check-lint-budget`: the recorded set
- * is the current one, a module leaving it is celebrated and locked in, and a
- * module JOINING it fails.
+ * Universal locations moved Angular observation into `@signal-tree/angular`,
+ * so the recorded set is now empty. Any kernel module importing an Angular
+ * value is a regression and fails this gate.
  *
  *     IMPORT STATEMENT KIND DOES NOT ESTABLISH RUNTIME COUPLING.
  *     VALUE-POSITION USE DOES.

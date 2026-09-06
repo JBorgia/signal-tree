@@ -128,8 +128,8 @@ describe('NOTIFIER-SCOPE-0 invariant: both trees must be delivered', () => {
     const off = getPathNotifier().subscribe('**', (next, _p, path) => {
       seen.push(`${path}=${String(next)}`);
     });
-    a.$.alpha.set('a1');
-    b.$.beta.set('b1');
+    a.$.alpha('a1');
+    b.$.beta('b1');
     await flush();
     off();
 
@@ -153,8 +153,8 @@ describe('NOTIFIER-SCOPE-0 invariant: both trees must be delivered', () => {
     const off = getPathNotifier().subscribe('**', (next, _p, path) => {
       seen.push(`${path}=${String(next)}`);
     });
-    a.$.theme.set('a1');
-    b.$.theme.set('b1');
+    a.$.theme('a1');
+    b.$.theme('b1');
     await flush();
     off();
 
