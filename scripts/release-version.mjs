@@ -29,9 +29,15 @@ const sameBaseRc = (current, tag) => {
 
 export const deriveReleaseVersion = (current, releaseType, tags = []) => {
   if (releaseType !== 'rc') {
+    const version = semver.inc(current, releaseType);
+    const parsedCurrent = semver.parse(current);
     return {
-      version: semver.inc(current, releaseType),
-      resumeFrom: undefined,
+      version,
+      resumeFrom:
+        parsedCurrent?.prerelease.length &&
+        version === `${parsedCurrent.major}.${parsedCurrent.minor}.${parsedCurrent.patch}`
+          ? current
+          : undefined,
     };
   }
 
@@ -58,6 +64,20 @@ export const deriveReleaseVersion = (current, releaseType, tags = []) => {
       };
 };
 
+export const updateCurrentReleaseClaim = (text, version) => {
+  const label = semver.prerelease(version)
+    ? 'Current prerelease'
+    : 'Current release';
+  const updated = text.replace(
+    /\*\*Current (?:pre)?release:\*\*\s+\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?/,
+    `**${label}:** ${version}`
+  );
+  if (updated === text) {
+    throw new Error('docs/README.md has no current release claim to update');
+  }
+  return updated;
+};
+
 const selfTest = () => {
   const cases = [
     {
@@ -75,6 +95,13 @@ const selfTest = () => {
         'v15.0.0-rc.12',
       ]),
       expected: { version: '15.0.0-rc.13', resumeFrom: undefined },
+    },
+    {
+      name: 'promote an active RC line to its stable base',
+      actual: deriveReleaseVersion('15.0.0-rc.16', 'patch', [
+        'v15.0.0-rc.16',
+      ]),
+      expected: { version: '15.0.0', resumeFrom: '15.0.0-rc.16' },
     },
     {
       name: 'retain legacy next-patch behavior without same-base RC tags',
@@ -113,6 +140,17 @@ const selfTest = () => {
     parsedTags[1] !== 'v15.0.0'
   ) {
     throw new Error(`remote tag parsing failed: ${JSON.stringify(parsedTags)}`);
+  }
+  const prereleaseClaim = updateCurrentReleaseClaim(
+    '**Current prerelease:** 15.0.0-rc.15 See CHANGELOG.\n',
+    '15.0.0-rc.16'
+  );
+  if (!prereleaseClaim.includes('**Current prerelease:** 15.0.0-rc.16')) {
+    throw new Error('prerelease documentation claim was not updated');
+  }
+  const stableClaim = updateCurrentReleaseClaim(prereleaseClaim, '15.0.0');
+  if (!stableClaim.includes('**Current release:** 15.0.0')) {
+    throw new Error('stable documentation claim was not promoted');
   }
   console.log(`Release-version derivation self-test passed (${cases.length} cases).`);
 };

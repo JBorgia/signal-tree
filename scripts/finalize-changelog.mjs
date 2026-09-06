@@ -92,6 +92,18 @@ const runSelfTest = () => {
     throw new Error('same-base RC resume did not rewrite the stable heading');
   }
 
+  const promoted = finalizeChangelogText(
+    '## 15.0.0-rc.16 (2026-09-05)\nbody\n',
+    {
+      version: '15.0.0',
+      today: '2026-09-06',
+      resumeFrom: '15.0.0-rc.16',
+    }
+  );
+  if (promoted.text !== '## 15.0.0 (2026-09-06)\nbody\n') {
+    throw new Error('active RC heading did not promote to stable');
+  }
+
   let refused = false;
   try {
     finalizeChangelogText('## 15.0.0 (2026-09-03)\n', {

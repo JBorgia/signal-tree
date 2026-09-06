@@ -7,6 +7,7 @@ import { assertReleasePlan } from './release-plan.mjs';
 import {
   deriveReleaseVersion,
   parseRemoteTagNames,
+  updateCurrentReleaseClaim,
 } from './release-version.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');
@@ -91,13 +92,7 @@ try {
   run('node', finalizeArgs);
   const docsReadmePath = join(ROOT, 'docs', 'README.md');
   const docsReadme = readFileSync(docsReadmePath, 'utf8');
-  const updatedDocsReadme = docsReadme.replace(
-    /(\*\*Current prerelease:\*\*\s+)\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?/,
-    `$1${next}`
-  );
-  if (updatedDocsReadme === docsReadme) {
-    throw new Error('docs/README.md has no current prerelease claim to update');
-  }
+  const updatedDocsReadme = updateCurrentReleaseClaim(docsReadme, next);
   writeFileSync(docsReadmePath, updatedDocsReadme);
   run('npm', ['run', 'gates', '--', '--release']);
   run('git', ['add', ...releaseOwnedPathspecs]);
