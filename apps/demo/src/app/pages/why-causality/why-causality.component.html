@@ -56,6 +56,7 @@
   <nav class="page-index" aria-label="Why causality sections">
     <a routerLink="/why-causality" fragment="market-value">Market value</a>
     <a routerLink="/why-causality" fragment="proof">The missing information</a>
+    <a routerLink="/why-causality" fragment="incident-ledger">Causal costs</a>
     <a routerLink="/why-causality" fragment="integrated-system"
       >SignalTree's system</a
     >
@@ -100,6 +101,76 @@
           <p role="cell">{{ row.withoutCausality }}</p>
           <p role="cell">{{ row.withSignalTree }}</p>
           <strong role="cell">{{ row.value }}</strong>
+        </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="incident-ledger"
+    class="page-band incident-band"
+    aria-labelledby="incident-title"
+  >
+    <div class="content-shell">
+      <header class="section-heading">
+        <p class="eyebrow">When the missing facts become expensive</p>
+        <h2 id="incident-title">Three public incidents. Three causal seams.</h2>
+        <p>
+          The biggest losses rarely look like a bad scalar assignment. They
+          emerge when valid local states disagree about authority, completion,
+          identity, or whether an external effect should continue.
+        </p>
+      </header>
+
+      <aside class="incident-disclaimer">
+        <strong>Counterfactuals, not attribution.</strong>
+        <p>
+          These systems did not use SignalTree. SignalTree is not a market-risk
+          engine, banking rail, or database consensus protocol, and these are
+          not claims that it would have prevented each incident end to end. Each
+          story asks a narrower question: where an application owns a decision,
+          which causal fact could stop that local action from amplifying an
+          upstream fault?
+        </p>
+      </aside>
+
+      <div class="incident-list">
+        @for (incident of incidents; track incident.id; let index = $index) {
+        <article class="incident-story" [attr.data-tone]="incident.tone">
+          <div class="incident-story__scale">
+            <span>Case 0{{ index + 1 }}</span>
+            <p>{{ incident.context }}</p>
+            <strong>{{ incident.scale }}</strong>
+          </div>
+
+          <div class="incident-story__narrative">
+            <h3>{{ incident.title }}</h3>
+            <p class="incident-record">{{ incident.record }}</p>
+
+            <div class="incident-story__analysis">
+              <div>
+                <span>The causal gap</span>
+                <p>{{ incident.causalGap }}</p>
+              </div>
+              <div>
+                <span>The SignalTree counterfactual</span>
+                <p>{{ incident.counterfactual }}</p>
+              </div>
+              <div>
+                <span>The honest boundary</span>
+                <p>{{ incident.boundary }}</p>
+              </div>
+            </div>
+
+            <a
+              [href]="incident.sourceUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {{ incident.sourceLabel }} <span aria-hidden="true">↗</span>
+            </a>
+          </div>
         </article>
         }
       </div>
@@ -360,10 +431,17 @@
   <section class="closing-band" aria-labelledby="closing-title">
     <div class="content-shell closing-layout">
       <div>
-        <p class="eyebrow">Build on meaning, not just values</p>
+        <p class="eyebrow">The cost you cannot query from a snapshot</p>
         <h2 id="closing-title">
-          Give every future interface—including AI—a state model worth trusting.
+          What are you losing that you don't even know about?
         </h2>
+        <p class="closing-lede">
+          A dashboard can be green while its authority is stale. A payment can
+          validate while its intent is wrong. A retry can succeed twice. Keep
+          the facts that let people and agents tell the difference. SignalTree
+          preserves that evidence; application policy and human review still
+          decide what to do.
+        </p>
       </div>
       <div class="closing-actions">
         <a routerLink="/start" class="action action-primary"

@@ -154,6 +154,52 @@ test('/why-causality: one snapshot reveals distinct identity histories', async (
   );
 });
 
+test('/why-causality: public incidents keep their counterfactual boundaries', async ({
+  page,
+}) => {
+  await page.goto('/why-causality#incident-ledger', { waitUntil: 'load' });
+
+  await expect(page.locator('.incident-story')).toHaveCount(3);
+  await expect(page.locator('.incident-disclaimer')).toContainText(
+    'Counterfactuals, not attribution.'
+  );
+  await expect(page.locator('.incident-story__scale')).toContainText([
+    '$460M loss in 45 minutes',
+    '$1.8B loan · unintended early repayment',
+    '43 seconds → 24h 11m degradation',
+  ]);
+  const sourceLinks = page.locator('.incident-story a');
+  await expect(sourceLinks).toHaveCount(3);
+  await expect(
+    sourceLinks.evaluateAll((links) =>
+      links.map((link) => ({
+        href: link.getAttribute('href'),
+        target: link.getAttribute('target'),
+        rel: link.getAttribute('rel'),
+      }))
+    )
+  ).resolves.toEqual([
+    {
+      href: 'https://www.sec.gov/newsroom/press-releases/2013-222',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
+    {
+      href: 'https://cases.justia.com/federal/appellate-courts/ca2/21-487/21-487-2022-09-08.pdf?ts=1662663612',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
+    {
+      href: 'https://github.blog/news-insights/company-news/oct21-post-incident-analysis/',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
+  ]);
+  await expect(page.locator('#closing-title')).toHaveText(
+    "What are you losing that you don't even know about?"
+  );
+});
+
 test('/why-causality: section index clears the fixed mobile header', async ({
   page,
 }) => {
