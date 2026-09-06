@@ -8,6 +8,7 @@ import { provideRouter, RouterLink } from '@angular/router';
 import { appRoutes } from '../app.routes';
 import { DocumentationComponent } from './documentation/documentation.component';
 import { StartHereComponent } from './start-here/start-here.component';
+import { WhyCausalityComponent } from './why-causality/why-causality.component';
 
 /**
  * Shared dead-link guard for the content-heavy demo pages.
@@ -39,7 +40,8 @@ function routerLinkTargets(fixture: ComponentFixture<unknown>): string[] {
   return fixture.debugElement
     .queryAll(By.directive(RouterLink))
     .map((de: DebugElement) => de.injector.get(RouterLink).href)
-    .filter((href): href is string => !!href);
+    .filter((href): href is string => !!href)
+    .map((href) => href.split(/[?#]/)[0]);
 }
 
 describe('demo content pages: every routerLink resolves to a real route', () => {
@@ -74,6 +76,21 @@ describe('demo content pages: every routerLink resolves to a real route', () => 
       ],
     }).compileComponents();
     const fixture = TestBed.createComponent(DocumentationComponent);
+    fixture.detectChanges();
+
+    const targets = routerLinkTargets(fixture);
+    expect(targets.length).toBeGreaterThan(0);
+    for (const target of targets) {
+      expect(validRoutePaths.has(target)).toBe(true);
+    }
+  });
+
+  it('why-causality', async () => {
+    await TestBed.configureTestingModule({
+      imports: [WhyCausalityComponent],
+      providers: [provideRouter([])],
+    }).compileComponents();
+    const fixture = TestBed.createComponent(WhyCausalityComponent);
     fixture.detectChanges();
 
     const targets = routerLinkTargets(fixture);

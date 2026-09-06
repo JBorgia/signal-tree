@@ -134,6 +134,49 @@ test('/batching: grouped writes publish once without intermediate observations',
   ).toHaveText('0');
 });
 
+test('/why-causality: one snapshot reveals distinct identity histories', async ({
+  page,
+}) => {
+  await page.goto('/why-causality', { waitUntil: 'load' });
+
+  await expect(page.locator('.snapshot-line code')).toHaveText(
+    'order.status = "approved"'
+  );
+  await page.getByRole('radio', { name: 'Identity' }).check();
+  await expect(page.locator('.snapshot-line code')).toHaveText(
+    'queue = [B, A, C]'
+  );
+  await expect(page.locator('.history-comparison')).toContainText(
+    'The same subjects were reordered'
+  );
+  await expect(page.locator('.history-comparison')).toContainText(
+    'Old rows were replaced by lookalikes'
+  );
+});
+
+test('/why-causality: section index clears the fixed mobile header', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/why-causality', { waitUntil: 'load' });
+
+  const targets = await page
+    .locator('.page-index a')
+    .evaluateAll((links) =>
+      links.map((link) => new URL((link as HTMLAnchorElement).href).hash)
+    );
+
+  for (const target of targets) {
+    expect(target).toMatch(/^#[a-z-]+$/);
+    await page.locator(`.page-index a[href$="${target}"]`).click();
+
+    const top = await page
+      .locator(target)
+      .evaluate((element) => Math.round(element.getBoundingClientRect().top));
+    expect(top).toBeGreaterThanOrEqual(64);
+  }
+});
+
 test('/deep-typing: selected compiled depth generates and passes runtime checks', async ({
   page,
 }) => {

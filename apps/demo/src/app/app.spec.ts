@@ -61,22 +61,25 @@ describe('AppComponent', () => {
     }
   });
 
-  it('makes the current start and architecture routes directly navigable', () => {
+  it('makes the current evaluation routes directly navigable', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const hrefs = Array.from(
-      fixture.nativeElement.querySelectorAll('.nav-item') as NodeListOf<HTMLAnchorElement>
+      fixture.nativeElement.querySelectorAll(
+        '.nav-item'
+      ) as NodeListOf<HTMLAnchorElement>
     ).map((link) => link.getAttribute('href'));
 
     expect(hrefs).toContain('/start');
+    expect(hrefs).toContain('/why-causality');
     expect(hrefs).toContain('/architecture-overview');
   });
 
   it('does not publish superseded architecture or benchmark claims in route metadata', () => {
     const descriptions = appRoutes
       .map((route) => route.data?.['description'])
-      .filter((description): description is string =>
-        typeof description === 'string'
+      .filter(
+        (description): description is string => typeof description === 'string'
       )
       .join(' ');
 
@@ -112,5 +115,4 @@ describe('AppComponent', () => {
     expect(routes.get('external-truth')?.loadComponent).toBeDefined();
     expect(routes.get('benchmarks')?.loadComponent).toBeDefined();
   });
-
 });
