@@ -196,7 +196,7 @@ test('/why-causality: public incidents keep their counterfactual boundaries', as
     },
   ]);
   await expect(page.locator('#closing-title')).toHaveText(
-    "What are you losing that you don't even know about?"
+    "What don't you know?"
   );
 });
 
