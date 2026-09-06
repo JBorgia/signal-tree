@@ -25,8 +25,33 @@ describe('WhyCausalityComponent', () => {
       'Yes—by adopting the same class of responsibilities'
     );
     expect(text).toContain('SignalTree ships the integrated model');
+    expect(text).toContain('Three public incidents. Three causal seams');
+    expect(text).toContain(
+      "What are you losing that you don't even know about"
+    );
     expect(text).not.toContain('the only library');
     expect(text).not.toContain('impossible for every other library');
+  });
+
+  it('labels public incident narratives as bounded counterfactuals', () => {
+    const fixture = TestBed.createComponent(WhyCausalityComponent);
+    fixture.detectChanges();
+    const text = renderedText(fixture.nativeElement);
+    const sources = fixture.nativeElement.querySelectorAll(
+      '.incident-story a[target="_blank"][rel="noopener noreferrer"]'
+    ) as NodeListOf<HTMLAnchorElement>;
+
+    expect(text).toContain('Counterfactuals, not attribution');
+    expect(text).toContain('$460M loss in 45 minutes');
+    expect(text).toContain('$1.8B loan · unintended early repayment');
+    expect(text).toContain('43 seconds → 24h 11m degradation');
+    expect(text).toContain('SignalTree would not have repaired');
+    expect(text).toContain('SignalTree cannot reverse');
+    expect(text).toContain('SignalTree cannot fix');
+    expect(text).toContain(
+      'not claims that it would have prevented each incident end to end'
+    );
+    expect(sources).toHaveLength(3);
   });
 
   it('demonstrates that one snapshot can have different causal histories', () => {
