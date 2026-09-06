@@ -39,6 +39,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const semver = require('semver');
 
 const ROOT = path.resolve(__dirname, '..');
 
@@ -53,24 +54,46 @@ const CLAIM_SITES = [
 const RELEASE_CLAIM_SITE = 'docs/README.md';
 
 function checkReleaseClaim(text, site, version) {
+  const expectedLabel = semver.prerelease(version)
+    ? 'prerelease'
+    : 'release';
   const claims = [
     ...text.matchAll(
-      /Current prerelease:\*{0,2}\s+(\d+\.\d+\.\d+(?:-[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?)/gi
+      /Current (pre)?release:\*{0,2}\s+(\d+\.\d+\.\d+(?:-[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?)/gi
     ),
-  ].map((match) => match[1]);
+  ].map((match) => ({
+    label: match[1] ? 'prerelease' : 'release',
+    version: match[2],
+  }));
   const violations = claims
-    .filter((claim) => claim !== version)
+    .filter(
+      (claim) =>
+        claim.version !== version || claim.label !== expectedLabel
+    )
     .map(
       (claim) =>
-        `${site}: stale prerelease claim "${claim}"; expected "${version}" derived from package.json`
+        `${site}: stale ${claim.label} claim "${claim.version}"; expected ` +
+        `current ${expectedLabel} "${version}" derived from package.json`
     );
-  if (!claims.includes(version)) {
+  if (
+    !claims.some(
+      (claim) =>
+        claim.version === version && claim.label === expectedLabel
+    )
+  ) {
     violations.push(
-      `${site}: missing current prerelease claim "${version}" derived from package.json`
+      `${site}: missing current ${expectedLabel} claim "${version}" derived from package.json`
     );
   }
-  if (claims.filter((claim) => claim === version).length > 1) {
-    violations.push(`${site}: duplicate current prerelease claim "${version}"`);
+  if (
+    claims.filter(
+      (claim) =>
+        claim.version === version && claim.label === expectedLabel
+    ).length > 1
+  ) {
+    violations.push(
+      `${site}: duplicate current ${expectedLabel} claim "${version}"`
+    );
   }
   return violations;
 }
@@ -257,6 +280,30 @@ function selfTest(majors) {
       'fixture-docs.md',
       '15.0.0-rc.1'
     ).length === 0
+  );
+  expect(
+    'passes the authoritative stable release claim',
+    checkReleaseClaim(
+      '**Current release:** 15.0.0.',
+      'fixture-docs.md',
+      '15.0.0'
+    ).length === 0
+  );
+  expect(
+    'rejects a prerelease label for a stable version',
+    checkReleaseClaim(
+      '**Current prerelease:** 15.0.0.',
+      'fixture-docs.md',
+      '15.0.0'
+    ).some((violation) => violation.includes('expected current release'))
+  );
+  expect(
+    'rejects a stable label for a prerelease version',
+    checkReleaseClaim(
+      '**Current release:** 15.0.0-rc.1.',
+      'fixture-docs.md',
+      '15.0.0-rc.1'
+    ).some((violation) => violation.includes('expected current prerelease'))
   );
   expect(
     'flags a stale prerelease claim beside the authoritative claim',
