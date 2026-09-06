@@ -8,7 +8,37 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## Current Phase
 
-Current phase: `Phase 7 — PRE-GA CLOSURE / FINAL RC VERIFICATION OWED`
+Current phase: `Phase 7 — GA AUTHORIZED / OFFICIAL RELEASE OWED`
+
+`15.0.0-rc.16` is **PUBLISHED / REGISTRY-VERIFIED** at `959019d9`. The signed
+tag passed the exact-tag `76/76` release matrix and `65/65` mutation proofs.
+Registry packages `kernel → angular → react → vue` match the immutable candidate
+SHA-512 values and npm's `rc` dist-tag. A clean external install passed packed
+runtime identity, strict `bundler` / `node16` declarations, kernel
+transaction/restoration/Link/EntityMap semantics, Angular native signals, Vue
+coherent refs, React selector updates, and React server rendering.
+
+`V3-BROWNFIELD-CONSUMER-0` is **CLOSED / GREEN** at TruckTrax V3 commit
+`e6405f12b`. The clean `migration/signaltree-v15-greenfield` branch installs
+registry rc.16 with candidate-matching lockfile integrities, removes obsolete
+`NaturalValue` and Geotrax carrier casts, and uses truthful Angular-facing
+`EntitySignal` contracts without compatibility shims. Uncached typecheck,
+tests, and lint pass for `store`, `core-services-v2`, `geotrax`, `scaletrax`,
+and `trucktrax-geo`; production builds pass for all three apps. Independent
+consumer review found no masked SignalTree defect.
+
+The human ruling therefore authorizes **GA**. Framework-native carriers,
+facade-polymorphic consumers, registry integrity, packed consumers, V3
+brownfield adoption, and source closure are all closed. No further architecture
+or performance work is authorized absent a direct GA-candidate falsifier.
+Official `15.0.0` preparation, exact-tag verification, sanctioned publication,
+and clean stable-registry proof remain owed.
+
+`GA-PROMOTION-0` is **CLOSED** at `aff1a0fd`. Release preparation promotes
+`15.0.0-rc.16` to `15.0.0`, explicitly reclassifies the dated changelog heading,
+and changes the documentation label from `Current prerelease` to
+`Current release`. Version/changelog self-tests, live claims, lint, focused
+release gates, mutation proofs, and independent release review are green.
 
 `UNIVERSAL-LOCATIONS-0` closed the kernel-authority question at `5efeb7f5`, but
 its universal first-party leaf-identity conclusion is **SUPERSEDED** by
@@ -66,9 +96,9 @@ This breaking architecture correction supersedes the former clean-clone
 technical-readiness checkpoint. Current ordinary evidence is green under the
 canonical Node `24.3.0` runtime in `.nvmrc`: strict source and public typecheck;
 kernel `2,178` passing tests plus two expected failures; Angular `99` passing / `3`
-skipped; React `6`; Vue `13`; demo `145` passing / `4` skipped; lint with zero
-errors and no warning-budget growth; forced-GC retention; `55/55` fast gates and
-`63/63` ordinary gates; `24/24` declared artifact entries; packed consumer
+skipped; React `7`; Vue `13`; demo `145` passing / `4` skipped; lint with zero
+errors and no warning-budget growth; forced-GC retention; `57/57` fast gates and
+`65/65` ordinary gates; `24/24` declared artifact entries; packed consumer
 typecheck under `bundler` and `node16`; facade runtime identity; `34` current
 architecture assets; production package and demo builds; numeric claims
 `176/176`; and bundle budgets at `9.95/10.0 KB` bare and `22.01/22.1 KB`
@@ -93,9 +123,12 @@ both designs; after 10,000 observed leaves the native carrier remains
 `destroy()`. These measurements select Angular's carrier only; they make no Vue
 or React performance claim.
 
-The full release-only matrix, exact candidate, registry write, tag, and publish
-remain intentionally unrun. They belong to the next explicitly authorized final
-RC boundary; GA remains held until that evidence and the human disposition.
+The final RC matrix, registry proof, and V3 consumer confirmation are complete.
+The official stable release remains a separate immutable operation: replace the
+explicitly authorized stale pre-carrier `v15.0.0` tag, prepare stable `15.0.0`
+from current source, rerun exact-tag release and mutation verification, publish
+through the sanctioned workflow, and prove a clean npm install before moving
+`latest` through that successful publication.
 
 `GATE F` was **SATISFIED** at `109595e6` for the superseded representation. Exact committed HEAD passed all 69
 ordinary and release-only gates with zero known-red. The independent Gate F
@@ -12994,10 +13027,10 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
 - [ ] verify npm/docs/install instructions from scratch
 - [ ] post-release operational readiness
 
-Technical readiness disposition: **REOPENED ONLY FOR FINAL RC VERIFICATION.**
-The source/API decision is closed; the exact candidate, release-only matrix,
-registry write, and post-publication consumer proof remain owed. Human GA
-disposition follows that evidence.
+Technical readiness disposition: **GA AUTHORIZED / OFFICIAL RELEASE OWED.**
+Source/API, exact-candidate, mutation, registry-integrity, packed-consumer, and
+V3 brownfield proof are closed. Only stable tag replacement, exact GA
+verification, sanctioned publication, and clean stable-registry proof remain.
 
 Exit condition: `GATE G` remains open until an explicitly authorized official
 release and post-publication verification.
