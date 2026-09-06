@@ -67,6 +67,14 @@ Historical inter-version migration guides live in [Guides](#-guides); the
 
 ---
 
+## Technical Papers
+
+| Document                                                                                               | Description                                                                                                                                                                  |
+| ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Beyond Snapshots: Causal State for Reactive Applications](reference/beyond-snapshots-causal-state.md) | The application and business case for SignalTree 15's integrated causal state model, including bounded public-incident counterfactuals, AI operations, costs, and non-claims |
+
+---
+
 ## 🤖 AI/LLM References
 
 | Document               | Description                       |
