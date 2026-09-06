@@ -68,6 +68,44 @@ h1 {
   margin-top: 2rem;
 }
 
+.rewrite-note {
+  display: flex;
+  max-width: 48rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-neutral-400);
+}
+
+.rewrite-note p {
+  margin: 0;
+  color: var(--color-neutral-600);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.rewrite-note code {
+  color: var(--color-ink);
+  font-size: 0.9em;
+}
+
+.rewrite-note a {
+  flex: 0 0 auto;
+  color: var(--color-primary-700);
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.rewrite-note a:hover,
+.rewrite-note a:focus-visible {
+  color: var(--color-primary-900);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
 .action {
   display: inline-flex;
   align-items: center;
@@ -381,6 +419,11 @@ h1 {
 
   h1 {
     font-size: clamp(3rem, 14vw, 4.5rem);
+  }
+
+  .rewrite-note {
+    display: grid;
+    gap: 0.75rem;
   }
 
   .hero-mark {
