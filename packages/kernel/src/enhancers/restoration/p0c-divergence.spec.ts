@@ -49,10 +49,10 @@ describe('P0-C C1 — scalar collision', () => {
     const tree = makeDoc();
     await flush();
 
-    undoable(() => tree.$.doc.title.set('A'));
+    undoable(() => tree.$.doc.title('A'));
     await flush();
 
-    realization(() => tree.$.doc.title.set('SERVER'));
+    realization(() => tree.$.doc.title('SERVER'));
     await flush();
 
     expect(() => tree.undo()).toThrow(/ST1034/);
@@ -98,12 +98,12 @@ describe('P0-C C3 — THE ATOMICITY CASE: mixed safe and unsafe in one turn', ()
     await flush();
 
     // ONE turn touching two locations.
-    undoable(() => tree.$.doc.title.set('A'));
-    undoable(() => tree.$.doc.description.set('B'));
+    undoable(() => tree.$.doc.title('A'));
+    undoable(() => tree.$.doc.description('B'));
     await flush();
 
     // Only ONE of them is superseded.
-    realization(() => tree.$.doc.title.set('SERVER'));
+    realization(() => tree.$.doc.title('SERVER'));
     await flush();
 
     expect(() => tree.undo()).toThrow(/ST1034/);
@@ -124,11 +124,11 @@ describe('P0-C C4 — the state machine after a refusal', () => {
     const tree = makeDoc();
     await flush();
 
-    undoable(() => tree.$.doc.title.set('A'));
+    undoable(() => tree.$.doc.title('A'));
     await flush();
     const indexBefore = tree.getCurrentIndex();
 
-    realization(() => tree.$.doc.title.set('SERVER'));
+    realization(() => tree.$.doc.title('SERVER'));
     await flush();
 
     const canRedoBefore = tree.canRedo();

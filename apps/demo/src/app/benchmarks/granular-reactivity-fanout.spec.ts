@@ -29,7 +29,7 @@
  *     reader fan-out on the collection signals (it pins write-path cost,
  *     caching, and snapshot semantics).
  */
-import { computed, signal } from '@angular/core';
+import { computed, signal, type WritableSignal } from '@angular/core';
 import { entityMap, signalTree } from '@signal-tree/angular';
 
 const N = 100;
@@ -58,10 +58,7 @@ describe('granular-reactivity fan-out', () => {
     const initial: Record<string, { v: number }> = {};
     for (let i = 0; i < N; i++) initial[`n${i}`] = { v: 0 };
     const tree = signalTree({ nodes: initial });
-    const nodes = tree.$.nodes as Record<
-      string,
-      { v: { (): number; set: (n: number) => void } }
-    >;
+    const nodes = tree.$.nodes as Record<string, { v: WritableSignal<number> }>;
 
     const { counters, readAll } = instrument((i) => nodes[`n${i}`].v());
 

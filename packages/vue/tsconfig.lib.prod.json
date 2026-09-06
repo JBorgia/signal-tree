@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.lib.json",
+  "compilerOptions": {
+    "declarationMap": false,
+    "declaration": true,
+    "stripInternal": true,
+    "sourceMap": false,
+    "outDir": "../../dist/packages/vue/dist",
+    "declarationDir": "../../dist/packages/vue/dist"
+  }
+}

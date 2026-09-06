@@ -31,10 +31,114 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+export const finalizeChangelogText = (
+  text,
+  { version, today, resumeFrom }
+) => {
+  const lines = text.split('\n');
+  const headingIdx = lines.findIndex((line) => /^##\s+/.test(line));
+  if (headingIdx === -1) {
+    throw new Error('no "## " heading found in CHANGELOG.md');
+  }
+
+  const heading = lines[headingIdx];
+  const versionPattern = escapeRegex(version);
+  const alreadyThis = new RegExp(
+    `^##\\s+v?${versionPattern}\\s+\\(\\d{4}-\\d{2}-\\d{2}\\)\\s*$`
+  );
+  if (alreadyThis.test(heading)) {
+    return { text, heading, changed: false };
+  }
+
+  const unreleasedThis = new RegExp(
+    `^##\\s+Unreleased\\s*\\(\\s*${versionPattern}\\s*\\)\\s*$`,
+    'i'
+  );
+  const unreleasedBare = /^##\s+Unreleased\s*$/i;
+  const resumeHeading = resumeFrom
+    ? new RegExp(
+        `^##\\s+v?${escapeRegex(resumeFrom)}\\s+\\(\\d{4}-\\d{2}-\\d{2}\\)\\s*$`
+      )
+    : undefined;
+
+  if (
+    !unreleasedThis.test(heading) &&
+    !unreleasedBare.test(heading) &&
+    !resumeHeading?.test(heading)
+  ) {
+    const resumeDescription = resumeFrom
+      ? ` nor the authorized resume base "## ${resumeFrom} (...)"`
+      : '';
+    throw new Error(
+      `top CHANGELOG heading is "${heading.trim()}", which is neither ` +
+        `"## Unreleased (${version})" / "## Unreleased" nor an already-dated ` +
+        `"## ${version} (...)"${resumeDescription}`
+    );
+  }
+
+  lines[headingIdx] = `## ${version} (${today})`;
+  return { text: lines.join('\n'), heading, changed: true };
+};
+
+const runSelfTest = () => {
+  const resumed = finalizeChangelogText('## 15.0.0 (2026-09-03)\nbody\n', {
+    version: '15.0.0-rc.13',
+    today: '2026-09-05',
+    resumeFrom: '15.0.0',
+  });
+  if (resumed.text !== '## 15.0.0-rc.13 (2026-09-05)\nbody\n') {
+    throw new Error('same-base RC resume did not rewrite the stable heading');
+  }
+
+  const promoted = finalizeChangelogText(
+    '## 15.0.0-rc.16 (2026-09-05)\nbody\n',
+    {
+      version: '15.0.0',
+      today: '2026-09-06',
+      resumeFrom: '15.0.0-rc.16',
+    }
+  );
+  if (promoted.text !== '## 15.0.0 (2026-09-06)\nbody\n') {
+    throw new Error('active RC heading did not promote to stable');
+  }
+
+  let refused = false;
+  try {
+    finalizeChangelogText('## 15.0.0 (2026-09-03)\n', {
+      version: '15.0.0-rc.13',
+      today: '2026-09-05',
+    });
+  } catch {
+    refused = true;
+  }
+  if (!refused) throw new Error('stable heading changed without --resume-from');
+  let malformedAccepted = false;
+  try {
+    finalizeChangelogText('## 15.0.0-rc.13 (draft)\n', {
+      version: '15.0.0-rc.13',
+      today: '2026-09-05',
+    });
+    malformedAccepted = true;
+  } catch {
+    // Expected: idempotence requires a dated heading.
+  }
+  if (malformedAccepted) throw new Error('malformed target heading was accepted');
+  console.log('Changelog finalization self-test passed (resume and refusal).');
+};
+
+if (process.argv.includes('--self-test')) {
+  runSelfTest();
+  process.exit(0);
+}
+
 const version = process.argv[2];
 if (!version || !/^\d+\.\d+\.\d+/.test(version)) {
   console.error('❌ finalize-changelog: missing/invalid <version> argument');
-  console.error('   Usage: node scripts/finalize-changelog.mjs <version> [--date YYYY-MM-DD]');
+  console.error(
+    '   Usage: node scripts/finalize-changelog.mjs <version> [--date YYYY-MM-DD]'
+  );
   process.exit(2);
 }
 
@@ -43,51 +147,21 @@ const today =
   dateIdx !== -1 && process.argv[dateIdx + 1]
     ? process.argv[dateIdx + 1]
     : new Date().toISOString().slice(0, 10);
+const resumeIdx = process.argv.indexOf('--resume-from');
+const resumeFrom = resumeIdx !== -1 ? process.argv[resumeIdx + 1] : undefined;
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const changelogPath = resolve(root, 'CHANGELOG.md');
+const text = readFileSync(changelogPath, 'utf8');
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const CHANGELOG = resolve(ROOT, 'CHANGELOG.md');
-
-const text = readFileSync(CHANGELOG, 'utf8');
-const lines = text.split('\n');
-
-const headingIdx = lines.findIndex((l) => /^##\s+/.test(l));
-if (headingIdx === -1) {
-  console.error('❌ finalize-changelog: no "## " heading found in CHANGELOG.md');
+try {
+  const result = finalizeChangelogText(text, { version, today, resumeFrom });
+  if (result.changed) writeFileSync(changelogPath, result.text);
+  console.log(
+    result.changed
+      ? `✅ finalize-changelog: "${result.heading.trim()}" → "## ${version} (${today})"`
+      : `✅ finalize-changelog: top heading already "${result.heading.trim()}" — no change (idempotent)`
+  );
+} catch (error) {
+  console.error(`❌ finalize-changelog: ${error.message}. Refusing to finalize.`);
   process.exit(1);
 }
-
-const heading = lines[headingIdx];
-const vEsc = version.replace(/\./g, '\\.');
-
-// Already dated for this exact version → idempotent no-op.
-const reAlreadyThis = new RegExp(`^##\\s+v?${vEsc}(\\D|$)`);
-if (reAlreadyThis.test(heading)) {
-  console.log(
-    `✅ finalize-changelog: top heading already "${heading.trim()}" — no change (idempotent)`
-  );
-  process.exit(0);
-}
-
-// "## Unreleased (X.Y.Z)" (this version) or bare "## Unreleased" → stamp date.
-const reUnreleasedThis = new RegExp(
-  `^##\\s+Unreleased\\s*\\(\\s*${vEsc}\\s*\\)\\s*$`,
-  'i'
-);
-const reUnreleasedBare = new RegExp(`^##\\s+Unreleased\\s*$`, 'i');
-
-if (reUnreleasedThis.test(heading) || reUnreleasedBare.test(heading)) {
-  lines[headingIdx] = `## ${version} (${today})`;
-  writeFileSync(CHANGELOG, lines.join('\n'));
-  console.log(
-    `✅ finalize-changelog: "${heading.trim()}" → "## ${version} (${today})"`
-  );
-  process.exit(0);
-}
-
-console.error(
-  `❌ finalize-changelog: top CHANGELOG heading is "${heading.trim()}",\n` +
-    `   which is neither "## Unreleased (${version})" / "## Unreleased" nor an\n` +
-    `   already-dated "## ${version} (...)". Refusing to finalize — document\n` +
-    `   ${version} at the top of CHANGELOG.md before releasing.`
-);
-process.exit(1);

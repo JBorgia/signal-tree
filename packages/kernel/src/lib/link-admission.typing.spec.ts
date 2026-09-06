@@ -35,6 +35,7 @@ const tree = signalTree({
 const cleanTree = signalTree({
   count: 1,
   plain: { a: 1, b: 'two' },
+  collision: { all: 1, setAll: 2, other: 3 },
 });
 
 type Exact<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;
@@ -83,7 +84,25 @@ link(tree.$.plain, {
 // ⚠️ A ROOT with no collection anywhere — ADMITTED. The rule is not about roots.
 link(cleanTree.$, {
   set: (value) => {
-    assertExact<Exact<typeof value, { count: number; plain: { a: number; b: string } }>>();
+    assertExact<
+      Exact<
+        typeof value,
+        {
+          count: number;
+          plain: { a: number; b: string };
+          collision: { all: number; setAll: number; other: number };
+        }
+      >
+    >();
+  },
+});
+
+// Ordinary state names never become reserved by EntityMap's API shape.
+link(cleanTree.$.collision, {
+  set: (value) => {
+    assertExact<
+      Exact<typeof value, { all: number; setAll: number; other: number }>
+    >();
   },
 });
 

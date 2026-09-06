@@ -1,32 +1,15 @@
 import {
-  NEUTRAL_MATERIALIZATION_REALIZATION,
-  type MaterializationRealization,
-} from './materialization-realization';
-import {
-  NEUTRAL_TREE_REALIZATION,
-  bindTreeRealization,
-  type TreeRealization,
-} from './tree-realization';
-
-/**
- * "Has the adapter already realized this node?" — see
- * `materialization-realization.ts`. Without an adapter this answers `false`,
- * which is the conservative direction: the walk treats the node as ordinary
- * data rather than skipping it.
- */
-function isReactiveNode(
-  node: unknown,
-  realization: MaterializationRealization =
-    NEUTRAL_MATERIALIZATION_REALIZATION
-): boolean {
-  return realization.isReactiveNode(node);
-}
-
-import {
   createPositionRegistry,
   type PositionRegistry,
 } from './position-registry';
 import type { PhysicalCommitClock } from './physical-commit-clock';
+import {
+  bindLocationRuntime,
+  createLocationRuntime,
+  type LocationRuntime,
+} from './location-runtime';
+import { NEUTRAL_OBSERVATION_ADAPTER } from './observation-adapter';
+import { isTreeCell } from './cell-identity';
 import { createRuntimeTreePlan } from './runtime-tree-plan';
 import type { RuntimeTreePlan } from './runtime-tree-plan';
 import type { TreeCapability } from '../types';
@@ -99,11 +82,7 @@ declare const ngDevMode: boolean | undefined;
 export type HydrateMode = 'merge' | 'restore' | 'rehydrate' | 'transfer';
 
 export interface MaterializationContext {
-  readonly cellRuntime: TreeRealization['cell'];
-  readonly derivedRuntime: TreeRealization['derived'];
-  readonly materializationRealization: TreeRealization['materialization'];
-  readonly scalarLeafRealization: TreeRealization['scalarLeaf'];
-  readonly suppressTracking: TreeRealization['suppressTracking'];
+  readonly locationRuntime: LocationRuntime;
   positionRegistry: PositionRegistry;
   positionTopologyEnabled: boolean;
   physicalCommitClock?: PhysicalCommitClock;
@@ -152,15 +131,13 @@ export function createMaterializationContext(
   hasCapability: (capability: TreeCapability) => boolean = (capability) =>
     capability === 'position-topology' ? positionTopologyEnabled : true,
   physicalCommitClock?: PhysicalCommitClock,
-  realization: TreeRealization = NEUTRAL_TREE_REALIZATION
+  locationRuntime: LocationRuntime = createLocationRuntime(
+    NEUTRAL_OBSERVATION_ADAPTER
+  )
 ): MaterializationContext {
   const positionRegistry = createPositionRegistry();
   return {
-    cellRuntime: realization.cell,
-    derivedRuntime: realization.derived,
-    materializationRealization: realization.materialization,
-    scalarLeafRealization: realization.scalarLeaf,
-    suppressTracking: realization.suppressTracking,
+    locationRuntime,
     positionRegistry,
     positionTopologyEnabled,
     physicalCommitClock,
@@ -500,16 +477,18 @@ function warnUndeclaredMarker(): void {
  */
 const warnedWriteOnly = new WeakSet<object>();
 
-function warnWriteOnlyMarker(
-  processor: MarkerProcessor,
-  node: unknown,
-  realization: MaterializationRealization
-): void {
+function warnWriteOnlyMarker(processor: MarkerProcessor, node: unknown): void {
   if (typeof ngDevMode !== 'undefined' && !ngDevMode) return;
   if (!processor.snapshot || processor.hydrate) return;
   // Exactly what `recursiveUpdate` falls through to. If that can write the
   // node, no hook is needed and there is nothing to report.
-  if (isReactiveNode(node, realization) && 'set' in (node as object)) return;
+  if (
+    typeof node === 'function' &&
+    'set' in node &&
+    typeof (node as { set?: unknown }).set === 'function'
+  ) {
+    return;
+  }
   if (warnedWriteOnly.has(processor as object)) return;
   warnedWriteOnly.add(processor as object);
   console.warn(
@@ -898,7 +877,7 @@ export function materializeMarkers(
   authority?: OrdinaryConstructionAuthority
 ): void {
   if (!isTraversableNode(node)) return;
-  if (context.materializationRealization.isReactiveNode(node)) return;
+  if (isTreeCell(node)) return;
 
   // Handle NodeAccessors (functions with properties)
   const isAccessor = typeof node === 'function' && isNodeAccessor(node);
@@ -950,14 +929,9 @@ export function materializeMarkers(
           // it cannot reach a string-key walk; the `SignalTree:` prefix keeps
           // it out of the symbol walk too.
           if (isTraversableNode(materialized)) {
-            bindTreeRealization(
+            bindLocationRuntime(
               materialized as object,
-              {
-                cell: context.cellRuntime,
-                derived: context.derivedRuntime,
-                materialization: context.materializationRealization,
-                scalarLeaf: context.scalarLeafRealization,
-              }
+              context.locationRuntime
             );
             Object.defineProperty(materialized, PROCESSOR_STAMP, {
               value: processor,
@@ -971,11 +945,7 @@ export function materializeMarkers(
           // dropping-dev-code.md), so a guard hidden in the function body
           // ships its message string to production.
           if (typeof ngDevMode === 'undefined' || ngDevMode) {
-            warnWriteOnlyMarker(
-              processor,
-              materialized,
-              context.materializationRealization
-            );
+            warnWriteOnlyMarker(processor, materialized);
           }
           (node as Record<string, unknown>)[key] = materialized;
           // A node accessor copies its store's properties, but its CALL path
@@ -1008,11 +978,7 @@ export function materializeMarkers(
       if (isNodeAccessor(value)) {
         // NodeAccessor - recurse to find nested markers
         materializeMarkers(value, notifier, currentPath, context, authority);
-      } else if (
-        typeof value === 'object' &&
-        !Array.isArray(value) &&
-        !isReactiveNode(value, context.materializationRealization)
-      ) {
+      } else if (typeof value === 'object' && !Array.isArray(value)) {
         // Plain object - recurse
         materializeMarkers(value, notifier, currentPath, context, authority);
       }

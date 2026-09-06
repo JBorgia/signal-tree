@@ -8,15 +8,171 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## Current Phase
 
-Current phase: `Phase 7 — PRE-GA CLOSURE / HUMAN GA DECISION HELD`
+Current phase: `Phase 7 — COMPLETE / GA RELEASED`
 
-`GATE F` is **SATISFIED** at `109595e6`. Exact committed HEAD passed all 69
+`15.0.0` is **GA RELEASED / REGISTRY-VERIFIED** at `8418cd7d`. Canonical
+preparation passed `76/76`, created the immutable four-package candidate, and
+pushed a signed replacement `v15.0.0` tag whose peeled commit and candidate
+manifest are identical. Tagged run `34001591297` first failed closed at `75/76`
+because GitHub lacked the signed `v14.1.1` release-claims baseline and therefore
+fell back to `v0.1.15`; release creation and npm publication were both skipped.
+The original signed `v14.1.1` tag object was restored without moving it, its
+incidental historical workflow `34002381375` was cancelled, and automatic
+release-claim selection then passed `138/138` from `v14.1.1`.
+
+Attempt 2 of tagged run `34001591297` passed the complete `76/76` release matrix,
+all `65/65` mutation proofs, version claims, artifacts, packed consumer, and
+changelog checks. It created a non-draft, non-prerelease GitHub release.
+Sanctioned publisher run `34002838449` independently repeated the full matrix
+and mutation proofs before publishing `kernel → angular → react → vue`. All four
+npm SHA-512 values match the immutable candidate and every package's `latest`
+dist-tag is `15.0.0`.
+
+Fresh exact-version and unversioned README installs both passed kernel
+transaction/restoration/Link/EntityMap semantics, Angular native signals, Vue
+synchronous coherence, React selector updates, and React server rendering.
+Registry-downloaded tarballs passed facade runtime identity and strict consumer
+typecheck under `bundler` and `node16`. TruckTrax V3 commit `07c13fdb5` promotes
+its registry catalog and lockfile from rc.16 to stable candidate-matching hashes;
+frozen install and all five SignalTree consumer typechecks pass uncached.
+
+`POST-GA-DOC-CURRENCY-0` is **CLOSED** at `aa15cc0c`. Final review found one
+live AI instruction still selecting npm's superseded `rc` channel and one
+symlink guide whose mechanical v15 rename had combined the new
+`@signal-tree/kernel` identity with old `@signaltree/core@5.1.2`; that hybrid
+never existed. Both installs now select stable current packages. The live
+documentation gate enforces publishability, explicit semver inclusion, and the
+current release-channel dist-tag, and its link/tag self-tests and registered
+mutations all fail closed.
+
+`GATE G` is **SATISFIED**.
+
+`15.0.0-rc.16` is **PUBLISHED / REGISTRY-VERIFIED** at `959019d9`. The signed
+tag passed the exact-tag `76/76` release matrix and `65/65` mutation proofs.
+Registry packages `kernel → angular → react → vue` match the immutable candidate
+SHA-512 values and npm's `rc` dist-tag. A clean external install passed packed
+runtime identity, strict `bundler` / `node16` declarations, kernel
+transaction/restoration/Link/EntityMap semantics, Angular native signals, Vue
+coherent refs, React selector updates, and React server rendering.
+
+`V3-BROWNFIELD-CONSUMER-0` is **CLOSED / GREEN** at TruckTrax V3 commit
+`e6405f12b`. The clean `migration/signaltree-v15-greenfield` branch installs
+registry rc.16 with candidate-matching lockfile integrities, removes obsolete
+`NaturalValue` and Geotrax carrier casts, and uses truthful Angular-facing
+`EntitySignal` contracts without compatibility shims. Uncached typecheck,
+tests, and lint pass for `store`, `core-services-v2`, `geotrax`, `scaletrax`,
+and `trucktrax-geo`; production builds pass for all three apps. Independent
+consumer review found no masked SignalTree defect.
+
+The human ruling authorized **GA**. Framework-native carriers,
+facade-polymorphic consumers, registry integrity, packed consumers, V3
+brownfield adoption, source closure, official publication, and clean stable
+registry proof are all closed. No further architecture or performance work is
+authorized absent a direct post-release falsifier.
+
+`GA-PROMOTION-0` is **CLOSED** at `aff1a0fd`. Release preparation promotes
+`15.0.0-rc.16` to `15.0.0`, explicitly reclassifies the dated changelog heading,
+and changes the documentation label from `Current prerelease` to
+`Current release`. Version/changelog self-tests, live claims, lint, focused
+release gates, mutation proofs, and independent release review are green.
+
+`UNIVERSAL-LOCATIONS-0` closed the kernel-authority question at `5efeb7f5`, but
+its universal first-party leaf-identity conclusion is **SUPERSEDED** by
+`FRAMEWORK-NATIVE-CARRIERS-0` at `7ab2e82d`. The kernel still owns canonical
+values, equality, revisions, positions, EntityMap identity, causal turns,
+transactions, restoration, grouped publication, snapshots, and explicit owner
+teardown. Framework carriers perform dependency tracking and native API
+realization only; they do not create another state authority.
+
+`CALLABLE-LOCATIONS-0` is **CLOSED / NARROWED** at `81780c4e` and `7ab2e82d`.
+Neutral kernel locations plus root and object branches retain one grammar:
+`location()` reads, `location(value)` replaces, and `location(updater)` derives.
+`leaf(value)` ends topology explicitly and disambiguates callable data. Angular
+terminal and EntityMap leaves instead expose native `.set()` / `.update()`
+methods; Vue leaves expose `.value`; React observes neutral locations through
+`useSignalTree`.
+
+`FRAMEWORK-NATIVE-CARRIERS-0` is **CLOSED IN SOURCE** at `7ab2e82d`. Angular
+writable leaves are `WritableSignal<T>` and derived/query leaves are `Signal<T>`;
+Vue writable leaves are `Ref<T>` and derived/query leaves are `ComputedRef<T>`;
+React remains hook-native over neutral kernel locations. Writable and readonly
+carrier algebras are separate, packed declarations compile under `bundler` and
+`node16`, and the complete native realization runtimes are reachable only from
+`@signal-tree/kernel/adapter`, so neutral consumers do not ship them.
+
+`FRAMEWORK-NATIVE-CARRIER-AUDIT-0` is **CLOSED IN SOURCE** at `63900634`.
+Synchronous Vue observers now see one coherent root, transaction, EntityMap, or
+restoration state; grouped publication remains dependency-scoped, including a
+100-derived unrelated-work control. Native Angular/Vue `link()` values and the
+`AccessibleNode` / `EntitySignalWithSlices` aliases are truthful in packed
+declarations, ordinary branches may still own `all` / `setAll` keys, and Vue's
+type-only readonly view no longer promises an intrinsic `ComputedRef` runtime.
+
+`FINAL-RC-VERSION-RESUME-0` is **CLOSED** at `8e84d0f1`. The superseded
+pre-carrier `v15.0.0` tag remains immutable and was never published to npm, but
+it left workspace manifests at `15.0.0`; the former `release:rc` derivation
+would therefore have produced the wrong line, `15.0.1-rc.0`. Preparation now
+uses authoritative remote tags, resumes the highest same-base RC as
+`15.0.0-rc.13`, ignores local-only tags, and requires explicit dated changelog
+reclassification. Derivation/changelog self-tests, script lint, publication
+architecture and authorization gates, both mutation proofs, and independent
+review are green.
+
+`15.0.0-rc.13` is **IMMUTABLE / NOT PUBLISHED** at `4b3c114a`. Local release
+preparation passed `74/74`, created four validated candidate tarballs in
+`kernel -> angular -> react -> vue` order, and pushed a verified signed tag.
+Tagged GitHub run `33986219645` passed the complete `74/74` production matrix,
+then correctly blocked release creation at the mutation matrix: `59/63` proved,
+while kernel-neutrality, C6 Angular realization, release claims, and declaration
+docs used stale anchors and remained green under mutation. No GitHub release or
+npm write occurred. The four proof repairs and the complete live docs/demo
+currency pass earn RC14; rc.13 is not moved or reused.
+
+This breaking architecture correction supersedes the former clean-clone
+technical-readiness checkpoint. Current ordinary evidence is green under the
+canonical Node `24.3.0` runtime in `.nvmrc`: strict source and public typecheck;
+kernel `2,178` passing tests plus two expected failures; Angular `99` passing / `3`
+skipped; React `7`; Vue `13`; demo `145` passing / `4` skipped; lint with zero
+errors and no warning-budget growth; forced-GC retention; `57/57` fast gates and
+`65/65` ordinary gates; `24/24` declared artifact entries; packed consumer
+typecheck under `bundler` and `node16`; facade runtime identity; `34` current
+architecture assets; production package and demo builds; numeric claims
+`176/176`; and bundle budgets at `9.95/10.0 KB` bare and `22.01/22.1 KB`
+EntityMap production gzip. Independent final review found no blocker.
+
+The controlled `84837fb3` method-form versus callable-location benchmark used
+mirrored persistent workers, 30 paired samples, five warmups, and an identical-
+current A/A control. Read, derivation, and construction intervals cross zero and
+support no change claim. Scalar replacement measured `+6.6%`, about `+4.1 ns`,
+with a paired p10-p90 interval of `+3.4%` to `+9.9%`; the corresponding A/A
+interval was `-4.3%` to `+0.1%`. Both arms are independently installed tarballs
+pinned by commit and full SHA-256 in the tracked raw samples.
+
+The Angular-specific native-carrier comparison uses the same mirrored,
+operation-isolated protocol against packed artifacts. Native leaves improve
+scalar read by `77.3%`, replacement by `33.3%`, derivation by `39.0%`, fan-out
+by `27.3-37.0%`, and a depth-10 chain by `15.5%`; the diamond overlaps the A/A
+control. Construction is inconclusive at 10 leaves and slower by `17.5%` at 100
+and `30.8%` at 1,000. Forced-GC density remains `1,934 B/leaf` unobserved for
+both designs; after 10,000 observed leaves the native carrier remains
+`1,934 B/leaf` versus `2,005 B/leaf`, and every sampled tree/leaf collects after
+`destroy()`. These measurements select Angular's carrier only; they make no Vue
+or React performance claim.
+
+The final RC matrix, official stable operation, registry proof, and V3 consumer
+confirmation are complete. The explicitly authorized stale pre-carrier
+`v15.0.0` tag was replaced only after confirming it had no GitHub release or npm
+publication; the replacement tag, release, registry artifacts, and `latest`
+dist-tags are bound to the verified GA source above.
+
+`GATE F` was **SATISFIED** at `109595e6` for the superseded representation. Exact committed HEAD passed all 69
 ordinary and release-only gates with zero known-red. The independent Gate F
 review found no critical, major, or minor blocker. `15.0.0-rc.1` remains the
 first published candidate; RC6 is published but superseded by the strict
 framework declaration failure recorded below.
 
-Phase 7 technical readiness is **CLOSED** against clean-clone commit `8d0108bc`:
+The prior Phase 7 technical-readiness checkpoint was **CLOSED** against
+clean-clone commit `8d0108bc`:
 
 ```text
 frozen-lockfile install       GREEN
@@ -2871,7 +3027,8 @@ Run the authoritative ladder before checkpointing a release slice.
 
 ## Workspace Dirt Not Owned By Release Tasks
 
-**Both former entries are cleared. The list is empty.**
+**The list is empty.** The user-owned `63900634` checkpoint included the former
+`.nvmrc` newline-only edit; no release-agent commit rewrote it.
 
 - ~~`eslint.config.mjs`~~ — committed alone at `e5fe21e7` (the `@nx/rollup`
   build-tooling allowlist entry, and a `no-empty-function` exemption for
@@ -12410,10 +12567,10 @@ Must complete BEFORE retyping the 132 Angular-shaped public type sites.
         tree                  controller, non-callable
         location()            READ
         location(fn)          DERIVE
-        location(mark(fn))    REPLACE the callable AS DATA
+        location(leaf(fn))    REPLACE the callable AS DATA
         the root tree.$ uses the SAME location grammar
 [x] canonical location object owned by the KERNEL, not a WritableSignal
-[x] Angular WritableSignal = explicit adapter view (spelling NOT yet frozen)
+[x] Angular WritableSignal = explicit `toWritableSignal(location)` adapter view
 [x] resolve function-valued-state disambiguation   FUNCTION-AS-STATE-0 = FNS-A
 [x] branch object write semantics                      RULED — whole-value T
 ```
@@ -12482,57 +12639,56 @@ function-as-data disambiguation is settled.
 
 ```text
 C1 REAL LOCATION SUBJECT
-   [ ] implement kernel Location<T> over the neutral scalar runtime
-   [ ] move the §B discriminator onto the REAL subject — cases 1–8, the
+   [x] implement kernel Location<T> over the neutral scalar runtime — 81780c4e
+   [x] move the §B discriminator onto the REAL subject — cases 1–8, the
        historical-inference mutation, the wrong-authority-ingress mutation
-   [ ] do NOT create another prototype carrier
+   [x] do NOT create another prototype carrier
 
 C2 TYPE CONTRACT
-   [ ] author strictness preserved: User rejects a partial; Partial<User>
+   [x] author strictness preserved: User rejects a partial; Partial<User>
        accepts one; { name; age? } keeps name required; entity Row same grammar
-   [ ] ordinary-value overload excludes callables AND constructors
-   [ ] NOTFN-GREENFIELD-DISPOSITION — prove an independent author-facing job or
-       DELETE. Expected: delete public NotFn, use an internal exclusion type.
+   [x] ordinary-value overload excludes callables AND constructors
+   [x] NOTFN-GREENFIELD-DISPOSITION — public NotFn deleted; exclusion is internal
 
 C3 MARKER PUBLIC SURFACE
-   [ ] smallest author-facing spelling for "this callable is DATA"
-   [ ] no global augmentation, no transform, no Angular dep, no persistent
+   [x] `leaf(value)` is the smallest author-facing terminal/callable-data spelling
+   [x] no global augmentation, no transform, no Angular dep, no persistent
        wrapper, no second assignment verb; good inference for callbacks,
        constructors, null unions, updater-shaped stored functions
 
 C4 NON-AUTHORED INGRESS
-   [ ] explicit realization/acquisition entrance taking raw values and
+   [x] explicit realization/acquisition entrance taking raw values and
        preserving the caller's known causal class
-   [ ] the three bind-branch partial-acquisition cases relocate here
-   [ ] NOT location(partialPayload), NOT location(rawFunction)
-   [ ] not public unless a public consumer proves it belongs there
+   [x] the three bind-branch partial-acquisition cases relocate here
+   [x] NOT location(partialPayload), NOT location(rawFunction)
+   [x] adapter-only export exists only where Angular proves the ingress need
 
 C5 REMOVE INCUMBENT CALLABLE SEMANTICS
-  [x] retire NodeAccessor Partial<T> callable + merging updater — 1495f713
-  [x] retire incumbent tree(); migrate the root to tree.$ — 1495f713
-     [x] merge carrier contradicted; strict whole-value and explicit runtime
-      permissiveness controls retained — 1495f713
-  [x] fixture-only callers migrate to complete values or explicit runtime probes,
-    assertions unchanged — 1495f713
+   [x] retire NodeAccessor Partial<T> callable + merging updater — 1495f713
+   [x] retire incumbent tree(); migrate the root to tree.$ — 1495f713
+       [x] merge carrier contradicted; strict whole-value and explicit runtime
+           permissiveness controls retained — 1495f713
+   [x] fixture-only callers migrate to complete values or explicit runtime probes,
+       assertions unchanged — 1495f713
 
 C6 ANGULAR HANDOFF
-   [ ] move the Angular scalar publication adapter, the WritableSignal view, the
+   [x] move the Angular scalar publication adapter, the WritableSignal view, the
        DI/lifecycle facade, toWritableSignal, Angular memo/invalidation
-   [ ] kernel stays neutral under the existing closure gate
-   [ ] do NOT make Angular signal identity canonical again to ease migration
+   [x] kernel stays neutral under the existing closure gate
+   [x] do NOT make Angular signal identity canonical again to ease migration
 
 C7 ENTITY DISCRIMINATOR — CLOSURE EVIDENCE, NOT PLANNING EVIDENCE
-   [ ] real entity path through a NON-Angular publication adapter: neutral
+   [x] real entity path through a NON-Angular publication adapter: neutral
        physical truth, structural/value mutation, commit/publication result,
        non-Angular observation, same semantic result as the Angular view
-   [ ] required before GREENFIELD-FRAMEWORK-HANDOFF-0 closes
+   [x] required before GREENFIELD-FRAMEWORK-HANDOFF-0 closes
 
 C8 SURFACE REVIEW — before regenerating the baseline
-   [ ] NotFn disposition · marker spelling · Angular bridge spelling
-   [ ] no duplicate mutation verbs
-   [ ] no leaked SlotIndex / revision / frame / internal marker types
-   [ ] no incumbent tree() · no WritableSignal as canonical location
-   [ ] THEN regenerate the baseline for the ACTUAL greenfield surface and
+   [x] NotFn disposition · `leaf` spelling · `toWritableSignal` bridge spelling
+   [x] no duplicate mutation verbs
+   [x] no leaked SlotIndex / revision / frame / internal marker types
+   [x] no incumbent tree() · no WritableSignal as canonical location
+   [x] regenerate the baseline for the ACTUAL greenfield surface and
        rerun the C/D/E release gates
 ```
 
@@ -12553,25 +12709,26 @@ The spike's vanilla-adapter proof covered **scalars only**. Before the handoff c
 called closed — not merely before planning:
 
 ```text
-[ ] one entity vertical slice through neutral stores + neutral commit +
+[x] one entity vertical slice through neutral stores + neutral commit +
     a vanilla publication adapter, yielding the SAME semantic result as Angular
 ```
 
 ### E. DELETE INCUMBENT REPRESENTATION
 
 ```text
-[ ] delete incumbent `tree()`
-[ ] delete Angular-owned leaf representation from the kernel
-[ ] compiler-drive the fallout
+[x] delete incumbent `tree()`
+[x] delete Angular-owned leaf representation from the kernel
+[x] compiler-drive the fallout
 ```
 
 Then, before any RC:
 
 ```text
-[ ] exhaustive public API review of the GREENFIELD surface
-[ ] regenerate `tools/api-baseline.json` for the ACTUAL 1.0 surface
-[ ] prove package/type closure on that artifact
-[ ] rerun Phase 3/4/5 gates against the greenfield artifact
+[x] exhaustive public API review of the GREENFIELD surface
+[x] regenerate `tools/api-baseline.json` for the ACTUAL 1.0 surface
+[x] prove package/type closure on that artifact
+[x] rerun ordinary Phase 3/4/5 gates against the greenfield artifact
+[ ] rerun release-only gates against the exact final candidate
 ```
 
 ⚠️ **GATES C/D/E DO NOT CARRY OVER AUTOMATICALLY.** Their TOOLING stays valid;
@@ -12729,10 +12886,10 @@ delay `GATE F` or GA without a concrete release falsifier.
       returned by the configured set rather than a deleted chain. Prettier,
       ESLint, kernel typing, diagnostics, `git diff --check`, and independent
       review passed.
-- [x] **Final public API review.** The greenfield API is frozen at
-      `75c003c2`; `tools/api-baseline.json`, release claims, public
-      dispositions, package exports, and strict packed declarations are green.
-      No later stabilization work changed the public API.
+- [x] **Final public API review.** The former greenfield API froze at
+      `75c003c2`; `FRAMEWORK-NATIVE-CARRIERS-0` deliberately superseded its leaf
+      carrier types at `7ab2e82d`. The API baseline, release claims, package
+      exports, and strict packed declarations are green for the replacement.
 
 Exit condition: `GATE F` — **SATISFIED at `109595e6`**
 
@@ -12817,14 +12974,109 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
       browser, and development policy probes; release gates `74/74`; release-
       inclusive mutation proofs `74/74` with zero unproven, blind, or errored
       gates; final independent review clean.
-- [ ] publish `1.0.0`
-- [ ] verify npm/docs/install instructions from scratch
-- [ ] post-release operational readiness
 
-Technical readiness disposition: **CLOSED — human GA decision required.**
+  - [x] **Kernel-owned universal locations and first-party Vue facade
+        (`5efeb7f5`; framework identity superseded by `7ab2e82d`).** Canonical
+        values, equality, revisions, dependency propagation, subscriptions,
+        derived memoization, and grouped publication remain behind the neutral
+        location runtime. The experiment's claim that every facade should expose
+        the same nominal location did not survive the native-carrier falsifiers.
+  - [x] **Callable kernel/root/branch grammar and explicit terminal topology
+        (`81780c4e`; narrowed by `7ab2e82d`).** Neutral locations plus root and
+        object branches retain read/replace/derive call syntax; `leaf(value)`
+        marks topology and callable data. Framework terminal leaves now use their
+        native writable APIs. The digest-pinned historical comparison finds no
+        clear read, derivation, or construction change and measures scalar
+        replacement at about `+4.1 ns`.
+  - [x] **Framework-native leaf carriers with kernel authority (`7ab2e82d`).**
+        Angular exposes `WritableSignal` / `Signal`, Vue exposes `Ref` /
+        `ComputedRef`, and React remains hook-native. Direct carrier identity,
+        batching interception, kernel snapshots, causal intent, EntityMap
+        projections, Vue `watch` / `unref` / `toValue` / `isReadonly`, strict
+        packed declarations, architecture assets, and full demo migration are
+        covered. HYBRID-A was rejected by preregistered CPU and density criteria;
+        the selected direct carrier preserves the unobserved `1,934 B/leaf`
+        density while materially improving Angular hot paths. Validation:
+        package suites, strict typecheck, lint, production package/demo builds,
+        digest-pinned CPU and forced-GC memory harnesses, `55/55` fast gates,
+        `63/63` ordinary gates, and independent review with no blocker. Exact-
+        candidate release-only verification remains owed.
+  - [x] **Framework-native carrier release audit (`63900634`).** Synchronous Vue
+        publication is coherent for root replacement, transactions, EntityMap
+        `setAll`, and undo without invalidating 100 unrelated observed derived
+        carriers. Nested groups drain every queued invalidation and preserve the
+        original mutation error. Native scalar/EntityMap `link()` inference,
+        facade-bound `AccessibleNode` / `EntitySignalWithSlices`, and the
+        distinction between intrinsic `ComputedRef` values and type-only
+        readonly `Ref` views are pinned in source and packed consumers. Live
+        bundle figures were refreshed from the authoritative generator. Exact
+        committed HEAD passed Vue `13/13`, kernel `2,178` plus two expected
+        failures, Angular `99` passing / `3` skipped, React `6/6`, demo `145`
+        passing / `4` skipped, strict typecheck, all lints, four production package
+        builds, packed `bundler` / `node16` consumers, numeric claims `176/176`,
+        API and release-claim gates, `55/55` fast gates, and `63/63` ordinary
+        gates. Independent release review found no source blocker. Exact-
+        candidate release-only verification remains owed.
+  - [x] **RC13 mutation-proof and documentation closure (`6db0e7df`).** Tagged RC13 passed
+        all 74 production gates and failed closed on four stale proof anchors.
+        The replacements target direct framework contamination, native Angular
+        publication, the live `replaceLocation` release claim, and the measured
+        kernel declaration-doc baseline. All four now fail under mutation and
+        pass restored. A complete live README/docs/demo audit found no remaining
+        current API or architecture drift; current version displays and
+        StackBlitz dependencies are generated, Vue is present in the package and
+        AI surfaces, demo tests/lint/production build pass, and 34 architecture
+        assets remain current. Historical RC1 records remain explicitly
+        historical. RC14 exact-candidate verification is next.
+  - [x] **RC15 browser and release-metadata closure (`807bbbe2`,
+        `a752d54f`).** RC14 passed tagged CI and was published under npm's `rc`
+        dist-tag, but the complete production route-smoke matrix subsequently
+        falsified its mobile demo layout and GitHub exposed its release as
+        stable metadata. RC14 remains immutable and is superseded. The demo now
+        passes all `127/127` desktop/mobile browser checks: benchmark grids shed
+        desktop minimum widths, deep-typing copy no longer forces an incoherent
+        break, and mobile architecture labels remain in their intended gaps.
+        GitHub release creation derives `prerelease` from the tag, and the new
+        `release-prerelease-metadata` gate rejects a hardcoded stable release.
+        Validation: production demo build; focused browser checks `28/28`;
+        complete route-smoke matrix `127/127`; fast gates `56/56`; ordinary
+        gates `64/64`; mutation proofs `64/64`; workflow syntax validation;
+        independent release review found no blocker. RC15 exact-candidate
+        verification and registry proof remain owed; GA is not authorized.
+  - [x] **RC16 React SSR source closure (`1b150355`).** RC15 passed its exact-tag
+        workflow, published all four packages under npm's `rc` dist-tag, and
+        matched the immutable candidate's four SHA-512 values in canonical
+        `kernel → angular → react → vue` order. Clean registry tarballs passed
+        facade identity and strict `bundler` / `node16` consumers. The required
+        post-registry semantic smoke then falsified React SSR with
+        `Missing getServerSnapshot`; RC15 remains immutable and published but is
+        superseded. `useSignalTree()` now supplies the canonical selector as the
+        server snapshot, with source and packed `react-dom/server` regression
+        coverage plus the mutation-proven `react-ssr-facade` release gate.
+        Validation: React `7/7`; strict typecheck; React lint/build; README and
+        documented-import checks; packed runtime and dual-resolver consumers;
+        clean packaged semantic-smoke overlay; fast gates `57/57`; ordinary
+        gates `65/65`; mutation proofs `65/65`; browser routes `127/127`;
+        independent release review found no blocker. RC16 exact-candidate,
+        registry, and V3 brownfield verification closed before GA authorization.
 
-Exit condition: `GATE G` remains open until an explicitly authorized official
-release and post-publication verification.
+  - [x] **GA publication and stable consumer closure (`8418cd7d`,
+        `07c13fdb5`).** Signed-tag run `34001591297` and sanctioned publisher run
+        `34002838449` passed the complete release and mutation matrices. Four
+        candidate-matching npm artifacts own `latest`; exact and unversioned
+        clean installs, dual-resolver declarations, cross-framework semantics,
+        React SSR, and stable V3 consumption are green.
+
+- [x] publish `15.0.0`
+- [x] verify npm/docs/install instructions from scratch
+- [x] post-release operational readiness
+
+Technical readiness disposition: **GA RELEASED / REGISTRY-VERIFIED.**
+Source/API, exact-candidate, mutation, registry-integrity, packed-consumer,
+stable V3 adoption, and post-publication proof are closed.
+
+Exit condition: `GATE G` **SATISFIED** by the official release and independent
+post-publication verification recorded above.
 
 ## Suggested Chat Boundaries
 

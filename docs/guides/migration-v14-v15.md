@@ -5,7 +5,7 @@
 **If you are on any `@signaltree/*` package, this is the migration you need.**
 `@signaltree/*` (no hyphen) is the pre-15 line. SignalTree 15 ships under the
 scoped, hyphenated `@signal-tree/*` name, and the multi-package surface is
-consolidated into three packages.
+consolidated into four packages.
 
 15.0 is also an API-reduction release: every API change below removes something
 that was either a duplicate of an existing path or a type that described a
@@ -23,19 +23,20 @@ publication. If one does not compile for you, that is a bug — please report it
 Every import specifier changes. There is no dist-tag or alias bridging the two
 names — `@signaltree/*` stops at 14.1.1.
 
-### Three packages, not eight
+### Four packages, not eight
 
-| v14 package (`@signaltree/*`)                     | v15                                                              |
-| ------------------------------------------------- | --------------------------------------------------------------- |
-| `@signaltree/core`                               | **`@signal-tree/kernel`** — framework-neutral tree, EntityMap, causal turns, links, `restoration()`, `transactions()`, `batching()`, `devTools()` |
-| `@signaltree/angular`                            | **`@signal-tree/angular`** — the Angular realization; **Angular apps import `signalTree` from here**, not the kernel (kernel leaves are neutral cells: `isSignal()` is `false`, so `toObservable`/`model()`/`input()` reject them) |
-| _(new)_                                          | **`@signal-tree/react`** — owner-bound React observation (`useSignalTree`) |
-| `@signaltree/ng-forms`                           | **Removed.** SignalTree 15 does not publish a forms capability. Own form-control wiring and validation in the application. |
-| `@signaltree/schema`                             | **Removed.** No published validation capability; validate in application code. |
-| `@signaltree/events`                             | **Removed.** No published event-bus capability. |
-| `@signaltree/realtime`                           | **Removed.** No published transport/realtime capability; own the socket and write resolved values through ordinary paths or `entityMap`, wrapping external-origin writes in `external()`. |
-| `@signaltree/guardrails`                         | **Folded into the kernel.** Dev-mode misuse warnings ship in `@signal-tree/kernel` with stable `[ST####]` codes; there is nothing to install. |
-| `@signaltree/shared`                             | **Internal.** Not a published package. |
+| v14 package (`@signaltree/*`) | v15                                                                                                                                                                                       |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@signaltree/core`            | **`@signal-tree/kernel`** — framework-neutral tree, EntityMap, causal turns, links, `restoration()`, `transactions()`, `batching()`, `devTools()`                                         |
+| `@signaltree/angular`         | **`@signal-tree/angular`** — native Angular signal leaves over kernel-owned state; **Angular apps import `signalTree` from here**                                                         |
+| _(new)_                       | **`@signal-tree/react`** — owner-bound React observation (`useSignalTree`)                                                                                                                |
+| _(new)_                       | **`@signal-tree/vue`** — native Vue ref leaves over kernel-owned state                                                                                                                    |
+| `@signaltree/ng-forms`        | **Removed.** SignalTree 15 does not publish a forms capability. Own form-control wiring and validation in the application.                                                                |
+| `@signaltree/schema`          | **Removed.** No published validation capability; validate in application code.                                                                                                            |
+| `@signaltree/events`          | **Removed.** No published event-bus capability.                                                                                                                                           |
+| `@signaltree/realtime`        | **Removed.** No published transport/realtime capability; own the socket and write resolved values through ordinary paths or `entityMap`, wrapping external-origin writes in `external()`. |
+| `@signaltree/guardrails`      | **Folded into the kernel.** Dev-mode misuse warnings ship in `@signal-tree/kernel` with stable `[ST####]` codes; there is nothing to install.                                             |
+| `@signaltree/shared`          | **Internal.** Not a published package.                                                                                                                                                    |
 
 Older standalone names retired before 14 (`@signaltree/batching`,
 `/devtools`, `/entities`, `/memoization`, `/presets`, `/time-travel`,
@@ -56,6 +57,7 @@ npm uninstall @signaltree/core @signaltree/angular @signaltree/ng-forms \
 npm install @signal-tree/angular
 #   framework-neutral / library / test code: npm install @signal-tree/kernel
 #   React app:                                 npm install @signal-tree/react
+#   Vue app:                                   npm install @signal-tree/vue
 ```
 
 ```ts
@@ -89,14 +91,14 @@ pipelines in an `@Injectable` Ops service, and land results with `external()`.
 
 ## API changes at a glance
 
-| Removed                                             | Replacement                                 |
-| --------------------------------------------------- | ------------------------------------------- |
-| `@signaltree/*` imports                             | `@signal-tree/*` (see §0)                   |
-| `SignalTreeBase<T>`                                 | `SignalTree<T>`                             |
-| root state properties on the tree (`tree.count`)    | `tree.$.count()`                            |
-| `tree.with(a)` / `.with(a).with(b)`                 | `signalTree(state, { enhancers: [a, b] })`  |
-| `composeEnhancers(a, b)`                            | `signalTree(state, { enhancers: [a, b] })`  |
-| `signalTree(state, derivedFn)` / `tree.derived(fn)` | `signalTree(state, { derived: derivedFn })` |
+| Removed                                                                   | Replacement                                                 |
+| ------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `@signaltree/*` imports                                                   | `@signal-tree/*` (see §0)                                   |
+| `SignalTreeBase<T>`                                                       | `SignalTree<T>`                                             |
+| root state properties on the tree (`tree.count`)                          | `tree.$.count()`                                            |
+| `tree.with(a)` / `.with(a).with(b)`                                       | `signalTree(state, { enhancers: [a, b] })`                  |
+| `composeEnhancers(a, b)`                                                  | `signalTree(state, { enhancers: [a, b] })`                  |
+| `signalTree(state, derivedFn)` / `tree.derived(fn)`                       | `signalTree(state, { derived: derivedFn })`                 |
 | `stored()`, `asyncSource()`, `asyncQuery()`, `form()`, `status()` markers | app-owned state + Ops service; `external()` to land results |
 
 ---

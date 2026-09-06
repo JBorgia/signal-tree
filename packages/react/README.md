@@ -50,6 +50,13 @@ const state = useSignalTree(tree, ($) => $());
 
 Use whole-root projection only when the component needs whole-root truth.
 
+## Server Rendering
+
+`useSignalTree()` reads the same canonical selector snapshot during server
+rendering, so React SSR does not require a mirrored store or a separate server
+adapter. Hydration should construct the tree from the same application state
+used by the server render before mounting the client tree.
+
 ## Selector Contract
 
 Selectors read synchronously from the supplied root location and must return an
@@ -82,6 +89,5 @@ SignalTree remains the only state authority. This package owns subscription,
 cleanup, and React snapshot observation. It does not mirror state, expose write
 APIs, own the tree lifecycle, or change SignalTree's causal semantics.
 
-SSR/hydration policy, React Native validation, custom equality, shared
-cross-component subscriptions, and first-party memoized selectors are not part
-of the initial surface.
+React Native validation, custom equality, shared cross-component subscriptions,
+and first-party memoized selectors are not part of the initial surface.

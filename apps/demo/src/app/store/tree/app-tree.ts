@@ -1,4 +1,3 @@
-import { computed } from '@angular/core';
 import { batching, devTools, signalTree } from '@signal-tree/angular';
 
 import { postsState, uiState, usersState } from './state';
@@ -56,15 +55,15 @@ export function createAppTree() {
   return signalTree(createBaseState(), {
     enhancers: [devTools({ name: STORE_NAME }), batching()],
     derived: ($) => {
-      const selectedUser = computed(() => {
+      const selectedUser = () => {
         const id = $.users.selectedId();
         return id === null ? null : $.users.entities.byId(id)?.() ?? null;
-      });
-      const selectedPost = computed(() => {
+      };
+      const selectedPost = () => {
         const id = $.posts.selectedId();
         return id === null ? null : $.posts.entities.byId(id)?.() ?? null;
-      });
-      const filteredPosts = computed(() => {
+      };
+      const filteredPosts = () => {
         const search = $.posts.filters.search().toLowerCase();
         const published = $.posts.filters.published();
         return $.posts.entities.all().filter((post: Post) => {
@@ -75,13 +74,13 @@ export function createAppTree() {
             post.content.toLowerCase().includes(search)
           );
         });
-      });
+      };
 
       return {
         users: {
           selected: selectedUser,
-          count: computed(() => $.users.entities.all().length),
-          byRole: computed(() => {
+          count: () => $.users.entities.all().length,
+          byRole: () => {
             const groups: Record<User['role'], User[]> = {
               admin: [],
               user: [],
@@ -90,40 +89,37 @@ export function createAppTree() {
             for (const user of $.users.entities.all())
               groups[user.role].push(user);
             return groups;
-          }),
+          },
         },
         posts: {
           selected: selectedPost,
           filtered: filteredPosts,
-          forSelectedUser: computed(() => {
+          forSelectedUser: () => {
             const user = selectedUser();
             return user === null
               ? []
               : $.posts.entities
                   .all()
                   .filter((post: Post) => post.authorId === user.id);
-          }),
-          canPublishSelected: computed(() => {
+                  },
+                  canPublishSelected: () => {
             const post = selectedPost();
             if (post === null) return false;
             const author = $.users.entities.byId(post.authorId)?.();
             return author?.role === 'admin' && !post.published;
-          }),
+          },
         },
         ui: {
-          isLoading: computed(
-            () =>
-              $.users.loading.state() === LoadingState.Loading ||
-              $.posts.loading.state() === LoadingState.Loading
-          ),
-          firstError: computed(
-            () => $.users.loading.error() ?? $.posts.loading.error() ?? null
-          ),
-          totals: computed(() => ({
+          isLoading: () =>
+            $.users.loading.state() === LoadingState.Loading ||
+            $.posts.loading.state() === LoadingState.Loading,
+          firstError: () =>
+            $.users.loading.error() ?? $.posts.loading.error() ?? null,
+          totals: () => ({
             users: $.users.entities.all().length,
             posts: $.posts.entities.all().length,
             filteredPosts: filteredPosts().length,
-          })),
+          }),
         },
       };
     },

@@ -72,7 +72,7 @@ describe('PER-0: what IS a restore, causally?', () => {
     ) as any;
     await settle();
 
-    const p = tree.transaction(() => { tree.$.prefs.theme.set('OPTIMISTIC'); });
+    const p = tree.transaction(() => { tree.$.prefs.theme('OPTIMISTIC'); });
     await tree.load();
     await settle();
     const afterLoad = tree.$.prefs.theme();

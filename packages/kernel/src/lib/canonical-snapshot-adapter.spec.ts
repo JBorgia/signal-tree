@@ -21,7 +21,7 @@ describe('canonical snapshot adapter handoff', () => {
     }>(tree);
 
     expect(readCanonicalSnapshot(tree)).toBe(first);
-    tree.$.count.set(2);
+    tree.$.count(2);
     expect(readCanonicalSnapshot(tree)).toEqual({
       count: 2,
       nested: { value: 2 },
@@ -36,7 +36,7 @@ describe('canonical snapshot adapter handoff', () => {
       seen.push(readCanonicalSnapshot(tree));
     });
 
-    tree.$.count.set(2);
+    tree.$.count(2);
     await flush();
 
     expect(seen).toEqual([{ count: 2 }]);

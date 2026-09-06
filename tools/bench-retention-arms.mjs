@@ -38,7 +38,7 @@ await settle();
 const base = heap();
 
 for (let s = 1; s <= steps; s++) {
-  if (shape === 'scalar')        tree.$.n.set(s);
+  if (shape === 'scalar')        tree.$.n(s);
   else if (shape === 'sameRow')  tree.$.rows.updateOne('1', { v: 1000 + s });
   else if (shape === 'diffRows') tree.$.rows.updateOne(String(s % width), { v: 1000 + s });
   else if (shape === 'allRows')  tree.$.rows.updateWhere(() => true, { v: 1000 + s });
@@ -47,7 +47,7 @@ for (let s = 1; s <= steps; s++) {
     // the collection. This is the only fair `recordHistory: false` comparison: with
     // `diffRows` alone the excluded collection records nothing, so the arm measures
     // "no history at all" rather than "history without this collection".
-    tree.$.n.set(s);
+    tree.$.n(s);
     tree.$.rows.updateOne(String(s % width), { v: 1000 + s });
   }
   else if (shape.startsWith('n')) {

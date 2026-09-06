@@ -21,6 +21,10 @@ const path = require('path');
 const zlib = require('zlib');
 const { execSync } = require('child_process');
 
+const releasePackages = JSON.parse(
+  execSync('node scripts/release-plan.mjs --json', { encoding: 'utf8' })
+);
+
 const packages = [
   {
     name: 'kernel',
@@ -43,6 +47,12 @@ const packages = [
     maxSize: 4000,
     claimed: 4000,
   },
+  {
+    name: 'vue',
+    path: 'dist/packages/vue/dist/index.js',
+    maxSize: 2000,
+    claimed: 2000,
+  },
 ];
 
 // MUST list every publishable package. `cleanAndBuild()` does `rm -rf dist`
@@ -51,7 +61,7 @@ const packages = [
 // pre-publish-validation.sh. `events` and `realtime` were never in this list,
 // so they were wiped and never rebuilt, and package-hygiene's skip-and-pass
 // meant a green release run had verified neither of them.
-const nxProjects = ['kernel', 'angular', 'react'];
+const nxProjects = releasePackages;
 
 class BundleAnalyzer {
   constructor() {
@@ -321,7 +331,7 @@ class BundleAnalyzer {
     this.log('\n📊 Full Package Analysis (All Files)');
     console.log('==========================================\n');
 
-    const packageDirs = ['kernel', 'angular', 'react'];
+    const packageDirs = releasePackages;
 
     const fullSizes = [];
 
@@ -786,7 +796,7 @@ class BundleAnalyzer {
       console.log('\n🏗️  Package Assessment:');
       console.log('======================');
       console.log(
-        '✅ Current kernel, Angular, React, and shared artifacts built'
+        '✅ Current kernel, framework facades, and shared artifacts built'
       );
       console.log(
         '✅ Public package outputs measured without missing-artifact skips'

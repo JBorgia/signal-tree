@@ -1145,6 +1145,146 @@ button:disabled {
   color: var(--color-primary-900);
 }
 
+.callable-location-comparison {
+  margin-top: var(--layout-section-gap);
+  border-top: 4px solid var(--color-primary-700);
+  background: var(--color-surface);
+}
+
+.callable-location-comparison > header {
+  display: grid;
+  grid-template-columns: minmax(18rem, 0.85fr) minmax(24rem, 1.15fr);
+  gap: var(--layout-section-gap);
+  align-items: end;
+  padding: var(--layout-panel-inset);
+  border-inline: var(--layout-rule);
+  border-bottom: var(--layout-rule);
+}
+
+.callable-location-comparison h2 {
+  margin: 0.4rem 0 0;
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.callable-location-comparison header > p,
+.callable-location-comparison footer > p {
+  margin: 0;
+  color: var(--color-neutral-700);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.callable-run-facts {
+  display: flex;
+  flex-wrap: wrap;
+  border-left: var(--layout-rule);
+}
+
+.callable-run-facts span {
+  flex: 1 1 12rem;
+  padding: 0.65rem var(--layout-panel-inset);
+  border-right: var(--layout-rule);
+  border-bottom: var(--layout-rule);
+  background: var(--color-framework);
+  color: var(--color-neutral-700);
+  font-family: var(--font-family-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.callable-result-table {
+  min-width: 0;
+  overflow-x: auto;
+  border-left: var(--layout-rule);
+}
+
+.callable-result-header,
+.callable-result-row {
+  display: grid;
+  grid-template-columns:
+    minmax(9rem, 1.15fr) repeat(3, minmax(6.75rem, 0.72fr))
+    repeat(2, minmax(9rem, 1fr)) minmax(10rem, 1.2fr);
+  min-width: 66rem;
+}
+
+.callable-result-table--memory .callable-result-header,
+.callable-result-table--memory .callable-result-row {
+  grid-template-columns: minmax(11rem, 1.1fr) repeat(4, minmax(9rem, 1fr));
+  min-width: 52rem;
+}
+
+.callable-result-header {
+  color: var(--color-neutral-600);
+  font-family: var(--font-family-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.callable-result-header > span,
+.callable-result-row > * {
+  min-width: 0;
+  padding: 0.7rem var(--layout-panel-inset);
+  border-right: var(--layout-rule);
+  border-bottom: var(--layout-rule);
+}
+
+.callable-result-row {
+  color: var(--color-neutral-700);
+  font-family: var(--font-family-mono);
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+.callable-result-row strong {
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+}
+
+.callable-result-row[data-disposition='overhead'] {
+  box-shadow: inset 4px 0 var(--color-warning-600);
+}
+
+.callable-result-row[data-disposition='improvement'] {
+  box-shadow: inset 4px 0 var(--color-success-600);
+}
+
+.callable-result-row > *::before {
+  display: none;
+}
+
+.callable-location-comparison footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--layout-panel-inset);
+  align-items: center;
+  padding: var(--layout-panel-inset);
+  border-inline: var(--layout-rule);
+  border-bottom: var(--layout-rule);
+  background: var(--color-paper);
+}
+
+.callable-location-comparison footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem var(--layout-panel-inset);
+  justify-content: flex-end;
+}
+
+.callable-location-comparison footer a {
+  color: var(--color-primary-700);
+  font-family: var(--font-family-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.callable-location-comparison footer a:hover {
+  color: var(--color-primary-900);
+}
+
 .steady-state-controls {
   display: grid;
   grid-template-columns: 12rem minmax(18rem, 0.7fr);
@@ -1428,10 +1568,57 @@ button:disabled {
   .calculation-guide > header,
   .capability-admission > header,
   .benchmark-philosophy > header,
+  .callable-location-comparison > header,
   .steady-state-heading,
   .foundation-ledger > header,
   .methodology {
     grid-template-columns: 1fr;
+  }
+
+  .callable-result-header {
+    position: absolute;
+    min-width: 0;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .callable-result-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+  }
+
+  // The --memory compound selectors (0,2,0) outrank the bare mobile
+  // resets above, so the 52rem desktop min-width would otherwise keep
+  // the memory density table wider than the viewport. Match specificity.
+  .callable-result-table--memory .callable-result-header,
+  .callable-result-table--memory .callable-result-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+  }
+
+  .callable-result-row > * {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .callable-result-row > *::before {
+    display: block;
+    color: var(--color-primary-700);
+    content: attr(data-label);
+    font-family: var(--font-family-mono);
+    font-size: 0.56rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .callable-result-row > *:last-child {
+    grid-column: 1 / -1;
   }
 
   .performance-priorities,
@@ -1555,11 +1742,21 @@ button:disabled {
 
   .performance-priorities,
   .construction-budget,
+  .callable-result-row,
+  .callable-location-comparison footer,
   .steady-state-controls,
   .profile-realization,
   .steady-state-row,
   .foundation-grid {
     grid-template-columns: 1fr;
+  }
+
+  .callable-result-row > *:last-child {
+    grid-column: 1;
+  }
+
+  .callable-location-comparison footer nav {
+    justify-content: flex-start;
   }
 
   .steady-state-row > strong,

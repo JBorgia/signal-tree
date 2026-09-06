@@ -15,7 +15,9 @@ import { describe, expect, it } from 'vitest';
 import {
   asReadonly,
   restoration,
+  SignalTreeRollbackError,
   signalTree,
+  transactions,
   undoable,
 } from '../index';
 // PHYSICAL-PACKAGE-SPLIT-0: `toWritableSignal` and `defineStore` are
@@ -35,6 +37,103 @@ const flush = async () => {
 // ════════════════════════════════════════════════════════════════════════════
 describe('PUBLIC CARRIER — toWritableSignal is reachable from @signal-tree/angular', () => {
   type Model = { name: string };
+
+  it('adapts a leaf without creating another state authority', async () => {
+    @Component({ standalone: true, template: '' })
+    class Host {
+      private readonly injector = inject(Injector);
+      readonly tree = signalTree({ name: 'Ada' });
+      readonly model = toWritableSignal(this.tree.$.name, this.injector);
+    }
+
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const host = fixture.componentInstance;
+
+    host.model.set('Grace');
+    expect(host.tree.$.name()).toBe('Grace');
+
+    host.tree.$.name.set('Lin');
+    TestBed.flushEffects();
+    await flush();
+    expect(host.model()).toBe('Lin');
+  });
+
+  it('derives updates from canonical tree state before effects flush', () => {
+    @Component({ standalone: true, template: '' })
+    class Host {
+      private readonly injector = inject(Injector);
+      readonly tree = signalTree({ count: 0 });
+      readonly model = toWritableSignal(this.tree.$.count, this.injector);
+    }
+
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const host = fixture.componentInstance;
+
+    host.tree.$.count.set(5);
+    host.model.update((current) => current + 1);
+
+    expect(host.tree.$.count()).toBe(6);
+    expect(host.model()).toBe(6);
+  });
+
+  it('preserves derive intent when adapting WritableSignal.update()', async () => {
+    @Component({ standalone: true, template: '' })
+    class Host {
+      private readonly injector = inject(Injector);
+      readonly tree = signalTree({ count: 0 }, { enhancers: [transactions()] });
+      readonly model = toWritableSignal(this.tree.$.count, this.injector);
+    }
+
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const host = fixture.componentInstance;
+    const pending = host.tree.transaction(() => host.tree.$.count.set(1));
+
+    host.model.update((current) => current + 1);
+    await flush();
+
+    expect(() => pending.rollback()).toThrow(SignalTreeRollbackError);
+    expect(host.tree.$.count()).toBe(2);
+  });
+
+  it('keeps adapted set() as a superseding replacement', async () => {
+    @Component({ standalone: true, template: '' })
+    class Host {
+      private readonly injector = inject(Injector);
+      readonly tree = signalTree({ count: 0 }, { enhancers: [transactions()] });
+      readonly model = toWritableSignal(this.tree.$.count, this.injector);
+    }
+
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const host = fixture.componentInstance;
+    const pending = host.tree.transaction(() => host.tree.$.count.set(1));
+
+    host.model.set(2);
+    await flush();
+
+    expect(() => pending.rollback()).not.toThrow();
+    expect(host.tree.$.count()).toBe(2);
+  });
+
+  it('adapts a branch whose state contains a set key', () => {
+    @Component({ standalone: true, template: '' })
+    class Host {
+      private readonly injector = inject(Injector);
+      readonly tree = signalTree({ nested: { set: 1, value: 1 } });
+      readonly model = toWritableSignal(this.tree.$.nested, this.injector);
+    }
+
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const host = fixture.componentInstance;
+
+    host.model.set({ set: 2, value: 2 });
+
+    expect(host.tree.$.nested()).toEqual({ set: 2, value: 2 });
+  });
 
   it('a form built through the PUBLIC route makes an edit restoration-eligible', async () => {
     @Component({ standalone: true, template: '' })

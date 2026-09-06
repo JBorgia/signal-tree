@@ -163,9 +163,12 @@ function mustDiscoverSomething(label, value) {
     process.exit(1);
   }
 }
-const rawBarrel = read(`${CORE}/index.ts`);
-const publicValues = detectPublicValueExports(rawBarrel);
-const publicTypes = detectPublicTypeExports(rawBarrel);
+const publicEntrypoints = [
+  read(`${CORE}/index.ts`),
+  read(`${CORE}/adapter.ts`),
+];
+const publicValues = publicEntrypoints.flatMap(detectPublicValueExports);
+const publicTypes = publicEntrypoints.flatMap(detectPublicTypeExports);
 census.publicSurface = {
   rootValueExports: [...new Set(publicValues)].sort(),
   rootTypeExports: [...new Set(publicTypes)].sort(),

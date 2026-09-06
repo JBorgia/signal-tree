@@ -54,7 +54,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -73,7 +73,7 @@ jobs:
         run: node scripts/verify-version-claims.js
 
       - name: Verify publish artifacts
-        run: node scripts/verify-publish-artifacts.mjs kernel angular react
+        run: node scripts/prepare-publish-artifacts.mjs --verify-only
 
       - name: Tarball-consumer gate (self-test, then gate)
         run: |
@@ -105,5 +105,6 @@ jobs:
         with:
           generate_release_notes: true
           tag_name: ${{ needs.verify.outputs.tag_name }}
+          prerelease: ${{ contains(needs.verify.outputs.tag_name, '-') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

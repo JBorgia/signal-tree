@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createReactiveTestRealization } from '../reactive-test-realization';
 import { acquireScalarProjection, EXTERNAL_ACQUISITION } from './internals/acquire-projection';
-import { bindSignalTreeRealization, signalTree } from './signal-tree';
+import { createSignalTreeFactory, signalTree } from './signal-tree';
 import { getOwnedPositionIds } from './internals/owned-mutation';
 import { getPositionRegistry } from './internals/position-registry';
 import {
@@ -12,8 +12,8 @@ import {
 } from './internals/production-substrate-stats';
 
 const testRealization = createReactiveTestRealization();
-const reactiveSignalTree = bindSignalTreeRealization(testRealization);
-const computed = testRealization.derived.createDerived;
+const reactiveSignalTree = createSignalTreeFactory(testRealization);
+const computed = testRealization.locations.createDerived;
 
 /**
  * C5-WHOLE-VALUE-MEMBERSHIP — GREENFIELD-BRANCH-WRITE-0.
@@ -106,7 +106,7 @@ describe('whole-value membership', () => {
     (tree.$.user as unknown as (v: object) => void)({ name: 'Dave' });
     expect(tree.$.user()).toEqual({ name: 'Dave' });
 
-    tree.$.user.age.set(50);
+    tree.$.user.age(50);
 
     // WRITING AN ABSENT DESCENDANT REACTIVATES ITS MEMBERSHIP — otherwise the
     // write would mutate hidden storage while the parent kept omitting it, which
@@ -152,7 +152,7 @@ describe('whole-value membership', () => {
     expect(observed()).toBeUndefined();
 
     // Writing the dormant slot's OWN value back through the child.
-    tree.$.user.age.set(42);
+    tree.$.user.age(42);
 
     expect(observed()).toBe(42);
     expect(tree.$.user()).toEqual({ name: 'Dave', age: 42 });
@@ -197,7 +197,7 @@ describe('whole-value membership', () => {
 
     // The SAME value the dormant slot still holds — no value inequality to lean
     // on, in either the child's publication or the parent's dependency graph.
-    tree.$.user.age.set(42);
+    tree.$.user.age(42);
     expect(childObserved()).toBe(42);
     expect(parentObserved()).toEqual({ name: 'Dave', age: 42 });
   });
@@ -230,7 +230,7 @@ describe('whole-value membership', () => {
     // The physical slot still holds 42; the member is semantically absent.
 
     const seen: Array<number | undefined> = [];
-    tree.$.user.age.update((current) => {
+    tree.$.user.age((current) => {
       seen.push(current);
       return 50;
     });
@@ -250,7 +250,7 @@ describe('whole-value membership', () => {
     );
     const seen: Array<number | undefined> = [];
 
-    tree.$.user.age.update((current) => {
+    tree.$.user.age((current) => {
       seen.push(current);
       return (current ?? 0) + 1;
     });
@@ -295,7 +295,7 @@ describe('whole-value membership', () => {
 
     // A — membership only, via the child, same value
     const a = make(); dormant(a);
-    expect(measure(() => a.tree.$.user.age.set(42))).toBe(1);
+    expect(measure(() => a.tree.$.user.age(42))).toBe(1);
 
     // B — membership only, via the parent, same value
     const b = make(); dormant(b);
@@ -438,7 +438,7 @@ describe('whole-value membership', () => {
     const afterFirst = rebuilds;
 
     // A value write must reach the snapshot through ordinary slot publication.
-    tree.$.box.keep.v.set(5);
+    tree.$.box.keep.v(5);
     expect(JSON.parse(held())).toEqual({ keep: { v: 5 }, other: { v: 2 } });
     const afterValueWrite = rebuilds;
 
@@ -483,32 +483,8 @@ describe('whole-value membership', () => {
   });
 });
 
-/**
- * ⚠️ PUBLIC-BOUNDARY CARRIER RULE.
- *
- * Every carrier above opts into `capabilities: ['causal-runtime']`, which proves
- * the CANONICAL SUBSTRATE MECHANISM and nothing about the contract a caller of
- * plain `signalTree(...)` actually gets. A default tree has NO scalar slot
- * runtime — its leaves are plain Angular signals whose reads cannot consult the
- * membership authority — so this suite is expected RED until the C6 Angular
- * handoff makes the kernel path the default adapter.
- *
- * It is written now, and left failing-by-skip rather than deleted, because the
- * alternative is discovering at C8 that the public surface never carried the
- * contract the kernel proved.
- */
 describe('whole-value membership — PUBLIC DEFAULT PATH', () => {
-  // ⚠️ EXPECTED-FAILURE CARRIER, NOT A SKIPPED ONE.
-  //
-  //     A BASELINE NOTHING VERIFIES IS A MEMO, NOT A GATE.
-  //
-  // An earlier revision gated this behind `const DEFAULT_PATH_CARRIES_MEMBERSHIP
-  // = false` and `it.skip`. That made the gap visible in prose while evaluating
-  // nothing, and it relied on somebody remembering to flip a boolean at C6.
-  // `it.fails` executes the target contract every run: the day the default path
-  // starts honouring membership, THIS SUITE TURNS RED because the qualifier has
-  // expired, and the failure names its own fix.
-  it.fails('PUBLIC DEFAULT: a plain signalTree carries whole-value membership', () => {
+  it('PUBLIC DEFAULT: a plain signalTree carries whole-value membership', () => {
     const tree = signalTree({ user: { name: 'Ada', age: 42 as number | undefined } });
 
     const parent = computed(() => tree.$.user());
@@ -520,7 +496,7 @@ describe('whole-value membership — PUBLIC DEFAULT PATH', () => {
     expect(parent()).toEqual({ name: 'Dave' });
     expect(child()).toBeUndefined();
 
-    tree.$.user.age.set(42); // the same value the dormant slot holds
+    tree.$.user.age(42); // the same value the dormant slot holds
     expect(child()).toBe(42);
     expect(parent()).toEqual({ name: 'Dave', age: 42 });
   });

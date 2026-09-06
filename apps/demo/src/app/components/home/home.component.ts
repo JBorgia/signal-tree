@@ -48,6 +48,14 @@ export class HomeComponent {
       action: 'Open the architecture',
     },
     {
+      eyebrow: 'Evaluating strategic value',
+      title: 'See why causality compounds',
+      description:
+        'Compare equal snapshots with different histories, then trace the value through recovery, synchronization, and AI execution.',
+      route: '/why-causality',
+      action: 'Explore the causal advantage',
+    },
+    {
       eyebrow: 'Ready to build',
       title: 'Work through examples',
       description:
@@ -69,13 +77,15 @@ export class HomeComponent {
     {
       name: '@signal-tree/angular',
       role: 'Angular applications',
-      detail: 'Native signals, dependency injection, and injector-bound cleanup.',
+      detail:
+        'Native signals, dependency injection, and injector-bound cleanup.',
       package: 'angular',
     },
     {
       name: '@signal-tree/kernel',
       role: 'Framework-neutral code',
-      detail: 'State, identity, causal turns, restoration, transactions, and Link.',
+      detail:
+        'State, identity, causal turns, restoration, transactions, and Link.',
       package: 'kernel',
     },
     {
@@ -90,11 +100,13 @@ export class HomeComponent {
     {
       label: 'state-grammar.ts',
       language: 'typescript',
-      source: `import { signalTree } from '@signal-tree/angular';
+      source: `import { leaf, signalTree } from '@signal-tree/angular';
 
 const tree = signalTree({
   count: 0,
-  profile: { name: 'Ada', role: 'engineer' }
+  profile: { name: 'Ada', role: 'engineer' },
+  range: leaf({ start: 0, end: 10 }),
+  onCount: leaf((count: number) => console.log(count)),
 });
 
 tree.$();                              // read root
@@ -108,7 +120,12 @@ tree.$.profile(current => ({
 
 tree.$.count();                        // read leaf
 tree.$.count.set(5);                   // replace leaf
-tree.$.count.update(n => n + 1);       // update leaf`,
+tree.$.count.update(n => n + 1);       // derive leaf
+
+tree.$.range.set({ start: 5, end: 15 }); // replace terminal object
+tree.$.onCount.set((count) => {         // replace callable data
+  console.info(count);
+});`,
     },
     {
       label: 'causal-writes.ts',

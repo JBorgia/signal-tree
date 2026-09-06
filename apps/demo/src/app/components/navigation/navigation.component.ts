@@ -48,6 +48,12 @@ export class NavigationComponent {
           route: '/start',
         },
         {
+          id: 'causality',
+          title: 'Why causality',
+          description: 'The business value of state that retains meaning',
+          route: '/why-causality',
+        },
+        {
           id: 'architecture',
           title: 'Architecture',
           description: 'Verified ownership, causality, identity, and Link',
@@ -150,7 +156,7 @@ export class NavigationComponent {
         {
           id: 'depth',
           title: 'Type system',
-          description: 'Compiled 15-branch proof',
+          description: 'Adjustable compile-backed depth proof',
           route: '/deep-typing',
         },
         {

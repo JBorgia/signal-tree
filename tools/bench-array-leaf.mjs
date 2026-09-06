@@ -78,7 +78,7 @@ const armArrayLeaf = () => {
   const s = process.hrtime.bigint();
   for (let i = 0; i < U; i++) {
     const k = i % N;
-    t.$.rows.update((cur) => {
+    t.$.rows((cur) => {
       const next = cur.slice();
       next[k] = { ...next[k], v: i };
       return next;

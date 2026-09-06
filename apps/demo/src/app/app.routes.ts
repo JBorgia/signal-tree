@@ -20,6 +20,18 @@ export const appRoutes: Route[] = [
         'Evaluate SignalTree in five minutes: the mental model, a side-by-side comparison with NgRx, the recommended architecture, and where to go next.',
     },
   },
+  {
+    path: 'why-causality',
+    loadComponent: () =>
+      import('./pages/why-causality/why-causality.component').then(
+        (c) => c.WhyCausalityComponent
+      ),
+    data: {
+      title: 'Why causality matters',
+      description:
+        'Why causal state has business value: reliable recovery, coherent operations, stable identity, external authority, and AI-ready application truth.',
+    },
+  },
 
   {
     path: 'whats-new-14',
@@ -208,7 +220,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Migrate from NgRx',
       description:
-        'How to migrate an NgRx codebase to SignalTree: actions become setters, reducers become updates, selectors become computed signals.',
+        'How to migrate an NgRx codebase to SignalTree: actions become operations, reducers become callable derivations, selectors become computed values.',
     },
   },
   // Performance comparisons
@@ -241,7 +253,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Deep typing',
       description:
-        'A compile-backed exact writable leaf and runtime update through one declared 15-branch state path.',
+        'Generate and runtime-test a selected depth from the strict compile-backed exact-leaf catalog.',
     },
   },
   {
@@ -308,7 +320,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Documentation',
       description:
-        'SignalTree package documentation for the kernel, Angular, and React packages.',
+        'SignalTree package documentation for the kernel, Angular, React, and Vue packages.',
     },
   },
 

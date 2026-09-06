@@ -5,7 +5,7 @@ import { withRestorationDesignation } from './internals/restoration-eligibility'
  *
  * ```ts
  * undoable(() => {
- *   tree.$.document.title.set('New title');
+ *   tree.$.document.title('New title');
  * });
  * ```
  *
@@ -23,13 +23,13 @@ import { withRestorationDesignation } from './internals/restoration-eligibility'
  * ```ts
  * // ONE designated write promotes the WHOLE turn. Both reverse together,
  * // because both belong to the same causal turn.
- * undoable(() => tree.$.document.title.set('edited'));
- * tree.$.ui.panel.set('inspector');          // same tick
+ * undoable(() => tree.$.document.title('edited'));
+ * tree.$.ui.panel('inspector');          // same tick
  *
  * // TWO scopes in one tick are ONE undo step, for the same reason. The scope
  * // chooses eligibility; it does not carve the turn up.
- * undoable(() => tree.$.a.set(1));
- * undoable(() => tree.$.b.set(2));           // same tick
+ * undoable(() => tree.$.a(1));
+ * undoable(() => tree.$.b(2));           // same tick
  * ```
  *
  * If you need them to be separate undo steps, separate the turns — an ordinary
@@ -46,12 +46,12 @@ import { withRestorationDesignation } from './internals/restoration-eligibility'
  * // ❌ throws ST1033
  * undoable(async () => {
  *   const data = await load();
- *   tree.$.x.set(data);
+ *   tree.$.x(data);
  * });
  *
  * // ✅ designate the synchronous write
  * const data = await load();
- * undoable(() => tree.$.x.set(data));
+ * undoable(() => tree.$.x(data));
  * ```
  *
  * ## Nesting

@@ -69,8 +69,8 @@ describe('PATH-NOTIFIER-DELIVERY-OWNERSHIP-0', () => {
     resetPathDeliveryRuntime();
     try {
       const tree = signalTree({ count: 0, user: { name: 'a' } }, CAPS);
-      tree.$.count.set(5);
-      tree.$.user.name.set('b');
+      tree.$.count(5);
+      tree.$.user.name('b');
       expect(tree.$()).toEqual({ count: 5, user: { name: 'b' } });
     } finally {
       getPathNotifier();
@@ -222,7 +222,7 @@ describe('PATH-NOTIFIER-DELIVERY-OWNERSHIP-0', () => {
 
     // and delivery actually reaches it
     const tree = signalTree({ x: 0 }, CAPS);
-    tree.$.x.set(1);
+    tree.$.x(1);
     again.flushSync?.();
     expect(seen.length).toBeGreaterThan(0);
   });

@@ -1,4 +1,8 @@
-import type { WritableCell } from './internals/cell-runtime';
+import type { Location } from './internals/cell-runtime';
+import {
+  isWritableLocation,
+  replaceLocation,
+} from './internals/location-runtime';
 
 import { deepEqual } from './utils';
 import { external } from './external';
@@ -14,11 +18,13 @@ import {
   type EntityEgressProjection,
 } from './internals/entity-egress-projection';
 import { applyAtRelativePath } from './internals/source-mutation';
-import { isTraversableNode } from './internals/node-shape';
+import {
+  isNodeAccessor,
+  isTraversableNode,
+} from './internals/node-shape';
 import { getRootTree } from './internals/root-source';
 import { scheduleDurableConsequence } from './internals/commit-consequence';
 import type { EntityMapBuilder } from './markers/entity-map';
-import type { EntitySignal } from './types';
 import type { NodeAccessor } from './node-accessor';
 
 /**
@@ -94,13 +100,20 @@ export interface Link {
  * infers `v: Row[]` with no explicit generic.
  */
 export type NaturalValue<S> =
-  S extends EntitySignal<infer R, infer _K>
-    ? R[]
+  S extends Location<infer T>
+    ? T
     : S extends NodeAccessor<infer T>
       ? T
-      : S extends WritableCell<infer T>
-        ? T
-        : never;
+      : S extends {
+    readonly all: unknown;
+    setAll(...args: infer Args): unknown;
+  }
+        ? Args[0]
+        : S extends () => infer T
+          ? T
+          : S extends { readonly value: infer T }
+            ? T
+            : never;
 
 /**
  * Does this declared value still contain a CONSTRUCTION MARKER?
@@ -154,8 +167,7 @@ export type TruthfulLinkSource<S> =
  *
  * ```text
  * collection   read all()      write setAll(value)
- * leaf         read signal()   write set(value)
- * branch/root  read source()   write source(value)
+ * location     read source()   write source(value)
  * ```
  */
 function accessorsFor<T>(x: unknown): {
@@ -167,7 +179,6 @@ function accessorsFor<T>(x: unknown): {
   const node = x as {
     all?: () => T;
     setAll?: (v: T) => void;
-    set?: (v: T) => void;
   };
 
   // THE ROOT ACCESSOR, checked FIRST: it is a plain object, so every later
@@ -180,6 +191,14 @@ function accessorsFor<T>(x: unknown): {
     return {
       read: () => rootTree.read() as T,
       write: (v: T) => rootTree.replace(v),
+      collection: false,
+    };
+  }
+
+  if (isNodeAccessor(x)) {
+    return {
+      read: () => x() as T,
+      write: (value: T) => x(value),
       collection: false,
     };
   }
@@ -197,11 +216,10 @@ function accessorsFor<T>(x: unknown): {
     };
   }
 
-  const set = node.set;
-  if (typeof set === 'function') {
+  if (isWritableLocation(x)) {
     return {
       read: () => (x as () => T)(),
-      write: (v: T) => set(v),
+      write: (value: T) => replaceLocation(x as Location<T>, value),
       collection: false,
     };
   }

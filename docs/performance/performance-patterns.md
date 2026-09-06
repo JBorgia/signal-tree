@@ -7,7 +7,7 @@ Practical patterns for avoiding common performance pitfalls in SignalTree + Angu
 Use `batching()` when you make **multiple writes in one synchronous turn** and want to consolidate change notifications.
 
 ```typescript
-// Without batching: each set() triggers a notification
+// Without batching: each location write triggers a notification
 tree.$.firstName.set('Alice');
 tree.$.lastName.set('Smith');
 tree.$.age.set(30);
@@ -34,7 +34,7 @@ const totalItems = computed(() => tree.$.items().length);
 const activeUsers = computed(() => tree.$.users().filter((u) => u.active));
 ```
 
-If you need value-equality semantics (e.g. API responses that rebuild the same object), compare inside the consumer or gate updates at the writer (`set`/`update`) rather than re-adding a cache layer.
+If you need value-equality semantics (e.g. API responses that rebuild the same object), compare inside the consumer or gate location writes rather than re-adding a cache layer.
 
 ## Selector Sharing
 

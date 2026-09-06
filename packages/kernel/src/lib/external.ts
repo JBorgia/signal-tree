@@ -23,13 +23,12 @@ import { getActiveWriteContext, withWriteContext } from './write-context';
  *
  * ```ts
  * const price = await pricingWorker.calculate(localInputs);
- * tree.$.quote.total.set(price);          // AUTHORED — the application
- *                                         // delegated computation and kept
- *                                         // authority. No door.
+ * tree.$.quote.total(price);          // AUTHORED — the application delegated
+ *                                     // computation and kept authority. No door.
  *
  * const reading = await sensorWorker.read();
- * external(() => tree.$.telemetry.set(reading));   // another authority observed
- *                                                  // it. Door.
+ * external(() => tree.$.telemetry(reading));   // another authority observed it.
+ *                                               // Door.
  * ```
  *
  * ```ts

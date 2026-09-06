@@ -1,8 +1,8 @@
 # `@signal-tree/angular`
 
-Angular realization for SignalTree. It uses native Angular `Signal` and
-`WritableSignal` carriers while keeping state, entity, and causal semantics in
-`@signal-tree/kernel`.
+Angular-native SignalTree realization. State, identity, entity behavior, and
+causal semantics remain in `@signal-tree/kernel`; terminal leaves are native
+Angular signals and work directly in templates and `computed()`.
 
 ## Semantic Guidance
 
@@ -27,7 +27,6 @@ Angular applications should construct state through this package, not through
 the neutral kernel package:
 
 ```ts
-import { computed } from '@angular/core';
 import { asReadonly, batching, entityMap, signalTree } from '@signal-tree/angular';
 
 type User = { id: number; name: string };
@@ -40,13 +39,13 @@ const tree = signalTree(
   {
     enhancers: [batching()],
     derived: ($) => {
-      const selected = computed(() => {
+      const selected = () => {
         const id = $.selectedId();
         return id === null ? null : $.users.byId(id)?.() ?? null;
-      });
+      };
       return {
         selected,
-        selectedName: computed(() => selected()?.name ?? 'None'),
+        selectedName: () => selected()?.name ?? 'None',
       };
     },
   }
@@ -57,10 +56,28 @@ reader.$.selectedName();
 ```
 
 There is one construction grammar: state, enhancers, and one derived factory are
-declared together in `signalTree(...)`. Derived values compose through ordinary
-local `computed` references inside that factory.
+declared together in `signalTree(...)`. Derived values are zero-argument recipes
+that SignalTree memoizes as native readonly Angular signals.
 
-Use `defineStore` for Angular dependency injection and `toWritableSignal` when a
-branch must cross an Angular writable-signal boundary. Application components
+Use `defineStore` for Angular dependency injection. State leaves already have
+native Angular signal identity and methods:
+
+```ts
+tree.$.selectedId.set(42);
+tree.$.selectedId.update((id) => (id ?? 0) + 1);
+```
+
+`toWritableSignal()` remains useful for adapting a callable root or object
+branch to APIs such as Signal Forms. Passing an ordinary leaf without options
+returns that same `WritableSignal`; `{ undoable: true }` creates a distinct
+ingress that designates writes for restoration:
+
+```ts
+const profileModel = toWritableSignal(tree.$.profile, injector, {
+  undoable: true,
+});
+```
+
+Application components
 should normally receive a read-only `$` plus explicit operation services for
 writes and asynchronous work.

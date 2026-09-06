@@ -9,12 +9,11 @@
     "build": {
       "executor": "@angular/build:application",
       "outputs": ["{options.outputPath}"],
-      "dependsOn": ["generate-versions"],
+      "dependsOn": ["generate-versions", "generate-deep-typing-proofs"],
       "defaultConfiguration": "production",
       "options": {
         "outputPath": "dist/apps/demo",
         "browser": "apps/demo/src/main.ts",
-        "polyfills": ["zone.js"],
         "tsConfig": "apps/demo/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -38,6 +37,11 @@
             "output": "assets/docs/react"
           },
           {
+            "glob": "README.md",
+            "input": "packages/vue",
+            "output": "assets/docs/vue"
+          },
+          {
             "glob": "composition-recipes.md",
             "input": "docs/guides",
             "output": "assets/docs/guides"
@@ -55,8 +59,8 @@
           "budgets": [
             {
               "type": "initial",
-              "maximumWarning": "1mb",
-              "maximumError": "2mb"
+              "maximumWarning": "525kb",
+              "maximumError": "550kb"
             },
             {
               "type": "anyComponentStyle",
@@ -105,6 +109,7 @@
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "dependsOn": ["generate-deep-typing-proofs"],
       "options": {
         "jestConfig": "apps/demo/jest.config.ts",
         "passWithNoTests": true,
@@ -115,6 +120,13 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "node tools/generate-version-env.cjs"
+      }
+    },
+    "generate-deep-typing-proofs": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node tools/generate-deep-typing-proofs.mjs"
       }
     },
     "serve-static": {

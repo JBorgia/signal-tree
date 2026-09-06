@@ -54,7 +54,7 @@ export const createReferenceStore = () => {
     advance(id: string): void {
       const pending = store.transaction(() => {
         store.$.jobs.updateOne(id, { status: 'done' });
-        store.$.filters.showCompleted.set(false);
+        store.$.filters.showCompleted(false);
       });
       pending.confirm();
     },

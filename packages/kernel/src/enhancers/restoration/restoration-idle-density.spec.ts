@@ -250,7 +250,7 @@ describe('RESTORATION-IDLE-DENSITY-0', () => {
       structuralEffects: 0,
     });
 
-    undoable(() => tree.$.counter.set(1));
+    undoable(() => tree.$.counter(1));
     await flush();
     expect(tree.getRestorationHistory()).toHaveLength(1);
     tree.undo();
@@ -289,7 +289,7 @@ describe('ZERO-HISTORY-RETENTION-0', () => {
 
   it('retains exactly one completed turn and supports one undo/redo at capacity one', async () => {
     const tree = makeTree(1);
-    undoable(() => tree.$.counter.set(1));
+    undoable(() => tree.$.counter(1));
     await flush();
 
     expect(tree.getRestorationHistory()).toHaveLength(1);

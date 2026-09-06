@@ -52,7 +52,10 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { RELEASE_PACKAGES } from '../scripts/release-plan.mjs';
+
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const BUILD_PROJECTS = RELEASE_PACKAGES.join(',');
 
 // A stray `NX_WORKSPACE_ROOT_PATH` silently redirects EVERY nx command to
 // another checkout, and nothing warns.
@@ -116,7 +119,7 @@ const GATES = [
       // `nx test demo` by hand. It is also the app the demo-coverage gate holds
       // up as proof every export is demonstrated — so it breaking silently would
       // undermine that gate too.
-      '--projects=kernel,angular,react,demo,react-reference',
+      `--projects=${BUILD_PROJECTS},demo,react-reference`,
       '--parallel=1',
       '--skip-nx-cache',
     ],
@@ -377,7 +380,10 @@ const GATES = [
     mutation: {
       file: 'packages/kernel/src/lib/internals/physical-commit-clock.ts',
       find: "import { isTraversableNode } from './node-shape';",
-      replace: "import { isTraversableNode } from '../utils';",
+      replace:
+        "import { isTraversableNode } from './node-shape';\n" +
+        "import type { Signal } from '@angular/core';\n" +
+        'export type __GateKernelTaint = Signal<unknown>;',
     },
   },
   {
@@ -470,14 +476,10 @@ const GATES = [
   {
     name: 'angular-coupling-budget',
     covers:
-      'Angular RUNTIME coupling (value-position use) never grows — the C6 ratchet',
-    // Zero is the eventual target and is deliberately NOT asserted yet: core IS
-    // the Angular adapter for this release, so a zero assertion would be a
-    // permanently red gate, and a normally-red gate teaches people to ignore it.
-    // The ratchet is honest today and tightens as C6 lands.
+      'kernel production modules remain free of Angular runtime coupling',
     cmd: ['node', 'tools/check-angular-coupling-budget.mjs'],
     mutation: {
-      file: 'packages/kernel/src/lib/internals/tracking-suppression.ts',
+      file: 'packages/kernel/src/lib/internals/observation-adapter.ts',
       append:
         "\nimport { untracked } from '@angular/core';\nexport const __gateCoupling = () => untracked(() => 1);\n",
     },
@@ -485,10 +487,7 @@ const GATES = [
   {
     name: 'c6-neutrality-invariants',
     covers:
-      'an ordinary Angular leaf stays the framework cell itself — no wrapper, no second reactive graph, no per-read allocation',
-    // The DETERMINISTIC half of the C6 performance requirement. Wall-clock lives
-    // in tools/bench-c6-baseline.mjs, which records and does not gate, because
-    // timings move with the machine and these facts do not.
+      'kernel-owned locations keep stable identity while direct reads participate in Angular dependency tracking and zoneless rendering',
     cmd: [
       'npx',
       'vitest',
@@ -498,9 +497,9 @@ const GATES = [
       'src/lib/angular-realization-invariants.spec.ts',
     ],
     mutation: {
-      file: 'packages/angular/src/lib/angular-realization.ts',
-      find: '      signal(initial, equal ? { equal } : undefined),',
-      replace: '      ((() => initial) as any),',
+      file: 'packages/angular/src/lib/observation-adapter.ts',
+      find: '        invalidate: () => publish(read()),',
+      replace: '        invalidate: () => undefined,',
     },
   },
   {
@@ -542,22 +541,20 @@ const GATES = [
     // Deleting a shipped capability from a live claim surface must fail. Chosen
     // over a synthetic export because it reproduces the ACTUAL defect: the API
     // is fine, the claim surface is the thing that went stale.
-    // The mutation must name a symbol that is IN THE CURRENT DELTA, or it proves
-    // nothing: the gate only inspects what this release added, so blanking a
-    // symbol from an older release is invisible to it. `prependOne` shipped in
-    // 14.0.0, which sat outside the window, so the previous mutation targeted
-    // a symbol outside the window and the harness correctly reported this gate
-    // BLIND. runInvalidationGroup is in the RC1-to-v15 delta and appears once
-    // in the kernel README. The production gate's base advances with each RC,
-    // so its proof pins that historical delta.
+    // mutation must name a VALUE in the current delta, not a member of a type
+    // newly exported in the same release: members of newly exported types are
+    // deliberately outside this gate's diff. `replaceLocation` is a current
+    // adapter value and CHANGELOG claim, so deleting that claim is observable.
+    // The production gate's base advances with each RC, while this proof pins
+    // the known RC1-to-v15 delta.
     mutationCmd: [
       'node',
       'tools/check-release-claims.mjs',
       '--base=v15.0.0-rc.1',
     ],
     mutation: {
-      file: 'packages/kernel/README.md',
-      find: 'runInvalidationGroup',
+      file: 'CHANGELOG.md',
+      find: '`replaceLocation`',
       replace: '__gateRemovedFromPriming',
     },
   },
@@ -963,7 +960,7 @@ const GATES = [
     // idle arm, which this repo has published once already.
     mutation: {
       file: 'tools/bench-state-scale.mjs',
-      find: '  const st = median(() => {\n    for (let w = 0; w < WRITES; w++) tree.$.k0.v.set(w);\n  });\n\n  const state = signalState(flat(size));',
+      find: '  const st = median(() => {\n    for (let w = 0; w < WRITES; w++) tree.$.k0.v(w);\n  });\n\n  const state = signalState(flat(size));',
       replace:
         '  const st = median(() => {\n    for (let w = 0; w < WRITES; w++) void w;\n  });\n\n  const state = signalState(flat(size));',
     },
@@ -1056,7 +1053,7 @@ const GATES = [
   {
     name: 'retention-gc',
     covers:
-      'the GC-requiring retention proofs: a diagnostic journal releases the values it described once its bounded record is evicted, and a persistence() tree is released by destroy() (both three-armed: control dies -> held lives -> released dies)',
+      'the GC-requiring retention proofs: diagnostic and persistence owners release values at their boundaries, and source locations do not retain abandoned derived recipes',
     // Runs outside `nx test kernel` because it needs --expose-gc, and it FAILS
     // rather than skips without it: a WeakRef that is merely eligible for
     // collection proves nothing, and a skipped retention test reads as evidence.
@@ -1202,11 +1199,12 @@ const GATES = [
     //
     // Kernel declarations are bundled to the public entry surface, so their
     // source ratio intentionally excludes private docs. Raise the measured
-    // public-doc ratchet by one to prove the aggregate gate catches any loss.
+    // UNIQUE public-doc ratchet by one to prove the aggregate gate catches any
+    // loss without rewarding duplicate re-exports across entrypoints.
     mutation: {
       file: 'tools/check-declaration-docs.mjs',
-      find: 'kernel: 243,',
-      replace: 'kernel: 244,',
+      find: 'kernel: 168,',
+      replace: 'kernel: 169,',
     },
   },
   {
@@ -1221,29 +1219,30 @@ const GATES = [
     // credited on a proof that never happened.
     mutation: {
       file: 'tools/check-declaration-docs.mjs',
-      find: '(text.match(/\\/\\*\\*/g) ?? []).length',
-      replace: '0',
+      find: 'const extractJsdocBlocks = (text) => {',
+      replace:
+        'const extractJsdocBlocks = (_text) => [];\nconst __unusedExtractJsdocBlocks = (text) => {',
     },
   },
   {
     name: 'doc-links',
     covers:
-      'every relative link resolves AND every install instruction names a publishable package (archive/CHANGELOG excluded as point-in-time)',
+      'every relative link resolves AND every install instruction selects a publishable current package (archive/CHANGELOG excluded as point-in-time)',
     cmd: ['node', 'tools/check-doc-links.mjs'],
     // A link is a claim about the repository. 28 were broken when this landed,
     // five of them in files that ship inside the npm tarballs — where a README
     // is immutable for the life of a published version. `readme-apis` checks
     // that every SYMBOL a README names exists; nothing checked that a PATH did.
     mutation: {
-      file: 'docs/README.md',
+      file: 'docs/ai/LLM.md',
       generate: (original) =>
-        `${original}\n\n[gate mutation](./__no_such_doc_4b1e__.md)\n`,
+        `${original}\n\n\`\`\`bash\nnpm install @signal-tree/angular@definitely-stale-tag\n\`\`\`\n`,
     },
   },
   {
     name: 'doc-links:self',
     covers:
-      'the link checker flags a missing target AND reports the repo clean without one',
+      'the documentation checker flags a missing target and stale dist-tag, then reports the repo clean without them',
     cmd: ['node', 'tools/check-doc-links.mjs', '--self-test'],
     // Make every target look resolvable. The self-test then plants a link to a
     // missing file and sees nothing wrong, which is exactly the failure a
@@ -1306,13 +1305,24 @@ const GATES = [
   {
     name: 'framework-facade-closure',
     covers:
-      'packed Angular and React facades forward every intended neutral runtime symbol by identity, while consumer declarations compile with skipLibCheck=false under bundler and node16 resolution',
+      'packed framework facades forward every intended neutral runtime symbol by identity, while consumer declarations compile with skipLibCheck=false under bundler and node16 resolution',
     cmd: ['node', 'tools/verify-consumer-typecheck.mjs'],
     needsBuild: true,
     mutation: {
       file: 'dist/packages/react/dist/index.js',
-      find: 'entityMap',
-      replace: 'entityMapBrokenByGate',
+      append: '\nexport const entityMap = (...args) => args;\n',
+    },
+  },
+  {
+    name: 'react-ssr-facade',
+    covers:
+      'the packed React facade supplies a canonical server snapshot to useSyncExternalStore',
+    cmd: ['node', 'tools/verify-consumer-typecheck.mjs'],
+    needsBuild: true,
+    mutation: {
+      file: 'dist/packages/react/dist/use-signal-tree.js',
+      find: 'useSyncExternalStore(subscribe,getSnapshot,getSnapshot)',
+      replace: 'useSyncExternalStore(subscribe,getSnapshot)',
     },
   },
   {
@@ -1345,13 +1355,13 @@ const GATES = [
     //   left the gate "proven" by a check of the compiler, not of the budget.
     //   The cast is what makes the proof mean what it says.
     mutation: {
-      file: 'packages/kernel/src/lib/utils.ts',
+      file: 'dist/packages/kernel/dist/lib/utils.js',
       generate: (original) => {
         const parts = [];
         for (let i = 0; i < 900; i++) {
           parts.push(`gateBloat_${i.toString(36)}_${(i * 2654435761) % 1e9}`);
         }
-        return `${original}\n(globalThis as any).__gateBloat = ${JSON.stringify(
+        return `${original}\nglobalThis.__gateBloat = ${JSON.stringify(
           parts
         )};\n`;
       },
@@ -1380,14 +1390,24 @@ const GATES = [
     },
   },
   {
+    name: 'release-prerelease-metadata',
+    covers: 'prerelease tags create GitHub releases marked as prereleases',
+    cmd: ['node', 'scripts/verify-publish-architecture.mjs'],
+    mutation: {
+      file: '.github/workflows/release.yml',
+      find: "          prerelease: ${{ contains(needs.verify.outputs.tag_name, '-') }}",
+      replace: '          prerelease: false',
+    },
+  },
+  {
     name: 'release-plan',
     covers:
       'the canonical release set matches publishable manifests and orders kernel before adapters',
     cmd: ['node', 'scripts/release-plan.mjs', '--json'],
     mutation: {
       file: 'scripts/release-plan.mjs',
-      find: "['kernel', 'angular', 'react']",
-      replace: "['angular', 'kernel', 'react']",
+      find: "  'kernel',\n  'angular',\n  'react',\n  'vue',",
+      replace: "  'angular',\n  'kernel',\n  'react',\n  'vue',",
     },
   },
 ];
@@ -1454,8 +1474,6 @@ const selected = GATES.filter(
  * half-written `dist/` produce noise, and "the build is broken" is the finding,
  * not a footnote to twenty-three other failures.
  */
-const BUILD_PROJECTS = 'kernel,angular,react';
-
 function buildOnceIfNeeded() {
   if (!selected.some((g) => g.needsBuild)) return;
   const names = selected.filter((g) => g.needsBuild).length;
@@ -1552,18 +1570,38 @@ function withMutation(mutation, fn) {
     // That is the ORIGINAL stale-dist bug wearing new clothes — dist no longer
     // matching source, with nothing noticing — reintroduced by the fix for it.
     // A mutation harness has to restore DERIVED artifacts too, not just the
-    // files it edited.
-    if (mutation.file.startsWith('packages/')) {
+    // files it edited. Only gates marked `writesDist` rebuild mutated source;
+    // rebuilding after every package-source mutation exhausts Node's heap.
+    if (mutation.writesDist) {
       try {
         execFileSync(
           'npx',
-          ['nx', 'run-many', '-t', 'build', `--projects=${BUILD_PROJECTS}`],
-          { cwd: ROOT, stdio: 'pipe', env: process.env }
+          [
+            'nx',
+            'run-many',
+            '-t',
+            'build',
+            `--projects=${BUILD_PROJECTS}`,
+            '--parallel=1',
+            '--skip-nx-cache',
+            '--output-style=static',
+          ],
+          {
+            cwd: ROOT,
+            stdio: 'pipe',
+            maxBuffer: 10 * 1024 * 1024,
+            env: {
+              ...process.env,
+              NX_DAEMON: 'false',
+              NX_ISOLATE_PLUGINS: 'false',
+            },
+          }
         );
-      } catch {
+      } catch (err) {
         console.error(
           `\n  FATAL: restored ${mutation.file} but could not rebuild dist/. ` +
-            `Built output still contains the mutation — run \`npm run build\`.`
+            `Built output still contains the mutation — run \`npm run build\`.\n\n` +
+            String(err.stderr ?? err.stdout ?? err.message).slice(-2000)
         );
         process.exit(2);
       }

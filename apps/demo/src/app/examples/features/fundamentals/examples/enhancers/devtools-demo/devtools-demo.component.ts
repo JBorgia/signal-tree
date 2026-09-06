@@ -56,9 +56,12 @@ const store = signalTree(
 );
 
 // Path-based updates surface automatically in Redux DevTools.
-store.$.counter.update((c) => c + 1);
+store.$.counter.update((counter) => counter + 1);
 store.$.user.name.set('Jane Doe');
-store.$.todos.update((t) => [...t, { id: 1, text: 'New', completed: false }]);`;
+store.$.todos.update((todos) => [
+  ...todos,
+  { id: 1, text: 'New', completed: false },
+]);`;
 
 @Component({
   selector: 'app-devtools-demo',

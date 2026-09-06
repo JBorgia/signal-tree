@@ -54,7 +54,7 @@ describe('DEVTOOLS-JUMP-0.1: inspection DURING a transaction callback', () => {
       // The developer scrubs WHILE the transaction is open. Transaction context
       // exists in this frame — so if exclusion is incidental rather than
       // designed, this is where it breaks.
-      asDevtools(() => tree.$.n.set(42));
+      asDevtools(() => tree.$.n(42));
     });
     await flush();
 

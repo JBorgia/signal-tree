@@ -1,11 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { createReactiveTestRealization } from '../reactive-test-realization';
 import { link } from './link';
 import { signalTree } from './signal-tree';
 import { withWriteContext } from './write-context';
-
-const computed = createReactiveTestRealization().derived.createDerived;
 
 const flush = async () => {
   for (let index = 0; index < 8; index++) await Promise.resolve();
@@ -25,7 +22,7 @@ describe('React observation discriminator: public link()', () => {
         origin: 'devtools',
         participation: 'inspection',
       },
-      () => tree.$.count.set(1)
+      () => tree.$.count(1)
     );
     await flush();
     await connection.settled();
@@ -41,7 +38,7 @@ describe('React observation discriminator: public link()', () => {
     const tree = signalTree(
       { count: 1 },
       {
-        derived: ($) => ({ doubled: computed(() => $.count() * 2) }),
+        derived: ($) => ({ doubled: () => $.count() * 2 }),
       }
     );
 

@@ -111,12 +111,12 @@ timingDescribe('Benchmark: enhancer overhead', () => {
       'Batching',
       () => {
         for (let i = 0; i < ITERATIONS; i++) {
-          plain.$.count.set(i);
+          plain.$.count(i);
         }
       },
       () => {
         for (let i = 0; i < ITERATIONS; i++) {
-          batched.$.count.set(i);
+          batched.$.count(i);
         }
       }
     );
@@ -149,13 +149,13 @@ timingDescribe('Benchmark: enhancer overhead', () => {
       'DevTools(disabled)',
       () => {
         for (let i = 0; i < ITERATIONS; i++) {
-          plain.$.count.set(i);
+          plain.$.count(i);
           plain.$.count();
         }
       },
       () => {
         for (let i = 0; i < ITERATIONS; i++) {
-          withDt.$.count.set(i);
+          withDt.$.count(i);
           withDt.$.count();
         }
       }
@@ -187,8 +187,8 @@ timingDescribe('Benchmark: mutation substrate overhead', () => {
       'Callable subtree update',
       () => {
         for (let i = 0; i < callableIterations; i++) {
-          baselineTree.$.profile.firstName.set(`A${i}`);
-          baselineTree.$.profile.lastName.set(`B${i}`);
+          baselineTree.$.profile.firstName(`A${i}`);
+          baselineTree.$.profile.lastName(`B${i}`);
         }
       },
       () => {
@@ -223,12 +223,12 @@ timingDescribe('Benchmark: mutation substrate overhead', () => {
       'History-enabled write',
       () => {
         for (let i = 0; i < ITERATIONS; i++) {
-          plain.$.value.set(i);
+          plain.$.value(i);
         }
       },
       () => {
         for (let i = 0; i < ITERATIONS; i++) {
-          history.$.value.set(i);
+          history.$.value(i);
         }
       }
     );
@@ -332,10 +332,10 @@ timingDescribe('Benchmark: per-mutation throughput at depth', () => {
     const ratio = stableRatio(
       'Mutation depth',
       () => {
-        for (let i = 0; i < ITERATIONS; i++) shallow.$.value.set(i);
+        for (let i = 0; i < ITERATIONS; i++) shallow.$.value(i);
       },
       () => {
-        for (let i = 0; i < ITERATIONS; i++) deep.$.a.b.c.d.e.value.set(i);
+        for (let i = 0; i < ITERATIONS; i++) deep.$.a.b.c.d.e.value(i);
       }
     );
     expect(ratio).toBeLessThan(2.5);

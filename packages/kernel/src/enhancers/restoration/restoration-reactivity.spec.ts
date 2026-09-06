@@ -33,7 +33,7 @@ describe('the imperative API is unchanged', () => {
     );
     expect(tree.canUndo()).toBe(false);
 
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await flush();
     expect(tree.canUndo()).toBe(true);
     expect(tree.canRedo()).toBe(false);
@@ -50,7 +50,7 @@ describe('the imperative API is unchanged', () => {
       { enhancers: [restoration({ maxHistorySize: 3 })] }
     );
     for (let i = 1; i <= 6; i++) {
-      undoable(() => tree.$.n.set(i));
+      undoable(() => tree.$.n(i));
       await flush();
     }
     expect(tree.getRestorationHistory().length).toBeLessThanOrEqual(3);

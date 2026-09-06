@@ -77,7 +77,7 @@ describe('greenfield React reference', () => {
     const initialRenders = renders;
 
     await act(async () => {
-      store.$.filters.team.set('South');
+      store.$.filters.team('South');
       await settleKernel();
     });
 
@@ -151,7 +151,7 @@ describe('greenfield React reference', () => {
     const readsAfterUnmount = reads;
 
     await act(async () => {
-      store.$.filters.team.set('South');
+      store.$.filters.team('South');
       await settleKernel();
     });
 
@@ -313,7 +313,7 @@ describe('greenfield React reference', () => {
 
     store.destroy();
     await act(async () => {
-      store.$.filters.team.set('South');
+      store.$.filters.team('South');
       await settleKernel();
     });
     expect(screen.getByText('North')).toBeTruthy();
@@ -339,7 +339,7 @@ describe('greenfield React reference', () => {
   it('never reuses a selected snapshot across owners', () => {
     const first = makeStore();
     const second = makeStore();
-    second.$.filters.team.set('South');
+    second.$.filters.team('South');
 
     function Team({ store }: { store: ReferenceStore }) {
       const team = useSignalTree(

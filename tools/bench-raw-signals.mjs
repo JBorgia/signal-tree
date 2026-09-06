@@ -91,10 +91,10 @@ const linesOf = (fn) =>
 function benchWriteOne(arm, round) {
   const store = arm.make();
   const field = arm.field(store);
-  for (let i = 0; i < WRITES / 10; i++) field.set(i); // warmup
-  field.set(-99999); // SENTINEL — postcondition can only pass if MEASURED ran
+  for (let i = 0; i < WRITES / 10; i++) arm.write(field, i); // warmup
+  arm.write(field, -99999); // SENTINEL — postcondition can only pass if MEASURED ran
   const t = process.hrtime.bigint();
-  for (let i = 0; i < WRITES; i++) field.set(i + round * WRITES);
+  for (let i = 0; i < WRITES; i++) arm.write(field, i + round * WRITES);
   const ns = Number(process.hrtime.bigint() - t) / WRITES;
   sink += field();
   if (field() !== WRITES - 1 + round * WRITES)
@@ -123,11 +123,11 @@ function benchWriteWithConsumers(arm, round) {
     c(); // prime
     consumers.push(c);
   }
-  for (let i = 0; i < WRITES / 10; i++) field.set(i);
-  field.set(-99999);
+  for (let i = 0; i < WRITES / 10; i++) arm.write(field, i);
+  arm.write(field, -99999);
   const t = process.hrtime.bigint();
   for (let i = 0; i < WRITES; i++) {
-    field.set(i + round * WRITES);
+    arm.write(field, i + round * WRITES);
     consumers.forEach((c) => c()); // what a change-detection pass would read
   }
   const ns = Number(process.hrtime.bigint() - t) / WRITES;
@@ -148,12 +148,12 @@ function benchWriteWithConsumers(arm, round) {
 function benchReadWhole(arm, round) {
   const store = arm.make();
   const field = arm.field(store);
-  for (let i = 0; i < WRITES / 10; i++) field.set(i);
-  field.set(-99999);
+  for (let i = 0; i < WRITES / 10; i++) arm.write(field, i);
+  arm.write(field, -99999);
   const t = process.hrtime.bigint();
   for (let i = 0; i < WRITES; i++) {
     sink += arm.whole(store);
-    if (i === WRITES - 1) field.set(i + round * WRITES); // keep it interesting
+    if (i === WRITES - 1) arm.write(field, i + round * WRITES); // keep it interesting
   }
   const ns = Number(process.hrtime.bigint() - t) / WRITES;
   if (field() !== WRITES - 1 + round * WRITES)
@@ -167,6 +167,7 @@ const ARMS = {
     name: 'raw',
     make: makeRaw,
     field: (s) => s.user.status,
+    write: (field, value) => field.set(value),
     readField: (s, i) => (i % 2 ? s.prefs.locale : s.user.name),
     whole: (s) =>
       `${s.user.name()}:${s.user.role()}:${s.user.status()}:${s.prefs.theme()}:${s.prefs.locale()}:${s.counter()}`,    lines: linesOf(makeRaw),
@@ -175,6 +176,7 @@ const ARMS = {
     name: 'signaltree',
     make: makeTree,
     field: (t) => t.$.user.status,
+    write: (field, value) => field(value),
     readField: (t, i) => (i % 2 ? t.$.prefs.locale : t.$.user.name),
     whole: (t) => {
       const s = t.$();

@@ -167,8 +167,8 @@ describe('Link persistence — publishing durable state', () => {
     const tree = makeTree();
     const l = track(link(tree.$.settings, endpointFor(be, 'k')));
 
-    tree.$.settings.theme.set('dark');
-    tree.$.settings.density.set(2);
+    tree.$.settings.theme('dark');
+    tree.$.settings.density(2);
     await flush();
     await l.settled();
 
@@ -183,8 +183,8 @@ describe('Link persistence — publishing durable state', () => {
     const tree = makeTree();
     const l = track(link(tree.$.settings, endpointFor(be, 'k')));
 
-    tree.$.settings.theme.set('dark');
-    tree.$.settings.density.set(2);
+    tree.$.settings.theme('dark');
+    tree.$.settings.density(2);
     await flush();
     await l.settled();
 
@@ -200,8 +200,8 @@ describe('Link persistence — publishing durable state', () => {
     const tree = makeTree();
     const l = track(link(tree.$.settings, endpointFor(be, 'k', { delayMs: 30 })));
 
-    tree.$.settings.theme.set('dark');
-    tree.$.settings.density.set(2);
+    tree.$.settings.theme('dark');
+    tree.$.settings.density(2);
     await flush();
 
     let settledResolved = false;
@@ -226,8 +226,8 @@ describe('Link persistence — transactional truth', () => {
     const l = track(link(tree.$.settings, endpointFor(be, 'k')));
 
     const p = tree.transaction(() => {
-      tree.$.settings.theme.set('SPECULATIVE');
-      tree.$.settings.density.set(99);
+      tree.$.settings.theme('SPECULATIVE');
+      tree.$.settings.density(99);
     });
     await flush();
     p.rollback();
@@ -248,8 +248,8 @@ describe('Link persistence — transactional truth', () => {
     const l = track(link(tree.$.settings, endpointFor(be, 'k')));
 
     const p = tree.transaction(() => {
-      tree.$.settings.theme.set('dark');
-      tree.$.settings.density.set(4);
+      tree.$.settings.theme('dark');
+      tree.$.settings.density(4);
     });
     await flush();
     p.confirm();
@@ -277,7 +277,7 @@ describe('Link persistence — failure and recovery', () => {
     track(link(tree.$.settings, endpointFor(be, 'a-storage-key-nobody-sees')));
 
     be.failSetOnce(new Error('disk full'));
-    tree.$.settings.theme.set('dark');
+    tree.$.settings.theme('dark');
     await flush();
 
     const failure = seen.find((e) => e.operation === 'link:set');
@@ -302,8 +302,8 @@ describe('Link persistence — failure and recovery', () => {
 
     beA.failSetOnce(new Error('disk full'));
     beB.failSetOnce(new Error('disk full'));
-    a.$.settings.theme.set('dark');
-    b.$.settings.theme.set('dark');
+    a.$.settings.theme('dark');
+    b.$.settings.theme('dark');
     await flush();
 
     const failures = seen.filter((e) => e.operation === 'link:set');
@@ -324,7 +324,7 @@ describe('Link persistence — failure and recovery', () => {
 
     for (const v of ['one', 'two', 'three']) {
       be.failSetOnce(new Error('disk full'));
-      tree.$.settings.theme.set(v);
+      tree.$.settings.theme(v);
       await flush();
     }
 
@@ -344,8 +344,8 @@ describe('Link persistence — failure and recovery', () => {
     const l = track(link(tree.$.settings, endpointFor(be, 'k')));
 
     be.failSetOnce(new Error('disk full'));
-    tree.$.settings.theme.set('dark');
-    tree.$.settings.density.set(2);
+    tree.$.settings.theme('dark');
+    tree.$.settings.density(2);
     await flush();
     await l.settled();
 
@@ -360,8 +360,8 @@ describe('Link persistence — failure and recovery', () => {
 
     // ⚠️ THE QUEUE SURVIVES. One rejection must not wedge the link forever —
     // that is a retry policy's failure mode arriving without a retry policy.
-    tree.$.settings.theme.set('solar');
-    tree.$.settings.density.set(5);
+    tree.$.settings.theme('solar');
+    tree.$.settings.density(5);
     await flush();
     await l.settled();
     expect(JSON.parse(be.store.get('k') as string).data).toEqual({
@@ -378,8 +378,8 @@ describe('Link persistence — administration', () => {
     const tree = makeTree();
     const l = track(link(tree.$.settings, endpointFor(be, 'k')));
 
-    tree.$.settings.theme.set('dark');
-    tree.$.settings.density.set(2);
+    tree.$.settings.theme('dark');
+    tree.$.settings.density(2);
     await flush();
     await l.settled();
     expect(be.store.has('k')).toBe(true);
@@ -388,8 +388,8 @@ describe('Link persistence — administration', () => {
     // makes the removal stable — it drains the write that would otherwise land
     // after `remove` and resurrect the key. Disposal was never the mechanism,
     // and using it here would end the relationship as a side effect.
-    tree.$.settings.theme.set(INITIAL.theme);
-    tree.$.settings.density.set(INITIAL.density);
+    tree.$.settings.theme(INITIAL.theme);
+    tree.$.settings.density(INITIAL.density);
     await flush();
     await l.settled();
     be.remove('k');
@@ -398,8 +398,8 @@ describe('Link persistence — administration', () => {
     // §10 SUCCESSOR OPERATION — the load-bearing half. A clear that silently
     // killed the link is indistinguishable from a correct one until the NEXT
     // authored write is asked to persist.
-    tree.$.settings.theme.set('dark');
-    tree.$.settings.density.set(7);
+    tree.$.settings.theme('dark');
+    tree.$.settings.density(7);
     await flush();
     await l.settled();
     expect(JSON.parse(be.store.get('k') as string).data).toEqual({
@@ -413,16 +413,16 @@ describe('Link persistence — administration', () => {
     const tree = makeTree();
     const l = track(link(tree.$.settings, endpointFor(be, 'k')));
 
-    tree.$.settings.theme.set('dark');
-    tree.$.settings.density.set(2);
+    tree.$.settings.theme('dark');
+    tree.$.settings.density(2);
     await flush();
     await l.settled();
     const durableAtDispose = be.writes.length;
 
     l.dispose();
     // CONTROL — teardown disposes again; dispose() must be idempotent.
-    tree.$.settings.theme.set('after-dispose');
-    tree.$.settings.density.set(9);
+    tree.$.settings.theme('after-dispose');
+    tree.$.settings.density(9);
     await new Promise((r) => setTimeout(r, 20));
 
     expect(be.writes.length).toBe(durableAtDispose);

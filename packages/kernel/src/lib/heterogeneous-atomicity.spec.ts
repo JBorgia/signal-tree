@@ -51,8 +51,8 @@ interface Harness {
   readonly tree: {
     (): { count: number; theme: string; rows: { all: Row[] } };
     $: {
-      count: { (): number; set(v: number): void };
-      theme: { (): string; set(v: string): void };
+      count: { (value: number): void; (update: (current: number) => number): void; (): number };
+      theme: { (value: string): void; (update: (current: string) => string): void; (): string };
       rows: {
         addOne(row: Row): void;
         removeOne(id: string): void;
@@ -118,7 +118,7 @@ describe('heterogeneous atomicity: scalar + structural in one transaction', () =
     const before = h.revision();
 
     const pending = h.tree.transaction(() => {
-      h.tree.$.count.set(1); // scalar
+      h.tree.$.count(1); // scalar
       h.tree.$.rows.addOne({ id: 'r1', name: 'Ada' }); // structural
     });
     pending.confirm();
@@ -168,7 +168,7 @@ describe('heterogeneous atomicity: scalar + structural in one transaction', () =
     });
 
     const pending = h.tree.transaction(() => {
-      h.tree.$.count.set(1);
+      h.tree.$.count(1);
       h.tree.$.rows.addOne({ id: 'r1', name: 'Ada' });
     });
     pending.confirm();
@@ -208,8 +208,8 @@ describe('heterogeneous atomicity: scalar + structural in one transaction', () =
 
     expect(() =>
       h.tree.transaction(() => {
-        h.tree.$.count.set(99);
-        h.tree.$.theme.set('doomed');
+        h.tree.$.count(99);
+        h.tree.$.theme('doomed');
         h.tree.$.rows.addOne({ id: 'ghost', name: 'Nobody' });
         throw new Error('boom');
       })
@@ -250,8 +250,8 @@ describe('heterogeneous atomicity: scalar + structural in one transaction', () =
     const before = h.revision();
 
     const pending = h.tree.transaction(() => {
-      h.tree.$.count.set(42);
-      h.tree.$.theme.set('doomed');
+      h.tree.$.count(42);
+      h.tree.$.theme('doomed');
       h.tree.$.rows.addOne({ id: 'ghost', name: 'Nobody' });
     });
     pending.rollback();

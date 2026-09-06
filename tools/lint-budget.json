@@ -1,11 +1,13 @@
 {
   "counts": {
     "packages/kernel": 0,
+    "packages/angular": 8,
     "packages/react": 0,
-    "apps/demo": 9,
+    "packages/vue": 0,
+    "apps/demo": 1,
     "tools": 2,
-    "scripts": 53
+    "scripts": 8
   },
-  "total": 64,
-  "filesLinted": 746
+  "total": 19,
+  "filesLinted": 773
 }

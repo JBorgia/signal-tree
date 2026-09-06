@@ -63,7 +63,7 @@ describe('A3-TX case 1: POST with no speculative state', () => {
     const pending = tree.transaction(() => {
       // ⚠️ THIS IS THE FINDING. To get a transaction to exist we must invent a
       // speculative business write that the application does not want:
-      tree.$.ticket.id.set('__inflight__');
+      tree.$.ticket.id('__inflight__');
       observations.push('had to write a sentinel to open a transaction');
     });
     await flush();
@@ -156,16 +156,16 @@ describe('A3-TX: and yet `status` does NOT come back', () => {
     await flush();
 
     const setLoading = () => {
-      tree.$.save.state.set('loading');
-      tree.$.save.error.set(null);
+      tree.$.save.state('loading');
+      tree.$.save.error(null);
     };
     const setLoaded = () => {
-      tree.$.save.state.set('loaded');
-      tree.$.save.error.set(null);
+      tree.$.save.state('loaded');
+      tree.$.save.error(null);
     };
     const setError = (e: NotifyError) => {
-      tree.$.save.state.set('error');
-      tree.$.save.error.set(e);
+      tree.$.save.state('error');
+      tree.$.save.error(e);
     };
     const isLoading = () => tree.$.save.state() === 'loading';
 

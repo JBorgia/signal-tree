@@ -252,9 +252,16 @@ h1 {
   background: var(--color-primary-50);
 }
 
+.path-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
 .home-section-ink {
   background-color: var(--color-ink);
-  background-image: radial-gradient(rgb(183 229 31 / 0.09) 1px, transparent 1px);
+  background-image: radial-gradient(
+    rgb(183 229 31 / 0.09) 1px,
+    transparent 1px
+  );
   background-size: 18px 18px;
   color: var(--color-paper);
 }

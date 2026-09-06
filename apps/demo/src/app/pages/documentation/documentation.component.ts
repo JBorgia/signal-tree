@@ -53,7 +53,7 @@ export class DocumentationComponent implements OnInit {
     {
       id: 'angular',
       name: '@signal-tree/angular',
-      description: 'Native Angular Signal carriers and defineStore ownership',
+      description: 'Native Angular signal leaves, defineStore, and DestroyRef cleanup',
       readmePath: 'assets/docs/angular/README.md',
     },
     {
@@ -61,6 +61,12 @@ export class DocumentationComponent implements OnInit {
       name: '@signal-tree/react',
       description: 'React external-store observation of canonical tree reads',
       readmePath: 'assets/docs/react/README.md',
+    },
+    {
+      id: 'vue',
+      name: '@signal-tree/vue',
+      description: 'Native Vue ref leaves over kernel-owned state',
+      readmePath: 'assets/docs/vue/README.md',
     },
     {
       id: 'composition-recipes',

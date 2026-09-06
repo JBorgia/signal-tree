@@ -89,8 +89,8 @@ describe('A2-4: one host event, two persisted leaves', () => {
     durability.persist('measurementSystem');
     durability.persist('lastDevice');
 
-    tree.$.measurementSystem.set('imperial');
-    tree.$.lastDevice.set('glinx-7');
+    tree.$.measurementSystem('imperial');
+    tree.$.lastDevice('glinx-7');
     await flush();
 
     // Both armed, neither durable — the debounce has not elapsed.
@@ -122,7 +122,7 @@ describe('A2-4: one host event, two persisted leaves', () => {
     durability.persist('measurementSystem');
 
     const pending = tree.transaction(() => {
-      tree.$.measurementSystem.set('imperial');
+      tree.$.measurementSystem('imperial');
     });
     await flush();
 
@@ -162,8 +162,8 @@ describe('A2-4: one host event, two persisted leaves', () => {
     dA.persist('alpha');
     dB.persist('beta');
 
-    a.$.alpha.set('dark');
-    b.$.beta.set('solarized');
+    a.$.alpha('dark');
+    b.$.beta('solarized');
     await flush();
 
     dA.flush();

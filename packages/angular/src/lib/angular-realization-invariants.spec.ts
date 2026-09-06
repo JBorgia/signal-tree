@@ -1,18 +1,27 @@
-import { computed, isSignal, untracked, type WritableSignal } from '@angular/core';
+import {
+  Component,
+  computed,
+  isSignal,
+  provideZonelessChangeDetection,
+  untracked,
+  type WritableSignal,
+} from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { entityMap, signalTree } from '../index';
 
 const causal = () =>
   signalTree({ a: 1, b: 2 }, { capabilities: ['causal-runtime'] });
+const native = <T>(value: unknown): WritableSignal<T> =>
+  value as WritableSignal<T>;
 
 describe('Angular realization invariants', () => {
-  it('uses native Angular cells for ordinary leaves', () => {
+  it('uses stable native Angular carriers for ordinary leaves', () => {
     TestBed.configureTestingModule({});
     const tree = signalTree({ a: 1, nested: { b: 2 } });
 
     expect(isSignal(tree.$.a)).toBe(true);
-    expect(typeof tree.$.a.set).toBe('function');
+    expect('set' in tree.$.a).toBe(true);
     expect(tree.$.a()).toBe(1);
     expect(tree.$.a).toBe(tree.$.a);
     expect(tree.$.nested).toBe(tree.$.nested);
@@ -31,7 +40,7 @@ describe('Angular realization invariants', () => {
 
     expect(doubled()).toBe(2);
     const before = runs;
-    tree.$.a.set(5);
+    native<number>(tree.$.a).set(5);
     expect(doubled()).toBe(10);
     expect(runs).toBeGreaterThan(before);
     tree.destroy();
@@ -49,21 +58,46 @@ describe('Angular realization invariants', () => {
     tree.destroy();
   });
 
-  it('uses one native Angular cell per causal scalar leaf', () => {
+  it('uses one stable native carrier per causal scalar leaf', () => {
     TestBed.configureTestingModule({});
     const tree = causal();
     const leaf = tree.$.a;
 
     expect(isSignal(leaf)).toBe(true);
-    expect(typeof (leaf as unknown as WritableSignal<number>).set).toBe(
-      'function'
-    );
+    expect('set' in leaf).toBe(true);
     expect(tree.$.a).toBe(leaf);
     expect(tree.$.a).not.toBe(tree.$.b);
     untracked(() => tree.$.a());
     untracked(() => tree.$.a());
     expect(tree.$.a).toBe(leaf);
     tree.destroy();
+  });
+
+  it('schedules a zoneless template after a direct location write', async () => {
+    @Component({
+      standalone: true,
+      template: `{{ tree.$.count() }}`,
+    })
+    class HostComponent {
+      readonly tree = signalTree(
+        { count: 0 },
+        { capabilities: ['causal-runtime'] }
+      );
+    }
+
+    TestBed.configureTestingModule({
+      imports: [HostComponent],
+      providers: [provideZonelessChangeDetection()],
+    });
+    const fixture = TestBed.createComponent(HostComponent);
+    await fixture.whenStable();
+    expect(fixture.nativeElement.textContent.trim()).toBe('0');
+
+    native<number>(fixture.componentInstance.tree.$.count).set(1);
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.textContent.trim()).toBe('1');
+    fixture.destroy();
   });
 
   it('connects causal scalar leaves directly to Angular computations', () => {
@@ -77,7 +111,7 @@ describe('Angular realization invariants', () => {
 
     expect(untracked(() => doubled())).toBe(2);
     const before = runs;
-    tree.$.a.set(5);
+    native<number>(tree.$.a).set(5);
     expect(untracked(() => doubled())).toBe(10);
     expect(runs).toBeGreaterThan(before);
     tree.destroy();
@@ -99,9 +133,6 @@ describe('Angular realization invariants', () => {
     const tree = signalTree({ count: 0, user: { name: 'x' } });
 
     expect(isSignal(tree.$.count)).toBe(true);
-    expect(Object.getOwnPropertySymbols(tree.$.count).map(String)).toContain(
-      'Symbol(SIGNAL)'
-    );
     expect(isSignal(tree.$.user)).toBe(false);
     tree.destroy();
   });

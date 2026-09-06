@@ -11,6 +11,7 @@ SignalTree is not NgRx SignalStore.
 - Angular: `@signal-tree/angular`
 - Framework-neutral kernel: `@signal-tree/kernel`
 - React observation: `@signal-tree/react`
+- Vue: `@signal-tree/vue`
 
 Do not generate historical `@signaltree/*` package names or invent capability
 packages.
@@ -18,7 +19,7 @@ packages.
 ## Install For Angular
 
 ```bash
-npm install @signal-tree/angular@15.0.0-rc.1
+npm install @signal-tree/angular
 ```
 
 ## Canonical Construction
@@ -28,7 +29,7 @@ Declare state, every enhancer, and one derived factory in the initial
 
 ```typescript
 import { computed } from '@angular/core';
-import { batching, defineStore, entityMap, signalTree } from '@signal-tree/angular';
+import { batching, defineStore, entityMap, leaf, signalTree } from '@signal-tree/angular';
 
 type User = {
   id: number;
@@ -85,7 +86,7 @@ For an external derived factory, type `$` with `TreeNode<State>` from
 `$` is the state facade.
 
 ```typescript
-// Leaf: call to read, use the native signal methods to write.
+// Angular leaves: call to read; use native signal methods to write.
 tree.$.filter();
 tree.$.filter.set('active');
 tree.$.filter.update((filter) => filter.trim());
@@ -102,6 +103,39 @@ tree.$();
 Branch value calls assign the complete branch value; they are not patch
 operations. Derive a patched value with the updater form. There is no separate
 `.state` or `.unwrap()` API.
+
+Use `leaf(value)` to make a plain object terminal instead of traversable, and to
+store callable data without confusing it with an updater:
+
+```typescript
+const tree = signalTree({
+  range: leaf({ start: 0, end: 10 }),
+  callback: leaf((value: number) => console.log(value)),
+});
+
+tree.$.range.set({ start: 5, end: 15 });
+tree.$.callback.set((value) => persist(value));
+```
+
+Angular leaves are native signals. `toWritableSignal(branch)` adapts a callable
+object branch when an Angular API requires one writable signal.
+
+## Vue Leaves
+
+Vue applications import their complete facade from `@signal-tree/vue`.
+Writable leaves are native `Ref<T>` values; derived and query leaves are
+`ComputedRef<T>` values. Root and object branches keep the callable whole-value
+grammar.
+
+```typescript
+import { signalTree } from '@signal-tree/vue';
+
+const tree = signalTree({ count: 1, profile: { name: 'Ada' } }, { derived: ($) => ({ doubled: () => $.count.value * 2 }) });
+
+tree.$.count.value = 2;
+tree.$.profile((profile) => ({ ...profile, name: 'Grace' }));
+tree.$.doubled.value; // 4
+```
 
 ## EntityMap
 
@@ -267,7 +301,8 @@ try {
   capabilities that are not in current package types.
 - `tree.update`, `tree.unwrap`, `tree.effect`, or `tree.subscribe`.
 - One-argument `entityMap.updateOne(entity)`; use `updateOne(id, changes)`.
-- Callable leaf writes; use `.set()` or `.update()`.
+- Callable writes on Angular leaves; use `.set()` or `.update()`.
+- Bare callable state at construction; declare it with `leaf(callable)`.
 - Multiple trees without distinct state authority and lifetime ownership.
 
 ## Historical Note

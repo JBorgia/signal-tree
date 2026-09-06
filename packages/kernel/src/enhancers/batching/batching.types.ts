@@ -76,8 +76,8 @@ export interface BatchingMethods {
    *
    * @example
    * tree.batch(() => {
-   *   tree.$.a.set(1);  // Value updates immediately
-   *   tree.$.b.set(2);  // Value updates immediately
+  *   tree.$.a(1);  // Value updates immediately
+  *   tree.$.b(2);  // Value updates immediately
    *   console.log(tree.$.a()); // Returns 1 ✅
    * });
    * // Single CD notification after batch completes
@@ -108,17 +108,18 @@ export interface BatchingMethods {
    * So `coalesce()` is wrong for any callback that reads back what it wrote, and
    * `batch()` is wrong when you specifically want intermediate values discarded.
    *
-   * ⚠️ An `update(fn)` inside `coalesce()` is NOT coalesced, deliberately. An
+  * ⚠️ An updater passed to a location inside `coalesce()` is NOT coalesced,
+  * deliberately. An
    * updater is a read-modify-write, so keeping only the last of three `+1`s would
    * mean `+1`. Updaters apply immediately, after draining any pending coalesced
-   * `set` on the same path.
+  * replacement on the same path.
    * Use for high-frequency updates (typing, dragging, etc.)
    *
    * @example
    * tree.coalesce(() => {
-   *   tree.$.query.set('h');
-   *   tree.$.query.set('he');
-   *   tree.$.query.set('hel');
+  *   tree.$.query('h');
+  *   tree.$.query('he');
+  *   tree.$.query('hel');
    * });
    * // Only 'hel' is written to the signal
    */

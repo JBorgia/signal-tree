@@ -83,7 +83,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.14.0'
+          node-version-file: '.nvmrc'
           registry-url: 'https://registry.npmjs.org'
           cache: 'pnpm'
 
@@ -106,12 +106,6 @@ jobs:
       # contents. `gates` verifies a build; it does not produce one.
       - name: Build all packages
         run: pnpm run build:all
-
-      # v15.0.0's release-claims gate delegates ordering to Git. Configure the
-      # stable prerelease suffix so its immutable tagged source chooses v14.1.1
-      # rather than v0.1.16 as the prior stable release on Ubuntu.
-      - name: Configure release tag ordering
-        run: git config versionsort.prereleaseSuffix -rc
 
       - name: All release gates (including benchmark, memory, and package harnesses)
         run: pnpm run gates -- --release

@@ -3,12 +3,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { entityMap } from './types';
 import { signalTree } from './signal-tree';
 import { markTreeCell } from './internals/cell-identity';
-import { NEUTRAL_CELL_RUNTIME } from './internals/cell-runtime';
-import { NEUTRAL_DERIVED_RUNTIME } from './internals/derived-runtime';
+import { NEUTRAL_LOCATION_RUNTIME } from './internals/location-runtime';
 import { stampDerived, unwrap } from './utils';
 
 const cell = <T,>(value: T) =>
-  markTreeCell(NEUTRAL_CELL_RUNTIME.createCell(value));
+  markTreeCell(NEUTRAL_LOCATION_RUNTIME.createCell(value));
 
 /**
  * `unwrap()`'s SYMBOL-KEY walk — previously the largest untested block in
@@ -117,7 +116,7 @@ describe('non-branded symbol keys are ordinary state', () => {
     const KEY = Symbol('derived');
     const store: Record<string | symbol, unknown> = { a: cell(1) };
     store[KEY] = stampDerived(
-      NEUTRAL_DERIVED_RUNTIME.createDerived(() => 5)
+      NEUTRAL_LOCATION_RUNTIME.createDerived(() => 5)
     );
 
     const out = unwrap(store) as Record<string | symbol, unknown>;

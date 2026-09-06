@@ -52,7 +52,7 @@ function measure(depth) {
 
   // Warm up: let V8 settle on shapes before anything is recorded.
   for (let i = 0; i < BATCH; i++) {
-    leaf.set(i);
+    leaf(i);
     sink += leaf();
   }
 
@@ -60,7 +60,7 @@ function measure(depth) {
   for (let b = 0; b < BATCHES; b++) {
     const t = process.hrtime.bigint();
     for (let i = 0; i < BATCH; i++) {
-      leaf.set(i + b * BATCH); // a NEW value every time — never a no-op write
+      leaf(i + b * BATCH); // a NEW value every time — never a no-op write
       sink += leaf();
     }
     perOp.push(Number(process.hrtime.bigint() - t) / BATCH / 1e6); // ms

@@ -7,7 +7,7 @@ import {
 } from '../../../reactive-test-realization';
 import { entityMap } from '../../markers/entity-map';
 import { getPathNotifier, resetPathNotifier } from '../../path-notifier';
-import { bindSignalTreeRealization, signalTree } from '../../signal-tree';
+import { createSignalTreeFactory, signalTree } from '../../signal-tree';
 import type { ISignalTree, WriteMetadata } from '../../types';
 import { restoration } from '../../../enhancers/restoration/restoration';
 import { transactions } from '../../../enhancers/transactions/transactions';
@@ -23,7 +23,6 @@ import {
 } from '../production-substrate-stats';
 import { getPhysicalCommitClock } from '../physical-commit-clock';
 import { getTreeScalarSlotRuntime } from '../tree-scalar-slot-port';
-import { getTreeRealization } from '../tree-realization';
 
 import { createTransactionCaptureBridge } from './transaction-capture-bridge';
 import {
@@ -33,8 +32,14 @@ import {
 } from './tree-realization-adapter';
 
 const testRealization = createReactiveTestRealization();
-const reactiveSignalTree = bindSignalTreeRealization(testRealization);
-const computed = testRealization.derived.createDerived;
+const reactiveSignalTree = createSignalTreeFactory(testRealization);
+const computed = testRealization.locations.createDerived;
+
+type TestLocation<T> = {
+  (value: T): void;
+  (update: (current: T) => T): void;
+  (): T;
+};
 
 function createMockStorage(): Storage {
   const store = new Map<string, string>();
@@ -97,10 +102,7 @@ describe('tree realization adapter', () => {
     ) as unknown as {
       $: {
         profile: {
-          name: {
-            (): string;
-            set(value: string): void;
-          };
+          name: TestLocation<string>;
         };
     };
       destroy(): void;
@@ -562,10 +564,7 @@ describe('tree realization adapter', () => {
           addOne(user: { id: string; name: string }): void;
           changeId(from: string, to: string): void;
           byIdOrFail(id: string): {
-            name: {
-              (): string;
-              set(value: string): void;
-            };
+            name: TestLocation<string> & { __subjectIds?: number[] };
           };
         };
     };
@@ -635,11 +634,7 @@ describe('tree realization adapter', () => {
               changeId(from: string, to: string): void;
               ids(): string[];
               byIdOrFail(id: string): {
-                name: {
-                  (): string;
-                  set(value: string): void;
-                  __subjectIds?: number[];
-                };
+                name: TestLocation<string> & { __subjectIds?: number[] };
               };
             };
         };
@@ -680,9 +675,6 @@ describe('tree realization adapter', () => {
           tree: tree as unknown as ISignalTree<object>,
           descriptors,
         });
-        expect(getTreeRealization(tree.$)?.scalarLeaf).toBe(
-          testRealization.scalarLeaf
-        );
         const observedValues: string[] = [];
         const observed = observeReactiveTestValue(
           () => `${tree.$.users.ids()[0]}|${nameLeaf()}`,
@@ -3304,15 +3296,7 @@ describe('tree realization adapter', () => {
 
       const tree = signalTree(state, {
         capabilities: ['causal-runtime'],
-      }) as ISignalTree<
-        Record<
-          string,
-          {
-            (): number;
-            set(value: number): void;
-          }
-        >
-      >;
+      }) as ISignalTree<Record<string, number>>;
       try {
         const effectCount = Math.min(50, size);
         const step = Math.max(1, Math.floor(size / effectCount));
@@ -3664,10 +3648,7 @@ describe('tree realization adapter', () => {
     ) as unknown as {
       $: {
         profile: {
-          name: {
-            (): string;
-            set(value: string): void;
-          };
+          name: TestLocation<string>;
         };
     };
       destroy(): void;
@@ -3717,9 +3698,9 @@ describe('tree realization adapter', () => {
       { enhancers: [restoration()] }
     ) as unknown as {
       $: {
-        left: { (): string; set(value: string): void };
-        middle: { (): string; set(value: string): void };
-        right: { (): string; set(value: string): void };
+        left: TestLocation<string>;
+        middle: TestLocation<string>;
+        right: TestLocation<string>;
     };
       destroy(): void;
     } & {
@@ -3743,7 +3724,7 @@ describe('tree realization adapter', () => {
 
     const baselineHistory = tree.getRestorationHistory().length;
 
-    undoable(() => tree.$.left.set('A'));
+    undoable(() => tree.$.left('A'));
     getPathNotifier().flushSync();
     await Promise.resolve();
     const afterAuthoredLeft = tree.getRestorationHistory().length;
@@ -3752,7 +3733,7 @@ describe('tree realization adapter', () => {
     getPathNotifier().flushSync();
     await Promise.resolve();
 
-    undoable(() => tree.$.right.set('C'));
+    undoable(() => tree.$.right('C'));
     getPathNotifier().flushSync();
     await Promise.resolve();
 
@@ -3847,8 +3828,8 @@ describe('tree realization adapter', () => {
       { enhancers: [restoration()] }
     ) as unknown as {
       $: {
-        before: { (): string; set(value: string): void };
-        after: { (): string; set(value: string): void };
+        before: TestLocation<string>;
+        after: TestLocation<string>;
         users: {
           ids(): string[];
         };
@@ -3858,7 +3839,7 @@ describe('tree realization adapter', () => {
       getRestorationHistory(): unknown[];
     };
 
-    undoable(() => tree.$.before.set('A'));
+    undoable(() => tree.$.before('A'));
     getPathNotifier().flushSync();
     await Promise.resolve();
     const baselineHistory = tree.getRestorationHistory().length;
@@ -3889,7 +3870,7 @@ describe('tree realization adapter', () => {
       ])
     ).toThrow('Missing structural restore metadata');
 
-    undoable(() => tree.$.after.set('B'));
+    undoable(() => tree.$.after('B'));
     getPathNotifier().flushSync();
     await Promise.resolve();
 
@@ -3904,9 +3885,9 @@ describe('tree realization adapter', () => {
       { enhancers: [transactions()] }
     ) as unknown as {
       $: {
-        left: { (): string; set(value: string): void };
-        middle: { (): string; set(value: string): void };
-        right: { (): string; set(value: string): void };
+        left: TestLocation<string>;
+        middle: TestLocation<string>;
+        right: TestLocation<string>;
     };
       destroy(): void;
     } & {
@@ -3933,9 +3914,9 @@ describe('tree realization adapter', () => {
     });
 
     const pending = tree.transaction(() => {
-      undoable(() => tree.$.left.set('A'));
+      undoable(() => tree.$.left('A'));
       adapter.applyAtomically([{ owner, before: '', after: 'B' }]);
-      undoable(() => tree.$.right.set('C'));
+      undoable(() => tree.$.right('C'));
     });
 
     expect(tree.$.left()).toBe('A');
@@ -3958,8 +3939,8 @@ describe('tree realization adapter', () => {
       { enhancers: [restoration()] }
     ) as unknown as {
       $: {
-        a: { (): string; set(value: string): void };
-        b: { (): string; set(value: string): void };
+        a: TestLocation<string>;
+        b: TestLocation<string>;
     };
       destroy(): void;
     } & {
@@ -4057,18 +4038,12 @@ describe('tree realization adapter', () => {
       { enhancers: [restoration()] }
     ) as unknown as {
       $: {
-        status: {
-          (): string;
-          set(value: string): void;
-        };
+        status: TestLocation<string>;
         users: {
           addOne(user: { id: string; name: string }): void;
           changeId(from: string, to: string): void;
           byIdOrFail(id: string): {
-            name: {
-              (): string;
-              set(value: string): void;
-            };
+            name: TestLocation<string>;
           };
         };
     };
@@ -4115,18 +4090,14 @@ describe('tree realization adapter', () => {
       { enhancers: [restoration()] }
     ) as unknown as {
       $: {
-        other: { (): string; set(value: string): void };
-        status: { (): string; set(value: string): void };
+        other: TestLocation<string>;
+        status: TestLocation<string>;
         users: {
           addOne(user: { id: string; name: string }): void;
           changeId(from: string, to: string): void;
           ids(): string[];
           byIdOrFail(id: string): {
-            name: {
-              (): string;
-              set(value: string): void;
-              __subjectIds?: number[];
-            };
+            name: TestLocation<string> & { __subjectIds?: number[] };
           };
           __planRekey?: (
             from: string,
@@ -4211,7 +4182,7 @@ describe('tree realization adapter', () => {
           update: frame.update.bind(frame),
           discard: frame.discard.bind(frame),
           commit: (options) => {
-            undoable(() => tree.$.other.set('updated elsewhere'));
+            undoable(() => tree.$.other('updated elsewhere'));
             return frame.commit(options);
           },
         };
@@ -4273,10 +4244,7 @@ describe('tree realization adapter', () => {
           { capabilities: ['causal-runtime'] }
         ) as unknown as {
       $: {
-            status: {
-              (): string;
-              set(value: string): void;
-            };
+            status: TestLocation<string>;
             users: {
               addOne(user: { id: string; name: string }): void;
               ids(): string[];
@@ -4370,10 +4338,7 @@ describe('tree realization adapter', () => {
     ) as unknown as {
       $: {
         profile: {
-          name: {
-            (): string;
-            set(value: string): void;
-          };
+          name: TestLocation<string>;
         };
         users: {
           addOne(user: { id: string; name: string }): void;

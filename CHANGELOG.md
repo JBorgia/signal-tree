@@ -1,5 +1,46 @@
-## 15.0.0 (2026-09-03)
+## 15.0.0 (2026-09-06)
 
+- **React selectors render canonical state on the server.** `useSignalTree()`
+  now supplies `useSyncExternalStore` with a server snapshot reader, so React
+  SSR no longer throws `Missing getServerSnapshot`; server reads and later
+  client subscriptions use the same selector over kernel truth.
+
+## 15.0.0-rc.15 (2026-09-05)
+
+- **The production demo passes the complete mobile route-smoke matrix.**
+  Responsive benchmark result grids no longer retain desktop minimum widths,
+  the deep-typing heading no longer forces an incoherent line break, and mobile
+  architecture connector labels remain inside their intended gaps.
+- **GitHub RC releases are always marked as prereleases.** The release workflow
+  derives prerelease metadata from the tag, and a mutation-proven gate rejects
+  a workflow that would expose an RC as a stable GitHub release.
+
+## 15.0.0-rc.14 (2026-09-05)
+
+- **Release mutation proofs track the current architecture.** Kernel-neutrality,
+  Angular carrier observation, release-claim coverage, and declaration-doc
+  mutations now break live mechanisms and current baselines instead of stale
+  pre-carrier anchors. Tagged CI must prove all registered gates can fail before
+  creating the GitHub release or allowing publication.
+- **Current documentation and demo sandboxes follow the candidate version.**
+  StackBlitz manifests and the What's New surface read generated version data,
+  the AI guide installs the `rc` channel and teaches Vue refs, and the docs index
+  includes all four published packages.
+
+## 15.0.0-rc.13 (2026-09-05)
+
+- **Framework facades expose native leaves without moving state authority.**
+  Angular state leaves are `WritableSignal` values and derived/query leaves are
+  `Signal` values; Vue exposes `Ref` and `ComputedRef`; React remains
+  selector/hook-native over neutral kernel locations. Root and object branches
+  retain callable whole-value access. Kernel slots still own values, equality,
+  revisions, transactions, restoration, EntityMap identity, and publication.
+- **The adapter SDK carries framework realization types and semantic ingress.**
+  Carrier-parametric tree/entity/readonly types let each facade publish truthful
+  declarations, and `replaceLocation` lets integration code route a neutral
+  location replacement through kernel semantics. Native realization runtime is
+  reachable through `@signal-tree/kernel/adapter` and tree-shakes out of neutral
+  consumers.
 - **Restoration history is state-only.** `RestorationHistoryEntry` no longer
   exposes `timestamp`, `action`, or arbitrary `payload`, and restoration no
   longer accepts presentation-label/payload configuration. Human and AI

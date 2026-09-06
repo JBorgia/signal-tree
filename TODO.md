@@ -9,18 +9,18 @@ Work that is decided and not yet done. **This is not an RFC list.**
   This is documentation/source hygiene only; do not reopen the one-way public
   construction surface while cleaning it.
 
-## DEEP-TYPING-DEPTH-0 — DEMO FOLLOW-UP
+## DEEP-TYPING-DEPTH-0 — CLOSED
 
-- Let users increase the demonstrated depth on `/deep-typing` within a bounded
-  set of compile-backed fixtures. A runtime depth control alone is not evidence
-  of TypeScript inference: each selectable proof depth must be generated or
-  declared in source and pass exact `WritableLeaf<T>` and `IsAny` checks during
-  the repository typecheck before the page may label it supported.
-- Explain what the page is testing and why it matters. Many users have not seen
-  deeply recursive mapped/conditional types silently widen, lose exact leaf
-  types, leak `any`, or reach TypeScript instantiation limits. Distinguish those
-  compile-time failures from the separate runtime read/write demonstration, and
-  keep the claim bounded to the concrete shapes and depths actually compiled.
+- [x] `/deep-typing` accepts a user-selected depth from 1 through 40, generates
+      the nested runtime shape, and verifies the deepest read, write, snapshot,
+      and reset before replacing the previous tree.
+- [x] `tools/generate-deep-typing-proofs.mjs` emits explicit initializer-
+      inference fixtures for every offered depth. Strict typecheck fails unless
+      each deepest leaf is exactly `WritableLeaf<DeepTypingStatus>`, never
+      `any`, and the generated file matches the generator.
+- [x] The page explains recursive mapped-type widening, `any`/`unknown` loss,
+      TypeScript instantiation limits, and why runtime interaction is separate
+      from compiler evidence. Claims remain bounded to generated fixtures.
 
 ## V15 pre-publish repository audit
 

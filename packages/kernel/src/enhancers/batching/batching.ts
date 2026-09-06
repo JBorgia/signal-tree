@@ -1,4 +1,8 @@
 import { visitTree } from '../../lib/internals/visit-tree';
+import {
+  interceptLocationWrites,
+  isWritableLocation,
+} from '../../lib/internals/location-runtime';
 
 import type {
   ISignalTree,
@@ -13,34 +17,27 @@ type ChangeDetectionAwareTree = {
   __notifyChangeDetection?: () => void;
 };
 
-type BatchWrappedNode = Record<string, unknown> & {
-  set?: (value: unknown) => void;
-  update?: (updater: (value: unknown) => unknown) => void;
-  __batchingWrapped?: boolean;
-  __batchingUpdateWrapped?: boolean;
-};
-
 /**
  * Batching enhancer for SignalTree.
  *
  * KEY PRINCIPLE: Signal writes are ALWAYS synchronous.
  * Batching only affects change detection notification timing.
  *
- * This aligns with Angular's signal contract:
- * - signal.set(x) updates the value immediately
- * - signal() always returns the current value
+ * This aligns with the canonical location contract:
+ * - location(x) updates the value immediately
+ * - location() always returns the current value
  * - Effects/CD run on microtask
  *
  * @example
  * ```typescript
  * const tree = signalTree({ count: 0 }, { enhancers: [batching()] });
  *
- * tree.$.count.set(5);
+ * tree.$.count(5);
  * console.log(tree.$.count()); // 5 - immediate!
  *
  * tree.batch(() => {
- *   tree.$.a.set(1);
- *   tree.$.b.set(2);
+ *   tree.$.a(1);
+ *   tree.$.b(2);
  *   // Values update immediately, CD notification batched
  * });
  * ```
@@ -83,6 +80,7 @@ export function batching(
 
     // For coalesce: track pending writes by path
     const coalescedUpdates = new Map<string, () => void>();
+    const releaseWriteInterceptors: Array<() => void> = [];
 
     /**
      * Schedule CD notification on microtask or after delay.
@@ -128,114 +126,49 @@ export function batching(
       const updates = Array.from(coalescedUpdates.values());
       coalescedUpdates.clear();
 
-      // Execute all coalesced updates
-      updates.forEach((fn) => {
-        try {
-          fn();
-        } catch (e) {
-          console.error('[SignalTree] Error in coalesced update:', e);
-        }
-      });
+      for (const update of updates) update();
     };
 
     // ========================================
-    // WRAP SIGNAL SETTERS TO TRACK NOTIFICATIONS
+    // INTERCEPT LOCATION WRITES TO TRACK NOTIFICATIONS
     // ========================================
 
     /**
-     * Recursively wrap signal setters to schedule notifications.
-     * Signal values still update immediately (synchronous).
-     *
-     * Traversal is the shared `visitTree` skeleton; this visitor supplies only
-     * the leaf action (wrap `.set`/`.update` for batch/coalesce scheduling) and
-     * always recurses. `skipKey` reproduces the former hand-rolled key filter:
-     * skipping `set`/`update`/`_`-prefixed keys keeps `visitTree` from *reading*
-     * `.update` on an entityMap proxy, which would trip the proxy's get-trap and
-     * fire a spurious `[ST2002]` warning. The `.set` read and the `'update' in
-     * node` has-trap guard below match the previous behavior exactly.
+     * Recursively intercept canonical locations beneath their escaped callable
+     * identity. Values remain synchronous except replacement writes explicitly
+     * deduplicated inside `coalesce()`.
      */
-    const wrapSignalSetters = (rootNode: Record<string, unknown>): void => {
+    const interceptWrites = (rootNode: Record<string, unknown>): void => {
       visitTree(
         rootNode,
         (node, path) => {
-          const wrappedNode = node as BatchWrappedNode;
-          // If this node has a set method, wrap it.
-          if (
-            typeof wrappedNode.set === 'function' &&
-            !wrappedNode.__batchingWrapped
-          ) {
-            const originalSet = wrappedNode.set.bind(wrappedNode);
-
-            wrappedNode.set = (value: unknown) => {
-              if (inCoalesce) {
-                coalescedUpdates.set(path, () => originalSet(value));
+          if (!isWritableLocation(node)) return true;
+          releaseWriteInterceptors.push(
+            interceptLocationWrites(node, (operation, proceed) => {
+              if (operation.intent === 'replace' && inCoalesce) {
+                coalescedUpdates.set(path, proceed);
               } else {
-                originalSet(value); // synchronous
-              }
-              if (!inBatch) {
-                scheduleNotification();
-              }
-            };
-
-            wrappedNode.__batchingWrapped = true;
-          }
-
-          // `'update' in node` FIRST: a bare `node.update` read on an entityMap
-          // proxy hits its get-trap and fires a spurious [ST2002] warning; the
-          // `in` check goes through the has-trap (no warning).
-          if (
-            'update' in wrappedNode &&
-            typeof wrappedNode.update === 'function' &&
-            !wrappedNode.__batchingUpdateWrapped
-          ) {
-            const originalUpdate = wrappedNode.update.bind(wrappedNode);
-
-            wrappedNode.update = (updater: (value: unknown) => unknown) => {
-              // An updater is a read-modify-write, so it CANNOT be coalesced:
-              // `update(v => v + 1)` three times means +3, and keeping only the
-              // last one means +1. Coalescing is sound for `set` (last value wins
-              // and none of them read the previous) and unsound for `update` by
-              // construction.
-              //
-              // This used to defer updaters into `coalescedUpdates` under the key
-              // `${path}:update:${Date.now()}`, which lost data on a wall-clock
-              // coin flip: two updaters in the SAME millisecond collided on that
-              // key and one was silently discarded. MEASURED before the fix —
-              // three `+1` updates inside one `coalesce()` produced n = 1 when
-              // they ran fast and n = 3 when spaced 2 ms apart. Same code, answer
-              // decided by machine speed.
-              //
-              // Apply immediately instead, after draining any pending coalesced
-              // `set` for this same path so the updater reads the value a caller
-              // would expect rather than a stale one.
-              if (inCoalesce) {
-                const pendingSet = coalescedUpdates.get(path);
-                if (pendingSet) {
-                  coalescedUpdates.delete(path);
-                  pendingSet();
+                if (inCoalesce) {
+                  const pendingReplace = coalescedUpdates.get(path);
+                  if (pendingReplace) {
+                    coalescedUpdates.delete(path);
+                    pendingReplace();
+                  }
                 }
+                proceed();
               }
-              originalUpdate(updater);
-              if (!inBatch) {
-                scheduleNotification();
-              }
-            };
-
-            wrappedNode.__batchingUpdateWrapped = true;
-          }
-
-          return true; // always recurse (a wrapped node still has children)
+              if (!inBatch) scheduleNotification();
+            })
+          );
+          return false;
         },
-        {
-          skipKey: (key) =>
-            key.startsWith('_') || key === 'set' || key === 'update',
-        }
+        { skipKey: (key) => key.startsWith('_') }
       );
     };
 
     // Wrap the tree's $ proxy
     if (tree.$) {
-      wrapSignalSetters(tree.$ as Record<string, unknown>);
+      interceptWrites(tree.$ as Record<string, unknown>);
     }
 
     // ========================================
@@ -270,25 +203,39 @@ export function batching(
       coalesce(fn: () => void): void {
         const wasCoalescing = inCoalesce;
         const wasBatching = inBatch;
+        const failures: unknown[] = [];
         inCoalesce = true;
         inBatch = true; // Also batch during coalesce
 
         try {
           fn();
+        } catch (error) {
+          failures.push(error);
         } finally {
           inCoalesce = wasCoalescing;
           inBatch = wasBatching;
+        }
 
-          // Execute coalesced updates
-          if (!wasCoalescing) {
+        if (!wasCoalescing) {
+          try {
             flushCoalescedUpdates();
-          }
-
-          // Schedule notification
-          if (!inBatch) {
-            scheduleNotification();
+          } catch (error) {
+            failures.push(error);
           }
         }
+
+        if (!inBatch) {
+          try {
+            scheduleNotification();
+          } catch (error) {
+            failures.push(error);
+          }
+        }
+
+        for (const secondary of failures.slice(1)) {
+          console.error('[SignalTree] Secondary error in coalesce():', secondary);
+        }
+        if (failures.length > 0) throw failures[0];
       },
 
       hasPendingNotifications(): boolean {
@@ -313,6 +260,8 @@ export function batching(
           notificationTimeoutId = undefined;
         }
         coalescedUpdates.clear();
+        for (const release of releaseWriteInterceptors) release();
+        releaseWriteInterceptors.length = 0;
       });
     }
 

@@ -3,8 +3,12 @@ import {
   getOrCreateSubjectRestorationClaims,
   type RestorationClaimOwner,
 } from '../../lib/internals/subject-restoration-claims';
-import { NEUTRAL_CELL_RUNTIME } from '../../lib/internals/cell-runtime';
-import { getTreeRealization } from '../../lib/internals/tree-realization';
+import {
+  deriveLocation,
+  getLocationRuntime,
+  NEUTRAL_LOCATION_RUNTIME,
+  replaceLocation,
+} from '../../lib/internals/location-runtime';
 import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-port';
 import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
 import { rootAuthorityFor } from '../../lib/internals/root-source';
@@ -445,18 +449,18 @@ class RestorationManager<T> {
     return this.indexSignal();
   }
   private set currentIndex(value: number) {
-    this.indexSignal.set(value);
+    replaceLocation(this.indexSignal, value);
     markOwnerInvalidatedFrom(this.tree);
   }
   /** Call after any structural change to `this.history`. */
   private bumpRestorationHistory(): void {
-    this.historyVersion.update((v) => v + 1);
+    deriveLocation(this.historyVersion, (value) => value + 1);
     markOwnerInvalidatedFrom(this.tree);
   }
 
   /** Call after any structural change to frontier-derived turn state. */
   private bumpFrontiers(): void {
-    this.frontierVersion.update((v) => v + 1);
+    deriveLocation(this.frontierVersion, (value) => value + 1);
     markOwnerInvalidatedFrom(this.tree);
   }
 
@@ -527,10 +531,11 @@ class RestorationManager<T> {
     private restoreStateFn?: (state: T) => void,
     private applyEffectsFn?: (applications: DirectedTurnApplication[]) => void
   ) {
-    const cellRuntime = getTreeRealization(tree)?.cell ?? NEUTRAL_CELL_RUNTIME;
-    this.indexSignal = cellRuntime.createCell(-1);
-    this.historyVersion = cellRuntime.createCell(0);
-    this.frontierVersion = cellRuntime.createCell(0);
+    const locations =
+      getLocationRuntime(tree) ?? NEUTRAL_LOCATION_RUNTIME;
+    this.indexSignal = locations.createCell(-1);
+    this.historyVersion = locations.createCell(0);
+    this.frontierVersion = locations.createCell(0);
     this.maxHistorySize = normaliseMaxHistorySize(config.maxHistorySize);
   }
 
@@ -2483,9 +2488,9 @@ export function restoration(
               },
               () => prepared.install()
             );
-          const scalarRealization = getTreeRealization(tree.$)?.scalarLeaf;
-          if (scalarRealization) {
-            scalarRealization.runInvalidationGroup(apply);
+          const locations = getLocationRuntime(tree.$);
+          if (locations) {
+            locations.runInvalidationGroup(apply);
           } else {
             apply();
           }
@@ -2683,13 +2688,12 @@ export function restoration(
     // a single snapshot per flush; otherwise, keep the existing immediate
     // update-based restoration history entry.
     //
-    // IMPORTANT: signalTree's recursive update pipeline writes to leaf
-    // signals directly without calling PathNotifier.notify(); only entity
-    // collections notify by themselves. To make direct leaf writes such as
-    // `tree.$.user.profile.name.set('x')` observable here we recursively
-    // intercept every plain writable signal and route their writes through
-    // the global notifier. Without this interception, restoration would
-    // silently miss every leaf .set()/.update() in the tree.
+    // IMPORTANT: signalTree's recursive update pipeline writes to locations
+    // directly without calling PathNotifier.notify(); only entity collections
+    // notify by themselves. To make direct writes such as
+    // `tree.$.user.profile.name('x')` observable here we subscribe to each
+    // writable location's intrinsic mutation channel and route writes through
+    // the global notifier.
     const createCaptureBucket = (): CaptureBucket => ({
       ownerPaths: new Set<string>(),
       subjectIds: new Set<number>(),

@@ -1,129 +1,153 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
+  isSignal,
   OnDestroy,
   signal,
+  type WritableSignal,
 } from '@angular/core';
-import { signalTree, type WritableLeaf } from '@signal-tree/angular';
+import { signalTree, type SignalTree } from '@signal-tree/angular';
 
-type DeepStatus = 'ready' | 'review';
+import {
+  DEEP_TYPING_BRANCH_SEGMENTS,
+  DEEP_TYPING_COMPILER_CHECKS,
+  DEEP_TYPING_MAX_DEPTH,
+  DEEP_TYPING_MIN_DEPTH,
+  isDeepTypingCompiledDepth,
+  type DeepTypingCompiledDepth,
+  type DeepTypingStatus,
+} from './deep-typing-catalog.generated';
 
-type Equal<Left, Right> = (<Value>() => Value extends Left ? 1 : 2) extends <
-  Value
->() => Value extends Right ? 1 : 2
-  ? true
-  : false;
-type IsAny<Value> = 0 extends 1 & Value ? true : false;
-
-interface DeepTypingState {
-  enterprise: {
-    divisions: {
-      technology: {
-        departments: {
-          engineering: {
-            teams: {
-              frontend: {
-                projects: {
-                  signaltree: {
-                    releases: {
-                      v15: {
-                        features: {
-                          recursiveTyping: {
-                            validation: {
-                              result: {
-                                status: DeepStatus;
-                                revision: number;
-                                owner: string;
-                              };
-                            };
-                          };
-                        };
-                      };
-                    };
-                  };
-                };
-              };
-            };
-          };
-        };
-      };
-    };
-  };
+interface DeepTypingResultValue {
+  readonly status: DeepTypingStatus;
+  readonly revision: number;
+  readonly owner: string;
 }
 
-const PATH_SEGMENTS = [
-  'enterprise',
-  'divisions',
-  'technology',
-  'departments',
-  'engineering',
-  'teams',
-  'frontend',
-  'projects',
-  'signaltree',
-  'releases',
-  'v15',
-  'features',
-  'recursiveTyping',
-  'validation',
+interface DeepTypingResultNode {
+  (): DeepTypingResultValue;
+  readonly status: WritableSignal<DeepTypingStatus>;
+  readonly revision: WritableSignal<number>;
+  readonly owner: WritableSignal<string>;
+}
+
+interface RuntimeProof {
+  readonly tree: SignalTree<Record<string, unknown>>;
+  readonly result: DeepTypingResultNode;
+}
+
+const DEFAULT_DEPTH: DeepTypingCompiledDepth = 15;
+
+const pathSegmentsForDepth = (
+  depth: DeepTypingCompiledDepth
+): readonly string[] => [
+  ...DEEP_TYPING_BRANCH_SEGMENTS.slice(0, depth - 1),
   'result',
-] as const;
+];
 
-const createDeepTypingProof = () => {
-  const tree = signalTree<DeepTypingState>({
-    enterprise: {
-      divisions: {
-        technology: {
-          departments: {
-            engineering: {
-              teams: {
-                frontend: {
-                  projects: {
-                    signaltree: {
-                      releases: {
-                        v15: {
-                          features: {
-                            recursiveTyping: {
-                              validation: {
-                                result: {
-                                  status: 'ready',
-                                  revision: 1,
-                                  owner: 'application',
-                                },
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
+const createNestedState = (
+  pathSegments: readonly string[]
+): Record<string, unknown> => {
+  const branchSegments = pathSegments.slice(0, -1);
+  let state: Record<string, unknown> = {
+    result: {
+      status: 'ready' satisfies DeepTypingStatus,
+      revision: 1,
+      owner: 'application',
     },
-  });
-
-  const result =
-    tree.$.enterprise.divisions.technology.departments.engineering.teams
-      .frontend.projects.signaltree.releases.v15.features.recursiveTyping
-      .validation.result;
-  const statusLeaf: WritableLeaf<DeepStatus> = result.status;
-  const statusIsAny: IsAny<typeof result.status> = false;
-  const statusHasExactType: Equal<
-    typeof result.status,
-    WritableLeaf<DeepStatus>
-  > = true;
-
-  return {
-    tree,
-    result,
-    statusLeaf,
-    statusIsAny,
-    statusHasExactType,
   };
+
+  for (const segment of [...branchSegments].reverse()) {
+    state = { [segment]: state };
+  }
+
+  return state;
+};
+
+const propertyAt = (value: unknown, property: string): unknown => {
+  if (
+    (typeof value !== 'object' || value === null) &&
+    typeof value !== 'function'
+  ) {
+    throw new Error(`Generated path stopped before ${property}`);
+  }
+
+  return (value as Record<string, unknown>)[property];
+};
+
+const isWritableSignal = (value: unknown): value is WritableSignal<unknown> =>
+  isSignal(value) &&
+  typeof propertyAt(value, 'set') === 'function' &&
+  typeof propertyAt(value, 'update') === 'function';
+
+const resolveResult = (
+  tree: SignalTree<Record<string, unknown>>,
+  pathSegments: readonly string[]
+): DeepTypingResultNode => {
+  let current: unknown = tree.$;
+  for (const segment of pathSegments) {
+    current = propertyAt(current, segment);
+  }
+
+  if (
+    typeof current !== 'function' ||
+    !isWritableSignal(propertyAt(current, 'status')) ||
+    !isWritableSignal(propertyAt(current, 'revision')) ||
+    !isWritableSignal(propertyAt(current, 'owner'))
+  ) {
+    throw new Error('Generated deepest branch is not a writable result node');
+  }
+
+  return current as unknown as DeepTypingResultNode;
+};
+
+const createRuntimeProof = (depth: DeepTypingCompiledDepth): RuntimeProof => {
+  const pathSegments = pathSegmentsForDepth(depth);
+  const tree = signalTree<Record<string, unknown>>(
+    createNestedState(pathSegments)
+  );
+
+  try {
+    const result = resolveResult(tree, pathSegments);
+    if (
+      result.status() !== 'ready' ||
+      result.revision() !== 1 ||
+      result.owner() !== 'application'
+    ) {
+      throw new Error('Generated deepest branch failed its initial read');
+    }
+
+    result.status.set('review');
+    result.revision.update((revision) => revision + 1);
+    const snapshot = result();
+    if (snapshot.status !== 'review' || snapshot.revision !== 2) {
+      throw new Error('Generated deepest branch failed its write test');
+    }
+
+    result.status.set('ready');
+    result.revision.set(1);
+    const resetSnapshot = result();
+    if (
+      resetSnapshot.status !== 'ready' ||
+      resetSnapshot.revision !== 1 ||
+      resetSnapshot.owner !== 'application'
+    ) {
+      throw new Error('Generated deepest branch failed its reset test');
+    }
+
+    return { tree, result };
+  } catch (error) {
+    tree.destroy();
+    throw error;
+  }
+};
+
+const parseDepth = (value: string): DeepTypingCompiledDepth | undefined => {
+  const depth = Number(value);
+  return value.trim() !== '' && isDeepTypingCompiledDepth(depth)
+    ? depth
+    : undefined;
 };
 
 @Component({
@@ -134,36 +158,68 @@ const createDeepTypingProof = () => {
   styleUrl: './extreme-depth.component.scss',
 })
 export class ExtremeDepthComponent implements OnDestroy {
-  private readonly proof = createDeepTypingProof();
+  private readonly proof = signal(createRuntimeProof(DEFAULT_DEPTH));
 
-  readonly tree = this.proof.tree;
-  readonly result = this.proof.result;
-  readonly statusLeaf = this.proof.statusLeaf;
-  readonly pathSegments = PATH_SEGMENTS;
-  readonly compilerChecks = {
-    exactWritableLeaf: this.proof.statusHasExactType,
-    isAny: this.proof.statusIsAny,
-  } as const;
-  readonly lastOperation = signal('No writes yet');
-  readonly path = PATH_SEGMENTS.join('.');
-  readonly readExample = `const status = tree.$.${this.path}.status();`;
-  readonly updateExample = `tree.$.${this.path}.status.set('review');`;
+  readonly minimumDepth = DEEP_TYPING_MIN_DEPTH;
+  readonly maximumDepth = DEEP_TYPING_MAX_DEPTH;
+  readonly selectedDepth = signal<DeepTypingCompiledDepth>(DEFAULT_DEPTH);
+  readonly depthInput = signal(String(DEFAULT_DEPTH));
+  readonly depthInputError = computed(() =>
+    parseDepth(this.depthInput()) === undefined
+      ? `Enter a whole number from ${this.minimumDepth} to ${this.maximumDepth}.`
+      : null
+  );
+  readonly canGenerate = computed(() => this.depthInputError() === null);
+  readonly tree = computed(() => this.proof().tree);
+  readonly result = computed(() => this.proof().result);
+  readonly pathSegments = computed(() =>
+    pathSegmentsForDepth(this.selectedDepth())
+  );
+  readonly compilerChecks = DEEP_TYPING_COMPILER_CHECKS;
+  readonly lastOperation = signal(
+    `Depth ${DEFAULT_DEPTH} generated; runtime read/write passed.`
+  );
+  readonly path = computed(() => this.pathSegments().join('.'));
+  readonly readExample = computed(
+    () => `const status = tree.$.${this.path()}.status();`
+  );
+  readonly updateExample = computed(
+    () => `tree.$.${this.path()}.status.set('review');`
+  );
+
+  setDepthInput(value: string): void {
+    this.depthInput.set(value);
+  }
+
+  generateAndTest(): void {
+    const depth = parseDepth(this.depthInput());
+    if (depth === undefined) return;
+
+    const nextProof = createRuntimeProof(depth);
+    const previousProof = this.proof();
+    this.proof.set(nextProof);
+    this.selectedDepth.set(depth);
+    this.lastOperation.set(
+      `Depth ${depth} generated from a compiled fixture; runtime read/write passed.`
+    );
+    previousProof.tree.destroy();
+  }
 
   toggleStatus(): void {
-    this.statusLeaf.update((status) =>
-      status === 'ready' ? 'review' : 'ready'
-    );
-    this.result.revision.update((revision) => revision + 1);
-    this.lastOperation.set('status.set() and revision.update() completed');
+    const result = this.result();
+    result.status.update((status) => (status === 'ready' ? 'review' : 'ready'));
+    result.revision.update((revision) => revision + 1);
+    this.lastOperation.set('status and revision signal writes completed');
   }
 
   reset(): void {
-    this.statusLeaf.set('ready');
-    this.result.revision.set(1);
+    const result = this.result();
+    result.status.set('ready');
+    result.revision.set(1);
     this.lastOperation.set('Deep result reset');
   }
 
   ngOnDestroy(): void {
-    this.tree.destroy();
+    this.tree().destroy();
   }
 }

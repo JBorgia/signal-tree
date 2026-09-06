@@ -38,7 +38,10 @@ const flush = async () => {
 
 type Rows = { addOne(r: Row): void; ids(): string[] };
 type Store = {
-  $: { rows: Rows; n: { (): number; set(v: number): void } };
+  $: {
+    rows: Rows;
+    n: { (value: number): void; (update: (current: number) => number): void; (): number };
+  };
   transaction(fn: () => void): { confirm(): void; rollback(): void };
 };
 
@@ -62,9 +65,9 @@ describe('DIAG-JOURNAL-1.1 FALSIFIER: is a bare transactionId unambiguous?', () 
       if (e.kind === 'opened') ids.push(e.id);
     });
 
-    tree.transaction(() => tree.$.n.set(1)).confirm();
+    tree.transaction(() => tree.$.n(1)).confirm();
     await flush();
-    tree.transaction(() => tree.$.n.set(2)).rollback();
+    tree.transaction(() => tree.$.n(2)).rollback();
     await flush();
     const nested = tree.transaction(() =>
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' })
@@ -99,8 +102,8 @@ describe('DIAG-JOURNAL-1.1 FALSIFIER: is a bare transactionId unambiguous?', () 
       if (e.kind === 'opened') seen.push({ tree: 'b', id: e.id, owner: e.owner });
     });
 
-    a.transaction(() => a.$.n.set(1)).confirm();
-    b.transaction(() => b.$.n.set(1)).confirm();
+    a.transaction(() => a.$.n(1)).confirm();
+    b.transaction(() => b.$.n(1)).confirm();
     await flush();
     offA();
     offB();

@@ -1,5 +1,5 @@
 import type { PositionId } from '../types';
-import type { WritableCell } from './cell-runtime';
+import type { Location } from './cell-runtime';
 import { isTraversableNode } from './node-shape';
 import type {
   ScalarSlotCommitResult,
@@ -18,9 +18,8 @@ import type {
  * The TREE-FACING contract (leaves), distinct from the physical slot
  * substrate that keeps the name `TreeScalarSlotRuntime`.
  *
- * Leaves are typed `WritableCell`, not `WritableSignal`: an Angular signal
- * satisfies the neutral contract (measured), so the adapter's realization
- * still fits while the kernel names no framework type.
+ * Leaves are universal `Location` values: causal storage and ordinary storage
+ * expose the same read, write, peek, and subscription contract.
  */
 export type SlotIndex = number;
 
@@ -38,14 +37,13 @@ export interface TreeScalarLeafRuntime {
   createLeaf<T>(
     initialValue: T,
     equal: (current: T, next: T) => boolean,
-    positionId?: PositionId,
-    snapshotOwner?: object
-  ): WritableCell<T>;
+    positionId?: PositionId
+  ): Location<T>;
   beginFrame(): ScalarSlotMutationFrame;
   runInvalidationGroup(run: () => void): void;
   publishPrepared(result: ScalarSlotCommitResult): void;
   resolveScalarSlot(positionId: PositionId): SlotIndex | undefined;
-  resolveScalarLeaf(positionId: PositionId): WritableCell<unknown> | undefined;
+  resolveScalarLeaf(positionId: PositionId): Location<unknown> | undefined;
   revision(): number;
   slotCount(): number;
 }

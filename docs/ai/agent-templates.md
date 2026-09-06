@@ -30,7 +30,7 @@ derived factory in the initial call:
 
 ```typescript
 import { computed } from '@angular/core';
-import { batching, defineStore, entityMap, signalTree } from '@signal-tree/angular';
+import { batching, defineStore, entityMap, leaf, signalTree } from '@signal-tree/angular';
 
 export const AppTree = defineStore(
   () =>
@@ -57,7 +57,7 @@ export const AppTree = defineStore(
 ```
 
 - Do not use `.with()` or fluent `.derived()` calls.
-- Compose dependent computeds through local variables in the one factory.
+- Compose dependent zero-argument recipes through local variables in the one factory.
 - An external derived factory can type `$` with `TreeNode<State>`.
 - The `Enhancer` function type remains available for advanced composition, but
   no public helper, dependency-metadata, or custom-marker authoring SDK ships.
@@ -67,15 +67,36 @@ export const AppTree = defineStore(
 `$` is the state facade.
 
 - Read a leaf: `tree.$.user.name()`.
-- Write a leaf: `tree.$.user.name.set(value)` or `.update(fn)`.
+- Replace an Angular leaf: `tree.$.user.name.set(value)`.
+- Derive an Angular leaf: `tree.$.user.name.update((current) => next)`.
 - Read a branch: `tree.$.user()`.
 - Replace a branch: `tree.$.user(value)`.
 - Update a branch: `tree.$.user((current) => next)`.
 - Read the full snapshot: `tree.$()`.
 - There is no separate `.state` or `.unwrap()` accessor.
 
-Leaves are native Angular signals. Calling a leaf with an argument is not a
-write.
+Root and object branches retain the callable whole-value grammar. Angular
+terminal leaves are native signals; Vue terminal leaves are refs; neutral
+kernel and React leaves are callable locations. Every write still enters kernel
+semantics.
+
+Use `leaf(value)` when a plain object should remain one atomic terminal instead
+of becoming a branch. Callable data always needs the wrapper, including when it
+is replaced, because a bare function argument means "derive":
+
+```typescript
+const tree = signalTree({
+  bounds: leaf({ min: 0, max: 100 }),
+  onSave: leaf((id: number) => console.log(id)),
+});
+
+tree.$.bounds.set({ min: 10, max: 90 });
+tree.$.onSave.set((id) => persist(id));
+```
+
+Use `toWritableSignal(branch)` when an Angular API requires one writable signal
+for an object branch. Passing an ordinary leaf without options returns the same
+native signal.
 
 ## EntityMap
 
@@ -144,8 +165,8 @@ historical migration documents as current API guidance.
 This Angular app uses SignalTree 15 from `@signal-tree/angular`. State,
 `enhancers`, and one `derived` factory are declared together in
 `signalTree(...)`; there is no `.with()` or fluent `.derived()`. Read through
-`tree.$`; leaves write with `.set()`/`.update()`, while root and branches accept
-whole values or updater functions. Put writes and async orchestration in Ops
+`tree.$`; every location accepts whole values or updater functions. Use
+`leaf(value)` for atomic objects and callable data. Put writes and async orchestration in Ops
 services; keep HTTP, persistence, forms, routing, and effects application-owned.
 Use `entityMap()` for normalized collections, `external()` for synchronous
 external-truth writes, `restoration()` + `undoable()` for retained undo history,

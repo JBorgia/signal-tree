@@ -61,7 +61,7 @@ const TARGETS = {
   'signaltree-bare': `
     import { signalTree } from ${JSON.stringify(CORE)};
     const t = signalTree({ count: 0, user: { name: 'a' } });
-    t.$.count.set(1); t.$.user.name.set('b');
+    t.$.count(1); t.$.user.name('b');
     globalThis.__sink = [t.$.count(), t.$.user.name()];
   `,
   'signaltree-entities': `

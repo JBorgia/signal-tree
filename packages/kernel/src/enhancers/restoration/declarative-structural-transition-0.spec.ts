@@ -159,7 +159,7 @@ describe('RESTORATION-DECLARATIVE-STRUCTURAL-TARGET-0', () => {
       },
       { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
-    undoable(() => tree.$.count.set(2));
+    undoable(() => tree.$.count(2));
     await flush();
     undoable(() => tree.$.rows.setAll([{ id: 'r1', value: 1 }]));
     await flush();
@@ -249,9 +249,9 @@ describe('RESTORATION-DECLARATIVE-STRUCTURAL-TARGET-0', () => {
       { left: 0, right: 0 },
       { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
-    undoable(() => tree.$.left.set(1));
+    undoable(() => tree.$.left(1));
     await flush();
-    undoable(() => tree.$.right.set(1));
+    undoable(() => tree.$.right(1));
     await flush();
     const manager = (tree as unknown as {
       __restoration: {

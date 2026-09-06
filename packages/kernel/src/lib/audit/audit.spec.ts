@@ -18,7 +18,7 @@ describe('audit (moved to core, RFC 0007)', () => {
     const log: AuditEntry<Data>[] = [];
     const stop = createAuditTracker(tree, log, { includePreviousValues: true });
 
-    tree.$.name.set('John');
+    tree.$.name('John');
     // NOTE: core signalTree has no `subscribe`, so the tracker uses its
     // polling fallback (100ms). Advance timers to let a poll run. (The
     // "zero-polling in Angular" claim only holds if the tree exposes

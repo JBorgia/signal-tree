@@ -34,7 +34,7 @@ try {
 } catch (error) {
   store.$.error.set(error); // application-owned presentation policy
 } finally {
-    store.$.loading.set(false);
+  store.$.loading.set(false);
 }`,
     },
   ];

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { globSync } from 'node:fs';
 
@@ -29,6 +30,19 @@ const expectedScripts = {
 };
 const violations = [];
 
+for (const script of [
+  'scripts/release-version.mjs',
+  'scripts/finalize-changelog.mjs',
+]) {
+  try {
+    execFileSync(process.execPath, [script, '--self-test'], {
+      stdio: 'pipe',
+    });
+  } catch {
+    violations.push(`${script}#self-test`);
+  }
+}
+
 for (const [file, expected] of expectedFiles) {
   if (readFileSync(file, 'utf8') !== expected) violations.push(file);
 }
@@ -55,6 +69,15 @@ if (
     'run: node scripts/publish-candidate.mjs --ci --prebuilt'
 ) {
   violations.push('.github/workflows/publish.yml');
+}
+
+const releaseWorkflow = readFileSync('.github/workflows/release.yml', 'utf8');
+if (
+  !releaseWorkflow.includes(
+    "prerelease: ${{ contains(needs.verify.outputs.tag_name, '-') }}"
+  )
+) {
+  violations.push('.github/workflows/release.yml#prerelease-metadata');
 }
 
 for (const file of [
@@ -84,4 +107,6 @@ if (violations.length > 0) {
   );
   process.exit(1);
 }
-console.log('Every registry publication path uses publish-candidate.mjs.');
+console.log(
+  'Registry publication is canonical and prerelease metadata is enforced.'
+);

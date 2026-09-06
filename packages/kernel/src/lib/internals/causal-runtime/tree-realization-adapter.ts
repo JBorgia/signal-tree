@@ -17,7 +17,7 @@ import { getTreeScalarSlotRuntime } from '../tree-scalar-slot-port';
 import { isTraversableNode } from '../../utils';
 import { visitTree } from '../visit-tree';
 import { markOwnerInvalidatedFrom } from '../owner-invalidation-port';
-import { getTreeRealization } from '../tree-realization';
+import { getLocationRuntime } from '../location-runtime';
 
 import type { ReversalEffect, ReversalRefusal } from './causal-types';
 import { normalizeScopedValuePath } from './scoped-value-addressing';
@@ -463,9 +463,9 @@ export function createTreeRealizationAdapter(
         }
       };
 
-      const scalarRealization = getTreeRealization(options.tree.$)?.scalarLeaf;
-      if (scalarRealization) {
-        scalarRealization.runInvalidationGroup(apply);
+      const locations = getLocationRuntime(options.tree.$);
+      if (locations) {
+        locations.runInvalidationGroup(apply);
       } else {
         apply();
       }
@@ -964,9 +964,9 @@ function planHeterogeneousFrame(
         markOwnerInvalidatedFrom(tree as object);
       };
 
-      const scalarRealization = getTreeRealization(tree.$)?.scalarLeaf;
-      if (scalarRealization) {
-        scalarRealization.runInvalidationGroup(commitAndPublish);
+      const locations = getLocationRuntime(tree.$);
+      if (locations) {
+        locations.runInvalidationGroup(commitAndPublish);
       } else if (scalarSlotRuntime) {
         scalarSlotRuntime.runInvalidationGroup(commitAndPublish);
       } else {

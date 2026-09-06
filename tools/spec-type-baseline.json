@@ -1,13 +1,10 @@
 {
-  "total": 238,
+  "total": 223,
   "files": {
     "packages/kernel/src/enhancers/batching/batching.spec.ts": 4,
     "packages/kernel/src/enhancers/devtools/devtools.spec.ts": 4,
-    "packages/kernel/src/enhancers/enhancer-cleanup.spec.ts": 1,
-    "packages/kernel/src/enhancers/restoration/restoration.spec.ts": 20,
+    "packages/kernel/src/enhancers/restoration/restoration.spec.ts": 18,
     "packages/kernel/src/enhancers/transactions/transactions.spec.ts": 12,
-    "packages/kernel/src/lib/declaration-extensibility-e0.spec.ts": 4,
-    "packages/kernel/src/lib/declaration-extensibility-e5-fork.spec.ts": 1,
     "packages/kernel/src/lib/enhancer-accumulation-survival.spec.ts": 1,
     "packages/kernel/src/lib/entity-array-diagnostic.spec.ts": 5,
     "packages/kernel/src/lib/entity-bare-array-hydrate.spec.ts": 5,
@@ -26,9 +23,9 @@
     "packages/kernel/src/lib/internals/causal-runtime/reversal-planner.spec.ts": 3,
     "packages/kernel/src/lib/internals/causal-runtime/structural-pending-rollback-composition.spec.ts": 4,
     "packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts": 20,
-    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts": 3,
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts": 1,
     "packages/kernel/src/lib/internals/tree-physical-substrate.spec.ts": 5,
-    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.spec.ts": 8,
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.spec.ts": 4,
     "packages/kernel/src/lib/marker-snapshot-memo.spec.ts": 15,
     "packages/kernel/src/lib/markers/marker-contract.spec.ts": 2,
     "packages/kernel/src/lib/mut-participation.spec.ts": 7,
@@ -39,7 +36,6 @@
     "packages/kernel/src/lib/snapshot-builder.spec.ts": 3,
     "packages/kernel/src/lib/traversal-diagnostics.spec.ts": 4,
     "packages/kernel/src/lib/types-schema.spec.ts": 1,
-    "packages/kernel/src/lib/unwrap-symbol-keys.spec.ts": 1,
     "packages/kernel/src/lib/update-and-report.spec.ts": 1
   }
 }

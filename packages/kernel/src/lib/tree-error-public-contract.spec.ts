@@ -78,8 +78,8 @@ describe('PUBLIC: attribution', () => {
 
     const la = link(a.$.settings.theme, { set: failing });
     const lb = link(b.$.settings.theme, { set: failing });
-    a.$.settings.theme.set('dark');
-    b.$.settings.theme.set('dark');
+    a.$.settings.theme('dark');
+    b.$.settings.theme('dark');
     await flush();
     await la.settled();
     await lb.settled();
@@ -100,10 +100,10 @@ describe('PUBLIC: attribution', () => {
     await flush();
     const l = link(tree.$.settings.theme, { set: failing });
 
-    tree.$.settings.theme.set('one');
+    tree.$.settings.theme('one');
     await flush();
     await l.settled();
-    tree.$.settings.theme.set('two');
+    tree.$.settings.theme('two');
     await flush();
     await l.settled();
 
@@ -120,7 +120,7 @@ describe('PUBLIC: delivery semantics', () => {
     const tree = makeTree();
     await flush();
     const l = link(tree.$.settings.theme, { set: failing });
-    tree.$.settings.theme.set('dark');
+    tree.$.settings.theme('dark');
     await flush();
     await l.settled();
 
@@ -149,13 +149,13 @@ describe('PUBLIC: delivery semantics', () => {
       },
     });
 
-    tree.$.settings.theme.set('dark');
+    tree.$.settings.theme('dark');
     await flush();
     await l.settled();
     expect(seen).toHaveLength(1);
 
     fail = false;
-    tree.$.settings.theme.set('blue');
+    tree.$.settings.theme('blue');
     await flush();
     await l.settled();
     expect(sent).toEqual(['blue']);
@@ -177,14 +177,14 @@ describe('PUBLIC: delivery semantics', () => {
     await flush();
     const l = link(tree.$.settings.theme, { set: failing });
 
-    tree.$.settings.theme.set('one');
+    tree.$.settings.theme('one');
     await flush();
     await l.settled();
     expect(a).toHaveLength(1);
     expect(b).toHaveLength(1);
 
     offA();
-    tree.$.settings.theme.set('two');
+    tree.$.settings.theme('two');
     await flush();
     await l.settled();
     expect(a).toHaveLength(1);
@@ -192,7 +192,7 @@ describe('PUBLIC: delivery semantics', () => {
 
     offB();
     // No listeners at all — nothing throws.
-    tree.$.settings.theme.set('three');
+    tree.$.settings.theme('three');
     await flush();
     await expect(l.settled()).resolves.toBeUndefined();
 
@@ -214,7 +214,7 @@ describe('PUBLIC: delivery semantics', () => {
       },
     });
 
-    tree.$.settings.theme.set('doomed');
+    tree.$.settings.theme('doomed');
     await flush();
     await expect(l.settled()).resolves.toBeUndefined();
 
@@ -222,7 +222,7 @@ describe('PUBLIC: delivery semantics', () => {
     expect(tree.$.settings.theme()).toBe('doomed');
 
     fail = false;
-    tree.$.settings.theme.set('recovered');
+    tree.$.settings.theme('recovered');
     await flush();
     await l.settled();
     expect(sent).toEqual(['recovered']);

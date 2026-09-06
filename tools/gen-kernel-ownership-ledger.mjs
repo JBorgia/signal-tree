@@ -38,11 +38,166 @@ const c = JSON.parse(
  *     KNOWN OWNER DOES NOT MEAN CONVERGED IMPLEMENTATION.
  */
 const RULINGS = {
-  // ── S1 — the ordinary-leaf carrier port ──────────────────────────────────
-  'bare-module:core/lib/internals/cell-runtime.ts': [
+  // ── UNIVERSAL LOCATIONS — kernel truth, framework observation ports ──────
+  'bare-module:core/lib/internals/location-runtime.ts': [
     'KERNEL',
     'CONVERGED',
-    'BM-A: the neutral leaf-carrier contract; bare-required and imports no framework',
+    'kernel-owned location values, dependency graph, equality and publication; bare-required and framework-free',
+  ],
+  'bare-module:core/lib/internals/observation-adapter.ts': [
+    'KERNEL',
+    'CONVERGED',
+    'neutral framework-observation port required by kernel-owned locations; implementation remains framework-owned',
+  ],
+  'state:lib/internals/location-runtime.ts:activeConsumer': [
+    'KERNEL',
+    'CONVERGED',
+    'active kernel derived-location dependency consumer',
+  ],
+  'state:lib/internals/location-runtime.ts:dependencyFinalizer': [
+    'KERNEL',
+    'CONVERGED',
+    'releases weak reverse dependency edges when derived locations are collected',
+  ],
+  'state:lib/internals/location-runtime.ts:publicationDepth': [
+    'KERNEL',
+    'CONVERGED',
+    'nested kernel publication depth for coherent derived settlement',
+  ],
+  'state:lib/internals/location-runtime.ts:pendingConsumers': [
+    'KERNEL',
+    'CONVERGED',
+    'pending kernel derived consumers awaiting dependency-ordered settlement',
+  ],
+  'state:lib/internals/location-runtime.ts:flushConsumers': [
+    'KERNEL',
+    'CONVERGED',
+    'dependency-ordered settlement of pending kernel derived locations',
+  ],
+  'state:lib/internals/location-runtime.ts:trackDependency': [
+    'KERNEL',
+    'CONVERGED',
+    'records kernel location dependencies and delegates only outer observation',
+  ],
+  'state:lib/internals/location-runtime.ts:notifyDependents': [
+    'KERNEL',
+    'CONVERGED',
+    'invalidates kernel dependency consumers after committed truth changes',
+  ],
+  'state:lib/internals/location-runtime.ts:notifyObservers': [
+    'KERNEL',
+    'CONVERGED',
+    'delivers framework invalidation and vanilla listeners without observer starvation',
+  ],
+  'state:lib/internals/location-runtime.ts:NODE_LOCATION_RUNTIMES': [
+    'KERNEL',
+    'CONVERGED',
+    'tree-node association with its construction-bound kernel location runtime',
+  ],
+  'state:lib/internals/location-runtime.ts:NEUTRAL_LOCATION_RUNTIME': [
+    'KERNEL',
+    'CONVERGED',
+    'framework-free default location runtime',
+  ],
+  'state:lib/internals/observation-adapter.ts:NEUTRAL_OBSERVATION_ADAPTER': [
+    'KERNEL',
+    'CONVERGED',
+    'neutral implementation of the framework-observation port',
+  ],
+  'state:lib/signal-tree.ts:createSignalTreeFactory': [
+    'KERNEL',
+    'CONVERGED',
+    'construction-bound factory creator for one observation adapter',
+  ],
+  'state:lib/signal-tree.ts:readWritableCell': [
+    'KERNEL',
+    'CONVERGED',
+    'non-tracking kernel read through Location.peek with structural fallback',
+  ],
+  'state:lib/utils.ts:isReactiveStateValue': [
+    'KERNEL',
+    'CONVERGED',
+    'kernel tree-cell classifier used by snapshot and unwrap traversal',
+  ],
+  'public-type:Location': [
+    'KERNEL',
+    'CONVERGED',
+    'universal writable location contract',
+  ],
+  'public-type:ReadonlyLocation': [
+    'KERNEL',
+    'CONVERGED',
+    'universal readable and subscribable location contract',
+  ],
+  'public-type:SignalTreeFactory': [
+    'KERNEL',
+    'CONVERGED',
+    'canonical construction overload set shared by every facade',
+  ],
+  'public-type:EntityNode': [
+    'DOMAIN-SPECIALIZATION',
+    'CONVERGED',
+    'entity subject node projected through universal locations',
+  ],
+  'public-type:ObservationAdapter': [
+    'KERNEL',
+    'CONVERGED',
+    'neutral adapter port for framework observation of kernel truth',
+  ],
+  'public-type:ObservationToken': [
+    'KERNEL',
+    'CONVERGED',
+    'neutral dependency-token port used by ObservationAdapter',
+  ],
+  'subpath:./adapter': [
+    'KERNEL',
+    'CONVERGED',
+    'minimal SDK for framework observation adapters and semantic ingress',
+  ],
+  'public:createSignalTreeFactory': [
+    'KERNEL',
+    'CONVERGED',
+    'binds a neutral observation adapter to canonical tree construction',
+  ],
+  'public:isNodeAccessor': [
+    'KERNEL',
+    'CONVERGED',
+    'kernel-owned branch identity guard exposed to adapters for collision-free location dispatch',
+  ],
+  'state:lib/internals/cell-identity.ts:CELL_MARK': [
+    'KERNEL',
+    'CONVERGED',
+    'nominal identity for runtime-minted and explicitly adopted universal locations',
+  ],
+  'public:observeOwnerInvalidation': [
+    'KERNEL',
+    'CONVERGED',
+    'adapter port for coherent owner-level invalidation',
+  ],
+  'public:readCanonicalSnapshot': [
+    'KERNEL',
+    'CONVERGED',
+    'adapter read of kernel-owned canonical whole-tree truth',
+  ],
+  'public:withRestorationDesignation': [
+    'OPTIONAL-CAPABILITY',
+    'CONVERGED',
+    'semantic ingress for framework-owned authored restoration intent',
+  ],
+  'orphan:enhancers/restoration/restoration.ts:shouldRunRestorationConsistencyChecks': [
+    'OPTIONAL-CAPABILITY',
+    'CONVERGED',
+    'restoration consistency-check policy with focused test consumers',
+  ],
+  'state:enhancers/restoration/restoration.ts:RUN_RESTORATION_CONSISTENCY_CHECKS': [
+    'OPTIONAL-CAPABILITY',
+    'CONVERGED',
+    'resolved restoration consistency-check policy',
+  ],
+  'state:enhancers/restoration/restoration.ts:process': [
+    'OPTIONAL-CAPABILITY',
+    'CONVERGED',
+    'optional Node environment input to restoration consistency diagnostics',
   ],
   // ── C6 / SERIALIZATION-REACTIVE-CLASSIFICATION-0 ─────────────────────────
   'angular-type:enhancers/serialization/serialization.ts': [
@@ -62,11 +217,6 @@ const RULINGS = {
     'CONVERGED',
     'S3 removed its only Angular VALUE import (untracked -> withoutTracking); the remaining WritableSignal reference is type-position and erases',
   ],
-  'bare-module:core/lib/internals/tracking-suppression.ts': [
-    'KERNEL',
-    'CONVERGED',
-    'BM-A: the neutral suppression port; bare-required and imports no framework',
-  ],
   // ── C6.4 — bare mixed-ownership dispositions, ADJUDICATED not mechanical ──
   // The derivation used `owners.length > 1 -> SPLIT`, which turned five modules
   // into five proposed file surgeries the moment corrected state provenance
@@ -83,18 +233,18 @@ const RULINGS = {
   // builds) rather than a real dependency.
   'bare-module:core/lib/utils.ts': [
     'KERNEL',
-    'SPLIT',
-    'SPLIT HELD: emits runtime signal/computed/isSignal AND Angular DI (effect, Injector, runInInjectionContext). The DI work is a genuinely different job from the bare-required kernel utilities beside it — a dependency boundary, not aesthetics',
+    'CONVERGED',
+    'framework observation and Angular DI moved to facade packages; this module now contains only kernel traversal and snapshot utilities',
   ],
   'bare-module:core/lib/signal-tree.ts': [
     'KERNEL',
-    'REIMPLEMENT',
-    'NOT split for diagnostics: its 32 ngDevMode guards are dev-only and its Angular coupling belongs to the kernel job itself (signal/isSignal/untracked/computed), so the fix is the C6 realization boundary, not file surgery',
+    'CONVERGED',
+    'universal LocationRuntime replaced framework signal/isSignal/untracked/computed dependencies',
   ],
   'bare-module:core/lib/internals/merge-derived.ts': [
     'KERNEL',
-    'REIMPLEMENT',
-    'NOT split: its only runtime framework coupling is isSignal, which the neutral isReactiveNode contract should absorb — re-evaluate after S2b',
+    'CONVERGED',
+    'derived recipes are realized by the kernel LocationRuntime with no framework predicate',
   ],
   'bare-module:core/lib/internals/materialize-markers.ts': [
     'KERNEL',
@@ -149,8 +299,8 @@ const RULINGS = {
   ],
   'bare-module:core/lib/internals/owned-mutation.ts': [
     'KERNEL',
-    'REIMPLEMENT',
-    'BM-A: every adjudicated job in lib/internals/owned-mutation.ts is KERNEL; the bare tree requires it',
+    'CONVERGED',
+    'intrinsic location mutation capture replaced framework tracking suppression',
   ],
   'bare-module:core/lib/internals/member-membership.ts': [
     'KERNEL',
@@ -217,11 +367,6 @@ const RULINGS = {
     'CONVERGED',
     'BM-A: every adjudicated job in lib/internals/path-observation-port.ts is KERNEL; the bare tree requires it',
   ],
-  'bare-module:core/lib/internals/materialization-realization.ts': [
-    'FRAMEWORK-ADAPTER',
-    'REIMPLEMENT',
-    'BM-C: every adjudicated job in lib/internals/materialization-realization.ts is framework runtime yet it is bare-reachable — the C6 handoff',
-  ],
   'bare-module:core/lib/internals/root-source.ts': [
     'KERNEL',
     'CONVERGED',
@@ -237,8 +382,8 @@ const RULINGS = {
     'CONVERGED',
     'BM-A: every adjudicated job in lib/write-context.ts is KERNEL; the bare tree requires it',
   ],
-  // ── BATCH 4A — module state (120 subjects), EXPLICIT PROVENANCE ──────────
-  // Generated by tools/state-ownership-registry.mjs. Every row is EXPLICIT:
+  // ── BATCH 4A — module state, EXPLICIT PROVENANCE ─────────────────────────
+  // This is the single state-ruling authority. Every row is EXPLICIT:
   // adjudicated per subject from its retained fact and its actual READERS
   // (`readerLocationsInFile`), which the evidence tool was extended to record.
   //
@@ -495,11 +640,6 @@ const RULINGS = {
     'CONVERGED',
     'EXPLICIT: private measured threshold for lazy cycle tracking in the kernel equality hot path; an implementation choice, not a public contract',
   ],
-  'state:lib/internals/cell-runtime.ts:installed': [
-    'KERNEL',
-    'CONVERGED',
-    'EXPLICIT: S1 — the installed ordinary-leaf carrier factory; undefined until a realization installs one, and signal-tree keeps a working fallback so leaf allocation never becomes contingent on an optional adapter',
-  ],
   'state:lib/internals/commit-consequence.ts:heldByKey': [
     'KERNEL',
     'CONVERGED',
@@ -544,11 +684,6 @@ const RULINGS = {
     'KERNEL',
     'CONVERGED',
     'EXPLICIT: onTreeError listener set — the frozen tree error boundary',
-  ],
-  'state:lib/internals/materialization-realization.ts:installed': [
-    'FRAMEWORK-ADAPTER',
-    'REIMPLEMENT',
-    'EXPLICIT: the installed realization boundary — a named C6 action',
   ],
   'state:lib/internals/materialize-markers.ts:applyMemberValue': [
     'KERNEL',
@@ -634,11 +769,6 @@ const RULINGS = {
     'KERNEL',
     'CONVERGED',
     'EXPLICIT: callable-signal protocol key',
-  ],
-  'state:lib/internals/observation-substrate.ts:ARM': [
-    'KERNEL',
-    'CONVERGED',
-    'EXPLICIT: read by installDormantObservation/claimLeaf',
   ],
   'state:lib/internals/observation-substrate.ts:OBSERVATION': [
     'KERNEL',
@@ -730,11 +860,6 @@ const RULINGS = {
       'CONVERGED',
       'EXPLICIT: tree-scoped restoration claim index key',
     ],
-  'state:lib/internals/tracking-suppression.ts:installed': [
-    'KERNEL',
-    'CONVERGED',
-    'EXPLICIT: the installed tracking-suppression implementation; undefined until a realization installs one, and the undefined default is correct for a runtime with no dependency tracking',
-  ],
   'state:lib/internals/tree-capabilities.ts:canonicalizeCapabilities': [
     'KERNEL',
     'CONVERGED',
@@ -749,11 +874,6 @@ const RULINGS = {
     'KERNEL',
     'CONVERGED',
     'EXPLICIT: capability ordering table',
-  ],
-  'state:lib/internals/tree-location.ts:FUNCTION_VALUE': [
-    'KERNEL',
-    'CONVERGED',
-    'EXPLICIT: callable-value marker for the location grammar',
   ],
   'state:lib/internals/tree-scalar-slot-angular-runtime.ts:TREE_SCALAR_SLOT_RUNTIME':
     [

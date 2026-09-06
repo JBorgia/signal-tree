@@ -26,8 +26,9 @@ describe('Schema-level type tests', () => {
     // $.count should be callable (returns number)
     expectTypeOf(tree.$.count).toBeFunction();
 
-    // $.count.set should exist
-    expectTypeOf(tree.$.count.set).toBeFunction();
+    // $.count accepts whole-value and updater calls
+    expectTypeOf(tree.$.count).toBeCallableWith(1);
+    expectTypeOf(tree.$.count).toBeCallableWith((current: number) => current + 1);
 
     // tree.destroy should exist
     expectTypeOf(tree.destroy).toBeFunction();

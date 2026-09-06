@@ -17,35 +17,36 @@ while the packages shipped 13.x. Don't reintroduce it; link the changelog instea
 - Causal transitions distinguish authored operations from external truth
 - Coherent multi-location commits with stable entity identity and explicit authority
 - Recursive typing with deep nesting and accurate type inference
-- Compile-backed exact leaf typing through the declared 15-branch demo model
+- Generated exact-leaf inference proofs for every selectable demo depth from 1 through 40
 - Memory efficiency via proportional causal history and explicit ownership lifetimes
-- Three focused packages with strong TypeScript support
+- Four focused packages with strong TypeScript support
 - Extensible via the declared `enhancers` set
 
 ## Core capabilities
 
-- Hierarchical signal trees with type-safe access and updates
-- Framework-neutral causal semantics realized by Angular and React packages
+- Hierarchical location trees with type-safe access and updates
+- Framework-neutral causal semantics observed by Angular, React, and Vue packages
 - Deterministic resource release through `destroy()`
 - Tree-shakeable: unused enhancers are eliminated by modern bundlers
 
 ## Package ecosystem
 
-SignalTree 15 has three public packages:
+SignalTree 15 has four public packages:
 
 - **`@signal-tree/kernel`**: framework-neutral state, EntityMap, links,
   restoration, batching, transactions, and DevTools
-- **`@signal-tree/angular`**: Angular-native realization and `defineStore`
+- **`@signal-tree/angular`**: native Angular signal leaves and `defineStore`
 - **`@signal-tree/react`**: owner-bound React observation
+- **`@signal-tree/vue`**: native Vue ref leaves and computed derivations
 
 ## Technical specifications
 
-- Angular 20, 21, or 22 (see `peerDependencies`), TypeScript 5.5+, Node 18.17+ (development)
+- Angular 20, 21, or 22 (see `peerDependencies`), TypeScript 5.5+, Node 24.3.0 (development; see `.nvmrc`)
 - Browser: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
 - Tree-shakeable, own code only, gzip (measured by
   `tools/check-bundle-budget.mjs`, esbuild + minify, Angular/RxJS external).
-  Production budgets are 9.7 KB for a bare tree and 21.7 KB with EntityMap;
-  development budgets are 11.9 KB and 24.4 KB. The generator reports current
+  Production budgets are 10.0 KB for a bare tree and 22.1 KB with EntityMap;
+  development budgets are 12.2 KB and 24.8 KB. The generator reports current
   measured values and enforces both ceilings; see
   [dropping dev code](performance/dropping-dev-code.md).
 - Performance targets: operations maintain sub‑millisecond times across common depths
@@ -74,8 +75,9 @@ the generator while the absolutes barely shift. That is the same instability the
 ST2018 multiplier was deleted for; quoting a midpoint here would have repeated
 the mistake one section after documenting it. The tool prints the spread.
 
-A direct leaf write (`tree.$.a.b.c.set(v)`) does not walk the path at all and
-measures at timer resolution, so the tool reports it but declines to quote it.
+A direct Angular leaf write (`tree.$.a.b.c.set(v)`) does not walk the path at
+all and measures at timer resolution, so the tool reports it but declines to
+quote it.
 
 > Replaced a "Performance targets (Sept 2025)" table for 14.0.0. It claimed
 > 0.041 / 0.061 / 0.092 / 0.104 ms at these depths and **nothing in the repo

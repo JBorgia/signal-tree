@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 // and kept returning its first value. The law under test is the kernel's, so
 // the observer is the kernel's too.
 //     MOVE FRAMEWORK ASSERTIONS. KEEP SEMANTIC ASSERTIONS WITH THEIR OWNER.
-import { NEUTRAL_DERIVED_RUNTIME } from '../derived-runtime';
+import { NEUTRAL_LOCATION_RUNTIME } from '../location-runtime';
 
 import { createEntitySignal } from '../../entity-signal';
 import type { PositionId } from '../../types';
@@ -109,7 +109,7 @@ describe('subject reclamation coordinator', () => {
     }
 
     let runs = 0;
-    const observedName = NEUTRAL_DERIVED_RUNTIME.createDerived(() => {
+    const observedName = NEUTRAL_LOCATION_RUNTIME.createDerived(() => {
       runs++;
       return heldName() ?? 'absent';
     });

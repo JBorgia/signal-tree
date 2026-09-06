@@ -14,17 +14,16 @@ import type { EntityMapMarker } from '@signal-tree/angular';
 /**
  * Effect Reactivity Test Component
  *
- * This component verifies that SignalTree signals properly trigger Angular's effect() re-runs.
+ * This component verifies that SignalTree locations trigger Angular effects.
  * It replicates the pattern used in the v3 trax-mobile app.
  *
  * VERIFIED BEHAVIOR (when installed via npm):
  * - Regular Angular signals: Effects RE-RUN ✅
- * - SignalTree signals: Effects RE-RUN ✅
+ * - SignalTree locations through the Angular adapter: Effects RE-RUN ✅
  *
  * NOTE: When using pnpm link for local development, you may encounter a "dual Angular
- * instance" issue where SignalTree's signals are created with a different @angular/core
- * than the consuming app. This causes Angular's isSignal() to return false for SignalTree
- * signals, breaking effect() reactivity. The solution is to:
+ * instance" issue where the adapter's observation tokens use a different
+ * @angular/core than the consuming app, breaking effect() reactivity. The solution is to:
  *   1. Install from npm (recommended)
  *   2. Match Angular versions between workspaces
  *   3. Use pnpm overrides to force resolution

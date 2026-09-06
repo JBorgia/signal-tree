@@ -116,20 +116,142 @@ test('/batching: grouped writes publish once without intermediate observations',
 
   await page.getByRole('button', { name: 'Run unbatched' }).click();
   await expect(page.locator('.timeline-entry')).toHaveCount(3);
-  await expect(page.locator('.run-metrics > div').nth(1).locator('dd')).toHaveText(
-    '3'
-  );
-  await expect(page.locator('.run-metrics > div').nth(2).locator('dd')).toHaveText(
-    '2'
-  );
+  await expect(
+    page.locator('.run-metrics > div').nth(1).locator('dd')
+  ).toHaveText('3');
+  await expect(
+    page.locator('.run-metrics > div').nth(2).locator('dd')
+  ).toHaveText('2');
 
   await page.getByRole('button', { name: 'Run batched' }).click();
   await expect(page.locator('.timeline-entry')).toHaveCount(1);
   await expect(page.locator('.timeline-entry')).toHaveClass(/--coherent/);
-  await expect(page.locator('.run-metrics > div').nth(1).locator('dd')).toHaveText(
-    '1'
+  await expect(
+    page.locator('.run-metrics > div').nth(1).locator('dd')
+  ).toHaveText('1');
+  await expect(
+    page.locator('.run-metrics > div').nth(2).locator('dd')
+  ).toHaveText('0');
+});
+
+test('/why-causality: one snapshot reveals distinct identity histories', async ({
+  page,
+}) => {
+  await page.goto('/why-causality', { waitUntil: 'load' });
+
+  await expect(page.locator('.snapshot-line code')).toHaveText(
+    'order.status = "approved"'
   );
-  await expect(page.locator('.run-metrics > div').nth(2).locator('dd')).toHaveText(
-    '0'
+  await page.getByRole('radio', { name: 'Identity' }).check();
+  await expect(page.locator('.snapshot-line code')).toHaveText(
+    'queue = [B, A, C]'
+  );
+  await expect(page.locator('.history-comparison')).toContainText(
+    'The same subjects were reordered'
+  );
+  await expect(page.locator('.history-comparison')).toContainText(
+    'Old rows were replaced by lookalikes'
+  );
+});
+
+test('/why-causality: public incidents keep their counterfactual boundaries', async ({
+  page,
+}) => {
+  await page.goto('/why-causality#incident-ledger', { waitUntil: 'load' });
+
+  await expect(page.locator('.incident-story')).toHaveCount(3);
+  await expect(page.locator('.incident-disclaimer')).toContainText(
+    'Counterfactuals, not attribution.'
+  );
+  await expect(page.locator('.incident-story__scale')).toContainText([
+    '$460M loss in 45 minutes',
+    '$1.8B loan · unintended early repayment',
+    '43 seconds → 24h 11m degradation',
+  ]);
+  const sourceLinks = page.locator('.incident-story a');
+  await expect(sourceLinks).toHaveCount(3);
+  await expect(
+    sourceLinks.evaluateAll((links) =>
+      links.map((link) => ({
+        href: link.getAttribute('href'),
+        target: link.getAttribute('target'),
+        rel: link.getAttribute('rel'),
+      }))
+    )
+  ).resolves.toEqual([
+    {
+      href: 'https://www.sec.gov/newsroom/press-releases/2013-222',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
+    {
+      href: 'https://cases.justia.com/federal/appellate-courts/ca2/21-487/21-487-2022-09-08.pdf?ts=1662663612',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
+    {
+      href: 'https://github.blog/news-insights/company-news/oct21-post-incident-analysis/',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
+  ]);
+  await expect(page.locator('#closing-title')).toHaveText(
+    "What are you losing that you don't even know about?"
+  );
+});
+
+test('/why-causality: section index clears the fixed mobile header', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/why-causality', { waitUntil: 'load' });
+
+  const targets = await page
+    .locator('.page-index a')
+    .evaluateAll((links) =>
+      links.map((link) => new URL((link as HTMLAnchorElement).href).hash)
+    );
+
+  for (const target of targets) {
+    expect(target).toMatch(/^#[a-z-]+$/);
+    await page.locator(`.page-index a[href$="${target}"]`).click();
+
+    const top = await page
+      .locator(target)
+      .evaluate((element) => Math.round(element.getBoundingClientRect().top));
+    expect(top).toBeGreaterThanOrEqual(64);
+  }
+});
+
+test('/deep-typing: selected compiled depth generates and passes runtime checks', async ({
+  page,
+}) => {
+  await page.goto('/deep-typing', { waitUntil: 'load' });
+
+  const depth = page.getByRole('spinbutton', {
+    name: 'Depth to generate and test',
+  });
+  const generate = page.getByRole('button', { name: 'Generate and test' });
+
+  await expect(depth).toHaveValue('15');
+  await depth.fill('32');
+  await generate.click();
+
+  await expect(
+    page.getByRole('heading', { name: 'The depth 32 path' })
+  ).toBeVisible();
+  await expect(page.locator('.path-ledger li')).toHaveCount(32);
+  await expect(page.locator('.live-result output')).toContainText(
+    'Depth 32 generated from a compiled fixture; runtime read/write passed.'
+  );
+
+  await page.getByRole('button', { name: 'Toggle deepest status' }).click();
+  await expect(page.locator('.result-values dd').first()).toHaveText('review');
+
+  await depth.fill('41');
+  await expect(depth).toHaveAttribute('aria-invalid', 'true');
+  await expect(generate).toBeDisabled();
+  await expect(page.locator('#typing-depth-help')).toHaveText(
+    'Enter a whole number from 1 to 40.'
   );
 });

@@ -196,7 +196,7 @@ describe('LINK-2 case 3: a rejected outbound set() is observable', () => {
       set: () => Promise.reject(new Error('endpoint down')),
     });
 
-    tree.$.leaf.set('doomed');
+    tree.$.leaf('doomed');
     await flush();
     await link.settled();
     link.dispose();
@@ -234,11 +234,11 @@ describe('LINK-2 case 3: a rejected outbound set() is observable', () => {
       },
     });
 
-    tree.$.leaf.set('first');
+    tree.$.leaf('first');
     await flush();
     await link.settled();
     fail = false;
-    tree.$.leaf.set('second');
+    tree.$.leaf('second');
     await flush();
     await link.settled();
     link.dispose();
@@ -284,7 +284,7 @@ describe('LINK-2 case 2: is settled() earned, or convenience?', () => {
       set: (v) => void store.set('leaf', v), // localStorage shape: returns void
     });
 
-    tree.$.leaf.set('v1');
+    tree.$.leaf('v1');
     await flush();
 
     // No `await settled()`. The value is already durable, because the endpoint
@@ -308,7 +308,7 @@ describe('LINK-2 case 2: is settled() earned, or convenience?', () => {
         ),
     });
 
-    tree.$.leaf.set('v1');
+    tree.$.leaf('v1');
     await flush();
 
     // The window is real, and a host about to be suspended cannot see it

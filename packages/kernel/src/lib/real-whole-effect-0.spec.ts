@@ -87,8 +87,8 @@ type Rows = {
   upsertOne(r: Row): void;
   setAll(r: Row[]): void;
   byIdOrFail(id: string): {
-    name: { (): string; set(v: string): void };
-    n: { (): number; set(v: number): void };
+    name: { (value: string): void; (update: (current: string) => string): void; (): string };
+    n: { (value: number): void; (update: (current: number) => number): void; (): number };
   };
   ids(): string[];
 };
@@ -151,7 +151,7 @@ describe('REAL-WHOLE-EFFECT-0: whole-entity ops decompose into field effects', (
     // not, because the effects are per-field.
     const p = tree.transaction(() => tree.$.rows.updateOne('r1', { n: 99 }));
     await flush();
-    tree.$.rows.byIdOrFail('r1').name.set('written-outside');
+    tree.$.rows.byIdOrFail('r1').name('written-outside');
     await flush();
 
     p.rollback();

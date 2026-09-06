@@ -10,6 +10,7 @@ import {
   resetProductionSubstrateStatsForTesting,
 } from '../../lib/internals/production-substrate-stats';
 import { signalTree } from '../../lib/signal-tree';
+import type { Location } from '../../lib/internals/cell-runtime';
 import { SignalTreeRollbackError } from '../../lib/types';
 import { transactions } from '../transactions/transactions';
 import {
@@ -93,7 +94,7 @@ describe('restoration enhancer', () => {
     );
 
     try {
-      undoable(() => tree.$.value.set(1));
+      undoable(() => tree.$.value(1));
       await Promise.resolve();
       const manager = (
         tree as unknown as {
@@ -140,8 +141,8 @@ describe('restoration enhancer', () => {
     // Two designated writes land in one notifier flush and therefore produce
     // one history entry containing the final value.
     undoable(() => {
-      store.$.count.set(1);
-      store.$.count.set(2);
+      store.$.count(1);
+      store.$.count(2);
     });
 
     // Allow microtask flush
@@ -168,12 +169,12 @@ describe('restoration enhancer', () => {
     const notifier = getPathNotifier();
     const unsubscribe = notifier.subscribe('count', (value) => {
       if (value === 1) {
-        undoable(() => store.$.count.set(2));
+        undoable(() => store.$.count(2));
       }
     });
 
     try {
-      undoable(() => store.$.count.set(1));
+      undoable(() => store.$.count(1));
       notifier.flushSync();
 
       expect(store.$.count()).toBe(2);
@@ -186,7 +187,7 @@ describe('restoration enhancer', () => {
     }
   });
 
-  it('records history when a top-level leaf signal is written via .set()', async () => {
+  it('records history when a top-level location is replaced directly', async () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
@@ -197,7 +198,7 @@ describe('restoration enhancer', () => {
     const t = (store as any).__restoration;
     const initial = t.getRestorationHistory().length;
 
-    undoable(() => (store as any).$.count.set(5));
+    undoable(() => (store as any).$.count(5));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -207,7 +208,7 @@ describe('restoration enhancer', () => {
     expect(history[history.length - 1].state).toEqual({ count: 5 });
   });
 
-  it('records history when a nested leaf signal is written via .set()', async () => {
+  it('records history when a nested location is replaced directly', async () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
@@ -218,7 +219,7 @@ describe('restoration enhancer', () => {
     const t = (store as any).__restoration;
     const initial = t.getRestorationHistory().length;
 
-    undoable(() => (store as any).$.user.profile.name.set('Grace'));
+    undoable(() => (store as any).$.user.profile.name('Grace'));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -316,7 +317,7 @@ describe('restoration enhancer', () => {
     const baselineHistory = t.getRestorationHistory().length;
 
     const pending = store.transaction(() => {
-      undoable(() => store.$.inside.set('grouped'));
+      undoable(() => store.$.inside('grouped'));
     });
 
     expect(store.$().inside).toBe('grouped');
@@ -348,10 +349,10 @@ describe('restoration enhancer', () => {
     const baselineHistory = t.getRestorationHistory().length;
 
     const pending = store.transaction(() => {
-      undoable(() => store.$.inside.set('grouped'));
+      undoable(() => store.$.inside('grouped'));
     });
 
-    undoable(() => store.$.outside.set('later'));
+    undoable(() => store.$.outside('later'));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -386,9 +387,9 @@ describe('restoration enhancer', () => {
 
     expect(() =>
       store.transaction(() => {
-        undoable(() => store.$.count.set(1));
+        undoable(() => store.$.count(1));
         store.transaction(() => {
-          undoable(() => store.$.count.set(2));
+          undoable(() => store.$.count(2));
         });
       })
     ).toThrow(/nested transaction/i);
@@ -416,8 +417,8 @@ describe('restoration enhancer', () => {
 
     expect(() =>
       store.transaction(() => {
-        undoable(() => store.$.left.set('L'));
-        undoable(() => store.$.right.set('R'));
+        undoable(() => store.$.left('L'));
+        undoable(() => store.$.right('R'));
         throw new Error('boom');
       })
     ).toThrow('boom');
@@ -441,10 +442,10 @@ describe('restoration enhancer', () => {
     t.resetRestorationHistory();
 
     const pending = store.transaction(() => {
-      undoable(() => store.$.x.set('pending'));
+      undoable(() => store.$.x('pending'));
     });
 
-    undoable(() => store.$.y.set('confirmed-later'));
+    undoable(() => store.$.y('confirmed-later'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -483,10 +484,10 @@ describe('restoration enhancer', () => {
     const applySpy = vi.spyOn(realizationPort, 'applyAtomically');
 
     const pending = store.transaction(() => {
-      undoable(() => store.$.a.x.set(10));
+      undoable(() => store.$.a.x(10));
     });
 
-    undoable(() => store.$.b.y.set(20));
+    undoable(() => store.$.b.y(20));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -514,10 +515,10 @@ describe('restoration enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      undoable(() => store.$.profile.name.set('Jon'));
+      undoable(() => store.$.profile.name('Jon'));
     });
 
-    undoable(() => store.$.profile.email.set('new@example.com'));
+    undoable(() => store.$.profile.email('new@example.com'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -542,10 +543,10 @@ describe('restoration enhancer', () => {
     const t = (store as any).__restoration;
 
     const pending = store.transaction(() => {
-      undoable(() => store.$.x.set('B'));
+      undoable(() => store.$.x('B'));
     });
 
-    undoable(() => store.$.x.set('C'));
+    undoable(() => store.$.x('C'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -569,10 +570,10 @@ describe('restoration enhancer', () => {
     const t = (store as any).__restoration;
 
     const pending = store.transaction(() => {
-      undoable(() => store.$.x.set(20));
+      undoable(() => store.$.x(20));
     });
 
-    undoable(() => store.$.x.update((value) => (value as number) + 5));
+    undoable(() => store.$.x((value) => (value as number) + 5));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -595,10 +596,10 @@ describe('restoration enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      undoable(() => store.$.x.set(20));
+      undoable(() => store.$.x(20));
     });
 
-    undoable(() => store.$.x.set(25));
+    undoable(() => store.$.x(25));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -617,10 +618,10 @@ describe('restoration enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      undoable(() => store.$.x.set(20));
+      undoable(() => store.$.x(20));
     });
 
-    undoable(() => store.$.x.update((value) => (value as number) + 5));
+    undoable(() => store.$.x((value) => (value as number) + 5));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -640,11 +641,11 @@ describe('restoration enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      undoable(() => store.$.x.set(20));
+      undoable(() => store.$.x(20));
     });
 
-    undoable(() => store.$.x.set(100));
-    undoable(() => store.$.x.update((value) => (value as number) + 5));
+    undoable(() => store.$.x(100));
+    undoable(() => store.$.x((value) => (value as number) + 5));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -663,11 +664,11 @@ describe('restoration enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      undoable(() => store.$.x.set(20));
+      undoable(() => store.$.x(20));
     });
 
-    undoable(() => store.$.x.update((value) => (value as number) + 5));
-    undoable(() => store.$.x.set(100));
+    undoable(() => store.$.x((value) => (value as number) + 5));
+    undoable(() => store.$.x(100));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -686,11 +687,11 @@ describe('restoration enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      undoable(() => store.$.x.set(20));
+      undoable(() => store.$.x(20));
     });
 
-    undoable(() => store.$.x.set(100));
-    undoable(() => store.$.x.set(105));
+    undoable(() => store.$.x(100));
+    undoable(() => store.$.x(105));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -709,11 +710,11 @@ describe('restoration enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      undoable(() => store.$.x.set(20));
+      undoable(() => store.$.x(20));
     });
 
-    undoable(() => store.$.x.update((value) => (value as number) + 5));
-    undoable(() => store.$.x.update((value) => (value as number) + 7));
+    undoable(() => store.$.x((value) => (value as number) + 5));
+    undoable(() => store.$.x((value) => (value as number) + 7));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -741,7 +742,7 @@ describe('restoration enhancer', () => {
       });
     });
 
-    undoable(() => store.$.count.set(30));
+    undoable(() => store.$.count(30));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -773,7 +774,7 @@ describe('restoration enhancer', () => {
       undoable(() => store.$.rows.addOne({ id: 17, name: 'pending' }));
     });
 
-    undoable(() => store.$.rows.byIdOrFail(18).name.set('later'));
+    undoable(() => store.$.rows.byIdOrFail(18).name('later'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -800,7 +801,7 @@ describe('restoration enhancer', () => {
       undoable(() => store.$.rows.addOne({ id: 17, name: 'pending' }));
     });
 
-    undoable(() => store.$.rows.byIdOrFail(17).name.set('later'));
+    undoable(() => store.$.rows.byIdOrFail(17).name('later'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -830,7 +831,7 @@ describe('restoration enhancer', () => {
       undoable(() => store.$.rows.addOne({ id: 17, name: 'pending' }));
     });
 
-    undoable(() => store.$.rows.byIdOrFail(17).name.update((value) => `${value}-updated`));
+    undoable(() => store.$.rows.byIdOrFail(17).name((value) => `${value}-updated`));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -871,7 +872,7 @@ describe('restoration enhancer', () => {
       undoable(() => store.$.rows.removeOne(17));
     });
 
-    undoable(() => store.$.rows.byIdOrFail(18).name.set('later'));
+    undoable(() => store.$.rows.byIdOrFail(18).name('later'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -987,7 +988,7 @@ describe('restoration enhancer', () => {
       undoable(() => store.$.rows.changeId(7, 42));
     });
 
-    undoable(() => store.$.rows.byIdOrFail(18).name.set('later'));
+    undoable(() => store.$.rows.byIdOrFail(18).name('later'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1020,13 +1021,13 @@ describe('restoration enhancer', () => {
     const baseline = t.getTurns().length;
     const baselineHistory = t.getRestorationHistory().length;
 
-    undoable(() => store.$.status.set('queued-before'));
+    undoable(() => store.$.status('queued-before'));
 
     const pending = store.transaction(() => {
       undoable(() => store.$.rows.addOne({ id: 17, name: 'pending' }));
     });
 
-    undoable(() => store.$.other.set('queued-after'));
+    undoable(() => store.$.other('queued-after'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1089,7 +1090,7 @@ describe('restoration enhancer', () => {
     const baseline = t.getTurns().length;
     const baselineHistory = t.getRestorationHistory().length;
 
-    undoable(() => store.$.a.set(1));
+    undoable(() => store.$.a(1));
 
     expect(() =>
       store.transaction(() => {
@@ -1134,7 +1135,7 @@ describe('restoration enhancer', () => {
       undoable(() => store.$.rows.changeId(7, 42));
     });
 
-    undoable(() => store.$.rows.byIdOrFail(42).name.set('later'));
+    undoable(() => store.$.rows.byIdOrFail(42).name('later'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1158,12 +1159,12 @@ describe('restoration enhancer', () => {
         }),
       },
       { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
-    ) as {
+    ) as unknown as {
       $: {
         rows: {
           addOne(row: { id: number; name: string }): void;
           changeId(from: number, to: number): void;
-          byIdOrFail(id: number): { name: { set(value: string): void } };
+          byIdOrFail(id: number): { name(value: string): void };
         };
       };
       transaction(fn: () => void): { confirm(): void; rollback(): void };
@@ -1182,7 +1183,7 @@ describe('restoration enhancer', () => {
 
     store.transaction(() => {
       undoable(() => store.$.rows.changeId(7, 42));
-      undoable(() => store.$.rows.byIdOrFail(42).name.set('stable'));
+      undoable(() => store.$.rows.byIdOrFail(42).name('stable'));
     });
 
     expect(
@@ -1210,13 +1211,13 @@ describe('restoration enhancer', () => {
         enhancers: [transactions(), restoration()],
         capabilities: ['causal-runtime'],
       }
-    ) as {
+    ) as unknown as {
       $: {
         rows: {
           addOne(row: { id: number; name: string }): void;
           changeId(from: number, to: number): void;
           byIdOrFail(id: number): {
-            name: { (): string; set(value: string): void };
+            name: { (value: string): void; (update: (current: string) => string): void; (): string };
           };
           ids(): number[];
         };
@@ -1249,7 +1250,7 @@ describe('restoration enhancer', () => {
 
     const pending = store.transaction(() => {
       undoable(() => store.$.rows.changeId(7, 42));
-      undoable(() => store.$.rows.byIdOrFail(42).name.set('stable'));
+      undoable(() => store.$.rows.byIdOrFail(42).name('stable'));
     });
 
     expect(store.$.rows.ids()).toEqual([42]);
@@ -1311,7 +1312,7 @@ describe('restoration enhancer', () => {
       undoable(() => store.$.rows.changeId(7, 42));
     });
 
-    undoable(() => store.$.rows.byIdOrFail(42).name.update((value) => `${value}-updated`));
+    undoable(() => store.$.rows.byIdOrFail(42).name((value) => `${value}-updated`));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1526,14 +1527,14 @@ describe('restoration enhancer', () => {
     );
 
     const confirmed = store.transaction(() => {
-      undoable(() => store.$.value.set('confirmed'));
+      undoable(() => store.$.value('confirmed'));
     });
     confirmed.confirm();
     confirmed.confirm();
     expect(store.$()).toEqual({ value: 'confirmed' });
 
     const rolledBack = store.transaction(() => {
-      undoable(() => store.$.value.set('rolled-back'));
+      undoable(() => store.$.value('rolled-back'));
     });
     rolledBack.rollback();
     rolledBack.rollback();
@@ -1547,13 +1548,13 @@ describe('restoration enhancer', () => {
     );
 
     const confirmed = store.transaction(() => {
-      undoable(() => store.$.value.set('confirmed'));
+      undoable(() => store.$.value('confirmed'));
     });
     confirmed.confirm();
     expect(() => confirmed.rollback()).toThrow(/confirmed transaction/i);
 
     const rolledBack = store.transaction(() => {
-      undoable(() => store.$.value.set('rolled-back'));
+      undoable(() => store.$.value('rolled-back'));
     });
     rolledBack.rollback();
     expect(() => rolledBack.confirm()).toThrow(/rolled back transaction/i);
@@ -1736,8 +1737,8 @@ describe('restoration enhancer', () => {
 
     t.resetRestorationHistory();
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
-    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId(7));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -1747,7 +1748,7 @@ describe('restoration enhancer', () => {
       __positionIds?: number[];
     };
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('released'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('released'));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -1810,8 +1811,8 @@ describe('restoration enhancer', () => {
 
     t.resetRestorationHistory();
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
-    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId(7));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -1823,8 +1824,8 @@ describe('restoration enhancer', () => {
     const driverPositionId = firstTurn.__positionIds?.[0] as number;
     const truckPositionId = firstTurn.__positionIds?.[1] as number;
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('loading'));
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('loading'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('queued'));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -1837,7 +1838,7 @@ describe('restoration enhancer', () => {
       (positionId: number) => positionId !== driverPositionId
     ) as number;
 
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('dispatched'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('dispatched'));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -1846,7 +1847,7 @@ describe('restoration enhancer', () => {
       id: number;
     };
 
-    undoable(() => store.$.depots.byIdOrFail(5).status.set('busy'));
+    undoable(() => store.$.depots.byIdOrFail(5).status('busy'));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -1914,8 +1915,8 @@ describe('restoration enhancer', () => {
 
     t.resetRestorationHistory();
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
-    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId(7));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1926,13 +1927,13 @@ describe('restoration enhancer', () => {
     const driverPositionId = firstTurn.__positionIds?.[0] as number;
     const truckPositionId = firstTurn.__positionIds?.[1] as number;
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('released'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('released'));
     await Promise.resolve();
     await Promise.resolve();
 
     const secondTurn = t.getTurns().at(-1) as { id: number };
 
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('queued'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1986,8 +1987,8 @@ describe('restoration enhancer', () => {
 
     t.resetRestorationHistory();
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
-    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId(7));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1996,7 +1997,7 @@ describe('restoration enhancer', () => {
       __positionIds?: number[];
     };
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('released'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('released'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2061,8 +2062,8 @@ describe('restoration enhancer', () => {
 
     t.resetRestorationHistory();
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
-    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId(7));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -2070,8 +2071,8 @@ describe('restoration enhancer', () => {
       __positionIds?: number[];
     };
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('loading'));
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('loading'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -2083,7 +2084,7 @@ describe('restoration enhancer', () => {
         positionId !== (firstTurn.__positionIds?.[0] as number)
     ) as number;
 
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('dispatched'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('dispatched'));
     await Promise.resolve();
     await Promise.resolve();
     const thirdTurn = t.getTurns().at(-1) as { id: number };
@@ -2145,8 +2146,8 @@ describe('restoration enhancer', () => {
 
     t.resetRestorationHistory();
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
-    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId(7));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -2155,8 +2156,8 @@ describe('restoration enhancer', () => {
     };
     const truckPositionId = firstTurn.__positionIds?.[1] as number;
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('loading'));
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('loading'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -2164,8 +2165,8 @@ describe('restoration enhancer', () => {
       __positionIds?: number[];
     };
 
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('dispatched'));
-    undoable(() => store.$.depots.byIdOrFail(5).status.set('busy'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('dispatched'));
+    undoable(() => store.$.depots.byIdOrFail(5).status('busy'));
     await Promise.resolve();
     await Promise.resolve();
     const thirdTurn = t.getTurns().at(-1) as {
@@ -2181,7 +2182,7 @@ describe('restoration enhancer', () => {
         ) as number)
     ) as number;
 
-    undoable(() => store.$.yards.byIdOrFail(2).status.set('occupied'));
+    undoable(() => store.$.yards.byIdOrFail(2).status('occupied'));
     await Promise.resolve();
     await Promise.resolve();
     const fourthTurn = t.getTurns().at(-1) as {
@@ -2242,8 +2243,8 @@ describe('restoration enhancer', () => {
 
     t.resetRestorationHistory();
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
-    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId(7));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -2252,8 +2253,8 @@ describe('restoration enhancer', () => {
     };
     const firstPositionIds = firstTurn.__positionIds ?? [];
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('loading'));
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('loading'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -2268,7 +2269,7 @@ describe('restoration enhancer', () => {
       (positionId: number) => !firstPositionIds.includes(positionId)
     ) as number;
 
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('dispatched'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('dispatched'));
     await Promise.resolve();
     await Promise.resolve();
     const thirdTurn = t.getTurns().at(-1) as { id: number };
@@ -2278,7 +2279,7 @@ describe('restoration enhancer', () => {
       secondTurn.id,
     ]);
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('staged'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('staged'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2325,8 +2326,8 @@ describe('restoration enhancer', () => {
 
     t.resetRestorationHistory();
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
-    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId(7));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -2335,8 +2336,8 @@ describe('restoration enhancer', () => {
     };
     const driverPositionId = firstTurn.__positionIds?.[0] as number;
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('loading'));
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('loading'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -2347,7 +2348,7 @@ describe('restoration enhancer', () => {
       (positionId: number) => positionId !== driverPositionId
     ) as number;
 
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('dispatched'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('dispatched'));
     await Promise.resolve();
     await Promise.resolve();
     const thirdTurn = t.getTurns().at(-1) as { id: number };
@@ -2357,7 +2358,7 @@ describe('restoration enhancer', () => {
       secondTurn.id,
     ]);
 
-    undoable(() => store.$.depots.byIdOrFail(5).status.set('busy'));
+    undoable(() => store.$.depots.byIdOrFail(5).status('busy'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2401,7 +2402,7 @@ describe('restoration enhancer', () => {
 
     t.resetRestorationHistory();
 
-    undoable(() => store.$.rows.byIdOrFail(7).status.set('two'));
+    undoable(() => store.$.rows.byIdOrFail(7).status('two'));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -2409,7 +2410,7 @@ describe('restoration enhancer', () => {
       __positionIds?: number[];
     };
 
-    undoable(() => store.$.rows.byIdOrFail(7).status.set('three'));
+    undoable(() => store.$.rows.byIdOrFail(7).status('three'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -2417,7 +2418,7 @@ describe('restoration enhancer', () => {
       __positionIds?: number[];
     };
 
-    undoable(() => store.$.rows.byIdOrFail(7).status.set('four'));
+    undoable(() => store.$.rows.byIdOrFail(7).status('four'));
     await Promise.resolve();
     await Promise.resolve();
     const thirdTurn = t.getTurns().at(-1) as { id: number };
@@ -2426,7 +2427,7 @@ describe('restoration enhancer', () => {
       thirdTurn.id,
     ]);
 
-    undoable(() => store.$.rows.byIdOrFail(7).status.set('five'));
+    undoable(() => store.$.rows.byIdOrFail(7).status('five'));
     await Promise.resolve();
     await Promise.resolve();
     const fourthTurn = t.getTurns().at(-1) as { id: number };
@@ -2451,9 +2452,9 @@ describe('restoration enhancer', () => {
 
     t.resetRestorationHistory();
 
-    undoable(() => store.$.rows.byIdOrFail(7).name.set('two'));
-    undoable(() => store.$.rows.byIdOrFail(7).name.set('three'));
-    undoable(() => store.$.rows.byIdOrFail(7).name.set('four'));
+    undoable(() => store.$.rows.byIdOrFail(7).name('two'));
+    undoable(() => store.$.rows.byIdOrFail(7).name('three'));
+    undoable(() => store.$.rows.byIdOrFail(7).name('four'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2498,8 +2499,8 @@ describe('restoration enhancer', () => {
     const baselineTurnCount = t.getTurns().length;
     const baselineRestorationCount = t.getRestorationHistory().length;
 
-    undoable(() => store.$.rows.byIdOrFail(7).name.set('two'));
-    undoable(() => store.$.rows.byIdOrFail(7).name.set('one'));
+    undoable(() => store.$.rows.byIdOrFail(7).name('two'));
+    undoable(() => store.$.rows.byIdOrFail(7).name('one'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2524,9 +2525,9 @@ describe('restoration enhancer', () => {
 
     t.resetRestorationHistory();
 
-    undoable(() => store.$.rows.byIdOrFail(7).name.set('two'));
-    undoable(() => store.$.rows.byIdOrFail(7).name.set('one'));
-    undoable(() => store.$.rows.byIdOrFail(7).active.set(true));
+    undoable(() => store.$.rows.byIdOrFail(7).name('two'));
+    undoable(() => store.$.rows.byIdOrFail(7).name('one'));
+    undoable(() => store.$.rows.byIdOrFail(7).active(true));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2566,8 +2567,8 @@ describe('restoration enhancer', () => {
 
     t.resetRestorationHistory();
 
-    undoable(() => store.$.rows.byIdOrFail(7).name.set('two'));
-    undoable(() => store.$.rows.byIdOrFail(7).active.set(true));
+    undoable(() => store.$.rows.byIdOrFail(7).name('two'));
+    undoable(() => store.$.rows.byIdOrFail(7).active(true));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2682,7 +2683,7 @@ describe('restoration enhancer', () => {
     };
     const collectionPositionId = removeTurn.__positionIds?.[0] as number;
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
     await Promise.resolve();
     await Promise.resolve();
     const scalarTurn = t.getTurns().at(-1) as {
@@ -2729,8 +2730,8 @@ describe('restoration enhancer', () => {
     t.resetRestorationHistory();
 
     undoable(() => store.$.rows.removeOne(2));
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
-    undoable(() => store.$.orders.byIdOrFail(31).state.set('dispatched'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
+    undoable(() => store.$.orders.byIdOrFail(31).state('dispatched'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2895,7 +2896,7 @@ describe('restoration enhancer', () => {
     t.resetRestorationHistory();
 
     undoable(() => store.$.rows.addOne({ id: 2, name: 'B' }));
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2944,7 +2945,7 @@ describe('restoration enhancer', () => {
     t.resetRestorationHistory();
 
     undoable(() => store.$.rows.addOne({ id: 2, name: 'B' }));
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3033,16 +3034,16 @@ describe('restoration enhancer', () => {
     );
     const t = (store as any).__restoration;
 
-    undoable(() => store.$.count.set(1));
+    undoable(() => store.$.count(1));
     await Promise.resolve();
     await Promise.resolve();
 
-    undoable(() => store.$.count.set(2));
+    undoable(() => store.$.count(2));
     await Promise.resolve();
     await Promise.resolve();
 
     t.undo();
-    undoable(() => store.$.count.set(3));
+    undoable(() => store.$.count(3));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3064,15 +3065,15 @@ describe('restoration enhancer', () => {
     );
     const t = (store as any).__restoration;
 
-    undoable(() => store.$.count.set(1));
+    undoable(() => store.$.count(1));
     await Promise.resolve();
     await Promise.resolve();
 
-    undoable(() => store.$.count.set(2));
+    undoable(() => store.$.count(2));
     await Promise.resolve();
     await Promise.resolve();
 
-    undoable(() => store.$.count.set(3));
+    undoable(() => store.$.count(3));
     t.undo();
     await Promise.resolve();
     await Promise.resolve();
@@ -3307,7 +3308,7 @@ describe('restoration enhancer', () => {
         ?.restorationSubjectIds ?? []),
     ];
 
-    undoable(() => store.$.rows.byIdOrFail(42).name.set('server'));
+    undoable(() => store.$.rows.byIdOrFail(42).name('server'));
     await Promise.resolve();
     await Promise.resolve();
     const retainedToken = [
@@ -3431,7 +3432,7 @@ describe('restoration enhancer', () => {
     t.resetRestorationHistory();
 
     undoable(() => store.$.rows.changeId(7, 42));
-    undoable(() => store.$.drivers.byIdOrFail(1).status.set('assigned'));
+    undoable(() => store.$.drivers.byIdOrFail(1).status('assigned'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3489,7 +3490,7 @@ describe('restoration enhancer', () => {
     t.resetRestorationHistory();
 
     undoable(() => store.$.rows.changeId(7, 42));
-    undoable(() => store.$.drivers.byIdOrFail(1).status.set('assigned'));
+    undoable(() => store.$.drivers.byIdOrFail(1).status('assigned'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3635,7 +3636,7 @@ describe('restoration enhancer', () => {
     );
     const t = (store as any).__restoration;
 
-    undoable(() => store.$.count.set(1));
+    undoable(() => store.$.count(1));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3667,7 +3668,7 @@ describe('restoration enhancer', () => {
 
     t.resetRestorationHistory();
 
-    undoable(() => store.$.rows.byIdOrFail(7).name.set('B'));
+    undoable(() => store.$.rows.byIdOrFail(7).name('B'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3752,7 +3753,7 @@ describe('restoration enhancer', () => {
     const rootPositionId = (store.$ as unknown as ScopedAuthorityNode)
       .__positionIds?.[0] as number;
 
-    undoable(() => store.$.count.set(1));
+    undoable(() => store.$.count(1));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3761,7 +3762,7 @@ describe('restoration enhancer', () => {
       __positionIds?: number[];
     };
 
-    undoable(() => store.$.title.set('B'));
+    undoable(() => store.$.title('B'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3834,7 +3835,7 @@ describe('restoration enhancer', () => {
     const baselineRestorationCount = t.getRestorationHistory().length;
     const baselineTurnCount = t.getTurns().length;
 
-    undoable(() => store.$.profile.firstName.set('Jon'));
+    undoable(() => store.$.profile.firstName('Jon'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3890,7 +3891,7 @@ describe('restoration enhancer', () => {
     const baselineRestorationCount = t.getRestorationHistory().length;
     const baselineTurnCount = t.getTurns().length;
 
-    undoable(() => store.$.profile.firstName.set('Jon'));
+    undoable(() => store.$.profile.firstName('Jon'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3995,14 +3996,14 @@ describe('restoration enhancer', () => {
     );
     const t = (store as any).__restoration as InternalRestorationManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
-      firstName: ScopedAuthorityNode & { (): string; set(value: string): void };
-      lastName: ScopedAuthorityNode & { (): string; set(value: string): void };
+      firstName: ScopedAuthorityNode & Location<string>;
+      lastName: ScopedAuthorityNode & Location<string>;
     };
 
     store
       .transaction(() => {
-        undoable(() => profile.firstName.set('Jane'));
-        undoable(() => profile.lastName.set('Jones'));
+        undoable(() => profile.firstName('Jane'));
+        undoable(() => profile.lastName('Jones'));
       })
       .confirm();
 
@@ -4043,12 +4044,12 @@ describe('restoration enhancer', () => {
     );
     const t = (store as any).__restoration as InternalRestorationManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
-      firstName: ScopedAuthorityNode & { (): string; set(value: string): void };
+      firstName: ScopedAuthorityNode & Location<string>;
     };
     const profilePositionId = profile.__positionIds?.[0] as number;
     const firstNamePositionId = profile.firstName.__positionIds?.[0] as number;
 
-    undoable(() => profile.firstName.set('Jane'));
+    undoable(() => profile.firstName('Jane'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -4079,16 +4080,16 @@ describe('restoration enhancer', () => {
     );
     const t = (store as any).__restoration as InternalRestorationManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
-      firstName: ScopedAuthorityNode & { (): string; set(value: string): void };
+      firstName: ScopedAuthorityNode & Location<string>;
     };
     const settings = store.$.settings as unknown as ScopedAuthorityNode & {
-      theme: ScopedAuthorityNode & { (): string; set(value: string): void };
+      theme: ScopedAuthorityNode & Location<string>;
     };
 
     store
       .transaction(() => {
-        undoable(() => profile.firstName.set('Jane'));
-        undoable(() => settings.theme.set('dark'));
+        undoable(() => profile.firstName('Jane'));
+        undoable(() => settings.theme('dark'));
       })
       .confirm();
 
@@ -4127,24 +4128,24 @@ describe('restoration enhancer', () => {
     );
     const t = (store as any).__restoration as InternalRestorationManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
-      firstName: ScopedAuthorityNode & { (): string; set(value: string): void };
-      lastName: ScopedAuthorityNode & { (): string; set(value: string): void };
+      firstName: ScopedAuthorityNode & Location<string>;
+      lastName: ScopedAuthorityNode & Location<string>;
     };
     const settings = store.$.settings as unknown as ScopedAuthorityNode & {
-      theme: ScopedAuthorityNode & { (): string; set(value: string): void };
+      theme: ScopedAuthorityNode & Location<string>;
     };
 
     store
       .transaction(() => {
-        undoable(() => profile.firstName.set('Ada'));
-        undoable(() => profile.lastName.set('Lovelace'));
+        undoable(() => profile.firstName('Ada'));
+        undoable(() => profile.lastName('Lovelace'));
       })
       .confirm();
 
     store
       .transaction(() => {
-        undoable(() => profile.firstName.set('Grace'));
-        undoable(() => settings.theme.set('dark'));
+        undoable(() => profile.firstName('Grace'));
+        undoable(() => settings.theme('dark'));
       })
       .confirm();
 
@@ -4177,7 +4178,7 @@ describe('restoration enhancer', () => {
     );
     const t = (store as any).__restoration;
 
-    undoable(() => store.$.count.set(1));
+    undoable(() => store.$.count(1));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -4210,7 +4211,7 @@ describe('restoration enhancer', () => {
 
     t.resetRestorationHistory();
 
-    undoable(() => store.$.rows.byIdOrFail(7).name.set('B'));
+    undoable(() => store.$.rows.byIdOrFail(7).name('B'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -4377,7 +4378,7 @@ describe('restoration enhancer', () => {
 
     store
       .transaction(() => {
-        undoable(() => store.$.count.set(1));
+        undoable(() => store.$.count(1));
         undoable(() => store.$.rows.changeId(7, 42));
       })
       .confirm();
@@ -4417,8 +4418,8 @@ describe('restoration enhancer', () => {
 
     store
       .transaction(() => {
-        undoable(() => store.$.count.set(1));
-        undoable(() => store.$.rows.byIdOrFail(7).name.set('B'));
+        undoable(() => store.$.count(1));
+        undoable(() => store.$.rows.byIdOrFail(7).name('B'));
       })
       .confirm();
 
@@ -4474,7 +4475,7 @@ describe('restoration enhancer', () => {
       throw new Error('Expected subject-owned leaf metadata');
     }
 
-    undoable(() => heldName.set('Alicia'));
+    undoable(() => heldName('Alicia'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -4527,7 +4528,7 @@ describe('restoration enhancer', () => {
       throw new Error('Expected subject-owned leaf metadata');
     }
 
-    undoable(() => heldName.set('Alicia'));
+    undoable(() => heldName('Alicia'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -4579,7 +4580,7 @@ describe('restoration enhancer', () => {
 
     store
       .transaction(() => {
-        undoable(() => store.$.count.set(1));
+        undoable(() => store.$.count(1));
         undoable(() => store.$.rows.removeOne(7));
       })
       .confirm();
@@ -4697,7 +4698,7 @@ describe('restoration enhancer', () => {
 
     store
       .transaction(() => {
-        undoable(() => store.$.count.set(1));
+        undoable(() => store.$.count(1));
         undoable(() => store.$.rows.removeOne(7));
       })
       .confirm();
@@ -4751,8 +4752,8 @@ describe('restoration enhancer', () => {
 
     t.resetRestorationHistory();
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
-    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId(7));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -4760,8 +4761,8 @@ describe('restoration enhancer', () => {
       __positionIds?: number[];
     };
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('loading'));
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('loading'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -4818,12 +4819,12 @@ describe('restoration enhancer', () => {
     const t = (store as any).__restoration;
     t.resetRestorationHistory();
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as { __positionIds?: number[] };
 
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -4867,8 +4868,8 @@ describe('restoration enhancer', () => {
     const t = (store as any).__restoration;
     t.resetRestorationHistory();
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
-    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId(7));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -4877,7 +4878,7 @@ describe('restoration enhancer', () => {
       __positionIds?: number[];
     };
 
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as { id: number };
@@ -4918,7 +4919,7 @@ describe('restoration enhancer', () => {
 
     try {
       for (let value = 1; value <= 100; value++) {
-        undoable(() => store.$.value.set(value));
+        undoable(() => store.$.value(value));
         await Promise.resolve();
         await Promise.resolve();
       }
@@ -4955,7 +4956,7 @@ describe('restoration enhancer', () => {
     const t = (store as any).__restoration;
     t.resetRestorationHistory();
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -4964,7 +4965,7 @@ describe('restoration enhancer', () => {
       __positionIds?: number[];
     };
 
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -5046,7 +5047,7 @@ describe('restoration enhancer', () => {
     const t = (store as any).__restoration;
     t.resetRestorationHistory();
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('assigned'));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -5054,7 +5055,7 @@ describe('restoration enhancer', () => {
       __positionIds?: number[];
     };
 
-    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
+    undoable(() => store.$.orders.byIdOrFail(99).status('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as { id: number };
@@ -5065,7 +5066,7 @@ describe('restoration enhancer', () => {
     expect(store.canUndo()).toBe(true);
     expect(store.canRedo()).toBe(true);
 
-    undoable(() => store.$.drivers.byIdOrFail(7).status.set('loading'));
+    undoable(() => store.$.drivers.byIdOrFail(7).status('loading'));
     await Promise.resolve();
     await Promise.resolve();
 

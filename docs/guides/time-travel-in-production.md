@@ -188,7 +188,7 @@ the entry was identified by a timestamp rather than by what the user did.
 
 And it was a **global** mode. `pausedSignal` was one flag on one manager and `addEntry`
 returned early for every writer, so correctness required sole ownership of the tree for
-the window's duration. Verified: an unrelated `tree.$.rev.set(999)` inside a paused window
+the window's duration. Verified: an unrelated `tree.$.rev(999)` inside a paused window
 was suppressed too. A synchronous `for` loop has sole ownership by construction; a
 multi-second `mergeMap` over N HTTP requests does not.
 
@@ -210,8 +210,8 @@ never an undo step in the first place, because nobody designated it:
 
 ```ts
 // 15.0 — no predicate, and no per-write comparator cost
-tree.$.ui.cursor.set(next); // not designated -> not an undo step
-undoable(() => tree.$.doc.body.set(v)); // designated -> one undo step
+tree.$.ui.cursor(next); // not designated -> not an undo step
+undoable(() => tree.$.doc.body(v)); // designated -> one undo step
 ```
 
 That also removes the cost warning this section used to carry: there is no
@@ -257,10 +257,10 @@ export const appTree = signalTree(
 );
 
 // Only designated operations are reversible.
-undoable(() => appTree.$.draft.title.set(title));
+undoable(() => appTree.$.draft.title(title));
 
 // Neither of these enters the undo stack — no option required.
-appTree.$.ui.cursor.set(next);
+appTree.$.ui.cursor(next);
 external(() => appTree.$.rows.setAll(serverRows));
 ```
 

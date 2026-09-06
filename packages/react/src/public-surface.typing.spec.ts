@@ -29,8 +29,8 @@ const readonlyTree = asReadonly(tree);
 const transactionMethods: TransactionMethods = tree;
 const connection: Link = link(tree.$.count, { get: async () => 1 });
 
-undoable(() => tree.$.count.set(1));
-external(() => tree.$.count.set(2));
+undoable(() => tree.$.count(1));
+external(() => tree.$.count(2));
 connection.dispose();
 
 void typedTree;

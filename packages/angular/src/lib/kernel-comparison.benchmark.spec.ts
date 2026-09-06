@@ -97,7 +97,7 @@ describe.runIf(RUN_TIMING)('Benchmark: neutral kernel vs raw Angular signal()', 
       },
       () => {
         for (let index = 0; index < ITERATIONS; index++) {
-          tree.$.value.set(index);
+          tree.$.value(index);
         }
       }
     );

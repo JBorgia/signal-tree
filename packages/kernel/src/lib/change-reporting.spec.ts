@@ -4,9 +4,9 @@ import {
   createReactiveTestRealization,
   observeReactiveTestValue,
 } from '../reactive-test-realization';
-import { bindSignalTreeRealization } from './signal-tree';
+import { createSignalTreeFactory } from './signal-tree';
 
-const signalTree = bindSignalTreeRealization(
+const signalTree = createSignalTreeFactory(
   createReactiveTestRealization()
 );
 
@@ -23,6 +23,21 @@ const signalTree = bindSignalTreeRealization(
  * path for every `set()` it attempted rather than every `set()` that landed.
  */
 describe('updateAndReport — reports only what landed', () => {
+  it('preserves omitted top-level members but replaces each included branch', () => {
+    const tree = signalTree({
+      untouched: { value: 1 },
+      edited: { keep: 1, omit: 2 } as { keep: number; omit?: number },
+    });
+
+    const changed = tree.updateAndReport({ edited: { keep: 3 } });
+
+    expect(changed).toEqual(['edited.keep']);
+    expect(tree.$()).toEqual({
+      untouched: { value: 1 },
+      edited: { keep: 3 },
+    });
+  });
+
   it('reports nothing for a deep-equal array leaf (new reference)', () => {
     const tree = signalTree({ users: [{ id: 1, name: 'Ada' }] });
     const before = tree.$.users();
@@ -207,13 +222,9 @@ describe('change reporting — defects found by adversarial audit', () => {
 });
 
 describe('change reporting — second-round audit findings', () => {
-  // A leaf NEVER invokes a function value. Updaters are a branch/root form;
-  // `tree.$.count.update(fn)` is the leaf form, mirroring Angular's signal API.
-  //
-  // A revision of this suite once asserted the opposite — that a function at a
-  // leaf is resolved as an updater — guarded on "the current value is not a
-  // function". That predicate is unknowable at runtime, and the tests below are
-  // the states it got wrong. All of them are ordinary callback fields.
+  // Structural application already knows these functions are replacement
+  // values, so it uses raw ingress instead of the authored location grammar
+  // where a naked function means updater. All cases below are callback fields.
   it('stores a handler assigned to a callback leaf sitting at null', () => {
     let ran = 0;
     const handler = () => {

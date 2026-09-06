@@ -29,7 +29,7 @@ const SCENARIOS = [
     signaltree: `
       import { signalTree } from ${JSON.stringify(CORE)};
       const tree = signalTree({ count: 0, user: { name: 'a' } });
-      tree.$.count.set(1);
+      tree.$.count(1);
       globalThis.__sink = [tree.$.count(), tree.$.user.name()];
     `,
     ngrxSignals: `

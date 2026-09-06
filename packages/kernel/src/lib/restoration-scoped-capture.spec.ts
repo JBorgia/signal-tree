@@ -61,7 +61,7 @@ describe('compact restoration history retention', () => {
       // warning could never fire.
       // 15.0: a partial ROOT write would now deactivate `rows` (whole-value
       // membership). The churn this measures is on `n`, so write the leaf.
-      undoable(() => tree.$.n.set(i));
+      undoable(() => tree.$.n(i));
       await flush();
     }
     return tree;

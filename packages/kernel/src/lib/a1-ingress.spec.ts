@@ -51,7 +51,7 @@ describe('A1 case 1-2: classification', () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     const { seen, off } = observe();
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await flush();
     off();
     // A1-N. An ordinary authored write carries NO origin. There is no positive
@@ -66,12 +66,12 @@ describe('A1 case 1-2: classification', () => {
   it('case 2 — an ingress carries external origin and admits no restoration', async () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await flush();
     const historyBefore = tree.getRestorationHistory().length;
 
     const { seen, off } = observe();
-    external(() => tree.$.n.set(9));
+    external(() => tree.$.n(9));
     await flush();
     off();
 
@@ -96,7 +96,7 @@ describe('A1 case 3-5: transaction interaction', () => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       // An acquisition landing INSIDE the callback. Merged context, so the
       // enclosing transactionId is still ambient here.
-      external(() => tree.$.n.set(7));
+      external(() => tree.$.n(7));
     });
     await flush();
 
@@ -160,7 +160,7 @@ describe('A1 case 3-5: transaction interaction', () => {
     });
     await flush();
 
-    external(() => tree.$.n.set(7));
+    external(() => tree.$.n(7));
     await flush();
 
     let refusal: unknown = 'no-refusal';
@@ -184,10 +184,10 @@ describe('A1 case 6: restoration cannot destroy external truth', () => {
   it('case 6 — an undo over a realized location is refused', async () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await flush();
 
-    external(() => tree.$.n.set(9));
+    external(() => tree.$.n(9));
     await flush();
 
     let refusal: unknown = 'no-refusal';
@@ -212,7 +212,7 @@ describe('A1 case 7-9: boundary', () => {
     await flush();
     const { seen, off } = observe();
     external(() => {
-      external(() => tree.$.n.set(5));
+      external(() => tree.$.n(5));
     });
     await flush();
     off();
@@ -223,11 +223,11 @@ describe('A1 case 7-9: boundary', () => {
   it('case 8 — classification does not leak past the callback', async () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
-    external(() => tree.$.n.set(5));
+    external(() => tree.$.n(5));
     await flush();
 
     const { seen, off } = observe();
-    undoable(() => tree.$.n.set(6));
+    undoable(() => tree.$.n(6));
     await flush();
     off();
 
@@ -245,7 +245,7 @@ describe('A1 case 7-9: boundary', () => {
     try {
       external(async () => {
         await Promise.resolve();
-        tree.$.n.set(9);
+        tree.$.n(9);
       });
     } catch (error) {
       thrown = (error as { message?: string })?.message?.slice(0, 6);

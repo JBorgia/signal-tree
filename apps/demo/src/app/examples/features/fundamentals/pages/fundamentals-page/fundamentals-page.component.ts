@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   OnDestroy,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -35,10 +34,8 @@ export class FundamentalsPageComponent implements OnDestroy {
     },
     {
       derived: ($) => ({
-        subtotal: computed(() => $.cart.itemCount() * $.cart.unitPrice()),
-        summary: computed(
-          () => `${$.customer.name()} · ${$.cart.itemCount()} items`
-        ),
+        subtotal: () => $.cart.itemCount() * $.cart.unitPrice(),
+        summary: () => `${$.customer.name()} · ${$.cart.itemCount()} items`,
       }),
     }
   );

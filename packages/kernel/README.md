@@ -39,10 +39,9 @@ const tree = signalTree({
 });
 ```
 
-`$` is the state facade. Root and branch locations support whole-value reads,
-assignments, and updater functions. A value call is never a patch; derive a
-patched value with an updater. Leaves are reactive cells with signal-like read,
-`set`, and `update` operations.
+`$` is the state facade. Root, branch, and terminal locations support whole-value
+reads, replacements, and updater functions. A value call is never a patch;
+derive a patched value with an updater.
 
 ```typescript
 tree.$();
@@ -51,12 +50,37 @@ tree.$.user({ name: 'Grace', active: true });
 tree.$.user((user) => ({ ...user, active: false }));
 
 tree.$.count();
-tree.$.count.set(1);
-tree.$.count.update((count) => count + 1);
+tree.$.count(1);
+tree.$.count((count) => count + 1);
 ```
 
 The state literal defines the public paths. There are no actions, reducers, or
 selectors required for ordinary reads and writes.
+
+## Terminal Values
+
+A plain object normally becomes a branch whose properties are locations. Use
+`leaf(value)` when an object should remain one atomic value, or when a callable
+is state rather than topology:
+
+```typescript
+import { leaf, signalTree } from '@signal-tree/kernel';
+
+const tree = signalTree({
+  user: { name: 'Ada' },
+  bounds: leaf({ min: 0, max: 100 }),
+  handler: leaf((value: number) => console.log(value)),
+});
+
+tree.$.user.name('Grace');
+tree.$.bounds({ min: 10, max: 90 });
+tree.$.handler(leaf((value) => persist(value)));
+```
+
+At construction, `leaf(object)` stops dot-path expansion. At invocation,
+`location(leaf(callable))` distinguishes callable data from the updater grammar.
+The wrapper never enters canonical state, snapshots, persistence, restoration,
+or links; reads return the original raw value by identity.
 
 ## Construction
 
@@ -141,7 +165,7 @@ reader.$.count();
 reader.$.catalog.products.byId(1)?.();
 ```
 
-Leaf setters and EntityMap mutation methods are absent from the read-only type.
+Location write overloads and EntityMap mutation methods are absent from the read-only type.
 Use this for consumers that should receive reads while an application-owned Ops
 service retains the writable tree.
 
@@ -171,7 +195,7 @@ const tree = signalTree(
   }
 );
 
-undoable(() => tree.$.count.set(1));
+undoable(() => tree.$.count(1));
 tree.undo();
 tree.redo();
 ```
@@ -252,7 +276,7 @@ A tree owns runtime resources until `destroy()` releases them.
 const tree = signalTree({ value: 1 });
 
 try {
-  tree.$.value.set(2);
+  tree.$.value(2);
 } finally {
   tree.destroy();
 }
@@ -277,20 +301,26 @@ The package publishes two code entry points:
 - `@signal-tree/kernel`
 - `@signal-tree/kernel/adapter`
 
-The adapter entry point is the framework-neutral realization SDK. It is not a
+The adapter entry point is the framework-neutral observation SDK. It is not a
 compatibility layer or an application convenience surface.
 
-- `createSignalTreeFactory(realization)` binds a framework realization to tree
+- `createSignalTreeFactory(observation)` binds framework observation to tree
   construction.
+- `isNodeAccessor(value)` distinguishes a root or branch accessor from a
+  terminal location when a realization must route framework integration.
+- `replaceLocation(location, value)` applies raw replacement ingress when the
+  caller already knows the operation semantics, including callable state; it
+  does not re-enter the authored updater grammar.
 - `observeOwnerInvalidation(owner, callback)` wakes a framework observer so it
   can reread canonical truth.
 - `readCanonicalSnapshot(owner)` reads the owner-qualified whole-tree snapshot.
 - `withRestorationDesignation(callback)` identifies framework-originated user
   writes that are eligible for restoration.
 
-A `ScalarLeafRealization` supplies `runInvalidationGroup(run)` so transactions
-and restoration can apply all scalar changes before framework observers are
-notified. It is an adapter coherence contract, not an application batching API.
+An `ObservationAdapter` supplies dependency tokens and
+`runInvalidationGroup(run)` so transactions and restoration can apply all
+changes before framework observers are notified. It never owns or mirrors
+location state.
 
 ## License
 

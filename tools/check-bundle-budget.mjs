@@ -29,8 +29,7 @@
  */
 import { build } from 'esbuild';
 import { gzipSync } from 'node:zlib';
-import { mkdtempSync, writeFileSync, statSync } from 'node:fs';
-import { execSync } from 'node:child_process';
+import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -51,42 +50,15 @@ const REPO_NODE_MODULES = new URL('../node_modules', import.meta.url).pathname;
  * staleness invisible. Every budget "verification" in between was measuring
  * code nobody had written yet.
  *
- * So the gate builds for itself now rather than trusting what it finds. Nx
- * caches, so a fresh tree costs a cache hit; an unbuilt one costs a build,
- * which is the correct price for a number that claims to describe the code.
+ * `verify-gates.mjs` now owns one production build for the whole verification
+ * run and seals `dist/` while checks consume it. Rebuilding here would violate
+ * that artifact boundary and make concurrent checks observe different output.
  *
  * Timestamps were tried first and rejected: an Nx cache RESTORE writes correct
  * output without bumping mtimes, so "source newer than dist" reports a stale
  * build that is not stale. A check with false alarms gets disabled, which
  * leaves you back here.
  */
-const BUILD_PROJECTS = 'kernel';
-
-function ensureBuilt() {
-  try {
-    execSync(`npx nx run-many -t build --projects=${BUILD_PROJECTS}`, {
-      cwd: new URL('..', import.meta.url).pathname,
-      stdio: 'pipe',
-    });
-  } catch (err) {
-    console.error(
-      `\n❌ Could not build the packages this gate measures.\n` +
-        `   It reads dist/, so it refuses to report a number rather than\n` +
-        `   report one for whatever happens to be there.\n\n` +
-        String(err.stdout ?? err.message).slice(-1500)
-    );
-    process.exit(1);
-  }
-  try {
-    statSync(CORE);
-  } catch {
-    console.error(`\n❌ Build reported success but ${CORE} is missing.\n`);
-    process.exit(1);
-  }
-}
-
-ensureBuilt();
-
 // id -> { code, budgetKB }
 const TARGETS = {
   'signaltree-bare': {
@@ -196,12 +168,34 @@ const TARGETS = {
     // `check-devmode-foldable` is green, so the strings provably do not ship.
     // That is the condition this file's own guidance states for a dev bump; a
     // prod change would have been a regression to fix instead.
-    devKB: 11.9,
-    prodKB: 9.7,
+    // Universal locations add vanilla subscriptions, coherent grouped
+    // publication, exception-safe settlement, and weak reverse dependency
+    // edges so abandoned derived recipes collect. After removing duplicate
+    // dispatch and notification code, the generator measures 9.76KB prod and
+    // 11.91KB dev. Raised by 0.1KB rather than weakening those invariants.
+    //
+    // Callable terminal locations replace `.set`/`.update` with one read /
+    // replace / derive grammar and add `leaf(value)` as explicit topology.
+    // After moving entity projections off the mandatory runtime object,
+    // restoring scalar-owned mutation emission, deleting the legacy setter
+    // fallback, and consolidating terminal construction, the final floor is
+    // 9.93KB prod / 12.09KB dev. Against archived 84837fb3, equivalent runnable
+    // bundles differ by 430 minified bytes: location-runtime +503, signal-tree
+    // +158, leaf +133, intrinsic observers +35, offset by owned-mutation -268
+    // and scalar-runtime -126. This is the callable contract, not an optional
+    // module leak.
+    // Framework-native leaf realization now lives behind the adapter entry.
+    // The first implementation left its native branches in the mandatory
+    // location/scalar modules and measured 10.80KB prod / 12.95KB dev here.
+    // Splitting complete kernel-owned native runtimes behind `kernel/adapter`
+    // restores the neutral floor to 9.95KB prod / 12.10KB dev without changing
+    // Angular or Vue semantics.
+    devKB: 12.2,
+    prodKB: 10.0,
     code: `
       import { signalTree } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, user: { name: 'a' } });
-      t.$.count.set(1); t.$.user.name.set('b');
+      t.$.count(1); t.$.user.name('b');
       globalThis.__sink = [t.$.count(), t.$.user.name()];
     `,
   },
@@ -353,8 +347,15 @@ const TARGETS = {
     // machinery. Dev foldability remains green (24.18 -> 21.48KB), so no
     // diagnostic text leaked into production. Budgets retain about 0.2KB of
     // headroom rather than rounding the measured values down.
-    devKB: 24.4,
-    prodKB: 21.7,
+    // Callable EntityMap fields add writable projections over stable entity
+    // identity. With the shared callable kernel included, the measured floor is
+    // 21.96KB prod / 24.60KB dev. The ceilings retain narrow headroom without
+    // weakening field identity, raw ingress, or terminal topology.
+    // Carrier-specific query and field realizations move that floor to 22.01KB
+    // prod / 24.66KB dev after adapter-only runtime splitting; the native
+    // implementation remains absent from neutral bundles.
+    devKB: 24.8,
+    prodKB: 22.1,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });

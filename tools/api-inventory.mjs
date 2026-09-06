@@ -103,7 +103,11 @@ function inventoryPackage(pkg) {
       skipLibCheck: true,
       noEmit: true,
       baseUrl: ROOT,
-      paths: { '@signaltree/*': ['packages/*/src/index.ts'] },
+      paths: {
+        '@signal-tree/kernel': ['packages/kernel/src/index.ts'],
+        '@signal-tree/kernel/adapter': ['packages/kernel/src/adapter.ts'],
+        '@signal-tree/*': ['packages/*/src/index.ts'],
+      },
     }
   );
   const checker = program.getTypeChecker();

@@ -57,7 +57,7 @@ export class PostOps {
     const post = this._$.posts.entities.byId(postId)?.();
     const author = this._$.users.entities.byId(post?.authorId)?.();
     if (author?.role !== 'admin') {
-      this._$.posts.loading.error.set('Only admins can publish posts');
+      this._$.posts.loading.error('Only admins can publish posts');
       return of(void 0);
     }
     return this._api.publishPost$(postId).pipe(
@@ -70,7 +70,7 @@ export class PostOps {
 const DERIVED_SOURCE = `// store/tree/app-tree.ts — one derived factory at construction
 const tree = signalTree(createBaseState(), {
   derived: ($) => {
-    const filteredPosts = computed(() => {
+    const filteredPosts = () => {
       const search = $.posts.filters.search().toLowerCase();
       const published = $.posts.filters.published();
       return $.posts.entities.all().filter((post) => {
@@ -78,10 +78,10 @@ const tree = signalTree(createBaseState(), {
         return !search || post.title.toLowerCase().includes(search)
                        || post.content.toLowerCase().includes(search);
       });
-    });
+    };
     return {
       posts: { filtered: filteredPosts },
-      ui: { filteredCount: computed(() => filteredPosts().length) },
+      ui: { filteredCount: () => filteredPosts().length },
     };
   },
 });`;
@@ -96,14 +96,14 @@ const APP_TREE = signalTree(
     count: 0,
     history: [] as number[],
   },
-  { derived: ($) => ({ doubled: computed(() => $.count() * 2) }) }
+  { derived: ($) => ({ doubled: () => $.count() * 2 }) }
 );
 
 // WRITE — mutations go through an ops service.
 @Injectable({ providedIn: 'root' })
 class CounterOps {
   private $ = APP_TREE.$;
-  increment() { this.$.count.update((n) => n + 1); }
+  increment() { this.$.count.update((count) => count + 1); }
   reset() { this.$.count.set(0); }
 }
 
@@ -125,7 +125,7 @@ export class AppComponent {
     // REACT — the state change IS the event. No actions, no dispatch.
     effect(() => {
       const n = this.$.count();
-      this.$.history.update((h) => [...h, n].slice(-5));
+      this.$.history.update((history) => [...history, n].slice(-5));
     });
   }
 }`;

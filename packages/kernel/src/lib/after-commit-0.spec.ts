@@ -95,7 +95,7 @@ describe('AFTER-COMMIT-0 case 1: outside a transaction', () => {
     await flush();
     const ran: string[] = [];
 
-    tree.$.n.set(1);
+    tree.$.n(1);
     afterCommit(tree, () => ran.push('effect'));
 
     // ⚠️ MEASURED, AND IT IS NOT WHAT I EXPECTED. With no open scope there is
@@ -126,7 +126,7 @@ describe('AFTER-COMMIT-0 cases 2 & 3: transaction outcome', () => {
     const ran: number[] = [];
 
     const p = tree.transaction(() => {
-      tree.$.n.set(2);
+      tree.$.n(2);
       afterCommit(tree, () => ran.push(tree.$.n()));
     });
     await flush();
@@ -143,7 +143,7 @@ describe('AFTER-COMMIT-0 cases 2 & 3: transaction outcome', () => {
     const ran: number[] = [];
 
     const p = tree.transaction(() => {
-      tree.$.n.set(9);
+      tree.$.n(9);
       afterCommit(tree, () => ran.push(tree.$.n()));
     });
     await flush();
@@ -163,7 +163,7 @@ describe('AFTER-COMMIT-0 case 4: per-registration identity', () => {
     const charge = () => void charges++;
 
     const p = tree.transaction(() => {
-      tree.$.n.set(1);
+      tree.$.n(1);
       afterCommit(tree, charge);
       afterCommit(tree, charge);
     });
@@ -185,7 +185,7 @@ describe('AFTER-COMMIT-0 case 4: per-registration identity', () => {
     let charges = 0;
     const charge = () => void charges++;
 
-    tree.$.n.set(1);
+    tree.$.n(1);
     afterCommit(tree, charge);
     afterCommit(tree, charge);
     await flush();
@@ -201,7 +201,7 @@ describe('AFTER-COMMIT-0 case 5: registration order', () => {
     const order: string[] = [];
 
     const p = tree.transaction(() => {
-      tree.$.n.set(1);
+      tree.$.n(1);
       afterCommit(tree, () => order.push('A'));
       afterCommit(tree, () => order.push('B'));
       afterCommit(tree, () => order.push('C'));
@@ -227,7 +227,7 @@ describe('AFTER-COMMIT-0 case 6: nesting', () => {
     expect(() =>
       tree.transaction(() => {
         tree.transaction(() => {
-          tree.$.n.set(1);
+          tree.$.n(1);
         });
       })
     ).toThrow(/[Nn]ested transaction/);
@@ -242,11 +242,11 @@ describe('AFTER-COMMIT-0 case 7: two trees, interleaved operations', () => {
     const ran: string[] = [];
 
     const pb = b.transaction(() => {
-      b.$.n.set(5);
+      b.$.n(5);
       afterCommit(b, () => ran.push('B'));
     });
     const pa = a.transaction(() => {
-      a.$.n.set(7);
+      a.$.n(7);
       afterCommit(a, () => ran.push('A'));
     });
     await flush();
@@ -272,7 +272,7 @@ describe('AFTER-COMMIT-0 case 8: async completion is the caller\'s', () => {
     const started: string[] = [];
 
     const p = tree.transaction(() => {
-      tree.$.n.set(1);
+      tree.$.n(1);
       afterCommit(tree, () => {
         started.push('first');
         // Deliberately never resolves. SignalTree owns PERMISSION TO START, not
@@ -298,7 +298,7 @@ describe('AFTER-COMMIT-0 case 8: async completion is the caller\'s', () => {
     const started: string[] = [];
 
     const p = tree.transaction(() => {
-      tree.$.n.set(1);
+      tree.$.n(1);
       afterCommit(tree, () => {
         started.push('first');
         throw new Error('effect exploded');

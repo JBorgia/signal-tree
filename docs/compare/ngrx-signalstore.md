@@ -118,7 +118,7 @@ export class TicketOps {
   private readonly tree = inject(AppTree);
 
   select(id: number | null): void {
-    this.tree.$.selectedId.set(id);
+    this.tree.$.selectedId(id);
   }
 }
 ```

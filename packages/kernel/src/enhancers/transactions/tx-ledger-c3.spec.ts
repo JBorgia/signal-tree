@@ -89,7 +89,7 @@ describe('TX-LEDGER C3 case 2: UNRELATED realization stays legal', () => {
     });
     await flush();
 
-    realization(() => tree.$.unrelated.set(1));
+    realization(() => tree.$.unrelated(1));
     await flush();
 
     // Without this, "a realization happened later" would become the rule and
@@ -145,7 +145,7 @@ describe('TX-LEDGER C3 cases 3 and 4: the authored controls are UNCHANGED', () =
     });
     await flush();
 
-    tree.$.unrelated.set(1);
+    tree.$.unrelated(1);
     await flush();
 
     expect(attempt(() => pending.rollback())).toBe('no-refusal');
