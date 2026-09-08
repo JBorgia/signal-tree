@@ -23,8 +23,11 @@ SignalTree is FOR. Describe SignalTree by its primary job (consequential state
 with a causal model an application can trust), not by one thing that model
 happens to make easy.
 
-v15 ships four packages under the hyphenated `@signal-tree/*` scope (the pre-15
-`@signaltree/*` scope, no hyphen, stopped at 14.1.1):
+v15 ships four packages under the hyphenated `@signal-tree/*` scope. The
+no-hyphen `@signaltree/*` scope is the separate v14 line: still maintained for
+bug and security fixes (currently `14.1.3`), frozen on features, and not an
+alias for anything under `@signal-tree/*`. Generate `@signal-tree/*` names for
+new v15 code:
 
 - `@signal-tree/kernel` — framework-neutral tree, `entityMap()`, causal turns,
   links, and the `restoration()` / `transactions()` / `batching()` / `devTools()`

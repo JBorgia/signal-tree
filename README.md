@@ -19,8 +19,10 @@
 
 **Different library, different author, different package** — the `@signal-tree/*` scope (hyphenated; not under `@ngrx/`). Angular apps install [`@signal-tree/angular`](packages/angular/README.md); React apps install [`@signal-tree/react`](packages/react/README.md); Vue apps install [`@signal-tree/vue`](packages/vue/README.md); framework-neutral libraries use [`@signal-tree/kernel`](packages/kernel/README.md). A framework package is the complete application facade: import SignalTree APIs through it rather than mixing framework and kernel imports. It's a typed reactive store where **your state literal is the API**: no `withState` / `withMethods` / `withComputed` wrappers, no actions, no reducers. Angular reads `tree.$.user.name()` and writes `tree.$.user.name.set(value)` at any depth; Vue exposes the same path as a ref. If a doc or AI agent conflated this with NgRx SignalStore, that's the confusion to drop first; see [SignalTree vs NgRx SignalStore](docs/compare/ngrx-signalstore.md).
 
-> **On `@signaltree/*` (no hyphen)?** That is the pre-15 line and it stops at
-> 14.1.1. See [Migration `@signaltree/*` → `@signal-tree/*` (v15)](docs/guides/migration-v14-v15.md).
+> **On `@signaltree/*` (no hyphen)?** That is the v14 line. It is still
+> maintained for bug and security fixes (currently `14.1.3`) — new projects
+> should start on v15. See the [support policy](docs/support-policy.md) and the
+> [v14 → v15 migration guide](docs/guides/migration-v14-v15.md).
 
 ## Why SignalTree
 
@@ -585,6 +587,7 @@ Declaring `devTools()` wires SignalTree into the standard Redux DevTools browser
 ## Documentation
 
 - [Architecture Guide](docs/architecture/signaltree-architecture-guide.md)
+- [Support policy](docs/support-policy.md) — `@signal-tree/*` v15 and `@signaltree/*` v14 are both supported; what each line receives
 - [Migration `@signaltree/*` → `@signal-tree/*` (v15)](docs/guides/migration-v14-v15.md) — the current migration target for every earlier version
 - [Composition Recipes](docs/guides/composition-recipes.md) — Ops service, entity-CRUD base, optimistic UI
 - [Enhancer authoring removal](docs/guides/custom-enhancers.md)
@@ -622,9 +625,11 @@ Contributions welcome. Please run `npm run validate:all` before submitting PRs.
 ## License
 
 **Apache License 2.0** — see [LICENSE](LICENSE). OSI-approved open source, with an
-explicit patent grant. Versions up to and including 14.1.1 were released under the
-Business Source License 1.1; that grant is irrevocable for those versions, so nothing
-you already depend on is withdrawn.
+explicit patent grant. The relicense from the Business Source License 1.1 landed
+in `14.1.2`, so every release from `14.1.2` onward — both the maintained
+`@signaltree/*` v14 line and all of `@signal-tree/*` v15 — is Apache-2.0.
+Releases up to and including `14.1.1` remain under BSL 1.1; that grant is
+irrevocable for those versions, so nothing you already depend on is withdrawn.
 
 ### Enterprise / procurement FAQ
 

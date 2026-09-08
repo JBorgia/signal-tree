@@ -93,5 +93,8 @@ Questions about attribution, trademark use, or this document:
 Copyright 2024-2026 Jonathan D Borgia and SignalTree contributors.
 Licensed under the Apache License, Version 2.0.
 
-Releases up to and including 14.1.1 were published under the Business Source License
-1.1. That grant is irrevocable for those versions and is not withdrawn here.
+The relicense to Apache-2.0 took effect in `14.1.2`. Every release from `14.1.2`
+onward is Apache-2.0 — this covers both the maintained `@signaltree/*` v14 line
+and all `@signal-tree/*` v15 releases. Releases up to and including `14.1.1` were
+published under the Business Source License 1.1; that grant is irrevocable for
+those versions and is not withdrawn here.

@@ -20,8 +20,12 @@ publication. If one does not compile for you, that is a bug — please report it
 
 ### The name changed: `@signaltree/*` → `@signal-tree/*`
 
-Every import specifier changes. There is no dist-tag or alias bridging the two
-names — `@signaltree/*` stops at 14.1.1.
+Every import specifier changes. No dist-tag or alias bridges the two names: the
+scopes are independent. `@signaltree/*` is the v14 line — still maintained for
+bug and security fixes (currently `14.1.3`) but frozen on features — and
+`@signal-tree/*` is v15 and forward. Migrate when you are ready; you are not
+racing an EOL. See the [support policy](../support-policy.md) for what v14 still
+receives.
 
 ### Four packages, not eight
 

@@ -210,14 +210,13 @@ before adding or moving files.
 pnpm install
 
 # Build
-pnpm run build:all            # all packages
-nx build core                 # single package
+pnpm run build:all            # all packages (kernel, angular, react, vue)
+nx build kernel               # single package
 pnpm run build:production     # production build
 
 # Test
 pnpm run test:all
-nx test core
-pnpm nx test guardrails --pool=forks --poolOptions.forks.singleFork
+nx test kernel                # run from the repo root; bare vitest here fails with `ngModule null`
 
 # Lint / format
 pnpm run lint:all
@@ -371,7 +370,7 @@ CORRECTION in `docs/architecture/v15-update-matrix-baseline.md`.
 
 `npm run typecheck` runs two passes, and the split is deliberate:
 
-- **`typecheck:typing`** — `packages/core/tsconfig.typecheck.json`, which
+- **`typecheck:typing`** — `packages/kernel/tsconfig.typecheck.json`, which
   includes ONLY `src/**/*.typing.spec.ts`. Those files are excluded from vitest
   (esbuild strips types without checking them), so `tsc` is the only thing that
   reads them. They carry the `@ts-expect-error` assertions that pin what must
