@@ -998,7 +998,106 @@ Only after `ATTRIBUTION-OWNER-0` and `STATE-CONSEQUENCE-VALUE-0` report should
 anything decide whether `@signal-tree/provenance` exists, whether a narrow
 enhancer-authoring seam deserves to exist, or whether this stays a demo idea.
 
-## STATE-CONSEQUENCE-VALUE-0
+## STATE-CONSEQUENCE-VALUE-0 — CLOSED 2026-09-08
+
+**OUTCOME: DIFFERENTIATION NOT EARNED.**
+
+```text
+The strong conventional control reconstructed the consequential
+application-state incident with high confidence using ordinary identity,
+authorization, tracing, backend audit and client correlation.
+
+SignalTree may make some relationships intrinsic rather than assembled, but
+the experiment did not establish a capability gap large enough to justify a
+provenance/audit product or any kernel / public-surface expansion.
+```
+
+### Evidence
+
+Two blind investigations, same ten questions, investigator given no knowledge of
+SignalTree or that anything was being compared.
+
+```text
+                        v1 (weak fixture)   v2 (repaired)
+total joins                     31               43
+ID-based                     9 (29%)         34 (79%)
+inferential                     22                6
+answered high-confidence      5/10             8/10
+```
+
+- **Q7 solved by ordinary instrumentation** — `serverRevision → appliedRevision`
+  propagation resolved eight values by ID join. Timestamp guesswork in v1.
+- **Q9 solved cleanly by `captureId`** — "was this restoration a fresh action?"
+  answered by ID join alone.
+- **Q6's residual gap is one explicit disposition field.**
+- **Q8's residual gap is propagating the same revision/source id to browser B.**
+- **Q3/Q4 gaps are agent prompt capture and policy text** — not state semantics.
+
+That moves the claim from *"the conventional stack fundamentally lacks the
+semantic model"* to *"the conventional stack needs disciplined instrumentation
+and some correlation work."* Those are commercially very different claims, and
+only the first was a business.
+
+The preregistered rubric anticipated exactly this: ordinary instrumentation plus
+cheap ID joins plus modest extra fields → **weak white space**.
+
+### v3 was declined deliberately
+
+Adding the browser-B revision stamp would probably turn Q8 green. Running v3
+after knowing that would be testing whether we can construct a conventional
+stack *badly enough* for SignalTree to win. **That is not an experiment.**
+
+### The explicit non-claim
+
+> This does **not** show SignalTree's causal/state semantics have no value. It
+> shows that **agent/application-state provenance is not presently justified as
+> a differentiated commercial product.**
+
+### What this saved
+
+Months of Relay + provenance + agent-identity integration + Audit + Verified
+Audit, built around a moat a competently instrumented enterprise stack
+reproduces with IDs and logs. **A successful falsifier is worth what it prevents.**
+
+### Surviving engineering findings — these are permanent
+
+The business thesis failed. The architectural constraints did not:
+
+```text
+externally supplied identity/delegation stays OUTSIDE the kernel
+transaction state consequence is NET EFFECT, not an audit of every attempt
+same-location transactional coalescing is deliberate and correct
+rollback already carries meaningful transaction correlation
+restoration is deliberately state-based — never fake an originating actor
+distributed causal correlation belongs to the transport/request context
+(owner, transactionId) matters — transaction id alone is UNSAFE
+observation channels have composition-dependent behaviour
+```
+
+### Spike disposition
+
+`packages/kernel/src/lib/internals/provenance-spike.ts` stays **experiment
+archaeology**. Do not turn it into product code. Once the surviving findings
+above have permanent carriers, evaluate it under the ordinary consolidation
+rule:
+
+```text
+the finding survives; the experiment implementation need not
+```
+
+**No `/authoring` resurrection. No settlement-outcome API because provenance
+wanted one. No provenance package.**
+
+### Redirect
+
+Commercialization effort returns to areas with stronger evidence: the core state
+architecture, causal debugging / Studio, and potentially Relay — where
+distributed state *semantics themselves*, not audit metadata, would be the
+differentiation.
+
+---
+
+**Original preregistration, retained:**
 
 **OPEN — THE COMMERCIAL FALSIFIER. Supersedes `ATTRIBUTION-PULL-0` as the gate.**
 

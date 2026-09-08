@@ -263,12 +263,55 @@ If the control answers **all ten** with high confidence, mostly ID-based joins,
 minimal bespoke state instrumentation, and modest effort — become substantially
 less bullish and consider stopping the provenance track outright.
 
-## Status
+### v2 result — THE CONTROL LARGELY WON
 
 ```text
-fixtures v2         BUILT
-blind re-run        DISPATCHED
-scoring rubric      PREREGISTERED (above), before the result was seen
-failure triage      pending
-independent review  REQUIRED before any bucket-3 claim is accepted
+                        v1          v2
+total joins             31          43
+ID-based             9 (29%)    34 (79%)
+inferential             22           6
+high-confidence       5/10        8/10
 ```
+
+The v1 "22 of 31 joins were inferential" figure — which had looked like the
+strongest pro-SignalTree signal — was **entirely a product of the weak fixture**.
+With correlation propagated properly it inverts.
+
+Scored against the rubric preregistered above:
+
+```text
+Q7  CONVENTIONAL WINS   serverRevision -> appliedRevision resolved 8 values by ID join
+Q9  CONVENTIONAL WINS   captureId answered "fresh action?" by ID join alone
+Q6  bucket 2            residual gap = ONE explicit disposition field
+Q8  bucket 1 + 2        residual gap = propagate the revision stamp to browser B
+Q3  not state semantics GenAI prompt capture
+Q4  not state semantics policy text
+```
+
+The investigator's own closing is the sharpest evidence against the thesis:
+
+> *"captureId is the proof of the point: it is the one place where 'was this a
+> fresh action?' was answerable directly, and it was answerable **because
+> someone recorded it**, not because it could be inferred."*
+
+That argues **recording the property is what matters**, and that a conventional
+stack can record it. It is not an argument that SignalTree is required.
+
+### v3 declined, deliberately
+
+Adding browser-B's revision stamp would probably turn Q8 green. Running v3
+knowing that would be testing whether the conventional stack can be built
+*badly enough* for SignalTree to win. That is not an experiment.
+
+## Status — CLOSED
+
+```text
+outcome             DIFFERENTIATION NOT EARNED
+disposition         recorded in TODO.md § STATE-CONSEQUENCE-VALUE-0
+SignalTree arm      NEVER BUILT — correctly, the control settled it first
+v3                  declined
+```
+
+**Non-claim, explicit:** this does not show SignalTree's causal/state semantics
+have no value. It shows agent/application-state provenance is not presently
+justified as a differentiated commercial product.
