@@ -1,5 +1,13 @@
 # SignalTree 15.0 — session handoff
 
+> **SUPERSEDED — historical, not current state.** `15.0.0` shipped GA on
+> 2026-09-06 (`@signal-tree/*`, `latest` on npm; tag `v15.0.0` at `8418cd7d`).
+> Everything below is a mid-development handoff from before the package re-slice
+> and refers to the pre-15 `packages/core` layout, `SignalTreeBase`,
+> `composeEnhancers`, and `.with()` — none of which exist in the shipped
+> architecture. For current state read [`RELEASE-1.0.md`](RELEASE-1.0.md)
+> (Phase 7 COMPLETE) and [`CHANGELOG.md`](CHANGELOG.md). Kept for provenance.
+
 Checkpoint **`7b3b3947`** on `history/gate1-frontier-cutover`. Nothing pushed
 (~150 commits ahead of origin, deliberately).
 

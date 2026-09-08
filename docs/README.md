@@ -32,6 +32,7 @@ Use this index to navigate the documentation.
 
 | Document                                                                          | Description                                                                                          |
 | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| [Support policy](support-policy.md)                                               | The two supported release lines (`@signal-tree/*` v15, `@signaltree/*` v14), what v14 still receives, and EOL intent |
 | [Migration `@signaltree/*` → `@signal-tree/*` (v15)](guides/migration-v14-v15.md) | **Current migration target for every earlier version** — rename, package consolidation, removed APIs |
 | [Composition Recipes](guides/composition-recipes.md)                              | Ops-service patterns, entity-CRUD base, optimistic UI                                                |
 | [Legacy docs (`@signaltree/*`, pre-15)](legacy/README.md)                         | Per-version migration guides and the 14.0.0 capability audit, quarantined                            |

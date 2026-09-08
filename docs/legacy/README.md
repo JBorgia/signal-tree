@@ -7,9 +7,12 @@ when the packages were published under the unscoped-looking `@signaltree/*` name
 `@signaltree/realtime`, `@signaltree/guardrails`, and earlier standalone
 enhancer packages.
 
-**None of this is current API guidance.** The `@signaltree/*` line stopped at
-`14.1.1`. SignalTree 15 ships as `@signal-tree/kernel`, `@signal-tree/angular`,
-and `@signal-tree/react`.
+**None of this is current v15 API guidance.** These docs cover `@signaltree/*`
+releases up to `14.1.1`. The `@signaltree/*` v14 line is still maintained for
+bug and security fixes (currently `14.1.3`) — see the
+[support policy](../support-policy.md) — but it is frozen on features. SignalTree
+15 ships as `@signal-tree/kernel`, `@signal-tree/angular`, `@signal-tree/react`,
+and `@signal-tree/vue`.
 
 ## If you are migrating
 
