@@ -207,24 +207,64 @@ GC, or restoration improvements.
 
 ## ATTRIBUTION-PULL-0
 
-**OPEN — DEMAND FALSIFIER. RUN BEFORE ANY IMPLEMENTATION.**
+**AMENDED 2026-09-08 — DEMOTED FROM GATE TO MESSAGING RESEARCH.**
+**No longer blocks `ATTRIBUTION-OWNER-0`.**
 
-Track state, frozen at `fb078a58`. The engineering side is closed; the next
-move is evidence collection, not design:
+### Amendment record
+
+The original preregistration below is preserved unedited. It is not overwritten
+because changing a gate after seeing evidence is itself a fact a later reader
+needs in order to judge whether the goalposts moved to reach a wanted
+conclusion.
+
+**What changed.** A market sweep of 2026 standards, regulation, enterprise
+surveys, IAM products, and agent-authorization drafts found the underlying
+enterprise requirement — agent identity, delegation, authorization, retained
+evidence — already independently established, and being productized by Microsoft
+Entra Agent ID, Okta, SailPoint, AWS AgentCore, OpenID AuthZEN, and an IETF
+delegation-receipt draft.
+
+**Why that retires the gate — and why it is NOT because "the need is
+validated."** That external evidence validates the *adjacent commodity layer*,
+not SignalTree's claim. Nothing in it concerns application-state causal
+provenance. The correct reading is narrower and less flattering to the original
+design:
 
 ```text
-ATTRIBUTION-PULL-0     READY / COLLECT EVIDENCE
-ATTRIBUTION-OWNER-0    BLOCKED
-provenance code        DO NOT BUILD
-authoring surface      DO NOT REOPEN
+PULL-0 tested a proposition that was already known.
+It would have produced a true but useless positive.
+The genuine unknown is whether state-consequence provenance is DISTINCT
+from what the commodity stack already delivers.
 ```
 
-Do not reopen the architecture discussion to refine the model further. The
-design questions are settled to the level this experiment can act on; anything
-more is speculation ahead of data.
+**Evidence caveats recorded deliberately.** The sweep is unverified from inside
+this repository, and most survey sources sell the remedy — Deloitte, KPMG,
+Grant Thornton and Schellman are governance-advisory firms; the CSA/Strata study
+is vendor-sponsored. "90% have allocated AI-governance funding" is exactly the
+class of stated-intent signal the original quality gate existed to filter, and
+that funding flows to IAM vendors rather than to a state library. The
+shipping-product and public-draft citations are stronger in kind than the
+surveys and carry the commodity argument on their own.
 
-Runnable instrument: [`docs/research/attribution-pull-0/`](docs/research/attribution-pull-0/README.md)
-— stripped-timeline spec, evaluator script, and per-session scoring sheet.
+**Superseded by** `STATE-CONSEQUENCE-VALUE-0` below.
+
+### Current disposition
+
+```text
+ATTRIBUTION-PULL-0          DEMOTED — optional messaging/buyer-language research
+ATTRIBUTION-OWNER-0         UNBLOCKED — feasibility spike may proceed
+STATE-CONSEQUENCE-VALUE-0   OPEN — the real commercial falsifier
+authoring surface           DO NOT REOPEN
+```
+
+The instrument is **not deleted**.
+[`docs/research/attribution-pull-0/`](docs/research/attribution-pull-0/README.md)
+— `frames.html` and the ten-beat timeline become the **SignalTree arm** of
+`STATE-CONSEQUENCE-VALUE-0`. Reuse them; do not rebuild.
+
+### Original preregistration — preserved as written
+
+**OPEN — DEMAND FALSIFIER. RUN BEFORE ANY IMPLEMENTATION.**
 
 Establish whether actor/delegation provenance is a real buyer need before
 building any of it. Show the ordinary SignalTree causal explanation for a
@@ -268,10 +308,59 @@ but the specific split between a presented credential and an operation receipt.
 
 ## ATTRIBUTION-OWNER-0
 
-**OPEN — BLOCKED ON `ATTRIBUTION-PULL-0`. DO NOT IMPLEMENT UNTIL PULL IS SHOWN.**
+**UNBLOCKED 2026-09-08. Internal, unexported spike may proceed.**
 
-The ownership question: can trustworthy actor/delegation provenance be built
-without putting actor machinery into the kernel?
+Unblocked as a **bounded, internal, deletable feasibility prerequisite** —
+required to construct the SignalTree arm of `STATE-CONSEQUENCE-VALUE-0` — and
+explicitly **not** because market demand passed a threshold. The market sweep
+that retired the PULL-0 gate validated the adjacent IAM/accountability layer,
+not this thesis. Feasibility is a question that had to be answered before any
+provenance work regardless of what buyers say, and the answer is cheap and
+reversible to obtain.
+
+Prohibitions from the original preregistration all still hold: no public kernel
+API additions, no reopening `/authoring`, no actor fields in `WriteMetadata`, no
+async ambient context. Unblocked means the spike may be written, not that
+anything may ship.
+
+### The trust model shrinks — SignalTree consumes claims, it does not mint them
+
+Recorded 2026-09-08, and it makes the spike smaller. Agent identity, delegated
+authorization, on-behalf-of semantics, and signed authorization receipts are
+being commoditized by Entra Agent ID, Okta, SailPoint, AWS AgentCore, OpenID
+AuthZEN, and IETF delegation-receipt work. SignalTree must not reinvent any of
+it.
+
+```text
+external identity provider          SignalTree
+  agent identity                      provenance scope
+  human delegation          ───►      committed / rolled-back consequences
+  authorization                       causal linkage
+  signed claim                        binding claim to state effect
+```
+
+The spike therefore carries the external claim as an **opaque value it never
+interprets**:
+
+```ts
+interface ProvenanceScopeContext {
+  scopeId: string;
+  externalClaim?: unknown; // opaque provider-issued evidence
+}
+```
+
+The concrete claim type is not SignalTree's problem unless later evidence earns
+an adapter contract. This strengthens the null: a scope carrying an opaque blob
+is far easier to keep out of the kernel than one modelling a trust system.
+
+The `actor` / `onBehalfOf` / `authorization` fields described below remain the
+right **vocabulary for the evidence record**, but they are now understood as
+projections of an externally issued claim, not as facts SignalTree establishes.
+
+### The original ownership question
+
+Can trustworthy actor/delegation provenance be built without putting actor
+machinery into the kernel?
 
 The candidate answer is that a **provenance scope is an application-declared
 semantic operation boundary, not a SignalTree causal turn.** The kernel keeps
@@ -394,8 +483,9 @@ the evidence that decision asked for.
 
 ```yaml
 id: ATTRIBUTION-OWNER-0
-status: OPEN
-blocked_on: ATTRIBUTION-PULL-0
+status: OPEN / UNBLOCKED 2026-09-08
+blocked_on: none
+required_by: STATE-CONSEQUENCE-VALUE-0   # the spike builds its SignalTree arm
 
 question: >
   Can trustworthy actor/delegation provenance for SignalTree state effects be
@@ -466,9 +556,83 @@ outcomes:
     kernel only for that demonstrated fact.
 ```
 
-Only after both experiments report should anything decide whether
-`@signal-tree/provenance` exists, whether a narrow enhancer-authoring seam
-deserves to exist, or whether this stays a demo idea.
+Only after `ATTRIBUTION-OWNER-0` and `STATE-CONSEQUENCE-VALUE-0` report should
+anything decide whether `@signal-tree/provenance` exists, whether a narrow
+enhancer-authoring seam deserves to exist, or whether this stays a demo idea.
+
+## STATE-CONSEQUENCE-VALUE-0
+
+**OPEN — THE COMMERCIAL FALSIFIER. Supersedes `ATTRIBUTION-PULL-0` as the gate.**
+
+Not "does anyone want provenance" — that is settled and largely commoditized.
+The unresolved question is whether SignalTree's contribution is **distinct**:
+
+> Does application-state consequence provenance add material explanatory and
+> evidentiary value beyond a strong conventional stack?
+
+### Control arm must be strong, not a strawman
+
+The experiment is worthless against a naive comparison. The control is a
+competent 2026 stack:
+
+```text
+CONTROL                              CANDIDATE
+agent IAM / identity                 the same stack
++ delegated authorization / OBO      + SignalTree state-consequence provenance
++ OpenTelemetry agent & tool tracing
++ backend audit / event history
++ ordinary client state
+```
+
+Run both against the same incident — the `$375,000 Exception` is already
+scripted for it.
+
+### The questions both arms must answer
+
+```text
+Why is this application field this value now?
+Who intentionally initiated the consequential operation?
+Was the agent acting for someone?
+What authorization permitted it?
+Which state effects actually committed?
+Which were rolled back?
+What did the backend subsequently establish as truth?
+Did another client author the resulting value, or merely realize it?
+Did a later restoration represent a new human action?
+Can all of that be connected without manually stitching four telemetry systems?
+```
+
+### Measured
+
+```text
+time to correct explanation
+manual cross-system joins required
+missing causal edges
+wrong actor attribution
+authored vs realized distinction preserved
+committed vs rolled-back effects distinguished
+ability to explain the current state value
+later realizations/restorations traced without actor inheritance
+application-specific instrumentation required
+```
+
+### Core falsifier
+
+> If competent investigators reconstruct the same state-causal explanation from
+> the control stack with comparable correctness, effort, and bespoke
+> correlation, **SignalTree has not established differentiated value** and
+> provenance returns to parked.
+
+### Notes
+
+The white-space claim behind this experiment — that no general-purpose layer
+organizes evidence around the resulting application-state consequence — rests on
+absence from a broad search, which is not a defensible universal negative. This
+experiment exists precisely to test it rather than assume it.
+
+Depends on `ATTRIBUTION-OWNER-0` for the candidate arm.
+[`docs/research/attribution-pull-0/frames.html`](docs/research/attribution-pull-0/frames.html)
+supplies the narrative shell for the SignalTree side.
 
 ## ENTITY-PHYSICAL-DENSITY-0 — CLOSED
 
