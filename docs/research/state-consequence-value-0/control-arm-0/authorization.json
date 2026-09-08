@@ -1,0 +1,29 @@
+{
+  "_source": "Policy decision point (AuthZEN-shaped decision log).",
+  "decisions": [
+    {
+      "decisionId": "az-5510",
+      "at": "2026-03-12T10:36:44Z",
+      "subject": { "actor": "svc-procurement-agent", "onBehalfOf": "alice@northwind.example", "agentSessionId": "ag-17" },
+      "action": "orders.reroute.propose",
+      "resource": "order/7841",
+      "decision": "PERMIT",
+      "policy": "expedite-proposal-under-50k",
+      "context": { "incrementalCostUsd": 42000, "thresholdUsd": 50000 }
+    },
+    {
+      "decisionId": "az-5511",
+      "at": "2026-03-12T10:36:45Z",
+      "subject": { "actor": "svc-procurement-agent", "onBehalfOf": "alice@northwind.example" },
+      "action": "orders.reroute.execute",
+      "resource": "order/7841",
+      "decision": "DENY",
+      "policy": "expedite-requires-dual-approval",
+      "obligations": ["approval:operations", "approval:finance"]
+    }
+  ],
+  "approvals": [
+    { "approvalId": "ap-48291", "at": "2026-03-12T10:41:18Z", "role": "operations", "principal": "alice@northwind.example", "sessionId": "us-44", "resource": "order/7841", "outcome": "APPROVED", "requestId": "rq-80" },
+    { "approvalId": "ap-48292", "at": "2026-03-12T10:43:02Z", "role": "finance", "principal": "raj@northwind.example", "sessionId": "us-45", "resource": "order/7841", "outcome": "APPROVED", "requestId": "rq-81" }
+  ]
+}
