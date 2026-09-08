@@ -19,12 +19,47 @@ says nothing about it, and measures whether anyone notices.
 
 | File | Purpose |
 | ---- | ------- |
-| [`walkthrough-script.md`](walkthrough-script.md) | **Runnable.** Frame-by-frame narrated walkthrough — build this as slides and go |
+| [`frames.html`](frames.html) | **The evaluator-facing artifact.** Open in a browser, full-screen, arrow keys to advance |
+| [`walkthrough-script.md`](walkthrough-script.md) | Facilitator narration for each frame, plus both interview phases |
 | [`stripped-timeline.md`](stripped-timeline.md) | The strip rules, and why each beat keeps or drops what it does |
 | [`evaluator-script.md`](evaluator-script.md) | Facilitator wording, and the phrases that invalidate a session |
 | [`scoring-sheet.md`](scoring-sheet.md) | Per-session observation sheet, one per evaluator |
 
-Start with the walkthrough script. It needs no working software.
+No working software required. The facilitator drives `frames.html` and reads
+narration from the walkthrough script; the evaluator sees only the frames.
+
+## Freezing the instrument
+
+The frames are part of the experiment, not presentation material. A wording or
+layout "improvement" made midway through a cohort makes the sessions
+non-comparable, and the damage is invisible in the results.
+
+```text
+PULL-0 instrument
+  walkthrough text     d42bb728
+  rendered artifact    <fill in at the freeze commit>
+  evaluator version    recorded per session on the scoring sheet
+```
+
+Rules:
+
+1. **Pilot once** for comprehension and timing before any valid session. Pilot
+   findings may change the frames — that is what the pilot is for.
+2. **Freeze after the pilot.** Record the commit above.
+3. **Do not edit `frames.html` during a cohort.** If you must, record the new
+   commit, note which evaluators saw which version, and treat the cohort as two
+   groups when scoring.
+4. Pilot sessions are never counted as evaluator evidence.
+
+## Deliberately plain
+
+The artifact is unstyled on purpose. No marketing aesthetic, no animation, no
+icons for people or systems, no causal-graph visual, and **no empty or dashed
+fields** anywhere. An "Actor: —" column, a blank avatar slot, or a conspicuously
+unstyled gap tells the evaluator what is missing and invalidates the session.
+
+Every frame must read as a complete, ordinary screen. Nothing on it should look
+withheld.
 
 ## Before the first session — the demo does not exist
 
