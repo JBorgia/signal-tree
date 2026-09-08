@@ -209,6 +209,20 @@ GC, or restoration improvements.
 
 **OPEN — DEMAND FALSIFIER. RUN BEFORE ANY IMPLEMENTATION.**
 
+Track state, frozen at `fb078a58`. The engineering side is closed; the next
+move is evidence collection, not design:
+
+```text
+ATTRIBUTION-PULL-0     READY / COLLECT EVIDENCE
+ATTRIBUTION-OWNER-0    BLOCKED
+provenance code        DO NOT BUILD
+authoring surface      DO NOT REOPEN
+```
+
+Do not reopen the architecture discussion to refine the model further. The
+design questions are settled to the level this experiment can act on; anything
+more is speculation ahead of data.
+
 Runnable instrument: [`docs/research/attribution-pull-0/`](docs/research/attribution-pull-0/README.md)
 — stripped-timeline spec, evaluator script, and per-session scoring sheet.
 

@@ -5,6 +5,24 @@
 > § "The $375,000 Exception". This is a deliberately incomplete build — do not
 > ship it, and do not let it become the canonical demo.
 
+## Pre-flight — reconcile against the built demo first
+
+**Required before the first evaluator session.** The ten beats below are derived
+from the planning document, not from the running application. Nobody has
+compared them to what the built `$375,000 Exception` demo actually renders.
+
+Walk the built demo against the beat table. Where they differ, **update this
+fixture to match what evaluators will actually see** — never the reverse. A
+strip spec that describes the planning document rather than the screen will
+either strip something that was never there or leave an actor label visible,
+and the second failure silently invalidates every session run after it.
+
+Record the reconciliation date and the demo commit here when done:
+
+```text
+reconciled against build   ______________  (commit ____________)
+```
+
 ## What is stripped, and what is not
 
 The strip line is **identity, not causality**. The timeline must remain complete
