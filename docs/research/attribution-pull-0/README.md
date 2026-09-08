@@ -23,6 +23,13 @@ says nothing about it, and measures whether anyone notices.
 | [`evaluator-script.md`](evaluator-script.md) | Facilitator wording, and the phrases that invalidate a session |
 | [`scoring-sheet.md`](scoring-sheet.md) | Per-session observation sheet, one per evaluator |
 
+## Before the first session
+
+The beat table in [`stripped-timeline.md`](stripped-timeline.md) is derived from
+the planning document, not from the running demo. **Reconcile it against the
+built application first** — see that file's pre-flight section. A leftover actor
+label on screen invalidates every session run after it, silently.
+
 ## Two phases, one session
 
 A late addition to the protocol, because the single-phase version conflates two
