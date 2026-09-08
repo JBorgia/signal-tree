@@ -1064,6 +1064,56 @@ survived". Do not repeat `CONTROL-ARM-0` v1: build the DevTools control to win.
 
 ## STUDIO-VALUE-0
 
+**STATUS: BLOCKED — SYNTHETIC CONTROL INVALID. No product conclusion.**
+
+```text
+Reason:
+The hand-authored NgRx control was not representative of evidence a competent
+production NgRx application would actually produce. Repairing another synthetic
+fixture risks repeatedly encoding the interested party's assumptions into the
+control.
+
+Next admissible discriminator:
+same application implemented in NgRx and SignalTree,
+same backend, same injected defect,
+raw/unedited runtime evidence from both.
+```
+
+**What failed is the control INSTRUMENT, not the Studio thesis.** An independent
+adversarial review (25 findings) judged the fixture "weaker than a competently
+instrumented NgRx application in 2026, and weaker in ways that are specifically
+load-bearing rather than cosmetic."
+
+The two findings that make it inadmissible were both authored bias:
+
+```text
+PRE-EDITORIALIZED   backend note fields narrated the conclusion into the
+                    evidence ("Recomputation ... is owned by the pricing
+                    pipeline, which this job does not invoke")
+
+TOO EASY AND TOO HARD SIMULTANEOUSLY
+                    a warn carrying knownIssue PRICE-441 fired at the exact
+                    millisecond of failure, so the answer was greppable, while
+                    no invariant check existed anywhere, so the mechanism was
+                    invisible. That is not what real evidence looks like in
+                    either direction.
+```
+
+Structurally: 7 actions in 30 minutes, no `@ngrx/store/init`, no
+`ROOT_EFFECTS_INIT`, no router actions, diffs confined to one slice. **No real
+DevTools export looks like this.**
+
+**Twice now** a hand-authored control has been structurally weak in exactly the
+places that favour SignalTree (`CONTROL-ARM-0` v1, and this). That is a pattern,
+not an accident. The interested party cannot author a fair control from
+imagination.
+
+Build scope: [`docs/research/studio-value-0/BUILD-SCOPE.md`](docs/research/studio-value-0/BUILD-SCOPE.md)
+The synthetic fixtures under `control-arm/` are **INVALID** and retained only as
+the record of the failure.
+
+### Original preregistration, retained
+
 **OPEN — the gate for the Studio wedge. Same discipline as the provenance track.**
 
 > Does SignalTree causal state plus a minimal inspector materially beat
