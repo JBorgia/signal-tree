@@ -1,0 +1,32 @@
+{
+  "_source": "Client-side structured logging a competent team would reasonably add around important state operations. Ordinary application store; NO bespoke state-provenance system.",
+  "_deliberate_note": "Entries are NOT annotated with authored-vs-realized, transaction disposition, or restoration semantics. Those are the properties under test. If the control wants them it must instrument them itself, and that engineering is measured.",
+  "browser-A": [
+    { "at": "2026-03-12T10:34:52Z", "traceId": "4ad1c9e2f0b74a1d", "session": "us-44", "event": "state.set", "key": "order.7841.deliveryConfidence", "value": 0.61, "prev": 0.92 },
+    { "at": "2026-03-12T10:36:52Z", "traceId": "4ad1c9e2f0b74a1d", "session": "us-44", "event": "state.set", "key": "order.7841.recommendedCarrier", "value": "NorthStar Freight" },
+    { "at": "2026-03-12T10:36:52Z", "traceId": "4ad1c9e2f0b74a1d", "session": "us-44", "event": "state.set", "key": "order.7841.expediteCostUsd", "value": 42000 },
+    { "at": "2026-03-12T10:36:53Z", "traceId": "4ad1c9e2f0b74a1d", "session": "us-44", "event": "state.set", "key": "order.7841.executionStatus", "value": "BLOCKED_AWAITING_APPROVALS" },
+    { "at": "2026-03-12T10:41:19Z", "session": "us-44", "event": "state.set", "key": "order.7841.approvals.operations", "value": "APPROVED" },
+    { "at": "2026-03-12T10:43:04Z", "session": "us-44", "event": "state.set", "key": "order.7841.approvals.finance", "value": "APPROVED" },
+    { "at": "2026-03-12T10:44:05Z", "session": "us-44", "event": "state.set", "key": "order.7841.rerouteStatus", "value": "authorized", "prev": "proposed" },
+    { "at": "2026-03-12T10:44:06Z", "session": "us-44", "event": "state.set", "key": "order.7841.priority", "value": "EXPEDITED", "prev": "STANDARD" },
+    { "at": "2026-03-12T10:51:31Z", "session": "us-44", "event": "state.set", "key": "order.7841.bookingStatus", "value": "pending" },
+    { "at": "2026-03-12T11:19:09Z", "session": "us-44", "event": "state.set", "key": "order.7841.tracking", "value": "NSF-882401" },
+    { "at": "2026-03-12T11:19:09Z", "session": "us-44", "event": "state.set", "key": "order.7841.eta", "value": "2026-03-12T14:30:00Z" },
+    { "at": "2026-03-12T12:16:47Z", "session": "us-44", "event": "state.set", "key": "order.7841.priority", "value": "STANDARD", "prev": "EXPEDITED" }
+  ],
+  "browser-B": [
+    { "at": "2026-03-12T10:42:58Z", "session": "us-45", "event": "ui.click", "target": "approve-finance" },
+    { "at": "2026-03-12T10:43:03Z", "session": "us-45", "event": "state.set", "key": "order.7841.approvals.finance", "value": "APPROVED" },
+    { "at": "2026-03-12T10:44:07Z", "session": "us-45", "event": "state.set", "key": "order.7841.rerouteStatus", "value": "authorized" }
+  ],
+  "field-device-7": [
+    { "at": "2026-03-12T11:07:32Z", "session": "us-46", "event": "state.set", "key": "order.7841.departure", "value": "departed-dock", "connectivity": "offline" },
+    { "at": "2026-03-12T11:14:50Z", "session": "us-46", "event": "sync.replay", "pendingCount": 3, "connectivity": "online" },
+    { "at": "2026-03-12T11:14:56Z", "session": "us-46", "event": "state.set", "key": "order.7841.departure", "value": "departed-dock" }
+  ],
+  "_known_client_gaps": [
+    "A speculative local write set order.7841.priority to EXPEDITED at 10:38:11 in browser-A and was withdrawn at 10:38:40 when the pre-approval check failed. Only the withdrawal's net result is visible in this log; the intermediate is absent because the store logs on commit.",
+    "browser-A and browser-B both show rerouteStatus=authorized. The log does not distinguish which client produced the value and which received it."
+  ]
+}

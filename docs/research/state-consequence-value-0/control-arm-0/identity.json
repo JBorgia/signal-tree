@@ -1,0 +1,31 @@
+{
+  "_source": "Agent identity provider (Entra Agent ID / Okta-shaped). Structure follows OBO token conventions.",
+  "agentSessions": [
+    {
+      "agentSessionId": "ag-17",
+      "agentId": "procurement-agent",
+      "agentDisplayName": "Procurement Agent",
+      "model": "gpt-5-class",
+      "authenticatedAt": "2026-03-12T10:35:02Z",
+      "expiresAt": "2026-03-12T11:35:02Z",
+      "actor": { "type": "agent", "sub": "svc-procurement-agent" },
+      "onBehalfOf": {
+        "type": "user",
+        "sub": "alice@northwind.example",
+        "displayName": "Alice Okonkwo",
+        "roles": ["operations.approver"]
+      },
+      "scopes": ["orders.read", "orders.reroute.propose"],
+      "tokenId": "tok-9f2a"
+    }
+  ],
+  "userSessions": [
+    { "sessionId": "us-44", "sub": "alice@northwind.example", "displayName": "Alice Okonkwo", "authenticatedAt": "2026-03-12T09:58:11Z", "client": "browser-A" },
+    { "sessionId": "us-45", "sub": "raj@northwind.example", "displayName": "Raj Patel", "roles": ["finance.approver"], "authenticatedAt": "2026-03-12T10:12:40Z", "client": "browser-B" },
+    { "sessionId": "us-46", "sub": "dana@northwind.example", "displayName": "Dana Ruiz", "roles": ["field.operator"], "authenticatedAt": "2026-03-12T10:50:03Z", "client": "field-device-7" }
+  ],
+  "serviceIdentities": [
+    { "sub": "svc-legacy-automation", "displayName": "Legacy Priority Automation", "type": "service" },
+    { "sub": "svc-carrier-callback", "displayName": "Carrier Booking Callback", "type": "service" }
+  ]
+}

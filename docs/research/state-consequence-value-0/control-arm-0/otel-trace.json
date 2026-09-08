@@ -1,0 +1,125 @@
+{
+  "_source": "OpenTelemetry spans. Attribute names follow OTel GenAI semantic conventions where applicable (gen_ai.*).",
+  "traces": [
+    {
+      "traceId": "4ad1c9e2f0b74a1d",
+      "spans": [
+        {
+          "spanId": "481",
+          "parent": null,
+          "name": "ui.expedite_workflow",
+          "start": "2026-03-12T10:34:50Z",
+          "end": "2026-03-12T10:44:10Z",
+          "attributes": {
+            "enduser.id": "alice@northwind.example",
+            "session.id": "us-44",
+            "order.id": "7841",
+            "client": "browser-A"
+          }
+        },
+        {
+          "spanId": "482",
+          "parent": "481",
+          "name": "gen_ai.invoke_agent",
+          "start": "2026-03-12T10:35:05Z",
+          "end": "2026-03-12T10:36:50Z",
+          "attributes": {
+            "gen_ai.operation.name": "invoke_agent",
+            "gen_ai.agent.id": "procurement-agent",
+            "agent.session.id": "ag-17",
+            "enduser.id": "alice@northwind.example"
+          }
+        },
+        {
+          "spanId": "483",
+          "parent": "482",
+          "name": "gen_ai.execute_tool searchCarrier",
+          "start": "2026-03-12T10:35:40Z",
+          "end": "2026-03-12T10:36:10Z",
+          "attributes": {
+            "gen_ai.tool.name": "searchCarrier",
+            "gen_ai.operation.name": "execute_tool",
+            "result.carrier": "NorthStar Freight",
+            "result.etaDelta": "-1d"
+          }
+        },
+        {
+          "spanId": "484",
+          "parent": "482",
+          "name": "gen_ai.execute_tool submitReroute",
+          "start": "2026-03-12T10:36:30Z",
+          "end": "2026-03-12T10:36:48Z",
+          "attributes": {
+            "gen_ai.tool.name": "submitReroute",
+            "gen_ai.operation.name": "execute_tool",
+            "arg.carrier": "NorthStar Freight",
+            "arg.incrementalCostUsd": 42000
+          }
+        },
+        {
+          "spanId": "485",
+          "parent": "484",
+          "name": "POST /orders/7841/reroute-proposal",
+          "start": "2026-03-12T10:36:40Z",
+          "end": "2026-03-12T10:36:47Z",
+          "attributes": {
+            "http.request.method": "POST",
+            "http.response.status_code": 202,
+            "request.id": "rq-79",
+            "authz.decision.id": "az-5510"
+          }
+        },
+        {
+          "spanId": "486",
+          "parent": null,
+          "name": "POST /orders/7841/reroute-execute",
+          "start": "2026-03-12T10:44:02Z",
+          "end": "2026-03-12T10:44:09Z",
+          "attributes": {
+            "http.request.method": "POST",
+            "http.response.status_code": 200,
+            "request.id": "rq-82",
+            "enduser.id": "alice@northwind.example",
+            "approvals": "ap-48291,ap-48292"
+          }
+        }
+      ]
+    },
+    {
+      "traceId": "7c33ab5590de41f8",
+      "spans": [
+        {
+          "spanId": "610",
+          "parent": null,
+          "name": "carrier.booking_callback",
+          "start": "2026-03-12T11:19:02Z",
+          "end": "2026-03-12T11:19:08Z",
+          "attributes": {
+            "request.id": "carrier-callback-91",
+            "service.name": "svc-carrier-callback",
+            "order.id": "7841"
+          }
+        }
+      ]
+    },
+    {
+      "traceId": "b90e17d4cc2a4e77",
+      "spans": [
+        {
+          "spanId": "720",
+          "parent": null,
+          "name": "legacy.nightly_priority_sweep",
+          "start": "2026-03-12T12:16:40Z",
+          "end": "2026-03-12T12:16:49Z",
+          "attributes": {
+            "service.name": "svc-legacy-automation",
+            "request.id": "rq-la-338",
+            "records.scanned": 4120,
+            "records.updated": 37
+          }
+        }
+      ]
+    }
+  ],
+  "_gap_note": "No span exists for the field device's offline capture; it was recorded while disconnected and replayed on reconnect without its own trace context."
+}

@@ -1,0 +1,12 @@
+{
+  "_source": "Authoritative business-object mutation log (append-only).",
+  "entries": [
+    { "at": "2026-03-12T10:36:47Z", "requestId": "rq-79", "principal": "svc-procurement-agent", "onBehalfOf": "alice@northwind.example", "order": "7841", "field": "rerouteProposal", "before": null, "after": { "carrier": "NorthStar Freight", "incrementalCostUsd": 42000 } },
+    { "at": "2026-03-12T10:44:08Z", "requestId": "rq-82", "principal": "alice@northwind.example", "order": "7841", "field": "rerouteApproved", "before": false, "after": true },
+    { "at": "2026-03-12T10:51:30Z", "requestId": "rq-82", "principal": "svc-booking", "order": "7841", "field": "bookingStatus", "before": "none", "after": "pending" },
+    { "at": "2026-03-12T11:14:55Z", "requestId": "rq-88", "principal": "dana@northwind.example", "order": "7841", "field": "departureRecorded", "before": null, "after": "2026-03-12T11:07:32Z", "note": "submitted on reconnect; client-supplied timestamp differs from server receipt" },
+    { "at": "2026-03-12T11:19:07Z", "requestId": "carrier-callback-91", "principal": "svc-carrier-callback", "order": "7841", "field": "tracking", "before": null, "after": "NSF-882401" },
+    { "at": "2026-03-12T11:19:07Z", "requestId": "carrier-callback-91", "principal": "svc-carrier-callback", "order": "7841", "field": "eta", "before": null, "after": "2026-03-12T14:30:00Z" },
+    { "at": "2026-03-12T12:16:44Z", "requestId": "rq-la-338", "principal": "svc-legacy-automation", "order": "7841", "field": "priority", "before": "EXPEDITED", "after": "STANDARD" }
+  ]
+}
