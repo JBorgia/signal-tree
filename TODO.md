@@ -205,6 +205,254 @@ pathological application startup falsifier. A slower `setAll` remains an
 acceptable trade when it buys measured recurring speed, density, allocation,
 GC, or restoration improvements.
 
+## ATTRIBUTION-PULL-0
+
+**OPEN — DEMAND FALSIFIER. RUN BEFORE ANY IMPLEMENTATION.**
+
+Establish whether actor/delegation provenance is a real buyer need before
+building any of it. Show the ordinary SignalTree causal explanation for a
+consequential AI-controlled transaction with actor provenance **deliberately
+absent**, and do not mention that it is missing. Observe whether evaluators
+spontaneously ask who caused a transition, whether it was agent or user, under
+whose authority the agent acted, who approved it, or whether the record can be
+independently verified.
+
+Segment the population. The signal differs, and so does its weight:
+
+```text
+ENGINEERING / SRE          "who or what actually caused this?"
+                           "was that server truth or agent action?"
+
+SECURITY / RISK / AUDIT    "which principal authorized that?"
+                           "was the agent delegated?"
+                           "can I prove who approved it?"
+                           "can that record be independently verified?"
+```
+
+A dev audience structurally under-detects this: "who did this, under whose
+authority" is a compliance question, not a debugging question. **No spontaneous
+question from engineers is a weak negative. No spontaneous attribution or
+delegation question from a risk/compliance evaluator, after watching a
+consequential agent-driven transaction, is a much stronger negative.**
+
+Reading:
+
+```text
+repeated unprompted asks        -> permission to spike ATTRIBUTION-OWNER-0
+no asks                         -> do not build it yet
+explicit indifference after
+  the capability is explained   -> evidence against productization
+```
+
+Absence of asks is not deletion authority; latent needs exist and are not always
+articulated. If a risk evaluator asks how they would know the agent really acted
+under a named principal's authority, that validates not merely actor provenance
+but the specific split between a presented credential and an operation receipt.
+
+## ATTRIBUTION-OWNER-0
+
+**OPEN — BLOCKED ON `ATTRIBUTION-PULL-0`. DO NOT IMPLEMENT UNTIL PULL IS SHOWN.**
+
+The ownership question: can trustworthy actor/delegation provenance be built
+without putting actor machinery into the kernel?
+
+The candidate answer is that a **provenance scope is an application-declared
+semantic operation boundary, not a SignalTree causal turn.** The kernel keeps
+physical mutation, authorship, publication, realization, and external
+consequence exactly as they are. The scope only says: for the duration of this
+synchronous frame, attribute qualifying effects to this provenance context.
+That resolves the fact that ordinary writes have no universal authored-turn
+identifier for provenance to decorate — `turnId` is private to the transactions
+enhancer (`transactions.ts`), and outside a transaction a consequence runs
+immediately in the caller's stack (`commit-consequence.ts`). The caller naming
+the scope *is* the boundary.
+
+Four separate questions, four separate fields. Do not overload them:
+
+```text
+actor          who intentionally initiated this provenance operation
+onBehalfOf     whose delegated authority the actor was exercising
+authorization  what permission / approval / policy permitted it
+origin         what semantic kind of transition this particular effect was
+derivedFrom    which prior operation caused this consequence
+```
+
+`authorization`, never `authority` — the kernel already uses *authority* for who
+owns the decision or the truth, and a second meaning inside the same record
+would collide.
+
+Origin is **per effect**, actor is **per scope**. One scope can legitimately span
+authored and external effects, so origin cannot live on the scope without
+re-coupling two axes that are supposed to be orthogonal.
+
+```ts
+interface ProvenanceScope {
+  scopeId: string;
+  actor: ActorRef;
+  onBehalfOf?: PrincipalRef;
+  authorization?: AuthorizationRef;
+  parentScopeId?: string;      // nested scopes: inner wins, lineage retained
+  attempts: ProvenanceAttempt[];
+  effects: ProvenanceEffect[];
+  summary: ProvenanceSummary;  // derived convenience, never authoritative
+}
+
+interface ProvenanceEffect {
+  path: string;
+  origin: 'authored' | 'external' | 'realization' | 'restoration';
+  derivedFrom?: string;        // realization/restoration: point at the cause,
+                               // never inherit the original actor
+  disposition: 'committed' | 'rolled-back';
+  revertedBy?: string;         // what caused the reversal — without this a
+                               // multi-scope transaction implicates the wrong
+                               // actor for a failure it did not own
+  published: boolean;
+  equalityBasis?: string;      // publication is equality-gated; without the
+                               // compare verdict or a config fingerprint,
+                               // cross-deployment comparison is unsound
+}
+
+interface ProvenanceSummary {
+  attempted: number;
+  committed: number;
+  rolledBack: number;
+  published: number;
+  classification:
+    | 'committed'
+    | 'rolled-back'
+    | 'partial'
+    | 'no-published-state-effect'
+    | 'failed';
+}
+```
+
+`no-published-state-effect`, never `no-effect`. Semantic transitions may be
+value-neutral, so "nothing published" must not be recorded as "nothing
+happened." Individual effects are the evidence; the classification is
+convenience.
+
+Trust is two artifacts, not one. The client **presents** a claim; a trusted sink
+**verifies** it and issues a receipt. Never let the claimant declare its own
+assurance level.
+
+```text
+IDENTITY / DELEGATION CREDENTIAL   "agent-7 is authenticated and may act for Alice"
+OPERATION RECEIPT                  "the sink observed scope P42 with these effects"
+                                   scopeId + canonicalEffectsHash + assurance
+                                   ideally the server issues the scopeId/nonce
+```
+
+A session-bound credential attests the *session*, not the operation; anything
+holding it could attribute arbitrary operations to that actor. Binding the
+receipt to the effect set is what makes `server-attested` mean something.
+
+The control-mode coverage gap is **not** an actor claim. Count only authored
+writes landing outside every provenance scope while a declared control session
+is active — realizations, restorations, and background reconciliation must not
+create noise. It says the cooperative protocol was not honoured, never that the
+agent caused the write. Report it as *provenance coverage*, not compliance.
+
+### Packaging is the real fork
+
+The settlement primitives a provenance enhancer needs are internal only.
+`onCommitScopesSettled` / `settleCommitScope` / `hasOpenCommitScope` are reached
+by `transactions.ts` and `owner-invalidation.ts` and are exported from neither
+`index.ts` nor `adapter.ts`; `index.ts` states outright that
+`getActiveWriteContext` and `interceptLeafSignals` are not root app API.
+`transactions()` can observe settlement only because it ships inside the kernel
+package. So "no kernel change" is a property of **where the code lives**, not of
+the semantics:
+
+```text
+(a) inside the kernel package    no public change, but actor vocabulary lands in the kernel
+(b) companion package            requires a new enhancer-authoring seam
+(c) unexported internal spike    no public change; decides (a) vs (b) with evidence
+```
+
+Take **(c)**. Do not reopen `/authoring` — it is recorded as STOPPED and
+UNPROVEN pending derived external implementer needs, and this spike is exactly
+the evidence that decision asked for.
+
+### Preregistration
+
+```yaml
+id: ATTRIBUTION-OWNER-0
+status: OPEN
+blocked_on: ATTRIBUTION-PULL-0
+
+question: >
+  Can trustworthy actor/delegation provenance for SignalTree state effects be
+  implemented entirely as an internal enhancer using existing kernel
+  mutation/origin/commit-settlement machinery, without changing the public
+  kernel contract?
+
+null: >
+  Provenance is not a kernel semantic authority. An enhancer-local synchronous
+  provenance scope plus existing internal write/origin/settlement seams can
+  observe attempts, committed effects, rollback, mixed origins, nesting, and
+  derived consequences correctly.
+
+prohibited_changes:
+  - no public kernel API additions
+  - no reopening /authoring
+  - no actor fields in WriteMetadata
+  - no provenance fields added to core mutation types
+  - no async ambient provenance context   # follows external()'s ST1035 ruling
+
+falsifiers:
+  - enhancer cannot distinguish committed from rolled-back effects
+  - mixed authored/external effects cannot retain independent origins
+  - provenance/external nesting order changes the resulting effect set
+  - transaction boundaries cross provenance scopes in a way the model cannot
+    represent truthfully
+  - value-neutral / no-publication cases force false "no effect" claims
+  - derived realization/restoration requires falsely inheriting the original actor
+  - a reversal cannot be attributed to its cause, implicating the wrong actor
+  - trusted sink cannot bind verified identity/delegation to the resulting
+    scope/effect record
+
+controls:
+  - ordinary authored write
+  - synchronous multi-write scope
+  - transaction commit
+  - transaction rollback
+  - committed write plus rolled-back transaction => partial scope
+  - scope that throws AFTER a write already committed => committed + failed
+  - authored + external mixed-origin scope
+  - provenance(external(write)) vs external(provenance(write))  # order-invariant
+  - nested provenance scopes
+  - two provenance scopes inside one transaction
+  - scope spanning writes to two trees          # settlement is tree-local
+  - same-value write with no publication
+  - realization/restoration derivedFrom case
+  - control-mode authored write outside every provenance scope
+
+sub_prediction:
+  question: may one transaction contain multiple provenance scopes?
+  predicted: >
+    YES. A multi-agent atomic workflow is the enterprise case the demo exists to
+    show, so prohibiting an actor change inside an open transaction forecloses
+    the product. Stated as a prediction rather than an open menu so the spike
+    can falsify it.
+
+outcomes:
+  A: >
+    Internal enhancer is sufficient. Provenance ownership is outside the kernel.
+    Use the evidence to decide whether a companion package deserves a narrow
+    enhancer-authoring seam.
+  B: >
+    Semantics belong outside the kernel, but one or more internal facilities must
+    become a narrowly defined authoring surface. Derive that surface from the
+    spike rather than resurrecting /authoring wholesale.
+  C: >
+    Correct provenance requires a genuinely new kernel semantic fact. Reopen the
+    kernel only for that demonstrated fact.
+```
+
+Only after both experiments report should anything decide whether
+`@signal-tree/provenance` exists, whether a narrow enhancer-authoring seam
+deserves to exist, or whether this stays a demo idea.
+
 ## ENTITY-PHYSICAL-DENSITY-0 — CLOSED
 
 The architecture-selection investigation is closed at `14302192`. Do not reopen
