@@ -889,6 +889,20 @@ export interface DevToolsConfig {
   /** Optional custom serializer for devtools state snapshots */
   serialize?: (state: unknown) => unknown;
   /**
+   * Add an id-keyed `byId` view alongside an `entityMap`'s `all` array in the
+   * DevTools payload. Display only — `all` is untouched, so time-travel
+   * round-trips unchanged.
+   *
+   * Redux DevTools' Chart tab labels array children by index, so a collection
+   * shows as `all[0] … all[n]` with no entity identity. This gives Chart real
+   * ids to label with, at the cost of roughly doubling the serialized size of
+   * each collection. Off by default.
+   *
+   * Keys are probed from `id` / `key` / `uuid`; if any entity lacks one the
+   * view is omitted rather than partially built.
+   */
+  entityKeyedView?: boolean;
+  /**
    * Configuration for sharing a single Redux DevTools instance across multiple stores.
    * When provided, stores with the same id will share a single DevTools connection.
    */
