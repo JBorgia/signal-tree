@@ -5,22 +5,55 @@
 > § "The $375,000 Exception". This is a deliberately incomplete build — do not
 > ship it, and do not let it become the canonical demo.
 
-## Pre-flight — reconcile against the built demo first
+## Pre-flight — THE DEMO DOES NOT EXIST YET
 
-**Required before the first evaluator session.** The ten beats below are derived
-from the planning document, not from the running application. Nobody has
-compared them to what the built `$375,000 Exception` demo actually renders.
+**Checked at `b4367505`: there is nothing to reconcile against.** The
+`$375,000 Exception` exists only as the planning document
+(`docs/reference/SignalTree_v15_Unified_Demo_and_Demo_Portfolio.docx`, committed
+`dbf958ad`). No file in the repository implements it; `git ls-files` matches
+nothing for the scenario, and the demo app's routes are all library-teaching
+examples — the five-minute tour, causality, External truth & Link, EntityMap,
+deep typing, architecture overview.
 
-Walk the built demo against the beat table. Where they differ, **update this
-fixture to match what evaluators will actually see** — never the reverse. A
-strip spec that describes the planning document rather than the screen will
-either strip something that was never there or leave an actor label visible,
-and the second failure silently invalidates every session run after it.
-
-Record the reconciliation date and the demo commit here when done:
+Several beats also depend on **commercial layers that do not exist as software**:
 
 ```text
-reconciled against build   ______________  (commit ____________)
+beat 5, 6, 9    Relay           unbuilt
+beat 8          Studio          unbuilt
+beat 9          Audit           unbuilt
+beat 10         Verified Audit  unbuilt
+```
+
+### PULL-0 does not need the flagship demo
+
+This is the important part. The experiment measures whether an evaluator
+spontaneously asks *who acted*. That depends on the **fidelity of the timeline as
+presented**, not on the fidelity of the implementation behind it. A convincing
+narrated walkthrough provokes the same question as a working distributed system.
+
+Building the flagship first would invert the logic — spending months on the
+artifact whose commercial case PULL-0 exists to test.
+
+Three viable artifacts, cheapest first. Pick deliberately and record the choice:
+
+```text
+(c) narrated static walkthrough    hours   slides or a screen recording of the
+                                           ten beats; no working software
+(b) clickable prototype            days    scripted click-through; state is faked
+(a) the built flagship demo        months  blocked on Relay/Studio/Audit
+```
+
+**(c) is sufficient** for a demand falsifier and is what the recruiting pitch
+already promises — "a short prototype." Do not let artifact fidelity become the
+reason this experiment never runs.
+
+Whichever is chosen, the beat table below is the script for it, and the strip
+rules apply identically. Record the choice before the first session:
+
+```text
+artifact chosen      ______________  (a / b / c)
+built at             ______________  (commit or file)
+strip verified by    ______________  walked the artifact, no actor label visible
 ```
 
 ## What is stripped, and what is not

@@ -23,12 +23,21 @@ says nothing about it, and measures whether anyone notices.
 | [`evaluator-script.md`](evaluator-script.md) | Facilitator wording, and the phrases that invalidate a session |
 | [`scoring-sheet.md`](scoring-sheet.md) | Per-session observation sheet, one per evaluator |
 
-## Before the first session
+## Before the first session — the demo does not exist
 
-The beat table in [`stripped-timeline.md`](stripped-timeline.md) is derived from
-the planning document, not from the running demo. **Reconcile it against the
-built application first** — see that file's pre-flight section. A leftover actor
-label on screen invalidates every session run after it, silently.
+Checked at `b4367505`: the `$375,000 Exception` is a planning document only, and
+four of its ten beats depend on unbuilt commercial layers (Relay, Studio, Audit,
+Verified Audit). There is nothing to reconcile the strip spec against.
+
+**This does not block PULL-0.** The experiment measures whether evaluators
+spontaneously ask *who acted*, which depends on the timeline as presented, not
+on working software behind it. A narrated walkthrough of the ten beats is
+sufficient and takes hours. See
+[`stripped-timeline.md`](stripped-timeline.md) § Pre-flight for the three
+artifact options and the fields to record before the first session.
+
+Building the flagship demo first would invert the logic — investing months in
+the artifact whose commercial case this experiment exists to test.
 
 ## Two phases, one session
 
