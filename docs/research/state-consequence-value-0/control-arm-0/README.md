@@ -137,11 +137,61 @@ control 4 minutes vs SignalTree 3 minutes   ->  NO BUSINESS
 
 It has to win **materially**, not marginally.
 
+## Run history
+
+### v1 — INVALID FOR ANY MOAT CLAIM
+
+The first blind run falsified the **fixture**, not the thesis. The investigator
+answered Q1-Q4 and Q9 with high confidence and failed Q6 and Q8 — but too many
+failures traced to inconsistencies introduced by the fixture author rather than
+to real limits of a conventional stack:
+
+```text
+priority never recorded as set to EXPEDITED    missing audit coverage
+svc-booking absent from identity.json           unregistered principal
+rq-82 reused across two principals              non-unique join key
+browser-A logged zero ui.click, browser-B did   asymmetric instrumentation
+pendingCount 3 vs one visible offline write     unexplained inconsistency
+only 4 of 18 client entries carried traceId     weak correlation propagation
+no PDP decision for any service principal       incomplete authz coverage
+no server revision echoed to the client         missing ordinary field
+```
+
+Worse, the strongest apparently-pro-SignalTree signal — that 22 of 31
+correlations were timestamp-adjacency rather than ID-based — was itself a
+product of that weak propagation. **Claiming white space from v1 would have been
+claiming a moat manufactured by the fixture author's own sloppiness.**
+
+Retained from v1: the investigator independently concluded the dispute turned on
+**transaction disposition, authored-vs-realized, and restoration semantics**.
+That validates the QUESTION SET. It is not evidence for any particular solution.
+
+### v2 — all eight bucket-1 items repaired
+
+```text
++ audit entry priority STANDARD -> EXPEDITED (rev 1045, derived write)
++ svc-booking, svc-orders-api registered
++ unique request ids per principal (rq-85 for svc-booking)
++ symmetric ui.click / interactionId across all three clients
++ pendingCount reconciled to 1, captureIds listed
++ traceId / requestId propagated through approvals, execute, replay
++ PDP decisions for every service principal, incl. the legacy sweep,
+  with its selection rule and match reason
++ serverRevision on every mutation, echoed as appliedRevision in client logs
++ span parentage corrected; offline capture linked to its replay
+```
+
+**Q6 and Q8 are now the real discriminators.** The control has full ordinary
+correlation infrastructure. What it still does not have is a state-semantic
+model — no origin marker, no transaction disposition, no restoration semantics.
+If ordinary fields turn out to answer Q6 and Q8, the white space shrinks
+dramatically, and that is a legitimate result.
+
 ## Status
 
 ```text
-fixtures            BUILT (this directory)
-blind investigation NOT YET RUN
-failure triage      pending investigation
+fixtures v2         BUILT
+blind re-run        DISPATCHED
+failure triage      pending
 independent review  REQUIRED before any bucket-3 claim is accepted
 ```

@@ -1,32 +1,52 @@
 {
-  "_source": "Client-side structured logging a competent team would reasonably add around important state operations. Ordinary application store; NO bespoke state-provenance system.",
+  "_source": "Client-side structured logging. Ordinary application store. Symmetric instrumentation across all three clients: UI interactions, API request lifecycle, and the serverRevision each applied value came from where one is known.",
+  "_version": "v2 — CONTROL-ARM-0 fixture repair. Symmetric ui.click/interactionId, traceId+requestId propagated, appliedRevision recorded, request lifecycle logged.",
   "_deliberate_note": "Entries are NOT annotated with authored-vs-realized, transaction disposition, or restoration semantics. Those are the properties under test. If the control wants them it must instrument them itself, and that engineering is measured.",
   "browser-A": [
-    { "at": "2026-03-12T10:34:52Z", "traceId": "4ad1c9e2f0b74a1d", "session": "us-44", "event": "state.set", "key": "order.7841.deliveryConfidence", "value": 0.61, "prev": 0.92 },
-    { "at": "2026-03-12T10:36:52Z", "traceId": "4ad1c9e2f0b74a1d", "session": "us-44", "event": "state.set", "key": "order.7841.recommendedCarrier", "value": "NorthStar Freight" },
-    { "at": "2026-03-12T10:36:52Z", "traceId": "4ad1c9e2f0b74a1d", "session": "us-44", "event": "state.set", "key": "order.7841.expediteCostUsd", "value": 42000 },
-    { "at": "2026-03-12T10:36:53Z", "traceId": "4ad1c9e2f0b74a1d", "session": "us-44", "event": "state.set", "key": "order.7841.executionStatus", "value": "BLOCKED_AWAITING_APPROVALS" },
-    { "at": "2026-03-12T10:41:19Z", "session": "us-44", "event": "state.set", "key": "order.7841.approvals.operations", "value": "APPROVED" },
-    { "at": "2026-03-12T10:43:04Z", "session": "us-44", "event": "state.set", "key": "order.7841.approvals.finance", "value": "APPROVED" },
+    { "at": "2026-03-12T10:34:50Z", "session": "us-44", "clientInstanceId": "cli-a1", "traceId": "4ad1c9e2f0b74a1d", "event": "ui.click", "target": "open-expedite-workflow", "interactionId": "ix-a-2180" },
+    { "at": "2026-03-12T10:34:52Z", "session": "us-44", "traceId": "4ad1c9e2f0b74a1d", "event": "state.set", "key": "order.7841.deliveryConfidence", "value": 0.61, "prev": 0.92 },
+    { "at": "2026-03-12T10:35:04Z", "session": "us-44", "traceId": "4ad1c9e2f0b74a1d", "event": "ui.click", "target": "ask-agent-for-options", "interactionId": "ix-a-2184" },
+    { "at": "2026-03-12T10:36:52Z", "session": "us-44", "traceId": "4ad1c9e2f0b74a1d", "event": "state.set", "key": "order.7841.recommendedCarrier", "value": "NorthStar Freight" },
+    { "at": "2026-03-12T10:36:52Z", "session": "us-44", "traceId": "4ad1c9e2f0b74a1d", "event": "state.set", "key": "order.7841.expediteCostUsd", "value": 42000 },
+    { "at": "2026-03-12T10:36:53Z", "session": "us-44", "traceId": "4ad1c9e2f0b74a1d", "event": "state.set", "key": "order.7841.executionStatus", "value": "BLOCKED_AWAITING_APPROVALS" },
+
+    { "at": "2026-03-12T10:38:11Z", "session": "us-44", "traceId": "4ad1c9e2f0b74a1d", "event": "ui.click", "target": "execute-reroute", "interactionId": "ix-a-2198" },
+    { "at": "2026-03-12T10:38:12Z", "session": "us-44", "traceId": "4ad1c9e2f0b74a1d", "event": "api.request.start", "requestId": "rq-80a", "endpoint": "POST /orders/7841/reroute-execute", "interactionId": "ix-a-2198" },
+    { "at": "2026-03-12T10:38:40Z", "session": "us-44", "traceId": "4ad1c9e2f0b74a1d", "event": "api.request.failed", "requestId": "rq-80a", "status": 403, "error": "authorization_denied", "interactionId": "ix-a-2198" },
+
+    { "at": "2026-03-12T10:41:14Z", "session": "us-44", "traceId": "4ad1c9e2f0b74a1d", "event": "ui.click", "target": "approve-operations", "interactionId": "ix-a-2201" },
+    { "at": "2026-03-12T10:41:15Z", "session": "us-44", "traceId": "4ad1c9e2f0b74a1d", "event": "api.request.start", "requestId": "rq-80", "endpoint": "POST /orders/7841/approvals/operations", "interactionId": "ix-a-2201" },
+    { "at": "2026-03-12T10:41:19Z", "session": "us-44", "traceId": "4ad1c9e2f0b74a1d", "event": "api.request.succeeded", "requestId": "rq-80", "status": 200, "appliedRevision": 1042 },
+    { "at": "2026-03-12T10:41:19Z", "session": "us-44", "traceId": "4ad1c9e2f0b74a1d", "event": "state.set", "key": "order.7841.approvals.operations", "value": "APPROVED", "appliedRevision": 1042 },
+
+    { "at": "2026-03-12T10:43:04Z", "session": "us-44", "event": "state.set", "key": "order.7841.approvals.finance", "value": "APPROVED", "appliedRevision": 1043 },
+
+    { "at": "2026-03-12T10:44:01Z", "session": "us-44", "traceId": "4ad1c9e2f0b74a1d", "event": "ui.click", "target": "execute-reroute", "interactionId": "ix-a-2214" },
+    { "at": "2026-03-12T10:44:02Z", "session": "us-44", "traceId": "4ad1c9e2f0b74a1d", "event": "api.request.start", "requestId": "rq-82", "endpoint": "POST /orders/7841/reroute-execute", "interactionId": "ix-a-2214" },
     { "at": "2026-03-12T10:44:05Z", "session": "us-44", "event": "state.set", "key": "order.7841.rerouteStatus", "value": "authorized", "prev": "proposed" },
     { "at": "2026-03-12T10:44:06Z", "session": "us-44", "event": "state.set", "key": "order.7841.priority", "value": "EXPEDITED", "prev": "STANDARD" },
-    { "at": "2026-03-12T10:51:31Z", "session": "us-44", "event": "state.set", "key": "order.7841.bookingStatus", "value": "pending" },
-    { "at": "2026-03-12T11:19:09Z", "session": "us-44", "event": "state.set", "key": "order.7841.tracking", "value": "NSF-882401" },
-    { "at": "2026-03-12T11:19:09Z", "session": "us-44", "event": "state.set", "key": "order.7841.eta", "value": "2026-03-12T14:30:00Z" },
-    { "at": "2026-03-12T12:16:47Z", "session": "us-44", "event": "state.set", "key": "order.7841.priority", "value": "STANDARD", "prev": "EXPEDITED" }
+    { "at": "2026-03-12T10:44:09Z", "session": "us-44", "traceId": "4ad1c9e2f0b74a1d", "event": "api.request.succeeded", "requestId": "rq-82", "status": 200, "appliedRevision": 1045 },
+
+    { "at": "2026-03-12T10:51:31Z", "session": "us-44", "event": "state.set", "key": "order.7841.bookingStatus", "value": "pending", "appliedRevision": 1046 },
+    { "at": "2026-03-12T11:19:09Z", "session": "us-44", "event": "state.set", "key": "order.7841.tracking", "value": "NSF-882401", "appliedRevision": 1048 },
+    { "at": "2026-03-12T11:19:09Z", "session": "us-44", "event": "state.set", "key": "order.7841.eta", "value": "2026-03-12T14:30:00Z", "appliedRevision": 1049 },
+    { "at": "2026-03-12T12:16:47Z", "session": "us-44", "event": "state.set", "key": "order.7841.priority", "value": "STANDARD", "prev": "EXPEDITED", "appliedRevision": 1050 }
   ],
   "browser-B": [
-    { "at": "2026-03-12T10:42:58Z", "session": "us-45", "event": "ui.click", "target": "approve-finance" },
-    { "at": "2026-03-12T10:43:03Z", "session": "us-45", "event": "state.set", "key": "order.7841.approvals.finance", "value": "APPROVED" },
-    { "at": "2026-03-12T10:44:07Z", "session": "us-45", "event": "state.set", "key": "order.7841.rerouteStatus", "value": "authorized" }
+    { "at": "2026-03-12T10:42:50Z", "session": "us-45", "clientInstanceId": "cli-b7", "traceId": "4ad1c9e2f0b74a1d", "event": "ui.click", "target": "open-approval-review", "interactionId": "ix-b-1099" },
+    { "at": "2026-03-12T10:42:58Z", "session": "us-45", "traceId": "4ad1c9e2f0b74a1d", "event": "ui.click", "target": "approve-finance", "interactionId": "ix-b-1104" },
+    { "at": "2026-03-12T10:42:59Z", "session": "us-45", "traceId": "4ad1c9e2f0b74a1d", "event": "api.request.start", "requestId": "rq-81", "endpoint": "POST /orders/7841/approvals/finance", "interactionId": "ix-b-1104" },
+    { "at": "2026-03-12T10:43:03Z", "session": "us-45", "traceId": "4ad1c9e2f0b74a1d", "event": "api.request.succeeded", "requestId": "rq-81", "status": 200, "appliedRevision": 1043 },
+    { "at": "2026-03-12T10:43:03Z", "session": "us-45", "event": "state.set", "key": "order.7841.approvals.finance", "value": "APPROVED", "appliedRevision": 1043 },
+    { "at": "2026-03-12T10:44:07Z", "session": "us-45", "event": "state.set", "key": "order.7841.rerouteStatus", "value": "authorized" },
+    { "at": "2026-03-12T10:44:07Z", "session": "us-45", "event": "state.set", "key": "order.7841.priority", "value": "EXPEDITED" }
   ],
   "field-device-7": [
-    { "at": "2026-03-12T11:07:32Z", "session": "us-46", "event": "state.set", "key": "order.7841.departure", "value": "departed-dock", "connectivity": "offline" },
-    { "at": "2026-03-12T11:14:50Z", "session": "us-46", "event": "sync.replay", "pendingCount": 3, "connectivity": "online" },
-    { "at": "2026-03-12T11:14:56Z", "session": "us-46", "event": "state.set", "key": "order.7841.departure", "value": "departed-dock" }
-  ],
-  "_known_client_gaps": [
-    "A speculative local write set order.7841.priority to EXPEDITED at 10:38:11 in browser-A and was withdrawn at 10:38:40 when the pre-approval check failed. Only the withdrawal's net result is visible in this log; the intermediate is absent because the store logs on commit.",
-    "browser-A and browser-B both show rerouteStatus=authorized. The log does not distinguish which client produced the value and which received it."
+    { "at": "2026-03-12T11:07:30Z", "session": "us-46", "clientInstanceId": "cli-f3", "event": "ui.click", "target": "record-departure", "interactionId": "ix-f-0042", "connectivity": "offline" },
+    { "at": "2026-03-12T11:07:32Z", "session": "us-46", "event": "state.set", "key": "order.7841.departure", "value": "departed-dock", "connectivity": "offline", "captureId": "cap-3311" },
+    { "at": "2026-03-12T11:14:50Z", "session": "us-46", "event": "sync.replay", "pendingCount": 1, "captureIds": ["cap-3311"], "connectivity": "online" },
+    { "at": "2026-03-12T11:14:52Z", "session": "us-46", "traceId": "2f81b6ce40aa4d93", "event": "api.request.start", "requestId": "rq-88", "endpoint": "POST /orders/7841/departure", "captureId": "cap-3311", "replay": true },
+    { "at": "2026-03-12T11:14:55Z", "session": "us-46", "traceId": "2f81b6ce40aa4d93", "event": "api.request.succeeded", "requestId": "rq-88", "status": 200, "appliedRevision": 1047 },
+    { "at": "2026-03-12T11:14:56Z", "session": "us-46", "event": "state.set", "key": "order.7841.departure", "value": "departed-dock", "appliedRevision": 1047, "captureId": "cap-3311" }
   ]
 }

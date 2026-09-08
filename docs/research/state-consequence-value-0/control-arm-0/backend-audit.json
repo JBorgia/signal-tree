@@ -1,12 +1,139 @@
 {
-  "_source": "Authoritative business-object mutation log (append-only).",
+  "_source": "Authoritative business-object mutation log (append-only). Every write carries a monotonic serverRevision returned to callers and echoed in API responses.",
+  "_version": "v2 — CONTROL-ARM-0 fixture repair. Full field coverage including derived writes; unique request ids per principal; serverRevision added.",
   "entries": [
-    { "at": "2026-03-12T10:36:47Z", "requestId": "rq-79", "principal": "svc-procurement-agent", "onBehalfOf": "alice@northwind.example", "order": "7841", "field": "rerouteProposal", "before": null, "after": { "carrier": "NorthStar Freight", "incrementalCostUsd": 42000 } },
-    { "at": "2026-03-12T10:44:08Z", "requestId": "rq-82", "principal": "alice@northwind.example", "order": "7841", "field": "rerouteApproved", "before": false, "after": true },
-    { "at": "2026-03-12T10:51:30Z", "requestId": "rq-82", "principal": "svc-booking", "order": "7841", "field": "bookingStatus", "before": "none", "after": "pending" },
-    { "at": "2026-03-12T11:14:55Z", "requestId": "rq-88", "principal": "dana@northwind.example", "order": "7841", "field": "departureRecorded", "before": null, "after": "2026-03-12T11:07:32Z", "note": "submitted on reconnect; client-supplied timestamp differs from server receipt" },
-    { "at": "2026-03-12T11:19:07Z", "requestId": "carrier-callback-91", "principal": "svc-carrier-callback", "order": "7841", "field": "tracking", "before": null, "after": "NSF-882401" },
-    { "at": "2026-03-12T11:19:07Z", "requestId": "carrier-callback-91", "principal": "svc-carrier-callback", "order": "7841", "field": "eta", "before": null, "after": "2026-03-12T14:30:00Z" },
-    { "at": "2026-03-12T12:16:44Z", "requestId": "rq-la-338", "principal": "svc-legacy-automation", "order": "7841", "field": "priority", "before": "EXPEDITED", "after": "STANDARD" }
+    {
+      "at": "2026-03-12T10:36:47Z",
+      "serverRevision": 1041,
+      "requestId": "rq-79",
+      "traceId": "4ad1c9e2f0b74a1d",
+      "principal": "svc-procurement-agent",
+      "onBehalfOf": "alice@northwind.example",
+      "authzDecisionId": "az-5510",
+      "order": "7841",
+      "field": "rerouteProposal",
+      "before": null,
+      "after": { "carrier": "NorthStar Freight", "incrementalCostUsd": 42000 }
+    },
+    {
+      "at": "2026-03-12T10:38:16Z",
+      "serverRevision": null,
+      "requestId": "rq-80a",
+      "traceId": "4ad1c9e2f0b74a1d",
+      "principal": "alice@northwind.example",
+      "authzDecisionId": "az-5518",
+      "order": "7841",
+      "field": null,
+      "outcome": "REJECTED",
+      "note": "No mutation applied. Authorization denied; request produced no state change."
+    },
+    {
+      "at": "2026-03-12T10:41:19Z",
+      "serverRevision": 1042,
+      "requestId": "rq-80",
+      "traceId": "4ad1c9e2f0b74a1d",
+      "principal": "alice@northwind.example",
+      "order": "7841",
+      "field": "approvals.operations",
+      "before": null,
+      "after": "APPROVED"
+    },
+    {
+      "at": "2026-03-12T10:43:03Z",
+      "serverRevision": 1043,
+      "requestId": "rq-81",
+      "traceId": "4ad1c9e2f0b74a1d",
+      "principal": "raj@northwind.example",
+      "order": "7841",
+      "field": "approvals.finance",
+      "before": null,
+      "after": "APPROVED"
+    },
+    {
+      "at": "2026-03-12T10:44:08Z",
+      "serverRevision": 1044,
+      "requestId": "rq-82",
+      "traceId": "4ad1c9e2f0b74a1d",
+      "principal": "alice@northwind.example",
+      "authzDecisionId": "az-5533",
+      "order": "7841",
+      "field": "rerouteApproved",
+      "before": false,
+      "after": true
+    },
+    {
+      "at": "2026-03-12T10:44:08Z",
+      "serverRevision": 1045,
+      "requestId": "rq-82",
+      "traceId": "4ad1c9e2f0b74a1d",
+      "principal": "alice@northwind.example",
+      "order": "7841",
+      "field": "priority",
+      "before": "STANDARD",
+      "after": "EXPEDITED",
+      "derivedFrom": "rerouteApproved",
+      "note": "Derived write applied by the reroute-execute handler in the same transaction as rev 1044."
+    },
+    {
+      "at": "2026-03-12T10:51:30Z",
+      "serverRevision": 1046,
+      "requestId": "rq-85",
+      "traceId": "4ad1c9e2f0b74a1d",
+      "principal": "svc-booking",
+      "order": "7841",
+      "field": "bookingStatus",
+      "before": "none",
+      "after": "pending",
+      "note": "Downstream of rq-82; svc-booking issues its own request id."
+    },
+    {
+      "at": "2026-03-12T11:14:55Z",
+      "serverRevision": 1047,
+      "requestId": "rq-88",
+      "traceId": "2f81b6ce40aa4d93",
+      "principal": "dana@northwind.example",
+      "order": "7841",
+      "field": "departureRecorded",
+      "before": null,
+      "after": "2026-03-12T11:07:32Z",
+      "note": "Submitted on reconnect; client-supplied capture timestamp differs from server receipt."
+    },
+    {
+      "at": "2026-03-12T11:19:07Z",
+      "serverRevision": 1048,
+      "requestId": "rq-91",
+      "traceId": "7c33ab5590de41f8",
+      "principal": "svc-carrier-callback",
+      "authzDecisionId": "az-5602",
+      "order": "7841",
+      "field": "tracking",
+      "before": null,
+      "after": "NSF-882401"
+    },
+    {
+      "at": "2026-03-12T11:19:07Z",
+      "serverRevision": 1049,
+      "requestId": "rq-91",
+      "traceId": "7c33ab5590de41f8",
+      "principal": "svc-carrier-callback",
+      "authzDecisionId": "az-5602",
+      "order": "7841",
+      "field": "eta",
+      "before": null,
+      "after": "2026-03-12T14:30:00Z"
+    },
+    {
+      "at": "2026-03-12T12:16:44Z",
+      "serverRevision": 1050,
+      "requestId": "rq-la-338",
+      "traceId": "b90e17d4cc2a4e77",
+      "principal": "svc-legacy-automation",
+      "authzDecisionId": "az-5710",
+      "order": "7841",
+      "field": "priority",
+      "before": "EXPEDITED",
+      "after": "STANDARD",
+      "selectionRule": "priority-normalization-v3"
+    }
   ]
 }
