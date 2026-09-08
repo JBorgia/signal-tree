@@ -1,5 +1,6 @@
 {
   "_source": "Agent identity provider (Entra Agent ID / Okta-shaped). Structure follows OBO token conventions.",
+  "_version": "v2 — CONTROL-ARM-0 fixture repair. All service principals registered.",
   "agentSessions": [
     {
       "agentSessionId": "ag-17",
@@ -20,12 +21,59 @@
     }
   ],
   "userSessions": [
-    { "sessionId": "us-44", "sub": "alice@northwind.example", "displayName": "Alice Okonkwo", "authenticatedAt": "2026-03-12T09:58:11Z", "client": "browser-A" },
-    { "sessionId": "us-45", "sub": "raj@northwind.example", "displayName": "Raj Patel", "roles": ["finance.approver"], "authenticatedAt": "2026-03-12T10:12:40Z", "client": "browser-B" },
-    { "sessionId": "us-46", "sub": "dana@northwind.example", "displayName": "Dana Ruiz", "roles": ["field.operator"], "authenticatedAt": "2026-03-12T10:50:03Z", "client": "field-device-7" }
+    {
+      "sessionId": "us-44",
+      "sub": "alice@northwind.example",
+      "displayName": "Alice Okonkwo",
+      "roles": ["operations.approver"],
+      "authenticatedAt": "2026-03-12T09:58:11Z",
+      "client": "browser-A",
+      "clientInstanceId": "cli-a1"
+    },
+    {
+      "sessionId": "us-45",
+      "sub": "raj@northwind.example",
+      "displayName": "Raj Patel",
+      "roles": ["finance.approver"],
+      "authenticatedAt": "2026-03-12T10:12:40Z",
+      "client": "browser-B",
+      "clientInstanceId": "cli-b7"
+    },
+    {
+      "sessionId": "us-46",
+      "sub": "dana@northwind.example",
+      "displayName": "Dana Ruiz",
+      "roles": ["field.operator"],
+      "authenticatedAt": "2026-03-12T10:50:03Z",
+      "client": "field-device-7",
+      "clientInstanceId": "cli-f3"
+    }
   ],
   "serviceIdentities": [
-    { "sub": "svc-legacy-automation", "displayName": "Legacy Priority Automation", "type": "service" },
-    { "sub": "svc-carrier-callback", "displayName": "Carrier Booking Callback", "type": "service" }
+    {
+      "sub": "svc-booking",
+      "displayName": "Booking Orchestration Service",
+      "type": "service",
+      "owner": "logistics-platform-team"
+    },
+    {
+      "sub": "svc-carrier-callback",
+      "displayName": "Carrier Booking Callback",
+      "type": "service",
+      "owner": "logistics-platform-team"
+    },
+    {
+      "sub": "svc-legacy-automation",
+      "displayName": "Legacy Priority Automation",
+      "type": "service",
+      "owner": "order-management-team",
+      "note": "Nightly sweep. Scheduled job, no interactive principal."
+    },
+    {
+      "sub": "svc-orders-api",
+      "displayName": "Orders API",
+      "type": "service",
+      "owner": "order-management-team"
+    }
   ]
 }

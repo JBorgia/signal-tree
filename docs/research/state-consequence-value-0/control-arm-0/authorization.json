@@ -1,10 +1,17 @@
 {
-  "_source": "Policy decision point (AuthZEN-shaped decision log).",
+  "_source": "Policy decision point (AuthZEN-shaped decision log). ALL principals routed through the PDP, including service principals and scheduled jobs.",
+  "_version": "v2 — CONTROL-ARM-0 fixture repair. Service-principal coverage added.",
   "decisions": [
     {
       "decisionId": "az-5510",
       "at": "2026-03-12T10:36:44Z",
-      "subject": { "actor": "svc-procurement-agent", "onBehalfOf": "alice@northwind.example", "agentSessionId": "ag-17" },
+      "traceId": "4ad1c9e2f0b74a1d",
+      "requestId": "rq-79",
+      "subject": {
+        "actor": "svc-procurement-agent",
+        "onBehalfOf": "alice@northwind.example",
+        "agentSessionId": "ag-17"
+      },
       "action": "orders.reroute.propose",
       "resource": "order/7841",
       "decision": "PERMIT",
@@ -14,16 +21,99 @@
     {
       "decisionId": "az-5511",
       "at": "2026-03-12T10:36:45Z",
-      "subject": { "actor": "svc-procurement-agent", "onBehalfOf": "alice@northwind.example" },
+      "traceId": "4ad1c9e2f0b74a1d",
+      "requestId": "rq-79",
+      "subject": {
+        "actor": "svc-procurement-agent",
+        "onBehalfOf": "alice@northwind.example",
+        "agentSessionId": "ag-17"
+      },
       "action": "orders.reroute.execute",
       "resource": "order/7841",
       "decision": "DENY",
       "policy": "expedite-requires-dual-approval",
       "obligations": ["approval:operations", "approval:finance"]
+    },
+    {
+      "decisionId": "az-5518",
+      "at": "2026-03-12T10:38:14Z",
+      "traceId": "4ad1c9e2f0b74a1d",
+      "requestId": "rq-80a",
+      "subject": { "actor": "alice@northwind.example", "sessionId": "us-44" },
+      "action": "orders.reroute.execute",
+      "resource": "order/7841",
+      "decision": "DENY",
+      "policy": "expedite-requires-dual-approval",
+      "obligations": ["approval:operations", "approval:finance"],
+      "note": "Pre-approval attempt. Both approvals still outstanding at this time."
+    },
+    {
+      "decisionId": "az-5533",
+      "at": "2026-03-12T10:44:03Z",
+      "traceId": "4ad1c9e2f0b74a1d",
+      "requestId": "rq-82",
+      "subject": { "actor": "alice@northwind.example", "sessionId": "us-44" },
+      "action": "orders.reroute.execute",
+      "resource": "order/7841",
+      "decision": "PERMIT",
+      "policy": "expedite-requires-dual-approval",
+      "satisfiedObligations": ["ap-48291", "ap-48292"]
+    },
+    {
+      "decisionId": "az-5602",
+      "at": "2026-03-12T11:19:04Z",
+      "traceId": "7c33ab5590de41f8",
+      "requestId": "rq-91",
+      "subject": { "actor": "svc-carrier-callback" },
+      "action": "orders.booking.write",
+      "resource": "order/7841",
+      "decision": "PERMIT",
+      "policy": "carrier-callback-may-write-booking-fields"
+    },
+    {
+      "decisionId": "az-5710",
+      "at": "2026-03-12T12:16:42Z",
+      "traceId": "b90e17d4cc2a4e77",
+      "requestId": "rq-la-338",
+      "subject": { "actor": "svc-legacy-automation" },
+      "action": "orders.priority.write",
+      "resource": "order/7841",
+      "decision": "PERMIT",
+      "policy": "batch-jobs-may-normalize-priority",
+      "context": {
+        "job": "legacy.nightly_priority_sweep",
+        "selectionRule": "priority-normalization-v3",
+        "matchReason": "order.shipmentClass = 'standard-ground' AND order.priority != derivedDefault('standard-ground')",
+        "derivedDefault": "STANDARD"
+      }
     }
   ],
   "approvals": [
-    { "approvalId": "ap-48291", "at": "2026-03-12T10:41:18Z", "role": "operations", "principal": "alice@northwind.example", "sessionId": "us-44", "resource": "order/7841", "outcome": "APPROVED", "requestId": "rq-80" },
-    { "approvalId": "ap-48292", "at": "2026-03-12T10:43:02Z", "role": "finance", "principal": "raj@northwind.example", "sessionId": "us-45", "resource": "order/7841", "outcome": "APPROVED", "requestId": "rq-81" }
+    {
+      "approvalId": "ap-48291",
+      "at": "2026-03-12T10:41:18Z",
+      "role": "operations",
+      "principal": "alice@northwind.example",
+      "sessionId": "us-44",
+      "clientInstanceId": "cli-a1",
+      "resource": "order/7841",
+      "outcome": "APPROVED",
+      "requestId": "rq-80",
+      "traceId": "4ad1c9e2f0b74a1d",
+      "interactionId": "ix-a-2201"
+    },
+    {
+      "approvalId": "ap-48292",
+      "at": "2026-03-12T10:43:02Z",
+      "role": "finance",
+      "principal": "raj@northwind.example",
+      "sessionId": "us-45",
+      "clientInstanceId": "cli-b7",
+      "resource": "order/7841",
+      "outcome": "APPROVED",
+      "requestId": "rq-81",
+      "traceId": "4ad1c9e2f0b74a1d",
+      "interactionId": "ix-b-1104"
+    }
   ]
 }
