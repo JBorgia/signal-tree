@@ -451,17 +451,52 @@ MO-2  SETTLEMENT
       Can existing transaction identity expose commit/discard so captured
       effects can be dispositioned truthfully?
 
-MO-3  DERIVATION
-      Can later realization/restoration consequences be correlated to the
-      causal operation they derive from, using already-existing kernel facts,
-      WITHOUT copying the originating actor/claim onto the later write?
+MO-3A LOCAL DERIVATION
+      When SignalTree ITSELF performs restoration / rollback / replay, does
+      existing causal state identify the prior operation it derives from?
+
+MO-3B DISTRIBUTED DERIVATION
+      When external/server truth arrives, WHO OWNS the correlation between
+      that realization and the earlier application operation?
+```
+
+**MO-3B is an ownership question before it is a capability question.** For a
+scope that proposes a reroute, waits on HTTP, and receives authoritative server
+truth five seconds later, `R22 derives from P17` may not be a kernel fact at
+all. If nobody transports that correlation across the network, the kernel cannot
+infer it truthfully, and adding a kernel field would not help. Likely owners:
+application request context, Relay, the backend adapter, an OTel trace context,
+or the external provider claim.
+
+```text
+"the kernel does not know derivedFrom"   != Outcome C
+
+C means: SignalTree OWNS a semantic relationship but discards a fact required
+         to represent it truthfully.
+NOT:     SignalTree never received the cross-system correlation at all.
 ```
 
 ```text
-MO-1 + MO-2 + MO-3 all yes                    -> B earned
-need only generic exposure of existing facts  -> B, narrow authoring seam
-any required association does not survive     -> C, for that specific fact only
+MO-1A distinct-location transaction effects
+      B — existing identity sufficient (positions delivered, sidecar works)
+
+MO-1B repeated same-location effects
+      CLOSED — destroyed at capture BY DESIGN, and out of scope for the product
+
+MO-2  settlement
+      OPEN, B strongly predicted
+      adversarial control: tree A / tx 1 rollback vs tree B / tx 1 commit
+      must not cross. If (transactionOwner, transactionId) isolates them,
+      MO-2 is B: existing fact, missing observation surface.
+
+MO-3A local restoration/replay derivation
+      OPEN — inspect the existing causal referent
+
+MO-3B distributed realization derivation
+      OWNER QUESTION FIRST — probably transport/Relay/application, not kernel
 ```
+
+Only after those does `ATTRIBUTION-OWNER-0` finally become B or C.
 
 ### MO-1 partial answer — inventory + probe, 2026-09-08
 
@@ -494,11 +529,51 @@ same path twice, one tx   a(8) then a(9) -> ONE event, prev:1 next:9
   coalesced effect after both scopes closed. Which scope authored the surviving
   value is genuinely **destroyed**, not hidden.
 
-**Do not treat the C-case as automatically load-bearing.** Two actors writing
-the SAME field inside one atomic operation is an edge case, and coalescing is
-arguably correct behaviour — the transaction's net effect on `a` really is
-`1 → 9`. Scope it and judge whether any real workload needs it before letting it
-reopen kernel semantics.
+### MO-1B — CLOSED. Destroyed by design, and correctly so.
+
+The delivery probe above proved only that `PathNotifier` coalesces. It did NOT
+prove destruction — the accumulator might have held both effects before
+reducing. Inspected directly, it does not.
+
+`enqueueEffect` keys scalar effects by `kind\0path\0position\0subject`, so two
+writes to one path **collide by construction**, and on collision it mutates the
+existing record in place:
+
+```ts
+if (existing.kind === 'set' && effect.kind === 'set') {
+  existing.after = effect.after;                                 // in place
+  if (existing.before === existing.after) effectMap.delete(key); // round trip
+  return;                                                        // -> no effect
+}
+```
+
+No second record is ever created, not even transiently. A round-trip write
+(`1 -> 8 -> 1`) produces **zero** effects. **The distinction is genuinely
+destroyed at capture time, not merely unexposed.**
+
+**But this is a feature, not a defect, and it must not be reopened.** The
+composition is REQUIRED for correct rollback — the neighbouring `RESTORE-P0
+P0-B` comment records that keying structural effects without collision made
+rollback apply both inverses and restore a row under the name it had been
+renamed TO. Preserving intermediates would conflict with a correctness
+requirement the kernel already holds.
+
+**And the product does not need it.** Two claims must stay separate:
+
+```text
+AUDIT OF ATTEMPTS            A attempted a=8, B attempted a=9
+COMMITTED STATE CONSEQUENCE  the transaction changed a from 1 -> 9
+```
+
+SignalTree's thesis needs the second. Nothing yet shows it needs the first. A
+generic trace system already records calls; **net application-state consequence
+is the thing SignalTree may be uniquely able to explain**, and the coalescing
+behaviour IS that semantics rather than an obstacle to it.
+
+**Disposition: the same-path multi-scope attempt audit is OUT OF SCOPE for
+state-consequence provenance.** Do not let an exotic multi-actor/same-field
+transaction earn permanent kernel machinery unless `STATE-CONSEQUENCE-VALUE-0`
+demonstrates it needs those semantics.
 
 ### MO-2 — narrowed null
 
