@@ -412,17 +412,74 @@ function computeChangedPaths(
   return output;
 }
 
+/**
+ * Make truncation VISIBLE. Strings already do this (`…`); collections did not,
+ * so a 200-entity collection rendered as exactly 50 rows with nothing to say so
+ * — a debugger showing evidence that looks complete and is not.
+ */
+function withTruncationMarker(
+  items: unknown[],
+  totalLength: number,
+  maxArrayLength: number
+): unknown[] {
+  if (totalLength <= maxArrayLength) return items;
+  return [...items, `…${totalLength - maxArrayLength} more (truncated)`];
+}
+
+/** The `entityMap` snapshot signature: exactly one key, `all`, holding an array. */
+function isEntitySnapshotShape(obj: Record<string, unknown>): boolean {
+  const keys = Object.keys(obj);
+  return keys.length === 1 && keys[0] === 'all' && Array.isArray(obj['all']);
+}
+
+/**
+ * Build the id-keyed display view. The devtools layer does not know the
+ * collection's `selectId`, so it probes the common identity fields and gives up
+ * entirely if any entity lacks one — a partially-keyed view would be worse than
+ * none, since a missing row would look like a missing entity.
+ */
+function buildKeyedEntityView(
+  all: unknown[],
+  options: {
+    maxDepth: number;
+    maxArrayLength: number;
+    maxStringLength: number;
+    entityKeyedView?: boolean;
+  },
+  depth: number,
+  seen: WeakSet<object>
+): Record<string, unknown> | undefined {
+  if (all.length === 0) return undefined;
+  const slice = all.slice(0, options.maxArrayLength);
+  const keyed: Record<string, unknown> = {};
+  for (const entity of slice) {
+    if (entity === null || typeof entity !== 'object') return undefined;
+    const record = entity as Record<string, unknown>;
+    const rawKey = record['id'] ?? record['key'] ?? record['uuid'];
+    if (typeof rawKey !== 'string' && typeof rawKey !== 'number') {
+      return undefined;
+    }
+    keyed[String(rawKey)] = sanitizeState(entity, options, depth + 1, seen);
+  }
+  if (all.length > options.maxArrayLength) {
+    keyed['…'] = `${all.length - options.maxArrayLength} more (truncated)`;
+  }
+  return keyed;
+}
+
 function sanitizeState(
   value: unknown,
   options: {
     maxDepth: number;
     maxArrayLength: number;
     maxStringLength: number;
+    entityKeyedView?: boolean;
   },
   depth = 0,
   seen = new WeakSet<object>()
 ): unknown {
-  const { maxDepth, maxArrayLength, maxStringLength } = options;
+  const { maxDepth, maxArrayLength, maxStringLength, entityKeyedView } =
+    options;
 
   if (value === null || value === undefined) return value;
 
@@ -452,20 +509,27 @@ function sanitizeState(
 
     if (value instanceof Map) {
       const entries = Array.from(value.entries()).slice(0, maxArrayLength);
-      return entries.map(([k, v]) => [
+      const mapped: unknown[] = entries.map(([k, v]) => [
         sanitizeState(k, options, depth + 1, seen),
         sanitizeState(v, options, depth + 1, seen),
       ]);
+      return withTruncationMarker(mapped, value.size, maxArrayLength);
     }
 
     if (value instanceof Set) {
       const values = Array.from(value.values()).slice(0, maxArrayLength);
-      return values.map((v) => sanitizeState(v, options, depth + 1, seen));
+      const mapped: unknown[] = values.map((v) =>
+        sanitizeState(v, options, depth + 1, seen)
+      );
+      return withTruncationMarker(mapped, value.size, maxArrayLength);
     }
 
     if (Array.isArray(value)) {
       const list = value.slice(0, maxArrayLength);
-      return list.map((item) => sanitizeState(item, options, depth + 1, seen));
+      const mapped: unknown[] = list.map((item) =>
+        sanitizeState(item, options, depth + 1, seen)
+      );
+      return withTruncationMarker(mapped, value.length, maxArrayLength);
     }
 
     const result: Record<string, unknown> = {};
@@ -473,6 +537,33 @@ function sanitizeState(
       if (typeof val === 'function') continue;
       result[key] = sanitizeState(val, options, depth + 1, seen);
     }
+
+    // ENTITY KEYED VIEW (opt-in, display only).
+    //
+    // `entityMap`'s snapshot contract is exactly `{ all: [...] }` — see
+    // `entity-map.ts`, which guarantees that shape and explains why the JS
+    // `Map` form was withdrawn (it serialised as `{}`, claiming an empty
+    // collection while holding 10,000 entities).
+    //
+    // Redux DevTools' Chart tab labels array children by INDEX, so a
+    // collection renders as `all[0] … all[49]` with no entity identity
+    // anywhere. Adding a keyed sibling gives Chart real ids to label with.
+    //
+    // `all` is left untouched deliberately: `hydrate` reads `value.all`, so
+    // time-travel round-trips unchanged and the extra key is ignored on the
+    // way back in. Reshaping `all` itself would silently break restore — the
+    // partial-hydrate failure `entity-map.ts` warns about, where "the parts
+    // that DID apply make it look like it worked".
+    if (entityKeyedView && depth < maxDepth - 1 && isEntitySnapshotShape(obj)) {
+      const keyed = buildKeyedEntityView(
+        obj['all'] as unknown[],
+        options,
+        depth,
+        seen
+      );
+      if (keyed) result['byId'] = keyed;
+    }
+
     return result;
   }
 
@@ -1106,6 +1197,7 @@ export function createDevToolsEnhancer(
     maxSendsPerSecond,
     maxDepth = 10,
     maxArrayLength = 50,
+    entityKeyedView = false,
     maxStringLength = 2000,
     serialize,
     aggregatedReduxInstance,
@@ -1227,6 +1319,7 @@ export function createDevToolsEnhancer(
         maxDepth,
         maxArrayLength,
         maxStringLength,
+        entityKeyedView,
       });
     };
 
