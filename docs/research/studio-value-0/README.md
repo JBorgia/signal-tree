@@ -146,13 +146,24 @@ Do **not** solve the universal mutation-observation seam
 instrumentation and let the commercial result decide whether that seam deserves
 engineering.
 
-## Status
+## Status — BLOCKED
 
 ```text
-incident            FROZEN (above)
-questions + scoring PREREGISTERED (above)
-control arm         BUILT — see control-arm/
-independent attack  REQUIRED before the blind run
-blind run           not yet
-SignalTree arm      NOT STARTED, deliberately
+STATUS              BLOCKED — SYNTHETIC CONTROL INVALID
+product conclusion  NONE. The instrument failed, not the thesis.
+control-arm/        INVALID — see control-arm/INVALID.md
+next step           BUILD-SCOPE.md — two real apps, one backend, raw evidence
 ```
+
+The independent adversarial review (step 4) returned 25 findings and judged the
+synthetic control weaker than a competently instrumented NgRx application, in
+load-bearing rather than cosmetic ways. It never reached step 5.
+
+**The review paid for itself completely.** Skipping the equivalent step on
+`CONTROL-ARM-0` cost a whole invalid run; running it here caught the fixture
+*before* the blind investigation.
+
+The incident, questions and scoring above remain sound and carry forward — with
+two corrections recorded in `BUILD-SCOPE.md`: the real scenario contains no
+atomic multi-field operation unless one is built deliberately, and the
+coalescing trap on Q6 does not survive a network round trip.
