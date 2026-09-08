@@ -532,10 +532,9 @@ MO-1B repeated same-location effects
       CLOSED — destroyed at capture BY DESIGN, and out of scope for the product
 
 MO-2  settlement
-      OPEN, B strongly predicted
-      adversarial control: tree A / tx 1 rollback vs tree B / tx 1 commit
-      must not cross. If (transactionOwner, transactionId) isolates them,
-      MO-2 is B: existing fact, missing observation surface.
+      ATTRIBUTION ISOLATION = B (proven).
+      DISPOSITION ISOLATION = still OPEN — untestable until settlement
+      outcome is exposed, because rollback emits no event to cross with.
 
 MO-3A local restoration/replay derivation
       ANSWERED — SPLITS. rollback = B (referent exists).
@@ -623,6 +622,36 @@ behaviour IS that semantics rather than an obstacle to it.
 state-consequence provenance.** Do not let an exotic multi-actor/same-field
 transaction earn permanent kernel machinery unless `STATE-CONSEQUENCE-VALUE-0`
 demonstrates it needs those semantics.
+
+### MO-2 — PARTIAL, 2026-09-08. Attribution isolation earned; disposition not.
+
+**The adversarial condition is real.** Measured: two independent trees EACH open
+`transactionId: 1`. They are separated only by `ownerId` (1 vs 2) and distinct
+`transactionOwner` objects.
+
+```text
+tree A   path a   txId 1   ownerId 1
+tree B   path b   txId 1   ownerId 2
+```
+
+**The spike was written with the defect this control exists to catch** — its
+sidecar keyed on `transactionId` ALONE, so one tree's rollback would have
+reverted another tree's effects. It did not show, because rollback emits no
+event at all: **the bug hid behind the silence.** Now keyed on
+`(ownerId, transactionId)`, and both observation channels were collapsed onto
+one `ingest()` so the keying cannot drift between them again — it already had.
+
+```text
+PROVEN     attribution isolates across a colliding transaction id, using
+           facts the kernel already delivers -> B, no new semantics
+NOT PROVEN rollback DISPOSITION isolation. Untestable today: there is no
+           reversal event to cross trees with. Needs settlement outcome
+           exposed before it can be falsified at all.
+```
+
+Do not read the green control as MO-2 closed. **Half of MO-2 is currently
+unfalsifiable**, and that is itself the argument for exposing settlement
+outcome — not to add a feature, but to make a correctness property testable.
 
 ### MO-2 — narrowed null
 

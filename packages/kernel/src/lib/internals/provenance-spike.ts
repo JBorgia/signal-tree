@@ -155,7 +155,21 @@ const records: ProvenanceScopeRecord[] = [];
  * them. A record is therefore NOT final when its scope exits — rollback
  * happens after the scope has returned. That is a finding, not a workaround.
  */
-const byTransaction = new Map<number, ProvenanceEffect[]>();
+const byTransaction = new Map<string, ProvenanceEffect[]>();
+
+/**
+ * MO-2. Keyed on the PAIR, never on `transactionId` alone. Measured: two
+ * independent trees each open transaction id 1, distinguished only by
+ * `transactionOwner` / `ownerId`. Keying on the id alone lets one tree's
+ * rollback revert another tree's effects — a latent defect that currently
+ * hides behind rollback emitting no event at all.
+ */
+function txKey(meta: WriteMetadata | undefined): string | undefined {
+  const id = meta?.transactionId;
+  if (id === undefined) return undefined;
+  const owner = meta.ownerId ?? 'no-owner';
+  return `${String(owner)}\u0000${id}`;
+}
 
 /** Authored writes that landed outside every scope, for coverage accounting. */
 const uncovered: ProvenanceAttempt[] = [];
@@ -215,56 +229,11 @@ export function observeProvenance(
   channel: 'intercept' | 'path-notifier' = 'intercept'
 ): () => void {
   if (channel === 'path-notifier') return observeViaPathNotifier();
+  // Both channels funnel into `ingest` so keying and classification cannot
+  // drift between them — they did, and the drift hid the MO-2 defect.
   return interceptLeafSignals(
     tree.$,
-    (path, next, prev, meta) => {
-      const origin = classifyOrigin(meta);
-      const transactionId = meta?.transactionId;
-
-      // A compensation write amends the effects it reverses rather than
-      // becoming an effect of whatever scope happens to be open.
-      if (origin === 'transaction-rollback' && transactionId !== undefined) {
-        const reverted = byTransaction.get(transactionId);
-        if (reverted) {
-          for (const effect of reverted) {
-            effect.disposition = 'rolled-back';
-            effect.revertedBy = `transaction:${transactionId}`;
-          }
-        }
-        resummarizeAll();
-        return;
-      }
-
-      if (!active) {
-        if (origin === 'authored') uncovered.push({ path, origin });
-        return;
-      }
-
-      active.record.attempts.push({ path, origin });
-
-      const effect: ProvenanceEffect = {
-        path,
-        origin,
-        disposition: 'committed',
-        // NOT the publication fact. This is only "next and prev differ under
-        // Object.is" — SignalTree's equality policy may differ, and no seam
-        // currently reports whether a reactive consequence was published.
-        // Naming it `published` manufactured evidence we do not have.
-        objectIsChanged: !Object.is(next, prev),
-        published: 'unknown',
-        equalityBasis: 'Object.is (NOT the kernel publication fact)',
-        transactionId,
-      };
-      active.record.effects.push(effect);
-
-      if (transactionId !== undefined) {
-        const list = byTransaction.get(transactionId) ?? [];
-        list.push(effect);
-        byTransaction.set(transactionId, list);
-      }
-
-      active.record.summary = summarize(active.record);
-    },
+    (path, next, prev, meta) => ingest(path, next, prev, meta),
     { maxDepth: 32 }
   );
 }
@@ -278,9 +247,10 @@ function ingest(
 ): void {
   const origin = classifyOrigin(meta);
   const transactionId = meta?.transactionId;
+  const key = txKey(meta);
 
-  if (origin === 'transaction-rollback' && transactionId !== undefined) {
-    const reverted = byTransaction.get(transactionId);
+  if (origin === 'transaction-rollback' && key !== undefined) {
+    const reverted = byTransaction.get(key);
     if (reverted) {
       for (const effect of reverted) {
         effect.disposition = 'rolled-back';
@@ -307,10 +277,10 @@ function ingest(
     transactionId,
   };
   active.record.effects.push(effect);
-  if (transactionId !== undefined) {
-    const list = byTransaction.get(transactionId) ?? [];
+  if (key !== undefined) {
+    const list = byTransaction.get(key) ?? [];
     list.push(effect);
-    byTransaction.set(transactionId, list);
+    byTransaction.set(key, list);
   }
   active.record.summary = summarize(active.record);
 }
