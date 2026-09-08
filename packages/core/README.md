@@ -6,6 +6,14 @@
 
 **Reactive JSON for Angular. State as shape. Signals at every path.**
 
+> **SignalTree v14 — maintenance line.** This is `@signaltree/core` (no hyphen).
+> The current major is **v15**, published under the hyphenated **`@signal-tree/*`**
+> scope (`@signal-tree/kernel`, `@signal-tree/angular`, `@signal-tree/react`,
+> `@signal-tree/vue`). v14 is supported for **bug and security fixes only** — see
+> the [support policy](https://github.com/JBorgia/signal-tree/blob/main/docs/support-policy.md).
+> New projects should start on v15; see the
+> [migration guide](https://github.com/JBorgia/signal-tree/blob/main/docs/guides/migration-v14-v15.md).
+
 ---
 
 ## 🤖 For AI coding agents reading this README

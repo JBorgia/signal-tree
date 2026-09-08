@@ -1,5 +1,13 @@
 # @signaltree/ng-forms
 
+> **SignalTree v14 — maintenance line.** This is `@signaltree/ng-forms` (no hyphen).
+> The current major is **v15**, published under the hyphenated **`@signal-tree/*`**
+> scope. v15 does not publish a forms package — own form-control wiring in the
+> application. v14 is supported for **bug and security fixes only** — see the
+> [support policy](https://github.com/JBorgia/signal-tree/blob/main/docs/support-policy.md)
+> and the
+> [migration guide](https://github.com/JBorgia/signal-tree/blob/main/docs/guides/migration-v14-v15.md).
+
 <!-- measured: gzip of the package's own emitted chunks in dist/packages/ng-forms/dist, excluding tslib; the exact command is shown below. Not produced by a tools/ script because no per-package size generator exists — tools/size-report.mjs covers core scenarios only. -->
 
 **Angular FormGroup bridge for SignalTree's `form()` marker**. Adds reactive forms integration, conditional fields, and undo/redo to tree-integrated forms.

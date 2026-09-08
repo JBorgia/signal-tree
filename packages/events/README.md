@@ -1,5 +1,13 @@
 # @signaltree/events
 
+> **SignalTree v14 — maintenance line.** This is `@signaltree/events` (no hyphen).
+> The current major is **v15**, published under the hyphenated **`@signal-tree/*`**
+> scope. v15 does not publish an event-bus package. v14 is supported for **bug and
+> security fixes only** — see the
+> [support policy](https://github.com/JBorgia/signal-tree/blob/main/docs/support-policy.md)
+> and the
+> [migration guide](https://github.com/JBorgia/signal-tree/blob/main/docs/guides/migration-v14-v15.md).
+
 Event-driven architecture infrastructure for SignalTree applications. Provides a complete event bus system with validation, subscribers, error classification, and real-time sync.
 
 > **Scope:** `@signaltree/events` is primarily a standalone full-stack event bus — no tree methods, enhancers, or markers; you wire the bus and your trees together in application code. The one exception (v13+) is the Angular `entityEventHandler`/`applyOptimisticEntityChange` bridge below, which maps event batches onto `@signaltree/core`'s `entityMap` batch ops — everything else in this package has no dependency on `@signaltree/core`.

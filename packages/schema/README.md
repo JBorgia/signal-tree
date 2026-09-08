@@ -1,5 +1,13 @@
 # @signaltree/schema
 
+> **SignalTree v14 — maintenance line.** This is `@signaltree/schema` (no hyphen).
+> The current major is **v15**, published under the hyphenated **`@signal-tree/*`**
+> scope. v15 does not publish a validation package — validate in application code.
+> v14 is supported for **bug and security fixes only** — see the
+> [support policy](https://github.com/JBorgia/signal-tree/blob/main/docs/support-policy.md)
+> and the
+> [migration guide](https://github.com/JBorgia/signal-tree/blob/main/docs/guides/migration-v14-v15.md).
+
 Schema-driven validation for SignalTree. StandardSchema-compatible, async-first, observe-only.
 
 ```ts
