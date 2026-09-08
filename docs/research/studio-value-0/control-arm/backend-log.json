@@ -1,0 +1,11 @@
+{
+  "_source": "Backend service log + authoritative cart mutation records with monotonic serverRevision.",
+  "mutations": [
+    { "at": "2026-03-14T09:12:04.880Z", "serverRevision": 3307, "requestId": "rq-5501", "traceId": "9c1f0ab377e24d10", "service": "promo-service", "cart": "88213", "changes": { "discount": { "before": 0.0, "after": 18.0 }, "total": { "before": 120.0, "after": 102.0 } }, "note": "Promo SAVE20 nominal value 24.00 reduced to 18.00 by silver-tier cap. Server computes from its own baseline; it did not observe any client-side value." },
+    { "at": "2026-03-14T09:41:57.990Z", "serverRevision": 3341, "requestId": "rq-5620", "traceId": "44be810cd9f3427a", "service": "cart-maintenance", "job": "expire-stale-promos", "cart": "88213", "changes": { "promoCode": { "before": "SAVE20", "after": null }, "discount": { "before": 18.0, "after": 0.0 } }, "note": "Job clears promo attribution fields only. Recomputation of dependent monetary fields is owned by the pricing pipeline, which this job does not invoke." }
+  ],
+  "serviceLog": [
+    { "at": "2026-03-14T09:12:04.905Z", "level": "info", "service": "promo-service", "requestId": "rq-5501", "msg": "promo validated", "code": "SAVE20", "nominalDiscount": 24.0, "appliedDiscount": 18.0, "capRule": "tier.silver.maxPromoDiscount=18.00" },
+    { "at": "2026-03-14T09:41:58.001Z", "level": "warn", "service": "cart-maintenance", "requestId": "rq-5620", "msg": "promo expired without price recomputation", "cart": "88213", "knownIssue": "PRICE-441" }
+  ]
+}
