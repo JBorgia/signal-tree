@@ -1,5 +1,14 @@
 # @signaltree/guardrails
 
+> **SignalTree v14 — maintenance line.** This is `@signaltree/guardrails` (no hyphen).
+> The current major is **v15**, published under the hyphenated **`@signal-tree/*`**
+> scope, where dev-mode misuse warnings are folded into `@signal-tree/kernel` with
+> stable `[ST####]` codes — nothing to install. v14 is supported for **bug and
+> security fixes only** — see the
+> [support policy](https://github.com/JBorgia/signal-tree/blob/main/docs/support-policy.md)
+> and the
+> [migration guide](https://github.com/JBorgia/signal-tree/blob/main/docs/guides/migration-v14-v15.md).
+
 > Development-only performance monitoring and anti-pattern detection for SignalTree
 
 ## Features

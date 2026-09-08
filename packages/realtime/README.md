@@ -1,5 +1,14 @@
 # @signaltree/realtime
 
+> **SignalTree v14 — maintenance line.** This is `@signaltree/realtime` (no hyphen).
+> The current major is **v15**, published under the hyphenated **`@signal-tree/*`**
+> scope. v15 does not publish a transport/realtime package — own the socket and
+> write resolved values through ordinary paths or `entityMap`. v14 is supported
+> for **bug and security fixes only** — see the
+> [support policy](https://github.com/JBorgia/signal-tree/blob/main/docs/support-policy.md)
+> and the
+> [migration guide](https://github.com/JBorgia/signal-tree/blob/main/docs/guides/migration-v14-v15.md).
+
 Real-time data synchronization enhancers for SignalTree. Provides seamless integration with Supabase Realtime, with a generic adapter pattern for Firebase and custom WebSocket implementations.
 
 ## Installation
