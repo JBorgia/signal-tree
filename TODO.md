@@ -209,6 +209,9 @@ GC, or restoration improvements.
 
 **OPEN — DEMAND FALSIFIER. RUN BEFORE ANY IMPLEMENTATION.**
 
+Runnable instrument: [`docs/research/attribution-pull-0/`](docs/research/attribution-pull-0/README.md)
+— stripped-timeline spec, evaluator script, and per-session scoring sheet.
+
 Establish whether actor/delegation provenance is a real buyer need before
 building any of it. Show the ordinary SignalTree causal explanation for a
 consequential AI-controlled transaction with actor provenance **deliberately
