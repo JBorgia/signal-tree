@@ -291,6 +291,51 @@ describe('ATTRIBUTION-OWNER-0 spike', () => {
     }
   );
 
+  // MO-2 / CONTROL 11 — the adversarial namespace case, and the limit of what
+  // is currently provable.
+  //
+  // MEASURED: two independent trees EACH open transaction id 1. They are
+  // separated only by `ownerId` (1 vs 2) and distinct `transactionOwner`
+  // objects. A sidecar keyed on `transactionId` alone therefore lets one tree's
+  // rollback revert another tree's effects. The spike was written with exactly
+  // that defect and it did not show, because rollback emits no event at all —
+  // the bug hid behind the silence.
+  //
+  // WHAT THIS PROVES: attribution isolates across a colliding transaction id.
+  // WHAT IT CANNOT PROVE: rollback disposition isolation, which needs settlement
+  // outcome exposed. Do not read a pass here as MO-2 fully closed.
+  it('MO-2/C11. two trees sharing transaction id 1 do not cross-attribute', () => {
+    const treeA = signalTree({ a: 0 }, { enhancers: [transactions()] });
+    const treeB = signalTree({ b: 0 }, { enhancers: [transactions()] });
+    const stop = observeProvenance(treeA, 'path-notifier'); // '**' sees both
+
+    provenanceScope({ scopeId: 'treeA' }, () =>
+      treeA.transaction(() => {
+        treeA.$.a(1);
+      })
+    ).confirm();
+    provenanceScope({ scopeId: 'treeB' }, () =>
+      treeB.transaction(() => {
+        treeB.$.b(1);
+      })
+    ).confirm();
+    stop();
+
+    const a = scopeOf('treeA');
+    const b = scopeOf('treeB');
+
+    // Non-vacuity: both scopes must actually hold effects, and the adversarial
+    // condition must really have occurred — the same transaction id on both.
+    expect(a?.effects.length).toBeGreaterThan(0);
+    expect(b?.effects.length).toBeGreaterThan(0);
+    expect(a?.effects[0].transactionId).toBe(1);
+    expect(b?.effects[0].transactionId).toBe(1);
+
+    // Isolation: neither scope absorbed the other's path.
+    expect(a?.effects.map((e) => e.path)).toEqual(['a']);
+    expect(b?.effects.map((e) => e.path)).toEqual(['b']);
+  });
+
   it('13. same-value write is not reported as a published effect', () => {
     const tree = signalTree({ status: 'paid' });
     const stop = observeProvenance(tree);
