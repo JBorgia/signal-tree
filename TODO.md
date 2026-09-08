@@ -431,6 +431,107 @@ depth > 32                     same-value / equality suppression
 composition-safe mutation observation, and settlement outcome (`tree key`,
 `transaction id`, `commit | discard`) — are hypotheses, not a design.
 
+### The load-bearing question
+
+> **Is the missing scope identity merely UNEXPOSED, or actually DESTROYED?**
+
+Unexposed → **B**. Destroyed → **C**. `WriteMetadata` being a closed union must
+NOT decide this by itself. The real question is whether *some existing stable
+identity* lets enhancer-owned state carry the fact across the
+deferred-publication boundary. If yes, leave `WriteMetadata` alone.
+
+### Three independent questions
+
+```text
+MO-1  MUTATION IDENTITY
+      Can enhancer-owned state associate a synchronous provenance scope with a
+      stable individual mutation/effect identity?
+
+MO-2  SETTLEMENT
+      Can existing transaction identity expose commit/discard so captured
+      effects can be dispositioned truthfully?
+
+MO-3  DERIVATION
+      Can later realization/restoration consequences be correlated to the
+      causal operation they derive from, using already-existing kernel facts,
+      WITHOUT copying the originating actor/claim onto the later write?
+```
+
+```text
+MO-1 + MO-2 + MO-3 all yes                    -> B earned
+need only generic exposure of existing facts  -> B, narrow authoring seam
+any required association does not survive     -> C, for that specific fact only
+```
+
+### MO-1 partial answer — inventory + probe, 2026-09-08
+
+Per-effect shapes carry **no operation identity**:
+
+```text
+TurnEffectBase   { position, ownerPath, path }
+CausalEffect     { owner: PositionId, before, after, subjectId?, structural? }
+```
+
+Identity is **locational, not per-operation**. Probed against a real transaction:
+
+```text
+distinct paths, one tx    a -> positions[2], b -> positions[3], txId 1
+                          BOTH delivered  => sidecar keyed on
+                          (transactionOwner, transactionId, positionId) WORKS
+
+same path twice, one tx   a(8) then a(9) -> ONE event, prev:1 next:9
+                          the intermediate 8 is GONE  => COALESCED
+```
+
+**So MO-1 splits, and the split is the B/C line:**
+
+- **Distinct locations → B.** The association is merely unexposed. A sidecar on
+  existing facts recovers it with no `WriteMetadata` change and no new kernel
+  semantics.
+- **Same location, two scopes, one transaction → C for that fact.** Writes
+  inside a transaction are not delivered synchronously (that is what refuted
+  sub-prediction A), so a sidecar never sees the individual writes — it sees one
+  coalesced effect after both scopes closed. Which scope authored the surviving
+  value is genuinely **destroyed**, not hidden.
+
+**Do not treat the C-case as automatically load-bearing.** Two actors writing
+the SAME field inside one atomic operation is an edge case, and coalescing is
+arguably correct behaviour — the transaction's net effect on `a` really is
+`1 → 9`. Scope it and judge whether any real workload needs it before letting it
+reopen kernel semantics.
+
+### MO-2 — narrowed null
+
+> **Rollback provenance requires settlement outcome, not necessarily
+> rollback-write publication.**
+
+Given captured effects plus `(transactionOwner, transactionId, 'commit' |
+'discard')`, provenance can disposition the effects it already holds and set
+`revertedBy: transaction:N`. A compensating write notification is only needed if
+some independently meaningful consequence occurs that the original effects plus
+disposition do not represent. **Do not add an event merely because the first
+record representation expected one.**
+
+### `published` is demoted
+
+Load-bearing: `attempted`, `committed`, `rolled-back`, `realized/restored`.
+Secondary: `published`. Whether a reactive notification was emitted may matter
+for Studio debugging but is not obviously part of state-consequence provenance.
+**Do not let proving `published` drag the architecture** unless
+`STATE-CONSEQUENCE-VALUE-0` turns out to need it.
+
+### Entry controls, sharpened
+
+- **C11 — multi-tree isolation.** Verify the complete namespace, not merely that
+  `transactionOwner` exists. Use the adversarial case: **tree A transactionId 1
+  and tree B transactionId 1 must never collide** in provenance bookkeeping.
+- **C14 — realization/restoration.** Does existing causal linkage suffice to say
+  a later consequence derives from prior scope `P17` *without copying P17's
+  actor/claim onto the later write*? If all that survives is
+  `participation: realization` with no causal referent, `derivedFrom` may itself
+  require a new retained fact — **C even if transaction provenance is fully
+  solved by a sidecar.**
+
 ---
 
 **Original unblocking rationale, retained:**
