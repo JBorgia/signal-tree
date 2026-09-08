@@ -524,6 +524,61 @@ C means: SignalTree OWNS a semantic relationship but discards a fact required
 NOT:     SignalTree never received the cross-system correlation at all.
 ```
 
+### DISCOVERY CLOSED 2026-09-08
+
+```text
+Outcome A   REFUTED — existing observation surfaces alone are insufficient
+Outcome B   LEADING VERY STRONGLY — every load-bearing fact found so far
+            already exists, is a deliberate contraction, or belongs above
+            the kernel
+Outcome C   NO LOAD-BEARING CASE FOUND
+```
+
+Every hard case landed in one of three buckets, and none of them is a missing
+kernel semantic:
+
+```text
+1. existing fact, merely not exposed
+2. deliberate semantic contraction
+3. correlation owned above the kernel
+```
+
+**Do not spend more effort proving B before testing whether the product
+matters.** No further kernel excavation until `STATE-CONSEQUENCE-VALUE-0`
+reports.
+
+### The circular dependency, and its resolution
+
+"Expose settlement outcome only once the moat is proven" does not work:
+`STATE-CONSEQUENCE-VALUE-0` must test attempted / committed / rolled-back, and
+the SignalTree arm cannot observe disposition without it.
+
+**Resolution: a test-only settlement oracle, not a product API.** `confirm()` /
+`rollback()` already exist at the application boundary on `PendingTransaction`,
+so the research harness wraps `tree.transaction(...)` and feeds the outcome to
+the provenance prototype. No public kernel API, no `/authoring`, no claim that
+this is the eventual implementation. If the experiment loses, delete it.
+
+**⚠ The oracle alone is NOT sufficient, and the arm must say so.** Measured: on
+rollback the writes are never published at all — confirm publishes the net
+effects, rollback publishes nothing. So the oracle can state *"transaction
+⟨owner,id⟩ was discarded"* while provenance holds **no effects to disposition**.
+The harness can supply the attempted writes because it authors the scenario, but
+then:
+
+```text
+HONESTY CONSTRAINT
+
+The candidate arm must NOT present harness-supplied facts as
+SignalTree-derived facts. Attempt-capture under rollback is the harness's
+knowledge, not the kernel's. Label it, or the comparison is rigged the same
+way the transaction-free escape hatch would have rigged it.
+```
+
+Only if the experiment wins decisively do we return and ask the real question:
+what is the smallest legitimate way for a provenance companion to obtain
+settlement outcome? **That is when the seam earns consideration — not before.**
+
 ```text
 MO-1A distinct-location transaction effects
       B — existing identity sufficient (positions delivered, sidecar works)
