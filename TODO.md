@@ -998,6 +998,119 @@ Only after `ATTRIBUTION-OWNER-0` and `STATE-CONSEQUENCE-VALUE-0` report should
 anything decide whether `@signal-tree/provenance` exists, whether a narrow
 enhancer-authoring seam deserves to exist, or whether this stays a demo idea.
 
+## PRODUCT DIRECTION — set 2026-09-08
+
+```text
+SIGNALTREE 15          free/open state substrate
+        |
+STUDIO                 causal debugging / explanation   <- NEXT WEDGE
+        |
+RELAY                  only if distributed semantics prove independently valuable
+```
+
+**Not in parallel.** Studio first.
+
+```text
+TRACK A  adoption      docs, examples, migration, real production users,
+                       framework adapters, case studies
+TRACK B  Studio proof  minimal causal inspector + STUDIO-VALUE-0
+```
+
+Explicitly NOT building: provenance package, Audit, Verified Audit,
+`/authoring` reopening, full Relay cloud.
+
+The product statement is no longer "SignalTree manages state better", and
+emphatically not "SignalTree proves what AI did". It is:
+
+> **SignalTree is application state that can explain itself.**
+
+Kernel gives the semantics. Studio explains them. Relay, if it earns its place,
+preserves them across machines.
+
+### Studio scope — brutally narrow
+
+```text
+Select a value -> WHY IS THIS VALUE HERE? -> originating operation, causal turn,
+affected paths, authored vs external/restoration, transaction boundary, net
+committed consequence, later overwrites, current causal chain
+```
+
+Not an observability suite, not AI governance, not an audit portal, not Merkle
+proofs. Those were the distraction the provenance track already cost us.
+
+### Three constraints Studio inherits — established, not speculative
+
+**1. Restoration has NO causal parent, deliberately.** `ATTRIBUTION-OWNER-0`
+MO-3A proved `RestorationHistoryEntry<T>` is `{ state: T }` and an undo carries
+`origin: 'restoration'` with no turn id. So a Studio "why is this value here"
+chain **cannot show restoration lineage**. It may say *"restored to a prior
+recorded state"*; it may not say *"this reverts T81"*. The chain has a
+documented hole exactly where undo/redo appears — design the UI around that
+truthfully rather than discovering it mid-build.
+
+**2. Studio inherits `MUTATION-OBSERVABILITY-0`.** Studio must observe
+everything, and observation is composition-dependent: `PathNotifier` misses
+direct leaf writes, `interceptLeafSignals` misses transacting trees and is
+documented as missing array-valued leaves and writes past `maxDepth`. Cloud
+infrastructure burden is low; **the observation-seam dependency is real** and is
+the same open question the provenance spike hit.
+
+**3. The control is stronger than it looks.** Redux/NgRx DevTools already
+answers "why is this value here" via an action log — a *developer-authored,
+human-readable narrative* that SignalTree does not have, because SignalTree has
+no actions. Causality here is structural, not narrated. That could make Studio
+**worse** at naive "what happened" and better at "what actually changed and what
+survived". Do not repeat `CONTROL-ARM-0` v1: build the DevTools control to win.
+
+## STUDIO-VALUE-0
+
+**OPEN — the gate for the Studio wedge. Same discipline as the provenance track.**
+
+> Does SignalTree causal state plus a minimal inspector materially beat
+> conventional debugging on an unfamiliar production-state bug?
+
+```text
+CONTROL                          CANDIDATE
+browser logs                     same application
+Redux/NgRx-style DevTools        + SignalTree causal state
+OpenTelemetry                    + minimal Studio inspector
+backend logs
+ordinary debugger
+```
+
+Measured:
+
+```text
+time to correct explanation
+number of tools opened
+number of logs manually correlated
+wrong hypotheses formed
+identified the causal operation
+distinguished server truth from local authorship
+identified transaction / net-effect boundaries
+```
+
+Better-fitted than the provenance comparison, because these semantics
+**originate inside SignalTree** rather than being reconstructable by generic
+IAM/audit tooling.
+
+**If Studio does not win decisively, stop that too.**
+
+## RELAY — separate thesis, argued on its own
+
+Possibly the largest revenue ceiling, but audit/provenance may **no longer form
+any part of the argument**. Relay earns itself only on distributed
+application-state semantics: offline/reconnect, server realization, multi-client
+coherence, cross-runtime state, reconciliation, semantic continuity across
+machines.
+
+> Does SignalTree preserve useful state semantics across runtime boundaries that
+> a good sync system makes developers rebuild manually?
+
+Needs its own adversarial landscape and control test against serious systems —
+**not "WebSockets are hard".** If it wins, build it. If not, SignalTree is still
+a very good state engine plus Studio.
+
 ## STATE-CONSEQUENCE-VALUE-0 — CLOSED 2026-09-08
 
 **OUTCOME: DIFFERENTIATION NOT EARNED.**
