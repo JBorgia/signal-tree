@@ -460,6 +460,54 @@ MO-3B DISTRIBUTED DERIVATION
       that realization and the earlier application operation?
 ```
 
+### MO-3A — ANSWERED 2026-09-08. Splits, and does NOT fire C.
+
+Inspected the restoration/rollback representations and probed a real undo.
+
+**Transaction rollback — the referent EXISTS.** Compensation writes are stamped
+`origin: 'transaction-rollback'` plus `transactionId`, and the DIAG-JOURNAL-1.1
+comment states the split explicitly: origin says WHY the write exists,
+`transactionId` says WHICH transaction it compensates. That is precisely the
+causal referent provenance needs. **B — project it, change nothing.**
+
+**Restoration / undo / redo — NO referent, and none is promised.** Measured:
+
+```text
+authored T1   meta keys: mutationIntent, ownerId, restorationDesignated
+authored T2   meta keys: mutationIntent, ownerId, restorationDesignated
+undo          meta keys: intent, origin, ownerId, participation
+              origin = 'restoration', participation = 'realized', 2 -> 1
+```
+
+No turn id, no prior-effect id, no restored-from reference — exactly the
+negative discriminator: `origin = restoration` and `path = x`, nothing more.
+
+**This is outcome D, not C.** The kernel does not know "this is a restoration of
+operation X" while discarding X. There is no X. `RestorationHistoryEntry<T>` is
+literally `{ state: T }`; the manager holds only a positional `currentIndex`
+into a truncatable array of STATES. Undo means "install the snapshot at index
+N-1", not "invert operation X". The prior operation was never retained as an
+entity, so nothing was discarded.
+
+And it is **deliberate**: 15.0.0-rc.13 removed `timestamp`, `action` and
+`payload` from `RestorationHistoryEntry`, recording that restoration history is
+state-only and that labels, clocks and actors should be projected from
+application context rather than retained as kernel restoration facts.
+
+**Consequence for the record shape — a truthfulness constraint, not a gap.**
+
+```text
+derivedFrom IS legitimate for   transaction-rollback consequences
+derivedFrom is NOT legitimate for restoration consequences
+```
+
+A restoration consequence may say *"this location was restored to a prior
+recorded state."* It may **not** say *"this derives from operation P17."* The
+absence is a FEATURE: it makes the audit lie identified early in this track —
+a restoration implying its original author acted again — structurally
+impossible. Do not invent `derivedFrom` for restoration merely because the
+proposed record shape had the field. **Narrow the thesis instead.**
+
 **MO-3B is an ownership question before it is a capability question.** For a
 scope that proposes a reroute, waits on HTTP, and receives authoritative server
 truth five seconds later, `R22 derives from P17` may not be a kernel fact at
@@ -490,7 +538,8 @@ MO-2  settlement
       MO-2 is B: existing fact, missing observation surface.
 
 MO-3A local restoration/replay derivation
-      OPEN — inspect the existing causal referent
+      ANSWERED — SPLITS. rollback = B (referent exists).
+      restoration = D (no causal parent is promised). Does NOT fire C.
 
 MO-3B distributed realization derivation
       OWNER QUESTION FIRST — probably transport/Relay/application, not kernel
