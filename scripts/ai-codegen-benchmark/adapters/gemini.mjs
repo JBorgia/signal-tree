@@ -7,10 +7,14 @@ export default async function geminiAdapter(promptText, { library }) {
   const apiKey = process.env.GOOGLE_API_KEY ?? process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GOOGLE_API_KEY / GEMINI_API_KEY not set');
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
+  // Key goes in a HEADER, not `?key=` — the query-string form Google documents
+  // puts the credential into shell history, proxy and server access logs, and
+  // any error text that echoes the URL. Every sibling adapter here already uses
+  // a header (`Authorization: Bearer`, `x-api-key`); this was the one outlier.
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
     body: JSON.stringify({
       contents: [{ parts: [{ text: promptText }] }],
       systemInstruction: {
