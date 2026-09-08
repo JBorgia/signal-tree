@@ -1,5 +1,24 @@
 # ATTRIBUTION-PULL-0 — demand falsifier
 
+> **DEMOTED 2026-09-08 — no longer a gate.** A market sweep found the underlying
+> requirement already established and being productized by Entra Agent ID, Okta,
+> SailPoint, AWS AgentCore, OpenID AuthZEN and IETF delegation-receipt work. That
+> validates the adjacent IAM/accountability layer, **not** SignalTree's
+> application-state provenance thesis — so PULL-0 is retired not because demand
+> is proven but because **the question is too broad to discriminate SignalTree's
+> value.** A positive result would mostly confirm a requirement other products
+> already address.
+>
+> Superseded as the gate by `STATE-CONSEQUENCE-VALUE-0` in
+> [`TODO.md`](../../../TODO.md). PULL-0 survives as optional messaging and
+> buyer-language research.
+>
+> **These artifacts are not retired.** [`frames.html`](frames.html) and the
+> ten-beat timeline become the **SignalTree arm** of
+> `STATE-CONSEQUENCE-VALUE-0`. The strip rules below still apply when running
+> PULL-0 as messaging research; for the comparative experiment the same frames
+> are shown *with* provenance against a strong conventional control.
+
 > **Disposition: INVESTIGATION. Non-shipping evidence.** This is the test
 > instrument for the experiment preregistered in [`TODO.md`](../../../TODO.md)
 > § `ATTRIBUTION-PULL-0`. It is not product guidance and describes no shipped
