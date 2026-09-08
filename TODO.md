@@ -308,7 +308,74 @@ but the specific split between a presented credential and an operation receipt.
 
 ## ATTRIBUTION-OWNER-0
 
-**UNBLOCKED 2026-09-08. Internal, unexported spike may proceed.**
+**RUN 2026-09-08 — RESULT: OUTCOME B.** Ownership stays outside the kernel, but
+a narrow authoring seam is required. Spike at
+`packages/kernel/src/lib/internals/provenance-spike.ts` (+ `.spec.ts`),
+internal and unexported. **9 passed / 5 failed.**
+
+### The falsifier that fired
+
+On a tree constructed with `transactions()`, `interceptLeafSignals` observes
+**nothing** — not inside a transaction and not outside one. The enhancer
+replaces the leaf write path. Probed directly: an identical write is observed on
+a plain tree and unobserved on a `transactions()` tree while state provably
+changes `0 → 5 → 7`.
+
+All five failures are transaction cases (3, 4, 6, 10, 12). Outcome A is refuted,
+because `transactions()` is exactly the enhancer producing the
+committed-versus-rolled-back distinction provenance exists to record.
+
+### Why B and not C
+
+The kernel already holds every required fact. It knows the write happened, and
+it knows the outcome at `settleCommitScope(owner, id, outcome)`. What is missing
+is **publication, not semantics**:
+
+```text
+1. a write-observation channel that survives enhancer composition
+2. settlement outcome delivered to listeners — onCommitScopesSettled
+   currently passes `() => void` and drops the commit/discard outcome
+```
+
+Both expose existing internal truth. **Kernel semantics stay closed**, and the
+smallest external seam should be derived from exactly these two capabilities —
+not by resurrecting `/authoring` wholesale.
+
+### What passed, and why it matters
+
+The nine green cases are the semantically hard ones: order-invariance between
+provenance and `external()`, nested scopes with retained lineage, `partial`
+classification when a scope throws over an already-durable write,
+`no-published-state-effect` on a same-value write, and coverage-gap accounting
+for authored writes outside every scope. **The evidence model is sound; only its
+observational reach fails.** That is what makes this B rather than a design
+defect.
+
+### Recorded honestly
+
+Case 12 initially passed **vacuously** — `[].every()` is `true`, so the
+assertion held on an empty effect set. A non-vacuity guard was added and the
+case then correctly failed. The first reported figure was 10/14; the true figure
+is 9/14.
+
+### Scope of the evidence
+
+Only `transactions()` was tested. Whether `restoration()` or `batching()`
+suppress interception identically is **untested** and must not be assumed.
+`interceptLeafSignals` additionally carries its own warning that it "misses
+writes past maxDepth and misses array-valued leaves entirely" and that new
+consumers should not be built on it — so it is a poor foundation for the seam
+even where it does fire.
+
+### Consequence for STATE-CONSEQUENCE-VALUE-0
+
+Its SignalTree arm cannot be built on existing seams alone. Either derive the
+narrow seam first, or run the comparative experiment against transaction-free
+trees and state that limitation in the result.
+
+---
+
+**Original unblocking rationale, retained:**
 
 Unblocked as a **bounded, internal, deletable feasibility prerequisite** —
 required to construct the SignalTree arm of `STATE-CONSEQUENCE-VALUE-0` — and
