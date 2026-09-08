@@ -1061,6 +1061,21 @@ application-specific instrumentation required
 > correlation, **SignalTree has not established differentiated value** and
 > provenance returns to parked.
 
+Harness design: [`docs/research/state-consequence-value-0/`](docs/research/state-consequence-value-0/README.md)
+
+### The control must be built to win
+
+A control arm built to lose proves nothing. **Whoever builds it is trying to make
+it answer every question**, and if it succeeds that is a valuable result — it
+means SignalTree should not build this and we saved the cost.
+
+**Blocked:** nobody on this side can provision real Entra/Okta, and a SignalTree
+author must not build the control arm alone. Either reproduce real OBO/OTel
+artifact structure from published specification, or recruit someone who runs
+that stack. Fidelity rule: every control artifact is generated to a published
+spec, never invented; a disputed span field is resolved by the OTel
+semantic-convention document, not by our judgement.
+
 ### Notes
 
 The white-space claim behind this experiment — that no general-purpose layer
