@@ -47,7 +47,40 @@ and a current-state inconsistency.
 
 Raised now because each one can silently decide the result.
 
-### 1. The scenario as written contains no atomic multi-field operation
+### RESOLVED 1 — the optimistic update IS one atomic operation, in both arms
+
+**Decision: build it atomically in both arms.**
+
+```text
+NgRx           ONE action, ONE reducer, three fields
+SignalTree     ONE transaction, three locations
+```
+
+Not rigging. A competent implementation does this anyway — you do not want a UI
+frame showing `promoCode: SAVE20` with `total` still 120.00. Choosing three
+independent writes would be the *unrealistic* option, and it would delete Q5 by
+accident rather than by decision.
+
+Q5 ("what changed atomically?") therefore stays a live discriminator, and both
+arms have an honest answer available.
+
+### RESOLVED 2 — drop the coalescing trap; score Q6 as an ordinary question
+
+**Decision: do NOT contrive a within-transaction repeated write.**
+
+The realistic scenario has none: `discount: 0 → 24 → 18` spans a network round
+trip, so both arms observe all three values. Forcing an artificial
+within-transaction repeat purely to hit a known SignalTree behaviour is the same
+rigging error in a new costume — designing the incident around the candidate's
+characteristics.
+
+Q6 becomes an ordinary question both arms should answer correctly. The honesty
+dimension is preserved by **Q10** ("what information is genuinely missing"),
+which tests counterfactual completeness without a planted trap. An arm that
+claims to see an intermediate value that does not exist still scores as a
+failure.
+
+### 1. (superseded — see RESOLVED 1 above)
 
 Step 2 sets `promoCode`, `discount` and `total` together — but only if it is
 *implemented* as one operation. If it is three independent writes, **SignalTree
@@ -58,7 +91,7 @@ evaporates as a discriminator.
 transaction and an NgRx single-action reducer, or drop the atomicity question.
 Do not let it be settled by implementation accident.
 
-### 2. The coalescing trap is not present in this scenario
+### 2. (superseded — see RESOLVED 2 above)
 
 `discount: 0 → 24 → 18` spans a network round trip, so both arms observe all
 three values. That is **not** the within-transaction repeated write that MO-1B
@@ -215,9 +248,11 @@ Not "NgRx is better." Only:
 
 ```text
 scope               THIS DOCUMENT
-design issues 1-4   UNRESOLVED — settle before writing code
-NgRx practitioner   NOT YET SECURED — required
-backend             not started
+design issue 1      RESOLVED — atomic in both arms
+design issue 2      RESOLVED — trap dropped, Q6 ordinary
+design issue 3      STANDING RULE — label shipped / research-only / derived
+design issue 4      OPEN — NgRx practitioner NOT SECURED, required before any run
+backend             BUILT — apps/backend/ (arm-neutral)
 NgRx arm            not started
 SignalTree arm      not started
 evidence freeze     not started
