@@ -11,6 +11,12 @@ Population        [ ] Engineering / SRE
                   [ ] Security / Risk / Audit / AI governance
                   [ ] Other: ______________________
 Role & seniority  ______________________
+Recruitment       [ ] cold outreach     [ ] warm intro
+channel           [ ] inbound / saw SignalTree content
+                  [ ] existing contact  [ ] other: ______________
+                  (inbound and warm evaluators are self-selected as already
+                   interested — weight their pull down, and never let the
+                   cohort be entirely non-cold)
 Buys or blocks?   [ ] can authorize spend  [ ] can block adoption  [ ] neither
 Session valid?    [ ] VALID   [ ] INVALID — reason: ______________________
 ```
