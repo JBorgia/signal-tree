@@ -187,11 +187,88 @@ model — no origin marker, no transaction disposition, no restoration semantics
 If ordinary fields turn out to answer Q6 and Q8, the white space shrinks
 dramatically, and that is a legitimate result.
 
+## Scoring rubric for v2 — PREREGISTERED, before the result was seen
+
+Recorded while the v2 investigator was still running, precisely so the rubric
+cannot be fitted to the answer.
+
+### "Answered" is not "solved"
+
+The experiment measures the **cost of obtaining the answer**, not only whether
+an answer exists. Two materially different outcomes look identical if scored as
+answered/unanswered:
+
+```text
+A. answered with ordinary instrumentation and cheap ID-based joins
+   -> white space is probably WEAK
+
+B. answered only after assembling interactionId + requestId + traceId +
+   serverRevision + captureId + client logging + backend audit + PDP,
+   and then manually reconstructing across five systems
+   -> SignalTree may still have value by making the semantic relationship
+      INTRINSIC rather than ASSEMBLED
+```
+
+**That distinction is the whole remaining business case.** Do not let *"the
+answer exists somewhere in the logs"* become equivalent to *"the problem is
+already solved."*
+
+### Six questions to ask of every remaining Q6/Q8 gap
+
+```text
+1. Could ordinary instrumentation close this?
+2. How many fields or hooks would have to be added?
+3. At which layer?
+4. Would EVERY application team need to implement it themselves?
+5. Does the solution generalize, or is it scenario-specific?
+6. Does implementing it amount to a state-semantic subsystem?
+```
+
+If the answer to a gap is *"one middleware hook + a transactionId + a
+disposition field"* — **the moat is thin.** If closing it starts requiring:
+
+```text
+intercept every state mutation
+group logical operations
+model transaction boundaries
+retain net effects
+distinguish ingress from authorship
+correlate server revisions
+avoid treating replay/restoration as fresh authorship
+```
+
+then the team is **recreating the semantic layer under test**, and that is
+bucket 3.
+
+### Q8 specifically — classify the reasoning, not just the verdict
+
+```text
+"B received it because it applied server revision 1045"
+    -> conventional stack WINS that part
+
+"B received it because there is no local click or request"
+    -> inference from ABSENCE. The fixture may still be under-instrumented;
+       consider a v3 where the sync layer propagates serverRevision and
+       sourceRequestId to the receiving client, which a strong conventional
+       implementation would plausibly do.
+
+"even with revision propagation I cannot tell the local semantic role
+ without an explicit authored/realized model"
+    -> INTERESTING WHITE SPACE
+```
+
+### The stopping condition
+
+If the control answers **all ten** with high confidence, mostly ID-based joins,
+minimal bespoke state instrumentation, and modest effort — become substantially
+less bullish and consider stopping the provenance track outright.
+
 ## Status
 
 ```text
 fixtures v2         BUILT
 blind re-run        DISPATCHED
+scoring rubric      PREREGISTERED (above), before the result was seen
 failure triage      pending
 independent review  REQUIRED before any bucket-3 claim is accepted
 ```
