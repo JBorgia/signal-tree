@@ -22,14 +22,17 @@ import {
  * These tests try to BREAK that. A failure here is EVIDENCE, classified
  * A / B / C. It is never a reason to repair the kernel.
  *
- * RESULT — OUTCOME B, 2026-09-08, 9 passed / 5 failed.
+ * RESULT — 2026-09-08. A REFUTED. B vs C NOT CLOSED. 10 passed / 4 red.
  *
- * The five transaction cases below are marked `it.fails` because they are
- * PROVEN RED, not because they are unimportant. On a tree constructed with
- * `transactions()`, `interceptLeafSignals` observes nothing at all — inside or
- * outside a transaction — so no effect is ever recorded. They are retained as
- * executable evidence: if a future seam makes any of them pass, `it.fails`
- * turns that green case RED and forces this file to be re-read.
+ * CORRECTION TO THE FIRST REPORT. The first run blamed `interceptLeafSignals`
+ * and called the result "outcome B". That was the wrong channel, not the whole
+ * story: `PathNotifier` — already subscribed by transactions, restoration,
+ * link, the diagnostic journal and the causal realization adapter — DOES
+ * observe transaction writes, and carries `transactionOwner` for tree
+ * isolation. Switching channel turned case 3 green.
+ *
+ * The four still-red cases are marked `it.fails` as executable evidence. If a
+ * future seam makes one pass, `it.fails` flips it RED and forces a re-read.
  *
  * DO NOT "fix" them by changing the kernel. Deriving the narrow authoring seam
  * is a separate, authorized piece of work — see TODO.md § ATTRIBUTION-OWNER-0.
@@ -56,7 +59,8 @@ describe('ATTRIBUTION-OWNER-0 spike', () => {
       path: 'n',
       origin: 'authored',
       disposition: 'committed',
-      published: true,
+      objectIsChanged: true,
+      published: 'unknown', // no seam reports the publication fact
     });
     expect(s?.summary.classification).toBe('committed');
   });
@@ -86,9 +90,9 @@ describe('ATTRIBUTION-OWNER-0 spike', () => {
     expect(s?.summary.committed).toBe(2);
   });
 
-  it.fails('3. transaction commits — effects stay committed', () => {
+  it('3. transaction commits — effects stay committed', () => {
     const tree = signalTree({ n: 0 }, { enhancers: [transactions()] });
-    const stop = observeProvenance(tree);
+    const stop = observeProvenance(tree, 'path-notifier');
 
     provenanceScope({ scopeId: 's3' }, () => {
       const pending = tree.transaction(() => {
@@ -107,7 +111,7 @@ describe('ATTRIBUTION-OWNER-0 spike', () => {
     '4. transaction rolls back — effects become rolled-back, not committed',
     () => {
       const tree = signalTree({ n: 0 }, { enhancers: [transactions()] });
-      const stop = observeProvenance(tree);
+      const stop = observeProvenance(tree, 'path-notifier');
 
       const pending = provenanceScope({ scopeId: 's4' }, () =>
         tree.transaction(() => {
@@ -155,7 +159,7 @@ describe('ATTRIBUTION-OWNER-0 spike', () => {
         { log: 0, n: 0 },
         { enhancers: [transactions()] }
       );
-      const stop = observeProvenance(tree);
+      const stop = observeProvenance(tree, 'path-notifier');
 
       const pending = provenanceScope({ scopeId: 's6' }, () => {
         tree.$.log(1); // immediate, durable
@@ -236,11 +240,16 @@ describe('ATTRIBUTION-OWNER-0 spike', () => {
     expect(scopeOf('inner')?.parentScopeId).toBe('outer');
   });
 
+  // REFUTES SUB-PREDICTION A with the current seam. Not because the model
+  // forbids multi-actor transactions, but because a write inside a transaction
+  // body publishes AFTER settlement — by which time the synchronous provenance
+  // scope has closed. Compare case 3, which passes only because the scope wraps
+  // the whole transaction. This is the sharpest B-vs-C discriminator found.
   it.fails(
     '10. SUB-PREDICTION A: one transaction may contain two provenance scopes',
     () => {
       const tree = signalTree({ a: 0, b: 0 }, { enhancers: [transactions()] });
-      const stop = observeProvenance(tree);
+      const stop = observeProvenance(tree, 'path-notifier');
 
       const pending = tree.transaction(() => {
         provenanceScope({ scopeId: 'agentA' }, () => tree.$.a(1));
@@ -258,7 +267,7 @@ describe('ATTRIBUTION-OWNER-0 spike', () => {
     '12. a reversal names its cause and does not implicate the other scope',
     () => {
       const tree = signalTree({ a: 0, b: 0 }, { enhancers: [transactions()] });
-      const stop = observeProvenance(tree);
+      const stop = observeProvenance(tree, 'path-notifier');
 
       const pending = tree.transaction(() => {
         provenanceScope({ scopeId: 'victimA' }, () => tree.$.a(1));
@@ -292,9 +301,11 @@ describe('ATTRIBUTION-OWNER-0 spike', () => {
     stop();
 
     const s = scopeOf('s13');
-    // Either the interceptor never fired, or it fired with published:false.
-    // What must NOT happen is a claim that a value changed.
-    expect(s?.effects.filter((e) => e.published)).toHaveLength(0);
+    // Either no event fired, or it fired with objectIsChanged:false. What must
+    // NOT happen is a claim that a value changed. `published` stays 'unknown'
+    // for every effect — the spike cannot observe the publication fact.
+    expect(s?.effects.filter((e) => e.objectIsChanged)).toHaveLength(0);
+    expect(s?.effects.every((e) => e.published === 'unknown')).toBe(true);
     expect(s?.summary.classification).toBe('no-published-state-effect');
   });
 

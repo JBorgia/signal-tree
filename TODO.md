@@ -308,70 +308,132 @@ but the specific split between a presented credential and an operation receipt.
 
 ## ATTRIBUTION-OWNER-0
 
-**RUN 2026-09-08 — RESULT: OUTCOME B.** Ownership stays outside the kernel, but
-a narrow authoring seam is required. Spike at
-`packages/kernel/src/lib/internals/provenance-spike.ts` (+ `.spec.ts`),
-internal and unexported. **9 passed / 5 failed.**
-
-### The falsifier that fired
-
-On a tree constructed with `transactions()`, `interceptLeafSignals` observes
-**nothing** — not inside a transaction and not outside one. The enhancer
-replaces the leaf write path. Probed directly: an identical write is observed on
-a plain tree and unobserved on a `transactions()` tree while state provably
-changes `0 → 5 → 7`.
-
-All five failures are transaction cases (3, 4, 6, 10, 12). Outcome A is refuted,
-because `transactions()` is exactly the enhancer producing the
-committed-versus-rolled-back distinction provenance exists to record.
-
-### Why B and not C
-
-The kernel already holds every required fact. It knows the write happened, and
-it knows the outcome at `settleCommitScope(owner, id, outcome)`. What is missing
-is **publication, not semantics**:
+**RUN 2026-09-08.**
 
 ```text
-1. a write-observation channel that survives enhancer composition
-2. settlement outcome delivered to listeners — onCommitScopesSettled
-   currently passes `() => void` and drops the commit/discard outcome
+A — REFUTED       synchronous scope attribution does not survive deferred
+                  publication inside a transaction
+B — LEADING       existing semantic facts appear sufficient; the generic
+                  observation surface appears insufficient
+C — NOT REFUTED   scope-token carriage, realization/derivedFrom and cross-tree
+                  ownership are not yet discriminated
+
+Next: MUTATION-OBSERVABILITY-0
 ```
 
-Both expose existing internal truth. **Kernel semantics stay closed**, and the
-smallest external seam should be derived from exactly these two capabilities —
-not by resurrecting `/authoring` wholesale.
+Spike at `packages/kernel/src/lib/internals/provenance-spike.ts` (+ `.spec.ts`),
+internal and unexported. **10 passed / 4 red of 14 written — and 14 is not 15.**
 
-### What passed, and why it matters
+### Correction to the first report
 
-The nine green cases are the semantically hard ones: order-invariance between
-provenance and `external()`, nested scopes with retained lineage, `partial`
-classification when a scope throws over an already-durable write,
-`no-published-state-effect` on a same-value write, and coverage-gap accounting
-for authored writes outside every scope. **The evidence model is sound; only its
-observational reach fails.** That is what makes this B rather than a design
-defect.
+The first pass blamed `interceptLeafSignals` and declared outcome B. **That was
+a wrong-channel error, not a finding.** `PathNotifier` — already subscribed by
+`transactions`, `restoration`, `link`, the diagnostic journal and the causal
+realization adapter — *does* observe transaction writes and delivers
+`meta.transactionOwner`, so tree isolation is available. `interceptLeafSignals`
+is the documented FALLBACK for direct leaf writes that never reach the notifier.
+Switching channel turned case 3 green. **The composition-safe channel largely
+already exists; building another observer would have been duplication.**
 
-### Recorded honestly
+### What is actually missing
 
-Case 12 initially passed **vacuously** — `[].every()` is `true`, so the
-assertion held on an empty effect set. A non-vacuity guard was added and the
-case then correctly failed. The first reported figure was 10/14; the true figure
-is 9/14.
+```text
+1. REVERSAL IS SILENT
+   a pending scalar rollback emits NOTHING through the notifier —
+   state goes 0 -> 1 -> 0 with ONE event. onCommitScopesSettled also
+   drops the commit/discard outcome. Cases 4, 6, 12 red.
 
-### Scope of the evidence
+2. DEFERRED PUBLICATION BREAKS SYNCHRONOUS ATTRIBUTION  <- discriminator
+   a write inside a transaction body publishes AFTER settlement, when
+   the synchronous scope has closed. Case 3 passes only because its
+   scope WRAPS the transaction; case 10 — transaction wrapping two
+   scopes — records nothing.
+```
 
-Only `transactions()` was tested. Whether `restoration()` or `batching()`
-suppress interception identically is **untested** and must not be assumed.
-`interceptLeafSignals` additionally carries its own warning that it "misses
-writes past maxDepth and misses array-valued leaves entirely" and that new
-consumers should not be built on it — so it is a poor foundation for the seam
-even where it does fire.
+**Sub-prediction A is REFUTED with the current seam.** Not because the model
+forbids multi-actor transactions, but because ambient synchronous attribution
+cannot survive deferred publication.
+
+### Why B vs C is genuinely open
+
+Fixing (2) needs a scope token carried from write time to publication time.
+`WriteMetadata` is a **closed union with no slot for one**, so an enhancer
+cannot stash it. Whether that is publication of an existing fact (**B**) or a
+new fact the kernel must retain (**C**) is precisely what
+`MUTATION-OBSERVABILITY-0` must decide. **Do not assume B.**
+
+### Recorded against myself
+
+- Case 12 first passed **vacuously** — `[].every()` is `true` on an empty effect
+  set. A non-vacuity guard was added and it correctly went red.
+- `published` was implemented as `!Object.is(next, prev)` — manufacturing the
+  publication fact this track had already ruled must never be inferred from
+  value equality. Now `published: 'unknown'` with a separate `objectIsChanged`.
+- **Two preregistered controls were never written**, and a classification was
+  reported anyway: control **11** (one scope spanning two trees) and control
+  **14** (realization/restoration `derivedFrom`).
+- `participation` — the real authorship/realization axis — is never read.
+  Classification comes only from `meta.origin`, so the four-way
+  authored/external/realization/restoration model remains **unproven**.
 
 ### Consequence for STATE-CONSEQUENCE-VALUE-0
 
-Its SignalTree arm cannot be built on existing seams alone. Either derive the
-narrow seam first, or run the comparative experiment against transaction-free
-trees and state that limitation in the result.
+Its SignalTree arm cannot yet be built. **Do not run the comparison against
+transaction-free trees** — that would delete attempted/committed/rolled-back,
+which is part of what SignalTree claims to explain better, and would prove
+differentiated causality by avoiding the hardest causal semantics. Derive the
+seam first.
+
+## MUTATION-OBSERVABILITY-0
+
+**OPEN — successor to the observation half of `ATTRIBUTION-OWNER-0`.**
+
+Named without presupposing provenance ownership, because the seam may serve
+other enhancers.
+
+> Can the kernel expose its already-existing mutation and settlement facts
+> through one composition-safe internal observation boundary, sufficient for
+> provenance and potentially other enhancers, **without adding new state
+> semantics**?
+
+**Null:** every fact needed already exists; the defect is fragmented and
+internal observability only.
+
+**Inventory first.** `PathNotifier` already carries most of it and is already
+the common subscriber channel. Do not build a second observer before proving
+the existing one insufficient. `interceptLeafSignals` is not the baseline — it
+is documented as missing array-valued leaves and writes past `maxDepth`, and as
+closed to new consumers.
+
+**Hard entry controls, carried over unrun from `ATTRIBUTION-OWNER-0`:**
+
+```text
+C11 — multi-tree transaction-owner isolation
+C14 — realization/restoration causal derivation (derivedFrom, no actor inheritance)
+```
+
+If both pass on existing facts plus a generic observation seam, **B is earned**.
+If either shows the kernel lacks a causal fact needed to state the truth,
+**C fires.**
+
+**Falsify across all mutation paths, not just scalar leaves:**
+
+```text
+plain scalar writes            batching
+transactions                   restoration
+transaction rollback           external realization
+two simultaneous trees         entityMap scalar fields
+structural entity mutations    array-valued leaves
+depth > 32                     same-value / equality suppression
+```
+
+**Do not freeze the seam shape yet.** The two capabilities the spike suggests —
+composition-safe mutation observation, and settlement outcome (`tree key`,
+`transaction id`, `commit | discard`) — are hypotheses, not a design.
+
+---
+
+**Original unblocking rationale, retained:**
 
 ---
 

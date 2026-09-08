@@ -1,44 +1,53 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * RESULT: OUTCOME B. Ownership stays outside the kernel, but a narrow
- * authoring seam is required. Measured 2026-09-08, 9 passed / 5 failed.
+ * RESULT 2026-09-08 — A REFUTED. B STRONGLY INDICATED. B vs C NOT CLOSED.
+ * 10 passed / 4 red of 14 written. TWO PREREGISTERED CONTROLS WERE NOT WRITTEN.
  *
- * THE FALSIFIER THAT FIRED. On a tree constructed with `transactions()`,
- * `interceptLeafSignals` observes NOTHING — not inside a transaction, and not
- * outside one either. The enhancer replaces the leaf write path entirely.
- * Probed directly: a write on a plain tree is observed; the identical write on
- * a `transactions()` tree is not, while state demonstrably changes (0 → 5 → 7).
+ * CORRECTION TO THE FIRST REPORT. The first pass blamed `interceptLeafSignals`
+ * and declared "outcome B". That was a wrong-channel error, not the finding.
+ * `PathNotifier` — already subscribed by `transactions`, `restoration`, `link`,
+ * the diagnostic journal and the causal realization adapter — DOES observe
+ * transaction writes and delivers `meta.transactionOwner`, so tree isolation is
+ * available. `interceptLeafSignals` is explicitly the FALLBACK for direct leaf
+ * writes that never reach the notifier, which is why a transacting tree is
+ * invisible to it. Switching channel turned case 3 green.
  *
- * That is fatal for outcome A, because `transactions()` is precisely the
- * enhancer producing the committed-versus-rolled-back distinction provenance
- * exists to record. A provenance enhancer cannot observe consequences on any
- * tree that also transacts.
+ * WHAT IS ACTUALLY MISSING. Two facts, both narrower than first reported:
  *
- * WHY B AND NOT C. The kernel already holds every fact required. It knows the
- * write happened, and it knows the outcome at
- * `settleCommitScope(owner, id, outcome)`. What is missing is PUBLICATION, not
- * semantics:
+ *   1. REVERSAL IS SILENT. A pending scalar transaction rollback emits NOTHING
+ *      through the notifier. State returns 0 → 1 → 0 with one event, not two.
+ *      `onCommitScopesSettled` also drops the commit/discard outcome
+ *      (`() => void`). Cases 4, 6, 12 stay red on this.
  *
- *   1. a write-observation channel that survives enhancer composition
- *   2. settlement outcome delivered to listeners — `onCommitScopesSettled`
- *      currently passes `() => void` and drops the commit/discard outcome
+ *   2. DEFERRED PUBLICATION BREAKS SYNCHRONOUS ATTRIBUTION — the sharpest
+ *      discriminator. A write inside a transaction body publishes AFTER
+ *      settlement, when the synchronous provenance scope has already closed.
+ *      Case 3 passes only because its scope WRAPS the transaction; case 10,
+ *      where the transaction wraps two scopes, records nothing and REFUTES
+ *      sub-prediction A with the current seam.
  *
- * Both expose existing internal truth. Neither is a new semantic fact, so
- * kernel semantics stay closed.
+ * WHY B vs C IS NOT CLOSED. Fixing (2) requires carrying a scope token from
+ * write time to publication time. `WriteMetadata` is a CLOSED union with no
+ * slot for one, so an enhancer cannot stash it. Whether that is publication of
+ * an existing fact (B) or a new fact the kernel must retain (C) is exactly what
+ * `MUTATION-OBSERVABILITY-0` must decide. Do not assume B.
  *
- * WHAT PASSED, AND WHY IT MATTERS. The nine green cases are the semantically
- * hard ones: order-invariance between provenance and `external()`, nested
- * scopes with lineage, partial classification when a scope throws over an
- * already-durable write, `no-published-state-effect` on a same-value write, and
- * coverage-gap accounting for authored writes outside every scope. The evidence
- * MODEL is sound. Only its observational reach fails.
+ * WHAT PASSED. Order-invariance with `external()`, nested scopes with lineage,
+ * `partial` when a scope throws over a durable write, same-value suppression,
+ * coverage-gap accounting, opaque claim carriage, and transaction COMMIT. The
+ * scope model survived every non-rollback discriminator exercised. That is not
+ * the same as proving the whole evidence model.
  *
- * SCOPE OF THE EVIDENCE. Only `transactions()` was tested. Whether
- * `restoration()` or `batching()` suppress interception the same way is
- * UNTESTED and must not be assumed either way.
+ * KNOWN GAPS IN THIS SPIKE — do not read the result as covering them:
+ *   - control 11 (one scope spanning two trees) WAS NEVER WRITTEN
+ *   - control 14 (realization/restoration `derivedFrom`) WAS NEVER WRITTEN
+ *   - `participation` — the actual authorship/realization axis — is never read;
+ *     classification comes only from `meta.origin`, so the four-way
+ *     authored/external/realization/restoration model is UNPROVEN
+ *   - only `transactions()` tested; `restoration()` and `batching()` untested
+ *   - `published` is NOT observed anywhere; see ProvenanceEffect.published
  *
- * NOTHING WAS REPAIRED TO MAKE THIS PASS. Per the preregistration, the
- * limitation is the result.
+ * NOTHING WAS REPAIRED TO MAKE THIS PASS.
  * ═══════════════════════════════════════════════════════════════════════════
  *
  * ATTRIBUTION-OWNER-0 — INTERNAL SPIKE. NOT PUBLIC. DELETABLE.
@@ -66,6 +75,7 @@
  */
 
 import { interceptLeafSignals } from './intercept-leaf-signals';
+import { getPathNotifier } from '../path-notifier';
 import type { WriteMetadata } from '../mutation-types';
 
 export interface ProvenanceScopeContext {
@@ -90,7 +100,13 @@ export interface ProvenanceEffect {
   path: string;
   origin: ProvenanceOrigin;
   disposition: 'committed' | 'rolled-back';
-  published: boolean;
+  /**
+   * Deliberately NOT a boolean. No existing seam reports whether SignalTree
+   * published a reactive consequence, so the spike must not claim to know.
+   */
+  published: 'unknown';
+  /** Only that next/prev differ under Object.is. Not a publication claim. */
+  objectIsChanged: boolean;
   equalityBasis?: unknown;
   derivedFrom?: string;
   /** What caused a reversal — never the scope's own actor. */
@@ -161,7 +177,8 @@ function summarize(record: ProvenanceScopeRecord): ProvenanceSummary {
   const rolledBack = record.effects.filter(
     (e) => e.disposition === 'rolled-back'
   ).length;
-  const published = record.effects.filter((e) => e.published).length;
+  // Counts Object.is changes, NOT publications. See ProvenanceEffect.published.
+  const published = record.effects.filter((e) => e.objectIsChanged).length;
 
   let classification: ProvenanceSummary['classification'];
   if (record.threw && committed > 0) classification = 'partial';
@@ -193,7 +210,11 @@ function resummarizeAll(): void {
  * new consumers on it. Recorded as evidence — the spike uses it because it is
  * the only existing internal write-observation channel.
  */
-export function observeProvenance(tree: { $: object }): () => void {
+export function observeProvenance(
+  tree: { $: object },
+  channel: 'intercept' | 'path-notifier' = 'intercept'
+): () => void {
+  if (channel === 'path-notifier') return observeViaPathNotifier();
   return interceptLeafSignals(
     tree.$,
     (path, next, prev, meta) => {
@@ -225,8 +246,13 @@ export function observeProvenance(tree: { $: object }): () => void {
         path,
         origin,
         disposition: 'committed',
-        published: !Object.is(next, prev),
-        equalityBasis: 'Object.is',
+        // NOT the publication fact. This is only "next and prev differ under
+        // Object.is" — SignalTree's equality policy may differ, and no seam
+        // currently reports whether a reactive consequence was published.
+        // Naming it `published` manufactured evidence we do not have.
+        objectIsChanged: !Object.is(next, prev),
+        published: 'unknown',
+        equalityBasis: 'Object.is (NOT the kernel publication fact)',
         transactionId,
       };
       active.record.effects.push(effect);
@@ -240,6 +266,75 @@ export function observeProvenance(tree: { $: object }): () => void {
       active.record.summary = summarize(active.record);
     },
     { maxDepth: 32 }
+  );
+}
+
+/** Shared write handling, independent of which channel delivered the write. */
+function ingest(
+  path: string,
+  next: unknown,
+  prev: unknown,
+  meta: WriteMetadata | undefined
+): void {
+  const origin = classifyOrigin(meta);
+  const transactionId = meta?.transactionId;
+
+  if (origin === 'transaction-rollback' && transactionId !== undefined) {
+    const reverted = byTransaction.get(transactionId);
+    if (reverted) {
+      for (const effect of reverted) {
+        effect.disposition = 'rolled-back';
+        effect.revertedBy = `transaction:${transactionId}`;
+      }
+    }
+    resummarizeAll();
+    return;
+  }
+
+  if (!active) {
+    if (origin === 'authored') uncovered.push({ path, origin });
+    return;
+  }
+
+  active.record.attempts.push({ path, origin });
+  const effect: ProvenanceEffect = {
+    path,
+    origin,
+    disposition: 'committed',
+    objectIsChanged: !Object.is(next, prev),
+    published: 'unknown',
+    equalityBasis: 'Object.is (NOT the kernel publication fact)',
+    transactionId,
+  };
+  active.record.effects.push(effect);
+  if (transactionId !== undefined) {
+    const list = byTransaction.get(transactionId) ?? [];
+    list.push(effect);
+    byTransaction.set(transactionId, list);
+  }
+  active.record.summary = summarize(active.record);
+}
+
+/**
+ * INVENTORY RESULT — the composition-safe channel may already exist.
+ *
+ * `PathNotifier` is subscribed by `transactions`, `restoration`, `link`, the
+ * diagnostic journal, and the causal realization adapter, and its handler
+ * already carries `meta` (transactionId, transactionOwner, participation,
+ * ownerId). `interceptLeafSignals` is explicitly the FALLBACK for direct leaf
+ * writes that never produce a notifier event — which is why a transacting tree
+ * is invisible to it.
+ *
+ * If the transaction cases pass through this channel, no new seam is required
+ * and outcome A returns. That is the question this exists to settle.
+ */
+function observeViaPathNotifier(): () => void {
+  const notifier = getPathNotifier();
+  if (!notifier) return () => undefined;
+  return notifier.subscribe(
+    '**',
+    (value, prev, path, _ownerPath, _origin, _subjectIds, _positionIds, meta) =>
+      ingest(path, value, prev, meta)
   );
 }
 
