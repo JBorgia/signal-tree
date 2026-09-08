@@ -7,6 +7,9 @@
 Session ID        ______________________
 Date              ______________________
 Facilitator       ______________________
+Artifact version  ______________________  (git commit of frames.html served)
+                  If this differs between evaluators, their results are not
+                  directly comparable — say so when scoring the cohort.
 Population        [ ] Engineering / SRE
                   [ ] Security / Risk / Audit / AI governance
                   [ ] Other: ______________________
