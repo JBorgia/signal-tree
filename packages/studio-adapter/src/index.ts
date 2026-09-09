@@ -1,10 +1,15 @@
 export { captureConfirmedTurns, type CaptureResult } from './attach';
+export { attachStudio } from './attach-studio';
 export {
-  attachStudio,
+  attachStudioProbe,
   type AttachStudioOptions,
   type StudioAttachment,
   type StudioTreeProbe,
-} from './attach-studio';
+} from './attach-studio-probe';
+export {
+  probeSignalTree,
+  type StudioAttachableTree,
+} from './probe-signal-tree';
 export { S1_CAPABILITIES, type StudioCapability } from './capabilities';
 export {
   StudioRequirementError,

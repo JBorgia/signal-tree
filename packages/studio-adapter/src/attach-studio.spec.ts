@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
-  attachStudio,
+  attachStudioProbe,
   peekRegistry,
   StudioRequirementError,
   type ConfirmedTurnReader,
@@ -32,8 +32,8 @@ const probe = (
  * after it, which is exactly what happened when this suite was first written.
  */
 const opened: { detach: () => void }[] = [];
-const open = (...args: Parameters<typeof attachStudio>) => {
-  const attachment = attachStudio(...args);
+const open = (...args: Parameters<typeof attachStudioProbe>) => {
+  const attachment = attachStudioProbe(...args);
   opened.push(attachment);
   return attachment;
 };
@@ -84,7 +84,7 @@ describe('attachStudio', () => {
 
   it('throws only when the caller declared require, and registers nothing', () => {
     expect(() =>
-      attachStudio(probe({ confirmedTurnReader: undefined }), {
+      attachStudioProbe(probe({ confirmedTurnReader: undefined }), {
         require: ['committed-transactions'],
       })
     ).toThrow(StudioRequirementError);
@@ -121,10 +121,10 @@ describe('registry lifecycle', () => {
   });
 
   it('is created on first attach and dropped with the last detach', () => {
-    const a = attachStudio(probe());
+    const a = attachStudioProbe(probe());
     expect(peekRegistry()).toBeDefined();
 
-    const b = attachStudio(probe());
+    const b = attachStudioProbe(probe());
     expect(peekRegistry()?.size()).toBe(2);
 
     a.detach();
@@ -136,7 +136,7 @@ describe('registry lifecycle', () => {
   });
 
   it('detach is idempotent', () => {
-    const a = attachStudio(probe());
+    const a = attachStudioProbe(probe());
     a.detach();
     a.detach();
     expect(peekRegistry()).toBeUndefined();
@@ -144,7 +144,7 @@ describe('registry lifecycle', () => {
 
   it('evicts automatically when the tree is destroyed', () => {
     let evict: (() => void) | undefined;
-    attachStudio(probe({ onDestroy: (fn) => (evict = fn) }), { label: 'Doomed' });
+    attachStudioProbe(probe({ onDestroy: (fn) => (evict = fn) }), { label: 'Doomed' });
 
     expect(peekRegistry()?.listTrees()).toHaveLength(1);
     evict?.();
@@ -177,12 +177,12 @@ describe('registry lifecycle', () => {
    * a different tree's history.
    */
   it('never recycles a session id, even across a registry drop', () => {
-    const a = attachStudio(probe());
+    const a = attachStudioProbe(probe());
     const firstId = a.id;
     a.detach();
     expect(peekRegistry()).toBeUndefined();
 
-    const b = attachStudio(probe());
+    const b = attachStudioProbe(probe());
     expect(b.id).not.toBe(firstId);
     b.detach();
   });
