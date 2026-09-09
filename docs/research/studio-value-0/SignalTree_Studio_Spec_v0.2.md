@@ -82,14 +82,14 @@ metadata, the thesis is weak"*).
 | F3 | Feasibility scores overstated on every feature that inherits the unshipped observation seam (#6, #8, #9, #11, #13), and understated where the kernel already ships the fact (#5). | §19 table corrected; seam given its own roadmap row; #5 reframed as projection of shipped kernel semantics. |
 | F4 | No roadmap item earns the observation seam itself before any P0 feature. | §8.5 adds **Phase 0**: seam + adversarial mutation-matrix gate (C11, C14). §22.1 made conditional on it. |
 | F5 | MVP could not demo the headline cart-88213 story (invariants/realization not in MVP). | §19.2 adds realization/origin view (already shipped kernel facts) and Studio-level invariant *evaluation* to MVP; "first-violating-event" linkage ships when the seam lands. |
-| F6 | Acceptance criteria non-measurable or self-contradictory (22.1.1). | §22 rewritten: assertable budgets, reproducible DERIVED, structurally distinct INFERENCE/UNKNOWN, measurable overhead, hard commercial gate. |
+| F6 | Acceptance criteria non-measurable or self-contradictory (22.1.1). | §22 rewritten: assertable budgets, reproducible DERIVED, structurally distinct INFERENCE/UNKNOWN, measurable overhead, and explicit refusal of unsupported compositions (22.1.11). Commercial gating replaced by the per-slice adoption measure (§20.7, §22.4). |
 | F7 | Narrative moat thinner than claimed: kernel already ships a narrative hook (`audit` `metadata.description`); kernel also ships a Redux-DevTools adapter via `devTools()`. | §3 and §8.4 record both facts honestly. Moat rests on the semantic layer, explicitly not on absence of actions. |
 | F8 | v3 validation has no exposure decision; v3 is an employer codebase. | The v3 track is withdrawn; the gate runs on the purpose-built fixture only (§20.3). Evidence hash-and-freeze before investigation is retained (§20.4). |
 | F9 | Review bibliography absent; provenance falsification uncredited. | Lineage credited in §2.1 and §20. |
 
 ### 0.2 Relation to prior research
 
-- **STUDIO-VALUE-0 (`README.md`):** the gate for the wedge — the frozen Cart
+- **STUDIO-VALUE-0 (`README.md`):** the gate for Studio — the frozen Cart
   88213 incident, its eight questions, the two trap questions Studio must fail
   honestly (Q4, Q7), and the scoring. **Adopted verbatim.** The incident is the
   distributed-responsibility flow the wedge is defined on, and it is
@@ -154,20 +154,21 @@ multi-write atomic transaction whose participants must be read as one net
 consequence; an authored→realized handoff where the value's current truth came
 from outside the authored operation; and a later, *non-atomic* overwrite that
 partially replaced those consequences. On those flows, action narrative plus
-ordinary instrumentation is not sufficient. That is the comparison this spec
-commits to winning, and the flagship scenario in Appendix A.1 is built
-exclusively from it. **If Studio does not clear the bar on that scenario —
-correct explanation, honest UNKNOWN where the kernel cannot know, within the
-stated budget — the commercial track stops** (§20, §22.1).
+ordinary instrumentation is not sufficient, and a newcomer stalls. That is
+where Studio has to earn its place, and the flagship scenario in Appendix A.1
+is built exclusively from it. **If a slice does not cut a newcomer's
+time-to-correct-explanation on that scenario — with honest UNKNOWNs where the
+kernel cannot know, and honest refusals on compositions it does not observe —
+the next slice is not built** (§20.7, §22.1).
 
 **The gating dependency.** Studio's value depends on complete and truthful
 observation. Current observation is composition-dependent (`PathNotifier` vs
-`interceptLeafSignals`) and neither is a universal, shipping seam. **Phase 0 of
-this roadmap is earning the seam** — one composition-safe internal observation
-boundary over already-existing mutation and settlement facts, without adding
-new state semantics — and passing an adversarial mutation-matrix gate. No P0
-Studio capability is claimed, marketed, or scored commercially before Phase 0
-lands. Every Studio data source is explicitly labelled SHIPPED SEMANTIC FACT,
+`interceptLeafSignals`) and neither is a universal, shipping seam. **The seam
+is committed work, built one composition at a time** (§8.5) — an internal
+observation boundary over already-existing mutation and settlement facts,
+without adding new state semantics. Each slice covers its declared
+compositions and refuses outside them. No Studio capability is claimed for a
+composition a slice does not observe. Every Studio data source is explicitly labelled SHIPPED SEMANTIC FACT,
 RESEARCH-ONLY OBSERVATION, DERIVED BY INSPECTOR, or EXTERNAL EVIDENCE (§8.3).
 
 **Commercial sequence (hard order).**
@@ -220,11 +221,11 @@ RESEARCH-ONLY OBSERVATION, DERIVED BY INSPECTOR, or EXTERNAL EVIDENCE (§8.3).
 - SignalTree owns meaningful state semantics — transactions, net effects,
   causal turns, origins/participation, subject identity, structural effects,
   restoration semantics, and history.
-- Studio is the next wedge — but *only after* the observation seam is earned
-  and the §20 gate is run and passed.
-- *"Why is this value here?"* is the entry point for the narrow wedge — and
-  Studio expands into a semantic debugging environment rather than terminating
-  at a timeline, once the wedge is validated.
+- Studio is the next thing built — on a seam that is committed and grows in
+  slices, with each slice gated on the §20 onboarding measure.
+- *"Why is this value here?"* is the narrow entry point — and Studio expands
+  into a semantic debugging environment rather than terminating at a timeline,
+  as each slice earns the next.
 - AI belongs above Studio — an analyst over structured evidence, not the source
   of evidence.
 - Bring-your-own-model is a first-class requirement — provider choice, local
@@ -290,9 +291,11 @@ questions **intrinsically** — atomic net consequence, participation parcel,
 surviving responsibility — rather than reconstructing them by correlation, and
 must return UNKNOWN where the kernel genuinely cannot know. Questions Studio
 can only reconstruct are, for those questions, metadata (§0.2, falsifier #10).
-If the intrinsic set is thin, or the cost is high, Studio remains a developer
-convenience rather than a commercial wedge, and pricing/team/production work is
-not started (§22.4).
+This matters for design direction, not for whether a capability gets built:
+under an adoption goal the live test is whether a newcomer's confusion is
+removed (§20.1), and a copyable capability that does that is worth building.
+Differentiation is recorded separately (§22.5) against a commercial track that
+is not open (§22.4).
 
 ### 3.3 Non-goals
 
@@ -1018,16 +1021,27 @@ restoration history.
 - Temporal adjacency alone never creates a causal graph edge.
 - Subject lifetime identity is not silently replaced by key/path identity.
 
-### 18.2 Observation completeness gate (Phase 0 exit, binding)
+### 18.2 Observation completeness matrix (per-slice, binding)
 
-Before Studio claims complete "why here" coverage, the supported observation
-contract must pass an adversarial mutation-matrix over: bare trees, enhanced
-trees (batching, transactions, restoration, devTools), trees mid-`transactions()`
+The full matrix covers: bare trees, enhanced trees (batching, transactions,
+restoration, devTools), trees mid-`transactions()`
 (attempted/committed/rolled-back), entityMap structural/entity operations,
 `external()` realization, restoration, destruction, and relevant nested
-configurations. Missing observation is surfaced as "coverage incomplete", not
-hidden. Transaction-free trees are an **inadmissible** surrogate for this gate
-(§20.6): a plain non-transacting tree proves none of the hardest semantics.
+configurations.
+
+**It is not passed once.** Each seam slice (§8.5) must pass the matrix **for
+the compositions it declares**, and must **detect and refuse** every
+composition outside them. The matrix is therefore two assertions per slice:
+what is covered behaves correctly, and what is not covered is recognised as
+uncovered. A slice that silently degrades on an undeclared composition fails
+this gate even if every declared row is green — that is the failure mode
+`MUTATION-OBSERVABILITY-0` records, and the reason growth is sliced rather
+than assumed.
+
+Missing observation is surfaced as "coverage incomplete", never hidden.
+Transaction-free trees are an **inadmissible** surrogate (§20.6): a plain
+non-transacting tree proves none of the hardest semantics, which is why
+transactions land in S1.
 
 ### 18.3 AI evaluation
 
@@ -1084,7 +1098,7 @@ aspiration. Features marked ⚠ inherit the seam and score no higher than it.
 | 35 | Studio plugin/tool API | 4 | 4 | 3 | 5 | P3 |
 | 36 | Cross-app semantic comparison | 3 | 5 | 2 | 4 | P4 |
 | 37 | Relay semantic continuity | 5 | 5 | 1 | 5 | P4 |
-| — | **Observation seam (Phase 0)** | — | — | **gate** | — | **P0-pre** |
+| — | **Observation seam (Phase 0, sliced S1–S4)** | — | — | **committed** | — | **S1** |
 
 > Note on #5: the authored/realized axis is already shipped kernel semantics
 > (`external()`). This feature is a projection, which is why Feas is 5 and the
@@ -1099,17 +1113,19 @@ aspiration. Features marked ⚠ inherit the seam and score no higher than it.
 | Transaction / causal debugging | 9.5/10 | Strong native semantics not naturally modeled by action timelines |
 | Invariant + divergence analysis | 9/10 | Turns state semantics into direct root-cause value |
 | Entity/structural debugging | 8.5/10 | Strong for data-heavy applications and subject identity |
-| Incident comparison / regression generation | 8.5/10 | High workflow value and path to monetization |
-| Production semantic debugging | 8/10 | High revenue but materially harder security/ops problem |
+| Incident comparison / regression generation | 8.5/10 | High workflow value; turns one explained incident into a durable test |
+| Production semantic debugging | 8/10 | Valuable but a materially harder security/ops problem; well past the current slices |
 | Reactive/performance causality | 7.5/10 | Valuable later; avoid scope explosion in MVP |
-| Team collaboration/reporting | 7/10 | Useful monetization layer, weak standalone moat |
+| Team collaboration/reporting | 7/10 | Helps a team share an explanation; does not help a newcomer reach one |
 | Relay-backed distributed Studio | 7/10 now; possibly 10/10 later | Huge if Relay independently proves distributed semantic value |
 | AI provenance/governance | 3/10 | Differentiation not earned in prior falsifier |
 | Generic observability replacement | 2/10 | Wrong battlefield; integrate instead |
 
 ### 19.3 Recommended MVP
 
-**Prerequisite: Phase 0 seam + observation-completeness gate (§8.5, §18.2).**
+**The MVP is not one delivery.** It is reached across seam slices S1–S3
+(§8.5); each slice ships the part of the list its compositions can support
+honestly, and refuses the rest. The full list below is complete at S3.
 
 > State Explorer + Why Here + Semantic Timeline + Turn Inspector +
 > Transaction Inspector + origin/participation (realization) labels +
@@ -1311,7 +1327,7 @@ continuity.
 
 ## 22. Acceptance criteria
 
-### 22.1 MVP functional acceptance (binding; conditional on Phase 0)
+### 22.1 MVP functional acceptance (binding; assessed per slice)
 
 1. **Seam acceptance met** (§18.2, §8.5): adversarial mutation-matrix green
    across the enumerated paths; **C11** and **C14** green. The seam is
@@ -1415,7 +1431,7 @@ SignalTree can offer, whether or not they are ever sold.
 
 | Issue | Disposition | Status |
 |---|---|---|
-| Universal observation seam | Highest architectural dependency. Phase 0 with §8.5 exit gates (mutation matrix + C11 + C14). | **Open — gating** |
+| Universal observation seam | Highest architectural dependency, and committed work (§8.5). Delivered S1–S4, each slice passing §18.2 for its declared compositions. | **Committed — S1 not started** |
 | Transaction settlement observation | Useful for transaction inspector; ship only if Studio value earns the seam and facts can be surfaced truthfully. | Open / value-gated |
 | Exact turn identity surface | Confirm which stable identifiers Studio can rely on across shipped configurations. | Open |
 | `PathNotifier` vs `audit` as candidate seams | Inventory-first rule (MUTATION-OBSERVABILITY-0): prove PathNotifier insufficient before building a second observer; `audit` is diff-sampling/polling and is not the seam. | Open — inventory in Phase 0 |
