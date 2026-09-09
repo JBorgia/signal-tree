@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "SignalTree Studio",
+  "version": "0.1.0",
+  "description": "Semantic debugging for SignalTree — committed causal consequence (S1).",
+  "devtools_page": "devtools/devtools.html",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/bridge.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "permissions": []
+}

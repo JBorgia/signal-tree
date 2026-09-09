@@ -12,5 +12,11 @@
   "include": [
     "vitest.config.ts",
     "src/**/*.spec.ts"
+  ],
+  "exclude": [
+    "devtools/**",
+    "panel/**",
+    "content/**",
+    "smoke/**"
   ]
 }
