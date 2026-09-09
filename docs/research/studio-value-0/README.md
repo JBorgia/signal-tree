@@ -11,10 +11,15 @@
 > production-state bug **correctly, cheaply, and honestly** — including
 > admitting what it cannot know?
 
-Studio is measured against the questions below on the frozen incident. It is
-not measured against another framework's tooling: benchmarking against an
-action-log paradigm would anchor Studio's design to a model it deliberately
-does not share.
+Studio is measured against the questions below on the frozen incident, and
+scored against **the best alternative buildable on SignalTree without Studio**
+— the shipped-API path (`devTools()`, `exportDebugSession()`, `audit`
+`metadata.description`) a competent developer already has for free.
+
+It is *not* measured against another framework's tooling. Benchmarking against
+an action-log paradigm would anchor Studio's design to a model it deliberately
+does not share. The substrate-native baseline is the harder test anyway: it is
+what Studio must actually beat to be worth existing.
 
 ## The frozen incident
 
@@ -128,12 +133,20 @@ The shared fixture backend that produces the incident lives in
 ## Outcomes
 
 ```text
-PASS   correct explanation, honest UNKNOWN on Q4/Q7, within the stated budget,
-       every fact labelled                     -> wedge earned; sequence proceeds
-PARK   correct but expensive, or leaning on research-only hooks for the
-       load-bearing claims                     -> free developer tool, no
+PASS   correct explanation, honest UNKNOWN on Q4/Q7, within budget, every fact
+       labelled, AND a material margin over the shipped-API baseline resting
+       on facts that baseline cannot reach     -> wedge earned; sequence proceeds
+PARK   the shipped-API baseline gets there at similar cost, or the margin is
+       only presentation, or load-bearing claims lean on research-only hooks
+                                               -> free developer tool, no
                                                   commercial track
 STOP   wrong explanation, or a knowledge claim on Q4/Q7 -> thesis not supported
 ```
+
+**The moat rule (spec §22.5).** Every load-bearing capability must rest on a
+fact unreachable without the Phase 0 seam. Anything the shipped API already
+gives away is a convenience feature: it may ship, but it cannot count toward
+differentiation or justify pricing. Presentation is a head start with a fixed
+expiry, not a moat.
 
 Budget and full outcome definitions: spec §20.
