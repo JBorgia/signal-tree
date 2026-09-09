@@ -516,9 +516,10 @@ type StudioKernelEvent =
 
 The exact API derives from existing semantics and falsifiers (C11, C14), not
 from Studio convenience. It exposes only facts SignalTree already owns or has
-deliberately chosen to own. `TransactionSettled` is **value-gated**: it may be
-useful for the transaction inspector, but only ships if Studio value earns the
-seam and existing facts can be surfaced truthfully (§23).
+deliberately chosen to own. `TransactionSettled` is **slice-scoped**: it is
+useful for the transaction inspector and lands with S1 if existing facts can be
+surfaced truthfully; if they cannot, S1 declares it uncovered rather than
+approximating it (§18.2, §23).
 
 ### 8.3 Capture labels
 
@@ -1432,11 +1433,11 @@ SignalTree can offer, whether or not they are ever sold.
 | Issue | Disposition | Status |
 |---|---|---|
 | Universal observation seam | Highest architectural dependency, and committed work (§8.5). Delivered S1–S4, each slice passing §18.2 for its declared compositions. | **Committed — S1 not started** |
-| Transaction settlement observation | Useful for transaction inspector; ship only if Studio value earns the seam and facts can be surfaced truthfully. | Open / value-gated |
+| Transaction settlement observation | Needed by the transaction inspector; lands with S1 if the facts surface truthfully, otherwise S1 declares it uncovered. | Open — resolve in S1 |
 | Exact turn identity surface | Confirm which stable identifiers Studio can rely on across shipped configurations. | Open |
 | `PathNotifier` vs `audit` as candidate seams | Inventory-first rule (MUTATION-OBSERVABILITY-0): prove PathNotifier insufficient before building a second observer; `audit` is diff-sampling/polling and is not the seam. | Open — inventory in Phase 0 |
-| SignalTree arm + minimal inspector | Not started; the gate cannot run until it exists. | **Blocking the gate** |
-| Independent investigator | Must not have built either the inspector or the §20.2 baseline, and must not be told which questions are traps (§20.4). | Open — required before any run |
+| Studio inspector (causal core) | Not started. S1 is the first build item; the gate cannot run before S2. | **Blocking — next action** |
+| Independent investigator | Must not have built the slice or set up the §20.2 control condition, and must not be told which questions are traps (§20.4). | Open — required before any run |
 | What counts as a material delta | §20.7 GROW requires "materially cuts time-to-correct-explanation" but the threshold is not quantified. | **Open — must be set before the first run, not after** |
 | Newcomer recruitment | §20.6 requires a real newcomer per slice run; source and profile undefined. | **Open — blocks the S2 gate** |
 | Production capture | Separate security/privacy/retention/overhead/deployment spec. | Deferred |
