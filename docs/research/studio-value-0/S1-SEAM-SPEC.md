@@ -6,68 +6,93 @@
 >
 > Status: **specification. Not implemented.**
 
+> ⚠️ **CORRECTED 2026-09-09.** The first version of this document was wrong on
+> its central claim. It located the S1 gap in
+> `causal-runtime/transaction-capture-bridge.ts`, which has **no non-spec
+> importer anywhere** — it and `greenfield-transactions.ts` are experimental
+> scaffolding with only spec coverage. Four of the five `path` cast sites
+> (`reversal-planner` ×2, `reapply-planner` ×2) are likewise dead: their only
+> importers, `confirmed-undo.ts` and `confirmed-redo.ts`, have no non-spec
+> importer either. The verified live path is below.
+
 ## Summary
 
-The seam adds **no new observation**. Every fact is already produced and already
-delivered. The minimum change is three things:
+**The live transaction path already carries the address.** The gap is not a
+discarded argument — it is that **nothing is published**.
 
-1. **Stop discarding the address** the capture bridge already receives.
-2. **Declare** the address field three consumers already read via cast.
-3. **Add a read port** for turns, modelled on `PathObservationPort`.
-
-Nothing else in the kernel moves.
-
----
-
-## 1. The one real gap
-
-`PathNotifierHandler` delivers the address:
-
-```ts
-export type PathNotifierHandler = (
-  value, prev,
-  path: string,          // <- delivered
-  ownerPath?: string,    // <- delivered
-  origin?, subjectIds?, positionIds?, meta?
-) => void | Promise<void>;
+```text
+enhancers/transactions/transactions.ts        <- the ONLY production consumer
+  captureEffects(path, ownerPath, ...)             of causal-runtime
+        v
+  TurnEffect  { position, ownerPath, path, ... }   <- path/ownerPath REQUIRED
+        v
+  TransactionTurnRecord { id, __effects: TurnEffect[], ... }
+        v
+  private confirmedTurns: TransactionTurnRecord[]  <- retained, addressed,
+                                                      and unreachable
 ```
 
-`transaction-capture-bridge.ts` binds and **discards** both:
+`confirmedTurns` is a private field on an internal authority class. Nothing
+observes it. **That is the entire S1 gap: a read surface, not a data gap.**
+
+## 1. What is actually live
+
+Verified by import graph, not by reading the product spec.
+
+| Module | Live? | Evidence |
+|---|---|---|
+| `enhancers/transactions/transactions.ts` | **yes** | sole non-spec importer of `causal-runtime`; `new TurnStore()` at :1356 |
+| `causal-runtime/turn-store`, `pending-rollback`, `applied-turn-projection`, `realization-context`, `target-transition`, `transaction-lifecycle`, `tree-realization-adapter`, `causal-types` | **yes** | imported by `transactions.ts` |
+| `transaction-capture-bridge`, `greenfield-transactions` | **no** | no non-spec importer |
+| `reversal-planner`, `reapply-planner` | **no** | only importers are `confirmed-undo` / `confirmed-redo`, which have none |
+| `confirmed-undo`, `confirmed-redo` | **no** | no non-spec importer |
+
+`TurnEffect` is already a discriminated union with the address **required**:
 
 ```ts
-return (next, prev, _path, _ownerPath, _source, subjectIds, positionIds, meta) => {
+type TurnEffectBase = { position: number; ownerPath: string; path: string };
+type TurnEffect = ScalarSetEffect | CollectionAddEffect
+                | CollectionRemoveEffect | CollectionRekeyEffect;
 ```
 
-and `toExplicitTransactionEffect()` builds `{ owner, before, after, subjectId,
-structural?, structuralContext? }` — no address. So a captured transaction
-effect can say *position 7 went from 24.00 to 18.00* and cannot say **which
-field that was**.
+## 2. The `CausalEffect.path` defect — real, live, and it has already bitten
 
-That is the entire gap for S1. The address is arriving on the same call and
-being dropped.
+This finding survives verification, in a better-evidenced form than first
+stated.
 
-## 2. A pre-existing defect this exposes
-
-`CausalEffect` does not declare `path`, yet three modules read it:
+`toCausalEffect` (`transactions.ts:1164`, live, reached from the rollback path
+at :1359) sets `path` and `ownerPath` on **all four** variants — and casts
+`as CausalEffect` on all four, because the interface declares neither:
 
 ```ts
-// reversal-planner.ts:48, :82   reapply-planner.ts:50, :82
-path: (effect as CausalEffect & { path?: string }).path,
+case 'set':
+  return { owner, before, after, subjectId,
+           path: effect.path, ownerPath: effect.ownerPath } as CausalEffect;
 ```
+
+The live consumer `pending-rollback.ts` reads them straight back through a
+double cast:
 
 ```ts
-// pending-rollback.ts:193 — a type guard asserting a field the interface lacks
-): effect is CausalTurn['effects'][number] & { path: string; ownerPath: string }
+const inlinePath = (effect as unknown as { path?: unknown }).path;
 ```
 
-Paths are present at runtime on effects produced by the realization adapter and
-absent on those produced by the capture bridge, and **the type system declares
-neither case**. Consumers cast across the difference.
+Its own comment records what happened when this address was mishandled:
+excluding subject-addressed effects sent them to the address-less branch, the
+applier resolved the target as the **row** instead of the **field**, and wrote
+`'Alpha'` over `{ id: 'A', name: 'Alpha' }` — *"it silently corrupted every
+entity FIELD rollback."*
 
-This is a defect independent of Studio: a field that some producers set, some
-do not, and the type never mentions, is exactly the shape that silently breaks
-when a producer changes. Declaring it is a fix the kernel wants regardless, and
-S1 should not build on top of the cast.
+So the type sits between two live parties that both know the field exists and
+forces both to lie about it, and the failure mode is already documented in
+tree.
+
+**Fix: make `path` and `ownerPath` required on `CausalEffect`.** Every live
+producer sets them on every variant; there are no pathless live variants, so
+`path?: string` would document the bug rather than fix it. Dead-code producers
+(`toExplicitTransactionEffect`) do not constrain this — they should be deleted
+or updated with their chains, not preserved as a reason to keep the field
+optional.
 
 ## 3. Address is not identity
 

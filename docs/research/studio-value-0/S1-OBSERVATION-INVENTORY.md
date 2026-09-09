@@ -5,6 +5,20 @@
 > This is that evidence. Conducted 2026-09-09 against `packages/kernel` at
 > `c0b3d49a`.
 
+> ⚠️ **CORRECTED 2026-09-09** — §C below was wrong. It cited
+> `transaction-capture-bridge.ts` as the live capture path. It has **no
+> non-spec importer**; it and `greenfield-transactions.ts` are experimental
+> scaffolding. So are `reversal-planner`/`reapply-planner` (reachable only from
+> `confirmed-undo`/`confirmed-redo`, which are themselves unreferenced). The
+> verified live path is `enhancers/transactions/transactions.ts`, the sole
+> production consumer of `causal-runtime`. See `S1-SEAM-SPEC.md` §1.
+>
+> The verdict below is unchanged and is in fact *more* strongly supported: the
+> live path already captures the address as a **required** field
+> (`TurnEffectBase`), so there is even less to build than this document
+> claimed. What changes is *where* the gap is — not a discarded argument, but
+> the absence of any read surface over `confirmedTurns`.
+
 ## Verdict
 
 **Do not build a new observer.** The kernel already produces every fact S1
