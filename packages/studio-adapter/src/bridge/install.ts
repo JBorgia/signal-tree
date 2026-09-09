@@ -48,39 +48,48 @@ export function installStudioBridge(
 
   const ports = new Set<MessagePort>();
 
-  const onPortMessage = (port: MessagePort) => (event: MessageEvent) => {
-    // Nothing is trusted because it arrived on the port. A malformed frame is
-    // ignored rather than answered — there is no id to answer to.
-    if (!isStudioBridgeRequest(event.data)) {
-      return;
-    }
-    port.postMessage(handleStudioRequest(event.data));
-  };
-
   const onConnect = (event: MessageEvent) => {
-    const data = event.data as Record<string, unknown> | null;
-    if (typeof data !== 'object' || data === null || data['type'] !== STUDIO_CONNECT) {
+    // Same-window frames only. This is hygiene against stray cross-frame
+    // traffic, NOT authentication — see S1-BRIDGE-SPEC §4.
+    if (event.source !== undefined && event.source !== host) {
       return;
     }
 
-    const channel = new MessageChannel();
-    const port = channel.port1;
-    port.onmessage = onPortMessage(port);
-    port.start();
-    ports.add(port);
+    const data = event.data as Record<string, unknown> | null;
+    if (typeof data !== 'object' || data === null) {
+      return;
+    }
+    if (data['type'] !== STUDIO_CONNECT) {
+      return;
+    }
+    if (data['protocol'] !== STUDIO_PROTOCOL_VERSION) {
+      return;
+    }
 
-    // The nonce is echoed so a caller can match this response to its request.
-    // It is NOT authentication — see protocol.ts and S1-BRIDGE-SPEC §4.
-    (event.source ?? (host as unknown as { postMessage: typeof postMessage }))
-      .postMessage?.(
-        {
-          type: STUDIO_CONNECT,
-          protocol: STUDIO_PROTOCOL_VERSION,
-          nonce: data['nonce'],
-          port: channel.port2,
-        },
-        { transfer: [channel.port2] } as never
-      );
+    // ⚠️ THE INITIATOR OWNS THE CHANNEL. The bridge accepts a transferred port
+    // and NEVER replies through `event.source`.
+    //
+    // The first implementation created the channel here and posted `port2`
+    // back to `event.source`, which assumed the connecting party is a page
+    // Window whose WindowProxy arrives on the event. A DevTools panel is not a
+    // page window — it reaches the page through a content script — so that
+    // reply channel was wrong, and the shape of it hid the mistake behind a
+    // plausible-looking line of code.
+    const port = event.ports?.[0];
+    if (!port) {
+      return;
+    }
+
+    port.onmessage = (message: MessageEvent) => {
+      // Nothing is trusted because it arrived on the port. A malformed frame is
+      // ignored rather than answered — there is no id to answer to.
+      if (!isStudioBridgeRequest(message.data)) {
+        return;
+      }
+      port.postMessage(handleStudioRequest(message.data));
+    };
+    port.start?.();
+    ports.add(port);
   };
 
   host.addEventListener('message', onConnect);

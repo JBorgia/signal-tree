@@ -303,7 +303,99 @@ interface ConfirmedTurnsResponse {
 `retention` crosses the bridge because bounded retention is not causal
 completeness, and the panel must be able to say so.
 
-## 4.1 DECISION — who installs the bridge
+## 4.0 DECISION — the initiator owns the MessageChannel
+
+**Frozen 2026-09-09. Corrects the first implementation.**
+
+The page bridge **never replies through `event.source`**. The first cut did, and
+it rested on a false assumption: that the party opening the connection is a
+page `Window` whose `WindowProxy` arrives as `event.source`. A DevTools panel is
+not a page window — it reaches the page through a content script — so
+`event.source` is the wrong reply channel and the shape of it hid that.
+
+**The initiator creates the channel and transfers a port in.** The bridge only
+accepts one:
+
+```ts
+// content script (extension isolated world)
+const channel = new MessageChannel();
+window.postMessage(
+  { type: 'SIGNALTREE_STUDIO_CONNECT', protocol: 1, nonce },
+  '*',
+  [channel.port2],
+);
+// content script retains channel.port1
+```
+
+```ts
+// page bridge (application main world)
+function onWindowMessage(event: MessageEvent) {
+  if (event.source !== window) return;
+  if (event.data?.type !== STUDIO_CONNECT) return;
+  if (event.data.protocol !== STUDIO_PROTOCOL_VERSION) return;
+  const port = event.ports[0];
+  if (!port) return;
+  connectStudioPort(port);
+}
+```
+
+No reply frame, no `event.source`, no assumption about who the sender is.
+
+## 4.1 The content script is the transport adapter
+
+Two different channels meet there, and translating between them is exactly its
+job:
+
+```text
+DevTools panel
+  |  chrome.tabs.connect(inspectedWindow.tabId)
+  v
+content script                     (extension isolated world)
+  |  window.postMessage(..., [port2])
+  v
+Studio page bridge                 (application main world)
+  |  MessagePort
+  v
+studio-adapter registry
+```
+
+⚠️ **The content script knows nothing about transactions, trees, effects,
+retention, or what a `StudioTreeId` means.** It forwards envelopes:
+
+```ts
+interface TransportEnvelope { id: string; payload: unknown }
+```
+
+Schema and protocol validation stay where they already are, in
+`@signal-tree/studio-adapter/bridge`.
+
+```text
+studio-query        semantics / query
+studio-adapter      attachment + capabilities + registry
+adapter /bridge     protocol
+content script      transport only
+studio-devtools     UI shell
+```
+
+### Two boundaries, only one of which is a trust boundary
+
+```text
+panel <-> content script      Chrome extension messaging
+content script <-> page       NOT authentication against hostile same-realm code
+```
+
+The `MessagePort` buys private subsequent traffic, request/response isolation,
+version negotiation and clean lifecycle. It does **not** prove the party on the
+application side is trustworthy, and §4's threat model is unchanged.
+
+The real security property is still absence:
+
+```text
+production never imports @signal-tree/studio-adapter/bridge
+  -> no installer, no connect listener, no historical-state endpoint
+```
+
+## 4.2 DECISION — who installs the bridge
 
 **Frozen 2026-09-09.**
 
@@ -335,7 +427,7 @@ A separate entry point is **structural** gating: a build that does not import
 Explicit call rather than a self-installing import, so `"sideEffects": false`
 stays truthful and the install point is greppable.
 
-## 4.2 DECISION — bridge lifetime is installation, not attachment
+## 4.3 DECISION — bridge lifetime is installation, not attachment
 
 **Frozen 2026-09-09. This supersedes "bridge removed when the last tree
 detaches."**

@@ -1,0 +1,25 @@
+:root { color-scheme: light dark; }
+body {
+  margin: 0;
+  font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: Canvas;
+  color: CanvasText;
+}
+#root { display: grid; grid-template-columns: 220px 1fr; height: 100vh; }
+.pane { overflow: auto; padding: 12px; }
+.pane + .pane { border-left: 1px solid color-mix(in srgb, CanvasText 15%, transparent); }
+h2 { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .6; margin: 0 0 8px; }
+ul { list-style: none; margin: 0; padding: 0; }
+li button { display: block; width: 100%; text-align: left; padding: 6px 8px; border: 0;
+  background: none; color: inherit; font: inherit; cursor: pointer; border-radius: 4px; }
+li button:hover { background: color-mix(in srgb, CanvasText 8%, transparent); }
+li button[aria-current='true'] { background: color-mix(in srgb, CanvasText 14%, transparent); }
+.cap { opacity: .55; font-size: 11px; }
+.effect { margin: 0 0 10px; }
+.path { font-weight: 600; }
+.delta { opacity: .85; }
+.muted { opacity: .6; }
+.empty { padding: 24px 12px; max-width: 46ch; }
+.notObserved { margin-top: 20px; padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, CanvasText 15%, transparent); opacity: .65; }
+.notObserved li { padding: 1px 0; }
