@@ -11,15 +11,19 @@
 > production-state bug **correctly, cheaply, and honestly** — including
 > admitting what it cannot know?
 
-Studio is measured against the questions below on the frozen incident, and
-scored against **the best alternative buildable on SignalTree without Studio**
-— the shipped-API path (`devTools()`, `exportDebugSession()`, `audit`
-`metadata.description`) a competent developer already has for free.
+The goal is **adoption of SignalTree**; Studio is the means. So the measure is
+onboarding cost:
 
-It is *not* measured against another framework's tooling. Benchmarking against
-an action-log paradigm would anchor Studio's design to a model it deliberately
-does not share. The substrate-native baseline is the harder test anyway: it is
-what Studio must actually beat to be worth existing.
+> Does a developer who does **not** know SignalTree reach a correct explanation
+> faster WITH Studio than with SignalTree and no Studio?
+
+The control is what a developer adopting SignalTree gets today — `devTools()`,
+`exportDebugSession()`, `audit` `metadata.description`, logs, OTel, a debugger.
+Not another framework's tooling: that would anchor Studio's design to a model
+it deliberately does not share.
+
+The investigator must be a real newcomer. The measure is worthless if they
+already carry the model in their head.
 
 ## The frozen incident
 
@@ -120,16 +124,14 @@ RESEARCH-ONLY OBSERVATION / DERIVED BY INSPECTOR / EXTERNAL EVIDENCE**
 (spec §8.3). A conclusion resting on a research-only hook is not a Studio
 capability claim.
 
-**This gate runs after the observation seam ships** (spec §8.5), on SHIPPED
-SEMANTIC FACTs. The seam is committed foundation, not something this experiment
-decides: every differentiating capability depends on it, and research-only
-evidence cannot support a capability claim (§8.3) — so a gate run before the
-seam could only ever return PARK or STOP.
+**This gate runs per seam slice**, from S2 onward (spec §8.5), on SHIPPED
+SEMANTIC FACTs — never on research hooks, which cannot support a capability
+claim (§8.3).
 
-What this gate decides is whether causal explanation, built on real shipped
-semantics, actually delivers against the shipped-API baseline. The engineering
-is spent first. That makes a negative result more expensive and more
-important, not less admissible.
+Each run answers one question: did this slice make SignalTree meaningfully
+easier for a newcomer to understand? A slice that did not is a HOLD, and the
+next slice waits until the reason is diagnosed. That is what keeps the cost of
+being wrong to one slice.
 
 ## Backend
 
@@ -138,21 +140,18 @@ The shared fixture backend that produces the incident lives in
 
 ## Outcomes
 
+Evaluated per slice, from S2 onward (spec §8.5, §20.7):
+
 ```text
-PASS   correct explanation, honest UNKNOWN on Q4/Q7, within budget, every fact
-       labelled, AND a material margin over the shipped-API baseline resting
-       on facts that baseline cannot reach     -> wedge earned; sequence proceeds
-PARK   the shipped-API baseline gets there at similar cost, or the margin is
-       only presentation, or load-bearing claims lean on research-only hooks
-                                               -> free developer tool, no
-                                                  commercial track
-STOP   wrong explanation, or a knowledge claim on Q4/Q7 -> thesis not supported
+GROW   materially cuts time-to-correct-explanation vs no-Studio, with honest
+       UNKNOWNs and honest composition refusals  -> build the next slice
+HOLD   no material delta on this slice's semantics -> stop; diagnose before
+                                                     spending on the next one
+STOP   wrong explanation, a knowledge claim on Q4/Q7, or a silent partial
+       answer on an unsupported composition      -> Studio is making adoption
+                                                     worse; fix or abandon
 ```
 
-**The moat rule (spec §22.5).** Every load-bearing capability must rest on a
-fact unreachable without the Phase 0 seam. Anything the shipped API already
-gives away is a convenience feature: it may ship, but it cannot count toward
-differentiation or justify pricing. Presentation is a head start with a fixed
-expiry, not a moat.
+A HOLD costs one slice, not the roadmap. That is the point of slicing.
 
 Budget and full outcome definitions: spec §20.

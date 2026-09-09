@@ -19,7 +19,8 @@ Semantic debugging, state explanation, and AI-assisted investigation for SignalT
 | Primary product statement | SignalTree is state with semantics. Studio makes those semantics visible, searchable, comparable, and explainable — scoped to the flows where SignalTree actually owns the facts (see §3). |
 | Kernel relationship | Studio consumes SignalTree semantics; it must not distort kernel truth to make explanations prettier. |
 | AI relationship | AI is optional, user-selected, read-only analysis over Studio evidence; AI is never the source of semantic truth. |
-| Commercial sequence | SignalTree v15 substrate → **observation seam (Phase 0 gate)** → Studio wedge → Relay only if distributed semantics independently earn it. The wedge proceeds commercially only on the binding pass/park/stop outcome of §20 (§22). |
+| Goal | **Adoption of SignalTree.** Studio is the means, ships free, and is measured on newcomer onboarding cost (§20.1). No commercial track while that holds (§22.4). |
+| Build sequence | v15 substrate → observation seam **built in slices** (§8.5) → each slice gated on the §20 onboarding measure → Relay only if distributed semantics independently earn it. |
 
 **Status discipline**
 
@@ -113,9 +114,10 @@ metadata, the thesis is weak"*).
 - **ADSP v0.6 falsifier #10:** Studio must be provably *more* than
   "logs, traces, or DevTools with more metadata." This is the null hypothesis
   the validation must be able to confirm. With the yardstick changed, it is
-  measured directly against the shipped-API baseline (§20.2, §20.5): if that
-  baseline answers a question at similar cost, Studio's version of it **is**
-  metadata. Enforced structurally by the moat criterion, §22.5.
+  relevant only if a commercial track is ever opened; it is recorded in §22.5
+  rather than governing the roadmap. Under an adoption goal the live question
+  is not "is this differentiated" but "does this remove a newcomer's
+  confusion" (§20.1).
 
 ---
 
@@ -174,8 +176,7 @@ RESEARCH-ONLY OBSERVATION, DERIVED BY INSPECTOR, or EXTERNAL EVIDENCE (§8.3).
 2. Build the causal core on top of it: why-here, transactions, realization,
    restoration, structural effects.
 3. Validate against the frozen incident, to the bar in §20, **on shipped facts**.
-4. Only on outcome PASS spend commercially — pricing, team service, production
-   capture.
+4. No commercial spend — Studio ships free in service of adoption (§22.4).
 5. Relay only if distributed semantics independently earn it (§21).
 6. Provenance/audit/pricing/team are all downstream and re-earned, never
    borrowed (§2.1).
@@ -228,8 +229,8 @@ RESEARCH-ONLY OBSERVATION, DERIVED BY INSPECTOR, or EXTERNAL EVIDENCE (§8.3).
   of evidence.
 - Bring-your-own-model is a first-class requirement — provider choice, local
   inference, enterprise endpoints, and user-controlled cost/privacy.
-- Validation must be falsifiable against the substrate's own free alternative
-  — the shipped-API baseline on the frozen incident, with the trap questions
+- Validation must be falsifiable: a newcomer's time-to-correct-explanation on
+  the frozen incident, against a no-Studio control, with the trap questions
   scored as failures if answered (§20).
 
 ---
@@ -543,49 +544,72 @@ today:
 | `PathNotifier` | **Internal singleton** | World-subscribe `'**'`, batching, entries carry path/position/subject/participation/owner. Inventory-first candidate seam. Not root API today. |
 | `interceptLeafSignals` | **Unexported, closed** | Documented gaps (array-valued leaves, writes past `maxDepth`); docblock refuted verbatim by kernel tests. Not the baseline. |
 
-### 8.5 Phase 0 — build the seam (committed)
+### 8.5 The seam — committed, built in slices
 
-**Foundation. Precedes and conditions every P0 Studio feature (`§19.4`).**
+**Foundation. Conditions every Studio capability (`§19.4`).**
 
-**This is a commitment, not a gate.** The moat criterion (§22.5) establishes
-that every differentiating Studio capability rests on a fact only the seam
-reaches. A product whose entire differentiated surface depends on one piece of
-infrastructure does not get to treat that infrastructure as optional — and
-cannot validate it conditionally, because the evidence would be RESEARCH-ONLY
-and therefore inadmissible as a capability claim (§8.3). The seam is built
-first, and Studio is designed on the assumption that it exists.
+**This is a commitment, not a gate.** Differentiation lives only in facts the
+seam reaches (§22.5), and those facts are the causal ones. A product whose
+differentiated surface depends entirely on one piece of infrastructure does not
+get to treat that infrastructure as optional.
 
-> Prove one composition-safe internal observation boundary over
-> existing mutation and settlement facts — sufficient for why-here,
-> transactions, realization, restoration, and structural effects — without
-> adding new state semantics.
+**Built iteratively, not as one delivery.** The seam is not a single milestone
+to be completed before anything is usable. It grows one *composition* at a
+time, and each slice ships a working end-to-end path: seam → causal core →
+something a developer can actually use on that composition.
 
-Exit criteria (binding):
+#### The growth discipline (binding)
 
-1. The adversarial mutation-matrix in §18.2 passes against: bare trees,
-   enhanced trees (batching, transactions, restoration, devTools), trees under
-   `transactions()` mid-flight, entityMap structural operations, `external()`
-   realizations, restoration, destruction, and nested combinations.
+Incremental observation is exactly how `MUTATION-OBSERVABILITY-0` was created:
+`PathNotifier` misses direct leaf writes, `interceptLeafSignals` misses
+transacting trees, and each was correct for the cases its author had in mind.
+Growing the seam slice-by-slice reproduces that failure unless every slice is
+explicit about its own edges.
+
+> **Every slice declares its supported composition set, and refuses — loudly —
+> outside it.** Studio must say "I do not observe this composition" rather than
+> render a confident partial answer. An unsupported composition is a visible
+> gap, never a silent omission (§22.1.10).
+
+The matrix widens. The guessing never does. A slice is done when its
+compositions are covered *and* everything outside them is detected and
+declared.
+
+#### Slices
+
+```text
+S1  plain tree + transactions        atomic net consequence; participation
+                                     parcel. C11 (multi-tree owner isolation).
+S2  + external() / realization       authored vs external truth; the
+                                     authored -> realized handoff. C14.
+S3  + restoration                    restoration truthfulness: "restored to a
+                                     prior recorded state", never a parent.
+S4  + entityMap structural ops,      the full §18.2 adversarial matrix;
+    destruction, nested combos       composition-safety in general.
+```
+
+S1–S3 are the three semantics the frozen incident actually exercises, so the
+onboarding measure (§20) is runnable from S2 onward and sharpens each slice.
+
+#### Per-slice acceptance (binding)
+
+1. The §18.2 adversarial mutation-matrix passes **for the slice's declared
+   compositions**, and every composition outside them is detected and refused.
 2. **C11** — multi-tree transaction-owner isolation: numeric transaction ids
-   from different trees never collide without owner/tree namespace.
+   from different trees never collide without owner/tree namespace. Required
+   from S1.
 3. **C14** — realization/restoration causal derivation: derived facts carry no
-   false actor inheritance; restoration exposes no invented parent.
+   false actor inheritance; restoration exposes no invented parent. Required
+   from S2.
 4. Every event carries explicit cost and lifecycle semantics; capture is
    droppable independently of restoration history (§17.1).
-5. The seam is stable enough that `PathNotifier` state does not leak (no global
-   singleton resets between trees; ownership invariant enforced).
+5. No `PathNotifier` state leaks: no global singleton resets between trees;
+   ownership invariant enforced.
 
-These exit criteria are **engineering acceptance on the seam itself**, not a
-commercial go/no-go on Studio. If C11 or C14 fails, or the mutation matrix
-reveals a missing kernel fact, the seam is not done — the failure is a
-specification of what the kernel must expose, not a signal to abandon the
-track. Escalation path for a genuinely unreachable fact: TODO.md
+These are **engineering acceptance on the seam**, not a commercial go/no-go. A
+failure specifies what the kernel must expose; it is not a signal to abandon
+the track. Escalation for a genuinely unreachable fact: TODO.md
 MUTATION-OBSERVABILITY-0.
-
-**Consequence for validation.** The §20 gate runs *after* the seam lands, on
-SHIPPED SEMANTIC FACTs. It does not run on research hooks. This is what makes
-a PASS reachable at all: a gate that demanded seam-dependent differentiation
-while forbidding seam-dependent evidence could only ever return PARK or STOP.
 
 ---
 
@@ -1101,14 +1125,19 @@ seam lands.
 ### 19.4 Roadmap
 
 ```
-Phase 0   OBSERVATION SEAM          COMMITTED. one composition-safe         accept:
-          (foundation)              boundary; §18.2 matrix + C11 + C14      §8.5, §18.2
-P0        CAUSAL CORE (MVP)         why-here, transaction/turn inspectors,
-                                    realization + origin, restoration
-                                    truthfulness, structural effects.
-                                    Deterministic-only; no AI prerequisite
-P0-exit   WEDGE VALIDATION          frozen-incident gate (§20) on SHIPPED   PASS/PARK/
-                                    facts; consume BEFORE commercial spend  STOP
+S1        seam: plain tree +        why-here over an atomic parcel;        accept:
+          transactions              participation. C11.                    §8.5
+S2        seam: + external() /      authored vs external truth; the        §20 gate
+          realization               realized handoff. C14.                 runs: GROW/
+                                    ---- onboarding measure starts here    HOLD/STOP
+S3        seam: + restoration       restoration truthfulness (UNKNOWN,     §20 gate
+                                    never an invented parent)              re-runs
+S4        seam: + entityMap ops,    full §18.2 adversarial matrix;         §20 gate
+          destruction, nesting      composition-safety in general          re-runs
+
+          Each slice ships end to end — seam, causal core, usable surface —
+          declares its supported compositions, and refuses outside them.
+          Deterministic-only throughout; no AI prerequisite.
 P1        Ask Studio / BYO; responsibility map; compare; subject history;
           invariants 1st-event; search; watchpoints; privacy policy; local-
           model mode
@@ -1120,175 +1149,136 @@ P3        Anomaly finder; production capture; reactive/fan-out; replay;
 P4        Cross-app comparison; Relay continuity (only if Relay earns itself)
 ```
 
-**Ranking rule (binding).** Position on this roadmap is set by how directly a
-capability advances *causal explanation*, not by how easy or demoable it is. A
-feature that does not make "why is this value here" more complete, more
-truthful, or cheaper to reach is not a P0 feature regardless of its cost to
-build. Convenience features (§22.5) may ship alongside, but never ahead of, the
-causal core, and never as the thing a release is about.
+**Ranking rule (binding).** Within a slice, position is set by how much a
+capability reduces a newcomer's time-to-correct-explanation (§20.1) — that is
+the adoption lever and the thing being measured. Where two capabilities help a
+newcomer equally, prefer the one resting on causal semantics the substrate
+uniquely owns (§22.5).
+
+**Growth rule (binding).** A slice is built only after the previous slice
+returned **GROW** (§20.7). A **HOLD** stops the next slice until the reason is
+diagnosed. This is what keeps the roadmap above a plan rather than a
+commitment: everything after the current slice is a hypothesis about where
+confusion lives, and each gate is permission to keep spending.
 
 ---
 
 ## 20. Validation plan — the STUDIO-VALUE-0 gate
 
-### 20.1 What Studio is measured against
+### 20.1 What Studio is measured on
 
-The gate defined in `docs/research/studio-value-0/README.md` is **binding**:
-the frozen Cart 88213 incident, its eight questions, the two trap questions
-Studio must fail honestly, and the scoring. What changed on **2026-09-08** is
-the *yardstick*.
+The overall goal is **adoption of SignalTree**. Studio is a means to it, not a
+separate product to be priced. So the gate measures the adoption lever
+directly:
 
-**Studio is not measured against another framework's tooling.** Benchmarking
-against an action-log model lets that model define the terms of success and
-pulls Studio's design toward being a better version of something SignalTree
-deliberately is not. Studio has no actions; its causality is structural.
+> **Does a developer who does not know SignalTree reach a correct explanation
+> of the frozen Cart 88213 incident faster WITH Studio than with SignalTree and
+> no Studio?**
 
-**Studio is measured against the best thing anyone could build on SignalTree
-without Studio.** That is the honest competitive set: the product ambition is
-to be better than every alternative that could exist *for this substrate*, so
-the alternative is what the bar has to be. Concretely, the baseline is the
-cheap shipped-API path a competent developer already has for free (§20.2) —
-not a hypothetical future tool, which is not testable.
+Time-to-understanding for a newcomer is the thing Studio has to move. If it
+does not cut that, it is not buying adoption, whatever else it does well.
 
-This is a **harder** bar than a cross-framework comparison, and it is the
-right one. It also collapses the author-bias problem: the baseline is built
-from documented shipped APIs rather than imagined from a rival paradigm, so
-"was the control built to win" stops being a question of good faith.
+**What this replaces, and why.** Earlier revisions measured Studio against a
+rival framework's tooling, then against an absolute bar, then against the
+shipped-API path. Those are the right questions for a product that has to
+justify a price. They are the wrong question for a tool whose job is to make
+the substrate easier to adopt: a convenience feature that removes a day of
+confusion has real adoption value even when it is not differentiated moat.
 
-**When it runs.** After the seam ships (§8.5), on SHIPPED SEMANTIC FACTs — not
-on research hooks. The seam is committed foundation, so the gate is no longer
-asking "should we start Studio"; it asks whether causal explanation, built on
-real shipped semantics, actually delivers. Running it earlier could only return
-PARK or STOP by construction: it would demand seam-dependent differentiation
-while forbidding seam-dependent evidence (§8.3).
+**What is deliberately kept.** "It helps adoption" is nearly unfalsifiable, and
+this repository has closed two investigations specifically to stop that kind of
+reasoning (`CONTROL-ARM-0`; `STATE-CONSEQUENCE-VALUE-0`, closed
+DIFFERENTIATION NOT EARNED). The measure above is falsifiable — it is a time,
+against a control condition, on a fixed incident, with a newcomer. The trap
+questions, the evidence labelling and the stop condition survive unchanged.
 
-What does **not** relax: the stop condition, the trap questions, the evidence
-labelling, or the requirement that the result be scored from a real
-investigation against captured evidence rather than from the design. Committing
-to the seam raises the stakes on this gate rather than softening it — the
-engineering is spent before the answer is known, which is exactly why the
-answer has to be allowed to come back negative.
+### 20.2 The control condition
 
-The null hypothesis (ADSP v0.6 falsifier #10 — "more than DevTools with more
-metadata") is now measured directly: if the shipped-API baseline answers a
-question at similar cost, Studio's version of that question **is** metadata.
+The same developer profile, the same frozen evidence, the same questions —
+SignalTree with **no Studio**: `devTools()` / `exportDebugSession()`, `audit`
+`metadata.description`, ordinary logs, OTel, a debugger.
 
-### 20.2 The baseline — the shipped-API alternative
-
-Built on the same application, the same substrate, the same captured evidence,
-using only what v15 ships today and no Studio:
-
-| Piece | Shipped surface |
-|---|---|
-| Timeline / state diffs | `devTools()` enhancer + `DebugSession` / `exportDebugSession()` |
-| Developer narrative | `createAuditTracker` `metadata.description` per authored parcel |
-| External truth correlation | backend `cartRevision` / `requestId` / `traceId` from the fixture |
-| Everything else | ordinary logs, OTel, a debugger |
-
-Rules for the baseline, mirroring §20.5: it is **built to win**. If one extra
-`metadata.description` field makes a question trivial, add it. It is authored
-by someone who is not building the inspector, from the documented API surface,
-and its cost in developer time is recorded.
-
-**If this baseline answers the load-bearing questions at similar cost, there is
-no Studio product** — only a nicer front end for facts the substrate already
-gives away. That is the outcome the gate exists to detect.
+This is not a rival paradigm and it is not a strawman: it is what a developer
+adopting SignalTree gets today. If they can already answer the questions
+cheaply, Studio is not what is standing between them and adoption.
 
 ### 20.3 The fixture
 
-One application against the shared fixture backend
-(`docs/research/studio-value-0/apps/`). Domain is one cart:
-`subtotal, promoCode, discount, total, status, serverRevision`. SignalTree arm
-plus a minimal inspector, answering the eight scoped questions — scored
-alongside the §20.2 baseline on the same evidence.
+The frozen Cart 88213 incident (`docs/research/studio-value-0/README.md`)
+against the shared backend (`apps/`). Domain is one cart:
+`subtotal, promoCode, discount, total, status, serverRevision`.
 
-Scenario (the distributed-responsibility flow that defines the wedge):
+The incident exercises three semantics, matching the seam slices (§8.5): an
+atomic multi-field parcel (S1), an authored→realized handoff (S2), and a
+later non-atomic overwrite plus restoration truthfulness (S3).
 
-```text
-1. user applies SAVE20
-2. client performs an OPTIMISTIC update     (atomic: promoCode+discount+total)
-3. server validates and applies a DIFFERENT authoritative discount (tier cap)
-4. client reconciles
-5. later, a backend maintenance push expires the promo
-6. the push clears promoCode + discount and FAILS to recompute total
-7. UI ends internally inconsistent: total reflects a discount no longer present
-```
+### 20.4 Run protocol — per slice, not once
 
-**Status:** backend built and verified; SignalTree arm + minimal inspector not
-started.
+The gate is **not** a single end-of-project event. It runs from **S2 onward**,
+each time a slice lands, on that slice's declared compositions.
 
-### 20.4 Run protocol
+1. Capture runtime evidence from the fixture — no hand-authored narration.
+2. sha256-hash the evidence; commit the manifest **before** investigation.
+3. Recruit an investigator who does not know SignalTree, did not build the
+   slice, and is not told which questions are traps.
+4. Run the questions in both conditions: Studio, and §20.2 no-Studio.
+5. Score against §20.5. Record the delta in time-to-correct-explanation.
+6. Publish the raw evidence and both timings, including the failures.
 
-1. Capture actual runtime evidence from the arm — no hand-authored narration.
-2. sha256-hash the evidence and commit the manifest **before** investigation.
-3. Build the §20.2 shipped-API baseline over the same frozen evidence, authored
-   by someone who is not building the inspector. Record its build cost.
-4. The investigator did not build either surface, is not told which questions
-   are traps, and runs the questions against both.
-5. Score against §20.5. A trap question answered with a knowledge claim is
-   recorded as a failure, not a partial credit.
-6. Publish the raw evidence, both scores, and the baseline's build cost
-   together — including the failures.
+Running it per slice is the point: it tells you whether the *next* slice is
+worth building while it is still cheap to stop.
 
 ### 20.5 What to measure
 
 | Measure | Why |
 |---|---|
-| Correctness | Did the investigator reach the right explanation? |
-| Marginal value over baseline | For each question: does Studio beat the §20.2 shipped-API path, and by how much? **The core measure.** |
-| Semantic coverage | Which questions are represented **intrinsically** vs reconstructed by correlation? A question the baseline reconstructs as cheaply is not differentiation. |
-| Seam dependence | Does Studio's advantage on this question require the Phase 0 seam, or could the baseline reach it? (§22.5 moat test) |
-| Time | Within the stated budget? |
-| Tools consulted | How many separate surfaces beyond the inspector? |
-| Manual joins | How much cross-tool correlation (ID-based vs inferential)? |
-| Wrong hypotheses | Did the representation steer investigation incorrectly? |
-| Bespoke instrumentation | How much app-specific support had to exist? |
-| Evidence discipline | Could every asserted fact be traced to captured evidence? |
+| Time to correct explanation | **The core measure.** Studio vs no-Studio, same newcomer profile. |
+| Correctness | Did they reach the right explanation at all? |
+| Wrong hypotheses | Did the representation steer them badly? |
+| Questions needing prior SignalTree knowledge | Adoption friction Studio failed to remove. |
 | Unknown recognition | Did the tool admit missing semantics rather than infer them? |
+| Composition refusals | Did Studio correctly declare what it does not observe (§8.5)? |
+| Bespoke instrumentation | How much app-specific support had to exist first? |
 
-Marginal value, seam dependence and unknown recognition are the rows that
-cannot be bought with effort; they are where the thesis actually lives. A
-Studio that wins only on presentation has not earned a commercial track.
+Unknown recognition and composition refusals cannot be bought with effort, and
+a tool that fakes either has made adoption *worse*, not better — a newcomer who
+trusts a confident wrong answer is in a worse position than one who got none.
 
 ### 20.6 Standing rules
 
-- **No transaction-free SignalTree arm.** An arm that avoids
-  attempted/committed/rolled-back deletes the hardest causal semantics and
-  proves differentiated causality by dodging it. The seam (Phase 0) ships
-  first, so this arm runs on real transaction facts.
-- **Shipped facts only.** The run happens post-seam. A capability whose
-  evidence is still RESEARCH-ONLY at gate time is not scored — it is not yet a
-  capability (§8.3).
-- **Label every fact** the inspector uses: SHIPPED SEMANTIC FACT /
-  RESEARCH-ONLY OBSERVATION / DERIVED BY INSPECTOR / EXTERNAL EVIDENCE. A
-  conclusion resting on a research-only hook is not a Studio capability claim.
+- **Shipped facts only.** A capability whose evidence is still RESEARCH-ONLY at
+  gate time is not scored — it is not yet a capability (§8.3).
+- **No transaction-free arm.** An arm that avoids attempted/committed/
+  rolled-back dodges the hardest causal semantics. S1 ships transactions first
+  precisely so this is never necessary.
 - **No hand-authored explanation strings.** The inspector derives explanations
   from real machinery, or it does not make the claim.
-- **Product-neutral backend logging.** No `knownIssue: PRICE-441` in log
-  messages that gives the incident away.
+- **Product-neutral backend logging.** No `knownIssue: PRICE-441` in log lines
+  that gives the incident away.
+- **The newcomer is real.** Not a teammate who absorbed SignalTree semantics by
+  osmosis. The measure is worthless if the investigator already knows the model.
 
-### 20.7 Binding outcomes
+### 20.7 Binding outcomes — evaluated per slice
 
 ```text
-PASS   correct explanation; honest UNKNOWN on Q4 and Q7; within the stated
-       budget; every fact labelled; AND a material margin over the §20.2
-       shipped-API baseline on the load-bearing questions, resting on facts
-       the baseline cannot reach
-       -> Studio wedge EARNED; commercial sequence proceeds
+GROW     Studio materially cuts time-to-correct-explanation vs no-Studio,
+         with honest UNKNOWNs and honest composition refusals
+         -> the slice earned itself; build the next one
 
-PARK   correct, but the shipped-API baseline gets there at similar cost, or
-       the margin rests only on presentation, or the load-bearing claims lean
-       on research-only hooks
-       -> free developer tooling only; no pricing/team/production spend
+HOLD     no material delta on this slice's semantics
+         -> do not build the next slice yet. Either the semantics are not
+            where the confusion lives, or the presentation is the problem.
+            Diagnose before spending.
 
-STOP   wrong explanation, or a knowledge claim on Q4 or Q7
-       -> thesis not supported; Studio commercial track stops
-
-BLOCKED  the answer requires unshipped kernel machinery
-       -> cannot support the claim; narrow the wedge or stop (see Phase 0, §8.5)
+STOP     wrong explanations, or a knowledge claim on Q4/Q7, or a silent
+         partial answer on an unsupported composition
+         -> Studio is making adoption worse; stop and fix or abandon
 ```
 
-These outcomes are consumed before any commercial spend, not after (§22.4).
+`HOLD` is the outcome iteration exists to make cheap: it costs one slice, not
+the whole roadmap. Commercial questions — pricing, team service, production
+capture — are downstream of adoption working at all, and are not decided here
+(§22.4).
 
 ---
 
@@ -1344,6 +1334,10 @@ continuity.
 8. Semantic search can filter by path and event type.
 9. Session capture is bounded and exportable/importable.
 10. Missing observation coverage is surfaced, never silently omitted.
+11. **Unsupported compositions are refused, not approximated** (§8.5): Studio
+    states "I do not observe this composition" rather than rendering a
+    confident partial answer. A silent partial answer on an unsupported
+    composition is a §20.7 STOP — it makes adoption worse than no tool.
 
 ### 22.2 AI acceptance
 
@@ -1375,51 +1369,45 @@ continuity.
 
 ### 22.4 Commercial gate (binding)
 
-- §20.7 outcome **PASS** is required before any commercial investment:
-  pricing, team service, or production-capture engineering.
-- On **PARK**: MVP may ship as free developer tooling; nothing commercial
-  starts.
-- On **STOP**: the Studio commercial track stops.
-- On **BLOCKED**: claims are narrowed to what ships, and the seam is re-earned.
-- §23 "Do not set pricing before differentiation is measured" is upgraded from
-  a disposition to a rule: pricing is not set before PASS.
+Studio's job is adoption of SignalTree (§20.1); it ships free. Commercial
+questions are downstream of adoption working at all, and none of them are
+decided by the §20 gate.
 
-### 22.5 Moat criterion (binding)
+- **No pricing, team service, or production-capture engineering** is started
+  while Studio is serving adoption. §23's "do not set pricing before
+  differentiation is measured" stands as a rule.
+- If a commercial track is ever opened, it needs its own gate, and the
+  differentiation question returns with it — see §22.5, which records where
+  durable differentiation would have to live.
+- A sustained run of §20.7 **GROW** outcomes is evidence Studio helps adoption.
+  It is *not* evidence anyone would pay for it. Those are different claims and
+  may not be substituted for one another.
 
-The product goal is that Studio is better than **anything else that could be
-built for SignalTree**. That is not testable against hypothetical tools, so it
-is enforced structurally instead:
+### 22.5 Where differentiation would have to live (recorded)
 
-> **Every load-bearing Studio capability must rest on a fact that is
-> unreachable without the Phase 0 observation seam (§8.5).**
+**This is not a rule about what to build. It is a finding to preserve**, so it
+is available if a commercial track is ever opened (§22.4) and so it is not
+rediscovered from scratch.
 
-The reasoning is a one-way door. If Studio's advantage is reachable from the
-shipped API surface (§8.4, §20.2), then by construction someone else can
-rebuild it cheaply — and "better than every alternative on this substrate" is
-already false, no matter how good the UX is. Presentation is not a moat; it is
-a head start with a fixed expiry.
+If Studio's advantage is reachable from the shipped API surface (§8.4, §20.2),
+then by construction someone else can rebuild it cheaply. Presentation is not a
+moat; it is a head start with a fixed expiry. Durable differentiation, if it is
+ever needed, lives only in facts the seam reaches — and those facts are exactly
+the causal ones: what an operation did as one net consequence, what
+participated in it, what came from outside, what a later write superseded.
 
-Applied as a rule:
+**Why it does not govern the roadmap.** Under an adoption goal it points the
+wrong way. A convenience feature that removes a day of a newcomer's confusion
+has real adoption value even though it is trivially copyable, and refusing to
+build it because it is not moat would be optimizing for a business model that
+does not currently exist. Adoption value and differentiation are separate
+axes; §20 measures the first, this section records the second.
 
-- A capability whose evidence is entirely SHIPPED SEMANTIC FACT reachable via
-  `devTools()` / `exportDebugSession()` / `audit` metadata is a **convenience
-  feature**. It may ship. It may not be counted toward differentiation, be
-  used to justify pricing, or appear in the PASS margin (§20.7).
-- A capability that requires the seam is **differentiating** — and until the
-  seam ships it is RESEARCH-ONLY and carries no capability claim (§8.3).
-- If, at the gate, no load-bearing capability turns out to require the seam,
-  the correct conclusion is that Studio is a free tool and the engineering did
-  not buy differentiation. That is a PARK, and it is recorded as such rather
-  than argued around — the seam having been built does not entitle the result
-  to be positive.
-
-**What this criterion commits the product to.** Since differentiation lives
-only in seam-reachable facts, and those facts are exactly the causal ones —
-what an operation did as one net consequence, what participated in it, what
-came from outside, what a later write superseded — the moat criterion and the
-product direction are the same statement. Everything Studio builds works toward
-causal explanation, or it is a convenience feature riding along. That is the
-ranking rule in §19.4 and the reason Phase 0 is committed rather than gated.
+The useful residue is a **design bias, not a gate**: when two capabilities help
+a newcomer equally, prefer the one resting on causal semantics the substrate
+uniquely owns. That is the ranking rule in §19.4, and the reason the seam is
+committed (§8.5) — it is the foundation for the capabilities that only
+SignalTree can offer, whether or not they are ever sold.
 
 ---
 
@@ -1433,12 +1421,13 @@ ranking rule in §19.4 and the reason Phase 0 is committed rather than gated.
 | `PathNotifier` vs `audit` as candidate seams | Inventory-first rule (MUTATION-OBSERVABILITY-0): prove PathNotifier insufficient before building a second observer; `audit` is diff-sampling/polling and is not the seam. | Open — inventory in Phase 0 |
 | SignalTree arm + minimal inspector | Not started; the gate cannot run until it exists. | **Blocking the gate** |
 | Independent investigator | Must not have built either the inspector or the §20.2 baseline, and must not be told which questions are traps (§20.4). | Open — required before any run |
-| Time budget and margin for PASS | The §20.7 budget is stated but not numbered, and "material margin" over the baseline is not quantified. | **Open — both must be set before the run, not after** |
+| What counts as a material delta | §20.7 GROW requires "materially cuts time-to-correct-explanation" but the threshold is not quantified. | **Open — must be set before the first run, not after** |
+| Newcomer recruitment | §20.6 requires a real newcomer per slice run; source and profile undefined. | **Open — blocks the S2 gate** |
 | Production capture | Separate security/privacy/retention/overhead/deployment spec. | Deferred |
 | Standalone shell technology | Browser extension first; Tauri/Electron/web later, after query/session engine stabilizes. | Deferred |
 | Source linkage | Requires build/source-map integration design. | Deferred |
 | Team service | No cloud requirement for MVP; collaboration follows product validation. | Deferred |
-| Commercial packaging/pricing | Not set before outcome PASS (§22.4). | Deferred |
+| Commercial packaging/pricing | Not started while Studio serves adoption (§22.4). | Deferred |
 | Relay coupling | No dependency until Relay independently passes its own value test. | Deferred |
 | AI provider adapter set | OpenRouter + generic compatible endpoint sufficient to establish architecture; direct adapters follow demand. | Open but non-blocking |
 
