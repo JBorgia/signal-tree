@@ -1055,96 +1055,51 @@ documented as missing array-valued leaves and writes past `maxDepth`. Cloud
 infrastructure burden is low; **the observation-seam dependency is real** and is
 the same open question the provenance spike hit.
 
-**3. The control is stronger than it looks.** Redux/NgRx DevTools already
-answers "why is this value here" via an action log — a *developer-authored,
-human-readable narrative* that SignalTree does not have, because SignalTree has
-no actions. Causality here is structural, not narrated. That could make Studio
-**worse** at naive "what happened" and better at "what actually changed and what
-survived". Do not repeat `CONTROL-ARM-0` v1: build the DevTools control to win.
+**3. Studio has no action narrative to fall back on.** SignalTree has no
+actions; causality here is structural, not narrated. Studio is therefore
+plausibly **worse** at naive "what happened" and must earn its case on what
+actually changed and what survived — the atomic net consequence, the
+participation parcel, and the surviving responsibility of a partially
+superseded consequence. Designing toward a narrative timeline would chase a
+model SignalTree does not have.
 
 ## STUDIO-VALUE-0
 
-**STATUS: BLOCKED — SYNTHETIC CONTROL INVALID. No product conclusion.**
+**STATUS: OPEN — the gate for the Studio wedge.**
+
+> Can SignalTree causal state plus a minimal inspector explain an unfamiliar
+> production-state bug **correctly, cheaply, and honestly** — including
+> admitting what it cannot know?
+
+Studio is scored against the frozen Cart 88213 incident and its eight
+questions, to an absolute bar. It is not scored against another framework's
+tooling: benchmarking against an action-log paradigm would anchor Studio's
+design to a model it deliberately does not share.
+
+Fixture, questions and scoring:
+[`docs/research/studio-value-0/README.md`](docs/research/studio-value-0/README.md)
+Bar, budget and binding outcomes: spec §20.
 
 ```text
-Reason:
-The hand-authored NgRx control was not representative of evidence a competent
-production NgRx application would actually produce. Repairing another synthetic
-fixture risks repeatedly encoding the interested party's assumptions into the
-control.
-
-Next admissible discriminator:
-same application implemented in NgRx and SignalTree,
-same backend, same injected defect,
-raw/unedited runtime evidence from both.
+PASS   correct explanation, honest UNKNOWN on Q4/Q7, within the stated budget,
+       every fact labelled                    -> wedge earned; sequence proceeds
+PARK   correct but expensive, or leaning on research-only hooks for the
+       load-bearing claims                    -> free developer tool, no
+                                                 commercial track
+STOP   wrong explanation, or a knowledge claim on Q4/Q7 -> thesis not supported
 ```
 
-**What failed is the control INSTRUMENT, not the Studio thesis.** An independent
-adversarial review (25 findings) judged the fixture "weaker than a competently
-instrumented NgRx application in 2026, and weaker in ways that are specifically
-load-bearing rather than cosmetic."
+**Two questions must be failed honestly.** Q4 (which intermediate writes did
+not survive) is unanswerable — transactions coalesce same-location writes to
+the net effect by design (MO-1B). Q7 (what restoration can tell us) has no
+causal parent to report (MO-3A). Claiming knowledge on either counts AGAINST
+the result.
 
-The two findings that make it inadmissible were both authored bias:
+**If Studio does not clear the bar, stop that too.**
 
-```text
-PRE-EDITORIALIZED   backend note fields narrated the conclusion into the
-                    evidence ("Recomputation ... is owned by the pricing
-                    pipeline, which this job does not invoke")
-
-TOO EASY AND TOO HARD SIMULTANEOUSLY
-                    a warn carrying knownIssue PRICE-441 fired at the exact
-                    millisecond of failure, so the answer was greppable, while
-                    no invariant check existed anywhere, so the mechanism was
-                    invisible. That is not what real evidence looks like in
-                    either direction.
-```
-
-Structurally: 7 actions in 30 minutes, no `@ngrx/store/init`, no
-`ROOT_EFFECTS_INIT`, no router actions, diffs confined to one slice. **No real
-DevTools export looks like this.**
-
-**Twice now** a hand-authored control has been structurally weak in exactly the
-places that favour SignalTree (`CONTROL-ARM-0` v1, and this). That is a pattern,
-not an accident. The interested party cannot author a fair control from
-imagination.
-
-Build scope: [`docs/research/studio-value-0/BUILD-SCOPE.md`](docs/research/studio-value-0/BUILD-SCOPE.md)
-The synthetic fixtures under `control-arm/` are **INVALID** and retained only as
-the record of the failure.
-
-### Original preregistration, retained
-
-**OPEN — the gate for the Studio wedge. Same discipline as the provenance track.**
-
-> Does SignalTree causal state plus a minimal inspector materially beat
-> conventional debugging on an unfamiliar production-state bug?
-
-```text
-CONTROL                          CANDIDATE
-browser logs                     same application
-Redux/NgRx-style DevTools        + SignalTree causal state
-OpenTelemetry                    + minimal Studio inspector
-backend logs
-ordinary debugger
-```
-
-Measured:
-
-```text
-time to correct explanation
-number of tools opened
-number of logs manually correlated
-wrong hypotheses formed
-identified the causal operation
-distinguished server truth from local authorship
-identified transaction / net-effect boundaries
-```
-
-Better-fitted than the provenance comparison, because these semantics
-**originate inside SignalTree** rather than being reconstructable by generic
-IAM/audit tooling.
-
-**If Studio does not win decisively, stop that too.**
+Status: backend fixture built and verified; SignalTree arm + minimal inspector
+not started; Phase 0 observation seam (spec §8.5) is the prerequisite for any
+non-research-only capability claim.
 
 ## RELAY — separate thesis, argued on its own
 

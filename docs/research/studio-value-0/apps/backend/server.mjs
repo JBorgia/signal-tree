@@ -1,9 +1,9 @@
 /**
  * STUDIO-VALUE-0 — shared backend. NON-SHIPPING RESEARCH FIXTURE.
  *
- * One backend, two clients (NgRx arm and SignalTree arm). Both hit this exact
- * implementation so the server side of the comparison is identical by
- * construction rather than by care.
+ * Produces the frozen Cart 88213 incident. Paradigm-neutral by construction:
+ * it emits raw evidence (facts, never conclusions) and takes no position on
+ * how a client models state.
  *
  * Zero dependencies, plain node:http, so it cannot drift and needs no install.
  *

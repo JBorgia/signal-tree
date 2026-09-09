@@ -1,11 +1,10 @@
-# STUDIO-VALUE-0 — applications
+# Studio validation fixture — applications
 
 **NON-SHIPPING RESEARCH FIXTURES.** Not part of any published package.
 
 ```text
-backend/     shared by BOTH arms — arm-neutral by construction
-ngrx/        not started — see BUILD-SCOPE.md design issue 4
-signaltree/  not started
+backend/     the fixture backend that produces the frozen Cart 88213 incident
+signaltree/  not started — the app + minimal inspector under validation
 ```
 
 ## Backend
@@ -39,8 +38,7 @@ leaky log lines: 0
 - **Facts, never conclusions.** No log line names the defect, references a
   ticket, or explains what a job failed to do. The maintenance job logs
   `fields: ["promoCode","discount"]` — the omission of `total` is visible in the
-  patch, not narrated. This is the defect that made the previous synthetic
-  fixture inadmissible.
+  patch, not narrated.
 - Money in **integer minor units** with an explicit `currency`, not JSON floats.
 - Mutations carry `actor`, `sourceService`, `reasonCode`, `schemaVersion`,
   `cartRevision`, `requestId`, `traceId`, `spanId` — machine fields.
@@ -49,5 +47,5 @@ leaky log lines: 0
   trace id.
 - Per-aggregate `cartRevision`, monotonic, so a client can detect gaps.
 
-Both arms hit this exact implementation, so the server side is identical by
-construction rather than by care.
+The backend is deliberately paradigm-neutral: it emits raw evidence and takes
+no position on how a client models state.
