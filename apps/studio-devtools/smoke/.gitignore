@@ -1,2 +1,3 @@
 bundle.js
 probe-extension/content.js
+probe-extension/driver.js
