@@ -169,11 +169,15 @@ lands. Every Studio data source is explicitly labelled SHIPPED SEMANTIC FACT,
 RESEARCH-ONLY OBSERVATION, DERIVED BY INSPECTOR, or EXTERNAL EVIDENCE (§8.3).
 
 **Commercial sequence (hard order).**
-1. Ship the observation seam (Phase 0) on the v15 substrate.
-2. Validate the wedge against the frozen incident, to the bar in §20.
-3. Only on outcome PASS build the Studio wedge commercially.
-4. Relay only if distributed semantics independently earn it (§21).
-5. Provenance/audit/pricing/team are all downstream and re-earned, never
+1. Build the observation seam (Phase 0) on the v15 substrate. **Committed, not
+   conditional** — every differentiating capability depends on it (§8.5, §22.5).
+2. Build the causal core on top of it: why-here, transactions, realization,
+   restoration, structural effects.
+3. Validate against the frozen incident, to the bar in §20, **on shipped facts**.
+4. Only on outcome PASS spend commercially — pricing, team service, production
+   capture.
+5. Relay only if distributed semantics independently earn it (§21).
+6. Provenance/audit/pricing/team are all downstream and re-earned, never
    borrowed (§2.1).
 
 ---
@@ -487,7 +491,7 @@ to reopen kernel semantics prematurely.
 kernel internally knows the fact. It must be reachable through a supported
 observation contract with explicit cost and lifecycle semantics.
 
-### 8.2 Proposed Studio observation contract (Phase 0 target, not yet earned)
+### 8.2 Studio observation contract (Phase 0 target — committed, not yet built)
 
 ```ts
 interface StudioObservationSource {
@@ -539,9 +543,17 @@ today:
 | `PathNotifier` | **Internal singleton** | World-subscribe `'**'`, batching, entries carry path/position/subject/participation/owner. Inventory-first candidate seam. Not root API today. |
 | `interceptLeafSignals` | **Unexported, closed** | Documented gaps (array-valued leaves, writes past `maxDepth`); docblock refuted verbatim by kernel tests. Not the baseline. |
 
-### 8.5 Phase 0 — earn the seam (new)
+### 8.5 Phase 0 — build the seam (committed)
 
-**Work item, precedes every P0 Studio feature on the roadmap (`§19.4`).**
+**Foundation. Precedes and conditions every P0 Studio feature (`§19.4`).**
+
+**This is a commitment, not a gate.** The moat criterion (§22.5) establishes
+that every differentiating Studio capability rests on a fact only the seam
+reaches. A product whose entire differentiated surface depends on one piece of
+infrastructure does not get to treat that infrastructure as optional — and
+cannot validate it conditionally, because the evidence would be RESEARCH-ONLY
+and therefore inadmissible as a capability claim (§8.3). The seam is built
+first, and Studio is designed on the assumption that it exists.
 
 > Prove one composition-safe internal observation boundary over
 > existing mutation and settlement facts — sufficient for why-here,
@@ -563,11 +575,17 @@ Exit criteria (binding):
 5. The seam is stable enough that `PathNotifier` state does not leak (no global
    singleton resets between trees; ownership invariant enforced).
 
-**If C11 or C14 fails, or the mutation matrix reveals a missing kernel fact,
-frame B of the commercial thesis collapses to C — the seam decision gate in
-TODO.md MUTATION-OBSERVABILITY-0.** The §20 gate may use RESEARCH-ONLY
-instrumentation to evaluate value before this lands (§20.6), but no shipping
-Studio capability claim may rest on it.
+These exit criteria are **engineering acceptance on the seam itself**, not a
+commercial go/no-go on Studio. If C11 or C14 fails, or the mutation matrix
+reveals a missing kernel fact, the seam is not done — the failure is a
+specification of what the kernel must expose, not a signal to abandon the
+track. Escalation path for a genuinely unreachable fact: TODO.md
+MUTATION-OBSERVABILITY-0.
+
+**Consequence for validation.** The §20 gate runs *after* the seam lands, on
+SHIPPED SEMANTIC FACTs. It does not run on research hooks. This is what makes
+a PASS reachable at all: a gate that demanded seam-dependent differentiation
+while forbidding seam-dependent evidence could only ever return PARK or STOP.
 
 ---
 
@@ -1083,11 +1101,14 @@ seam lands.
 ### 19.4 Roadmap
 
 ```
-Phase 0   OBSERVATION SEAM          earn one composition-safe boundary;     gate:
-          (P0-pre)                  pass §18.2 matrix + C11 + C14           §8.5, §18.2
-Phase 0   WEDGE VALIDATION          frozen-incident gate (§20); consume     PASS/PARK/
-                                    outcomes BEFORE any commercial spend    STOP
-P0        MVP (list above)          deterministic-only; no AI prerequisite
+Phase 0   OBSERVATION SEAM          COMMITTED. one composition-safe         accept:
+          (foundation)              boundary; §18.2 matrix + C11 + C14      §8.5, §18.2
+P0        CAUSAL CORE (MVP)         why-here, transaction/turn inspectors,
+                                    realization + origin, restoration
+                                    truthfulness, structural effects.
+                                    Deterministic-only; no AI prerequisite
+P0-exit   WEDGE VALIDATION          frozen-incident gate (§20) on SHIPPED   PASS/PARK/
+                                    facts; consume BEFORE commercial spend  STOP
 P1        Ask Studio / BYO; responsibility map; compare; subject history;
           invariants 1st-event; search; watchpoints; privacy policy; local-
           model mode
@@ -1098,6 +1119,13 @@ P3        Anomaly finder; production capture; reactive/fan-out; replay;
           counterfactual; team sharing; plugin API
 P4        Cross-app comparison; Relay continuity (only if Relay earns itself)
 ```
+
+**Ranking rule (binding).** Position on this roadmap is set by how directly a
+capability advances *causal explanation*, not by how easy or demoable it is. A
+feature that does not make "why is this value here" more complete, more
+truthful, or cheaper to reach is not a P0 feature regardless of its cost to
+build. Convenience features (§22.5) may ship alongside, but never ahead of, the
+causal core, and never as the thing a release is about.
 
 ---
 
@@ -1127,9 +1155,19 @@ right one. It also collapses the author-bias problem: the baseline is built
 from documented shipped APIs rather than imagined from a rival paradigm, so
 "was the control built to win" stops being a question of good faith.
 
+**When it runs.** After the seam ships (§8.5), on SHIPPED SEMANTIC FACTs — not
+on research hooks. The seam is committed foundation, so the gate is no longer
+asking "should we start Studio"; it asks whether causal explanation, built on
+real shipped semantics, actually delivers. Running it earlier could only return
+PARK or STOP by construction: it would demand seam-dependent differentiation
+while forbidding seam-dependent evidence (§8.3).
+
 What does **not** relax: the stop condition, the trap questions, the evidence
 labelling, or the requirement that the result be scored from a real
-investigation against captured evidence rather than from the design.
+investigation against captured evidence rather than from the design. Committing
+to the seam raises the stakes on this gate rather than softening it — the
+engineering is spent before the answer is known, which is exactly why the
+answer has to be allowed to come back negative.
 
 The null hypothesis (ADSP v0.6 falsifier #10 — "more than DevTools with more
 metadata") is now measured directly: if the shipped-API baseline answers a
@@ -1216,8 +1254,11 @@ Studio that wins only on presentation has not earned a commercial track.
 
 - **No transaction-free SignalTree arm.** An arm that avoids
   attempted/committed/rolled-back deletes the hardest causal semantics and
-  proves differentiated causality by dodging it. Derive the seam first
-  (Phase 0) — or use RESEARCH-ONLY instrumentation and label it.
+  proves differentiated causality by dodging it. The seam (Phase 0) ships
+  first, so this arm runs on real transaction facts.
+- **Shipped facts only.** The run happens post-seam. A capability whose
+  evidence is still RESEARCH-ONLY at gate time is not scored — it is not yet a
+  capability (§8.3).
 - **Label every fact** the inspector uses: SHIPPED SEMANTIC FACT /
   RESEARCH-ONLY OBSERVATION / DERIVED BY INSPECTOR / EXTERNAL EVIDENCE. A
   conclusion resting on a research-only hook is not a Studio capability claim.
@@ -1282,10 +1323,11 @@ continuity.
 
 ### 22.1 MVP functional acceptance (binding; conditional on Phase 0)
 
-1. **Observation-completeness gate passed** (§18.2): adversarial mutation-matrix
-   green across the enumerated paths; **C11** and **C14** green
-   (§8.5). Until then, "Studio can browse current state" (§2) does not pass and
-   no capability claim is made from RESEARCH-ONLY capture.
+1. **Seam acceptance met** (§18.2, §8.5): adversarial mutation-matrix green
+   across the enumerated paths; **C11** and **C14** green. The seam is
+   committed work, so this is a definition-of-done on the foundation, not a
+   decision about whether to proceed. Until it is met, no capability claim is
+   made from RESEARCH-ONLY capture.
 2. User can connect Studio to a development SignalTree application with **no
    change to application domain logic**; capture wiring goes through the
    supported adapter, and trees without a stable identity carry a state-side
@@ -1366,9 +1408,18 @@ Applied as a rule:
 - A capability that requires the seam is **differentiating** — and until the
   seam ships it is RESEARCH-ONLY and carries no capability claim (§8.3).
 - If, at the gate, no load-bearing capability turns out to require the seam,
-  the correct conclusion is that the seam is not worth the engineering and
-  Studio is a free tool. That is a PARK, and it is recorded as such rather
-  than argued around.
+  the correct conclusion is that Studio is a free tool and the engineering did
+  not buy differentiation. That is a PARK, and it is recorded as such rather
+  than argued around — the seam having been built does not entitle the result
+  to be positive.
+
+**What this criterion commits the product to.** Since differentiation lives
+only in seam-reachable facts, and those facts are exactly the causal ones —
+what an operation did as one net consequence, what participated in it, what
+came from outside, what a later write superseded — the moat criterion and the
+product direction are the same statement. Everything Studio builds works toward
+causal explanation, or it is a convenience feature riding along. That is the
+ranking rule in §19.4 and the reason Phase 0 is committed rather than gated.
 
 ---
 

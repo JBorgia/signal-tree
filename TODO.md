@@ -1065,7 +1065,13 @@ model SignalTree does not have.
 
 ## STUDIO-VALUE-0
 
-**STATUS: OPEN — the gate for the Studio wedge.**
+**STATUS: OPEN — runs after the seam ships.**
+
+**The seam is committed** (spec §8.5). Every differentiating Studio capability
+rests on a fact only the observation seam reaches, so it is built first rather
+than gated on this experiment. Gating it the other way was circular: the gate
+demands seam-dependent differentiation while research-only evidence cannot
+support a capability claim, so it could only ever return PARK or STOP.
 
 > Can SignalTree causal state plus a minimal inspector explain an unfamiliar
 > production-state bug **correctly, cheaply, and honestly** — including
@@ -1107,9 +1113,20 @@ the result.
 
 **If Studio does not clear the bar, stop that too.**
 
-Status: backend fixture built and verified; SignalTree arm + minimal inspector
-not started; Phase 0 observation seam (spec §8.5) is the prerequisite for any
-non-research-only capability claim.
+**Everything works toward causality.** Differentiation lives only in
+seam-reachable facts, and those facts are the causal ones — net consequence,
+participation, external realization, supersession. So the roadmap ranks by how
+directly a capability advances "why is this value here" (spec §19.4), and
+anything the shipped API already gives away rides along as convenience rather
+than leading a release.
+
+The engineering is spent before the answer is known. That is the deliberate
+trade, and it is why the gate must still be allowed to come back negative:
+having built the seam does not entitle the result to be positive.
+
+Status: backend fixture built and verified; observation seam not started (now
+the first build item); SignalTree arm + minimal inspector not started; gate
+runs post-seam on shipped facts.
 
 ## RELAY — separate thesis, argued on its own
 

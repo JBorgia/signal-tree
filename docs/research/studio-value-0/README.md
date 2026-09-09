@@ -120,10 +120,16 @@ RESEARCH-ONLY OBSERVATION / DERIVED BY INSPECTOR / EXTERNAL EVIDENCE**
 (spec §8.3). A conclusion resting on a research-only hook is not a Studio
 capability claim.
 
-Research-only instrumentation is permitted for this fixture. Do **not** solve
-the universal mutation-observation seam (`MUTATION-OBSERVABILITY-0`) to make
-the experiment possible — that is Phase 0 (spec §8.5), and the result of this
-fixture is part of what decides whether the seam deserves the engineering.
+**This gate runs after the observation seam ships** (spec §8.5), on SHIPPED
+SEMANTIC FACTs. The seam is committed foundation, not something this experiment
+decides: every differentiating capability depends on it, and research-only
+evidence cannot support a capability claim (§8.3) — so a gate run before the
+seam could only ever return PARK or STOP.
+
+What this gate decides is whether causal explanation, built on real shipped
+semantics, actually delivers against the shipped-API baseline. The engineering
+is spent first. That makes a negative result more expensive and more
+important, not less admissible.
 
 ## Backend
 
