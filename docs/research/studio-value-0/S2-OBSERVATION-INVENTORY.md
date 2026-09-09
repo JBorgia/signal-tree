@@ -11,8 +11,11 @@
 
 S1 read a history the kernel was *already retaining*, so it cost nothing when
 unused and needed no capture. **Realized writes are retained nowhere.** S2 must
-therefore *capture*, which puts it on the write path — precisely the trigger
-that revives the ≤1% budget.
+therefore *capture*.
+
+⚠️ **CORRECTED 2026-09-09.** An earlier revision of this document said capture
+"revives the ≤1% budget". That was wrong, and the error mattered enough to keep
+visible. See §D.
 
 ## A. The semantic facts already exist and are first-class
 
@@ -91,7 +94,7 @@ Notably it is *bounded*, where `confirmedTurns` is not. If S2 adopts it, Studio
 inherits a truthful retention story for free — and `retention.truncated` stops
 being permanently `false`.
 
-## D. This slice puts work on the write path
+## D. Capture is write-path work — but that is NOT the deferred budget
 
 The journal does:
 
@@ -101,21 +104,24 @@ notifier.subscribe('**', (next, prev, path, ownerPath, origin, ...) => {
 });
 ```
 
-**A `DiagnosticEffect` allocated per write while subscribed.** That is exactly
-the condition recorded in `S1-COST-MEASUREMENTS.md` §2 as reviving the budget:
+**A `DiagnosticEffect` allocated per write while subscribed.**
 
-> an event allocated before knowing whether anyone listens
+⚠️ **This is not the deferred ≤1% trigger, and conflating them would be a
+category error.** That budget asks: *does unused/disabled Studio impose work on
+ordinary SignalTree execution?* An allocation that happens **only because a
+developer explicitly enabled capture** is not disabled overhead — it is
+instrumented DevTools mode, which is supposed to cost something.
 
-Two different questions now have to be kept apart, and S1's answer only covers
-the first:
+The trigger fires only if S2 adds a branch or allocation to every write **while
+capture is off**.
 
-```text
-cost when UNUSED     expected zero — no subscription, and hasPathObservers()
-                     already short-circuits the producer. Must still be proven.
+Three states, three different standards:
 
-cost when ATTACHED   real, per write, and UNMEASURED. New question. S1 never
-                     had one because it never captured.
-```
+| State | Requirement |
+|---|---|
+| S2 present, capture **off** | The zero-cost-unused contract, unchanged. The ≤1% trigger applies here and only here — if idle hot-path work appears. |
+| S2 capture **on** | Measure overhead and memory honestly, against a **separate instrumentation budget**. Developers deserve to know the cost; a recorder is not required to observe every write for ≤1%. |
+| Studio absent from production | Still zero adapter/bridge code, as S1 proved. |
 
 ## E. Consequences for S2's design
 
