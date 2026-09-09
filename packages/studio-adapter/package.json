@@ -14,7 +14,12 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./bridge": {
+      "types": "./src/bridge/index.d.ts",
+      "import": "./dist/bridge/index.js",
+      "default": "./dist/bridge/index.js"
+    }
   },
   "files": [
     "dist/**/*.js",

@@ -24,6 +24,7 @@
       "@signal-tree/kernel/internals": ["packages/kernel/src/internals.ts"],
       "@signal-tree/kernel": ["packages/kernel/src/index.ts"],
       "@signal-tree/react": ["packages/react/src/index.ts"],
+      "@signal-tree/studio-adapter/bridge": ["packages/studio-adapter/src/bridge/index.ts"],
       "@signal-tree/studio-adapter": ["packages/studio-adapter/src/index.ts"],
       "@signal-tree/studio-query": ["packages/studio-query/src/index.ts"]
     },
