@@ -14,12 +14,12 @@ Semantic debugging, state explanation, and AI-assisted investigation for SignalT
 | Document | SignalTree Studio — Product & Engineering Specification |
 | Version | 0.2 (revised after adversarial review of v0.1) |
 | Status | Working specification; product thesis under validation |
-| Supersedes | v0.1 (2026-09-08); **amends STUDIO-VALUE-0 preregistration** (see §0) |
+| Supersedes | v0.1 (2026-09-08); **redefines the STUDIO-VALUE-0 gate** (see §0, §20) |
 | Date | 2026-09-08 |
 | Primary product statement | SignalTree is state with semantics. Studio makes those semantics visible, searchable, comparable, and explainable — scoped to the flows where SignalTree actually owns the facts (see §3). |
 | Kernel relationship | Studio consumes SignalTree semantics; it must not distort kernel truth to make explanations prettier. |
 | AI relationship | AI is optional, user-selected, read-only analysis over Studio evidence; AI is never the source of semantic truth. |
-| Commercial sequence | SignalTree v15 substrate → **observation seam (Phase 0 gate)** → Studio wedge → Relay only if distributed semantics independently earn it. The wedge proceeds commercially only on the preregistered go/park/stop outcome (§20, §22). |
+| Commercial sequence | SignalTree v15 substrate → **observation seam (Phase 0 gate)** → Studio wedge → Relay only if distributed semantics independently earn it. The wedge proceeds commercially only on the binding pass/park/stop outcome of §20 (§22). |
 
 **Status discipline**
 
@@ -53,7 +53,7 @@ traceable to the adversarial findings recorded in §0.1.
 17. Performance and scalability budgets
 18. Reliability, evidence discipline, and testing
 19. Feature ranking and roadmap
-20. Validation plan — amends STUDIO-VALUE-0
+20. Validation plan — the STUDIO-VALUE-0 gate
 21. Future Relay integration
 22. Acceptance criteria
 23. Open issues and decisions
@@ -66,18 +66,18 @@ Appendices — schemas, examples, and API sketches
 
 v0.2 is the response to an adversarial review of v0.1. The review was grounded
 against the current 15.0 kernel surface and the repository's existing research
-lineage: `docs/research/studio-value-0/` (preregistration + two-app build scope),
+lineage: `docs/research/studio-value-0/` (the frozen incident, questions and scoring),
 `TODO.md` §MUTATION-OBSERVABILITY-0 and the "three constraints Studio inherits"
 section, and `docs/ADSP/SignalTree_Protection_Commercialization_Adversarial_Audit_v0.6.md`
-(falsifier #10: *"if Studio is merely logs, traces, or Redux/NgRx DevTools with
-more metadata, the thesis is weak"*).
+(falsifier #10: *"if Studio is merely logs, traces, or DevTools with more
+metadata, the thesis is weak"*).
 
 ### 0.1 Findings and dispositions
 
 | # | Finding (v0.1 review) | Disposition in v0.2 |
 |---|---|---|
 | F1 | Wedge overstated: "why is this value here" is usually answered by single-writer correlation, which a competent control wins. Differentiation survives only in *distributed-responsibility* flows: multi-write atomic parcels, authored→realized handoffs, non-atomic later overwrites. | §3 reframes the wedge. Flagship demo and validation score distributed-responsibility cases like-for-like. |
-| F2 | v0.1 replaced the STUDIO-VALUE-0 preregistration without engaging it; preregistration discipline invalidated. | §0, §20: this spec **amends** the preregistration. The two-app/one-backend build remains the primary engaged experiment. v3 migration admitted only as a gated supplemental track. |
+| F2 | v0.1 replaced the STUDIO-VALUE-0 gate without engaging it; validation discipline invalidated. | §0, §20: the gate is **engaged and kept binding**, with the yardstick changed on the record — Studio is scored to an absolute bar against the frozen incident rather than against a rival framework's tooling (§20.1). The stop condition survives the change. |
 | F3 | Feasibility scores overstated on every feature that inherits the unshipped observation seam (#6, #8, #9, #11, #13), and understated where the kernel already ships the fact (#5). | §19 table corrected; seam given its own roadmap row; #5 reframed as projection of shipped kernel semantics. |
 | F4 | No roadmap item earns the observation seam itself before any P0 feature. | §8.5 adds **Phase 0**: seam + adversarial mutation-matrix gate (C11, C14). §22.1 made conditional on it. |
 | F5 | MVP could not demo the headline cart-88213 story (invariants/realization not in MVP). | §19.2 adds realization/origin view (already shipped kernel facts) and Studio-level invariant *evaluation* to MVP; "first-violating-event" linkage ships when the seam lands. |
@@ -88,32 +88,41 @@ more metadata, the thesis is weak"*).
 
 ### 0.2 Relation to prior research
 
-- **STUDIO-VALUE-0 (preregistration, README.md):** the gate for the wedge.
-  Sequence: control first, blind investigation, *then* minimum inspector. Bar:
-  material win or stop. Status at time of writing: BLOCKED — synthetic control
-  invalid; the instrument failed, not the thesis. **Unchanged and adopted.**
-- **STUDIO-VALUE-0 (BUILD-SCOPE.md):** the admissible discriminator — one tiny
-  cart app built twice against one neutral backend, NgRx arm vs SignalTree arm +
-  minimal inspector. Backend built; NgRx arm not started; NgRx practitioner at
-  this writing **not secured**. **Adopted as the primary experiment.** Two of its
-  standing rules are restored here (§20.6): no transaction-free SignalTree arm;
-  label every fact SHIPPED / RESEARCH / DERIVED.
+- **STUDIO-VALUE-0 (`README.md`):** the gate for the wedge — the frozen Cart
+  88213 incident, its eight questions, the two trap questions Studio must fail
+  honestly (Q4, Q7), and the scoring. **Adopted verbatim.** The incident is the
+  distributed-responsibility flow the wedge is defined on, and it is
+  paradigm-neutral: it is a property of the application's state history, not of
+  any framework's representation of it.
+- **Yardstick, changed on the record (2026-09-08):** Studio is scored to an
+  **absolute bar** against that incident, not against a rival framework's
+  tooling. Benchmarking Studio against an action-log paradigm would anchor its
+  design to a model SignalTree deliberately does not share, and would let the
+  rival's representation define the terms of Studio's success. The gate, the
+  stop condition, and the evidence discipline are unchanged; only the reference
+  frame moved. Two standing rules are kept (§20.5): no transaction-free
+  SignalTree arm; label every fact SHIPPED / RESEARCH / DERIVED.
 - **MUTATION-OBSERVABILITY-0 and MO-1B / MO-3A:** the observation seam and the
   two provenance "hard entry controls" (C11 multi-tree transaction-owner
   isolation, C14 realization/restoration causal derivation). Net-effect
   coalescing (MO-1B) and restoration-without-parent (MO-3A) are **kernel
   constraints, not Studio design choices**. §8 and §22.1 carry them verbatim.
 - **ADSP v0.6 falsifier #10:** Studio must be provably *more* than
-  "logs, traces, or Redux/NgRx DevTools with more metadata." This is the null
-  hypothesis the validation must be able to confirm.
+  "logs, traces, or DevTools with more metadata." This is the null hypothesis
+  the validation must be able to confirm. With the yardstick changed, it is
+  answered by the **semantic-coverage** measure (§20.4) — which of the scoped
+  questions Studio represents *intrinsically* versus reconstructs from
+  correlation — not by a build-off against another tool. A question Studio can
+  only reconstruct is, for that question, metadata.
 
 ---
 
 ## 1. Executive summary
 
 SignalTree Studio is the proposed semantic debugger and investigation
-environment for SignalTree applications. It is not a recreation of Redux/NgRx
-DevTools, not an observability platform, and not an AI chatbot around logs.
+environment for SignalTree applications. It is not a recreation of an
+action-log debugger, not an observability platform, and not an AI chatbot
+around logs.
 Studio exposes state semantics that originate inside SignalTree: causal turns,
 atomic transaction consequences, authored versus realized/external state,
 structural subject changes, restoration semantics, history, supersession, and
@@ -143,8 +152,9 @@ from outside the authored operation; and a later, *non-atomic* overwrite that
 partially replaced those consequences. On those flows, action narrative plus
 ordinary instrumentation is not sufficient. That is the comparison this spec
 commits to winning, and the flagship scenario in Appendix A.1 is built
-exclusively from it. **If the preregistered experiment does not show a material
-win on that scenario, the commercial track stops** (§20, §22.1).
+exclusively from it. **If Studio does not clear the bar on that scenario —
+correct explanation, honest UNKNOWN where the kernel cannot know, within the
+stated budget — the commercial track stops** (§20, §22.1).
 
 **The gating dependency.** Studio's value depends on complete and truthful
 observation. Current observation is composition-dependent (`PathNotifier` vs
@@ -158,8 +168,8 @@ RESEARCH-ONLY OBSERVATION, DERIVED BY INSPECTOR, or EXTERNAL EVIDENCE (§8.3).
 
 **Commercial sequence (hard order).**
 1. Ship the observation seam (Phase 0) on the v15 substrate.
-2. Validate the wedge against the preregistered two-app experiment (§20).
-3. Only on outcome A (decisive win) build the Studio wedge commercially.
+2. Validate the wedge against the frozen incident, to the bar in §20.
+3. Only on outcome PASS build the Studio wedge commercially.
 4. Relay only if distributed semantics independently earn it (§21).
 5. Provenance/audit/pricing/team are all downstream and re-earned, never
    borrowed (§2.1).
@@ -204,7 +214,7 @@ RESEARCH-ONLY OBSERVATION, DERIVED BY INSPECTOR, or EXTERNAL EVIDENCE (§8.3).
   causal turns, origins/participation, subject identity, structural effects,
   restoration semantics, and history.
 - Studio is the next wedge — but *only after* the observation seam is earned
-  and the preregistered comparison is run (§20).
+  and the §20 gate is run and passed.
 - *"Why is this value here?"* is the entry point for the narrow wedge — and
   Studio expands into a semantic debugging environment rather than terminating
   at a timeline, once the wedge is validated.
@@ -212,9 +222,9 @@ RESEARCH-ONLY OBSERVATION, DERIVED BY INSPECTOR, or EXTERNAL EVIDENCE (§8.3).
   of evidence.
 - Bring-your-own-model is a first-class requirement — provider choice, local
   inference, enterprise endpoints, and user-controlled cost/privacy.
-- Validation must use fair controls — the committed experiment is the
-  two-app/one-backend build; the v3 historical migration is a gated supplement
-  (§20.5).
+- Validation must be falsifiable on its own terms — an absolute bar against the
+  frozen incident, with the trap questions scored as failures if answered
+  (§20).
 
 ---
 
@@ -261,16 +271,21 @@ instrumentation without rebuilding the candidate abstraction.
   "developer-authored narrative" SignalTree lacks as a default. The moat is
   therefore the *semantic* layer (atomicity, participation, supersession), not
   the absence of actions.
-- The kernel already ships a `devTools()` enhancer that speaks Redux DevTools.
-  Studio is competing on top of a free existing path. Its marginal value is
-  exactly the semantic differentiation above; there is no free "not Redux
-  DevTools" argument.
+- The kernel already ships a `devTools()` enhancer that speaks the Redux
+  DevTools protocol. Studio is competing on top of a free existing path. Its
+  marginal value is exactly the semantic differentiation above; there is no
+  free "we are not that" argument.
 
-The product must not assume superiority. Studio must earn its case in the
-preregistered two-app experiment. If ordinary action narrative plus competent
-instrumentation answers the scoped questions at similar cost, Studio remains a
-developer convenience rather than a commercial wedge, and pricing/team/production
-work is not started (§22.4).
+The product must not assume superiority, and it does not get to define
+superiority relative to a tool built on a different model. Studio earns its
+case against the §20 bar: on the frozen incident it must represent the scoped
+questions **intrinsically** — atomic net consequence, participation parcel,
+surviving responsibility — rather than reconstructing them by correlation, and
+must return UNKNOWN where the kernel genuinely cannot know. Questions Studio
+can only reconstruct are, for those questions, metadata (§0.2, falsifier #10).
+If the intrinsic set is thin, or the cost is high, Studio remains a developer
+convenience rather than a commercial wedge, and pricing/team/production work is
+not started (§22.4).
 
 ### 3.3 Non-goals
 
@@ -329,7 +344,7 @@ work is not started (§22.4).
 | BYO model | Studio's durable value is its semantic tool layer, not a specific foundation model. |
 | Local-first privacy | Core Studio should run locally and require no SignalTree cloud account. |
 | Bounded evidence | History/capture must have explicit budgets and retention policies; debug usefulness cannot justify unbounded runtime cost. |
-| Control built to win | Every competitive validation assumes a competent conventional implementation and strengthens the control before comparing. |
+| Score against the bar, not a rival | Validation is an absolute bar on a frozen incident. Studio is never justified by comparison to a tool built on a different model — that lets the rival define success and pulls design toward a paradigm SignalTree does not share. |
 | Separate shipped facts from research hooks | Every Studio data source is tagged SHIPPED SEMANTIC FACT, RESEARCH-ONLY OBSERVATION, DERIVED BY INSPECTOR, or EXTERNAL EVIDENCE. |
 
 ---
@@ -548,8 +563,8 @@ Exit criteria (binding):
 
 **If C11 or C14 fails, or the mutation matrix reveals a missing kernel fact,
 frame B of the commercial thesis collapses to C — the seam decision gate in
-TODO.md MUTATION-OBSERVABILITY-0.** The two-app experiment may use RESEARCH-ONLY
-instrumentation to evaluate value before this lands (§20.6), but no shipping
+TODO.md MUTATION-OBSERVABILITY-0.** The §20 gate may use RESEARCH-ONLY
+instrumentation to evaluate value before this lands (§20.5), but no shipping
 Studio capability claim may rest on it.
 
 ---
@@ -1068,8 +1083,8 @@ seam lands.
 ```
 Phase 0   OBSERVATION SEAM          earn one composition-safe boundary;     gate:
           (P0-pre)                  pass §18.2 matrix + C11 + C14           §8.5, §18.2
-Phase 0   WEDGE VALIDATION          two-app experiment (§20); consume       A/B/C/D
-                                    outcomes BEFORE any commercial spend
+Phase 0   WEDGE VALIDATION          frozen-incident gate (§20); consume     PASS/PARK/
+                                    outcomes BEFORE any commercial spend    STOP
 P0        MVP (list above)          deterministic-only; no AI prerequisite
 P1        Ask Studio / BYO; responsibility map; compare; subject history;
           invariants 1st-event; search; watchpoints; privacy policy; local-
@@ -1084,27 +1099,43 @@ P4        Cross-app comparison; Relay continuity (only if Relay earns itself)
 
 ---
 
-## 20. Validation plan — amends STUDIO-VALUE-0
+## 20. Validation plan — the STUDIO-VALUE-0 gate
 
-### 20.1 Relationship to the preregistration
+### 20.1 The bar, and the yardstick change
 
-This section **amends** `docs/research/studio-value-0/README.md` +
-`BUILD-SCOPE.md`. It does not replace them. The preregistered gate —
-*control first, blind investigation, minimum inspector last; material win or
-stop* — is unchanged and binding. The preregistered bar is carried verbatim:
+The gate defined in `docs/research/studio-value-0/README.md` is **binding**:
+the frozen Cart 88213 incident, its eight questions, the two trap questions
+Studio must fail honestly, and the scoring. What changed on **2026-09-08** is
+the *yardstick*, not the gate.
 
-```text
-control 4 minutes vs Studio 3 minutes   ->  NO BUSINESS
-```
+Studio is scored to an **absolute bar** against the incident. It is **not**
+scored against a rival framework's tooling. Two reasons, both load-bearing:
 
-### 20.2 Primary experiment (engaged, unchanged direction)
+1. **Paradigm anchoring.** Benchmarking Studio against an action-log model
+   lets that model define the terms of success, and pulls Studio's design
+   toward being a better version of something SignalTree deliberately is not.
+   Studio has no actions; its causality is structural. A comparison scored on
+   narrative fluency measures the wrong axis, and a comparison scored on
+   Studio's own axis is not a fair comparison — it is this bar with extra
+   steps.
+2. **Author bias is unfixable by effort.** A rival arm built by the interested
+   party is not made neutral by building it well; the failure mode is
+   structural, not one of care.
 
-The two-app/one-shared-backend cart build from BUILD-SCOPE.md. Domain is one
-cart: `subtotal, promoCode, discount, total, status, serverRevision`. NgRx arm
-(full DevTools + OTel + backend correlation) vs SignalTree arm + minimal
-inspector answering one data-grounded question. **Status: backend built; NgRx
-arm not started; NgRx practitioner not secured — required before any run
-(BUILD-SCOPE design issue 4).**
+What the change does **not** relax: the stop condition, the trap questions, the
+evidence labelling, or the requirement that the result be scored from a real
+investigation against captured evidence rather than from the design.
+
+The null hypothesis (ADSP v0.6 falsifier #10 — "more than DevTools with more
+metadata") survives as the **semantic-coverage** measure in §20.4: a question
+Studio can only reconstruct by correlation is, for that question, metadata.
+
+### 20.2 The fixture
+
+One application against the shared fixture backend
+(`docs/research/studio-value-0/apps/`). Domain is one cart:
+`subtotal, promoCode, discount, total, status, serverRevision`. SignalTree arm
+plus a minimal inspector, answering the eight scoped questions.
 
 Scenario (the distributed-responsibility flow that defines the wedge):
 
@@ -1118,93 +1149,67 @@ Scenario (the distributed-responsibility flow that defines the wedge):
 7. UI ends internally inconsistent: total reflects a discount no longer present
 ```
 
-### 20.3 v3 historical migration — gated supplemental track (v0.2)
+**Status:** backend built and verified; SignalTree arm + minimal inspector not
+started.
 
-v0.1 proposed "the real v3 NgRx-to-SignalTree migration" as the preferred
-validation. v0.2 **downgrades it to a supplemental track conditional on five
-gates**, because a real migration is a stronger fixture but carries risks a
-hand-built arm does not:
+### 20.3 Run protocol
 
-1. **Exposure.** v3 is an employer codebase. Before any capture: decide
-   anonymize/redact, or run internally on non-IP material. Public evidence from
-   v3 domain state is otherwise forbidden.
-2. **Clean freeze.** A genuinely clean boundary must exist: last clean
-   NgRx/SignalStore revision and first clean SignalTree revision of the same
-   feature, diverging only in the state layer. If the migration crossed
-   features or state layers together, the candidate is rejected (selection
-   protocol, below).
-3. **Discriminator presence.** The chosen feature must contain the
-   distributed-responsibility flow (§3.1). BUILD-SCOPE warned a real cart flow
-   contains no atomic multi-field operation unless one is built deliberately —
-   same caution applies to choosing a v3 feature.
-4. **Neutral control authoring.** The NgRx arm of a real migration is authored
-   by the migrating team(s) — the interested-party bias is *not* removed by
-   realism. An independent NgRx practitioner must review/benchmark it.
-5. **Hash-and-freeze.** Raw evidence from both arms is sha256-hashed and the
-   manifest committed before investigation, by someone who built neither arm.
+1. Capture actual runtime evidence from the arm — no hand-authored narration.
+2. sha256-hash the evidence and commit the manifest **before** investigation.
+3. The investigator did not build the arm and is not told which questions are
+   traps.
+4. Score against §20.4. A trap question answered with a knowledge claim is
+   recorded as a failure, not a partial credit.
+5. Publish the raw evidence and the score together, including the failures.
 
-If any gate fails, the track is dropped without weakening the primary
-experiment. The primary experiment never waits on v3.
-
-### 20.4 Selection protocol (for either real-history track)
-
-1. Identify a feature/store with a clean historical migration boundary.
-2. Freeze the last clean pre-SignalTree version and first clean SignalTree
-   version of the same feature.
-3. Enumerate all non-state-layer functional changes; reject if equivalence is
-   too weak.
-4. Prefer a real historical state bug or the injected shared-boundary defect;
-   the injection point must be identical for both arms.
-5. Capture actual runtime evidence from both examples.
-6. Hash/freeze evidence before investigation; investigators built neither arm.
-7. Score ordinary root-cause questions and the semantic questions Studio claims
-   to make intrinsic.
-
-### 20.5 What to measure
+### 20.4 What to measure
 
 | Measure | Why |
 |---|---|
 | Correctness | Did the investigator reach the right explanation? |
-| Time | How quickly? |
-| Tools consulted | How many separate surfaces? |
+| Semantic coverage | Which questions are represented **intrinsically** vs reconstructed by correlation? (the falsifier-#10 measure) |
+| Time | Within the stated budget? |
+| Tools consulted | How many separate surfaces beyond the inspector? |
 | Manual joins | How much cross-tool correlation (ID-based vs inferential)? |
-| Wrong hypotheses | Did one representation steer investigation incorrectly? |
+| Wrong hypotheses | Did the representation steer investigation incorrectly? |
 | Bespoke instrumentation | How much app-specific support had to exist? |
-| Semantic coverage | Which questions are represented intrinsically vs reconstructed? |
-| Evidence discipline | Could every asserted fact be traced to actual evidence? |
+| Evidence discipline | Could every asserted fact be traced to captured evidence? |
 | Unknown recognition | Did the tool admit missing semantics rather than infer them? |
 
-### 20.6 Standing rules restored from BUILD-SCOPE
+Semantic coverage and unknown recognition are the two rows that cannot be
+bought with effort; they are where the thesis actually lives.
 
-- **No transaction-free SignalTree arm.** A comparison that avoids
+### 20.5 Standing rules
+
+- **No transaction-free SignalTree arm.** An arm that avoids
   attempted/committed/rolled-back deletes the hardest causal semantics and
   proves differentiated causality by dodging it. Derive the seam first
   (Phase 0) — or use RESEARCH-ONLY instrumentation and label it.
 - **Label every fact** the inspector uses: SHIPPED SEMANTIC FACT /
   RESEARCH-ONLY OBSERVATION / DERIVED BY INSPECTOR / EXTERNAL EVIDENCE. A
   conclusion resting on a research-only hook is not a Studio capability claim.
-- **Control built to win.** If one extra action field makes a question trivial,
-  add it. No hand-authored explanation strings in the SignalTree arm; the
-  inspector derives explanations from real machinery.
+- **No hand-authored explanation strings.** The inspector derives explanations
+  from real machinery, or it does not make the claim.
 - **Product-neutral backend logging.** No `knownIssue: PRICE-441` in log
   messages that gives the incident away.
 
-### 20.7 Preregistered outcomes (binding)
+### 20.6 Binding outcomes
 
 ```text
-A  Studio wins decisively
-   faster / more correct, fewer joins, materially less app-specific
-   instrumentation                          -> Studio wedge EARNED; commercial
-                                               sequence proceeds
-B  roughly equivalent
-   Studio cleaner but control gets there cheaply -> PARK; free developer
-                                               tooling only; no pricing/team/
-                                               production spend
-C  control wins
-   action narrative + ordinary instrumentation easier -> STOP the Studio
-                                               commercial track
-D  candidate requires hypothetical/unshipped kernel machinery
-   -> experiment cannot support the Studio claim; narrow or stop (see Phase 0)
+PASS   correct explanation; honest UNKNOWN on Q4 and Q7; within the stated
+       budget; every fact labelled; the load-bearing questions represented
+       intrinsically rather than reconstructed
+       -> Studio wedge EARNED; commercial sequence proceeds
+
+PARK   correct, but expensive, or the load-bearing questions are reconstructed
+       rather than intrinsic, or the answer leans on research-only hooks
+       -> free developer tooling only; no pricing/team/production spend
+
+STOP   wrong explanation, or a knowledge claim on Q4 or Q7
+       -> thesis not supported; Studio commercial track stops
+
+BLOCKED  the answer requires unshipped kernel machinery
+       -> cannot support the claim; narrow the wedge or stop (see Phase 0, §8.5)
 ```
 
 These outcomes are consumed before any commercial spend, not after (§22.4).
@@ -1311,13 +1316,14 @@ continuity.
 | Transaction settlement observation | Useful for transaction inspector; ship only if Studio value earns the seam and facts can be surfaced truthfully. | Open / value-gated |
 | Exact turn identity surface | Confirm which stable identifiers Studio can rely on across shipped configurations. | Open |
 | `PathNotifier` vs `audit` as candidate seams | Inventory-first rule (MUTATION-OBSERVABILITY-0): prove PathNotifier insufficient before building a second observer; `audit` is diff-sampling/polling and is not the seam. | Open — inventory in Phase 0 |
-| Two-app NgRx arm authorship | NgRx practitioner not secured; required before any run (BUILD-SCOPE issue 4). | **Blocking the primary experiment** |
-| v3 supplemental track | Gated on §20.3 (exposure, clean freeze, discriminator, neutral author, hash-freeze). | Deferred / conditional |
+| SignalTree arm + minimal inspector | Not started; the gate cannot run until it exists. | **Blocking the gate** |
+| Independent investigator | Must not have built the arm, and must not be told which questions are traps (§20.3). | Open — required before any run |
+| Time budget for PASS | The §20.6 budget is stated but not yet fixed to a number. | **Open — must be set before the run, not after** |
 | Production capture | Separate security/privacy/retention/overhead/deployment spec. | Deferred |
 | Standalone shell technology | Browser extension first; Tauri/Electron/web later, after query/session engine stabilizes. | Deferred |
 | Source linkage | Requires build/source-map integration design. | Deferred |
 | Team service | No cloud requirement for MVP; collaboration follows product validation. | Deferred |
-| Commercial packaging/pricing | Not set before outcome A (§22.4). | Deferred |
+| Commercial packaging/pricing | Not set before outcome PASS (§22.4). | Deferred |
 | Relay coupling | No dependency until Relay independently passes its own value test. | Deferred |
 | AI provider adapter set | OpenRouter + generic compatible endpoint sufficient to establish architecture; direct adapters follow demand. | Open but non-blocking |
 
@@ -1440,8 +1446,8 @@ value in a flow where responsibility is spread across an atomic operation, a
 realized handoff, and a partial supersession, obtain a truthful semantic
 explanation in seconds, inspect the exact transaction/turn/effects behind that
 explanation, compare alternate points or sessions, and optionally ask their
-preferred AI model to investigate using the same evidence model — **and if the
-preregistered comparison shows a material, instrumentation-fair win over a
-control built to win.** Everything else — team services, production capture,
+preferred AI model to investigate using the same evidence model — **and if
+Studio clears the §20 bar on the frozen incident: the load-bearing questions
+represented intrinsically, the trap questions failed honestly.** Everything else — team services, production capture,
 performance causality, and Relay continuity — follows only after that foundation
 proves differentiated value, and only in the order §1 and §19.4 define.
