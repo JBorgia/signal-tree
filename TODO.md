@@ -1008,12 +1008,22 @@ STUDIO                 causal debugging / explanation   <- NEXT WEDGE
 RELAY                  only if distributed semantics prove independently valuable
 ```
 
-**Not in parallel.** Studio first.
+**Studio serves adoption; it is not a separate product.** SignalTree adoption
+is the goal, Studio is the means (spec §20.1) — it ships free, and no pricing
+or team-service work starts while that is true.
+
+**Not in parallel, but not a waterfall either.** Studio leads because the
+adoption blocker it targets — a newcomer cannot explain why a value is what it
+is — is upstream of docs and case studies: examples of a model people cannot
+debug do not convert. Studio is built in slices (spec §8.5), and TRACK A work
+folds in behind each slice that earns a GROW, using what that slice made
+explicable.
 
 ```text
 TRACK A  adoption      docs, examples, migration, real production users,
                        framework adapters, case studies
-TRACK B  Studio proof  minimal causal inspector + STUDIO-VALUE-0
+TRACK B  Studio         causal inspector, built in slices; each slice gated
+                       on the STUDIO-VALUE-0 onboarding measure
 ```
 
 Explicitly NOT building: provenance package, Audit, Verified Audit,
@@ -1065,13 +1075,24 @@ model SignalTree does not have.
 
 ## STUDIO-VALUE-0
 
-**STATUS: OPEN — runs after the seam ships.**
+**STATUS: OPEN — runs per slice, from S2 onward.**
 
-**The seam is committed** (spec §8.5). Every differentiating Studio capability
-rests on a fact only the observation seam reaches, so it is built first rather
-than gated on this experiment. Gating it the other way was circular: the gate
-demands seam-dependent differentiation while research-only evidence cannot
-support a capability claim, so it could only ever return PARK or STOP.
+**The measure is onboarding cost, because adoption is the goal:**
+
+> Does a developer who does not know SignalTree reach a correct explanation of
+> the frozen Cart 88213 incident faster WITH Studio than with SignalTree and
+> no Studio?
+
+Not against another framework's tooling, and not against an absolute bar.
+Those are the right questions for something being priced; Studio ships free to
+make the substrate adoptable. The control is what a developer adopting
+SignalTree gets today: `devTools()`, `exportDebugSession()`, `audit`
+metadata, logs, OTel, a debugger.
+
+**"It helps adoption" is nearly unfalsifiable**, and this repo has closed two
+investigations to stop exactly that reasoning. So the measure is a time,
+against a control condition, on a fixed incident, with a real newcomer — and
+the trap questions still count against the result.
 
 > Can SignalTree causal state plus a minimal inspector explain an unfamiliar
 > production-state bug **correctly, cheaply, and honestly** — including
@@ -1095,14 +1116,15 @@ Fixture, questions and scoring:
 Bar, budget and binding outcomes: spec §20.
 
 ```text
-PASS   correct explanation, honest UNKNOWN on Q4/Q7, within budget, every fact
-       labelled, AND a material margin over the shipped-API baseline resting
-       on facts that baseline cannot reach    -> wedge earned; sequence proceeds
-PARK   the shipped-API baseline gets there at similar cost, or the margin is
-       only presentation, or load-bearing claims lean on research-only hooks
-                                              -> free developer tool, no
-                                                 commercial track
-STOP   wrong explanation, or a knowledge claim on Q4/Q7 -> thesis not supported
+GROW   materially cuts a newcomer's time-to-correct-explanation vs no-Studio,
+       with honest UNKNOWNs and honest composition refusals
+                                              -> build the next slice
+HOLD   no material delta on this slice's semantics
+                                              -> stop; diagnose before
+                                                 spending on the next slice
+STOP   wrong explanation, a knowledge claim on Q4/Q7, or a silent partial
+       answer on an unsupported composition   -> making adoption worse;
+                                                 fix or abandon
 ```
 
 **Two questions must be failed honestly.** Q4 (which intermediate writes did
@@ -1113,20 +1135,27 @@ the result.
 
 **If Studio does not clear the bar, stop that too.**
 
-**Everything works toward causality.** Differentiation lives only in
-seam-reachable facts, and those facts are the causal ones — net consequence,
-participation, external realization, supersession. So the roadmap ranks by how
-directly a capability advances "why is this value here" (spec §19.4), and
-anything the shipped API already gives away rides along as convenience rather
-than leading a release.
+**Built in slices, each one end to end.** The seam is committed but not a
+single delivery — it grows one composition at a time (S1 transactions, S2
+realization, S3 restoration, S4 the full matrix), and each slice ships seam +
+causal core + a usable surface together.
 
-The engineering is spent before the answer is known. That is the deliberate
-trade, and it is why the gate must still be allowed to come back negative:
-having built the seam does not entitle the result to be positive.
+**The growth discipline that keeps this honest:** every slice declares its
+supported composition set and *refuses* outside it. Studio says "I do not
+observe this composition" rather than rendering a confident partial answer.
+Growing observation slice-by-slice without that rule is precisely how
+MUTATION-OBSERVABILITY-0 happened — PathNotifier and interceptLeafSignals were
+each correct for the cases their author had in mind. The matrix widens; the
+guessing does not. A silent partial answer is a STOP, not a rough edge: a
+newcomer who trusts a confident wrong answer is worse off than one who got
+nothing.
 
-Status: backend fixture built and verified; observation seam not started (now
-the first build item); SignalTree arm + minimal inspector not started; gate
-runs post-seam on shipped facts.
+**A HOLD costs one slice, not the roadmap.** The next slice is built only after
+the previous one returned GROW. Everything past the current slice is a
+hypothesis about where confusion lives.
+
+Status: backend fixture built and verified; seam S1 not started (first build
+item); onboarding measure runs from S2.
 
 ## RELAY — separate thesis, argued on its own
 
