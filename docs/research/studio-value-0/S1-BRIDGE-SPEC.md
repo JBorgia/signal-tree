@@ -232,7 +232,7 @@ Redacting after arrival would mean the data already crossed the boundary.
 - no tree objects, signals or readers cross the boundary — records only
 - structured-clone-safe payloads exclusively
 - no provider credentials ever cross it
-- bridge removed when the last tree detaches
+- bridge removed by `uninstallStudioBridge()` (see §4.2)
 
 ## 5. Wire contract — frozen
 
@@ -302,6 +302,74 @@ interface ConfirmedTurnsResponse {
 
 `retention` crosses the bridge because bounded retention is not causal
 completeness, and the panel must be able to say so.
+
+## 4.1 DECISION — who installs the bridge
+
+**Frozen 2026-09-09.**
+
+The registry is module-private to `studio-adapter` in the page realm, so the
+bridge must be installed there. It is **not** installed by `attachStudio`
+behind an environment guard.
+
+```ts
+// dev-only setup, browser builds
+import { attachStudio } from '@signal-tree/studio-adapter';
+import { installStudioBridge } from '@signal-tree/studio-adapter/bridge';
+
+installStudioBridge();
+attachStudio(appTree, { label: 'AppTree' });
+```
+
+⚠️ **A runtime `typeof window` guard would put the bridge in every bundle.**
+This repository has already paid for that lesson once: `restoration()` reaches
+an app tree only through a `debug-enhancers.ts` module that `fileReplacements`
+swaps for an empty one, and the eslint `no-restricted-imports` rule exists
+because *"a runtime isProduction gate cannot be tree-shaken, which no bundler
+can fold, so it ships in — and runs in — production."* An `isBrowser` check is
+the same shape.
+
+A separate entry point is **structural** gating: a build that does not import
+`/bridge` does not contain it. Same mechanism as the kernel's `/adapter` and
+`/internals` subpaths.
+
+Explicit call rather than a self-installing import, so `"sideEffects": false`
+stays truthful and the install point is greppable.
+
+## 4.2 DECISION — bridge lifetime is installation, not attachment
+
+**Frozen 2026-09-09. This supersedes "bridge removed when the last tree
+detaches."**
+
+The earlier rule made two states indistinguishable: a page with Studio
+installed but no trees currently attached looked exactly like a page with no
+Studio at all — both are silence. That is unhelpful *and* untruthful, since
+those are different facts.
+
+```text
+installStudioBridge() never called   no bridge, no response
+                                     -> "No Studio-enabled SignalTree found"
+
+installed, zero trees attached       hello answers; listTrees() -> []
+                                     -> "Studio enabled, no trees attached"
+
+installed, trees attached            hello answers; listTrees() -> [...]
+```
+
+This does not weaken the security boundary at all. The bridge still exists only
+because a developer explicitly installed it in a development build; production
+never calls `installStudioBridge`, so §4A is unchanged — **absence, not
+disablement**.
+
+It also stops the panel connection flapping on a page that attaches and
+detaches trees dynamically.
+
+**Registry teardown is unaffected and stays as it is:** the registry is still
+dropped on the last detach, because that is about not retaining tree
+references. Bridge lifetime and registry lifetime are separate concerns, and
+`listTrees()` reads `peekRegistry() ?? []` — a dropped registry means zero
+attached trees, which is a meaningful answer rather than an error.
+
+`uninstallStudioBridge()` removes the listener and the port.
 
 ## 5.1 Registry lifecycle
 
