@@ -39,7 +39,7 @@ projection moved into `internals.ts`, reachable only from a build that imports
 
 A design that is "obviously zero-cost" was not. The number found it.
 
-## 2. Disabled runtime overhead — NO REGRESSION, but the threshold is NOT assertable
+## 2. Disabled runtime overhead — PASS structurally; the ≤1% bound is characterization debt
 
 pre-S1 kernel vs current kernel with Studio unused, same workload, medians of
 15–25 reps after warmup.
@@ -63,7 +63,41 @@ What it does support: **no regression is detectable**, and the direction of the
 deltas is inconsistent with a real cost.
 
 Asserting ≤1% would need an interleaved in-process A/B, far more reps, and a
-quiet machine. That is recorded as unfinished rather than rounded up.
+quiet machine.
+
+### Classified as performance characterization debt, NOT S1 acceptance debt
+
+Decided 2026-09-09. The question S1 actually had to answer was *"does unused
+Studio support impose work on ordinary SignalTree users?"* — and §1 plus the
+structural tests answer it far more strongly than a timing run could.
+
+The ≤1% figure was useful as a **falsifier**, and the frozen-threshold
+discipline already earned its keep on the bundle side by exposing the +161 B
+class-method problem. But inferring a 1% effect from measurements whose noise
+is tens to hundreds of percent is not a resolvable experiment, and
+
+> "the harness cannot measure 1%"
+
+must not be laundered into
+
+> "S1 has not established acceptable runtime behavior."
+
+Those are different statements. S1 is a **read port over state the transaction
+runtime was already retaining**; there is almost nothing for an unused-runtime
+benchmark to measure.
+
+### ⚠️ When this becomes blocking again
+
+The budget returns the moment a slice puts something on the **actual write
+path**. Concretely, if a later slice:
+
+- adds an `if (observer)` branch to every write, or
+- allocates an event object before knowing whether anyone is listening, or
+- maintains another index or history while Studio is unattached,
+
+then **rerun a precise benchmark before shipping that slice**. S2 is the first
+real test of this, since realization/external truth is closer to the write path
+than committed-turn reading was.
 
 ### The stronger guarantee is structural, not statistical
 
