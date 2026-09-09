@@ -1557,7 +1557,10 @@ SignalTree can offer, whether or not they are ever sold.
 | Durable tree identity for sessions | `TreeId` is explicitly non-persistent and non-serializable, so `.ststudio` bundles cannot key on it. The adapter needs its own session-scoped tree identity mapped at capture. | **Open — blocks studio-adapter** |
 
 | Zero-cost-when-unused | S1 disabled/unused contract, 8 binding points (§8.5). Bundle delta and disabled-overhead are measured numbers, not assertions. | **Binding — must pass before S1 ships** |
-| Studio inspector (causal core) | Not started. S1 vertical: kernel seam -> studio-adapter -> studio-query -> minimal devtools UI, answering "what did this transaction cause state to become?" | **Blocking — after inventory** |
+| Studio inspector (causal core) | **S1 vertical connected 2026-09-09.** kernel `confirmedTurnReader` -> studio-adapter -> studio-query -> studio-devtools projection, on real trees. | Done for S1 |
+| Studio page bridge | Specified in `S1-BRIDGE-SPEC.md`: explicit `attachStudio` opt-in, adapter-owned registry, MessagePort transport, three read-only commands, versioned. Not implemented. | **Open — next build item** |
+| Destroyed-tree lifecycle | **Resolved and proven.** A destroyed tree's reader throws `StudioTreeDestroyedError`; `[]` stays reserved for a live tree with no retained turns. Three states are distinguishable: no enhancer, live-but-empty, destroyed. | Closed |
+| Automatic SignalTree detection | **Not being solved.** Studio enumerates trees explicitly attached to it. No kernel registry, no page scanning, no heuristic detection — and no "detected but not enabled" claim, which would require a detection mechanism that does not truthfully exist. | Closed by decision |
 | Independent investigator | Must not have built the slice or set up the §20.2 control condition, and must not be told which questions are traps (§20.4). | Open — required before any run |
 | What counts as a material delta | §20.7 GROW requires "materially cuts time-to-correct-explanation" but the threshold is not quantified. | **Open — must be set before the first run, not after** |
 | Newcomer recruitment | §20.6 requires a real newcomer per slice run; source and profile undefined. | **Open — blocks the S2 gate** |

@@ -164,3 +164,44 @@ describe('confirmedTurnReader', () => {
     expect(symbols.some((s) => s.includes('transaction-runtime'))).toBe(false);
   });
 });
+
+describe('destroyed-tree lifecycle (acceptance 9)', () => {
+  it('refuses explicitly after destroy, rather than reporting empty history', async () => {
+    const { StudioTreeDestroyedError } = await import('../../internals');
+    const tree = cartTree();
+    tree.transaction(() => tree.$['total'](9600)).confirm();
+
+    const reader = confirmedTurnReader(tree as never);
+    expect(reader?.readConfirmedTurns().turns).toHaveLength(1);
+
+    (tree as unknown as { destroy(): void }).destroy();
+
+    // Empty history and a dead tree are different facts.
+    expect(() => reader?.readConfirmedTurns()).toThrow(StudioTreeDestroyedError);
+    expect(() => reader?.readConfirmedTurns()).toThrow(/STUDIO_TREE_DESTROYED/);
+  });
+
+  /**
+   * The three states a consumer must be able to tell apart. Collapsing any two
+   * of them produces a confident wrong answer, which is worse than a refusal.
+   */
+  it('distinguishes no-transactions, live-but-empty, and destroyed', () => {
+    // 1. no transactions enhancer -> no reader at all.
+    const bare = signalTree<Cart>({ promoCode: null, discount: 0, total: 12000 });
+    expect(confirmedTurnReader(bare as never)).toBeUndefined();
+
+    // 2. live tree, enhancer present, nothing committed -> a reader that
+    //    truthfully reports an empty history.
+    const idle = cartTree();
+    const idleSnapshot = confirmedTurnReader(idle as never)?.readConfirmedTurns();
+    expect(idleSnapshot?.turns).toEqual([]);
+    expect(idleSnapshot?.retention.truncated).toBe(false);
+
+    // 3. destroyed -> a reader that refuses, so (2) and (3) never look alike.
+    const used = cartTree();
+    used.transaction(() => used.$['total'](1)).confirm();
+    const reader = confirmedTurnReader(used as never);
+    (used as unknown as { destroy(): void }).destroy();
+    expect(() => reader?.readConfirmedTurns()).toThrow(/STUDIO_TREE_DESTROYED/);
+  });
+});
