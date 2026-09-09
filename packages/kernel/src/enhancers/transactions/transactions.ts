@@ -1171,7 +1171,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           subjectId: effect.subject,
           path: effect.path,
           ownerPath: effect.ownerPath,
-        } as CausalEffect;
+        };
       case 'add':
         return {
           owner: effect.position as CausalPositionId,
@@ -1189,7 +1189,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             beforeSubject: effect.beforeSubject,
             afterSubject: effect.afterSubject,
           },
-        } as CausalEffect;
+        };
       case 'remove':
         return {
           owner: effect.position as CausalPositionId,
@@ -1207,7 +1207,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             beforeSubject: effect.beforeSubject,
             afterSubject: effect.afterSubject,
           },
-        } as CausalEffect;
+        };
       case 'rekey':
         return {
           owner: effect.position as CausalPositionId,
@@ -1223,7 +1223,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             beforeKey: effect.beforeKey,
             afterKey: effect.afterKey,
           },
-        } as CausalEffect;
+        };
     }
   };
 

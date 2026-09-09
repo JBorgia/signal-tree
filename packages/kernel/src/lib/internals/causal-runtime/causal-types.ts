@@ -17,6 +17,30 @@ export interface CausalEffect {
   readonly before: unknown;
   readonly after: unknown;
   readonly subjectId?: unknown;
+  /**
+   * Captured realization address — REQUIRED, because every live producer sets
+   * it on every variant.
+   *
+   *     A TYPE THAT OMITS A FIELD ITS ONLY PRODUCER ALWAYS SETS FORCES EVERY
+   *     PARTY TO LIE ABOUT THE SHAPE.
+   *
+   * ⚠️ THESE WERE OPTIONAL-BY-OMISSION UNTIL 2026-09-09, AND THE OMISSION HAD
+   * ALREADY CAUSED A CORRUPTION. `toCausalEffect` (transactions.ts) sets both
+   * on all four variants and cast `as CausalEffect` to do it; `pending-rollback`
+   * then cast back out via `as unknown as { path?: unknown }` to read them.
+   * With the address invisible to the type, an earlier narrowing sent
+   * subject-addressed effects down the address-less branch, the applier resolved
+   * the target as the ROW rather than the FIELD, and a field rollback replaced
+   * `{ id: 'A', name: 'Alpha' }` with the bare string `'Alpha'`. See
+   * `hasInlineScopedLeafAddress`'s doc in `pending-rollback.ts`.
+   *
+   * ⚠️ NOT SEMANTIC IDENTITY. Used to derive collection context and a
+   * subject-relative field address. Resolving a current entity target must go
+   * through `subjectId`; a subject can move between paths.
+   */
+  readonly path: string;
+  /** Owner (collection) address for {@link path}. Required for the same reason. */
+  readonly ownerPath: string;
   readonly structural?: StructuralEffectKind;
   /**
    * Producer-authored structural information required to realize this

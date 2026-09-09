@@ -190,10 +190,12 @@ function createPendingRollbackEffect(
 
 function hasInlineScopedLeafAddress(
   effect: CausalTurn['effects'][number]
-): effect is CausalTurn['effects'][number] & { path: string; ownerPath: string } {
-  const inlinePath = (effect as unknown as { path?: unknown }).path;
-  const inlineOwnerPath = (effect as unknown as { ownerPath?: unknown }).ownerPath;
-
+): boolean {
+  // `path`/`ownerPath` are REQUIRED on CausalEffect as of 2026-09-09, so this
+  // no longer probes for their presence through a double cast — it asks the one
+  // question that was ever semantic: is this a SCOPED LEAF address (a field
+  // inside a collection member) rather than the collection itself?
+  //
   // ⚠️ DO NOT RE-ADD `effect.subjectId === undefined` HERE.
   //
   // It was here, and it silently corrupted every entity FIELD rollback. An
@@ -215,12 +217,7 @@ function hasInlineScopedLeafAddress(
   // `rollback()` was not, and the difference was this one condition.
   //
   // See transactions-documented-defects.spec.ts.
-  return (
-    effect.structural === undefined &&
-    typeof inlinePath === 'string' &&
-    typeof inlineOwnerPath === 'string' &&
-    inlinePath !== inlineOwnerPath
-  );
+  return effect.structural === undefined && effect.path !== effect.ownerPath;
 }
 
 function deriveStructuralRollbackBefore(
