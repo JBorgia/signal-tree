@@ -13,8 +13,12 @@
 import type { ISignalTree } from './lib/types';
 import { peekInternalTransactionRuntime } from './enhancers/transactions/transactions';
 import { getPositionRegistry } from './lib/internals/position-registry';
-import type { ConfirmedTurnReader } from './lib/internals/confirmed-turn-view';
+import {
+  StudioTreeDestroyedError,
+  type ConfirmedTurnReader,
+} from './lib/internals/confirmed-turn-view';
 
+export { StudioTreeDestroyedError } from './lib/internals/confirmed-turn-view';
 export type {
   ConfirmedTurnEffectKind,
   ConfirmedTurnEffectView,
@@ -48,8 +52,17 @@ export function confirmedTurnReader<T>(
     return undefined;
   }
 
+  const destroyed = (tree as unknown as { destroyed?: () => boolean }).destroyed;
+
   return {
     treeId: getPositionRegistry(tree.$)?.id,
-    readConfirmedTurns: () => runtime.readConfirmedTurns(),
+    readConfirmedTurns: () => {
+      // Checked per call, not at construction: a reader is legitimately held
+      // across a tree's lifetime, and the interesting moment is the read.
+      if (destroyed?.() === true) {
+        throw new StudioTreeDestroyedError();
+      }
+      return runtime.readConfirmedTurns();
+    },
   };
 }

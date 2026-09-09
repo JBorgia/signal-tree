@@ -64,6 +64,30 @@ export interface ConfirmedTurnSnapshot {
  * nothing has investigated, and a second thing to keep alive — all against the
  * zero-cost-when-unused requirement.
  */
+/**
+ * Thrown when a reader is used after its tree was destroyed.
+ *
+ *     EMPTY HISTORY AND A DEAD TREE ARE DIFFERENT FACTS.
+ *
+ * ⚠️ Returning `[]` for a destroyed tree would let a consumer report "nothing
+ * happened" about a tree that is simply gone — and an inspector that cannot
+ * tell those apart is worse than one that refuses, because the wrong answer
+ * looks like a finding. A reader holder snapshots what it needs before
+ * releasing the tree.
+ */
+export class StudioTreeDestroyedError extends Error {
+  readonly code = 'STUDIO_TREE_DESTROYED';
+  constructor() {
+    super(
+      'STUDIO_TREE_DESTROYED: this tree was destroyed; its retained ' +
+        'transaction history is no longer readable. Empty history and a ' +
+        'destroyed tree are different facts, so this refuses rather than ' +
+        'returning an empty snapshot.'
+    );
+    this.name = 'StudioTreeDestroyedError';
+  }
+}
+
 export interface ConfirmedTurnReader {
   /**
    * Runtime tree identity. Equality and `Map`-key use only — NEVER serialize
