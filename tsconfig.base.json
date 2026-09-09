@@ -21,6 +21,7 @@
     "paths": {
       "@signal-tree/angular": ["packages/angular/src/index.ts"],
       "@signal-tree/kernel/adapter": ["packages/kernel/src/adapter.ts"],
+      "@signal-tree/kernel/internals": ["packages/kernel/src/internals.ts"],
       "@signal-tree/kernel": ["packages/kernel/src/index.ts"],
       "@signal-tree/react": ["packages/react/src/index.ts"],
       "@signal-tree/studio-adapter": ["packages/studio-adapter/src/index.ts"],

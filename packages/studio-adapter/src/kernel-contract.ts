@@ -34,6 +34,25 @@ export interface KernelConfirmedTurn {
 }
 
 /**
+ * What the kernel can and cannot say about completeness.
+ *
+ *     BOUNDED RETENTION IS NOT CAUSAL COMPLETENESS.
+ *
+ * ⚠️ Studio must never render retained turns as "everything that happened".
+ * This envelope exists so truncation is a FACT the reader states, not something
+ * a consumer has to infer from a suspiciously round history length.
+ */
+export interface KernelRetention {
+  readonly truncated: boolean;
+  readonly firstAvailableTurnId?: number;
+}
+
+export interface KernelConfirmedTurnSnapshot {
+  readonly turns: readonly KernelConfirmedTurn[];
+  readonly retention: KernelRetention;
+}
+
+/**
  * A read-only window onto one tree's retained committed turns.
  *
  *     BOUNDED TO EXISTING RETAINED HISTORY. NOT A SECOND HISTORY.
@@ -48,5 +67,5 @@ export interface ConfirmedTurnReader {
    * key — never serialized. See `assignStudioTreeId`.
    */
   readonly treeId: unknown;
-  readConfirmedTurns(): readonly KernelConfirmedTurn[];
+  readConfirmedTurns(): KernelConfirmedTurnSnapshot;
 }

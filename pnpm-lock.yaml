@@ -378,6 +378,9 @@ importers:
 
   packages/studio-adapter:
     dependencies:
+      '@signal-tree/kernel':
+        specifier: workspace:*
+        version: link:../kernel
       '@signal-tree/studio-query':
         specifier: workspace:*
         version: link:../studio-query

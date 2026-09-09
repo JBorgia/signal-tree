@@ -24,7 +24,8 @@
     "NOTICE"
   ],
   "dependencies": {
-    "@signal-tree/studio-query": "workspace:*"
+    "@signal-tree/studio-query": "workspace:*",
+    "@signal-tree/kernel": "workspace:*"
   },
   "peerDependencies": {
     "tslib": "^2.0.0"
