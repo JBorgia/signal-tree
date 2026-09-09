@@ -1,0 +1,55 @@
+/**
+ * `@signal-tree/kernel/internals` — supported seams for tooling, NOT everyday
+ * application API.
+ *
+ *     TOOLING NEEDS A SUPPORTED SEAM. APPLICATION CODE DOES NOT NEED
+ *     TRANSACTION HISTORY.
+ *
+ * ⚠️ The intended dependency is `studio-adapter -> kernel`, never
+ * `application business code -> confirmed turn history`. This subpath exists so
+ * Studio has a stable contract without `causal-runtime` or the transactions
+ * enhancer's storage types becoming public surface.
+ */
+import type { ISignalTree } from './lib/types';
+import { peekInternalTransactionRuntime } from './enhancers/transactions/transactions';
+import { getPositionRegistry } from './lib/internals/position-registry';
+import type { ConfirmedTurnReader } from './lib/internals/confirmed-turn-view';
+
+export type {
+  ConfirmedTurnEffectKind,
+  ConfirmedTurnEffectView,
+  ConfirmedTurnReader,
+  ConfirmedTurnRetention,
+  ConfirmedTurnSnapshot,
+  ConfirmedTurnView,
+} from './lib/internals/confirmed-turn-view';
+
+/**
+ * A read-only window onto one tree's retained committed turns, or `undefined`
+ * if this tree has no transaction runtime.
+ *
+ *     OBSERVATION PEEKS. IT DOES NOT INSTALL.
+ *
+ * ⚠️ `undefined` is a MEANINGFUL ANSWER — the tree was built without
+ * `transactions()`, or has not run one. It is deliberately not "create a
+ * runtime so there is something to read": allocating a `TransactionAuthority`
+ * because someone LOOKED would violate the rule that an unused observation seam
+ * retains nothing, and would make the act of inspecting change what is
+ * inspected.
+ *
+ * Returns a live view: it reads what the enhancer already retains and keeps no
+ * history of its own. Repeated calls are cheap and always current.
+ */
+export function confirmedTurnReader<T>(
+  tree: ISignalTree<T>
+): ConfirmedTurnReader | undefined {
+  const runtime = peekInternalTransactionRuntime(tree);
+  if (!runtime) {
+    return undefined;
+  }
+
+  return {
+    treeId: getPositionRegistry(tree.$)?.id,
+    readConfirmedTurns: () => runtime.readConfirmedTurns(),
+  };
+}

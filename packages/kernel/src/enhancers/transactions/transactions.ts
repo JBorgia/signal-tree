@@ -50,6 +50,11 @@ import {
   rememberTreeRealizationDescriptor,
 } from '../../lib/internals/causal-runtime/tree-realization-adapter';
 import { TurnStore } from '../../lib/internals/causal-runtime/turn-store';
+import type {
+  ConfirmedTurnEffectView,
+  ConfirmedTurnSnapshot,
+  ConfirmedTurnView,
+} from '../../lib/internals/confirmed-turn-view';
 import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
 import {
   getMutationCaptureRuntime,
@@ -178,6 +183,8 @@ type TransactionLifecycleListener = (turn: TransactionTurnRecord) => void;
 
 export interface InternalTransactionRuntime {
   transaction(fn: () => void): PendingTransaction;
+  /** @internal Studio read surface — see `confirmed-turn-view.ts`. */
+  readConfirmedTurns(): ConfirmedTurnSnapshot;
   getConfirmedTurnCount(): number;
   getPendingTurnCount(): number;
   getConfirmedTurnIds(): number[];
@@ -612,6 +619,47 @@ class TransactionAuthority {
     return [...this.pendingTurns.keys()].sort((left, right) => left - right);
   }
 
+  /**
+   * Studio read surface. Projects retained records into the stable view model
+   * WITHOUT copying history into a second store — the array below is built per
+   * call from what is already retained, and nothing here is kept.
+   */
+  readConfirmedTurns(): ConfirmedTurnSnapshot {
+    const turns: ConfirmedTurnView[] = [];
+    for (const record of this.confirmedTurns) {
+      const effects: ConfirmedTurnEffectView[] = [];
+      for (const effect of record.__effects ?? []) {
+        effects.push({
+          position: effect.position,
+          path: effect.path,
+          ownerPath: effect.ownerPath,
+          kind: effect.kind,
+          before: 'before' in effect ? effect.before : undefined,
+          after: 'after' in effect ? effect.after : undefined,
+          subjectId: 'subject' in effect ? effect.subject : undefined,
+        });
+      }
+      turns.push({
+        id: record.id,
+        positions: [...(record.__positionIds ?? [])],
+        effects,
+      });
+    }
+
+    // DERIVED, not asserted. Turn ids are allocated from 1 and never reused, so
+    // a first retained id above 1 means earlier turns are gone. Today nothing
+    // evicts from `confirmedTurns`, so this is false — and it will start
+    // reporting true on its own if that ever changes.
+    const firstAvailableTurnId = turns[0]?.id;
+    return {
+      turns,
+      retention: {
+        truncated: firstAvailableTurnId !== undefined && firstAvailableTurnId > 1,
+        firstAvailableTurnId,
+      },
+    };
+  }
+
   private insertConfirmed(turn: TransactionTurnRecord): void {
     const insertIndex = this.confirmedTurns.findIndex(
       (candidate) => candidate.id > turn.id
@@ -645,6 +693,22 @@ function createCaptureBucket(): CaptureBucket {
     effects: new Map(),
     collectionOrders: new Map(),
   };
+}
+
+/**
+ * @internal Read the transaction runtime WITHOUT creating one.
+ *
+ * ⚠️ NEVER USE `getOrCreateInternalTransactionRuntime` FOR OBSERVATION. It
+ * allocates a `TransactionAuthority` for a tree that may never have run a
+ * transaction, which is exactly the "no retained state when unused" rule the
+ * Studio seam has to satisfy. Observation peeks; it does not install.
+ */
+export function peekInternalTransactionRuntime<T>(
+  tree: ISignalTree<T>
+): InternalTransactionRuntime | undefined {
+  return (tree as unknown as Record<PropertyKey, unknown>)[
+    INTERNAL_TRANSACTION_RUNTIME
+  ] as InternalTransactionRuntime | undefined;
 }
 
 export function getOrCreateInternalTransactionRuntime<T>(
@@ -1907,6 +1971,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
         },
       };
     },
+    readConfirmedTurns: () => authority.readConfirmedTurns(),
     getConfirmedTurnCount: () => authority.getConfirmedTurnCount(),
     getPendingTurnCount: () => authority.getPendingTurnCount(),
     getConfirmedTurnIds: () => authority.getConfirmedTurnIds(),

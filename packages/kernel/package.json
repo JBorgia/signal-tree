@@ -19,6 +19,11 @@
       "types": "./dist/adapter.d.ts",
       "import": "./dist/adapter.js",
       "default": "./dist/adapter.js"
+    },
+    "./internals": {
+      "types": "./dist/internals.d.ts",
+      "import": "./dist/internals.js",
+      "default": "./dist/internals.js"
     }
   },
   "peerDependencies": {

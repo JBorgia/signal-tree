@@ -15,7 +15,7 @@ const session = () => {
     identities: createTreeIdentityRegistry(),
     reader: {
       treeId: {},
-      readConfirmedTurns: () => [
+      readConfirmedTurns: () => ({ retention: { truncated: false, firstAvailableTurnId: 31 }, turns: [
         {
           id: 31,
           positions: [1, 2, 3],
@@ -25,7 +25,7 @@ const session = () => {
             { position: 3, path: 'cart.total', ownerPath: 'cart', kind: 'set', before: 12000, after: 9600 },
           ],
         },
-      ],
+      ] }),
     },
   });
   return s;

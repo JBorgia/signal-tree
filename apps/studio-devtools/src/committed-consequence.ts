@@ -59,13 +59,22 @@ const S1_NOT_OBSERVED: readonly string[] = [
 ];
 
 export function committedConsequence(
-  turn: StudioTurn
+  turn: StudioTurn,
+  options: { readonly truncated?: boolean } = {}
 ): CommittedConsequence {
   return {
     treeId: turn.treeId,
     turnId: turn.id,
     rows: turn.effects.map(toRow),
-    notObserved: S1_NOT_OBSERVED,
+    notObserved: options.truncated
+      ? [
+          // Retention is not completeness. If the kernel has evicted earlier
+          // turns, saying so is the difference between a bounded view and a
+          // wrong one.
+          'turns older than the retained window (history is truncated)',
+          ...S1_NOT_OBSERVED,
+        ]
+      : S1_NOT_OBSERVED,
   };
 }
 

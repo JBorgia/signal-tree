@@ -10,7 +10,7 @@ import {
 /** The frozen Cart 88213 promo transaction, in kernel record shape. */
 const promoReader = (runtimeTreeId: unknown): ConfirmedTurnReader => ({
   treeId: runtimeTreeId,
-  readConfirmedTurns: () => [
+  readConfirmedTurns: () => ({ retention: { truncated: false, firstAvailableTurnId: 31 }, turns: [
     {
       id: 31,
       positions: [1, 2, 3],
@@ -20,7 +20,7 @@ const promoReader = (runtimeTreeId: unknown): ConfirmedTurnReader => ({
         { position: 3, path: 'cart.total', ownerPath: 'cart', kind: 'set', before: 12000, after: 9600 },
       ],
     },
-  ],
+  ] }),
 });
 
 describe('captureConfirmedTurns', () => {
@@ -28,7 +28,7 @@ describe('captureConfirmedTurns', () => {
     const session = createStudioSession();
     const identities = createTreeIdentityRegistry();
 
-    expect(captureConfirmedTurns({ reader: promoReader({}), session, identities })).toBe(1);
+    expect(captureConfirmedTurns({ reader: promoReader({}), session, identities }).captured).toBe(1);
 
     const [turn] = session.turns();
     expect(turn?.disposition).toBe('committed');
@@ -45,8 +45,8 @@ describe('captureConfirmedTurns', () => {
     const identities = createTreeIdentityRegistry();
     const reader = promoReader({});
 
-    expect(captureConfirmedTurns({ reader, session, identities })).toBe(1);
-    expect(captureConfirmedTurns({ reader, session, identities })).toBe(0);
+    expect(captureConfirmedTurns({ reader, session, identities }).captured).toBe(1);
+    expect(captureConfirmedTurns({ reader, session, identities }).captured).toBe(0);
     expect(session.turns()).toHaveLength(1);
   });
 
@@ -85,15 +85,26 @@ describe('captureConfirmedTurns', () => {
       identities: createTreeIdentityRegistry(),
       reader: {
         treeId: {},
-        readConfirmedTurns: () => [
-          {
-            id: 1,
-            positions: [4],
-            effects: [
-              { position: 4, path: 'rows.A', ownerPath: 'rows', kind: 'remove', before: 'A', after: undefined, subject: 1 },
-            ],
-          },
-        ],
+        readConfirmedTurns: () => ({
+          retention: { truncated: false, firstAvailableTurnId: 1 },
+          turns: [
+            {
+              id: 1,
+              positions: [4],
+              effects: [
+                {
+                  position: 4,
+                  path: 'rows.A',
+                  ownerPath: 'rows',
+                  kind: 'remove' as const,
+                  before: 'A',
+                  after: undefined,
+                  subject: 1,
+                },
+              ],
+            },
+          ],
+        }),
       },
     });
 
