@@ -273,12 +273,15 @@ instrumentation without rebuilding the candidate abstraction.
 
 **Two caveats recorded, not assumed away:**
 
-- The kernel already ships a narrative hook the control can copy:
-  `createAuditTracker`'s `metadata.description` (§8.4). A disciplined team that
-  attaches a description per authored/external parcel regains part of the
-  "developer-authored narrative" SignalTree lacks as a default. The moat is
-  therefore the *semantic* layer (atomicity, participation, supersession), not
-  the absence of actions.
+- The kernel *contains* a narrative hook the control could copy —
+  `createAuditTracker`'s `metadata.description` (§8.4) — but *does not ship
+  it*: the root barrel exports nothing from that module
+  (`S1-OBSERVATION-INVENTORY.md` §A). If it were exported, a disciplined team
+  attaching a description per authored/external parcel would regain part of the
+  "developer-authored narrative" SignalTree lacks by default. Either way the
+  moat is the *semantic* layer (atomicity, participation, supersession), not
+  the absence of actions — so exporting it is a fair-control decision, not a
+  competitive risk.
 - The kernel already ships a `devTools()` enhancer that speaks the Redux
   DevTools protocol. Studio is competing on top of a free existing path. Its
   marginal value is exactly the semantic differentiation above; there is no
@@ -614,6 +617,52 @@ These are **engineering acceptance on the seam**, not a commercial go/no-go. A
 failure specifies what the kernel must expose; it is not a signal to abandon
 the track. Escalation for a genuinely unreachable fact: TODO.md
 MUTATION-OBSERVABILITY-0.
+
+#### S1 disabled/unused contract (binding)
+
+The seam lives in `@signal-tree/kernel` because truthful observation is a
+capability of SignalTree itself, not a Studio implementation detail — which
+means **every consumer carries it, including those who never open Studio**.
+SignalTree measures ~6.6–9.4KB gzip, near the top of its range; "small bundle"
+is not a claim this project can make. A seam that adds unconditional weight
+makes an existing weakness worse for every user, so the cost of *not* using
+Studio is a binding release gate, not a follow-up optimization.
+
+> **Unused observation must be operationally indistinguishable from having no
+> Studio support.**
+
+Not necessarily zero source bytes — a tiny seam API may remain — but **zero
+active runtime machinery and negligible bundled cost**.
+
+```text
+1. No observer is registered merely by importing @signal-tree/kernel.
+2. No Studio event objects are allocated when observation is unused.
+3. No retained global/session state exists when observation is unused.
+4. No meaningful extra branch/work appears on the hot write path when unused.
+5. Studio-specific implementation code remains tree-shakeable.
+6. Production bundle delta is explicitly measured.
+7. Runtime disabled-overhead is explicitly benchmarked.
+8. Enabling observation is explicit and disposable.
+```
+
+Points 6 and 7 are measurements with recorded numbers, not assertions. There is
+precedent in this repository for the structural approach point 5 requires:
+`debug-enhancers.prod.ts` plus `fileReplacements` keeps `restoration()` out of
+production bundles by making it unreachable, rather than by gating it at
+runtime — a runtime `isProduction` check cannot be tree-shaken (eslint
+`no-restricted-imports`, and `StandardEnhancerOptions.extra`'s doc).
+
+#### S1 starts with an inventory, not a new observer
+
+`MUTATION-OBSERVABILITY-0`'s inventory-first rule applies before any seam code
+is written: **prove the existing observation paths insufficient before building
+a third one.** `PathNotifier` and `interceptLeafSignals` each cover a different
+mutation class and each was correct for the cases its author had in mind;
+adding a third observer without evidence risks encoding another partial truth.
+
+S1 therefore begins by inventorying `PathNotifier`, the `audit`/debug-session
+machinery, and transaction settlement facts against the S1 composition set, and
+specifies the minimum kernel seam **from that evidence** (§23).
 
 ---
 
@@ -972,6 +1021,51 @@ DevTools panel ships first (lowest friction). Standalone follows for large
 sessions, cross-session comparison, local models, production evidence. Both are
 shells over one query/session engine.
 
+### 16.0 Nx workspace layout
+
+Studio is several projects with different lifecycles, in the existing monorepo
+— not one project, and not a separate repository. §22.4 closed the commercial
+track, so the usual reason to split a repo does not apply; the monorepo also
+version-locks Studio against the kernel it observes and lets a seam change land
+with its consumer in one commit.
+
+```text
+packages/kernel            observation seam ONLY
+                           no Studio UI / query / AI code
+
+packages/studio-query      semantic session model, evidence graph, why-here,
+                           transaction/turn queries, compare/search/invariants
+
+packages/studio-adapter    opt-in bridge from the kernel seam; capture budgets;
+                           session normalization/transport
+
+apps/studio-devtools       PRIVATE Nx app — browser DevTools UI
+
+later:
+packages/studio-ai
+apps/studio-standalone
+```
+
+**The seam stays in `@signal-tree/kernel`** because truthful observation is a
+capability of SignalTree itself, not a Studio implementation detail. Studio
+consumes it. That also lets future tools use the same observation surface
+without depending on Studio — and decouples the seam's fate from Studio's, so
+a §20.7 HOLD does not orphan infrastructure with independent adoption value.
+
+**Nothing below `packages/kernel` is scaffolded ahead of need.** `studio-ai`
+and `studio-standalone` are not created at S1: five empty packages around a
+1,400-line specification is not progress. S1 builds one complete vertical:
+
+```text
+kernel seam -> studio-adapter -> studio-query -> minimal studio-devtools UI
+```
+
+answering exactly one real question — **"what did this transaction actually
+cause state to become?"** S2 widens the same projects to authored → realized
+external truth, S3 adds restoration truthfulness, S4 broadens structural/entity/
+nested composition coverage. The projects grow; the project *count* grows only
+when a slice needs it.
+
 ### 16.1 Framework scope
 
 Studio is a SignalTree product, not an Angular-only product. The runtime adapter
@@ -1212,8 +1306,26 @@ questions, the evidence labelling and the stop condition survive unchanged.
 ### 20.2 The control condition
 
 The same developer profile, the same frozen evidence, the same questions —
-SignalTree with **no Studio**: `devTools()` / `exportDebugSession()`, `audit`
-`metadata.description`, ordinary logs, OTel, a debugger.
+SignalTree with **no Studio**.
+
+⚠️ **What that actually is, verified against the export map**
+(`S1-OBSERVATION-INVENTORY.md` §A): the `devTools()` enhancer and the
+`DevToolsDebugSession` type. That is the whole programmatic surface.
+`createAuditTracker` and `exportDebugSession()` are **not exported** —
+`src/index.ts:123` is `export {} from './lib/audit/audit'`, and
+`exportDebugSession` appears only in a comment. Plus ordinary logs, OTel, and a
+debugger.
+
+Earlier revisions of this section credited the control with
+`exportDebugSession()` and `audit` `metadata.description`. They are not
+reachable by a user. The error ran in the direction that **flatters Studio** —
+describing a stronger control than one a developer can assemble — and it
+survived four revisions because each reasoned about the baseline from this
+document rather than from the export map.
+
+**Before any gate run, one of two things must be true:** this section describes
+only what is reachable, or the missing surfaces are actually exported. Not
+both, and not neither.
 
 This is not a rival paradigm and it is not a strawman: it is what a developer
 adopting SignalTree gets today. If they can already answer the questions
@@ -1436,7 +1548,11 @@ SignalTree can offer, whether or not they are ever sold.
 | Transaction settlement observation | Needed by the transaction inspector; lands with S1 if the facts surface truthfully, otherwise S1 declares it uncovered. | Open — resolve in S1 |
 | Exact turn identity surface | Confirm which stable identifiers Studio can rely on across shipped configurations. | Open |
 | `PathNotifier` vs `audit` as candidate seams | Inventory-first rule (MUTATION-OBSERVABILITY-0): prove PathNotifier insufficient before building a second observer; `audit` is diff-sampling/polling and is not the seam. | Open — inventory in Phase 0 |
-| Studio inspector (causal core) | Not started. S1 is the first build item; the gate cannot run before S2. | **Blocking — next action** |
+| Observation-surface inventory | **Done 2026-09-09** — `S1-OBSERVATION-INVENTORY.md`. Verdict: build no new observer; the kernel already produces and delivers every S1 fact. The seam is a read contract, not machinery. | Closed |
+| Control-condition overstatement | §20.2/§3.2 credited the control with `exportDebugSession()` and `audit` `metadata.description`, neither exported. Error flatters Studio. Corrected in-doc; the export-or-narrow decision is still open. | **Open — must resolve before any gate run** |
+| Turn identity surface for Studio | `CausalTurn.participants` is `PositionId[]`, a numeric identity. Studio needs a stable human-meaningful parcel address. Inventory confirms this blocks S1 *contract design*, not just UI. | **Open — blocks S1 step 3** |
+| Zero-cost-when-unused | S1 disabled/unused contract, 8 binding points (§8.5). Bundle delta and disabled-overhead are measured numbers, not assertions. | **Binding — must pass before S1 ships** |
+| Studio inspector (causal core) | Not started. S1 vertical: kernel seam -> studio-adapter -> studio-query -> minimal devtools UI, answering "what did this transaction cause state to become?" | **Blocking — after inventory** |
 | Independent investigator | Must not have built the slice or set up the §20.2 control condition, and must not be told which questions are traps (§20.4). | Open — required before any run |
 | What counts as a material delta | §20.7 GROW requires "materially cuts time-to-correct-explanation" but the threshold is not quantified. | **Open — must be set before the first run, not after** |
 | Newcomer recruitment | §20.6 requires a real newcomer per slice run; source and profile undefined. | **Open — blocks the S2 gate** |
