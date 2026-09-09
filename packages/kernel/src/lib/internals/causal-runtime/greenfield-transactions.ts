@@ -70,7 +70,9 @@ class DefaultGreenfieldTransactionDraft implements GreenfieldTransactionDraft {
 
     this.sealedTurn = this.options.store.admitPending({
       id: this.options.turnId,
-      effects,
+      // DEAD-CHAIN BOUNDARY — see normalizeDraftEffects' doc. These effects
+      // carry no address, so they are not complete CausalEffects.
+      effects: effects as unknown as CausalTurn['effects'],
     });
     this.state = 'sealed';
     return this.sealedTurn;
@@ -127,10 +129,25 @@ export function createGreenfieldTransactionDraft(
   return new DefaultGreenfieldTransactionDraft(options);
 }
 
+/**
+ * ⚠️ DEAD CHAIN. This module and `transaction-capture-bridge.ts` have NO
+ * non-spec importer; the live transaction path is
+ * `enhancers/transactions/transactions.ts`. Scheduled for deletion or revival
+ * as its own change — see the Studio §23 "dead causal-runtime chains" item.
+ *
+ * `CausalEffect.path`/`ownerPath` became REQUIRED on 2026-09-09 because every
+ * LIVE producer sets them. This chain's `ExplicitTransactionEffect` carries no
+ * address, so it cannot produce a complete `CausalEffect` — which is the type
+ * correctly reporting that this path never did. Its internals are therefore
+ * typed as the address-less effect they actually are, and the single
+ * `admitPending` boundary carries one explicit cast rather than fabricating
+ * empty addresses into the data (which would let this chain's specs pass on
+ * invented values).
+ */
 function normalizeDraftEffects(
   effects: readonly ExplicitTransactionEffect[]
-): CausalTurn['effects'] {
-  const normalizedEffects: Array<CausalTurn['effects'][number]> = [];
+): readonly ExplicitTransactionEffect[] {
+  const normalizedEffects: ExplicitTransactionEffect[] = [];
   const scalarIndexByOwner = new Map<PositionId, number>();
 
   for (const effect of effects) {
@@ -167,7 +184,7 @@ function shouldPreserveAuthoredEffect(effect: ExplicitTransactionEffect): boolea
 
 function copyEffect(
   effect: ExplicitTransactionEffect
-): CausalTurn['effects'][number] {
+): ExplicitTransactionEffect {
   return {
     owner: effect.owner,
     before: effect.before,
