@@ -50,11 +50,6 @@ import {
   rememberTreeRealizationDescriptor,
 } from '../../lib/internals/causal-runtime/tree-realization-adapter';
 import { TurnStore } from '../../lib/internals/causal-runtime/turn-store';
-import type {
-  ConfirmedTurnEffectView,
-  ConfirmedTurnSnapshot,
-  ConfirmedTurnView,
-} from '../../lib/internals/confirmed-turn-view';
 import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
 import {
   getMutationCaptureRuntime,
@@ -183,8 +178,8 @@ type TransactionLifecycleListener = (turn: TransactionTurnRecord) => void;
 
 export interface InternalTransactionRuntime {
   transaction(fn: () => void): PendingTransaction;
-  /** @internal Studio read surface — see `confirmed-turn-view.ts`. */
-  readConfirmedTurns(): ConfirmedTurnSnapshot;
+  /** @internal Raw retained records; projected by `/internals`. */
+  getConfirmedTurnRecords(): readonly TransactionTurnRecord[];
   getConfirmedTurnCount(): number;
   getPendingTurnCount(): number;
   getConfirmedTurnIds(): number[];
@@ -620,44 +615,23 @@ class TransactionAuthority {
   }
 
   /**
-   * Studio read surface. Projects retained records into the stable view model
-   * WITHOUT copying history into a second store — the array below is built per
-   * call from what is already retained, and nothing here is kept.
+   * @internal Raw retained records, for the `/internals` read seam.
+   *
+   *     A PROJECTION ON THIS CLASS CANNOT BE TREE-SHAKEN.
+   *
+   * ⚠️ This used to be `readConfirmedTurns()`, which built the whole
+   * `ConfirmedTurnView` here. Class methods are retained whenever the class is
+   * instantiated, and the transactions enhancer always instantiates this one —
+   * so every consumer of `transactions()` paid for the projection whether or
+   * not any tool ever read it. Measured: +489 B minified / +161 B gzip against
+   * a 100 B budget.
+   *
+   * The projection now lives in `internals.ts` and is pulled in only by a build
+   * that imports `@signal-tree/kernel/internals`. What remains here is the
+   * narrow accessor that cannot live anywhere else.
    */
-  readConfirmedTurns(): ConfirmedTurnSnapshot {
-    const turns: ConfirmedTurnView[] = [];
-    for (const record of this.confirmedTurns) {
-      const effects: ConfirmedTurnEffectView[] = [];
-      for (const effect of record.__effects ?? []) {
-        effects.push({
-          position: effect.position,
-          path: effect.path,
-          ownerPath: effect.ownerPath,
-          kind: effect.kind,
-          before: 'before' in effect ? effect.before : undefined,
-          after: 'after' in effect ? effect.after : undefined,
-          subjectId: 'subject' in effect ? effect.subject : undefined,
-        });
-      }
-      turns.push({
-        id: record.id,
-        positions: [...(record.__positionIds ?? [])],
-        effects,
-      });
-    }
-
-    // DERIVED, not asserted. Turn ids are allocated from 1 and never reused, so
-    // a first retained id above 1 means earlier turns are gone. Today nothing
-    // evicts from `confirmedTurns`, so this is false — and it will start
-    // reporting true on its own if that ever changes.
-    const firstAvailableTurnId = turns[0]?.id;
-    return {
-      turns,
-      retention: {
-        truncated: firstAvailableTurnId !== undefined && firstAvailableTurnId > 1,
-        firstAvailableTurnId,
-      },
-    };
+  getConfirmedTurnRecords(): readonly TransactionTurnRecord[] {
+    return this.confirmedTurns;
   }
 
   private insertConfirmed(turn: TransactionTurnRecord): void {
@@ -1971,7 +1945,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
         },
       };
     },
-    readConfirmedTurns: () => authority.readConfirmedTurns(),
+    getConfirmedTurnRecords: () => authority.getConfirmedTurnRecords(),
     getConfirmedTurnCount: () => authority.getConfirmedTurnCount(),
     getPendingTurnCount: () => authority.getPendingTurnCount(),
     getConfirmedTurnIds: () => authority.getConfirmedTurnIds(),

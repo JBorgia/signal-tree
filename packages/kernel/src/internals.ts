@@ -16,7 +16,10 @@ import { getPositionRegistry } from './lib/internals/position-registry';
 import type { TreeId } from './lib/internals/position-registry';
 import {
   StudioTreeDestroyedError,
+  type ConfirmedTurnEffectView,
   type ConfirmedTurnReader,
+  type ConfirmedTurnSnapshot,
+  type ConfirmedTurnView,
 } from './lib/internals/confirmed-turn-view';
 
 export { StudioTreeDestroyedError } from './lib/internals/confirmed-turn-view';
@@ -28,6 +31,67 @@ export type {
   ConfirmedTurnSnapshot,
   ConfirmedTurnView,
 } from './lib/internals/confirmed-turn-view';
+
+/**
+ * Project retained records into the stable view model.
+ *
+ *     THE PROJECTION LIVES HERE SO IT TREE-SHAKES.
+ *
+ * ⚠️ This was a method on `TransactionAuthority` until it was measured. Class
+ * methods are retained whenever the class is instantiated, and the transactions
+ * enhancer always instantiates that one — so every consumer paid +489 B
+ * minified / +161 B gzip for a projection most of them never call. Here it is
+ * reachable only from a build that imports `@signal-tree/kernel/internals`.
+ */
+function projectConfirmedTurns(
+  records: readonly {
+    id: number;
+    __positionIds?: number[];
+    __effects?: readonly {
+      position: number;
+      path: string;
+      ownerPath: string;
+      kind: 'set' | 'add' | 'remove' | 'rekey';
+      before?: unknown;
+      after?: unknown;
+      subject?: unknown;
+    }[];
+  }[]
+): ConfirmedTurnSnapshot {
+  const turns: ConfirmedTurnView[] = [];
+  for (const record of records) {
+    const effects: ConfirmedTurnEffectView[] = [];
+    for (const effect of record.__effects ?? []) {
+      effects.push({
+        position: effect.position,
+        path: effect.path,
+        ownerPath: effect.ownerPath,
+        kind: effect.kind,
+        before: 'before' in effect ? effect.before : undefined,
+        after: 'after' in effect ? effect.after : undefined,
+        subjectId: 'subject' in effect ? effect.subject : undefined,
+      });
+    }
+    turns.push({
+      id: record.id,
+      positions: [...(record.__positionIds ?? [])],
+      effects,
+    });
+  }
+
+  // DERIVED, not asserted. Turn ids are allocated from 1 and never reused, so a
+  // first retained id above 1 means earlier turns are gone. Nothing evicts from
+  // `confirmedTurns` today, so this is false — and it starts reporting true on
+  // its own if that ever changes.
+  const firstAvailableTurnId = turns[0]?.id;
+  return {
+    turns,
+    retention: {
+      truncated: firstAvailableTurnId !== undefined && firstAvailableTurnId > 1,
+      firstAvailableTurnId,
+    },
+  };
+}
 
 /**
  * This tree's runtime identity, or `undefined` if it has none.
@@ -79,7 +143,9 @@ export function confirmedTurnReader<T>(
       if (destroyed?.() === true) {
         throw new StudioTreeDestroyedError();
       }
-      return runtime.readConfirmedTurns();
+      return projectConfirmedTurns(
+        runtime.getConfirmedTurnRecords() as never
+      );
     },
   };
 }
