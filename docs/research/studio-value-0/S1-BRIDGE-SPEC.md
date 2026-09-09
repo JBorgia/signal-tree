@@ -323,7 +323,20 @@ last attachment removed   destroy bridge
                           release all Studio references
 ```
 
-Ids are never recycled within a session: a rebuilt tree is a new tree.
+### Id allocation outlives the registry
+
+⚠️ **Two rules here quietly conflict, and a test caught it.** "Drop the registry
+with the last detachment" and "ids are never recycled" cannot both hold if the
+counter lives inside the registry — dropping it restarts numbering, so a later
+tree is handed `tree-0001` again and a panel still holding that id silently
+reads a *different* tree's history. That is the cross-tree confusion C11 and
+`effectKey` exist to prevent, arriving through the front door.
+
+Recycling is the dangerous half, so **the ordinal counter survives registry
+drops**. It is a monotonic integer, not a reference: it pins no tree, no reader
+and no DOM, so "release all Studio references" still holds exactly. The
+runtime→session mapping *is* dropped with the attachment, so a rebuilt tree is
+a new tree rather than inheriting a retired id.
 
 ### Two absences that are not the same
 
