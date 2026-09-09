@@ -1,8 +1,8 @@
 # Studio validation fixture — the frozen incident
 
 > **Disposition: INVESTIGATION. Non-shipping.** The fixture Studio is validated
-> against, and the scoring that decides whether the wedge is earned. Gate
-> recorded in [`TODO.md`](../../../TODO.md); bar defined in
+> against, and the scoring that decides whether each seam slice earned the next
+> one. Gate recorded in [`TODO.md`](../../../TODO.md); measure defined in
 > [`SignalTree_Studio_Spec_v0.2.md`](SignalTree_Studio_Spec_v0.2.md) §20.
 
 ## Question
@@ -65,9 +65,9 @@ T47              expire-stale-promos sweep clears promoCode -> null and
 current          total 102.00, discount 0.00, promoCode null   <- surprising
 ```
 
-This is the distributed-responsibility flow that defines the wedge: a
-multi-write atomic parcel, an authored→realized handoff, and a later
-*non-atomic* overwrite that partially replaced those consequences.
+This is the distributed-responsibility flow Studio is built for: a multi-write
+atomic parcel (S1), an authored→realized handoff (S2), and a later *non-atomic*
+overwrite plus restoration truthfulness (S3).
 
 ## The questions
 
