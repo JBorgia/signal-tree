@@ -1,7 +1,13 @@
 import nx from '@nx/eslint-plugin';
 import jsoncParser from 'jsonc-eslint-parser';
 
+const GENERATED_SMOKE = [
+  '**/apps/studio-devtools/smoke/bundle.js',
+  '**/apps/studio-devtools/smoke/probe-extension/*.js',
+];
+
 export default [
+  { ignores: GENERATED_SMOKE },
   ...nx.configs['flat/base'],
   ...nx.configs['flat/typescript'],
   ...nx.configs['flat/javascript'],
