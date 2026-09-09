@@ -1072,19 +1072,29 @@ model SignalTree does not have.
 > admitting what it cannot know?
 
 Studio is scored against the frozen Cart 88213 incident and its eight
-questions, to an absolute bar. It is not scored against another framework's
-tooling: benchmarking against an action-log paradigm would anchor Studio's
-design to a model it deliberately does not share.
+questions — measured against **the best alternative buildable on SignalTree
+without Studio**: the shipped-API path (`devTools()`, `exportDebugSession()`,
+`audit` `metadata.description`) a developer already has for free. Not against
+another framework's tooling, which would anchor Studio's design to a model it
+deliberately does not share.
+
+**The moat rule (spec §22.5):** every load-bearing capability must rest on a
+fact unreachable without the Phase 0 seam. Anything the shipped API already
+gives away is a convenience feature — it may ship, but it cannot count toward
+differentiation or justify pricing. If nothing load-bearing needs the seam,
+the seam is not worth building and Studio is a free tool.
 
 Fixture, questions and scoring:
 [`docs/research/studio-value-0/README.md`](docs/research/studio-value-0/README.md)
 Bar, budget and binding outcomes: spec §20.
 
 ```text
-PASS   correct explanation, honest UNKNOWN on Q4/Q7, within the stated budget,
-       every fact labelled                    -> wedge earned; sequence proceeds
-PARK   correct but expensive, or leaning on research-only hooks for the
-       load-bearing claims                    -> free developer tool, no
+PASS   correct explanation, honest UNKNOWN on Q4/Q7, within budget, every fact
+       labelled, AND a material margin over the shipped-API baseline resting
+       on facts that baseline cannot reach    -> wedge earned; sequence proceeds
+PARK   the shipped-API baseline gets there at similar cost, or the margin is
+       only presentation, or load-bearing claims lean on research-only hooks
+                                              -> free developer tool, no
                                                  commercial track
 STOP   wrong explanation, or a knowledge claim on Q4/Q7 -> thesis not supported
 ```
