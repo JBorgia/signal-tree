@@ -1,0 +1,12 @@
+{
+  "name": "@signal-tree/studio-devtools",
+  "version": "15.0.0",
+  "description": "SignalTree Studio DevTools UI. Private \u2014 never published.",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "dependencies": {
+    "@signal-tree/studio-adapter": "workspace:*",
+    "@signal-tree/studio-query": "workspace:*"
+  }
+}

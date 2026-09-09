@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "../..",
+    "outDir": "../../dist/packages/studio-query/dist",
+    "declarationDir": "../../dist/packages/studio-query/dist",
+    "declaration": true,
+    "declarationMap": true,
+    "inlineSources": false,
+    "module": "ESNext",
+    "types": [
+      "node"
+    ],
+    "paths": {}
+  },
+  "exclude": [
+    "src/**/*.spec.ts",
+    "vitest.config.ts"
+  ],
+  "include": [
+    "src/**/*.ts"
+  ]
+}

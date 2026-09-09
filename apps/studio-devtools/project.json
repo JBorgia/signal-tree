@@ -1,0 +1,20 @@
+{
+  "name": "studio-devtools",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/studio-devtools/src",
+  "projectType": "application",
+  "tags": [],
+  "implicitDependencies": [],
+  "targets": {
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm exec tsc --noEmit -p apps/studio-devtools/tsconfig.spec.json && npx vitest run --config apps/studio-devtools/vitest.config.ts",
+        "forwardAllArgs": true
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
