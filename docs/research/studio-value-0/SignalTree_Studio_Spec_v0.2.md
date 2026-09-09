@@ -529,6 +529,7 @@ approximating it (§18.2, §23).
 | Label | Definition | Product implication |
 |---|---|---|
 | SHIPPED SEMANTIC FACT | Exists in v15 shipping semantics and is reachable through a supported seam | May support a Studio capability claim |
+| — | As of 2026-09-09 `committed-transactions` is in this row: the facts are retained by the transactions enhancer and reachable via `@signal-tree/kernel/internals`' `confirmedTurnReader`. **It is no longer RESEARCH-ONLY.** | Claimable |
 | RESEARCH-ONLY OBSERVATION | Temporary instrumentation used to evaluate value before a shipping seam exists | Cannot be credited as a shipping capability |
 | DERIVED BY INSPECTOR | Mechanically computed from captured facts | Allowed if deterministic and reproducible |
 | EXTERNAL EVIDENCE | Logs, OTel, backend revisions, request IDs, source maps, etc. | Useful enrichment, but not SignalTree-native differentiation |
@@ -1558,7 +1559,10 @@ SignalTree can offer, whether or not they are ever sold.
 
 | Zero-cost-when-unused | S1 disabled/unused contract, 8 binding points (§8.5). Bundle delta and disabled-overhead are measured numbers, not assertions. | **Binding — must pass before S1 ships** |
 | Studio inspector (causal core) | **S1 vertical connected 2026-09-09.** kernel `confirmedTurnReader` -> studio-adapter -> studio-query -> studio-devtools projection, on real trees. | Done for S1 |
-| Studio page bridge | Specified in `S1-BRIDGE-SPEC.md`: explicit `attachStudio` opt-in, adapter-owned registry, MessagePort transport, three read-only commands, versioned. Not implemented. | **Open — next build item** |
+| Studio page bridge | **Built and browser-proven 2026-09-09** (Chrome 141). Full chain verified with the real content script: `chrome.tabs.connect` -> `chrome.runtime.onConnect` -> transferred `MessagePort` isolated->main -> bridge -> registry -> `confirmedTurnReader` -> live committed effects. Evidence: `apps/studio-devtools/smoke/`. | Closed |
+| MAIN-world shim fallback | **Not needed.** The documented fallback existed only in case a transferred `MessagePort` could not cross Chrome's isolated-world boundary. It does. Frozen as unnecessary absent a new falsifier — do not build it speculatively. | Closed by evidence |
+| DevTools panel registration | `chrome.devtools.panels.create` and `chrome.devtools.inspectedWindow.tabId` are the ONLY unverified calls; DevTools panels cannot be automated. Everything downstream of the tab id is proven. | **Open — human check** |
+| S1 disabled/unused measurements | §8.5 contract points 6 and 7 — production bundle delta and disabled-overhead benchmark — are still **unmeasured numbers**, not assertions. The other six points hold structurally via `path-observation-port`'s pattern. | **Open — required before S1 ships** |
 | Destroyed-tree lifecycle | **Resolved and proven.** A destroyed tree's reader throws `StudioTreeDestroyedError`; `[]` stays reserved for a live tree with no retained turns. Three states are distinguishable: no enhancer, live-but-empty, destroyed. | Closed |
 | Automatic SignalTree detection | **Not being solved.** Studio enumerates trees explicitly attached to it. No kernel registry, no page scanning, no heuristic detection — and no "detected but not enabled" claim, which would require a detection mechanism that does not truthfully exist. | Closed by decision |
 | Independent investigator | Must not have built the slice or set up the §20.2 control condition, and must not be told which questions are traps (§20.4). | Open — required before any run |
