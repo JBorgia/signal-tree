@@ -13,6 +13,7 @@
 import type { ISignalTree } from './lib/types';
 import { peekInternalTransactionRuntime } from './enhancers/transactions/transactions';
 import { getPositionRegistry } from './lib/internals/position-registry';
+import type { TreeId } from './lib/internals/position-registry';
 import {
   StudioTreeDestroyedError,
   type ConfirmedTurnReader,
@@ -27,6 +28,22 @@ export type {
   ConfirmedTurnSnapshot,
   ConfirmedTurnView,
 } from './lib/internals/confirmed-turn-view';
+
+/**
+ * This tree's runtime identity, or `undefined` if it has none.
+ *
+ * ⚠️ SEPARATE FROM `confirmedTurnReader` ON PURPOSE. A tree built without
+ * `transactions()` has no reader, but it is still a distinct tree that a tool
+ * may legitimately attach to and key on. Folding identity into the reader would
+ * mean a capability-less tree had no identity at all, and two of them would be
+ * indistinguishable.
+ *
+ * Equality and `Map`-key use only — never serialize it. A consumer needing
+ * persistence maps this to its own session identity.
+ */
+export function treeRuntimeId<T>(tree: ISignalTree<T>): TreeId | undefined {
+  return getPositionRegistry(tree.$)?.id;
+}
 
 /**
  * A read-only window onto one tree's retained committed turns, or `undefined`
@@ -55,7 +72,7 @@ export function confirmedTurnReader<T>(
   const destroyed = (tree as unknown as { destroyed?: () => boolean }).destroyed;
 
   return {
-    treeId: getPositionRegistry(tree.$)?.id,
+    treeId: treeRuntimeId(tree),
     readConfirmedTurns: () => {
       // Checked per call, not at construction: a reader is legitimately held
       // across a tree's lifetime, and the interesting moment is the read.

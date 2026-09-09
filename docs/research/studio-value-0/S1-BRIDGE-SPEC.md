@@ -400,13 +400,54 @@ Snapshot-first, matching the kernel seam. The panel polls modestly while open
 When polling is visibly inadequate, investigate the cheapest truthful
 notification point then. Until then, do not prepay for it.
 
+## Layering — settled
+
+```text
+application code
+  |  attachStudio(tree, options)          <- the whole public experience
+  v
+studio-adapter
+  |  probeSignalTree(tree)                <- internal glue, the one place
+  v                                          that knows both sides
+StudioTreeProbe
+  +-- confirmedTurnReader   (kernel /internals)
+  +-- treeRuntimeId         (kernel /internals)
+  +-- onDestroy             (tree.registerCleanup)
+```
+
+`StudioTreeProbe` stays, as an **adapter implementation detail** — it keeps most
+adapter tests free of real trees and isolates the adapter if kernel internals
+move. It is not a product API: application code never constructs one.
+`attachStudioProbe` remains exported for that seam; `attachStudio` is what
+callers use.
+
+**Capabilities are derived, never configured.** A caller cannot assert a
+capability a tree lacks; `require` can only tighten an expectation against
+reality, never fabricate it.
+
+**Identity is separate from capability.** `treeRuntimeId` was added to kernel
+`/internals` precisely because a tree without `transactions()` has no reader —
+folding identity into the reader would leave capability-less trees with no
+identity, making two of them indistinguishable.
+
+**A failed `require` consumes nothing** — no registry, and no session id, since
+allocation happens only after the checks pass. Repeated bad wiring cannot
+advance the observable id sequence for trees that never entered Studio.
+
 ## Implementation order
 
 ```text
-1. adapter registry + attachStudio/detach + destroy eviction   <- next
-2. page bridge (handshake, MessagePort, 3 commands, versioning)
-3. MV3 shell around the existing studio-devtools projection
+1. adapter registry + attachStudio/detach + destroy eviction   DONE
+2. real-tree glue (probeSignalTree) + integration tests        DONE
+3. page bridge (handshake, MessagePort, 3 commands, versioning) <- next
+4. MV3 shell around the existing studio-devtools projection
 ```
+
+By the time the bridge is written the registry is fully coherent — every
+attached tree has a session id, a label, derived capabilities, real read
+functions and destroy lifecycle — so **the transport is dumb serialization**.
+It never touches a kernel tree, never sees `TreeId`, never wires destruction
+and never infers a capability.
 
 The projection in `apps/studio-devtools` is already the panel body and needs no
 change to be rendered by a real extension — which is the point of having kept
