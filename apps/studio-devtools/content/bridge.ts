@@ -30,7 +30,7 @@ const pending = new Map<string, (payload: unknown) => void>();
  * and never replies through `event.source`, which would wrongly assume the
  * connecting party is a page Window.
  */
-function connectToPage(): MessagePort {
+export function connectToPage(): MessagePort {
   const channel = new MessageChannel();
 
   channel.port1.onmessage = (event: MessageEvent) => {
