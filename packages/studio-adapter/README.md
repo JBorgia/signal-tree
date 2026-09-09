@@ -21,3 +21,26 @@ on `causal-runtime`.
 
 `disposition` is always `'committed'` here. `pending`/`discarded` arrive with
 S1P, from a source that actually observes them — never by inference.
+
+
+## Bridge (development only)
+
+```ts
+import { attachStudio } from '@signal-tree/studio-adapter';
+import { installStudioBridge } from '@signal-tree/studio-adapter/bridge';
+
+installStudioBridge();
+attachStudio(appTree, { label: 'AppTree' });
+```
+
+`/bridge` is a **separate entry point on purpose**. A `typeof window` guard
+inside `attachStudio` could not be tree-shaken and would ship the transport in
+every bundle — the trap `debug-enhancers.prod.ts` and the repo's
+`no-restricted-imports` rule already exist to prevent. A build that never
+imports `/bridge` does not contain it, and that absence is the security
+boundary: production has no Studio surface to reach, rather than a disabled one.
+
+Three read-only commands — `hello`, `listTrees`, `readConfirmedTurns` — over a
+versioned `MessagePort`. The handshake nonce matches a response to its request;
+it is **not** authentication, and same-realm script is inside the application
+trust boundary (`S1-BRIDGE-SPEC.md` §4).
