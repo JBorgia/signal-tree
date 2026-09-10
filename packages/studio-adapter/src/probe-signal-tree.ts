@@ -1,6 +1,12 @@
-import { confirmedTurnReader, treeRuntimeId } from '@signal-tree/kernel/internals';
+import {
+  confirmedTurnReader,
+  treeCapabilities,
+  treeRuntimeId,
+} from '@signal-tree/kernel/internals';
 
 import { type StudioTreeProbe } from './attach-studio-probe';
+import { readCurrentValue } from './realization/current-value';
+import { liveCaptureTarget } from './realization/live-target';
 
 /**
  * The minimum a tree must structurally be for Studio to attach to it.
@@ -37,5 +43,10 @@ export function probeSignalTree(tree: StudioAttachableTree): StudioTreeProbe {
     // can only tighten expectations, never fabricate them.
     confirmedTurnReader: confirmedTurnReader(kernelTree),
     onDestroy: (evict) => tree.registerCleanup(evict),
+    structure: { capabilities: treeCapabilities(kernelTree) },
+    // Built lazily: constructing a target installs nothing, but there is no
+    // reason to build one for a tree nobody captures.
+    createCaptureTarget: () => liveCaptureTarget(tree, 'pending'),
+    readCurrentValue: (path) => readCurrentValue(tree, path),
   };
 }

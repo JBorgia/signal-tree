@@ -103,3 +103,20 @@ export type RealizationSupport =
       readonly capture: 'active';
       readonly snapshot: RealizationCaptureSnapshot;
     };
+
+/**
+ * What `readRealizations` returns.
+ *
+ * ⚠️ THREE STATES, NEVER COLLAPSED TO `[]`. "This composition cannot observe",
+ * "observation available but not recording" and "recording, nothing seen yet"
+ * are three different truths, and only the last may be read as
+ * "no realizations happened since capture began".
+ */
+export type RealizationReadResult =
+  | { readonly support: 'unsupported'; readonly reason: 'leaf-observation-unavailable' }
+  | { readonly support: 'supported'; readonly capture: 'inactive' }
+  | {
+      readonly support: 'supported';
+      readonly capture: 'active';
+      readonly snapshot: RealizationCaptureSnapshot;
+    };
