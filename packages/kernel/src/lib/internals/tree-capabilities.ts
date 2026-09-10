@@ -99,3 +99,52 @@ export function assertTreeCapabilityGraphAcyclic(): void {
     visit(capability);
   }
 }
+
+const TREE_CAPABILITIES = Symbol.for('SignalTree:TreeCapabilities');
+
+/**
+ * @internal Record the capability set a tree was CONSTRUCTED with.
+ *
+ *     A CONSTRUCTION-TIME FACT, NOT AN OBSERVED BEHAVIOUR.
+ *
+ * ⚠️ WHY THIS EXISTS. `buildPlan` is local to `signalTree()` and never
+ * retained, so nothing could ask a finished tree what it was built with. The
+ * only alternative for a tool was to probe behaviour — write something and see
+ * whether an observer fires — which cannot distinguish "this composition cannot
+ * observe" from "nothing has happened yet". That is the same class of error as
+ * inferring a semantic fact from a value's shape.
+ *
+ * Stores the plan's existing array by reference; no allocation.
+ *
+ * Deliberately GENERIC. Kernel truth about construction, not a consumer's
+ * question — no `supportsX`-shaped accessor belongs here. A consumer translates
+ * capabilities into its own capability model.
+ */
+export function defineTreeCapabilities(
+  tree: object,
+  capabilities: readonly TreeCapability[]
+): void {
+  Object.defineProperty(tree, TREE_CAPABILITIES, {
+    value: capabilities,
+    enumerable: false,
+    configurable: true,
+  });
+}
+
+/**
+ * @internal The capabilities this tree was built with, or `undefined` when the
+ * subject is not a tree.
+ *
+ * ⚠️ An EMPTY array is a meaningful answer — a bare tree — and must not be
+ * conflated with `undefined`.
+ */
+export function getTreeCapabilities(
+  tree: unknown
+): readonly TreeCapability[] | undefined {
+  if (typeof tree !== 'object' || tree === null) {
+    return undefined;
+  }
+  return (tree as Record<symbol, readonly TreeCapability[] | undefined>)[
+    TREE_CAPABILITIES
+  ];
+}
