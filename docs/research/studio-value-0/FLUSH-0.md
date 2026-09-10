@@ -99,3 +99,95 @@ journal's turn model is unnecessary
                               extract or build the smallest bounded
                               effect-capture primitive instead
 ```
+
+
+---
+
+# RESULT — 2026-09-10
+
+Suites: `flush-0.spec.ts`, `flush-probe.spec.ts`
+
+```text
+case 1  bare tree: delivered=NO   turns=0
+case 2  complete=YES  origin=external participation=realized ownerId=2
+case 3  writes=3  groupingFact=NO  transactionIds=[null]
+case 4  authoredFrames=1 realizedFrames=1  succession=9600->10200
+case 6  entity rowFrame=YES participation=realized
+case 7  delivered=["a","b","c"]   (no flush involved)
+```
+
+## Outcome: **D** — capture effects, do not invent turns
+
+**Case 3 is decisive.** Three synchronous realized writes inside one
+`external()` call share **no identifier whatsoever** (`transactionIds=[null]`).
+There is no shipped semantic fact proving they belong to one realization
+operation, so S2 must not manufacture a "realization turn".
+
+**Case 7 confirms flush is packaging, not observation.** Three writes were each
+delivered individually with no flush involved. The journal's `onFlush`
+buffering was how a dormant module chose to group records — not a semantic
+boundary S2 depends on.
+
+**Case 2 confirms raw delivery is sufficient.** One frame carries `path`,
+`ownerPath`, `before`, `after`, `origin: 'external'`,
+`participation: 'realized'` and `ownerId` — S2's entire required fact, with no
+flush and no turn container.
+
+## ⚠️ But the precondition is REAL — and it is not the journal's fault
+
+I expected the flush dependency to be the journal's artifact. It is. **The
+actual constraint is different and more fundamental:**
+
+```text
+bare (no enhancers)            0 frames
+batching()                     0 frames
+restoration()                  2 frames
+transactions()                 2 frames
+restoration()+transactions()   2 frames
+```
+
+**Scalar leaf writes are unobservable unless `restoration()` or
+`transactions()` is installed.** Either alone suffices; `batching()` does not
+help. `entityMap` writes are observable with no enhancers at all (case 6).
+
+The gate is **leaf interception**, which those enhancers install — not flush,
+and not anything Studio can opt into after the fact.
+
+So S2 *does* carry a capability precondition, but it must be stated correctly:
+
+> **Scalar realization coverage requires a tree composed with `restoration()`
+> or `transactions()`. Entity/structural realization does not.**
+
+A tree without either shows an empty realization history that is
+indistinguishable from "no realizations happened" — which is exactly the
+absence-is-not-evidence failure. It must be reported as **unsupported**, not
+empty.
+
+## Consequences
+
+1. **Do not adopt `createDiagnosticJournal`.** Its turn model is unnecessary
+   (case 3) and its flush packaging is not a semantic boundary (case 7). Useful
+   prior art for classification and bounded retention; not the primitive.
+2. **The `ownerId` repair is no longer necessary.** OWNER-SCOPE-0 authorized it,
+   FLUSH-0 removes the reason. Do not repair dead machinery for Studio's sake —
+   it remains a real kernel defect, tracked separately, on its own merits.
+3. **Build the smallest bounded effect-capture primitive**, roughly:
+
+```ts
+interface RealizationEffect {
+  sequence: number;
+  treeId: StudioTreeId;
+  path: string;
+  ownerPath: string;
+  before: unknown;
+  after: unknown;
+  origin?: WriteOrigin;
+  participation: 'realized';
+  transactionId?: number;   // correlation only when actually supplied
+}
+```
+
+   No turn. No flush requirement. Bounded retention plus explicit coverage.
+4. **S1 is untouched.** `confirmedTurns` stays authoritative for transaction net
+   consequence; this stream is authoritative for value succession; the query
+   layer combines them. Two sources, never one merged capture.
