@@ -42,6 +42,25 @@ Three were caught by noticing a pass that arrived too easily. **The fourth was
 caught by review, not by me** — which is precisely why vigilance is not a
 sufficient control.
 
+### R1a — a positive control alone is insufficient
+
+A positive control proves the instrument can see the condition **present**. It
+does not prove the instrument can see it **absent**.
+
+`CAPTURE-DISPOSE-0` had a passing positive control (a deliberately held
+reference stayed alive) while being completely blind to collection — an object
+with no references also reported alive. It nearly recorded a phantom leak in the
+capture lease.
+
+> **Where a test can report "condition still holds", pair the positive control
+> with a NEGATIVE control that must report the condition gone.**
+
+### R1b — a gate must assert the EXPECTED value, not merely a non-zero one
+
+`CAPTURE-MEMORY-0`'s gate checked `retained === 0` and sailed past a
+`retained === 1` failure caused by same-value write suppression. The shape
+benchmark's gate checked the expected count and caught it immediately.
+
 ## R2 — A superseded conclusion is invalidated at the top of its own document
 
 Not appended beside. A future reader must not be able to find the old

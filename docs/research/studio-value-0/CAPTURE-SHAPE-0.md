@@ -59,11 +59,10 @@ frozen on this evidence.
 - **eviction genuinely bounds memory**: capping 200 effects at 50 holds 8.9 MB
   rather than 35.2 MB.
 
-**NOT established — dispose release.** Residual heap equals captured heap in
-every row. `dispose()` does clear the effects array, so this is more likely GC
-timing or `heapUsed` imprecision than a leak — but *"dispose releases retained
-memory"* is **not proven by this harness** and must not be claimed. It needs its
-own investigation with a retained-object probe rather than heap deltas.
+**Dispose release — RESOLVED by [`CAPTURE-DISPOSE-0.md`](CAPTURE-DISPOSE-0.md):
+dispose DOES release.** The residual-equals-captured readings here were GC
+timing, exactly as suspected, not a leak. Heap deltas were the wrong
+instrument; a `WeakRef` probe with both controls settled it.
 
 ## Method — the sanity gate earned its keep twice more
 
