@@ -32,6 +32,15 @@ export {
 } from './realization/capture';
 export { realizationSupport, type TreeStructure } from './realization/support';
 export {
+  isCaptureActive,
+  startRealizationCapture,
+  StudioCaptureError,
+  type CaptureTarget,
+  type RealizationLease,
+  type StartCaptureOptions,
+} from './realization/lease';
+export {
+  type CapturedValue,
   type RealizationCaptureSnapshot,
   type RealizationCoverage,
   type RealizationEffect,
