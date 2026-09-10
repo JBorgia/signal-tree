@@ -387,6 +387,43 @@ incomplete + effects: []   -> "no ATTRIBUTABLE realizations were retained;
 13 tests, each invariant paired with an **R1 positive control** proving it can
 fail.
 
+## S2-13 — capture economics: PARTIALLY CLOSED
+
+**Frozen on evidence:**
+
+```text
+✓ capture is explicit, never automatic
+✓ capture OFF has no observer or retention work
+✓ maxEffects bounds retained effect count
+✓ eviction demonstrably bounds retained memory  (200@cap50 = 8.9MB vs 35.2MB)
+✓ before/after are immutable snapshots           (CAPTURE-VALUE-0)
+✓ dispose releases retained evidence             (CAPTURE-DISPOSE-0)
+✓ capture cost is GRAPH-SHAPE sensitive, ~12x at equal logical size
+```
+
+**Explicitly open, and deliberately NOT built:**
+
+```text
+○ no bound on the complexity of a single captured value
+○ no total retained graph-complexity budget
+○ bounded-snapshotter design
+```
+
+⚠️ `maxValueBytes` is **rejected** — bytes are not the cost driver, and sizing a
+value requires the traversal being guarded against (`CAPTURE-SHAPE-0`).
+
+A node-budget snapshotter is a genuine subsystem — what counts as a node,
+whether repeated references count once, Map/Set/typed-array semantics, cycles,
+depth exposure, aliasing under truncation, preview retention — and building it
+now would become another research branch before Studio answers its first useful
+question. **Let real session use establish whether it is needed.**
+
+The query model operates on `CapturedValue` as it stands and must respect the
+discriminator rather than reaching for `effect.after.value`. If bounded
+snapshots later prove necessary, adding a third variant —
+`{ kind: 'truncated', reason: 'complexity-limit', … }` — is natural schema
+evolution and is **not** added speculatively.
+
 ## Next
 
 1. Capture **lease** wiring (`startRealizationCapture`), refusing immediately
