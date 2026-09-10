@@ -160,19 +160,26 @@ await check('2. AppTree appears in the tree list', () => waitForText('AppTree'))
 await check('3. realization status begins supported/inactive', () => waitForText('○ INACTIVE'));
 
 await clickPanel('Start Capture');
-await check('4/5. Start Capture -> status becomes active', () => waitForText('● ACTIVE'));
+await check('4/5. Start Capture -> status becomes active', () => waitForText('● CAPTURE'));
 await check('5b. header reports LIVE', () => waitForText('LIVE'));
 
 await clickDemo('10200');
-await check('6. the realization is retained', () => waitForText('1 effect(s) retained'));
+await check('6. the realization is retained', () => waitForText('● CAPTURE 1'));
+
+// ⚠️ Selection is driven by the STATE pane, which lists locations from
+// `readStateShape` — including ones no evidence mentions.
+await check('6b. State shows a location nothing has written to', () => waitForText('subtotal'));
+await check('6c. State shows a branch outside the cart entirely', () => waitForText('orders'));
 
 await panel.evaluate(() => {
-  const b = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'cart.total');
-  if (!b) throw new Error('no cart.total chip');
-  b.click();
+  const node = [...document.querySelectorAll('button.node')].find(
+    (x) => x.textContent.trim().endsWith('total') && !x.textContent.includes('sub')
+  );
+  if (!node) throw new Error('no total node in State');
+  node.click();
 });
-// Wait for a CLAIM, not for the word "Why?" — that is also the button's label.
-await check('7. cart.total selected, explanation rendered', () => waitForText('FACT'));
+// Wait for a CLAIM, not for the word "Why?" — that is also a heading.
+await check('7. cart.total selected from State, explanation rendered', () => waitForText('FACT'));
 
 await check('8. WHY? reads the LIVE current value (10200)', async () => {
   const ok = await waitForText('10200');
@@ -195,7 +202,8 @@ await check('10c. UNKNOWN authored cause is stated, not omitted', async () =>
   (await waitForText('UNKNOWN')) && (await waitForText('No retained evidence identifies'))
 );
 
-await check('11. no transactionId is invented on the realization', async () => {
+/** Clicking a claim's reference must illuminate the matching EVIDENCE card. */
+await check('11a. an evidence ref illuminates its record in the Evidence column', async () => {
   await panel.waitForFunction(
     () => [...document.querySelectorAll('button.ref')].some((x) => x.textContent.startsWith('realization:')),
     undefined,
@@ -206,22 +214,56 @@ await check('11. no transactionId is invented on the realization', async () => {
       .find((x) => x.textContent.startsWith('realization:'))
       .click();
   });
-  await panel.waitForSelector('.detail', { timeout: 5000 });
-  const drawer = await panel.evaluate(() => document.querySelector('.detail')?.innerText ?? '');
+  await panel.waitForSelector('.evidence .card.focused', { timeout: 5000 });
+  const lit = await panel.evaluate(
+    () => document.querySelector('.evidence .card.focused')?.innerText ?? ''
+  );
+  return { ok: /R\d+\s+realization/.test(lit), detail: lit.replace(/\n/g, ' ').slice(0, 60) };
+});
+
+await check('11b. the time strip marks the same record', async () =>
+  (await panel.evaluate(() => !!document.querySelector('.timestrip .mark.focused'))) === true
+);
+
+await check('11c. no transactionId is invented on the realization', async () => {
+  await panel.evaluate(() => {
+    [...document.querySelectorAll('button.action')]
+      .find((x) => x.textContent.startsWith('Raw evidence'))
+      .click();
+  });
+  await panel.waitForSelector('.raw', { timeout: 5000 });
+  const raw = await panel.evaluate(() => document.querySelector('.raw')?.innerText ?? '');
   return {
-    ok: drawer.includes('participation') && !drawer.includes('transactionId'),
-    detail: drawer.replace(/\n/g, ' ').slice(0, 100),
+    ok: raw.includes('participation') && !raw.includes('transactionId'),
+    detail: raw.replace(/\n/g, ' ').slice(0, 90),
   };
 });
 
 // ⚠️ The point of the whole exercise: look at it.
+/**
+ * ⚠️ THE LAYOUT IS AN ASSERTION NOW. The previous vertical stack put WHY? at
+ * y≈475 in a 620px panel, so the DERIVED and UNKNOWN lines were never on
+ * screen. This fails if the answer ever slides below the fold again.
+ */
+await check('L1. the first claim is above the fold', async () => {
+  const y = await panel.evaluate(() => document.querySelector('.claim')?.getBoundingClientRect().top ?? 1e6);
+  return { ok: y < 300, detail: `first claim at y=${Math.round(y)}` };
+});
+await check('L2. every claim class is visible without scrolling', async () => {
+  const info = await panel.evaluate(() => {
+    const last = [...document.querySelectorAll('.claim')].at(-1);
+    return { bottom: last?.getBoundingClientRect().bottom ?? 1e6, h: window.innerHeight };
+  });
+  return { ok: info.bottom <= info.h, detail: `last claim ends at y=${Math.round(info.bottom)} of ${info.h}` };
+});
+
 await panel.screenshot({ path: join(shots, '1-live-why.png') });
 
 await clickPanel('Stop Capture');
 await check('12/14. Stop Capture -> capture reports inactive', () => waitForText('○ INACTIVE'));
 await check('13. the investigation survives panel-side', async () =>
   (await waitForText('External realization changed 9800 → 10200')) &&
-  (await waitForText('Holding 1 effect(s) from a stopped session'))
+  (await waitForText('not recording — holding 1'))
 );
 
 await clickDemo('9950');
@@ -231,6 +273,20 @@ await check('15. the live read follows the tree after capture stopped', () =>
 await check('16. WHY? warns that retained evidence no longer explains it', () =>
   waitForText('not explained by retained evidence')
 );
+
+/**
+ * ⚠️ THE GLYPH IS A CLAIM TOO. Once the live value diverges, drawing the last
+ * realization as an edge into it asserts a cause the query declined to state.
+ */
+await check('16b. the glyph severs its edge instead of claiming a cause', async () => {
+  const t = await text();
+  return {
+    ok:
+      t.includes('does not explain this value') &&
+      !/external realization\n/.test(t),
+    detail: 'severed connector shown',
+  };
+});
 
 await panel.screenshot({ path: join(shots, '2-diverged.png') });
 console.log(`\nscreens -> ${shots}`);

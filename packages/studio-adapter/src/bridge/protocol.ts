@@ -65,6 +65,19 @@ export type StudioBridgeRequest =
       readonly command: 'readCurrentValue';
       readonly treeId: StudioTreeId;
       readonly path: string;
+    }
+  /**
+   * Key structure only — no values. The state pane needs names; values are read
+   * per-path on demand, so arbitrary application data never crosses the
+   * transport to populate a sidebar.
+   */
+  | {
+      readonly protocol: number;
+      readonly id: string;
+      readonly command: 'readStateShape';
+      readonly treeId: StudioTreeId;
+      readonly maxDepth?: number;
+      readonly maxKeys?: number;
     };
 
 export type StudioBridgeResponse<T = unknown> =
@@ -100,6 +113,7 @@ export function isStudioBridgeRequest(value: unknown): value is StudioBridgeRequ
     case 'startRealizationCapture':
     case 'stopRealizationCapture':
     case 'readRealizations':
+    case 'readStateShape':
       return typeof candidate['treeId'] === 'string';
     case 'readCurrentValue':
       return typeof candidate['treeId'] === 'string' && typeof candidate['path'] === 'string';

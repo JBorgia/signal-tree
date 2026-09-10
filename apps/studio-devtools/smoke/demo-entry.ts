@@ -19,13 +19,25 @@ import { installStudioBridge } from '@signal-tree/studio-adapter/bridge';
  * UNKNOWN line real rather than decorative.
  */
 
-type Cart = { promoCode: string | null; discount: number; total: number };
+type Cart = {
+  subtotal: number;
+  promoCode: string | null;
+  discount: number;
+  total: number;
+};
 
 installStudioBridge();
 
-const tree = signalTree({ cart: { promoCode: null, discount: 0, total: 12000 } as Cart }, {
-  enhancers: [transactions()],
-} as never) as never as {
+const tree = signalTree(
+  {
+    cart: { subtotal: 12000, promoCode: null, discount: 0, total: 12000 } as Cart,
+    // ⚠️ Never written by this demo, ON PURPOSE. The State pane must show
+    // locations that carry no evidence; an evidence-derived list cannot.
+    orders: { open: [] as string[], lastSyncedAt: null as string | null },
+    ui: { theme: 'dark', panel: { width: 320, pinned: false } },
+  },
+  { enhancers: [transactions()] } as never
+) as never as {
   $: { cart: Record<string, (v?: unknown) => unknown> };
   transaction(fn: () => void): { confirm(): void };
   destroy(): void;

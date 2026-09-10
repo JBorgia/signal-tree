@@ -28,6 +28,8 @@ export interface StudioTreeProbe {
   readonly createCaptureTarget?: () => unknown;
   /** The value at `path` right now — compared against retained evidence. */
   readonly readCurrentValue?: (path: string) => unknown;
+  /** Key structure for the state pane. Never values. */
+  readonly readStateShape?: (options: { maxDepth?: number; maxKeys?: number }) => unknown;
 }
 
 export interface AttachStudioOptions {
@@ -80,6 +82,7 @@ export function attachStudioProbe(
     structure: probe.structure,
     createCaptureTarget: probe.createCaptureTarget,
     readCurrentValue: probe.readCurrentValue,
+    readStateShape: probe.readStateShape,
   });
 
   let detached = false;
