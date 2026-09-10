@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "SignalTree Studio",
   "version": "0.1.0",
-  "description": "Semantic debugging for SignalTree — committed causal consequence (S1).",
+  "description": "Semantic debugging for SignalTree \u2014 committed causal consequence and realization evidence.",
   "devtools_page": "devtools/devtools.html",
   "content_scripts": [
     {
@@ -11,5 +11,5 @@
       "run_at": "document_start"
     }
   ],
-  "permissions": []
+  "host_permissions": ["<all_urls>"]
 }

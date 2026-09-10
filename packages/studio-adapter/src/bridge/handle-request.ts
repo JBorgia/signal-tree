@@ -1,15 +1,14 @@
+import { REALIZATION_CAPABILITY } from '../capabilities';
 import { peekRegistry } from '../registry';
 import { realizationSupport } from '../realization/support';
 import {
+  disposeCapture,
+  peekCapture,
   startRealizationCapture,
   StudioCaptureError,
   type CaptureTarget,
-  type RealizationLease,
 } from '../realization/lease';
 import { type RealizationReadResult } from '../realization/types';
-
-/** Panel-driven leases, so stop/read can find them. */
-const leases = new Map<string, RealizationLease>();
 import {
   STUDIO_PROTOCOL_VERSION,
   STUDIO_SCHEMA_VERSION,
@@ -70,32 +69,41 @@ export function handleStudioRequest(
         return { ...envelope, ok: false, error: { code: 'STUDIO_TREE_NOT_FOUND' } };
       }
       const support = realizationSupport({ capabilities: attachment.structure?.capabilities });
+      // ⚠️ The capability named must be the one that is missing. Naming
+      // `committed-transactions` here detected the right condition and stated
+      // the wrong reason, and the panel renders the reason.
       if (support.state === 'unsupported') {
         return {
           ...envelope, ok: false,
-          error: { code: 'STUDIO_CAPABILITY_UNAVAILABLE', capability: 'committed-transactions' },
+          error: { code: 'STUDIO_CAPABILITY_UNAVAILABLE', capability: REALIZATION_CAPABILITY },
         };
       }
-      if (leases.has(request.treeId)) {
+      if (peekCapture(request.treeId)) {
         return { ...envelope, ok: true, value: { started: false, reason: 'already-active' } };
       }
       const target = attachment.createCaptureTarget?.() as CaptureTarget | undefined;
       if (!target) {
+        // Attached and structurally capable, but this attachment cannot build a
+        // capture target — still a realization gap, not a missing tree.
         return {
           ...envelope, ok: false,
-          error: { code: 'STUDIO_CAPABILITY_UNAVAILABLE', capability: 'committed-transactions' },
+          error: { code: 'STUDIO_CAPABILITY_UNAVAILABLE', capability: REALIZATION_CAPABILITY },
         };
       }
       try {
-        leases.set(
-          request.treeId,
-          startRealizationCapture({ ...target, treeId: request.treeId }, { maxEffects: request.maxEffects })
+        startRealizationCapture(
+          { ...target, treeId: request.treeId },
+          { maxEffects: request.maxEffects }
         );
       } catch (cause) {
-        if (cause instanceof StudioCaptureError) {
-          return { ...envelope, ok: false, error: { code: 'STUDIO_TREE_NOT_FOUND' } };
+        if (!(cause instanceof StudioCaptureError)) {
+          throw cause;
         }
-        throw cause;
+        // Report what was refused. Flattening these to NOT_FOUND told the panel
+        // the tree had vanished when it was attached the whole time.
+        return cause.error.code === 'STUDIO_CAPTURE_ALREADY_ACTIVE'
+          ? { ...envelope, ok: true, value: { started: false, reason: 'already-active' } }
+          : { ...envelope, ok: false, error: cause.error };
       }
       return { ...envelope, ok: true, value: { started: true } };
     }
@@ -106,13 +114,12 @@ export function handleStudioRequest(
      * not the investigation.
      */
     case 'stopRealizationCapture': {
-      const lease = leases.get(request.treeId);
+      const lease = peekCapture(request.treeId);
       if (!lease) {
         return { ...envelope, ok: true, value: { stopped: false, reason: 'not-active' } };
       }
       const snapshot = lease.snapshot();
-      lease.dispose();
-      leases.delete(request.treeId);
+      disposeCapture(request.treeId);
       return { ...envelope, ok: true, value: { stopped: true, snapshot } };
     }
 
@@ -126,9 +133,15 @@ export function handleStudioRequest(
       const result: RealizationReadResult =
         support.state === 'unsupported'
           ? { support: 'unsupported', reason: 'leaf-observation-unavailable' }
-          : leases.has(request.treeId)
-            ? { support: 'supported', capture: 'active', snapshot: leases.get(request.treeId)!.snapshot() }
-            : { support: 'supported', capture: 'inactive' };
+          : (() => {
+              // Asked of the lease module, never of a bridge-local copy: a
+              // lease disposed by detach or destroy must stop reading active
+              // the moment it stops observing.
+              const lease = peekCapture(request.treeId);
+              return lease
+                ? { support: 'supported', capture: 'active', snapshot: lease.snapshot() }
+                : { support: 'supported', capture: 'inactive' };
+            })();
       return { ...envelope, ok: true, value: result };
     }
 

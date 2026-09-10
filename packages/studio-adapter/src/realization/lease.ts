@@ -1,5 +1,6 @@
 import { type StudioTreeId } from '@signal-tree/studio-query';
 
+import { REALIZATION_CAPABILITY } from '../capabilities';
 import { type StudioBridgeError } from '../errors';
 import {
   createRealizationCapture,
@@ -30,9 +31,19 @@ export interface StartCaptureOptions {
   readonly maxEffects?: number;
 }
 
+/**
+ * ⚠️ CARRIES THE REFUSAL, NOT JUST THE FACT OF ONE. A caller that flattens
+ * every capture failure to one code makes the bridge state a wrong reason for a
+ * correctly detected condition — which is how "leaf observation unavailable"
+ * once surfaced as "tree not found".
+ */
 export class StudioCaptureError extends Error {
-  constructor(readonly error: StudioBridgeError | { code: string; reason?: string }) {
-    super(`${(error as { code: string }).code}`);
+  constructor(
+    readonly error:
+      | StudioBridgeError
+      | { readonly code: 'STUDIO_CAPTURE_ALREADY_ACTIVE' }
+  ) {
+    super(error.code);
     this.name = 'StudioCaptureError';
   }
 }
@@ -62,9 +73,13 @@ export function startRealizationCapture(
   const support = realizationSupport(target.structure);
   if (support.state === 'unsupported') {
     // Nothing is installed and nothing is registered on this path.
+    //
+    // ⚠️ The capability named is the one actually missing. `support.reason`
+    // ('leaf-observation-unavailable') is the mechanism; `realizations` is the
+    // capability, and the caller renders the capability.
     throw new StudioCaptureError({
       code: 'STUDIO_CAPABILITY_UNAVAILABLE',
-      reason: support.reason,
+      capability: REALIZATION_CAPABILITY,
     });
   }
 
@@ -105,4 +120,33 @@ export function startRealizationCapture(
 /** Whether a capture is currently active for this tree. Never creates one. */
 export function isCaptureActive(treeId: StudioTreeId): boolean {
   return active.has(treeId);
+}
+
+/**
+ * The live lease for a tree, or `undefined`.
+ *
+ *     ONE AUTHORITY FOR "IS THIS TREE BEING CAPTURED".
+ *
+ * ⚠️ EXISTS SO CALLERS DO NOT KEEP THEIR OWN MAP. The bridge used to track its
+ * panel-driven leases separately, which made "capture active" answerable two
+ * ways. Destruction disposed the lease here and left the bridge's copy behind,
+ * so `readRealizations` would report `capture: 'active'` for a tree whose
+ * observer was already gone.
+ */
+export function peekCapture(treeId: StudioTreeId): RealizationLease | undefined {
+  return active.get(treeId);
+}
+
+/**
+ * Stop capturing for this tree, if it is. Idempotent; returns whether there was
+ * anything to stop.
+ *
+ * ⚠️ LIFECYCLE BELONGS BELOW THE UI. Studio must never keep charging writes for
+ * a tree it has stopped presenting, and "the panel remembers to press Stop
+ * first" is not a mechanism — detach and destroy are not user actions.
+ */
+export function disposeCapture(treeId: StudioTreeId): boolean {
+  const lease = active.get(treeId);
+  lease?.dispose();
+  return lease !== undefined;
 }

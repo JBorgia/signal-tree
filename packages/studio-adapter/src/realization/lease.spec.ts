@@ -58,9 +58,13 @@ describe('CAPTURE-S2-0', () => {
     expect(isCaptureActive('tree-0001')).toBe(false);
 
     try { startRealizationCapture(h.t); } catch (e) {
-      expect((e as StudioCaptureError).error).toMatchObject({
+      // The refusal names the CAPABILITY, not the mechanism. It used to carry
+      // `reason: 'leaf-observation-unavailable'` and no capability at all,
+      // which left the bridge free to fill one in — and it filled in the wrong
+      // one. See CAPTURE-LIFECYCLE-0.
+      expect((e as StudioCaptureError).error).toEqual({
         code: 'STUDIO_CAPABILITY_UNAVAILABLE',
-        reason: 'leaf-observation-unavailable',
+        capability: 'realizations',
       });
     }
   });

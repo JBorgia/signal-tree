@@ -37,9 +37,18 @@ export function readCurrentValue(
   }
 
   for (const segment of path.split('.')) {
-    if (node === null || typeof node !== 'object') {
-      // The path does not resolve. `undefined` is a legitimate VALUE, so this
-      // is reported as unresolvable rather than as `undefined`.
+    // ⚠️ KEY PRESENCE, NOT VALUE SHAPE.
+    //
+    //     `undefined` IS A LEGITIMATE SIGNALTREE VALUE.
+    //
+    // Reading the segment and testing the RESULT cannot tell `{ total:
+    // undefined }` from a tree with no `total` at all — and this function's
+    // whole job is to say truthfully what is at a location. An earlier version
+    // guarded only that the CONTAINER was an object, which caught a broken
+    // intermediate segment but let a missing FINAL segment through: asking for
+    // `cart.nope` answered `{ kind: 'value', value: undefined }`, presenting
+    // absence as a value. Verified in a real browser before it shipped.
+    if (node === null || typeof node !== 'object' || !(segment in node)) {
       return { kind: 'unserializable', valueType: 'unresolved-path', preview: path };
     }
     node = (node as Record<string, unknown>)[segment];
