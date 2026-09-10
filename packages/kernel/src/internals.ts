@@ -14,6 +14,10 @@ import type { ISignalTree } from './lib/types';
 import { peekInternalTransactionRuntime } from './enhancers/transactions/transactions';
 import { getPositionRegistry } from './lib/internals/position-registry';
 import { getTreeCapabilities } from './lib/internals/tree-capabilities';
+export {
+  observeWrites,
+  type ObservedWriteFrame,
+} from './lib/internals/write-observation';
 import type { TreeId } from './lib/internals/position-registry';
 import {
   StudioTreeDestroyedError,

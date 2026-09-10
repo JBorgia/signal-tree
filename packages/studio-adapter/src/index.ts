@@ -30,6 +30,7 @@ export {
   type RealizationCapture,
   type RealizationCaptureOptions,
 } from './realization/capture';
+export { liveCaptureTarget, type LiveTree } from './realization/live-target';
 export { realizationSupport, type TreeStructure } from './realization/support';
 export {
   isCaptureActive,
