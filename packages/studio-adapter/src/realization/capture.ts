@@ -1,10 +1,46 @@
 import { type StudioTreeId } from '@signal-tree/studio-query';
 
 import {
+  type CapturedValue,
   type RealizationCaptureSnapshot,
   type RealizationEffect,
   type ScopeIntegrity,
 } from './types';
+
+/**
+ * Snapshot a value at capture time.
+ *
+ * `structuredClone` is the right primitive here, chosen from what
+ * CAPTURE-VALUE-0 actually measured rather than assumed: it preserves `Date`,
+ * `Map` and `Set`, and handles cyclic objects — all of which a JSON round-trip
+ * would lose or throw on. It rejects functions and symbols, and those become an
+ * explicit `unserializable` record rather than vanishing.
+ */
+function capture(value: unknown): CapturedValue {
+  try {
+    return { kind: 'value', value: structuredClone(value) };
+  } catch {
+    return {
+      kind: 'unserializable',
+      valueType: typeof value,
+      preview: previewOf(value),
+    };
+  }
+}
+
+function previewOf(value: unknown): string {
+  if (typeof value === 'function') {
+    return `function ${(value as { name?: string }).name || '(anonymous)'}`;
+  }
+  if (typeof value === 'symbol') {
+    return String(value);
+  }
+  try {
+    return String(value);
+  } catch {
+    return `[unrepresentable ${typeof value}]`;
+  }
+}
 
 /**
  * One observed write frame, as the adapter receives it. Structural, so this
@@ -74,8 +110,9 @@ export function createRealizationCapture(
         sequence: sequence++,
         path: frame.path,
         ownerPath: frame.ownerPath,
-        before: frame.before,
-        after: frame.after,
+        // Snapshotted, never referenced — see CapturedValue's doc.
+        before: capture(frame.before),
+        after: capture(frame.after),
         origin: frame.origin,
         participation: 'realized',
       });

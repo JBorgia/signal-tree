@@ -34,8 +34,8 @@ describe('realization capture', () => {
     expect(s.effects).toHaveLength(1);
     expect(s.effects[0]).toMatchObject({
       path: 'cart.total',
-      before: 9800,
-      after: 10200,
+      before: { kind: 'value', value: 9800 },
+      after: { kind: 'value', value: 10200 },
       origin: 'external',
       participation: 'realized',
     });
@@ -112,7 +112,7 @@ describe('realization capture', () => {
       expect(s.retention.capacity).toBe(3);
       expect(s.retention.retained).toBe(3);
       expect(s.retention.truncated).toBe(true);
-      expect(s.effects.map((e) => e.after)).toEqual([7, 8, 9]);
+      expect(s.effects.map((e) => (e.after as { value: number }).value)).toEqual([7, 8, 9]);
       expect(s.retention.firstRetainedSequence).toBe(7);
       expect(s.retention.lastRetainedSequence).toBe(9);
     });

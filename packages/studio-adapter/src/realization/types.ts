@@ -1,6 +1,28 @@
 import { type StudioTreeId } from '@signal-tree/studio-query';
 
 /**
+ * A value as it was AT CAPTURE TIME.
+ *
+ *     EVIDENCE MUST NOT CHANGE UNDERNEATH THE OBSERVER.
+ *
+ * ⚠️ CAPTURE-VALUE-0 measured the naive implementation — storing `before`/
+ * `after` by reference — and it FAILED: mutating the source object afterwards
+ * silently rewrote the retained "history". That is not evidence retention, it
+ * is a pointer to current mutable data.
+ *
+ * ⚠️ Serialization loss and observation loss are DIFFERENT epistemic facts.
+ * A value that cannot cross the bridge is recorded as `unserializable` rather
+ * than dropped, so it can never read as "no realization happened".
+ */
+export type CapturedValue =
+  | { readonly kind: 'value'; readonly value: unknown }
+  | {
+      readonly kind: 'unserializable';
+      readonly valueType: string;
+      readonly preview: string;
+    };
+
+/**
  * One realized write, as observed. **Deliberately minimal** — FLUSH-0 returned
  * outcome D, so there is no turn, no flush boundary, and no invented operation
  * grouping. Fields are added only when a specific S2 query earns them.
@@ -13,8 +35,8 @@ export interface RealizationEffect {
   readonly sequence: number;
   readonly path: string;
   readonly ownerPath: string;
-  readonly before: unknown;
-  readonly after: unknown;
+  readonly before: CapturedValue;
+  readonly after: CapturedValue;
   readonly origin?: 'external' | 'restoration' | 'devtools' | 'transaction-rollback';
   readonly participation: 'realized';
   /**
