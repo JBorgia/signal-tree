@@ -44,7 +44,16 @@ is in S2's own territory — but the leak turns out to be harmless:
 The unowned frame is a **bare collection invalidation** — no `before`, no
 `after`. The frame carrying the actual `Alpha → Server` transition **is** owned.
 
-## The repair rule
+> ## ⚠️ CORRECTED BY OWNER-EVIDENCE-0 — 2026-09-10
+>
+> The conclusion below rested on an **unsafe predicate**:
+> `carriesValue = next !== undefined || prev !== undefined`. `undefined` is a
+> legitimate SignalTree state value, so the shape of before/after cannot prove a
+> frame is not evidence. OWNER-EVIDENCE-0 looked for a positive discriminator
+> and **found none**. The corrected rule is in `OWNER-EVIDENCE-0.md`; outcome is
+> **C, not B**, and `scopeIntegrity` **is** required.
+
+## The repair rule (superseded)
 
 ```ts
 typeof meta.ownerId === 'number' && meta.ownerId !== targetOwnerId

@@ -281,6 +281,61 @@ Therefore the `ownerId` repair is **no longer necessary**. OWNER-SCOPE-0
 authorized it; FLUSH-0 removed the reason. It stays a real kernel defect,
 tracked on its own merits — **do not repair dead machinery for Studio's sake.**
 
+## S2-10 — scope integrity (frozen by OWNER-EVIDENCE-0)
+
+An unowned frame **cannot** be classified as non-evidence. No positive
+discriminator exists: `subjectIds`, `positionIds`, `ownerPath` and meta-key
+presence are identical on owned and unowned frames, and `path === ownerPath` is
+true for scalar leaves too.
+
+```text
+ownerId present, matches    -> attributable
+ownerId present, differs    -> reject
+ownerId absent              -> CANNOT ATTRIBUTE; never guess
+```
+
+So capture reports:
+
+```ts
+scopeIntegrity: 'complete' | 'incomplete-unscoped-writes'
+```
+
+> "Some observed writes could not be assigned safely to this tree. This capture
+> is incomplete."
+
+Better than cross-tree pollution, and better than silently dropping evidence and
+presenting the remainder as complete.
+
+⚠️ This **reverses** OWNER-SCOPE-0's conclusion, which used
+`before/after === undefined` as proof of non-evidence. `undefined` is a
+legitimate state value; the shape of a payload proves nothing.
+
+## S2-11 — supported compositions are deliberately narrow
+
+FLUSH-0 measured that `entityMap` writes are observable with **no** enhancers,
+while scalar leaves are not. **S2 does not expose that partial coverage.**
+
+```text
+transactions() present   -> supported
+restoration() present    -> supported
+neither                  -> UNSUPPORTED
+```
+
+Even though some entity effects would be observable, supporting them while
+silently missing scalar leaves is exactly the partial-history trap. Support less
+and refuse loudly. A later composition-widening slice can turn `unsupported`
+into truthful partial or full structural coverage once the whole matrix is
+proven.
+
+Three states, and an empty history exists in only one of them:
+
+```text
+UNSUPPORTED         this composition cannot provide complete observation
+SUPPORTED/INACTIVE  available, capture has not started
+SUPPORTED/ACTIVE    recording  -> [] truthfully means
+                                  "no realized writes since capture began"
+```
+
 ## S2-9 — the real capability precondition (frozen by FLUSH-0)
 
 Not flush. **Leaf interception.**
