@@ -25,6 +25,20 @@ export {
 } from './kernel-contract';
 export { toStudioTurn } from './normalize';
 export {
+  createRealizationCapture,
+  type ObservedFrame,
+  type RealizationCapture,
+  type RealizationCaptureOptions,
+} from './realization/capture';
+export {
+  type RealizationCaptureSnapshot,
+  type RealizationCoverage,
+  type RealizationEffect,
+  type RealizationRetention,
+  type RealizationSupport,
+  type ScopeIntegrity,
+} from './realization/types';
+export {
   peekRegistry,
   type ConfirmedTurnsResponse,
   type StudioBridgeTree,

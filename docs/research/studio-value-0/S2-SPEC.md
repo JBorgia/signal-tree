@@ -354,9 +354,54 @@ empty history — an empty list there is indistinguishable from "no realizations
 happened", which is the absence-is-not-evidence failure this project keeps
 refusing.
 
+## S2-12 — schema frozen and implemented (2026-09-10)
+
+`packages/studio-adapter/src/realization/`. **Three independent axes**, because
+collapsing them is how a tool starts implying history it does not have:
+
+```ts
+support:   'unsupported' | 'supported/inactive' | 'supported/active'
+coverage:  { completeFromTreeStart: false; scopeIntegrity; startedAtSequence }
+retention: { capacity; retained; truncated; first/lastRetainedSequence }
+```
+
+- `completeFromTreeStart` is typed **`false`**, not `boolean`. Studio has no
+  mechanism that can *prove* capture preceded all activity, and "we installed it
+  early" is not proof. Widening the type later must be a deliberate act with a
+  mechanism behind it.
+- `scopeIntegrity: 'complete'` means **only**: among frames observed during this
+  capture, none that could be semantic lacked trustworthy ownership. It does not
+  mean capture began at tree creation, that nothing was evicted, or that the
+  composition is fully observable — those are the other two axes.
+- An unowned frame is **neither attributed nor silently dropped**: it degrades
+  integrity, and degradation is sticky.
+
+Which produces the honesty boundary:
+
+```text
+complete   + effects: []   -> "no realizations since capture began"
+incomplete + effects: []   -> "no ATTRIBUTABLE realizations were retained;
+                               some observed activity could not be assigned"
+```
+
+13 tests, each invariant paired with an **R1 positive control** proving it can
+fail.
+
 ## Next
 
-1. **Coverage/retention schema** (S2-6) against the WEAK contract, now including
-   the S2-9 precondition as a third capability state.
-2. Build the bounded `RealizationEffect` capture primitive.
-3. Query model, then UI.
+1. Capture **lease** wiring (`startRealizationCapture`), refusing immediately
+   with `STUDIO_CAPABILITY_UNAVAILABLE` on an unsupported composition — never a
+   partial start.
+2. Live-tree proof: supported, unsupported, empty-active, external, restoration,
+   unowned degradation, disposal, eviction.
+3. Capture-**off** structural proof; capture-**on** characterization.
+4. `UNSCOPED-IMPACT-0` before multi-tree is claimed trustworthy — when an
+   unowned frame occurs while several captures are active, which can be *proven*
+   affected? Likely answer: none can, so all active captures degrade. Ugly but
+   truthful, and an independent argument for fixing the kernel ownership defect.
+5. Query model, then UI.
+
+⚠️ **No hub yet.** `scopeIntegrity` sharpens the multiplexer argument, but an
+unowned global frame gives no way to know *which* tree's integrity to degrade —
+a hub has the same epistemic problem as per-tree observers and is harder to
+study. Measure the simple version first.
