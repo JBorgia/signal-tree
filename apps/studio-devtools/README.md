@@ -81,8 +81,19 @@ same run.
 ## Automated verification
 
 ```bash
-node apps/studio-devtools/smoke/verify-extension.mjs
+node apps/studio-devtools/smoke/verify-extension.mjs   # the bridge chain
+node apps/studio-devtools/smoke/verify-panel.mjs       # the real panel's DOM
 ```
+
+`verify-panel.mjs` loads the shipped `panel/main.js` itself and stubs exactly
+one thing — `chrome.devtools.inspectedWindow.tabId` — then drives acceptance
+steps 3-16 and asserts on rendered text. It also writes `smoke/screens/`.
+
+⚠️ Stubbing the tab id is a real narrowing: it is the one value only a genuine
+DevTools context supplies. Steps 1-2 (does the SignalTree tab appear;
+`chrome.devtools.panels.create`) cannot be automated and stay manual.
+
+`verify-extension.mjs` covers the transport chain beneath the UI:
 
 Runs the **shipped `dist/studio-devtools`** in a real Chromium and drives the
 whole command set through `chrome.tabs.connect` → content script → page bridge,
