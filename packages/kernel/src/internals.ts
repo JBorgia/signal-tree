@@ -13,6 +13,7 @@
 import type { ISignalTree } from './lib/types';
 import { peekInternalTransactionRuntime } from './enhancers/transactions/transactions';
 import { getPositionRegistry } from './lib/internals/position-registry';
+import { getTreeCapabilities } from './lib/internals/tree-capabilities';
 import type { TreeId } from './lib/internals/position-registry';
 import {
   StudioTreeDestroyedError,
@@ -23,6 +24,18 @@ import {
 } from './lib/internals/confirmed-turn-view';
 
 export { StudioTreeDestroyedError } from './lib/internals/confirmed-turn-view';
+
+/**
+ * The capabilities this tree was CONSTRUCTED with, or `undefined` if the
+ * subject is not a tree. An empty array is meaningful — a bare tree — and must
+ * not be conflated with `undefined`.
+ *
+ * ⚠️ Generic kernel truth, deliberately. A consumer translates capabilities
+ * into its own capability model; no consumer-shaped predicate belongs here.
+ */
+export function treeCapabilities<T>(tree: ISignalTree<T>) {
+  return getTreeCapabilities(tree);
+}
 export type {
   ConfirmedTurnEffectKind,
   ConfirmedTurnEffectView,

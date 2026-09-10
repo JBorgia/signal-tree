@@ -84,6 +84,7 @@ import {
 } from './internals/physical-commit-clock';
 import {
   collectRequestedTreeCapabilities,
+  defineTreeCapabilities,
   resolveTreeCapabilities,
 } from './internals/tree-capabilities';
 import type { MaterializationContext } from './internals/materialize-markers';
@@ -1694,6 +1695,9 @@ function create<T extends object>(
     defineOwnedPositionIds(signalState as object, rootPositionIds);
     defineOwnedPositionIds(rootAccessor as object, rootPositionIds);
   }
+  // Construction-time truth, so a tool can ask what this tree was built with
+  // instead of probing behaviour to find out. See tree-capabilities.ts.
+  defineTreeCapabilities(tree as object, buildPlan.capabilities);
   if (buildPlan.has('mutation-capture')) {
     defineOwnedOwnerPath(tree as object, '');
     defineOwnedOwnerPath(signalState as object, '');

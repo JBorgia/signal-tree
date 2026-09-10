@@ -23,6 +23,26 @@ No import of `@signal-tree/studio-adapter`, `/bridge`, `studio-query`, or
 Threshold: 0 B attributable to Studio packages, ≤100 B gzip kernel seam.
 **Both met.** Studio symbol grep over both production bundles: **none**.
 
+### ⚠️ UPDATED 2026-09-10 — the bare-tree zero is gone
+
+S2 needed a construction-time capability fact (`defineTreeCapabilities`, so a
+tool can ask what a tree was built with instead of probing behaviour). It runs
+**unconditionally**, so:
+
+| build | gzip vs pre-S1 baseline | was |
+|---|---|---|
+| bare `signalTree` | **+19 B** | +0 B |
+| `signalTree` + `transactions()` | **+31 B** | +17 B |
+
+Still comfortably inside the ≤100 B budget, but the "+0 B for bare trees"
+property no longer holds and should not be quoted. It was traded for a
+capability accessor bare trees cannot use — they are unsupported for S2 anyway.
+
+The alternative was skipping attachment when the capability list is empty, which
+would make a bare tree indistinguishable from a non-tree (`undefined` both) and
+collapse a distinction documented as meaningful. 19 B was judged the better
+trade; recorded so the judgement is visible rather than implied.
+
 ### ⚠️ The first measurement FAILED, and that is why it was measured
 
 Initially: **+489 B min / +161 B gzip**, with `readConfirmedTurns` present in

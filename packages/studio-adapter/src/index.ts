@@ -30,6 +30,7 @@ export {
   type RealizationCapture,
   type RealizationCaptureOptions,
 } from './realization/capture';
+export { realizationSupport, type TreeStructure } from './realization/support';
 export {
   type RealizationCaptureSnapshot,
   type RealizationCoverage,
