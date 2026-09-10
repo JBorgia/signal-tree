@@ -24,14 +24,19 @@ region **includes delivery** — writes are flushed asynchronously.
 | 100 KB object | 0.0205 | 0.0201 | −2% | 0.0442 | 49,862 |
 | 1 MB object | 0.2233 | 0.2120 | −5% | 0.2665 | 4,718 |
 
-**Read:** capture roughly **doubles the cost of a cheap realized write** — a
-fixed per-write cost (ownership filter, realized filter, snapshot, bounded
-push) that dominates when the write itself is trivial. At 10 KB and above the
-overhead falls into noise; the negative figures are noise, not speedups, and
-bound the residual measurement error at roughly ±6%.
+**Read — and note what this does NOT support.** Capture roughly **doubles the
+cost of a cheap realized write**: a fixed per-write cost (ownership filter,
+realized filter, snapshot, bounded push) that dominates when the write itself is
+trivial. That part is resolved.
 
-For an explicitly enabled DevTools recorder this is acceptable, and it does not
-degrade with payload size across the range tested.
+⚠️ **The ≥10 KB rows resolve nothing.** −2% and −5% are impossible as
+speedups, so at those sizes the harness cannot separate Studio's incremental
+clone cost from the write's own cost — it bounds residual error at roughly ±6%
+and no more. An earlier revision of this document concluded *"it does not
+degrade with payload size across the range tested."* **That claim is withdrawn**:
+absolute write time clearly grows with payload, and how much of that growth is
+attributable to Studio is unmeasured. Comparing two independent medians was the
+wrong instrument; paired per-repetition deltas are needed. See [`CAPTURE-SHAPE-0.md`](CAPTURE-SHAPE-0.md), which resolved it — and found that **shape, not size, is the cost driver**.
 
 ## ⚠️ Caveat — the payloads were string-heavy
 
