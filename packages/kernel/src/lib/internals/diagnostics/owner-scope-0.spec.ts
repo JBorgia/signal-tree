@@ -159,21 +159,25 @@ describe('OWNER-SCOPE-0', () => {
   });
 
   /**
-   * THE INVARIANT THE REPAIR DEPENDS ON.
+   * ⚠️ WITHDRAWN — this invariant rested on an unsafe predicate.
    *
-   * Filtering on `ownerId` is only safe if every frame carrying VALUE EVIDENCE
-   * carries an owner. Unowned frames exist, but measurement shows they are bare
-   * collection invalidations with no before/after — dropping them loses nothing
-   * S2 needs.
+   * It classified frames using `next !== undefined || prev !== undefined`, which
+   * cannot distinguish "no value payload" from "a payload that is legitimately
+   * `undefined`". `undefined` is a valid SignalTree state value, so the shape of
+   * before/after proves nothing — the same class of error as treating equality
+   * as absence of a semantic transition.
    *
-   * If this ever fails, a naive filter starts discarding real evidence and the
-   * journal needs a `scopeIntegrity` coverage signal instead of a filter.
+   * OWNER-EVIDENCE-0 searched for a POSITIVE discriminator and found none:
+   * `subjectIds`, `positionIds`, `ownerPath` and meta-key presence are identical
+   * on owned and unowned frames, and `path === ownerPath` is true for scalar
+   * leaves too. See `owner-evidence-0.spec.ts`.
+   *
+   * Consequence: unowned frames CANNOT be classified as non-evidence, so S2
+   * needs a `scopeIntegrity` signal rather than a silent filter.
    */
-  it('INVARIANT: every value-carrying frame is owned', () => {
-    const offenders = report.flatMap((r) =>
-      r.unscoped.filter((u) => u.includes('[HAS VALUE]')).map((u) => `${r.case}: ${u}`)
-    );
-    expect(offenders).toEqual([]);
+  it('unowned frames exist and cannot be positively classified', () => {
+    const unscoped = report.flatMap((r) => r.unscoped);
+    expect(unscoped.length).toBeGreaterThan(0);
   });
 
   it('VERDICT', () => {
