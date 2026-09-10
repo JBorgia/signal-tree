@@ -3,6 +3,7 @@ import { type StudioTreeId } from '@signal-tree/studio-query';
 import { type StudioCapability } from './capabilities';
 import { StudioRequirementError } from './errors';
 import { type ConfirmedTurnReader } from './kernel-contract';
+import { disposeCapture } from './realization/lease';
 import { dropRegistryIfEmpty, registryForAttach } from './registry';
 
 /**
@@ -87,6 +88,21 @@ export function attachStudioProbe(
       return;
     }
     detached = true;
+    // ⚠️ RELEASE THE OBSERVER BEFORE DELISTING THE TREE.
+    //
+    //     STUDIO MUST NOT KEEP CHARGING WRITES FOR A TREE IT HAS STOPPED
+    //     PRESENTING.
+    //
+    // Capture was bridge-driven and the registry knew nothing about it, so
+    // detaching removed the attachment and left the process-global write
+    // observer installed and retaining evidence — with the tree no longer
+    // listed, nothing could ever stop it. Destruction reached the same state by
+    // the other route: `probe.onDestroy` calls this.
+    //
+    // Not the panel's job. Detach and destroy are not user actions, so
+    // "press Stop first" is not a mechanism. Idempotent, and a no-op for the
+    // overwhelmingly common attached-but-never-captured tree.
+    disposeCapture(id);
     registry.remove(id);
     // Last one out drops the registry, so "nothing attached" and "never
     // attached" are the same observable state.

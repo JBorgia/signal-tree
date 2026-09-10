@@ -3,6 +3,7 @@ import jsoncParser from 'jsonc-eslint-parser';
 
 const GENERATED_SMOKE = [
   '**/apps/studio-devtools/smoke/bundle.js',
+  '**/apps/studio-devtools/smoke/demo.js',
   '**/apps/studio-devtools/smoke/probe-extension/*.js',
 ];
 
@@ -156,6 +157,20 @@ export default [
           ],
         },
       ],
+    },
+  },
+  {
+    // ⚠️ `@nx/dependency-checks` keeps a PUBLISHED package.json honest about
+    // its runtime dependencies. `studio-devtools` is `"private": true` and
+    // ships as an unpacked extension that `build.mjs` bundles from source — no
+    // consumer ever resolves its dependency list. The rule only began firing
+    // here when that build target was added, and its findings are wrong in
+    // both directions: it wants `esbuild`/`playwright` (build and test tooling)
+    // listed as runtime deps, and reports `@signal-tree/studio-query` unused
+    // while `src/why-value.ts` imports `explainValue` from it.
+    files: ['apps/studio-devtools/package.json'],
+    rules: {
+      '@nx/dependency-checks': 'off',
     },
   },
   {

@@ -5,7 +5,25 @@ body {
   background: Canvas;
   color: CanvasText;
 }
-#root { display: grid; grid-template-columns: 220px 1fr; height: 100vh; }
+#root { display: flex; flex-direction: column; height: 100vh; }
+.body { display: grid; grid-template-columns: 220px 1fr; flex: 1; min-height: 0; }
+.topbar { display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 12px; border-bottom: 1px solid color-mix(in srgb, CanvasText 15%, transparent); }
+.brand { font-weight: 600; letter-spacing: .02em; }
+.badge { font-size: 10px; letter-spacing: .12em; padding: 2px 7px; border-radius: 10px;
+  border: 1px solid color-mix(in srgb, CanvasText 25%, transparent); opacity: .65; }
+.badge.on { color: #2e9e5b; border-color: #2e9e5b; opacity: 1; }
+.treename { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.pathrow { display: flex; gap: 6px; }
+.pathrow input { flex: 1; min-width: 0; padding: 5px 8px; font: inherit;
+  border-radius: 4px; background: Canvas; color: inherit;
+  border: 1px solid color-mix(in srgb, CanvasText 30%, transparent); }
+.pathrow .action { margin-top: 0; }
+.paths { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.paths li { display: block; }
+.paths li button { width: auto; padding: 2px 8px; border-radius: 10px;
+  border: 1px solid color-mix(in srgb, CanvasText 18%, transparent); }
+.whyhead { margin-top: 18px; }
 .pane { overflow: auto; padding: 12px; }
 .pane + .pane { border-left: 1px solid color-mix(in srgb, CanvasText 15%, transparent); }
 h2 { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .6; margin: 0 0 8px; }
@@ -23,3 +41,26 @@ li button[aria-current='true'] { background: color-mix(in srgb, CanvasText 14%, 
 .notObserved { margin-top: 20px; padding-top: 12px;
   border-top: 1px solid color-mix(in srgb, CanvasText 15%, transparent); opacity: .65; }
 .notObserved li { padding: 1px 0; }
+.section { margin-top: 18px; padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, CanvasText 15%, transparent); }
+.action { margin-top: 8px; padding: 5px 10px; border-radius: 4px; cursor: pointer;
+  border: 1px solid color-mix(in srgb, CanvasText 30%, transparent);
+  background: none; color: inherit; font: inherit; }
+.live { color: #2e9e5b; font-weight: 600; }
+.warn { color: #b3541e; }
+.value { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+.claim { margin: 0 0 12px; padding-left: 10px; border-left: 3px solid transparent; }
+.claim.fact    { border-left-color: #2e7d86; }
+.claim.derived { border-left-color: #8a7bbf; }
+.claim.unknown { border-left-color: color-mix(in srgb, CanvasText 25%, transparent); opacity: .78; }
+.claim .class { font-size: 10px; letter-spacing: .12em; opacity: .65; }
+.claim .text { margin-top: 2px; }
+.ref { margin-top: 4px; margin-right: 6px; padding: 1px 6px; font: inherit; font-size: 11px;
+  cursor: pointer; border-radius: 3px; background: none; color: inherit;
+  border: 1px dashed color-mix(in srgb, CanvasText 30%, transparent); opacity: .8; }
+.ref:hover { opacity: 1; }
+.detail { margin: 4px 0 14px 10px; padding: 8px 10px; border-radius: 4px;
+  background: color-mix(in srgb, CanvasText 6%, transparent); }
+.detail .row { display: flex; gap: 10px; }
+.detail .k { min-width: 96px; opacity: .6; }
+.detail .v { word-break: break-all; }
