@@ -60,3 +60,9 @@ export {
   createTreeIdentityRegistry,
   type TreeIdentityRegistry,
 } from './tree-identity';
+export {
+  readStateShape,
+  type StateNode,
+  type StateShape,
+  type StateShapeResult,
+} from './state-shape';

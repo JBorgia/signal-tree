@@ -154,6 +154,22 @@ export function handleStudioRequest(
       return { ...envelope, ok: true, value: attachment.readCurrentValue(request.path) };
     }
 
+    /** Structure, not values. See `state-shape.ts`. */
+    case 'readStateShape': {
+      const attachment = peekRegistry()?.attachment(request.treeId);
+      if (!attachment?.readStateShape) {
+        return { ...envelope, ok: false, error: { code: 'STUDIO_TREE_NOT_FOUND' } };
+      }
+      return {
+        ...envelope,
+        ok: true,
+        value: attachment.readStateShape({
+          maxDepth: request.maxDepth,
+          maxKeys: request.maxKeys,
+        }),
+      };
+    }
+
     case 'readConfirmedTurns': {
       const registry = peekRegistry();
       if (!registry) {

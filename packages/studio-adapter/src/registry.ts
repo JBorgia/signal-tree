@@ -28,6 +28,7 @@ interface Attachment {
   readonly structure?: { readonly capabilities: readonly string[] | undefined };
   readonly createCaptureTarget?: () => unknown;
   readonly readCurrentValue?: (path: string) => unknown;
+  readonly readStateShape?: (options: { maxDepth?: number; maxKeys?: number }) => unknown;
 }
 
 export interface StudioRegistry {

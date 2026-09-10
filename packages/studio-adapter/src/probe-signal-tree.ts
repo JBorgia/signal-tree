@@ -6,6 +6,7 @@ import {
 
 import { type StudioTreeProbe } from './attach-studio-probe';
 import { readCurrentValue } from './realization/current-value';
+import { readStateShape } from './state-shape';
 import { liveCaptureTarget } from './realization/live-target';
 
 /**
@@ -48,5 +49,6 @@ export function probeSignalTree(tree: StudioAttachableTree): StudioTreeProbe {
     // reason to build one for a tree nobody captures.
     createCaptureTarget: () => liveCaptureTarget(tree, 'pending'),
     readCurrentValue: (path) => readCurrentValue(tree, path),
+    readStateShape: (options) => readStateShape(tree, options),
   };
 }
