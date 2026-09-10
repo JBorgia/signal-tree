@@ -1,4 +1,27 @@
-# OWNER-SCOPE-0 — what does an absent `ownerId` mean?
+# OWNER-SCOPE-0 — SUPERSEDED
+
+> # ⚠️ THIS RESULT IS INVALID. DO NOT RESURRECT IT.
+>
+> ```text
+> OWNER-SCOPE-0   initial conclusion: B ("filtering on ownerId is safe")
+>                 status: SUPERSEDED 2026-09-10
+>
+> OWNER-EVIDENCE-0  final conclusion: C
+>                   unowned frames exist
+>                   no positive discriminator proves them ignorable
+>                   -> scopeIntegrity REQUIRED
+> ```
+>
+> The conclusion below was derived from an unsafe predicate —
+> `carriesValue = next !== undefined || prev !== undefined` — and `undefined` is
+> a legitimate SignalTree state value, so the shape of a payload proves nothing
+> about whether a frame is evidence.
+>
+> **The measurement table is still valid** (seven of eight paths carry `ownerId`;
+> one does not). **The conclusion drawn from it is not.**
+>
+> Binding result: [`OWNER-EVIDENCE-0.md`](OWNER-EVIDENCE-0.md).
+
 
 > Run before repairing JOURNAL-LIVE-0 falsifier 1, because the repair rule
 > depends on the answer. 2026-09-09.
@@ -12,7 +35,7 @@ and *"an owner-filtered observer is blind to every"* such write. So a naive
 filter could trade a cross-tree bug for a **missing-evidence** bug — strictly
 worse for a tool whose discipline is *absence is not evidence*.
 
-## Result — OUTCOME B
+## Measurement (still valid) — but see the supersession above
 
 ```text
 scalar authored             1/ 1 owned
@@ -26,6 +49,9 @@ entity remove               2/ 2 owned
 
 OUTCOME B: unscoped frames exist (1) but carry NO value
         -> filtering on ownerId is SAFE for S2
+
+        ^^^ THIS LINE IS THE INVALID CONCLUSION. The suite still prints it
+            because it is the raw output; OWNER-EVIDENCE-0 overturns it.
 ```
 
 Seven of eight paths carry `ownerId` on every frame. Exactly one leaks, and it
@@ -43,15 +69,6 @@ is in S2's own territory — but the leak turns out to be harmless:
 
 The unowned frame is a **bare collection invalidation** — no `before`, no
 `after`. The frame carrying the actual `Alpha → Server` transition **is** owned.
-
-> ## ⚠️ CORRECTED BY OWNER-EVIDENCE-0 — 2026-09-10
->
-> The conclusion below rested on an **unsafe predicate**:
-> `carriesValue = next !== undefined || prev !== undefined`. `undefined` is a
-> legitimate SignalTree state value, so the shape of before/after cannot prove a
-> frame is not evidence. OWNER-EVIDENCE-0 looked for a positive discriminator
-> and **found none**. The corrected rule is in `OWNER-EVIDENCE-0.md`; outcome is
-> **C, not B**, and `scopeIntegrity` **is** required.
 
 ## The repair rule (superseded)
 
