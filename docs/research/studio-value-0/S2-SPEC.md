@@ -237,12 +237,38 @@ No historical realization evidence is available before capture begins.
 
 ---
 
+## S2-8 — what S2 may claim about supersession (frozen by SUPERSESSION-0)
+
+Outcome: **WEAK**. `SUPERSESSION-0.md` has the evidence.
+
+**Licensed:**
+
+> "10200 replaced the previously visible value 9800 at `cart.total`. It arrived
+> as external truth, not authored work."
+
+**Not licensed:**
+
+> ~~"The server corrected Transaction 31."~~
+
+External realizations carry no `transactionId`; nothing in the evidence names a
+transaction. The value-level predecessor is the **last** value, never the most
+interesting one.
+
+⚠️ **Consequence for the visualization.** The external-truth arrow may point at a
+**value**, never at a **transaction**. Drawing "T31 was corrected" would be a lie
+the UI invented, and the picture being more compelling that way is exactly why
+the arrows were not formalized before this ran.
+
+**Entity fields (case 3).** An authored entity-field write addresses
+`rows.A.name`; an external `updateOne` addresses `rows.A` with whole-object
+before/after. Field-level supersession is **derivable by diffing** but was not
+addressed by the kernel — so it is DERIVED BY INSPECTOR (§8.3) and must be
+labelled, never presented as a shipped semantic fact.
+
 ## Next, before the S2 query model
 
-1. **Run `JOURNAL-LIVE-0`.** Adopt, repair, or replace on the evidence.
-2. **Flush-boundary grouping versus actual supersession.** This determines
-   whether S2 yields a realization *log* or can truthfully say *"this
-   authoritative value replaced that authored value."* Investigate before
-   designing the query model — it is the difference between S2 being useful and
-   S2 being a second timeline.
-3. Settle the coverage/retention schema against whatever (2) concludes.
+1. **`ownerId` journal repair** — the JOURNAL-LIVE-0 defect, as its own kernel
+   fix, handling the `ownerId: undefined` hazard deliberately.
+2. **Complete JOURNAL-LIVE-0** — falsifiers 2, 3, 4 remain unrun.
+3. **Coverage/retention schema** (S2-6) against the WEAK contract.
+4. Then the query model, then UI.
