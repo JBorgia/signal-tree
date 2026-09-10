@@ -265,10 +265,43 @@ before/after. Field-level supersession is **derivable by diffing** but was not
 addressed by the kernel — so it is DERIVED BY INSPECTOR (§8.3) and must be
 labelled, never presented as a shipped semantic fact.
 
-## Next, before the S2 query model
+## S2-1 SUPERSEDED by FLUSH-0 — the journal is NOT adopted
 
-1. **`ownerId` journal repair** — the JOURNAL-LIVE-0 defect, as its own kernel
-   fix, handling the `ownerId: undefined` hazard deliberately.
-2. **Complete JOURNAL-LIVE-0** — falsifiers 2, 3, 4 remain unrun.
-3. **Coverage/retention schema** (S2-6) against the WEAK contract.
-4. Then the query model, then UI.
+FLUSH-0 returned **outcome D**. `createDiagnosticJournal` is prior art, not the
+primitive:
+
+- **case 3** — three synchronous realized writes share no identifier at all, so
+  no shipped fact groups them. S2 must not manufacture a "realization turn".
+- **case 7** — writes are delivered individually with no flush. The journal's
+  `onFlush` buffering was a dormant module's packaging choice, not a semantic
+  boundary.
+- **case 2** — one raw frame already carries S2's entire required fact.
+
+Therefore the `ownerId` repair is **no longer necessary**. OWNER-SCOPE-0
+authorized it; FLUSH-0 removed the reason. It stays a real kernel defect,
+tracked on its own merits — **do not repair dead machinery for Studio's sake.**
+
+## S2-9 — the real capability precondition (frozen by FLUSH-0)
+
+Not flush. **Leaf interception.**
+
+```text
+bare / batching()                 scalar writes UNOBSERVABLE
+restoration() or transactions()   scalar writes observable
+entityMap                         observable with no enhancers
+```
+
+> **Scalar realization coverage requires a tree composed with `restoration()`
+> or `transactions()`. Entity/structural realization does not.**
+
+⚠️ A tree with neither must report realizations as **unsupported**, never as an
+empty history — an empty list there is indistinguishable from "no realizations
+happened", which is the absence-is-not-evidence failure this project keeps
+refusing.
+
+## Next
+
+1. **Coverage/retention schema** (S2-6) against the WEAK contract, now including
+   the S2-9 precondition as a third capability state.
+2. Build the bounded `RealizationEffect` capture primitive.
+3. Query model, then UI.
