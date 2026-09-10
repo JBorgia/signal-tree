@@ -21,6 +21,12 @@ export interface StudioTreeProbe {
   readonly confirmedTurnReader: ConfirmedTurnReader | undefined;
   /** Called with an eviction callback; returns nothing. */
   readonly onDestroy?: (evict: () => void) => void;
+  /** Construction-time capabilities, for structural support decisions. */
+  readonly structure?: { readonly capabilities: readonly string[] | undefined };
+  /** Build a realization capture target for this tree, if it is one. */
+  readonly createCaptureTarget?: () => unknown;
+  /** The value at `path` right now — compared against retained evidence. */
+  readonly readCurrentValue?: (path: string) => unknown;
 }
 
 export interface AttachStudioOptions {
@@ -70,6 +76,9 @@ export function attachStudioProbe(
     label: options.label,
     reader: probe.confirmedTurnReader,
     capabilities,
+    structure: probe.structure,
+    createCaptureTarget: probe.createCaptureTarget,
+    readCurrentValue: probe.readCurrentValue,
   });
 
   let detached = false;

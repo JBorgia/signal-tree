@@ -24,10 +24,16 @@ interface Attachment {
   /** `undefined` when the tree has no transactions() enhancer. */
   readonly reader: ConfirmedTurnReader | undefined;
   readonly capabilities: readonly StudioCapability[];
+  /** S2 hooks. Absent for a probe-injected attachment in tests. */
+  readonly structure?: { readonly capabilities: readonly string[] | undefined };
+  readonly createCaptureTarget?: () => unknown;
+  readonly readCurrentValue?: (path: string) => unknown;
 }
 
 export interface StudioRegistry {
   add(runtimeTreeId: unknown, attachment: Omit<Attachment, 'studioTreeId'>): StudioTreeId;
+  /** The attachment record, for S2 bridge commands. Never creates. */
+  attachment(treeId: StudioTreeId): Attachment | undefined;
   remove(studioTreeId: StudioTreeId): void;
   listTrees(): readonly StudioBridgeTree[];
   readConfirmedTurns(treeId: StudioTreeId): StudioResult<ConfirmedTurnsResponse>;
@@ -64,6 +70,10 @@ function createRegistry(): StudioRegistry {
       assigned.set(runtimeTreeId, studioTreeId);
       attachments.set(studioTreeId, { ...attachment, studioTreeId });
       return studioTreeId;
+    },
+
+    attachment(treeId) {
+      return attachments.get(treeId);
     },
 
     remove(studioTreeId) {

@@ -5,6 +5,9 @@ export default defineConfig({
   root: import.meta.dirname,
   resolve: {
     alias: {
+      '@signal-tree/kernel/adapter': fileURLToPath(
+        new URL('../../packages/kernel/src/adapter.ts', import.meta.url)
+      ),
       '@signal-tree/kernel/internals': fileURLToPath(
         new URL('../../packages/kernel/src/internals.ts', import.meta.url)
       ),

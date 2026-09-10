@@ -33,6 +33,38 @@ export type StudioBridgeRequest =
       readonly id: string;
       readonly command: 'readConfirmedTurns';
       readonly treeId: StudioTreeId;
+    }
+  /**
+   * ⚠️ These two ALTER STUDIO INSTRUMENTATION ONLY — they start and stop a
+   * recorder. They are not application-state mutation, and the protocol still
+   * admits no `setValue`, `eval` or rollback command. Recording never begins
+   * merely because DevTools opened; a person asks for it.
+   */
+  | {
+      readonly protocol: number;
+      readonly id: string;
+      readonly command: 'startRealizationCapture';
+      readonly treeId: StudioTreeId;
+      readonly maxEffects?: number;
+    }
+  | {
+      readonly protocol: number;
+      readonly id: string;
+      readonly command: 'stopRealizationCapture';
+      readonly treeId: StudioTreeId;
+    }
+  | {
+      readonly protocol: number;
+      readonly id: string;
+      readonly command: 'readRealizations';
+      readonly treeId: StudioTreeId;
+    }
+  | {
+      readonly protocol: number;
+      readonly id: string;
+      readonly command: 'readCurrentValue';
+      readonly treeId: StudioTreeId;
+      readonly path: string;
     };
 
 export type StudioBridgeResponse<T = unknown> =
@@ -65,7 +97,12 @@ export function isStudioBridgeRequest(value: unknown): value is StudioBridgeRequ
     case 'listTrees':
       return true;
     case 'readConfirmedTurns':
+    case 'startRealizationCapture':
+    case 'stopRealizationCapture':
+    case 'readRealizations':
       return typeof candidate['treeId'] === 'string';
+    case 'readCurrentValue':
+      return typeof candidate['treeId'] === 'string' && typeof candidate['path'] === 'string';
     default:
       return false;
   }
