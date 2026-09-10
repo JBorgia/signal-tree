@@ -73,6 +73,54 @@ stop and replace or extract. If it needs a **narrow correctness repair**, repair
 it independently — as its own kernel fix, like `CausalEffect.path` was — and
 then adopt it.
 
+### JOURNAL-LIVE-0 RESULT — 2026-09-09
+
+Suite: `packages/kernel/src/lib/internals/diagnostics/journal-live-0.spec.ts`
+
+**Falsifier 1 FIRES. The journal captures other trees' writes.**
+
+Verdict per the rule above: **narrow correctness repair, then adopt.** Not a
+model problem, because the kernel already has the mechanism and the journal is
+simply the one authority consumer not using it.
+
+`WriteMetadata.ownerId` exists for exactly this, and says so:
+
+> `NOTIFIER-SCOPE-0`. The path notifier is process-global and every AUTHORITY
+> consumer subscribes with `'**'`, so restoration and transactions receive
+> writes belonging to OTHER trees. **Delivered here so they can decline them**:
+> `positionId` alone cannot say which tree it indexes.
+
+It is stamped broadly — `signal-tree.ts:207` on the core write path,
+`entity-map.ts:262`, plus restoration and transactions — and both
+`restoration.ts:3380` and `transactions.ts:1489` decline on it. The journal
+never checks it.
+
+⚠️ **The repair is not a one-line filter.** `restoration.ts:2624` records a
+hazard directly on this path: a write can arrive with `ownerId: undefined`, and
+*"an owner-filtered observer is blind to every"* such write. So the repair must
+decide deliberately what an absent owner means — dropping them silently would
+trade a cross-tree bug for a missing-evidence bug, which is worse for a tool
+whose entire discipline is *absence is not evidence*.
+
+Tracked as its own kernel fix. Not bundled into S2.
+
+### ⚠️ PRECONDITION — capture needs a flush driver
+
+Found while building the harness, and it nearly invalidated the whole suite.
+
+The journal materializes a turn on a **notifier flush**, and nothing drives one
+on a bare tree — `path-notifier` names restoration as the flush source. A first
+harness on a bare `signalTree` captured **nothing**, which made falsifier 1 pass
+**vacuously**. A falsifier that cannot fail is worse than no falsifier.
+
+So S2 capture carries a composition dependency: it observes only trees whose
+composition drives notifier flushes. That must be **declared as a capability
+precondition**, not assumed — a tree without it would show an empty realization
+history that looks exactly like "no realizations happened."
+
+The suite now pins the precondition as test 0, so the falsifiers can never go
+vacuous again.
+
 ## S2-2 — `attachStudio` stays discovery/inspection only
 
 ```text
