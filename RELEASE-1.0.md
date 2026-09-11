@@ -13271,3 +13271,36 @@ The plugin-stage question is ANSWERED: the plugin emits the broken declaration
 26. Run clean-clone final release matrix.
 27. Publish `1.0.0`.
 28. Verify the published package and documentation from scratch.
+
+
+## Studio tooling release preparation — 2026-09-11
+
+- [x] **Restore legacy causal fixture addresses (`8409ec97`).** Following
+  `7649aa65cc`, 20 spec files now model required `path`/`ownerPath` fields.
+  A pre-edit audit classified 290 direct input records; a separately audited
+  addendum covered six nested stub effects exposed at four diagnostic sites.
+  Whole-owner scalar addresses, shared collection scope and inline member paths
+  remain distinct. Native structural capture is tested with a member path;
+  collection-path equality is asserted only for appropriate abstract fixtures.
+  The settings/profile undo test retains distinct scopes and proves its
+  applied-versus-redo premise before exercising the original outcome.
+- [x] **Validate the fixture migration.** 269 tests across 25 suites pass,
+  including a native entity-field rollback witness. Structural AST comparison
+  preserves all 1,128 original assertions apart from required address metadata.
+  Independent review found no new casts, type assertions or suppressions.
+  The spec-type gate passes with 223 unrelated known diagnostics in 36 files;
+  its baseline was not increased. This fixture commit changes no production code.
+- [x] **Verify the prepared six-package source together.** An independent local
+  checkout reconstructed the package release scope with a fresh frozen install
+  and only the adapter esbuild importer added to the committed lockfile. All six
+  production builds and strict installed-tarball consumers pass. The full release
+  matrix passes 76/76, including the fixture migration and pending Studio package
+  and release-tooling changes. This is combined source validation, not a claim
+  that the fixture commit alone contains the complete release preparation.
+- [ ] **Finish the Studio package release checkpoint and publication.** The
+  remaining package/release preparation is separate from the fixture commit.
+  No new version, tag, push or npm publication has occurred. Proposed evaluation
+  version: 15.1.0-rc.1 on the rc channel. Exact candidate/tag/registry verification
+  remains owed; the broader Studio product backlog and human evaluation remain
+  incomplete. Private application evaluation material is excluded from the
+  package release scope.
