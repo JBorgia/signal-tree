@@ -13371,3 +13371,28 @@ and all79 prior dirty-file hashes remain preserved in its ignored migration
 backup. Public npm publication remains paused; the prior six-package tags are
 not usable release candidates. The active local preview now runs from the
 private workspace at its existing localhost address.
+
+
+### 2026-09-11 — synchronous transaction observation identity
+
+User objective: correlate declared operation context with the exact transaction
+without inferring causality from matching effects or notification timing.
+The existing confirmed reader cannot distinguish a no-op invocation, identical
+effects, reverse confirmation order, or reentrant notification delivery. The
+notification-window candidate was rejected: transaction entry may flush earlier
+queued events before allocating the new transaction ID.
+
+Independent contract review and premise attack accepted the narrow observation
+seam: activeTransactionContext() on /internals projects only the existing ambient
+owner token and transaction ID during the synchronous callback. It is not a
+write-target assertion or evidence of commit, and adds no state, listener, hot-path
+write, root export, operation label, or realization semantics. A wrapper earns
+association by reading at the entry of the callback passed to the actual tree.
+Owner identity is ephemeral and must not be serialized. Async propagation and
+automatic input-dependency attribution remain outside this contract.
+
+Evidence: 18 focused observation tests; full kernel suite 273 files, 2,276 passed,
+7 expected failures, 13 skipped, 1 todo. The prior confirmed reader regressions
+also pass. Production ES2022 root-only consumer bundles before and after are
+byte-for-byte identical: 101,523 minified bytes / 30,781 gzip bytes (esbuild
+0.25.12, tslib external). This is a local development artifact, not an npm release.

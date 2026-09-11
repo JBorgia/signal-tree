@@ -11,6 +11,7 @@
  * enhancer's storage types becoming public surface.
  */
 import type { ISignalTree } from './lib/types';
+import { getActiveWriteContext } from './lib/write-context';
 import { peekInternalTransactionRuntime } from './enhancers/transactions/transactions';
 import { getPositionRegistry } from './lib/internals/position-registry';
 import { getTreeCapabilities } from './lib/internals/tree-capabilities';
@@ -28,6 +29,26 @@ import {
 } from './lib/internals/confirmed-turn-view';
 
 export { StudioTreeDestroyedError } from './lib/internals/confirmed-turn-view';
+
+/**
+ * The transaction active in the current synchronous ambient scope, if any.
+ * This identifies callback scope, not a write target or a committed outcome.
+ * It is absent after the callback returns or throws, including across await.
+ * The owner is an opaque identity token: compare by reference, never serialize.
+ * Reading this projection installs no observation or transaction machinery.
+ */
+export function activeTransactionContext():
+  | { readonly owner: object; readonly id: number }
+  | undefined {
+  const context = getActiveWriteContext();
+  const owner = context?.transactionOwner;
+  const id = context?.transactionId;
+  if (
+    typeof owner !== 'object' || owner === null ||
+    typeof id !== 'number' || !Number.isSafeInteger(id) || id < 0
+  ) return undefined;
+  return { owner, id };
+}
 
 /**
  * The capabilities this tree was CONSTRUCTED with, or `undefined` if the
