@@ -1,3 +1,11 @@
+## Unreleased
+
+- **Release verification tests missing declaration documentation directly.**
+  The gate mutation strips JSDoc from the built kernel root declarations instead
+  of raising a stale count threshold. The production documentation requirement
+  remains unchanged. This replaces the unpublished 15.1.0-rc.1 candidate; package
+  runtime behavior and public APIs are unchanged from that candidate.
+
 ## 15.1.0-rc.1 (2026-09-11)
 
 - **Redux DevTools can display entities by key.** The optional `entityKeyedView`
