@@ -1,5 +1,14 @@
 ## Unreleased
 
+- **Redux DevTools can display entities by key.** The optional `entityKeyedView`
+  setting adds a `byId` display alongside the unchanged `all` array. It is off by
+  default, increases snapshot size, and is omitted when included entities lack
+  an `id`, `key`, or `uuid`.
+- **Committed-record access stays behind the tooling projection.** The internal
+  `getConfirmedTurnRecords` accessor supplies retained records to
+  `confirmedTurnReader` at `@signal-tree/kernel/internals`; tools should use
+  that projected reader rather than the raw transaction runtime.
+
 - **Studio ships as two opt-in tooling packages.** `@signal-tree/studio-query`
   adds `createStudioSession`, tree-scoped `effectKey` and `evidenceRef`, and
   evidence-backed `explainValue`, `currentObservedResponsibility`, `predecessor`,
