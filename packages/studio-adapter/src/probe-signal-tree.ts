@@ -1,3 +1,4 @@
+import { observeOwnerInvalidation } from '@signal-tree/kernel/adapter';
 import {
   confirmedTurnReader,
   treeCapabilities,
@@ -5,7 +6,7 @@ import {
 } from '@signal-tree/kernel/internals';
 
 import { type StudioTreeProbe } from './attach-studio-probe';
-import { readCurrentValue } from './realization/current-value';
+import { readCurrentValue, readCurrentValues } from './realization/current-value';
 import { readStateShape } from './state-shape';
 import { liveCaptureTarget } from './realization/live-target';
 
@@ -18,6 +19,7 @@ import { liveCaptureTarget } from './realization/live-target';
  */
 export interface StudioAttachableTree {
   readonly $: object;
+  readonly destroyed: () => boolean;
   registerCleanup(fn: () => void): void;
 }
 
@@ -43,12 +45,14 @@ export function probeSignalTree(tree: StudioAttachableTree): StudioTreeProbe {
     // capability the tree does not have — see attachStudio's `require`, which
     // can only tighten expectations, never fabricate them.
     confirmedTurnReader: confirmedTurnReader(kernelTree),
+    observeChanges: (notify) => observeOwnerInvalidation(tree, notify),
     onDestroy: (evict) => tree.registerCleanup(evict),
     structure: { capabilities: treeCapabilities(kernelTree) },
     // Built lazily: constructing a target installs nothing, but there is no
     // reason to build one for a tree nobody captures.
     createCaptureTarget: () => liveCaptureTarget(tree, 'pending'),
     readCurrentValue: (path) => readCurrentValue(tree, path),
+    readCurrentValues: (paths) => readCurrentValues(tree, paths),
     readStateShape: (options) => readStateShape(tree, options),
   };
 }

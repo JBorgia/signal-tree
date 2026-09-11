@@ -10,6 +10,7 @@ import { type CaptureTarget } from './lease';
 /** The minimum a real tree must structurally be. */
 export interface LiveTree {
   readonly $: object;
+  readonly destroyed: () => boolean;
   registerCleanup(fn: () => void): void;
 }
 
@@ -59,6 +60,9 @@ export function liveCaptureTarget(
           // Passed through unchanged — the lease decides what an absent owner
           // means, and it degrades scopeIntegrity rather than guessing.
           ownerId: frame.ownerId,
+          transactionId: frame.transactionId,
+          subjectIds: frame.subjectIds,
+          positionIds: frame.positionIds,
         });
       }),
     onDestroy: (dispose) => tree.registerCleanup(dispose),

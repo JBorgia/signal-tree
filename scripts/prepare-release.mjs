@@ -12,9 +12,11 @@ import {
 
 const ROOT = resolve(import.meta.dirname, '..');
 const releaseType = process.argv[2] ?? 'patch';
-const allowed = new Set(['rc', 'patch', 'minor', 'major']);
+const allowed = new Set(['rc', 'minor-rc', 'patch', 'minor', 'major']);
 if (!allowed.has(releaseType)) {
-  throw new Error(`Expected rc, patch, minor, or major; received ${releaseType}`);
+  throw new Error(
+    `Expected rc, minor-rc, patch, minor, or major; received ${releaseType}`
+  );
 }
 const run = (command, args, options = {}) => {
   console.log(`> ${command} ${args.join(' ')}`);
@@ -35,7 +37,14 @@ if (output('git', ['status', '--porcelain'])) {
 const branch = output('git', ['branch', '--show-current']);
 if (!branch) throw new Error('Release preparation requires a named branch');
 run('git', ['fetch', 'origin', '--tags', '--force']);
-if (output('git', ['rev-list', '--left-right', '--count', `origin/${branch}...HEAD`]) !== '0\t0') {
+if (
+  output('git', [
+    'rev-list',
+    '--left-right',
+    '--count',
+    `origin/${branch}...HEAD`,
+  ]) !== '0\t0'
+) {
   throw new Error(`Local ${branch} must exactly match origin/${branch}`);
 }
 
@@ -60,7 +69,10 @@ const releaseOwnedPathspecs = [
   'apps/demo/src/app/library-versions.ts',
 ];
 const originals = new Map(
-  releaseOwnedPaths.map((filePath) => [filePath, readFileSync(filePath, 'utf8')])
+  releaseOwnedPaths.map((filePath) => [
+    filePath,
+    readFileSync(filePath, 'utf8'),
+  ])
 );
 const current = JSON.parse(readFileSync(manifestPaths[0], 'utf8')).version;
 const tags = parseRemoteTagNames(
@@ -71,7 +83,8 @@ const { version: next, resumeFrom } = deriveReleaseVersion(
   releaseType,
   tags
 );
-if (!next) throw new Error(`Cannot derive ${releaseType} version from ${current}`);
+if (!next)
+  throw new Error(`Cannot derive ${releaseType} version from ${current}`);
 if (output('git', ['tag', '--list', `v${next}`])) {
   throw new Error(`Tag v${next} already exists`);
 }
@@ -99,10 +112,14 @@ try {
   run('git', ['commit', '-m', `chore(release): prepare ${next}`]);
 } catch (error) {
   try {
-    execFileSync('git', ['restore', '--staged', '--', ...releaseOwnedPathspecs], {
-      cwd: ROOT,
-      stdio: 'ignore',
-    });
+    execFileSync(
+      'git',
+      ['restore', '--staged', '--', ...releaseOwnedPathspecs],
+      {
+        cwd: ROOT,
+        stdio: 'ignore',
+      }
+    );
   } catch {
     // Preserve the original failure; restoring file bytes below remains useful.
   }

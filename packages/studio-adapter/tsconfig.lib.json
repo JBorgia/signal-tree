@@ -8,20 +8,18 @@
     "declarationMap": true,
     "inlineSources": false,
     "module": "ESNext",
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "paths": {
       "@signal-tree/studio-query": [
-        "dist/packages/studio-query/dist/index.d.ts"
+        "dist/packages/studio-query/src/index.d.ts"
+      ],
+      "@signal-tree/kernel": ["dist/packages/kernel/dist/index.d.ts"],
+      "@signal-tree/kernel/adapter": ["dist/packages/kernel/dist/adapter.d.ts"],
+      "@signal-tree/kernel/internals": [
+        "dist/packages/kernel/dist/internals.d.ts"
       ]
     }
   },
-  "exclude": [
-    "src/**/*.spec.ts",
-    "vitest.config.ts"
-  ],
-  "include": [
-    "src/**/*.ts"
-  ]
+  "exclude": ["src/**/*.spec.ts", "vitest.config.ts"],
+  "include": ["src/**/*.ts"]
 }

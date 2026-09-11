@@ -198,3 +198,22 @@ describe('currentObservedResponsibility checks the LIVE value', () => {
     expect(r.source).toMatchObject({ kind: 'unknown', reason: 'no-retained-evidence' });
   });
 });
+
+describe('transported object matches remain epistemically weak', () => {
+  it('finds cloned candidates without claiming an authoring cause', () => {
+    const before = { price: 10, flags: new Set(['a', 'b']) };
+    const after = { price: 12 };
+    const realization = rz(2, 'cart', structuredClone(before), after);
+    const set: EvidenceSet = { transactions: [tx(1, 'cart', {}, before)], realizations: [realization], coverage: coverage() };
+    expect(priorProducerFor(set, realization).value.map((t) => t.turnId)).toEqual([1]);
+    expect(currentObservedResponsibility(set, 'cart', val(structuredClone(after))).value.source.kind).toBe('realization');
+    expect(explainValue(set, 'cart').value.find((c) => c.code === 'AUTHORING_CAUSE_UNKNOWN')?.classification).toBe('unknown');
+  });
+  it('returns unknown responsibility and no candidates for unsupported values', () => {
+    const value = new Uint8Array([1]);
+    const realization = rz(2, 'cart', value, value);
+    const set: EvidenceSet = { transactions: [tx(1, 'cart', 0, value)], realizations: [realization], coverage: coverage() };
+    expect(priorProducerFor(set, realization).value).toEqual([]);
+    expect(currentObservedResponsibility(set, 'cart', val(value)).value.source.kind).toBe('unknown');
+  });
+});

@@ -1,3 +1,37 @@
+## Unreleased
+
+- **Studio ships as two opt-in tooling packages.** `@signal-tree/studio-query`
+  adds `createStudioSession`, tree-scoped `effectKey` and `evidenceRef`, and
+  evidence-backed `explainValue`, `currentObservedResponsibility`, `predecessor`,
+  `priorProducerFor`, `latestRealization`, `realizations`, `realizationsForPath`
+  and `absenceCaveats`. Queries preserve unknowns and distinguish committed
+  transaction consequences from observed realizations; event timing alone does
+  not prove a causal relationship.
+- **The Studio adapter attaches to an existing tree without owning its state.**
+  `attachStudio`, `attachStudioProbe`, `probeSignalTree`, `S1_CAPABILITIES` and
+  `StudioRequirementError` establish capability checks. `captureConfirmedTurns`
+  and `toStudioTurn` normalize retained committed records; `createTreeIdentityRegistry`
+  and `peekRegistry` keep tooling identity separate from application identity.
+  `readCurrentValue`, `readStateShape`, `realizationSupport` and `liveCaptureTarget`
+  inspect canonical state. `createRealizationCapture`, `startRealizationCapture`,
+  `isCaptureActive` and `StudioCaptureError` expose bounded, explicit recording
+  with retention and unsupported-value reporting. These are observation APIs,
+  not a guarantee of complete history or pending transaction visibility.
+- **An explicit browser bridge lives at `@signal-tree/studio-adapter/bridge`.**
+  `installStudioBridge`, `uninstallStudioBridge`, `studioBridgeInstalled`,
+  `handleStudioRequest`, `isStudioBridgeRequest`, `STUDIO_CONNECT`,
+  `STUDIO_PROTOCOL_VERSION` and `STUDIO_SCHEMA_VERSION` provide the opt-in
+  request/response protocol; importing the module does not install it.
+- **Kernel tooling exports are packaged at `@signal-tree/kernel/internals`.**
+  `treeRuntimeId`, `treeCapabilities`, `confirmedTurnReader`, `observeWrites`
+  and `StudioTreeDestroyedError` provide the existing observation seam alongside
+  its read-only view types. Kernel and framework root exports remain unchanged;
+  Studio and the framework facade must resolve the same kernel instance.
+- **Release validation covers all six packages in dependency order.**
+  Additive evaluation candidates use `release:minor-rc` to prepare the next
+  minor RC through the existing gated signed-tag workflow. This entry records
+  unreleased work, not a published version or completed human evaluation.
+
 ## 15.0.0 (2026-09-06)
 
 - **React selectors render canonical state on the server.** `useSignalTree()`

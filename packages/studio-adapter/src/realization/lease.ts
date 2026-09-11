@@ -23,12 +23,17 @@ export interface CaptureTarget {
 
 export interface RealizationLease {
   snapshot(): RealizationCaptureSnapshot;
+  isPaused(): boolean;
+  pause(): void;
+  resume(): void;
+  clear(): void;
   /** Idempotent. */
   dispose(): void;
 }
 
 export interface StartCaptureOptions {
   readonly maxEffects?: number;
+  readonly maxBytes?: number;
 }
 
 /**
@@ -89,23 +94,35 @@ export function startRealizationCapture(
     throw new StudioCaptureError({ code: 'STUDIO_CAPTURE_ALREADY_ACTIVE' });
   }
 
-  const capture: RealizationCapture = createRealizationCapture({
-    treeId: target.treeId,
-    ownerId: target.ownerId,
-    maxEffects: options.maxEffects,
+  const create = () => createRealizationCapture({
+    treeId: target.treeId, ownerId: target.ownerId,
+    maxEffects: options.maxEffects, maxBytes: options.maxBytes,
   });
-
-  const uninstall = target.observe((frame) => capture.accept(frame));
-
+  let capture: RealizationCapture = create();
+  let uninstall: (() => void) | undefined = target.observe((frame) => capture.accept(frame));
   let disposed = false;
+  let interrupted = false;
   const lease: RealizationLease = {
-    snapshot: () => capture.snapshot(),
+    snapshot: () => {
+      const snapshot = capture.snapshot();
+      return interrupted ? {...snapshot, coverage: {...snapshot.coverage, interrupted: true}} : snapshot;
+    },
+    isPaused: () => !uninstall,
+    pause() {
+      if (disposed || !uninstall) return;
+      uninstall(); uninstall = undefined; interrupted = true;
+    },
+    resume() {
+      if (!disposed && !uninstall) uninstall = target.observe((frame) => capture.accept(frame));
+    },
+    clear() {
+      if (disposed) return;
+      capture.dispose(); capture = create(); interrupted = !uninstall;
+    },
     dispose() {
-      if (disposed) {
-        return;
-      }
+      if (disposed) return;
       disposed = true;
-      uninstall();
+      uninstall?.(); uninstall = undefined;
       capture.dispose();
       active.delete(target.treeId);
     },
@@ -119,7 +136,8 @@ export function startRealizationCapture(
 
 /** Whether a capture is currently active for this tree. Never creates one. */
 export function isCaptureActive(treeId: StudioTreeId): boolean {
-  return active.has(treeId);
+  const lease = active.get(treeId);
+  return lease !== undefined && !lease.isPaused();
 }
 
 /**

@@ -1,3 +1,4 @@
+import { clearStudioHistory, pauseStudioRecording, readStudioTurns, resumeStudioRecording, studioHistoryEpoch } from './recording';
 import { REALIZATION_CAPABILITY } from '../capabilities';
 import { peekRegistry } from '../registry';
 import { realizationSupport } from '../realization/support';
@@ -53,6 +54,30 @@ export function handleStudioRequest(
         value: { protocol: STUDIO_PROTOCOL_VERSION, schema: STUDIO_SCHEMA_VERSION },
       };
 
+    case 'readInspection': {
+      if (!peekRegistry()?.attachment(request.treeId)) {
+        return { ...envelope, ok: false, error: { code: 'STUDIO_TREE_NOT_FOUND' } };
+      }
+      // No awaits or scheduled work: publication tasks cannot interleave these
+      // existing reads. This does not expose pending work as confirmed history.
+      const common = { protocol: request.protocol, id: request.id, treeId: request.treeId };
+      return { ...envelope, ok: true, value: {
+        turns: handleStudioRequest({ ...common, command: 'readConfirmedTurns', knownTurnIds: request.knownTurnIds, historyEpoch: request.historyEpoch }),
+        realizations: handleStudioRequest({ ...common, command: 'readRealizations', captureId: request.captureId, afterSequence: request.afterSequence }),
+        values: handleStudioRequest({ ...common, command: 'readCurrentValues', paths: request.paths }),
+        ...(request.includeStructure ? { structure: handleStudioRequest({ ...common, command: 'readStateShape' }) } : {}),
+      } };
+    }
+
+    case 'pauseStudioRecording':
+    case 'resumeStudioRecording':
+    case 'clearStudioHistory': {
+      if (!peekRegistry()?.attachment(request.treeId)) return {...envelope,ok:false,error:{code:'STUDIO_TREE_NOT_FOUND'}};
+      if (request.command === 'pauseStudioRecording') pauseStudioRecording(request.treeId);
+      else if (request.command === 'resumeStudioRecording') resumeStudioRecording(request.treeId);
+      else clearStudioHistory(request.treeId);
+      return {...envelope,ok:true,value:{updated:true}};
+    }
     case 'listTrees':
       // A dropped registry means zero attached trees — a meaningful answer, not
       // an error. "Studio installed, nothing attached" and "no Studio at all"
@@ -64,6 +89,10 @@ export function handleStudioRequest(
      * starts merely because DevTools opened.
      */
     case 'startRealizationCapture': {
+      if ((request.maxEffects !== undefined && (!Number.isSafeInteger(request.maxEffects) || request.maxEffects < 1 || request.maxEffects > 10000)) ||
+          (request.maxBytes !== undefined && (!Number.isSafeInteger(request.maxBytes) || request.maxBytes < 1 || request.maxBytes > 16 * 1024 * 1024))) {
+        return {...envelope,ok:false,error:{code:'STUDIO_INVALID_LIMIT'}};
+      }
       const attachment = peekRegistry()?.attachment(request.treeId);
       if (!attachment) {
         return { ...envelope, ok: false, error: { code: 'STUDIO_TREE_NOT_FOUND' } };
@@ -93,7 +122,7 @@ export function handleStudioRequest(
       try {
         startRealizationCapture(
           { ...target, treeId: request.treeId },
-          { maxEffects: request.maxEffects }
+          { maxEffects: request.maxEffects, maxBytes: request.maxBytes }
         );
       } catch (cause) {
         if (!(cause instanceof StudioCaptureError)) {
@@ -139,9 +168,12 @@ export function handleStudioRequest(
               // the moment it stops observing.
               const lease = peekCapture(request.treeId);
               return lease
-                ? { support: 'supported', capture: 'active', snapshot: lease.snapshot() }
+                ? { support: 'supported', capture: lease.isPaused() ? 'paused' : 'active', snapshot: lease.snapshot() }
                 : { support: 'supported', capture: 'inactive' };
             })();
+      if (result.support === 'supported' && result.capture !== 'inactive' && request.captureId === result.snapshot.captureId && Number.isSafeInteger(request.afterSequence)) {
+        return {...envelope,ok:true,value:{...result,snapshot:{...result.snapshot,effects:result.snapshot.effects.filter(effect => effect.sequence > request.afterSequence!)}}};
+      }
       return { ...envelope, ok: true, value: result };
     }
 
@@ -152,6 +184,17 @@ export function handleStudioRequest(
         return { ...envelope, ok: false, error: { code: 'STUDIO_TREE_NOT_FOUND' } };
       }
       return { ...envelope, ok: true, value: attachment.readCurrentValue(request.path) };
+    }
+
+    case 'readCurrentValues': {
+      const attachment = peekRegistry()?.attachment(request.treeId);
+      if (!attachment?.readCurrentValues) {
+        return { ...envelope, ok: false, error: { code: 'STUDIO_TREE_NOT_FOUND' } };
+      }
+      return {
+        ...envelope, ok: true,
+        value: { values: attachment.readCurrentValues(request.paths) },
+      };
     }
 
     /** Structure, not values. See `state-shape.ts`. */
@@ -175,9 +218,15 @@ export function handleStudioRequest(
       if (!registry) {
         return { ...envelope, ok: false, error: { code: 'STUDIO_TREE_NOT_FOUND' } };
       }
-      const result = registry.readConfirmedTurns(request.treeId);
+      const result = readStudioTurns(request.treeId)!;
+      const known = new Set(request.knownTurnIds);
       return result.ok
-        ? { ...envelope, ok: true, value: result.value }
+        ? { ...envelope, ok: true, value: {...result.value,
+            historyEpoch:studioHistoryEpoch(request.treeId),
+            reset:request.historyEpoch !== studioHistoryEpoch(request.treeId) || !Array.isArray(request.knownTurnIds) || request.knownTurnIds.length > 500,
+            turns:request.historyEpoch === studioHistoryEpoch(request.treeId) && Array.isArray(request.knownTurnIds) && request.knownTurnIds.length <= 500
+              ? result.value.turns.filter(turn => !known.has(turn.id)) : result.value.turns,
+          } }
         : { ...envelope, ok: false, error: result.error };
     }
   }

@@ -71,6 +71,19 @@ export function readStateShape(
 ): StateShapeResult {
   const maxDepth = options.maxDepth ?? DEFAULT_MAX_DEPTH;
   const maxKeys = options.maxKeys ?? DEFAULT_MAX_KEYS;
+  if (
+    !Number.isInteger(maxDepth) ||
+    maxDepth < 1 ||
+    maxDepth > 32 ||
+    !Number.isInteger(maxKeys) ||
+    maxKeys < 1 ||
+    maxKeys > 1000
+  ) {
+    return {
+      ok: false,
+      reason: 'Shape limits require maxDepth 1–32 and maxKeys 1–1000 integers',
+    };
+  }
 
   let root: unknown;
   try {
@@ -82,37 +95,64 @@ export function readStateShape(
     return { ok: true, shape: { nodes: [], truncated: false } };
   }
 
+  let addressError: string | undefined;
   let truncated = false;
+  let remainingNodes = 2000; // Global output ceiling, independent of branching factor.
 
   const walk = (value: object, prefix: string, depth: number): StateNode[] => {
     const keys = Object.keys(value);
+    // The bridge and kernel use dotted paths without an escape syntax. Refuse
+    // this view instead of emitting two identical canvas addresses or hiding
+    // a literal key while pretending the structure is complete.
+    if (keys.some((key) => key.length === 0 || key.includes('.'))) {
+      addressError =
+        'State shape unavailable: literal dotted or empty keys cannot be represented unambiguously by Studio dot-separated paths.';
+      return [];
+    }
     const shown = keys.slice(0, maxKeys);
     if (shown.length < keys.length) {
       truncated = true;
     }
 
-    return shown.map((key): StateNode => {
-      const path = prefix ? `${prefix}.${key}` : key;
-      const child = (value as Record<string, unknown>)[key];
-
-      if (!isBranch(child)) {
-        return { key, path, kind: 'leaf' };
-      }
-      if (depth + 1 >= maxDepth) {
-        // ⚠️ STILL A BRANCH. Emitting `kind: 'leaf'` here would assert the
-        // state ends at this location, which this read has not established.
+    const nodes: StateNode[] = [];
+    for (const key of shown) {
+      if (remainingNodes === 0) {
         truncated = true;
-        return { key, path, kind: 'branch', truncated: 'depth' };
+        break;
       }
-
-      const children = walk(child as object, path, depth + 1);
-      const total = Object.keys(child as object).length;
-      return children.length < total
-        ? { key, path, kind: 'branch', children, truncated: 'breadth' }
-        : { key, path, kind: 'branch', children };
-    });
+      remainingNodes--;
+      const path = prefix ? `${prefix}.${key}` : key;
+      if (path.length > 2048) {
+        addressError =
+          'State shape unavailable: a path exceeds the 2048-character address limit.';
+        return [];
+      }
+      const descriptor = Object.getOwnPropertyDescriptor(value, key)!;
+      if (!('value' in descriptor)) {
+        addressError =
+          'State shape unavailable: accessor properties cannot be safely enumerated.';
+        return [];
+      }
+      const child = descriptor.value;
+      if (!isBranch(child)) {
+        nodes.push({ key, path, kind: 'leaf' });
+      } else if (depth + 1 >= maxDepth) {
+        truncated = true;
+        nodes.push({ key, path, kind: 'branch', truncated: 'depth' });
+      } else {
+        const children = walk(child as object, path, depth + 1);
+        const total = Object.keys(child as object).length;
+        nodes.push(
+          children.length < total
+            ? { key, path, kind: 'branch', children, truncated: 'breadth' }
+            : { key, path, kind: 'branch', children }
+        );
+      }
+    }
+    return nodes;
   };
 
   const nodes = walk(root as object, '', 0);
+  if (addressError) return { ok: false, reason: addressError };
   return { ok: true, shape: { nodes, truncated } };
 }

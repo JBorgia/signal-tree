@@ -156,8 +156,8 @@ function barrelsFor(pkgDir) {
     const types = typeof entry === 'object' ? entry?.types : entry;
     if (typeof types !== 'string' || !types.endsWith('.d.ts')) continue;
     const sourceEntry = subpath === '.' ? 'index' : subpath.replace(/^\.\//, '');
-    const src = join(pkgDir, 'src', `${sourceEntry}.ts`);
-    out.add(relative(ROOT, src));
+    const src = [join(pkgDir, 'src', `${sourceEntry}.ts`), join(pkgDir, 'src', sourceEntry, 'index.ts')].find(existsSync);
+    if (src) out.add(relative(ROOT, src));
   }
   return [...out];
 }

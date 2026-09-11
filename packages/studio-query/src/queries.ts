@@ -1,3 +1,4 @@
+import { compareTransportedValues } from './value-equality';
 import { absenceCaveats, type RealizationCoverage, type UnknownReason } from './coverage';
 import {
   evidenceRef,
@@ -84,7 +85,7 @@ export function priorProducerFor(
   }
   const target = effect.before.value;
   const candidates = set.transactions.filter((t) =>
-    t.effects.some((e) => e.path === effect.path && Object.is(e.after, target))
+    t.effects.some((e) => e.path === effect.path && compareTransportedValues(e.after, target) === 'equal')
   );
   return answer(candidates, set);
 }
@@ -126,10 +127,10 @@ export function currentObservedResponsibility(
   const matches =
     latest.after.kind === 'value' &&
     currentValue.kind === 'value' &&
-    Object.is(latest.after.value, currentValue.value);
+    compareTransportedValues(latest.after.value, currentValue.value) === 'equal';
 
   if (!matches) {
-    // Later activity exists that this capture did not observe.
+    // A differing or uncomparable live value cannot establish a retained match.
     return answer(
       { path, currentValue, source: { kind: 'unknown', reason: 'no-retained-evidence' }, confidence: 'derived' },
       set

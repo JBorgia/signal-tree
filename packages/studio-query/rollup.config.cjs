@@ -1,15 +1,14 @@
 const { withNx } = require('@nx/rollup/with-nx');
 
-// These options were migrated by @nx/rollup:convert-to-inferred from project.json
 const options = {
   main: './src/index.ts',
-  additionalEntryPoints: ['./src/adapter.ts', './src/internals.ts'],
+  additionalEntryPoints: [],
   tsConfig: './tsconfig.lib.prod.json',
-  outputPath: '../../dist/packages/kernel',
+  outputPath: '../../dist/packages/studio-query',
   format: ['esm'],
   assets: [
     {
-      input: 'packages/kernel',
+      input: 'packages/studio-query',
       glob: 'README.md',
       output: '.',
     },
@@ -24,9 +23,14 @@ const options = {
       output: '.',
     },
     {
-      input: 'packages/kernel',
+      input: 'packages/studio-query',
       glob: 'package.json',
       output: '.',
+    },
+    {
+      input: 'packages/studio-query/src',
+      glob: '**/*.d.ts',
+      output: './src',
     },
   ],
   deleteOutputPath: true,
@@ -34,12 +38,7 @@ const options = {
   generatePackageJson: false,
 };
 
-let config = withNx(options, {
-  // Provide additional rollup configuration here. See: https://rollupjs.org/configuration-options
-  // e.g.
-  // output: { sourcemap: true },
-});
-
+let config = withNx(options, {});
 config = require('./rollup.custom.mjs').default(config, options);
 
 module.exports = config;

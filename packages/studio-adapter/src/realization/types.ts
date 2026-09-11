@@ -32,12 +32,17 @@ export type CapturedValue =
  * transaction net consequence.
  */
 export interface RealizationEffect {
+  readonly captureId?: string;
   readonly sequence: number;
   readonly path: string;
   readonly ownerPath: string;
   readonly before: CapturedValue;
   readonly after: CapturedValue;
-  readonly origin?: 'external' | 'restoration' | 'devtools' | 'transaction-rollback';
+  readonly origin?:
+    | 'external'
+    | 'restoration'
+    | 'devtools'
+    | 'transaction-rollback';
   readonly participation: 'realized';
   /**
    * Present only when existing semantics supplied it. **Never inferred from
@@ -45,6 +50,10 @@ export interface RealizationEffect {
    * causation.
    */
   readonly transactionId?: number;
+  readonly subjectIds?: readonly number[];
+  readonly positionIds?: readonly number[];
+  /** Source metadata exceeded the bounded identity payload; no partial list is asserted. */
+  readonly metadataOmitted?: true;
 }
 
 /**
@@ -58,6 +67,7 @@ export interface RealizationEffect {
 export type ScopeIntegrity = 'complete' | 'incomplete-unscoped-evidence';
 
 export interface RealizationCoverage {
+  readonly interrupted?: boolean;
   /**
    * ⚠️ ALWAYS `false`. Studio has no mechanism that can PROVE capture began
    * before any relevant state activity, and "we installed it early" is not
@@ -71,6 +81,9 @@ export interface RealizationCoverage {
 
 export interface RealizationRetention {
   readonly capacity: number;
+  /** Conservative accounted bytes, not engine heap usage. */
+  readonly maxBytes?: number;
+  readonly retainedBytes?: number;
   readonly retained: number;
   /** Captured evidence existed and has since been evicted. */
   readonly truncated: boolean;
@@ -79,6 +92,7 @@ export interface RealizationRetention {
 }
 
 export interface RealizationCaptureSnapshot {
+  readonly captureId?: string;
   readonly treeId: StudioTreeId;
   readonly coverage: RealizationCoverage;
   readonly retention: RealizationRetention;
@@ -96,11 +110,14 @@ export interface RealizationCaptureSnapshot {
  * ```
  */
 export type RealizationSupport =
-  | { readonly state: 'unsupported'; readonly reason: 'leaf-observation-unavailable' }
+  | {
+      readonly state: 'unsupported';
+      readonly reason: 'leaf-observation-unavailable';
+    }
   | { readonly state: 'supported'; readonly capture: 'inactive' }
   | {
       readonly state: 'supported';
-      readonly capture: 'active';
+      readonly capture: 'active' | 'paused';
       readonly snapshot: RealizationCaptureSnapshot;
     };
 
@@ -113,10 +130,13 @@ export type RealizationSupport =
  * "no realizations happened since capture began".
  */
 export type RealizationReadResult =
-  | { readonly support: 'unsupported'; readonly reason: 'leaf-observation-unavailable' }
+  | {
+      readonly support: 'unsupported';
+      readonly reason: 'leaf-observation-unavailable';
+    }
   | { readonly support: 'supported'; readonly capture: 'inactive' }
   | {
       readonly support: 'supported';
-      readonly capture: 'active';
+      readonly capture: 'active' | 'paused';
       readonly snapshot: RealizationCaptureSnapshot;
     };
