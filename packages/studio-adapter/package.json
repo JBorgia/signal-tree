@@ -1,6 +1,6 @@
 {
   "name": "@signal-tree/studio-adapter",
-  "version": "15.0.0",
+  "version": "15.1.0-rc.1",
   "description": "Opt-in bridge from the SignalTree kernel observation seam to Studio.",
   "license": "Apache-2.0",
   "type": "module",
