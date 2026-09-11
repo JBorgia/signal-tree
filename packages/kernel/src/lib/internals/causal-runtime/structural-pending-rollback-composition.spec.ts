@@ -43,6 +43,8 @@ describe('structural pending rollback production composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'A',
           after: 'B',
@@ -55,6 +57,8 @@ describe('structural pending rollback production composition', () => {
       id: 2,
       effects: [
         {
+          path: 'profile.B.name',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: 'Alice',
           after: 'Alicia',
@@ -88,9 +92,13 @@ describe('structural pending rollback production composition', () => {
         appliedEffects.push(
           effects.map((effect) => ({
             ...effect,
-            structural: (effect as ReversalEffect & { structural?: 'add' | 'remove' | 'rekey' })
-              .structural,
-            subjectId: (effect as ReversalEffect & { subjectId?: unknown }).subjectId,
+            structural: (
+              effect as ReversalEffect & {
+                structural?: 'add' | 'remove' | 'rekey';
+              }
+            ).structural,
+            subjectId: (effect as ReversalEffect & { subjectId?: unknown })
+              .subjectId,
           }))
         );
 
@@ -130,6 +138,8 @@ describe('structural pending rollback production composition', () => {
       id: confirmed.id,
       effects: [
         {
+          path: 'profile.B.name',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: 'Alice',
           after: 'Alicia',
@@ -169,6 +179,8 @@ describe('structural pending rollback production composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'A',
           after: 'B',
@@ -181,6 +193,8 @@ describe('structural pending rollback production composition', () => {
       id: 2,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'B',
           after: 'C',
@@ -246,6 +260,8 @@ describe('structural pending rollback production composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: undefined,
           after: 'A',
@@ -256,7 +272,15 @@ describe('structural pending rollback production composition', () => {
     });
     const confirmed = store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_THEME, before: 'light', after: 'dark' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'light',
+          after: 'dark',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
@@ -284,9 +308,13 @@ describe('structural pending rollback production composition', () => {
         appliedEffects.push(
           effects.map((effect) => ({
             ...effect,
-            structural: (effect as ReversalEffect & { structural?: 'add' | 'remove' | 'rekey' })
-              .structural,
-            subjectId: (effect as ReversalEffect & { subjectId?: unknown }).subjectId,
+            structural: (
+              effect as ReversalEffect & {
+                structural?: 'add' | 'remove' | 'rekey';
+              }
+            ).structural,
+            subjectId: (effect as ReversalEffect & { subjectId?: unknown })
+              .subjectId,
           }))
         );
 
@@ -353,6 +381,8 @@ describe('structural pending rollback production composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: undefined,
           after: 'A',
@@ -360,6 +390,8 @@ describe('structural pending rollback production composition', () => {
           structural: 'add',
         },
         {
+          path: 'profile.A.name',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: undefined,
           after: 'Alice',
@@ -368,6 +400,11 @@ describe('structural pending rollback production composition', () => {
       ],
     });
 
+    expect(pending.effects[0]?.ownerPath).toBe('profile');
+    expect(pending.effects[0]?.path).toBe(pending.effects[0]?.ownerPath);
+    expect(pending.effects[1]?.ownerPath).toBe('profile');
+    expect(pending.effects[1]?.path).toBe('profile.A.name');
+    expect(pending.effects[1]?.path).not.toBe(pending.effects[1]?.ownerPath);
     const values = new Map<PositionId, unknown>([
       [P_DRIVER_KEY, 'A'],
       [P_DRIVER_NAME, 'Alice'],
@@ -392,9 +429,13 @@ describe('structural pending rollback production composition', () => {
         appliedEffects.push(
           effects.map((effect) => ({
             ...effect,
-            structural: (effect as ReversalEffect & { structural?: 'add' | 'remove' | 'rekey' })
-              .structural,
-            subjectId: (effect as ReversalEffect & { subjectId?: unknown }).subjectId,
+            structural: (
+              effect as ReversalEffect & {
+                structural?: 'add' | 'remove' | 'rekey';
+              }
+            ).structural,
+            subjectId: (effect as ReversalEffect & { subjectId?: unknown })
+              .subjectId,
           }))
         );
 
@@ -432,8 +473,6 @@ describe('structural pending rollback production composition', () => {
     expect(store.hasPendingTurn(pending.id)).toBe(false);
   });
 
-
-
   it('refuses pending remove rollback after later same-subject structural supersession', () => {
     const topology = createPositionRegistry();
     const root = topology.allocate();
@@ -455,6 +494,8 @@ describe('structural pending rollback production composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'A',
           after: undefined,
@@ -467,6 +508,8 @@ describe('structural pending rollback production composition', () => {
       id: 2,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: undefined,
           after: 'B',
@@ -527,12 +570,16 @@ describe('structural pending rollback production composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.A.name',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: 'Alice',
           after: undefined,
           subjectId: SUBJECT_DRIVER,
         },
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'A',
           after: undefined,
@@ -542,6 +589,11 @@ describe('structural pending rollback production composition', () => {
       ],
     });
 
+    expect(pending.effects[1]?.ownerPath).toBe('profile');
+    expect(pending.effects[1]?.path).toBe(pending.effects[1]?.ownerPath);
+    expect(pending.effects[0]?.ownerPath).toBe('profile');
+    expect(pending.effects[0]?.path).toBe('profile.A.name');
+    expect(pending.effects[0]?.path).not.toBe(pending.effects[0]?.ownerPath);
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
     const appliedBefore = appliedTurns.inspect();
@@ -618,12 +670,16 @@ describe('structural pending rollback production composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.A.name',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: 'Alice',
           after: undefined,
           subjectId: SUBJECT_DRIVER,
         },
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'A',
           after: undefined,
@@ -636,6 +692,8 @@ describe('structural pending rollback production composition', () => {
       id: 2,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: undefined,
           after: 'A',
@@ -694,6 +752,8 @@ describe('structural pending rollback production composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'A',
           after: 'B',
@@ -706,6 +766,8 @@ describe('structural pending rollback production composition', () => {
       id: 2,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: undefined,
           after: 'A',

@@ -32,11 +32,27 @@ describe('pending rollback production composition', () => {
     });
     const pending = store.admitPending({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
     const confirmed = store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'B',
+          after: 'C',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
     const confirmedStoreBeforeRollback = store.inspect();
@@ -97,6 +113,8 @@ describe('pending rollback production composition', () => {
 
     expect(appliedEffects[1]).toEqual([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'C',
         after: 'A',
@@ -117,6 +135,8 @@ describe('pending rollback production composition', () => {
 
     expect(appliedEffects[2]).toEqual([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'A',
         after: 'C',
@@ -145,8 +165,20 @@ describe('pending rollback production composition', () => {
     const pending = store.admitPending({
       id: 1,
       effects: [
-        { owner: P_FIRST_NAME, before: 'A', after: 'B' },
-        { owner: P_FIRST_NAME, before: 'B', after: 'C' },
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'A',
+          after: 'B',
+        },
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'B',
+          after: 'C',
+        },
       ],
     });
 
@@ -219,13 +251,33 @@ describe('pending rollback production composition', () => {
     const pending = store.admitPending({
       id: 1,
       effects: [
-        { owner: P_FIRST_NAME, before: 'A', after: 'B' },
-        { owner: P_THEME, before: 'X', after: 'Y' },
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'A',
+          after: 'B',
+        },
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'X',
+          after: 'Y',
+        },
       ],
     });
     const confirmed = store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'B',
+          after: 'C',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
@@ -289,6 +341,8 @@ describe('pending rollback production composition', () => {
 
     expect(appliedEffects[1]).toEqual([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'C',
         after: 'A',
@@ -317,11 +371,27 @@ describe('pending rollback production composition', () => {
     });
     const t1 = store.admitPending({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
     const t2 = store.admitPending({
       id: 2,
-      effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'B',
+          after: 'C',
+        },
+      ],
     });
 
     const values = new Map<PositionId, unknown>([[P_FIRST_NAME, 'C']]);

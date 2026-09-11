@@ -16,16 +16,22 @@ describe('applyReversalPlan', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 'Ada',
           after: 'Grace',
         },
         {
+          path: 'profile.lastName',
+          ownerPath: 'profile.lastName',
           owner: P_LAST_NAME,
           before: 'Lovelace',
           after: 'Hopper',
         },
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: P_THEME,
           before: 'light',
           after: 'dark',
@@ -49,16 +55,22 @@ describe('applyReversalPlan', () => {
     expect(applyAtomically).toHaveBeenCalledTimes(1);
     expect(applyAtomically).toHaveBeenCalledWith([
       {
+        path: 'settings.theme',
+        ownerPath: 'settings.theme',
         owner: P_THEME,
         before: 'dark',
         after: 'light',
       },
       {
+        path: 'profile.lastName',
+        ownerPath: 'profile.lastName',
         owner: P_LAST_NAME,
         before: 'Hopper',
         after: 'Lovelace',
       },
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Grace',
         after: 'Ada',
@@ -74,6 +86,8 @@ describe('applyReversalPlan', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 'Ada',
           after: 'Grace',

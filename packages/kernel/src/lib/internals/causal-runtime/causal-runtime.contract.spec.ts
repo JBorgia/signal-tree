@@ -38,13 +38,10 @@ type RedoResult = ReversalResult<
 >;
 
 type RollbackResult = ReversalResult<
-  | { readonly kind: 'dependency-conflict' }
-  | { readonly kind: 'turn-evicted' }
+  { readonly kind: 'dependency-conflict' } | { readonly kind: 'turn-evicted' }
 >;
 
-type PendingLifecycleResult = ReversalResult<
-  | { readonly kind: 'turn-evicted' }
->;
+type PendingLifecycleResult = ReversalResult<{ readonly kind: 'turn-evicted' }>;
 
 interface RuntimeSnapshot {
   values: Record<string, unknown>;
@@ -197,11 +194,12 @@ class ContractRuntime {
     const latestIntersectingTurn = [...this.appliedTurnIds]
       .reverse()
       .map((turnId) => this.confirmedTurns.find(({ id }) => id === turnId))
-      .find((turn) =>
-        turn !== undefined &&
-        turn.participants.some((participant) =>
-          this.isContainedWithin(authority, participant)
-        )
+      .find(
+        (turn) =>
+          turn !== undefined &&
+          turn.participants.some((participant) =>
+            this.isContainedWithin(authority, participant)
+          )
       );
 
     if (!latestIntersectingTurn) {
@@ -245,7 +243,8 @@ class ContractRuntime {
     }
 
     const restoresValidPrefix = turn.participants.every(
-      (participant) => this.getFirstUnappliedTurnIdForParticipant(participant) === turn.id
+      (participant) =>
+        this.getFirstUnappliedTurnIdForParticipant(participant) === turn.id
     );
     if (!restoresValidPrefix) {
       return 'prefix-blocked';
@@ -387,25 +386,24 @@ class ContractRuntime {
     });
     const currentByOwner = new Map<PositionId, unknown>();
 
-    return [...turn.effects]
-      .reverse()
-      .map((effect) => {
-        const originalIndex = turn.effects.indexOf(effect);
-        const before = currentByOwner.has(effect.owner)
-          ? currentByOwner.get(effect.owner)
-          : this.currentValues[effect.owner];
-        const after = firstEffectIndexByOwner.get(effect.owner) === originalIndex
+    return [...turn.effects].reverse().map((effect) => {
+      const originalIndex = turn.effects.indexOf(effect);
+      const before = currentByOwner.has(effect.owner)
+        ? currentByOwner.get(effect.owner)
+        : this.currentValues[effect.owner];
+      const after =
+        firstEffectIndexByOwner.get(effect.owner) === originalIndex
           ? projectedValues[effect.owner]
           : effect.before;
 
-        currentByOwner.set(effect.owner, after);
+      currentByOwner.set(effect.owner, after);
 
-        return {
-          owner: effect.owner,
-          before,
-          after,
-        };
-      });
+      return {
+        owner: effect.owner,
+        before,
+        after,
+      };
+    });
   }
 
   private createConfirmedReapplyEffects(
@@ -428,7 +426,9 @@ class ContractRuntime {
     });
   }
 
-  private computeValues(appliedTurnIds: readonly number[]): Record<string, unknown> {
+  private computeValues(
+    appliedTurnIds: readonly number[]
+  ): Record<string, unknown> {
     const values = { ...this.baselineValues };
     const activeConfirmedTurns = appliedTurnIds
       .map((turnId) => this.confirmedTurns.find(({ id }) => id === turnId))
@@ -524,7 +524,10 @@ class ContractRuntime {
     }
   }
 
-  private isContainedWithin(authority: PositionId, participant: PositionId): boolean {
+  private isContainedWithin(
+    authority: PositionId,
+    participant: PositionId
+  ): boolean {
     let current: PositionId | undefined = participant;
 
     while (current) {
@@ -572,7 +575,9 @@ class ContractRuntime {
 
     this.redoTurns = this.redoTurns.filter(
       (turn) =>
-        !turn.participants.some((participant) => participantSet.has(participant))
+        !turn.participants.some((participant) =>
+          participantSet.has(participant)
+        )
     );
   }
 }
@@ -670,6 +675,8 @@ describe('CausalRuntime contract', () => {
 
     const turn = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
@@ -693,11 +700,15 @@ describe('CausalRuntime contract', () => {
     });
     const turn = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
       },
       {
+        path: 'settings.theme',
+        ownerPath: 'settings.theme',
         owner: P_THEME,
         before: 'light',
         after: 'dark',
@@ -730,11 +741,15 @@ describe('CausalRuntime contract', () => {
 
     runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
       },
       {
+        path: 'profile.lastName',
+        ownerPath: 'profile.lastName',
         owner: P_LAST_NAME,
         before: 'Lovelace',
         after: 'Hopper',
@@ -742,11 +757,15 @@ describe('CausalRuntime contract', () => {
     ]);
     runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Grace',
         after: 'Katherine',
       },
       {
+        path: 'settings.theme',
+        ownerPath: 'settings.theme',
         owner: P_THEME,
         before: 'light',
         after: 'dark',
@@ -770,6 +789,8 @@ describe('CausalRuntime contract', () => {
 
     const t1 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
@@ -781,11 +802,15 @@ describe('CausalRuntime contract', () => {
     });
     const t2 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Grace',
         after: 'Katherine',
       },
       {
+        path: 'profile.lastName',
+        ownerPath: 'profile.lastName',
         owner: P_LAST_NAME,
         before: 'Lovelace',
         after: 'Hopper',
@@ -797,6 +822,8 @@ describe('CausalRuntime contract', () => {
     });
     const t3 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Katherine',
         after: 'Joan',
@@ -844,11 +871,15 @@ describe('CausalRuntime contract', () => {
 
     const turn = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
       },
       {
+        path: 'settings.theme',
+        ownerPath: 'settings.theme',
         owner: P_THEME,
         before: 'light',
         after: 'dark',
@@ -856,6 +887,8 @@ describe('CausalRuntime contract', () => {
     ]);
     runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Grace',
         after: 'Katherine',
@@ -873,6 +906,8 @@ describe('CausalRuntime contract', () => {
 
     const pendingTurn = runtime.addPendingTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'A',
         after: 'B',
@@ -902,6 +937,8 @@ describe('CausalRuntime contract', () => {
 
     const pendingTurn = runtime.addPendingTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'A',
         after: 'B',
@@ -946,6 +983,8 @@ describe('CausalRuntime contract', () => {
 
     const t0 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'A',
         after: 'B',
@@ -958,6 +997,8 @@ describe('CausalRuntime contract', () => {
 
     const pendingTurn = runtime.addPendingTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'A',
         after: 'C',
@@ -1005,6 +1046,8 @@ describe('CausalRuntime contract', () => {
 
     const pendingTurn = runtime.addPendingTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'A',
         after: 'B',
@@ -1035,6 +1078,8 @@ describe('CausalRuntime contract', () => {
 
     const pendingTurn = runtime.addPendingTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'A',
         after: 'B',
@@ -1043,6 +1088,8 @@ describe('CausalRuntime contract', () => {
 
     runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'B',
         after: 'C',
@@ -1066,6 +1113,8 @@ describe('CausalRuntime contract', () => {
 
     const pendingTurn = runtime.addPendingTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'A',
         after: 'B',
@@ -1073,6 +1122,8 @@ describe('CausalRuntime contract', () => {
     ]);
     const confirmedTurn = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'B',
         after: 'C',
@@ -1115,6 +1166,8 @@ describe('CausalRuntime contract', () => {
       id: confirmedTurn.id,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 'B',
           after: 'C',
@@ -1148,6 +1201,8 @@ describe('CausalRuntime contract', () => {
       id: confirmedTurn.id,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 'B',
           after: 'C',
@@ -1166,6 +1221,8 @@ describe('CausalRuntime contract', () => {
 
     const pendingTurn = runtime.addPendingTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'A',
         after: 'B',
@@ -1173,11 +1230,15 @@ describe('CausalRuntime contract', () => {
     ]);
     const confirmedTurn = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'B',
         after: 'C',
       },
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'C',
         after: 'D',
@@ -1251,11 +1312,15 @@ describe('CausalRuntime contract', () => {
       id: confirmedTurn.id,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 'B',
           after: 'C',
         },
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 'C',
           after: 'D',
@@ -1274,6 +1339,8 @@ describe('CausalRuntime contract', () => {
 
     const pendingRekey = rollbackAllowed.addPendingTurn([
       {
+        path: 'drivers',
+        ownerPath: 'drivers',
         owner: P_ENTITY_KEY,
         before: 'driver-1',
         after: 'driver-2',
@@ -1284,6 +1351,8 @@ describe('CausalRuntime contract', () => {
 
     rollbackAllowed.confirmTurn([
       {
+        path: 'drivers.driver-2.name',
+        ownerPath: 'drivers',
         owner: P_ENTITY_NAME,
         before: 'Alice',
         after: 'Alicia',
@@ -1306,6 +1375,8 @@ describe('CausalRuntime contract', () => {
 
     const blockedPendingRekey = rollbackRefused.addPendingTurn([
       {
+        path: 'drivers',
+        ownerPath: 'drivers',
         owner: P_ENTITY_KEY,
         before: 'driver-1',
         after: 'driver-2',
@@ -1316,6 +1387,8 @@ describe('CausalRuntime contract', () => {
 
     rollbackRefused.confirmTurn([
       {
+        path: 'drivers',
+        ownerPath: 'drivers',
         owner: P_ENTITY_KEY,
         before: 'driver-2',
         after: undefined,
@@ -1343,6 +1416,8 @@ describe('CausalRuntime contract', () => {
 
     const turn = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
@@ -1401,11 +1476,15 @@ describe('CausalRuntime contract', () => {
 
     const t1 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 0,
         after: 1,
       },
       {
+        path: 'settings.theme',
+        ownerPath: 'settings.theme',
         owner: P_THEME,
         before: 0,
         after: 1,
@@ -1417,6 +1496,8 @@ describe('CausalRuntime contract', () => {
     });
     const t2 = runtime.confirmTurn([
       {
+        path: 'settings.theme',
+        ownerPath: 'settings.theme',
         owner: P_THEME,
         before: 1,
         after: 2,
@@ -1428,6 +1509,8 @@ describe('CausalRuntime contract', () => {
     });
     const t3 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 1,
         after: 3,
@@ -1467,6 +1550,8 @@ describe('CausalRuntime contract', () => {
 
     runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 0,
         after: 1,
@@ -1474,11 +1559,15 @@ describe('CausalRuntime contract', () => {
     ]);
     const t2 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 1,
         after: 2,
       },
       {
+        path: 'settings.theme',
+        ownerPath: 'settings.theme',
         owner: P_THEME,
         before: 0,
         after: 2,
@@ -1508,6 +1597,8 @@ describe('CausalRuntime contract', () => {
 
     runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 1,
         after: 3,
@@ -1541,6 +1632,8 @@ describe('CausalRuntime contract', () => {
 
     const t1 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'A',
         after: 'B',
@@ -1554,6 +1647,8 @@ describe('CausalRuntime contract', () => {
 
     runtime.confirmTurn([
       {
+        path: 'settings.notifications',
+        ownerPath: 'settings.notifications',
         owner: P_NOTIFICATIONS,
         before: false,
         after: true,
@@ -1587,11 +1682,15 @@ describe('CausalRuntime contract', () => {
 
     const t1 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'A',
         after: 'B',
       },
       {
+        path: 'settings.theme',
+        ownerPath: 'settings.theme',
         owner: P_THEME,
         before: 'light',
         after: 'dark',
@@ -1605,6 +1704,8 @@ describe('CausalRuntime contract', () => {
 
     runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'B',
         after: 'C',
@@ -1639,11 +1740,15 @@ describe('CausalRuntime contract', () => {
 
     const t1 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
       },
       {
+        path: 'profile.lastName',
+        ownerPath: 'profile.lastName',
         owner: P_LAST_NAME,
         before: 'Lovelace',
         after: 'Hopper',
@@ -1655,11 +1760,15 @@ describe('CausalRuntime contract', () => {
     });
     const t2 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Grace',
         after: 'Joan',
       },
       {
+        path: 'settings.theme',
+        ownerPath: 'settings.theme',
         owner: P_THEME,
         before: 'light',
         after: 'dark',
@@ -1694,6 +1803,8 @@ describe('CausalRuntime contract', () => {
 
     const turn = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
@@ -1729,6 +1840,8 @@ describe('CausalRuntime contract', () => {
 
     const turn = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
@@ -1770,11 +1883,15 @@ describe('CausalRuntime contract', () => {
 
     const t1 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
       },
       {
+        path: 'profile.lastName',
+        ownerPath: 'profile.lastName',
         owner: P_LAST_NAME,
         before: 'Lovelace',
         after: 'Hopper',
@@ -1786,6 +1903,8 @@ describe('CausalRuntime contract', () => {
     });
     const t2 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Grace',
         after: 'Joan',
@@ -1848,6 +1967,8 @@ describe('CausalRuntime contract', () => {
 
     const t1 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
@@ -1859,6 +1980,8 @@ describe('CausalRuntime contract', () => {
     });
     const t2 = runtime.confirmTurn([
       {
+        path: 'settings.theme',
+        ownerPath: 'settings.theme',
         owner: P_THEME,
         before: 'light',
         after: 'dark',
@@ -1913,6 +2036,8 @@ describe('CausalRuntime contract', () => {
 
     const t1 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
@@ -1920,6 +2045,8 @@ describe('CausalRuntime contract', () => {
     ]);
     const t2 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Grace',
         after: 'Joan',
@@ -1948,6 +2075,8 @@ describe('CausalRuntime contract', () => {
 
     const t1 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
@@ -1959,11 +2088,15 @@ describe('CausalRuntime contract', () => {
     });
     const t2 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Grace',
         after: 'Joan',
       },
       {
+        path: 'settings.theme',
+        ownerPath: 'settings.theme',
         owner: P_THEME,
         before: 'light',
         after: 'dark',
@@ -1999,6 +2132,8 @@ describe('CausalRuntime contract', () => {
 
     const t1 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
@@ -2010,6 +2145,8 @@ describe('CausalRuntime contract', () => {
     });
     const t2 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Grace',
         after: 'Joan',
@@ -2046,11 +2183,15 @@ describe('CausalRuntime contract', () => {
 
     const turn = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
       },
       {
+        path: 'settings.theme',
+        ownerPath: 'settings.theme',
         owner: P_THEME,
         before: 'light',
         after: 'dark',
@@ -2090,6 +2231,8 @@ describe('CausalRuntime contract', () => {
 
     const turn = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
@@ -2130,6 +2273,8 @@ describe('CausalRuntime contract', () => {
 
     const turn = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
@@ -2176,6 +2321,8 @@ describe('CausalRuntime contract', () => {
 
     const t1 = runtime.confirmTurn([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'Ada',
         after: 'Grace',
@@ -2187,6 +2334,8 @@ describe('CausalRuntime contract', () => {
     });
     const t2 = runtime.confirmTurn([
       {
+        path: 'settings.theme',
+        ownerPath: 'settings.theme',
         owner: P_THEME,
         before: 'light',
         after: 'dark',

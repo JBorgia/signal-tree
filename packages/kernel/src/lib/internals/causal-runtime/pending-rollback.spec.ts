@@ -1,3 +1,5 @@
+import { signalTree, transactions, entityMap } from '../../../index';
+import { confirmedTurnReader } from '../../../internals';
 import { createEntitySignal } from '../../entity-signal';
 import type { PositionId, ReversalEffect } from './causal-types';
 import { AppliedTurnProjection } from './applied-turn-projection';
@@ -6,10 +8,7 @@ import {
   createPositionRegistry,
   type PositionRegistry,
 } from '../position-registry';
-import {
-  getOwnedPositionIds,
-  getOwnedSubjectIds,
-} from '../owned-metadata';
+import { getOwnedPositionIds, getOwnedSubjectIds } from '../owned-metadata';
 import { createRealizationContextSource } from './realization-context';
 import { runPhysicalMaintenance } from './subject-reclamation-coordinator';
 import { TurnStore } from './turn-store';
@@ -31,6 +30,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: undefined,
           after: 'shared',
@@ -38,6 +39,8 @@ describe('rollbackPendingTurnAt', () => {
           structural: 'add',
         },
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: undefined,
           after: 'shared',
@@ -46,9 +49,8 @@ describe('rollbackPendingTurnAt', () => {
         },
       ],
     });
-    const applyAtomically = vi.fn<
-      (effects: readonly ReversalEffect[]) => void
-    >();
+    const applyAtomically =
+      vi.fn<(effects: readonly ReversalEffect[]) => void>();
 
     expect(
       rollbackPendingTurnAt({
@@ -72,6 +74,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'shared',
           after: 'next',
@@ -84,6 +88,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 2,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: undefined,
           after: 'shared',
@@ -92,9 +98,12 @@ describe('rollbackPendingTurnAt', () => {
         },
       ],
     });
-    const applyAtomically = vi.fn<
-      (effects: readonly ReversalEffect[]) => void
-    >();
+    expect(pending.effects[0]?.ownerPath).toBe('profile');
+    expect(pending.effects[0]?.path).toBe(pending.effects[0]?.ownerPath);
+    expect(store.getTurn(2)?.effects[0]?.ownerPath).toBe('profile');
+    expect(store.getTurn(2)?.effects[0]?.path).toBe('profile');
+    const applyAtomically =
+      vi.fn<(effects: readonly ReversalEffect[]) => void>();
 
     expect(
       rollbackPendingTurnAt({
@@ -117,16 +126,23 @@ describe('rollbackPendingTurnAt', () => {
 
     const confirmed = store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'Ada',
+          after: 'Grace',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
     const appliedBefore = appliedTurns.inspect();
-    const applyAtomically = vi.fn<
-      (effects: readonly ReversalEffect[]) => void
-    >();
+    const applyAtomically =
+      vi.fn<(effects: readonly ReversalEffect[]) => void>();
 
     expect(
       rollbackPendingTurnAt({
@@ -154,15 +170,22 @@ describe('rollbackPendingTurnAt', () => {
 
     const pending = store.admitPending({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'Ada',
+          after: 'Grace',
+        },
+      ],
     });
 
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
     const appliedBefore = appliedTurns.inspect();
-    const applyAtomically = vi.fn<
-      (effects: readonly ReversalEffect[]) => void
-    >();
+    const applyAtomically =
+      vi.fn<(effects: readonly ReversalEffect[]) => void>();
 
     expect(
       rollbackPendingTurnAt({
@@ -192,6 +215,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'driver-1',
           after: 'driver-2',
@@ -204,6 +229,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 2,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'driver-2',
           after: undefined,
@@ -217,9 +244,8 @@ describe('rollbackPendingTurnAt', () => {
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
     const appliedBefore = appliedTurns.inspect();
-    const applyAtomically = vi.fn<
-      (effects: readonly ReversalEffect[]) => void
-    >();
+    const applyAtomically =
+      vi.fn<(effects: readonly ReversalEffect[]) => void>();
 
     expect(
       rollbackPendingTurnAt({
@@ -247,6 +273,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'A',
           after: undefined,
@@ -261,6 +289,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 2,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: undefined,
           after: 'A',
@@ -271,9 +301,8 @@ describe('rollbackPendingTurnAt', () => {
       participants: [P_DRIVER_KEY],
       state: 'confirmed' as const,
     };
-    const applyAtomically = vi.fn<
-      (effects: readonly ReversalEffect[]) => void
-    >();
+    const applyAtomically =
+      vi.fn<(effects: readonly ReversalEffect[]) => void>();
     const validateEffects = vi.fn();
     const store = {
       getPendingTurn: () => pendingRemove,
@@ -317,6 +346,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'A',
           after: 'B',
@@ -331,6 +362,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 2,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: undefined,
           after: 'A',
@@ -341,9 +374,8 @@ describe('rollbackPendingTurnAt', () => {
       participants: [P_DRIVER_KEY],
       state: 'pending' as const,
     };
-    const applyAtomically = vi.fn<
-      (effects: readonly ReversalEffect[]) => void
-    >();
+    const applyAtomically =
+      vi.fn<(effects: readonly ReversalEffect[]) => void>();
     const validateEffects = vi.fn();
     const store = {
       getPendingTurn: () => pendingRekey,
@@ -385,13 +417,20 @@ describe('rollbackPendingTurnAt', () => {
   it('leaves all state untouched when prepared discard refuses after planning', () => {
     const turn = {
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'Ada',
+          after: 'Grace',
+        },
+      ],
       participants: [P_FIRST_NAME],
       state: 'pending' as const,
     };
-    const applyAtomically = vi.fn<
-      (effects: readonly ReversalEffect[]) => void
-    >();
+    const applyAtomically =
+      vi.fn<(effects: readonly ReversalEffect[]) => void>();
     const store = {
       getPendingTurn: () => turn,
       getPendingTurns: () => [turn],
@@ -429,6 +468,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'driver-1',
           after: undefined,
@@ -439,9 +480,8 @@ describe('rollbackPendingTurnAt', () => {
       participants: [P_DRIVER_KEY],
       state: 'pending' as const,
     };
-    const applyAtomically = vi.fn<
-      (effects: readonly ReversalEffect[]) => void
-    >();
+    const applyAtomically =
+      vi.fn<(effects: readonly ReversalEffect[]) => void>();
     const store = {
       getPendingTurn: () => turn,
       getPendingTurns: () => [turn],
@@ -483,11 +523,27 @@ describe('rollbackPendingTurnAt', () => {
 
     const pending = store.admitPending({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'Ada',
+          after: 'Grace',
+        },
+      ],
     });
     const confirmed = store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_THEME, before: 'light', after: 'dark' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'light',
+          after: 'dark',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
@@ -550,6 +606,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 1,
       effects: [
         {
+          path: 'users.1.name',
+          ownerPath: 'users',
           owner: P_DRIVER_NAME,
           before: 'Alice',
           after: 'Alicia',
@@ -600,6 +658,8 @@ describe('rollbackPendingTurnAt', () => {
           applyAtomically: vi.fn((effects: readonly ReversalEffect[]) => {
             expect(effects).toEqual([
               {
+                path: 'users.1.name',
+                ownerPath: 'users',
                 owner: P_DRIVER_NAME,
                 before: 'Alicia',
                 after: 'Alice',
@@ -685,6 +745,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 1,
       effects: [
         {
+          path: 'users.1.name',
+          ownerPath: 'users',
           owner: P_DRIVER_NAME,
           before: 'Alice',
           after: 'Alicia',
@@ -744,6 +806,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'driver-1',
           after: 'driver-2',
@@ -756,6 +820,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 2,
       effects: [
         {
+          path: 'profile.driver-2.name',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: 'Alice',
           after: 'Alicia',
@@ -823,6 +889,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'driver-1',
           after: 'driver-2',
@@ -835,6 +903,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 2,
       effects: [
         {
+          path: 'profile.driver-2.name',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: 'Alice',
           after: 'Alicia',
@@ -895,6 +965,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'driver-1',
           after: undefined,
@@ -902,6 +974,8 @@ describe('rollbackPendingTurnAt', () => {
           structural: 'remove',
         },
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'driver-2',
           after: undefined,
@@ -963,6 +1037,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'driver-1',
           after: 'driver-2',
@@ -975,6 +1051,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 2,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'driver-2',
           after: undefined,
@@ -987,9 +1065,8 @@ describe('rollbackPendingTurnAt', () => {
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
     const appliedBefore = appliedTurns.inspect();
-    const applyAtomically = vi.fn<
-      (effects: readonly ReversalEffect[]) => void
-    >();
+    const applyAtomically =
+      vi.fn<(effects: readonly ReversalEffect[]) => void>();
 
     expect(
       rollbackPendingTurnAt({
@@ -1019,6 +1096,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: undefined,
           after: 'driver-1',
@@ -1031,6 +1110,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 2,
       effects: [
         {
+          path: 'profile.driver-1.name',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: undefined,
           after: 'Alice',
@@ -1040,12 +1121,18 @@ describe('rollbackPendingTurnAt', () => {
     });
     expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
+    expect(pendingAdd.effects[0]?.ownerPath).toBe('profile');
+    expect(pendingAdd.effects[0]?.path).toBe(pendingAdd.effects[0]?.ownerPath);
+    expect(store.getTurn(2)?.effects[0]?.ownerPath).toBe('profile');
+    expect(store.getTurn(2)?.effects[0]?.path).toBe('profile.driver-1.name');
+    expect(store.getTurn(2)?.effects[0]?.path).not.toBe(
+      store.getTurn(2)?.effects[0]?.ownerPath
+    );
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
     const appliedBefore = appliedTurns.inspect();
-    const applyAtomically = vi.fn<
-      (effects: readonly ReversalEffect[]) => void
-    >();
+    const applyAtomically =
+      vi.fn<(effects: readonly ReversalEffect[]) => void>();
 
     expect(
       rollbackPendingTurnAt({
@@ -1075,6 +1162,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: undefined,
           after: 'driver-1',
@@ -1087,6 +1176,8 @@ describe('rollbackPendingTurnAt', () => {
       id: 2,
       effects: [
         {
+          path: 'profile.driver-1.name',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: undefined,
           after: 'Alice',
@@ -1095,12 +1186,20 @@ describe('rollbackPendingTurnAt', () => {
       ],
     });
 
+    expect(pendingAdd.effects[0]?.ownerPath).toBe('profile');
+    expect(pendingAdd.effects[0]?.path).toBe(pendingAdd.effects[0]?.ownerPath);
+    expect(store.getPendingTurn(2)?.effects[0]?.ownerPath).toBe('profile');
+    expect(store.getPendingTurn(2)?.effects[0]?.path).toBe(
+      'profile.driver-1.name'
+    );
+    expect(store.getPendingTurn(2)?.effects[0]?.path).not.toBe(
+      store.getPendingTurn(2)?.effects[0]?.ownerPath
+    );
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
     const appliedBefore = appliedTurns.inspect();
-    const applyAtomically = vi.fn<
-      (effects: readonly ReversalEffect[]) => void
-    >();
+    const applyAtomically =
+      vi.fn<(effects: readonly ReversalEffect[]) => void>();
 
     expect(
       rollbackPendingTurnAt({
@@ -1152,3 +1251,72 @@ function createPendingRollbackContext(): {
 
   return { store, appliedTurns, topology };
 }
+
+describe('production address witness for the abstract topology fixtures', () => {
+  it('retains member addresses under shared entity ownership and rolls back one inline field independently', () => {
+    const tree = signalTree(
+      {
+        profile: { firstName: 'Ada' },
+        users: entityMap<
+          { id: string; name: string; enabled: boolean },
+          string
+        >(),
+      },
+      { enhancers: [transactions()] }
+    );
+    try {
+      tree
+        .transaction(() =>
+          tree.$.users.addOne({ id: 'A', name: 'Alice', enabled: true })
+        )
+        .confirm();
+      tree
+        .transaction(() => {
+          tree.$.profile.firstName('Grace');
+          tree.$.users.byIdOrFail('A').name('Alicia');
+          tree.$.users.byIdOrFail('A').enabled(false);
+        })
+        .confirm();
+      const records = confirmedTurnReader(tree)?.readConfirmedTurns().turns;
+      const add = records?.[0]?.effects[0];
+      expect(add?.kind).toBe('add');
+      expect(add?.ownerPath).toBe('users');
+      // Native structural notification addresses the member, unlike abstract collection-level fixtures.
+      expect(add?.path).toBe('users.A');
+      const effects = records?.[1]?.effects ?? [];
+      const scalar = effects.find(
+        (effect) => effect.path === 'profile.firstName'
+      );
+      expect(scalar?.ownerPath).toBe('profile.firstName');
+      const members = effects.filter((effect) => effect.ownerPath === 'users');
+      expect(members.map((effect) => effect.path).sort()).toEqual([
+        'users.A.enabled',
+        'users.A.name',
+      ]);
+      const collectionPositions = getOwnedPositionIds(tree.$.users);
+      expect(collectionPositions).toHaveLength(1);
+      expect(members.map((effect) => effect.position)).toEqual([
+        collectionPositions?.[0],
+        collectionPositions?.[0],
+      ]);
+      expect(getOwnedPositionIds(tree.$.users.byIdOrFail('A').name)).toEqual(
+        collectionPositions
+      );
+      expect(getOwnedPositionIds(tree.$.users.byIdOrFail('A').enabled)).toEqual(
+        collectionPositions
+      );
+      for (const effect of members) {
+        expect(effect.ownerPath).toBe('users');
+        expect(effect.path).not.toBe(effect.ownerPath);
+      }
+      const pending = tree.transaction(() =>
+        tree.$.users.byIdOrFail('A').name('Temporary')
+      );
+      expect(() => pending.rollback()).not.toThrow();
+      expect(tree.$.users.byIdOrFail('A').name()).toBe('Alicia');
+      expect(tree.$.users.byIdOrFail('A').enabled()).toBe(false);
+    } finally {
+      tree.destroy();
+    }
+  });
+});

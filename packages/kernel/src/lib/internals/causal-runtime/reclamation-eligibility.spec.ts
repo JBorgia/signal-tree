@@ -44,6 +44,8 @@ describe('reclamation eligibility', () => {
       id: 1,
       effects: [
         {
+          path: 'drivers',
+          ownerPath: 'drivers',
           owner: P_DRIVER_KEY,
           before: 'u1',
           after: undefined,
@@ -61,15 +63,15 @@ describe('reclamation eligibility', () => {
         appliedTurns,
       }),
       {
-      eligible: false,
-      blockers: [
-        {
-          kind: 'confirmed-restore-path',
-          turnId: 1,
-          state: 'confirmed-applied',
-          structural: 'remove',
-        },
-      ],
+        eligible: false,
+        blockers: [
+          {
+            kind: 'confirmed-restore-path',
+            turnId: 1,
+            state: 'confirmed-applied',
+            structural: 'remove',
+          },
+        ],
       }
     );
   });
@@ -82,6 +84,8 @@ describe('reclamation eligibility', () => {
       id: 1,
       effects: [
         {
+          path: 'drivers',
+          ownerPath: 'drivers',
           owner: P_DRIVER_KEY,
           before: undefined,
           after: 'u1',
@@ -100,15 +104,15 @@ describe('reclamation eligibility', () => {
         appliedTurns,
       }),
       {
-      eligible: false,
-      blockers: [
-        {
-          kind: 'confirmed-restore-path',
-          turnId: 1,
-          state: 'confirmed-redoable',
-          structural: 'add',
-        },
-      ],
+        eligible: false,
+        blockers: [
+          {
+            kind: 'confirmed-restore-path',
+            turnId: 1,
+            state: 'confirmed-redoable',
+            structural: 'add',
+          },
+        ],
       }
     );
   });
@@ -121,6 +125,8 @@ describe('reclamation eligibility', () => {
       id: 1,
       effects: [
         {
+          path: 'drivers',
+          ownerPath: 'drivers',
           owner: P_DRIVER_KEY,
           before: 'u1',
           after: 'u2',
@@ -138,13 +144,15 @@ describe('reclamation eligibility', () => {
         appliedTurns,
       }),
       {
-      eligible: true,
-      blockers: [],
+        eligible: true,
+        blockers: [],
       }
     );
   });
 
   it('does not let confirmed scalar history alone block reclamation', () => {
+    const member: { id: string; name: string } = { id: 'u1', name: 'Alice' };
+
     const store = new TurnStore();
     const appliedTurns = new AppliedTurnProjection(store);
 
@@ -152,8 +160,10 @@ describe('reclamation eligibility', () => {
       id: 1,
       effects: [
         {
+          path: `drivers.${member.id}.name`,
+          ownerPath: 'drivers',
           owner: P_DRIVER_NAME,
-          before: 'Alice',
+          before: member.name,
           after: 'Alicia',
           subjectId: SUBJECT_DRIVER,
         },
@@ -168,13 +178,15 @@ describe('reclamation eligibility', () => {
         appliedTurns,
       }),
       {
-      eligible: true,
-      blockers: [],
+        eligible: true,
+        blockers: [],
       }
     );
   });
 
   it('blocks reclamation while pending speculative state still references the subject', () => {
+    const member: { id: string; name: string } = { id: 'u1', name: 'Alice' };
+
     const store = new TurnStore();
     const appliedTurns = new AppliedTurnProjection(store);
 
@@ -182,8 +194,10 @@ describe('reclamation eligibility', () => {
       id: 2,
       effects: [
         {
+          path: `drivers.${member.id}.name`,
+          ownerPath: 'drivers',
           owner: P_DRIVER_NAME,
-          before: 'Alice',
+          before: member.name,
           after: 'Alicia',
           subjectId: SUBJECT_DRIVER,
         },
@@ -197,15 +211,15 @@ describe('reclamation eligibility', () => {
         appliedTurns,
       }),
       {
-      eligible: false,
-      blockers: [
-        {
-          kind: 'pending-reference',
-          turnId: 2,
-          state: 'pending',
-          structural: undefined,
-        },
-      ],
+        eligible: false,
+        blockers: [
+          {
+            kind: 'pending-reference',
+            turnId: 2,
+            state: 'pending',
+            structural: undefined,
+          },
+        ],
       }
     );
   });
@@ -218,6 +232,8 @@ describe('reclamation eligibility', () => {
       id: 2,
       effects: [
         {
+          path: 'drivers',
+          ownerPath: 'drivers',
           owner: P_DRIVER_KEY,
           before: 'u1',
           after: 'u2',
@@ -234,15 +250,15 @@ describe('reclamation eligibility', () => {
         appliedTurns,
       }),
       {
-      eligible: false,
-      blockers: [
-        {
-          kind: 'pending-reference',
-          turnId: 2,
-          state: 'pending',
-          structural: 'rekey',
-        },
-      ],
+        eligible: false,
+        blockers: [
+          {
+            kind: 'pending-reference',
+            turnId: 2,
+            state: 'pending',
+            structural: 'rekey',
+          },
+        ],
       }
     );
   });
@@ -255,6 +271,8 @@ describe('reclamation eligibility', () => {
       id: 1,
       effects: [
         {
+          path: 'drivers',
+          ownerPath: 'drivers',
           owner: P_DRIVER_KEY,
           before: 'u1',
           after: undefined,
@@ -269,6 +287,8 @@ describe('reclamation eligibility', () => {
       id: 2,
       effects: [
         {
+          path: 'drivers.u1.name',
+          ownerPath: 'drivers',
           owner: P_DRIVER_NAME,
           before: 'Alice',
           after: 'Alicia',
@@ -284,21 +304,21 @@ describe('reclamation eligibility', () => {
         appliedTurns,
       }),
       {
-      eligible: false,
-      blockers: [
-        {
-          kind: 'pending-reference',
-          turnId: 2,
-          state: 'pending',
-          structural: undefined,
-        },
-        {
-          kind: 'confirmed-restore-path',
-          turnId: 1,
-          state: 'confirmed-applied',
-          structural: 'remove',
-        },
-      ],
+        eligible: false,
+        blockers: [
+          {
+            kind: 'pending-reference',
+            turnId: 2,
+            state: 'pending',
+            structural: undefined,
+          },
+          {
+            kind: 'confirmed-restore-path',
+            turnId: 1,
+            state: 'confirmed-applied',
+            structural: 'remove',
+          },
+        ],
       }
     );
   });
@@ -318,6 +338,8 @@ describe('reclamation eligibility', () => {
       id: 1,
       effects: [
         {
+          path: 'drivers',
+          ownerPath: 'drivers',
           owner: P_DRIVER_KEY,
           before: 'u1',
           after: undefined,
@@ -330,7 +352,15 @@ describe('reclamation eligibility', () => {
 
     const unrelated = store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_DRIVER_NAME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'profile.driverName',
+          ownerPath: 'profile.driverName',
+          owner: P_DRIVER_NAME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(unrelated.id)).toEqual({ ok: true });
 
@@ -341,8 +371,8 @@ describe('reclamation eligibility', () => {
         appliedTurns,
       }),
       {
-      eligible: true,
-      blockers: [],
+        eligible: true,
+        blockers: [],
       }
     );
   });

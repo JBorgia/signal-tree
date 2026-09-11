@@ -16,7 +16,8 @@ describe('pending confirmation', () => {
     } = {};
     const store = new TurnStore({
       capacity: 0,
-      retainEvictedConfirmedTurn: (turn) => sourceRef.current?.retainEvictedConfirmedTurn(turn),
+      retainEvictedConfirmedTurn: (turn) =>
+        sourceRef.current?.retainEvictedConfirmedTurn(turn),
     });
     const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
@@ -28,7 +29,15 @@ describe('pending confirmation', () => {
 
     store.admitPending({
       id: 1,
-      effects: [{ owner: P_THEME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
 
     expect(confirmPendingTurnAt({ turnId: 1, store, appliedTurns })).toEqual({
@@ -48,7 +57,8 @@ describe('pending confirmation', () => {
     } = {};
     const store = new TurnStore({
       capacity: 1,
-      retainEvictedConfirmedTurn: (turn) => sourceRef.current?.retainEvictedConfirmedTurn(turn),
+      retainEvictedConfirmedTurn: (turn) =>
+        sourceRef.current?.retainEvictedConfirmedTurn(turn),
     });
     const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
@@ -60,12 +70,28 @@ describe('pending confirmation', () => {
 
     const earlier = store.admitConfirmed({
       id: 1,
-      effects: [{ owner: P_THEME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(earlier.id)).toEqual({ ok: true });
     store.admitPending({
       id: 2,
-      effects: [{ owner: P_THEME, before: 'B', after: 'C' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'B',
+          after: 'C',
+        },
+      ],
     });
 
     expect(confirmPendingTurnAt({ turnId: 2, store, appliedTurns })).toEqual({
@@ -86,7 +112,8 @@ describe('pending confirmation', () => {
     } = {};
     const store = new TurnStore({
       capacity: 1,
-      retainEvictedConfirmedTurn: (turn) => sourceRef.current?.retainEvictedConfirmedTurn(turn),
+      retainEvictedConfirmedTurn: (turn) =>
+        sourceRef.current?.retainEvictedConfirmedTurn(turn),
     });
     const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
@@ -98,13 +125,31 @@ describe('pending confirmation', () => {
 
     const earlier = store.admitConfirmed({
       id: 1,
-      effects: [{ owner: P_THEME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(earlier.id)).toEqual({ ok: true });
-    expect(appliedTurns.moveConfirmedTurnToRedo(earlier.id)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(earlier.id)).toEqual({
+      ok: true,
+    });
     store.admitPending({
       id: 2,
-      effects: [{ owner: P_THEME, before: 'A', after: 'C' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'A',
+          after: 'C',
+        },
+      ],
     });
 
     expect(confirmPendingTurnAt({ turnId: 2, store, appliedTurns })).toEqual({
@@ -125,7 +170,8 @@ describe('pending confirmation', () => {
     } = {};
     const store = new TurnStore({
       capacity: 2,
-      retainEvictedConfirmedTurn: (turn) => sourceRef.current?.retainEvictedConfirmedTurn(turn),
+      retainEvictedConfirmedTurn: (turn) =>
+        sourceRef.current?.retainEvictedConfirmedTurn(turn),
     });
     const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
@@ -137,19 +183,45 @@ describe('pending confirmation', () => {
 
     const first = store.admitConfirmed({
       id: 1,
-      effects: [{ owner: P_THEME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
     const second = store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_THEME, before: 'B', after: 'C' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'B',
+          after: 'C',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(first.id)).toEqual({ ok: true });
     expect(appliedTurns.admitConfirmed(second.id)).toEqual({ ok: true });
-    expect(appliedTurns.moveConfirmedTurnToRedo(second.id)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(second.id)).toEqual({
+      ok: true,
+    });
 
     store.admitPending({
       id: 3,
-      effects: [{ owner: P_THEME, before: 'B', after: 'D' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'B',
+          after: 'D',
+        },
+      ],
     });
 
     expect(confirmPendingTurnAt({ turnId: 3, store, appliedTurns })).toEqual({
@@ -171,7 +243,8 @@ describe('pending confirmation', () => {
     const observerErrors: unknown[] = [];
     const store = new TurnStore({
       capacity: 0,
-      retainEvictedConfirmedTurn: (turn) => sourceRef.current?.retainEvictedConfirmedTurn(turn),
+      retainEvictedConfirmedTurn: (turn) =>
+        sourceRef.current?.retainEvictedConfirmedTurn(turn),
       onEvictConfirmedTurn: () => {
         throw new Error('observer failure');
       },
@@ -189,7 +262,15 @@ describe('pending confirmation', () => {
 
     store.admitPending({
       id: 1,
-      effects: [{ owner: P_THEME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
 
     expect(confirmPendingTurnAt({ turnId: 1, store, appliedTurns })).toEqual({
@@ -232,7 +313,8 @@ describe('pending confirmation', () => {
     } = {};
     const store = new TurnStore({
       capacity: 0,
-      retainEvictedConfirmedTurn: (turn) => sourceRef.current?.retainEvictedConfirmedTurn(turn),
+      retainEvictedConfirmedTurn: (turn) =>
+        sourceRef.current?.retainEvictedConfirmedTurn(turn),
     });
     const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
@@ -245,6 +327,8 @@ describe('pending confirmation', () => {
       id: 1,
       effects: [
         {
+          path: 'users',
+          ownerPath: 'users',
           owner: P_DRIVER_KEY,
           before: 1,
           after: undefined,
@@ -371,6 +455,8 @@ describe('pending confirmation', () => {
       id: 1,
       effects: [
         {
+          path: 'users.1.name',
+          ownerPath: 'users',
           owner: P_DRIVER_KEY,
           before: 'Alice',
           after: 'Alicia',
@@ -473,6 +559,8 @@ describe('pending confirmation', () => {
       id: 1,
       effects: [
         {
+          path: 'users',
+          ownerPath: 'users',
           owner: P_DRIVER_KEY,
           before: 1,
           after: undefined,
@@ -575,6 +663,8 @@ describe('pending confirmation', () => {
       id: 1,
       effects: [
         {
+          path: 'users',
+          ownerPath: 'users',
           owner: P_DRIVER_KEY,
           before: undefined,
           after: 1,
@@ -584,12 +674,16 @@ describe('pending confirmation', () => {
       ],
     });
     expect(appliedTurns.admitConfirmed(redoableAdd.id)).toEqual({ ok: true });
-    expect(appliedTurns.moveConfirmedTurnToRedo(redoableAdd.id)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(redoableAdd.id)).toEqual({
+      ok: true,
+    });
 
     store.admitPending({
       id: 2,
       effects: [
         {
+          path: 'users',
+          ownerPath: 'users',
           owner: P_DRIVER_KEY,
           before: 1,
           after: 2,

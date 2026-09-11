@@ -20,7 +20,9 @@ import {
 
 type User = { id: number; name: string; active: boolean };
 
-type SubjectReclamationApi = ReturnType<typeof createEntitySignal<User, number>> & {
+type SubjectReclamationApi = ReturnType<
+  typeof createEntitySignal<User, number>
+> & {
   __listSubjectReclamationCandidates?: () => readonly number[];
   __inspectSubjectResources?: (subjectId: number) => unknown;
   __prepareSubjectReclamation?: (
@@ -53,6 +55,10 @@ function makeOwner() {
 
 describe('subject reclamation coordinator', () => {
   it('does not reach physical preparation when causal eligibility is blocked', () => {
+    const member: User = { id: 1, name: 'Alice', active: true };
+    const subjectId = 7;
+    expect(member.id).not.toBe(subjectId);
+
     const store = new TurnStore();
     const appliedTurns = new AppliedTurnProjection(store);
     const prepare = vi.fn();
@@ -62,10 +68,12 @@ describe('subject reclamation coordinator', () => {
       id: 1,
       effects: [
         {
+          path: `users.${member.id}.name`,
+          ownerPath: 'users',
           owner: 3 as PositionId,
-          before: 'Alice',
+          before: member.name,
           after: 'Alicia',
-          subjectId: 7,
+          subjectId: subjectId,
         },
       ],
     });
@@ -173,7 +181,11 @@ describe('subject reclamation coordinator', () => {
     const driftingOwner: SubjectReclamationPhysicalOwner = {
       __prepareSubjectReclamation: (candidate, options) => {
         const prepared = api.__prepareSubjectReclamation?.(candidate, options);
-        api.__restoreOne?.(1, { id: 1, name: 'Alice', active: true }, candidate);
+        api.__restoreOne?.(
+          1,
+          { id: 1, name: 'Alice', active: true },
+          candidate
+        );
         return prepared as any;
       },
       __applyPreparedSubjectReclamation: (prepared) => {
@@ -406,6 +418,8 @@ describe('subject reclamation coordinator', () => {
       id: 11,
       effects: [
         {
+          path: 'users.2.name',
+          ownerPath: 'users',
           owner: 4 as PositionId,
           before: 'Bob',
           after: 'Bobby',
@@ -524,6 +538,8 @@ describe('subject reclamation coordinator', () => {
       id: 12,
       effects: [
         {
+          path: 'users.2.name',
+          ownerPath: 'users',
           owner: 4 as PositionId,
           before: 'Bob',
           after: 'Bobby',
@@ -640,6 +656,8 @@ describe('subject reclamation coordinator', () => {
       id: 13,
       effects: [
         {
+          path: 'users.1.name',
+          ownerPath: 'users',
           owner: 4 as PositionId,
           before: 'Alice',
           after: 'Alicia',
