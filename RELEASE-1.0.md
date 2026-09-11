@@ -13297,9 +13297,11 @@ The plugin-stage question is ANSWERED: the plugin emits the broken declaration
   matrix passes 76/76, including the fixture migration and pending Studio package
   and release-tooling changes. This is combined source validation, not a claim
   that the fixture commit alone contains the complete release preparation.
-- [ ] **Finish the Studio package release checkpoint and publication.** The
-  remaining package/release preparation is separate from the fixture commit.
-  No new version, tag, push or npm publication has occurred. Proposed evaluation
+- [x] **Checkpoint the Studio package release source (`7fa20637`).** The
+  63-file package/release commit includes the minimal validated lockfile change.
+  Uncommitted UI work and private evaluation material remain outside that commit.
+- [ ] **Publish the Studio evaluation candidate.** No new version, tag, push
+  or npm publication has occurred. Proposed evaluation
   version: 15.1.0-rc.1 on the rc channel. Exact candidate/tag/registry verification
   remains owed; the broader Studio product backlog and human evaluation remain
   incomplete. Private application evaluation material is excluded from the
