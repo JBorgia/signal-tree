@@ -13307,9 +13307,22 @@ The plugin-stage question is ANSWERED: the plugin emits the broken declaration
   describe their actual display/internal roles. Explicit 15.0.0 delta coverage
   passes for all 114 additions, alongside README API and numeric-claim checks.
   The failed preparation restored source versions before creating any tag.
-- [ ] **Publish the Studio evaluation candidate.** No new version, tag, push
-  or npm publication has occurred. Proposed evaluation
-  version: 15.1.0-rc.1 on the rc channel. Exact candidate/tag/registry verification
-  remains owed; the broader Studio product backlog and human evaluation remain
-  incomplete. Private application evaluation material is excluded from the
-  package release scope.
+- [x] **Prepare the immutable first Studio candidate (`31b030cd`).** Signed
+  `v15.1.0-rc.1` was pushed after 76/76 local release gates and six-package
+  installed-tarball validation. Independent verification matched all six hashes,
+  package order, candidate commit and signed tag. The original Studio working
+  tree was fast-forwarded with all 79 uncommitted files preserved byte-for-byte.
+- [x] **Repair the declaration gate mutation (`44805555`).** Tagged CI run
+  `34609297591` passed the normal gates but stopped at 64/65 mutation proofs.
+  The old 168-to-169 documentation threshold mutation was inert against the new
+  197-block artifact. The replacement strips JSDoc from the built kernel root
+  declarations, reducing unique shipped documentation to 112 and triggering the
+  unchanged 168-block floor. Focused clean/mutated checks, independent review,
+  all 65/65 mutation proofs and all 76/76 release gates pass. No package runtime,
+  public API, documentation baseline or production checker changed.
+- [ ] **Publish the corrected Studio evaluation candidate.** The signed
+  15.1.0-rc.1 tag remains immutable and UNPUBLISHED; no publisher was dispatched.
+  A new 15.1.0-rc.2 candidate on the rc channel requires version authorization,
+  canonical preparation, tagged CI and exact registry consumer verification.
+  The broader Studio product backlog and human evaluation remain incomplete.
+  Private application evaluation material is excluded from package releases.
