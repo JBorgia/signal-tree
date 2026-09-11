@@ -1,4 +1,4 @@
-## Unreleased
+## 15.1.0-rc.1 (2026-09-11)
 
 - **Redux DevTools can display entities by key.** The optional `entityKeyedView`
   setting adds a `byId` display alongside the unchanged `all` array. It is off by
