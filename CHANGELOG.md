@@ -1,4 +1,4 @@
-## Unreleased
+## 15.1.0-rc.2 (2026-09-11)
 
 - **Release verification tests missing declaration documentation directly.**
   The gate mutation strips JSDoc from the built kernel root declarations instead
