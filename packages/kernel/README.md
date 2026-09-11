@@ -322,6 +322,14 @@ An `ObservationAdapter` supplies dependency tokens and
 changes before framework observers are notified. It never owns or mirrors
 location state.
 
+## Redux DevTools collection display
+
+The optional `entityKeyedView` setting adds an id-keyed `byId` view alongside
+an EntityMap's `all` array in Redux DevTools snapshots. It is off by default
+because it increases payload size. Keys come from `id`, `key`, or `uuid`; the
+keyed view is omitted if any included entity lacks a key. This is display data:
+the existing `all` representation and time-travel hydration remain unchanged.
+
 ## Tooling observation
 
 `@signal-tree/kernel/internals` is a supported observation seam for tools such as
@@ -332,6 +340,10 @@ are not additions to the kernel root API.
 - `treeCapabilities` reports construction capabilities; an empty list is a bare tree.
 - `confirmedTurnReader` reads retained committed consequences without installing history. Its `ConfirmedTurnReader`, `ConfirmedTurnSnapshot`, `ConfirmedTurnView`, `ConfirmedTurnEffectView`, `ConfirmedTurnEffectKind` and `ConfirmedTurnRetention` types describe that window, including retention limits. Reads after destruction throw `StudioTreeDestroyedError`.
 - `observeWrites` subscribes to `ObservedWriteFrame` observation. A notification does not establish a causal relationship, intermediate attempted write, or complete history.
+
+Internally, `getConfirmedTurnRecords` supplies retained records to the tooling
+projection. Tools consume `confirmedTurnReader`; the raw internal transaction
+runtime accessor is not the supported inspection contract.
 
 Studio attaches explicitly through `@signal-tree/studio-adapter`; query and presentation code must retain unknown/unsupported distinctions and must not infer causality from event timing.
 
