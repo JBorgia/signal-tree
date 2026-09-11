@@ -2764,3 +2764,13 @@ any disposition recorded as frozen in RELEASE-1.0.md
 
 _"Should we preserve X because 14.x had it?"_ is not a valid question and is
 answered mechanically by Rule 0n/0o.
+
+
+## Synchronous transaction observation (2026-09-11)
+
+The /internals activeTransactionContext accessor projects the existing ambient
+transaction owner and ID only within the synchronous callback. It introduces no
+new kernel authority or durable causal state. Callback-entry observation can
+identify an invocation; it does not establish commit, read dependencies, a write
+target, or async parentage. See the dated RELEASE-1.0.md observation-identity
+entry for rejected notification matching, independent review and measured cost.
