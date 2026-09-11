@@ -1399,6 +1399,16 @@ const GATES = [
     },
   },
   {
+    name: 'release-plan:self',
+    covers: 'the public release boundary rejects private Studio source, unexpected packages and reversed dependencies',
+    cmd: ['node', 'scripts/release-plan.mjs', '--self-test'],
+    mutation: {
+      file: 'scripts/release-plan.mjs',
+      find: 'return RELEASE_PACKAGES;',
+      replace: 'return [];',
+    },
+  },
+  {
     name: 'release-plan',
     covers:
       'the canonical release set matches publishable manifests and orders kernel before adapters',

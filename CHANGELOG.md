@@ -1,3 +1,13 @@
+## Unreleased
+
+- **Separate paid Studio from public library releases.** Public releases contain
+  the kernel and official Angular, React and Vue packages. Studio source moves
+  to a private development workspace; its application, adapter and query engine
+  are excluded from public npm publication. Existing kernel integration seams
+  remain available. The earlier six-package RC candidates were never published.
+- **Fail closed on Studio source in the public checkout.** Release validation
+  rejects both public and private Studio manifests and unexpected release packages.
+
 ## 15.1.0-rc.2 (2026-09-11)
 
 - **Release verification tests missing declaration documentation directly.**

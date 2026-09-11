@@ -128,3 +128,8 @@ RELEASE-NOTES-*.md
 
 vite.config.*.timestamp*
 vitest.config.*.timestamp*
+
+# Paid Studio lives in a separate private workspace; never stage its source here.
+/apps/studio-devtools/
+/packages/studio-query/
+/packages/studio-adapter/

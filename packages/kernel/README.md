@@ -345,7 +345,7 @@ Internally, `getConfirmedTurnRecords` supplies retained records to the tooling
 projection. Tools consume `confirmedTurnReader`; the raw internal transaction
 runtime accessor is not the supported inspection contract.
 
-Studio attaches explicitly through `@signal-tree/studio-adapter`; query and presentation code must retain unknown/unsupported distinctions and must not infer causality from event timing.
+Studio is a separate private product with an explicit development-only attachment. Its adapter and query engine are not public npm packages. Tooling must retain unknown/unsupported distinctions and must not infer causality from event timing.
 
 ## License
 

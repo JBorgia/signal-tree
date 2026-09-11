@@ -10,8 +10,8 @@ const packageRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const baseConfigFactory = createLibraryRollupConfig({ packageRoot });
 
-const adapterEntityMarkerIdentityPlugin = {
-  name: 'signaltree-adapter-entity-marker-identity',
+const adapterMarkerIdentityPlugin = {
+  name: 'signaltree-adapter-marker-identity',
   renderChunk(code, chunk) {
     if (!chunk.fileName.endsWith('adapter.d.ts')) {
       return null;
@@ -30,18 +30,18 @@ const adapterEntityMarkerIdentityPlugin = {
         statement.declarationList.declarations.some(
           (declaration) =>
             ts.isIdentifier(declaration.name) &&
-            declaration.name.text === 'ENTITY_MAP_BRAND'
+            ['ENTITY_MAP_BRAND', 'LEAF_DEFINITION_TYPE'].includes(declaration.name.text)
         )
     );
     const markerDeclarations = source.statements.filter(
       (statement) =>
         ts.isInterfaceDeclaration(statement) &&
-        statement.name.text === 'EntityMapMarker'
+        ['EntityMapMarker', 'LeafDefinition'].includes(statement.name.text)
     );
 
-    if (brandDeclarations.length !== 1 || markerDeclarations.length !== 1) {
+    if (brandDeclarations.length !== 2 || markerDeclarations.length !== 2) {
       this.error(
-        'adapter declaration must contain exactly one local EntityMapMarker definition.'
+        'adapter declaration must contain one local EntityMapMarker and LeafDefinition, each with its brand.'
       );
     }
 
@@ -56,7 +56,7 @@ const adapterEntityMarkerIdentityPlugin = {
     }
 
     return {
-      code: `import type { EntityMapMarker } from './index.js';\n${transformed}`,
+      code: `import type { EntityMapMarker, LeafDefinition } from './index.js';\n${transformed}`,
       map: null,
     };
   },
@@ -205,7 +205,7 @@ export default (config, options) => {
           '../../dist/packages/kernel/dist/adapter.d.ts'
         ),
         format: 'es',
-        plugins: [adapterEntityMarkerIdentityPlugin],
+        plugins: [adapterMarkerIdentityPlugin],
       },
       plugins: [dts({ respectExternal: true })],
     },

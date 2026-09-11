@@ -2,6 +2,13 @@
 
 Work that is decided and not yet done. **This is not an RFC list.**
 
+## Studio commercial separation
+
+Studio development and its complete implementation/evaluation ledger now live
+in a separate private workspace. The September 11 owner decision supersedes
+historical free-Studio sections below. Public library work keeps only the
+existing observation/realization contracts and four framework/kernel packages.
+
 ## V15 pre-GA source hygiene
 
 - Remove stale internal comments in `signal-tree.ts` that still teach the
@@ -1100,8 +1107,9 @@ the trap questions still count against the result.
 
 Studio is scored against the frozen Cart 88213 incident and its eight
 questions — measured against **the best alternative buildable on SignalTree
-without Studio**: the shipped-API path (`devTools()`, `exportDebugSession()`,
-`audit` `metadata.description`) a developer already has for free. Not against
+without Studio**: the currently shipped `devTools()` / `DevToolsDebugSession` surface plus ordinary
+debugger/logging tools a developer already has for free. A standalone
+`exportDebugSession()` export is not present; the evaluation kit records the verified baseline. Not against
 another framework's tooling, which would anchor Studio's design to a model it
 deliberately does not share.
 

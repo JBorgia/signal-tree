@@ -13326,3 +13326,40 @@ The plugin-stage question is ANSWERED: the plugin emits the broken declaration
   canonical preparation, tagged CI and exact registry consumer verification.
   The broader Studio product backlog and human evaluation remain incomplete.
   Private application evaluation material is excluded from package releases.
+
+
+## Studio commercial boundary — 2026-09-11
+
+The user superseded the free-Studio interpretation and authorized separation:
+public Apache-2.0 kernel/framework packages and existing integration primitives;
+private paid Studio application, attachment/bridge, recording, sessions and
+investigation queries. No pricing or new commercial license terms are set here.
+
+- rc.1 is immutable and unpublished (tagged CI failed its stale mutation proof).
+- rc.2 at b8455615 is immutable and unpublished. Run34615177142 was cancelled;
+  no publisher was dispatched. Both Studio npm package lookups returned404.
+- Source and tags were already pushed to the public repository. This separation
+  protects future work; it is not history erasure or retroactive relicensing.
+- All subsequent public releases must contain only kernel, angular, react, vue.
+  The old six-package tag workflows must not be resumed.
+- Private Studio retains the development and evaluation work and its existing
+  attribution notices. Commercial licensing/distribution and any free tier are
+  separate unresolved product decisions; workspace separation is not a paywall.
+
+
+Commercial separation validation:
+
+- Public source removal preserves all prior Studio development/evaluation files
+  in the private workspace, with an exact original-source migration backup.
+- Four-package builds and installed-tarball consumer checks pass. The private
+  build exposed a root/adapter LeafDefinition declaration identity mismatch;
+  extending the existing EntityMapMarker identity fix closes it. The new packed
+  Angular leaf regression fails before and passes after under Bundler and Node16.
+- Public gates pass77/77; mutation proofs pass66/66, including private-package
+  rejection. No public runtime semantics or exports were changed.
+- Private query31, adapter203 and app113 tests pass; strict consumers and all4
+  runtime identity cases pass. Angular AOT and interactive preview pass. Private
+  lint has0errors and96existing warnings. Initial panel516403bytes is below the
+  unchanged600000-byte budget.
+- Pricing, commercial legal terms, entitlement enforcement and private hosted
+  distribution are not implemented by this workspace migration.
