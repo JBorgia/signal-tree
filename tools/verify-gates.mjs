@@ -1197,14 +1197,13 @@ const GATES = [
     // package-hygiene checks presence. Comments now stay in both outputs and the
     // strip plugin in tools/build/create-rollup-config.mjs removes them from JS.
     //
-    // Kernel declarations are bundled to the public entry surface, so their
-    // source ratio intentionally excludes private docs. Raise the measured
-    // UNIQUE public-doc ratchet by one to prove the aggregate gate catches any
-    // loss without rewarding duplicate re-exports across entrypoints.
+    // Strip the shipped root declarations, reproducing removeComments rather
+    // than moving the checker threshold. The old 168 -> 169 mutation became
+    // inert when the tooling entrypoint increased shipped documentation to 197.
+    // Keep the production floor intact and test the actual damaged artifact.
     mutation: {
-      file: 'tools/check-declaration-docs.mjs',
-      find: 'kernel: 168,',
-      replace: 'kernel: 169,',
+      file: 'dist/packages/kernel/dist/index.d.ts',
+      generate: (original) => original.replace(/\/\*\*[\s\S]*?\*\//g, ''),
     },
   },
   {
