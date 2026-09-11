@@ -13300,6 +13300,13 @@ The plugin-stage question is ANSWERED: the plugin emits the broken declaration
 - [x] **Checkpoint the Studio package release source (`7fa20637`).** The
   63-file package/release commit includes the minimal validated lockfile change.
   Uncommitted UI work and private evaluation material remain outside that commit.
+- [x] **Close final-version documentation gaps (`b3a4a1bb`).** Preparing
+  15.1.0-rc.1 changes the release-claims baseline from 14.1.1 to 15.0.0,
+  exposing the previously unlisted `entityKeyedView` and
+  `getConfirmedTurnRecords` members. The kernel README and changelog now
+  describe their actual display/internal roles. Explicit 15.0.0 delta coverage
+  passes for all 114 additions, alongside README API and numeric-claim checks.
+  The failed preparation restored source versions before creating any tag.
 - [ ] **Publish the Studio evaluation candidate.** No new version, tag, push
   or npm publication has occurred. Proposed evaluation
   version: 15.1.0-rc.1 on the rc channel. Exact candidate/tag/registry verification
