@@ -26,7 +26,8 @@
     "src/**/*.d.ts",
     "README.md",
     "LICENSE",
-    "NOTICE"
+    "NOTICE",
+    "llms.txt"
   ],
   "dependencies": {
     "@signal-tree/studio-query": "workspace:*",
@@ -42,5 +43,8 @@
     "type": "git",
     "url": "git+https://github.com/JBorgia/signal-tree.git",
     "directory": "packages/studio-adapter"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.12"
   }
 }

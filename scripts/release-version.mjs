@@ -28,6 +28,27 @@ const sameBaseRc = (current, tag) => {
 };
 
 export const deriveReleaseVersion = (current, releaseType, tags = []) => {
+  if (releaseType === 'minor-rc') {
+    if (!semver.valid(current) || semver.prerelease(current)) {
+      throw new Error(
+        'minor-rc requires a stable current version; use rc to advance an active candidate'
+      );
+    }
+    const base = semver.inc(current, 'minor');
+    if (tags.some((tag) => semver.valid(tag.replace(/^v/, '')) === base)) {
+      throw new Error(
+        `Minor release ${base} already exists; update the local release baseline first`
+      );
+    }
+    const latest = tags
+      .map((tag) => sameBaseRc(base, tag))
+      .filter(Boolean)
+      .sort(semver.rcompare)[0];
+    return {
+      version: latest ? semver.inc(latest, 'prerelease', 'rc') : `${base}-rc.1`,
+      resumeFrom: undefined,
+    };
+  }
   if (releaseType !== 'rc') {
     const version = semver.inc(current, releaseType);
     const parsedCurrent = semver.parse(current);
@@ -35,7 +56,8 @@ export const deriveReleaseVersion = (current, releaseType, tags = []) => {
       version,
       resumeFrom:
         parsedCurrent?.prerelease.length &&
-        version === `${parsedCurrent.major}.${parsedCurrent.minor}.${parsedCurrent.patch}`
+        version ===
+          `${parsedCurrent.major}.${parsedCurrent.minor}.${parsedCurrent.patch}`
           ? current
           : undefined,
     };
@@ -81,6 +103,19 @@ export const updateCurrentReleaseClaim = (text, version) => {
 const selfTest = () => {
   const cases = [
     {
+      name: 'start additive minor evaluation candidate',
+      actual: deriveReleaseVersion('15.0.0', 'minor-rc', ['v15.0.0-rc.16']),
+      expected: { version: '15.1.0-rc.1', resumeFrom: undefined },
+    },
+    {
+      name: 'advance remote minor candidate numerically',
+      actual: deriveReleaseVersion('15.0.0', 'minor-rc', [
+        'v15.1.0-rc.2',
+        'v15.1.0-rc.10',
+      ]),
+      expected: { version: '15.1.0-rc.11', resumeFrom: undefined },
+    },
+    {
       name: 'resume a same-base RC line after stable preparation',
       actual: deriveReleaseVersion('15.0.0', 'rc', [
         'v15.0.0-rc.12',
@@ -91,16 +126,12 @@ const selfTest = () => {
     },
     {
       name: 'advance an active RC line',
-      actual: deriveReleaseVersion('15.0.0-rc.12', 'rc', [
-        'v15.0.0-rc.12',
-      ]),
+      actual: deriveReleaseVersion('15.0.0-rc.12', 'rc', ['v15.0.0-rc.12']),
       expected: { version: '15.0.0-rc.13', resumeFrom: undefined },
     },
     {
       name: 'promote an active RC line to its stable base',
-      actual: deriveReleaseVersion('15.0.0-rc.16', 'patch', [
-        'v15.0.0-rc.16',
-      ]),
+      actual: deriveReleaseVersion('15.0.0-rc.16', 'patch', ['v15.0.0-rc.16']),
       expected: { version: '15.0.0', resumeFrom: '15.0.0-rc.16' },
     },
     {
@@ -125,9 +156,26 @@ const selfTest = () => {
       actual.resumeFrom !== expected.resumeFrom
     ) {
       throw new Error(
-        `${name}: expected ${JSON.stringify(expected)}, received ${JSON.stringify(actual)}`
+        `${name}: expected ${JSON.stringify(
+          expected
+        )}, received ${JSON.stringify(actual)}`
       );
     }
+  }
+  for (const [current, tags] of [
+    ['15.0.0', ['v15.1.0']],
+    ['15.1.0-rc.1', []],
+  ]) {
+    let rejected = false;
+    try {
+      deriveReleaseVersion(current, 'minor-rc', tags);
+    } catch {
+      rejected = true;
+    }
+    if (!rejected)
+      throw new Error(
+        'minor-rc must reject a stable collision or an active candidate baseline'
+      );
   }
   const parsedTags = parseRemoteTagNames(
     'abc123\trefs/tags/v15.0.0-rc.12\n' +
@@ -152,7 +200,9 @@ const selfTest = () => {
   if (!stableClaim.includes('**Current release:** 15.0.0')) {
     throw new Error('stable documentation claim was not promoted');
   }
-  console.log(`Release-version derivation self-test passed (${cases.length} cases).`);
+  console.log(
+    `Release-version derivation self-test passed (${cases.length} cases).`
+  );
 };
 
 if (process.argv.includes('--self-test')) selfTest();

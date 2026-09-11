@@ -3,7 +3,7 @@ const { withNx } = require('@nx/rollup/with-nx');
 // These options were migrated by @nx/rollup:convert-to-inferred from project.json
 const options = {
   main: './src/index.ts',
-  additionalEntryPoints: ['./src/adapter.ts'],
+  additionalEntryPoints: ['./src/adapter.ts', './src/internals.ts'],
   tsConfig: './tsconfig.lib.prod.json',
   outputPath: '../../dist/packages/kernel',
   format: ['esm'],

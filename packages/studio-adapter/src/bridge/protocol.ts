@@ -31,14 +31,28 @@ export type StudioBridgeRequest =
   | {
       readonly protocol: number;
       readonly id: string;
+      readonly command: 'readInspection';
+      readonly treeId: StudioTreeId;
+      readonly paths: readonly string[];
+      readonly knownTurnIds?: readonly number[];
+      readonly historyEpoch?: number;
+      readonly captureId?: string;
+      readonly afterSequence?: number;
+      readonly includeStructure?: boolean;
+    }
+  | { readonly protocol: number; readonly id: string; readonly command: 'pauseStudioRecording' | 'resumeStudioRecording' | 'clearStudioHistory'; readonly treeId: StudioTreeId }
+  | {
+      readonly protocol: number;
+      readonly id: string;
       readonly command: 'readConfirmedTurns';
+      readonly knownTurnIds?: readonly number[];
+      readonly historyEpoch?: number;
       readonly treeId: StudioTreeId;
     }
   /**
    * ⚠️ These two ALTER STUDIO INSTRUMENTATION ONLY — they start and stop a
    * recorder. They are not application-state mutation, and the protocol still
-   * admits no `setValue`, `eval` or rollback command. Recording never begins
-   * merely because DevTools opened; a person asks for it.
+   * admits no `setValue`, `eval` or rollback command. Connected Studio panels automatically request bounded recording.
    */
   | {
       readonly protocol: number;
@@ -46,6 +60,7 @@ export type StudioBridgeRequest =
       readonly command: 'startRealizationCapture';
       readonly treeId: StudioTreeId;
       readonly maxEffects?: number;
+      readonly maxBytes?: number;
     }
   | {
       readonly protocol: number;
@@ -57,6 +72,8 @@ export type StudioBridgeRequest =
       readonly protocol: number;
       readonly id: string;
       readonly command: 'readRealizations';
+      readonly afterSequence?: number;
+      readonly captureId?: string;
       readonly treeId: StudioTreeId;
     }
   | {
@@ -66,9 +83,16 @@ export type StudioBridgeRequest =
       readonly treeId: StudioTreeId;
       readonly path: string;
     }
+  | {
+      readonly protocol: number;
+      readonly id: string;
+      readonly command: 'readCurrentValues';
+      readonly treeId: StudioTreeId;
+      readonly paths: readonly string[];
+    }
   /**
    * Key structure only — no values. The state pane needs names; values are read
-   * per-path on demand, so arbitrary application data never crosses the
+   * for explicitly requested paths, so unrelated application data never crosses the
    * transport to populate a sidebar.
    */
   | {
@@ -94,6 +118,15 @@ export type StudioBridgeResponse<T = unknown> =
       readonly error: StudioBridgeError;
     };
 
+/** Parts retain their individual capability/error envelopes. Read in one JS task;
+ * this is not a new kernel revision, transaction, or causal ordering claim. */
+export interface StudioInspectionResponse {
+  readonly turns: StudioBridgeResponse;
+  readonly realizations: StudioBridgeResponse;
+  readonly values: StudioBridgeResponse;
+  readonly structure?: StudioBridgeResponse;
+}
+
 export type { StudioBridgeError, StudioBridgeTree, ConfirmedTurnsResponse, StudioCapability };
 
 /** Structural validation. Nothing is trusted because it arrived on the port. */
@@ -109,12 +142,31 @@ export function isStudioBridgeRequest(value: unknown): value is StudioBridgeRequ
     case 'hello':
     case 'listTrees':
       return true;
+    case 'readInspection':
+      return typeof candidate['treeId'] === 'string'
+        && Array.isArray(candidate['paths']) && candidate['paths'].length <= 200
+        && candidate['paths'].every((path: unknown) => typeof path === 'string')
+        && (candidate['knownTurnIds'] === undefined || (Array.isArray(candidate['knownTurnIds'])
+          && candidate['knownTurnIds'].length <= 500
+          && candidate['knownTurnIds'].every((id: unknown) => typeof id === 'number' && Number.isSafeInteger(id) && id >= 0)))
+        && (candidate['historyEpoch'] === undefined || (typeof candidate['historyEpoch'] === 'number' && Number.isSafeInteger(candidate['historyEpoch']) && candidate['historyEpoch'] >= 0))
+        && (candidate['captureId'] === undefined || typeof candidate['captureId'] === 'string')
+        && (candidate['afterSequence'] === undefined || (typeof candidate['afterSequence'] === 'number' && Number.isSafeInteger(candidate['afterSequence']) && candidate['afterSequence'] >= -1))
+        && (candidate['includeStructure'] === undefined || typeof candidate['includeStructure'] === 'boolean');
+    case 'pauseStudioRecording':
+    case 'resumeStudioRecording':
+    case 'clearStudioHistory':
     case 'readConfirmedTurns':
     case 'startRealizationCapture':
     case 'stopRealizationCapture':
     case 'readRealizations':
     case 'readStateShape':
       return typeof candidate['treeId'] === 'string';
+    case 'readCurrentValues':
+      return typeof candidate['treeId'] === 'string'
+        && Array.isArray(candidate['paths'])
+        && candidate['paths'].length <= 200
+        && candidate['paths'].every((path: unknown) => typeof path === 'string');
     case 'readCurrentValue':
       return typeof candidate['treeId'] === 'string' && typeof candidate['path'] === 'string';
     default:

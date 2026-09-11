@@ -105,13 +105,13 @@ async function record(name: string, run: () => void | Promise<void>) {
 describe('OWNER-SCOPE-0', () => {
   it('ordinary scalar authored', async () => {
     const t = scalarTree();
-    const { seen } = await record('scalar authored', () => t.$['total'](1));
+    const { seen } = await record('scalar authored', () => { t.$['total'](1); });
     expect(seen.length).toBeGreaterThan(0);
   });
 
   it('external scalar realization', async () => {
     const t = scalarTree();
-    await record('external scalar', () => external(() => t.$['total'](2)));
+    await record('external scalar', () => { external(() => t.$['total'](2)); });
   });
 
   it('transaction-authored', async () => {

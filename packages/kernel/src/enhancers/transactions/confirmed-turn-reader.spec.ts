@@ -9,8 +9,8 @@ type Cart = { promoCode: string | null; discount: number; total: number };
 type Row = { id: string; name: string };
 
 const cartTree = () =>
-  signalTree<Cart>(
-    { promoCode: null, discount: 0, total: 12000 },
+  signalTree(
+    { promoCode: null, discount: 0, total: 12000 } as Cart,
     { enhancers: [transactions()] }
   ) as never as {
     $: Record<string, (value?: unknown) => unknown>;

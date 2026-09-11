@@ -167,7 +167,7 @@ const byTransaction = new Map<string, ProvenanceEffect[]>();
 function txKey(meta: WriteMetadata | undefined): string | undefined {
   const id = meta?.transactionId;
   if (id === undefined) return undefined;
-  const owner = meta.ownerId ?? 'no-owner';
+  const owner = meta?.ownerId ?? 'no-owner';
   return `${String(owner)}\u0000${id}`;
 }
 

@@ -7,11 +7,15 @@
  * `undefined`.
  */
 import { signalTree } from '@signal-tree/kernel';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import * as kernelAdapter from '@signal-tree/kernel/adapter';
 
 import { readStateShape, type StateNode } from './state-shape';
 
-const find = (nodes: readonly StateNode[], path: string): StateNode | undefined => {
+const find = (
+  nodes: readonly StateNode[],
+  path: string
+): StateNode | undefined => {
   for (const n of nodes) {
     if (n.path === path) return n;
     const hit = n.children && find(n.children, path);
@@ -28,7 +32,10 @@ const shapeOf = (state: object, options = {}) => {
 
 describe('STATE-SHAPE-0', () => {
   it('describes locations nothing has ever written to', () => {
-    const shape = shapeOf({ cart: { subtotal: 0, total: 0 }, orders: { open: [] } });
+    const shape = shapeOf({
+      cart: { subtotal: 0, total: 0 },
+      orders: { open: [] },
+    });
     // `subtotal` appears in no transaction and no realization. An
     // evidence-derived pane could not show it at all.
     expect(find(shape.nodes, 'cart.subtotal')).toMatchObject({ kind: 'leaf' });
@@ -85,12 +92,21 @@ describe('STATE-SHAPE-0', () => {
    * assertions above could pass against this, they would prove nothing.
    */
   it('POSITIVE CONTROL — a depth cut that emits a leaf is indistinguishable', () => {
-    const leafOnCut = (value: object, depth: number, max: number): StateNode[] =>
+    const leafOnCut = (
+      value: object,
+      depth: number,
+      max: number
+    ): StateNode[] =>
       Object.keys(value).map((key) => {
         const child = (value as Record<string, unknown>)[key];
         const branch = child !== null && typeof child === 'object';
         return branch && depth + 1 < max
-          ? { key, path: key, kind: 'branch', children: leafOnCut(child as object, depth + 1, max) }
+          ? {
+              key,
+              path: key,
+              kind: 'branch',
+              children: leafOnCut(child as object, depth + 1, max),
+            }
           : { key, path: key, kind: 'leaf' };
       });
 
@@ -98,5 +114,95 @@ describe('STATE-SHAPE-0', () => {
     const real = leafOnCut({ a: { b: 1 } }, 0, 2);
     // Both say `a.b` is a leaf. The defect, reproduced.
     expect(cut[0].children).toEqual(real[0].children);
+  });
+});
+
+describe('shape output budgets', () => {
+  it('rejects invalid options before materializing state', () => {
+    for (const options of [
+      { maxKeys: 0 },
+      { maxKeys: Infinity },
+      { maxDepth: NaN },
+      { maxDepth: 33 },
+      { maxKeys: 1.5 },
+    ]) {
+      expect(
+        readStateShape(
+          {
+            get $(): object {
+              throw new Error('must not read');
+            },
+          },
+          options
+        )
+      ).toMatchObject({
+        ok: false,
+        reason: expect.stringContaining('Shape limits'),
+      });
+    }
+  });
+
+  it('caps all returned nodes, not each level independently', () => {
+    const state = Object.fromEntries(
+      Array.from({ length: 50 }, (_, i) => [
+        `branch${i}`,
+        Object.fromEntries(
+          Array.from({ length: 50 }, (_, j) => [`leaf${j}`, j])
+        ),
+      ])
+    );
+    const shape = shapeOf(state);
+    const count = (nodes: readonly StateNode[]): number =>
+      nodes.reduce((sum, node) => sum + 1 + count(node.children ?? []), 0);
+    expect(count(shape.nodes)).toBe(2000);
+    expect(shape.truncated).toBe(true);
+    expect(shape.nodes.at(-1)).toMatchObject({
+      kind: 'branch',
+      truncated: 'breadth',
+    });
+  });
+});
+
+describe('state shape address safety', () => {
+  it('refuses a shape with colliding literal/nested dotted addresses', () => {
+    const source = signalTree({ 'cart.total': 1, cart: { total: 2 } });
+    try {
+      expect(readStateShape(source)).toMatchObject({
+        ok: false,
+        reason: expect.stringContaining('dotted'),
+      });
+    } finally {
+      source.destroy();
+    }
+  });
+  it('refuses unsupported empty keys rather than emitting the root address twice', () => {
+    const source = signalTree({ '': 1, other: 2 });
+    try {
+      expect(readStateShape(source)).toMatchObject({
+        ok: false,
+        reason: expect.stringContaining('empty'),
+      });
+    } finally {
+      source.destroy();
+    }
+  });
+  it('enumerates own prototype-named data and array indices with unique addresses', () => {
+    const snapshot = JSON.parse(
+      '{"constructor":7,"__proto__":{"n":8},"rows":[{"n":9}]}'
+    );
+    const spy = vi
+      .spyOn(kernelAdapter, 'readCanonicalSnapshot')
+      .mockReturnValue(snapshot);
+    try {
+      const result = readStateShape({ $: {} });
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(find(result.shape.nodes, 'constructor')).toBeDefined();
+      expect(find(result.shape.nodes, '__proto__.n')).toBeDefined();
+      expect(find(result.shape.nodes, 'rows.0.n')).toBeDefined();
+      expect(find(result.shape.nodes, 'toString')).toBeUndefined();
+    } finally {
+      spy.mockRestore();
+    }
   });
 });

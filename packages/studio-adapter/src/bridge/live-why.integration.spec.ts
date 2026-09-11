@@ -15,7 +15,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { attachStudio, type LiveTree } from '../index';
 import { handleStudioRequest } from './index';
-import { STUDIO_PROTOCOL_VERSION } from './protocol';
+import { STUDIO_PROTOCOL_VERSION, isStudioBridgeRequest } from './protocol';
 
 type Cart = { total: number };
 const settle = async () => { await Promise.resolve(); await Promise.resolve(); };
@@ -153,5 +153,35 @@ describe('live Why? vertical', () => {
     opened.push(a);
     const v = ok<CapturedValue>(send('readCurrentValue', { treeId: a.id, path: 'nope.missing' }));
     expect(v.kind).toBe('unserializable');
+  });
+});
+
+
+describe('bounded overview values over the bridge', () => {
+  it('reads unselected values from the live tree without capture', () => {
+    const tree = signalTree({ total: 12000, note: undefined, other: 7 }) as never as LiveTree;
+    const attached = attachStudio(tree);
+    opened.push(attached);
+    expect(ok(send('readCurrentValues', { treeId: attached.id, paths: ['total', 'other', 'note', 'missing'] }))).toEqual({
+      values: [
+        { path: 'total', value: { kind: 'value', value: 12000 } },
+        { path: 'other', value: { kind: 'value', value: 7 } },
+        { path: 'note', value: { kind: 'value', value: undefined } },
+        { path: 'missing', value: { kind: 'unserializable', valueType: 'unresolved-path', preview: 'missing' } },
+      ],
+    });
+    attached.detach();
+    expect(send('readCurrentValues', { treeId: attached.id, paths: ['total'] })).toMatchObject({
+      ok: false, error: { code: 'STUDIO_TREE_NOT_FOUND' },
+    });
+  });
+
+  it('validates batch size and every requested path before dispatch', () => {
+    const request = { protocol: STUDIO_PROTOCOL_VERSION, id: 'batch', command: 'readCurrentValues', treeId: 'tree' };
+    expect(isStudioBridgeRequest({ ...request, paths: [] })).toBe(true);
+    expect(isStudioBridgeRequest({ ...request, paths: Array(200).fill('total') })).toBe(true);
+    for (const paths of [undefined, 'total', ['total', 2], Array(201).fill('total')]) {
+      expect(isStudioBridgeRequest({ ...request, paths })).toBe(false);
+    }
   });
 });

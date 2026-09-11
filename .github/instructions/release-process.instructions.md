@@ -5,7 +5,7 @@ applyTo: '**'
 # SignalTree Release Process
 
 - Never run `nx release`, `npm version`, or package-local `npm publish`.
-- Prepare versions and signed tags only through `npm run release:rc`,
+- Prepare versions and signed tags only through `npm run release:rc` / `npm run release:minor-rc`,
   `release:patch`, `release:minor`, or `release:major`.
 - `scripts/prepare-release.mjs` must remain incapable of npm publication.
 - Registry publication must route through `scripts/publish-candidate.mjs`.
@@ -22,3 +22,5 @@ applyTo: '**'
   use temporary ignored configuration removed on exit.
 - Do not publish, tag, or push unless the user explicitly authorizes an official
   release operation.
+
+For an additive evaluation release from a stable baseline, `npm run release:minor-rc` starts the next minor at `rc.1`, or advances its highest remote RC. It refuses an already tagged stable minor and an active local prerelease; use `release:rc` for that active candidate. All clean-tree, synchronized-branch, validation, signed-tag, and canonical publication checks remain mandatory.

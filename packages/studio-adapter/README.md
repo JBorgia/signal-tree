@@ -2,7 +2,7 @@
 
 Opt-in bridge from the SignalTree kernel observation seam to Studio.
 
-**Status: S1 scaffold.** Owns two things:
+**Status: opt-in development tooling.** Provides:
 
 1. **Session tree identity.** The kernel's `TreeId` promises equality and
    `Map`-key use and nothing else — not persistence, not serialization
@@ -12,12 +12,14 @@ Opt-in bridge from the SignalTree kernel observation seam to Studio.
    package.
 2. **Normalization** of kernel turn records into `@signal-tree/studio-query`
    session records.
+3. **Bounded observation.** Current values, state shape, retained committed
+   turns, and supported external realizations, with explicit limits and gaps.
 
-`ConfirmedTurnReader` is the shape this package **consumes**. The kernel does
-not implement it yet: the S1 kernel work is a narrow read-only surface over the
-committed turns the transactions enhancer already retains. It is declared
-structurally rather than by importing kernel internals, so Studio never depends
-on `causal-runtime`.
+The adapter consumes the kernel observation seam at
+`@signal-tree/kernel/internals`; it does not import `causal-runtime` modules.
+Committed history requires the transactions enhancer. Other inspection
+capabilities are checked per tree. Install matching SignalTree versions and
+ensure the application facade and adapter resolve one kernel instance.
 
 `disposition` is always `'committed'` here. `pending`/`discarded` arrive with
 S1P, from a source that actually observes them — never by inference.
@@ -40,7 +42,13 @@ every bundle — the trap `debug-enhancers.prod.ts` and the repo's
 imports `/bridge` does not contain it, and that absence is the security
 boundary: production has no Studio surface to reach, rather than a disabled one.
 
-Three read-only commands — `hello`, `listTrees`, `readConfirmedTurns` — over a
-versioned `MessagePort`. The handshake nonce matches a response to its request;
-it is **not** authentication, and same-realm script is inside the application
-trust boundary (`S1-BRIDGE-SPEC.md` §4).
+The versioned `MessagePort` protocol supports tree discovery, current-value
+and structure reads, bounded history and realization reads, and recording
+controls. Pause, resume, and clear affect Studio observation, not application
+state. `readInspection` collects its reads synchronously in one JavaScript task;
+it is not a server-wide snapshot or a record of pending work.
+
+The handshake nonce matches a response to its request; it is **not**
+authentication. Same-realm scripts are inside the application trust boundary.
+
+See the [llms.txt](llms.txt) for the shared SignalTree model and observation boundaries.

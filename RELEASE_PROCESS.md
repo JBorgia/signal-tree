@@ -8,10 +8,15 @@ From a clean branch that exactly matches its remote:
 
 ```bash
 pnpm run release:rc
+pnpm run release:minor-rc
 pnpm run release:patch
 pnpm run release:minor
 pnpm run release:major
 ```
+
+`release:minor-rc` starts an additive minor candidate from a stable version
+(for example, `15.0.0` → `15.1.0-rc.1`). Use `release:rc` to advance
+an active candidate. Prereleases use the npm `rc` channel.
 
 `scripts/prepare-release.mjs`:
 
@@ -39,7 +44,8 @@ node scripts/publish-candidate.mjs --ci --prebuilt
 ```
 
 The engine prepares manifests, runs package/declaration/consumer checks, packs
-the ordered `kernel`, `angular`, and `react` artifacts, records SHA-512
+the ordered `kernel`, `angular`, `react`, `vue`, `studio-query`, and
+`studio-adapter` artifacts from `scripts/release-plan.mjs`, records SHA-512
 integrity, and publishes those tarballs with provenance. A rerun skips an
 existing version only when registry integrity matches exactly; any mismatch or
 registry lookup failure aborts.
@@ -61,7 +67,7 @@ preparation. For SSH signing, configure `gpg.format=ssh`, `user.signingkey`, and
 
 ## After Publication
 
-Verify all three npm versions and dist-tags, install the exact version into a
+Verify all six npm versions and dist-tags, install the exact version into a
 fresh external project, confirm runtime and strict typechecking, then create or
 verify the GitHub release notes. Never unpublish a partial release as routine
 recovery; inspect candidate and registry integrity and resume the same version.

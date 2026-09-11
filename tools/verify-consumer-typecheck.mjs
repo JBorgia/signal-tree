@@ -27,6 +27,7 @@
 import { execFileSync } from 'node:child_process';
 import {
   existsSync,
+  copyFileSync,
   mkdtempSync,
   mkdirSync,
   writeFileSync,
@@ -117,6 +118,9 @@ import {
   type ReadonlyLocation,
 } from '@signal-tree/kernel';
 import { createSignalTreeFactory } from '@signal-tree/kernel/adapter';
+import { createStudioSession } from '@signal-tree/studio-query';
+import { attachStudio } from '@signal-tree/studio-adapter';
+import { installStudioBridge, STUDIO_PROTOCOL_VERSION } from '@signal-tree/studio-adapter/bridge';
 import {
   defineStore,
   entityMap as angularEntityMap,
@@ -134,6 +138,9 @@ import {
   type AccessibleNode as VueAccessibleNode,
   type EntitySignalWithSlices as VueEntitySignalWithSlices,
 } from '@signal-tree/vue';
+
+const studioSession = createStudioSession();
+void [studioSession.turns(), attachStudio, installStudioBridge, STUDIO_PROTOCOL_VERSION];
 
 type User = { id: number; name: string; version: number };
 
@@ -243,6 +250,15 @@ import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
 import { isRef } from 'vue';
 
+const studioQuery = await import('@signal-tree/studio-query');
+const studioAdapter = await import('@signal-tree/studio-adapter');
+const studioBridge = await import('@signal-tree/studio-adapter/bridge');
+if (studioQuery.createStudioSession().turns().length !== 0 ||
+    typeof studioAdapter.attachStudio !== 'function' ||
+    typeof studioBridge.installStudioBridge !== 'function') {
+  throw new Error('Studio public entrypoints did not load from installed release tarballs.');
+}
+
 const sharedRuntimeSymbols = [
   'entityMap',
   'link',
@@ -336,11 +352,33 @@ execFileSync(
 );
 
 try {
-  execFileSync('node', ['src/facade-identity.mjs'], { cwd: proj, stdio: 'pipe' });
+  execFileSync('node', ['src/facade-identity.mjs'], {
+    cwd: proj,
+    stdio: 'pipe',
+  });
   console.log('  ✅ framework facade runtime identities');
 } catch (err) {
   const out = `${err.stdout || ''}${err.stderr || ''}`.trim();
   console.error(`  ❌ framework facade runtime identities\n       ${out}`);
+  process.exit(1);
+}
+
+copyFileSync(
+  join(ROOT, 'tools/fixtures/studio-runtime-consumer.mjs'),
+  join(proj, 'studio-runtime-consumer.mjs')
+);
+try {
+  execFileSync('node', ['studio-runtime-consumer.mjs'], {
+    cwd: proj,
+    stdio: 'pipe',
+  });
+  console.log(
+    '  ✅ Studio native/root runtime identity, recording, realization and unsupported-tree contracts'
+  );
+} catch (err) {
+  console.error(
+    `  ❌ Studio runtime consumer\n${err.stdout || ''}${err.stderr || ''}`
+  );
   process.exit(1);
 }
 

@@ -322,6 +322,19 @@ An `ObservationAdapter` supplies dependency tokens and
 changes before framework observers are notified. It never owns or mirrors
 location state.
 
+## Tooling observation
+
+`@signal-tree/kernel/internals` is a supported observation seam for tools such as
+Studio. Application code continues to use its framework facade; these exports
+are not additions to the kernel root API.
+
+- `treeRuntimeId` exposes runtime identity for equality and map keys, never a persisted identity.
+- `treeCapabilities` reports construction capabilities; an empty list is a bare tree.
+- `confirmedTurnReader` reads retained committed consequences without installing history. Its `ConfirmedTurnReader`, `ConfirmedTurnSnapshot`, `ConfirmedTurnView`, `ConfirmedTurnEffectView`, `ConfirmedTurnEffectKind` and `ConfirmedTurnRetention` types describe that window, including retention limits. Reads after destruction throw `StudioTreeDestroyedError`.
+- `observeWrites` subscribes to `ObservedWriteFrame` observation. A notification does not establish a causal relationship, intermediate attempted write, or complete history.
+
+Studio attaches explicitly through `@signal-tree/studio-adapter`; query and presentation code must retain unknown/unsupported distinctions and must not infer causality from event timing.
+
 ## License
 
 Apache-2.0. See [LICENSE](../../LICENSE) and [NOTICE](../../NOTICE).

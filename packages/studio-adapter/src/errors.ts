@@ -16,6 +16,7 @@ import { type StudioCapability } from './capabilities';
  */
 export type StudioBridgeError =
   | { readonly code: 'STUDIO_TREE_NOT_FOUND' }
+  | { readonly code: 'STUDIO_INVALID_LIMIT' }
   | { readonly code: 'STUDIO_TREE_DESTROYED' }
   | {
       readonly code: 'STUDIO_CAPABILITY_UNAVAILABLE';

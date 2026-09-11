@@ -49,6 +49,7 @@ function liveTree() {
     $: { cart: { total: (v?: number) => number } };
     registerCleanup(fn: () => void): void;
     destroy(): void;
+    destroyed(): boolean;
   };
 }
 

@@ -2,6 +2,7 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { globSync } from 'node:fs';
+import { RELEASE_PACKAGES } from './release-plan.mjs';
 
 const expectedFiles = new Map([
   [
@@ -24,6 +25,7 @@ const expectedScripts = {
   'publish:ci': 'bash scripts/ci-publish.sh',
   release: './scripts/release.sh patch',
   'release:rc': './scripts/release.sh rc',
+  'release:minor-rc': './scripts/release.sh minor-rc',
   'release:patch': './scripts/release.sh patch',
   'release:minor': './scripts/release.sh minor',
   'release:major': './scripts/release.sh major',
@@ -31,6 +33,7 @@ const expectedScripts = {
 const violations = [];
 
 for (const script of [
+  'scripts/release-plan.mjs',
   'scripts/release-version.mjs',
   'scripts/finalize-changelog.mjs',
 ]) {
@@ -49,7 +52,24 @@ for (const [file, expected] of expectedFiles) {
 
 const packageScripts = JSON.parse(readFileSync('package.json', 'utf8')).scripts;
 for (const [name, expected] of Object.entries(expectedScripts)) {
-  if (packageScripts[name] !== expected) violations.push(`package.json#${name}`);
+  if (packageScripts[name] !== expected)
+    violations.push(`package.json#${name}`);
+}
+
+for (const name of [
+  'build',
+  'build:lib',
+  'build:all',
+  'build:packages',
+  'build:production',
+  'test:all',
+  'test:lib',
+  'lint:all',
+]) {
+  const selected =
+    packageScripts[name]?.match(/--projects=([^\s]+)/)?.[1].split(',') ?? [];
+  if (RELEASE_PACKAGES.some((pkg) => !selected.includes(pkg)))
+    violations.push(`package.json#${name}-release-coverage`);
 }
 
 const workflow = readFileSync('.github/workflows/publish.yml', 'utf8');
@@ -62,7 +82,9 @@ if (!workflow.includes('NPM_TOKEN: ${{ secrets.NPM_TOKEN }}')) {
 const workflowPublishCommands = workflow
   .split('\n')
   .map((line) => line.trim())
-  .filter((line) => /^run:.*\b(?:npm|pnpm|yarn|node)\b.*\bpublish\b/.test(line));
+  .filter((line) =>
+    /^run:.*\b(?:npm|pnpm|yarn|node)\b.*\bpublish\b/.test(line)
+  );
 if (
   workflowPublishCommands.length !== 1 ||
   workflowPublishCommands[0] !==
@@ -103,7 +125,9 @@ for (const file of [
 
 if (violations.length > 0) {
   console.error(
-    `Publication bypasses canonical engine: ${[...new Set(violations)].join(', ')}`
+    `Publication bypasses canonical engine: ${[...new Set(violations)].join(
+      ', '
+    )}`
   );
   process.exit(1);
 }

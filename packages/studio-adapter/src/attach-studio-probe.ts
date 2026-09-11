@@ -1,3 +1,4 @@
+import { type CurrentValueEntry } from './realization/current-value';
 import { type StudioTreeId } from '@signal-tree/studio-query';
 
 import { type StudioCapability } from './capabilities';
@@ -16,6 +17,7 @@ import { dropRegistryIfEmpty, registryForAttach } from './registry';
  * internals moving.
  */
 export interface StudioTreeProbe {
+  readonly observeChanges?: (notify: () => void) => () => void;
   /** Opaque runtime identity — equality/Map-key only, never serialized. */
   readonly runtimeTreeId: unknown;
   /** `undefined` when the tree has no transactions() enhancer. */
@@ -28,6 +30,7 @@ export interface StudioTreeProbe {
   readonly createCaptureTarget?: () => unknown;
   /** The value at `path` right now — compared against retained evidence. */
   readonly readCurrentValue?: (path: string) => unknown;
+  readonly readCurrentValues?: (paths: readonly string[]) => readonly CurrentValueEntry[];
   /** Key structure for the state pane. Never values. */
   readonly readStateShape?: (options: { maxDepth?: number; maxKeys?: number }) => unknown;
 }
@@ -77,11 +80,13 @@ export function attachStudioProbe(
   const registry = registryForAttach();
   const id = registry.add(probe.runtimeTreeId, {
     label: options.label,
+    observeChanges: probe.observeChanges,
     reader: probe.confirmedTurnReader,
     capabilities,
     structure: probe.structure,
     createCaptureTarget: probe.createCaptureTarget,
     readCurrentValue: probe.readCurrentValue,
+    readCurrentValues: probe.readCurrentValues,
     readStateShape: probe.readStateShape,
   });
 

@@ -12,8 +12,7 @@
  *      files. Catches "exports points at a file the `files` field didn't
  *      include" (the guardrails@10.6 barrel bug class) and the v12 subpath
  *      moves (e.g. `/authoring`) shipping their JS + d.ts.
- *   B. For `@signal-tree/kernel` (the flagship; no workspace deps so it installs
- *      cleanly), `npm install` the tarball into a throwaway consumer and
+ *   B. Install all canonical release tarballs together into a throwaway consumer and
  *      `require.resolve()` every documented subpath — proving Node's resolver +
  *      a real install accept the published `exports` end-to-end. `--legacy-peer-
  *      deps` skips the heavy @angular/rxjs peer install (we test resolution,
@@ -31,25 +30,15 @@ import {
   existsSync,
   readFileSync,
   writeFileSync,
-  readdirSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { assertReleasePlan } from '../scripts/release-plan.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist', 'packages');
-const PACKAGES = readdirSync(join(ROOT, 'packages'), { withFileTypes: true })
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name)
-  .filter((pkg) => {
-    const manifestPath = join(ROOT, 'packages', pkg, 'package.json');
-    return (
-      existsSync(manifestPath) &&
-      JSON.parse(readFileSync(manifestPath, 'utf8')).private !== true
-    );
-  })
-  .sort();
+const PACKAGES = assertReleasePlan(ROOT);
 
 const errors = [];
 const info = [];
@@ -130,9 +119,11 @@ function checkPackedExports(pkg, tmp) {
 }
 
 // --- Part B: kernel installs into a real consumer and resolves every subpath ---
-function checkKernelConsumerResolves(kernelTgz, tmp) {
-  if (!kernelTgz) {
-    errors.push('kernel: tarball not produced — cannot run consumer resolve.');
+function checkConsumerResolves(tarballs, tmp) {
+  if (Object.keys(tarballs).length !== PACKAGES.length) {
+    errors.push(
+      'Release tarball set incomplete — cannot run consumer resolve.'
+    );
     return;
   }
   const consumer = join(tmp, 'consumer');
@@ -144,7 +135,12 @@ function checkKernelConsumerResolves(kernelTgz, tmp) {
         name: 'st-tarball-consumer',
         private: true,
         version: '0.0.0',
-        dependencies: { '@signal-tree/kernel': `file:${kernelTgz}` },
+        dependencies: Object.fromEntries(
+          Object.entries(tarballs).map(([name, path]) => [
+            `@signal-tree/${name}`,
+            `file:${path}`,
+          ])
+        ),
       },
       null,
       2
@@ -164,31 +160,31 @@ function checkKernelConsumerResolves(kernelTgz, tmp) {
     );
   } catch (e) {
     errors.push(
-      `kernel consumer: npm install of the tarball failed — ${
+      `release consumer: npm install of the tarball failed — ${
         String(e).split('\n')[0]
       }`
     );
     return;
   }
   const req = createRequire(join(consumer, 'index.js'));
-  const manifest = JSON.parse(
-    readFileSync(join(DIST, 'kernel', 'package.json'), 'utf8')
-  );
-  const subpaths = Object.keys(manifest.exports ?? {})
-    .filter((subpath) => subpath !== './package.json')
-    .map((subpath) =>
-      subpath === '.'
-        ? '@signal-tree/kernel'
-        : `@signal-tree/kernel/${subpath.slice(2)}`
+  for (const pkg of PACKAGES) {
+    const manifest = JSON.parse(
+      readFileSync(join(DIST, pkg, 'package.json'), 'utf8')
     );
-  for (const sp of subpaths) {
-    try {
-      req.resolve(sp);
-      info.push(`kernel consumer: resolved ${sp} ✓`);
-    } catch {
-      errors.push(
-        `kernel consumer: could NOT resolve '${sp}' from an installed tarball — exports/files broken.`
+    const subpaths = Object.keys(manifest.exports ?? {})
+      .filter((subpath) => subpath !== './package.json')
+      .map((subpath) =>
+        subpath === '.' ? manifest.name : `${manifest.name}/${subpath.slice(2)}`
       );
+    for (const sp of subpaths) {
+      try {
+        req.resolve(sp);
+        info.push(`release consumer: resolved ${sp} ✓`);
+      } catch {
+        errors.push(
+          `release consumer: could NOT resolve '${sp}' from an installed tarball — exports/files broken.`
+        );
+      }
     }
   }
 }
@@ -226,12 +222,12 @@ if (process.argv.includes('--self-test')) {
 
 // --- run ---------------------------------------------------------------------
 const tmp = mkdtempSync(join(tmpdir(), 'st-tarball-'));
-let kernelTgz;
+const tarballs = {};
 for (const pkg of PACKAGES) {
   const tgz = checkPackedExports(pkg, tmp);
-  if (pkg === 'kernel') kernelTgz = tgz;
+  if (tgz) tarballs[pkg] = tgz;
 }
-checkKernelConsumerResolves(kernelTgz, tmp);
+checkConsumerResolves(tarballs, tmp);
 
 for (const line of info) console.log('  ' + line);
 if (errors.length) {
@@ -240,5 +236,5 @@ if (errors.length) {
   process.exit(1);
 }
 console.log(
-  '\n✅ Tarball-consumer gate passed: every packed exports target ships, and @signal-tree/kernel resolves from a real install.'
+  '\n✅ Tarball-consumer gate passed: every packed exports target ships, and all release package subpaths resolve from a real install.'
 );

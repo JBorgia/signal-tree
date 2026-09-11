@@ -166,6 +166,27 @@ export default (config, options) => {
   return [
     runtimeConfig,
     {
+      input: path.join(packageRoot, 'src/internals.ts'),
+      output: {
+        file: path.join(packageRoot, '../../dist/packages/kernel/dist/internals.d.ts'),
+        format: 'es',
+      },
+      plugins: [
+        {
+          name: 'signaltree-tooling-public-type-identity',
+          resolveId(source, importer) {
+            // Tooling accepts the very same branded tree types applications use.
+            // Rebundling ISignalTree would duplicate its unique-symbol markers.
+            if (source === './lib/types' && importer === path.join(packageRoot, 'src/internals.ts')) {
+              return { id: './index.js', external: true };
+            }
+            return null;
+          },
+        },
+        dts({ respectExternal: true }),
+      ],
+    },
+    {
       input: path.join(packageRoot, 'src/index.ts'),
       output: {
         file: path.join(

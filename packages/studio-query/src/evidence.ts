@@ -33,9 +33,14 @@ export interface TransactionEvidence {
   readonly treeId: StudioTreeId;
   readonly turnId: number;
   readonly disposition: 'committed';
+  /** Tree-scoped positions supplied by the confirmed-turn reader. */
+  readonly participants?: readonly number[];
   readonly effects: readonly {
     readonly path: string;
     readonly ownerPath: string;
+    readonly owner?: number;
+    readonly subjectId?: unknown;
+    readonly structural?: 'add' | 'remove' | 'rekey';
     readonly before: unknown;
     readonly after: unknown;
   }[];
@@ -48,6 +53,7 @@ export interface TransactionEvidence {
  * never inferred from adjacency (`SUPERSESSION-0`, WEAK).
  */
 export interface RealizationEvidence {
+  readonly captureId?: string;
   readonly kind: 'realization';
   readonly treeId: StudioTreeId;
   readonly sequence: number;
@@ -58,6 +64,10 @@ export interface RealizationEvidence {
   readonly origin?: WriteOrigin;
   readonly participation: 'realized';
   readonly transactionId?: number;
+  /** Source-supplied identities, scoped to treeId; path equality is not subject identity. */
+  readonly subjectIds?: readonly number[];
+  readonly positionIds?: readonly number[];
+  readonly metadataOmitted?: true;
 }
 
 /**
@@ -72,5 +82,7 @@ export type StudioEvidence = TransactionEvidence | RealizationEvidence;
 
 export const evidenceRef = (e: StudioEvidence): EvidenceRef =>
   e.kind === 'realization'
-    ? `realization:${e.treeId}:${e.sequence}`
+    ? `realization:${e.treeId}:${e.captureId ? `${e.captureId}:` : ''}${
+        e.sequence
+      }`
     : `transaction:${e.treeId}:${e.turnId}`;
