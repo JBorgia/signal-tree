@@ -13363,3 +13363,11 @@ Commercial separation validation:
   unchanged600000-byte budget.
 - Pricing, commercial legal terms, entitlement enforcement and private hosted
   distribution are not implemented by this workspace migration.
+
+Commercial workspace separation is checkpointed at public commit82dbd57d and
+private local commitbb72e07. The public branch contains no Studio implementation
+source; the private workspace has no remote. Exact original working directories
+and all79 prior dirty-file hashes remain preserved in its ignored migration
+backup. Public npm publication remains paused; the prior six-package tags are
+not usable release candidates. The active local preview now runs from the
+private workspace at its existing localhost address.
