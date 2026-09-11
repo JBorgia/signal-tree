@@ -16,11 +16,17 @@ export const RELEASE_PACKAGES = Object.freeze([
   'angular',
   'react',
   'vue',
-  'studio-query',
-  'studio-adapter',
 ]);
 
 export function assertReleasePlan(root = process.cwd()) {
+  for (const path of ['apps/studio-devtools', 'packages/studio-query', 'packages/studio-adapter']) {
+    if (existsSync(join(root, path, 'package.json'))) {
+      throw new Error(`Private Studio source must remain outside the public checkout: ${path}`);
+    }
+  }
+  if (RELEASE_PACKAGES.some((name) => !['kernel', 'angular', 'react', 'vue'].includes(name))) {
+    throw new Error('Private Studio implementation cannot enter the public release set');
+  }
   if (RELEASE_PACKAGES[0] !== 'kernel') {
     throw new Error('Kernel must be first in the release package order');
   }
@@ -85,30 +91,24 @@ if (process.argv[1] && import.meta.filename === resolve(process.argv[1])) {
     };
     try {
       for (const name of RELEASE_PACKAGES) write(name);
-      write('studio-adapter', {
-        '@signal-tree/kernel': 'workspace:*',
-        '@signal-tree/studio-query': 'workspace:*',
-      });
-      assert.deepEqual(assertReleasePlan(root), [
-        'kernel',
-        'angular',
-        'react',
-        'vue',
-        'studio-query',
-        'studio-adapter',
-      ]);
-      rmSync(join(root, 'packages', 'studio-query'), { recursive: true });
+      write('angular', { '@signal-tree/kernel': 'workspace:*' });
+      assert.deepEqual(assertReleasePlan(root), ['kernel', 'angular', 'react', 'vue']);
+      rmSync(join(root, 'packages', 'vue'), { recursive: true });
       assert.throws(() => assertReleasePlan(root), /package set mismatch/);
-      write('studio-query', { '@signal-tree/studio-adapter': 'workspace:*' });
-      assert.throws(
-        () => assertReleasePlan(root),
-        /dependency order violation/
-      );
+      write('vue');
+      write('kernel', { '@signal-tree/angular': 'workspace:*' });
+      assert.throws(() => assertReleasePlan(root), /dependency order violation/);
+      write('kernel');
       write('studio-query');
+      assert.throws(() => assertReleasePlan(root), /Private Studio source/);
+      const studioManifest = join(root, 'packages', 'studio-query', 'package.json');
+      writeFileSync(studioManifest, JSON.stringify({ name: '@signal-tree/studio-query', private: true }));
+      assert.throws(() => assertReleasePlan(root), /Private Studio source/);
+      rmSync(join(root, 'packages', 'studio-query'), { recursive: true });
       write('unexpected');
       assert.throws(() => assertReleasePlan(root), /package set mismatch/);
       console.log(
-        'Release plan self-test passed: exact six-package set, missing/extra package rejection, dependency order.'
+        'Release plan self-test passed: exact four-package public set, Studio rejection, missing/extra package rejection, dependency order.'
       );
     } finally {
       rmSync(root, { recursive: true, force: true });

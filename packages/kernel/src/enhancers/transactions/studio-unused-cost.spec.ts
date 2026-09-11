@@ -2,7 +2,7 @@
  * S1 DISABLED/UNUSED CONTRACT — the structural half (§8.5 points 1-5, 8).
  *
  * Points 6 and 7 are measured numbers, recorded in
- * `apps/studio-devtools/smoke/README.md`. These are the invariants that can be
+ * the private Studio workspace's smoke README. These are the invariants that can be
  * asserted rather than timed, so they cannot silently regress.
  */
 import { describe, expect, it } from 'vitest';

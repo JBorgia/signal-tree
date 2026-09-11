@@ -1497,26 +1497,35 @@ continuity.
 6. Phase 0 seam per-event cost is explicit and lifecycle-defined before
    closure (§8.5).
 
-### 22.4 Commercial gate (binding)
+### 22.4 Commercial boundary (supersedes the September 8 adoption-only decision)
 
-Studio's job is adoption of SignalTree (§20.1); it ships free. Commercial
-questions are downstream of adoption working at all, and none of them are
-decided by the §20 gate.
+Jonathan's explicit September 11 decision restores paid, proprietary Studio.
+The earlier statement that Studio "ships free" is superseded. Adoption evidence
+remains useful product validation; it neither sets a price nor authorizes a
+public source release or an Apache license for Studio.
 
-- **No pricing, team service, or production-capture engineering** is started
-  while Studio is serving adoption. §23's "do not set pricing before
-  differentiation is measured" stands as a rule.
-- If a commercial track is ever opened, it needs its own gate, and the
-  differentiation question returns with it — see §22.5, which records where
-  durable differentiation would have to live.
-- A sustained run of §20.7 **GROW** outcomes is evidence Studio helps adoption.
-  It is *not* evidence anyone would pay for it. Those are different claims and
-  may not be substituted for one another.
+- SignalTree kernel and official Angular/React/Vue packages remain public Apache-2.0.
+- Existing kernel observation and realization interfaces form the public
+  integration boundary. No new public convenience API is required.
+- The Studio application, adapter/attachment, recording and bridge implementation,
+  session model and query/investigation engine belong in a separate private
+  workspace. They are not public npm release packages.
+- A free trial or free tier, pricing, payment enforcement and commercial license
+  terms remain undecided. No such capability is claimed as implemented.
+- Existing Apache-marked public commits remain historical exposure. Moving source
+  or changing a manifest does not erase that history or purport to revoke prior
+  grants. Preserve applicable notices in the private workspace.
+- No release resumes until the public/private boundary is verified. The rc.1 and
+  rc.2 six-package candidates are unpublished and must not be dispatched.
 
-### 22.5 Where differentiation would have to live (recorded)
+### 22.5 Where differentiation would have to live (historical research)
+
+The following September 8 interpretation is retained as research context.
+Its adoption-only roadmap language is superseded by the owner decision in §22.4;
+it does not authorize free distribution or public licensing.
 
 **This is not a rule about what to build. It is a finding to preserve**, so it
-is available if a commercial track is ever opened (§22.4) and so it is not
+is available for the commercial track (§22.4) and so it is not
 rediscovered from scratch.
 
 If Studio's advantage is reachable from the shipped API surface (§8.4, §20.2),

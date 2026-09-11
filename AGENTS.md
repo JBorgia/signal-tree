@@ -77,6 +77,20 @@ pending when the work has shipped: four RFC statuses said "proposed" or "Accepte
 for work already in a release, and 0012 claimed it had not shipped when all three
 of its items had.
 
+## Public library / private Studio boundary
+
+The September 11 owner decision supersedes earlier free-Studio documentation.
+Only kernel, angular, react and vue belong in this public release workspace.
+The existing kernel observation interfaces remain public integration primitives.
+Studio application, attachment/bridge, recording, sessions and query engine live
+in a separate private workspace. Do not copy that source back or include its
+packages in public releases, even with private manifests.
+
+The six-package v15.1.0-rc.1 and rc.2 candidates were NOT published. Never resume
+or dispatch their old release/publish workflows. A later public release must
+use the corrected four-package plan. Existing public history and Apache notices
+are not erased or retroactively revoked by the separation.
+
 ## Release work
 
 Read [`RELEASE-1.0.md`](RELEASE-1.0.md) before release-related work.

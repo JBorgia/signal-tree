@@ -44,8 +44,7 @@ node scripts/publish-candidate.mjs --ci --prebuilt
 ```
 
 The engine prepares manifests, runs package/declaration/consumer checks, packs
-the ordered `kernel`, `angular`, `react`, `vue`, `studio-query`, and
-`studio-adapter` artifacts from `scripts/release-plan.mjs`, records SHA-512
+the ordered public `kernel`, `angular`, `react`, and `vue` artifacts from `scripts/release-plan.mjs`, records SHA-512
 integrity, and publishes those tarballs with provenance. A rerun skips an
 existing version only when registry integrity matches exactly; any mismatch or
 registry lookup failure aborts.
