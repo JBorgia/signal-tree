@@ -3,11 +3,7 @@ import { AppliedTurnProjection } from './applied-turn-projection';
 import { rollbackPendingTurnAt } from './pending-rollback';
 import { getPathNotifier, resetPathNotifier } from '../../path-notifier';
 import { signalTree } from '../../signal-tree';
-import type {
-  ISignalTree,
-  StructuralEffect,
-  WriteMetadata,
-} from '../../types';
+import type { ISignalTree, StructuralEffect, WriteMetadata } from '../../types';
 import { withWriteContext } from '../../write-context';
 import { entityMap } from '../../markers/entity-map';
 import { getOwnedPositionIds } from '../owned-mutation';
@@ -180,7 +176,7 @@ const createLiveUsersAbortHarness = () => {
     },
     { capabilities: ['causal-runtime'] }
   ) as unknown as {
-      $: {
+    $: {
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
@@ -190,9 +186,9 @@ const createLiveUsersAbortHarness = () => {
           name: (() => string | undefined) & { __subjectIds?: number[] };
         };
       };
-  };
-      destroy(): void;
     };
+    destroy(): void;
+  };
 
   const store = new TurnStore();
   const appliedTurns = new AppliedTurnProjection(store);
@@ -529,7 +525,15 @@ describe('greenfield transactions', () => {
     draft.seal();
     store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_THEME, before: 'B', after: 'C' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'B',
+          after: 'C',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(2)).toEqual({ ok: true });
 
@@ -552,7 +556,13 @@ describe('greenfield transactions', () => {
       })
     ).toEqual({ ok: true, turnId: 2 });
     expect(appliedEffects[1]).toEqual([
-      { owner: P_THEME, before: 'C', after: 'A' },
+      {
+        path: 'settings.theme',
+        ownerPath: 'settings.theme',
+        owner: P_THEME,
+        before: 'C',
+        after: 'A',
+      },
     ]);
     expect(values.get(P_THEME)).toBe('A');
   });
@@ -1042,7 +1052,7 @@ describe('greenfield transactions', () => {
       { theme: 'light' },
       { capabilities: ['causal-runtime'] }
     ) as unknown as {
-      $: {   theme: string };
+      $: { theme: string };
       destroy(): void;
     };
     const store = new TurnStore();
@@ -1117,7 +1127,7 @@ describe('greenfield transactions', () => {
       { theme: 'A' },
       { capabilities: ['causal-runtime'] }
     ) as unknown as {
-      $: {   theme: string };
+      $: { theme: string };
       destroy(): void;
     };
     const store = new TurnStore();
@@ -1156,7 +1166,7 @@ describe('greenfield transactions', () => {
         a: string;
         b: string;
         c: string;
-    };
+      };
       destroy(): void;
     };
     const store = new TurnStore();
@@ -1253,7 +1263,7 @@ describe('greenfield transactions', () => {
           (update: (current: string) => string): void;
           (): string;
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -1366,7 +1376,7 @@ describe('greenfield transactions', () => {
           addOne(user: { id: string; name: string }): void;
           byIdOrFail(id: string): { name: () => string | undefined };
         };
-    };
+      };
       destroy(): void;
     };
     const store = new TurnStore();
@@ -1424,7 +1434,7 @@ describe('greenfield transactions', () => {
           addOne(user: { id: string; name: string }): void;
           removeOne(id: string): void;
         };
-    };
+      };
       destroy(): void;
     };
     tree.$.users.addOne({ id: 'u1', name: 'Jonathan' });
@@ -1494,7 +1504,7 @@ describe('greenfield transactions', () => {
             enabled: (() => boolean | undefined) & { __positionIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -1593,7 +1603,11 @@ describe('greenfield transactions', () => {
       { capabilities: ['causal-runtime'] }
     ) as unknown as {
       $: {
-        count: { (value: number): void; (update: (current: number) => number): void; (): number };
+        count: {
+          (value: number): void;
+          (update: (current: number) => number): void;
+          (): number;
+        };
         users: {
           addOne(user: { id: string; name: string }): void;
           removeOne(id: string): void;
@@ -1603,7 +1617,7 @@ describe('greenfield transactions', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -1780,14 +1794,8 @@ describe('greenfield transactions', () => {
   });
 
   it('constructs fresh add plus rekey rollback as a stale pre-rekey remove and refuses it as structural drift', () => {
-    const {
-      tree,
-      store,
-      appliedTurns,
-      liveDraft,
-      liveHarness,
-      abortWithPort,
-    } = createLiveUsersAbortHarness();
+    const { tree, store, appliedTurns, liveDraft, liveHarness, abortWithPort } =
+      createLiveUsersAbortHarness();
 
     let freshSubject: number | undefined;
     liveHarness.write(() => {
@@ -1852,14 +1860,8 @@ describe('greenfield transactions', () => {
   });
 
   it('proves the adapter can remove the fresh subject once the stale rollback remove is contextualized to the current key', () => {
-    const {
-      tree,
-      store,
-      appliedTurns,
-      liveDraft,
-      liveHarness,
-      abortWithPort,
-    } = createLiveUsersAbortHarness();
+    const { tree, store, appliedTurns, liveDraft, liveHarness, abortWithPort } =
+      createLiveUsersAbortHarness();
 
     const collectionInternal = tree.$.users as typeof tree.$.users & {
       __findKeyBySubjectId?: (subjectId: number) => string | number | undefined;
@@ -1942,14 +1944,8 @@ describe('greenfield transactions', () => {
   });
 
   it('constructs fresh add plus rekey plus scalar rollback as the same stale pre-rekey remove frontier', () => {
-    const {
-      tree,
-      store,
-      appliedTurns,
-      liveDraft,
-      liveHarness,
-      abortWithPort,
-    } = createLiveUsersAbortHarness();
+    const { tree, store, appliedTurns, liveDraft, liveHarness, abortWithPort } =
+      createLiveUsersAbortHarness();
 
     let freshSubject: number | undefined;
     liveHarness.write(() => {
@@ -2041,7 +2037,7 @@ describe('greenfield transactions', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -2125,7 +2121,7 @@ describe('greenfield transactions', () => {
             enabled(): boolean | undefined;
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -2225,7 +2221,7 @@ describe('greenfield transactions', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -2428,7 +2424,7 @@ describe('greenfield transactions', () => {
             settings: { enabled: boolean };
           }>;
         };
-    };
+      };
       destroy(): void;
     };
 

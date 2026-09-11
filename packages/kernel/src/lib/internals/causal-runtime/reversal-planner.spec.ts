@@ -68,11 +68,15 @@ describe('planConfirmedReversal', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Ada',
           after: 'Grace',
         },
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: positions.theme,
           before: 'light',
           after: 'dark',
@@ -89,11 +93,15 @@ describe('planConfirmedReversal', () => {
         turnId: 1,
         effects: [
           {
+            path: 'settings.theme',
+            ownerPath: 'settings.theme',
             owner: positions.theme,
             before: 'dark',
             after: 'light',
           },
           {
+            path: 'profile.firstName',
+            ownerPath: 'profile.firstName',
             owner: positions.firstName,
             before: 'Grace',
             after: 'Ada',
@@ -105,13 +113,17 @@ describe('planConfirmedReversal', () => {
   });
 
   it('refuses planning for an evicted or missing confirmed turn without mutating store state', () => {
+    const { positions } = buildTopology();
+
     const store = new TurnStore({ capacity: 1 });
 
     store.admitConfirmed({
       id: 1,
       effects: [
         {
-          owner: 1 as PositionId,
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: positions.firstName,
           before: 'A',
           after: 'B',
         },
@@ -121,7 +133,9 @@ describe('planConfirmedReversal', () => {
       id: 2,
       effects: [
         {
-          owner: 1 as PositionId,
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: positions.firstName,
           before: 'B',
           after: 'C',
         },
@@ -146,11 +160,15 @@ describe('planConfirmedReversal', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Ada',
           after: 'Grace',
         },
         {
+          path: 'profile.lastName',
+          ownerPath: 'profile.lastName',
           owner: positions.lastName,
           before: 'Lovelace',
           after: 'Hopper',
@@ -162,11 +180,15 @@ describe('planConfirmedReversal', () => {
       id: 2,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Grace',
           after: 'Katherine',
         },
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: positions.theme,
           before: 'light',
           after: 'dark',
@@ -215,6 +237,8 @@ describe('planConfirmedReversal', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: positions.key,
           before: 'A',
           after: undefined,
@@ -225,12 +249,16 @@ describe('planConfirmedReversal', () => {
     });
     expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
 
-    expect(planConfirmedReversal({ turnId: 1, store, realizationContext })).toEqual({
+    expect(
+      planConfirmedReversal({ turnId: 1, store, realizationContext })
+    ).toEqual({
       ok: true,
       plan: {
         turnId: 1,
         effects: [
           {
+            path: 'profile',
+            ownerPath: 'profile',
             owner: positions.key,
             before: undefined,
             after: 'A',
@@ -260,12 +288,16 @@ describe('planConfirmedReversal', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.A.name',
+          ownerPath: 'profile',
           owner: positions.name,
           before: 'Alice',
           after: 'Alicia',
           subjectId: SUBJECT_PROFILE,
         },
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: positions.key,
           before: 'A',
           after: undefined,
@@ -276,12 +308,16 @@ describe('planConfirmedReversal', () => {
     });
     expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
 
-    expect(planConfirmedReversal({ turnId: 1, store, realizationContext })).toEqual({
+    expect(
+      planConfirmedReversal({ turnId: 1, store, realizationContext })
+    ).toEqual({
       ok: true,
       plan: {
         turnId: 1,
         effects: [
           {
+            path: 'profile',
+            ownerPath: 'profile',
             owner: positions.key,
             before: undefined,
             after: 'A',
@@ -289,6 +325,8 @@ describe('planConfirmedReversal', () => {
             structural: 'add',
           },
           {
+            path: 'profile.A.name',
+            ownerPath: 'profile',
             owner: positions.name,
             before: 'Alicia',
             after: 'Alice',
@@ -318,6 +356,8 @@ describe('planConfirmedReversal', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.A.enabled',
+          ownerPath: 'profile',
           owner: positions.enabled,
           before: false,
           after: true,
@@ -330,12 +370,16 @@ describe('planConfirmedReversal', () => {
       id: 2,
       effects: [
         {
+          path: 'profile.A.name',
+          ownerPath: 'profile',
           owner: positions.name,
           before: 'Alice',
           after: 'Alicia',
           subjectId: SUBJECT_PROFILE,
         },
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: positions.key,
           before: 'A',
           after: undefined,
@@ -346,12 +390,16 @@ describe('planConfirmedReversal', () => {
     });
     expect(appliedTurns.admitConfirmed(2)).toEqual({ ok: true });
 
-    expect(planConfirmedReversal({ turnId: 2, store, realizationContext })).toEqual({
+    expect(
+      planConfirmedReversal({ turnId: 2, store, realizationContext })
+    ).toEqual({
       ok: true,
       plan: {
         turnId: 2,
         effects: [
           {
+            path: 'profile',
+            ownerPath: 'profile',
             owner: positions.key,
             before: undefined,
             after: 'A',
@@ -359,6 +407,8 @@ describe('planConfirmedReversal', () => {
             structural: 'add',
           },
           {
+            path: 'profile.A.name',
+            ownerPath: 'profile',
             owner: positions.name,
             before: 'Alicia',
             after: 'Alice',

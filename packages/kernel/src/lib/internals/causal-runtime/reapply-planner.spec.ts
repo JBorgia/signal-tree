@@ -40,11 +40,15 @@ describe('planConfirmedReapply', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Ada',
           after: 'Grace',
         },
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: positions.theme,
           before: 'light',
           after: 'dark',
@@ -61,11 +65,15 @@ describe('planConfirmedReapply', () => {
         turnId: 1,
         effects: [
           {
+            path: 'profile.firstName',
+            ownerPath: 'profile.firstName',
             owner: positions.firstName,
             before: 'Ada',
             after: 'Grace',
           },
           {
+            path: 'settings.theme',
+            ownerPath: 'settings.theme',
             owner: positions.theme,
             before: 'light',
             after: 'dark',
@@ -77,13 +85,17 @@ describe('planConfirmedReapply', () => {
   });
 
   it('refuses planning for an evicted or missing confirmed turn without mutating store state', () => {
+    const { positions } = buildTopology();
+
     const store = new TurnStore({ capacity: 1 });
 
     store.admitConfirmed({
       id: 1,
       effects: [
         {
-          owner: 1 as PositionId,
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: positions.firstName,
           before: 'A',
           after: 'B',
         },
@@ -93,7 +105,9 @@ describe('planConfirmedReapply', () => {
       id: 2,
       effects: [
         {
-          owner: 1 as PositionId,
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: positions.firstName,
           before: 'B',
           after: 'C',
         },
@@ -117,6 +131,8 @@ describe('planConfirmedReapply', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Ada',
           after: 'Grace',
@@ -127,6 +143,8 @@ describe('planConfirmedReapply', () => {
       id: 2,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Grace',
           after: 'Joan',

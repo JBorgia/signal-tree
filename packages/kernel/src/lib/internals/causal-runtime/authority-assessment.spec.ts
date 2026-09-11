@@ -45,11 +45,15 @@ describe('assessConfirmedUndo', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Ada',
           after: 'Grace',
         },
         {
+          path: 'profile.lastName',
+          ownerPath: 'profile.lastName',
           owner: positions.lastName,
           before: 'Lovelace',
           after: 'Hopper',
@@ -60,11 +64,15 @@ describe('assessConfirmedUndo', () => {
       id: 2,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Grace',
           after: 'Katherine',
         },
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: positions.theme,
           before: 'light',
           after: 'dark',
@@ -96,11 +104,15 @@ describe('assessConfirmedUndo', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Ada',
           after: 'Grace',
         },
         {
+          path: 'profile.lastName',
+          ownerPath: 'profile.lastName',
           owner: positions.lastName,
           before: 'Lovelace',
           after: 'Hopper',
@@ -111,11 +123,15 @@ describe('assessConfirmedUndo', () => {
       id: 2,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Grace',
           after: 'Katherine',
         },
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: positions.theme,
           before: 'light',
           after: 'dark',
@@ -147,6 +163,8 @@ describe('assessConfirmedUndo', () => {
       id: 3,
       effects: [
         {
+          path: 'profile.lastName',
+          ownerPath: 'profile.lastName',
           owner: positions.lastName,
           before: 'Lovelace',
           after: 'Hopper',
@@ -199,11 +217,15 @@ describe('assessConfirmedUndo', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Ada',
           after: 'Grace',
         },
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: positions.theme,
           before: 'light',
           after: 'dark',
@@ -234,6 +256,8 @@ describe('assessConfirmedUndo', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Ada',
           after: 'Grace',
@@ -244,6 +268,8 @@ describe('assessConfirmedUndo', () => {
       id: 2,
       effects: [
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: positions.theme,
           before: 'light',
           after: 'dark',
@@ -288,12 +314,16 @@ describe('assessConfirmedUndo', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.A.lastName',
+          ownerPath: 'profile',
           owner: positions.lastName,
           before: 'Alice',
           after: 'Alicia',
           subjectId: 'profile-1',
         },
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: positions.firstName,
           before: 'A',
           after: undefined,

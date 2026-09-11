@@ -18,11 +18,15 @@ describe('TurnStore', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 'Ada',
           after: 'Grace',
         },
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: P_THEME,
           before: 'light',
           after: 'dark',
@@ -34,11 +38,15 @@ describe('TurnStore', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 'Ada',
           after: 'Grace',
         },
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: P_THEME,
           before: 'light',
           after: 'dark',
@@ -81,6 +89,8 @@ describe('TurnStore', () => {
       id: 2,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 'Ada',
           after: 'Grace',
@@ -92,6 +102,8 @@ describe('TurnStore', () => {
       id: 2,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 'Ada',
           after: 'Grace',
@@ -122,6 +134,8 @@ describe('TurnStore', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 'Ada',
           after: 'Grace',
@@ -134,6 +148,8 @@ describe('TurnStore', () => {
         id: 1,
         effects: [
           {
+            path: 'settings.theme',
+            ownerPath: 'settings.theme',
             owner: P_THEME,
             before: 'light',
             after: 'dark',
@@ -147,6 +163,8 @@ describe('TurnStore', () => {
         id: 1,
         effects: [
           {
+            path: 'settings.theme',
+            ownerPath: 'settings.theme',
             owner: P_THEME,
             before: 'light',
             after: 'dark',
@@ -166,6 +184,8 @@ describe('TurnStore', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 'Ada',
           after: 'Grace',
@@ -178,6 +198,8 @@ describe('TurnStore', () => {
         id: 1,
         effects: [
           {
+            path: 'settings.theme',
+            ownerPath: 'settings.theme',
             owner: P_THEME,
             before: 'light',
             after: 'dark',
@@ -198,6 +220,8 @@ describe('TurnStore', () => {
       id: 2,
       effects: [
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: P_THEME,
           before: 'light',
           after: 'dark',
@@ -208,6 +232,8 @@ describe('TurnStore', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 'Ada',
           after: 'Grace',
@@ -221,6 +247,8 @@ describe('TurnStore', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 'Ada',
           after: 'Grace',
@@ -246,6 +274,8 @@ describe('TurnStore', () => {
       id: 1,
       effects: [
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: P_THEME,
           before: 'light',
           after: 'dark',
@@ -292,6 +322,8 @@ describe('TurnStore', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 'Ada',
           after: 'Grace',
@@ -302,6 +334,8 @@ describe('TurnStore', () => {
       id: 2,
       effects: [
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: P_THEME,
           before: 'light',
           after: 'dark',
@@ -330,11 +364,15 @@ describe('TurnStore', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 0,
           after: 1,
         },
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: P_THEME,
           before: 0,
           after: 1,
@@ -345,6 +383,8 @@ describe('TurnStore', () => {
       id: 2,
       effects: [
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: P_THEME,
           before: 1,
           after: 2,
@@ -355,6 +395,8 @@ describe('TurnStore', () => {
       id: 3,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: P_FIRST_NAME,
           before: 1,
           after: 3,
@@ -390,12 +432,16 @@ describe('TurnStore', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.A.lastName',
+          ownerPath: 'profile',
           owner: P_LAST_NAME,
           before: 'Alice',
           after: 'Alicia',
           subjectId: 'profile-1',
         },
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_FIRST_NAME,
           before: 'A',
           after: undefined,

@@ -14,7 +14,15 @@ describe('AppliedTurnProjection', () => {
 
     const pending = store.admitPending({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
 
     expect(store.getTurn(pending.id)).toBeUndefined();
@@ -37,17 +45,45 @@ describe('AppliedTurnProjection', () => {
     store.admitConfirmed({
       id: 1,
       effects: [
-        { owner: P_FIRST_NAME, before: 'A', after: 'B' },
-        { owner: P_LAST_NAME, before: 'L', after: 'H' },
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'A',
+          after: 'B',
+        },
+        {
+          path: 'profile.lastName',
+          ownerPath: 'profile.lastName',
+          owner: P_LAST_NAME,
+          before: 'L',
+          after: 'H',
+        },
       ],
     });
     store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'B',
+          after: 'C',
+        },
+      ],
     });
     store.admitConfirmed({
       id: 3,
-      effects: [{ owner: P_FIRST_NAME, before: 'C', after: 'D' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'C',
+          after: 'D',
+        },
+      ],
     });
 
     expect(history.admitConfirmed(1)).toEqual({ ok: true });
@@ -74,15 +110,39 @@ describe('AppliedTurnProjection', () => {
 
     store.admitConfirmed({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
     store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_THEME, before: 'light', after: 'dark' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'light',
+          after: 'dark',
+        },
+      ],
     });
     store.admitConfirmed({
       id: 3,
-      effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'B',
+          after: 'C',
+        },
+      ],
     });
 
     history.admitConfirmed(1);
@@ -92,7 +152,15 @@ describe('AppliedTurnProjection', () => {
 
     store.admitConfirmed({
       id: 4,
-      effects: [{ owner: P_FIRST_NAME, before: 'C', after: 'E' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'C',
+          after: 'E',
+        },
+      ],
     });
 
     expect(history.admitConfirmed(4)).toEqual({ ok: true });
@@ -113,11 +181,27 @@ describe('AppliedTurnProjection', () => {
 
     store.admitConfirmed({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
     store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'B',
+          after: 'C',
+        },
+      ],
     });
 
     history.admitConfirmed(1);
@@ -138,11 +222,27 @@ describe('AppliedTurnProjection', () => {
 
     store.admitConfirmed({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
     store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_THEME, before: 'light', after: 'dark' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'light',
+          after: 'dark',
+        },
+      ],
     });
 
     expect(history.admitConfirmed(1)).toEqual({ ok: true });
@@ -167,11 +267,27 @@ describe('AppliedTurnProjection', () => {
 
     store.admitConfirmed({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
     store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_THEME, before: 'light', after: 'dark' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'light',
+          after: 'dark',
+        },
+      ],
     });
 
     expect(history.admitConfirmed(1)).toEqual({ ok: true });
@@ -180,7 +296,15 @@ describe('AppliedTurnProjection', () => {
 
     store.admitConfirmed({
       id: 3,
-      effects: [{ owner: P_NOTIFICATIONS, before: false, after: true }],
+      effects: [
+        {
+          path: 'settings.notifications',
+          ownerPath: 'settings.notifications',
+          owner: P_NOTIFICATIONS,
+          before: false,
+          after: true,
+        },
+      ],
     });
 
     expect(history.admitConfirmed(3)).toEqual({ ok: true });
@@ -201,8 +325,20 @@ describe('AppliedTurnProjection', () => {
     store.admitConfirmed({
       id: 1,
       effects: [
-        { owner: P_FIRST_NAME, before: 'A', after: 'B' },
-        { owner: P_THEME, before: 'light', after: 'dark' },
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'A',
+          after: 'B',
+        },
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'light',
+          after: 'dark',
+        },
       ],
     });
 
@@ -211,7 +347,15 @@ describe('AppliedTurnProjection', () => {
 
     store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'B',
+          after: 'C',
+        },
+      ],
     });
 
     expect(history.admitConfirmed(2)).toEqual({ ok: true });
@@ -230,11 +374,27 @@ describe('AppliedTurnProjection', () => {
 
     store.admitConfirmed({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
     store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_THEME, before: 'light', after: 'dark' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'light',
+          after: 'dark',
+        },
+      ],
     });
 
     expect(history.admitConfirmed(1)).toEqual({ ok: true });
@@ -258,11 +418,27 @@ describe('AppliedTurnProjection', () => {
 
     store.admitConfirmed({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
     store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'B',
+          after: 'C',
+        },
+      ],
     });
 
     expect(history.admitConfirmed(1)).toEqual({ ok: true });
@@ -300,13 +476,33 @@ describe('AppliedTurnProjection', () => {
 
     store.admitConfirmed({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'A', after: 'B' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'A',
+          after: 'B',
+        },
+      ],
     });
     store.admitConfirmed({
       id: 2,
       effects: [
-        { owner: P_FIRST_NAME, before: 'B', after: 'C' },
-        { owner: P_THEME, before: 'light', after: 'dark' },
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'B',
+          after: 'C',
+        },
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'light',
+          after: 'dark',
+        },
       ],
     });
 

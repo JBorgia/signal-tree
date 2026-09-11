@@ -41,6 +41,8 @@ describe('assessConfirmedRedo', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Ada',
           after: 'Grace',
@@ -51,6 +53,8 @@ describe('assessConfirmedRedo', () => {
       id: 2,
       effects: [
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: positions.theme,
           before: 'light',
           after: 'dark',
@@ -82,6 +86,8 @@ describe('assessConfirmedRedo', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Ada',
           after: 'Grace',
@@ -92,6 +98,8 @@ describe('assessConfirmedRedo', () => {
       id: 2,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Grace',
           after: 'Joan',
@@ -132,6 +140,8 @@ describe('assessConfirmedRedo', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Ada',
           after: 'Grace',
@@ -142,11 +152,15 @@ describe('assessConfirmedRedo', () => {
       id: 2,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Grace',
           after: 'Joan',
         },
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: positions.theme,
           before: 'light',
           after: 'dark',
@@ -188,11 +202,15 @@ describe('assessConfirmedRedo', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Ada',
           after: 'Grace',
         },
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: positions.theme,
           before: 'light',
           after: 'dark',
@@ -230,11 +248,15 @@ describe('assessConfirmedRedo', () => {
       id: 1,
       effects: [
         {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
           owner: positions.firstName,
           before: 'Ada',
           after: 'Grace',
         },
         {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
           owner: positions.theme,
           before: 'light',
           after: 'dark',
@@ -245,6 +267,8 @@ describe('assessConfirmedRedo', () => {
       id: 2,
       effects: [
         {
+          path: 'profile.lastName',
+          ownerPath: 'profile.lastName',
           owner: positions.lastName,
           before: 'Lovelace',
           after: 'Hopper',

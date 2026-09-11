@@ -31,7 +31,15 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
 
     const t2 = store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'B',
+          after: 'C',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(t2.id)).toEqual({ ok: true });
 
@@ -68,6 +76,8 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
 
     expect(appliedEffects[0]).toEqual([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'C',
         after: 'A',
@@ -76,7 +86,15 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
     expect(values.get(P_FIRST_NAME)).toBe('A');
     expect(store.getTurn(t2.id)).toEqual({
       id: t2.id,
-      effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'B',
+          after: 'C',
+        },
+      ],
       participants: [P_FIRST_NAME],
       state: 'confirmed',
     });
@@ -94,6 +112,8 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
 
     expect(appliedEffects[1]).toEqual([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'A',
         after: 'C',
@@ -102,7 +122,15 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
     expect(values.get(P_FIRST_NAME)).toBe('C');
     expect(store.getTurn(t2.id)).toEqual({
       id: t2.id,
-      effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'B',
+          after: 'C',
+        },
+      ],
       participants: [P_FIRST_NAME],
       state: 'confirmed',
     });
@@ -129,8 +157,20 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
     const t2 = store.admitConfirmed({
       id: 2,
       effects: [
-        { owner: P_FIRST_NAME, before: 'B', after: 'C' },
-        { owner: P_FIRST_NAME, before: 'C', after: 'D' },
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'B',
+          after: 'C',
+        },
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'C',
+          after: 'D',
+        },
       ],
     });
     expect(appliedTurns.admitConfirmed(t2.id)).toEqual({ ok: true });
@@ -168,11 +208,15 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
 
     expect(appliedEffects[0]).toEqual([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'D',
         after: 'C',
       },
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'C',
         after: 'A',
@@ -193,11 +237,15 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
 
     expect(appliedEffects[1]).toEqual([
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'A',
         after: 'C',
       },
       {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
         owner: P_FIRST_NAME,
         before: 'C',
         after: 'D',
@@ -207,8 +255,20 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
     expect(store.getTurn(t2.id)).toEqual({
       id: t2.id,
       effects: [
-        { owner: P_FIRST_NAME, before: 'B', after: 'C' },
-        { owner: P_FIRST_NAME, before: 'C', after: 'D' },
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'B',
+          after: 'C',
+        },
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'C',
+          after: 'D',
+        },
       ],
       participants: [P_FIRST_NAME],
       state: 'confirmed',

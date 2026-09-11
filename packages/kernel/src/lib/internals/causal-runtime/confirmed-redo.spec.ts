@@ -1,7 +1,10 @@
 import type { PositionId, ReversalEffect } from './causal-types';
 import { AppliedTurnProjection } from './applied-turn-projection';
 import { redoConfirmedAt } from './confirmed-redo';
-import { createPositionRegistry, type PositionRegistry } from '../position-registry';
+import {
+  createPositionRegistry,
+  type PositionRegistry,
+} from '../position-registry';
 import { createRealizationContextSource } from './realization-context';
 import { TurnStore } from './turn-store';
 
@@ -19,8 +22,20 @@ describe('redoConfirmedAt', () => {
     store.admitConfirmed({
       id: 1,
       effects: [
-        { owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' },
-        { owner: P_THEME, before: 'light', after: 'dark' },
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'Ada',
+          after: 'Grace',
+        },
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'light',
+          after: 'dark',
+        },
       ],
     });
     expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
@@ -59,7 +74,15 @@ describe('redoConfirmedAt', () => {
 
     store.admitConfirmed({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'Ada',
+          after: 'Grace',
+        },
+      ],
     });
     const storeBefore = store.inspect();
     const appliedBefore = appliedTurns.inspect();
@@ -113,7 +136,15 @@ describe('redoConfirmedAt', () => {
 
     store.admitConfirmed({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'Ada',
+          after: 'Grace',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
     expect(appliedTurns.moveConfirmedTurnToRedo(1)).toEqual({ ok: true });
@@ -151,11 +182,27 @@ describe('redoConfirmedAt', () => {
 
     store.admitConfirmed({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'Ada',
+          after: 'Grace',
+        },
+      ],
     });
     store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_THEME, before: 'light', after: 'dark' }],
+      effects: [
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'light',
+          after: 'dark',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
     expect(appliedTurns.admitConfirmed(2)).toEqual({ ok: true });
@@ -203,7 +250,13 @@ describe('redoConfirmedAt', () => {
     });
     expect(applyAtomically).toHaveBeenCalledTimes(1);
     expect(applyAtomically).toHaveBeenCalledWith([
-      { owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' },
+      {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
+        owner: P_FIRST_NAME,
+        before: 'Ada',
+        after: 'Grace',
+      },
     ]);
   });
 });

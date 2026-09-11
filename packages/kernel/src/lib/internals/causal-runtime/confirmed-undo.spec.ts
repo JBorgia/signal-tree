@@ -1,7 +1,10 @@
 import type { PositionId, ReversalEffect } from './causal-types';
 import { AppliedTurnProjection } from './applied-turn-projection';
 import { undoConfirmedAt } from './confirmed-undo';
-import { createPositionRegistry, type PositionRegistry } from '../position-registry';
+import {
+  createPositionRegistry,
+  type PositionRegistry,
+} from '../position-registry';
 import { createRealizationContextSource } from './realization-context';
 import { TurnStore } from './turn-store';
 
@@ -19,15 +22,39 @@ describe('undoConfirmedAt', () => {
     store.admitConfirmed({
       id: 1,
       effects: [
-        { owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' },
-        { owner: P_LAST_NAME, before: 'Lovelace', after: 'Hopper' },
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'Ada',
+          after: 'Grace',
+        },
+        {
+          path: 'profile.lastName',
+          ownerPath: 'profile.lastName',
+          owner: P_LAST_NAME,
+          before: 'Lovelace',
+          after: 'Hopper',
+        },
       ],
     });
     store.admitConfirmed({
       id: 2,
       effects: [
-        { owner: P_FIRST_NAME, before: 'Grace', after: 'Joan' },
-        { owner: P_THEME, before: 'light', after: 'dark' },
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'Grace',
+          after: 'Joan',
+        },
+        {
+          path: 'settings.theme',
+          ownerPath: 'settings.theme',
+          owner: P_THEME,
+          before: 'light',
+          after: 'dark',
+        },
       ],
     });
     expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
@@ -67,7 +94,15 @@ describe('undoConfirmedAt', () => {
 
     store.admitConfirmed({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'Ada',
+          after: 'Grace',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
 
@@ -81,7 +116,8 @@ describe('undoConfirmedAt', () => {
     });
     const refusingAppliedTurns = {
       getAppliedTurnIds: () => appliedTurns.getAppliedTurnIds(),
-      getFrontier: (positionId: PositionId) => appliedTurns.getFrontier(positionId),
+      getFrontier: (positionId: PositionId) =>
+        appliedTurns.getFrontier(positionId),
       prepareUnapplyConfirmedTurn: () => ({
         ok: false as const,
         reason: 'not-applied-frontier' as const,
@@ -123,7 +159,15 @@ describe('undoConfirmedAt', () => {
 
     store.admitConfirmed({
       id: 1,
-      effects: [{ owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'Ada',
+          after: 'Grace',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
 
@@ -161,13 +205,33 @@ describe('undoConfirmedAt', () => {
     store.admitConfirmed({
       id: 1,
       effects: [
-        { owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' },
-        { owner: P_LAST_NAME, before: 'Lovelace', after: 'Hopper' },
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'Ada',
+          after: 'Grace',
+        },
+        {
+          path: 'profile.lastName',
+          ownerPath: 'profile.lastName',
+          owner: P_LAST_NAME,
+          before: 'Lovelace',
+          after: 'Hopper',
+        },
       ],
     });
     store.admitConfirmed({
       id: 2,
-      effects: [{ owner: P_FIRST_NAME, before: 'Grace', after: 'Joan' }],
+      effects: [
+        {
+          path: 'profile.firstName',
+          ownerPath: 'profile.firstName',
+          owner: P_FIRST_NAME,
+          before: 'Grace',
+          after: 'Joan',
+        },
+      ],
     });
     expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
     expect(appliedTurns.admitConfirmed(2)).toEqual({ ok: true });
@@ -214,7 +278,13 @@ describe('undoConfirmedAt', () => {
     });
     expect(applyAtomically).toHaveBeenCalledTimes(1);
     expect(applyAtomically).toHaveBeenCalledWith([
-      { owner: P_FIRST_NAME, before: 'Joan', after: 'Grace' },
+      {
+        path: 'profile.firstName',
+        ownerPath: 'profile.firstName',
+        owner: P_FIRST_NAME,
+        before: 'Joan',
+        after: 'Grace',
+      },
     ]);
   });
 
@@ -225,6 +295,8 @@ describe('undoConfirmedAt', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_FIRST_NAME,
           before: 'A',
           after: 'B',
@@ -237,6 +309,8 @@ describe('undoConfirmedAt', () => {
       id: 2,
       effects: [
         {
+          path: 'settings',
+          ownerPath: 'settings',
           owner: P_THEME,
           before: undefined,
           after: 'A',
@@ -247,7 +321,31 @@ describe('undoConfirmedAt', () => {
     });
     expect(appliedTurns.admitConfirmed(first.id)).toEqual({ ok: true });
     expect(appliedTurns.admitConfirmed(second.id)).toEqual({ ok: true });
-    expect(appliedTurns.moveConfirmedTurnToRedo(second.id)).toEqual({ ok: true });
+    // This guard compares occupied keys globally, even across distinct address scopes.
+    expect(first.effects[0]?.ownerPath).toBe('profile');
+    expect(second.effects[0]?.ownerPath).toBe('settings');
+    const beforeBlockedUndo = store.inspect();
+    const beforeBlockedApplied = appliedTurns.inspect();
+    const blockedApply = vi.fn();
+    expect(
+      undoConfirmedAt({
+        authority: P_PROFILE,
+        store,
+        appliedTurns,
+        topology,
+        port: { applyAtomically: blockedApply },
+        realizationContext: createRealizationContextSource({
+          store,
+          appliedTurns,
+        }),
+      })
+    ).toEqual({ ok: false, refusal: { kind: 'dependency-conflict' } });
+    expect(blockedApply).not.toHaveBeenCalled();
+    expect(store.inspect()).toEqual(beforeBlockedUndo);
+    expect(appliedTurns.inspect()).toEqual(beforeBlockedApplied);
+    expect(appliedTurns.moveConfirmedTurnToRedo(second.id)).toEqual({
+      ok: true,
+    });
 
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
     const validateEffects = vi.fn();
@@ -275,6 +373,8 @@ describe('undoConfirmedAt', () => {
     expect(applyAtomically).toHaveBeenCalledTimes(1);
     expect(applyAtomically).toHaveBeenCalledWith([
       {
+        path: 'profile',
+        ownerPath: 'profile',
         owner: P_FIRST_NAME,
         before: 'B',
         after: 'A',

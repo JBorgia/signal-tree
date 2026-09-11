@@ -44,6 +44,8 @@ describe('confirmed structural undo/redo composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'A',
           after: 'B',
@@ -51,6 +53,8 @@ describe('confirmed structural undo/redo composition', () => {
           structural: 'rekey',
         },
         {
+          path: 'profile.B.name',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: 'Alice',
           after: 'Alicia',
@@ -96,6 +100,8 @@ describe('confirmed structural undo/redo composition', () => {
 
     expect(appliedEffects[0]).toEqual([
       {
+        path: 'profile.B.name',
+        ownerPath: 'profile',
         owner: P_DRIVER_NAME,
         before: 'Alicia',
         after: 'Alice',
@@ -103,6 +109,8 @@ describe('confirmed structural undo/redo composition', () => {
         structural: undefined,
       },
       {
+        path: 'profile',
+        ownerPath: 'profile',
         owner: P_DRIVER_KEY,
         before: 'B',
         after: 'A',
@@ -116,6 +124,8 @@ describe('confirmed structural undo/redo composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'A',
           after: 'B',
@@ -123,6 +133,8 @@ describe('confirmed structural undo/redo composition', () => {
           structural: 'rekey',
         },
         {
+          path: 'profile.B.name',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: 'Alice',
           after: 'Alicia',
@@ -153,6 +165,8 @@ describe('confirmed structural undo/redo composition', () => {
         structural: 'rekey',
       },
       {
+        path: 'profile.B.name',
+        ownerPath: 'profile',
         owner: P_DRIVER_NAME,
         before: 'Alice',
         after: 'Alicia',
@@ -193,6 +207,8 @@ describe('confirmed structural undo/redo composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'A',
           after: 'B',
@@ -205,6 +221,8 @@ describe('confirmed structural undo/redo composition', () => {
       id: 2,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_OTHER_DRIVER_KEY,
           before: undefined,
           after: 'A',
@@ -266,6 +284,8 @@ describe('confirmed structural undo/redo composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'A',
           after: 'B',
@@ -278,6 +298,8 @@ describe('confirmed structural undo/redo composition', () => {
       id: 2,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_OTHER_DRIVER_KEY,
           before: undefined,
           after: 'A',
@@ -288,7 +310,9 @@ describe('confirmed structural undo/redo composition', () => {
     });
     expect(appliedTurns.admitConfirmed(first.id)).toEqual({ ok: true });
     expect(appliedTurns.admitConfirmed(second.id)).toEqual({ ok: true });
-    expect(appliedTurns.moveConfirmedTurnToRedo(second.id)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(second.id)).toEqual({
+      ok: true,
+    });
 
     const values = new Map<PositionId, unknown>([
       [P_DRIVER_KEY, 'B'],
@@ -327,6 +351,8 @@ describe('confirmed structural undo/redo composition', () => {
     expect(appliedEffects).toEqual([
       [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'B',
           after: 'A',
@@ -358,6 +384,8 @@ describe('confirmed structural undo/redo composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'A',
           after: 'B',
@@ -369,7 +397,9 @@ describe('confirmed structural undo/redo composition', () => {
     expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
-    const validateEffects = vi.fn(() => ({ kind: 'structural-drift' as const }));
+    const validateEffects = vi.fn(() => ({
+      kind: 'structural-drift' as const,
+    }));
     const appliedBefore = appliedTurns.inspect();
     const storeBefore = store.inspect();
 
@@ -416,6 +446,8 @@ describe('confirmed structural undo/redo composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: 'A',
           after: 'B',
@@ -423,6 +455,8 @@ describe('confirmed structural undo/redo composition', () => {
           structural: 'rekey',
         },
         {
+          path: 'profile.B.name',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: 'Alice',
           after: 'Alicia',
@@ -463,7 +497,9 @@ describe('confirmed structural undo/redo composition', () => {
     ).toEqual({ ok: true, turnId: confirmed.id });
 
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
-    const validateEffects = vi.fn(() => ({ kind: 'structural-drift' as const }));
+    const validateEffects = vi.fn(() => ({
+      kind: 'structural-drift' as const,
+    }));
     const appliedBefore = appliedTurns.inspect();
     const storeBefore = store.inspect();
 
@@ -510,6 +546,8 @@ describe('confirmed structural undo/redo composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: undefined,
           after: 'A',
@@ -517,6 +555,8 @@ describe('confirmed structural undo/redo composition', () => {
           structural: 'add',
         },
         {
+          path: 'profile.A.name',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: undefined,
           after: 'Alice',
@@ -546,6 +586,8 @@ describe('confirmed structural undo/redo composition', () => {
 
     expect(appliedEffects[0]).toEqual([
       {
+        path: 'profile.A.name',
+        ownerPath: 'profile',
         owner: P_DRIVER_NAME,
         before: 'Alice',
         after: undefined,
@@ -553,6 +595,8 @@ describe('confirmed structural undo/redo composition', () => {
         structural: undefined,
       },
       {
+        path: 'profile',
+        ownerPath: 'profile',
         owner: P_DRIVER_KEY,
         before: 'A',
         after: undefined,
@@ -583,6 +627,8 @@ describe('confirmed structural undo/redo composition', () => {
         structural: 'add',
       },
       {
+        path: 'profile.A.name',
+        ownerPath: 'profile',
         owner: P_DRIVER_NAME,
         before: undefined,
         after: 'Alice',
@@ -623,6 +669,8 @@ describe('confirmed structural undo/redo composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: undefined,
           after: 'A',
@@ -630,12 +678,16 @@ describe('confirmed structural undo/redo composition', () => {
           structural: 'add',
         },
         {
+          path: 'profile.A.name',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: undefined,
           after: 'Alice',
           subjectId: SUBJECT_DRIVER,
         },
         {
+          path: 'profile.A.enabled',
+          ownerPath: 'profile',
           owner: P_DRIVER_ENABLED,
           before: undefined,
           after: true,
@@ -666,6 +718,8 @@ describe('confirmed structural undo/redo composition', () => {
 
     expect(appliedEffects[0]).toEqual([
       {
+        path: 'profile.A.enabled',
+        ownerPath: 'profile',
         owner: P_DRIVER_ENABLED,
         before: true,
         after: undefined,
@@ -673,6 +727,8 @@ describe('confirmed structural undo/redo composition', () => {
         structural: undefined,
       },
       {
+        path: 'profile.A.name',
+        ownerPath: 'profile',
         owner: P_DRIVER_NAME,
         before: 'Alice',
         after: undefined,
@@ -680,6 +736,8 @@ describe('confirmed structural undo/redo composition', () => {
         structural: undefined,
       },
       {
+        path: 'profile',
+        ownerPath: 'profile',
         owner: P_DRIVER_KEY,
         before: 'A',
         after: undefined,
@@ -711,6 +769,8 @@ describe('confirmed structural undo/redo composition', () => {
         structural: 'add',
       },
       {
+        path: 'profile.A.name',
+        ownerPath: 'profile',
         owner: P_DRIVER_NAME,
         before: undefined,
         after: 'Alice',
@@ -718,6 +778,8 @@ describe('confirmed structural undo/redo composition', () => {
         structural: undefined,
       },
       {
+        path: 'profile.A.enabled',
+        ownerPath: 'profile',
         owner: P_DRIVER_ENABLED,
         before: undefined,
         after: true,
@@ -729,9 +791,6 @@ describe('confirmed structural undo/redo composition', () => {
     expect(values.get(P_DRIVER_NAME)).toBe('Alice');
     expect(values.get(P_DRIVER_ENABLED)).toBe(true);
   });
-
-
-
 
   it('keeps a confirmed add redoable when redo validation refuses with structural-drift', () => {
     const topology = createPositionRegistry();
@@ -759,6 +818,8 @@ describe('confirmed structural undo/redo composition', () => {
       id: 1,
       effects: [
         {
+          path: 'profile',
+          ownerPath: 'profile',
           owner: P_DRIVER_KEY,
           before: undefined,
           after: 'A',
@@ -766,6 +827,8 @@ describe('confirmed structural undo/redo composition', () => {
           structural: 'add',
         },
         {
+          path: 'profile.A.name',
+          ownerPath: 'profile',
           owner: P_DRIVER_NAME,
           before: undefined,
           after: 'Alice',
@@ -793,7 +856,9 @@ describe('confirmed structural undo/redo composition', () => {
     ).toEqual({ ok: true, turnId: confirmed.id });
 
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
-    const validateEffects = vi.fn(() => ({ kind: 'structural-drift' as const }));
+    const validateEffects = vi.fn(() => ({
+      kind: 'structural-drift' as const,
+    }));
     const appliedBefore = appliedTurns.inspect();
     const storeBefore = store.inspect();
 
@@ -818,6 +883,8 @@ describe('confirmed structural undo/redo composition', () => {
         structural: 'add',
       },
       {
+        path: 'profile.A.name',
+        ownerPath: 'profile',
         owner: P_DRIVER_NAME,
         before: undefined,
         after: 'Alice',
@@ -829,7 +896,6 @@ describe('confirmed structural undo/redo composition', () => {
     expect(store.inspect()).toEqual(storeBefore);
     expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
-
 });
 
 function createStructuralPort(
@@ -843,7 +909,6 @@ function createStructuralPort(
       for (const effect of effects) {
         expect(staged.get(effect.owner)).toEqual(effect.before);
         staged.set(effect.owner, effect.after);
-
       }
 
       appliedEffects.push(effects.map((effect) => ({ ...effect })));
