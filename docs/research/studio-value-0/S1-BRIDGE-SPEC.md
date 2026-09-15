@@ -403,14 +403,11 @@ The registry is module-private to `studio-adapter` in the page realm, so the
 bridge must be installed there. It is **not** installed by `attachStudio`
 behind an environment guard.
 
-```ts
-// dev-only setup, browser builds
-import { attachStudio } from '@signal-tree/studio-adapter';
-import { installStudioBridge } from '@signal-tree/studio-adapter/bridge';
-
-installStudioBridge();
-attachStudio(appTree, { label: 'AppTree' });
-```
+**Packaging update, 2026-09-15:** Studio's adapter and bridge now live in the
+private Studio repository and are not public npm packages. The frozen lifetime
+decision remains: development setup installs the bridge before attaching the
+application tree. Follow the private Studio installation guide for its current
+entry points; this public document no longer supplies an npm import example.
 
 ⚠️ **A runtime `typeof window` guard would put the bridge in every bundle.**
 This repository has already paid for that lesson once: `restoration()` reaches

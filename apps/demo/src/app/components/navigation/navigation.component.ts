@@ -196,7 +196,7 @@ export class NavigationComponent {
     },
     {
       label: 'npm',
-      url: 'https://www.npmjs.com/org/signaltree',
+      url: 'https://www.npmjs.com/org/signal-tree',
       title: 'View packages on npm',
     },
   ];
