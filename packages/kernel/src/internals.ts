@@ -10,6 +10,7 @@
  * Studio has a stable contract without `causal-runtime` or the transactions
  * enhancer's storage types becoming public surface.
  */
+export { withWriteObservationScope, type DeclaredWriteScopes } from './lib/internals/write-observation-scope';
 import type { ISignalTree } from './lib/types';
 import { getActiveWriteContext } from './lib/write-context';
 import { peekInternalTransactionRuntime } from './enhancers/transactions/transactions';
