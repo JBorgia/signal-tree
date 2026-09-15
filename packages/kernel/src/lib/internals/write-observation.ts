@@ -1,3 +1,4 @@
+import type { DeclaredWriteScopes } from './write-observation-scope';
 import type { WriteMetadata } from '../mutation-types';
 import { getPathNotifier } from '../path-notifier';
 
@@ -10,6 +11,7 @@ import { getPathNotifier } from '../path-notifier';
  * what an absent owner means rather than guessing.
  */
 export interface ObservedWriteFrame {
+  readonly declaredScopes?: DeclaredWriteScopes;
   readonly path: string;
   readonly ownerPath: string;
   readonly before: unknown;
@@ -43,16 +45,18 @@ export function observeWrites(
 ): () => void {
   return getPathNotifier().subscribe(
     '**',
-    (next, prev, path, ownerPath, origin, subjectIds, positionIds, meta) => {
+    (next, prev, path, ownerPath, origin, subjectIds, positionIds, meta, declaredScopes, ownerId) => {
       const m = (meta ?? {}) as WriteMetadata;
       handler({
+        ...(declaredScopes ? { declaredScopes } : {}),
         path,
         ownerPath: ownerPath ?? path,
         before: prev,
         after: next,
         origin: (origin as WriteMetadata['origin']) ?? m.origin,
         participation: m.participation,
-        ownerId: m.ownerId,
+        // Ownership survives mixed metadata; it is independent of causal admission.
+        ownerId: ownerId ?? m.ownerId,
         transactionId: typeof m.transactionId === 'number' ? m.transactionId : undefined,
         subjectIds,
         positionIds,

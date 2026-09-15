@@ -11,6 +11,10 @@
 
 import { getActiveWriteContext } from './write-context';
 import {
+  currentWriteObservationScopes, mergeWriteObservationScopes,
+  withoutWriteObservationScopes, type DeclaredWriteScopes,
+} from './internals/write-observation-scope';
+import {
   isRestorationDesignated,
   markMetaDesignated,
 } from './internals/restoration-eligibility';
@@ -28,7 +32,9 @@ export type PathNotifierHandler = (
   origin?: string,
   subjectIds?: number[],
   positionIds?: number[],
-  meta?: WriteMetadata
+  meta?: WriteMetadata,
+  declaredScopes?: DeclaredWriteScopes,
+  ownerId?: number
 ) => void | Promise<void>;
 
 type BatchIdentityMode =
@@ -44,6 +50,7 @@ type PendingEntry = {
   ownerPath?: string;
   origin?: string;
   meta?: WriteMetadata;
+  declaredScopes?: DeclaredWriteScopes;
   subjectId?: number;
   positionId?: number;
   /**
@@ -208,6 +215,7 @@ export class PathNotifier {
       ? metaBeforeOwner
       : { ...(metaBeforeOwner ?? {}), ownerId };
 
+    const declaredScopes = currentWriteObservationScopes(ownerId);
     const origin = meta?.origin;
     if (!this.batchingEnabled) {
       // Synchronous path: run subscribers immediately
@@ -220,7 +228,9 @@ export class PathNotifier {
         origin,
         subjectIds,
         positionIds,
-        deliveryMeta
+        deliveryMeta,
+        declaredScopes,
+        ownerId
       );
     }
 
@@ -231,6 +241,7 @@ export class PathNotifier {
       ownerPath,
       origin,
       meta,
+      declaredScopes,
       subjectId: subjectIds?.[0],
       positionId: positionIds?.[0],
       ownerId,
@@ -260,7 +271,9 @@ export class PathNotifier {
     origin?: string,
     subjectIds?: number[],
     positionIds?: number[],
-    meta?: WriteMetadata
+    meta?: WriteMetadata,
+    declaredScopes?: DeclaredWriteScopes,
+    ownerId?: number
   ): void {
     // ⚠️ THE INTERCEPTOR LOOP WAS DELETED IN 15.0 — PATH-NOTIFIER-INTERCEPT-
     // SURVIVAL-0. It ran here, before subscribers, and could suppress delivery
@@ -284,7 +297,7 @@ export class PathNotifier {
     for (const [pattern, handlers] of this.subscribers) {
       if (this.matches(pattern, path)) {
         for (const handler of handlers) {
-          handler(
+          withoutWriteObservationScopes(() => handler(
             transformed,
             prev,
             path,
@@ -292,8 +305,10 @@ export class PathNotifier {
             origin,
             subjectIds,
             positionIds,
-            meta
-          );
+            meta,
+            declaredScopes,
+            ownerId
+          ));
         }
       }
     }
@@ -339,7 +354,9 @@ export class PathNotifier {
           entry.origin,
           entry.subjectIds,
           entry.positionIds,
-          materializeDeliveryMeta(entry.meta)
+          materializeDeliveryMeta(entry.meta),
+          entry.declaredScopes,
+          entry.ownerId
         );
       }
     }
@@ -347,7 +364,7 @@ export class PathNotifier {
     // Call flush listeners (e.g., restoration) once per flush
     for (const cb of Array.from(this.flushCallbacks)) {
       try {
-        cb();
+        withoutWriteObservationScopes(cb);
       } catch {
         // swallow callback errors to avoid breaking flush loop
       }
@@ -541,6 +558,7 @@ export class PathNotifier {
   }
 
   private coalesceEntry(target: PendingEntry, next: PendingEntry): void {
+    target.declaredScopes = mergeWriteObservationScopes(target.declaredScopes, next.declaredScopes);
     target.newValue = next.newValue;
     target.ownerPath = next.ownerPath;
     target.origin = this.mergeOrigin(target.origin, next.origin);
@@ -615,7 +633,7 @@ export class PathNotifier {
   emitReset(): void {
     for (const cb of Array.from(this.resetCallbacks)) {
       try {
-        cb();
+        withoutWriteObservationScopes(cb);
       } catch {
         // swallow callback errors to avoid breaking reset flow
       }

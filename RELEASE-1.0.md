@@ -6,6 +6,23 @@ credible `1.0.0` release candidate.
 This is the release controller, not the full historical backlog. Use it to
 bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
+## Development tooling follow-up — September 14, 2026
+
+Owner approved `withWriteObservationScope(ownerId, token, write)` on the existing
+`@signal-tree/kernel/internals` tooling entrypoint. Declarations are captured at
+notification creation, owner-qualified, immutable and bounded to eight tokens;
+coalescing retains explicit unscoped/omitted flags independently of semantic
+metadata. Subscriber and flush delivery suspend only diagnostic scopes. This
+neither creates transactions nor changes their admission, partitions or rollback.
+Mixed semantic metadata no longer erases the explicit observed tree namespace.
+Private Studio owns labels, attempts, recording, transport and UI; none moved here.
+
+Validation: 44 focused tests; full kernel suite 2300 passed, 7 expected failures,
+13 skipped and one TODO; source/typing checks and scoped lint passed; kernel build,
+production demo build and generated production/development bundle budgets passed.
+The first sandboxed demo attempt exited without diagnostics; the escalated retry
+passed. This is a local development API addition, not a registry release or tag.
+
 ## Current Phase
 
 Current phase: `Phase 7 — COMPLETE / GA RELEASED`
