@@ -27,6 +27,14 @@ for (const route of DEMO_ROUTES) {
     });
     await page.evaluate(() => document.fonts.ready);
 
+    if (route === '/') {
+      // fe6d13b70 deliberately marks the preserved archive with its v14 palette.
+      const archiveLink = page.locator('.rewrite-note a[href="/v14/"]');
+      await expect(archiveLink).toHaveCount(1);
+      await expect(archiveLink).toBeVisible();
+      await expect(archiveLink).toHaveCSS('background-color', 'rgb(124, 58, 237)');
+    }
+
     const audit = await page.evaluate((legacyColors) => {
       const forbidden = new Set(legacyColors);
       const colorProperties = [
@@ -64,7 +72,14 @@ for (const route of DEMO_ROUTES) {
         .flatMap((element) => {
           const style = getComputedStyle(element);
           return colorProperties
-            .filter((property) => forbidden.has(style[property]))
+            .filter((property) => {
+              // Only the archive CTA's intentional purple background is exempt.
+              const archiveBackground =
+                element.matches('.rewrite-note a[href="/v14/"]') &&
+                property === 'backgroundColor' &&
+                style[property] === 'rgb(124, 58, 237)';
+              return forbidden.has(style[property]) && !archiveBackground;
+            })
             .map((property) => `${label(element)} [${property}=${style[property]}]`);
         })
         .slice(0, 40);

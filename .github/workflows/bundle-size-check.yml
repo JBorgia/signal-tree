@@ -24,6 +24,9 @@ jobs:
         run: |
           pnpm install --frozen-lockfile --ignore-scripts
 
+      - name: Build packages for artifact checks
+        run: pnpm run build:all
+
       - name: Check bundle sizes
         run: pnpm run size:check
         env:
