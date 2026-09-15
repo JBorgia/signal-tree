@@ -1,11 +1,15 @@
 {
   "framework": "angular",
-  "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm nx build demo --configuration=production",
+  "installCommand": "pnpm install --frozen-lockfile --ignore-scripts --prod=false",
+  "buildCommand": "node scripts/build-demo-site.mjs",
   "outputDirectory": "dist/apps/demo/browser",
   "routes": [
     {
       "handle": "filesystem"
+    },
+    {
+      "src": "/v14(?:/.*)?",
+      "dest": "/v14/index.html"
     },
     {
       "src": "/.*",
