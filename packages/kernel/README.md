@@ -340,6 +340,8 @@ are not additions to the kernel root API.
 - `treeCapabilities` reports construction capabilities; an empty list is a bare tree.
 - `confirmedTurnReader` reads retained committed consequences without installing history. Its `ConfirmedTurnReader`, `ConfirmedTurnSnapshot`, `ConfirmedTurnView`, `ConfirmedTurnEffectView`, `ConfirmedTurnEffectKind` and `ConfirmedTurnRetention` types describe that window, including retention limits. Reads after destruction throw `StudioTreeDestroyedError`.
 - `observeWrites` subscribes to `ObservedWriteFrame` observation. A notification does not establish a causal relationship, intermediate attempted write, or complete history.
+- `activeTransactionContext` returns the synchronous transaction callback's owner and local ID, or `undefined` outside that scope. It does not report confirmation or propagate across `await`.
+- `withWriteObservationScope` associates writes with a bounded, owner-qualified tooling token during a synchronous callback. `ObservedWriteFrame.declaredScopes` uses `DeclaredWriteScopes` to preserve retained `tokens`, `includesUnscoped` contributions and `omitted` overflow when notifications coalesce. Declarations describe scope membership, not proven input dependencies or exclusive causes. Observer delivery does not inherit the scope.
 
 Internally, `getConfirmedTurnRecords` supplies retained records to the tooling
 projection. Tools consume `confirmedTurnReader`; the raw internal transaction

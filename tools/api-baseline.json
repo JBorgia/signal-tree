@@ -1292,6 +1292,15 @@
         "internalDecl": true
       },
       {
+        "name": "activeTransactionContext",
+        "subpath": "./internals",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/internals.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "ConfirmedTurnEffectKind",
         "subpath": "./internals",
         "kind": "type-only",
@@ -1355,6 +1364,15 @@
         "internalDecl": true
       },
       {
+        "name": "DeclaredWriteScopes",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/write-observation-scope.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
         "name": "ObservedWriteFrame",
         "subpath": "./internals",
         "kind": "type-only",
@@ -1398,6 +1416,15 @@
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
+      },
+      {
+        "name": "withWriteObservationScope",
+        "subpath": "./internals",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/internals/write-observation-scope.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
       }
     ]
   },
