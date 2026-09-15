@@ -1,4 +1,4 @@
-## Unreleased
+## 15.1.1 (2026-09-15)
 
 - **Correct demo navigation.** npm links now target the `signal-tree` organization;
   the live-demo link uses the canonical `signaltree.io` domain.
