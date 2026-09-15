@@ -228,6 +228,10 @@ function ensureCommitted3ArgPathNotifierModule() {
   mkdirSync(join(dirname(COMMITTED_3ARG_LIB), 'internals'), { recursive: true });
   for (const [sourcePath, outputPath] of [
     [
+      'packages/kernel/src/lib/internals/write-observation-scope.ts',
+      join(dirname(COMMITTED_3ARG_LIB), 'internals', 'write-observation-scope.mjs'),
+    ],
+    [
       'packages/kernel/src/lib/internals/restoration-eligibility.ts',
       join(dirname(COMMITTED_3ARG_LIB), 'internals', 'restoration-eligibility.mjs'),
     ],
@@ -266,6 +270,10 @@ function ensureCommitted3ArgPathNotifierModule() {
       .replace(
         "'./internals/restoration-eligibility'",
         "'./internals/restoration-eligibility.mjs'"
+      )
+      .replace(
+        "'./internals/write-observation-scope'",
+        "'./internals/write-observation-scope.mjs'"
       )
       .replace(
         "'./internals/path-observation-port'",

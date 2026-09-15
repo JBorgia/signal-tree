@@ -2,11 +2,12 @@
 
 - **Attribute observed writes without creating transactions.** Tooling can use
   `withWriteObservationScope` from `@signal-tree/kernel/internals` to retain
-  bounded, owner-qualified declaration tokens at write time. Coalesced writes
+  bounded, owner-qualified declaration tokens in `ObservedWriteFrame.declaredScopes`
+  at write time. Coalesced writes
   preserve unscoped and omitted contributions; observer callbacks do not inherit
   diagnostic scopes. Mixed metadata no longer erases the observed tree identity.
 - **Read synchronous transaction identity for tooling.** The internals tooling
-  surface exposes the active transaction identity for exact recorded correlation.
+  surface exposes `activeTransactionContext` for exact recorded correlation.
 
 - **Separate paid Studio from public library releases.** Public releases contain
   the kernel and official Angular, React and Vue packages. Studio source moves

@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { activeTransactionContext, confirmedTurnReader } from './internals';
 import { signalTree, transactions } from './index';
 import { withWriteContext } from './lib/write-context';
+import type { WriteMetadata } from './lib/mutation-types';
 
 const cleanups: (() => void)[] = [];
 const createTree = () => {
@@ -115,7 +116,8 @@ describe('activeTransactionContext', () => {
     { transactionOwner: {}, transactionId: Number.POSITIVE_INFINITY },
     { transactionOwner: {}, transactionId: Number.MAX_SAFE_INTEGER + 1 },
   ])('refuses incomplete or invalid context %j', context => {
-    withWriteContext(context, () => expect(activeTransactionContext()).toBeUndefined());
+    // Deliberately inject malformed runtime metadata to exercise defensive validation.
+    withWriteContext(context as unknown as WriteMetadata, () => expect(activeTransactionContext()).toBeUndefined());
   });
 
   it('projects only owner and safe nonnegative ID', () => {
