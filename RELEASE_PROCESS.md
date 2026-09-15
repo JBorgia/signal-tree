@@ -66,7 +66,7 @@ preparation. For SSH signing, configure `gpg.format=ssh`, `user.signingkey`, and
 
 ## After Publication
 
-Verify all six npm versions and dist-tags, install the exact version into a
+Verify all four npm versions and dist-tags, install the exact version into a
 fresh external project, confirm runtime and strict typechecking, then create or
 verify the GitHub release notes. Never unpublish a partial release as routine
 recovery; inspect candidate and registry integrity and resume the same version.
