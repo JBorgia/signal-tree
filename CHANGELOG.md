@@ -1,4 +1,4 @@
-## Unreleased
+## 15.1.0 (2026-09-15)
 
 - **Attribute observed writes without creating transactions.** Tooling can use
   `withWriteObservationScope` from `@signal-tree/kernel/internals` to retain
