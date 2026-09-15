@@ -8,6 +8,8 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## Development tooling follow-up — September 14, 2026
 
+Implementation checkpoint: `eeb87868`.
+
 Owner approved `withWriteObservationScope(ownerId, token, write)` on the existing
 `@signal-tree/kernel/internals` tooling entrypoint. Declarations are captured at
 notification creation, owner-qualified, immutable and bounded to eight tokens;
