@@ -1,3 +1,12 @@
+## Unreleased
+
+- **Correct demo navigation.** npm links now target the `signal-tree` organization;
+  the live-demo link uses the canonical `signaltree.io` domain.
+
+- **Validate documentation against the public release set.** Stale local build
+  folders can no longer make private Studio imports appear publicly available.
+  The historical bridge document now directs installation to private Studio.
+
 ## 15.1.0 (2026-09-15)
 
 - **Attribute observed writes without creating transactions.** Tooling can use

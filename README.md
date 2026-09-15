@@ -5,7 +5,7 @@
   <p>State as shape. Consequential transitions. Locations at every path.</p>
 
   <p>
-    <a href="https://jborgia.github.io/signaltree/" target="_blank"><strong>Live Demo</strong></a>
+    <a href="https://signaltree.io/" target="_blank"><strong>Live Demo</strong></a>
     &nbsp;|&nbsp;
     <a href="https://www.npmjs.com/package/@signal-tree/kernel" target="_blank">npm</a>
     &nbsp;|&nbsp;

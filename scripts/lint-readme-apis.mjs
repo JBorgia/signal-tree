@@ -36,6 +36,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
+import { assertReleasePlan } from './release-plan.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -65,7 +66,9 @@ function entryPoints(pkg) {
 }
 
 const ENTRYPOINTS = new Map();
-for (const pkg of readdirSync(join(ROOT, 'dist/packages'))) {
+// Only shipped packages establish valid imports. Stale dist folders must not
+// make private or retired APIs appear available on a developer's machine.
+for (const pkg of assertReleasePlan(ROOT)) {
   for (const [spec, file] of entryPoints(pkg)) ENTRYPOINTS.set(spec, file);
 }
 
