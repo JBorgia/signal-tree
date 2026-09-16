@@ -36,7 +36,9 @@ passed. TruckTrax Geotrax's actual strict application compilation reproduces the
 15.1.2 detached-slice failure and passes with rebuilt declarations (zero
 diagnostics), using temporary compiler paths and one Angular peer; no V3 source
 or dependency files were modified. Full release matrix remains mandatory before
-tagging/publication.
+tagging/publication. The first full attempt caught one type-fixture-only lint
+warning (a store token used only in a type); returning that token from the proof
+closed it. The full lint ratchet is green at its unchanged 19-warning baseline.
 
 ## Framework store ownership contracts — September 16, 2026
 

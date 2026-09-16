@@ -111,7 +111,7 @@ export function genericFeatureStore<
     reader.$.feature.filter.set(filter);
     return reader.$.filterCopy();
   };
-  return { tree, filterCopy, checkReader };
+  return { tree, filterCopy, Store, checkReader };
 }
 
 export function genericEntitySlices<
