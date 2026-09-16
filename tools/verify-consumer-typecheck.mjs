@@ -122,6 +122,8 @@ import {
   leaf as angularLeaf,
   entityMap as angularEntityMap,
   signalTree as angularSignalTree,
+  restoration as angularRestoration,
+  type LeafDefinition as AngularLeafDefinition,
   type AccessibleNode as AngularAccessibleNode,
   type EntitySignalWithSlices as AngularEntitySignalWithSlices,
 } from '@signal-tree/angular';
@@ -132,6 +134,9 @@ import {
   asReadonly as vueAsReadonly,
   entityMap as vueEntityMap,
   signalTree as vueSignalTree,
+  leaf as vueLeaf,
+  restoration as vueRestoration,
+  type LeafDefinition as VueLeafDefinition,
   type AccessibleNode as VueAccessibleNode,
   type EntitySignalWithSlices as VueEntitySignalWithSlices,
 } from '@signal-tree/vue';
@@ -245,6 +250,85 @@ void [vueProfile, vueSlicedUsers];
 void vueReadonlyCount.value;
 // @ts-expect-error a type-only readonly view of a writable Ref is not ComputedRef
 void vueReader.$.count.effect;
+
+// Generic entity markers and nested opaque payloads must survive declaration
+// bundling without inspecting their generic configuration or payload internals.
+export function makeAngularGenericStore<E, K extends string | number, F>(
+  selectId: (row: E) => K,
+  filter: F
+) {
+  const store = angularSignalTree(
+    { rows: angularEntityMap<E, K>({ selectId }), filters: { value: angularLeaf(filter) }, count: 1 },
+    { enhancers: [angularRestoration()], derived: ($) => ({ doubled: () => $.count() * 2 }) }
+  );
+  const payload: F = store.$.filters.value();
+  const doubled: number = store.$.doubled();
+  const canUndo: boolean = store.canUndo();
+  void [payload, doubled, canUndo];
+  return store;
+}
+export function makeVueGenericStore<E, K extends string | number, F>(
+  selectId: (row: E) => K,
+  filter: F
+) {
+  const store = vueSignalTree(
+    { rows: vueEntityMap<E, K>({ selectId }), filters: { value: vueLeaf(filter) }, count: 1 },
+    { enhancers: [vueRestoration()], derived: ($) => ({ doubled: () => $.count.value * 2 }) }
+  );
+  const payload: F = store.$.filters.value.value;
+  const doubled: number = store.$.doubled.value;
+  const canUndo: boolean = store.canUndo();
+  void [payload, doubled, canUndo];
+  return store;
+}
+
+// Packed declarations must retain native terminal carriers and unwrap optional
+// leaf definitions in both location reads and whole-root snapshots.
+const angularDefinition: {
+  optional?: AngularLeafDefinition<{ enabled: boolean }>;
+  union: AngularLeafDefinition<number> | string;
+} = { optional: angularLeaf({ enabled: true }), union: angularLeaf(1) };
+const angularTerminals = angularSignalTree({
+  ...angularDefinition,
+  weakMap: new WeakMap<object, string>(),
+  bytes: new Uint8Array(2),
+  callback: (text: string) => text.length,
+});
+const angularOptional: { enabled: boolean } | undefined = angularTerminals.$.optional?.();
+const angularUnion: number | string = angularTerminals.$.union();
+const angularWeakMap: WritableSignal<WeakMap<object, string>> = angularTerminals.$.weakMap;
+const angularBytes: Uint8Array = angularTerminals.$.bytes();
+const angularCallback: (text: string) => number = angularTerminals.$.callback();
+const angularSnapshot: { optional?: { enabled: boolean }; union: number | string } = angularTerminals.$();
+// @ts-expect-error a terminal payload does not expose branch methods
+void angularTerminals.$.weakMap.get;
+// @ts-expect-error typed array elements belong to the terminal payload
+void angularTerminals.$.bytes[0];
+void [angularOptional, angularUnion, angularWeakMap, angularBytes, angularCallback, angularSnapshot];
+angularTerminals.destroy();
+
+const vueDefinition: {
+  optional?: VueLeafDefinition<{ enabled: boolean }>;
+  union: VueLeafDefinition<number> | string;
+} = { optional: vueLeaf({ enabled: true }), union: vueLeaf(1) };
+const vueTerminals = vueSignalTree({
+  ...vueDefinition,
+  weakMap: new WeakMap<object, string>(),
+  bytes: new Uint8Array(2),
+  callback: (text: string) => text.length,
+});
+const vueOptional: { enabled: boolean } | undefined = vueTerminals.$.optional?.value;
+const vueUnion: number | string = vueTerminals.$.union.value;
+const vueWeakMap: Ref<WeakMap<object, string>> = vueTerminals.$.weakMap;
+const vueBytes: Uint8Array = vueTerminals.$.bytes.value;
+const vueCallback: (text: string) => number = vueTerminals.$.callback.value;
+const vueSnapshot: { optional?: { enabled: boolean }; union: number | string } = vueTerminals.$();
+// @ts-expect-error a terminal payload does not expose branch methods
+void vueTerminals.$.weakMap.get;
+// @ts-expect-error typed array elements belong to the terminal payload
+void vueTerminals.$.bytes[0];
+void [vueOptional, vueUnion, vueWeakMap, vueBytes, vueCallback, vueSnapshot];
+vueTerminals.destroy();
 
 // Enhancer methods
 tree.undo();

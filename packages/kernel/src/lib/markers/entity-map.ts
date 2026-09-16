@@ -83,6 +83,22 @@ export type EntitySignalWithSlices<
   Slices extends Record<string, unknown>
 > = EntitySignalWithSlicesOf<E, K, Slices, 'location'>;
 
+// Slices extend the collection surface; they cannot replace its native API.
+// Runtime parity with the native collection is checked in entity-map.spec.ts.
+const ENTITY_SLICE_RESERVED_NAMES =
+  'byId|byIdOrFail|all|count|ids|has|empty|asMap|where|find|activeId|activeEntity|setActiveId|clearActiveId|addOne|addMany|prependOne|prependMany|changeId|updateOne|replaceOne|updateMany|updateWhere|upsertOne|upsertMany|removeOne|removeMany|removeWhere|clear|setAll|tap|intercept'.split(
+    '|'
+  );
+
+type NativeSliceName = keyof EntitySignalOf<
+  unknown,
+  string | number,
+  'location'
+>;
+type AvailableSliceName<N extends string> = N extends NativeSliceName
+  ? never
+  : N;
+
 /**
  * Builder for chainable computed slices on a plain entityMap.
  */
@@ -95,7 +111,8 @@ export interface EntityMapBuilder<
   __sliceTypes?: Slices;
 
   /**
-   * Add a computed slice to this entityMap.
+   * Add a computed slice to this entityMap. Native collection API names
+   * such as `ids`, `all`, and `addOne` cannot be used as slice names.
    *
    * @example
    * ```typescript
@@ -105,7 +122,7 @@ export interface EntityMapBuilder<
    * ```
    */
   computed<N extends string, R>(
-    name: N,
+    name: N & AvailableSliceName<N>,
     compute: (entities: E[]) => R
   ): EntityMapBuilder<E, K, Slices & Record<N, R>>;
 
@@ -414,6 +431,9 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
       name: N,
       compute: (entities: E[]) => R
     ): EntityMapBuilder<E, K, Record<N, R>> {
+      if (ENTITY_SLICE_RESERVED_NAMES.includes(name)) {
+        throw new TypeError(`SignalTree: reserved entityMap slice "${name}".`);
+      }
       slices[name] = { compute: compute as (entities: E[]) => unknown };
       return combined as unknown as EntityMapBuilder<E, K, Record<N, R>>;
     },

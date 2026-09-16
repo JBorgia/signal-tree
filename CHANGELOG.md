@@ -1,5 +1,16 @@
 ## Unreleased
 
+- **Restore generic EntityMap construction.** Framework input validation recognizes
+  EntityMap's opaque brand without comparing contravariant configuration callbacks.
+  Generic entity and filter factories compile while implicit native signals/refs
+  remain rejected. Inline enhancer tuples retain derived-state inference.
+- **Align terminal types with runtime values.** Weak collections, buffers, promises,
+  typed functions and constructors expose leaf carriers. Optional and union
+  `leaf(...)` definitions expose their payloads in carriers and root snapshots.
+- **Protect EntityMap's native API.** Computed slices cannot replace collection
+  members such as `ids` or `addOne`; literal names fail typechecking and dynamic
+  names fail before tree construction.
+
 - **Tighten Angular store ownership.** `defineStore` rejects primitive factory
   results in types and at runtime instead of advertising a value Angular cannot
   inject. Object and callable factories retain their identity and inferred types.

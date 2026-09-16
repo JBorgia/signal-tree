@@ -27,6 +27,30 @@ describe('entityMap() marker', () => {
   });
 
   describe('computed slices', () => {
+    it.each(['ids', 'all', 'addOne', 'where', 'tap'])(
+      'rejects the native API name %s before tree construction',
+      (name: string) => {
+        const marker = entityMap<User, number>();
+        expect(() => marker.computed(name, (all) => all.length)).toThrow(
+          `reserved entityMap slice "${name}"`
+        );
+        expect(Object.keys(marker.__computedSlices ?? {})).toEqual([]);
+      }
+    );
+
+    it('rejects every native collection member as a slice name', () => {
+      const tree = signalTree({ rows: entityMap<User, number>() });
+      try {
+        for (const name of Object.keys(tree.$.rows)) {
+          expect(() =>
+            entityMap<User, number>().computed(name, (all) => all.length)
+          ).toThrow(`reserved entityMap slice "${name}"`);
+        }
+      } finally {
+        tree.destroy();
+      }
+    });
+
     it('should create marker with computed slices', () => {
       const marker = entityMap<User, number>()
         .computed('admins', (all) => all.filter((u) => u.role === 'admin'))

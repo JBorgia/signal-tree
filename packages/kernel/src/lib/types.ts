@@ -184,26 +184,34 @@ export type CarrierKind = keyof LeafCarriers<unknown> &
   keyof ReadonlyViewLeafCarriers<unknown>;
 export type LeafOf<T, C extends CarrierKind> = LeafCarriers<T>[C];
 
+/** Object terminals recognized by the runtime in every environment. */
+type BuiltInObjectValue =
+  | Date
+  | RegExp
+  | Map<unknown, unknown>
+  | Set<unknown>
+  | WeakMap<object, unknown>
+  | WeakSet<object>
+  | ArrayBuffer
+  | ArrayBufferView
+  | Error
+  | Promise<unknown>;
+
 export type TreeNodeOf<T, C extends CarrierKind> = {
   [K in keyof T]: T[K] extends LeafDefinition<infer Value>
     ? LeafOf<Value, C>
     : T[K] extends EntityMapMarker<infer E, infer Key>
     ? ApplyComputedSlices<T[K], EntitySignalOf<E, Key, C>, C>
-    : T[K] extends Primitive
-    ? LeafOf<T[K], C>
-    : T[K] extends readonly unknown[]
-    ? LeafOf<T[K], C>
     : T[K] extends
-        | Date
-        | RegExp
-        | Map<unknown, unknown>
-        | Set<unknown>
-        | Error
-        | ((...args: unknown[]) => unknown)
-    ? LeafOf<T[K], C> // Built-in objects → treat as atomic values
+        | Primitive
+        | LeafDefinition<unknown>
+        | readonly unknown[]
+        | BuiltInObjectValue
+        | CallableSyntax
+    ? LeafOf<ResolveLeafDefinitions<T[K]>, C>
     : T[K] extends object
     ? NodeAccessor<ResolveLeafDefinitions<T[K]>> & TreeNodeOf<T[K], C>
-    : LeafOf<T[K], C>;
+    : LeafOf<ResolveLeafDefinitions<T[K]>, C>;
 };
 
 export type TreeNode<T> = TreeNodeOf<T, 'location'>;
@@ -214,13 +222,7 @@ export type ResolveLeafDefinitions<T> = T extends LeafDefinition<infer Value>
   ? T
   : T extends readonly unknown[]
   ? T
-  : T extends
-      | Date
-      | RegExp
-      | Map<unknown, unknown>
-      | Set<unknown>
-      | Error
-      | CallableSyntax
+  : T extends BuiltInObjectValue | CallableSyntax
   ? T
   : T extends object
   ? { [K in keyof T]: ResolveLeafDefinitions<T[K]> }
@@ -1088,18 +1090,11 @@ type ConstructionInput<T, Excluded> = [Excluded] extends [never]
   :
       | Primitive
       | LeafDefinition<unknown>
-      | EntityMapMarker<unknown, string | number>
+      // Marker configuration contains contravariant callbacks. Only the brand
+      // establishes opacity; validating its payload would cross that boundary.
+      | Omit<EntityMapMarker<unknown, string | number>, '__entityMapConfig'>
       | readonly unknown[]
-      | Date
-      | RegExp
-      | Map<unknown, unknown>
-      | Set<unknown>
-      | WeakMap<object, unknown>
-      | WeakSet<object>
-      | ArrayBuffer
-      | ArrayBufferView
-      | Error
-      | Promise<unknown>
+      | BuiltInObjectValue
       | (T extends Excluded
           ? never
           : T extends CallableSyntax
@@ -1112,7 +1107,7 @@ export interface SignalTreeFactoryOf<C extends CarrierKind, Excluded = never> {
   <
     T extends object,
     TDerived extends object,
-    const E extends readonly Enhancer<unknown>[] = readonly []
+    const E extends readonly Enhancer<unknown>[] = readonly Enhancer<unknown>[]
   >(
     initialState: T & NoInfer<ConstructionInput<T, Excluded>>,
     config: Omit<TreeConfig, 'enhancers' | 'derived'> & {
