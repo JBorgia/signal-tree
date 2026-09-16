@@ -6,6 +6,37 @@ credible `1.0.0` release candidate.
 This is the release controller, not the full historical backlog. Use it to
 bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
+## Framework construction ownership — September 16, 2026
+
+Implementation checkpoint: `6676f976` (local; not published).
+
+Owner-requested protection rejects implicit external Angular signals and Vue
+refs/proxies in construction topology. Diagnostics and native identity checks
+belong to the framework facades. The adapter SDK's `isConstructionBranch` only
+answers the kernel-owned topology question; no primitive-detection hook was
+added to kernel construction or observation contracts. Existing native inputs
+must not silently look tree-owned while their captured external writers bypass
+causal turns and restoration (see the external-signal evidence in archived
+RFC 0016). Explicit `leaf(existing)` remains external reactive data; a plain
+value snapshot starts independent state. Arrays, built-ins and marker contents
+remain opaque. React has no corresponding native signal primitive to reject.
+
+Framework preparation reads branch properties once and retains symbol metadata
+for kernel marker diagnostics. Type constraints reject known signals/refs while
+preserving scalar/container generics, derived inference and enhancer additions.
+Vue proxies need runtime checks; their structural types can look like plain data.
+Checks cover initial construction only, not subsequent writes or foreign runtimes.
+
+Validation: Angular 107 passed (3 skipped), Vue 28 passed, kernel 2300 passed
+(7 expected failures, 13 skipped, one TODO), React 7 passed; all four package
+build/lint targets; final edited-source lint clean; source/kernel typing and the
+spec-type ratchet passed (223 existing diagnostics, none added). Packed consumers
+passed runtime identity and bundler/node16 type checks. Fast gates passed 58/58,
+including bundle budgets and API inventory. Final symbol-descriptor cleanup was
+then rebuilt and retested in Angular/Vue. Independent review caught and closed
+lost symbol diagnostics and overly strict generic scalar constraints. This is
+not a full release or benchmark-matrix run.
+
 ## Development tooling follow-up — September 14, 2026
 
 Implementation checkpoint: `eeb87868`.
