@@ -12,14 +12,24 @@ import type {
   LeafOf,
   ReadonlyStoreOf,
   ReadonlyViewOf,
-  SignalTreeFactoryOf,
   TreeNodeOf,
 } from '@signal-tree/kernel/adapter';
 
-export const signalTree =
-  createSignalTreeFactory(
-    ANGULAR_OBSERVATION_ADAPTER
-  ) as unknown as SignalTreeFactoryOf<'angular'>;
+import {
+  prepareConstructionInput,
+  type FrameworkSignalTreeFactory,
+} from './lib/construction-input.js';
+
+const createAngularTree = createSignalTreeFactory(
+  ANGULAR_OBSERVATION_ADAPTER
+) as (state: object, config?: unknown) => unknown;
+
+/** Construct native Angular leaves from values; external signals require leaf(). */
+export const signalTree = ((initialState: object, config?: unknown) =>
+  createAngularTree(
+    prepareConstructionInput(initialState),
+    config
+  )) as FrameworkSignalTreeFactory;
 
 export type TreeNode<T> = TreeNodeOf<T, 'angular'>;
 export type WritableLeaf<T> = LeafOf<T, 'angular'>;

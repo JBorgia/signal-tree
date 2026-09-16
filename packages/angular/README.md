@@ -81,3 +81,29 @@ const profileModel = toWritableSignal(tree.$.profile, injector, {
 Application components
 should normally receive a read-only `$` plus explicit operation services for
 writes and asynchronous work.
+
+## Initial values and external reactivity
+
+Pass initial values to `signalTree()`, not existing Angular signals. Direct
+signals (including readonly and computed signals) at the root or a nested branch
+are rejected with a path-specific error, and known signal types are rejected by
+TypeScript. SignalTree creates its own native signals so it owns their writes.
+
+```ts
+import { signal, untracked } from '@angular/core';
+import { leaf, signalTree } from '@signal-tree/angular';
+
+const existing = signal(1);
+const tree = signalTree({ count: leaf(untracked(existing)) });
+```
+
+This takes an independent snapshot; later writes to `existing` do not update
+`tree`. For an object snapshot, copy the value too if you need independent object
+identity. `leaf(existing)` explicitly stores the signal itself as data. Reading
+that leaf returns the original signal; its inner writes remain outside tree
+transactions and restoration.
+
+Validation stops at explicit `leaf(...)`, marker definitions, arrays and built-in
+terminal values. Their contents remain data, not separately owned tree locations.
+Ordinary functions remain valid callable data. These checks apply to initial
+construction, not arbitrary later writes or foreign reactivity from other libraries.
