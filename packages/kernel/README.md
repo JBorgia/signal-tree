@@ -306,6 +306,10 @@ compatibility layer or an application convenience surface.
 
 - `createSignalTreeFactory(observation)` binds framework observation to tree
   construction.
+- `isConstructionBranch(value)` identifies recursively traversed construction
+  definitions, excluding explicit leaves, markers and terminal containers.
+  Framework facades use this boundary for their own input validation; native
+  reactive identity checks remain framework-owned.
 - `isNodeAccessor(value)` distinguishes a root or branch accessor from a
   terminal location when a realization must route framework integration.
 - `replaceLocation(location, value)` applies raw replacement ingress when the
