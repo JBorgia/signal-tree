@@ -6,6 +6,38 @@ credible `1.0.0` release candidate.
 This is the release controller, not the full historical backlog. Use it to
 bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
+## Generic construction and terminal declarations — September 16, 2026
+
+Implementation checkpoint: `5ce1458f`. Validated locally; not yet published.
+
+Owner identified that `EntityMapMarker<unknown, ...>` cannot accept real marker
+configuration callbacks contravariantly. Construction now excludes the config
+payload while retaining the opaque brand and runtime marker. Generic entity and
+filter factories compile without casts or application constraints. Packed proof
+caught a private-brand symbol missing from bundled adapter declarations; the
+final formulation avoids referencing that private symbol across entry points.
+
+Shared return types now preserve native leaf carriers for weak collections,
+buffers, promises, typed functions and constructors, and unwrap optional/union
+leaf definitions. Inline enhancer-plus-derived inference and explicit factory
+generics are covered. Native Angular signals and Vue refs remain rejected unless
+explicitly stored as data. Computed EntityMap slices reject native API names
+before materialization; runtime parity tests keep the reserved names aligned.
+This guard costs about 0.19KB compressed, measured by
+`node tools/check-bundle-budget.mjs`; its explicit budget adjustment is recorded
+beside the authoritative gate rather than hidden by a skipped check.
+
+Validation: all four package test/build/lint targets passed (kernel 2305 passed,
+7 expected failures, 13 skipped, one TODO; Angular 123 passed, 3 skipped;
+React 9; Vue 33). Final collision parity test passed in the focused 16-test
+marker suite. Source/kernel typing, spec-type ratchet (223 existing diagnostics,
+none added), formatting, packed bundler/node16 consumers and 58/58 fast gates
+passed. TruckTrax Geotrax's actual strict application compilation reproduces the
+15.1.2 detached-slice failure and passes with rebuilt declarations (zero
+diagnostics), using temporary compiler paths and one Angular peer; no V3 source
+or dependency files were modified. Full release matrix remains mandatory before
+tagging/publication.
+
 ## Framework store ownership contracts — September 16, 2026
 
 Implementation checkpoint: `e3ebcb91`. Local implementation; not published.
