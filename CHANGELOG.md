@@ -1,4 +1,4 @@
-## Unreleased
+## 15.1.3 (2026-09-16)
 
 - **Restore generic EntityMap construction.** Framework input validation recognizes
   EntityMap's opaque brand without comparing contravariant configuration callbacks.
