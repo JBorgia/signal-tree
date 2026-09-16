@@ -1,3 +1,16 @@
+## Unreleased
+
+- **Reject accidentally nested reactive state.** Angular construction rejects
+  existing signals, including readonly/computed signals. Vue construction rejects
+  existing refs and reactive/readonly proxies. Errors identify the input path;
+  known signal/ref types also fail at compile time. Pass plain initial values or
+  an independent snapshot. Explicit `leaf(existing)` still stores an external
+  reactive value as data, outside tree transaction/restoration ownership.
+- **Preserve construction boundaries.** Arrays, built-in terminal values and
+  marker contents remain opaque. Branch getters are read once, symbol-based
+  marker diagnostics survive preparation, and generic scalar/container inputs
+  retain their typing. React and framework-neutral construction are unchanged.
+
 ## 15.1.1 (2026-09-15)
 
 - **Correct demo navigation.** npm links now target the `signal-tree` organization;
