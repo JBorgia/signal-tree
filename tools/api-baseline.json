@@ -1112,6 +1112,15 @@
         "internalDecl": false
       },
       {
+        "name": "isConstructionBranch",
+        "subpath": "./adapter",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/internals/construction-branch.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
         "name": "ISignalTree",
         "subpath": "./adapter",
         "kind": "type-only",

@@ -144,3 +144,10 @@ export type {
   ReadonlyViewOf,
 } from './lib/readonly';
 export { isNodeAccessor } from './lib/internals/node-shape';
+
+/**
+ * Whether a construction definition contributes recursively traversed topology.
+ * Realizations use this kernel-owned boundary when validating their inputs;
+ * native primitive detection and diagnostics remain realization-owned.
+ */
+export { isConstructionBranch } from './lib/internals/construction-branch';

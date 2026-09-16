@@ -1022,10 +1022,8 @@ type PathInterceptor = (
  */
 export type WritableLeaf<T> = LeafOf<T, 'location'>;
 
-export type AccessibleNodeOf<
-  T,
-  C extends CarrierKind
-> = NodeAccessor<T> & TreeNodeOf<T, C>;
+export type AccessibleNodeOf<T, C extends CarrierKind> = NodeAccessor<T> &
+  TreeNodeOf<T, C>;
 
 export type AccessibleNode<T> = AccessibleNodeOf<T, 'location'>;
 
@@ -1084,13 +1082,39 @@ import type { ProcessDerivedOf } from './internals/derived-types';
 import type { Enhancer } from '../enhancers/types';
 import type { AccumulatedEnhancerAdditions } from './enhancer-types';
 
-export interface SignalTreeFactoryOf<C extends CarrierKind> {
+/** Framework-owned exclusions apply only at construction topology positions. */
+type ConstructionInput<T, Excluded> = [Excluded] extends [never]
+  ? T
+  :
+      | Primitive
+      | LeafDefinition<unknown>
+      | EntityMapMarker<unknown, string | number>
+      | readonly unknown[]
+      | Date
+      | RegExp
+      | Map<unknown, unknown>
+      | Set<unknown>
+      | WeakMap<object, unknown>
+      | WeakSet<object>
+      | ArrayBuffer
+      | ArrayBufferView
+      | Error
+      | Promise<unknown>
+      | (T extends Excluded
+          ? never
+          : T extends CallableSyntax
+          ? T
+          : T extends object
+          ? { [K in keyof T]: ConstructionInput<T[K], Excluded> }
+          : T);
+
+export interface SignalTreeFactoryOf<C extends CarrierKind, Excluded = never> {
   <
     T extends object,
     TDerived extends object,
     const E extends readonly Enhancer<unknown>[] = readonly []
   >(
-    initialState: T,
+    initialState: T & NoInfer<ConstructionInput<T, Excluded>>,
     config: Omit<TreeConfig, 'enhancers' | 'derived'> & {
       enhancers?: E;
       derived: ($: TreeNodeOf<T, C>) => TDerived;
@@ -1102,7 +1126,7 @@ export interface SignalTreeFactoryOf<C extends CarrierKind> {
   > &
     AccumulatedEnhancerAdditions<E>;
   <T extends object, const E extends readonly Enhancer<unknown>[]>(
-    initialState: T,
+    initialState: T & NoInfer<ConstructionInput<T, Excluded>>,
     config: Omit<TreeConfig, 'enhancers' | 'derived'> & {
       enhancers: E;
       derived?: never;
@@ -1110,7 +1134,7 @@ export interface SignalTreeFactoryOf<C extends CarrierKind> {
   ): ISignalTreeOf<ResolveLeafDefinitions<T>, C, TreeNodeOf<T, C>> &
     AccumulatedEnhancerAdditions<E>;
   <T extends object>(
-    initialState: T,
+    initialState: T & NoInfer<ConstructionInput<T, Excluded>>,
     config?: Omit<TreeConfig, 'enhancers' | 'derived'> & {
       enhancers?: never;
       derived?: never;

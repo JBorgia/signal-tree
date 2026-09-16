@@ -17,9 +17,13 @@ import {
   type LeafOf,
   type ReadonlyStoreOf,
   type ReadonlyViewOf,
-  type SignalTreeFactoryOf,
   type TreeNodeOf,
 } from '@signal-tree/kernel/adapter';
+
+import {
+  prepareConstructionInput,
+  type FrameworkSignalTreeFactory,
+} from './lib/construction-input.js';
 
 import { createVueObservationAdapter } from './lib/vue-observation.js';
 
@@ -30,7 +34,10 @@ export const signalTree = ((initialState: object, config?: unknown) =>
       state: object,
       options?: unknown
     ) => unknown
-  )(initialState, config)) as SignalTreeFactoryOf<'vue'>;
+  )(
+    prepareConstructionInput(initialState),
+    config
+  )) as FrameworkSignalTreeFactory;
 
 export type TreeNode<T> = TreeNodeOf<T, 'vue'>;
 export type WritableLeaf<T> = LeafOf<T, 'vue'>;
