@@ -8,7 +8,22 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## Framework construction ownership — September 16, 2026
 
-Implementation checkpoint: `6676f976` (local; not published).
+Implementation checkpoint: `6676f976`. Published as `15.1.2` from signed tag
+`v15.1.2`, release commit `2efe0010`.
+
+Publication verification: canonical local preparation and tagged CI passed all
+77 release gates. GitHub release run
+[35129289141](https://github.com/JBorgia/signal-tree/actions/runs/35129289141)
+and sanctioned npm run
+[35129444208](https://github.com/JBorgia/signal-tree/actions/runs/35129444208)
+completed successfully, including gate mutation proofs. Kernel, Angular, React
+and Vue all resolve to `15.1.2` on npm's `latest` channel, and all four downloaded
+tarball SHA-512 values match the local immutable candidate. A fresh external
+consumer passed runtime facade identity and strict bundler/node16 type checks.
+Published-package probes passed Angular signal rejection, Vue ref/proxy rejection,
+explicit reactive data identity and independent snapshots. Production demo build
+passed. The first preparation run's sole failure was missing helper documentation;
+that was corrected before the successful full run and signed tag.
 
 Owner-requested protection rejects implicit external Angular signals and Vue
 refs/proxies in construction topology. Diagnostics and native identity checks
