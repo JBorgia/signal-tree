@@ -1,4 +1,4 @@
-## Unreleased
+## 15.1.2 (2026-09-16)
 
 - **Share construction topology with framework adapters.** The neutral
   `isConstructionBranch` helper in `@signal-tree/kernel/adapter` lets adapters
