@@ -354,8 +354,13 @@ const TARGETS = {
     // Carrier-specific query and field realizations move that floor to 22.01KB
     // prod / 24.66KB dev after adapter-only runtime splitting; the native
     // implementation remains absent from neutral bundles.
-    devKB: 24.8,
-    prodKB: 22.1,
+    // Native-name collision rejection adds declaration-time validation to the
+    // existing computed-slice builder. Measured 22.20KB prod / 24.84KB dev.
+    // The compact exact-name list prevents slices from corrupting collection
+    // accessors or writers before materialization; it must also run in prod.
+    // Deliberate correctness cost (~0.19KB), not a diagnostic folding regression.
+    devKB: 24.9,
+    prodKB: 22.3,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });
