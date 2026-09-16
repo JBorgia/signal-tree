@@ -23,8 +23,82 @@ the complete SignalTree facade for Angular applications: import `signalTree`,
 markers, enhancers, and types from this package rather than mixing kernel
 imports into Angular application code.
 
-Angular applications should construct state through this package, not through
-the neutral kernel package:
+## Application-store ownership
+
+Use `defineStore(() => signalTree(...))` for an Angular-owned application store.
+`signalTree` selects Angular reactivity and constructs the tree; `defineStore`
+creates its injectable token and binds destruction to the providing injector.
+The factory runs in injection context and must return a fresh owned object or
+function, not a primitive or a tree borrowed from another owner. Cleanup errors
+are reported with Angular's default `ErrorHandler` so later store cleanup can
+still run. This does not resolve the application's custom handler: that handler
+may itself depend on a store, and the owning injector is already destroyed when
+teardown runs.
+
+```ts
+import { inject } from '@angular/core';
+import { defineStore, signalTree } from '@signal-tree/angular';
+
+export const SettingsStore = defineStore(() => signalTree({ theme: 'light' }), { providedIn: 'root' });
+
+// In an Angular injection context:
+const settings = inject(SettingsStore);
+```
+
+Omit `providedIn` and add the token to a component's `providers` for a separate
+store per component. A consumer borrowing an injected store does not destroy
+it. Do not wrap a borrowed tree in another `defineStore`: that registers a
+second owner. Root/request injectors must themselves be destroyed by the
+application or SSR host at the end of their lifetime.
+
+### Readonly state and operations share one owner
+
+`expose: 'readonly'` narrows the token for **all** consumers, including an Ops
+service. It does not create a separate writable injection path. When components
+need readonly state and operations need writes, keep the owner token internal
+and expose its readonly `$` through a non-owning Angular provider:
+
+```ts
+import { inject, Injectable, InjectionToken, type Provider } from '@angular/core';
+import { asReadonly, defineStore, signalTree } from '@signal-tree/angular';
+
+const CounterTree = defineStore(() => signalTree({ count: 0 }));
+
+@Injectable()
+export class CounterOps {
+  private readonly tree = inject(CounterTree);
+  readonly state = asReadonly(this.tree).$;
+
+  increment(): void {
+    this.tree.$.count.update((count) => count + 1);
+  }
+}
+
+export const COUNTER_STATE = new InjectionToken<CounterOps['state']>('CounterState');
+
+export function provideCounterStore(): Provider[] {
+  return [CounterTree, CounterOps, { provide: COUNTER_STATE, useFactory: () => inject(CounterOps).state }];
+}
+```
+
+Register `provideCounterStore()` at application bootstrap for one application
+owner, or in a component's `providers` for independent local owners. Register
+Ops and the reader together with the tree at the intended scope. Components use
+`inject(COUNTER_STATE).count()` and `inject(CounterOps).increment()`; only
+`CounterTree` owns teardown. The reader exposes neither writers nor `destroy()`.
+Readonly remains a compile-time boundary, not runtime access control.
+
+For stores where every injected consumer should be readonly, the existing
+`expose: 'readonly'` option is sufficient. Prefer an inferred config literal or
+`{ expose: 'readonly' } satisfies DefineStoreConfig`; widening to
+`DefineStoreConfig` erases the information required to choose the readonly
+return type.
+
+## Tree construction
+
+Inside the store factory, declare state, enhancers, and derived recipes together.
+The following standalone example uses explicit cleanup; this lower-level form
+also serves tests and intentionally manual lifetimes:
 
 ```ts
 import { asReadonly, batching, entityMap, signalTree } from '@signal-tree/angular';
@@ -53,6 +127,7 @@ const tree = signalTree(
 
 const reader = asReadonly(tree);
 reader.$.selectedName();
+tree.destroy(); // End the explicitly owned standalone example.
 ```
 
 There is one construction grammar: state, enhancers, and one derived factory are

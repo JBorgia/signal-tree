@@ -43,8 +43,8 @@ fake realizations used in tests.
 Angular example:
 
 ```typescript
-import { computed } from '@angular/core';
-import { batching, defineStore, entityMap, restoration, signalTree } from '@signal-tree/angular';
+import { computed, inject, InjectionToken } from '@angular/core';
+import { asReadonly, batching, defineStore, entityMap, restoration, signalTree } from '@signal-tree/angular';
 
 type Ticket = {
   id: number;
@@ -52,7 +52,8 @@ type Ticket = {
   closed: boolean;
 };
 
-export const AppTree = defineStore(
+// Internal writable owner. Consumers receive APP_STATE below.
+const AppTree = defineStore(
   () =>
     signalTree(
       {
@@ -83,6 +84,15 @@ export const AppTree = defineStore(
     ),
   { providedIn: 'root' }
 );
+
+function appReads() {
+  return asReadonly(inject(AppTree)).$;
+}
+
+export const APP_STATE = new InjectionToken<ReturnType<typeof appReads>>('AppState', {
+  providedIn: 'root',
+  factory: appReads,
+});
 ```
 
 The derived factory runs once after enhancer setup. When one computed depends on
@@ -97,14 +107,19 @@ that set.
 
 ### Read
 
-Components read from `$`. Root and object branches are callable whole-value
+Components inject `APP_STATE` to receive readonly `$`; internal Ops inject the
+one writable `AppTree`. `APP_STATE` borrows the tree and never owns destruction.
+Do not create a second `defineStore` for this alias.
+
+Root and object branches are callable whole-value
 accessors. Terminal leaves use the facade's native carrier: Angular signals,
 Vue refs, or neutral kernel locations.
 
 ```typescript
-const selected = tree.$.selected();
-const filter = tree.$.filter();
-const snapshot = tree.$();
+const state = inject(APP_STATE);
+const selected = state.selected();
+const filter = state.filter();
+const snapshot = state();
 ```
 
 Expose `asReadonly(tree)` when a consumer should not mutate state. On the
