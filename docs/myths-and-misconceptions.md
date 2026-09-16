@@ -187,7 +187,9 @@ tree.$.users.byId(42)?.();
 
 **Correction:** A normal tree is writable. Use `asReadonly(tree)` or
 `defineStore(factory, { expose: 'readonly' })` when consumers should receive a
-read-only facade. Put domain writes in explicit Ops services.
+read-only facade. The readonly token also restricts Ops that inject it. For
+separate writers, own one writable tree and expose a non-owning readonly `$`
+provider to components; see the [Angular ownership recipe](../packages/angular/README.md#readonly-state-and-operations-share-one-owner).
 
 NgRx SignalStore protects consumer state by default; that is a genuine
 difference, not a SignalTree feature under another name.

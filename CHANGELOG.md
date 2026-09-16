@@ -1,3 +1,16 @@
+## Unreleased
+
+- **Tighten Angular store ownership.** `defineStore` rejects primitive factory
+  results in types and at runtime instead of advertising a value Angular cannot
+  inject. Object and callable factories retain their identity and inferred types.
+  Teardown invokes only callable `destroy` methods and reports failures with
+  Angular's default error reporter while allowing sibling cleanup to continue.
+  Reporting does not instantiate an application handler that may depend on a store.
+- **Document and verify framework lifetimes.** Angular readonly readers and Ops
+  share one owner through non-owning reader providers. React examples cover
+  external application/request ownership and StrictMode borrowers; Vue examples
+  cover scope disposal and borrowed trees. No new construction API is introduced.
+
 ## 15.1.2 (2026-09-16)
 
 - **Share construction topology with framework adapters.** The neutral

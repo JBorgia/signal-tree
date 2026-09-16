@@ -139,6 +139,19 @@ import {
 
 // All public Angular markers must retain identity across root/adapter .d.ts.
 const markedAngularTree = angularSignalTree({ count: angularLeaf<number>(1) });
+// Public factory constraints must survive declaration packaging in both resolvers.
+// @ts-expect-error primitive factory results cannot be injected store objects
+defineStore(() => 42);
+// @ts-expect-error null cannot be an owned store object
+defineStore(() => null);
+// @ts-expect-error an absent factory result cannot be an owned store object
+defineStore(() => undefined);
+const ObjectStore = defineStore(() => ({ count: 0 }));
+const CallableStore = defineStore(() => () => 42);
+const acceptObjectStore = (store: InstanceType<typeof ObjectStore>): number => store.count;
+const acceptCallableStore = (store: InstanceType<typeof CallableStore>): number => store();
+void [acceptObjectStore, acceptCallableStore];
+
 markedAngularTree.$.count.set(2);
 const markedCount: number = markedAngularTree.$.count();
 void markedCount;

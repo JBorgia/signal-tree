@@ -60,3 +60,37 @@ Validation stops at explicit `leaf(...)`, marker definitions, arrays and built-i
 terminal values. Their contents remain data, not separately owned tree locations.
 Ordinary functions remain valid callable data. These checks apply to initial
 construction, not arbitrary later writes or foreign reactivity from other libraries.
+
+## Ownership and disposal
+
+`signalTree()` constructs a tree; it does not register scope cleanup. A tree owns
+runtime resources until `destroy()` is called. Dropping its last reference is not
+prompt resource reclamation.
+
+For a component- or composable-owned tree, construct it inside the active Vue
+scope and register its disposal there:
+
+```ts
+import { onScopeDispose } from 'vue';
+import { signalTree } from '@signal-tree/vue';
+
+// Call synchronously during setup() or inside an active effectScope().
+function useCounter() {
+  const tree = signalTree({ count: 0 });
+  onScopeDispose(() => tree.destroy());
+  return tree;
+}
+```
+
+Stopping the owning scope destroys the tree. A component that receives a tree
+through props or `inject()` only borrows it: do not register destruction in that
+consumer's scope. Shared application stores belong to the application owner,
+which can use ordinary `provide()`/`inject()` to distribute them and call
+`destroy()` after unmounting the application.
+
+For SSR, construct a fresh tree for each request, provide it to that request's
+application, and destroy it in `finally` after awaited rendering finishes. Do not
+rely on component unmount hooks for request cleanup or share a module-level tree
+between requests. With streaming rendering, wait for completion or abort before
+destroying the request owner. Construct the client tree from the same initial
+state used for the server output before hydration.

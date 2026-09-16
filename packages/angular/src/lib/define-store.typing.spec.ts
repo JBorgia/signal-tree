@@ -97,3 +97,23 @@ export type _DefineStoreTypeChecks = [
     >
   >
 ];
+
+// Factories must return values a JavaScript constructor can preserve by identity.
+// @ts-expect-error primitive factory results cannot become injected store objects
+defineStore(() => 42);
+// @ts-expect-error strings are not store objects
+defineStore(() => 'store');
+// @ts-expect-error undefined cannot become an injected store object
+defineStore(() => undefined);
+// @ts-expect-error null cannot become an injected store object
+defineStore(() => null);
+// @ts-expect-error a possibly absent result is not a valid store factory
+defineStore(() => (Math.random() ? { count: 0 } : undefined));
+
+const ObjectStore = defineStore(() => ({ count: 0 }));
+const CallableStore = defineStore(() => (): number => 42);
+void [ObjectStore, CallableStore];
+export type _FactoryIdentityChecks = [
+  Expect<Equal<InstanceType<typeof ObjectStore>, { count: number }>>,
+  Expect<Equal<InstanceType<typeof CallableStore>, () => number>>
+];

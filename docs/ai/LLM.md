@@ -200,9 +200,11 @@ export class UserOps {
 ```
 
 Use `asReadonly(tree)` or
-`defineStore(factory, { expose: 'readonly' })` when a consumer should not receive
-mutation methods. This is compile-time narrowing of the same runtime object, not
-a security boundary.
+`defineStore(factory, { expose: 'readonly' })` when all consumers of that token
+should lack mutation methods. Ops injecting that token are readonly too. For
+separate readers and writers, use one writable owner and a non-owning readonly
+`$` provider; see the [Angular ownership recipe](../../packages/angular/README.md#readonly-state-and-operations-share-one-owner).
+This is compile-time narrowing of the same runtime object, not a security boundary.
 
 ## External Truth
 

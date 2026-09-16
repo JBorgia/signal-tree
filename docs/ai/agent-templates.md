@@ -122,8 +122,10 @@ entities elsewhere in state.
 
 Components should normally receive read-only `$` state plus explicit Ops
 methods. Put domain writes and asynchronous orchestration in injectable Ops
-services. Use `asReadonly(tree)` or
-`defineStore(factory, { expose: 'readonly' })` for read-only consumers.
+services. A `defineStore(factory, { expose: 'readonly' })` token is readonly
+for every consumer, including Ops. For separate readers and writers, own one
+writable tree and expose its readonly `$` through a non-owning provider. See
+the [complete Angular ownership recipe](../../packages/angular/README.md#readonly-state-and-operations-share-one-owner).
 
 Network requests, retries, cancellation, persistence, routing, analytics, and
 forms belong to application services or framework primitives. SignalTree 15 has

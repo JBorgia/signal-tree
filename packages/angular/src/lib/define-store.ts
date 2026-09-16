@@ -1,4 +1,10 @@
-import { DestroyRef, inject, Injectable, type Type } from '@angular/core';
+import {
+  DestroyRef,
+  ErrorHandler,
+  inject,
+  Injectable,
+  type Type,
+} from '@angular/core';
 
 import type {
   ISignalTreeOf,
@@ -10,9 +16,9 @@ import type {
  */
 export interface DefineStoreConfig {
   /**
-   * Where to provide the store. `'root'`/`'platform'` make it an app-wide
-   * singleton (like `@Injectable({ providedIn: 'root' })`); omit/`null` to
-   * provide it locally via a component/route `providers` array.
+   * `'root'` provides an application singleton. `'platform'` shares the store
+   * across applications on that platform; do not use it for request-local state.
+   * Omit/`null` to provide it locally via a component/route `providers` array.
    */
   providedIn?: 'root' | 'platform' | null;
   /**
@@ -26,9 +32,10 @@ export interface DefineStoreConfig {
    * it does not protect against a deliberate `as any` bypass — it protects
    * the common case where an AI agent or developer reaches for a
    * `.set()`/mutator that simply isn't offered on the injected type. Use it
-   * for components that should only read the store, pairing it with a
-   * separate `@Injectable` Ops service for writes (see "Production
-   * architecture" in the root README).
+   * when every consumer of this token should receive a readonly tree. An Ops
+   * service injecting this same token is also readonly. For separate readers
+   * and writers, own one writable tree and expose a non-owning readonly `$`
+   * token; see the Angular package README's ownership example.
    *
    * Only accepted when the factory returns a real tree
    * (`signalTree(...)`-shaped); combining it with
@@ -42,14 +49,24 @@ export interface DefineStoreConfig {
  * idiomatic Angular DI pattern for a tree, comparable to NgRx SignalStore's
  * `signalStore()`.
  *
- * `inject(MyStore)` resolves to the **real tree** — callable, with `$` and any
+ * `inject(MyStore)` resolves to the **real tree** — with `$` and any
  * configured enhancer methods — not a wrapper. The tree's
  * `destroy()` is tied to the host injector's lifecycle via `DestroyRef`, so a
  * component-provided store tears down with the component and a root store with
  * the app.
  *
  * The factory runs inside Angular's injection context, so it may call `inject()`
- * (e.g. to read other services).
+ * (e.g. to read other services). Return a fresh owned object or function for
+ * each providing injector, never a tree borrowed from another owner. The
+ * factory selects the realization: import `signalTree` from this Angular
+ * facade, not the neutral kernel. Use ordinary DI aliases for borrowed views;
+ * another `defineStore` would register another destruction owner.
+ *
+ * Primitive factory results are rejected. If the returned object has a
+ * `destroy()` method, failures are reported with Angular's default `ErrorHandler`,
+ * not resolved from DI: an application handler may itself depend on this store,
+ * and the owning injector is already destroyed when cleanup runs. Reporting
+ * allows sibling cleanup to continue. SignalTree destruction is idempotent.
  *
  * @example
  * ```ts
@@ -112,11 +129,11 @@ export function defineStore<T, A>(
  * literal (or `as const`). Deliberate: this cliff is what makes
  * `expose: 'readonly'` misuse a compile error instead of a silent no-op.
  */
-export function defineStore<R>(
+export function defineStore<R extends object>(
   factory: () => R,
   config?: DefineStoreConfig & { expose?: undefined }
 ): Type<R>;
-export function defineStore<R>(
+export function defineStore<R extends object>(
   factory: () => R,
   config: DefineStoreConfig = {}
 ): Type<R> {
@@ -124,21 +141,33 @@ export function defineStore<R>(
   class SignalTreeStore {
     constructor() {
       const tree = factory();
+      if (
+        tree === null ||
+        // Constructor return identity is a JS/Angular contract, not kernel traversal.
+        // eslint-disable-next-line no-restricted-syntax
+        (typeof tree !== 'object' && typeof tree !== 'function')
+      ) {
+        throw new TypeError(
+          '[SignalTree] defineStore factory must return an object or function.'
+        );
+      }
 
       // Tie the tree's teardown to the host injector — component-provided stores
       // dispose with the component, root stores with the app. (NgRx SignalStore
       // ties teardown to the injector's DestroyRef the same way.)
       inject(DestroyRef).onDestroy(() => {
         try {
-          (tree as { destroy?: () => void }).destroy?.();
-        } catch {
-          /* destroy() is idempotent — ignore double-teardown */
+          const destroy = (tree as { destroy?: unknown }).destroy;
+          if (typeof destroy === 'function') destroy.call(tree);
+        } catch (error) {
+          // Throwing here aborts Angular's remaining injector cleanup callbacks.
+          new ErrorHandler().handleError(error);
         }
       });
 
       // A constructor that returns an object makes `new SignalTreeStore()`
       // resolve to THAT object. Angular instantiates the token with `new`, so
-      // `inject(MyStore)` yields the real tree (full callable API), not this
+      // `inject(MyStore)` yields the real tree (full tree API), not this
       // wrapper instance — no proxy, no property copying, no lost call signature.
       return tree as object;
     }

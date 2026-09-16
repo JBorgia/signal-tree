@@ -89,5 +89,61 @@ SignalTree remains the only state authority. This package owns subscription,
 cleanup, and React snapshot observation. It does not mirror state, expose write
 APIs, own the tree lifecycle, or change SignalTree's causal semantics.
 
+Construct an application-owned tree outside React rendering, then pass it through
+props or ordinary React context. Components borrow that tree: unmounting a
+consumer removes its subscription and must not destroy the shared owner.
+
+```tsx
+import { createRoot } from 'react-dom/client';
+import { signalTree, useSignalTree } from '@signal-tree/react';
+
+const tree = createStore();
+
+function Count({ tree }: { tree: ReturnType<typeof createStore> }) {
+  return <output>{useSignalTree(tree, ($) => $.count())}</output>;
+}
+
+function createStore() {
+  return signalTree({ count: 0 });
+}
+
+const root = createRoot(document.getElementById('root')!);
+root.render(<Count tree={tree} />);
+
+// Called by the application owner when this application is disposed.
+function disposeApp() {
+  root.unmount();
+  tree.destroy();
+}
+```
+
+Do not construct resource-owning trees during component rendering, including
+`useState`, `useMemo`, or `useRef` initialization. Render attempts can be
+repeated or abandoned. An effect cleanup that destroys a borrowed tree is also
+incorrect: StrictMode can replay effects while the application still owns it.
+For a bounded workflow, create the tree at its explicit owner boundary and
+destroy it after its consumers have unmounted.
+
+For SSR, create one tree per request and release it when that render finishes:
+
+```tsx
+import { renderToString } from 'react-dom/server';
+
+function renderRequest(count: number) {
+  const tree = signalTree({ count });
+  try {
+    return renderToString(<Count tree={tree} />);
+  } finally {
+    tree.destroy();
+  }
+}
+```
+
+A module-level server tree would share state between requests. For streaming
+SSR, retain the request owner until rendering completes or aborts; returning a
+stream is not the end of its lifetime. Hydration must start with the same state
+that produced the server output. Dropping the last reference does not promptly
+release tree resources; bounded owners must call `destroy()`.
+
 React Native validation, custom equality, shared cross-component subscriptions,
 and first-party memoized selectors are not part of the initial surface.
