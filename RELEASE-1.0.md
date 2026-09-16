@@ -8,7 +8,23 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## Generic construction and terminal declarations — September 16, 2026
 
-Implementation checkpoint: `5ce1458f`. Validated locally; not yet published.
+Implementation checkpoint: `5ce1458f` (typing-fixture lint follow-up `13dd2a2e`).
+Published as `15.1.3` from signed tag `v15.1.3`, release commit `a05fe488`.
+
+Publication verification: canonical preparation passed all 77 release gates.
+Tagged [release CI](https://github.com/JBorgia/signal-tree/actions/runs/35158659963)
+and sanctioned [npm CI](https://github.com/JBorgia/signal-tree/actions/runs/35158751705)
+both passed their full matrices and gate mutation proofs. Kernel, Angular, React
+and Vue resolve to `15.1.3` on npm's `latest` channel. All four downloaded tarball
+SHA-512 values match the local immutable candidate; a fresh external consumer
+passed runtime facade identity and strict bundler/node16 typechecking. Registry
+metadata and tarballs initially lagged publication; verification was completed
+only after all downloads became available.
+
+Owner's inference concern was checked explicitly: exact entity, key, computed
+slice, filter and derived return types remain inferred; an anti-`any` assertion
+passes, and invalid keys, entity/filter writes and derived writes remain compile
+errors. No `any` escape hatch or removal of recursive branch validation was used.
 
 Owner identified that `EntityMapMarker<unknown, ...>` cannot accept real marker
 configuration callbacks contravariantly. Construction now excludes the config
@@ -42,7 +58,7 @@ closed it. The full lint ratchet is green at its unchanged 19-warning baseline.
 
 ## Framework store ownership contracts — September 16, 2026
 
-Implementation checkpoint: `e3ebcb91`. Local implementation; not published.
+Implementation checkpoint: `e3ebcb91`. Published in `15.1.3`; see verification above.
 
 Owner requested tighter framework-native lifetime and factory contracts, without
 adding competing construction APIs. Angular `defineStore` now accepts only
