@@ -6,6 +6,33 @@ credible `1.0.0` release candidate.
 This is the release controller, not the full historical backlog. Use it to
 bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
+## Framework store ownership contracts — September 16, 2026
+
+Implementation checkpoint: `e3ebcb91`. Local implementation; not published.
+
+Owner requested tighter framework-native lifetime and factory contracts, without
+adding competing construction APIs. Angular `defineStore` now accepts only
+object/function factory results, rejects primitives at runtime for JavaScript
+callers, and preserves valid result identity. Cleanup invokes only callable
+`destroy` methods with their receiver. Failures use Angular's default error
+reporter: throwing aborts sibling cleanup, eager app-handler injection creates
+cycles with diagnostic stores, and the owning injector is already destroyed
+when teardown callbacks run. No custom handler is resolved during store creation.
+
+The Angular recipe shares one writable owner with Ops and a non-owning readonly
+`$` provider. The readonly token's limits apply to every consumer, not just
+components. React documents externally owned application/request trees and
+borrowed StrictMode consumers. Vue documents owned scopes and borrowed trees.
+Focused tests prove these ownership boundaries; no new framework constructor or
+kernel ownership mechanism was added.
+
+Validation: Angular 121 passed (3 skipped), React 9 passed, Vue 31 passed;
+framework package build/lint, source/kernel typing, spec-type ratchet (223
+existing diagnostics, none added), packed consumers under bundler and node16,
+58/58 fast gates, formatting, and independent review. Final reporter revision
+was rebuilt and retested; final packed artifacts passed consumer checks.
+No full release/benchmark matrix or npm publication was performed.
+
 ## Framework construction ownership — September 16, 2026
 
 Implementation checkpoint: `6676f976`. Published as `15.1.2` from signed tag
