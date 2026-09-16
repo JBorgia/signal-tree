@@ -1,5 +1,9 @@
 ## Unreleased
 
+- **Share construction topology with framework adapters.** The neutral
+  `isConstructionBranch` helper in `@signal-tree/kernel/adapter` lets adapters
+  validate inputs without duplicating marker and terminal-boundary rules.
+
 - **Reject accidentally nested reactive state.** Angular construction rejects
   existing signals, including readonly/computed signals. Vue construction rejects
   existing refs and reactive/readonly proxies. Errors identify the input path;
