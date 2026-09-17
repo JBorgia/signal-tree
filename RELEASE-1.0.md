@@ -28,7 +28,9 @@ Focused packed AOT self-test passes on Node 24.15.0. Explicit supplied tarballs
 pass with SHA-512 installation and single-kernel resolution checks; incompatible
 artifacts are rejected before installation. Independent review findings on
 artifact identity and cleanup were fixed. Full canonical release and registry
-verification are still pending.
+verification are still pending. The first canonical attempt passed 78/79 checks;
+the sole failure was a new non-null assertion warning in the AOT fixture. An
+explicit missing-store error replaces that assertion; no lint allowance changed.
 
 ## Angular AOT store bootstrap — September 17, 2026
 
