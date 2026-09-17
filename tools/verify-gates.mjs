@@ -485,6 +485,19 @@ const GATES = [
     },
   },
   {
+    name: 'angular-aot-consumer',
+    covers:
+      'installed tarballs bootstrap in production AOT without a runtime compiler, render repeated writes and release component/root stores with their injectors',
+    cmd: ['node', 'tools/verify-angular-aot-consumer.mjs'],
+    needsBuild: true,
+    slow: true,
+    mutation: {
+      file: 'tools/verify-angular-aot-consumer.mjs',
+      find: "const negativeControl = process.argv.includes('--negative-control');",
+      replace: 'const negativeControl = true;',
+    },
+  },
+  {
     name: 'angular-coupling-budget',
     covers:
       'kernel production modules remain free of Angular runtime coupling',

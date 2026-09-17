@@ -210,7 +210,7 @@ Quick-reference distilled from [`.cursorrules`](.cursorrules). That file remains
 - **Language**: TypeScript (strict, no `any`; prefer `unknown`)
 - **Builds**: Rollup for packages & guardrails, Angular CLI for the demo app
 - **Tests**: Vitest
-- **Node**: 24.3.0 (see `.nvmrc`)
+- **Node**: 24.15.0 (see `.nvmrc`)
 
 Repository placement and authority are mapped in
 [`docs/repository-map.md`](docs/repository-map.md). Use it to distinguish

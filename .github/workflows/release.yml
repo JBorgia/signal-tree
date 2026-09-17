@@ -60,6 +60,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
+      - name: Install Chromium for packed Angular AOT gate
+        run: pnpm exec playwright install --with-deps chromium
+
       - name: Build all packages
         run: pnpm run build:all
 

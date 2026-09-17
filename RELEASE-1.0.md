@@ -6,6 +6,30 @@ credible `1.0.0` release candidate.
 This is the release controller, not the full historical backlog. Use it to
 bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
+## Packed Angular AOT consumer release coverage — September 17, 2026
+
+Owner authorized shipping the AOT fix and strengthening runtime consumer evidence.
+A new isolated Angular CLI production app installs the actual kernel/Angular
+packages, excludes the compiler from its browser bundle, exercises repeated
+OnPush rendering, recreates a component owner and verifies root/component teardown.
+The original runtime decorator must fail specifically with missing JIT/compiler
+at bootstrap. CI now installs Chromium and uses Node 24.15.0, the supported Node
+24 minimum required by installed Angular CLI 22.
+
+V3 tracking coverage now includes incremental entity writes, captured leaf and
+computed references, selected-ID reordering, selection subtree replacement and
+snapshot restore. All 15 focused tests, test types, lint and formatting pass;
+untracking the captured read makes exactly the three added cases fail. V3
+checkpoint: `2479d61bb`. Studio preview was recovered by restarting its stale
+server; 641 private tests pass and the browser records fixture writes without
+errors. V3's explicit Studio command runs on port 4206 (`45dc17d80`).
+
+Focused packed AOT self-test passes on Node 24.15.0. Explicit supplied tarballs
+pass with SHA-512 installation and single-kernel resolution checks; incompatible
+artifacts are rejected before installation. Independent review findings on
+artifact identity and cleanup were fixed. Full canonical release and registry
+verification are still pending.
+
 ## Angular AOT store bootstrap — September 17, 2026
 
 Fixed `defineStore` runtime DI registration after GeoTrax reproduced a missing

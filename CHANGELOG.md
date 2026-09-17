@@ -5,6 +5,11 @@
   Local, root and platform scopes retain factory identity and injector-owned
   teardown. A compiler-free runtime gate covers the bootstrap regression.
 
+- **Exercise real Angular consumers before release.** A packed-package production
+  AOT browser gate now checks repeated rendering and injector teardown without
+  the JIT compiler. Release CI installs Chromium; development and release builds
+  use Node 24.15.0 to satisfy Angular CLI 22.
+
 ## 15.1.3 (2026-09-16)
 
 - **Restore generic EntityMap construction.** Framework input validation recognizes
