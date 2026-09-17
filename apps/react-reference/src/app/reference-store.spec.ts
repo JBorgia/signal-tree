@@ -81,7 +81,10 @@ describe('greenfield reference state', () => {
     ]);
 
     store.setTeam('South');
-    expect(store.$.visibleJobs().map((job) => job.id)).toEqual(['J-201', 'J-202']);
+    expect(store.$.visibleJobs().map((job) => job.id)).toEqual([
+      'J-201',
+      'J-202',
+    ]);
 
     store.setShowCompleted(false);
     expect(store.$.visibleJobs().map((job) => job.id)).toEqual(['J-201']);
@@ -130,7 +133,10 @@ describe('greenfield reference state', () => {
     // No await, no flush: the write is already canonical truth to a direct
     // reader. Only NOTIFICATION of observers is deferred, not the state itself.
     expect(store.$.filters.team()).toBe('South');
-    expect(store.$.visibleJobs().map((job) => job.id)).toEqual(['J-201', 'J-202']);
+    expect(store.$.visibleJobs().map((job) => job.id)).toEqual([
+      'J-201',
+      'J-202',
+    ]);
 
     store.destroy();
   });

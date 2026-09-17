@@ -42,11 +42,14 @@ describe('greenfield React reference', () => {
       </StrictMode>
     );
 
-    expect(screen.getByRole('heading', { name: 'Field work queue' })).toBeTruthy();
-    expect(screen.getByLabelText('2 active jobs').textContent).toContain('North');
+    expect(
+      screen.getByRole('heading', { name: 'Field work queue' })
+    ).toBeTruthy();
+    expect(screen.getByLabelText('2 active jobs').textContent).toContain(
+      'North'
+    );
     expect(screen.getAllByText('Replace pressure sensor')).toHaveLength(2);
     expect(screen.getByText('Mina Okafor')).toBeTruthy();
-
   });
 
   it('rerenders after a canonical SignalTree write without mirroring', async () => {
@@ -54,12 +57,15 @@ describe('greenfield React reference', () => {
     await settleKernel();
     render(<App store={store} />);
 
-    fireEvent.click(screen.getByRole('button', { name: /Replace pressure sensor/ }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Replace pressure sensor/ })
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Advance' }));
 
     expect(store.$.jobs.byIdOrFail('J-104')().status).toBe('done');
-    await waitFor(() => expect(screen.getByLabelText('1 active job')).toBeTruthy());
-
+    await waitFor(() =>
+      expect(screen.getByLabelText('1 active job')).toBeTruthy()
+    );
   });
 
   it('preserves a canonical entity projection across unrelated writes', async () => {
@@ -100,13 +106,10 @@ describe('greenfield React reference', () => {
 
     function SelectedJob() {
       renders++;
-      const job = useSignalTree(
-        store,
-        ($) => {
-          selectedReads++;
-          return $.jobs.byIdOrFail('J-104')();
-        }
-      );
+      const job = useSignalTree(store, ($) => {
+        selectedReads++;
+        return $.jobs.byIdOrFail('J-104')();
+      });
       return <output>{job.status}</output>;
     }
 
@@ -200,15 +203,12 @@ describe('greenfield React reference', () => {
     const held = store.$.jobs.byIdOrFail('J-104');
 
     function HeldJobProbe() {
-      const job = useSignalTree(
-        store,
-        ($) => {
-          // `held` belongs to this same owner and remains its canonical
-          // lifetime-specific location after the key is reused.
-          void $;
-          return held() as unknown as Job | undefined;
-        }
-      );
+      const job = useSignalTree(store, ($) => {
+        // `held` belongs to this same owner and remains its canonical
+        // lifetime-specific location after the key is reused.
+        void $;
+        return held() as unknown as Job | undefined;
+      });
       return <output>{job?.status ?? 'retired'}</output>;
     }
 
@@ -236,14 +236,15 @@ describe('greenfield React reference', () => {
 
     expect(screen.getByText('retired')).toBeTruthy();
     expect(store.$.jobs.byIdOrFail('J-104')().status).toBe('queued');
-
   });
 
   it('publishes active selection through the owner primitive', async () => {
     const store = makeStore();
     await settleKernel();
     const rendered = render(<App store={store} />);
-    fireEvent.click(screen.getByRole('button', { name: /Inspect transfer pump/ }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /Inspect transfer pump/ })
+    );
     await act(async () => settleKernel());
 
     expect(store.$.jobs.activeId()).toBe('J-105');
@@ -273,8 +274,9 @@ describe('greenfield React reference', () => {
       await Promise.resolve();
     });
 
-    await waitFor(() => expect(screen.getByLabelText('3 active jobs')).toBeTruthy());
-
+    await waitFor(() =>
+      expect(screen.getByLabelText('3 active jobs')).toBeTruthy()
+    );
   });
 
   it('keeps same-address publications from two owners distinct', async () => {
@@ -282,7 +284,13 @@ describe('greenfield React reference', () => {
     const second = makeStore();
     await settleKernel();
 
-    function Status({ store, label }: { store: ReferenceStore; label: string }) {
+    function Status({
+      store,
+      label,
+    }: {
+      store: ReferenceStore;
+      label: string;
+    }) {
       const status = useSignalTree(
         store,
         ($) => $.jobs.all().find((job) => job.id === 'J-105')?.status
@@ -352,17 +360,22 @@ describe('greenfield React reference', () => {
     const store = makeStore();
     await settleKernel();
     render(<App store={store} />);
-    const queue = () => within(screen.getByRole('region', { name: "Today's work" }));
+    const queue = () =>
+      within(screen.getByRole('region', { name: "Today's work" }));
 
     expect(queue().getByText('Replace pressure sensor')).toBeTruthy();
     expect(queue().queryByText('Seal conveyor housing')).toBeNull();
 
     await act(async () => {
-      fireEvent.change(screen.getByLabelText('Team'), { target: { value: 'South' } });
+      fireEvent.change(screen.getByLabelText('Team'), {
+        target: { value: 'South' },
+      });
       await settleKernel();
     });
 
-    await waitFor(() => expect(queue().getByText('Seal conveyor housing')).toBeTruthy());
+    await waitFor(() =>
+      expect(queue().getByText('Seal conveyor housing')).toBeTruthy()
+    );
     expect(queue().queryByText('Replace pressure sensor')).toBeNull();
     // Completed South job is visible while `showCompleted` is on.
     expect(queue().getByText('Service dust collector')).toBeTruthy();
@@ -372,7 +385,9 @@ describe('greenfield React reference', () => {
       await settleKernel();
     });
 
-    await waitFor(() => expect(queue().queryByText('Service dust collector')).toBeNull());
+    await waitFor(() =>
+      expect(queue().queryByText('Service dust collector')).toBeNull()
+    );
     expect(queue().getByText('Seal conveyor housing')).toBeTruthy();
   });
 
@@ -386,7 +401,10 @@ describe('greenfield React reference', () => {
     // Write OUTSIDE act: canonical truth is readable immediately...
     store.setTeam('South');
     expect(store.$.filters.team()).toBe('South');
-    expect(store.$.visibleJobs().map((job) => job.id)).toEqual(['J-201', 'J-202']);
+    expect(store.$.visibleJobs().map((job) => job.id)).toEqual([
+      'J-201',
+      'J-202',
+    ]);
 
     // ...while the rendered tree still shows the pre-notification value.
     expect(screen.getByLabelText('2 active jobs')).toBeTruthy();
@@ -395,7 +413,9 @@ describe('greenfield React reference', () => {
     await act(async () => {
       await settleKernel();
     });
-    await waitFor(() => expect(screen.getByLabelText('1 active job')).toBeTruthy());
+    await waitFor(() =>
+      expect(screen.getByLabelText('1 active job')).toBeTruthy()
+    );
   });
 
   it('discloses a selection its filters hide, without clearing it', async () => {
@@ -407,12 +427,16 @@ describe('greenfield React reference', () => {
     expect(screen.getByText('Mina Okafor')).toBeTruthy();
 
     await act(async () => {
-      fireEvent.change(screen.getByLabelText('Team'), { target: { value: 'South' } });
+      fireEvent.change(screen.getByLabelText('Team'), {
+        target: { value: 'South' },
+      });
       await settleKernel();
     });
 
     await waitFor(() =>
-      expect(screen.getByRole('note').textContent).toContain('Hidden by the current filters')
+      expect(screen.getByRole('note').textContent).toContain(
+        'Hidden by the current filters'
+      )
     );
     // Selection is held, not discarded.
     expect(store.$.jobs.activeId()).toBe('J-104');
@@ -441,7 +465,11 @@ describe('greenfield React reference', () => {
       await settleKernel();
     });
 
-    await waitFor(() => expect(screen.getByText('No jobs match the current filters.')).toBeTruthy());
+    await waitFor(() =>
+      expect(
+        screen.getByText('No jobs match the current filters.')
+      ).toBeTruthy()
+    );
   });
 
   it('disables reset at the default filter set and enables it once dirty', async () => {
@@ -449,7 +477,10 @@ describe('greenfield React reference', () => {
     await settleKernel();
     render(<App store={store} />);
 
-    const reset = () => screen.getByRole('button', { name: 'Reset filters' }) as HTMLButtonElement;
+    const reset = () =>
+      screen.getByRole('button', {
+        name: 'Reset filters',
+      }) as HTMLButtonElement;
     expect(reset().disabled).toBe(true);
 
     await act(async () => {
@@ -473,10 +504,7 @@ describe('greenfield React reference', () => {
     second.$.filters.team('South');
 
     function Team({ store }: { store: ReferenceStore }) {
-      const team = useSignalTree(
-        store,
-        ($) => $.filters.team()
-      );
+      const team = useSignalTree(store, ($) => $.filters.team());
       return <output>{team}</output>;
     }
 
