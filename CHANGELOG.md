@@ -1,3 +1,10 @@
+## Unreleased
+
+- **Fix Angular AOT store injection.** `defineStore` now registers its DI definition
+  directly, avoiding the runtime decorator that required the JIT compiler.
+  Local, root and platform scopes retain factory identity and injector-owned
+  teardown. A compiler-free runtime gate covers the bootstrap regression.
+
 ## 15.1.3 (2026-09-16)
 
 - **Restore generic EntityMap construction.** Framework input validation recognizes

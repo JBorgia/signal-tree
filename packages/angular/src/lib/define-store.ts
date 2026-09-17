@@ -2,7 +2,7 @@ import {
   DestroyRef,
   ErrorHandler,
   inject,
-  Injectable,
+  ɵɵdefineInjectable,
   type Type,
 } from '@angular/core';
 
@@ -137,8 +137,14 @@ export function defineStore<R extends object>(
   factory: () => R,
   config: DefineStoreConfig = {}
 ): Type<R> {
-  @Injectable({ providedIn: config.providedIn ?? null })
   class SignalTreeStore {
+    // This class is created at runtime: a decorator would require Angular JIT.
+    // Supply the DI definition directly so AOT consumers need no compiler.
+    static readonly ɵprov = ɵɵdefineInjectable({
+      token: SignalTreeStore,
+      providedIn: config.providedIn ?? null,
+      factory: () => new SignalTreeStore(),
+    });
     constructor() {
       const tree = factory();
       if (
