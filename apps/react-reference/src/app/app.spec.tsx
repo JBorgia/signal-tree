@@ -4,6 +4,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from '@testing-library/react';
 import { StrictMode } from 'react';
 import { useSignalTree } from '@signal-tree/react';
@@ -166,22 +167,31 @@ describe('greenfield React reference', () => {
     function CoherenceProbe() {
       const snapshot = useSignalTree(
         store,
-        ($) => `${$.jobs.byIdOrFail('J-104')().status}:${$.filters.showCompleted()}`
+        ($) => `${$.filters.team()}:${$.filters.showCompleted()}`
       );
       seen.push(snapshot);
       return <output>{snapshot}</output>;
     }
 
-    render(<CoherenceProbe />);
     await act(async () => {
-      store.advance('J-104');
-      await Promise.resolve();
+      store.setTeam('South');
+      store.setShowCompleted(false);
+      await settleKernel();
     });
 
-    await waitFor(() => expect(screen.getByText('done:false')).toBeTruthy());
-    expect(seen).not.toContain('done:true');
-    expect(seen).not.toContain('active:false');
+    render(<CoherenceProbe />);
+    expect(screen.getByText('South:false')).toBeTruthy();
 
+    // Both filter fields move inside one transaction.
+    await act(async () => {
+      store.resetFilters();
+      await settleKernel();
+    });
+
+    await waitFor(() => expect(screen.getByText('North:true')).toBeTruthy());
+    // Neither half-reset state was ever rendered.
+    expect(seen).not.toContain('North:false');
+    expect(seen).not.toContain('South:true');
   });
 
   it('keeps a held entity reference bound to its original lifetime', async () => {
@@ -217,6 +227,7 @@ describe('greenfield React reference', () => {
         title: 'Successor pressure sensor job',
         site: 'Plant 12',
         owner: 'Mina Okafor',
+        team: 'North',
         priority: 'urgent',
         status: 'queued',
       });
@@ -254,6 +265,7 @@ describe('greenfield React reference', () => {
           title: 'Inspect transfer pump',
           site: 'Yard 4',
           owner: 'Theo Martin',
+          team: 'North',
           priority: 'routine',
           status: 'active',
         },
@@ -334,6 +346,125 @@ describe('greenfield React reference', () => {
 
     expect(screen.getByText('North')).toBeTruthy();
     rendered.unmount();
+  });
+
+  it('filters the rendered queue from the filter boundary', async () => {
+    const store = makeStore();
+    await settleKernel();
+    render(<App store={store} />);
+    const queue = () => within(screen.getByRole('region', { name: "Today's work" }));
+
+    expect(queue().getByText('Replace pressure sensor')).toBeTruthy();
+    expect(queue().queryByText('Seal conveyor housing')).toBeNull();
+
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText('Team'), { target: { value: 'South' } });
+      await settleKernel();
+    });
+
+    await waitFor(() => expect(queue().getByText('Seal conveyor housing')).toBeTruthy());
+    expect(queue().queryByText('Replace pressure sensor')).toBeNull();
+    // Completed South job is visible while `showCompleted` is on.
+    expect(queue().getByText('Service dust collector')).toBeTruthy();
+
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText('Show completed'));
+      await settleKernel();
+    });
+
+    await waitFor(() => expect(queue().queryByText('Service dust collector')).toBeNull());
+    expect(queue().getByText('Seal conveyor housing')).toBeTruthy();
+  });
+
+  it('separates the synchronous state read from the rendered notification', async () => {
+    const store = makeStore();
+    await settleKernel();
+    render(<App store={store} />);
+
+    expect(screen.getByLabelText('2 active jobs')).toBeTruthy();
+
+    // Write OUTSIDE act: canonical truth is readable immediately...
+    store.setTeam('South');
+    expect(store.$.filters.team()).toBe('South');
+    expect(store.$.visibleJobs().map((job) => job.id)).toEqual(['J-201', 'J-202']);
+
+    // ...while the rendered tree still shows the pre-notification value.
+    expect(screen.getByLabelText('2 active jobs')).toBeTruthy();
+
+    // Notification is what the render waits on.
+    await act(async () => {
+      await settleKernel();
+    });
+    await waitFor(() => expect(screen.getByLabelText('1 active job')).toBeTruthy());
+  });
+
+  it('discloses a selection its filters hide, without clearing it', async () => {
+    const store = makeStore();
+    await settleKernel();
+    render(<App store={store} />);
+
+    expect(screen.queryByRole('note')).toBeNull();
+    expect(screen.getByText('Mina Okafor')).toBeTruthy();
+
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText('Team'), { target: { value: 'South' } });
+      await settleKernel();
+    });
+
+    await waitFor(() =>
+      expect(screen.getByRole('note').textContent).toContain('Hidden by the current filters')
+    );
+    // Selection is held, not discarded.
+    expect(store.$.jobs.activeId()).toBe('J-104');
+    expect(screen.getByText('Mina Okafor')).toBeTruthy();
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Reset filters' }));
+      await settleKernel();
+    });
+
+    await waitFor(() => expect(screen.queryByRole('note')).toBeNull());
+    expect(
+      within(screen.getByRole('region', { name: "Today's work" })).getByText(
+        'Replace pressure sensor'
+      )
+    ).toBeTruthy();
+  });
+
+  it('renders an empty queue rather than a stale list', async () => {
+    const store = makeStore();
+    await settleKernel();
+    render(<App store={store} />);
+
+    await act(async () => {
+      store.$.jobs.removeWhere((job) => job.team === 'North');
+      await settleKernel();
+    });
+
+    await waitFor(() => expect(screen.getByText('No jobs match the current filters.')).toBeTruthy());
+  });
+
+  it('disables reset at the default filter set and enables it once dirty', async () => {
+    const store = makeStore();
+    await settleKernel();
+    render(<App store={store} />);
+
+    const reset = () => screen.getByRole('button', { name: 'Reset filters' }) as HTMLButtonElement;
+    expect(reset().disabled).toBe(true);
+
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText('Show completed'));
+      await settleKernel();
+    });
+
+    await waitFor(() => expect(reset().disabled).toBe(false));
+
+    await act(async () => {
+      fireEvent.click(reset());
+      await settleKernel();
+    });
+
+    await waitFor(() => expect(reset().disabled).toBe(true));
   });
 
   it('never reuses a selected snapshot across owners', () => {

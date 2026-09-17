@@ -109,3 +109,76 @@ h2 { font-size: 1.35rem; }
 	.job-select { grid-template-columns: 3.75rem minmax(0, 1fr); }
 	.job-state { grid-column: 2; text-align: left; }
 }
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  margin: 0 0 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgb(148 163 184 / 0.28);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.55);
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.filter-field select {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgb(148 163 184 / 0.5);
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+}
+
+.filter-toggle {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-reset {
+  margin-left: auto;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid rgb(148 163 184 / 0.5);
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filter-reset:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.empty-queue {
+  margin: 0;
+  padding: 1.5rem;
+  border: 1px dashed rgb(148 163 184 / 0.5);
+  border-radius: 12px;
+  color: rgb(71 85 105);
+  text-align: center;
+}
+
+/* Sits inside the dark `.active-job` panel — light text, not the dark amber
+   that reads on a light surface. */
+.selection-hidden {
+  margin: 0 0 0.75rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid rgb(251 191 36 / 0.45);
+  border-radius: 8px;
+  background: rgb(251 191 36 / 0.14);
+  color: rgb(253 224 71);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
