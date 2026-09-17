@@ -1,4 +1,4 @@
-## Unreleased
+## 15.1.4 (2026-09-17)
 
 - **Fix Angular AOT store injection.** `defineStore` now registers its DI definition
   directly, avoiding the runtime decorator that required the JIT compiler.
