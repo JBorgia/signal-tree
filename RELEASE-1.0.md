@@ -27,10 +27,25 @@ errors. V3's explicit Studio command runs on port 4206 (`45dc17d80`).
 Focused packed AOT self-test passes on Node 24.15.0. Explicit supplied tarballs
 pass with SHA-512 installation and single-kernel resolution checks; incompatible
 artifacts are rejected before installation. Independent review findings on
-artifact identity and cleanup were fixed. Full canonical release and registry
-verification are still pending. The first canonical attempt passed 78/79 checks;
+artifact identity and cleanup were fixed. The first canonical attempt passed 78/79 checks;
 the sole failure was a new non-null assertion warning in the AOT fixture. An
 explicit missing-store error replaces that assertion; no lint allowance changed.
+
+Published 15.1.4 from signed tag `v15.1.4`, commit `0c41772a`. Canonical local
+release passed 79/79 gates. Tagged Release run `35264201596` and Publish run
+`35264248410` both passed all release gates and mutation proofs. All four registry
+tarballs match the immutable candidate SHA-512 hashes. Those downloaded artifacts
+pass production AOT bootstrap, repeated rendered writes, component recreation,
+local/root teardown and compiler exclusion with no browser errors; all four also
+pass strict Bundler/Node16 consumers and facade runtime identity checks.
+
+Private Studio commit `e25f283` adopts public 15.1.4. Its full release verification
+passes 641 tests, strict consumers, browser acceptance and artifact agreement.
+The rebuilt preview records fixture writes without browser errors. GeoTrax with
+published 15.1.4 passes its production build and all 15 focused tracking tests.
+V3's temporary Angular patch is removed in favor of the published package. The
+installed Chrome extension panel still requires a human reload/connection check;
+browser automation cannot access chrome://extensions.
 
 ## Angular AOT store bootstrap — September 17, 2026
 
@@ -45,7 +60,8 @@ Validation: Angular 123 passed / 3 skipped; Angular build and lint passed (eight
 existing typing-fixture warnings); source/kernel typecheck passed; formatting and
 59/59 fast gates passed. GeoTrax production build and browser sign-in passed with
 zero console errors using a recorded pnpm patch (V3 commit `43b76d0a1`).
-This is an unreleased source fix; no npm publication or tag was created.
+At that checkpoint this was an unreleased source fix. It subsequently shipped in
+15.1.4 with the packed consumer evidence recorded above.
 
 ## Generic construction and terminal declarations — September 16, 2026
 
