@@ -721,6 +721,57 @@ ownership from the needs of a new consequential application, not from v3's
 current loader, status, storage, or forms APIs. Validate each pattern outside
 v3 before it can become a migration target.
 
+### DERIVED-STATE-PATTERN-0 — CLOSED GREEN (`8a5e697a`)
+
+The first of the four patterns. Established outside v3, from the needs of the
+greenfield app; no v3 loader, status, storage, or forms API was consulted.
+
+**Pattern: a cross-domain projection is STATE, not a framework selector.**
+`config.derived` is the placement. Two properties decided it, both probed
+before implementation rather than assumed:
+
+- `derived` tracks every location it reads, across domains, so a filter-only
+  write moves a jobs projection;
+- it returns an `Object.is`-stable array while its inputs are unchanged, which
+  is exactly what `useSyncExternalStore` demands of a snapshot.
+
+**`jobs.where()` is NOT the tool for this and the failure is silent.** It caches
+on predicate identity and invalidates on the entity collection's version alone.
+A predicate reading `$.filters` keeps returning its first list after a
+filter-only write — measured: `['a']` retained across a team switch that should
+have yielded `['b']`. No warning, no error, a stale list. The equivalent React
+mistake is the opposite failure and just as quiet: a selector returning
+`all().filter(...)` hands React a new array identity per `getSnapshot`.
+
+**Ownership, where the boundaries touch.** The filter boundary does not write
+into the jobs domain. When a filter hides the selected entity the selection is
+HELD and disclosed (`selectionHiddenByFilters`), not cleared — clearing would
+install the filter boundary as a second authority over selection. Writes that
+must cross domains go the other way: `advance()` READS filters to decide
+whether a job survives its own completion, and applies the status change and
+any successor selection in one transaction.
+
+**Reset is a transaction, not a sequence.** Every field of the boundary's rest
+position moves inside one `store.transaction()`, so no reader and no render can
+observe a half-reset. A single `DEFAULT_FILTERS` definition is both the reset
+target and the `filtersAreDefault` comparison, so a new filter field cannot be
+added without also being reset.
+
+**Synchronous state reads are not notification timing.** Canonical truth is
+readable with no await immediately after a write; only observer notification is
+deferred. Both suites assert the two separately and neither conflates them.
+
+Validation: `test`/`typecheck`/`lint`/`build` for `react-reference` and `test`
+for `react`, all exit 0; 26 tests, up from 16. Driven in Chrome across team
+switch, hide-completed, reset, and the advance-successor path with zero console
+errors and zero warnings. The browser pass caught a contrast defect jsdom
+cannot see, which is why it is a required control for this row and not an
+optional confirmation.
+
+Still open in GREENFIELD-APPLICATION-PATTERNS-0: async/server acquisition,
+forms, and persistence. No migration target may be declared from this row
+alone.
+
 ## TruckTrax v2 wedge: Route History
 
 **Blocked until `@signal-tree/react` is architecturally closed and its contract
