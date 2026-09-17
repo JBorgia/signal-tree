@@ -57,7 +57,9 @@ void bootstrapApplication(Consumer).then(async (app) => {
       production: !isDevMode(),
       write(value: number) {
         component.root.$.count.set(value);
-        localTrees.at(-1)!.$.count.set(value);
+        const local = localTrees.at(-1);
+        if (!local) throw new Error('Local store was not created');
+        local.$.count.set(value);
         // No detectChanges/tick: the Angular realization must notify rendering.
       },
       hide() {
