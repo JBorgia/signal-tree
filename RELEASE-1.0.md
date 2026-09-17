@@ -6,6 +6,21 @@ credible `1.0.0` release candidate.
 This is the release controller, not the full historical backlog. Use it to
 bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
+## Angular AOT store bootstrap — September 17, 2026
+
+Fixed `defineStore` runtime DI registration after GeoTrax reproduced a missing
+JIT compiler error during bootstrap. The local class now supplies its injectable
+definition directly; store identity, local/root/platform scopes and injector-owned
+teardown remain unchanged. The original runtime decorator fails the new fresh-Node
+compiler-free fixture. The fixed source and built implementation pass, including
+production mode. The fixture is now a mutation-proven fast gate.
+
+Validation: Angular 123 passed / 3 skipped; Angular build and lint passed (eight
+existing typing-fixture warnings); source/kernel typecheck passed; formatting and
+59/59 fast gates passed. GeoTrax production build and browser sign-in passed with
+zero console errors using a recorded pnpm patch (V3 commit `43b76d0a1`).
+This is an unreleased source fix; no npm publication or tag was created.
+
 ## Generic construction and terminal declarations — September 16, 2026
 
 Implementation checkpoint: `5ce1458f` (typing-fixture lint follow-up `13dd2a2e`).

@@ -474,6 +474,17 @@ const GATES = [
     },
   },
   {
+    name: 'angular-store-runtime',
+    covers:
+      'defineStore resolves without the JIT compiler with local/root/platform identity and injector-owned teardown',
+    cmd: ['node', 'tools/verify-angular-store-runtime.mjs'],
+    mutation: {
+      file: 'packages/angular/src/lib/define-store.ts',
+      find: 'factory: () => new SignalTreeStore(),',
+      replace: 'factory: () => undefined,',
+    },
+  },
+  {
     name: 'angular-coupling-budget',
     covers:
       'kernel production modules remain free of Angular runtime coupling',
