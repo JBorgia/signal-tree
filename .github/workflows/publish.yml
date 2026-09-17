@@ -90,6 +90,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
+      - name: Install Chromium for packed Angular AOT gate
+        run: pnpm exec playwright install --with-deps chromium
+
       - name: Use npm CLI with trusted publishing support
         run: npm install -g npm@^11.5.1 && npm --version
 

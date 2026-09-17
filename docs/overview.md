@@ -41,7 +41,7 @@ SignalTree 15 has four public packages:
 
 ## Technical specifications
 
-- Angular 20, 21, or 22 (see `peerDependencies`), TypeScript 5.5+, Node 24.3.0 (development; see `.nvmrc`)
+- Angular 20, 21, or 22 (see `peerDependencies`), TypeScript 5.5+, Node 24.15.0 (development; see `.nvmrc`)
 - Browser: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
 - Tree-shakeable, own code only, gzip (measured by
   `tools/check-bundle-budget.mjs`, esbuild + minify, Angular/RxJS external).
