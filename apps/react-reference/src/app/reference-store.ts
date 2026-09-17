@@ -95,12 +95,18 @@ export const createReferenceStore = () => {
       // exactly what `useSyncExternalStore` requires of a snapshot.
       derived: ($) => ({
         visibleJobs: () => {
-          const filters = { team: $.filters.team(), showCompleted: $.filters.showCompleted() };
+          const filters = {
+            team: $.filters.team(),
+            showCompleted: $.filters.showCompleted(),
+          };
           return $.jobs.all().filter((job) => isVisible(job, filters));
         },
         activeJobCount: () => {
           const team = $.filters.team();
-          return $.jobs.all().filter((job) => job.team === team && job.status === 'active').length;
+          return $.jobs
+            .all()
+            .filter((job) => job.team === team && job.status === 'active')
+            .length;
         },
         /**
          * Selection is NOT cleared when a filter hides the selected job — the
@@ -143,10 +149,12 @@ export const createReferenceStore = () => {
      * no React render — can observe a half-reset filter set.
      */
     resetFilters(): void {
-      store.transaction(() => {
-        store.$.filters.team(DEFAULT_FILTERS.team);
-        store.$.filters.showCompleted(DEFAULT_FILTERS.showCompleted);
-      }).confirm();
+      store
+        .transaction(() => {
+          store.$.filters.team(DEFAULT_FILTERS.team);
+          store.$.filters.showCompleted(DEFAULT_FILTERS.showCompleted);
+        })
+        .confirm();
     },
 
     /**
@@ -160,13 +168,15 @@ export const createReferenceStore = () => {
         ? id
         : store.$.visibleJobs().find((job) => job.id !== id)?.id;
 
-      store.transaction(() => {
-        store.$.jobs.updateOne(id, { status: 'done' });
-        if (successor !== id) {
-          if (successor) store.$.jobs.setActiveId(successor);
-          else store.$.jobs.clearActiveId();
-        }
-      }).confirm();
+      store
+        .transaction(() => {
+          store.$.jobs.updateOne(id, { status: 'done' });
+          if (successor !== id) {
+            if (successor) store.$.jobs.setActiveId(successor);
+            else store.$.jobs.clearActiveId();
+          }
+        })
+        .confirm();
     },
   });
 };

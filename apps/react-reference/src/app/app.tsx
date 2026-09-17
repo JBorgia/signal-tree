@@ -13,7 +13,9 @@ function Summary({ store }: { store: ReferenceStore }) {
       </div>
       <div
         className="summary-metric"
-        aria-label={`${activeCount} active ${activeCount === 1 ? 'job' : 'jobs'}`}
+        aria-label={`${activeCount} active ${
+          activeCount === 1 ? 'job' : 'jobs'
+        }`}
       >
         <strong>{activeCount}</strong>
         <span>active for {team}</span>
@@ -75,7 +77,9 @@ function WorkQueue({ store }: { store: ReferenceStore }) {
           <p className="eyebrow">Live assignment</p>
           <h2 id="queue-title">Today&apos;s work</h2>
         </div>
-        <span className="status-key"><i /> In progress</span>
+        <span className="status-key">
+          <i /> In progress
+        </span>
       </div>
 
       <div className="job-list">
@@ -136,10 +140,22 @@ function ActiveJob({ store }: { store: ReferenceStore }) {
             </p>
           ) : null}
           <dl>
-            <div><dt>Site</dt><dd>{active.site}</dd></div>
-            <div><dt>Owner</dt><dd>{active.owner}</dd></div>
-            <div><dt>Team</dt><dd>{active.team}</dd></div>
-            <div><dt>Status</dt><dd>{active.status}</dd></div>
+            <div>
+              <dt>Site</dt>
+              <dd>{active.site}</dd>
+            </div>
+            <div>
+              <dt>Owner</dt>
+              <dd>{active.owner}</dd>
+            </div>
+            <div>
+              <dt>Team</dt>
+              <dd>{active.team}</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd>{active.status}</dd>
+            </div>
           </dl>
         </>
       ) : (
