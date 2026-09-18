@@ -248,17 +248,49 @@ const WORKLOADS = {
     t.destroy?.();
     return (e - s) / ops;
   },
-  'entity-byId-field-read': (m) => {
+  // Split from a single 'entity-byId-field-read' arm, which conflated three
+  // different economic questions and so was not interpretable. Measured
+  // decomposition: held field read 1.19x v14 and warm byId 1.22x — both near
+  // parity — while the old composite read 2.03x. Calling the composite "field
+  // read" attributed a gap to field access that field access does not have.
+  //
+  // A third workload, ephemeral acquisition with nothing retained, is NOT here:
+  // instrumented counters showed it reconstructs nothing over 2M reads (the
+  // WeakRefs never clear inside a tight loop), so it does not measure churn
+  // either. Adding it back needs a fixture that forces collection.
+  'entity-field-read-held': (m) => {
     const cfg = { selectId: (r) => r.id };
     const t = m.signalTree({ rows: m.entityMap(cfg) });
     t.$.rows.setAll(seed(10000));
+    // The real hot UI read: the application already holds the row.
+    const held = [];
+    for (let i = 0; i < 10000; i++) held.push(t.$.rows.byId(i));
     const ops = 200000;
-    for (let i = 0; i < 20000; i++) void t.$.rows.byId(i % 10000)?.name();
+    for (let i = 0; i < 20000; i++) void held[i % 10000].name();
     const s = now();
     let sink = 0;
-    for (let i = 0; i < ops; i++) sink += t.$.rows.byId(i % 10000)?.name() ? 1 : 0;
+    for (let i = 0; i < ops; i++) sink += held[i % 10000].name() ? 1 : 0;
     const e = now();
-    if (sink !== ops) throw new Error('entity-byId-field-read did not land');
+    if (sink !== ops) throw new Error('entity-field-read-held did not land');
+    t.destroy?.();
+    return (e - s) / ops;
+  },
+  'entity-byId-warm': (m) => {
+    const cfg = { selectId: (r) => r.id };
+    const t = m.signalTree({ rows: m.entityMap(cfg) });
+    t.$.rows.setAll(seed(10000));
+    // Every node retained so the node cache cannot miss: this isolates key
+    // lookup, SubjectId resolution and cache return WITHOUT reconstruction.
+    const held = [];
+    for (let i = 0; i < 10000; i++) held.push(t.$.rows.byId(i));
+    const ops = 200000;
+    for (let i = 0; i < 20000; i++) void t.$.rows.byId(i % 10000);
+    const s = now();
+    let sink = 0;
+    for (let i = 0; i < ops; i++) sink += t.$.rows.byId(i % 10000) ? 1 : 0;
+    const e = now();
+    if (sink !== ops) throw new Error('entity-byId-warm did not land');
+    if (held.length !== 10000) throw new Error('nodes were not retained');
     t.destroy?.();
     return (e - s) / ops;
   },
