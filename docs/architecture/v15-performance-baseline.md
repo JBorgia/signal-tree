@@ -558,10 +558,18 @@ number here; nothing in this file is hand-copied from a scratch run.
 > probe is a leaf that owns its own cell and performs equality and commit against
 > it directly, with the slot runtime retained for cross-slot coordination.
 >
-> ### `NATIVE-STORAGE-0` STEP ONE — SHIPPED: publish the committed value
+> ### `DIRECT-PUBLISH-0` — SHIPPED (groundwork, NOT `NATIVE-STORAGE-0`)
 >
-> The first cut removes the RE-READ rather than the second copy, and it
-> captured most of the available win.
+> Named apart from `NATIVE-STORAGE-0` on purpose. This removes the redundant
+> READ between the two stores; the second physical copy of a committed scalar
+> still exists. A later reader must not conclude single-storage was evaluated
+> and shipped.
+>
+> The general rule it establishes, which entity realization should inherit:
+>
+> > **Do not invalidate a native carrier just so it can pull back a value
+> > SignalTree already holds. Push the committed value directly wherever
+> > semantics allow.**
 >
 > A scalar write used to store twice and read once in between: the kernel
 > assigned its slot, then `token.invalidate()` called the cell's `read()`
@@ -601,9 +609,13 @@ number here; nothing in this file is hand-copied from a scratch run.
 > only the redundant read was removed. Eliminating the copy means the kernel no
 > longer owning scalar truth, which reaches frames, snapshots, restoration
 > replay and transactions — a large refactor whose remaining measured prize is
-> the ~4.2 ns between 14.5 and v14's 10.3, minus whatever equality against the
+> the ~4.3 ns between 14.4 and v14's 10.1, minus whatever equality against the
 > cell costs in place of equality against the array. Recorded as available, not
 > as obviously worth it.
+>
+> **1.43x is not a failure state.** v14 is the economic floor and carries weaker
+> semantics — its keys ARE identity. The residual is worth understanding, but it
+> does not outrank `entity-updateOne` at 2.56x or `entity-setAll` at 10.25x.
 >
 > Validation: kernel `277` files / `2332`, Angular `22` / `129`, gates green.
 > The `native-storage-0-contract` and `compensation-provenance` specs pin the
