@@ -558,6 +558,63 @@ number here; nothing in this file is hand-copied from a scratch run.
 > probe is a leaf that owns its own cell and performs equality and commit against
 > it directly, with the slot runtime retained for cross-slot coordination.
 >
+> ### `UPDATEONE-FAST-0` — SHIPPED
+>
+> Profiling entities under the REAL Angular adapter overturned the expectation
+> that the scalar lesson would transfer. The pull-back pattern does exist one
+> layer up (`native-location-realization.ts`: `notify()` -> `token.invalidate()`
+> -> `read()`), but it is only **7.6%** of `updateOne`. Entity FIELDS do not have
+> it at all — the Angular adapter answers `createWritableProjection` with
+> `linkedSignal`, which recomputes lazily from the entity version signal.
+>
+> `updateOne` at 378 ns/op, self time:
+>
+> | share | frame                                    |
+> | ----: | ---------------------------------------- |
+> | 20.3% | `entity-mutation-frame.commit`           |
+> | 11.8% | `updateOne`                              |
+> |  9.4% | garbage collector                        |
+> |  8.9% | `updateSignals`                          |
+> |  7.6% | `native-location-realization` (3 frames) |
+>
+> `commit()` allocates per mutation regardless of size — a prepared-instruction
+> array from `.map`, a `Set`, an id array — plus `rememberSubjectIds([id])`
+> allocating twice for one id. For a one-field update that machinery IS the
+> mutation. The rule is not "push instead of pull"; it is the one underneath:
+> **do not construct general machinery for the specific case.**
+>
+> `updateOne` now calls `commitExistingSubjectValue` directly. That is
+> admissible because `updateOne` is the admissible case by construction — it
+> stages exactly one `replace-value` and nothing structural.
+>
+> | pair |    frame |         fast |
+> | ---- | -------: | -----------: |
+> | 1    | 417.1 ns | **387.9 ns** |
+> | 2    | 420.7 ns | **373.1 ns** |
+> | 3    | 419.7 ns | **374.7 ns** |
+> | 4    | 413.6 ns | **363.9 ns** |
+>
+> 4/4, about **44 ns (-10.6%)**, and **GC events over a 3M-op window fall from
+> 108/107 to 84/81 (-23%)**. Both moved, which was the preregistered condition
+> for keeping the complexity.
+>
+> A first GC attempt measured `heapUsed` delta and reported the fast path
+> allocating MORE. That measurement was invalid — GC ran inside the window, so
+> the delta was residual rather than churn, and the `PerformanceObserver` gc
+> hook never fired (`gcEvents: 0` in every arm). `--trace-gc` counting is the
+> number to trust.
+>
+> Equivalence is pinned by `entity-update-one-equivalence.spec.ts`: 11
+> assertions covering value, held-node identity, subject lifetime versus
+> remove/re-add, row and field invalidation, whole-collection projections,
+> no-op patches, unknown-id throw, undo, authored-vs-realized refusal, and
+> transaction rollback with a held node. **All 11 were run against the frame
+> implementation as well as the fast path** — a suite that only described the
+> new behaviour could not have detected divergence.
+>
+> `entity-updateOne` against v14: **2.54x -> 2.27x**. The 7.6% publication
+> residue is deliberately NOT included here so the two remain attributable.
+>
 > ### `DIRECT-PUBLISH-0` — SHIPPED (groundwork, NOT `NATIVE-STORAGE-0`)
 >
 > Named apart from `NATIVE-STORAGE-0` on purpose. This removes the redundant
