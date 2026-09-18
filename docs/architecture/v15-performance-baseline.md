@@ -615,6 +615,42 @@ number here; nothing in this file is hand-copied from a scratch run.
 > `entity-updateOne` against v14: **2.54x -> 2.27x**. The 7.6% publication
 > residue is deliberately NOT included here so the two remain attributable.
 >
+> ### Realized entity memory, attributed by stage — Angular vs v14
+>
+> Same fixture and quiescence protocol as the realization matrix, 10k entities,
+> 3 fields, one process per arm, every arm WeakRef-collectable.
+>
+> | stage                 |     v14 |     v15 | v15 increment |
+> | --------------------- | ------: | ------: | ------------: |
+> | untouched             |   131 B |   489 B |             — |
+> | node created and held | 2,838 B | 6,093 B |    **+5,604** |
+> | + first field read    | 2,987 B | 7,885 B |    **+1,792** |
+> | + two more fields     | 3,277 B | 8,335 B | +450 (225 ea) |
+> | nodes released        |   562 B | 3,624 B |             — |
+>
+> **The node object dominates, not the field carriers.** Holding a row costs
+> +5,604 B/entity before a single field is read — 2.07x v14's +2,707 B.
+>
+> **The FIRST field read costs 1,792 B; the next two cost 225 B each.** v14's
+> first field costs 149 B. That 12x gap on field one against 1.55x on fields two
+> and three says the cost is one-time per node, not per field: something
+> expensive is realized on first access and then amortized.
+>
+> **The residue after releasing every node is the number that matters for a
+> scrolling grid: 3,624 B vs v14's 562 B.** Dropping all row references leaves
+> v15 holding **3,135 B/entity above its own untouched baseline**, against v14's
+> 431 B — 6.45x. A long-lived list that scrolls through rows accumulates this,
+> and it is invisible to any arm that only measures held nodes.
+>
+> That figure also does not match the recorded attribution. `E4` in
+> [entity-physical-density.md](./entity-physical-density.md) puts the
+> released-realization residual at about 356 B for the `entitySignals` entry plus
+> 356 B for the `subjectStateSignals` activation cell — roughly 712 B/realized
+> subject. Measured here at 3,135 B, 4.4x that. The likely reason is the same one
+> that invalidated the entity density bisect: **E4 ran on the neutral kernel
+> path**, and these arms run through the Angular adapter. E4's attribution should
+> be re-run adapter-bound before it is quoted for any framework.
+>
 > ### Entity field read — the arm was measuring the wrong thing
 >
 > `entity-byId-field-read` conflated three different economic questions:
