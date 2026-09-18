@@ -651,10 +651,43 @@ number here; nothing in this file is hand-copied from a scratch run.
 > observer probe fixed earlier, at 25.6% of a bulk load instead of 5.7% of a
 > write.
 >
-> Not yet fixed. The fix needs to establish which consumers require add/remove
-> effect VALUES and whether a bare tree has any, then skip the clone — not skip
-> the effect — when none does. `addOne` is on the same path and presumably pays
-> it too; `updateOne` does not (it produces a replacement, not an add).
+> #### `EFFECT-VALUE-PAYFORUSE` — ATTEMPTED AND REVERTED
+>
+> The mechanism works; the capability gate was wrong, and the wrong gate is the
+> whole finding.
+>
+> Consumer audit found five clone sites, all genuine `add`/`remove` structural
+> effects (two in `setAll`, the rest in `addOne`/`removeOne`), and these
+> readers:
+>
+> | consumer                                     | reads `.value`         | exists when              |
+> | -------------------------------------------- | ---------------------- | ------------------------ |
+> | `tree-realization-adapter.ts:1270,:1488`     | YES                    | restoration/transactions |
+> | `restoration.ts:3151`, `transactions.ts:945` | in-enhancer            | mutation-capture         |
+> | `path-notifier.ts` (runs on EVERY tree)      | no — kind/subject only | always                   |
+>
+> That argued for gating on `mutation-capture`. Implemented as a
+> construction-time choice (`captureEffectValue`, resolved once, effect still
+> built and only its payload withheld), it type-checked and passed 2,342 of
+> 2,343 tests.
+>
+> **The failure is the useful part.** `marker-location-grammar.spec.ts`
+> "persistence() — the durable path the stored leak actually reached" serialized
+> `[{'§u': true}]` — an undefined placeholder — where the entity belonged. So a
+> `persistence()` tree, which has no `mutation-capture`, DOES depend on those
+> payloads. Forcing the option back to `true` makes it pass, which isolates the
+> gate VALUE as wrong rather than the mechanism.
+>
+> The path is not yet understood: `serialization.ts` never references
+> `structuralEffect` and does not subscribe to structural notifications, so the
+> dependency is indirect. Reverted rather than shipped behind a gate that cannot
+> be explained.
+>
+> To finish it: bisect the five sites to find which one persistence depends on,
+> trace how a payload reaches the durable snapshot, then gate on a capability
+> that actually covers every consumer — or move the clone to the consumer, which
+> would make the question moot. The prize is unchanged: 25.6% of a fresh bulk
+> load, and `addOne` is on the same path.
 >
 > ### Realized entity memory, attributed by stage — Angular vs v14
 >
