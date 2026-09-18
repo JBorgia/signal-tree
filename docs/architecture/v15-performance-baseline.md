@@ -638,23 +638,32 @@ number here; nothing in this file is hand-copied from a scratch run.
 > const subjectStateSignals = new Map<number, Location<number>>();
 > ```
 >
-> Keyed by SubjectId and strongly held, while the node itself is a `WeakRef`. So
-> the lifecycle is exactly the shape that explains both open questions: the node
-> becomes collectable, the realization state does not. That is also why the CPU
-> loop measured 2,000,000 cache hits and zero reconstructions — the expensive
-> part was never eligible for collection in the first place.
+> Keyed by SubjectId and strongly held, while the node itself is a `WeakRef`:
+> the node becomes collectable, the realization state does not.
+>
+> **NOT yet proven: which increment belongs to which registry.** The two steps
+> line up with the two maps, but that is inference from the order realization
+> happens in, not measurement. Pin it by counting map entries per arm and by
+> suppressing each registration independently.
+>
+> **Also NOT established: that this explains the zero WeakRef misses.** An
+> earlier draft said so. It does not follow — the public node is still weakly
+> held, and these maps retain their own realization objects rather than the node.
+> Zero reconstruction in the tight loop may simply mean GC never reclaimed the
+> weak node during that workload. Two separate findings; keep them separate.
 >
 > **v14 adds ZERO durable bytes on first node invocation (560 -> 560).** The
 > activation cell is a v15 structure with no v14 counterpart, and it costs
 > 1,561 B/entity permanently. Total durable residue: v15 3,134 B against v14
 > 431 B per entity, 7.3x.
 >
-> **E4's attribution does not reproduce on either path.** It puts these two cells
-> at about 356 B each, roughly 712 B/realized subject. Measured here: 1,570 +
-> 1,561 = 3,131 B adapter-bound and 1,844 + 1,834 = 3,678 B on the neutral path
-> E4 itself used. So this is not only the neutral-vs-adapter discrepancy found
-> earlier — E4 under-reports by ~5x against its own runtime. Re-derive it before
-> any of its numbers are quoted again.
+> **E4 no longer reproduces under the current harness and build.** It puts these
+> two cells at about 356 B each, roughly 712 B/realized subject. Measured here:
+> 1,570 + 1,561 = 3,131 B adapter-bound and 1,844 + 1,834 = 3,678 B on the
+> neutral path E4 itself used. Stated as staleness, not as historical error —
+> implementation or protocol may have changed since E4, and establishing which
+> needs its original fixture re-run against this commit. Either way its numbers
+> should not be quoted until reproduced.
 >
 > No optimization attempted. Note before one is: E4 explicitly tested naive
 > `WeakRef`s for these cells and REJECTED them after forced GC produced stale
