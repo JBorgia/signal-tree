@@ -1021,6 +1021,41 @@ export function createEntitySignal<
     return ids.map((id) => commitFreshSubject(id));
   }
 
+  /**
+   * `UPDATEONE-FAST-0`. The single-subject form of `rememberSubjectIds`, which
+   * allocates twice for one id — once for the caller's `[id]` literal and once
+   * for `.map`.
+   */
+  function rememberSubjectId(id: K): number {
+    const resolved = allocateSubjectId(id);
+    lastSubjectIds = [resolved];
+    return resolved;
+  }
+
+  /**
+   * THE value-replacement commit for a subject that already exists.
+   *
+   * `EntityMutationFrame`'s `replace-value` instruction performs this identical
+   * store; this is the same operation reachable without building the frame
+   * around it, in the same spirit as `commitSlotValue` on the scalar side.
+   *
+   * Admissible ONLY when the mutation is exactly one value replacement with no
+   * structural consequence: the subject exists, keeps its SubjectId and
+   * lifetime, does not change key, ordering, membership or structural owner,
+   * and nothing is created, restored or retired. `updateOne` is that case by
+   * construction — it stages one `replace-value` and nothing else — which is
+   * why it can call this directly rather than testing for it.
+   *
+   * Profiled: the frame path cost `entity-mutation-frame.commit` 20.3% of
+   * `updateOne` plus 9.4% GC, because `commit()` allocates a prepared-
+   * instruction array, a `Set` and an id array per mutation regardless of size.
+   * For a one-field update that machinery is the mutation.
+   */
+  function commitExistingSubjectValue(subjectId: number, nextValue: E): void {
+    valueStore.retainSubjectValue(subjectId, nextValue);
+    physicalCommitClock?.advance();
+  }
+
   function rememberSubjectIds(ids: K[]): number[] {
     const resolved = ids.map((id) => allocateSubjectId(id));
     lastSubjectIds = resolved;
@@ -2382,16 +2417,10 @@ export function createEntitySignal<
       }
 
       const finalUpdated = { ...entity, ...transformedChanges };
-      const subjectIdsForWrite = rememberSubjectIds([id]);
-      const replacement: PreparedValueReplacement<K, E> = {
-        kind: 'replace-value',
-        key: id,
-        subjectId: subjectIdsForWrite[0],
-        nextValue: finalUpdated,
-      };
-      const frame = createEntityMutationFrame();
-      frame.stageValueReplacement(replacement);
-      commitAndProjectEntityMutationFrame(frame);
+      // One value replacement, no structural consequence — commit it directly.
+      // See `commitExistingSubjectValue` for why this is the whole case.
+      const subjectIdForWrite = rememberSubjectId(id);
+      commitExistingSubjectValue(subjectIdForWrite, finalUpdated);
       syncEntitySignal(id);
       updateSignals();
 
@@ -2401,7 +2430,7 @@ export function createEntitySignal<
         finalUpdated,
         prev,
         basePath,
-        subjectIdsForWrite,
+        lastSubjectIds,
         getPositionIdsForNotify(),
         ambientMeta()
       );
