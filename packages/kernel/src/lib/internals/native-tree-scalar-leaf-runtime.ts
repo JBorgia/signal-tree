@@ -127,9 +127,26 @@ function createNativeScalarLeaf<T>(
     );
   };
 
-  const publishChanged = (changed: boolean): void => {
+  /**
+   * `NATIVE-STORAGE-0`. When the adapter can accept a committed value, publish
+   * it directly instead of invalidating a token that immediately calls back
+   * into `kernel.readSlot` for the value this call already has.
+   *
+   * `committed` is passed only by paths that know it. A dormant member reads as
+   * `undefined` through the cell's own closure, so reactivation without a known
+   * value still goes the invalidate route.
+   */
+  const commitNative = realized.commit;
+  const publishChanged = (changed: boolean, committed?: { value: T }): void => {
     const reactivated = reactivateOnWrite(leaf);
     if (!changed && !reactivated) return;
+    if (committed !== undefined && commitNative !== undefined) {
+      commitNative(committed.value);
+      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
+        recordProductionSubstrateStat('publications');
+      }
+      return;
+    }
     publication.publishSlot({ changed: true, slot: slotIndex });
   };
 
@@ -141,7 +158,7 @@ function createNativeScalarLeaf<T>(
       const before = observer ? realized.peek() : undefined;
       // The authoritative commit primitive: no result object on the hot path.
       const changed = kernel.commitSlotValue(slotIndex, value);
-      publishChanged(changed);
+      publishChanged(changed, { value });
       if (observer) {
         observer({
           intent: 'replace',

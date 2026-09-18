@@ -558,12 +558,57 @@ number here; nothing in this file is hand-copied from a scratch run.
 > probe is a leaf that owns its own cell and performs equality and commit against
 > it directly, with the slot runtime retained for cross-slot coordination.
 >
-> Not yet built. This entry records the falsification, the measured prize, and
-> the go/no-go evidence. Building it is the next work item, ahead of `updateOne`
-> — entity fields go through `createWritableProjection` -> `linkedSignal`, which
-> is the same duplicate-storage pattern one layer up, so optimising `updateOne`
-> first would mean optimising around an abstraction this may remove.
+> ### `NATIVE-STORAGE-0` STEP ONE — SHIPPED: publish the committed value
 >
+> The first cut removes the RE-READ rather than the second copy, and it
+> captured most of the available win.
+>
+> A scalar write used to store twice and read once in between: the kernel
+> assigned its slot, then `token.invalidate()` called the cell's `read()`
+> closure — dormancy check, `assertSlotIndex`, stats, array read — to fetch the
+> value the caller already had, and assigned the framework cell. The adapter
+> contract now carries an optional `commit(next)`; Angular supplies it, and the
+> `replace` path publishes the committed value directly.
+>
+> Paired against the pre-change build, control alternated, order flipped:
+>
+> | pair |  before |       after |
+> | ---- | ------: | ----------: |
+> | 1    | 28.4 ns | **16.0 ns** |
+> | 2    | 24.4 ns | **15.3 ns** |
+> | 3    | 23.4 ns | **15.8 ns** |
+> | 4    | 22.3 ns | **14.5 ns** |
+>
+> 4/4, about **8.4 ns — a 35% cut**, and slightly past the 17.08 ns simulated
+> ceiling.
+>
+> | workload      |     v15 |     v14 |     ratio |
+> | ------------- | ------: | ------: | --------: |
+> | `scalar-read` |  7.7 ns | 10.5 ns | **0.74x** |
+> | `scalar-set`  | 14.5 ns | 10.3 ns | **1.41x** |
+>
+> `scalar-set` across the session: **2.77x -> 2.15x -> 1.41x**. `scalar-read`
+> beats v14. Entity arms are unchanged, as expected — this touched scalar leaves
+> only.
+>
+> **Cost, stated:** +16 B/leaf (1,801 -> 1,817 at 100k leaves, quiesced). The
+> adapter must capture `cell.set` BEFORE the leaf replaces it with the
+> intercepted write, so each leaf holds the pre-interception setter. Calling
+> `cell.set` instead would re-enter the interception. 8.4 ns per write against
+> 16 B per leaf is the trade.
+>
+> **The second copy still exists.** The kernel continues to own `values[slot]`;
+> only the redundant read was removed. Eliminating the copy means the kernel no
+> longer owning scalar truth, which reaches frames, snapshots, restoration
+> replay and transactions — a large refactor whose remaining measured prize is
+> the ~4.2 ns between 14.5 and v14's 10.3, minus whatever equality against the
+> cell costs in place of equality against the array. Recorded as available, not
+> as obviously worth it.
+>
+> Validation: kernel `277` files / `2332`, Angular `22` / `129`, gates green.
+> The `native-storage-0-contract` and `compensation-provenance` specs pin the
+> semantics this had to preserve.
+
 > Still open: against a rebuilt `851f496e`, whether the old
 > `Object.assign(computed, { set })` was a true writable carrier. That decides
 > whether the neutral-path spend is a purchase (real writable identity) or an

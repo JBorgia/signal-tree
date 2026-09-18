@@ -21,6 +21,9 @@ export const ANGULAR_OBSERVATION_ADAPTER: ObservationAdapter = {
     return {
       cell,
       peek: read,
+      // The committed value, published without pulling it back out of the
+      // kernel. `invalidate` remains for callers that only know a slot changed.
+      commit: publish,
       token: {
         observe: () => void cell(),
         invalidate: () => publish(read()),
