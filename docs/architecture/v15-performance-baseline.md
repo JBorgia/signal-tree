@@ -615,6 +615,54 @@ number here; nothing in this file is hand-copied from a scratch run.
 > `entity-updateOne` against v14: **2.54x -> 2.27x**. The 7.6% publication
 > residue is deliberately NOT included here so the two remain attributable.
 >
+> ### Released-memory attribution, adapter-bound — the residue is TWO registries
+>
+> Every arm below drops all node references before measuring. What differs is
+> how far realization got first, so each step's increment is what SURVIVES
+> release rather than what it costs while held.
+>
+> | arm (released)   |            v14 |      v15 Angular |       v15 kernel |
+> | ---------------- | -------------: | ---------------: | ---------------: |
+> | untouched        |          131 B |            489 B |            488 B |
+> | `byId` only      |   560 B (+429) | 2,059 B (+1,570) | 2,332 B (+1,844) |
+> | node called once | 560 B (**+0**) | 3,620 B (+1,561) | 4,166 B (+1,834) |
+> | one field        |          562 B |          3,622 B |                — |
+> | all three fields |          562 B |          3,623 B |                — |
+>
+> **Field carriers leave nothing durable: +2 B and +1 B.** The whole residue is
+> two per-subject registrations, and they are the two strong `Map`s at
+> `entity-signal.ts:627` and `:630`:
+>
+> ```ts
+> const entitySignals = new Map<number, Location<E | undefined>>();
+> const subjectStateSignals = new Map<number, Location<number>>();
+> ```
+>
+> Keyed by SubjectId and strongly held, while the node itself is a `WeakRef`. So
+> the lifecycle is exactly the shape that explains both open questions: the node
+> becomes collectable, the realization state does not. That is also why the CPU
+> loop measured 2,000,000 cache hits and zero reconstructions — the expensive
+> part was never eligible for collection in the first place.
+>
+> **v14 adds ZERO durable bytes on first node invocation (560 -> 560).** The
+> activation cell is a v15 structure with no v14 counterpart, and it costs
+> 1,561 B/entity permanently. Total durable residue: v15 3,134 B against v14
+> 431 B per entity, 7.3x.
+>
+> **E4's attribution does not reproduce on either path.** It puts these two cells
+> at about 356 B each, roughly 712 B/realized subject. Measured here: 1,570 +
+> 1,561 = 3,131 B adapter-bound and 1,844 + 1,834 = 3,678 B on the neutral path
+> E4 itself used. So this is not only the neutral-vs-adapter discrepancy found
+> earlier — E4 under-reports by ~5x against its own runtime. Re-derive it before
+> any of its numbers are quoted again.
+>
+> No optimization attempted. Note before one is: E4 explicitly tested naive
+> `WeakRef`s for these cells and REJECTED them after forced GC produced stale
+> UI, and the forced-GC durability laws in that document remain binding. The
+> question worth asking is not "can these be weak" — that is answered — but
+> whether 1,561 B is the true cost of an activation cell or whether the cell is
+> retaining more than its semantic job requires.
+>
 > ### `setAll` as amplifier — it found a pay-for-use violation
 >
 > First, the arm was measuring the wrong thing, the same defect as the
