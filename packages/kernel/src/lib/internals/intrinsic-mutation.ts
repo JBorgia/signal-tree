@@ -38,7 +38,16 @@ export interface IntrinsicMutationSource<T> {
 }
 
 interface SourceRecord {
-  readonly observers: Set<IntrinsicMutationObserver<unknown>>;
+  /**
+   * Created on first `observeIntrinsicMutations`, not at registration.
+   *
+   * An empty `Set` measures 161 B, and a realized entity registers two mutation
+   * sources — its entity cell and its activation cell — so eager allocation
+   * cost 322 B/entity of sets that never receive an observer on a tree with no
+   * inspection, capture or Studio attached. Same pay-for-use rule as the
+   * per-write probe above, applied to retention rather than to CPU.
+   */
+  observers: Set<IntrinsicMutationObserver<unknown>> | undefined;
   observer: IntrinsicMutationObserver<unknown> | undefined;
 }
 
@@ -54,7 +63,7 @@ const SOURCES = new WeakMap<object, SourceRecord>();
  */
 function compose(record: SourceRecord): void {
   const { observers } = record;
-  if (observers.size === 0) {
+  if (observers === undefined || observers.size === 0) {
     record.observer = undefined;
     return;
   }
@@ -91,7 +100,7 @@ function compose(record: SourceRecord): void {
 export function registerIntrinsicMutationSource<T = unknown>(
   node: object
 ): IntrinsicMutationSource<T> {
-  const record: SourceRecord = { observers: new Set(), observer: undefined };
+  const record: SourceRecord = { observers: undefined, observer: undefined };
   SOURCES.set(node, record);
   return record as IntrinsicMutationSource<T>;
 }
@@ -103,13 +112,13 @@ export function observeIntrinsicMutations<T>(
   const record = SOURCES.get(node);
   if (!record) return undefined;
   const installed = observer as IntrinsicMutationObserver<unknown>;
-  record.observers.add(installed);
+  (record.observers ??= new Set()).add(installed);
   compose(record);
   let active = true;
   return () => {
     if (!active) return;
     active = false;
-    record.observers.delete(installed);
+    record.observers?.delete(installed);
     compose(record);
   };
 }
