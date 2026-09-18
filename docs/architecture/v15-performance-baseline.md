@@ -615,6 +615,56 @@ number here; nothing in this file is hand-copied from a scratch run.
 > `entity-updateOne` against v14: **2.54x -> 2.27x**. The 7.6% publication
 > residue is deliberately NOT included here so the two remain attributable.
 >
+> ### Registry mapping PROVEN, and one pay-for-use fix shipped
+>
+> The mapping is now measurement rather than inference. Counting entries per
+> stage, 1,000 entities:
+>
+> | stage             | `entitySignals` | `subjectStateSignals` |
+> | ----------------- | --------------: | --------------------: |
+> | after `setAll`    |               0 |                     0 |
+> | after `byId` only |       **1,000** |                     0 |
+> | after node called |           1,000 |             **1,000** |
+> | after field read  |           1,000 |                 1,000 |
+>
+> So `entitySignals` is the +1,570 B step and `subjectStateSignals` the
+> +1,561 B step, confirmed by which map gains entries at which call.
+>
+> **What a Location costs against what it wraps** (100k each, quiesced):
+>
+> | primitive                 | B each |
+> | ------------------------- | -----: |
+> | raw Angular `signal()`    |    386 |
+> | signal + strong Map entry |    413 |
+> | `computed()`              |    674 |
+> | **empty `Set()`**         |    161 |
+>
+> A Location is ~1,570 B against a 386 B signal — about 1,184 B of wrapper per
+> cell: token object and its two closures, the binding and its three, a WeakMap
+> entry, a `SourceRecord`, and an empty `Set`.
+>
+> **The `Set` was the reachable part.** `registerIntrinsicMutationSource`
+> allocated one eagerly per source, and a realized entity registers two sources,
+> so a bare tree paid 2 x 161 B for sets that never receive an observer. Made
+> lazy — created on first `observeIntrinsicMutations`:
+>
+> | arm (released) |  before |   after |
+> | -------------- | ------: | ------: |
+> | untouched      |   489 B |   489 B |
+> | `byId` only    | 2,059 B | 1,907 B |
+> | node called    | 3,620 B | 3,316 B |
+> | all fields     | 3,623 B | 3,319 B |
+>
+> **-304 B/entity**, exactly 2 x 152, matching two sources per entity. Durable
+> residue 3,134 -> 2,830 B above untouched, a 9.7% cut. `scalar-set` unchanged
+> at 1.42x with a ±0.3% A/A band, so nothing moved on CPU — the lazy check is on
+> the install path, and the hot path still reads one field.
+>
+> Remaining per cell: the Angular signal itself (386 B, irreducible without
+> changing the carrier) plus ~1,000 B of token/binding/registry wrapper. That
+> wrapper is the next target, and unlike the `Set` it is not obviously
+> removable — each piece has a caller.
+>
 > ### Released-memory attribution, adapter-bound — the residue is TWO registries
 >
 > Every arm below drops all node references before measuring. What differs is
