@@ -1,9 +1,6 @@
 import type { PositionId } from '../types';
 import { markTreeCell } from './cell-identity';
-import {
-  getIntrinsicMutationObserver,
-  registerIntrinsicMutationSource,
-} from './intrinsic-mutation';
+import { registerIntrinsicMutationSource } from './intrinsic-mutation';
 import {
   registerWritableLocationBinding,
   type WritableLocationBinding,
@@ -117,7 +114,7 @@ function createNativeScalarLeaf<T>(
   publication.bind(slotIndex, realized.token);
   const leaf = markTreeCell(native as unknown as Location<T>);
   holder.leaf = leaf;
-  registerIntrinsicMutationSource(leaf as object);
+  const mutationSource = registerIntrinsicMutationSource<T>(leaf as object);
 
   const publishResult = (
     result: ReturnType<TreeScalarSlotRuntime['commitSlot']>
@@ -130,20 +127,27 @@ function createNativeScalarLeaf<T>(
     );
   };
 
+  const publishChanged = (changed: boolean): void => {
+    const reactivated = reactivateOnWrite(leaf);
+    if (!changed && !reactivated) return;
+    publication.publishSlot({ changed: true, slot: slotIndex });
+  };
+
   const binding: WritableLocationBinding<T> = {
     location: leaf,
     notify: () => publication.publishSlot({ changed: true, slot: slotIndex }),
     replace: (value) => {
-      const observer = getIntrinsicMutationObserver<T>(leaf as object);
+      const observer = mutationSource.observer;
       const before = observer ? realized.peek() : undefined;
-      const result = kernel.commitSlot(slotIndex, value);
-      publishResult(result);
+      // The authoritative commit primitive: no result object on the hot path.
+      const changed = kernel.commitSlotValue(slotIndex, value);
+      publishChanged(changed);
       if (observer) {
         observer({
           intent: 'replace',
           before: before as T,
-          after: result.changed ? value : (before as T),
-          changed: result.changed,
+          after: changed ? value : (before as T),
+          changed,
         });
       }
     },
@@ -153,7 +157,7 @@ function createNativeScalarLeaf<T>(
         publishResult(kernel.commitSlot(slotIndex, next));
         return;
       }
-      const observer = getIntrinsicMutationObserver<T>(leaf as object);
+      const observer = mutationSource.observer;
       if (!observer) {
         publishResult(kernel.updateSlot(slotIndex, update));
         return;

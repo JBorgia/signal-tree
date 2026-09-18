@@ -499,8 +499,7 @@ const GATES = [
   },
   {
     name: 'angular-coupling-budget',
-    covers:
-      'kernel production modules remain free of Angular runtime coupling',
+    covers: 'kernel production modules remain free of Angular runtime coupling',
     cmd: ['node', 'tools/check-angular-coupling-budget.mjs'],
     mutation: {
       file: 'packages/kernel/src/lib/internals/observation-adapter.ts',
@@ -1173,6 +1172,38 @@ const GATES = [
     },
   },
   {
+    name: 'documented-examples',
+    covers:
+      'every example a LIVE document teaches still typechecks against the API it imports — the block-level complement to documented-symbols and documented-imports, which check names and specifiers but never the call',
+    cmd: ['node', 'tools/check-documented-examples.mjs'],
+    // Earned because nothing inherited lint-skills. `scripts/lint-readme-apis.mjs`
+    // states in its own header that whole-block typechecking is lint-skills'
+    // job; `lint-skills.mjs` and `docs/skills/` were both deleted and no gate
+    // took the responsibility. `packages/kernel/ENHANCERS.md` — which ships
+    // inside the kernel tarball — then taught `.with()` chaining as the current
+    // composition API, 38 lines below its own note saying `.with()` was removed
+    // in 15.0, plus `withTimeTravel`, exported from nowhere. Every other gate
+    // stayed green: the specifier resolves and `signalTree`/`batching`/`devTools`
+    // all exist. None of them ask whether `.with()` is still a method.
+    mutation: {
+      file: 'packages/kernel/README.md',
+      append:
+        "\n```ts\nimport { signalTree, batching } from '@signal-tree/kernel';\nconst stale = signalTree({ count: 0 }).with(batching());\n```\n",
+    },
+  },
+  {
+    name: 'documented-examples:self',
+    covers:
+      'the documented-example checker rejects a deleted method, an unexported symbol and a wrong-carrier spelling, while tolerating the elided context and repeated declarations that made the previous whole-file attempt permanently red',
+    cmd: ['node', 'tools/check-documented-examples.mjs', '--self-test'],
+    mutation: {
+      file: 'tools/check-documented-examples.mjs',
+      find: 'const IMPORT_SHAPE = new Set([',
+      replace:
+        'const IMPORT_SHAPE = new Set([]); const __importShape = new Set([',
+    },
+  },
+  {
     name: 'error-codes',
     covers:
       'every diagnostic code the packages can emit is in docs/errors/README.md, and the catalogue invents none',
@@ -1424,7 +1455,8 @@ const GATES = [
   },
   {
     name: 'release-plan:self',
-    covers: 'the public release boundary rejects private Studio source, unexpected packages and reversed dependencies',
+    covers:
+      'the public release boundary rejects private Studio source, unexpected packages and reversed dependencies',
     cmd: ['node', 'scripts/release-plan.mjs', '--self-test'],
     mutation: {
       file: 'scripts/release-plan.mjs',

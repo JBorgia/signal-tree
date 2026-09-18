@@ -2,20 +2,26 @@
 /**
  * Every `@signaltree/*` symbol named in a shipped README must actually exist.
  *
- * ## Why this is narrower than lint-skills, on purpose
+ * ## Why this is narrower than block typechecking, on purpose
  *
- * `lint-skills.mjs` type-checks whole code blocks, which is the right bar for
- * `docs/skills/**` because those are written to be compiled. Pointing it at the
- * package READMEs produces ~170 errors, and almost all of them are the linter's
- * own model rather than doc defects: it concatenates every block in a file into
- * one scope, so a README that declares `const tree` in five examples reports
- * four redeclarations. Gating on that number would mean a permanently red gate,
- * and a permanently red gate teaches people to ignore gates.
- *
- * So this checks the ONE thing that is unambiguous and that actually burns a
+ * This checks the ONE thing that is unambiguous and that actually burns a
  * user: does the symbol exist in the package the README says to import it from?
  * A reader copying an import that resolves to nothing is a broken first
  * experience, and READMEs ship inside the npm tarball.
+ *
+ * Whole-block typechecking is `tools/check-documented-examples.mjs`. It used to
+ * be `lint-skills.mjs`, which this header pointed at for years after both it and
+ * `docs/skills/` were deleted — so the responsibility was named and owned by
+ * nothing, and `packages/kernel/ENHANCERS.md` shipped `.with()` examples through
+ * every gate for the whole of 15.x. See that file's header for what it found.
+ *
+ * The earlier attempt was abandoned for a real reason: pointed at the package
+ * READMEs it produced ~170 errors, almost all the linter's own model rather than
+ * doc defects, because it concatenated every block in a file into one scope and
+ * reported a `const tree` declared in five examples as four redeclarations.
+ * Gating on that number would mean a permanently red gate, and a permanently red
+ * gate teaches people to ignore gates. The replacement compiles each block as its
+ * own module, which removes that class outright.
  *
  * ## What it found the first time it ran
  *

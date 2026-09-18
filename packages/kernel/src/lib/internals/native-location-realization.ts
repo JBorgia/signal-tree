@@ -1,9 +1,6 @@
 import { markTreeCell } from './cell-identity';
 import type { Location, ReadonlyLocation } from './cell-runtime';
-import {
-  getIntrinsicMutationObserver,
-  registerIntrinsicMutationSource,
-} from './intrinsic-mutation';
+import { registerIntrinsicMutationSource } from './intrinsic-mutation';
 import {
   registerWritableLocationBinding,
   type LocationPublisher,
@@ -78,12 +75,14 @@ export function createNativeLocationRuntime(
       throw new Error('Expected a native writable cell realization');
 
     const location = markTreeCell(realized.cell as unknown as Location<T>);
-    registerIntrinsicMutationSource(location as object);
+    const mutationSource1 = registerIntrinsicMutationSource<T>(
+      location as object
+    );
     const binding: WritableLocationBinding<T> = {
       location,
       notify: () => realized.token.invalidate(),
       replace: (next) => {
-        const observer = getIntrinsicMutationObserver<T>(location as object);
+        const observer = mutationSource1.observer;
         const before = observer ? realized.peek() : undefined;
         const changed = write(next, 'replace');
         if (observer) {
@@ -100,7 +99,7 @@ export function createNativeLocationRuntime(
         const before = realized.peek();
         const next = update(before);
         const changed = write(next, 'derive');
-        const observer = getIntrinsicMutationObserver<T>(location as object);
+        const observer = mutationSource1.observer;
         if (observer) {
           observer({
             intent: 'derive',
@@ -143,12 +142,14 @@ export function createNativeLocationRuntime(
     }
 
     const location = markTreeCell(realized.cell as unknown as Location<T>);
-    registerIntrinsicMutationSource(location as object);
+    const mutationSource2 = registerIntrinsicMutationSource<T>(
+      location as object
+    );
     const binding: WritableLocationBinding<T> = {
       location,
       notify: () => undefined,
       replace: (value) => {
-        const observer = getIntrinsicMutationObserver<T>(location as object);
+        const observer = mutationSource2.observer;
         const before = observer ? realized.peek() : undefined;
         write(value, 'replace');
         if (observer) {
@@ -164,7 +165,7 @@ export function createNativeLocationRuntime(
       derive: (update) => {
         const before = realized.peek();
         write(update(before), 'derive');
-        const observer = getIntrinsicMutationObserver<T>(location as object);
+        const observer = mutationSource2.observer;
         if (observer) {
           const after = realized.peek();
           observer({
