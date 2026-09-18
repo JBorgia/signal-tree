@@ -41,32 +41,43 @@ Behavior
 
 All enhancers are imported from `@signal-tree/kernel`:
 
-### Apply enhancers in explicit order:
+### Declare the enhancer set:
 
 ```typescript
 import { signalTree, batching, devTools } from '@signal-tree/kernel';
 
-const enhanced = signalTree({ count: 0 }).with(batching()).with(devTools());
+const tree = signalTree({ count: 0 }, { enhancers: [batching(), devTools()] });
 ```
 
-Each `.with()` returns `this & TAdded`, so every enhancer's methods accumulate
-and stay statically available to the end of the chain. Note that the enhancers
-are CALLED — `batching` is a factory that takes config and returns the enhancer.
+The enhancers are CALLED — `batching` is a factory that takes config and returns
+the enhancer. Every enhancer's methods accumulate onto the constructed tree's
+type, so they stay statically available on `tree`.
 
-> `composeEnhancers(...)` was removed in 15.0. Its type used one `T` for both
-> its parameter and its return, leaving nowhere to carry what an enhancer ADDS,
-> so a composed chain silently lost every method it applied. Chain `.with()`
-> instead; it is not a workaround, it is the path that preserves the types.
+The whole set is known before any state is materialized, which is the point of
+declaring it here rather than chaining: the planner validates all `requires`
+against all `provides` at once, so declaration order does not decide whether a
+dependency can be satisfied.
 
-### Use presets for convenient developer setup:
+> `tree.with(...)` and `composeEnhancers(...)` were both removed in 15.0.
+> `composeEnhancers` used one `T` for both its parameter and its return, leaving
+> nowhere to carry what an enhancer ADDS, so a composed chain silently lost every
+> method it applied. `.with()` carried the types correctly but applied enhancers
+> to a tree that was already live, which made the build plan unknowable. The
+> `enhancers` array replaces both.
 
-> **9.0.1:** Preset factories (`createDevTree`, `TREE_PRESETS`) were removed. Compose enhancers directly:
+### Add undo over designated work:
 
 ```typescript
-import { signalTree, batching, devTools, withTimeTravel } from '@signal-tree/kernel';
+import { signalTree, batching, restoration, undoable } from '@signal-tree/kernel';
 
-const tree = signalTree({ count: 0 }).with(batching()).with(devTools()).with(withTimeTravel());
+const tree = signalTree({ count: 0 }, { enhancers: [batching(), restoration()] });
+
+undoable(() => tree.$.count(1));
 ```
+
+Undo covers only the operations you mark with `undoable()`, and requires
+`restoration()` to be declared. Preset factories (`createDevTree`,
+`TREE_PRESETS`) were removed in 9.0.1; declare the enhancers you want instead.
 
 ## Best practices
 

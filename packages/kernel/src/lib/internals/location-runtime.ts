@@ -10,10 +10,7 @@ import {
   PRODUCTION_SUBSTRATE_STATS_ENABLED,
   recordProductionSubstrateStat,
 } from './production-substrate-stats';
-import {
-  getIntrinsicMutationObserver,
-  registerIntrinsicMutationSource,
-} from './intrinsic-mutation';
+import { registerIntrinsicMutationSource } from './intrinsic-mutation';
 
 interface DependencyConsumer {
   readonly dependencies: Map<DependencyNode, DependencyEdge>;
@@ -142,13 +139,15 @@ export function createWritableProjection<T>(
     }
     return undefined;
   } as Location<T>);
-  registerIntrinsicMutationSource(location as object);
+  const mutationSource1 = registerIntrinsicMutationSource<T>(
+    location as object
+  );
 
   const binding: WritableLocationBinding<T> = {
     location,
     notify: () => undefined,
     replace: (value) => {
-      const observer = getIntrinsicMutationObserver<T>(location as object);
+      const observer = mutationSource1.observer;
       const before = observer ? source.peek() : undefined;
       write(value, 'replace');
       if (observer) {
@@ -164,7 +163,7 @@ export function createWritableProjection<T>(
     derive: (update) => {
       const before = source.peek();
       write(update(before), 'derive');
-      const observer = getIntrinsicMutationObserver<T>(location as object);
+      const observer = mutationSource1.observer;
       if (observer) {
         const after = source.peek();
         observer({
@@ -388,7 +387,9 @@ export function createLocationRuntime(
       }
       return undefined;
     } as Location<T>);
-    registerIntrinsicMutationSource(location as object);
+    const mutationSource2 = registerIntrinsicMutationSource<T>(
+      location as object
+    );
     const binding: WritableLocationBinding<T> = {
       location,
       notify: () => {
@@ -397,7 +398,7 @@ export function createLocationRuntime(
         notifyObservers(observationToken, listeners);
       },
       replace: (next) => {
-        const observer = getIntrinsicMutationObserver<T>(location as object);
+        const observer = mutationSource2.observer;
         const before = observer ? read() : undefined;
         const changed = write(next, 'replace');
         if (observer) {
@@ -414,7 +415,7 @@ export function createLocationRuntime(
         const before = read();
         const next = update(before);
         const changed = write(next, 'derive');
-        const observer = getIntrinsicMutationObserver<T>(location as object);
+        const observer = mutationSource2.observer;
         if (observer) {
           observer({
             intent: 'derive',

@@ -32,6 +32,7 @@ import {
 } from '../../lib/internals/position-registry';
 import {
   createTreeRealizationAdapter,
+  deriveFieldPathFromEffect,
   defineTreeRealizationDescriptors,
   defineTreeRealizationPort,
   forgetSubjectsInTreeRealizationDescriptors,
@@ -53,6 +54,7 @@ import { recordProductionSubstrateStat } from '../../lib/internals/production-su
 import {
   getWriteParticipation,
   isInspectionWrite,
+  isCompensationWrite,
 } from '../../lib/write-participation';
 import { getPathNotifier } from '../../lib/path-notifier';
 import {
@@ -438,7 +440,7 @@ class RestorationManager<T> {
    * array is mutated in place (push/shift/slice-assign). Every mutation bumps
    * it, so a consumer reading history reactively sees entries appear.
    *
-  * Found by comparing against a store that exposes reactive past/future status.
+   * Found by comparing against a store that exposes reactive past/future status.
    */
   private readonly indexSignal;
   private readonly historyVersion;
@@ -484,7 +486,7 @@ class RestorationManager<T> {
     if (
       lastTurn &&
       lastEvent?.boundaryTurnId === lastTurn.id &&
-        designated &&
+      designated &&
       collectionOrders.length === 0
     ) {
       lastEvent.effects.push(...effects.map(cloneTurnEffect));
@@ -531,8 +533,7 @@ class RestorationManager<T> {
     private restoreStateFn?: (state: T) => void,
     private applyEffectsFn?: (applications: DirectedTurnApplication[]) => void
   ) {
-    const locations =
-      getLocationRuntime(tree) ?? NEUTRAL_LOCATION_RUNTIME;
+    const locations = getLocationRuntime(tree) ?? NEUTRAL_LOCATION_RUNTIME;
     this.indexSignal = locations.createCell(-1);
     this.historyVersion = locations.createCell(0);
     this.frontierVersion = locations.createCell(0);
@@ -1384,14 +1385,13 @@ class RestorationManager<T> {
       return this.undoPosition(positionId).length > 0;
     }
     recordProductionSubstrateStat('turnIndexLookups');
-    const seedPositionId = this.turns
-      .get(seedTurnId)
-      ?.__positionIds?.find((candidatePositionId) =>
-        this.containsPosition(positionId, candidatePositionId)
-      ) ?? positionId;
-    return (
-      this.undoPosition(seedPositionId).length > 0
-    );
+    const seedPositionId =
+      this.turns
+        .get(seedTurnId)
+        ?.__positionIds?.find((candidatePositionId) =>
+          this.containsPosition(positionId, candidatePositionId)
+        ) ?? positionId;
+    return this.undoPosition(seedPositionId).length > 0;
   }
 
   redoAt(positionId: number): boolean {
@@ -1410,14 +1410,13 @@ class RestorationManager<T> {
       return this.redoPosition(positionId).length > 0;
     }
     recordProductionSubstrateStat('turnIndexLookups');
-    const seedPositionId = this.turns
-      .get(seedTurnId)
-      ?.__positionIds?.find((candidatePositionId) =>
-        this.containsPosition(positionId, candidatePositionId)
-      ) ?? positionId;
-    return (
-      this.redoPosition(seedPositionId).length > 0
-    );
+    const seedPositionId =
+      this.turns
+        .get(seedTurnId)
+        ?.__positionIds?.find((candidatePositionId) =>
+          this.containsPosition(positionId, candidatePositionId)
+        ) ?? positionId;
+    return this.redoPosition(seedPositionId).length > 0;
   }
 
   private getLatestAppliedTurn(): CanonicalTurn<T> | undefined {
@@ -2547,26 +2546,31 @@ export function restoration(
             }
           }
 
-          // P0-C-ROW. Entity row field: compare the specific field out of the
-          // row the realization delivered, which is why the row VALUE is stored
-          // rather than a flag.
+          // Entity notifications contain a row snapshot, but only changed
+          // fields acquire external provenance. Unchanged siblings stay authored.
           const subjectKey = subjectTruthKey(effect.owner, effect.subjectId);
           if (subjectKey === undefined) continue;
           const rowTruth = externalTruthBySubject.get(subjectKey);
           if (!rowTruth) continue;
-          if (!path.startsWith(`${rowTruth.rowPath}.`)) continue;
-
-          const fieldSegments = path
-            .slice(rowTruth.rowPath.length + 1)
-            .split('.');
-          const current = readNested(rowTruth.value, fieldSegments);
-          if (!Object.is(current, effect.after)) {
-            return {
-              kind: 'value-drift',
-              path,
-              current,
-              expected: effect.after,
-            };
+          const fieldPath = deriveFieldPathFromEffect(effect, positionRegistry);
+          if (fieldPath === undefined || fieldPath === '') continue;
+          for (const [externalPath, value] of rowTruth.fields) {
+            if (!pathsOverlap(fieldPath, externalPath)) continue;
+            const current = fieldPath.startsWith(`${externalPath}.`)
+              ? readNested(
+                  value,
+                  fieldPath.slice(externalPath.length + 1).split('.')
+                )
+              : value;
+            const expected = externalPath.startsWith(`${fieldPath}.`)
+              ? readNested(
+                  effect.after,
+                  externalPath.slice(fieldPath.length + 1).split('.')
+                )
+              : effect.after;
+            if (!Object.is(current, expected)) {
+              return { kind: 'value-drift', path, current, expected };
+            }
           }
         }
         return undefined;
@@ -2655,8 +2659,17 @@ export function restoration(
           effect.owner,
           effect.subjectId
         );
-        if (restoredSubjectKey !== undefined) {
-          externalTruthBySubject.delete(restoredSubjectKey);
+        if (
+          restoredSubjectKey !== undefined &&
+          typeof effect.path === 'string'
+        ) {
+          const truth = externalTruthBySubject.get(restoredSubjectKey);
+          const fieldPath = deriveFieldPathFromEffect(effect, positionRegistry);
+          if (truth && effect.structural === undefined && fieldPath) {
+            clearExternalFields(truth.fields, fieldPath);
+            if (truth.fields.size === 0)
+              externalTruthBySubject.delete(restoredSubjectKey);
+          }
         }
       }
     };
@@ -2724,25 +2737,58 @@ export function restoration(
      */
     const externalTruthByPath = new Map<string, unknown>();
 
-    /**
-     * P0-C-ROW — external truth for an ENTITY ROW, keyed by position+subject.
-     *
-     * The path-keyed index above cannot see row fields, because the two sides
-     * disagree about granularity. Measured:
-     *
-     *   recorded at   `rows.a`        the whole row object, subj=1, pos=2
-     *   checked at    `rows.a.name`   the field,            subj=1, owner=2
-     *
-     * Position and subject are the identity both sides carry, so the row value
-     * is stored under those and the individual field is compared out of it.
-     * Without this, an authored row edit superseded by a server refresh was
-     * silently reverted — the original P0-C defect, alive for the single most
-     * common `entityMap` mutation shape.
-     */
+    // Entity writes publish whole rows while reversal effects address fields.
+    // Keep provenance at the same field granularity as those effects, keyed by
+    // stable position+subject so sibling writes cannot claim or erase authority.
     const externalTruthBySubject = new Map<
       string,
-      { readonly rowPath: string; readonly value: unknown }
+      { readonly rowPath: string; readonly fields: Map<string, unknown> }
     >();
+    const pathsOverlap = (left: string, right: string): boolean =>
+      left === right ||
+      left.startsWith(`${right}.`) ||
+      right.startsWith(`${left}.`);
+    const clearExternalFields = (
+      fields: Map<string, unknown>,
+      path: string
+    ): void => {
+      for (const field of fields.keys()) {
+        if (pathsOverlap(field, path)) fields.delete(field);
+      }
+    };
+    const updateExternalRowFields = (
+      subjectKey: string,
+      rowPath: string,
+      before: unknown,
+      after: Record<string, unknown>,
+      realized: boolean
+    ): void => {
+      const previousTruth = externalTruthBySubject.get(subjectKey);
+      if (!realized && !previousTruth) return;
+      const fields = previousTruth?.fields ?? new Map<string, unknown>();
+      const visit = (prev: unknown, next: unknown, path: string): void => {
+        if (Object.is(prev, next)) return;
+        if (isPlainRecord(prev) && isPlainRecord(next)) {
+          for (const key of new Set([
+            ...Object.keys(prev),
+            ...Object.keys(next),
+          ])) {
+            visit(prev[key], next[key], path ? `${path}.${key}` : key);
+          }
+          return;
+        }
+        clearExternalFields(fields, path);
+        if (realized) fields.set(path, next);
+      };
+      // Initial row acquisition has no prior record; index its fields too.
+      visit(isPlainRecord(before) ? before : {}, after, '');
+      if (previousTruth && previousTruth.rowPath !== rowPath) {
+        externalTruthByPath.delete(previousTruth.rowPath);
+      }
+      if (fields.size)
+        externalTruthBySubject.set(subjectKey, { rowPath, fields });
+      else externalTruthBySubject.delete(subjectKey);
+    };
     const externalOrderOwners = new Set<number>();
     // Accepts `unknown` because `PositionId` is a branded type on the reversal
     // side and a plain number on the notification side; the key only needs the
@@ -2771,6 +2817,101 @@ export function restoration(
     // rather than assuming provenance would be sufficient.
 
     const pendingTransactions = new Map<number, CaptureBucket>();
+    /**
+     * External provenance displaced by a speculative authored write, by PATH.
+     *
+     * An authored write returns a location to history's control — correct while
+     * the turn is in force. But an ABANDONED turn must not keep that authority:
+     * rollback restores prior truth AND prior authority over it. Without this,
+     * a rolled-back transaction silently handed history a value the server
+     * owned, and a later undo would overwrite it.
+     *
+     *   rollback     restores prior authority (the entry is replayed)
+     *   confirmation replaces prior authority (the entry is dropped)
+     *
+     * Keyed by PATH, not by transaction id, because the id cannot be the join:
+     * a speculative write resolves through `resolveTransactionId`, which needs
+     * a matching `transactionOwner`, while the compensation carries a bare
+     * `transactionId` under `origin: 'transaction-rollback'`. Measured, they
+     * disagree — remember recorded under 1, the compensation asked for 2.
+     *
+     * The restore also cannot live in the `rolled-back` lifecycle handler:
+     * measured, that fires BEFORE the compensation writes land, and each of
+     * those clears provenance at its own path, wiping anything restored there.
+     *
+     * Only paths that actually HELD external truth are recorded, so an ordinary
+     * transaction over history-owned state stores nothing.
+     */
+    const supersededExternalTruth = new Map<number, Map<string, unknown>>();
+    /**
+     * A rollback's compensation hands the location back to whoever owned it
+     * before the speculative turn: the displaced external truth if there was
+     * one, otherwise history. Consumed per path so the baseline does not
+     * outlive the transaction that created it.
+     */
+    /**
+     * The transaction a COMPENSATION belongs to.
+     *
+     * `resolveTransactionId` cannot answer this. Its last branch requires the
+     * transaction to still be OPEN — correct for its own job, since a stale id
+     * must not divert writes into a bucket nothing will drain — but a
+     * compensation arrives by definition AFTER the decision, once the
+     * `rolled-back` handler has already removed the id from
+     * `activeForeignTransactions`. Traced: the speculative write resolved to 1
+     * and the compensation to `undefined`, so the baseline was never found.
+     *
+     * Ownership is still checked. What is dropped is only the openness
+     * requirement, and `origin: 'transaction-rollback'` has already established
+     * that this write is that transaction's own compensation.
+     */
+    const compensationTransactionId = (meta?: {
+      transactionId?: unknown;
+    }): number | undefined => {
+      // Only ever called behind `isCompensationWrite`, so
+      // `origin: 'transaction-rollback'` has already established both that this
+      // is a compensation and whose it is. No owner token is required — and
+      // none is available: stamping `transactionOwner` on a compensation makes
+      // `activeTransactionContext()` report an open scope, reopening the
+      // callback scope a rollback must leave closed.
+      return typeof meta?.transactionId === 'number'
+        ? meta.transactionId
+        : undefined;
+    };
+    const restoreSupersededTruth = (
+      transactionId: number | undefined,
+      path: string
+    ): void => {
+      const displaced =
+        transactionId === undefined
+          ? undefined
+          : supersededExternalTruth.get(transactionId);
+      if (displaced?.has(path)) {
+        externalTruthByPath.set(path, displaced.get(path));
+        displaced.delete(path);
+        if (displaced.size === 0 && transactionId !== undefined) {
+          supersededExternalTruth.delete(transactionId);
+        }
+        return;
+      }
+      externalTruthByPath.delete(path);
+    };
+    const rememberSupersededTruth = (
+      transactionId: number | undefined,
+      path: string
+    ): void => {
+      if (transactionId === undefined) return;
+      if (!externalTruthByPath.has(path)) return;
+      let displaced = supersededExternalTruth.get(transactionId);
+      if (!displaced) {
+        displaced = new Map();
+        supersededExternalTruth.set(transactionId, displaced);
+      }
+      // First supersession wins: later writes in the same turn supersede the
+      // speculative value, not the external one.
+      if (!displaced.has(path)) {
+        displaced.set(path, externalTruthByPath.get(path));
+      }
+    };
     const pendingDescriptorInputs = new Map<
       number,
       CaptureBucket['descriptorInputs']
@@ -3252,6 +3393,10 @@ export function restoration(
     ): CanonicalTurn<T> | undefined => {
       const bucket = pendingTransactions.get(transactionId);
       pendingTransactions.delete(transactionId);
+      // NOT `supersededExternalTruth.delete` here. This runs at 'staged' —
+      // every transaction stages, decided or not — so discarding the displaced
+      // provenance at this point destroys it before a rollback can restore it.
+      // The lifecycle handler discards it after the decision instead.
       if (!bucket) {
         return undefined;
       }
@@ -3334,6 +3479,16 @@ export function restoration(
       activeForeignTransactions.delete(key);
       if (event.kind === 'rolled-back') {
         pendingTransactions.delete(event.id);
+        // NOT restored here. Measured: this event fires BEFORE the rollback's
+        // compensation writes land, and each of those clears provenance at its
+        // own path — so anything restored here is immediately wiped. The
+        // compensation write restores it instead, which is also the only place
+        // that knows the path actually came back.
+      }
+      if (event.kind !== 'rolled-back') {
+        // Confirmation REPLACES prior authority: the authored turn genuinely
+        // superseded the realization, so the displaced provenance is dropped.
+        supersededExternalTruth.clear();
       }
       const stagedTurnId = stagedForeignTurns.get(key);
       stagedForeignTurns.delete(key);
@@ -3454,7 +3609,14 @@ export function restoration(
                   positionIds?.[0],
                   subjectIds?.[0]
                 );
-                if (next === undefined) {
+                // A rollback's restore half is `realized` but is NOT external
+                // truth — it returns a value history already owns. Recording it
+                // here made an abandoned speculative turn refuse a later undo
+                // of an EARLIER authored turn. See `isCompensationWrite`.
+                const compensation = isCompensationWrite(meta);
+                if (compensation) {
+                  restoreSupersededTruth(compensationTransactionId(meta), path);
+                } else if (next === undefined) {
                   externalTruthByPath.delete(path);
                 } else {
                   externalTruthByPath.set(path, next);
@@ -3462,18 +3624,18 @@ export function restoration(
                 // Only a row-shaped payload is useful here; the collection also
                 // notifies at its own path with an undefined value.
                 if (
+                  !compensation &&
                   subjectKey !== undefined &&
                   next !== null &&
                   typeof next === 'object'
                 ) {
-                  const previousTruth = externalTruthBySubject.get(subjectKey);
-                  if (previousTruth && previousTruth.rowPath !== path) {
-                    externalTruthByPath.delete(previousTruth.rowPath);
-                  }
-                  externalTruthBySubject.set(subjectKey, {
-                    rowPath: path,
-                    value: next,
-                  });
+                  updateExternalRowFields(
+                    subjectKey,
+                    path,
+                    prev,
+                    next as Record<string, unknown>,
+                    true
+                  );
                 }
                 selfDirty = true;
                 captureEffects(
@@ -3488,7 +3650,10 @@ export function restoration(
                 );
                 return;
               }
-              // An authored write returns this location to history's control.
+              // An authored write returns this location to history's control —
+              // but if it is speculative, remember what authority it displaced
+              // so a rollback can hand it back.
+              rememberSupersededTruth(resolveTransactionId(meta), path);
               externalTruthByPath.delete(path);
               const authoredPosition = positionIds?.[0];
               if (authoredPosition !== undefined) {
@@ -3498,8 +3663,14 @@ export function restoration(
                 positionIds?.[0],
                 subjectIds?.[0]
               );
-              if (authoredSubjectKey !== undefined) {
-                externalTruthBySubject.delete(authoredSubjectKey);
+              if (authoredSubjectKey !== undefined && isPlainRecord(next)) {
+                updateExternalRowFields(
+                  authoredSubjectKey,
+                  path,
+                  prev,
+                  next,
+                  false
+                );
               }
               const transactionId = resolveTransactionId(meta);
               if (transactionId !== undefined) {
@@ -3565,8 +3736,17 @@ export function restoration(
                 return;
               }
               if (getWriteParticipation(effectiveMeta) === 'realized') {
-                // P0-C: remember that this location now holds external truth.
-                externalTruthByPath.set(path, next);
+                // P0-C: remember that this location now holds external truth —
+                // unless this is a transaction's own compensation, which
+                // restores a value history already owns.
+                if (isCompensationWrite(effectiveMeta)) {
+                  restoreSupersededTruth(
+                    compensationTransactionId(effectiveMeta),
+                    path
+                  );
+                } else {
+                  externalTruthByPath.set(path, next);
+                }
                 notifier.notify(
                   path,
                   next,
@@ -3579,9 +3759,11 @@ export function restoration(
                 return;
               }
               // An authored write supersedes the realization at this location,
-              // so the location is back under history's control.
-              externalTruthByPath.delete(path);
+              // so the location is back under history's control — recording
+              // what it displaced, in case this turn is abandoned.
               const transactionId = resolveTransactionId(effectiveMeta);
+              rememberSupersededTruth(transactionId, path);
+              externalTruthByPath.delete(path);
               if (transactionId !== undefined) {
                 captureIntoBucket(
                   getTransactionBucket(transactionId),
@@ -3724,6 +3906,7 @@ export function restoration(
       pendingDescriptorInputs.clear();
       stagedForeignTurns.clear();
       pendingTransactions.clear();
+      supersededExternalTruth.clear();
       activeForeignTransactions.clear();
       externalTruthByPath.clear();
       externalTruthBySubject.clear();
@@ -3822,6 +4005,7 @@ export function restoration(
         releaseCapture?.();
         resetRestorationRetention();
         pendingTransactions.clear();
+        supersededExternalTruth.clear();
         activeForeignTransactions.clear();
       });
     }

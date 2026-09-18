@@ -8,13 +8,16 @@ import type {
   ISignalTree,
   WriteMetadata,
 } from '../../lib/types';
-import type { PendingTransaction, TransactionMethods } from './transactions.types';
+import type {
+  PendingTransaction,
+  TransactionMethods,
+} from './transactions.types';
 
-import { getWriteParticipation, isInspectionWrite } from '../../lib/write-participation';
 import {
-  ENHANCER_META,
-  SignalTreeRollbackError,
-} from '../../lib/types';
+  getWriteParticipation,
+  isInspectionWrite,
+} from '../../lib/write-participation';
+import { ENHANCER_META, SignalTreeRollbackError } from '../../lib/types';
 import {
   openCommitScope,
   settleCommitScope,
@@ -59,7 +62,10 @@ import { getOwnedPositionIds } from '../../lib/internals/owned-mutation';
 import { getPositionRegistry } from '../../lib/internals/position-registry';
 import { getPathNotifier } from '../../lib/path-notifier';
 import { isTraversableNode } from '../../lib/utils';
-import { getActiveWriteContext, withWriteContext } from '../../lib/write-context';
+import {
+  getActiveWriteContext,
+  withWriteContext,
+} from '../../lib/write-context';
 import { visitTree } from '../../lib/internals/visit-tree';
 import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-port';
 import { getLocationRuntime } from '../../lib/internals/location-runtime';
@@ -211,9 +217,7 @@ const ROLLBACK_ERROR_MESSAGE =
  * decision improves. The constant remains the PREFIX so existing matchers keep
  * matching — the message is additive, not replaced.
  */
-export const explainRollbackFailure = (
-  cause: RollbackFailureCause
-): string => {
+export const explainRollbackFailure = (cause: RollbackFailureCause): string => {
   if (cause.kind === 'later-confirmed-dependency') {
     const at =
       cause.conflictingTurnId === undefined
@@ -649,7 +653,9 @@ class TransactionAuthority {
 function cloneTurnRecord(turn: TransactionTurnRecord): TransactionTurnRecord {
   return {
     ...turn,
-    restorationSubjectIds: turn.restorationSubjectIds ? [...turn.restorationSubjectIds] : undefined,
+    restorationSubjectIds: turn.restorationSubjectIds
+      ? [...turn.restorationSubjectIds]
+      : undefined,
     __positionIds: turn.__positionIds ? [...turn.__positionIds] : undefined,
     __effects: turn.__effects ? turn.__effects.map(cloneTurnEffect) : undefined,
     __baselineValues: turn.__baselineValues
@@ -688,9 +694,9 @@ export function peekInternalTransactionRuntime<T>(
 export function getOrCreateInternalTransactionRuntime<T>(
   tree: ISignalTree<T>
 ): InternalTransactionRuntime {
-  const existing = (
-    tree as unknown as Record<PropertyKey, unknown>
-  )[INTERNAL_TRANSACTION_RUNTIME] as InternalTransactionRuntime | undefined;
+  const existing = (tree as unknown as Record<PropertyKey, unknown>)[
+    INTERNAL_TRANSACTION_RUNTIME
+  ] as InternalTransactionRuntime | undefined;
   if (existing) {
     return existing;
   }
@@ -849,7 +855,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
   const effectKey = (effect: TurnEffect): string => {
     switch (effect.kind) {
       case 'set':
-        return `${effect.kind}\u0000${effect.path}\u0000${effect.position}\u0000${effect.subject ?? ''}`;
+        return `${effect.kind}\u0000${effect.path}\u0000${
+          effect.position
+        }\u0000${effect.subject ?? ''}`;
       // RESTORE-P0 P0-B: keyed by SUBJECT, deliberately without `kind`, so the
       // transaction's effects on one subject collide and can be composed into
       // the NET effect. With `kind` in the key, `rekey('a','a2')` and
@@ -967,7 +975,13 @@ export function getOrCreateInternalTransactionRuntime<T>(
     positionIds?: number[]
   ): void => {
     const structuralEffect = ownerPath
-      ? buildTurnEffectFromStructural(meta, ownerPath, path, positionIds, subjectIds)
+      ? buildTurnEffectFromStructural(
+          meta,
+          ownerPath,
+          path,
+          positionIds,
+          subjectIds
+        )
       : undefined;
     if (structuralEffect) {
       enqueueEffect(bucket, effectMap, structuralEffect);
@@ -1085,9 +1099,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
     );
   };
 
-  const recordConfirmedBucket = (bucket: CaptureBucket): TransactionTurnRecord | undefined => {
-    const { subjectIds, positionIds, effects } =
-      drainCaptureBucket(bucket);
+  const recordConfirmedBucket = (
+    bucket: CaptureBucket
+  ): TransactionTurnRecord | undefined => {
+    const { subjectIds, positionIds, effects } = drainCaptureBucket(bucket);
     return authority.recordConfirmed(
       subjectIds.length > 0 ? subjectIds : undefined,
       positionIds.length > 0 ? positionIds : undefined,
@@ -1104,9 +1119,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
     return bucket;
   };
 
-  const resolveTransactionId = (
-    meta?: { transactionId?: unknown; transactionOwner?: unknown }
-  ): number | undefined =>
+  const resolveTransactionId = (meta?: {
+    transactionId?: unknown;
+    transactionOwner?: unknown;
+  }): number | undefined =>
     typeof meta?.transactionId === 'number' &&
     meta.transactionOwner === transactionOwnerToken
       ? meta.transactionId
@@ -1275,8 +1291,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
         causal.structural === 'add'
           ? 'remove'
           : causal.structural === 'remove'
-            ? 'add'
-            : causal.structural,
+          ? 'add'
+          : causal.structural,
     };
   };
 
@@ -1288,7 +1304,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
     const bindings = new Map<number, CollectionTransitionTargetBinding>();
     visitTree(tree.$, (node) => {
       const binding = (
-        node as { __prepareTransitionTarget?: CollectionTransitionTargetBinding }
+        node as {
+          __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+        }
       ).__prepareTransitionTarget;
       if (binding) {
         bindings.set(binding.owner, binding);
@@ -1304,7 +1322,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
     const collections = [...collectionOwners].map((owner) => {
       const binding = bindings.get(owner);
       if (!binding) {
-        throw new Error(`Transaction rollback has no collection binding ${owner}`);
+        throw new Error(
+          `Transaction rollback has no collection binding ${owner}`
+        );
       }
       return binding.readSource();
     });
@@ -1325,18 +1345,25 @@ export function getOrCreateInternalTransactionRuntime<T>(
                 const slot = scalarSlotRuntime.resolveScalarSlot(owner);
                 if (slot === undefined) {
                   frame.discard();
-                  throw new Error(`Transaction rollback has no scalar slot ${owner}`);
+                  throw new Error(
+                    `Transaction rollback has no scalar slot ${owner}`
+                  );
                 }
                 frame.set(slot, value);
               }
               let result: ReturnType<typeof frame.commit> | undefined;
               return {
                 install(): void {
-                  result = frame.commit({ advanceRevision: false, publish: false });
+                  result = frame.commit({
+                    advanceRevision: false,
+                    publish: false,
+                  });
                 },
                 publish(): void {
                   if (!result) {
-                    throw new Error('Transaction scalar published before installation');
+                    throw new Error(
+                      'Transaction scalar published before installation'
+                    );
                   }
                   scalarSlotRuntime.publishPrepared(result);
                 },
@@ -1363,7 +1390,20 @@ export function getOrCreateInternalTransactionRuntime<T>(
     effects: TurnEffect[],
     baselineValues: ReadonlyMap<number, unknown>,
     orderDeltas: CollectionOrderDelta[] = [],
-    callbackError?: unknown
+    callbackError?: unknown,
+    /**
+     * The TRANSACTION this compensation belongs to, when that differs from the
+     * pending-turn id above.
+     *
+     * The first parameter is a pending-TURN id at one call site and a
+     * transaction id at the other, and the write context was stamping whichever
+     * arrived. Restoration joins a compensation to the authority its
+     * speculative writes displaced by transaction id, so a turn id there is not
+     * merely imprecise — it names a different thing. Traced: the speculative
+     * write recorded under transaction 1 while its own compensation announced
+     * 2, and the join silently missed.
+     */
+    owningTransactionId: number = transactionId
   ): void => {
     if (effects.length === 0 && orderDeltas.length === 0) {
       return;
@@ -1386,7 +1426,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
         kind: 'effect-validation-failed',
         pendingTurnId: transactionId,
         compensation: effects,
-        errorMessage: 'Transaction rollback requires tree realization infrastructure',
+        errorMessage:
+          'Transaction rollback requires tree realization infrastructure',
         callbackError,
       });
     }
@@ -1416,7 +1457,13 @@ export function getOrCreateInternalTransactionRuntime<T>(
     const result = withWriteContext(
       {
         origin: 'transaction-rollback',
-        transactionId,
+        transactionId: owningTransactionId,
+        // NOT `transactionOwner`. Stamping it here makes
+        // `activeTransactionContext()` report an open scope during the
+        // compensation, which reopens the callback scope a rollback must leave
+        // closed — `active-transaction-context.spec.ts` pins that. The join
+        // restoration needs is carried by `origin` plus the corrected
+        // `transactionId` instead.
         // OWNER-REPLAY-1, same shape as restoration's: stamped once on the wrap
         // that already surrounds the compensation, so every downstream meta
         // that spreads `getActiveWriteContext()` carries the namespace.
@@ -1452,7 +1499,16 @@ export function getOrCreateInternalTransactionRuntime<T>(
         unsubscribeNotifications?.();
         unsubscribeNotifications = notifier.subscribe(
           '**',
-          (next, prev, path, ownerPath, origin, subjectIds, positionIds, meta) => {
+          (
+            next,
+            prev,
+            path,
+            ownerPath,
+            origin,
+            subjectIds,
+            positionIds,
+            meta
+          ) => {
             if (origin === 'restoration') {
               return;
             }
@@ -1507,7 +1563,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
                   subjectIds,
                   positionIds
                 );
-                authority.observeLaterEffects(drainCaptureBucket(probe).effects);
+                authority.observeLaterEffects(
+                  drainCaptureBucket(probe).effects
+                );
               }
               return;
             }
@@ -1616,8 +1674,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             ownerPath,
             subjectIds,
             positionIds,
-            effectiveMeta
-          ,
+            effectiveMeta,
             treeOwnerId
           );
         }
@@ -1686,7 +1743,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
             drainTransactionRollbackInput(transactionId);
           const rollbackSubjectIds = effects
             .map((effect) => effect.subject)
-            .filter((subjectId): subjectId is number => subjectId !== undefined);
+            .filter(
+              (subjectId): subjectId is number => subjectId !== undefined
+            );
           // Starts true: "nothing to reverse" is a rollback that succeeded
           // trivially, NOT a refusal. Only the port throwing means nothing was
           // compensated.
@@ -1755,7 +1814,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
           releaseCapture?.();
         } catch (error) {
           if (primaryError !== undefined) {
-            reportCleanupFailure('transaction capture release after failure', error);
+            reportCleanupFailure(
+              'transaction capture release after failure',
+              error
+            );
           } else {
             cleanupError = error;
           }
@@ -1888,7 +1950,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
                   pendingTurnId as number,
                   [...compensation].reverse(),
                   discardedTurn?.__baselineValues ?? new Map(),
-                  orderDeltas
+                  orderDeltas,
+                  undefined,
+                  transactionId
                 );
               } catch (error) {
                 compensated = false;
@@ -2007,8 +2071,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
     });
   }
 
-  (tree as unknown as Record<PropertyKey, unknown>)[INTERNAL_TRANSACTION_RUNTIME] =
-    runtime;
+  (tree as unknown as Record<PropertyKey, unknown>)[
+    INTERNAL_TRANSACTION_RUNTIME
+  ] = runtime;
 
   // TURN-FEED-0.2. The runtime OWNS the lifecycle channel, so it installs one on
   // the tree's canonical host here rather than letting the first `announce()`
@@ -2024,7 +2089,8 @@ export function transactions(): Enhancer<TransactionMethods> {
   ): ISignalTree<T> & TransactionMethods => {
     const runtime = getOrCreateInternalTransactionRuntime(tree);
 
-    (tree as ISignalTree<T> & TransactionMethods).transaction = runtime.transaction;
+    (tree as ISignalTree<T> & TransactionMethods).transaction =
+      runtime.transaction;
 
     (tree as unknown as Record<string, unknown>)['__transactions'] = {
       getConfirmedTurnCount: () => runtime.getConfirmedTurnCount(),
