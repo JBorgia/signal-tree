@@ -615,6 +615,44 @@ number here; nothing in this file is hand-copied from a scratch run.
 > `entity-updateOne` against v14: **2.54x -> 2.27x**. The 7.6% publication
 > residue is deliberately NOT included here so the two remain attributable.
 >
+> ### Entity publication residue — NEGATIVE / NOT TAKEN
+>
+> The 7.6% `native-location-realization` slice was ceiling-probed and is not
+> worth building.
+>
+> **Direct-publish on the entity location: ~0-3 ns.** Replacing
+> `publish([binding])` with `realized.commit(next)` measured 365.9 vs 363.6 ns
+> median, 2/2 directional split, one arm a 407.9 outlier. The reason it cannot
+> help is structural: `updateOne` calls `replaceLocation` INSIDE
+> `locations.runInvalidationGroup`, so `publish` already takes the
+> `invalidationGroupDepth > 0` branch and defers rather than reading back. The
+> read-back the scalar work removed is not on this path at write time.
+>
+> That probe also bypassed grouping to get its number, which a shippable version
+> could not do. **Do not copy the scalar direct-publish shape here**: the
+> requirement is to push at DELIVERY time, not at write time, or coherent
+> grouping is lost.
+>
+> **Lazy `errors[]` in `deliver`: no measurable signal.** 2/2 split, and that
+> run was far noisier than its neighbours (356-469 ns against a 334-403 ns
+> cluster elsewhere). Recorded as below noise rather than as a win.
+>
+> **The pending-snapshot copy in `updateSignals` is NOT taken, deliberately.**
+> A combined probe removing both allocations measured ~24 ns across 4/4 pairs,
+> so a prize plausibly exists there. But the probe iterated
+> `pendingEntitySignalValues` live, and that is not a safe replacement for
+> `[...pending]` + `clear()`. The copy is a SNAPSHOT: `replaceLocation` notifies
+> intrinsic mutation observers, an observer can call back into the tree, and a
+> callback reaching `syncEntitySignal` enqueues into the same map. Live
+> iteration would process a reentrant enqueue in the same turn, or clear one
+> that should have survived to the next.
+>
+> Every safe snapshot design considered trades the array allocation for a `Map`
+> allocation — swap-and-replace, double buffer — so the measured prize may not
+> survive the safe implementation. Combined with a machine too noisy to resolve
+> 20 ns today, this is left open rather than shipped. **Do not trade the
+> publication snapshot boundary for an unmeasured allocation saving.**
+>
 > ### `DIRECT-PUBLISH-0` — SHIPPED (groundwork, NOT `NATIVE-STORAGE-0`)
 >
 > Named apart from `NATIVE-STORAGE-0` on purpose. This removes the redundant
