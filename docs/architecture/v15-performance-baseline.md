@@ -615,6 +615,47 @@ number here; nothing in this file is hand-copied from a scratch run.
 > `entity-updateOne` against v14: **2.54x -> 2.27x**. The 7.6% publication
 > residue is deliberately NOT included here so the two remain attributable.
 >
+> ### `setAll` as amplifier — it found a pay-for-use violation
+>
+> First, the arm was measuring the wrong thing, the same defect as the
+> field-read arm: `entity-setAll-10k` creates AND destroys a tree per op.
+>
+> | arm                       |      v15 |     v14 |    ratio |
+> | ------------------------- | -------: | ------: | -------: |
+> | construct + destroy only  |  0.02 ms | 0.00 ms |        — |
+> | create + setAll + destroy | 11.29 ms | 1.30 ms |     8.7x |
+> | **setAll only, reused**   |  4.49 ms | 1.22 ms | **3.7x** |
+>
+> Construction is free. The gap is between populating a FRESH collection and
+> replacing entities that already exist — v15 pays 2.5x more for the first
+> population, while v14 barely distinguishes them (1.30 vs 1.22).
+>
+> Profiling the two separately:
+>
+> |                   |     fresh | reused |
+> | ----------------- | --------: | -----: |
+> | ms/op             |     15.35 |   4.95 |
+> | `structuredClone` | **25.6%** | absent |
+> | `setAll` self     |     16.4% |  51.5% |
+>
+> Instrumenting `deepClone` gives the mechanism exactly: **10,000 clones on the
+> first `setAll`, 0 on the second, 0 on destroy** — one per entity, from
+> `setAll`'s own `map`. The call site is `entity-signal.ts:3358`, building a
+> causal `kind: 'add'` effect with `value: deepClone(entity)`. A second site at
+> `:3250` does the same for `kind: 'remove'`. First population is all adds;
+> repopulation is replacements, which build neither.
+>
+> **The benchmark tree has no enhancers configured.** No restoration, no
+> transactions, no causal retention, no Studio. Those 10,000 deep clones build
+> effects nothing retains — the same pay-for-use violation as the per-write
+> observer probe fixed earlier, at 25.6% of a bulk load instead of 5.7% of a
+> write.
+>
+> Not yet fixed. The fix needs to establish which consumers require add/remove
+> effect VALUES and whether a bare tree has any, then skip the clone — not skip
+> the effect — when none does. `addOne` is on the same path and presumably pays
+> it too; `updateOne` does not (it produces a replacement, not an add).
+>
 > ### Realized entity memory, attributed by stage — Angular vs v14
 >
 > Same fixture and quiescence protocol as the realization matrix, 10k entities,
