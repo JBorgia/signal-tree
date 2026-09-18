@@ -1033,11 +1033,20 @@ export function createEntitySignal<
   }
 
   /**
-   * THE value-replacement commit for a subject that already exists.
+   * The value-replacement commit for a subject that already exists.
    *
-   * `EntityMutationFrame`'s `replace-value` instruction performs this identical
-   * store; this is the same operation reachable without building the frame
-   * around it, in the same spirit as `commitSlotValue` on the scalar side.
+   * NOT yet a single shared implementation, and the distinction matters.
+   * `valueStore.retainSubjectValue` IS the true primitive and both routes call
+   * it; what is duplicated is the REVISION advance, which happens here for the
+   * fast path and in `commitAndProjectEntityMutationFrame` for the frame path.
+   * Behaviour is equivalent and pinned by
+   * `entity-update-one-equivalence.spec.ts`, which runs against both — but two
+   * call sites advance the physical clock, so a change to revision semantics
+   * has to find both.
+   *
+   * CLEANUP OWED: have `EntityMutationFrame`'s `replace-value` instruction go
+   * through this function, or move the advance into `retainSubjectValue`, so
+   * there is one place that decides what a value replacement costs.
    *
    * Admissible ONLY when the mutation is exactly one value replacement with no
    * structural consequence: the subject exists, keeps its SubjectId and
