@@ -615,6 +615,43 @@ number here; nothing in this file is hand-copied from a scratch run.
 > `entity-updateOne` against v14: **2.54x -> 2.27x**. The 7.6% publication
 > residue is deliberately NOT included here so the two remain attributable.
 >
+> ### Entity field read — the arm was measuring the wrong thing
+>
+> `entity-byId-field-read` conflated three different economic questions:
+> `byId` key lookup, node realization, and the field read itself. Profiling it
+> showed `get` 26.1%, `getOrCreateNode` 10.3%, `byId` 9.3% — acquisition, not
+> field access — and `registerIntrinsicMutationSource` appearing inside a READ
+> loop. Calling that composite "field read" attributed a gap to field access.
+>
+> Split into `entity-field-read-held` (the real hot UI read, row already held)
+> and `entity-byId-warm` (lookup with every node retained so the cache cannot
+> miss).
+>
+> **A third hypothesis was falsified by counters.** Both the composite arm and
+> its profile suggested nodes were being reconstructed. Instrumenting the node
+> cache says otherwise: over 2,000,000 reads with nothing retained,
+> **0 reconstructions, 0 WeakRef misses, 2,000,000 hits.** The WeakRefs never
+> clear inside a tight loop, so that arm does not measure churn either. The
+> counter was self-tested — after a forced collection `built` rises 1 -> 2 — so
+> the zero is real and not a dead probe.
+>
+> So "entity field reads are slow" and "entity node reacquisition is slow" are
+> BOTH currently unsupported.
+>
+> **The new arms are not yet trustworthy.** Their A/A bands are ±31.5% and
+> ±26.7%, well outside this harness's own "if the ranges overlap there is no
+> result" rule, and they disagree with a sandbox measurement of the same
+> decomposition (held read 1.19x and warm byId 1.22x there, 2.85x and 1.07x
+> here). The machine had been under sustained benchmark load for hours. Re-run
+> both on a quiet machine before quoting either.
+>
+> **Do NOT make the node cache strong on this evidence.** There is none that
+> reconstruction is happening, and Angular held entity nodes measure ~6,396
+> B/entity — a strong cache would trade nanoseconds for megabytes. If a real
+> churn workload later shows reconstruction cost, the interesting shape is a
+> cheap durable identity shell with field carriers still lazy, not whole-node
+> retention.
+>
 > ### Entity publication residue — NEGATIVE / NOT TAKEN
 >
 > The 7.6% `native-location-realization` slice was ceiling-probed and is not
