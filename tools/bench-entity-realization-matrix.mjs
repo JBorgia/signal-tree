@@ -120,7 +120,7 @@ const ROWS = [
     buildHint: `npx nx build core   (in ${V14_ROOT})`,
   },
 ];
-const CELLS = ['untouched', 'realized', 'held'];
+const CELLS = ['untouched', 'realized', 'held', 'held-no-read', 'released'];
 
 /** Framework runtimes the built packages import as bare specifiers. */
 const RUNTIME_DEPS = ['@angular/core', 'vue', 'react', 'rxjs', 'tslib'];
@@ -194,8 +194,29 @@ const build = () => {
   }
   if (cell === 'held') {
     const nodes = [];
+    for (let i = 0; i < n; i++) {
+      const node = t.$.rows.byId(i);
+      void node?.id(); void node?.name(); void node?.v();
+      nodes.push(node);
+    }
+    return { t, nodes };
+  }
+  if (cell === 'held-no-read') {
+    // The node object alone. Separates node cost from field-carrier cost —
+    // measured, the node dominates.
+    const nodes = [];
     for (let i = 0; i < n; i++) nodes.push(t.$.rows.byId(i));
     return { t, nodes };
+  }
+  if (cell === 'released') {
+    // Every row realized, every field read, then ALL references dropped. What
+    // survives is what a scrolling list accumulates — invisible to any arm that
+    // only measures held nodes.
+    for (let i = 0; i < n; i++) {
+      const node = t.$.rows.byId(i);
+      void node?.id(); void node?.name(); void node?.v();
+    }
+    return { t };
   }
   throw new Error('unknown cell ' + cell);
 };
@@ -256,14 +277,16 @@ console.log(
 );
 console.log('only the runtime answering the realization seam differs\n');
 console.log(
-  '  row       untouched   field realized   nodes held   what supplies realization'
+  '  row       untouched   field realized   nodes held   node only    released   realization by'
 );
 console.log(`  ${'-'.repeat(94)}`);
 for (const { row, note } of rows) {
   console.log(
     `  ${row.padEnd(9)} ${String(at(row, 'untouched')).padStart(9)} B ${String(
       at(row, 'realized')
-    ).padStart(14)} B ${String(at(row, 'held')).padStart(12)} B   ${note}`
+    ).padStart(14)} B ${String(at(row, 'held')).padStart(12)} B ${String(
+      at(row, 'held-no-read')
+    ).padStart(10)} B ${String(at(row, 'released')).padStart(10)} B   ${note}`
   );
 }
 
