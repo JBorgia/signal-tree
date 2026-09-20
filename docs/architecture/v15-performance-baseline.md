@@ -800,6 +800,105 @@ number here; nothing in this file is hand-copied from a scratch run.
 > remove. That is a CPU/memory trade needing its own measurement, and it is not
 > attempted here.
 >
+
+> ### `SUBJECT-STATE-SEMANTIC-0` — the activation carrier is now held weakly
+>
+> #### First, a correction to the anchor above
+>
+> The residue figures published as `2,831 -> 2,709 B/entity` DO NOT REPRODUCE on
+> `tools/bench-entity-realization-matrix.mjs`. Measured there, the angular
+> `released` column is **3,591 B/entity before `SUBJECT-STATE-MINIMAL-0` and
+> 3,470 after**. The -121 B delta was right; the absolute anchor was not, and
+> everything below is quoted on the matrix scale. Two independent harnesses
+> agree on it (an ad-hoc probe and the matrix both return 2,222 for this
+> change), so the matrix scale is the one to trust. Where the earlier 2,830
+> figure came from could not be reconstructed.
+>
+> #### What it does
+>
+> `subjectStateSignals` holds a `WeakRef<Location<number>>` instead of the
+> `Location` itself, and the node closure captures its own carrier on first read
+> and becomes the strong retainer.
+>
+> The reason this is safe is narrower than "weak realization works": **this
+> carrier has no durable semantic value.** Its number is a nonce. Nothing reads
+> it; `currentKey` only subscribes to it, and the durable truth it stands for is
+> `structuralStore.subjectRevision`, which already existed and was already paid
+> for. So there is no state to persist and nothing to restore — only a carrier
+> to FIND while something is still listening. A replacement can start back at 0
+> precisely because no observer survives that could compare against the old
+> count.
+>
+> #### Measured — matrix `released`, matched builds, same session
+>
+> | row               | before |   SS0 | delta  |
+> | ----------------- | -----: | ----: | ------ |
+> | angular           |   3470 |  2222 | -1,248 |
+> | vue               |   4399 |  2687 | -1,712 |
+> | kernel (neutral)  |   3715 |  2475 | -1,240 |
+>
+> Deterministic: three repetitions per arm, spread of at most 1 B. The absolute
+> floor — the registry made entirely free, semantics broken — is 2,036 B, so the
+> `WeakRef` plus its `Map` entry cost 183 B/entity over that floor.
+>
+> #### CPU — one real regression, disclosed
+>
+> Alternating A/B, two runs per build, 9 rounds each:
+>
+> | workload        | SS0           | base          | verdict            |
+> | --------------- | ------------- | ------------- | ------------------ |
+> | `updateOne-10k` | 393.7 / 401.6 | 382.2 / 381.8 | **+4.1%, no overlap** |
+> | `scalar-set`    | 14.3 / 14.7   | 14.4 / 14.2   | flat               |
+> | `setAll-10k`    | 15.42 / 14.14 | 14.84 / 14.59 | flat               |
+>
+> `updateOne` is genuinely slower. The base readings differ by 0.1% and the two
+> ranges do not overlap, so this is not noise, and the mechanism is plain: one
+> extra `WeakRef.deref()` per mutation in `bumpSubjectStateSignal`. It is
+> recorded as a cost of the change, not argued away.
+>
+> #### The tests, and what they could NOT prove
+>
+> Ten tests in `subject-state-weak-realization.spec.ts`, under the real Angular
+> adapter with forced GC (`--expose-gc` is now on the angular test target,
+> because a weakly held carrier has no observable behaviour without a real
+> collection). A CONTROL test asserts an unreferenced carrier is actually
+> reclaimed — without it every other test could pass vacuously.
+>
+> Covered: held node still updates; held field carrier still updates; a live
+> reactive observer prevents collection and never goes stale; a re-added key
+> does not retarget a held reference; `field.set` authors through a recreated
+> carrier; mutations made while nothing is realized are visible on re-
+> realization; optimistic transaction state stays visible across a collection;
+> rollback compensates through the same held carrier.
+>
+> **Mutation proof, and its limit.** Against the old STRONG map, three tests
+> fail — the reclamation claims are real. Against a NAIVE weak variant that
+> mints a replacement without checking liveness — the stale-realization trap
+> this design was supposed to guard against — **all ten tests pass.** Two
+> separate discriminating constructions were attempted and neither separated
+> them.
+>
+> The likely reason is structural, and it is stated here as reasoning, NOT as a
+> proven property: no public observer depends on the activation carrier alone.
+> Reading a node evaluates `currentKey` AND the entity value cell, so a
+> structural bump delivered to the wrong carrier is masked by the value cell's
+> own invalidation. If that is right, the liveness check is defensive rather
+> than load bearing. It is kept regardless — it costs nothing and it stops the
+> registry minting a fresh `Location` per node — but nobody should believe the
+> test suite has proved it.
+>
+> #### Against the preregistered criteria
+>
+> `<2,000 B/entity` was the "worth pursuing" gate and this lands at **2,222 B**,
+> so on the literal number it falls short. On the other stated criterion —
+> "removes 700-1,500+ B/entity means the correct physical model" — -1,248 B is
+> inside the band, and the shape of the result supports the thesis: the cost was
+> fixed per realized subject, not proportional to field count.
+>
+> `entitySignals` is untouched and is the next candidate; it is the same
+> `createCell` shape, but unlike this one it DOES carry a durable value, so the
+> same trick does not transfer unchanged.
+>
 > ### Registry mapping PROVEN, and one pay-for-use fix shipped
 >
 > The mapping is now measurement rather than inference. Counting entries per

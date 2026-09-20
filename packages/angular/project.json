@@ -42,7 +42,7 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx vitest run --root packages/angular",
+        "command": "NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular",
         "forwardAllArgs": true
       }
     },

@@ -476,7 +476,7 @@ export function createEntitySignal<
         afterKey: after?.key,
         beforeValue: before?.value,
         valueSignal: entitySignals.get(subjectId),
-        stateSignal: subjectStateSignals.get(subjectId),
+        stateSignal: subjectStateSignals.get(subjectId)?.deref(),
         afterValue: after?.value,
         bindingChanged: !before || !after || before.key !== after.key,
         targetNeighbors: targetNeighborBySubject.get(subjectId),
@@ -627,7 +627,25 @@ export function createEntitySignal<
   const entitySignals = new Map<number, Location<E | undefined>>();
   const structuralStore = new StructuralStore<K>();
   const valueStore = new EntityValueStore<E>();
-  const subjectStateSignals = new Map<number, Location<number>>();
+  /**
+   * `SUBJECT-STATE-SEMANTIC-0`. Held WEAKLY.
+   *
+   * This carrier has no durable semantic value. Its number is a nonce: nothing
+   * reads it, `currentKey` only subscribes to it, and the durable truth it
+   * stands for is `structuralStore.subjectRevision`. So there is nothing here
+   * to persist — only a carrier to FIND while something is still listening.
+   *
+   * Strongly held, it was the single largest item in the released residue: a
+   * full `Location<number>` per realized subject, measured at 1,249 B/entity of
+   * a 2,709 B residue. Weak, a released subject keeps a `WeakRef` and a `Map`
+   * entry instead.
+   *
+   * Safe against the stale-realization trap because the entry is replaced ONLY
+   * when `deref()` comes back empty. A live Angular consumer retains its
+   * producers, so a carrier anything still observes is still reachable, still
+   * deref-able, and still the one a bump finds.
+   */
+  const subjectStateSignals = new Map<number, WeakRef<Location<number>>>();
   const ownerMetadataEnabled = options?.ownerMetadataEnabled ?? true;
   const subjectMetadataEnabled =
     options?.subjectMetadataEnabled ?? ownerMetadataEnabled;
@@ -981,19 +999,21 @@ export function createEntitySignal<
   }
 
   function getSubjectStateSignal(subjectId: number): Location<number> {
-    let s = subjectStateSignals.get(subjectId);
-    if (!s) {
-      s = locations.createCell(0);
-      subjectStateSignals.set(subjectId, s);
-    }
-    return s;
+    const existing = subjectStateSignals.get(subjectId)?.deref();
+    if (existing) return existing;
+    // Starting a replacement back at 0 is sound precisely because the value is
+    // a nonce: every observer that could have compared against the old count
+    // was retaining the old carrier, which is why this branch was not taken.
+    const created = locations.createCell(0);
+    subjectStateSignals.set(subjectId, new WeakRef(created));
+    return created;
   }
 
   function bumpSubjectStateSignal(subjectId: number): void {
     // Publish only to an activation token that already exists. Interning here
     // would recreate eager realization through the write path: any subject that
     // is ever mutated would acquire a token whether or not anything observes it.
-    const signal = subjectStateSignals.get(subjectId);
+    const signal = subjectStateSignals.get(subjectId)?.deref();
     if (signal) deriveLocation(signal, (value) => value + 1);
   }
 
@@ -1624,8 +1644,14 @@ export function createEntitySignal<
       );
     }
 
+    // `SUBJECT-STATE-SEMANTIC-0`. The registry is weak, so THIS closure is what
+    // keeps the activation carrier alive: while a caller holds this node, its
+    // carrier cannot be collected out from under a pending bump. Captured on
+    // first read rather than at node creation, so `byId` alone still realizes
+    // nothing.
+    let activationCarrier: Location<number> | undefined;
     const currentKey = (): K | undefined => {
-      getSubjectStateSignal(subjectId)();
+      (activationCarrier ??= getSubjectStateSignal(subjectId))();
       const resolved = structuralStore.resolveSubjectHandle(handle);
       return resolved.state === 'active' ? resolved.key : undefined;
     };
@@ -1750,7 +1776,7 @@ export function createEntitySignal<
       activeKey: subjectState.active ? subjectState.key : undefined,
       retainedSubjectState: structuralStore.hasSubject(subjectId),
       entitySignal: entitySignals.has(subjectId),
-      activationToken: subjectStateSignals.has(subjectId),
+      activationToken: subjectStateSignals.get(subjectId)?.deref() !== undefined,
       nodeFacadeMaterialized: node !== undefined,
       fieldFacadesMaterialized,
       positionIds: getPositionIds(),
