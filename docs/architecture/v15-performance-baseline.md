@@ -615,6 +615,57 @@ number here; nothing in this file is hand-copied from a scratch run.
 > `entity-updateOne` against v14: **2.54x -> 2.27x**. The 7.6% publication
 > residue is deliberately NOT included here so the two remain attributable.
 >
+> ### `SUBJECT-STATE-MINIMAL-0` — NEGATIVE: no prize in wrapper-slimming
+>
+> `subjectStateSignals` holds `locations.createCell(0)`, a full writable
+> `Location<number>` used only as an internal version counter and bumped through
+> `deriveLocation`. After the lazy-`Set` fix it still costs ~1,409 B/entity,
+> while v14 adds nothing at the analogous transition. The question was whether a
+> minimal internal cell could be dramatically smaller.
+>
+> Each wrapper layer measured cumulatively, 100k each, quiesced, replicating
+> what `createWritable` adds in the order it adds it:
+>
+> | layer                               | B each | delta |
+> | ----------------------------------- | -----: | ----: |
+> | L0 closure over `value`             |    153 |     — |
+> | L1 + Angular signal                 |    386 |  +233 |
+> | L2 + token, 2 closures              |    634 |  +248 |
+> | L3 + `SourceRecord` + WeakMap entry |    724 |   +90 |
+> | L4 + binding, 3 closures            |    956 |  +232 |
+> | L5 + binding registry entry         |    998 |   +42 |
+>
+> **The remaining ~1 KB is several small costs, not one dominant object.** No
+> layer exceeds 248 B. The simulation accounts for 998 B of the measured
+> ~1,409 B; the unattributed ~411 B is `markTreeCell`, the `Location` wrapper
+> itself and the owning `Map` entry, and is not broken down further here.
+>
+> Then each layer was checked against its callers:
+>
+> | layer          | removable for an internal cell?   | why                                             |
+> | -------------- | --------------------------------- | ----------------------------------------------- |
+> | Angular signal | no                                | it is the reactive carrier                      |
+> | token          | no                                | how observers subscribe                         |
+> | binding        | no                                | `deriveLocation` resolves through it            |
+> | registry entry | no                                | `WRITABLE_LOCATION_BINDINGS` is that resolution |
+> | `SourceRecord` | **only if provably unobservable** | 90 B                                            |
+>
+> `bumpSubjectStateSignal` calls `deriveLocation`, which looks the binding up in
+> `WRITABLE_LOCATION_BINDINGS` — so the binding and its registry entry are load
+> bearing, not incidental. The only candidate is the `SourceRecord` at 90 B per
+> cell, roughly 180 B/entity across both registries, against a 2,830 B residue.
+>
+> **Verdict: specializing the internal cell is not worth it.** The residue is
+> structurally two full `Location`s per realized subject, and every layer has a
+> real caller. Wrapper-slimming cannot reach the <2,000 B milestone.
+>
+> That redirects the question rather than closing it. Getting materially below
+> 2,000 B/entity means not creating a full `Location` per subject at all — a
+> tiny durable semantic record, with a native carrier materialized only while
+> observation requires one. That is the deferred architecture, and this result is
+> the argument for it: the cost is not waste inside the cell, it is that there
+> are two permanent cells.
+>
 > ### Registry mapping PROVEN, and one pay-for-use fix shipped
 >
 > The mapping is now measurement rather than inference. Counting entries per
@@ -660,10 +711,15 @@ number here; nothing in this file is hand-copied from a scratch run.
 > at 1.42x with a ±0.3% A/A band, so nothing moved on CPU — the lazy check is on
 > the install path, and the hot path still reads one field.
 >
-> Remaining per cell: the Angular signal itself (386 B, irreducible without
-> changing the carrier) plus ~1,000 B of token/binding/registry wrapper. That
-> wrapper is the next target, and unlike the `Set` it is not obviously
-> removable — each piece has a caller.
+> Remaining per cell: the Angular signal itself (386 B) plus ~1,000 B of
+> token/binding/registry wrapper. That wrapper is the next target, and unlike
+> the `Set` it is not obviously removable — each piece has a caller.
+>
+> The 386 B is a **lower bound for the current permanent-native-carrier design,
+> not an absolute floor.** An architecture that kept a tiny durable semantic
+> record and materialized a native carrier only while observation required one
+> would not pay it per subject. That is a separate, later experiment; do not
+> fold it into wrapper-slimming.
 >
 > ### Released-memory attribution, adapter-bound — the residue is TWO registries
 >
