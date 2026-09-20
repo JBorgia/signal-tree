@@ -4,6 +4,7 @@ import {
   getIntrinsicMutationObserver,
   observeIntrinsicMutations,
   registerIntrinsicMutationSource,
+  unobservableMutationSource,
 } from './intrinsic-mutation';
 import { createTreeScalarLeafRuntime } from './tree-scalar-leaf-runtime';
 
@@ -118,6 +119,50 @@ describe('intrinsic mutation observation is pay-for-use', () => {
     const seen: string[] = [];
     observeIntrinsicMutations<string>(other, (m) => seen.push(m.after));
     other('B');
+    expect(seen).toEqual(['B']);
+  });
+});
+
+/**
+ * `SUBJECT-STATE-MINIMAL-0`. The cells behind a realized entity — its value
+ * cell, its activation counter, the collection's active-id cell — are created
+ * by `createCell` and live only inside a private `Map` in `createEntitySignal`.
+ * Nothing hands one out, so no caller can ever pass one to
+ * `observeIntrinsicMutations`, and they skip per-source registration: measured
+ * at 122 B/entity off a 2,831 B residue.
+ *
+ * They skip it by SHARING one frozen source, which is the hazard worth pinning.
+ * A shared mutable source would mean one observer installed on any cell
+ * notifying for every cell in the process. Frozen, that attempt throws instead.
+ * There is no test here that observes a cell directly because there is no way
+ * to reach one — that unreachability IS the optimization, so this covers the
+ * primitive underneath it.
+ */
+describe('the shared unobservable source cannot carry an observer', () => {
+  it('never reports an observer', () => {
+    expect(unobservableMutationSource<string>().observer).toBeUndefined();
+  });
+
+  it('is shared across cells, so it must not be writable', () => {
+    const a = unobservableMutationSource<string>();
+    const b = unobservableMutationSource<number>();
+    expect(a).toBe(b);
+
+    // Frozen: a write fails loudly here rather than silently wiring every
+    // internal cell in the process to one observer.
+    expect(() => {
+      (a as { observer: unknown }).observer = () => undefined;
+    }).toThrow();
+    expect(a.observer).toBeUndefined();
+  });
+
+  it('leaves real leaves observable — the optimization is not global', () => {
+    const runtime = createTreeScalarLeafRuntime(undefined);
+    const leaf = runtime.createLeaf<string>('A', Object.is);
+
+    const seen: string[] = [];
+    observeIntrinsicMutations<string>(leaf, (m) => seen.push(m.after));
+    leaf('B');
     expect(seen).toEqual(['B']);
   });
 });
