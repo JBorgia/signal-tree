@@ -736,6 +736,70 @@ number here; nothing in this file is hand-copied from a scratch run.
 > no test that observes a cell directly, because no caller can reach one — that
 > unreachability is precisely what licenses the optimization.
 >
+
+> ### `FIELD-SOURCE-PAYFORUSE` — real ceiling, NOT shippable as a deletion
+>
+> Instrumenting registration call sites answered a question the byte totals
+> could not. Per entity, `byId` alone registers FOUR mutation sources, and only
+> one is a `createCell`:
+>
+> | source                                     | count / entity | created at |
+> | ------------------------------------------ | -------------: | ---------- |
+> | field carrier (`createWritableProjection`) |    1 per field | `byId`     |
+> | entity value cell (`createCell`)           |              1 | `byId`     |
+> | subject activation cell (`createCell`)     |              1 | node call  |
+>
+> The field carriers are created EAGERLY — every field of every row `byId`
+> touches, read or not. Reading all fields afterwards adds 3 B/entity
+> (3,467 -> 3,470), which is the measurement that proves they already existed.
+>
+> A ceiling probe made projections unobservable and measured `byId`-only
+> residue against field count:
+>
+> | fields |  min | ceiling | delta | per field |
+> | -----: | ---: | ------: | ----: | --------: |
+> |      1 | 2007 |    1954 |   -53 |       -53 |
+> |      3 | 2212 |    2106 |  -106 |       -35 |
+> |      6 | 2412 |    2202 |  -210 |       -35 |
+> |     12 | 3024 |    2604 |  -420 |       -35 |
+>
+> So ~35 B per field, linear, and it scales with entity WIDTH rather than with
+> entity count — ~420 B/entity on a twelve-field row.
+>
+> **It cannot be taken as a deletion. The capability is live.** A direct
+> `field.set(...)` notifies the field's intrinsic observer, confirmed through a
+> real Angular adapter and now pinned by
+> `native-projection-observability.spec.ts`.
+>
+> **The dangerous part is how nearly this shipped.** Under the ceiling probe the
+> entire kernel suite passed — 278 files, 2,346 tests — because a kernel tree
+> built through `signalTree` falls through to `NEUTRAL_LOCATION_RUNTIME`. Before
+> that spec, NO test in this repository executed
+> `native-location-realization.ts`; the file every framework realization depends
+> on had zero direct coverage, so removing a live capability from it was silent.
+> That is the same neutral-fallback trap that invalidated `bench-entity-layers`,
+> reappearing as a test-coverage hole rather than a benchmark hole.
+>
+> An interim probe reported the observer NOT firing and briefly looked like
+> evidence the registration was dead. That was the probe's error, not the
+> product's: Angular `WritableSignal`s are written with `.set(v)`, and calling
+> `field('v')` is a READ that returns the old value. Recorded because the wrong
+> version of that probe would have justified the deletion.
+>
+> **Open question, deliberately not asserted as a defect.** `updateOne` and
+> `setAll` change a field's value WITHOUT notifying that field's intrinsic
+> observer, while a direct `set` does. That may be correct by design — those
+> writes are captured at entity granularity — but it has not been verified
+> against the capture contract, so it is recorded as a question.
+>
+> **Route, not taken here.** Capturing the 35 B/field means registering lazily,
+> on first observation, instead of at creation. The write path currently reads
+> `mutationSource.observer` from a captured object; any lazy scheme must let an
+> already-built closure see a source created later, which costs an indirection
+> on EVERY write — the exact cost the source-holding design was adopted to
+> remove. That is a CPU/memory trade needing its own measurement, and it is not
+> attempted here.
+>
 > ### Registry mapping PROVEN, and one pay-for-use fix shipped
 >
 > The mapping is now measurement rather than inference. Counting entries per
