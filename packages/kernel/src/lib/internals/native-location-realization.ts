@@ -1,6 +1,9 @@
 import { markTreeCell } from './cell-identity';
 import type { Location, ReadonlyLocation } from './cell-runtime';
-import { registerIntrinsicMutationSource } from './intrinsic-mutation';
+import {
+  registerIntrinsicMutationSource,
+  unobservableMutationSource,
+} from './intrinsic-mutation';
 import {
   registerWritableLocationBinding,
   type LocationPublisher,
@@ -68,16 +71,21 @@ export function createNativeLocationRuntime(
 
   const createWritable = <T>(
     read: () => T,
-    write: (value: T, intent: 'replace' | 'derive') => boolean
+    write: (value: T, intent: 'replace' | 'derive') => boolean,
+    /**
+     * `SUBJECT-STATE-MINIMAL-0`. Pass false for a cell no caller can reach and
+     * therefore no caller can observe — see `unobservableMutationSource`.
+     */
+    observable = true
   ): WritableLocationBinding<T> => {
     const realized = observation.createWritableCell?.(read);
     if (!realized)
       throw new Error('Expected a native writable cell realization');
 
     const location = markTreeCell(realized.cell as unknown as Location<T>);
-    const mutationSource1 = registerIntrinsicMutationSource<T>(
-      location as object
-    );
+    const mutationSource1 = observable
+      ? registerIntrinsicMutationSource<T>(location as object)
+      : unobservableMutationSource<T>();
     const binding: WritableLocationBinding<T> = {
       location,
       notify: () => realized.token.invalidate(),
@@ -128,7 +136,8 @@ export function createNativeLocationRuntime(
         if (equal(value, next)) return false;
         value = next;
         return true;
-      }
+      },
+      false
     ).location;
   };
 

@@ -615,7 +615,7 @@ number here; nothing in this file is hand-copied from a scratch run.
 > `entity-updateOne` against v14: **2.54x -> 2.27x**. The 7.6% publication
 > residue is deliberately NOT included here so the two remain attributable.
 >
-> ### `SUBJECT-STATE-MINIMAL-0` — NEGATIVE: no prize in wrapper-slimming
+> ### `SUBJECT-STATE-MINIMAL-0` — negative for the milestone; 121 B/entity landed
 >
 > `subjectStateSignals` holds `locations.createCell(0)`, a full writable
 > `Location<number>` used only as an internal version counter and bumped through
@@ -655,7 +655,8 @@ number here; nothing in this file is hand-copied from a scratch run.
 > bearing, not incidental. The only candidate is the `SourceRecord` at 90 B per
 > cell, roughly 180 B/entity across both registries, against a 2,830 B residue.
 >
-> **Verdict: specializing the internal cell is not worth it.** The residue is
+> **Verdict (SUPERSEDED — see the amendment below): specializing the internal
+> cell is not worth it.** The residue is
 > structurally two full `Location`s per realized subject, and every layer has a
 > real caller. Wrapper-slimming cannot reach the <2,000 B milestone.
 >
@@ -665,6 +666,75 @@ number here; nothing in this file is hand-copied from a scratch run.
 > observation requires one. That is the deferred architecture, and this result is
 > the argument for it: the cost is not waste inside the cell, it is that there
 > are two permanent cells.
+>
+> #### AMENDMENT — built anyway, and it pays 121 B/entity
+>
+> The verdict above priced a hypothetical: specializing the internal cell into a
+> distinct minimal type. What the ceiling probe actually required was one
+> boolean parameter on `createWritable` plus one frozen shared
+> `UNOBSERVABLE_SOURCE`, so `createCell` skips per-source registration entirely.
+> The cost side of the trade was much smaller than the thing I had priced, so
+> the verdict flips. The benefit side also came in BELOW my own prediction —
+> 121 B/entity measured against ~180 B predicted from the 90 B-per-cell layer
+> table — so this is a smaller win reached by a much cheaper route, not a
+> vindication of the estimate.
+>
+> Two builds, differing only in that parameter, five interleaved repetitions
+> each. Nothing is held; what is measured is registry residue:
+>
+> | stage         | base | min  | delta | base spread | min spread |
+> | ------------- | ---: | ---: | ----: | ----------: | ---------: |
+> | untouched     |  488 |  488 |     0 |           0 |          0 |
+> | `byId` only   | 2043 | 2035 |    -8 |           1 |          0 |
+> | node called   | 3587 | 3467 |  -120 |           1 |          0 |
+> | + all fields  | 3591 | 3470 |  -121 |           0 |          2 |
+>
+> The harness is effectively deterministic at this size — spread is at most 2 B
+> across five runs — so both deltas are signal, including the small one.
+>
+> **The saving is not a threshold artifact.** Re-run at N = 5,000 / 10,000 /
+> 20,000 the per-entity saving is 120 / 121 / 121 at full realization and
+> 10 / 8 / 8 at `byId` only. A `SOURCES` WeakMap crossing a table-doubling
+> boundary would swing with N; these do not.
+>
+> **What the registration counts show.** Counting `createCell` and
+> `registerIntrinsicMutationSource` in an instrumented copy of the base build:
+>
+> | stage       | `createCell` / entity | registrations / entity |
+> | ----------- | --------------------: | ---------------------: |
+> | `byId` only |                     1 |                      4 |
+> | node called |                     2 |                      5 |
+>
+> So `byId` alone registers four mutation sources per entity and only one of
+> them is a `createCell`; invoking the node adds a fifth. At full realization
+> `min` removes two of five, which at ~60 B per retained registration accounts
+> for the measured 120 B exactly.
+>
+> **That mechanism does not explain the `byId` row, and I am not going to
+> pretend it does.** Removing one of four registrations should save ~60 B by the
+> same arithmetic; it saves 8. Three candidate explanations were tested and
+> killed: it is not cell count (counted: 1 per entity), it is not a transient
+> uncached cell from the `subjectId === undefined` branch (counted: zero
+> transient — every entity cell is cached and retained), and it is not WeakMap
+> table doubling (stable across three sizes). The 8 B is real, reproducible and
+> unattributed.
+>
+> **This does not reach the milestone and does not revive wrapper-slimming.**
+> Residue at full realization moves 2,831 -> 2,709 B/entity against a <2,000 B
+> target. The paragraph above still stands: the cost is that there are two
+> permanent cells per realized subject, and the deferred architecture is still
+> the only route below 2,000 B.
+>
+> CPU is unchanged — `entity-updateOne-10k` 2.02x both sides, `scalar-set`
+> 1.40x -> 1.36x against an A/A band of +-2.1%, which is at best marginal and is
+> not claimed as an improvement.
+>
+> The contract that makes this safe is pinned in
+> `intrinsic-mutation-pay-for-use.spec.ts`: the unobservable source is SHARED,
+> so it is frozen and an attempt to install an observer on it throws rather than
+> silently wiring every internal cell in the process to one callback. There is
+> no test that observes a cell directly, because no caller can reach one — that
+> unreachability is precisely what licenses the optimization.
 >
 > ### Registry mapping PROVEN, and one pay-for-use fix shipped
 >

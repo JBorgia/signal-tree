@@ -93,6 +93,29 @@ function compose(record: SourceRecord): void {
 }
 
 /**
+ * The source for a location nothing can observe.
+ *
+ * `SUBJECT-STATE-MINIMAL-0`. An internal cell — an entity's value cell or its
+ * activation counter — is reachable only through a private `Map` inside
+ * `createEntitySignal`. No caller can obtain the `Location` to pass to
+ * `observeIntrinsicMutations`, so registering a per-cell `SourceRecord` and
+ * WeakMap entry buys nothing: measured at 90 B per cell, and a realized entity
+ * has two.
+ *
+ * Shared and permanently empty. `observer` stays `undefined`, so the mutating
+ * closures take their existing no-observer branch unchanged, and because these
+ * cells are never entered into `SOURCES`, an attempt to observe one returns
+ * `undefined` rather than silently attaching to a shared record.
+ */
+const UNOBSERVABLE_SOURCE: IntrinsicMutationSource<never> = Object.freeze({
+  observer: undefined,
+});
+
+export function unobservableMutationSource<T>(): IntrinsicMutationSource<T> {
+  return UNOBSERVABLE_SOURCE as unknown as IntrinsicMutationSource<T>;
+}
+
+/**
  * Registers `node` as observable and returns the handle the mutating closure
  * should keep. Callers must hold the returned source — re-deriving it per write
  * is the cost this exists to remove.
