@@ -39,6 +39,14 @@ trees, which is the confound this whole validation exists to eliminate.
 | `cpu/cell-epoch`     | `native-location-realization.ts` <- cell  | 2,087 / 1,752 / 1,747 |
 | `cpu/token-epoch`    | HEAD, unchanged (reference)               | 1,959 / 1,672 / 1,747 |
 
+Released memory was MEASURED ON THESE EXACT BRANCHES rather than inherited from
+the historically equivalent trees, and every candidate reproduced its design's
+figures: strong 2,222/2,687/2,475, cell 2,087/1,752/1,747, token
+1,959/1,672/1,747. Spreads 0.00-0.04% across three process-isolated runs, stable
+at N=20,000. So the one-file swaps genuinely reconstruct the architectures they
+are named after — CPU and memory now come from the same artifacts. Frozen into
+the manifests.
+
 Verified mechanically in `cpu-candidates/*.json`: each candidate differs from
 the reference by EXACTLY ONE FILE, carries 0 dirty files, and produces a
 BYTE-IDENTICAL `@signal-tree/angular` dist hash (`25383e31a8aa8d50`). Only the
@@ -76,6 +84,34 @@ node tools/bench-build-ab.mjs \
 `strong` is the reference (pre-epoch carrier, `09b0d9c3`). All three builds are
 interleaved within each pass and the order is reversed for the second half, so
 no build systematically occupies a hotter slot.
+
+## Provenance checking on the quiet host
+
+The manifests exist to detect drift, not to be a checksum ritual. Verify in two
+tiers:
+
+**MUST match, or the run is invalid:**
+
+- candidate commit and the common parent it derives from
+- the one-file diff against the reference
+- lockfile hash
+- clean `git status` (0 dirty files)
+- build succeeds and the suites pass
+
+**Record, do NOT require to match:**
+
+- the built package-tree `sha256`
+
+A dist hash is only meaningful across an INTENTIONALLY identical build
+environment. Source maps, tool versions, absolute paths and platform details can
+change the package-tree hash while the source is identical, so a legitimate
+quiet-host run must not be discarded because a sourcemap moved. Record the new
+hash in the result instead; if the source-level checks above all match, the
+artifact is the right one.
+
+The hash still earns its place: on the SAME machine it caught that all three
+candidates emit a byte-identical `@signal-tree/angular`, which is how we know
+only the kernel realization varies.
 
 ## Gate
 
