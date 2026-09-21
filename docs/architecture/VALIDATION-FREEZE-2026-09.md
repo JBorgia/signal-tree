@@ -266,3 +266,62 @@ non-retaining `computed` froze silently when the carrier was reclaimed. Both are
 memory and semantics arguments, and both were independently reproduced.
 
 What does NOT survive is any statement about this change making anything faster.
+
+
+---
+
+# Follow-up: audit debt
+
+## F11 — the `collectable` gate is repaired and now self-tested
+
+`measureRetained().collectable` watched whatever `build()` returned. Every arm
+in every retained-heap bench returns a fresh wrapper (`{ t }`, `{ t, nodes }`)
+that nothing else references, so the answer was unconditionally `true` — all 20
+cells of the realization matrix reported `collectable: true` while arms retained
+~100 MB. The only pass/fail gate in these harnesses proved nothing.
+
+`sentinelsFor()` now unwraps a plain-object wrapper and watches its OWN
+object-valued properties, so the tree and any held nodes are what must become
+unreachable. A build returning its subject directly is watched as-is, and the
+wrapper is still included, so the check can never be weaker than what it
+replaced.
+
+`tools/lib/heap-quiescence.selftest.mjs` asserts the gate can both pass AND
+fail. Mutation-proved: under the previous implementation the self-test fails on
+the retained-wrapper case and passes the other two — which is precisely the
+shape every matrix arm has.
+
+A gate that cannot fail is worse than no gate, because it is read as evidence.
+
+## F13 — quantified, and it is PRE-EXISTING
+
+Remove-all / re-add-same-keys / re-realize, 2,000 live rows held constant,
+measuring bytes per LIVE entity:
+
+| churn cycles | pre-epoch | EPOCH-TOKEN-0 |
+| -----------: | --------: | ------------: |
+|            0 |     2,199 |         2,050 |
+|            1 |     2,597 |         2,449 |
+|            3 |     3,256 |         3,102 |
+|            6 |     3,986 |         3,852 |
+|           10 |     5,922 |         5,779 |
+
+Growth per cycle: **372 B pre-epoch, 373 B now.** Retention scales with
+HISTORICAL lifetimes rather than live subjects, and the epoch work neither
+caused nor fixed it — it is slightly better at every point purely because its
+resting cost is lower.
+
+This is also not new information. `tools/bench-entity-churn-retention.mjs`
+already measures it with a finer decomposition — 7 B/retired subject with
+nothing observed, 86 B with reads, 250 B with a restorer attached, 1,269 B with
+both — and `docs/architecture/entity-churn-retention.md` pre-registers the
+interpretation. The causes it names are `StructuralStore.subjectStates` keeping
+a lifetime record and `EntityValueStore` never being told to retire the value.
+
+So the audit's F13 — `subjectStateSignals` entries never deleted — is REAL but
+is a minor contributor to an already-tracked unbounded-churn behaviour, not the
+explanation for it. Attributing 373 B/cycle to a dead `WeakRef` plus a `Map`
+entry would be wrong by roughly an order of magnitude.
+
+Not fixed here: it is pre-existing, separately tracked, and out of scope for
+work whose claims were about resting cost.

@@ -130,6 +130,36 @@ export async function quiesce({
  *   measuring an empty scenario.
  * @param {{label?: string}} [opts]
  */
+/**
+ * WeakRefs to what the arm actually RETAINS, not to the box it came in.
+ *
+ * `collectable` used to WeakRef whatever `build()` returned. Every arm in every
+ * bench here returns a fresh wrapper — `{ t }`, `{ t, nodes }` — and nothing
+ * else references that literal, so the answer was unconditionally `true`. An
+ * independent audit found all 20 cells of the realization matrix reporting
+ * `collectable: true` while arms retained ~100 MB. The only pass/fail gate in
+ * the retained-heap harnesses proved nothing.
+ *
+ * A wrapper is therefore unwrapped: its own object-valued properties become the
+ * sentinels, so the tree and any held nodes are what must become unreachable.
+ * A build that returns its subject directly is watched as-is. The wrapper is
+ * still included, so this can never be weaker than what it replaced.
+ */
+function sentinelsFor(held) {
+  if (held === null || (typeof held !== 'object' && typeof held !== 'function')) {
+    return [new WeakRef({ held })];
+  }
+  const refs = [new WeakRef(held)];
+  if (Object.getPrototypeOf(held) === Object.prototype) {
+    for (const value of Object.values(held)) {
+      if (value !== null && (typeof value === 'object' || typeof value === 'function')) {
+        refs.push(new WeakRef(value));
+      }
+    }
+  }
+  return refs;
+}
+
 export async function measureRetained(build, { label = 'scenario' } = {}) {
   const start = await quiesce({ label: `${label} (baseline)` });
   let held = await build();
@@ -138,9 +168,7 @@ export async function measureRetained(build, { label = 'scenario' } = {}) {
   }
   const settled = await quiesce({ label: `${label} (held)` });
 
-  const ref = new WeakRef(
-    typeof held === 'object' && held !== null ? held : { held }
-  );
+  const refs = sentinelsFor(held);
   held = null;
   await quiesce({ label: `${label} (released)` });
 
@@ -148,7 +176,7 @@ export async function measureRetained(build, { label = 'scenario' } = {}) {
     retainedBytes: settled.heapUsed - start.heapUsed,
     retainedMB: (settled.heapUsed - start.heapUsed) / MB,
     quiesceRounds: settled.rounds,
-    collectable: ref.deref() === undefined,
+    collectable: refs.every((ref) => ref.deref() === undefined),
   };
 }
 
