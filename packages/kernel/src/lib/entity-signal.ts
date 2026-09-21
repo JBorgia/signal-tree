@@ -640,10 +640,21 @@ export function createEntitySignal<
    * a 2,709 B residue. Weak, a released subject keeps a `WeakRef` and a `Map`
    * entry instead.
    *
-   * Safe against the stale-realization trap because the entry is replaced ONLY
-   * when `deref()` comes back empty. A live Angular consumer retains its
-   * producers, so a carrier anything still observes is still reachable, still
-   * deref-able, and still the one a bump finds.
+   * THE ACTUAL INVARIANT, corrected. Every public dependency on subject
+   * structural state also depends on another stable reactive path that
+   * guarantees invalidation — concretely, `tombstoneSubjectSignal` publishes
+   * `undefined` into the PERMANENT entity value cell, so a structural change
+   * reaches an observer even when it holds nothing here.
+   *
+   * It is NOT true that live consumers retain this carrier. Angular does not
+   * give that property: measured across a forced GC, a `computed` closing over
+   * the node retains its carrier, but `computed(() => rows.byId(k)?.()?.x)` —
+   * a live observer that re-resolves each evaluation — does NOT, and its
+   * carrier is collected. Weakening `entitySignals` removes the stable path
+   * above and breaks exactly that shape; see `ENTITY-SIGNAL-SEMANTIC-0`.
+   *
+   * So this is safe only while `entitySignals` stays strong, and the entry is
+   * replaced only when `deref()` comes back empty.
    */
   const subjectStateSignals = new Map<number, WeakRef<Location<number>>>();
   const ownerMetadataEnabled = options?.ownerMetadataEnabled ?? true;
