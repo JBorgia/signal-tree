@@ -20,7 +20,21 @@ export NX_DAEMON=false
 
 step() { printf '\n\033[1m== %s\033[0m\n' "$1"; }
 
-step "1/5  stopping nx daemons and orphans"
+step "0/6  clearing stale worktrees from any previous run"
+# A candidate branch can only be checked out in one worktree. An interrupted
+# run leaves one behind and every later run dies with
+# "fatal: 'cpu/v2-token' is already used by worktree at ...".
+for c in "${CANDIDATES[@]}"; do
+  for stale in $(git -C "$REPO" worktree list --porcelain | awk -v b="cpu/$c" '/^worktree /{w=$2} /^branch /{if ($2=="refs/heads/"b) print w}'); do
+    echo "  removing stale worktree $stale"
+    rm -f "$stale/node_modules" 2>/dev/null || true
+    git -C "$REPO" worktree remove "$stale" --force 2>/dev/null || rm -rf "$stale"
+  done
+done
+git -C "$REPO" worktree prune
+rm -rf "$WORK"
+
+step "1/6  stopping nx daemons and orphans"
 (cd "$REPO" && npx nx daemon --stop >/dev/null 2>&1 || true)
 [ -d "$HOME/code/signaltree-14x" ] && (cd "$HOME/code/signaltree-14x" && npx nx daemon --stop >/dev/null 2>&1 || true)
 pkill -f 'nx@23' 2>/dev/null || true
@@ -29,12 +43,12 @@ pkill -9 -f 'nx@23' 2>/dev/null || true
 sleep 2
 echo "remaining nx processes: $(pgrep -fc 'nx@23' 2>/dev/null || echo 0)"
 
-step "2/5  letting the machine settle (90s)"
+step "2/6  letting the machine settle (90s)"
 sleep 90
 uptime
 ps aux | sort -nrk 3 | awk 'NR<=5 {printf "  %5.1f%%  %s\n", $3, $11}'
 
-step "3/5  building the four candidates"
+step "3/6  building the four candidates"
 rm -rf "$WORK"; mkdir -p "$WORK/dist"
 for c in "${CANDIDATES[@]}"; do
   git -C "$REPO" worktree add "$WORK/$c" "cpu/$c" >/dev/null
@@ -50,9 +64,22 @@ done
 
 # Building respawns daemons. Stop them again before measuring anything.
 pkill -9 -f 'nx@23' 2>/dev/null || true
-sleep 5
 
-step "4/5  A/A PREFLIGHT — same build against itself"
+step "4/6  waiting for filesystem indexing to settle"
+# Creating worktrees and writing dist churns thousands of files, and Spotlight
+# indexes them: `mds_stores` was observed at 99.6% of a core immediately after
+# this step. Benchmarking through that would measure the indexer. Wait for it to
+# drop rather than assuming a fixed sleep is enough.
+for i in $(seq 1 40); do
+  mds=$(ps -eo pcpu,comm | awk '/mds_stores|mdworker/ {s+=$1} END {printf "%.0f", s+0}')
+  printf '\r  indexing load: %s%%   (check %s/40)' "${mds:-0}" "$i"
+  [ "${mds:-0}" -lt 10 ] && { echo; echo "  settled"; break; }
+  sleep 15
+done
+echo
+uptime
+
+step "5/6  A/A PREFLIGHT — same build against itself"
 echo "If this does not come in comfortably under 5%, STOP. The host cannot"
 echo "resolve the effect and the four-way run would only produce noise."
 node "$REPO/tools/bench-build-ab.mjs" \
@@ -63,7 +90,7 @@ printf '\nPreflight done. Continue to the four-way run? [y/N] '
 read -r reply
 [ "$reply" = "y" ] || { echo "stopped after preflight; results in $WORK/preflight.txt"; exit 0; }
 
-step "5/5  four-way run"
+step "6/6  four-way run"
 node "$REPO/tools/bench-build-ab.mjs" \
   --roots strong="$WORK/dist/v2-strong",cell="$WORK/dist/v2-cell",token="$WORK/dist/v2-token",native="$WORK/dist/v2-angular-native" \
   --pairs "$PAIRS" | tee "$WORK/four-way.txt"
