@@ -114,6 +114,30 @@ fails AS CONSTRUCTED, because carrier and shared publisher changed together;
 attributing a regression to the carrier requires the bounded publisher-vs-carrier
 follow-up.
 
+## Known limitation of the A/A metric — DOCUMENTED, NOT CHANGED
+
+The gate computes `(max - min) / median` across the A/A samples. That is a full
+RANGE, not a robust dispersion measure, so it is deliberately harsh and gets
+harsher as samples increase: with 20 process-level observations a single tail
+event rejects the workload.
+
+That makes the stopping rule conservative — it will call a workload
+unresolvable that a percentile-based measure might accept. It is left exactly as
+it is. Switching to an interquartile or trimmed measure now would be another
+methodology revision made after seeing results, and this document exists to stop
+that. A conservative gate that occasionally refuses a real signal is the right
+error to make here; the opposite error is the one this program already made
+twice.
+
+## Smoke-test values are NOT results
+
+A smoke run during harness development reported `scalar-set` 1.6 ns and
+`field-read-held` 39.6 ns against v2's 5.5 and 47. Those came from a host with
+Defender at ~196% of a core, Chrome active and an elevated window server. They
+establish only that the harness executes and that calibration changes the timing
+regime. They are not performance numbers, they are not evidence for the duration
+hypothesis, and they must not be cited as either.
+
 ## STOPPING RULE — binding
 
 > If the preregistered long-duration A/A calibration cannot resolve the four
