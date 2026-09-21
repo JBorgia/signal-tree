@@ -1,0 +1,30 @@
+{
+  "candidate": "cpu/cell-epoch",
+  "commit": "f7f3d5ce5cf5c01645dce9fd7fcd46fefe7250b0",
+  "commitSubject": "cpu-candidate: cell-based epoch",
+  "derivedFrom": {
+    "reference": "cpu/token-epoch",
+    "commonParent": "1940d3c379a1555e786131d31447995d22f79445"
+  },
+  "filesDifferingFromReference": [
+    "packages/kernel/src/lib/internals/native-location-realization.ts"
+  ],
+  "dirtyFiles": 0,
+  "node": "v24.15.0",
+  "platform": "darwin/arm64",
+  "lockfile": {
+    "name": "pnpm-lock.yaml",
+    "sha256": "713d4f880b57878f36da46f56c2e66d1b16ef443b8a37cd1879d20fe7352a452"
+  },
+  "dist": {
+    "angular": {
+      "sha256": "25383e31a8aa8d50000f439aaef679cc51c38f4f17cc213012c92c53bfa88898",
+      "fileCount": 17
+    },
+    "kernel": {
+      "sha256": "7fdc12bedb8fc88e344fe03d2e15c06d3bd92060d2b9f9a276417aeee7fe62f1",
+      "fileCount": 89
+    }
+  },
+  "generatedAt": "2026-09-21T03:37:32.329Z"
+}
