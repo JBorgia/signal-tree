@@ -1,0 +1,53 @@
+{
+  "candidate": "cpu/v2-cell",
+  "commit": "4a2315543146439401f0c5b70ae9dba8c4620f95",
+  "commitSubject": "cpu/v2-cell: portable epoch built on createWritableCell",
+  "derivedFrom": {
+    "reference": "cpu/v2-base",
+    "commonParent": "1cc60bca74b9484e5ce3cdb8510f06c9b52632eb"
+  },
+  "filesDifferingFromReference": [
+    "packages/kernel/src/lib/internals/native-location-realization.ts"
+  ],
+  "dirtyFiles": 0,
+  "node": "v24.15.0",
+  "platform": "darwin/arm64",
+  "lockfile": {
+    "name": "pnpm-lock.yaml",
+    "sha256": "713d4f880b57878f36da46f56c2e66d1b16ef443b8a37cd1879d20fe7352a452"
+  },
+  "dist": {
+    "angular": {
+      "sha256": "25383e31a8aa8d50000f439aaef679cc51c38f4f17cc213012c92c53bfa88898",
+      "fileCount": 17
+    },
+    "kernel": {
+      "sha256": "c7a7fe9e8ac57879f0c5f05962e2c11efb9d7fa221cbc0c7ed38499aa03fc1b0",
+      "fileCount": 89
+    },
+    "react": {
+      "sha256": "2202e835debfec75ab8d4f1a24402e1d129684f5c76a3fafb7d658f4533b810b",
+      "fileCount": 10
+    },
+    "vue": {
+      "sha256": "0cbc9b4adcaf043196e370b773dcb39ec3a2d4de4d862ffecf04a1cfe06095a0",
+      "fileCount": 13
+    }
+  },
+  "generatedAt": "2026-09-21T04:34:00.178Z",
+  "releasedMemoryBytesPerEntity": {
+    "note": "Measured on THIS candidate, which derives from cpu/v2-base by one realization file. All four share the adapter seam, the runtime advanceEpoch contract and the shared epoch publisher, so the grid isolates carrier realization rather than publisher allocation.",
+    "harness": "tools/bench-entity-realization-matrix.mjs (released column)",
+    "runsPerCell": 3,
+    "byRowAndN": {
+      "angular@10000": 1991,
+      "angular@20000": 1970,
+      "kernel@10000": 1747,
+      "kernel@20000": 1724,
+      "react@10000": 1748,
+      "react@20000": 1724,
+      "vue@10000": 1656,
+      "vue@20000": 1634
+    }
+  }
+}
