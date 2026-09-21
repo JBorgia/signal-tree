@@ -1,5 +1,9 @@
 import { markTreeCell } from './cell-identity';
-import type { Location, ReadonlyLocation } from './cell-runtime';
+import type {
+  Location,
+  ReadonlyLocation,
+  WritableCell,
+} from './cell-runtime';
 import {
   registerIntrinsicMutationSource,
   unobservableMutationSource,
@@ -198,8 +202,22 @@ export function createNativeLocationRuntime(
     return markTreeCell(native as unknown as ReadonlyLocation<T>);
   };
 
+  /**
+   * `SUBJECT-EPOCH-0`. The bare native cell, with the realization wrapper
+   * DISCARDED. Retaining `{ cell, token, peek, commit }` — or re-wrapping the
+   * cell in a `{ read, bump }` object — measured 192 B/entity more than
+   * retaining the cell alone, and an epoch needs nothing the wrapper provides.
+   */
+  const createEpoch = (): WritableCell<number> => {
+    const realized = observation.createWritableCell?.(() => 0);
+    if (!realized)
+      throw new Error('Expected a native writable cell realization');
+    return realized.cell;
+  };
+
   return {
     createCell,
+    createEpoch,
     createDerived,
     createWritable,
     createWritableProjection,

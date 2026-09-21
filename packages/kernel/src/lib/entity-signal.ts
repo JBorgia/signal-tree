@@ -1,4 +1,8 @@
-import type { Location, ReadableCell } from './internals/cell-runtime';
+import type {
+  Location,
+  ReadableCell,
+  WritableCell,
+} from './internals/cell-runtime';
 import {
   createWritableProjection,
   deriveLocation,
@@ -336,10 +340,22 @@ export function createEntitySignal<
    * once per frame pays once per frame instead of once per write.
    */
   const version = locations.createCell(0);
-  const pendingEntitySignalValues = new Map<
-    Location<E | undefined>,
-    E | undefined
-  >();
+  /**
+   * `SUBJECT-EPOCH-0`. Epochs to advance when the batch flushes.
+   *
+   * It holds the CELLS, not subject ids, and that is load bearing. `removeOne`
+   * runs `tombstoneSubjectSignal` -> `reclaimRetiredSubjectsWithoutOwner` ->
+   * `updateSignals`, and the middle step deletes the registry entry. Staging an
+   * id means the flush looks up an epoch that no longer exists, skips the
+   * advance, and a `computed` that read this row never learns it was removed.
+   * Holding the cell keeps the pending invalidation alive across its own
+   * reclamation — which is exactly why the map this replaced staged `Location`
+   * objects rather than keys.
+   *
+   * No value is staged: the value is already in `EntityValueStore` before
+   * anything lands here, so a copy would be a second truth.
+   */
+  const pendingSubjectEpochs = new Set<WritableCell<number>>();
 
   const createVersionedProjection = <TValue>(
     compute: () => TValue
@@ -475,7 +491,7 @@ export function createEntitySignal<
         beforeKey: before?.key,
         afterKey: after?.key,
         beforeValue: before?.value,
-        valueSignal: entitySignals.get(subjectId),
+        valueEpoch: subjectEpochs.get(subjectId),
         stateSignal: subjectStateSignals.get(subjectId)?.deref(),
         afterValue: after?.value,
         bindingChanged: !before || !after || before.key !== after.key,
@@ -490,9 +506,9 @@ export function createEntitySignal<
       },
       publish(options): void {
         for (const publication of subjectChanges) {
-          if (publication.valueSignal) {
-            replaceLocation(publication.valueSignal, publication.afterValue);
-          }
+          // Only a realized subject has an epoch, so this stays as lazy as the
+          // per-entity signal it replaces.
+          publication.valueEpoch?.update(advanceEpoch);
           if (publication.bindingChanged) {
             if (publication.stateSignal) {
               deriveLocation(publication.stateSignal, (value) => value + 1);
@@ -624,7 +640,27 @@ export function createEntitySignal<
    * Materialized lazily (on first `byId`/node access) and kept O(1) per
    * mutation by only syncing the entities that actually changed.
    */
-  const entitySignals = new Map<number, Location<E | undefined>>();
+  /**
+   * `SUBJECT-EPOCH-0`. One stable reactive anchor per REALIZED subject, held
+   * strongly and deliberately.
+   *
+   * This replaces `entitySignals`, a full `Location<E>` per subject holding a
+   * copy of the entity. That copy was never the durable record —
+   * `getEntitySignal` seeded every cell from
+   * `valueStore.backingForSubject(subjectId)` — so it was authority duplicated
+   * into the framework. Reads now take a dependency here and then read
+   * `EntityValueStore` directly, which is the only copy.
+   *
+   * STRONG on purpose, and that is the design. `ENTITY-SIGNAL-SEMANTIC-0`
+   * proved a weakly held carrier is unsafe: a non-live Angular `computed` does
+   * not retain its producers, so `computed(() => rows.byId(k)?.()?.x)` loses
+   * its carrier to a collection and silently freezes. An epoch is cheap enough
+   * to simply keep — 562 B/entity against 1,248 B for the `Location` it
+   * replaces — so reachability is guaranteed by retention rather than hoped
+   * for.
+   */
+  const subjectEpochs = new Map<number, WritableCell<number>>();
+  const advanceEpoch = (current: number): number => current + 1;
   const structuralStore = new StructuralStore<K>();
   const valueStore = new EntityValueStore<E>();
   /**
@@ -640,20 +676,21 @@ export function createEntitySignal<
    * a 2,709 B residue. Weak, a released subject keeps a `WeakRef` and a `Map`
    * entry instead.
    *
-   * THE ACTUAL INVARIANT, corrected. Every public dependency on subject
-   * structural state also depends on another stable reactive path that
-   * guarantees invalidation — concretely, `tombstoneSubjectSignal` publishes
-   * `undefined` into the PERMANENT entity value cell, so a structural change
-   * reaches an observer even when it holds nothing here.
+   * THE INVARIANT. Every public dependency on subject structural state also
+   * depends on a SECOND, permanently retained reactive path, so invalidation
+   * reaches an observer that holds nothing here. That path is now
+   * [[subjectEpochs]]: `tombstoneSubjectSignal` stages an epoch advance, and
+   * the epoch is strong.
    *
    * It is NOT true that live consumers retain this carrier. Angular does not
    * give that property: measured across a forced GC, a `computed` closing over
    * the node retains its carrier, but `computed(() => rows.byId(k)?.()?.x)` —
-   * a live observer that re-resolves each evaluation — does NOT, and its
-   * carrier is collected. Weakening `entitySignals` removes the stable path
-   * above and breaks exactly that shape; see `ENTITY-SIGNAL-SEMANTIC-0`.
+   * an equally live observer that re-resolves each evaluation — does NOT, and
+   * its carrier is collected. `ENTITY-SIGNAL-SEMANTIC-0` records the attempt
+   * that proved it, by removing the stable path and watching that exact shape
+   * freeze.
    *
-   * So this is safe only while `entitySignals` stays strong, and the entry is
+   * So this stays safe only while the epoch stays strong, and the entry here is
    * replaced only when `deref()` comes back empty.
    */
   const subjectStateSignals = new Map<number, WeakRef<Location<number>>>();
@@ -993,20 +1030,49 @@ export function createEntitySignal<
   }
 
   /** Get (or lazily create) the per-entity signal, seeded from storage. */
-  function getEntitySignal(id: K): Location<E | undefined> {
-    const subjectId = resolveSubjectId(id);
-    if (subjectId === undefined) {
-      return locations.createCell<E | undefined>(getProjectedEntity(id));
-    }
+  /** Stage an advance only for a subject something has actually realized. */
+  function stageSubjectEpoch(subjectId: number): void {
+    const epoch = subjectEpochs.get(subjectId);
+    if (epoch) pendingSubjectEpochs.add(epoch);
+  }
 
-    let s = entitySignals.get(subjectId);
-    if (!s) {
-      s = locations.createCell<E | undefined>(
-        valueStore.backingForSubject(subjectId)
-      );
-      entitySignals.set(subjectId, s);
+  /** Materialized lazily: a subject nobody has read has no epoch. */
+  function getSubjectEpoch(subjectId: number): WritableCell<number> {
+    let epoch = subjectEpochs.get(subjectId);
+    if (!epoch) {
+      epoch = locations.createEpoch
+        ? locations.createEpoch()
+        : neutralEpoch();
+      subjectEpochs.set(subjectId, epoch);
     }
-    return s;
+    return epoch;
+  }
+
+  function neutralEpoch(): WritableCell<number> {
+    const cell = locations.createCell(0);
+    const epoch = (() => cell()) as WritableCell<number>;
+    epoch.set = (value: number) => cell(value);
+    epoch.update = (fn: (current: number) => number) => cell(fn);
+    epoch.asReadonly = () => cell;
+    return epoch;
+  }
+
+  /**
+   * Take the stable dependency, then read the ONE copy of the value.
+   *
+   * Order matters: canonical stores are written by `install()` before
+   * `publish()` advances any epoch, so a reader can observe a new value before
+   * its invalidation, but never an invalidation before its value.
+   */
+  function readSubjectEntity(subjectId: number): E | undefined {
+    getSubjectEpoch(subjectId)();
+    return valueStore.backingForSubject(subjectId);
+  }
+
+  function readEntityByKey(id: K): E | undefined {
+    const subjectId = resolveSubjectId(id);
+    if (subjectId === undefined) return getProjectedEntity(id);
+    return readSubjectEntity(subjectId);
   }
 
   function getSubjectStateSignal(subjectId: number): Location<number> {
@@ -1473,9 +1539,7 @@ export function createEntitySignal<
       return;
     }
 
-    const s = entitySignals.get(subjectId);
-    if (s)
-      pendingEntitySignalValues.set(s, valueStore.backingForSubject(subjectId));
+    stageSubjectEpoch(subjectId);
   }
 
   /**
@@ -1485,8 +1549,7 @@ export function createEntitySignal<
    * restore of the same subject re-publishes through the same signal.
    */
   function tombstoneSubjectSignal(subjectId: number): void {
-    const signal = entitySignals.get(subjectId);
-    if (signal) pendingEntitySignalValues.set(signal, undefined);
+    stageSubjectEpoch(subjectId);
   }
 
   // TOMBSTONE: `resetEntitySignals()` — a bulk `forEach(set(undefined))` +
@@ -1595,11 +1658,11 @@ export function createEntitySignal<
 
   /** Mark the collection dirty. O(1) — see the `version` docs above. */
   function updateSignals(): void {
-    const pending = [...pendingEntitySignalValues];
-    pendingEntitySignalValues.clear();
+    const pending = [...pendingSubjectEpochs];
+    pendingSubjectEpochs.clear();
     locations.runInvalidationGroup(() => {
-      for (const [signal, value] of pending) {
-        replaceLocation(signal, value);
+      for (const epoch of pending) {
+        epoch.update(advanceEpoch);
       }
       deriveLocation(version, (value) => value + 1);
       markOwnerInvalidated(ownerId);
@@ -1669,7 +1732,7 @@ export function createEntitySignal<
 
     const entitySig = () => {
       const key = currentKey();
-      return key === undefined ? undefined : getEntitySignal(key)();
+      return key === undefined ? undefined : readEntityByKey(key);
     };
 
     const node = ((valueOrUpdater?: E | ((current: E) => E)): E | undefined => {
@@ -1786,7 +1849,7 @@ export function createEntitySignal<
       subjectRevision: getSubjectRevision(subjectId),
       activeKey: subjectState.active ? subjectState.key : undefined,
       retainedSubjectState: structuralStore.hasSubject(subjectId),
-      entitySignal: entitySignals.has(subjectId),
+      entitySignal: subjectEpochs.has(subjectId),
       activationToken: subjectStateSignals.get(subjectId)?.deref() !== undefined,
       nodeFacadeMaterialized: node !== undefined,
       fieldFacadesMaterialized,
@@ -1877,7 +1940,7 @@ export function createEntitySignal<
         forgetLifetime,
       };
       frame.stageRetainedValueRetirement(retirement);
-      entitySignals.delete(prepared.subjectId);
+      subjectEpochs.delete(prepared.subjectId);
     }
 
     const result = commitAndProjectEntityMutationFrame(frame);
@@ -1985,7 +2048,7 @@ export function createEntitySignal<
         forgetLifetime: true,
       };
       frame.stageRetainedValueRetirement(retirement);
-      entitySignals.delete(subjectId);
+      subjectEpochs.delete(subjectId);
       staged += 1;
     }
 
@@ -2020,7 +2083,7 @@ export function createEntitySignal<
     }
 
     valueStore.retireSubjectValue(subjectId);
-    entitySignals.delete(subjectId);
+    subjectEpochs.delete(subjectId);
   }
 
   // ==================
@@ -2051,7 +2114,7 @@ export function createEntitySignal<
         // Present: subscribe to the PER-ENTITY signal only, so callers re-run
         // when THIS entity changes but not when others do (body-granular).
         // Materialized lazily here — bounded by the number of live entities.
-        const entity = getEntitySignal(id)();
+        const entity = readEntityByKey(id);
         return entity ? getOrCreateNode(id, entity) : undefined;
       }
       // Absent: subscribe to the shared ids signal for "appears later"
@@ -2115,7 +2178,7 @@ export function createEntitySignal<
       return (cachedActiveEntity ??= locations.createDerived(() => {
         const id = activeIdSignal();
         if (id === undefined) return undefined;
-        return getEntitySignal(id)();
+        return readEntityByKey(id);
       }));
     },
 

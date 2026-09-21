@@ -982,6 +982,99 @@ number here; nothing in this file is hand-copied from a scratch run.
 > becomes weak. That test does NOT discriminate the naive weak subject-state
 > variant it was written for; catching this is what it is actually for.
 >
+
+> ### `SUBJECT-EPOCH-0` — the entity carrier is replaced by a stable anchor
+>
+> The previous two experiments framed a false choice: keep a permanent
+> `Location<E>` per subject, or reclaim it and break reactivity. The third
+> option is that the durable thing need not be a CARRIER at all. What a
+> non-retaining observer needs is something stable in the dependency graph to be
+> invalidated through; it does not need that thing to hold the value.
+>
+> So `entitySignals` is gone. In its place, one epoch per realized subject:
+>
+> | concern                      | owner                          |
+> | ---------------------------- | ------------------------------ |
+> | entity value                 | `EntityValueStore` (unchanged) |
+> | key / lifetime / revision    | `StructuralStore` (unchanged)  |
+> | reactive invalidation anchor | `subjectEpochs` — STRONG, tiny |
+> | public native projections    | ephemeral, consumer-held       |
+>
+> Reads take a dependency on the epoch and then read `EntityValueStore`
+> directly. Writes update the canonical stores first, then advance the epoch. No
+> framework object holds a copy of the entity any more.
+>
+> #### Why an epoch is cheap and a `Location` is not
+>
+> | shape                                   | B/entity |
+> | --------------------------------------- | -------: |
+> | `Map` entry alone                       |       47 |
+> | `Map` + plain `{v:0}`                   |       79 |
+> | `Map` + bare Angular `signal(0)`        |      562 |
+> | `Map` + signal wrapped in `{read,bump}` |      754 |
+> | the `Location` stack it replaces        |    1,248 |
+>
+> Two things follow. The `Location` wrapper — write bindings, registry entry,
+> mutation source, peek/subscribe surface — costs 686 B over the primitive it
+> wraps, and an epoch needs none of it. And re-wrapping the native cell in a
+> facade costs another 192 B, which is why `createEpoch` returns the CELL: read
+> it by calling it, advance it with `update`.
+>
+> #### Measured — matrix `released`
+>
+> | row              | before | SUBJECT-EPOCH-0 |    delta |
+> | ---------------- | -----: | --------------: | -------: |
+> | angular          |  2,222 |       **1,350** |     -872 |
+> | vue              |  2,687 |           2,039 |     -648 |
+> | kernel (neutral) |  2,476 |           2,781 | **+305** |
+>
+> The neutral row gets WORSE, which is expected rather than hidden: the neutral
+> runtime has no native cell, so its epoch falls back to a full `Location` and it
+> now pays for an epoch on top of losing nothing. Neutral is not a memory target
+> — it realizes no framework carrier — but the number is recorded so nobody
+> reads the control row as a regression signal.
+>
+> Session to date, angular `released`: **3,591 -> 3,470 -> 2,222 -> 1,350
+> B/entity**, against a v14 economic floor of 698 B. That is 1.93x v14, from
+> 4.97x at the start.
+>
+> #### CPU — faster on every path it touches
+>
+> Paired, one workload per process, 10 pairs per arm, run in both orders:
+>
+> | workload    |     base |    epoch | delta      |
+> | ----------- | -------: | -------: | ---------- |
+> | `updateOne` | 296.4 ns | 273.7 ns | **-7.7%**  |
+> | `byId`      | 198.4 ns | 182.2 ns | **-8.2%**  |
+> | field read  | 109.2 ns |  52.7 ns | **-51.8%** |
+>
+> Unchanged paths, paired: `setAll` 5.043 -> 5.000 ms, `scalar-set` 5.9 -> 6.0
+> ns. Against v14 on the control harness, `entity-updateOne-10k` moves
+> 2.02x -> 1.86x.
+>
+> The field read roughly halving is the memory result seen from the other side:
+> a field read used to traverse the `Location` stack to reach a value
+> `EntityValueStore` already had.
+>
+> #### The tests, and the mutation proof
+>
+> `subject-epoch-non-retaining-observer.spec.ts` — ten tests, real Angular
+> adapter, forced GC. Every one builds `computed(() => rows.byId(k)?.()?.x)`,
+> which NEVER captures the node, forces a collection, mutates, and requires the
+> computed to see it: `updateOne`, `field.set`, `replaceOne`, `setAll`,
+> `removeOne`, remove-then-same-key-re-add (including that a reference to the
+> old subject does not follow the new occupant), speculative transaction state,
+> rollback, confirm, and held node/field. A CONTROL asserts the node facade
+> really was collected, so the rest cannot pass vacuously.
+>
+> **Mutation proof: holding the epoch weakly fails 6 of the 10.** The battery
+> detects the exact failure `ENTITY-SIGNAL-SEMANTIC-0` hit, which is what
+> licenses holding the epoch strongly rather than arguing about reachability.
+>
+> NOT covered here: restore. There is no public restore operation on the
+> collection — only the `__restoreOne` test hook — so it is exercised by the
+> kernel suite rather than through this adapter-level battery.
+>
 > ### Registry mapping PROVEN, and one pay-for-use fix shipped
 >
 > The mapping is now measurement rather than inference. Counting entries per
