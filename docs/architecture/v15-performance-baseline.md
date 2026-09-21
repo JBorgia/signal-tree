@@ -920,6 +920,68 @@ number here; nothing in this file is hand-copied from a scratch run.
 > `createCell` shape, but unlike this one it DOES carry a durable value, so the
 > same trick does not transfer unchanged.
 >
+
+> ### `ENTITY-SIGNAL-SEMANTIC-0` — NEGATIVE: reverted, and it qualifies the win above
+>
+> The prize was real and large. Held weakly, `entitySignals` measures
+> **974 B/entity** released, down from 2,222 — another **-1,248 B**, and below
+> the 1 KB "excellent" mark. The absolute floor with neither registry retaining
+> anything is 819 B, so two weak registries cost 155 B/entity over ideal; a
+> single bundled per-subject handle could recover at most that 155 B and
+> realistically about half, which is the bound on that idea and the reason it
+> was not built.
+>
+> The audit that motivated it holds up: `getEntitySignal` already seeds every
+> cell from `valueStore.backingForSubject(subjectId)`, so the carrier was always
+> a realization of `EntityValueStore` and never the durable record. Nothing
+> needed a new semantic record.
+>
+> **It is reverted anyway, because the retention assumption is false.**
+>
+> Weakly held, four tests failed: a held field carrier stopped updating, a live
+> observer went stale, rollback compensated into the wrong carrier. Adding a
+> strong retainer in the node closure — the carrier pinned by whichever node or
+> field holds it — fixed three. The fourth is not fixable this way.
+>
+> Measured directly, three holder shapes across a forced GC:
+>
+> | holder                              | carrier survives? |
+> | ----------------------------------- | ----------------- |
+> | nothing held                        | no (as designed)  |
+> | computed CLOSING OVER the node      | yes               |
+> | computed re-resolving via `byId`    | **NO**            |
+>
+> **A non-live Angular `computed` does not retain its producers.** So an
+> observer can depend on a carrier, the carrier can be collected anyway, a
+> replacement is minted from canonical truth, writes land in the replacement,
+> and the original observer is orphaned — reading a value frozen at the instant
+> of collection, with no way to reach it and invalidate it.
+>
+> That breaks the premise the whole approach rested on. The earlier claim that
+> "a live Angular consumer retains its producers, so a carrier anything still
+> observes is still reachable" is TRUE only for a consumer that retains the
+> node. It is false for the plain `computed(() => rows.byId(k)?.()?.x)` shape,
+> which is ordinary application code.
+>
+> Any reclamation of this carrier changes reactive behaviour for that shape, so
+> it is a semantics decision rather than an optimization, and it is not taken
+> unilaterally.
+>
+> #### This qualifies `SUBJECT-STATE-SEMANTIC-0`
+>
+> That change is safe **only while `entitySignals` stays STRONG.** The activation
+> carrier has the same reachability hole, but a structural change reaches a
+> non-retaining observer through the entity VALUE cell — `tombstoneSubjectSignal`
+> publishes `undefined` into it — and that cell is permanent. Remove that path
+> and both carriers go stale together, which is exactly what the four failures
+> showed.
+>
+> The coupling is load bearing and non-obvious, so it is pinned: "a re-
+> realization reuses the carrier a live observer depends on" in
+> `subject-state-weak-realization.spec.ts` fails the moment `entitySignals`
+> becomes weak. That test does NOT discriminate the naive weak subject-state
+> variant it was written for; catching this is what it is actually for.
+>
 > ### Registry mapping PROVEN, and one pay-for-use fix shipped
 >
 > The mapping is now measurement rather than inference. Counting entries per

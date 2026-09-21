@@ -215,9 +215,23 @@ describe('SUBJECT-STATE-SEMANTIC-0: weakly held activation carriers', () => {
 
 /**
  * The trap this architecture is most likely to fall into: a replacement carrier
- * minted while something still observes the old one. Bumps go to the
+ * minted while something still observes the old one. Writes go to the
  * replacement, the live observer never fires, and the staleness only appears
  * after a GC — the failure mode that makes naive weak realization unsafe.
+ *
+ * WHAT THIS ACTUALLY CATCHES. It was written to discriminate a naive weak
+ * `subjectStateSignals`, and it does not — that variant passes. It earned its
+ * place by catching something else: making `entitySignals` weak. That attempt
+ * failed here and in three tests above, because a non-live Angular `computed`
+ * does NOT retain its producers. Measured three holder shapes across a forced
+ * GC: nothing held → collected; a computed CLOSING OVER the node → retained; a
+ * computed re-resolving through `byId` → COLLECTED, even though it is a live
+ * observer of that carrier.
+ *
+ * So `SUBJECT-STATE-SEMANTIC-0` is safe only while `entitySignals` stays
+ * STRONG: a structural change reaches this observer through the entity value
+ * cell, not through the activation carrier. Anyone making `entitySignals` weak
+ * removes that path and this test fails. Do not delete it as redundant.
  *
  * Observation must reach the carrier WITHOUT retaining the node, or the node
  * keeps its own cached carrier and there is nothing to discriminate. Hence a
