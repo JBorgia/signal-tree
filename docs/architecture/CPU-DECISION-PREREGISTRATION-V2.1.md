@@ -130,9 +130,16 @@ former apparent Angular advantage      609 B
 normalization mostly intact, but it had to be measured rather than assumed.
 
 The shared publisher saves **exactly 96 B on both Angular and Vue** (1,959 ->
-1,863 and 1,672 -> 1,576). The same figure on two unrelated adapters is what
-establishes it as common infrastructure rather than an Angular coincidence, so
-it belongs in the kernel.
+1,863 and 1,672 -> 1,576).
+
+CORRECTION to how that was first written here and in `e541bcc2`: the equal
+figure does NOT by itself make the publisher "provably common infrastructure".
+What makes it common infrastructure is structural — the optimization lives in
+the shared runtime and both adapter paths use it. What the two equal
+measurements establish is narrower and still worth having: its MEMORY EFFECT
+REPRODUCES across two unrelated adapters, so the saving is not an Angular
+coincidence. The architectural claim and the measurement claim are different,
+and the first sentence collapsed them.
 
 ## The control held
 
@@ -161,6 +168,30 @@ token had against strong. **The thresholds are NOT adjusted for that.** They
 stay exactly as preregistered in v1; the efficient frontier is read afterwards
 using the rules already written. Widening a threshold because a candidate is
 winning on the other axis is the failure this whole process exists to prevent.
+
+## Conditional interpretation, preregistered before any CPU number
+
+**The four-way run measures complete candidates. It does NOT independently
+measure the CPU effect of the shared publisher.** Every epoch-based v2 candidate
+contains it; `v2-strong` does not exercise that path at all.
+
+So if an epoch candidate fails the >5% threshold on `byId-warm` or `updateOne`,
+the correct conclusion is bounded:
+
+> That candidate fails AS CONSTRUCTED. The regression is NOT yet attributable to
+> its carrier, because carrier and publisher changed together. Mechanism
+> attribution requires a bounded follow-up comparing shared versus per-epoch
+> publication before an otherwise valuable carrier is abandoned.
+
+This is written down now, before any CPU result exists, because the failure mode
+it guards against is specific and this program has already committed it once: a
+`+4.1%` regression was attributed to a `WeakRef.deref()` in code that provably
+never executed in that benchmark. An undifferentiated regression is not a
+mechanism.
+
+No fifth candidate is added. Expanding the experiment after every result is how
+a decision program never terminates; the follow-up is conditional and bounded,
+and only runs if the threshold is actually failed.
 
 ## Final CPU family
 
