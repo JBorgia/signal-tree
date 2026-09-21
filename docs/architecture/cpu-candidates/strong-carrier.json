@@ -26,5 +26,20 @@
       "fileCount": 89
     }
   },
-  "generatedAt": "2026-09-21T03:37:31.897Z"
+  "generatedAt": "2026-09-21T03:37:31.897Z",
+  "releasedMemoryBytesPerEntity": {
+    "note": "Measured on THIS candidate branch, not inherited from a historically equivalent tree. Three process-isolated runs per cell at two entity counts; median reported. A per-entity quantity must not move with N.",
+    "harness": "tools/bench-entity-realization-matrix.mjs (released column)",
+    "runsPerCell": 3,
+    "byRowAndN": {
+      "angular@10000": 2222,
+      "angular@20000": 2202,
+      "kernel@10000": 2475,
+      "kernel@20000": 2453,
+      "react@10000": 2475,
+      "react@20000": 2453,
+      "vue@10000": 2687,
+      "vue@20000": 2666
+    }
+  }
 }
