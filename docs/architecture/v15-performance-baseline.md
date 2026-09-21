@@ -1047,28 +1047,62 @@ number here; nothing in this file is hand-copied from a scratch run.
 > B/entity**, against a v14 economic floor of 698 B. That is 1.93x v14, from
 > 4.97x at the start.
 >
-> #### CPU — faster on every path it touches
+> #### CPU — RETRACTED IN FULL: not resolvable on the measurement machine
 >
-> Paired, one workload per process, 10 pairs per arm, run in both orders:
+> This section previously published `updateOne -7.7%`, `byId -8.2%` and
+> `field read -51.8%`, and a headline of "faster on every path it touches."
+> **All of it is withdrawn.** Not corrected — withdrawn. Neither a speed-up nor
+> a regression is established for this change.
 >
-> | workload    | run 1  | run 2  |
-> | ----------- | -----: | -----: |
-> | `updateOne` | -7.7%  | -7.0%  |
-> | `byId`      | -8.2%  | -12.8% |
-> | field read  | -51.8% | -13.8% |
+> Three independent reasons, any one of which is sufficient:
 >
-> Faster on every path in both runs, but **the field-read magnitude is not
-> pinned**. The second run's absolute baselines were higher across the board
-> (field read base 109.2 -> 121.3 ns), so the machine was busier; the direction
-> reproduces and the size does not. Quote the direction, not -51.8%.
+> **1. The harness was never committed.** The numbers came from an ad-hoc
+> script that does not exist in this repository, so its arm definitions were
+> unrecoverable and the claim was unfalsifiable as written. That is a worse
+> defect than a wrong number. `tools/bench-build-ab.mjs` now exists so the
+> question is attackable by anyone.
 >
-> Unchanged paths, paired: `setAll` 5.043 -> 5.000 ms, `scalar-set` 5.9 -> 6.0
-> ns. Against v14 on the control harness, `entity-updateOne-10k` moves
-> 2.02x -> 1.86x.
+> **2. The A/A control rejects every workload.** Running the SAME build against
+> itself through the identical path:
 >
-> The field read roughly halving is the memory result seen from the other side:
-> a field read used to traverse the `Location` stack to reach a value
-> `EntityValueStore` already had.
+> | workload          | A med | B med |  delta | A/A spread | verdict        |
+> | ----------------- | ----: | ----: | -----: | ---------: | -------------- |
+> | `updateOne`       | 334.1 | 304.8 |  -8.8% |      21.4% | NOT RESOLVABLE |
+> | `byId-warm`       | 167.0 | 158.1 |  -5.3% |      16.0% | NOT RESOLVABLE |
+> | `byId-cold`       | 9,551 | 7,154 | -25.1% |      25.1% | NOT RESOLVABLE |
+> | `field-read-held` |  62.1 |  44.6 | -28.2% |      32.4% | NOT RESOLVABLE |
+> | `setAll-reused`   | 5.08ms| 5.10ms|  +0.3% |      14.4% | NOT RESOLVABLE |
+> | `scalar-set`      |   5.8 |   5.8 |  +0.3% |       5.9% | NOT RESOLVABLE |
+>
+> A build cannot differ from itself. Where identity measures 6-32%, a -28% is
+> not a finding. The favourable-looking numbers are rejected on exactly the same
+> grounds as the unfavourable ones.
+>
+> **3. The machine cannot be quieted.** Load average 3.25 with an agent server
+> at 69%, a browser at 60%, the window server at 45% and enterprise endpoint
+> protection at 26%. None of that is under this repository's control, so
+> "re-run when quiet" is not available here, and re-running until a band looks
+> clean is the degrees-of-freedom failure this freeze exists to prevent.
+>
+> **An independent audit reached the opposite sign on one arm.** It measured
+> `byId` ~37% faster COLD and ~5% SLOWER WARM, with a mechanism visible in the
+> code: a warm read was one `Map` lookup plus a carrier read, and is now an
+> epoch lookup, an epoch call, and a second `Map` lookup into `valueStore`. That
+> is a real cost this design incurs and the document previously did not mention
+> it. But that measurement was taken on the same contended machine and is
+> equally unresolvable — it is recorded as a MECHANISM worth testing on a quiet
+> host, not as a counter-result.
+>
+> The single name `byId` hid a possible sign change, because realization cost
+> and repeat-read cost move in opposite directions under this design. The
+> committed harness now measures `byId-cold` and `byId-warm` separately for that
+> reason.
+>
+> **What this does NOT affect.** The case for the epoch was memory and
+> semantics: a permanent `Location<E>` per subject duplicating
+> `EntityValueStore`, and a non-retaining `computed` that silently froze when
+> the carrier was reclaimed. Neither argument used a CPU number. The memory
+> results are independently reproduced and the mutants fail as preregistered.
 >
 > #### The tests, and the mutation proof
 >
