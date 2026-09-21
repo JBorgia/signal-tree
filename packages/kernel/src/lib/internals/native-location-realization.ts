@@ -203,16 +203,51 @@ export function createNativeLocationRuntime(
   };
 
   /**
-   * `SUBJECT-EPOCH-0`. The bare native cell, with the realization wrapper
-   * DISCARDED. Retaining `{ cell, token, peek, commit }` — or re-wrapping the
-   * cell in a `{ read, bump }` object — measured 192 B/entity more than
-   * retaining the cell alone, and an epoch needs nothing the wrapper provides.
+   * `SUBJECT-EPOCH-0`. A stable reactive anchor: call it to depend, `update` to
+   * invalidate everyone who did.
+   *
+   * The first version returned `realized.cell` directly, to save the 192 B/entity
+   * that a wrapper costs. That was WRONG, and wrong in a way that shipped:
+   *
+   * An adapter's raw cell is NOT writable on its own. The kernel is what makes
+   * it writable, by assigning `cell.set = binding.replace` in `createWritable`.
+   * Angular's cell happens to be a real `WritableSignal`, so calling `.update()`
+   * on it worked by accident. Vue's `createWritableCell` ships
+   * `cell.set = () => undefined` as a placeholder for the kernel to replace —
+   * so on Vue the epoch never advanced, and entity invalidation was silently
+   * dead. One Vue test caught it; nothing in the kernel or Angular suites could.
+   *
+   * The portable contract is the TOKEN, not the cell: `token.observe()` to
+   * depend and `token.invalidate()` to publish, which every adapter implements
+   * because the rest of the runtime already depends on it. Routing the advance
+   * through `publish` also puts the epoch back inside invalidation grouping,
+   * which returning the bare cell had opted it out of.
    */
   const createEpoch = (): WritableCell<number> => {
-    const realized = observation.createWritableCell?.(() => 0);
+    let version = 0;
+    const realized = observation.createWritableCell?.(() => version);
     if (!realized)
       throw new Error('Expected a native writable cell realization');
-    return realized.cell;
+    // Destructured so the closures below retain the TOKEN and nothing else.
+    // Capturing `realized` would pin its whole record — cell, peek, commit —
+    // per realized subject, and only the token is on this path. The cell stays
+    // reachable through the adapter's own token closures.
+    const { token, commit } = realized;
+    const publisher: LocationPublisher = {
+      notify: () => (commit ? commit(version) : token.invalidate()),
+    };
+    const epoch = (() => {
+      token.observe();
+      return version;
+    }) as WritableCell<number>;
+    epoch.set = (next: number) => {
+      if (next === version) return;
+      version = next;
+      publish([publisher]);
+    };
+    epoch.update = (fn: (current: number) => number) => epoch.set(fn(version));
+    epoch.asReadonly = () => epoch;
+    return epoch;
   };
 
   return {
