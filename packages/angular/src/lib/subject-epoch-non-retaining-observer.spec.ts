@@ -47,7 +47,17 @@ type Api = {
       })
     | undefined;
   __acquireEntityHandleForTesting(k: number): { subjectId: number };
-  __inspectSubjectResources(s: number): { nodeFacadeMaterialized: boolean };
+  __inspectSubjectResources(s: number): {
+    nodeFacadeMaterialized: boolean;
+    state: string;
+  };
+  __restoreOne(
+    key: number,
+    entity: Row,
+    subjectId: number,
+    beforeSubject?: number,
+    afterSubject?: number
+  ): void;
 };
 
 function make(withTransactions = false) {
@@ -203,5 +213,58 @@ describe('SUBJECT-EPOCH-0: a non-retaining computed survives collection', () => 
     tree.$.rows.updateOne(1, { name: 'held-after-gc' });
     expect(node?.()?.name).toBe('held-after-gc');
     expect(field()).toBe('held-after-gc');
+  });
+
+  /**
+   * Restore is the operation the epoch most has to get right: the subject is
+   * tombstoned, its realizations are reclaimed, and then the SAME SubjectId
+   * comes back. An observer that never held the node must still see it.
+   *
+   * Note what `removeOne` actually does: `reclaimRetiredSubjectsWithoutOwner`
+   * forgets the subject immediately, so `__inspectSubjectResources` returns
+   * `undefined` afterwards. That is structural ownership, not JS reachability —
+   * holding the node does NOT keep the record alive. Restore still revives the
+   * same SubjectId, which is the behaviour under test; asserting on the
+   * inventory in between would only be asserting a wrong model of reclamation.
+   *
+   * Driven through `__restoreOne` because the collection exposes no public
+   * restore. Testing the mechanism does not require shipping it.
+   */
+  it('sees a restore of the same SubjectId after collection', async () => {
+    const tree = make();
+    const api = tree.$.rows;
+    const subjectId = api.__acquireEntityHandleForTesting(1).subjectId;
+
+    const view = watch(tree, 1);
+    expect(view()).toBe('a');
+
+    tree.$.rows.removeOne(1);
+    expect(view()).toBeUndefined();
+
+    await collect();
+
+    api.__restoreOne(1, { id: 1, name: 'restored', v: 3 }, subjectId);
+
+    expect(view()).toBe('restored');
+    expect(api.__acquireEntityHandleForTesting(1).subjectId).toBe(subjectId);
+  });
+
+  it('revives a reference held across the remove/restore cycle', async () => {
+    const tree = make();
+    const api = tree.$.rows;
+    const subjectId = api.__acquireEntityHandleForTesting(1).subjectId;
+
+    const held = tree.$.rows.byId(1);
+    expect(held?.()).toEqual({ id: 1, name: 'a', v: 1 });
+
+    tree.$.rows.removeOne(1);
+    await collect();
+    expect(held?.()).toBeUndefined();
+
+    api.__restoreOne(1, { id: 1, name: 'revived', v: 4 }, subjectId);
+
+    // Same subject lifetime, so the old reference is valid again — the
+    // guarantee that distinguishes this from v14 key identity.
+    expect(held?.()?.name).toBe('revived');
   });
 });
