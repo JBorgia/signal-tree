@@ -841,20 +841,41 @@ number here; nothing in this file is hand-copied from a scratch run.
 > floor — the registry made entirely free, semantics broken — is 2,036 B, so the
 > `WeakRef` plus its `Map` entry cost 183 B/entity over that floor.
 >
-> #### CPU — one real regression, disclosed
+> #### CPU — RETRACTED: there is no regression
 >
-> Alternating A/B, two runs per build, 9 rounds each:
+> This section previously reported `updateOne` +4.1% "no overlap", attributed to
+> an extra `WeakRef.deref()` per mutation. **Both halves of that were wrong.**
 >
-> | workload        | SS0           | base          | verdict            |
-> | --------------- | ------------- | ------------- | ------------------ |
-> | `updateOne-10k` | 393.7 / 401.6 | 382.2 / 381.8 | **+4.1%, no overlap** |
-> | `scalar-set`    | 14.3 / 14.7   | 14.4 / 14.2   | flat               |
-> | `setAll-10k`    | 15.42 / 14.14 | 14.84 / 14.59 | flat               |
+> The mechanism claim was false on inspection: `updateOne` takes the
+> `commitExistingSubjectValue` fast path, which calls neither
+> `publishSubjectPhysicalChange` nor `bumpSubjectStateSignal`, and the benchmark
+> arm realizes no nodes, so `subjectStateSignals` is EMPTY throughout. Counters
+> in an instrumented build confirm it: over 200,000 `updateOne` calls,
+> `bumpSubjectStateSignal` runs 0 times and `getSubjectStateSignal` runs 0
+> times. The changed code never executes in that arm.
 >
-> `updateOne` is genuinely slower. The base readings differ by 0.1% and the two
-> ranges do not overlap, so this is not noise, and the mechanism is plain: one
-> extra `WeakRef.deref()` per mutation in `bumpSubjectStateSignal`. It is
-> recorded as a cost of the change, not argued away.
+> The number was an artifact of the harness, not of the change. Re-measured as
+> a focused paired test — one workload per process, 20 pairs, run in BOTH orders
+> to control for ordering:
+>
+> | build | median | mean  | min   | max   |
+> | ----- | -----: | ----: | ----: | ----: |
+> | base  |  291.0 | 294.5 | 284.6 | 380.7 |
+> | SS0   |  290.7 | 291.6 | 282.2 | 310.7 |
+>
+> Median delta **-0.3 ns (-0.1%)**, ranges fully overlapping, and SS0 is
+> marginally ahead in both orderings.
+>
+> The lesson is about the protocol, not this change. The original A/B rebuilt
+> between arms and ran every workload in a single process, so what looked like
+> clean separation — base readings 0.1% apart, ranges not overlapping — was
+> cross-run state, not a property of the code. Non-overlapping ranges across two
+> runs of a multi-workload harness are NOT a paired measurement, and this is the
+> second time in this program that an apparently tight band came from comparing
+> arms that were not measured under the same conditions.
+>
+> So the memory win carries no CPU cost. `scalar-set` and `setAll-10k` were
+> flat in the original A/B and nothing here disturbs that.
 >
 > #### The tests, and what they could NOT prove
 >
