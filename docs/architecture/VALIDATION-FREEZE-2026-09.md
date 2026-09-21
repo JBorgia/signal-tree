@@ -201,3 +201,68 @@ no tests. An exit code alone would have been read as a pass of the mutant and
 therefore as a failure of the guard. Re-run against the correct suite it fails
 with `expected undefined to be type of 'function'`. Recorded because "exit
 non-zero" and "the guard fired" are not the same fact.
+
+
+## CPU — REJECTED, not measured
+
+Every workload failed the preregistered A/A gate. See
+`v15-performance-baseline.md` for the table. The A/A control — the same build
+against itself — spread 5.9% to 32.4% against a 5% threshold, so no CPU claim in
+EITHER direction is established, and the published percentages are withdrawn
+rather than corrected.
+
+The machine cannot be quieted: load 3.25, with an agent server at 69%, a browser
+at 60%, the window server at 45% and enterprise endpoint protection at 26%. None
+of it under this repository's control.
+
+C6 **REJECTED — UNRESOLVED**. C7 **REJECTED — UNRESOLVED**.
+
+This is the gate doing its job. The rejected numbers included -25% and -28%
+results that favoured the change, and they are discarded on the same grounds as
+everything else.
+
+## Independent adversarial audit
+
+An agent was given the claim table and the commit range, and explicitly NOT the
+architectural thesis, which claims were believed solid, or the expected outcome.
+It built its own worktrees rather than trusting `dist/`.
+
+Could not break: **C1, C3, C4, C5, C8**. Most reproduced exactly; C8 gave
+precisely the 6-of-12 split. It attacked the silent-neutral-fallback theory on
+the angular and vue rows and failed — those rows diverge from the control by 397
+and 292 B, so they are genuinely running native adapters.
+
+Broke or qualified:
+
+| id  | finding | status |
+| --- | ------- | ------ |
+| F1  | NEITHER end of the range builds; shipped `dist` came from uncommitted source, proven by signature-diffing `materializeOrdinaryBranch` (8 params vs the committed 9) | CONFIRMED, worse than self-found |
+| F3  | React is byte-identical to neutral — it supplies no adapter, so C2 and C3 are ONE measurement reported twice, and "four rows improve" is three code paths | ACCEPTED |
+| F4  | `byId` faster cold, SLOWER warm — the published claim measured one arm and named it for both | ACCEPTED as mechanism; both measurements unresolvable |
+| F7  | `native-projection-observability.spec.ts` covers one of six runtime members: its stub adapter omits `createWritableCell`, so native `createCell` and `createEpoch` have ZERO kernel coverage | ACCEPTED |
+| F9  | The doc claims the epoch "routes through `publish`, so grouping behaves as before". True for neutral, FALSE for native: `createEpoch` returns the raw cell, registers no binding, so `update` fires immediately while other native publications defer — and Angular's `runInvalidationGroup` is a no-op | ACCEPTED — mechanism asserted, not demonstrated |
+| F10 | "A reader can observe a new value before its invalidation" argues one direction only; the change is in the other — synchronous in-frame readers now see post-write state where they saw pre-write | ACCEPTED as one-sided |
+| F11 | The matrix's only pass/fail gate is VACUOUS: `measureRetained` WeakRefs the object literal `build()` returned, which nothing else holds, so `collectable` is unconditionally true even for arms retaining ~100 MB | CONFIRMED by inspection |
+| F12 | `realized` and `released` differ by 0-3 B at every commit — the same arm twice | ACCEPTED |
+| F15 | The harness's own stated self-validation (`kernel held` must reproduce 9,527) is unsatisfied at BOTH ends and the doc does not note it | ACCEPTED |
+| F8  | The two runtimes now disagree about `createCell` observability; latent trap at `signal-tree.ts:1289`, and every consumer swallows a missing observer | LATENT, not live |
+| F13 | `subjectStateSignals` entries are never deleted; one dead `WeakRef` per retired subject accumulates | PRE-EXISTING |
+| F14 | `neutralEpoch()` is unreachable — both shipped runtimes define `createEpoch` | DEAD CODE |
+
+F8, F13 and F14 are NOT fixed here. The freeze forbids architectural change, and
+editing the artifact mid-audit is the thing the freeze exists to prevent.
+
+## Verdict
+
+| arm       | result |
+| --------- | ------ |
+| memory    | **PASS** — independently reproduced, deltas exact to within 1-2 B |
+| semantics | **PASS** — all three mutants fail as preregistered |
+| CPU       | **REJECTED** — unresolvable on this machine; claims withdrawn |
+
+The architecture conclusion survives, because it never rested on a CPU number:
+a permanent `Location<E>` per subject duplicated `EntityValueStore`, and a
+non-retaining `computed` froze silently when the carrier was reclaimed. Both are
+memory and semantics arguments, and both were independently reproduced.
+
+What does NOT survive is any statement about this change making anything faster.
