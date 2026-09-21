@@ -24,6 +24,46 @@ the change by 25-28%.
 Re-running until a band looks clean is the researcher-degrees-of-freedom failure
 this whole validation exists to prevent. The question is closed on that host.
 
+## Candidates — derived from HEAD, not from history
+
+The three arms are branches off the CURRENT reproducible HEAD with one file
+swapped each, NOT the historical commits that introduced them. The historical
+range was not independently buildable until the provenance fixes, so
+benchmarking old SHAs would reintroduce exactly the artifact problem those fixes
+removed — and worse, would build the three arms from differently-provenanced
+trees, which is the confound this whole validation exists to eliminate.
+
+| branch               | swap                                      | released B/entity (angular/vue/neutral) |
+| -------------------- | ----------------------------------------- | --------------------------------------- |
+| `cpu/strong-carrier` | `entity-signal.ts` <- pre-epoch           | 2,222 / 2,687 / 2,476 |
+| `cpu/cell-epoch`     | `native-location-realization.ts` <- cell  | 2,087 / 1,752 / 1,747 |
+| `cpu/token-epoch`    | HEAD, unchanged (reference)               | 1,959 / 1,672 / 1,747 |
+
+Verified mechanically in `cpu-candidates/*.json`: each candidate differs from
+the reference by EXACTLY ONE FILE, carries 0 dirty files, and produces a
+BYTE-IDENTICAL `@signal-tree/angular` dist hash (`25383e31a8aa8d50`). Only the
+kernel realization varies. The manifests also pin the Node version, the lockfile
+hash and a content hash of each built package tree, so a reported number can be
+traced to the artifact that produced it rather than to a branch name.
+
+## Test fairness — classified BEFORE the run
+
+All three candidates pass every suite identically: kernel 280 files, angular 24,
+vue 4. Nothing needed excluding, but the classification is recorded because
+"strong-carrier passed" means different things for different specs:
+
+| class | specs | status |
+| ----- | ----- | ------ |
+| shared semantic contract — must pass all three | everything driving the public entity API, INCLUDING `subject-epoch-non-retaining-observer.spec.ts` | all three pass |
+| implementation-specific | `native-epoch-publication.spec.ts` — drives `runtime.createEpoch` directly | passes on all three; under strong-carrier the runtime still DEFINES `createEpoch`, but `entity-signal.ts` references neither it nor `subjectEpochs`, so it does not gate that candidate's entity path |
+| mutation guards for one implementation | weak-epoch mutant | applies to epoch candidates only; NOT used to reject the strong carrier |
+
+`subject-epoch-non-retaining-observer.spec.ts` is named for the epoch but is a
+SHARED contract test: it asserts behaviour through the public API rather than
+mechanism, which is why the strong carrier satisfies it honestly rather than
+vacuously. A test named after an implementation is not automatically an
+implementation test.
+
 ## Command
 
 ```
