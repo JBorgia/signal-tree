@@ -220,7 +220,29 @@ const build = () => {
   }
   throw new Error('unknown cell ' + cell);
 };
-const r = await measureRetained(build, { label: row + '/' + cell });
+const r = await measureRetained(build, {
+  label: row + '/' + cell,
+  // Explicit, because the inferred sentinels only reach one level down: given
+  // { t, nodes } they watch the ARRAY, so a single node leaked into an internal
+  // registry while the array dies would still report collectable. This bench
+  // drives architecture decisions, so it names the nested resources whose
+  // collection it actually claims. A deterministic three-node sample is enough
+  // to prove the mechanism can see a leaked node.
+  sentinels: (held) => {
+    const out = [held.t];
+    const nodes = held.nodes;
+    if (Array.isArray(nodes) && nodes.length > 0) {
+      out.push(nodes[0], nodes[nodes.length >> 1], nodes[nodes.length - 1]);
+    }
+    return out.filter(Boolean);
+  },
+});
+if (!r.collectable) {
+  throw new Error(
+    row + '/' + cell + ': measured structure was NOT collectable — a sentinel ' +
+      'survived release, so this cell is measuring a leak rather than residue.'
+  );
+}
 console.log(JSON.stringify({
   row, cell, n,
   retainedMB: Number(r.retainedMB.toFixed(2)),

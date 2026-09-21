@@ -293,6 +293,22 @@ shape every matrix arm has.
 
 A gate that cannot fail is worse than no gate, because it is read as evidence.
 
+**The inferred sentinel is still only SHALLOW, and that limit is now pinned
+rather than papered over.** Given `{ t, nodes }` it watches the array, not the
+nodes inside it, so a single node leaked into an internal registry while the
+array dies would still report `collectable: true`. `measureRetained` therefore
+takes an explicit `sentinels` callback, and the realization matrix — the bench
+that drives architecture decisions — names the nested resources whose collection
+it actually claims: the tree plus a deterministic first/middle/last node sample.
+Three WeakRefs prove the mechanism can see a leaked node; ten thousand would
+only slow the collector.
+
+The matrix now THROWS on a surviving sentinel rather than printing a number.
+Mutation-proved twice: the self-test asserts inferred sentinels miss a leaked
+nested node while explicit ones catch it, and leaking one held node in the
+matrix fails the run with `kernel/held: measured structure was NOT
+collectable`.
+
 ## F13 — quantified, and it is PRE-EXISTING
 
 Remove-all / re-add-same-keys / re-realize, 2,000 live rows held constant,

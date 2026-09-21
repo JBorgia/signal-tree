@@ -144,6 +144,12 @@ export async function quiesce({
  * sentinels, so the tree and any held nodes are what must become unreachable.
  * A build that returns its subject directly is watched as-is. The wrapper is
  * still included, so this can never be weaker than what it replaced.
+ *
+ * This inferred form is still only a SHALLOW check. Given `{ t, nodes }` it
+ * watches the array, not the nodes inside it — so a single node leaked into an
+ * internal registry while the array dies reports `collectable: true`. Any bench
+ * whose claim depends on nested resources must pass `sentinels` explicitly; see
+ * `measureRetained`.
  */
 function sentinelsFor(held) {
   if (held === null || (typeof held !== 'object' && typeof held !== 'function')) {
@@ -160,7 +166,19 @@ function sentinelsFor(held) {
   return refs;
 }
 
-export async function measureRetained(build, { label = 'scenario' } = {}) {
+/**
+ * @param build     Returns the structure to measure.
+ * @param sentinels Optional `(built) => object[]`. Use it wherever the claim
+ *                  depends on a NESTED resource being collected — a realized
+ *                  node, a carrier — because the inferred sentinels only reach
+ *                  one level down. A deterministic sample is enough: three
+ *                  nodes prove the mechanism can see a leaked node, and 10,000
+ *                  WeakRefs would only slow the collector down.
+ */
+export async function measureRetained(
+  build,
+  { label = 'scenario', sentinels } = {}
+) {
   const start = await quiesce({ label: `${label} (baseline)` });
   let held = await build();
   if (held === undefined) {
@@ -168,7 +186,12 @@ export async function measureRetained(build, { label = 'scenario' } = {}) {
   }
   const settled = await quiesce({ label: `${label} (held)` });
 
-  const refs = sentinelsFor(held);
+  const explicit = sentinels
+    ? sentinels(held)
+        .filter((v) => v !== null && (typeof v === 'object' || typeof v === 'function'))
+        .map((v) => new WeakRef(v))
+    : [];
+  const refs = [...sentinelsFor(held), ...explicit];
   held = null;
   await quiesce({ label: `${label} (released)` });
 
