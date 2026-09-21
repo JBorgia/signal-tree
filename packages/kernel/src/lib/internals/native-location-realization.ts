@@ -272,15 +272,24 @@ export function createNativeLocationRuntime(
 
   const createEpoch = (): EpochHandle => {
     if (nativeEpochs) return observation.createEpoch?.() as EpochHandle;
+    // `cpu/v2-cell`: the portable epoch built on `createWritableCell` rather
+    // than `createToken`. Semantically identical and equally correct -- it
+    // publishes through the realization's token, not by writing the cell --
+    // but it allocates a state primitive to do a non-state job, and keeps the
+    // realization record's token/commit alive to do it.
     let version = 0;
-    const token = observation.createToken();
+    const realized = observation.createWritableCell?.(() => version);
+    if (!realized)
+      throw new Error('Expected a native writable cell realization');
+    const { token, commit } = realized;
     const epoch = (() => {
       token.observe();
       return version;
     }) as WritableCell<number>;
     epoch.set = (next: number) => {
       version = next;
-      token.invalidate();
+      if (commit) commit(version);
+      else token.invalidate();
     };
     epoch.update = (fn: (current: number) => number) => epoch.set(fn(version));
     epoch.asReadonly = () => epoch;
