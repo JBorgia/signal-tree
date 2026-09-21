@@ -1022,12 +1022,50 @@ number here; nothing in this file is hand-copied from a scratch run.
 >
 > #### Measured — matrix `released`
 >
-> | row              | before | first cut | specialized neutral |
-> | ---------------- | -----: | --------: | ------------------: |
-> | angular          |  2,222 |     1,350 |           **1,350** |
-> | vue              |  2,687 |     2,039 |           **2,039** |
-> | kernel (neutral) |  2,476 | **+2,781** |           **1,747** |
-> | react            |  2,476 | **+2,780** |           **1,748** |
+> | row              | pre-epoch | AS SHIPPED (broken) | CORRECTED |
+> | ---------------- | --------: | ------------------: | --------: |
+> | angular          |     2,222 |               1,350 | **2,087** |
+> | vue              |     2,687 |               2,039 | **1,752** |
+> | kernel (neutral) |     2,476 |               1,747 | **1,747** |
+> | react            |     2,476 |               1,748 | **1,748** |
+>
+> **The 1,350 was not real.** It was measured on an implementation that had
+> silently disabled entity invalidation on Vue — see the retraction below. The
+> corrected Angular figure is **2,087 B/entity, a 135 B improvement over
+> pre-epoch, not 872 B.** Vue and the neutral/React path keep most of their
+> gain because their cost was never the epoch wrapper.
+>
+> #### RETRACTION: the first epoch broke Vue, and most of the Angular win was that bug
+>
+> `createEpoch` returned `realized.cell` and called `.update()` on it. An
+> adapter's raw cell is NOT writable by contract — the kernel is what makes it
+> writable, assigning `cell.set = binding.replace` inside `createWritable`.
+> Angular's cell is a real `WritableSignal`, so this worked BY ACCIDENT. Vue
+> ships `cell.set = () => undefined` as a placeholder awaiting exactly that
+> assignment, so on Vue the epoch never advanced and entity invalidation was
+> dead.
+>
+> Nothing in this program could see it. The kernel suite builds on
+> `NEUTRAL_LOCATION_RUNTIME` and never executes the native file; the Angular
+> suite passes because Angular works by accident. It surfaced only when HEAD was
+> made buildable from a clean checkout and `nx test vue` ran for the first time
+> this session: "publishes one coherent EntityMap replacement to synchronous
+> watchers", expected one entry, got none.
+>
+> The fix publishes through the adapter's TOKEN, which every adapter implements,
+> and routes the advance through `publish` so the epoch is inside invalidation
+> grouping again — which returning the bare cell had opted it out of. That was
+> predicted as F9 in the audit, as a mechanism asserted but not demonstrated. It
+> was not merely undemonstrated; it was false, and on Vue it was fatal.
+>
+> Correctness costs memory here, and the cost is most of the headline:
+> retaining a publisher plus the token is what the bare cell avoided. Capturing
+> only `{ token, commit }` rather than the whole realization record recovers
+> 49 B on Angular and 904 B on Vue, whose record is heavier.
+>
+> Guarded by `native-epoch-publication.spec.ts`, whose stub adapter is inert in
+> exactly the way Vue is honest. Mutation-proved: restoring cell-writing
+> publication fails 2 of its 3 tests AND reproduces the original Vue failure.
 >
 > The middle column is a defect that was nearly shipped as a footnote. Backing
 > the neutral epoch with a full `Location` made the neutral runtime pay for an
@@ -1043,9 +1081,10 @@ number here; nothing in this file is hand-copied from a scratch run.
 > as before. React then moves 2,476 -> 1,748 B/entity, **-728 B (-29%)**, and
 > all four rows improve.
 >
-> Session to date, angular `released`: **3,591 -> 3,470 -> 2,222 -> 1,350
-> B/entity**, against a v14 economic floor of 698 B. That is 1.93x v14, from
-> 4.97x at the start.
+> Session to date, angular `released`: **3,591 -> 3,470 -> 2,222 -> 2,087
+> B/entity** (-41.9%), against a v14 economic floor of 698 B. That is 2.99x v14,
+> from 4.97x at the start. The previously published 1,350 / -62.4% / 1.93x
+> figures are withdrawn: they were measured on the broken epoch.
 >
 > #### CPU — RETRACTED IN FULL: not resolvable on the measurement machine
 >
