@@ -113,11 +113,56 @@ for i in 1 2 3; do
   if [ -s "$F" ] && grep -q scalar-set "$F"; then
     echo "  preflight $i already recorded — re-checking its gate"
   else
-    settle "preflight $i"
-    { date; uptime; echo "free: $(free_gb) GB"; } > "$RESULTS/preflight-$i-machine.txt"
-    echo "  running preflight $i ..."
-    node "$HARNESS" --roots "a=$DIST/v2-token,b=$DIST/v2-token" --pairs 10 >"$F" 2>&1 \
-      || { echo "  harness failed"; PASS=0; break; }
+    # Up to three attempts, because a preflight ABORTED for memory recorded no
+    # verdict -- nothing was measured, so retrying it is not retrying a result.
+    # The previous runner died mid-preflight when the host ran out of memory and
+    # lost everything; this watches free memory WHILE the harness runs and
+    # restarts the attempt on a calm host instead.
+    ATTEMPT=0
+    while :; do
+      ATTEMPT=$((ATTEMPT + 1))
+      if [ "$ATTEMPT" -gt 3 ]; then
+        cat > "$RESULTS/FINAL-STATUS.txt" <<STATUS
+EXECUTION INVALID — HOST RAN OUT OF MEMORY REPEATEDLY
+
+Preflight $i was aborted three times because free memory collapsed below 1.5 GB
+while the harness was running. No measurement completed, so NOTHING is known
+about whether the v3 harness can resolve the entity workloads.
+
+This is NOT the v3 stopping rule and does NOT settle the CPU question.
+Re-running on a host with more headroom is legitimate; methodology, thresholds,
+candidates and harness are untouched.
+STATUS
+        echo "  aborted 3x for memory — recording EXECUTION INVALID"
+        PASS=0
+        break 2
+      fi
+
+      settle "preflight $i (attempt $ATTEMPT)"
+      { date; uptime; echo "free: $(free_gb) GB"; } > "$RESULTS/preflight-$i-machine.txt"
+      echo "  running preflight $i (attempt $ATTEMPT) ..."
+
+      node "$HARNESS" --roots "a=$DIST/v2-token,b=$DIST/v2-token" --pairs 10 >"$F" 2>&1 &
+      HPID=$!
+      ABORTED=0
+      while kill -0 "$HPID" 2>/dev/null; do
+        FM=$(free_gb)
+        if awk -v m="$FM" 'BEGIN { exit !(m < 1.5) }'; then
+          echo "  free memory fell to ${FM} GB — aborting this attempt"
+          kill -9 "$HPID" 2>/dev/null
+          pkill -9 -f 'st-ab3-' 2>/dev/null
+          ABORTED=1
+          break
+        fi
+        sleep 10
+      done
+      wait "$HPID" 2>/dev/null
+      RC=$?
+
+      [ "$ABORTED" = "1" ] && { echo "  settling before retry"; sleep 120; continue; }
+      [ "$RC" != "0" ] && { echo "  harness exited $RC"; PASS=0; break 2; }
+      break
+    done
   fi
   tail -9 "$F"
   if ! gate "$F"; then echo "  PREFLIGHT $i FAILED THE 5% A/A GATE"; PASS=0; break; fi
