@@ -93,3 +93,141 @@ describe('P0-C-ROW: entity row field divergence', () => {
     expect(tree.$.rows.byId('a')?.()?.name).toBe('orig');
   });
 });
+
+type Order = { id: string; priority: string; status: string };
+const makeOrders = () =>
+  signalTree(
+    { rows: entityMap<Order, string>({ selectId: (row) => row.id }) },
+    { enhancers: [restoration()] }
+  );
+
+for (const api of ['field', 'updateOne'] as const) {
+  const write = (
+    tree: ReturnType<typeof makeOrders>,
+    key: 'priority' | 'status',
+    value: string
+  ) => {
+    if (api === 'field') tree.$.rows.byIdOrFail('a')[key](value);
+    else tree.$.rows.updateOne('a', { [key]: value });
+  };
+
+  describe(`entity external provenance via ${api}`, () => {
+    it('undo and redo preserve external sibling updates across repeated turns', async () => {
+      const tree = makeOrders();
+      try {
+        realization(() =>
+          tree.$.rows.addOne({
+            id: 'a',
+            priority: 'Standard',
+            status: 'Packing',
+          })
+        );
+        await flush();
+        undoable(() => write(tree, 'priority', 'Rush'));
+        await flush();
+        realization(() => write(tree, 'status', 'Shipped'));
+        await flush();
+        tree.undo();
+        await flush();
+        expect(tree.$.rows.byIdOrFail('a')()).toEqual({
+          id: 'a',
+          priority: 'Standard',
+          status: 'Shipped',
+        });
+        realization(() => write(tree, 'status', 'Delivered'));
+        await flush();
+        tree.redo();
+        await flush();
+        expect(tree.$.rows.byIdOrFail('a')()).toEqual({
+          id: 'a',
+          priority: 'Rush',
+          status: 'Delivered',
+        });
+        tree.undo();
+        await flush();
+        expect(tree.$.rows.byIdOrFail('a').priority()).toBe('Standard');
+        expect(tree.$.rows.byIdOrFail('a').status()).toBe('Delivered');
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    it('an authored sibling write must not erase an external conflict', async () => {
+      const tree = makeOrders();
+      try {
+        tree.$.rows.addOne({
+          id: 'a',
+          priority: 'Standard',
+          status: 'Packing',
+        });
+        await flush();
+        undoable(() => write(tree, 'priority', 'Rush'));
+        await flush();
+        realization(() => write(tree, 'priority', 'Server priority'));
+        await flush();
+        undoable(() => write(tree, 'status', 'Local status'));
+        await flush();
+        tree.undo();
+        await flush();
+        expect(tree.$.rows.byIdOrFail('a').status()).toBe('Packing');
+        const index = tree.getCurrentIndex();
+        expect(() => tree.undo()).toThrow(/ST1034/);
+        expect(tree.getCurrentIndex()).toBe(index);
+        expect(tree.$.rows.byIdOrFail('a').priority()).toBe('Server priority');
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    it('refuses the whole operation if one edited field conflicts', async () => {
+      const tree = makeOrders();
+      try {
+        tree.$.rows.addOne({
+          id: 'a',
+          priority: 'Standard',
+          status: 'Packing',
+        });
+        await flush();
+        undoable(() => {
+          write(tree, 'priority', 'Rush');
+          write(tree, 'status', 'Local status');
+        });
+        await flush();
+        realization(() => write(tree, 'status', 'Shipped'));
+        await flush();
+        const index = tree.getCurrentIndex();
+        expect(() => tree.undo()).toThrow(/ST1034/);
+        expect(tree.getCurrentIndex()).toBe(index);
+        expect(tree.$.rows.byIdOrFail('a')()).toEqual({
+          id: 'a',
+          priority: 'Rush',
+          status: 'Shipped',
+        });
+      } finally {
+        tree.destroy();
+      }
+    });
+  });
+}
+
+it('preserves external conflict protection after undoing a rekey', async () => {
+  const tree = makeOrders();
+  try {
+    tree.$.rows.addOne({ id: 'a', priority: 'Standard', status: 'Packing' });
+    await flush();
+    undoable(() => tree.$.rows.updateOne('a', { priority: 'Rush' }));
+    await flush();
+    realization(() => tree.$.rows.updateOne('a', { priority: 'Server' }));
+    await flush();
+    undoable(() => tree.$.rows.changeId('a', 'b'));
+    await flush();
+    tree.undo();
+    await flush();
+    const index = tree.getCurrentIndex();
+    expect(() => tree.undo()).toThrow(/ST1034/);
+    expect(tree.getCurrentIndex()).toBe(index);
+    expect(tree.$.rows.byIdOrFail('a').priority()).toBe('Server');
+  } finally {
+    tree.destroy();
+  }
+});

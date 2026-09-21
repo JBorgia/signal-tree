@@ -1223,8 +1223,7 @@ function materializeOrdinaryBranch(
   captureRuntime: MutationCaptureRuntime,
   scalarSlotRuntime: TreeScalarLeafRuntime | undefined,
   childPositionIds: number[] | undefined,
-  childPath: string,
-  devPath: string
+  childPath: string
 ): unknown {
   const nested = createSignalStore(
     value,
@@ -1234,7 +1233,7 @@ function materializeOrdinaryBranch(
     captureRuntime,
     scalarSlotRuntime,
     childPositionIds,
-    devPath
+    childPath
   );
   const accessor = makeNodeAccessor(
     nested as TreeNode<object>,
@@ -1266,9 +1265,9 @@ function createSignalStore<T>(
   scalarSlotRuntime: TreeScalarLeafRuntime | undefined,
   positionIds?: readonly number[],
   /**
-   * Dot-path to this node, used ONLY to name the leaf in ST2027. Threaded
-   * rather than reconstructed because the walk already knows it, and a
-   * diagnostic that cannot say WHICH leaf is most of the way to useless.
+   * Canonical ownership path. Link and mutation capture use it in production;
+   * development diagnostics also use it to identify the affected leaf.
+   * Removing parent segments for diagnostics would corrupt nested egress.
    */
   path = ''
 ): TreeNode<T> {
@@ -1492,15 +1491,7 @@ function createSignalStore<T>(
       captureRuntime,
       scalarSlotRuntime,
       getChildPositionIds(),
-      childPath,
-      // Folds to '' in production — the path exists only to name a leaf in
-      // ST2027, so a prod build should not spend a string concat per node
-      // building one nothing will read.
-      typeof ngDevMode === 'undefined' || ngDevMode
-        ? path
-          ? `${path}.${key}`
-          : key
-        : ''
+      childPath
     );
   }
 
@@ -1599,8 +1590,7 @@ function create<T extends object>(
       captureRuntime,
       scalarSlotRuntime,
       childPositionIds,
-      path,
-      typeof ngDevMode === 'undefined' || ngDevMode ? path : ''
+      path
     );
   };
 
@@ -1645,8 +1635,7 @@ function create<T extends object>(
           captureRuntime,
           scalarSlotRuntime,
           childPositionIds,
-          childPath,
-          typeof ngDevMode === 'undefined' || ngDevMode ? childPath : ''
+          childPath
         );
       };
     },
