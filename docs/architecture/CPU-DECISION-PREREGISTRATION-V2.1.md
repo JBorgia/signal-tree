@@ -98,3 +98,75 @@ Thresholds (`byId-warm` / `updateOne` flat <=2%, tradeoff 2-5%, materially
 worse >5%), the 5% A/A rejection gate, one workload per process, both execution
 orders, two-tier provenance, and the principle that Angular does not subsidize
 the other adapters.
+
+
+---
+
+# Results — memory, frozen
+
+Four candidates, each one realization file off `cpu/v2-base`, three
+process-isolated runs per cell, two entity counts. Released B/entity:
+
+| candidate           | angular | vue  | kernel | react | angular @20k |
+| ------------------- | ------: | ---: | -----: | ----: | -----------: |
+| `v2-strong`         |   2,222 | 2,687|  2,475 | 2,475 |        2,202 |
+| `v2-cell`           |   1,991 | 1,656|  1,747 | 1,748 |        1,970 |
+| `v2-token`          |   1,863 | 1,576|  1,747 | 1,748 |        1,842 |
+| `v2-angular-native` | **1,350** | 1,576| 1,747 | 1,748 |      1,329 |
+
+All four pass every suite identically: kernel 280 files, angular 24, vue 4, with
+0 dirty files each.
+
+## The attribution, which is why this amendment existed
+
+```
+former apparent Angular advantage      609 B
+  shared publisher (neutral)            96 B   16%
+  Angular-native carrier               513 B   84%
+```
+
+`v2-token` minus `v2-angular-native` is **513 B/entity (27.5%)**, and that — not
+609 — is the price of Angular specialization. The headline survived
+normalization mostly intact, but it had to be measured rather than assumed.
+
+The shared publisher saves **exactly 96 B on both Angular and Vue** (1,959 ->
+1,863 and 1,672 -> 1,576). The same figure on two unrelated adapters is what
+establishes it as common infrastructure rather than an Angular coincidence, so
+it belongs in the kernel.
+
+## The control held
+
+`v2-strong` measures 2,222 B — identical to `cpu/strong-carrier` on the v1 base.
+The v2 infrastructure did not perturb the non-epoch entity path, which is the
+check that the normalization introduced no confound of its own. Had it moved,
+the grid would have been evidence about `cpu/v2-base` rather than about
+carriers.
+
+## Cell is memory-dominated
+
+Against `v2-token`: 128 B worse on Angular, 80 B worse on Vue, same intended
+semantics. It stays in the CPU run anyway, because the preregistration says a
+dominance claim gets measured rather than assumed. If it buys no CPU, it can be
+formally removed from the frontier afterwards.
+
+## The question the CPU run now answers
+
+It is no longer "is the token epoch acceptable on Angular?" but:
+
+> **Does Angular-native keep its 27.5% memory advantage without paying enough
+> CPU to invalidate it?**
+
+A candidate 513 B/entity ahead has more room to absorb a small CPU cost than
+token had against strong. **The thresholds are NOT adjusted for that.** They
+stay exactly as preregistered in v1; the efficient frontier is read afterwards
+using the rules already written. Widening a threshold because a candidate is
+winning on the other axis is the failure this whole process exists to prevent.
+
+## Final CPU family
+
+```
+cpu/v2-strong   cpu/v2-cell   cpu/v2-token   cpu/v2-angular-native
+```
+
+Run these four, not the original three. Manifests with frozen memory are in
+`cpu-candidates/v2/`.
