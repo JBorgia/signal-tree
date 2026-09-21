@@ -55,7 +55,60 @@ const bareLeak = await measureRetained(
 );
 check('unwrapped retained subject reports NOT collectable', bareLeak.collectable, false);
 
-console.log(leaked.length + bare.length > 0 ? '' : 'retainers empty');
+// THE CASE THE INFERRED SENTINELS CANNOT SEE. The array dies; one node inside
+// it is retained by an internal registry. Shallow watching reports `true`.
+const registry = [];
+const shallow = await measureRetained(
+  () => {
+    const nodes = [];
+    for (let i = 0; i < 5; i++) nodes.push({ id: i, payload: new Array(20000).fill(0) });
+    registry.push(nodes[2]);
+    return { t: { rows: 5 }, nodes };
+  },
+  { label: 'selftest/nested-shallow' }
+);
+check(
+  'INFERRED sentinels miss a leaked nested node (known limit)',
+  shallow.collectable,
+  true
+);
+
+const registry2 = [];
+const explicit = await measureRetained(
+  () => {
+    const nodes = [];
+    for (let i = 0; i < 5; i++) nodes.push({ id: i, payload: new Array(20000).fill(0) });
+    registry2.push(nodes[2]);
+    return { t: { rows: 5 }, nodes };
+  },
+  {
+    label: 'selftest/nested-explicit',
+    // A deterministic sample: first, middle, last.
+    sentinels: ({ nodes }) => [nodes[0], nodes[nodes.length >> 1], nodes[nodes.length - 1]],
+  }
+);
+check(
+  'EXPLICIT sentinels catch a leaked nested node',
+  explicit.collectable,
+  false
+);
+
+const clean2 = await measureRetained(
+  () => {
+    const nodes = [];
+    for (let i = 0; i < 5; i++) nodes.push({ id: i, payload: new Array(20000).fill(0) });
+    return { t: { rows: 5 }, nodes };
+  },
+  {
+    label: 'selftest/nested-clean',
+    sentinels: ({ nodes }) => [nodes[0], nodes[nodes.length >> 1], nodes[nodes.length - 1]],
+  }
+);
+check('EXPLICIT sentinels pass when nothing leaks', clean2.collectable, true);
+
+console.log(
+  leaked.length + bare.length + registry.length + registry2.length > 0 ? '' : 'retainers empty'
+);
 if (failures > 0) {
   console.error(`\n${failures} gate self-test(s) failed — collectable is not trustworthy.`);
   process.exit(1);
