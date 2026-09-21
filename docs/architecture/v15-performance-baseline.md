@@ -1022,17 +1022,26 @@ number here; nothing in this file is hand-copied from a scratch run.
 >
 > #### Measured — matrix `released`
 >
-> | row              | before | SUBJECT-EPOCH-0 |    delta |
-> | ---------------- | -----: | --------------: | -------: |
-> | angular          |  2,222 |       **1,350** |     -872 |
-> | vue              |  2,687 |           2,039 |     -648 |
-> | kernel (neutral) |  2,476 |           2,781 | **+305** |
+> | row              | before | first cut | specialized neutral |
+> | ---------------- | -----: | --------: | ------------------: |
+> | angular          |  2,222 |     1,350 |           **1,350** |
+> | vue              |  2,687 |     2,039 |           **2,039** |
+> | kernel (neutral) |  2,476 | **+2,781** |           **1,747** |
+> | react            |  2,476 | **+2,780** |           **1,748** |
 >
-> The neutral row gets WORSE, which is expected rather than hidden: the neutral
-> runtime has no native cell, so its epoch falls back to a full `Location` and it
-> now pays for an epoch on top of losing nothing. Neutral is not a memory target
-> — it realizes no framework carrier — but the number is recorded so nobody
-> reads the control row as a regression signal.
+> The middle column is a defect that was nearly shipped as a footnote. Backing
+> the neutral epoch with a full `Location` made the neutral runtime pay for an
+> epoch on top of losing nothing — and **React uses that runtime by design**, so
+> "the neutral row is not a memory target" was the wrong reading. It was a
+> +304 B/entity REGRESSION for a shipped framework, hidden behind a row labelled
+> "control".
+>
+> The fix is that the neutral runtime deserves the same specialization Angular
+> got: a dependency node, a version and a publisher, with no write binding, no
+> binding-registry entry, no mutation source and no peek/subscribe surface. It
+> still routes the advance through `publish`, so invalidation grouping behaves
+> as before. React then moves 2,476 -> 1,748 B/entity, **-728 B (-29%)**, and
+> all four rows improve.
 >
 > Session to date, angular `released`: **3,591 -> 3,470 -> 2,222 -> 1,350
 > B/entity**, against a v14 economic floor of 698 B. That is 1.93x v14, from
@@ -1042,11 +1051,16 @@ number here; nothing in this file is hand-copied from a scratch run.
 >
 > Paired, one workload per process, 10 pairs per arm, run in both orders:
 >
-> | workload    |     base |    epoch | delta      |
-> | ----------- | -------: | -------: | ---------- |
-> | `updateOne` | 296.4 ns | 273.7 ns | **-7.7%**  |
-> | `byId`      | 198.4 ns | 182.2 ns | **-8.2%**  |
-> | field read  | 109.2 ns |  52.7 ns | **-51.8%** |
+> | workload    | run 1  | run 2  |
+> | ----------- | -----: | -----: |
+> | `updateOne` | -7.7%  | -7.0%  |
+> | `byId`      | -8.2%  | -12.8% |
+> | field read  | -51.8% | -13.8% |
+>
+> Faster on every path in both runs, but **the field-read magnitude is not
+> pinned**. The second run's absolute baselines were higher across the board
+> (field read base 109.2 -> 121.3 ns), so the machine was busier; the direction
+> reproduces and the size does not. Quote the direction, not -51.8%.
 >
 > Unchanged paths, paired: `setAll` 5.043 -> 5.000 ms, `scalar-set` 5.9 -> 6.0
 > ns. Against v14 on the control harness, `entity-updateOne-10k` moves
@@ -1071,9 +1085,23 @@ number here; nothing in this file is hand-copied from a scratch run.
 > detects the exact failure `ENTITY-SIGNAL-SEMANTIC-0` hit, which is what
 > licenses holding the epoch strongly rather than arguing about reachability.
 >
-> NOT covered here: restore. There is no public restore operation on the
-> collection — only the `__restoreOne` test hook — so it is exercised by the
-> kernel suite rather than through this adapter-level battery.
+> Restore IS now covered, through `__restoreOne`: testing a mechanism does not
+> require exposing it. Two cases — a non-retaining computed observing a restore
+> of the same SubjectId, and a reference held across the whole remove/restore
+> cycle reviving onto the same subject lifetime, which is the guarantee v14's
+> key identity does not make.
+>
+> Both restore tests PASS under the weak-epoch mutant. They are not retention
+> guards and should not be counted as such; they cover restore correctness, and
+> the six that do discriminate are listed above.
+>
+> Writing them corrected a wrong model of reclamation worth recording:
+> `removeOne` runs `reclaimRetiredSubjectsWithoutOwner`, which forgets the
+> subject IMMEDIATELY, so `__inspectSubjectResources` returns `undefined`
+> afterwards and holding the node does not prevent it. "Without owner" is
+> structural ownership, not JS reachability. A first draft asserted the subject
+> was still `tombstoned` at that point and failed — against the model, not the
+> code.
 >
 > ### Registry mapping PROVEN, and one pay-for-use fix shipped
 >

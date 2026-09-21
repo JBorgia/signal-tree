@@ -216,6 +216,9 @@ const flushConsumers = (): unknown[] => {
   return errors;
 };
 
+/** Shared: an epoch has no `subscribe` surface, so it has no listeners. */
+const NO_LISTENERS: ReadonlySet<() => void> = new Set<() => void>();
+
 const notifyObservers = (
   token: ObservationToken | undefined,
   listeners: ReadonlySet<() => void>
@@ -586,15 +589,48 @@ export function createLocationRuntime(
     return location;
   };
 
-  // The neutral runtime is not a memory target — it never realizes a framework
-  // carrier — so it satisfies the epoch contract by wrapping its own cell
-  // rather than duplicating one.
+  /**
+   * `SUBJECT-EPOCH-0`, neutral implementation.
+   *
+   * This started as a wrapper around `createCell`, and that was wrong for a
+   * reason worth recording: REACT USES THIS RUNTIME. It has no framework-native
+   * persistent signals by design, so backing an epoch with a full `Location`
+   * cost React +304 B/entity while Angular and Vue were winning — paying for an
+   * epoch on top of losing nothing.
+   *
+   * A dependency node, a version, and a publisher is the whole requirement. No
+   * write binding, no binding registry entry, no mutation source, no
+   * peek/subscribe surface. It still routes the advance through `publish` so an
+   * invalidation group batches it exactly like every other publication.
+   */
   const createEpoch = (): WritableCell<number> => {
-    const location = createCell(0);
-    const epoch = (() => location()) as WritableCell<number>;
-    epoch.set = (value: number) => location(value);
-    epoch.update = (fn: (current: number) => number) => location(fn);
-    epoch.asReadonly = () => location;
+    let observationToken: ObservationToken | undefined;
+    let version = 0;
+    const token = () => (observationToken ??= realization.createToken());
+    const node: DependencyNode = {
+      consumers: new Set(),
+      level: 0,
+      version: 0,
+      refresh: () => undefined,
+    };
+    const publisher: LocationPublisher = {
+      notify: () => {
+        node.version += 1;
+        notifyDependents(node);
+        notifyObservers(observationToken, NO_LISTENERS);
+      },
+    };
+    const epoch = (() => {
+      trackDependency(node, token);
+      return version;
+    }) as WritableCell<number>;
+    epoch.set = (next: number) => {
+      if (next === version) return;
+      version = next;
+      publish([publisher]);
+    };
+    epoch.update = (fn: (current: number) => number) => epoch.set(fn(version));
+    epoch.asReadonly = () => epoch;
     return epoch;
   };
 
