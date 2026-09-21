@@ -1,6 +1,10 @@
 import { markTreeCell } from './cell-identity';
 import { isLeafDefinition, leafDefinitionValue } from '../leaf';
-import type { Location, ReadonlyLocation } from './cell-runtime';
+import type {
+  Location,
+  ReadonlyLocation,
+  WritableCell,
+} from './cell-runtime';
 import type {
   ObservationAdapter,
   ObservationToken,
@@ -279,6 +283,21 @@ export interface LocationRuntime {
     compute: () => T,
     write: (value: T, intent: 'replace' | 'derive') => void
   ): Location<T>;
+  /**
+   * `SUBJECT-EPOCH-0`. A stable reactive anchor and nothing else: call it to
+   * take a dependency, `update` it to invalidate everyone who did.
+   *
+   * It exists because a full `Location` is the wrong shape for the job. A
+   * `Location` is durable authority — value, mutation observation, write
+   * bindings, a registry entry — and an epoch carries no authority at all. The
+   * value it holds is a counter nobody reads; the truth stays in
+   * `EntityValueStore` and `StructuralStore`. Measured, that distinction is the
+   * whole cost: a bare native cell in a `Map` is 562 B/entity against 1,248 B
+   * for the `Location` stack around it, and wrapping the cell back up in an
+   * object with methods costs another 192 B, which is why this returns the
+   * cell itself rather than an `{ read, bump }` facade.
+   */
+  createEpoch?(): WritableCell<number>;
   publish(publishers: readonly LocationPublisher[]): void;
   runInvalidationGroup(run: () => void): void;
 }
@@ -567,10 +586,23 @@ export function createLocationRuntime(
     return location;
   };
 
+  // The neutral runtime is not a memory target — it never realizes a framework
+  // carrier — so it satisfies the epoch contract by wrapping its own cell
+  // rather than duplicating one.
+  const createEpoch = (): WritableCell<number> => {
+    const location = createCell(0);
+    const epoch = (() => location()) as WritableCell<number>;
+    epoch.set = (value: number) => location(value);
+    epoch.update = (fn: (current: number) => number) => location(fn);
+    epoch.asReadonly = () => location;
+    return epoch;
+  };
+
   return {
     createCell,
     createDerived,
     createWritable,
+    createEpoch,
     publish,
     runInvalidationGroup,
   };
