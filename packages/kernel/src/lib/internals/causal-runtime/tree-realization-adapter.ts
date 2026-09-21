@@ -1832,7 +1832,7 @@ function deriveCollectionPathFromEffect(
   ).collectionPath;
 }
 
-function deriveFieldPathFromEffect(
+export function deriveFieldPathFromEffect(
   effect: ReversalEffect,
   registry: PositionRegistry | undefined
 ): string | undefined {
