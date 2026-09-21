@@ -224,17 +224,21 @@ export function createNativeLocationRuntime(
    * which returning the bare cell had opted it out of.
    */
   const createEpoch = (): WritableCell<number> => {
+    // `EPOCH-TOKEN-0`. An epoch is not state. Its number is a nonce nobody
+    // reads — the durable truth is `EntityValueStore` and `StructuralStore` —
+    // so what it needs is exactly a read-dependency and an invalidation, which
+    // is what `createToken` IS.
+    //
+    // Two earlier versions built it on `createWritableCell`, and both were
+    // wrong for the same underlying reason: reaching for a STATE primitive to
+    // do a non-state job. The first returned the adapter's raw cell and wrote
+    // to it, which is not writable by contract and left Vue's epoch
+    // permanently dead. The second kept the whole realization record merely to
+    // harvest the token inside it. This allocates the token and nothing else.
     let version = 0;
-    const realized = observation.createWritableCell?.(() => version);
-    if (!realized)
-      throw new Error('Expected a native writable cell realization');
-    // Destructured so the closures below retain the TOKEN and nothing else.
-    // Capturing `realized` would pin its whole record — cell, peek, commit —
-    // per realized subject, and only the token is on this path. The cell stays
-    // reachable through the adapter's own token closures.
-    const { token, commit } = realized;
+    const token = observation.createToken();
     const publisher: LocationPublisher = {
-      notify: () => (commit ? commit(version) : token.invalidate()),
+      notify: () => token.invalidate(),
     };
     const epoch = (() => {
       token.observe();

@@ -1022,12 +1022,36 @@ number here; nothing in this file is hand-copied from a scratch run.
 >
 > #### Measured — matrix `released`
 >
-> | row              | pre-epoch | AS SHIPPED (broken) | CORRECTED |
-> | ---------------- | --------: | ------------------: | --------: |
-> | angular          |     2,222 |               1,350 | **2,087** |
-> | vue              |     2,687 |               2,039 | **1,752** |
-> | kernel (neutral) |     2,476 |               1,747 | **1,747** |
-> | react            |     2,476 |               1,748 | **1,748** |
+> | row              | pre-epoch | BROKEN (withdrawn) | cell-based, correct | **EPOCH-TOKEN-0** |
+> | ---------------- | --------: | -----------------: | ------------------: | ----------------: |
+> | angular          |     2,222 |              1,350 |               2,087 |         **1,959** |
+> | vue              |     2,687 |              2,039 |               1,752 |         **1,672** |
+> | kernel (neutral) |     2,476 |              1,747 |               1,747 |         **1,747** |
+> | react            |     2,476 |              1,748 |               1,748 |         **1,748** |
+>
+> #### `EPOCH-TOKEN-0` — an epoch is not state, so it should not be built on a state primitive
+>
+> Both earlier versions built the epoch on `createWritableCell`, and both were
+> wrong for the same underlying reason: reaching for a STATE primitive to do a
+> non-state job. The first returned the adapter's raw cell and wrote to it —
+> not writable by contract, and fatal on Vue. The second kept the entire
+> realization record merely to harvest the token inside it.
+>
+> An epoch needs a read-dependency and an invalidation. That is precisely what
+> `ObservationAdapter.createToken()` is, and every adapter implements it because
+> the rest of the runtime already depends on it. So the epoch now allocates a
+> token and nothing else: no writable cell, no native signal carrying a `0`
+> nobody reads, no `commit`, no realization record, and no assumption about
+> whether the adapter's cell is writable.
+>
+> Angular recovers 128 B against the cell-based version and Vue 80 B, with the
+> abstraction boundary landing where it belongs — reactive reachability is an
+> observation concern, not a state concern.
+>
+> Mutation-proved against bypassing `publish()`: the kernel grouping test fails.
+> Note that VUE still passes that mutant, because the Vue adapter schedules its
+> own invalidations, so `native-epoch-publication.spec.ts` is the ONLY guard for
+> kernel-level grouping.
 >
 > **The 1,350 was not real.** It was measured on an implementation that had
 > silently disabled entity invalidation on Vue — see the retraction below. The
@@ -1081,10 +1105,14 @@ number here; nothing in this file is hand-copied from a scratch run.
 > as before. React then moves 2,476 -> 1,748 B/entity, **-728 B (-29%)**, and
 > all four rows improve.
 >
-> Session to date, angular `released`: **3,591 -> 3,470 -> 2,222 -> 2,087
-> B/entity** (-41.9%), against a v14 economic floor of 698 B. That is 2.99x v14,
+> Session to date, angular `released`: **3,591 -> 3,470 -> 2,222 -> 1,959
+> B/entity** (-45.5%), against a v14 economic floor of 698 B. That is 2.81x v14,
 > from 4.97x at the start. The previously published 1,350 / -62.4% / 1.93x
 > figures are withdrawn: they were measured on the broken epoch.
+>
+> Cross-framework, baseline -> current: vue 4,519 -> 1,672 (-63.0%), react and
+> neutral 3,715 -> 1,748 (-52.9%). Angular is the SMALLEST beneficiary of this
+> architecture, which is worth stating plainly given it is the primary target.
 >
 > #### CPU — RETRACTED IN FULL: not resolvable on the measurement machine
 >
