@@ -77,38 +77,65 @@ describe('native epoch publishes through the token, not the cell', () => {
     const epoch = runtime.createEpoch?.();
     expect(epoch).toBeDefined();
 
-    expect(epoch?.()).toBe(0);
-    epoch?.update((v) => v + 1);
+    runtime.advanceEpoch?.(epoch as never);
 
     // The observable effect is an invalidation. If the implementation writes to
     // the cell instead, this is 0 and the epoch is dead on Vue.
     expect(invalidations()).toBeGreaterThan(0);
-    expect(epoch?.()).toBe(1);
     expect(cellWrites()).toBe(0);
   });
 
-  it('is a no-op when the value does not change', () => {
-    const { adapter, invalidations } = inertCellAdapter();
-    const epoch = createNativeLocationRuntime(adapter).createEpoch?.();
-    epoch?.update((v) => v + 1);
-    const after = invalidations();
-    epoch?.set(epoch?.() as number);
-    expect(invalidations()).toBe(after);
-  });
-
-  it('defers publication inside an invalidation group', () => {
+  it('coalesces repeated advances and defers them inside a group', () => {
     const { adapter, invalidations } = inertCellAdapter();
     const runtime = createNativeLocationRuntime(adapter);
-    const epoch = runtime.createEpoch?.();
+    const epoch = runtime.createEpoch?.() as never;
 
     runtime.runInvalidationGroup(() => {
-      epoch?.update((v) => v + 1);
-      epoch?.update((v) => v + 1);
-      // Returning the bare cell opted the epoch out of grouping entirely, so
-      // advances landed immediately and out of order with every other
-      // publication in the same batch.
+      runtime.advanceEpoch?.(epoch);
+      runtime.advanceEpoch?.(epoch);
+      runtime.advanceEpoch?.(epoch);
+      // Advances are STAGED. Landing them immediately would put per-entity
+      // invalidation out of order with every other publication in the batch.
       expect(invalidations()).toBe(0);
     });
-    expect(invalidations()).toBeGreaterThan(0);
+    // Staged in a Set, so three advances of one epoch land once.
+    expect(invalidations()).toBe(1);
+  });
+
+  /**
+   * `ANGULAR-NATIVE-EPOCH-0`. When an adapter supplies the create/advance pair,
+   * the kernel must USE it and must never write the handle itself. The handle
+   * here is deliberately inert — if the kernel tries to drive it directly, the
+   * adapter's counter stays at zero and the epoch is silently dead, which is
+   * the Vue failure in miniature.
+   */
+  it('uses an adapter-supplied epoch pair and never writes the handle', () => {
+    let advanced = 0;
+    let handleWrites = 0;
+    const base = inertCellAdapter().adapter;
+    const makeHandle = () => {
+      const handle = (() => 0) as unknown as {
+        (): number;
+        set(v: number): void;
+        update(f: (n: number) => number): void;
+      };
+      handle.set = () => void (handleWrites += 1);
+      handle.update = () => void (handleWrites += 1);
+      return handle;
+    };
+    const runtime = createNativeLocationRuntime({
+      ...base,
+      createEpoch: makeHandle as never,
+      advanceEpoch: () => void (advanced += 1),
+    });
+
+    const epoch = runtime.createEpoch?.() as never;
+    runtime.runInvalidationGroup(() => {
+      runtime.advanceEpoch?.(epoch);
+      runtime.advanceEpoch?.(epoch);
+    });
+
+    expect(advanced).toBe(1);
+    expect(handleWrites).toBe(0);
   });
 });

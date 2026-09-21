@@ -3,6 +3,7 @@ import type {
   ReadableCell,
   WritableCell,
 } from './internals/cell-runtime';
+import type { EpochHandle } from './internals/observation-adapter';
 import {
   createWritableProjection,
   deriveLocation,
@@ -355,7 +356,7 @@ export function createEntitySignal<
    * No value is staged: the value is already in `EntityValueStore` before
    * anything lands here, so a copy would be a second truth.
    */
-  const pendingSubjectEpochs = new Set<WritableCell<number>>();
+  const pendingSubjectEpochs = new Set<EpochHandle>();
 
   const createVersionedProjection = <TValue>(
     compute: () => TValue
@@ -508,7 +509,7 @@ export function createEntitySignal<
         for (const publication of subjectChanges) {
           // Only a realized subject has an epoch, so this stays as lazy as the
           // per-entity signal it replaces.
-          publication.valueEpoch?.update(advanceEpoch);
+          if (publication.valueEpoch) advanceEpochHandle(publication.valueEpoch);
           if (publication.bindingChanged) {
             if (publication.stateSignal) {
               deriveLocation(publication.stateSignal, (value) => value + 1);
@@ -659,8 +660,15 @@ export function createEntitySignal<
    * replaces — so reachability is guaranteed by retention rather than hoped
    * for.
    */
-  const subjectEpochs = new Map<number, WritableCell<number>>();
-  const advanceEpoch = (current: number): number => current + 1;
+  const subjectEpochs = new Map<number, EpochHandle>();
+  /**
+   * `ANGULAR-NATIVE-EPOCH-0`. Advance through the RUNTIME, never by writing the
+   * handle. A framework-supplied handle belongs to its adapter; the kernel
+   * assuming it could write one is what left Vue's epoch permanently dead.
+   */
+  const advanceEpochHandle = (handle: EpochHandle): void => {
+    locations.advanceEpoch?.(handle);
+  };
   const structuralStore = new StructuralStore<K>();
   const valueStore = new EntityValueStore<E>();
   /**
@@ -1037,24 +1045,22 @@ export function createEntitySignal<
   }
 
   /** Materialized lazily: a subject nobody has read has no epoch. */
-  function getSubjectEpoch(subjectId: number): WritableCell<number> {
+  function getSubjectEpoch(subjectId: number): EpochHandle {
     let epoch = subjectEpochs.get(subjectId);
     if (!epoch) {
-      epoch = locations.createEpoch
-        ? locations.createEpoch()
-        : neutralEpoch();
+      epoch = locations.createEpoch ? locations.createEpoch() : neutralEpoch();
       subjectEpochs.set(subjectId, epoch);
     }
     return epoch;
   }
 
-  function neutralEpoch(): WritableCell<number> {
+  function neutralEpoch(): EpochHandle {
     const cell = locations.createCell(0);
     const epoch = (() => cell()) as WritableCell<number>;
     epoch.set = (value: number) => cell(value);
     epoch.update = (fn: (current: number) => number) => cell(fn);
     epoch.asReadonly = () => cell;
-    return epoch;
+    return epoch as unknown as EpochHandle;
   }
 
   /**
@@ -1662,7 +1668,7 @@ export function createEntitySignal<
     pendingSubjectEpochs.clear();
     locations.runInvalidationGroup(() => {
       for (const epoch of pending) {
-        epoch.update(advanceEpoch);
+        advanceEpochHandle(epoch);
       }
       deriveLocation(version, (value) => value + 1);
       markOwnerInvalidated(ownerId);

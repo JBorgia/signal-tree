@@ -9,7 +9,10 @@ import type {
   ObservationAdapter,
   ObservationToken,
 } from './observation-adapter';
-import { NEUTRAL_OBSERVATION_ADAPTER } from './observation-adapter';
+import {
+  NEUTRAL_OBSERVATION_ADAPTER,
+  type EpochHandle,
+} from './observation-adapter';
 import {
   PRODUCTION_SUBSTRATE_STATS_ENABLED,
   recordProductionSubstrateStat,
@@ -300,7 +303,13 @@ export interface LocationRuntime {
    * object with methods costs another 192 B, which is why this returns the
    * cell itself rather than an `{ read, bump }` facade.
    */
-  createEpoch?(): WritableCell<number>;
+  createEpoch?(): EpochHandle;
+  /**
+   * Advance an epoch created by THIS runtime. Separate from the handle so a
+   * framework-owned handle is never written to by the kernel — see
+   * `ObservationAdapter.createEpoch`.
+   */
+  advanceEpoch?(epoch: EpochHandle): void;
   publish(publishers: readonly LocationPublisher[]): void;
   runInvalidationGroup(run: () => void): void;
 }
@@ -603,7 +612,7 @@ export function createLocationRuntime(
    * peek/subscribe surface. It still routes the advance through `publish` so an
    * invalidation group batches it exactly like every other publication.
    */
-  const createEpoch = (): WritableCell<number> => {
+  const createEpoch = (): EpochHandle => {
     let observationToken: ObservationToken | undefined;
     let version = 0;
     const token = () => (observationToken ??= realization.createToken());
@@ -631,7 +640,11 @@ export function createLocationRuntime(
     };
     epoch.update = (fn: (current: number) => number) => epoch.set(fn(version));
     epoch.asReadonly = () => epoch;
-    return epoch;
+    return epoch as unknown as EpochHandle;
+  };
+
+  const advanceEpoch = (handle: EpochHandle): void => {
+    (handle as unknown as WritableCell<number>).update((v) => v + 1);
   };
 
   return {
@@ -639,6 +652,7 @@ export function createLocationRuntime(
     createDerived,
     createWritable,
     createEpoch,
+    advanceEpoch,
     publish,
     runInvalidationGroup,
   };
