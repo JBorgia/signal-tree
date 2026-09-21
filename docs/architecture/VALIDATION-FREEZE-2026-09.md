@@ -103,3 +103,101 @@ Semantics:
 4. An independent adversarial reviewer audits the frozen commit WITHOUT being
    given this project's architectural thesis or the expected outcome. Its brief
    is to find reasons the conclusions are false.
+
+
+---
+
+# Results
+
+Recorded as the protocol above specified. Nothing here was added to the matrix
+after a result was seen.
+
+## Harness validity
+
+`git diff 71182dd5..53dde504 -- tools/` is EMPTY. The before/after comparison
+ran through identical benchmark code. Only product source, tests, one
+`project.json` flag and one document changed. This was the single largest threat
+to the memory claims, given that this session found four harnesses measuring
+something other than their name, and it is excluded by construction rather than
+by argument.
+
+## DEFECT FOUND IN THE FREEZE ITSELF
+
+**The baseline commit does not build.** `71182dd5` fails with
+`"deriveFieldPathFromEffect" is not exported by tree-realization-adapter.ts`,
+because that export exists only in an UNCOMMITTED file in the working tree. The
+tree carries ~60 modified files predating this work, three of them kernel
+source.
+
+Consequences, which cut in both directions:
+
+- Every A/B in this session swapped only session-owned product files inside one
+  otherwise-identical tree. The uncommitted files were present and identical on
+  both arms, so they cannot produce a delta. The PAIRED comparisons stand.
+- The claim that these results reproduce from commit `71182dd5` to commit
+  `53dde504` is FALSE. Nobody can check out that baseline and rebuild it. The
+  real comparison is "this tree, with these files swapped", which is a weaker
+  guarantee than the preregistration asserted two paragraphs into its own text.
+- Absolute figures such as "1,350 B/entity" carry an uncontrolled common-mode
+  term from those three kernel files. Invisible to a delta; NOT invisible to a
+  number quoted externally.
+
+Measurements below were taken in an isolated `git worktree` with that
+uncommitted context replicated, so they reproduce what was actually compared.
+
+## Memory — PASS
+
+Three process-isolated runs per cell, two entity counts, `released` column.
+
+| row     | baseline | pre-epoch | FROZEN | spread      | drift 10k->20k |
+| ------- | -------: | --------: | -----: | ----------- | -------------: |
+| angular |    3,591 |     2,222 |  1,350 | 0.00%       |  -0.58..-1.56% |
+| vue     |    4,519 |     2,687 |  2,039 | 0.00%       |  -0.46..-1.08% |
+| react   |    3,715 |     2,475 |  1,748 | 0.00..0.08% |  -0.59..-1.37% |
+| kernel  |    3,715 |     2,476 |  1,747 | 0.00..0.06% |  -0.62..-1.32% |
+| v14     |        — |         — |    698 | 0.00%       |         -1.58% |
+
+- C1 angular 2,222 -> 1,350 (delta 872, claimed 872) **VERIFIED**
+- C2 react 2,475 -> 1,748 (delta 727, claimed 728) **VERIFIED**
+- C3 kernel 2,476 -> 1,747 (delta 729, claimed 729) **VERIFIED**
+- C4 vue 2,687 -> 2,039 (delta 648, claimed 648) **VERIFIED**
+- C5 angular 3,591 at baseline **VERIFIED EXACTLY**
+- C9 every row improves, none regresses **VERIFIED**
+
+Two points that strengthen this beyond reproduction:
+
+**The drift is common-mode.** Every row INCLUDING the untouched v14 control
+loses ~0.5-1.6% per entity between N=10k and N=20k — fixed collection overhead
+amortizing, not a property of the change. Cross-row ratios cancel it exactly:
+angular/v14 is 1.934 at both entity counts.
+
+**An unrequested reproduction.** Baseline angular 3,591 against the 3,470
+measured after the first commit is -121 B, reproducing `SUBJECT-STATE-MINIMAL-0`
+exactly from a different tree and a fresh build, long after that number was
+recorded. Vue independently gives -120. Nobody asked for that check and it had
+no opportunity to be steered.
+
+**Caveat:** the v14 control row is ABSENT from the baseline and pre-epoch runs —
+that row resolves `../signaltree-14x` relative to the workspace root, which does
+not exist beside a `/tmp` worktree. Those two runs therefore had no external
+control. v14 is unaffected by any change here and measured 698 on the frozen
+side, so no claim depends on it, but the gap is stated rather than implied away.
+
+## Semantics — PASS
+
+All three mutants fail as preregistered; no guard is vacuous.
+
+| mutant                            | expected | actual |
+| --------------------------------- | -------- | ------ |
+| M1 epoch held weakly              | >= 6     | **6**  |
+| M2 subject-state held strongly    | >= 1     | **3**  |
+| M3 native projection unobservable | >= 1     | **1**  |
+
+C8 **VERIFIED**.
+
+M3's first run reported exit 1 with ZERO failures — the filter was pointed at
+the Angular package while that spec lives in the kernel package, so it matched
+no tests. An exit code alone would have been read as a pass of the mutant and
+therefore as a failure of the guard. Re-run against the correct suite it fails
+with `expected undefined to be type of 'function'`. Recorded because "exit
+non-zero" and "the guard fired" are not the same fact.
