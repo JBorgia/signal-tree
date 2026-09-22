@@ -1,5 +1,10 @@
 # 15.0 performance baseline
 
+> **Start at [`ENTITY-REALIZATION-RECORD.md`](ENTITY-REALIZATION-RECORD.md).**
+> It carries the decision, what is established, and — importantly — every
+> retracted number in one place. This document is retained as detail and
+> evidence; read it knowing some claims inside it were later withdrawn.
+
 **Status:** MEASURED at `87a790eb`, on a quiet machine, after declarative
 construction and zero-owner reclamation. This is the reference point later work
 is compared against, not a claim about any other machine.

@@ -1,5 +1,10 @@
 # Quiet-host CPU decision — preregistered
 
+> **Start at [`ENTITY-REALIZATION-RECORD.md`](ENTITY-REALIZATION-RECORD.md).**
+> It carries the decision, what is established, and — importantly — every
+> retracted number in one place. This document is retained as detail and
+> evidence; read it knowing some claims inside it were later withdrawn.
+
 **Written before the run. Nothing below may be edited after a number is seen.**
 
 The entity-realization memory work is validated. The one open question is
