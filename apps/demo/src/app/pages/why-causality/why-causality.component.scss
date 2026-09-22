@@ -12,7 +12,17 @@
   box-sizing: border-box;
 }
 .causality-hero {
+  // A full-width band, like .home-hero and .architecture-hero: its inner
+  // content sits exactly one --layout-gutter from the frame edge. The rewrite
+  // had given it .content-shell instead, which centres at 76rem and pushed
+  // the hero 232px off the gutter the rest of the site aligns to.
   padding-block: clamp(2.5rem, 6vw, 5rem);
+  padding-inline: var(--layout-gutter);
+}
+
+// The measure the hero carried before, when .hero-copy held it.
+.causality-hero > :is(.eyebrow, h1, .hero-lede) {
+  max-width: 58rem;
 }
 .eyebrow {
   margin: 0 0 1rem;
