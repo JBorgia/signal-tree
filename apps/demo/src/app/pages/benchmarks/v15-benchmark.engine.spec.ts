@@ -54,7 +54,9 @@ describe('v15 browser benchmark engine', () => {
       arms: [arm('tree', 2, events), arm('store', 5, events)],
       rounds: 3,
       warmupRounds: 1,
-      settle: async () => events.push('settle'),
+      settle: async () => {
+        events.push('settle');
+      },
     });
 
     expect(report.results).toEqual([
@@ -119,7 +121,9 @@ describe('v15 browser benchmark engine', () => {
       arms: [arm('a', 1, events), arm('b', 1, events), arm('c', 1, events)],
       rounds: 5,
       warmupRounds: 0,
-      settle: async () => events.push('settle'),
+      settle: async () => {
+        events.push('settle');
+      },
     });
 
     const order = events
