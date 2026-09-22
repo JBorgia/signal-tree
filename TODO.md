@@ -2026,6 +2026,209 @@ raising `SAMPLES_PER_POINT` would only make the coin flip more expensive.
 measurement, unrelated to transaction classification, and reproduces without
 any of that work present.
 
+## DX-ROADMAP-0 — opened 2026-09-22
+
+**A separate track. Ships no kernel, and is NOT scope inside `PROPOSAL-0`.**
+Opened from a developer-experience audit of the shipped 15.2.1 surface. The
+audit's recommendations are carried forward here; its numbers are not.
+
+### What this audit is, and is not, evidence for
+
+The audit scored seventeen areas to one decimal. **Those ratings are not
+project facts and must not be cited as measurements.** Every one was derived
+from reading the public API and the documentation — which is a review of the
+DESIGN, not an observation of the EXPERIENCE. No external developer was
+watched using SignalTree, and the file says so itself.
+
+```text
+EVIDENCE        the named findings below, each checkable against this repo
+NOT EVIDENCE    "DX is 7.5/10", and every other score in that document
+```
+
+Recorded because this is the same failure the repository already guards
+against elsewhere: a green-looking signal standing in for the thing it cannot
+measure. The way to make a DX claim real is `## 32. Real external consumer
+test`, not a re-scoring pass.
+
+### The positioning claim — adopted
+
+> SignalTree does not compete on **fewest concepts required to store a
+> boolean**. It competes on **fewest concepts required to manage a complicated
+> application correctly.**
+
+This is the frame the architecture already implies, and it decides arguments
+that otherwise recur forever. A comparison against a minimal store that counts
+lines-to-first-write is measuring the contest SignalTree is not entering. It
+also sets the bar for this track: the goal is to make existing correctness
+DISCOVERABLE, not to shorten the shortest path.
+
+Consistent with, and downstream of, `## PRODUCT DIRECTION` — _application
+state that can explain itself_.
+
+### Finding 1 — lifecycle ownership is uneven across adapters
+
+Not the vague "`destroy()` is a footgun" complaint. `destroy()` is correct: a
+live tree owns runtime resources. The gap is that **one** adapter owns it.
+
+Checked against the implementations, not against the export lists — exporting
+a hook does not prove the hook owns teardown, and the first draft of this
+finding inferred exactly that about React.
+
+```text
+Angular  VERIFIED     defineStore() calls tree.destroy() from
+                      inject(DestroyRef).onDestroy(), so component-provided
+                      stores dispose with the component and root stores with
+                      the app — packages/angular/src/lib/define-store.ts:164
+
+React    MEASURED     useSignalTree() does NOT own teardown. It is an
+                      observation hook over useSyncExternalStore: it takes an
+                      already-created tree as `owner` and never calls
+                      destroy() — packages/react/src/use-signal-tree.ts
+
+Vue      NOT FOUND    no lifecycle-owning public helper; whether normal usage
+                      can own destroy() is UNINVESTIGATED
+
+Solid    NOT FOUND    same
+```
+
+`.destroy()` appears in no adapter source outside Angular's `DestroyRef`
+callback. That is a measurement over the three adapter `src` trees, and it is
+what turns "no obvious helper" into "no helper".
+
+And the first-hour document teaches the manual path on the framework that
+already owns it: `docs/why-signaltree.md` imports from `@signal-tree/angular`
+and ends its "whole everyday surface" example with a bare `store.destroy()`.
+
+### Finding 2 — the docs are becoming reliable; the repository is still large
+
+Both halves are true and they are not in tension, because they describe
+different sets.
+
+```text
+GATED      33 examples across 25 live documents typecheck against the API they
+           teach — tools/check-documented-examples.mjs, exit 0, 2026-09-22.
+           LIVE_DOCS is 12 entries.
+UNGATED    docs/architecture/**, docs/research/**, docs/audits/**, ADSP, RFCs —
+           by design. They record what was true at a point in time.
+```
+
+So "documentation is reliable" is a statement about the paved road, and
+"documentation is overwhelming" is a statement about everything else. **The fix
+is not deleting the engineering record.** It is making the public path small
+enough that a newcomer never walks into the record by accident.
+
+### Finding 3 — the proposal-vocabulary objection, and how it resolved
+
+The audit challenged whether `proposal()` was a sixth vocabulary family over
+machinery that already had one. Half of that survived contact with the
+implementation, and the disposition lives in `PROPOSAL-0` above, not here:
+
+```text
+optimistic operation, no reviewer   transaction / confirm / rollback
+reviewed operation                  proposal / inspect / accept / reject
+```
+
+`accept`/`reject` do duplicate `confirm`/`rollback`. `inspect()` does not
+duplicate anything, and database-flavoured "transaction" is the wrong register
+for a human-review workflow. The guardrail that keeps this from decaying into
+two half-APIs is already recorded and already has a detector:
+
+```text
+Proposal must never gain a BEHAVIOUR PendingTransaction lacks
+PendingTransaction must never gain inspect()
+```
+
+If either stops holding, the split reopens.
+
+### STALE in the audit — do not carry forward
+
+Its sketch of the proposal API included `p.accept({ undoable: true })`. That
+option was **falsified during implementation**: `undoable()` designates the
+causal turn containing its WRITES, a proposal's writes happen at `proposal()`
+time, and an accept-time flag could only work by retroactively designating a
+settled turn. See the C-double-prime decision table.
+
+### The work
+
+Ordered by how much of the newcomer path each item repairs, not by size.
+
+```text
+1  ONE canonical "build a real feature" tutorial
+   Not API reference. One feature, end to end, in this order:
+     scalar state -> entities -> external/server update ->
+     optimistic transaction -> rollback -> undo
+   It is the artifact the paved road points at. Everything else in the
+   public path either leads to it or follows from it.
+
+2  Goal-based recipe index, addressed by what the developer wants to DO
+     edit a field                     manage records
+     save optimistically              undo a user action
+     apply server truth               sync with an endpoint
+     handle a rollback refusal        review a proposed change
+     tear down a store
+   Indexed by goal, never by enhancer name. A developer who does not yet
+   know that undo lives in restoration() cannot search for restoration().
+
+3  Lifecycle ownership audit — Finding 1
+     Angular   DOCUMENT the ownership defineStore() already has. Verified,
+               so this item is writing, not investigation.
+     React     DECIDE and state it: either a tree scoped to a component's
+               lifetime gets an owning hook, or React usage is expected to
+               create trees outside the component tree. useSignalTree()
+               observes; it does not own, and the README does not say so.
+     Vue       determine whether normal usage can own destroy(); if it can,
+               ship the helper; if it cannot, say so loudly
+     Solid     same
+     docs      stop teaching bare destroy() in the first-hour document on a
+               framework that owns it
+   Deliverable is a per-adapter answer to one question: in ordinary usage,
+   does the developer have to remember anything?
+
+4  Finish the shared framework conformance contract
+   Already required by PROPOSAL-0 Phase B. Listed here too because it is
+   what makes "supported" mean something to a USER, independently of how
+   many specs each adapter happens to carry (Angular 29, Vue 6, React 2,
+   Solid 1). One contract every adapter passes.
+
+5  Studio UX organised around questions, not architecture
+     "Why is this value this?"        "What changed it?"
+     "What would undo affect?"        "What was superseded?"
+   `## PRODUCT DIRECTION` -> "Studio scope — brutally narrow" already frames
+   the first question exactly this way; this item extends the same treatment
+   to the other three. CONSTRAINT: each question must be answerable from
+   facts the kernel already has. If one is not, that is a finding to record
+   here — never a licence to add a kernel fact for a UI.
+
+6  Freeze the public API
+   After PROPOSAL-0 ships: no new public primitive until items 1-3 exist and
+   a real external consumer has used them (`## 32. Real external consumer
+   test`). The versioning policy is now good; the REPUTATION is not, and
+   only boring compatibility repairs that.
+```
+
+### The stop condition this track exists to enforce
+
+> **Do not answer an awkwardness with another primitive.**
+
+The kernel has enough. The next DX gains come from recipes, discovery,
+framework conformance, visual debugging and fewer decisions in the first-use
+flow — not from more kernel concepts, more enhancer types, more public
+metadata, more lifecycle statuses or more knobs. SignalTree's hidden
+correctness (a held entity reference that does not retarget, an undo that
+refuses rather than destroying newer truth, a rollback that will not
+half-reverse) is ALREADY a DX advantage. It is just not discoverable yet, and
+discoverability is a documentation and tooling problem.
+
+### Relationship to the other open tracks
+
+```text
+PROPOSAL-0                       finish facade lifecycle, Phase B, ship
+DX-ROADMAP-0                     post-Proposal; ships no kernel
+RETIRED-SUBJECT-SLOPE-STABILITY-0  independent release-infrastructure repair
+```
+
+None of the three gates another.
+
 ## PRODUCT DIRECTION — set 2026-09-08
 
 ```text
