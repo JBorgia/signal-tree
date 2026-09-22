@@ -1188,8 +1188,9 @@ REKEY-SUPERSESSION-0  TINY PREREQUISITE — blocks PROPOSAL-0
                       can the turn skip that compensation and reverse the
                       rest without resurrecting or retargeting an entity?
 
-PROPOSAL-0            BLOCKED on PROPOSAL-REJECTION-0 surviving AND on
-                      REKEY-SUPERSESSION-0 dispositioning
+PROPOSAL-0            PHASE A (kernel) DONE — null survives, 10/10.
+                      PHASE B (framework realization conformance) is a
+                      MANDATORY release criterion, not follow-up.
                       Is propose/accept/reject a truthful NAME over existing
                       transaction semantics, or does it need new kernel rules?
                       No MO dependency — speculative state is already
@@ -1635,6 +1636,101 @@ Sharing a symptom was not allowed to merge the two.
 
 **`PROPOSAL-0` is now unblocked.** Stop hunting transaction edge cases
 opportunistically; enter the preregistered PROPOSAL-0 matrix.
+
+#### PROPOSAL-0 — PHASE A (kernel) RUN 2026-09-22
+
+**NULL SURVIVES at the kernel level.** Fixture:
+`packages/kernel/src/enhancers/transactions/proposal-0-kernel.spec.ts`,
+10 cases, green on the first run. **No case required a rule `transaction()`
+does not already have**, so the mapping holds:
+
+```text
+propose -> transaction     accept -> confirm     reject -> rollback
+```
+
+Written entirely against the shipped primitives on purpose: if the matrix
+passes without a facade, that IS the evidence a facade would add naming and
+nothing else. No public API named.
+
+Settled by this pass:
+
+```text
+A1  clean accept              speculative value readable pre-accept, survives
+A2  clean reject              withdrawn through the same references
+A3  multi-field               one unit on both accept and reject
+A4  multi-entity              no partial settlement
+A5  unrelated human edit      survives rejection
+A6  server write then ACCEPT  see below — the product finding
+A7  mixed scalar + structural coherent single turn
+A8  remove/re-add lifetime    held reference does NOT retarget; the reused
+                              business key is a different subject
+A9  restoration               confirm alone adds NO undo step;
+                              undoable(confirm) adds exactly one, and undo
+                              reverses the turn as one unit
+A10 two proposals at once     independent handles settle independently
+```
+
+**A10 was previously unpinned.** The data structures supported concurrent
+pending turns (`pendingTurns` is a Map, `openScopesByKey` a Set) but no test
+held two handles open and settled them separately. It is the review-UI
+requirement — one proposal outstanding while the human keeps working — and it
+now has a test.
+
+**A6 is a product finding, not a defect.** Accepting a proposal whose location
+newer truth already overwrote does **not** clobber that newer truth: the
+server's value stands and the proposal's other locations commit.
+
+```text
+propose  name='FromAgent', priority=3
+server   name='FromServer'
+ACCEPT   -> name='FromServer', priority=3
+```
+
+Consistent with external-authority semantics and with the reject-side rule, so
+the null holds. But it means **accept is not "apply everything I proposed"**,
+and a review surface that says "Accepted" without showing which fields were
+superseded would be lying to the user. That is a Phase B / AGENT-UX-REFERENCE-0
+requirement, recorded here so it is not discovered late.
+
+**One honest qualification on "just naming".** A9 shows that one-undo-unit
+behaviour needs `undoable(() => transaction(...).confirm())`, not `confirm()`
+alone. That is composition of two shipped primitives rather than a new
+semantic, so the null stands — but a facade must DECIDE whether accepting
+enrolls in restoration, and that decision is a public-surface question, not an
+implementation detail. Carry it into the API-derivation step.
+
+**Phase B is a MANDATORY release criterion, not follow-up.** The kernel owns
+what proposal semantics mean; adapters prove each framework physically
+realizes them. Do not duplicate this matrix four times — build one shared
+realization contract every shipping adapter must pass:
+
+```text
+proposal-realization-conformance
+  1  speculative value observable before settlement
+  2  accept leaves the committed value visible through the SAME held
+     framework references
+  3  reject republishes the restored value through those same references
+  4  mixed structural/scalar publishes coherently — no transient half-state
+  5  remove/re-add does not retarget a held entity reference
+```
+
+Plus a per-framework mutation proof that the native carrier actually reruns:
+Angular signal dependency, Vue ref/reader, React `useSyncExternalStore`
+snapshot + subscription, Solid effect/accessor.
+
+This also fixes the uneven-adapter problem properly. Angular has 29 specs,
+Vue 6, React 2, Solid 1; the answer is a concrete contract every adapter
+passes, not bulk-creating framework tests or asking a future adapter author to
+guess which of Angular's 29 matter.
+
+```text
+PROPOSAL-0 kernel matrix   DONE — null survives
+        -> derive smallest public API
+        -> shared proposal-realization contract
+        -> Angular / Vue / React / Solid
+        -> packed-consumer proof
+        -> only then ship
+```
 
 #### WRITE-CONTEXT-0
 
