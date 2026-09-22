@@ -98,8 +98,9 @@ describe('V15BenchmarksComponent', () => {
     expect(component.rounds()).toBe(73);
     expect(component.roundInputError()).toBeNull();
     expect(
-      fixture.nativeElement.querySelector<HTMLInputElement>('#measured-rounds')
-        ?.value
+      (fixture.nativeElement as HTMLElement).querySelector<HTMLInputElement>(
+        '#measured-rounds'
+      )?.value
     ).toBe('73');
 
     component.setRoundInput('0');
@@ -109,8 +110,9 @@ describe('V15BenchmarksComponent', () => {
       'Enter a whole number from 1 to 1,000.'
     );
     expect(
-      fixture.nativeElement.querySelector<HTMLButtonElement>('.run-command')
-        ?.disabled
+      (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+        '.run-command'
+      )?.disabled
     ).toBe(true);
   });
 
@@ -248,7 +250,8 @@ describe('V15BenchmarksComponent', () => {
       .spyOn(engine, 'runInterleavedBenchmark')
       .mockImplementation(async (options) => ({
         workload: options.workload,
-        rounds: options.rounds,
+        // BenchmarkReport.rounds is required; the option is optional.
+        rounds: options.rounds ?? 0,
         warmupRounds: options.warmupRounds ?? 0,
         results: [],
       }));
