@@ -83,7 +83,7 @@ writeFileSync(
 writeFileSync(
   join(proj, 'src', 'main.ts'),
   `
-import { Component } from '@angular/core';
+import { Component, type Signal } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import {
   asReadonly,
@@ -93,7 +93,6 @@ import {
   signalTree,
   restoration,
   toWritableSignal,
-  type ReadonlyLocation,
 } from '@signal-tree/angular';
 
 type User = { id: number; name: string };
@@ -104,7 +103,7 @@ const tree = signalTree({
 }, { enhancers: [restoration(), batching()] });
 
 tree.$.users.addOne({ id: 1, name: 'Ada' });
-tree.batch(() => tree.$.count(1));
+tree.batch(() => tree.$.count.set(1));
 
 const derivedTree = signalTree(
   { count: 1 },
@@ -114,7 +113,7 @@ const derivedTree = signalTree(
   }
 );
 const reader = asReadonly(derivedTree);
-const doubled: ReadonlyLocation<number> = reader.$.doubled;
+const doubled: Signal<number> = reader.$.doubled;
 
 const ReadonlyStore = defineStore(
   () => signalTree(
@@ -124,7 +123,7 @@ const ReadonlyStore = defineStore(
   { expose: 'readonly' }
 );
 type Injected = InstanceType<typeof ReadonlyStore>;
-const injectedDoubled: ReadonlyLocation<number> = null as unknown as Injected['$']['doubled'];
+const injectedDoubled: Signal<number> = null as unknown as Injected['$']['doubled'];
 
 // Forms are COMPOSED, not provided. The ng-forms package is deleted, so this
 // fixture exercises the seam the project actually ships: an ordinary branch
@@ -162,12 +161,16 @@ import { computed, isSignal } from '@angular/core';
 import { signalTree } from '@signal-tree/angular';
 
 const tree = signalTree({ count: 1 });
-if (isSignal(tree.$.count)) {
-  throw new Error('Angular observation replaced a kernel-owned location');
+// The Angular-native realization makes leaves real Angular signals. This
+// asserted the opposite while leaves were kernel-owned locations observed by
+// Angular; inverted so the fixture proves the native realization shipped
+// rather than forbidding it.
+if (!isSignal(tree.$.count)) {
+  throw new Error('Angular leaf is not a native Angular signal');
 }
 const doubled = computed(() => tree.$.count() * 2);
 if (doubled() !== 2) throw new Error('Angular computed could not read a location');
-tree.$.count(2);
+tree.$.count.set(2);
 if (doubled() !== 4) throw new Error('Angular computed did not observe a location write');
 tree.destroy();
 `
@@ -265,4 +268,4 @@ try {
   process.exit(1);
 }
 
-console.log('✅ Angular package observes kernel-owned locations.');
+console.log('✅ Angular package realizes leaves as native Angular signals.');
