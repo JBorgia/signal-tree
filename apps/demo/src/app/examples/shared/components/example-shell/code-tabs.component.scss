@@ -162,21 +162,3 @@
     font-weight: 700;
   }
 }
-
-.code-tabs__tab:focus-visible,
-.code-tabs__copy:focus-visible,
-.code-tabs__pre:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: -3px;
-}
-
-.code-tabs__status {
-  margin: 0;
-  padding: 0 $spacing-lg $spacing-sm;
-  color: var(--color-neutral-100);
-  font-size: $text-xs;
-
-  &:empty {
-    padding: 0;
-  }
-}

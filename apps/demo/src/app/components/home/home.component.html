@@ -2,190 +2,165 @@
   <section class="home-hero">
     <div class="hero-inner">
       <div class="hero-copy">
-        <p class="hero-eyebrow">SignalTree · Typed reactive state</p>
-        <h1>Update one field. Keep the rest intact.</h1>
+        <p class="hero-eyebrow">SignalTree v15</p>
+        <h1>State authority without state ceremony</h1>
         <p class="hero-lede">
-          Work with nested data directly. Keep individual records reactive. Add
-          undo that preserves unrelated server updates.
+          A framework-neutral causal state kernel with framework-native
+          observation. Keep state, identity, authority, and coherent operations
+          in one model without making a framework realization another store.
         </p>
-        <div class="hero-actions">
-          <a href="#try-it" class="action action-primary"
-            >Try it below <span aria-hidden="true">↓</span></a
-          >
-          <a href="#install" class="action action-secondary">Start building</a>
-        </div>
         <aside class="rewrite-note" aria-label="SignalTree version guidance">
           <p>
-            <strong>On v14?</strong> v15 is a rewrite. Historical guidance stays
-            available.
+            <strong>Moving from v14?</strong> Version 15 is a ground-up causal
+            rewrite. The complete v14 site remains available as historical
+            guidance for applications still using <code>@signaltree/*</code>.
           </p>
-          <a href="/v14/">v14 docs <span aria-hidden="true">↗</span></a>
+          <a href="/v14/"
+            >Open the preserved v14 site <span aria-hidden="true">↗</span></a
+          >
         </aside>
+        <div class="hero-actions">
+          <a routerLink="/start" class="action action-primary"
+            >Start building</a
+          >
+          <a routerLink="/why-causality" class="action action-secondary">
+            Why causality matters
+          </a>
+        </div>
       </div>
+
       <div class="hero-mark" aria-hidden="true">
         <img src="/signaltree-mark.png" alt="SignalTree" data-brand-mark />
       </div>
     </div>
   </section>
 
-  <section id="try-it" class="home-section" aria-labelledby="try-title">
+  <section class="authority-band" aria-labelledby="authority-title">
     <div class="content-shell">
-      <header class="section-heading">
-        <p>One record. One direct update.</p>
-        <h2 id="try-title">Try an order edit.</h2>
-        <span
-          >Make an order urgent, receive a shipping update, then undo only your
-          edit.</span
-        >
+      <header class="section-heading section-heading-compact">
+        <p>One state authority, three distinct questions</p>
+        <h2 id="authority-title">Know who decided and what observes</h2>
       </header>
-      <div class="demo-layout">
-        <div class="live-example">
-          <div class="order-list" aria-label="Live orders">
-            @for (order of orders; track order.id(); let index = $index) {
-            <article
-              class="order"
-              [class.order-edited]="order.priority() === 'Rush'"
-              [attr.data-order]="order.id()"
-            >
-              <div class="order-heading">
-                <h3>Order {{ order.id() }}</h3>
-                <span>{{ order.customer() }}</span>
-              </div>
-              <dl>
-                <div>
-                  <dt>Priority</dt>
-                  <dd data-priority>{{ priorityReaders[index]().value }}</dd>
-                </div>
-                <div>
-                  <dt>Status</dt>
-                  <dd data-status>{{ order.status() }}</dd>
-                </div>
-              </dl>
-              <p class="reader-count">
-                Priority reader runs: {{ priorityReaders[index]().runs }}
-              </p>
-            </article>
-            }
-          </div>
-          <div class="demo-actions">
-            <button
-              type="button"
-              class="action action-primary"
-              (click)="prioritize()"
-              [disabled]="orders[0].priority() === 'Rush'"
-            >
-              1. Make it Rush
-            </button>
-            <button
-              type="button"
-              class="action action-secondary"
-              (click)="receiveUpdate()"
-              [disabled]="orders[0].status() === 'Shipped'"
-            >
-              2. Receive server update
-            </button>
-            <button
-              type="button"
-              class="action action-secondary"
-              (click)="undo()"
-              [disabled]="!canUndo()"
-            >
-              3. Undo my edit
-            </button>
-            <button type="button" class="reset-button" (click)="reset()">
-              Reset
-            </button>
-          </div>
-          <p class="demo-message" role="status">{{ message() }}</p>
-          <p class="reader-note">
-            Counts show computed reader evaluations, not browser rendering.
-          </p>
-          <a routerLink="/restoration" class="text-link"
-            >How optional undo works <span aria-hidden="true">→</span></a
-          >
-        </div>
-        <st-code-tabs [files]="example" />
-      </div>
-      <div class="benefits">
-        <article>
-          <h3>Write the field you mean</h3>
+
+      <div class="authority-grid">
+        <article class="authority-item authority-item-authored">
+          <p class="item-number">01</p>
+          <h3>Authored work</h3>
           <p>
-            Read and write nested fields directly, with TypeScript checking each
-            path.
+            Ordinary application writes belong to the operation that made the
+            decision. Restoration designation is optional and separate.
           </p>
         </article>
-        <article>
-          <h3>Track each record</h3>
-          <p>Subscribe to the fields and records your screen uses.</p>
-        </article>
-        <article>
-          <h3>Undo without losing updates</h3>
+        <article class="authority-item authority-item-external">
+          <p class="item-number">02</p>
+          <h3>External truth</h3>
           <p>
-            Reverse a designated user edit while keeping unrelated server
-            changes.
+            <code>external()</code> marks values whose decision belonged to
+            another authority. They remain visible and causally relevant.
           </p>
-          <a routerLink="/why-causality" class="text-link"
-            >Why this matters →</a
-          >
+        </article>
+        <article class="authority-item authority-item-framework">
+          <p class="item-number">03</p>
+          <h3>Framework-native observation</h3>
+          <p>
+            Framework realizations receive invalidation and reread canonical
+            truth. They connect the kernel to observation; they do not mirror
+            its state.
+          </p>
         </article>
       </div>
     </div>
   </section>
 
-  <section id="install" class="home-section" aria-labelledby="install-title">
-    <div class="content-shell install-layout">
-      <div>
-        <p class="section-kicker">Start with one feature</p>
-        <h2 id="install-title">Use it in your app.</h2>
-        <p>Choose your framework and try one feature.</p>
-      </div>
-      <div class="install-panel">
-        <div
-          class="framework-options"
-          role="group"
-          aria-label="Choose your framework"
-        >
-          @for (entry of packages; track entry.id) {
-          <button
-            type="button"
-            [attr.aria-pressed]="selectedPackage().id === entry.id"
-            (click)="selectedPackage.set(entry)"
+  <section class="home-section" aria-labelledby="paths-title">
+    <div class="content-shell">
+      <header class="section-heading">
+        <p>Choose an entry point</p>
+        <h2 id="paths-title">Move from model to evidence</h2>
+        <span>
+          Start with the question you need answered. Current guidance stays
+          separate from historical release material.
+        </span>
+      </header>
+
+      <div class="path-grid">
+        @for (path of paths; track path.title) {
+        <article class="path-card">
+          <p class="path-eyebrow">{{ path.eyebrow }}</p>
+          <h3>{{ path.title }}</h3>
+          <p>{{ path.description }}</p>
+          <a [routerLink]="path.route"
+            >{{ path.action }} <span aria-hidden="true">→</span></a
           >
-            {{ entry.label }}
-          </button>
-          }
-        </div>
-        <pre><code>{{ selectedPackage().command }}</code></pre>
-        <a
-          routerLink="/docs"
-          [queryParams]="{ package: selectedPackage().id }"
-          class="action action-primary"
-          >Open {{ selectedPackage().label }} setup →</a
-        >
+        </article>
+        }
       </div>
-      <div class="fit-grid">
+    </div>
+  </section>
+
+  <section
+    class="home-section home-section-ink"
+    aria-labelledby="grammar-title"
+  >
+    <div class="content-shell grammar-layout">
+      <div class="grammar-copy">
+        <p class="section-kicker">The public state grammar</p>
+        <h2 id="grammar-title">Location shape determines access shape</h2>
         <p>
-          <strong>A good fit</strong>Nested forms, live record lists, and edits
-          that need undo.
+          The tree is a controller. Root and branch accessors are callable for
+          reads, whole-value replacements, and updater functions. Angular
+          terminal leaves are native signals with <code>.set()</code> and
+          <code>.update()</code>; <code>leaf(value)</code> declares where
+          traversal stops.
         </p>
-        <p>
-          <strong>Start small</strong>A few local values may need only native
-          signals.
-          <a routerLink="/benchmarks">Run the benchmarks in your browser →</a>
-        </p>
+        <a routerLink="/architecture-overview#accessor-grammar">
+          See the complete state grammar <span aria-hidden="true">→</span>
+        </a>
       </div>
-      <nav class="adoption-links" aria-label="Evaluate adoption">
-        <a routerLink="/migrate">Migration</a>
-        <a routerLink="/architecture-overview">Architecture</a>
-        <a
-          href="https://github.com/JBorgia/signal-tree/blob/main/docs/support-policy.md"
-          >Support policy</a
-        >
-        <a href="https://github.com/JBorgia/signal-tree/releases">Releases</a>
-        <a href="https://github.com/JBorgia/signal-tree/blob/main/LICENSE"
-          >Apache-2.0</a
-        >
-      </nav>
+      <st-code-tabs [files]="stateGrammar" />
+    </div>
+  </section>
+
+  <section class="home-section" aria-labelledby="packages-title">
+    <div class="content-shell">
+      <header class="section-heading">
+        <p>Package ownership</p>
+        <h2 id="packages-title">Use one facade for application code</h2>
+        <span>
+          Framework packages forward kernel APIs and add their native
+          observation boundary. Framework-neutral libraries import the kernel.
+        </span>
+      </header>
+
+      <div class="package-list">
+        @for (entry of packages; track entry.name; let index = $index) {
+        <article class="package-row">
+          <span class="package-index">0{{ index + 1 }}</span>
+          <div>
+            <h3>
+              <code>{{ entry.name }}</code>
+            </h3>
+            <p class="package-role">{{ entry.role }}</p>
+          </div>
+          <p>{{ entry.detail }}</p>
+          <a routerLink="/docs" [queryParams]="{ package: entry.package }">
+            Read docs <span aria-hidden="true">→</span>
+          </a>
+        </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="closing-band">
+    <div class="content-shell closing-inner">
+      <div>
+        <p>Build from verified semantics</p>
+        <h2>
+          Start with one tree. Add only the capabilities the product needs.
+        </h2>
+      </div>
+      <a routerLink="/start" class="action action-primary">Take the tour</a>
     </div>
   </section>
 </div>

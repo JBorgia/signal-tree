@@ -1,45 +1,100 @@
 <div class="fundamentals-page layout-frame">
-  <st-example
-    id="signals-basics"
-    heading="Nested state. Direct updates."
-    [headingLevel]="1"
-    intro="Change the item count or price. The total updates from the same typed state."
-    [code]="codeFiles"
-  >
-    <div class="sequence-step sequence-step--interactive">
-      <h2>{{ tree.$.customer.name() }}'s cart</h2>
-      <div class="write-controls">
-        <button type="button" (click)="removeItem()">Remove item</button>
-        <output aria-label="Item count">{{ tree.$.cart.itemCount() }}</output>
-        <button type="button" (click)="addItem()">Add item</button>
-      </div>
-      <label for="unit-price">Unit price</label>
-      <input
-        id="unit-price"
-        type="number"
-        min="0"
-        [value]="tree.$.cart.unitPrice()"
-        (input)="setUnitPrice(+$any($event.target).value)"
-      />
-      <dl class="derived-result" aria-live="polite">
-        <div>
-          <dt>Summary</dt>
-          <dd>{{ tree.$.summary() }}</dd>
+  <header class="fundamentals-hero">
+    <p class="eyebrow">Learn / fundamentals</p>
+    <h1>State shape becomes the API.</h1>
+    <p class="hero-copy">
+      Start with one object. SignalTree preserves its shape behind
+      <code>$</code>, gives leaves signal-style writes, and declares derived
+      values in the same construction call.
+    </p>
+  </header>
+
+  <section id="signals-basics" class="sequence" aria-labelledby="sequence-heading">
+    <header class="section-heading">
+      <p class="eyebrow">Curated sequence</p>
+      <h2 id="sequence-heading">Four steps before specialized concepts</h2>
+    </header>
+
+    <div class="sequence-grid">
+      <article class="sequence-step">
+        <span class="step-index">01</span>
+        <h3>Declare state shape</h3>
+        <p>The initial object defines the paths consumers can read.</p>
+        <pre><code>signalTree(&#123;
+  cart: &#123; itemCount: 2, unitPrice: 24 &#125;,
+  customer: &#123; name: 'Ada' &#125;
+&#125;)</code></pre>
+      </article>
+
+      <article class="sequence-step">
+        <span class="step-index">02</span>
+        <h3>Read through <code>$</code></h3>
+        <p>Root and branch accessors are callable; terminal leaves are native Angular signals.</p>
+        <dl class="live-values">
+          <div>
+            <dt>tree.$.cart()</dt>
+            <dd>
+              {{ tree.$.cart.itemCount() }} items at
+              {{ tree.$.cart.unitPrice() }} each
+            </dd>
+          </div>
+          <div><dt>tree.$.customer.name()</dt><dd>{{ tree.$.customer.name() }}</dd></div>
+        </dl>
+      </article>
+
+      <article class="sequence-step sequence-step--interactive">
+        <span class="step-index">03</span>
+        <h3>Write through native leaf signals</h3>
+        <p>
+          Use <code>.set()</code> to replace a leaf, or <code>.update()</code>
+          to derive its next value. Branches retain whole-value call syntax.
+        </p>
+        <div class="write-controls">
+          <button type="button" (click)="removeItem()">Remove item</button>
+          <output>{{ tree.$.cart.itemCount() }}</output>
+          <button type="button" (click)="addItem()">Add item</button>
         </div>
-        <div>
-          <dt>Subtotal</dt>
-          <dd>{{ tree.$.subtotal() }}</dd>
-        </div>
-      </dl>
+        <label for="unit-price">Unit price</label>
+        <input
+          id="unit-price"
+          type="number"
+          min="0"
+          [value]="tree.$.cart.unitPrice()"
+          (input)="setUnitPrice(+$any($event.target).value)"
+        />
+      </article>
+
+      <article class="sequence-step sequence-step--derived">
+        <span class="step-index">04</span>
+        <h3>Declare derived state once</h3>
+        <p>Angular-native <code>computed()</code> values join the tree through the construction config.</p>
+        <pre><code>derived: ($) =&gt; (&#123;
+  subtotal: computed(() =&gt;
+    $.cart.itemCount() * $.cart.unitPrice()
+  )
+&#125;)</code></pre>
+        <dl class="derived-result">
+          <div><dt>Summary</dt><dd>{{ tree.$.summary() }}</dd></div>
+          <div><dt>Subtotal</dt><dd>{{ tree.$.subtotal() }}</dd></div>
+        </dl>
+      </article>
     </div>
-  </st-example>
-  <nav class="concept-links" aria-label="Next SignalTree concepts">
-    @for (concept of nextConcepts; track concept.route) {
-    <a [routerLink]="concept.route"
-      ><strong>{{ concept.title }}</strong
-      ><small>{{ concept.description }}</small
-      ><span aria-hidden="true">→</span></a
-    >
-    }
-  </nav>
+  </section>
+
+  <section class="handoff" aria-labelledby="handoff-heading">
+    <header class="section-heading">
+      <p class="eyebrow">Continue by concept</p>
+      <h2 id="handoff-heading">Dedicated pages own the next questions.</h2>
+    </header>
+    <nav class="concept-links" aria-label="Next SignalTree concepts">
+      @for (concept of nextConcepts; track concept.route) {
+      <a [routerLink]="concept.route">
+        <span>{{ concept.index }}</span>
+        <strong>{{ concept.title }}</strong>
+        <small>{{ concept.description }}</small>
+        <span aria-hidden="true">&rarr;</span>
+      </a>
+      }
+    </nav>
+  </section>
 </div>

@@ -1,86 +1,20 @@
 import { expect, test } from '@playwright/test';
 
-/**
- * These three tests were written against a ranked `.result-table` of
- * `.result-row`s. That display was deliberately replaced by paired
- * `.butterfly` comparisons -- one figure per competitor, a baseline half and a
- * competitor half -- so the old selectors describe markup that no longer
- * exists. They assert the same PROPERTIES against the new display: the run
- * completes, every checked arm reports, nothing overflows at mobile or tablet
- * width, and the comparison bars stay inside their figure.
- */
-
-/** One baseline half plus one competitor half per comparison. */
-const COMPARISONS = 7;
-const WORKLOADS = 3;
-
-const horizontalOverflow = (page: import('@playwright/test').Page) =>
-  page.evaluate(
-    () =>
-      document.documentElement.scrollWidth -
-      document.documentElement.clientWidth
-  );
-
-/** Every comparison's bars must stay within the figure that owns them. */
-const barsEscapingTheirFigure = (page: import('@playwright/test').Page) =>
-  page.evaluate(() =>
-    Array.from(document.querySelectorAll('.butterfly')).flatMap((figure) => {
-      const bounds = figure.getBoundingClientRect();
-      return Array.from(figure.querySelectorAll('.paired-bars, .bar')).flatMap(
-        (part) => {
-          const box = part.getBoundingClientRect();
-          const escapes =
-            box.left < bounds.left - 1 || box.right > bounds.right + 1;
-          return escapes
-            ? [
-                {
-                  competitor: figure.getAttribute('data-competitor'),
-                  cls: part.getAttribute('class'),
-                  box: [box.left, box.right],
-                  figure: [bounds.left, bounds.right],
-                },
-              ]
-            : [];
-        }
-      );
-    })
-  );
-
-const runBenchmarks = async (page: import('@playwright/test').Page) => {
-  // Nothing is rendered before a run: `.butterfly` is 0 on a fresh load, so
-  // waiting for the full set is a real completion signal rather than a wait
-  // that was already satisfied.
-  await expect(page.locator('.butterfly')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Run benchmarks' }).click();
-  await expect(page.locator('.butterfly')).toHaveCount(COMPARISONS, {
-    timeout: 60_000,
-  });
-  await expect(page.locator('.benchmarks-page')).toHaveAttribute(
-    'aria-busy',
-    'false'
-  );
-  await expect(page.locator('.run-error')).toHaveCount(0);
-  // Every arm reported a median. Guards against a redesign that renders the
-  // figures but leaves them empty, which the counts alone would not catch.
-  const medians = await page
-    .locator('.pair-labels span')
-    .evaluateAll((spans) => spans.map((span) => span.textContent?.trim() ?? ''));
-  expect(medians).toHaveLength(COMPARISONS * 2);
-  expect(medians.every((text) => /ms$/.test(text))).toBe(true);
-};
-
 test('v15 browser spot-check completes every checked arm', async ({ page }) => {
   test.setTimeout(120_000);
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/benchmarks', { waitUntil: 'load' });
   await expect(
-    page.getByRole('heading', { name: 'Compare the work your app does.' })
+    page.getByRole('heading', {
+      name: 'Recurring application-state performance',
+    })
   ).toBeVisible();
   await expect(page.locator('.build-notice')).toHaveCount(0);
 
-  // --- run controls -------------------------------------------------------
   const measuredRounds = page.locator('#measured-rounds');
-  const runButton = page.getByRole('button', { name: 'Run benchmarks' });
+  const runButton = page.getByRole('button', {
+    name: 'Run recurring spot-check',
+  });
   await expect(measuredRounds).toHaveValue('25');
   await expect(page.locator('.benchmarks-page')).toHaveAttribute(
     'data-measured-rounds',
@@ -95,124 +29,367 @@ test('v15 browser spot-check completes every checked arm', async ({ page }) => {
   await measuredRounds.fill('0');
   await expect(measuredRounds).toHaveAttribute('aria-invalid', 'true');
   await expect(runButton).toBeDisabled();
-
-  // Depth is chosen by two aria-pressed buttons; each restores its own rounds.
-  const steady = page.getByRole('button', { name: 'Steady', exact: true });
-  const quick = page.getByRole('button', { name: 'Quick', exact: true });
-  await steady.click();
+  await page
+    .getByRole('button', { name: /Steady 100 measured rounds/ })
+    .click();
   await expect(measuredRounds).toHaveValue('100');
-  await expect(steady).toHaveAttribute('aria-pressed', 'true');
-  await quick.click();
+  await page.getByRole('button', { name: /Quick 25 measured rounds/ }).click();
   await expect(measuredRounds).toHaveValue('25');
-  await expect(quick).toHaveAttribute('aria-pressed', 'true');
 
-  // --- the run ------------------------------------------------------------
-  await runBenchmarks(page);
-  await expect(page.locator('.workload')).toHaveCount(WORKLOADS);
-  await expect(page.locator('.chart-key')).toHaveCount(WORKLOADS);
-  await expect(page.locator('.paired-bars')).toHaveCount(COMPARISONS);
-  await expect(page.locator('.bar-half')).toHaveCount(COMPARISONS * 2);
-  await expect(page.locator('.bar')).toHaveCount(COMPARISONS * 2);
+  await runButton.click();
+  await expect(page.locator('.result-row')).toHaveCount(13, {
+    timeout: 60_000,
+  });
+
+  await expect(page.locator('.run-error')).toHaveCount(0);
+  await expect(page.locator('body')).not.toContainText(/\bElf\b/i);
+  await expect(page.locator('.benchmarks-page')).toHaveAttribute(
+    'aria-busy',
+    'false'
+  );
+  await expect(page.locator('.result-table')).toHaveCount(3);
   await expect(page.locator('.development-badge')).toHaveCount(0);
+  await expect(page.locator('.range-label')).toHaveCount(13);
+  await expect(page.locator('.result-visual-track')).toHaveCount(13);
+  await expect(page.locator('.result-row .comparison-kind')).toHaveCount(13);
+  await expect(page.locator('.comparison-command')).toHaveCount(13);
+  await expect(page.locator('.implementation-source-links a')).toHaveCount(13);
+  await expect(page.locator('.evidence-line a')).toHaveCount(9);
+  await expect(page.locator('.phase-breakdown')).toHaveCount(3);
+  await expect(
+    page.locator('.result-row .comparison-kind', { hasText: 'Harness' })
+  ).toHaveCount(0);
+  await expect(page.locator('.spread')).toHaveCount(0);
 
-  // Every checked arm reported, and the baseline appears in each comparison.
-  for (const [label, count] of Object.entries({
-    'SignalTree Angular': COMPARISONS,
+  await expect(
+    page.getByRole('heading', { name: 'How each result is calculated' })
+  ).toBeVisible();
+
+  for (const workload of await page.locator('.workload').all()) {
+    const rows = workload.locator('.result-row');
+    const medians = await rows.evaluateAll((elements) =>
+      elements.map((element) => Number(element.getAttribute('data-median-ms')))
+    );
+    expect(medians).toEqual([...medians].sort((left, right) => left - right));
+    expect(
+      await rows.evaluateAll((elements) =>
+        elements.map((element) => Number(element.getAttribute('data-rank')))
+      )
+    ).toEqual(
+      Array.from({ length: await rows.count() }, (_, index) => index + 1)
+    );
+  }
+
+  for (const [expected, count] of Object.entries({
+    'SignalTree Angular': 3,
+    'SignalTree Kernel': 3,
     'NgRx Signals': 2,
     Akita: 3,
     'Redux Toolkit': 2,
   })) {
     await expect(
-      page.locator('.pair-labels strong', { hasText: label })
+      page.locator('.result-row .implementation strong', {
+        hasText: expected,
+      })
     ).toHaveCount(count);
   }
 
-  // Each workload still discloses what it measured and who qualified.
+  await expect(page.locator('.capability-admission')).toHaveCount(3);
   await expect(
-    page.locator('summary', { hasText: 'Exact results and implementation' })
-  ).toHaveCount(WORKLOADS);
-  await expect(
-    page.locator('summary', { hasText: 'What is measured and which libraries' })
-  ).toHaveCount(WORKLOADS);
-  await expect(page.locator('.capability-admission')).toHaveCount(WORKLOADS);
-  // Plain locators, not getByRole: these headings live inside the collapsed
-  // `.capability-admission` details, so they are absent from the
-  // accessibility tree until the reader opens it.
-  await expect(
-    page.locator('.capability-admission h3', {
-      hasText: 'First-party keyed entity state',
-    })
+    page.getByRole('heading', { name: 'First-party keyed entity state' })
   ).toHaveCount(2);
   await expect(
-    page.locator('.capability-admission h3', {
-      hasText: 'First-party linear undo over keyed state',
+    page.getByRole('heading', {
+      name: 'First-party linear undo over keyed state',
     })
   ).toHaveCount(1);
-
-  // --- claims that were withdrawn must not come back ----------------------
-  await expect(page.locator('body')).not.toContainText(/\bElf\b/i);
-  await expect(page.getByText('Raw Angular', { exact: false })).toHaveCount(0);
+  await expect(page.getByText('@ngrx/signals 21.1.1')).toHaveCount(2);
+  await expect(page.getByText('@reduxjs/toolkit 2.12.0')).toHaveCount(2);
   await expect(page.getByText('One-time cost', { exact: true })).toHaveCount(0);
   await expect(page.getByText('Ongoing cost', { exact: true })).toHaveCount(0);
-  await expect(page.getByText(/crossover/i)).toHaveCount(0);
-  await expect(page.getByText(/lifetime advantage/i)).toHaveCount(0);
+  await expect(page.getByText('Raw Angular', { exact: false })).toHaveCount(0);
   await expect(page.locator('[data-workload-id="initialization"]')).toHaveCount(
     0
   );
   await expect(page.locator('.value-proposition')).toHaveCount(0);
+  await expect(page.getByText(/crossover/i)).toHaveCount(0);
+  await expect(page.getByText(/lifetime advantage/i)).toHaveCount(0);
 
-  expect(await horizontalOverflow(page)).toBe(0);
-  expect(await barsEscapingTheirFigure(page)).toEqual([]);
+  const profileRows = page.locator('.steady-state-row');
+  await expect(profileRows).toHaveCount(3);
+  await expect(
+    page.getByRole('heading', {
+      name: 'What compounds after construction',
+    })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', {
+      name: 'What must survive underneath the numbers',
+    })
+  ).toBeVisible();
+  await expect(page.locator('.performance-priorities section')).toHaveCount(3);
+  await expect(page.locator('.construction-budget')).toContainText(
+    'Initialization is a budget, not an optimization target'
+  );
+  await expect(page.locator('.projection-condition')).toContainText(
+    'No workload is pooled into an aggregate score'
+  );
+  await expect(page.locator('.foundation-grid article')).toHaveCount(4);
+  await expect(page.locator('.foundation-evidence a')).toHaveCount(15);
+  await expect(page.locator('.foundation-ledger')).toContainText(
+    'Typed dot notation survives representation changes'
+  );
+  await expect(page.locator('.foundation-ledger')).toContainText(
+    'Measured; not globally optimal'
+  );
+  await expect(page.locator('.foundation-ledger')).toContainText(
+    'Measured; not proven optimal'
+  );
+  await expect(page.locator('.foundation-ledger')).toContainText(
+    'Optimistic and causal work avoids a future state-model rewrite'
+  );
+  await expect(page.locator('.foundation-verdict')).toContainText(
+    'Speed and density are measured independently'
+  );
+  await expect(page.locator('.foundation-ledger')).toContainText(
+    'tools/bench-capability-density.mjs'
+  );
+  await expect(page.locator('.foundation-ledger')).toContainText(
+    'tools/bench-update-matrix.mjs'
+  );
+  for (const row of await profileRows.all()) {
+    const values = await row.evaluate((element) => ({
+      measured: Number(element.getAttribute('data-measured-median-ms')),
+      operations: Number(element.getAttribute('data-measured-operations')),
+      perThousand: Number(element.getAttribute('data-per-thousand-ms')),
+      perTenThousand: Number(element.getAttribute('data-per-ten-thousand-ms')),
+      perHundredThousand: Number(
+        element.getAttribute('data-per-hundred-thousand-ms')
+      ),
+      position: Number(element.getAttribute('data-position')),
+      cohortSize: Number(element.getAttribute('data-cohort-size')),
+    }));
+    expect(Number.isFinite(values.measured)).toBe(true);
+    expect(values.operations).toBeGreaterThan(0);
+    expect(values.perThousand).toBeCloseTo(
+      (values.measured / values.operations) * 1_000,
+      8
+    );
+    expect(values.perTenThousand).toBeCloseTo(values.perThousand * 10, 8);
+    expect(values.perHundredThousand).toBeCloseTo(values.perThousand * 100, 8);
+    expect(values.position).toBeGreaterThanOrEqual(1);
+    expect(values.position).toBeLessThanOrEqual(values.cohortSize);
+  }
+  for (const selector of [
+    '.steady-state-heading h2',
+    '.steady-state-row > strong',
+    '.steady-state-row > span strong',
+  ]) {
+    const contrastRatio = await page
+      .locator(selector)
+      .first()
+      .evaluate((element) => {
+        const parse = (color: string): [number, number, number, number] => {
+          const parts = color.match(/[\d.]+/g)?.map(Number) ?? [];
+          return [parts[0] ?? 0, parts[1] ?? 0, parts[2] ?? 0, parts[3] ?? 1];
+        };
+        const luminance = ([red, green, blue]: readonly number[]): number => {
+          const channels = [red, green, blue].map((channel) => {
+            const normalized = channel / 255;
+            return normalized <= 0.04045
+              ? normalized / 12.92
+              : ((normalized + 0.055) / 1.055) ** 2.4;
+          });
+          return (
+            0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]
+          );
+        };
+        const foreground = parse(getComputedStyle(element).color);
+        let surface: Element | null = element.parentElement;
+        while (
+          surface &&
+          parse(getComputedStyle(surface).backgroundColor)[3] === 0
+        ) {
+          surface = surface.parentElement;
+        }
+        const background = parse(
+          surface
+            ? getComputedStyle(surface).backgroundColor
+            : 'rgb(255, 255, 255)'
+        );
+        const lighter = Math.max(luminance(foreground), luminance(background));
+        const darker = Math.min(luminance(foreground), luminance(background));
+        return (lighter + 0.05) / (darker + 0.05);
+      });
+    expect(contrastRatio).toBeGreaterThanOrEqual(4.5);
+  }
+
+  const kernelCollectionMedian = Number(
+    await page
+      .locator(
+        '[data-workload-id="collection"] [data-arm-id="signaltree-kernel"]'
+      )
+      .getAttribute('data-median-ms')
+  );
+  await page.getByRole('button', { name: 'Kernel realization' }).click();
+  await expect(page.locator('.steady-state-value')).toHaveAttribute(
+    'data-profile-arm-id',
+    'signaltree-kernel'
+  );
+  expect(
+    Number(
+      await page
+        .locator('[data-profile-workload="collection"]')
+        .getAttribute('data-measured-median-ms')
+    )
+  ).toBe(kernelCollectionMedian);
+
+  const restorationProvenance = {
+    'signaltree-angular': 'Built-in history',
+    'signaltree-kernel': 'Built-in history',
+    akita: 'First-party history add-on',
+  };
+  for (const [armId, provenance] of Object.entries(restorationProvenance)) {
+    await expect(
+      page.locator(
+        `[data-workload-id="restoration"] [data-arm-id="${armId}"] .comparison-kind`
+      )
+    ).toHaveText(provenance);
+  }
+
+  const comparisonTrigger = page.locator(
+    '[data-workload-id="restoration"] [data-arm-id="akita"] .comparison-command'
+  );
+  await comparisonTrigger.click();
+  const comparisonDialog = page.locator('.comparison-dialog');
+  await expect(comparisonDialog).toBeVisible();
+  await expect(comparisonDialog).toContainText('First-party history add-on');
+  await expect(comparisonDialog).toContainText('@datorama/akita 8.0.1');
+  await expect(
+    comparisonDialog.getByRole('link', {
+      name: 'Akita StateHistoryPlugin documentation',
+    })
+  ).toHaveAttribute(
+    'href',
+    'https://opensource.salesforce.com/akita/docs/plugins/state-history/'
+  );
+  await expect(comparisonDialog).toContainText(
+    'attaches StateHistoryPlugin to the real Akita QueryEntity'
+  );
+  await page.keyboard.press('Escape');
+  await expect(comparisonDialog).not.toBeVisible();
+  await expect(comparisonTrigger).toBeFocused();
+
+  await comparisonTrigger.click();
+  await comparisonDialog.getByRole('button', { name: 'Close' }).click();
+  await expect(comparisonDialog).not.toBeVisible();
+
+  expect(
+    await page
+      .locator('.result-row')
+      .first()
+      .evaluate(
+        (element) =>
+          getComputedStyle(element).gridTemplateColumns.split(' ').length
+      )
+  ).toBe(5);
+
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth
+    )
+  ).toBe(0);
 });
 
-test('paired comparisons stack without overflow on mobile', async ({
+test('ranked result displays stack without overflow on mobile', async ({
   page,
 }) => {
   test.setTimeout(120_000);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/benchmarks', { waitUntil: 'load' });
-  await runBenchmarks(page);
+  await page.getByRole('button', { name: 'Run recurring spot-check' }).click();
+  await expect(page.locator('.result-row')).toHaveCount(13, {
+    timeout: 60_000,
+  });
 
-  expect(await horizontalOverflow(page)).toBe(0);
-  expect(await barsEscapingTheirFigure(page)).toEqual([]);
+  const firstRow = page.locator('.result-row').first();
+  expect(
+    await firstRow.evaluate(
+      (element) =>
+        getComputedStyle(element).gridTemplateColumns.split(' ').length
+    )
+  ).toBe(2);
+  expect(
+    (await firstRow.locator('.result-visual-track').boundingBox())?.width
+  ).toBeGreaterThan(150);
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth
+    )
+  ).toBe(0);
 
-  // The halves stack rather than sitting side by side at this width, and the
-  // figure still fits the viewport's content box.
-  const figure = page.locator('.butterfly').first();
-  const box = await figure.boundingBox();
-  expect(box?.width).toBeLessThanOrEqual(390);
-  expect(box?.width).toBeGreaterThan(150);
+  await page.locator('.comparison-command').first().click();
+  const dialog = page.locator('.comparison-dialog');
+  await expect(dialog).toBeVisible();
+  const dialogBox = await dialog.boundingBox();
+  expect(dialogBox?.width).toBeLessThanOrEqual(374);
+  expect(dialogBox?.height).toBeLessThanOrEqual(828);
 
-  // Bars stay measurable rather than collapsing to nothing.
-  const widths = await page
-    .locator('.butterfly')
-    .first()
-    .locator('.bar')
-    .evaluateAll((bars) =>
-      bars.map((bar) => bar.getBoundingClientRect().width)
-    );
-  expect(widths).toHaveLength(2);
-  expect(Math.max(...widths)).toBeGreaterThan(0);
+  expect(
+    await page
+      .locator('.steady-state-row')
+      .first()
+      .evaluate(
+        (element) =>
+          getComputedStyle(element).gridTemplateColumns.split(' ').length
+      )
+  ).toBe(1);
+  expect(
+    (await page.locator('.profile-realization').boundingBox())?.width
+  ).toBeLessThanOrEqual(358);
 });
 
-test('paired comparisons retain their bars at the tablet breakpoint', async ({
+test('ranked result displays retain visual tracks at the tablet breakpoint', async ({
   page,
 }) => {
   test.setTimeout(120_000);
   await page.setViewportSize({ width: 768, height: 900 });
   await page.goto('/benchmarks', { waitUntil: 'load' });
-  await runBenchmarks(page);
+  await page.getByRole('button', { name: 'Run recurring spot-check' }).click();
+  await expect(page.locator('.result-row')).toHaveCount(13, {
+    timeout: 60_000,
+  });
 
-  expect(await horizontalOverflow(page)).toBe(0);
-  expect(await barsEscapingTheirFigure(page)).toEqual([]);
-
-  const figure = page.locator('.butterfly').first();
-  const figureBox = await figure.boundingBox();
-  expect(figureBox?.width).toBeGreaterThan(250);
-  expect(figureBox?.width).toBeLessThanOrEqual(768);
-
-  const track = await figure.locator('.paired-bars').boundingBox();
-  expect(track?.width).toBeGreaterThan(250);
+  const firstRow = page.locator('.result-row').first();
+  expect(
+    await firstRow.evaluate(
+      (element) =>
+        getComputedStyle(element).gridTemplateColumns.split(' ').length
+    )
+  ).toBe(3);
+  expect(
+    (await firstRow.locator('.result-visual-track').boundingBox())?.width
+  ).toBeGreaterThan(250);
+  expect(
+    await page
+      .locator('.steady-state-row')
+      .first()
+      .evaluate(
+        (element) =>
+          getComputedStyle(element).gridTemplateColumns.split(' ').length
+      )
+  ).toBe(2);
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth
+    )
+  ).toBe(0);
 });
 
 for (const legacyPath of ['/benchmark', '/realistic-comparison']) {
@@ -222,7 +399,7 @@ for (const legacyPath of ['/benchmark', '/realistic-comparison']) {
     await expect(page).toHaveURL(/\/benchmarks$/);
     await expect(
       page.getByRole('heading', {
-        name: 'Compare the work your app does.',
+        name: 'Recurring application-state performance',
       })
     ).toBeVisible();
   });

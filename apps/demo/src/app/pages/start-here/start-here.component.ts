@@ -1,6 +1,14 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
+interface NextStepCard {
+  audience: string;
+  title: string;
+  description: string;
+  route: string;
+  cta: string;
+}
+
 @Component({
   selector: 'app-start-here',
   standalone: true,
@@ -10,53 +18,109 @@ import { RouterModule } from '@angular/router';
   styleUrl: './start-here.component.scss',
 })
 export class StartHereComponent {
-  readonly firstFeatureCode = `import { inject } from '@angular/core';
-import { defineStore, signalTree } from '@signal-tree/angular';
+  readonly mentalModelCode = `// 1. Initialize with a plain JSON shape
+const tree = signalTree({
+  user: { name: 'Ada', age: 36 },
+  count: 0,
+});
 
-export const OrdersStore = defineStore(() => signalTree({
-  order: { customer: 'Ada', priority: 'Standard' },
-}));
+// 2. Read by calling — fully typed, deeply nested
+tree.$.user.name();          // 'Ada'  (leaf: an Angular signal)
+tree.$.user();               // { name: 'Ada', age: 36 }  (branch: callable)
+tree.$.count();              // 0
 
-// Add OrdersStore to your feature component's providers.
-// In that component's injection context:
-const orders = inject(OrdersStore);
-orders.$.order.priority(); // 'Standard'
-orders.$.order.priority.set('Rush');
-// The providing injector owns cleanup.`;
+// 3. Angular leaves use native signal writes
+tree.$.user.name.set('Bo');
+tree.$.count.update((count) => count + 1);
 
-  readonly nextSteps = [
+// 4. Branches are callable — the value form supplies the WHOLE next value
+tree.$.user({ name: 'Bo', age: 37 });
+// ...and the updater form is how you patch
+tree.$.user((u) => ({ ...u, age: 38 }));`;
+
+  readonly ngrxCounterCode = `// counter.actions.ts
+export const increment = createAction('[Counter] Increment');
+export const reset = createAction('[Counter] Reset');
+
+// counter.reducer.ts
+export const counterReducer = createReducer(
+  0,
+  on(increment, (state) => state + 1),
+  on(reset, () => 0)
+);
+
+// counter.selectors.ts
+export const selectCount = createFeatureSelector<number>('count');
+
+// counter.component.ts
+@Component({ /* ... */ })
+export class CounterComponent {
+  count$ = this.store.select(selectCount);
+  constructor(private store: Store) {}
+  inc() { this.store.dispatch(increment()); }
+  reset() { this.store.dispatch(reset()); }
+}`;
+
+  readonly signalTreeCounterCode = `// counter.tree.ts
+export const counterTree = signalTree({ count: 0 });
+
+// counter.component.ts
+@Component({ /* ... */ })
+export class CounterComponent {
+  count = counterTree.$.count;
+  inc() { counterTree.$.count.update((count) => count + 1); }
+  reset() { counterTree.$.count.set(0); }
+}`;
+
+  readonly architectureCode = `// app.tree.ts — one runtime tree, typed slices
+export const appTree = signalTree({
+  user: { name: '', email: '' },
+  ui: { theme: 'light', sidebarOpen: false },
+  cart: { items: [] as CartItem[], total: 0 },
+}, {
+  enhancers: [devTools()],
+  derived: appDerived,
+});
+
+// Use it anywhere — features get typed slices
+@Component({ /* ... */ })
+export class CartView {
+  items = appTree.$.cart.items;
+  total = appTree.$.cart.total;
+}`;
+
+  readonly nextSteps: NextStepCard[] = [
     {
-      audience: 'Angular',
-      title: 'Native signals and DI',
+      audience: "I'm ready to build",
+      title: 'Run the fundamentals',
       description:
-        'Install, provide an owned store, and expose state and operations.',
-      route: '/docs',
-      package: 'angular',
-      cta: 'Angular setup →',
+        'Open a working playground with v15 construction, EntityMap, callable branches, external truth, transactions, and restoration.',
+      route: '/examples/fundamentals',
+      cta: 'Open fundamentals →',
     },
     {
-      audience: 'React',
-      title: 'Observe selected state',
-      description: 'Create an owner and subscribe through React hooks.',
-      route: '/docs',
-      package: 'react',
-      cta: 'React setup →',
+      audience: "I'm migrating from NgRx",
+      title: 'Read the migration recipe',
+      description:
+        'Mechanical mapping: actions → operations, reducers → callable derivations, selectors → computed values. With a phased rollout playbook.',
+      route: '/migrate',
+      cta: 'Open migration recipe →',
     },
     {
-      audience: 'Vue',
-      title: 'Native refs',
-      description: 'Connect a tree to Vue and dispose it with its scope.',
+      audience: 'I want the full reference',
+      title: 'Browse package docs',
+      description:
+        'Browse the kernel, Angular realization, and React observation package surfaces.',
       route: '/docs',
-      package: 'vue',
-      cta: 'Vue setup →',
+      cta: 'Open docs →',
     },
     {
-      audience: 'TypeScript',
-      title: 'Framework-neutral state',
-      description: 'Use the kernel directly and own the tree lifetime.',
-      route: '/docs',
-      package: 'kernel',
-      cta: 'TypeScript setup →',
+      audience: 'I need architecture evidence',
+      title: 'Inspect the verified boundaries',
+      description:
+        'Trace package ownership, causal authority, restoration designation, EntityMap identity, and Link to their source evidence.',
+      route: '/architecture-overview',
+      cta: 'Open architecture →',
     },
   ];
 }

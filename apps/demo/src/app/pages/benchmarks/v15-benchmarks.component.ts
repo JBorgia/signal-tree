@@ -4,7 +4,6 @@ import {
   computed,
   ElementRef,
   isDevMode,
-  OnDestroy,
   signal,
   viewChild,
 } from '@angular/core';
@@ -18,26 +17,188 @@ import {
   yieldToBrowserTask,
 } from './v15-benchmark.engine';
 import {
+  BenchmarkPackageReference,
+  BenchmarkSource,
   createV15BenchmarkSuites,
   DEFAULT_V15_BENCHMARK_CONFIG,
   V15BenchmarkArm,
   V15BenchmarkConfig,
   V15_BENCHMARK_SOURCE_PATHS,
+  V15_BENCHMARK_SOURCE_URLS,
   V15BenchmarkSuite,
 } from './v15-benchmark.workloads';
+import { ANGULAR_NATIVE_AA_BENCHMARK } from './angular-native-aa.generated';
+import { ANGULAR_NATIVE_MEMORY_BENCHMARK } from './angular-native-memory.generated';
+import { ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK } from './angular-native-vs-universal.generated';
 
 type BenchmarkMode = 'quick' | 'steady';
 type SignalTreeProfileArmId = 'signaltree-angular' | 'signaltree-kernel';
+type RecurringWorkloadId = 'collection' | 'projection' | 'restoration';
 
 interface ActiveComparison {
   readonly suite: V15BenchmarkSuite;
   readonly arm: V15BenchmarkArm;
 }
 
-interface ButterflyPair {
-  readonly baseline: BenchmarkArmResult;
-  readonly competitor: BenchmarkArmResult;
+interface ValueFoundation {
+  readonly status: string;
+  readonly title: string;
+  readonly durableValue: string;
+  readonly currentCost: string;
+  readonly evidence: readonly string[];
 }
+
+interface SteadyStateProfile {
+  readonly workloadId: RecurringWorkloadId;
+  readonly title: string;
+  readonly unit: string;
+  readonly result: BenchmarkArmResult;
+  readonly operations: number;
+  readonly position: number;
+  readonly cohortSize: number;
+}
+
+interface AngularLeafComparisonRow {
+  readonly operation: string;
+  readonly universal: string;
+  readonly native: string;
+  readonly pairedDelta: string;
+  readonly pairedRange: string;
+  readonly controlRange: string;
+  readonly disposition: 'overhead' | 'improvement' | 'neutral';
+  readonly interpretation: string;
+}
+
+interface AngularLeafMemoryRow {
+  readonly observation: string;
+  readonly universal: string;
+  readonly native: string;
+  readonly delta: string;
+  readonly collection: string;
+}
+
+const ANGULAR_LEAF_OPERATION_LABELS = {
+  'scalar-read': 'Scalar read',
+  'scalar-replace': 'Scalar replacement',
+  'scalar-derive': 'Scalar derivation',
+  'angular-fanout-1': 'Angular fan-out 1',
+  'angular-fanout-10': 'Angular fan-out 10',
+  'angular-fanout-100': 'Angular fan-out 100',
+  'angular-chain-10': 'Derived chain depth 10',
+  'angular-diamond': 'Derived diamond',
+  'construction-10': 'Construct 10 leaves',
+  'construction-100': 'Construct 100 leaves',
+  'construction-1000': 'Construct 1,000 leaves',
+} as const;
+
+const formatNanoseconds = (value: number): string =>
+  value < 1_000
+    ? `${value.toFixed(2)} ns`
+    : `${(value / 1_000).toFixed(2)} us`;
+
+const formatPercent = (value: number): string =>
+  `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
+
+const formatPercentRange = (low: number, high: number): string =>
+  `${formatPercent(low)} to ${formatPercent(high)}`;
+
+const createAngularLeafRows = (): readonly AngularLeafComparisonRow[] =>
+  ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.results.map((result) => {
+    const control = ANGULAR_NATIVE_AA_BENCHMARK.results.find(
+      (candidate) => candidate.operation === result.operation
+    );
+    if (!control) {
+      throw new Error(`Missing A/A control for ${result.operation}`);
+    }
+
+    const disposition =
+      result.pairedDeltaPct.p90 < 0 &&
+      result.pairedDeltaPct.p90 < control.pairedDeltaPct.p10
+        ? 'improvement'
+        : result.pairedDeltaPct.p10 > 0 &&
+          result.pairedDeltaPct.p10 > control.pairedDeltaPct.p90
+        ? 'overhead'
+        : 'neutral';
+
+    return {
+      operation: ANGULAR_LEAF_OPERATION_LABELS[result.operation],
+      universal: formatNanoseconds(result.aNs),
+      native: formatNanoseconds(result.bNs),
+      pairedDelta: formatPercent(result.pairedDeltaPct.median),
+      pairedRange: formatPercentRange(
+        result.pairedDeltaPct.p10,
+        result.pairedDeltaPct.p90
+      ),
+      controlRange: formatPercentRange(
+        control.pairedDeltaPct.p10,
+        control.pairedDeltaPct.p90
+      ),
+      disposition,
+      interpretation:
+        disposition === 'overhead'
+          ? 'Clear native overhead'
+          : disposition === 'improvement'
+          ? 'Clear native improvement'
+          : 'Inconclusive against A/A control',
+    };
+  });
+
+const createAngularLeafMemoryRows = (): readonly AngularLeafMemoryRow[] => {
+  const universalLabel = ANGULAR_NATIVE_MEMORY_BENCHMARK.arms[0].label;
+  const nativeLabel = ANGULAR_NATIVE_MEMORY_BENCHMARK.arms[1].label;
+  return [0, ANGULAR_NATIVE_MEMORY_BENCHMARK.config.observedCount].map(
+    (observedCount) => {
+      const universal = ANGULAR_NATIVE_MEMORY_BENCHMARK.results.find(
+        (result) =>
+          result.label === universalLabel &&
+          result.observedCount === observedCount
+      );
+      const native = ANGULAR_NATIVE_MEMORY_BENCHMARK.results.find(
+        (result) =>
+          result.label === nativeLabel && result.observedCount === observedCount
+      );
+      if (!universal || !native) {
+        throw new Error(`Missing Angular leaf memory row for ${observedCount}`);
+      }
+      const delta = native.bytesPerLeaf - universal.bytesPerLeaf;
+      return {
+        observation:
+          observedCount === 0
+            ? '100k leaves, unobserved'
+            : `100k leaves, ${observedCount / 1_000}k observed`,
+        universal: `${universal.retainedMB.toFixed(3)} MB · ${universal.bytesPerLeaf} B/leaf`,
+        native: `${native.retainedMB.toFixed(3)} MB · ${native.bytesPerLeaf} B/leaf`,
+        delta: `${delta > 0 ? '+' : ''}${delta} B/leaf`,
+        collection:
+          universal.collectable && native.collectable
+            ? 'Both collectible'
+            : 'Collection failure',
+      };
+    }
+  );
+};
+
+const RECURRING_PROFILES: readonly {
+  readonly workloadId: RecurringWorkloadId;
+  readonly title: string;
+  readonly unit: string;
+}[] = [
+  {
+    workloadId: 'collection',
+    title: 'Keyed update and point read',
+    unit: 'update + by-ID read',
+  },
+  {
+    workloadId: 'projection',
+    title: 'Keyed update and coherent complete read',
+    unit: 'update + complete read',
+  },
+  {
+    workloadId: 'restoration',
+    title: 'Designated change and undo',
+    unit: 'record + undo pair',
+  },
+];
 
 const QUICK_CONFIG: V15BenchmarkConfig = {
   collectionSize: 1_000,
@@ -67,13 +228,81 @@ const parseRoundCount = (value: string): number | undefined => {
   styleUrl: './v15-benchmarks.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class V15BenchmarksComponent implements OnDestroy {
-  private readonly runController = new AbortController();
+export class V15BenchmarksComponent {
   private readonly comparisonDialog =
     viewChild<ElementRef<HTMLDialogElement>>('comparisonDialog');
 
   readonly isDevBuild = isDevMode();
   readonly benchmarkSourcePaths = V15_BENCHMARK_SOURCE_PATHS;
+  readonly benchmarkSourceUrls = V15_BENCHMARK_SOURCE_URLS;
+  readonly angularLeafRows = createAngularLeafRows();
+  readonly angularLeafMemoryRows = createAngularLeafMemoryRows();
+  readonly angularLeafBenchmark = {
+    method: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.method,
+    samples: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.config.samples,
+    warmups: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.config.warmups,
+    trials: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.config.trials,
+    universal: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.arms.a.label,
+    native: ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.arms.b.label,
+    runtime: `${ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.runtime.node} / ${ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.runtime.platform}-${ANGULAR_NATIVE_VS_UNIVERSAL_BENCHMARK.runtime.architecture}`,
+  };
+  readonly valueFoundations: readonly ValueFoundation[] = [
+    {
+      status: 'Public contract',
+      title: 'Typed dot notation survives representation changes',
+      durableValue:
+        'Consumers keep tree.$.branch.leaf and typed entity-field handles while the physical storage and indexing strategy can change underneath.',
+      currentCost:
+        'This is a compatibility constraint, not a performance benefit. A denser or faster substrate must preserve the inferred read/write types.',
+      evidence: [
+        'packages/kernel/src/lib/signal-tree-type-matrix.typing.spec.ts',
+        'packages/kernel/src/enhancers/transactions/transactions-contract.typing.spec.ts',
+      ],
+    },
+    {
+      status: 'Measured; not globally optimal',
+      title: 'Speed is judged per workload, not globally',
+      durableValue:
+        'Keyed point updates avoid rebuilding the collection. The new recurring projection workload separately measures the known complete-read cost after mutation.',
+      currentCost:
+        'SignalTree is not called optimal when a recurring workload loses. The browser profile keeps point access, complete projection, and restoration separate so each reproducible deficit remains an optimization target.',
+      evidence: [
+        'apps/demo/src/app/pages/benchmarks/v15-benchmark.workloads.ts',
+        'tools/bench-vs-signalstore.mjs',
+        'tools/bench-workload-classes.mjs',
+        'tools/bench-update-matrix.mjs',
+      ],
+    },
+    {
+      status: 'Measured; not proven optimal',
+      title: 'Density remains an independent release constraint',
+      durableValue:
+        'The typed API does not require one permanent physical layout. Consolidation candidates can change allocation without changing application code.',
+      currentCost:
+        'The production entity layout is retained because no tested candidate beat it across density, latency, identity, lifecycle, rollback, restoration, and GC. Denser prototypes are evidence, not production wins.',
+      evidence: [
+        'docs/architecture/entity-physical-density.md',
+        'tools/bench-entity-physical-density.mjs',
+        'tools/bench-subject-record-consolidation.mjs',
+        'tools/bench-capability-density.mjs',
+      ],
+    },
+    {
+      status: 'Correctness foundation',
+      title: 'Optimistic and causal work avoids a future state-model rewrite',
+      durableValue:
+        'Pending work can confirm or roll back; rollback refuses when later authored or server-realized work depends on speculation; unrelated external truth survives.',
+      currentCost:
+        'Retained subject-density cost is pay-for-participation: the capability-density matrix currently finds no material live-subject slope for causal-runtime-only or configured-but-unused restoration. Fixed tree cost, CPU work, and retained active history remain real.',
+      evidence: [
+        'packages/kernel/src/enhancers/transactions/transactions.ts',
+        'packages/kernel/src/enhancers/transactions/tx-ledger-c3.spec.ts',
+        'packages/kernel/src/lib/link-0-three-directions.spec.ts',
+        'tools/bench-capability-density.mjs',
+        'tools/bench-update-matrix.mjs',
+      ],
+    },
+  ];
   readonly mode = signal<BenchmarkMode>('quick');
   readonly activeWorkload = signal<BenchmarkWorkloadId | null>(null);
   readonly reports = signal<ReadonlyMap<BenchmarkWorkloadId, BenchmarkReport>>(
@@ -96,34 +325,29 @@ export class V15BenchmarksComponent implements OnDestroy {
   );
   readonly suites = computed(() => createV15BenchmarkSuites(this.config()));
   readonly isRunning = computed(() => this.activeWorkload() !== null);
-  taskTitle(id: BenchmarkWorkloadId): string {
-    return id === 'collection'
-      ? 'Update and read one record'
-      : id === 'projection'
-      ? 'Update and read the whole collection'
-      : 'Record and undo changes';
-  }
+  readonly steadyStateProfiles = computed<readonly SteadyStateProfile[]>(() =>
+    RECURRING_PROFILES.flatMap((profile) => {
+      const report = this.reports().get(profile.workloadId);
+      if (!report) return [];
+      const ranked = this.rankedResults(report);
+      const result = ranked.find(
+        (candidate) => candidate.armId === this.profileArmId()
+      );
+      if (!result) return [];
 
-  butterflyPairs(report: BenchmarkReport): readonly ButterflyPair[] {
-    const baseline = report.results.find(
-      (result) => result.armId === this.profileArmId()
-    );
-    if (!baseline) return [];
-    return this.rankedResults(report)
-      .filter((result) => !result.armId.startsWith('signaltree-'))
-      .map((competitor) => ({ baseline, competitor }));
-  }
-
-  pairInterpretation(pair: ButterflyPair, measuredRounds: number): string {
-    if (measuredRounds < 2)
-      return 'One measured round; variability has not been measured.';
-    if (pair.baseline.maxMs < 0.1 || pair.competitor.maxMs < 0.1)
-      return 'Below useful timing resolution; no clear comparison.';
-    return pair.baseline.minMs <= pair.competitor.maxMs &&
-      pair.competitor.minMs <= pair.baseline.maxMs
-      ? 'Observed ranges overlap; no clear difference in this run.'
-      : 'Observed ranges do not overlap in this run.';
-  }
+      return [
+        {
+          ...profile,
+          result,
+          operations: report.workload.operations,
+          position:
+            ranked.findIndex((candidate) => candidate.armId === result.armId) +
+            1,
+          cohortSize: ranked.length,
+        },
+      ];
+    })
+  );
 
   setMode(mode: BenchmarkMode): void {
     if (this.isRunning()) return;
@@ -149,12 +373,7 @@ export class V15BenchmarksComponent implements OnDestroy {
   }
 
   async runBenchmarks(): Promise<void> {
-    if (
-      this.runController.signal.aborted ||
-      this.isRunning() ||
-      this.roundInputError()
-    )
-      return;
+    if (this.isRunning() || this.roundInputError()) return;
 
     this.reports.set(new Map());
     this.error.set(null);
@@ -163,15 +382,12 @@ export class V15BenchmarksComponent implements OnDestroy {
       for (const suite of this.suites()) {
         this.activeWorkload.set(suite.workload.id);
         await yieldToBrowserTask();
-        if (this.runController.signal.aborted) return;
         const report = await runInterleavedBenchmark({
           workload: suite.workload,
           arms: suite.arms,
           rounds: this.rounds(),
           warmupRounds: this.warmupRounds(),
-          signal: this.runController.signal,
         });
-        if (this.runController.signal.aborted) return;
         this.reports.update((current) => {
           const next = new Map(current);
           next.set(suite.workload.id, report);
@@ -179,18 +395,12 @@ export class V15BenchmarksComponent implements OnDestroy {
         });
       }
     } catch (error) {
-      if (this.runController.signal.aborted) return;
       this.error.set(
         error instanceof Error ? error.message : 'The benchmark run failed.'
       );
     } finally {
       this.activeWorkload.set(null);
     }
-  }
-
-  ngOnDestroy(): void {
-    this.runController.abort();
-    this.reports.set(new Map());
   }
 
   reportFor(workloadId: BenchmarkWorkloadId): BenchmarkReport | undefined {
@@ -204,6 +414,34 @@ export class V15BenchmarksComponent implements OnDestroy {
         left.minMs - right.minMs ||
         left.label.localeCompare(right.label)
     );
+  }
+
+  armDescription(
+    arms: readonly { readonly id: string; readonly description: string }[],
+    armId: string
+  ): string {
+    return arms.find((arm) => arm.id === armId)?.description ?? '';
+  }
+
+  armComparisonKind(arms: readonly V15BenchmarkArm[], armId: string): string {
+    return (
+      arms.find((arm) => arm.id === armId)?.comparison.kind ??
+      'Comparison details'
+    );
+  }
+
+  armPackages(
+    arms: readonly V15BenchmarkArm[],
+    armId: string
+  ): readonly BenchmarkPackageReference[] {
+    return arms.find((arm) => arm.id === armId)?.comparison.packages ?? [];
+  }
+
+  armSources(
+    arms: readonly V15BenchmarkArm[],
+    armId: string
+  ): readonly BenchmarkSource[] {
+    return arms.find((arm) => arm.id === armId)?.comparison.sources ?? [];
   }
 
   packageVersion(versionKey: string): string {
@@ -242,7 +480,7 @@ export class V15BenchmarksComponent implements OnDestroy {
   }
 
   resultScaleMaximum(report: BenchmarkReport): number {
-    return Math.max(0.1, ...report.results.map((result) => result.maxMs));
+    return Math.max(...report.results.map((result) => result.maxMs));
   }
 
   formatMilliseconds(value: number): string {
@@ -255,5 +493,41 @@ export class V15BenchmarksComponent implements OnDestroy {
     return `${this.formatMilliseconds(minMs)}–${this.formatMilliseconds(
       maxMs
     )} ms`;
+  }
+
+  normalizedRecurringCost(
+    profile: SteadyStateProfile,
+    operationCount: number
+  ): number {
+    return (profile.result.medianMs / profile.operations) * operationCount;
+  }
+
+  resultInterpretation(
+    result: BenchmarkArmResult,
+    report: BenchmarkReport
+  ): string {
+    if (result.maxMs < 0.1) return 'Below useful timing resolution';
+
+    const lowestMedian = Math.min(
+      ...report.results.map((candidate) => candidate.medianMs)
+    );
+    const lowest = report.results.find(
+      (candidate) => candidate.medianMs === lowestMedian
+    );
+    if (!lowest) return 'No comparison available';
+    if (result.medianMs === lowestMedian) {
+      const tied = report.results.filter(
+        (candidate) => candidate.medianMs === lowestMedian
+      ).length;
+      return tied > 1
+        ? 'Tied lowest observed median'
+        : 'Lowest observed median';
+    }
+
+    const rangesOverlap =
+      result.minMs <= lowest.maxMs && lowest.minMs <= result.maxMs;
+    return rangesOverlap
+      ? 'Observed ranges overlapped'
+      : 'Observed ranges did not overlap';
   }
 }

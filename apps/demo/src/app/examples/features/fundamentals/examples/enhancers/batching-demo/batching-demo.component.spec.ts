@@ -11,19 +11,21 @@ describe('BatchingDemoComponent', () => {
     component.ngOnDestroy();
   });
 
-  it('records state at each explicit checkpoint in the separate path', () => {
+  it('shows intermediate publications when each write is published separately', () => {
     component.runUnbatched();
 
     expect(component.writesPerformed()).toBe(3);
     expect(component.publicationTimeline()).toHaveLength(3);
     expect(component.intermediateStatesVisible()).toBe(2);
-    expect(
-      component.publicationTimeline().map((entry) => entry.coherent)
-    ).toEqual([false, false, true]);
+    expect(component.publicationTimeline().map((entry) => entry.coherent)).toEqual([
+      false,
+      false,
+      true,
+    ]);
     expect(component.finalStateCoherent()).toBe(true);
   });
 
-  it('records the completed transfer at the grouped path checkpoint', () => {
+  it('groups the same writes into one coherent publication', () => {
     component.runBatched();
 
     expect(component.writesPerformed()).toBe(3);

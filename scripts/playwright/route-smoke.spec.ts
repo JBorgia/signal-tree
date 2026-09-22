@@ -134,36 +134,70 @@ test('/batching: grouped writes publish once without intermediate observations',
   ).toHaveText('0');
 });
 
-test('/why-causality: choose a concrete illustrated scenario', async ({
+test('/why-causality: one snapshot reveals distinct identity histories', async ({
   page,
 }) => {
   await page.goto('/why-causality', { waitUntil: 'load' });
+
   await expect(page.locator('.snapshot-line code')).toHaveText(
-    'priority: Rush → Standard · status: Shipped'
+    'order.status = "approved"'
   );
-  await page.getByRole('radio', { name: 'Keep a record' }).check();
+  await page.getByRole('radio', { name: 'Identity' }).check();
   await expect(page.locator('.snapshot-line code')).toHaveText(
-    'temporary ID → server ID · same held record'
+    'queue = [B, A, C]'
   );
   await expect(page.locator('.history-comparison')).toContainText(
-    'changeId() preserves the record’s identity'
+    'The same subjects were reordered'
   );
-  await expect(
-    page.getByRole('link', { name: 'Try entity collections' })
-  ).toHaveAttribute('href', '/entities');
+  await expect(page.locator('.history-comparison')).toContainText(
+    'Old rows were replaced by lookalikes'
+  );
 });
 
-test('/why-causality: old section links retain a useful destination', async ({
+test('/why-causality: public incidents keep their counterfactual boundaries', async ({
   page,
 }) => {
   await page.goto('/why-causality#incident-ledger', { waitUntil: 'load' });
-  await expect(page.locator('#incident-ledger')).toBeAttached();
+
+  await expect(page.locator('.incident-story')).toHaveCount(3);
+  await expect(page.locator('.incident-disclaimer')).toContainText(
+    'Counterfactuals, not attribution.'
+  );
+  await expect(page.locator('.incident-story__scale')).toContainText([
+    '$460M loss in 45 minutes',
+    '$1.8B loan · unintended early repayment',
+    '43 seconds → 24h 11m degradation',
+  ]);
+  const sourceLinks = page.locator('.incident-story a');
+  await expect(sourceLinks).toHaveCount(3);
   await expect(
-    page.getByRole('heading', { name: 'See the rules behind the examples.' })
-  ).toBeVisible();
-  await expect(
-    page.getByRole('link', { name: 'Architecture and boundaries' })
-  ).toHaveAttribute('href', '/architecture-overview');
+    sourceLinks.evaluateAll((links) =>
+      links.map((link) => ({
+        href: link.getAttribute('href'),
+        target: link.getAttribute('target'),
+        rel: link.getAttribute('rel'),
+      }))
+    )
+  ).resolves.toEqual([
+    {
+      href: 'https://www.sec.gov/newsroom/press-releases/2013-222',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
+    {
+      href: 'https://cases.justia.com/federal/appellate-courts/ca2/21-487/21-487-2022-09-08.pdf?ts=1662663612',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
+    {
+      href: 'https://github.blog/news-insights/company-news/oct21-post-incident-analysis/',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
+  ]);
+  await expect(page.locator('#closing-title')).toHaveText(
+    "What don't you know?"
+  );
 });
 
 test('/why-causality: section index clears the fixed mobile header', async ({

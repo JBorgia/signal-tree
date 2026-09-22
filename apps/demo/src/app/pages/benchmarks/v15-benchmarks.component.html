@@ -6,294 +6,859 @@
   [attr.data-warmup-rounds]="warmupRounds()"
 >
   <header class="benchmark-hero">
-    <p class="eyebrow">Browser benchmarks</p>
-    <h1>Compare the work your app does.</h1>
-    <p>
-      Run three checked tasks in your browser. Compare medians and observed
-      ranges; lower time is better.
+    <p class="eyebrow">Long-lived consequential state</p>
+    <h1>Recurring application-state performance</h1>
+    <p class="hero-copy">
+      Three recurring v15 tasks run across framework-specific and
+      framework-neutral state-library runtimes after construction and population
+      are complete. Every timed run must produce the expected final state or the
+      comparison fails instead of publishing a number.
     </p>
+    <p class="comparability-note">
+      Every ranked row satisfies the same capability floor through the measured
+      library or an official first-party package. Implementations requiring a
+      benchmark-invented entity model or history feature are excluded. A shared
+      floor does not make broader semantics identical, and these browser
+      spot-checks are not statistical significance tests.
+    </p>
+    <p class="source-note">
+      <strong>Source rule:</strong> exact installed versions and official API or
+      source links appear beside every implementation. “Not ranked” means the
+      required capability was not established in the cited first-party package
+      surface; it does not claim that no community add-on exists.
+    </p>
+
+    <div class="scope-strip">
+      <section>
+        <h2>What this page measures</h2>
+        <p>
+          Keyed access, coherent complete reads, and reversible user changes.
+        </p>
+      </section>
+      <section>
+        <h2>What stays in Node</h2>
+        <p>
+          Construction ceilings, retained density, GC, churn, and release
+          claims.
+        </p>
+      </section>
+      <section>
+        <h2>How to read results</h2>
+        <p>
+          Compare absolute task time with its observed range. Overlap means no
+          clear difference.
+        </p>
+      </section>
+    </div>
   </header>
 
-  <section class="run-bar" aria-label="Benchmark controls">
-    <div class="mode-control" role="group" aria-label="Run depth">
+  <section class="benchmark-philosophy" aria-labelledby="philosophy-heading">
+    <header>
+      <p class="eyebrow">Benchmark philosophy</p>
+      <h2 id="philosophy-heading">Recurring work is the product benchmark</h2>
+      <p>
+        For long-lived application state, the relevant question is what the
+        application repeatedly pays while retaining typed access, stable
+        identity, authority rules, rollback correctness, and framework-neutral
+        semantics.
+      </p>
+    </header>
+    <div class="performance-priorities">
+      <section>
+        <h3>Primary recurring targets</h3>
+        <p>
+          Point reads and writes, structural mutation, observation and
+          publication, long-running churn, retained density, restoration, and
+          rollback.
+        </p>
+      </section>
+      <section>
+        <h3>Important recurring targets</h3>
+        <p>
+          Coherent complete-value projection, framework realization overhead,
+          and the runtime substrate shipped to consumers.
+        </p>
+      </section>
+      <section>
+        <h3>Hard gate</h3>
+        <p>
+          Faster or denser underpinnings must preserve typed dot notation,
+          identity, lifecycle, causal authority, transaction, restoration, and
+          GC laws.
+        </p>
+      </section>
+    </div>
+    <aside class="construction-budget">
+      <div>
+        <strong>Initialization is a budget, not an optimization target</strong>
+        <p>
+          SignalTree may spend construction work to make recurring operations
+          faster or denser. Construction remains an internal regression ceiling
+          for pathological startup behavior; it receives no public rank and no
+          value score.
+        </p>
+      </div>
+      <a
+        [href]="repositorySourceUrl('tools/bench-public-collection-layers.mjs')"
+        target="_blank"
+        rel="noreferrer"
+      >
+        <code>tools/bench-public-collection-layers.mjs</code>
+      </a>
+    </aside>
+  </section>
+
+  <section
+    class="callable-location-comparison"
+    aria-labelledby="callable-location-heading"
+  >
+    <header>
+      <div>
+        <p class="eyebrow">Universal vs framework-native</p>
+        <h2 id="callable-location-heading">Angular leaf realization</h2>
+      </div>
+      <p>
+        The superseded universal Angular facade at <code>a8c34b2a</code> and the
+        production native-signal facade run as packed builds in isolated
+        persistent workers. Samples are paired, call order alternates,
+        artifact-to-worker assignment is mirrored, and a native/native A/A run
+        exposes protocol noise.
+      </p>
+    </header>
+
+    <div class="callable-run-facts">
+      <span>{{ angularLeafBenchmark.samples }} paired samples</span>
+      <span>{{ angularLeafBenchmark.warmups }} warmups</span>
+      <span>{{ angularLeafBenchmark.trials }} trials per paired arm</span>
+      <span>Mirrored worker assignment</span>
+      <span>{{ angularLeafBenchmark.runtime }}</span>
+    </div>
+
+    <div
+      class="callable-result-table"
+      role="table"
+      aria-label="Universal versus native Angular leaf performance"
+    >
+      <div class="callable-result-header" role="row">
+        <span role="columnheader">Operation</span>
+        <span role="columnheader">Universal</span>
+        <span role="columnheader">Native</span>
+        <span role="columnheader">Paired median</span>
+        <span role="columnheader">Paired p10-p90</span>
+        <span role="columnheader">A/A p10-p90</span>
+        <span role="columnheader">Reading</span>
+      </div>
+      @for (row of angularLeafRows; track row.operation) {
+      <div
+        class="callable-result-row"
+        role="row"
+        [attr.data-disposition]="row.disposition"
+      >
+        <strong role="cell" data-label="Operation">{{ row.operation }}</strong>
+        <span role="cell" data-label="Universal">{{ row.universal }}</span>
+        <span role="cell" data-label="Native">{{ row.native }}</span>
+        <span role="cell" data-label="Paired median">{{ row.pairedDelta }}</span>
+        <span role="cell" data-label="Paired p10-p90">{{ row.pairedRange }}</span>
+        <span role="cell" data-label="A/A p10-p90">{{ row.controlRange }}</span>
+        <span role="cell" data-label="Reading">{{ row.interpretation }}</span>
+      </div>
+      }
+    </div>
+
+    <div
+      class="callable-result-table callable-result-table--memory"
+      role="table"
+      aria-label="Universal versus native Angular leaf retained memory"
+    >
+      <div class="callable-result-header" role="row">
+        <span role="columnheader">Density arm</span>
+        <span role="columnheader">Universal</span>
+        <span role="columnheader">Native</span>
+        <span role="columnheader">Native delta</span>
+        <span role="columnheader">After destroy</span>
+      </div>
+      @for (row of angularLeafMemoryRows; track row.observation) {
+      <div class="callable-result-row" role="row">
+        <strong role="cell" data-label="Density arm">{{ row.observation }}</strong>
+        <span role="cell" data-label="Universal">{{ row.universal }}</span>
+        <span role="cell" data-label="Native">{{ row.native }}</span>
+        <span role="cell" data-label="Native delta">{{ row.delta }}</span>
+        <span role="cell" data-label="After destroy">{{ row.collection }}</span>
+      </div>
+      }
+    </div>
+
+    <footer>
+      <p>
+        A row is called different only when its paired p10-p90 interval stays on
+        one side of zero and clears the A/A interval. Scalar paths, fan-out 1/10,
+        and the diamond are clear native wins; fan-out 100, chain depth 10, and
+        smaller construction rows remain inconclusive, while 1,000-leaf
+        construction is a clear loss.
+      </p>
+      <nav aria-label="Angular leaf benchmark evidence">
+        <a
+          [href]="repositorySourceUrl('tools/bench-angular-leaf-strategies.mjs')"
+          target="_blank"
+          rel="noreferrer"
+        >Harness source</a>
+        <a
+          [href]="repositorySourceUrl('docs/performance/framework-native-leaves.md')"
+          target="_blank"
+          rel="noreferrer"
+        >Method and interpretation</a>
+        <a href="benchmarks/angular-native-vs-universal.json">Raw comparison JSON</a>
+        <a href="benchmarks/angular-native-aa.json">Raw A/A JSON</a>
+        <a href="benchmarks/angular-native-memory.json">Raw memory JSON</a>
+        <a href="benchmarks/angular-native-vs-historical.json">Historical native JSON</a>
+      </nav>
+    </footer>
+  </section>
+
+  <section class="run-bar" aria-labelledby="run-heading">
+    <div>
+      <p class="eyebrow">Measurement plan</p>
+      <h2 id="run-heading">Choose the run depth</h2>
+    </div>
+    <div class="run-controls">
+      <div class="mode-control" role="group" aria-labelledby="run-heading">
+        <button
+          type="button"
+          [attr.aria-pressed]="mode() === 'quick'"
+          [disabled]="isRunning()"
+          (click)="setMode('quick')"
+        >
+          Quick
+          <span>25 measured rounds</span>
+        </button>
+        <button
+          type="button"
+          [attr.aria-pressed]="mode() === 'steady'"
+          [disabled]="isRunning()"
+          (click)="setMode('steady')"
+        >
+          Steady
+          <span>100 measured rounds</span>
+        </button>
+      </div>
+      <label class="round-control" [class.invalid]="roundInputError()">
+        <span>Measured rounds</span>
+        <input
+          #roundsInput
+          id="measured-rounds"
+          type="number"
+          inputmode="numeric"
+          min="1"
+          max="1000"
+          step="1"
+          [value]="roundInput()"
+          [disabled]="isRunning()"
+          [attr.aria-invalid]="roundInputError() !== null"
+          aria-describedby="measured-rounds-help"
+          (input)="setRoundInput(roundsInput.value)"
+        />
+        <small id="measured-rounds-help">
+          {{ roundInputError() ?? 'Custom range: 1–1,000' }}
+        </small>
+      </label>
       <button
         type="button"
-        [attr.aria-pressed]="mode() === 'quick'"
-        [disabled]="isRunning()"
-        (click)="setMode('quick')"
+        class="run-command"
+        [disabled]="isRunning() || roundInputError() !== null"
+        (click)="runBenchmarks()"
       >
-        Quick
-      </button>
-      <button
-        type="button"
-        [attr.aria-pressed]="mode() === 'steady'"
-        [disabled]="isRunning()"
-        (click)="setMode('steady')"
-      >
-        Steady
+        {{
+          isRunning() ? 'Running checked tasks...' : 'Run recurring spot-check'
+        }}
       </button>
     </div>
-    <label class="round-control"
-      >Measured rounds
-      <input
-        #roundsInput
-        id="measured-rounds"
-        type="number"
-        min="1"
-        max="1000"
-        step="1"
-        inputmode="numeric"
-        [value]="roundInput()"
-        [disabled]="isRunning()"
-        [attr.aria-invalid]="roundInputError() !== null"
-        aria-describedby="rounds-help"
-        (input)="setRoundInput(roundsInput.value)"
-      />
-      <small id="rounds-help">{{
-        roundInputError() ?? warmupRounds() + ' warmup rounds excluded'
-      }}</small>
-    </label>
-    <button
-      class="run-command"
-      type="button"
-      [disabled]="isRunning() || roundInputError() !== null"
-      (click)="runBenchmarks()"
-    >
-      {{ isRunning() ? 'Running…' : 'Run benchmarks' }}
-    </button>
-    <div
-      class="baseline-control"
-      role="group"
-      aria-label="SignalTree comparison baseline"
-    >
-      <span>Compare from</span>
-      <button
-        type="button"
-        [attr.aria-pressed]="profileArmId() === 'signaltree-angular'"
-        (click)="setProfileArm('signaltree-angular')"
-      >
-        Angular
-      </button>
-      <button
-        type="button"
-        [attr.aria-pressed]="profileArmId() === 'signaltree-kernel'"
-        (click)="setProfileArm('signaltree-kernel')"
-      >
-        Kernel
-      </button>
+
+    @if (isDevBuild) {
+    <p class="build-notice">
+      Development build detected. Results below are diagnostic only. Use the
+      production demo for representative browser measurements.
+    </p>
+    } @if (error()) {
+    <p class="run-error" role="alert">{{ error() }}</p>
+    } @else if (isRunning()) {
+    <p class="run-status" role="status">
+      Running {{ activeWorkload() }}. Arms rotate and reverse between rounds.
+    </p>
+    }
+  </section>
+
+  <section class="calculation-guide" aria-labelledby="calculation-heading">
+    <header>
+      <p class="eyebrow">Reading the display</p>
+      <h2 id="calculation-heading">How each result is calculated</h2>
+      <p>
+        Each chart ranks only implementations admitted by the same capability
+        contract. Open method details to see whether that capability is built in
+        or supplied by an official first-party add-on.
+      </p>
+    </header>
+    <div class="calculation-grid">
+      <section>
+        <h3>Median</h3>
+        <p>
+          Sort measured round durations and use the middle value. With an even
+          count, average the two middle values.
+        </p>
+      </section>
+      <section>
+        <h3>Observed range</h3>
+        <p>
+          Show the smallest and largest measured durations. Warmup rounds are
+          discarded first.
+        </p>
+      </section>
+      <section>
+        <h3>Result order</h3>
+        <p>
+          Within one matched cohort, sort by median task time. Order is not a
+          winner claim when observed ranges overlap.
+        </p>
+      </section>
+      <section>
+        <h3>Visual scale</h3>
+        <p>
+          Plot each range and median from zero to that task’s slowest observed
+          maximum. Different tasks do not share a scale.
+        </p>
+      </section>
     </div>
   </section>
-  @if (isDevBuild) {
-  <p class="build-notice">
-    Development build detected. Use the production demo for representative
-    browser measurements.
-  </p>
-  } @if (error()) {
-  <p role="alert" class="run-error">{{ error() }}</p>
-  } @if (isRunning()) {
-  <p role="status">Running {{ taskTitle(activeWorkload()!) }}…</p>
-  }
 
   <div class="workload-list">
-    @for (suite of suites(); track suite.workload.id) {
+    @for (suite of suites(); track suite.workload.id; let workloadIndex =
+    $index) {
     <section
       class="workload"
       [attr.data-workload-id]="suite.workload.id"
       [attr.aria-labelledby]="suite.workload.id + '-heading'"
     >
-      <header>
-        <h2 [id]="suite.workload.id + '-heading'">
-          {{ taskTitle(suite.workload.id) }}
-        </h2>
-        <p>{{ suite.applicationExample }}</p>
-        <small
-          >{{
-            suite.workload.id === 'restoration'
-              ? config().restorationSize
-              : config().collectionSize
-          }}
-          records · {{ suite.workload.operations }}
-          {{
-            suite.workload.id === 'restoration'
-              ? 'record/undo pairs'
-              : 'update/read cycles'
-          }}
-          per measured task</small
-        >
+      <header class="workload-heading">
+        <div>
+          <p class="workload-index">
+            0{{ workloadIndex + 1 }} / recurring task
+          </p>
+          <h2 [id]="suite.workload.id + '-heading'">
+            {{ suite.workload.title }}
+          </h2>
+        </div>
+        <p>{{ suite.workload.description }}</p>
       </header>
-      @if (reportFor(suite.workload.id); as report) {
-      <p class="chart-key">
-        {{ report.rounds }} rounds · median task time (ms) · lower is better
-      </p>
-      @for (pair of butterflyPairs(report); track pair.competitor.armId) {
-      <figure class="butterfly" [attr.data-competitor]="pair.competitor.armId">
-        <div class="pair-labels">
-          <div>
-            <strong>{{ pair.baseline.label }}</strong
-            ><span>{{ formatMilliseconds(pair.baseline.medianMs) }} ms</span
-            ><small>{{
-              formatRange(pair.baseline.minMs, pair.baseline.maxMs)
-            }}</small>
-          </div>
-          <div>
-            <strong>{{ pair.competitor.label }}</strong
-            ><span>{{ formatMilliseconds(pair.competitor.medianMs) }} ms</span
-            ><small>{{
-              formatRange(pair.competitor.minMs, pair.competitor.maxMs)
-            }}</small>
-          </div>
-        </div>
-        <div class="paired-bars" aria-hidden="true">
-          <div class="bar-half bar-half--left">
-            <span
-              class="bar bar--baseline"
-              [style.width]="resultPosition(pair.baseline.medianMs, report)"
-            ></span>
-          </div>
-          <div class="bar-half">
-            <span
-              class="bar bar--competitor"
-              [style.width]="resultPosition(pair.competitor.medianMs, report)"
-            ></span>
-          </div>
-        </div>
-        <div class="pair-axis" aria-hidden="true">
-          <span>{{ formatMilliseconds(resultScaleMaximum(report)) }}</span
-          ><span>0</span
-          ><span>{{ formatMilliseconds(resultScaleMaximum(report)) }}</span>
-        </div>
-        <figcaption>{{ pairInterpretation(pair, report.rounds) }}</figcaption>
-      </figure>
-      }
-      <p class="chart-note">
-        Both sides use the same zero-based scale; scales differ between tasks.
-        Ranges are observed minimum–maximum, not confidence intervals. State
-        operations only; no rendering is timed.
-      </p>
-      <details class="exact-results">
-        <summary>Exact results and implementation details</summary>
-        <div class="table-scroll">
-          <table>
-            <caption>
-              Measured task durations in milliseconds
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col">Implementation</th>
-                <th scope="col">Median</th>
-                <th scope="col">Observed range</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (result of rankedResults(report); track result.armId) {
-              <tr [attr.data-arm-id]="result.armId">
-                <th scope="row">
-                  <button
-                    type="button"
-                    class="text-button"
-                    (click)="openComparison(suite, result.armId)"
-                  >
-                    {{ result.label }}
-                  </button>
-                </th>
-                <td>{{ formatMilliseconds(result.medianMs) }}</td>
-                <td>{{ formatRange(result.minMs, result.maxMs) }}</td>
-              </tr>
+
+      <div class="meaning-strip">
+        <section>
+          <h3>Real app example</h3>
+          <p>{{ suite.applicationExample }}</p>
+        </section>
+        <section>
+          <h3>Application impact</h3>
+          <p>{{ suite.financialImpact }}</p>
+        </section>
+      </div>
+
+      <aside class="cost-context">
+        <strong>{{ suite.costLabel }}</strong>
+        <p>{{ suite.costContext }}</p>
+      </aside>
+
+      <section
+        class="capability-admission"
+        [attr.aria-labelledby]="suite.workload.id + '-capability-heading'"
+      >
+        <header>
+          <p class="eyebrow">Capability admission</p>
+          <h3 [id]="suite.workload.id + '-capability-heading'">
+            {{ suite.capability.title }}
+          </h3>
+          <p>
+            Only implementations meeting every requirement receive a timing or
+            position in this product chart. Exclusion here does not disqualify a
+            storage strategy from internal speed or density experiments beneath
+            SignalTree’s public contract.
+          </p>
+        </header>
+        <div class="capability-columns">
+          <section>
+            <h4>Required for ranking</h4>
+            <ul>
+              @for (requirement of suite.capability.requirements; track
+              requirement) {
+              <li>{{ requirement }}</li>
               }
-            </tbody>
-          </table>
+            </ul>
+          </section>
+          <section>
+            <h4>Not ranked</h4>
+            <dl>
+              @for (exclusion of suite.capability.exclusions; track
+              exclusion.label) {
+              <div>
+                <dt>{{ exclusion.label }}</dt>
+                <dd>
+                  <span>{{ exclusion.reason }}</span>
+                  <span class="source-links">
+                    @for (source of exclusion.sources; track source.url) {
+                    <a [href]="source.url" target="_blank" rel="noreferrer">
+                      {{ source.label }}
+                    </a>
+                    @if (source.path) {
+                    <code>{{ source.path }}</code>
+                    } }
+                  </span>
+                </dd>
+              </div>
+              }
+            </dl>
+          </section>
+        </div>
+      </section>
+
+      <details class="calculation-details">
+        <summary>Calculation and timer boundaries</summary>
+        <div class="calculation-details-grid">
+          <section data-calculation-field="timedCalculation">
+            <h3>Timed calculation</h3>
+            <p>{{ suite.calculation.timedCalculation }}</p>
+          </section>
+          <section data-calculation-field="outsideTimer">
+            <h3>Outside the timer</h3>
+            <p>{{ suite.calculation.outsideTimer }}</p>
+          </section>
+          <section data-calculation-field="correctnessCheck">
+            <h3>Correctness gate</h3>
+            <p>{{ suite.calculation.correctnessCheck }}</p>
+          </section>
+          <section data-calculation-field="notCompared">
+            <h3>Not compared</h3>
+            <p>{{ suite.calculation.notCompared }}</p>
+          </section>
         </div>
       </details>
-      } @else {
-      <p class="empty-results">
-        {{
-          activeWorkload() === suite.workload.id
-            ? 'Measuring this task…'
-            : 'Run benchmarks to generate this comparison.'
-        }}
-      </p>
-      }
-      <details class="capability-admission">
-        <summary>What is measured and which libraries qualify</summary>
-        <p>{{ suite.calculation.timedCalculation }}</p>
-        <p>{{ suite.calculation.outsideTimer }}</p>
-        <p>
-          <strong>Checked outcome:</strong>
-          {{ suite.calculation.correctnessCheck }}
-        </p>
-        <p><strong>Scope:</strong> {{ suite.calculation.notCompared }}</p>
-        <h3>{{ suite.capability.title }}</h3>
-        <ul>
-          @for (requirement of suite.capability.requirements; track requirement)
-          {
-          <li>{{ requirement }}</li>
-          }
-        </ul>
-        <p>
-          Shared requirements do not imply identical broader semantics. Only
-          admitted implementations receive timings.
-        </p>
-        <div class="admitted-arms">
-          @for (arm of suite.arms; track arm.id) {
-          <button
-            type="button"
-            class="text-button"
-            (click)="openComparison(suite, arm.id)"
+
+      @if (reportFor(suite.workload.id); as report) {
+      <div class="results" aria-live="polite">
+        <div class="results-heading">
+          <div>
+            <h3>Capability-matched results, fastest median first</h3>
+            @if (isDevBuild) {
+            <strong class="development-badge"
+              >Development / non-representative</strong
+            >
+            }
+          </div>
+          <p>
+            Median of {{ report.rounds }} rounds after
+            {{ report.warmupRounds }} warmup
+            {{ report.warmupRounds === 1 ? 'round' : 'rounds' }}.
+          </p>
+        </div>
+
+        <div class="result-key" aria-label="Visual result key">
+          <span class="result-key-range">Observed min–max</span>
+          <span class="result-key-median">Median</span>
+          <span class="result-key-direction">Lower task time is faster</span>
+        </div>
+
+        <div
+          class="result-table"
+          role="table"
+          [attr.aria-label]="suite.workload.title + ' results'"
+        >
+          <div class="result-header" role="row">
+            <span role="columnheader">Order</span>
+            <span role="columnheader">Implementation</span>
+            <span role="columnheader">Median task</span>
+            <span role="columnheader">Relative task time</span>
+            <span role="columnheader">Interpretation</span>
+          </div>
+          @for (result of rankedResults(report); track result.armId; let rank =
+          $index) {
+          <div
+            class="result-row"
+            role="row"
+            [attr.data-rank]="rank + 1"
+            [attr.data-arm-id]="result.armId"
+            [attr.data-median-ms]="result.medianMs"
+            [attr.data-min-ms]="result.minMs"
+            [attr.data-max-ms]="result.maxMs"
           >
-            {{ arm.label }}
-          </button>
+            <span
+              class="result-rank"
+              role="cell"
+              [attr.aria-label]="'Order ' + (rank + 1)"
+            >
+              {{ rank + 1 }}
+            </span>
+            <div class="implementation" role="cell">
+              <strong>{{ result.label }}</strong>
+              <span>{{ armDescription(suite.arms, result.armId) }}</span>
+              <span class="package-versions">
+                @for (package of armPackages(suite.arms, result.armId); track
+                package.name) {
+                <code
+                  >{{ package.name }}
+                  {{ packageVersion(package.versionKey) }}</code
+                >
+                }
+              </span>
+              <span class="comparison-kind">
+                {{ armComparisonKind(suite.arms, result.armId) }}
+              </span>
+              <span class="source-links implementation-source-links">
+                @for (source of armSources(suite.arms, result.armId); track
+                source.url) {
+                <a [href]="source.url" target="_blank" rel="noreferrer">
+                  {{ source.label }}
+                </a>
+                @if (source.path) {
+                <code>{{ source.path }}</code>
+                } }
+              </span>
+              <button
+                type="button"
+                class="comparison-command"
+                aria-haspopup="dialog"
+                [attr.aria-label]="
+                  'Explain ' +
+                  result.label +
+                  ' comparison for ' +
+                  suite.workload.title
+                "
+                (click)="openComparison(suite, result.armId)"
+              >
+                Method details
+              </button>
+            </div>
+            <div class="timing" role="cell">
+              <strong>{{ formatMilliseconds(result.medianMs) }} ms</strong>
+              @if (result.phases.length > 0) {
+              <span class="phase-breakdown">
+                @for (phase of result.phases; track phase.id) {
+                <span
+                  [attr.data-phase-id]="phase.id"
+                  [attr.data-phase-median-ms]="phase.medianMs"
+                  [attr.data-phase-min-ms]="phase.minMs"
+                  [attr.data-phase-max-ms]="phase.maxMs"
+                >
+                  {{ phase.id }} {{ formatMilliseconds(phase.medianMs) }} ms ({{
+                    formatRange(phase.minMs, phase.maxMs)
+                  }})
+                </span>
+                }
+              </span>
+              }
+            </div>
+            <div class="result-visual" role="cell">
+              <div
+                class="result-visual-track"
+                role="img"
+                [attr.aria-label]="
+                  result.label +
+                  ': median ' +
+                  formatMilliseconds(result.medianMs) +
+                  ' milliseconds; observed range ' +
+                  formatRange(result.minMs, result.maxMs)
+                "
+                [style.--result-color]="result.color"
+                [style.--range-start]="resultPosition(result.minMs, report)"
+                [style.--range-end]="resultPosition(result.maxMs, report)"
+                [style.--median-position]="
+                  resultPosition(result.medianMs, report)
+                "
+              >
+                <span class="result-range-mark"></span>
+                <span class="result-median-mark"></span>
+              </div>
+              <span class="range-label">{{
+                formatRange(result.minMs, result.maxMs)
+              }}</span>
+            </div>
+            <span class="interpretation" role="cell">
+              {{ resultInterpretation(result, report) }}
+            </span>
+          </div>
           }
         </div>
-        <h3>Not included in this task</h3>
-        <ul>
-          @for (entry of suite.capability.exclusions; track entry.label) {
-          <li>
-            <strong>{{ entry.label }}:</strong> {{ entry.reason }} @for (source
-            of entry.sources; track source.url) {
-            <a [href]="source.url">{{ source.label }}</a> }
-          </li>
+        <div class="result-scale" aria-hidden="true">
+          <span>0 ms</span>
+          <span
+            >{{ formatMilliseconds(resultScaleMaximum(report)) }} ms scale</span
+          >
+        </div>
+      </div>
+      } @else {
+      <div class="ready-state">
+        <header>
+          <p>Ready to measure</p>
+          <span
+            >All {{ suite.arms.length }} arms must pass the same checksum.</span
+          >
+        </header>
+        <div class="planned-arms">
+          @for (arm of suite.arms; track arm.id) {
+          <span class="planned-arm">
+            <strong>{{ arm.label }}</strong>
+            <span>{{ arm.description }}</span>
+            <span class="package-versions">
+              @for (package of arm.comparison.packages; track package.name) {
+              <code
+                >{{ package.name }}
+                {{ packageVersion(package.versionKey) }}</code
+              >
+              }
+            </span>
+            <span class="source-links">
+              @for (source of arm.comparison.sources; track source.url) {
+              <a [href]="source.url" target="_blank" rel="noreferrer">
+                {{ source.label }}
+              </a>
+              }
+            </span>
+          </span>
           }
-        </ul>
-        <p>
-          “Not included” refers to this first-party capability requirement;
-          community add-ons may exist.
-        </p>
-      </details>
+        </div>
+      </div>
+      }
+
+      <footer class="evidence-line">
+        <span>Reproduce and inspect</span>
+        <div>
+          <a
+            [href]="benchmarkSourceUrls.workloads"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Benchmark repository
+          </a>
+          <code>{{ benchmarkSourcePaths.workloads }}</code>
+          <a
+            [href]="benchmarkSourceUrls.engine"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Benchmark repository
+          </a>
+          <code>{{ benchmarkSourcePaths.engine }}</code>
+          <a [href]="suite.relatedSourceUrl" target="_blank" rel="noreferrer">
+            Related Node generator source
+          </a>
+          <code>{{ suite.relatedSourcePath }}</code>
+          <code class="evidence-command">{{ suite.relatedCommand }}</code>
+        </div>
+      </footer>
     </section>
     }
   </div>
-  <details class="methodology">
-    <summary>Methodology and sources</summary>
-    <p>
-      Each implementation keeps one populated store across warmup and measured
-      rounds. Construction is outside the timer. Arm order rotates and reverses;
-      every result must pass its correctness check. Stores are disposed after
-      each workload.
-    </p>
-    <p>
-      Browser timing near the 0.1 ms floor is diagnostic. Overlapping observed
-      ranges do not establish a winner; these are not statistical significance
-      tests. Keep the tab foreground and rerun on your target device.
-    </p>
-    <p>
-      History results exclude asymmetric inspection materialization. No workload
-      is pooled into an aggregate score or extrapolated to an assumed
-      application frequency.
-    </p>
-    <p>
-      SignalTree runs the code bundled with this demo; version labels come from
-      package manifests.
-    </p>
-    <nav aria-label="Benchmark source">
-      <a [href]="repositorySourceUrl(benchmarkSourcePaths.engine)"
-        >Engine source</a
-      ><a [href]="repositorySourceUrl(benchmarkSourcePaths.workloads)"
-        >Workload source</a
-      ><a [href]="repositorySourceUrl('docs/performance/methodology.md')"
-        >Performance methodology</a
+
+  @if (steadyStateProfiles().length > 0) {
+  <section
+    class="steady-state-value"
+    aria-labelledby="steady-state-heading"
+    [attr.data-profile-arm-id]="profileArmId()"
+  >
+    <header class="steady-state-heading">
+      <div>
+        <p class="eyebrow">Steady-state value</p>
+        <h2 id="steady-state-heading">What compounds after construction</h2>
+      </div>
+      <p>
+        Each workload remains independent. Normalized columns scale the measured
+        median arithmetically; they are not a forecast of application frequency,
+        elapsed wall time, or business value.
+      </p>
+    </header>
+    <div class="steady-state-controls">
+      <span>SignalTree realization</span>
+      <div
+        class="profile-realization"
+        role="group"
+        aria-label="SignalTree realization"
       >
-    </nav>
-  </details>
+        <button
+          type="button"
+          [attr.aria-pressed]="profileArmId() === 'signaltree-angular'"
+          (click)="setProfileArm('signaltree-angular')"
+        >
+          Angular realization
+        </button>
+        <button
+          type="button"
+          [attr.aria-pressed]="profileArmId() === 'signaltree-kernel'"
+          (click)="setProfileArm('signaltree-kernel')"
+        >
+          Kernel realization
+        </button>
+      </div>
+    </div>
+    <div
+      class="steady-state-table"
+      role="table"
+      aria-label="SignalTree recurring performance profile"
+    >
+      <div class="steady-state-table-header" role="row">
+        <span role="columnheader">Recurring workload</span>
+        <span role="columnheader">Measured batch</span>
+        <span role="columnheader">Per 1k</span>
+        <span role="columnheader">Per 10k</span>
+        <span role="columnheader">Per 100k</span>
+        <span role="columnheader">Observed standing</span>
+      </div>
+      @for (profile of steadyStateProfiles(); track profile.workloadId) {
+      <div
+        class="steady-state-row"
+        role="row"
+        [attr.data-profile-workload]="profile.workloadId"
+        [attr.data-measured-median-ms]="profile.result.medianMs"
+        [attr.data-measured-operations]="profile.operations"
+        [attr.data-per-thousand-ms]="normalizedRecurringCost(profile, 1000)"
+        [attr.data-per-ten-thousand-ms]="
+          normalizedRecurringCost(profile, 10000)
+        "
+        [attr.data-per-hundred-thousand-ms]="
+          normalizedRecurringCost(profile, 100000)
+        "
+        [attr.data-position]="profile.position"
+        [attr.data-cohort-size]="profile.cohortSize"
+      >
+        <span class="steady-workload" role="cell">
+          <strong>{{ profile.title }}</strong>
+          <small>{{ profile.unit }}</small>
+        </span>
+        <span role="cell">
+          <strong>{{ formatMilliseconds(profile.result.medianMs) }} ms</strong>
+          <small>{{ profile.operations }} measured operations</small>
+        </span>
+        <strong role="cell">
+          {{ formatMilliseconds(normalizedRecurringCost(profile, 1000)) }} ms
+        </strong>
+        <strong role="cell">
+          {{ formatMilliseconds(normalizedRecurringCost(profile, 10000)) }} ms
+        </strong>
+        <strong role="cell">
+          {{ formatMilliseconds(normalizedRecurringCost(profile, 100000)) }} ms
+        </strong>
+        <span class="steady-standing" role="cell">
+          <strong>{{ profile.position }} of {{ profile.cohortSize }}</strong>
+          <small>{{
+            formatRange(profile.result.minMs, profile.result.maxMs)
+          }}</small>
+        </span>
+      </div>
+      }
+    </div>
+    <aside class="projection-condition">
+      <strong>Projection is conditional</strong>
+      <p>
+        Whole-state projection is included because some applications repeatedly
+        need a coherent complete value. Applications dominated by keyed point
+        reads may have a different profile, or no projection cost at all. No
+        workload is pooled into an aggregate score.
+      </p>
+    </aside>
+  </section>
+  }
+
+  <section class="foundation-ledger" aria-labelledby="foundation-heading">
+    <header>
+      <p class="eyebrow">Ten-year architecture bet</p>
+      <h2 id="foundation-heading">What must survive underneath the numbers</h2>
+      <p>
+        The target is not one frozen implementation. It is a durable typed API
+        over a substrate that keeps getting faster and denser while preserving
+        optimistic and causal correctness. Each dimension has its own evidence,
+        and none compensates numerically for another.
+      </p>
+    </header>
+    <aside class="foundation-verdict">
+      <strong>Current verdict</strong>
+      <p>
+        SignalTree fixes the semantic contract and keeps the implementation
+        replaceable. Speed and density are measured independently, and every
+        reproducible deficit is an optimization target—not a price users should
+        accept for architecture.
+      </p>
+    </aside>
+    <div class="foundation-grid">
+      @for (foundation of valueFoundations; track foundation.title) {
+      <article>
+        <p class="foundation-status">{{ foundation.status }}</p>
+        <h3>{{ foundation.title }}</h3>
+        <dl>
+          <div>
+            <dt>Durable value</dt>
+            <dd>{{ foundation.durableValue }}</dd>
+          </div>
+          <div>
+            <dt>Cost or constraint</dt>
+            <dd>{{ foundation.currentCost }}</dd>
+          </div>
+          <div>
+            <dt>Repository evidence</dt>
+            <dd class="foundation-evidence">
+              @for (source of foundation.evidence; track source) {
+              <a
+                [href]="repositorySourceUrl(source)"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <code>{{ source }}</code>
+              </a>
+              }
+            </dd>
+          </div>
+        </dl>
+      </article>
+      }
+    </div>
+    <aside class="foundation-decision">
+      <strong>Release decision rule</strong>
+      <p>
+        Keep typed dot notation and causal correctness fixed. Front-load work
+        when it makes recurring speed, density, allocation, GC, restoration, or
+        churn better. Replace any underpinning that loses reproducibly while
+        preserving the same semantic laws.
+      </p>
+    </aside>
+  </section>
+
+  <section class="methodology" aria-labelledby="methodology-heading">
+    <header>
+      <p class="eyebrow">Methodology</p>
+      <h2 id="methodology-heading">What makes a number admissible</h2>
+    </header>
+    <ol>
+      <li>
+        Each keyed-state arm uses a first-party entity abstraction; the harness
+        does not invent its data model.
+      </li>
+      <li>
+        Each history arm uses built-in or official first-party history; packages
+        requiring benchmark-owned snapshots are excluded.
+      </li>
+      <li>Construction and population remain outside every public timer.</li>
+      <li>
+        Arm order rotates and reverses to reduce position and warmup bias.
+      </li>
+      <li>The final state is checked before a timing enters the report.</li>
+      <li>
+        One store per arm remains live across warmup and measured rounds. Every
+        SignalTree is destroyed when its workload run completes.
+      </li>
+    </ol>
+    <aside class="methodology-correction">
+      <strong>Methodology correction</strong>
+      <p>
+        An earlier harness included <code>getRestorationHistory()</code> state
+        materialization only in the SignalTree arm. Current results exclude that
+        asymmetric inspection and verify the exact value after every undo.
+      </p>
+    </aside>
+  </section>
+
   <dialog
     #comparisonDialog
     class="comparison-dialog"
@@ -378,14 +943,3 @@
     }
   </dialog>
 </div>
-<p class="run-announcement" role="status">
-  {{
-    isRunning()
-      ? 'Benchmarks running.'
-      : error()
-      ? 'Benchmark run failed.'
-      : reports().size === suites().length
-      ? 'Benchmarks complete. Results are ready.'
-      : ''
-  }}
-</p>
