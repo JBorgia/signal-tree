@@ -116,7 +116,12 @@ import {
   batching,
   type ReadonlyLocation,
 } from '@signal-tree/kernel';
-import { createSignalTreeFactory } from '@signal-tree/kernel/adapter';
+import {
+  createSignalTreeFactory,
+  type EpochHandle,
+  type ObservationAdapter,
+  type ObservationToken,
+} from '@signal-tree/kernel/adapter';
 import {
   defineStore,
   leaf as angularLeaf,
@@ -141,6 +146,37 @@ import {
   type EntitySignalWithSlices as VueEntitySignalWithSlices,
 } from '@signal-tree/vue';
 
+
+// A THIRD-PARTY FRAMEWORK ADAPTER, built from public exports only.
+//
+// \`@signal-tree/<framework>\` is the physical-realization optimizer for its
+// framework, so the adapter seam is a supported extension point -- which means
+// every type needed to implement it has to be nameable from the public entry.
+// \`EpochHandle\` was declared but NOT exported until this was checked, so an
+// external adapter could not type its own createEpoch/advanceEpoch pair.
+//
+// The pair is the contract: the adapter creates a handle and the adapter
+// advances it. The kernel never assumes the handle is writable, has \`.value\`,
+// or is any particular framework's primitive.
+const thirdPartyAdapter: ObservationAdapter = {
+  createToken(): ObservationToken {
+    let version = 0;
+    return { observe: () => void version, invalidate: () => void (version += 1) };
+  },
+  createEpoch(): EpochHandle {
+    let version = 0;
+    const handle = (() => version) as EpochHandle & { bump?: () => void };
+    handle.bump = () => void (version += 1);
+    return handle;
+  },
+  advanceEpoch(epoch: EpochHandle): void {
+    (epoch as EpochHandle & { bump?: () => void }).bump?.();
+  },
+  runInvalidationGroup(run: () => void): void {
+    run();
+  },
+};
+void thirdPartyAdapter;
 
 // All public Angular markers must retain identity across root/adapter .d.ts.
 const markedAngularTree = angularSignalTree({ count: angularLeaf<number>(1) });

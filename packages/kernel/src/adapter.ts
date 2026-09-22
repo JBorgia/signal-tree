@@ -79,6 +79,7 @@ export function readCanonicalSnapshot<T>(owner: { readonly $: object }): T {
 }
 
 export type {
+  EpochHandle,
   ObservationAdapter,
   ObservationToken,
 } from './lib/internals/observation-adapter';

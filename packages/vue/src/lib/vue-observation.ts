@@ -7,17 +7,10 @@ import {
 } from 'vue';
 
 import type {
+  EpochHandle,
   ObservationAdapter,
   ObservationToken,
 } from '@signal-tree/kernel/adapter';
-
-/**
- * Structural, not imported: the kernel declares `EpochHandle` but does not
- * export it from `@signal-tree/kernel/adapter`. That is a real gap in an
- * otherwise public seam — a third-party adapter cannot name this type — and it
- * is left for a separate kernel change rather than widened here.
- */
-type EpochHandle = { (): unknown };
 
 /**
  * The ref lives on the handle itself rather than in a side table: a `WeakMap`
