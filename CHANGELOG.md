@@ -1,5 +1,11 @@
 ## 15.2.0 (2026-09-21)
 
+**TL;DR** — Safe bump: no breaking changes, no removed exports. Adds
+`@signal-tree/solid`, makes Angular and Vue realize state with native
+primitives (entity memory down 62% and 75% per entity), and exports
+`EpochHandle` for adapter authors. Costs ~0.24 KB more kernel gzip
+(+2.4%). CPU differences remain unresolved and unclaimed.
+
 - **One semantic authority, framework-specialized physical realization.** The kernel
   keeps sole ownership of meaning: subject identity, causality, transactions, external
   truth and restoration. Each framework package now owns only the cheapest correct
