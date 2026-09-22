@@ -207,6 +207,55 @@ describe('DocumentationComponent', () => {
     );
   });
 
+  it('anchors rendered headings while still sanitizing dangerous markup', async () => {
+    // Both halves matter and they pull against each other. Heading anchors
+    // only reach the DOM because they are applied AFTER sanitization, so this
+    // test also has to prove that moving them there did not buy working deep
+    // links by trusting the markdown: the script, the inline handler and the
+    // javascript: URL below must all still be neutralized.
+    const hostile = globalThis as unknown as { __pwned?: boolean };
+    delete hostile.__pwned;
+
+    httpMock.expectOne('assets/docs/core/README.md').flush(
+      [
+        '## Ownership',
+        '',
+        '<script>globalThis.__pwned = true;</script>',
+        '<img src="x" onerror="globalThis.__pwned = true">',
+        '<a href="javascript:globalThis.__pwned = true">bad link</a>',
+        '',
+        '## Ownership',
+        '',
+        '## Ownership & Scope!',
+        '',
+      ].join('\n')
+    );
+    await fixture.whenStable();
+    fixture.detectChanges();
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    fixture.detectChanges();
+
+    const root = fixture.nativeElement as HTMLElement;
+
+    // Anchors exist on the RENDERED headings, de-duplicated in document order.
+    expect(root.querySelector('#ownership')?.textContent).toBe('Ownership');
+    expect(root.querySelector('#ownership-1')?.textContent).toBe('Ownership');
+    expect(root.querySelector('#ownership--scope')?.textContent).toBe(
+      'Ownership & Scope!'
+    );
+
+    // Sanitization is untouched.
+    expect(root.querySelector('.markdown-content script')).toBeNull();
+    expect(
+      root.querySelector('.markdown-content img')?.hasAttribute('onerror')
+    ).not.toBe(true);
+    const link = Array.from(
+      root.querySelectorAll('.markdown-content a')
+    ).find((element) => element.textContent === 'bad link');
+    expect(link?.getAttribute('href') ?? '').not.toMatch(/^javascript:/i);
+    expect(hostile.__pwned).toBeUndefined();
+  });
+
   it('does not replace the selected package with an older response', async () => {
     const initial = httpMock.expectOne('assets/docs/core/README.md');
     const vue = component.packages.find((entry) => entry.id === 'vue')!;

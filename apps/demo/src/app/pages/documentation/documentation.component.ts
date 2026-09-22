@@ -4,6 +4,7 @@ import {
   afterNextRender,
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   inject,
   Injector,
   OnInit,
@@ -18,6 +19,22 @@ import json from 'highlight.js/lib/languages/json';
 import typescript from 'highlight.js/lib/languages/typescript';
 import { marked } from 'marked';
 import { lastValueFrom } from 'rxjs';
+
+/**
+ * The heading-anchor slug rule, shared by everything that needs to agree on
+ * what `#ownership` means. Kept at module scope because the anchors are now
+ * assigned to RENDERED elements rather than to the generated HTML, and both
+ * the component and its tests have to derive the same ids from the same text.
+ */
+function headingSlug(text: string): string {
+  return (
+    text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\p{L}\p{N}_\-\s]/gu, '')
+      .replace(/\s/g, '-') || 'section'
+  );
+}
 
 interface DocPackage {
   id: string;
@@ -47,6 +64,7 @@ export class DocumentationComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly injector = inject(Injector);
   private readonly scroller = inject(ViewportScroller);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private loadSequence = 0;
 
   packages: DocPackage[] = [
@@ -182,22 +200,66 @@ export class DocumentationComponent implements OnInit {
       const html = await marked.parse(markdown);
       if (requestId !== this.loadSequence) return;
       this.markdownContent.set(this.prepareMarkdown(html, pkg));
-      const fragment = this.route.snapshot.fragment;
-      if (fragment) {
-        afterNextRender(
-          () => {
-            if (requestId === this.loadSequence)
-              this.scroller.scrollToAnchor(fragment);
-          },
-          { injector: this.injector }
-        );
-      }
     } catch {
       if (requestId !== this.loadSequence) return;
       this.error.set(`Failed to load documentation for ${pkg.name}`);
       this.markdownContent.set('');
     } finally {
-      if (requestId === this.loadSequence) this.loading.set(false);
+      if (requestId === this.loadSequence) {
+        // Clear `loading` FIRST: the markdown container is inside the
+        // non-loading branch, so the anchor pass has nothing to walk until
+        // this flips.
+        this.loading.set(false);
+        this.scheduleAnchorPass(requestId);
+      }
+    }
+  }
+
+  /**
+   * Assign heading anchors AFTER Angular has sanitized and rendered the
+   * markdown, then scroll.
+   *
+   * Angular strips `id` from an `[innerHTML]` string binding — a
+   * DOM-clobbering defense — so an anchor written into the generated HTML
+   * never survives to the DOM, and every `/docs?package=x#section` deep link
+   * silently landed nowhere. The ids are therefore applied to the rendered
+   * elements instead. Sanitization is completely unchanged; nothing is
+   * marked trusted, and no markup crosses the sanitizer that did not before.
+   *
+   * The scroll is deliberately inside the same callback, after the walk: a
+   * fragment cannot resolve against anchors that do not exist yet.
+   */
+  private scheduleAnchorPass(requestId: number): void {
+    afterNextRender(
+      () => {
+        if (requestId !== this.loadSequence) return;
+        this.assignHeadingIds();
+        const fragment = this.route.snapshot.fragment;
+        if (fragment) this.scroller.scrollToAnchor(fragment);
+      },
+      { injector: this.injector }
+    );
+  }
+
+  /**
+   * Deterministic and idempotent: the same rendered text always yields the
+   * same ids, so re-running over an unchanged container is a no-op rather
+   * than a source of drift. Duplicate headings get `-1`, `-2`, ... in
+   * document order, which is why ids are not seeded from existing ones.
+   */
+  private assignHeadingIds(): void {
+    const container =
+      this.host.nativeElement.querySelector('.markdown-content');
+    if (!container) return;
+    const usedIds = new Set<string>();
+    for (const heading of Array.from(
+      container.querySelectorAll('h1,h2,h3,h4,h5,h6')
+    )) {
+      const base = headingSlug(heading.textContent ?? '');
+      let id = base;
+      for (let suffix = 1; usedIds.has(id); suffix++) id = `${base}-${suffix}`;
+      heading.id = id;
+      usedIds.add(id);
     }
   }
 
@@ -252,24 +314,10 @@ export class DocumentationComponent implements OnInit {
         image.setAttribute('src', new URL(src, base).href);
       }
     }
-    const usedIds = new Set(
-      Array.from(tempDiv.querySelectorAll('[id]'), (element) => element.id)
-    );
-    for (const heading of Array.from(
-      tempDiv.querySelectorAll('h1,h2,h3,h4,h5,h6')
-    )) {
-      if (heading.id) continue;
-      const base =
-        (heading.textContent ?? '')
-          .toLowerCase()
-          .trim()
-          .replace(/[^\p{L}\p{N}_\-\s]/gu, '')
-          .replace(/\s/g, '-') || 'section';
-      let id = base;
-      for (let suffix = 1; usedIds.has(id); suffix++) id = `${base}-${suffix}`;
-      heading.id = id;
-      usedIds.add(id);
-    }
+    // Heading anchors are NOT written here. Angular removes `id` from a
+    // sanitized [innerHTML] binding, so ids placed on this detached tree were
+    // discarded on the way to the DOM. They are assigned post-render by
+    // assignHeadingIds(), using the shared headingSlug() rule.
 
     const codeBlocks = Array.from(tempDiv.querySelectorAll('pre code'));
     for (const block of codeBlocks) {
