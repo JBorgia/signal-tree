@@ -172,6 +172,42 @@ Each is now guarded by a test that fails without the fix.
 
 ---
 
+## 4b. The adapter rule — binding for every future adapter
+
+> **Do not ask** "how do we make framework X use SignalTree's reactive
+> mechanism?"
+>
+> **Ask** "what is the cheapest correct native primitive framework X gives us
+> for realizing SignalTree semantics?"
+
+Every expensive failure in this program came from the first question.
+
+The universal bare-cell epoch asked it and assumed an adapter's cell was
+writable — true of Angular by accident, false of Vue, which ships an inert
+placeholder for the kernel to replace. Vue's entity invalidation was silently
+dead and no kernel or Angular test could see it. The universal token epoch asked
+a politer version of the same question and imposed one mechanism everywhere,
+costing Angular 513 B/entity and Vue 441 B/entity against what each framework
+could do natively.
+
+Asking the second question produced both wins, and they are not the same
+primitive: Angular's is a callable `signal`, Vue's a `shallowRef` plus a reader.
+Vue's is CHEAPER. A design that had reasoned from Angular's shape toward "the
+right universal primitive" would have shipped the more expensive one everywhere.
+
+The structural consequence is the create/advance PAIR. The adapter creates a
+handle and the adapter advances it; the kernel may only ask the handle to
+establish a dependency, and `EpochHandle` is deliberately opaque —
+`{ (): unknown }`, no `.value`, no `.set`, no framework type. That opacity is
+what makes the rule enforceable instead of advisory: the kernel cannot reach
+into a realization even by mistake.
+
+For a new adapter this means: find the framework's cheapest primitive that can
+establish a dependency and be advanced, implement the pair, make it pass the
+same semantic conformance suite, and measure the realization separately. Do not
+assume a framework is a good fit because its API looks familiar. Angular looked
+uniquely suited until Vue measured cheaper.
+
 ## 5. Methodology, in one place
 
 What repeatedly produced false results, and what stopped it:
