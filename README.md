@@ -83,11 +83,16 @@ The scope is **`@signal-tree/*`**, distinct from `@ngrx/signals`. Existing **`@s
 
 | Need                                       | Start here                                                                                                                     |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Decide whether to adopt it at all          | [Why SignalTree?](docs/why-signaltree.md)                                                                                      |
+| Translate unfamiliar vocabulary            | [Glossary](docs/glossary.md)                                                                                                   |
+| Know what is open source and what is not   | [Open source vs Studio](docs/oss-vs-studio.md)                                                                                 |
+| Judge versioning and framework maturity    | [Support policy](docs/support-policy.md#versioning-commitment)                                                                 |
 | Structure a feature and coordinate updates | [Architecture](docs/architecture/signaltree-architecture-guide.md) · [Composition recipes](docs/guides/composition-recipes.md) |
 | Work with normalized collections           | [EntityMap API and example](packages/kernel/README.md#entitymap)                                                               |
 | Add undo or inspect changes                | [Restoration](packages/kernel/README.md#restoration) · [DevTools](packages/kernel/README.md#devtools)                          |
 | Diagnose a failure                         | [Error codes](docs/errors/README.md) · [Report an issue](https://github.com/JBorgia/signal-tree/issues)                        |
 | Guide an AI coding assistant               | [Current llms.txt](llms.txt) and your framework package's README and types                                                     |
+| Add or maintain a framework adapter        | [Contributing](CONTRIBUTING.md)                                                                                                |
 
 ## Project and support
 

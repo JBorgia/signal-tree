@@ -1,7 +1,13 @@
 # `@signal-tree/kernel`
 
-Framework-neutral SignalTree state, EntityMap, causal turns, links,
-restoration, transactions, batching, and DevTools.
+Framework-neutral SignalTree state: fields and entity collections,
+transactions and rollback, undo, external updates through `link()`, batching,
+and DevTools.
+
+This is the package framework adapters are built on, so it also documents the
+advanced vocabulary (causal turns, restoration designation, the observation
+seam). Application developers usually need only the terms in the
+[glossary](../../docs/glossary.md)'s first table.
 
 Angular applications should construct trees through `@signal-tree/angular`
 (requires Angular 20, 21, or 22 — see `peerDependencies` in

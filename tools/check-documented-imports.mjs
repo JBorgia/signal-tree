@@ -53,9 +53,12 @@ const LIVE_DOCS = [
   'packages/angular/README.md',
   'packages/react/README.md',
   'packages/vue/README.md',
+  'packages/solid/README.md',
   'docs/guides',
   'docs/ai',
   'docs/overview.md',
+  'docs/why-signaltree.md',
+  'docs/glossary.md',
 ];
 
 const EXCLUDED_PREFIXES = [
