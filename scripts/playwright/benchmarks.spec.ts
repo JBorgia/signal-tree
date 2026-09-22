@@ -6,14 +6,14 @@ test('v15 browser spot-check completes every checked arm', async ({ page }) => {
   await page.goto('/benchmarks', { waitUntil: 'load' });
   await expect(
     page.getByRole('heading', {
-      name: 'Recurring application-state performance',
+      name: 'Compare the work your app does.',
     })
   ).toBeVisible();
   await expect(page.locator('.build-notice')).toHaveCount(0);
 
   const measuredRounds = page.locator('#measured-rounds');
   const runButton = page.getByRole('button', {
-    name: 'Run recurring spot-check',
+    name: 'Run benchmarks',
   });
   await expect(measuredRounds).toHaveValue('25');
   await expect(page.locator('.benchmarks-page')).toHaveAttribute(
@@ -309,7 +309,7 @@ test('ranked result displays stack without overflow on mobile', async ({
   test.setTimeout(120_000);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/benchmarks', { waitUntil: 'load' });
-  await page.getByRole('button', { name: 'Run recurring spot-check' }).click();
+  await page.getByRole('button', { name: 'Run benchmarks' }).click();
   await expect(page.locator('.result-row')).toHaveCount(13, {
     timeout: 60_000,
   });
@@ -359,7 +359,7 @@ test('ranked result displays retain visual tracks at the tablet breakpoint', asy
   test.setTimeout(120_000);
   await page.setViewportSize({ width: 768, height: 900 });
   await page.goto('/benchmarks', { waitUntil: 'load' });
-  await page.getByRole('button', { name: 'Run recurring spot-check' }).click();
+  await page.getByRole('button', { name: 'Run benchmarks' }).click();
   await expect(page.locator('.result-row')).toHaveCount(13, {
     timeout: 60_000,
   });
@@ -399,7 +399,7 @@ for (const legacyPath of ['/benchmark', '/realistic-comparison']) {
     await expect(page).toHaveURL(/\/benchmarks$/);
     await expect(
       page.getByRole('heading', {
-        name: 'Recurring application-state performance',
+        name: 'Compare the work your app does.',
       })
     ).toBeVisible();
   });
