@@ -333,6 +333,21 @@ An `ObservationAdapter` supplies dependency tokens and
 changes before framework observers are notified. It never owns or mirrors
 location state.
 
+An adapter may also supply an epoch, which lets a framework invalidate a whole
+subject through one native primitive instead of one carrier per field:
+
+- `createEpoch()` returns an `EpochHandle` — an opaque callable the adapter
+  owns. The kernel stores it, passes it back, and never writes through it or
+  inspects what is inside.
+- `advanceEpoch(epoch)` marks that handle stale. The kernel calls this; the
+  adapter decides what the framework does about it.
+
+The two are a pair. An adapter that supplies one without the other does not
+receive an epoch at all, because a handle the kernel cannot advance would
+silently stop invalidating. `EpochHandle` is exported from
+`@signal-tree/kernel/adapter` alongside `ObservationAdapter` and
+`ObservationToken`.
+
 ## Redux DevTools collection display
 
 The optional `entityKeyedView` setting adds an id-keyed `byId` view alongside

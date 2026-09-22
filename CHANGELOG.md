@@ -1,3 +1,57 @@
+## 15.2.0 (unreleased)
+
+- **One semantic authority, framework-specialized physical realization.** The kernel
+  keeps sole ownership of meaning: subject identity, causality, transactions, external
+  truth and restoration. Each framework package now owns only the cheapest correct
+  native primitive for making that meaning observable, instead of asking its framework
+  to observe a shared neutral carrier. These are realization layers rather than
+  wrappers, and no framework is held to another's lowest common denominator.
+
+- **The adapter rule, binding for every future adapter.** Do not ask how to make a
+  framework use SignalTree's reactive mechanism. Ask what the cheapest correct native
+  primitive that framework offers for realizing SignalTree semantics is. A framework
+  earns a place by passing the same semantic conformance suite the shipping ones did.
+
+- **Angular-native and Vue-native realizations.** Angular realizes leaves as Angular
+  signals; Vue realizes them as `shallowRef` with a reader. Both route invalidation
+  through a shared epoch publisher held once per runtime rather than once per subject.
+  Vue's realization is the cheaper of the two, which is the point: the win belongs to
+  framework specialization, not to any one framework.
+
+- **New package: `@signal-tree/solid`.** A native Solid realization built on
+  `createSignal`, with batched publication and root-scoped disposal. It ships on
+  correctness and semantic conformance: a packed-tarball gate installs it into a clean
+  project, type-checks it, and runs it under Solid's client export conditions, so a
+  vacuous pass against the SSR build — where effects never run — cannot be mistaken for
+  a real one. Its realization cost has not been characterized and no figure is claimed.
+
+- **Public `EpochHandle`.** `@signal-tree/kernel/adapter` now exports `EpochHandle`
+  alongside `ObservationAdapter` and `ObservationToken`. The epoch seam is a paired
+  `createEpoch`/`advanceEpoch` contract: the handle is deliberately opaque, and the
+  kernel never writes adapter-owned state through it. An adapter that ships an epoch
+  ships both halves.
+
+- **Entity realization memory.** Released entity-realization residue — what a collection
+  still retains per entity after realized rows are dropped — measured process-isolated
+  on one harness and reproduced at two entity counts: Angular 3,591 to 1,350 B/entity,
+  Vue 4,519 to 1,135 B/entity, React and framework-neutral 3,715 to 1,748 B/entity.
+  Against a normalized token realization the native paths save 513 B/entity (27.5%) on
+  Angular and 441 B/entity (28.0%) on Vue. These are not general speed or footprint
+  claims. They are not comparable to v14, whose keys are identity: a held v14 node
+  follows a fresh occupant of the same key, a materially weaker guarantee, and a
+  comparison omitting that sentence misrepresents both lines.
+
+- **CPU is unresolved and stays unresolved.** CPU differences could not be resolved on
+  the available hardware under the preregistered methodology, so no claim is made in
+  either direction. Among implementations with validated semantics, Angular-native
+  provides the lowest measured Angular memory cost, saving 513 B/entity (27.5%) versus
+  the normalized token realization.
+
+- **A framework surface in the demo.** The demo presents the four shipping realizations
+  with their primitives, read/write idioms and memory figures, each carrying the
+  qualifier that makes it honest, and lists Solid as uncharacterized rather than
+  inventing a number to fill the column.
+
 ## 15.1.4 (2026-09-17)
 
 - **Fix Angular AOT store injection.** `defineStore` now registers its DI definition
