@@ -1,5 +1,10 @@
 # CPU decision — preregistration v3 (final methodology revision)
 
+> **Start at [`ENTITY-REALIZATION-RECORD.md`](ENTITY-REALIZATION-RECORD.md).**
+> It carries the decision, what is established, and — importantly — every
+> retracted number in one place. This document is retained as detail and
+> evidence; read it knowing some claims inside it were later withdrawn.
+
 **Dated 2026-09-21.** This is the LAST harness revision for this decision. There
 is no v4; the stopping rule is at the bottom and it is binding.
 

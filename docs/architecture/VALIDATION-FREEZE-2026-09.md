@@ -1,5 +1,10 @@
 # Validation freeze — entity realization work
 
+> **Start at [`ENTITY-REALIZATION-RECORD.md`](ENTITY-REALIZATION-RECORD.md).**
+> It carries the decision, what is established, and — importantly — every
+> retracted number in one place. This document is retained as detail and
+> evidence; read it knowing some claims inside it were later withdrawn.
+
 **Written before any measurement in this pass was run.** The matrix, the
 repetition counts, the accept/reject rules and the mutants are all fixed here so
 that nothing can be adjusted after a result is seen. Anything discovered later

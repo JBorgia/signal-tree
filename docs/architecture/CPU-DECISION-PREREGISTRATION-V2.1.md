@@ -1,5 +1,10 @@
 # Quiet-host CPU decision — preregistration v2.1
 
+> **Start at [`ENTITY-REALIZATION-RECORD.md`](ENTITY-REALIZATION-RECORD.md).**
+> It carries the decision, what is established, and — importantly — every
+> retracted number in one place. This document is retained as detail and
+> evidence; read it knowing some claims inside it were later withdrawn.
+
 **Dated 2026-09-20. Written BEFORE any quiet-host CPU number has been observed.**
 Angular MEMORY for the native candidate has been seen (1,350 B/entity); CPU has
 not. This amendment concerns only how the CPU candidates are constructed.
