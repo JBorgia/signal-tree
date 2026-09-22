@@ -233,6 +233,16 @@ dd {
 .text-link {
   font-size: 0.85rem;
 }
+// The same treatment styles.scss already gives `main a:not([class])`. These
+// links only escape that rule because they carry a class.
+.text-link:hover,
+.fit-grid a:hover,
+.adoption-links a:hover {
+  color: var(--color-primary-800);
+  text-decoration-color: currentColor;
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+}
 .benefits {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

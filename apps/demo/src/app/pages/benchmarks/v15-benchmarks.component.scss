@@ -237,6 +237,9 @@ summary {
   font-size: 0.9rem;
   font-weight: 700;
 }
+summary:hover {
+  color: var(--color-primary-700);
+}
 details[open] > :not(summary) {
   margin-top: 0.8rem;
 }

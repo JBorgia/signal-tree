@@ -68,8 +68,20 @@ const captureHoverState = async (
     };
 
     const rootBox = element.getBoundingClientRect();
+    // The hover point comes from the FIRST line box, not from the bounding
+    // box. An inline link that wraps across two lines has a bounding box
+    // spanning both, whose centre lands in the leading BETWEEN them: the
+    // cursor then sits on the parent paragraph and the link never receives
+    // :hover, which this suite reported as "no visible hover response" on
+    // links whose hover styling was perfectly fine.
+    const firstLine = element.getClientRects()[0] ?? rootBox;
     return {
-      target: [rootBox.left, rootBox.top, rootBox.width, rootBox.height],
+      target: [
+        firstLine.left,
+        firstLine.top,
+        firstLine.width,
+        firstLine.height,
+      ],
       boxes: geometryNodes.map((node) => {
         const box = node.getBoundingClientRect();
         return [
