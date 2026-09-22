@@ -1,0 +1,16 @@
+v3 calibrated paired A/B — 10 pairs per order, both orders, 5 batches/process
+  a          /Users/jonathanborgia/signaltree-cpu-results/dist/v2-token
+  b          /Users/jonathanborgia/signaltree-cpu-results/dist/v2-token
+
+reference = a; A/A rejection threshold 5% of median
+Iteration counts are calibrated per process to >=250ms (500ms for the
+cheapest ops). Statistic is a MEDIAN at both levels: min-of-N is not used.
+
+workload                  a         b    delta     A/A  verdict
+---------------------------------------------------------------
+updateOne             258.2     259.7    +0.6%    3.4%  within A/A
+byId-warm             153.0     152.7    -0.2%   20.0%  NOT RESOLVABLE
+byId-cold            8371.2    8439.9    +0.8%   24.8%  NOT RESOLVABLE
+field-read-held        32.8      30.8    -5.9%   21.8%  NOT RESOLVABLE
+setAll-reused     3474780.0 3473080.5    -0.0%   13.9%  NOT RESOLVABLE
+scalar-set              1.7       1.7    -0.1%    7.6%  NOT RESOLVABLE
