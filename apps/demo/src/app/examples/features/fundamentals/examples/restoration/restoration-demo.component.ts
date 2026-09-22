@@ -1,4 +1,3 @@
-import { JsonPipe } from '@angular/common';
 import {
   Component,
   computed,
@@ -7,20 +6,25 @@ import {
   signal,
   ChangeDetectionStrategy,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import {
   entityMap,
   external,
+  SignalTreeRollbackError,
   signalTree,
   restoration,
   undoable,
 } from '@signal-tree/angular';
 
-import {
-  ExampleComponent,
-  type CodeFile,
-} from '../../../../shared/components/example-shell';
+import { ExampleComponent } from '../../../../shared/components/example-shell';
 
 import type { RestorationMethods } from '@signal-tree/angular';
+
+interface Todo {
+  id: number;
+  title: string;
+  completed: boolean;
+}
 
 interface Person {
   id: number;
@@ -36,70 +40,22 @@ type ProfileModel = {
 interface AppState {
   counter: number;
   message: string;
+  todos: Todo[];
 }
 
 @Component({
   selector: 'app-restoration-demo',
   standalone: true,
-  imports: [ExampleComponent, JsonPipe],
+  imports: [FormsModule, ExampleComponent],
   templateUrl: './restoration-demo.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './restoration-demo.component.scss',
 })
 export class RestorationDemoComponent {
-  readonly entityCode: CodeFile[] = [
-    {
-      label: 'Undo collection edits',
-      language: 'typescript',
-      source: `// markerTree uses entityMap() and the restoration() enhancer.
-// Each button runs in a separate user event.
-undoable(() => markerTree.$.people.addOne({ id, name: \`Person \${id}\` }));
-
-// After the event settles:
-markerTree.undo(); // removes that addition
-markerTree.redo(); // restores it
-
-// Ordinary nested values use the same designation.
-undoable(() => markerTree.$.job.set('LOADED'));`,
-    },
-  ];
-  readonly codeFiles: CodeFile[] = [
-    {
-      label: 'User edit and undo',
-      language: 'typescript',
-      source: `import { signalTree, restoration, undoable, external } from '@signal-tree/angular';
-
-const tree = signalTree(initialState, {
-  enhancers: [restoration({ maxHistorySize: 50 })],
-});
-
-// One user action:
-undoable(() => tree.$.counter.update((value) => value + 1));
-// After that event settles, on a later user action:
-tree.undo();
-tree.redo();
-// Call tree.destroy() when its owner is torn down.`,
-    },
-    {
-      label: 'Incoming update',
-      language: 'typescript',
-      source: `// Simulated resolved server data enters synchronously.
-external(() => tree.$.message.set('Updated by the server'));
-
-// External data does not create an undo step.
-// Undo may refuse an edit that conflicts with later external truth.
-try {
-  tree.undo();
-} catch (error) {
-  if (!(error instanceof Error) || !error.message.startsWith('ST1034:')) throw error;
-  rollbackMessage.set(error.message);
-}`,
-    },
-  ];
-
   private readonly destroyRef = inject(DestroyRef);
   private readonly timers = new Set<ReturnType<typeof setTimeout>>();
   private readonly sampleTimers = new Set<ReturnType<typeof setTimeout>>();
+  newTodoText = '';
 
   // EntityMap and ordinary state participate in the same restoration model.
   private markerTree = signalTree(
@@ -256,6 +212,11 @@ try {
     {
       counter: 0,
       message: 'Hello SignalTree!',
+      todos: [
+        { id: 1, title: 'Learn SignalTree', completed: true },
+        { id: 2, title: 'Try restoration', completed: false },
+        { id: 3, title: 'Inspect causal turns', completed: false },
+      ],
     } as AppState,
     { enhancers: [restoration({ maxHistorySize: 50 })] }
   );
@@ -263,6 +224,7 @@ try {
   // State signals
   counter = this.tree.$.counter;
   message = this.tree.$.message;
+  todos = this.tree.$.todos;
 
   // Restoration view state derives from the tree.
   history = signal(this.tree.getRestorationHistory());
@@ -285,6 +247,12 @@ try {
     this.queueRestorationStateRefresh();
   }
 
+  // Computed signals
+  activeTodos = computed(() => this.todos().filter((t: Todo) => !t.completed));
+  completedTodos = computed(() =>
+    this.todos().filter((t: Todo) => t.completed)
+  );
+
   historyLength = computed(() => this.history().length);
 
   // Counter actions
@@ -305,10 +273,71 @@ try {
     this.designate(() => this.message.set(value));
   }
 
-  // Apply the resolved server value without creating an undo step.
+  // Todo actions
+  addTodo() {
+    const text = this.newTodoText.trim();
+    if (!text) return;
+
+    const newTodo: Todo = {
+      id: Date.now(),
+      title: text,
+      completed: false,
+    };
+
+    // `undoable()` marks the authored causal turn containing these writes as
+    // eligible for undo. Adding a todo is a real user operation, which is the
+    // bar for designation — not "it happens to change state".
+    //
+    // It does NOT create a turn boundary: anything else written in this same
+    // tick belongs to the same operation and reverses with it.
+    this.designate(() =>
+      this.todos.update((todos) => [...todos, newTodo])
+    );
+    this.newTodoText = '';
+  }
+
+  /**
+   * A server refresh — the mirror of `addTodo()`.
+   *
+   * `external()` says the contained writes are externally acquired truth rather
+   * than work the user authored. Watch the history counter: it does NOT grow,
+   * and the Undo button still points at your last real operation.
+   *
+   * Without it, a refresh is indistinguishable from a user edit, so Undo would
+   * revert the SERVER's value back to a stale client one.
+   *
+   * Note the shape: acquisition is asynchronous and belongs to whatever fetches
+   * (a `resource()`, an RxJS pipeline, a fetch). Only APPLYING the result is a
+   * SignalTree event, and that part is synchronous — `external(async () => …)`
+   * is refused with ST1035 rather than silently classifying nothing.
+   */
   refreshFromServer() {
-    external(() => this.message.set('Updated by the server'));
+    const serverTodos: Todo[] = [
+      { id: 1, title: 'Learn SignalTree', completed: true },
+      { id: 2, title: 'Try Time Travel', completed: true },
+      { id: 9001, title: 'Review the server refresh', completed: false },
+    ];
+
+    external(() => {
+      this.todos.set(serverTodos);
+    });
     this.queueRestorationStateRefresh();
+  }
+
+  toggleTodo(id: number) {
+    this.designate(() =>
+      this.todos.update((todos) =>
+        todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        )
+      )
+    );
+  }
+
+  deleteTodo(id: number) {
+    this.designate(() =>
+      this.todos.update((todos) => todos.filter((todo) => todo.id !== id))
+    );
   }
 
   // Time travel actions
@@ -318,7 +347,7 @@ try {
       this.tree.undo();
       this.queueRestorationStateRefresh();
     } catch (error) {
-      this.handleRestorationError(error);
+      this.handleRollbackError(error);
     }
   }
 
@@ -328,7 +357,7 @@ try {
       this.tree.redo();
       this.queueRestorationStateRefresh();
     } catch (error) {
-      this.handleRestorationError(error);
+      this.handleRollbackError(error);
     }
   }
 
@@ -338,13 +367,12 @@ try {
       this.tree.jumpTo(index);
       this.queueRestorationStateRefresh();
     } catch (error) {
-      this.handleRestorationError(error);
+      this.handleRollbackError(error);
     }
   }
 
-  private handleRestorationError(error: unknown): void {
-    // Restoration conflicts are coded errors; transaction rollback has a different type.
-    if (!(error instanceof Error) || !error.message.startsWith('ST1034:')) {
+  private handleRollbackError(error: unknown): void {
+    if (!(error instanceof SignalTreeRollbackError)) {
       throw error;
     }
 
@@ -382,6 +410,14 @@ try {
     }, 200);
 
     this.scheduleSample(() => {
+      this.designate(() =>
+        this.todos.set([
+          { id: Date.now(), title: 'First task', completed: false },
+        ])
+      );
+    }, 300);
+
+    this.scheduleSample(() => {
       this.designate(() => this.counter.set(5));
     }, 400);
 
@@ -390,8 +426,27 @@ try {
     }, 500);
 
     this.scheduleSample(() => {
+      this.designate(() =>
+        this.todos.update((todos) => [
+          ...todos,
+          { id: Date.now() + 1, title: 'Second task', completed: false },
+        ])
+      );
+    }, 600);
+
+    this.scheduleSample(() => {
       this.designate(() => this.counter.set(10));
     }, 700);
+
+    this.scheduleSample(() => {
+      this.designate(() =>
+        this.todos.update((todos) =>
+          todos.map((todo, index) =>
+            index === 0 ? { ...todo, completed: true } : todo
+          )
+        )
+      );
+    }, 800);
 
     this.scheduleSample(() => {
       this.designate(() =>
@@ -405,9 +460,8 @@ try {
   }
 
   getStatePreview(state: AppState): string {
-    return `Counter: ${state.counter}, Message: "${state.message.substring(
-      0,
-      20
-    )}..."`;
+    return `Counter: ${state.counter}, Todos: ${
+      state.todos.length
+    }, Message: "${state.message.substring(0, 20)}..."`;
   }
 }

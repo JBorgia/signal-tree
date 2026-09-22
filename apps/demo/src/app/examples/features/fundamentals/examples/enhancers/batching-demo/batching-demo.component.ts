@@ -1,8 +1,4 @@
 import {
-  ExampleComponent,
-  type CodeFile,
-} from '../../../../../shared/components/example-shell';
-import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -76,45 +72,11 @@ const createPublicationTree = () =>
 @Component({
   selector: 'app-batching-demo',
   standalone: true,
-  imports: [ExampleComponent],
   templateUrl: './batching-demo.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './batching-demo.component.scss',
 })
 export class BatchingDemoComponent implements OnDestroy {
-  readonly codeFiles: CodeFile[] = [
-    {
-      label: 'Grouped writes',
-      language: 'typescript',
-      source: `// Construct the demo tree with:
-// { enhancers: [batching({ notificationDelayMs: 0 })] }
-// Import batching and signalTree from '@signal-tree/angular'.
-
-const { alice, bob } = tree.$.users;
-const post = tree.$.posts.featured;
-
-tree.batch(() => {
-  alice.postCount.update((count) => count - 1);
-  bob.postCount.update((count) => count + 1);
-  post.authorId.set(2);
-});
-tree.flushNotifications(); // then inspect the completed transfer`,
-    },
-    {
-      label: 'Separate writes',
-      language: 'typescript',
-      source: `alice.postCount.update((count) => count - 1);
-tree.flushNotifications(); // Alice 3, Bob 2, author Alice
-bob.postCount.update((count) => count + 1);
-tree.flushNotifications(); // Alice 3, Bob 3, author Alice
-post.authorId.set(2);
-tree.flushNotifications(); // Alice 3, Bob 3, author Bob
-
-// The demo records state after each explicit flush.
-// These are explicit state checkpoints, not observer or render counts.`,
-    },
-  ];
-
   readonly tree = createPublicationTree();
   readonly alice = this.tree.$.users.alice;
   readonly bob = this.tree.$.users.bob;
@@ -138,17 +100,17 @@ tree.flushNotifications(); // Alice 3, Bob 3, author Bob
     {
       path: 'users.alice.postCount',
       change: '4 -> 3',
-      label: 'Alice post count changed',
+      label: 'Alice post count published',
     },
     {
       path: 'users.bob.postCount',
       change: '2 -> 3',
-      label: 'Bob post count changed',
+      label: 'Bob post count published',
     },
     {
       path: 'posts.featured.authorId',
       change: 'Alice -> Bob',
-      label: 'Post owner changed',
+      label: 'Post owner published',
     },
   ] as const;
 
@@ -181,7 +143,7 @@ tree.flushNotifications(); // Alice 3, Bob 3, author Bob
       this.incrementBob();
       this.transferPost();
     });
-    this.publish('After grouped writes');
+    this.publish('After grouped publication');
 
     this.batchedSummary.set(this.currentSummary());
   }

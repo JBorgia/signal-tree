@@ -1,163 +1,147 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  DestroyRef,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import {
-  defineStore,
-  entityMap,
-  external,
-  restoration,
-  signalTree,
-  undoable,
-} from '@signal-tree/angular';
 
 import {
   CodeTabsComponent,
   type CodeFile,
 } from '../../examples/shared/components/example-shell';
 
-interface Order {
-  id: number;
-  customer: string;
-  priority: string;
-  status: string;
+interface HomeLink {
+  readonly eyebrow: string;
+  readonly title: string;
+  readonly description: string;
+  readonly route: string;
+  readonly action: string;
 }
 
-const DemoOrders = defineStore(() => {
-  const tree = signalTree(
-    { orders: entityMap<Order, number>({ selectId: (order) => order.id }) },
-    { enhancers: [restoration()] }
-  );
-  external(() =>
-    tree.$.orders.addMany([
-      { id: 101, customer: 'Ada', priority: 'Standard', status: 'Packing' },
-      { id: 102, customer: 'Lin', priority: 'Standard', status: 'Ready' },
-    ])
-  );
-  return tree;
-});
+interface PackageEntry {
+  readonly name: string;
+  readonly role: string;
+  readonly detail: string;
+  readonly package: 'angular' | 'kernel' | 'react';
+}
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [RouterModule, CodeTabsComponent],
-  providers: [DemoOrders],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
-  private readonly tree = inject(DemoOrders);
-  private readonly destroyRef = inject(DestroyRef);
-  private refreshTimer: ReturnType<typeof setTimeout> | undefined;
-  readonly orders = [
-    this.tree.$.orders.byIdOrFail(101),
-    this.tree.$.orders.byIdOrFail(102),
-  ];
-  // Instrument actual memoized readers, not DOM renders or synthetic counters.
-  readonly priorityReaders = this.orders.map((order) => {
-    let runs = 0;
-    return computed(() => ({ value: order.priority(), runs: ++runs }));
-  });
-  readonly canUndo = signal(false);
-  readonly message = signal('Try order 101. Order 102 stays unchanged.');
-
-  readonly packages = [
+  readonly paths: readonly HomeLink[] = [
     {
-      label: 'Angular',
-      id: 'angular',
-      command: 'npm install @signal-tree/angular',
-    },
-    { label: 'React', id: 'react', command: 'npm install @signal-tree/react' },
-    { label: 'Vue', id: 'vue', command: 'npm install @signal-tree/vue' },
-    {
-      label: 'TypeScript',
-      id: 'kernel',
-      command: 'npm install @signal-tree/kernel',
-    },
-  ] as const;
-  readonly selectedPackage = signal(
-    this.packages[0] as (typeof this.packages)[number]
-  );
-
-  readonly example: CodeFile[] = [
-    {
-      label: 'Update a field',
-      language: 'typescript',
-      source: `// Angular · live example
-const order = tree.$.orders.byIdOrFail(101);
-
-order.priority(); // 'Standard'
-order.priority.set('Rush');
-order.priority(); // 'Rush'
-
-// The other order stays Standard.
-tree.$.orders.byIdOrFail(102).priority();`,
+      eyebrow: 'New to SignalTree',
+      title: 'Learn the model',
+      description:
+        'Read the state grammar, build one tree, and see where optional capabilities attach.',
+      route: '/start',
+      action: 'Take the five-minute tour',
     },
     {
-      label: 'Keep server updates',
-      language: 'typescript',
-      source: `// Optional: construct with enhancers: [restoration()].
-// Import these APIs from '@signal-tree/angular'.
-
-// User action: designate this edit for undo.
-undoable(() => order.priority.set('Rush'));
-
-// Later, a server response arrives.
-external(() => order.status.set('Shipped'));
-
-// On the next user action:
-tree.undo();
-// Priority: Standard. Server status: still Shipped.`,
+      eyebrow: 'Evaluating architecture',
+      title: 'Inspect the boundaries',
+      description:
+        'See exactly what the kernel, framework realizations, applications, and external endpoints own.',
+      route: '/architecture-overview',
+      action: 'Open the architecture',
+    },
+    {
+      eyebrow: 'Evaluating strategic value',
+      title: 'See why causality compounds',
+      description:
+        'Compare equal snapshots with different histories, then trace the value through recovery, synchronization, and AI execution.',
+      route: '/why-causality',
+      action: 'Explore the causal advantage',
+    },
+    {
+      eyebrow: 'Ready to build',
+      title: 'Work through examples',
+      description:
+        'Use live state, derived values, EntityMap collections, transactions, and restoration.',
+      route: '/examples/fundamentals',
+      action: 'Open fundamentals',
+    },
+    {
+      eyebrow: 'Working from existing code',
+      title: 'Plan the migration',
+      description:
+        'Map current application responsibilities onto the v15 ownership model without recreating legacy architecture.',
+      route: '/migrate',
+      action: 'Open the migration guide',
     },
   ];
 
-  constructor() {
-    this.destroyRef.onDestroy(() => clearTimeout(this.refreshTimer));
-  }
+  readonly packages: readonly PackageEntry[] = [
+    {
+      name: '@signal-tree/angular',
+      role: 'Angular applications',
+      detail:
+        'Native signals, dependency injection, and injector-bound cleanup.',
+      package: 'angular',
+    },
+    {
+      name: '@signal-tree/kernel',
+      role: 'Framework-neutral code',
+      detail:
+        'State, identity, causal turns, restoration, transactions, and Link.',
+      package: 'kernel',
+    },
+    {
+      name: '@signal-tree/react',
+      role: 'React applications',
+      detail: 'Owner-bound observation over the same kernel authority.',
+      package: 'react',
+    },
+  ];
 
-  prioritize(): void {
-    undoable(() => this.orders[0].priority.set('Rush'));
-    this.message.set('Order 101 is Rush. Order 102 stays Standard.');
-    this.refreshUndo();
-  }
+  readonly stateGrammar: CodeFile[] = [
+    {
+      label: 'state-grammar.ts',
+      language: 'typescript',
+      source: `import { leaf, signalTree } from '@signal-tree/angular';
 
-  receiveUpdate(): void {
-    external(() => this.orders[0].status.set('Shipped'));
-    this.message.set('Simulated server update: order 101 is Shipped.');
-    this.refreshUndo();
-  }
+const tree = signalTree({
+  count: 0,
+  profile: { name: 'Ada', role: 'engineer' },
+  range: leaf({ start: 0, end: 10 }),
+  onCount: leaf((count: number) => console.log(count)),
+});
 
-  undo(): void {
-    this.tree.undo();
-    this.message.set(
-      `Priority restored. Order 101 is still ${this.orders[0].status()}.`
-    );
-    this.refreshUndo();
-  }
+tree.$();                              // read root
+tree.$(current => ({ ...current }));  // update root
 
-  reset(): void {
-    external(() => {
-      this.orders[0].priority.set('Standard');
-      this.orders[0].status.set('Packing');
-    });
-    this.tree.resetRestorationHistory();
-    this.canUndo.set(false);
-    this.message.set('Try order 101. Order 102 stays unchanged.');
-    this.refreshUndo();
-  }
+tree.$.profile();                      // read branch
+tree.$.profile(current => ({
+  ...current,
+  role: 'architect'
+}));                                   // update branch
 
-  private refreshUndo(): void {
-    // Designated turns settle after the event; do not read the previous history.
-    clearTimeout(this.refreshTimer);
-    this.refreshTimer = setTimeout(
-      () => this.canUndo.set(this.tree.canUndo()),
-      0
-    );
-  }
+tree.$.count();                        // read leaf
+tree.$.count.set(5);                   // replace leaf
+tree.$.count.update(n => n + 1);       // derive leaf
+
+tree.$.range.set({ start: 5, end: 15 }); // replace terminal object
+tree.$.onCount.set((count) => {         // replace callable data
+  console.info(count);
+});`,
+    },
+    {
+      label: 'causal-writes.ts',
+      language: 'typescript',
+      source: `import { external, undoable } from '@signal-tree/angular';
+
+tree.$.count.set(1);                   // authored, undesignated
+
+undoable(() => {
+  tree.$.profile.role.set('architect');
+});                                   // authored + restoration-designated
+
+const profile = await api.loadProfile();
+external(() => {
+  tree.$.profile(profile);
+});                                   // externally realized truth`,
+    },
+  ];
 }

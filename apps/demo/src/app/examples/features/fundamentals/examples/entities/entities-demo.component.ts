@@ -1,8 +1,4 @@
 import {
-  ExampleComponent,
-  type CodeFile,
-} from '../../../../shared/components/example-shell';
-import {
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -76,40 +72,12 @@ const createInventoryTree = () => {
 @Component({
   selector: 'app-entities-demo',
   standalone: true,
-  imports: [FormsModule, ExampleComponent],
+  imports: [FormsModule],
   templateUrl: './entities-demo.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './entities-demo.component.scss',
 })
 export class EntitiesDemoComponent implements OnDestroy {
-  readonly codeFiles: CodeFile[] = [
-    {
-      label: 'Create collection',
-      language: 'typescript',
-      source: `import { entityMap, signalTree } from '@signal-tree/angular';
-
-const store = signalTree({
-  products: entityMap<Product, number>({ selectId: (p) => p.id }),
-});
-store.$.products.addMany(INITIAL_PRODUCTS);
-const held = store.$.products.byIdOrFail(1);
-// Call store.destroy() when its owner is torn down.`,
-    },
-    {
-      label: 'Update and query',
-      language: 'typescript',
-      source: `const products = store.$.products;
-const available = products.where((p) => p.availability === 'available');
-
-products.updateOne(1, { name: 'Desk lamp, revised' });
-held().name; // 'Desk lamp, revised' — same handle
-
-products.updateOne(1, { availability: 'reserved' });
-available(); // excludes product 1
-products.count(); // collection size is unchanged`,
-    },
-  ];
-
   readonly store = createInventoryTree();
   readonly filter = signal<InventoryFilter>('all');
   readonly selectedProductId = signal<number | null>(1);
@@ -171,9 +139,7 @@ products.count(); // collection size is unchanged`,
       onAdd: (product) => {
         this.blockedOperation.set(null);
         this.lastEvent.set(
-          `Added ${
-            product.name
-          } after commit (${this.store.$.products.count()} total)`
+          `Added ${product.name} after commit (${this.store.$.products.count()} total)`
         );
       },
       onUpdate: (_id, _changes, product) => {

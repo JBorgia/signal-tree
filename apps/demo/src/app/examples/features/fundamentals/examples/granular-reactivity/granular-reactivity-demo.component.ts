@@ -10,18 +10,31 @@ import { entityMap, signalTree } from '@signal-tree/angular';
 
 import type { EntityMapMarker } from '@signal-tree/angular';
 
-import {
-  ExampleComponent,
-  type CodeFile,
-} from '../../../../shared/components/example-shell';
+import { ExampleComponent } from '../../../../shared/components/example-shell';
 
 interface Row {
   id: number;
   value: number;
 }
 
-/** Counts computed derivation bodies for two access patterns, not DOM renders.
- * Other designs may memoize unchanged records; this is not a library ranking.
+/**
+ * Honest demonstration of body-granular reactivity.
+ *
+ * IMPORTANT (and the reason this demo measures derivations, not renders):
+ * Angular's `computed()` equality already isolates *renders* for ANY library —
+ * a `signal(bigObject)` with per-item `computed()` under `OnPush` re-renders
+ * only the rows whose value actually changed. So "who re-renders" is NOT a
+ * SignalTree win.
+ *
+ * What DOES differ is how many derivation BODIES re-run per change:
+ *  - SignalTree `entityMap`: per-entity signals — only the touched entity's
+ *    derivation re-runs (fan-out 1).
+ *  - Naive `signal(object)`: every per-item computed reads the one root signal,
+ *    so ALL N bodies re-run on every change (they then return equal values, so
+ *    renders still isolate — the work is wasted, not visible).
+ *
+ * To match SignalTree with raw signals you'd hand-roll one signal per field —
+ * which is exactly what SignalTree does for you.
  */
 @Component({
   selector: 'app-granular-reactivity-demo',
@@ -29,54 +42,53 @@ interface Row {
   imports: [ExampleComponent],
   template: `
     <div class="layout-frame">
-      <st-example
-        heading="Granular reactivity — how many derivations re-run?"
-        [headingLevel]="1"
-        [code]="codeFiles"
-      >
-        <p intro class="muted">
-          Update one row and count computed bodies that run again. Compare
-          per-record dependencies with a single root signal.
-        </p>
+    <st-example
+      heading="Granular reactivity — how many derivations re-run?"
+      [headingLevel]="1"
+    >
+      <p intro class="muted">
+        Both columns isolate <em>renders</em> (Angular
+        <code>computed()</code> equality). Watch
+        <strong>derivations re-run per change</strong> instead: SignalTree
+        re-runs only the touched entity's; the naive single signal re-runs all
+        {{ n }}.
+      </p>
 
-        <section class="demo">
-          <div class="cols">
-            <div class="col">
-              <h3>SignalTree <code>entityMap</code></h3>
-              <button type="button" (click)="bumpTree()">
-                Bump a random row
-              </button>
-              <p class="metric">
-                derivations re-run on last change:
-                <strong [class.good]="treeDelta() <= 1">{{
-                  treeDelta()
-                }}</strong>
-                / {{ n }}
-              </p>
-              <p class="muted total">total since load: {{ treeTotal() }}</p>
-            </div>
-
-            <div class="col">
-              <h3>Single root signal</h3>
-              <button type="button" (click)="bumpRaw()">
-                Bump a random row
-              </button>
-              <p class="metric">
-                derivations re-run on last change:
-                <strong [class.bad]="rawDelta() > 1">{{ rawDelta() }}</strong>
-                / {{ n }}
-              </p>
-              <p class="muted total">total since load: {{ rawTotal() }}</p>
-            </div>
+      <section class="demo">
+        <div class="cols">
+          <div class="col">
+            <h3>SignalTree <code>entityMap</code></h3>
+            <button type="button" (click)="bumpTree()">
+              Bump a random row
+            </button>
+            <p class="metric">
+              derivations re-run on last change:
+              <strong [class.good]="treeDelta() <= 1">{{ treeDelta() }}</strong>
+              / {{ n }}
+            </p>
+            <p class="muted total">total since load: {{ treeTotal() }}</p>
           </div>
 
-          <p class="muted">
-            This measures two access patterns, not browser rendering or
-            optimized library alternatives. Other designs can cache unchanged
-            records and avoid repeating work.
-          </p>
-        </section>
-      </st-example>
+          <div class="col">
+            <h3>Naive <code>signal(object)</code></h3>
+            <button type="button" (click)="bumpRaw()">Bump a random row</button>
+            <p class="metric">
+              derivations re-run on last change:
+              <strong [class.bad]="rawDelta() > 1">{{ rawDelta() }}</strong>
+              / {{ n }}
+            </p>
+            <p class="muted total">total since load: {{ rawTotal() }}</p>
+          </div>
+        </div>
+
+        <p class="muted">
+          After a few bumps the SignalTree side stays at <strong>1</strong>; the
+          naive side re-runs all {{ n }} every time. Renders look identical —
+          the difference is the wasted derivation work the naive pattern can't
+          avoid without hand-rolling a signal per field.
+        </p>
+      </section>
+    </st-example>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -91,7 +103,7 @@ interface Row {
       }
       .cols {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+        grid-template-columns: 1fr 1fr;
         gap: 1.5rem;
         margin: 1rem 0;
       }
@@ -117,37 +129,6 @@ interface Row {
   ],
 })
 export class GranularReactivityDemoComponent implements OnDestroy {
-  readonly codeFiles: CodeFile[] = [
-    {
-      label: 'Per-record dependency',
-      language: 'typescript',
-      source: `// One computed value per row, primed before measuring.
-const value = computed(() => {
-  treeBodyRuns++;
-  return tree.$.rows.byId(id)?.value() ?? 0;
-});
-
-tree.$.rows.updateOne(id, { value: previous + 1 });
-// Read every computed: only the changed row's body reruns.
-for (const read of treeDerivations) read();`,
-    },
-    {
-      label: 'Single root dependency',
-      language: 'typescript',
-      source: `const value = computed(() => {
-  rawBodyRuns++;
-  return rawRoot()[id]?.value ?? 0;
-});
-
-rawRoot.update((rows) => ({
-  ...rows, [id]: { ...rows[id], value: rows[id].value + 1 },
-}));
-for (const read of rawDerivations) read();
-// All bodies depend on rawRoot. Equal results can still avoid renders.
-// A hand-built signal per record is another possible design.`,
-    },
-  ];
-
   readonly n = 6;
 
   // Body-execution counters incremented INSIDE each row's derivation.
@@ -198,8 +179,6 @@ for (const read of rawDerivations) read();
     // Prime both (initial body run for each).
     this.flush(this.treeDerivations);
     this.flush(this.rawDerivations);
-    this.treeTotal.set(this.treeBodyRuns);
-    this.rawTotal.set(this.rawBodyRuns);
   }
 
   ngOnDestroy(): void {

@@ -1,8 +1,8 @@
 import {
-  ExampleComponent,
-  type CodeFile,
-} from '../../../../shared/components/example-shell';
-import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { signalTree } from '@signal-tree/angular';
 
@@ -16,41 +16,12 @@ interface NextConcept {
 @Component({
   selector: 'app-fundamentals-page',
   standalone: true,
-  imports: [RouterLink, ExampleComponent],
+  imports: [RouterLink],
   templateUrl: './fundamentals-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './fundamentals-page.component.scss',
 })
 export class FundamentalsPageComponent implements OnDestroy {
-  readonly codeFiles: CodeFile[] = [
-    {
-      label: 'Create state',
-      language: 'typescript',
-      source: `import { signalTree } from '@signal-tree/angular';
-
-const tree = signalTree({
-  cart: { itemCount: 2, unitPrice: 24 },
-  customer: { name: 'Ada' },
-}, {
-  derived: ($) => ({
-    subtotal: () => $.cart.itemCount() * $.cart.unitPrice(),
-    summary: () => \`\${$.customer.name()} · \${$.cart.itemCount()} items\`,
-  }),
-});
-// Call tree.destroy() when its owner is torn down.`,
-    },
-    {
-      label: 'Update and read',
-      language: 'typescript',
-      source: `tree.$.cart.itemCount.update((count) => count + 1);
-tree.$.cart.unitPrice.set(30);
-tree.$.subtotal(); // 90
-
-// A branch reads the current subtree.
-tree.$.cart(); // { itemCount: 3, unitPrice: 30 }`,
-    },
-  ];
-
   readonly tree = signalTree(
     {
       cart: {

@@ -51,10 +51,7 @@ code {
 
 .authority-path {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 2.5rem minmax(0, 1fr) 2.5rem minmax(
-      0,
-      1fr
-    );
+  grid-template-columns: minmax(0, 1fr) 2.5rem minmax(0, 1fr) 2.5rem minmax(0, 1fr);
   margin-top: 2.5rem;
   border-top: 1px solid var(--color-neutral-300);
   border-left: 1px solid var(--color-neutral-300);
@@ -294,43 +291,4 @@ code {
     min-height: 2.5rem;
     transform: rotate(90deg);
   }
-}
-
-st-example {
-  display: block;
-  margin: 1.5rem 0;
-}
-.live-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-.live-controls button {
-  padding: 0.65rem 0.85rem;
-  border: 1px solid var(--color-primary-600);
-  border-radius: var(--radius-md);
-  background: var(--color-accent-soft);
-  color: var(--color-ink);
-  cursor: pointer;
-}
-.live-values {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-}
-.live-values dd {
-  margin: 0.5rem 0 0;
-  font-weight: 700;
-}
-.request-policy {
-  padding: 1rem;
-  border: 1px solid var(--color-neutral-200);
-  border-radius: var(--radius-lg);
-}
-.request-policy summary {
-  cursor: pointer;
-}
-.request-policy summary:hover {
-  color: var(--color-primary-700);
 }

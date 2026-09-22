@@ -40,26 +40,9 @@ describe('StartHereComponent', () => {
     });
   });
 
-  it('links each framework to its own setup and includes ownership guidance', () => {
-    const element: HTMLElement = fixture.nativeElement;
-    const ctas = element.querySelectorAll<HTMLAnchorElement>('.next-step-cta');
-    for (const [index, packageId] of [
-      'angular',
-      'react',
-      'vue',
-      'kernel',
-    ].entries()) {
-      expect(ctas[index].getAttribute('href')).toBe(
-        `/docs?package=${packageId}`
-      );
-    }
-    expect(element.textContent).toContain('defineStore');
-    expect(element.textContent).toContain('destroy()');
-    expect(
-      element.querySelector('a[href$="native-signals.md"]')
-    ).not.toBeNull();
-    expect(
-      element.querySelector('a[href$="ngrx-signalstore.md"]')
-    ).not.toBeNull();
+  it('NgRx vs SignalTree comparison panes both render their code samples', () => {
+    const text = fixture.nativeElement.textContent as string;
+    expect(text).toContain('createReducer');
+    expect(text).toContain('counterTree.$.count.update((count) => count + 1)');
   });
 });

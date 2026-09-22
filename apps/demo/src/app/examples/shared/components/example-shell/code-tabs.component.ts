@@ -2,12 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  DestroyRef,
-  ElementRef,
   inject,
   input,
   signal,
-  viewChildren,
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import hljs from 'highlight.js/lib/core';
@@ -51,119 +48,55 @@ function grammar(lang: CodeLang): string {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (files().length) {
-    <div class="code-tabs">
-      @if (files().length > 1) {
-      <div
-        class="code-tabs__bar"
-        role="tablist"
-        aria-label="Example source files"
-      >
-        @for (file of files(); track file.label; let i = $index) {
-        <button
-          #fileTab
-          class="code-tabs__tab"
-          [id]="id + '-tab-' + i"
-          [attr.aria-controls]="id + '-panel'"
-          [tabIndex]="i === selectedIndex() ? 0 : -1"
-          (keydown)="onTabKeydown($event, i)"
-          role="tab"
-          type="button"
-          [class.code-tabs__tab--active]="i === selectedIndex()"
-          [attr.aria-selected]="i === selectedIndex()"
-          (click)="select(i)"
-        >
-          {{ file.label }}
-        </button>
+      <div class="code-tabs">
+        @if (files().length > 1) {
+          <div class="code-tabs__bar" role="tablist">
+            @for (file of files(); track file.label; let i = $index) {
+              <button
+                class="code-tabs__tab"
+                role="tab"
+                type="button"
+                [class.code-tabs__tab--active]="i === active()"
+                [attr.aria-selected]="i === active()"
+                (click)="active.set(i)"
+              >
+                {{ file.label }}
+              </button>
+            }
+          </div>
         }
-      </div>
-      }
 
-      <div
-        class="code-tabs__body"
-        [id]="id + '-panel'"
-        [attr.role]="files().length > 1 ? 'tabpanel' : 'region'"
-        [attr.aria-labelledby]="
-          files().length > 1 ? id + '-tab-' + selectedIndex() : null
-        "
-        [attr.aria-label]="files().length === 1 ? current().label : null"
-      >
-        <button
-          class="code-tabs__copy"
-          type="button"
-          (click)="copy()"
-          [attr.aria-label]="'Copy ' + current().label"
-        >
-          {{ copied() ? 'Copied' : 'Copy' }}
-        </button>
-        <pre
-          class="code-tabs__pre"
-          tabindex="0"
-          [attr.aria-label]="current().label + ' source code'"
-        ><code [innerHTML]="highlighted()"></code></pre>
+        <div class="code-tabs__body">
+          <button
+            class="code-tabs__copy"
+            type="button"
+            (click)="copy()"
+            [attr.aria-label]="'Copy ' + current().label"
+          >
+            {{ copied() ? 'Copied' : 'Copy' }}
+          </button>
+          <pre
+            class="code-tabs__pre"
+          ><code [innerHTML]="highlighted()"></code></pre>
+        </div>
       </div>
-      <p class="code-tabs__status" role="status">{{ copyStatus() }}</p>
-    </div>
     }
   `,
   styleUrl: './code-tabs.component.scss',
 })
 export class CodeTabsComponent {
-  private static nextId = 0;
-  readonly id = `example-source-${CodeTabsComponent.nextId++}`;
   private readonly sanitizer = inject(DomSanitizer);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly tabs =
-    viewChildren<ElementRef<HTMLButtonElement>>('fileTab');
 
   readonly files = input<CodeFile[]>([]);
 
   readonly active = signal(0);
   readonly copied = signal(false);
-  readonly copyStatus = signal('');
-  readonly selectedIndex = computed(() =>
-    Math.min(this.active(), Math.max(0, this.files().length - 1))
-  );
-
-  constructor() {
-    this.destroyRef.onDestroy(() => clearTimeout(this.copyResetHandle));
-  }
-
-  select(index: number): void {
-    this.active.set(index);
-    this.copied.set(false);
-    this.copyStatus.set('');
-    clearTimeout(this.copyResetHandle);
-  }
-
-  onTabKeydown(event: KeyboardEvent, index: number): void {
-    const last = this.files().length - 1;
-    let next: number;
-    switch (event.key) {
-      case 'ArrowRight':
-        next = index === last ? 0 : index + 1;
-        break;
-      case 'ArrowLeft':
-        next = index === 0 ? last : index - 1;
-        break;
-      case 'Home':
-        next = 0;
-        break;
-      case 'End':
-        next = last;
-        break;
-      default:
-        return;
-    }
-    event.preventDefault();
-    this.select(next);
-    this.tabs()[next]?.nativeElement.focus();
-  }
 
   private copyResetHandle: ReturnType<typeof setTimeout> | undefined;
 
   readonly current = computed<CodeFile>(
     () =>
-      this.files()[this.selectedIndex()] ??
+      this.files()[this.active()] ??
       this.files()[0] ?? { label: '', language: 'typescript', source: '' }
   );
 
@@ -178,25 +111,13 @@ export class CodeTabsComponent {
   });
 
   async copy(): Promise<void> {
-    const file = this.current();
-    this.copied.set(false);
-    this.copyStatus.set('');
-    clearTimeout(this.copyResetHandle);
     try {
-      await navigator.clipboard.writeText(file.source);
-      if (this.destroyRef.destroyed || this.current() !== file) return;
+      await navigator.clipboard.writeText(this.current().source);
       this.copied.set(true);
-      this.copyStatus.set(`${file.label} copied.`);
       clearTimeout(this.copyResetHandle);
-      this.copyResetHandle = setTimeout(() => {
-        this.copied.set(false);
-        this.copyStatus.set('');
-      }, 1500);
+      this.copyResetHandle = setTimeout(() => this.copied.set(false), 1500);
     } catch {
-      if (this.destroyRef.destroyed || this.current() !== file) return;
-      this.copyStatus.set(
-        'Copy unavailable. Select the code and copy it manually.'
-      );
+      // Clipboard unavailable (e.g. insecure context) — silently no-op.
     }
   }
 }
