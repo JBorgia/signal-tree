@@ -16,6 +16,7 @@ export const RELEASE_PACKAGES = Object.freeze([
   'angular',
   'react',
   'vue',
+  'solid',
 ]);
 
 export function assertReleasePlan(root = process.cwd()) {
@@ -24,7 +25,11 @@ export function assertReleasePlan(root = process.cwd()) {
       throw new Error(`Private Studio source must remain outside the public checkout: ${path}`);
     }
   }
-  if (RELEASE_PACKAGES.some((name) => !['kernel', 'angular', 'react', 'vue'].includes(name))) {
+  if (
+    RELEASE_PACKAGES.some(
+      (name) => !['kernel', 'angular', 'react', 'vue', 'solid'].includes(name)
+    )
+  ) {
     throw new Error('Private Studio implementation cannot enter the public release set');
   }
   if (RELEASE_PACKAGES[0] !== 'kernel') {
