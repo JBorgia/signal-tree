@@ -1,0 +1,101 @@
+<article class="frameworks">
+  <header class="frameworks__intro">
+    <h1>One semantic model. Native to your framework.</h1>
+    <p class="frameworks__lede">
+      SignalTree gives Angular, Vue, Solid and React one model for identity,
+      causality, transactions, external truth and restoration — while each
+      framework realizes that model with its own reactive primitive.
+    </p>
+    <p>
+      The kernel owns meaning. A framework package owns only the cheapest
+      correct way to make that meaning observable. That is why these are
+      realization layers rather than wrappers, and why none of them forces the
+      others through a shared lowest common denominator.
+    </p>
+  </header>
+
+  <section class="frameworks__grid" aria-label="Supported frameworks">
+    @for (framework of shipping; track framework.id) {
+    <div class="framework-card">
+      <div class="framework-card__head">
+        <h2>{{ framework.name }}</h2>
+        <span class="framework-card__badge">Shipping</span>
+      </div>
+      <p class="framework-card__realization">{{ framework.realization }}</p>
+      <dl>
+        <dt>Primitive</dt>
+        <dd>
+          <code>{{ framework.primitive }}</code>
+        </dd>
+        <dt>Read</dt>
+        <dd>
+          <code>{{ framework.read }}</code>
+        </dd>
+        <dt>Write</dt>
+        <dd>
+          <code>{{ framework.write }}</code>
+        </dd>
+        <dt>Entity realization memory</dt>
+        <dd>{{ framework.memory }}</dd>
+      </dl>
+      <pre
+        class="framework-card__install"
+      ><code>{{ framework.install }}</code></pre>
+    </div>
+    }
+  </section>
+
+  <section class="frameworks__note" aria-label="About the memory figures">
+    <h2>About those memory figures</h2>
+    <p>
+      They are <strong>released entity-realization residue</strong> — what a
+      collection still retains per entity after realized rows are dropped —
+      measured on one harness, process-isolated, and reproduced at two entity
+      counts. They are not a general speed or footprint claim.
+    </p>
+    <p>
+      <strong>CPU is unresolved.</strong> Differences could not be measured on
+      the available hardware under the preregistered methodology, so no claim is
+      made in either direction. Solid's realization cost has not been
+      characterized at all; it shipped on correctness and semantic conformance.
+    </p>
+    <p>
+      These numbers should not be compared against SignalTree v14. v14's keys
+      are identity, so a held node follows a fresh occupant of the same key —
+      materially weaker guarantees, and a comparison without that sentence
+      misrepresents both.
+    </p>
+  </section>
+
+  <section class="frameworks__semantics" aria-label="Shared semantics">
+    <h2>The same semantics everywhere</h2>
+    <p>
+      These are what the kernel guarantees regardless of which framework renders
+      them — and what a framework's own reactivity does not provide on its own.
+    </p>
+    <dl class="semantics-list">
+      @for (item of semantics; track item.name) {
+      <dt>{{ item.name }}</dt>
+      <dd>{{ item.detail }}</dd>
+      }
+    </dl>
+  </section>
+
+  <section class="frameworks__roadmap" aria-label="Roadmap">
+    <h2>Roadmap</h2>
+    <p>
+      Listed because the adapter seam is public, not as a commitment to dates. A
+      framework earns a place by passing the same semantic conformance suite the
+      shipping ones did.
+    </p>
+    <ul>
+      @for (entry of roadmap; track entry.name) {
+      <li>
+        <strong>{{ entry.name }}</strong>
+        <span class="roadmap__when">{{ entry.when }}</span>
+        <span class="roadmap__note">{{ entry.note }}</span>
+      </li>
+      }
+    </ul>
+  </section>
+</article>

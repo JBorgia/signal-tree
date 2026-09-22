@@ -5,9 +5,27 @@ export const appRoutes: Route[] = [
     path: '',
     loadComponent: () =>
       import('./components/home/home.component').then((c) => c.HomeComponent),
+    data: {
+      title: 'Update one field. Keep the rest intact',
+      description:
+        'Typed reactive state for nested data and live collections. Try SignalTree, compare workloads, and start with Angular, Vue, Solid, React, or TypeScript.',
+    },
   },
 
-  // Opinionated 5-minute evaluation path
+  {
+    path: 'frameworks',
+    loadComponent: () =>
+      import('./pages/frameworks/frameworks.component').then(
+        (c) => c.FrameworksComponent
+      ),
+    data: {
+      title: 'One semantic model. Native to your framework',
+      description:
+        'Angular, Vue, Solid and React share one SignalTree semantic model while each realizes it with its own reactive primitive.',
+    },
+  },
+
+  // Evaluate one owned feature
   {
     path: 'start',
     loadComponent: () =>
@@ -15,9 +33,9 @@ export const appRoutes: Route[] = [
         (c) => c.StartHereComponent
       ),
     data: {
-      title: 'Start here · 5-minute tour',
+      title: 'Start here · One feature',
       description:
-        'Evaluate SignalTree in five minutes: the mental model, a side-by-side comparison with NgRx, the recommended architecture, and where to go next.',
+        'Choose a framework, create an owned store, and evaluate SignalTree in one feature.',
     },
   },
   {
@@ -29,7 +47,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Why causality matters',
       description:
-        'Why causal state has business value: reliable recovery, coherent operations, stable identity, external authority, and AI-ready application truth.',
+        'Keep user edits separate from server updates, group related changes, and follow records as lists change.',
     },
   },
 
@@ -231,9 +249,9 @@ export const appRoutes: Route[] = [
         (component) => component.V15BenchmarksComponent
       ),
     data: {
-      title: 'Recurring application-state performance',
+      title: 'Run the benchmarks',
       description:
-        'Checked point access, conditional complete projection, and restoration workloads across capability-matched state libraries.',
+        'Run keyed-update, collection-read, and undo benchmarks in your browser. Compare measured times, ranges, and methods.',
     },
   },
   // Redirect old route to new one
