@@ -1176,10 +1176,27 @@ tolerable for the closed thesis are **correct** for this one.
 
 ### Sub-tracks
 
+**Revised 2026-09-22 (second pass).** The first pass ordered these by track
+number. It is reordered by **cheapest available falsifier**, which moved the
+conflicting-rejection question to the front and un-serialized MO-2. See
+"Ordering principle" below.
+
 ```text
-PROPOSAL-0            UNBLOCKED TODAY — no MO dependency
+PROPOSAL-REJECTION-0  RUN FIRST — existential falsifier for the whole track
+                      Can a speculative transaction always be rejected without
+                      silently retaining its proposed values or overwriting
+                      newer truth?
+
+PROPOSAL-0            BLOCKED on PROPOSAL-REJECTION-0 surviving
                       Is propose/accept/reject a truthful NAME over existing
                       transaction semantics, or does it need new kernel rules?
+                      No MO dependency — speculative state is already
+                      live-readable, measured 2026-09-22.
+
+MO-2                  INDEPENDENT — may run in parallel with PROPOSAL-0
+                      Disposition isolation. The only unresolved
+                      mutation-observability question. Gates WRITE-CONTEXT-0
+                      ONLY; it does not gate PROPOSAL-0.
 
 WRITE-CONTEXT-0       BLOCKED on MO-2 disposition isolation
                       Can an opaque, externally-owned context survive the
@@ -1189,7 +1206,142 @@ AGENT-UX-REFERENCE-0  BLOCKED on PROPOSAL-0
                       Documentation/reference integration only. Ships no kernel.
 ```
 
+#### Ordering principle
+
+> **Research ordering follows the cheapest available falsifier, not
+> architectural layering. Settled findings are inputs, not experiments to
+> repeat.**
+
+Two corrections this principle forced, both recorded so the reasoning survives:
+
+- **`MUTATION-OBSERVABILITY-0` is not a prerequisite for `PROPOSAL-0`.** An
+  earlier roadmap draft said observability must establish that mutation
+  identity survives deferred publication before proposal work begins. That is
+  stale: MO-1A is settled (**B** — recoverable via a sidecar keyed on
+  `(transactionOwner, transactionId, positionId)`, no `WriteMetadata` change).
+  What genuinely does not survive deferred publication is **ambient
+  write-context attribution** (spike case 10), and that is a `WRITE-CONTEXT-0`
+  problem. A review UI never needs it — the human reads proposed values off the
+  tree directly. **Transaction identity and ambient write context are not the
+  same question**, and coupling them made two independently falsifiable things
+  serial for no reason.
+
+- **MO-2 is not ordered before `PROPOSAL-0`.** It is roughly a day's work, but
+  cost is not a dependency. It gates `WRITE-CONTEXT-0` and nothing else.
+
+#### Baseline
+
+```text
+15.2.1 — COMPLETE. The frozen baseline for this track.
+```
+
+Published to npm for `@signal-tree/{kernel,angular,react,vue,solid}`, tagged
+`v15.2.1` 2026-09-21. No commit since that tag touches `packages/`. **Do not
+open work to "finish" or "stabilize" this release** — stale status language is
+how a closed release gets reopened.
+
+#### PROPOSAL-REJECTION-0
+
+**OPEN — preregistered 2026-09-22. Run before any other sub-track. No API
+naming until this reports.**
+
+The product pitch is *"show provisional changes and safely reject them."* If
+rejection is not safe under the adversarial case, the pitch is false and no
+amount of naming, context or reference UX repairs it. This is the cheapest
+test that can kill the track, so it runs first.
+
+**Observed behaviour, HEAD, read from source — not yet dispositioned:**
+
+```text
+transaction writes 7 fields across 3 entities
+        ↓
+a server realization lands on ONE of those paths
+        ↓
+reject()
+        ↓
+buildPendingRollbackPlan returns { conflict } on the FIRST conflicting
+effect and abandons the whole compensation list
+        ↓
+settleCommitScope(owner, id, 'commit')      <- settles as COMMIT
+        ↓
+throw SignalTreeRollbackError
+        ↓
+all 7 proposed values remain live in the tree, now as committed truth;
+the 6 non-conflicting ones were never compensated
+```
+
+Sources: `packages/kernel/src/enhancers/transactions/transactions.ts`
+— conflict detection `buildPendingRollbackPlan` / `classifyLaterOverlap`
+(~L260-409, note the `'superseded'` arm already *does* skip surgically, so
+partial handling exists for one classification and not the other); refusal
+door and `'commit'` settle (~L1900-1925); cause type
+`PendingRollbackDependencyConflict` (~L123-129) reports only the **first**
+conflicting pair, not the full set. End-to-end in
+`transactions/tx-ledger-c3.spec.ts:62-77`.
+
+**The existing rationale is serious and must be engaged, not assumed wrong.**
+The code comment argues the `'commit'` settle is correct *because* nothing was
+compensated: the authored writes are still live and therefore *are* the truth a
+reader sees, so discarding would drop durable consequences for state the tree
+is still displaying — the tree/storage divergence the commit boundary exists to
+prevent. The "application refetch fallback" is a shipped, tested pattern, not
+an oversight. **This track may well conclude the kernel is right and the
+proposal thesis must adapt.**
+
+> **Null:** current rejection semantics are correct as general transaction
+> behaviour, and a truthful multi-writer review UX can be built on them with no
+> proposal-specific rule.
+
+Falsify across: human write during a proposal; server realization during a
+proposal; same-location conflict; multi-location proposal; multi-entity
+proposal; entity remove/re-add; conflict on one path of many.
+
+**Dispositions — exactly one must be chosen before `PROPOSAL-0` opens.**
+Labelled `PR-*` deliberately: these are NOT the A/B/C outcomes of the
+`MULTI-WRITER-INTERACTION-0` preregistration further down, which mean
+different things.
+
+```text
+PR-A  TRANSACTION CORRECTNESS DEFECT
+   Rejection should compensate the non-conflicting effects and refuse only
+   the conflicting ones, or should not settle unreverted work as 'commit'.
+   -> Fix transaction semantics FIRST, generically, with no proposal branding.
+      This is kernel work and gets its own release.
+
+PR-B  SEMANTICS CORRECT, THESIS INCOMPATIBLE
+   The behaviour is right for transactions but cannot carry a truthful review
+   UX without a proposal-only exception.
+   -> PROPOSAL-0's null is FALSIFIED. propose() is not sugar over transaction().
+      Stop and re-scope the product claim before writing any API.
+
+PR-C  MISREADING OF THE CONFLICT CASE
+   The refusal contract is truthful and sufficient; a review UI is expected to
+   catch, surface the conflict and reconcile.
+   -> Pin the correct behaviour with a minimal test, document the contract,
+      proceed to PROPOSAL-0 unchanged.
+```
+
+**Required regardless of disposition:** the refusal contract is currently
+invisible to consumers. `SignalTreeRollbackError` and
+`later-confirmed-dependency` appear only in `docs/architecture/**` and
+`docs/audits/**` — both **ungated** for dead-API drift — and in no gated
+user-facing document. `apps/demo` contains **zero** transaction usage.
+
+Falsifiers for this track itself:
+
+- a "fix" that makes rejection safe only when the transaction came from
+  `propose()` — that is disposition B wearing disposition A's clothes
+- partial compensation that leaves the tree and durable storage divergent —
+  the exact failure the current `'commit'` settle exists to prevent
+- reporting a conflict set that the application cannot act on (today only the
+  first conflicting pair is named)
+
 #### PROPOSAL-0
+
+**BLOCKED on `PROPOSAL-REJECTION-0` reporting PR-A or PR-C.** If it reports
+PR-B, this
+section does not open — the null below is already falsified and the product
+claim needs re-scoping first.
 
 > **Null:** `propose()` / `accept()` / `reject()` can be implemented as a
 > semantic facade over existing transaction behaviour, introducing **no new
@@ -1274,12 +1426,45 @@ prohibited_changes:
   - no claim that carrying a token establishes authority
   - no reopening /authoring
 
-sequencing:
-  - PROPOSAL-0 first — unblocked; no MO dependency (speculative state is
-    already live-readable, measured 2026-09-22)
-  - MO-2 disposition isolation — the only live MO dependency
+ordering_principle: >
+  Research ordering follows the cheapest available falsifier, not
+  architectural layering. Settled findings are inputs, not experiments to
+  repeat.
+
+baseline:
+  15.2.1: COMPLETE — published for kernel + 4 adapters, tagged v15.2.1
+    2026-09-21, no packages/ commit since. Not work. Do not reopen.
+
+do_not_re_derive:   # answered 2026-09-08; re-running risks contradicting a
+                    # recorded result. An older roadmap section is NOT
+                    # permission to reopen these.
+  - MO-1A   # mutation identity survives deferred publication = B (sidecar
+            #   keyed on (transactionOwner, transactionId, positionId));
+            #   settled, NOT a prerequisite for PROPOSAL-0
+  - MO-1B   # same-path multi-scope attempt capture destroyed at capture by
+            #   enqueueEffect keying; REQUIRED for correct rollback
+  - MO-3A   # rollback = B; restoration = D, no causal parent promised;
+            #   derivedFrom stays illegitimate for restoration
+  - "SignalTree consumes claims, it does not mint them"
+
+sequencing:   # revised 2026-09-22, second pass — by falsifier cost
+  - PROPOSAL-REJECTION-0 first — existential falsifier; no API naming until
+    it reports PR-A, PR-B or PR-C (that track's own disposition scheme —
+    NOT the A/B/C outcomes of this preregistration below)
+  - if PR-B — STOP. PROPOSAL-0's null is falsified; re-scope the claim
+  - if PR-A — fix transaction rejection generically, its own release, no
+    proposal branding, before PROPOSAL-0 opens
+  - if PR-A or PR-C — PROPOSAL-0 and MO-2 may then run INDEPENDENTLY
+  - MO-2 disposition isolation — gates WRITE-CONTEXT-0 ONLY, never PROPOSAL-0
   - WRITE-CONTEXT-0 — only after MO-2
-  - AGENT-UX-REFERENCE-0 — reference integration only
+  - AGENT-UX-REFERENCE-0 — reference integration only; blocked on PROPOSAL-0
+
+superseded_sequencing: >
+  The first-pass order (MUTATION-OBSERVABILITY-0 -> PROPOSAL-0 ->
+  WRITE-CONTEXT-0) is STALE and must not be restored. It rested on the premise
+  that mutation identity must be proven to survive deferred publication before
+  proposal work — already answered by MO-1A. Transaction identity and ambient
+  write-context attribution are different questions; only the latter is open.
 
 outcomes:
   A: >
