@@ -1,4 +1,4 @@
-## 15.2.0 (unreleased)
+## 15.2.0 (2026-09-21)
 
 - **One semantic authority, framework-specialized physical realization.** The kernel
   keeps sole ownership of meaning: subject identity, causality, transactions, external
@@ -40,6 +40,17 @@
   claims. They are not comparable to v14, whose keys are identity: a held v14 node
   follows a fresh occupant of the same key, a materially weaker guarantee, and a
   comparison omitting that sentence misrepresents both lines.
+
+- **What this cost.** 15.2.0 raises the bare kernel production gzip floor by
+  roughly 0.24 KB (about 2.4%, from ~9.95 KB to 10.19 KB) as the common cost of
+  the framework-specialized realization contract; the entities target moves
+  similarly, to 22.47 KB. This is not an optional module leaking onto the
+  mandatory path — `native-location-realization` remains reachable only through
+  `@signal-tree/kernel/adapter` — but distributed inline growth in the kernel
+  machinery every tree pays for. It was rebased into the budget rather than
+  clawed back. Recorded here so the release is not described as an improvement
+  on every axis: a couple of hundred compressed bytes of static kernel code
+  were traded for the entity-residue reductions above.
 
 - **CPU is unresolved and stays unresolved.** CPU differences could not be resolved on
   the available hardware under the preregistered methodology, so no claim is made in
