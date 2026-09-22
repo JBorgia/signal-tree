@@ -179,7 +179,7 @@ describe('compensation is not external truth', () => {
 
     const pending = store.transaction(() => store.$.theme('red'));
     await flush();
-    await pending.commit?.();
+    pending.confirm();
     await flush();
     expect(store.$.theme()).toBe('red');
 

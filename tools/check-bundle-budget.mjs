@@ -190,8 +190,21 @@ const TARGETS = {
     // Splitting complete kernel-owned native runtimes behind `kernel/adapter`
     // restores the neutral floor to 9.95KB prod / 12.10KB dev without changing
     // Angular or Vue semantics.
-    devKB: 12.2,
-    prodKB: 10.0,
+    // 15.2.0: the framework-specialized epoch architecture. Measured 10.19KB
+    // prod / 12.31KB dev, up from the 9.95/12.10 floor the adapter split
+    // established. This is NOT an optional module leaking back onto the
+    // mandatory path -- verified: native-location-realization.ts is still
+    // imported only by kernel/adapter.ts, and the one import added to a
+    // mandatory module (registerIntrinsicMutationSource) points at
+    // intrinsic-mutation, which the bare path already reached. The cost is
+    // distributed inline across location-runtime, intrinsic-mutation,
+    // tree-scalar-slot-runtime, signal-tree and write-participation
+    // (+308/-76 lines), which is the paired createEpoch/advanceEpoch contract
+    // itself. Raised to the measurement plus the usual narrow headroom rather
+    // than clawed back, because reclaiming it is a performance change and
+    // belongs in its own release.
+    devKB: 12.45,
+    prodKB: 10.25,
     code: `
       import { signalTree } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, user: { name: 'a' } });
@@ -359,8 +372,12 @@ const TARGETS = {
     // The compact exact-name list prevents slices from corrupting collection
     // accessors or writers before materialization; it must also run in prod.
     // Deliberate correctness cost (~0.19KB), not a diagnostic folding regression.
-    devKB: 24.9,
-    prodKB: 22.3,
+    // 15.2.0: same epoch architecture, measured here at 22.47KB prod /
+    // 25.10KB dev. entity-signal.ts carries the per-subject epoch registry
+    // (subjectEpochs / pendingSubjectEpochs) on top of the shared kernel
+    // growth above. Same disposition and same reason.
+    devKB: 25.25,
+    prodKB: 22.6,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });
