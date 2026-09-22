@@ -1182,7 +1182,14 @@ PROPOSAL-REJECTION-0  RUN FIRST — existential falsifier for the whole track
                       silently retaining its proposed values or overwriting
                       newer truth?
 
-PROPOSAL-0            BLOCKED on PROPOSAL-REJECTION-0 surviving
+REKEY-SUPERSESSION-0  TINY PREREQUISITE — blocks PROPOSAL-0
+                      The one remaining known structural case. When newer
+                      truth eliminated the subject a pending rekey created,
+                      can the turn skip that compensation and reverse the
+                      rest without resurrecting or retargeting an entity?
+
+PROPOSAL-0            BLOCKED on PROPOSAL-REJECTION-0 surviving AND on
+                      REKEY-SUPERSESSION-0 dispositioning
                       Is propose/accept/reject a truthful NAME over existing
                       transaction semantics, or does it need new kernel rules?
                       No MO dependency — speculative state is already
@@ -1382,6 +1389,12 @@ refuse and must not — stable entity lifetime makes the re-added row a
 DIFFERENT subject, so compensating the turn cannot reach it. The pre-PR-A
 build refused there and stranded the scalar; the fix strictly improves it.
 
+**Gate evidence for the PR-A fix, `ff864757`:** `gates --release` 81/81
+passed, 0 failed, 0 known-red; `gates:self-test` 70/70 proven able to fail,
+0 unproven, 0 blind, 0 errored. A transaction-classification change is exactly
+where a mutation-tested gate can go blind while ordinary tests stay green, so
+this was run before any follow-up work.
+
 **Sequencing consequence.** `PROPOSAL-0` does NOT open yet. This lands first as
 a standalone generic transaction correctness fix, in its own change, with:
 
@@ -1485,6 +1498,98 @@ Falsifiers:
   or silently discarded on reject
 - rejecting leaves observable residue
 - the API must special-case structural entity mutation to stay truthful
+
+#### REKEY-SUPERSESSION-0
+
+**OPEN — preregistered 2026-09-22. A tiny prerequisite, not a new track.**
+Blocks `PROPOSAL-0`. Closes the one remaining known structural case that
+decides whether "reject the proposal" can truthfully mean reject the _whole_
+proposal.
+
+> **Question:** when newer truth has eliminated or superseded the subject/key
+> state created by a pending rekey, can the transaction safely skip that
+> structural compensation and reverse the rest of the turn **without
+> resurrecting or retargeting an entity**?
+
+Scope discipline: this is the last opportunistic transaction question. Once it
+dispositions, stop hunting edge cases and enter the preregistered `PROPOSAL-0`
+matrix.
+
+**Why it is not merely tidy-up.** PR-A established the rule — _the axis is
+supersession vs dependency, not scalar vs structural_. Case 16 is the same
+defect class under that rule:
+
+```text
+initial     row A,  x = 0
+tx          x = 1,  changeId A -> A2
+later       remove A2
+reject      currently REFUSES; x stranded at 1; row absent
+```
+
+The structural state the turn introduced is already gone. If `x` stays
+speculative only because a later removal is classified as a dependency rather
+than a supersession, PR-A's rule says that classification is wrong.
+
+**Why it was not folded into `ff864757`.** Rekey rollback carries a documented
+repair history — RESTORE-P0 P0-B, `d487a4ae`, pinned by
+`rekeyed-rollback-defect.spec.ts`, whose own table records rekey+remove and
+rekey+update as separately broken and separately repaired. Widening into a
+deliberate prior repair inside a commit with a different preregistered target
+is how a fixed bug returns.
+
+**Case 15 is a CONTROL, not a second fix.** It strands the same scalar, and
+that coincidence must not merge the two:
+
+```text
+case 15  pending REMOVE of A, later writer creates a new A
+         rollback would restore the ORIGINAL A into a key newer truth occupies
+         -> refusal is COHERENT. Whole-turn refusal leaves the unrelated scalar
+            speculative, and that is the price of atomic rejection when the
+            turn cannot be completely reversed.
+         -> EXPECTED REFUSAL / CONTROL. Do not "fix".
+
+case 16  pending REKEY, later writer eliminated the rekeyed subject
+         nothing remains to resurrect or retarget
+         -> UNRESOLVED SUPERSESSION QUESTION. This track.
+```
+
+**Minimum matrix — pin all five BEFORE changing rekey code:**
+
+```text
+1  tx changeId A->A2;  later update A2
+   rollback -> REFUSE          newer truth depends on the surviving subject
+
+2  tx changeId A->A2;  later remove A2
+   rollback -> SUCCEED for unrelated tx effects; row remains absent
+
+3  tx changeId A->A2;  later remove A2, then add a new A2
+   rollback -> MUST NOT touch the new subject
+   unrelated tx effects revert only if lifetime separation makes it safe
+
+4  clean tx rekey, no later writer
+   rollback -> restore original A     RESTORE-P0 behaviour UNCHANGED
+
+5  tx rekey + another structural operation
+   no regression of the rekey/remove repair
+```
+
+Case 3 is the discriminating one: v15 subject lifetime should make the
+re-added business key a **different subject**, which turns an otherwise
+ambiguous question into a testable one — exactly as it did for PR-A case 13.
+
+**Falsifiers — any of these means stop and keep the refusal:**
+
+- skipping the rekey compensation resurrects an entity, or retargets a held
+  reference to a different subject
+- case 4 changes in any way, i.e. the RESTORE-P0 repair regresses
+- the fix needs a rule that applies only to rekey rather than following from
+  the supersession/dependency axis
+- case 3 lets compensation reach the newly created subject
+
+**Exit:** disposition recorded, and either a narrow generic fix landing with
+full transaction + restoration + lifetime suites and `gates:self-test`, or an
+explicit "refusal is correct here" with case 16 converted from an open gap to
+a documented control alongside case 15.
 
 #### WRITE-CONTEXT-0
 
