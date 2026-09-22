@@ -1,42 +1,9 @@
 <div class="container layout-frame">
-  <st-example
-    heading="Restoration: designated authored operations"
-    [headingLevel]="1"
-  >
-    <div intro>
-      <p class="intro-text">
-        <strong>Restoration retains only explicitly designated authored work.</strong>
-        Ordinary writes remain authored but do not enter restoration history.
-        Wrap a synchronous product operation in <code>undoable()</code> when
-        undo and redo are part of that operation's contract.
-      </p>
-      <div class="how-it-works">
-        <h3>The v15 model</h3>
-        <ol class="instruction-list">
-          <li>
-            <strong>Authority first:</strong> application decisions are authored;
-            values decided elsewhere are applied through <code>external()</code>.
-          </li>
-          <li>
-            <strong>Designation is separate:</strong> <code>undoable()</code>
-            marks the authored causal turn containing its writes. It does not
-            create a turn boundary.
-          </li>
-          <li>
-            <strong>Settlement retains the turn:</strong> accepted designated
-            work enters bounded restoration history after the causal turn settles.
-          </li>
-          <li>
-            <strong>Undo and redo preserve authority:</strong> restoration may
-            refuse rather than discard later external truth.
-          </li>
-          <li>
-            <strong>Tooling can navigate:</strong> <code>jumpTo()</code> moves to
-            another retained boundary without making snapshots causal authority.
-          </li>
-        </ol>
-      </div>
-    </div>
+  <st-example heading="Undo user edits" [code]="codeFiles" [headingLevel]="1">
+    <p intro>
+      Make an edit, then undo or redo it. A server refresh is external data;
+      restoration preserves it or reports a conflict.
+    </p>
 
     <div class="demo-grid">
       <div class="card actions-card">
@@ -66,8 +33,9 @@
         </div>
 
         <div class="control-section">
-          <h3>Message</h3>
+          <h3><label for="restoration-message">Message</label></h3>
           <input
+            id="restoration-message"
             type="text"
             [value]="message()"
             (input)="updateMessage($any($event.target).value)"
@@ -76,57 +44,26 @@
         </div>
 
         <div class="control-section">
-          <h3>Todos</h3>
-          <div class="input-group">
-            <input
-              type="text"
-              [(ngModel)]="newTodoText"
-              (keyup.enter)="addTodo()"
-              placeholder="Add a todo..."
-              class="form-input"
-            />
-            <button
-              (click)="addTodo()"
-              [disabled]="!newTodoText.trim()"
-              class="btn-primary btn-sm"
-            >
-              Add
-            </button>
-          </div>
-          <div class="input-group">
-            <button (click)="refreshFromServer()" class="btn-secondary btn-sm">
-              Refresh from server
-            </button>
-            <span class="card-description">
-              Applied as external truth — no undo step is created.
-            </span>
-          </div>
-          <div class="todos-list">
-            @for (todo of todos(); track todo.id) {
-            <div class="todo-item" [class.completed]="todo.completed">
-              <input
-                type="checkbox"
-                [checked]="todo.completed"
-                (change)="toggleTodo(todo.id)"
-              />
-              <span>{{ todo.title }}</span>
-              <button (click)="deleteTodo(todo.id)" class="btn-delete">
-                X
-              </button>
-            </div>
-            }
-          </div>
+          <button
+            type="button"
+            (click)="refreshFromServer()"
+            class="btn-secondary btn-sm"
+          >
+            Receive server message
+          </button>
+          <p class="card-description">
+            Replaces the message without adding an undo step. Undoing a counter
+            edit preserves it; undoing a conflicting message edit is refused.
+          </p>
         </div>
       </div>
 
       <div class="card restoration-card">
         <h2>Restoration controls</h2>
-        <p class="card-description">
-          Move across retained designated turns.
-        </p>
+        <p class="card-description">Move across retained designated turns.</p>
 
         @if (rollbackMessage(); as message) {
-        <p class="error-message">{{ message }}</p>
+        <p class="error-message" role="alert">{{ message }}</p>
         }
 
         <div class="tt-controls">
@@ -193,20 +130,11 @@
     </div>
   </st-example>
 
-  <st-example heading="EntityMap shares the same restoration model">
-    <div intro>
-      <p class="intro-text">
-        <strong>EntityMap structural work and ordinary state use the same
-        designation door.</strong> Each control below authors one designated
-        causal turn. Held entity identity, collection membership, scalar state,
-        and branch state remain coherent through undo and redo.
-      </p>
-      <p class="intro-text">
-        Restoration retains the causal work required to reverse the operation;
-        public historical state is materialized when requested rather than
-        stored as causal authority.
-      </p>
-    </div>
+  <st-example heading="Undo collection edits" [code]="entityCode">
+    <p intro>
+      Add a person or edit the profile, then undo and redo. Collection edits and
+      ordinary fields share the same history.
+    </p>
 
     <div class="demo-grid">
       <div class="card actions-card">
@@ -247,7 +175,7 @@
           <li>
             <strong>entityMap</strong>
             — {{ peopleCount() }} people:
-            <code>{{ people().length ? people() : '(empty)' }}</code>
+            <code>{{ people() | json }}</code>
           </li>
           <li>
             <strong>ordinary job state</strong>
@@ -255,7 +183,7 @@
           </li>
           <li>
             <strong>ordinary profile state</strong>
-            — <code>{{ profileValues() }}</code>
+            — <code>{{ profileValues() | json }}</code>
           </li>
         </ul>
         <p class="intro-text">

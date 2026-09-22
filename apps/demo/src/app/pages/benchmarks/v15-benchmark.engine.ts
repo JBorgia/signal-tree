@@ -63,6 +63,7 @@ export interface RunInterleavedBenchmarkOptions {
   readonly rounds?: number;
   readonly warmupRounds?: number;
   readonly settle?: () => Promise<void>;
+  readonly signal?: AbortSignal;
 }
 
 const median = (values: readonly number[]): number => {
@@ -105,6 +106,7 @@ export const runInterleavedBenchmark = async ({
   rounds = 25,
   warmupRounds = 2,
   settle = defaultSettle,
+  signal,
 }: RunInterleavedBenchmarkOptions): Promise<BenchmarkReport> => {
   if (arms.length === 0)
     throw new Error('At least one benchmark arm is required');
@@ -117,6 +119,11 @@ export const runInterleavedBenchmark = async ({
   if (!Number.isInteger(workload.operations) || workload.operations < 1) {
     throw new Error(`${workload.id} must declare a positive operation count`);
   }
+
+  const checkCancellation = (): void => {
+    if (signal?.aborted)
+      throw new DOMException('Benchmark cancelled', 'AbortError');
+  };
 
   const samplesByArm = new Map(
     arms.map((currentArm) => [currentArm.id, [] as number[]])
@@ -131,27 +138,34 @@ export const runInterleavedBenchmark = async ({
 
   try {
     for (const currentArm of arms) {
+      checkCancellation();
       preparedSamples.set(
         currentArm.id,
         await currentArm.createSample(workload)
       );
+      checkCancellation();
     }
 
     for (let round = 0; round < totalRounds; round += 1) {
+      checkCancellation();
       await settle();
+      checkCancellation();
       const offset = Math.floor(round / 2) % arms.length;
       const rotatedArms = [...arms.slice(offset), ...arms.slice(0, offset)];
       const orderedArms =
         round % 2 === 0 ? rotatedArms : [...rotatedArms].reverse();
 
       for (const currentArm of orderedArms) {
+        checkCancellation();
         const sample = preparedSamples.get(currentArm.id);
         if (!sample) {
           throw new Error(
             `${currentArm.id} did not prepare a benchmark sample`
           );
         }
+        // Do not interrupt timed work or destroy a store still being measured.
         const measurement: BenchmarkMeasurement = await sample.measure();
+        checkCancellation();
         if (
           !Number.isFinite(measurement.durationMs) ||
           measurement.durationMs < 0 ||

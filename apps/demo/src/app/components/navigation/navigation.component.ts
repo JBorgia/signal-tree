@@ -104,7 +104,7 @@ export class NavigationComponent {
     {
       id: 'frameworks',
       label: 'Frameworks',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           id: 'frameworks-overview',

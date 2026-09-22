@@ -584,3 +584,23 @@ input:focus-visible {
     border-radius: var(--radius-sm);
   }
 }
+
+// The preview shares its width with source; avoid viewport-sized inner columns.
+.command-band,
+.workbench-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+.collection-labels {
+  display: none;
+}
+.entity-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.row-operations {
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+}
+.workbench-header,
+.add-command > div {
+  flex-wrap: wrap;
+}

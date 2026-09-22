@@ -19,7 +19,7 @@
       />
       <span>
         <strong>SignalTree</strong>
-        <small>Causal application state</small>
+        <small>Reactive state</small>
       </span>
     </a>
     <button
@@ -34,15 +34,24 @@
 
   <nav class="navigation-groups" aria-label="Site sections">
     @for (section of sections; track section.id; let sectionIndex = $index) {
-    <section
+    <details
       class="navigation-group"
+      routerLinkActive
+      #groupActive="routerLinkActive"
+      [open]="!section.collapsed || groupActive.isActive"
+      [routerLinkActiveOptions]="{
+        paths: 'exact',
+        queryParams: 'exact',
+        matrixParams: 'ignored',
+        fragment: 'exact'
+      }"
       [class.navigation-group--archive]="section.id === 'archive'"
       [attr.aria-labelledby]="section.id + '-label'"
     >
-      <h2 class="group-label" [id]="section.id + '-label'">
+      <summary class="group-label" [id]="section.id + '-label'">
         <span>0{{ sectionIndex + 1 }}</span>
         {{ section.label }}
-      </h2>
+      </summary>
       <div class="group-links">
         @for (item of section.items; track item.id) {
         <a
@@ -57,15 +66,13 @@
             fragment: 'exact'
           }"
           class="navigation-link nav-item"
-          [title]="item.description"
           (click)="closeMobileMenu()"
         >
           <span class="navigation-link__title">{{ item.title }}</span>
-          <span class="navigation-link__description">{{ item.description }}</span>
         </a>
         }
       </div>
-    </section>
+    </details>
     }
   </nav>
 

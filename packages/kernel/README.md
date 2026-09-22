@@ -195,13 +195,19 @@ const tree = signalTree(
   }
 );
 
-undoable(() => tree.$.count(1));
-tree.undo();
-tree.redo();
+// Connect these handlers to separate user actions.
+const actions = {
+  increment: () => undoable(() => tree.$.count((count) => count + 1)),
+  undo: () => tree.undo(),
+  redo: () => tree.redo(),
+};
 ```
 
 `undoable()` designates the current synchronous authored turn. It is not an async
-scope and does not create a separate state authority.
+scope and does not create a separate state authority. History is recorded when
+that turn settles: call undo from a later user action, not immediately after
+`undoable()` in the same synchronous function. The tree owner calls `destroy()`
+when this store is no longer needed.
 
 ### `transactions()`
 
@@ -296,10 +302,11 @@ errors.
 
 ## Exports
 
-The package publishes two code entry points:
+The package publishes three code entry points:
 
 - `@signal-tree/kernel`
 - `@signal-tree/kernel/adapter`
+- `@signal-tree/kernel/internals` — supported tooling observation seam
 
 The adapter entry point is the framework-neutral observation SDK. It is not a
 compatibility layer or an application convenience surface.

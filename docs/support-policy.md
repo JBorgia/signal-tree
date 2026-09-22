@@ -8,13 +8,18 @@ SignalTree currently has **two supported release lines under two independent npm
 scopes**. Neither scope is an alias, a redirect, or a dist-tag bridge for the
 other — the import specifiers are different packages.
 
-| Line    | Scope             | npm `latest` | License                      | Status                         |
-| ------- | ----------------- | ------------ | ---------------------------- | ------------------------------ |
-| **v15** | `@signal-tree/*`  | `15.0.0`     | Apache-2.0                   | **Active** — features + fixes  |
-| **v14** | `@signaltree/*`   | `14.1.3`     | Apache-2.0 (from `14.1.2`)   | **Maintenance** — fixes only   |
+| Line    | Scope            | License                    | Status                        |
+| ------- | ---------------- | -------------------------- | ----------------------------- |
+| **v15** | `@signal-tree/*` | Apache-2.0                 | **Active** — features + fixes |
+| **v14** | `@signaltree/*`  | Apache-2.0 (from `14.1.2`) | **Maintenance** — fixes only  |
 
-`@signal-tree/*` v15 ships four packages: `@signal-tree/kernel`,
-`@signal-tree/angular`, `@signal-tree/react`, `@signal-tree/vue`. The
+See the [release history](https://github.com/JBorgia/signal-tree/releases) and
+[npm package listing](https://www.npmjs.com/org/signal-tree) for current published
+versions.
+
+`@signal-tree/*` v15 ships five packages: `@signal-tree/kernel`,
+`@signal-tree/angular`, `@signal-tree/react`, `@signal-tree/vue`, and
+`@signal-tree/solid`. The
 `@signaltree/*` v14 line is the pre-reset multi-package surface
 (`@signaltree/core`, `@signaltree/angular`, `@signaltree/ng-forms`,
 `@signaltree/events`, and earlier standalone packages).
