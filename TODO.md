@@ -1586,10 +1586,55 @@ ambiguous question into a testable one — exactly as it did for PR-A case 13.
   the supersession/dependency axis
 - case 3 lets compensation reach the newly created subject
 
-**Exit:** disposition recorded, and either a narrow generic fix landing with
-full transaction + restoration + lifetime suites and `gates:self-test`, or an
-explicit "refusal is correct here" with case 16 converted from an open gap to
-a documented control alongside case 15.
+**DISPOSITIONED AND FIXED 2026-09-22.** The matrix was pinned first
+(`2eae8ef3`), then `classifyStructuralOverlap` was widened from `add` to
+`add | rekey` — one clause, same rule.
+
+One prediction was wrong before it ran, and narrowed the track:
+
+```text
+case 1  later UPDATE of the rekeyed subject   ALREADY SURGICAL, not a refusal
+        `hasSameSubjectDependency` guards later `set` effects with
+        `effect.kind !== 'rekey'`, deliberately: a rekey changes the KEY, a
+        later set changes a FIELD. They do not contend. The rename reverses,
+        the server's field value rides along with the subject.
+```
+
+So only case 2 was ever defective, and the fix moved exactly cases 2 and 3:
+
+```text
+case 2  later REMOVE          refuse, x stranded  ->  reverses, x = 0, row absent
+case 3  later REMOVE + ADD    refuse, x stranded  ->  reverses, x = 0,
+                                                      new subject UNTOUCHED
+case 1, 4, 5                  unchanged
+```
+
+Case 3 resolved the way subject lifetime predicted: the re-added business key
+is a different subject, so compensation cannot reach it and reversing the rest
+is safe — the same mechanism that decided `proposal-rejection-0` case 13.
+
+Mutation-checked:
+
+```text
+rekey always superseded (drop the erasure test)   kills 5, incl. RESTORE-P0
+                                                  controls               OK
+first-remove-wins instead of last-effect-wins     survives          UNOBSERVABLE
+```
+
+The second is recorded rather than papered over: stable entity lifetime means
+a removed subject can never be referenced again, so the scan-to-end and a
+break-on-first-remove are indistinguishable by any test. The scan is kept as
+the form that stays correct if subject resurrection ever becomes
+representable, and the code comment now says so instead of claiming the scan
+is load-bearing.
+
+**Case 15 stays an expected-refusal control**, unmoved. It strands the same
+scalar for a different reason — compensating a pending remove restores the
+ORIGINAL row into a key newer truth occupies — so refusing is coherent there.
+Sharing a symptom was not allowed to merge the two.
+
+**`PROPOSAL-0` is now unblocked.** Stop hunting transaction edge cases
+opportunistically; enter the preregistered PROPOSAL-0 matrix.
 
 #### WRITE-CONTEXT-0
 

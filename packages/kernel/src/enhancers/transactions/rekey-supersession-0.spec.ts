@@ -78,7 +78,7 @@ describe('REKEY-SUPERSESSION-0 / 1 — later UPDATE of the rekeyed subject', () 
 });
 
 describe('REKEY-SUPERSESSION-0 / 2 — later REMOVE of the rekeyed subject', () => {
-  it('the open question: currently refuses and strands the scalar', async () => {
+  it('completes the reversal: nothing remains to rename', async () => {
     const tree = rowTree();
     tree.$.rows.addOne({ id: 'A', name: 'Original' });
     await flush();
@@ -92,11 +92,14 @@ describe('REKEY-SUPERSESSION-0 / 2 — later REMOVE of the rekeyed subject', () 
     realization(() => tree.$.rows.removeOne('A2'));
     await flush();
 
-    // Nothing remains to resurrect or retarget, yet the turn refuses and `x`
-    // stays speculative. This is PROPOSAL-REJECTION-0 case 16 restated as the
-    // subject of its own track.
-    expect(tryReject(pending)).toBe('later-confirmed-dependency');
-    expect(tree.$.x()).toBe(1);
+    // The subject the rekey retargeted is gone, so the compensating rename has
+    // nothing to act on and nothing to resurrect. Skipping it lets the rest of
+    // the turn reverse. The row stays absent because the SERVER deleted it —
+    // newer truth, correctly preserved.
+    //
+    // Pre-fix this refused and stranded `x` at 1; see the pinning commit.
+    expect(tryReject(pending)).toBe(false);
+    expect(tree.$.x()).toBe(0);
     expect(tree.$.rows.ids()).toEqual([]);
   });
 });
@@ -121,12 +124,15 @@ describe('REKEY-SUPERSESSION-0 / 3 — later REMOVE then ADD of the same key', (
 
     const refusal = tryReject(pending);
 
-    // Whatever the refusal decision, the newly created subject must survive
-    // untouched. That invariant holds independently of the disposition.
+    // THE INVARIANT: the newly created subject must survive untouched. It
+    // reuses the business key but is a different subject, so the turn's
+    // compensation cannot reach it.
     expect(tree.$.rows.byId('A2')?.()?.name).toBe('FromServer');
+
+    // Lifetime separation makes reversing the rest safe, so it does.
     expect({ refusal, x: tree.$.x(), ids: tree.$.rows.ids() }).toEqual({
-      refusal: 'later-confirmed-dependency',
-      x: 1,
+      refusal: false,
+      x: 0,
       ids: ['A2'],
     });
   });
