@@ -15,6 +15,13 @@ export interface ObservationToken {
  * timing. A framework supplies only its dependency token and invalidation-group
  * mechanism; it never owns or mirrors location state.
  */
+/**
+ * An opaque per-subject invalidation anchor. Callable to take a dependency; the
+ * value it returns is a nonce and is never read. Only the adapter that created
+ * it may advance it.
+ */
+export type EpochHandle = { (): unknown };
+
 export interface ObservationAdapter {
   createToken(): ObservationToken;
   createWritableCell?<T>(read: () => T): {
@@ -40,6 +47,22 @@ export interface ObservationAdapter {
     readonly peek: () => T;
   };
   createReadonlyCell?<T>(compute: () => T): ReadableCell<T>;
+  /**
+   * `ANGULAR-NATIVE-EPOCH-0`. The framework's cheapest read-dependency
+   * primitive, for a per-subject invalidation anchor that carries no value
+   * anyone reads.
+   *
+   * Supplied as a PAIR with {@link advanceEpoch}, and that is the whole point.
+   * The kernel must never assume an adapter's handle is writable — assuming
+   * exactly that is what silently killed Vue's entity invalidation, because
+   * Vue ships `cell.set` as an inert placeholder. Here the adapter that creates
+   * the handle is the adapter that advances it, so no such assumption exists.
+   *
+   * An adapter supplying neither keeps the portable token-based epoch.
+   * Supplying only one is ignored: both or neither.
+   */
+  createEpoch?(): EpochHandle;
+  advanceEpoch?(epoch: EpochHandle): void;
   runInvalidationGroup(run: () => void): void;
 }
 
