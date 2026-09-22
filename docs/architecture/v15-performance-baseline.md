@@ -1380,7 +1380,8 @@ number here; nothing in this file is hand-copied from a scratch run.
 > **The failure is the useful part.** `marker-location-grammar.spec.ts`
 > "persistence() — the durable path the stored leak actually reached" serialized
 > `[{'§u': true}]` — an undefined placeholder — where the entity belonged. So a
-> `persistence()` tree, which has no `mutation-capture`, DOES depend on those
+> `persistence()` tree — an enhancer since deleted, because persistence is
+> application-owned — which has no `mutation-capture`, DOES depend on those
 > payloads. Forcing the option back to `true` makes it pass, which isolates the
 > gate VALUE as wrong rather than the mechanism.
 >
