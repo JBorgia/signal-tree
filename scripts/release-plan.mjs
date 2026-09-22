@@ -97,7 +97,17 @@ if (process.argv[1] && import.meta.filename === resolve(process.argv[1])) {
     try {
       for (const name of RELEASE_PACKAGES) write(name);
       write('angular', { '@signal-tree/kernel': 'workspace:*' });
-      assert.deepEqual(assertReleasePlan(root), ['kernel', 'angular', 'react', 'vue']);
+      // Spelled out on purpose. Deriving this from RELEASE_PACKAGES would make
+      // it tautological precisely where it earns its keep: this asserts the
+      // returned DEPENDENCY ORDER, so an accidental reordering of the source
+      // list has to fail here. Adding an adapter is supposed to update it.
+      assert.deepEqual(assertReleasePlan(root), [
+        'kernel',
+        'angular',
+        'react',
+        'vue',
+        'solid',
+      ]);
       rmSync(join(root, 'packages', 'vue'), { recursive: true });
       assert.throws(() => assertReleasePlan(root), /package set mismatch/);
       write('vue');
