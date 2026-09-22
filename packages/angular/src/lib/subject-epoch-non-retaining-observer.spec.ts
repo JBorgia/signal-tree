@@ -5,6 +5,16 @@ import { describe, expect, it } from 'vitest';
 
 import { entityMap, signalTree } from '../index';
 
+/**
+ * Narrows away `undefined` without a non-null assertion, and fails loudly
+ * rather than silently reading through a row that was reclaimed -- which is
+ * exactly the condition these tests exist to detect.
+ */
+function requireNode<T>(node: T | undefined): T {
+  if (node === undefined) throw new Error('expected the row to be present');
+  return node;
+}
+
 type Row = { id: number; name: string; v: number };
 
 /**
@@ -61,10 +71,12 @@ type Api = {
 };
 
 function make(withTransactions = false) {
-  const tree = signalTree(
-    { rows: entityMap<Row>({}) },
-    withTransactions ? { enhancers: [transactions()] } : undefined
-  ) as unknown as {
+  // Two concrete calls rather than a `config | undefined` argument: the
+  // overloads distinguish an enhanced tree from a bare one, and a union of
+  // the two matches neither.
+  const tree = (withTransactions
+    ? signalTree({ rows: entityMap<Row>({}) }, { enhancers: [transactions()] })
+    : signalTree({ rows: entityMap<Row>({}) })) as unknown as {
     $: { rows: Api };
     transaction(fn: () => void): { confirm(): void; rollback(): void };
   };
@@ -121,7 +133,7 @@ describe('SUBJECT-EPOCH-0: a non-retaining computed survives collection', () => 
     const view = watch(tree, 1);
     expect(view()).toBe('a');
     await collect();
-    tree.$.rows.byId(1)!.name.set('field-set');
+    requireNode(tree.$.rows.byId(1)).name.set('field-set');
     expect(view()).toBe('field-set');
   });
 
@@ -206,7 +218,7 @@ describe('SUBJECT-EPOCH-0: a non-retaining computed survives collection', () => 
   it('keeps a held node and a held field working across collection', async () => {
     const tree = make();
     const node = tree.$.rows.byId(1);
-    const field = node!.name;
+    const field = requireNode(node).name;
 
     await collect();
 

@@ -16,13 +16,29 @@ type Row = { id: number; name: string; v: number };
 const rows = (n: number): Row[] =>
   Array.from({ length: n }, (_, i) => ({ id: i, name: 'n' + i, v: i }));
 
-const collection = (enhancers: unknown[] = []) => {
-  const tree = signalTree(
-    { rows: entityMap<Row, number>({ selectId: (row) => row.id }) },
-    enhancers.length
-      ? ({ enhancers } as Parameters<typeof signalTree>[1])
-      : undefined
-  );
+// One concrete signalTree() call per enhancer set. Passing `unknown[]`
+// enhancers through a cast erased the capabilities the tree gains from them,
+// so `undo()` and `transaction()` did not exist on the returned type.
+const baseState = () => ({
+  rows: entityMap<Row, number>({ selectId: (row) => row.id }),
+});
+
+const collection = () => {
+  const tree = signalTree(baseState());
+  tree.$.rows.setAll(rows(5));
+  return tree;
+};
+
+const restorableCollection = () => {
+  const tree = signalTree(baseState(), { enhancers: [restoration()] });
+  tree.$.rows.setAll(rows(5));
+  return tree;
+};
+
+const transactionalCollection = () => {
+  const tree = signalTree(baseState(), {
+    enhancers: [restoration(), transactions()],
+  });
   tree.$.rows.setAll(rows(5));
   return tree;
 };
@@ -119,7 +135,7 @@ describe('updateOne is equivalent to the frame path', () => {
   });
 
   it('is undoable, and undo restores the prior value', async () => {
-    const tree = collection([restoration()]);
+    const tree = restorableCollection();
     await flush();
     undoable(() => tree.$.rows.updateOne(1, { v: 500 }));
     await flush();
@@ -132,7 +148,7 @@ describe('updateOne is equivalent to the frame path', () => {
   });
 
   it('keeps realized classification distinct from authored', async () => {
-    const tree = collection([restoration()]);
+    const tree = restorableCollection();
     await flush();
     undoable(() => tree.$.rows.updateOne(1, { v: 10 }));
     await flush();
@@ -151,7 +167,7 @@ describe('updateOne is equivalent to the frame path', () => {
   });
 
   it('participates in a transaction and rolls back', async () => {
-    const tree = collection([restoration(), transactions()]);
+    const tree = transactionalCollection();
     await flush();
     const pending = tree.transaction(() => tree.$.rows.updateOne(2, { v: 77 }));
     await flush();
@@ -165,7 +181,7 @@ describe('updateOne is equivalent to the frame path', () => {
   });
 
   it('a held node survives a transaction rollback', async () => {
-    const tree = collection([restoration(), transactions()]);
+    const tree = transactionalCollection();
     await flush();
     const held = tree.$.rows.byId(3);
     const pending = tree.transaction(() => tree.$.rows.updateOne(3, { v: 88 }));

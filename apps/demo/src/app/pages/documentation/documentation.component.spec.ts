@@ -9,6 +9,21 @@ import { provideRouter } from '@angular/router';
 import { DocumentationComponent } from './documentation.component';
 
 /**
+ * Looks a package up by id and fails with the id if it is gone. These tests
+ * were twice broken by a package being deleted out from under a hard-coded
+ * id, so the failure should name what went missing rather than throw on
+ * `undefined` three lines later.
+ */
+function packageById(
+  packages: readonly { id: string; readmePath: string }[],
+  id: string
+) {
+  const found = packages.find((entry) => entry.id === id);
+  if (!found) throw new Error(`no documentation package with id "${id}"`);
+  return found;
+}
+
+/**
  * This page is a thin shell over package READMEs fetched at runtime via
  * HttpClient + marked — the actual documentation content lives in markdown
  * files, not in this component. Per review guidance, kept thin: a render
@@ -138,7 +153,7 @@ describe('DocumentationComponent', () => {
     async (id) => {
       httpMock.expectOne('assets/docs/core/README.md').flush('# Initial');
       await fixture.whenStable();
-      const target = component.packages.find((entry) => entry.id === id)!;
+      const target = packageById(component.packages, id);
       component.selectPackage(target);
       httpMock.expectOne(target.readmePath).flush(`
 ## Ownership
@@ -187,9 +202,7 @@ describe('DocumentationComponent', () => {
   it('resolves guide links from docs/guides rather than from a package or served asset path', async () => {
     httpMock.expectOne('assets/docs/core/README.md').flush('# Initial');
     await fixture.whenStable();
-    const target = component.packages.find(
-      (entry) => entry.id === 'composition-recipes'
-    )!;
+    const target = packageById(component.packages, 'composition-recipes');
     component.selectPackage(target);
     httpMock
       .expectOne(target.readmePath)
@@ -216,20 +229,22 @@ describe('DocumentationComponent', () => {
     const hostile = globalThis as unknown as { __pwned?: boolean };
     delete hostile.__pwned;
 
-    httpMock.expectOne('assets/docs/core/README.md').flush(
-      [
-        '## Ownership',
-        '',
-        '<script>globalThis.__pwned = true;</script>',
-        '<img src="x" onerror="globalThis.__pwned = true">',
-        '<a href="javascript:globalThis.__pwned = true">bad link</a>',
-        '',
-        '## Ownership',
-        '',
-        '## Ownership & Scope!',
-        '',
-      ].join('\n')
-    );
+    httpMock
+      .expectOne('assets/docs/core/README.md')
+      .flush(
+        [
+          '## Ownership',
+          '',
+          '<script>globalThis.__pwned = true;</script>',
+          '<img src="x" onerror="globalThis.__pwned = true">',
+          '<a href="javascript:globalThis.__pwned = true">bad link</a>',
+          '',
+          '## Ownership',
+          '',
+          '## Ownership & Scope!',
+          '',
+        ].join('\n')
+      );
     await fixture.whenStable();
     fixture.detectChanges();
     await new Promise<void>((resolve) => setTimeout(resolve, 0));
@@ -249,16 +264,16 @@ describe('DocumentationComponent', () => {
     expect(
       root.querySelector('.markdown-content img')?.hasAttribute('onerror')
     ).not.toBe(true);
-    const link = Array.from(
-      root.querySelectorAll('.markdown-content a')
-    ).find((element) => element.textContent === 'bad link');
+    const link = Array.from(root.querySelectorAll('.markdown-content a')).find(
+      (element) => element.textContent === 'bad link'
+    );
     expect(link?.getAttribute('href') ?? '').not.toMatch(/^javascript:/i);
     expect(hostile.__pwned).toBeUndefined();
   });
 
   it('does not replace the selected package with an older response', async () => {
     const initial = httpMock.expectOne('assets/docs/core/README.md');
-    const vue = component.packages.find((entry) => entry.id === 'vue')!;
+    const vue = packageById(component.packages, 'vue');
     component.selectPackage(vue);
     httpMock.expectOne(vue.readmePath).flush('# Vue setup');
     await fixture.whenStable();

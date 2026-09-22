@@ -149,7 +149,7 @@ describe('NATIVE-STORAGE-0 contract', () => {
     const beforeCount = seen.length;
 
     const pending = store.transaction(() => store.$.theme.set('dark'));
-    await pending.commit?.();
+    pending.confirm();
     TestBed.tick();
     await flush();
 

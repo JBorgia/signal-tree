@@ -6,6 +6,16 @@ import { transactions } from '@signal-tree/kernel';
 
 import { entityMap, signalTree } from '../index';
 
+/**
+ * Narrows away `undefined` without a non-null assertion, and fails loudly
+ * rather than silently reading through a row that was reclaimed -- which is
+ * exactly the condition these tests exist to detect.
+ */
+function requireNode<T>(node: T | undefined): T {
+  if (node === undefined) throw new Error('expected the row to be present');
+  return node;
+}
+
 type Row = { id: number; name: string; v: number };
 
 /** Only the surface these tests drive. */
@@ -38,7 +48,10 @@ function make() {
   ]);
   const api = tree.$.rows as unknown as {
     __acquireEntityHandleForTesting: (k: number) => { subjectId: number };
-    __inspectSubjectResources: (s: number) => { activationToken: boolean };
+    __inspectSubjectResources: (s: number) => {
+      activationToken: boolean;
+      subjectId: number;
+    };
   };
   return { tree, api };
 }
@@ -99,7 +112,7 @@ describe('SUBJECT-STATE-SEMANTIC-0: weakly held activation carriers', () => {
     });
     const { tree } = make();
 
-    const field = tree.$.rows.byId(1)!.name;
+    const field = requireNode(tree.$.rows.byId(1)).name;
     expect(field()).toBe('a');
 
     await collect();
@@ -179,7 +192,7 @@ describe('SUBJECT-STATE-SEMANTIC-0: weakly held activation carriers', () => {
       false
     );
 
-    const field = tree.$.rows.byId(1)!.name;
+    const field = requireNode(tree.$.rows.byId(1)).name;
     field.set('set-after-reclaim');
     expect(field()).toBe('set-after-reclaim');
     expect(tree.$.rows.byId(1)?.()?.name).toBe('set-after-reclaim');
@@ -317,7 +330,7 @@ describe('SUBJECT-STATE-SEMANTIC-0: transactions across a collection', () => {
     });
     const tree = txTree();
     const node = tree.$.rows.byId(1);
-    const field = node!.name;
+    const field = requireNode(node).name;
 
     const tx = tree.transaction(() => {
       tree.$.rows.updateOne(1, { name: 'speculative' });

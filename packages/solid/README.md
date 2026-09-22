@@ -11,6 +11,11 @@ can track.
 npm i @signal-tree/solid solid-js
 ```
 
+Solid 1.9 or newer is required as a peer dependency.
+
+The canonical v15 model and composition guidance ships with this package as
+[llms.txt](llms.txt).
+
 ## Usage
 
 Leaves are Solid accessors. Read by calling; write with `.set()`.
