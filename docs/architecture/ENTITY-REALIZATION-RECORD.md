@@ -22,7 +22,8 @@ The one-line result:
 @signal-tree/angular    createEpoch/advanceEpoch pair; the epoch IS a bare
                         Angular signal                      1,350 B/entity
 
-@signal-tree/vue        portable token epoch                1,576 B/entity
+@signal-tree/vue        createEpoch/advanceEpoch pair; the epoch is a
+                        Vue shallowRef                      1,135 B/entity
 
 @signal-tree/react      token / neutral path                ~1,748 B/entity
 ```
@@ -56,8 +57,28 @@ process-isolated, reproduced at two entity counts and from a clean checkout:
 1,350   Angular-native epoch                 -513 vs token, -27.5%
 ```
 
-Cross-framework at the chosen architecture: angular 1,350 · vue 1,576 ·
-neutral 1,747 · react 1,748, against a v14 economic floor of 698.
+Cross-framework at the chosen architecture: **angular 1,350 · vue 1,135 ·
+neutral 1,747 · react 1,748**.
+
+Against the pre-work baseline:
+
+| path          | before | after | change |
+| ------------- | -----: | ----: | -----: |
+| Angular       |  3,591 | 1,350 | -62.4% |
+| Vue           |  4,519 | 1,135 | -74.9% |
+| neutral/React |  3,715 | 1,748 | -52.9% |
+
+And native realization against the already-improved portable token path:
+Angular 1,863 -> 1,350 (-513 B, -27.5%); Vue 1,576 -> 1,135 (-441 B, -28.0%).
+
+**Angular is not uniquely suited to this design.** Angular measured first, so it
+looked that way at 1,350. Vue then landed at 1,135 — cheaper — using a
+`shallowRef` rather than a callable signal. The advantage is FRAMEWORK
+SPECIALIZATION, not Angular. Two independent frameworks now show the same
+architecture paying off, which is what makes Solid and Preact worth trying next.
+
+Angular remains the flagship for market reasons, not because it is the cheapest
+realization.
 
 Why this is trusted: spreads of 0.00–0.08% across runs; stable per-entity at
 N=10k and N=20k (a per-entity quantity must not move with N); the benchmark
@@ -91,7 +112,17 @@ The stopping rule fired; the four-way candidate run was correctly never
 executed. **No candidate CPU delta from this program is admissible**, including
 those that favoured the chosen design.
 
-The only permitted statement:
+### Three things NOT to claim
+
+1. **Not** that CPU is faster. It was never resolved.
+2. **Not** that native realization is always cheaper in every framework. Two
+   frameworks measured; the rest are untested.
+3. **Not** a direct memory comparison against v14 implying equal semantics. v14
+   is a materially weaker semantic system — its keys are identity, and a held
+   node follows a fresh same-key occupant. Quoting its 698 B alongside these
+   figures without that sentence misrepresents both.
+
+The only permitted statement about CPU:
 
 > CPU differences could not be resolved on the available hardware under the
 > preregistered methodology. Among implementations with validated semantics,
