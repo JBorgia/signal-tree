@@ -186,6 +186,12 @@ export interface InternalTransactionRuntime {
   transaction(fn: () => void): PendingTransaction;
   /** @internal Raw retained records; projected by `/internals`. */
   getConfirmedTurnRecords(): readonly TransactionTurnRecord[];
+  /** @internal PROPOSAL-INSPECTION-0 raw material; unclassified. */
+  describePendingTurn(
+    turnId: number
+  ):
+    | { effects: readonly TurnEffect[]; laterEffects: readonly TurnEffect[] }
+    | undefined;
   getConfirmedTurnCount(): number;
   getPendingTurnCount(): number;
   getConfirmedTurnIds(): number[];
@@ -673,6 +679,46 @@ class TransactionAuthority {
 
   hasConfirmedTurnAfter(turnId: number): boolean {
     return this.confirmedTurns.some((turn) => turn.id > turnId);
+  }
+
+  /**
+   * PROPOSAL-INSPECTION-0. Raw material only: the pending turn's own effects
+   * and the later effects admitted against it, with NO classification.
+   *
+   * Exposed because the classifier is not proven yet and must not be invented
+   * in production first. A rollback plan answers "what can I safely
+   * compensate?"; a review answers "which parts of what I proposed are still
+   * represented in current truth?". Those questions overlap but are not the
+   * same — a later UPDATE of a proposed row makes the rollback REFUSE while
+   * leaving the proposal's structural contribution entirely current — so the
+   * plan cannot be reused as the answer. This returns the inputs both
+   * questions share and commits to neither.
+   *
+   * Reading only. No retained fact is added: both collections already exist
+   * for the rollback path's own use.
+   *
+   * @internal
+   */
+  describePendingTurn(
+    turnId: number
+  ):
+    | { effects: readonly TurnEffect[]; laterEffects: readonly TurnEffect[] }
+    | undefined {
+    const turn = this.pendingTurns.get(turnId);
+    if (!turn) {
+      return undefined;
+    }
+    const authoredLater = this.confirmedTurns
+      .filter((t) => t.id > turnId)
+      .flatMap((t) => t.__effects ?? []);
+    const openedAt = this.pendingOpenedAtSeq.get(turnId) ?? 0;
+    const observedLater = this.dependencyLedger
+      .filter((entry) => entry.seq > openedAt)
+      .map((entry) => entry.effect);
+    return {
+      effects: (turn.__effects ?? []).map(cloneTurnEffect),
+      laterEffects: [...authoredLater, ...observedLater].map(cloneTurnEffect),
+    };
   }
 
   getPendingRollbackPlan(turnId: number): PendingRollbackPlan {
@@ -2106,6 +2152,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
       };
     },
     getConfirmedTurnRecords: () => authority.getConfirmedTurnRecords(),
+    describePendingTurn: (turnId: number) =>
+      authority.describePendingTurn(turnId),
     getConfirmedTurnCount: () => authority.getConfirmedTurnCount(),
     getPendingTurnCount: () => authority.getPendingTurnCount(),
     getConfirmedTurnIds: () => authority.getConfirmedTurnIds(),
