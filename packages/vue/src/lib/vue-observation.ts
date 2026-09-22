@@ -3,12 +3,28 @@ import {
   shallowRef,
   triggerRef,
   type ComputedRef,
+  type ShallowRef,
 } from 'vue';
 
 import type {
   ObservationAdapter,
   ObservationToken,
 } from '@signal-tree/kernel/adapter';
+
+/**
+ * Structural, not imported: the kernel declares `EpochHandle` but does not
+ * export it from `@signal-tree/kernel/adapter`. That is a real gap in an
+ * otherwise public seam — a third-party adapter cannot name this type — and it
+ * is left for a separate kernel change rather than widened here.
+ */
+type EpochHandle = { (): unknown };
+
+/**
+ * The ref lives on the handle itself rather than in a side table: a `WeakMap`
+ * entry per subject is exactly the per-entity allocation this design exists to
+ * avoid.
+ */
+const EPOCH_REF = Symbol('signaltree.vue.epoch');
 
 interface VueReadonlyCell<T> {
   (): T;
@@ -96,6 +112,40 @@ export const createVueObservationAdapter = (): ObservationAdapter => {
           },
         },
       };
+    },
+
+    /**
+     * `VUE-NATIVE-EPOCH-0`. Vue's own realization of a per-subject
+     * invalidation anchor.
+     *
+     * An epoch carries no value anyone reads — it exists to be depended on and
+     * advanced — so this is a `shallowRef` and a reader, with no writable-cell
+     * record and no observation-token wrapper around it.
+     *
+     * Supplied as a PAIR with `advanceEpoch`, which is the load-bearing part.
+     * The kernel never writes this handle: Vue creates it and Vue advances it.
+     * An earlier design had the kernel write the adapter's cell directly, and
+     * because Vue ships `cell.set` as an inert placeholder for the kernel to
+     * replace, Vue's entity invalidation was silently dead. The pair makes that
+     * class of defect unexpressible.
+     *
+     * Advancement goes through `scheduleInvalidation`, so a Vue invalidation
+     * group batches epoch advances exactly like every other publication.
+     */
+    createEpoch: () => {
+      const revision = shallowRef(0);
+      const epoch = (() => revision.value) as EpochHandle & {
+        [EPOCH_REF]?: typeof revision;
+      };
+      epoch[EPOCH_REF] = revision;
+      return epoch;
+    },
+
+    advanceEpoch: (epoch) => {
+      const revision = (epoch as EpochHandle & {
+        [EPOCH_REF]?: ShallowRef<number>;
+      })[EPOCH_REF];
+      if (revision) scheduleInvalidation(() => triggerRef(revision));
     },
 
     createWritableProjection: <T>(computeValue: () => T) => ({
