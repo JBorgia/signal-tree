@@ -450,6 +450,17 @@ seam first.
 
 **OPEN — successor to the observation half of `ATTRIBUTION-OWNER-0`.**
 
+**Status amended 2026-09-22.** The hold recorded below — *"no further kernel
+excavation until `STATE-CONSEQUENCE-VALUE-0` reports"* — is **discharged**.
+SCV-0 reported **CLOSED / DIFFERENTIATION NOT EARNED** on 2026-09-08, which
+retires the forensic-attribution consumer this track was excavating for.
+
+What remains open is re-justified, if at all, by `MULTI-WRITER-INTERACTION-0`
+below — a **different product with a different falsifier**, not a rename of the
+closed one. Only **MO-2 disposition isolation** is a live dependency of that
+track. MO-1A, MO-1B and MO-3A are answered and **must not be re-derived**; see
+that section's "Already answered" table.
+
 Named without presupposing provenance ownership, because the seam may serve
 other enhancers.
 
@@ -1059,6 +1070,228 @@ outcomes:
 Only after `ATTRIBUTION-OWNER-0` and `STATE-CONSEQUENCE-VALUE-0` report should
 anything decide whether `@signal-tree/provenance` exists, whether a narrow
 enhancer-authoring seam deserves to exist, or whether this stays a demo idea.
+
+## MULTI-WRITER-INTERACTION-0 — preregistered 2026-09-22
+
+**OPEN.** The successor consumer for the still-open half of
+`MUTATION-OBSERVABILITY-0`. It does **not** reopen `STATE-CONSEQUENCE-VALUE-0`.
+
+### The distinction this track exists to hold
+
+```text
+CLOSED 2026-09-08     FORENSIC ATTRIBUTION
+                      "prove who did what under what authority"
+                      A competent IAM + OpenTelemetry + backend audit stack
+                      reconstructs this with IDs and correlation.
+                      DIFFERENTIATION NOT EARNED.
+
+OPEN — this track     LIVE MULTI-WRITER INTERACTION CORRECTNESS
+                      "an agent proposed changes to 7 fields across 3 entities;
+                       show them, let a human accept or reject them as ONE
+                       action, do not clobber concurrent user/server truth,
+                       make the accepted action one reversible unit"
+                      A state-semantics problem, not an audit problem.
+```
+
+The second question is not answered by any amount of identity, tracing or audit
+infrastructure. That is the whole basis for reopening anything here, and it is a
+different claim from the one that was killed — not the same claim renamed
+because agents became fashionable.
+
+### Hard non-goal — the falsifier for scope creep
+
+> This track does not attempt to prove who performed an action, reconstruct
+> authoritative delegation, replace IAM / OpenTelemetry / backend audit, or
+> establish an evidentiary history. `STATE-CONSEQUENCE-VALUE-0` remains CLOSED.
+
+Language is the detector, because this thesis died once already and the failure
+mode is re-entry by vocabulary:
+
+```text
+BACK IN THE DEAD THESIS — STOP     PERMITTED REGISTER
+"prove what the agent did"         "show what is proposed"
+"compliance trail"                 "accept or reject as one operation"
+"authoritative actor attribution"  "do not clobber newer truth"
+"tamper-evident provenance"        "which current changes belong to this action"
+```
+
+Reopening the closed thesis requires new evidence attacking its **original
+falsifier**, not a new application of the same capability.
+
+### Already answered — do NOT re-derive
+
+The 2026-09-08 discovery pass answered most of what a multi-writer track would
+naively re-ask. Re-running it would burn the budget and risk contradicting a
+recorded result.
+
+| Question | Recorded disposition | Consequence here |
+| --- | --- | --- |
+| Does mutation identity survive deferred publication? | **MO-1A = B.** Distinct locations: association merely unexposed; a sidecar keyed on `(transactionOwner, transactionId, positionId)` recovers it with no `WriteMetadata` change | Settled. Not a prerequisite |
+| Same-path multi-scope attempt audit | **MO-1B = CLOSED.** Destroyed at capture — `enqueueEffect` keys by `kind\0path\0position\0subject` and mutates in place; a round trip yields **zero** effects. Required for correct rollback (`RESTORE-P0 P0-B`) | **Must not be reopened.** See below — this track *benefits* from it |
+| Local restoration/rollback derivation | **MO-3A ANSWERED.** rollback = B (referent exists: `origin:'transaction-rollback'` + `transactionId`); restoration = **D** — no causal parent is promised, deliberately (15.0.0-rc.13) | Settled. `derivedFrom` stays illegitimate for restoration |
+| Should the kernel model actors? | Recorded 2026-09-08: **"SignalTree consumes claims, it does not mint them."** The scope carries `externalClaim?: unknown`, an opaque value it never interprets | Already binding. Adopt it; do not re-derive it |
+| Can settlement describe disposition? | **MO-2 PARTIAL.** Attribution isolation = B (proven, keyed `(ownerId, transactionId)`). **Disposition isolation still OPEN** — untestable, because rollback emits no event to cross trees with | **The only live MO dependency.** Gates `WRITE-CONTEXT-0`, not `PROPOSAL-0` |
+| Distributed realization derivation | **MO-3B** — an ownership question; likely transport / Relay / application, not kernel | Out of scope |
+
+### Measured 2026-09-22 — speculative state is ALREADY live-readable
+
+This removes what looked like the track's hardest dependency, so it is recorded
+before any sub-track is defined.
+
+```text
+const pending = store.transaction(() => { store.$.count(1); });
+
+store.$.count()           === 1     <- VISIBLE BEFORE confirm()
+getPendingTurnCount()     === 1        the TURN is pending, the VALUE is not
+getConfirmedTurnCount()   === 0
+```
+
+Source: `packages/kernel/src/enhancers/transactions/transactions.spec.ts`.
+Rollback is implemented by **compensating writes**, which is only coherent if
+the speculative value was applied in the first place.
+
+**Two layers must not be conflated.** The recorded line *"on rollback the writes
+are never published at all"* describes the **effect-observation channel** that a
+provenance sidecar consumes. It does **not** describe tree visibility. Reading it
+as the latter produces the false conclusion that a reviewer cannot see a proposal
+before accepting it.
+
+```text
+TREE VISIBILITY          speculative value readable during a pending turn   YES
+EFFECT PUBLICATION       effects delivered to observers at settlement       DEFERRED
+```
+
+**Consequence:** the review-UI requirement — a human sees proposed state before
+accepting — holds on existing behaviour. `PROPOSAL-0` is therefore **not** gated
+on `MUTATION-OBSERVABILITY-0`. That is a correction to the sequencing this track
+was proposed with.
+
+### Why MO-1B's coalescing is an asset here, not an obstacle
+
+The killed forensic product wanted the audit of attempts (*A tried 8, B tried
+9*). This track wants the **net pending delta** — *what would change if I accept
+this?* Coalescing produces exactly that, and a round trip correctly contributing
+nothing is the right answer for a review surface. The semantics that were merely
+tolerable for the closed thesis are **correct** for this one.
+
+### Sub-tracks
+
+```text
+PROPOSAL-0            UNBLOCKED TODAY — no MO dependency
+                      Is propose/accept/reject a truthful NAME over existing
+                      transaction semantics, or does it need new kernel rules?
+
+WRITE-CONTEXT-0       BLOCKED on MO-2 disposition isolation
+                      Can an opaque, externally-owned context survive the
+                      complete lifecycle including deferred publication?
+
+AGENT-UX-REFERENCE-0  BLOCKED on PROPOSAL-0
+                      Documentation/reference integration only. Ships no kernel.
+```
+
+#### PROPOSAL-0
+
+> **Null:** `propose()` / `accept()` / `reject()` can be implemented as a
+> semantic facade over existing transaction behaviour, introducing **no new
+> kernel state semantics**.
+
+```text
+propose()   ->  transaction()
+accept()    ->  confirm()
+reject()    ->  rollback()
+```
+
+Deliberately **provenance-neutral**. The application already knows it invoked an
+agent and can render that itself. This track must not acquire an actor concept
+to justify itself.
+
+Try to kill the null across: multiple fields; multiple entities; remove/re-add;
+server realization arriving *during* a proposal; user write *during* a proposal;
+rejection; acceptance; later restoration; held references. **If any case needs
+`propose()` to have a rule `transaction()` does not have, it is not DX sugar and
+the null fails.**
+
+Falsifiers:
+
+- a proposal cannot be presented as one reviewable unit across several entities
+- accepting is not one reversible unit in restoration history
+- concurrent authoritative truth arriving mid-proposal is clobbered on accept,
+  or silently discarded on reject
+- rejecting leaves observable residue
+- the API must special-case structural entity mutation to stay truthful
+
+#### WRITE-CONTEXT-0
+
+Only after MO-2 disposition isolation. The existing constraint is **binding
+until disproven**: externally supplied identity/delegation stays outside the
+kernel.
+
+**Explicitly rejected as a kernel-owned schema:**
+
+```ts
+{ actorKind: 'human' | 'agent' | 'system' }   // the kernel does not own the
+                                              // world's actor taxonomy
+```
+
+Entra, Okta, AuthZEN, application sessions, agent frameworks and delegation
+chains already model identity. SignalTree carries an opaque claim:
+
+```ts
+withWriteContext({ source: claim, operation: token }, () => { ... });
+```
+
+SignalTree may guarantee only *"this opaque token accompanied these
+consequences."* It may never assert *"this token proves Alice authorized GPT-9
+to do X."* That sentence is the line back into the closed thesis.
+
+Naming — `source` vs `actor` — is deferred until MO-2 reports. Do not let the
+public spelling presuppose the answer.
+
+### Preregistration
+
+```yaml
+id: MULTI-WRITER-INTERACTION-0
+status: OPEN — preregistered 2026-09-22
+supersedes: nothing
+reopens: nothing
+does_not_reopen: STATE-CONSEQUENCE-VALUE-0   # CLOSED 2026-09-08, stays closed
+
+question: >
+  Can SignalTree provide correct live application behaviour when multiple
+  writers — human, agent, server, automation — propose, commit, reject,
+  supersede and reverse shared state, expressed as ordinary state primitives
+  rather than as an evidentiary system?
+
+null: >
+  Proposal/review is a truthful naming of existing transaction semantics.
+  No new kernel state semantics, no actor model, no retained provenance fact.
+
+prohibited_changes:
+  - no actor/identity taxonomy in the kernel
+  - no provenance fields added to core mutation types
+  - no reopening MO-1B same-path attempt capture
+  - no derivedFrom for restoration consequences
+  - no claim that carrying a token establishes authority
+  - no reopening /authoring
+
+sequencing:
+  - PROPOSAL-0 first — unblocked; no MO dependency (speculative state is
+    already live-readable, measured 2026-09-22)
+  - MO-2 disposition isolation — the only live MO dependency
+  - WRITE-CONTEXT-0 — only after MO-2
+  - AGENT-UX-REFERENCE-0 — reference integration only
+
+outcomes:
+  A: >
+    Null holds. Proposal/review ships as ordinary state primitives on the
+    existing transaction substrate. No kernel change.
+  B: >
+    Null holds for the API but settlement disposition must become observable
+    for the lifecycle to be describable truthfully. Derive the narrowest seam.
+  C: >
+    Multi-writer correctness requires a genuinely new kernel semantic fact.
+    Reopen the kernel only for that demonstrated fact.
+```
 
 ## PRODUCT DIRECTION — set 2026-09-08
 
