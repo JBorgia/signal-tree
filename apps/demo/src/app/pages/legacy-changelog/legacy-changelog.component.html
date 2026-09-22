@@ -4,18 +4,22 @@
   <p class="historical-note">
     <strong>This is pre-15 release history, not current API guidance.</strong>
     The sections below describe APIs as they were at each release — many were
-    later removed (the async markers, <code>form()</code>, <code>status()</code>,
-    <code>stored()</code>, <code>rxMethod</code>,
-    <code>&#64;signaltree/guardrails</code>, the <code>&#64;signaltree/core</code>
-    package name). They are kept so older logs and migrations route correctly.
-    The current surface is the package READMEs, <code>CHANGELOG.md</code>, and the
-    <a href="https://github.com/JBorgia/signal-tree/blob/main/docs/guides/migration-v14-v15.md" target="_blank" rel="noopener">v15 migration guide</a>.
-    For <strong>v15</strong>, see <a routerLink="/examples/fundamentals" fragment="whats-new">What's New</a>.
+    later removed (the async markers, <code>form()</code>,
+    <code>status()</code>, <code>stored()</code>, <code>rxMethod</code>,
+    <code>&#64;signaltree/guardrails</code>, the
+    <code>&#64;signaltree/core</code> package name). They are kept so older logs
+    and migrations route correctly. The current surface is the package READMEs,
+    <code>CHANGELOG.md</code>, and the
+    <a
+      href="https://github.com/JBorgia/signal-tree/blob/main/docs/guides/migration-v14-v15.md"
+      target="_blank"
+      rel="noopener"
+      >v15 migration guide</a
+    >. For <strong>v15</strong>, see the
+    <a routerLink="/migrate">upgrade guide</a>.
   </p>
 
-  <h3>
-    🧩 v14.0.0 — a snapshot carries values, not machinery (August 2026)
-  </h3>
+  <h3>🧩 v14.0.0 — a snapshot carries values, not machinery (August 2026)</h3>
   <div class="release-highlights">
     <p>
       One question turned out to be behind four separate bugs, and nothing in
@@ -45,7 +49,9 @@
         ; branches and the root stay callable, unchanged.
       </li>
       <li>
-        <strong><code>&#64;signaltree/callable-syntax</code> is deleted.</strong>
+        <strong
+          ><code>&#64;signaltree/callable-syntax</code> is deleted.</strong
+        >
         The build transform that was meant to make the line above real could not
         run inside an Angular app at all —
         <code>&#64;angular/build:application</code>
@@ -79,8 +85,8 @@
       <li>
         The unexported <code>asyncStream</code> marker is removed. Accumulation
         is three lines of composition over a plain leaf, and a leaf is captured
-        by <code>restoration()</code>, appears in <code>tree.$()</code> and persists
-        with no marker contract to satisfy.
+        by <code>restoration()</code>, appears in <code>tree.$()</code> and
+        persists with no marker contract to satisfy.
       </li>
     </ul>
 
@@ -104,24 +110,31 @@
         boundary.
       </li>
       <li>
-        <strong>A loader-backed collection is no longer clobbered by
-        rehydration.</strong>
+        <strong
+          >A loader-backed collection is no longer clobbered by
+          rehydration.</strong
+        >
         The marker that knows least about freshness used to be last to write.
         Now a marker that owns a source declines a tree-level rehydrate — and
-        the knob for offline-first already existed
-        (<code>persist: {{ '{' }} hydrateThenRevalidate {{ '}' }}</code>).
+        the knob for offline-first already existed (<code
+          >persist: {{ '{' }} hydrateThenRevalidate {{ '}' }}</code
+        >).
       </li>
       <li>
-        <strong>Scrubbing a devtools timeline no longer rewrites your
-        localStorage.</strong>
+        <strong
+          >Scrubbing a devtools timeline no longer rewrites your
+          localStorage.</strong
+        >
         Undo and devtools replay were indistinguishable because both tagged
         writes <code>'restoration'</code>. Undoing
         <em>should</em>
         write through to storage; dragging a devtools slider should not.
       </li>
       <li>
-        <strong><code>stored()</code> can no longer leak its storage adapter
-        into a snapshot</strong>
+        <strong
+          ><code>stored()</code> can no longer leak its storage adapter into a
+          snapshot</strong
+        >
         — a security fix, not a tidy-up.
       </li>
     </ul>
@@ -193,48 +206,58 @@
     <h4>⚡ Performance</h4>
     <ul>
       <li>
-        <strong><code>tree.$()</code> is memoised and structurally shared.</strong>
+        <strong
+          ><code>tree.$()</code> is memoised and structurally shared.</strong
+        >
         A node rebuilds only when a signal beneath it actually changed; clean
-        subtrees come back <em>by reference</em>. Reading the whole state after a
-        one-leaf write went <strong>1807.8µs → 149.2µs</strong> on a 10,000-leaf
-        tree, and reading it with nothing changed returns the identical object in
-        <strong>0.044µs</strong>. Built on Angular's own <code>computed()</code>,
-        so the invalidation rides the existing write path and
-        <strong>costs writes nothing</strong>.
+        subtrees come back <em>by reference</em>. Reading the whole state after
+        a one-leaf write went <strong>1807.8µs → 149.2µs</strong> on a
+        10,000-leaf tree, and reading it with nothing changed returns the
+        identical object in <strong>0.044µs</strong>. Built on Angular's own
+        <code>computed()</code>, so the invalidation rides the existing write
+        path and <strong>costs writes nothing</strong>.
       </li>
       <li>
-        <strong><code>restoration()</code> no longer scales with state
-        size.</strong> A history entry is now the snapshot reference rather than
-        a <code>structuredClone</code>, and every comparison collapses to
+        <strong
+          ><code>restoration()</code> no longer scales with state size.</strong
+        >
+        A history entry is now the snapshot reference rather than a
+        <code>structuredClone</code>, and every comparison collapses to
         <code>===</code>. 50 writes each changing ONE number, at 10,000 rows:
         <strong>340.60ms → 0.04ms</strong>. Flat in state size — that is the
         qualitative change, not the percentage. Memory per entry drops from a
         full copy of state to only the nodes that changed.
       </li>
       <li>
-        <strong>Serialisation stopped stringifying the tree to ask "did anything
-        change?"</strong> <code>autoSave</code> polled
-        <code>JSON.stringify(tree.$())</code> every 100ms to answer a yes/no
-        question the write path already knew. It is now an O(1) identity check.
+        <strong
+          >Serialisation stopped stringifying the tree to ask "did anything
+          change?"</strong
+        >
+        <code>autoSave</code> polled <code>JSON.stringify(tree.$())</code> every
+        100ms to answer a yes/no question the write path already knew. It is now
+        an O(1) identity check.
       </li>
     </ul>
 
     <h4>✨ New</h4>
     <ul>
       <li>
-        <strong><code>compared()</code> / <code>byKeys()</code> — per-leaf
-        equality.</strong> A tree has one equality function for every leaf, which
-        is the right default and the wrong answer for a few positions: it cannot
-        know which fields matter, or that a <code>version</code> field already
-        answers the question.
+        <strong
+          ><code>compared()</code> / <code>byKeys()</code> — per-leaf
+          equality.</strong
+        >
+        A tree has one equality function for every leaf, which is the right
+        default and the wrong answer for a few positions: it cannot know which
+        fields matter, or that a <code>version</code> field already answers the
+        question.
         <span class="release-example">
           <code
             >user: compared(initialUser, byKeys&lt;User&gt;('id',
             'version'))</code
           >
         </span>
-        On an object leaf that is <strong>53.8ns → 8.9ns</strong>, and on the same
-        object re-fetched over HTTP (equivalent value, new identity)
+        On an object leaf that is <strong>53.8ns → 8.9ns</strong>, and on the
+        same object re-fetched over HTTP (equivalent value, new identity)
         <strong>110.3ns → 9.0ns</strong>. The point is not the speed: a
         comparator reaches the reference-equality floor
         <em>while keeping re-fetch correctness</em>, which is exactly why
@@ -246,13 +269,19 @@
         </span>
       </li>
       <li>
-        <strong>[ST2018] — a warning when a collection is stored as a plain array
-        leaf.</strong> The most expensive idiom mistake available here, and it
-        does not look like a mistake. 1000 updates to a 50,000-row collection:
+        <strong
+          >[ST2018] — a warning when a collection is stored as a plain array
+          leaf.</strong
+        >
+        The most expensive idiom mistake available here, and it does not look
+        like a mistake. 1000 updates to a 50,000-row collection:
         <strong>49.80ms</strong> as an array leaf versus
-        <strong>1.63ms</strong> via <code>entityMap</code> — the array leaf lands
-        at parity with the immutable stores SignalTree otherwise beats ~28x.
-        Documentation did not prevent this: <em>our own demo benchmark</em>
+        <strong>1.63ms</strong> via <code>entityMap</code> — the array leaf
+        lands at parity with the immutable stores that
+        <code>entityMap</code> measured ~28x faster than on this workload —
+        1,000 updates to a 50,000-row keyed collection, against NgRx
+        SignalStore, on the hardware and versions of that era. Documentation did
+        not prevent this: <em>our own demo benchmark</em>
         shipped the array-leaf idiom while the entity cookbook sat in the repo.
         Hence a diagnostic instead of another guide.
       </li>
@@ -261,36 +290,48 @@
     <h4>🐛 Fixed</h4>
     <ul>
       <li>
-        <strong>A held <code>byId()</code> reference died permanently across
-        remove → re-add.</strong> The node captured the per-entity signal once, so
-        a re-added entity left the held reference reading an orphan forever.
-        Holding a reference to a nested position is the capability this library
-        has and immutable stores do not — it has to survive the collection
-        churning underneath it.
+        <strong
+          >A held <code>byId()</code> reference died permanently across remove →
+          re-add.</strong
+        >
+        The node captured the per-entity signal once, so a re-added entity left
+        the held reference reading an orphan forever. Holding a reference to a
+        nested position is the capability this library has and immutable stores
+        do not — it has to survive the collection churning underneath it.
       </li>
       <li>
-        <strong><code>restoration()</code> charged you for other people's
-        trees.</strong> It subscribes to the global flush, so every restored
-        tree materialised and deep-cloned <em>itself</em> whenever
-        <em>any</em> tree in the process flushed: 0.008ms → 9.7ms as three
-        unrelated 10,000-leaf trees were kept alive.
+        <strong
+          ><code>restoration()</code> charged you for other people's
+          trees.</strong
+        >
+        It subscribes to the global flush, so every restored tree materialised
+        and deep-cloned <em>itself</em> whenever <em>any</em> tree in the
+        process flushed: 0.008ms → 9.7ms as three unrelated 10,000-leaf trees
+        were kept alive.
       </li>
     </ul>
 
     <h4>⚠️ Breaking</h4>
     <ul>
       <li>
-        <strong><code>tree.$()</code> no longer returns a freshly allocated
-        object.</strong> Mutating a snapshot would corrupt the cache and survive
-        into every later read. Snapshots were always meant to be read-only; that
-        is now load-bearing, so each node is frozen in dev and a mutation throws
-        immediately. If you mutate a snapshot, copy it first. Nothing in this repo
-        did — all 751 pre-existing core tests passed with the freeze active.
+        <strong
+          ><code>tree.$()</code> no longer returns a freshly allocated
+          object.</strong
+        >
+        Mutating a snapshot would corrupt the cache and survive into every later
+        read. Snapshots were always meant to be read-only; that is now
+        load-bearing, so each node is frozen in dev and a mutation throws
+        immediately. If you mutate a snapshot, copy it first. Nothing in this
+        repo did — all 751 pre-existing core tests passed with the freeze
+        active.
       </li>
       <li>
-        <strong><code>getRestorationHistory()</code> returns entry states by
-        reference.</strong> The entry objects are still copied, so history
-        metadata cannot be rewritten.
+        <strong
+          ><code>getRestorationHistory()</code> returns entry states by
+          reference.</strong
+        >
+        The entry objects are still copied, so history metadata cannot be
+        rewritten.
       </li>
     </ul>
   </div>
@@ -309,14 +350,18 @@
     <h4>🔐 Security</h4>
     <ul>
       <li>
-        <strong>An explicit <code>storage:</code> option no longer reaches
-        snapshots.</strong> A <code>stored()</code> marker nested under an object
-        parent used to surface as its <em>raw marker</em> from
-        <code>tree.$()</code>, carrying <code>options.storage</code> with it — and
+        <strong
+          >An explicit <code>storage:</code> option no longer reaches
+          snapshots.</strong
+        >
+        A <code>stored()</code> marker nested under an object parent used to
+        surface as its <em>raw marker</em> from <code>tree.$()</code>, carrying
+        <code>options.storage</code> with it — and
         <code>unwrap</code> deep-copied that storage object, enumerating
-        unrelated keys into the snapshot. Anyone passing <code>storage:</code>
-        explicitly <em>and</em> using <code>serialization()</code>,
-        <code>persistence()</code>, devtools or <code>createAuditTracker</code>
+        unrelated keys into the snapshot. Anyone passing
+        <code>storage:</code> explicitly <em>and</em> using
+        <code>serialization()</code>, <code>persistence()</code>, devtools or
+        <code>createAuditTracker</code>
         was emitting that storage's contents into those payloads. The default
         path was never affected.
         <span class="release-note">
@@ -345,35 +390,42 @@
         This hit <em>every</em> marker — nested <code>status()</code>,
         <code>entityMap()</code>, <code>form()</code> and
         <code>asyncSource()</code> all leaked raw markers into
-        <code>tree.$()</code>. Only <code>stored()</code> got noticed, because its
-        marker carries a <code>Storage</code> handle.
+        <code>tree.$()</code>. Only <code>stored()</code> got noticed, because
+        its marker carries a <code>Storage</code> handle.
       </li>
       <li>
-        <strong><code>tree.$()</code> called before <code>tree.$</code> now
-        finalizes.</strong> Every other entry point did; the builder's own call
-        path was the sole omission, so <code>tree.$()</code> as a first operation
-        returned raw markers.
+        <strong
+          ><code>tree.$()</code> called before <code>tree.$</code> now
+          finalizes.</strong
+        >
+        Every other entry point did; the builder's own call path was the sole
+        omission, so <code>tree.$()</code> as a first operation returned raw
+        markers.
       </li>
     </ul>
     <h4>🆕 Added</h4>
     <ul>
       <li>
-        <strong>Dev-mode diagnostics for writes and snapshots that go
-        nowhere</strong> — <code>ST2008</code> (a value omitted from a
-        snapshot), <code>ST2009</code> (<code>applyState</code> replacing a live
-        value), <code>ST2010</code> (a write to a key absent from the tree's
-        initial shape — it has no signal to land on and is discarded), and
+        <strong
+          >Dev-mode diagnostics for writes and snapshots that go nowhere</strong
+        >
+        — <code>ST2008</code> (a value omitted from a snapshot),
+        <code>ST2009</code> (<code>applyState</code> replacing a live value),
+        <code>ST2010</code> (a write to a key absent from the tree's initial
+        shape — it has no signal to land on and is discarded), and
         <code>ST2011</code> (a marker inside a <code>lazy()</code> tree, which
         is never materialized). All four were previously silent.
         <code>ngDevMode: false</code> removes them entirely.
       </li>
       <li>
-        <strong><code>reload()</code> returns
-        <code>'ok' | 'default' | 'error'</code></strong> (was
-        <code>void</code>). <code>'error'</code> means the stored data couldn't
-        be read or migrated: the signal falls back to its default while storage
-        is left <em>intact</em>, because destroying data a human might still
-        recover is your call, not the library's.
+        <strong
+          ><code>reload()</code> returns
+          <code>'ok' | 'default' | 'error'</code></strong
+        >
+        (was <code>void</code>). <code>'error'</code> means the stored data
+        couldn't be read or migrated: the signal falls back to its default while
+        storage is left <em>intact</em>, because destroying data a human might
+        still recover is your call, not the library's.
       </li>
     </ul>
     <h4>⚠️ Changed (behavior)</h4>
@@ -404,42 +456,51 @@ tree.$();  // &#123; settings: &#123; theme: 'dark' &#125; &#125;  — not a raw
     <p>
       An independent audit of 13.3.0 found two real defects in the work that
       release shipped — one of them undermining the exact guarantee it was
-      written to provide. <strong>13.3.0 is deprecated on npm; take this patch
-      if you use <code>stored()</code> with
-      <code>version</code>/<code>migrate</code>, or create and destroy
-      trees.</strong>
+      written to provide.
+      <strong
+        >13.3.0 is deprecated on npm; take this patch if you use
+        <code>stored()</code> with <code>version</code>/<code>migrate</code>, or
+        create and destroy trees.</strong
+      >
     </p>
     <h4>✨ Fixed</h4>
     <ul>
       <li>
-        <strong><code>clear()</code> and <code>reload()</code> are no longer
-        undone by a migration re-persist.</strong> A migrated value is written
-        back in a queued microtask, which the timer cancellation couldn't
-        reach — so <code>clear()</code> in the same tick that a tree
-        materialized with a version migration removed the key, and one
-        microtask later the migrated value was written straight back. That is
-        precisely the signal/storage drift 13.3.0 claimed to eliminate.
+        <strong
+          ><code>clear()</code> and <code>reload()</code> are no longer undone
+          by a migration re-persist.</strong
+        >
+        A migrated value is written back in a queued microtask, which the timer
+        cancellation couldn't reach — so <code>clear()</code> in the same tick
+        that a tree materialized with a version migration removed the key, and
+        one microtask later the migrated value was written straight back. That
+        is precisely the signal/storage drift 13.3.0 claimed to eliminate.
       </li>
       <li>
-        <strong>The lifecycle-drain registry no longer retains destroyed
-        trees.</strong> It held every debounced signal's flush closure forever —
-        and through it the <code>Storage</code> backend, the default value, the
-        current value and your callbacks (~4&nbsp;MB measured across 20
-        short-lived trees). Membership is now scoped to <em>pending writes</em>:
-        a signal enrols when a write is armed and leaves when it commits or is
-        cancelled.
+        <strong
+          >The lifecycle-drain registry no longer retains destroyed
+          trees.</strong
+        >
+        It held every debounced signal's flush closure forever — and through it
+        the <code>Storage</code> backend, the default value, the current value
+        and your callbacks (~4&nbsp;MB measured across 20 short-lived trees).
+        Membership is now scoped to <em>pending writes</em>: a signal enrols
+        when a write is armed and leaves when it commits or is cancelled.
       </li>
       <li>
-        <strong>One failing signal no longer abandons the rest of a
-        drain</strong>, and removal failures report
-        <code>operation: 'remove'</code> instead of <code>'write'</code>.
+        <strong
+          >One failing signal no longer abandons the rest of a drain</strong
+        >, and removal failures report <code>operation: 'remove'</code> instead
+        of <code>'write'</code>.
       </li>
       <li>
-        <strong><code>createFormTree()</code>: field lookups no longer resolve
-        <code>Object.prototype</code> members</strong> (a field named
-        <code>toString</code> returned the inherited method where an error
-        message belonged), per-index errors under a glob validator resolve, and
-        the per-path cache is bounded.
+        <strong
+          ><code>createFormTree()</code>: field lookups no longer resolve
+          <code>Object.prototype</code> members</strong
+        >
+        (a field named <code>toString</code> returned the inherited method where
+        an error message belonged), per-index errors under a glob validator
+        resolve, and the per-path cache is bounded.
       </li>
     </ul>
   </div>
@@ -450,62 +511,74 @@ tree.$();  // &#123; settings: &#123; theme: 'dark' &#125; &#125;  — not a raw
   </h3>
   <div class="release-highlights">
     <p>
-      A field report from a Capacitor app: select a value, background the app within
-      ~100&nbsp;ms, and the selection is gone — the debounced storage write never fired
-      and nothing drained it. The debounce/coalescing model was right; draining was
-      missing. This release closes the loss window automatically and fixes two real
-      bugs the investigation surfaced.
+      A field report from a Capacitor app: select a value, background the app
+      within ~100&nbsp;ms, and the selection is gone — the debounced storage
+      write never fired and nothing drained it. The debounce/coalescing model
+      was right; draining was missing. This release closes the loss window
+      automatically and fixes two real bugs the investigation surfaced.
     </p>
     <h4>✨ Fixed</h4>
     <ul>
       <li>
-        <strong><code>clear()</code> and <code>reload()</code> cancel the pending
-        debounced write</strong> — previously <code>clear()</code> removed the key but
-        left the write timer armed, so the cleared value was written back
-        ~100&nbsp;ms later: resurrected in storage while the signal held the default.
-        <code>reload()</code> had the mirror hazard (a stale pending value overwriting
-        what was just read).
+        <strong
+          ><code>clear()</code> and <code>reload()</code> cancel the pending
+          debounced write</strong
+        >
+        — previously <code>clear()</code> removed the key but left the write
+        timer armed, so the cleared value was written back ~100&nbsp;ms later:
+        resurrected in storage while the signal held the default.
+        <code>reload()</code> had the mirror hazard (a stale pending value
+        overwriting what was just read).
       </li>
       <li>
-        <strong><code>reload()</code> runs migrations</strong> — it used to apply
-        stored data regardless of its <code>__v</code>, so reloading a key written by
-        an older app version (say, another tab) bypassed the <code>migrate</code>
-        function initial load would have run. Reload and init now share one load path.
+        <strong><code>reload()</code> runs migrations</strong> — it used to
+        apply stored data regardless of its <code>__v</code>, so reloading a key
+        written by an older app version (say, another tab) bypassed the
+        <code>migrate</code>
+        function initial load would have run. Reload and init now share one load
+        path.
       </li>
     </ul>
     <h4>🆕 Added</h4>
     <ul>
       <li>
-        <strong>Automatic lifecycle drain</strong> — every stored signal with debounced
-        writes is flushed on <code>visibilitychange</code>&nbsp;→&nbsp;hidden and
-        <code>pagehide</code> (one lazy listener pair, SSR-safe). By the time a mobile
-        WebView is suspended or a tab closes, pending values are in storage — no
-        consumer changes needed.
+        <strong>Automatic lifecycle drain</strong> — every stored signal with
+        debounced writes is flushed on
+        <code>visibilitychange</code>&nbsp;→&nbsp;hidden and
+        <code>pagehide</code> (one lazy listener pair, SSR-safe). By the time a
+        mobile WebView is suspended or a tab closes, pending values are in
+        storage — no consumer changes needed.
       </li>
       <li>
-        <strong><code>.flush()</code></strong> commits one signal's pending write
-        synchronously; <strong><code>flushAllStoredSignals()</code></strong> drains
-        everything — wire it to native lifecycle hooks the DOM can't see, e.g.
-        Capacitor's <code>App.addListener('pause', …)</code>.
+        <strong><code>.flush()</code></strong> commits one signal's pending
+        write synchronously;
+        <strong><code>flushAllStoredSignals()</code></strong> drains everything
+        — wire it to native lifecycle hooks the DOM can't see, e.g. Capacitor's
+        <code>App.addListener('pause', …)</code>.
       </li>
       <li>
-        <strong><code>maxWaitMs</code></strong> — plain debouncing resets the timer on
-        every update, so a key updated faster than <code>debounceMs</code> never
-        persisted until updates stopped. <code>maxWaitMs</code> bounds that staleness.
+        <strong><code>maxWaitMs</code></strong> — plain debouncing resets the
+        timer on every update, so a key updated faster than
+        <code>debounceMs</code> never persisted until updates stopped.
+        <code>maxWaitMs</code> bounds that staleness.
       </li>
       <li>
-        <strong><code>onError</code></strong> (+ <code>StoredErrorContext</code>) —
-        storage failures (quota, serialization, migration) previously only
-        <code>console.warn</code>'d in dev and were compiled out of production builds:
-        silently dropped data. Now there's a programmatic hook.
+        <strong><code>onError</code></strong> (+
+        <code>StoredErrorContext</code>) — storage failures (quota,
+        serialization, migration) previously only <code>console.warn</code>'d in
+        dev and were compiled out of production builds: silently dropped data.
+        Now there's a programmatic hook.
       </li>
     </ul>
     <h4>⚠️ Changed (behavior)</h4>
     <ul>
       <li>
-        <strong><code>debounceMs: 0</code> writes synchronously in the caller's
-        stack</strong> (was deferred one microtask) — <code>set()</code> returning now
-        means the value is in storage, for keys that must never sit in a debounce
+        <strong
+          ><code>debounceMs: 0</code> writes synchronously in the caller's
+          stack</strong
+        >
+        (was deferred one microtask) — <code>set()</code> returning now means
+        the value is in storage, for keys that must never sit in a debounce
         window.
       </li>
     </ul>
@@ -518,64 +591,80 @@ stored('truckId', null, &#123; debounceMs: 0 &#125;); // synchronous per-key
   </div>
 
   <h3>
-    🎯 v13.2.0 — typed <code>.computed()</code> slices, branded form errors by default
-    (July 2026)
+    🎯 v13.2.0 — typed <code>.computed()</code> slices, branded form errors by
+    default (July 2026)
   </h3>
   <div class="release-highlights">
     <p>
-      A shipped primitive stopped requiring a cast, a two-release-old promise got kept,
-      and a silent failure became a loud one.
+      A shipped primitive stopped requiring a cast, a two-release-old promise
+      got kept, and a silent failure became a loud one.
     </p>
     <h4>✨ Fixed</h4>
     <ul>
       <li>
-        <strong><code>entityMap().computed()</code> slice names are typed on
-        <code>tree.$</code></strong> — reading a slice used to mean throwing away type
-        safety with <code>(tree.$.users as any).active()</code>, which the docs taught as
-        the official pattern. The runtime always worked; the types were dropped at
-        materialization. Now <code>tree.$.users.active()</code> is
-        <code>Signal&lt;User[]&gt;</code> with no cast, <code>.computed()</code> chains
-        type each name independently, and loader-backed collections keep their loader
-        surface alongside the slices. <strong>Delete those casts.</strong>
+        <strong
+          ><code>entityMap().computed()</code> slice names are typed on
+          <code>tree.$</code></strong
+        >
+        — reading a slice used to mean throwing away type safety with
+        <code>(tree.$.users as any).active()</code>, which the docs taught as
+        the official pattern. The runtime always worked; the types were dropped
+        at materialization. Now <code>tree.$.users.active()</code> is
+        <code>Signal&lt;User[]&gt;</code> with no cast,
+        <code>.computed()</code> chains type each name independently, and
+        loader-backed collections keep their loader surface alongside the
+        slices. <strong>Delete those casts.</strong>
       </li>
       <li>
-        <strong><code>DevToolsMethods</code> / <code>OptimizedUpdateMethods</code> are
-        exported</strong> — they existed but were missing from the barrel, so a
-        <em>library</em> wrapping an enhancer chain could not name its own return type
-        and had to erase <code>.batch()</code>/<code>.undo()</code> for its callers.
+        <strong
+          ><code>DevToolsMethods</code> /
+          <code>OptimizedUpdateMethods</code> are exported</strong
+        >
+        — they existed but were missing from the barrel, so a
+        <em>library</em> wrapping an enhancer chain could not name its own
+        return type and had to erase <code>.batch()</code>/<code>.undo()</code>
+        for its callers.
       </li>
     </ul>
     <h4>⚠️ Changed (behavior)</h4>
     <ul>
       <li>
-        <strong><code>signalForm()</code>: <code>nativeErrors</code> now defaults to
-        <code>true</code></strong> — built-in validator failures arrive as Angular's
-        branded error classes rather than plain <code>&#123; kind, message &#125;</code>
-        objects. This is the flip announced in 11.6.0 and deferred through 12.x and 13.x.
-        <code>kind</code> and <code>message</code> exist on <strong>both</strong> shapes,
-        so most code is unaffected; narrowing on the plain shape, serializing errors, or
-        deep-equalling them in tests is what changes. Pass
-        <code>&#123; nativeErrors: false &#125;</code> to keep the old shape.
+        <strong
+          ><code>signalForm()</code>: <code>nativeErrors</code> now defaults to
+          <code>true</code></strong
+        >
+        — built-in validator failures arrive as Angular's branded error classes
+        rather than plain <code>&#123; kind, message &#125;</code>
+        objects. This is the flip announced in 11.6.0 and deferred through 12.x
+        and 13.x.
+        <code>kind</code> and <code>message</code> exist on
+        <strong>both</strong> shapes, so most code is unaffected; narrowing on
+        the plain shape, serializing errors, or deep-equalling them in tests is
+        what changes. Pass <code>&#123; nativeErrors: false &#125;</code> to
+        keep the old shape.
       </li>
     </ul>
     <h4>🛡️ New guardrail</h4>
     <ul>
       <li>
-        <strong><code>[ST2007]</code></strong> — <code>.derived()</code> used to drop any
-        value it didn't recognize as a signal, silently. The usual cause is brutal to
-        find: two copies of <code>&#64;angular/core</code> mean two
-        <code>Symbol(SIGNAL)</code>s, so <code>isSignal()</code> inside SignalTree rejects
-        a <code>computed()</code> you just created and <em>every</em> derived value
-        vanishes. It now says so, and names the bundler fix.
+        <strong><code>[ST2007]</code></strong> — <code>.derived()</code> used to
+        drop any value it didn't recognize as a signal, silently. The usual
+        cause is brutal to find: two copies of
+        <code>&#64;angular/core</code> mean two <code>Symbol(SIGNAL)</code>s, so
+        <code>isSignal()</code> inside SignalTree rejects a
+        <code>computed()</code> you just created and <em>every</em> derived
+        value vanishes. It now says so, and names the bundler fix.
       </li>
     </ul>
     <h4>📉 Bundle</h4>
     <ul>
       <li>
-        Dev-only guardrails don't tree-shake on their own — <code>ngDevMode</code> is a
-        runtime global, so the branch survives minification. Define it
-        (<code>"define": &#123; "ngDevMode": "false" &#125;</code>) and reclaim
-        <strong>~0.5–0.9 KB gzip</strong>. Thrown-error messages stay on purpose.
+        Dev-only guardrails don't tree-shake on their own —
+        <code>ngDevMode</code> is a runtime global, so the branch survives
+        minification. Define it (<code
+          >"define": &#123; "ngDevMode": "false" &#125;</code
+        >) and reclaim <strong>~0.5–0.9 KB gzip</strong>. Thrown-error messages
+        stay on purpose.
       </li>
     </ul>
     <pre><code>// Typed slices — no cast since 13.2
@@ -587,72 +676,93 @@ store.$.plants.byUrl();       // Signal&lt;Record&lt;string, PlantDto&gt;&gt;
 store.$.plants.activeCount(); // Signal&lt;number&gt;</code></pre>
   </div>
 
-  <h3>🎯 v13.0.0–13.1.0 — the packaging principle, <code>history()</code>, events↔entityMap (July 2026)</h3>
+  <h3>
+    🎯 v13.0.0–13.1.0 — the packaging principle, <code>history()</code>,
+    events↔entityMap (July 2026)
+  </h3>
   <div class="release-highlights">
     <p>
       v13 wrote down the rule for what belongs in which package —
-      <em>independent dependency or runtime → its own package; a within-tree mechanic →
-      core</em> — and moved the two capabilities that were filed wrong.
+      <em
+        >independent dependency or runtime → its own package; a within-tree
+        mechanic → core</em
+      >
+      — and moved the two capabilities that were filed wrong.
     </p>
     <h4>✨ New</h4>
     <ul>
       <li>
-        <strong><code>history()</code> (core)</strong> — signal-native undo/redo for the
-        <code>form()</code> marker: <code>form(&#123; history: history(&#123; capacity &#125;) &#125;)</code>.
-        Drives a bound <code>signalForm()</code> field tree from the same engine, which
-        the old <code>FormGroup</code>-only <code>withFormHistory</code> structurally
-        could not reach. <strong>13.1.0</strong> added
-        <code>trackHistory(model)</code> — the same engine pointed at any
-        <code>WritableSignal</code>, no marker required.
+        <strong><code>history()</code> (core)</strong> — signal-native undo/redo
+        for the <code>form()</code> marker:
+        <code>form(&#123; history: history(&#123; capacity &#125;) &#125;)</code
+        >. Drives a bound <code>signalForm()</code> field tree from the same
+        engine, which the old <code>FormGroup</code>-only
+        <code>withFormHistory</code> structurally could not reach.
+        <strong>13.1.0</strong> added <code>trackHistory(model)</code> — the
+        same engine pointed at any <code>WritableSignal</code>, no marker
+        required.
       </li>
       <li>
-        <strong><code>entityEventHandler</code> / <code>applyOptimisticEntityChange</code></strong>
+        <strong
+          ><code>entityEventHandler</code> /
+          <code>applyOptimisticEntityChange</code></strong
+        >
         (<code>&#64;signaltree/events/angular</code>) — map an event batch onto
         <code>entityMap</code>'s batch ops instead of a per-event
-        <code>upsertOne</code> loop, and derive the optimistic-update rollback closure
-        automatically.
+        <code>upsertOne</code> loop, and derive the optimistic-update rollback
+        closure automatically.
       </li>
     </ul>
     <h4>🔀 Moved (breaking, one import path)</h4>
     <ul>
       <li>
-        <code>createAuditTracker</code>/<code>createAuditCallback</code> moved from
-        <code>&#64;signaltree/ng-forms</code> to <code>&#64;signaltree/core</code> —
-        they never depended on <code>&#64;angular/forms</code>. The old path still
-        re-exports them, deprecated.
+        <code>createAuditTracker</code>/<code>createAuditCallback</code> moved
+        from <code>&#64;signaltree/ng-forms</code> to
+        <code>&#64;signaltree/core</code> — they never depended on
+        <code>&#64;angular/forms</code>. The old path still re-exports them,
+        deprecated.
       </li>
     </ul>
   </div>
 
-  <h3>🎯 v12.1.0 — <code>idle()</code>/<code>settled()</code> status predicates + <code>persist.maxScopes</code> (July 2026)</h3>
+  <h3>
+    🎯 v12.1.0 — <code>idle()</code>/<code>settled()</code> status predicates +
+    <code>persist.maxScopes</code> (July 2026)
+  </h3>
   <div class="release-highlights">
     <p>
-      Two gaps closed from external audits: a <code>status()</code> guard predicate that
-      actually covers the <code>Error</code> state, and storage garbage collection for
-      high-cardinality scoped loaders.
+      Two gaps closed from external audits: a <code>status()</code> guard
+      predicate that actually covers the <code>Error</code> state, and storage
+      garbage collection for high-cardinality scoped loaders.
     </p>
     <h4>✨ New</h4>
     <ul>
       <li>
-        <strong><code>status().idle()</code> / <code>status().settled()</code></strong> —
-        the standard composite predicates. <code>idle()</code> is
-        <code>!loading() &amp;&amp; !loaded()</code>, true for <strong>both</strong>
-        <code>NotLoaded</code> and <code>Error</code> — guards/resolvers should use
-        <code>idle()</code>, not <code>notLoaded()</code>: a <code>notLoaded()</code>-gated
-        fetch silently never retries after an error, because the collection has moved to
-        the distinct <code>Error</code> state. <code>settled()</code> is
-        <code>loaded() || hasError()</code> ("done, stop the spinner"); <code>idle()</code>
-        and <code>settled()</code> deliberately overlap while errored.
+        <strong
+          ><code>status().idle()</code> /
+          <code>status().settled()</code></strong
+        >
+        — the standard composite predicates. <code>idle()</code> is
+        <code>!loading() &amp;&amp; !loaded()</code>, true for
+        <strong>both</strong> <code>NotLoaded</code> and <code>Error</code> —
+        guards/resolvers should use <code>idle()</code>, not
+        <code>notLoaded()</code>: a <code>notLoaded()</code>-gated fetch
+        silently never retries after an error, because the collection has moved
+        to the distinct <code>Error</code> state. <code>settled()</code> is
+        <code>loaded() || hasError()</code> ("done, stop the spinner");
+        <code>idle()</code> and <code>settled()</code> deliberately overlap
+        while errored.
       </li>
       <li>
-        <strong><code>persist.maxScopes</code></strong> — persisted-scope garbage
-        collection for scoped cache-aware collections
-        (<code>entityMap(&#123; load: loader(fn, &#123; persist &#125;) &#125;)</code>).
-        Each scope persists under its own storage key, so high-cardinality scopes
-        (tenants, customers, searches) previously accumulated entries forever. With
-        <code>maxScopes</code> set, the loader keeps a touch-ordered index and evicts
-        the least-recently-written scopes beyond the cap on every write-through. Unset
-        = previous behavior (no GC).
+        <strong><code>persist.maxScopes</code></strong> — persisted-scope
+        garbage collection for scoped cache-aware collections (<code
+          >entityMap(&#123; load: loader(fn, &#123; persist &#125;)
+          &#125;)</code
+        >). Each scope persists under its own storage key, so high-cardinality
+        scopes (tenants, customers, searches) previously accumulated entries
+        forever. With <code>maxScopes</code> set, the loader keeps a
+        touch-ordered index and evicts the least-recently-written scopes beyond
+        the cap on every write-through. Unset = previous behavior (no GC).
       </li>
     </ul>
     <pre><code>// idle() vs notLoaded() after an error
@@ -675,72 +785,85 @@ customers: entityMap&lt;Customer, string, &#123; tenantId: string &#125;&gt;(&#1
     </p>
   </div>
 
-  <h3>🔐 v12.0.0 — <code>signalForm()</code> unification + <code>nativeErrors</code> branded errors (July 2026)</h3>
+  <h3>
+    🔐 v12.0.0 — <code>signalForm()</code> unification +
+    <code>nativeErrors</code> branded errors (July 2026)
+  </h3>
   <div class="release-highlights">
     <p>
-      <code>signalForm()</code> becomes the one name for the Signal Forms bridge, plus a
-      branded-error opt-in for the marker-form shape.
+      <code>signalForm()</code> becomes the one name for the Signal Forms
+      bridge, plus a branded-error opt-in for the marker-form shape.
     </p>
     <h4>✨ New</h4>
     <ul>
       <li>
         <strong><code>nativeErrors</code></strong> option on
         <code>signalForm(marker, options)</code> — built-in validator failures
-        (<code>required</code>, <code>email</code>, <code>min</code>, <code>max</code>,
-        <code>minLength</code>, <code>maxLength</code>, <code>pattern</code>) emit
-        Angular's branded error classes (<code>requiredError()</code>,
-        <code>minError()</code>, …) instead of a plain
-        <code>&#123; kind, message &#125;</code> object, so
-        <code>error instanceof MinValidationError</code> genuinely holds and typed
-        constraints (<code>.min</code>, <code>.maxLength</code>, …) are readable
-        directly — no message-string parsing. Default <code>false</code> in 12.x; the
-        flip to <code>true</code> is postponed to v13.
+        (<code>required</code>, <code>email</code>, <code>min</code>,
+        <code>max</code>, <code>minLength</code>, <code>maxLength</code>,
+        <code>pattern</code>) emit Angular's branded error classes
+        (<code>requiredError()</code>, <code>minError()</code>, …) instead of a
+        plain <code>&#123; kind, message &#125;</code> object, so
+        <code>error instanceof MinValidationError</code> genuinely holds and
+        typed constraints (<code>.min</code>, <code>.maxLength</code>, …) are
+        readable directly — no message-string parsing. Default
+        <code>false</code> in 12.x; the flip to <code>true</code> is postponed
+        to v13.
       </li>
     </ul>
     <p>
       See the second, <code>nativeErrors: true</code> bridged form on the
-      <a routerLink="/signal-forms">Signal Forms demo</a> for the branded-error shape
-      side by side with the default.
+      <a routerLink="/signal-forms">Signal Forms demo</a> for the branded-error
+      shape side by side with the default.
     </p>
   </div>
 
-  <h3>📡 v11.2.0 — <code>entityMap()</code> cache-aware loading + <code>invalidateTag()</code> (July 2026)</h3>
+  <h3>
+    📡 v11.2.0 — <code>entityMap()</code> cache-aware loading +
+    <code>invalidateTag()</code> (July 2026)
+  </h3>
   <div class="release-highlights">
     <p>
-      A cache-aware, self-loading <code>entityMap</code>: the marker family gains a
-      collection primitive that owns its own fetch, freshness, and invalidation —
-      no more hand-wiring <code>asyncSource</code> + <code>entityMap</code> +
-      manual staleness bookkeeping for the common "load a list, cache it, invalidate
-      on demand" shape.
+      A cache-aware, self-loading <code>entityMap</code>: the marker family
+      gains a collection primitive that owns its own fetch, freshness, and
+      invalidation — no more hand-wiring <code>asyncSource</code> +
+      <code>entityMap</code> + manual staleness bookkeeping for the common "load
+      a list, cache it, invalidate on demand" shape.
     </p>
     <h4>✨ New</h4>
     <ul>
       <li>
         <strong><code>entityMap&lt;E, K&gt;(config)</code></strong> with a
-        <code>load</code> option — the full <code>entityMap</code> surface (all CRUD
-        + query signals) now composes with a loader, load status, and cache
-        semantics directly. <code>.load()</code> is guarded: a no-op while
-        fresh or already in-flight, so concurrent callers coalesce onto one fetch.
-        <code>.refresh()</code> forces a reload; <code>.invalidate()</code> marks the
-        collection stale without fetching.
+        <code>load</code> option — the full <code>entityMap</code> surface (all
+        CRUD + query signals) now composes with a loader, load status, and cache
+        semantics directly. <code>.load()</code> is guarded: a no-op while fresh
+        or already in-flight, so concurrent callers coalesce onto one fetch.
+        <code>.refresh()</code> forces a reload;
+        <code>.invalidate()</code> marks the collection stale without fetching.
       </li>
       <li>
-        <strong><code>staleTime</code></strong> — freshness window (ms or a duration
-        string like <code>'30m'</code>) that <code>.load()</code> respects before
-        refetching. <strong><code>swr</code></strong> (stale-while-revalidate) keeps
-        <code>loaded()</code> true during background revalidation instead of flipping
-        back to loading.
+        <strong><code>staleTime</code></strong> — freshness window (ms or a
+        duration string like <code>'30m'</code>) that
+        <code>.load()</code> respects before refetching.
+        <strong><code>swr</code></strong> (stale-while-revalidate) keeps
+        <code>loaded()</code> true during background revalidation instead of
+        flipping back to loading.
       </li>
       <li>
-        <strong><code>tags</code> + <code>invalidateTag(tree, tag)</code></strong> — register
-        a collection under one or more tags, then invalidate every collection carrying
-        that tag from anywhere with a single call. The push-invalidation seam for
-        SSE/SignalR: an incoming "plants changed" event becomes
-        <code>invalidateTag(tree, 'plants')</code>, no manual fan-out to each consumer.
+        <strong
+          ><code>tags</code> + <code>invalidateTag(tree, tag)</code></strong
+        >
+        — register a collection under one or more tags, then invalidate every
+        collection carrying that tag from anywhere with a single call. The
+        push-invalidation seam for SSE/SignalR: an incoming "plants changed"
+        event becomes <code>invalidateTag(tree, 'plants')</code>, no manual
+        fan-out to each consumer.
       </li>
       <li>
-        <strong>Optional offline-first persistence</strong> — <code>persist: &#123; adapter, key, hydrateThenRevalidate &#125;</code>
-        seeds rows instantly from a storage adapter on materialize, then revalidates via
+        <strong>Optional offline-first persistence</strong> —
+        <code>persist: &#123; adapter, key, hydrateThenRevalidate &#125;</code>
+        seeds rows instantly from a storage adapter on materialize, then
+        revalidates via
         <code>load()</code> in the background.
       </li>
     </ul>
@@ -758,10 +881,12 @@ tree.$.plants.loading();    // Signal&lt;boolean&gt;
 await tree.$.plants.load(); // guarded — no-op while fresh / in-flight
 invalidateTag(tree, 'plants'); // marks every 'plants'-tagged collection stale</code></pre>
     <p>
-      Explore the <a routerLink="/entity-collection">interactive showcase</a> — single-flight
-      coalescing, the staleTime freshness ring, tag invalidation, SWR, and offline-first, all
-      visualized. Also see the <a routerLink="/marker-zoo">marker zoo</a> for a live depth-4
-      example, and <code>docs/guides/entity-collection-cookbook.md</code> for the full walkthrough.
+      Explore the <a routerLink="/entity-collection">interactive showcase</a> —
+      single-flight coalescing, the staleTime freshness ring, tag invalidation,
+      SWR, and offline-first, all visualized. Also see the
+      <a routerLink="/marker-zoo">marker zoo</a> for a live depth-4 example, and
+      <code>docs/guides/entity-collection-cookbook.md</code> for the full
+      walkthrough.
     </p>
   </div>
 
@@ -773,8 +898,8 @@ invalidateTag(tree, 'plants'); // marks every 'plants'-tagged collection stale</
     <ul>
       <li>
         <code>@signaltree/guardrails</code> packaging fixes — dropped an
-        unsatisfiable <code>@signaltree/shared</code> peerDependency and stopped the
-        <code>dependency-checks</code> lint from flagging the build-inlined
+        unsatisfiable <code>@signaltree/shared</code> peerDependency and stopped
+        the <code>dependency-checks</code> lint from flagging the build-inlined
         <code>@signaltree/shared</code>.
       </li>
       <li>
@@ -782,49 +907,56 @@ invalidateTag(tree, 'plants'); // marks every 'plants'-tagged collection stale</
         <code>ngDevMode</code>, so they strip cleanly from production builds.
       </li>
       <li>
-        Demo/example pages migrated onto a shared <code>st-example</code> playground
-        toolkit (this page included).
+        Demo/example pages migrated onto a shared
+        <code>st-example</code> playground toolkit (this page included).
       </li>
     </ul>
   </div>
 
-  <h3>💥 v11.0.0 — Deprecations removed; tree-shakeable by default; <code>linked()</code> (June 2026)</h3>
+  <h3>
+    💥 v11.0.0 — Deprecations removed; tree-shakeable by default;
+    <code>linked()</code> (June 2026)
+  </h3>
   <div class="release-highlights">
     <p>
-      The cleanup release the v10.3 deprecations pointed at, plus a real bundle-floor
-      reduction and one new primitive.
+      The cleanup release the v10.3 deprecations pointed at, plus a real
+      bundle-floor reduction and one new primitive.
     </p>
     <h4>⚠️ Breaking Changes</h4>
     <ul>
       <li>
-        <strong>Deprecated <code>is</code>-prefix predicates removed.</strong> Use the
-        v10.3 canonical bare names: <code>status</code> →
+        <strong>Deprecated <code>is</code>-prefix predicates removed.</strong>
+        Use the v10.3 canonical bare names: <code>status</code> →
         <code>loading</code> / <code>loaded</code> / <code>hasError</code> /
-        <code>notLoaded</code> (was <code>isLoading</code> / <code>isLoaded</code> /
-        <code>isError</code> / <code>isNotLoaded</code>), and <code>entityMap().empty</code>
-        (was <code>isEmpty</code>). All mechanical — TypeScript flags every call site.
+        <code>notLoaded</code> (was <code>isLoading</code> /
+        <code>isLoaded</code> / <code>isError</code> /
+        <code>isNotLoaded</code>), and <code>entityMap().empty</code> (was
+        <code>isEmpty</code>). All mechanical — TypeScript flags every call
+        site.
       </li>
       <li>
-        <strong>Root <code>tree.state</code> accessor removed.</strong> Read (and write)
-        through <code>tree.$</code> everywhere — <code>state</code> was always the same
-        reference, now retired.
+        <strong>Root <code>tree.state</code> accessor removed.</strong> Read
+        (and write) through <code>tree.$</code> everywhere —
+        <code>state</code> was always the same reference, now retired.
       </li>
       <li>
-        <strong><code>security</code> is opt-in.</strong> Wrap security config with
-        <code>security()</code> from <code>&#64;signaltree/core/security</code>. It was
-        statically reachable before and shipped in every bundle; it now tree-shakes out
-        when unused. Reads/writes are functionally identical. (Lazy signal creation was
-        opt-in alongside it and is removed in 15.0 — incremental materialization on the
-        default path is what makes large trees cheap to read.)
+        <strong><code>security</code> is opt-in.</strong> Wrap security config
+        with <code>security()</code> from
+        <code>&#64;signaltree/core/security</code>. It was statically reachable
+        before and shipped in every bundle; it now tree-shakes out when unused.
+        Reads/writes are functionally identical. (Lazy signal creation was
+        opt-in alongside it and is removed in 15.0 — incremental materialization
+        on the default path is what makes large trees cheap to read.)
       </li>
     </ul>
     <h4>✨ New</h4>
     <ul>
       <li>
-        <strong><code>linked(...)</code> — derived-but-writable signal.</strong> Wraps
-        Angular's native <code>linkedSignal</code>: a value computed from a source that you
-        can also write directly, re-deriving when the source changes (e.g. a "sticky
-        selection"). Composes with serialization / persistence / snapshot.
+        <strong><code>linked(...)</code> — derived-but-writable signal.</strong>
+        Wraps Angular's native <code>linkedSignal</code>: a value computed from
+        a source that you can also write directly, re-deriving when the source
+        changes (e.g. a "sticky selection"). Composes with serialization /
+        persistence / snapshot.
         <pre><code>// simple form
 tree.derived($ =&gt; (&#123; doubled: linked(() =&gt; $.count() * 2) &#125;));
 
@@ -841,17 +973,21 @@ tree.$.selected.set(next); // type-checks — it's a real WritableSignal</code><
       <li>
         <strong><code>defineStore(factory, config?)</code></strong> — wraps a
         <code>signalTree(...)</code> factory in an injectable Angular service
-        (<code>inject(MyStore)</code> resolves to the real tree; <code>destroy()</code> is
-        tied to the host injector via <code>DestroyRef</code>). Tree-shakes out when unused.
+        (<code>inject(MyStore)</code> resolves to the real tree;
+        <code>destroy()</code> is tied to the host injector via
+        <code>DestroyRef</code>). Tree-shakes out when unused.
       </li>
     </ul>
     <h4>📦 Bundle</h4>
     <p>
-      Injecting the security + lazy/memory machinery drops the bare-tree gzip floor ~29%
-      (7.5KB → ~5.3KB; ~8.1KB with <code>entityMap</code> in use), and
-      <code>devTools()</code> now fully strips from production builds. Same release also
-      <strong>corrected an old, false "smaller than NgRx SignalStore" claim</strong> —
-      SignalStore is ~2.3KB and SignalTree is larger; the honest framing is
+      Injecting the security + lazy/memory machinery drops the bare-tree gzip
+      floor ~29% (7.5KB → ~5.3KB; ~8.1KB with <code>entityMap</code> in use),
+      and <code>devTools()</code> now fully strips from production builds. Same
+      release also
+      <strong
+        >corrected an old, false "smaller than NgRx SignalStore" claim</strong
+      >
+      — SignalStore is ~2.3KB and SignalTree is larger; the honest framing is
       capability-per-KB and zero runtime dependencies, not raw size.
     </p>
   </div>
@@ -860,21 +996,29 @@ tree.$.selected.set(next); // type-checks — it's a real WritableSignal</code><
   <div class="release-highlights">
     <p>
       Every core message and dev-mode guardrail now carries a greppable
-      <code>[ST####]</code> code (<code>ST1xxx</code> core, <code>ST2xxx</code>
-      entity/markers), mapped to cause + fix in <code>docs/errors/README.md</code>. New
-      dev-mode guardrails: <strong>[ST2001]</strong> for <code>entityMap</code> entities with
-      a null/undefined id (missing <code>selectId</code>), and <strong>[ST2002]</strong> for
-      entity method names borrowed from other libraries (such as Akita <code>.upsert</code>
-      <code>.addEntities</code>, RxJS <code>.next</code>) → hints the SignalTree equivalent.
+      <code>[ST####]</code> code (<code>ST1xxx</code> core,
+      <code>ST2xxx</code> entity/markers), mapped to cause + fix in
+      <code>docs/errors/README.md</code>. New dev-mode guardrails:
+      <strong>[ST2001]</strong> for <code>entityMap</code> entities with a
+      null/undefined id (missing <code>selectId</code>), and
+      <strong>[ST2002]</strong> for entity method names borrowed from other
+      libraries (such as Akita <code>.upsert</code> <code>.addEntities</code>,
+      RxJS <code>.next</code>) → hints the SignalTree equivalent.
     </p>
   </div>
 
-  <h3>🔢 v10.5.0 — Auto-sorted <code>entityMap</code> + body-granular reads (June 2026)</h3>
+  <h3>
+    🔢 v10.5.0 — Auto-sorted <code>entityMap</code> + body-granular reads (June
+    2026)
+  </h3>
   <div class="release-highlights">
     <p>
-      <strong>New <code>sortComparer</code> option on <code>entityMap</code></strong> keeps
-      <code>all()</code> / <code>ids()</code> in a stable sorted order
-      (<code>&#64;ngrx/entity</code> parity); <code>map()</code> retains insertion order.
+      <strong
+        >New <code>sortComparer</code> option on <code>entityMap</code></strong
+      >
+      keeps <code>all()</code> / <code>ids()</code> in a stable sorted order
+      (<code>&#64;ngrx/entity</code> parity); <code>map()</code> retains
+      insertion order.
     </p>
     <pre><code>users: entityMap&lt;User, number&gt;(&#123;
   selectId: (u) =&gt; u.id,
@@ -884,35 +1028,40 @@ tree.$.selected.set(next); // type-checks — it's a real WritableSignal</code><
 tree.$.users.all();  // always name-sorted</code></pre>
     <p>
       Also: <strong>body-granular <code>entityMap</code> reads</strong> —
-      <code>byId(id).field()</code> now depends only on that one entity's signal, so updating
-      one entity no longer re-runs every entity's computeds (fan-out 1). Per-entity signals
-      materialize lazily and release on removal.
+      <code>byId(id).field()</code> now depends only on that one entity's
+      signal, so updating one entity no longer re-runs every entity's computeds
+      (fan-out 1). Per-entity signals materialize lazily and release on removal.
     </p>
   </div>
 
   <h3>📝 v10.4.0 — <code>form.data()</code> read alias (June 2026)</h3>
   <div class="release-highlights">
     <p>
-      Same "meet AI where it is" pattern v10.2 applied to <code>status()</code>: models
-      trained on form-state vocabularies (Angular <code>FormGroup</code>, Formik,
-      react-hook-form) reach for <code>.data()</code> to read form values. v10.4 adds
-      <code>.data()</code> as a first-class alias that returns the same value as calling the
-      marker directly. Purely additive — no new state, no deprecation on the canonical form.
+      Same "meet AI where it is" pattern v10.2 applied to <code>status()</code>:
+      models trained on form-state vocabularies (Angular <code>FormGroup</code>,
+      Formik, react-hook-form) reach for <code>.data()</code> to read form
+      values. v10.4 adds <code>.data()</code> as a first-class alias that
+      returns the same value as calling the marker directly. Purely additive —
+      no new state, no deprecation on the canonical form.
     </p>
     <pre><code>tree.$.profile();        // canonical — call the marker
 tree.$.profile.data();   // v10.4 alias — identical value
 tree.$.profile.$.name(); // field signal (still preferred in templates)</code></pre>
   </div>
 
-  <h3>🎯 v10.3.0 — Marker accessor shape UNIFIED (bare-name predicates) (May 2026)</h3>
+  <h3>
+    🎯 v10.3.0 — Marker accessor shape UNIFIED (bare-name predicates) (May 2026)
+  </h3>
   <div class="release-highlights">
     <p>
-      A real DX bug the v10.2 benchmark surfaced: SignalTree's own markers named their
-      predicate accessors inconsistently — <code>status()</code> used
-      <code>is</code>-prefix (<code>.isLoading()</code>), <code>entityMap</code> had
-      <code>.isEmpty()</code>, while <code>form</code>/<code>asyncSource</code>/<code>asyncQuery</code>
-      already used bare names. v10.3 makes <strong>bare names canonical everywhere</strong>,
-      matching <code>FormControl.dirty</code> / <code>.valid</code> and Angular signal
+      A real DX bug the v10.2 benchmark surfaced: SignalTree's own markers named
+      their predicate accessors inconsistently — <code>status()</code> used
+      <code>is</code>-prefix (<code>.isLoading()</code>),
+      <code>entityMap</code> had <code>.isEmpty()</code>, while
+      <code>form</code>/<code>asyncSource</code>/<code>asyncQuery</code> already
+      used bare names. v10.3 makes
+      <strong>bare names canonical everywhere</strong>, matching
+      <code>FormControl.dirty</code> / <code>.valid</code> and Angular signal
       conventions.
     </p>
     <pre><code>tree.$.load.loading();   // was .isLoading()
@@ -920,27 +1069,46 @@ tree.$.load.loaded();    // was .isLoaded()
 tree.$.load.hasError();  // was .isError()
 tree.$.users.empty();    // was .isEmpty()</code></pre>
     <p>
-      <strong>No breaking changes in v10.3</strong> — the <code>is</code>-prefix names became
-      <code>&#64;deprecated</code> aliases returning the <em>same</em> Signal instance (no
-      double allocation), and were removed in v11.0. The deeper takeaway: the AI-codegen
-      benchmark didn't just measure AI accuracy, it surfaced a genuine DX bug — AI-friendly
-      and human-friendly turned out to be the same thing.
+      <strong>No breaking changes in v10.3</strong> — the <code>is</code>-prefix
+      names became <code>&#64;deprecated</code> aliases returning the
+      <em>same</em> Signal instance (no double allocation), and were removed in
+      v11.0. The deeper takeaway: the AI-codegen benchmark didn't just measure
+      AI accuracy, it surfaced a genuine DX bug — AI-friendly and human-friendly
+      turned out to be the same thing.
     </p>
   </div>
 
-  <h3>🤖 v10.2.0 — AI-discoverability hardening, measured +42pp lift (May 2026)</h3>
+  <h3>
+    🤖 v10.2.0 — AI-discoverability hardening, measured +42pp lift (May 2026)
+  </h3>
   <div class="release-highlights">
     <p>
-      The result of a full audit of where AI coding agents fail on SignalTree. Three measured failure modes from a reproducible 720-cell benchmark, each addressed in the v10.2 release.
+      The result of a full audit of where AI coding agents fail on SignalTree.
+      Three measured failure modes from a reproducible 720-cell benchmark, each
+      addressed in the v10.2 release.
     </p>
     <p>
-      <strong>Headline measurement:</strong> SignalTree's AI-codegen accuracy goes from
+      <strong>Headline measurement:</strong> SignalTree's AI-codegen accuracy
+      goes from
       <strong>49% (cold) to 91% (primed with <code>llms.txt</code>)</strong> — a
-      <strong>+42 percentage-point lift</strong> from a single retrievable file. Across 6 frontier models, 8 prompts, 5 libraries, 720 cells. Claude Sonnet 4.6 primed hits <strong>99/100</strong>.
+      <strong>+42 percentage-point lift</strong> from a single retrievable file.
+      Across 6 frontier models, 8 prompts, 5 libraries, 720 cells. Claude Sonnet
+      4.6 primed hits <strong>99/100</strong>.
     </p>
-    <h4>✨ New: Promise-vocabulary aliases on the <code>status()</code> marker</h4>
+    <h4>
+      ✨ New: Promise-vocabulary aliases on the <code>status()</code> marker
+    </h4>
     <p>
-      AI agents trained on Promise-state vocabularies consistently reach for <code>.setSuccess()</code> / <code>.start()</code> / <code>.succeed()</code> / <code>.fail()</code>. Rather than fight the linguistic gravity, v10.2 adds these as first-class aliases. Identical semantics, identical behavior, identical performance. <strong>Both forms work; canonical names (<code>setLoading</code>/<code>setLoaded</code>/<code>setError</code>) still preferred in new code.</strong>
+      AI agents trained on Promise-state vocabularies consistently reach for
+      <code>.setSuccess()</code> / <code>.start()</code> /
+      <code>.succeed()</code> / <code>.fail()</code>. Rather than fight the
+      linguistic gravity, v10.2 adds these as first-class aliases. Identical
+      semantics, identical behavior, identical performance.
+      <strong
+        >Both forms work; canonical names
+        (<code>setLoading</code>/<code>setLoaded</code>/<code>setError</code>)
+        still preferred in new code.</strong
+      >
     </p>
     <pre><code>tree.$.load.setLoading();   // canonical
 tree.$.load.start();        // equivalent (v10.2+)
@@ -950,95 +1118,166 @@ tree.$.load.setSuccess();   // equivalent (v10.2+)
 
 tree.$.load.setError(err);  // canonical
 tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
-    <h4>📚 New: disambiguation table in <code>llms.txt</code> + <code>llms-full.txt</code></h4>
+    <h4>
+      📚 New: disambiguation table in <code>llms.txt</code> +
+      <code>llms-full.txt</code>
+    </h4>
     <p>
-      17 rows of "wrong pattern → real origin library → correct SignalTree." Empirically derived: every "Wrong" entry was actually generated by a frontier model in the cold-run benchmark. Catches the dominant cross-library contamination failure mode in one priming pass.
+      17 rows of "wrong pattern → real origin library → correct SignalTree."
+      Empirically derived: every "Wrong" entry was actually generated by a
+      frontier model in the cold-run benchmark. Catches the dominant
+      cross-library contamination failure mode in one priming pass.
     </p>
     <h4>📦 Shipped with npm install</h4>
     <p>
-      <code>llms.txt</code> and <code>llms-full.txt</code> now ship in the <code>&#64;signaltree/core</code> tarball. After <code>npm install &#64;signaltree/core</code>, retrieval-aware AI agents find <code>node_modules/&#64;signaltree/core/llms.txt</code> automatically — no web fetch required. The <code>&#64;signaltree/core/README.md</code> also leads with the disambiguation table so every npm reader, human or AI, sees it.
+      <code>llms.txt</code> and <code>llms-full.txt</code> now ship in the
+      <code>&#64;signaltree/core</code> tarball. After
+      <code>npm install &#64;signaltree/core</code>, retrieval-aware AI agents
+      find <code>node_modules/&#64;signaltree/core/llms.txt</code> automatically
+      — no web fetch required. The
+      <code>&#64;signaltree/core/README.md</code> also leads with the
+      disambiguation table so every npm reader, human or AI, sees it.
     </p>
     <h4>🔬 Benchmark infrastructure</h4>
     <ul>
       <li>3 new scorers (idiomatic + import-resolution + marker-method)</li>
-      <li>8 prompts (counter, paginated-users, debounced-search, derived-state, form, undo-redo, deep-state, multi-marker)</li>
-      <li>Per-tier model comparison (haiku, gpt-mini): primed Haiku 4.5 outscores cold Sonnet by 2.4×</li>
-      <li>Multi-file priming A/B (surprise finding: adding myths.md regressed score — context dilution)</li>
-      <li>Quarterly cadence documented in <code>scripts/ai-codegen-benchmark/CADENCE.md</code></li>
+      <li>
+        8 prompts (counter, paginated-users, debounced-search, derived-state,
+        form, undo-redo, deep-state, multi-marker)
+      </li>
+      <li>
+        Per-tier model comparison (haiku, gpt-mini): primed Haiku 4.5 outscores
+        cold Sonnet by 2.4×
+      </li>
+      <li>
+        Multi-file priming A/B (surprise finding: adding myths.md regressed
+        score — context dilution)
+      </li>
+      <li>
+        Quarterly cadence documented in
+        <code>scripts/ai-codegen-benchmark/CADENCE.md</code>
+      </li>
     </ul>
     <h4>📊 No breaking changes</h4>
-    <p>Status marker aliases are additive. All v10.1.0 code continues to work unchanged.</p>
+    <p>
+      Status marker aliases are additive. All v10.1.0 code continues to work
+      unchanged.
+    </p>
   </div>
 
-  <h3>🧹 v9.6.0 — rxMethod removed; async markers are the only async story (May 2026)</h3>
+  <h3>
+    🧹 v9.6.0 — rxMethod removed; async markers are the only async story (May
+    2026)
+  </h3>
   <div class="release-highlights">
     <p>
-      A short-lived <code>rxMethod</code> alias (shipped in 9.5.0-9.5.2) is gone.
-      Keeping it created two parallel async stories. The canonical answer is, and
-      stays, the <strong>marker family</strong>.
+      A short-lived <code>rxMethod</code> alias (shipped in 9.5.0-9.5.2) is
+      gone. Keeping it created two parallel async stories. The canonical answer
+      is, and stays, the <strong>marker family</strong>.
     </p>
     <h4>💥 Breaking</h4>
     <ul>
       <li>
-        <strong><code>@signal-tree/kernel/rxjs-interop</code> subpath removed.</strong>
-        <code>import &#123; rxMethod &#125; from '&#64;signaltree/core/rxjs-interop'</code> no longer resolves.
-        <code>/rxmethod</code> demo route now 301-redirects to <a routerLink="/async">/async</a>.
+        <strong
+          ><code>@signal-tree/kernel/rxjs-interop</code> subpath
+          removed.</strong
+        >
+        <code
+          >import &#123; rxMethod &#125; from
+          '&#64;signaltree/core/rxjs-interop'</code
+        >
+        no longer resolves. <code>/rxmethod</code> demo route now 301-redirects
+        to <a routerLink="/async">/async</a>.
       </li>
     </ul>
     <h4>🔄 Migration</h4>
     <ul>
-      <li><code>rxMethod&lt;void&gt;(pipeline)</code> load-and-expose → <code>asyncSource(config)</code> at the data's tree path.</li>
-      <li><code>rxMethod&lt;TInput&gt;(pipeline)</code> input-driven query → <code>asyncQuery(config)</code> at the search/results tree path.</li>
-      <li>Complex multi-step orchestration neither marker fits → plain Observable method in an <code>&#64;Injectable()</code> Ops class.</li>
+      <li>
+        <code>rxMethod&lt;void&gt;(pipeline)</code> load-and-expose →
+        <code>asyncSource(config)</code> at the data's tree path.
+      </li>
+      <li>
+        <code>rxMethod&lt;TInput&gt;(pipeline)</code> input-driven query →
+        <code>asyncQuery(config)</code> at the search/results tree path.
+      </li>
+      <li>
+        Complex multi-step orchestration neither marker fits → plain Observable
+        method in an <code>&#64;Injectable()</code> Ops class.
+      </li>
     </ul>
   </div>
 
-  <h3>✨ v9.5.0 — Async markers: <code>asyncSource</code> and <code>asyncQuery</code> (May 2026)</h3>
+  <h3>
+    ✨ v9.5.0 — Async markers: <code>asyncSource</code> and
+    <code>asyncQuery</code> (May 2026)
+  </h3>
   <div class="release-highlights">
     <p>
       The SignalTree-native answer to async state. Two new markers in the same
-      family as <code>entityMap</code>, <code>status</code>, <code>stored</code>,
-      and <code>form</code>: <strong>attach at any tree path, auto-derive
-      <code>data</code>/<code>loading</code>/<code>error</code> signals, no manual
-      <code>tap()/setLoading()</code> wiring.</strong>
+      family as <code>entityMap</code>, <code>status</code>,
+      <code>stored</code>, and <code>form</code>:
+      <strong
+        >attach at any tree path, auto-derive
+        <code>data</code>/<code>loading</code>/<code>error</code> signals, no
+        manual <code>tap()/setLoading()</code> wiring.</strong
+      >
     </p>
     <h4>✨ New</h4>
     <ul>
       <li>
-        <strong><code>asyncSource&lt;T&gt;(config)</code></strong> — load-and-expose.
-        Auto-loads on materialization. Exposes <code>data</code>, <code>loading</code>,
-        <code>error</code>, plus <code>refresh</code> / <code>set</code> / <code>update</code> /
+        <strong><code>asyncSource&lt;T&gt;(config)</code></strong> —
+        load-and-expose. Auto-loads on materialization. Exposes
+        <code>data</code>, <code>loading</code>, <code>error</code>, plus
+        <code>refresh</code> / <code>set</code> / <code>update</code> /
         <code>reset</code>. Accepts Observable or Promise loaders.
       </li>
       <li>
-        <strong><code>asyncQuery&lt;TInput, TResult&gt;(config)</code></strong> — input-driven
-        debounced query. Writable <code>input</code> signal drives a
-        <code>debounce → filter → distinctUntilChanged → switchMap</code> pipeline.
-        Race conditions, cancellation, dedup all handled.
+        <strong><code>asyncQuery&lt;TInput, TResult&gt;(config)</code></strong>
+        — input-driven debounced query. Writable <code>input</code> signal
+        drives a
+        <code>debounce → filter → distinctUntilChanged → switchMap</code>
+        pipeline. Race conditions, cancellation, dedup all handled.
       </li>
-      <li>
-        <strong>Live demo:</strong> <a routerLink="/async">/async</a>
-      </li>
+      <li><strong>Live demo:</strong> <a routerLink="/async">/async</a></li>
     </ul>
     <p>
-      <strong>v9.5.1</strong> shipped a <code>TreeNode&lt;T&gt;</code> type-mapper fix so the
-      new accessors surface correctly in TypeScript and Angular template AOT.
-      <strong>v9.5.2</strong> leveled the docs surface — agent skill (shipped in npm tarball),
-      llms.txt, comparison doc, agent templates — to lead with the markers.
+      <strong>v9.5.1</strong> shipped a
+      <code>TreeNode&lt;T&gt;</code> type-mapper fix so the new accessors
+      surface correctly in TypeScript and Angular template AOT.
+      <strong>v9.5.2</strong> leveled the docs surface — agent skill (shipped in
+      npm tarball), llms.txt, comparison doc, agent templates — to lead with the
+      markers.
     </p>
   </div>
 
   <h3>📚 v9.5.x — AI-discoverability docs landed (May 2026)</h3>
   <div class="release-highlights">
     <p>
-      Major investment in making SignalTree retrieve and reason well for AI coding agents
-      (Cursor, Claude Code, Copilot, Gemini, Perplexity):
+      Major investment in making SignalTree retrieve and reason well for AI
+      coding agents (Cursor, Claude Code, Copilot, Gemini, Perplexity):
     </p>
     <ul>
-      <li><strong><code>/llms.txt</code> and <code>/llms-full.txt</code></strong> at site root — canonical references following the emerging convention.</li>
-      <li><strong>NgRx SignalStore comparison page</strong> — honest axis-by-axis comparison at <a href="https://github.com/JBorgia/signal-tree/blob/main/docs/compare/ngrx-signalstore.md">docs/compare/ngrx-signalstore.md</a>.</li>
-      <li><strong>Myths &amp; misconceptions doc</strong> — 16+ catalogued false claims LLMs frequently propagate, with source-code citations.</li>
-      <li><strong>Drop-in AI agent templates</strong> — <code>.cursorrules</code>, <code>CLAUDE.md</code>, <code>copilot-instructions.md</code> for downstream projects.</li>
+      <li>
+        <strong><code>/llms.txt</code> and <code>/llms-full.txt</code></strong>
+        at site root — canonical references following the emerging convention.
+      </li>
+      <li>
+        <strong>NgRx SignalStore comparison page</strong> — honest axis-by-axis
+        comparison at
+        <a
+          href="https://github.com/JBorgia/signal-tree/blob/main/docs/compare/ngrx-signalstore.md"
+          >docs/compare/ngrx-signalstore.md</a
+        >.
+      </li>
+      <li>
+        <strong>Myths &amp; misconceptions doc</strong> — 16+ catalogued false
+        claims LLMs frequently propagate, with source-code citations.
+      </li>
+      <li>
+        <strong>Drop-in AI agent templates</strong> — <code>.cursorrules</code>,
+        <code>CLAUDE.md</code>, <code>copilot-instructions.md</code> for
+        downstream projects.
+      </li>
     </ul>
   </div>
 
@@ -1046,10 +1285,10 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
   <div class="release-highlights">
     <p>
       Briefly shipped a NgRx-shaped <code>rxMethod</code> primitive at
-      <code>&#64;signaltree/core/rxjs-interop</code> as the canonical async story.
-      <strong>Unpublished after design review</strong> — the marker-based shape
-      (shipped in 9.5.0) is the right SignalTree answer. v9.4.0 stays in CHANGELOG
-      history as a stepping stone, not on npm.
+      <code>&#64;signaltree/core/rxjs-interop</code> as the canonical async
+      story. <strong>Unpublished after design review</strong> — the marker-based
+      shape (shipped in 9.5.0) is the right SignalTree answer. v9.4.0 stays in
+      CHANGELOG history as a stepping stone, not on npm.
     </p>
   </div>
 
@@ -1057,21 +1296,33 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
   <div class="release-highlights">
     <p>Workspace-wide version sync plus a handful of small fixes:</p>
     <ul>
-      <li><code>@signaltree/ng-forms</code> <code>./audit</code> subpath pointed at <code>audit.ts</code> directly.</li>
-      <li><code>@signaltree/schema</code> wired <code>rollup.config.mjs</code> into <code>project.json</code> build options.</li>
-      <li><code>@signaltree/schema</code> added to <code>lint-skills</code> resolver map.</li>
+      <li>
+        <code>@signaltree/ng-forms</code> <code>./audit</code> subpath pointed
+        at <code>audit.ts</code> directly.
+      </li>
+      <li>
+        <code>@signaltree/schema</code> wired
+        <code>rollup.config.mjs</code> into <code>project.json</code> build
+        options.
+      </li>
+      <li>
+        <code>@signaltree/schema</code> added to
+        <code>lint-skills</code> resolver map.
+      </li>
     </ul>
   </div>
 
   <h3>🛡️ v9.2.0 — Augmentation safety + hybrid-NgRx support (March 2026)</h3>
   <div class="release-highlights">
     <p>
-      Breaking type-only change (invisible for almost all users): removed the global
+      Breaking type-only change (invisible for almost all users): removed the
+      global
       <code>declare module '@angular/core'</code> augmentation from
-      <code>@signal-tree/kernel</code> that added callable overloads to Angular's
-      <code>WritableSignal&lt;T&gt;</code>. Augmentation now lives exclusively in
-      <code>@signaltree/callable-syntax</code>. Unblocks <strong>gradual adoption alongside
-      <code>@ngrx/signals</code></strong> in monorepos.
+      <code>@signal-tree/kernel</code> that added callable overloads to
+      Angular's <code>WritableSignal&lt;T&gt;</code>. Augmentation now lives
+      exclusively in <code>@signaltree/callable-syntax</code>. Unblocks
+      <strong>gradual adoption alongside <code>@ngrx/signals</code></strong> in
+      monorepos.
     </p>
   </div>
 
@@ -1079,7 +1330,9 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
   <div class="release-highlights">
     <p>
       SignalTree v9 aligns the API surface with the core ethos:
-      <strong>state is data, use Angular directly, ship less, mean more.</strong>
+      <strong
+        >state is data, use Angular directly, ship less, mean more.</strong
+      >
     </p>
     <h4>⚠️ Breaking Changes</h4>
     <ul>
@@ -1094,13 +1347,13 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
       <li>
         <strong>Memoization enhancer removed:</strong>
         Use Angular's <code>computed()</code> directly. The previous variants
-        (<code>shallowMemoization()</code>, <code>lightweightMemoization()</code>,
-        etc.) were unified in v9 and the entire enhancer was removed in 9.0.1.
+        (<code>shallowMemoization()</code>,
+        <code>lightweightMemoization()</code>, etc.) were unified in v9 and the
+        entire enhancer was removed in 9.0.1.
       </li>
       <li>
         <strong>Subpath exports:</strong> Security, presets, storage, and
-        edit-session moved to
-        <code>&#64;signaltree/core/security</code>,
+        edit-session moved to <code>&#64;signaltree/core/security</code>,
         <code>/presets</code>, <code>/storage</code>,
         <code>/edit-session</code>.
       </li>
@@ -1124,7 +1377,8 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
     </ul>
     <p>
       See the
-      <a href="https://github.com/JBorgia/signal-tree/blob/main/docs/legacy/migration-v8-v9.md"
+      <a
+        href="https://github.com/JBorgia/signal-tree/blob/main/docs/legacy/migration-v8-v9.md"
         >v8 → v9 migration guide</a
       >
       for before/after code and the full list of changes.
@@ -1287,8 +1541,14 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
   <h4>🚀 Performance Improvements</h4>
   <ul>
     <li>
-      <strong>2-5x faster bulk operations</strong> with diff-based updates in
-      enterprise enhancer
+      <strong>Diff-based bulk updates</strong> in the enterprise enhancer. The
+      "2–5x faster" figure originally published here has been withdrawn:
+      <a
+        href="https://github.com/JBorgia/signal-tree/blob/main/docs/rfcs/0010-retiring-enterprise.md"
+        >RFC 0010</a
+      >
+      records that it was never measured against core, and the enterprise
+      enhancer was removed in 14.0.0.
     </li>
     <li>
       <strong>40.5% bundle size reduction</strong> with consolidated
@@ -1301,9 +1561,10 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
   </ul>
   <p class="disclaimer">
     <em
-      >*The speed and bundle figures above were measured on one app's workload at
-      the time of the v5 release; your results will vary. See the current
-      <a routerLink="/benchmarks">benchmarks</a> for up-to-date, reproducible numbers.</em
+      >*The speed and bundle figures above were measured on one app's workload
+      at the time of the v5 release; your results will vary. See the current
+      <a routerLink="/benchmarks">benchmarks</a> for up-to-date, reproducible
+      numbers.</em
     >
   </p>
 
