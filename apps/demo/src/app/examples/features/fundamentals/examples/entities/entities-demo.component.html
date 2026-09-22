@@ -146,7 +146,7 @@
               Remove
             </button>
             } @else {
-            <span class="held-label">Held handle</span>
+            <span class="held-label">Reference in use</span>
             }
           </div>
         </article>
@@ -158,12 +158,12 @@
       <aside class="inspection-pane" aria-label="EntityMap inspection">
         <section class="inspection-section held-inspection">
           <p class="eyebrow">Stable ordinary identity</p>
-          <h3>Held handle</h3>
+          <h3>A reference that stays valid</h3>
           <code>const held = products.byIdOrFail(1)</code>
           <output>{{ heldProduct().name }}</output>
           <p>
-            <code>updateOne()</code> changes the value while the held signal
-            object remains stable.
+            <code>updateOne()</code> changes the record's value while the
+            reference you kept stays the same object.
           </p>
           <button type="button" class="primary-command" (click)="renameAnchorProduct()">
             Update through the map
