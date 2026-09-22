@@ -80,7 +80,8 @@ of its items had.
 ## Public library / private Studio boundary
 
 The September 11 owner decision supersedes earlier free-Studio documentation.
-Only kernel, angular, react and vue belong in this public release workspace.
+Only kernel, angular, react, vue and solid belong in this public release
+workspace.
 The existing kernel observation interfaces remain public integration primitives.
 Studio application, attachment/bridge, recording, sessions and query engine live
 in a separate private workspace. Do not copy that source back or include its
@@ -88,8 +89,44 @@ packages in public releases, even with private manifests.
 
 The six-package v15.1.0-rc.1 and rc.2 candidates were NOT published. Never resume
 or dispatch their old release/publish workflows. A later public release must
-use the corrected four-package plan. Existing public history and Apache notices
+use the corrected five-package plan (`scripts/release-plan.mjs` is the
+authority; do not hand-maintain the list). Existing public history and Apache notices
 are not erased or retroactively revoked by the separation.
+
+## Documentation language
+
+SignalTree has three vocabularies. [`docs/glossary.md`](docs/glossary.md)
+defines them and is the reference when you are unsure which level a term
+belongs to.
+
+**Binding rule:** users learn the behaviour first; names for the machinery come
+later; internal implementation vocabulary never appears in introductory
+material unless the user must interact with it.
+
+- **Everyday** (state, field, entity, entity ID, write, external update,
+  transaction, rollback, undo/redo, linked state) — dominates the root README,
+  package READMEs, quickstarts and examples. A developer should be able to
+  build a serious application knowing only these.
+- **Advanced** (entity lifetime, authored write, realized update, causal turn,
+  restoration, retained history) — used when explaining *why* SignalTree
+  behaves differently. Always teach the behaviour before the term: "a server
+  response establishes the current value — a *realized update*", never the
+  reverse.
+- **Architecture and adapter** (`SubjectId`, `PositionId`, `ownerId`,
+  `EntityValueStore`, `StructuralStore`, `EpochHandle`, `ObservationToken`,
+  realization carrier, restoration designation) — architecture documents,
+  contributor documentation and the adapter SDK only.
+
+Say **entity lifetime**, not *subject*, in anything public. The internal name
+is accurate, but RxJS owns that word for Angular developers and a `Subject` in
+an Angular codebase means something else entirely.
+
+Opening copy describes behaviour, not authority. Write "SignalTree keeps state
+behaviour consistent across frameworks: entity identity, transactions, undo,
+external updates and reactive publication all follow the same rules" rather
+than "the kernel owns meaning — identity, subject lifetime, canonical values,
+causality and publication". The second sentence is true and belongs in the
+architecture guide.
 
 ## Release work
 

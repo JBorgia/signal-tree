@@ -24,6 +24,64 @@ versions.
 (`@signaltree/core`, `@signaltree/angular`, `@signaltree/ng-forms`,
 `@signaltree/events`, and earlier standalone packages).
 
+## Versioning commitment
+
+**Starting with 15.2, SignalTree follows ordinary SemVer for its public API.**
+
+- **PATCH** — fixes. No intentional public API breakage.
+- **MINOR** — additive capabilities. No intentional public API breakage.
+- **MAJOR** — breaking public API changes.
+- A deprecated API gets a documented migration path before removal, except
+  where keeping it would preserve a correctness or security defect. When that
+  exception is used, the release notes say so explicitly and say why.
+
+The public API is what the package barrels export. `@signal-tree/kernel/adapter`
+and `@signal-tree/kernel/internals` are versioned the same way, but they are
+seams for adapter authors and tooling rather than application surface.
+
+This commitment is new, and it is a response to a real history. Earlier
+releases did not behave this way: 14.0.0 was deprecated within about a day,
+14.1.0 shipped a packaging defect that was superseded immediately, and 15.0.0
+carried a long RC tail. A MINOR once carried a BREAKING section because the
+prior version had been deprecated. That is not a pattern to repeat, and the
+gates built in response — mutation-tested release gates, packed-tarball install
+verification under real export conditions — now run on the exact tagged commit
+before anything reaches npm.
+
+### The scope rename
+
+`@signaltree/*` → `@signal-tree/*` is **complete**. `@signal-tree/*` is the
+stable namespace going forward. The old scope remains only as the v14
+maintenance line described above; it is not an alias and will not become one.
+
+## Framework support and maturity
+
+Every supported framework passes the same semantic conformance suite — that is
+what "supported" means here. It does not mean every adapter is equally
+exercised or equally characterized.
+
+| Framework | Status    | Realization                | Characterization                                 |
+| --------- | --------- | -------------------------- | ------------------------------------------------ |
+| Angular   | Supported | Native signals             | Most established adapter; memory characterized   |
+| Vue       | Supported | Native refs                | Memory characterized                             |
+| React     | Supported | External-store integration | Memory characterized                             |
+| Solid     | Supported | Native signals             | New in 15.2; memory not yet characterized        |
+
+React integrates through an external store rather than a native per-field
+primitive, because that is React's own model — it is a different physical
+shape, deliberately, not a lesser one.
+
+### The cost of specializing per framework
+
+Specializing per framework produces more adapter code than one
+lowest-common-denominator abstraction would. SignalTree accepts that
+maintenance cost to keep each framework's own behaviour intact.
+
+A framework stays supported only while its adapter passes the shared semantic
+conformance suite and the packed-consumer gates against its declared peer
+range. If an adapter cannot be kept passing as a framework's reactivity
+evolves, its support status changes here rather than degrading silently.
+
 ## What the v14 line receives
 
 - **Bug fixes** for defects reproducible against the latest `14.1.x`.

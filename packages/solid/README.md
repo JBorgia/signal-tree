@@ -1,11 +1,16 @@
 # @signal-tree/solid
 
-Solid-native realization of SignalTree state.
+SignalTree state, using Solid's own reactivity.
 
-The kernel owns meaning — identity, subject lifetime, canonical values,
-transactions, rollback, restoration, causality and publication. This package
-owns only the *physical realization*: how that meaning becomes something Solid
-can track.
+State behaves the same here as in every other SignalTree package: entity
+identity, transactions, undo, external updates and reactive publication all
+follow the same rules. This package decides only how that state becomes
+something Solid can track — leaves are real Solid accessors, so they go
+straight into `createMemo`, `createEffect` and JSX.
+
+(In architecture terms the kernel holds semantic authority and this package is
+its physical realization; see the
+[glossary](../../docs/glossary.md) if you meet that vocabulary elsewhere.)
 
 ```bash
 npm i @signal-tree/solid solid-js

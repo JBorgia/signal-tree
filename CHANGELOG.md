@@ -1,3 +1,70 @@
+## 15.2.1 (2026-09-22)
+
+**TL;DR** — Safe patch. No API changes, no behaviour changes, no size change.
+Documentation, versioning policy and contributor rules only. This is the first
+npm release of the 15.2 architecture; 15.2.0 was tagged and released on GitHub
+but superseded before publication.
+
+### For users
+
+- **A "Why SignalTree?" page.** [`docs/why-signaltree.md`](docs/why-signaltree.md)
+  answers the adoption question in ordinary language, including when *not* to
+  adopt: for a small component or simple application, your framework's built-in
+  state is probably all you need.
+- **A glossary.** [`docs/glossary.md`](docs/glossary.md) separates the three
+  vocabularies — everyday, advanced, and architecture — so the precise terms
+  are optional rather than prerequisite. Public documentation now says **entity
+  lifetime** rather than *subject*, because RxJS owns that word for Angular
+  developers.
+- **Introductory copy rewritten around behaviour.** The Solid and kernel
+  READMEs opened with semantic-authority language; they now describe what the
+  state does, with the architecture vocabulary moved behind a glossary link.
+- **A stated versioning commitment.** See below — this is the change most
+  likely to matter for anyone evaluating adoption.
+- **An explicit open-source / Studio boundary.**
+  [`docs/oss-vs-studio.md`](docs/oss-vs-studio.md) lists what is in the npm
+  packages and what is not, so a Studio capability cannot be mistaken for
+  something `npm install` provides.
+
+### Versioning and support
+
+- **From 15.2 onward, ordinary SemVer for the public API.** PATCH fixes, MINOR
+  adds, MAJOR breaks; deprecations get a documented migration path before
+  removal except where keeping them would preserve a correctness or security
+  defect. The release history that made this necessary — a version deprecated
+  within a day, a packaging defect superseded immediately, a MINOR carrying a
+  BREAKING section — is stated plainly in the policy rather than left for
+  readers to reconstruct from the changelog.
+- **Framework maturity is published, not implied.** "Supported" means the
+  adapter passes the shared semantic conformance suite. It does not mean every
+  adapter is equally characterized, and the table says which are. Solid is new
+  in 15.2 and its memory cost is still uncharacterized.
+- **The scope rename is complete.** `@signaltree/*` → `@signal-tree/*`, stated
+  once in the support policy instead of implied across release notes.
+
+### For adapter authors
+
+- **[`CONTRIBUTING.md`](CONTRIBUTING.md) now carries the adapter contract** as
+  seven written rules backed by executable gates: kernel semantics do not bend
+  for framework convenience; use the cheapest correct native primitive; pass
+  the conformance suite; add a mutation proof that publication is necessary;
+  prove a packed external consumer; document framework-specific limitations;
+  claim no performance without a named generator. The intent is that an adapter
+  can be added or repaired from the written contract plus the gates.
+- **The documentation-language rule is binding** and recorded in `AGENTS.md`.
+
+### Engineering record
+
+- `packages/solid/README.md` was never in the `LIVE_DOCS` list, so its examples
+  and import specifiers were ungated from the day the package shipped. Added,
+  along with the two new documents, to both `check-documented-examples.mjs` and
+  `check-documented-imports.mjs`.
+- `AGENTS.md` still described a four-package release workspace and a
+  "four-package plan"; corrected to five, pointing at `scripts/release-plan.mjs`
+  as the authority rather than a hand-maintained list.
+- No package source changed in this release. Bundle sizes, the public API
+  surface and the API baseline are identical to 15.2.0.
+
 ## 15.2.0 (2026-09-21)
 
 **TL;DR** — Safe bump: no breaking changes, no removed exports. Adds
