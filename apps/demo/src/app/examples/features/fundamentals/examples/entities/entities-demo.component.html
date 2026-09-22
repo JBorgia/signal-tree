@@ -1,218 +1,193 @@
 <div class="entity-page layout-frame">
-  <header class="entity-hero">
-    <p class="eyebrow">@signal-tree/kernel / entityMap()</p>
-    <h1>EntityMap keeps each entity fact under one authority.</h1>
-    <p class="hero-copy">
-      A normalized collection owns keyed identity, order, structural mutation,
-      and reactive queries. Store selection as an ID, then resolve the entity
-      from the map instead of duplicating its value elsewhere.
-    </p>
-
-    <div class="entity-facts" aria-label="EntityMap guarantees demonstrated here">
-      <div>
-        <span>Collection order</span>
-        <strong>Preserved</strong>
-      </div>
-      <div>
-        <span>Ordinary updates</span>
-        <strong>Stable handle</strong>
-      </div>
-      <div>
-        <span>Query result</span>
-        <strong>Reactive signal</strong>
-      </div>
-    </div>
-  </header>
-
-  <section class="authority-strip" aria-label="EntityMap ownership model">
-    <div>
-      <span class="strip-index">01</span>
-      <h2>One map owns the facts</h2>
-      <p><code>entityMap()</code> normalizes records at one state path.</p>
-    </div>
-    <div>
-      <span class="strip-index">02</span>
-      <h2>Selection keeps only identity</h2>
-      <p>The selected product is derived from its ID with <code>byId()</code>.</p>
-    </div>
-    <div>
-      <span class="strip-index">03</span>
-      <h2>Queries stay live</h2>
-      <p><code>where()</code>, <code>all</code>, and <code>count</code> remain signals.</p>
-    </div>
-  </section>
-
-  <section class="workbench" aria-labelledby="workbench-heading">
-    <header class="workbench-header">
-      <div>
-        <p class="eyebrow">Live map</p>
-        <h2 id="workbench-heading">Inventory workbench</h2>
-      </div>
-      <dl class="workbench-counts">
+  <st-example
+    heading="Live collections"
+    [headingLevel]="1"
+    intro="Reserve a product, filter the list, or rename the held record. Its handle stays stable across ordinary updates."
+    [code]="codeFiles"
+  >
+    <section class="workbench" aria-labelledby="workbench-heading">
+      <header class="workbench-header">
         <div>
-          <dt>Records</dt>
-          <dd>{{ store.$.products.count() }}</dd>
+          <p class="eyebrow">Live map</p>
+          <h2 id="workbench-heading">Inventory workbench</h2>
         </div>
-        <div>
-          <dt>Available</dt>
-          <dd>{{ availableCount() }}</dd>
-        </div>
-      </dl>
-    </header>
-
-    <div class="command-band">
-      <div class="filter-control" role="group" aria-label="Filter products">
-        <span>Query</span>
-        <button
-          type="button"
-          [class.active]="filter() === 'all'"
-          [attr.aria-pressed]="filter() === 'all'"
-          (click)="setFilter('all')"
-        >
-          All
-        </button>
-        <button
-          type="button"
-          [class.active]="filter() === 'available'"
-          [attr.aria-pressed]="filter() === 'available'"
-          (click)="setFilter('available')"
-        >
-          Available
-        </button>
-        <button
-          type="button"
-          [class.active]="filter() === 'reserved'"
-          [attr.aria-pressed]="filter() === 'reserved'"
-          (click)="setFilter('reserved')"
-        >
-          Reserved
-        </button>
-      </div>
-
-      <div class="add-command">
-        <label for="new-product-name">Add one record</label>
-        <div>
-          <input
-            id="new-product-name"
-            type="text"
-            [(ngModel)]="newProductName"
-            placeholder="Product name"
-          />
-          <button
-            type="button"
-            class="primary-command"
-            [disabled]="!newProductName.trim()"
-            (click)="addProduct()"
-          >
-            Add product
-          </button>
-          <button type="button" (click)="resetCatalog()">Reset</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="workbench-grid">
-      <section class="collection-pane" aria-label="Product collection">
-        <div class="collection-labels" aria-hidden="true">
-          <span>Identity and value</span>
-          <span>Status</span>
-          <span>Operation</span>
-        </div>
-
-        @for (product of visibleProducts(); track product.id) {
-        <article
-          class="entity-row"
-          [class.selected]="selectedProductId() === product.id"
-        >
-          <button
-            type="button"
-            class="entity-select"
-            [attr.aria-pressed]="selectedProductId() === product.id"
-            (click)="selectProduct(product.id)"
-          >
-            <span class="entity-key">#{{ product.id }} / {{ product.sku }}</span>
-            <strong>{{ product.name }}</strong>
-            <span>{{ product.location }}</span>
-          </button>
-          <span class="availability" [class.reserved]="product.availability === 'reserved'">
-            {{ product.availability }}
-          </span>
-          <div class="row-operations">
-            <button type="button" (click)="toggleAvailability(product.id)">
-              {{ product.availability === 'available' ? 'Reserve' : 'Release' }}
-            </button>
-            @if (product.id !== 1) {
-            <button type="button" class="remove-command" (click)="removeProduct(product.id)">
-              Remove
-            </button>
-            } @else {
-            <span class="held-label">Held handle</span>
-            }
+        <dl class="workbench-counts">
+          <div>
+            <dt>Records</dt>
+            <dd>{{ store.$.products.count() }}</dd>
           </div>
-        </article>
-        } @empty {
-        <p class="empty-state">No records match this query.</p>
-        }
-      </section>
+          <div>
+            <dt>Available</dt>
+            <dd>{{ availableCount() }}</dd>
+          </div>
+        </dl>
+      </header>
 
-      <aside class="inspection-pane" aria-label="EntityMap inspection">
-        <section class="inspection-section held-inspection">
-          <p class="eyebrow">Stable ordinary identity</p>
-          <h3>Held handle</h3>
-          <code>const held = products.byIdOrFail(1)</code>
-          <output>{{ heldProduct().name }}</output>
-          <p>
-            <code>updateOne()</code> changes the value while the held signal
-            object remains stable.
-          </p>
-          <button type="button" class="primary-command" (click)="renameAnchorProduct()">
-            Update through the map
+      <div class="command-band">
+        <div class="filter-control" role="group" aria-label="Filter products">
+          <span>Query</span>
+          <button
+            type="button"
+            [class.active]="filter() === 'all'"
+            [attr.aria-pressed]="filter() === 'all'"
+            (click)="setFilter('all')"
+          >
+            All
           </button>
-        </section>
+          <button
+            type="button"
+            [class.active]="filter() === 'available'"
+            [attr.aria-pressed]="filter() === 'available'"
+            (click)="setFilter('available')"
+          >
+            Available
+          </button>
+          <button
+            type="button"
+            [class.active]="filter() === 'reserved'"
+            [attr.aria-pressed]="filter() === 'reserved'"
+            (click)="setFilter('reserved')"
+          >
+            Reserved
+          </button>
+        </div>
 
-        <section class="inspection-section selected-inspection">
-          <p class="eyebrow">Derived selection</p>
-          <h3>Selected record</h3>
-          @if (selectedProduct(); as product) {
-          <dl class="selected-record">
-            <div><dt>ID</dt><dd>{{ product.id }}</dd></div>
-            <div><dt>SKU</dt><dd>{{ product.sku }}</dd></div>
-            <div><dt>Location</dt><dd>{{ product.location }}</dd></div>
-          </dl>
-          } @else {
-          <p>No record selected.</p>
+        <div class="add-command">
+          <label for="new-product-name">Add one record</label>
+          <div>
+            <input
+              id="new-product-name"
+              type="text"
+              [(ngModel)]="newProductName"
+              placeholder="Product name"
+            />
+            <button
+              type="button"
+              class="primary-command"
+              [disabled]="!newProductName.trim()"
+              (click)="addProduct()"
+            >
+              Add product
+            </button>
+            <button type="button" (click)="resetCatalog()">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="workbench-grid">
+        <section class="collection-pane" aria-label="Product collection">
+          <div class="collection-labels" aria-hidden="true">
+            <span>Identity and value</span>
+            <span>Status</span>
+            <span>Operation</span>
+          </div>
+
+          @for (product of visibleProducts(); track product.id) {
+          <article
+            class="entity-row"
+            [class.selected]="selectedProductId() === product.id"
+          >
+            <button
+              type="button"
+              class="entity-select"
+              [attr.aria-pressed]="selectedProductId() === product.id"
+              (click)="selectProduct(product.id)"
+            >
+              <span class="entity-key"
+                >#{{ product.id }} / {{ product.sku }}</span
+              >
+              <strong>{{ product.name }}</strong>
+              <span>{{ product.location }}</span>
+            </button>
+            <span
+              class="availability"
+              [class.reserved]="product.availability === 'reserved'"
+            >
+              {{ product.availability }}
+            </span>
+            <div class="row-operations">
+              <button type="button" (click)="toggleAvailability(product.id)">
+                {{
+                  product.availability === 'available' ? 'Reserve' : 'Release'
+                }}
+              </button>
+              @if (product.id !== 1) {
+              <button
+                type="button"
+                class="remove-command"
+                (click)="removeProduct(product.id)"
+              >
+                Remove
+              </button>
+              } @else {
+              <span class="held-label">Held handle</span>
+              }
+            </div>
+          </article>
+          } @empty {
+          <p class="empty-state">No records match this query.</p>
           }
         </section>
 
-        <section class="inspection-section boundary-inspection">
-          <p class="eyebrow">Mutation boundary</p>
-          <h3>Intercept before, tap after</h3>
-          <output class="event-output" aria-live="polite">{{ lastEvent() }}</output>
-          @if (blockedOperation()) {
-          <output class="blocked-output" aria-live="polite">{{ blockedOperation() }}</output>
-          }
-          <button type="button" (click)="tryRejectedAdd()">
-            Attempt a blank-name add
-          </button>
-        </section>
-      </aside>
-    </div>
-  </section>
+        <aside class="inspection-pane" aria-label="EntityMap inspection">
+          <section class="inspection-section held-inspection">
+            <p class="eyebrow">Stable ordinary identity</p>
+            <h3>Held handle</h3>
+            <code>const held = products.byIdOrFail(1)</code>
+            <output>{{ heldProduct().name }}</output>
+            <p>
+              <code>updateOne()</code> changes the value while the held signal
+              object remains stable.
+            </p>
+            <button
+              type="button"
+              class="primary-command"
+              (click)="renameAnchorProduct()"
+            >
+              Update through the map
+            </button>
+          </section>
 
-  <section class="api-ledger" aria-labelledby="api-ledger-heading">
-    <header>
-      <p class="eyebrow">Public surface in use</p>
-      <h2 id="api-ledger-heading">One structural API, signal-shaped reads.</h2>
-    </header>
-    <div>
-      <code>addMany()</code>
-      <code>addOne()</code>
-      <code>updateOne()</code>
-      <code>removeOne()</code>
-      <code>byId()</code>
-      <code>where()</code>
-      <code>count()</code>
-      <code>all()</code>
-    </div>
-  </section>
+          <section class="inspection-section selected-inspection">
+            <p class="eyebrow">Derived selection</p>
+            <h3>Selected record</h3>
+            @if (selectedProduct(); as product) {
+            <dl class="selected-record">
+              <div>
+                <dt>ID</dt>
+                <dd>{{ product.id }}</dd>
+              </div>
+              <div>
+                <dt>SKU</dt>
+                <dd>{{ product.sku }}</dd>
+              </div>
+              <div>
+                <dt>Location</dt>
+                <dd>{{ product.location }}</dd>
+              </div>
+            </dl>
+            } @else {
+            <p>No record selected.</p>
+            }
+          </section>
+
+          <section class="inspection-section boundary-inspection">
+            <p class="eyebrow">Mutation boundary</p>
+            <h3>Intercept before, tap after</h3>
+            <output class="event-output" aria-live="polite">{{
+              lastEvent()
+            }}</output>
+            @if (blockedOperation()) {
+            <output class="blocked-output" aria-live="polite">{{
+              blockedOperation()
+            }}</output>
+            }
+            <button type="button" (click)="tryRejectedAdd()">
+              Attempt a blank-name add
+            </button>
+          </section>
+        </aside>
+      </div>
+    </section>
+  </st-example>
 </div>

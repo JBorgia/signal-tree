@@ -42,6 +42,11 @@
             "output": "assets/docs/vue"
           },
           {
+            "glob": "README.md",
+            "input": "packages/solid",
+            "output": "assets/docs/solid"
+          },
+          {
             "glob": "composition-recipes.md",
             "input": "docs/guides",
             "output": "assets/docs/guides"

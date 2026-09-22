@@ -110,6 +110,61 @@ Construction time is a regression ceiling, not an optimization target. Reopen
 retained scalar density only from a specific newly attributed allocation or
 ownership hypothesis, not from the headline bytes-per-leaf gap alone.
 
+## DEMO-EVALUATION-0 — IMPLEMENTED LOCALLY 2026-09-17
+
+- [x] Distill README/homepage to the value, one live example, fit/evidence, and setup.
+- [x] Reuse the shared live-preview/source shell across active feature examples;
+      preserve state when hiding source, support keyboard source tabs and copy.
+- [x] Keep advanced navigation and diagnostic detail optional; include Vue setup.
+- [x] Withdraw the separately introduced Node comparison and static chart claims.
+      They measured different work from the runnable browser benchmarks and were
+      incorrectly promoted as public comparison evidence.
+- [x] Render butterfly comparisons directly from the existing browser benchmark
+      results; simplify homepage, navigation, and why-use-it copy. Published
+      after 168 demo tests, source typecheck, lint, production build, real browser
+      runs, mobile checks, and 82 production route checks. Benchmark engine and
+      workload timing code remain unchanged.
+- [x] Validate examples, types, production build, documentation links, and mobile
+      layouts. Automated/browser checks establish behavior, not comprehension.
+- [ ] Run comprehension sessions with developers unfamiliar with SignalTree.
+      Study tasks and recording sheet are prepared; no participant findings are
+      claimed. This requires actual participants before it can be closed.
+
+## LINK-PRODUCTION-PATH-0 — FIXED LOCALLY 2026-09-17
+
+- [x] Preserve canonical nested ownership paths when development diagnostics
+      are disabled. The live Link example exposed a production-only failure:
+      nested edits were ignored by a branch link or projected at the wrong level
+      by a root link, despite `settled()` returning.
+
+Ordinary branch construction passed a development-only path into a constructor
+that now also assigns semantic ownership addresses. Production erased parent
+segments. All three ordinary-branch construction entrances now pass the
+canonical path; diagnostic execution remains development-only.
+
+[`link-production-path.spec.ts`](packages/kernel/src/lib/link-production-path.spec.ts)
+pins nested egress, root snapshot shape, and unrelated sibling isolation in both
+modes. The external-data demo also has a production-mode regression and separate
+DOM-event-turn coverage. No endpoint value is manually patched by the demo.
+
+## RESTORATION-ENTITY-SIBLING-EXTERNAL-0 — FIXED LOCALLY 2026-09-17
+
+- [x] Characterize and resolve the entity-row restoration refusal after external
+      truth changes a different field, without losing same-field protection.
+
+Entity notifications publish whole rows. Treating the entire snapshot as
+external truth incorrectly blocked undo of unchanged siblings; clearing that
+snapshot after an authored sibling write could also erase a real conflict.
+The guard now tracks changed fields per stable subject and uses the captured
+realization address so a rekey round trip cannot lose protection.
+
+Regression coverage in
+[`p0c-row-divergence.spec.ts`](packages/kernel/src/enhancers/restoration/p0c-row-divergence.spec.ts)
+checks direct entity-field writes and `updateOne()`, repeated undo/redo with
+external sibling updates, atomic refusal when an edited field conflicts,
+authored/restored siblings preserving a conflict, and undo after a rekey.
+The homepage now demonstrates this sequence with an actual `entityMap`.
+
 ## RESTORATION-HOT-PATH-0
 
 **CLOSED — one production defect removed; no retained-plan redesign earned.**

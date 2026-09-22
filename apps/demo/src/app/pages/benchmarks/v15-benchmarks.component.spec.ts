@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BenchmarkArmResult, BenchmarkReport } from './v15-benchmark.engine';
+import * as engine from './v15-benchmark.engine';
 import { V15BenchmarksComponent } from './v15-benchmarks.component';
 
 const text = (fixture: ComponentFixture<V15BenchmarksComponent>): string =>
@@ -56,107 +57,22 @@ describe('V15BenchmarksComponent', () => {
     fixture.detectChanges();
   });
 
-  it('presents only checked v15 browser workloads', () => {
+  it('starts with runnable tasks and keeps methodology behind disclosures', () => {
     const rendered = text(fixture);
-
-    expect(rendered).toContain('Recurring application-state performance');
-    expect(rendered).not.toContain('Initialize and populate keyed state');
-    expect(rendered).toContain('Update and read one keyed record');
-    expect(rendered).toContain('Update one record and re-read the collection');
-    expect(rendered).toContain('Consequential authored work: record and undo');
-    expect(rendered).toContain('SignalTree Angular');
-    expect(rendered).toContain('SignalTree Kernel');
-    expect(rendered).toContain('NgRx Signals');
-    expect(rendered).toContain('Redux Toolkit');
-    expect(rendered).toContain('Zustand');
-    expect(rendered).toContain('MobX');
-    expect(rendered).toContain('Valtio');
-    expect(rendered).not.toContain('One-time cost');
-    expect(rendered).toContain('Recurring work is the product benchmark');
-    expect(rendered).toContain('Angular leaf realization');
-    expect(rendered).toContain('Scalar replacement');
-    expect(rendered).toContain('Clear native improvement');
-    expect(rendered).toContain('Clear native overhead');
-    expect(rendered).toContain('Inconclusive against A/A control');
-    expect(rendered).toContain('100k leaves, 10k observed');
-    expect(rendered).toContain('Both collectible');
-    expect(rendered).toContain('Raw comparison JSON');
-    expect(
-      fixture.nativeElement.querySelectorAll('.callable-result-row')
-    ).toHaveLength(13);
-    expect(rendered).toContain(
-      'Initialization is a budget, not an optimization target'
+    expect(rendered).toContain('Compare the work your app does.');
+    expect(fixture.nativeElement.querySelectorAll('.workload')).toHaveLength(3);
+    expect(fixture.nativeElement.querySelectorAll('.butterfly')).toHaveLength(
+      0
     );
-    expect(rendered).toContain('it receives no public rank and no value score');
-    expect(rendered).not.toContain('Raw Angular');
-    expect(rendered).toContain('Application impact');
-    expect(rendered).toContain('not statistical significance tests');
-    expect(rendered).toContain('Methodology correction');
+    expect(rendered).toContain('Run benchmarks to generate this comparison.');
+    expect(rendered).not.toContain('Angular leaf realization');
+    expect(rendered).not.toContain('Ten-year architecture bet');
+    expect(rendered).not.toContain('100,000');
+    expect(
+      fixture.nativeElement.querySelectorAll('details[open]')
+    ).toHaveLength(0);
     expect(rendered).toContain('Development build detected');
-    expect(rendered).toContain('How each result is calculated');
-    expect(rendered).toContain('Calculation and timer boundaries');
-    expect(rendered).toContain('First-party keyed entity state');
-    expect(rendered).toContain('First-party linear undo over keyed state');
-    expect(rendered).toContain(
-      'Only implementations meeting every requirement receive a timing'
-    );
-    expect(rendered).toContain(
-      'does not disqualify a storage strategy from internal speed or density experiments'
-    );
-    expect(rendered).toContain(
-      'choosing a Map schema and copy strategy would benchmark the harness design'
-    );
-    expect(rendered).toContain(
-      'not the history capability required by this chart'
-    );
-    expect(rendered).toContain(
-      'Sub-millisecond browser gaps near the timer floor are diagnostic'
-    );
-    expect(rendered).toContain(
-      'overlapping observed ranges mean no clear difference in that run'
-    );
-    expect(rendered).not.toContain('Harness-supplied history outcome');
-    expect(rendered).toContain('Source rule:');
-    expect(rendered).toContain(
-      'it does not claim that no community add-on exists'
-    );
-    expect(rendered).toContain('@ngrx/signals 21.1.1');
-    expect(rendered).toContain('@reduxjs/toolkit 2.12.0');
-    expect(rendered).toContain('Reproduce and inspect');
-    expect(rendered).toContain('Ten-year architecture bet');
-    expect(rendered).toContain(
-      'Typed dot notation survives representation changes'
-    );
-    expect(rendered).toContain(
-      'Optimistic and causal work avoids a future state-model rewrite'
-    );
-    expect(rendered).toContain(
-      'every reproducible deficit is an optimization target'
-    );
-    expect(rendered).toContain(
-      'Retained subject-density cost is pay-for-participation'
-    );
-    expect(
-      fixture.nativeElement.querySelectorAll('.foundation-evidence a')
-    ).toHaveLength(15);
-    expect(rendered).toContain(
-      'Front-load work when it makes recurring speed, density, allocation, GC, restoration, or churn better'
-    );
-    expect(rendered).not.toContain('Does recurring benefit repay setup cost?');
-    expect(rendered).not.toContain('crossover');
-    expect(rendered).not.toContain('lifetime advantage');
-    expect(
-      fixture.nativeElement.querySelectorAll('.capability-admission a').length
-    ).toBeGreaterThan(0);
-    expect(
-      fixture.nativeElement.querySelectorAll('.evidence-line a')
-    ).toHaveLength(9);
-    expect(
-      fixture.nativeElement.querySelectorAll('.planned-arm .source-links a')
-    ).toHaveLength(13);
-    expect(rendered).not.toContain('Middleware');
-    expect(rendered).not.toContain('Async enhancer');
-    expect(rendered).not.toContain('Time travel');
+    expect(rendered).toContain('not statistical significance tests');
   });
 
   it('switches between quick and steady measurement plans', () => {
@@ -198,174 +114,89 @@ describe('V15BenchmarksComponent', () => {
     ).toBe(true);
   });
 
-  it('does not turn overlapping observed ranges into a winner claim', () => {
-    const report: BenchmarkReport = {
-      workload: {
-        id: 'restoration',
-        title: 'History',
-        description: 'Checked history',
-        operations: 1,
-        expectedChecksum: 'ok',
-      },
-      rounds: 3,
-      warmupRounds: 1,
-      results: [
-        {
-          armId: 'lowest',
-          label: 'Lowest',
-          color: '#000000',
-          medianMs: 0.2,
-          minMs: 0.1,
-          maxMs: 0.3,
-          spreadMs: 0.2,
-          microsecondsPerOperation: 200,
-          samples: [0.1, 0.2, 0.3],
-          phases: [],
-        },
-        {
-          armId: 'overlap',
-          label: 'Overlap',
-          color: '#000000',
-          medianMs: 0.3,
-          minMs: 0.2,
-          maxMs: 0.4,
-          spreadMs: 0.2,
-          microsecondsPerOperation: 300,
-          samples: [0.2, 0.3, 0.4],
-          phases: [],
-        },
-      ],
-    };
-
-    expect(component.resultInterpretation(report.results[1], report)).toBe(
-      'Observed ranges overlapped'
-    );
-
-    const tiedReport: BenchmarkReport = {
-      ...report,
-      results: [
-        { ...report.results[0], armId: 'later', minMs: 0.2 },
-        {
-          ...report.results[1],
-          armId: 'earlier',
-          medianMs: 0.2,
-          minMs: 0.1,
-        },
-      ],
-    };
-    expect(component.rankedResults(tiedReport)[0].armId).toBe('earlier');
-    expect(
-      tiedReport.results.map((result) =>
-        component.resultInterpretation(result, tiedReport)
-      )
-    ).toEqual(['Tied lowest observed median', 'Tied lowest observed median']);
-  });
-
-  it('orders measured rows by result and renders a visual range for each arm', () => {
-    const report: BenchmarkReport = {
-      workload: {
-        id: 'collection',
-        title: 'Collection',
-        description: 'Checked collection',
-        operations: 1,
-        expectedChecksum: 'ok',
-      },
-      rounds: 3,
-      warmupRounds: 1,
-      results: [
-        {
-          armId: 'slower',
-          label: 'Slower',
-          color: '#aa0000',
-          medianMs: 4,
-          minMs: 3,
-          maxMs: 5,
-          spreadMs: 2,
-          microsecondsPerOperation: 4_000,
-          samples: [3, 4, 5],
-          phases: [],
-        },
-        {
-          armId: 'faster',
-          label: 'Faster',
-          color: '#00aa00',
-          medianMs: 2,
-          minMs: 1,
-          maxMs: 3,
-          spreadMs: 2,
-          microsecondsPerOperation: 2_000,
-          samples: [1, 2, 3],
-          phases: [],
-        },
-      ],
-    };
-
+  it('builds symmetric butterfly bars only from current measured results', () => {
+    const report = recurringReport('collection', 10, [
+      result('signaltree-angular', 'SignalTree Angular', 1, 0.8, 1.2),
+      result('signaltree-kernel', 'SignalTree Kernel', 2, 1.8, 2.2),
+      result('ngrx-signals', 'NgRx Signals', 4, 3, 5),
+      result('akita', 'Akita', 3, 2.8, 3.2),
+    ]);
     component.reports.set(new Map([['collection', report]]));
     fixture.detectChanges();
-
-    const rows = Array.from(
-      fixture.nativeElement.querySelectorAll(
-        '[data-workload-id="collection"] .result-row'
-      ) as NodeListOf<HTMLElement>
-    );
-    expect(rows.map((row) => row.dataset['armId'])).toEqual([
-      'faster',
-      'slower',
+    const element: HTMLElement = fixture.nativeElement;
+    const charts = element.querySelectorAll<HTMLElement>('.butterfly');
+    expect(charts).toHaveLength(2);
+    expect([...charts].map((chart) => chart.dataset['competitor'])).toEqual([
+      'akita',
+      'ngrx-signals',
     ]);
-    expect(rows.map((row) => row.dataset['rank'])).toEqual(['1', '2']);
     expect(
-      fixture.nativeElement.querySelectorAll(
-        '[data-workload-id="collection"] .result-visual-track'
+      charts[0].querySelector<HTMLElement>('.bar--baseline')?.style.width
+    ).toBe('20%');
+    expect(
+      charts[0].querySelector<HTMLElement>('.bar--competitor')?.style.width
+    ).toBe('60%');
+    expect(
+      charts[1].querySelector<HTMLElement>('.bar--competitor')?.style.width
+    ).toBe('80%');
+    expect(
+      [...charts[0].querySelectorAll('.pair-axis span')].map((label) =>
+        label.textContent?.trim()
       )
-    ).toHaveLength(2);
-  });
-
-  it('normalizes three independent recurring workloads without a setup score', () => {
-    component.reports.set(
-      new Map([
-        [
-          'collection',
-          recurringReport('collection', 10, [
-            result('signaltree-angular', 'SignalTree Angular', 1, 0.8, 1.2),
-            result('signaltree-kernel', 'SignalTree Kernel', 2, 1.8, 2.2),
-            result('akita', 'Akita', 3, 2.8, 3.2),
-          ]),
-        ],
-        [
-          'projection',
-          recurringReport('projection', 10, [
-            result('signaltree-angular', 'SignalTree Angular', 2, 1.8, 2.2),
-            result('signaltree-kernel', 'SignalTree Kernel', 3, 2.8, 3.2),
-            result('akita', 'Akita', 5, 4.8, 5.2),
-          ]),
-        ],
-        [
-          'restoration',
-          recurringReport('restoration', 10, [
-            result('akita', 'Akita', 1, 0.8, 1.2),
-            result('signaltree-kernel', 'SignalTree Kernel', 3, 2.8, 3.2),
-            result('signaltree-angular', 'SignalTree Angular', 4, 3.8, 4.2),
-          ]),
-        ],
-      ])
-    );
-    fixture.detectChanges();
-
-    expect(component.steadyStateProfiles()).toHaveLength(3);
-    expect(text(fixture)).toContain('What compounds after construction');
-    expect(text(fixture)).toContain('100.00 ms');
-    expect(text(fixture)).toContain('200.00 ms');
-    expect(text(fixture)).toContain('400.00 ms');
-    expect(text(fixture)).toContain(
-      'No workload is pooled into an aggregate score'
-    );
-
+    ).toEqual(['5.00', '0', '5.00']);
     component.setProfileArm('signaltree-kernel');
     fixture.detectChanges();
     expect(
-      component.steadyStateProfiles().map((profile) => profile.position)
-    ).toEqual([2, 2, 2]);
-    expect(text(fixture)).toContain('300.00 ms');
+      charts[0].querySelector<HTMLElement>('.bar--baseline')?.style.width
+    ).toBe('40%');
+    expect(component.reports().get('collection')).toBe(report);
+    expect(
+      element.querySelectorAll('[data-workload-id="projection"] .butterfly')
+    ).toHaveLength(0);
+  });
+
+  it('does not fabricate a baseline or infer significance from overlapping ranges', () => {
+    const competitor = result('akita', 'Akita', 0.3, 0.2, 0.4);
+    const report = recurringReport('restoration', 1, [competitor]);
+    expect(component.butterflyPairs(report)).toEqual([]);
+    expect(
+      component.pairInterpretation(
+        {
+          baseline: result(
+            'signaltree-angular',
+            'SignalTree Angular',
+            0.2,
+            0.1,
+            0.3
+          ),
+          competitor,
+        },
+        report.rounds
+      )
+    ).toContain('no clear difference');
+    expect(
+      component.pairInterpretation(
+        {
+          baseline: result(
+            'signaltree-angular',
+            'SignalTree Angular',
+            0.02,
+            0.01,
+            0.04
+          ),
+          competitor,
+        },
+        report.rounds
+      )
+    ).toContain('Below useful timing resolution');
+    expect(
+      component.resultPosition(
+        0,
+        recurringReport('collection', 1, [
+          result('signaltree-angular', 'SignalTree Angular', 0, 0, 0),
+        ])
+      )
+    ).toBe('0%');
   });
 
   it('explains the first-party capability used by each admitted history arm', () => {
@@ -405,37 +236,98 @@ describe('V15BenchmarksComponent', () => {
     expect(component.formatMilliseconds(0)).toBe('< 0.1');
     expect(component.formatRange(0, 0.08)).toBe('Below useful resolution');
     expect(component.formatRange(0.04, 0.2)).toBe('< 0.1–0.200 ms');
+  });
 
-    const belowResolution: BenchmarkReport = {
-      workload: {
-        id: 'collection',
-        title: 'Collection',
-        description: 'Checked collection',
-        operations: 1,
-        expectedChecksum: 'ok',
-      },
-      rounds: 3,
-      warmupRounds: 1,
-      results: [
-        {
-          armId: 'fast',
-          label: 'Fast',
-          color: '#000000',
-          medianMs: 0.04,
-          minMs: 0.02,
-          maxMs: 0.08,
-          spreadMs: 0.06,
-          microsecondsPerOperation: 40,
-          samples: [0.02, 0.04, 0.08],
-          phases: [],
-        },
-      ],
+  it('replaces old results on rerun and does not leave stale charts after failure', async () => {
+    const previous = recurringReport('collection', 1, [
+      result('signaltree-angular', 'SignalTree Angular', 1, 0.8, 1.2),
+      result('akita', 'Akita', 2, 1.8, 2.2),
+    ]);
+    component.reports.set(new Map([['collection', previous]]));
+    const runner = jest
+      .spyOn(engine, 'runInterleavedBenchmark')
+      .mockImplementation(async (options) => ({
+        workload: options.workload,
+        rounds: options.rounds,
+        warmupRounds: options.warmupRounds ?? 0,
+        results: [],
+      }));
+    try {
+      const run = component.runBenchmarks();
+      fixture.detectChanges();
+      expect(component.reports().size).toBe(0);
+      expect(fixture.nativeElement.querySelectorAll('.butterfly')).toHaveLength(
+        0
+      );
+      await run;
+      expect(runner).toHaveBeenCalledTimes(3);
+      expect(component.reports().size).toBe(3);
+      expect(runner.mock.calls[0][0].arms).toEqual(component.suites()[0].arms);
+      runner.mockRejectedValueOnce(new Error('Outcome check failed'));
+      await component.runBenchmarks();
+      fixture.detectChanges();
+      expect(component.reports().size).toBe(0);
+      expect(component.error()).toBe('Outcome check failed');
+      expect(fixture.nativeElement.querySelectorAll('.butterfly')).toHaveLength(
+        0
+      );
+    } finally {
+      runner.mockRestore();
+    }
+  });
+
+  it('shows one-round values without claiming measured variability', () => {
+    const report = {
+      ...recurringReport('restoration', 10, [
+        result('signaltree-angular', 'SignalTree Angular', 1, 1, 1),
+        result('akita', 'Akita', 4, 4, 4),
+      ]),
+      rounds: 1,
     };
-    expect(
-      component.resultInterpretation(
-        belowResolution.results[0],
-        belowResolution
-      )
-    ).toBe('Below useful timing resolution');
+    component.reports.set(new Map([['restoration', report]]));
+    fixture.detectChanges();
+    const panel: HTMLElement = fixture.nativeElement.querySelector(
+      '[data-workload-id="restoration"]'
+    );
+    expect(panel.textContent).toContain(
+      'One measured round; variability has not been measured.'
+    );
+    expect(panel.textContent).toContain('1.00 ms');
+    expect(panel.textContent).toContain('4.00 ms');
+    expect(panel.textContent).toContain('10 record/undo pairs');
+    expect(panel.textContent).not.toContain('ranges do not overlap');
+  });
+
+  it('cancels a destroyed page without starting the next suite or showing partial results', async () => {
+    let signal: AbortSignal | undefined;
+    let started: () => void = () => undefined;
+    const hasStarted = new Promise<void>((resolve) => {
+      started = resolve;
+    });
+    const runner = jest
+      .spyOn(engine, 'runInterleavedBenchmark')
+      .mockImplementation((options) => {
+        signal = options.signal;
+        started();
+        return new Promise((_, reject) => {
+          options.signal?.addEventListener(
+            'abort',
+            () => reject(new DOMException('Cancelled', 'AbortError')),
+            { once: true }
+          );
+        });
+      });
+    try {
+      const run = component.runBenchmarks();
+      await hasStarted;
+      fixture.destroy();
+      await run;
+      expect(signal?.aborted).toBe(true);
+      expect(runner).toHaveBeenCalledTimes(1);
+      expect(component.reports().size).toBe(0);
+      expect(component.error()).toBeNull();
+    } finally {
+      runner.mockRestore();
+    }
   });
 });

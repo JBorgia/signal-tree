@@ -1,5 +1,11 @@
 @use '../../styles' as *;
 
+:host {
+  display: block;
+  min-width: 0;
+  container: example / inline-size;
+}
+
 .st-example {
   width: 100%;
   min-width: 0;
@@ -48,6 +54,52 @@
     }
   }
 
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+    padding: $spacing-md var(--layout-panel-inset);
+    border-bottom: 1px solid var(--color-neutral-200);
+  }
+
+  &__preview-label {
+    margin: 0;
+    font-size: $text-sm;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+  }
+
+  &__workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+  }
+
+  &__diagnostics {
+    border-top: 1px solid var(--color-neutral-200);
+
+    summary {
+      cursor: pointer;
+      padding: $spacing-md var(--layout-panel-inset);
+      color: var(--color-ink);
+      font-size: $text-sm;
+      font-weight: 600;
+
+      &:focus-visible {
+        outline: 2px solid var(--color-primary-500);
+        outline-offset: -3px;
+      }
+    }
+  }
+
   &__demo {
     display: flex;
     flex-direction: column;
@@ -58,14 +110,9 @@
 
   &__reactive {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     min-width: 0;
     border-top: 1px solid var(--color-neutral-200);
-    border-bottom: 1px solid var(--color-neutral-200);
-
-    @include respond-to('md') {
-      grid-template-columns: 1fr;
-    }
   }
 
   &__panel {
@@ -74,7 +121,7 @@
   }
 
   &__panel + &__panel {
-    border-left: 1px solid var(--color-neutral-200);
+    border-top: 1px solid var(--color-neutral-200);
   }
 
   &__panel-label {
@@ -86,27 +133,21 @@
     color: $text-tertiary;
   }
 
-  &__code-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: $spacing-md;
-    margin-bottom: $spacing-lg;
-  }
-
   &__code {
+    border-top: 1px solid var(--color-neutral-200);
     min-width: 0;
     padding: var(--layout-panel-inset);
   }
 
   &__code-title {
-    margin: 0;
+    margin: 0 0 $spacing-md;
     font-size: $text-lg;
     font-weight: 600;
     color: $dark;
   }
 
-  &__edit {
+  &__edit,
+  &__toggle {
     appearance: none;
     cursor: pointer;
     font-family: inherit;
@@ -129,19 +170,25 @@
     }
   }
 
-  @media (max-width: 640px) {
+  @container example (min-width: 60rem) {
+    &__workspace--with-code {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &__code {
+      border-top: 0;
+      border-left: 1px solid var(--color-neutral-200);
+    }
+  }
+
+  @container example (min-width: 40rem) {
+    &__reactive {
+      grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    }
+
     &__panel + &__panel {
-      border-top: 1px solid var(--color-neutral-200);
-      border-left: 0;
-    }
-
-    &__code-head {
-      align-items: stretch;
-      flex-direction: column;
-    }
-
-    &__edit {
-      width: 100%;
+      border-top: 0;
+      border-left: 1px solid var(--color-neutral-200);
     }
   }
 }

@@ -87,16 +87,13 @@ describe('DocumentationComponent', () => {
     fixture.detectChanges();
 
     expect(component.markdownContent()).not.toContain('<br>');
-    const content: HTMLElement = fixture.nativeElement.querySelector(
-      '.markdown-content'
-    );
+    const content: HTMLElement =
+      fixture.nativeElement.querySelector('.markdown-content');
     expect(content.querySelector('br')).toBeNull();
     expect(content.querySelectorAll('p')).toHaveLength(2);
     expect(
       content.querySelector('p')?.textContent?.replace(/\s+/g, ' ').trim()
-    ).toContain(
-      'A sentence wrapped in source continues as normal prose.'
-    );
+    ).toContain('A sentence wrapped in source continues as normal prose.');
   });
 
   it('selectPackage() updates selectedPackage() and re-issues the README fetch', () => {
@@ -135,5 +132,94 @@ describe('DocumentationComponent', () => {
 
     expect(component.selectedPackage().id).toBe(target.id);
     expect(buttons[index].classList.contains('active')).toBe(true);
+  });
+  it.each(['kernel', 'angular', 'react', 'vue'])(
+    'resolves %s documentation links from the source document and keeps anchors in the docs route',
+    async (id) => {
+      httpMock.expectOne('assets/docs/core/README.md').flush('# Initial');
+      await fixture.whenStable();
+      const target = component.packages.find((entry) => entry.id === id)!;
+      component.selectPackage(target);
+      httpMock.expectOne(target.readmePath).flush(`
+## Ownership
+[Same section](#ownership)
+[Same document](README.md#ownership)
+[Manifest](llms.txt)
+[Package metadata](../angular/package.json)
+[License](../../LICENSE)
+[React guide](../react/README.md#ownership)
+[External](https://example.com/guide?q=1#setup)
+[Email](mailto:help@example.com)
+[Demo](/entities)
+![Diagram](./diagram.svg)
+## Ownership
+`);
+      await fixture.whenStable();
+      fixture.detectChanges();
+      const root = fixture.nativeElement as HTMLElement;
+      const href = (label: string) =>
+        Array.from(root.querySelectorAll('.markdown-content a'))
+          .find((element) => element.textContent === label)
+          ?.getAttribute('href');
+      expect(href('Same section')).toBe(`/docs?package=${id}#ownership`);
+      expect(href('Same document')).toBe(`/docs?package=${id}#ownership`);
+      expect(href('Manifest')).toBe('/llms.txt');
+      expect(href('Package metadata')).toBe(
+        'https://github.com/JBorgia/signal-tree/blob/main/packages/angular/package.json'
+      );
+      expect(href('License')).toBe(
+        'https://github.com/JBorgia/signal-tree/blob/main/LICENSE'
+      );
+      expect(href('React guide')).toBe('/docs?package=react#ownership');
+      expect(href('External')).toBe('https://example.com/guide?q=1#setup');
+      expect(href('Email')).toBe('mailto:help@example.com');
+      expect(href('Demo')).toBe('/entities');
+      expect(root.querySelector('#ownership')?.textContent).toBe('Ownership');
+      expect(root.querySelector('#ownership-1')?.textContent).toBe('Ownership');
+      expect(
+        root.querySelector('.markdown-content img')?.getAttribute('src')
+      ).toBe(
+        `https://raw.githubusercontent.com/JBorgia/signal-tree/main/packages/${id}/diagram.svg`
+      );
+    }
+  );
+
+  it('resolves guide links from docs/guides rather than from a package or served asset path', async () => {
+    httpMock.expectOne('assets/docs/core/README.md').flush('# Initial');
+    await fixture.whenStable();
+    const target = component.packages.find(
+      (entry) => entry.id === 'composition-recipes'
+    )!;
+    component.selectPackage(target);
+    httpMock
+      .expectOne(target.readmePath)
+      .flush(
+        '[Architecture](../architecture/signaltree-architecture-guide.md)'
+      );
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(
+      fixture.nativeElement
+        .querySelector('.markdown-content a')
+        ?.getAttribute('href')
+    ).toBe(
+      'https://github.com/JBorgia/signal-tree/blob/main/docs/architecture/signaltree-architecture-guide.md'
+    );
+  });
+
+  it('does not replace the selected package with an older response', async () => {
+    const initial = httpMock.expectOne('assets/docs/core/README.md');
+    const vue = component.packages.find((entry) => entry.id === 'vue')!;
+    component.selectPackage(vue);
+    httpMock.expectOne(vue.readmePath).flush('# Vue setup');
+    await fixture.whenStable();
+    initial.flush('# Kernel setup');
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(component.selectedPackage().id).toBe('vue');
+    expect(
+      fixture.nativeElement.querySelector('.markdown-content h1')?.textContent
+    ).toBe('Vue setup');
+    expect(component.loading()).toBe(false);
   });
 });

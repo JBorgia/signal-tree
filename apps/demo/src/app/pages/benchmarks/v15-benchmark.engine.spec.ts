@@ -211,4 +211,59 @@ describe('v15 browser benchmark engine', () => {
     ]);
     expect(events).toContain('dispose:later');
   });
+
+  it('finishes an in-flight measurement then disposes every arm on cancellation', async () => {
+    const events: string[] = [];
+    const controller = new AbortController();
+    const first: BenchmarkArm = {
+      ...arm('first', 1, events),
+      createSample: async () => ({
+        measure: async () => {
+          events.push('measure:first');
+          controller.abort();
+          await Promise.resolve();
+          events.push('finished:first');
+          return { durationMs: 1, operations: workload.operations };
+        },
+        checksum: () => workload.expectedChecksum,
+        dispose: () => events.push('dispose:first'),
+      }),
+    };
+    const options = {
+      workload,
+      arms: [first, arm('second', 2, events)],
+      rounds: 3,
+      warmupRounds: 0,
+      signal: controller.signal,
+      settle: async () => undefined,
+    };
+    await expect(runInterleavedBenchmark(options)).rejects.toMatchObject({
+      name: 'AbortError',
+    });
+    expect(events).toEqual([
+      'create:second',
+      'measure:first',
+      'finished:first',
+      'dispose:first',
+      'dispose:second',
+    ]);
+  });
+
+  it('does not allocate samples for an already cancelled run', async () => {
+    const events: string[] = [];
+    const controller = new AbortController();
+    controller.abort();
+    const options = {
+      workload,
+      arms: [arm('first', 1, events)],
+      rounds: 1,
+      warmupRounds: 0,
+      signal: controller.signal,
+      settle: async () => undefined,
+    };
+    await expect(runInterleavedBenchmark(options)).rejects.toMatchObject({
+      name: 'AbortError',
+    });
+    expect(events).toEqual([]);
+  });
 });

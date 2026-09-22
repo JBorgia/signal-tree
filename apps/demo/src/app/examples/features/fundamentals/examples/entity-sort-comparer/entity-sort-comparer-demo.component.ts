@@ -1,7 +1,10 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { entityMap, signalTree } from '@signal-tree/angular';
 
-import { ExampleComponent } from '../../../../shared/components/example-shell';
+import {
+  ExampleComponent,
+  type CodeFile,
+} from '../../../../shared/components/example-shell';
 
 import type { EntityMapMarker } from '@signal-tree/angular';
 
@@ -29,39 +32,40 @@ interface LeaderboardState {
   imports: [ExampleComponent],
   template: `
     <div class="layout-frame">
-    <st-example
-      heading="Auto-sorted collection — sortComparer"
-      [headingLevel]="1"
-    >
-      <p intro class="muted">
-        <code
-          >entityMap&lt;Player&gt;({{ '{' }} sortComparer: (a, b) =&gt; b.score
-          - a.score {{ '}' }})</code
-        >
-        keeps <code>all()</code> highest-score-first on every read.
-      </p>
-
-      <div class="demo">
-        <div class="controls">
-          <button type="button" (click)="addRandom()">+ Add player</button>
-          <button type="button" (click)="bumpRandom()">↑ Bump a score</button>
-          <button type="button" (click)="reset()">Reset</button>
-        </div>
-
-        <ol class="board">
-          @for (p of players(); track p.id) {
-          <li>
-            <span class="rank">#{{ $index + 1 }}</span>
-            <span class="name">{{ p.name }}</span>
-            <span class="score">{{ p.score }}</span>
-          </li>
-          }
-        </ol>
-        <p class="muted">
-          Rows reorder automatically — no manual sort runs after mutations.
+      <st-example
+        heading="Auto-sorted collection — sortComparer"
+        [headingLevel]="1"
+        [code]="codeFiles"
+      >
+        <p intro class="muted">
+          <code
+            >entityMap&lt;Player&gt;({{ '{' }} sortComparer: (a, b) =&gt;
+            b.score - a.score {{ '}' }})</code
+          >
+          keeps <code>all()</code> highest-score-first on every read.
         </p>
-      </div>
-    </st-example>
+
+        <div class="demo">
+          <div class="controls">
+            <button type="button" (click)="addRandom()">+ Add player</button>
+            <button type="button" (click)="bumpRandom()">↑ Bump a score</button>
+            <button type="button" (click)="reset()">Reset</button>
+          </div>
+
+          <ol class="board">
+            @for (p of players(); track p.id) {
+            <li>
+              <span class="rank">#{{ $index + 1 }}</span>
+              <span class="name">{{ p.name }}</span>
+              <span class="score">{{ p.score }}</span>
+            </li>
+            }
+          </ol>
+          <p class="muted">
+            Rows reorder automatically — no manual sort runs after mutations.
+          </p>
+        </div>
+      </st-example>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -109,7 +113,31 @@ interface LeaderboardState {
     `,
   ],
 })
-export class EntitySortComparerDemoComponent {
+export class EntitySortComparerDemoComponent implements OnDestroy {
+  readonly codeFiles: CodeFile[] = [
+    {
+      label: 'Keep scores sorted',
+      language: 'typescript',
+      source: `import { entityMap, signalTree } from '@signal-tree/angular';
+
+const store = signalTree({
+  players: entityMap<Player, number>({
+    selectId: (p) => p.id,
+    sortComparer: (a, b) => b.score - a.score,
+  }),
+});
+store.$.players.addMany(initialPlayers);
+const player = store.$.players.byId(id)?.();
+if (player) store.$.players.updateOne(id, { score: player.score + 50 });
+store.$.players.all(); // highest score first
+// Call store.destroy() when its owner is torn down.`,
+    },
+  ];
+
+  ngOnDestroy(): void {
+    this.store.destroy();
+  }
+
   private nextId = 5;
   private readonly names = [
     'Ada',

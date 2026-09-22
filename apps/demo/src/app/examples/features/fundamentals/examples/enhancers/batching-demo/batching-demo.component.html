@@ -1,244 +1,155 @@
 <div class="batching-page layout-frame">
-  <header class="batching-hero">
-    <p class="eyebrow">Core concept / batching()</p>
-    <h1>Multiple writes. One coherent publication.</h1>
-    <p class="hero-statement">
-      <strong>Batching groups publication, not business jobs.</strong> Multiple
-      synchronous state writes can be grouped into one framework publication so
-      observers re-read one coherent final state.
-    </p>
-    <p class="hero-boundary">
-      Batching does not own HTTP retries, queues, delays, background work, or
-      failure recovery. Values still update immediately inside
-      <code>batch()</code>; transaction semantics are separate.
-    </p>
-  </header>
-
-  <section class="publication-model" aria-labelledby="model-heading">
-    <header class="section-heading">
-      <p class="eyebrow">The observable difference</p>
-      <h2 id="model-heading">Same writes, different publication boundaries</h2>
-    </header>
-
-    <div class="model-grid">
-      <article class="model-lane model-lane--unbatched">
-        <header>
-          <span class="lane-index">A</span>
-          <div>
-            <h3>Without explicit grouping</h3>
-            <p>Each write may be published before the next write begins.</p>
-          </div>
-        </header>
-        <ol class="flow-list">
-          <li>
-            <code>alice.postCount: 4 -&gt; 3</code>
-            <span>publication 1</span>
-          </li>
-          <li>
-            <code>bob.postCount: 2 -&gt; 3</code>
-            <span>publication 2</span>
-          </li>
-          <li>
-            <code>post.authorId: Alice -&gt; Bob</code>
-            <span>publication 3</span>
-          </li>
-        </ol>
-        <div class="observer-result observer-result--warning">
-          Observer can re-read two incomplete combinations before the final
-          state.
+  <st-example
+    heading="Group related writes"
+    [headingLevel]="1"
+    intro="Transfer a post and update both author counts. Inspect state between separate writes and after a grouped update."
+    [code]="codeFiles"
+  >
+    <section class="transfer-lab" aria-labelledby="lab-heading">
+      <header class="lab-header">
+        <div>
+          <p class="eyebrow">Interactive example</p>
+          <h2 id="lab-heading">Transfer Post #17 from Alice to Bob</h2>
+          <p>
+            The operation touches two user counters and the post owner. Run both
+            paths to inspect the state at explicit checkpoints.
+          </p>
         </div>
-      </article>
+        <div class="lab-controls">
+          <button type="button" (click)="runUnbatched()">Run unbatched</button>
+          <button type="button" class="primary-command" (click)="runBatched()">
+            Run batched
+          </button>
+          <button type="button" (click)="reset()">Reset</button>
+        </div>
+      </header>
 
-      <article class="model-lane model-lane--batched">
-        <header>
-          <span class="lane-index">B</span>
-          <div>
-            <h3>Inside <code>batch()</code></h3>
-            <p>All writes run synchronously before one publication is released.</p>
-          </div>
-        </header>
-        <div class="grouped-writes">
-          @for (step of writeSteps; track step.path) {
-          <code>{{ step.path }}</code>
+      <div class="state-board" aria-label="Current transfer state">
+        <article class="state-subject">
+          <span class="subject-kind">User A</span>
+          <h3>{{ alice.name() }}</h3>
+          <dl>
+            <dt>Post count</dt>
+            <dd>{{ alice.postCount() }}</dd>
+          </dl>
+        </article>
+        <div class="transfer-direction" aria-hidden="true">&rarr;</div>
+        <article class="state-subject">
+          <span class="subject-kind">User B</span>
+          <h3>{{ bob.name() }}</h3>
+          <dl>
+            <dt>Post count</dt>
+            <dd>{{ bob.postCount() }}</dd>
+          </dl>
+        </article>
+        <article class="state-subject state-subject--post">
+          <span class="subject-kind">Post #{{ featuredPost.id() }}</span>
+          <h3>{{ featuredPost.title() }}</h3>
+          <dl>
+            <dt>Current author</dt>
+            <dd>{{ postAuthor() }}</dd>
+          </dl>
+        </article>
+      </div>
+
+      <dl class="run-metrics" aria-label="Current run observations">
+        <div>
+          <dt>Writes performed</dt>
+          <dd>{{ writesPerformed() }}</dd>
+        </div>
+        <div>
+          <dt>Recorded checkpoints</dt>
+          <dd>{{ publicationTimeline().length }}</dd>
+        </div>
+        <div>
+          <dt>Inconsistent checkpoints</dt>
+          <dd>{{ intermediateStatesVisible() }}</dd>
+        </div>
+        <div>
+          <dt>Final state coherent</dt>
+          <dd>{{ finalStateCoherent() ? 'Yes' : 'No' }}</dd>
+        </div>
+      </dl>
+
+      <div class="run-comparison" aria-label="Run comparison">
+        <div>
+          <span>Unbatched result</span>
+          @if (unbatchedSummary(); as summary) {
+          <strong>{{ summary.publications }} checkpoints</strong>
+          <small
+            >{{ summary.intermediateStates }} inconsistent checkpoints</small
+          >
+          } @else {
+          <strong>Not run</strong>
+          <small>Run the comparison path.</small>
           }
         </div>
-        <div class="publication-boundary">
-          <span>publication boundary</span>
+        <div>
+          <span>Batched result</span>
+          @if (batchedSummary(); as summary) {
+          <strong>{{ summary.publications }} checkpoint</strong>
+          <small
+            >{{ summary.intermediateStates }} inconsistent checkpoints</small
+          >
+          } @else {
+          <strong>Not run</strong>
+          <small>Run the grouped path.</small>
+          }
         </div>
-        <div class="observer-result observer-result--coherent">
-          Observer re-reads Alice 3, Bob 3, and Post #17 owned by Bob.
-        </div>
-      </article>
-    </div>
-  </section>
+      </div>
+    </section>
 
-  <section class="transfer-lab" aria-labelledby="lab-heading">
-    <header class="lab-header">
-      <div>
-        <p class="eyebrow">Interactive proof</p>
-        <h2 id="lab-heading">Transfer Post #17 from Alice to Bob</h2>
+    <section class="timeline-section" aria-labelledby="timeline-heading">
+      <header class="section-heading">
+        <p class="eyebrow">Demo instrumentation</p>
+        <h2 id="timeline-heading">State at each checkpoint</h2>
         <p>
-          The operation touches two user counters and the post owner. Run both
-          paths to compare what the publication observer receives.
+          The demo reads state after each explicit
+          <code>flushNotifications()</code>: three checkpoints in the separate
+          path, one in the grouped path. These counts are chosen by the example,
+          not measured observer or render counts.
         </p>
-      </div>
-      <div class="lab-controls">
-        <button type="button" (click)="runUnbatched()">Run unbatched</button>
-        <button type="button" class="primary-command" (click)="runBatched()">
-          Run batched
-        </button>
-        <button type="button" (click)="reset()">Reset</button>
-      </div>
-    </header>
+      </header>
 
-    <div class="state-board" aria-label="Current transfer state">
-      <article class="state-subject">
-        <span class="subject-kind">User A</span>
-        <h3>{{ alice.name() }}</h3>
-        <dl>
-          <dt>Post count</dt>
-          <dd>{{ alice.postCount() }}</dd>
-        </dl>
-      </article>
-      <div class="transfer-direction" aria-hidden="true">&rarr;</div>
-      <article class="state-subject">
-        <span class="subject-kind">User B</span>
-        <h3>{{ bob.name() }}</h3>
-        <dl>
-          <dt>Post count</dt>
-          <dd>{{ bob.postCount() }}</dd>
-        </dl>
-      </article>
-      <article class="state-subject state-subject--post">
-        <span class="subject-kind">Post #{{ featuredPost.id() }}</span>
-        <h3>{{ featuredPost.title() }}</h3>
-        <dl>
-          <dt>Current author</dt>
-          <dd>{{ postAuthor() }}</dd>
-        </dl>
-      </article>
-    </div>
-
-    <dl class="run-metrics" aria-label="Current run observations">
-      <div>
-        <dt>Writes performed</dt>
-        <dd>{{ writesPerformed() }}</dd>
-      </div>
-      <div>
-        <dt>Observer publications</dt>
-        <dd>{{ publicationTimeline().length }}</dd>
-      </div>
-      <div>
-        <dt>Intermediate states visible</dt>
-        <dd>{{ intermediateStatesVisible() }}</dd>
-      </div>
-      <div>
-        <dt>Final state coherent</dt>
-        <dd>{{ finalStateCoherent() ? 'Yes' : 'No' }}</dd>
-      </div>
-    </dl>
-
-    <div class="run-comparison" aria-label="Run comparison">
-      <div>
-        <span>Unbatched result</span>
-        @if (unbatchedSummary(); as summary) {
-        <strong>{{ summary.publications }} publications</strong>
-        <small>{{ summary.intermediateStates }} intermediate states</small>
-        } @else {
-        <strong>Not run</strong>
-        <small>Run the comparison path.</small>
-        }
-      </div>
-      <div>
-        <span>Batched result</span>
-        @if (batchedSummary(); as summary) {
-        <strong>{{ summary.publications }} publication</strong>
-        <small>{{ summary.intermediateStates }} intermediate states</small>
-        } @else {
-        <strong>Not run</strong>
-        <small>Run the grouped path.</small>
-        }
-      </div>
-    </div>
-  </section>
-
-  <section class="timeline-section" aria-labelledby="timeline-heading">
-    <header class="section-heading">
-      <p class="eyebrow">Demo instrumentation</p>
-      <h2 id="timeline-heading">Observation timeline</h2>
-      <p>
-        This timeline is produced by the page after each explicit
-        <code>flushNotifications()</code>. SignalTree does not retain these
-        presentation records as causal history.
-      </p>
-    </header>
-
-    <div class="timeline">
-      @for (entry of publicationTimeline(); track entry.index) {
-      <article class="timeline-entry" [class.timeline-entry--coherent]="entry.coherent">
-        <div class="timeline-marker">{{ entry.index }}</div>
-        <div class="timeline-copy">
-          <span>{{ entry.label }}</span>
-          <strong>{{ entry.coherent ? 'Coherent state' : 'Intermediate state' }}</strong>
+      <div class="timeline">
+        @for (entry of publicationTimeline(); track entry.index) {
+        <article
+          class="timeline-entry"
+          [class.timeline-entry--coherent]="entry.coherent"
+        >
+          <div class="timeline-marker">{{ entry.index }}</div>
+          <div class="timeline-copy">
+            <span>{{ entry.label }}</span>
+            <strong>{{
+              entry.coherent ? 'Coherent state' : 'Intermediate state'
+            }}</strong>
+          </div>
+          <dl>
+            <div>
+              <dt>Alice</dt>
+              <dd>{{ entry.alicePostCount }}</dd>
+            </div>
+            <div>
+              <dt>Bob</dt>
+              <dd>{{ entry.bobPostCount }}</dd>
+            </div>
+            <div>
+              <dt>Post owner</dt>
+              <dd>{{ entry.postAuthor }}</dd>
+            </div>
+          </dl>
+        </article>
+        } @empty {
+        <div class="timeline-empty">
+          Choose a run mode to record the transfer checkpoints.
         </div>
-        <dl>
-          <div><dt>Alice</dt><dd>{{ entry.alicePostCount }}</dd></div>
-          <div><dt>Bob</dt><dd>{{ entry.bobPostCount }}</dd></div>
-          <div><dt>Post owner</dt><dd>{{ entry.postAuthor }}</dd></div>
-        </dl>
-      </article>
-      } @empty {
-      <div class="timeline-empty">
-        Choose a run mode to publish the transfer observations.
+        }
       </div>
-      }
-    </div>
-  </section>
-
-  <section class="ownership-section" aria-labelledby="ownership-heading">
-    <header class="section-heading">
-      <p class="eyebrow">Keep the boundaries separate</p>
-      <h2 id="ownership-heading">Three different responsibilities</h2>
-    </header>
-    <div class="ownership-grid">
-      <article>
-        <span>Batching</span>
-        <h3>Coherent publication</h3>
-        <p>Groups owner invalidation so framework observers re-read once.</p>
-      </article>
-      <article>
-        <span>Transactions</span>
-        <h3>Pending operation semantics</h3>
-        <p>Adds confirmation and rollback around a distinct operation boundary.</p>
-      </article>
-      <article>
-        <span>Application orchestration</span>
-        <h3>Network and job policy</h3>
-        <p>{{ nonResponsibilities.join(', ') }} remain application concerns.</p>
-      </article>
-    </div>
-  </section>
-
-  <section class="principles" aria-label="Batching principles">
-    <article>
-      <span>01</span>
-      <h3>Coherent publication</h3>
-      <p>Related writes become one framework-facing publication.</p>
-    </article>
-    <article>
-      <span>02</span>
-      <h3>No partial observation</h3>
-      <p>Observers need not render an intermediate member of the operation.</p>
-    </article>
-    <article>
-      <span>03</span>
-      <h3>Framework-neutral semantics</h3>
-      <p>The kernel owns grouping; framework realizations own delivery.</p>
-    </article>
-    <article>
-      <span>04</span>
-      <h3>Separate from transactions</h3>
-      <p>Batching changes publication timing, not rollback or confirmation.</p>
-    </article>
-  </section>
+    </section>
+  </st-example>
+  <p class="hero-boundary">
+    Values change immediately inside <code>batch()</code>. Confirmation and
+    rollback belong to transactions; retries and queues remain application
+    concerns.
+  </p>
 </div>
