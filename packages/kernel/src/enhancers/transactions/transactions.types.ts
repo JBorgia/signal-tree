@@ -18,7 +18,7 @@ export interface TransactionMethods {
    * multi-writer workflow and given a review projection. See the PROPOSAL-0
    * block at the foot of this file.
    */
-  proposal(fn: () => void): Proposal;
+  propose(fn: () => void): Proposal;
 }
 
 export interface PendingTransaction {
@@ -37,7 +37,7 @@ export interface PendingTransaction {
 //
 // Every member below maps mechanically onto machinery that already shipped:
 //
-//     proposal()                 -> transaction()
+//     propose()                 -> transaction()
 //     inspect()                  -> classify retained effects vs later effects
 //     accept()                   -> confirm()
 //     reject()                   -> rollback()
@@ -45,13 +45,13 @@ export interface PendingTransaction {
 // Restoration is NOT fused in. `undoable()` stays `undoable()`, wrapped by the
 // caller around the proposal's WRITES:
 //
-//     undoable(() => { proposal = store.proposal(() => applyResult(r)); });
+//     undoable(() => { proposal = store.propose(() => applyResult(r)); });
 //     ...review...
 //     proposal.accept();          // one undo unit
 //
 // An earlier draft offered `accept({ undoable: true })`. Implementing it proved
 // it CANNOT be composition — `undoable()` designates the causal turn containing
-// its writes, and a proposal's writes happen at `proposal()` time, so wrapping
+// its writes, and a proposal's writes happen at `propose()` time, so wrapping
 // `confirm()` designates nothing. Measured 0 undo entries against 1 for
 // wrapping the proposal. The option was deleted rather than kept as a
 // placeholder, so this surface is smaller than the one that was frozen.
@@ -107,7 +107,7 @@ export interface Proposal {
    *
    * Does NOT enroll in restoration, and takes no option to. `undoable()`
    * designates the causal turn containing its WRITES, and a proposal's writes
-   * happen when `proposal()` runs — so an `accept()`-time flag could only be
+   * happen when `propose()` runs — so an `accept()`-time flag could only be
    * honoured by retroactively designating a turn, which is a new authority
    * rule this facade exists to avoid. Measured: wrapping `confirm()` alone
    * designates nothing.
@@ -118,7 +118,7 @@ export interface Proposal {
    * ```ts
    * let proposal!: Proposal;
    * undoable(() => {
-   *   proposal = store.proposal(() => applyResult(result));
+   *   proposal = store.propose(() => applyResult(result));
    * });
    * // ...human reviews for as long as needed...
    * proposal.accept();   // one undo unit

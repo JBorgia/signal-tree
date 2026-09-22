@@ -12,7 +12,7 @@ import { transactions } from './transactions';
  *
  * The adversarial matrix was already run against the raw primitives in
  * `proposal-0-kernel.spec.ts` BEFORE this facade existed. This file re-runs
- * the load-bearing cases through `proposal()` and asserts the two surfaces
+ * the load-bearing cases through `propose()` and asserts the two surfaces
  * agree — which is what makes "naming, not new semantics" checkable rather
  * than merely claimed. The lower-level transaction specs stay: if these two
  * ever disagree, the facade grew a rule of its own.
@@ -59,7 +59,7 @@ describe('PROPOSAL-0 facade / accept', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.proposal(() => {
+    const proposal = t.propose(() => {
       t.$.name('Samuel');
     });
     await flush();
@@ -78,7 +78,7 @@ describe('PROPOSAL-0 facade / reject', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.proposal(() => {
+    const proposal = t.propose(() => {
       t.$.name('Samuel');
       t.$.priority(3);
     });
@@ -101,7 +101,7 @@ describe('PROPOSAL-0 facade / inspect', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.proposal(() => {
+    const proposal = t.propose(() => {
       t.$.name('FromAgent');
       t.$.priority(3);
     });
@@ -125,7 +125,7 @@ describe('PROPOSAL-0 facade / inspect', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.proposal(() => {
+    const proposal = t.propose(() => {
       t.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
     await flush();
@@ -144,7 +144,7 @@ describe('PROPOSAL-0 facade / inspect', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.proposal(() => {
+    const proposal = t.propose(() => {
       t.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
     await flush();
@@ -166,7 +166,7 @@ describe('PROPOSAL-0 facade / accept closes the inspect race', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.proposal(() => {
+    const proposal = t.propose(() => {
       t.$.name('FromAgent');
     });
     await flush();
@@ -192,7 +192,7 @@ describe('PROPOSAL-0 facade / restoration stays orthogonal', () => {
     await flush();
     const base = t.getRestorationHistory().length;
 
-    t.proposal(() => {
+    t.propose(() => {
       t.$.name('Samuel');
     }).accept();
     await flush();
@@ -205,14 +205,14 @@ describe('PROPOSAL-0 facade / restoration stays orthogonal', () => {
     await flush();
     const base = t.getRestorationHistory().length;
 
-    t.proposal(() => {
+    t.propose(() => {
       t.$.name('Samuel');
     }).accept();
     await flush();
 
     let proposal!: ReturnType<typeof t.proposal>;
     undoable(() => {
-      proposal = t.proposal(() => {
+      proposal = t.propose(() => {
         t.$.name('Agent');
         t.$.priority(4);
       });
@@ -245,7 +245,7 @@ describe('PROPOSAL-0 facade / restoration stays orthogonal', () => {
 
     let proposal!: ReturnType<typeof t.proposal>;
     undoable(() => {
-      proposal = t.proposal(() => {
+      proposal = t.propose(() => {
         t.$.name('Agent');
       });
     });
@@ -265,7 +265,7 @@ describe('PROPOSAL-0 facade / restoration stays orthogonal', () => {
 
     let proposal!: ReturnType<typeof t.proposal>;
     undoable(() => {
-      proposal = t.proposal(() => {
+      proposal = t.propose(() => {
         t.$.name('Agent');
         t.$.priority(4);
       });
@@ -288,7 +288,7 @@ describe('PROPOSAL-0 facade / reject refusal is not swallowed', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.proposal(() => {
+    const proposal = t.propose(() => {
       t.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
     await flush();
@@ -306,11 +306,11 @@ describe('PROPOSAL-0 facade / two proposals outstanding', () => {
     const t = tree();
     await flush();
 
-    const first = t.proposal(() => {
+    const first = t.propose(() => {
       t.$.name('FromA');
     });
     await flush();
-    const second = t.proposal(() => {
+    const second = t.propose(() => {
       t.$.priority(9);
     });
     await flush();
@@ -333,7 +333,7 @@ describe('PROPOSAL-0 facade / equivalence with the raw primitives', () => {
     await flush();
 
     viaFacade
-      .proposal(() => {
+      .propose(() => {
         viaFacade.$.name('X');
         viaFacade.$.rows.addOne({ id: 'A', name: 'Alpha' });
       })
@@ -355,7 +355,7 @@ describe('PROPOSAL-0 facade / equivalence with the raw primitives', () => {
     const viaRaw = tree();
     await flush();
 
-    const p = viaFacade.proposal(() => {
+    const p = viaFacade.propose(() => {
       viaFacade.$.name('X');
       viaFacade.$.rows.addOne({ id: 'A', name: 'Alpha' });
     });
@@ -385,7 +385,7 @@ describe('PROPOSAL-0 facade / double settlement', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.proposal(() => {
+    const proposal = t.propose(() => {
       t.$.name('Samuel');
     });
     await flush();
@@ -401,7 +401,7 @@ describe('PROPOSAL-0 facade / double settlement', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.proposal(() => {
+    const proposal = t.propose(() => {
       t.$.name('Samuel');
     });
     await flush();
@@ -415,7 +415,7 @@ describe('PROPOSAL-0 facade / double settlement', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.proposal(() => {
+    const proposal = t.propose(() => {
       t.$.name('Samuel');
     });
     await flush();
@@ -431,7 +431,7 @@ describe('PROPOSAL-0 facade / double settlement', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.proposal(() => {
+    const proposal = t.propose(() => {
       t.$.name('Samuel');
     });
     await flush();
@@ -447,7 +447,7 @@ describe('PROPOSAL-0 facade / double settlement', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.proposal(() => {
+    const proposal = t.propose(() => {
       t.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
     await flush();
@@ -468,7 +468,7 @@ describe('PROPOSAL-0 facade / double settlement', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.proposal(() => {
+    const proposal = t.propose(() => {
       t.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
     await flush();

@@ -1,14 +1,14 @@
 ## Unreleased
 
-**TL;DR** — Additive. One new method (`tree.proposal()`) and five new public
+**TL;DR** — Additive. One new method (`tree.propose()`) and five new public
 types. No existing API is removed or renamed. Two transaction rollback
 correctness defects are fixed: a rejected turn that could previously strand
 unrelated speculative values now reverses them. Nothing to migrate.
 
 ### For users
 
-- **`proposal()` — reviewing a change before it lands.** `transactions()` now
-  also provides `tree.proposal(fn)`: the same pending turn, named for the
+- **`propose()` — reviewing a change before it lands.** `transactions()` now
+  also provides `tree.propose(fn)`: the same pending turn, named for the
   workflow where somebody reviews a change first. `inspect()` reports whether
   each proposed change still represents current truth, `accept()` commits and
   returns that inspection as settled, `reject()` withdraws. New types:

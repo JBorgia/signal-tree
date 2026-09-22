@@ -1787,7 +1787,7 @@ not exist as composition. Deleted outright rather than left as a placeholder,
 so the public surface got SMALLER than the frozen design.
 
 ```ts
-const proposal = store.proposal(() => {
+const proposal = store.propose(() => {
   // synchronous writes
 });
 
@@ -1804,7 +1804,7 @@ proposal's WRITES, never the acceptance:
 ```ts
 let proposal!: Proposal;
 undoable(() => {
-  proposal = store.proposal(() => applyResult(result));
+  proposal = store.propose(() => applyResult(result));
 });
 // ...human reviews for as long as needed...
 proposal.accept(); // one undo unit
@@ -1814,7 +1814,7 @@ proposal.accept(); // one undo unit
 DECISION                         EVIDENCE
 accept NEVER enrolls, and takes  `undoable()` designates the causal turn
 no option to                     containing its WRITES. A proposal's writes
-                                 happen at proposal() time, so wrapping
+                                 happen at propose() time, so wrapping
                                  confirm() alone designates NOTHING — measured
                                  0 entries, against 1 for wrapping the
                                  proposal. An accept-time flag could only work
@@ -1824,7 +1824,7 @@ designation survives the gap     wrapping the proposal and confirming three
                                  ticks later still yields exactly one undo
                                  unit, so the compositional form serves a real
                                  review delay
-no Option B sugar yet            `proposal(fn, { undoable: true })` would work,
+no Option B sugar yet            `propose(fn, { undoable: true })` would work,
                                  but the composition is short and no consumer
                                  has asked. No API by analogy.
 accept returns a snapshot        closes the inspect->accept race; measured not
@@ -1858,7 +1858,7 @@ mutation-checked — breaking the proposal block fails under both bundler and
 node16 resolution.
 
 **Phase B needs no export-plumbing work.** `api-baseline` showed the types
-already reach all four adapter barrels by facade re-export, and `proposal()`
+already reach all four adapter barrels by facade re-export, and `propose()`
 rides on the tree. Phase B is realization conformance only.
 
 #### WRITE-CONTEXT-0
@@ -2119,7 +2119,7 @@ enough that a newcomer never walks into the record by accident.
 
 ### Finding 3 — the proposal-vocabulary objection, and how it resolved
 
-The audit challenged whether `proposal()` was a sixth vocabulary family over
+The audit challenged whether `propose()` was a sixth vocabulary family over
 machinery that already had one. Half of that survived contact with the
 implementation, and the disposition lives in `PROPOSAL-0` above, not here:
 
@@ -2144,7 +2144,7 @@ If either stops holding, the split reopens.
 
 Its sketch of the proposal API included `p.accept({ undoable: true })`. That
 option was **falsified during implementation**: `undoable()` designates the
-causal turn containing its WRITES, a proposal's writes happen at `proposal()`
+causal turn containing its WRITES, a proposal's writes happen at `propose()`
 time, and an accept-time flag could only work by retroactively designating a
 settled turn. See the C-double-prime decision table.
 
@@ -2228,6 +2228,418 @@ RETIRED-SUBJECT-SLOPE-STABILITY-0  independent release-infrastructure repair
 ```
 
 None of the three gates another.
+
+## PUBLIC-API-GRAMMAR-0 — opened 2026-09-22
+
+**Supersedes the `proposal()` -> `propose()` rename as a standalone change.**
+That rename is correct and is already applied in the working tree, but shipping
+it alone would fix one name and leave the grammar it implies unstated. The
+question is not what to call one method. It is whether SignalTree has ONE
+grammar or a set of individually reasonable names.
+
+**Blocks: no new public callable ships until this reports.** That includes
+`propose()`, which has not shipped and therefore costs nothing to hold.
+
+### The rule
+
+> **Public callable names describe what calling them does. Public types and
+> returned handles describe what they are. Factories name what they construct.
+> Qualifiers describe the writes inside their scope.**
+
+Five categories. Every public callable gets exactly one, recorded, before it
+can be exported.
+
+```text
+COMMAND     changes state, settles, or ends a lifetime        VERB
+            transact() propose() confirm() rollback() accept() reject()
+            undo() redo() destroy() dispose() addOne() updateOne()
+
+QUERY       observes, locates or describes; mutates nothing   NOUN / PREDICATE
+            byId() all() canUndo() inspect() retrieve()
+
+FACTORY     constructs or configures a thing                  CONCEPT NAME
+            signalTree() entityMap() transactions() restoration()
+            batching() devTools() leaf()
+
+QUALIFIER   classifies the writes inside its callback         ADJECTIVE / DOMAIN
+            undoable() external()
+
+EVENT       registers a subscription                          on<Thing>
+            onTreeError()
+```
+
+The categories exist to stop the rule degrading into "every function must be a
+verb", which would produce a worse API. `byId()` is not a naming defect; it is
+a query, and queries read as what they return.
+
+**`undoable()` and `external()` are the load-bearing proof that this is a
+system and not a preference.** They are not commands. They do not mean _perform
+undoable_. They classify the enclosed writes, and their adjective naming is how
+they say so:
+
+```text
+undoable(() => ...)     these writes are undoable
+external(() => ...)     these writes are external truth
+transact(() => ...)     transact these writes
+propose(() => ...)      propose these writes
+```
+
+**Not Redux Actions.** A method here is an action in the ordinary English
+sense — calling it does something. No `Action` type, no dispatch, no serialized
+command object, and no reducer. This distinction is recorded because the word
+invites exactly that misreading.
+
+### The factory/operation pair is self-documenting, and deliberate
+
+```text
+transactions()   plural noun, a FACTORY    installs the capability
+transact()       verb, a COMMAND           performs the operation
+```
+
+```ts
+const store = signalTree(state, { enhancers: [transactions()] });
+const tx = store.transact(() => { ... });
+```
+
+Same shape for restoration:
+
+```ts
+enhancers: [restoration()]   // factory: install the capability
+undoable(() => { ... })      // qualifier: classify the writes
+store.undo();                // command: perform the operation
+```
+
+That is three categories doing three jobs with three naming shapes, in one
+example. It is worth keeping precisely because a reader can infer the layering
+from the syntax without being told.
+
+### What this makes explainable
+
+The public explanation of Proposal stops being an implementation fact:
+
+```text
+WAS   "proposal() is a facade over transactions"
+IS    "use transact() when the caller settles the operation;
+       use propose() when it is reviewed before settlement"
+```
+
+"Facade" is an architecture classification. It belongs in the architecture
+documents, not in the getting-started mental model.
+
+### The gate — an inventory, not a parser
+
+**Do not try to decide whether English is a verb.** That is brittle and would
+fail on `inspect`, `retrieve` and every predicate. The gate asks a question
+that has a checkable answer:
+
+> Is every public callable deliberately classified, and did anything reach the
+> public surface without a classification?
+
+```yaml
+# tools/api-grammar.yaml — committed inventory, one entry per public callable
+transact: { category: command, since: '16.0.0' }
+propose: { category: command, since: '16.0.0' }
+confirm: { category: command }
+rollback: { category: command }
+inspect: { category: query }
+accept: { category: command }
+reject: { category: command }
+byId: { category: query }
+undoable: { category: qualifier }
+external: { category: qualifier }
+signalTree: { category: factory }
+entityMap: { category: factory }
+transactions: { category: factory }
+onTreeError: { category: event }
+transaction:
+  category: command
+  disposition: rename
+  replacement: transact
+  removed_in: '16.0.0'
+```
+
+**The gate must key on CALLABLES, not on exports.** `proposal()` entered the
+public surface as a method added to an existing exported interface —
+`TransactionMethods` — and no export changed. An export-diffing gate would not
+have seen it. `tools/api-baseline.json` has the same blind spot: it tracks
+exported symbols, and it recorded five new TYPES for this feature while the
+method that returns them was invisible to it.
+
+An exception is allowed and must carry a recorded rationale, the same way
+`check-release-claims.mjs` exemptions do today.
+
+### Documentation follows the same taxonomy
+
+The API reference stops being alphabetical and becomes the categories, which is
+what a newcomer actually navigates by:
+
+```text
+Create        signalTree() entityMap() leaf()
+Configure     transactions() restoration() batching() devTools()
+Change state  set() addOne() updateOne() removeOne() transact() propose()
+Review/settle inspect() confirm() rollback() accept() reject()
+Reverse       undo() redo()
+Read          byId() all() canUndo() canRedo()
+Classify      undoable() external()
+Lifecycle     destroy() dispose()
+```
+
+This is DX-ROADMAP-0 item 2 (the goal-based recipe index) arriving from the
+other direction, and the two must produce the same grouping or one of them is
+wrong.
+
+### Inventory — kernel, classified
+
+Taken from the root barrel and the exported interfaces, not from prose. Every
+line below is a callable an application can invoke.
+
+```text
+FACTORY     signalTree() leaf() entityMap() builder.build()
+            transactions() restoration() batching() devTools()
+            builder.computed(name, fn)
+
+QUALIFIER   undoable() external()
+
+EVENT       onTreeError()
+
+COMMAND     tree.destroy() tree.registerCleanup() tree.updateAndReport()
+            leaf(value) leaf(updater) entityNode(value) entityNode(updater)
+            addOne() addMany() prependOne() prependMany() upsertOne()
+            upsertMany() updateOne() updateMany() updateWhere() replaceOne()
+            removeOne() removeMany() removeWhere() setAll() clear()
+            changeId() setActiveId() clearActiveId()
+            transact()* propose()* confirm() rollback() accept() reject()
+            undo() redo() jumpTo() resetRestorationHistory()
+            batch() coalesce() flushNotifications()
+            connectDevTools() disconnectDevTools() exportDebugSession()
+            link.retrieve() link.dispose()
+
+QUERY       leaf() entityNode() byId() byIdOrFail() all() count() ids()
+            has() asMap() where() find() activeId() activeEntity()
+            canUndo() canRedo() getRestorationHistory() getCurrentIndex()
+            hasPendingNotifications() proposal.inspect() tree.destroyed
+            asReadonly()
+
+            * not yet shipped under this name
+```
+
+**`link.retrieve()` is a COMMAND, not a query, and the name survives anyway.**
+It reads like a fetch but it WRITES the endpoint's value into the source. The
+rule classifies by what calling it does, not by how the word sounds, and
+"retrieve these values into the tree" is an accurate command reading.
+
+**`asReadonly()` is a QUERY, not a factory.** It returns the same runtime
+object with a narrowed type — it constructs nothing. Recorded because the
+`as`-prefix invites the factory reading.
+
+### The rename set
+
+Each entry cites the rule it violates. A name that merely reads oddly while
+classifying correctly is NOT in this set.
+
+```text
+CONFIRMED — the classification and the name disagree
+
+transaction() -> transact()
+    COMMAND named as a noun. Calling it opens and performs an operation;
+    it constructs no configuration. Shipped in 15.2.1, so it carries the
+    deprecation window described under Sequencing.
+
+proposal() -> propose()
+    Same defect, never shipped. ALREADY APPLIED in the working tree
+    (53 occurrences across 13 files, kernel + 4 adapters + docs + tools).
+
+empty() -> isEmpty()
+    QUERY named as a command verb, and it sits directly beside clear(),
+    which IS the command that empties the collection. Two adjacent names
+    where the imperative-sounding one is the reader and the plain one is
+    the mutator. This is the worst single pairing the inventory found.
+```
+
+```text
+NEEDS DISPOSITION — a real mismatch, but the replacement is not derivable
+                     from the rule alone
+
+settled() -> ?
+    QUERY on Link returning Promise<void>. Past-participle naming reads as
+    a state predicate ("is it settled?") while the call is a wait.
+    whenSettled() states the wait; settled() matches the handle's other
+    bare names. Needs a decision, not a default.
+
+tap() / intercept()
+    Both register handlers and return an unsubscribe, which is the EVENT
+    category, whose shape in this API is on<Thing> (onTreeError). Neither
+    follows it. `tap` additionally borrows RxJS, which the glossary work
+    already avoided once for `subject`. Disposition required: adopt the
+    event shape, or record why collection observation is exempt.
+
+exportDebugSession()
+    Classified COMMAND above because "export" is a verb, but it mutates
+    nothing — it describes. If it is a QUERY the name is still fine, which
+    is why it is here rather than in the confirmed set: the category is
+    ambiguous and the name survives either reading.
+```
+
+```text
+ALREADY TRACKED in "## 5b. Naming: finish the pass" — do not duplicate
+
+getRestorationHistory() / getCurrentIndex()   5b item 3. get-prefixed queries
+                                              in a library of bare-noun
+                                              queries; both move to the
+                                              devtools surface anyway
+byIdOrFail()                                  5b item 5
+batchUpdate                                   5b item 1, deletion not rename
+resetRestorationHistory()                     5b item 4, ANSWERED: no rename,
+                                              the name is accurate
+```
+
+```text
+EXPLICITLY NOT RENAMED — classified, correct, and staying
+
+byId() all() count() ids() has() asMap() where() find()
+activeId() activeEntity() canUndo() canRedo() inspect()
+    QUERIES. Queries read as what they return. "Not an imperative verb" is
+    not a defect.
+
+signalTree() entityMap() transactions() restoration() batching() devTools()
+    FACTORIES. They construct or configure; noun naming is the rule, not an
+    exception to it.
+
+undoable() external()
+    QUALIFIERS. They classify the enclosed writes and their adjective form
+    is how they communicate that.
+
+retrieve() confirm() rollback() accept() reject() undo() redo() destroy()
+dispose() batch() coalesce() jumpTo() and every entity mutator
+    COMMANDS, already verbs.
+```
+
+### Inventory — adapters
+
+The adapters own almost no vocabulary. Everything else they expose arrives by
+`export * from '@signal-tree/kernel'` and is governed by the kernel rows above.
+
+```text
+angular   signalTree()        FACTORY, re-typed kernel factory
+          asReadonly()        QUERY, re-typed
+          defineStore()       FACTORY — constructs an injectable service type
+          toWritableSignal()  QUERY — converts a branch to a WritableSignal
+
+react     useSignalTree()     FACTORY/hook — EXEMPT, see below
+
+vue       signalTree() asReadonly()   re-typed only, no owned vocabulary
+solid     signalTree() asReadonly()   re-typed only, no owned vocabulary
+```
+
+**Consequence for 16.0.0: the blast radius is almost entirely kernel.** No
+adapter owns a name this audit proposes to change. A rename release touches
+four packages' re-exports and their docs, not four packages' APIs.
+
+### Framework convention overrides the grammar — an explicit exemption
+
+```text
+useSignalTree()     React REQUIRES the use* prefix for a hook. The convention
+                    is not optional and not ours to improve.
+toWritableSignal()  Angular's established to*() conversion idiom (toSignal,
+                    toObservable). Matching the host framework is worth more
+                    than matching our own query naming.
+defineStore()       define* is the idiom the Angular ecosystem uses for this
+                    exact job, and Pinia uses it for the same concept in Vue.
+```
+
+The rule: **where a host framework mandates or strongly establishes a shape,
+the framework wins, and the exemption is recorded with the convention it
+follows.** A grammar gate that flagged `useSignalTree` would be wrong, and a
+gate nobody trusts gets disabled.
+
+### Sequencing — ONE correction to the proposed plan
+
+The plan as proposed is "make the break once, as 16.0.0, with no alias period."
+The intent is right and the shape needs one change, because of a commitment
+this repository published two days ago in `docs/support-policy.md`:
+
+> A deprecated API gets a documented migration path before removal, except
+> where keeping it would preserve a correctness or security defect.
+
+`transaction()` is a shipped 15.2.1 public API. Renaming it is not a
+correctness defect — it is a grammar defect — so the exception does not apply,
+and removing it in 16.0.0 with no prior deprecation would break the versioning
+commitment in the release immediately after making it. DX-ROADMAP-0 already
+records why that specific move is expensive: the policy is good now, the
+REPUTATION is not, and only boring compatibility repairs it.
+
+**The correction is small, and it is not "aliases for years".** The rejected
+thing is a permanent double vocabulary. A bounded, declared window is a
+different object:
+
+```text
+15.3.0 — MINOR, additive, policy-compliant
+  transact()      ADDED, the final grammar
+  propose()       ADDED, new; never shipped under the old name
+  transaction()   @deprecated, with the one-line migration in the JSDoc
+                  and in the release notes. Still works. Still tested.
+
+16.0.0 — MAJOR, deliberately boring
+  transaction()   REMOVED
+  plus every other rename this audit proves, applied together
+  NOTHING ELSE: no new semantics, no architecture, no opportunistic features
+```
+
+Two things this buys that the no-window version does not:
+
+1. **Phase B targets final names immediately.** The conformance contract can be
+   written against `transact()`/`propose()` in 15.3 and never rewritten.
+2. **No user ever has to adopt a name that is already scheduled to die.** In
+   the no-window version, anyone who adopts Proposal in 15.x writes
+   `transaction()` beside `propose()` and then has to change one of them.
+
+The alias window is ONE minor line, declared at the moment it opens, with the
+removal version named in the deprecation text. If that is still judged too
+expensive, the alternative is to hold `propose()` and the whole grammar for
+16.0.0 and ship nothing public in between — which is coherent, but it delays
+Proposal by a major cycle for a naming reason.
+
+**This is the one decision in this track that is not mine to derive.** Both
+paths are defensible; they differ in what SignalTree is telling its users about
+whether the versioning commitment means anything yet.
+
+### Interaction with the tracks already open
+
+```text
+PROPOSAL-0        Phase B HELD until the rename set is approved. Its contract
+                  must be written against final names ONCE. It is 4 adapter
+                  spec files plus a shared contract; rewriting them after a
+                  rename is pure waste, and two React cases are failing right
+                  now for reasons that have nothing to do with naming.
+DX-ROADMAP-0      item 6 ("freeze the public API") now starts at 16.0.0, not
+                  at Proposal's ship. Recorded there so the two do not
+                  contradict each other.
+RETIRED-SUBJECT-  unaffected.
+SLOPE-STABILITY-0
+```
+
+### Ordering
+
+```text
+1   HOLD Phase B                                             <- coordination, not code
+2   Inventory every public callable: kernel + 4 adapters
+3   Classify each: command / query / factory / qualifier / event
+4   Produce the rename set. Every entry cites the rule it violates.
+    No rename by aesthetic preference — a name that merely reads oddly
+    but classifies correctly STAYS.
+5   REVIEW GATE: the rename set is approved before anything is applied
+6   Apply all approved renames together
+7   Sweep: types, api-baseline, docs, examples, demo, migration guide,
+    llms.txt, packed consumer, framework barrels, release notes
+8   Add tools/api-grammar.yaml + the gate, keyed on callables
+9   Full release gates + gates:self-test
+10  Resume Phase B against final names
+11  Release per the sequencing decision above
+```
+
+Step 4 is the one that decides whether this is a system or a preference. A
+violation needs a rule, and the rule has to be the one written at the top of
+this track.
 
 ## PRODUCT DIRECTION — set 2026-09-08
 

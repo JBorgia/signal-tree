@@ -263,7 +263,7 @@ export type { ReadonlyStore } from './lib/readonly';
 // RETURNS it, and a kept public API must have a nameable return type.
 export type { PendingTransaction } from './enhancers/transactions/transactions.types';
 export type { TransactionMethods } from './enhancers/transactions/transactions.types';
-// PROPOSAL-0. Same rule again: `TransactionMethods.proposal()` returns
+// PROPOSAL-0. Same rule again: `TransactionMethods.propose()` returns
 // `Proposal`, and `Proposal.inspect()`/`accept()` return the inspection types,
 // so each is a nameable return type of a kept public API. Nothing here carries
 // kernel identity — `ProposalChange` is `{ path, status }`, proven sufficient
@@ -325,7 +325,7 @@ export { devTools } from './enhancers/devtools/devtools';
  * - `batching(config?)` - Batch CD notifications
  * - `restoration(config?)` - Undo/redo
  * - `transactions()` - Optimistic transaction rollback without undo/redo
- *   history. Also provides `.proposal(fn)`, the review vocabulary over the same
+ *   history. Also provides `.propose(fn)`, the review vocabulary over the same
  *   turn: `inspect()` / `accept()` / `reject()`. Restoration stays orthogonal —
  *   wrap `undoable()` around the proposal, not around `accept()`.
  * - `devTools(config?)` - Redux DevTools integration

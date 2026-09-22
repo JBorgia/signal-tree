@@ -393,7 +393,7 @@ const reviewTree = signalTree(
 // causal turn containing its writes.
 let pendingProposal!: Proposal;
 undoable(() => {
-  pendingProposal = reviewTree.proposal(() => {
+  pendingProposal = reviewTree.propose(() => {
     reviewTree.$.note('proposed');
     reviewTree.$.rows.addOne({ id: 'a', name: 'Alpha' });
   });

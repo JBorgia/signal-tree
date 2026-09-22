@@ -210,7 +210,7 @@ const INTERNAL_TRANSACTION_RUNTIME = Symbol(
 );
 
 /**
- * PROPOSAL-0. Carries the pending turn id from `transaction()` to `proposal()`
+ * PROPOSAL-0. Carries the pending turn id from `transaction()` to `propose()`
  * without widening `PendingTransaction`, which is public. Module-private, so
  * nothing outside this file can read or forge it.
  */
@@ -2305,7 +2305,7 @@ export function transactions(): Enhancer<TransactionMethods> {
     // PROPOSAL-0. Naming and a review projection over the SAME turn — no
     // second code path, no proposal-only rule. `pending` here is exactly what
     // `transaction()` hands any other caller.
-    (tree as ISignalTree<T> & TransactionMethods).proposal = (
+    (tree as ISignalTree<T> & TransactionMethods).propose = (
       fn: () => void
     ): Proposal => {
       const pending = runtime.transaction(fn);
