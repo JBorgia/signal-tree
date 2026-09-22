@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { entityMap, signalTree } from '../index';
+import { entityMap, signalTree, transactions } from '../index';
 
 const causal = () =>
   signalTree({ a: 1, b: 2 }, { capabilities: ['causal-runtime'] });
@@ -148,6 +148,35 @@ describe('Angular realization invariants', () => {
     expect(isSignal(tree.$.plain)).toBe(true);
     expect(isSignal(tree.$.rows as never)).toBe(false);
     expect(typeof tree.$.rows).toBe('object');
+    tree.destroy();
+  });
+
+  /**
+   * Covers the adapter's `token.invalidate` publication path specifically.
+   *
+   * A scalar write publishes the committed value straight through `commit`.
+   * Once that arrived, every test in this spec went through `commit` and none
+   * touched `invalidate` -- which made the c6-neutrality gate BLIND: replacing
+   * `invalidate` with a no-op no longer failed the suite the gate runs, even
+   * though 35 tests elsewhere in the package caught it.
+   *
+   * A rollback republishes a prior value through the location publisher, which
+   * notifies via `token.invalidate()`. Verified in both directions: this fails
+   * under that mutation and passes without it.
+   */
+  it('republishes a rolled-back value through Angular dependency tracking', () => {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    const tree = signalTree({ count: 0 }, { enhancers: [transactions()] });
+    const observed = computed(() => tree.$.count());
+
+    const pending = tree.transaction(() => tree.$.count.set(9));
+    expect(observed()).toBe(9);
+
+    pending.rollback();
+    expect(observed()).toBe(0);
+
     tree.destroy();
   });
 });
