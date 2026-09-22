@@ -1732,6 +1732,98 @@ PROPOSAL-0 kernel matrix   DONE — null survives
         -> only then ship
 ```
 
+#### PROPOSAL-REVIEW-SURFACE-0 — RUN 2026-09-22, PASSES
+
+> Can an application truthfully review a proposal WITHOUT being given the
+> kernel's internal identity?
+
+**Yes.** `packages/kernel/src/enhancers/transactions/proposal-review-surface-0.spec.ts`,
+3 cases. Not "can the kernel tell the subjects apart" — INSPECTION-0 case 6
+settled that it can and must. This asked whether the classification RESULT has
+to carry the identity that produced it.
+
+Measured effect shapes, which is what made the answer cheap:
+
+```text
+                proposal effect        later effects
+A  update       add rows.A  subj 1     set rows.A.name  subj 1
+B  remove+add   add rows.A  subj 1     remove rows.A subj 1, add rows.A subj 2
+```
+
+`path` for an entity effect already carries the business key (`rows.A`, not
+`rows`), so it locates the row precisely. The ONLY public difference between A
+and B is `status`; the discriminator (`subject` 1 vs 2) stays internal.
+
+Case C is the proof: **identical path, identical visible value, different
+status** — and status alone drives a different reviewer action set
+(`accept|reject` vs `accept|reject|reconcile`).
+
+**BOUNDARY ESTABLISHED:**
+
+```text
+internal   subject identity determines truth
+public     path communicates location
+           status communicates proposal ownership / currentness
+```
+
+**`kind` NOT included.** The review UI rendered correctly without it, so it
+fails the "make the scenario prove the UI needs it" bar. Available internally
+is not a reason to publish.
+
+**One honest constraint on the shape.** `status: 'current'` on a structural
+add means _the proposal's structural contribution still stands_, NOT _the
+proposed value stands_. In case A the row still exists because of the proposal
+while its contents are the server's. The rendering is truthful only because
+the review surface also reads current values — which applications do anyway,
+and which the test does through an ordinary tree read rather than through
+`inspect()`. A UI that displayed status without the current value could
+mislead. Carry this into AGENT-UX-REFERENCE-0 as a documentation requirement.
+
+#### PROPOSAL-0 — PUBLIC SURFACE FROZEN (C-prime), 2026-09-22
+
+Every clause below is backed by a measurement in this repo, not by preference.
+
+```ts
+const proposal = store.proposal(() => {
+  // synchronous writes
+});
+
+proposal.inspect();
+// { changes: [ { path: 'rows.A', status: 'superseded' } ] }
+
+proposal.accept(); // confirm semantics; NOT undo-enrolled
+proposal.accept({ undoable: true }); // confirm + exactly one undo unit
+proposal.reject(); // rollback; MAY THROW a refusal
+```
+
+```text
+DECISION                         EVIDENCE
+accept defaults to NOT enrolled  PROPOSAL-0 A9 — confirm() alone adds no
+                                 restoration entry; enrolling by default would
+                                 quietly change transaction semantics rather
+                                 than name them
+enrollment chosen at ACCEPT      the agent proposing must not decide whether
+                                 the human's eventual acceptance is undoable
+accept returns a snapshot        closes the inspect->accept race; measured not
+                                 obviously expensive at tested sizes, so there
+                                 is no cost argument for withholding it
+reject keeps THROWING            a refusal that can be ignored is worse than
+                                 one that cannot; PROPOSAL-REJECTION-0
+inspect() not superseded()       INSPECTION-0 case 3 shows a binary named for
+                                 supersession is already too coarse; a
+                                 {path,status} list extends without breaking
+{ path, status }, no identity    PROPOSAL-REVIEW-SURFACE-0 case C
+no `kind`                        the review UI did not need it
+current inspection in OSS        an application cannot build a truthful review
+                                 screen if the data to render it is paywalled
+```
+
+**Not yet implemented.** The facade does not exist; every proof above runs
+against the shipped primitives, which is what makes "naming, not new
+semantics" an evidenced claim rather than an intention. Shipping it fires
+`demo-coverage`, `release-claims`, `documented-examples`, `documented-symbols`
+and the packed-consumer fixture — see the Phase B cost notes.
+
 #### WRITE-CONTEXT-0
 
 Only after MO-2 disposition isolation. The existing constraint is **binding
