@@ -287,7 +287,7 @@ Entra Agent ID, Okta, SailPoint, AWS AgentCore, OpenID AuthZEN, and an IETF
 delegation-receipt draft.
 
 **Why that retires the gate — and why it is NOT because "the need is
-validated."** That external evidence validates the *adjacent commodity layer*,
+validated."** That external evidence validates the _adjacent commodity layer_,
 not SignalTree's claim. Nothing in it concerns application-state causal
 provenance. The correct reading is narrower and less flattering to the original
 design:
@@ -391,7 +391,7 @@ internal and unexported. **10 passed / 4 red of 14 written — and 14 is not 15.
 The first pass blamed `interceptLeafSignals` and declared outcome B. **That was
 a wrong-channel error, not a finding.** `PathNotifier` — already subscribed by
 `transactions`, `restoration`, `link`, the diagnostic journal and the causal
-realization adapter — *does* observe transaction writes and delivers
+realization adapter — _does_ observe transaction writes and delivers
 `meta.transactionOwner`, so tree isolation is available. `interceptLeafSignals`
 is the documented FALLBACK for direct leaf writes that never reach the notifier.
 Switching channel turned case 3 green. **The composition-safe channel largely
@@ -450,8 +450,8 @@ seam first.
 
 **OPEN — successor to the observation half of `ATTRIBUTION-OWNER-0`.**
 
-**Status amended 2026-09-22.** The hold recorded below — *"no further kernel
-excavation until `STATE-CONSEQUENCE-VALUE-0` reports"* — is **discharged**.
+**Status amended 2026-09-22.** The hold recorded below — _"no further kernel
+excavation until `STATE-CONSEQUENCE-VALUE-0` reports"_ — is **discharged**.
 SCV-0 reported **CLOSED / DIFFERENTIATION NOT EARNED** on 2026-09-08, which
 retires the forensic-attribution consumer this track was excavating for.
 
@@ -509,8 +509,8 @@ composition-safe mutation observation, and settlement outcome (`tree key`,
 > **Is the missing scope identity merely UNEXPOSED, or actually DESTROYED?**
 
 Unexposed → **B**. Destroyed → **C**. `WriteMetadata` being a closed union must
-NOT decide this by itself. The real question is whether *some existing stable
-identity* lets enhancer-owned state carry the fact across the
+NOT decide this by itself. The real question is whether _some existing stable
+identity_ lets enhancer-owned state carry the fact across the
 deferred-publication boundary. If yes, leave `WriteMetadata` alone.
 
 ### Three independent questions
@@ -574,8 +574,8 @@ derivedFrom IS legitimate for   transaction-rollback consequences
 derivedFrom is NOT legitimate for restoration consequences
 ```
 
-A restoration consequence may say *"this location was restored to a prior
-recorded state."* It may **not** say *"this derives from operation P17."* The
+A restoration consequence may say _"this location was restored to a prior
+recorded state."_ It may **not** say _"this derives from operation P17."_ The
 absence is a FEATURE: it makes the audit lie identified early in this track —
 a restoration implying its original author acted again — structurally
 impossible. Do not invent `derivedFrom` for restoration merely because the
@@ -634,8 +634,8 @@ this is the eventual implementation. If the experiment loses, delete it.
 
 **⚠ The oracle alone is NOT sufficient, and the arm must say so.** Measured: on
 rollback the writes are never published at all — confirm publishes the net
-effects, rollback publishes nothing. So the oracle can state *"transaction
-⟨owner,id⟩ was discarded"* while provenance holds **no effects to disposition**.
+effects, rollback publishes nothing. So the oracle can state _"transaction
+⟨owner,id⟩ was discarded"_ while provenance holds **no effects to disposition**.
 The harness can supply the attempted writes because it authors the scenario, but
 then:
 
@@ -717,9 +717,9 @@ existing record in place:
 
 ```ts
 if (existing.kind === 'set' && effect.kind === 'set') {
-  existing.after = effect.after;                                 // in place
+  existing.after = effect.after; // in place
   if (existing.before === existing.after) effectMap.delete(key); // round trip
-  return;                                                        // -> no effect
+  return; // -> no effect
 }
 ```
 
@@ -807,8 +807,8 @@ for Studio debugging but is not obviously part of state-consequence provenance.
   `transactionOwner` exists. Use the adversarial case: **tree A transactionId 1
   and tree B transactionId 1 must never collide** in provenance bookkeeping.
 - **C14 — realization/restoration.** Does existing causal linkage suffice to say
-  a later consequence derives from prior scope `P17` *without copying P17's
-  actor/claim onto the later write*? If all that survives is
+  a later consequence derives from prior scope `P17` _without copying P17's
+  actor/claim onto the later write_? If all that survives is
   `participation: realization` with no causal referent, `derivedFrom` may itself
   require a new retained fact — **C even if transaction provenance is fully
   solved by a sidecar.**
@@ -882,7 +882,7 @@ That resolves the fact that ordinary writes have no universal authored-turn
 identifier for provenance to decorate — `turnId` is private to the transactions
 enhancer (`transactions.ts`), and outside a transaction a consequence runs
 immediately in the caller's stack (`commit-consequence.ts`). The caller naming
-the scope *is* the boundary.
+the scope _is_ the boundary.
 
 Four separate questions, four separate fields. Do not overload them:
 
@@ -894,7 +894,7 @@ origin         what semantic kind of transition this particular effect was
 derivedFrom    which prior operation caused this consequence
 ```
 
-`authorization`, never `authority` — the kernel already uses *authority* for who
+`authorization`, never `authority` — the kernel already uses _authority_ for who
 owns the decision or the truth, and a second meaning inside the same record
 would collide.
 
@@ -908,25 +908,25 @@ interface ProvenanceScope {
   actor: ActorRef;
   onBehalfOf?: PrincipalRef;
   authorization?: AuthorizationRef;
-  parentScopeId?: string;      // nested scopes: inner wins, lineage retained
+  parentScopeId?: string; // nested scopes: inner wins, lineage retained
   attempts: ProvenanceAttempt[];
   effects: ProvenanceEffect[];
-  summary: ProvenanceSummary;  // derived convenience, never authoritative
+  summary: ProvenanceSummary; // derived convenience, never authoritative
 }
 
 interface ProvenanceEffect {
   path: string;
   origin: 'authored' | 'external' | 'realization' | 'restoration';
-  derivedFrom?: string;        // realization/restoration: point at the cause,
-                               // never inherit the original actor
+  derivedFrom?: string; // realization/restoration: point at the cause,
+  // never inherit the original actor
   disposition: 'committed' | 'rolled-back';
-  revertedBy?: string;         // what caused the reversal — without this a
-                               // multi-scope transaction implicates the wrong
-                               // actor for a failure it did not own
+  revertedBy?: string; // what caused the reversal — without this a
+  // multi-scope transaction implicates the wrong
+  // actor for a failure it did not own
   published: boolean;
-  equalityBasis?: string;      // publication is equality-gated; without the
-                               // compare verdict or a config fingerprint,
-                               // cross-deployment comparison is unsound
+  equalityBasis?: string; // publication is equality-gated; without the
+  // compare verdict or a config fingerprint,
+  // cross-deployment comparison is unsound
 }
 
 interface ProvenanceSummary {
@@ -934,12 +934,7 @@ interface ProvenanceSummary {
   committed: number;
   rolledBack: number;
   published: number;
-  classification:
-    | 'committed'
-    | 'rolled-back'
-    | 'partial'
-    | 'no-published-state-effect'
-    | 'failed';
+  classification: 'committed' | 'rolled-back' | 'partial' | 'no-published-state-effect' | 'failed';
 }
 ```
 
@@ -959,7 +954,7 @@ OPERATION RECEIPT                  "the sink observed scope P42 with these effec
                                    ideally the server issues the scopeId/nonce
 ```
 
-A session-bound credential attests the *session*, not the operation; anything
+A session-bound credential attests the _session_, not the operation; anything
 holding it could attribute arbitrary operations to that actor. Binding the
 receipt to the effect set is what makes `server-attested` mean something.
 
@@ -967,7 +962,7 @@ The control-mode coverage gap is **not** an actor claim. Count only authored
 writes landing outside every provenance scope while a declared control session
 is active — realizations, restorations, and background reconciliation must not
 create noise. It says the cooperative protocol was not honoured, never that the
-agent caused the write. Report it as *provenance coverage*, not compliance.
+agent caused the write. Report it as _provenance coverage_, not compliance.
 
 ### Packaging is the real fork
 
@@ -996,7 +991,7 @@ the evidence that decision asked for.
 id: ATTRIBUTION-OWNER-0
 status: OPEN / UNBLOCKED 2026-09-08
 blocked_on: none
-required_by: STATE-CONSEQUENCE-VALUE-0   # the spike builds its SignalTree arm
+required_by: STATE-CONSEQUENCE-VALUE-0 # the spike builds its SignalTree arm
 
 question: >
   Can trustworthy actor/delegation provenance for SignalTree state effects be
@@ -1015,7 +1010,7 @@ prohibited_changes:
   - no reopening /authoring
   - no actor fields in WriteMetadata
   - no provenance fields added to core mutation types
-  - no async ambient provenance context   # follows external()'s ST1035 ruling
+  - no async ambient provenance context # follows external()'s ST1035 ruling
 
 falsifiers:
   - enhancer cannot distinguish committed from rolled-back effects
@@ -1037,10 +1032,10 @@ controls:
   - committed write plus rolled-back transaction => partial scope
   - scope that throws AFTER a write already committed => committed + failed
   - authored + external mixed-origin scope
-  - provenance(external(write)) vs external(provenance(write))  # order-invariant
+  - provenance(external(write)) vs external(provenance(write)) # order-invariant
   - nested provenance scopes
   - two provenance scopes inside one transaction
-  - scope spanning writes to two trees          # settlement is tree-local
+  - scope spanning writes to two trees # settlement is tree-local
   - same-value write with no publication
   - realization/restoration derivedFrom case
   - control-mode authored write outside every provenance scope
@@ -1124,14 +1119,14 @@ The 2026-09-08 discovery pass answered most of what a multi-writer track would
 naively re-ask. Re-running it would burn the budget and risk contradicting a
 recorded result.
 
-| Question | Recorded disposition | Consequence here |
-| --- | --- | --- |
-| Does mutation identity survive deferred publication? | **MO-1A = B.** Distinct locations: association merely unexposed; a sidecar keyed on `(transactionOwner, transactionId, positionId)` recovers it with no `WriteMetadata` change | Settled. Not a prerequisite |
-| Same-path multi-scope attempt audit | **MO-1B = CLOSED.** Destroyed at capture — `enqueueEffect` keys by `kind\0path\0position\0subject` and mutates in place; a round trip yields **zero** effects. Required for correct rollback (`RESTORE-P0 P0-B`) | **Must not be reopened.** See below — this track *benefits* from it |
-| Local restoration/rollback derivation | **MO-3A ANSWERED.** rollback = B (referent exists: `origin:'transaction-rollback'` + `transactionId`); restoration = **D** — no causal parent is promised, deliberately (15.0.0-rc.13) | Settled. `derivedFrom` stays illegitimate for restoration |
-| Should the kernel model actors? | Recorded 2026-09-08: **"SignalTree consumes claims, it does not mint them."** The scope carries `externalClaim?: unknown`, an opaque value it never interprets | Already binding. Adopt it; do not re-derive it |
-| Can settlement describe disposition? | **MO-2 PARTIAL.** Attribution isolation = B (proven, keyed `(ownerId, transactionId)`). **Disposition isolation still OPEN** — untestable, because rollback emits no event to cross trees with | **The only live MO dependency.** Gates `WRITE-CONTEXT-0`, not `PROPOSAL-0` |
-| Distributed realization derivation | **MO-3B** — an ownership question; likely transport / Relay / application, not kernel | Out of scope |
+| Question                                             | Recorded disposition                                                                                                                                                                                             | Consequence here                                                           |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Does mutation identity survive deferred publication? | **MO-1A = B.** Distinct locations: association merely unexposed; a sidecar keyed on `(transactionOwner, transactionId, positionId)` recovers it with no `WriteMetadata` change                                   | Settled. Not a prerequisite                                                |
+| Same-path multi-scope attempt audit                  | **MO-1B = CLOSED.** Destroyed at capture — `enqueueEffect` keys by `kind\0path\0position\0subject` and mutates in place; a round trip yields **zero** effects. Required for correct rollback (`RESTORE-P0 P0-B`) | **Must not be reopened.** See below — this track _benefits_ from it        |
+| Local restoration/rollback derivation                | **MO-3A ANSWERED.** rollback = B (referent exists: `origin:'transaction-rollback'` + `transactionId`); restoration = **D** — no causal parent is promised, deliberately (15.0.0-rc.13)                           | Settled. `derivedFrom` stays illegitimate for restoration                  |
+| Should the kernel model actors?                      | Recorded 2026-09-08: **"SignalTree consumes claims, it does not mint them."** The scope carries `externalClaim?: unknown`, an opaque value it never interprets                                                   | Already binding. Adopt it; do not re-derive it                             |
+| Can settlement describe disposition?                 | **MO-2 PARTIAL.** Attribution isolation = B (proven, keyed `(ownerId, transactionId)`). **Disposition isolation still OPEN** — untestable, because rollback emits no event to cross trees with                   | **The only live MO dependency.** Gates `WRITE-CONTEXT-0`, not `PROPOSAL-0` |
+| Distributed realization derivation                   | **MO-3B** — an ownership question; likely transport / Relay / application, not kernel                                                                                                                            | Out of scope                                                               |
 
 ### Measured 2026-09-22 — speculative state is ALREADY live-readable
 
@@ -1150,8 +1145,8 @@ Source: `packages/kernel/src/enhancers/transactions/transactions.spec.ts`.
 Rollback is implemented by **compensating writes**, which is only coherent if
 the speculative value was applied in the first place.
 
-**Two layers must not be conflated.** The recorded line *"on rollback the writes
-are never published at all"* describes the **effect-observation channel** that a
+**Two layers must not be conflated.** The recorded line _"on rollback the writes
+are never published at all"_ describes the **effect-observation channel** that a
 provenance sidecar consumes. It does **not** describe tree visibility. Reading it
 as the latter produces the false conclusion that a reviewer cannot see a proposal
 before accepting it.
@@ -1168,9 +1163,9 @@ was proposed with.
 
 ### Why MO-1B's coalescing is an asset here, not an obstacle
 
-The killed forensic product wanted the audit of attempts (*A tried 8, B tried
-9*). This track wants the **net pending delta** — *what would change if I accept
-this?* Coalescing produces exactly that, and a round trip correctly contributing
+The killed forensic product wanted the audit of attempts (_A tried 8, B tried
+9_). This track wants the **net pending delta** — _what would change if I accept
+this?_ Coalescing produces exactly that, and a round trip correctly contributing
 nothing is the right answer for a review surface. The semantics that were merely
 tolerable for the closed thesis are **correct** for this one.
 
@@ -1245,43 +1240,123 @@ how a closed release gets reopened.
 **OPEN — preregistered 2026-09-22. Run before any other sub-track. No API
 naming until this reports.**
 
-The product pitch is *"show provisional changes and safely reject them."* If
+The product pitch is _"show provisional changes and safely reject them."_ If
 rejection is not safe under the adversarial case, the pitch is false and no
 amount of naming, context or reference UX repairs it. This is the cheapest
 test that can kill the track, so it runs first.
 
-**Observed behaviour, HEAD, read from source — not yet dispositioned:**
+**Observation pass RUN 2026-09-22.** Fixture:
+`packages/kernel/src/enhancers/transactions/proposal-rejection-0.spec.ts`,
+12 cases, all green. The fixture records measurements only; the disposition
+argument lives here.
+
+**Correction 1 — to the preregistration.** It was written from a source
+reading that said any conflicting effect aborts the whole compensation list.
+Measurement refuted that for scalars.
+
+**Correction 2 — to the first reading of that measurement.** The first pass
+described the split as _scalar vs structural_. That is a proxy. The axis the
+existing rationale actually names is **whether newer truth DEPENDS on the
+speculative fact, or has SUPERSEDED it** — and the two happen to coincide in
+every case measured before the control below was added.
 
 ```text
-transaction writes 7 fields across 3 entities
-        ↓
-a server realization lands on ONE of those paths
-        ↓
-reject()
-        ↓
-buildPendingRollbackPlan returns { conflict } on the FIRST conflicting
-effect and abandons the whole compensation list
-        ↓
-settleCommitScope(owner, id, 'commit')      <- settles as COMMIT
-        ↓
-throw SignalTreeRollbackError
-        ↓
-all 7 proposed values remain live in the tree, now as committed truth;
-the 6 non-conflicting ones were never compensated
+SUPERSEDED                              DEPENDED-UPON
+tx sets a = 1                           tx adds row A
+later: a = 99                           later: server updates row A
+the tx's contribution at `a` is         the tx's structural contribution is
+already gone; compensating the          still required by newer truth;
+turn's other locations COMPLETES        removing A would destroy it, and
+the reversal                            compensating only the scalars would
+                                        HALF-APPLY the turn
+-> reject can succeed                   -> refusing is coherent
 ```
 
-Sources: `packages/kernel/src/enhancers/transactions/transactions.ts`
-— conflict detection `buildPendingRollbackPlan` / `classifyLaterOverlap`
-(~L260-409, note the `'superseded'` arm already *does* skip surgically, so
-partial handling exists for one classification and not the other); refusal
-door and `'commit'` settle (~L1900-1925); cause type
-`PendingRollbackDependencyConflict` (~L123-129) reports only the **first**
-conflicting pair, not the full set. End-to-end in
-`transactions/tx-ledger-c3.spec.ts:62-77`.
+Refusal in the depended-upon column is not a defect. Partially reversing a
+logical operation while reporting it as rejected is the partial-undo behaviour
+this repo has repeatedly judged worse than an honest refusal.
+
+**The discriminating control** (cases 11 and 12) therefore tests supersession
+on the structural arm, where dependency and supersession finally come apart:
+
+```text
+initial     x = 0, y = 0, no row A
+tx          x = 1, y = 2, rows.addOne('A')
+later       rows.removeOne('A')        <- ERASES the tx's structural fact;
+                                          nothing depends on it surviving
+reject      throws later-confirmed-dependency
+after       x = 1   y = 2   rows = []  <- x and y NEVER compensated
+```
+
+Identical for a realized remove and for an ordinary authored remove, so this is
+not realization-specific handling.
+
+**Measured summary:**
+
+```text
+later effect vs pending turn                    rejection behaviour
+---------------------------------------------------------------------------
+scalar set, later REPLACEMENT (auth/realized)   surgical compensation
+structural add, later UPDATE of the subject     whole-turn refusal
+structural add, later REMOVE of the subject     whole-turn refusal
+```
+
+**Mechanism, read from source.** `classifyLaterOverlap` distinguishes
+supersession from conflict for scalars via `mutationIntent === 'replace'` plus
+`supersededScalarKeys`. `hasSameSubjectDependency` returns a conflict for **any**
+later same-subject effect — it never asks whether that effect depends on the
+turn's structural fact or erases it. Its name states a dependency test; its
+body implements a presence test.
+
+**DISPOSITION: PR-A — CONFIRMED 2026-09-22.** The control was specified in
+advance with two outcomes: reject succeeds and the scalars compensate
+(structural machinery already distinguishes dependency from supersession ->
+PR-C), or reject refuses with the scalars left dirty (classifier too coarse ->
+PR-A). The measured result is the second. Newer truth had _erased_ the
+speculative row rather than come to rely on it, so no "don't destroy newer
+truth" rationale covers leaving `x` and `y` dirty — there is no newer truth at
+`x` or `y` at all.
+
+**The semantic rule the fix must satisfy:**
+
+> **The axis is supersession vs dependency, not scalar vs structural.**
+
+**PR-A is NOT a licence to partially roll back turns with real structural
+dependencies.** It is narrower: `hasSameSubjectDependency` cannot distinguish
+
+```text
+newer truth that DEPENDS ON speculative structure   -> refusal stays correct
+newer truth that SUPERSEDES/REMOVES it              -> rollback should complete
+                                                       for the rest of the turn
+```
+
+The scalar path already draws this distinction; the structural path does not.
+Half-applying a turn whose structural fact newer truth still needs remains the
+partial-undo behaviour this repo judges worse than an honest refusal.
+
+**Acceptance matrix for the fix:**
+
+```text
+tx adds A;      later UPDATES A        rollback -> REFUSE
+tx adds A;      later REMOVES A        rollback -> SUCCEED for remaining effects
+tx sets scalar; later REPLACES scalar  rollback -> preserve newer, compensate rest
+unrelated later write                  rollback -> SUCCEED
+```
+
+**Sequencing consequence.** `PROPOSAL-0` does NOT open yet. This lands first as
+a standalone generic transaction correctness fix, in its own change, with:
+
+- refusal preserved for the depends-on cases
+- structural supersession no longer blocking rollback
+- unrelated effects in the turn compensated
+- entity lifetime semantics intact
+- mutation/falsifier coverage proving the classifier distinguishes
+  **dependency vs supersession**, not merely scalar vs structural
+- full transaction, restoration and entity-lifetime suites run
 
 **The existing rationale is serious and must be engaged, not assumed wrong.**
-The code comment argues the `'commit'` settle is correct *because* nothing was
-compensated: the authored writes are still live and therefore *are* the truth a
+The code comment argues the `'commit'` settle is correct _because_ nothing was
+compensated: the authored writes are still live and therefore _are_ the truth a
 reader sees, so discarding would drop durable consequences for state the tree
 is still displaying — the tree/storage divergence the commit boundary exists to
 prevent. The "application refetch fallback" is a shipped, tested pattern, not
@@ -1358,7 +1433,7 @@ agent and can render that itself. This track must not acquire an actor concept
 to justify itself.
 
 Try to kill the null across: multiple fields; multiple entities; remove/re-add;
-server realization arriving *during* a proposal; user write *during* a proposal;
+server realization arriving _during_ a proposal; user write _during_ a proposal;
 rejection; acceptance; later restoration; held references. **If any case needs
 `propose()` to have a rule `transaction()` does not have, it is not DX sugar and
 the null fails.**
@@ -1381,8 +1456,10 @@ kernel.
 **Explicitly rejected as a kernel-owned schema:**
 
 ```ts
-{ actorKind: 'human' | 'agent' | 'system' }   // the kernel does not own the
-                                              // world's actor taxonomy
+{
+  actorKind: 'human' | 'agent' | 'system';
+} // the kernel does not own the
+// world's actor taxonomy
 ```
 
 Entra, Okta, AuthZEN, application sessions, agent frameworks and delegation
@@ -1392,9 +1469,9 @@ chains already model identity. SignalTree carries an opaque claim:
 withWriteContext({ source: claim, operation: token }, () => { ... });
 ```
 
-SignalTree may guarantee only *"this opaque token accompanied these
-consequences."* It may never assert *"this token proves Alice authorized GPT-9
-to do X."* That sentence is the line back into the closed thesis.
+SignalTree may guarantee only _"this opaque token accompanied these
+consequences."_ It may never assert _"this token proves Alice authorized GPT-9
+to do X."_ That sentence is the line back into the closed thesis.
 
 Naming — `source` vs `actor` — is deferred until MO-2 reports. Do not let the
 public spelling presuppose the answer.
@@ -1406,7 +1483,7 @@ id: MULTI-WRITER-INTERACTION-0
 status: OPEN — preregistered 2026-09-22
 supersedes: nothing
 reopens: nothing
-does_not_reopen: STATE-CONSEQUENCE-VALUE-0   # CLOSED 2026-09-08, stays closed
+does_not_reopen: STATE-CONSEQUENCE-VALUE-0 # CLOSED 2026-09-08, stays closed
 
 question: >
   Can SignalTree provide correct live application behaviour when multiple
@@ -1435,19 +1512,19 @@ baseline:
   15.2.1: COMPLETE — published for kernel + 4 adapters, tagged v15.2.1
     2026-09-21, no packages/ commit since. Not work. Do not reopen.
 
-do_not_re_derive:   # answered 2026-09-08; re-running risks contradicting a
-                    # recorded result. An older roadmap section is NOT
-                    # permission to reopen these.
-  - MO-1A   # mutation identity survives deferred publication = B (sidecar
-            #   keyed on (transactionOwner, transactionId, positionId));
-            #   settled, NOT a prerequisite for PROPOSAL-0
-  - MO-1B   # same-path multi-scope attempt capture destroyed at capture by
-            #   enqueueEffect keying; REQUIRED for correct rollback
-  - MO-3A   # rollback = B; restoration = D, no causal parent promised;
-            #   derivedFrom stays illegitimate for restoration
-  - "SignalTree consumes claims, it does not mint them"
+do_not_re_derive: # answered 2026-09-08; re-running risks contradicting a
+  # recorded result. An older roadmap section is NOT
+  # permission to reopen these.
+  - MO-1A # mutation identity survives deferred publication = B (sidecar
+    #   keyed on (transactionOwner, transactionId, positionId));
+    #   settled, NOT a prerequisite for PROPOSAL-0
+  - MO-1B # same-path multi-scope attempt capture destroyed at capture by
+    #   enqueueEffect keying; REQUIRED for correct rollback
+  - MO-3A # rollback = B; restoration = D, no causal parent promised;
+    #   derivedFrom stays illegitimate for restoration
+  - 'SignalTree consumes claims, it does not mint them'
 
-sequencing:   # revised 2026-09-22, second pass — by falsifier cost
+sequencing: # revised 2026-09-22, second pass — by falsifier cost
   - PROPOSAL-REJECTION-0 first — existential falsifier; no API naming until
     it reports PR-A, PR-B or PR-C (that track's own disposition scheme —
     NOT the A/B/C outcomes of this preregistration below)
@@ -1533,8 +1610,8 @@ proofs. Those were the distraction the provenance track already cost us.
 **1. Restoration has NO causal parent, deliberately.** `ATTRIBUTION-OWNER-0`
 MO-3A proved `RestorationHistoryEntry<T>` is `{ state: T }` and an undo carries
 `origin: 'restoration'` with no turn id. So a Studio "why is this value here"
-chain **cannot show restoration lineage**. It may say *"restored to a prior
-recorded state"*; it may not say *"this reverts T81"*. The chain has a
+chain **cannot show restoration lineage**. It may say _"restored to a prior
+recorded state"_; it may not say _"this reverts T81"_. The chain has a
 documented hole exactly where undo/redo appears — design the UI around that
 truthfully rather than discovering it mid-build.
 
@@ -1622,7 +1699,7 @@ realization, S3 restoration, S4 the full matrix), and each slice ships seam +
 causal core + a usable surface together.
 
 **The growth discipline that keeps this honest:** every slice declares its
-supported composition set and *refuses* outside it. Studio says "I do not
+supported composition set and _refuses_ outside it. Studio says "I do not
 observe this composition" rather than rendering a confident partial answer.
 Growing observation slice-by-slice without that rule is precisely how
 MUTATION-OBSERVABILITY-0 happened — PathNotifier and interceptLeafSignals were
@@ -1688,9 +1765,9 @@ answered high-confidence      5/10             8/10
 - **Q8's residual gap is propagating the same revision/source id to browser B.**
 - **Q3/Q4 gaps are agent prompt capture and policy text** — not state semantics.
 
-That moves the claim from *"the conventional stack fundamentally lacks the
-semantic model"* to *"the conventional stack needs disciplined instrumentation
-and some correlation work."* Those are commercially very different claims, and
+That moves the claim from _"the conventional stack fundamentally lacks the
+semantic model"_ to _"the conventional stack needs disciplined instrumentation
+and some correlation work."_ Those are commercially very different claims, and
 only the first was a business.
 
 The preregistered rubric anticipated exactly this: ordinary instrumentation plus
@@ -1700,7 +1777,7 @@ cheap ID joins plus modest extra fields → **weak white space**.
 
 Adding the browser-B revision stamp would probably turn Q8 green. Running v3
 after knowing that would be testing whether we can construct a conventional
-stack *badly enough* for SignalTree to win. **That is not an experiment.**
+stack _badly enough_ for SignalTree to win. **That is not an experiment.**
 
 ### The explicit non-claim
 
@@ -1747,7 +1824,7 @@ wanted one. No provenance package.**
 
 Commercialization effort returns to areas with stronger evidence: the core state
 architecture, causal debugging / Studio, and potentially Relay — where
-distributed state *semantics themselves*, not audit metadata, would be the
+distributed state _semantics themselves_, not audit metadata, would be the
 differentiation.
 
 ---
