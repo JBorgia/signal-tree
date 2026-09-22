@@ -1,0 +1,10 @@
+CPU UNKNOWN — V3 STOPPING RULE TRIGGERED
+
+A required entity workload exceeded the preregistered 5% A/A gate in a
+token-vs-token preflight taken on a calm host.
+
+Per CPU-DECISION-PREREGISTRATION-V3.md:
+- no candidate CPU result is admissible
+- the four-way experiment was NOT run
+- no v4 methodology revision is permitted
+- the architecture decision proceeds from semantics and memory

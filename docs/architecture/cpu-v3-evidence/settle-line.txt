@@ -1,0 +1,3 @@
+  waiting for a calm host before preflight 1 (attempt 1)  (load < 3.0, > 3.0 GB free)
+    load=4.45  free=20.2GB  waiting 0m     load=3.21  free=20.2GB  waiting 1m   calm: load 2.63, 20.2 GB free
+  running preflight 1 (attempt 1)
