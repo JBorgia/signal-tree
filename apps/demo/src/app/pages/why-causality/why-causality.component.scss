@@ -18,6 +18,12 @@
   // the hero 232px off the gutter the rest of the site aligns to.
   padding-block: clamp(2.5rem, 6vw, 5rem);
   padding-inline: var(--layout-gutter);
+  // The grid motif every other hero band carries (.home-hero, and the
+  // architecture hero via its own hardcoded copy). The rewrite dropped it here
+  // along with .position-band, leaving this the one hero band without it.
+  background-color: var(--color-paper);
+  background-image: var(--pattern-grid);
+  background-size: var(--pattern-grid-size);
 }
 
 // The measure the hero carried before, when .hero-copy held it.
