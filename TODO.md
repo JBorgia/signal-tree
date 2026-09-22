@@ -1343,6 +1343,45 @@ tx sets scalar; later REPLACES scalar  rollback -> preserve newer, compensate re
 unrelated later write                  rollback -> SUCCEED
 ```
 
+**PR-A FIX LANDED 2026-09-22.** `classifyStructuralOverlap` in
+`transactions.ts` gives the structural arm the supersession distinction the
+scalar arm had. A pending `add` whose subject the later work ERASED is
+superseded; anything that puts the subject back keeps refusing. Acceptance
+suite is the same fixture, now 16 cases.
+
+Mutation-checked rather than assumed green:
+
+```text
+always-supersede-a-pending-add        kills 4 cases, incl. 9 and 14   OK
+widen supersession to pending remove  survives                        INERT
+```
+
+The second is inert, not a coverage hole: a later remove of an
+already-removed subject is unreachable (the collection throws "Entity with id
+... not found"), verified by probe.
+
+**Two same-symptom gaps recorded, NOT fixed** — both verified identical with
+and without the fix, so they are pre-existing:
+
+```text
+case 15  pending REMOVE, later re-add    refuses via effect-validation-failed
+                                         newer truth preserved, scalar stranded
+case 16  pending REKEY, later remove     refuses via later-confirmed-dependency
+                                         structural fact gone, scalar stranded
+```
+
+Case 16 is the same rule PR-A just applied and would be consistent to fix.
+It was left out because rekey rollback carries a documented repair history
+(RESTORE-P0 P0-B, `d487a4ae`, pinned by `rekeyed-rollback-defect.spec.ts`), so
+widening into it risks regressing a deliberate prior repair. **OPEN DECISION:**
+extend PR-A to pending rekey, or ship the narrow fix and track case 16
+separately.
+
+Also corrected by measurement: case 13 (later remove then re-add) does not
+refuse and must not — stable entity lifetime makes the re-added row a
+DIFFERENT subject, so compensating the turn cannot reach it. The pre-PR-A
+build refused there and stranded the scalar; the fix strictly improves it.
+
 **Sequencing consequence.** `PROPOSAL-0` does NOT open yet. This lands first as
 a standalone generic transaction correctness fix, in its own change, with:
 
