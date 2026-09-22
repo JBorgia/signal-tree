@@ -183,7 +183,7 @@ print_header "3. Type Checking"
 print_step "Running TypeScript compiler checks"
 # Type checking happens during build, so we'll verify TypeScript configs exist
 TYPECHECK_PASSED=true
-for package in kernel angular react vue; do
+for package in kernel angular react vue solid; do
     TSCONFIG="./packages/$package/tsconfig.json"
     if [ ! -f "$TSCONFIG" ]; then
         print_error "Missing tsconfig.json for $package"
