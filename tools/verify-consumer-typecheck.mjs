@@ -114,7 +114,14 @@ import {
   link,
   restoration,
   batching,
+  transactions,
+  undoable,
   type ReadonlyLocation,
+  type Proposal,
+  type ProposalAcceptance,
+  type ProposalChange,
+  type ProposalInspection,
+  type ProposalStatus,
 } from '@signal-tree/kernel';
 import {
   createSignalTreeFactory,
@@ -372,6 +379,34 @@ tree.redo();
 tree.batch(() => tree.$.count(0));
 
 export const _used = [n, whole, rows, names, currentNames, angularCount, angularUsers, vueCount, vueDoubled, createSignalTreeFactory, defineStore, useSignalTree];
+
+// PROPOSAL-0 — the review vocabulary, exercised exactly as the docs teach it.
+// Packed-tarball proof: these types must be nameable and these calls must
+// compile against the PUBLISHED export map, not against workspace internals.
+const reviewTree = signalTree(
+  { rows: entityMap<{ id: string; name: string }, string>({ selectId: (r) => r.id }), note: '' },
+  { enhancers: [restoration({ maxHistorySize: 10 }), transactions()] }
+);
+
+// Restoration is orthogonal: undoable() wraps the PROPOSAL's writes, never
+// accept(). An accept()-time flag could not work — undoable() designates the
+// causal turn containing its writes.
+let pendingProposal!: Proposal;
+undoable(() => {
+  pendingProposal = reviewTree.proposal(() => {
+    reviewTree.$.note('proposed');
+    reviewTree.$.rows.addOne({ id: 'a', name: 'Alpha' });
+  });
+});
+
+const review: ProposalInspection = pendingProposal.inspect();
+const firstChange: ProposalChange | undefined = review.changes[0];
+const changeStatus: ProposalStatus | undefined = firstChange?.status;
+const changePath: string | undefined = firstChange?.path;
+const settled: ProposalAcceptance = pendingProposal.accept();
+void changeStatus;
+void changePath;
+void settled.changes.length;
 `;
 writeFileSync(join(proj, 'src', 'main.ts'), SAMPLE);
 

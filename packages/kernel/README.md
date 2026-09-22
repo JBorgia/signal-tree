@@ -220,6 +220,67 @@ when this store is no longer needed.
 Adds an explicit pending operation that can be confirmed or rolled back. Use it
 for pending authority, not as a synonym for retained undo history.
 
+#### Reviewing a proposal
+
+`proposal()` is the same pending turn `transaction()` opens, named for the case
+where somebody reviews a change before it lands — an agent's suggestion, an
+import, a bulk edit. The proposed values are readable immediately through
+ordinary references, so a review screen renders from the state it already uses.
+
+```typescript
+const tree = signalTree(state, { enhancers: [transactions()] });
+
+const result = await agent.suggestChanges();
+
+const proposal = tree.proposal(() => {
+  tree.$.order.customer(result.customer);
+  tree.$.order.priority(result.priority);
+});
+
+// The reviewer sees the proposed values through the normal tree.
+tree.$.order.priority(); // the proposed value
+
+proposal.accept(); // or proposal.reject()
+```
+
+`inspect()` reports whether each proposed change still represents current
+truth, which matters when a server or another person writes while the review is
+open:
+
+```typescript
+proposal.inspect();
+// { changes: [ { path: 'order.priority', status: 'superseded' } ] }
+```
+
+`accept()` returns that same inspection as settled, so a value that changed
+between the last read and the decision is still reported.
+
+> **`current` means the proposal's contribution still stands — not that the
+> value it proposed is still there.** An added row stays `current` while
+> another writer edits fields on that same row. Render `inspect()` next to
+> ordinary current-state reads; it is a review status, not a value snapshot.
+
+`reject()` throws `SignalTreeRollbackError` when the reversal cannot be applied
+without destroying newer truth — for example when a server write now depends on
+a row the proposal created. Catch it and offer reconciliation rather than
+treating rejection as always available.
+
+Acceptance is **not** undo history. Restoration stays a separate decision, and
+`undoable()` wraps the proposal's writes rather than the acceptance, because it
+designates the causal turn where the writes happened:
+
+```typescript
+let proposal!: Proposal;
+
+undoable(() => {
+  proposal = tree.proposal(() => applyResult(result));
+});
+
+// ...the human reviews for as long as they need...
+
+proposal.accept(); // one undo step
+```
+
 ### `devTools()`
 
 Connects the tree to Redux DevTools and adds the typed debug-session surface.
