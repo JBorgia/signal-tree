@@ -1840,6 +1840,63 @@ outcomes:
     Reopen the kernel only for that demonstrated fact.
 ```
 
+## RETIRED-SUBJECT-SLOPE-STABILITY-0 — opened 2026-09-22
+
+**OPEN. A release gate is unreliable on unmodified code.** Found while
+clearing PROPOSAL-INSPECTION-0; the inspection work is exonerated and this is
+pre-existing.
+
+**Measured on clean `833e986e`, no working-tree changes**, sampling the gate's
+own bench directly (`tools/bench-entity-churn-retention.mjs`, arm
+`no-history-reads`):
+
+```text
+150 rounds, 12 samples
+  3.23  3.24  3.23  15.22  15.22  15.22  15.22  3.23  15.22  3.24  3.23  3.23
+  -> BIMODAL: 3.23 MB x7, 15.22 MB x5   (~42% in the high mode)
+
+50 rounds, 10 samples
+  4.1  4.1  8.1  4.1  2.1  4.11  4.1  8.1  4.1  4.1
+  -> dominated by 4.1 MB
+```
+
+**Why the gate flips.** `check-retired-subject-slope.mjs` takes the MEDIAN OF
+THREE isolated processes per endpoint (`SAMPLES_PER_POINT = 3`) against a
+20 B/retired ceiling. Median-of-3 corrects one outlier in a unimodal
+distribution — which is what its header claims it is for — but this
+distribution is bimodal with roughly balanced modes, so the median simply
+reports whichever mode drew two of three samples.
+
+```text
+150-arm median 15.22, 50-arm median 4.1   -> ~116 B/retired  FAIL
+150-arm median  3.23                      -> negative growth PASS
+```
+
+With the high mode at ~42%, P(>=2 of 3 high) is about **38%**. So the gate
+fails roughly two runs in five **on unmodified code**.
+
+**Consequence that must not be softened.** A gate whose noise crosses its own
+threshold provides no evidence, in either direction. Today's two 81/81
+clearances were favourable draws on this gate, not demonstrations — the other
+80 gates cleared those commits, this one did not contribute. Its `:self`
+companion still passes, which is the trap: proving a checker can reject a
+synthetic bad table says nothing about whether its input is stable enough to
+classify.
+
+**DO NOT raise the tolerance.** The header already warns the gate regressed
+once when a step re-interned a forgotten subject by id; widening the ceiling
+would delete exactly that detection. Prove a stable measurement first.
+
+**The 12 MB gap is a lead, not noise.** 3.23 vs 15.22 MB is discrete and
+clean, which suggests a bistable condition — a collection that either has or
+has not run before the measurement, or a lazily allocated structure — rather
+than scatter. Characterise the cause before touching sampling or thresholds;
+raising `SAMPLES_PER_POINT` would only make the coin flip more expensive.
+
+**Not blocking** the proposal track: the instability is in retention
+measurement, unrelated to transaction classification, and reproduces without
+any of that work present.
+
 ## PRODUCT DIRECTION — set 2026-09-08
 
 ```text
