@@ -51,11 +51,13 @@ import { transactions } from './transactions';
  * a turn holding one superseded AND one depended-upon subject (case 14), a
  * pending remove whose subject newer truth re-created (case 15).
  *
- * Known same-symptom gaps PR-A does NOT close, recorded not fixed: pending
- * remove (case 15) and pending rekey (case 16) both strand a scalar when their
- * subject is superseded. Rekey rollback carries a documented repair history
- * (RESTORE-P0 P0-B, rekeyed-rollback-defect.spec.ts), so widening into it is a
- * scope decision, not a tidy-up.
+ * Case 15 (pending REMOVE whose subject newer truth re-created) remains an
+ * EXPECTED REFUSAL control, not a gap: compensating it would restore the
+ * ORIGINAL row into a key newer truth now occupies, so whole-turn refusal is
+ * coherent there. Case 16 (pending REKEY) looked like the same symptom but was
+ * a genuine instance of the supersession rule, and is closed by
+ * REKEY-SUPERSESSION-0 — see `rekey-supersession-0.spec.ts`. The two were kept
+ * apart despite sharing a symptom, which is why only one of them moved.
  *
  * Deliberately NOT done here, per the preregistration: no propose()/accept()/
  * reject() naming, no change to transaction semantics, nothing touching
@@ -490,7 +492,7 @@ describe('PROPOSAL-REJECTION-0 / 15 — pending REMOVE is not superseded by a la
 });
 
 describe('PROPOSAL-REJECTION-0 / 16 — pending REKEY superseded by a later remove', () => {
-  it('still refuses and strands the scalar (PRE-EXISTING, out of PR-A scope)', async () => {
+  it('completes the reversal (closed by REKEY-SUPERSESSION-0)', async () => {
     const tree = rowTree();
     tree.$.rows.addOne({ id: 'A', name: 'Original' });
     await flush();
@@ -504,16 +506,13 @@ describe('PROPOSAL-REJECTION-0 / 16 — pending REKEY superseded by a later remo
     realization(() => tree.$.rows.removeOne('A2'));
     await flush();
 
-    // The SAME symptom PR-A fixed for pending adds: the turn's structural fact
-    // is gone, nothing depends on it, yet the reject refuses and `x` is left
-    // at its proposed value.
-    //
-    // NOT fixed here, deliberately. PR-A's scope is pending adds, and rekey
-    // rollback carries a documented repair history (RESTORE-P0 P0-B, see
-    // rekeyed-rollback-defect.spec.ts) that a scope expansion could regress.
-    // Recorded in TODO.md as the follow-up decision.
-    expect(tryReject(pending)).toBe('later-confirmed-dependency');
-    expect(tree.$.x()).toBe(1);
+    // Was the same symptom PR-A fixed for pending adds, and was left out of
+    // PR-A on purpose because rekey rollback carries a documented repair
+    // history. REKEY-SUPERSESSION-0 pinned that history first (cases 4 and 5
+    // there) and then closed this. Full matrix lives in
+    // `rekey-supersession-0.spec.ts`; this case stays as the cross-reference.
+    expect(tryReject(pending)).toBe(false);
+    expect(tree.$.x()).toBe(0);
     expect(tree.$.rows.ids()).toEqual([]);
   });
 });

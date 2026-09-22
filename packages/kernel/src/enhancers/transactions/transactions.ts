@@ -381,10 +381,18 @@ function buildPendingRollbackPlan(
    * at their proposed values after a reject although nothing ever wrote to
    * them.
    *
-   * Anything that puts the subject BACK — a later add, rekey or set after the
-   * remove — means newer truth now occupies the position, so the refusal
-   * stands. Only the final later effect for the subject decides, which is why
-   * this scans to the end rather than returning on the first remove.
+   * Anything that puts the subject BACK would mean newer truth occupies the
+   * position again and the refusal should stand, which is why this scans to
+   * the end rather than returning on the first remove.
+   *
+   * Honest limit on that last sentence: the distinction is currently
+   * UNOBSERVABLE. Replacing the scan with a break on the first remove passes
+   * every test in the suite, because stable entity lifetime means a removed
+   * subject can never be referenced again — a later add of the same business
+   * key creates a DIFFERENT subject (`proposal-rejection-0.spec.ts` case 13,
+   * `rekey-supersession-0.spec.ts` case 3). The scan is kept as the form that
+   * stays correct if subject resurrection ever becomes representable, not
+   * because a test currently distinguishes it.
    *
    * Deliberately narrow: only a pending `add` can be superseded this way.
    *
@@ -394,11 +402,20 @@ function buildPendingRollbackPlan(
    * (the collection throws "Entity with id ... not found"), which is why
    * widening this test to `remove` is inert rather than merely untested.
    *
-   * A pending `rekey` superseded by a later remove exhibits the SAME stranded
-   * -scalar symptom — measured, `proposal-rejection-0.spec.ts` case 16 — and is
-   * left unfixed on purpose: rekey rollback carries a documented repair history
-   * (RESTORE-P0 P0-B, see `rekeyed-rollback-defect.spec.ts`), so widening into
-   * it is a scope decision rather than a tidy-up.
+   * A pending `rekey` is included for the same reason and on the same rule:
+   * when the subject it retargeted is gone, the compensating rename has
+   * nothing to act on and nothing to resurrect. That was added by
+   * REKEY-SUPERSESSION-0, which first pinned the documented rekey repair
+   * (RESTORE-P0 P0-B, `rekeyed-rollback-defect.spec.ts`) as cases 4 and 5 of
+   * `rekey-supersession-0.spec.ts` so the widening could not regress it
+   * quietly. Dropping the erasure test for rekeys kills five tests, including
+   * those controls.
+   *
+   * A later UPDATE of a rekeyed subject is deliberately NOT a conflict —
+   * `hasSameSubjectDependency` guards later `set` effects with
+   * `effect.kind !== 'rekey'`, because a rekey changes the KEY while a set
+   * changes a FIELD of the same subject. They do not contend, the rename
+   * reverses and the newer field value rides along with the subject.
    */
   const classifyStructuralOverlap = (
     effect: CollectionAddEffect | CollectionRemoveEffect | CollectionRekeyEffect
@@ -410,7 +427,7 @@ function buildPendingRollbackPlan(
         conflictingTurnId?: number;
         conflictingEffect?: TurnEffect;
       } => {
-    if (effect.kind === 'add') {
+    if (effect.kind === 'add' || effect.kind === 'rekey') {
       let erased = false;
       for (const laterEntry of laterEffects) {
         const laterEffect = laterEntry.effect;
