@@ -16,7 +16,8 @@
     "src/**/*.test.ts",
     "src/**/*.d.ts",
     "src/lib/experimental/**",
-    "src/reactive-test-realization.ts"
+    "src/reactive-test-realization.ts",
+    "src/proposal-realization-contract.ts"
   ],
   "include": ["src/**/*.ts"]
 }
