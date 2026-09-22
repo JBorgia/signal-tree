@@ -263,6 +263,16 @@ export type { ReadonlyStore } from './lib/readonly';
 // RETURNS it, and a kept public API must have a nameable return type.
 export type { PendingTransaction } from './enhancers/transactions/transactions.types';
 export type { TransactionMethods } from './enhancers/transactions/transactions.types';
+// PROPOSAL-0. Same rule again: `TransactionMethods.proposal()` returns
+// `Proposal`, and `Proposal.inspect()`/`accept()` return the inspection types,
+// so each is a nameable return type of a kept public API. Nothing here carries
+// kernel identity — `ProposalChange` is `{ path, status }`, proven sufficient
+// by PROPOSAL-REVIEW-SURFACE-0 while subject lifetime stays internal.
+export type { Proposal } from './enhancers/transactions/transactions.types';
+export type { ProposalAcceptance } from './enhancers/transactions/transactions.types';
+export type { ProposalChange } from './enhancers/transactions/transactions.types';
+export type { ProposalInspection } from './enhancers/transactions/transactions.types';
+export type { ProposalStatus } from './enhancers/transactions/transactions.types';
 export { transactions } from './enhancers/transactions/transactions';
 
 export type {} from './enhancers/serialization/serialization';
@@ -314,7 +324,10 @@ export { devTools } from './enhancers/devtools/devtools';
  * **Enhancers (one function each):**
  * - `batching(config?)` - Batch CD notifications
  * - `restoration(config?)` - Undo/redo
- * - `transactions()` - Optimistic transaction rollback without undo/redo history
+ * - `transactions()` - Optimistic transaction rollback without undo/redo
+ *   history. Also provides `.proposal(fn)`, the review vocabulary over the same
+ *   turn: `inspect()` / `accept()` / `reject()`. Restoration stays orthogonal —
+ *   wrap `undoable()` around the proposal, not around `accept()`.
  * - `devTools(config?)` - Redux DevTools integration
  *
  * **Derived State:**

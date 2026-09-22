@@ -1779,9 +1779,12 @@ and which the test does through an ordinary tree read rather than through
 `inspect()`. A UI that displayed status without the current value could
 mislead. Carry this into AGENT-UX-REFERENCE-0 as a documentation requirement.
 
-#### PROPOSAL-0 — PUBLIC SURFACE FROZEN (C-prime), 2026-09-22
+#### PROPOSAL-0 — PUBLIC SURFACE FROZEN (C-double-prime), IMPLEMENTED 2026-09-22
 
-Every clause below is backed by a measurement in this repo, not by preference.
+Every clause is backed by a measurement. **Amended during implementation:** C'
+carried `accept({ undoable: true })`, and building it proved that option could
+not exist as composition. Deleted outright rather than left as a placeholder,
+so the public surface got SMALLER than the frozen design.
 
 ```ts
 const proposal = store.proposal(() => {
@@ -1791,22 +1794,41 @@ const proposal = store.proposal(() => {
 proposal.inspect();
 // { changes: [ { path: 'rows.A', status: 'superseded' } ] }
 
-proposal.accept(); // confirm semantics; NOT undo-enrolled
-proposal.accept({ undoable: true }); // confirm + exactly one undo unit
+const settled = proposal.accept(); // confirm semantics; returns the settlement
 proposal.reject(); // rollback; MAY THROW a refusal
+```
+
+Restoration stays orthogonal and compositional — `undoable()` wraps the
+proposal's WRITES, never the acceptance:
+
+```ts
+let proposal!: Proposal;
+undoable(() => {
+  proposal = store.proposal(() => applyResult(result));
+});
+// ...human reviews for as long as needed...
+proposal.accept(); // one undo unit
 ```
 
 ```text
 DECISION                         EVIDENCE
-accept defaults to NOT enrolled  PROPOSAL-0 A9 — confirm() alone adds no
-                                 restoration entry; enrolling by default would
-                                 quietly change transaction semantics rather
-                                 than name them
-enrollment chosen at ACCEPT      the agent proposing must not decide whether
-                                 the human's eventual acceptance is undoable
+accept NEVER enrolls, and takes  `undoable()` designates the causal turn
+no option to                     containing its WRITES. A proposal's writes
+                                 happen at proposal() time, so wrapping
+                                 confirm() alone designates NOTHING — measured
+                                 0 entries, against 1 for wrapping the
+                                 proposal. An accept-time flag could only work
+                                 by retroactively designating a turn, which is
+                                 the new-authority-rule stop condition.
+designation survives the gap     wrapping the proposal and confirming three
+                                 ticks later still yields exactly one undo
+                                 unit, so the compositional form serves a real
+                                 review delay
+no Option B sugar yet            `proposal(fn, { undoable: true })` would work,
+                                 but the composition is short and no consumer
+                                 has asked. No API by analogy.
 accept returns a snapshot        closes the inspect->accept race; measured not
-                                 obviously expensive at tested sizes, so there
-                                 is no cost argument for withholding it
+                                 obviously expensive at the tested sizes
 reject keeps THROWING            a refusal that can be ignored is worse than
                                  one that cannot; PROPOSAL-REJECTION-0
 inspect() not superseded()       INSPECTION-0 case 3 shows a binary named for
@@ -1816,13 +1838,28 @@ inspect() not superseded()       INSPECTION-0 case 3 shows a binary named for
 no `kind`                        the review UI did not need it
 current inspection in OSS        an application cannot build a truthful review
                                  screen if the data to render it is paywalled
+double settlement inherited      accept/reject repeat idempotently, cross
+                                 transitions throw, and a REFUSED reject leaves
+                                 the proposal still acceptable because the
+                                 refusal precedes the lifecycle move. No
+                                 proposal-only rule.
 ```
 
-**Not yet implemented.** The facade does not exist; every proof above runs
-against the shipped primitives, which is what makes "naming, not new
-semantics" an evidenced claim rather than an intention. Shipping it fires
-`demo-coverage`, `release-claims`, `documented-examples`, `documented-symbols`
-and the packed-consumer fixture — see the Phase B cost notes.
+**IMPLEMENTED.** `proposal-facade-0.spec.ts`, 20 cases, including
+raw/facade equivalence: `proposal+accept` and `transaction+confirm` reach
+byte-identical state, as do `proposal+reject` and `transaction+rollback`. The
+adversarial matrix was run against the raw primitives BEFORE the facade
+existed, which is what makes "naming, not new semantics" evidenced.
+
+Shipping coverage done: five types on the root barrel, API-SUMMARY updated,
+kernel README section, CHANGELOG entry, `api-baseline` regenerated (five types
+x five barrels, zero removals), and the packed-consumer fixture extended AND
+mutation-checked — breaking the proposal block fails under both bundler and
+node16 resolution.
+
+**Phase B needs no export-plumbing work.** `api-baseline` showed the types
+already reach all four adapter barrels by facade re-export, and `proposal()`
+rides on the tree. Phase B is realization conformance only.
 
 #### WRITE-CONTEXT-0
 

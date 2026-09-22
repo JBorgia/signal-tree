@@ -10,6 +10,10 @@ import type {
 } from '../../lib/types';
 import type {
   PendingTransaction,
+  Proposal,
+  ProposalAcceptance,
+  ProposalInspection,
+  ProposalStatus,
   TransactionMethods,
 } from './transactions.types';
 
@@ -204,6 +208,13 @@ export interface InternalTransactionRuntime {
 const INTERNAL_TRANSACTION_RUNTIME = Symbol(
   'signaltree:internal:transaction-runtime'
 );
+
+/**
+ * PROPOSAL-0. Carries the pending turn id from `transaction()` to `proposal()`
+ * without widening `PendingTransaction`, which is public. Module-private, so
+ * nothing outside this file can read or forge it.
+ */
+const PENDING_TURN_ID = Symbol('signaltree:internal:pending-turn-id');
 
 const ROLLBACK_ERROR_MESSAGE =
   'SignalTree could not rollback the pending transaction';
@@ -1989,7 +2000,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
       }
       let lifecycle: 'pending' | 'confirmed' | 'rejected' = 'pending';
 
-      return {
+      const handle = {
+        [PENDING_TURN_ID]: pendingTurnId,
         confirm(): void {
           if (lifecycle === 'confirmed') {
             return;
@@ -2150,6 +2162,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
           }
         },
       };
+      // Cast, not a widened public type: PENDING_TURN_ID is module-private
+      // and PendingTransaction must not grow a field for it.
+      return handle as PendingTransaction;
     },
     getConfirmedTurnRecords: () => authority.getConfirmedTurnRecords(),
     describePendingTurn: (turnId: number) =>
@@ -2227,6 +2242,57 @@ export function getOrCreateInternalTransactionRuntime<T>(
   return runtime;
 }
 
+/**
+ * PROPOSAL-0. Classify one proposed effect against the later work admitted
+ * against its turn.
+ *
+ * Proven as `PROPOSAL-INSPECTION-0` (6 cases) before being written here. The
+ * rule: a proposed effect is SUPERSEDED when later work replaced the exact
+ * contribution it made — a scalar whose location was written again, or a
+ * structural effect whose SUBJECT was removed. Everything else is CURRENT,
+ * including a subject newer truth merely updated or renamed, and including a
+ * path later reoccupied by a DIFFERENT subject.
+ *
+ * ⚠️ This is NOT the rollback plan. A rollback plan answers "what can I safely
+ * compensate?"; this answers "which parts of what I proposed are still
+ * represented in current truth?". They come apart: a later UPDATE of a
+ * proposed row makes the rollback REFUSE while leaving the proposal's
+ * structural contribution entirely current, and a refused plan has no
+ * compensation list to reason from at all.
+ *
+ * Subject identity decides the structural cases. Path coincidence must not:
+ * a reused business key belongs to a different record.
+ */
+function classifyProposedEffect(
+  effect: TurnEffect,
+  laterEffects: readonly TurnEffect[]
+): ProposalStatus {
+  if (effect.kind === 'set') {
+    const replaced = laterEffects.some(
+      (later) =>
+        later.kind === 'set' &&
+        later.position === effect.position &&
+        later.path === effect.path &&
+        (later.subject === undefined ||
+          effect.subject === undefined ||
+          later.subject === effect.subject)
+    );
+    return replaced ? 'superseded' : 'current';
+  }
+
+  let present = true;
+  for (const later of laterEffects) {
+    if (later.ownerPath !== effect.ownerPath) {
+      continue;
+    }
+    if (later.subject !== effect.subject) {
+      continue;
+    }
+    present = later.kind !== 'remove';
+  }
+  return present ? 'current' : 'superseded';
+}
+
 export function transactions(): Enhancer<TransactionMethods> {
   const enhancerFn = <T>(
     tree: ISignalTree<T>
@@ -2235,6 +2301,59 @@ export function transactions(): Enhancer<TransactionMethods> {
 
     (tree as ISignalTree<T> & TransactionMethods).transaction =
       runtime.transaction;
+
+    // PROPOSAL-0. Naming and a review projection over the SAME turn — no
+    // second code path, no proposal-only rule. `pending` here is exactly what
+    // `transaction()` hands any other caller.
+    (tree as ISignalTree<T> & TransactionMethods).proposal = (
+      fn: () => void
+    ): Proposal => {
+      const pending = runtime.transaction(fn);
+      const turnId = (pending as unknown as Record<PropertyKey, unknown>)[
+        PENDING_TURN_ID
+      ] as number | undefined;
+
+      let settled: ProposalInspection | undefined;
+
+      const read = (): ProposalInspection => {
+        if (turnId === undefined) {
+          return { changes: [] };
+        }
+        const raw = runtime.describePendingTurn(turnId);
+        if (!raw) {
+          return { changes: [] };
+        }
+        return {
+          changes: raw.effects.map((effect) => ({
+            path: effect.path,
+            status: classifyProposedEffect(effect, raw.laterEffects),
+          })),
+        };
+      };
+
+      return {
+        inspect(): ProposalInspection {
+          // After settlement the turn is no longer pending, so the inspection
+          // as of that settlement is what there is to report.
+          return settled ?? read();
+        },
+        accept(): ProposalAcceptance {
+          // Snapshot BEFORE confirming: this is the race inspect() alone
+          // cannot close, and after confirm the pending turn is gone.
+          const atSettlement = settled ?? read();
+          pending.confirm();
+          settled = atSettlement;
+          return atSettlement;
+        },
+        reject(): void {
+          const atSettlement = settled ?? read();
+          // Throws on a conservative refusal. Deliberately not caught: the
+          // caller must see a reversal that could not be applied.
+          pending.rollback();
+          settled = atSettlement;
+        },
+      };
+    };
 
     (tree as unknown as Record<string, unknown>)['__transactions'] = {
       getConfirmedTurnCount: () => runtime.getConfirmedTurnCount(),

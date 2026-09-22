@@ -155,8 +155,12 @@ function barrelsFor(pkgDir) {
   for (const [subpath, entry] of Object.entries(map)) {
     const types = typeof entry === 'object' ? entry?.types : entry;
     if (typeof types !== 'string' || !types.endsWith('.d.ts')) continue;
-    const sourceEntry = subpath === '.' ? 'index' : subpath.replace(/^\.\//, '');
-    const src = [join(pkgDir, 'src', `${sourceEntry}.ts`), join(pkgDir, 'src', sourceEntry, 'index.ts')].find(existsSync);
+    const sourceEntry =
+      subpath === '.' ? 'index' : subpath.replace(/^\.\//, '');
+    const src = [
+      join(pkgDir, 'src', `${sourceEntry}.ts`),
+      join(pkgDir, 'src', sourceEntry, 'index.ts'),
+    ].find(existsSync);
     if (src) out.add(relative(ROOT, src));
   }
   return [...out];
@@ -366,6 +370,8 @@ const EXEMPT = new Map(
       'internal WriteMetadata transaction token used by transactions()',
     transactionOwner:
       'internal WriteMetadata tree token used to isolate transactions()',
+    describePendingTurn:
+      "@internal member of InternalTransactionRuntime, not app-facing: returns UNCLASSIFIED raw material (a pending turn's effects and the later effects admitted against it) so PROPOSAL-INSPECTION-0 could prove the review classification derivable without inventing it in production first. The public surface it enabled is Proposal.inspect(), which IS documented",
     // ── under active disposition in HIST-C2 step 7 ──────────────────────
     // These are declines WITH a stated deadline, not silent gaps. Each is a
     // real public config member today; each is slated to be deleted or
@@ -494,13 +500,13 @@ if (LIST_ONLY || gaps.length) {
     const tag = r.exemptReason
       ? 'exempt '
       : r.missing.length
-        ? 'MISSING'
-        : 'covered';
+      ? 'MISSING'
+      : 'covered';
     const kind = r.isCode ? 'code' : r.kind;
     console.log(
-      `  ${tag} ${r.name.padEnd(30)} ${`(${kind}, ${r.pkg})`.padEnd(
-        18
-      )} ${r.missing.join(', ') || `all ${r.applicable} surfaces`}`
+      `  ${tag} ${r.name.padEnd(30)} ${`(${kind}, ${r.pkg})`.padEnd(18)} ${
+        r.missing.join(', ') || `all ${r.applicable} surfaces`
+      }`
     );
     if (r.exemptReason) console.log(`          └─ ${r.exemptReason}`);
   }

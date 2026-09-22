@@ -1,3 +1,39 @@
+## Unreleased
+
+**TL;DR** — Additive. One new method (`tree.proposal()`) and five new public
+types. No existing API is removed or renamed. Two transaction rollback
+correctness defects are fixed: a rejected turn that could previously strand
+unrelated speculative values now reverses them. Nothing to migrate.
+
+### For users
+
+- **`proposal()` — reviewing a change before it lands.** `transactions()` now
+  also provides `tree.proposal(fn)`: the same pending turn, named for the
+  workflow where somebody reviews a change first. `inspect()` reports whether
+  each proposed change still represents current truth, `accept()` commits and
+  returns that inspection as settled, `reject()` withdraws. New types:
+  `Proposal`, `ProposalChange`, `ProposalStatus`, `ProposalInspection`,
+  `ProposalAcceptance`. See the kernel README.
+
+  It adds no new state semantics — the whole adversarial matrix was run against
+  `transaction()`/`confirm()`/`rollback()` before the facade existed, and
+  passed. Accepting is deliberately **not** undo history: wrap `undoable()`
+  around the proposal, not around `accept()`.
+
+- **Rejecting a transaction no longer strands unrelated changes.** Previously,
+  if a turn added an entity and another writer then touched that entity, the
+  rejection refused _entirely_ — leaving every value in that turn live,
+  including fields nothing else had touched. Rejection now completes for the
+  rest of the turn when newer truth has **superseded** the structural change
+  (the row was removed), while still refusing when newer truth **depends** on
+  it (the row was updated). Refusing there is correct: reversing would destroy
+  the newer write, and half-reversing a turn while reporting it rejected is
+  worse than an honest refusal.
+
+- **The same fix for a renamed entity.** A turn that rekeys a row, whose row a
+  later writer then deletes, now reverses the rest of the turn instead of
+  refusing.
+
 ## 15.2.1 (2026-09-22)
 
 **TL;DR** — Safe patch. No API changes, no behaviour changes, no size change.
@@ -8,13 +44,13 @@ but superseded before publication.
 ### For users
 
 - **A "Why SignalTree?" page.** [`docs/why-signaltree.md`](docs/why-signaltree.md)
-  answers the adoption question in ordinary language, including when *not* to
+  answers the adoption question in ordinary language, including when _not_ to
   adopt: for a small component or simple application, your framework's built-in
   state is probably all you need.
 - **A glossary.** [`docs/glossary.md`](docs/glossary.md) separates the three
   vocabularies — everyday, advanced, and architecture — so the precise terms
   are optional rather than prerequisite. Public documentation now says **entity
-  lifetime** rather than *subject*, because RxJS owns that word for Angular
+  lifetime** rather than _subject_, because RxJS owns that word for Angular
   developers.
 - **Introductory copy rewritten around behaviour.** The Solid and kernel
   READMEs opened with semantic-authority language; they now describe what the
