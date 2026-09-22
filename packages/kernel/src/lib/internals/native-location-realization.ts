@@ -14,7 +14,10 @@ import {
   type LocationRuntime,
   type WritableLocationBinding,
 } from './location-runtime';
-import type { ObservationAdapter } from './observation-adapter';
+import type {
+  EpochHandle,
+  ObservationAdapter,
+} from './observation-adapter';
 
 export function createNativeLocationRuntime(
   observation: ObservationAdapter
@@ -223,40 +226,78 @@ export function createNativeLocationRuntime(
    * through `publish` also puts the epoch back inside invalidation grouping,
    * which returning the bare cell had opted it out of.
    */
-  const createEpoch = (): WritableCell<number> => {
-    // `EPOCH-TOKEN-0`. An epoch is not state. Its number is a nonce nobody
-    // reads — the durable truth is `EntityValueStore` and `StructuralStore` —
-    // so what it needs is exactly a read-dependency and an invalidation, which
-    // is what `createToken` IS.
-    //
-    // Two earlier versions built it on `createWritableCell`, and both were
-    // wrong for the same underlying reason: reaching for a STATE primitive to
-    // do a non-state job. The first returned the adapter's raw cell and wrote
-    // to it, which is not writable by contract and left Vue's epoch
-    // permanently dead. The second kept the whole realization record merely to
-    // harvest the token inside it. This allocates the token and nothing else.
+  /**
+   * `ANGULAR-NATIVE-EPOCH-0`. Prefer the framework's own epoch primitive when
+   * the adapter supplies the create/advance PAIR; otherwise build a portable
+   * one on `createToken`.
+   *
+   * The pair matters: the kernel never writes to an adapter-owned handle — the
+   * adapter that created it advances it — so the assumption that silently
+   * killed Vue's entity invalidation cannot be made here.
+   */
+  const nativeEpochs = Boolean(
+    observation.createEpoch && observation.advanceEpoch
+  );
+
+  /**
+   * ONE publisher for every epoch in this runtime, not one per subject.
+   *
+   * Per-epoch allocation is the entire economics here: a bare Angular signal is
+   * 562 B/entity and any wrapper around it costs ~190 B more. Staging handles
+   * in a shared set and publishing a single shared publisher keeps grouping
+   * intact — `publish` dedupes it, and a group flush drains every pending
+   * advance at once — while allocating nothing per subject beyond the
+   * framework's own primitive.
+   */
+  const pendingEpochs = new Set<EpochHandle>();
+
+  const advanceHandle = (handle: EpochHandle): void => {
+    if (nativeEpochs) {
+      observation.advanceEpoch?.(handle);
+      return;
+    }
+    // A handle WE built, so updating it is not an assumption about an
+    // adapter's cell.
+    (handle as unknown as WritableCell<number>).update((v) => v + 1);
+  };
+
+  const epochPublisher: LocationPublisher = {
+    notify: () => {
+      if (pendingEpochs.size === 0) return;
+      const draining = [...pendingEpochs];
+      pendingEpochs.clear();
+      for (const handle of draining) advanceHandle(handle);
+    },
+  };
+
+  const createEpoch = (): EpochHandle => {
+    if (nativeEpochs) return observation.createEpoch?.() as EpochHandle;
     let version = 0;
     const token = observation.createToken();
-    const publisher: LocationPublisher = {
-      notify: () => token.invalidate(),
-    };
     const epoch = (() => {
       token.observe();
       return version;
     }) as WritableCell<number>;
     epoch.set = (next: number) => {
-      if (next === version) return;
       version = next;
-      publish([publisher]);
+      token.invalidate();
     };
     epoch.update = (fn: (current: number) => number) => epoch.set(fn(version));
     epoch.asReadonly = () => epoch;
-    return epoch;
+    return epoch as unknown as EpochHandle;
   };
+
+  /** Stage an advance; grouping decides when it lands. */
+  const advanceEpoch = (handle: EpochHandle): void => {
+    pendingEpochs.add(handle);
+    publish([epochPublisher]);
+  };
+
 
   return {
     createCell,
     createEpoch,
+    advanceEpoch,
     createDerived,
     createWritable,
     createWritableProjection,
