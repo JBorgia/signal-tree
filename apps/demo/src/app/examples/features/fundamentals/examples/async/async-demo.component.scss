@@ -331,3 +331,6 @@ st-example {
 .request-policy summary {
   cursor: pointer;
 }
+.request-policy summary:hover {
+  color: var(--color-primary-700);
+}

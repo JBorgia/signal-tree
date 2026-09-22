@@ -80,6 +80,14 @@ a:focus-visible {
   font-weight: 700;
   text-underline-offset: 0.25em;
 }
+// Matches styles.scss `main a:not([class]):hover`; the class is the only
+// reason these links were not already covered by it.
+.text-link:hover {
+  color: var(--color-primary-800);
+  text-decoration-color: currentColor;
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+}
 .page-band {
   position: relative;
   padding-block: clamp(2rem, 4vw, 3.25rem);
@@ -120,6 +128,14 @@ a:focus-visible {
 .scenario-picker label.is-selected {
   background: var(--color-accent-soft);
 }
+// The radio itself has no border, so the global input hover rule in
+// styles.scss has nothing to colour. The row is the real target, as with
+// .navigation-link:hover -- and the border, not the background, because the
+// selected row already carries --color-accent-soft.
+.scenario-picker label:hover {
+  border-color: var(--color-primary-700);
+}
+
 .scenario-picker label:focus-within {
   outline: 3px solid var(--color-primary-700);
   outline-offset: 3px;
