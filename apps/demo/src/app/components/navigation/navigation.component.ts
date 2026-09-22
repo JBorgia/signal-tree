@@ -6,7 +6,6 @@ import { SIGNALTREE_VERSION_SUMMARY } from '../../version';
 interface DemoLink {
   readonly id: string;
   readonly title: string;
-  readonly description: string;
   readonly route: string;
   readonly queryParams?: Readonly<Record<string, string>>;
   readonly fragment?: string;
@@ -15,6 +14,7 @@ interface DemoLink {
 interface NavigationSection {
   readonly id: string;
   readonly label: string;
+  readonly collapsed?: boolean;
   readonly items: readonly DemoLink[];
 }
 
@@ -44,68 +44,59 @@ export class NavigationComponent {
         {
           id: 'start',
           title: 'Start here',
-          description: 'A five-minute tour of the current v15 model',
           route: '/start',
         },
         {
           id: 'causality',
-          title: 'Why causality',
-          description: 'The business value of state that retains meaning',
+          title: 'Why SignalTree?',
           route: '/why-causality',
         },
         {
           id: 'architecture',
           title: 'Architecture',
-          description: 'Verified ownership, causality, identity, and Link',
           route: '/architecture-overview',
         },
         {
           id: 'fundamentals',
           title: 'Fundamentals',
-          description: 'Interactive construction and state grammar',
           route: '/examples/fundamentals',
         },
         {
           id: 'migration',
-          title: 'Migration',
-          description: 'Move application ownership toward the v15 model',
+          title: 'Upgrade to v15',
           route: '/migrate',
         },
       ],
     },
     {
       id: 'core',
-      label: 'Core concepts',
+      label: 'Examples',
+      collapsed: true,
       items: [
         {
           id: 'state-derived',
-          title: 'State & derived',
-          description: 'Shape, $ access, writes, and computed state',
+          title: 'Nested state',
           route: '/examples/fundamentals',
           fragment: 'signals-basics',
         },
         {
           id: 'batching',
-          title: 'Coherent operations',
-          description: 'Batching and grouped publication',
+          title: 'Update several fields',
           route: '/batching',
         },
         {
           id: 'entities',
-          title: 'EntityMap',
-          description: 'Keyed identity and queries',
+          title: 'Live collections',
           route: '/entities',
         },
         {
           id: 'restoration',
-          title: 'Restoration',
-          description: 'Designated undo and redo',
+          title: 'Undo user edits',
           route: '/restoration',
         },
         {
           id: 'external',
-          title: 'External truth & Link',
-          description: 'Ingress authority and persistent relationships',
+          title: 'Server updates',
           route: '/external-truth',
         },
       ],
@@ -113,25 +104,40 @@ export class NavigationComponent {
     {
       id: 'frameworks',
       label: 'Frameworks',
+      collapsed: false,
       items: [
+        {
+          id: 'frameworks-overview',
+          title: 'Overview',
+          route: '/frameworks',
+        },
         {
           id: 'angular',
           title: 'Angular',
-          description: 'Native signals, DI, and owned construction',
           route: '/docs',
           queryParams: { package: 'angular' },
         },
         {
           id: 'react',
           title: 'React',
-          description: 'Owner-bound external-store observation',
           route: '/docs',
           queryParams: { package: 'react' },
         },
         {
+          id: 'vue',
+          title: 'Vue',
+          route: '/docs',
+          queryParams: { package: 'vue' },
+        },
+        {
+          id: 'solid',
+          title: 'Solid',
+          route: '/docs',
+          queryParams: { package: 'solid' },
+        },
+        {
           id: 'kernel',
-          title: 'Kernel / Plain TypeScript',
-          description: 'Framework-neutral state and causal semantics',
+          title: 'TypeScript',
           route: '/docs',
           queryParams: { package: 'kernel' },
         },
@@ -140,29 +146,26 @@ export class NavigationComponent {
     {
       id: 'advanced',
       label: 'Advanced',
+      collapsed: true,
       items: [
         {
           id: 'benchmarks',
           title: 'Browser benchmarks',
-          description: 'Capability-matched recurring costs and foundations',
           route: '/benchmarks',
         },
         {
           id: 'devtools',
           title: 'DevTools',
-          description: 'State inspection integration',
           route: '/devtools',
         },
         {
           id: 'depth',
           title: 'Type system',
-          description: 'Adjustable compile-backed depth proof',
           route: '/deep-typing',
         },
         {
           id: 'adapter-sdk',
           title: 'Adapter SDK',
-          description: 'Kernel authority and framework realization',
           route: '/architecture-overview',
           fragment: 'foundation-heading',
         },
@@ -171,17 +174,16 @@ export class NavigationComponent {
     {
       id: 'archive',
       label: 'Archive',
+      collapsed: true,
       items: [
         {
           id: 'legacy-changelog',
           title: 'Pre-v15 releases',
-          description: 'Historical APIs and release notes',
           route: '/legacy-changelog',
         },
         {
           id: 'benchmark-history',
           title: 'Benchmark history',
-          description: 'Archived harness submissions',
           route: '/realistic-benchmark-history',
         },
       ],
