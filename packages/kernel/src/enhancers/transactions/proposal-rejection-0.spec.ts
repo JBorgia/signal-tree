@@ -12,10 +12,11 @@ import { transactions } from './transactions';
  * > behaviour, and a truthful multi-writer review UX can be built on them with
  * > no proposal-specific rule.
  *
- * THIS FILE FIXES NOTHING AND DISPOSITIONS NOTHING. Every expectation records
- * what HEAD does today. An expectation here means "this is what happens",
- * never "this is what should happen". The PR-A / PR-B / PR-C disposition is
- * argued in TODO.md against these measurements, not asserted here.
+ * Started as an observation pass; now ALSO the acceptance suite for the PR-A
+ * fix that pass produced. Every expectation still records measured behaviour.
+ * Cases marked PRE-EXISTING record behaviour PR-A deliberately did not change,
+ * and were verified identical with and without the fix applied, so they are
+ * evidence rather than aspiration. The disposition argument lives in TODO.md.
  *
  * ---------------------------------------------------------------------------
  * MEASURED, 2026-09-22:
@@ -33,19 +34,28 @@ import { transactions } from './transactions';
  *                                                location in the turn stays at
  *                                                its proposed value
  *
- *   structural add, later REMOVE of the          whole-turn refusal —
- *   added subject (authored or realized)         same as above, although the
- *                                                turn's structural fact is
- *                                                already gone
+ *   structural add, later REMOVE of the          reversal COMPLETES — the
+ *   added subject (authored or realized)         turn's structural fact is
+ *                                                already gone, so the rest of
+ *                                                the turn compensates (PR-A)
  * ---------------------------------------------------------------------------
  *
  * The third row is the discriminating control: it separates "newer truth
  * DEPENDS on the speculative structure" from "newer truth SUPERSEDED it".
- * `classifyLaterOverlap` draws that distinction for scalars via
- * `mutationIntent === 'replace'` + `supersededScalarKeys`.
- * `hasSameSubjectDependency` returns a conflict for ANY later same-subject
- * effect. Both facts are stated here as read code; what they imply is a
- * disposition question and lives in TODO.md.
+ * Before PR-A it refused, stranding unrelated speculative scalars; that is the
+ * measurement the disposition rests on.
+ *
+ *     The axis is supersession vs dependency, not scalar vs structural.
+ *
+ * Still refusing, and correctly: a later UPDATE of the added subject (case 9),
+ * a turn holding one superseded AND one depended-upon subject (case 14), a
+ * pending remove whose subject newer truth re-created (case 15).
+ *
+ * Known same-symptom gaps PR-A does NOT close, recorded not fixed: pending
+ * remove (case 15) and pending rekey (case 16) both strand a scalar when their
+ * subject is superseded. Rekey rollback carries a documented repair history
+ * (RESTORE-P0 P0-B, rekeyed-rollback-defect.spec.ts), so widening into it is a
+ * scope decision, not a tidy-up.
  *
  * Deliberately NOT done here, per the preregistration: no propose()/accept()/
  * reject() naming, no change to transaction semantics, nothing touching
@@ -337,7 +347,7 @@ describe('PROPOSAL-REJECTION-0 / 10 — unrelated writer must NOT block (control
 // judged.
 
 describe('PROPOSAL-REJECTION-0 / 11 — structural supersession, REALIZED remove', () => {
-  it('refuses although the added subject is already gone', async () => {
+  it('completes the reversal: the added subject is already gone', async () => {
     const tree = rowTree();
     await flush();
 
@@ -355,15 +365,17 @@ describe('PROPOSAL-REJECTION-0 / 11 — structural supersession, REALIZED remove
     // for; nothing later depends on it.
     expect(tree.$.rows.ids()).toEqual([]);
 
-    expect(tryReject(pending)).toBe('later-confirmed-dependency');
-    expect(tree.$.x()).toBe(1);
-    expect(tree.$.y()).toBe(2);
+    // PR-A. The later remove already performed the compensation the rollback
+    // would issue, so reversing the rest COMPLETES the turn's reversal.
+    expect(tryReject(pending)).toBe(false);
+    expect(tree.$.x()).toBe(0);
+    expect(tree.$.y()).toBe(0);
     expect(tree.$.rows.ids()).toEqual([]);
   });
 });
 
 describe('PROPOSAL-REJECTION-0 / 12 — structural supersession, AUTHORED remove', () => {
-  it('refuses identically, so the behaviour is not realization-specific', async () => {
+  it('completes identically, so the behaviour is not realization-specific', async () => {
     const tree = rowTree();
     await flush();
 
@@ -377,9 +389,131 @@ describe('PROPOSAL-REJECTION-0 / 12 — structural supersession, AUTHORED remove
     tree.$.rows.removeOne('A');
     await flush();
 
+    expect(tryReject(pending)).toBe(false);
+    expect(tree.$.x()).toBe(0);
+    expect(tree.$.y()).toBe(0);
+    expect(tree.$.rows.ids()).toEqual([]);
+  });
+});
+
+// ───────────── PR-A falsifiers: dependency vs supersession, not kind ─────────
+//
+// These exist to stop the PR-A fix degenerating into "structural adds always
+// roll back". The discriminator must be whether newer truth currently occupies
+// the position, not the effect kind and not the mere presence of a remove.
+
+describe('PROPOSAL-REJECTION-0 / 13 — remove then RE-ADD under a new subject', () => {
+  it('reverses the turn and leaves the re-added record untouched', async () => {
+    const tree = rowTree();
+    await flush();
+
+    const pending = tree.transaction(() => {
+      tree.$.x(1);
+      tree.$.rows.addOne({ id: 'A', name: 'Proposed' });
+    });
+    await flush();
+
+    realization(() => {
+      tree.$.rows.removeOne('A');
+      tree.$.rows.addOne({ id: 'A', name: 'FromServer' });
+    });
+    await flush();
+
+    // Stable entity lifetime decides this. The server's re-added row REUSES
+    // the business key but is a DIFFERENT subject, so it is not the subject
+    // the turn added and compensating the turn cannot reach it. The turn's own
+    // subject was erased, so the reversal completes.
+    //
+    // Measured against the pre-PR-A build, which refused here and stranded `x`
+    // at 1: the fix strictly improves this case rather than changing which
+    // record survives.
+    expect(tryReject(pending)).toBe(false);
+    expect(tree.$.x()).toBe(0);
+    expect(tree.$.rows.byId('A')?.()?.name).toBe('FromServer');
+  });
+});
+
+describe('PROPOSAL-REJECTION-0 / 14 — one superseded AND one depended-upon subject', () => {
+  it('a single surviving dependency still refuses the whole turn', async () => {
+    const tree = rowTree();
+    await flush();
+
+    const pending = tree.transaction(() => {
+      tree.$.x(1);
+      tree.$.rows.addOne({ id: 'A', name: 'ProposedA' });
+      tree.$.rows.addOne({ id: 'B', name: 'ProposedB' });
+    });
+    await flush();
+
+    realization(() => {
+      tree.$.rows.removeOne('A'); // superseded
+      tree.$.rows.updateOne('B', { name: 'FromServer' }); // depended upon
+    });
+    await flush();
+
+    // Partial supersession is NOT a licence to partially reverse the turn.
+    expect(tryReject(pending)).toBe('later-confirmed-dependency');
+    expect(tree.$.rows.byId('B')?.()?.name).toBe('FromServer');
+    expect(tree.$.x()).toBe(1);
+  });
+});
+
+describe('PROPOSAL-REJECTION-0 / 15 — pending REMOVE is not superseded by a later add', () => {
+  it('still refuses, through the effect-validation door (PRE-EXISTING)', async () => {
+    const tree = rowTree();
+    tree.$.rows.addOne({ id: 'A', name: 'Original' });
+    await flush();
+
+    const pending = tree.transaction(() => {
+      tree.$.x(1);
+      tree.$.rows.removeOne('A');
+    });
+    await flush();
+
+    realization(() => tree.$.rows.addOne({ id: 'A', name: 'FromServer' }));
+    await flush();
+
+    // Compensating a pending remove means re-adding the ORIGINAL row, which
+    // would clobber the server's. Only a pending `add` may be superseded, so
+    // PR-A deliberately leaves this path alone.
+    //
+    // Verified identical with and without the PR-A change: it refuses through
+    // `effect-validation-failed` (the compensating re-add fails because the
+    // key is occupied) rather than `later-confirmed-dependency`. Newer truth
+    // IS preserved, but `x` is stranded at its proposed value — the same
+    // symptom PR-A fixed for pending adds, reached by a different door.
+    // Recorded as a follow-up in TODO.md; NOT fixed here.
+    expect(tryReject(pending)).toBe('effect-validation-failed');
+    expect(tree.$.rows.byId('A')?.()?.name).toBe('FromServer');
+    expect(tree.$.x()).toBe(1);
+  });
+});
+
+describe('PROPOSAL-REJECTION-0 / 16 — pending REKEY superseded by a later remove', () => {
+  it('still refuses and strands the scalar (PRE-EXISTING, out of PR-A scope)', async () => {
+    const tree = rowTree();
+    tree.$.rows.addOne({ id: 'A', name: 'Original' });
+    await flush();
+
+    const pending = tree.transaction(() => {
+      tree.$.x(1);
+      tree.$.rows.changeId('A', 'A2');
+    });
+    await flush();
+
+    realization(() => tree.$.rows.removeOne('A2'));
+    await flush();
+
+    // The SAME symptom PR-A fixed for pending adds: the turn's structural fact
+    // is gone, nothing depends on it, yet the reject refuses and `x` is left
+    // at its proposed value.
+    //
+    // NOT fixed here, deliberately. PR-A's scope is pending adds, and rekey
+    // rollback carries a documented repair history (RESTORE-P0 P0-B, see
+    // rekeyed-rollback-defect.spec.ts) that a scope expansion could regress.
+    // Recorded in TODO.md as the follow-up decision.
     expect(tryReject(pending)).toBe('later-confirmed-dependency');
     expect(tree.$.x()).toBe(1);
-    expect(tree.$.y()).toBe(2);
     expect(tree.$.rows.ids()).toEqual([]);
   });
 });

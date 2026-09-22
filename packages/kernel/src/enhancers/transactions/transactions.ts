@@ -361,6 +361,82 @@ function buildPendingRollbackPlan(
     return undefined;
   };
 
+  /**
+   * PROPOSAL-REJECTION-0, disposition PR-A.
+   *
+   * The axis is SUPERSESSION vs DEPENDENCY, not scalar vs structural.
+   * `hasSameSubjectDependency` is named for a dependency test but implements a
+   * presence test: any later effect on the same subject refuses. That is right
+   * when newer truth RESTS ON the structure this turn created — removing the
+   * row would destroy it, and compensating only the turn's other effects would
+   * half-apply a turn we reported as rejected, which is worse than refusing.
+   *
+   * It is wrong when newer truth ERASED that structure instead. A later remove
+   * of a subject this turn added has already performed the compensation the
+   * rollback would issue: there is nothing left to undo at that position and
+   * nothing there to destroy. Reversing the turn's remaining effects then
+   * COMPLETES the reversal rather than half-applying it, and refusing instead
+   * strands unrelated speculative values — measured at
+   * `proposal-rejection-0.spec.ts` cases 11 and 12, where `x` and `y` stayed
+   * at their proposed values after a reject although nothing ever wrote to
+   * them.
+   *
+   * Anything that puts the subject BACK — a later add, rekey or set after the
+   * remove — means newer truth now occupies the position, so the refusal
+   * stands. Only the final later effect for the subject decides, which is why
+   * this scans to the end rather than returning on the first remove.
+   *
+   * Deliberately narrow: only a pending `add` can be superseded this way.
+   *
+   * A pending `remove` compensates by re-adding, and a later writer re-adding
+   * that subject is newer truth the re-add would clobber, so it must keep
+   * refusing; a later remove of an already-removed subject is unreachable
+   * (the collection throws "Entity with id ... not found"), which is why
+   * widening this test to `remove` is inert rather than merely untested.
+   *
+   * A pending `rekey` superseded by a later remove exhibits the SAME stranded
+   * -scalar symptom — measured, `proposal-rejection-0.spec.ts` case 16 — and is
+   * left unfixed on purpose: rekey rollback carries a documented repair history
+   * (RESTORE-P0 P0-B, see `rekeyed-rollback-defect.spec.ts`), so widening into
+   * it is a scope decision rather than a tidy-up.
+   */
+  const classifyStructuralOverlap = (
+    effect: CollectionAddEffect | CollectionRemoveEffect | CollectionRekeyEffect
+  ):
+    | { kind: 'none' }
+    | { kind: 'superseded' }
+    | {
+        kind: 'conflict';
+        conflictingTurnId?: number;
+        conflictingEffect?: TurnEffect;
+      } => {
+    if (effect.kind === 'add') {
+      let erased = false;
+      for (const laterEntry of laterEffects) {
+        const laterEffect = laterEntry.effect;
+        if (laterEffect.ownerPath !== effect.ownerPath) {
+          continue;
+        }
+        if (laterEffect.subject !== effect.subject) {
+          continue;
+        }
+        erased = laterEffect.kind === 'remove';
+      }
+      if (erased) {
+        return { kind: 'superseded' };
+      }
+    }
+
+    const dependency = hasSameSubjectDependency(effect);
+    return dependency
+      ? {
+          kind: 'conflict',
+          conflictingTurnId: dependency.conflictingTurnId,
+          conflictingEffect: dependency.conflictingEffect,
+        }
+      : { kind: 'none' };
+  };
+
   const compensation: TurnEffect[] = [];
   for (let i = pendingEffects.length - 1; i >= 0; i--) {
     const effect = pendingEffects[i];
@@ -387,17 +463,20 @@ function buildPendingRollbackPlan(
       case 'add':
       case 'remove':
       case 'rekey': {
-        const dependency = hasSameSubjectDependency(effect);
-        if (dependency) {
+        const overlap = classifyStructuralOverlap(effect);
+        if (overlap.kind === 'conflict') {
           return {
             conflict: {
               kind: 'later-confirmed-dependency',
               pendingTurnId: pendingTurn.id,
               pendingEffect: effect,
-              conflictingTurnId: dependency.conflictingTurnId,
-              conflictingEffect: dependency.conflictingEffect,
+              conflictingTurnId: overlap.conflictingTurnId,
+              conflictingEffect: overlap.conflictingEffect,
             },
           };
+        }
+        if (overlap.kind === 'superseded') {
+          continue;
         }
         compensation.push(effect);
         break;
