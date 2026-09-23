@@ -76,6 +76,34 @@ CONSEQUENCE PUBLICATION    effects stay DEFERRED until settlement
 The open commit scope legitimately gates the second. It is currently also
 gating the first, and those are different questions.
 
+## Acceptance controls — preregistered before touching the seam
+
+Four controls, fixed in advance so the fix has nowhere to hide. All four are
+measured through ONE held `useSignalTree` consumer, because a fix that only
+works for a freshly mounted component is not a fix.
+
+```text
+A  plain write                 React updates normally
+                               (guards against breaking the ordinary path)
+
+B  pending transact            React observes the speculative value BEFORE
+                               confirm() is called
+
+C  consequence publication     durable/consequence observers do NOT publish
+                               early while the turn is still open
+
+D  pending 7 -> rollback       the SAME held consumer observes 0 -> 7 -> 0
+```
+
+**C is the one that makes this hard.** B alone is satisfiable by simply
+deleting the `hasOpenCommitScope` guard, which would publish deferred
+consequences early and collapse the two layers this track exists to keep apart.
+B and C must hold simultaneously.
+
+**D is the one that catches a half-fix.** A seam that delivers the speculative
+value but not its compensation leaves the UI showing a value the tree no longer
+holds — worse than never showing it, because the user acts on it.
+
 ## Falsifiers
 
 - a fix that publishes deferred consequences early to make the UI update
