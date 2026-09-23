@@ -1,6 +1,6 @@
 # CAPABILITY-SURFACE-0
 
-> **Disposition: OPEN — preregistered 2026-09-22. Non-shipping.** Blocks
+> **Disposition: KEEP METHODS — reported 2026-09-22.** Blocks
 > `PUBLIC-API-GRAMMAR-0` and the `proposal() -> propose()` rename, because a
 > naming pass applied to methods that are about to move is a pass done twice.
 
@@ -135,3 +135,97 @@ interface can evade an export-oriented API baseline: `proposal()` was added to
 `TransactionMethods` and `api-baseline` recorded only the five new types. Any
 surface gate that comes out of this work must inventory **callables**, not
 exports.
+
+---
+
+# RESULT — KEEP METHODS
+
+Arm B was built and measured in full. It **passed every criterion except the
+one that motivated it**.
+
+## The tree-shaking rationale is refuted, quantitatively
+
+```text
+consumer                                  gzip        over bare
+bare signalTree                          12583 B          —
+transactions() configured, NEVER used    31380 B     +18797 B
+all enhancers configured, never used     47017 B     +34434 B
+```
+
+**Configuring `transactions()` costs 18.8 KB gzip even if you never call it.**
+
+Arm B's standalone extraction works — the propose module genuinely disappears
+when unimported, verified by a marker string unique to that module, not by
+bundler intuition:
+
+```text
+arm   scenario                            gzip     propose module present
+A     configured, neither used           31613 B   yes
+A     transaction used, proposal not     31627 B   yes
+A     both used                          31650 B   yes
+B     configured, neither used           31391 B   NO
+B     transact used, propose NOT         31448 B   NO
+B     both used                          31700 B   yes
+```
+
+Arm A never drops anything: all four scenarios sit within 37 B. Arm B drops
+cleanly. But the recovered amount is **179–222 B gzip — about 1.2% of the
+18.8 KB the enhancer costs**, and ~0.6% of the bundle.
+
+The weight is in the **enhancer machinery** — causal runtime, turn authority,
+rollback planning — not in the public operation wrappers. Moving a name off the
+tree object cannot reach it, because the enhancer is what installs the
+machinery and the consumer configured it deliberately.
+
+> If the goal is to reduce what a transactions-configured app pays, the lever
+> is the enhancer's machinery. It is not whether the call is
+> `store.proposal(fn)` or `propose(store, fn)`.
+
+## Everything else about arm B held
+
+```text
+typing         HOLDS. A phantom `TransactionsCapability` marker contributed by
+               the enhancer makes transact(treeWithoutTransactions, fn) a
+               COMPILE ERROR, not runtime discovery. Both @ts-expect-error
+               probes were consumed.
+semantics      IDENTICAL. 20/20 ported assertions, including byte-identical
+               state against raw transaction()/confirm()/rollback().
+neutrality     PASSES. Adapters re-export with `export *`, so a standalone
+               operation needs no per-adapter work.
+runtime        EXPLICIT. Missing capability throws, never silently no-ops.
+```
+
+So arm B is **technically viable**. It simply does not earn adoption on the
+measurement that prompted it.
+
+## What this decides, and what it does not
+
+**Decided:** the bundle argument contributes nothing to the placement question.
+It should not be cited again in either direction.
+
+**Not decided by measurement:** whether optional operations _should_ live on the
+tree object is now purely an API-design judgement — surface size, grammar,
+discoverability, how much a state object should carry. That is a legitimate
+question, but it is the owner's call and no longer has a measurement behind it.
+
+Recorded outcome per the preregistered rule: _"KEEP METHODS — no material
+bundle difference."_ 179 B gzip is not material.
+
+## Consequence for the release sequence
+
+`PUBLIC-API-GRAMMAR-0` is **unblocked**. Names apply to the method surface:
+
+```text
+transaction()  ->  transact()
+proposal()     ->  propose()
+```
+
+The rename preserved on `grammar-rename-unapproved` targets the surface that is
+being kept, so it is no longer at risk of being a pass done twice.
+
+## Preserved
+
+```text
+capability-surface-0-arm-b   full arm B implementation + typing, runtime and
+                             equivalence proofs
+```
