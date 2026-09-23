@@ -20,6 +20,21 @@ test. Every one must turn at least one test RED.
     M09  resurrect the predecessor after a newer rejection          <- R8/E
     M10  remove the dependency edge on a structural add             <- L8
 
+    M11  an accepted OLDER contribution overwrites a newer committed
+         frontier                                                    <- L11
+    M12  a superseded pending contribution becomes visible again
+         after a newer accept                                        <- L6 L11
+    M13  settlement succeeds but one contribution has no terminal
+         disposition                                                 <- L9
+    M14  a structural DEPENDENCY is treated as supersession           <- T02a
+    M15  a structural INDEPENDENCE is treated as dependency           <- T06a
+    M16  a confirmed/realized write fails to advance semantic
+         precedence                                                  <- L11
+
+M11..M16 attack the laws added after the first draft, which is the point: the
+mutation set has to grow whenever a law does, or the new laws are untested
+assertions.
+
 M04 exists because the SEMANTICS-1 draft missed Law 6 entirely: a model can
 satisfy all eight earlier laws and still let `accept P2; accept P1` end at
 P1's value. M04 is the mutation that would have caught that on paper.

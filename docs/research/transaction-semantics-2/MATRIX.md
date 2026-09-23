@@ -3,6 +3,25 @@
 Preregistered before any prototype runs. Expected states are recorded per case
 in the contract module before execution.
 
+## The adapter is SEMANTIC, not API-shaped
+
+The contract module must not assume a candidate exposes
+`transaction()` / `confirm()` / `rollback()`. An MVCC/draft candidate
+naturally exposes `draft()` / `merge()` / `discard()`; a contribution-layer
+candidate exposes something else again. Binding the harness to today's method
+names would privilege the current architecture and quietly decide the
+competition.
+
+The adapter expresses semantic operations only:
+
+    beginContribution(...)      open a speculative unit
+    settleAccept(...)           make its surviving contributions current
+    settleReject(...)           remove its contributions
+    readVisible(...)            resolved visible truth
+    readSettlementState(...)    disposition of each contribution + ownership
+
+Each candidate maps its own mechanism onto that contract.
+
 The suite is BLACK-BOX. It observes only: state before, the operations, state
 after, pending/confirmed status, and errors raised. It must know nothing about
 `classifyLaterOverlap`, `hasSameSubjectDependency`, compensation, layers,
@@ -53,8 +72,36 @@ case and still be conceptually wrong; S04/S12 are what catch that.
     T13  server realization against pending-created subject
     T14  mixed structural + scalar transaction            L9
 
-T02, T03 and T06 are the trichotomy discriminators: a candidate that treats
-them identically has a presence test, not a dependency model.
+### Dependency vs coexistence — the discriminating triple
+
+T02/T03/T06 alone do not prove a candidate can RECOGNISE dependency; they can
+be passed by replacing one presence test with another. These three must be
+distinguished from each other:
+
+    T02a  P1 adds A(S1); later writes A(S1).name; reject P1
+          DEPENDENCY  — the later fact requires S1 to exist, so existence
+                        cannot simply be removed
+
+    T06a  P1 rekeys A(S1) -> B; later writes A(S1).name; reject P1
+          INDEPENDENCE — a key change and a field change do not contend:
+                        reverse the key, preserve the name
+
+    T06b  P1 rekeys A(S1) -> B; later creates something whose identity or
+          relationship REQUIRES key B; reject P1
+          DEPENDENCY  — a real rekey dependency
+
+T06b is the case that matters most. Without it, "rekey + later field write"
+proves independence but the suite never proves it can recognise a genuine
+rekey dependency — so a candidate that calls every rekey independent passes.
+
+### Committed-frontier precedence (L11)
+
+    T15  canonical y=0; P1 seq1 y=1 pending; P2 seq2 y=2 pending;
+         committed/realized seq3 y=3
+         visible is 3; accepting P1 or P2 later cannot resurrect 1 or 2
+    T16  same, with the committed write landing between the two proposals
+    T17  committed frontier advances a STRUCTURAL location while a pending
+         structural contribution targets it
 
 ## Composition
 

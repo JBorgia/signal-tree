@@ -62,9 +62,45 @@ If P1 creates S1 and later truth modifies S1, rejecting P1 must either
 preserve all dependent truth correctly, or refuse while changing nothing. It
 may not erase the dependency or half-settle.
 
-**L9 — one semantic unit settles atomically.**
-A mixed transaction (scalar, scalar, rekey, field update) cannot become
-partly settled.
+**L9 — settlement is atomic over the DISPOSITION of every contribution.**
+Not "every effect must win". Every contribution in the unit must end in a
+defined state:
+
+    committed / current
+    superseded / non-effective
+    rejected / removed
+    conflicted / refused
+
+The operation may not leave any contribution with no owner or an unresolved
+settlement status.
+
+The earlier wording ("a mixed transaction cannot become partly settled") was
+wrong: it outlawed behaviour already decided to be correct.
+
+    P1 proposes   name = Agent, priority = 3
+    later truth   name = Server
+    accept P1     name stays Server, priority = 3
+
+That is a COMPLETE settlement in which one contribution was already
+superseded. L9 forbids R6-style orphaning without forbidding this.
+
+**L11 — a later committed/realized frontier supersedes older pending
+contributions.**
+A committed or realized write at a semantic location supersedes any OLDER
+pending contribution at that location, unless the pending contribution is
+explicitly defined as dependent on the committed change.
+
+    canonical rev0   y=0
+    P1 seq1          y=1  pending
+    P2 seq2          y=2  pending
+    committed seq3   y=3
+
+Visible truth is 3. Both P1 and P2 are superseded for that location, and
+accepting either later cannot resurrect 1 or 2.
+
+This is a separate law from L6 on purpose. L6 alone yields a resolver that
+orders P1 against P2 correctly and still gets SERVER REALIZATION wrong, which
+is the ordinary case, not the exotic one.
 
 **L10 — observation agrees with settlement.**
 If `inspect()` reports a contribution as current, superseded or conflicted,
@@ -72,6 +108,14 @@ settlement must behave consistently with that classification. No
 "inspect says superseded, reject corrupts or refuses for an unrelated
 reason" without an honest additional status. This law is what makes a review
 UI truthful, so it is load-bearing for the product thesis.
+
+## Dependency is not coexistence
+
+The trichotomy below is not provable by a suite that only ever touches a
+subject one way. A candidate can pass by swapping one presence test for
+another unless the matrix contains a pair where the SAME subject is touched
+twice and only one touch is genuinely dependent. See T02a / T06a / T06b in
+MATRIX.md.
 
 ## The trichotomy that survives every architecture
 
