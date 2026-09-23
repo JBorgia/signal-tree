@@ -56,7 +56,11 @@ regression it exists to detect. Different claim, weaker evidence.
 
 ## Stage 3 (real) — same arm, deliberate retention
 
-`--retain N` holds N retired subject nodes strongly reachable. Same arm, same
+`--retain N` holds N retired-node HANDLES — the results of `byId()` —
+strongly reachable. Stated as handles, not subjects: a one-handle-to-one-
+retired-SubjectId relationship has not been separately proven for this
+benchmark, and the mutation's value is that it exercises the same
+lifetime/reachability failure mode, not that it counts subjects. Same arm, same
 churn, same protocol; the only difference is that retired subjects stop being
 forgettable. Five samples per level, 150 rounds:
 
@@ -72,8 +76,9 @@ retained   observed growthMB          vs 40 MB ceiling
 
 **The sensitivity specification the gate can honestly claim:**
 
-> Reliably detects gross retired-subject retention at or above **~10,000
-> accidentally retained subjects** (~6.7% of the 150k churned). 5,000 is
+> Reliably detects gross retention at or above **~10,000 deliberately
+> retained retired-node handles** (the mutation holds `byId()` results
+> strongly reachable across rounds). 5,000 is
 > MARGINAL — its 40.56 MB floor sits barely above the ceiling, and a 12 MB
 > low-mode draw would put it under. At or below 2,500 it is invisible.
 
@@ -247,3 +252,37 @@ platform before it blocks a release**: control distribution, and the
 Until then the gate is better than what it replaced but not yet cleared. The
 checker now prints Node version, V8 version, platform and arch on failure, so a
 future runtime upgrade turning this red is diagnosable rather than mysterious.
+
+### The characterization job
+
+`.github/workflows/retention-characterization.yml`, **manual dispatch only** —
+it is a one-off measurement, not a gate, and must not turn anything red while
+the threshold is unvalidated.
+
+```text
+CONTROL    no-history-reads, rounds 150, retain 0       30 fresh processes
+MUTATION   no-history-reads, rounds 150, retain 10000   10 fresh processes
+```
+
+Node version is already identical (`.nvmrc` 24.15.0); only platform and arch
+differ, which is precisely the variable under test. The full JSON — growthMB,
+heapUsed, heapTotal, RSS, per-space large-object figures, Node, V8, platform,
+arch, heap limit — uploads as an artifact.
+
+**It reports a separation summary and deliberately does not pass or fail.**
+The threshold is not the acceptance condition; the distributions are collected
+first, then the threshold is decided. Three outcomes:
+
+```text
+A  control well under 40, mutation well over   -> 40 MB validated, close
+B  clean separation at different values        -> derive a Linux ceiling from
+                                                  the distributions, document
+                                                  the environment dependence
+C  material overlap                            -> an absolute ceiling is not a
+                                                  reliable gate here; do NOT
+                                                  tune it to green
+```
+
+**Sample counts must not be reduced.** A three-sample green median hiding
+multimodal behaviour is the exact failure that kept an untrustworthy gate in
+place; spending the CI minutes to see the distribution is the entire point.
