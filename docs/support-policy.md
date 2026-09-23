@@ -39,6 +39,27 @@ The public API is what the package barrels export. `@signal-tree/kernel/adapter`
 and `@signal-tree/kernel/internals` are versioned the same way, but they are
 seams for adapter authors and tooling rather than application surface.
 
+### One recorded exception — 16.0.0
+
+**16.0.0 removes `transaction()` without a deprecation cycle.** It is renamed to
+`transact()`, and no alias ships.
+
+The MAJOR rule is honoured: this is a breaking change in a MAJOR release. What
+it skips is the _deprecate-then-remove_ path the bullet above implies. That is
+stated here rather than left to a research note, because a policy contradicted
+somewhere else is not a policy.
+
+Why the owner chose it: SignalTree is early enough that carrying a known-wrong
+public name purely for compatibility would create permanent surface debt, and
+breaking outright makes every missed call site a compile error instead of a
+silent deprecation warning. The migration is mechanical and total —
+`tree.transaction(fn)` becomes `tree.transact(fn)`.
+
+**This is a one-time reset, not a loosening of the rule.** From 16.0.0 the
+corrected surface is the compatibility baseline and the deprecation path above
+applies normally. Full reasoning:
+[`docs/research/api-breaking-reset-0.md`](research/api-breaking-reset-0.md).
+
 This commitment is new, and it is a response to a real history. Earlier
 releases did not behave this way: 14.0.0 was deprecated within about a day,
 14.1.0 shipped a packaging defect that was superseded immediately, and 15.0.0
@@ -60,12 +81,12 @@ Every supported framework passes the same semantic conformance suite — that is
 what "supported" means here. It does not mean every adapter is equally
 exercised or equally characterized.
 
-| Framework | Status    | Realization                | Characterization                                 |
-| --------- | --------- | -------------------------- | ------------------------------------------------ |
-| Angular   | Supported | Native signals             | Most established adapter; memory characterized   |
-| Vue       | Supported | Native refs                | Memory characterized                             |
-| React     | Supported | External-store integration | Memory characterized                             |
-| Solid     | Supported | Native signals             | New in 15.2; memory not yet characterized        |
+| Framework | Status    | Realization                | Characterization                               |
+| --------- | --------- | -------------------------- | ---------------------------------------------- |
+| Angular   | Supported | Native signals             | Most established adapter; memory characterized |
+| Vue       | Supported | Native refs                | Memory characterized                           |
+| React     | Supported | External-store integration | Memory characterized                           |
+| Solid     | Supported | Native signals             | New in 15.2; memory not yet characterized      |
 
 React integrates through an external store rather than a native per-field
 primitive, because that is React's own model — it is a different physical
