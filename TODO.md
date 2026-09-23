@@ -1245,8 +1245,10 @@ how a closed release gets reopened.
 
 #### PROPOSAL-REJECTION-0
 
-**OPEN — preregistered 2026-09-22. Run before any other sub-track. No API
-naming until this reports.**
+**CLOSED — PR-A confirmed and fixed, 2026-09-22.** Preregistered, run, and
+dispositioned: a superseded structural effect no longer blocks rollback. Full
+disposition and acceptance matrix below; the header said OPEN for a day after
+the fix landed.
 
 The product pitch is _"show provisional changes and safely reject them."_ If
 rejection is not safe under the adversarial case, the pitch is false and no
@@ -1502,10 +1504,10 @@ Falsifiers:
 
 #### REKEY-SUPERSESSION-0
 
-**OPEN — preregistered 2026-09-22. A tiny prerequisite, not a new track.**
-Blocks `PROPOSAL-0`. Closes the one remaining known structural case that
-decides whether "reject the proposal" can truthfully mean reject the _whole_
-proposal.
+**CLOSED — rekey supersession fixed, 2026-09-22.** Was the last known
+structural case deciding whether "reject the proposal" can truthfully mean
+reject the _whole_ proposal. It no longer blocks `PROPOSAL-0`, which is
+itself now implemented. Disposition below.
 
 > **Question:** when newer truth has eliminated or superseded the subject/key
 > state created by a pending rekey, can the transaction safely skip that
@@ -1969,9 +1971,151 @@ outcomes:
     Reopen the kernel only for that demonstrated fact.
 ```
 
-## RETIRED-SUBJECT-SLOPE-STABILITY-0 — opened 2026-09-22
+## PUBLIC-API-GRAMMAR-0 — CLOSED, rename set applied in 16.0.0
 
-**OPEN. A release gate is unreliable on unmodified code.** Found while
+**Record recovered 2026-09-23.** The full inventory was produced on branch
+`grammar-rename-unapproved` and never reached `main`: `TODO.md` was reverted to
+run `CAPABILITY-SURFACE-0` and the section went with it. Distilled here rather
+than merged — that branch is now thousands of lines behind and merging it would
+restore stale state to recover a record.
+
+**Ordering note, settled after this was written.** This section originally
+declared itself blocking on the grounds that no new public callable should ship
+until the grammar reported. `CAPABILITY-SURFACE-0` then established that
+PLACEMENT decides names, so the grammar was applied to the surface actually
+kept: enhancer capabilities remain tree methods.
+
+### The rule
+
+> **Public callable names describe what calling them does. Public types and
+> returned handles describe what they are. Factories name what they construct.
+> Qualifiers describe the writes inside their scope.**
+
+```text
+COMMAND     changes state, settles, or ends a lifetime        VERB
+            transact() propose() confirm() rollback() accept() reject()
+            undo() redo() destroy() dispose() addOne() updateOne()
+
+QUERY       observes, locates or describes; mutates nothing   NOUN / PREDICATE
+            byId() all() canUndo() inspect() retrieve()
+
+FACTORY     constructs or configures a thing                  CONCEPT NAME
+            signalTree() entityMap() transactions() restoration()
+            batching() devTools() leaf()
+
+QUALIFIER   classifies the writes inside its callback         ADJECTIVE / DOMAIN
+            undoable() external()
+
+EVENT       registers a subscription                          on<Thing>
+            onTreeError()
+```
+
+The categories exist to stop the rule degrading into "every function must be a
+verb", which would produce a worse API. `byId()` is not a defect; it is a
+query, and queries read as what they return.
+
+**`undoable()` and `external()` are the load-bearing proof that this is a
+system rather than a preference.** They are not commands — they classify the
+enclosed writes, and adjective naming is how they say so:
+
+```text
+undoable(() => ...)     these writes are undoable
+external(() => ...)     these writes are external truth
+transact(() => ...)     transact these writes
+propose(() => ...)      propose these writes
+```
+
+**Not Redux actions.** A method here is an action in the ordinary English
+sense: calling it does something. No `Action` type, no dispatch, no serialized
+command object, no reducer. Recorded because the word invites that misreading.
+
+### The factory/operation pair is deliberate
+
+```text
+transactions()   plural noun, FACTORY   installs the capability
+transact()       verb, COMMAND          performs the operation
+```
+
+### Adapters own almost no vocabulary
+
+Everything else arrives by `export * from '@signal-tree/kernel'`. Angular adds
+`defineStore()` (factory) and `toWritableSignal()` (query); React adds
+`useSignalTree()`; Vue and Solid own nothing. **Consequence: the 16.0.0 blast
+radius is almost entirely kernel** — the rename touched four packages'
+re-exports and docs, not four packages' APIs.
+
+### Final disposition of the rename set
+
+```text
+APPLIED   transaction() -> transact()   COMMAND named as a noun. Shipped in
+                                        15.2.1, removed outright under the
+                                        recorded one-time 16.0.0 reset.
+APPLIED   proposal()    -> propose()    Same defect, never shipped.
+
+REJECTED  empty -> isEmpty()            The audit called this "the worst single
+                                        pairing". Use-site inspection refuted
+                                        it: `empty` is not a method but a
+                                        readonly reactive signal PROPERTY, in a
+                                        block the source labels "Queries
+                                        (readonly properties returning
+                                        signals)" beside all/count/ids/asMap,
+                                        with a documented v10.3 decision
+                                        aligning bare-boolean accessors across
+                                        status/form/asyncSource. It and
+                                        `clear()` are not the same kind of
+                                        callable.
+
+KEPT      settled()                     Every use site is `await x.settled()`,
+                                        which supplies the temporal reading.
+                                        The boolean `settled()` that would have
+                                        created a collision is on `status()`,
+                                        which is not exported.
+KEPT      tap()                         Takes a BAG of observers
+                                        (onAdd/onUpdate/onRemove/onChange) and
+                                        returns an unsubscribe; the `on` is
+                                        already inside the payload, so forcing
+                                        the method into `on<Thing>` would be
+                                        wrong for a multi-handler registration.
+KEPT      intercept()                   `InterceptContext` exposes `block()`
+                                        and `transform()` applied synchronously
+                                        — an operation, not a subscription.
+KEPT      exportDebugSession()          Accurate; query-vs-command creates no
+                                        naming defect.
+```
+
+Full reasoning: `docs/research/public-api-grammar-0-dispositions.md`.
+
+### The proposed `api-grammar.yaml` is SUPERSEDED
+
+This section proposed a hand-maintained `tools/api-grammar.yaml`, one row per
+public callable, so the gate could ask "is every public callable deliberately
+classified?" rather than parse English.
+
+That question was right and the mechanism was replaced by something stronger:
+**`tools/api-callable-baseline.json`, GENERATED from emitted `.d.ts` via the
+TypeScript compiler API.** A hand-maintained inventory records what someone
+remembered to add; a generated one cannot miss a member. It captures owner,
+member kind and normalized signatures across functions, methods, callable
+properties, callable types and constructable classes — 240 entries, 13/13
+mutation-proven.
+
+What it does NOT carry is the `category` field. Classification remains prose
+here. If a future audit wants the category checkable, add it to the generated
+baseline rather than reviving a parallel hand-maintained file.
+
+## RETIRED-SUBJECT-SLOPE-STABILITY-0 — CLOSED 2026-09-23
+
+**CLOSED — gross-retention gate validated on Linux.** The unreliable slope gate
+was refuted and replaced by an absolute retained-heap ceiling, renamed
+`retired-lifetime-gross-retention`, and validated on the release environment
+(run `35886271808`, head SHA `f8f81505`, ubuntu-latest linux/x64: control
+3.23-3.24 MB over 30 processes, retain=10000 mutation 82.75-82.76 MB over 10,
+a 79.51 MB gap with no overlap). Full record:
+[`docs/research/retired-subject-slope-stability-0.md`](docs/research/retired-subject-slope-stability-0.md).
+
+The original finding, kept because it is the evidence:
+
+**A release gate was unreliable on unmodified code.** Found while
 clearing PROPOSAL-INSPECTION-0; the inspection work is exonerated and this is
 pre-existing.
 
