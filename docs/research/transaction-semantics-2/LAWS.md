@@ -102,12 +102,77 @@ This is a separate law from L6 on purpose. L6 alone yields a resolver that
 orders P1 against P2 correctly and still gets SERVER REALIZATION wrong, which
 is the ordinary case, not the exotic one.
 
+**L12 — arrival order is not authority order.**
+A realization advances authoritative truth only according to evidence its
+authority boundary supplies: revision, version or correlation semantics. Where
+that evidence is absent, SignalTree must NOT invent ordering.
+
+    server canonical rev10   y=0
+    request A sent
+    P1 local seq1            y=1
+    P2 local seq2            y=2      <- newer local intent
+    STALE response to A      rev11    y=1
+
+Treating "the realization arrived later" as "the frontier advanced past P2"
+is a temporal heuristic, and rebuilds exactly the invented distributed
+causality this project has refused everywhere else. There are two distinct
+orders — local contribution order and authoritative revision order — plus
+possibly a correlation between them. Absent evidence, the answer is UNKNOWN or
+conflict, never an inferred ordering.
+
+L11 is constrained by this law: "later committed/realized" means later in
+AUTHORITY order, not later in wall-clock arrival.
+
+**L13 — settlement publishes only coherent truth.**
+Accept, reject, realization and failed settlement must not expose transient
+states that violate the semantic unit being settled. A settlement that lands
+on the correct final value having published an impossible half-state on the
+way has still broken the law, because application effects have already reacted
+to it.
+
+Final-state assertions cannot see this, so the adapter records observer
+snapshots, not only final reads.
+
+**L14 — settlement has explicit terminality.**
+A successful settlement is terminal: a subsequent settlement attempt cannot
+mutate state. A failed settlement that preserves pending authority is either
+explicitly retryable or explicitly non-retryable, and may NEVER masquerade as
+a successful terminal settlement.
+
+Whether a second successful call is a no-op or raises AlreadySettled is not
+decided here. It must be DEFINED and non-mutating. R6 is the counterexample:
+a failed rollback whose retry returned success while reversing nothing.
+
 **L10 — observation agrees with settlement.**
 If `inspect()` reports a contribution as current, superseded or conflicted,
 settlement must behave consistently with that classification. No
 "inspect says superseded, reject corrupts or refuses for an unrelated
 reason" without an honest additional status. This law is what makes a review
 UI truthful, so it is load-bearing for the product thesis.
+
+## The constitution, grouped
+
+    OWNERSHIP
+      L1   a visible speculative fact has an owner
+      L2   settlement authority is conserved
+      L3   rejection removes a contribution, not a baseline value
+
+    PRECEDENCE
+      L4   later surviving truth is inviolate
+      L5   rejected truth cannot resurrect
+      L6   settlement time does not reorder authorship
+      L11  a committed frontier supersedes older contributions
+      L12  arrival order is not authority order
+
+    IDENTITY / DEPENDENCY
+      L7   subject lifetime is not the business key
+      L8   structural dependencies survive honestly
+
+    SETTLEMENT
+      L9   atomic disposition of every contribution
+      L10  observation agrees with settlement
+      L13  publication is coherent
+      L14  settlement terminality and retry are explicit
 
 ## Dependency is not coexistence
 

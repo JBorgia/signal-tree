@@ -14,11 +14,27 @@ competition.
 
 The adapter expresses semantic operations only:
 
-    beginContribution(...)      open a speculative unit
-    settleAccept(...)           make its surviving contributions current
-    settleReject(...)           remove its contributions
-    readVisible(...)            resolved visible truth
-    readSettlementState(...)    disposition of each contribution + ownership
+    interface SemanticCandidate {
+      beginContribution(fn): Handle;
+
+      settleAccept(handle): Result;
+      settleReject(handle): Result;
+
+      applyCommittedTruth(fn, evidence?): void;   // realization + authority
+                                                  // evidence (L11, L12)
+
+      readVisible(): Snapshot;
+      readSettlementState(handle): SettlementView;
+
+      observeVisible(cb): Unsubscribe;            // publication coherence (L13)
+    }
+
+`applyCommittedTruth` and `observeVisible` exist because L11, L12, L13 and the
+ordinary server-realization case cannot otherwise be tested without reaching
+outside the abstraction.
+
+Note what is absent: layers, MVCC, rollback, baseline, SubjectId
+representation, TurnStore.
 
 Each candidate maps its own mechanism onto that contract.
 
@@ -86,13 +102,24 @@ distinguished from each other:
           INDEPENDENCE — a key change and a field change do not contend:
                         reverse the key, preserve the name
 
-    T06b  P1 rekeys A(S1) -> B; later creates something whose identity or
-          relationship REQUIRES key B; reject P1
-          DEPENDENCY  — a real rekey dependency
+    T06b  P1 rekeys A(S1) -> B; later ADDS A(S2) at the vacated key; reject P1
+          DEPENDENCY  — reversing the rekey requires moving S1 back to A,
+                        and A is now occupied by a different subject
 
-T06b is the case that matters most. Without it, "rekey + later field write"
-proves independence but the suite never proves it can recognise a genuine
-rekey dependency — so a candidate that calls every rekey independent passes.
+An earlier draft of T06b said "later creates something whose identity or
+relationship requires key B". That was wrong: relationship-requires-B is
+BUSINESS semantics the kernel cannot know, and the test would have forced
+candidates either to infer application meaning or to carry metadata invented
+only to satisfy a synthetic case. The occupancy formulation is mechanically
+provable from SignalTree's own structural topology.
+
+The triple is then the SAME operation with three different relationships:
+
+    T06a  rekey A->B, later field update on S1   INDEPENDENT
+    T06b  rekey A->B, later add S2 at A          DEPENDENT
+    T07   rekey A->B, later remove S1            SUPERSEDED
+
+A candidate that treats those three alike has not solved the problem.
 
 ### Committed-frontier precedence (L11)
 
@@ -102,6 +129,41 @@ rekey dependency — so a candidate that calls every rekey independent passes.
     T16  same, with the committed write landing between the two proposals
     T17  committed frontier advances a STRUCTURAL location while a pending
          structural contribution targets it
+
+### Authority order vs arrival order (L12)
+
+    T18  a NEWER server revision arrives normally
+    T19  a STALE server revision arrives after a newer one
+    T20  the response to P1 arrives after P2 was authored
+    T21  two server realizations arrive OUT OF ORDER
+    T22  no revision/correlation evidence at all
+         -> UNKNOWN or conflict, never an inferred ordering
+
+T22 is the anti-heuristic control. A candidate that silently orders by arrival
+passes T18 and fails T19/T21; a candidate that invents ordering to make T22
+"work" has reintroduced the distributed causality this project refuses.
+
+### Publication coherence (L13)
+
+Final-state assertions cannot see these; the adapter records observer
+snapshots during settlement.
+
+    O01  successful multi-field ACCEPT publishes no half-state
+    O02  successful multi-field REJECT publishes no half-state
+    O03  mixed structural/scalar settlement publishes no half-state
+    O04  FAILED settlement publishes nothing at all
+    O05  settling a superseded contribution does not briefly resurrect it
+
+### Settlement terminality (L14)
+
+    F06  reject succeeds -> reject again
+    F07  reject succeeds -> accept afterwards
+    F08  accept succeeds -> reject afterwards
+    F09  failed reject -> retry against the UNCHANGED conflict
+    F10  failed reject -> resolve the conflict -> retry
+
+Whether a second successful call is a no-op or raises AlreadySettled is not
+decided here. It must be defined and non-mutating.
 
 ## Composition
 
