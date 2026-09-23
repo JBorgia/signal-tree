@@ -376,6 +376,17 @@ const GATES = [
       'CONSTRUCTOR — while ignoring a non-exported interface',
     cmd: ['node', 'tools/api-callable-inventory-selftest.mjs'],
     needsBuild: true,
+    // A `:self` gate that cannot itself be proven to fail is the blindness this
+    // suite exists to prevent, one level up. Blinding the selftest's failure
+    // DETECTION makes every "must fail" case read as not-failed, so the proof
+    // collapses and the command exits non-zero. Found because the self-test
+    // reported "1 unproven" at exit 0 during RC verification — every other
+    // `:self` gate carries a mutation and this one did not.
+    mutation: {
+      file: 'tools/api-callable-inventory-selftest.mjs',
+      find: "return { failed: true, out: `${e.stdout ?? ''}${e.stderr ?? ''}` };",
+      replace: "return { failed: false, out: '' };",
+    },
   },
   {
     name: 'api-baseline',
