@@ -121,6 +121,20 @@ const buildReview = (tree, proposal) =>
 
 `status` from `inspect()`, `currentValue` from an ordinary read. Nothing else.
 
+**Stated accurately: `readByPath()` is an APPLICATION adapter, not something
+SignalTree provides.** There is no universal path resolver here and none is
+claimed. The proof is narrower and sufficient: an application can map a public
+`path` onto state it already understands, without `SubjectId`, `PositionId`,
+private effects or supersession logic of its own.
+
+**Consequence: `ProposalChange.path` is now behavioural API.** The reference
+associates review status with application state through it, so its FORMAT is a
+contract and not merely a string-shaped type — `orders.7841.priority` carries
+the business key. `proposal-review-surface-0.spec.ts` remains the explicit
+authority for that behaviour. Do NOT respond to path handling by adding value
+snapshots to `ProposalInspection`; that would make the inspection pretend to be
+a value snapshot, which is exactly the presentation trap above.
+
 **So no new primitive is added.** The standing rule holds: don't answer an
 awkwardness with another primitive.
 
