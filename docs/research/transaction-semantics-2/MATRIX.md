@@ -20,14 +20,35 @@ The adapter expresses semantic operations only:
       settleAccept(handle): Result;
       settleReject(handle): Result;
 
-      applyCommittedTruth(fn, evidence?): void;   // realization + authority
-                                                  // evidence (L11, L12)
+      applyCommittedTruth(fn, claim: AuthorityClaim): void;
 
       readVisible(): Snapshot;
       readSettlementState(handle): SettlementView;
 
       observeVisible(cb): Unsubscribe;            // publication coherence (L13)
     }
+
+The ingress claim is TYPED, not a loose `evidence?` bag. Left untyped, every
+candidate interprets it differently and the "same" black-box test stops
+testing the same semantics:
+
+    type AuthorityClaim =
+      | { kind: 'authoritative-snapshot' }          // current truth now;
+                                                    // advances the frontier,
+                                                    // settles nothing
+      | { kind: 'versioned'; revision: unknown }    // order by this evidence
+      | { kind: 'correlated-accept'; contribution: Handle }
+      | { kind: 'correlated-reject'; contribution: Handle }
+      | { kind: 'included-through'; contribution: Handle }  // watermark
+      | { kind: 'unordered' };                      // no relation available
+
+Settlement results are typed for the same reason — exceptions, no-ops and
+internal APIs must not leak into the contract:
+
+    type SettlementResult =
+      | { status: 'settled' }
+      | { status: 'refused'; reason: unknown }
+      | { status: 'already-settled' };
 
 `applyCommittedTruth` and `observeVisible` exist because L11, L12, L13 and the
 ordinary server-realization case cannot otherwise be tested without reaching
@@ -130,18 +151,35 @@ A candidate that treats those three alike has not solved the problem.
     T17  committed frontier advances a STRUCTURAL location while a pending
          structural contribution targets it
 
-### Authority order vs arrival order (L12)
+### Authority: frontier vs settlement relation (L11, L12)
 
-    T18  a NEWER server revision arrives normally
-    T19  a STALE server revision arrives after a newer one
+The decisive split is that advancing canonical truth must not settle a pending
+contribution unless a relation is established.
+
+    A1  pending P1; an UNRELATED authoritative snapshot arrives
+        -> canonical advances, P1 REMAINS PENDING
+    A2  pending P1; correlated-accept for P1          -> P1 settles
+    A3  pending P1; correlated-reject for P1          -> P1's contribution goes
+    A4  pending P1; snapshot with included-through P1 -> P1 may be superseded
+    A5  pending P1; a FRESH snapshot with no relation to P1 established
+        -> do NOT invent settlement
+    A6  a STALE versioned event arrives after a newer revision
+        -> canonical does NOT regress
+
+A1 and A5 are the load-bearing controls, and they are the ordinary case, not
+the exotic one: a refetch that happens to return the server's current value
+says nothing about whether the server ever saw P1.
+
+    T18  a NEWER versioned event arrives normally
+    T19  a STALE versioned event arrives after a newer one
     T20  the response to P1 arrives after P2 was authored
-    T21  two server realizations arrive OUT OF ORDER
-    T22  no revision/correlation evidence at all
+    T21  two versioned realizations arrive OUT OF ORDER
+    T22  claim kind 'unordered'
          -> UNKNOWN or conflict, never an inferred ordering
 
 T22 is the anti-heuristic control. A candidate that silently orders by arrival
-passes T18 and fails T19/T21; a candidate that invents ordering to make T22
-"work" has reintroduced the distributed causality this project refuses.
+passes T18 and fails T19/T21; one that invents an order to make T22 "work" has
+reintroduced the distributed causality this project refuses everywhere else.
 
 ### Publication coherence (L13)
 

@@ -84,11 +84,52 @@ wrong: it outlawed behaviour already decided to be correct.
 That is a COMPLETE settlement in which one contribution was already
 superseded. L9 forbids R6-style orphaning without forbidding this.
 
-**L11 — a later committed/realized frontier supersedes older pending
-contributions.**
-A committed or realized write at a semantic location supersedes any OLDER
-pending contribution at that location, unless the pending contribution is
-explicitly defined as dependent on the committed change.
+**L10 — observation agrees with settlement.**
+If `inspect()` reports a contribution as current, superseded or conflicted,
+settlement must behave consistently with that classification. No
+"inspect says superseded, reject corrupts or refuses for an unrelated
+reason" without an honest additional status. This law is what makes a review
+UI truthful, so it is load-bearing for the product thesis.
+
+**L11 — authoritative truth advances the canonical frontier; superseding a
+pending contribution requires an established relation.**
+Authoritative truth at a semantic location advances the CANONICAL FRONTIER. It
+supersedes a pending contribution only when the ingress contract or supplied
+authority evidence establishes that the authoritative truth is subsequent to,
+incorporates, or disposes that contribution.
+
+Advancing canonical truth does NOT inherently remove the pending overlay:
+
+    server canonical rev10   y=0
+    P1 local pending         y=1
+    refetch: authoritative snapshot y=0, "this is current server truth"
+
+    canonical advances. P1 is NOT superseded — the server has simply never
+    seen it. Visible projection stays y=1, and review reports P1 as pending
+    relative to the NEW canonical base.
+
+Reading "an authoritative snapshot arrived" as "every older pending
+contribution is superseded" recreates the reconciliation bug this work exists
+to eliminate. Three orders stay separate:
+
+    1 CONTRIBUTION ORDER   P1 authored before P2
+    2 AUTHORITY ORDER      server rev10 before rev11
+    3 SETTLEMENT RELATION  the authoritative truth explicitly accepts,
+                           rejects, incorporates, or is known to follow P1
+
+A snapshot establishes 2. It does NOT automatically establish 3. A correlated
+ack does. A watermark of the form "this state includes all writes through X"
+does. A snapshot fetched after a known-completed mutation does, if the ingress
+contract says so. "This is current server state" alone proves nothing about
+the disposition of a local pending contribution.
+
+                    CANONICAL FRONTIER
+                   server / current truth
+                            |
+                  pending contributions
+                            |
+                            v
+                    visible projection
 
     canonical rev0   y=0
     P1 seq1          y=1  pending
@@ -156,13 +197,6 @@ a successful terminal settlement.
 Whether a second successful call is a no-op or raises AlreadySettled is not
 decided here. It must be DEFINED and non-mutating. R6 is the counterexample:
 a failed rollback whose retry returned success while reversing nothing.
-
-**L10 — observation agrees with settlement.**
-If `inspect()` reports a contribution as current, superseded or conflicted,
-settlement must behave consistently with that classification. No
-"inspect says superseded, reject corrupts or refuses for an unrelated
-reason" without an honest additional status. This law is what makes a review
-UI truthful, so it is load-bearing for the product thesis.
 
 **L15 — correctness retention follows live responsibility.**
 State retained for CORRECTNESS exists only while a live semantic obligation
