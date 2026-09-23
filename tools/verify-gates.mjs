@@ -855,7 +855,9 @@ const GATES = [
   {
     name: 'retired-subject-slope',
     covers:
-      'retention does not grow with the number of subjects that have retired — the asymptotic claim a byte budget cannot express',
+      'a non-retaining arm stays under an absolute retained-heap ceiling — ' +
+      'the slope between two 4 MB-quantized, overlapping medians could not ' +
+      'express it',
     // 117 B/retired passes any budget stable enough to keep, and 117 B/retired
     // is unbounded growth. So this measures the same workload at 50 and 150
     // rounds and fails if the total scales with the retirements rather than
@@ -869,7 +871,9 @@ const GATES = [
   {
     name: 'retired-subject-slope:self',
     covers:
-      'the slope checker rejects the pre-fix linear table and accepts the measured flat one',
+      'the retention checker rejects the retention REGIME and accepts flat ' +
+      'totals, bounded fixed runtime cost, and the worst control sample ' +
+      'measured across 24 processes',
     cmd: ['node', 'tools/check-retired-subject-slope.mjs', '--self-test'],
     // Blind the VERDICT, not one input to it.
     //
