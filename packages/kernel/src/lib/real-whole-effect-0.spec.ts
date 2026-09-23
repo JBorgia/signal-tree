@@ -107,7 +107,7 @@ const topTree = () =>
     { enhancers: [restoration(), transactions()] }
   ) as unknown as {
     $: { rows: Rows };
-    transaction: (fn: () => void) => { rollback(): void; confirm(): void };
+    transact: (fn: () => void) => { rollback(): void; confirm(): void };
   };
 
 const seeded = async () => {

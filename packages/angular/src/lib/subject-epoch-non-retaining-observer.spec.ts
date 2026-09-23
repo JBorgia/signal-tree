@@ -78,7 +78,7 @@ function make(withTransactions = false) {
     ? signalTree({ rows: entityMap<Row>({}) }, { enhancers: [transactions()] })
     : signalTree({ rows: entityMap<Row>({}) })) as unknown as {
     $: { rows: Api };
-    transaction(fn: () => void): { confirm(): void; rollback(): void };
+    transact(fn: () => void): { confirm(): void; rollback(): void };
   };
   tree.$.rows.setAll([
     { id: 1, name: 'a', v: 1 },

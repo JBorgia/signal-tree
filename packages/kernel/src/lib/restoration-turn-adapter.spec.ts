@@ -24,7 +24,7 @@ type HistoryStepStore = {
       (): string;
     };
   };
-  transaction(fn: () => void): { confirm(): void; rollback(): void };
+  transact(fn: () => void): { confirm(): void; rollback(): void };
   undo(): void;
   canUndo(): boolean;
   getRestorationHistory(): unknown[];
@@ -44,7 +44,7 @@ type EntityHistoryStepStore = {
       byId(id: number): { label: () => string | undefined } | undefined;
     };
   };
-  transaction(fn: () => void): { confirm(): void; rollback(): void };
+  transact(fn: () => void): { confirm(): void; rollback(): void };
   undo(): void;
   getRestorationHistory(): unknown[];
 };

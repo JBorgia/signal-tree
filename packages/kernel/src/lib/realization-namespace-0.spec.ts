@@ -109,7 +109,7 @@ type Rows = {
 };
 type Tree = {
   $: { data: Record<string, Rows>; scalar(value: number): void };
-  transaction: (fn: () => void) => { rollback(): void };
+  transact: (fn: () => void) => { rollback(): void };
 };
 
 const nested = () =>

@@ -18,7 +18,7 @@ const cart = () =>
     enhancers: [transactions()],
   }) as never as {
     $: Record<string, (v?: unknown) => unknown>;
-    transaction(fn: () => void): { confirm(): void };
+    transact(fn: () => void): { confirm(): void };
   };
 
 describe('Studio costs nothing when unused', () => {

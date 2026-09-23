@@ -108,7 +108,7 @@ describe('RESTORATION-REKEY-CLAIM-WIDTH-0 — producer participation', () => {
       { rows: entityMap<Row, number>({ selectId: (r) => r.id }) },
       { enhancers: [restoration({ maxHistorySize: 5 }), transactions()] }
     ) as ReturnType<typeof makeTree> & {
-      transaction: (fn: () => void) => { rollback(): void; confirm(): void };
+      transact: (fn: () => void) => { rollback(): void; confirm(): void };
     };
 
     tree.$.rows.setAll(seed(80));
@@ -288,7 +288,7 @@ describe('RESTORATION-REKEY-CLAIM-WIDTH-0 — restoration claim width', () => {
       { rows: entityMap<Row, number>({ selectId: (r) => r.id }) },
       { enhancers: [restoration({ maxHistorySize: 5 }), transactions()] }
     ) as ReturnType<typeof makeTree> & {
-      transaction: (fn: () => void) => { rollback(): void; confirm(): void };
+      transact: (fn: () => void) => { rollback(): void; confirm(): void };
     };
 
     tree.$.rows.setAll(seed(30));

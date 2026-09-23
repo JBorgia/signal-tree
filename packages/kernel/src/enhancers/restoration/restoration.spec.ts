@@ -1250,7 +1250,7 @@ describe('restoration enhancer', () => {
           byIdOrFail(id: number): { name(value: string): void };
         };
       };
-      transaction(fn: () => void): { confirm(): void; rollback(): void };
+      transact(fn: () => void): { confirm(): void; rollback(): void };
       __restoration: {
         resetRestorationHistory(): void;
         getTurns(): Array<{ id: number; __effects?: Array<{ kind: string }> }>;
@@ -1309,7 +1309,7 @@ describe('restoration enhancer', () => {
           ids(): number[];
         };
       };
-      transaction(fn: () => void): { confirm(): void; rollback(): void };
+      transact(fn: () => void): { confirm(): void; rollback(): void };
       __transactions: {
         getConfirmedTurnCount(): number;
         getPendingTurnCount(): number;

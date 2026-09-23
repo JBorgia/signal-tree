@@ -294,7 +294,7 @@ describe('SUBJECT-STATE-SEMANTIC-0: transactions across a collection', () => {
       $: {
         rows: EntityMapApi;
       };
-      transaction(fn: () => void): { confirm(): void; rollback(): void };
+      transact(fn: () => void): { confirm(): void; rollback(): void };
     };
     tree.$.rows.setAll([
       { id: 1, name: 'a', v: 1 },

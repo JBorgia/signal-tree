@@ -120,7 +120,7 @@ const topTree = () =>
     { enhancers: [restoration(), transactions()] }
   ) as unknown as {
     $: { rows: Rows };
-    transaction: (fn: () => void) => { rollback(): void; confirm(): void };
+    transact: (fn: () => void) => { rollback(): void; confirm(): void };
   };
 
 const nestedTree = () =>
@@ -129,7 +129,7 @@ const nestedTree = () =>
     { enhancers: [restoration(), transactions()] }
   ) as unknown as {
     $: { data: { rows: Rows } };
-    transaction: (fn: () => void) => { rollback(): void; confirm(): void };
+    transact: (fn: () => void) => { rollback(): void; confirm(): void };
   };
 
 describe('SUBJECT-ADDRESS-0: a whole-subject update is a real operation', () => {

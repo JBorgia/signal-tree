@@ -13,7 +13,7 @@ const cartTree = () =>
     enhancers: [transactions()],
   }) as never as {
     $: Record<string, (value?: unknown) => unknown>;
-    transaction(fn: () => void): { confirm(): void };
+    transact(fn: () => void): { confirm(): void };
   };
 
 describe('confirmedTurnReader', () => {
@@ -123,7 +123,7 @@ describe('confirmedTurnReader', () => {
       { enhancers: [transactions()] }
     ) as never as {
       $: { rows: { addOne(row: Row): void } };
-      transaction(fn: () => void): { confirm(): void };
+      transact(fn: () => void): { confirm(): void };
     };
     tree
       .transact(() => tree.$.rows.addOne({ id: 'A', name: 'Alpha' }))

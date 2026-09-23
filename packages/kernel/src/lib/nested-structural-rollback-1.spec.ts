@@ -141,7 +141,7 @@ const attempt = async (
   const before = JSON.stringify(rows.all());
   const p = (
     tree as unknown as {
-      transaction: (fn: () => void) => { rollback(): void };
+      transact: (fn: () => void) => { rollback(): void };
     }
   ).transact(() => op(rows));
   await flush();
@@ -291,7 +291,7 @@ describe('NESTED-STRUCTURAL-ROLLBACK-1: isolation', () => {
     await flush();
 
     const p = (
-      a as unknown as { transaction: (fn: () => void) => { rollback(): void } }
+      a as unknown as { transact: (fn: () => void) => { rollback(): void } }
     ).transact(() => {
       shapes.nested.rows(a).removeOne('a-seed');
     });

@@ -93,7 +93,7 @@ type Rows = {
 
 type Deep = {
   $: { a: { b: { c: { rows: Rows } } } };
-  transaction: (fn: () => void) => { rollback(): void; confirm(): void };
+  transact: (fn: () => void) => { rollback(): void; confirm(): void };
 };
 
 const nestedTree = () =>
@@ -109,7 +109,7 @@ const nestedTree = () =>
         (): number;
       };
     };
-    transaction: (fn: () => void) => { rollback(): void; confirm(): void };
+    transact: (fn: () => void) => { rollback(): void; confirm(): void };
     undo?: () => void;
   };
 

@@ -210,7 +210,7 @@ describe('PROPOSAL-0 facade / restoration stays orthogonal', () => {
     }).accept();
     await flush();
 
-    let proposal!: ReturnType<typeof t.proposal>;
+    let proposal!: ReturnType<typeof t.propose>;
     undoable(() => {
       proposal = t.propose(() => {
         t.$.name('Agent');
@@ -243,7 +243,7 @@ describe('PROPOSAL-0 facade / restoration stays orthogonal', () => {
     await flush();
     const base = t.getRestorationHistory().length;
 
-    let proposal!: ReturnType<typeof t.proposal>;
+    let proposal!: ReturnType<typeof t.propose>;
     undoable(() => {
       proposal = t.propose(() => {
         t.$.name('Agent');
@@ -263,7 +263,7 @@ describe('PROPOSAL-0 facade / restoration stays orthogonal', () => {
     await flush();
     const base = t.getRestorationHistory().length;
 
-    let proposal!: ReturnType<typeof t.proposal>;
+    let proposal!: ReturnType<typeof t.propose>;
     undoable(() => {
       proposal = t.propose(() => {
         t.$.name('Agent');

@@ -39,7 +39,7 @@ const probeRollbackOwner = async (tree: {
       updateOne(id: string, c: Partial<Row>): void;
     };
   };
-  transaction(fn: () => void): { rollback(): void };
+  transact(fn: () => void): { rollback(): void };
 }) => {
   const pending = tree.transact(() => {
     tree.$.rows.addOne({ id: 'a', name: 'Alpha' });

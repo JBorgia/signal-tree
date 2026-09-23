@@ -46,7 +46,7 @@ type Store = {
       (): number;
     };
   };
-  transaction(fn: () => void): { confirm(): void; rollback(): void };
+  transact(fn: () => void): { confirm(): void; rollback(): void };
 };
 
 const makeTree = () =>

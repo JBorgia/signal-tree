@@ -27,7 +27,7 @@ const tick = () => new Promise<void>((r) => setTimeout(r, 0));
 
 type TT<S> = {
   $: S;
-  transaction(fn: () => void): { confirm(): void; rollback(): void };
+  transact(fn: () => void): { confirm(): void; rollback(): void };
   undo(): void;
   redo(): void;
   canUndo(): boolean;

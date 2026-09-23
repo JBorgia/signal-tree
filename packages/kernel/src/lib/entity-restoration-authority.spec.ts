@@ -172,7 +172,7 @@ describe('restoration authority is fixed at construction', () => {
     // transaction surface offers, none of it may resurrect A.
     const pending = (
       tree as unknown as {
-        transaction: (f: () => void) => { rollback(): void };
+        transact: (f: () => void) => { rollback(): void };
       }
     ).transact(() => {
       undoable(() => tree.$.rows.updateOne('B', { name: 'Beta2' }));
