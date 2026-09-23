@@ -1,6 +1,10 @@
 import { createEffect, createRoot } from 'solid-js';
 import { describe } from 'vitest';
 
+// The shared contract is kernel TEST SUPPORT, excluded from the kernel build
+// and deliberately not on its public barrel — so it is reached by path, the
+// same way ssr-transfer.spec.ts reaches serialization.
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import {
   proposalRealizationContract,
   type ConformanceRow,
