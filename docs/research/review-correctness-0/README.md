@@ -18,19 +18,32 @@ Studio product work are all moot.
 
 NOT the hypothesis: "SignalTree has transactions." TanStack DB already does.
 
-## Scoring — four outcomes, not two
+## Scoring — independent axes, not one label
 
-Ratified before running. A pass/fail scheme cannot express what SignalTree
-actually does on the structural cases, and would score a refusal as a win.
+REVISED 2026-09-23 before execution. The first draft used four mutually
+exclusive labels. That was wrong twice over: refusal and correctness are
+different properties, and one of the labels ("STRANDED") asserted a lifecycle
+fact no measurement had established. Score every arm/case on four axes:
 
-    REVERSED   T1 undone, later/unrelated truth intact     <- the ONLY wedge win
-    REFUSED    nothing changed, error raised naming why    <- safe, wedge NOT delivered
-    STRANDED   reported rejected, yet partly applied       <- worse than refusing
-    WRONG      final state incorrect                       <- failure
+    REVERSAL     COMPLETE | PARTIAL | NONE
+    SAFETY       PRESERVED_NEWER_TRUTH | CORRUPTED_NEWER_TRUTH
+    SETTLEMENT   SETTLED | REFUSED_RECOVERABLE | REFUSED_POISONED | UNKNOWN
+    ATOMICITY    WHOLE_OPERATION | PARTIAL_OPERATION
 
-**Only REVERSED satisfies the hypothesis.** Rationale: any store can refuse.
-A refusal preserves truth but delivers no reversal, so counting it as a win
-would let SignalTree pass this matrix while doing nothing a competitor cannot.
+**Only `COMPLETE + PRESERVED_NEWER_TRUTH + SETTLED` satisfies the surgical
+reversal wedge.** A safe refusal is genuinely better than corruption and the
+axes must say so, but it does not satisfy the hypothesis: any store can refuse.
+
+Worked examples:
+
+    R3 (SignalTree's strongest)      R5 (refusal)                 an ugly implementation
+      REVERSAL    COMPLETE             REVERSAL    NONE             REVERSAL    PARTIAL
+      SAFETY      PRESERVED            SAFETY      PRESERVED        SAFETY      CORRUPTED
+      SETTLEMENT  SETTLED              SETTLEMENT  REFUSED_?        SETTLEMENT  SETTLED
+      ATOMICITY   WHOLE                ATOMICITY   WHOLE            ATOMICITY   PARTIAL
+
+The `?` on R5 is deliberate: recoverable vs poisoned is UNMEASURED. See
+R6-LIVENESS-0.
 
 ## Arms
 
@@ -62,13 +75,15 @@ working tree at 2026-09-23.
     R2  COVERED   proposal-rejection-0.spec.ts:319    REVERSED
     R3  COVERED   proposal-rejection-0.spec.ts:146,168 REVERSED (supersession)
     R4  COVERED   proposal-rejection-0.spec.ts:351,379 REVERSED (supersession)
-    R5  COVERED   proposal-rejection-0.spec.ts:293    REFUSED   ('later-confirmed-dependency')
-    R6  COVERED   proposal-rejection-0.spec.ts:463    STRANDED  (see below)
+    R5  COVERED   proposal-rejection-0.spec.ts:293    REVERSAL NONE, SAFETY PRESERVED, SETTLEMENT UNMEASURED
+    R6  COVERED   proposal-rejection-0.spec.ts:463    REVERSAL PARTIAL?, SAFETY PRESERVED, SETTLEMENT UNMEASURED
     R7  COVERED   rekey-supersession-0.spec.ts (5)    REVERSED
     R8  PARTIAL   -- the only unknown in arm A
 
-Under the ratified scoring, arm A therefore scores REVERSED on R1,R2,R3,R4,R7;
-REFUSED on R5; STRANDED on R6.
+Under the revised axes, arm A reaches the full wedge condition
+(COMPLETE + PRESERVED + SETTLED) on R1, R2, R3, R4, R7 only. R5 and R6 refuse,
+and **their SETTLEMENT axis is unmeasured** — which R6-LIVENESS-0 now closes
+before any competitor arm is built.
 
 ### Two facts recorded against SignalTree, verified in source
 
@@ -79,44 +94,89 @@ REFUSED on R5; STRANDED on R6.
    on it. The wedge accuses competitors of requiring broader rollback; here
    SignalTree requires broader refusal.
 
-2. `proposal-rejection-0.spec.ts:463` (case 15, flagged PRE-EXISTING, TODO.md:1373)
+2. `proposal-rejection-0.spec.ts:463` (case 15, PRE-EXISTING, TODO.md:1373)
    — a pending REMOVE superseded by a later add returns
-   `'effect-validation-failed'`, preserves the server row, and **strands `x` at
-   its proposed value**. The turn is reported rejected while half its effects
-   persist. The same source comment calls that outcome "worse than refusing"
-   while justifying the presence test; it occurs anyway through another door.
-   SignalTree LOSES R6 to any arm that reverses cleanly or refuses atomically.
+   `'effect-validation-failed'`, preserves the server row, and leaves `x` at
+   its proposed value `1` **at the moment of the throw**. What this does NOT
+   establish is the proposal's lifecycle state afterwards. `reject()` runs
+   `pending.rollback()` and assigns `settled` only if it returns
+   (`transactions.ts:2384-2390`), so a throw leaves `settled` undefined and
+   `inspect()` falling back to live `read()`. The turn may therefore still be
+   OPEN and recoverable rather than half-settled. An earlier draft of this
+   document called it STRANDED; that label is WITHDRAWN as unmeasured.
 
-## The only unknown: R8
+## R6-LIVENESS-0 — runs FIRST, before R8
 
-Absent at the public API. Closest existing evidence, neither sufficient:
-  - `proposal-0-kernel.spec.ts:289` — two outstanding proposals, but DISJOINT
-    fields (name vs priority), and only one settlement order.
-  - `pending-rollback-composition.spec.ts:355` — genuinely overlapping same-field
-    pending turns, but at the internal TurnStore port, and only oldest-first.
+Closes the SETTLEMENT axis for a refused rejection. Cheapest experiment in the
+program; it is a handful of assertions on an existing scenario.
 
-R8 must exercise: partly-overlapping (not disjoint, not identical) fields and
-entities, BOTH settlement orders, through the public `transact()`/`propose()` API.
+    initial   A(S1), x=0
+    P1        x=1 ; remove A(S1)
+    later     add A(S2)            (same business key, new subject)
+    reject P1 -> throws 'effect-validation-failed'
 
-## Preregistered predictions for R8 (arm A), recorded before running
+    THEN MEASURE, rather than infer:
+      __transactions.getPendingTurnCount() / getPendingTurnIds()
+      proposal.inspect()          -- live read, or a settled snapshot?
+      is accept() still legal?
+      is reject() retryable?
+      remove S2, retry reject: does x return to 0 and S1 restore correctly?
 
-  R8-scalar, overlapping field, reject P1 then settle P2   predict REVERSED
-  R8-scalar, overlapping field, settle P2 then reject P1   predict REVERSED
-  R8-structural, overlapping subject, either order         predict REFUSED
-       (presence test fires: P2 touched a subject P1 also touched)
-  R8-mixed, partial field overlap + one structural effect  predict REFUSED or STRANDED
+Three materially different outcomes, only the last of which is "stranded":
 
-If R8 returns WRONG or STRANDED in any order, the wedge dies immediately and
-arms B and C are never built.
+    REFUSED_RECOVERABLE   rollback refused, proposal still pending,
+                          conflict resolvable, retry succeeds
+    REFUSED_POISONED      still nominally pending, can never settle correctly
+    PARTIALLY_SETTLED     considered rejected/closed while speculative
+                          contribution remains
+
+**Do not fix R6 before characterizing it.** It is currently excellent evidence.
+Measure the failure completely, then decide whether it is a bug worth fixing or
+evidence that the optimistic-live proposal architecture is the wrong model.
+
+## R8 — concrete, overlapping, both orders
+
+Not "partly overlapping" in prose. The fixture is:
+
+    base   x=0  y=0  z=0
+    P1     x=1  y=1
+    P2          y=2  z=2        <- P2 supersedes P1 on y; x and z are disjoint
+
+Eight settlements, all through the public `transact()`/`propose()` API:
+
+    A  reject P1 -> accept P2        E  reject P1 -> reject P2
+    B  accept P2 -> reject P1        F  reject P2 -> reject P1
+    C  reject P2 -> accept P1        G  accept P1 -> accept P2
+    D  accept P1 -> reject P2        H  accept P2 -> accept P1
+
+### Preregistered expected final states, recorded before writing the spec
+
+    A  x=0 y=2 z=2   reject P1 reverses x; y NOT reverted (superseded by P2)
+    B  x=0 y=2 z=2   same, order-independent
+    C  x=1 y=1 z=0   rollback of P2 must restore y to P1's PENDING 1, not 0
+    D  x=1 y=1 z=0   P1 confirmed first; P2 rollback returns y to P1's value
+    E  x=0 y=0 z=0   P2 rollback must NOT resurrect rejected P1's y=1
+    F  x=0 y=0 z=0   full baseline
+    G  x=1 y=2 z=2   both confirmed; P2's y wins as the later write
+    H  x=1 y=2 z=2   same
+
+C and E are the discriminating cases.
+  C fails if rolling back P2 restores y to the true baseline 0 — that would
+    destroy P1's still-pending contribution (SAFETY CORRUPTED).
+  E fails if rolling back P2 restores y to 1 — resurrecting a contribution
+    from an already-rejected proposal.
+
+The question is not "does it throw". It is: **can it remove exactly P1's
+surviving contribution without damaging P2's?**
 
 ## Execution order — cheapest falsifier first
 
-    1. Close R8 for arm A ALONE. One spec file. If it strands or corrupts,
-       STOP: the wedge is dead without installing TanStack.
-    2. Only if arm A survives R8: build arms B and C for the DISCRIMINATOR
-       subset R3, R5, R6, R7, R8. R1/R2/R4 are commodity — every serious store
-       passes them, and building them wastes the budget.
-    3. Score all arms on the four-outcome scheme.
+    1. R6-LIVENESS-0. Closes the SETTLEMENT axis on the two refusal cases.
+    2. R8 against arm A ALONE, all eight orderings. If SignalTree cannot
+       surgically separate overlapping SCALAR proposals, the wedge does not
+       survive our own implementation and no competitor arm is needed.
+    3. Only then build arms B and C, for the discriminator subset
+       R3/R5/R6/R7/R8. R1/R2/R4 are commodity; every serious store passes them.
 
 ## Kill rule
 
@@ -145,3 +205,38 @@ absence from earlier planning was a methodological error.
 ## Standing rule for the whole program
 
 > A missing capability is no longer permission to build it. It is a question to test.
+
+## Recorded alongside, not part of this experiment
+
+### The classifier approximates dependency with presence
+
+`hasSameSubjectDependency` cannot currently distinguish:
+
+    supersession           later fact REPLACES the earlier one
+    dependency             later fact RESTS ON the earlier one
+    independent consequence later fact merely TOUCHED the same subject
+
+It collapses the second and third into "same subject present, refuse". The
+rekey arm shows the distinction is tractable — a later `set` rides along with a
+rekeyed subject because a key change and a field change do not contend
+(`transactions.ts:364`) — so the conservatism is not inherent, only unbuilt.
+
+"Which later facts depend on which earlier facts" is more general than
+transactions and may be one of SignalTree's genuinely interesting ideas. It is
+NOT a roadmap item: a missing capability is a question to test, not permission
+to build. Recorded here only so the abstraction is not advertised as more exact
+than it is.
+
+### version-claims has the wrong semantic owner
+
+`checkReleaseClaim` validates `**Current release:**` against `package.json`,
+so the tree is self-consistent at 16.0.0 while npm and GitHub serve 15.2.1.
+Mechanically coherent, semantically misleading to a reader. The sentence should
+eventually become:
+
+    Development version: 16.0.0 (unreleased)
+    Latest published release: 15.2.1
+
+with `version-claims` taught the difference. Not urgent relative to
+PRODUCT-ARCH-0, but a misleading sentence should not be preserved merely
+because a gate happens to enforce it.
