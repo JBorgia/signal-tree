@@ -2,7 +2,12 @@ import { act, render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { signalTree, transactions } from '@signal-tree/kernel';
+// Control C uses the EXISTING settlement-gated mechanism rather than a new
+// observer invented for the test, and that mechanism is internal by design —
+// so it is reached by path, as ssr-transfer.spec.ts reaches serialization.
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { getPositionRegistry } from '../../kernel/src/lib/internals/position-registry';
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { scheduleDurableConsequence } from '../../kernel/src/lib/internals/commit-consequence';
 import { useSignalTree } from './use-signal-tree';
 

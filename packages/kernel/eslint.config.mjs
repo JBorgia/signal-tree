@@ -20,6 +20,14 @@ export default [
             // vitest.retention.config.ts is the DIAG-JOURNAL-1 F6 gate's config.
             '{projectRoot}/vitest.config.ts',
             '{projectRoot}/vitest.retention.config.ts',
+            // PROPOSAL-0 Phase B. The shared realization contract imports
+            // `it`/`expect` because it IS a suite — adapters instantiate it
+            // from their own specs. It is test support, not runtime: already
+            // excluded from the build in tsconfig.lib.json beside
+            // reactive-test-realization.ts, and no consumer can reach it.
+            // Without this, vitest would be demanded as a runtime peer of a
+            // published package.
+            '{projectRoot}/src/proposal-realization-contract.ts',
           ],
           ignoredDependencies: [
             'tslib',
