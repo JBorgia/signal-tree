@@ -88,11 +88,25 @@ You are at risk if you install `transactions()` AND either:
 
 ## Fix status
 
-No fix is available. Both defects share one root cause: compensation is
-computed from a per-transaction baseline captured against live state, with no
-record of which transaction currently owns a value. A baseline is not
-ownership. Repairing this is an architectural change, not a patch, and the
-design is under evaluation.
+Fixed in **15.2.2**. The patch makes transaction settlement safe rather than
+more capable:
+
+    if a rollback can be proven safe   it completes fully
+    if it cannot                       NOTHING changes, the transaction
+                                       stays pending, and a refusal is thrown
+
+This is deliberately more conservative than 15.2.1 appeared to be. Rolling
+back a transaction that overlaps a newer still-pending transaction now
+REFUSES where it previously appeared to succeed and corrupted state. That is
+the intended direction for a patch: behaviour that was unsafe becomes safely
+rejected.
+
+Both defects share one root cause — compensation is computed from a
+per-transaction baseline captured against live state, with no record of which
+transaction currently owns a value. A baseline is not ownership. Solving that
+properly (surgical multi-owner settlement) is an architectural change and is
+out of scope for a patch release; 15.2.2 makes the unsafe paths refuse
+instead of corrupt.
 
 ## Credit
 
