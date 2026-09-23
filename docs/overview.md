@@ -120,6 +120,27 @@ See [Frequency Weighting System Documentation](performance/frequency-weighting-s
 - Other runtimes can realize the neutral `@signal-tree/kernel` contracts
 - Applications own persistence, serialization, and SSR payload policy
 
+### Leaf read/write grammar is framework-specialized
+
+A leaf is a **native** reactive value of its framework, so the way you read and
+write one differs by adapter. This is deliberate — framework-specialized
+physical realization is the point, and there is no unification layer.
+
+```text
+Angular    read  leaf()         write  leaf.set(v)
+Vue        read  leaf.value     write  leaf.value = v
+Solid      read  leaf()         write  leaf.set(v)
+React /    read  leaf()         write  leaf(v)
+neutral
+```
+
+⚠️ **An example written for one adapter's write grammar can be silently wrong
+on another.** `leaf(v)` on Angular or Solid is a READ with an ignored argument:
+it compiles, it throws nothing, and the write never happens. This is not
+hypothetical — it was hit while building the agent-review reference, where a
+proposal appeared to make two changes and reported only one. Copy examples
+between framework docs with that in mind.
+
 ---
 
 Source materials consolidated from `FEATURES.md` and `SPECIFICATIONS.md`.
