@@ -297,13 +297,31 @@ first, then the threshold is decided. Three outcomes:
 
 ```text
 A  control well under 40, mutation well over   -> 40 MB validated, close
-B  clean separation at different values        -> derive a Linux ceiling from
-                                                  the distributions, document
-                                                  the environment dependence
+B  clean separation at different values        -> derive a Linux ceiling, then
+                                                  VALIDATE IT ON FRESH SAMPLES
 C  material overlap                            -> an absolute ceiling is not a
                                                   reliable gate here; do NOT
                                                   tune it to green
 ```
+
+### Outcome B needs a second batch — outcome A does not
+
+If a new Linux threshold has to be derived, **it may not be declared validated
+by the samples that chose it.** That is fitting the line to the answer wearing
+a different hat.
+
+```text
+characterization batch   30 control + 10 retain=10k
+        -> derive and FREEZE the Linux threshold
+independent batch        fresh control + fresh retain=10k samples
+        -> both must behave correctly under the frozen threshold
+        -> only then close
+```
+
+**Outcome A is exempt, and for a real reason rather than convenience:** 40 MB
+was derived on darwin/arm64, so a Linux run that leaves it untouched IS the
+independent validation. The samples that chose it and the samples testing it
+come from different environments.
 
 **The job builds the kernel first, and that is required rather than
 precautionary.** `bench-entity-churn-retention.mjs` imports
