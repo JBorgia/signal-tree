@@ -63,12 +63,22 @@ So removals need a bridge release that deprecates with a stated replacement,
 then one coherent major — not a silent rewrite of a policy adopted days ago
 specifically to rebuild API-stability trust.
 
-### 5. `retired-subject-slope`
+### 5. `retired-subject-slope` — redesigned, NOT yet cleared
 
-~38% spurious red on untouched code, bimodal, tracked in
-`RETIRED-SUBJECT-SLOPE-STABILITY-0`. Does not block development; does block
-trustworthy release gates, because a gate whose noise crosses its threshold
-provides no evidence in either direction.
+The old 50-vs-150 slope and ratio checks are falsified and removed: their
+operands were 4 MB-quantized and overlapping, so the verdict was decided by
+which runtime mode each median drew. Replaced by an absolute 40 MB ceiling on
+the non-retaining arm, mutation-proven in the SAME arm with deliberate
+retention.
+
+**Remaining blocker: the threshold was derived on darwin/arm64 and release
+gates run on ubuntu-latest linux/x64.** An absolute ceiling is
+environment-dependent in a way the normalized slope was not. Validate on the
+release platform — control distribution plus `--retain 10000` — before it
+blocks a release.
+
+Honest sensitivity, recorded rather than implied: reliably detects >= ~10,000
+accidentally retained subjects; 5,000 is marginal; <= 2,500 invisible.
 
 ### 6. `REACT-PENDING-TURN-REALIZATION-0`
 
