@@ -127,7 +127,12 @@ if (armFlag !== -1) {
   // Baseline AFTER the first generation, so the figure is growth per RETIRED
   // subject and excludes the live collection entirely. Baselining before the
   // first setAll would fold the live rows in and overstate it.
-  const before = (await quiesce({ label: `${name} (baseline)` })).heapUsed;
+  const beforeQ = await quiesce({ label: `${name} (baseline)` });
+  const before = beforeQ.heapUsed;
+  // RETIRED-SUBJECT-SLOPE-STABILITY-0. Additive diagnostics: the gate reads
+  // only `growthMB`/`retiredSubjects`, but distinguishing RETAINED OBJECTS from
+  // heap RESERVATION needs more than heapUsed. Emitted, never interpreted here.
+  const beforeMem = process.memoryUsage();
 
   for (let g = 1; g <= ROUNDS; g++) {
     tree.$.rows.setAll(generation(g));
@@ -139,7 +144,10 @@ if (armFlag !== -1) {
     await new Promise((r) => setTimeout(r, 0));
   }
 
-  const after = (await quiesce({ label: `${name} (after churn)` })).heapUsed;
+  const afterQ = await quiesce({ label: `${name} (after churn)` });
+  const after = afterQ.heapUsed;
+  const afterMem = process.memoryUsage();
+  const v8 = (await import('node:v8')).getHeapStatistics();
 
   // POSTCONDITION. Live membership must be exactly what it was: the entire
   // claim is "constant live cardinality, growing heap", and an arm whose
@@ -160,6 +168,17 @@ if (armFlag !== -1) {
       retiredSubjects: retired,
       growthMB: +((after - before) / MB).toFixed(2),
       bytesPerRetiredSubject: Math.round((after - before) / retired),
+      diagnostics: {
+        heapUsedBeforeMB: +(beforeMem.heapUsed / MB).toFixed(2),
+        heapUsedAfterMB: +(afterMem.heapUsed / MB).toFixed(2),
+        heapTotalBeforeMB: +(beforeMem.heapTotal / MB).toFixed(2),
+        heapTotalAfterMB: +(afterMem.heapTotal / MB).toFixed(2),
+        rssBeforeMB: +(beforeMem.rss / MB).toFixed(2),
+        rssAfterMB: +(afterMem.rss / MB).toFixed(2),
+        v8UsedMB: +(v8.used_heap_size / MB).toFixed(2),
+        v8TotalMB: +(v8.total_heap_size / MB).toFixed(2),
+        v8LimitMB: +(v8.heap_size_limit / MB).toFixed(2),
+      },
     })
   );
   process.exit(0);

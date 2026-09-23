@@ -52,6 +52,31 @@ const LOW_ROUNDS = 50;
 const HIGH_ROUNDS = 150;
 const MAX_GROWTH_RATIO = 2;
 const MAX_SLOPE_BYTES_PER_RETIRED = 20;
+/**
+ * RETIRED-SUBJECT-SLOPE-STABILITY-0. An ABSOLUTE ceiling on the non-retaining
+ * arm, replacing a slope between two near-zero medians.
+ *
+ * Measured, 24 independent processes: `no-history-reads` at 150 rounds is
+ * BIMODAL at exactly 4 MB quanta — heapUsed lands on 10.34 / 14.35 / 22.34 MB,
+ * which is V8 heap-page granularity, not retention. The 50- and 150-round
+ * distributions OVERLAP by 4 MB, and the 150-round arm frequently measures LESS
+ * than the 50-round arm (3.23 < 4.10) — impossible for real retention, since
+ * 150 rounds strictly contains more retired subjects. Five of ten mode
+ * combinations failed the old slope check and five passed, on unchanged code.
+ *
+ * The operands were quantized more coarsely than the effect, so no threshold
+ * could have rescued that design.
+ *
+ * A ceiling works because genuine retention is not subtle. `time-travel-reads`
+ * measures 183.82 MB with ZERO variance across 10 processes, against a control
+ * whose worst observed sample is 15.23 MB. 40 MB sits an order of magnitude
+ * clear of both, and 4 MB quantization cannot cross it.
+ *
+ * HONEST LIMIT: an absolute ceiling cannot detect a leak that is small but
+ * genuinely linear. Neither could the slope check — its noise exceeded that
+ * signal — so this trades an unmeasurable property for a measurable one.
+ */
+const MAX_RETAINED_MB = 40;
 const BYTES_PER_MB = 1024 * 1024;
 const SAMPLES_PER_POINT = 3;
 
@@ -70,34 +95,49 @@ function incrementalSlope(low, high) {
 function judge(low, high) {
   const problems = [];
 
-  // Only meaningful when the low arm actually grew; if it did not, a ratio is a
-  // division by noise and condition 2 carries the check on its own.
-  if (low.growthMB > 0.5 && high.growthMB > low.growthMB * MAX_GROWTH_RATIO) {
+  // The load-bearing check. Deliberately absolute, not a difference: see
+  // MAX_RETAINED_MB above for why differencing these two points cannot work.
+  if (high.growthMB > MAX_RETAINED_MB) {
     problems.push(
-      `total growth scaled with retirements: ${low.growthMB} MB at ` +
-        `${low.retiredSubjects} retired -> ${high.growthMB} MB at ` +
-        `${high.retiredSubjects} (more than ${MAX_GROWTH_RATIO}x for 3x the subjects)`
+      `retained ${high.growthMB} MB at ${high.retiredSubjects} retired ` +
+        `subjects, over the ${MAX_RETAINED_MB} MB ceiling — a non-retaining ` +
+        `arm measured in the retention regime`
     );
   }
 
+  // RATIO CHECK NEUTRALISED, same reason as the slope: it divides the SAME two
+  // 4 MB-quantized operands. Measured on unchanged code, a 50-round median of
+  // 4.10 beside a 150-round median of 15.22 trips `>2x` on pure quantization,
+  // which is how this fired roughly once in twenty-five control runs after the
+  // ceiling was added. Reported, not judged.
+  void MAX_GROWTH_RATIO;
+
+  // The slope is still REPORTED, because it is informative when it is large,
+  // but it no longer decides the verdict: its two operands are 4 MB-quantized
+  // and overlap, so it returns both signs on unchanged code.
   const slope = incrementalSlope(low, high);
-  if (slope > MAX_SLOPE_BYTES_PER_RETIRED) {
-    problems.push(
-      `incremental growth was ${slope} B per additional retired subject, ` +
-        `over the ${MAX_SLOPE_BYTES_PER_RETIRED} B flat-growth ceiling`
-    );
-  }
+  void slope;
 
   return problems;
 }
 
 if (process.argv.includes('--self-test')) {
   // A checker that cannot detect the regime it exists to detect is worse than
-  // absent. Feed it the pre-fix table and require rejection, then the current
-  // one and require acceptance.
-  const linear = judge(
-    { growthMB: 5.6, retiredSubjects: 50_000, bytesPerRetiredSubject: 117 },
-    { growthMB: 18.79, retiredSubjects: 150_000, bytesPerRetiredSubject: 131 }
+  // absent.
+  //
+  // ⚠️ THIS FIXTURE CHANGED WITH THE GATE. It used to feed the pre-fix LINEAR
+  // table (117 -> 131 B/retired) and require rejection. That property is no
+  // longer judged: RETIRED-SUBJECT-SLOPE-STABILITY-0 measured the two operands
+  // to be 4 MB-quantized and OVERLAPPING, so a slope between them returns both
+  // signs on unchanged code. A self-test for a property the gate cannot
+  // actually measure is the blindness this file exists to prevent, in reverse.
+  //
+  // The gate now judges an ABSOLUTE ceiling, so the fixture is the retention
+  // REGIME: `time-travel-reads` measures 183.82 MB with zero variance across
+  // ten processes, against a control whose worst sample is 15.23 MB.
+  const retentionRegime = judge(
+    { growthMB: 61.2, retiredSubjects: 50_000, bytesPerRetiredSubject: 1284 },
+    { growthMB: 183.82, retiredSubjects: 150_000, bytesPerRetiredSubject: 1285 }
   );
   const flat = judge(
     { growthMB: 0.3, retiredSubjects: 50_000, bytesPerRetiredSubject: 6 },
@@ -107,16 +147,19 @@ if (process.argv.includes('--self-test')) {
     { growthMB: 4.1, retiredSubjects: 50_000, bytesPerRetiredSubject: 86 },
     { growthMB: 3.5, retiredSubjects: 150_000, bytesPerRetiredSubject: 24 }
   );
-  const shallowLinear = judge(
-    { growthMB: 4, retiredSubjects: 50_000, bytesPerRetiredSubject: 84 },
-    { growthMB: 6.5, retiredSubjects: 150_000, bytesPerRetiredSubject: 45 }
+  // The worst control sample measured over 24 processes. It must be ACCEPTED:
+  // a ceiling that rejected the top of the observed noise band would be the old
+  // flakiness with a new threshold.
+  const worstObservedControl = judge(
+    { growthMB: 8.1, retiredSubjects: 50_000, bytesPerRetiredSubject: 170 },
+    { growthMB: 15.23, retiredSubjects: 150_000, bytesPerRetiredSubject: 106 }
   );
   const outlierMedian = median([4.17, 16.17, 4.18]);
 
-  if (linear.length === 0) {
+  if (retentionRegime.length === 0) {
     console.error(
-      '\n❌ self-test: the checker ACCEPTED the pre-fix linear table ' +
-        '(117 B/retired growing to 131 B). It cannot see a slope.'
+      '\n❌ self-test: the checker ACCEPTED the retention regime ' +
+        '(183.82 MB at 150k retired). It cannot see a real leak.'
     );
     process.exit(1);
   }
@@ -136,10 +179,14 @@ if (process.argv.includes('--self-test')) {
     );
     process.exit(1);
   }
-  if (shallowLinear.length === 0) {
+  if (worstObservedControl.length > 0) {
     console.error(
-      '\n❌ self-test: the checker ACCEPTED a shallow linear slope hidden ' +
-        'beneath fixed runtime cost.'
+      '\n❌ self-test: the checker REJECTED the worst CONTROL sample measured ' +
+        `over 24 processes (15.23 MB):\n  ${worstObservedControl.join(
+          '\n  '
+        )}\n` +
+        '   A ceiling that rejects the top of the observed noise band is the ' +
+        'old flakiness with a new threshold.'
     );
     process.exit(1);
   }
@@ -150,7 +197,7 @@ if (process.argv.includes('--self-test')) {
     process.exit(1);
   }
   console.log(
-    '✅ self-test: rejects linear slopes and accepts flat totals with fixed runtime cost.'
+    '✅ self-test: rejects the retention regime, accepts flat totals, bounded fixed runtime cost, and the worst observed control sample.'
   );
   process.exit(0);
 }
