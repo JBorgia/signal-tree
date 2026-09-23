@@ -319,6 +319,36 @@ const GATES = [
     },
   },
   {
+    name: 'react-reference-typecheck',
+    covers:
+      'every committed source file in apps/react-reference compiles against the ' +
+      'actual workspace packages — reference code is documentation with ' +
+      'executable authority',
+    cmd: [
+      'pnpm',
+      'exec',
+      'tsc',
+      '--noEmit',
+      '-p',
+      'apps/react-reference/tsconfig.app.json',
+    ],
+    // ⚠️ THIS APP WAS UNGUARDED. `apps/react-reference/project.json` declares
+    // `"targets": {}` — no build, no test — so nothing typechecked it, even
+    // though `test:all` names the project. Its two `tree.transaction(...)` call
+    // sites survived the 16.0 rename and were found by a MANUAL classification
+    // pass, not by any gate. Reference code that no gate covers is a stale
+    // example waiting to happen.
+    //
+    // Deliberately narrow: typecheck only. No browser E2E, no rendering
+    // assertions, no bundle metrics. The job is catching stale API names,
+    // invalid tree typing and invalid enhancer surfaces.
+    mutation: {
+      file: 'apps/react-reference/src/app/reference-store.ts',
+      find: '.transact(',
+      replace: '.transaction(',
+    },
+  },
+  {
     name: 'api-callable-baseline',
     covers:
       'the committed INVOCATION-SURFACE baseline matches the built surface — ' +
