@@ -49,7 +49,7 @@ describe('TX-LEDGER-0 case 3: does a REALIZATION create a rollback dependency?',
     const tree = makeTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -70,7 +70,7 @@ describe('TX-LEDGER-0 case 3: does a REALIZATION create a rollback dependency?',
     const tree = makeTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -105,7 +105,7 @@ describe('TX-LEDGER-0 case 4: can a dependency be REMOVED?', () => {
     const tree = makeTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();

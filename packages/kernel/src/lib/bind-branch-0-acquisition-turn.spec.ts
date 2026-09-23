@@ -91,7 +91,10 @@ type Effect = {
  * `dispose()` does `turns.length = 0`, so a reference taken first is emptied
  * under you. That cost one debugging round here.
  */
-const drain = (journal: { turns(): readonly { effects: readonly unknown[] }[]; dispose(): void }): Effect[] => {
+const drain = (journal: {
+  turns(): readonly { effects: readonly unknown[] }[];
+  dispose(): void;
+}): Effect[] => {
   const effects = journal.turns().flatMap((t) => t.effects) as Effect[];
   const copy = effects.map((e) => ({ ...e }));
   journal.dispose();
@@ -184,8 +187,7 @@ describe('BIND-BRANCH-0: what belongs to an external acquisition?', () => {
     const tree = makeTree();
     await flush();
     const foreground = () =>
-      tree.$.settings.theme() === 'light' ? 'black' : 'white'
-    ;
+      tree.$.settings.theme() === 'light' ? 'black' : 'white';
     expect(foreground()).toBe('black');
 
     const journal = createDiagnosticJournal(tree as object);

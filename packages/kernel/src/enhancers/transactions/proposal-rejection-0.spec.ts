@@ -129,7 +129,7 @@ describe('PROPOSAL-REJECTION-0 / 1 — clean reject, no competing writer', () =>
     const tree = scalarTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.a(1);
     });
     await flush();
@@ -148,7 +148,7 @@ describe('PROPOSAL-REJECTION-0 / 2 — same-location EXTERNAL realization', () =
     const tree = scalarTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.a(1);
       tree.$.b(2);
     });
@@ -170,7 +170,7 @@ describe('PROPOSAL-REJECTION-0 / 3 — same-location AUTHORED write', () => {
     const tree = scalarTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.a(1);
       tree.$.b(2);
     });
@@ -189,7 +189,7 @@ describe('PROPOSAL-REJECTION-0 / 4 — multi-location, ONE conflicting location'
     const tree = scalarTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.a(1);
       tree.$.b(2);
       tree.$.c(3);
@@ -213,7 +213,7 @@ describe('PROPOSAL-REJECTION-0 / 5 — multi-location, MULTIPLE conflicting', ()
     const tree = scalarTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.a(1);
       tree.$.b(2);
       tree.$.c(3);
@@ -242,7 +242,7 @@ describe('PROPOSAL-REJECTION-0 / 6 — coalesced same-location writes', () => {
     const tree = scalarTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.a(1);
       tree.$.a(2); // coalesces to the net effect, by design
     });
@@ -262,7 +262,7 @@ describe('PROPOSAL-REJECTION-0 / 7 — structural remove + re-add, no competitor
     tree.$.rows.addOne({ id: 'a', name: 'Original' });
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.removeOne('a');
       tree.$.rows.addOne({ id: 'a', name: 'Reproposed' });
     });
@@ -280,7 +280,7 @@ describe('PROPOSAL-REJECTION-0 / 8 — structural add, no competitor (control)',
     const tree = rowTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Proposed' });
     });
     await flush();
@@ -295,7 +295,7 @@ describe('PROPOSAL-REJECTION-0 / 9 — MIXED proposal, server touches the row', 
     const tree = rowTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.x(1);
       tree.$.y(2);
       tree.$.rows.addOne({ id: 'a', name: 'Proposed' });
@@ -321,7 +321,7 @@ describe('PROPOSAL-REJECTION-0 / 10 — unrelated writer must NOT block (control
     const tree = scalarTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.a(1);
     });
     await flush();
@@ -353,7 +353,7 @@ describe('PROPOSAL-REJECTION-0 / 11 — structural supersession, REALIZED remove
     const tree = rowTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.x(1);
       tree.$.y(2);
       tree.$.rows.addOne({ id: 'A', name: 'Proposed' });
@@ -381,7 +381,7 @@ describe('PROPOSAL-REJECTION-0 / 12 — structural supersession, AUTHORED remove
     const tree = rowTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.x(1);
       tree.$.y(2);
       tree.$.rows.addOne({ id: 'A', name: 'Proposed' });
@@ -409,7 +409,7 @@ describe('PROPOSAL-REJECTION-0 / 13 — remove then RE-ADD under a new subject',
     const tree = rowTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.x(1);
       tree.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
@@ -440,7 +440,7 @@ describe('PROPOSAL-REJECTION-0 / 14 — one superseded AND one depended-upon sub
     const tree = rowTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.x(1);
       tree.$.rows.addOne({ id: 'A', name: 'ProposedA' });
       tree.$.rows.addOne({ id: 'B', name: 'ProposedB' });
@@ -466,7 +466,7 @@ describe('PROPOSAL-REJECTION-0 / 15 — pending REMOVE is not superseded by a la
     tree.$.rows.addOne({ id: 'A', name: 'Original' });
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.x(1);
       tree.$.rows.removeOne('A');
     });
@@ -497,7 +497,7 @@ describe('PROPOSAL-REJECTION-0 / 16 — pending REKEY superseded by a later remo
     tree.$.rows.addOne({ id: 'A', name: 'Original' });
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.x(1);
       tree.$.rows.changeId('A', 'A2');
     });

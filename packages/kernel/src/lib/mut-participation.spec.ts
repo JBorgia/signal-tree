@@ -84,9 +84,7 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
   it('ORDINARY LEAF WRITE — the reference case', async () => {
     const r = await probe(plain, (t) => {
       undoable(() =>
-        (t as unknown as { $: { a: { n(value: number): void } } }).$.a.n(
-          2
-        )
+        (t as unknown as { $: { a: { n(value: number): void } } }).$.a.n(2)
       );
     });
     expect({
@@ -102,7 +100,9 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
 
   it('BRANCH CALL-FORM WRITE', async () => {
     const r = await probe(plain, (t) => {
-      undoable(() => (t as unknown as { $: { a: (v: object) => void } }).$.a({ n: 3 }));
+      undoable(() =>
+        (t as unknown as { $: { a: (v: object) => void } }).$.a({ n: 3 })
+      );
     });
     expect({
       landed: r.landed,
@@ -117,7 +117,9 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
 
   it('DEEP-EQUAL WRITE — a write that does NOT land', async () => {
     const r = await probe(plain, (t) => {
-      undoable(() => (t as unknown as { $: { a: (v: object) => void } }).$.a({ n: 1 }));
+      undoable(() =>
+        (t as unknown as { $: { a: (v: object) => void } }).$.a({ n: 1 })
+      );
     });
     // LANDED is the precondition: nothing downstream observes a write that
     // did not land.
@@ -274,9 +276,7 @@ describe('MUT-1 — which WRITE PATHS reach the notifier?', () => {
   it('DIRECT leaf .set()', async () => {
     const r = await capture((t) => {
       undoable(() =>
-        (t as unknown as { $: { a: { n(value: number): void } } }).$.a.n(
-          2
-        )
+        (t as unknown as { $: { a: { n(value: number): void } } }).$.a.n(2)
       );
     });
     expect(r.notified).toEqual(['a.n']);
@@ -284,7 +284,9 @@ describe('MUT-1 — which WRITE PATHS reach the notifier?', () => {
 
   it('BRANCH call form', async () => {
     const r = await capture((t) => {
-      undoable(() => (t as unknown as { $: { a: (v: object) => void } }).$.a({ n: 3 }));
+      undoable(() =>
+        (t as unknown as { $: { a: (v: object) => void } }).$.a({ n: 3 })
+      );
     });
     expect(r.notified).toEqual(['a.n']);
   });
@@ -310,8 +312,8 @@ describe('MUT-1 — which WRITE PATHS reach the notifier?', () => {
 
 describe('MUT-1 — the interceptLeafSignals docblock, tested verbatim', () => {
   /**
-  * Its stated premise: direct location writes do not invoke PathNotifier by
-  * themselves, so the intrinsic mutation channel must bridge them.
+   * Its stated premise: direct location writes do not invoke PathNotifier by
+   * themselves, so the intrinsic mutation channel must bridge them.
    */
   it('the exact shape the docblock names', async () => {
     resetPathNotifier();
@@ -371,7 +373,8 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
             : Object.fromEntries(
                 Object.entries(raw).filter(
                   ([k, v]) =>
-                    k !== 'ownerId' && !(k === 'structuralEffect' && v === undefined)
+                    k !== 'ownerId' &&
+                    !(k === 'structuralEffect' && v === undefined)
                 )
               );
         seen.push({
@@ -546,7 +549,9 @@ describe('MUT-2A — what does ABSENCE of participation mean?', () => {
     //   (meta) => meta?.participation ?? 'authored'
     expect(getWriteParticipation(undefined)).toBe('authored');
     expect(getWriteParticipation({})).toBe('authored');
-    expect(getWriteParticipation({ participation: 'authored' })).toBe('authored');
+    expect(getWriteParticipation({ participation: 'authored' })).toBe(
+      'authored'
+    );
     expect(getWriteParticipation({ participation: 'realized' })).toBe(
       'realized'
     );
@@ -595,7 +600,10 @@ describe('MUT-2B — does OMITTING the realization stamp manufacture authorship?
     });
     await tick();
 
-    return { delta: tree.getRestorationHistory().length - before, value: tree.$.a.n() };
+    return {
+      delta: tree.getRestorationHistory().length - before,
+      value: tree.$.a.n(),
+    };
   };
 
   it('CONTROL — no write context at all', async () => {
@@ -646,7 +654,10 @@ describe('MUT-2B CONTROL LADDER — is it the FIELD or merely the CONTEXT?', () 
   it('the mode FIELD is decisive, not the presence of a context', async () => {
     const noContext = await withCtx(null);
     const emptyContext = await withCtx({});
-    const systemNoMode = await withCtx({ origin: 'external', intent: 'system' });
+    const systemNoMode = await withCtx({
+      origin: 'external',
+      intent: 'system',
+    });
     const realization = await withCtx({
       origin: 'external',
       intent: 'system',

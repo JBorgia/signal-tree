@@ -35,7 +35,11 @@ type Rows = {
 type Store = {
   $: {
     rows: Rows;
-    n: { (value: number): void; (update: (current: number) => number): void; (): number };
+    n: {
+      (value: number): void;
+      (update: (current: number) => number): void;
+      (): number;
+    };
   };
   transaction(fn: () => void): { confirm(): void; rollback(): void };
   undo(): void;
@@ -77,7 +81,7 @@ describe('DIAG-JOURNAL-1 F7: retained records hold no live SignalTree handles', 
     await flush();
     undoable(() => tree.$.rows.updateOne('a', { name: 'Renamed' }));
     await flush();
-    const pending = tree.transaction(() => tree.$.n(3));
+    const pending = tree.transact(() => tree.$.n(3));
     await flush();
     pending.rollback();
     await flush();
@@ -105,18 +109,18 @@ describe('DIAG-JOURNAL-1 F7: retained records hold no live SignalTree handles', 
     for (const value of values) {
       if (value && typeof value === 'object') {
         for (const marker of INTERNAL) {
-          expect(
-            Object.prototype.hasOwnProperty.call(value, marker)
-          ).toBe(false);
+          expect(Object.prototype.hasOwnProperty.call(value, marker)).toBe(
+            false
+          );
         }
         // The tree itself, its `$`, and any node would satisfy these.
         expect(
           typeof (value as { getRestorationHistory?: unknown })
             .getRestorationHistory
         ).not.toBe('function');
-        expect(
-          typeof (value as { transaction?: unknown }).transaction
-        ).not.toBe('function');
+        expect(typeof (value as { transact?: unknown }).transact).not.toBe(
+          'function'
+        );
       }
     }
   });
@@ -144,7 +148,7 @@ describe('DIAG-JOURNAL-1: can a reader tell the compensation turn from the specu
     await flush();
     const journal = createDiagnosticJournal(tree as unknown as object);
 
-    const pending = tree.transaction(() =>
+    const pending = tree.transact(() =>
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' })
     );
     await flush();

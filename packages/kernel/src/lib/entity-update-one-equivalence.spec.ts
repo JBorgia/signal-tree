@@ -169,7 +169,7 @@ describe('updateOne is equivalent to the frame path', () => {
   it('participates in a transaction and rolls back', async () => {
     const tree = transactionalCollection();
     await flush();
-    const pending = tree.transaction(() => tree.$.rows.updateOne(2, { v: 77 }));
+    const pending = tree.transact(() => tree.$.rows.updateOne(2, { v: 77 }));
     await flush();
     // Optimistic: the speculative value is visible before any decision.
     expect(tree.$.rows.byId(2)?.().v).toBe(77);
@@ -184,7 +184,7 @@ describe('updateOne is equivalent to the frame path', () => {
     const tree = transactionalCollection();
     await flush();
     const held = tree.$.rows.byId(3);
-    const pending = tree.transaction(() => tree.$.rows.updateOne(3, { v: 88 }));
+    const pending = tree.transact(() => tree.$.rows.updateOne(3, { v: 88 }));
     await flush();
     expect(held?.().v).toBe(88);
 

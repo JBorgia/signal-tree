@@ -1266,12 +1266,12 @@ describe('production address witness for the abstract topology fixtures', () => 
     );
     try {
       tree
-        .transaction(() =>
+        .transact(() =>
           tree.$.users.addOne({ id: 'A', name: 'Alice', enabled: true })
         )
         .confirm();
       tree
-        .transaction(() => {
+        .transact(() => {
           tree.$.profile.firstName('Grace');
           tree.$.users.byIdOrFail('A').name('Alicia');
           tree.$.users.byIdOrFail('A').enabled(false);
@@ -1309,7 +1309,7 @@ describe('production address witness for the abstract topology fixtures', () => 
         expect(effect.ownerPath).toBe('users');
         expect(effect.path).not.toBe(effect.ownerPath);
       }
-      const pending = tree.transaction(() =>
+      const pending = tree.transact(() =>
         tree.$.users.byIdOrFail('A').name('Temporary')
       );
       expect(() => pending.rollback()).not.toThrow();

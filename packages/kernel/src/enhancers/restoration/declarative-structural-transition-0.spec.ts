@@ -138,7 +138,7 @@ describe('RESTORATION-DECLARATIVE-STRUCTURAL-TARGET-0', () => {
       { enhancers: [transactions()] }
     );
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.left.addOne({ id: 'shared', value: 1 });
     });
     tree.$.right.addOne({ id: 'shared', value: 2 });
@@ -201,9 +201,9 @@ describe('RESTORATION-DECLARATIVE-STRUCTURAL-TARGET-0', () => {
       __acquireEntityHandleForTesting(id: string): { subjectId: number };
     };
     expect(
-      tree.$.rows.ids().map(
-        (id) => internal.__acquireEntityHandleForTesting(id).subjectId
-      )
+      tree.$.rows
+        .ids()
+        .map((id) => internal.__acquireEntityHandleForTesting(id).subjectId)
     ).toEqual([3, 4, 2]);
   });
 
@@ -224,11 +224,13 @@ describe('RESTORATION-DECLARATIVE-STRUCTURAL-TARGET-0', () => {
     undoable(() => tree.$.rows.changeId('r1', 'r2'));
     await flush();
 
-    const manager = (tree as unknown as {
-      __restoration: {
-        history: Array<{ state: unknown }>;
-      };
-    }).__restoration;
+    const manager = (
+      tree as unknown as {
+        __restoration: {
+          history: Array<{ state: unknown }>;
+        };
+      }
+    ).__restoration;
     for (const turn of manager.history) {
       turn.state = { poisoned: true };
     }
@@ -253,16 +255,18 @@ describe('RESTORATION-DECLARATIVE-STRUCTURAL-TARGET-0', () => {
     await flush();
     undoable(() => tree.$.right(1));
     await flush();
-    const manager = (tree as unknown as {
-      __restoration: {
-        history: Array<{
-          historyIndex: number;
-          __positionIds?: number[];
-          __effects?: Array<{ position: number }>;
-        }>;
-        undoPosition(positionId: number): number[];
-      };
-    }).__restoration;
+    const manager = (
+      tree as unknown as {
+        __restoration: {
+          history: Array<{
+            historyIndex: number;
+            __positionIds?: number[];
+            __effects?: Array<{ position: number }>;
+          }>;
+          undoPosition(positionId: number): number[];
+        };
+      }
+    ).__restoration;
     const first = manager.history[0];
     const firstPosition = first.__positionIds?.[0];
     if (firstPosition === undefined || !first.__effects?.[0]) {

@@ -66,7 +66,7 @@ describe('a refused rollback names its refusal', () => {
     tree.$.rows.addOne({ id: 'a', n: 1 });
     await tick();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       undoable(() => tree.$.rows.removeOne('a'));
     });
     await tick();
@@ -80,7 +80,7 @@ describe('a refused rollback names its refusal', () => {
     const t2 = makeTree();
     t2.$.rows.addOne({ id: 'a', n: 1 });
     await tick();
-    const p2 = t2.transaction(() => {
+    const p2 = t2.transact(() => {
       undoable(() => t2.$.rows.removeOne('a'));
     });
     await tick();
@@ -134,7 +134,9 @@ describe('a refused rollback names its refusal', () => {
     expect(validation).toContain('effect-validation-failed');
     // The constant survives as a PREFIX, so existing matchers keep matching.
     for (const m of [dependency, validation]) {
-      expect(m.startsWith('SignalTree could not rollback the pending transaction')).toBe(true);
+      expect(
+        m.startsWith('SignalTree could not rollback the pending transaction')
+      ).toBe(true);
     }
   });
 });

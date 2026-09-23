@@ -64,12 +64,15 @@ type Tree = ReturnType<typeof signalTree<S>> & {
 };
 
 const makeTree = (adapter: StorageAdapter, key: string) =>
-  signalTree({ a: 'a0', b: 'b0' }, {
-    enhancers: [
-      transactions(),
-      persistence({ key, storage: adapter, debounceMs: 0, autoLoad: false }),
-    ],
-  }) as unknown as Tree;
+  signalTree(
+    { a: 'a0', b: 'b0' },
+    {
+      enhancers: [
+        transactions(),
+        persistence({ key, storage: adapter, debounceMs: 0, autoLoad: false }),
+      ],
+    }
+  ) as unknown as Tree;
 
 describe('the durable commit boundary, carried by persistence()', () => {
   it('CONTROL — a bare write with no transaction becomes durable', async () => {
@@ -94,7 +97,7 @@ describe('the durable commit boundary, carried by persistence()', () => {
     await flush();
     writes.length = 0;
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.a('a1');
       tree.$.a('a2'); // superseded — must never be durable
       tree.$.b('b1');
@@ -123,7 +126,7 @@ describe('the durable commit boundary, carried by persistence()', () => {
     writes.length = 0;
 
     expect(() =>
-      tree.transaction(() => {
+      tree.transact(() => {
         tree.$.a('doomed');
         throw new Error('boom');
       })
@@ -140,8 +143,8 @@ describe('the durable commit boundary, carried by persistence()', () => {
     await flush();
     writes.length = 0;
 
-    const first = tree.transaction(() => tree.$.a('FIRST'));
-    const second = tree.transaction(() => tree.$.a('SECOND'));
+    const first = tree.transact(() => tree.$.a('FIRST'));
+    const second = tree.transact(() => tree.$.a('SECOND'));
 
     // Confirmed in the WRONG order: the later transaction settles first.
     second.confirm();
@@ -164,7 +167,7 @@ describe('the durable commit boundary, carried by persistence()', () => {
     mine.writes.length = 0;
     theirs.writes.length = 0;
 
-    const foreignPending = foreign.transaction(() => foreign.$.a('THEIRS'));
+    const foreignPending = foreign.transact(() => foreign.$.a('THEIRS'));
 
     // My write is not inside anybody's scope, so it must be durable now.
     tree.$.a('MINE');

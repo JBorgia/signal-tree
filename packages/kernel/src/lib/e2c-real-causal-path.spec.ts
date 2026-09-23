@@ -35,13 +35,25 @@ type TT<S> = {
 };
 
 type Scalar = {
-  x: { (value: string): void; (update: (current: string) => string): void; (): string };
+  x: {
+    (value: string): void;
+    (update: (current: string) => string): void;
+    (): string;
+  };
 };
 type Nested = {
   profile: {
     (): { name: string; age: number };
-    name: { (value: string): void; (update: (current: string) => string): void; (): string };
-    age: { (value: number): void; (update: (current: number) => number): void; (): number };
+    name: {
+      (value: string): void;
+      (update: (current: string) => string): void;
+      (): string;
+    };
+    age: {
+      (value: number): void;
+      (update: (current: number) => number): void;
+      (): number;
+    };
   };
 };
 
@@ -56,7 +68,7 @@ describe('E2-C1 — real P3', () => {
     ) as unknown as TT<Scalar>;
     const base = tree.getRestorationHistory().length;
 
-    undoable(() => tree.transaction(() => tree.$.x('B')));
+    undoable(() => tree.transact(() => tree.$.x('B')));
     await tick();
 
     expect(tree.$.x()).toBe('B'); // optimistic: visible immediately
@@ -69,11 +81,11 @@ describe('E2-C1 — real P3', () => {
       { enhancers: [restoration(), transactions()] }
     ) as unknown as TT<Scalar>;
 
-    const t1 = undoable(() => tree.transaction(() => tree.$.x('B'))); // pending
+    const t1 = undoable(() => tree.transact(() => tree.$.x('B'))); // pending
     await tick();
     const histAfterT1 = tree.getRestorationHistory().length;
 
-    const t2 = undoable(() => tree.transaction(() => tree.$.x('C')));
+    const t2 = undoable(() => tree.transact(() => tree.$.x('C')));
     await tick();
     expect(tree.getRestorationHistory().length).toBe(histAfterT1); // still not historied
     t2.confirm();
@@ -94,9 +106,9 @@ describe('E2-C1 — real P3', () => {
       { enhancers: [restoration(), transactions()] }
     ) as unknown as TT<Scalar>;
 
-    const t1 = undoable(() => tree.transaction(() => tree.$.x('B')));
+    const t1 = undoable(() => tree.transact(() => tree.$.x('B')));
     await tick();
-    const t2 = undoable(() => tree.transaction(() => tree.$.x('C')));
+    const t2 = undoable(() => tree.transact(() => tree.$.x('C')));
     await tick();
     t2.confirm();
     await tick();
@@ -140,9 +152,9 @@ describe('E2-C2 — nested path', () => {
       { enhancers: [restoration(), transactions()] }
     ) as unknown as TT<Nested>;
 
-    const t1 = undoable(() => tree.transaction(() => tree.$.profile.name('B')));
+    const t1 = undoable(() => tree.transact(() => tree.$.profile.name('B')));
     await tick();
-    const t2 = undoable(() => tree.transaction(() => tree.$.profile.name('C')));
+    const t2 = undoable(() => tree.transact(() => tree.$.profile.name('C')));
     await tick();
     t2.confirm();
     await tick();
@@ -170,14 +182,14 @@ describe('E2-C3 — real ABA authorship', () => {
       { enhancers: [restoration(), transactions()] }
     ) as unknown as TT<Scalar>;
 
-    const t1 = undoable(() => tree.transaction(() => tree.$.x('B')));
+    const t1 = undoable(() => tree.transact(() => tree.$.x('B')));
     t1.confirm(); // CONFIRMED — this is the entry undo targets
     await tick();
     const hist = tree.getRestorationHistory().length;
 
     // Later work outside confirmed history, produced by the real mechanism: a
     // PENDING turn is visible in truth and adds no restoration history entry (E2-C1 row 1).
-    const later = tree.transaction(() => {
+    const later = tree.transact(() => {
       undoable(() => tree.$.x('C'));
       tree.$.x('B'); // value returns to T1's, authored by THIS turn
     });

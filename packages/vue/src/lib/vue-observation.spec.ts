@@ -141,7 +141,7 @@ describe('@signal-tree/vue observation', () => {
       { flush: 'sync' }
     );
 
-    const pending = tree.transaction(() => tree.$({ left: 1, right: 1 }));
+    const pending = tree.transact(() => tree.$({ left: 1, right: 1 }));
 
     expect(seen).toEqual([[1, 1]]);
     pending.confirm();
@@ -169,18 +169,18 @@ describe('@signal-tree/vue observation', () => {
       }
     );
     const stops = names.map((name) =>
-        watchEffect(
-          () => {
-            void (
-              tree.$ as unknown as Record<string, { readonly value: number }>
-            )[name].value;
-          },
-          { flush: 'sync' }
-        )
-      );
+      watchEffect(
+        () => {
+          void (
+            tree.$ as unknown as Record<string, { readonly value: number }>
+          )[name].value;
+        },
+        { flush: 'sync' }
+      )
+    );
     const before = computations;
 
-    tree.transaction(() => tree.$({ left: 1, right: 1, untouched: 1 })).confirm();
+    tree.transact(() => tree.$({ left: 1, right: 1, untouched: 1 })).confirm();
 
     expect(computations).toBe(before);
     for (const stop of stops) stop();

@@ -108,7 +108,11 @@ describe('A2-2: what does a TREE-SCOPED durable re-read claim causally?', () => 
       }
     ) as unknown as {
       $: {
-        alpha: { (value: string): void; (update: (current: string) => string): void; (): string };
+        alpha: {
+          (value: string): void;
+          (update: (current: string) => string): void;
+          (): string;
+        };
       };
       load(): Promise<void>;
     };
@@ -150,7 +154,11 @@ describe('A2-2: what does a TREE-SCOPED durable re-read claim causally?', () => 
       }
     ) as unknown as {
       $: {
-        beta: { (value: string): void; (update: (current: string) => string): void; (): string };
+        beta: {
+          (value: string): void;
+          (update: (current: string) => string): void;
+          (): string;
+        };
       };
     };
     await flush();
@@ -166,7 +174,6 @@ describe('A2-2: what does a TREE-SCOPED durable re-read claim causally?', () => 
       { origin: null, participation: null },
     ]);
   });
-
 });
 
 /**

@@ -33,7 +33,10 @@ describe('subject restoration claims', () => {
     claims.retain('restoration:1', [1, 2]);
     claims.retain('transaction:1', [2, 3]);
 
-    expect([...claims.ownersOf(2)].sort()).toEqual(['restoration:1', 'transaction:1']);
+    expect([...claims.ownersOf(2)].sort()).toEqual([
+      'restoration:1',
+      'transaction:1',
+    ]);
     // Evicting the whole restoration window must not free a subject a pending
     // transaction still needs to roll back to.
     expect(claims.release('restoration:1')).toEqual([1]);

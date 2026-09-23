@@ -49,7 +49,7 @@ describe('DEVTOOLS-JUMP-0.1: inspection DURING a transaction callback', () => {
     );
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       // The developer scrubs WHILE the transaction is open. Transaction context
       // exists in this frame — so if exclusion is incidental rather than
@@ -83,7 +83,7 @@ describe('DEVTOOLS-JUMP-0.1: inspection DURING a transaction callback', () => {
     );
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       asDevtools(() => tree.$.rows.updateOne('a', { name: 'Inspected' }));
     });
@@ -112,7 +112,7 @@ describe('DEVTOOLS-JUMP-0.1: inspection is not a causal eraser', () => {
     );
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -155,7 +155,7 @@ describe('DEVTOOLS-JUMP-0.1: the ledger hole', () => {
     );
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -178,7 +178,7 @@ describe('DEVTOOLS-JUMP-0.1: the ledger hole', () => {
     );
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();

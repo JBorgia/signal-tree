@@ -10,7 +10,10 @@
  * Studio has a stable contract without `causal-runtime` or the transactions
  * enhancer's storage types becoming public surface.
  */
-export { withWriteObservationScope, type DeclaredWriteScopes } from './lib/internals/write-observation-scope';
+export {
+  withWriteObservationScope,
+  type DeclaredWriteScopes,
+} from './lib/internals/write-observation-scope';
 import type { ISignalTree } from './lib/types';
 import { getActiveWriteContext } from './lib/write-context';
 import { peekInternalTransactionRuntime } from './enhancers/transactions/transactions';
@@ -45,9 +48,13 @@ export function activeTransactionContext():
   const owner = context?.transactionOwner;
   const id = context?.transactionId;
   if (
-    typeof owner !== 'object' || owner === null ||
-    typeof id !== 'number' || !Number.isSafeInteger(id) || id < 0
-  ) return undefined;
+    typeof owner !== 'object' ||
+    owner === null ||
+    typeof id !== 'number' ||
+    !Number.isSafeInteger(id) ||
+    id < 0
+  )
+    return undefined;
   return { owner, id };
 }
 
@@ -172,7 +179,8 @@ export function confirmedTurnReader<T>(
     return undefined;
   }
 
-  const destroyed = (tree as unknown as { destroyed?: () => boolean }).destroyed;
+  const destroyed = (tree as unknown as { destroyed?: () => boolean })
+    .destroyed;
 
   return {
     treeId: treeRuntimeId(tree),
@@ -182,9 +190,7 @@ export function confirmedTurnReader<T>(
       if (destroyed?.() === true) {
         throw new StudioTreeDestroyedError();
       }
-      return projectConfirmedTurns(
-        runtime.getConfirmedTurnRecords() as never
-      );
+      return projectConfirmedTurns(runtime.getConfirmedTurnRecords() as never);
     },
   };
 }

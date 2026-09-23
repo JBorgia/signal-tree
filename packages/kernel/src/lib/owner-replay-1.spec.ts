@@ -91,7 +91,7 @@ describe('OWNER-REPLAY-1: every delivered mutation names its owner', () => {
     // keeps this test on ITS question, which is namespace propagation.
     external(() => tree.$.n(3));
     await flush();
-    const p = tree.transaction(() => tree.$.n(9));
+    const p = tree.transact(() => tree.$.n(9));
     await flush();
     p.rollback(); // rollback compensation
     await flush();
@@ -135,8 +135,12 @@ describe('OWNER-REPLAY-1: every delivered mutation names its owner', () => {
     // collision, now reached through the REPLAY path as well as the authored one.
     const owners = new Set(seen.map((s) => s.ownerId));
     expect(owners).toEqual(new Set([idA, idB]));
-    expect(seen.filter((s) => s.ownerId === idA).length).toBeGreaterThanOrEqual(2);
-    expect(seen.filter((s) => s.ownerId === idB).length).toBeGreaterThanOrEqual(2);
+    expect(seen.filter((s) => s.ownerId === idA).length).toBeGreaterThanOrEqual(
+      2
+    );
+    expect(seen.filter((s) => s.ownerId === idB).length).toBeGreaterThanOrEqual(
+      2
+    );
   });
 
   it('⚠️ an owner-filtered observer now SEES a restoration', async () => {

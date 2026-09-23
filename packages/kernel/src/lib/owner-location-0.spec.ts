@@ -122,7 +122,10 @@ describe('OWNER-LOCATION-0: which node kinds name their owning tree?', () => {
     const addressableWithoutOwner = Object.entries(inventory)
       .filter(([, s]) => s.positionIds && s.ownerPath && !s.registry)
       .map(([name]) => name);
-    console.log('ADDRESSABLE-WITHOUT-OWNER:', JSON.stringify(addressableWithoutOwner));
+    console.log(
+      'ADDRESSABLE-WITHOUT-OWNER:',
+      JSON.stringify(addressableWithoutOwner)
+    );
 
     // The control: SOMETHING must be addressable-with-owner, or the query is
     // matching nothing for the wrong reason.
@@ -165,5 +168,4 @@ describe('OWNER-LOCATION-0: the invariant holds across trees', () => {
       getOwnedPositionIds(b.$.data.rows)
     );
   });
-
 });

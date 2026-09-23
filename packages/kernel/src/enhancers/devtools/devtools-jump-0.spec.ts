@@ -64,7 +64,7 @@ describe('DEVTOOLS-JUMP-0: interaction with a PENDING transaction', () => {
     );
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -96,7 +96,7 @@ describe('DEVTOOLS-JUMP-0: interaction with a PENDING transaction', () => {
     );
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();

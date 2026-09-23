@@ -2299,15 +2299,17 @@ export function transactions(): Enhancer<TransactionMethods> {
   ): ISignalTree<T> & TransactionMethods => {
     const runtime = getOrCreateInternalTransactionRuntime(tree);
 
-    (tree as ISignalTree<T> & TransactionMethods).transaction =
-      runtime.transaction;
+    // `transact`, not `transaction`: a verb beside `propose()` and the
+    // handle's own `confirm()`/`rollback()`. The old spelling was REMOVED
+    // outright in the 2026-09-22 breaking API reset rather than bridged — see
+    // docs/research/api-breaking-reset-0.md.
+    const host = tree as ISignalTree<T> & TransactionMethods;
+    host.transact = runtime.transaction;
 
     // PROPOSAL-0. Naming and a review projection over the SAME turn — no
     // second code path, no proposal-only rule. `pending` here is exactly what
     // `transaction()` hands any other caller.
-    (tree as ISignalTree<T> & TransactionMethods).proposal = (
-      fn: () => void
-    ): Proposal => {
+    host.propose = (fn: () => void): Proposal => {
       const pending = runtime.transaction(fn);
       const turnId = (pending as unknown as Record<PropertyKey, unknown>)[
         PENDING_TURN_ID

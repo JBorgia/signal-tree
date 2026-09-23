@@ -144,7 +144,10 @@ export function external<R>(operation: () => R): R {
 
   // Thenable check written WITHOUT a `typeof result === 'object'` clause — see
   // restoration-eligibility.ts for why that clause is wrong here.
-  if (typeof (result as { then?: unknown } | null | undefined)?.then === 'function') {
+  if (
+    typeof (result as { then?: unknown } | null | undefined)?.then ===
+    'function'
+  ) {
     throw new Error(
       'ST1035: an external-truth application must be synchronous. The ' +
         'classification is restored before the scope returns, so writes after ' +

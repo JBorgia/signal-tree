@@ -15,72 +15,69 @@ const flush = async () => {
 };
 
 describe('RESTORATION-POSITION-CAPTURE-0', () => {
-  it(
-    'retains and reverses a designated pure reorder without replacing subjects',
-    async () => {
-      const tree = signalTree(
-        { rows: entityMap<Row, string>({ selectId: (row) => row.id }) },
-        { enhancers: [restoration({ maxHistorySize: 10 })] }
-      );
+  it('retains and reverses a designated pure reorder without replacing subjects', async () => {
+    const tree = signalTree(
+      { rows: entityMap<Row, string>({ selectId: (row) => row.id }) },
+      { enhancers: [restoration({ maxHistorySize: 10 })] }
+    );
 
-      undoable(() =>
-        tree.$.rows.setAll([
-          { id: 'a', value: 1 },
-          { id: 'b', value: 2 },
-          { id: 'c', value: 3 },
-        ])
-      );
-      await flush();
+    undoable(() =>
+      tree.$.rows.setAll([
+        { id: 'a', value: 1 },
+        { id: 'b', value: 2 },
+        { id: 'c', value: 3 },
+      ])
+    );
+    await flush();
 
-      const heldA = tree.$.rows.byIdOrFail('a');
-      const heldB = tree.$.rows.byIdOrFail('b');
-      const heldC = tree.$.rows.byIdOrFail('c');
-      const before = tree.getRestorationHistory().length;
+    const heldA = tree.$.rows.byIdOrFail('a');
+    const heldB = tree.$.rows.byIdOrFail('b');
+    const heldC = tree.$.rows.byIdOrFail('c');
+    const before = tree.getRestorationHistory().length;
 
-      undoable(() =>
-        tree.$.rows.setAll([
-          { id: 'c', value: 3 },
-          { id: 'b', value: 2 },
-          { id: 'a', value: 1 },
-        ])
-      );
-      await flush();
+    undoable(() =>
+      tree.$.rows.setAll([
+        { id: 'c', value: 3 },
+        { id: 'b', value: 2 },
+        { id: 'a', value: 1 },
+      ])
+    );
+    await flush();
 
-      expect(tree.$.rows.ids()).toEqual(['c', 'b', 'a']);
-      expect(tree.getRestorationHistory()).toHaveLength(before + 1);
-      const internal = tree as unknown as {
-        __restoration: {
-          getTurns(): Array<{
-            __orderDeltas?: Array<{ afterFrontier: unknown }>;
-          }>;
-        };
+    expect(tree.$.rows.ids()).toEqual(['c', 'b', 'a']);
+    expect(tree.getRestorationHistory()).toHaveLength(before + 1);
+    const internal = tree as unknown as {
+      __restoration: {
+        getTurns(): Array<{
+          __orderDeltas?: Array<{ afterFrontier: unknown }>;
+        }>;
       };
-      const binding = tree.$.rows as unknown as {
-        __prepareTransitionTarget: {
-          readSource(): { orderFrontier: unknown };
-        };
+    };
+    const binding = tree.$.rows as unknown as {
+      __prepareTransitionTarget: {
+        readSource(): { orderFrontier: unknown };
       };
-      expect(
-        binding.__prepareTransitionTarget.readSource().orderFrontier
-      ).toBe(internal.__restoration.getTurns().at(-1)?.__orderDeltas?.[0].afterFrontier);
+    };
+    expect(binding.__prepareTransitionTarget.readSource().orderFrontier).toBe(
+      internal.__restoration.getTurns().at(-1)?.__orderDeltas?.[0].afterFrontier
+    );
 
-      tree.undo();
-      await flush();
+    tree.undo();
+    await flush();
 
-      expect(tree.$.rows.ids()).toEqual(['a', 'b', 'c']);
-      expect(heldA()).toEqual({ id: 'a', value: 1 });
-      expect(heldB()).toEqual({ id: 'b', value: 2 });
-      expect(heldC()).toEqual({ id: 'c', value: 3 });
+    expect(tree.$.rows.ids()).toEqual(['a', 'b', 'c']);
+    expect(heldA()).toEqual({ id: 'a', value: 1 });
+    expect(heldB()).toEqual({ id: 'b', value: 2 });
+    expect(heldC()).toEqual({ id: 'c', value: 3 });
 
-      tree.redo();
-      await flush();
+    tree.redo();
+    await flush();
 
-      expect(tree.$.rows.ids()).toEqual(['c', 'b', 'a']);
-      expect(heldA()).toEqual({ id: 'a', value: 1 });
-      expect(heldB()).toEqual({ id: 'b', value: 2 });
-      expect(heldC()).toEqual({ id: 'c', value: 3 });
-    }
-  );
+    expect(tree.$.rows.ids()).toEqual(['c', 'b', 'a']);
+    expect(heldA()).toEqual({ id: 'a', value: 1 });
+    expect(heldB()).toEqual({ id: 'b', value: 2 });
+    expect(heldC()).toEqual({ id: 'c', value: 3 });
+  });
 
   it('reverses a reorder and field write as one target transition', async () => {
     const tree = signalTree(
@@ -141,7 +138,7 @@ describe('RESTORATION-POSITION-CAPTURE-0', () => {
     );
     await flush();
 
-    const pending = tree.transaction(() =>
+    const pending = tree.transact(() =>
       undoable(() => {
         tree.$.count(1);
         tree.$.rows.setAll([
@@ -184,7 +181,7 @@ describe('RESTORATION-POSITION-CAPTURE-0', () => {
     ]);
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.count(1);
       tree.$.rows.setAll([
         { id: 'c', value: 3 },
@@ -212,7 +209,7 @@ describe('RESTORATION-POSITION-CAPTURE-0', () => {
     await flush();
 
     expect(() =>
-      tree.transaction(() => {
+      tree.transact(() => {
         tree.$.rows.setAll([
           { id: 'c', value: 3 },
           { id: 'b', value: 2 },

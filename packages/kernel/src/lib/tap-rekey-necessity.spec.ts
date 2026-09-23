@@ -61,7 +61,8 @@ describe('TAP — histories with an IDENTICAL final state', () => {
 
     const updates: string[] = [];
     tree.$.rows.tap({
-      onUpdate: (id, changes) => updates.push(`${id}:${JSON.stringify(changes)}`),
+      onUpdate: (id, changes) =>
+        updates.push(`${id}:${JSON.stringify(changes)}`),
     });
 
     const start = tree.$.rows.byId('a')?.n();

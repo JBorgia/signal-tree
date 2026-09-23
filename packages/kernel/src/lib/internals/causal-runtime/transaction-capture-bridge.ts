@@ -1,10 +1,16 @@
 import type { PathNotifierHandler } from '../../path-notifier';
 
-import { getWriteParticipation, isInspectionWrite } from '../../write-participation';
+import {
+  getWriteParticipation,
+  isInspectionWrite,
+} from '../../write-participation';
 
 import type { PositionId, StructuralEffect, WriteMetadata } from '../../types';
 
-import type { ExplicitTransactionEffect, GreenfieldTransactionDraft } from './greenfield-transactions';
+import type {
+  ExplicitTransactionEffect,
+  GreenfieldTransactionDraft,
+} from './greenfield-transactions';
 
 export function toExplicitTransactionEffect(options: {
   next: unknown;

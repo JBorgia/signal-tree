@@ -23,7 +23,10 @@ const tree = signalTree(
   { enhancers: [batching(), restoration(), transactions()] }
 );
 
-const typedTree: SignalTree<{ rows: ReturnType<typeof entityMap<{ id: number }, number>>; count: number }> = tree;
+const typedTree: SignalTree<{
+  rows: ReturnType<typeof entityMap<{ id: number }, number>>;
+  count: number;
+}> = tree;
 const rows: EntitySignal<{ id: number }, number> = tree.$.rows;
 const readonlyTree = asReadonly(tree);
 const transactionMethods: TransactionMethods = tree;

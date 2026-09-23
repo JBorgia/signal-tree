@@ -116,16 +116,16 @@ describe('ENTITY-LINK-0: is parent-branch linking the SAME thing?', () => {
     const branchTriggers: string[] = [];
     const rowsTriggers: string[] = [];
     const ownerPathOf = (p: string) => p.startsWith('data');
-    const off = (
-      await import('./path-notifier')
-    ).getPathNotifier().subscribe('**', (v, prev, path) => {
-      if (v === undefined && prev === undefined) return;
-      if (!ownerPathOf(path)) return;
-      branchTriggers.push(path);
-      if (path === 'data.rows' || path.startsWith('data.rows.')) {
-        rowsTriggers.push(path);
-      }
-    });
+    const off = (await import('./path-notifier'))
+      .getPathNotifier()
+      .subscribe('**', (v, prev, path) => {
+        if (v === undefined && prev === undefined) return;
+        if (!ownerPathOf(path)) return;
+        branchTriggers.push(path);
+        if (path === 'data.rows' || path.startsWith('data.rows.')) {
+          rowsTriggers.push(path);
+        }
+      });
 
     // A purely presentational change, unrelated to the collection.
     tree.$.data.page(2);

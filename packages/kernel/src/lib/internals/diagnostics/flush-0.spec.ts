@@ -68,16 +68,22 @@ const bare = () =>
  * transactions() alone deliver. Leaf interception, not flush, is the gate.
  */
 const observable = () =>
-  signalTree({ total: 12000, a: 0, b: 0, c: 0 } as Cart, {
-    enhancers: [transactions()],
-  } as never) as never as {
+  signalTree(
+    { total: 12000, a: 0, b: 0, c: 0 } as Cart,
+    {
+      enhancers: [transactions()],
+    } as never
+  ) as never as {
     $: Record<string, (v?: unknown) => unknown>;
   };
 
 const enhanced = () =>
-  signalTree({ total: 12000, a: 0, b: 0, c: 0 } as Cart, {
-    enhancers: [restoration(), transactions()],
-  } as never) as never as {
+  signalTree(
+    { total: 12000, a: 0, b: 0, c: 0 } as Cart,
+    {
+      enhancers: [restoration(), transactions()],
+    } as never
+  ) as never as {
     $: Record<string, (v?: unknown) => unknown>;
     transaction(fn: () => void): { confirm(): void };
   };
@@ -98,7 +104,11 @@ describe('FLUSH-0', () => {
       const delivered = seen.find((f) => f.path === 'total');
       const materialized = journal.turns().length;
 
-      note(`case 1  A delivered=${delivered ? 'YES' : 'NO'}  C turns=${materialized}`);
+      note(
+        `case 1  A delivered=${
+          delivered ? 'YES' : 'NO'
+        }  C turns=${materialized}`
+      );
 
       // THE FINDING: a bare tree delivers NO scalar frame at all. The flush
       // question is moot here — there is nothing to package.
@@ -160,8 +170,9 @@ describe('FLUSH-0', () => {
       const groupingFact = ids.size === 1 && [...ids][0] !== undefined;
 
       note(
-        `case 3  writes=${realized.length} groupingFact=${groupingFact ? 'YES' : 'NO'} ` +
-          `transactionIds=${JSON.stringify([...ids])}`
+        `case 3  writes=${realized.length} groupingFact=${
+          groupingFact ? 'YES' : 'NO'
+        } ` + `transactionIds=${JSON.stringify([...ids])}`
       );
       // Recorded, not asserted as desirable.
       expect(realized.length).toBe(3);
@@ -175,7 +186,7 @@ describe('FLUSH-0', () => {
     const tree = enhanced();
     const { seen, off } = observe();
     try {
-      tree.transaction(() => tree.$['total'](9600)).confirm();
+      tree.transact(() => tree.$['total'](9600)).confirm();
       await settle();
       external(() => tree.$['total'](10200));
       await settle();
@@ -200,7 +211,14 @@ describe('FLUSH-0', () => {
   it('case 6 — entity realization delivers without a flush driver', async () => {
     const tree = signalTree({
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-    }) as never as { $: { rows: { addOne(r: Row): void; updateOne(id: string, p: Partial<Row>): void } } };
+    }) as never as {
+      $: {
+        rows: {
+          addOne(r: Row): void;
+          updateOne(id: string, p: Partial<Row>): void;
+        };
+      };
+    };
 
     tree.$.rows.addOne({ id: 'A', name: 'Alpha' });
     await settle();
@@ -211,7 +229,11 @@ describe('FLUSH-0', () => {
       await settle();
 
       const row = seen.find((f) => f.path === 'rows.A');
-      note(`case 6  rowFrame=${row ? 'YES' : 'NO'} participation=${row?.participation}`);
+      note(
+        `case 6  rowFrame=${row ? 'YES' : 'NO'} participation=${
+          row?.participation
+        }`
+      );
       expect(row).toBeDefined();
       expect(row?.participation).toBe('realized');
     } finally {

@@ -61,14 +61,12 @@ describe('restoration authority is fixed at construction', () => {
     // reinterpreted as owned. This assertion is what the reclaimer's
     // eligibility rule now rests on — if late enhancement ever returns, this
     // row fails and the rule has to be re-derived, not merely re-tested.
-    expect(
-      (tree as unknown as { with?: unknown }).with
-    ).toBeUndefined();
+    expect((tree as unknown as { with?: unknown }).with).toBeUndefined();
 
     // And the tree exposes no restoration surface of its own.
     expect((tree as unknown as { undo?: unknown }).undo).toBeUndefined();
     expect(
-      (tree as unknown as { transaction?: unknown }).transaction
+      (tree as unknown as { transact?: unknown }).transact
     ).toBeUndefined();
   });
 
@@ -173,8 +171,10 @@ describe('restoration authority is fixed at construction', () => {
     // A rollback covers only what its own transaction did. Whatever the
     // transaction surface offers, none of it may resurrect A.
     const pending = (
-      tree as unknown as { transaction: (f: () => void) => { rollback(): void } }
-    ).transaction(() => {
+      tree as unknown as {
+        transaction: (f: () => void) => { rollback(): void };
+      }
+    ).transact(() => {
       undoable(() => tree.$.rows.updateOne('B', { name: 'Beta2' }));
     });
     pending.rollback();
@@ -196,15 +196,17 @@ describe('restoration authority is fixed at construction', () => {
   const inspect = (rows: unknown, subjectId: number) =>
     (
       rows as {
-        __inspectSubjectResources: (id: number) =>
-          | { retainedValueBacking: unknown; state: string }
-          | undefined;
+        __inspectSubjectResources: (
+          id: number
+        ) => { retainedValueBacking: unknown; state: string } | undefined;
       }
     ).__inspectSubjectResources(subjectId);
 
   const subjectIdOf = (rows: unknown, key: string) =>
     (
-      rows as { __acquireEntityHandleForTesting: (k: string) => { subjectId: number } }
+      rows as {
+        __acquireEntityHandleForTesting: (k: string) => { subjectId: number };
+      }
     ).__acquireEntityHandleForTesting(key).subjectId;
 
   it('reclaims backing for a subject retired with no restoration owner', async () => {

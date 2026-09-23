@@ -1,12 +1,15 @@
 import type { PositionRegistry } from '../position-registry';
 
-import type { PositionId, ReversalEffect, ReversalResult, TurnId, CausalTurn } from './causal-types';
+import type {
+  PositionId,
+  ReversalEffect,
+  ReversalResult,
+  TurnId,
+  CausalTurn,
+} from './causal-types';
 import type { EffectApplicationPort } from './effect-applier';
 import type { RealizationContext } from './realization-context';
-import type {
-  PreparePendingTurnDiscardResult,
-  TurnStore,
-} from './turn-store';
+import type { PreparePendingTurnDiscardResult, TurnStore } from './turn-store';
 
 export type RollbackPendingResult = ReversalResult<
   | { readonly kind: 'outside-boundary' }
@@ -18,7 +21,9 @@ export type RollbackPendingResult = ReversalResult<
 export interface PendingRollbackPort extends EffectApplicationPort {
   validateEffects?(
     effects: readonly ReversalEffect[]
-  ): Extract<RollbackPendingResult, { readonly ok: false }>['refusal'] | undefined;
+  ):
+    | Extract<RollbackPendingResult, { readonly ok: false }>['refusal']
+    | undefined;
 }
 
 export interface RollbackPendingTurnAtOptions {
@@ -36,9 +41,15 @@ export interface RollbackPendingTurnAtOptions {
   readonly port: PendingRollbackPort;
   readonly realizationContext: RealizationContext;
   readonly onMaintenanceMayBeUseful?: (turn: CausalTurn) => void;
-  readonly reportMaintenanceObserverError?: (error: unknown, turn: CausalTurn) => void;
+  readonly reportMaintenanceObserverError?: (
+    error: unknown,
+    turn: CausalTurn
+  ) => void;
   readonly onPendingTurnDiscarded?: (turn: CausalTurn) => void;
-  readonly reportDiscardObserverError?: (error: unknown, turn: CausalTurn) => void;
+  readonly reportDiscardObserverError?: (
+    error: unknown,
+    turn: CausalTurn
+  ) => void;
 }
 
 export function rollbackPendingTurnAt(
@@ -61,7 +72,10 @@ export function rollbackPendingTurnAt(
     return { ok: false, refusal: { kind: 'dependency-conflict' } };
   }
 
-  const effects = createPendingRollbackEffects(turn, options.realizationContext);
+  const effects = createPendingRollbackEffects(
+    turn,
+    options.realizationContext
+  );
   const validationRefusal = options.port.validateEffects?.(effects);
   if (validationRefusal) {
     return { ok: false, refusal: validationRefusal };
@@ -80,7 +94,8 @@ export function rollbackPendingTurnAt(
   const maintenanceObserver =
     options.onMaintenanceMayBeUseful ?? options.onPendingTurnDiscarded;
   const maintenanceErrorObserver =
-    options.reportMaintenanceObserverError ?? options.reportDiscardObserverError;
+    options.reportMaintenanceObserverError ??
+    options.reportDiscardObserverError;
 
   if (discardedTurn && maintenanceObserver) {
     try {
@@ -124,23 +139,21 @@ function createPendingRollbackEffects(
   });
 
   return turn.effects
-    .filter(
-      (effect, index) => {
-        if (effect.subjectId !== undefined) {
-          const dominantStructuralEffect = dominantStructuralEffects.find(
-            (candidate) => sameSubjectScope(candidate, effect)
-          );
-          if (dominantStructuralEffect) {
-            return dominantStructuralEffect === effect;
-          }
+    .filter((effect, index) => {
+      if (effect.subjectId !== undefined) {
+        const dominantStructuralEffect = dominantStructuralEffects.find(
+          (candidate) => sameSubjectScope(candidate, effect)
+        );
+        if (dominantStructuralEffect) {
+          return dominantStructuralEffect === effect;
         }
-
-        const effectKey = hasInlineScopedLeafAddress(effect)
-          ? `${String(effect.owner)}\u0000${effect.path}`
-          : String(effect.owner);
-        return firstEffectIndexByOwner.get(effectKey) === index;
       }
-    )
+
+      const effectKey = hasInlineScopedLeafAddress(effect)
+        ? `${String(effect.owner)}\u0000${effect.path}`
+        : String(effect.owner);
+      return firstEffectIndexByOwner.get(effectKey) === index;
+    })
     .map((effect) =>
       createPendingRollbackEffect(effect, turn.id, realizationContext)
     )
@@ -263,20 +276,19 @@ function hasLaterStructuralDependency(
 
     if (pendingEffect.structural === 'add') {
       return laterTurns.some((turn) =>
-        turn.effects.some(
-          (effect) =>
-            sameSubjectScope(effect, pendingEffect)
-        )
+        turn.effects.some((effect) => sameSubjectScope(effect, pendingEffect))
       );
     }
 
-    const restoredStructuralResource = getRestoredStructuralResource(pendingEffect);
+    const restoredStructuralResource =
+      getRestoredStructuralResource(pendingEffect);
     if (
       restoredStructuralResource !== undefined &&
       laterTurns.some((turn) =>
         turn.effects.some(
           (effect) =>
-            getAcquiredStructuralResource(effect) === restoredStructuralResource &&
+            getAcquiredStructuralResource(effect) ===
+              restoredStructuralResource &&
             sameStructuralScope(effect, pendingEffect)
         )
       )
@@ -287,7 +299,8 @@ function hasLaterStructuralDependency(
     return laterTurns.some((turn) =>
       turn.effects.some(
         (effect) =>
-          effect.structural !== undefined && sameSubjectScope(effect, pendingEffect)
+          effect.structural !== undefined &&
+          sameSubjectScope(effect, pendingEffect)
       )
     );
   });

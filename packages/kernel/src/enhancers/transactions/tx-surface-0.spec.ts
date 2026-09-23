@@ -7,7 +7,7 @@ import { transactions } from './transactions';
 import { undoable } from '../../lib/undoable';
 
 /**
- * TX-SURFACE-0 — does `restoration().transaction()` deserve to exist?
+ * TX-SURFACE-0 — does `restoration().transact()` deserve to exist?
  *
  * > NULL: `restoration()`'s `transaction()` has no independently owned public
  * > role and should be deleted in favour of `transactions()`.
@@ -32,13 +32,16 @@ const refusalKind = (error: unknown): unknown =>
   (error as { cause?: { kind?: unknown } })?.cause?.kind;
 
 /** Which implementation answered, inferred from behaviour rather than identity. */
-const probeRollbackOwner = async (
-  tree: {
-    $: { rows: { addOne(r: Row): void; updateOne(id: string, c: Partial<Row>): void } };
-    transaction(fn: () => void): { rollback(): void };
-  }
-) => {
-  const pending = tree.transaction(() => {
+const probeRollbackOwner = async (tree: {
+  $: {
+    rows: {
+      addOne(r: Row): void;
+      updateOne(id: string, c: Partial<Row>): void;
+    };
+  };
+  transaction(fn: () => void): { rollback(): void };
+}) => {
+  const pending = tree.transact(() => {
     tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
   });
   await flush();
@@ -89,7 +92,7 @@ describe('TX-SURFACE-0: the duplicate transaction() surface', () => {
     // the ownership change real: a transaction boundary requires the enhancer
     // that owns one.
     expect(
-      (tree as unknown as { transaction?: unknown }).transaction
+      (tree as unknown as { transact?: unknown }).transact
     ).toBeUndefined();
   });
 });
@@ -111,7 +114,7 @@ describe('TX-SURFACE-0: the composed ownership story', () => {
     const before = tree.getRestorationHistory().length;
 
     tree
-      .transaction(() => {
+      .transact(() => {
         tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       })
       .confirm();
@@ -140,7 +143,7 @@ describe('TX-SURFACE-0: the composed ownership story', () => {
 
     undoable(() => {
       tree
-        .transaction(() => {
+        .transact(() => {
           tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
           tree.$.rows.addOne({ id: 'b', name: 'Beta' });
         })

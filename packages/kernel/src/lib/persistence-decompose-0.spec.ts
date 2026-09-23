@@ -126,7 +126,7 @@ describe('PERSISTENCE-DECOMPOSE-0 §8: speculative writes must NOT persist', () 
     await flush();
     const l = link(tree.$.settings, persistenceEndpoint<Settings>(be, 'k'));
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.settings.theme('A');
       tree.$.settings.density(2);
     });
@@ -164,7 +164,7 @@ describe('PERSISTENCE-DECOMPOSE-0 §8: speculative writes must NOT persist', () 
     await flush();
     const l = link(tree.$.settings, persistenceEndpoint<Settings>(be, 'k'));
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.settings.theme('B');
       tree.$.settings.density(3);
     });
@@ -360,7 +360,7 @@ describe('PERSISTENCE-DECOMPOSE-0 §11-12: codec and migration are endpoint-owne
     clearTreeErrorListenersForTesting();
   });
 
-  it('an absent durable value is the endpoint\'s decision, not Link\'s', async () => {
+  it("an absent durable value is the endpoint's decision, not Link's", async () => {
     const be = backend();
     const tree = makeTree();
     await flush();
@@ -768,7 +768,10 @@ describe('0B §4: migration-failure clearing is adapter policy', () => {
     be.store.set('k', JSON.stringify({ __v: 1, theme: 'legacy' }));
     const tree = makeTree();
     await flush();
-    const l = link(tree.$.settings, migratingEndpoint(be, 'k', false, fallback));
+    const l = link(
+      tree.$.settings,
+      migratingEndpoint(be, 'k', false, fallback)
+    );
 
     await l.retrieve();
     await flush();

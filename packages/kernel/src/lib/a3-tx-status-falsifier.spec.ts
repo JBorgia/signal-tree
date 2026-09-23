@@ -60,7 +60,7 @@ describe('A3-TX case 1: POST with no speculative state', () => {
 
     // A transaction is a scope around AUTHORED WRITES. To open one at all, there
     // has to be a write. The POST has none to make yet.
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       // ⚠️ THIS IS THE FINDING. To get a transaction to exist we must invent a
       // speculative business write that the application does not want:
       tree.$.ticket.id('__inflight__');
@@ -71,7 +71,9 @@ describe('A3-TX case 1: POST with no speculative state', () => {
     // "Loading" is not a state a transaction exposes. The closest available fact
     // is "a pending transaction exists", which is not the same question and is
     // not addressable per-operation from the UI.
-    observations.push(`pending exists: ${typeof pending.rollback === 'function'}`);
+    observations.push(
+      `pending exists: ${typeof pending.rollback === 'function'}`
+    );
 
     // And the failure path carries no typed payload. A rollback reverses writes;
     // it does not record WHY.
@@ -114,14 +116,16 @@ describe('A3-TX case 2: an imperative load that is not a transaction at all', ()
     try {
       // An empty transaction: no speculative writes, because there are none to
       // make. Does it give us an operation to attach status to?
-      const pending = tree.transaction(() => {
+      const pending = tree.transact(() => {
         /* nothing — the fetch has not returned */
       });
       await flush();
       pending.confirm();
       openedWithoutWrites = 'opened and confirmed with zero writes';
     } catch (error) {
-      openedWithoutWrites = `refused: ${(error as { message?: string })?.message?.slice(0, 40)}`;
+      openedWithoutWrites = `refused: ${(
+        error as { message?: string }
+      )?.message?.slice(0, 40)}`;
     }
     await flush();
 
@@ -151,7 +155,10 @@ describe('A3-TX: and yet `status` does NOT come back', () => {
     // above, though correct, does not resurrect anything. The alternative is
     // ORDINARY STORE TRUTH with derived projections, and this is it:
     const tree = signalTree({
-      save: { state: 'idle' as 'idle' | 'loading' | 'loaded' | 'error', error: null as NotifyError | null },
+      save: {
+        state: 'idle' as 'idle' | 'loading' | 'loaded' | 'error',
+        error: null as NotifyError | null,
+      },
     });
     await flush();
 

@@ -59,9 +59,7 @@ describe('RESTORATION-HISTORICAL-MATERIALIZATION-0', () => {
 
     undoable(() => tree.$.designated(1));
     await flush();
-    withWriteContext({ participation: 'realized' }, () =>
-      tree.$.external(1)
-    );
+    withWriteContext({ participation: 'realized' }, () => tree.$.external(1));
     await flush();
 
     expect(tree.getRestorationHistory().map(({ state }) => state)).toEqual([
@@ -106,7 +104,7 @@ describe('RESTORATION-HISTORICAL-MATERIALIZATION-0', () => {
       { count: 0 },
       { enhancers: [restoration(), transactions()] }
     );
-    const pending = tree.transaction(() => undoable(() => tree.$.count(1)));
+    const pending = tree.transact(() => undoable(() => tree.$.count(1)));
 
     tree.resetRestorationHistory();
     pending.confirm();

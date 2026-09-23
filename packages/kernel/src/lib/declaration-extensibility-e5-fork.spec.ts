@@ -63,7 +63,7 @@ describe('E5 fork — canonical participation of the two candidate paths', () =>
     const tree = signalTree({ counter: 10 }, { enhancers: [transactions()] });
     const api = makeCounterApi(tree.$.counter);
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       api.increment();
       api.increment();
     });

@@ -69,7 +69,7 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
     await flush();
     const w = watch(tree);
 
-    tree.transaction(() => tree.$.n(1)).confirm();
+    tree.transact(() => tree.$.n(1)).confirm();
     await flush();
     w.off();
 
@@ -84,7 +84,7 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
     await flush();
     const w = watch(tree);
 
-    const pending = tree.transaction(() =>
+    const pending = tree.transact(() =>
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' })
     );
     await flush();
@@ -103,7 +103,7 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
     await flush();
     const w = watch(tree);
 
-    tree.transaction(() => tree.$.n(1)).confirm();
+    tree.transact(() => tree.$.n(1)).confirm();
     await flush();
     w.off();
 
@@ -123,7 +123,7 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
       );
       await flush();
       const w = watch(tree);
-      tree.transaction(() => tree.$.n(1)).confirm();
+      tree.transact(() => tree.$.n(1)).confirm();
       await flush();
       w.off();
       return w.seen;
@@ -141,7 +141,7 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
     const wa = watch(a);
     const wb = watch(b);
 
-    a.transaction(() => a.$.n(1)).confirm();
+    a.transact(() => a.$.n(1)).confirm();
     await flush();
     wa.off();
     wb.off();
@@ -159,7 +159,7 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
     const w = watch(tree);
     await flush();
 
-    tree.transaction(() => tree.$.n(1)).confirm();
+    tree.transact(() => tree.$.n(1)).confirm();
     await flush();
     w.off();
 
@@ -195,9 +195,7 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
     // host — while leaving the transaction authority in place. This is the state
     // the old code produced silently on every single-enhancer tree.
     const host = tree as unknown as object;
-    expect(
-      Object.prototype.hasOwnProperty.call(host, LIFECYCLE)
-    ).toBe(true);
+    expect(Object.prototype.hasOwnProperty.call(host, LIFECYCLE)).toBe(true);
     delete (host as Record<symbol, unknown>)[LIFECYCLE];
 
     // Never a freshly minted inert channel.
@@ -256,7 +254,7 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
     const w = watch(tree);
     w.off();
 
-    const pending = tree.transaction(() =>
+    const pending = tree.transact(() =>
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' })
     );
     await flush();

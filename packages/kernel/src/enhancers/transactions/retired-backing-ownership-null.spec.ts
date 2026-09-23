@@ -152,7 +152,7 @@ describe('ownership of retired value backing', () => {
     const subject = subjectOf(store.$.rows, 'a');
     const held = store.$.rows.byIdOrFail('a');
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.removeOne('a'));
     });
     await tick();
@@ -174,7 +174,7 @@ describe('ownership of retired value backing', () => {
     await tick();
     const held = store.$.rows.byIdOrFail('a');
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.removeOne('a'));
     });
     await tick();
@@ -192,7 +192,7 @@ describe('ownership of retired value backing', () => {
     undoable(() => store.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     const subject = subjectOf(store.$.rows, 'a');
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.removeOne('a'));
     });
     expect(store.$.rows.ids()).toEqual([]);
@@ -215,7 +215,7 @@ describe('ownership of retired value backing', () => {
     const held = store.$.rows.byIdOrFail('a');
     const heldName = held.name;
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.removeOne('a'));
     });
     deleteValueBacking(store.$.rows, subject);
@@ -256,7 +256,7 @@ describe('ownership of retired value backing', () => {
     const subject = subjectOf(store.$.rows, 'a');
 
     store
-      .transaction(() => {
+      .transact(() => {
         undoable(() => store.$.rows.removeOne('a'));
       })
       .confirm();
@@ -266,7 +266,7 @@ describe('ownership of retired value backing', () => {
 
     expect(store.$.rows.ids()).toEqual(['b']);
     undoable(() => store.$.rows.addOne({ id: 'c', name: 'Gamma' }));
-    const later = store.transaction(() => {
+    const later = store.transact(() => {
       undoable(() => store.$.rows.updateOne('b', { name: 'Beta2' }));
     });
     later.rollback();
@@ -282,7 +282,7 @@ describe('ownership of retired value backing', () => {
 
     let freshSubject: number | undefined;
     expect(() =>
-      store.transaction(() => {
+      store.transact(() => {
         undoable(() => store.$.rows.addOne({ id: 'temp', name: 'Temp' }));
         freshSubject = subjectOf(store.$.rows, 'temp');
         throw new Error('boom');
@@ -314,7 +314,7 @@ describe('ownership of retired value backing', () => {
     await tick();
     deleteValueBacking(store.$.rows, subject);
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.updateOne('b', { name: 'Beta2' }));
       undoable(() => store.$.rows.addOne({ id: 'c', name: 'Gamma' }));
     });
@@ -325,13 +325,16 @@ describe('ownership of retired value backing', () => {
   });
 
   it('BOTH ENHANCERS: neither system needs the bytes when the other is present', async () => {
-    const store = makeStore([restoration({ maxHistorySize: 20 }), transactions()]);
+    const store = makeStore([
+      restoration({ maxHistorySize: 20 }),
+      transactions(),
+    ]);
     undoable(() => store.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     await tick();
     await tick();
     const subject = subjectOf(store.$.rows, 'a');
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.removeOne('a'));
     });
     deleteValueBacking(store.$.rows, subject);

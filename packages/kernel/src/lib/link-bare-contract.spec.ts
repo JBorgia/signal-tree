@@ -72,7 +72,9 @@ describe('link() on a tree built with no enhancers and no capabilities', () => {
     const heldUnits = tree.$.settings.units;
 
     const got: unknown[] = [];
-    const l = track(link(tree.$.settings, { set: (v: unknown) => void got.push(v) }));
+    const l = track(
+      link(tree.$.settings, { set: (v: unknown) => void got.push(v) })
+    );
 
     heldTheme('dark');
     await flush();
@@ -87,7 +89,9 @@ describe('link() on a tree built with no enhancers and no capabilities', () => {
     const tree = signalTree({ linked: { a: 1 }, unrelated: { b: 2 } });
     await flush();
     const got: unknown[] = [];
-    const l = track(link(tree.$.linked, { set: (v: unknown) => void got.push(v) }));
+    const l = track(
+      link(tree.$.linked, { set: (v: unknown) => void got.push(v) })
+    );
 
     tree.$.unrelated.b(99);
     await flush();
@@ -105,7 +109,9 @@ describe('link() on a tree built with no enhancers and no capabilities', () => {
     // carry their own structural observation and never needed ordinary
     // interception. ENTITY OBSERVATION REMAINS NATIVE.
     const tree = signalTree({
-      rows: entityMap<{ id: number; n: string }, number>({ selectId: (e) => e.id }),
+      rows: entityMap<{ id: number; n: string }, number>({
+        selectId: (e) => e.id,
+      }),
     });
     await flush();
     const got: unknown[] = [];

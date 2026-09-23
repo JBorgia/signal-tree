@@ -193,7 +193,7 @@ describe('SUBJECT-EPOCH-0: a non-retaining computed survives collection', () => 
     expect(view()).toBe('a');
     await collect();
 
-    const tx = tree.transaction(() => {
+    const tx = tree.transact(() => {
       tree.$.rows.updateOne(1, { name: 'speculative' });
     });
     expect(view()).toBe('speculative');
@@ -208,7 +208,7 @@ describe('SUBJECT-EPOCH-0: a non-retaining computed survives collection', () => 
     const view = watch(tree, 1);
     await collect();
     tree
-      .transaction(() => {
+      .transact(() => {
         tree.$.rows.updateOne(1, { name: 'committed' });
       })
       .confirm();

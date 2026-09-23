@@ -135,7 +135,7 @@ const rowsOf = (t: Tree, key = 'rows') => t.$.data[key];
 const seedRemoveRollback = async (a: Tree, key = 'rows') => {
   rowsOf(a, key).addOne({ id: 'a-seed', n: 1 });
   await flush();
-  const p = a.transaction(() => {
+  const p = a.transact(() => {
     rowsOf(a, key).removeOne('a-seed');
   });
   await flush();
@@ -246,10 +246,12 @@ describe('REALIZATION-NAMESPACE-0: descriptor state is OWNER-ISOLATED', () => {
     );
     expect(getPositionRegistry(a.$)).not.toBe(getPositionRegistry(b.$));
     // The collision the whole investigation turns on: same LOCAL position id.
-    expect(getOwnedPositionIds(rowsOf(a))).toEqual(getOwnedPositionIds(rowsOf(b)));
+    expect(getOwnedPositionIds(rowsOf(a))).toEqual(
+      getOwnedPositionIds(rowsOf(b))
+    );
   });
 
-  it('B never WRITES A descriptor, and no longer changes A\'s derived address', async () => {
+  it("B never WRITES A descriptor, and no longer changes A's derived address", async () => {
     const withB = async (second: boolean) => {
       const a = nested();
       if (second) {

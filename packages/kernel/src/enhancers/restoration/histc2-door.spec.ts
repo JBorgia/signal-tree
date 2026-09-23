@@ -35,8 +35,7 @@ const flush = async () => {
  * result type and `check-spec-types` caught it. Spelling each tree out keeps
  * the enhancer methods on the inferred type.
  */
-const ttDesignated = () =>
-  restoration({ maxHistorySize: 50 });
+const ttDesignated = () => restoration({ maxHistorySize: 50 });
 
 const makeTree = () =>
   signalTree(
@@ -158,7 +157,7 @@ describe('HIST-C2 door: turn-level eligibility', () => {
 
     undoable(() => {
       tree
-        .transaction(() => {
+        .transact(() => {
           tree.$.document.title('edited');
           tree.$.ui.panel('inspector');
         })
@@ -181,7 +180,7 @@ describe('HIST-C2 door: turn-level eligibility', () => {
     await flush();
 
     tree
-      .transaction(() => {
+      .transact(() => {
         tree.$.document.title('edited');
       })
       .confirm();

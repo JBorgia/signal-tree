@@ -56,7 +56,7 @@ describe('REKEY-SUPERSESSION-0 / 1 — later UPDATE of the rekeyed subject', () 
     tree.$.rows.addOne({ id: 'A', name: 'Original' });
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.x(1);
       tree.$.rows.changeId('A', 'A2');
     });
@@ -83,7 +83,7 @@ describe('REKEY-SUPERSESSION-0 / 2 — later REMOVE of the rekeyed subject', () 
     tree.$.rows.addOne({ id: 'A', name: 'Original' });
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.x(1);
       tree.$.rows.changeId('A', 'A2');
     });
@@ -110,7 +110,7 @@ describe('REKEY-SUPERSESSION-0 / 3 — later REMOVE then ADD of the same key', (
     tree.$.rows.addOne({ id: 'A', name: 'Original' });
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.x(1);
       tree.$.rows.changeId('A', 'A2');
     });
@@ -144,7 +144,7 @@ describe('REKEY-SUPERSESSION-0 / 4 — clean rekey, no later writer', () => {
     tree.$.rows.addOne({ id: 'A', name: 'Original' });
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.x(1);
       tree.$.rows.changeId('A', 'A2');
     });
@@ -166,7 +166,7 @@ describe('REKEY-SUPERSESSION-0 / 5 — rekey plus another structural operation',
     tree.$.rows.addOne({ id: 'A', name: 'Original' });
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.x(1);
       tree.$.rows.changeId('A', 'A2');
       tree.$.rows.removeOne('A2');

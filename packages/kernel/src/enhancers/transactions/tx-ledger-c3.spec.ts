@@ -63,7 +63,7 @@ describe('TX-LEDGER C3 case 1: dependent realization must REFUSE', () => {
     const tree = makeTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -73,7 +73,9 @@ describe('TX-LEDGER C3 case 1: dependent realization must REFUSE', () => {
 
     // The known failure: rollback used to proceed and delete a row the server
     // had just written to — RESTORE-P0 P0-C one layer up.
-    expect(attempt(() => pending.rollback())).toBe('later-confirmed-dependency');
+    expect(attempt(() => pending.rollback())).toBe(
+      'later-confirmed-dependency'
+    );
     expect(tree.$.rows.ids()).toEqual(['a']);
     expect(tree.$.rows.byId('a')?.()?.name).toBe('FromServer');
   });
@@ -84,7 +86,7 @@ describe('TX-LEDGER C3 case 2: UNRELATED realization stays legal', () => {
     const tree = makeTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -104,7 +106,7 @@ describe('TX-LEDGER C3 case 2: UNRELATED realization stays legal', () => {
     tree.$.rows.setAll([{ id: 'other', name: 'Other' }]);
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -123,7 +125,7 @@ describe('TX-LEDGER C3 cases 3 and 4: the authored controls are UNCHANGED', () =
     const tree = makeTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -133,14 +135,16 @@ describe('TX-LEDGER C3 cases 3 and 4: the authored controls are UNCHANGED', () =
 
     // Realization handling must not be bought by weakening the case that was
     // already correct.
-    expect(attempt(() => pending.rollback())).toBe('later-confirmed-dependency');
+    expect(attempt(() => pending.rollback())).toBe(
+      'later-confirmed-dependency'
+    );
   });
 
   it('4 — an authored unrelated write is still legal', async () => {
     const tree = makeTree();
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -158,7 +162,7 @@ describe('TX-LEDGER C3 case 5: ORIGIN EQUIVALENCE', () => {
     const build = async (viaRealization: boolean) => {
       const tree = makeTree();
       await flush();
-      const pending = tree.transaction(() => {
+      const pending = tree.transact(() => {
         tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       });
       await flush();
@@ -183,7 +187,7 @@ describe('TX-LEDGER C3 case 6: LIFETIME', () => {
     const tree = makeTree();
     await flush();
 
-    const first = tree.transaction(() => {
+    const first = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -195,7 +199,7 @@ describe('TX-LEDGER C3 case 6: LIFETIME', () => {
     await flush();
 
     // A NEW transaction on the same subject must not inherit the old evidence.
-    const second = tree.transaction(() => {
+    const second = tree.transact(() => {
       tree.$.rows.updateOne('a', { name: 'Second' });
     });
     await flush();

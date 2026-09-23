@@ -206,7 +206,7 @@ describe('PRODUCTION-LINK-CONFORMANCE-0: settlement, echo, reconciliation', () =
     // any flush. That tests something STRONGER than was earned — no observation
     // had reached the authority yet — and it failed for that reason rather than
     // for the WEAK-reading defect this pins.
-    const p = tree.transaction(() => tree.$.leaf('B'));
+    const p = tree.transact(() => tree.$.leaf('B'));
     await flush();
 
     const waiting = l.settled();

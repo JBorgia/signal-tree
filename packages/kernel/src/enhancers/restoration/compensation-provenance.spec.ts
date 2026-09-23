@@ -57,7 +57,7 @@ describe('compensation is not external truth', () => {
     undoable(() => store.$.theme('dark'));
     await flush();
 
-    const pending = store.transaction(() => store.$.theme('speculative'));
+    const pending = store.transact(() => store.$.theme('speculative'));
     await flush();
     pending.rollback();
     await flush();
@@ -91,7 +91,7 @@ describe('compensation is not external truth', () => {
     undoable(() => store.$.theme('dark'));
     await flush();
 
-    const pending = store.transaction(() => store.$.theme('speculative'));
+    const pending = store.transact(() => store.$.theme('speculative'));
     await flush();
     pending.rollback();
     await flush();
@@ -112,7 +112,7 @@ describe('compensation is not external truth', () => {
     undoable(() => store.$.theme('dark'));
     await flush();
 
-    const pending = store.transaction(() => store.$.theme('speculative'));
+    const pending = store.transact(() => store.$.theme('speculative'));
     await flush();
     pending.rollback();
     await flush();
@@ -154,7 +154,7 @@ describe('compensation is not external truth', () => {
     realize(() => store.$.theme('blue'));
     await flush();
 
-    const pending = store.transaction(() => store.$.theme('red'));
+    const pending = store.transact(() => store.$.theme('red'));
     await flush();
     pending.rollback();
     await flush();
@@ -177,7 +177,7 @@ describe('compensation is not external truth', () => {
     realize(() => store.$.theme('blue'));
     await flush();
 
-    const pending = store.transaction(() => store.$.theme('red'));
+    const pending = store.transact(() => store.$.theme('red'));
     await flush();
     pending.confirm();
     await flush();
@@ -208,9 +208,9 @@ describe('compensation is not external truth', () => {
     realize(() => store.$.theme('blue'));
     await flush();
 
-    const first = store.transaction(() => store.$.theme('red'));
+    const first = store.transact(() => store.$.theme('red'));
     await flush();
-    const second = store.transaction(() => store.$.theme('green'));
+    const second = store.transact(() => store.$.theme('green'));
     await flush();
     expect(store.$.theme()).toBe('green');
 
@@ -230,9 +230,9 @@ describe('compensation is not external truth', () => {
     realize(() => store.$.theme('blue'));
     await flush();
 
-    const first = store.transaction(() => store.$.theme('red'));
+    const first = store.transact(() => store.$.theme('red'));
     await flush();
-    const second = store.transaction(() => store.$.theme('green'));
+    const second = store.transact(() => store.$.theme('green'));
     await flush();
 
     second.rollback();
@@ -252,7 +252,7 @@ describe('compensation is not external truth', () => {
     undoable(() => store.$.theme('dark'));
     await flush();
 
-    const pending = store.transaction(() => store.$.theme('speculative'));
+    const pending = store.transact(() => store.$.theme('speculative'));
     await flush();
     pending.rollback();
     await flush();

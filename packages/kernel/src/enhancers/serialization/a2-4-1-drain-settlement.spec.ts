@@ -71,7 +71,11 @@ const makeTree = (adapter: StorageAdapter, key: string) =>
     }
   ) as unknown as {
     $: {
-      a: { (value: string): void; (update: (current: string) => string): void; (): string };
+      a: {
+        (value: string): void;
+        (update: (current: string) => string): void;
+        (): string;
+      };
     };
     transaction: (fn: () => void) => { confirm(): void; rollback(): void };
     __flushAutoSave?: () => Promise<void>;
@@ -98,7 +102,7 @@ describe('A2-4.1: the drain vs. the commit boundary', () => {
     const rec = recordingStorage();
     const tree = makeTree(rec.adapter, 'a2-4-1-open');
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.a('doomed');
     });
     await armDebounce();

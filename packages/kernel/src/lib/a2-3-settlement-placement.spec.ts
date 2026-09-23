@@ -47,7 +47,11 @@ const flush = async () => {
  * and defers every durable write through the single consequence authority — no
  * transaction inspection anywhere.
  */
-const makePersister = (claimant: unknown, path: string, store: Map<string, unknown>) => {
+const makePersister = (
+  claimant: unknown,
+  path: string,
+  store: Map<string, unknown>
+) => {
   const durableWrites: unknown[] = [];
   const off = getPathNotifier().subscribe('**', (next, _p, writtenPath) => {
     if (writtenPath !== path) return;
@@ -91,7 +95,7 @@ describe('A2-3 arm B: persister given ONLY the leaf node', () => {
     // would give the implementation.
     const p = makePersister(tree.$.theme, 'theme', store);
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.theme('dark');
     });
     await flush();
@@ -127,7 +131,7 @@ describe('A2-3 arm C: persister given the TREE as claimant', () => {
 
     const p = makePersister(tree, 'theme', store);
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.theme('dark');
     });
     await flush();
@@ -166,7 +170,7 @@ describe('A2-3 arm C: persister given the TREE as claimant', () => {
 
     const p = makePersister(tree, 'theme', store);
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.theme('dark');
     });
     await flush();

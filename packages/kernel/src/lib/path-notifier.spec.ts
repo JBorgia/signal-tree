@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { getPathNotifier, PathNotifier, resetPathNotifier } from './path-notifier';
+import {
+  getPathNotifier,
+  PathNotifier,
+  resetPathNotifier,
+} from './path-notifier';
 import type { WriteMetadata } from './types';
 
 describe('PathNotifier (batching)', () => {
@@ -20,7 +24,16 @@ describe('PathNotifier (batching)', () => {
 
     notifier.subscribe(
       '**',
-      (_value, _prev, path, ownerPath, _origin, subjectIds, positionIds, meta) => {
+      (
+        _value,
+        _prev,
+        path,
+        ownerPath,
+        _origin,
+        subjectIds,
+        positionIds,
+        meta
+      ) => {
         seen.push({
           path,
           ownerPath,
@@ -62,9 +75,12 @@ describe('PathNotifier (batching)', () => {
     const notifier = new PathNotifier();
     const spy = vi.fn();
 
-    notifier.subscribe('rows.*', (_v, _p, path, ownerPath, _origin, subjectIds, positionIds) => {
-      spy(path, ownerPath, subjectIds, positionIds);
-    });
+    notifier.subscribe(
+      'rows.*',
+      (_v, _p, path, ownerPath, _origin, subjectIds, positionIds) => {
+        spy(path, ownerPath, subjectIds, positionIds);
+      }
+    );
 
     notifier.notify('rows.1', { id: 1 }, undefined, 'rows', [17], [3]);
     await Promise.resolve();
@@ -90,8 +106,12 @@ describe('PathNotifier (batching)', () => {
     await Promise.resolve();
 
     expect(spy).toHaveBeenCalledTimes(2);
-    expect(spy).toHaveBeenNthCalledWith(1, 'A', 'before-P17', 'foo.x', 'foo', [17]);
-    expect(spy).toHaveBeenNthCalledWith(2, 'B', 'before-P18', 'foo.x', 'foo', [18]);
+    expect(spy).toHaveBeenNthCalledWith(1, 'A', 'before-P17', 'foo.x', 'foo', [
+      17,
+    ]);
+    expect(spy).toHaveBeenNthCalledWith(2, 'B', 'before-P18', 'foo.x', 'foo', [
+      18,
+    ]);
   });
 
   it('treats subject changes as batching boundaries on the same path under one owner', async () => {
@@ -158,10 +178,24 @@ describe('PathNotifier (batching)', () => {
     );
 
     withWriteContext({ intent: 'system', origin: 'restoration' }, () => {
-      notifier.notify('rows.7', { id: 7, name: 'after-replay' }, undefined, 'rows', [17], [3]);
+      notifier.notify(
+        'rows.7',
+        { id: 7, name: 'after-replay' },
+        undefined,
+        'rows',
+        [17],
+        [3]
+      );
     });
     withWriteContext({ intent: 'user', origin: 'devtools' }, () => {
-      notifier.notify('rows.7', { id: 7, name: 'after-devtools' }, { id: 7, name: 'after-replay' }, 'rows', [17], [3]);
+      notifier.notify(
+        'rows.7',
+        { id: 7, name: 'after-devtools' },
+        { id: 7, name: 'after-replay' },
+        'rows',
+        [17],
+        [3]
+      );
     });
 
     await Promise.resolve();
@@ -176,8 +210,25 @@ describe('PathNotifier (batching)', () => {
 
     notifier.subscribe(
       'rows.7.name',
-      (value, prev, path, ownerPath, _origin, subjectIds, positionIds, meta) => {
-        seen(value, prev, path, ownerPath, subjectIds, positionIds, meta?.participation);
+      (
+        value,
+        prev,
+        path,
+        ownerPath,
+        _origin,
+        subjectIds,
+        positionIds,
+        meta
+      ) => {
+        seen(
+          value,
+          prev,
+          path,
+          ownerPath,
+          subjectIds,
+          positionIds,
+          meta?.participation
+        );
       }
     );
 
@@ -235,8 +286,25 @@ describe('PathNotifier (batching)', () => {
 
     notifier.subscribe(
       'rows.7.name',
-      (value, prev, path, ownerPath, _origin, subjectIds, positionIds, meta) => {
-        seen(value, prev, path, ownerPath, subjectIds, positionIds, meta?.participation);
+      (
+        value,
+        prev,
+        path,
+        ownerPath,
+        _origin,
+        subjectIds,
+        positionIds,
+        meta
+      ) => {
+        seen(
+          value,
+          prev,
+          path,
+          ownerPath,
+          subjectIds,
+          positionIds,
+          meta?.participation
+        );
       }
     );
 
@@ -251,7 +319,15 @@ describe('PathNotifier (batching)', () => {
     await Promise.resolve();
 
     expect(seen).toHaveBeenCalledTimes(1);
-    expect(seen).toHaveBeenCalledWith('C', 'A', 'rows.7.name', 'rows', [17], [3], 'authored');
+    expect(seen).toHaveBeenCalledWith(
+      'C',
+      'A',
+      'rows.7.name',
+      'rows',
+      [17],
+      [3],
+      'authored'
+    );
   });
 
   it('still coalesces ordinary authoring writes across unrelated interleaving paths', async () => {
@@ -260,8 +336,25 @@ describe('PathNotifier (batching)', () => {
 
     notifier.subscribe(
       '**',
-      (value, prev, path, ownerPath, _origin, subjectIds, positionIds, meta) => {
-        seen(value, prev, path, ownerPath, subjectIds, positionIds, meta?.participation);
+      (
+        value,
+        prev,
+        path,
+        ownerPath,
+        _origin,
+        subjectIds,
+        positionIds,
+        meta
+      ) => {
+        seen(
+          value,
+          prev,
+          path,
+          ownerPath,
+          subjectIds,
+          positionIds,
+          meta?.participation
+        );
       }
     );
 
@@ -319,17 +412,9 @@ describe('PathNotifier (batching)', () => {
           },
         }
       );
-      notifier.notify(
-        'rows.42.name',
-        'later',
-        'pending',
-        'rows',
-        [17],
-        [3],
-        {
-          mutationIntent: 'replace',
-        }
-      );
+      notifier.notify('rows.42.name', 'later', 'pending', 'rows', [17], [3], {
+        mutationIntent: 'replace',
+      });
     });
 
     expect(seen).toHaveLength(2);
@@ -378,17 +463,9 @@ describe('PathNotifier (batching)', () => {
           },
         }
       );
-      notifier.notify(
-        'rows.42.name',
-        'later',
-        'pending',
-        'rows',
-        [17],
-        [3],
-        {
-          mutationIntent: 'derive',
-        }
-      );
+      notifier.notify('rows.42.name', 'later', 'pending', 'rows', [17], [3], {
+        mutationIntent: 'derive',
+      });
     });
 
     expect(seen).toHaveLength(2);
@@ -580,17 +657,9 @@ describe('PathNotifier (batching)', () => {
           },
         }
       );
-      notifier.notify(
-        'rows.17.name',
-        'later',
-        'pending',
-        'rows',
-        [17],
-        [3],
-        {
-          mutationIntent: 'replace',
-        }
-      );
+      notifier.notify('rows.17.name', 'later', 'pending', 'rows', [17], [3], {
+        mutationIntent: 'replace',
+      });
     });
 
     expect(seen).toHaveLength(2);
@@ -637,17 +706,9 @@ describe('PathNotifier (batching)', () => {
           },
         }
       );
-      notifier.notify(
-        'rows.17.name',
-        'later',
-        'pending',
-        'rows',
-        [17],
-        [3],
-        {
-          mutationIntent: 'derive',
-        }
-      );
+      notifier.notify('rows.17.name', 'later', 'pending', 'rows', [17], [3], {
+        mutationIntent: 'derive',
+      });
     });
 
     expect(seen).toHaveLength(2);

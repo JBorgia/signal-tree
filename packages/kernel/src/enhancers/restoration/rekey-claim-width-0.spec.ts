@@ -45,7 +45,9 @@ const makeTree = (maxHistorySize = 1) =>
 
 // The producer's last-write participation latch, read exactly where the
 // leaf-signal interceptor reads it.
-const participation = (tree: ReturnType<typeof makeTree>): number[] | undefined =>
+const participation = (
+  tree: ReturnType<typeof makeTree>
+): number[] | undefined =>
   (tree.$.rows as unknown as { __subjectIds?: number[] }).__subjectIds;
 
 const claimedCount = (tree: ReturnType<typeof makeTree>): number =>
@@ -67,9 +69,11 @@ describe('RESTORATION-REKEY-CLAIM-WIDTH-0 — producer participation', () => {
     await settle();
     expect(participation(tree)?.length).toBe(200);
 
-    const rekeyed = (tree.$.rows.byIdOrFail(100).name as unknown as {
-      __subjectIds?: number[];
-    }).__subjectIds?.[0];
+    const rekeyed = (
+      tree.$.rows.byIdOrFail(100).name as unknown as {
+        __subjectIds?: number[];
+      }
+    ).__subjectIds?.[0];
     undoable(() => tree.$.rows.changeId(100, 10_000));
     await settle();
 
@@ -87,9 +91,11 @@ describe('RESTORATION-REKEY-CLAIM-WIDTH-0 — producer participation', () => {
       if (prior === 'removeOne') tree.$.rows.removeOne(7);
       await settle();
 
-      const rekeyed = (tree.$.rows.byIdOrFail(20).name as unknown as {
-        __subjectIds?: number[];
-      }).__subjectIds?.[0];
+      const rekeyed = (
+        tree.$.rows.byIdOrFail(20).name as unknown as {
+          __subjectIds?: number[];
+        }
+      ).__subjectIds?.[0];
       undoable(() => tree.$.rows.changeId(20, 20_000));
       await settle();
 
@@ -108,11 +114,13 @@ describe('RESTORATION-REKEY-CLAIM-WIDTH-0 — producer participation', () => {
     tree.$.rows.setAll(seed(80));
     await settle();
 
-    const rekeyed = (tree.$.rows.byIdOrFail(40).name as unknown as {
-      __subjectIds?: number[];
-    }).__subjectIds?.[0];
+    const rekeyed = (
+      tree.$.rows.byIdOrFail(40).name as unknown as {
+        __subjectIds?: number[];
+      }
+    ).__subjectIds?.[0];
 
-    const pending = tree.transaction(() => tree.$.rows.changeId(40, 40_000));
+    const pending = tree.transact(() => tree.$.rows.changeId(40, 40_000));
     pending.confirm();
     await settle();
 
@@ -133,12 +141,16 @@ describe('RESTORATION-REKEY-CLAIM-WIDTH-0 — producer participation', () => {
     await settle();
     expect(participation(tree)?.length).toBe(50);
 
-    const noOpSubject = (tree.$.rows.byIdOrFail(10).name as unknown as {
-      __subjectIds?: number[];
-    }).__subjectIds?.[0];
-    const realSubject = (tree.$.rows.byIdOrFail(20).name as unknown as {
-      __subjectIds?: number[];
-    }).__subjectIds?.[0];
+    const noOpSubject = (
+      tree.$.rows.byIdOrFail(10).name as unknown as {
+        __subjectIds?: number[];
+      }
+    ).__subjectIds?.[0];
+    const realSubject = (
+      tree.$.rows.byIdOrFail(20).name as unknown as {
+        __subjectIds?: number[];
+      }
+    ).__subjectIds?.[0];
 
     undoable(() => {
       tree.$.rows.changeId(10, 10); // no-op: same key, fires the interceptor
@@ -186,9 +198,11 @@ describe('RESTORATION-REKEY-CLAIM-WIDTH-0 — producer participation', () => {
       tree.$.rows.setAll(seed(width));
       await settle();
       const from = Math.floor(width / 2);
-      const rekeyed = (tree.$.rows.byIdOrFail(from).name as unknown as {
-        __subjectIds?: number[];
-      }).__subjectIds?.[0];
+      const rekeyed = (
+        tree.$.rows.byIdOrFail(from).name as unknown as {
+          __subjectIds?: number[];
+        }
+      ).__subjectIds?.[0];
 
       undoable(() => tree.$.rows.changeId(from, width * 100));
       await settle();
@@ -236,8 +250,11 @@ describe('RESTORATION-REKEY-CLAIM-WIDTH-0 — restoration claim width', () => {
     expect(tree.$.rows.byId(5)?.()).toBeUndefined();
     expect(tree.$.rows.ids()).toContain(500);
     expect(
-      (tree.$.rows.byIdOrFail(500).name as unknown as { __subjectIds?: number[] })
-        .__subjectIds?.[0]
+      (
+        tree.$.rows.byIdOrFail(500).name as unknown as {
+          __subjectIds?: number[];
+        }
+      ).__subjectIds?.[0]
     ).toBe(subjectId);
     expect(heldName()).toBe('n4');
   });
@@ -250,7 +267,9 @@ describe('RESTORATION-REKEY-CLAIM-WIDTH-0 — restoration claim width', () => {
 
     undoable(() => tree.$.rows.changeId(3, 300));
     await settle();
-    expect(tree.$.rows.ids()).toEqual(before.map((id) => (id === 3 ? 300 : id)));
+    expect(tree.$.rows.ids()).toEqual(
+      before.map((id) => (id === 3 ? 300 : id))
+    );
 
     tree.undo();
     await settle();
@@ -258,7 +277,9 @@ describe('RESTORATION-REKEY-CLAIM-WIDTH-0 — restoration claim width', () => {
 
     tree.redo();
     await settle();
-    expect(tree.$.rows.ids()).toEqual(before.map((id) => (id === 3 ? 300 : id)));
+    expect(tree.$.rows.ids()).toEqual(
+      before.map((id) => (id === 3 ? 300 : id))
+    );
     expect(claimedCount(tree)).toBe(1);
   });
 
@@ -274,7 +295,7 @@ describe('RESTORATION-REKEY-CLAIM-WIDTH-0 — restoration claim width', () => {
     await settle();
     const before = tree.$.rows.ids();
 
-    const pending = tree.transaction(() => tree.$.rows.changeId(15, 1500));
+    const pending = tree.transact(() => tree.$.rows.changeId(15, 1500));
     pending.rollback();
     await settle();
 
@@ -287,9 +308,11 @@ describe('RESTORATION-REKEY-CLAIM-WIDTH-0 — restoration claim width', () => {
     undoable(() => tree.$.rows.setAll(seed(40)));
     await settle();
 
-    const rekeyedSubject = (tree.$.rows.byIdOrFail(20).name as unknown as {
-      __subjectIds?: number[];
-    }).__subjectIds?.[0] as number;
+    const rekeyedSubject = (
+      tree.$.rows.byIdOrFail(20).name as unknown as {
+        __subjectIds?: number[];
+      }
+    ).__subjectIds?.[0] as number;
     undoable(() => tree.$.rows.changeId(20, 2000));
     await settle();
     expect(retainedSubjectIds(tree)).toEqual([rekeyedSubject]);
@@ -308,23 +331,30 @@ describe('RESTORATION-REKEY-CLAIM-WIDTH-0 — restoration claim width', () => {
     undoable(() => tree.$.rows.setAll(seed(10)));
     await settle();
 
-    const originalSubject = (tree.$.rows.byIdOrFail(4).name as unknown as {
-      __subjectIds?: number[];
-    }).__subjectIds?.[0];
+    const originalSubject = (
+      tree.$.rows.byIdOrFail(4).name as unknown as {
+        __subjectIds?: number[];
+      }
+    ).__subjectIds?.[0];
 
     undoable(() => tree.$.rows.changeId(4, 400));
     await settle();
     tree.$.rows.addOne({ id: 4, name: 'fresh', v: -1 });
     await settle();
 
-    const freshSubject = (tree.$.rows.byIdOrFail(4).name as unknown as {
-      __subjectIds?: number[];
-    }).__subjectIds?.[0];
+    const freshSubject = (
+      tree.$.rows.byIdOrFail(4).name as unknown as {
+        __subjectIds?: number[];
+      }
+    ).__subjectIds?.[0];
 
     expect(freshSubject).not.toBe(originalSubject);
     expect(
-      (tree.$.rows.byIdOrFail(400).name as unknown as { __subjectIds?: number[] })
-        .__subjectIds?.[0]
+      (
+        tree.$.rows.byIdOrFail(400).name as unknown as {
+          __subjectIds?: number[];
+        }
+      ).__subjectIds?.[0]
     ).toBe(originalSubject);
   });
 });

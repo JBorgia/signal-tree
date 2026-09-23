@@ -12,13 +12,19 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface TransactionMethods {
-  transaction(fn: () => void): PendingTransaction;
   /**
-   * A reviewable proposal: the same turn `transaction()` opens, named for the
-   * multi-writer workflow and given a review projection. See the PROPOSAL-0
-   * block at the foot of this file.
+   * Open an optimistic turn. Returns a handle that confirms or rolls back.
+   *
+   * A verb, matching `propose()` and the handle's own `confirm()`/`rollback()`.
    */
-  proposal(fn: () => void): Proposal;
+  transact(fn: () => void): PendingTransaction;
+  /**
+   * Open a reviewable proposal: the same turn `transact()` opens, named for the
+   * multi-writer workflow and given a review projection.
+   *
+   * Never shipped under another name, so there is no bridge to keep.
+   */
+  propose(fn: () => void): Proposal;
 }
 
 export interface PendingTransaction {

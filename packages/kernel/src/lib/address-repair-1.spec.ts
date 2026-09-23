@@ -76,8 +76,16 @@ type Rows = {
   removeOne(id: string): void;
   changeId(from: string, to: string): void;
   byIdOrFail(id: string): {
-    name: { (value: string): void; (update: (current: string) => string): void; (): string };
-    n: { (value: number): void; (update: (current: number) => number): void; (): number };
+    name: {
+      (value: string): void;
+      (update: (current: string) => string): void;
+      (): string;
+    };
+    n: {
+      (value: number): void;
+      (update: (current: number) => number): void;
+      (): number;
+    };
   };
   ids(): string[];
   all(): Row[];
@@ -95,7 +103,11 @@ const nestedTree = () =>
   ) as unknown as {
     $: {
       data: { rows: Rows };
-      other: { (value: number): void; (update: (current: number) => number): void; (): number };
+      other: {
+        (value: number): void;
+        (update: (current: number) => number): void;
+        (): number;
+      };
     };
     transaction: (fn: () => void) => { rollback(): void; confirm(): void };
     undo?: () => void;
@@ -159,7 +171,7 @@ describe('ADDRESS-REPAIR-1: nested rollback batteries', () => {
   it('two fields on one nested subject both roll back', async () => {
     const tree = await seededNested();
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.data.rows.byIdOrFail('r1').name('changed');
       tree.$.data.rows.byIdOrFail('r1').n(99);
     });
@@ -176,7 +188,7 @@ describe('ADDRESS-REPAIR-1: nested rollback batteries', () => {
   it('field -> rekey -> field rolls back as one nested frame', async () => {
     const tree = await seededNested();
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.data.rows.byIdOrFail('r1').name('changed');
       tree.$.data.rows.changeId('r1', 'r9');
       tree.$.data.rows.byIdOrFail('r9').n(99);
@@ -197,7 +209,7 @@ describe('ADDRESS-REPAIR-1: nested rollback batteries', () => {
   it('mixed scalar + structural rolls back atomically', async () => {
     const tree = await seededNested();
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.other(42);
       tree.$.data.rows.byIdOrFail('r1').n(99);
       tree.$.data.rows.addOne({ id: 'r2', name: 'added', n: 2 });
@@ -219,7 +231,7 @@ describe('ADDRESS-REPAIR-1: nested rollback batteries', () => {
     tree.$.a.b.c.rows.addOne({ id: 'r1', name: 'orig', n: 1 });
     await flush();
 
-    const p = tree.transaction(() => tree.$.a.b.c.rows.updateOne('r1', { n: 99 }));
+    const p = tree.transact(() => tree.$.a.b.c.rows.updateOne('r1', { n: 99 }));
     await flush();
     p.rollback();
     await flush();
@@ -251,7 +263,7 @@ describe('ADDRESS-REPAIR-1: the owner ping establishes NO subject address', () =
     const tree = await seededNested();
     const rows = tree.$.data.rows;
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       if (pingFirst) {
         rows.addOne({ id: 'r2', name: 'ping', n: 2 });
         rows.byIdOrFail('r1').n(99);
@@ -284,7 +296,7 @@ describe('ADDRESS-REPAIR-1: the owner ping establishes NO subject address', () =
   it('a structural-only frame rolls back with no scalar address involved', async () => {
     const tree = await seededNested();
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.data.rows.addOne({ id: 'r2', name: 'x', n: 2 });
       tree.$.data.rows.removeOne('r1');
     });
@@ -313,7 +325,7 @@ describe('ADDRESS-REPAIR-1: two same-shaped trees stay isolated', () => {
       getOwnedPositionIds(b.$.data.rows)
     );
 
-    const p = a.transaction(() => a.$.data.rows.updateOne('r1', { n: 99 }));
+    const p = a.transact(() => a.$.data.rows.updateOne('r1', { n: 99 }));
     await flush();
     p.rollback();
     await flush();
@@ -374,18 +386,20 @@ describe('ADDRESS-REPAIR-1: the ping contract, pinned directly', () => {
 
     // No coordinate, at either level. The old code returned `''` here — and
     // returned it BEFORE examining subjectId at all.
-    expect(descriptors.get(owner as PositionId)?.fieldPathFromRow).toBeUndefined();
     expect(
-      descriptors
-        .get(owner as PositionId)
-        ?.subjectDescriptors?.get('1')?.fieldPathFromRow
+      descriptors.get(owner as PositionId)?.fieldPathFromRow
+    ).toBeUndefined();
+    expect(
+      descriptors.get(owner as PositionId)?.subjectDescriptors?.get('1')
+        ?.fieldPathFromRow
     ).toBeUndefined();
   });
 
   it('a row-level notification IS whole; a field notification is the field', async () => {
     const { registry, owner } = await collectionPositionOf();
     const sub = (d: Map<PositionId, TreeRealizationDescriptor>) =>
-      d.get(owner as PositionId)?.subjectDescriptors?.get('1')?.fieldPathFromRow;
+      d.get(owner as PositionId)?.subjectDescriptors?.get('1')
+        ?.fieldPathFromRow;
 
     const whole = new Map<PositionId, TreeRealizationDescriptor>();
     rememberTreeRealizationDescriptor({

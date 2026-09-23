@@ -33,11 +33,7 @@
 import { signalTree } from '../../lib/signal-tree';
 import { transactions } from './transactions';
 
-import type {
-  WritableLeaf,
-  Enhancer,
-  PendingTransaction,
-} from '../../index';
+import type { WritableLeaf, Enhancer, PendingTransaction } from '../../index';
 
 // --- compile-time assertion helpers -----------------------------------------
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
@@ -61,9 +57,9 @@ const txn = signalTree(initial, { enhancers: [transactions()] });
 // 1 — the method is inferred, with its exact signature
 // ============================================================================
 export type _MethodType = Expect<
-  Equal<(typeof txn)['transaction'], (fn: () => void) => PendingTransaction>
+  Equal<(typeof txn)['transact'], (fn: () => void) => PendingTransaction>
 >;
-export const _pending: PendingTransaction = txn.transaction(() => undefined);
+export const _pending: PendingTransaction = txn.transact(() => undefined);
 
 // ============================================================================
 // 2 — the state surface is untouched by enhancement
@@ -83,13 +79,21 @@ txn.$({ count: 1, user: { name: 'Ada', age: 37 } });
 // ============================================================================
 declare const labeller: Enhancer<{ label(): string }>;
 
-const txnThenLabelled = signalTree(initial, { enhancers: [transactions(), labeller] });
-const labelledThenTxn = signalTree(initial, { enhancers: [labeller, transactions()] });
+const txnThenLabelled = signalTree(initial, {
+  enhancers: [transactions(), labeller],
+});
+const labelledThenTxn = signalTree(initial, {
+  enhancers: [labeller, transactions()],
+});
 
 export const _f1: string = txnThenLabelled.label();
-export const _f2: PendingTransaction = txnThenLabelled.transaction(() => undefined);
+export const _f2: PendingTransaction = txnThenLabelled.transact(
+  () => undefined
+);
 export const _f3: string = labelledThenTxn.label();
-export const _f4: PendingTransaction = labelledThenTxn.transaction(() => undefined);
+export const _f4: PendingTransaction = labelledThenTxn.transact(
+  () => undefined
+);
 export const _f5: number = txnThenLabelled.$.count();
 
 // ============================================================================
@@ -102,5 +106,5 @@ signalTree(initial, { enhancers: [transactions({ nope: true })] });
 // 5 — negative controls
 // ============================================================================
 // @ts-expect-error `transaction` requires transactions()
-export type _NoTransactionBefore = (typeof tree)['transaction'];
+export type _NoTransactionBefore = (typeof tree)['transact'];
 export type _EnhancedDiffers = ExpectFalse<Equal<typeof txn, typeof tree>>;

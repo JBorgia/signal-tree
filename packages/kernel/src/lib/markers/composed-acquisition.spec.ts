@@ -62,7 +62,9 @@ const usersState = () => ({
 // that hides the very API under test makes the assertions vacuous.
 const makePlainTree = () => signalTree(usersState());
 const makeRestorationTree = () =>
-  signalTree(usersState(), { enhancers: [restoration({ maxHistorySize: 20 })] });
+  signalTree(usersState(), {
+    enhancers: [restoration({ maxHistorySize: 20 })],
+  });
 const makeTransactionTree = () =>
   signalTree(usersState(), { enhancers: [transactions()] });
 
@@ -142,12 +144,16 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
     await flush();
     const before = [subjectOf(tree.$.users, 'a'), subjectOf(tree.$.users, 'b')];
 
-    applyServerTruth(tree.$.users, rows.map((r) => ({ ...r })));
+    applyServerTruth(
+      tree.$.users,
+      rows.map((r) => ({ ...r }))
+    );
     await flush();
 
-    expect([subjectOf(tree.$.users, 'a'), subjectOf(tree.$.users, 'b')]).toEqual(
-      before
-    );
+    expect([
+      subjectOf(tree.$.users, 'a'),
+      subjectOf(tree.$.users, 'b'),
+    ]).toEqual(before);
   });
 
   it('CASE 8 — REPAIRED: an untagged refresh does NOT become an undoable turn', async () => {
@@ -157,7 +163,9 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
     const before = tree.getRestorationHistory().length;
 
     // A background poll. The user did nothing.
-    applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada-from-server', v: 2 }]);
+    applyServerTruth(tree.$.users, [
+      { id: 'a', name: 'Ada-from-server', v: 2 },
+    ]);
     await flush();
 
     // ✅ REPAIRED by opt-in eligibility. A1-0's finding was that acquisition is
@@ -201,7 +209,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada', v: 1 }]);
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.users.updateOne('a', { name: 'Optimistic' });
     });
     expect(tree.$.users.byId('a')?.()?.name).toBe('Optimistic');
@@ -221,7 +229,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada', v: 1 }]);
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.users.updateOne('a', { name: 'Optimistic' });
     });
 

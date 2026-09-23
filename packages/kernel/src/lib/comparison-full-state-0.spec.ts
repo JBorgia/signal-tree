@@ -184,12 +184,15 @@ describe('COMPARISON-FULL-STATE-0: collection boundary is full-value', () => {
     let emit!: (v: Row[]) => void;
     // ⚠️ THE SOURCE CAST ERASES THE ENDPOINT'S VALUE TYPE TOO, so the endpoint
     // is typed at the same subject rather than left to infer from `never`.
-    const l = link(tree.$.rows as never, {
-      subscribe: (next: (v: Row[]) => void) => {
-        emit = next;
-        return (): void => void 0;
-      },
-    } as never);
+    const l = link(
+      tree.$.rows as never,
+      {
+        subscribe: (next: (v: Row[]) => void) => {
+          emit = next;
+          return (): void => void 0;
+        },
+      } as never
+    );
 
     emit([
       { id: 'B', n: 2 },
@@ -366,7 +369,12 @@ describe('COMPARISON-FULL-STATE-0: what deepEqual actually promises', () => {
     expect(deepEqual(f, f)).toBe(true);
     // Two identical closures are NOT equal. Link is not extended to handle
     // this; the inventory exists so the promise is not overstated.
-    expect(deepEqual(() => 1, () => 1)).toBe(false);
+    expect(
+      deepEqual(
+        () => 1,
+        () => 1
+      )
+    ).toBe(false);
   });
 
   it('and distinguishes structurally different values', () => {
@@ -381,7 +389,10 @@ describe('COMPARISON-FULL-STATE-0: what deepEqual actually promises', () => {
 // ───────────────────────────────────────────────────────────────────────────
 
 const SRC = (() => {
-  for (const c of [join(process.cwd(), 'packages/kernel/src'), join(process.cwd(), 'src')]) {
+  for (const c of [
+    join(process.cwd(), 'packages/kernel/src'),
+    join(process.cwd(), 'src'),
+  ]) {
     try {
       readFileSync(join(c, 'lib/signal-tree.ts'), 'utf8');
       return c;
@@ -389,7 +400,9 @@ const SRC = (() => {
       /* next */
     }
   }
-  throw new Error('COMPARISON-FULL-STATE-0: could not locate packages/kernel/src');
+  throw new Error(
+    'COMPARISON-FULL-STATE-0: could not locate packages/kernel/src'
+  );
 })();
 
 describe('COMPARISON-FULL-STATE-0: the experiment chose the architecture', () => {
@@ -404,7 +417,7 @@ describe('COMPARISON-FULL-STATE-0: the experiment chose the architecture', () =>
     //   LINK-ECHO-1      'correlation' | 'equality-said' | 'equality-held'
     //
     // Users do not choose the experiment.
-    expect(src).not.toContain("mode:");
+    expect(src).not.toContain('mode:');
     expect(src).not.toContain('Suppression');
     expect(src).not.toMatch(/'weak'|'strong'|'included'|'excluded'/);
   });

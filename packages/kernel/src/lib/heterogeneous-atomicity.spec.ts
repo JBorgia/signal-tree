@@ -51,8 +51,16 @@ interface Harness {
   readonly tree: {
     (): { count: number; theme: string; rows: { all: Row[] } };
     $: {
-      count: { (value: number): void; (update: (current: number) => number): void; (): number };
-      theme: { (value: string): void; (update: (current: string) => string): void; (): string };
+      count: {
+        (value: number): void;
+        (update: (current: number) => number): void;
+        (): number;
+      };
+      theme: {
+        (value: string): void;
+        (update: (current: string) => string): void;
+        (): string;
+      };
       rows: {
         addOne(row: Row): void;
         removeOne(id: string): void;
@@ -117,7 +125,7 @@ describe('heterogeneous atomicity: scalar + structural in one transaction', () =
     const h = harness('het-count');
     const before = h.revision();
 
-    const pending = h.tree.transaction(() => {
+    const pending = h.tree.transact(() => {
       h.tree.$.count(1); // scalar
       h.tree.$.rows.addOne({ id: 'r1', name: 'Ada' }); // structural
     });
@@ -167,7 +175,7 @@ describe('heterogeneous atomicity: scalar + structural in one transaction', () =
       });
     });
 
-    const pending = h.tree.transaction(() => {
+    const pending = h.tree.transact(() => {
       h.tree.$.count(1);
       h.tree.$.rows.addOne({ id: 'r1', name: 'Ada' });
     });
@@ -207,7 +215,7 @@ describe('heterogeneous atomicity: scalar + structural in one transaction', () =
     const before = h.revision();
 
     expect(() =>
-      h.tree.transaction(() => {
+      h.tree.transact(() => {
         h.tree.$.count(99);
         h.tree.$.theme('doomed');
         h.tree.$.rows.addOne({ id: 'ghost', name: 'Nobody' });
@@ -249,7 +257,7 @@ describe('heterogeneous atomicity: scalar + structural in one transaction', () =
     const h = harness('het-rollback');
     const before = h.revision();
 
-    const pending = h.tree.transaction(() => {
+    const pending = h.tree.transact(() => {
       h.tree.$.count(42);
       h.tree.$.theme('doomed');
       h.tree.$.rows.addOne({ id: 'ghost', name: 'Nobody' });

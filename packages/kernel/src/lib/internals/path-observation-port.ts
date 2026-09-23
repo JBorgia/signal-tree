@@ -119,7 +119,16 @@ export function hasPathObservers(): boolean {
  * degraded one: no runtime means no subscribers, so there is nothing to deliver.
  */
 const PORT: PathObservationPort = {
-  notify(path, value, prev, ownerPath, subjectIds, positionIds, metaOverride, ownerId) {
+  notify(
+    path,
+    value,
+    prev,
+    ownerPath,
+    subjectIds,
+    positionIds,
+    metaOverride,
+    ownerId
+  ) {
     runtime?.notify(
       path,
       value,

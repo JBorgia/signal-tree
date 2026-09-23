@@ -30,7 +30,10 @@ describe('activation lifecycle', () => {
   it('dormant -> armed -> dormant -> armed, on ONE retained callable', async () => {
     resetPathNotifier();
     const pubs: string[] = [];
-    const off = getPathNotifier().subscribe('**', (_v, _p, p) => void pubs.push(p));
+    const off = getPathNotifier().subscribe(
+      '**',
+      (_v, _p, p) => void pubs.push(p)
+    );
 
     const tree = signalTree({ x: 0 });
     await flush();
@@ -92,7 +95,10 @@ describe('claims compose by physical leaf', () => {
   it('a parent and a child link share one installation and one publication', async () => {
     resetPathNotifier();
     const pubs: string[] = [];
-    const off = getPathNotifier().subscribe('**', (_v, _p, p) => void pubs.push(p));
+    const off = getPathNotifier().subscribe(
+      '**',
+      (_v, _p, p) => void pubs.push(p)
+    );
 
     const tree = signalTree({ settings: { theme: 'light', units: 'metric' } });
     await flush();
@@ -104,7 +110,9 @@ describe('claims compose by physical leaf', () => {
     const a: unknown[] = [];
     const b: string[] = [];
     const la = link(tree.$.settings, { set: (v: unknown) => void a.push(v) });
-    const lb = link(tree.$.settings.theme, { set: (v: string) => void b.push(v) });
+    const lb = link(tree.$.settings.theme, {
+      set: (v: string) => void b.push(v),
+    });
 
     expect(state(theme).claims).toBe(2);
     expect(state(units).claims).toBe(1);
@@ -152,7 +160,9 @@ describe('claims compose by physical leaf', () => {
     const tree = signalTree({ settings: { theme: 'light', units: 'metric' } });
     await flush();
     const a: unknown[] = [];
-    const la = track(link(tree.$.settings, { set: (v: unknown) => void a.push(v) }));
+    const la = track(
+      link(tree.$.settings, { set: (v: unknown) => void a.push(v) })
+    );
     const lb = link(tree.$.settings.theme, { set: () => undefined });
     expect(state(tree.$.settings.theme).claims).toBe(2);
 
@@ -232,7 +242,11 @@ describe('metadata fidelity', () => {
     origin: 'devtools',
     participation: 'inspection',
   } as const;
-  const REALIZED = { intent: 'system', origin: 'external', participation: 'realized' } as const;
+  const REALIZED = {
+    intent: 'system',
+    origin: 'external',
+    participation: 'realized',
+  } as const;
 
   async function observe(run: (leaf: Location<number>) => void) {
     resetPathNotifier();
@@ -242,7 +256,10 @@ describe('metadata fidelity', () => {
       (v, prev, path, ownerPath, origin, _s, _p, meta) => {
         const m = (meta ?? {}) as Record<string, unknown>;
         rows.push({
-          path, ownerPath, before: prev, after: v,
+          path,
+          ownerPath,
+          before: prev,
+          after: v,
           intent: m['mutationIntent'],
           participation: m['participation'] ?? null,
           origin: origin ?? m['origin'] ?? null,
@@ -267,22 +284,41 @@ describe('metadata fidelity', () => {
     // `mutationIntent`, both declare `causal-runtime`, and that implies
     // `mutation-capture` — whose own interception replaces this substrate
     // entirely. So this asserts carriage, not a live behavioural dependency.
-    expect((await observe((location) => location(1)))['intent']).toBe('replace');
-    expect((await observe((location) => location((value) => value + 1)))['intent']).toBe('derive');
+    expect((await observe((location) => location(1)))['intent']).toBe(
+      'replace'
+    );
+    expect(
+      (await observe((location) => location((value) => value + 1)))['intent']
+    ).toBe('derive');
   });
 
   it('path, ownerPath and before/after are reported', async () => {
     const row = await observe((location) => location(42));
-    expect(row).toMatchObject({ path: 'x', ownerPath: 'x', before: 0, after: 42 });
+    expect(row).toMatchObject({
+      path: 'x',
+      ownerPath: 'x',
+      before: 0,
+      after: 42,
+    });
   });
 
   it('participation is transported, with authored represented by ABSENCE', async () => {
-    expect((await observe((location) => location(1)))['participation']).toBeNull();
     expect(
-      (await observe((location) => withWriteContext(INSPECTION, () => location(1))))['participation']
+      (await observe((location) => location(1)))['participation']
+    ).toBeNull();
+    expect(
+      (
+        await observe((location) =>
+          withWriteContext(INSPECTION, () => location(1))
+        )
+      )['participation']
     ).toBe('inspection');
     expect(
-      (await observe((location) => withWriteContext(REALIZED, () => location(1))))['participation']
+      (
+        await observe((location) =>
+          withWriteContext(REALIZED, () => location(1))
+        )
+      )['participation']
     ).toBe('realized');
   });
 

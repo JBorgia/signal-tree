@@ -73,7 +73,11 @@ const flush = async () => {
  * authored event. See the duplicate-registration case.
  */
 function afterCommit(anchor: unknown, effect: () => void): void {
-  scheduleDurableConsequence({ claimant: anchor as object, key: {}, run: effect });
+  scheduleDurableConsequence({
+    claimant: anchor as object,
+    key: {},
+    run: effect,
+  });
 }
 
 /** The falsified candidate, kept so its failure stays measurable. */
@@ -125,7 +129,7 @@ describe('AFTER-COMMIT-0 cases 2 & 3: transaction outcome', () => {
     await flush();
     const ran: number[] = [];
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.n(2);
       afterCommit(tree, () => ran.push(tree.$.n()));
     });
@@ -142,7 +146,7 @@ describe('AFTER-COMMIT-0 cases 2 & 3: transaction outcome', () => {
     await flush();
     const ran: number[] = [];
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.n(9);
       afterCommit(tree, () => ran.push(tree.$.n()));
     });
@@ -162,7 +166,7 @@ describe('AFTER-COMMIT-0 case 4: per-registration identity', () => {
     let charges = 0;
     const charge = () => void charges++;
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.n(1);
       afterCommit(tree, charge);
       afterCommit(tree, charge);
@@ -200,7 +204,7 @@ describe('AFTER-COMMIT-0 case 5: registration order', () => {
     await flush();
     const order: string[] = [];
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.n(1);
       afterCommit(tree, () => order.push('A'));
       afterCommit(tree, () => order.push('B'));
@@ -225,8 +229,8 @@ describe('AFTER-COMMIT-0 case 6: nesting', () => {
     // answer it, and if nesting is ever added this test is where the question
     // returns.
     expect(() =>
-      tree.transaction(() => {
-        tree.transaction(() => {
+      tree.transact(() => {
+        tree.transact(() => {
           tree.$.n(1);
         });
       })
@@ -241,11 +245,11 @@ describe('AFTER-COMMIT-0 case 7: two trees, interleaved operations', () => {
     await flush();
     const ran: string[] = [];
 
-    const pb = b.transaction(() => {
+    const pb = b.transact(() => {
       b.$.n(5);
       afterCommit(b, () => ran.push('B'));
     });
-    const pa = a.transaction(() => {
+    const pa = a.transact(() => {
       a.$.n(7);
       afterCommit(a, () => ran.push('A'));
     });
@@ -265,13 +269,13 @@ describe('AFTER-COMMIT-0 case 7: two trees, interleaved operations', () => {
   });
 });
 
-describe('AFTER-COMMIT-0 case 8: async completion is the caller\'s', () => {
+describe("AFTER-COMMIT-0 case 8: async completion is the caller's", () => {
   it('a never-resolving effect does not block the next one', async () => {
     const tree = makeTree();
     await flush();
     const started: string[] = [];
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.n(1);
       afterCommit(tree, () => {
         started.push('first');
@@ -297,7 +301,7 @@ describe('AFTER-COMMIT-0 case 8: async completion is the caller\'s', () => {
     await flush();
     const started: string[] = [];
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.n(1);
       afterCommit(tree, () => {
         started.push('first');

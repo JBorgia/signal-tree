@@ -157,7 +157,11 @@ describe('REALIZATION-ADDRESS-0: the position-role discriminator', () => {
     const shapes: Array<[string, () => unknown, (t: unknown) => unknown]> = [
       [
         'top',
-        () => signalTree({ rows: em() }, { enhancers: [restoration(), transactions()] }),
+        () =>
+          signalTree(
+            { rows: em() },
+            { enhancers: [restoration(), transactions()] }
+          ),
         (t) => (t as { $: { rows: unknown } }).$.rows,
       ],
       [

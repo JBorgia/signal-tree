@@ -109,7 +109,10 @@ type Rows = {
 const shapes = {
   top: {
     make: () =>
-      signalTree({ rows: em() }, { enhancers: [restoration(), transactions()] }),
+      signalTree(
+        { rows: em() },
+        { enhancers: [restoration(), transactions()] }
+      ),
     rows: (t: unknown) => (t as { $: { rows: Rows } }).$.rows,
   },
   nested: {
@@ -140,7 +143,7 @@ const attempt = async (
     tree as unknown as {
       transaction: (fn: () => void) => { rollback(): void };
     }
-  ).transaction(() => op(rows));
+  ).transact(() => op(rows));
   await flush();
   let threw = false;
   try {
@@ -226,11 +229,14 @@ describe('NESTED-STRUCTURAL-ROLLBACK-1: nested', () => {
     // collection address the authority, so `data.rows` is never read as `data`.
     const stillRed = STILL_RED.includes(name);
     const runner = stillRed ? it.fails : it;
-    runner(`${stillRed ? '⚠️ KNOWN RED — ' : ''}${name} rolls back cleanly`, async () => {
-      const r = await attempt('nested', seed, op);
-      expect(r.threw).toBe(false);
-      expect(r.restored).toBe(true);
-    });
+    runner(
+      `${stillRed ? '⚠️ KNOWN RED — ' : ''}${name} rolls back cleanly`,
+      async () => {
+        const r = await attempt('nested', seed, op);
+        expect(r.threw).toBe(false);
+        expect(r.restored).toBe(true);
+      }
+    );
   }
 });
 
@@ -286,7 +292,7 @@ describe('NESTED-STRUCTURAL-ROLLBACK-1: isolation', () => {
 
     const p = (
       a as unknown as { transaction: (fn: () => void) => { rollback(): void } }
-    ).transaction(() => {
+    ).transact(() => {
       shapes.nested.rows(a).removeOne('a-seed');
     });
     await flush();

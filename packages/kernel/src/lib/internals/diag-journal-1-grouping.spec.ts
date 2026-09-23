@@ -132,7 +132,7 @@ describe('DIAG-JOURNAL-1 F1: does a flush-bounded entry equal one causal turn?',
     await flush();
     const p = probe(tree);
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       tree.$.n(1);
     });
@@ -157,7 +157,7 @@ describe('DIAG-JOURNAL-1 F1: does a flush-bounded entry equal one causal turn?',
     await flush();
     const p = probe(tree);
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();

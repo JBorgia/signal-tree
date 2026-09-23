@@ -311,7 +311,7 @@ describe('SUBJECT-STATE-SEMANTIC-0: transactions across a collection', () => {
     const node = tree.$.rows.byId(1);
     expect(node?.()?.name).toBe('a');
 
-    const tx = tree.transaction(() => {
+    const tx = tree.transact(() => {
       tree.$.rows.updateOne(1, { name: 'speculative' });
     });
 
@@ -332,7 +332,7 @@ describe('SUBJECT-STATE-SEMANTIC-0: transactions across a collection', () => {
     const node = tree.$.rows.byId(1);
     const field = requireNode(node).name;
 
-    const tx = tree.transaction(() => {
+    const tx = tree.transact(() => {
       tree.$.rows.updateOne(1, { name: 'speculative' });
     });
     expect(field()).toBe('speculative');
