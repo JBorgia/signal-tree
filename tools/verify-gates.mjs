@@ -319,6 +319,32 @@ const GATES = [
     },
   },
   {
+    name: 'api-callable-baseline',
+    covers:
+      'the committed CALLABLE baseline matches the built surface — no public ' +
+      'method, callable property or function added, removed or changed KIND',
+    cmd: ['node', 'tools/api-callable-inventory.mjs', '--check'],
+    needsBuild: true,
+    provenBy: 'api-callable-baseline:self',
+    // ⚠️ THE EXPORT BASELINE IS BLIND TO MEMBERS. `proposal()` was added to the
+    // already-exported `TransactionMethods` and `api-baseline` recorded only the
+    // five new TYPES. Checked across the surface the hole was total — settled,
+    // tap, intercept, empty, exportDebugSession and transaction were all absent,
+    // and `transaction()` shipped in 15.2.1 without the API gate knowing it
+    // existed. memberKind is part of the identity, not metadata: `empty` is a
+    // callable PROPERTY and `clear()` is a METHOD, and conflating them is what
+    // produced a wrong rename proposal once already.
+  },
+  {
+    name: 'api-callable-baseline:self',
+    covers:
+      'the callable checker detects an added member, a removed member, a rename ' +
+      'as removal+addition, a method<->callable-property kind flip and a new ' +
+      'exported function, while ignoring a non-exported interface',
+    cmd: ['node', 'tools/api-callable-inventory-selftest.mjs'],
+    needsBuild: true,
+  },
+  {
     name: 'api-baseline',
     covers:
       'the committed public API baseline matches the built surface — no ' +

@@ -1,0 +1,1614 @@
+{
+  "rows": [
+    {
+      "id": "kernel:BatchingMethods.batch",
+      "pkg": "kernel",
+      "owner": "BatchingMethods",
+      "name": "batch",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:BatchingMethods.coalesce",
+      "pkg": "kernel",
+      "owner": "BatchingMethods",
+      "name": "coalesce",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:BatchingMethods.flushNotifications",
+      "pkg": "kernel",
+      "owner": "BatchingMethods",
+      "name": "flushNotifications",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:BatchingMethods.hasPendingNotifications",
+      "pkg": "kernel",
+      "owner": "BatchingMethods",
+      "name": "hasPendingNotifications",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ComputedSliceConfig.compute",
+      "pkg": "kernel",
+      "owner": "ComputedSliceConfig",
+      "name": "compute",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:DefaultKey.toLocaleString",
+      "pkg": "kernel",
+      "owner": "DefaultKey",
+      "name": "toLocaleString",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:DefaultKey.toString",
+      "pkg": "kernel",
+      "owner": "DefaultKey",
+      "name": "toString",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:DefaultKey.valueOf",
+      "pkg": "kernel",
+      "owner": "DefaultKey",
+      "name": "valueOf",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:DevToolsMethods.connectDevTools",
+      "pkg": "kernel",
+      "owner": "DevToolsMethods",
+      "name": "connectDevTools",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:DevToolsMethods.disconnectDevTools",
+      "pkg": "kernel",
+      "owner": "DevToolsMethods",
+      "name": "disconnectDevTools",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:DevToolsMethods.exportDebugSession",
+      "pkg": "kernel",
+      "owner": "DevToolsMethods",
+      "name": "exportDebugSession",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntityMapBuilder.build",
+      "pkg": "kernel",
+      "owner": "EntityMapBuilder",
+      "name": "build",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntityMapBuilder.computed",
+      "pkg": "kernel",
+      "owner": "EntityMapBuilder",
+      "name": "computed",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.activeEntity",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "activeEntity",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:EntitySignal.activeId",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "activeId",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:EntitySignal.addMany",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "addMany",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.addOne",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "addOne",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.all",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "all",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:EntitySignal.asMap",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "asMap",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:EntitySignal.byId",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "byId",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.byIdOrFail",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "byIdOrFail",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.changeId",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "changeId",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.clear",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "clear",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.clearActiveId",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "clearActiveId",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.count",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "count",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:EntitySignal.empty",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "empty",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:EntitySignal.find",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "find",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.has",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "has",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.ids",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "ids",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:EntitySignal.intercept",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "intercept",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.prependMany",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "prependMany",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.prependOne",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "prependOne",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.removeMany",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "removeMany",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.removeOne",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "removeOne",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.removeWhere",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "removeWhere",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.replaceOne",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "replaceOne",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.setActiveId",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "setActiveId",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.setAll",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "setAll",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.tap",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "tap",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.updateMany",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "updateMany",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.updateOne",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "updateOne",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.updateWhere",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "updateWhere",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.upsertMany",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "upsertMany",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.upsertOne",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "upsertOne",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignal.where",
+      "pkg": "kernel",
+      "owner": "EntitySignal",
+      "name": "where",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.activeEntity",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "activeEntity",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.activeId",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "activeId",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.addMany",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "addMany",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.addOne",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "addOne",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.all",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "all",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.asMap",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "asMap",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.byId",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "byId",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.byIdOrFail",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "byIdOrFail",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.changeId",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "changeId",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.clear",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "clear",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.clearActiveId",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "clearActiveId",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.count",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "count",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.empty",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "empty",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.find",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "find",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.has",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "has",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.ids",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "ids",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.intercept",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "intercept",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.prependMany",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "prependMany",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.prependOne",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "prependOne",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.removeMany",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "removeMany",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.removeOne",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "removeOne",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.removeWhere",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "removeWhere",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.replaceOne",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "replaceOne",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.setActiveId",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "setActiveId",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.setAll",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "setAll",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.tap",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "tap",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.updateMany",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "updateMany",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.updateOne",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "updateOne",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.updateWhere",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "updateWhere",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.upsertMany",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "upsertMany",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.upsertOne",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "upsertOne",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:EntitySignalWithSlices.where",
+      "pkg": "kernel",
+      "owner": "EntitySignalWithSlices",
+      "name": "where",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:Link.dispose",
+      "pkg": "kernel",
+      "owner": "Link",
+      "name": "dispose",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:Link.retrieve",
+      "pkg": "kernel",
+      "owner": "Link",
+      "name": "retrieve",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:Link.settled",
+      "pkg": "kernel",
+      "owner": "Link",
+      "name": "settled",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:LinkEndpoint.get",
+      "pkg": "kernel",
+      "owner": "LinkEndpoint",
+      "name": "get",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:LinkEndpoint.set",
+      "pkg": "kernel",
+      "owner": "LinkEndpoint",
+      "name": "set",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:LinkEndpoint.subscribe",
+      "pkg": "kernel",
+      "owner": "LinkEndpoint",
+      "name": "subscribe",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:Location.asReadonly",
+      "pkg": "kernel",
+      "owner": "Location",
+      "name": "asReadonly",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:Location.peek",
+      "pkg": "kernel",
+      "owner": "Location",
+      "name": "peek",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:Location.subscribe",
+      "pkg": "kernel",
+      "owner": "Location",
+      "name": "subscribe",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:PendingTransaction.confirm",
+      "pkg": "kernel",
+      "owner": "PendingTransaction",
+      "name": "confirm",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:PendingTransaction.rollback",
+      "pkg": "kernel",
+      "owner": "PendingTransaction",
+      "name": "rollback",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:Proposal.accept",
+      "pkg": "kernel",
+      "owner": "Proposal",
+      "name": "accept",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:Proposal.inspect",
+      "pkg": "kernel",
+      "owner": "Proposal",
+      "name": "inspect",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:Proposal.reject",
+      "pkg": "kernel",
+      "owner": "Proposal",
+      "name": "reject",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.__@iterator@11",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "__@iterator@11",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.anchor",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "anchor",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.at",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "at",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.big",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "big",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.blink",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "blink",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.bold",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "bold",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.charAt",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "charAt",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.charCodeAt",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "charCodeAt",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.codePointAt",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "codePointAt",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.concat",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "concat",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.endsWith",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "endsWith",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.fixed",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "fixed",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.fontcolor",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "fontcolor",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.fontsize",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "fontsize",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.includes",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "includes",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.indexOf",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "indexOf",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.italics",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "italics",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.lastIndexOf",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "lastIndexOf",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.link",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "link",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.localeCompare",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "localeCompare",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.match",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "match",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.matchAll",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "matchAll",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.normalize",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "normalize",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.padEnd",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "padEnd",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.padStart",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "padStart",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.repeat",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "repeat",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.replace",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "replace",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.replaceAll",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "replaceAll",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.search",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "search",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.slice",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "slice",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.small",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "small",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.split",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "split",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.startsWith",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "startsWith",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.strike",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "strike",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.sub",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "sub",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.substr",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "substr",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.substring",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "substring",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.sup",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "sup",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.toLocaleLowerCase",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "toLocaleLowerCase",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.toLocaleUpperCase",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "toLocaleUpperCase",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.toLowerCase",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "toLowerCase",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.toString",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "toString",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.toUpperCase",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "toUpperCase",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.trim",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "trim",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.trimEnd",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "trimEnd",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.trimLeft",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "trimLeft",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.trimRight",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "trimRight",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.trimStart",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "trimStart",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ProposalStatus.valueOf",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "valueOf",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ReadonlyLocation.peek",
+      "pkg": "kernel",
+      "owner": "ReadonlyLocation",
+      "name": "peek",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ReadonlyLocation.subscribe",
+      "pkg": "kernel",
+      "owner": "ReadonlyLocation",
+      "name": "subscribe",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ReadonlyStore.$",
+      "pkg": "kernel",
+      "owner": "ReadonlyStore",
+      "name": "$",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:ReadonlyStore.destroy",
+      "pkg": "kernel",
+      "owner": "ReadonlyStore",
+      "name": "destroy",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:ReadonlyStore.destroyed",
+      "pkg": "kernel",
+      "owner": "ReadonlyStore",
+      "name": "destroyed",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:RestorationMethods.canRedo",
+      "pkg": "kernel",
+      "owner": "RestorationMethods",
+      "name": "canRedo",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:RestorationMethods.canUndo",
+      "pkg": "kernel",
+      "owner": "RestorationMethods",
+      "name": "canUndo",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:RestorationMethods.getCurrentIndex",
+      "pkg": "kernel",
+      "owner": "RestorationMethods",
+      "name": "getCurrentIndex",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:RestorationMethods.getRestorationHistory",
+      "pkg": "kernel",
+      "owner": "RestorationMethods",
+      "name": "getRestorationHistory",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:RestorationMethods.jumpTo",
+      "pkg": "kernel",
+      "owner": "RestorationMethods",
+      "name": "jumpTo",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:RestorationMethods.redo",
+      "pkg": "kernel",
+      "owner": "RestorationMethods",
+      "name": "redo",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:RestorationMethods.resetRestorationHistory",
+      "pkg": "kernel",
+      "owner": "RestorationMethods",
+      "name": "resetRestorationHistory",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:RestorationMethods.undo",
+      "pkg": "kernel",
+      "owner": "RestorationMethods",
+      "name": "undo",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:SignalTree.$",
+      "pkg": "kernel",
+      "owner": "SignalTree",
+      "name": "$",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:SignalTree.destroy",
+      "pkg": "kernel",
+      "owner": "SignalTree",
+      "name": "destroy",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:SignalTree.destroyed",
+      "pkg": "kernel",
+      "owner": "SignalTree",
+      "name": "destroyed",
+      "memberKind": "callable-property"
+    },
+    {
+      "id": "kernel:SignalTree.registerCleanup",
+      "pkg": "kernel",
+      "owner": "SignalTree",
+      "name": "registerCleanup",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:SignalTree.updateAndReport",
+      "pkg": "kernel",
+      "owner": "SignalTree",
+      "name": "updateAndReport",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TransactionMethods.propose",
+      "pkg": "kernel",
+      "owner": "TransactionMethods",
+      "name": "propose",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TransactionMethods.transact",
+      "pkg": "kernel",
+      "owner": "TransactionMethods",
+      "name": "transact",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.__@iterator@11",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "__@iterator@11",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.anchor",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "anchor",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.at",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "at",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.big",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "big",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.blink",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "blink",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.bold",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "bold",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.charAt",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "charAt",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.charCodeAt",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "charCodeAt",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.codePointAt",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "codePointAt",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.concat",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "concat",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.endsWith",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "endsWith",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.fixed",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "fixed",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.fontcolor",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "fontcolor",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.fontsize",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "fontsize",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.includes",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "includes",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.indexOf",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "indexOf",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.italics",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "italics",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.lastIndexOf",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "lastIndexOf",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.link",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "link",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.localeCompare",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "localeCompare",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.match",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "match",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.matchAll",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "matchAll",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.normalize",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "normalize",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.padEnd",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "padEnd",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.padStart",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "padStart",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.repeat",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "repeat",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.replace",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "replace",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.replaceAll",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "replaceAll",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.search",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "search",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.slice",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "slice",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.small",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "small",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.split",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "split",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.startsWith",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "startsWith",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.strike",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "strike",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.sub",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "sub",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.substr",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "substr",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.substring",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "substring",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.sup",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "sup",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.toLocaleLowerCase",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "toLocaleLowerCase",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.toLocaleUpperCase",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "toLocaleUpperCase",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.toLowerCase",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "toLowerCase",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.toString",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "toString",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.toUpperCase",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "toUpperCase",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.trim",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "trim",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.trimEnd",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "trimEnd",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.trimLeft",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "trimLeft",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.trimRight",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "trimRight",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.trimStart",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "trimStart",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeCapability.valueOf",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "valueOf",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeId.toExponential",
+      "pkg": "kernel",
+      "owner": "TreeId",
+      "name": "toExponential",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeId.toFixed",
+      "pkg": "kernel",
+      "owner": "TreeId",
+      "name": "toFixed",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeId.toLocaleString",
+      "pkg": "kernel",
+      "owner": "TreeId",
+      "name": "toLocaleString",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeId.toPrecision",
+      "pkg": "kernel",
+      "owner": "TreeId",
+      "name": "toPrecision",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeId.toString",
+      "pkg": "kernel",
+      "owner": "TreeId",
+      "name": "toString",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:TreeId.valueOf",
+      "pkg": "kernel",
+      "owner": "TreeId",
+      "name": "valueOf",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:WritableLeaf.asReadonly",
+      "pkg": "kernel",
+      "owner": "WritableLeaf",
+      "name": "asReadonly",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:WritableLeaf.peek",
+      "pkg": "kernel",
+      "owner": "WritableLeaf",
+      "name": "peek",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:WritableLeaf.subscribe",
+      "pkg": "kernel",
+      "owner": "WritableLeaf",
+      "name": "subscribe",
+      "memberKind": "method"
+    },
+    {
+      "id": "kernel:root.asReadonly",
+      "pkg": "kernel",
+      "owner": "root",
+      "name": "asReadonly",
+      "memberKind": "function"
+    },
+    {
+      "id": "kernel:root.batching",
+      "pkg": "kernel",
+      "owner": "root",
+      "name": "batching",
+      "memberKind": "function"
+    },
+    {
+      "id": "kernel:root.devTools",
+      "pkg": "kernel",
+      "owner": "root",
+      "name": "devTools",
+      "memberKind": "function"
+    },
+    {
+      "id": "kernel:root.entityMap",
+      "pkg": "kernel",
+      "owner": "root",
+      "name": "entityMap",
+      "memberKind": "function"
+    },
+    {
+      "id": "kernel:root.external",
+      "pkg": "kernel",
+      "owner": "root",
+      "name": "external",
+      "memberKind": "function"
+    },
+    {
+      "id": "kernel:root.leaf",
+      "pkg": "kernel",
+      "owner": "root",
+      "name": "leaf",
+      "memberKind": "function"
+    },
+    {
+      "id": "kernel:root.link",
+      "pkg": "kernel",
+      "owner": "root",
+      "name": "link",
+      "memberKind": "function"
+    },
+    {
+      "id": "kernel:root.onTreeError",
+      "pkg": "kernel",
+      "owner": "root",
+      "name": "onTreeError",
+      "memberKind": "function"
+    },
+    {
+      "id": "kernel:root.restoration",
+      "pkg": "kernel",
+      "owner": "root",
+      "name": "restoration",
+      "memberKind": "function"
+    },
+    {
+      "id": "kernel:root.signalTree",
+      "pkg": "kernel",
+      "owner": "root",
+      "name": "signalTree",
+      "memberKind": "function"
+    },
+    {
+      "id": "kernel:root.transactions",
+      "pkg": "kernel",
+      "owner": "root",
+      "name": "transactions",
+      "memberKind": "function"
+    },
+    {
+      "id": "kernel:root.undoable",
+      "pkg": "kernel",
+      "owner": "root",
+      "name": "undoable",
+      "memberKind": "function"
+    }
+  ]
+}
