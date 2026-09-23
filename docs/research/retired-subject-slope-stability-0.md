@@ -1,6 +1,7 @@
 # RETIRED-SUBJECT-SLOPE-STABILITY-0
 
-> **Disposition: THE METRIC IS SOUND, THE GATE DESIGN IS NOT. 2026-09-22.**
+> **Disposition: OPEN — amended 2026-09-23. The old gate is falsified and
+> replaced; the NEW gate is not yet cleared for release.**
 > The question was never "how do we get the benchmark under 20 B". It was
 > whether a repeatable measurement can distinguish retained retired subjects
 > from runtime memory modes. It can — but not the way this gate asks.
@@ -11,7 +12,77 @@ Already answered by the existing harness: `check-retired-subject-slope.mjs`
 spawns a fresh process per sample via `execFileSync`, and bimodality was
 measured across 12 such processes. Process history is not the cause.
 
-## Stage 2 — the modes are V8 heap quantization, not retention
+## AMENDMENT 2026-09-23 — three corrections to my own conclusions
+
+### 1. The mechanism was asserted, then actually measured
+
+I wrote that the modes were "V8 heap-page / semi-space granularity". **That was
+an unmeasured mechanism claim.** Measured afterwards with
+`v8.getHeapSpaceStatistics()`, across 6 processes:
+
+```text
+growthMB   old_space   new_space   large_object_space
+    3.23        5.42        0.07                 4.25
+   15.22        5.41        0.07                16.25
+```
+
+`old_space` and `new_space` are FLAT. The entire step is
+**`large_object_space` occupancy**, varying by 12 MB (= 3 x 4 MB). Not heap
+pages, not semi-spaces. The honest statement is: **repeatable ~4 MB-quantized
+modes in large-object space**; whether that is allocation granularity,
+collection timing or backing-store cohorting is still not established, and does
+not need to be to repair the gate.
+
+### 2. "Physically impossible" was too strong
+
+I wrote that a 150-round arm measuring less than a 50-round arm is physically
+impossible for real retention. It is not: these are **net `after - before`
+measurements from different processes**, and GC, compaction and heap-layout
+history differ. A larger workload can legitimately end lower.
+
+The correct, narrower, and still sufficient claim:
+
+> **The cross-process delta is not a reliable monotonic estimator of retained
+> retired-subject memory.**
+
+That kills the slope calculation without needing an impossibility argument.
+
+### 3. The mutation tested the wrong thing
+
+Stage 3 swapped ARM `no-history-reads` -> `time-travel-reads` and reported
+183.82 MB. That proves a subsystem _designed_ to retain does retain. It does
+**not** prove the gate catches an accidental leak in a plain tree, which is the
+regression it exists to detect. Different claim, weaker evidence.
+
+## Stage 3 (real) — same arm, deliberate retention
+
+`--retain N` holds N retired subject nodes strongly reachable. Same arm, same
+churn, same protocol; the only difference is that retired subjects stop being
+forgettable. Five samples per level, 150 rounds:
+
+```text
+retained   observed growthMB          vs 40 MB ceiling
+       0   3.23  15.23  3.23  3.23  3.23      pass
+   1,000   9.86   9.87 21.86  9.86  9.86      pass — INVISIBLE
+   2,500  32.78  23.89 23.89 23.89 23.89      pass — below ceiling
+   5,000  40.56  40.56 40.56 40.56 41.44      fails, but MARGINAL
+  10,000  82.75  82.74 82.75 82.75 98.75      fails reliably
+  25,000 182.34 182.34 182.34 182.34 182.34   fails reliably
+```
+
+**The sensitivity specification the gate can honestly claim:**
+
+> Reliably detects gross retired-subject retention at or above **~10,000
+> accidentally retained subjects** (~6.7% of the 150k churned). 5,000 is
+> MARGINAL — its 40.56 MB floor sits barely above the ceiling, and a 12 MB
+> low-mode draw would put it under. At or below 2,500 it is invisible.
+
+5,000 is deliberately NOT claimed, and the threshold was NOT lowered to claim
+it: a 12 MB quantum is comparable to 5,000 subjects' entire signal above
+control, so no ceiling makes that level reliable. Tuning the number to turn a
+marginal case green is the failure this track exists to end.
+
+## Stage 2 — the modes are ~4 MB-quantized runtime modes
 
 24 independent processes, `no-history-reads`, 150 rounds:
 
@@ -22,16 +93,17 @@ growthMB   heapUsedAfter   heapTotalAfter   rssAfter
   15.22           22.34           ~153        708-721
 ```
 
-The modes are **exact 4 MB quanta**:
+The modes are repeatable **4 MB quanta** (mechanism measured in the amendment
+above — large-object space):
 
 ```text
 10.34  ->  14.35  ->  22.34
         +4.00     +12.00  (= 3 x 4.00)
 ```
 
-That is V8 heap-page / semi-space granularity. `rssAfter` swings 357-721 MB, a
-2x spread, so RSS is useless here; `heapTotal` moves with reservation.
-`heapUsed` is the right metric and is still quantized at 4 MB.
+`rssAfter` swings 357-721 MB, a 2x spread, so RSS is useless here; `heapTotal`
+moves with reservation. `heapUsed` is the right metric and is still quantized
+at 4 MB.
 
 **The signal is the same order as the quantization.** The whole claimed growth
 for 150k retired subjects is ~3-15 MB, and the noise band is 4-12 MB.
@@ -44,9 +116,11 @@ for 150k retired subjects is ~3-15 MB, and the noise band is 4-12 MB.
 ```
 
 **The distributions overlap by 4.00 MB, and the 150-round arm frequently
-measures LESS than the 50-round arm** — 3.23 < 4.10. That is physically
-impossible for real retention: 150 rounds strictly contains more retired
-subjects than 50. The measurement is not reading retention at all in this arm.
+measures LESS than the 50-round arm** — 3.23 < 4.10. See amendment 2: this does
+not prove impossibility, since these are net measurements from different
+processes. What it does establish is that the cross-process delta is **not a
+reliable monotonic estimator** of retained memory, which is all the slope
+calculation needed to be unusable.
 
 The verdict is decided by which quantum each median lands in:
 
@@ -158,3 +232,18 @@ measured noise band would be the old flakiness wearing a new threshold.
 The gate no longer claims to detect a leak that is small but genuinely linear.
 It never could — its noise exceeded that signal — so the claim was the thing
 that was false, not the capability that was lost.
+
+## STILL OPEN — release-environment validation
+
+The 40 MB ceiling was derived entirely on **darwin/arm64, Node v24.15.0, V8
+13.6.233.17**. Release gates run on **ubuntu-latest (linux/x64)**.
+
+An absolute ceiling is environment-dependent in a way the normalized slope was
+not, and large-object-space behaviour is exactly the kind of thing that differs
+across platform and V8 build. **This threshold must be validated on the release
+platform before it blocks a release**: control distribution, and the
+`--retain 10000` mutation, both measured on Linux x64.
+
+Until then the gate is better than what it replaced but not yet cleared. The
+checker now prints Node version, V8 version, platform and arch on failure, so a
+future runtime upgrade turning this red is diagnosable rather than mysterious.

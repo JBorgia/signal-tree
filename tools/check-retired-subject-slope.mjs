@@ -256,6 +256,17 @@ const problems = judge(low, high);
 if (problems.length > 0) {
   console.error(`\n❌ retention is scaling with retired subjects:`);
   for (const problem of problems) console.error(`   - ${problem}`);
+  // An absolute ceiling is environment-dependent in a way a normalized slope
+  // was not, so a red gate must say where it ran. The threshold was derived on
+  // darwin/arm64; a runtime or platform change is a likelier explanation for a
+  // surprising red than a leak.
+  const env = high.diagnostics ?? {};
+  console.error(
+    `\n   environment: ${env.nodeVersion ?? process.version} ` +
+      `v8 ${env.v8Version ?? process.versions.v8} ` +
+      `${env.platform ?? process.platform}/${env.arch ?? process.arch}` +
+      (env.v8LimitMB ? `  heap limit ${env.v8LimitMB} MB` : '')
+  );
   console.error(
     '\n   Read the header before adjusting the tolerance: this regressed once ' +
       '\n   because a later step re-interned a forgotten subject by id.'

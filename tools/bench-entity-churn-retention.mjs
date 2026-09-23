@@ -68,6 +68,18 @@ const arg = (name, dflt) => {
 };
 const WIDTH = Number(arg('--width', 1000));
 const ROUNDS = Number(arg('--rounds', 50));
+/**
+ * RETIRED-SUBJECT-SLOPE-STABILITY-0, stage 3 (real). Deliberately hold N
+ * retired subject nodes strongly reachable, in the SAME arm, with the same
+ * churn and the same protocol. The only difference is that retired subjects
+ * stop being forgettable.
+ *
+ * This is the mutation the gate actually claims to catch. Swapping to a
+ * restoration-attached arm proves only that a subsystem DESIGNED to retain
+ * retains; it says nothing about an accidental leak in a plain tree.
+ */
+const RETAIN = Number(arg('--retain', 0));
+const deliberatelyRetained = [];
 
 const ARMS = {
   'no-history': {
@@ -137,7 +149,12 @@ if (armFlag !== -1) {
   for (let g = 1; g <= ROUNDS; g++) {
     tree.$.rows.setAll(generation(g));
     if (a.readNodes)
-      for (let i = 0; i < WIDTH; i++) void tree.$.rows.byId(`g${g}-${i}`);
+      for (let i = 0; i < WIDTH; i++) {
+        const node = tree.$.rows.byId(`g${g}-${i}`);
+        if (deliberatelyRetained.length < RETAIN) {
+          deliberatelyRetained.push(node);
+        }
+      }
     // A turn per round: the notifier flushes on a microtask and history records
     // on a flush, so rounds without one coalesce and the arm measures fewer
     // logical generations than it claims to.
@@ -166,6 +183,7 @@ if (armFlag !== -1) {
       liveRows: WIDTH,
       rounds: ROUNDS,
       retiredSubjects: retired,
+      deliberatelyRetained: deliberatelyRetained.length,
       growthMB: +((after - before) / MB).toFixed(2),
       bytesPerRetiredSubject: Math.round((after - before) / retired),
       diagnostics: {
@@ -178,6 +196,19 @@ if (armFlag !== -1) {
         v8UsedMB: +(v8.used_heap_size / MB).toFixed(2),
         v8TotalMB: +(v8.total_heap_size / MB).toFixed(2),
         v8LimitMB: +(v8.heap_size_limit / MB).toFixed(2),
+        // An absolute ceiling is environment-dependent in a way a normalized
+        // slope was not, so the environment is part of the evidence.
+        nodeVersion: process.version,
+        v8Version: process.versions.v8,
+        platform: process.platform,
+        arch: process.arch,
+        spaces: (await import('node:v8'))
+          .getHeapSpaceStatistics()
+          .map((sp) => ({
+            name: sp.space_name,
+            usedMB: +(sp.space_used_size / MB).toFixed(2),
+            sizeMB: +(sp.space_size / MB).toFixed(2),
+          })),
       },
     })
   );
