@@ -82,6 +82,55 @@ const CASES = [
     mutate: (s) => `${s}\ninterface __NotExported { __privateThing(): void }\n`,
     expect: (r) => !r.failed,
   },
+  {
+    name: '8 change a method PARAMETER type',
+    mutate: (s) =>
+      s.replace(
+        'transact(fn: () => void): PendingTransaction;',
+        'transact(fn: (x: number) => void): PendingTransaction;'
+      ),
+    expect: (r) =>
+      r.failed &&
+      /SIGNATURE CHANGED.*TransactionMethods\.transact/s.test(r.out),
+  },
+  {
+    name: '9 change a method RETURN type',
+    mutate: (s) =>
+      s.replace(
+        'transact(fn: () => void): PendingTransaction;',
+        'transact(fn: () => void): void;'
+      ),
+    expect: (r) =>
+      r.failed &&
+      /SIGNATURE CHANGED.*TransactionMethods\.transact/s.test(r.out),
+  },
+  {
+    name: '10 REMOVE an overload from a callable type',
+    mutate: (s) =>
+      s.replace(
+        'interface NodeAccessor<T> {\n    /** Read: unwraps this node and everything under it. */\n    (): T;',
+        'interface NodeAccessor<T> {'
+      ),
+    expect: (r) => r.failed && /SIGNATURE CHANGED.*NodeAccessor/s.test(r.out),
+  },
+  {
+    name: '11 ADD an overload to a callable type',
+    mutate: (s) =>
+      s.replace(
+        'interface NodeAccessor<T> {',
+        'interface NodeAccessor<T> {\n    (sneaky: string): void;'
+      ),
+    expect: (r) => r.failed && /SIGNATURE CHANGED.*NodeAccessor/s.test(r.out),
+  },
+  {
+    name: '12 optional parameter becomes REQUIRED',
+    mutate: (s) =>
+      s.replace(
+        'addOne(entity: E, opts?: AddOptions<E, K>): K;',
+        'addOne(entity: E, opts: AddOptions<E, K>): K;'
+      ),
+    expect: (r) => r.failed && /SIGNATURE CHANGED.*addOne/s.test(r.out),
+  },
 ];
 
 copyFileSync(DTS, BACKUP);
