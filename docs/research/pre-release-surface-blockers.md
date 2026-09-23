@@ -76,6 +76,31 @@ React does not physically realize pending-turn state — measured with raw
 `transaction()`, so it is not a Proposal defect. Angular, Vue and Solid pass
 the same conformance contract 7/7.
 
+## Permanent engineering rule from this episode
+
+> **Never use a global textual rename as evidence that an API migration is
+> complete.**
+
+The `transaction()` -> `transact()` sweep looked complete after matching
+`.transaction(`. It was not. What the grep did not distinguish:
+
+```text
+bare property access        store.transaction        (no parens)
+indexed type access         (typeof t)['transaction']
+synthetic fixtures          test extensions that declare their OWN member
+                            named `transaction`, which must NOT be renamed
+formatting-sensitive tests  @ts-expect-error directives whose position depends
+                            on a file being unformatted
+```
+
+Typecheck and the behavioural suites found every one of those; the grep found
+none of them. A rename is complete when the type system and the gates say so.
+
+Corollary, learned the expensive way in the same change: **never run a
+formatter over a glob wider than the files you edited.** A blanket prettier
+sweep reformatted 135 unrelated files and broke `@ts-expect-error` positioning
+by splitting single-line calls away from their directives.
+
 ## Preserved work
 
 ```text
