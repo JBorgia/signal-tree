@@ -340,8 +340,17 @@ place; spending the CI minutes to see the distribution is the entire point.
 
 # LINUX RESULT — outcome A, with an unexpected finding
 
-Run `35886271808`, `ubuntu-latest`, Node v24.15.0, V8 13.6.233.17-node.48,
-linux/x64.
+```text
+run:      35886271808        event: workflow_dispatch
+head SHA: f8f815053a1b7722d2389bddb088100135880733
+branch:   main
+runner:   ubuntu-latest / linux x64
+Node:     v24.15.0
+V8:       13.6.233.17-node.48
+```
+
+Recorded exactly rather than as "the commit before the closure", because
+evidence attached to an approximate SHA is not evidence.
 
 ```text
 CONTROL   n=30, retain=0        3.23 x28,  3.24 x2
@@ -359,18 +368,23 @@ validation — the samples that chose it and the samples testing it come from
 different environments, which is exactly the condition outcome A was defined
 to satisfy.
 
-## The unexpected part: the bimodality is macOS-specific
+## The unexpected part: the multimodality did not appear on the release runner
 
 Linux control is **unimodal and essentially exact** — 28 of 30 samples
-identical to the centibyte. The 3.23 / 7.23 / 15.22 mode structure that
-motivated this entire investigation **does not appear on Linux at all**.
+identical to the centibyte.
 
-Stated carefully, because it would be easy to overclaim in either direction:
+**Deliberately NOT stated as "macOS-specific".** That would re-introduce the
+attribution error this track already corrected once. Two environments differ in
+OS, architecture, allocator and runtime libraries, runner image and host; the
+measurement isolates none of them. What was observed:
 
 ```text
-ESTABLISHED   macOS/arm64 150-round control is multimodal across 4 MB steps,
-              localized to large_object_space
-ESTABLISHED   linux/x64 150-round control is unimodal and tight
+ESTABLISHED   the darwin/arm64 DEVELOPMENT environment showed multimodal
+              150-round control across 4 MB steps, localized to
+              large_object_space
+ESTABLISHED   the sampled ubuntu-latest linux/x64 RELEASE environment showed
+              tight unimodal 150-round control
+NOT ISOLATED  which of the differing variables causes it
 NOT MEASURED  linux 50-round control — so whether the OLD slope gate would
               have been stable in CI is UNKNOWN
 ```
