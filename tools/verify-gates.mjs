@@ -31,7 +31,12 @@
  * Realisation 15 in design-thesis-and-benchmarking-rules.md: a gate must report
  * what it COVERED, not just that it passed. So the summary counts proven gates
  * against total gates and names every unproven one. A gate with no mutation
- * defined is not a silent gap — it is printed, every run, as UNPROVEN.
+ * defined is not a silent gap — it is printed, every run, as UNPROVEN, and it
+ * FAILS the self-test. Printing alone was the contract until RC2 of 16.0.0,
+ * which reported `72/73 proven, 1 unproven` and still exited 0; the gap was
+ * caught by a human reading the totals. An invariant that depends on someone
+ * reading the summary is not an invariant, so `--self-test` now exits 0 only
+ * when unproven, blind and errored are all zero.
  *
  * ## Usage
  *
@@ -1775,7 +1780,10 @@ if (has('--self-test')) {
         continue;
       }
       results.push({ gate, state: 'unproven' });
-      console.log(`  ~ ${gate.name.padEnd(20)} UNPROVEN — ${gate.unproven}`);
+      console.log(
+        `  ~ ${gate.name.padEnd(20)} UNPROVEN — no mutation and no provenBy; ` +
+          `this gate proves nothing about itself`
+      );
       continue;
     }
     process.stdout.write(
@@ -1843,12 +1851,19 @@ if (has('--self-test')) {
       )} errored.`
   );
   for (const r of results.filter((r) => r.state === 'unproven')) {
-    console.log(`  unproven: ${r.gate.name} — ${r.gate.unproven}`);
+    console.log(
+      `  unproven: ${r.gate.name} — add a \`mutation\`, or a \`provenBy\` ` +
+        `naming the companion self-test gate that mutates its checker`
+    );
   }
   for (const r of results.filter((r) => r.state === 'blind')) {
     console.log(`  BLIND:    ${r.gate.name} — passed while broken`);
   }
-  const bad = count('blind') + count('error');
+  // `unproven` counts as failure. A gate reaches that state only by declaring
+  // neither a `mutation` nor a `provenBy` — it is always an omission, never a
+  // documented exemption, because nothing in this file grants one. Leaving it
+  // out of `bad` is what let RC2 report 1 unproven at exit 0.
+  const bad = count('unproven') + count('blind') + count('error');
   process.exit(bad > 0 ? 1 : 0);
 } else {
   console.log(
