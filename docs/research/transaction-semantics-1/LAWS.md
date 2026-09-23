@@ -1,5 +1,11 @@
 # TRANSACTION-SEMANTICS-1 — the laws
 
+> **SUPERSEDED by `../transaction-semantics-2/LAWS.md` (same day).** Kept as
+> the historical record. Its eight laws are all carried forward, but it was
+> missing the precedence law, and a naive contribution-layer model satisfying
+> only these eight still fails `accept P2 -> accept P1`. See SEMANTICS-2 for
+> the hole and the correction. Do not work from this file.
+
 Frozen 2026-09-23, BEFORE any implementation change. Derived from the
 behaviour we want, not from the defects we know how to make green.
 
