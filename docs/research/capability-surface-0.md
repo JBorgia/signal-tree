@@ -1,6 +1,7 @@
 # CAPABILITY-SURFACE-0
 
-> **Disposition: KEEP METHODS — reported 2026-09-22.** Blocks
+> **Disposition: METHODS KEPT — reported 2026-09-22.** The measurement settled
+> only the bundle question; the architecture was settled separately, below. Blocks
 > `PUBLIC-API-GRAMMAR-0` and the `proposal() -> propose()` rename, because a
 > naming pass applied to methods that are about to move is a pass done twice.
 
