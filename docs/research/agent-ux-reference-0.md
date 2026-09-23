@@ -1,6 +1,6 @@
 # AGENT-UX-REFERENCE-0
 
-> **Disposition: OPEN — preregistered 2026-09-22.** A product proof using the
+> **Disposition: PASSES — reported 2026-09-22. No new primitive added.** A product proof using the
 > API that already exists. **Not** a kernel-design track.
 
 ## Question
@@ -86,3 +86,74 @@ Executable, not illustrative. The reference lives in `apps/demo`, whose specs
 import `@signal-tree/angular` by package name — so "public API only" is
 enforced by the import path rather than by reviewer discipline. A reach into
 kernel internals would be visible as an import, which is the point.
+
+---
+
+# RESULT — the workflow builds on the public API, unchanged
+
+`apps/demo/src/app/agent-review-reference.spec.ts`, 7 cases, green. All five
+required properties hold, plus the presentation trap and the restoration
+section.
+
+## Every falsifier stayed clear
+
+```text
+needs SubjectId or PositionId                    NO
+app reconstructs supersession itself             NO — inspect() reports it
+app inspects private transaction effects         NO
+framework-specific Proposal APIs required        NO
+accept/reject needs behaviour PendingTransaction
+  does not already support                       NO
+state cannot be rendered beside inspect()        NO
+one logical action needs app-side grouping       NO
+```
+
+The whole review surface an application writes is this:
+
+```ts
+const buildReview = (tree, proposal) =>
+  proposal.inspect().changes.map((change) => ({
+    path: change.path,
+    status: change.status,
+    currentValue: readByPath(tree, change.path),
+  }));
+```
+
+`status` from `inspect()`, `currentValue` from an ordinary read. Nothing else.
+
+**So no new primitive is added.** The standing rule holds: don't answer an
+awkwardness with another primitive.
+
+## The presentation trap, proved rather than described
+
+An agent adds row `A` with `assignee: 'Alpha'`; a server then renames it:
+
+```text
+row A   status  'current'        the contribution — the entity exists — stands
+        value   'Server Name'    an ordinary read, which is the server's
+```
+
+A UI showing status without that value column would tell the reviewer the
+opposite of the truth. The reference renders them side by side.
+
+## A real DX finding the reference surfaced
+
+The first draft wrote `tree.$.lastSyncedBy('agent')` on the ANGULAR facade.
+That silently did nothing: Angular leaves are Angular signals, written with
+`.set()`, so the callable form is a read with an ignored argument. The write
+never happened and `inspect()` correctly reported only the other change.
+
+This is the third adapter where the callable-write form is not the write door —
+Solid documents `.set()` too, while React writes callably. The grammar is
+genuinely adapter-physical, which is why the Phase B contract delegates writes
+to hooks. Worth carrying into the docs: **a reference example written for one
+adapter's write grammar is silently wrong on another.**
+
+## Verified
+
+```text
+reference cases        7/7
+demo full suite        29 suites, 169 passed, 4 skipped
+kernel                 286 files / 2410 passed
+typecheck              exit 0
+```
