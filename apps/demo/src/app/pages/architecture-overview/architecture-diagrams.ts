@@ -325,7 +325,7 @@ export const CAUSAL_AUTHORITY_DIAGRAM: ArchitectureDiagramSpec = {
   groups: [
     {
       id: 'transaction-boundary',
-      label: 'Orthogonal operation boundary · transaction()',
+      label: 'Orthogonal operation boundary · transact()',
       tone: 'neutral',
       position: {
         desktop: box(185, 20, 670, 120),
@@ -441,7 +441,7 @@ export const COHERENT_OPERATION_DIAGRAM: ArchitectureDiagramSpec = {
   nodes: [
     node(
       'transaction',
-      ['transaction(() => …)'],
+      ['transact(() => …)'],
       ['one semantic operation'],
       'application',
       box(30, 175, 190, 100),

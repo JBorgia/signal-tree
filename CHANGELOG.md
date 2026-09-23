@@ -1,24 +1,61 @@
-## Unreleased
+## 16.0.0 (unreleased)
 
-**TL;DR** — Additive. One new method (`tree.proposal()`) and five new public
-types. No existing API is removed or renamed. Two transaction rollback
-correctness defects are fixed: a rejected turn that could previously strand
-unrelated speculative values now reverses them. Nothing to migrate.
+**TL;DR** — **Breaking, and deliberately so.** `tree.transaction()` is renamed
+to `tree.transact()` and the old spelling is **removed, not deprecated**. One
+new method, `tree.propose()`, plus five new public types. Two transaction
+rollback correctness defects are fixed. The migration is one mechanical rename.
+
+### Breaking changes
+
+```text
+15.2.1                    16.0.0
+tree.transaction(fn)  ->  tree.transact(fn)
+```
+
+No alias ships. A missed call site is a **compile error**, not a silent
+deprecation warning — which is the reason for breaking rather than bridging.
+
+`propose()` had not shipped under any other name, so nothing migrates:
+`tree.proposal(fn)` never became public API.
+
+#### Why this did not go through a deprecation cycle
+
+The support policy promises a deprecated API gets a documented migration path
+before removal, except where keeping it would preserve a correctness or
+security defect. **A naming cleanup does not qualify for that exception**, so
+this release does not satisfy that clause — it is a recorded one-time
+exception, taken deliberately.
+
+SignalTree is early enough that carrying a known-wrong public name purely for
+compatibility would create permanent surface debt. **This is not a loosening of
+the rule.** From 16.0.0 the corrected surface is the compatibility baseline and
+the deprecation path applies normally. See
+[`docs/support-policy.md`](docs/support-policy.md) and
+[`docs/research/api-breaking-reset-0.md`](docs/research/api-breaking-reset-0.md).
 
 ### For users
 
-- **`proposal()` — reviewing a change before it lands.** `transactions()` now
-  also provides `tree.proposal(fn)`: the same pending turn, named for the
-  workflow where somebody reviews a change first. `inspect()` reports whether
-  each proposed change still represents current truth, `accept()` commits and
+- **`transact()` — the same optimistic turn, named as a verb.** It matches the
+  handle operations it opens (`confirm()`, `rollback()`) and its sibling
+  `propose()`. `transaction()` was a noun used as a method.
+
+- **`propose()` — reviewing a change before it lands.** `transactions()` also
+  provides `tree.propose(fn)`: the same pending turn, named for the workflow
+  where somebody reviews a change first. `inspect()` reports whether each
+  proposed change still represents current truth, `accept()` commits and
   returns that inspection as settled, `reject()` withdraws. New types:
   `Proposal`, `ProposalChange`, `ProposalStatus`, `ProposalInspection`,
-  `ProposalAcceptance`. See the kernel README.
+  `ProposalAcceptance`.
 
-  It adds no new state semantics — the whole adversarial matrix was run against
-  `transaction()`/`confirm()`/`rollback()` before the facade existed, and
-  passed. Accepting is deliberately **not** undo history: wrap `undoable()`
-  around the proposal, not around `accept()`.
+  It adds no new state semantics — the whole adversarial matrix ran against
+  `transact()`/`confirm()`/`rollback()` before the facade existed, and passed.
+  Accepting is deliberately **not** undo history: wrap `undoable()` around the
+  proposal, not around `accept()`.
+
+  > `status: 'current'` means the proposal's _contribution_ still stands, not
+  > that the value it proposed is still present. An added row stays `current`
+  > while another writer edits its fields. Render `inspect()` beside ordinary
+  > current-state reads; it is a review status, not a value snapshot.
 
 - **Rejecting a transaction no longer strands unrelated changes.** Previously,
   if a turn added an entity and another writer then touched that entity, the
@@ -33,6 +70,16 @@ unrelated speculative values now reverses them. Nothing to migrate.
 - **The same fix for a renamed entity.** A turn that rekeys a row, whose row a
   later writer then deletes, now reverses the rest of the turn instead of
   refusing.
+
+### For contributors
+
+- **The public API gate now guards the invocation surface, not just exports.**
+  `api-baseline` records exported symbols and was blind to every callable
+  member of an exported type — `transaction()` itself shipped in 15.2.1 without
+  the gate knowing it existed. A second baseline now records functions,
+  methods, callable properties, callable types and constructable classes, with
+  normalized signatures, so a changed parameter, return type, overload or
+  constructor fails the build. Mutation-proven 13/13.
 
 ## 15.2.1 (2026-09-22)
 

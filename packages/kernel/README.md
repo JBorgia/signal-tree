@@ -222,7 +222,7 @@ for pending authority, not as a synonym for retained undo history.
 
 #### Reviewing a proposal
 
-`proposal()` is the same pending turn `transaction()` opens, named for the case
+`propose()` is the same pending turn `transact()` opens, named for the case
 where somebody reviews a change before it lands — an agent's suggestion, an
 import, a bulk edit. The proposed values are readable immediately through
 ordinary references, so a review screen renders from the state it already uses.
@@ -232,7 +232,7 @@ const tree = signalTree(state, { enhancers: [transactions()] });
 
 const result = await agent.suggestChanges();
 
-const proposal = tree.proposal(() => {
+const proposal = tree.propose(() => {
   tree.$.order.customer(result.customer);
   tree.$.order.priority(result.priority);
 });
@@ -273,7 +273,7 @@ designates the causal turn where the writes happened:
 let proposal!: Proposal;
 
 undoable(() => {
-  proposal = tree.proposal(() => applyResult(result));
+  proposal = tree.propose(() => applyResult(result));
 });
 
 // ...the human reviews for as long as they need...
