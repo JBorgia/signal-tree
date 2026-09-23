@@ -1,6 +1,16 @@
 #!/usr/bin/env node
 /**
- * CALLABLE-SURFACE-0 — inventory the public CALLABLE surface, not just exports.
+ * CALLABLE-SURFACE-0 — inventory the public INVOCATION surface, not just
+ * exports. "Invocation" rather than "callable" because a constructable class is
+ * invoked with `new` and is not callable in JavaScript.
+ *
+ * Every way a consumer can invoke public API:
+ *
+ *     root function        signalTree(...)
+ *     method               tree.transact(...)
+ *     callable property    rows.empty()
+ *     callable type        tree.$.name(...)
+ *     constructable type   new SignalTreeRollbackError(...)
  *
  * WHY THIS EXISTS. `tools/api-baseline.json` records exported SYMBOLS. It is
  * therefore blind to every callable MEMBER of an exported type: when
@@ -62,6 +72,17 @@ function signaturesOf(type, checker) {
     .getSignaturesOfType(type, ts.SignatureKind.Call)
     .map((sig) => checker.signatureToString(sig))
     .map((text) => text.replace(/\s+/g, ' ').trim())
+    .filter((text, i, all) => all.indexOf(text) === i)
+    .sort();
+}
+
+/** Construct signatures — `new Exported(...)` — read off the STATIC side. */
+function constructSignaturesOf(type, checker) {
+  return checker
+    .getSignaturesOfType(type, ts.SignatureKind.Construct)
+    .map((sig) => checker.signatureToString(sig))
+    .map((text) => text.replace(/\s+/g, ' ').trim())
+    .filter((text, i, all) => all.indexOf(text) === i)
     .sort();
 }
 
@@ -134,6 +155,29 @@ function collect() {
         if (!decl) continue;
         const type = checker.getDeclaredTypeOfSymbol(resolved);
 
+        // `new Exported(...)`. Construct signatures live on the STATIC side and
+        // are a DIFFERENT SignatureKind, so neither the call-signature pass nor
+        // the property pass can see them. An exported class could change its
+        // constructor entirely while its name, members and call signatures all
+        // stayed identical.
+        const staticDecl = resolved.getDeclarations()?.[0];
+        if (staticDecl) {
+          const staticType = checker.getTypeOfSymbolAtLocation(
+            resolved,
+            staticDecl
+          );
+          const ctors = constructSignaturesOf(staticType, checker);
+          if (ctors.length) {
+            rows.set(`${pkg}:${name}.new`, {
+              pkg,
+              owner: name,
+              name: 'new',
+              memberKind: 'constructable-type',
+              signatures: ctors,
+            });
+          }
+        }
+
         // The TYPE ITSELF may be callable — `tree.$.name()`, `row()`. These are
         // call signatures, not properties, so nothing above would see them.
         const ownCalls = signaturesOf(type, checker);
@@ -182,7 +226,9 @@ const serialized = JSON.stringify({ rows }, null, 2) + '\n';
 
 if (!process.argv.includes('--check')) {
   writeFileSync(BASELINE, serialized);
-  console.log(`Callable baseline written: ${rows.length} public callables.`);
+  console.log(
+    `Callable baseline written: ${rows.length} entries in the public invocation surface.`
+  );
   process.exit(0);
 }
 
@@ -218,12 +264,12 @@ const resigned = shared
 
 if (!added.length && !removed.length && !changed.length && !resigned.length) {
   console.log(
-    `Callable surface matches the baseline (${rows.length} callables).`
+    `Public invocation surface matches the baseline (${rows.length} entries).`
   );
   process.exit(0);
 }
 
-console.error('\nPUBLIC CALLABLE SURFACE CHANGED\n');
+console.error('\nPUBLIC INVOCATION SURFACE CHANGED\n');
 for (const k of removed)
   console.error(`  REMOVED        ${k}  (${before.get(k).memberKind})`);
 for (const k of added)
