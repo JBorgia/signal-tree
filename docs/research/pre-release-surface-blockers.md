@@ -63,27 +63,30 @@ So removals need a bridge release that deprecates with a stated replacement,
 then one coherent major — not a silent rewrite of a policy adopted days ago
 specifically to rebuild API-stability trust.
 
-### 5. `retired-subject-slope` — redesigned, NOT yet cleared
+### 5. `retired-lifetime-gross-retention` — CLOSED 2026-09-23
 
 The old 50-vs-150 slope and ratio checks are falsified and removed: their
-operands were 4 MB-quantized and overlapping, so the verdict was decided by
-which runtime mode each median drew. Replaced by an absolute 40 MB ceiling on
-the non-retaining arm, mutation-proven in the SAME arm with deliberate
-retention.
+operands were 4 MB-quantized and overlapping on darwin/arm64, so the verdict
+was decided by which runtime mode each median drew. Replaced by an absolute
+40 MB ceiling on the non-retaining arm, mutation-proven in the SAME arm with
+deliberate retention, and **renamed** — it no longer judges a slope.
 
-**Remaining blocker: the threshold was derived on darwin/arm64 and release
-gates run on ubuntu-latest linux/x64.** Also pending on closure: RENAME the
-gate. It is still called `retired-subject-slope` and no longer judges a slope;
-its claim is that a workload which should forget retired node handles has not
-entered a gross-retention regime. An absolute ceiling is
-environment-dependent in a way the normalized slope was not. Validate on the
-release platform — control distribution plus `--retain 10000` — before it
-blocks a release.
+**Validated on the release environment**, run `35886271808`, ubuntu-latest,
+linux/x64:
 
-Honest sensitivity, recorded rather than implied: reliably detects >= ~10,000
-deliberately retained retired-node HANDLES; 5,000 is marginal; <= 2,500
-invisible. Handles rather than subjects, because a 1:1 handle-to-SubjectId
-relationship was not separately proven.
+```text
+control  n=30  retain=0        3.23 - 3.24 MB
+mutation n=10  retain=10000   82.75 - 82.76 MB
+gap 79.51 MB, no overlap
+```
+
+The threshold was derived on darwin/arm64 and Linux left it untouched, so this
+is genuine independent validation. Also learned: the bimodality is
+macOS-specific — Linux control is unimodal, 28 of 30 samples identical.
+
+Honest sensitivity: reliably detects >= ~10,000 deliberately retained
+retired-node HANDLES. Handles rather than subjects, because a 1:1
+handle-to-SubjectId relationship was not separately proven.
 
 ### 6. `REACT-PENDING-TURN-REALIZATION-0`
 
