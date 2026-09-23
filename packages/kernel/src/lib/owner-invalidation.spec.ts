@@ -302,7 +302,20 @@ describe('OWNER INVALIDATION LAW', () => {
     tree.destroy();
   });
 
-  it('does not invalidate a deferred transaction before final settlement', async () => {
+  /**
+   * SUPERSEDED by CURRENT-TRUTH-OBSERVATION-0. This previously asserted
+   * `seen` stayed `[]` while a turn was pending and became `[0]` only after
+   * rollback — i.e. the adapter-facing observation layer was DELIBERATELY
+   * stale relative to canonical truth.
+   *
+   * That conflated two different semantic authorities. Speculative state is
+   * canonical truth while pending: `tree.$.value()` returns 1, and Angular,
+   * Vue and Solid all realize it. Only React withheld it, because it is the
+   * one adapter routed through this seam. For a turn held open while a human
+   * reviews a proposal, "wait for settlement" is unbounded — the reviewer
+   * could not see what they were being asked to accept.
+   */
+  it('invalidates for a pending turn AND for its compensation', async () => {
     const tree = signalTree({ value: 0 }, { enhancers: [transactions()] });
     const seen: number[] = [];
     const cleanup = observeOwnerInvalidation(tree, () =>
@@ -311,20 +324,38 @@ describe('OWNER INVALIDATION LAW', () => {
 
     const pending = tree.transact(() => tree.$.value(1));
     await flush();
-    expect(seen).toEqual([]);
+    // Canonical truth moved, so an observer is told to reread it.
+    expect(seen).toEqual([1]);
 
     pending.rollback();
     await flush();
-    expect(seen).toEqual([0]);
+    // And the compensation moves it back, which is equally observable. An
+    // observer left at 1 here would show a value the tree no longer holds.
+    expect(seen).toEqual([1, 0]);
 
     cleanup();
     tree.destroy();
   });
 
-  it('does not reschedule owner invalidation through a newly opened commit scope', async () => {
+  /**
+   * SUPERSEDED by CURRENT-TRUTH-OBSERVATION-0, same reason.
+   *
+   * A commit scope's job is DURABLE CONSEQUENCE GATING — the one production
+   * opener says so outright: "open the deferral scope BEFORE the callback runs,
+   * so speculative writes inside it queue instead of reaching storage." It was
+   * never a statement about whether current truth may be read.
+   *
+   * Coherence is preserved by the DOUBLE microtask in `scheduleInvalidation`,
+   * not by this scope: writes assembled inside a synchronous callback cannot be
+   * observed mid-assembly because the delivery cannot run until that callback
+   * returns.
+   */
+  it('invalidates through an open commit scope, coalescing to the latest truth', async () => {
     const tree = signalTree({ value: 0 });
-    const callback = vi.fn();
-    const cleanup = observeOwnerInvalidation(tree, callback);
+    const seen: number[] = [];
+    const cleanup = observeOwnerInvalidation(tree, () =>
+      seen.push(tree.$.value())
+    );
     const owner = {};
 
     tree.$.value(1);
@@ -332,11 +363,13 @@ describe('OWNER INVALIDATION LAW', () => {
     tree.$.value(2);
     await flush();
 
-    expect(callback).not.toHaveBeenCalled();
+    // One coalesced delivery carrying the latest truth — not zero.
+    expect(seen).toEqual([2]);
 
     settleCommitScope(owner, 1, 'commit');
     await flush();
-    expect(callback).toHaveBeenCalledTimes(1);
+    // Settlement itself moves no truth, so it adds no delivery.
+    expect(seen).toEqual([2]);
 
     cleanup();
     tree.destroy();

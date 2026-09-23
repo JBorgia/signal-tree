@@ -27,6 +27,7 @@ import {
   settleCommitScope,
 } from '../../lib/internals/commit-consequence';
 import { AppliedTurnProjection } from '../../lib/internals/causal-runtime/applied-turn-projection';
+import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
 import type {
   CausalEffect,
   PositionId as CausalPositionId,
@@ -1538,7 +1539,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     }
   };
 
-  const rollbackPendingEffectsThroughRealizationPort = (
+  const applyRollbackCompensation = (
     transactionId: number,
     effects: TurnEffect[],
     baselineValues: ReadonlyMap<number, unknown>,
@@ -1642,6 +1643,39 @@ export function getOrCreateInternalTransactionRuntime<T>(
         callbackError,
       });
     }
+  };
+
+  /**
+   * CURRENT-TRUTH-OBSERVATION-0. Compensation moves canonical truth, so a held
+   * observer must be told to reread it.
+   *
+   * Measured before this existed: an owner observer saw the speculative 7 and
+   * then NOTHING when the turn was rolled back, leaving an adapter showing a
+   * value the tree no longer held. The old settlement-gated seam masked it,
+   * because a single invalidation fired at settle and happened to sweep up the
+   * final value. Once observation stopped waiting for settlement, the gap in
+   * the compensation path itself became visible.
+   *
+   * Authorship decides authority, history and consequences. It does not decide
+   * whether current truth is observable.
+   */
+  const rollbackPendingEffectsThroughRealizationPort = (
+    transactionId: number,
+    effects: TurnEffect[],
+    baselineValues: ReadonlyMap<number, unknown>,
+    orderDeltas: CollectionOrderDelta[] = [],
+    callbackError?: unknown,
+    owningTransactionId: number = transactionId
+  ): void => {
+    applyRollbackCompensation(
+      transactionId,
+      effects,
+      baselineValues,
+      orderDeltas,
+      callbackError,
+      owningTransactionId
+    );
+    markOwnerInvalidatedFrom(tree.$ as object);
   };
 
   try {
