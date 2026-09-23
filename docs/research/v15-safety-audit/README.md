@@ -77,3 +77,42 @@ The v14 line is therefore safe and remains maintained.
     npm init -y >/dev/null && npm pkg set type=module
     npm install @signal-tree/kernel@15.2.1
     cp <this dir>/probe.mjs . && node probe.mjs
+
+## Exposure investigation (2026-09-23)
+
+### Known consumers — none enable `transactions()`
+
+    repo                  package / version         transactions() ?
+    v3 (TruckTrax, prod)  @signaltree/core          UNAFFECTED PACKAGE
+    86xed                 @signaltree/core ^11.0.0  UNAFFECTED PACKAGE
+    v2                    -                         no signaltree usage found
+    signaltree-studio     @signal-tree/kernel 15.1.4  affected pkg, NOT enabled
+
+TruckTrax and 86xed are on the older `@signaltree/*` scope entirely, which
+ships no transactions enhancer, so they cannot reach either defect.
+
+signaltree-studio depends on an affected kernel version but does not install
+the enhancer. `packages/studio-adapter/src/capabilities.ts` states it
+"deliberately does not use `transactions()`", and the consumer fixture
+(`tests/consumer/main.ts`) builds with `{ enhancers: [restoration(),
+batching()] }`. Studio only READS confirmed turns when a host tree happens to
+have the enhancer. Every `transactions()` occurrence found in that repo is in
+a `.spec.ts` or a doc comment.
+
+### npm volume
+
+    @signal-tree/kernel    1226 / month     393 / week
+    @signal-tree/angular   1456 / month
+    @signal-tree/react      964 / month
+    @signal-tree/vue        881 / month
+
+Small and consistent with CI/mirror traffic rather than application installs.
+Enhancer usage among external installers is NOT observable from the registry,
+so this bounds exposure, it does not prove it is zero.
+
+### Conclusion
+
+No known real consumer uses `transactions()` in an affected pattern. Per the
+standing instruction — deprecate promptly IF a real consumer is affected —
+the npm deprecation is NOT triggered. A private advisory draft is prepared at
+`ADVISORY-DRAFT.md` and is unpublished pending review.
