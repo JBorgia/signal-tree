@@ -225,3 +225,54 @@ certain compositions" is then a finding, not a premise.
 
 For every F case: state unchanged, pending authority retained, no confirmed
 record created, retry semantics explicit.
+
+
+## Retention — correctness vs diagnostics (L15)
+
+    R01  50k SUCCESSFUL transactions
+    R02  50k REJECTED transactions
+    R03  repeated failed settlement creates no duplicate retained state
+    R04  terminal transactions disappear from the active machinery
+    R05  tree destruction releases pending machinery
+    R06  enabling diagnostics does not change settlement CORRECTNESS
+
+R06 is the separation test: if turning diagnostics on or off changes a
+settlement outcome, correctness and evidence are entangled and L15 is broken
+regardless of what the byte counts say.
+
+## Non-interference (L16)
+
+    N01  pending x does not block outbound y
+    N02  FAILED settlement on x does not block y
+    N03  abandoned pending x does not freeze unrelated link traffic
+    N04  independent pending transactions settle independently
+    N05  only a DEMONSTRATED dependency may create a hold
+
+N05 is the anti-global-lock control. A contribution graph that holds
+everything satisfies every settlement law and fails this one.
+
+## Identity losslessness (L17)
+
+    I01  "a.b"
+    I02  "a/b"
+    I03  "a::b"
+    I04  "jo.doe@example.com"
+    I05  "1.2.3"
+    I06  numeric 1 vs string "1"          must NOT collide
+    I07  same business key, different subject lifetime
+    I08  identity preserved through transactions + link + entityMap
+
+I08 is the seam test. I01..I07 inside one subsystem prove little; the measured
+pattern is that semantics are strong inside a subsystem and degrade at the
+boundary.
+
+## Deferral and semantic classification (L18)
+
+    CCTX1  external, direct vs deferred
+    CCTX2  transaction, direct vs deferred
+    CCTX3  restoration, direct vs deferred
+    CCTX4  nested semantic scopes
+    CCTX5  a REFUSED composition schedules no write
+
+CCTX5 matters as much as the others: refusing is a legitimate answer, but a
+refusal that has already queued a write is not a refusal.
