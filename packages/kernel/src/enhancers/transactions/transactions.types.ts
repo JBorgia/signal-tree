@@ -13,12 +13,23 @@
 
 export interface TransactionMethods {
   transaction(fn: () => void): PendingTransaction;
-  /**
-   * A reviewable proposal: the same turn `transaction()` opens, named for the
-   * multi-writer workflow and given a review projection. See the PROPOSAL-0
-   * block at the foot of this file.
-   */
-  proposal(fn: () => void): Proposal;
+}
+
+/**
+ * CAPABILITY-SURFACE-0 arm B. A phantom marker the `transactions()` enhancer
+ * contributes to the tree TYPE, carrying capability presence without adding a
+ * public method.
+ *
+ * Erased at runtime — nothing ever assigns this property. Its only job is to
+ * let a standalone operation REQUIRE the capability statically, so
+ * `transact(treeWithoutTransactions, fn)` is a compile error rather than a
+ * runtime discovery failure. If that does not hold, arm B is disqualified
+ * however well it bundles.
+ */
+declare const TRANSACTIONS_CAPABILITY: unique symbol;
+
+export interface TransactionsCapability {
+  readonly [TRANSACTIONS_CAPABILITY]: true;
 }
 
 export interface PendingTransaction {

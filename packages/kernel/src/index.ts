@@ -274,6 +274,10 @@ export type { ProposalChange } from './enhancers/transactions/transactions.types
 export type { ProposalInspection } from './enhancers/transactions/transactions.types';
 export type { ProposalStatus } from './enhancers/transactions/transactions.types';
 export { transactions } from './enhancers/transactions/transactions';
+// CAPABILITY-SURFACE-0 arm B — standalone capability operations.
+export { transact } from './lib/transact';
+export { propose } from './lib/propose';
+export type { TransactionsCapability } from './enhancers/transactions/transactions.types';
 
 export type {} from './enhancers/serialization/serialization';
 
