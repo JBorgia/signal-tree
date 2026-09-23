@@ -1,1614 +1,2436 @@
 {
   "rows": [
     {
+      "id": "kernel:AccessibleNode",
+      "pkg": "kernel",
+      "owner": "AccessibleNode",
+      "name": "(call)",
+      "memberKind": "callable-type",
+      "signatures": [
+        "(): T",
+        "(updater: (current: T) => T): void",
+        "(value: T): void"
+      ]
+    },
+    {
       "id": "kernel:BatchingMethods.batch",
       "pkg": "kernel",
       "owner": "BatchingMethods",
       "name": "batch",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(fn: () => void): void"
+      ]
     },
     {
       "id": "kernel:BatchingMethods.coalesce",
       "pkg": "kernel",
       "owner": "BatchingMethods",
       "name": "coalesce",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(fn: () => void): void"
+      ]
     },
     {
       "id": "kernel:BatchingMethods.flushNotifications",
       "pkg": "kernel",
       "owner": "BatchingMethods",
       "name": "flushNotifications",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): void"
+      ]
     },
     {
       "id": "kernel:BatchingMethods.hasPendingNotifications",
       "pkg": "kernel",
       "owner": "BatchingMethods",
       "name": "hasPendingNotifications",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): boolean"
+      ]
     },
     {
       "id": "kernel:ComputedSliceConfig.compute",
       "pkg": "kernel",
       "owner": "ComputedSliceConfig",
       "name": "compute",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(entities: E[]): R"
+      ]
     },
     {
       "id": "kernel:DefaultKey.toLocaleString",
       "pkg": "kernel",
       "owner": "DefaultKey",
       "name": "toLocaleString",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string",
+        "(locales?: LocalesArgument, options?: NumberFormatOptions | undefined): string",
+        "(locales?: string | string[] | undefined, options?: NumberFormatOptions | undefined): string"
+      ]
     },
     {
       "id": "kernel:DefaultKey.toString",
       "pkg": "kernel",
       "owner": "DefaultKey",
       "name": "toString",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string",
+        "(radix?: number | undefined): string"
+      ]
     },
     {
       "id": "kernel:DefaultKey.valueOf",
       "pkg": "kernel",
       "owner": "DefaultKey",
       "name": "valueOf",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string | number"
+      ]
     },
     {
       "id": "kernel:DevToolsMethods.connectDevTools",
       "pkg": "kernel",
       "owner": "DevToolsMethods",
       "name": "connectDevTools",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(name?: string | undefined): void"
+      ]
     },
     {
       "id": "kernel:DevToolsMethods.disconnectDevTools",
       "pkg": "kernel",
       "owner": "DevToolsMethods",
       "name": "disconnectDevTools",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): void"
+      ]
     },
     {
       "id": "kernel:DevToolsMethods.exportDebugSession",
       "pkg": "kernel",
       "owner": "DevToolsMethods",
       "name": "exportDebugSession",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): DevToolsDebugSession"
+      ]
+    },
+    {
+      "id": "kernel:Enhancer",
+      "pkg": "kernel",
+      "owner": "Enhancer",
+      "name": "(call)",
+      "memberKind": "callable-type",
+      "signatures": [
+        "(tree: EnhancerHost): EnhancerHost & TAdded"
+      ]
+    },
+    {
+      "id": "kernel:EnhancerCleanup",
+      "pkg": "kernel",
+      "owner": "EnhancerCleanup",
+      "name": "(call)",
+      "memberKind": "callable-type",
+      "signatures": [
+        "(): void"
+      ]
+    },
+    {
+      "id": "kernel:EnhancerWithMeta",
+      "pkg": "kernel",
+      "owner": "EnhancerWithMeta",
+      "name": "(call)",
+      "memberKind": "callable-type",
+      "signatures": [
+        "(tree: EnhancerHost): EnhancerHost & TAdded"
+      ]
     },
     {
       "id": "kernel:EntityMapBuilder.build",
       "pkg": "kernel",
       "owner": "EntityMapBuilder",
       "name": "build",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): EntityMapMarkerWithSlices<E, K, Slices>"
+      ]
     },
     {
       "id": "kernel:EntityMapBuilder.computed",
       "pkg": "kernel",
       "owner": "EntityMapBuilder",
       "name": "computed",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "<N extends string, R>(name: N & AvailableSliceName<N>, compute: (entities: E[]) => R): EntityMapBuilder<E, K, Slices & Record<N, R>>"
+      ]
+    },
+    {
+      "id": "kernel:EntityNode",
+      "pkg": "kernel",
+      "owner": "EntityNode",
+      "name": "(call)",
+      "memberKind": "callable-type",
+      "signatures": [
+        "(): E",
+        "(updater: (current: E) => E): void",
+        "(value: E): void"
+      ]
     },
     {
       "id": "kernel:EntitySignal.activeEntity",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "activeEntity",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): E | undefined"
+      ]
     },
     {
       "id": "kernel:EntitySignal.activeId",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "activeId",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): K | undefined"
+      ]
     },
     {
       "id": "kernel:EntitySignal.addMany",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "addMany",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(entities: E[], opts?: AddManyOptions<E, K> | undefined): K[]"
+      ]
     },
     {
       "id": "kernel:EntitySignal.addOne",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "addOne",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(entity: E, opts?: AddOptions<E, K> | undefined): K"
+      ]
     },
     {
       "id": "kernel:EntitySignal.all",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "all",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): E[]"
+      ]
     },
     {
       "id": "kernel:EntitySignal.asMap",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "asMap",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): ReadonlyMap<K, E>"
+      ]
     },
     {
       "id": "kernel:EntitySignal.byId",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "byId",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(id: K): EntityNodeOf<E, \"location\"> | undefined"
+      ]
     },
     {
       "id": "kernel:EntitySignal.byIdOrFail",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "byIdOrFail",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(id: K): EntityNodeOf<E, \"location\">"
+      ]
     },
     {
       "id": "kernel:EntitySignal.changeId",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "changeId",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(from: K, to: K): void"
+      ]
     },
     {
       "id": "kernel:EntitySignal.clear",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "clear",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): void"
+      ]
     },
     {
       "id": "kernel:EntitySignal.clearActiveId",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "clearActiveId",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): void"
+      ]
     },
     {
       "id": "kernel:EntitySignal.count",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "count",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): number"
+      ]
     },
     {
       "id": "kernel:EntitySignal.empty",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "empty",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): boolean"
+      ]
     },
     {
       "id": "kernel:EntitySignal.find",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "find",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(predicate: (entity: E) => boolean): ReadonlyLocation<E | undefined>"
+      ]
     },
     {
       "id": "kernel:EntitySignal.has",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "has",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(id: K): ReadonlyLocation<boolean>"
+      ]
     },
     {
       "id": "kernel:EntitySignal.ids",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "ids",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): K[]"
+      ]
     },
     {
       "id": "kernel:EntitySignal.intercept",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "intercept",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(handlers: InterceptHandlers<E, K>): () => void"
+      ]
     },
     {
       "id": "kernel:EntitySignal.prependMany",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "prependMany",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(entities: E[], opts?: AddManyOptions<E, K> | undefined): K[]"
+      ]
     },
     {
       "id": "kernel:EntitySignal.prependOne",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "prependOne",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(entity: E, opts?: AddOptions<E, K> | undefined): K"
+      ]
     },
     {
       "id": "kernel:EntitySignal.removeMany",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "removeMany",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(ids: K[], opts?: MutationOptions | undefined): void"
+      ]
     },
     {
       "id": "kernel:EntitySignal.removeOne",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "removeOne",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(id: K, opts?: MutationOptions | undefined): void"
+      ]
     },
     {
       "id": "kernel:EntitySignal.removeWhere",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "removeWhere",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(predicate: (entity: E) => boolean): number"
+      ]
     },
     {
       "id": "kernel:EntitySignal.replaceOne",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "replaceOne",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(id: K, entity: E, opts?: MutationOptions | undefined): void"
+      ]
     },
     {
       "id": "kernel:EntitySignal.setActiveId",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "setActiveId",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(id: K | undefined): void"
+      ]
     },
     {
       "id": "kernel:EntitySignal.setAll",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "setAll",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(entities: E[], opts?: AddOptions<E, K> | undefined): void"
+      ]
     },
     {
       "id": "kernel:EntitySignal.tap",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "tap",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(handlers: TapHandlers<E, K>): () => void"
+      ]
     },
     {
       "id": "kernel:EntitySignal.updateMany",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "updateMany",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(ids: K[], changes: Partial<E>, opts?: MutationOptions | undefined): void"
+      ]
     },
     {
       "id": "kernel:EntitySignal.updateOne",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "updateOne",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(id: K, changes: Partial<E>, opts?: MutationOptions | undefined): void"
+      ]
     },
     {
       "id": "kernel:EntitySignal.updateWhere",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "updateWhere",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(predicate: (entity: E) => boolean, changes: Partial<E>): number"
+      ]
     },
     {
       "id": "kernel:EntitySignal.upsertMany",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "upsertMany",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(entities: E[], opts?: AddOptions<E, K> | undefined): K[]"
+      ]
     },
     {
       "id": "kernel:EntitySignal.upsertOne",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "upsertOne",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(entity: E, opts?: AddOptions<E, K> | undefined): K"
+      ]
     },
     {
       "id": "kernel:EntitySignal.where",
       "pkg": "kernel",
       "owner": "EntitySignal",
       "name": "where",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(predicate: (entity: E) => boolean): ReadonlyLocation<E[]>"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.activeEntity",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "activeEntity",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): E | undefined"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.activeId",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "activeId",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): K | undefined"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.addMany",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "addMany",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(entities: E[], opts?: AddManyOptions<E, K> | undefined): K[]"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.addOne",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "addOne",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(entity: E, opts?: AddOptions<E, K> | undefined): K"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.all",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "all",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): E[]"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.asMap",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "asMap",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): ReadonlyMap<K, E>"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.byId",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "byId",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(id: K): EntityNodeOf<E, \"location\"> | undefined"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.byIdOrFail",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "byIdOrFail",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(id: K): EntityNodeOf<E, \"location\">"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.changeId",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "changeId",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(from: K, to: K): void"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.clear",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "clear",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): void"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.clearActiveId",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "clearActiveId",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): void"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.count",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "count",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): number"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.empty",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "empty",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): boolean"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.find",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "find",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(predicate: (entity: E) => boolean): ReadonlyLocation<E | undefined>"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.has",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "has",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(id: K): ReadonlyLocation<boolean>"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.ids",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "ids",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): K[]"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.intercept",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "intercept",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(handlers: InterceptHandlers<E, K>): () => void"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.prependMany",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "prependMany",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(entities: E[], opts?: AddManyOptions<E, K> | undefined): K[]"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.prependOne",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "prependOne",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(entity: E, opts?: AddOptions<E, K> | undefined): K"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.removeMany",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "removeMany",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(ids: K[], opts?: MutationOptions | undefined): void"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.removeOne",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "removeOne",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(id: K, opts?: MutationOptions | undefined): void"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.removeWhere",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "removeWhere",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(predicate: (entity: E) => boolean): number"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.replaceOne",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "replaceOne",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(id: K, entity: E, opts?: MutationOptions | undefined): void"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.setActiveId",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "setActiveId",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(id: K | undefined): void"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.setAll",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "setAll",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(entities: E[], opts?: AddOptions<E, K> | undefined): void"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.tap",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "tap",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(handlers: TapHandlers<E, K>): () => void"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.updateMany",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "updateMany",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(ids: K[], changes: Partial<E>, opts?: MutationOptions | undefined): void"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.updateOne",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "updateOne",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(id: K, changes: Partial<E>, opts?: MutationOptions | undefined): void"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.updateWhere",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "updateWhere",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(predicate: (entity: E) => boolean, changes: Partial<E>): number"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.upsertMany",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "upsertMany",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(entities: E[], opts?: AddOptions<E, K> | undefined): K[]"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.upsertOne",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "upsertOne",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(entity: E, opts?: AddOptions<E, K> | undefined): K"
+      ]
     },
     {
       "id": "kernel:EntitySignalWithSlices.where",
       "pkg": "kernel",
       "owner": "EntitySignalWithSlices",
       "name": "where",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(predicate: (entity: E) => boolean): ReadonlyLocation<E[]>"
+      ]
     },
     {
       "id": "kernel:Link.dispose",
       "pkg": "kernel",
       "owner": "Link",
       "name": "dispose",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): void"
+      ]
     },
     {
       "id": "kernel:Link.retrieve",
       "pkg": "kernel",
       "owner": "Link",
       "name": "retrieve",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): Promise<void>"
+      ]
     },
     {
       "id": "kernel:Link.settled",
       "pkg": "kernel",
       "owner": "Link",
       "name": "settled",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): Promise<void>"
+      ]
     },
     {
       "id": "kernel:LinkEndpoint.get",
       "pkg": "kernel",
       "owner": "LinkEndpoint",
       "name": "get",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": []
     },
     {
       "id": "kernel:LinkEndpoint.set",
       "pkg": "kernel",
       "owner": "LinkEndpoint",
       "name": "set",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": []
     },
     {
       "id": "kernel:LinkEndpoint.subscribe",
       "pkg": "kernel",
       "owner": "LinkEndpoint",
       "name": "subscribe",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": []
+    },
+    {
+      "id": "kernel:Location",
+      "pkg": "kernel",
+      "owner": "Location",
+      "name": "(call)",
+      "memberKind": "callable-type",
+      "signatures": [
+        "(): T",
+        "(): T",
+        "(update: (current: T) => T): void",
+        "(value: LeafDefinition<Extract<T, CallableSyntax>>): void",
+        "(value: NonCallableValue<T>): void"
+      ]
     },
     {
       "id": "kernel:Location.asReadonly",
       "pkg": "kernel",
       "owner": "Location",
       "name": "asReadonly",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): ReadonlyLocation<T>"
+      ]
     },
     {
       "id": "kernel:Location.peek",
       "pkg": "kernel",
       "owner": "Location",
       "name": "peek",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): T"
+      ]
     },
     {
       "id": "kernel:Location.subscribe",
       "pkg": "kernel",
       "owner": "Location",
       "name": "subscribe",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(listener: () => void): () => void"
+      ]
+    },
+    {
+      "id": "kernel:NodeAccessor",
+      "pkg": "kernel",
+      "owner": "NodeAccessor",
+      "name": "(call)",
+      "memberKind": "callable-type",
+      "signatures": [
+        "(): T",
+        "(updater: (current: T) => T): void",
+        "(value: T): void"
+      ]
     },
     {
       "id": "kernel:PendingTransaction.confirm",
       "pkg": "kernel",
       "owner": "PendingTransaction",
       "name": "confirm",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): void"
+      ]
     },
     {
       "id": "kernel:PendingTransaction.rollback",
       "pkg": "kernel",
       "owner": "PendingTransaction",
       "name": "rollback",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): void"
+      ]
     },
     {
       "id": "kernel:Proposal.accept",
       "pkg": "kernel",
       "owner": "Proposal",
       "name": "accept",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): ProposalInspection"
+      ]
     },
     {
       "id": "kernel:Proposal.inspect",
       "pkg": "kernel",
       "owner": "Proposal",
       "name": "inspect",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): ProposalInspection"
+      ]
     },
     {
       "id": "kernel:Proposal.reject",
       "pkg": "kernel",
       "owner": "Proposal",
       "name": "reject",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): void"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.__@iterator@11",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "__@iterator@11",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): StringIterator<string>"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.anchor",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "anchor",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(name: string): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.at",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "at",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(index: number): string | undefined"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.big",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "big",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.blink",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "blink",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.bold",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "bold",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.charAt",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "charAt",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(pos: number): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.charCodeAt",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "charCodeAt",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(index: number): number"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.codePointAt",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "codePointAt",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(pos: number): number | undefined"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.concat",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "concat",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(...strings: string[]): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.endsWith",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "endsWith",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(searchString: string, endPosition?: number | undefined): boolean"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.fixed",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "fixed",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.fontcolor",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "fontcolor",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(color: string): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.fontsize",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "fontsize",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(size: number): string",
+        "(size: string): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.includes",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "includes",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(searchString: string, position?: number | undefined): boolean"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.indexOf",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "indexOf",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(searchString: string, position?: number | undefined): number"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.italics",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "italics",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.lastIndexOf",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "lastIndexOf",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(searchString: string, position?: number | undefined): number"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.link",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "link",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(url: string): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.localeCompare",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "localeCompare",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(that: string): number",
+        "(that: string, locales?: LocalesArgument, options?: CollatorOptions | undefined): number",
+        "(that: string, locales?: string | string[] | undefined, options?: CollatorOptions | undefined): number"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.match",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "match",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(matcher: { [Symbol.match](string: string): RegExpMatchArray | null; }): RegExpMatchArray | null",
+        "(regexp: string | RegExp): RegExpMatchArray | null"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.matchAll",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "matchAll",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(regexp: RegExp): RegExpStringIterator<RegExpExecArray>"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.normalize",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "normalize",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(form: \"NFC\" | \"NFD\" | \"NFKC\" | \"NFKD\"): string",
+        "(form?: string | undefined): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.padEnd",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "padEnd",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(maxLength: number, fillString?: string | undefined): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.padStart",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "padStart",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(maxLength: number, fillString?: string | undefined): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.repeat",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "repeat",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(count: number): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.replace",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "replace",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(searchValue: string | RegExp, replaceValue: string): string",
+        "(searchValue: string | RegExp, replacer: (substring: string, ...args: any[]) => string): string",
+        "(searchValue: { [Symbol.replace](string: string, replaceValue: string): string; }, replaceValue: string): string",
+        "(searchValue: { [Symbol.replace](string: string, replacer: (substring: string, ...args: any[]) => string): string; }, replacer: (substring: string, ...args: any[]) => string): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.replaceAll",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "replaceAll",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(searchValue: string | RegExp, replaceValue: string): string",
+        "(searchValue: string | RegExp, replacer: (substring: string, ...args: any[]) => string): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.search",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "search",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(regexp: string | RegExp): number",
+        "(searcher: { [Symbol.search](string: string): number; }): number"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.slice",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "slice",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(start?: number | undefined, end?: number | undefined): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.small",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "small",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.split",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "split",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(separator: string | RegExp, limit?: number | undefined): string[]",
+        "(splitter: { [Symbol.split](string: string, limit?: number | undefined): string[]; }, limit?: number | undefined): string[]"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.startsWith",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "startsWith",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(searchString: string, position?: number | undefined): boolean"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.strike",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "strike",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.sub",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "sub",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.substr",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "substr",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(from: number, length?: number | undefined): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.substring",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "substring",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(start: number, end?: number | undefined): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.sup",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "sup",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.toLocaleLowerCase",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "toLocaleLowerCase",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(locales?: LocalesArgument): string",
+        "(locales?: string | string[] | undefined): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.toLocaleUpperCase",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "toLocaleUpperCase",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(locales?: LocalesArgument): string",
+        "(locales?: string | string[] | undefined): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.toLowerCase",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "toLowerCase",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.toString",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "toString",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.toUpperCase",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "toUpperCase",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.trim",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "trim",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.trimEnd",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "trimEnd",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.trimLeft",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "trimLeft",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.trimRight",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "trimRight",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.trimStart",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "trimStart",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:ProposalStatus.valueOf",
       "pkg": "kernel",
       "owner": "ProposalStatus",
       "name": "valueOf",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ReadonlyLocation",
+      "pkg": "kernel",
+      "owner": "ReadonlyLocation",
+      "name": "(call)",
+      "memberKind": "callable-type",
+      "signatures": [
+        "(): T"
+      ]
     },
     {
       "id": "kernel:ReadonlyLocation.peek",
       "pkg": "kernel",
       "owner": "ReadonlyLocation",
       "name": "peek",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): T"
+      ]
     },
     {
       "id": "kernel:ReadonlyLocation.subscribe",
       "pkg": "kernel",
       "owner": "ReadonlyLocation",
       "name": "subscribe",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(listener: () => void): () => void"
+      ]
     },
     {
       "id": "kernel:ReadonlyStore.$",
       "pkg": "kernel",
       "owner": "ReadonlyStore",
       "name": "$",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): TSource"
+      ]
     },
     {
       "id": "kernel:ReadonlyStore.destroy",
       "pkg": "kernel",
       "owner": "ReadonlyStore",
       "name": "destroy",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): void"
+      ]
     },
     {
       "id": "kernel:ReadonlyStore.destroyed",
       "pkg": "kernel",
       "owner": "ReadonlyStore",
       "name": "destroyed",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): boolean"
+      ]
     },
     {
       "id": "kernel:RestorationMethods.canRedo",
       "pkg": "kernel",
       "owner": "RestorationMethods",
       "name": "canRedo",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): boolean"
+      ]
     },
     {
       "id": "kernel:RestorationMethods.canUndo",
       "pkg": "kernel",
       "owner": "RestorationMethods",
       "name": "canUndo",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): boolean"
+      ]
     },
     {
       "id": "kernel:RestorationMethods.getCurrentIndex",
       "pkg": "kernel",
       "owner": "RestorationMethods",
       "name": "getCurrentIndex",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): number"
+      ]
     },
     {
       "id": "kernel:RestorationMethods.getRestorationHistory",
       "pkg": "kernel",
       "owner": "RestorationMethods",
       "name": "getRestorationHistory",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): RestorationHistoryEntry<never>[]"
+      ]
     },
     {
       "id": "kernel:RestorationMethods.jumpTo",
       "pkg": "kernel",
       "owner": "RestorationMethods",
       "name": "jumpTo",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(index: number): void"
+      ]
     },
     {
       "id": "kernel:RestorationMethods.redo",
       "pkg": "kernel",
       "owner": "RestorationMethods",
       "name": "redo",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): void"
+      ]
     },
     {
       "id": "kernel:RestorationMethods.resetRestorationHistory",
       "pkg": "kernel",
       "owner": "RestorationMethods",
       "name": "resetRestorationHistory",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): void"
+      ]
     },
     {
       "id": "kernel:RestorationMethods.undo",
       "pkg": "kernel",
       "owner": "RestorationMethods",
       "name": "undo",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): void"
+      ]
     },
     {
       "id": "kernel:SignalTree.$",
       "pkg": "kernel",
       "owner": "SignalTree",
       "name": "$",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): T",
+        "(updater: (current: T) => T): void",
+        "(value: T): void"
+      ]
     },
     {
       "id": "kernel:SignalTree.destroy",
       "pkg": "kernel",
       "owner": "SignalTree",
       "name": "destroy",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): void"
+      ]
     },
     {
       "id": "kernel:SignalTree.destroyed",
       "pkg": "kernel",
       "owner": "SignalTree",
       "name": "destroyed",
-      "memberKind": "callable-property"
+      "memberKind": "callable-property",
+      "signatures": [
+        "(): boolean"
+      ]
     },
     {
       "id": "kernel:SignalTree.registerCleanup",
       "pkg": "kernel",
       "owner": "SignalTree",
       "name": "registerCleanup",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(fn: EnhancerCleanup): void"
+      ]
     },
     {
       "id": "kernel:SignalTree.updateAndReport",
       "pkg": "kernel",
       "owner": "SignalTree",
       "name": "updateAndReport",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(updates: Partial<T> | ((current: T) => Partial<T>)): string[]"
+      ]
     },
     {
       "id": "kernel:TransactionMethods.propose",
       "pkg": "kernel",
       "owner": "TransactionMethods",
       "name": "propose",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(fn: () => void): Proposal"
+      ]
     },
     {
       "id": "kernel:TransactionMethods.transact",
       "pkg": "kernel",
       "owner": "TransactionMethods",
       "name": "transact",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(fn: () => void): PendingTransaction"
+      ]
     },
     {
       "id": "kernel:TreeCapability.__@iterator@11",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "__@iterator@11",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): StringIterator<string>"
+      ]
     },
     {
       "id": "kernel:TreeCapability.anchor",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "anchor",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(name: string): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.at",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "at",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(index: number): string | undefined"
+      ]
     },
     {
       "id": "kernel:TreeCapability.big",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "big",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.blink",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "blink",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.bold",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "bold",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.charAt",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "charAt",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(pos: number): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.charCodeAt",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "charCodeAt",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(index: number): number"
+      ]
     },
     {
       "id": "kernel:TreeCapability.codePointAt",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "codePointAt",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(pos: number): number | undefined"
+      ]
     },
     {
       "id": "kernel:TreeCapability.concat",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "concat",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(...strings: string[]): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.endsWith",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "endsWith",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(searchString: string, endPosition?: number | undefined): boolean"
+      ]
     },
     {
       "id": "kernel:TreeCapability.fixed",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "fixed",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.fontcolor",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "fontcolor",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(color: string): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.fontsize",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "fontsize",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(size: number): string",
+        "(size: string): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.includes",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "includes",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(searchString: string, position?: number | undefined): boolean"
+      ]
     },
     {
       "id": "kernel:TreeCapability.indexOf",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "indexOf",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(searchString: string, position?: number | undefined): number"
+      ]
     },
     {
       "id": "kernel:TreeCapability.italics",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "italics",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.lastIndexOf",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "lastIndexOf",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(searchString: string, position?: number | undefined): number"
+      ]
     },
     {
       "id": "kernel:TreeCapability.link",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "link",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(url: string): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.localeCompare",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "localeCompare",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(that: string): number",
+        "(that: string, locales?: LocalesArgument, options?: CollatorOptions | undefined): number",
+        "(that: string, locales?: string | string[] | undefined, options?: CollatorOptions | undefined): number"
+      ]
     },
     {
       "id": "kernel:TreeCapability.match",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "match",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(matcher: { [Symbol.match](string: string): RegExpMatchArray | null; }): RegExpMatchArray | null",
+        "(regexp: string | RegExp): RegExpMatchArray | null"
+      ]
     },
     {
       "id": "kernel:TreeCapability.matchAll",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "matchAll",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(regexp: RegExp): RegExpStringIterator<RegExpExecArray>"
+      ]
     },
     {
       "id": "kernel:TreeCapability.normalize",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "normalize",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(form: \"NFC\" | \"NFD\" | \"NFKC\" | \"NFKD\"): string",
+        "(form?: string | undefined): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.padEnd",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "padEnd",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(maxLength: number, fillString?: string | undefined): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.padStart",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "padStart",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(maxLength: number, fillString?: string | undefined): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.repeat",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "repeat",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(count: number): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.replace",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "replace",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(searchValue: string | RegExp, replaceValue: string): string",
+        "(searchValue: string | RegExp, replacer: (substring: string, ...args: any[]) => string): string",
+        "(searchValue: { [Symbol.replace](string: string, replaceValue: string): string; }, replaceValue: string): string",
+        "(searchValue: { [Symbol.replace](string: string, replacer: (substring: string, ...args: any[]) => string): string; }, replacer: (substring: string, ...args: any[]) => string): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.replaceAll",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "replaceAll",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(searchValue: string | RegExp, replaceValue: string): string",
+        "(searchValue: string | RegExp, replacer: (substring: string, ...args: any[]) => string): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.search",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "search",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(regexp: string | RegExp): number",
+        "(searcher: { [Symbol.search](string: string): number; }): number"
+      ]
     },
     {
       "id": "kernel:TreeCapability.slice",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "slice",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(start?: number | undefined, end?: number | undefined): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.small",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "small",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.split",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "split",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(separator: string | RegExp, limit?: number | undefined): string[]",
+        "(splitter: { [Symbol.split](string: string, limit?: number | undefined): string[]; }, limit?: number | undefined): string[]"
+      ]
     },
     {
       "id": "kernel:TreeCapability.startsWith",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "startsWith",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(searchString: string, position?: number | undefined): boolean"
+      ]
     },
     {
       "id": "kernel:TreeCapability.strike",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "strike",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.sub",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "sub",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.substr",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "substr",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(from: number, length?: number | undefined): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.substring",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "substring",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(start: number, end?: number | undefined): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.sup",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "sup",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.toLocaleLowerCase",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "toLocaleLowerCase",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(locales?: LocalesArgument): string",
+        "(locales?: string | string[] | undefined): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.toLocaleUpperCase",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "toLocaleUpperCase",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(locales?: LocalesArgument): string",
+        "(locales?: string | string[] | undefined): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.toLowerCase",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "toLowerCase",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.toString",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "toString",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.toUpperCase",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "toUpperCase",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.trim",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "trim",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.trimEnd",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "trimEnd",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.trimLeft",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "trimLeft",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.trimRight",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "trimRight",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.trimStart",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "trimStart",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeCapability.valueOf",
       "pkg": "kernel",
       "owner": "TreeCapability",
       "name": "valueOf",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
     },
     {
       "id": "kernel:TreeId.toExponential",
       "pkg": "kernel",
       "owner": "TreeId",
       "name": "toExponential",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(fractionDigits?: number | undefined): string"
+      ]
     },
     {
       "id": "kernel:TreeId.toFixed",
       "pkg": "kernel",
       "owner": "TreeId",
       "name": "toFixed",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(fractionDigits?: number | undefined): string"
+      ]
     },
     {
       "id": "kernel:TreeId.toLocaleString",
       "pkg": "kernel",
       "owner": "TreeId",
       "name": "toLocaleString",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(locales?: LocalesArgument, options?: NumberFormatOptions | undefined): string",
+        "(locales?: string | string[] | undefined, options?: NumberFormatOptions | undefined): string"
+      ]
     },
     {
       "id": "kernel:TreeId.toPrecision",
       "pkg": "kernel",
       "owner": "TreeId",
       "name": "toPrecision",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(precision?: number | undefined): string"
+      ]
     },
     {
       "id": "kernel:TreeId.toString",
       "pkg": "kernel",
       "owner": "TreeId",
       "name": "toString",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(radix?: number | undefined): string"
+      ]
     },
     {
       "id": "kernel:TreeId.valueOf",
       "pkg": "kernel",
       "owner": "TreeId",
       "name": "valueOf",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): number"
+      ]
+    },
+    {
+      "id": "kernel:WritableLeaf",
+      "pkg": "kernel",
+      "owner": "WritableLeaf",
+      "name": "(call)",
+      "memberKind": "callable-type",
+      "signatures": [
+        "(): T",
+        "(): T",
+        "(update: (current: T) => T): void",
+        "(value: LeafDefinition<Extract<T, CallableSyntax>>): void",
+        "(value: NonCallableValue<T>): void"
+      ]
     },
     {
       "id": "kernel:WritableLeaf.asReadonly",
       "pkg": "kernel",
       "owner": "WritableLeaf",
       "name": "asReadonly",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): ReadonlyLocation<T>"
+      ]
     },
     {
       "id": "kernel:WritableLeaf.peek",
       "pkg": "kernel",
       "owner": "WritableLeaf",
       "name": "peek",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(): T"
+      ]
     },
     {
       "id": "kernel:WritableLeaf.subscribe",
       "pkg": "kernel",
       "owner": "WritableLeaf",
       "name": "subscribe",
-      "memberKind": "method"
+      "memberKind": "method",
+      "signatures": [
+        "(listener: () => void): () => void"
+      ]
     },
     {
       "id": "kernel:root.asReadonly",
       "pkg": "kernel",
       "owner": "root",
       "name": "asReadonly",
-      "memberKind": "function"
+      "memberKind": "function",
+      "signatures": [
+        "<TSource, TAccum, C extends CarrierKind = \"location\">(tree: ISignalTreeOf<TSource, C, TAccum>): ReadonlyStoreOf<TSource, TAccum, C>"
+      ]
     },
     {
       "id": "kernel:root.batching",
       "pkg": "kernel",
       "owner": "root",
       "name": "batching",
-      "memberKind": "function"
+      "memberKind": "function",
+      "signatures": [
+        "(config?: BatchingConfig | undefined): Enhancer<BatchingMethods>"
+      ]
     },
     {
       "id": "kernel:root.devTools",
       "pkg": "kernel",
       "owner": "root",
       "name": "devTools",
-      "memberKind": "function"
+      "memberKind": "function",
+      "signatures": [
+        "(config?: DevToolsConfig | undefined): Enhancer<DevToolsMethods>"
+      ]
     },
     {
       "id": "kernel:root.entityMap",
       "pkg": "kernel",
       "owner": "root",
       "name": "entityMap",
-      "memberKind": "function"
+      "memberKind": "function",
+      "signatures": [
+        "<E, K extends string | number = DefaultKey<E>>(config?: EntityConfig<E, K> | undefined): EntityMapBuilder<E, K, Record<string, never>>"
+      ]
     },
     {
       "id": "kernel:root.external",
       "pkg": "kernel",
       "owner": "root",
       "name": "external",
-      "memberKind": "function"
+      "memberKind": "function",
+      "signatures": [
+        "<R>(operation: () => R): R"
+      ]
     },
     {
       "id": "kernel:root.leaf",
       "pkg": "kernel",
       "owner": "root",
       "name": "leaf",
-      "memberKind": "function"
+      "memberKind": "function",
+      "signatures": [
+        "<T>(value: T): LeafDefinition<T>"
+      ]
     },
     {
       "id": "kernel:root.link",
       "pkg": "kernel",
       "owner": "root",
       "name": "link",
-      "memberKind": "function"
+      "memberKind": "function",
+      "signatures": [
+        "<S>(source: TruthfulLinkSource<S>, endpoint: LinkEndpoint<NaturalValue<S>>): Link"
+      ]
     },
     {
       "id": "kernel:root.onTreeError",
       "pkg": "kernel",
       "owner": "root",
       "name": "onTreeError",
-      "memberKind": "function"
+      "memberKind": "function",
+      "signatures": [
+        "(listener: (event: TreeErrorEvent) => void): () => void"
+      ]
     },
     {
       "id": "kernel:root.restoration",
       "pkg": "kernel",
       "owner": "root",
       "name": "restoration",
-      "memberKind": "function"
+      "memberKind": "function",
+      "signatures": [
+        "(config?: RestorationConfig | undefined): Enhancer<RestorationMethods>"
+      ]
     },
     {
       "id": "kernel:root.signalTree",
       "pkg": "kernel",
       "owner": "root",
       "name": "signalTree",
-      "memberKind": "function"
+      "memberKind": "function",
+      "signatures": [
+        "<T extends object, TDerived extends object, const E extends readonly Enhancer<unknown>[] = readonly Enhancer<unknown>[]>(initialState: T & NoInfer<T>, config: Omit<TreeConfig, \"enhancers\" | \"derived\"> & { ...; }): ISignalTreeOf<...> & UnionToIntersection<...>",
+        "<T extends object, const E extends readonly Enhancer<unknown>[]>(initialState: T & NoInfer<T>, config: Omit<TreeConfig, \"enhancers\" | \"derived\"> & { enhancers: E; derived?: undefined; }): ISignalTreeOf<...> & UnionToIntersection<...>",
+        "<T extends object>(initialState: T & NoInfer<T>, config?: (Omit<TreeConfig, \"enhancers\" | \"derived\"> & { enhancers?: undefined; derived?: undefined; }) | undefined): ISignalTreeOf<...>"
+      ]
     },
     {
       "id": "kernel:root.transactions",
       "pkg": "kernel",
       "owner": "root",
       "name": "transactions",
-      "memberKind": "function"
+      "memberKind": "function",
+      "signatures": [
+        "(): Enhancer<TransactionMethods>"
+      ]
     },
     {
       "id": "kernel:root.undoable",
       "pkg": "kernel",
       "owner": "root",
       "name": "undoable",
-      "memberKind": "function"
+      "memberKind": "function",
+      "signatures": [
+        "<R>(operation: () => R): R"
+      ]
     }
   ]
 }
