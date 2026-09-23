@@ -31,7 +31,13 @@ test. Every one must turn at least one test RED.
     M16  a confirmed/realized write fails to advance semantic
          precedence                                                  <- L11
 
-M11..M16 attack the laws added after the first draft, which is the point: the
+    M17  treat ARRIVAL order as authority order                      <- L12
+    M18  publish a half-state partway through settlement             <- L13
+    M19  a second call on a successfully settled unit mutates state   <- L14
+    M20  a failed settlement reports terminal success                 <- L14 R6
+    M21  invent an ordering when no authority evidence exists         <- L12 T22
+
+M11..M21 attack the laws added after the first draft, which is the point: the
 mutation set has to grow whenever a law does, or the new laws are untested
 assertions.
 
