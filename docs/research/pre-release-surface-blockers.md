@@ -71,8 +71,9 @@ was decided by which runtime mode each median drew. Replaced by an absolute
 40 MB ceiling on the non-retaining arm, mutation-proven in the SAME arm with
 deliberate retention, and **renamed** — it no longer judges a slope.
 
-**Validated on the release environment**, run `35886271808`, ubuntu-latest,
-linux/x64:
+**Validated on the release environment**, run `35886271808`, head SHA
+`f8f815053a1b7722d2389bddb088100135880733`, ubuntu-latest, linux/x64,
+Node v24.15.0, V8 13.6.233.17-node.48:
 
 ```text
 control  n=30  retain=0        3.23 - 3.24 MB
@@ -81,8 +82,11 @@ gap 79.51 MB, no overlap
 ```
 
 The threshold was derived on darwin/arm64 and Linux left it untouched, so this
-is genuine independent validation. Also learned: the bimodality is
-macOS-specific — Linux control is unimodal, 28 of 30 samples identical.
+is genuine independent validation. Also observed: the multimodality seen on the
+darwin/arm64 development environment was ABSENT on the sampled release runner,
+where control is unimodal with 28 of 30 samples identical. Not attributed to
+macOS — the two environments differ in OS, architecture, allocator, runner
+image and host, and nothing here isolates which.
 
 Honest sensitivity: reliably detects >= ~10,000 deliberately retained
 retired-node HANDLES. Handles rather than subjects, because a 1:1
@@ -93,6 +97,21 @@ handle-to-SubjectId relationship was not separately proven.
 React does not physically realize pending-turn state — measured with raw
 `transaction()`, so it is not a Proposal defect. Angular, Vue and Solid pass
 the same conformance contract 7/7.
+
+## How a red gate is resolved
+
+> **Each gate has an authoritative environment and a preregistered measurement
+> contract. A red gate is resolved according to THAT gate's methodology.**
+
+Recorded because the obvious wrong lesson from
+RETIRED-SUBJECT-SLOPE-STABILITY-0 is "memory gates are flaky locally, check
+Linux before believing them". That converts one measured, gate-specific
+discovery into a blanket excuse for red memory gates, which is how a real
+regression gets waved through.
+
+The finding was narrow: ONE benchmark's control distribution differed between
+a development and a release environment. It says nothing about any other gate.
+If a different retention-adjacent gate goes red, investigate that gate.
 
 ## Permanent engineering rule from this episode
 
