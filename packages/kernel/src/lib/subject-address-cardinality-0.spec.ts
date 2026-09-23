@@ -108,14 +108,25 @@ type Rows = {
   updateOne(id: string, patch: Partial<Row>): void;
   changeId(from: string, to: string): void;
   byIdOrFail(id: string): {
-    name: { (value: string): void; (update: (current: string) => string): void; (): string };
-    enabled: { (value: boolean): void; (update: (current: boolean) => boolean): void; (): boolean };
+    name: {
+      (value: string): void;
+      (update: (current: string) => string): void;
+      (): string;
+    };
+    enabled: {
+      (value: boolean): void;
+      (update: (current: boolean) => boolean): void;
+      (): boolean;
+    };
   };
   ids(): string[];
 };
 
 const topTree = () =>
-  signalTree({ rows: em() }, { enhancers: [restoration(), transactions()] }) as unknown as {
+  signalTree(
+    { rows: em() },
+    { enhancers: [restoration(), transactions()] }
+  ) as unknown as {
     $: { rows: Rows };
     transaction: (fn: () => void) => { rollback(): void; confirm(): void };
   };
@@ -139,7 +150,7 @@ describe('SUBJECT-ADDRESS-CARDINALITY-0: two coordinates, one slot', () => {
     tree.$.rows.addOne({ id: 'r1', name: 'before', enabled: false });
     await flush();
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.rows.byIdOrFail('r1').name('after');
       tree.$.rows.byIdOrFail('r1').enabled(true);
     });
@@ -169,7 +180,7 @@ describe('SUBJECT-ADDRESS-CARDINALITY-0: two coordinates, one slot', () => {
     tree.$.rows.addOne({ id: 'r1', name: 'before', enabled: false });
     await flush();
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.rows.byIdOrFail('r1').enabled(true);
       tree.$.rows.byIdOrFail('r1').name('after');
     });
@@ -188,7 +199,7 @@ describe('SUBJECT-ADDRESS-CARDINALITY-0: two coordinates, one slot', () => {
     tree.$.rows.addOne({ id: 'r1', name: 'before', enabled: false });
     await flush();
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.rows.byIdOrFail('r1').name('after');
       tree.$.rows.changeId('r1', 'r9');
       tree.$.rows.byIdOrFail('r9').enabled(true);

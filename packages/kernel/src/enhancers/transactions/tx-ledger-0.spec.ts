@@ -48,7 +48,7 @@ describe('TX-LEDGER-0 case 6: rollback safety without restoration()', () => {
     );
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -74,7 +74,7 @@ describe('TX-LEDGER-0 case 6: rollback safety without restoration()', () => {
     );
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -108,7 +108,7 @@ describe('TX-LEDGER-0 case 6: rollback safety without restoration()', () => {
     );
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();

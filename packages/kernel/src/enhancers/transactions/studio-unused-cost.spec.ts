@@ -14,7 +14,9 @@ import { transactions } from './transactions';
 type Cart = { total: number };
 
 const cart = () =>
-  signalTree({ total: 0 } as Cart, { enhancers: [transactions()] }) as never as {
+  signalTree({ total: 0 } as Cart, {
+    enhancers: [transactions()],
+  }) as never as {
     $: Record<string, (v?: unknown) => unknown>;
     transaction(fn: () => void): { confirm(): void };
   };
@@ -42,13 +44,13 @@ describe('Studio costs nothing when unused', () => {
   it('4/5. no Studio branch scales with writes, and none is reachable', () => {
     const tree = cart();
     // Writes are unaffected by whether a reader was ever created.
-    tree.transaction(() => tree.$['total'](1)).confirm();
+    tree.transact(() => tree.$['total'](1)).confirm();
     const withoutReader = tree.$['total']();
 
     const reader = confirmedTurnReader(tree as never);
     expect(reader).toBeDefined();
 
-    tree.transaction(() => tree.$['total'](2)).confirm();
+    tree.transact(() => tree.$['total'](2)).confirm();
     expect(tree.$['total']()).toBe(2);
     expect(withoutReader).toBe(1);
   });
@@ -63,7 +65,7 @@ describe('Studio costs nothing when unused', () => {
     // no turn — correct kernel behaviour, and a fixture that ignored it made
     // this assertion fail for the wrong reason.
     for (let i = 1; i <= 5; i++) {
-      tree.transaction(() => tree.$['total'](i)).confirm();
+      tree.transact(() => tree.$['total'](i)).confirm();
     }
 
     const first = confirmedTurnReader(tree as never)?.readConfirmedTurns();
@@ -72,12 +74,14 @@ describe('Studio costs nothing when unused', () => {
     expect(first?.turns).toHaveLength(5);
     expect(second?.turns).toHaveLength(5);
     // Reading twice must not duplicate, accumulate or mutate.
-    expect(second?.turns.map((t) => t.id)).toEqual(first?.turns.map((t) => t.id));
+    expect(second?.turns.map((t) => t.id)).toEqual(
+      first?.turns.map((t) => t.id)
+    );
   });
 
   it('8. enabling is explicit and disposable', () => {
     const tree = cart();
-    tree.transaction(() => tree.$['total'](1)).confirm();
+    tree.transact(() => tree.$['total'](1)).confirm();
 
     // Nothing is installed by construction; a reader is created on request and
     // holds no registration that would need tearing down.

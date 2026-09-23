@@ -5,7 +5,10 @@ import { transactions } from '../transactions/transactions';
 import { persistence } from './serialization';
 import type { StorageAdapter } from './storage-adapters';
 
-const settle = async () => { await Promise.resolve(); await new Promise(r => setTimeout(r, 350)); };
+const settle = async () => {
+  await Promise.resolve();
+  await new Promise((r) => setTimeout(r, 350));
+};
 /**
  * Seed by ROUND-TRIPPING a real `save()` rather than hand-writing the payload.
  * The first version invented a shape, `load()` silently ignored it, and the
@@ -41,7 +44,7 @@ async function realPayload(key: string, state: { prefs: { theme: string } }) {
 describe('PER-0: what IS a restore, causally?', () => {
   it('DIAGNOSTIC: what does a real save() actually write?', async () => {
     const raw = await realPayload('probe', { prefs: { theme: 'PERSISTED' } });
-    console.log(`PAYLOAD ${raw.replace(/\s+/g, " ").slice(0, 200)}`);
+    console.log(`PAYLOAD ${raw.replace(/\s+/g, ' ').slice(0, 200)}`);
     expect(typeof raw).toBe('string');
   });
 
@@ -50,7 +53,12 @@ describe('PER-0: what IS a restore, causally?', () => {
     const { adapter } = seeded('r1', JSON.parse(raw));
     const tree = signalTree(
       { prefs: { theme: 'default' } },
-      { enhancers: [restoration({ maxHistorySize: 20 }), persistence({ key: 'r1', storage: adapter, debounceMs: 0 })] }
+      {
+        enhancers: [
+          restoration({ maxHistorySize: 20 }),
+          persistence({ key: 'r1', storage: adapter, debounceMs: 0 }),
+        ],
+      }
     ) as any;
     await settle();
 
@@ -58,8 +66,14 @@ describe('PER-0: what IS a restore, causally?', () => {
     const len = tree.getRestorationHistory().length;
     const canUndo = tree.canUndo();
     let afterUndo = '(not attempted)';
-    if (canUndo) { tree.undo(); await settle(); afterUndo = tree.$.prefs.theme(); }
-    console.log(`RESTORE value=${restored} historyLen=${len} canUndo=${canUndo} afterUndo=${afterUndo}`);
+    if (canUndo) {
+      tree.undo();
+      await settle();
+      afterUndo = tree.$.prefs.theme();
+    }
+    console.log(
+      `RESTORE value=${restored} historyLen=${len} canUndo=${canUndo} afterUndo=${afterUndo}`
+    );
     expect(true).toBe(true);
   });
 
@@ -68,18 +82,36 @@ describe('PER-0: what IS a restore, causally?', () => {
     const { adapter } = seeded('r2', JSON.parse(raw));
     const tree = signalTree(
       { prefs: { theme: 'default' } },
-      { enhancers: [transactions(), persistence({ key: 'r2', storage: adapter, autoLoad: false, debounceMs: 0 })] }
+      {
+        enhancers: [
+          transactions(),
+          persistence({
+            key: 'r2',
+            storage: adapter,
+            autoLoad: false,
+            debounceMs: 0,
+          }),
+        ],
+      }
     ) as any;
     await settle();
 
-    const p = tree.transaction(() => { tree.$.prefs.theme('OPTIMISTIC'); });
+    const p = tree.transact(() => {
+      tree.$.prefs.theme('OPTIMISTIC');
+    });
     await tree.load();
     await settle();
     const afterLoad = tree.$.prefs.theme();
     let err = 'none';
-    try { p.rollback(); } catch (e) { err = (e as Error).message.replace(/\s+/g, ' ').slice(0, 80); }
+    try {
+      p.rollback();
+    } catch (e) {
+      err = (e as Error).message.replace(/\s+/g, ' ').slice(0, 80);
+    }
     await settle();
-    console.log(`LOAD-IN-TX afterLoad=${afterLoad} rollback="${err}" final=${tree.$.prefs.theme()}`);
+    console.log(
+      `LOAD-IN-TX afterLoad=${afterLoad} rollback="${err}" final=${tree.$.prefs.theme()}`
+    );
     expect(true).toBe(true);
   });
 });
@@ -97,15 +129,32 @@ describe('PER-0: is restore fixed by A1 ingress classification?', () => {
 
     const tree = signalTree(
       { prefs: { theme: 'default' } },
-      { enhancers: [restoration({ maxHistorySize: 20 }), persistence({ key: 'r3', storage: adapter, autoLoad: false, debounceMs: 0 })] }
+      {
+        enhancers: [
+          restoration({ maxHistorySize: 20 }),
+          persistence({
+            key: 'r3',
+            storage: adapter,
+            autoLoad: false,
+            debounceMs: 0,
+          }),
+        ],
+      }
     ) as any;
     await settle();
     const before = tree.getRestorationHistory().length;
 
-    await withWriteContext({ intent: 'system', participation: 'realized' }, () => tree.load());
+    await withWriteContext(
+      { intent: 'system', participation: 'realized' },
+      () => tree.load()
+    );
     await settle();
 
-    console.log(`RESTORE-AS-REALIZATION value=${tree.$.prefs.theme()} historyBefore=${before} after=${tree.getRestorationHistory().length} canUndo=${tree.canUndo()}`);
+    console.log(
+      `RESTORE-AS-REALIZATION value=${tree.$.prefs.theme()} historyBefore=${before} after=${
+        tree.getRestorationHistory().length
+      } canUndo=${tree.canUndo()}`
+    );
     expect(true).toBe(true);
   });
 });

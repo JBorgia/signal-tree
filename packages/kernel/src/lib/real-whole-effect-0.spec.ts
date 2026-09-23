@@ -87,14 +87,25 @@ type Rows = {
   upsertOne(r: Row): void;
   setAll(r: Row[]): void;
   byIdOrFail(id: string): {
-    name: { (value: string): void; (update: (current: string) => string): void; (): string };
-    n: { (value: number): void; (update: (current: number) => number): void; (): number };
+    name: {
+      (value: string): void;
+      (update: (current: string) => string): void;
+      (): string;
+    };
+    n: {
+      (value: number): void;
+      (update: (current: number) => number): void;
+      (): number;
+    };
   };
   ids(): string[];
 };
 
 const topTree = () =>
-  signalTree({ rows: em() }, { enhancers: [restoration(), transactions()] }) as unknown as {
+  signalTree(
+    { rows: em() },
+    { enhancers: [restoration(), transactions()] }
+  ) as unknown as {
     $: { rows: Rows };
     transaction: (fn: () => void) => { rollback(): void; confirm(): void };
   };
@@ -111,7 +122,7 @@ describe('REAL-WHOLE-EFFECT-0: whole-entity ops decompose into field effects', (
   it('upsertOne over an existing subject rolls back field-by-field', async () => {
     const tree = await seeded();
 
-    const p = tree.transaction(() =>
+    const p = tree.transact(() =>
       tree.$.rows.upsertOne({ id: 'r1', name: 'changed', n: 99 })
     );
     await flush();
@@ -131,7 +142,7 @@ describe('REAL-WHOLE-EFFECT-0: whole-entity ops decompose into field effects', (
   it('setAll replacing an existing subject also rolls back field-by-field', async () => {
     const tree = await seeded();
 
-    const p = tree.transaction(() =>
+    const p = tree.transact(() =>
       tree.$.rows.setAll([{ id: 'r1', name: 'changed', n: 99 }])
     );
     await flush();
@@ -149,7 +160,7 @@ describe('REAL-WHOLE-EFFECT-0: whole-entity ops decompose into field effects', (
     // The discriminator. If updateOne produced ONE whole-row effect, rolling it
     // back would restore the entire row and clobber this sibling write. It does
     // not, because the effects are per-field.
-    const p = tree.transaction(() => tree.$.rows.updateOne('r1', { n: 99 }));
+    const p = tree.transact(() => tree.$.rows.updateOne('r1', { n: 99 }));
     await flush();
     tree.$.rows.byIdOrFail('r1').name('written-outside');
     await flush();

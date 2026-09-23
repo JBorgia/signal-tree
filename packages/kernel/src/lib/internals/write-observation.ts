@@ -45,7 +45,18 @@ export function observeWrites(
 ): () => void {
   return getPathNotifier().subscribe(
     '**',
-    (next, prev, path, ownerPath, origin, subjectIds, positionIds, meta, declaredScopes, ownerId) => {
+    (
+      next,
+      prev,
+      path,
+      ownerPath,
+      origin,
+      subjectIds,
+      positionIds,
+      meta,
+      declaredScopes,
+      ownerId
+    ) => {
       const m = (meta ?? {}) as WriteMetadata;
       handler({
         ...(declaredScopes ? { declaredScopes } : {}),
@@ -57,7 +68,8 @@ export function observeWrites(
         participation: m.participation,
         // Ownership survives mixed metadata; it is independent of causal admission.
         ownerId: ownerId ?? m.ownerId,
-        transactionId: typeof m.transactionId === 'number' ? m.transactionId : undefined,
+        transactionId:
+          typeof m.transactionId === 'number' ? m.transactionId : undefined,
         subjectIds,
         positionIds,
       });

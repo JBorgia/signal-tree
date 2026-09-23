@@ -47,7 +47,7 @@ describe('TURN-FEED-0 case 1: pending isolation', () => {
     await flush();
     const before = tree.getRestorationHistory().length;
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -76,7 +76,7 @@ describe('TURN-FEED-0 case 2: confirmation', () => {
     // Designated: this case asserts the confirmed transaction becomes exactly
     // ONE admitted turn, which requires it to be admitted at all.
     const pending = undoable(() =>
-      tree.transaction(() => {
+      tree.transact(() => {
         tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       })
     );
@@ -100,7 +100,7 @@ describe('TURN-FEED-0 case 2: confirmation', () => {
     const before = turns(tree);
 
     tree
-      .transaction(() => {
+      .transact(() => {
         tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       })
       .confirm();
@@ -122,7 +122,7 @@ describe('TURN-FEED-0 case 2: confirmation', () => {
 
     undoable(() => {
       tree
-        .transaction(() => {
+        .transact(() => {
           tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
           tree.$.rows.addOne({ id: 'b', name: 'Beta' });
         })
@@ -146,7 +146,7 @@ describe('TURN-FEED-0 case 3: rollback', () => {
     await flush();
     const before = tree.getRestorationHistory().length;
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -161,8 +161,11 @@ describe('TURN-FEED-0 case 3: rollback', () => {
 describe('TURN-FEED-0 case 4: surrounding writes', () => {
   it('write / transaction / write stay distinct, with no contamination', async () => {
     const tree = signalTree(
-      { status: 'idle', other: 'before',
-        rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
+      {
+        status: 'idle',
+        other: 'before',
+        rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+      },
       { enhancers: [restoration({ maxHistorySize: 50 }), transactions()] }
     );
     await flush();
@@ -172,7 +175,7 @@ describe('TURN-FEED-0 case 4: surrounding writes', () => {
     // the absence of cross-bucket contamination between them.
     undoable(() => tree.$.status('queued-before'));
     const pending = undoable(() =>
-      tree.transaction(() => {
+      tree.transact(() => {
         tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       })
     );
@@ -201,14 +204,17 @@ describe('TURN-FEED-0 case 5: enhancer ordering', () => {
     await flush();
     const before = tree.getRestorationHistory().length;
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
     const whilePending = tree.getRestorationHistory().length - before;
     pending.confirm();
     await flush();
-    return { whilePending, afterConfirm: tree.getRestorationHistory().length - before };
+    return {
+      whilePending,
+      afterConfirm: tree.getRestorationHistory().length - before,
+    };
   };
 
   it('both orders behave identically', async () => {
@@ -226,7 +232,7 @@ describe('TURN-FEED-0 case 6: ownership independence', () => {
     );
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();

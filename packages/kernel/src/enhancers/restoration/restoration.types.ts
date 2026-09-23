@@ -2,9 +2,7 @@ import type { NodeAccessor } from '../../lib/node-accessor';
 import { Assert, Equals } from '../test-helpers/types-equals';
 import { restoration, RestorationConfig } from './restoration';
 
-import type {
-  Enhancer,
-} from '../../lib/types';
+import type { Enhancer } from '../../lib/types';
 
 /**
  * `restoration()` returns the NEUTRAL enhancer contract.
@@ -23,7 +21,9 @@ import type {
  * That is `restoration-contract.typing.spec.ts`, proven green BEFORE this
  * signature changed and re-run unchanged afterwards.
  */
-type ExpectedSignature = (config?: RestorationConfig) => Enhancer<RestorationMethods>;
+type ExpectedSignature = (
+  config?: RestorationConfig
+) => Enhancer<RestorationMethods>;
 
 type ActualSignature = typeof restoration;
 
@@ -32,7 +32,6 @@ type _ContractCheck = Assert<Equals<ActualSignature, ExpectedSignature>>;
 // .with() preserves accumulated types via `this & TAdded` pattern.
 
 export {};
-
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MOVED HERE IN 15.0 — TYPE-BARREL-CONVERGENCE-0.

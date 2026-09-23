@@ -38,7 +38,11 @@ type Rows = {
 type Store = {
   $: {
     rows: Rows;
-    n: { (value: number): void; (update: (current: number) => number): void; (): number };
+    n: {
+      (value: number): void;
+      (update: (current: number) => number): void;
+      (): number;
+    };
   };
   getRestorationHistory(): unknown[];
   canUndo(): boolean;
@@ -87,9 +91,10 @@ const run = async <R>(
 const runObserved = async <R>(
   body: (tree: Store) => Promise<R> | R,
   maxHistorySize = 50
-): Promise<{ result: R; observed: ReturnType<
-  ReturnType<typeof createDiagnosticJournal>['turns']
-> }> => {
+): Promise<{
+  result: R;
+  observed: ReturnType<ReturnType<typeof createDiagnosticJournal>['turns']>;
+}> => {
   const tree = makeTree(maxHistorySize);
   await flush();
   const journal = createDiagnosticJournal(tree as unknown as object, {
@@ -134,7 +139,9 @@ describe('DIAG-JOURNAL-1 F3: the journal grants zero restoration rights', () => 
 
     // CONTROL: the journal saw the writes whose restoration facts were compared.
     expect(observed.length).toBeGreaterThan(0);
-    expect(observedPaths(observed).some((p) => p.startsWith('rows'))).toBe(true);
+    expect(observedPaths(observed).some((p) => p.startsWith('rows'))).toBe(
+      true
+    );
     expect(observedPaths(observed)).toContain('n');
   });
 
@@ -182,7 +189,7 @@ describe('DIAG-JOURNAL-1 F4: the journal acquires no SignalTree ownership', () =
     undoable(() => tree.$.rows.removeOne('a'));
     await flush();
 
-    const pending = tree.transaction(() =>
+    const pending = tree.transact(() =>
       tree.$.rows.addOne({ id: 'b', name: 'Beta' })
     );
     await flush();
@@ -285,7 +292,7 @@ describe('DIAG-JOURNAL-1 F4b: disposal ends observation and changes nothing', ()
     expect(journal.turns()).toEqual([]);
     undoable(() => tree.$.rows.addOne({ id: 'b', name: 'Beta' }));
     await flush();
-    const pending = tree.transaction(() => tree.$.n(5));
+    const pending = tree.transact(() => tree.$.n(5));
     await flush();
     pending.rollback();
     await flush();

@@ -275,7 +275,7 @@ function read(node: unknown): SubjectRestorationClaims | undefined {
   if (!isTraversableNode(node)) {
     return undefined;
   }
-  return (
-    node as Record<symbol, SubjectRestorationClaims | undefined>
-  )[SUBJECT_RESTORATION_CLAIMS_SYMBOL];
+  return (node as Record<symbol, SubjectRestorationClaims | undefined>)[
+    SUBJECT_RESTORATION_CLAIMS_SYMBOL
+  ];
 }

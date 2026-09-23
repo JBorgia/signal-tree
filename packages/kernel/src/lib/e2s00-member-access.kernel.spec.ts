@@ -257,7 +257,8 @@ describe('E2-S00-D — same membership, new value', () => {
     const evolve = addressCollection([{ id: 'k', n: 111 }]);
     const capturedEvolve = evolve.at('k');
     evolve.patch('k', { n: 112 }); // SAME member, new value
-    const evolveVerdict = evolve.at('k') !== capturedEvolve ? 'STALE' : 'APPLIED';
+    const evolveVerdict =
+      evolve.at('k') !== capturedEvolve ? 'STALE' : 'APPLIED';
 
     const reuse = addressCollection([{ id: 'k', n: 111 }]);
     const capturedReuse = reuse.at('k');

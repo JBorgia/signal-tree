@@ -11,8 +11,10 @@
 
 import { getActiveWriteContext } from './write-context';
 import {
-  currentWriteObservationScopes, mergeWriteObservationScopes,
-  withoutWriteObservationScopes, type DeclaredWriteScopes,
+  currentWriteObservationScopes,
+  mergeWriteObservationScopes,
+  withoutWriteObservationScopes,
+  type DeclaredWriteScopes,
 } from './internals/write-observation-scope';
 import {
   isRestorationDesignated,
@@ -90,12 +92,10 @@ export class PathNotifier {
   // Map of pattern -> Set of handlers
   private subscribers = new Map<string, Set<PathNotifierHandler>>();
 
-
   // Batching state
   private resetCallbacks = new Set<() => void>();
   private batchingEnabled = true;
-  private batchIdentityMode: BatchIdentityMode =
-    'path-position-subject';
+  private batchIdentityMode: BatchIdentityMode = 'path-position-subject';
   private pendingFlush = false;
   private pending = new Map<string, PendingSlot>();
   private flushCallbacks = new Set<() => void>();
@@ -116,10 +116,7 @@ export class PathNotifier {
   }
 
   hasObservers(): boolean {
-    return (
-      this.subscribers.size > 0 ||
-      this.flushCallbacks.size > 0
-    );
+    return this.subscribers.size > 0 || this.flushCallbacks.size > 0;
   }
 
   /**
@@ -211,9 +208,10 @@ export class PathNotifier {
     // whose tree it belongs to. Folded in here rather than added as a delivery
     // parameter: every consumer already receives `meta`, and the handler
     // signature is enhancer-facing.
-    const meta = ownerId === undefined
-      ? metaBeforeOwner
-      : { ...(metaBeforeOwner ?? {}), ownerId };
+    const meta =
+      ownerId === undefined
+        ? metaBeforeOwner
+        : { ...(metaBeforeOwner ?? {}), ownerId };
 
     const declaredScopes = currentWriteObservationScopes(ownerId);
     const origin = meta?.origin;
@@ -297,18 +295,20 @@ export class PathNotifier {
     for (const [pattern, handlers] of this.subscribers) {
       if (this.matches(pattern, path)) {
         for (const handler of handlers) {
-          withoutWriteObservationScopes(() => handler(
-            transformed,
-            prev,
-            path,
-            ownerPath,
-            origin,
-            subjectIds,
-            positionIds,
-            meta,
-            declaredScopes,
-            ownerId
-          ));
+          withoutWriteObservationScopes(() =>
+            handler(
+              transformed,
+              prev,
+              path,
+              ownerPath,
+              origin,
+              subjectIds,
+              positionIds,
+              meta,
+              declaredScopes,
+              ownerId
+            )
+          );
         }
       }
     }
@@ -334,8 +334,7 @@ export class PathNotifier {
           entry.ownerPath !== undefined &&
           entry.newValue === undefined &&
           entry.oldValue === undefined;
-        const hasStructuralEffect =
-          entry.meta?.structuralEffect !== undefined;
+        const hasStructuralEffect = entry.meta?.structuralEffect !== undefined;
         // If value didn't change compared to original oldValue, skip
         if (
           entry.newValue === entry.oldValue &&
@@ -484,7 +483,10 @@ export class PathNotifier {
     this.coalesceEntry(target, entry);
   }
 
-  private hasSameSemanticIdentity(left: PendingEntry, right: PendingEntry): boolean {
+  private hasSameSemanticIdentity(
+    left: PendingEntry,
+    right: PendingEntry
+  ): boolean {
     if (this.crossesStructuralBoundary(left, right)) {
       return false;
     }
@@ -511,12 +513,14 @@ export class PathNotifier {
     }
 
     return (
-      left.positionId === right.positionId &&
-      left.subjectId === right.subjectId
+      left.positionId === right.positionId && left.subjectId === right.subjectId
     );
   }
 
-  private crossesStructuralBoundary(left: PendingEntry, right: PendingEntry): boolean {
+  private crossesStructuralBoundary(
+    left: PendingEntry,
+    right: PendingEntry
+  ): boolean {
     const leftEffect = left.meta?.structuralEffect;
     const rightEffect = right.meta?.structuralEffect;
     const leftStructural = leftEffect !== undefined;
@@ -536,14 +540,21 @@ export class PathNotifier {
     // Keeping both entries is the notifier's whole job here: it must not lose
     // information. Deciding what the pair NETS to is a history concern and
     // belongs to the turn recorder, which composes them per subject.
-    if (leftStructural && rightStructural && leftEffect.kind !== rightEffect.kind) {
+    if (
+      leftStructural &&
+      rightStructural &&
+      leftEffect.kind !== rightEffect.kind
+    ) {
       return true;
     }
 
     return false;
   }
 
-  private crossesScalarIntentBoundary(left: PendingEntry, right: PendingEntry): boolean {
+  private crossesScalarIntentBoundary(
+    left: PendingEntry,
+    right: PendingEntry
+  ): boolean {
     const leftIntent = left.meta?.mutationIntent;
     const rightIntent = right.meta?.mutationIntent;
     return (
@@ -553,12 +564,20 @@ export class PathNotifier {
     );
   }
 
-  private crossesCausalModeBoundary(left: PendingEntry, right: PendingEntry): boolean {
-    return getWriteParticipation(left.meta) !== getWriteParticipation(right.meta);
+  private crossesCausalModeBoundary(
+    left: PendingEntry,
+    right: PendingEntry
+  ): boolean {
+    return (
+      getWriteParticipation(left.meta) !== getWriteParticipation(right.meta)
+    );
   }
 
   private coalesceEntry(target: PendingEntry, next: PendingEntry): void {
-    target.declaredScopes = mergeWriteObservationScopes(target.declaredScopes, next.declaredScopes);
+    target.declaredScopes = mergeWriteObservationScopes(
+      target.declaredScopes,
+      next.declaredScopes
+    );
     target.newValue = next.newValue;
     target.ownerPath = next.ownerPath;
     target.origin = this.mergeOrigin(target.origin, next.origin);
@@ -650,7 +669,6 @@ export class PathNotifier {
     }
     return count;
   }
-
 }
 
 /**

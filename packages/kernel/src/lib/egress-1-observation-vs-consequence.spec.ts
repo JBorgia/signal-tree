@@ -173,7 +173,7 @@ describe('EGRESS-1: what causes make a state OBSERVER fire?', () => {
 
   it('⚠️ a ROLLBACK COMPENSATION fires it', async () => {
     const r = await observe(async (t) => {
-      const p = t.transaction(() => t.$.order({ id: 'o1', total: 999 }));
+      const p = t.transact(() => t.$.order({ id: 'o1', total: 999 }));
       await flush();
       p.rollback();
     });
@@ -207,7 +207,7 @@ describe('EGRESS-1: what does a ONE-SHOT consequence do for the same causes?', (
     await flush();
     const charges: number[] = [];
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.order({ id: 'o1', total: 200 });
       // Scheduled INSIDE the operation, in its own stack.
       afterCommit(tree.$.order, () => charges.push(tree.$.order().total));
@@ -226,7 +226,7 @@ describe('EGRESS-1: what does a ONE-SHOT consequence do for the same causes?', (
     await flush();
     const charges: number[] = [];
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.order({ id: 'o1', total: 999 });
       afterCommit(tree.$.order, () => charges.push(tree.$.order().total));
     });
@@ -244,7 +244,7 @@ describe('EGRESS-1: what does a ONE-SHOT consequence do for the same causes?', (
     await flush();
     const charges: number[] = [];
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.order({ id: 'o1', total: 200 });
       afterCommit(tree.$.order, () => charges.push(tree.$.order().total));
     });
@@ -260,7 +260,7 @@ describe('EGRESS-1: what does a ONE-SHOT consequence do for the same causes?', (
     await flush();
     tree.undo();
     await flush();
-    const p2 = tree.transaction(() => tree.$.order({ id: 'o1', total: 555 }));
+    const p2 = tree.transact(() => tree.$.order({ id: 'o1', total: 555 }));
     await flush();
     p2.rollback();
     await flush();

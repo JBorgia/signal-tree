@@ -58,14 +58,13 @@ interface LinkEndpoint<T> {
 const link = <T>(x: unknown, endpoint: LinkEndpoint<T>) =>
   productionLink<never>(x as never, endpoint as LinkEndpoint<never>);
 
-
 const collTree = () =>
   signalTree(
     { data: { rows: entityMap<Row, string>({ selectId: (r) => r.id }) } },
     { enhancers: [restoration(), transactions()] }
   );
 
-describe('LINK-COLLECTION-0: is Row[] the collection\'s value?', () => {
+describe("LINK-COLLECTION-0: is Row[] the collection's value?", () => {
   it('the read is rows.all() and the acquire is rows.setAll()', async () => {
     const tree = collTree();
     await flush();
@@ -143,10 +142,16 @@ describe('LINK-COLLECTION-0: is Row[] the collection\'s value?', () => {
     ) as unknown as ReturnType<typeof collTree>;
     await flush();
     const sent: Row[][] = [];
-    const l = link<Row[]>((tree.$ as unknown as { rows: typeof tree.$.data.rows }).rows, { set: (v) => void sent.push(v) });
+    const l = link<Row[]>(
+      (tree.$ as unknown as { rows: typeof tree.$.data.rows }).rows,
+      { set: (v) => void sent.push(v) }
+    );
 
-    const p = tree.transaction(() => {
-      (tree.$ as unknown as { rows: typeof tree.$.data.rows }).rows.addOne({ id: 'doomed', n: 9 });
+    const p = tree.transact(() => {
+      (tree.$ as unknown as { rows: typeof tree.$.data.rows }).rows.addOne({
+        id: 'doomed',
+        n: 9,
+      });
     });
     await flush();
     expect(sent).toEqual([]);
@@ -159,7 +164,9 @@ describe('LINK-COLLECTION-0: is Row[] the collection\'s value?', () => {
     for (const snapshot of sent) {
       expect(snapshot.map((r) => r.id)).not.toContain('doomed');
     }
-    expect((tree.$ as unknown as { rows: typeof tree.$.data.rows }).rows.all()).toHaveLength(0);
+    expect(
+      (tree.$ as unknown as { rows: typeof tree.$.data.rows }).rows.all()
+    ).toHaveLength(0);
   });
 
   it('restoration reconciles to the final restored collection', async () => {
@@ -287,7 +294,7 @@ describe('NESTED-COLLECTION-ROLLBACK-0', () => {
     );
     await flush();
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.rows.addOne({ id: 'doomed', n: 9 });
     });
     await flush();
@@ -301,7 +308,7 @@ describe('NESTED-COLLECTION-ROLLBACK-0', () => {
     const tree = collTree();
     await flush();
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.data.rows.addOne({ id: 'doomed', n: 9 });
     });
     await flush();

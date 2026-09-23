@@ -101,11 +101,7 @@ export interface WriteMetadata {
    * It answers only WHY the write exists; WHICH transaction it compensates is
    * `transactionId`, deliberately a separate fact.
    */
-  origin?:
-    | 'restoration'
-    | 'devtools'
-    | 'external'
-    | 'transaction-rollback';
+  origin?: 'restoration' | 'devtools' | 'external' | 'transaction-rollback';
   /** Suppress guardrails for this update. */
   suppressGuardrails?: boolean;
   /**

@@ -47,7 +47,16 @@ const observe = () => {
   const seen: Observed[] = [];
   const off = getPathNotifier().subscribe(
     '**',
-    (_next, _prev, path, _ownerPath, source, _subjectIds, _positionIds, meta) => {
+    (
+      _next,
+      _prev,
+      path,
+      _ownerPath,
+      source,
+      _subjectIds,
+      _positionIds,
+      meta
+    ) => {
       const m = (meta ?? {}) as Record<string, unknown>;
       seen.push({
         path: String(path),
@@ -131,7 +140,7 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
     const { seen, off } = observe();
 
     const pending = undoable(() =>
-      tree.transaction(() => {
+      tree.transact(() => {
         tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       })
     );

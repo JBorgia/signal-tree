@@ -52,7 +52,10 @@ const em = () => entityMap<Row, string>({ selectId: (r) => r.id });
  * what turns the notifier on.
  */
 const make = () =>
-  signalTree({ data: { rows: em() }, scalar: 0 }, { enhancers: [restoration()] });
+  signalTree(
+    { data: { rows: em() }, scalar: 0 },
+    { enhancers: [restoration()] }
+  );
 
 describe('notifier ownership invariant', () => {
   it('two trees give their collections the SAME local position id', async () => {

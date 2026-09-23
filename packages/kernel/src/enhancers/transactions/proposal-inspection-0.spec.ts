@@ -107,7 +107,7 @@ describe('PROPOSAL-INSPECTION-0 / 1 — scalar proposal untouched', () => {
   it('current', async () => {
     const tree = rowTree();
     await flush();
-    tree.transaction(() => {
+    tree.transact(() => {
       tree.$.x(1);
     });
     await flush();
@@ -120,7 +120,7 @@ describe('PROPOSAL-INSPECTION-0 / 2 — scalar replaced by a newer write', () =>
   it('superseded', async () => {
     const tree = rowTree();
     await flush();
-    tree.transaction(() => {
+    tree.transact(() => {
       tree.$.x(1);
     });
     await flush();
@@ -135,7 +135,7 @@ describe('PROPOSAL-INSPECTION-0 / 3 — structural add, later UPDATE of the subj
   it('still current — the case that refutes the rollback-plan formula', async () => {
     const tree = rowTree();
     await flush();
-    tree.transaction(() => {
+    tree.transact(() => {
       tree.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
     await flush();
@@ -152,7 +152,7 @@ describe('PROPOSAL-INSPECTION-0 / 4 — structural add, later REMOVE of the subj
   it('superseded', async () => {
     const tree = rowTree();
     await flush();
-    tree.transaction(() => {
+    tree.transact(() => {
       tree.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
     await flush();
@@ -168,7 +168,7 @@ describe('PROPOSAL-INSPECTION-0 / 5 — rekey, later field update', () => {
     const tree = rowTree();
     tree.$.rows.addOne({ id: 'A', name: 'Original' });
     await flush();
-    tree.transaction(() => {
+    tree.transact(() => {
       tree.$.rows.changeId('A', 'A2');
     });
     await flush();
@@ -183,7 +183,7 @@ describe('PROPOSAL-INSPECTION-0 / 6 — remove/re-add of the same business key',
   it('classification follows subject lifetime, not path coincidence', async () => {
     const tree = rowTree();
     await flush();
-    tree.transaction(() => {
+    tree.transact(() => {
       tree.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
     await flush();

@@ -65,23 +65,36 @@ const settle = async () => {
 };
 
 const scalarTree = () =>
-  signalTree({ total: 0 } as { total: number }, {
-    enhancers: [restoration(), transactions()],
-  } as never) as never as {
+  signalTree(
+    { total: 0 } as { total: number },
+    {
+      enhancers: [restoration(), transactions()],
+    } as never
+  ) as never as {
     $: Record<string, (v?: unknown) => unknown>;
     transaction(fn: () => void): { confirm(): void; rollback(): void };
   };
 
 const rowTree = () =>
-  signalTree(
-    { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-    { enhancers: [restoration(), transactions()] } as never
-  ) as never as {
-    $: { rows: { addOne(r: Row): void; updateOne(id: string, p: Partial<Row>): void; removeOne(id: string): void } };
+  signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) }, {
+    enhancers: [restoration(), transactions()],
+  } as never) as never as {
+    $: {
+      rows: {
+        addOne(r: Row): void;
+        updateOne(id: string, p: Partial<Row>): void;
+        removeOne(id: string): void;
+      };
+    };
   };
 
 /** Collected across every case so the verdict is evidence, not impression. */
-const report: { case: string; total: number; withOwner: number; unscoped: string[] }[] = [];
+const report: {
+  case: string;
+  total: number;
+  withOwner: number;
+  unscoped: string[];
+}[] = [];
 
 async function record(name: string, run: () => void | Promise<void>) {
   const { seen, off } = observe();
@@ -98,47 +111,60 @@ async function record(name: string, run: () => void | Promise<void>) {
         `${s.path}${s.origin ? ` (${s.origin})` : ''}` +
         (s.carriesValue ? ' [HAS VALUE]' : ' [no value]')
     );
-  report.push({ case: name, total: seen.length, withOwner: seen.length - unscoped.length, unscoped });
+  report.push({
+    case: name,
+    total: seen.length,
+    withOwner: seen.length - unscoped.length,
+    unscoped,
+  });
   return { seen, unscoped };
 }
 
 describe('OWNER-SCOPE-0', () => {
   it('ordinary scalar authored', async () => {
     const t = scalarTree();
-    const { seen } = await record('scalar authored', () => { t.$['total'](1); });
+    const { seen } = await record('scalar authored', () => {
+      t.$['total'](1);
+    });
     expect(seen.length).toBeGreaterThan(0);
   });
 
   it('external scalar realization', async () => {
     const t = scalarTree();
-    await record('external scalar', () => { external(() => t.$['total'](2)); });
+    await record('external scalar', () => {
+      external(() => t.$['total'](2));
+    });
   });
 
   it('transaction-authored', async () => {
     const t = scalarTree();
     await record('transaction authored', () => {
-      t.transaction(() => t.$['total'](3)).confirm();
+      t.transact(() => t.$['total'](3)).confirm();
     });
   });
 
   it('transaction rollback compensation', async () => {
     const t = scalarTree();
     await record('transaction rollback', () => {
-      const pending = t.transaction(() => t.$['total'](4));
+      const pending = t.transact(() => t.$['total'](4));
       pending.rollback();
     });
   });
 
   it('entityMap add (structural)', async () => {
     const t = rowTree();
-    await record('entity add', () => t.$.rows.addOne({ id: 'A', name: 'Alpha' }));
+    await record('entity add', () =>
+      t.$.rows.addOne({ id: 'A', name: 'Alpha' })
+    );
   });
 
   it('entity field authored', async () => {
     const t = rowTree();
     t.$.rows.addOne({ id: 'A', name: 'Alpha' });
     await settle();
-    await record('entity field authored', () => t.$.rows.updateOne('A', { name: 'Beta' }));
+    await record('entity field authored', () =>
+      t.$.rows.updateOne('A', { name: 'Beta' })
+    );
   });
 
   it('entity field external realization', async () => {
@@ -183,7 +209,9 @@ describe('OWNER-SCOPE-0', () => {
   it('VERDICT', () => {
     const lines = report.map(
       (r) =>
-        `${r.case.padEnd(26)} ${String(r.withOwner).padStart(2)}/${String(r.total).padStart(2)} owned` +
+        `${r.case.padEnd(26)} ${String(r.withOwner).padStart(2)}/${String(
+          r.total
+        ).padStart(2)} owned` +
         (r.unscoped.length ? `  UNSCOPED: ${r.unscoped.join(', ')}` : '')
     );
     const unscopedWithValue = report.flatMap((r) =>
@@ -195,9 +223,12 @@ describe('OWNER-SCOPE-0', () => {
     const outcome = unscopedWithValue.length
       ? `OUTCOME C: ${unscopedWithValue.length} unscoped frame(s) CARRY VALUE -> a filter drops real evidence; scopeIntegrity required`
       : unscopedBare.length
-        ? `OUTCOME B: unscoped frames exist (${unscopedBare.length}) but carry NO value -> filtering on ownerId is SAFE for S2`
-        : 'OUTCOME A: ownerId always present -> filter trivially safe';
-    writeFileSync('/tmp/owner-scope-0.txt', lines.join('\n') + '\n\n' + outcome + '\n');
+      ? `OUTCOME B: unscoped frames exist (${unscopedBare.length}) but carry NO value -> filtering on ownerId is SAFE for S2`
+      : 'OUTCOME A: ownerId always present -> filter trivially safe';
+    writeFileSync(
+      '/tmp/owner-scope-0.txt',
+      lines.join('\n') + '\n\n' + outcome + '\n'
+    );
     expect(report.length).toBeGreaterThan(0);
   });
 });

@@ -25,7 +25,10 @@ import { getPathNotifier } from '../../path-notifier';
 import { signalTree } from '../../signal-tree';
 
 type Cart = { total: number };
-const settle = async () => { await Promise.resolve(); await Promise.resolve(); };
+const settle = async () => {
+  await Promise.resolve();
+  await Promise.resolve();
+};
 const rows: string[] = [];
 
 /** Empirical: does a scalar leaf write reach an observer? */
@@ -53,13 +56,18 @@ async function probe(label: string, make: () => unknown) {
 
 describe('LEAF-OBSERVATION-SUPPORT-0', () => {
   it('bare tree', async () => {
-    expect(await probe('bare', () => signalTree({ total: 12000 } as Cart))).toBe(false);
+    expect(
+      await probe('bare', () => signalTree({ total: 12000 } as Cart))
+    ).toBe(false);
   });
 
   it('batching only', async () => {
     expect(
       await probe('batching()', () =>
-        signalTree({ total: 12000 } as Cart, { enhancers: [batching()] } as never)
+        signalTree(
+          { total: 12000 } as Cart,
+          { enhancers: [batching()] } as never
+        )
       )
     ).toBe(false);
   });
@@ -67,7 +75,10 @@ describe('LEAF-OBSERVATION-SUPPORT-0', () => {
   it('transactions', async () => {
     expect(
       await probe('transactions()', () =>
-        signalTree({ total: 12000 } as Cart, { enhancers: [transactions()] } as never)
+        signalTree(
+          { total: 12000 } as Cart,
+          { enhancers: [transactions()] } as never
+        )
       )
     ).toBe(true);
   });
@@ -75,7 +86,10 @@ describe('LEAF-OBSERVATION-SUPPORT-0', () => {
   it('restoration', async () => {
     expect(
       await probe('restoration()', () =>
-        signalTree({ total: 12000 } as Cart, { enhancers: [restoration()] } as never)
+        signalTree(
+          { total: 12000 } as Cart,
+          { enhancers: [restoration()] } as never
+        )
       )
     ).toBe(true);
   });
@@ -83,9 +97,12 @@ describe('LEAF-OBSERVATION-SUPPORT-0', () => {
   it('both', async () => {
     expect(
       await probe('transactions()+restoration()', () =>
-        signalTree({ total: 12000 } as Cart, {
-          enhancers: [restoration(), transactions()],
-        } as never)
+        signalTree(
+          { total: 12000 } as Cart,
+          {
+            enhancers: [restoration(), transactions()],
+          } as never
+        )
       )
     ).toBe(true);
   });
@@ -98,9 +115,12 @@ describe('LEAF-OBSERVATION-SUPPORT-0', () => {
    */
   it('capabilities:[causal-runtime] WITHOUT an enhancer', async () => {
     const observable = await probe('capabilities:[causal-runtime]', () =>
-      signalTree({ total: 12000 } as Cart, {
-        capabilities: ['causal-runtime'],
-      } as never)
+      signalTree(
+        { total: 12000 } as Cart,
+        {
+          capabilities: ['causal-runtime'],
+        } as never
+      )
     );
     rows.push(
       observable

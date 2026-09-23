@@ -115,7 +115,10 @@ type Rows = {
 };
 
 const topTree = () =>
-  signalTree({ rows: em() }, { enhancers: [restoration(), transactions()] }) as unknown as {
+  signalTree(
+    { rows: em() },
+    { enhancers: [restoration(), transactions()] }
+  ) as unknown as {
     $: { rows: Rows };
     transaction: (fn: () => void) => { rollback(): void; confirm(): void };
   };
@@ -152,7 +155,7 @@ describe('SUBJECT-ADDRESS-0: a whole-subject update is a real operation', () => 
     tree.$.rows.addOne({ id: 'seed', n: 0 });
     await flush();
 
-    const p = tree.transaction(() => tree.$.rows.updateOne('seed', { n: 99 }));
+    const p = tree.transact(() => tree.$.rows.updateOne('seed', { n: 99 }));
     await flush();
     p.rollback();
     await flush();
@@ -167,7 +170,7 @@ describe('SUBJECT-ADDRESS-0: a whole-subject update is a real operation', () => 
     tree.$.data.rows.addOne({ id: 'seed', n: 0 });
     await flush();
 
-    const p = tree.transaction(() =>
+    const p = tree.transact(() =>
       tree.$.data.rows.updateOne('seed', { n: 99 })
     );
     await flush();

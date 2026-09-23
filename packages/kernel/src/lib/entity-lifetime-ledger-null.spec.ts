@@ -179,7 +179,7 @@ describe('a tree WITH a restorer keeps everything', () => {
       tree as unknown as {
         transaction: (f: () => void) => { rollback(): void };
       }
-    ).transaction(() => {
+    ).transact(() => {
       undoable(() => tree.$.rows.updateOne('A', { name: 'Changed' }));
     });
     expect(tree.$.rows.byId('A')?.().name).toBe('Changed');
@@ -353,7 +353,13 @@ describe('a forgotten lifetime stays forgotten', () => {
     const bare = signalTree({
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),
     }) as unknown as Record<string, unknown>;
-    for (const surface of ['undo', 'redo', 'jumpTo', 'transaction', 'getRestorationHistory']) {
+    for (const surface of [
+      'undo',
+      'redo',
+      'jumpTo',
+      'transaction',
+      'getRestorationHistory',
+    ]) {
       expect(bare[surface]).toBeUndefined();
     }
   });

@@ -23,7 +23,6 @@ import {
 } from '../../lib/internals/location-runtime';
 import { isNodeAccessor } from '../../lib/internals/node-shape';
 
-
 /**
  * Is this node of the tree a WRITABLE cell?
  *
@@ -861,9 +860,7 @@ export function serialization(
             node = (node as Record<string, unknown>)[p];
           }
 
-          if (
-            isWritableLocation(node) || isNodeAccessor(node)
-          ) {
+          if (isWritableLocation(node) || isNodeAccessor(node)) {
             // Extract the corresponding value from restoredData
             let current: unknown = restoredData as unknown;
             for (const p of parts) {
@@ -991,10 +988,7 @@ export function serialization(
         // `restore()`, which shares `fromJSON` — running in the wrong mode.
         hydrateMode = fullConfig.transfer ? 'transfer' : 'rehydrate';
         try {
-          acquireJSON(
-            data as T,
-            metadata as SerializedState<T>['metadata']
-          );
+          acquireJSON(data as T, metadata as SerializedState<T>['metadata']);
         } finally {
           hydrateMode = 'rehydrate';
         }

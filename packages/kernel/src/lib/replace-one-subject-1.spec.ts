@@ -85,7 +85,10 @@ type Rows = {
 };
 
 const topTree = () =>
-  signalTree({ rows: em() }, { enhancers: [restoration(), transactions()] }) as unknown as {
+  signalTree(
+    { rows: em() },
+    { enhancers: [restoration(), transactions()] }
+  ) as unknown as {
     $: { rows: Rows };
     transaction: (fn: () => void) => { rollback(): void; confirm(): void };
     undo?: () => void;
@@ -101,7 +104,10 @@ const nestedTree = () =>
     undo?: () => void;
   };
 
-const seed = async <T extends { $: unknown }>(tree: T, rows: (t: T) => Rows) => {
+const seed = async <T extends { $: unknown }>(
+  tree: T,
+  rows: (t: T) => Rows
+) => {
   await flush();
   rows(tree).addOne({ id: 'r1', name: 'orig', n: 1 });
   await flush();
@@ -119,7 +125,7 @@ describe('REPLACE-ONE-SUBJECT-1: reversal now works', () => {
   it('TOP transaction rollback restores the original fields', async () => {
     const tree = await seed(topTree(), TOP);
 
-    const p = tree.transaction(() =>
+    const p = tree.transact(() =>
       tree.$.rows.replaceOne('r1', { id: 'r1', name: 'changed', n: 99 })
     );
     await flush();
@@ -151,7 +157,7 @@ describe('REPLACE-ONE-SUBJECT-1: reversal now works', () => {
   it('NESTED transaction rollback restores the original fields', async () => {
     const tree = await seed(nestedTree(), NESTED);
 
-    const p = tree.transaction(() =>
+    const p = tree.transact(() =>
       tree.$.data.rows.replaceOne('r1', { id: 'r1', name: 'changed', n: 99 })
     );
     await flush();
@@ -203,7 +209,7 @@ describe('REPLACE-ONE-SUBJECT-1: subject lifetime', () => {
     // Same subject, new key — the identity that must survive.
     expect(subjectIdOf(tree.$.rows, 'r9')).toBe(original);
 
-    const p = tree.transaction(() =>
+    const p = tree.transact(() =>
       tree.$.rows.replaceOne('r9', { id: 'r9', name: 'changed', n: 99 })
     );
     await flush();
@@ -219,7 +225,7 @@ describe('REPLACE-ONE-SUBJECT-1: subject lifetime', () => {
   it('a rekey INSIDE the transaction also rolls back with replaceOne', async () => {
     const tree = await seed(topTree(), TOP);
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.rows.replaceOne('r1', { id: 'r1', name: 'changed', n: 99 });
       tree.$.rows.changeId('r1', 'r9');
     });
@@ -238,7 +244,7 @@ describe('REPLACE-ONE-SUBJECT-1: controls', () => {
   it('upsertOne over the same subject still rolls back', async () => {
     const tree = await seed(topTree(), TOP);
 
-    const p = tree.transaction(() =>
+    const p = tree.transact(() =>
       tree.$.rows.upsertOne({ id: 'r1', name: 'changed', n: 99 })
     );
     await flush();
@@ -251,7 +257,7 @@ describe('REPLACE-ONE-SUBJECT-1: controls', () => {
   it('ordinary updateOne still rolls back', async () => {
     const tree = await seed(topTree(), TOP);
 
-    const p = tree.transaction(() => tree.$.rows.updateOne('r1', { n: 99 }));
+    const p = tree.transact(() => tree.$.rows.updateOne('r1', { n: 99 }));
     await flush();
     p.rollback();
     await flush();
@@ -271,8 +277,6 @@ describe('REPLACE-ONE-SUBJECT-1: controls', () => {
     // The omitted key's LEAF is gone entirely, not merely set to undefined —
     // which is the distinction `replaceOne` exists to express and `updateOne`
     // cannot. Unchanged by this fix.
-    expect(
-      (tree.$.rows.byIdOrFail('r1') as { n?: unknown }).n
-    ).toBeUndefined();
+    expect((tree.$.rows.byIdOrFail('r1') as { n?: unknown }).n).toBeUndefined();
   });
 });

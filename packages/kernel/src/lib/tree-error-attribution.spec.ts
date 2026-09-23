@@ -187,7 +187,9 @@ describe('ERROR-SURFACE-2 B: path names the linked source location', () => {
     const cap = capture();
     type Row = { id: string; n: number };
     const tree = signalTree(
-      { data: { rows: entityMap<Row, string>({ selectId: (r: Row) => r.id }) } },
+      {
+        data: { rows: entityMap<Row, string>({ selectId: (r: Row) => r.id }) },
+      },
       { enhancers: [restoration(), transactions()] }
     ) as unknown as {
       $: { data: { rows: { addOne(r: Row): void } } };
@@ -320,7 +322,9 @@ describe('TREE ERROR: the TreeId contract', () => {
     const a = idTree();
     const b = idTree();
     await flush();
-    expect(getOwnedPositionIds(a.$.rows)).toEqual(getOwnedPositionIds(b.$.rows));
+    expect(getOwnedPositionIds(a.$.rows)).toEqual(
+      getOwnedPositionIds(b.$.rows)
+    );
     expect(getPositionRegistry(a.$)?.id).not.toBe(getPositionRegistry(b.$)?.id);
   });
 

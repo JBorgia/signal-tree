@@ -171,7 +171,7 @@ describe('Angular realization invariants', () => {
     const tree = signalTree({ count: 0 }, { enhancers: [transactions()] });
     const observed = computed(() => tree.$.count());
 
-    const pending = tree.transaction(() => tree.$.count.set(9));
+    const pending = tree.transact(() => tree.$.count.set(9));
     expect(observed()).toBe(9);
 
     pending.rollback();

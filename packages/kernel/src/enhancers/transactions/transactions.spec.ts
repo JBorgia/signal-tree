@@ -29,7 +29,7 @@ describe('transactions enhancer', () => {
       { enhancers: [transactions()] }
     ) as Record<string, unknown>;
 
-    expect(typeof store.transaction).toBe('function');
+    expect(typeof store.transact).toBe('function');
     expect(store.undo).toBeUndefined();
     expect(store.redo).toBeUndefined();
     expect(store.canUndo).toBeUndefined();
@@ -44,7 +44,10 @@ describe('transactions enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ count: 0 }, { enhancers: [transactions()] }) as unknown as {
+    const store = signalTree(
+      { count: 0 },
+      { enhancers: [transactions()] }
+    ) as unknown as {
       $: { (): { count: number }; count: () => number };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
       __transactions: {
@@ -53,7 +56,7 @@ describe('transactions enhancer', () => {
       };
     };
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       store.$.count(1);
     });
 
@@ -77,7 +80,7 @@ describe('transactions enhancer', () => {
       seen.push([store.$.left(), store.$.right()]);
     });
 
-    store.transaction(() => {
+    store.transact(() => {
       store.$.left(1);
       store.$.right(1);
     });
@@ -95,7 +98,7 @@ describe('transactions enhancer', () => {
       { enhancers: [transactions()] }
     );
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       store.$.inside('grouped');
     });
 
@@ -133,7 +136,7 @@ describe('transactions enhancer', () => {
     );
 
     expect(() =>
-      store.transaction(() => {
+      store.transact(() => {
         store.$.left('L');
         store.$.right('R');
         throw new Error('boom');
@@ -161,7 +164,10 @@ describe('transactions enhancer', () => {
       { enhancers: [transactions()] }
     ) as unknown as {
       $: {
-        (): { count: number; rows: { all: Array<{ id: string; name: string }> } };
+        (): {
+          count: number;
+          rows: { all: Array<{ id: string; name: string }> };
+        };
         count: () => number;
         rows: {
           addOne(row: { id: string; name: string }): void;
@@ -192,7 +198,7 @@ describe('transactions enhancer', () => {
     let abortedFreshSubject: number | undefined;
 
     expect(() =>
-      store.transaction(() => {
+      store.transact(() => {
         store.$.count(1);
         store.$.rows.removeOne('b');
         store.$.rows.addOne({ id: 'a', name: 'Alpha' });
@@ -276,7 +282,7 @@ describe('transactions enhancer', () => {
     const applyAtomically = vi.spyOn(realizationPort, 'applyAtomically');
 
     try {
-      store.transaction(() => {
+      store.transact(() => {
         store.$.count(1);
         store.$.rows.removeOne('b');
         store.$.rows.addOne({ id: 'a', name: 'Alpha' });
@@ -353,7 +359,7 @@ describe('transactions enhancer', () => {
     const originalSubject = store.$.rows.byIdOrFail('b').name
       .__subjectIds?.[0] as number | undefined;
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       store.$.count(1);
       store.$.rows.removeOne('b');
       store.$.rows.addOne({ id: 'a', name: 'Alpha' });
@@ -490,7 +496,7 @@ describe('transactions enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       store.$.rows.changeId(7, 42);
     });
 
@@ -517,7 +523,7 @@ describe('transactions enhancer', () => {
       { enhancers: [transactions()] }
     );
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       store.$.rows.addOne({ id: 17, name: 'pending' });
     });
 
@@ -549,7 +555,7 @@ describe('transactions enhancer', () => {
       { enhancers: [transactions()] }
     );
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       store.$.order.status('assigned');
       store.$.driver.orderId(17);
     });
@@ -580,7 +586,7 @@ describe('transactions enhancer', () => {
       { enhancers: [transactions()] }
     );
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       store.$.rows.addOne({ id: 17, name: 'optimistic' });
     });
 

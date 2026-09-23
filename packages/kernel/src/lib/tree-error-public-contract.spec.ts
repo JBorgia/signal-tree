@@ -111,7 +111,6 @@ describe('PUBLIC: attribution', () => {
     l.dispose();
     cap.stop();
   });
-
 });
 
 describe('PUBLIC: delivery semantics', () => {
@@ -242,7 +241,10 @@ describe('PUBLIC: delivery semantics', () => {
 });
 
 const SRC = (() => {
-  for (const c of [join(process.cwd(), 'packages/kernel/src'), join(process.cwd(), 'src')]) {
+  for (const c of [
+    join(process.cwd(), 'packages/kernel/src'),
+    join(process.cwd(), 'src'),
+  ]) {
     try {
       readFileSync(join(c, 'lib/signal-tree.ts'), 'utf8');
       return c;
@@ -250,7 +252,9 @@ const SRC = (() => {
       /* next */
     }
   }
-  throw new Error('ERROR-SURFACE-2-PUBLIC: could not locate packages/kernel/src');
+  throw new Error(
+    'ERROR-SURFACE-2-PUBLIC: could not locate packages/kernel/src'
+  );
 })();
 
 describe('PUBLIC: the surface is exactly three symbols', () => {

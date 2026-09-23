@@ -40,7 +40,11 @@ type Rows = { addOne(r: Row): void; ids(): string[] };
 type Store = {
   $: {
     rows: Rows;
-    n: { (value: number): void; (update: (current: number) => number): void; (): number };
+    n: {
+      (value: number): void;
+      (update: (current: number) => number): void;
+      (): number;
+    };
   };
   transaction(fn: () => void): { confirm(): void; rollback(): void };
 };
@@ -65,11 +69,11 @@ describe('DIAG-JOURNAL-1.1 FALSIFIER: is a bare transactionId unambiguous?', () 
       if (e.kind === 'opened') ids.push(e.id);
     });
 
-    tree.transaction(() => tree.$.n(1)).confirm();
+    tree.transact(() => tree.$.n(1)).confirm();
     await flush();
-    tree.transaction(() => tree.$.n(2)).rollback();
+    tree.transact(() => tree.$.n(2)).rollback();
     await flush();
-    const nested = tree.transaction(() =>
+    const nested = tree.transact(() =>
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' })
     );
     await flush();
@@ -94,16 +98,18 @@ describe('DIAG-JOURNAL-1.1 FALSIFIER: is a bare transactionId unambiguous?', () 
     const offA = getTransactionLifecycleChannel(
       a as unknown as object
     ).subscribe((e) => {
-      if (e.kind === 'opened') seen.push({ tree: 'a', id: e.id, owner: e.owner });
+      if (e.kind === 'opened')
+        seen.push({ tree: 'a', id: e.id, owner: e.owner });
     });
     const offB = getTransactionLifecycleChannel(
       b as unknown as object
     ).subscribe((e) => {
-      if (e.kind === 'opened') seen.push({ tree: 'b', id: e.id, owner: e.owner });
+      if (e.kind === 'opened')
+        seen.push({ tree: 'b', id: e.id, owner: e.owner });
     });
 
-    a.transaction(() => a.$.n(1)).confirm();
-    b.transaction(() => b.$.n(1)).confirm();
+    a.transact(() => a.$.n(1)).confirm();
+    b.transact(() => b.$.n(1)).confirm();
     await flush();
     offA();
     offB();
@@ -122,7 +128,7 @@ describe('DIAG-JOURNAL-1.1: the compensation turn is correlatable', () => {
     await flush();
     const journal = createDiagnosticJournal(tree as unknown as object);
 
-    const pending = tree.transaction(() =>
+    const pending = tree.transact(() =>
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' })
     );
     await flush();
@@ -165,9 +171,9 @@ describe('DIAG-JOURNAL-1.1: the compensation turn is correlatable', () => {
         t.effects.some((e) => e.origin === 'transaction-rollback')
       );
     expect(compensation.length).toBe(1);
-    expect(
-      compensation[0].effects.every((e) => e.transactionId === 1)
-    ).toBe(true);
+    expect(compensation[0].effects.every((e) => e.transactionId === 1)).toBe(
+      true
+    );
 
     journal.dispose();
   });
@@ -177,7 +183,9 @@ describe('DIAG-JOURNAL-1.1: the compensation turn is correlatable', () => {
     await flush();
     const journal = createDiagnosticJournal(tree as unknown as object);
 
-    tree.transaction(() => tree.$.rows.addOne({ id: 'a', name: 'Alpha' })).confirm();
+    tree
+      .transact(() => tree.$.rows.addOne({ id: 'a', name: 'Alpha' }))
+      .confirm();
     await flush();
 
     // The control that keeps the origin meaningful: it marks compensation, not

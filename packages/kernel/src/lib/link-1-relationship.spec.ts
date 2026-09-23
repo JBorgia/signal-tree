@@ -83,7 +83,6 @@ interface Endpoint<T> {
   subscribe?(next: (value: T) => void): () => void;
 }
 
-
 /**
  * `X` is accepted only if it is an OWNED WRITABLE SignalTree LOCATION.
  *
@@ -374,7 +373,9 @@ describe('LINK-1 case 2: dispose() stops NEW activity, and claims nothing more',
     const tree = makeTree();
     await flush();
     const sent: string[] = [];
-    const link = makeLink<string>(tree.$.leaf, { set: (v) => void sent.push(v) });
+    const link = makeLink<string>(tree.$.leaf, {
+      set: (v) => void sent.push(v),
+    });
 
     tree.$.leaf('before');
     await flush();
@@ -436,10 +437,12 @@ describe('LINK-1 case 2: dispose() stops NEW activity, and claims nothing more',
     const tree = makeTree();
     await flush();
     const sent: string[] = [];
-    const link = makeLink<string>(tree.$.leaf, { set: (v) => void sent.push(v) });
+    const link = makeLink<string>(tree.$.leaf, {
+      set: (v) => void sent.push(v),
+    });
 
     // The write is observed and its consequence is HELD by the open scope.
-    const pendingTx = tree.transaction(() => tree.$.leaf('held'));
+    const pendingTx = tree.transact(() => tree.$.leaf('held'));
     await flush();
     expect(sent).toEqual([]);
 
@@ -457,9 +460,11 @@ describe('LINK-1 case 2: dispose() stops NEW activity, and claims nothing more',
     const tree = makeTree();
     await flush();
     const sent: string[] = [];
-    const link = makeLink<string>(tree.$.leaf, { set: (v) => void sent.push(v) });
+    const link = makeLink<string>(tree.$.leaf, {
+      set: (v) => void sent.push(v),
+    });
 
-    const pendingTx = tree.transaction(() => tree.$.leaf('held'));
+    const pendingTx = tree.transact(() => tree.$.leaf('held'));
     await flush();
     expect(sent).toEqual([]);
 

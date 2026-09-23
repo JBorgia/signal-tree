@@ -2,7 +2,10 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { WriteMetadata } from '../../types';
 
-import { createTransactionCaptureBridge, toExplicitTransactionEffect } from './transaction-capture-bridge';
+import {
+  createTransactionCaptureBridge,
+  toExplicitTransactionEffect,
+} from './transaction-capture-bridge';
 
 describe('transaction capture bridge', () => {
   it('maps complete canonical structural metadata without normalization', () => {
@@ -75,19 +78,10 @@ describe('transaction capture bridge', () => {
       [3],
       meta
     );
-    bridge(
-      { id: 'u3' },
-      undefined,
-      'users.u3',
-      'users',
-      'user',
-      [18],
-      [3],
-      {
-        transactionId: 8,
-        transactionOwner: owner,
-      }
-    );
+    bridge({ id: 'u3' }, undefined, 'users.u3', 'users', 'user', [18], [3], {
+      transactionId: 8,
+      transactionOwner: owner,
+    });
 
     expect(capture).toHaveBeenCalledTimes(1);
     expect(capture).toHaveBeenCalledWith({

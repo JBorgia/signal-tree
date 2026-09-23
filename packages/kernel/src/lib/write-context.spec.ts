@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  withWriteContext,
-  getActiveWriteContext,
-} from './write-context';
+import { withWriteContext, getActiveWriteContext } from './write-context';
 import type { WriteMetadata } from './types';
 
 describe('withWriteContext / getActiveWriteContext', () => {

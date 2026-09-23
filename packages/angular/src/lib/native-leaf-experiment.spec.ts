@@ -37,7 +37,7 @@ describe('native Angular leaf realization', () => {
   it('preserves replacement and derivation intent', async () => {
     const tree = signalTree({ count: 0 }, { enhancers: [transactions()] });
     const count = native<number>(tree.$.count);
-    const pending = tree.transaction(() => count.set(1));
+    const pending = tree.transact(() => count.set(1));
 
     count.update((value) => value + 1);
     await Promise.resolve();

@@ -20,7 +20,7 @@ describe('activeTransactionContext', () => {
     const tree = createTree();
     expect(activeTransactionContext()).toBeUndefined();
     let observed: ReturnType<typeof activeTransactionContext>;
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       observed = activeTransactionContext();
       expect(observed?.owner).toEqual(expect.any(Object));
       expect(observed?.id).toBe(1);
@@ -28,15 +28,19 @@ describe('activeTransactionContext', () => {
       expect(activeTransactionContext()).toEqual(observed);
     });
     expect(activeTransactionContext()).toBeUndefined();
-    expect(confirmedTurnReader(tree)!.readConfirmedTurns().turns).toHaveLength(0);
+    expect(confirmedTurnReader(tree)!.readConfirmedTurns().turns).toHaveLength(
+      0
+    );
     pending.confirm();
     expect(activeTransactionContext()).toBeUndefined();
-    expect(confirmedTurnReader(tree)!.readConfirmedTurns().turns[0].id).toBe(observed!.id);
+    expect(confirmedTurnReader(tree)!.readConfirmedTurns().turns[0].id).toBe(
+      observed!.id
+    );
   });
 
   it('reports no-op callback scope without requiring an effect', () => {
     const tree = createTree();
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       expect(activeTransactionContext()?.id).toBe(1);
     });
     expect(activeTransactionContext()).toBeUndefined();
@@ -45,21 +49,26 @@ describe('activeTransactionContext', () => {
   });
 
   it('does not confuse two owners whose local transaction IDs match', () => {
-    const a = createTree(), b = createTree();
-    const scopes: NonNullable<ReturnType<typeof activeTransactionContext>>[] = [];
+    const a = createTree(),
+      b = createTree();
+    const scopes: NonNullable<ReturnType<typeof activeTransactionContext>>[] =
+      [];
     for (const tree of [a, b, a]) {
-      tree.transaction(() => scopes.push(activeTransactionContext()!)).confirm();
+      tree.transact(() => scopes.push(activeTransactionContext()!)).confirm();
     }
-    expect(scopes.map(scope => scope.id)).toEqual([1, 1, 2]);
+    expect(scopes.map((scope) => scope.id)).toEqual([1, 1, 2]);
     expect(scopes[0].owner).not.toBe(scopes[1].owner);
     expect(scopes[0].owner).toBe(scopes[2].owner);
   });
 
   it('reports ambient owner even when another tree is written', () => {
-    const a = createTree(), b = createTree();
+    const a = createTree(),
+      b = createTree();
     let owner: object | undefined;
-    a.transaction(() => { owner = activeTransactionContext()?.owner; }).confirm();
-    a.transaction(() => {
+    a.transact(() => {
+      owner = activeTransactionContext()?.owner;
+    }).confirm();
+    a.transact(() => {
       b.$.count(2);
       expect(activeTransactionContext()?.owner).toBe(owner);
     }).confirm();
@@ -69,32 +78,36 @@ describe('activeTransactionContext', () => {
 
   it('clears scope after a thrown callback and its compensation', () => {
     const tree = createTree();
-    expect(() => tree.transaction(() => {
-      expect(activeTransactionContext()?.id).toBe(1);
-      tree.$.count(1);
-      throw new Error('failed callback');
-    })).toThrow('failed callback');
+    expect(() =>
+      tree.transact(() => {
+        expect(activeTransactionContext()?.id).toBe(1);
+        tree.$.count(1);
+        throw new Error('failed callback');
+      })
+    ).toThrow('failed callback');
     expect(tree.$.count()).toBe(0);
     expect(activeTransactionContext()).toBeUndefined();
   });
 
   it('does not reopen callback scope during rollback', () => {
     const tree = createTree();
-    const pending = tree.transaction(() => tree.$.count(1));
+    const pending = tree.transact(() => tree.$.count(1));
     const scopes: ReturnType<typeof activeTransactionContext>[] = [];
-    const unsubscribe = tree.$.count.subscribe(() => scopes.push(activeTransactionContext()));
+    const unsubscribe = tree.$.count.subscribe(() =>
+      scopes.push(activeTransactionContext())
+    );
     pending.rollback();
     unsubscribe();
     expect(tree.$.count()).toBe(0);
     expect(scopes.length).toBeGreaterThan(0);
-    expect(scopes.every(scope => scope === undefined)).toBe(true);
+    expect(scopes.every((scope) => scope === undefined)).toBe(true);
     expect(activeTransactionContext()).toBeUndefined();
   });
 
   it('does not carry ambient identity into async continuations', async () => {
     const tree = createTree();
     let continuation: Promise<void> | undefined;
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       expect(activeTransactionContext()?.id).toBe(1);
       continuation = (async () => {
         await Promise.resolve();
@@ -107,7 +120,9 @@ describe('activeTransactionContext', () => {
   });
 
   it.each([
-    {}, { transactionId: 1 }, { transactionOwner: {} },
+    {},
+    { transactionId: 1 },
+    { transactionOwner: {} },
     { transactionOwner: null, transactionId: 1 },
     { transactionOwner: 'owner', transactionId: 1 },
     { transactionOwner: {}, transactionId: -1 },
@@ -115,9 +130,11 @@ describe('activeTransactionContext', () => {
     { transactionOwner: {}, transactionId: Number.NaN },
     { transactionOwner: {}, transactionId: Number.POSITIVE_INFINITY },
     { transactionOwner: {}, transactionId: Number.MAX_SAFE_INTEGER + 1 },
-  ])('refuses incomplete or invalid context %j', context => {
+  ])('refuses incomplete or invalid context %j', (context) => {
     // Deliberately inject malformed runtime metadata to exercise defensive validation.
-    withWriteContext(context as unknown as WriteMetadata, () => expect(activeTransactionContext()).toBeUndefined());
+    withWriteContext(context as unknown as WriteMetadata, () =>
+      expect(activeTransactionContext()).toBeUndefined()
+    );
   });
 
   it('projects only owner and safe nonnegative ID', () => {

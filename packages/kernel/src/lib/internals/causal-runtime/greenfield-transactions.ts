@@ -1,7 +1,12 @@
 import type { StructuralEffect } from '../../types';
 
 import type { AppliedTurnProjection } from './applied-turn-projection';
-import type { CausalTurn, PositionId, ReversalResult, TurnId } from './causal-types';
+import type {
+  CausalTurn,
+  PositionId,
+  ReversalResult,
+  TurnId,
+} from './causal-types';
 import { confirmPendingTurnAt } from './pending-confirmation';
 import type { RollbackPendingResult } from './pending-rollback';
 import type { TurnStore } from './turn-store';
@@ -31,10 +36,11 @@ export interface GreenfieldTransactionDraft {
 
 export interface CreateGreenfieldTransactionDraftOptions {
   readonly turnId: TurnId;
-  readonly store: Pick<TurnStore, 'admitPending'> & Pick<
-    TurnStore,
-    'prepareConfirmPendingTurn' | 'commitPreparedConfirmPending'
-  >;
+  readonly store: Pick<TurnStore, 'admitPending'> &
+    Pick<
+      TurnStore,
+      'prepareConfirmPendingTurn' | 'commitPreparedConfirmPending'
+    >;
   readonly appliedTurns: Pick<
     AppliedTurnProjection,
     'prepareAdmitConfirmedTurn' | 'commitPreparedAdmitConfirmed'
@@ -49,7 +55,9 @@ class DefaultGreenfieldTransactionDraft implements GreenfieldTransactionDraft {
   private readonly capturedEffects: ExplicitTransactionEffect[] = [];
   private sealedTurn?: CausalTurn;
 
-  constructor(private readonly options: CreateGreenfieldTransactionDraftOptions) {}
+  constructor(
+    private readonly options: CreateGreenfieldTransactionDraftOptions
+  ) {}
 
   capture(effect: ExplicitTransactionEffect): void {
     this.assertState('open');
@@ -171,10 +179,14 @@ function normalizeDraftEffects(
     };
   }
 
-  return normalizedEffects.filter((effect) => !Object.is(effect.before, effect.after));
+  return normalizedEffects.filter(
+    (effect) => !Object.is(effect.before, effect.after)
+  );
 }
 
-function shouldPreserveAuthoredEffect(effect: ExplicitTransactionEffect): boolean {
+function shouldPreserveAuthoredEffect(
+  effect: ExplicitTransactionEffect
+): boolean {
   return (
     effect.subjectId !== undefined ||
     effect.structural !== undefined ||

@@ -97,7 +97,7 @@ describe('transaction rollback after a rekey', () => {
     await tick();
     await tick();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       store.$.rows.changeId('a', 'a2');
     });
     expect(store.$.rows.ids()).toEqual(['a2']);
@@ -113,7 +113,7 @@ describe('transaction rollback after a rekey', () => {
     await tick();
     await tick();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       store.$.rows.removeOne('a');
     });
     pending.rollback();
@@ -128,7 +128,7 @@ describe('transaction rollback after a rekey', () => {
     await tick();
     await tick();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       store.$.rows.changeId('a', 'a2');
       store.$.rows.removeOne('a2');
     });
@@ -148,7 +148,7 @@ describe('transaction rollback after a rekey', () => {
     await tick();
     await tick();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       store.$.rows.changeId('a', 'a2');
       store.$.rows.updateOne('a2', { name: 'Changed' });
     });

@@ -17,8 +17,13 @@ function recordingAdapter() {
   const store = new Map<string, string>();
   const adapter: StorageAdapter = {
     getItem: (k: string) => store.get(k) ?? null,
-    setItem: (k: string, v: string) => { writes.push(v); store.set(k, v); },
-    removeItem: (k: string) => { store.delete(k); },
+    setItem: (k: string, v: string) => {
+      writes.push(v);
+      store.set(k, v);
+    },
+    removeItem: (k: string) => {
+      store.delete(k);
+    },
   } as unknown as StorageAdapter;
   return { adapter, writes, store };
 }
@@ -38,14 +43,21 @@ describe('A2 discriminators against the SHIPPED persistence enhancer', () => {
     const { adapter, writes } = recordingAdapter();
     const tree = signalTree(
       { prefs: { theme: 'dark' }, count: 0 },
-      { enhancers: [transactions(), persistence({ key: 'k', storage: adapter, debounceMs: 0 })] }
+      {
+        enhancers: [
+          transactions(),
+          persistence({ key: 'k', storage: adapter, debounceMs: 0 }),
+        ],
+      }
     ) as any;
     await flush();
     writes.length = 0;
 
-    const p = tree.transaction(() => { tree.$.prefs.theme('OPTIMISTIC'); });
+    const p = tree.transact(() => {
+      tree.$.prefs.theme('OPTIMISTIC');
+    });
     await flush();
-    const midWrites = writes.filter(w => w.includes('OPTIMISTIC')).length;
+    const midWrites = writes.filter((w) => w.includes('OPTIMISTIC')).length;
     p.rollback();
     await flush();
 
@@ -60,7 +72,11 @@ describe('A2 discriminators against the SHIPPED persistence enhancer', () => {
     const { adapter, writes } = recordingAdapter();
     const tree = signalTree(
       { prefs: { theme: 'dark' } },
-      { enhancers: [persistence({ key: 'k2', storage: adapter, debounceMs: 5000 })] }
+      {
+        enhancers: [
+          persistence({ key: 'k2', storage: adapter, debounceMs: 5000 }),
+        ],
+      }
     ) as any;
     await flush();
     writes.length = 0;
@@ -85,8 +101,13 @@ describe('A2 discriminators against the SHIPPED persistence enhancer', () => {
   it('case 8: can a tree exist with no storage platform?', async () => {
     let threw = 'none';
     try {
-      signalTree({ a: 1 }, { enhancers: [persistence({ key: 'k3', storage: undefined as never })] });
-    } catch (e) { threw = (e as Error).message.slice(0, 60); }
+      signalTree(
+        { a: 1 },
+        { enhancers: [persistence({ key: 'k3', storage: undefined as never })] }
+      );
+    } catch (e) {
+      threw = (e as Error).message.slice(0, 60);
+    }
     // In a DOM environment `storage: undefined` silently falls back to
     // window.localStorage. Without a window it throws AT CONSTRUCTION — a tree
     // with persistence() cannot be built on a platform with no storage, it
@@ -97,8 +118,15 @@ describe('A2 discriminators against the SHIPPED persistence enhancer', () => {
   it('case 9: scoping — does persistence write the WHOLE tree?', async () => {
     const { adapter, store } = recordingAdapter();
     const tree = signalTree(
-      { prefs: { theme: 'dark' }, transient: { scratch: 'should-not-persist' } },
-      { enhancers: [persistence({ key: 'k4', storage: adapter, debounceMs: 0 })] }
+      {
+        prefs: { theme: 'dark' },
+        transient: { scratch: 'should-not-persist' },
+      },
+      {
+        enhancers: [
+          persistence({ key: 'k4', storage: adapter, debounceMs: 0 }),
+        ],
+      }
     ) as any;
     await flush();
     tree.$.prefs.theme('light');

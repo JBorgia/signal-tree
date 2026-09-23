@@ -8,9 +8,21 @@ const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
 type HistoryStepStore = {
   $: {
-    left: { (value: string): void; (update: (current: string) => string): void; (): string };
-    right: { (value: string): void; (update: (current: string) => string): void; (): string };
-    later: { (value: string): void; (update: (current: string) => string): void; (): string };
+    left: {
+      (value: string): void;
+      (update: (current: string) => string): void;
+      (): string;
+    };
+    right: {
+      (value: string): void;
+      (update: (current: string) => string): void;
+      (): string;
+    };
+    later: {
+      (value: string): void;
+      (update: (current: string) => string): void;
+      (): string;
+    };
   };
   transaction(fn: () => void): { confirm(): void; rollback(): void };
   undo(): void;
@@ -58,7 +70,7 @@ describe('restoration turn adapter seam', () => {
     const store = createStore();
     const initialHistoryLength = store.getRestorationHistory().length;
 
-    const step = store.transaction(() => {
+    const step = store.transact(() => {
       undoable(() => store.$.left('L1'));
       undoable(() => store.$.right('R1'));
     });
@@ -72,7 +84,9 @@ describe('restoration turn adapter seam', () => {
     await tick();
 
     expect(store.canUndo()).toBe(true);
-    expect(store.getRestorationHistory()).toHaveLength(initialHistoryLength + 1);
+    expect(store.getRestorationHistory()).toHaveLength(
+      initialHistoryLength + 1
+    );
 
     store.undo();
     await tick();
@@ -83,7 +97,7 @@ describe('restoration turn adapter seam', () => {
 
   it('keeps ordinary writes outside the demarcated step as separate undo steps', async () => {
     const store = createStore();
-    const step = store.transaction(() => {
+    const step = store.transact(() => {
       undoable(() => store.$.left('L1'));
       undoable(() => store.$.right('R1'));
     });
@@ -115,7 +129,7 @@ describe('restoration turn adapter seam', () => {
     const initialHistoryLength = store.getRestorationHistory().length;
 
     expect(() =>
-      store.transaction(() => {
+      store.transact(() => {
         undoable(() => store.$.left('L1'));
         undoable(() => store.$.right('R1'));
         throw new Error('boom');
@@ -133,18 +147,18 @@ describe('restoration turn adapter seam', () => {
   it('keeps writes scheduled after the callback outside the demarcated step', async () => {
     const store = createStore();
     const initialHistoryLength = store.getRestorationHistory().length;
-    const step = store.transaction(() => {
+    const step = store.transact(() => {
       undoable(() => store.$.left('L1'));
-      void Promise.resolve().then(() =>
-        undoable(() => store.$.right('R1'))
-      );
+      void Promise.resolve().then(() => undoable(() => store.$.right('R1')));
     });
 
     await tick();
     step.confirm();
     await tick();
 
-    expect(store.getRestorationHistory()).toHaveLength(initialHistoryLength + 2);
+    expect(store.getRestorationHistory()).toHaveLength(
+      initialHistoryLength + 2
+    );
 
     store.undo();
     await tick();
@@ -162,9 +176,9 @@ describe('restoration turn adapter seam', () => {
     const store = createStore();
 
     expect(() =>
-      store.transaction(() => {
+      store.transact(() => {
         undoable(() => store.$.left('L1'));
-        store.transaction(() => store.$.right('R1'));
+        store.transact(() => store.$.right('R1'));
       })
     ).toThrow(/nested transaction/i);
   });
@@ -176,7 +190,7 @@ describe('restoration turn adapter seam', () => {
     await tick();
     const initialHistoryLength = store.getRestorationHistory().length;
 
-    const step = store.transaction(() => {
+    const step = store.transact(() => {
       undoable(() => store.$.rows.addOne({ id: 3, label: 'add' }));
       undoable(() => store.$.rows.updateOne(1, { label: 'updated' }));
       undoable(() => store.$.rows.removeOne(2));
@@ -190,7 +204,9 @@ describe('restoration turn adapter seam', () => {
     step.confirm();
     await tick();
 
-    expect(store.getRestorationHistory()).toHaveLength(initialHistoryLength + 1);
+    expect(store.getRestorationHistory()).toHaveLength(
+      initialHistoryLength + 1
+    );
 
     store.undo();
     await tick();
@@ -210,7 +226,7 @@ describe('restoration turn adapter seam', () => {
     await tick();
     const initialHistoryLength = store.getRestorationHistory().length;
 
-    const step = store.transaction(() => {
+    const step = store.transact(() => {
       undoable(() =>
         store.$.rows.setAll([
           { id: 1, label: 'updated' },
@@ -227,7 +243,9 @@ describe('restoration turn adapter seam', () => {
     step.confirm();
     await tick();
 
-    expect(store.getRestorationHistory()).toHaveLength(initialHistoryLength + 1);
+    expect(store.getRestorationHistory()).toHaveLength(
+      initialHistoryLength + 1
+    );
 
     store.undo();
     await tick();
@@ -244,7 +262,7 @@ describe('restoration turn adapter seam', () => {
     await tick();
     const initialHistoryLength = store.getRestorationHistory().length;
 
-    const step = store.transaction(() => {
+    const step = store.transact(() => {
       undoable(() => store.$.rows.changeId(1, 42));
       undoable(() => store.$.rows.updateOne(42, { label: 'server' }));
     });
@@ -256,7 +274,9 @@ describe('restoration turn adapter seam', () => {
     step.confirm();
     await tick();
 
-    expect(store.getRestorationHistory()).toHaveLength(initialHistoryLength + 1);
+    expect(store.getRestorationHistory()).toHaveLength(
+      initialHistoryLength + 1
+    );
 
     store.undo();
     await tick();

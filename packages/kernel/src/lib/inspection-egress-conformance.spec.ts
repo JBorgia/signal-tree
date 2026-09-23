@@ -59,7 +59,10 @@ afterEach(() => {
 });
 
 const makeTree = () =>
-  signalTree({ s: { ...INITIAL } }, { enhancers: [transactions(), restoration()] });
+  signalTree(
+    { s: { ...INITIAL } },
+    { enhancers: [transactions(), restoration()] }
+  );
 const makeScalar = () =>
   signalTree({ n: 0 }, { enhancers: [transactions(), restoration()] });
 
@@ -160,9 +163,7 @@ describe('the axis: participation, not provenance', () => {
     const got: number[] = [];
     const tree = makeScalar();
     await flush();
-    const l = track(
-      link(tree.$.n, { set: (v: number) => void got.push(v) })
-    );
+    const l = track(link(tree.$.n, { set: (v: number) => void got.push(v) }));
 
     tree.$.n(5);
     await flush();
@@ -383,7 +384,10 @@ describe('inbound external truth is authoritative', () => {
     tree.$.s.density(9);
     await flush();
     await l.settled();
-    expect(r.got[r.got.length - 1]).toEqual({ theme: 'C-EXTERNAL', density: 9 });
+    expect(r.got[r.got.length - 1]).toEqual({
+      theme: 'C-EXTERNAL',
+      density: 9,
+    });
   });
 
   it('I2 subscribe() sets the projection directly', async () => {
@@ -411,7 +415,10 @@ describe('inbound external truth is authoritative', () => {
     tree.$.s.density(9);
     await flush();
     await l.settled();
-    expect(r.got[r.got.length - 1]).toEqual({ theme: 'C-EXTERNAL', density: 9 });
+    expect(r.got[r.got.length - 1]).toEqual({
+      theme: 'C-EXTERNAL',
+      density: 9,
+    });
   });
 
   it('⚠️ I4 inbound truth that COINCIDES with an inspection value is still adopted', async () => {
@@ -458,7 +465,10 @@ describe('inbound external truth is authoritative', () => {
     await l.settled();
 
     // Adopted from the endpoint — NOT reverted to the stale authored 'A'.
-    expect(r.got[r.got.length - 1]).toEqual({ theme: 'B-INSPECTION', density: 9 });
+    expect(r.got[r.got.length - 1]).toEqual({
+      theme: 'B-INSPECTION',
+      density: 9,
+    });
   });
 
   it('I3 inspection AFTER inbound does not advance the projection', async () => {
@@ -487,7 +497,10 @@ describe('inbound external truth is authoritative', () => {
     await flush();
     await l.settled();
 
-    expect(r.got[r.got.length - 1]).toEqual({ theme: 'C-EXTERNAL', density: 9 });
+    expect(r.got[r.got.length - 1]).toEqual({
+      theme: 'C-EXTERNAL',
+      density: 9,
+    });
   });
 });
 

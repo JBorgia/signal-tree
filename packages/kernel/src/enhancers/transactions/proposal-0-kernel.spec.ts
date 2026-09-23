@@ -73,7 +73,7 @@ describe('PROPOSAL-0 / A1 — clean accept', () => {
     const tree = plainTree();
     await flush();
 
-    const proposal = tree.transaction(() => {
+    const proposal = tree.transact(() => {
       tree.$.name('Samuel');
     });
     await flush();
@@ -93,7 +93,7 @@ describe('PROPOSAL-0 / A2 — clean reject', () => {
     const tree = plainTree();
     await flush();
 
-    const proposal = tree.transaction(() => {
+    const proposal = tree.transact(() => {
       tree.$.name('Samuel');
     });
     await flush();
@@ -109,7 +109,7 @@ describe('PROPOSAL-0 / A3 — multi-field proposal is one unit', () => {
     const accepted = plainTree();
     await flush();
     accepted
-      .transaction(() => {
+      .transact(() => {
         accepted.$.name('Samuel');
         accepted.$.phone('555-0100');
         accepted.$.priority(3);
@@ -124,7 +124,7 @@ describe('PROPOSAL-0 / A3 — multi-field proposal is one unit', () => {
 
     const rejected = plainTree();
     await flush();
-    const proposal = rejected.transaction(() => {
+    const proposal = rejected.transact(() => {
       rejected.$.name('Samuel');
       rejected.$.phone('555-0100');
       rejected.$.priority(3);
@@ -144,7 +144,7 @@ describe('PROPOSAL-0 / A4 — multi-entity proposal is one unit', () => {
     const tree = plainTree();
     await flush();
 
-    const proposal = tree.transaction(() => {
+    const proposal = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       tree.$.rows.addOne({ id: 'b', name: 'Beta' });
     });
@@ -161,7 +161,7 @@ describe('PROPOSAL-0 / A5 — human edits an UNRELATED field during a proposal',
     const tree = plainTree();
     await flush();
 
-    const proposal = tree.transaction(() => {
+    const proposal = tree.transact(() => {
       tree.$.name('Samuel');
     });
     await flush();
@@ -180,7 +180,7 @@ describe('PROPOSAL-0 / A6 — server realization during a proposal, then ACCEPT'
     const tree = plainTree();
     await flush();
 
-    const proposal = tree.transaction(() => {
+    const proposal = tree.transact(() => {
       tree.$.name('FromAgent');
       tree.$.priority(3);
     });
@@ -209,7 +209,7 @@ describe('PROPOSAL-0 / A7 — mixed scalar + structural proposal', () => {
     await flush();
 
     tree
-      .transaction(() => {
+      .transact(() => {
         tree.$.priority(7);
         tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       })
@@ -233,7 +233,7 @@ describe('PROPOSAL-0 / A8 — remove/re-add lifetime under a proposal', () => {
     expect(held?.()?.name).toBe('Original');
 
     tree
-      .transaction(() => {
+      .transact(() => {
         tree.$.rows.removeOne('a');
         tree.$.rows.addOne({ id: 'a', name: 'Recreated' });
       })
@@ -254,7 +254,7 @@ describe('PROPOSAL-0 / A9 — accepted proposal and restoration', () => {
     const base = tree.getRestorationHistory().length;
 
     tree
-      .transaction(() => {
+      .transact(() => {
         tree.$.name('Samuel');
       })
       .confirm();
@@ -265,7 +265,7 @@ describe('PROPOSAL-0 / A9 — accepted proposal and restoration', () => {
 
     undoable(() => {
       tree
-        .transaction(() => {
+        .transact(() => {
           tree.$.name('Agent');
           tree.$.priority(4);
         })
@@ -291,12 +291,12 @@ describe('PROPOSAL-0 / A10 — two proposals outstanding at once', () => {
     const tree = plainTree();
     await flush();
 
-    const first = tree.transaction(() => {
+    const first = tree.transact(() => {
       tree.$.name('FromA');
     });
     await flush();
 
-    const second = tree.transaction(() => {
+    const second = tree.transact(() => {
       tree.$.priority(9);
     });
     await flush();

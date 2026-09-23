@@ -293,7 +293,7 @@ describe('P5 — external acquisition moves eligible authority with no local mut
       tree as unknown as {
         transaction(fn: () => void): { confirm(): void; rollback(): void };
       }
-    ).transaction(() => {
+    ).transact(() => {
       tree.$.a('SPECULATIVE');
     });
     await tree.load();

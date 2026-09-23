@@ -104,7 +104,7 @@ describe('tree realization adapter', () => {
         profile: {
           name: TestLocation<string>;
         };
-    };
+      };
       destroy(): void;
     };
     const owner = getOwnedPositionIds(tree.$.profile.name)?.[0];
@@ -163,7 +163,9 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    undoable(() => tree.$.users.addOne({ id: 'u2', name: 'Alice', enabled: true }));
+    undoable(() =>
+      tree.$.users.addOne({ id: 'u2', name: 'Alice', enabled: true })
+    );
     getPathNotifier().flushSync();
 
     const owner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -240,11 +242,13 @@ describe('tree realization adapter', () => {
             enabled: (() => boolean) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
-    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true }));
+    undoable(() =>
+      tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true })
+    );
     getPathNotifier().flushSync();
 
     const collectionOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -278,7 +282,7 @@ describe('tree realization adapter', () => {
             name: (() => string) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -337,7 +341,7 @@ describe('tree realization adapter', () => {
             name: (() => string) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -400,7 +404,7 @@ describe('tree realization adapter', () => {
           };
           ids(): string[];
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -507,7 +511,7 @@ describe('tree realization adapter', () => {
             name: (() => string) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -567,7 +571,7 @@ describe('tree realization adapter', () => {
             name: TestLocation<string> & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -628,7 +632,7 @@ describe('tree realization adapter', () => {
           },
           { capabilities: ['causal-runtime'] }
         ) as unknown as {
-      $: {
+          $: {
             users: {
               addOne(user: { id: string; name: string }): void;
               changeId(from: string, to: string): void;
@@ -637,9 +641,9 @@ describe('tree realization adapter', () => {
                 name: TestLocation<string> & { __subjectIds?: number[] };
               };
             };
+          };
+          destroy(): void;
         };
-      destroy(): void;
-    };
 
         undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice' }));
 
@@ -729,11 +733,13 @@ describe('tree realization adapter', () => {
           };
           ids(): string[];
         };
-    };
+      };
       destroy(): void;
     };
 
-    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true }));
+    undoable(() =>
+      tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true })
+    );
     getPathNotifier().flushSync();
 
     const owner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -831,7 +837,7 @@ describe('tree realization adapter', () => {
             name: (() => string) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -910,7 +916,7 @@ describe('tree realization adapter', () => {
           },
           { enhancers: [restoration()] }
         ) as unknown as {
-      $: {
+          $: {
             users: {
               addOne(user: { id: string; name: string }): void;
               removeOne(id: string): void;
@@ -921,9 +927,9 @@ describe('tree realization adapter', () => {
                 name: (() => string | undefined) & { __subjectIds?: number[] };
               };
             };
+          };
+          destroy(): void;
         };
-      destroy(): void;
-    };
 
         undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Ada' }));
         getPathNotifier().flushSync();
@@ -1004,7 +1010,8 @@ describe('tree realization adapter', () => {
 
         const observedValues: string[] = [];
         const observed = observeReactiveTestValue(
-          () => `${tree.$.users.ids()[0] ?? '<none>'}|${heldName() ?? '<none>'}`,
+          () =>
+            `${tree.$.users.ids()[0] ?? '<none>'}|${heldName() ?? '<none>'}`,
           (value) => observedValues.push(value)
         );
         expect(observed()).toBe('<none>|<none>');
@@ -1049,7 +1056,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -1200,7 +1207,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -1320,7 +1327,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -1445,7 +1452,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -1533,7 +1540,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -1658,7 +1665,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -1803,7 +1810,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -1951,7 +1958,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -2086,7 +2093,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -2264,7 +2271,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -2360,7 +2367,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -2493,7 +2500,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -2608,7 +2615,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -2703,7 +2710,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -2837,7 +2844,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -2948,7 +2955,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -3095,7 +3102,7 @@ describe('tree realization adapter', () => {
             name: (() => string | undefined) & { __subjectIds?: number[] };
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -3377,7 +3384,7 @@ describe('tree realization adapter', () => {
           };
           ids(): string[];
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -3523,11 +3530,13 @@ describe('tree realization adapter', () => {
           };
           ids(): string[];
         };
-    };
+      };
       destroy(): void;
     };
 
-    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true }));
+    undoable(() =>
+      tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true })
+    );
     getPathNotifier().flushSync();
 
     const owner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -3553,7 +3562,9 @@ describe('tree realization adapter', () => {
     expect(heldName()).toBeUndefined();
     expect(tree.$.users.ids()).toEqual([]);
 
-    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Bob', enabled: false }));
+    undoable(() =>
+      tree.$.users.addOne({ id: 'u1', name: 'Bob', enabled: false })
+    );
     getPathNotifier().flushSync();
 
     expect(heldRow()).toBeUndefined();
@@ -3650,7 +3661,7 @@ describe('tree realization adapter', () => {
         profile: {
           name: TestLocation<string>;
         };
-    };
+      };
       destroy(): void;
     };
     const owner = getOwnedPositionIds(tree.$.profile.name)?.[0];
@@ -3701,7 +3712,7 @@ describe('tree realization adapter', () => {
         left: TestLocation<string>;
         middle: TestLocation<string>;
         right: TestLocation<string>;
-    };
+      };
       destroy(): void;
     } & {
       getRestorationHistory(): unknown[];
@@ -3762,7 +3773,7 @@ describe('tree realization adapter', () => {
           };
           ids(): string[];
         };
-    };
+      };
       destroy(): void;
     } & {
       getRestorationHistory(): unknown[];
@@ -3833,7 +3844,7 @@ describe('tree realization adapter', () => {
         users: {
           ids(): string[];
         };
-    };
+      };
       destroy(): void;
     } & {
       getRestorationHistory(): unknown[];
@@ -3888,7 +3899,7 @@ describe('tree realization adapter', () => {
         left: TestLocation<string>;
         middle: TestLocation<string>;
         right: TestLocation<string>;
-    };
+      };
       destroy(): void;
     } & {
       transaction(fn: () => void): { confirm(): void; rollback(): void };
@@ -3913,7 +3924,7 @@ describe('tree realization adapter', () => {
       descriptors,
     });
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       undoable(() => tree.$.left('A'));
       adapter.applyAtomically([{ owner, before: '', after: 'B' }]);
       undoable(() => tree.$.right('C'));
@@ -3941,7 +3952,7 @@ describe('tree realization adapter', () => {
       $: {
         a: TestLocation<string>;
         b: TestLocation<string>;
-    };
+      };
       destroy(): void;
     } & {
       getRestorationHistory(): unknown[];
@@ -4046,7 +4057,7 @@ describe('tree realization adapter', () => {
             name: TestLocation<string>;
           };
         };
-    };
+      };
       destroy(): void;
     };
 
@@ -4107,7 +4118,7 @@ describe('tree realization adapter', () => {
             publish(metaOverride?: WriteMetadata): void;
           };
         };
-    };
+      };
       destroy(): void;
     } & {
       getRestorationHistory(): unknown[];
@@ -4243,7 +4254,7 @@ describe('tree realization adapter', () => {
           },
           { capabilities: ['causal-runtime'] }
         ) as unknown as {
-      $: {
+          $: {
             status: TestLocation<string>;
             users: {
               addOne(user: { id: string; name: string }): void;
@@ -4255,9 +4266,9 @@ describe('tree realization adapter', () => {
                 };
               };
             };
+          };
+          destroy(): void;
         };
-      destroy(): void;
-    };
 
         undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice' }));
 
@@ -4343,7 +4354,7 @@ describe('tree realization adapter', () => {
         users: {
           addOne(user: { id: string; name: string }): void;
         };
-    };
+      };
       destroy(): void;
     };
 

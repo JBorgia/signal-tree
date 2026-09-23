@@ -150,9 +150,9 @@ export function getOrCreateSubjectReclamationSink(
   if (!isTraversableNode(host)) {
     return undefined;
   }
-  const existing = (
-    host as Record<symbol, SubjectReclamationSink | undefined>
-  )[SUBJECT_RECLAMATION_SINK_SYMBOL];
+  const existing = (host as Record<symbol, SubjectReclamationSink | undefined>)[
+    SUBJECT_RECLAMATION_SINK_SYMBOL
+  ];
   if (existing) {
     return existing;
   }

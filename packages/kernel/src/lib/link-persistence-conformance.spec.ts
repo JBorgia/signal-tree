@@ -133,7 +133,10 @@ afterEach(() => {
 describe('Link persistence — acquiring durable state', () => {
   it('§1 RETRIEVE — a durable value becomes tree state', async () => {
     const be = backend();
-    be.store.set('k', JSON.stringify({ v: 1, data: { theme: 'dark', density: 3 } }));
+    be.store.set(
+      'k',
+      JSON.stringify({ v: 1, data: { theme: 'dark', density: 3 } })
+    );
 
     const tree = makeTree();
     await flush();
@@ -145,7 +148,10 @@ describe('Link persistence — acquiring durable state', () => {
 
   it('§8 a FAILED retrieve rejects its caller and leaves state truthful', async () => {
     const be = backend();
-    be.store.set('k', JSON.stringify({ v: 1, data: { theme: 'dark', density: 3 } }));
+    be.store.set(
+      'k',
+      JSON.stringify({ v: 1, data: { theme: 'dark', density: 3 } })
+    );
     const tree = makeTree();
     const l = track(link(tree.$.settings, endpointFor(be, 'k')));
 
@@ -198,7 +204,9 @@ describe('Link persistence — publishing durable state', () => {
   it('§6 DURABILITY SETTLEMENT — settled() waits for the durable write', async () => {
     const be = backend();
     const tree = makeTree();
-    const l = track(link(tree.$.settings, endpointFor(be, 'k', { delayMs: 30 })));
+    const l = track(
+      link(tree.$.settings, endpointFor(be, 'k', { delayMs: 30 }))
+    );
 
     tree.$.settings.theme('dark');
     tree.$.settings.density(2);
@@ -225,7 +233,7 @@ describe('Link persistence — transactional truth', () => {
     const tree = makeTree();
     const l = track(link(tree.$.settings, endpointFor(be, 'k')));
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.settings.theme('SPECULATIVE');
       tree.$.settings.density(99);
     });
@@ -247,7 +255,7 @@ describe('Link persistence — transactional truth', () => {
     const tree = makeTree();
     const l = track(link(tree.$.settings, endpointFor(be, 'k')));
 
-    const p = tree.transaction(() => {
+    const p = tree.transact(() => {
       tree.$.settings.theme('dark');
       tree.$.settings.density(4);
     });
@@ -257,7 +265,10 @@ describe('Link persistence — transactional truth', () => {
 
     // One write of the COMPLETE committed value — not one per field.
     expect(be.writes.length).toBe(1);
-    expect(JSON.parse(be.writes[0]).data).toEqual({ theme: 'dark', density: 4 });
+    expect(JSON.parse(be.writes[0]).data).toEqual({
+      theme: 'dark',
+      density: 4,
+    });
   });
 });
 
@@ -331,7 +342,9 @@ describe('Link persistence — failure and recovery', () => {
     const ids = new Set(
       seen.filter((e) => e.operation === 'link:set').map((e) => e.treeId)
     );
-    expect(seen.filter((e) => e.operation === 'link:set').length).toBeGreaterThan(1);
+    expect(
+      seen.filter((e) => e.operation === 'link:set').length
+    ).toBeGreaterThan(1);
     expect(ids.size).toBe(1);
   });
 

@@ -132,7 +132,7 @@ describe('RESTORATION-IDLE-DENSITY-0', () => {
       }
     );
     const pending = undoable(() =>
-      tree.transaction(() => tree.$.rows.addOne({ id: 1, value: 1 }))
+      tree.transact(() => tree.$.rows.addOne({ id: 1, value: 1 }))
     );
     pending.rollback();
     await flush();
@@ -156,7 +156,7 @@ describe('RESTORATION-IDLE-DENSITY-0', () => {
       }
     );
     const pending = undoable(() =>
-      tree.transaction(() => {
+      tree.transact(() => {
         tree.$.rows.addOne({ id: 1, value: 1 });
         tree.$.rows.removeOne(1);
       })
@@ -182,7 +182,7 @@ describe('RESTORATION-IDLE-DENSITY-0', () => {
       }
     );
     const pending = undoable(() =>
-      tree.transaction(() => tree.$.rows.addOne({ id: 1, value: 1 }))
+      tree.transact(() => tree.$.rows.addOne({ id: 1, value: 1 }))
     );
     tree.resetRestorationHistory();
     pending.confirm();
@@ -206,7 +206,7 @@ describe('RESTORATION-IDLE-DENSITY-0', () => {
       }
     );
     const pending = undoable(() =>
-      tree.transaction(() => tree.$.rows.addOne({ id: 1, value: 1 }))
+      tree.transact(() => tree.$.rows.addOne({ id: 1, value: 1 }))
     );
 
     tree.destroy();
@@ -234,7 +234,7 @@ describe('RESTORATION-IDLE-DENSITY-0', () => {
     );
 
     expect(() =>
-      tree.transaction(() => {
+      tree.transact(() => {
         tree.$.rows.addOne({ id: 1, value: 1 });
         throw new Error('abort');
       })
@@ -260,7 +260,9 @@ describe('RESTORATION-IDLE-DENSITY-0', () => {
 
 describe('ZERO-HISTORY-RETENTION-0', () => {
   it('retains no completed entries, claims, or reversal descriptors at capacity zero', async () => {
-    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const error = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
     const tree = makeTree(0);
     tree.$.rows.setAll([{ id: 1, value: 1 }]);
     await flush();

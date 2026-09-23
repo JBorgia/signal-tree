@@ -75,7 +75,7 @@ describe('transactions — entity field rollback', () => {
     tree.$.rows.addOne({ id: 'A', name: 'Alpha' });
     await settle();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.updateOne('A', { name: 'Changed' });
     });
     expect(tree.$.rows.all()).toEqual([{ id: 'A', name: 'Changed' }]);
@@ -101,7 +101,7 @@ describe('transactions — entity field rollback', () => {
     tree.$.rows.addOne({ id: 'A', name: 'Alpha', tag: 'first' });
     await settle();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.updateOne('A', { name: 'Changed' });
       tree.$.rows.updateOne('A', { tag: 'second' });
     });
@@ -127,7 +127,7 @@ describe('transactions — entity field rollback', () => {
     tree.$.rows.addOne({ id: 'B', name: 'Beta' });
     await settle();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.updateOne('A', { name: 'A-changed' });
       tree.$.rows.updateOne('B', { name: 'B-changed' });
     });
@@ -146,7 +146,7 @@ describe('transactions — entity field rollback', () => {
     tree.$.rows.addOne({ id: 'A', name: 'Alpha' });
     await settle();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.updateOne('A', { name: 'Changed' });
     });
     pending.confirm();
@@ -164,14 +164,18 @@ describe('transactions — entity field rollback', () => {
       { enhancers: [transactions()] }
     ) as never as {
       $: {
-        count: { (value: number): void; (update: (current: number) => number): void; (): number };
+        count: {
+          (value: number): void;
+          (update: (current: number) => number): void;
+          (): number;
+        };
       };
       transaction: (fn: () => void) => { rollback(): void };
     };
     tree.$.count(1);
     await settle();
 
-    const pending = tree.transaction(() => tree.$.count(99));
+    const pending = tree.transact(() => tree.$.count(99));
     expect(tree.$.count()).toBe(99);
 
     pending.rollback();

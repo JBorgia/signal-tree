@@ -122,7 +122,7 @@ describe('NOTIFIER-SCOPE-0: what does it do to transaction compensation?', () =>
     );
     await flush();
 
-    const p = a.transaction(() => a.$.only('a1'));
+    const p = a.transact(() => a.$.only('a1'));
     await flush();
     p.rollback();
     await flush();
@@ -149,7 +149,7 @@ describe('NOTIFIER-SCOPE-0: what does it do to transaction compensation?', () =>
     );
     await flush();
 
-    const pa = a.transaction(() => a.$.tx('a1'));
+    const pa = a.transact(() => a.$.tx('a1'));
     b.$.tx('b1'); // ordinary committed work on an unrelated tree
     await flush();
 

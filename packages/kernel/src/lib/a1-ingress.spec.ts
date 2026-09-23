@@ -92,7 +92,7 @@ describe('A1 case 3-5: transaction interaction', () => {
     );
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       // An acquisition landing INSIDE the callback. Merged context, so the
       // enclosing transactionId is still ambient here.
@@ -125,7 +125,7 @@ describe('A1 case 3-5: transaction interaction', () => {
     );
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
@@ -155,7 +155,7 @@ describe('A1 case 3-5: transaction interaction', () => {
     );
     await flush();
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();

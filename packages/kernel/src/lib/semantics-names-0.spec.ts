@@ -97,7 +97,10 @@ describe('SEMANTICS-NAMES-0: the measured combination space', () => {
   });
 
   it('THE DECIDING CASE — a devtools state application', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [restoration(), transactions()] });
+    const tree = signalTree(
+      { n: 0 },
+      { enhancers: [restoration(), transactions()] }
+    );
     await flush();
 
     const { seen, off } = observe();

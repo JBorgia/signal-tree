@@ -89,7 +89,7 @@ describe('PUBLIC CARRIER — toWritableSignal is reachable from @signal-tree/ang
     const fixture = TestBed.createComponent(Host);
     fixture.detectChanges();
     const host = fixture.componentInstance;
-    const pending = host.tree.transaction(() => host.tree.$.count.set(1));
+    const pending = host.tree.transact(() => host.tree.$.count.set(1));
 
     host.model.update((current) => current + 1);
     await flush();
@@ -109,7 +109,7 @@ describe('PUBLIC CARRIER — toWritableSignal is reachable from @signal-tree/ang
     const fixture = TestBed.createComponent(Host);
     fixture.detectChanges();
     const host = fixture.componentInstance;
-    const pending = host.tree.transaction(() => host.tree.$.count.set(1));
+    const pending = host.tree.transact(() => host.tree.$.count.set(1));
 
     host.model.set(2);
     await flush();

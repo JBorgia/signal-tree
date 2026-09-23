@@ -67,7 +67,10 @@ function observe() {
   return { seen, off };
 }
 
-const settle = async () => { await Promise.resolve(); await Promise.resolve(); };
+const settle = async () => {
+  await Promise.resolve();
+  await Promise.resolve();
+};
 const out: string[] = [];
 
 describe('OWNER-EVIDENCE-0', () => {
@@ -78,9 +81,12 @@ describe('OWNER-EVIDENCE-0', () => {
    * classified as non-evidence.
    */
   it('a value-neutral realized write is not mistaken for a non-evidence frame', async () => {
-    const tree = signalTree({ value: undefined } as Maybe, {
-      enhancers: [transactions()],
-    } as never) as never as { $: Record<string, (v?: unknown) => unknown> };
+    const tree = signalTree(
+      { value: undefined } as Maybe,
+      {
+        enhancers: [transactions()],
+      } as never
+    ) as never as { $: Record<string, (v?: unknown) => unknown> };
 
     const { seen, off } = observe();
     try {
@@ -90,7 +96,9 @@ describe('OWNER-EVIDENCE-0', () => {
       const frames = seen.filter((f) => f.path === 'value');
       out.push(
         `undefined->undefined realized: ${frames.length} frame(s) ` +
-          JSON.stringify(frames.map((f) => ({ ownerId: f.ownerId, meta: f.metaKeys })))
+          JSON.stringify(
+            frames.map((f) => ({ ownerId: f.ownerId, meta: f.metaKeys }))
+          )
       );
 
       // Recorded either way. If the notifier suppresses a same-value write, the
@@ -106,7 +114,14 @@ describe('OWNER-EVIDENCE-0', () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
       { enhancers: [transactions()] } as never
-    ) as never as { $: { rows: { addOne(r: Row): void; updateOne(id: string, p: Partial<Row>): void } } };
+    ) as never as {
+      $: {
+        rows: {
+          addOne(r: Row): void;
+          updateOne(id: string, p: Partial<Row>): void;
+        };
+      };
+    };
 
     tree.$.rows.addOne({ id: 'A', name: 'Alpha' });
     await settle();
@@ -133,15 +148,21 @@ describe('OWNER-EVIDENCE-0', () => {
         ],
         'positionIds present': [
           Array.isArray(owned?.positionIds) && owned!.positionIds!.length > 0,
-          Array.isArray(unowned?.positionIds) && unowned!.positionIds!.length > 0,
+          Array.isArray(unowned?.positionIds) &&
+            unowned!.positionIds!.length > 0,
         ],
-        'meta has keys': [owned!.metaKeys.length > 0, unowned!.metaKeys.length > 0],
+        'meta has keys': [
+          owned!.metaKeys.length > 0,
+          unowned!.metaKeys.length > 0,
+        ],
         'ownerPath present': [
           typeof owned?.ownerPath === 'string',
           typeof unowned?.ownerPath === 'string',
         ],
       };
-      out.push('DISCRIMINATORS (owned, unowned): ' + JSON.stringify(discriminators));
+      out.push(
+        'DISCRIMINATORS (owned, unowned): ' + JSON.stringify(discriminators)
+      );
     } finally {
       off();
     }
@@ -152,9 +173,12 @@ describe('OWNER-EVIDENCE-0', () => {
    * collection-level frame? Only if SCALAR leaves do not share that shape.
    */
   it('tests whether path===ownerPath can identify collection frames', async () => {
-    const tree = signalTree({ total: 12000 } as { total: number }, {
-      enhancers: [transactions()],
-    } as never) as never as { $: Record<string, (v?: unknown) => unknown> };
+    const tree = signalTree(
+      { total: 12000 } as { total: number },
+      {
+        enhancers: [transactions()],
+      } as never
+    ) as never as { $: Record<string, (v?: unknown) => unknown> };
 
     const { seen, off } = observe();
     try {
@@ -163,7 +187,9 @@ describe('OWNER-EVIDENCE-0', () => {
       const scalar = seen.find((f) => f.path === 'total');
       out.push(
         `SCALAR frame: path=${scalar?.path} ownerPath=${scalar?.ownerPath} ` +
-          `equal=${scalar?.path === scalar?.ownerPath} ownerId=${scalar?.ownerId}`
+          `equal=${scalar?.path === scalar?.ownerPath} ownerId=${
+            scalar?.ownerId
+          }`
       );
     } finally {
       off();

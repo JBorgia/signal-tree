@@ -101,10 +101,7 @@ describe('restoration enhancer', () => {
           __restoration: { assertTurnStatusConsistency(): void };
         }
       ).__restoration;
-      const consistencyCheck = vi.spyOn(
-        manager,
-        'assertTurnStatusConsistency'
-      );
+      const consistencyCheck = vi.spyOn(manager, 'assertTurnStatusConsistency');
 
       tree.undo();
       expect(tree.$.value()).toBe(0);
@@ -250,14 +247,17 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
     t.resetRestorationHistory();
     const baseline = t.getTurns().length;
     const baselineHistory = t.getRestorationHistory().length;
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.drivers.addOne({ id: 7, status: 'assigned' }));
       undoable(() => store.$.trucks.addOne({ id: 12, driverId: 7 }));
       undoable(() => store.$.orders.addOne({ id: 99, status: 'dispatched' }));
@@ -309,14 +309,17 @@ describe('restoration enhancer', () => {
         inside: '',
         outside: '',
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
     t.resetRestorationHistory();
     const baseline = t.getTurns().length;
     const baselineHistory = t.getRestorationHistory().length;
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.inside('grouped'));
     });
 
@@ -341,14 +344,17 @@ describe('restoration enhancer', () => {
         inside: '',
         outside: '',
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
     t.resetRestorationHistory();
     const baseline = t.getTurns().length;
     const baselineHistory = t.getRestorationHistory().length;
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.inside('grouped'));
     });
 
@@ -382,13 +388,16 @@ describe('restoration enhancer', () => {
   it('rejects nested explicit transactions', () => {
     const store = signalTree(
       { count: 0 },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
 
     expect(() =>
-      store.transaction(() => {
+      store.transact(() => {
         undoable(() => store.$.count(1));
-        store.transaction(() => {
+        store.transact(() => {
           undoable(() => store.$.count(2));
         });
       })
@@ -404,7 +413,10 @@ describe('restoration enhancer', () => {
 
     const store = signalTree(
       { left: '', right: '' },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
     t.resetRestorationHistory();
@@ -416,7 +428,7 @@ describe('restoration enhancer', () => {
     const applySpy = vi.spyOn(realizationPort, 'applyAtomically');
 
     expect(() =>
-      store.transaction(() => {
+      store.transact(() => {
         undoable(() => store.$.left('L'));
         undoable(() => store.$.right('R'));
         throw new Error('boom');
@@ -436,12 +448,15 @@ describe('restoration enhancer', () => {
 
     const store = signalTree(
       { x: '', y: '' },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
     t.resetRestorationHistory();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.x('pending'));
     });
 
@@ -475,7 +490,10 @@ describe('restoration enhancer', () => {
         a: { x: 1 },
         b: { y: 2 },
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const realizationPort = getTreeRealizationPort(store.$);
     if (!realizationPort) {
@@ -483,7 +501,7 @@ describe('restoration enhancer', () => {
     }
     const applySpy = vi.spyOn(realizationPort, 'applyAtomically');
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.a.x(10));
     });
 
@@ -511,10 +529,13 @@ describe('restoration enhancer', () => {
           email: 'old@example.com',
         },
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.profile.name('Jon'));
     });
 
@@ -538,11 +559,14 @@ describe('restoration enhancer', () => {
 
     const store = signalTree(
       { x: 'A' },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.x('B'));
     });
 
@@ -565,11 +589,14 @@ describe('restoration enhancer', () => {
 
     const store = signalTree(
       { x: 10 },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.x(20));
     });
 
@@ -592,10 +619,13 @@ describe('restoration enhancer', () => {
 
     const store = signalTree(
       { x: 10 },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.x(20));
     });
 
@@ -614,10 +644,13 @@ describe('restoration enhancer', () => {
 
     const store = signalTree(
       { x: 10 },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.x(20));
     });
 
@@ -637,10 +670,13 @@ describe('restoration enhancer', () => {
 
     const store = signalTree(
       { x: 10 },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.x(20));
     });
 
@@ -660,10 +696,13 @@ describe('restoration enhancer', () => {
 
     const store = signalTree(
       { x: 10 },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.x(20));
     });
 
@@ -683,10 +722,13 @@ describe('restoration enhancer', () => {
 
     const store = signalTree(
       { x: 10 },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.x(20));
     });
 
@@ -706,10 +748,13 @@ describe('restoration enhancer', () => {
 
     const store = signalTree(
       { x: 10 },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.x(20));
     });
 
@@ -732,10 +777,13 @@ describe('restoration enhancer', () => {
 
     const store = signalTree(
       { count: 10, title: 'Original' },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       store.$({
         count: 20,
         title: 'Pending',
@@ -761,7 +809,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -770,7 +821,7 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     t.resetRestorationHistory();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.addOne({ id: 17, name: 'pending' }));
     });
 
@@ -794,10 +845,13 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.addOne({ id: 17, name: 'pending' }));
     });
 
@@ -824,14 +878,19 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.addOne({ id: 17, name: 'pending' }));
     });
 
-    undoable(() => store.$.rows.byIdOrFail(17).name((value) => `${value}-updated`));
+    undoable(() =>
+      store.$.rows.byIdOrFail(17).name((value) => `${value}-updated`)
+    );
     await Promise.resolve();
     await Promise.resolve();
 
@@ -854,7 +913,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -868,7 +930,7 @@ describe('restoration enhancer', () => {
     const originalSubject = (store.$.rows.byIdOrFail(17).name as any)
       .__subjectIds?.[0] as number;
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.removeOne(17));
     });
 
@@ -896,7 +958,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -905,7 +970,7 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     t.resetRestorationHistory();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.removeOne(17));
     });
 
@@ -930,7 +995,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -939,7 +1007,7 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     t.resetRestorationHistory();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.removeOne(17));
     });
 
@@ -971,7 +1039,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -984,7 +1055,7 @@ describe('restoration enhancer', () => {
     const originalSubject = (store.$.rows.byIdOrFail(7).name as any)
       .__subjectIds?.[0] as number;
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.changeId(7, 42));
     });
 
@@ -1014,7 +1085,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
     t.resetRestorationHistory();
@@ -1023,7 +1097,7 @@ describe('restoration enhancer', () => {
 
     undoable(() => store.$.status('queued-before'));
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.addOne({ id: 17, name: 'pending' }));
     });
 
@@ -1083,7 +1157,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
     t.resetRestorationHistory();
@@ -1093,7 +1170,7 @@ describe('restoration enhancer', () => {
     undoable(() => store.$.a(1));
 
     expect(() =>
-      store.transaction(() => {
+      store.transact(() => {
         undoable(() => store.$.rows.addOne({ id: 17, name: 'pending' }));
         throw new Error('boom');
       })
@@ -1122,7 +1199,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -1131,7 +1211,7 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     t.resetRestorationHistory();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.changeId(7, 42));
     });
 
@@ -1158,7 +1238,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     ) as unknown as {
       $: {
         rows: {
@@ -1181,7 +1264,7 @@ describe('restoration enhancer', () => {
     const t = store.__restoration;
     t.resetRestorationHistory();
 
-    store.transaction(() => {
+    store.transact(() => {
       undoable(() => store.$.rows.changeId(7, 42));
       undoable(() => store.$.rows.byIdOrFail(42).name('stable'));
     });
@@ -1217,7 +1300,11 @@ describe('restoration enhancer', () => {
           addOne(row: { id: number; name: string }): void;
           changeId(from: number, to: number): void;
           byIdOrFail(id: number): {
-            name: { (value: string): void; (update: (current: string) => string): void; (): string };
+            name: {
+              (value: string): void;
+              (update: (current: string) => string): void;
+              (): string;
+            };
           };
           ids(): number[];
         };
@@ -1248,7 +1335,7 @@ describe('restoration enhancer', () => {
     const baselineTransactionPending =
       store.__transactions.getPendingTurnCount();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.changeId(7, 42));
       undoable(() => store.$.rows.byIdOrFail(42).name('stable'));
     });
@@ -1299,7 +1386,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -1308,11 +1398,13 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     t.resetRestorationHistory();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.changeId(7, 42));
     });
 
-    undoable(() => store.$.rows.byIdOrFail(42).name((value) => `${value}-updated`));
+    undoable(() =>
+      store.$.rows.byIdOrFail(42).name((value) => `${value}-updated`)
+    );
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1332,7 +1424,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -1341,7 +1436,7 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     t.resetRestorationHistory();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.changeId(7, 42));
     });
 
@@ -1368,7 +1463,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -1380,7 +1478,7 @@ describe('restoration enhancer', () => {
     const originalSubject = (store.$.rows.byIdOrFail(7).name as any)
       .__subjectIds?.[0] as number;
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.changeId(7, 42));
     });
 
@@ -1416,7 +1514,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -1427,7 +1528,7 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     t.resetRestorationHistory();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.removeOne(17));
     });
 
@@ -1452,7 +1553,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -1463,7 +1567,7 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     t.resetRestorationHistory();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.removeOne(17));
     });
 
@@ -1488,7 +1592,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -1499,7 +1606,7 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     t.resetRestorationHistory();
 
-    const pending = store.transaction(() => {
+    const pending = store.transact(() => {
       undoable(() => store.$.rows.removeOne(17));
     });
 
@@ -1523,17 +1630,20 @@ describe('restoration enhancer', () => {
   it('makes confirm and rollback idempotent in their own terminal direction', () => {
     const store = signalTree(
       { value: '' },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
 
-    const confirmed = store.transaction(() => {
+    const confirmed = store.transact(() => {
       undoable(() => store.$.value('confirmed'));
     });
     confirmed.confirm();
     confirmed.confirm();
     expect(store.$()).toEqual({ value: 'confirmed' });
 
-    const rolledBack = store.transaction(() => {
+    const rolledBack = store.transact(() => {
       undoable(() => store.$.value('rolled-back'));
     });
     rolledBack.rollback();
@@ -1544,16 +1654,19 @@ describe('restoration enhancer', () => {
   it('rejects mixed terminal transitions on a transaction handle', () => {
     const store = signalTree(
       { value: '' },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
 
-    const confirmed = store.transaction(() => {
+    const confirmed = store.transact(() => {
       undoable(() => store.$.value('confirmed'));
     });
     confirmed.confirm();
     expect(() => confirmed.rollback()).toThrow(/confirmed transaction/i);
 
-    const rolledBack = store.transaction(() => {
+    const rolledBack = store.transact(() => {
       undoable(() => store.$.value('rolled-back'));
     });
     rolledBack.rollback();
@@ -2370,10 +2483,9 @@ describe('restoration enhancer', () => {
 
     expect(t.getTurn(secondTurn.id)).toBeUndefined();
     expect(t.getTurn(thirdTurn.id)).toBeUndefined();
-    expect(t.getRestorationHistory().map((entry: { id: number }) => entry.id)).toEqual([
-      firstTurn.id,
-      fourthTurn.id,
-    ]);
+    expect(
+      t.getRestorationHistory().map((entry: { id: number }) => entry.id)
+    ).toEqual([firstTurn.id, fourthTurn.id]);
     expect(t.getTurnIdsForPosition(driverPositionId)).toEqual([firstTurn.id]);
     expect(t.getTurnIdsForPosition(orderPositionId)).toEqual([]);
     expect(t.resolveRedoClosure(driverPositionId)).toEqual([]);
@@ -3002,10 +3114,13 @@ describe('restoration enhancer', () => {
     const seenPaths: string[] = [];
     const seenOwnerPaths: string[] = [];
     const notifier = getPathNotifier();
-    const unsubscribe = notifier.subscribe('rows.*', (_next, _prev, path, ownerPath) => {
-      seenPaths.push(path);
-      seenOwnerPaths.push(ownerPath);
-    });
+    const unsubscribe = notifier.subscribe(
+      'rows.*',
+      (_next, _prev, path, ownerPath) => {
+        seenPaths.push(path);
+        seenOwnerPaths.push(ownerPath);
+      }
+    );
 
     undoable(() => store.$.rows.addOne({ id: -1, name: 'temp' }));
     await Promise.resolve();
@@ -3133,8 +3248,9 @@ describe('restoration enhancer', () => {
         ?.__positionIds ?? []),
     ];
     const subjectAfterFirstAdd = [
-      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
-        ?.restorationSubjectIds ?? []),
+      ...((
+        t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] }
+      )?.restorationSubjectIds ?? []),
     ];
 
     undoable(() => store.$.rows.addOne({ id: 8, name: 'second' }));
@@ -3145,8 +3261,9 @@ describe('restoration enhancer', () => {
         ?.__positionIds ?? []),
     ];
     const subjectAfterSecondAdd = [
-      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
-        ?.restorationSubjectIds ?? []),
+      ...((
+        t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] }
+      )?.restorationSubjectIds ?? []),
     ];
 
     undoable(() => store.$.rows.changeId(7, 70));
@@ -3169,8 +3286,9 @@ describe('restoration enhancer', () => {
         ?.__positionIds ?? []),
     ];
     const subjectAfterReuse = [
-      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
-        ?.restorationSubjectIds ?? []),
+      ...((
+        t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] }
+      )?.restorationSubjectIds ?? []),
     ];
 
     t.undo();
@@ -3296,32 +3414,36 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const addedToken = [
-      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
-        ?.restorationSubjectIds ?? []),
+      ...((
+        t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] }
+      )?.restorationSubjectIds ?? []),
     ];
 
     undoable(() => store.$.rows.changeId(-1, 42));
     await Promise.resolve();
     await Promise.resolve();
     const rekeyedToken = [
-      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
-        ?.restorationSubjectIds ?? []),
+      ...((
+        t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] }
+      )?.restorationSubjectIds ?? []),
     ];
 
     undoable(() => store.$.rows.byIdOrFail(42).name('server'));
     await Promise.resolve();
     await Promise.resolve();
     const retainedToken = [
-      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
-        ?.restorationSubjectIds ?? []),
+      ...((
+        t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] }
+      )?.restorationSubjectIds ?? []),
     ];
 
     undoable(() => store.$.rows.addOne({ id: -1, name: 'replacement' }));
     await Promise.resolve();
     await Promise.resolve();
     const reusedPathToken = [
-      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
-        ?.restorationSubjectIds ?? []),
+      ...((
+        t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] }
+      )?.restorationSubjectIds ?? []),
     ];
 
     t.undo();
@@ -3586,24 +3708,27 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const originalToken = [
-      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
-        ?.restorationSubjectIds ?? []),
+      ...((
+        t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] }
+      )?.restorationSubjectIds ?? []),
     ];
 
     undoable(() => store.$.rows.removeOne(7));
     await Promise.resolve();
     await Promise.resolve();
     const removedToken = [
-      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
-        ?.restorationSubjectIds ?? []),
+      ...((
+        t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] }
+      )?.restorationSubjectIds ?? []),
     ];
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'replacement' }));
     await Promise.resolve();
     await Promise.resolve();
     const replacementToken = [
-      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
-        ?.restorationSubjectIds ?? []),
+      ...((
+        t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] }
+      )?.restorationSubjectIds ?? []),
     ];
 
     t.undo();
@@ -3814,8 +3939,7 @@ describe('restoration enhancer', () => {
         enhancers: [restoration()],
         derived: ($) => ({
           profile: {
-            fullName: () =>
-              `${$.profile.firstName()} ${$.profile.lastName()}`,
+            fullName: () => `${$.profile.firstName()} ${$.profile.lastName()}`,
           },
         }),
       }
@@ -3853,7 +3977,9 @@ describe('restoration enhancer', () => {
 
     expect(store.$.profile.firstName()).toBe('Jon');
     expect(fullName()).toBe('Jon Borgia');
-    expect(t.getRestorationHistory()).toHaveLength(baselineRestorationCount + 1);
+    expect(t.getRestorationHistory()).toHaveLength(
+      baselineRestorationCount + 1
+    );
     expect(t.getTurns()).toHaveLength(baselineTurnCount + 1);
     expect(turn.__positionIds).toHaveLength(1);
     expect(turn.__effects).toHaveLength(1);
@@ -3879,8 +4005,7 @@ describe('restoration enhancer', () => {
         enhancers: [restoration()],
         derived: ($) => ({
           profile: {
-            fullName: () =>
-              `${$.profile.firstName()} ${$.profile.lastName()}`,
+            fullName: () => `${$.profile.firstName()} ${$.profile.lastName()}`,
           },
         }),
       }
@@ -3899,7 +4024,9 @@ describe('restoration enhancer', () => {
     const positionId = turn.__positionIds?.[0] as number;
 
     expect(store.$.profile.fullName()).toBe('Jon Borgia');
-    expect(t.getRestorationHistory()).toHaveLength(baselineRestorationCount + 1);
+    expect(t.getRestorationHistory()).toHaveLength(
+      baselineRestorationCount + 1
+    );
     expect(t.getTurns()).toHaveLength(baselineTurnCount + 1);
     expect(t.getFrontier(positionId)).toBe(1);
 
@@ -3907,7 +4034,9 @@ describe('restoration enhancer', () => {
 
     expect(store.$.profile.firstName()).toBe('Jonathan');
     expect(store.$.profile.fullName()).toBe('Jonathan Borgia');
-    expect(t.getRestorationHistory()).toHaveLength(baselineRestorationCount + 1);
+    expect(t.getRestorationHistory()).toHaveLength(
+      baselineRestorationCount + 1
+    );
     expect(t.getTurns()).toHaveLength(baselineTurnCount + 1);
     expect(t.getFrontier(positionId)).toBe(0);
     expect(store.canUndo()).toBe(false);
@@ -3992,7 +4121,10 @@ describe('restoration enhancer', () => {
       {
         profile: { firstName: 'John', lastName: 'Smith' },
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration as InternalRestorationManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
@@ -4001,7 +4133,7 @@ describe('restoration enhancer', () => {
     };
 
     store
-      .transaction(() => {
+      .transact(() => {
         undoable(() => profile.firstName('Jane'));
         undoable(() => profile.lastName('Jones'));
       })
@@ -4076,7 +4208,10 @@ describe('restoration enhancer', () => {
         profile: { firstName: 'John', lastName: 'Smith' },
         settings: { theme: 'light' },
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration as InternalRestorationManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
@@ -4087,7 +4222,7 @@ describe('restoration enhancer', () => {
     };
 
     store
-      .transaction(() => {
+      .transact(() => {
         undoable(() => profile.firstName('Jane'));
         undoable(() => settings.theme('dark'));
       })
@@ -4124,7 +4259,10 @@ describe('restoration enhancer', () => {
         profile: { firstName: 'John', lastName: 'Smith' },
         settings: { theme: 'light' },
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration as InternalRestorationManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
@@ -4136,14 +4274,14 @@ describe('restoration enhancer', () => {
     };
 
     store
-      .transaction(() => {
+      .transact(() => {
         undoable(() => profile.firstName('Ada'));
         undoable(() => profile.lastName('Lovelace'));
       })
       .confirm();
 
     store
-      .transaction(() => {
+      .transact(() => {
         undoable(() => profile.firstName('Grace'));
         undoable(() => settings.theme('dark'));
       })
@@ -4367,7 +4505,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -4377,7 +4518,7 @@ describe('restoration enhancer', () => {
     t.resetRestorationHistory();
 
     store
-      .transaction(() => {
+      .transact(() => {
         undoable(() => store.$.count(1));
         undoable(() => store.$.rows.changeId(7, 42));
       })
@@ -4407,7 +4548,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -4417,7 +4561,7 @@ describe('restoration enhancer', () => {
     t.resetRestorationHistory();
 
     store
-      .transaction(() => {
+      .transact(() => {
         undoable(() => store.$.count(1));
         undoable(() => store.$.rows.byIdOrFail(7).name('B'));
       })
@@ -4569,7 +4713,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -4579,7 +4726,7 @@ describe('restoration enhancer', () => {
     t.resetRestorationHistory();
 
     store
-      .transaction(() => {
+      .transact(() => {
         undoable(() => store.$.count(1));
         undoable(() => store.$.rows.removeOne(7));
       })
@@ -4687,7 +4834,10 @@ describe('restoration enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [restoration(), transactions()], capabilities: ['causal-runtime'] }
+      {
+        enhancers: [restoration(), transactions()],
+        capabilities: ['causal-runtime'],
+      }
     );
     const t = (store as any).__restoration;
 
@@ -4697,7 +4847,7 @@ describe('restoration enhancer', () => {
     t.resetRestorationHistory();
 
     store
-      .transaction(() => {
+      .transact(() => {
         undoable(() => store.$.count(1));
         undoable(() => store.$.rows.removeOne(7));
       })
@@ -4925,9 +5075,9 @@ describe('restoration enhancer', () => {
       }
 
       resetProductionSubstrateStatsForTesting(stats);
-  store.jumpTo(0);
+      store.jumpTo(0);
       expect(store.$.value()).toBe(1);
-  expect(store.getCurrentIndex()).toBe(0);
+      expect(store.getCurrentIndex()).toBe(0);
       expect(stats.turnIndexLookups).toBe(199);
     } finally {
       clearProductionSubstrateStatsForTesting();

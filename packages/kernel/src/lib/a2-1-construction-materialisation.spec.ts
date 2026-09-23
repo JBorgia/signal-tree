@@ -59,10 +59,7 @@ describe('A2-1 arm B: COMPOSITION, adapter reads AFTER construction', () => {
     const { seen, off } = observe();
     // The shape a post-construction `persist(node, { key })` adapter is forced
     // into: the tree exists with its default before anything can read storage.
-    const tree = signalTree(
-      { theme: 'light' },
-      { enhancers: [restoration()] }
-    );
+    const tree = signalTree({ theme: 'light' }, { enhancers: [restoration()] });
     const firstObserved = tree.$.theme();
 
     // …then the adapter hydrates.

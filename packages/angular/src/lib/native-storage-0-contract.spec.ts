@@ -55,7 +55,7 @@ describe('NATIVE-STORAGE-0 contract', () => {
     });
     TestBed.tick();
 
-    const pending = store.transaction(() => store.$.theme.set('speculative'));
+    const pending = store.transact(() => store.$.theme.set('speculative'));
     TestBed.tick();
     await flush();
 
@@ -73,7 +73,7 @@ describe('NATIVE-STORAGE-0 contract', () => {
     const carrierBefore = store.$.theme;
     expect(isSignal(carrierBefore)).toBe(true);
 
-    const pending = store.transaction(() => store.$.theme.set('speculative'));
+    const pending = store.transact(() => store.$.theme.set('speculative'));
     await flush();
     expect(store.$.theme).toBe(carrierBefore); // identity survives a speculative write
 
@@ -122,7 +122,7 @@ describe('NATIVE-STORAGE-0 contract', () => {
     undoable(() => store.$.theme.set('dark'));
     await flush();
 
-    const pending = store.transaction(() => store.$.theme.set('speculative'));
+    const pending = store.transact(() => store.$.theme.set('speculative'));
     await flush();
     pending.rollback();
     await flush();
@@ -148,7 +148,7 @@ describe('NATIVE-STORAGE-0 contract', () => {
     TestBed.tick();
     const beforeCount = seen.length;
 
-    const pending = store.transaction(() => store.$.theme.set('dark'));
+    const pending = store.transact(() => store.$.theme.set('dark'));
     pending.confirm();
     TestBed.tick();
     await flush();
@@ -167,7 +167,7 @@ describe('NATIVE-STORAGE-0 contract', () => {
     expect(isSignal(store.$.theme)).toBe(true);
     expect(typeof store.$.theme.set).toBe('function');
 
-    const pending = store.transaction(() => store.$.theme.set('speculative'));
+    const pending = store.transact(() => store.$.theme.set('speculative'));
     expect(isSignal(store.$.theme)).toBe(true);
     pending.rollback();
     await flush();

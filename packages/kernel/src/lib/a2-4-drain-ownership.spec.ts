@@ -121,7 +121,7 @@ describe('A2-4: one host event, two persisted leaves', () => {
     const durability = makeDurability(tree, store);
     durability.persist('measurementSystem');
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.measurementSystem('imperial');
     });
     await flush();

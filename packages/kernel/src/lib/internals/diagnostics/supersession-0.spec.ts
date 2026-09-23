@@ -49,9 +49,12 @@ function observe() {
 }
 
 const cart = (total = 12000) =>
-  signalTree({ total } as Cart, {
-    enhancers: [restoration(), transactions()],
-  } as never) as never as {
+  signalTree(
+    { total } as Cart,
+    {
+      enhancers: [restoration(), transactions()],
+    } as never
+  ) as never as {
     $: Record<string, (v?: unknown) => unknown>;
     transaction(fn: () => void): { confirm(): void };
   };
@@ -90,7 +93,7 @@ describe('SUPERSESSION-0', () => {
     const tree = cart();
     const { seen, off } = observe();
     try {
-      tree.transaction(() => tree.$['total'](9600)).confirm();
+      tree.transact(() => tree.$['total'](9600)).confirm();
       await settle();
       external(() => tree.$['total'](10200));
       await settle();
@@ -98,7 +101,9 @@ describe('SUPERSESSION-0', () => {
       const authored = seen.find((s) => s.transactionId !== undefined);
       expect(authored).toBeDefined();
 
-      const realized = seen.filter((s) => s.participation === 'realized').at(-1)!;
+      const realized = seen
+        .filter((s) => s.participation === 'realized')
+        .at(-1)!;
       // The realization does NOT carry the transaction it superseded.
       expect(realized.transactionId).toBeUndefined();
       expect(realized.transactionId).not.toBe(authored?.transactionId);
@@ -121,14 +126,16 @@ describe('SUPERSESSION-0', () => {
     const tree = cart();
     const { seen, off } = observe();
     try {
-      tree.transaction(() => tree.$['total'](9600)).confirm();
+      tree.transact(() => tree.$['total'](9600)).confirm();
       await settle();
-      tree.transaction(() => tree.$['total'](9800)).confirm();
+      tree.transact(() => tree.$['total'](9800)).confirm();
       await settle();
       external(() => tree.$['total'](10200));
       await settle();
 
-      const realized = seen.filter((s) => s.participation === 'realized').at(-1)!;
+      const realized = seen
+        .filter((s) => s.participation === 'realized')
+        .at(-1)!;
 
       // Local succession is truthful and available.
       expect(realized.before).toBe(9800);
@@ -153,7 +160,9 @@ describe('SUPERSESSION-0', () => {
 
       // May coalesce to no-op; if it surfaces, it must not read as authored.
       for (const s of seen.filter((x) => x.after === 9600).slice(1)) {
-        expect(s.participation === 'realized' || s.participation === undefined).toBe(true);
+        expect(
+          s.participation === 'realized' || s.participation === undefined
+        ).toBe(true);
       }
     } finally {
       off();
@@ -173,7 +182,14 @@ describe('SUPERSESSION-0', () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
       { enhancers: [restoration(), transactions()] } as never
-    ) as never as { $: { rows: { addOne(r: Row): void; updateOne(id: string, p: Partial<Row>): void } } };
+    ) as never as {
+      $: {
+        rows: {
+          addOne(r: Row): void;
+          updateOne(id: string, p: Partial<Row>): void;
+        };
+      };
+    };
 
     tree.$.rows.addOne({ id: 'A', name: 'Alpha' });
     await settle();

@@ -117,7 +117,7 @@ describe('OWNER-REPLAY-2: structural collection mutations', () => {
     await flush();
     tree.undo(); // structural replay: a remove
     await flush();
-    const p = tree.transaction(() => tree.$.rows.addOne({ id: 'c', n: 3 }));
+    const p = tree.transact(() => tree.$.rows.addOne({ id: 'c', n: 3 }));
     await flush();
     p.rollback(); // structural compensation
     await flush();

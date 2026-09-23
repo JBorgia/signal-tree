@@ -179,7 +179,9 @@ describe('DEMARCATION-0 Q3: every collection transition has a QUALIFIED trigger'
           if (!path.startsWith('data.rows')) return;
           const m = (meta ?? {}) as Record<string, unknown>;
           const valued = !(v === undefined && prev === undefined);
-          (valued && m['ownerId'] === owner ? qualified : unqualified).push(path);
+          (valued && m['ownerId'] === owner ? qualified : unqualified).push(
+            path
+          );
         }
       );
       op();
@@ -191,7 +193,14 @@ describe('DEMARCATION-0 Q3: every collection transition has a QUALIFIED trigger'
     // Every mutator the collection surface offers.
     for (const [label, op] of [
       ['addOne', () => tree.$.data.rows.addOne({ id: 'a', n: 1 })],
-      ['addMany', () => tree.$.data.rows.addMany([{ id: 'b', n: 2 }, { id: 'c', n: 3 }])],
+      [
+        'addMany',
+        () =>
+          tree.$.data.rows.addMany([
+            { id: 'b', n: 2 },
+            { id: 'c', n: 3 },
+          ]),
+      ],
       ['updateOne', () => tree.$.data.rows.updateOne('a', { n: 9 })],
       ['upsertOne', () => tree.$.data.rows.upsertOne({ id: 'a', n: 10 })],
       ['removeOne', () => tree.$.data.rows.removeOne('b')],
@@ -205,8 +214,10 @@ describe('DEMARCATION-0 Q3: every collection transition has a QUALIFIED trigger'
       // least one qualified, value-carrying `rows.<id>`. So a link that filters
       // on the namespace and then LATE-READS the collection sees every
       // transition, and the ping needs no fix for link's sake.
-      expect(r.qualified.length, `${label} produced no qualified trigger`)
-        .toBeGreaterThan(0);
+      expect(
+        r.qualified.length,
+        `${label} produced no qualified trigger`
+      ).toBeGreaterThan(0);
       expect(r.unqualified.length, `${label} ping count`).toBeGreaterThan(0);
     }
   });
@@ -287,7 +298,7 @@ describe('DEMARCATION-0: the observer sees every cause link needs', () => {
     await flush();
     external(() => tree.$.theme('acquired'));
     await flush();
-    const p = tree.transaction(() => tree.$.theme('speculative'));
+    const p = tree.transact(() => tree.$.theme('speculative'));
     await flush();
     const duringPending = [...seen];
     p.rollback();
@@ -324,7 +335,7 @@ describe('DEMARCATION-0: what an ordinary Angular effect sees', () => {
     // The remedy is not a public observer. It is that an irreversible action
     // belongs to WHOEVER OWNS TRANSACTION CONFIRMATION, which the same code
     // already has, because it is the code holding `p`.
-    const p = tree.transaction(() => tree.$.theme('dark'));
+    const p = tree.transact(() => tree.$.theme('dark'));
     await flush();
     expect(charges).toEqual([]);
 
@@ -357,7 +368,9 @@ describe('DEMARCATION-0: the entityMap ownership gap this file found', () => {
     expect(getPositionRegistry(tree.$.data.rows)).toBe(
       getPositionRegistry(tree.$)
     );
-    expect(() => observeCommitted(tree.$.data.rows, () => void 0)).not.toThrow();
+    expect(() =>
+      observeCommitted(tree.$.data.rows, () => void 0)
+    ).not.toThrow();
   });
 
   it('...and the PARENT BRANCH covers it, so link is not blocked', async () => {
@@ -438,7 +451,7 @@ describe('DEMARCATION-0 Q1: does public link work on PRIVATE machinery?', () => 
     const sent: string[] = [];
     const l = link<string>(tree.$.theme, { set: (v) => void sent.push(v) });
 
-    const p = tree.transaction(() => tree.$.theme('doomed'));
+    const p = tree.transact(() => tree.$.theme('doomed'));
     await flush();
     expect(sent).toEqual([]);
 

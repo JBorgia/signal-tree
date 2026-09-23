@@ -48,7 +48,6 @@ interface Endpoint<T> {
   subscribe?(next: (value: T) => void): () => void;
 }
 
-
 const linkableWrite = <T>(x: unknown): ((value: T) => void) => {
   if (!getPositionRegistry(x)) {
     throw new Error(
@@ -96,7 +95,9 @@ describe('LINK-2 cases 1 & 5: the endpoint contract', () => {
 
     const pull = makeLink<string>(tree.$.leaf, { get: () => 'g' });
     const push = makeLink<string>(tree.$.leaf, { set: () => void 0 });
-    const live = makeLink<string>(tree.$.leaf, { subscribe: () => () => void 0 });
+    const live = makeLink<string>(tree.$.leaf, {
+      subscribe: () => () => void 0,
+    });
 
     // WAS `expect(l.linkId).toMatch(/^link#/)`. `linkId` was a REFERENCE-HARNESS
     // artifact and is not on the shipped handle, which is deliberately three
@@ -108,7 +109,9 @@ describe('LINK-2 cases 1 & 5: the endpoint contract', () => {
       expect(typeof l.retrieve).toBe('function');
       expect(typeof l.settled).toBe('function');
       expect(typeof l.dispose).toBe('function');
-      expect((l as unknown as Record<string, unknown>)['linkId']).toBeUndefined();
+      expect(
+        (l as unknown as Record<string, unknown>)['linkId']
+      ).toBeUndefined();
     }
     for (const l of [pull, push, live]) l.dispose();
   });

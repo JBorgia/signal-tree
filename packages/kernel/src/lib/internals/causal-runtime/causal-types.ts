@@ -110,8 +110,7 @@ export type ReversalRefusal =
     }
   | { readonly kind: 'not-found' };
 
-export type ReversalResult<
-  TRefusal extends ReversalRefusal = ReversalRefusal,
-> =
-  | { readonly ok: true; readonly turnId: TurnId }
-  | { readonly ok: false; readonly refusal: TRefusal };
+export type ReversalResult<TRefusal extends ReversalRefusal = ReversalRefusal> =
+
+    | { readonly ok: true; readonly turnId: TurnId }
+    | { readonly ok: false; readonly refusal: TRefusal };

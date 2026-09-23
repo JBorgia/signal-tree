@@ -97,7 +97,7 @@ describe('HIST-0 baseline: what whole-tree history does today', () => {
     await flush();
 
     tree
-      .transaction(() => {
+      .transact(() => {
         undoable(() => tree.$.document.title('edited'));
         undoable(() => tree.$.ui.selectedPanel('inspector'));
       })

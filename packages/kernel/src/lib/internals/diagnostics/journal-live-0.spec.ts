@@ -28,16 +28,21 @@ type Tree = {
 
 /** The composition the journal's own passing specs use. */
 const doc = (title = 'a') =>
-  signalTree({ title, count: 0 } as Doc, {
-    enhancers: [restoration(), transactions()],
-  } as never) as never as Tree;
+  signalTree(
+    { title, count: 0 } as Doc,
+    {
+      enhancers: [restoration(), transactions()],
+    } as never
+  ) as never as Tree;
 
 const settle = async () => {
   await Promise.resolve();
   await Promise.resolve();
 };
 
-const effectsOf = (j: { turns(): readonly { effects: readonly unknown[] }[] }) =>
+const effectsOf = (j: {
+  turns(): readonly { effects: readonly unknown[] }[];
+}) =>
   j.turns().flatMap((t) => t.effects) as readonly {
     path: string;
     before: unknown;
@@ -96,19 +101,24 @@ describe('JOURNAL-LIVE-0', () => {
    * notifier is process-global "so they can decline them". `restoration.ts` and
    * `transactions.ts` both filter on it. The journal does not.
    */
-  it.fails('1. does not capture another tree\'s writes — KNOWN DEFECT', async () => {
-    const a = doc('a');
-    const b = doc('b');
-    const journalA = createDiagnosticJournal(a);
-    try {
-      b.$['title']('written-by-B');
-      await settle();
+  it.fails(
+    "1. does not capture another tree's writes — KNOWN DEFECT",
+    async () => {
+      const a = doc('a');
+      const b = doc('b');
+      const journalA = createDiagnosticJournal(a);
+      try {
+        b.$['title']('written-by-B');
+        await settle();
 
-      expect(effectsOf(journalA).map((e) => e.after)).not.toContain('written-by-B');
-    } finally {
-      journalA.dispose();
+        expect(effectsOf(journalA).map((e) => e.after)).not.toContain(
+          'written-by-B'
+        );
+      } finally {
+        journalA.dispose();
+      }
     }
-  });
+  );
 
   it('6. dispose() stops capture', async () => {
     const tree = doc();
@@ -122,7 +132,9 @@ describe('JOURNAL-LIVE-0', () => {
     tree.$['title']('after-dispose');
     await settle();
 
-    expect(effectsOf(journal).map((e) => e.after)).not.toContain('after-dispose');
+    expect(effectsOf(journal).map((e) => e.after)).not.toContain(
+      'after-dispose'
+    );
   });
 
   it('7. retention overflow evicts the oldest', async () => {

@@ -118,7 +118,7 @@ describe('PROPOSAL-REVIEW-SURFACE-0 / A — server updates the SAME subject', ()
     const tree = rowTree();
     await flush();
 
-    tree.transaction(() => {
+    tree.transact(() => {
       tree.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
     await flush();
@@ -144,7 +144,7 @@ describe('PROPOSAL-REVIEW-SURFACE-0 / B — server removes and creates a NEW sub
     const tree = rowTree();
     await flush();
 
-    tree.transaction(() => {
+    tree.transact(() => {
       tree.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
     await flush();
@@ -174,7 +174,7 @@ describe('PROPOSAL-REVIEW-SURFACE-0 / C — A and B are distinguishable publicly
     const build = async (superseding: boolean) => {
       const tree = rowTree();
       await flush();
-      tree.transaction(() => {
+      tree.transact(() => {
         tree.$.rows.addOne({ id: 'A', name: 'Proposed' });
       });
       await flush();

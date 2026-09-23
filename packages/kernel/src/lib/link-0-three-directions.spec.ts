@@ -210,7 +210,7 @@ describe('LINK-0 PUSH-IN: a pushed source crossing the boundary', () => {
     const source = makeSource<string>();
     const stop = source.subscribe((v) => external(() => tree.$.leaf(v)));
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.settings.theme('speculative');
     });
     // A GPS fix does not become speculative by arriving while an unrelated
@@ -234,12 +234,10 @@ describe('LINK-0 PUSH-IN: a pushed source crossing the boundary', () => {
       await flush();
       const source = makeSource<string>();
       const stop = source.subscribe((v) =>
-        mode === 'external'
-          ? external(() => tree.$.leaf(v))
-          : tree.$.leaf(v)
+        mode === 'external' ? external(() => tree.$.leaf(v)) : tree.$.leaf(v)
       );
 
-      const pending = tree.transaction(() => {
+      const pending = tree.transact(() => {
         tree.$.leaf('speculative');
       });
       source.emit('from-source');
@@ -301,7 +299,6 @@ describe('LINK-0 PUSH-IN: a pushed source crossing the boundary', () => {
     expect(acquired.refused).toMatch(/ST1034/);
     expect(acquired.value).toBe('from-source');
   });
-
 });
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -341,7 +338,7 @@ describe('LINK-0 PUSH-OUT: only settled state escapes, at every scope', () => {
     await flush();
     const out = outbound(s.tree, s.leaf);
 
-    const pending = s.tree.transaction(() => s.tree.$.leaf('doomed'));
+    const pending = s.tree.transact(() => s.tree.$.leaf('doomed'));
     out.push();
     await flush();
     expect(out.sent).toEqual([]);
@@ -357,7 +354,7 @@ describe('LINK-0 PUSH-OUT: only settled state escapes, at every scope', () => {
     await flush();
     const out = outbound(s.tree, s.branch);
 
-    const pending = s.tree.transaction(() =>
+    const pending = s.tree.transact(() =>
       s.tree.$.settings({ theme: 'doomed', units: 'imperial' })
     );
     out.push();
@@ -377,7 +374,7 @@ describe('LINK-0 PUSH-OUT: only settled state escapes, at every scope', () => {
     await flush();
     const out = outbound(s.tree, s.root);
 
-    const pending = s.tree.transaction(() =>
+    const pending = s.tree.transact(() =>
       s.tree.$((current) => ({ ...current, leaf: 'doomed' }))
     );
     out.push();
@@ -397,7 +394,7 @@ describe('LINK-0 PUSH-OUT: only settled state escapes, at every scope', () => {
     await flush();
     const out = outbound(s.tree, s.leaf);
 
-    const pending = s.tree.transaction(() => s.tree.$.leaf('kept'));
+    const pending = s.tree.transact(() => s.tree.$.leaf('kept'));
     out.push();
     await flush();
     expect(out.sent).toEqual([]);

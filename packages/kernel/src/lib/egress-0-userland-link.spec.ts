@@ -132,7 +132,9 @@ const userlandLink = <T>(
   opts: { reconcile?: 'none' | 'recheck' | 'loop' } = {}
 ) => {
   if (!endpoint.get && !endpoint.set && !endpoint.subscribe) {
-    throw new Error('link: endpoint must supply at least one of get/set/subscribe.');
+    throw new Error(
+      'link: endpoint must supply at least one of get/set/subscribe.'
+    );
   }
 
   // Public shape detection: a leaf has `.set`, a branch/root is callable.
@@ -218,7 +220,10 @@ const userlandLink = <T>(
 };
 
 const leafTree = () =>
-  signalTree({ theme: 'light' }, { enhancers: [restoration(), transactions()] });
+  signalTree(
+    { theme: 'light' },
+    { enhancers: [restoration(), transactions()] }
+  );
 const branchTree = () =>
   signalTree(
     { settings: { theme: 'light', units: 'imperial' } },
@@ -252,7 +257,9 @@ describe('EGRESS-0: the whole battery, against a USER-LAND link', () => {
     const tree = leafTree();
     await flush();
     const sent: string[] = [];
-    const l = userlandLink<string>(tree.$.theme, { set: (v) => void sent.push(v) });
+    const l = userlandLink<string>(tree.$.theme, {
+      set: (v) => void sent.push(v),
+    });
 
     tree.$.theme('typed');
     await flush();
@@ -271,7 +278,9 @@ describe('EGRESS-0: the whole battery, against a USER-LAND link', () => {
       get: () => 'from-A',
       set: (v) => void toA.push(v),
     });
-    const b = userlandLink<string>(tree.$.theme, { set: (v) => void toB.push(v) });
+    const b = userlandLink<string>(tree.$.theme, {
+      set: (v) => void toB.push(v),
+    });
 
     await a.retrieve();
     await flush();
@@ -328,9 +337,11 @@ describe('EGRESS-0: the whole battery, against a USER-LAND link', () => {
     const tree = leafTree();
     await flush();
     const sent: string[] = [];
-    const l = userlandLink<string>(tree.$.theme, { set: (v) => void sent.push(v) });
+    const l = userlandLink<string>(tree.$.theme, {
+      set: (v) => void sent.push(v),
+    });
 
-    const pending = tree.transaction(() => tree.$.theme('doomed'));
+    const pending = tree.transact(() => tree.$.theme('doomed'));
     await flush();
     expect(sent).toEqual([]);
 
@@ -373,9 +384,11 @@ describe('EGRESS-0: the whole battery, against a USER-LAND link', () => {
     const tree = leafTree();
     await flush();
     const sent: string[] = [];
-    const l = userlandLink<string>(tree.$.theme, { set: (v) => void sent.push(v) });
+    const l = userlandLink<string>(tree.$.theme, {
+      set: (v) => void sent.push(v),
+    });
 
-    const pending = tree.transaction(() => tree.$.theme('held'));
+    const pending = tree.transact(() => tree.$.theme('held'));
     await flush();
     l.dispose();
     pending.confirm();
@@ -443,7 +456,9 @@ describe('EGRESS-0: the whole battery, against a USER-LAND link', () => {
    */
 
   it('the candidate gate itself refuses an unowned X', async () => {
-    expect(() => onCommitted({}, () => void 0)).toThrow(/owned SignalTree location/);
+    expect(() => onCommitted({}, () => void 0)).toThrow(
+      /owned SignalTree location/
+    );
   });
 });
 

@@ -123,9 +123,9 @@ travelled.resetRestorationHistory();
 // `RestorationMethods extends TransactionMethods`, so this enhancer adds two
 // surfaces. A migration that kept only the restoration half would pass §2.
 export type _TransactionSurvives = Expect<
-  Equal<(typeof travelled)['transaction'], (fn: () => void) => PendingTransaction>
+  Equal<(typeof travelled)['transact'], (fn: () => void) => PendingTransaction>
 >;
-export const _pending: PendingTransaction = travelled.transaction(() => undefined);
+export const _pending: PendingTransaction = travelled.transact(() => undefined);
 
 // ============================================================================
 // 4 — the state surface is untouched by enhancement

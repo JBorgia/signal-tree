@@ -3,7 +3,7 @@ import { transactions } from './transactions';
 
 const transactional = signalTree({ n: 0 }, { enhancers: [transactions()] });
 
-export const _pending = transactional.transaction(() => {
+export const _pending = transactional.transact(() => {
   transactional.$.n(1);
 });
 

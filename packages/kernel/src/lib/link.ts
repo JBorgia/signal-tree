@@ -18,10 +18,7 @@ import {
   type EntityEgressProjection,
 } from './internals/entity-egress-projection';
 import { applyAtRelativePath } from './internals/source-mutation';
-import {
-  isNodeAccessor,
-  isTraversableNode,
-} from './internals/node-shape';
+import { isNodeAccessor, isTraversableNode } from './internals/node-shape';
 import { getRootTree } from './internals/root-source';
 import { scheduleDurableConsequence } from './internals/commit-consequence';
 import type { EntityMapBuilder } from './markers/entity-map';
@@ -99,21 +96,20 @@ export interface Link {
  * flow into the endpoint callbacks, so `link(tree.$.rows, { set: (v) => ... })`
  * infers `v: Row[]` with no explicit generic.
  */
-export type NaturalValue<S> =
-  S extends Location<infer T>
-    ? T
-    : S extends NodeAccessor<infer T>
-      ? T
-      : S extends {
-    readonly all: unknown;
-    setAll(...args: infer Args): unknown;
-  }
-        ? Args[0]
-        : S extends () => infer T
-          ? T
-          : S extends { readonly value: infer T }
-            ? T
-            : never;
+export type NaturalValue<S> = S extends Location<infer T>
+  ? T
+  : S extends NodeAccessor<infer T>
+  ? T
+  : S extends {
+      readonly all: unknown;
+      setAll(...args: infer Args): unknown;
+    }
+  ? Args[0]
+  : S extends () => infer T
+  ? T
+  : S extends { readonly value: infer T }
+  ? T
+  : never;
 
 /**
  * Does this declared value still contain a CONSTRUCTION MARKER?
@@ -129,16 +125,16 @@ export type NaturalValue<S> =
 type ContainsEntityMapMarker<T> = [T] extends [never]
   ? false
   : T extends EntityMapBuilder<infer _R, infer _K, infer _S>
+  ? true
+  : T extends readonly unknown[]
+  ? false
+  : T extends object
+  ? true extends {
+      [K in keyof T]-?: ContainsEntityMapMarker<T[K]>;
+    }[keyof T]
     ? true
-    : T extends readonly unknown[]
-      ? false
-      : T extends object
-        ? true extends {
-            [K in keyof T]-?: ContainsEntityMapMarker<T[K]>;
-          }[keyof T]
-          ? true
-          : false
-        : false;
+    : false
+  : false;
 
 /**
  * A source whose declared natural value is TRUTHFUL.
@@ -159,8 +155,11 @@ type ContainsEntityMapMarker<T> = [T] extends [never]
  * link(tree.$.nested.users, endpoint)   // User[], truthful
  * ```
  */
-export type TruthfulLinkSource<S> =
-  ContainsEntityMapMarker<NaturalValue<S>> extends true ? never : S;
+export type TruthfulLinkSource<S> = ContainsEntityMapMarker<
+  NaturalValue<S>
+> extends true
+  ? never
+  : S;
 
 /**
  * Read/write accessors resolved from the NODE, not configured by the caller.
@@ -384,7 +383,10 @@ export function link<S>(
   };
 
   /** Write a nested collection's eligible value into the branch snapshot. */
-  const advanceNested = (collectionPath: string, projection: EntityEgressProjection): void => {
+  const advanceNested = (
+    collectionPath: string,
+    projection: EntityEgressProjection
+  ): void => {
     // The snapshot grammar for a collection is `{ all: Row[] }` — the same
     // shape `tree.$()` produces, so the published branch value stays canonical.
     eligible = applyAtRelativePath(eligible, ownerPath, collectionPath, {

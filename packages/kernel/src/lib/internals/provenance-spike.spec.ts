@@ -95,7 +95,7 @@ describe('ATTRIBUTION-OWNER-0 spike', () => {
     const stop = observeProvenance(tree, 'path-notifier');
 
     provenanceScope({ scopeId: 's3' }, () => {
-      const pending = tree.transaction(() => {
+      const pending = tree.transact(() => {
         tree.$.n(1);
       });
       pending.confirm();
@@ -114,7 +114,7 @@ describe('ATTRIBUTION-OWNER-0 spike', () => {
       const stop = observeProvenance(tree, 'path-notifier');
 
       const pending = provenanceScope({ scopeId: 's4' }, () =>
-        tree.transaction(() => {
+        tree.transact(() => {
           tree.$.n(1);
         })
       );
@@ -163,7 +163,7 @@ describe('ATTRIBUTION-OWNER-0 spike', () => {
 
       const pending = provenanceScope({ scopeId: 's6' }, () => {
         tree.$.log(1); // immediate, durable
-        return tree.transaction(() => {
+        return tree.transact(() => {
           tree.$.n(1);
         });
       });
@@ -251,7 +251,7 @@ describe('ATTRIBUTION-OWNER-0 spike', () => {
       const tree = signalTree({ a: 0, b: 0 }, { enhancers: [transactions()] });
       const stop = observeProvenance(tree, 'path-notifier');
 
-      const pending = tree.transaction(() => {
+      const pending = tree.transact(() => {
         provenanceScope({ scopeId: 'agentA' }, () => tree.$.a(1));
         provenanceScope({ scopeId: 'agentB' }, () => tree.$.b(2));
       });
@@ -269,7 +269,7 @@ describe('ATTRIBUTION-OWNER-0 spike', () => {
       const tree = signalTree({ a: 0, b: 0 }, { enhancers: [transactions()] });
       const stop = observeProvenance(tree, 'path-notifier');
 
-      const pending = tree.transaction(() => {
+      const pending = tree.transact(() => {
         provenanceScope({ scopeId: 'victimA' }, () => tree.$.a(1));
         provenanceScope({ scopeId: 'culpritB' }, () => tree.$.b(2));
       });
@@ -310,12 +310,12 @@ describe('ATTRIBUTION-OWNER-0 spike', () => {
     const stop = observeProvenance(treeA, 'path-notifier'); // '**' sees both
 
     provenanceScope({ scopeId: 'treeA' }, () =>
-      treeA.transaction(() => {
+      treeA.transact(() => {
         treeA.$.a(1);
       })
     ).confirm();
     provenanceScope({ scopeId: 'treeB' }, () =>
-      treeB.transaction(() => {
+      treeB.transact(() => {
         treeB.$.b(1);
       })
     ).confirm();

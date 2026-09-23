@@ -83,8 +83,16 @@ function makeTree(recorder: Recorder, key: string) {
     }
   ) as unknown as {
     $: {
-      a: { (value: string): void; (update: (current: string) => string): void; (): string };
-      b: { (value: string): void; (update: (current: string) => string): void; (): string };
+      a: {
+        (value: string): void;
+        (update: (current: string) => string): void;
+        (): string;
+      };
+      b: {
+        (value: string): void;
+        (update: (current: string) => string): void;
+        (): string;
+      };
     };
     transaction: (fn: () => void) => { confirm(): void; rollback(): void };
   };
@@ -95,7 +103,7 @@ describe('persistence() autoSave respects the commit boundary', () => {
     const rec = recordingStorage();
     const tree = makeTree(rec, 'pco-open');
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.a('a1');
       tree.$.b('b1');
     });
@@ -114,7 +122,7 @@ describe('persistence() autoSave respects the commit boundary', () => {
     const rec = recordingStorage();
     const tree = makeTree(rec, 'pco-confirm');
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.a('a1');
       tree.$.b('b1');
     });
@@ -136,7 +144,7 @@ describe('persistence() autoSave respects the commit boundary', () => {
     const rec = recordingStorage();
     const tree = makeTree(rec, 'pco-rollback');
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.a('doomed');
     });
     await settleTimers();
@@ -157,7 +165,7 @@ describe('persistence() autoSave respects the commit boundary', () => {
     const tree = makeTree(rec, 'pco-throw');
 
     expect(() =>
-      tree.transaction(() => {
+      tree.transact(() => {
         tree.$.a('doomed');
         throw new Error('boom');
       })
@@ -181,7 +189,7 @@ describe('persistence() autoSave respects the commit boundary', () => {
     const blocked = makeTree(recBlocked, 'pco-blocked');
     const free = makeTree(recFree, 'pco-free');
 
-    const pending = blocked.transaction(() => {
+    const pending = blocked.transact(() => {
       blocked.$.a('a1');
     });
 
@@ -230,7 +238,7 @@ describe('persistence() autoSave survives a refused rollback', () => {
       port.validateEffects = () => ({ kind: 'structural-drift' });
     }
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.a('a1');
     });
 
@@ -290,7 +298,11 @@ describe('persistence() autoSave survives a REFUSED ROLLBACK PLAN', () => {
       }
     ) as unknown as {
       $: {
-        note: { (value: string): void; (update: (current: string) => string): void; (): string };
+        note: {
+          (value: string): void;
+          (update: (current: string) => string): void;
+          (): string;
+        };
         rows: {
           addOne(r: { id: string; name: string }): void;
           byIdOrFail(id: string): { name(value: string): void };
@@ -299,7 +311,7 @@ describe('persistence() autoSave survives a REFUSED ROLLBACK PLAN', () => {
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
     };
 
-    const pending = tree.transaction(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'r1', name: 'Ada' });
     });
 

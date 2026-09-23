@@ -145,10 +145,12 @@ describe('OWNER INVALIDATION LAW', () => {
       seen.push([tree.$.left(), tree.$.right()]);
     });
 
-    tree.transaction(() => {
-      tree.$.left(1);
-      tree.$.right(1);
-    }).confirm();
+    tree
+      .transact(() => {
+        tree.$.left(1);
+        tree.$.right(1);
+      })
+      .confirm();
     await flush();
 
     expect(seen).toEqual([[1, 1]]);
@@ -181,10 +183,12 @@ describe('OWNER INVALIDATION LAW', () => {
       seen.push([tree.$.left(), tree.$.right()]);
     });
 
-    tree.transaction(() => {
-      tree.$.left(1);
-      tree.$.right(1);
-    }).rollback();
+    tree
+      .transact(() => {
+        tree.$.left(1);
+        tree.$.right(1);
+      })
+      .rollback();
     await flush();
 
     expect(seen).toEqual([[0, 0]]);
@@ -299,14 +303,13 @@ describe('OWNER INVALIDATION LAW', () => {
   });
 
   it('does not invalidate a deferred transaction before final settlement', async () => {
-    const tree = signalTree(
-      { value: 0 },
-      { enhancers: [transactions()] }
-    );
+    const tree = signalTree({ value: 0 }, { enhancers: [transactions()] });
     const seen: number[] = [];
-    const cleanup = observeOwnerInvalidation(tree, () => seen.push(tree.$.value()));
+    const cleanup = observeOwnerInvalidation(tree, () =>
+      seen.push(tree.$.value())
+    );
 
-    const pending = tree.transaction(() => tree.$.value(1));
+    const pending = tree.transact(() => tree.$.value(1));
     await flush();
     expect(seen).toEqual([]);
 
@@ -340,12 +343,11 @@ describe('OWNER INVALIDATION LAW', () => {
   });
 
   it('invalidates restoration status after the status itself settles', async () => {
-    const tree = signalTree(
-      { value: 0 },
-      { enhancers: [restoration()] }
-    );
+    const tree = signalTree({ value: 0 }, { enhancers: [restoration()] });
     const seen: boolean[] = [];
-    const cleanup = observeOwnerInvalidation(tree, () => seen.push(tree.canUndo()));
+    const cleanup = observeOwnerInvalidation(tree, () =>
+      seen.push(tree.canUndo())
+    );
 
     undoable(() => tree.$.value(1));
     await flush();
