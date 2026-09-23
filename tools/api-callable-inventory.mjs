@@ -48,6 +48,13 @@
  * consumers can actually type against, so internal machinery that never reaches
  * a barrel is correctly invisible here.
  *
+ * SCOPE. This is complete for SignalTree's CURRENT exported invocation forms,
+ * not for every pattern TypeScript can express. If the library ever exports an
+ * object constant holding nested methods, or adds static class methods, those
+ * are new forms and the collector must be revisited then. Extending it
+ * speculatively now would add untested branches to a gate whose value comes
+ * from being mutation-proven.
+ *
  * ⚠️ ONLY MEANINGFUL AGAINST DECLARATIONS BUILT FROM THE CURRENT COMMIT. The
  * first run of this tool read stale declarations left by an abandoned
  * experiment and recorded standalone `root.transact` FUNCTIONS that the source

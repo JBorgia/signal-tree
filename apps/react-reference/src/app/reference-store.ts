@@ -150,7 +150,7 @@ export const createReferenceStore = () => {
      */
     resetFilters(): void {
       store
-        .transaction(() => {
+        .transact(() => {
           store.$.filters.team(DEFAULT_FILTERS.team);
           store.$.filters.showCompleted(DEFAULT_FILTERS.showCompleted);
         })
@@ -169,7 +169,7 @@ export const createReferenceStore = () => {
         : store.$.visibleJobs().find((job) => job.id !== id)?.id;
 
       store
-        .transaction(() => {
+        .transact(() => {
           store.$.jobs.updateOne(id, { status: 'done' });
           if (successor !== id) {
             if (successor) store.$.jobs.setActiveId(successor);

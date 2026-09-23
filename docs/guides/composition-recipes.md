@@ -325,7 +325,7 @@ const tree = signalTree(
   { enhancers: [transactions()] }
 );
 
-const pending = tree.transaction(() => {
+const pending = tree.transact(() => {
   tree.$.order.status('assigned');
   tree.$.driver.orderId(17);
 });
