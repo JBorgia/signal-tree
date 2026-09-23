@@ -17,47 +17,67 @@ The adapter expresses semantic operations only:
     interface SemanticCandidate {
       beginContribution(fn): Handle;
 
-      settleAccept(handle): Result;
-      settleReject(handle): Result;
+      settleAccept(handle): SettlementResult;
+      settleReject(handle): SettlementResult;
 
-      applyCommittedTruth(fn, claim: AuthorityClaim): void;
+      applyAuthority(event: {
+        truth?: () => void;
+        order: AuthorityOrder;
+        settlement?: SettlementRelation | readonly SettlementRelation[];
+      }): void;
 
-      readVisible(): Snapshot;
+      readCanonical(): Snapshot;      // server/current truth
+      readVisible(): Snapshot;        // canonical + pending projection
       readSettlementState(handle): SettlementView;
 
-      observeVisible(cb): Unsubscribe;            // publication coherence (L13)
+      observeVisible(cb): Unsubscribe;
     }
 
-The ingress claim is TYPED, not a loose `evidence?` bag. Left untyped, every
-candidate interprets it differently and the "same" black-box test stops
-testing the same semantics:
+Authority ingress is TWO ORTHOGONAL DIMENSIONS, not one mutually exclusive
+union. An earlier draft made them alternatives, which forced the adapter to
+discard information: a single server response can simultaneously be an
+authoritative snapshot, revision 42, and an acceptance of P1. Collapsing those
+into one variant destroys exactly the separation L11 establishes.
 
-    type AuthorityClaim =
-      | { kind: 'authoritative-snapshot' }          // current truth now;
-                                                    // advances the frontier,
-                                                    // settles nothing
-      | { kind: 'versioned'; revision: unknown }    // order by this evidence
-      | { kind: 'correlated-accept'; contribution: Handle }
-      | { kind: 'correlated-reject'; contribution: Handle }
-      | { kind: 'included-through'; contribution: Handle }  // watermark
-      | { kind: 'unordered' };                      // no relation available
+    type AuthorityOrder =
+      | { kind: 'snapshot' }                      // caller asserts current truth
+      | { kind: 'versioned'; revision: number }   // ordered by this evidence
+      | { kind: 'unordered' };                    // no ordering available
 
-Settlement results are typed for the same reason — exceptions, no-ops and
-internal APIs must not leak into the contract:
+    type SettlementRelation =
+      | { kind: 'none' }
+      | { kind: 'accepts';  contribution: Handle }
+      | { kind: 'rejects';  contribution: Handle }
+      | { kind: 'includes'; contribution: Handle };   // watermark
+
+`settlement` accepts an array because one authority event may settle several
+contributions. A plain snapshot is `{ order: {kind:'snapshot'}, settlement:
+{kind:'none'} }` — it advances canonical truth and settles nothing, which is
+A1/A5.
 
     type SettlementResult =
       | { status: 'settled' }
       | { status: 'refused'; reason: unknown }
       | { status: 'already-settled' };
 
-`applyCommittedTruth` and `observeVisible` exist because L11, L12, L13 and the
-ordinary server-realization case cannot otherwise be tested without reaching
-outside the abstraction.
+`revision` is a NUMBER in the conformance suite rather than `unknown`. Left
+opaque, candidate A could order "42" differently from candidate B and the
+black-box comparison would stop meaning the same thing. Production adapters
+are free to translate their real authority tokens; the harness only needs one
+ordering contract.
 
-Note what is absent: layers, MVCC, rollback, baseline, SubjectId
-representation, TurnStore.
+`readCanonical()` exists so A1 is DIRECTLY assertable. Without it, canonical
+advancement could only be proven indirectly by rejecting P1 afterwards and
+observing the result, entangling the very two concepts the case exists to
+separate:
 
-Each candidate maps its own mechanism onto that contract.
+    before     canonical 0, P1 pending 1, visible 1
+    snapshot   canonical 2, P1 still pending, visible 1
+    assert     readCanonical() === 2, readVisible() === 1, P1 pending
+    then       reject P1 -> visible 2        (a SEPARATE assertion)
+
+Note what is still absent: rollback, layers, MVCC, baseline, TurnStore,
+internal SubjectId representation.
 
 The suite is BLACK-BOX. It observes only: state before, the operations, state
 after, pending/confirmed status, and errors raised. It must know nothing about
