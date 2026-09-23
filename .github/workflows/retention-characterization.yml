@@ -45,6 +45,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
+      # REQUIRED, not precautionary: bench-entity-churn-retention.mjs imports
+      # dist/packages/kernel/dist/index.js at runtime and exits 1 with
+      # "build first" when it is absent. A fresh runner has no dist, so without
+      # this the job fails before measuring anything.
+      - name: Build kernel (the benchmark imports its dist)
+        run: npx nx build kernel
+
       - name: Record environment
         run: |
           node -e "console.log(JSON.stringify({node:process.version,v8:process.versions.v8,platform:process.platform,arch:process.arch},null,1))" \

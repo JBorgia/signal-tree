@@ -72,7 +72,10 @@ the non-retaining arm, mutation-proven in the SAME arm with deliberate
 retention.
 
 **Remaining blocker: the threshold was derived on darwin/arm64 and release
-gates run on ubuntu-latest linux/x64.** An absolute ceiling is
+gates run on ubuntu-latest linux/x64.** Also pending on closure: RENAME the
+gate. It is still called `retired-subject-slope` and no longer judges a slope;
+its claim is that a workload which should forget retired node handles has not
+entered a gross-retention regime. An absolute ceiling is
 environment-dependent in a way the normalized slope was not. Validate on the
 release platform — control distribution plus `--retain 10000` — before it
 blocks a release.
