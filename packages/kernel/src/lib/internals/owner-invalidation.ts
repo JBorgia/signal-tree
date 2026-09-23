@@ -1,8 +1,4 @@
 import { getPositionRegistry } from './position-registry';
-import {
-  hasOpenCommitScope,
-  onCommitScopesSettled,
-} from './commit-consequence';
 import { installOwnerInvalidationDispatch } from './owner-invalidation-port';
 
 interface OwnerInvalidationTarget {
@@ -17,7 +13,6 @@ interface OwnerInvalidationState {
   requested: number;
   readonly listeners: Set<{ readonly callback: () => void }>;
   readonly releaseObservation: () => void;
-  releaseSettlement: () => void;
 }
 
 let states: Map<number, OwnerInvalidationState> | undefined;
@@ -52,11 +47,7 @@ export function observeOwnerInvalidationInternal(
       requested: 0,
       listeners: new Set(),
       releaseObservation: activateObservation(),
-      releaseSettlement: () => undefined,
     };
-    nextState.releaseSettlement = onCommitScopesSettled(owner.$, () => {
-      if (nextState.requested > 0) scheduleInvalidation(ownerId, nextState);
-    });
     state = nextState;
     (states ??= new Map()).set(ownerId, state);
   }
@@ -75,7 +66,6 @@ export function observeOwnerInvalidationInternal(
     state.active = false;
     state.pending = false;
     state.releaseObservation();
-    state.releaseSettlement();
     states?.delete(ownerId);
     if (states?.size === 0) states = undefined;
   };
@@ -86,7 +76,7 @@ export function markOwnerInvalidated(ownerId: number | undefined): void {
   const state = states?.get(ownerId);
   if (!state?.active) return;
   state.requested++;
-  if (!hasOpenCommitScope(state.owner.$)) scheduleInvalidation(ownerId, state);
+  scheduleInvalidation(ownerId, state);
 }
 
 export function markOwnerInvalidatedFrom(owner: object): void {
@@ -103,27 +93,25 @@ function scheduleInvalidation(
 
   // Mutation observers and enhancer consequences scheduled in the write stack
   // settle before an adapter is told to reread externally visible truth.
-  queueMicrotask(() => queueMicrotask(() => {
-    if (!state.active || states?.get(ownerId) !== state) return;
-    if (hasOpenCommitScope(state.owner.$)) {
-      state.pending = false;
-      return;
-    }
-    if (state.requested !== requested) {
-      state.pending = false;
-      scheduleInvalidation(ownerId, state);
-      return;
-    }
-    state.pending = false;
-    state.requested = 0;
-    for (const subscription of [...state.listeners]) {
-      try {
-        subscription.callback();
-      } catch {
-        // One observer cannot fail invalidation or starve another observer.
+  queueMicrotask(() =>
+    queueMicrotask(() => {
+      if (!state.active || states?.get(ownerId) !== state) return;
+      if (state.requested !== requested) {
+        state.pending = false;
+        scheduleInvalidation(ownerId, state);
+        return;
       }
-    }
-  }));
+      state.pending = false;
+      state.requested = 0;
+      for (const subscription of [...state.listeners]) {
+        try {
+          subscription.callback();
+        } catch {
+          // One observer cannot fail invalidation or starve another observer.
+        }
+      }
+    })
+  );
 }
 
 export function terminateOwnerInvalidation(owner: object): void {
@@ -137,7 +125,6 @@ export function terminateOwnerInvalidation(owner: object): void {
   state.requested = 0;
   state.listeners.clear();
   state.releaseObservation();
-  state.releaseSettlement();
   states?.delete(ownerId);
   if (states?.size === 0) states = undefined;
 }
