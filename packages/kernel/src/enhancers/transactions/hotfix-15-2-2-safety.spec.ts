@@ -107,12 +107,16 @@ describe('H1 — a failed rollback KEEPS settlement authority', () => {
     const { tree, pending } = await r6Scenario();
 
     expect(pendingCount(tree)).toBe(1);
+    // Ordinary writes are confirmed turns of their own, so the invariant is
+    // that the FAILED ROLLBACK confirms nothing -- a delta, not an absolute.
+    const confirmedBefore = confirmedCount(tree);
+
     const outcome = settle(() => pending.rollback());
 
     expect(outcome).not.toBe('ok');
     // 15.2.1 retires the turn here. It must not.
     expect(pendingCount(tree)).toBe(1);
-    expect(confirmedCount(tree)).toBe(0);
+    expect(confirmedCount(tree)).toBe(confirmedBefore);
   });
 });
 
@@ -178,14 +182,23 @@ describe('H5 — an accepted transaction never silently loses a field', () => {
 });
 
 describe('H6 — a rolled-back value is never resurrected', () => {
-  it('settling P2 cannot restore P1s already-rolled-back y=1', async () => {
+  it('settling P2 cannot restore a value P1 already gave up', async () => {
     const { tree, p1, p2 } = await r8Scenario();
 
-    settle(() => p1.rollback());
+    const firstOutcome = settle(() => p1.rollback());
     settle(() => p2.rollback());
 
-    // 15.2.1 ends at y=1 — P1's rolled-back value.
-    expect(xyz(tree).y).not.toBe(1);
+    if (firstOutcome === 'ok') {
+      // P1 genuinely reversed, so its y=1 must not come back when P2 settles.
+      // This is the 15.2.1 failure: it ended at y=1.
+      expect(xyz(tree).y).not.toBe(1);
+    } else {
+      // P1 refused atomically and is STILL PENDING, so y=1 is its live
+      // contribution and is correct. Nothing was resurrected because nothing
+      // was given up.
+      expect(pendingCount(tree)).toBe(1);
+      expect(xyz(tree).y).toBe(1);
+    }
   });
 });
 
