@@ -102,10 +102,24 @@ This is a separate law from L6 on purpose. L6 alone yields a resolver that
 orders P1 against P2 correctly and still gets SERVER REALIZATION wrong, which
 is the ordinary case, not the exotic one.
 
-**L12 — arrival order is not authority order.**
-A realization advances authoritative truth only according to evidence its
-authority boundary supplies: revision, version or correlation semantics. Where
-that evidence is absent, SignalTree must NOT invent ordering.
+**L12 — authority order is explicit, never inferred from arrival.**
+The kernel never infers authority order from arrival order. Authority order
+comes from the semantic contract of the INGRESS OPERATION, or from explicit
+authority evidence.
+
+That distinction keeps "no revision number" from meaning "SignalTree can never
+consume an ordinary REST snapshot". What the caller claims is what counts:
+
+    AUTHORITATIVE SNAPSHOT   "this is current server truth now"
+                             caller asserts freshness; the canonical frontier
+                             may advance
+    VERSIONED EVENT          "this happened at server revision 42"
+                             order by the supplied evidence
+    CORRELATED ACK           "this is the disposition of contribution P1"
+                             the relation to P1 is explicit
+    UNORDERED EXTERNAL EVENT "here is a value, I cannot tell you how it
+                             relates to pending work"
+                             do NOT invent causal or authority ordering
 
     server canonical rev10   y=0
     request A sent
@@ -150,6 +164,54 @@ settlement must behave consistently with that classification. No
 reason" without an honest additional status. This law is what makes a review
 UI truthful, so it is load-bearing for the product thesis.
 
+**L15 — correctness retention follows live responsibility.**
+State retained for CORRECTNESS exists only while a live semantic obligation
+requires it. Terminal transaction state may not remain in the active
+correctness machinery for diagnostic purposes. Historical evidence is a
+separate, explicitly bounded facility.
+
+    pending contribution                  may retain correctness state
+    accepted/rejected/superseded terminal correctness state RELEASED
+    optional audit/history                separate store, explicit policy
+
+Without this law we could repair R8 and keep an unbounded-retention
+architecture. (Retention probes reporting large turn accumulation exist from
+another session and have NOT been re-run here; the law stands on its own
+merits and R01..R06 will measure it directly.)
+
+**L16 — independent work makes independent progress.**
+A pending contribution may delay work only where an ACTUAL semantic
+dependency requires it. Unrelated state stays readable, writable, publishable
+and synchronizable.
+
+    P1 pending on  order.123.priority
+    must not freeze telemetry.connected or settings.theme
+
+This law exists because a future "contribution graph" could otherwise become
+a global lock, satisfy every settlement test, and make the product unusable.
+
+**L17 — semantic identity is lossless.**
+Every semantic identity component stays typed and structurally distinct across
+every correctness boundary. Human-readable paths are PRESENTATION, never
+authoritative identity. Covers TreeId, PositionId, SubjectId, business key and
+key type.
+
+L7 says a business key is not a subject lifetime. L17 is what stops
+`"foo.bar"`, `"foo/bar"`, `1` and `"1"` being flattened into ambiguous
+path or global-key strings. It applies to EVERY candidate: the `1` vs `"1"`
+collision is the same architectural smell in any encoding.
+
+**L18 — deferral cannot change semantic classification.**
+A write's semantic classification may not change because its physical
+execution was deferred. A system either carries the semantic context with the
+queued operation, or REJECTS the composition before scheduling it.
+
+    external(() => write)
+    coalesce(() => external(() => write))      must not differ in category
+
+An architecture is free to declare a composition unsupported. It must say so
+BEFORE quietly reclassifying the mutation.
+
 ## The constitution, grouped
 
     OWNERSHIP
@@ -168,11 +230,23 @@ UI truthful, so it is load-bearing for the product thesis.
       L7   subject lifetime is not the business key
       L8   structural dependencies survive honestly
 
+    IDENTITY / DEPENDENCY (cont.)
+      L17  semantic identity is lossless and typed
+
     SETTLEMENT
       L9   atomic disposition of every contribution
       L10  observation agrees with settlement
       L13  publication is coherent
       L14  settlement terminality and retry are explicit
+
+    SYSTEM COMPOSITION
+      L15  correctness retention follows live responsibility
+      L16  independent work makes independent progress
+      L18  deferral cannot alter semantic classification
+
+**L1..L18 are FROZEN as of 2026-09-23.** No further laws are added
+speculatively. Past this point more whiteboarding is its own form of
+overfitting; the tests produce the evidence now.
 
 ## Dependency is not coexistence
 

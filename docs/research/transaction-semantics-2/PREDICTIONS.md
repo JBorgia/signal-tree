@@ -46,9 +46,28 @@ These are not changed after execution. A wrong prediction is a finding.
     L14  FAIL        R6 demonstrated it directly: a failed rollback whose retry
                      returns success while reversing nothing.
 
+    L15  FAIL        terminal transaction state is not separated from active
+                     correctness state; the confirmed-turn ledger is the
+                     settlement machinery. R06 is the sharp one: if toggling
+                     diagnostics changes a settlement outcome, correctness and
+                     evidence are entangled.
+    L16  UNKNOWN,    no per-position scoping of holds is visible in the
+         likely FAIL  settlement path, so N03/N05 are the likely failures.
+                     Predicting UNKNOWN rather than FAIL because the
+                     owner-invalidation work may already scope more tightly
+                     than expected.
+    L17  UNKNOWN     L7's subject machinery is typed and looks lossless, but
+                     whether identity stays typed ACROSS the transaction/link/
+                     entityMap seam is untested. I08 is the case that decides
+                     it; I06 (1 vs "1") is the cheapest falsifier.
+    L18  likely FAIL a deferred write that resolves ambient context at
+                     execution rather than capture would reclassify silently.
+                     CCTX5 is the interesting one: refusing is legitimate, but
+                     a refusal that already queued a write is not a refusal.
+
 ## Aggregate prediction
 
-    9 FAIL, 1 PARTIAL, 2 UNKNOWN, 2 PASS(ish)
+    L1..L18:  11 FAIL, 1 PARTIAL, 4 UNKNOWN, 2 PASS(ish)
 
 The two predicted passes matter more than the nine failures. L7 and L13 are
 the parts of the current kernel worth carrying into whatever wins. If L7
