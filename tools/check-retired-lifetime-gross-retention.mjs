@@ -1,5 +1,19 @@
 #!/usr/bin/env node
 /**
+ * RENAMED from `check-retired-subject-slope.mjs`. It no longer judges a slope:
+ * RETIRED-SUBJECT-SLOPE-STABILITY-0 measured the two operands of that slope to
+ * be 4 MB-quantized and overlapping on darwin/arm64, so it returned both signs
+ * on unchanged code. What this asserts now is narrower and measurable:
+ *
+ *     a workload that should FORGET retired node handles has not entered a
+ *     GROSS-RETENTION regime
+ *
+ * 40 MB is therefore not expected memory usage and not a slope — it is the line
+ * between runtime noise plus retention too small to resolve, and something
+ * having gone badly wrong. Validated on the release environment: linux/x64
+ * control 3.23-3.24 MB across 30 processes, retain=10000 mutation 82.75-82.76
+ * across 10, a 79.51 MB gap with no overlap.
+ *
  * Gate: retired-subject retention has NO MEASURABLE SLOPE.
  *
  * ## What this pins, and why it is not a byte budget
@@ -40,7 +54,7 @@
  * and turned 6 B/retired into 79 B/retired. Look for that before touching the
  * numbers. `entity-lifetime-ledger-null.spec.ts` has the unit-level version.
  *
- * Usage: node --expose-gc tools/check-retired-subject-slope.mjs [--self-test]
+ * Usage: node --expose-gc tools/check-retired-lifetime-gross-retention.mjs [--self-test]
  */
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';

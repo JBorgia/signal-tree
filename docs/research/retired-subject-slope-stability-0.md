@@ -1,7 +1,7 @@
 # RETIRED-SUBJECT-SLOPE-STABILITY-0
 
-> **Disposition: OPEN — amended 2026-09-23. The old gate is falsified and
-> replaced; the NEW gate is not yet cleared for release.**
+> **Disposition: CLOSED — 2026-09-23. Outcome A: the 40 MB ceiling is
+> validated on the release environment.**
 > The question was never "how do we get the benchmark under 20 B". It was
 > whether a repeatable measurement can distinguish retained retired subjects
 > from runtime memory modes. It can — but not the way this gate asks.
@@ -335,3 +335,58 @@ let a stale API baseline record functions the source no longer contained.
 **Sample counts must not be reduced.** A three-sample green median hiding
 multimodal behaviour is the exact failure that kept an untrustworthy gate in
 place; spending the CI minutes to see the distribution is the entire point.
+
+---
+
+# LINUX RESULT — outcome A, with an unexpected finding
+
+Run `35886271808`, `ubuntu-latest`, Node v24.15.0, V8 13.6.233.17-node.48,
+linux/x64.
+
+```text
+CONTROL   n=30, retain=0        3.23 x28,  3.24 x2
+MUTATION  n=10, retain=10000   82.75 x9,  82.76 x1
+
+control  3.23 .. 3.24
+mutation 82.75 .. 82.76
+GAP      79.51 MB          overlap: none
+```
+
+**40 MB is validated.** No control sample comes within 36 MB of it; every
+mutation sample clears it by more than 42 MB. The threshold was derived on
+darwin/arm64 and left untouched by Linux, so this IS the independent
+validation — the samples that chose it and the samples testing it come from
+different environments, which is exactly the condition outcome A was defined
+to satisfy.
+
+## The unexpected part: the bimodality is macOS-specific
+
+Linux control is **unimodal and essentially exact** — 28 of 30 samples
+identical to the centibyte. The 3.23 / 7.23 / 15.22 mode structure that
+motivated this entire investigation **does not appear on Linux at all**.
+
+Stated carefully, because it would be easy to overclaim in either direction:
+
+```text
+ESTABLISHED   macOS/arm64 150-round control is multimodal across 4 MB steps,
+              localized to large_object_space
+ESTABLISHED   linux/x64 150-round control is unimodal and tight
+NOT MEASURED  linux 50-round control — so whether the OLD slope gate would
+              have been stable in CI is UNKNOWN
+```
+
+I did not collect Linux 50-round samples, so I cannot say the old slope gate
+was fine in CI. What the redesign rests on is unchanged and sufficient: a gate
+that is ~38% spuriously red on the platform developers actually run it on is
+not usable, whatever CI happens to do with it.
+
+## Sensitivity on the release platform
+
+The macOS floor study (invisible at 2,500, marginal at 5,000, reliable at
+10,000) was measured on the noisy platform. On Linux the control band is ~0.01
+MB wide rather than ~12 MB, so the detection floor there is certainly LOWER —
+but it was not measured, and the gate does not claim it. The honest claim
+remains:
+
+> Reliably detects gross retention at or above ~10,000 deliberately retained
+> retired-node handles, verified on the release environment.

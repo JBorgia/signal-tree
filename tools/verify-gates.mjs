@@ -845,7 +845,7 @@ const GATES = [
     // is a fixture of the exact table it accepted.
     cmd: ['node', 'tools/probe-bounded-history-retention.mjs', '--self-test'],
     // Blind the VERDICT rather than one fixture — same reason recorded on
-    // `retired-subject-slope:self`.
+    // `retired-lifetime-gross-retention:self`.
     mutation: {
       file: 'tools/probe-bounded-history-retention.mjs',
       find: '  return ratio < 2;',
@@ -853,7 +853,7 @@ const GATES = [
     },
   },
   {
-    name: 'retired-subject-slope',
+    name: 'retired-lifetime-gross-retention',
     covers:
       'a non-retaining arm stays under an absolute retained-heap ceiling — ' +
       'the slope between two 4 MB-quantized, overlapping medians could not ' +
@@ -863,18 +863,26 @@ const GATES = [
     // rounds and fails if the total scales with the retirements rather than
     // sitting flat. It regressed once already, when a step inside the retirement
     // re-interned the forgotten subject by id and turned 6 B into 79 B.
-    cmd: ['node', '--expose-gc', 'tools/check-retired-subject-slope.mjs'],
+    cmd: [
+      'node',
+      '--expose-gc',
+      'tools/check-retired-lifetime-gross-retention.mjs',
+    ],
     slow: true,
     needsBuild: true,
-    provenBy: 'retired-subject-slope:self',
+    provenBy: 'retired-lifetime-gross-retention:self',
   },
   {
-    name: 'retired-subject-slope:self',
+    name: 'retired-lifetime-gross-retention:self',
     covers:
       'the retention checker rejects the retention REGIME and accepts flat ' +
       'totals, bounded fixed runtime cost, and the worst control sample ' +
       'measured across 24 processes',
-    cmd: ['node', 'tools/check-retired-subject-slope.mjs', '--self-test'],
+    cmd: [
+      'node',
+      'tools/check-retired-lifetime-gross-retention.mjs',
+      '--self-test',
+    ],
     // Blind the VERDICT, not one input to it.
     //
     // Registered blind on the first attempt by widening MAX_BYTES_PER_RETIRED
@@ -883,7 +891,7 @@ const GATES = [
     // single-input mutation proves nothing — same trap recorded on
     // `signal-identity-durability:self` above.
     mutation: {
-      file: 'tools/check-retired-subject-slope.mjs',
+      file: 'tools/check-retired-lifetime-gross-retention.mjs',
       find: '  return problems;',
       replace: '  return [];',
     },
