@@ -238,6 +238,24 @@ The gate no longer claims to detect a leak that is small but genuinely linear.
 It never could — its noise exceeded that signal — so the claim was the thing
 that was false, not the capability that was lost.
 
+## PENDING ON CLOSURE — rename the gate
+
+The gate is still called `retired-subject-slope` /
+`check-retired-subject-slope.mjs`, and it **no longer judges a slope**. The
+name is now actively misleading, and probably part of why a 40 MB figure reads
+oddly: 40 MB is not expected memory usage and not a slope — it is the line
+between "runtime noise plus retention we cannot resolve" and "something has
+gone badly wrong".
+
+What it now asserts is:
+
+> This workload, which should forget retired node handles, has not entered a
+> GROSS-RETENTION regime.
+
+Rename to something like `retired-lifetime-gross-retention` or
+`retired-subject-retention-ceiling` once the Linux characterization closes the
+track — after, so the rename does not churn the thing being measured.
+
 ## STILL OPEN — release-environment validation
 
 The 40 MB ceiling was derived entirely on **darwin/arm64, Node v24.15.0, V8
@@ -264,8 +282,12 @@ CONTROL    no-history-reads, rounds 150, retain 0       30 fresh processes
 MUTATION   no-history-reads, rounds 150, retain 10000   10 fresh processes
 ```
 
-Node version is already identical (`.nvmrc` 24.15.0); only platform and arch
-differ, which is precisely the variable under test. The full JSON — growthMB,
+`.nvmrc` pins 24.15.0, so **Node version is held constant**. Everything else
+about the runner differs — OS, kernel, allocator and runtime libraries,
+executable build, host environment — and that is intentional: the goal is the
+REAL release environment, not a laboratory isolation of CPU architecture. An
+earlier draft of this note said "only platform and arch differ", which
+overstated the control. The full JSON — growthMB,
 heapUsed, heapTotal, RSS, per-space large-object figures, Node, V8, platform,
 arch, heap limit — uploads as an artifact.
 
@@ -282,6 +304,15 @@ C  material overlap                            -> an absolute ceiling is not a
                                                   reliable gate here; do NOT
                                                   tune it to green
 ```
+
+**The job builds the kernel first, and that is required rather than
+precautionary.** `bench-entity-churn-retention.mjs` imports
+`dist/packages/kernel/dist/index.js` at runtime and exits 1 with "build first"
+when it is absent. Verified by moving `dist` aside and running the exact
+sequence: the bench fails without it and succeeds after `npx nx build kernel`.
+The first draft of the workflow omitted this and would have failed on a fresh
+runner before measuring anything — the same absent/stale-dist class that once
+let a stale API baseline record functions the source no longer contained.
 
 **Sample counts must not be reduced.** A three-sample green median hiding
 multimodal behaviour is the exact failure that kept an untrustworthy gate in
