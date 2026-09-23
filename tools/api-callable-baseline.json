@@ -889,7 +889,6 @@
       "memberKind": "callable-type",
       "signatures": [
         "(): T",
-        "(): T",
         "(update: (current: T) => T): void",
         "(value: LeafDefinition<Extract<T, CallableSyntax>>): void",
         "(value: NonCallableValue<T>): void"
@@ -988,10 +987,10 @@
       ]
     },
     {
-      "id": "kernel:ProposalStatus.__@iterator@11",
+      "id": "kernel:ProposalStatus.__@iterator@16",
       "pkg": "kernel",
       "owner": "ProposalStatus",
-      "name": "__@iterator@11",
+      "name": "__@iterator@16",
       "memberKind": "method",
       "signatures": [
         "(): StringIterator<string>"
@@ -1683,6 +1682,16 @@
       ]
     },
     {
+      "id": "kernel:SignalTreeRollbackError.new",
+      "pkg": "kernel",
+      "owner": "SignalTreeRollbackError",
+      "name": "new",
+      "memberKind": "constructable-type",
+      "signatures": [
+        "(message?: string | undefined, options?: { cause?: unknown; } | undefined): SignalTreeRollbackError"
+      ]
+    },
+    {
       "id": "kernel:TransactionMethods.propose",
       "pkg": "kernel",
       "owner": "TransactionMethods",
@@ -1703,10 +1712,10 @@
       ]
     },
     {
-      "id": "kernel:TreeCapability.__@iterator@11",
+      "id": "kernel:TreeCapability.__@iterator@16",
       "pkg": "kernel",
       "owner": "TreeCapability",
-      "name": "__@iterator@11",
+      "name": "__@iterator@16",
       "memberKind": "method",
       "signatures": [
         "(): StringIterator<string>"
@@ -2273,7 +2282,6 @@
       "name": "(call)",
       "memberKind": "callable-type",
       "signatures": [
-        "(): T",
         "(): T",
         "(update: (current: T) => T): void",
         "(value: LeafDefinition<Extract<T, CallableSyntax>>): void",

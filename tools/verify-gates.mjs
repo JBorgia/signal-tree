@@ -321,9 +321,9 @@ const GATES = [
   {
     name: 'api-callable-baseline',
     covers:
-      'the committed CALLABLE baseline matches the built surface — no public ' +
-      'method, callable property, callable type or function added, removed, ' +
-      'changed KIND or changed SIGNATURE',
+      'the committed INVOCATION-SURFACE baseline matches the built surface — ' +
+      'no public function, method, callable property, callable type or ' +
+      'constructable class added, removed, changed KIND or changed SIGNATURE',
     cmd: ['node', 'tools/api-callable-inventory.mjs', '--check'],
     needsBuild: true,
     provenBy: 'api-callable-baseline:self',
@@ -342,8 +342,8 @@ const GATES = [
       'the callable checker detects an added/removed member, a rename as ' +
       'removal+addition, a method<->callable-property kind flip, a new exported ' +
       'function, a changed parameter or return type, an added or removed ' +
-      'overload on a callable type, and optional->required — while ignoring a ' +
-      'non-exported interface',
+      'overload on a callable type, optional->required, and a changed class ' +
+      'CONSTRUCTOR — while ignoring a non-exported interface',
     cmd: ['node', 'tools/api-callable-inventory-selftest.mjs'],
     needsBuild: true,
   },

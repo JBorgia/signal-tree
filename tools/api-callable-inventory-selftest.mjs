@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Mutation proof for the callable gate. A gate that cannot fail proves nothing,
+ * Mutation proof for the invocation-surface gate. A gate that cannot fail proves nothing,
  * and this one exists because the EXPORT baseline silently passed while
  * `transaction()` shipped unrecorded.
  *
@@ -130,6 +130,17 @@ const CASES = [
         'addOne(entity: E, opts: AddOptions<E, K>): K;'
       ),
     expect: (r) => r.failed && /SIGNATURE CHANGED.*addOne/s.test(r.out),
+  },
+  {
+    name: '13 change an exported class CONSTRUCTOR shape',
+    mutate: (s) =>
+      s.replace(
+        'constructor(message?: string, options?: {',
+        'constructor(code: number, message?: string, options?: {'
+      ),
+    expect: (r) =>
+      r.failed &&
+      /SIGNATURE CHANGED.*SignalTreeRollbackError\.new/s.test(r.out),
   },
 ];
 
