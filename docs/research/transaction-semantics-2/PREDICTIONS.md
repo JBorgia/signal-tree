@@ -31,9 +31,14 @@ These are not changed after execution. A wrong prediction is a finding.
     L10  UNKNOWN     inspect() reports current/superseded, but whether
                      settlement agrees has never been tested. This is the
                      product-thesis law, so the answer matters either way.
-    L11  FAIL        supersession is recognised against later authored and
-                     realized writes but NOT across concurrent pending turns,
-                     which is R8's mechanism.
+    L11  FAIL        two ways. Supersession is not recognised across
+                     concurrent pending turns (R8's mechanism), AND there is
+                     no notion of a settlement RELATION distinct from
+                     authority order — an authoritative write is simply a
+                     later effect. Expect A1/A5 to fail: a refetch that
+                     returns current server truth is likely to be treated as
+                     superseding an unrelated pending contribution, which is
+                     the ordinary REST case rather than an exotic one.
     L12  UNKNOWN,    there is no revision/correlation model to order by, so
          likely FAIL any ordering that exists is arrival-based. Expect T19 and
                      T21 to fail; T22 is the interesting one, because

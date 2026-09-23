@@ -46,6 +46,10 @@ test. Every one must turn at least one test RED.
     M27  diagnostic history is REQUIRED for settlement correctness     <- L15
     M28  an authoritative snapshot is treated as unordered merely
          because it carries no version                                 <- L12
+    M29  an authoritative snapshot SETTLES or supersedes an unrelated
+         pending contribution                                          <- L11 A1 A5
+    M30  a correlated-accept is treated as a bare snapshot, so the
+         contribution it disposes stays pending                        <- L11 A2
 
 M22..M28 attack the system-composition laws. They matter disproportionately:
 the measured pattern is that this codebase is strongest inside a subsystem and
