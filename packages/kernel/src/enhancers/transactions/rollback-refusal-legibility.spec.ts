@@ -46,7 +46,7 @@ const makeTree = () =>
         ids(): string[];
       };
     };
-    transaction(fn: () => void): { confirm(): void; rollback(): void };
+    transact(fn: () => void): { confirm(): void; rollback(): void };
   };
 
 describe('a refused rollback names its refusal', () => {

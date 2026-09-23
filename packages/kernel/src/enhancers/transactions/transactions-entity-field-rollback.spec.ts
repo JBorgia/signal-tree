@@ -66,7 +66,7 @@ const makeTree = () =>
         byId(id: string): (() => Row | undefined) | undefined;
       };
     };
-    transaction: (fn: () => void) => { rollback(): void; confirm(): void };
+    transact: (fn: () => void) => { rollback(): void; confirm(): void };
   };
 
 describe('transactions — entity field rollback', () => {
@@ -170,7 +170,7 @@ describe('transactions — entity field rollback', () => {
           (): number;
         };
       };
-      transaction: (fn: () => void) => { rollback(): void };
+      transact: (fn: () => void) => { rollback(): void };
     };
     tree.$.count(1);
     await settle();

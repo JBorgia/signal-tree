@@ -81,7 +81,7 @@ type Store = {
       byId(id: string): (() => Row | undefined) | undefined;
     };
   };
-  transaction: (fn: () => void) => { confirm(): void; rollback(): void };
+  transact: (fn: () => void) => { confirm(): void; rollback(): void };
 };
 
 const makeStore = (): Store =>

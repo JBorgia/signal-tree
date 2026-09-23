@@ -67,7 +67,7 @@ interface Harness {
         ids(): string[];
       };
     };
-    transaction: (fn: () => void) => { confirm(): void; rollback(): void };
+    transact: (fn: () => void) => { confirm(): void; rollback(): void };
   };
   readonly writes: string[];
   revision(): number | undefined;

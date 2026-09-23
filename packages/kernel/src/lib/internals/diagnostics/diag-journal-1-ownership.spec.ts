@@ -49,7 +49,7 @@ type Store = {
   canRedo(): boolean;
   undo(): void;
   redo(): void;
-  transaction(fn: () => void): { confirm(): void; rollback(): void };
+  transact(fn: () => void): { confirm(): void; rollback(): void };
 };
 
 const makeTree = (maxHistorySize = 50) =>

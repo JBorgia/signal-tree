@@ -177,7 +177,7 @@ describe('a tree WITH a restorer keeps everything', () => {
 
     const pending = (
       tree as unknown as {
-        transaction: (f: () => void) => { rollback(): void };
+        transact: (f: () => void) => { rollback(): void };
       }
     ).transact(() => {
       undoable(() => tree.$.rows.updateOne('A', { name: 'Changed' }));

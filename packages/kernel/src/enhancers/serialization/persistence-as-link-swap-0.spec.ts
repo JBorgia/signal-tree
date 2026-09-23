@@ -291,7 +291,7 @@ describe('P5 — external acquisition moves eligible authority with no local mut
 
     const pending = (
       tree as unknown as {
-        transaction(fn: () => void): { confirm(): void; rollback(): void };
+        transact(fn: () => void): { confirm(): void; rollback(): void };
       }
     ).transact(() => {
       tree.$.a('SPECULATIVE');

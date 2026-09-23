@@ -49,7 +49,7 @@ describe('transactions enhancer', () => {
       { enhancers: [transactions()] }
     ) as unknown as {
       $: { (): { count: number }; count: () => number };
-      transaction: (fn: () => void) => { confirm(): void; rollback(): void };
+      transact: (fn: () => void) => { confirm(): void; rollback(): void };
       __transactions: {
         getConfirmedTurnCount(): number;
         getPendingTurnCount(): number;
@@ -179,7 +179,7 @@ describe('transactions enhancer', () => {
           };
         };
       };
-      transaction: (fn: () => void) => { confirm(): void; rollback(): void };
+      transact: (fn: () => void) => { confirm(): void; rollback(): void };
       __transactions: {
         getConfirmedTurnCount(): number;
         getPendingTurnCount(): number;
@@ -258,7 +258,7 @@ describe('transactions enhancer', () => {
           ids(): string[];
         };
       };
-      transaction: (fn: () => void) => { confirm(): void; rollback(): void };
+      transact: (fn: () => void) => { confirm(): void; rollback(): void };
       __transactions: {
         getConfirmedTurnCount(): number;
         getPendingTurnCount(): number;
@@ -343,7 +343,7 @@ describe('transactions enhancer', () => {
           };
         };
       };
-      transaction: (fn: () => void) => { confirm(): void; rollback(): void };
+      transact: (fn: () => void) => { confirm(): void; rollback(): void };
       __transactions: {
         getConfirmedTurnCount(): number;
         getPendingTurnCount(): number;

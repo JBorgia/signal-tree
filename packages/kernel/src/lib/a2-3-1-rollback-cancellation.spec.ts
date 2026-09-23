@@ -104,7 +104,7 @@ const persistedTree = (adapter: StorageAdapter, key: string) =>
         (): string;
       };
     };
-    transaction: (fn: () => void) => { confirm(): void; rollback(): void };
+    transact: (fn: () => void) => { confirm(): void; rollback(): void };
   };
 
 describe('A2-3.1 on the SHIPPING tree-scoped surface', () => {

@@ -94,7 +94,7 @@ function makeTree(recorder: Recorder, key: string) {
         (): string;
       };
     };
-    transaction: (fn: () => void) => { confirm(): void; rollback(): void };
+    transact: (fn: () => void) => { confirm(): void; rollback(): void };
   };
 }
 
@@ -308,7 +308,7 @@ describe('persistence() autoSave survives a REFUSED ROLLBACK PLAN', () => {
           byIdOrFail(id: string): { name(value: string): void };
         };
       };
-      transaction: (fn: () => void) => { confirm(): void; rollback(): void };
+      transact: (fn: () => void) => { confirm(): void; rollback(): void };
     };
 
     const pending = tree.transact(() => {

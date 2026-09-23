@@ -100,7 +100,7 @@ type Rows = {
 type Store = {
   (): { rows: { all: Row[] } };
   $: { rows: Rows };
-  transaction: (fn: () => void) => { confirm(): void; rollback(): void };
+  transact: (fn: () => void) => { confirm(): void; rollback(): void };
   undo(): void;
   destroy(): void;
 };

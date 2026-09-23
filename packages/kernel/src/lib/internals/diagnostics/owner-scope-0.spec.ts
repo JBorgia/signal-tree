@@ -72,7 +72,7 @@ const scalarTree = () =>
     } as never
   ) as never as {
     $: Record<string, (v?: unknown) => unknown>;
-    transaction(fn: () => void): { confirm(): void; rollback(): void };
+    transact(fn: () => void): { confirm(): void; rollback(): void };
   };
 
 const rowTree = () =>

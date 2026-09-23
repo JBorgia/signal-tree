@@ -77,7 +77,7 @@ const makeTree = (adapter: StorageAdapter, key: string) =>
         (): string;
       };
     };
-    transaction: (fn: () => void) => { confirm(): void; rollback(): void };
+    transact: (fn: () => void) => { confirm(): void; rollback(): void };
     __flushAutoSave?: () => Promise<void>;
   };
 

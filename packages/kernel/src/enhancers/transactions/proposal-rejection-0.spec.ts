@@ -109,7 +109,7 @@ const scalarTree = () =>
       c: (v?: number) => number;
       unrelated: (v?: number) => number;
     };
-    transaction: (fn: () => void) => { confirm(): void; rollback(): void };
+    transact: (fn: () => void) => { confirm(): void; rollback(): void };
   };
 
 const rowTree = () =>

@@ -60,7 +60,7 @@ const durable = (writes: string[]): S[] =>
 
 type Tx = { confirm(): void; rollback(): void };
 type Tree = ReturnType<typeof signalTree<S>> & {
-  transaction(fn: () => void): Tx;
+  transact(fn: () => void): Tx;
 };
 
 const makeTree = (adapter: StorageAdapter, key: string) =>

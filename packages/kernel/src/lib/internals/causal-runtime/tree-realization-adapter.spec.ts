@@ -3902,7 +3902,7 @@ describe('tree realization adapter', () => {
       };
       destroy(): void;
     } & {
-      transaction(fn: () => void): { confirm(): void; rollback(): void };
+      transact(fn: () => void): { confirm(): void; rollback(): void };
       __transactions: {
         getPendingTurnCount(): number;
         getConfirmedTurnCount(): number;
