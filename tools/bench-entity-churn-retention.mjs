@@ -70,8 +70,11 @@ const WIDTH = Number(arg('--width', 1000));
 const ROUNDS = Number(arg('--rounds', 50));
 /**
  * RETIRED-SUBJECT-SLOPE-STABILITY-0, stage 3 (real). Deliberately hold N
- * retired subject nodes strongly reachable, in the SAME arm, with the same
- * churn and the same protocol. The only difference is that retired subjects
+ * retired-node HANDLES — the results of byId() — strongly reachable, in the
+ * SAME arm, with the same churn and the same protocol. Handles, not subjects:
+ * a 1:1 handle-to-retired-SubjectId relationship is not separately proven here,
+ * and what matters is that this exercises the same lifetime/reachability
+ * failure mode. The only difference is that retired subjects
  * stop being forgettable.
  *
  * This is the mutation the gate actually claims to catch. Swapping to a

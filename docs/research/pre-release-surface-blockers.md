@@ -78,7 +78,9 @@ release platform — control distribution plus `--retain 10000` — before it
 blocks a release.
 
 Honest sensitivity, recorded rather than implied: reliably detects >= ~10,000
-accidentally retained subjects; 5,000 is marginal; <= 2,500 invisible.
+deliberately retained retired-node HANDLES; 5,000 is marginal; <= 2,500
+invisible. Handles rather than subjects, because a 1:1 handle-to-SubjectId
+relationship was not separately proven.
 
 ### 6. `REACT-PENDING-TURN-REALIZATION-0`
 

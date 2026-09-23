@@ -1,0 +1,99 @@
+# RETIRED-SUBJECT-SLOPE-STABILITY-0 — release-environment characterization.
+#
+# The 40 MB retained-heap ceiling was derived entirely on darwin/arm64, while
+# release gates run on ubuntu-latest. An absolute ceiling is environment-
+# dependent in a way the normalized slope it replaced was not, and the 4 MB
+# modes were localized to large_object_space — exactly the kind of behaviour
+# that differs across platform and V8 build.
+#
+# This job collects the DISTRIBUTIONS on the real release runner. It is
+# deliberately manual (workflow_dispatch): it is a one-off characterization,
+# not a gate, and it must not turn anything red while the threshold is still
+# unvalidated.
+#
+# ⚠️ DO NOT reduce the sample counts. Small-sample medians hiding multimodal
+# behaviour is the entire reason this investigation exists — a three-sample
+# green median is what shipped an untrustworthy gate for months.
+name: Retention characterization (release environment)
+
+on:
+  workflow_dispatch:
+    inputs:
+      control_samples:
+        description: 'Fresh processes for the control arm (retain=0)'
+        default: '30'
+      mutation_samples:
+        description: 'Fresh processes for the mutation arm (retain=10000)'
+        default: '10'
+
+jobs:
+  characterize:
+    name: Collect control and mutation distributions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Record environment
+        run: |
+          node -e "console.log(JSON.stringify({node:process.version,v8:process.versions.v8,platform:process.platform,arch:process.arch},null,1))" \
+            | tee artifacts/retention-env.json || (mkdir -p artifacts && node -e "console.log(JSON.stringify({node:process.version,v8:process.versions.v8,platform:process.platform,arch:process.arch},null,1))" > artifacts/retention-env.json)
+
+      - name: CONTROL — retain=0, one fresh process per sample
+        run: |
+          mkdir -p artifacts
+          : > artifacts/retention-control.jsonl
+          for i in $(seq 1 ${{ github.event.inputs.control_samples || 30 }}); do
+            node --expose-gc tools/bench-entity-churn-retention.mjs \
+              --arm no-history-reads --rounds 150 --retain 0 \
+              | tail -1 >> artifacts/retention-control.jsonl
+          done
+          echo "--- control growthMB ---"
+          node -e "const fs=require('fs');const r=fs.readFileSync('artifacts/retention-control.jsonl','utf8').trim().split('\n').map(JSON.parse);console.log(r.map(x=>x.growthMB).sort((a,b)=>a-b).join(', '))"
+
+      - name: MUTATION — retain=10000, one fresh process per sample
+        run: |
+          : > artifacts/retention-mutation.jsonl
+          for i in $(seq 1 ${{ github.event.inputs.mutation_samples || 10 }}); do
+            node --expose-gc tools/bench-entity-churn-retention.mjs \
+              --arm no-history-reads --rounds 150 --retain 10000 \
+              | tail -1 >> artifacts/retention-mutation.jsonl
+          done
+          echo "--- mutation growthMB ---"
+          node -e "const fs=require('fs');const r=fs.readFileSync('artifacts/retention-mutation.jsonl','utf8').trim().split('\n').map(JSON.parse);console.log(r.map(x=>x.growthMB).sort((a,b)=>a-b).join(', '))"
+
+      - name: Separation summary (reported, NOT a pass/fail)
+        run: |
+          node -e "
+            const fs=require('fs');
+            const load=f=>fs.readFileSync(f,'utf8').trim().split('\n').map(JSON.parse).map(x=>x.growthMB);
+            const c=load('artifacts/retention-control.jsonl').sort((a,b)=>a-b);
+            const m=load('artifacts/retention-mutation.jsonl').sort((a,b)=>a-b);
+            const overlap=Math.min(c[c.length-1],m[m.length-1])-Math.max(c[0],m[0]);
+            console.log('control  n='+c.length+'  min='+c[0]+'  max='+c[c.length-1]);
+            console.log('mutation n='+m.length+'  min='+m[0]+'  max='+m[m.length-1]);
+            console.log('gap between control max and mutation min: '+(m[0]-c[c.length-1]).toFixed(2)+' MB');
+            console.log('distributions overlap: '+(overlap>0));
+            console.log('');
+            console.log('Outcome A: control well under 40 and mutation well over -> 40 MB validated');
+            console.log('Outcome B: clean separation at other values -> derive a Linux ceiling from these');
+            console.log('Outcome C: material overlap -> absolute ceiling is not a reliable gate; do NOT tune to green');
+          "
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: retention-characterization
+          path: artifacts/retention-*.json*
+          if-no-files-found: error
