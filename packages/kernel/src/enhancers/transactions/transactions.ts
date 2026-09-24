@@ -868,6 +868,32 @@ class TransactionAuthority {
               conflictingEffect: overlap,
             },
           };
+
+        // KEY OCCUPANCY across pending turns. The check above matches by
+        // position/path, so a DIFFERENT subject sitting at a different
+        // position never matches — yet a pending add at the key a rekey
+        // vacated occupies that key just as physically as a confirmed one,
+        // because pending writes are applied optimistically. Without this the
+        // arm fell through to the physical-failure door.
+        if (effect.kind === 'rekey') {
+          const occupant = later.__effects?.find(
+            (candidate) =>
+              candidate.kind === 'add' &&
+              candidate.ownerPath === effect.ownerPath &&
+              candidate.key === effect.beforeKey &&
+              candidate.subject !== effect.subject
+          );
+          if (occupant)
+            return {
+              conflict: {
+                kind: 'later-confirmed-dependency',
+                pendingTurnId: turnId,
+                pendingEffect: effect,
+                conflictingTurnId: later.id,
+                conflictingEffect: occupant,
+              },
+            };
+        }
       }
     }
     const authoredLater = this.confirmedTurns
