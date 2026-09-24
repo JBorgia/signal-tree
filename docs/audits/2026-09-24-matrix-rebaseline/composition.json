@@ -1,0 +1,3517 @@
+{
+  "mode": "current",
+  "suite": "composition",
+  "baseline": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+  "timestamp": "2026-09-24T21:42:21.355Z",
+  "scope": "Supplemental assertions only; no whole-law or release verdict. Refusal safety is separate from successful surgical settlement.",
+  "inputs": {
+    "tools/run-semantics-supplemental.mjs": {
+      "sha256": "8de4ad08d8255939207d66895b396058fa39166cae5bc30446efbeedaf91f4a1",
+      "source": "working-tree"
+    },
+    "docs/audits/2026-09-23-semantics-composition/FROZEN-v3.json": {
+      "sha256": "8d2e636d5713b0385df0886877a479b52e572204d122e8638173ae28eb22d895",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/enhancers/transactions/semantics-composition.ts": {
+      "sha256": "b8f6a59127edc6ca901613056f4c6cf99a35b64c0ffa49f7f5af730fa21f7028",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/enhancers/transactions/semantics-composition-domain.ts": {
+      "sha256": "022e51ca9bf4eb641fdad92f8ac157c50ee6beaadee2ce966193532dbf25c5f0",
+      "source": "working-tree"
+    },
+    "docs/research/transaction-semantics-2/LAWS.md": {
+      "sha256": "5bfd86511723e6b23b72603ebabe35d3df1557586c3b86e0508117c60666d79b",
+      "source": "working-tree"
+    },
+    "docs/research/transaction-semantics-2/MATRIX.md": {
+      "sha256": "a590fdaa195a00c8ed7f7228bcd690cd1bdc96d400d02a2fced53be9553ef747",
+      "source": "working-tree"
+    },
+    "docs/research/transaction-semantics-2/MUTATIONS.md": {
+      "sha256": "a15751402867e59197383d0893e1deea0ec811b3c155d54bd155a2efac2fb292",
+      "source": "working-tree"
+    },
+    "docs/research/transaction-semantics-2/PREDICTIONS.md": {
+      "sha256": "81c47d4a7f28eacce31a0f814fa5b2c5edf6663350178d444809dd4a60212180",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/enhancers/transactions/semantics-supplemental.ts": {
+      "sha256": "5459e2ebe639a3d3258a8e67ee87f7ce756e589e242074483abc76b0d89895d6",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/enhancers/transactions/semantics-composition-adapter.ts": {
+      "sha256": "ec94de004be09daefb2f3552a33ab4c3cf7b70ebbcd1e13442b337d465d5a9c5",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/enhancers/transactions/semantics-contract.ts": {
+      "sha256": "d94c8e8d26d9ed46a3a88d133482f780ad74186fc65407e1310b72d292a8bb96",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/enhancers/transactions/semantics-current-adapter.ts": {
+      "sha256": "7838c1309e36f92f82c3819b00b42991f91fbd9565ad9902f2f46d22422925c7",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/signal-tree.ts": {
+      "sha256": "7440a2cd3c814e253c2aa49bc34b96afd49ac5150272c48682065f7efc5e99e3",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/markers/entity-map.ts": {
+      "sha256": "dcd89d2b8f2afc3931dcce3ddf935578d9c98dc1762f1b4a49041e1b275d182e",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/link.ts": {
+      "sha256": "2ad1d034e0fc85d8bfc13a6a4264c4eb735947af9987334b81b702bffee473f9",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/external.ts": {
+      "sha256": "dea4c23ea9ef115ea0200561068d6a1e64da0ba9e0ce53161f66a413cbf9d704",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/undoable.ts": {
+      "sha256": "c77dc84b015f025a4b83b79d63bf33e0e706078ff555e0913989de78c34c47db",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/enhancers/batching/batching.ts": {
+      "sha256": "8899a815e0ca41c804277ff43bb03d7dfbdf2ad2554a8ead216a17febe4f14d1",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/enhancers/restoration/restoration.ts": {
+      "sha256": "e5c8cfe51d9031e24a08a57df3b29dc95b848ea20ae5901367dc2a27c0f8b4d4",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/enhancers/transactions/transactions.ts": {
+      "sha256": "e4d6fa5af4732bf4a01f79220e2cd56993225cc2b285d1e8f0ebe28b9ae42657",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/adapter.ts": {
+      "sha256": "e99cc57221d867942fcb276fb48136ebd5b5620663436d7a2ed756c75a7d6fa9",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/types.ts": {
+      "sha256": "89908148d075acfa95a06767c651fa4159b68170422416f738d92f4de4fc351d",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/write-context.ts": {
+      "sha256": "8bb6f9dd964192f2ef92f399f2866e1577c2eb594bdff24fa060a357ab0129ad",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/position-registry.ts": {
+      "sha256": "0f0270979ab11a1d0309c2ffefe9e87bb8eb456c49c061aafb299b962a871184",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/restoration-eligibility.ts": {
+      "sha256": "322d963bd3c23ec4fe24aabfa7f6f399979371b4d83368b7ef108c0ca6321f2e",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/owner-invalidation-port.ts": {
+      "sha256": "8e1a2ace8ffc3640649449944e99905ee239fec53c9e375bd011556d30c315f7",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/visit-tree.ts": {
+      "sha256": "1c542d5082a0b4acb2f627eb70e88fcfabd4f49acb2b120d43d90f25b6199078",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/location-runtime.ts": {
+      "sha256": "19315d91502a57757c8d9f73aff2b36b2e4b2a5b47e066aab5d80d75b66f98e1",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/materialize-markers.ts": {
+      "sha256": "67e276b2bc6ccc84d6dae74a1fd6d36ded9c032b8efb30e455a4f7b0bb6460d1",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/mutation-capture-runtime.ts": {
+      "sha256": "d29008b03b2df740930e1e1f0f2c358fc486dcf81e6ef4442e60a6d10e056818",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/utils.ts": {
+      "sha256": "e3998436dfb9437a19168d0dd16846ab9217269db67cabbd3491d8fdcd9dc950",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/entity-signal.ts": {
+      "sha256": "fcf260b88665b5f5fd68dd2aca9cec2c1e0cbc92aa9a06880292dd593688f2ea",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/commit-consequence.ts": {
+      "sha256": "e849b30019c99a1b919a533fc625a318ee99e4646d2217f02269faf6a624ac80",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/owned-metadata.ts": {
+      "sha256": "192ca95912014282eca73f56005df91a565ec048b558dee8c88a02883e86a376",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/path-notifier.ts": {
+      "sha256": "8b64d318c3d3c4f0a92928a8692833737a14414cf329d27ee3fa28b6f20cd84d",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/error-reporter.ts": {
+      "sha256": "afea4528726649253d7605476ccf918045f67185ad0042d8279cdde160bd5a17",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/observation-substrate.ts": {
+      "sha256": "74bfc1e148cdf432164e27227e9e8113f540650885c467d58b26cc28f604500d",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/write-participation.ts": {
+      "sha256": "874604cae15f14835731ed26a7f7b7bc65ec138ae966a2db2c9fb93032b7fb6e",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/entity-projection-seed.ts": {
+      "sha256": "044549e0abf060cfee14c26a13e013d22f2a4fbe6ad4db37206247d88d7eecd6",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/entity-egress-projection.ts": {
+      "sha256": "f071541ff79537b0fde69d4d85554b37c1a586942964a26cdcdd816bb111a115",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/source-mutation.ts": {
+      "sha256": "cc24db10b21def186cca62d23a27224e09edb7ffe8991bdd8e8ebb094b8b5a87",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/root-source.ts": {
+      "sha256": "96ce05e9464bb874f09c6e418b0cf68ebe36e8d3995bcab30e2d9fa4fbc279c2",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/node-shape.ts": {
+      "sha256": "435224e100d4a45f7a52691236b3a9289d05cfb11100eb26fd5fc7275921c5d1",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/observation-adapter.ts": {
+      "sha256": "cc505e5d8951e6b25a17b6741cdcd9d9070fe76bdcf73e3ceabb2c028efd1016",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/snapshot-authority.ts": {
+      "sha256": "13e9eeb8f460511898cfe80843de0efe65436f9f328537b1e22aee0d278a84ab",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/constants.ts": {
+      "sha256": "0198acd1d2d8325d846b80cadefdf53db12df2d7843fd6bb41b47fd0fb93da00",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/enhancers/index.ts": {
+      "sha256": "b3f2d8805cd540733e58950d1673e8f6b7ebe850f8589d3067680b2c2b94768f",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/member-membership.ts": {
+      "sha256": "d5b2a944fc117c2acb3677aa8db2845c261b7ca85f8bf77cc28de0d5d8409116",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/tree-capabilities.ts": {
+      "sha256": "e11c6e045c7e88e19458ee841936a3e3afe50de74b17cf9279c3e2e5fc37e9d9",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/merge-derived.ts": {
+      "sha256": "a4bd3d4bbc0d4d5739d6c728cac4585d2eed9384274f4c2095b4ff7b14f59968",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/leaf.ts": {
+      "sha256": "c2a8c94a23b8adab93e21961b3835fc99a4e39af559de1d7d177a699e7e1d30e",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/owned-mutation.ts": {
+      "sha256": "8491afa231ffef3734a5be76bbb541631913dbc77cd81b02578af2b22080ca24",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": {
+      "sha256": "6d18d1b5c7e1c169ebae26fa8d7e83b991f7cb8d579b8a6c5c93a8505c63456c",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/physical-commit-clock.ts": {
+      "sha256": "44466c7b0b6bdde4d7a24b7d324c575a8cf782c5b60c2b85bf08c9c12442119e",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts": {
+      "sha256": "aedefcfe25998346c2db43568efc85b6e49174649624a42425cdfa60d12205bc",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/construction-branch.ts": {
+      "sha256": "22a1ad1a73e6f8bdc6cf9ff29ba91fbda767df2c415343eaa7b3e2497ade8282",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/native-location-realization.ts": {
+      "sha256": "1b75c21c161b8507324747fdab8b1affa01a182def23b173fd23ab03178a9193",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": {
+      "sha256": "00ac6cee41bc0a4b29d62539cf7652e1cbc7fed0e150665108b252a5bff18c34",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/canonical-snapshot.ts": {
+      "sha256": "51b8ca59737c3b3c082a12926925b526fcb2182bb345a15eb189320209741d50",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/owner-invalidation.ts": {
+      "sha256": "5c69c9022656eb21baeb4f242d81d399db82a8867a595266e1a3d4ff419eb627",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/subject-reclamation-sink.ts": {
+      "sha256": "84f269cd29df0dbcd7c0e3ca198ba0f1386ea18292b304528a6f4dd7fb745345",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/production-substrate-stats.ts": {
+      "sha256": "0ff31359dac07b31f4c04e870735618ecdef3fa3645ac1693f8fd5217d3c5b07",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": {
+      "sha256": "787e113601f19fbb6fe1c2190c85f4f9f99b21e95a29e816f818b5cc4940859b",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/subject-restoration-claims.ts": {
+      "sha256": "78da09b87c6e0a902b6ed7353a04ddd382fc7c5b8e8c4ed66de8634b87298cbf",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/intercept-leaf-signals.ts": {
+      "sha256": "6c4b840a31d3fd235b83803ec1150be60d3c8252081280529d4145d06dd543da",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/transaction-lifecycle.ts": {
+      "sha256": "2beca18cdf035ee8227c5026f401d61161cf6a1460276ce632966ae0e94cedd2",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/target-transition.ts": {
+      "sha256": "fd57f4a397d0bafccd4f74341e866313194a4467667d336e8bd916b34eb2ff4e",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/turn-store.ts": {
+      "sha256": "49520bc9420ebd430b982edf9a0a21f4a8ca889539a54b5198d205a9bd8f667f",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/applied-turn-projection.ts": {
+      "sha256": "d4b0314fdb72f518740ab3db6c90dc011d42abe94a4e3f17d995d3ac538dd5c8",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts": {
+      "sha256": "c7a4b27e035afc5893a19c0fb49f418cda02bf4df8735d92914cae2854278469",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/realization-context.ts": {
+      "sha256": "6ec5b9efd721421f6766d7ceaa81c3e7441cb59c93b36b3ca3a924a9855229da",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/enhancer-types.ts": {
+      "sha256": "7583d38293a9853af8bfb3e534f3bd4bb1361d75eb0cfb1b6a5b8802ad7cf8d0",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": {
+      "sha256": "ce5d130c453a2469319533f22d9687bc16932bd164be0a6d88dfad077af44d6c",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/cell-identity.ts": {
+      "sha256": "60a94340b3830b8f9a6efe2ec0b2206b141f64aae7ce46593a1517f9f964c492",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/path-observation-port.ts": {
+      "sha256": "a0274629171e65e7aca492b7cc0be4a0965fb7b7a571282689d70e8a2e25bc48",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/runtime-tree-plan.ts": {
+      "sha256": "e407dd6b87df6b8cb9ea674f5c93321c9f38447740cd782a4ca32ebf4e160272",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/utilities/is-built-in-object.ts": {
+      "sha256": "6690b24d9e52fe23c1d01d296826b44aa4c79b457ada685307697012d9846111",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/utilities/deep-equal.ts": {
+      "sha256": "d3281de95e87aab27bc493810e4b3e1b13c9ce874d9e68c8435140c94f48271c",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": {
+      "sha256": "27f5e8dcebaf91645744636980244bdc7cdd012bf3b10efde34edce2faa9c31b",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/write-observation-scope.ts": {
+      "sha256": "3cd7be31fe6a76ef174912c8281f0b22e4e7236888fb63c54a8f90d68b046406",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/physical/structural-store.ts": {
+      "sha256": "217feea4b0b0a41caa03f22aa5587c87bcd504264b63005b6bc2aa48211f410b",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/utilities/deep-clone.ts": {
+      "sha256": "4d4052a19f5bc484792d3cfc2d821890ce255d69d0640565ccbeda18b81b2635",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/physical/entity-mutation-frame.ts": {
+      "sha256": "b8d06d220a11cf63d16a7a50adb7a5c78784966d7141b940866b1389f2014f1b",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/physical/entity-value-store.ts": {
+      "sha256": "f6400264ea2fc4f54091f13c1c0004cca68b75eb40cd011ee4e4f85efe264e6f",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/physical/entity-handle-resolution.ts": {
+      "sha256": "8ac798d660e0050bc864c6c09b199ccd0f3c069ebd7abf07d311d74529931005",
+      "source": "working-tree"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/scoped-value-addressing.ts": {
+      "sha256": "1505a2da26081d0f282e034277cc6ada8abca342f19e13a2f369cb3402132456",
+      "source": "working-tree"
+    }
+  },
+  "changedInputs": [],
+  "totals": {
+    "held": 28,
+    "violated": 10,
+    "unsupported": 133,
+    "not-exercised": 0,
+    "error": 0
+  },
+  "rows": [
+    {
+      "id": "C1-transactions/CCTX1/direct/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/CCTX1/direct/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "external input retains this handle authority",
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/CCTX2/direct/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "both transaction writes present",
+          "status": "held"
+        },
+        {
+          "label": "actual pending authority",
+          "status": "held"
+        },
+        {
+          "label": "reject succeeds",
+          "status": "held"
+        },
+        {
+          "label": "both owned writes reversed",
+          "status": "held"
+        },
+        {
+          "label": "pending authority released",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/CCTX3/direct/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/CCTX1/batch/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/CCTX1/batch/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/CCTX2/batch/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/CCTX3/batch/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/CCTX1/coalesce/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/CCTX1/coalesce/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/CCTX2/coalesce/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/CCTX3/coalesce/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/CCTX2/coalesce/later-local-constant",
+      "scope": "Independent of read-dependency policy: later literal assignment survives older acceptance",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/CCTX4-CCTX5/batch/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/CCTX4-CCTX5/coalesce/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/CCTX4/coalesce/mixed-external-undoable",
+      "scope": "Queued external and undoable writes preserve their classifications",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/N01-N03-N05/pending-x-constant-y",
+      "scope": "Finite 100-turn non-interference control, not arbitrary liveness or dependency-policy proof",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no Link capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/N02/refused-x-constant-y",
+      "scope": "Actual occupied-entity refusal plus unrelated scalar or held-field delivery",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C1-transactions/N04-N05/independent-pending-links",
+      "scope": "Independent constant transactions settle and publish separately",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no Link capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX1/direct/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX1/direct/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "external input retains this handle authority",
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX2/direct/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "both transaction writes present",
+          "status": "held"
+        },
+        {
+          "label": "actual pending authority",
+          "status": "held"
+        },
+        {
+          "label": "reject succeeds",
+          "status": "held"
+        },
+        {
+          "label": "both owned writes reversed",
+          "status": "held"
+        },
+        {
+          "label": "pending authority released",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX3/direct/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX1/batch/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX1/batch/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX2/batch/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX3/batch/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX1/coalesce/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX1/coalesce/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX2/coalesce/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX3/coalesce/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX2/coalesce/later-local-constant",
+      "scope": "Independent of read-dependency policy: later literal assignment survives older acceptance",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX4-CCTX5/batch/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX4-CCTX5/coalesce/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX4/coalesce/mixed-external-undoable",
+      "scope": "Queued external and undoable writes preserve their classifications",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/N01-N03-N05/pending-x-constant-y",
+      "scope": "Finite 100-turn non-interference control, not arbitrary liveness or dependency-policy proof",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no Link capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/N02/refused-x-constant-y",
+      "scope": "Actual occupied-entity refusal plus unrelated scalar or held-field delivery",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no Link capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C2-transactions-entityMap/N04-N05/independent-pending-links",
+      "scope": "Independent constant transactions settle and publish separately",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no Link capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX1/direct/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX1/direct/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "external input retains this handle authority",
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX2/direct/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "both transaction writes present",
+          "status": "held"
+        },
+        {
+          "label": "actual pending authority",
+          "status": "held"
+        },
+        {
+          "label": "reject succeeds",
+          "status": "held"
+        },
+        {
+          "label": "both owned writes reversed",
+          "status": "held"
+        },
+        {
+          "label": "pending authority released",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX3/direct/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX1/batch/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX1/batch/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX2/batch/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX3/batch/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX1/coalesce/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX1/coalesce/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX2/coalesce/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX3/coalesce/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX2/coalesce/later-local-constant",
+      "scope": "Independent of read-dependency policy: later literal assignment survives older acceptance",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX4-CCTX5/batch/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX4-CCTX5/coalesce/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX4/coalesce/mixed-external-undoable",
+      "scope": "Queued external and undoable writes preserve their classifications",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/N01-N03-N05/pending-x-constant-y",
+      "scope": "Finite 100-turn non-interference control, not arbitrary liveness or dependency-policy proof",
+      "status": "violated",
+      "assertions": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "held"
+        },
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "held"
+        },
+        {
+          "label": "positive x delivery control",
+          "status": "held"
+        },
+        {
+          "label": "positive y delivery control",
+          "status": "held"
+        },
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ],
+      "trace": [
+        {
+          "outbound": [
+            5
+          ],
+          "expected": 5
+        },
+        {
+          "outbound": [
+            5
+          ],
+          "expected": 5
+        },
+        {
+          "outbound": [],
+          "expected": 11
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/N02/refused-x-constant-y",
+      "scope": "Actual occupied-entity refusal plus unrelated scalar or held-field delivery",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C3-transactions-link/N04-N05/independent-pending-links",
+      "scope": "Independent constant transactions settle and publish separately",
+      "status": "violated",
+      "assertions": [
+        {
+          "label": "x pending withheld",
+          "status": "held"
+        },
+        {
+          "label": "y pending withheld",
+          "status": "held"
+        },
+        {
+          "label": "accept independent y",
+          "status": "held"
+        },
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ],
+      "trace": [
+        {
+          "a": {
+            "status": "settled"
+          }
+        },
+        {
+          "outbound": [],
+          "expected": 2
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX1/direct/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C4-transactions-batching/CCTX1/direct/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "external input retains this handle authority",
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C4-transactions-batching/CCTX2/direct/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "both transaction writes present",
+          "status": "held"
+        },
+        {
+          "label": "actual pending authority",
+          "status": "held"
+        },
+        {
+          "label": "reject succeeds",
+          "status": "held"
+        },
+        {
+          "label": "both owned writes reversed",
+          "status": "held"
+        },
+        {
+          "label": "pending authority released",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX3/direct/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C4-transactions-batching/CCTX1/batch/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C4-transactions-batching/CCTX1/batch/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "external input retains this handle authority",
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C4-transactions-batching/CCTX2/batch/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "both transaction writes present",
+          "status": "held"
+        },
+        {
+          "label": "actual pending authority",
+          "status": "held"
+        },
+        {
+          "label": "reject succeeds",
+          "status": "held"
+        },
+        {
+          "label": "both owned writes reversed",
+          "status": "held"
+        },
+        {
+          "label": "pending authority released",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX3/batch/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C4-transactions-batching/CCTX1/coalesce/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C4-transactions-batching/CCTX1/coalesce/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "external input retains this handle authority",
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C4-transactions-batching/CCTX2/coalesce/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "both transaction writes present",
+          "status": "held"
+        },
+        {
+          "label": "actual pending authority",
+          "status": "held"
+        },
+        {
+          "label": "reject succeeds",
+          "status": "held"
+        },
+        {
+          "label": "both owned writes reversed",
+          "status": "held"
+        },
+        {
+          "label": "pending authority released",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX3/coalesce/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C4-transactions-batching/CCTX2/coalesce/later-local-constant",
+      "scope": "Independent of read-dependency policy: later literal assignment survives older acceptance",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "later literal visible",
+          "status": "held"
+        },
+        {
+          "label": "old authority retained",
+          "status": "held"
+        },
+        {
+          "label": "accept older transaction",
+          "status": "held"
+        },
+        {
+          "label": "accept cannot replay older literal",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "r": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX4-CCTX5/batch/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "accepted callback completes",
+          "status": "held"
+        },
+        {
+          "label": "accepted work plus prior outer write",
+          "status": "held"
+        },
+        {
+          "label": "accepted inner transaction can reject",
+          "status": "held"
+        },
+        {
+          "label": "rejection preserves prior outer write",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX4-CCTX5/coalesce/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "zero writes from refused unit; prior outer z survives",
+          "status": "held"
+        },
+        {
+          "label": "refused unit did not complete",
+          "status": "held"
+        },
+        {
+          "label": "refused x never published",
+          "status": "held"
+        },
+        {
+          "label": "refused y never published",
+          "status": "held"
+        },
+        {
+          "label": "refused unit leaves no latent write",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "nativeRefusal": {
+            "name": "Error",
+            "message": "A transaction cannot defer its writes beyond its callback; put coalesce() inside the transaction"
+          }
+        },
+        {
+          "scope": "safe composition refusal only, not successful transaction conformance",
+          "confirmedBefore": 0,
+          "confirmedAfter": 0
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX4/coalesce/mixed-external-undoable",
+      "scope": "Queued external and undoable writes preserve their classifications",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C4-transactions-batching/N01-N03-N05/pending-x-constant-y",
+      "scope": "Finite 100-turn non-interference control, not arbitrary liveness or dependency-policy proof",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no Link capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C4-transactions-batching/N02/refused-x-constant-y",
+      "scope": "Actual occupied-entity refusal plus unrelated scalar or held-field delivery",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C4-transactions-batching/N04-N05/independent-pending-links",
+      "scope": "Independent constant transactions settle and publish separately",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no Link capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX1/direct/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "external write realized",
+          "status": "held"
+        },
+        {
+          "label": "undo preserves external truth",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX1/direct/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "external input retains this handle authority",
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX2/direct/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "both transaction writes present",
+          "status": "held"
+        },
+        {
+          "label": "actual pending authority",
+          "status": "held"
+        },
+        {
+          "label": "reject succeeds",
+          "status": "held"
+        },
+        {
+          "label": "both owned writes reversed",
+          "status": "held"
+        },
+        {
+          "label": "pending authority released",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX3/direct/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "designated writes visible",
+          "status": "held"
+        },
+        {
+          "label": "undo restores both writes",
+          "status": "held"
+        },
+        {
+          "label": "undo actually publishes",
+          "status": "held"
+        },
+        {
+          "label": "no partial undo callback",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX1/batch/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX1/batch/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX2/batch/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX3/batch/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX1/coalesce/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX1/coalesce/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX2/coalesce/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX3/coalesce/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX2/coalesce/later-local-constant",
+      "scope": "Independent of read-dependency policy: later literal assignment survives older acceptance",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX4-CCTX5/batch/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX4-CCTX5/coalesce/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX4/coalesce/mixed-external-undoable",
+      "scope": "Queued external and undoable writes preserve their classifications",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/N01-N03-N05/pending-x-constant-y",
+      "scope": "Finite 100-turn non-interference control, not arbitrary liveness or dependency-policy proof",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no Link capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/N02/refused-x-constant-y",
+      "scope": "Actual occupied-entity refusal plus unrelated scalar or held-field delivery",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C5-transactions-restoration/N04-N05/independent-pending-links",
+      "scope": "Independent constant transactions settle and publish separately",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no Link capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX1/direct/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX1/direct/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "external input retains this handle authority",
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX2/direct/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "both transaction writes present",
+          "status": "held"
+        },
+        {
+          "label": "actual pending authority",
+          "status": "held"
+        },
+        {
+          "label": "reject succeeds",
+          "status": "held"
+        },
+        {
+          "label": "both owned writes reversed",
+          "status": "held"
+        },
+        {
+          "label": "pending authority released",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX3/direct/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX1/batch/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX1/batch/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX2/batch/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX3/batch/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX1/coalesce/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX1/coalesce/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX2/coalesce/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX3/coalesce/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX2/coalesce/later-local-constant",
+      "scope": "Independent of read-dependency policy: later literal assignment survives older acceptance",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX4-CCTX5/batch/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX4-CCTX5/coalesce/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX4/coalesce/mixed-external-undoable",
+      "scope": "Queued external and undoable writes preserve their classifications",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/N01-N03-N05/pending-x-constant-y",
+      "scope": "Finite 100-turn non-interference control, not arbitrary liveness or dependency-policy proof",
+      "status": "violated",
+      "assertions": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "held"
+        },
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "held"
+        },
+        {
+          "label": "positive x delivery control",
+          "status": "held"
+        },
+        {
+          "label": "positive y delivery control",
+          "status": "held"
+        },
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ],
+      "trace": [
+        {
+          "outbound": [
+            5
+          ],
+          "expected": 5
+        },
+        {
+          "outbound": [
+            5
+          ],
+          "expected": 5
+        },
+        {
+          "outbound": [],
+          "expected": 11
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/N02/refused-x-constant-y",
+      "scope": "Actual occupied-entity refusal plus unrelated scalar or held-field delivery",
+      "status": "violated",
+      "assertions": [
+        {
+          "label": "refusal makes zero state writes",
+          "status": "held"
+        },
+        {
+          "label": "refusal preserves entire entity state",
+          "status": "held"
+        },
+        {
+          "label": "refusal retains actual pending ID",
+          "status": "held"
+        },
+        {
+          "label": "refusal creates no confirmed turn",
+          "status": "held"
+        },
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ],
+      "trace": [
+        {
+          "r": {
+            "status": "refused",
+            "reason": {
+              "name": "SignalTreeRollbackError",
+              "message": "SignalTree could not rollback the pending transaction: compensating turn 1 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]",
+              "cause": {
+                "kind": "effect-validation-failed",
+                "pendingTurnId": 1,
+                "compensation": [
+                  {
+                    "kind": "set",
+                    "path": "rows.held.x",
+                    "ownerPath": "rows",
+                    "position": 5,
+                    "subject": 1,
+                    "subjectFieldSegments": [
+                      "x"
+                    ],
+                    "before": 0,
+                    "after": 1
+                  },
+                  {
+                    "kind": "remove",
+                    "subject": 2,
+                    "key": "collision",
+                    "value": {
+                      "id": "collision",
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    },
+                    "beforeSubject": 1,
+                    "ownerPath": "rows",
+                    "path": "rows.collision",
+                    "position": 5
+                  }
+                ],
+                "errorMessage": "Transaction rollback refused: structural-drift",
+                "cause": {
+                  "kind": "structural-drift"
+                }
+              }
+            }
+          }
+        },
+        {
+          "outbound": [],
+          "expected": 2
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/N04-N05/independent-pending-links",
+      "scope": "Independent constant transactions settle and publish separately",
+      "status": "violated",
+      "assertions": [
+        {
+          "label": "x pending withheld",
+          "status": "held"
+        },
+        {
+          "label": "y pending withheld",
+          "status": "held"
+        },
+        {
+          "label": "accept independent y",
+          "status": "held"
+        },
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ],
+      "trace": [
+        {
+          "a": {
+            "status": "settled"
+          }
+        },
+        {
+          "outbound": [],
+          "expected": 2
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX1/direct/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX1/direct/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "external input retains this handle authority",
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX2/direct/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "both transaction writes present",
+          "status": "held"
+        },
+        {
+          "label": "actual pending authority",
+          "status": "held"
+        },
+        {
+          "label": "reject succeeds",
+          "status": "held"
+        },
+        {
+          "label": "both owned writes reversed",
+          "status": "held"
+        },
+        {
+          "label": "pending authority released",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX3/direct/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX1/batch/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX1/batch/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "external input retains this handle authority",
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX2/batch/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "both transaction writes present",
+          "status": "held"
+        },
+        {
+          "label": "actual pending authority",
+          "status": "held"
+        },
+        {
+          "label": "reject succeeds",
+          "status": "held"
+        },
+        {
+          "label": "both owned writes reversed",
+          "status": "held"
+        },
+        {
+          "label": "pending authority released",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX3/batch/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX1/coalesce/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX1/coalesce/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "external input retains this handle authority",
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX2/coalesce/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "both transaction writes present",
+          "status": "held"
+        },
+        {
+          "label": "actual pending authority",
+          "status": "held"
+        },
+        {
+          "label": "reject succeeds",
+          "status": "held"
+        },
+        {
+          "label": "both owned writes reversed",
+          "status": "held"
+        },
+        {
+          "label": "pending authority released",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX3/coalesce/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX2/coalesce/later-local-constant",
+      "scope": "Independent of read-dependency policy: later literal assignment survives older acceptance",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "later literal visible",
+          "status": "held"
+        },
+        {
+          "label": "old authority retained",
+          "status": "held"
+        },
+        {
+          "label": "accept older transaction",
+          "status": "held"
+        },
+        {
+          "label": "accept cannot replay older literal",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "r": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX4-CCTX5/batch/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "accepted callback completes",
+          "status": "held"
+        },
+        {
+          "label": "accepted work plus prior outer write",
+          "status": "held"
+        },
+        {
+          "label": "accepted inner transaction can reject",
+          "status": "held"
+        },
+        {
+          "label": "rejection preserves prior outer write",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX4-CCTX5/coalesce/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "zero writes from refused unit; prior outer z survives",
+          "status": "held"
+        },
+        {
+          "label": "refused unit did not complete",
+          "status": "held"
+        },
+        {
+          "label": "refused x never published",
+          "status": "held"
+        },
+        {
+          "label": "refused y never published",
+          "status": "held"
+        },
+        {
+          "label": "refused unit leaves no latent write",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "nativeRefusal": {
+            "name": "Error",
+            "message": "A transaction cannot defer its writes beyond its callback; put coalesce() inside the transaction"
+          }
+        },
+        {
+          "scope": "safe composition refusal only, not successful transaction conformance",
+          "confirmedBefore": 0,
+          "confirmedAfter": 0
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX4/coalesce/mixed-external-undoable",
+      "scope": "Queued external and undoable writes preserve their classifications",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C7-transactions-batching-external/N01-N03-N05/pending-x-constant-y",
+      "scope": "Finite 100-turn non-interference control, not arbitrary liveness or dependency-policy proof",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no Link capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C7-transactions-batching-external/N02/refused-x-constant-y",
+      "scope": "Actual occupied-entity refusal plus unrelated scalar or held-field delivery",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C7-transactions-batching-external/N04-N05/independent-pending-links",
+      "scope": "Independent constant transactions settle and publish separately",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no Link capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX1/direct/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "external write realized",
+          "status": "held"
+        },
+        {
+          "label": "undo preserves external truth",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX1/direct/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "external input retains this handle authority",
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX2/direct/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "both transaction writes present",
+          "status": "held"
+        },
+        {
+          "label": "actual pending authority",
+          "status": "held"
+        },
+        {
+          "label": "reject succeeds",
+          "status": "held"
+        },
+        {
+          "label": "both owned writes reversed",
+          "status": "held"
+        },
+        {
+          "label": "pending authority released",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX3/direct/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "designated writes visible",
+          "status": "held"
+        },
+        {
+          "label": "undo restores both writes",
+          "status": "held"
+        },
+        {
+          "label": "undo actually publishes",
+          "status": "held"
+        },
+        {
+          "label": "no partial undo callback",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX1/batch/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX1/batch/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX2/batch/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX3/batch/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX1/coalesce/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX1/coalesce/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX2/coalesce/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX3/coalesce/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX2/coalesce/later-local-constant",
+      "scope": "Independent of read-dependency policy: later literal assignment survives older acceptance",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX4-CCTX5/batch/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no batch capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX4-CCTX5/coalesce/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX4/coalesce/mixed-external-undoable",
+      "scope": "Queued external and undoable writes preserve their classifications",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/N01-N03-N05/pending-x-constant-y",
+      "scope": "Finite 100-turn non-interference control, not arbitrary liveness or dependency-policy proof",
+      "status": "violated",
+      "assertions": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "held"
+        },
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "held"
+        },
+        {
+          "label": "positive x delivery control",
+          "status": "held"
+        },
+        {
+          "label": "positive y delivery control",
+          "status": "held"
+        },
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ],
+      "trace": [
+        {
+          "outbound": [
+            5
+          ],
+          "expected": 5
+        },
+        {
+          "outbound": [
+            5
+          ],
+          "expected": 5
+        },
+        {
+          "outbound": [],
+          "expected": 11
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/N02/refused-x-constant-y",
+      "scope": "Actual occupied-entity refusal plus unrelated scalar or held-field delivery",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/N04-N05/independent-pending-links",
+      "scope": "Independent constant transactions settle and publish separately",
+      "status": "violated",
+      "assertions": [
+        {
+          "label": "x pending withheld",
+          "status": "held"
+        },
+        {
+          "label": "y pending withheld",
+          "status": "held"
+        },
+        {
+          "label": "accept independent y",
+          "status": "held"
+        },
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ],
+      "trace": [
+        {
+          "a": {
+            "status": "settled"
+          }
+        },
+        {
+          "outbound": [],
+          "expected": 2
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX1/direct/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C9-transactions-entityMap-link-batching has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX1/direct/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "external input retains this handle authority",
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX2/direct/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "both transaction writes present",
+          "status": "held"
+        },
+        {
+          "label": "actual pending authority",
+          "status": "held"
+        },
+        {
+          "label": "reject succeeds",
+          "status": "held"
+        },
+        {
+          "label": "both owned writes reversed",
+          "status": "held"
+        },
+        {
+          "label": "pending authority released",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX3/direct/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C9-transactions-entityMap-link-batching has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX1/batch/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C9-transactions-entityMap-link-batching has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX1/batch/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "external input retains this handle authority",
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX2/batch/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "both transaction writes present",
+          "status": "held"
+        },
+        {
+          "label": "actual pending authority",
+          "status": "held"
+        },
+        {
+          "label": "reject succeeds",
+          "status": "held"
+        },
+        {
+          "label": "both owned writes reversed",
+          "status": "held"
+        },
+        {
+          "label": "pending authority released",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX3/batch/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C9-transactions-entityMap-link-batching has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX1/coalesce/external-history",
+      "scope": "External truth is not an undo record; visible-state projection only",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C9-transactions-entityMap-link-batching has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX1/coalesce/pending-canonical",
+      "scope": "Canonical/overlay obligations remain explicit, not inferred from visible state",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "external input retains this handle authority",
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX2/coalesce/transaction",
+      "scope": "Accepted transaction retains deferred writes and rejects all its own writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "both transaction writes present",
+          "status": "held"
+        },
+        {
+          "label": "actual pending authority",
+          "status": "held"
+        },
+        {
+          "label": "reject succeeds",
+          "status": "held"
+        },
+        {
+          "label": "both owned writes reversed",
+          "status": "held"
+        },
+        {
+          "label": "pending authority released",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX3/coalesce/restoration",
+      "scope": "Undo designation survives scheduling; owner callbacks see complete undo",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C9-transactions-entityMap-link-batching has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX2/coalesce/later-local-constant",
+      "scope": "Independent of read-dependency policy: later literal assignment survives older acceptance",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "later literal visible",
+          "status": "held"
+        },
+        {
+          "label": "old authority retained",
+          "status": "held"
+        },
+        {
+          "label": "accept older transaction",
+          "status": "held"
+        },
+        {
+          "label": "accept cannot replay older literal",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "r": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX4-CCTX5/batch/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "accepted callback completes",
+          "status": "held"
+        },
+        {
+          "label": "accepted work plus prior outer write",
+          "status": "held"
+        },
+        {
+          "label": "accepted inner transaction can reject",
+          "status": "held"
+        },
+        {
+          "label": "rejection preserves prior outer write",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX4-CCTX5/coalesce/inner-transaction",
+      "scope": "Accepted composition owns only its writes; native refusal queues none of its writes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "zero writes from refused unit; prior outer z survives",
+          "status": "held"
+        },
+        {
+          "label": "refused unit did not complete",
+          "status": "held"
+        },
+        {
+          "label": "refused x never published",
+          "status": "held"
+        },
+        {
+          "label": "refused y never published",
+          "status": "held"
+        },
+        {
+          "label": "refused unit leaves no latent write",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "nativeRefusal": {
+            "name": "Error",
+            "message": "A transaction cannot defer its writes beyond its callback; put coalesce() inside the transaction"
+          }
+        },
+        {
+          "scope": "safe composition refusal only, not successful transaction conformance",
+          "confirmedBefore": 0,
+          "confirmedAfter": 0
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX4/coalesce/mixed-external-undoable",
+      "scope": "Queued external and undoable writes preserve their classifications",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C9-transactions-entityMap-link-batching has no restoration capability"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/N01-N03-N05/pending-x-constant-y",
+      "scope": "Finite 100-turn non-interference control, not arbitrary liveness or dependency-policy proof",
+      "status": "violated",
+      "assertions": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "held"
+        },
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "held"
+        },
+        {
+          "label": "positive x delivery control",
+          "status": "held"
+        },
+        {
+          "label": "positive y delivery control",
+          "status": "held"
+        },
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ],
+      "trace": [
+        {
+          "outbound": [
+            5
+          ],
+          "expected": 5
+        },
+        {
+          "outbound": [
+            5
+          ],
+          "expected": 5
+        },
+        {
+          "outbound": [],
+          "expected": 11
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/N02/refused-x-constant-y",
+      "scope": "Actual occupied-entity refusal plus unrelated scalar or held-field delivery",
+      "status": "violated",
+      "assertions": [
+        {
+          "label": "refusal makes zero state writes",
+          "status": "held"
+        },
+        {
+          "label": "refusal preserves entire entity state",
+          "status": "held"
+        },
+        {
+          "label": "refusal retains actual pending ID",
+          "status": "held"
+        },
+        {
+          "label": "refusal creates no confirmed turn",
+          "status": "held"
+        },
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ],
+      "trace": [
+        {
+          "r": {
+            "status": "refused",
+            "reason": {
+              "name": "SignalTreeRollbackError",
+              "message": "SignalTree could not rollback the pending transaction: compensating turn 1 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]",
+              "cause": {
+                "kind": "effect-validation-failed",
+                "pendingTurnId": 1,
+                "compensation": [
+                  {
+                    "kind": "set",
+                    "path": "rows.held.x",
+                    "ownerPath": "rows",
+                    "position": 5,
+                    "subject": 1,
+                    "subjectFieldSegments": [
+                      "x"
+                    ],
+                    "before": 0,
+                    "after": 1
+                  },
+                  {
+                    "kind": "remove",
+                    "subject": 2,
+                    "key": "collision",
+                    "value": {
+                      "id": "collision",
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    },
+                    "beforeSubject": 1,
+                    "ownerPath": "rows",
+                    "path": "rows.collision",
+                    "position": 5
+                  }
+                ],
+                "errorMessage": "Transaction rollback refused: structural-drift",
+                "cause": {
+                  "kind": "structural-drift"
+                }
+              }
+            }
+          }
+        },
+        {
+          "outbound": [],
+          "expected": 2
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/N04-N05/independent-pending-links",
+      "scope": "Independent constant transactions settle and publish separately",
+      "status": "violated",
+      "assertions": [
+        {
+          "label": "x pending withheld",
+          "status": "held"
+        },
+        {
+          "label": "y pending withheld",
+          "status": "held"
+        },
+        {
+          "label": "accept independent y",
+          "status": "held"
+        },
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ],
+      "trace": [
+        {
+          "a": {
+            "status": "settled"
+          }
+        },
+        {
+          "outbound": [],
+          "expected": 2
+        }
+      ]
+    }
+  ],
+  "exitCode": 1
+}
