@@ -44,7 +44,7 @@ describe('transactions enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ count: 0 }, { enhancers: [transactions()] }) as unknown as {
+    const store = signalTree({ count: 0 }, { enhancers: [transactions({ history: { retain: 1000 } })] }) as unknown as {
       $: { (): { count: number }; count: () => number };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
       __transactions: {

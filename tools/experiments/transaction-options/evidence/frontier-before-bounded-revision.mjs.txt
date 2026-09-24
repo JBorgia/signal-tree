@@ -1,0 +1,444 @@
+// NON-SHIPPING bounded model of PROTOCOL.md. No production/framework integration.
+// Independent implementation: committed cells + authored pending patches. Reads
+// resolve cells, never replay a transaction journal. Snapshot construction scans
+// locations; topology validation scans entities. Neither is a scalability claim.
+// Unsupported: structural authority, structural undo/defer, arbitrary path/key
+// objects, reentrant writes from observers, callback/dependency inference, and
+// canonical support topology requiring pending-created/vacated structure.
+import { isDeepStrictEqual } from 'node:util';
+
+const ABSENT = Symbol('absent');
+const copy = value => value === ABSENT ? ABSENT : structuredClone(value);
+const ok = () => ({ status: 'settled' });
+const refused = reason => ({ status: 'refused', reason });
+function unsupported(reason) {
+  throw Object.assign(new Error(reason), { name: 'Unsupported' });
+}
+const defaultSeed = () => ({
+  values: ['x', 'y', 'z'].map(k => ({ path: [k], value: 0 })),
+  entities: [{ ref: 'original', key: 'A', fields: { name: 'Original', priority: 0 } }],
+});
+function atom(value) {
+  if (typeof value !== 'string' && !(typeof value === 'number' && Number.isFinite(value))) {
+    unsupported('Identity components must be strings or finite numbers');
+  }
+}
+function pathKey(path) {
+  if (!Array.isArray(path) || !path.length) unsupported('Nonempty structured paths required');
+  path.forEach(atom);
+  // JSON arrays are injective for the admitted typed components (Map treats
+  // -0 and 0 alike). This is not delimiter joining or String(key) coercion.
+  return JSON.stringify(path);
+}
+const cell = value => ({ committed: value === ABSENT ? null : { value: copy(value), seq: 0 }, pending: new Set() });
+const emptyEntity = ref => ({ ref, presence: cell(ABSENT), key: cell(ABSENT), fields: new Map() });
+
+export function create({ profile = 'live', diagnostics = false, seed = defaultSeed() } = {}) {
+  if (!['live', 'draft'].includes(profile)) unsupported('Unknown profile');
+  const scalars = new Map();
+  const entities = new Map();
+  const active = new Set();
+  let handles = new WeakMap(); // Terminal summaries cannot keep caller handles alive.
+  const observers = new Set();
+  const links = new Set();
+  const queue = [];
+  const undoHistory = [];
+  const diagnosticHistory = []; // Optional evidence, bounded independently of correctness.
+  let sequence = 0;
+  let revision = -Infinity;
+  let destroyed = false;
+  let publishing = false;
+
+  for (const { path, value } of seed.values) {
+    scalars.set(pathKey(path), { path: copy(path), cell: cell(value) });
+  }
+  for (const { ref, key, fields } of seed.entities) {
+    atom(key);
+    const e = emptyEntity(ref);
+    e.presence = cell(true); e.key = cell(key);
+    for (const [name, value] of Object.entries(fields)) e.fields.set(name, cell(value));
+    entities.set(ref, e);
+  }
+
+  function alive(mutation = false) {
+    if (destroyed) throw new Error('Model destroyed');
+    if (mutation && publishing) unsupported('Reentrant observer mutation');
+  }
+  function record(id) {
+    const r = handles.get(id);
+    if (!r) throw new Error('Unknown contribution handle');
+    return r;
+  }
+  function committed(c, overrides) { return overrides?.get(c) ?? c.committed; }
+  function resolve(c, { canonical = false, omit, overrides } = {}) {
+    let winner = committed(c, overrides);
+    if (!canonical) for (const patch of c.pending) {
+      if (patch.owner !== omit && (!winner || patch.seq > winner.seq)) winner = patch;
+    }
+    return winner ?? { value: ABSENT, seq: -Infinity };
+  }
+  function cells(e) { return [e.presence, e.key, ...e.fields.values()]; }
+  function snapshot({ canonical = profile === 'draft', omit, overrides, plan } = {}) {
+    const opts = { canonical, omit, overrides };
+    const values = [];
+    for (const s of [...scalars.values(), ...(plan?.scalars.values() ?? [])]) {
+      const v = resolve(s.cell, opts).value;
+      if (v !== ABSENT) values.push({ path: copy(s.path), value: copy(v) });
+    }
+    const rows = [];
+    for (const e of [...entities.values(), ...(plan?.entities.values() ?? [])]) {
+      if (resolve(e.presence, opts).value !== true) continue;
+      const key = resolve(e.key, opts).value;
+      if (key === ABSENT) throw new Error('Present entity has no key');
+      const fields = {};
+      const fieldEntries = new Map([...e.fields, ...(plan?.fields.get(e) ?? [])]);
+      for (const [name, c] of fieldEntries) {
+        const v = resolve(c, opts).value;
+        if (v !== ABSENT) Object.defineProperty(fields, name, { value: copy(v), enumerable: true, writable: true, configurable: true });
+      }
+      rows.push({ ref: e.ref, key: copy(key), fields });
+    }
+    return { values, entities: rows };
+  }
+  function unique(s) {
+    const keys = new Set();
+    for (const e of s.entities) {
+      if (keys.has(e.key)) return false;
+      keys.add(e.key);
+    }
+    return true;
+  }
+
+  // Compilation touches only the supplied operations. New locations are staged
+  // until preflight succeeds; refusal cannot leave hidden cell registrations.
+  function prepare(ops, seqs, canonical = profile === 'draft') {
+    const plan = { groups: [], scalars: new Map(), entities: new Map(), fields: new Map() };
+    const overlay = new Map();
+    const view = c => resolve(c, { canonical, overrides: overlay }).value;
+    const findEntity = ref => plan.entities.get(ref) ?? entities.get(ref);
+    for (let i = 0; i < ops.length; i++) {
+      const op = ops[i];
+      const seq = seqs[i];
+      const g = { kind: op.kind, seq, entity: null, patches: [], primary: null };
+      const put = (c, value) => {
+        const patch = { cell: c, value: copy(value), seq, owner: null,
+          base: profile === 'draft' ? c.committed : null };
+        g.patches.push(patch);
+        overlay.set(c, patch);
+        return c;
+      };
+      if (op.kind === 'set') {
+        const key = pathKey(op.path);
+        let s = scalars.get(key) ?? plan.scalars.get(key);
+        if (!s) { s = { path: copy(op.path), cell: cell(ABSENT) }; plan.scalars.set(key, s); }
+        g.primary = put(s.cell, op.value);
+      } else if (op.kind === 'add') {
+        atom(op.key);
+        if (typeof op.ref !== 'string') unsupported('Entity refs must be opaque string labels');
+        if (findEntity(op.ref)) return { error: 'Lifetime ref already exists; use a new ref' };
+        const e = emptyEntity(op.ref);
+        plan.entities.set(op.ref, e); g.entity = e;
+        g.primary = put(e.presence, true); put(e.key, op.key);
+        for (const [name, value] of Object.entries(op.fields)) {
+          const c = cell(ABSENT); e.fields.set(name, c); put(c, value);
+        }
+      } else if (['field', 'rekey', 'remove'].includes(op.kind)) {
+        const e = findEntity(op.ref);
+        if (!e || view(e.presence) !== true) return { error: 'Referenced lifetime is not present' };
+        g.entity = e;
+        if (op.kind === 'remove') g.primary = put(e.presence, false);
+        else if (op.kind === 'rekey') { atom(op.key); g.primary = put(e.key, op.key); }
+        else {
+          if (typeof op.field !== 'string') unsupported('Field names must be strings');
+          let c = e.fields.get(op.field) ?? plan.fields.get(e)?.get(op.field);
+          if (!c) {
+            c = cell(ABSENT);
+            if (!plan.fields.has(e)) plan.fields.set(e, new Map());
+            plan.fields.get(e).set(op.field, c);
+          }
+          g.primary = put(c, op.value);
+        }
+      } else unsupported(`Operation ${op.kind}`);
+      plan.groups.push(g);
+    }
+    plan.overlay = overlay;
+    const proposed = snapshot({ canonical, overrides: overlay, plan });
+    if (!unique(proposed)) return { error: 'Business key occupied' };
+    plan.proposed = proposed;
+    return plan;
+  }
+  function register(plan) {
+    for (const [key, s] of plan.scalars) scalars.set(key, s);
+    for (const [ref, e] of plan.entities) entities.set(ref, e);
+    for (const [e, fields] of plan.fields) for (const [name, c] of fields) e.fields.set(name, c);
+  }
+  function sequences(ops) {
+    if (!Array.isArray(ops) || !ops.length) unsupported('Empty contribution/write');
+    return ops.map(() => ++sequence);
+  }
+  function superseded(g, overrides) {
+    const death = g.entity && committed(g.entity.presence, overrides);
+    return (death?.value === false && death.seq > g.seq)
+      || (committed(g.primary, overrides)?.seq ?? -Infinity) > g.seq;
+  }
+  function stateOf(r) {
+    if (r.status !== 'pending') return copy(r.summary);
+    return { status: 'pending', authority: true,
+      dispositions: r.groups.map(g => superseded(g) ? 'superseded' : 'pending') };
+  }
+  function retire(r, status, dispositions) {
+    for (const g of r.groups) for (const p of g.patches) p.cell.pending.delete(p);
+    active.delete(r);
+    const summary = { status, authority: false, dispositions };
+    handles.set(r.handle, { status, summary });
+    if (diagnostics) {
+      diagnosticHistory.push(copy(summary));
+      if (diagnosticHistory.length > 128) diagnosticHistory.shift();
+    }
+    // No strong registry entry, operations, base snapshots, or cell references
+    // survive in the terminal handle's WeakMap summary.
+  }
+  function collectEmptyLocations() {
+    // Rejected new paths/lifetimes must not leave empty correctness scaffolding.
+    const empty = c => c.committed === null && c.pending.size === 0;
+    for (const [key, s] of scalars) if (empty(s.cell)) scalars.delete(key);
+    for (const [ref, e] of entities) {
+      for (const [name, c] of e.fields) if (empty(c)) e.fields.delete(name);
+      if (cells(e).every(empty)) entities.delete(ref);
+    }
+  }
+  function canonicalSnapshot() {
+    const result = snapshot({ canonical: true });
+    if (!unique(result)) unsupported('Canonical key support depends on pending-vacated topology');
+    for (const e of entities.values()) {
+      if (e.presence.committed?.value === true || resolve(e.presence).value !== true) continue;
+      if ([e.key, ...e.fields.values()].some(c => c.committed !== null)) {
+        unsupported('Canonical field support depends on pending-created existence');
+      }
+    }
+    return result;
+  }
+  function publish(before) {
+    const after = snapshot();
+    publishing = true;
+    const errors = [];
+    try {
+      if (!isDeepStrictEqual(before, after)) for (const callback of [...observers]) {
+        try { callback(copy(after)); } catch (e) { errors.push(e); }
+      }
+      for (const link of [...links]) {
+        const s = scalars.get(link.key);
+        const winner = s ? resolve(s.cell, { canonical: profile === 'draft' }) : { value: ABSENT };
+        if (winner.owner || winner.value === ABSENT || isDeepStrictEqual(winner.value, link.last)) continue;
+        link.last = copy(winner.value);
+        try { link.callback(copy(winner.value)); } catch (e) { errors.push(e); }
+      }
+    } finally { publishing = false; }
+    if (errors.length) throw new AggregateError(errors, 'Model subscriber failed after commit');
+  }
+  function apply(overrides) { for (const [c, next] of overrides) c.committed = next; }
+  function acceptance(r, extra = new Map(), covered = new Set()) {
+    const overrides = new Map(extra);
+    for (const g of r.groups) {
+      if (superseded(g, overrides)) continue;
+      for (const p of g.patches) {
+        const current = committed(p.cell, overrides);
+        if (covered.has(p.cell) || (current?.seq ?? -Infinity) > p.seq) continue;
+        if (profile === 'draft' && p.cell.committed !== p.base && (current?.seq ?? -Infinity) < p.seq) {
+          return { error: 'Draft base changed without an authored superseding frontier' };
+        }
+        overrides.set(p.cell, { value: copy(p.value), seq: p.seq });
+      }
+    }
+    return { overrides };
+  }
+  function rejectDependency(r) {
+    for (const g of r.groups) {
+      if (g.kind !== 'add') continue;
+      const e = g.entity;
+      if (resolve(e.presence).value !== true || resolve(e.presence, { omit: r }).value === true) continue;
+      for (const c of [e.key, ...e.fields.values()]) {
+        const survivor = resolve(c, { omit: r });
+        if (survivor.seq > g.seq && survivor.value !== ABSENT) return true;
+      }
+    }
+    return false;
+  }
+  function settle(id, decision) {
+    alive(true);
+    const r = record(id);
+    if (r.status !== 'pending') return { status: 'already-settled' };
+    if (decision === 'reject' && profile === 'live' && rejectDependency(r)) return refused('Surviving facts require this existence');
+    const planned = decision === 'accept' ? acceptance(r) : { overrides: new Map() };
+    if (planned.error) return refused(planned.error);
+    if (!unique(snapshot({ omit: r, overrides: planned.overrides }))) return refused('Settlement collides with a surviving key occupant');
+    const dispositions = r.groups.map(g => superseded(g, planned.overrides) ? 'superseded' : decision === 'accept' ? 'committed' : 'rejected');
+    const before = snapshot();
+    apply(planned.overrides);
+    retire(r, decision === 'accept' ? 'accepted' : 'rejected', dispositions);
+    collectEmptyLocations();
+    publish(before);
+    return ok();
+  }
+
+  function directWrite(ops, context, seqs) {
+    const plan = prepare(ops, seqs);
+    if (plan.error) return refused(plan.error);
+    const overrides = new Map();
+    const inverse = [];
+    for (const g of plan.groups) for (const p of g.patches) {
+      const current = overrides.get(p.cell) ?? p.cell.committed;
+      if (context !== 'external' && (current?.seq ?? -Infinity) > p.seq) continue;
+      const next = { value: copy(p.value), seq: context === 'external' ? current?.seq ?? 0 : p.seq };
+      if (context === 'undoable') inverse.push({ cell: p.cell, before: current ? current.value : ABSENT, applied: next });
+      overrides.set(p.cell, next);
+    }
+    if (!unique(snapshot({ overrides, plan }))) return refused('Write collides with pending topology');
+    const before = snapshot();
+    register(plan); apply(overrides);
+    if (context === 'undoable') undoHistory.push(inverse);
+    publish(before);
+    return ok();
+  }
+  function validateWrite(ops, context, defer) {
+    if (!['local', 'external', 'undoable'].includes(context)) unsupported('Unknown write context');
+    if (!Array.isArray(ops)) unsupported('Recorded operation array required');
+    if ((context !== 'local' || defer) && ops.some(op => op.kind !== 'set')) {
+      unsupported('Structural authority/undo/deferred operations are not modeled');
+    }
+    for (const op of ops) if (op.kind === 'set') pathKey(op.path);
+  }
+
+  return {
+    begin(ops) {
+      alive(true);
+      const plan = prepare(copy(ops), sequences(ops));
+      if (plan.error) throw new Error(`Invalid proposal: ${plan.error}`);
+      const before = snapshot();
+      const handle = Object.freeze({});
+      const r = { handle, status: 'pending', groups: plan.groups,
+        draft: profile === 'draft' ? plan.proposed : null };
+      register(plan);
+      for (const g of r.groups) for (const p of g.patches) { p.owner = r; p.cell.pending.add(p); }
+      handles.set(handle, r); active.add(r);
+      publish(before);
+      return handle;
+    },
+    accept(id) { return settle(id, 'accept'); },
+    reject(id) { return settle(id, 'reject'); },
+    write(ops, { context = 'local', defer = false } = {}) {
+      alive(true);
+      validateWrite(ops, context, defer);
+      const captured = copy(ops);
+      const seqs = sequences(captured);
+      if (defer) { queue.push({ ops: captured, context, seqs }); return ok(); }
+      return directWrite(captured, context, seqs);
+    },
+    flush() {
+      alive(true);
+      while (queue.length) {
+        const item = queue[0];
+        const result = directWrite(item.ops, item.context, item.seqs);
+        if (result.status !== 'settled') throw new Error(`Deferred write refused: ${result.reason}`);
+        queue.shift();
+      }
+    },
+    authority({ ops = [], order, settlements = [] }) {
+      alive(true);
+      if (!['snapshot', 'versioned', 'unordered'].includes(order?.kind)) unsupported('Authority order required');
+      if (ops.some(op => op.kind !== 'set')) unsupported('Structural authority is not modeled');
+      if (order.kind === 'unordered') return refused('No authority ordering evidence');
+      if (order.kind === 'versioned' && !Number.isFinite(order.revision)) unsupported('Finite authority revision required');
+      const relations = settlements.map(({ kind, id }) => {
+        if (!['accepts', 'rejects', 'includes'].includes(kind)) unsupported('Unknown settlement relation');
+        return { kind, r: record(id) };
+      });
+      if (relations.some(({ r }) => r.status === 'pending' && r.groups.some(g => g.kind !== 'set'))) {
+        unsupported('Structural correlated settlement is not modeled');
+      }
+      if (new Set(relations.map(x => x.r)).size !== relations.length) return refused('Duplicate settlement relation');
+      const fresh = order.kind === 'snapshot' || order.revision > revision;
+      const plan = prepare(copy(ops), ops.map(() => ++sequence));
+      if (plan.error) return refused(plan.error);
+      const overrides = new Map();
+      const covered = new Set();
+      for (const g of plan.groups) for (const p of g.patches) {
+        covered.add(p.cell); // A stale payload still correlates this location.
+        if (fresh) overrides.set(p.cell, { value: copy(p.value), seq: p.cell.committed?.seq ?? 0 });
+      }
+      for (const { kind, r } of relations) {
+        if (r.status !== 'pending' || kind === 'rejects') continue;
+        const accepted = acceptance(r, overrides, covered);
+        if (accepted.error) return refused(accepted.error);
+        for (const [c, v] of accepted.overrides) overrides.set(c, v);
+      }
+      const before = snapshot();
+      if (fresh) register(plan);
+      apply(overrides);
+      if (order.kind === 'versioned' && fresh) revision = order.revision;
+      for (const { kind, r } of relations) {
+        if (r.status !== 'pending') continue;
+        const status = kind === 'rejects' ? 'rejected' : 'accepted';
+        retire(r, status, r.groups.map(g => superseded(g) ? 'superseded' : status === 'accepted' ? 'committed' : 'rejected'));
+      }
+      collectEmptyLocations();
+      publish(before);
+      return ok();
+    },
+    read() { alive(); return snapshot(); },
+    canonical() { alive(); return canonicalSnapshot(); },
+    draft(id) {
+      alive();
+      if (profile !== 'draft') unsupported('draft() requires draft profile');
+      const r = record(id);
+      if (r.status !== 'pending') unsupported('Terminal draft snapshots are not retained');
+      return copy(r.draft);
+    },
+    state(id) { alive(); return stateOf(record(id)); },
+    observe(callback) { alive(); observers.add(callback); return () => observers.delete(callback); },
+    link(path, callback) {
+      alive();
+      const key = pathKey(path);
+      const s = scalars.get(key);
+      const link = { key, callback, last: copy(s?.cell.committed ? s.cell.committed.value : ABSENT) };
+      links.add(link);
+      return () => links.delete(link);
+    },
+    undo() {
+      alive(true);
+      const inverse = undoHistory.at(-1);
+      if (!inverse) return refused('No undoable write');
+      const expected = new Map();
+      for (const p of inverse) expected.set(p.cell, p.applied);
+      if ([...expected].some(([c, applied]) => c.committed !== applied)) return refused('Undo target has intervening canonical truth');
+      const overrides = new Map();
+      for (const p of [...inverse].reverse()) overrides.set(p.cell, { value: copy(p.before), seq: ++sequence });
+      const before = snapshot();
+      apply(overrides); undoHistory.pop(); publish(before);
+      return ok();
+    },
+    stats() {
+      const all = [...scalars.values()].map(s => s.cell).concat([...entities.values()].flatMap(cells));
+      const pendingPatches = all.reduce((n, c) => n + c.pending.size, 0);
+      const queuedOperations = queue.reduce((n, q) => n + q.ops.length, 0);
+      const undoEntries = undoHistory.reduce((n, entries) => n + entries.length, 0);
+      return {
+        active: active.size,
+        retainedOperations: all.length + pendingPatches + queuedOperations + undoEntries,
+        history: undoHistory.length + diagnosticHistory.length,
+        // Counts of actual stored records, not bytes or GC measurements. Draft
+        // snapshots are additional retained facts, not operation-log entries.
+        locations: all.length, pendingPatches, queuedOperations, undoEntries,
+        entityRecords: entities.size,
+        draftSnapshotFacts: [...active].reduce((n, r) => n + (r.draft
+          ? r.draft.values.length + r.draft.entities.reduce((m, e) => m + 2 + Object.keys(e.fields).length, 0) : 0), 0),
+      };
+    },
+    destroy() {
+      if (destroyed) return;
+      active.clear(); handles = new WeakMap(); scalars.clear(); entities.clear();
+      observers.clear(); links.clear(); queue.length = 0; undoHistory.length = 0; diagnosticHistory.length = 0;
+      destroyed = true;
+    },
+  };
+}

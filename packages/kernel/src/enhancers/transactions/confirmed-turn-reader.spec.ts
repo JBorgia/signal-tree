@@ -1,3 +1,8 @@
+/**
+ * MIGRATED for the L15 default (15.x port). Correctness-only is the default,
+ * so a tree that wants diagnostic history declares it. No assertion is
+ * loosened; these trees now REQUEST the history they were always reading.
+ */
 import { describe, expect, it } from 'vitest';
 
 import { confirmedTurnReader } from '../../internals';
@@ -11,7 +16,7 @@ type Row = { id: string; name: string };
 const cartTree = () =>
   signalTree(
     { promoCode: null, discount: 0, total: 12000 } as Cart,
-    { enhancers: [transactions()] }
+    { enhancers: [transactions({ history: { retain: 1000 } })] }
   ) as never as {
     $: Record<string, (value?: unknown) => unknown>;
     transaction(fn: () => void): { confirm(): void };
@@ -110,7 +115,7 @@ describe('confirmedTurnReader', () => {
   it('6. structural effects keep their address and kind', () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [transactions()] }
+      { enhancers: [transactions({ history: { retain: 1000 } })] }
     ) as never as {
       $: { rows: { addOne(row: Row): void } };
       transaction(fn: () => void): { confirm(): void };

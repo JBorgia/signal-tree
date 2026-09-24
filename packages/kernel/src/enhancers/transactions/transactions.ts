@@ -186,6 +186,10 @@ export interface InternalTransactionRuntime {
   transaction(fn: () => void): PendingTransaction;
   /** @internal Raw retained records; projected by `/internals`. */
   getConfirmedTurnRecords(): readonly TransactionTurnRecord[];
+  /** L15: opt-in evidence retention beyond the correctness obligation. */
+  setHistoryRetention(retain: number): void;
+  /** Explicit retention metadata; never inferred from ids. */
+  getConfirmedRetention(): { truncated: boolean; firstAvailableTurnId?: number };
   getConfirmedTurnCount(): number;
   getPendingTurnCount(): number;
   getConfirmedTurnIds(): number[];
@@ -410,6 +414,10 @@ function buildPendingRollbackPlan(
 
 class TransactionAuthority {
   private confirmedTurns: TransactionTurnRecord[] = [];
+  /** L15: evidence retained beyond correctness. 0 = correctness-only. */
+  private historyRetain = 0;
+  /** Set once a record has actually been dropped. Never inferred from ids. */
+  private evictedConfirmed = false;
   private pendingTurns = new Map<number, TransactionTurnRecord>();
   private nextTurnId = 1;
 
@@ -493,6 +501,8 @@ class TransactionAuthority {
       return undefined;
     }
     this.insertConfirmed(turn);
+    // The obligation set just changed; release what it no longer covers.
+    this.releaseConfirmedBeyondObligation();
     return cloneTurnRecord(turn);
   }
 
@@ -545,6 +555,54 @@ class TransactionAuthority {
     }
   }
 
+  setHistoryRetention(retain: number): void {
+    this.historyRetain = Number.isFinite(retain) && retain > 0 ? retain : 0;
+    this.releaseConfirmedBeyondObligation();
+  }
+
+  /** Explicit retention metadata for the reader; never inferred from ids. */
+  getConfirmedRetention(): {
+    truncated: boolean;
+    firstAvailableTurnId?: number;
+  } {
+    return {
+      truncated: this.evictedConfirmed,
+      firstAvailableTurnId: this.confirmedTurns[0]?.id,
+    };
+  }
+
+  /**
+   * L15: correctness retention follows live responsibility.
+   *
+   * `getPendingRollbackPlan` is the only correctness consumer of this ledger
+   * and selects `confirmedTurns.filter(t => t.id > turnId)`. Ids are monotonic,
+   * so a confirmed turn can only ever be needed by a pending turn OLDER than
+   * itself; once none remains it can never appear in a future plan.
+   *
+   * Derived, not a cap. `historyRetain` is a separate, explicitly requested
+   * evidence facility layered on top.
+   */
+  private releaseConfirmedBeyondObligation(): void {
+    if (this.confirmedTurns.length === 0) return;
+    let minPending = Infinity;
+    for (const id of this.pendingTurns.keys()) {
+      if (id < minPending) minPending = id;
+    }
+    const required = (turn: TransactionTurnRecord) => turn.id > minPending;
+    const before = this.confirmedTurns.length;
+    if (this.historyRetain <= 0) {
+      this.confirmedTurns = this.confirmedTurns.filter(required);
+    } else {
+      const keep = new Set<number>();
+      for (const turn of this.confirmedTurns)
+        if (required(turn)) keep.add(turn.id);
+      for (const turn of this.confirmedTurns.slice(-this.historyRetain))
+        keep.add(turn.id);
+      this.confirmedTurns = this.confirmedTurns.filter((t) => keep.has(t.id));
+    }
+    if (this.confirmedTurns.length < before) this.evictedConfirmed = true;
+  }
+
   confirmPending(turnId: number): TransactionTurnRecord | undefined {
     const turn = this.pendingTurns.get(turnId);
     if (!turn) {
@@ -559,6 +617,8 @@ class TransactionAuthority {
     // the handoff.
     this.releasePendingClaims(turnId);
     this.insertConfirmed(turn);
+    // The obligation set just changed; release what it no longer covers.
+    this.releaseConfirmedBeyondObligation();
     this.releaseLedgerIfQuiet();
     return cloneTurnRecord(turn);
   }
@@ -572,6 +632,8 @@ class TransactionAuthority {
     this.pendingOpenedAtSeq.delete(turnId);
     this.releasePendingClaims(turnId);
     this.releaseLedgerIfQuiet();
+    // Discarding can raise min(pendingIds) and discharge the obligation.
+    this.releaseConfirmedBeyondObligation();
     return cloneTurnRecord(turn);
   }
 
@@ -2010,6 +2072,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
       };
     },
     getConfirmedTurnRecords: () => authority.getConfirmedTurnRecords(),
+    setHistoryRetention: (retain: number) =>
+      authority.setHistoryRetention(retain),
+    getConfirmedRetention: () => authority.getConfirmedRetention(),
     getConfirmedTurnCount: () => authority.getConfirmedTurnCount(),
     getPendingTurnCount: () => authority.getPendingTurnCount(),
     getConfirmedTurnIds: () => authority.getConfirmedTurnIds(),
@@ -2083,11 +2148,24 @@ export function getOrCreateInternalTransactionRuntime<T>(
   return runtime;
 }
 
-export function transactions(): Enhancer<TransactionMethods> {
+/**
+ * Optional evidence retention (L15). Correctness records are bounded by live
+ * obligation and are NOT configurable; this asks for diagnostic history ON TOP
+ * of that, and is opt-in because the reader-visible policy may not change
+ * silently.
+ */
+export type TransactionsConfig = {
+  history?: { retain: number };
+};
+
+export function transactions(config?: TransactionsConfig): Enhancer<TransactionMethods> {
   const enhancerFn = <T>(
     tree: ISignalTree<T>
   ): ISignalTree<T> & TransactionMethods => {
     const runtime = getOrCreateInternalTransactionRuntime(tree);
+    if (config?.history) {
+      runtime.setHistoryRetention(config.history.retain);
+    }
 
     (tree as ISignalTree<T> & TransactionMethods).transaction =
       runtime.transaction;

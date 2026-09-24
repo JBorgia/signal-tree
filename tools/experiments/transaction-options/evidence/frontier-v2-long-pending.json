@@ -1,0 +1,111 @@
+{
+  "sourceSha256": "d02433285ca8360224298babf92fd02946b2e684afad3649107b0376bb58c380",
+  "probeSha256": "a6d5934e21b2516ded4e79502d7bfbb59db5a2206a04a6514283e5678b124199",
+  "command": [
+    "tools/experiments/transaction-options/long-pending.mjs",
+    "tools/experiments/transaction-options/frontier.mjs",
+    "1000"
+  ],
+  "exitCode": 0,
+  "result": {
+    "candidate": "tools/experiments/transaction-options/frontier.mjs",
+    "count": 1000,
+    "ms": 30.480625,
+    "rejectMs": 0.09474999999999767,
+    "result": {
+      "status": "settled"
+    },
+    "open": {
+      "active": 1,
+      "retainedOperations": 8,
+      "history": 0,
+      "locations": 7,
+      "pendingPatches": 1,
+      "queuedOperations": 0,
+      "undoEntries": 0,
+      "entityRecords": 1,
+      "retiredLifetimeLabels": 0,
+      "draftSnapshotFacts": 0
+    },
+    "after": {
+      "active": 0,
+      "retainedOperations": 7,
+      "history": 0,
+      "locations": 7,
+      "pendingPatches": 0,
+      "queuedOperations": 0,
+      "undoEntries": 0,
+      "entityRecords": 1,
+      "retiredLifetimeLabels": 0,
+      "draftSnapshotFacts": 0
+    },
+    "visible": {
+      "values": [
+        {
+          "path": [
+            "x"
+          ],
+          "value": 1001
+        },
+        {
+          "path": [
+            "y"
+          ],
+          "value": 0
+        },
+        {
+          "path": [
+            "z"
+          ],
+          "value": 0
+        }
+      ],
+      "entities": [
+        {
+          "ref": "original",
+          "key": "A",
+          "fields": {
+            "name": "Original",
+            "priority": 0
+          }
+        }
+      ]
+    },
+    "final": {
+      "values": [
+        {
+          "path": [
+            "x"
+          ],
+          "value": 1001
+        },
+        {
+          "path": [
+            "y"
+          ],
+          "value": 0
+        },
+        {
+          "path": [
+            "z"
+          ],
+          "value": 0
+        }
+      ],
+      "entities": [
+        {
+          "ref": "original",
+          "key": "A",
+          "fields": {
+            "name": "Original",
+            "priority": 0
+          }
+        }
+      ]
+    },
+    "node": "v24.15.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "stderr": ""
+}
