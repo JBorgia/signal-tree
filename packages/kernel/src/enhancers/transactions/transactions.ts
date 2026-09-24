@@ -709,6 +709,12 @@ class TransactionAuthority {
       return undefined;
     }
     this.insertConfirmed(turn);
+    // ORDINARY writes reach the ledger here, not through confirmPending, so
+    // without this the obligation bound applied to transactional churn only
+    // and `retain: 5` retained 49. Safe by the same argument as confirmPending:
+    // a turn recorded while something is pending has a higher id than
+    // min(pendingIds) and is kept by `required`.
+    this.releaseConfirmedBeyondObligation();
     return cloneTurnRecord(turn);
   }
 
@@ -878,11 +884,33 @@ class TransactionAuthority {
     const openedAt = this.pendingOpenedAtSeq.get(turnId) ?? 0;
     const observedLater = this.dependencyLedger
       .filter((entry) => entry.seq > openedAt)
-      .map((entry) => ({ turnId, effect: entry.effect }));
+      .map((entry) => ({
+        entry: { turnId, effect: entry.effect },
+        seq: entry.seq,
+      }));
 
-    return buildPendingRollbackPlan(this.pendingTurns.get(turnId), [
-      ...authoredLater,
+    // REKEY-OCCUPANCY-0 follow-up. These three sources are concatenated by
+    // ORIGIN, so without a merge key every authored effect sorts before every
+    // realized one regardless of when each happened. Both folds downstream —
+    // `erased` and the net-occupancy loop — are last-write-wins and therefore
+    // read a wrong "latest" for any key touched by more than one source.
+    //
+    // `ledgerSeq` is the shared clock: pending turns are already stamped with
+    // it on open, and confirmed turns are now stamped on insertion.
+    const ordered = [
+      ...authoredLater.map((entry) => ({
+        entry,
+        seq: this.confirmedAtSeq.get(entry.turnId) ?? 0,
+      })),
       ...observedLater,
+    ]
+      .sort((a, b) => a.seq - b.seq)
+      .map((wrapped) => wrapped.entry);
+
+    // Queued evidence stays last: it is read before delivery and belongs to
+    // THIS turn, so it is not part of the shared chronology.
+    return buildPendingRollbackPlan(this.pendingTurns.get(turnId), [
+      ...ordered,
       ...[...(retained?.values() ?? [])].map((effect) => ({ turnId, effect })),
     ]);
   }
@@ -981,7 +1009,21 @@ class TransactionAuthority {
     return this.confirmedTurns;
   }
 
+  /**
+   * When each confirmed turn entered the ledger, on the SAME clock the
+   * dependency ledger uses. Without this, later-effects can only be ordered
+   * within their own source.
+   */
+  private confirmedAtSeq = new Map<number, number>();
+
   private insertConfirmed(turn: TransactionTurnRecord): void {
+    // The clock must tick for AUTHORED work too. It previously advanced only
+    // inside `observeLaterEffects`, so every authored confirmation shared
+    // whatever value a realization had last left behind — stamps tied, the
+    // stable sort fell back to source order, and the merge was no better than
+    // the concatenation it replaced.
+    this.ledgerSeq += 1;
+    this.confirmedAtSeq.set(turn.id, this.ledgerSeq);
     const insertIndex = this.confirmedTurns.findIndex(
       (candidate) => candidate.id > turn.id
     );
@@ -2576,8 +2618,14 @@ export function getOrCreateInternalTransactionRuntime<T>(
           // refusal arrives here still 'pending' while an observer failure
           // arrives 'rejected'. Attaching a handle to a settled turn would
           // offer authority that no longer exists.
+          // `!destroyed` matters: rollback()'s first guard throws on a
+          // destroyed tree BEFORE lifecycle can move, so the lifecycle test
+          // alone would hand back a handle whose every method throws "Cannot
+          // settle a destroyed tree". Offering unusable authority is the same
+          // class of false claim this recovery exists to remove.
           if (
             lifecycle === 'pending' &&
+            !destroyed &&
             typeof rollbackError === 'object' &&
             rollbackError !== null
           ) {

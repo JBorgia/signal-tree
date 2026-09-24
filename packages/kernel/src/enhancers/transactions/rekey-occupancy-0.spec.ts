@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { entityMap } from '../../lib/markers/entity-map';
+import { withWriteContext } from '../../lib/write-context';
 import { signalTree } from '../../lib/signal-tree';
 import { transactions } from './transactions';
 
@@ -207,5 +208,69 @@ describe('REKEY-OCCUPANCY-0 / 3 — CONTROLS: the other arms are unchanged', () 
     expect(settle(() => pending.rollback())).toBe('settled');
     expect(store.$.rows.ids()).toEqual(['A']);
     expect(store.$.x()).toBe(0);
+  });
+});
+
+/** A server/outside write: participation 'realized', not authored locally. */
+const realization = (fn: () => void) =>
+  withWriteContext({ intent: 'system', participation: 'realized' }, fn);
+
+describe('REKEY-OCCUPANCY-0 / 4 — occupancy must not depend on EFFECT SOURCE', () => {
+  /**
+   * The net-occupancy fold is last-write-wins over `laterEffects`, which is
+   * built by concatenating authored effects, then realized ones, then queued
+   * evidence. That is ordered by SOURCE, not by time, so a realized add is
+   * always folded after an authored remove no matter when each happened.
+   */
+  it('a REALIZED add that was later removed leaves the key free', async () => {
+    const store = signalTree(
+      { rows: entityMap<Row, string>({ selectId: (r) => r.id }), x: 0 },
+      { enhancers: [transactions()] }
+    ) as unknown as Store;
+    store.$.rows.addOne({ id: 'A', name: 'original' });
+    await flush();
+
+    const pending = store.transact(() => {
+      store.$.x(1);
+      store.$.rows.changeId('A', 'B');
+    });
+    await flush();
+
+    // Occupy the vacated key from OUTSIDE, then free it locally.
+    realization(() => store.$.rows.addOne({ id: 'A', name: 'newcomer' }));
+    await flush();
+    store.$.rows.removeOne('A');
+    await flush();
+
+    // Key 'A' is genuinely free at this point, so the rekey must reverse.
+    expect(settle(() => pending.rollback())).toBe('settled');
+    expect(store.$.x()).toBe(0);
+    expect(store.$.rows.ids()).toEqual(['A']);
+  });
+
+  it('a REALIZED add in the middle of add/remove/add is still an occupant', async () => {
+    const store = signalTree(
+      { rows: entityMap<Row, string>({ selectId: (r) => r.id }), x: 0 },
+      { enhancers: [transactions()] }
+    ) as unknown as Store;
+    store.$.rows.addOne({ id: 'A', name: 'original' });
+    await flush();
+
+    const pending = store.transact(() => {
+      store.$.x(1);
+      store.$.rows.changeId('A', 'B');
+    });
+    await flush();
+
+    store.$.rows.addOne({ id: 'A', name: 'first' });
+    await flush();
+    realization(() => store.$.rows.removeOne('A'));
+    await flush();
+    store.$.rows.addOne({ id: 'A', name: 'second' });
+    await flush();
+
+    // Net occupancy is OCCUPIED, so this must refuse by RULE, not fall through
+    // to the physical-failure door.
+    expect(settle(() => pending.rollback())).toBe('later-confirmed-dependency');
   });
 });

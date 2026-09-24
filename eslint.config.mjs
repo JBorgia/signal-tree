@@ -23,7 +23,7 @@ export default [
       // ignored here too so a probe in flight cannot fail the lint gate. A test
       // worth keeping gets a real name and is not matched by this pattern.
       '**/zz-*.ts',
-      // Untracked, user-owned research harnesses. They import kernel source by
+      // User-owned research harnesses, gitignored. They import kernel source by
       // relative path on purpose (they bundle a pinned snapshot rather than
       // consuming the published entry points), which trips
       // @nx/enforce-module-boundaries. Same reasoning as the probe specs

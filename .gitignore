@@ -133,3 +133,7 @@ vitest.config.*.timestamp*
 /apps/studio-devtools/
 /packages/studio-query/
 /packages/studio-adapter/
+
+# User-owned research harnesses. Untracked by owner instruction; listed here
+# because 'git add -A' re-added them twice on 2026-09-24.
+tools/experiments/
