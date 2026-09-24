@@ -1,0 +1,101 @@
+{
+  "profile": "live",
+  "totals": {
+    "passed": 9,
+    "failed": 5,
+    "error": 0,
+    "unsupported": 0,
+    "profile-mismatch": 0
+  },
+  "results": [
+    {
+      "id": "clean-single-rollback",
+      "family": "current-public-behavior",
+      "status": "passed",
+      "ms": 6.246874999999989
+    },
+    {
+      "id": "R6-refused-rollback-retains-same-authority",
+      "family": "current-public-behavior",
+      "status": "failed",
+      "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/current-characterization.mjs:12:88)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/current-characterization.mjs:31:14",
+      "ms": 2.35779100000002
+    },
+    {
+      "id": "R8-01-accept-accept",
+      "family": "current-public-behavior",
+      "status": "passed",
+      "ms": 0.7492909999999711
+    },
+    {
+      "id": "R8-01-accept-reject",
+      "family": "current-public-behavior",
+      "status": "passed",
+      "ms": 0.5224999999999795
+    },
+    {
+      "id": "R8-01-reject-accept",
+      "family": "current-public-behavior",
+      "status": "failed",
+      "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 2\n\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/current-characterization.mjs:22:13)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/current-characterization.mjs:31:14",
+      "ms": 0.4063340000000153
+    },
+    {
+      "id": "R8-01-reject-reject",
+      "family": "current-public-behavior",
+      "status": "failed",
+      "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 2\n\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/current-characterization.mjs:22:13)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/current-characterization.mjs:31:14",
+      "ms": 0.3547500000000241
+    },
+    {
+      "id": "R8-10-accept-accept",
+      "family": "current-public-behavior",
+      "status": "passed",
+      "ms": 0.32833299999998644
+    },
+    {
+      "id": "R8-10-accept-reject",
+      "family": "current-public-behavior",
+      "status": "passed",
+      "ms": 0.3899579999999787
+    },
+    {
+      "id": "R8-10-reject-accept",
+      "family": "current-public-behavior",
+      "status": "passed",
+      "ms": 0.4037919999999531
+    },
+    {
+      "id": "R8-10-reject-reject",
+      "family": "current-public-behavior",
+      "status": "passed",
+      "ms": 0.3935000000000173
+    },
+    {
+      "id": "same-tick-local-flush-false",
+      "family": "current-public-behavior",
+      "status": "failed",
+      "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 2\n\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/current-characterization.mjs:29:30)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/current-characterization.mjs:31:14",
+      "ms": 0.320541999999989
+    },
+    {
+      "id": "same-tick-local-flush-true",
+      "family": "current-public-behavior",
+      "status": "passed",
+      "ms": 0.19170800000000554
+    },
+    {
+      "id": "same-tick-external-flush-false",
+      "family": "current-public-behavior",
+      "status": "failed",
+      "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 2\n\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/current-characterization.mjs:29:30)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/current-characterization.mjs:31:14",
+      "ms": 0.2141669999999749
+    },
+    {
+      "id": "same-tick-external-flush-true",
+      "family": "current-public-behavior",
+      "status": "passed",
+      "ms": 0.22320799999999963
+    }
+  ]
+}
