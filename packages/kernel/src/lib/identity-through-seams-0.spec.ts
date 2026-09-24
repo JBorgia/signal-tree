@@ -328,7 +328,6 @@ describe('STRUCTURAL-TRICHOTOMY-0 — is a dependency graph required?', () => {
     await flush();
 
     const outcome = settle(() => pending.rollback());
-    // eslint-disable-next-line no-console
     console.log(
       `[trichotomy] T06a rekey+field -> ${outcome}; ids=${JSON.stringify(
         tree.$.rows.ids()
@@ -357,18 +356,25 @@ describe('STRUCTURAL-TRICHOTOMY-0 — is a dependency graph required?', () => {
     await flush();
 
     const outcome = settle(() => pending.rollback());
-    // eslint-disable-next-line no-console
     console.log(
       `[trichotomy] T06b rekey+occupy -> ${outcome}; ids=${JSON.stringify(
         tree.$.rows.ids()
       )}; x=${tree.$.x()}`
     );
-    // MEASURED: the DECISION is right — key occupancy makes this dependent and
-    // it refuses. But it arrives through the wrong door. `effect-validation-
-    // failed` means the compensating re-add physically failed because the key
-    // was taken, not that a semantic rule recognised the dependency. The cost
-    // of deciding by accident is visible: x is STRANDED at 1, the R6 symptom.
-    expect(outcome).toBe('effect-validation-failed');
+    // RE-CHARACTERIZED 2026-09-24 by REKEY-OCCUPANCY-0, which is exactly what
+    // the previous pin said should happen: "a future ownership model that
+    // decides T06b deliberately will fail these and force re-characterization".
+    //
+    // Before: `effect-validation-failed` — the compensating re-add physically
+    // failed on a taken key, after compensation had begun.
+    // Now: `later-confirmed-dependency` — net key occupancy is recognised at
+    // PLAN time, before anything is touched, and the refusal is recoverable.
+    //
+    // x is still 1 and the visible state is identical. That is not a
+    // non-improvement: the difference is OWNERSHIP. The turn remains pending,
+    // so x = 1 is its speculative contribution rather than a value owned by
+    // nothing (L1, L8).
+    expect(outcome).toBe('later-confirmed-dependency');
     expect(tree.$.rows.ids()).toEqual(['B', 'A']);
     expect(tree.$.x()).toBe(1);
     tree.destroy();
@@ -387,7 +393,6 @@ describe('STRUCTURAL-TRICHOTOMY-0 — is a dependency graph required?', () => {
     await flush();
 
     const outcome = settle(() => pending.rollback());
-    // eslint-disable-next-line no-console
     console.log(
       `[trichotomy] T07  rekey+remove -> ${outcome}; ids=${JSON.stringify(
         tree.$.rows.ids()

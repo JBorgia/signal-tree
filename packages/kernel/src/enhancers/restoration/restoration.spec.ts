@@ -1493,8 +1493,18 @@ describe('restoration enhancer', () => {
     // message instead. Asserting the machine-readable field rather than the
     // sentence — and the legibility difference is recorded as a follow-up rather
     // than quietly accepted.
+    // UPDATED 2026-09-24 by REKEY-OCCUPANCY-0. Same scenario, same verdict,
+    // same resulting state — a different door. Net key occupancy is now
+    // recognised while the rollback plan is built, so the refusal happens
+    // BEFORE compensation is attempted rather than when the compensating
+    // re-add hits a taken key. That is strictly more atomic than what this
+    // test was written to pin, and unlike the old path it is recoverable:
+    // free the key and the same turn settles.
+    //
+    // Keeping this test's own discipline: asserting the machine-readable kind
+    // rather than the sentence.
     expectRollbackError(() => pending.rollback(), {
-      kind: 'effect-validation-failed',
+      kind: 'later-confirmed-dependency',
     });
     expect(store.$.rows.ids()).toEqual([42, 7]);
     expect(store.$.rows.byIdOrFail(42).name()).toBe('target');
