@@ -1,0 +1,53 @@
+{
+  "profile": "live",
+  "totals": {
+    "passed": 1,
+    "failed": 3,
+    "error": 0,
+    "unsupported": 2,
+    "profile-mismatch": 0
+  },
+  "results": [
+    {
+      "id": "E06-newer-correlated-accept-preserves-local-precedence",
+      "family": "authority",
+      "status": "failed",
+      "message": "AssertionError [ERR_ASSERTION]: accepted newer contribution must not reveal older pending truth\n\n1 !== 20\n\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/extension-cases.mjs:9:11)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/extensions.mjs:7:14",
+      "ms": 2.0087919999999997
+    },
+    {
+      "id": "E01-literal-path-versus-nested-through-settlement",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.2448750000000004
+    },
+    {
+      "id": "E02-held-retired-lifetime-write-never-retargets",
+      "family": "identity",
+      "status": "unsupported",
+      "message": "Unsupported: Replay control supports scalar assignments only\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/replay.mjs:5:49)\n    at check (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/replay.mjs:12:90)\n    at Object.write (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/replay.mjs:30:47)\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/extension-cases.mjs:19:14)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/extensions.mjs:7:14",
+      "ms": 0.0714579999999998
+    },
+    {
+      "id": "E03-deferred-authorship-is-enqueue-not-flush",
+      "family": "context",
+      "status": "failed",
+      "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n1 !== 2\n\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/extension-cases.mjs:26:70)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/extensions.mjs:7:14",
+      "ms": 0.15725000000000122
+    },
+    {
+      "id": "E04-terminal-entity-churn-bounded",
+      "family": "retention",
+      "status": "unsupported",
+      "message": "Unsupported: Replay control supports scalar assignments only\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/replay.mjs:5:49)\n    at check (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/replay.mjs:12:90)\n    at Object.write (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/replay.mjs:30:47)\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/extension-cases.mjs:30:60)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/extensions.mjs:7:14",
+      "ms": 0.060416000000000025
+    },
+    {
+      "id": "E05-long-pending-successor-compaction",
+      "family": "retention",
+      "status": "failed",
+      "message": "AssertionError [ERR_ASSERTION]: obsolete terminal successors retained behind one pending predecessor\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/extension-cases.mjs:36:11)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/extensions.mjs:7:14",
+      "ms": 78.84866699999999
+    }
+  ]
+}

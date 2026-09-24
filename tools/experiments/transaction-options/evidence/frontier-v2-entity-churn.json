@@ -1,0 +1,43 @@
+{
+  "sourceSha256": "d02433285ca8360224298babf92fd02946b2e684afad3649107b0376bb58c380",
+  "probeSha256": "0d6f830f633b734d0657bf63be8ed1259f4bdcf4f58e71ec22fbb65a20d24275",
+  "command": [
+    "tools/experiments/transaction-options/entity-churn.mjs",
+    "tools/experiments/transaction-options/frontier.mjs",
+    "1000"
+  ],
+  "exitCode": 1,
+  "result": {
+    "candidate": "tools/experiments/transaction-options/frontier.mjs",
+    "profile": "live",
+    "count": 1000,
+    "ms": 48.032584,
+    "before": {
+      "active": 0,
+      "retainedOperations": 7,
+      "history": 0,
+      "locations": 7,
+      "pendingPatches": 0,
+      "queuedOperations": 0,
+      "undoEntries": 0,
+      "entityRecords": 1,
+      "retiredLifetimeLabels": 0,
+      "draftSnapshotFacts": 0
+    },
+    "after": {
+      "active": 0,
+      "retainedOperations": 1007,
+      "history": 0,
+      "locations": 7,
+      "pendingPatches": 0,
+      "queuedOperations": 0,
+      "undoEntries": 0,
+      "entityRecords": 1,
+      "retiredLifetimeLabels": 1000,
+      "draftSnapshotFacts": 0
+    },
+    "visibleEntities": 1,
+    "retainedGrowth": 1000
+  },
+  "stderr": ""
+}

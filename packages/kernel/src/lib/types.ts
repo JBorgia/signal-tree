@@ -374,8 +374,36 @@ export type EnhancerCleanup = () => void;
  * Richer causal details may be attached as an internal `cause` payload for
  * tooling, but that shape is not part of the application-facing API.
  */
+/**
+ * Handle back to a transaction that is STILL PENDING after a settlement
+ * attempt failed. Present only when the caller cannot already hold the
+ * transaction: `transact()` throws before returning when its callback throws
+ * and compensation then refuses, so without this the caller has no reference
+ * to a transaction that remains settleable.
+ *
+ * Absent when the turn actually settled. In particular an observer that throws
+ * AFTER compensation has installed leaves a rejected turn, and offering
+ * authority there would be a lie.
+ */
+export type SignalTreeRollbackRecovery = {
+  /** The same still-pending transaction. Retry or confirm through this. */
+  readonly transaction: { confirm(): void; rollback(): void };
+  /**
+   * Explicit, because a callback may legally `throw undefined`. The absence of
+   * `callbackError` cannot distinguish that from "the callback did not throw".
+   */
+  readonly callbackFailed: boolean;
+  /** Whatever the callback threw, including `undefined`. */
+  readonly callbackError?: unknown;
+};
+
 export class SignalTreeRollbackError extends Error {
   readonly code = 'SIGNALTREE_ROLLBACK_FAILED';
+  /**
+   * Non-enumerable when set, so structured logging cannot drag a live
+   * transaction handle into a serialized error payload. Read it directly.
+   */
+  readonly recovery?: SignalTreeRollbackRecovery;
   // NOT declared as a field. Whether `cause` exists on `Error` depends on the
   // lib target, and the workspace disagrees: the demo's compiler requires
   // `override` (TS4114) while core's rollup build rejects it as not present in
