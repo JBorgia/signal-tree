@@ -130,7 +130,37 @@ function resolveBase() {
   const candidates = isPrerelease
     ? tags.filter((t) => t !== `v${current}`)
     : tags.filter((t) => t !== `v${current}` && !/-/.test(t));
-  const base = candidates.sort(compareStableTags)[0];
+  /**
+   * ...AND THE BASE MUST BE ON THIS RELEASE LINE. Third correction here, and
+   * the first that made this gate return a WRONG answer rather than a blind
+   * one.
+   *
+   * The sort ranks tags across the WHOLE tag namespace, which is not the same
+   * set as "releases this commit descends from". A repository carrying more
+   * than one line — or a checkout that has fetched a second remote — therefore
+   * resolves a base from a line this commit never touched. Measured while
+   * preparing the 14.1.4 security patch: the base came out `v15.3.0`, the gate
+   * diffed the 14.x API against the 15.x API, and it reported 405 "added"
+   * symbols, every one an ordinary 14.x export that 15.x renamed or dropped.
+   * Unsatisfiable by construction, and loud enough that it read as a real
+   * finding.
+   *
+   * ANCESTRY is the version-independent form of the question already asked
+   * above: "what reaches a user upgrading from the last version they could
+   * install" means the last release THIS COMMIT DESCENDS FROM. On a single
+   * linear line it selects exactly what the old rule selected, so nothing about
+   * an ordinary release changes.
+   */
+  const base = candidates
+    .sort(compareStableTags)
+    .find((tag) => {
+      try {
+        git('merge-base', '--is-ancestor', tag, 'HEAD');
+        return true;
+      } catch {
+        return false;
+      }
+    });
   if (!base) {
     console.error(
       'No prior version tag found to diff against.\n' +
@@ -138,6 +168,8 @@ function resolveBase() {
         '  so it needs tags. In CI that means `fetch-depth: 0` and\n' +
         '  `fetch-tags: true` on actions/checkout — a shallow clone has none, and\n' +
         '  the failure then reproduces on no developer machine.\n' +
+        '  The tag must also be an ANCESTOR of HEAD — a tag on another release\n' +
+        '  line is not a base this commit can be a delta from.\n' +
         '  Locally: `git fetch --tags`. Or pass --base=<ref> explicitly.'
     );
     process.exit(1);
@@ -368,6 +400,10 @@ const EXEMPT = new Map(
       'method bag type; the methods are documented individually',
     transactionId:
       'internal WriteMetadata transaction token used by transactions()',
+    getConfirmedRetention:
+      '@internal member of InternalTransactionRuntime, not app-facing: supplies the explicit retention metadata the reader needs, because truncation must be asserted by the authority and never inferred from turn-id gaps. The public surface it feeds is confirmedTurnReader().readConfirmedTurns().retention, documented in the kernel README and the 15.3.0 CHANGELOG entry',
+    setHistoryRetention:
+      '@internal member of InternalTransactionRuntime, not app-facing: the documented public way to request diagnostic retention is the transactions({ history: { retain } }) option',
     transactionOwner:
       'internal WriteMetadata tree token used to isolate transactions()',
     describePendingTurn:
@@ -444,6 +480,25 @@ const added = [
     .filter((c) => !codesBefore.has(c))
     .map((name) => ({ name, kind: 'value', pkg: 'core', isCode: true })),
 ].sort((a, b) => a.name.localeCompare(b.name));
+
+/**
+ * COVERAGE PROBE — how many things this gate is checking right now.
+ *
+ * The self-test harness mutates a gate's target and requires the gate to fail.
+ * That premise silently assumes the gate HAS something to check. This one's
+ * coverage set is "public symbols added since the last release", which is
+ * legitimately EMPTY for a patch that adds no API — and then no mutation of a
+ * claim surface can make it fail, so the harness reported it BLIND: "passed
+ * while broken". Nothing was broken. There was nothing to break.
+ *
+ * Reporting the size lets the harness tell those apart. Deliberately the gate's
+ * OWN count rather than a guess made by the harness, because only the gate
+ * knows what it covers.
+ */
+if (process.argv.includes('--coverage-count')) {
+  console.log(String(added.length));
+  process.exit(0);
+}
 
 console.log(
   `\nRelease-delta claim coverage — ${BASE} -> ${HEAD}\n` +

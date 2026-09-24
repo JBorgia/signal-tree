@@ -1,0 +1,10 @@
+import {pathToFileURL} from 'node:url';
+import {resolve} from 'node:path';
+import {writeFileSync} from 'node:fs';
+import {runCases,exitFor} from './runner.mjs';
+import {cases} from './extension-cases.mjs';
+const {create}=await import(pathToFileURL(resolve(process.argv[2])).href);
+const report=await runCases(create,cases,{profile:process.argv[3]??'live'});
+console.log(JSON.stringify(report.totals));
+if(process.argv[4])writeFileSync(process.argv[4],JSON.stringify(report,null,2)+'\n');
+process.exitCode=exitFor(report);

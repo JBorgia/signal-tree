@@ -1,0 +1,43 @@
+{
+  "profile": "live",
+  "totals": {
+    "passed": 4,
+    "failed": 0,
+    "error": 0,
+    "unsupported": 1,
+    "profile-mismatch": 0
+  },
+  "results": [
+    {
+      "id": "E01-literal-path-versus-nested-through-settlement",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.8539580000000022
+    },
+    {
+      "id": "E02-held-retired-lifetime-write-never-retargets",
+      "family": "identity",
+      "status": "passed",
+      "ms": 5.6299160000000015
+    },
+    {
+      "id": "E03-deferred-authorship-is-enqueue-not-flush",
+      "family": "context",
+      "status": "unsupported",
+      "message": "Unsupported: deferred operations unsupported; nothing queued\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/prepared.mjs:11:23)\n    at Object.write (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/prepared.mjs:239:18)\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/extension-cases.mjs:18:14)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/extensions.mjs:7:14",
+      "ms": 0.14466700000000188
+    },
+    {
+      "id": "E04-terminal-entity-churn-bounded",
+      "family": "retention",
+      "status": "passed",
+      "ms": 4.676333
+    },
+    {
+      "id": "E05-long-pending-successor-compaction",
+      "family": "retention",
+      "status": "passed",
+      "ms": 2.043582999999998
+    }
+  ]
+}

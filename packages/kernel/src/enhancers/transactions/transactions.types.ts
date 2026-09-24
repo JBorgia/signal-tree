@@ -140,3 +140,12 @@ export interface Proposal {
    */
   reject(): void;
 }
+/**
+ * Optional evidence retention (L15). Correctness records are bounded by live
+ * obligation and are NOT configurable; this asks for diagnostic history ON TOP
+ * of that, and is opt-in because the reader-visible policy may not change
+ * silently.
+ */
+export type TransactionsConfig = {
+  history?: { retain: number };
+};
