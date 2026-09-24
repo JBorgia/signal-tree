@@ -1,4 +1,4 @@
-## 15.3.0 (unreleased)
+## 15.3.0 (2026-09-24)
 
 **TL;DR** — **Minor, with two behaviour changes to published surfaces.**
 (1) A `rollback()` that cannot be proven safe now REFUSES WITHOUT CHANGING
