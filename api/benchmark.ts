@@ -12,32 +12,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  * "Realistic Comparison" benchmarks (SignalTree vs NgRx vs Akita vs NgXs).
  */
 
-interface BenchmarkSubmission {
-  timestamp: string;
-  depth: number;
-  sessionId: string;
-  consentGiven: boolean;
-
-  machineInfo: {
-    browser: string;
-    os: string;
-    cpuCores: number;
-    memory: string;
-    screenResolution: string;
-    devicePixelRatio: number;
-    userAgent: string;
-  };
-
-  results: {
-    creationTime: number;
-    accessTime: number;
-    updateTime: number;
-    totalTests: number;
-  };
-
-  version: string;
-}
-
+// BenchmarkSubmission removed with the POST handler that was its only user.
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');

@@ -274,3 +274,39 @@ describe('REKEY-OCCUPANCY-0 / 4 — occupancy must not depend on EFFECT SOURCE',
     expect(settle(() => pending.rollback())).toBe('later-confirmed-dependency');
   });
 });
+
+describe('REKEY-OCCUPANCY-0 / 5 — a still-PENDING turn can be the occupant', () => {
+  /**
+   * The occupancy fold reads only confirmed and realized effects. A pending
+   * turn's writes are physically applied too, so a pending add at the vacated
+   * key occupies it just as much — but the pending-vs-pending pre-check
+   * compares position/path overlap, and a different subject at a different
+   * position never matches. That arm therefore still decided by physical
+   * failure, the mechanism this file exists to replace.
+   */
+  it('refuses by rule when another PENDING turn holds the vacated key', async () => {
+    const store = signalTree(
+      { rows: entityMap<Row, string>({ selectId: (r) => r.id }), x: 0 },
+      { enhancers: [transactions()] }
+    ) as unknown as Store;
+    store.$.rows.addOne({ id: 'A', name: 'original' });
+    await flush();
+
+    const p1 = store.transact(() => {
+      store.$.x(1);
+      store.$.rows.changeId('A', 'B');
+    });
+    await flush();
+
+    // A SECOND, still-pending turn occupies the key p1 vacated.
+    store.transact(() => {
+      store.$.rows.addOne({ id: 'A', name: 'newcomer' });
+    });
+    await flush();
+
+    expect(settle(() => p1.rollback())).toBe('later-confirmed-dependency');
+    expect(store.$.rows.ids()).toEqual(['B', 'A']);
+    expect(store.$.x()).toBe(1);
+    expect(store.__transactions.getPendingTurnCount()).toBe(2);
+  });
+});
