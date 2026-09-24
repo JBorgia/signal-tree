@@ -81,8 +81,8 @@ describe('independent queued inspection review', () => {
       });
       flush();
       expect(proposal.inspect().changes).toEqual([
-        { path: 'rows.a.x', address: ['rows'], subject: expect.any(Number), status: 'superseded' },
-        { path: 'rows.a.y', address: ['rows'], subject: expect.any(Number), status: 'current' },
+        { path: 'rows.a.x', address: ['rows', 'x'], subject: expect.any(Number), status: 'superseded' },
+        { path: 'rows.a.y', address: ['rows', 'y'], subject: expect.any(Number), status: 'current' },
       ]);
     } finally {
       tree.destroy();
@@ -121,11 +121,11 @@ describe('independent queued inspection review', () => {
       const proposal = tree.propose(() => tree.$.rows.updateOne('a', { x: 1 }));
       external(() => tree.$.rows.removeOne('a'));
       expect(proposal.inspect().changes).toEqual([
-        { path: 'rows.a.x', address: ['rows'], subject: expect.any(Number), status: 'superseded' },
+        { path: 'rows.a.x', address: ['rows', 'x'], subject: expect.any(Number), status: 'superseded' },
       ]);
       flush();
       expect(proposal.inspect().changes).toEqual([
-        { path: 'rows.a.x', address: ['rows'], subject: expect.any(Number), status: 'superseded' },
+        { path: 'rows.a.x', address: ['rows', 'x'], subject: expect.any(Number), status: 'superseded' },
       ]);
     } finally {
       tree.destroy();

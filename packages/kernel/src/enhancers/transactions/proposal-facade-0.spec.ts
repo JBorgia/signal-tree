@@ -149,6 +149,14 @@ describe('PROPOSAL-0 facade / inspect', () => {
     });
     await flush();
 
+    // Captured BEFORE the key is taken over. This is the whole reason
+    // `subject` exists: the reported identity must stay the PROPOSAL's retired
+    // subject, not silently become the new occupant's. `expect.any(Number)`
+    // passes either way and so cannot detect that confusion — a relative
+    // comparison is counter-independent without being blind.
+    const proposedSubject = proposal.inspect().changes[0]?.subject;
+    expect(proposedSubject).toEqual(expect.any(Number));
+
     realization(() => {
       t.$.rows.removeOne('A');
       t.$.rows.addOne({ id: 'A', name: 'FromServer' });
@@ -156,7 +164,12 @@ describe('PROPOSAL-0 facade / inspect', () => {
     await flush();
 
     expect(proposal.inspect().changes).toEqual([
-      { path: 'rows.A', address: ['rows'], subject: expect.any(Number), status: 'superseded' },
+      {
+        path: 'rows.A',
+        address: ['rows'],
+        subject: proposedSubject,
+        status: 'superseded',
+      },
     ]);
   });
 });

@@ -405,8 +405,24 @@ const firstChange: ProposalChange | undefined = review.changes[0];
 const changeStatus: ProposalStatus | undefined = firstChange?.status;
 const changePath: string | undefined = firstChange?.path;
 const settled: ProposalAcceptance = pendingProposal.accept();
+
+// CONSTRUCTION, not just consumption. Reading a ProposalChange type-checks
+// whatever fields it has, so a required field added to the type is invisible
+// to a read-only probe — which is how the 16.0.0 address change shipped as a
+// declared break that nothing measured. A consumer with a test double, a
+// fixture or an adapter mapping must build one, so this builds one.
+const constructedChange: ProposalChange = {
+  path: 'a.b',
+  address: ['a', 'b'],
+  status: 'current',
+};
+const changeAddress: readonly string[] | undefined = constructedChange.address;
+const changeSubject: number | undefined = constructedChange.subject;
+
 void changeStatus;
 void changePath;
+void changeAddress;
+void changeSubject;
 void settled.changes.length;
 `;
 writeFileSync(join(proj, 'src', 'main.ts'), SAMPLE);
