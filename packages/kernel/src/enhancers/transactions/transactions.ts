@@ -813,9 +813,6 @@ class TransactionAuthority {
     return cloneTurnRecord(turn);
   }
 
-  hasConfirmedTurnAfter(turnId: number): boolean {
-    return this.confirmedTurns.some((turn) => turn.id > turnId);
-  }
 
   observeQueuedEffects(turnId: number, queued: readonly TurnEffect[]): void {
     if (!this.pendingTurns.has(turnId)) return;
@@ -962,7 +959,8 @@ class TransactionAuthority {
    * monotonic, so a confirmed turn can only ever be needed by a pending turn
    * OLDER than itself. Once no such pending turn remains, the record can never
    * appear in any future plan, and keeping it is diagnostics, not correctness.
-   * (`hasConfirmedTurnAfter` has no call sites, so it adds no obligation.)
+   * (A `hasConfirmedTurnAfter` reader existed alongside it with no call sites
+   * anywhere and was deleted, so it imposes no obligation either.)
    *
    * This is not an arbitrary cap: the bound is derived from the obligation.
    * `historyRetain` is a SEPARATE, explicitly requested evidence facility

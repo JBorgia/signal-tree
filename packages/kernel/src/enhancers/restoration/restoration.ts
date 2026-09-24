@@ -665,9 +665,6 @@ class RestorationManager<TSource, T> {
     return this.pendingTurns.has(turnId);
   }
 
-  hasConfirmedTurnAfter(turnId: number): boolean {
-    return this.history.some((turn) => turn.id > turnId);
-  }
 
   // `getPendingRollbackPlan()` was DELETED in 15.0 with restoration()'s duplicate
   // `transaction()` (TX-SURFACE-0).
