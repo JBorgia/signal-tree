@@ -4,16 +4,16 @@
  * and this one exists because the EXPORT baseline silently passed while
  * `transaction()` shipped unrecorded.
  *
- * Mutations are applied to the emitted `index.d.ts`, which is exactly the input
- * the gate reads — so this tests the gate, not the build.
+ * Mutations target the emitted declaration owning each exported type/member,
+ * following re-exports into shared chunks — this tests the gate, not the build.
  */
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { isAbsolute, join, relative } from 'node:path';
+import ts from 'typescript';
 
 const ROOT = process.cwd();
 const DTS = join(ROOT, 'dist/packages/kernel/dist/index.d.ts');
-const BACKUP = `${DTS}.selftest-backup`;
 
 const run = () => {
   try {
@@ -30,6 +30,7 @@ const run = () => {
 const CASES = [
   {
     name: '1 add method to an ALREADY-EXPORTED interface',
+    owner: 'TransactionMethods',
     mutate: (s) =>
       s.replace(
         'interface TransactionMethods {',
@@ -39,12 +40,16 @@ const CASES = [
   },
   {
     name: '2 remove a method',
+    owner: 'TransactionMethods',
+    member: 'transact',
     mutate: (s) =>
       s.replace(/\n\s*transact\(fn: \(\) => void\): PendingTransaction;/, ''),
     expect: (r) => r.failed && /REMOVED.*transact\b/s.test(r.out),
   },
   {
     name: '3 rename a method -> one removal + one addition',
+    owner: 'TransactionMethods',
+    member: 'transact',
     mutate: (s) =>
       s.replace(
         'transact(fn: () => void): PendingTransaction;',
@@ -57,6 +62,8 @@ const CASES = [
   },
   {
     name: '4 method -> callable property',
+    owner: 'EntitySignal',
+    member: 'clear',
     mutate: (s) => s.replace('clear(): void;', 'readonly clear: { (): void };'),
     expect: (r) =>
       r.failed &&
@@ -64,6 +71,8 @@ const CASES = [
   },
   {
     name: '5 callable property -> method',
+    owner: 'EntitySignal',
+    member: 'empty',
     mutate: (s) =>
       s.replace(/readonly empty: ReadonlyOf<boolean, C>;/, 'empty(): boolean;'),
     expect: (r) =>
@@ -84,6 +93,8 @@ const CASES = [
   },
   {
     name: '8 change a method PARAMETER type',
+    owner: 'TransactionMethods',
+    member: 'transact',
     mutate: (s) =>
       s.replace(
         'transact(fn: () => void): PendingTransaction;',
@@ -95,6 +106,8 @@ const CASES = [
   },
   {
     name: '9 change a method RETURN type',
+    owner: 'TransactionMethods',
+    member: 'transact',
     mutate: (s) =>
       s.replace(
         'transact(fn: () => void): PendingTransaction;',
@@ -106,6 +119,7 @@ const CASES = [
   },
   {
     name: '10 REMOVE an overload from a callable type',
+    owner: 'NodeAccessor',
     mutate: (s) =>
       s.replace(
         'interface NodeAccessor<T> {\n    /** Read: unwraps this node and everything under it. */\n    (): T;',
@@ -115,6 +129,7 @@ const CASES = [
   },
   {
     name: '11 ADD an overload to a callable type',
+    owner: 'NodeAccessor',
     mutate: (s) =>
       s.replace(
         'interface NodeAccessor<T> {',
@@ -124,6 +139,8 @@ const CASES = [
   },
   {
     name: '12 optional parameter becomes REQUIRED',
+    owner: 'EntitySignal',
+    member: 'addOne',
     mutate: (s) =>
       s.replace(
         'addOne(entity: E, opts?: AddOptions<E, K>): K;',
@@ -133,6 +150,7 @@ const CASES = [
   },
   {
     name: '13 change an exported class CONSTRUCTOR shape',
+    owner: 'SignalTreeRollbackError',
     mutate: (s) =>
       s.replace(
         'constructor(message?: string, options?: {',
@@ -144,29 +162,93 @@ const CASES = [
   },
 ];
 
-copyFileSync(DTS, BACKUP);
-const original = readFileSync(DTS, 'utf8');
+// Resolve all targets before the first write. Never guess a generated basename
+// or mutate the first matching text in an unrelated declaration.
+const program = ts.createProgram([DTS], {
+  noEmit: true,
+  skipLibCheck: true,
+  moduleResolution: ts.ModuleResolutionKind.Bundler,
+  target: ts.ScriptTarget.ES2022,
+});
+const checker = program.getTypeChecker();
+const entry = program.getSourceFile(DTS);
+const moduleSymbol = entry && checker.getSymbolAtLocation(entry);
+if (!moduleSymbol) throw new Error('Missing kernel declaration entry module');
+const exported = new Map(
+  checker
+    .getExportsOfModule(moduleSymbol)
+    .map((symbol) => [symbol.getName(), symbol])
+);
+const originals = new Map();
+const targets = CASES.map((c) => {
+  let declaration = entry;
+  if (c.owner) {
+    const symbol = exported.get(c.owner);
+    const resolved =
+      symbol &&
+      (symbol.flags & ts.SymbolFlags.Alias
+        ? checker.getAliasedSymbol(symbol)
+        : symbol);
+    const target =
+      c.member && resolved
+        ? checker.getDeclaredTypeOfSymbol(resolved).getProperty(c.member)
+        : resolved;
+    const declarations = target?.getDeclarations() ?? [];
+    if (declarations.length !== 1)
+      throw new Error(
+        `${c.name}: expected exactly one declaration owner, found ${declarations.length}`
+      );
+    declaration = declarations[0];
+  }
+  const file = declaration.getSourceFile().fileName;
+  const path = relative(join(ROOT, 'dist/packages/kernel'), file);
+  if (isAbsolute(path) || path === '..' || path.startsWith('../'))
+    throw new Error(
+      `${c.name}: declaration owner is outside the kernel artifact`
+    );
+  if (!originals.has(file)) originals.set(file, readFileSync(file));
+  const original = originals.get(file).toString('utf8');
+  const before = original.slice(declaration.pos, declaration.end);
+  const after = c.mutate(before);
+  if (before === after)
+    throw new Error(
+      `${c.name}: MUTATION DID NOT APPLY (inert, proves nothing)`
+    );
+  return {
+    file,
+    original: originals.get(file),
+    mutated:
+      original.slice(0, declaration.pos) +
+      after +
+      original.slice(declaration.end),
+  };
+});
+
+// This script is the existing api-callable-baseline:self gate. Keep allocation
+// identity regressions mandatory, with their own count, before the 13 mutants.
+execFileSync(
+  process.execPath,
+  [join(ROOT, 'tools/check-callable-inventory.mjs')],
+  {
+    cwd: ROOT,
+    stdio: 'inherit',
+  }
+);
+
+const clean = run();
+if (clean.failed) {
+  console.error(
+    '❌ baseline is not clean before mutating; regenerate it first'
+  );
+  process.exit(1); // No mutation has happened yet.
+}
 let pass = 0;
 let fail = 0;
-try {
-  const clean = run();
-  if (clean.failed) {
-    console.error(
-      '❌ baseline is not clean before mutating; regenerate it first'
-    );
-    process.exit(1);
-  }
-  console.log('\nCallable-gate mutation proof\n');
-  for (const c of CASES) {
-    const mutated = c.mutate(original);
-    if (mutated === original) {
-      console.log(
-        `  ✗ ${c.name}  — MUTATION DID NOT APPLY (inert, proves nothing)`
-      );
-      fail++;
-      continue;
-    }
-    writeFileSync(DTS, mutated);
+console.log('\nCallable-gate mutation proof\n');
+for (const [index, c] of CASES.entries()) {
+  const target = targets[index];
+  try {
+    writeFileSync(target.file, target.mutated);
     const r = run();
     if (c.expect(r)) {
       console.log(`  ✓ ${c.name}`);
@@ -179,10 +261,11 @@ try {
       );
       fail++;
     }
-    writeFileSync(DTS, original);
+  } finally {
+    // Restore exact bytes even if the mutant write or child checker throws.
+    // Backups stay in memory, never inside the sealed package file set.
+    writeFileSync(target.file, target.original);
   }
-} finally {
-  copyFileSync(BACKUP, DTS);
 }
 console.log(
   `\n${pass}/${CASES.length} mutations behaved correctly, ${fail} did not.\n`

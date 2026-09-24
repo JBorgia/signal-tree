@@ -223,7 +223,7 @@ describe('compensation is not external truth', () => {
     store.destroy();
   });
 
-  it('CURRENT BEHAVIOUR: an out-of-order rollback is refused', async () => {
+  it('newer-first compensation leaves the older rollback authority intact', async () => {
     const store = tree();
     await flush();
 
@@ -238,10 +238,10 @@ describe('compensation is not external truth', () => {
     second.rollback();
     await flush();
 
-    // Pinned as observed, not as desired: the outer turn can no longer be
-    // reversed once an inner one has been. Recorded so a storage refactor
-    // cannot change it silently.
-    expect(() => first.rollback()).toThrowError(/could not rollback/i);
+    // Compensation restores the older pending's ownership; it is not a new
+    // external writer that makes that pending depend on itself.
+    first.rollback();
+    expect(store.$.theme()).toBe('blue');
     store.destroy();
   });
 

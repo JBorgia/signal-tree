@@ -19,7 +19,9 @@ name: Publish to npm (CI)
 #      unverified commit can be tagged for release.
 #
 # Usage: Actions → "Publish to npm (CI)" → Run workflow → enter the version
-# tag (e.g. v12.0.1). The `release: published` trigger also fires for a
+# tag (e.g. v12.0.1), selecting that SAME tag as the workflow's run ref.
+# A branch dispatch is refused: npm provenance must name the tagged commit.
+# The `release: published` trigger also fires for a
 # release published manually in the GitHub UI — but NOT for releases created
 # by release.yml (GITHUB_TOKEN events never trigger other workflows), so the
 # normal flow is: push signed tag → release.yml verifies + creates the
@@ -51,14 +53,22 @@ jobs:
     steps:
       - name: Resolve release tag
         id: release_tag
+        env:
+          INPUT_TAG: ${{ github.event.inputs.release_tag }}
+          EVENT_TAG: ${{ github.event.release.tag_name }}
         run: |
-          TAG_NAME="${{ github.event.inputs.release_tag }}"
+          TAG_NAME="$INPUT_TAG"
           if [[ -z "$TAG_NAME" ]]; then
-            TAG_NAME="${{ github.event.release.tag_name }}"
+            TAG_NAME="$EVENT_TAG"
           fi
 
-          if [[ "$TAG_NAME" != v* ]]; then
+          if [[ ! "$TAG_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+(\.[0-9A-Za-z]+)*)?$ ]]; then
             echo "Expected a version tag like v12.0.1, got: ${TAG_NAME}"
+            exit 1
+          fi
+
+          if [[ "$GITHUB_REF" != "refs/tags/$TAG_NAME" ]]; then
+            echo "Run this workflow from the release tag itself: $TAG_NAME"
             exit 1
           fi
 
@@ -113,8 +123,8 @@ jobs:
       - name: All release gates (including benchmark, memory, and package harnesses)
         run: pnpm run gates -- --release
 
-      - name: Prove every gate can still fail
-        run: pnpm run gates:self-test
+      - name: Prove release gates can still fail
+        run: node tools/verify-gates.mjs --self-test --release
 
       - name: Verify version claims
         run: node scripts/verify-version-claims.js
@@ -131,8 +141,12 @@ jobs:
           bash scripts/verify-changelog-entry.sh --self-test
           bash scripts/verify-changelog-entry.sh "$VERSION"
 
+      # The publisher reruns release checks and mutation proofs, then rebuilds
+      # without cache before packing, requiring identical gated artifact hashes.
+      # Prebuilt artifacts and mismatched event/checkout SHAs cannot publish.
       - name: Publish to npm
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
-        run: node scripts/publish-candidate.mjs --ci --prebuilt
+          RELEASE_TAG: ${{ steps.release_tag.outputs.tag_name }}
+        run: node scripts/publish-candidate.mjs --ci

@@ -1,0 +1,3187 @@
+{
+  "baseline": "baseline-final.json",
+  "current": "current-final.json",
+  "scope": "Preserved 207-case snapshot comparison only, not a proof that no other regression exists. Shipped rekey/later-field success remains required; baseline red does not justify blanket refusal.",
+  "transitions": {
+    "held -> held": 80,
+    "violated -> held": 46,
+    "unsupported -> unsupported": 24,
+    "violated -> violated": 48,
+    "error -> held": 9
+  },
+  "lostGreens": [],
+  "currentViolations": [
+    {
+      "id": "T10/reject/123/\"A\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "A",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "A",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/132/\"A\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "A",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "A",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/213/\"A\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/231/\"A\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/312/\"A\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 2 is no longer safe [later-confirmed-dependency]",
+            "cause": {
+              "kind": "later-confirmed-dependency",
+              "pendingTurnId": 2,
+              "pendingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": "A",
+                "afterKey": "B",
+                "ownerPath": "rows",
+                "path": "rows.B",
+                "position": 5
+              },
+              "conflictingTurnId": 2,
+              "conflictingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": "D",
+                "afterKey": "C",
+                "ownerPath": "rows",
+                "path": "rows.C",
+                "position": 5
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "A",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T09/rekey/12/\"A\"",
+      "baseline": "violated",
+      "baselineTrace": [],
+      "currentTrace": [],
+      "failedAssertions": [
+        {
+          "label": "requested rekey rejection",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/123/\"a.b\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "a.b",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "a.b",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/132/\"a.b\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "a.b",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "a.b",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/213/\"a.b\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/231/\"a.b\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/312/\"a.b\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 2 is no longer safe [later-confirmed-dependency]",
+            "cause": {
+              "kind": "later-confirmed-dependency",
+              "pendingTurnId": 2,
+              "pendingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": "a.b",
+                "afterKey": "B",
+                "ownerPath": "rows",
+                "path": "rows.B",
+                "position": 5
+              },
+              "conflictingTurnId": 2,
+              "conflictingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": "D",
+                "afterKey": "C",
+                "ownerPath": "rows",
+                "path": "rows.C",
+                "position": 5
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "a.b",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T09/rekey/12/\"a.b\"",
+      "baseline": "violated",
+      "baselineTrace": [],
+      "currentTrace": [],
+      "failedAssertions": [
+        {
+          "label": "requested rekey rejection",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/123/\"a/b\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "a/b",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "a/b",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/132/\"a/b\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "a/b",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "a/b",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/213/\"a/b\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/231/\"a/b\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/312/\"a/b\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 2 is no longer safe [later-confirmed-dependency]",
+            "cause": {
+              "kind": "later-confirmed-dependency",
+              "pendingTurnId": 2,
+              "pendingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": "a/b",
+                "afterKey": "B",
+                "ownerPath": "rows",
+                "path": "rows.B",
+                "position": 5
+              },
+              "conflictingTurnId": 2,
+              "conflictingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": "D",
+                "afterKey": "C",
+                "ownerPath": "rows",
+                "path": "rows.C",
+                "position": 5
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "a/b",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T09/rekey/12/\"a/b\"",
+      "baseline": "violated",
+      "baselineTrace": [],
+      "currentTrace": [],
+      "failedAssertions": [
+        {
+          "label": "requested rekey rejection",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/123/\"a::b\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "a::b",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "a::b",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/132/\"a::b\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "a::b",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "a::b",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/213/\"a::b\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/231/\"a::b\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/312/\"a::b\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 2 is no longer safe [later-confirmed-dependency]",
+            "cause": {
+              "kind": "later-confirmed-dependency",
+              "pendingTurnId": 2,
+              "pendingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": "a::b",
+                "afterKey": "B",
+                "ownerPath": "rows",
+                "path": "rows.B",
+                "position": 5
+              },
+              "conflictingTurnId": 2,
+              "conflictingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": "D",
+                "afterKey": "C",
+                "ownerPath": "rows",
+                "path": "rows.C",
+                "position": 5
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "a::b",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T09/rekey/12/\"a::b\"",
+      "baseline": "violated",
+      "baselineTrace": [],
+      "currentTrace": [],
+      "failedAssertions": [
+        {
+          "label": "requested rekey rejection",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/123/\"jo.doe@example.com\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "jo.doe@example.com",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "jo.doe@example.com",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/132/\"jo.doe@example.com\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "jo.doe@example.com",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "jo.doe@example.com",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/213/\"jo.doe@example.com\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/231/\"jo.doe@example.com\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/312/\"jo.doe@example.com\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 2 is no longer safe [later-confirmed-dependency]",
+            "cause": {
+              "kind": "later-confirmed-dependency",
+              "pendingTurnId": 2,
+              "pendingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": "jo.doe@example.com",
+                "afterKey": "B",
+                "ownerPath": "rows",
+                "path": "rows.B",
+                "position": 5
+              },
+              "conflictingTurnId": 2,
+              "conflictingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": "D",
+                "afterKey": "C",
+                "ownerPath": "rows",
+                "path": "rows.C",
+                "position": 5
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "jo.doe@example.com",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T09/rekey/12/\"jo.doe@example.com\"",
+      "baseline": "violated",
+      "baselineTrace": [],
+      "currentTrace": [],
+      "failedAssertions": [
+        {
+          "label": "requested rekey rejection",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/123/\"1.2.3\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "1.2.3",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "1.2.3",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/132/\"1.2.3\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "1.2.3",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "1.2.3",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/213/\"1.2.3\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/231/\"1.2.3\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/312/\"1.2.3\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 2 is no longer safe [later-confirmed-dependency]",
+            "cause": {
+              "kind": "later-confirmed-dependency",
+              "pendingTurnId": 2,
+              "pendingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": "1.2.3",
+                "afterKey": "B",
+                "ownerPath": "rows",
+                "path": "rows.B",
+                "position": 5
+              },
+              "conflictingTurnId": 2,
+              "conflictingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": "D",
+                "afterKey": "C",
+                "ownerPath": "rows",
+                "path": "rows.C",
+                "position": 5
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "1.2.3",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T09/rekey/12/\"1.2.3\"",
+      "baseline": "violated",
+      "baselineTrace": [],
+      "currentTrace": [],
+      "failedAssertions": [
+        {
+          "label": "requested rekey rejection",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/123/1",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": 1,
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": 1,
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/132/1",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": 1,
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": 1,
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/213/1",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/231/1",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/312/1",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 2 is no longer safe [later-confirmed-dependency]",
+            "cause": {
+              "kind": "later-confirmed-dependency",
+              "pendingTurnId": 2,
+              "pendingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": 1,
+                "afterKey": "B",
+                "ownerPath": "rows",
+                "path": "rows.B",
+                "position": 5
+              },
+              "conflictingTurnId": 2,
+              "conflictingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": "D",
+                "afterKey": "C",
+                "ownerPath": "rows",
+                "path": "rows.C",
+                "position": 5
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": 1,
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T09/rekey/12/1",
+      "baseline": "violated",
+      "baselineTrace": [],
+      "currentTrace": [],
+      "failedAssertions": [
+        {
+          "label": "requested rekey rejection",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/123/\"1\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "1",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "1",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/132/\"1\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "1",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "1",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/213/\"1\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/231/\"1\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 3,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "B",
+                  "afterKey": "C",
+                  "ownerPath": "rows",
+                  "path": "rows.C",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T10/reject/312/\"1\"",
+      "baseline": "violated",
+      "baselineTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 2 is no longer safe [later-confirmed-dependency]",
+            "cause": {
+              "kind": "later-confirmed-dependency",
+              "pendingTurnId": 2,
+              "pendingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": "1",
+                "afterKey": "B",
+                "ownerPath": "rows",
+                "path": "rows.B",
+                "position": 5
+              },
+              "conflictingTurnId": 2,
+              "conflictingEffect": {
+                "kind": "rekey",
+                "subject": 1,
+                "beforeKey": "D",
+                "afterKey": "C",
+                "ownerPath": "rows",
+                "path": "rows.C",
+                "position": 5
+              }
+            }
+          }
+        }
+      ],
+      "currentTrace": [
+        {
+          "status": "settled"
+        },
+        {
+          "status": "refused",
+          "reason": {
+            "name": "SignalTreeRollbackError",
+            "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Transaction rollback refused: structural-drift [effect-validation-failed]",
+            "cause": {
+              "kind": "effect-validation-failed",
+              "pendingTurnId": 2,
+              "compensation": [
+                {
+                  "kind": "rekey",
+                  "subject": 1,
+                  "beforeKey": "1",
+                  "afterKey": "B",
+                  "ownerPath": "rows",
+                  "path": "rows.B",
+                  "position": 5
+                }
+              ],
+              "errorMessage": "Transaction rollback refused: structural-drift",
+              "cause": {
+                "kind": "structural-drift"
+              }
+            }
+          }
+        }
+      ],
+      "failedAssertions": [
+        {
+          "label": "structural surgical rejection succeeds",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    },
+    {
+      "id": "T09/rekey/12/\"1\"",
+      "baseline": "violated",
+      "baselineTrace": [],
+      "currentTrace": [],
+      "failedAssertions": [
+        {
+          "label": "requested rekey rejection",
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+        }
+      ]
+    }
+  ],
+  "shippedRekeyLaterField": [
+    {
+      "id": "T06a/\"A\"",
+      "baseline": "held",
+      "current": "held"
+    },
+    {
+      "id": "T06a/\"a.b\"",
+      "baseline": "held",
+      "current": "held"
+    },
+    {
+      "id": "T06a/\"a/b\"",
+      "baseline": "held",
+      "current": "held"
+    },
+    {
+      "id": "T06a/\"a::b\"",
+      "baseline": "held",
+      "current": "held"
+    },
+    {
+      "id": "T06a/\"jo.doe@example.com\"",
+      "baseline": "held",
+      "current": "held"
+    },
+    {
+      "id": "T06a/\"1.2.3\"",
+      "baseline": "held",
+      "current": "held"
+    },
+    {
+      "id": "T06a/1",
+      "baseline": "held",
+      "current": "held"
+    },
+    {
+      "id": "T06a/\"1\"",
+      "baseline": "held",
+      "current": "held"
+    }
+  ],
+  "unsupported": [
+    {
+      "id": "T13/\"A\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "T14/accept/\"A\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    },
+    {
+      "id": "T14/reject/\"A\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    },
+    {
+      "id": "T13/\"a.b\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "T14/accept/\"a.b\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    },
+    {
+      "id": "T14/reject/\"a.b\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    },
+    {
+      "id": "T13/\"a/b\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "T14/accept/\"a/b\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    },
+    {
+      "id": "T14/reject/\"a/b\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    },
+    {
+      "id": "T13/\"a::b\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "T14/accept/\"a::b\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    },
+    {
+      "id": "T14/reject/\"a::b\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    },
+    {
+      "id": "T13/\"jo.doe@example.com\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "T14/accept/\"jo.doe@example.com\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    },
+    {
+      "id": "T14/reject/\"jo.doe@example.com\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    },
+    {
+      "id": "T13/\"1.2.3\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "T14/accept/\"1.2.3\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    },
+    {
+      "id": "T14/reject/\"1.2.3\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    },
+    {
+      "id": "T13/1",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "T14/accept/1",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    },
+    {
+      "id": "T14/reject/1",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    },
+    {
+      "id": "T13/\"1\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "T14/accept/\"1\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    },
+    {
+      "id": "T14/reject/\"1\"",
+      "baseline": "unsupported",
+      "missing": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Pending ID is absent; no native terminal disposition reader for this handle"
+        }
+      ]
+    }
+  ]
+}

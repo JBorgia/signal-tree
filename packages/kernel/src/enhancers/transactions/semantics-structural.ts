@@ -1,0 +1,771 @@
+/** Frozen expected behaviors are derived from MATRIX T01–T14/I01–I08, L3–L9/L17.
+ * No candidate resolver is imported. This module is frozen before its first run.
+ */
+import {
+  UnsupportedSemantic,
+  type Handle,
+  type Snapshot,
+} from './semantics-contract';
+import type {
+  EntityDomain,
+  EntityEntry,
+  EntityFields,
+  EntityKey,
+  EntityRef,
+} from './semantics-structural-domain';
+import type {
+  Fixture,
+  Context,
+  SupplementalCase,
+} from './semantics-supplemental';
+
+export const STRUCTURAL_CASES: SupplementalCase[] = [];
+const add = (
+  id: string,
+  scope: string,
+  run: (f: Fixture, c: Context, d: EntityDomain) => Promise<void>
+) =>
+  STRUCTURAL_CASES.push({
+    id,
+    scope,
+    fixture: 'structural',
+    async run(f, c) {
+      if (!f.domain)
+        throw new UnsupportedSemantic('No public entity domain mapping');
+      await run(f, c, f.domain);
+    },
+  });
+const flush = async (f: Fixture) => {
+  for (let i = 0; i < 6; i++) await f.flush();
+};
+const requireRef = (ref: EntityRef | undefined): EntityRef => {
+  if (!ref)
+    throw new Error('Synchronous entity add did not return a held reference');
+  return ref;
+};
+const row = (name: string, score = 0): EntityFields => ({ name, score });
+const entry = (key: EntityKey, name: string, score = 0): EntityEntry => ({
+  key,
+  value: row(name, score),
+});
+const expectEntries = (
+  d: EntityDomain,
+  c: Context,
+  expected: EntityEntry[],
+  label: string
+) => {
+  const got = d.entries();
+  c.equal(got.length, expected.length, `${label}: membership count`);
+  for (const want of expected) {
+    const matches = got.filter((item) => Object.is(item.key, want.key));
+    c.equal(
+      matches.length,
+      1,
+      `${label}: one exact typed key ${JSON.stringify(want.key)}`
+    );
+    c.equal(
+      matches[0]?.value,
+      want.value,
+      `${label}: fields for ${JSON.stringify(want.key)}`
+    );
+  }
+};
+const nativePending = (f: Fixture, c: Context, h: Handle, expected: boolean) =>
+  c.equal(
+    f.hasPendingAuthority(h),
+    expected,
+    'actual pending authority of this handle'
+  );
+const sameHeld = (
+  d: EntityDomain,
+  c: Context,
+  key: EntityKey,
+  ref: EntityRef
+) =>
+  c.check(d.lookup(key) === ref, 'lookup still designates the held lifetime');
+// This safety assertion is intentionally separate from successful surgery. It
+// checks all visible state, both authority evidence and native observer silence.
+async function dependencyReject(
+  f: Fixture,
+  c: Context,
+  h: Handle,
+  success: () => void
+) {
+  const before = structuredClone(f.candidate.readVisible()),
+    count = f.confirmedCount();
+  const seen: Snapshot[] = [],
+    off = f.candidate.observeVisible((s) => seen.push(structuredClone(s)));
+  try {
+    const result = f.candidate.settleReject(h);
+    c.note({ result });
+    await flush(f);
+    if (result.status === 'refused') {
+      c.equal(
+        f.candidate.readVisible(),
+        before,
+        'dependency refusal preserves complete visible state'
+      );
+      nativePending(f, c, h, true);
+      c.equal(f.confirmedCount(), count, 'refusal creates no confirmed record');
+      c.equal(seen, [], 'refusal publishes nothing');
+      c.note({
+        outcome: 'safe refusal measured; successful surgery not exercised',
+      });
+    } else {
+      c.requireSuccess(result, 'successful rejection, if chosen');
+      success();
+      nativePending(f, c, h, false);
+      // Preservation of values alone cannot prove who owns surviving dependent
+      // truth after success. Require the real reader; never infer a disposition.
+      c.note(f.candidate.readSettlementState(h));
+    }
+  } finally {
+    off();
+  }
+}
+
+// Every structural case is additionally keyed with MATRIX's delimiter and
+// numeric/string representatives. Collision pairs are tested separately below.
+export const KEYS: readonly EntityKey[] = [
+  'A',
+  'a.b',
+  'a/b',
+  'a::b',
+  'jo.doe@example.com',
+  '1.2.3',
+  1,
+  '1',
+];
+for (const key of KEYS) {
+  const suffix = JSON.stringify(key);
+  add(
+    `T01/${suffix}`,
+    'pending add rejected: membership and held lifetime disappear',
+    async (f, c, d) => {
+      let held: EntityRef | undefined;
+      const p = f.candidate.beginContribution(() => {
+        held = d.add(key, row('added'));
+      });
+      await flush(f);
+      expectEntries(d, c, [entry(key, 'added')], 'pending add');
+      nativePending(f, c, p, true);
+      c.requireSuccess(
+        f.candidate.settleReject(p),
+        'independent add rejection succeeds'
+      );
+      await flush(f);
+      expectEntries(d, c, [], 'rejected add');
+      c.equal(
+        d.heldRead(requireRef(held)),
+        undefined,
+        'held added lifetime is absent'
+      );
+      nativePending(f, c, p, false);
+    }
+  );
+  for (const later of ['ordinary', 'pending', 'confirmed'] as const)
+    add(
+      `${
+        later === 'ordinary'
+          ? 'T02a'
+          : later === 'pending'
+          ? 'T12/pending'
+          : 'T12/confirmed'
+      }/${suffix}`,
+      'L8 dependent field truth: preserve honestly or refuse atomically',
+      async (f, c, d) => {
+        let held: EntityRef | undefined;
+        const p = f.candidate.beginContribution(() => {
+          held = d.add(key, row('created'));
+        });
+        await flush(f);
+        let q: Handle | undefined;
+        if (later === 'ordinary')
+          d.field(requireRef(held), { field: 'name', value: 'later' });
+        else {
+          q = f.candidate.beginContribution(() =>
+            d.field(requireRef(held), { field: 'name', value: 'later' })
+          );
+          await flush(f);
+          if (later === 'confirmed')
+            c.requireSuccess(
+              f.candidate.settleAccept(q),
+              'dependent writer confirmed'
+            );
+        }
+        await flush(f);
+        await dependencyReject(f, c, p, () => {
+          expectEntries(d, c, [entry(key, 'later')], 'dependent fact survives');
+          sameHeld(d, c, key, requireRef(held));
+        });
+        if (q) nativePending(f, c, q, later === 'pending');
+      }
+    );
+  add(
+    `T03/${suffix}`,
+    'pending add superseded by later removal must not resurrect',
+    async (f, c, d) => {
+      let held: EntityRef | undefined;
+      const p = f.candidate.beginContribution(() => {
+        held = d.add(key, row('created'));
+      });
+      await flush(f);
+      d.remove(requireRef(held));
+      await flush(f);
+      c.requireSuccess(
+        f.candidate.settleReject(p),
+        'superseded add settles successfully'
+      );
+      await flush(f);
+      expectEntries(d, c, [], 'later removal survives');
+      c.equal(
+        d.heldRead(requireRef(held)),
+        undefined,
+        'old lifetime stays absent'
+      );
+      nativePending(f, c, p, false);
+    }
+  );
+  add(
+    `T04/${suffix}`,
+    'later same-key lifetime survives rejection of the old pending add',
+    async (f, c, d) => {
+      let old: EntityRef | undefined;
+      const p = f.candidate.beginContribution(() => {
+        old = d.add(key, row('old'));
+      });
+      await flush(f);
+      d.remove(requireRef(old));
+      await flush(f);
+      const fresh = d.add(key, row('fresh'));
+      await flush(f);
+      c.requireSuccess(
+        f.candidate.settleReject(p),
+        'superseded old add settles'
+      );
+      await flush(f);
+      expectEntries(d, c, [entry(key, 'fresh')], 'fresh lifetime survives');
+      c.equal(
+        d.heldRead(requireRef(old)),
+        undefined,
+        'held old lifetime does not retarget'
+      );
+      sameHeld(d, c, key, fresh);
+      nativePending(f, c, p, false);
+    }
+  );
+  add(
+    `T05/${suffix}`,
+    'occupied restoration destination: preserve new lifetime and honest authority',
+    async (f, c, d) => {
+      const old = d.add(key, row('old'));
+      await flush(f);
+      const p = f.candidate.beginContribution(() => d.remove(old));
+      await flush(f);
+      const fresh = d.add(key, row('fresh'));
+      await flush(f);
+      await dependencyReject(f, c, p, () => {
+        expectEntries(
+          d,
+          c,
+          [entry(key, 'fresh')],
+          'occupied key retains fresh lifetime'
+        );
+        sameHeld(d, c, key, fresh);
+      });
+      c.equal(
+        d.heldRead(old),
+        undefined,
+        'old lifetime cannot read through new occupant'
+      );
+      sameHeld(d, c, key, fresh);
+    }
+  );
+  add(
+    `T06a/${suffix}`,
+    'independent field write survives reversal of a rekey',
+    async (f, c, d) => {
+      const held = d.add(key, row('old'));
+      await flush(f);
+      const p = f.candidate.beginContribution(() =>
+        d.rekey(held, 'destination')
+      );
+      await flush(f);
+      d.field(held, { field: 'name', value: 'later' });
+      await flush(f);
+      c.requireSuccess(
+        f.candidate.settleReject(p),
+        'independent rekey reversal succeeds'
+      );
+      await flush(f);
+      expectEntries(
+        d,
+        c,
+        [entry(key, 'later')],
+        'original key and later field'
+      );
+      sameHeld(d, c, key, held);
+      c.equal(
+        d.heldRead(held),
+        row('later'),
+        'held ref follows lifetime across rekey'
+      );
+      nativePending(f, c, p, false);
+    }
+  );
+  add(
+    `T06b/${suffix}`,
+    'vacated source occupied by another lifetime is a real dependency',
+    async (f, c, d) => {
+      const held = d.add(key, row('old'));
+      await flush(f);
+      const p = f.candidate.beginContribution(() =>
+        d.rekey(held, 'destination')
+      );
+      await flush(f);
+      const fresh = d.add(key, row('fresh'));
+      await flush(f);
+      await dependencyReject(f, c, p, () => {
+        expectEntries(
+          d,
+          c,
+          [entry('destination', 'old'), entry(key, 'fresh')],
+          'both surviving lifetimes preserved'
+        );
+      });
+      sameHeld(d, c, key, fresh);
+      sameHeld(d, c, 'destination', held);
+    }
+  );
+  add(
+    `T07/${suffix}`,
+    'removal supersedes the rekey; rejecting it cannot resurrect a lifetime',
+    async (f, c, d) => {
+      const held = d.add(key, row('old'));
+      await flush(f);
+      const p = f.candidate.beginContribution(() =>
+        d.rekey(held, 'destination')
+      );
+      await flush(f);
+      d.remove(held);
+      await flush(f);
+      c.requireSuccess(f.candidate.settleReject(p), 'superseded rekey settles');
+      await flush(f);
+      expectEntries(d, c, [], 'removed entity remains absent');
+      c.equal(
+        d.heldRead(held),
+        undefined,
+        'held removed lifetime stays absent'
+      );
+      nativePending(f, c, p, false);
+    }
+  );
+  add(
+    `T08/${suffix}`,
+    'destination re-use belongs to a new lifetime, not the old rekey',
+    async (f, c, d) => {
+      const held = d.add(key, row('old'));
+      await flush(f);
+      const p = f.candidate.beginContribution(() =>
+        d.rekey(held, 'destination')
+      );
+      await flush(f);
+      d.remove(held);
+      await flush(f);
+      const fresh = d.add('destination', row('fresh'));
+      await flush(f);
+      c.requireSuccess(f.candidate.settleReject(p), 'superseded rekey settles');
+      await flush(f);
+      expectEntries(
+        d,
+        c,
+        [entry('destination', 'fresh')],
+        'new destination occupant survives'
+      );
+      sameHeld(d, c, 'destination', fresh);
+      c.equal(
+        d.heldRead(held),
+        undefined,
+        'old held lifetime does not retarget'
+      );
+      nativePending(f, c, p, false);
+    }
+  );
+  add(
+    `T11-I07/${suffix}`,
+    'held references do not follow same-key remove/re-add',
+    async (f, c, d) => {
+      const old = d.add(key, row('old'));
+      await flush(f);
+      d.remove(old);
+      await flush(f);
+      const fresh = d.add(key, row('fresh'));
+      await flush(f);
+      c.check(
+        old !== fresh,
+        'same business key denotes different held lifetimes'
+      );
+      c.equal(d.heldRead(old), undefined, 'old held ref is absent');
+      c.equal(d.heldRead(fresh), row('fresh'), 'new held ref reads new truth');
+      sameHeld(d, c, key, fresh);
+      const p = f.candidate.beginContribution(() =>
+        d.field(fresh, { field: 'score', value: 7 })
+      );
+      await flush(f);
+      c.requireSuccess(
+        f.candidate.settleReject(p),
+        'fresh lifetime field rejection'
+      );
+      await flush(f);
+      c.equal(
+        d.heldRead(old),
+        undefined,
+        'settlement on new lifetime cannot revive old ref'
+      );
+      expectEntries(d, c, [entry(key, 'fresh')], 'fresh state restored');
+    }
+  );
+  add(
+    `T13/${suffix}`,
+    'server realization against pending-created lifetime; canonical assertion remains explicit',
+    async (f, c, d) => {
+      let held: EntityRef | undefined;
+      const p = f.candidate.beginContribution(() => {
+        held = d.add(key, row('pending'));
+      });
+      await flush(f);
+      f.candidate.applyAuthority({
+        order: { kind: 'snapshot' },
+        settlement: { kind: 'none' },
+        truth: () =>
+          d.field(requireRef(held), { field: 'name', value: 'server' }),
+      });
+      await flush(f);
+      nativePending(f, c, p, true);
+      // L11 requires separate canonical and pending truth. Do not replace that
+      // assertion with the observed merged row or choose a synthetic overlay.
+      c.note(f.candidate.readCanonical());
+      throw new UnsupportedSemantic(
+        'Structural canonical/lifetime projection assertions are not yet expressed by this scalar authority contract'
+      );
+    }
+  );
+  for (const operation of ['accept', 'reject'] as const)
+    add(
+      `T14/${operation}/${suffix}`,
+      'independent mixed scalar + structural settlement and coherent owner publication',
+      async (f, c, d) => {
+        let held: EntityRef | undefined;
+        const p = f.candidate.beginContribution(() => {
+          f.write('x', 1);
+          held = d.add(key, row('mixed'));
+        });
+        await flush(f);
+        const seen: Snapshot[] = [],
+          off = f.candidate.observeVisible((s) =>
+            seen.push(structuredClone(s))
+          );
+        try {
+          c.requireSuccess(
+            operation === 'accept'
+              ? f.candidate.settleAccept(p)
+              : f.candidate.settleReject(p),
+            'mixed settlement succeeds'
+          );
+          await flush(f);
+          const expected =
+            operation === 'accept'
+              ? { x: 1, y: 0, z: 0, entities: [entry(key, 'mixed')] }
+              : { x: 0, y: 0, z: 0, entities: [] };
+          c.equal(f.candidate.readVisible(), expected, 'whole mixed state');
+          seen.forEach((s, i) =>
+            c.equal(s, expected, `coherent mixed callback ${i}`)
+          );
+          if (operation === 'reject')
+            c.check(seen.length > 0, 'changed mixed truth is observed');
+          c.equal(
+            d.heldRead(requireRef(held)),
+            operation === 'accept' ? row('mixed') : undefined,
+            'held lifetime agrees with state'
+          );
+          nativePending(f, c, p, false);
+          c.note({
+            snapshots: seen,
+            limitation:
+              'No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9.',
+          });
+          c.note(f.candidate.readSettlementState(p));
+          throw new UnsupportedSemantic(
+            'Per-contribution terminal dispositions are not exposed by this fixture contract'
+          );
+        } finally {
+          off();
+        }
+      }
+    );
+}
+
+const REKEY_ORDERS = [
+  ['123', ['D', 'D', 'A']],
+  ['132', ['D', 'C', 'A']],
+  ['213', ['D', 'D', 'A']],
+  ['231', ['D', 'B', 'A']],
+  ['312', ['C', 'C', 'A']],
+  ['321', ['C', 'B', 'A']],
+] as const;
+for (const initialKey of KEYS) {
+  for (const [order, keys] of REKEY_ORDERS)
+    add(
+      `T10/reject/${order}/${JSON.stringify(initialKey)}`,
+      'three pending rekeys; explicit intermediate topology, successful settlement required',
+      async (f, c, d) => {
+        const held = d.add(initialKey, row('held'));
+        await flush(f);
+        const handles: Handle[] = [];
+        for (const key of ['B', 'C', 'D']) {
+          handles.push(f.candidate.beginContribution(() => d.rekey(held, key)));
+          await flush(f);
+        }
+        const pending = new Set([0, 1, 2]);
+        for (const [step, digit] of [...order].entries()) {
+          const i = Number(digit) - 1;
+          const result = f.candidate.settleReject(handles[i]);
+          c.note(result);
+          c.requireSuccess(result, 'structural surgical rejection succeeds');
+          await flush(f);
+          pending.delete(i);
+          expectEntries(
+            d,
+            c,
+            [entry(keys[step] === 'A' ? initialKey : keys[step], 'held')],
+            `topology after step ${step + 1}`
+          );
+          sameHeld(d, c, keys[step] === 'A' ? initialKey : keys[step], held);
+          handles.forEach((h, j) => nativePending(f, c, h, pending.has(j)));
+        }
+      }
+    );
+  for (const [order, keys] of [
+    ['12', ['C', 'A']],
+    ['21', ['B', 'A']],
+  ] as const)
+    add(
+      `T09/rekey/${order}/${JSON.stringify(initialKey)}`,
+      'two overlapping rekeys; no settlement-order resurrection',
+      async (f, c, d) => {
+        const held = d.add(initialKey, row('held'));
+        await flush(f);
+        const p = f.candidate.beginContribution(() => d.rekey(held, 'B'));
+        await flush(f);
+        const q = f.candidate.beginContribution(() => d.rekey(held, 'C'));
+        await flush(f);
+        for (const [i, digit] of [...order].entries()) {
+          c.requireSuccess(
+            f.candidate.settleReject(digit === '1' ? p : q),
+            'requested rekey rejection'
+          );
+          await flush(f);
+          expectEntries(
+            d,
+            c,
+            [entry(keys[i] === 'A' ? initialKey : keys[i], 'held')],
+            'surviving topology'
+          );
+          sameHeld(d, c, keys[i] === 'A' ? initialKey : keys[i], held);
+        }
+        nativePending(f, c, p, false);
+        nativePending(f, c, q, false);
+      }
+    );
+  add(
+    `T09/adds/${JSON.stringify(initialKey)}`,
+    'two pending membership additions retain the other lifetime',
+    async (f, c, d) => {
+      const p = f.candidate.beginContribution(() =>
+        d.add(initialKey, row('first'))
+      );
+      await flush(f);
+      const q = f.candidate.beginContribution(() => d.add('B', row('second')));
+      await flush(f);
+      c.requireSuccess(
+        f.candidate.settleReject(p),
+        'first add rejected independently'
+      );
+      await flush(f);
+      expectEntries(d, c, [entry('B', 'second')], 'second addition remains');
+      nativePending(f, c, q, true);
+      c.requireSuccess(f.candidate.settleAccept(q), 'second addition accepted');
+      await flush(f);
+      expectEntries(d, c, [entry('B', 'second')], 'accepted addition survives');
+    }
+  );
+}
+
+for (const [id, key, control] of [
+  ['I01', 'a.b', 'a'],
+  ['I02', 'a/b', 'a'],
+  ['I03', 'a::b', 'a'],
+  ['I04', 'jo.doe@example.com', 'jo'],
+  ['I05', '1.2.3', '1'],
+  ['I06', 1, '1'],
+] as const)
+  add(
+    id,
+    'typed business key lookup/write/settlement isolation',
+    async (f, c, d) => {
+      const target = d.add(key, row('target')),
+        other = d.add(control, row('control'));
+      await flush(f);
+      c.check(target !== other, 'distinct keys designate distinct references');
+      sameHeld(d, c, key, target);
+      sameHeld(d, c, control, other);
+      const p = f.candidate.beginContribution(() =>
+        d.field(target, { field: 'name', value: 'pending' })
+      );
+      await flush(f);
+      d.field(other, { field: 'score', value: 7 });
+      await flush(f);
+      c.requireSuccess(f.candidate.settleReject(p), 'target field rejection');
+      await flush(f);
+      expectEntries(
+        d,
+        c,
+        [entry(key, 'target'), entry(control, 'control', 7)],
+        'typed-key independence'
+      );
+      sameHeld(d, c, key, target);
+      sameHeld(d, c, control, other);
+    }
+  );
+for (const key of KEYS)
+  add(
+    `I08/${JSON.stringify(key)}`,
+    'transactions + real Link + EntityMap + held lifetime; endpoint evidence',
+    async (f, c, d) => {
+      const target = d.add(key, row('initial')),
+        control = d.add('control-key', row('control'));
+      await flush(f);
+      const sent: Array<string | undefined> = [],
+        other: Array<string | undefined> = [];
+      const relationship = d.linkName(target, (v) => sent.push(v)),
+        controlLink = d.linkName(control, (v) => other.push(v));
+      try {
+        d.field(target, { field: 'name', value: 'positive' });
+        await flush(f);
+        await relationship.settled();
+        c.equal(sent, ['positive'], 'positive native Link control');
+        c.equal(other, [], 'other entity endpoint untouched');
+        sent.length = 0;
+        const p = f.candidate.beginContribution(() =>
+          d.field(target, { field: 'name', value: 'rejected' })
+        );
+        await flush(f);
+        c.equal(sent, [], 'speculative value not admitted');
+        c.requireSuccess(f.candidate.settleReject(p), 'linked field rollback');
+        await flush(f);
+        await relationship.settled();
+        c.check(!sent.includes('rejected'), 'no rejected value ever delivered');
+        c.equal(other, [], 'other lifetime still isolated');
+        const q = f.candidate.beginContribution(() =>
+          d.field(target, { field: 'name', value: 'accepted' })
+        );
+        await flush(f);
+        c.requireSuccess(f.candidate.settleAccept(q), 'linked field accepted');
+        await flush(f);
+        await relationship.settled();
+        c.equal(
+          sent.at(-1),
+          'accepted',
+          'accepted value reaches real endpoint'
+        );
+        d.rekey(target, 'moved-key');
+        d.field(target, { field: 'name', value: 'moved' });
+        await flush(f);
+        await relationship.settled();
+        c.equal(
+          sent.at(-1),
+          'moved',
+          'relationship follows held lifetime across rekey'
+        );
+        d.remove(target);
+        await flush(f);
+        await relationship.settled();
+        sent.length = 0;
+        const fresh = d.add('moved-key', row('replacement'));
+        await flush(f);
+        await relationship.settled();
+        c.check(target !== fresh, 'reused key is a new reference');
+        c.equal(
+          d.heldRead(target),
+          undefined,
+          'old held lifetime remains absent'
+        );
+        c.equal(
+          sent,
+          [],
+          'old relationship cannot acquire replacement lifetime'
+        );
+      } finally {
+        relationship.dispose();
+        controlLink.dispose();
+      }
+    }
+  );
+
+add(
+  'I08/typed-pair',
+  'numeric/string business keys stay isolated across two real relationships',
+  async (f, c, d) => {
+    const numeric = d.add(1, row('number')),
+      textual = d.add('1', row('string'));
+    await flush(f);
+    const numbers: Array<string | undefined> = [],
+      strings: Array<string | undefined> = [];
+    const a = d.linkName(numeric, (v) => numbers.push(v)),
+      b = d.linkName(textual, (v) => strings.push(v));
+    try {
+      const p = f.candidate.beginContribution(() =>
+        d.field(numeric, { field: 'name', value: 'number accepted' })
+      );
+      await flush(f);
+      c.equal(numbers, [], 'numeric speculative value is held');
+      c.equal(strings, [], 'string relationship remains untouched');
+      c.requireSuccess(
+        f.candidate.settleAccept(p),
+        'numeric contribution accepted'
+      );
+      await flush(f);
+      await a.settled();
+      await b.settled();
+      c.equal(
+        numbers,
+        ['number accepted'],
+        'numeric endpoint gets numeric lifetime'
+      );
+      c.equal(strings, [], 'numeric settlement does not reach string endpoint');
+      d.field(textual, { field: 'name', value: 'string authored' });
+      await flush(f);
+      await a.settled();
+      await b.settled();
+      c.equal(
+        strings,
+        ['string authored'],
+        'string endpoint gets string lifetime'
+      );
+      c.equal(
+        numbers,
+        ['number accepted'],
+        'string write does not reach numeric endpoint'
+      );
+      expectEntries(
+        d,
+        c,
+        [entry(1, 'number accepted'), entry('1', 'string authored')],
+        'typed identity across seam'
+      );
+    } finally {
+      a.dispose();
+      b.dispose();
+    }
+  }
+);

@@ -292,6 +292,23 @@ export function settleCommitScope(
   if (failed) throw firstError;
 }
 
+/** Terminal owner teardown. No durable work or settlement observers may run. */
+export function cancelCommitScopes(owner: object): void {
+  const scopes = scopesByOwner.get(owner);
+  if (!scopes) return;
+  scopesByOwner.delete(owner);
+  for (const [id, scope] of scopes) {
+    scope.consequences.clear();
+    if (!scope.key) continue;
+    const open = openScopesByKey.get(scope.key);
+    open?.delete(id);
+    if (open?.size === 0) openScopesByKey.delete(scope.key);
+    heldByKey.delete(scope.key);
+    settleListenersByKey.delete(scope.key);
+  }
+  scopes.clear();
+}
+
 /** True while any explicit transaction on this node's tree is unsettled. */
 export function hasOpenCommitScope(node: object): boolean {
   const key = resolveScopeKey(node);

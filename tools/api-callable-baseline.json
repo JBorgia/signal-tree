@@ -7,9 +7,9 @@
       "name": "(call)",
       "memberKind": "callable-type",
       "signatures": [
-        "(): T",
-        "(updater: (current: T) => T): void",
-        "(value: T): void"
+        "(): SnapshotValue<T, false>",
+        "(updater: (current: SnapshotValue<T, false>) => SnapshotValue<T, true>): void",
+        "(value: SnapshotValue<T, true>): void"
       ]
     },
     {
@@ -987,10 +987,10 @@
       ]
     },
     {
-      "id": "kernel:ProposalStatus.__@iterator@16",
+      "id": "kernel:ProposalStatus[Symbol.iterator]",
       "pkg": "kernel",
       "owner": "ProposalStatus",
-      "name": "__@iterator@16",
+      "name": "[Symbol.iterator]",
       "memberKind": "method",
       "signatures": [
         "(): StringIterator<string>"
@@ -1636,9 +1636,9 @@
       "name": "$",
       "memberKind": "callable-property",
       "signatures": [
-        "(): T",
-        "(updater: (current: T) => T): void",
-        "(value: T): void"
+        "(): SnapshotValue<ConstructionOf<TreeNode<T>, T>, false>",
+        "(updater: (current: SnapshotValue<ConstructionOf<TreeNode<T>, T>, false>) => SnapshotValue<ConstructionOf<TreeNode<T>, T>, true>): void",
+        "(value: SnapshotValue<ConstructionOf<TreeNode<T>, T>, true>): void"
       ]
     },
     {
@@ -1712,10 +1712,10 @@
       ]
     },
     {
-      "id": "kernel:TreeCapability.__@iterator@16",
+      "id": "kernel:TreeCapability[Symbol.iterator]",
       "pkg": "kernel",
       "owner": "TreeCapability",
-      "name": "__@iterator@16",
+      "name": "[Symbol.iterator]",
       "memberKind": "method",
       "signatures": [
         "(): StringIterator<string>"

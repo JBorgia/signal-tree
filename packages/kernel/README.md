@@ -260,6 +260,11 @@ between the last read and the decision is still reported.
 > another writer edits fields on that same row. Render `inspect()` next to
 > ordinary current-state reads; it is a review status, not a value snapshot.
 
+`path` is a display path, not a unique address. For example, a literal key
+`"a.b"` and nested fields `a.b` can produce the same string and status. A review
+UI must use its knowledge of the application's fields and entity IDs to associate
+changes with values. Splitting paths on dots is not a universal resolver.
+
 `reject()` throws `SignalTreeRollbackError` when the reversal cannot be applied
 without destroying newer truth — for example when a server write now depends on
 a row the proposal created. Catch it and offer reconciliation rather than

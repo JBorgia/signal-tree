@@ -1,0 +1,18 @@
+{
+  "candidate": "tools/experiments/transaction-options/draft.mjs",
+  "profile": "draft",
+  "count": 1000,
+  "ms": 26.544667000000004,
+  "before": {
+    "active": 0,
+    "retainedOperations": 0,
+    "history": 0
+  },
+  "after": {
+    "active": 0,
+    "retainedOperations": 0,
+    "history": 0
+  },
+  "visibleEntities": 1,
+  "retainedGrowth": 0
+}

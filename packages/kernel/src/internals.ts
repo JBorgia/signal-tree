@@ -14,7 +14,7 @@ export {
   withWriteObservationScope,
   type DeclaredWriteScopes,
 } from './lib/internals/write-observation-scope';
-import type { ISignalTree } from './lib/types';
+import type { CarrierKind, ISignalTree, ISignalTreeOf } from './lib/types';
 import { getActiveWriteContext } from './lib/write-context';
 import { peekInternalTransactionRuntime } from './enhancers/transactions/transactions';
 import { getPositionRegistry } from './lib/internals/position-registry';
@@ -66,7 +66,9 @@ export function activeTransactionContext():
  * ⚠️ Generic kernel truth, deliberately. A consumer translates capabilities
  * into its own capability model; no consumer-shaped predicate belongs here.
  */
-export function treeCapabilities<T>(tree: ISignalTree<T>) {
+export function treeCapabilities<T, C extends CarrierKind = CarrierKind>(
+  tree: ISignalTreeOf<T, C, unknown>
+) {
   return getTreeCapabilities(tree);
 }
 export type {
@@ -125,15 +127,15 @@ function projectConfirmedTurns(
     });
   }
 
-  // DERIVED, not asserted. Turn ids are allocated from 1 and never reused, so a
-  // first retained id above 1 means earlier turns are gone. Nothing evicts from
-  // `confirmedTurns` today, so this is false — and it starts reporting true on
-  // its own if that ever changes.
+  // TransactionAuthority currently never evicts confirmed records. Missing IDs
+  // can belong to pending or rejected turns, so they are not truncation evidence.
+  // If eviction is introduced, the authority must supply explicit retention
+  // metadata (including an entirely evicted window); never infer it from IDs.
   const firstAvailableTurnId = turns[0]?.id;
   return {
     turns,
     retention: {
-      truncated: firstAvailableTurnId !== undefined && firstAvailableTurnId > 1,
+      truncated: false,
       firstAvailableTurnId,
     },
   };
@@ -151,7 +153,11 @@ function projectConfirmedTurns(
  * Equality and `Map`-key use only — never serialize it. A consumer needing
  * persistence maps this to its own session identity.
  */
-export function treeRuntimeId<T>(tree: ISignalTree<T>): TreeId | undefined {
+export function treeRuntimeId<
+  T,
+  C extends CarrierKind = CarrierKind,
+  TAccum = unknown
+>(tree: ISignalTreeOf<T, C, TAccum>): TreeId | undefined {
   return getPositionRegistry(tree.$)?.id;
 }
 
@@ -171,10 +177,15 @@ export function treeRuntimeId<T>(tree: ISignalTree<T>): TreeId | undefined {
  * Returns a live view: it reads what the enhancer already retains and keeps no
  * history of its own. Repeated calls are cheap and always current.
  */
-export function confirmedTurnReader<T>(
-  tree: ISignalTree<T>
-): ConfirmedTurnReader | undefined {
-  const runtime = peekInternalTransactionRuntime(tree);
+export function confirmedTurnReader<
+  T,
+  C extends CarrierKind = CarrierKind,
+  TAccum = unknown
+>(tree: ISignalTreeOf<T, C, TAccum>): ConfirmedTurnReader | undefined {
+  // The peek reads only the runtime's symbol on the tree, never its carriers.
+  const runtime = peekInternalTransactionRuntime(
+    tree as unknown as ISignalTree<T>
+  );
   if (!runtime) {
     return undefined;
   }

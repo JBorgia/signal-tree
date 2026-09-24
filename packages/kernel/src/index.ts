@@ -275,8 +275,6 @@ export type { ProposalInspection } from './enhancers/transactions/transactions.t
 export type { ProposalStatus } from './enhancers/transactions/transactions.types';
 export { transactions } from './enhancers/transactions/transactions';
 
-export type {} from './enhancers/serialization/serialization';
-
 /**
  * DevTools enhancer for development and debugging
  * @see {@link devTools} for development tools and Redux DevTools integration

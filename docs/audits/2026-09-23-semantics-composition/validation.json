@@ -1,0 +1,41 @@
+{
+  "focusedTests": {
+    "files": 3,
+    "passed": 23,
+    "exitCode": 0
+  },
+  "sourceTsc": {
+    "exitCode": 0
+  },
+  "specTypeGate": {
+    "exitCode": 0,
+    "baselineUpdated": false
+  },
+  "focusedEslint": {
+    "exitCode": 0
+  },
+  "diffCheck": {
+    "exitCode": 0
+  },
+  "selectedCurrentInputChangesAtCheckpoint": [],
+  "baselineCurrentHarnessHashDifferences": [],
+  "productionChanges": false,
+  "mutationRuns": false,
+  "commits": false,
+  "reachabilityCheckpoint": {
+    "timestamp": "2026-09-24T02:36:16.747281+00:00",
+    "focusedTests": {
+      "files": 3,
+      "passed": 24,
+      "exitCode": 0
+    },
+    "deadExports": {
+      "command": "node tools/find-dead-exports.mjs --max=0",
+      "exitCode": 0,
+      "baselineChanged": false
+    },
+    "nativeFixture": "makeOccupiedConflict statically imported and exercised: refusal preserves state/pending authority, blocker removal permits successful retry with real publication.",
+    "oracleChanges": [],
+    "selectedBaselineCurrentInputChanges": []
+  }
+}

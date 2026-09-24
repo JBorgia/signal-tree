@@ -1,23 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import type { StorageAdapter } from '../enhancers/serialization/storage-adapters';
 
 import { entityMap } from './markers/entity-map';
 import { getPhysicalCommitClock } from './internals/physical-commit-clock';
 import { signalTree } from './signal-tree';
-import { transactions } from '../enhancers/transactions/transactions';
+import { link } from '../index';
+import { afterEach } from 'vitest';
+const cleanup: Array<() => void> = [];
+afterEach(() => {
+  for (const dispose of cleanup.splice(0)) dispose();
+});
 
-/**
- * Local stand-in for the deleted `createStorageAdapter()` factory, which was
- * `(getItem, setItem, removeItem) => ({ getItem, setItem, removeItem })` and
- * nothing more. STORAGE-DEL removed it from the public surface (PER-0: no
- * consumer outside these specs, no SignalTree semantics); the three-line
- * convenience lives here now, where it is used.
- */
-const createStorageAdapter = (
-  getItem: StorageAdapter['getItem'],
-  setItem: StorageAdapter['setItem'],
-  removeItem: StorageAdapter['removeItem']
-): StorageAdapter => ({ getItem, setItem, removeItem });
+import { transactions } from '../enhancers/transactions/transactions';
 
 /**
  * Heterogeneous atomicity — RELEASE-1.0.md Phase 1.
@@ -47,44 +40,8 @@ const createStorageAdapter = (
 
 type Row = { id: string; name: string };
 
-interface Harness {
-  readonly tree: {
-    (): { count: number; theme: string; rows: { all: Row[] } };
-    $: {
-      count: {
-        (value: number): void;
-        (update: (current: number) => number): void;
-        (): number;
-      };
-      theme: {
-        (value: string): void;
-        (update: (current: string) => string): void;
-        (): string;
-      };
-      rows: {
-        addOne(row: Row): void;
-        removeOne(id: string): void;
-        ids(): string[];
-      };
-    };
-    transact: (fn: () => void) => { confirm(): void; rollback(): void };
-  };
-  readonly writes: string[];
-  revision(): number | undefined;
-}
-
-function harness(key: string): Harness {
-  const map = new Map<string, string>();
+function harness() {
   const writes: string[] = [];
-  const adapter = createStorageAdapter(
-    (k) => map.get(k) ?? null,
-    (k, v) => {
-      map.set(k, v);
-      writes.push(String(JSON.parse(v).data));
-    },
-    (k) => void map.delete(k)
-  );
-
   const tree = signalTree(
     {
       count: 0,
@@ -94,11 +51,35 @@ function harness(key: string): Harness {
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),
     },
     { enhancers: [transactions()] }
-  ) as unknown as Harness['tree'];
+  );
+
+  const scalar = link(tree.$.count, {
+    set: (value) => {
+      writes.push(JSON.stringify(value));
+    },
+  });
+  const rows = link(tree.$.rows, {
+    set: (value) => {
+      writes.push(JSON.stringify(value));
+    },
+  });
+  const theme = link(tree.$.theme, {
+    set: (value) => {
+      writes.push(value);
+    },
+  });
+  cleanup.push(() => {
+    scalar.dispose();
+    rows.dispose();
+    theme.dispose();
+    tree.destroy();
+  });
 
   return {
     tree,
     writes,
+    settle: () =>
+      Promise.all([scalar.settled(), rows.settled(), theme.settled()]),
     revision: () =>
       (
         getPhysicalCommitClock(tree) ??
@@ -122,7 +103,7 @@ describe('heterogeneous atomicity: scalar + structural in one transaction', () =
     // because batched delivery is the condition these assertions were written
     // and validated against; `resetPathNotifier()` already leaves batching on.
 
-    const h = harness('het-count');
+    const h = harness();
     const before = h.revision();
 
     const pending = h.tree.transact(() => {
@@ -162,7 +143,7 @@ describe('heterogeneous atomicity: scalar + structural in one transaction', () =
     // because batched delivery is the condition these assertions were written
     // and validated against; `resetPathNotifier()` already leaves batching on.
 
-    const h = harness('het-observe');
+    const h = harness();
 
     // Capture the full tree on every notification. If the two physical frames
     // are independently visible, some capture holds one change without the
@@ -211,7 +192,7 @@ describe('heterogeneous atomicity: scalar + structural in one transaction', () =
     // because batched delivery is the condition these assertions were written
     // and validated against; `resetPathNotifier()` already leaves batching on.
 
-    const h = harness('het-throw');
+    const h = harness();
     const before = h.revision();
 
     expect(() =>
@@ -223,7 +204,7 @@ describe('heterogeneous atomicity: scalar + structural in one transaction', () =
       })
     ).toThrow('boom');
 
-    await Promise.resolve();
+    await h.settle();
 
     // Semantic state is neutral: no scalar, no row, no durable write.
     expect(h.tree.$.count()).toBe(0);
@@ -254,7 +235,7 @@ describe('heterogeneous atomicity: scalar + structural in one transaction', () =
     // because batched delivery is the condition these assertions were written
     // and validated against; `resetPathNotifier()` already leaves batching on.
 
-    const h = harness('het-rollback');
+    const h = harness();
     const before = h.revision();
 
     const pending = h.tree.transact(() => {
@@ -263,6 +244,7 @@ describe('heterogeneous atomicity: scalar + structural in one transaction', () =
       h.tree.$.rows.addOne({ id: 'ghost', name: 'Nobody' });
     });
     pending.rollback();
+    await h.settle();
 
     expect(h.tree.$.count()).toBe(0);
     expect(h.tree.$.rows.ids()).toEqual([]);

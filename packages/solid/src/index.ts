@@ -28,16 +28,22 @@ import {
 import { createSolidObservationAdapter } from './lib/solid-observation.js';
 
 /** Construct a SignalTree whose leaves are native Solid accessors. */
-export const signalTree = ((initialState: object, config?: unknown) =>
-  (
-    createSignalTreeFactory(createSolidObservationAdapter()) as (
-      state: object,
-      options?: unknown
-    ) => unknown
-  )(
-    prepareConstructionInput(initialState),
-    config
-  )) as FrameworkSignalTreeFactory;
+export const signalTree = ((initialState: object, config?: unknown) => {
+  const adapter = createSolidObservationAdapter();
+  try {
+    const tree = (
+      createSignalTreeFactory(adapter) as (
+        state: object,
+        options?: unknown
+      ) => { registerCleanup(cleanup: () => void): void }
+    )(prepareConstructionInput(initialState), config);
+    tree.registerCleanup(adapter.dispose);
+    return tree;
+  } catch (error) {
+    adapter.dispose();
+    throw error;
+  }
+}) as FrameworkSignalTreeFactory;
 
 export type TreeNode<T> = TreeNodeOf<T, 'solid'>;
 export type WritableLeaf<T> = LeafOf<T, 'solid'>;

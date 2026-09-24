@@ -31,6 +31,7 @@ import {
   mkdirSync,
   writeFileSync,
   readdirSync,
+  readFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -409,6 +410,24 @@ void changePath;
 void settled.changes.length;
 `;
 writeFileSync(join(proj, 'src', 'main.ts'), SAMPLE);
+
+// Run the owning source proofs unchanged against the actual packed facades.
+// In particular, all negative Link admissions must still fail when construction
+// metadata crosses the kernel root / adapter declaration boundary.
+for (const facade of ['angular', 'react', 'vue', 'solid']) {
+  const fixture = readFileSync(
+    join(ROOT, 'packages', facade, 'src/lib/hydration-accessor.typing.spec.ts'),
+    'utf8'
+  );
+  const localImport = "from '../index'";
+  if (fixture.split(localImport).length !== 2) {
+    throw new Error(`${facade} hydration proof must have one facade import`);
+  }
+  writeFileSync(
+    join(proj, 'src', `${facade}-hydration.ts`),
+    fixture.replace(localImport, `from '@signal-tree/${facade}'`)
+  );
+}
 
 const FACADE_IDENTITY_PROBE = `
 import * as kernel from '@signal-tree/kernel';

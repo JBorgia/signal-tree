@@ -2,6 +2,13 @@
 
 Work that is decided and not yet done. **This is not an RFC list.**
 
+## September 23 audit remediation — ACTIVE / RELEASE HELD
+
+All reproduced security, correctness, composition, lifecycle and tooling findings
+are tracked in [the remediation ledger](docs/audits/2026-09-23-remediation.md).
+Research prototypes are frozen; public release and disclosure remain on hold.
+
+
 ## Studio commercial separation
 
 Studio development and its complete implementation/evaluation ledger now live

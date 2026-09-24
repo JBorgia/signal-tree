@@ -1,0 +1,18 @@
+{
+  "frozenAt": "2026-09-24T01:19:03.730795+00:00",
+  "execution": "Before any v2 baseline/current execution.",
+  "correction": "Only ten non-null fixture-reference assertions became a runtime guard; case identifiers, expectations and paths unchanged. No law or native implementation changed. First oracle and first reds retained.",
+  "previousManifest": "FROZEN.json",
+  "previousOracle": {
+    "path": "docs/audits/2026-09-23-semantics-structural/oracle-v1.ts.txt",
+    "sha256": "869135130d91db92b6ee1665f365e260547beac4dabf182ce9993b32fb212f09"
+  },
+  "sources": {
+    "packages/kernel/src/enhancers/transactions/semantics-structural.ts": "0cd3ab1983ba635f5d3ab32fb0b0f9c4c25a98403c7e4f93c3908afd8da32cef",
+    "packages/kernel/src/enhancers/transactions/semantics-structural-domain.ts": "1dd36d92b6658230b7331a4be3fd73f3a5c1b04ea2bc064fcec4e4dd4af381c8",
+    "docs/research/transaction-semantics-2/LAWS.md": "5bfd86511723e6b23b72603ebabe35d3df1557586c3b86e0508117c60666d79b",
+    "docs/research/transaction-semantics-2/MATRIX.md": "a590fdaa195a00c8ed7f7228bcd690cd1bdc96d400d02a2fced53be9553ef747",
+    "docs/research/transaction-semantics-2/MUTATIONS.md": "a15751402867e59197383d0893e1deea0ec811b3c155d54bd155a2efac2fb292",
+    "docs/research/transaction-semantics-2/PREDICTIONS.md": "81c47d4a7f28eacce31a0f814fa5b2c5edf6663350178d444809dd4a60212180"
+  }
+}

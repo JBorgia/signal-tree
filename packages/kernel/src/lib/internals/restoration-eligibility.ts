@@ -45,7 +45,9 @@ export type DesignatedWriteMeta = WriteMetadata & {
 
 /** @internal Read the designation off a delivered metadata object. */
 export function isMetaDesignated(meta: WriteMetadata | undefined): boolean {
-  return (meta as DesignatedWriteMeta | undefined)?.restorationDesignated === true;
+  return (
+    (meta as DesignatedWriteMeta | undefined)?.restorationDesignated === true
+  );
 }
 
 /** @internal Stamp the ambient designation onto a metadata object. */
@@ -111,7 +113,10 @@ export function withRestorationDesignation<R>(fn: () => R): R {
   // (`isTraversableNode()`) is wrong here — a Promise is not a traversable
   // node. Optional chaining covers null/undefined, and dropping the clause also
   // catches a thenable function, which the narrower form missed.
-  if (typeof (result as { then?: unknown } | null | undefined)?.then === 'function') {
+  if (
+    typeof (result as { then?: unknown } | null | undefined)?.then ===
+    'function'
+  ) {
     throw new Error(
       'ST1033: a restoration designation scope must be synchronous. The ' +
         'designation is restored before the scope returns, so writes after an ' +
@@ -122,4 +127,18 @@ export function withRestorationDesignation<R>(fn: () => R): R {
   }
 
   return result;
+}
+
+/** @internal Restore an enqueue-time designation, including explicit absence. */
+export function withCapturedRestorationDesignation<R>(
+  value: boolean,
+  fn: () => R
+): R {
+  const previous = designated;
+  designated = value;
+  try {
+    return fn();
+  } finally {
+    designated = previous;
+  }
 }

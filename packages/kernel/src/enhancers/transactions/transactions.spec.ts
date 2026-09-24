@@ -307,7 +307,10 @@ describe('transactions enhancer', () => {
       expect(store.__transactions.getConfirmedTurnCount()).toBe(
         baselineConfirmed
       );
-      expect(store.__transactions.getPendingTurnCount()).toBe(baselinePending);
+      // Refused compensation preserves the same pending settlement authority.
+      expect(store.__transactions.getPendingTurnCount()).toBe(
+        baselinePending + 1
+      );
     }
 
     validateEffects.mockRestore();

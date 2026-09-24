@@ -15,7 +15,7 @@ const expectedFiles = new Map([
   ],
   [
     'scripts/ci-publish.sh',
-    '#!/usr/bin/env bash\nset -euo pipefail\ncd "$(dirname "$0")/.."\nexec node scripts/publish-candidate.mjs --ci --prebuilt "$@"\n',
+    '#!/usr/bin/env bash\nset -euo pipefail\ncd "$(dirname "$0")/.."\nexec node scripts/publish-candidate.mjs --ci "$@"\n',
   ],
 ]);
 const expectedScripts = {
@@ -33,6 +33,7 @@ const expectedScripts = {
 const violations = [];
 
 for (const script of [
+  'scripts/check-publish-candidate.mjs',
   'scripts/release-plan.mjs',
   'scripts/release-version.mjs',
   'scripts/finalize-changelog.mjs',
@@ -79,6 +80,11 @@ if (!workflow.includes("if: github.repository == 'JBorgia/signal-tree'")) {
 if (!workflow.includes('NPM_TOKEN: ${{ secrets.NPM_TOKEN }}')) {
   violations.push('.github/workflows/publish.yml#npm-token-fallback');
 }
+if (
+  !workflow.includes('RELEASE_TAG: ${{ steps.release_tag.outputs.tag_name }}')
+) {
+  violations.push('.github/workflows/publish.yml#explicit-release-tag');
+}
 const workflowPublishCommands = workflow
   .split('\n')
   .map((line) => line.trim())
@@ -87,10 +93,37 @@ const workflowPublishCommands = workflow
   );
 if (
   workflowPublishCommands.length !== 1 ||
-  workflowPublishCommands[0] !==
-    'run: node scripts/publish-candidate.mjs --ci --prebuilt'
+  workflowPublishCommands[0] !== 'run: node scripts/publish-candidate.mjs --ci'
 ) {
   violations.push('.github/workflows/publish.yml');
+}
+
+// Release-only gates must be selected for mutation execution too. Keep this
+// command explicit: no --fast/--only selector may silently narrow the matrix.
+const hasReleaseMutations = (text) =>
+  text
+    .split('\n')
+    .some(
+      (line) =>
+        line.trim() === 'run: node tools/verify-gates.mjs --self-test --release'
+    );
+const mutationControl =
+  '  run: node tools/verify-gates.mjs --self-test --release';
+if (
+  !hasReleaseMutations(mutationControl) ||
+  hasReleaseMutations(mutationControl.replace(' --release', '')) ||
+  hasReleaseMutations(mutationControl + ' --fast') ||
+  hasReleaseMutations(mutationControl + ' --only=version-claims') ||
+  hasReleaseMutations('# ' + mutationControl.trim())
+) {
+  throw new Error('Release mutation coverage detector self-test failed');
+}
+for (const file of [
+  '.github/workflows/release.yml',
+  '.github/workflows/publish.yml',
+]) {
+  if (!hasReleaseMutations(readFileSync(file, 'utf8')))
+    violations.push(`${file}#release-mutation-coverage`);
 }
 
 const releaseWorkflow = readFileSync('.github/workflows/release.yml', 'utf8');

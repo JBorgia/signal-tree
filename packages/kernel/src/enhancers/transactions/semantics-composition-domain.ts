@@ -1,0 +1,84 @@
+/** Test-only semantic jobs, not a new production API or dependency policy. */
+export type CompositionMode = 'direct' | 'batch' | 'coalesce';
+export type CompositionJobs = {
+  group(mode: CompositionMode, operation: () => void): void;
+  external(operation: () => void): void;
+  undoable(operation: () => void): void;
+  undo(): void;
+  readEntityState(): unknown;
+  outbound(
+    key: 'x' | 'y',
+    receive: (value: number) => void
+  ): {
+    settled(): Promise<void>;
+    dispose(): void;
+  };
+  /** Recognize only an actual native composition refusal, never arbitrary errors. */
+  isCompositionRefusal(error: unknown): boolean;
+};
+export const COMBINATIONS = [
+  {
+    id: 'C1-transactions',
+    entity: false,
+    link: false,
+    batching: false,
+    restoration: false,
+  },
+  {
+    id: 'C2-transactions-entityMap',
+    entity: true,
+    link: false,
+    batching: false,
+    restoration: false,
+  },
+  {
+    id: 'C3-transactions-link',
+    entity: false,
+    link: true,
+    batching: false,
+    restoration: false,
+  },
+  {
+    id: 'C4-transactions-batching',
+    entity: false,
+    link: false,
+    batching: true,
+    restoration: false,
+  },
+  {
+    id: 'C5-transactions-restoration',
+    entity: false,
+    link: false,
+    batching: false,
+    restoration: true,
+  },
+  {
+    id: 'C6-transactions-entityMap-link',
+    entity: true,
+    link: true,
+    batching: false,
+    restoration: false,
+  },
+  {
+    id: 'C7-transactions-batching-external',
+    entity: false,
+    link: false,
+    batching: true,
+    restoration: false,
+  },
+  {
+    id: 'C8-transactions-restoration-link',
+    entity: false,
+    link: true,
+    batching: false,
+    restoration: true,
+  },
+  {
+    id: 'C9-transactions-entityMap-link-batching',
+    entity: true,
+    link: true,
+    batching: true,
+    restoration: false,
+  },
+] as const;
+export type Combination = (typeof COMBINATIONS)[number];

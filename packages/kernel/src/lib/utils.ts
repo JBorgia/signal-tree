@@ -1,3 +1,4 @@
+import type { SnapshotValue } from './internals/construction-accessor';
 // TYPE-ONLY: this transitional package still names Angular's types publicly;
 // the split rebinds them per package. No Angular VALUE remains in kernel utils.
 import type { ReadableCell } from './internals/cell-runtime';
@@ -272,8 +273,10 @@ export function stampDerived<T>(sig: T): T {
  * Unwraps a signal or signal tree into a plain JS value shaped as T.
  * NOTE: Runtime strips the dynamic set/update helpers; call sites receive T.
  */
-export function unwrap<T>(node: TreeNode<T>): T;
-export function unwrap<T>(node: NodeAccessor<T> & TreeNode<T>): T;
+export function unwrap<T>(node: TreeNode<T>): SnapshotValue<T>;
+export function unwrap<T>(
+  node: NodeAccessor<T> & TreeNode<T>
+): SnapshotValue<T>;
 export function unwrap<T>(node: NodeAccessor<T>): T;
 export function unwrap<T>(node: unknown): T;
 export function unwrap<T>(node: unknown): T {
@@ -313,16 +316,9 @@ export function unwrap<T>(node: unknown): T {
       : buildFromStore<T>(target);
   }
   if (isReactiveStateValue(node)) {
-    const value = (node as ReadableCell<unknown>)();
-    if (
-      typeof value === 'object' &&
-      value !== null &&
-      !Array.isArray(value) &&
-      !isBuiltInObject(value)
-    ) {
-      return unwrap(value) as T;
-    }
-    return value as T;
+    // A terminal's value is opaque state, not another tree store. In particular,
+    // callable data, marker definitions and cycles inside it must remain data.
+    return (node as ReadableCell<T>)();
   }
 
   if (typeof node !== 'object') {
@@ -444,22 +440,9 @@ function buildFromStore<T>(node: object): T {
       // destroyed the structural sharing the memo exists to produce: every
       // parent read minted a fresh copy of every child, so NO subtree was ever
       // reference-stable and a one-leaf write still cost O(state) downstream.
-      // (The identical-looking recursion in the `isSignal` branch below IS
-      // load-bearing: a leaf's VALUE is user data, and copying it is what keeps
-      // a snapshot from aliasing live state.)
       result[key] = value();
     } else if (isReactiveStateValue(value)) {
-      const unwrappedValue = (value as ReadableCell<unknown>)();
-      if (
-        typeof unwrappedValue === 'object' &&
-        unwrappedValue !== null &&
-        !Array.isArray(unwrappedValue) &&
-        !isBuiltInObject(unwrappedValue)
-      ) {
-        result[key] = unwrap(unwrappedValue);
-      } else {
-        result[key] = unwrappedValue;
-      }
+      result[key] = (value as ReadableCell<unknown>)();
     } else if (
       typeof value === 'object' &&
       value !== null &&
@@ -533,22 +516,11 @@ function buildFromStore<T>(node: object): T {
       // destroyed the structural sharing the memo exists to produce: every
       // parent read minted a fresh copy of every child, so NO subtree was ever
       // reference-stable and a one-leaf write still cost O(state) downstream.
-      // (The identical-looking recursion in the `isSignal` branch below IS
-      // load-bearing: a leaf's VALUE is user data, and copying it is what keeps
-      // a snapshot from aliasing live state.)
       (result as Record<symbol, unknown>)[sym] = value();
     } else if (isReactiveStateValue(value)) {
-      const unwrappedValue = (value as ReadableCell<unknown>)();
-      if (
-        typeof unwrappedValue === 'object' &&
-        unwrappedValue !== null &&
-        !Array.isArray(unwrappedValue) &&
-        !isBuiltInObject(unwrappedValue)
-      ) {
-        (result as Record<symbol, unknown>)[sym] = unwrap(unwrappedValue);
-      } else {
-        (result as Record<symbol, unknown>)[sym] = unwrappedValue;
-      }
+      (result as Record<symbol, unknown>)[sym] = (
+        value as ReadableCell<unknown>
+      )();
     } else if (
       typeof value === 'object' &&
       value !== null &&
@@ -567,14 +539,14 @@ function buildFromStore<T>(node: object): T {
 /**
  * Snapshot the current tree state into a plain JS object by unwrapping signals.
  */
-export function snapshotState<T>(state: TreeNode<T>): T {
+export function snapshotState<T>(state: TreeNode<T>): SnapshotValue<T> {
   // Routed through the memo, not bare `unwrap`. Every snapshot consumer —
   // restoration, devtools, serialisation — was rebuilding the entire tree on
   // every call while `tree.$()` next door returned a memoised result, because
   // this took the raw store and `unwrap`'s uncached path.
   return state !== null && typeof state === 'object'
-    ? materializeNode<T>(state as unknown as object)
-    : (unwrap(state as unknown) as T);
+    ? materializeNode<SnapshotValue<T>>(state as unknown as object)
+    : unwrap<SnapshotValue<T>>(state as unknown);
   // materializeNode falls back to a plain walk for anything that is not a
   // registered tree store or a node accessor — see isMemoisable().
 }
@@ -583,7 +555,10 @@ export function snapshotState<T>(state: TreeNode<T>): T {
  * Apply a plain JS snapshot onto a TreeNode (state.$) by writing into signals or node accessors.
  * This is a shallow/apply operation suitable for devtools/restoration use-cases.
  */
-export function applyState<T>(stateNode: TreeNode<T>, snapshot: T): void {
+export function applyState<T>(
+  stateNode: TreeNode<T>,
+  snapshot: SnapshotValue<NoInfer<T>>
+): void {
   if (snapshot === null || snapshot === undefined) return;
   if (typeof snapshot !== 'object') return;
 

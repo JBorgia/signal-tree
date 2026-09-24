@@ -1,0 +1,13 @@
+{
+  "frozenAt": "2026-09-24T01:14:26.741534+00:00",
+  "execution": "No baseline/current structural run has occurred. The native structural adapter has not yet been implemented.",
+  "sources": {
+    "packages/kernel/src/enhancers/transactions/semantics-structural.ts": "869135130d91db92b6ee1665f365e260547beac4dabf182ce9993b32fb212f09",
+    "packages/kernel/src/enhancers/transactions/semantics-structural-domain.ts": "1dd36d92b6658230b7331a4be3fd73f3a5c1b04ea2bc064fcec4e4dd4af381c8",
+    "docs/research/transaction-semantics-2/LAWS.md": "5bfd86511723e6b23b72603ebabe35d3df1557586c3b86e0508117c60666d79b",
+    "docs/research/transaction-semantics-2/MATRIX.md": "a590fdaa195a00c8ed7f7228bcd690cd1bdc96d400d02a2fced53be9553ef747",
+    "docs/research/transaction-semantics-2/MUTATIONS.md": "a15751402867e59197383d0893e1deea0ec811b3c155d54bd155a2efac2fb292",
+    "docs/research/transaction-semantics-2/PREDICTIONS.md": "81c47d4a7f28eacce31a0f814fa5b2c5edf6663350178d444809dd4a60212180"
+  },
+  "expectationScope": "MATRIX-derived topology/lifetime/key assertions; dependency refusal safety is distinct from required surgical success. T13 canonical and T14 per-contribution disposition remain unsupported. No frozen law is amended."
+}

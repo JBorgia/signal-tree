@@ -23,6 +23,7 @@ import {
 } from '../../lib/write-participation';
 import { ENHANCER_META, SignalTreeRollbackError } from '../../lib/types';
 import {
+  cancelCommitScopes,
   openCommitScope,
   settleCommitScope,
 } from '../../lib/internals/commit-consequence';
@@ -73,6 +74,7 @@ import {
 } from '../../lib/write-context';
 import { visitTree } from '../../lib/internals/visit-tree';
 import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-port';
+import { getPhysicalCommitClock } from '../../lib/internals/physical-commit-clock';
 import { getLocationRuntime } from '../../lib/internals/location-runtime';
 
 type TurnEffectBase = {
@@ -84,6 +86,8 @@ type TurnEffectBase = {
 export type ScalarSetEffect = TurnEffectBase & {
   kind: 'set';
   subject?: number;
+  /** Producer-known row-relative address; display paths never encode identity. */
+  subjectFieldSegments?: readonly string[];
   before: unknown;
   after: unknown;
   mutationIntent?: 'replace' | 'derive';
@@ -188,6 +192,11 @@ export type TransactionTurnRecord = {
 type TransactionLifecycleListener = (turn: TransactionTurnRecord) => void;
 
 export interface InternalTransactionRuntime {
+  /** @internal Count-only retention probe; no state or writer identities escape. */
+  getInspectionFootprintCountsForTesting(): {
+    writers: number;
+    footprints: number;
+  };
   transaction(fn: () => void): PendingTransaction;
   /** @internal Raw retained records; projected by `/internals`. */
   getConfirmedTurnRecords(): readonly TransactionTurnRecord[];
@@ -259,7 +268,9 @@ const createRollbackError = (
   new SignalTreeRollbackError(explainRollbackFailure(cause), { cause });
 
 function cloneTurnEffect(effect: TurnEffect): TurnEffect {
-  return { ...effect };
+  return effect.kind === 'set' && effect.subjectFieldSegments
+    ? { ...effect, subjectFieldSegments: [...effect.subjectFieldSegments] }
+    : { ...effect };
 }
 
 function combineScalarMutationIntent(
@@ -275,6 +286,25 @@ function combineScalarMutationIntent(
   return undefined;
 }
 
+/** Compare producer-known coordinates before consulting legacy display paths. */
+function scalarRelation(
+  left: ScalarSetEffect,
+  right: ScalarSetEffect
+): 'same' | 'overlap' | 'disjoint' {
+  const a = left.subjectFieldSegments;
+  const b = right.subjectFieldSegments;
+  if (a && b) {
+    const common = Math.min(a.length, b.length);
+    for (let i = 0; i < common; i++) if (a[i] !== b[i]) return 'disjoint';
+    return a.length === b.length ? 'same' : 'overlap';
+  }
+  if (left.path === right.path) return 'same';
+  return left.path.startsWith(`${right.path}.`) ||
+    right.path.startsWith(`${left.path}.`)
+    ? 'overlap'
+    : 'disjoint';
+}
+
 function buildPendingRollbackPlan(
   pendingTurn: TransactionTurnRecord | undefined,
   laterEffects: LaterAppliedEffect[]
@@ -285,7 +315,11 @@ function buildPendingRollbackPlan(
 
   const pendingEffects = pendingTurn.__effects ?? [];
   const makeScalarKey = (effect: ScalarSetEffect): string =>
-    `${effect.position}\u0000${effect.path}\u0000${effect.subject ?? ''}`;
+    JSON.stringify([
+      effect.position,
+      effect.subject,
+      effect.subjectFieldSegments ?? effect.path,
+    ]);
   const supersededScalarKeys = new Set(
     laterEffects
       .map(({ effect }) => effect)
@@ -316,7 +350,11 @@ function buildPendingRollbackPlan(
       ) {
         continue;
       }
-      if (laterEffect.path === effect.path) {
+      if (
+        laterEffect.kind === 'set'
+          ? scalarRelation(effect, laterEffect) === 'same'
+          : laterEffect.path === effect.path
+      ) {
         if (laterEffect.kind !== 'set') {
           return {
             kind: 'conflict',
@@ -337,8 +375,10 @@ function buildPendingRollbackPlan(
         };
       }
       if (
-        laterEffect.path.startsWith(`${effect.path}.`) ||
-        effect.path.startsWith(`${laterEffect.path}.`)
+        laterEffect.kind === 'set'
+          ? scalarRelation(effect, laterEffect) === 'overlap'
+          : laterEffect.path.startsWith(`${effect.path}.`) ||
+            effect.path.startsWith(`${laterEffect.path}.`)
       ) {
         return {
           kind: 'conflict',
@@ -526,6 +566,7 @@ class TransactionAuthority {
   private confirmedTurns: TransactionTurnRecord[] = [];
   private pendingTurns = new Map<number, TransactionTurnRecord>();
   private nextTurnId = 1;
+  private queuedEvidence = new Map<number, Map<string, TurnEffect>>();
 
   /**
    * TX-LEDGER C3 — later effects that are NOT authored turns.
@@ -666,6 +707,7 @@ class TransactionAuthority {
     }
     this.pendingTurns.delete(turnId);
     this.pendingOpenedAtSeq.delete(turnId);
+    this.queuedEvidence.delete(turnId);
     // SETTLED. Confirmation discards rollback state rather than becoming
     // permanent history — those are different product concepts. A tree that
     // also has `restoration()` has already claimed these subjects through its
@@ -684,6 +726,7 @@ class TransactionAuthority {
     }
     this.pendingTurns.delete(turnId);
     this.pendingOpenedAtSeq.delete(turnId);
+    this.queuedEvidence.delete(turnId);
     this.releasePendingClaims(turnId);
     this.releaseLedgerIfQuiet();
     return cloneTurnRecord(turn);
@@ -693,47 +736,67 @@ class TransactionAuthority {
     return this.confirmedTurns.some((turn) => turn.id > turnId);
   }
 
-  /**
-   * PROPOSAL-INSPECTION-0. Raw material only: the pending turn's own effects
-   * and the later effects admitted against it, with NO classification.
-   *
-   * Exposed because the classifier is not proven yet and must not be invented
-   * in production first. A rollback plan answers "what can I safely
-   * compensate?"; a review answers "which parts of what I proposed are still
-   * represented in current truth?". Those questions overlap but are not the
-   * same — a later UPDATE of a proposed row makes the rollback REFUSE while
-   * leaving the proposal's structural contribution entirely current — so the
-   * plan cannot be reused as the answer. This returns the inputs both
-   * questions share and commits to neither.
-   *
-   * Reading only. No retained fact is added: both collections already exist
-   * for the rollback path's own use.
-   *
-   * @internal
-   */
-  describePendingTurn(
-    turnId: number
-  ):
-    | { effects: readonly TurnEffect[]; laterEffects: readonly TurnEffect[] }
-    | undefined {
-    const turn = this.pendingTurns.get(turnId);
-    if (!turn) {
-      return undefined;
+  observeQueuedEffects(turnId: number, queued: readonly TurnEffect[]): void {
+    if (!this.pendingTurns.has(turnId)) return;
+    // Evidence read before delivery belongs to THIS pending turn. Do not put
+    // it in the global sequence ledger: that would make retries duplicate it
+    // or incorrectly classify it as later than a subsequently opened turn.
+    let retained = this.queuedEvidence.get(turnId);
+    if (!retained && queued.length) {
+      retained = new Map();
+      this.queuedEvidence.set(turnId, retained);
     }
-    const authoredLater = this.confirmedTurns
-      .filter((t) => t.id > turnId)
-      .flatMap((t) => t.__effects ?? []);
-    const openedAt = this.pendingOpenedAtSeq.get(turnId) ?? 0;
-    const observedLater = this.dependencyLedger
-      .filter((entry) => entry.seq > openedAt)
-      .map((entry) => entry.effect);
-    return {
-      effects: (turn.__effects ?? []).map(cloneTurnEffect),
-      laterEffects: [...authoredLater, ...observedLater].map(cloneTurnEffect),
-    };
+    for (const effect of queued) {
+      retained?.set(
+        JSON.stringify([
+          effect.kind,
+          effect.position,
+          effect.subject ?? null,
+          effect.kind === 'set'
+            ? effect.subjectFieldSegments ?? effect.path
+            : effect.path,
+        ]),
+        effect
+      );
+    }
   }
 
-  getPendingRollbackPlan(turnId: number): PendingRollbackPlan {
+  getPendingRollbackPlan(
+    turnId: number,
+    queued: readonly TurnEffect[] = []
+  ): PendingRollbackPlan {
+    this.observeQueuedEffects(turnId, queued);
+    const pending = this.pendingTurns.get(turnId);
+    const retained = this.queuedEvidence.get(turnId);
+    // A later pending replacement is not settled authority. Reversing its
+    // baseline would make its own later rollback resurrect rejected state.
+    for (const later of this.pendingTurns.values()) {
+      if (later.id <= turnId) continue;
+      for (const effect of pending?.__effects ?? []) {
+        const overlap = later.__effects?.find(
+          (candidate) =>
+            candidate.position === effect.position &&
+            (candidate.subject === undefined ||
+              effect.subject === undefined ||
+              candidate.subject === effect.subject) &&
+            (candidate.kind === 'set' && effect.kind === 'set'
+              ? scalarRelation(candidate, effect) !== 'disjoint'
+              : candidate.path === effect.path ||
+                candidate.path.startsWith(`${effect.path}.`) ||
+                effect.path.startsWith(`${candidate.path}.`))
+        );
+        if (overlap)
+          return {
+            conflict: {
+              kind: 'later-confirmed-dependency',
+              pendingTurnId: turnId,
+              pendingEffect: effect,
+              conflictingTurnId: later.id,
+              conflictingEffect: overlap,
+            },
+          };
+      }
+    }
     const authoredLater = this.confirmedTurns
       .filter((turn) => turn.id > turnId)
       .flatMap((turn) =>
@@ -753,11 +816,24 @@ class TransactionAuthority {
     return buildPendingRollbackPlan(this.pendingTurns.get(turnId), [
       ...authoredLater,
       ...observedLater,
+      ...[...(retained?.values() ?? [])].map((effect) => ({ turnId, effect })),
     ]);
+  }
+
+  releaseConfirmedTurnsOnDestroy(): void {
+    // Drop authority ownership without mutating records or arrays already
+    // returned to callers. Live history retention remains unchanged.
+    this.confirmedTurns = [];
   }
 
   getConfirmedTurnCount(): number {
     return this.confirmedTurns.length;
+  }
+
+  getPendingTurn(
+    turnId: number | undefined
+  ): TransactionTurnRecord | undefined {
+    return turnId === undefined ? undefined : this.pendingTurns.get(turnId);
   }
 
   getPendingTurnCount(): number {
@@ -879,15 +955,37 @@ export function getOrCreateInternalTransactionRuntime<T>(
   );
   const transactionOwnerToken = {};
   let nextTransactionId = 1;
+  let destroyed = false;
   const isRestoring = false;
   let selfDirty = false;
   let unsubscribeFlush: (() => void) | null = null;
   let unsubscribeNotifications: (() => void) | null = null;
+  let unsubscribeEnqueue: (() => void) | null = null;
   let unsubscribeReset: (() => void) | null = null;
   let unsubscribeCollectionOrders: (() => void) | null = null;
   let restoreLeafInterceptors: (() => void) | null = null;
   const pendingCapture = createCaptureBucket();
   const pendingTransactions = new Map<number, CaptureBucket>();
+  // External writes can arrive while the callback is still collecting, before
+  // it has a turn id. Keep that evidence under the transaction id until admission.
+  const callbackExternalEffects = new Map<number, TurnEffect[]>();
+  // Inspection owns local mutation chronology, not conservative rollback evidence.
+  // Keep only the latest footprint per location/writer while a proposal is open.
+  type InspectionWrite = { seq: number; effect: TurnEffect };
+  let inspectionSeq = 0;
+  let inspectionUnavailable = false;
+  const inspectionWrites = new Map<
+    number | undefined,
+    Map<string, InspectionWrite>
+  >();
+  const inspectionTransactionByTurn = new Map<number, number>();
+  const releaseInspectionIfQuiet = (): void => {
+    if (authority.getPendingTurnCount() || pendingTransactions.size) return;
+    inspectionWrites.clear();
+    inspectionTransactionByTurn.clear();
+    inspectionSeq = 0;
+    inspectionUnavailable = false;
+  };
   const pendingOrderDeltas = new Map<number, CollectionOrderDelta[]>();
   const pendingCreatedListeners = new Set<TransactionLifecycleListener>();
   const pendingConfirmedListeners = new Set<TransactionLifecycleListener>();
@@ -1009,9 +1107,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
   const effectKey = (effect: TurnEffect): string => {
     switch (effect.kind) {
       case 'set':
-        return `${effect.kind}\u0000${effect.path}\u0000${
-          effect.position
-        }\u0000${effect.subject ?? ''}`;
+        return JSON.stringify([
+          effect.kind,
+          effect.position,
+          effect.subject,
+          effect.subjectFieldSegments ?? effect.path,
+        ]);
       // RESTORE-P0 P0-B: keyed by SUBJECT, deliberately without `kind`, so the
       // transaction's effects on one subject collide and can be composed into
       // the NET effect. With `kind` in the key, `rekey('a','a2')` and
@@ -1165,6 +1266,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           ownerPath: ownerPath ?? path,
           position,
           subject,
+          subjectFieldSegments: subject === undefined ? undefined : [key],
           before,
           after,
           mutationIntent: meta?.mutationIntent,
@@ -1188,6 +1290,53 @@ export function getOrCreateInternalTransactionRuntime<T>(
       after: next,
       mutationIntent: meta?.mutationIntent,
     });
+  };
+
+  const inspectPendingTurn = (turnId: number) => {
+    if (inspectionUnavailable)
+      throw new Error(
+        'SignalTree: proposal inspection unavailable because mutation chronology capture failed.'
+      );
+    const turn = authority.getPendingTurn(turnId);
+    if (!turn) return undefined;
+    const effects = turn.__effects ?? [];
+    const transactionId = inspectionTransactionByTurn.get(turnId);
+    const own = inspectionWrites.get(transactionId);
+    const later = new Set<InspectionWrite>();
+    for (const effect of effects) {
+      const authored = own?.get(effectKey(effect));
+      if (!authored) {
+        inspectionUnavailable = true;
+        throw new Error(
+          'SignalTree: proposal inspection unavailable because an authored contribution has no mutation chronology.'
+        );
+      }
+      for (const [writer, writes] of inspectionWrites) {
+        if (writer === transactionId) continue;
+        for (const candidate of writes.values()) {
+          if (candidate.seq <= authored.seq) continue;
+          const other = candidate.effect;
+          if (
+            other.position !== effect.position ||
+            other.subject !== effect.subject
+          )
+            continue;
+          if (effect.kind === 'set') {
+            if (
+              other.kind === 'remove' ||
+              (other.kind === 'set' && scalarRelation(other, effect) === 'same')
+            )
+              later.add(candidate);
+          } else if (other.kind !== 'set') later.add(candidate);
+        }
+      }
+    }
+    return {
+      effects,
+      laterEffects: [...later]
+        .sort((a, b) => a.seq - b.seq)
+        .map(({ effect }) => cloneTurnEffect(effect)),
+    };
   };
 
   const resolveOwnerPositionId = (ownerPath?: string): number | undefined => {
@@ -1323,6 +1472,21 @@ export function getOrCreateInternalTransactionRuntime<T>(
       effects.length > 0 ? effects : undefined,
       baselineValues.size > 0 ? baselineValues : undefined
     );
+    const externalEffects = callbackExternalEffects.get(transactionId) ?? [];
+    callbackExternalEffects.delete(transactionId);
+    if (pending && externalEffects.length) {
+      // The callback can author again after an ingress. Until that mixed
+      // ownership can be separated, refuse overlap rather than declaring its
+      // final speculative value settled because an earlier ingress replaced it.
+      authority.observeQueuedEffects(
+        pending.id,
+        externalEffects.map((effect) =>
+          effect.kind === 'set'
+            ? { ...effect, mutationIntent: 'derive' }
+            : effect
+        )
+      );
+    }
     if (pending && collectionOrders.length > 0) {
       pendingOrderDeltas.set(
         pending.id,
@@ -1340,35 +1504,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
     return pending;
   };
 
-  const drainTransactionRollbackInput = (
-    transactionId: number
-  ): {
-    effects: TurnEffect[];
-    baselineValues: Map<number, unknown>;
-    orderDeltas: CollectionOrderDelta[];
-  } => {
-    const bucket = pendingTransactions.get(transactionId);
-    pendingTransactions.delete(transactionId);
-    if (!bucket) {
-      return { effects: [], baselineValues: new Map(), orderDeltas: [] };
-    }
-    const { effects, baselineValues, collectionOrders } =
-      drainCaptureBucket(bucket);
-    return {
-      effects,
-      baselineValues,
-      orderDeltas: collectionOrders.map((order) =>
-        deriveCollectionOrderDelta(
-          order.owner,
-          order.beforeSubjects,
-          order.afterSubjects,
-          order.beforeFrontier,
-          order.afterFrontier
-        )
-      ),
-    };
-  };
-
   const toCausalEffect = (effect: TurnEffect): CausalEffect => {
     switch (effect.kind) {
       case 'set':
@@ -1377,6 +1512,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           before: effect.before,
           after: effect.after,
           subjectId: effect.subject,
+          subjectFieldSegments: effect.subjectFieldSegments,
           path: effect.path,
           ownerPath: effect.ownerPath,
         };
@@ -1563,14 +1699,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
       return;
     }
 
-    if (
-      orderDeltas.length > 0 ||
-      requiresDeclarativeStructuralTarget(effects.map(toRollbackEffect))
-    ) {
-      rollbackPendingTarget(effects, orderDeltas);
-      return;
-    }
-
     const positionRegistry = getPositionRegistry(tree.$);
     const authorityPosition = getOwnedPositionIds(tree.$)?.[0] as
       | CausalPositionId
@@ -1623,15 +1751,38 @@ export function getOrCreateInternalTransactionRuntime<T>(
         // that spreads `getActiveWriteContext()` carries the namespace.
         ownerId: positionRegistry?.id,
       },
-      () =>
-        rollbackPendingTurnAt({
+      () => {
+        if (
+          orderDeltas.length > 0 ||
+          requiresDeclarativeStructuralTarget(
+            effects.map(toRollbackEffect),
+            (owner) => {
+              let binding: CollectionTransitionTargetBinding | undefined;
+              visitTree(tree.$, (node) => {
+                const candidate = (
+                  node as {
+                    __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+                  }
+                ).__prepareTransitionTarget;
+                if (candidate?.owner === owner) binding = candidate;
+                return undefined;
+              });
+              return binding?.readSource();
+            }
+          )
+        ) {
+          rollbackPendingTarget(effects, orderDeltas);
+          return { ok: true as const };
+        }
+        return rollbackPendingTurnAt({
           authority: authorityPosition,
           turnId: transactionId,
           store,
           topology: positionRegistry,
           port: realizationPort,
           realizationContext,
-        })
+        });
+      }
     );
     if (!result.ok) {
       throw createRollbackError({
@@ -1682,6 +1833,68 @@ export function getOrCreateInternalTransactionRuntime<T>(
     const notifier = getPathNotifier();
     if (notifier) {
       const treeOwnerId = getPositionRegistry(tree.$)?.id;
+      if (treeOwnerId !== undefined) {
+        unsubscribeEnqueue = notifier.observeEnqueue(treeOwnerId, (entry) => {
+          if (
+            destroyed ||
+            (!authority.getPendingTurnCount() && !pendingTransactions.size)
+          )
+            return;
+          const meta = entry.meta;
+          if (
+            meta?.origin === 'restoration' ||
+            meta?.origin === 'transaction-rollback' ||
+            isInspectionWrite(meta)
+          )
+            return;
+          const realized = getWriteParticipation(meta) === 'realized';
+          if (
+            !realized &&
+            typeof meta?.transactionId === 'number' &&
+            meta.transactionOwner !== transactionOwnerToken
+          )
+            return;
+          const writer =
+            !realized && meta?.transactionOwner === transactionOwnerToken
+              ? meta.transactionId
+              : undefined;
+          try {
+            const probe = createCaptureBucket();
+            captureEffects(
+              probe,
+              probe.effects,
+              entry.path,
+              entry.newValue,
+              entry.oldValue,
+              meta,
+              entry.ownerPath,
+              entry.subjectIds,
+              entry.positionIds
+            );
+            const effects = drainCaptureBucket(probe).effects;
+            if (!effects.length) return;
+            const seq = ++inspectionSeq;
+            let writes = inspectionWrites.get(writer);
+            if (!writes) inspectionWrites.set(writer, (writes = new Map()));
+            for (const effect of effects) {
+              // No value snapshots or row references belong in inspection evidence.
+              const footprint: TurnEffect =
+                effect.kind === 'set'
+                  ? { ...effect, before: undefined, after: undefined }
+                  : effect.kind === 'rekey'
+                  ? { ...effect }
+                  : { ...effect, value: undefined };
+              writes.set(effectKey(effect), { seq, effect: footprint });
+            }
+          } catch (error) {
+            // The write already happened; never report a confident status after
+            // losing its chronology. The notifier isolates and reports the error.
+            inspectionUnavailable = true;
+            throw error;
+          }
+        });
+      }
+
       const subscribeCollectionNotifications = (): void => {
         unsubscribeNotifications?.();
         unsubscribeNotifications = notifier.subscribe(
@@ -1696,7 +1909,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             positionIds,
             meta
           ) => {
-            if (origin === 'restoration') {
+            if (origin === 'restoration' || origin === 'transaction-rollback') {
               return;
             }
             // NOTIFIER-SCOPE-0. The notifier is PROCESS-GLOBAL and this
@@ -1738,7 +1951,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
               //
               // Skipped entirely when nothing is pending, so a tree with no open
               // transaction pays nothing for this.
-              if (authority.getPendingTurnCount() > 0) {
+              if (
+                authority.getPendingTurnCount() > 0 ||
+                pendingTransactions.size > 0
+              ) {
                 const probe = createCaptureBucket();
                 captureIntoBucket(
                   probe,
@@ -1750,9 +1966,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
                   subjectIds,
                   positionIds
                 );
-                authority.observeLaterEffects(
-                  drainCaptureBucket(probe).effects
-                );
+                const effects = drainCaptureBucket(probe).effects;
+                authority.observeLaterEffects(effects);
+                for (const id of pendingTransactions.keys()) {
+                  const prior = callbackExternalEffects.get(id) ?? [];
+                  callbackExternalEffects.set(id, [...prior, ...effects]);
+                }
               }
               return;
             }
@@ -1881,8 +2100,74 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // fall through without capture support
   }
 
+  const readQueuedLaterEffects = (): TurnEffect[] => {
+    const ownerId = getPositionRegistry(tree.$)?.id;
+    return (getPathNotifier()?.readPending() ?? []).flatMap<TurnEffect>(
+      (entry) => {
+        const meta = entry.meta;
+        if (
+          (entry.ownerId ?? meta?.ownerId) !== ownerId ||
+          meta?.origin === 'restoration' ||
+          meta?.origin === 'transaction-rollback' ||
+          isInspectionWrite(meta) ||
+          (getWriteParticipation(meta) !== 'realized' &&
+            meta?.transactionOwner === transactionOwnerToken &&
+            typeof meta.transactionId === 'number')
+        )
+          return [];
+        const position = entry.positionIds?.[0];
+        if (position === undefined) return [];
+        const structural = entry.ownerPath
+          ? buildTurnEffectFromStructural(
+              meta,
+              entry.ownerPath,
+              entry.path,
+              entry.positionIds,
+              entry.subjectIds
+            )
+          : undefined;
+        if (structural) return [structural];
+        if (
+          entry.subjectFieldKeys !== undefined &&
+          entry.subjectIds?.length === 1
+        ) {
+          const before = entry.oldValue as Record<string, unknown>;
+          const after = entry.newValue as Record<string, unknown>;
+          // The notifier preserves the producer's literal field footprint even
+          // when coalescing returns to the original value (ABA).
+          return entry.subjectFieldKeys.map((key) => ({
+            kind: 'set' as const,
+            position,
+            path: `${entry.path}.${key}`,
+            ownerPath: entry.ownerPath ?? entry.path,
+            subject: entry.subjectIds?.[0],
+            subjectFieldSegments: [key],
+            before: before[key],
+            after: after[key],
+            mutationIntent: 'derive' as const,
+          }));
+        }
+        // A queued row may have returned to the same object/value. Its path and
+        // identity still witness a write; equality cannot grant rollback rights.
+        return [
+          {
+            kind: 'set' as const,
+            position,
+            path: entry.path,
+            ownerPath: entry.ownerPath ?? entry.path,
+            subject: entry.subjectIds?.[0],
+            before: entry.oldValue,
+            after: entry.newValue,
+            mutationIntent: 'derive' as const,
+          },
+        ];
+      }
+    );
+  };
+
   const runtime: InternalTransactionRuntime = {
     transaction(fn: () => void): PendingTransaction {
+      if (destroyed) throw new Error('Cannot transact on a destroyed tree');
       const activeMeta = getActiveWriteContext();
       const notifier = getPathNotifier();
       const captureRuntime = getMutationCaptureRuntime(tree);
@@ -1890,6 +2175,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
         throw new Error('Nested transaction is not supported');
       }
 
+      // The existing construction flush must not erase net-equal queued
+      // evidence for older pending turns while allocating this new turn.
+      const beforeOpen = readQueuedLaterEffects();
+      for (const id of authority.getPendingTurnIds()) {
+        authority.observeQueuedEffects(id, beforeOpen);
+      }
       notifier?.flushSync();
       const transactionId = nextTransactionId++;
       const descriptorOwnersBefore = new Set(realizationDescriptors.keys());
@@ -1911,8 +2202,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
 
       const releaseCapture = captureRuntime?.activateCapture();
       let primaryError: unknown;
+      let primaryFailed = false;
       let cleanupError: unknown;
-
+      let cleanupFailed = false;
       const executeTransaction = (): void => {
         try {
           withWriteContext(
@@ -1924,119 +2216,81 @@ export function getOrCreateInternalTransactionRuntime<T>(
             fn
           );
         } catch (error) {
+          primaryFailed = true;
           primaryError = error;
-          notifier?.flushSync();
-          const { effects, baselineValues, orderDeltas } =
-            drainTransactionRollbackInput(transactionId);
-          const rollbackSubjectIds = effects
-            .map((effect) => effect.subject)
-            .filter(
-              (subjectId): subjectId is number => subjectId !== undefined
-            );
-          // Starts true: "nothing to reverse" is a rollback that succeeded
-          // trivially, NOT a refusal. Only the port throwing means nothing was
-          // compensated.
-          let compensated = true;
-          try {
-            if (effects.length > 0 || orderDeltas.length > 0) {
-              try {
-                rollbackPendingEffectsThroughRealizationPort(
-                  transactionId,
-                  effects,
-                  baselineValues,
-                  orderDeltas,
-                  error
-                );
-              } catch (refusal) {
-                compensated = false;
-                throw refusal;
-              }
-            }
-          } finally {
-            try {
-              // Settle AFTER compensation, but UNCONDITIONALLY. Late, so consumers
-              // released by this scope observe the RESTORED state rather than the
-              // doomed one. In a `finally`, because compensation is fallible — it
-              // throws SignalTreeRollbackError on a conservative refusal, which is
-              // a supported fail-closed contract, not an edge case. Skipping the
-              // settle there left the scope open forever, and since nothing can
-              // ever settle it afterwards, autoSave was wedged for the life of the
-              // tree: post-commit silently degraded to never-commit.
-              //
-              // The OUTCOME depends on whether compensation actually applied, which
-              // a bare `finally` cannot see. Refused (or nothing to reverse) means
-              // the authored effects are still the live authoritative state, so
-              // their consequences must FLUSH; discarding them would make durable
-              // truth disagree with live truth to honour a reversal that did not
-              // happen. This is the same rule the plan-level door already applies.
-              settleCommitScope(
-                transactionOwnerToken,
-                transactionId,
-                compensated ? 'discard' : 'commit'
-              );
-              forgetUnclaimedDescriptorSubjects(
-                rollbackSubjectIds,
-                descriptorOwnersBefore
-              );
-            } finally {
-              lifecycleChannel.announce({
-                kind: 'rolled-back',
-                owner: transactionOwnerToken,
-                id: transactionId,
-              });
-            }
-          }
         }
       };
-
       try {
-        const locationRuntime = getLocationRuntime(tree.$);
-        if (locationRuntime) {
-          locationRuntime.runInvalidationGroup(executeTransaction);
-        } else {
-          executeTransaction();
+        const locations = getLocationRuntime(tree.$);
+        if (locations) locations.runInvalidationGroup(executeTransaction);
+        else executeTransaction();
+      } catch (error) {
+        if (!primaryFailed) {
+          primaryFailed = true;
+          primaryError = error;
         }
       } finally {
         try {
           releaseCapture?.();
         } catch (error) {
-          if (primaryError !== undefined) {
+          if (primaryFailed)
             reportCleanupFailure(
               'transaction capture release after failure',
               error
             );
-          } else {
+          else {
+            cleanupFailed = true;
             cleanupError = error;
           }
         }
       }
 
-      if (primaryError !== undefined) {
-        throw primaryError;
+      // Read before staging/flush: delivery intentionally drops net-equal ABA
+      // notifications, but compensation may not erase that writer's authority.
+      const callbackQueuedEvidence = readQueuedLaterEffects();
+      for (const id of authority.getPendingTurnIds()) {
+        authority.observeQueuedEffects(id, callbackQueuedEvidence);
       }
-      if (cleanupError !== undefined) {
-        throw cleanupError;
+      if (callbackQueuedEvidence.length) {
+        callbackExternalEffects.set(transactionId, [
+          ...(callbackExternalEffects.get(transactionId) ?? []),
+          ...callbackQueuedEvidence,
+        ]);
       }
 
       // TURN-FEED-0 'staged': the callback has returned, so this transaction's
       // contribution is complete and awaits a decision.
-      lifecycleChannel.announce({
-        kind: 'staged',
-        owner: transactionOwnerToken,
-        id: transactionId,
-      });
+      if (!primaryFailed)
+        lifecycleChannel.announce({
+          kind: 'staged',
+          owner: transactionOwnerToken,
+          id: transactionId,
+        });
 
       notifier?.flushSync();
       const pendingTurn = materializePendingTransaction(transactionId);
       const pendingTurnId = pendingTurn?.id;
       if (pendingTurn) {
+        inspectionTransactionByTurn.set(pendingTurn.id, transactionId);
+        const keys = new Set((pendingTurn.__effects ?? []).map(effectKey));
+        const writes = inspectionWrites.get(transactionId);
+        for (const key of writes?.keys() ?? [])
+          if (!keys.has(key)) writes?.delete(key);
         notifyListeners(pendingCreatedListeners, pendingTurn);
+      } else {
+        inspectionWrites.delete(transactionId);
       }
+      releaseInspectionIfQuiet();
       let lifecycle: 'pending' | 'confirmed' | 'rejected' = 'pending';
+      let settling = false;
 
       const handle = {
         [PENDING_TURN_ID]: pendingTurnId,
         confirm(): void {
+          const pendingTurn = authority.getPendingTurn(pendingTurnId);
+          if (destroyed) throw new Error('Cannot settle a destroyed tree');
+          if (settling)
+            throw new Error('Transaction settlement is already in progress');
           if (lifecycle === 'confirmed') {
             return;
           }
@@ -2052,6 +2306,18 @@ export function getOrCreateInternalTransactionRuntime<T>(
           try {
             if (pendingTurnId !== undefined) {
               const confirmedTurn = authority.confirmPending(pendingTurnId);
+              const accepted = inspectionWrites.get(transactionId);
+              if (accepted) {
+                let settled = inspectionWrites.get(undefined);
+                if (!settled)
+                  inspectionWrites.set(undefined, (settled = new Map()));
+                for (const [key, write] of accepted) {
+                  if ((settled.get(key)?.seq ?? -1) < write.seq)
+                    settled.set(key, write);
+                }
+                inspectionWrites.delete(transactionId);
+              }
+              inspectionTransactionByTurn.delete(pendingTurnId);
               if (confirmedTurn) {
                 notifyListeners(pendingConfirmedListeners, confirmedTurn);
               }
@@ -2060,6 +2326,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             if (pendingTurnId !== undefined) {
               pendingOrderDeltas.delete(pendingTurnId);
             }
+            releaseInspectionIfQuiet();
             // The physical state this transaction authored is committed truth,
             // so its durable consequences run — last, so a throwing storage
             // backend cannot leave the turn unconfirmed, and in a `finally` so
@@ -2078,131 +2345,127 @@ export function getOrCreateInternalTransactionRuntime<T>(
           }
         },
         rollback(): void {
-          if (lifecycle === 'rejected') {
-            return;
-          }
-          if (lifecycle === 'confirmed') {
+          const pendingTurn = authority.getPendingTurn(pendingTurnId);
+          if (destroyed) throw new Error('Cannot settle a destroyed tree');
+          if (settling)
+            throw new Error('Transaction settlement is already in progress');
+          if (lifecycle === 'rejected') return;
+          if (lifecycle === 'confirmed')
             throw new Error('Cannot rollback a confirmed transaction');
-          }
-
-          const rollbackPlan =
-            pendingTurnId !== undefined
-              ? authority.getPendingRollbackPlan(pendingTurnId)
-              : { compensation: [] };
-          if ('conflict' in rollbackPlan) {
-            // The SECOND refusal door. 1f94f74a wrapped only the
-            // effect-validation refusal thrown from compensation; this
-            // PLAN-level refusal escaped before any settle, leaking the scope
-            // and killing persistence() for the life of the tree. It is not an
-            // edge case — it is the shipped, tested "application refetch
-            // fallback" pattern, which catches this error, compensates by hand
-            // and never confirms.
-            //
-            // Settled as 'commit', not 'discard': nothing was compensated, so
-            // every write this transaction authored is still live in the tree
-            // and IS the committed truth a reader sees. Discarding would drop
-            // durable consequences for state the tree is still showing, which
-            // is the tree/storage divergence this whole boundary exists to
-            // prevent. Same argument confirm() already uses for the equivalent
-            // situation.
-            settleCommitScope(transactionOwnerToken, transactionId, 'commit');
-            throw createRollbackError(rollbackPlan.conflict);
-          }
-
-          lifecycle = 'rejected';
-          lifecycleChannel.announce({
-            kind: 'rolled-back',
-            owner: transactionOwnerToken,
-            id: transactionId,
-          });
-          let discardedTurn: TransactionTurnRecord | undefined;
-          if (pendingTurnId !== undefined) {
-            discardedTurn = authority.discardPending(pendingTurnId);
-          }
-
-          const compensation = rollbackPlan.compensation;
+          const plan =
+            pendingTurnId === undefined
+              ? { compensation: [] }
+              : authority.getPendingRollbackPlan(
+                  pendingTurnId,
+                  readQueuedLaterEffects()
+                );
+          if ('conflict' in plan) throw createRollbackError(plan.conflict);
+          const compensation = plan.compensation;
           const orderDeltas =
             pendingTurnId === undefined
               ? []
               : pendingOrderDeltas.get(pendingTurnId) ?? [];
-          if (pendingTurnId !== undefined) {
-            pendingOrderDeltas.delete(pendingTurnId);
-          }
-          // Starts true: "nothing to reverse" is a rollback that succeeded
-          // trivially, NOT a refusal.
-          let compensated = true;
+          let installed = false;
+          let observerFailed = false;
+          let observerError: unknown;
+          const clock =
+            getPhysicalCommitClock(tree.$) ?? getPhysicalCommitClock(tree);
+          const revision = clock?.revision();
+          settling = true;
           try {
-            if (compensation.length > 0 || orderDeltas.length > 0) {
-              try {
-                rollbackPendingEffectsThroughRealizationPort(
-                  pendingTurnId as number,
-                  [...compensation].reverse(),
-                  discardedTurn?.__baselineValues ?? new Map(),
-                  orderDeltas,
-                  undefined,
-                  transactionId
-                );
-              } catch (error) {
-                compensated = false;
-                // ⚠️ DO NOT RE-WRAP AN ALREADY-RENDERED ROLLBACK REFUSAL. A
-                // refusal thrown deeper is a SignalTreeRollbackError whose
-                // message already names its kind; stuffing that message into
-                // `errorMessage` and wrapping again produced a DOUBLED
-                // sentence — prefix, reason, prefix, reason, and two `[kind]`
-                // tags. The constant message hid this for as long as it existed:
-                // both layers rendered identically, so the duplication was
-                // invisible until the reason became legible.
-                //
-                // Rethrowing preserves the INNERMOST, most specific refusal,
-                // which is the whole point of making the reason legible. Same
-                // error type, same refusal, same cause chain.
+            const apply = () => {
+              rollbackPendingEffectsThroughRealizationPort(
+                pendingTurnId ?? transactionId,
+                [...compensation].reverse(),
+                pendingTurn?.__baselineValues ?? new Map(),
+                orderDeltas,
+                primaryFailed ? primaryError : undefined,
+                transactionId
+              );
+              installed = true;
+            };
+            try {
+              const locations = getLocationRuntime(tree.$);
+              if (locations) locations.runInvalidationGroup(apply);
+              else apply();
+            } catch (error) {
+              // Physical commit precedes observer delivery. A delivery failure
+              // must not leave a successfully compensated turn retryable.
+              installed ||=
+                revision !== undefined && clock?.revision() !== revision;
+              if (!installed) {
                 if (error instanceof SignalTreeRollbackError) throw error;
                 throw createRollbackError({
                   kind: 'effect-validation-failed',
-                  pendingTurnId: pendingTurnId as number,
+                  pendingTurnId: pendingTurnId ?? transactionId,
                   compensation,
                   errorMessage:
                     error instanceof Error
                       ? error.message
                       : 'Unknown rollback validation failure',
                   cause: error,
+                  callbackError: primaryFailed ? primaryError : undefined,
                 });
               }
+              observerFailed = true;
+              observerError = error;
             }
+            lifecycle = 'rejected';
+            inspectionWrites.delete(transactionId);
+            if (pendingTurnId !== undefined)
+              inspectionTransactionByTurn.delete(pendingTurnId);
+            const discarded =
+              pendingTurnId === undefined
+                ? undefined
+                : authority.discardPending(pendingTurnId);
+            if (pendingTurnId !== undefined)
+              pendingOrderDeltas.delete(pendingTurnId);
+            releaseInspectionIfQuiet();
+            lifecycleChannel.announce({
+              kind: 'rolled-back',
+              owner: transactionOwnerToken,
+              id: transactionId,
+            });
+            try {
+              if (discarded)
+                notifyListeners(pendingDiscardedListeners, discarded);
+            } finally {
+              try {
+                settleCommitScope(
+                  transactionOwnerToken,
+                  transactionId,
+                  'discard'
+                );
+              } finally {
+                forgetUnclaimedDescriptorSubjects(
+                  pendingTurn?.restorationSubjectIds ?? [],
+                  descriptorOwnersBefore
+                );
+              }
+            }
+            if (observerFailed) throw observerError;
           } finally {
-            // Late so consumers observe restored state, unconditional so a
-            // refused compensation cannot strand the scope. `lifecycle` is
-            // already 'rejected' at this point, so no later confirm() or
-            // rollback() could ever settle it — skipping here wedged autoSave
-            // permanently.
-            //
-            // Outcome tracks whether compensation APPLIED. A refusal reverses
-            // nothing, so the authored effects remain live truth and flush; a
-            // successful compensation restored the baseline, so they are
-            // discarded. See the thrown-callback path for the full note.
-            settleCommitScope(
-              transactionOwnerToken,
-              transactionId,
-              compensated ? 'discard' : 'commit'
-            );
-            forgetUnclaimedDescriptorSubjects(
-              discardedTurn?.restorationSubjectIds ?? [],
-              descriptorOwnersBefore
-            );
-          }
-
-          if (discardedTurn) {
-            notifyListeners(pendingDiscardedListeners, discardedTurn);
+            settling = false;
           }
         },
       };
-      // Cast, not a widened public type: PENDING_TURN_ID is module-private
-      // and PendingTransaction must not grow a field for it.
+      if (primaryFailed) {
+        handle.rollback();
+        throw primaryError;
+      }
+      if (cleanupFailed) throw cleanupError;
+      // The pending-turn symbol remains private to the Proposal facade.
       return handle as PendingTransaction;
     },
     getConfirmedTurnRecords: () => authority.getConfirmedTurnRecords(),
-    describePendingTurn: (turnId: number) =>
-      authority.describePendingTurn(turnId),
+    describePendingTurn: inspectPendingTurn,
+    getInspectionFootprintCountsForTesting: () => ({
+      writers: inspectionWrites.size,
+      footprints: [...inspectionWrites.values()].reduce(
+        (count, writes) => count + writes.size,
+        0
+      ),
+    }),
     getConfirmedTurnCount: () => authority.getConfirmedTurnCount(),
     getPendingTurnCount: () => authority.getPendingTurnCount(),
     getConfirmedTurnIds: () => authority.getConfirmedTurnIds(),
@@ -2230,6 +2493,27 @@ export function getOrCreateInternalTransactionRuntime<T>(
 
   if (typeof tree.registerCleanup === 'function') {
     tree.registerCleanup(() => {
+      destroyed = true;
+      authority.releaseConfirmedTurnsOnDestroy();
+      cancelCommitScopes(transactionOwnerToken);
+      for (const id of authority.getPendingTurnIds()) {
+        const discarded = authority.discardPending(id);
+        forgetUnclaimedDescriptorSubjects(
+          discarded?.restorationSubjectIds ?? [],
+          new Set()
+        );
+      }
+      pendingTransactions.clear();
+      callbackExternalEffects.clear();
+      inspectionWrites.clear();
+      inspectionTransactionByTurn.clear();
+      unsubscribeEnqueue?.();
+      unsubscribeEnqueue = null;
+      pendingCreatedListeners.clear();
+      pendingConfirmedListeners.clear();
+      pendingDiscardedListeners.clear();
+      drainCaptureBucket(pendingCapture);
+
       try {
         unsubscribeFlush?.();
       } catch (error) {
@@ -2304,12 +2588,15 @@ function classifyProposedEffect(
   if (effect.kind === 'set') {
     const replaced = laterEffects.some(
       (later) =>
-        later.kind === 'set' &&
         later.position === effect.position &&
-        later.path === effect.path &&
-        (later.subject === undefined ||
-          effect.subject === undefined ||
-          later.subject === effect.subject)
+        ((later.kind === 'remove' &&
+          effect.subject !== undefined &&
+          later.subject === effect.subject) ||
+          (later.kind === 'set' &&
+            scalarRelation(later, effect) === 'same' &&
+            (later.subject === undefined ||
+              effect.subject === undefined ||
+              later.subject === effect.subject)))
     );
     return replaced ? 'superseded' : 'current';
   }

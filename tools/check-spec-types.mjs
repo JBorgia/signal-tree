@@ -79,7 +79,7 @@
  * it is known to be a vacuous test, but nothing in it has been checked either —
  * that is what the number means.
  */
-import { execFileSync } from 'node:child_process';
+import { spawnSync, execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 const BASELINE = new URL('./spec-type-baseline.json', import.meta.url);
@@ -87,17 +87,45 @@ const PROJECT = 'tsconfig.typecheck-specs.json';
 const ROOT = new URL('..', import.meta.url).pathname.replace(/\/$/, '');
 
 function run() {
-  try {
-    execFileSync('npx', ['tsc', '--noEmit', '-p', PROJECT], {
-      cwd: ROOT,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-    return '';
-  } catch (e) {
-    // tsc exits non-zero when it reports diagnostics; that is the normal path.
-    return `${e.stdout ?? ''}${e.stderr ?? ''}`;
+  // Invoke the installed compiler directly: npx may fetch or fail before tsc runs.
+  const result = spawnSync(
+    process.execPath,
+    [
+      `${ROOT}/node_modules/typescript/bin/tsc`,
+      '--noEmit',
+      '--pretty',
+      'false',
+      '-p',
+      PROJECT,
+    ],
+    { cwd: ROOT, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 }
+  );
+  const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
+  const lines = output.split(/\r?\n/).filter((line) => line.trim());
+  const diagnostic = /^(.+?)\(\d+,\d+\): error TS\d+:/;
+  const located = lines.filter((line) => diagnostic.test(line));
+  // Only normal source diagnostics may be ratcheted. Global/config errors,
+  // crashes, signals, spawn failures and truncated output are infrastructure reds,
+  // even if valid source diagnostics preceded them.
+  if (
+    result.error ||
+    result.signal ||
+    (result.status !== 0 && ![1, 2].includes(result.status)) ||
+    (result.status === 0 && lines.length > 0) ||
+    (result.status !== 0 && located.length === 0) ||
+    lines.some((line) => /error TS\d+:/.test(line) && !diagnostic.test(line)) ||
+    located.some((line) => /\.json\(\d+,\d+\):/.test(line)) ||
+    lines.some((line) => !diagnostic.test(line) && !/^\s/.test(line))
+  ) {
+    console.error(
+      'check-spec-types: compiler execution failed; baseline unchanged.\n' +
+        (result.error?.message ?? result.signal ?? '') +
+        '\n' +
+        output
+    );
+    process.exit(2);
   }
+  return output;
 }
 
 /** file -> error count, from tsc's `path(line,col): error TSxxxx:` lines. */
@@ -113,11 +141,6 @@ function countsFrom(output) {
 }
 
 const output = run();
-if (/error TS(5\d{3}|6\d{3})/.test(output) && !/error TS\d+:/.test(output)) {
-  console.error('check-spec-types: tsc could not load the project.\n' + output);
-  process.exit(2);
-}
-
 const actual = countsFrom(output);
 const actualTotal = Object.values(actual).reduce((a, b) => a + b, 0);
 
@@ -175,6 +198,11 @@ function deadBaselineEntries(files) {
 }
 
 if (process.argv.includes('--self-test')) {
+  execFileSync(
+    process.execPath,
+    ['--test', 'tools/check-spec-types-selftest.mjs'],
+    { cwd: ROOT, stdio: 'inherit' }
+  );
   // POSITIVE CONTROL: a checker that only ever reports "no dead entries" is
   // indistinguishable from one that cannot detect them. Inject a subject that
   // certainly does not exist and require the detector to name it.

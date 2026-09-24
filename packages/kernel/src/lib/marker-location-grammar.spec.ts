@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { entityMap } from './types';
-import { persistence } from '../enhancers/serialization/serialization';
+import { link } from '../index';
 import { signalTree } from './signal-tree';
 
 /**
@@ -104,31 +104,26 @@ describe('supported marker positions are payload-opaque', () => {
     });
   });
 
-  it('persistence() — the durable path the stored leak actually reached', async () => {
-    const map = new Map<string, string>();
-    const storage = {
-      getItem: (k: string) => map.get(k) ?? null,
-      setItem: (k: string, v: string) => void map.set(k, v),
-      removeItem: (k: string) => void map.delete(k),
-    };
-    const tree = signalTree(
-      { rows: entityMap<Row, number>(cfg()) },
-      {
-        enhancers: [
-          persistence({ key: 'mlg', storage: storage as never, debounceMs: 0 }),
-        ] as never,
-      }
-    );
-    tree.$.rows.setAll([{ id: 1, name: 'a' }]);
-    // autoSave lands as a post-commit durable consequence, never inline.
-    await new Promise((r) => setTimeout(r, 20));
-
-    const durable = [...map.values()].join('|');
-    assertOpaque('persistence()', durable);
-    // CONTROL — parsed, not substring-matched: persistence pretty-prints, so a
-    // substring control silently mis-fires on an empty or reformatted payload.
-    const parsed = JSON.parse(durable) as { data: { rows: { all: Row[] } } };
-    expect(parsed.data.rows.all).toEqual([{ id: 1, name: 'a' }]);
+  it('Link — marker payloads reaching a durable endpoint remain opaque', async () => {
+    const tree = signalTree({ rows: entityMap<Row, number>(cfg()) });
+    const writes: string[] = [];
+    const connection = link(tree.$.rows, {
+      set: (rows) => {
+        writes.push(JSON.stringify({ data: { rows: { all: rows } } }));
+      },
+    });
+    try {
+      tree.$.rows.setAll([{ id: 1, name: 'a' }]);
+      for (let i = 0; i < 8; i++) await Promise.resolve();
+      await connection.settled();
+      const durable = writes.join('|');
+      assertOpaque('Link', durable);
+      const parsed = JSON.parse(durable) as { data: { rows: { all: Row[] } } };
+      expect(parsed.data.rows.all).toEqual([{ id: 1, name: 'a' }]);
+    } finally {
+      connection.dispose();
+      tree.destroy();
+    }
   });
 
   it('the PUBLIC config has no field that can carry application data', () => {
@@ -149,15 +144,26 @@ describe('supported marker positions are payload-opaque', () => {
     expect(json).not.toContain(secret);
     // What survives is the empty husk of `hooks` — functions do not serialize.
     expect(JSON.parse(json)).toEqual({
-      list: [{ __isEntityMap: true, __entityMapConfig: { hooks: {} }, __computedSlices: {} }],
+      list: [
+        {
+          __isEntityMap: true,
+          __entityMapConfig: { hooks: {} },
+          __computedSlices: {},
+        },
+      ],
     });
   });
 
   it('CONTROL — a data-bearing config WOULD be visible there', () => {
     // Forced, out-of-contract: the public API cannot produce this shape. It
     // proves the test above is measuring absence of data, not absence of a path.
-    const m = entityMap<Row, number>(cfg()) as unknown as Record<string, unknown>;
-    (m['__entityMapConfig'] as Record<string, unknown>)['probe'] = { t: 'SECRET-CTL' };
+    const m = entityMap<Row, number>(cfg()) as unknown as Record<
+      string,
+      unknown
+    >;
+    (m['__entityMapConfig'] as Record<string, unknown>)['probe'] = {
+      t: 'SECRET-CTL',
+    };
     expect(
       JSON.stringify((signalTree({ list: [m] } as never) as any).$())
     ).toContain('SECRET-CTL');

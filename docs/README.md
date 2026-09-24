@@ -6,7 +6,15 @@
 
 Use this index to navigate the documentation.
 
-**Current release:** 16.0.0 See [CHANGELOG](../CHANGELOG.md).
+**Workspace version:** 16.0.0
+
+**Publication status:** Release held pending correctness and validation closure.
+The workspace version and [CHANGELOG](../CHANGELOG.md) do not establish that
+16.0.0 was published or is safe to release. The September 23 source audit
+reproduced rollback and composition failures; see the
+[transaction evidence](research/v15-safety-audit/README.md) and
+[unpublished advisory draft](research/v15-safety-audit/ADVISORY-DRAFT.md).
+No current registry version or fixed release is verified by this index.
 
 ---
 
