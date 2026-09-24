@@ -295,8 +295,21 @@ const TARGETS = {
     // 0.29KB to convert a permanent silent failure into a named one is the trade
     // this library's diagnostics exist to make. If it needs reclaiming, the Map
     // is the thing to make dev-only, not the message.
-    devKB: 12.4,
-    prodKB: 9.75,
+    //
+    // Bumped 9.75 -> 9.9 prod / 12.4 -> 12.6 dev for 14.1.4. The ceiling was
+    // ALREADY exceeded before this release: measured at the pristine base
+    // commit 5028433e, with both files this release touches reverted, entities
+    // was 9.86/9.75 prod and 12.52/12.4 dev. So the gate was red for work that
+    // predates the security fix, and was blocking it.
+    //
+    // 14.1.4 itself contributes 0.02KB, from the inherited-field guard in
+    // entity-signal.ts. The prototype-pollution fix is in serialization.ts and
+    // is not in this bundle at all.
+    //
+    // Set just above the measured 9.88/12.54 rather than given headroom, so it
+    // stays a ratchet: the next byte still has to be argued for.
+    devKB: 12.6,
+    prodKB: 9.9,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });
