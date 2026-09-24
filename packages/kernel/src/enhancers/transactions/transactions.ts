@@ -2450,7 +2450,38 @@ export function getOrCreateInternalTransactionRuntime<T>(
         },
       };
       if (primaryFailed) {
-        handle.rollback();
+        try {
+          handle.rollback();
+        } catch (rollbackError) {
+          // RECOVERY-HANDLE-0. `transact()` has not returned, so a refused
+          // compensation would otherwise strand a transaction that is still
+          // pending and still settleable with no reference to it. Catching
+          // inside the callback only helps prospectively.
+          //
+          // `lifecycle` is the exact discriminator: rollback() assigns
+          // 'rejected' only AFTER compensation physically installs, so a
+          // refusal arrives here still 'pending' while an observer failure
+          // arrives 'rejected'. Attaching a handle to a settled turn would
+          // offer authority that no longer exists.
+          if (
+            lifecycle === 'pending' &&
+            typeof rollbackError === 'object' &&
+            rollbackError !== null
+          ) {
+            Object.defineProperty(rollbackError, 'recovery', {
+              value: {
+                transaction: handle as PendingTransaction,
+                // Explicit: the callback may have thrown `undefined`.
+                callbackFailed: true,
+                callbackError: primaryError,
+              },
+              enumerable: false,
+              configurable: true,
+              writable: true,
+            });
+          }
+          throw rollbackError;
+        }
         throw primaryError;
       }
       if (cleanupFailed) throw cleanupError;

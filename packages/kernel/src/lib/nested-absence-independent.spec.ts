@@ -48,7 +48,6 @@ describe('nested-absence / held descendant after ancestor omission', () => {
 
     // MEASURED, not asserted-as-correct. Recorded so the disposition is
     // explicit either way.
-    // eslint-disable-next-line no-console
     console.log(
       `[nested-absence] held child after omission = ${JSON.stringify(
         observed
@@ -76,7 +75,6 @@ describe('nested-absence / held descendant after ancestor omission', () => {
     await flush();
 
     const afterWrite = tree.$.parent() as Record<string, unknown>;
-    // eslint-disable-next-line no-console
     console.log(
       `[nested-absence] after write through absent descendant, parent = ${JSON.stringify(
         afterWrite
@@ -107,7 +105,6 @@ describe('nested-absence / held descendant after ancestor omission', () => {
 
     // entity-signal.ts states this explicitly: the held reference keeps
     // reading undefined because the key->subject mapping is gone.
-    // eslint-disable-next-line no-console
     console.log(
       `[nested-absence] CONTROL retired entity read = ${JSON.stringify(
         heldRow?.()

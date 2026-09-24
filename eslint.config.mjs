@@ -23,6 +23,12 @@ export default [
       // ignored here too so a probe in flight cannot fail the lint gate. A test
       // worth keeping gets a real name and is not matched by this pattern.
       '**/zz-*.ts',
+      // Untracked, user-owned research harnesses. They import kernel source by
+      // relative path on purpose (they bundle a pinned snapshot rather than
+      // consuming the published entry points), which trips
+      // @nx/enforce-module-boundaries. Same reasoning as the probe specs
+      // above: scratch research that is not repo code must not gate repo lint.
+      'tools/experiments/**',
       'scripts/ai-codegen-benchmark/results/**',
       // Generated when Vite configuration is loaded through a TypeScript shim.
       '**/vite.config.*.timestamp*',
