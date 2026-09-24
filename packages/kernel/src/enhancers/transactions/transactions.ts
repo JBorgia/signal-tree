@@ -200,6 +200,8 @@ export interface InternalTransactionRuntime {
   transaction(fn: () => void): PendingTransaction;
   /** @internal Raw retained records; projected by `/internals`. */
   getConfirmedTurnRecords(): readonly TransactionTurnRecord[];
+  /** L15: opt-in evidence retention beyond the correctness obligation. */
+  setHistoryRetention(retain: number): void;
   /** @internal PROPOSAL-INSPECTION-0 raw material; unclassified. */
   describePendingTurn(
     turnId: number
@@ -564,6 +566,18 @@ function buildPendingRollbackPlan(
 
 class TransactionAuthority {
   private confirmedTurns: TransactionTurnRecord[] = [];
+  /**
+   * L15. Records kept purely as evidence, beyond what correctness requires.
+   * 0 means correctness-only, which is the default.
+   */
+  private historyRetain = 0;
+  /**
+   * Whether an explicit retention contract exists. Until one does, the ledger
+   * is left exactly as it has always behaved: the reader-visible history
+   * policy may not change silently, and `confirmedTurnReader` is a shipped
+   * surface whose purpose is reading confirmed history.
+   */
+  private historyConfigured = false;
   private pendingTurns = new Map<number, TransactionTurnRecord>();
   private nextTurnId = 1;
   private queuedEvidence = new Map<number, Map<string, TurnEffect>>();
@@ -716,6 +730,9 @@ class TransactionAuthority {
     this.releasePendingClaims(turnId);
     this.insertConfirmed(turn);
     this.releaseLedgerIfQuiet();
+    // The pending set shrank and a confirmed record arrived: the obligation
+    // set changed in both directions.
+    this.releaseConfirmedBeyondObligation();
     return cloneTurnRecord(turn);
   }
 
@@ -729,6 +746,9 @@ class TransactionAuthority {
     this.queuedEvidence.delete(turnId);
     this.releasePendingClaims(turnId);
     this.releaseLedgerIfQuiet();
+    // Discarding a pending turn can raise min(pendingIds) and so discharge the
+    // obligation that was keeping confirmed records alive.
+    this.releaseConfirmedBeyondObligation();
     return cloneTurnRecord(turn);
   }
 
@@ -818,6 +838,52 @@ class TransactionAuthority {
       ...observedLater,
       ...[...(retained?.values() ?? [])].map((effect) => ({ turnId, effect })),
     ]);
+  }
+
+  setHistoryRetention(retain: number): void {
+    this.historyRetain = Number.isFinite(retain) && retain > 0 ? retain : 0;
+    this.historyConfigured = true;
+    this.releaseConfirmedBeyondObligation();
+  }
+
+  /**
+   * L15: correctness retention follows live responsibility.
+   *
+   * `getPendingRollbackPlan` is the ONLY correctness consumer of this ledger,
+   * and it selects `confirmedTurns.filter(t => t.id > pendingId)`. Turn ids are
+   * monotonic, so a confirmed turn can only ever be needed by a pending turn
+   * OLDER than itself. Once no such pending turn remains, the record can never
+   * appear in any future plan, and keeping it is diagnostics, not correctness.
+   * (`hasConfirmedTurnAfter` has no call sites, so it adds no obligation.)
+   *
+   * This is not an arbitrary cap: the bound is derived from the obligation.
+   * `historyRetain` is a SEPARATE, explicitly requested evidence facility
+   * layered on top of it.
+   */
+  private releaseConfirmedBeyondObligation(): void {
+    // No contract, no change. Pruning by default would empty a shipped reader
+    // whose whole purpose is confirmed history — measured: 19 existing tests
+    // across six files, including 10 in confirmed-turn-reader.spec.ts. What
+    // the default should be is an owner decision, recorded in
+    // docs/audits/2026-09-23-open-decisions.md, not something to settle by
+    // rewriting those tests.
+    if (!this.historyConfigured) return;
+    if (this.confirmedTurns.length === 0) return;
+    let minPending = Infinity;
+    for (const id of this.pendingTurns.keys()) {
+      if (id < minPending) minPending = id;
+    }
+    const required = (turn: TransactionTurnRecord) => turn.id > minPending;
+    if (this.historyRetain <= 0) {
+      this.confirmedTurns = this.confirmedTurns.filter(required);
+      return;
+    }
+    const keep = new Set<number>();
+    for (const turn of this.confirmedTurns)
+      if (required(turn)) keep.add(turn.id);
+    for (const turn of this.confirmedTurns.slice(-this.historyRetain))
+      keep.add(turn.id);
+    this.confirmedTurns = this.confirmedTurns.filter((t) => keep.has(t.id));
   }
 
   releaseConfirmedTurnsOnDestroy(): void {
@@ -2489,6 +2555,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
       return handle as PendingTransaction;
     },
     getConfirmedTurnRecords: () => authority.getConfirmedTurnRecords(),
+    setHistoryRetention: (retain: number) =>
+      authority.setHistoryRetention(retain),
     describePendingTurn: inspectPendingTurn,
     getInspectionFootprintCountsForTesting: () => ({
       writers: inspectionWrites.size,
@@ -2645,11 +2713,34 @@ function classifyProposedEffect(
   return present ? 'current' : 'superseded';
 }
 
-export function transactions(): Enhancer<TransactionMethods> {
+/**
+ * Optional evidence retention (L15).
+ *
+ * Correctness records are bounded by live obligation and are NOT configurable:
+ * a confirmed turn is released once no older pending turn could still need it.
+ * This asks for diagnostic history ON TOP of that, and it is opt-in because
+ * the reader-visible policy may not change silently.
+ */
+export type TransactionsConfig = {
+  history?: {
+    /**
+     * Most recent confirmed turns to retain as evidence beyond what
+     * correctness requires. Omitted or 0 means correctness-only.
+     */
+    retain: number;
+  };
+};
+
+export function transactions(
+  config?: TransactionsConfig
+): Enhancer<TransactionMethods> {
   const enhancerFn = <T>(
     tree: ISignalTree<T>
   ): ISignalTree<T> & TransactionMethods => {
     const runtime = getOrCreateInternalTransactionRuntime(tree);
+    if (config?.history) {
+      runtime.setHistoryRetention(config.history.retain);
+    }
 
     // `transact`, not `transaction`: a verb beside `propose()` and the
     // handle's own `confirm()`/`rollback()`. The old spelling was REMOVED
