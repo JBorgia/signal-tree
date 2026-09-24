@@ -52,7 +52,7 @@ export interface PendingTransaction {
 // does NOT: every member mapped mechanically onto machinery that already
 // shipped, and the only thing that survives as public surface is `inspect()`.
 //
-//     pending()                 -> transact()      (one verb, folded)
+//     propose()                 -> transact()      (one verb, folded)
 //     inspect()                  -> KEPT, on every PendingTransaction
 //     accept()                   -> confirm()
 //     reject()                   -> rollback()
@@ -66,13 +66,13 @@ export interface PendingTransaction {
 // Restoration is NOT fused in. `undoable()` stays `undoable()`, wrapped by the
 // caller around the pending's WRITES:
 //
-//     undoable(() => { pending = store.pending(() => applyResult(r)); });
+//     undoable(() => { pending = store.transact(() => applyResult(r)); });
 //     ...review...
 //     pending.confirm();          // one undo unit
 //
 // An earlier draft offered `accept({ undoable: true })`. Implementing it proved
 // it CANNOT be composition — `undoable()` designates the causal turn containing
-// its writes, and a pending's writes happen at `pending()` time, so wrapping
+// its writes, and a proposal's writes happened at `propose()` time, so wrapping
 // `confirm()` designates nothing. Measured 0 undo entries against 1 for
 // wrapping the pending. The option was deleted rather than kept as a
 // placeholder, so this surface is smaller than the one that was frozen.
@@ -80,7 +80,7 @@ export interface PendingTransaction {
 // It adds NO authority rule, NO retained semantic fact and NO pending-only
 // transaction behaviour. That is an evidenced claim, not an intention: the
 // whole adversarial matrix was run against the raw primitives BEFORE this
-// facade existed (`pending-0-kernel.spec.ts`), and passed.
+// facade existed (`proposal-0-kernel.spec.ts`), and passed.
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**

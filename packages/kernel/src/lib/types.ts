@@ -386,8 +386,24 @@ export type EnhancerCleanup = () => void;
  * authority there would be a lie.
  */
 export type SignalTreeRollbackRecovery = {
-  /** The same still-pending transaction. Retry or confirm through this. */
-  readonly transaction: { confirm(): void; rollback(): void };
+  /**
+   * The same still-pending transaction. Retry, confirm, or INSPECT through it.
+   *
+   * `inspect()` is here for the same reason it is on every other handle: this
+   * IS the pending turn, and a caller recovering from a failed callback has
+   * more reason than most to see what the partial turn actually contains
+   * before deciding. It was briefly settlement-only, which made the claim
+   * "inspection is available on every handle" false.
+   *
+   * Typed structurally rather than as `TransactionInspection`: this module is
+   * below the enhancers in the layering and must not import from them. The
+   * concrete handle returned at runtime is a full `PendingTransaction`.
+   */
+  readonly transaction: {
+    inspect(): { changes: readonly unknown[] };
+    confirm(): void;
+    rollback(): void;
+  };
   /**
    * Explicit, because a callback may legally `throw undefined`. The absence of
    * `callbackError` cannot distinguish that from "the callback did not throw".
