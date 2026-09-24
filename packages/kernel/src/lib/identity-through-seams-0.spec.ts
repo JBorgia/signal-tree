@@ -138,6 +138,87 @@ describe('IDENTITY-THROUGH-SEAMS-0 / I07 — same key, different lifetime', () =
   });
 });
 
+describe('IDENTITY-THROUGH-SEAMS-0 / I09 — subject ids are MONOTONIC', () => {
+  /**
+   * Added after a mutation survived, and kept even though it does NOT kill it.
+   *
+   * Removing the increment from `allocateFreshSubjectId()` makes it hand out
+   * [1,1,1] instead of [1,2,3] — verified directly against a bare
+   * StructuralStore, so the mutation is semantically effective, not inert.
+   * Yet 2,750 existing tests pass under it, and so do these two cases.
+   *
+   * Scope, stated precisely rather than dramatically: `planFreshSubjectIds` is
+   * unaffected and still returns distinct ids, so only ONE of the two
+   * allocation paths (`commitFreshSubject`) can break undetected. I07 above is
+   * blind to it for a specific reason — the key->subject mapping is tombstoned
+   * on removal, so a held handle reads undefined whether or not ids collide.
+   *
+   * These two cases assert the property that SHOULD follow from monotonic
+   * allocation: no cross-talk between concurrently live subjects. They are
+   * correct and worth keeping. They are not sufficient, because the collision
+   * is not observable through the public entity surface in any scenario found
+   * so far — lookups are key-first, so a duplicated subject id does not
+   * surface as wrong data here.
+   *
+   * Disposition: monotonicity is a WHITE-BOX invariant. Per LAWS.md, white-box
+   * invariants are written after an architecture is selected, so this is
+   * recorded as a known gap rather than closed with a reach-around into
+   * internals.
+   */
+  it('two concurrently live subjects do not share identity', async () => {
+    const tree = signalTree(
+      { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
+      { enhancers: [transactions()] }
+    );
+    try {
+      tree.$.rows.addOne({ id: 'A', name: 'a-initial' });
+      tree.$.rows.addOne({ id: 'B', name: 'b-initial' });
+      await flush();
+
+      const heldA = tree.$.rows.byId('A');
+      const heldB = tree.$.rows.byId('B');
+
+      // Writing through one live subject must not be visible through another.
+      tree.$.rows.updateOne('A', { name: 'a-changed' });
+      await flush();
+
+      expect(heldA?.()?.name).toBe('a-changed');
+      expect(heldB?.()?.name).toBe('b-initial');
+      expect(tree.$.rows.byId('B')?.()?.name).toBe('b-initial');
+      expect(tree.$.rows.ids()).toEqual(['A', 'B']);
+    } finally {
+      tree.destroy();
+    }
+  });
+
+  it('a third subject added after a removal still gets its own identity', async () => {
+    const tree = signalTree(
+      { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
+      { enhancers: [transactions()] }
+    );
+    try {
+      tree.$.rows.addOne({ id: 'A', name: 'a' });
+      tree.$.rows.addOne({ id: 'B', name: 'b' });
+      await flush();
+      tree.$.rows.removeOne('A');
+      await flush();
+      tree.$.rows.addOne({ id: 'C', name: 'c' });
+      await flush();
+
+      // C must not inherit A's retired identity and must not alias B.
+      const heldB = tree.$.rows.byId('B');
+      tree.$.rows.updateOne('C', { name: 'c-changed' });
+      await flush();
+
+      expect(heldB?.()?.name).toBe('b');
+      expect(tree.$.rows.byId('C')?.()?.name).toBe('c-changed');
+      expect(tree.$.rows.ids()).toEqual(['B', 'C']);
+    } finally {
+      tree.destroy();
+    }
+  });
+});
+
 describe('IDENTITY-THROUGH-SEAMS-0 / I08 — identity across transaction + link', () => {
   it('a rolled-back entity field does not corrupt the linked payload identity', async () => {
     const tree = signalTree(
