@@ -51,8 +51,9 @@ the deprecation path applies normally. See
   `ChangeStatus`, `TransactionInspection`.
 
   ONE verb and ONE handle, deliberately. An earlier draft of this release also
-  shipped `propose()` / `Proposal` / `accept()` / `reject()` as a parallel
-  vocabulary over the identical mechanism. It was REMOVED before release:
+  LANDED `propose()` / `Proposal` / `accept()` / `reject()` on main as a
+  parallel vocabulary over the identical mechanism. It was REMOVED before any
+  16.x release, so no published package ever carried it:
   PROPOSAL-0's own evidence is that the facade added no authority rule, no
   retained semantic fact and no proposal-only behaviour, and AGENTS.md binds
   public naming to the glossary's Everyday vocabulary — which defines

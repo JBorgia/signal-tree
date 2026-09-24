@@ -23,7 +23,7 @@ import { transactions } from './transactions';
  * and is a mandatory release criterion, not follow-up.
  *
  * Reject-side conflict behaviour is NOT re-derived here; it is owned by
- * `pending-rejection-0.spec.ts` and `rekey-supersession-0.spec.ts`. This file
+ * `proposal-rejection-0.spec.ts` and `rekey-supersession-0.spec.ts`. This file
  * covers the ACCEPT side, the composite lifecycle, and concurrency.
  */
 

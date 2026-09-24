@@ -189,25 +189,13 @@ export type TransactionTurnRecord = {
 
 type TransactionLifecycleListener = (turn: TransactionTurnRecord) => void;
 
-/**
- * What the runtime itself mints: settlement only.
- *
- * NOT a `PendingTransaction` — that now carries `inspect()`, which is built by
- * the `transact()` wrapper from `describePendingTurn`. Keeping the two apart
- * stops the runtime from owing a projection it does not produce.
- */
-type RuntimeSettleHandle = {
-  confirm(): void;
-  rollback(): void;
-};
-
 export interface InternalTransactionRuntime {
   /** @internal Count-only retention probe; no state or writer identities escape. */
   getInspectionFootprintCountsForTesting(): {
     writers: number;
     footprints: number;
   };
-  transaction(fn: () => void): RuntimeSettleHandle;
+  transaction(fn: () => void): PendingTransaction;
   /** @internal Raw retained records; projected by `/internals`. */
   getConfirmedTurnRecords(): readonly TransactionTurnRecord[];
   /** L15: opt-in evidence retention beyond the correctness obligation. */
@@ -234,7 +222,7 @@ const INTERNAL_TRANSACTION_RUNTIME = Symbol(
 );
 
 /**
- * PROPOSAL-0. Carries the pending turn id from `transaction()` to `pending()`
+ * PROPOSAL-0. Carries the pending turn id from `transaction()` to the handle decorator
  * without widening `PendingTransaction`, which is public. Module-private, so
  * nothing outside this file can read or forge it.
  */
@@ -449,7 +437,7 @@ function buildPendingRollbackPlan(
    * nothing there to destroy. Reversing the turn's remaining effects then
    * COMPLETES the reversal rather than half-applying it, and refusing instead
    * strands unrelated speculative values — measured at
-   * `pending-rejection-0.spec.ts` cases 11 and 12, where `x` and `y` stayed
+   * `proposal-rejection-0.spec.ts` cases 11 and 12, where `x` and `y` stayed
    * at their proposed values after a reject although nothing ever wrote to
    * them.
    *
@@ -461,7 +449,7 @@ function buildPendingRollbackPlan(
    * UNOBSERVABLE. Replacing the scan with a break on the first remove passes
    * every test in the suite, because stable entity lifetime means a removed
    * subject can never be referenced again — a later add of the same business
-   * key creates a DIFFERENT subject (`pending-rejection-0.spec.ts` case 13,
+   * key creates a DIFFERENT subject (`proposal-rejection-0.spec.ts` case 13,
    * `rekey-supersession-0.spec.ts` case 3). The scan is kept as the form that
    * stays correct if subject resurrection ever becomes representable, not
    * because a test currently distinguishes it.
@@ -2394,8 +2382,147 @@ export function getOrCreateInternalTransactionRuntime<T>(
     );
   };
 
+  /**
+   * Add `inspect()` to a raw settle handle.
+   *
+   * Lives in the RUNTIME so both paths that mint a handle get it: the ordinary
+   * `transaction()` return, and the RECOVERY handle attached to a rollback
+   * error when the callback itself threw. Built in the enhancer instead, it
+   * made "inspection is available on every handle" FALSE — a caller recovering
+   * from a failed callback got settlement only and could not see what the
+   * partial turn contained, which is the same arbitrary asymmetry that folding
+   * `propose()` in was meant to remove.
+   */
+  const decorateHandle = (
+    pending: { confirm(): void; rollback(): void },
+    turnId: number | undefined
+  ): PendingTransaction => {
+
+    let settled: TransactionInspection | undefined;
+
+    const read = (): TransactionInspection => {
+      if (turnId === undefined) {
+        return { changes: [] };
+      }
+      const raw = inspectPendingTurn(turnId);
+      if (!raw) {
+        return { changes: [] };
+      }
+      // The registry already holds the typed segment address for every
+      // position — the same L17 machinery `link()` egress uses. Projecting
+      // only the dotted string was what made two different locations
+      // indistinguishable to a reviewer.
+      const registry = getPositionRegistry(tree.$);
+      return {
+        changes: raw.effects.map((effect) => ({
+          path: effect.path,
+          // The position address locates the OWNER (for an entity field that
+          // is the collection); `subjectFieldSegments` is the producer-known
+          // row-relative address. Appending it is what makes two fields of
+          // one row distinguishable. The segments already existed and were
+          // already authoritative — `scalarRelation` and `makeScalarKey`
+          // key on them — so only the public projection was dropping them.
+          address: (() => {
+            const owner = registry?.addressFor(effect.position);
+            if (!owner) return owner;
+            const within =
+              effect.kind === 'set' ? effect.subjectFieldSegments : undefined;
+            return within ? [...owner, ...within] : owner;
+          })(),
+          subject:
+            'subject' in effect && typeof effect.subject === 'number'
+              ? effect.subject
+              : undefined,
+          status: classifyProposedEffect(effect, raw.laterEffects),
+        })),
+      };
+    };
+
+    /**
+     * ⚠️ SETTLEMENT MUST NOT DEPEND ON INSPECTION.
+     *
+     * `read()` throws when mutation chronology capture has failed, and
+     * folding the review projection into `transact()` briefly made
+     * `confirm()` call it unguarded — so a tree whose inspection was
+     * unavailable could no longer be SETTLED at all. The handle wedged.
+     * `path-notifier-enqueue.spec.ts` caught it: "the low-level settlement
+     * handle does not depend on the inspection UI."
+     *
+     * Returning `undefined` rather than an empty inspection is deliberate.
+     * `{ changes: [] }` would be a FALSE claim that the turn changed
+     * nothing; leaving it unset makes a later `inspect()` fall through to
+     * `read()` and report the unavailability honestly.
+     */
+    const snapshot = (): TransactionInspection | undefined => {
+      try {
+        return read();
+      } catch {
+        return undefined;
+      }
+    };
+
+    /**
+     * Did settlement become TERMINAL, whatever else happened?
+     *
+     * ⚠️ A settle call can throw AFTER it has already succeeded. The runtime
+     * installs the compensation, retires the turn, and only THEN rethrows an
+     * observer-delivery failure — deliberately, because delivery failing must
+     * not make a completed reversal look retryable.
+     *
+     * The wrapper has to preserve that distinction or it silently destroys
+     * it. Measured before this guard: compensation succeeded (x=0, y=0), the
+     * turn retired, `rollback()` threw, and `inspect()` afterwards reported
+     * `{ changes: [] }` — the settlement snapshot was never cached because
+     * the assignment sat after the call.
+     *
+     * An unconditional `finally` is the WRONG fix: a genuine refusal leaves
+     * the turn pending and its inspection must stay LIVE, not freeze at a
+     * pre-refusal snapshot. Turn presence is the honest discriminator.
+     */
+    const settlementWasTerminal = (): boolean =>
+      turnId !== undefined && !authority.getPendingTurnIds().includes(turnId);
+
+    return {
+      inspect(): TransactionInspection {
+        // After settlement the turn is no longer pending, so the inspection
+        // as of that settlement is what there is to report.
+        return settled ?? read();
+      },
+      confirm(): void {
+        // Snapshot BEFORE confirming: this is the race inspect() alone
+        // cannot close, and after confirm the pending turn is gone. The
+        // snapshot is kept even though confirm() returns void, so a later
+        // inspect() still reports the truth as of settlement.
+        const atSettlement = settled ?? snapshot();
+        try {
+          pending.confirm();
+        } catch (error) {
+          if (settlementWasTerminal()) settled = atSettlement;
+          throw error;
+        }
+        settled = atSettlement;
+      },
+      rollback(): void {
+        const atSettlement = settled ?? snapshot();
+        // Throws on a conservative refusal, and ALSO on an observer failure
+        // that followed a successful compensation. Rethrown either way — the
+        // caller must see both — but only the second is terminal, so only
+        // the second caches the snapshot. A refused rollback leaves the
+        // handle reporting live state, matching the turn, which stays
+        // pending.
+        try {
+          pending.rollback();
+        } catch (error) {
+          if (settlementWasTerminal()) settled = atSettlement;
+          throw error;
+        }
+        settled = atSettlement;
+      },
+    };
+  };
+
   const runtime: InternalTransactionRuntime = {
-    transaction(fn: () => void): RuntimeSettleHandle {
+    transaction(fn: () => void): PendingTransaction {
       if (destroyed) throw new Error('Cannot transact on a destroyed tree');
       const activeMeta = getActiveWriteContext();
       const notifier = getPathNotifier();
@@ -2705,7 +2832,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           ) {
             Object.defineProperty(rollbackError, 'recovery', {
               value: {
-                transaction: handle as RuntimeSettleHandle,
+                transaction: decorateHandle(handle, pendingTurnId),
                 // Explicit: the callback may have thrown `undefined`.
                 callbackFailed: true,
                 callbackError: primaryError,
@@ -2720,8 +2847,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
         throw primaryError;
       }
       if (cleanupFailed) throw cleanupError;
-      // The pending-turn symbol stays private to the `transact()` wrapper.
-      return handle as RuntimeSettleHandle;
+      // The pending-turn symbol stays private to the decorator.
+      return decorateHandle(handle, pendingTurnId);
     },
     getConfirmedTurnRecords: () => authority.getConfirmedTurnRecords(),
     setHistoryRetention: (retain: number) =>
@@ -2930,101 +3057,7 @@ export function transactions(
     // vocabulary it carried was a fourth naming level AGENTS.md does not
     // sanction. No second code path, no turn-opening-specific rule: `pending`
     // below is exactly what the runtime hands anyone.
-    host.transact = (fn: () => void): PendingTransaction => {
-      const pending = runtime.transaction(fn);
-      const turnId = (pending as unknown as Record<PropertyKey, unknown>)[
-        PENDING_TURN_ID
-      ] as number | undefined;
-
-      let settled: TransactionInspection | undefined;
-
-      const read = (): TransactionInspection => {
-        if (turnId === undefined) {
-          return { changes: [] };
-        }
-        const raw = runtime.describePendingTurn(turnId);
-        if (!raw) {
-          return { changes: [] };
-        }
-        // The registry already holds the typed segment address for every
-        // position — the same L17 machinery `link()` egress uses. Projecting
-        // only the dotted string was what made two different locations
-        // indistinguishable to a reviewer.
-        const registry = getPositionRegistry(tree.$);
-        return {
-          changes: raw.effects.map((effect) => ({
-            path: effect.path,
-            // The position address locates the OWNER (for an entity field that
-            // is the collection); `subjectFieldSegments` is the producer-known
-            // row-relative address. Appending it is what makes two fields of
-            // one row distinguishable. The segments already existed and were
-            // already authoritative — `scalarRelation` and `makeScalarKey`
-            // key on them — so only the public projection was dropping them.
-            address: (() => {
-              const owner = registry?.addressFor(effect.position);
-              if (!owner) return owner;
-              const within =
-                effect.kind === 'set' ? effect.subjectFieldSegments : undefined;
-              return within ? [...owner, ...within] : owner;
-            })(),
-            subject:
-              'subject' in effect && typeof effect.subject === 'number'
-                ? effect.subject
-                : undefined,
-            status: classifyProposedEffect(effect, raw.laterEffects),
-          })),
-        };
-      };
-
-      /**
-       * ⚠️ SETTLEMENT MUST NOT DEPEND ON INSPECTION.
-       *
-       * `read()` throws when mutation chronology capture has failed, and
-       * folding the review projection into `transact()` briefly made
-       * `confirm()` call it unguarded — so a tree whose inspection was
-       * unavailable could no longer be SETTLED at all. The handle wedged.
-       * `path-notifier-enqueue.spec.ts` caught it: "the low-level settlement
-       * handle does not depend on the inspection UI."
-       *
-       * Returning `undefined` rather than an empty inspection is deliberate.
-       * `{ changes: [] }` would be a FALSE claim that the turn changed
-       * nothing; leaving it unset makes a later `inspect()` fall through to
-       * `read()` and report the unavailability honestly.
-       */
-      const snapshot = (): TransactionInspection | undefined => {
-        try {
-          return read();
-        } catch {
-          return undefined;
-        }
-      };
-
-      return {
-        inspect(): TransactionInspection {
-          // After settlement the turn is no longer pending, so the inspection
-          // as of that settlement is what there is to report.
-          return settled ?? read();
-        },
-        confirm(): void {
-          // Snapshot BEFORE confirming: this is the race inspect() alone
-          // cannot close, and after confirm the pending turn is gone. The
-          // snapshot is kept even though confirm() returns void, so a later
-          // inspect() still reports the truth as of settlement.
-          const atSettlement = settled ?? snapshot();
-          pending.confirm();
-          settled = atSettlement;
-        },
-        rollback(): void {
-          const atSettlement = settled ?? snapshot();
-          // Throws on a conservative refusal. Deliberately not caught: the
-          // caller must see a reversal that could not be applied. `settled` is
-          // assigned only on success, so a refused rollback leaves the handle
-          // reporting live state — matching the turn, which stays pending.
-          pending.rollback();
-          settled = atSettlement;
-        },
-      };
-    };
+    host.transact = runtime.transaction;
 
     (tree as unknown as Record<string, unknown>)['__transactions'] = {
       getConfirmedTurnCount: () => runtime.getConfirmedTurnCount(),

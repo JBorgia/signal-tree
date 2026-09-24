@@ -91,7 +91,15 @@ const refuseCompensation = (store: Store) => {
 };
 
 type Recovery = {
-  transaction: { confirm(): void; rollback(): void };
+  // `inspect()` included DELIBERATELY. This alias previously described
+  // settlement only, so the suite could not have noticed that the recovery
+  // path handed back an undecorated handle — which it did, making
+  // "inspection is available on every handle" false.
+  transaction: {
+    inspect(): { changes: readonly { path: string; status: string }[] };
+    confirm(): void;
+    rollback(): void;
+  };
   callbackFailed: boolean;
   callbackError?: unknown;
 };
@@ -263,5 +271,41 @@ describe('RECOVERY-HANDLE-0 / 5 — no handle when the handle cannot work', () =
     // method throws "Cannot settle a destroyed tree". Offering unusable
     // authority is the same class of false claim the recovery exists to fix.
     expect(recoveryOf(thrown)).toBeUndefined();
+  });
+});
+
+describe('RECOVERY-HANDLE-0 / 4 — the recovered handle can INSPECT', () => {
+  it('reports the partial turn it hands back, not just how to settle it', async () => {
+    const store = await makeStore();
+    const spy = refuseCompensation(store);
+
+    let thrown: unknown;
+    try {
+      store.transact(() => {
+        store.$.count(1);
+        store.$.rows.removeOne('b');
+        throw new Error('boom');
+      });
+    } catch (error) {
+      thrown = error;
+    }
+
+    const recovery = recoveryOf(thrown);
+    expect(recovery).toBeDefined();
+
+    // The whole point of handing back authority is that the caller can DECIDE.
+    // Deciding needs to see what the partial turn actually contains, and this
+    // is the same pending turn every other handle wraps.
+    expect(typeof recovery?.transaction.inspect).toBe('function');
+    const changes = recovery?.transaction.inspect().changes ?? [];
+    expect(changes.length).toBeGreaterThan(0);
+    expect(changes.some((c) => c.path === 'count')).toBe(true);
+    expect(changes.every((c) => c.status === 'current')).toBe(true);
+
+    // And the authority is still real.
+    expect(store.__transactions.getPendingTurnCount()).toBe(1);
+
+    spy.mockRestore();
+    store.destroy();
   });
 });

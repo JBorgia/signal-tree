@@ -11,8 +11,8 @@ import { transactions } from './transactions';
  * PROPOSAL-0 — the frozen facade, exercised through the PUBLIC surface.
  *
  * The adversarial matrix was already run against the raw primitives in
- * `pending-0-kernel.spec.ts` BEFORE this facade existed. This file re-runs
- * the load-bearing cases through `pending()` and asserts the two surfaces
+ * `proposal-0-kernel.spec.ts` BEFORE this facade existed. This file re-runs
+ * the load-bearing cases through `propose()` and asserts the two surfaces
  * agree — which is what makes "naming, not new semantics" checkable rather
  * than merely claimed. The lower-level transaction specs stay: if these two
  * ever disagree, the facade grew a rule of its own.
