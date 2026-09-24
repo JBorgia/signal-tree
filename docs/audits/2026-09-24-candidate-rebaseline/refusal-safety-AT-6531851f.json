@@ -1,0 +1,83 @@
+{
+  "provenance": {
+    "resolvedKernelSha": "6531851f1b8d5be7607af19cdbb7f55ee3df1116",
+    "kernelSourceSelection": "git show 6531851f1b8d5be7607af19cdbb7f55ee3df1116:packages/kernel/src/**",
+    "bundleSha256": "c8eac5b8a8f1f94638d1751a6a2bc75bd59d01454bb26166a52fa3b3d1478764",
+    "bundleBytes": 511993,
+    "adapterSha256_16": "1c3bf8941fff1d64",
+    "scenarioSha256_16": "e603aee4ea9361c1",
+    "runnerSha256_16": "5afb9872b7d770a8",
+    "assertionsSha256_16": "2182d9bbbe33aa92",
+    "node": "v24.15.0",
+    "generatedAt": "2026-09-24T23:55:41.022Z"
+  },
+  "kind": "refusal-safety-characterization",
+  "rows": [
+    {
+      "id": "R8-01-reject-accept",
+      "firstStatus": "refused",
+      "stateUnchangedByRefusal": true,
+      "before": {
+        "x": 1,
+        "y": 2,
+        "z": 2
+      },
+      "after": {
+        "x": 1,
+        "y": 2,
+        "z": 2
+      },
+      "refusedHandleKeepsAuthority": true,
+      "otherHandleKeepsAuthority": true,
+      "secondSettles": "settled",
+      "observationsDuringWholeRun": 2
+    },
+    {
+      "id": "R8-01-reject-reject",
+      "firstStatus": "refused",
+      "stateUnchangedByRefusal": true,
+      "before": {
+        "x": 1,
+        "y": 2,
+        "z": 2
+      },
+      "after": {
+        "x": 1,
+        "y": 2,
+        "z": 2
+      },
+      "refusedHandleKeepsAuthority": true,
+      "otherHandleKeepsAuthority": true,
+      "secondSettles": "settled",
+      "observationsDuringWholeRun": 2
+    },
+    {
+      "id": "same-tick-local-flush-false",
+      "firstStatus": "refused",
+      "laterWritePreserved": true,
+      "stateUnchangedByRefusal": true,
+      "before": {
+        "x": 2
+      },
+      "after": {
+        "x": 2
+      },
+      "refusedHandleKeepsAuthority": true,
+      "observationsDuringWholeRun": 1
+    },
+    {
+      "id": "same-tick-external-flush-false",
+      "firstStatus": "refused",
+      "laterWritePreserved": true,
+      "stateUnchangedByRefusal": true,
+      "before": {
+        "x": 2
+      },
+      "after": {
+        "x": 2
+      },
+      "refusedHandleKeepsAuthority": true,
+      "observationsDuringWholeRun": 1
+    }
+  ]
+}
