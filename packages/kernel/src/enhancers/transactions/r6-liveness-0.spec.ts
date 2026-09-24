@@ -52,7 +52,12 @@ const rowTree = () => {
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),
       x: 0,
     },
-    { enhancers: [transactions()] }
+    // Declares diagnostic history because it COUNTS confirmed turns. Without
+    // it, the L15 default evicts a promoted turn inside the same synchronous
+    // confirmPending call, the delta is always 0, and the mutation this case
+    // exists to catch (promote instead of reject) passes. Verified: the
+    // accept()-for-reject() mutant survived at 7/7 before this line.
+    { enhancers: [transactions({ history: { retain: 1000 } })] }
   );
   owned.push(tree);
   return tree;
@@ -123,6 +128,10 @@ describe('R6-LIVENESS-0 / 2 — SETTLEMENT axis: is the proposal still open?', (
     // The decisive question: is x=1 now merely orphaned live state, or did
     // the kernel promote the rejected turn into the confirmed ledger?
     expect(confirmedCount(tree) - confirmedBefore).toBe(0);
+    // Backstop, matching every other confirmedCount-invariance site: a promoted
+    // turn also leaves the pending set, so this fails even if the confirmed
+    // counter is ever bounded out from under the assertion again.
+    expect(pendingCount(tree)).toBe(1);
   });
 });
 

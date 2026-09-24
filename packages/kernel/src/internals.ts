@@ -200,18 +200,14 @@ export function confirmedTurnReader<
       if (destroyed?.() === true) {
         throw new StudioTreeDestroyedError();
       }
-      const authority = runtime as unknown as {
-        getConfirmedRetention?: () => {
-          truncated: boolean;
-          firstAvailableTurnId?: number;
-        };
-      };
+      // No cast and no fallback. `getConfirmedRetention()` is a REQUIRED
+      // member of InternalTransactionRuntime, so this type-checks directly;
+      // the previous `as unknown as {...?}` discarded that guarantee, and its
+      // `?? { truncated: false }` branch was unreachable while being the one
+      // thing that could silently restore the assertion this work deleted.
       return projectConfirmedTurns(
         runtime.getConfirmedTurnRecords() as never,
-        authority.getConfirmedRetention?.() ?? {
-          truncated: false,
-          firstAvailableTurnId: undefined,
-        }
+        runtime.getConfirmedRetention()
       );
     },
   };
