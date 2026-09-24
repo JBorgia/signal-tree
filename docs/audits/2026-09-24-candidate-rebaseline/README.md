@@ -28,13 +28,18 @@
 
 The current-source run used a COPY of the frozen experiment with `baseline`
 repointed, placed in a gitignored sibling directory so the frozen experiment is
-untouched. It records what it loaded:
+untouched. Runner self-test PASSED first, per the protocol's evidence gate.
 
-    [source-selected] baseline=6531851f1b8d5be7607af19cdbb7f55ee3df1116
-                      bundleSha256=c8eac5b8a8f1f94638d1751a6a2bc75bd59d01454bb26166a52fa3b3d1478764
-                      bytes=511993
+Provenance is INSIDE the report, not only in prose — the kernel is
+revision-pinned while the adapter and scenarios come from the copy, so a reader
+must be able to identify both without relying on a filename:
 
-Runner self-test PASSED first, per the protocol's evidence gate.
+    resolvedKernelSha   6531851f1b8d5be7607af19cdbb7f55ee3df1116
+    bundleSha256        c8eac5b8a8f1f946...  (511993 bytes)
+    adapterSha256_16    1c3bf8941fff1d64
+    scenarioSha256_16   e603aee4ea9361c1
+    runnerSha256_16     5afb9872b7d770a8
+    node                v24.15.0
 
 ## What actually changed between the two revisions
 
@@ -62,8 +67,20 @@ cannot show:
 succeeded and destroyed a later write. `'refused' !== 'settled'` fails at
 `settled()` itself — nothing was destroyed, the operation declined.
 
-So the merged work turned three silent data losses into refusals, and fixed a
-fourth case outright. That is a real improvement the totals row hides.
+So the merged work fixed one case outright and turned **four** value
+corruptions into refusals — across **two defect families**:
+
+    overlapping writers       R8-01-reject-{accept,reject}
+    unflushed later write     same-tick-{local,external}-flush-false
+
+(An earlier draft said "three data losses". There are four cases and two
+families; the number was simply wrong.)
+
+⚠️ **The oracle alone does not prove the refusals are SAFE.** Those controls
+stop at `settled(c.reject(p))`, and when that assertion throws every later value
+assertion is skipped. The JSON therefore establishes only that the operation
+refuses instead of reaching the old incorrect-value assertion. Safety is a
+separate dimension and is measured separately — see below.
 
 ## The remaining four are the v16 target, stated precisely
 
@@ -75,9 +92,34 @@ refuse.** They are the cases where containment is correct but insufficient.
     same-tick-*-flush-false          reversal must see a later write that the
                                      notifier has not yet delivered
 
-No safety work turns these green. Only the ownership model does. This is the
-"H1..H9 is a floor, not a success criterion" point with a number on it: **4 of
-14 current-source controls demand settlement we decline.**
+This is the "H1..H9 is a floor, not a success criterion" point with a number on
+it: **4 of 14 current-source controls demand a settlement the incumbent
+declines.**
+
+⚠️ What that does NOT establish is WHICH MECHANISM is required. An earlier draft
+said "only the ownership model can fix this"; that is an outcome measurement
+being read as a mechanism proof. These four cases may well need DIFFERENT
+improvements — overlapping-writer settlement and unflushed-write visibility are
+not obviously the same problem. The ownership direction stands as the chosen
+product decision; the mechanism is for candidate evidence to decide.
+
+## Refusal safety, measured separately
+
+`refusal-safety-AT-6531851f.json` records what survives each refusal, WITHOUT
+weakening the successful-settlement oracle above — weakening it is what would
+hide the gap:
+
+    case                             refuses  state     refused   other     later write
+                                              unchanged  keeps     keeps     preserved
+                                                         authority authority
+    R8-01-reject-accept              yes      yes       yes       yes       n/a
+    R8-01-reject-reject              yes      yes       yes       yes       n/a
+    same-tick-local-flush-false      yes      yes       yes       n/a       yes
+    same-tick-external-flush-false   yes      yes       yes       n/a       yes
+
+In both R8 cases the OTHER handle then settles cleanly. Publication is reported
+as a raw count over the whole run rather than asserted: isolating publication to
+the refusal itself needs a marker the adapter does not expose.
 
 ## Method notes worth keeping
 

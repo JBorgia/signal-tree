@@ -1,4 +1,16 @@
 {
+  "provenance": {
+    "resolvedKernelSha": "6531851f1b8d5be7607af19cdbb7f55ee3df1116",
+    "kernelSourceSelection": "git show 6531851f1b8d5be7607af19cdbb7f55ee3df1116:packages/kernel/src/**",
+    "bundleSha256": "c8eac5b8a8f1f94638d1751a6a2bc75bd59d01454bb26166a52fa3b3d1478764",
+    "bundleBytes": 511993,
+    "adapterSha256_16": "1c3bf8941fff1d64",
+    "scenarioSha256_16": "e603aee4ea9361c1",
+    "runnerSha256_16": "5afb9872b7d770a8",
+    "assertionsSha256_16": "2182d9bbbe33aa92",
+    "node": "v24.15.0",
+    "generatedAt": "2026-09-24T23:54:56.392Z"
+  },
   "profile": "live",
   "totals": {
     "passed": 10,
@@ -12,89 +24,89 @@
       "id": "clean-single-rollback",
       "family": "current-public-behavior",
       "status": "passed",
-      "ms": 13.77558399999998
+      "ms": 20.227208000000246
     },
     {
       "id": "R6-refused-rollback-retains-same-authority",
       "family": "current-public-behavior",
       "status": "passed",
-      "ms": 3.3483750000000327
+      "ms": 4.202750000000378
     },
     {
       "id": "R8-01-accept-accept",
       "family": "current-public-behavior",
       "status": "passed",
-      "ms": 1.2916669999999613
+      "ms": 10.20516699999962
     },
     {
       "id": "R8-01-accept-reject",
       "family": "current-public-behavior",
       "status": "passed",
-      "ms": 1.6706670000003214
+      "ms": 9.836749999999938
     },
     {
       "id": "R8-01-reject-accept",
       "family": "current-public-behavior",
       "status": "failed",
       "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'refused'\n- 'settled'\n\n    at settled (file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/assertions.mjs:7:41)\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/current-characterization.mjs:19:30)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/runner.mjs:12:74)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/current-characterization.mjs:31:14",
-      "ms": 1.281999999999698
+      "ms": 1.0410830000000715
     },
     {
       "id": "R8-01-reject-reject",
       "family": "current-public-behavior",
       "status": "failed",
       "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'refused'\n- 'settled'\n\n    at settled (file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/assertions.mjs:7:41)\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/current-characterization.mjs:19:30)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/runner.mjs:12:74)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/current-characterization.mjs:31:14",
-      "ms": 0.5286669999995866
+      "ms": 0.5083330000002206
     },
     {
       "id": "R8-10-accept-accept",
       "family": "current-public-behavior",
       "status": "passed",
-      "ms": 0.4643750000000182
+      "ms": 0.43779200000017227
     },
     {
       "id": "R8-10-accept-reject",
       "family": "current-public-behavior",
       "status": "passed",
-      "ms": 1.2710000000001855
+      "ms": 20.181958000000122
     },
     {
       "id": "R8-10-reject-accept",
       "family": "current-public-behavior",
       "status": "passed",
-      "ms": 0.8209160000001248
+      "ms": 3.7723339999997734
     },
     {
       "id": "R8-10-reject-reject",
       "family": "current-public-behavior",
       "status": "passed",
-      "ms": 0.6456250000001091
+      "ms": 5.658832999999959
     },
     {
       "id": "same-tick-local-flush-false",
       "family": "current-public-behavior",
       "status": "failed",
       "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'refused'\n- 'settled'\n\n    at settled (file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/assertions.mjs:7:41)\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/current-characterization.mjs:29:2)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/runner.mjs:12:74)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/current-characterization.mjs:31:14",
-      "ms": 0.4389579999997295
+      "ms": 2.9492079999999987
     },
     {
       "id": "same-tick-local-flush-true",
       "family": "current-public-behavior",
       "status": "passed",
-      "ms": 1.0519999999996799
+      "ms": 1.6940840000002026
     },
     {
       "id": "same-tick-external-flush-false",
       "family": "current-public-behavior",
       "status": "failed",
       "message": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'refused'\n- 'settled'\n\n    at settled (file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/assertions.mjs:7:41)\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/current-characterization.mjs:29:2)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/runner.mjs:12:74)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/.current-source-run/current-characterization.mjs:31:14",
-      "ms": 0.35787500000014916
+      "ms": 3.1852499999999964
     },
     {
       "id": "same-tick-external-flush-true",
       "family": "current-public-behavior",
       "status": "passed",
-      "ms": 0.30920800000012605
+      "ms": 1.1037499999997635
     }
   ]
 }
