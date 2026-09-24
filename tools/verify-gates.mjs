@@ -418,16 +418,30 @@ const GATES = [
     // is fine, the claim surface is the thing that went stale.
     // The mutation must name a symbol that is IN THE CURRENT DELTA, or it proves
     // nothing: the gate only inspects what this release added, so blanking a
-    // symbol from an older release is invisible to it. `prependOne` shipped in
-    // 14.0.0, which sat outside the window, so the previous mutation targeted
-    // a symbol outside the window and the harness correctly reported this gate
-    // BLIND. `asMap` is in the delta and appears exactly once in llms.txt —
-    // occurrence count matters, because the harness uses String.replace, which
-    // substitutes only the FIRST match and would leave the symbol still present.
-    // Re-check this target whenever the base tag moves: `--list` prints the delta.
+    // symbol from an older release is invisible to it. This has now gone wrong
+    // TWICE, in both directions, and the harness caught it both times.
+    //
+    //   `prependOne` shipped in 14.0.0, outside the window  -> BLIND
+    //   `asMap`, in the window while the base was resolving
+    //     to a tag on the 15.x line                          -> caught, but the
+    //                                                           window was wrong
+    //
+    // Fixing the base to the last release on THIS line (see resolveBase in
+    // check-release-claims.mjs) narrowed the delta from 406 symbols to 1, and
+    // `asMap` fell outside it — BLIND again, reported honestly.
+    //
+    // ST2033 is that one symbol, and it appears exactly once in llms-full.txt.
+    // Occurrence count matters: a find/replace that hits several places can
+    // fail the gate for a reason other than the one being proven.
+    //
+    // ⚠️ THIS TARGET IS DELTA-BOUND BY NATURE. Once 14.1.4 is tagged and the
+    // next patch resolves its base here, ST2033 leaves the window and this goes
+    // blind again. That is not a defect in the mutation — it is this gate being
+    // honest that it covers nothing when a release adds nothing. Retarget it to
+    // a symbol in the new delta, or accept the blind report as accurate.
     mutation: {
-      file: 'apps/demo/public/llms.txt',
-      find: 'asMap',
+      file: 'apps/demo/public/llms-full.txt',
+      find: 'ST2033',
       replace: '__gateRemovedFromPriming',
     },
   },
