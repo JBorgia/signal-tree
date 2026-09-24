@@ -3,15 +3,14 @@ import { writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from '../../lib/signal-tree';
-import { withWriteContext } from '../../lib/write-context';
 import { transactions } from './transactions';
+import { makeCurrent } from './semantics-current-adapter';
 import {
+  ALL_CASES,
+  ContractExecutionError,
+  UnsupportedSemantic,
   runContract,
-  type CandidateFactory,
-  type Handle,
-  type SemanticCandidate,
-  type SettlementResult,
-  type Snapshot,
+  type CaseResult,
 } from './semantics-contract';
 
 /**
@@ -27,170 +26,219 @@ import {
  * Violations found here are EVIDENCE, and are reported, not fixed.
  */
 
-const flushTwice = async () => {
-  await Promise.resolve();
-  await Promise.resolve();
-};
-
-type Pending = { confirm(): void; rollback(): void };
-
-const makeCurrent: CandidateFactory = async () => {
-  const tree = signalTree(
-    { x: 0, y: 0, z: 0 },
-    { enhancers: [transactions()] }
-  ) as unknown as {
-    $: Record<string, (v?: unknown) => unknown>;
-    transact?: (fn: () => void) => Pending;
-    transaction?: (fn: () => void) => Pending;
-    __transactions: { getPendingTurnIds(): number[] };
-  };
-
-  const open = tree.transact ?? tree.transaction;
-  if (!open) throw new Error('no transaction entry point on this tree');
-
-  const write = (key: string, value: unknown) => {
-    tree.$[key]?.(value);
-  };
-  const read = (): Snapshot => ({
-    x: tree.$['x']?.(),
-    y: tree.$['y']?.(),
-    z: tree.$['z']?.(),
-  });
-
-  const handles = new Map<Handle, { pending: Pending; settled: boolean }>();
-
-  /**
-   * The current model keeps no canonical/pending split: there is one live
-   * tree. Canonical is therefore approximated as "the last authority truth
-   * written", tracked here by the adapter rather than read from the kernel.
-   * That approximation is itself a finding — a model with no canonical layer
-   * cannot answer readCanonical() from its own state.
-   */
-  const canonical: Snapshot = { x: 0, y: 0, z: 0 };
-  let highestRevision = -Infinity;
-
-  const candidate: SemanticCandidate = {
-    beginContribution(fn) {
-      const h = {} as Handle;
-      handles.set(h, { pending: open(fn), settled: false });
-      return h;
-    },
-    settleAccept(handle): SettlementResult {
-      const entry = handles.get(handle);
-      if (!entry) return { status: 'refused', reason: 'unknown handle' };
-      if (entry.settled) return { status: 'already-settled' };
-      try {
-        entry.pending.confirm();
-        entry.settled = true;
-        return { status: 'settled' };
-      } catch (e) {
-        return { status: 'refused', reason: e };
-      }
-    },
-    settleReject(handle): SettlementResult {
-      const entry = handles.get(handle);
-      if (!entry) return { status: 'refused', reason: 'unknown handle' };
-      if (entry.settled) return { status: 'already-settled' };
-      try {
-        entry.pending.rollback();
-        entry.settled = true;
-        return { status: 'settled' };
-      } catch (e) {
-        return { status: 'refused', reason: e };
-      }
-    },
-    applyAuthority(event) {
-      const order = event.order;
-      if (order.kind === 'versioned') {
-        // L12: a stale revision must not advance canonical truth.
-        if (order.revision <= highestRevision) return;
-        highestRevision = order.revision;
-      }
-      if (event.truth) {
-        withWriteContext(
-          { intent: 'system', participation: 'realized' },
-          event.truth
-        );
-        Object.assign(canonical, read());
-      }
-      // The current model has no notion of a settlement RELATION: an
-      // authority write is simply a later effect. Correlated accept/reject
-      // therefore cannot be honoured, which is what A2 measures.
-    },
-    readCanonical() {
-      return { ...canonical };
-    },
-    readVisible() {
-      return read();
-    },
-    readSettlementState(handle) {
-      const entry = handles.get(handle);
-      const open = (tree.__transactions?.getPendingTurnIds?.() ?? []).length > 0;
-      if (!entry) {
-        return { disposition: 'conflicted', retainsAuthority: false };
-      }
-      if (entry.settled) {
-        return { disposition: 'committed', retainsAuthority: false };
-      }
-      return {
-        disposition: open ? 'pending' : 'conflicted',
-        retainsAuthority: open,
-      };
-    },
-    observeVisible() {
-      return () => undefined;
-    },
-  };
-
-  return { candidate, write, flush: flushTwice };
-};
+function reportResults(results: CaseResult[]): string {
+  const lines = [
+    '',
+    'TRANSACTION-SEMANTICS-2 / candidate A — current implementation',
+    '',
+  ];
+  for (const r of results) {
+    lines.push(`  ${r.status.toUpperCase().padEnd(11)} ${r.id}`);
+    const note = r.error ?? r.unsupported ?? r.violation;
+    if (note) lines.push(`              ${note}`);
+  }
+  lines.push(
+    '',
+    `  cases: ${['held', 'violated', 'unsupported', 'error']
+      .map(
+        (status) =>
+          `${results.filter((r) => r.status === status).length} ${status}`
+      )
+      .join(', ')}, ${results.length} total`,
+    '  Held means this implemented case only; unsupported is not a pass or a law verdict.',
+    ''
+  );
+  return lines.join('\n');
+}
 
 describe('TRANSACTION-SEMANTICS-2 — candidate A (current implementation)', () => {
-  it('reports a disposition table; violations are evidence, not failures', async () => {
-    const results = await runContract(makeCurrent);
-
-    const violated = new Map<string, string[]>();
-    for (const r of results) {
-      const note = r.error ? `ERROR ${r.error}` : r.violation;
-      if (!note) continue;
-      for (const law of r.laws) {
-        const list = violated.get(law) ?? [];
-        list.push(`${r.id} — ${note}`);
-        violated.set(law, list);
-      }
+  it('reports semantic evidence and fails on execution errors', async () => {
+    let results: CaseResult[];
+    let failure: ContractExecutionError | undefined;
+    try {
+      results = await runContract(makeCurrent);
+    } catch (e) {
+      if (!(e instanceof ContractExecutionError)) throw e;
+      results = e.results;
+      failure = e;
     }
-
-    const lines: string[] = [
-      '',
-      'TRANSACTION-SEMANTICS-2 / candidate A — current implementation',
-      '',
-    ];
-    for (const r of results) {
-      const note = r.error ? `ERROR ${r.error}` : r.violation;
-      lines.push(`  ${note ? 'VIOLATION' : 'holds    '}  ${r.id}`);
-      if (note) lines.push(`             ${note}`);
-    }
-    lines.push('');
-    lines.push(
-      `  laws violated: ${
-        [...violated.keys()].sort().join(', ') || '(none)'
-      }`
-    );
-    lines.push(
-      `  cases: ${results.filter((r) => !r.violation && !r.error).length} held, ${
-        results.filter((r) => r.violation || r.error).length
-      } violated, ${results.length} total`
-    );
-    lines.push('');
-    const report = lines.join('\n');
+    const report = reportResults(results);
     console.log(report);
-    if (process.env['SEMANTICS_REPORT']) {
+    if (process.env['SEMANTICS_REPORT'])
       writeFileSync(process.env['SEMANTICS_REPORT'], report, 'utf8');
-    }
+    if (failure) throw failure;
+    expect(results.map((r) => r.id)).toEqual(ALL_CASES.map((c) => c.id));
+    expect(results).toHaveLength(13);
+  });
+});
 
-    // The contract must RUN. It is not asserted green: the current
-    // implementation is expected to violate most of these laws, and the
-    // disposition table above is the deliverable.
-    expect(results.length).toBeGreaterThan(0);
+// Instrument regressions, not additional frozen research cases.
+describe('current adapter and contract execution integrity', () => {
+  it('fails when all 13 constructors throw, retaining each error', async () => {
+    let attempts = 0;
+    const failure = await runContract(async () => {
+      attempts++;
+      throw new Error('constructor unavailable');
+    }).catch((e: unknown) => e);
+    expect(attempts).toBe(13);
+    expect(failure).toBeInstanceOf(ContractExecutionError);
+    if (!(failure instanceof ContractExecutionError))
+      throw new Error('Expected execution failure');
+    expect(failure.results).toHaveLength(13);
+    expect(
+      failure.results.every(
+        (r) =>
+          r.status === 'error' && r.error?.includes('constructor unavailable')
+      )
+    ).toBe(true);
+  });
+
+  it('does not disguise a construction failure as unsupported', async () => {
+    await expect(
+      runContract(async () => {
+        throw new UnsupportedSemantic('constructor cannot run');
+      })
+    ).rejects.toBeInstanceOf(ContractExecutionError);
+  });
+
+  it('unsupported operations never become held cases, and every fixture is disposed', async () => {
+    let disposed = 0;
+    const unsupported = (): never => {
+      throw new UnsupportedSemantic('fixture lacks operation');
+    };
+    const results = await runContract(async () => {
+      const fixture = await makeCurrent();
+      return {
+        ...fixture,
+        candidate: {
+          ...fixture.candidate,
+          beginContribution: unsupported,
+          applyAuthority: unsupported,
+        },
+        dispose: () => {
+          disposed++;
+          fixture.dispose();
+        },
+      };
+    });
+    expect(disposed).toBe(13);
+    expect(results.every((r) => r.status === 'unsupported')).toBe(true);
+    expect(reportResults(results)).toContain(
+      '0 held, 0 violated, 13 unsupported, 0 error'
+    );
+  });
+
+  it('fails if one constructor fails even when others run and dispose', async () => {
+    let attempts = 0;
+    let disposed = 0;
+    const failure = await runContract(async () => {
+      if (++attempts === 2) throw new Error('single broken constructor');
+      const fixture = await makeCurrent();
+      return {
+        ...fixture,
+        dispose: () => {
+          disposed++;
+          fixture.dispose();
+        },
+      };
+    }).catch((e: unknown) => e);
+    expect(failure).toBeInstanceOf(ContractExecutionError);
+    expect(attempts).toBe(13);
+    expect(disposed).toBe(12);
+  });
+
+  it('treats teardown failure as execution failure', async () => {
+    await expect(
+      runContract(async () => {
+        const fixture = await makeCurrent();
+        return {
+          ...fixture,
+          dispose: () => {
+            fixture.dispose();
+            throw new Error('teardown failed');
+          },
+        };
+      })
+    ).rejects.toBeInstanceOf(ContractExecutionError);
+  });
+
+  it('matches native settlement results on every call, including repeated rollback', async () => {
+    const f = await makeCurrent();
+    const control = signalTree(
+      { x: 0, y: 0, z: 0 },
+      { enhancers: [transactions()] }
+    );
+    const nativeStatus = (operation: () => void) => {
+      try {
+        operation();
+        return 'settled';
+      } catch {
+        return 'refused';
+      }
+    };
+    try {
+      const h = f.candidate.beginContribution(() => f.write('x', 1));
+      const native = control.transact(() => control.$.x(1));
+      await f.flush();
+      expect(f.candidate.settleReject(h).status).toBe(
+        nativeStatus(() => native.rollback())
+      );
+      expect(f.candidate.settleReject(h).status).toBe(
+        nativeStatus(() => native.rollback())
+      );
+      expect(f.candidate.settleAccept(h).status).toBe(
+        nativeStatus(() => native.confirm())
+      );
+    } finally {
+      f.dispose();
+      control.destroy();
+    }
+  });
+
+  it('reads only this handle pending ID and never invents terminal disposition', async () => {
+    const f = await makeCurrent();
+    try {
+      const first = f.candidate.beginContribution(() => f.write('x', 1));
+      await f.flush();
+      const second = f.candidate.beginContribution(() => f.write('y', 2));
+      await f.flush();
+      expect(f.candidate.readSettlementState(first)).toEqual({
+        disposition: 'pending',
+        retainsAuthority: true,
+      });
+      expect(f.candidate.settleReject(first).status).toBe('settled');
+      expect(() => f.candidate.readSettlementState(first)).toThrow(
+        UnsupportedSemantic
+      );
+      expect(f.candidate.readSettlementState(second)).toEqual({
+        disposition: 'pending',
+        retainsAuthority: true,
+      });
+    } finally {
+      f.dispose();
+    }
+  });
+
+  it('reports missing canonical, revision and correlation semantics explicitly', async () => {
+    const f = await makeCurrent();
+    try {
+      expect(() => f.candidate.readCanonical()).toThrow(UnsupportedSemantic);
+      expect(() =>
+        f.candidate.applyAuthority({
+          truth: () => f.write('x', 7),
+          order: { kind: 'versioned', revision: 20 },
+        })
+      ).toThrow(UnsupportedSemantic);
+      expect(f.candidate.readVisible()['x']).toBe(0);
+      const h = f.candidate.beginContribution(() => f.write('y', 1));
+      expect(() =>
+        f.candidate.applyAuthority({
+          order: { kind: 'snapshot' },
+          settlement: { kind: 'accepts', contribution: h },
+        })
+      ).toThrow(UnsupportedSemantic);
+    } finally {
+      f.dispose();
+    }
   });
 });

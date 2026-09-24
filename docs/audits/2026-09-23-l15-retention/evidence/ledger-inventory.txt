@@ -1,0 +1,42 @@
+189:  __baselineValues?: Map<number, unknown>;
+566:  private confirmedTurns: TransactionTurnRecord[] = [];
+576:   * and the old answer came only from `confirmedTurns` — which excludes
+596:  private dependencyLedger: Array<{ seq: number; effect: TurnEffect }> = [];
+598:  private readonly pendingOpenedAtSeq = new Map<number, number>();
+637:      __baselineValues: baselineValues ? new Map(baselineValues) : undefined,
+670:    this.pendingOpenedAtSeq.set(turn.id, this.ledgerSeq);
+690:      this.dependencyLedger.push({ seq: this.ledgerSeq, effect });
+697:      this.dependencyLedger = [];
+699:      this.pendingOpenedAtSeq.clear();
+709:    this.pendingOpenedAtSeq.delete(turnId);
+728:    this.pendingOpenedAtSeq.delete(turnId);
+736:    return this.confirmedTurns.some((turn) => turn.id > turnId);
+800:    const authoredLater = this.confirmedTurns
+811:    const openedAt = this.pendingOpenedAtSeq.get(turnId) ?? 0;
+812:    const observedLater = this.dependencyLedger
+824:    return this.confirmedTurns.length;
+838:    return this.confirmedTurns.map((turn) => turn.id);
+862:    return this.confirmedTurns;
+866:    const insertIndex = this.confirmedTurns.findIndex(
+870:      this.confirmedTurns.push(turn);
+872:      this.confirmedTurns.splice(insertIndex, 0, turn);
+885:    __baselineValues: turn.__baselineValues
+886:      ? new Map(turn.__baselineValues)
+971:  const inspectionWrites = new Map<
+978:    inspectionWrites.clear();
+1298:    const own = inspectionWrites.get(transactionId);
+1308:      for (const [writer, writes] of inspectionWrites) {
+1856:            let writes = inspectionWrites.get(writer);
+1857:            if (!writes) inspectionWrites.set(writer, (writes = new Map()));
+1929:              // only; nothing here reaches confirmedTurns.
+2255:        const writes = inspectionWrites.get(transactionId);
+2260:        inspectionWrites.delete(transactionId);
+2288:              const accepted = inspectionWrites.get(transactionId);
+2290:                let settled = inspectionWrites.get(undefined);
+2292:                  inspectionWrites.set(undefined, (settled = new Map()));
+2297:                inspectionWrites.delete(transactionId);
+2359:                pendingTurn?.__baselineValues ?? new Map(),
+2393:            inspectionWrites.delete(transactionId);
+2442:      writers: inspectionWrites.size,
+2443:      footprints: [...inspectionWrites.values()].reduce(
+2486:      inspectionWrites.clear();

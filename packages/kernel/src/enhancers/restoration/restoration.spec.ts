@@ -1623,9 +1623,11 @@ describe('restoration enhancer', () => {
     expect(store.$.rows.byIdOrFail(16).name()).toBe('replacement-anchor');
   });
 
-  it.todo(
-    'characterizes rollback when both remove anchors are gone and no retained structural fact proves placement'
-  );
+  // Missing-anchor characterization is covered by the 26 executable controls
+  // in ./restoration-missing-anchors.spec.ts: rollback/undo/redo refuse without
+  // changing state, publication, or retry authority when placement is unproved.
+  // Bounded closure and remaining limits:
+  // docs/audits/2026-09-23-remaining-expected-failures.md#restoration-todo-disposition
 
   it('makes confirm and rollback idempotent in their own terminal direction', () => {
     const store = signalTree(

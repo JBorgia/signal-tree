@@ -39,7 +39,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const semver = require('semver');
 
 const ROOT = path.resolve(__dirname, '..');
 
@@ -53,46 +52,26 @@ const CLAIM_SITES = [
 ];
 const RELEASE_CLAIM_SITE = 'docs/README.md';
 
+// A manifest identifies source, never registry publication. Require the source
+// version explicitly; reject the old generated release claim even if it matches.
 function checkReleaseClaim(text, site, version) {
-  const expectedLabel = semver.prerelease(version)
-    ? 'prerelease'
-    : 'release';
-  const claims = [
-    ...text.matchAll(
-      /Current (pre)?release:\*{0,2}\s+(\d+\.\d+\.\d+(?:-[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?)/gi
-    ),
-  ].map((match) => ({
-    label: match[1] ? 'prerelease' : 'release',
-    version: match[2],
-  }));
-  const violations = claims
-    .filter(
-      (claim) =>
-        claim.version !== version || claim.label !== expectedLabel
-    )
-    .map(
-      (claim) =>
-        `${site}: stale ${claim.label} claim "${claim.version}"; expected ` +
-        `current ${expectedLabel} "${version}" derived from package.json`
-    );
-  if (
-    !claims.some(
-      (claim) =>
-        claim.version === version && claim.label === expectedLabel
-    )
-  ) {
+  const violations = [];
+  const claims = [...text.matchAll(/Workspace version:\*{0,2}\s+(\S+)/gi)].map(
+    (match) => match[1]
+  );
+  if (claims.length !== 1 || claims[0] !== version) {
     violations.push(
-      `${site}: missing current ${expectedLabel} claim "${version}" derived from package.json`
+      `${site}: require exactly one Workspace version claim "${version}" derived from package.json`
     );
   }
-  if (
-    claims.filter(
-      (claim) =>
-        claim.version === version && claim.label === expectedLabel
-    ).length > 1
-  ) {
+  if (/Current (?:pre)?release:/i.test(text)) {
     violations.push(
-      `${site}: duplicate current ${expectedLabel} claim "${version}"`
+      `${site}: unsupported current release claim; package.json is not publication evidence`
+    );
+  }
+  if (!/Publication status:\*{0,2}\s+\S/i.test(text)) {
+    violations.push(
+      `${site}: missing explicit Publication status; do not hide an unsupported release status`
     );
   }
   return violations;
@@ -265,62 +244,54 @@ function selfTest(majors) {
   )} (\`@angular/core ${semverPhrase(majors)}\`).`;
   const v3 = checkSite(clean, 'fixture-clean.md', majors);
   expect('passes a clean site (control)', v3.length === 0);
-  expect(
-    'flags a stale prerelease claim',
-    checkReleaseClaim(
-      '**Current prerelease:** 9.6.0.',
-      'fixture-docs.md',
-      '15.0.0-rc.1'
-    ).some((violation) => violation.includes('stale prerelease claim'))
-  );
-  expect(
-    'passes the authoritative prerelease claim',
-    checkReleaseClaim(
-      '**Current prerelease:** 15.0.0-rc.1.',
-      'fixture-docs.md',
-      '15.0.0-rc.1'
-    ).length === 0
-  );
-  expect(
-    'passes the authoritative stable release claim',
-    checkReleaseClaim(
-      '**Current release:** 15.0.0.',
-      'fixture-docs.md',
-      '15.0.0'
-    ).length === 0
-  );
-  expect(
-    'rejects a prerelease label for a stable version',
-    checkReleaseClaim(
-      '**Current prerelease:** 15.0.0.',
-      'fixture-docs.md',
-      '15.0.0'
-    ).some((violation) => violation.includes('expected current release'))
-  );
-  expect(
-    'rejects a stable label for a prerelease version',
-    checkReleaseClaim(
-      '**Current release:** 15.0.0-rc.1.',
-      'fixture-docs.md',
-      '15.0.0-rc.1'
-    ).some((violation) => violation.includes('expected current prerelease'))
-  );
-  expect(
-    'flags a stale prerelease claim beside the authoritative claim',
-    checkReleaseClaim(
-      '**Current prerelease:** 9.6.0.\n**Current prerelease:** 15.0.0-rc.1.',
-      'fixture-docs.md',
-      '15.0.0-rc.1'
-    ).some((violation) => violation.includes('stale prerelease claim'))
-  );
-  expect(
-    'flags an undecorated stale prerelease claim beside the authoritative claim',
-    checkReleaseClaim(
-      'Current prerelease: 14.9.0\n**Current prerelease:** 15.0.0-rc.1.',
-      'fixture-docs.md',
-      '15.0.0-rc.1'
-    ).some((violation) => violation.includes('stale prerelease claim'))
-  );
+  for (const version of ['15.0.0', '15.0.0-rc.1']) {
+    const claim = `**Workspace version:** ${version}\n**Publication status:** Held; not registry-verified.`;
+    expect(
+      'passes an explicit source version and held status',
+      checkReleaseClaim(claim, 'fixture', version).length === 0
+    );
+    expect(
+      'rejects missing workspace version',
+      checkReleaseClaim('**Publication status:** Held.', 'fixture', version)
+        .length > 0
+    );
+    expect(
+      'rejects stale workspace version',
+      checkReleaseClaim(claim, 'fixture', '14.0.0').length > 0
+    );
+    expect(
+      'rejects duplicate workspace version',
+      checkReleaseClaim(
+        claim + `\nWorkspace version: ${version}`,
+        'fixture',
+        version
+      ).length > 0
+    );
+    expect(
+      'rejects matching but unproven release claim',
+      checkReleaseClaim(
+        claim + `\nCurrent release: ${version}`,
+        'fixture',
+        version
+      ).some((v) => v.includes('unsupported'))
+    );
+    expect(
+      'rejects matching but unproven prerelease claim',
+      checkReleaseClaim(
+        claim + `\nCurrent prerelease: ${version}`,
+        'fixture',
+        version
+      ).some((v) => v.includes('unsupported'))
+    );
+    expect(
+      'rejects missing publication status',
+      checkReleaseClaim(
+        `Workspace version: ${version}`,
+        'fixture',
+        version
+      ).some((v) => v.includes('Publication status'))
+    );
+  }
   const contradictory = `${humanPhrase(
     majors
   )}. Another path requires Angular 22.`;

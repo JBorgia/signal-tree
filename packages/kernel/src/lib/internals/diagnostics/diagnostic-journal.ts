@@ -3,6 +3,7 @@ import {
   type TransactionLifecycleEvent,
 } from '../causal-runtime/transaction-lifecycle';
 import { getPathNotifier } from '../../path-notifier';
+import { getPositionRegistry } from '../position-registry';
 
 import type { WriteMetadata } from '../../mutation-types';
 
@@ -113,11 +114,14 @@ export function createDiagnosticJournal(
   let disposed = false;
 
   const notifier = getPathNotifier();
+  const ownerId = getPositionRegistry(tree)?.id;
 
   const offWrite = notifier.subscribe(
     '**',
     (next, prev, path, ownerPath, origin, subjectIds, positionIds, meta) => {
-      if (disposed) return;
+      // The notifier is process-global. Unknown ownership is not permission
+      // to attribute another tree's write to this journal.
+      if (disposed || ownerId === undefined || meta?.ownerId !== ownerId) return;
       const m = (meta ?? {}) as WriteMetadata;
       (open ??= []).push({
         path,

@@ -40,15 +40,21 @@ type Key = string | number;
  */
 export function applyAtRelativePath<T>(
   previous: T,
-  ownerPath: string,
-  path: string,
+  segments: readonly string[],
   value: unknown
 ): T {
-  // A whole-source notification already carries the complete value: the scalar
-  // case, where `path === ownerPath`.
-  if (path === ownerPath) return value as T;
-  const relative = ownerPath === '' ? path : path.slice(ownerPath.length + 1);
-  return setAtPath(previous, relative.split('.'), value) as T;
+  return setAtPath(previous, segments, value) as T;
+}
+
+/** An exact structural prefix, including literal dots and empty property keys. */
+export function relativeSourceAddress(
+  source: readonly string[],
+  address: readonly string[]
+): readonly string[] | undefined {
+  if (source.length > address.length) return undefined;
+  if (!source.every((segment, index) => segment === address[index]))
+    return undefined;
+  return address.slice(source.length);
 }
 
 function setAtPath(
@@ -103,6 +109,8 @@ export type EntityTopology = {
     subject: number,
     isIncluded: (subject: number) => boolean
   ): { after: number } | { before: number } | 'end';
+  /** Apply a captured collection order without changing addresses. */
+  reorder(afterSubjects: readonly number[]): void;
   /** Replace the whole topology, e.g. after inbound external truth lands. */
   reload(seed: readonly EntityProjectionSeedEntry<Key, unknown>[]): void;
 };
@@ -125,6 +133,9 @@ export function createEntityTopology(
 
   return {
     reload,
+    reorder: (afterSubjects) => {
+      order = [...afterSubjects];
+    },
     keyOf: (subject) => keys.get(subject),
     has: (subject) => order.includes(subject),
 
@@ -151,7 +162,8 @@ export function createEntityTopology(
         keys.delete(effect.subject);
         return;
       }
-      if (effect.afterKey !== undefined) keys.set(effect.subject, effect.afterKey);
+      if (effect.afterKey !== undefined)
+        keys.set(effect.subject, effect.afterKey);
     },
 
     placement(subject, isIncluded) {

@@ -160,12 +160,45 @@ describe('confirmedTurnReader', () => {
 
     const retention = confirmedTurnReader(tree as never)?.readConfirmedTurns()
       .retention;
-    // Nothing evicts from confirmedTurns today, so history is complete — and
-    // `truncated` is derived from the retained ids, so it starts reporting true
-    // on its own if eviction is ever added.
+    // No confirmed records are evicted today; pending/rejected ID gaps do not
+    // imply missing confirmed history. Future eviction needs explicit metadata.
     expect(retention?.truncated).toBe(false);
     expect(retention?.firstAvailableTurnId).toBe(1);
   });
+
+  it.each(['rejected', 'pending'] as const)(
+    'does not report missing confirmed history when an earlier ID is %s',
+    (state) => {
+      const tree = signalTree({ x: 0, y: 0 }, { enhancers: [transactions()] });
+      try {
+        const first = tree.transact(() => tree.$.x(1));
+        if (state === 'rejected') first.rollback();
+        tree.transact(() => tree.$.y(2)).confirm();
+        const reader = confirmedTurnReader(tree)!;
+        const snapshot = reader.readConfirmedTurns();
+        expect(snapshot.turns.map(({ id }) => id)).toEqual([2]);
+        expect(snapshot.retention).toEqual({
+          truncated: false,
+          firstAvailableTurnId: 2,
+        });
+        if (state === 'pending') {
+          first.confirm();
+          const complete = reader.readConfirmedTurns();
+          expect(complete.turns.map(({ id }) => id)).toEqual([1, 2]);
+          expect(complete.retention).toEqual({
+            truncated: false,
+            firstAvailableTurnId: 1,
+          });
+        }
+        tree.destroy();
+        expect(() => reader.readConfirmedTurns()).toThrow(
+          /STUDIO_TREE_DESTROYED/
+        );
+      } finally {
+        tree.destroy();
+      }
+    }
+  );
 
   /**
    * 10. Zero-cost when unused. A tree that never ran a transaction has no

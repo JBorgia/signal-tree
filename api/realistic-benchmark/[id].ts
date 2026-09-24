@@ -11,13 +11,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (req.method !== 'GET') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
+    return res
+      .status(405)
+      .json({ success: false, error: 'Method not allowed' });
   }
 
   const { id } = req.query;
 
-  if (!id || Array.isArray(id)) {
-    return res.status(400).json({ success: false, error: 'Missing benchmark id' });
+  if (typeof id !== 'string' || !/^[a-f0-9]{1,40}$/i.test(id)) {
+    return res
+      .status(400)
+      .json({ success: false, error: 'Missing benchmark id' });
   }
 
   try {
@@ -31,19 +35,56 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     if (!response.ok) {
-      return res.status(response.status).json({ success: false, error: 'Benchmark not found' });
+      return res
+        .status(response.status)
+        .json({ success: false, error: 'Benchmark not found' });
     }
 
     const gist = (await response.json()) as {
-      files: Record<string, { raw_url: string }>;
+      owner?: { login?: string };
+      description?: string;
+      files?: Record<string, { raw_url?: string }>;
     };
 
-    const fileKey = Object.keys(gist.files)[0];
-    const fileUrl = gist.files[fileKey].raw_url;
-    const contentResponse = await fetch(fileUrl);
+    // A caller-supplied gist ID is not permission to proxy arbitrary account
+    // content. Only this service's benchmark records belong to this endpoint.
+    const entry = Object.entries(gist.files ?? {}).find(([name]) =>
+      /^realistic-benchmark-.+\.json$/.test(name)
+    );
+    const fileUrl = entry?.[1].raw_url;
+    let trustedContent = false;
+    if (typeof fileUrl === 'string') {
+      try {
+        const url = new URL(fileUrl);
+        trustedContent =
+          url.protocol === 'https:' &&
+          url.hostname === 'gist.githubusercontent.com' &&
+          !url.username &&
+          !url.password &&
+          !url.port &&
+          url.pathname
+            .toLowerCase()
+            .startsWith(`/jborgia/${id.toLowerCase()}/raw/`);
+      } catch {
+        /* malformed upstream record is not a benchmark */
+      }
+    }
+    if (
+      gist.owner?.login?.toLowerCase() !== 'jborgia' ||
+      !gist.description?.startsWith('SignalTree Realistic Benchmark:') ||
+      !trustedContent ||
+      !fileUrl
+    ) {
+      return res
+        .status(404)
+        .json({ success: false, error: 'Benchmark not found' });
+    }
+    const contentResponse = await fetch(fileUrl, { redirect: 'error' });
 
     if (!contentResponse.ok) {
-      return res.status(500).json({ success: false, error: 'Failed to load benchmark content' });
+      return res
+        .status(500)
+        .json({ success: false, error: 'Failed to load benchmark content' });
     }
 
     const benchmark = await contentResponse.json();
@@ -51,6 +92,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ success: true, benchmark });
   } catch (error) {
     console.error('Error fetching benchmark details:', error);
-    return res.status(500).json({ success: false, error: 'Failed to fetch benchmark details' });
+    return res
+      .status(500)
+      .json({ success: false, error: 'Failed to fetch benchmark details' });
   }
 }

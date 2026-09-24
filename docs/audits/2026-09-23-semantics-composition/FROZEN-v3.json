@@ -1,0 +1,14 @@
+{
+  "frozenAt": "2026-09-24T02:21:35.155338+00:00",
+  "execution": "Before v3 baseline/current execution.",
+  "correction": "Public undo returns void: remove invented true return expectation, retain complete restored state and publication assertions. Non-interference observes actual endpoint delivery, not Link.settled() completion. Actual root used for native observation; no synthesized observations. v1/v2 oracle and first reports preserved; v2 reds from incorrect return/observer/completion instrumentation are not product-law failures.",
+  "previousManifest": "FROZEN-v2.json",
+  "sources": {
+    "packages/kernel/src/enhancers/transactions/semantics-composition.ts": "b8f6a59127edc6ca901613056f4c6cf99a35b64c0ffa49f7f5af730fa21f7028",
+    "packages/kernel/src/enhancers/transactions/semantics-composition-domain.ts": "022e51ca9bf4eb641fdad92f8ac157c50ee6beaadee2ce966193532dbf25c5f0",
+    "docs/research/transaction-semantics-2/LAWS.md": "5bfd86511723e6b23b72603ebabe35d3df1557586c3b86e0508117c60666d79b",
+    "docs/research/transaction-semantics-2/MATRIX.md": "a590fdaa195a00c8ed7f7228bcd690cd1bdc96d400d02a2fced53be9553ef747",
+    "docs/research/transaction-semantics-2/MUTATIONS.md": "a15751402867e59197383d0893e1deea0ec811b3c155d54bd155a2efac2fb292",
+    "docs/research/transaction-semantics-2/PREDICTIONS.md": "81c47d4a7f28eacce31a0f814fa5b2c5edf6663350178d444809dd4a60212180"
+  }
+}

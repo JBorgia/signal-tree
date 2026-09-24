@@ -42,9 +42,12 @@ export interface ConfirmedTurnView {
  *     BOUNDED RETENTION IS NOT CAUSAL COMPLETENESS.
  *
  * ⚠️ A consumer must never read "these are the turns" as "these are all the
- * turns that ever happened". `truncated` is DERIVED from the retained ids
- * rather than asserted, so if eviction is ever added to `confirmedTurns` this
- * becomes true on its own instead of silently lying.
+ * turns that ever happened". TransactionAuthority currently never evicts
+ * confirmed records, so `truncated` is false. Pending or rejected turns can
+ * leave ID gaps without any confirmed history being missing.
+ *
+ * Future eviction must supply explicit retention metadata, including when the
+ * retained window is empty; truncation cannot be inferred from retained IDs.
  */
 export interface ConfirmedTurnRetention {
   readonly truncated: boolean;

@@ -1,27 +1,18 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { signalTree } from '../../lib/signal-tree';
 import { transactions } from './transactions';
 
-/**
- * R8-OVERLAP-0 — preregistered in docs/research/review-correctness-0/README.md.
- * Expected final states were recorded there BEFORE this file was written.
- *
- * Two outstanding proposals with genuinely OVERLAPPING contributions, settled
- * in every order, through the public API:
- *
- *     base   x=0  y=0  z=0
- *     P1     x=1  y=1
- *     P2          y=2  z=2      <- P2 supersedes P1 on y; x and z are disjoint
- *
- * The question is not "does it throw". It is: can the runtime remove exactly
- * P1's surviving contribution without damaging P2's, and vice versa?
- *
- * R6-LIVENESS-0 showed that checking only final values misses the important
- * failure — there, the ledger and the physical state disagreed about who owned
- * a value. So every settlement here records pending ids, confirmed ids and the
- * thrown cause alongside x/y/z.
+/** Safety containment, not completion of the surgical R8 product contract.
+ * The original measured-corruption fixture is archived verbatim under
+ * docs/research/review-correctness-0/fixtures/7ade0e3e/.
+ * Older overlapping rollback may now refuse atomically; the frozen research
+ * contract still records that as a failure to provide surgical settlement.
  */
+const owned: Array<{ destroy(): void }> = [];
+afterEach(() => {
+  for (const tree of owned.splice(0)) tree.destroy();
+});
 
 const flush = async () => {
   await Promise.resolve();
@@ -36,8 +27,14 @@ type Ledger = {
   confirmed: number;
 };
 
-const scalarTree = () =>
-  signalTree({ x: 0, y: 0, z: 0 }, { enhancers: [transactions()] });
+const scalarTree = () => {
+  const tree = signalTree(
+    { x: 0, y: 0, z: 0 },
+    { enhancers: [transactions()] }
+  );
+  owned.push(tree);
+  return tree;
+};
 
 const ledger = (tree: ReturnType<typeof scalarTree>): Ledger => {
   const tx = (
@@ -97,33 +94,20 @@ describe('R8-OVERLAP-0 / setup — both proposals outstanding', () => {
   });
 });
 
-describe('R8-OVERLAP-0 / A — reject P1, then accept P2', () => {
-  it('reverses x, leaves y superseded by P2', async () => {
+describe('R8 safety / A — older reject refuses, newer accepts, older retry', () => {
+  it('preserves both pending contributions until settlement is safe', async () => {
     const { tree, p1, p2 } = await twoOverlapping();
-
-    const first = settle(() => p1.reject());
-    const afterFirst = ledger(tree);
-
-    const second = settle(() => p2.accept());
-    const afterSecond = ledger(tree);
-
-    expect(first.ok).toBe(true);
-    expect(second.ok).toBe(true);
-    expect(afterFirst.pending).toBe(1);
-
-    // PREREGISTERED x=0 y=2 z=2. MEASURED 2026-09-23: y=0.
-    // Rejecting P1 reverted `y` to P1's captured BASELINE, destroying P2's
-    // still-pending y=2 — supersession is not recognised across concurrent
-    // pending proposals, only against authored/realized later writes.
-    expect(afterFirst).toMatchObject({ x: 0, y: 0, z: 2 });
-    // Worse: accepting P2 does NOT restore its own contribution. P2's `z`
-    // commits, P2's `y` is gone, and nothing raised.
-    expect(afterSecond).toMatchObject({ x: 0, y: 0, z: 2 });
+    expect(settle(() => p1.reject()).ok).toBe(false);
+    expect(ledger(tree)).toMatchObject({ x: 1, y: 2, z: 2, pending: 2 });
+    expect(settle(() => p2.accept()).ok).toBe(true);
+    expect(ledger(tree)).toMatchObject({ x: 1, y: 2, z: 2, pending: 1 });
+    expect(settle(() => p1.reject()).ok).toBe(true);
+    expect(ledger(tree)).toMatchObject({ x: 0, y: 2, z: 2, pending: 0 });
   });
 });
 
 describe('R8-OVERLAP-0 / B — accept P2, then reject P1', () => {
-  it('order-independent with A', async () => {
+  it('preserves the newer confirmed contribution', async () => {
     const { tree, p1, p2 } = await twoOverlapping();
 
     const first = settle(() => p2.accept());
@@ -169,26 +153,16 @@ describe('R8-OVERLAP-0 / D — accept P1, then reject P2', () => {
   });
 });
 
-describe('R8-OVERLAP-0 / E — reject P1, then reject P2 (DISCRIMINATOR)', () => {
-  it("P2's rollback must NOT resurrect rejected P1's y=1", async () => {
+describe('R8 safety / E — older reject refuses, newer rejects, older retry', () => {
+  it('never resurrects a contribution that was actually rejected', async () => {
     const { tree, p1, p2 } = await twoOverlapping();
-
-    const first = settle(() => p1.reject());
-    const afterFirst = ledger(tree);
-
-    const second = settle(() => p2.reject());
-
-    expect(first.ok).toBe(true);
-    expect(second.ok).toBe(true);
-    // PREREGISTERED x=0 y=2 z=2 after the first reject. MEASURED: y=0, the
-    // same clobber as case A.
-    expect(afterFirst).toMatchObject({ x: 0, y: 0, z: 2 });
-    // PREREGISTERED final x=0 y=0 z=0. MEASURED: x=0 y=1 z=0.
-    // BOTH proposals were rejected and neither is pending, yet `y` holds
-    // P1's REJECTED value. Rejecting P2 compensated y back to the value P2
-    // had captured as its baseline — which was P1's speculative y=1, already
-    // rejected by then. The resurrection E was written to detect.
-    expect(ledger(tree)).toMatchObject({ x: 0, y: 1, z: 0, pending: 0 });
+    expect(settle(() => p1.reject()).ok).toBe(false);
+    expect(ledger(tree)).toMatchObject({ x: 1, y: 2, z: 2, pending: 2 });
+    expect(settle(() => p2.reject()).ok).toBe(true);
+    // P1 was refused, not rejected: it still owns these values.
+    expect(ledger(tree)).toMatchObject({ x: 1, y: 1, z: 0, pending: 1 });
+    expect(settle(() => p1.reject()).ok).toBe(true);
+    expect(ledger(tree)).toMatchObject({ x: 0, y: 0, z: 0, pending: 0 });
   });
 });
 

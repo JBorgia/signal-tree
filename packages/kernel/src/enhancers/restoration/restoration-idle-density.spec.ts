@@ -210,7 +210,7 @@ describe('RESTORATION-IDLE-DENSITY-0', () => {
     );
 
     tree.destroy();
-    pending.confirm();
+    expect(() => pending.confirm()).toThrow(/destroyed/);
 
     expect(tree.getRestorationHistory()).toEqual([]);
     expect(claimInventory(tree)).toEqual({ owners: 0, claimedSubjects: 0 });

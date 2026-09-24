@@ -3,7 +3,6 @@ import { ENHANCER_META } from '../lib/types';
 import { batching } from './batching/batching';
 import { restoration } from './restoration/restoration';
 import { devTools } from './devtools/devtools';
-import { serialization } from './serialization/serialization';
 
 /**
  * Enhancer metadata — that real enhancer factories carry the metadata the
@@ -36,7 +35,6 @@ describe('enhancer metadata', () => {
     ['batching', batching],
     ['restoration', restoration],
     ['devTools', devTools],
-    ['serialization', serialization],
   ])('%s attaches metadata with name', (expectedName, factory) => {
     const enhancerFn = (factory as any)();
     const meta =

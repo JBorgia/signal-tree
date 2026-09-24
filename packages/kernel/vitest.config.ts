@@ -18,9 +18,7 @@ export default defineConfig({
       },
       {
         find: '@signal-tree/kernel',
-        replacement: fileURLToPath(
-          new URL('./src/index.ts', import.meta.url)
-        ),
+        replacement: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
       },
       {
         find: '@signal-tree/angular',
@@ -64,7 +62,7 @@ export default defineConfig({
       // exclude, `vitest.retention.config.ts`'s include, and the gate. Missing
       // this one showed up immediately as two failures in `nx test core`.
       '**/diag-journal-1-eviction.spec.ts',
-      '**/a2-5-lifetime.spec.ts',
+      '**/link-lifetime.spec.ts',
       '**/location-runtime-retention.spec.ts',
     ],
     coverage: {

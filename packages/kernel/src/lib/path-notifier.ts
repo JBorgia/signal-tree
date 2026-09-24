@@ -36,7 +36,9 @@ export type PathNotifierHandler = (
   positionIds?: number[],
   meta?: WriteMetadata,
   declaredScopes?: DeclaredWriteScopes,
-  ownerId?: number
+  ownerId?: number,
+  /** @internal null means explicit whole-row replacement; undefined unavailable. */
+  subjectFieldFootprint?: readonly string[] | null
 ) => void | Promise<void>;
 
 type BatchIdentityMode =
@@ -64,9 +66,42 @@ type PendingEntry = {
   ownerId?: number;
   subjectIds?: number[];
   positionIds?: number[];
+  /**
+   * Complete top-level field footprint from queued single-subject row writes.
+   * Literal keys, never parsed paths. Empty means known unchanged; undefined
+   * means this queue entry cannot supply a complete field footprint.
+   */
+  subjectFieldKeys?: readonly string[];
+  subjectFieldFootprint?: readonly string[] | null;
 };
 
 type PendingSlot = PendingEntry | PendingEntry[];
+
+const isPlainRowRecord = (value: unknown): value is Record<string, unknown> => {
+  if (value === null || typeof value !== 'object') return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === null || prototype === Object.prototype;
+};
+
+const changedSubjectFieldKeys = (
+  before: unknown,
+  after: unknown,
+  subjectIds?: readonly number[]
+): readonly string[] | undefined => {
+  if (
+    subjectIds?.length !== 1 ||
+    !isPlainRowRecord(before) ||
+    !isPlainRowRecord(after)
+  ) {
+    return undefined;
+  }
+  return [...new Set([...Object.keys(before), ...Object.keys(after)])].filter(
+    (key) =>
+      Object.prototype.hasOwnProperty.call(before, key) !==
+        Object.prototype.hasOwnProperty.call(after, key) ||
+      !Object.is(before[key], after[key])
+  );
+};
 
 const materializeDeliveryMeta = (
   meta?: WriteMetadata
@@ -99,6 +134,28 @@ export class PathNotifier {
   private pendingFlush = false;
   private pending = new Map<string, PendingSlot>();
   private flushCallbacks = new Set<() => void>();
+  private enqueueObservers = new Map<
+    number,
+    Set<(entry: Readonly<PendingEntry>) => void>
+  >();
+
+  /** @internal Owner-scoped evidence before batching can discard chronology. */
+  observeEnqueue(
+    ownerId: number,
+    listener: (entry: Readonly<PendingEntry>) => void
+  ): () => void {
+    let listeners = this.enqueueObservers.get(ownerId);
+    if (!listeners) this.enqueueObservers.set(ownerId, (listeners = new Set()));
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+      if (
+        listeners.size === 0 &&
+        this.enqueueObservers.get(ownerId) === listeners
+      )
+        this.enqueueObservers.delete(ownerId);
+    };
+  }
 
   constructor(options?: { batching?: boolean }) {
     if (options && options.batching === false) this.batchingEnabled = false;
@@ -187,7 +244,8 @@ export class PathNotifier {
     subjectIds?: number[],
     positionIds?: number[],
     metaOverride?: WriteMetadata,
-    ownerId?: number
+    ownerId?: number,
+    subjectFieldFootprint?: readonly string[] | null
   ): void {
     const ambientMeta = metaOverride ?? getActiveWriteContext();
     // HIST-C2. Captured HERE, at the synchronous observation of the write, for
@@ -215,6 +273,50 @@ export class PathNotifier {
 
     const declaredScopes = currentWriteObservationScopes(ownerId);
     const origin = meta?.origin;
+    const evidenceOwner = ownerId ?? meta?.ownerId;
+    const evidenceListeners =
+      evidenceOwner === undefined
+        ? undefined
+        : this.enqueueObservers.get(evidenceOwner);
+    if (evidenceListeners?.size) {
+      // Copy metadata and identities before coalescing mutates the queued entry.
+      // Payloads remain opaque; consumers retain footprints, not these values.
+      const snapshot = Object.freeze({
+        path,
+        newValue: value,
+        oldValue: prev,
+        ownerPath,
+        origin,
+        ownerId: evidenceOwner,
+        meta: meta
+          ? Object.freeze({ ...materializeDeliveryMeta(meta) })
+          : undefined,
+        positionIds: positionIds ? [...positionIds] : undefined,
+        subjectIds: subjectIds ? [...subjectIds] : undefined,
+      });
+      if (snapshot.positionIds) Object.freeze(snapshot.positionIds);
+      if (snapshot.subjectIds) Object.freeze(snapshot.subjectIds);
+      for (const listener of [...evidenceListeners]) {
+        try {
+          withoutWriteObservationScopes(() => listener(snapshot));
+        } catch (error) {
+          // Observation cannot veto a mutation that has already happened.
+          try {
+            console.error('SignalTree: enqueue observation failed.', error);
+          } catch {
+            /* reporting cannot veto either */
+          }
+        }
+      }
+    }
+    const fieldKeys = changedSubjectFieldKeys(prev, value, subjectIds);
+    const footprintKeys = subjectFieldFootprint ?? fieldKeys;
+    const knownFootprint =
+      subjectFieldFootprint === null
+        ? null
+        : footprintKeys === undefined
+        ? undefined
+        : Object.freeze([...footprintKeys]);
     if (!this.batchingEnabled) {
       // Synchronous path: run subscribers immediately
       const deliveryMeta = materializeDeliveryMeta(meta);
@@ -228,7 +330,8 @@ export class PathNotifier {
         positionIds,
         deliveryMeta,
         declaredScopes,
-        ownerId
+        ownerId,
+        knownFootprint
       );
     }
 
@@ -245,6 +348,8 @@ export class PathNotifier {
       ownerId,
       subjectIds,
       positionIds,
+      subjectFieldKeys: fieldKeys,
+      subjectFieldFootprint: knownFootprint,
     };
 
     this.enqueuePending(entry);
@@ -271,7 +376,8 @@ export class PathNotifier {
     positionIds?: number[],
     meta?: WriteMetadata,
     declaredScopes?: DeclaredWriteScopes,
-    ownerId?: number
+    ownerId?: number,
+    subjectFieldFootprint?: readonly string[] | null
   ): void {
     // ⚠️ THE INTERCEPTOR LOOP WAS DELETED IN 15.0 — PATH-NOTIFIER-INTERCEPT-
     // SURVIVAL-0. It ran here, before subscribers, and could suppress delivery
@@ -306,7 +412,8 @@ export class PathNotifier {
               positionIds,
               meta,
               declaredScopes,
-              ownerId
+              ownerId,
+              subjectFieldFootprint
             )
           );
         }
@@ -355,7 +462,8 @@ export class PathNotifier {
           entry.positionIds,
           materializeDeliveryMeta(entry.meta),
           entry.declaredScopes,
-          entry.ownerId
+          entry.ownerId,
+          entry.subjectFieldFootprint
         );
       }
     }
@@ -392,6 +500,20 @@ export class PathNotifier {
   onFlush(callback: () => void): () => void {
     this.flushCallbacks.add(callback);
     return () => this.flushCallbacks.delete(callback);
+  }
+
+  /** Internal evidence only: never drains the queue or invokes observers.
+   * Include net-equal entries: an ABA write still changed ownership.
+   */
+  readPending(): readonly Readonly<PendingEntry>[] {
+    return [...this.pending.values()].flatMap((slot) =>
+      (Array.isArray(slot) ? slot : [slot]).map((entry) => ({
+        ...entry,
+        subjectFieldKeys: entry.subjectFieldKeys
+          ? [...entry.subjectFieldKeys]
+          : undefined,
+      }))
+    );
   }
 
   /**
@@ -574,6 +696,26 @@ export class PathNotifier {
   }
 
   private coalesceEntry(target: PendingEntry, next: PendingEntry): void {
+    target.subjectFieldFootprint =
+      target.subjectFieldFootprint === undefined ||
+      next.subjectFieldFootprint === undefined
+        ? undefined
+        : target.subjectFieldFootprint === null ||
+          next.subjectFieldFootprint === null
+        ? null
+        : Object.freeze([
+            ...new Set([
+              ...target.subjectFieldFootprint,
+              ...next.subjectFieldFootprint,
+            ]),
+          ]);
+    // Preserve intermediate writes, including ABA. One unknown contribution
+    // makes the complete footprint unknown; a partial union is not evidence.
+    target.subjectFieldKeys =
+      target.subjectFieldKeys !== undefined &&
+      next.subjectFieldKeys !== undefined
+        ? [...new Set([...target.subjectFieldKeys, ...next.subjectFieldKeys])]
+        : undefined;
     target.declaredScopes = mergeWriteObservationScopes(
       target.declaredScopes,
       next.declaredScopes

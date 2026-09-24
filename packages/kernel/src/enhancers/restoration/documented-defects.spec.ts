@@ -3,7 +3,7 @@ import { undoable } from '../../lib/undoable';
 
 import { createAuditTracker } from '../../lib/audit/audit';
 import { signalTree } from '../../lib/signal-tree';
-import { serialization } from '../serialization/serialization';
+import { link } from '../../index';
 import { restoration } from './restoration';
 
 /**
@@ -76,8 +76,8 @@ describe('6b — createAuditTracker samples on a timer', () => {
   });
 });
 
-describe('6c — undo() after deserialize() (REPAIRED by opt-in eligibility)', () => {
-  // ✅ FIXED, and not by fixing it. `deserialize()` is not an operation a user
+describe('6c — undo() after external Link retrieval (REPAIRED by opt-in eligibility)', () => {
+  // ✅ FIXED, and not by fixing it. `retrieve()` is not an operation a user
   // authored, so it is never designated and never becomes an undo step — there
   // is nothing for a first undo to discard.
   //
@@ -89,27 +89,33 @@ describe('6c — undo() after deserialize() (REPAIRED by opt-in eligibility)', (
   //   docs/guides/restoration-in-production.md
   //   TODO.md 6c
   it('a restored payload is NOT an undo step, so undo cannot discard it', async () => {
-    const make = () =>
-      signalTree({ n: 0 }, { enhancers: [serialization(), restoration({})] });
+    const make = () => signalTree({ n: 0 }, { enhancers: [restoration({})] });
 
     const source = make();
     undoable(() => source.$.n(7));
     await flush();
-    const payload = source.serialize();
+    const payload = source.$();
 
     const target = make();
     await flush();
-    target.deserialize(payload);
-    await flush();
+    const connection = link(target.$, { get: () => payload });
+    try {
+      await connection.retrieve();
+      await flush();
 
-    expect(target.$.n()).toBe(7);
+      expect(target.$.n()).toBe(7);
 
-    // The defect was `canUndo()` being true here, with the first undo throwing
-    // the restore away.
-    expect(target.canUndo()).toBe(false);
+      // The defect was `canUndo()` being true here, with the first undo throwing
+      // the restore away.
+      expect(target.canUndo()).toBe(false);
 
-    target.undo();
-    expect(target.$.n()).toBe(7);
+      target.undo();
+      expect(target.$.n()).toBe(7);
+    } finally {
+      connection.dispose();
+      target.destroy();
+      source.destroy();
+    }
   });
 });
 

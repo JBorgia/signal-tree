@@ -80,13 +80,13 @@ export interface PendingTransaction {
 export type ProposalStatus = 'current' | 'superseded';
 
 /**
- * One proposed change, located by path.
+ * One proposed change, described by a display path and review status.
  *
- * Carries no identity token deliberately. Classification uses subject lifetime
- * internally — it must, or a business key reused by a different record would
- * be misread — but `PROPOSAL-REVIEW-SURFACE-0` measured that the RESULT does
- * not need it: two proposals with the same `path` and the same visible value
- * are still told apart by `status` alone.
+ * Classification distinguishes entity lifetimes internally. The public path
+ * is not a unique address: a literal key containing a dot can have the same
+ * display path as nested fields. Status does not resolve that ambiguity.
+ * Map changes to ordinary state reads using application knowledge; splitting
+ * this string on dots is not a general-purpose resolver.
  */
 export type ProposalChange = {
   path: string;
@@ -113,7 +113,7 @@ export interface Proposal {
    *
    * Does NOT enroll in restoration, and takes no option to. `undoable()`
    * designates the causal turn containing its WRITES, and a proposal's writes
-   * happen when `proposal()` runs — so an `accept()`-time flag could only be
+   * happen when `propose()` runs — so an `accept()`-time flag could only be
    * honoured by retroactively designating a turn, which is a new authority
    * rule this facade exists to avoid. Measured: wrapping `confirm()` alone
    * designates nothing.
@@ -124,7 +124,7 @@ export interface Proposal {
    * ```ts
    * let proposal!: Proposal;
    * undoable(() => {
-   *   proposal = store.proposal(() => applyResult(result));
+   *   proposal = store.propose(() => applyResult(result));
    * });
    * // ...human reviews for as long as needed...
    * proposal.accept();   // one undo unit

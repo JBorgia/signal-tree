@@ -130,9 +130,7 @@ function createPendingRollbackEffects(
 
   const firstEffectIndexByOwner = new Map<string, number>();
   turn.effects.forEach((effect, index) => {
-    const effectKey = hasInlineScopedLeafAddress(effect)
-      ? `${String(effect.owner)}\u0000${effect.path}`
-      : String(effect.owner);
+    const effectKey = rollbackAddressKey(effect);
     if (!firstEffectIndexByOwner.has(effectKey)) {
       firstEffectIndexByOwner.set(effectKey, index);
     }
@@ -149,15 +147,26 @@ function createPendingRollbackEffects(
         }
       }
 
-      const effectKey = hasInlineScopedLeafAddress(effect)
-        ? `${String(effect.owner)}\u0000${effect.path}`
-        : String(effect.owner);
+      const effectKey = rollbackAddressKey(effect);
       return firstEffectIndexByOwner.get(effectKey) === index;
     })
     .map((effect) =>
       createPendingRollbackEffect(effect, turn.id, realizationContext)
     )
     .filter((effect) => effect.before !== effect.after);
+}
+
+function rollbackAddressKey(effect: CausalTurn['effects'][number]): string {
+  if (effect.subjectFieldSegments !== undefined) {
+    return JSON.stringify([
+      effect.owner,
+      effect.subjectId,
+      effect.subjectFieldSegments,
+    ]);
+  }
+  return hasInlineScopedLeafAddress(effect)
+    ? `${String(effect.owner)}\u0000${effect.path}`
+    : String(effect.owner);
 }
 
 function createPendingRollbackEffect(
@@ -173,6 +182,7 @@ function createPendingRollbackEffect(
       before: deriveStructuralRollbackBefore(effect),
       after: deriveStructuralRollbackAfter(effect),
       subjectId: effect.subjectId,
+      subjectFieldSegments: effect.subjectFieldSegments,
       structural,
       structuralContext: effect.structuralContext,
     };
@@ -184,6 +194,7 @@ function createPendingRollbackEffect(
       before: effect.after,
       after: effect.before,
       subjectId: effect.subjectId,
+      subjectFieldSegments: effect.subjectFieldSegments,
       path: effect.path,
       ownerPath: effect.ownerPath,
       structural,
@@ -196,6 +207,7 @@ function createPendingRollbackEffect(
     before: realizationContext.getCurrentValue(effect.owner),
     after: realizationContext.getValueWithoutPendingTurn(turnId, effect.owner),
     subjectId: effect.subjectId,
+    subjectFieldSegments: effect.subjectFieldSegments,
     structural,
     structuralContext: effect.structuralContext,
   };
@@ -204,6 +216,7 @@ function createPendingRollbackEffect(
 function hasInlineScopedLeafAddress(
   effect: CausalTurn['effects'][number]
 ): boolean {
+  if (effect.subjectFieldSegments !== undefined) return true;
   // `path`/`ownerPath` are REQUIRED on CausalEffect as of 2026-09-09, so this
   // no longer probes for their presence through a double cast — it asks the one
   // question that was ever semantic: is this a SCOPED LEAF address (a field

@@ -1,13 +1,21 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { getPathNotifier } from './path-notifier';
-import { persistence } from '../enhancers/serialization/serialization';
+import { link } from '../index';
 import { restoration } from '../enhancers/restoration/restoration';
 import { scheduleDurableConsequence } from './internals/commit-consequence';
 import { signalTree } from './signal-tree';
 import { transactions } from '../enhancers/transactions/transactions';
 
-import type { StorageAdapter } from '../enhancers/serialization/storage-adapters';
+type StorageAdapter = {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+  removeItem(key: string): void;
+};
+const cleanup: Array<() => void> = [];
+afterEach(() => {
+  for (const dispose of cleanup.splice(0)) dispose();
+});
 
 /**
  * A2-3.1 — A DISCARDED VALUE MUST NEVER BECOME DURABLE, promoted out of A2-3
@@ -49,9 +57,10 @@ import type { StorageAdapter } from '../enhancers/serialization/storage-adapters
  *                    with no cancellation at all.               ✓
  * ```
  *
- * `stored()` is rollback-safe by cancelling (it captures early, in the
- * mutation's own stack). `persistence()` is rollback-safe by reading late.
- * Both satisfy the invariant; neither mechanism is the invariant.
+ * That was the historical mechanism comparison. The shared endpoint cases
+ * now use public Link; the independent arm-time/run-time consequence specimens
+ * below retain their original discriminating assertions. Neither retired API
+ * is retained or implied to remain available.
  */
 
 const flush = async () => {
@@ -59,8 +68,10 @@ const flush = async () => {
   await Promise.resolve();
 };
 
-/** Long enough for the 100ms polling fallback plus the autoSave debounce. */
-const settleTimers = () => new Promise((r) => setTimeout(r, 260));
+/** Let queued Link consequences run; no retired polling timer remains. */
+const settleTimers = async () => {
+  for (let i = 0; i < 8; i++) await Promise.resolve();
+};
 
 const recordingStorage = () => {
   const map = new Map<string, string>();
@@ -80,34 +91,22 @@ const recordingStorage = () => {
   return { adapter, payloads };
 };
 
-const persistedTree = (adapter: StorageAdapter, key: string) =>
-  signalTree(
+const persistedTree = (adapter: StorageAdapter, key: string) => {
+  const tree = signalTree(
     { theme: 'light' },
-    {
-      enhancers: [
-        restoration(),
-        transactions(),
-        persistence({
-          key,
-          storage: adapter,
-          autoSave: true,
-          autoLoad: false,
-          debounceMs: 10,
-        }),
-      ],
-    }
-  ) as unknown as {
-    $: {
-      theme: {
-        (value: string): void;
-        (update: (current: string) => string): void;
-        (): string;
-      };
-    };
-    transact: (fn: () => void) => { confirm(): void; rollback(): void };
-  };
+    { enhancers: [restoration(), transactions()] }
+  );
+  const connection = link(tree.$, {
+    set: (value) => adapter.setItem(key, JSON.stringify({ data: value })),
+  });
+  cleanup.push(() => {
+    connection.dispose();
+    tree.destroy();
+  });
+  return tree;
+};
 
-describe('A2-3.1 on the SHIPPING tree-scoped surface', () => {
+describe('A2-3.1 through public Link', () => {
   it('no payload storage ever held contains the rolled-back value', async () => {
     const rec = recordingStorage();
     const tree = persistedTree(rec.adapter, 'a2-3-1-rollback');
@@ -167,6 +166,7 @@ describe('A2-3.1 discriminator: arm-time vs run-time value capture', () => {
       { theme: 'light' },
       { enhancers: [restoration(), transactions()] }
     );
+    cleanup.push(() => tree.destroy());
     await flush();
 
     const pending = tree.transact(() => {
@@ -260,6 +260,7 @@ describe('A2-3.1 withdrawal: a post-construction seam, with run-time capture', (
     );
     await flush();
 
+    cleanup.push(() => tree.destroy());
     // The seam a post-construction `persist(x, y)` would have to use. One tree
     // in this test, deliberately: NOTIFIER-SCOPE-0 is a separate finding and
     // must not be allowed to confound this one.
@@ -308,7 +309,7 @@ describe('A2-3.1 withdrawal: a post-construction seam, with run-time capture', (
 });
 
 /**
- * ## A2-3.1 RESULT
+ * ## Historical A2-3.1 result (retired marker/enhancer mechanisms)
  *
  * ```text
  * INVARIANT   no durable payload may EVER contain a discarded value

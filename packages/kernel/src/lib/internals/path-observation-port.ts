@@ -68,7 +68,9 @@ export interface PathObservationPort {
     subjectIds?: number[],
     positionIds?: number[],
     metaOverride?: WriteMetadata,
-    ownerId?: number
+    ownerId?: number,
+    /** Literal authored field keys; null explicitly replaces the whole row. */
+    subjectFieldFootprint?: readonly string[] | null
   ): void;
 }
 
@@ -127,7 +129,8 @@ const PORT: PathObservationPort = {
     subjectIds,
     positionIds,
     metaOverride,
-    ownerId
+    ownerId,
+    subjectFieldFootprint
   ) {
     runtime?.notify(
       path,
@@ -137,7 +140,8 @@ const PORT: PathObservationPort = {
       subjectIds,
       positionIds,
       metaOverride,
-      ownerId
+      ownerId,
+      subjectFieldFootprint
     );
   },
 };

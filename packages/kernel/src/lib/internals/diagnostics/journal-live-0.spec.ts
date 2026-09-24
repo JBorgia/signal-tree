@@ -12,7 +12,7 @@
  * falsifier that cannot fail is worse than no falsifier, so the composition is
  * pinned explicitly below.
  */
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { restoration } from '../../../enhancers/restoration/restoration';
 import { transactions } from '../../../enhancers/transactions/transactions';
@@ -21,19 +21,21 @@ import { createDiagnosticJournal } from './diagnostic-journal';
 
 type Doc = { title: string; count: number };
 
-type Tree = {
-  $: Record<string, (v?: unknown) => unknown>;
-  transaction(fn: () => void): { confirm(): void };
-};
-
 /** The composition the journal's own passing specs use. */
-const doc = (title = 'a') =>
-  signalTree(
+const ownedTrees: { destroy(): void }[] = [];
+afterEach(() => {
+  for (const tree of ownedTrees.splice(0)) tree.destroy();
+});
+const doc = (title = 'a') => {
+  const tree = signalTree(
     { title, count: 0 } as Doc,
     {
       enhancers: [restoration(), transactions()],
-    } as never
-  ) as never as Tree;
+    }
+  );
+  ownedTrees.push(tree);
+  return tree;
+};
 
 const settle = async () => {
   await Promise.resolve();
@@ -90,19 +92,17 @@ describe('JOURNAL-LIVE-0', () => {
    * global notifier.
    */
   /**
-   * ⚠️ PINNED AS FAILING — this is a REAL DEFECT, not a test bug.
-   *
-   * `it.fails` asserts the current broken behaviour, so the suite stays green
-   * while the bug is documented, and this test starts failing the moment the
-   * journal is repaired — which is the prompt to flip it back to `it`.
+   * Former expected failure, reproduced as a normal red in the September 23
+   * audit. The journal now filters by its construction owner's identity; the
+   * same-flush two-journal control below also proves capture remains active.
    *
    * The repair is narrow and the kernel already has the mechanism:
    * `WriteMetadata.ownerId` exists for exactly this, and its own doc says the
    * notifier is process-global "so they can decline them". `restoration.ts` and
-   * `transactions.ts` both filter on it. The journal does not.
+   * `transactions.ts` already filter on it.
    */
-  it.fails(
-    "1. does not capture another tree's writes — KNOWN DEFECT",
+  it(
+    "1. does not capture another tree's writes",
     async () => {
       const a = doc('a');
       const b = doc('b');
@@ -116,9 +116,30 @@ describe('JOURNAL-LIVE-0', () => {
         );
       } finally {
         journalA.dispose();
+        a.destroy();
+        b.destroy();
       }
     }
   );
+
+  it('keeps both owners distinct when identical paths share one flush', async () => {
+    const a = signalTree({ title: 'a' }, { enhancers: [transactions()] });
+    const b = signalTree({ title: 'b' }, { enhancers: [transactions()] });
+    const journalA = createDiagnosticJournal(a);
+    const journalB = createDiagnosticJournal(b);
+    try {
+      a.$.title('only-A');
+      b.$.title('only-B');
+      await settle();
+      expect(effectsOf(journalA).map((effect) => effect.after)).toEqual(['only-A']);
+      expect(effectsOf(journalB).map((effect) => effect.after)).toEqual(['only-B']);
+    } finally {
+      journalA.dispose();
+      journalB.dispose();
+      a.destroy();
+      b.destroy();
+    }
+  });
 
   it('6. dispose() stops capture', async () => {
     const tree = doc();

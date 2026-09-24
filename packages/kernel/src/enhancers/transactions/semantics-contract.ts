@@ -80,19 +80,35 @@ export type CandidateFactory = () => Promise<{
   write: (key: string, value: unknown) => void;
   /** Let pending work flush. */
   flush: () => Promise<void>;
-  dispose?: () => void;
+  dispose: () => void;
 }>;
 
 export type LawId =
-  | 'L1' | 'L2' | 'L3' | 'L4' | 'L5' | 'L6'
-  | 'L7' | 'L8' | 'L9' | 'L10' | 'L11' | 'L12'
-  | 'L13' | 'L14' | 'L15' | 'L16' | 'L17' | 'L18';
+  | 'L1'
+  | 'L2'
+  | 'L3'
+  | 'L4'
+  | 'L5'
+  | 'L6'
+  | 'L7'
+  | 'L8'
+  | 'L9'
+  | 'L10'
+  | 'L11'
+  | 'L12'
+  | 'L13'
+  | 'L14'
+  | 'L15'
+  | 'L16'
+  | 'L17'
+  | 'L18';
 
 export type CaseResult = {
   id: string;
   laws: LawId[];
-  /** undefined when the case held. */
+  status: 'held' | 'violated' | 'unsupported' | 'error';
   violation?: string;
+  unsupported?: string;
   error?: string;
 };
 
@@ -210,7 +226,8 @@ const SCALAR_CASES: Case[] = [
         );
       }
       const second = candidate.settleAccept(p2);
-      if (second.status !== 'settled') return `accept refused: ${second.status}`;
+      if (second.status !== 'settled')
+        return `accept refused: ${second.status}`;
       return expectVisible(
         candidate.readVisible(),
         { x: 0, y: 2, z: 2 },
@@ -402,6 +419,11 @@ const AUTHORITY_CASES: Case[] = [
 
 const TERMINALITY_CASES: Case[] = [
   {
+    // Historical assertion frozen below: it treats every repeated `settled`
+    // result as fresh success. L14/MATRIX also permit a defined non-mutating
+    // no-op. A void native return cannot distinguish those outcomes. Preserve
+    // this first-red instrument result; supplemental sentinel checks measure
+    // non-mutation independently without inventing an already-settled status.
     id: 'F06 reject succeeds, then reject again',
     laws: ['L14'],
     run: async (f) => {
@@ -449,22 +471,88 @@ export const ALL_CASES: Case[] = [
   ...TERMINALITY_CASES,
 ];
 
-/** Runs every case against one candidate and reports dispositions. */
+/** Missing candidate semantics are evidence gaps, never passing cases. */
+export class UnsupportedSemantic extends Error {}
+
+/** Preserve every result while making instrument failures fail the invocation. */
+export class ContractExecutionError extends Error {
+  constructor(readonly results: CaseResult[]) {
+    super(
+      `Contract execution failed: ${
+        results.filter((r) => r.status === 'error').length
+      } case(s)`
+    );
+  }
+}
+
+/** Runs the existing cases, disposes every fixture, and rejects execution errors. */
 export async function runContract(
   factory: CandidateFactory
 ): Promise<CaseResult[]> {
   const out: CaseResult[] = [];
   for (const c of ALL_CASES) {
+    const fixtures: Awaited<ReturnType<CandidateFactory>>[] = [];
+    let result: CaseResult;
     try {
-      const violation = await c.run(factory);
-      out.push({ id: c.id, laws: c.laws, violation });
-    } catch (e) {
-      out.push({
+      const violation = await c.run(async () => {
+        let fixture: Awaited<ReturnType<CandidateFactory>>;
+        try {
+          fixture = await factory();
+        } catch (cause) {
+          // Even an UnsupportedSemantic from a constructor means no candidate
+          // ran; it cannot turn an entirely broken factory into a green report.
+          throw new Error(
+            `Candidate construction failed: ${describeError(cause)}`
+          );
+        }
+        fixtures.push(fixture);
+        return fixture;
+      });
+      result = {
         id: c.id,
         laws: c.laws,
-        error: e instanceof Error ? e.message : String(e),
-      });
+        status: violation ? 'violated' : 'held',
+        violation,
+      };
+    } catch (e) {
+      result =
+        e instanceof UnsupportedSemantic
+          ? {
+              id: c.id,
+              laws: c.laws,
+              status: 'unsupported',
+              unsupported: e.message,
+            }
+          : {
+              id: c.id,
+              laws: c.laws,
+              status: 'error',
+              error: describeError(e),
+            };
+    } finally {
+      // Cases can return early or throw; ownership still ends at this boundary.
+      for (const fixture of fixtures.reverse()) {
+        try {
+          fixture.dispose();
+        } catch (e) {
+          result = {
+            id: c.id,
+            laws: c.laws,
+            status: 'error',
+            error: `${result?.error ?? ''} Disposal failed: ${describeError(
+              e
+            )}`.trim(),
+          };
+        }
+      }
     }
+    out.push(result);
   }
+  if (out.some((r) => r.status === 'error'))
+    throw new ContractExecutionError(out);
   return out;
+}
+
+function describeError(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
