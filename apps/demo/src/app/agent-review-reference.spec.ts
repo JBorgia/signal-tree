@@ -5,8 +5,8 @@ import {
   transactions,
   undoable,
   external,
-  type Proposal,
-  type ProposalChange,
+  type PendingTransaction,
+  type InspectedChange,
 } from '@signal-tree/angular';
 
 /**
@@ -17,7 +17,7 @@ import {
  * by PACKAGE NAME, so "public API only" is enforced by the import path rather
  * than by reviewer discipline. A reach into kernel internals — SubjectId,
  * PositionId, transaction effects — would appear as an import, and there is
- * none. The review surface consumes exactly `proposal.inspect()` plus ordinary
+ * none. The review surface consumes exactly `pending.inspect()` plus ordinary
  * state reads.
  */
 
@@ -50,12 +50,12 @@ type Tree = ReturnType<typeof makeTree>;
  */
 type ReviewRow = {
   path: string;
-  status: ProposalChange['status'];
+  status: InspectedChange['status'];
   currentValue: unknown;
 };
 
-const buildReview = (tree: Tree, proposal: Proposal): ReviewRow[] =>
-  proposal.inspect().changes.map((change) => ({
+const buildReview = (tree: Tree, pending: PendingTransaction): ReviewRow[] =>
+  pending.inspect().changes.map((change) => ({
     path: change.path,
     status: change.status,
     currentValue: readByPath(tree, change.path),
@@ -90,7 +90,7 @@ describe('AGENT-UX-REFERENCE-0 — agent proposes, human reviews', () => {
     seedOrder(tree);
     await flush();
 
-    const proposal = tree.propose(() => {
+    const pending = tree.transact(() => {
       tree.$.orders.updateOne('7841', { priority: 3, assignee: 'Ada' });
     });
     await flush();
@@ -99,7 +99,7 @@ describe('AGENT-UX-REFERENCE-0 — agent proposes, human reviews', () => {
     expect(tree.$.orders.byId('7841')?.()?.priority).toBe(3);
     expect(tree.$.orders.byId('7841')?.()?.assignee).toBe('Ada');
 
-    proposal.reject();
+    pending.rollback();
     tree.destroy();
   });
 
@@ -108,13 +108,13 @@ describe('AGENT-UX-REFERENCE-0 — agent proposes, human reviews', () => {
     seedOrder(tree);
     await flush();
 
-    const proposal = tree.propose(() => {
+    const pending = tree.transact(() => {
       tree.$.orders.updateOne('7841', { priority: 3 });
       tree.$.lastSyncedBy.set('agent');
     });
     await flush();
 
-    expect(buildReview(tree, proposal).map((r) => r.status)).toEqual([
+    expect(buildReview(tree, pending).map((r) => r.status)).toEqual([
       'current',
       'current',
     ]);
@@ -123,12 +123,12 @@ describe('AGENT-UX-REFERENCE-0 — agent proposes, human reviews', () => {
     tree.$.lastSyncedBy.set('human');
     await flush();
 
-    const review = buildReview(tree, proposal);
+    const review = buildReview(tree, pending);
     const synced = review.find((r) => r.path === 'lastSyncedBy');
     expect(synced?.status).toBe('superseded');
     expect(synced?.currentValue).toBe('human');
 
-    proposal.reject();
+    pending.rollback();
     tree.destroy();
   });
 
@@ -137,7 +137,7 @@ describe('AGENT-UX-REFERENCE-0 — agent proposes, human reviews', () => {
     seedOrder(tree);
     await flush();
 
-    const proposal = tree.propose(() => {
+    const pending = tree.transact(() => {
       tree.$.orders.updateOne('7841', { priority: 3 });
     });
     await flush();
@@ -152,7 +152,7 @@ describe('AGENT-UX-REFERENCE-0 — agent proposes, human reviews', () => {
     expect(tree.$.orders.byId('7841')?.()?.status).toBe('escalated');
     expect(tree.$.orders.byId('7841')?.()?.priority).toBe(3);
 
-    proposal.accept();
+    pending.confirm();
     tree.destroy();
   });
 
@@ -161,7 +161,7 @@ describe('AGENT-UX-REFERENCE-0 — agent proposes, human reviews', () => {
     seedOrder(tree);
     await flush();
 
-    const proposal = tree.propose(() => {
+    const pending = tree.transact(() => {
       tree.$.orders.updateOne('7841', { priority: 3 });
       tree.$.lastSyncedBy.set('agent');
     });
@@ -170,7 +170,8 @@ describe('AGENT-UX-REFERENCE-0 — agent proposes, human reviews', () => {
     external(() => tree.$.lastSyncedBy.set('server'));
     await flush();
 
-    const settled = proposal.accept();
+    pending.confirm();
+    const settled = pending.inspect();
     await flush();
 
     // The superseded location keeps the newer value; the rest commits.
@@ -196,7 +197,7 @@ describe('AGENT-UX-REFERENCE-0 — agent proposes, human reviews', () => {
     });
     await flush();
 
-    const proposal = tree.propose(() => {
+    const pending = tree.transact(() => {
       tree.$.orders.updateOne('7841', { priority: 3, assignee: 'Ada' });
       tree.$.orders.updateOne('9002', { priority: 5 });
       tree.$.lastSyncedBy.set('agent');
@@ -204,7 +205,7 @@ describe('AGENT-UX-REFERENCE-0 — agent proposes, human reviews', () => {
     await flush();
 
     // One reject withdraws every field across both entities.
-    proposal.reject();
+    pending.rollback();
     await flush();
 
     expect(tree.$.orders.byId('7841')?.()?.priority).toBe(1);
@@ -221,7 +222,7 @@ describe('AGENT-UX-REFERENCE-0 — `current` is the contribution, not the value'
     const tree = makeTree();
     await flush();
 
-    const proposal = tree.propose(() => {
+    const pending = tree.transact(() => {
       tree.$.orders.addOne({
         id: 'A',
         status: 'open',
@@ -234,7 +235,7 @@ describe('AGENT-UX-REFERENCE-0 — `current` is the contribution, not the value'
     external(() => tree.$.orders.updateOne('A', { assignee: 'Server Name' }));
     await flush();
 
-    const [row] = buildReview(tree, proposal);
+    const [row] = buildReview(tree, pending);
 
     // The contribution — the entity existing — still stands.
     expect(row.status).toBe('current');
@@ -242,21 +243,21 @@ describe('AGENT-UX-REFERENCE-0 — `current` is the contribution, not the value'
     // status without this column would tell the reviewer the wrong thing.
     expect((row.currentValue as Order).assignee).toBe('Server Name');
 
-    proposal.accept();
+    pending.confirm();
     tree.destroy();
   });
 });
 
 describe('AGENT-UX-REFERENCE-0 — restoration is a separate decision', () => {
-  it('designation wraps the authored proposal, not accept()', async () => {
+  it('designation wraps the authored pending, not accept()', async () => {
     const tree = makeTree();
     seedOrder(tree);
     await flush();
     const before = tree.getRestorationHistory().length;
 
-    let proposal!: Proposal;
+    let pending!: PendingTransaction;
     undoable(() => {
-      proposal = tree.propose(() => {
+      pending = tree.transact(() => {
         tree.$.orders.updateOne('7841', { priority: 3, assignee: 'Ada' });
       });
     });
@@ -266,7 +267,7 @@ describe('AGENT-UX-REFERENCE-0 — restoration is a separate decision', () => {
     await flush();
     await flush();
 
-    proposal.accept();
+    pending.confirm();
     await flush();
 
     expect(tree.getRestorationHistory().length).toBe(before + 1);

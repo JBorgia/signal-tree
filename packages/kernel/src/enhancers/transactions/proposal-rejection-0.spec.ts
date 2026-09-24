@@ -10,7 +10,7 @@ import { transactions } from './transactions';
  *
  * > NULL: current rejection semantics are correct as general transaction
  * > behaviour, and a truthful multi-writer review UX can be built on them with
- * > no proposal-specific rule.
+ * > no pending-specific rule.
  *
  * Started as an observation pass; now ALSO the acceptance suite for the PR-A
  * fix that pass produced. Every expectation still records measured behaviour.
@@ -59,7 +59,7 @@ import { transactions } from './transactions';
  * REKEY-SUPERSESSION-0 — see `rekey-supersession-0.spec.ts`. The two were kept
  * apart despite sharing a symptom, which is why only one of them moved.
  *
- * Deliberately NOT done here, per the preregistration: no propose()/accept()/
+ * Deliberately NOT done here, per the preregistration: no transact()/accept()/
  * reject() naming, no change to transaction semantics, nothing touching
  * MO-1A, MO-1B or MO-3A.
  *
@@ -81,7 +81,7 @@ const realization = (fn: () => void) =>
   withWriteContext({ intent: 'system', participation: 'realized' }, fn);
 
 /** `false` when the reject was accepted, otherwise the refusal kind. */
-const tryReject = (pending: { rollback(): void }): false | unknown => {
+const tryRollback = (pending: { rollback(): void }): false | unknown => {
   try {
     pending.rollback();
     return false;
@@ -137,7 +137,7 @@ describe('PROPOSAL-REJECTION-0 / 1 — clean reject, no competing writer', () =>
     expect(tree.$.a()).toBe(1); // speculative value IS visible pre-reject
     expect(pendingCount(tree)).toBe(1);
 
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect(tree.$.a()).toBe(0);
     expect(pendingCount(tree)).toBe(0);
   });
@@ -158,7 +158,7 @@ describe('PROPOSAL-REJECTION-0 / 2 — same-location EXTERNAL realization', () =
     await flush();
 
     expect({ a: tree.$.a(), b: tree.$.b() }).toEqual({ a: 99, b: 2 });
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
 
     // `a` keeps the server's value; `b` is compensated.
     expect({ a: tree.$.a(), b: tree.$.b() }).toEqual({ a: 99, b: 0 });
@@ -179,7 +179,7 @@ describe('PROPOSAL-REJECTION-0 / 3 — same-location AUTHORED write', () => {
     tree.$.a(50); // ordinary authored write: no transaction, no realization
     await flush();
 
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect({ a: tree.$.a(), b: tree.$.b() }).toEqual({ a: 50, b: 0 });
   });
 });
@@ -199,7 +199,7 @@ describe('PROPOSAL-REJECTION-0 / 4 — multi-location, ONE conflicting location'
     realization(() => tree.$.a(99));
     await flush();
 
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect({ a: tree.$.a(), b: tree.$.b(), c: tree.$.c() }).toEqual({
       a: 99,
       b: 0,
@@ -226,7 +226,7 @@ describe('PROPOSAL-REJECTION-0 / 5 — multi-location, MULTIPLE conflicting', ()
     });
     await flush();
 
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     // Both replaced locations keep their newer values; the untouched one is
     // compensated. No conflict is reported on this arm.
     expect({ a: tree.$.a(), b: tree.$.b(), c: tree.$.c() }).toEqual({
@@ -249,7 +249,7 @@ describe('PROPOSAL-REJECTION-0 / 6 — coalesced same-location writes', () => {
     await flush();
 
     expect(tree.$.a()).toBe(2);
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect(tree.$.a()).toBe(0);
   });
 });
@@ -269,7 +269,7 @@ describe('PROPOSAL-REJECTION-0 / 7 — structural remove + re-add, no competitor
     await flush();
 
     expect(tree.$.rows.byId('a')?.()?.name).toBe('Reproposed');
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect(tree.$.rows.ids()).toEqual(['a']);
     expect(tree.$.rows.byId('a')?.()?.name).toBe('Original');
   });
@@ -285,12 +285,12 @@ describe('PROPOSAL-REJECTION-0 / 8 — structural add, no competitor (control)',
     });
     await flush();
 
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect(tree.$.rows.ids()).toEqual([]);
   });
 });
 
-describe('PROPOSAL-REJECTION-0 / 9 — MIXED proposal, server touches the row', () => {
+describe('PROPOSAL-REJECTION-0 / 9 — MIXED pending, server touches the row', () => {
   it('refuses the whole turn; untouched scalars stay at proposed values', async () => {
     const tree = rowTree();
     await flush();
@@ -305,7 +305,7 @@ describe('PROPOSAL-REJECTION-0 / 9 — MIXED proposal, server touches the row', 
     realization(() => tree.$.rows.updateOne('a', { name: 'FromServer' }));
     await flush();
 
-    expect(tryReject(pending)).toBe('later-confirmed-dependency');
+    expect(tryRollback(pending)).toBe('later-confirmed-dependency');
 
     // Nothing ever wrote to x or y, yet after the rejection they hold the
     // values the rejected turn proposed. Compensated locations: none.
@@ -331,7 +331,7 @@ describe('PROPOSAL-REJECTION-0 / 10 — unrelated writer must NOT block (control
 
     // If this refused, the conflict criterion would be over-broad and every
     // observation above would be uninterpretable.
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect({ a: tree.$.a(), unrelated: tree.$.unrelated() }).toEqual({
       a: 0,
       unrelated: 42,
@@ -369,7 +369,7 @@ describe('PROPOSAL-REJECTION-0 / 11 — structural supersession, REALIZED remove
 
     // PR-A. The later remove already performed the compensation the rollback
     // would issue, so reversing the rest COMPLETES the turn's reversal.
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect(tree.$.x()).toBe(0);
     expect(tree.$.y()).toBe(0);
     expect(tree.$.rows.ids()).toEqual([]);
@@ -391,7 +391,7 @@ describe('PROPOSAL-REJECTION-0 / 12 — structural supersession, AUTHORED remove
     tree.$.rows.removeOne('A');
     await flush();
 
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect(tree.$.x()).toBe(0);
     expect(tree.$.y()).toBe(0);
     expect(tree.$.rows.ids()).toEqual([]);
@@ -429,7 +429,7 @@ describe('PROPOSAL-REJECTION-0 / 13 — remove then RE-ADD under a new subject',
     // Measured against the pre-PR-A build, which refused here and stranded `x`
     // at 1: the fix strictly improves this case rather than changing which
     // record survives.
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect(tree.$.x()).toBe(0);
     expect(tree.$.rows.byId('A')?.()?.name).toBe('FromServer');
   });
@@ -454,7 +454,7 @@ describe('PROPOSAL-REJECTION-0 / 14 — one superseded AND one depended-upon sub
     await flush();
 
     // Partial supersession is NOT a licence to partially reverse the turn.
-    expect(tryReject(pending)).toBe('later-confirmed-dependency');
+    expect(tryRollback(pending)).toBe('later-confirmed-dependency');
     expect(tree.$.rows.byId('B')?.()?.name).toBe('FromServer');
     expect(tree.$.x()).toBe(1);
   });
@@ -485,7 +485,7 @@ describe('PROPOSAL-REJECTION-0 / 15 — pending REMOVE is not superseded by a la
     // IS preserved, but `x` is stranded at its proposed value — the same
     // symptom PR-A fixed for pending adds, reached by a different door.
     // Recorded as a follow-up in TODO.md; NOT fixed here.
-    expect(tryReject(pending)).toBe('effect-validation-failed');
+    expect(tryRollback(pending)).toBe('effect-validation-failed');
     expect(tree.$.rows.byId('A')?.()?.name).toBe('FromServer');
     expect(tree.$.x()).toBe(1);
   });
@@ -511,7 +511,7 @@ describe('PROPOSAL-REJECTION-0 / 16 — pending REKEY superseded by a later remo
     // history. REKEY-SUPERSESSION-0 pinned that history first (cases 4 and 5
     // there) and then closed this. Full matrix lives in
     // `rekey-supersession-0.spec.ts`; this case stays as the cross-reference.
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect(tree.$.x()).toBe(0);
     expect(tree.$.rows.ids()).toEqual([]);
   });

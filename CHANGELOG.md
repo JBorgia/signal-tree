@@ -2,7 +2,7 @@
 
 **TL;DR** — **Breaking, and deliberately so.** `tree.transaction()` is renamed
 to `tree.transact()` and the old spelling is **removed, not deprecated**. One
-new method, `tree.propose()`, plus five new public types. The transaction rollback
+`inspect()` on every transaction handle, plus three new public types. The transaction rollback
 correctness defects described here SHIPPED IN 15.3.0 — see that entry; this
 section predates it and is kept for the vocabulary change only. The rename is
 mechanical; if you read confirmed history through `@signaltree/kernel/internals`,
@@ -18,8 +18,8 @@ tree.transaction(fn)  ->  tree.transact(fn)
 No alias ships. A missed call site is a **compile error**, not a silent
 deprecation warning — which is the reason for breaking rather than bridging.
 
-`propose()` had not shipped under any other name, so nothing migrates:
-`tree.proposal(fn)` never became public API.
+Nothing else migrates: `propose()` never reached a release, so there is no
+second rename to make.
 
 #### Why this did not go through a deprecation cycle
 
@@ -39,24 +39,32 @@ the deprecation path applies normally. See
 ### For users
 
 - **`transact()` — the same optimistic turn, named as a verb.** It matches the
-  handle operations it opens (`confirm()`, `rollback()`) and its sibling
-  `propose()`. `transaction()` was a noun used as a method.
+  handle operations it opens (`confirm()`, `rollback()`), and it is the verb
+  form of the noun the glossary already teaches. `transaction()` was a noun used
+  as a method.
 
-- **`propose()` — reviewing a change before it lands.** `transactions()` also
-  provides `tree.propose(fn)`: the same pending turn, named for the workflow
-  where somebody reviews a change first. `inspect()` reports whether each
-  proposed change still represents current truth, `accept()` commits and
-  returns that inspection as settled, `reject()` withdraws. New types:
-  `Proposal`, `ProposalChange`, `ProposalStatus`, `ProposalInspection`,
-  `ProposalAcceptance`.
+- **`inspect()` — reviewing a change before it lands.** Every handle
+  `transact()` returns carries it. It reports whether each change the turn made
+  still represents current truth (`'current'`) or has been overtaken
+  (`'superseded'`), and `confirm()` / `rollback()` snapshot it as they settle,
+  which closes a race `inspect()` alone cannot. New types: `InspectedChange`,
+  `ChangeStatus`, `TransactionInspection`.
 
-  It adds no new state semantics — the whole adversarial matrix ran against
-  `transact()`/`confirm()`/`rollback()` before the facade existed, and passed.
+  ONE verb and ONE handle, deliberately. An earlier draft of this release also
+  shipped `propose()` / `Proposal` / `accept()` / `reject()` as a parallel
+  vocabulary over the identical mechanism. It was REMOVED before release:
+  PROPOSAL-0's own evidence is that the facade added no authority rule, no
+  retained semantic fact and no proposal-only behaviour, and AGENTS.md binds
+  public naming to the glossary's Everyday vocabulary — which defines
+  `transaction` and `rollback` and never defines propose/accept/reject. A second
+  name for every operation was a fourth naming level the project had not agreed
+  to teach. The capability is unchanged and now reaches more callers, since
+  inspection is no longer gated behind a second entry verb.
   Accepting is deliberately **not** undo history: wrap `undoable()` around the
-  proposal, not around `accept()`.
+  turn’s writes, not around `confirm()`.
 
-  > `status: 'current'` means the proposal's _contribution_ still stands, not
-  > that the value it proposed is still present. An added row stays `current`
+  > `status: 'current'` means the turn's _contribution_ still stands, not
+  > that the value it wrote is still present. An added row stays `current`
   > while another writer edits its fields. Render `inspect()` beside ordinary
   > current-state reads; it is a review status, not a value snapshot.
 

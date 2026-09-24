@@ -13,21 +13,28 @@
 
 export interface TransactionMethods {
   /**
-   * Open an optimistic turn. Returns a handle that confirms or rolls back.
+   * Open an optimistic turn. Returns a handle that inspects, confirms or rolls
+   * back.
    *
-   * A verb, matching `propose()` and the handle's own `confirm()`/`rollback()`.
+   * A verb, matching the handle's own `confirm()` / `rollback()`, and the verb
+   * form of the noun the glossary already teaches.
    */
   transact(fn: () => void): PendingTransaction;
-  /**
-   * Open a reviewable proposal: the same turn `transact()` opens, named for the
-   * multi-writer workflow and given a review projection.
-   *
-   * Never shipped under another name, so there is no bridge to keep.
-   */
-  propose(fn: () => void): Proposal;
 }
 
 export interface PendingTransaction {
+  /**
+   * The current review state of each change this turn made.
+   *
+   * Safe to call repeatedly while the turn is outstanding. After settlement it
+   * reports the inspection as of that settlement — `confirm()` and `rollback()`
+   * snapshot before they act, which is the race `inspect()` alone cannot close.
+   *
+   * Available on EVERY handle. It was briefly reachable only through a second
+   * entry verb, which was an arbitrary restriction: nothing about inspection
+   * depends on how the turn was opened.
+   */
+  inspect(): TransactionInspection;
   confirm(): void;
   /**
    * Rolls back the pending optimistic transaction.
@@ -39,48 +46,56 @@ export interface PendingTransaction {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PROPOSAL-0 — a public vocabulary over transaction semantics.
+// PROPOSAL-0 — the review projection, folded into the one transaction verb.
 //
-// Every member below maps mechanically onto machinery that already shipped:
+// This row asked whether reviewing unapproved work needs its own semantics. It
+// does NOT: every member mapped mechanically onto machinery that already
+// shipped, and the only thing that survives as public surface is `inspect()`.
 //
-//     proposal()                 -> transaction()
-//     inspect()                  -> classify retained effects vs later effects
+//     pending()                 -> transact()      (one verb, folded)
+//     inspect()                  -> KEPT, on every PendingTransaction
 //     accept()                   -> confirm()
 //     reject()                   -> rollback()
 //
-// Restoration is NOT fused in. `undoable()` stays `undoable()`, wrapped by the
-// caller around the proposal's WRITES:
+// The parallel vocabulary was REMOVED before 16.0 shipped. AGENTS.md binds
+// public naming to the glossary's Everyday vocabulary, which defines
+// `transaction` and `rollback` and never defines propose/accept/reject — so a
+// second name for every operation was a fourth vocabulary the project had not
+// agreed to teach. The capability is unchanged; only the naming is.
 //
-//     undoable(() => { proposal = store.proposal(() => applyResult(r)); });
+// Restoration is NOT fused in. `undoable()` stays `undoable()`, wrapped by the
+// caller around the pending's WRITES:
+//
+//     undoable(() => { pending = store.pending(() => applyResult(r)); });
 //     ...review...
-//     proposal.accept();          // one undo unit
+//     pending.confirm();          // one undo unit
 //
 // An earlier draft offered `accept({ undoable: true })`. Implementing it proved
 // it CANNOT be composition — `undoable()` designates the causal turn containing
-// its writes, and a proposal's writes happen at `proposal()` time, so wrapping
+// its writes, and a pending's writes happen at `pending()` time, so wrapping
 // `confirm()` designates nothing. Measured 0 undo entries against 1 for
-// wrapping the proposal. The option was deleted rather than kept as a
+// wrapping the pending. The option was deleted rather than kept as a
 // placeholder, so this surface is smaller than the one that was frozen.
 //
-// It adds NO authority rule, NO retained semantic fact and NO proposal-only
+// It adds NO authority rule, NO retained semantic fact and NO pending-only
 // transaction behaviour. That is an evidenced claim, not an intention: the
 // whole adversarial matrix was run against the raw primitives BEFORE this
-// facade existed (`proposal-0-kernel.spec.ts`), and passed.
+// facade existed (`pending-0-kernel.spec.ts`), and passed.
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Whether a proposed change still represents current truth.
+ * Whether a change this turn made still represents current truth.
  *
- * ⚠️ `'current'` means THE PROPOSAL'S CONTRIBUTION still stands — not that the
- * value originally proposed is still present. A structural add stays
+ * ⚠️ `'current'` means THIS TURN'S CONTRIBUTION still stands — not that the
+ * value it originally wrote is still present. A structural add stays
  * `'current'` while a later writer changes fields on that same entity, because
  * the row it added is still the row that is there. Render `inspect()` beside
  * ordinary current-state reads, never as a value snapshot.
  */
-export type ProposalStatus = 'current' | 'superseded';
+export type ChangeStatus = 'current' | 'superseded';
 
 /**
- * One proposed change, described by a display path and review status.
+ * One change a turn made, described by a display path and review status.
  *
  * Classification distinguishes entity lifetimes internally. The public path
  * is not a unique address: a literal key containing a dot can have the same
@@ -88,7 +103,7 @@ export type ProposalStatus = 'current' | 'superseded';
  * Map changes to ordinary state reads using application knowledge; splitting
  * this string on dots is not a general-purpose resolver.
  */
-export type ProposalChange = {
+export type InspectedChange = {
   /**
    * Human-readable location. PRESENTATION ONLY, and deliberately ambiguous:
    * a literal key `'a.b'` and the nested path `a.b` both render as `"a.b"`.
@@ -112,56 +127,13 @@ export type ProposalChange = {
    * to be there" (law L7).
    */
   subject?: number;
-  status: ProposalStatus;
+  status: ChangeStatus;
 };
 
-export type ProposalInspection = {
-  changes: readonly ProposalChange[];
+export type TransactionInspection = {
+  changes: readonly InspectedChange[];
 };
 
-/** What `accept()` returns: the settled inspection, closing the read/act race. */
-export type ProposalAcceptance = ProposalInspection;
-
-export interface Proposal {
-  /**
-   * The current review state of each proposed change.
-   *
-   * Safe to call repeatedly while the proposal is outstanding. After
-   * settlement it reports the inspection as of that settlement.
-   */
-  inspect(): ProposalInspection;
-  /**
-   * Commit the proposal. Returns the inspection as settled.
-   *
-   * Does NOT enroll in restoration, and takes no option to. `undoable()`
-   * designates the causal turn containing its WRITES, and a proposal's writes
-   * happen when `propose()` runs — so an `accept()`-time flag could only be
-   * honoured by retroactively designating a turn, which is a new authority
-   * rule this facade exists to avoid. Measured: wrapping `confirm()` alone
-   * designates nothing.
-   *
-   * Restoration stays orthogonal and compositional. Designation declared at
-   * proposal time survives an arbitrary review gap:
-   *
-   * ```ts
-   * let proposal!: Proposal;
-   * undoable(() => {
-   *   proposal = store.propose(() => applyResult(result));
-   * });
-   * // ...human reviews for as long as needed...
-   * proposal.accept();   // one undo unit
-   * ```
-   */
-  accept(): ProposalAcceptance;
-  /**
-   * Withdraw the proposal.
-   *
-   * Throws {@link SignalTreeRollbackError} when the reversal cannot be applied
-   * without destroying newer truth. A refusal that could be ignored would be
-   * worse than one that cannot.
-   */
-  reject(): void;
-}
 /**
  * Optional evidence retention (L15). Correctness records are bounded by live
  * obligation and are NOT configurable; this asks for diagnostic history ON TOP

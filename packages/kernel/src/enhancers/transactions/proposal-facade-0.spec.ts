@@ -11,8 +11,8 @@ import { transactions } from './transactions';
  * PROPOSAL-0 — the frozen facade, exercised through the PUBLIC surface.
  *
  * The adversarial matrix was already run against the raw primitives in
- * `proposal-0-kernel.spec.ts` BEFORE this facade existed. This file re-runs
- * the load-bearing cases through `proposal()` and asserts the two surfaces
+ * `pending-0-kernel.spec.ts` BEFORE this facade existed. This file re-runs
+ * the load-bearing cases through `pending()` and asserts the two surfaces
  * agree — which is what makes "naming, not new semantics" checkable rather
  * than merely claimed. The lower-level transaction specs stay: if these two
  * ever disagree, the facade grew a rule of its own.
@@ -28,9 +28,9 @@ const flush = async () => {
 const realization = (fn: () => void) =>
   withWriteContext({ intent: 'system', participation: 'realized' }, fn);
 
-const tryReject = (proposal: { reject(): void }): false | unknown => {
+const tryRollback = (pending: { rollback(): void }): false | unknown => {
   try {
-    proposal.reject();
+    pending.rollback();
     return false;
   } catch (error) {
     return (error as { cause?: { kind?: unknown } })?.cause?.kind ?? 'error';
@@ -59,13 +59,14 @@ describe('PROPOSAL-0 facade / accept', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.propose(() => {
+    const pending = t.transact(() => {
       t.$.name('Samuel');
     });
     await flush();
 
     expect(t.$.name()).toBe('Samuel');
-    const result = proposal.accept();
+    pending.confirm();
+    const result = pending.inspect();
     await flush();
 
     expect(t.$.name()).toBe('Samuel');
@@ -78,7 +79,7 @@ describe('PROPOSAL-0 facade / reject', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.propose(() => {
+    const pending = t.transact(() => {
       t.$.name('Samuel');
       t.$.priority(3);
     });
@@ -87,7 +88,7 @@ describe('PROPOSAL-0 facade / reject', () => {
     t.$.untouched('edited-by-human');
     await flush();
 
-    expect(tryReject(proposal)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect({ name: t.$.name(), priority: t.$.priority() }).toEqual({
       name: '',
       priority: 0,
@@ -97,17 +98,17 @@ describe('PROPOSAL-0 facade / reject', () => {
 });
 
 describe('PROPOSAL-0 facade / inspect', () => {
-  it('reports current vs superseded while the proposal is outstanding', async () => {
+  it('reports current vs superseded while the pending is outstanding', async () => {
     const t = tree();
     await flush();
 
-    const proposal = t.propose(() => {
+    const pending = t.transact(() => {
       t.$.name('FromAgent');
       t.$.priority(3);
     });
     await flush();
 
-    expect(proposal.inspect().changes).toEqual([
+    expect(pending.inspect().changes).toEqual([
       { path: 'name', address: ['name'], status: 'current' },
       { path: 'priority', address: ['priority'], status: 'current' },
     ]);
@@ -115,7 +116,7 @@ describe('PROPOSAL-0 facade / inspect', () => {
     realization(() => t.$.name('FromServer'));
     await flush();
 
-    expect(proposal.inspect().changes).toEqual([
+    expect(pending.inspect().changes).toEqual([
       { path: 'name', address: ['name'], status: 'superseded' },
       { path: 'priority', address: ['priority'], status: 'current' },
     ]);
@@ -125,7 +126,7 @@ describe('PROPOSAL-0 facade / inspect', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.propose(() => {
+    const pending = t.transact(() => {
       t.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
     await flush();
@@ -133,8 +134,8 @@ describe('PROPOSAL-0 facade / inspect', () => {
     realization(() => t.$.rows.updateOne('A', { name: 'FromServer' }));
     await flush();
 
-    // 'current' = the proposal's CONTRIBUTION stands, not the proposed value.
-    expect(proposal.inspect().changes).toEqual([
+    // 'current' = the pending's CONTRIBUTION stands, not the proposed value.
+    expect(pending.inspect().changes).toEqual([
       { path: 'rows.A', address: ['rows'], subject: expect.any(Number), status: 'current' },
     ]);
     expect(t.$.rows.byId('A')?.()?.name).toBe('FromServer');
@@ -144,7 +145,7 @@ describe('PROPOSAL-0 facade / inspect', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.propose(() => {
+    const pending = t.transact(() => {
       t.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
     await flush();
@@ -154,7 +155,7 @@ describe('PROPOSAL-0 facade / inspect', () => {
     // subject, not silently become the new occupant's. `expect.any(Number)`
     // passes either way and so cannot detect that confusion — a relative
     // comparison is counter-independent without being blind.
-    const proposedSubject = proposal.inspect().changes[0]?.subject;
+    const proposedSubject = pending.inspect().changes[0]?.subject;
     expect(proposedSubject).toEqual(expect.any(Number));
 
     realization(() => {
@@ -163,7 +164,7 @@ describe('PROPOSAL-0 facade / inspect', () => {
     });
     await flush();
 
-    expect(proposal.inspect().changes).toEqual([
+    expect(pending.inspect().changes).toEqual([
       {
         path: 'rows.A',
         address: ['rows'],
@@ -179,23 +180,24 @@ describe('PROPOSAL-0 facade / accept closes the inspect race', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.propose(() => {
+    const pending = t.transact(() => {
       t.$.name('FromAgent');
     });
     await flush();
 
-    const early = proposal.inspect();
+    const early = pending.inspect();
     expect(early.changes).toEqual([{ path: 'name', address: ['name'], status: 'current' }]);
 
     // Newer truth lands between the reviewer reading and acting.
     realization(() => t.$.name('FromServer'));
     await flush();
 
-    const result = proposal.accept();
+    pending.confirm();
+    const result = pending.inspect();
 
     expect(result.changes).toEqual([{ path: 'name', address: ['name'], status: 'superseded' }]);
     // And the acceptance snapshot is stable afterwards.
-    expect(proposal.inspect()).toEqual(result);
+    expect(pending.inspect()).toEqual(result);
   });
 });
 
@@ -205,9 +207,9 @@ describe('PROPOSAL-0 facade / restoration stays orthogonal', () => {
     await flush();
     const base = t.getRestorationHistory().length;
 
-    t.propose(() => {
+    t.transact(() => {
       t.$.name('Samuel');
-    }).accept();
+    }).confirm();
     await flush();
 
     expect(t.getRestorationHistory().length).toBe(base);
@@ -218,26 +220,26 @@ describe('PROPOSAL-0 facade / restoration stays orthogonal', () => {
     await flush();
     const base = t.getRestorationHistory().length;
 
-    t.propose(() => {
+    t.transact(() => {
       t.$.name('Samuel');
-    }).accept();
+    }).confirm();
     await flush();
 
-    let proposal!: ReturnType<typeof t.propose>;
+    let pending!: ReturnType<typeof t.propose>;
     undoable(() => {
-      proposal = t.propose(() => {
+      pending = t.transact(() => {
         t.$.name('Agent');
         t.$.priority(4);
       });
     });
 
-    // The review gap: designation is declared at proposal time and must
+    // The review gap: designation is declared at pending time and must
     // survive an arbitrary delay before the human acts.
     await flush();
     await flush();
     await flush();
 
-    proposal.accept();
+    pending.confirm();
     await flush();
 
     expect(t.getRestorationHistory().length).toBe(base + 1);
@@ -251,41 +253,41 @@ describe('PROPOSAL-0 facade / restoration stays orthogonal', () => {
   });
 
   // GUARD 1 — early designation must not mean early history.
-  it('a designated proposal that is still PENDING has no completed entry', async () => {
+  it('a designated pending that is still PENDING has no completed entry', async () => {
     const t = restorable();
     await flush();
     const base = t.getRestorationHistory().length;
 
-    let proposal!: ReturnType<typeof t.propose>;
+    let pending!: ReturnType<typeof t.propose>;
     undoable(() => {
-      proposal = t.propose(() => {
+      pending = t.transact(() => {
         t.$.name('Agent');
       });
     });
     await flush();
 
     expect(t.getRestorationHistory().length).toBe(base);
-    expect(proposal.inspect().changes).toEqual([
+    expect(pending.inspect().changes).toEqual([
       { path: 'name', address: ['name'], status: 'current' },
     ]);
   });
 
   // GUARD 2 — early designation must not leave residue after rejection.
-  it('a designated proposal that is REJECTED leaves no entry behind', async () => {
+  it('a designated pending that is REJECTED leaves no entry behind', async () => {
     const t = restorable();
     await flush();
     const base = t.getRestorationHistory().length;
 
-    let proposal!: ReturnType<typeof t.propose>;
+    let pending!: ReturnType<typeof t.propose>;
     undoable(() => {
-      proposal = t.propose(() => {
+      pending = t.transact(() => {
         t.$.name('Agent');
         t.$.priority(4);
       });
     });
     await flush();
 
-    proposal.reject();
+    pending.rollback();
     await flush();
 
     expect(t.getRestorationHistory().length).toBe(base);
@@ -301,7 +303,7 @@ describe('PROPOSAL-0 facade / reject refusal is not swallowed', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.propose(() => {
+    const pending = t.transact(() => {
       t.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
     await flush();
@@ -309,27 +311,27 @@ describe('PROPOSAL-0 facade / reject refusal is not swallowed', () => {
     realization(() => t.$.rows.updateOne('A', { name: 'FromServer' }));
     await flush();
 
-    expect(tryReject(proposal)).toBe('later-confirmed-dependency');
+    expect(tryRollback(pending)).toBe('later-confirmed-dependency');
     expect(t.$.rows.byId('A')?.()?.name).toBe('FromServer');
   });
 });
 
-describe('PROPOSAL-0 facade / two proposals outstanding', () => {
+describe('PROPOSAL-0 facade / two pendings outstanding', () => {
   it('independent handles settle independently', async () => {
     const t = tree();
     await flush();
 
-    const first = t.propose(() => {
+    const first = t.transact(() => {
       t.$.name('FromA');
     });
     await flush();
-    const second = t.propose(() => {
+    const second = t.transact(() => {
       t.$.priority(9);
     });
     await flush();
 
-    expect(tryReject(first)).toBe(false);
-    second.accept();
+    expect(tryRollback(first)).toBe(false);
+    second.confirm();
     await flush();
 
     expect({ name: t.$.name(), priority: t.$.priority() }).toEqual({
@@ -340,17 +342,17 @@ describe('PROPOSAL-0 facade / two proposals outstanding', () => {
 });
 
 describe('PROPOSAL-0 facade / equivalence with the raw primitives', () => {
-  it('proposal+accept and transaction+confirm reach the same state', async () => {
+  it('pending+accept and transaction+confirm reach the same state', async () => {
     const viaFacade = tree();
     const viaRaw = tree();
     await flush();
 
     viaFacade
-      .propose(() => {
+      .transact(() => {
         viaFacade.$.name('X');
         viaFacade.$.rows.addOne({ id: 'A', name: 'Alpha' });
       })
-      .accept();
+      .confirm();
 
     viaRaw
       .transact(() => {
@@ -363,12 +365,12 @@ describe('PROPOSAL-0 facade / equivalence with the raw primitives', () => {
     expect(viaFacade.$()).toEqual(viaRaw.$());
   });
 
-  it('proposal+reject and transaction+rollback reach the same state', async () => {
+  it('pending+reject and transaction+rollback reach the same state', async () => {
     const viaFacade = tree();
     const viaRaw = tree();
     await flush();
 
-    const p = viaFacade.propose(() => {
+    const p = viaFacade.transact(() => {
       viaFacade.$.name('X');
       viaFacade.$.rows.addOne({ id: 'A', name: 'Alpha' });
     });
@@ -378,7 +380,7 @@ describe('PROPOSAL-0 facade / equivalence with the raw primitives', () => {
     });
     await flush();
 
-    p.reject();
+    p.rollback();
     r.rollback();
     await flush();
 
@@ -390,21 +392,23 @@ describe('PROPOSAL-0 facade / equivalence with the raw primitives', () => {
 //
 // Inherited wholesale from the pending-transaction lifecycle: repeats are
 // idempotent, cross-transitions throw, and a REFUSED rejection leaves the
-// proposal still pending because the refusal is raised before the lifecycle
-// moves. No proposal-only rule — these pin that the facade adds none.
+// pending still pending because the refusal is raised before the lifecycle
+// moves. No pending-only rule — these pin that the facade adds none.
 
 describe('PROPOSAL-0 facade / double settlement', () => {
   it('accept() twice is idempotent and returns a stable snapshot', async () => {
     const t = tree();
     await flush();
 
-    const proposal = t.propose(() => {
+    const pending = t.transact(() => {
       t.$.name('Samuel');
     });
     await flush();
 
-    const first = proposal.accept();
-    const second = proposal.accept();
+    pending.confirm();
+    const first = pending.inspect();
+    pending.confirm();
+    const second = pending.inspect();
 
     expect(second).toEqual(first);
     expect(t.$.name()).toBe('Samuel');
@@ -414,13 +418,13 @@ describe('PROPOSAL-0 facade / double settlement', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.propose(() => {
+    const pending = t.transact(() => {
       t.$.name('Samuel');
     });
     await flush();
 
-    proposal.reject();
-    expect(() => proposal.reject()).not.toThrow();
+    pending.rollback();
+    expect(() => pending.rollback()).not.toThrow();
     expect(t.$.name()).toBe('');
   });
 
@@ -428,13 +432,13 @@ describe('PROPOSAL-0 facade / double settlement', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.propose(() => {
+    const pending = t.transact(() => {
       t.$.name('Samuel');
     });
     await flush();
 
-    proposal.accept();
-    expect(() => proposal.reject()).toThrow(
+    pending.confirm();
+    expect(() => pending.rollback()).toThrow(
       /Cannot rollback a confirmed transaction/
     );
     expect(t.$.name()).toBe('Samuel');
@@ -444,23 +448,23 @@ describe('PROPOSAL-0 facade / double settlement', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.propose(() => {
+    const pending = t.transact(() => {
       t.$.name('Samuel');
     });
     await flush();
 
-    proposal.reject();
-    expect(() => proposal.accept()).toThrow(
+    pending.rollback();
+    expect(() => pending.confirm()).toThrow(
       /Cannot confirm a rolled back transaction/
     );
     expect(t.$.name()).toBe('');
   });
 
-  it('a REFUSED reject leaves the proposal still acceptable', async () => {
+  it('a REFUSED reject leaves the pending still acceptable', async () => {
     const t = tree();
     await flush();
 
-    const proposal = t.propose(() => {
+    const pending = t.transact(() => {
       t.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
     await flush();
@@ -469,10 +473,11 @@ describe('PROPOSAL-0 facade / double settlement', () => {
     await flush();
 
     // The refusal is raised BEFORE the lifecycle moves, so this is still a
-    // live proposal — a review UI can offer reconcile-then-accept.
-    expect(tryReject(proposal)).toBe('later-confirmed-dependency');
+    // live pending — a review UI can offer reconcile-then-accept.
+    expect(tryRollback(pending)).toBe('later-confirmed-dependency');
 
-    const settled = proposal.accept();
+    pending.confirm();
+    const settled = pending.inspect();
     expect(settled.changes).toEqual([{ path: 'rows.A', address: ['rows'], subject: expect.any(Number), status: 'current' }]);
     expect(t.$.rows.byId('A')?.()?.name).toBe('FromServer');
   });
@@ -481,7 +486,7 @@ describe('PROPOSAL-0 facade / double settlement', () => {
     const t = tree();
     await flush();
 
-    const proposal = t.propose(() => {
+    const pending = t.transact(() => {
       t.$.rows.addOne({ id: 'A', name: 'Proposed' });
     });
     await flush();
@@ -489,8 +494,8 @@ describe('PROPOSAL-0 facade / double settlement', () => {
     realization(() => t.$.rows.updateOne('A', { name: 'FromServer' }));
     await flush();
 
-    expect(tryReject(proposal)).toBe('later-confirmed-dependency');
-    expect(proposal.inspect().changes).toEqual([
+    expect(tryRollback(pending)).toBe('later-confirmed-dependency');
+    expect(pending.inspect().changes).toEqual([
       { path: 'rows.A', address: ['rows'], subject: expect.any(Number), status: 'current' },
     ]);
 
@@ -498,7 +503,7 @@ describe('PROPOSAL-0 facade / double settlement', () => {
     realization(() => t.$.rows.removeOne('A'));
     await flush();
 
-    expect(proposal.inspect().changes).toEqual([
+    expect(pending.inspect().changes).toEqual([
       { path: 'rows.A', address: ['rows'], subject: expect.any(Number), status: 'superseded' },
     ]);
   });

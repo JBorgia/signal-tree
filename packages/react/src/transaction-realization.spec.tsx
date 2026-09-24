@@ -7,11 +7,11 @@ import { entityMap, signalTree, transactions } from '@signal-tree/kernel';
 // same way ssr-transfer.spec.ts reaches serialization.
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
-  proposalRealizationContract,
+  transactionRealizationContract,
   type ConformanceRow,
   type MixedFrame,
   type Observation,
-} from '../../kernel/src/proposal-realization-contract';
+} from '../../kernel/src/transaction-realization-contract';
 import { useSignalTree } from './use-signal-tree';
 
 /**
@@ -84,8 +84,8 @@ const decodeFrame = (encoded: string): MixedFrame => {
   };
 };
 
-describe('@signal-tree/react — proposal realization conformance', () => {
-  proposalRealizationContract<Tree>({
+describe('@signal-tree/react — pending realization conformance', () => {
+  transactionRealizationContract<Tree>({
     framework: 'react',
 
     createStore() {
@@ -96,7 +96,7 @@ describe('@signal-tree/react — proposal realization conformance', () => {
       };
     },
 
-    propose: (tree, fn) => tree.propose(fn),
+    transact: (tree, fn) => tree.transact(fn),
 
     writeScalar: (tree, value) => tree.$.scalar(value),
     readScalar: (tree) => tree.$.scalar(),

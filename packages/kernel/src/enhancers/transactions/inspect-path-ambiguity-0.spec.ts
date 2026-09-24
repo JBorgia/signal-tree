@@ -7,9 +7,9 @@ import { transactions } from './transactions';
 
 /**
  * Independent check of the one claim that speaks to a HUMAN: does
- * `proposal.inspect()` truthfully identify what an agent changed?
+ * `pending.inspect()` truthfully identify what an agent changed?
  *
- * MEASURED 2026-09-24, independently of docs/audits/2026-09-23-proposal-path.md.
+ * MEASURED 2026-09-24, independently of docs/audits/2026-09-23-pending-path.md.
  * Originally the answer was NO and this file pinned the ambiguity. It is now
  * the proof of the fix: `path` stays ambiguous by design because it is
  * presentation, and `address` carries lossless typed segments (L17).
@@ -37,7 +37,7 @@ describe('inspect() path ambiguity', () => {
         $: Record<string, never> & (() => unknown);
         propose: (fn: () => void) => {
           inspect(): { changes: { path: string; status: string }[] };
-          reject(): void;
+          rollback(): void;
         };
         destroy(): void;
       };
@@ -50,11 +50,11 @@ describe('inspect() path ambiguity', () => {
           };
           propose: (fn: () => void) => {
             inspect(): { changes: { path: string; status: string }[] };
-            reject(): void;
+            rollback(): void;
           };
           destroy(): void;
         };
-        const proposal = t.propose(() => {
+        const pending = t.transact(() => {
           if (target === 'literal') t.$['a.b'](1);
           else t.$.a.b(2);
         });
@@ -63,7 +63,7 @@ describe('inspect() path ambiguity', () => {
           else t.$['a.b'](1);
         });
         await flush();
-        const inspection = proposal.inspect();
+        const inspection = pending.inspect();
         return {
           byPath: inspection.changes.map((c) => `${c.path}=${c.status}`),
           byAddress: inspection.changes.map(
@@ -84,7 +84,7 @@ describe('inspect() path ambiguity', () => {
     console.log('[inspect] LITERAL path :', literal.byPath, 'addr:', literal.byAddress);
     console.log('[inspect] NESTED  path :', nested.byPath, 'addr:', nested.byAddress);
 
-    // Two DIFFERENT proposals, touching two DIFFERENT locations, each with a
+    // Two DIFFERENT pendings, touching two DIFFERENT locations, each with a
     // different concurrent external writer.
     //
     // MEASURED: both project to exactly [ 'a.b=current' ]. A reviewer cannot
@@ -146,12 +146,12 @@ describe('inspect() address — entity FIELDS are distinguishable too', () => {
     try {
       tree.$.rows.addOne({ id: 'A', 'n.a': 0, n: { a: 0 } });
       await flush();
-      const proposal = tree.propose(() => {
+      const pending = tree.transact(() => {
         tree.$.rows.updateOne('A', { 'n.a': 1, n: { a: 1 } });
       });
       await flush();
 
-      const changes = proposal.inspect().changes;
+      const changes = pending.inspect().changes;
       const keys = changes.map(
         (c) => `${JSON.stringify(c.address)}#${String(c.subject)}`
       );

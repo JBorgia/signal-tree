@@ -32,7 +32,7 @@ const flush = async () => {
 const realization = (fn: () => void) =>
   withWriteContext({ intent: 'system', participation: 'realized' }, fn);
 
-const tryReject = (pending: { rollback(): void }): false | unknown => {
+const tryRollback = (pending: { rollback(): void }): false | unknown => {
   try {
     pending.rollback();
     return false;
@@ -70,7 +70,7 @@ describe('REKEY-SUPERSESSION-0 / 1 — later UPDATE of the rekeyed subject', () 
     // a later set changes a FIELD of the same subject, so they do not contend.
     // The turn's contribution (the rename) reverses; the server's field value
     // rides along with the subject and survives.
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect(tree.$.rows.ids()).toEqual(['A']);
     expect(tree.$.rows.byId('A')?.()?.name).toBe('FromServer');
     expect(tree.$.x()).toBe(0);
@@ -98,7 +98,7 @@ describe('REKEY-SUPERSESSION-0 / 2 — later REMOVE of the rekeyed subject', () 
     // newer truth, correctly preserved.
     //
     // Pre-fix this refused and stranded `x` at 1; see the pinning commit.
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect(tree.$.x()).toBe(0);
     expect(tree.$.rows.ids()).toEqual([]);
   });
@@ -122,7 +122,7 @@ describe('REKEY-SUPERSESSION-0 / 3 — later REMOVE then ADD of the same key', (
     });
     await flush();
 
-    const refusal = tryReject(pending);
+    const refusal = tryRollback(pending);
 
     // THE INVARIANT: the newly created subject must survive untouched. It
     // reuses the business key but is a different subject, so the turn's
@@ -153,7 +153,7 @@ describe('REKEY-SUPERSESSION-0 / 4 — clean rekey, no later writer', () => {
     expect(tree.$.rows.ids()).toEqual(['A2']);
 
     // The guard against regressing the documented repair.
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect(tree.$.rows.ids()).toEqual(['A']);
     expect(tree.$.rows.byId('A')?.()?.name).toBe('Original');
     expect(tree.$.x()).toBe(0);
@@ -177,7 +177,7 @@ describe('REKEY-SUPERSESSION-0 / 5 — rekey plus another structural operation',
 
     // The exact composition the repair fixed. Must stay green through any
     // supersession change.
-    expect(tryReject(pending)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect(tree.$.rows.ids()).toEqual(['A']);
     expect(tree.$.x()).toBe(0);
   });

@@ -1,11 +1,11 @@
 import { expect, it } from 'vitest';
 
-import type { Proposal } from './enhancers/transactions/transactions.types';
+import type { PendingTransaction } from './enhancers/transactions/transactions.types';
 
 /**
  * PROPOSAL-REALIZATION-CONFORMANCE — PROPOSAL-0 Phase B.
  *
- * The kernel owns what proposal semantics MEAN; Phase A settled that against
+ * The kernel owns what pending semantics MEAN; Phase A settled that against
  * framework-neutral behaviour and it is not re-litigated here. This contract
  * asks one narrower question per adapter:
  *
@@ -14,7 +14,7 @@ import type { Proposal } from './enhancers/transactions/transactions.types';
  *
  * The assertions live here and are shared. An adapter supplies only physical
  * hooks. That is deliberate: adapter test depth is wildly uneven — angular 29
- * specs, vue 6, react 2, solid 1 — and "is Proposal supported here" must stop
+ * specs, vue 6, react 2, solid 1 — and "is PendingTransaction supported here" must stop
  * being answerable by spec count. THIS CONTRACT IS THE DEFINITION OF SUPPORT.
  * A future adapter proves the same five behaviours rather than copying
  * whichever existing adapter happens to have the most tests.
@@ -27,8 +27,8 @@ import type { Proposal } from './enhancers/transactions/transactions.types';
  * form rejected by its types. A contract that hard-coded either spelling would
  * be testing one adapter's grammar in the others' names.
  *
- * Out of scope on purpose: no adapter-specific proposal helpers, no re-testing
- * of proposal semantics, no export plumbing. `propose()` rides on the tree and
+ * Out of scope on purpose: no adapter-specific pending helpers, no re-testing
+ * of pending semantics, no export plumbing. `transact()` rides on the tree and
  * the public types already reach every adapter barrel by facade re-export.
  */
 
@@ -53,7 +53,7 @@ export type MixedFrame = {
  * contain an assertion, and the contract may not branch on `framework` — a
  * contract with per-framework exceptions is four contracts wearing one name.
  */
-export type ProposalRealizationHooks<Tree> = {
+export type TransactionRealizationHooks<Tree> = {
   readonly framework: string;
 
   /**
@@ -63,8 +63,8 @@ export type ProposalRealizationHooks<Tree> = {
    */
   createStore(): { tree: Tree; dispose(): void };
 
-  /** `tree.propose(fn)` — present on every adapter; no re-export needed. */
-  propose(tree: Tree, fn: () => void): Proposal;
+  /** `tree.transact(fn)` — present on every adapter; no re-export needed. */
+  transact(tree: Tree, fn: () => void): PendingTransaction;
 
   writeScalar(tree: Tree, value: number): void;
   readScalar(tree: Tree): number;
@@ -89,8 +89,8 @@ export type ProposalRealizationHooks<Tree> = {
 /**
  * Run the five-behaviour contract. Call inside a `describe`.
  */
-export function proposalRealizationContract<Tree>(
-  hooks: ProposalRealizationHooks<Tree>
+export function transactionRealizationContract<Tree>(
+  hooks: TransactionRealizationHooks<Tree>
 ): void {
   // 1 ──────────────────────────────────────────────────────────────────────
   it('1 speculative publication — proposed values reach the native carrier before settlement', async () => {
@@ -99,10 +99,10 @@ export function proposalRealizationContract<Tree>(
     await hooks.flush();
     expect(observed.current()).toBe(0);
 
-    hooks.propose(tree, () => hooks.writeScalar(tree, 7));
+    hooks.transact(tree, () => hooks.writeScalar(tree, 7));
     await hooks.flush();
 
-    // A reviewer must see the proposal through the reference the UI already
+    // A reviewer must see the pending through the reference the UI already
     // holds — no extra subscription, no settlement required.
     expect(observed.current()).toBe(7);
     expect(observed.seen).toContain(7);
@@ -117,10 +117,10 @@ export function proposalRealizationContract<Tree>(
     const observed = hooks.observeScalar(tree);
     await hooks.flush();
 
-    const proposal = hooks.propose(tree, () => hooks.writeScalar(tree, 7));
+    const pending = hooks.transact(tree, () => hooks.writeScalar(tree, 7));
     await hooks.flush();
 
-    proposal.accept();
+    pending.confirm();
     await hooks.flush();
 
     expect(observed.current()).toBe(7);
@@ -136,11 +136,11 @@ export function proposalRealizationContract<Tree>(
     const observed = hooks.observeScalar(tree);
     await hooks.flush();
 
-    const proposal = hooks.propose(tree, () => hooks.writeScalar(tree, 7));
+    const pending = hooks.transact(tree, () => hooks.writeScalar(tree, 7));
     await hooks.flush();
     expect(observed.current()).toBe(7);
 
-    proposal.reject();
+    pending.rollback();
     await hooks.flush();
 
     // A carrier that published the speculative value but not its compensation
@@ -159,12 +159,12 @@ export function proposalRealizationContract<Tree>(
     const observed = hooks.observeMixed(tree);
     await hooks.flush();
 
-    const proposal = hooks.propose(tree, () => {
+    const pending = hooks.transact(tree, () => {
       hooks.writeScalar(tree, 7);
       hooks.addRow(tree, { id: 'A', name: 'Alpha' });
     });
     await hooks.flush();
-    proposal.accept();
+    pending.confirm();
     await hooks.flush();
 
     // Both writes belong to ONE turn, so any frame showing one without the
@@ -183,12 +183,12 @@ export function proposalRealizationContract<Tree>(
     const observed = hooks.observeMixed(tree);
     await hooks.flush();
 
-    const proposal = hooks.propose(tree, () => {
+    const pending = hooks.transact(tree, () => {
       hooks.writeScalar(tree, 7);
       hooks.addRow(tree, { id: 'A', name: 'Alpha' });
     });
     await hooks.flush();
-    proposal.reject();
+    pending.rollback();
     await hooks.flush();
 
     for (const frame of observed.seen) {
@@ -225,7 +225,7 @@ export function proposalRealizationContract<Tree>(
     dispose();
   });
 
-  it('5b lifetime preservation holds when the rename happens inside a proposal', async () => {
+  it('5b lifetime preservation holds when the rename happens inside a pending', async () => {
     const { tree, dispose } = hooks.createStore();
     hooks.addRow(tree, { id: 'A', name: 'Original' });
     await hooks.flush();
@@ -233,7 +233,7 @@ export function proposalRealizationContract<Tree>(
     const held = hooks.holdEntity(tree, 'A');
     await hooks.flush();
 
-    const proposal = hooks.propose(tree, () => {
+    const pending = hooks.transact(tree, () => {
       hooks.removeRow(tree, 'A');
       hooks.addRow(tree, { id: 'A', name: 'Impostor' });
     });
@@ -241,7 +241,7 @@ export function proposalRealizationContract<Tree>(
 
     expect(held.current()?.name).not.toBe('Impostor');
 
-    proposal.reject();
+    pending.rollback();
     await hooks.flush();
 
     // And the original must come back through that same held reference.

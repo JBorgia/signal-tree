@@ -6,11 +6,11 @@ import { describe } from 'vitest';
 // same way ssr-transfer.spec.ts reaches serialization.
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
-  proposalRealizationContract,
+  transactionRealizationContract,
   type ConformanceRow,
   type MixedFrame,
   type Observation,
-} from '../../../kernel/src/proposal-realization-contract';
+} from '../../../kernel/src/transaction-realization-contract';
 import { entityMap, signalTree, transactions } from '../index';
 
 /**
@@ -43,8 +43,8 @@ const observe = <T>(read: () => T): Observation<T> => {
   return { seen, current: () => latest, dispose: stop };
 };
 
-describe('@signal-tree/vue — proposal realization conformance', () => {
-  proposalRealizationContract<Tree>({
+describe('@signal-tree/vue — pending realization conformance', () => {
+  transactionRealizationContract<Tree>({
     framework: 'vue',
 
     createStore() {
@@ -52,7 +52,7 @@ describe('@signal-tree/vue — proposal realization conformance', () => {
       return { tree, dispose: () => tree.destroy() };
     },
 
-    propose: (tree, fn) => tree.propose(fn),
+    transact: (tree, fn) => tree.transact(fn),
 
     writeScalar: (tree, value) => {
       tree.$.scalar.value = value;

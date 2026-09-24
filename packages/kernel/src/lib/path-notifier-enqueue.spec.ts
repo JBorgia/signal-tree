@@ -63,7 +63,7 @@ describe('private enqueue observation', () => {
     }
   });
 
-  it('does not duplicate turns or publish a proposal before settlement', async () => {
+  it('does not duplicate turns or publish a pending before settlement', async () => {
     const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
     const sent: number[] = [];
     const connection = link(tree.$.x, {
@@ -75,15 +75,15 @@ describe('private enqueue observation', () => {
       const runtime = peekInternalTransactionRuntime(tree)!;
       const created = vi.fn();
       const off = runtime.onPendingCreated(created);
-      const proposal = tree.propose(() => tree.$.x(1));
+      const pending = tree.transact(() => tree.$.x(1));
       await flush();
-      proposal.inspect();
-      proposal.inspect();
+      pending.inspect();
+      pending.inspect();
       expect(created).toHaveBeenCalledTimes(1);
       expect(runtime.getPendingTurnCount()).toBe(1);
       expect(runtime.getConfirmedTurnCount()).toBe(0);
       expect(sent).toEqual([]);
-      proposal.accept();
+      pending.confirm();
       await connection.settled();
       expect(sent).toEqual([1]);
       expect(runtime.getPendingTurnCount()).toBe(0);
@@ -145,7 +145,7 @@ describe('private enqueue observation', () => {
       // Discard the synthetic hostile delivery after proving the enqueue seam.
       getPathNotifier().clear();
       getPathNotifier().emitReset();
-      const fresh = tree.propose(() => tree.$.x(2));
+      const fresh = tree.transact(() => tree.$.x(2));
       expect(fresh.inspect().changes).toEqual([
         { path: 'x', address: ['x'], status: 'current' },
       ]);

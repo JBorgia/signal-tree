@@ -27,7 +27,7 @@ export default [
             // reactive-test-realization.ts, and no consumer can reach it.
             // Without this, vitest would be demanded as a runtime peer of a
             // published package.
-            '{projectRoot}/src/proposal-realization-contract.ts',
+            '{projectRoot}/src/transaction-realization-contract.ts',
           ],
           ignoredDependencies: [
             'tslib',
