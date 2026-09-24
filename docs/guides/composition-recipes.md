@@ -344,6 +344,32 @@ see `transactions enhancer › supports an optimistic workflow where rollback
 reverts optimistic state but preserves later unrelated activity` in
 [`packages/kernel/src/enhancers/transactions/transactions.spec.ts`](../../packages/kernel/src/enhancers/transactions/transactions.spec.ts).
 
+#### When a rollback refuses
+
+`rollback()` reverses only what it can prove safe. When later work depends on
+what the transaction wrote — a server response that re-created a row it
+removed, or a second transaction still open over the same field — it throws
+`SignalTreeRollbackError` instead of guessing.
+
+A refusal changes **nothing**: no value moves, and the transaction stays
+pending, so you can retry it, `confirm()` it, or reconcile by hand.
+
+```typescript
+try {
+  pending.rollback();
+} catch (error) {
+  // Still pending. Settle it deliberately — refetch and confirm, or retry the
+  // rollback once the conflicting work has settled.
+  await refetchOrder();
+  pending.confirm();
+}
+```
+
+The one ordering to know: settle the **newest** open transaction first. Rolling
+an older one back while a newer overlapping one is open refuses with
+`cause.kind === 'later-pending-dependency'`, because the newer transaction's
+before-image records what the field *held*, not who owns it.
+
 ### What `transactions()` does not decide for you
 
 `transactions()` gives you the **pending → confirm/rollback lifecycle**. It

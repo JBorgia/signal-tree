@@ -6,7 +6,7 @@
 
 Use this index to navigate the documentation.
 
-**Current release:** 16.0.0 See [CHANGELOG](../CHANGELOG.md).
+**Current release:** 15.3.0 See [CHANGELOG](../CHANGELOG.md).
 
 ---
 

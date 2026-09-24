@@ -102,7 +102,8 @@ function projectConfirmedTurns(
       after?: unknown;
       subject?: unknown;
     }[];
-  }[]
+  }[],
+  retention: { truncated: boolean; firstAvailableTurnId?: number }
 ): ConfirmedTurnSnapshot {
   const turns: ConfirmedTurnView[] = [];
   for (const record of records) {
@@ -125,18 +126,14 @@ function projectConfirmedTurns(
     });
   }
 
-  // DERIVED, not asserted. Turn ids are allocated from 1 and never reused, so a
-  // first retained id above 1 means earlier turns are gone. Nothing evicts from
-  // `confirmedTurns` today, so this is false — and it starts reporting true on
-  // its own if that ever changes.
-  const firstAvailableTurnId = turns[0]?.id;
-  return {
-    turns,
-    retention: {
-      truncated: firstAvailableTurnId !== undefined && firstAvailableTurnId > 1,
-      firstAvailableTurnId,
-    },
-  };
+  // EXPLICIT, not derived. The previous version inferred truncation from
+  // `firstAvailableTurnId > 1` and predicted it would "start reporting true on
+  // its own" once eviction existed. Porting L15 here proved it would not: when
+  // the WHOLE window is evicted, `turns` is empty, `firstAvailableTurnId` is
+  // undefined, and the comparison yields FALSE — asserting a complete history
+  // precisely when none was kept. Id gaps are also left by pending and
+  // rejected turns, so they were never truncation evidence to begin with.
+  return { turns, retention };
 }
 
 /**
@@ -190,7 +187,10 @@ export function confirmedTurnReader<T>(
       if (destroyed?.() === true) {
         throw new StudioTreeDestroyedError();
       }
-      return projectConfirmedTurns(runtime.getConfirmedTurnRecords() as never);
+      return projectConfirmedTurns(
+        runtime.getConfirmedTurnRecords() as never,
+        runtime.getConfirmedRetention()
+      );
     },
   };
 }

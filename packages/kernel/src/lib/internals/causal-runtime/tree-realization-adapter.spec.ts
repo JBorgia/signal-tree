@@ -3893,7 +3893,7 @@ describe('tree realization adapter', () => {
   it('keeps outer transaction authorship active across an inner realization write', () => {
     const tree = signalTree(
       { left: '', middle: '', right: '' },
-      { enhancers: [transactions()] }
+      { enhancers: [transactions({ history: { retain: 1000 } })] }
     ) as unknown as {
       $: {
         left: TestLocation<string>;

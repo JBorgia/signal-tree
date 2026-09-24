@@ -1,5 +1,13 @@
 # V15 SAFETY AUDIT — published artifacts, not source
 
+> **STATUS — FIXED IN 15.3.0.** Everything below is the measurement as taken on
+> 2026-09-23 against published tarballs, and is kept unedited as the evidence
+> for the release claim. It describes 15.0.0–15.2.1, NOT current behaviour. The
+> contract that replaces it is H1–H9 in
+> `packages/kernel/src/enhancers/transactions/hotfix-15-2-2-safety.spec.ts`; the
+> fix is in the 15.3.0 CHANGELOG entry. Re-running `probe.mjs` against 15.3.0 or
+> later should report NO reproduction.
+
 Run 2026-09-23 against tarballs installed from the npm registry into isolated
 consumers. No repo source, no local `dist/`, no workspace `node_modules`.
 
@@ -114,5 +122,7 @@ so this bounds exposure, it does not prove it is zero.
 
 No known real consumer uses `transactions()` in an affected pattern. Per the
 standing instruction — deprecate promptly IF a real consumer is affected —
-the npm deprecation is NOT triggered. A private advisory draft is prepared at
-`ADVISORY-DRAFT.md` and is unpublished pending review.
+the npm deprecation is NOT triggered. A private advisory draft was prepared at
+`ADVISORY-DRAFT.md`; it has since been superseded by the finalized
+`docs/advisories/2026-09-24-transaction-rollback-15x.md`, written once 15.3.0
+shipped the fix.

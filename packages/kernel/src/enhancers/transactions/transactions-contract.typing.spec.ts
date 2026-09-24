@@ -97,10 +97,26 @@ export const _f4: PendingTransaction = labelledThenTxn.transact(
 export const _f5: number = txnThenLabelled.$.count();
 
 // ============================================================================
-// 4 — takes no config
+// 4 — config surface (L15 retention)
 // ============================================================================
-// @ts-expect-error `transactions()` takes no arguments
-signalTree(initial, { enhancers: [transactions({ nope: true })] });
+// `transactions()` previously took no arguments; it now takes an optional
+// TransactionsConfig. The old @ts-expect-error here asserted "takes no
+// arguments" and went stale rather than failing, so it is replaced with cases
+// that pin the CURRENT contract in both directions.
+// Directives are kept on the SAME line the error lands on: a multi-line call
+// puts the diagnostic on the inner line and the directive above the statement
+// then suppresses nothing, which is how the stale one above survived.
+signalTree(initial, { enhancers: [transactions()] });
+signalTree(initial, { enhancers: [transactions({ history: { retain: 10 } })] });
+// `retain` is required once `history` is given.
+// @ts-expect-error missing required property `retain`
+transactions({ history: {} });
+// `retain` is a number, not a string.
+// @ts-expect-error wrong type for `retain`
+transactions({ history: { retain: 'lots' } });
+// An unknown option is rejected rather than silently ignored.
+// @ts-expect-error unknown option
+transactions({ nope: true });
 
 // ============================================================================
 // 5 — negative controls

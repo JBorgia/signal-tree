@@ -9,6 +9,7 @@ import type {
   WriteMetadata,
 } from '../../lib/types';
 import type {
+  TransactionsConfig,
   PendingTransaction,
   Proposal,
   ProposalAcceptance,
@@ -123,15 +124,59 @@ export type TurnEffect =
 type LaterAppliedEffect = {
   turnId: number;
   effect: TurnEffect;
+  /**
+   * H4/H5/H6 — THE SUPERSEDER'S OWN SETTLEMENT STATE.
+   *
+   * A later effect used to arrive with no provenance, and the plan builder
+   * treated every one of them as ESTABLISHED: a later `replace` at the same
+   * location meant the older contribution was already invisible, so reversing
+   * it needed no compensation. That is true of a CONFIRMED later write. It is
+   * false of one belonging to a transaction that is itself still pending,
+   * because that write may yet be rolled back — and when it is, the location
+   * falls back to a before-image that records what the slot HELD (the older
+   * transaction's speculative value), not who owns it now. Measured: rolling
+   * back P1 then P2 resurrected P1's y=1, a value P1 had already given up.
+   *
+   * Repairing that properly means per-location ownership rather than per-turn
+   * before-images, which is the 16.0 model and deliberately not a patch. Here
+   * the flag only makes the plan builder REFUSE instead of guessing.
+   */
+  unsettled?: boolean;
 };
 
-export type PendingRollbackDependencyConflict = {
-  kind: 'later-confirmed-dependency';
+/** The payload both dependency refusals carry; the `kind` is added per member. */
+type PendingRollbackDependencyDetail = {
   pendingTurnId: number;
   pendingEffect: TurnEffect;
   conflictingTurnId?: number;
   conflictingEffect?: TurnEffect;
 };
+
+/**
+ * `later-confirmed-dependency` — settled later work depends on state this
+ * rollback would invalidate. `later-pending-dependency` — the later work is
+ * ANOTHER OPEN TRANSACTION, so neither reversing nor skipping can be proven
+ * safe. Separate kinds because the second is not a claim about confirmed state
+ * and must not borrow a name that says it is.
+ *
+ * Two MEMBERS rather than one member with two `kind` values, so that testing
+ * both kinds narrows the union to `never` and `explainRollbackFailure` can
+ * prove it handles every one.
+ */
+export type PendingRollbackDependencyConflict =
+  | (PendingRollbackDependencyDetail & {
+      kind: 'later-confirmed-dependency';
+    })
+  | (PendingRollbackDependencyDetail & { kind: 'later-pending-dependency' });
+
+/** Build the right member from the superseder's settlement state. */
+const dependencyConflict = (
+  unsettled: boolean,
+  detail: PendingRollbackDependencyDetail
+): PendingRollbackDependencyConflict =>
+  unsettled
+    ? { kind: 'later-pending-dependency', ...detail }
+    : { kind: 'later-confirmed-dependency', ...detail };
 
 type PendingRollbackPlan =
   | { compensation: TurnEffect[] }
@@ -197,6 +242,13 @@ export interface InternalTransactionRuntime {
   ):
     | { effects: readonly TurnEffect[]; laterEffects: readonly TurnEffect[] }
     | undefined;
+  /** L15: opt-in evidence retention beyond the correctness obligation. */
+  setHistoryRetention(retain: number): void;
+  /** Explicit retention metadata; never inferred from ids. */
+  getConfirmedRetention(): {
+    truncated: boolean;
+    firstAvailableTurnId?: number;
+  };
   getConfirmedTurnCount(): number;
   getPendingTurnCount(): number;
   getConfirmedTurnIds(): number[];
@@ -236,6 +288,25 @@ const ROLLBACK_ERROR_MESSAGE =
  * matching — the message is additive, not replaced.
  */
 export const explainRollbackFailure = (cause: RollbackFailureCause): string => {
+  // Narrowed on the UNIQUE kind first, so that the two dependency kinds below
+  // can each be tested and still leave `never` for the exhaustiveness check.
+  if (cause.kind === 'effect-validation-failed') {
+    return (
+      `${ROLLBACK_ERROR_MESSAGE}: compensating turn ${cause.pendingTurnId} ` +
+      `failed validation — ${cause.errorMessage} [effect-validation-failed]`
+    );
+  }
+  if (cause.kind === 'later-pending-dependency') {
+    const at =
+      cause.conflictingTurnId === undefined
+        ? 'another open transaction'
+        : `open transaction ${cause.conflictingTurnId}`;
+    return (
+      `${ROLLBACK_ERROR_MESSAGE}: ${at} overlaps turn ${cause.pendingTurnId}, ` +
+      `so reversing it cannot be proven safe while both are unsettled — ` +
+      `settle the newer transaction first [later-pending-dependency]`
+    );
+  }
   if (cause.kind === 'later-confirmed-dependency') {
     const at =
       cause.conflictingTurnId === undefined
@@ -247,10 +318,13 @@ export const explainRollbackFailure = (cause: RollbackFailureCause): string => {
       `[later-confirmed-dependency]`
     );
   }
-  return (
-    `${ROLLBACK_ERROR_MESSAGE}: compensating turn ${cause.pendingTurnId} ` +
-    `failed validation — ${cause.errorMessage} [effect-validation-failed]`
-  );
+  // Exhaustive. A new refusal kind is a COMPILE error here rather than a
+  // silently generic sentence — the legibility this function exists for is
+  // only worth anything if it cannot quietly stop applying.
+  const unhandled: never = cause;
+  return `${ROLLBACK_ERROR_MESSAGE} [${
+    (unhandled as { kind: string }).kind
+  }]`;
 };
 
 const createRollbackError = (
@@ -286,8 +360,24 @@ function buildPendingRollbackPlan(
   const pendingEffects = pendingTurn.__effects ?? [];
   const makeScalarKey = (effect: ScalarSetEffect): string =>
     `${effect.position}\u0000${effect.path}\u0000${effect.subject ?? ''}`;
+  // SETTLED superseders only — the ONE place an open transaction is denied
+  // supersession, deliberately.
+  //
+  // An unsettled superseder may itself be rolled back, and when it is, the
+  // location it "superseded" is restored from a before-image naming THIS turn's
+  // speculative value — see `LaterAppliedEffect.unsettled`. Missing that key
+  // makes the path-equal branch below fall through to a conflict instead of
+  // skipping compensation, which is the refusal H4/H5/H6 require.
+  //
+  // ⚠️ An early `if (laterEntry.unsettled) return conflictWith(laterEntry)` in
+  // that branch produces the same refusals and was written first. It is NOT
+  // kept: it is correct only because the loop visits every later entry, so an
+  // added `break` or a reordering would silently restore the defect. Honesty
+  // belongs in the SET, where it holds however the loop is rewritten. Measured
+  // — each guard alone passes H1..H9; with both removed H6 fails.
   const supersededScalarKeys = new Set(
     laterEffects
+      .filter((entry) => !entry.unsettled)
       .map(({ effect }) => effect)
       .filter((effect): effect is ScalarSetEffect => effect.kind === 'set')
       .map(makeScalarKey)
@@ -300,10 +390,18 @@ function buildPendingRollbackPlan(
     | { kind: 'superseded' }
     | {
         kind: 'conflict';
+        unsettled: boolean;
         conflictingTurnId?: number;
         conflictingEffect?: TurnEffect;
       } => {
     let superseded = false;
+    const conflictWith = (laterEntry: LaterAppliedEffect) =>
+      ({
+        kind: 'conflict',
+        unsettled: laterEntry.unsettled === true,
+        conflictingTurnId: laterEntry.turnId,
+        conflictingEffect: laterEntry.effect,
+      } as const);
     for (const laterEntry of laterEffects) {
       const laterEffect = laterEntry.effect;
       if (laterEffect.position !== effect.position) {
@@ -318,11 +416,7 @@ function buildPendingRollbackPlan(
       }
       if (laterEffect.path === effect.path) {
         if (laterEffect.kind !== 'set') {
-          return {
-            kind: 'conflict',
-            conflictingTurnId: laterEntry.turnId,
-            conflictingEffect: laterEffect,
-          };
+          return conflictWith(laterEntry);
         }
         if (laterEffect.mutationIntent === 'replace') {
           if (supersededScalarKeys.has(makeScalarKey(effect))) {
@@ -330,21 +424,13 @@ function buildPendingRollbackPlan(
             continue;
           }
         }
-        return {
-          kind: 'conflict',
-          conflictingTurnId: laterEntry.turnId,
-          conflictingEffect: laterEffect,
-        };
+        return conflictWith(laterEntry);
       }
       if (
         laterEffect.path.startsWith(`${effect.path}.`) ||
         effect.path.startsWith(`${laterEffect.path}.`)
       ) {
-        return {
-          kind: 'conflict',
-          conflictingTurnId: laterEntry.turnId,
-          conflictingEffect: laterEffect,
-        };
+        return conflictWith(laterEntry);
       }
     }
     return superseded ? { kind: 'superseded' } : { kind: 'none' };
@@ -353,27 +439,30 @@ function buildPendingRollbackPlan(
   const hasSameSubjectDependency = (
     effect: CollectionAddEffect | CollectionRemoveEffect | CollectionRekeyEffect
   ):
-    | { conflictingTurnId?: number; conflictingEffect?: TurnEffect }
+    | {
+        unsettled: boolean;
+        conflictingTurnId?: number;
+        conflictingEffect?: TurnEffect;
+      }
     | undefined => {
     for (const laterEntry of laterEffects) {
       const laterEffect = laterEntry.effect;
       if (laterEffect.ownerPath !== effect.ownerPath) {
         continue;
       }
+      const found = () => ({
+        unsettled: laterEntry.unsettled === true,
+        conflictingTurnId: laterEntry.turnId,
+        conflictingEffect: laterEffect,
+      });
       if (laterEffect.kind === 'set') {
         if (laterEffect.subject === effect.subject && effect.kind !== 'rekey') {
-          return {
-            conflictingTurnId: laterEntry.turnId,
-            conflictingEffect: laterEffect,
-          };
+          return found();
         }
         continue;
       }
       if (laterEffect.subject === effect.subject) {
-        return {
-          conflictingTurnId: laterEntry.turnId,
-          conflictingEffect: laterEffect,
-        };
+        return found();
       }
     }
     return undefined;
@@ -442,11 +531,13 @@ function buildPendingRollbackPlan(
     | { kind: 'superseded' }
     | {
         kind: 'conflict';
+        unsettled: boolean;
         conflictingTurnId?: number;
         conflictingEffect?: TurnEffect;
       } => {
     if (effect.kind === 'add' || effect.kind === 'rekey') {
       let erased = false;
+      let erasedByOpenTransaction = false;
       for (const laterEntry of laterEffects) {
         const laterEffect = laterEntry.effect;
         if (laterEffect.ownerPath !== effect.ownerPath) {
@@ -456,8 +547,19 @@ function buildPendingRollbackPlan(
           continue;
         }
         erased = laterEffect.kind === 'remove';
+        erasedByOpenTransaction = erased && laterEntry.unsettled === true;
       }
-      if (erased) {
+      // AN OPEN TRANSACTION CANNOT ERASE, only conflict — the same rule the
+      // scalar path applies through `supersededScalarKeys`, stated here because
+      // this is the STRUCTURAL path's own supersession and it had no equivalent.
+      //
+      // "Superseded" means this turn's contribution is already invisible, so
+      // reversing it needs no compensation. A remove belonging to a STILL-OPEN
+      // transaction has not established that: roll that transaction back and
+      // the subject returns, at which point this add was skipped for a reason
+      // that no longer holds. Falling through to the dependency test instead
+      // yields a `later-pending-dependency` refusal, which is recoverable.
+      if (erased && !erasedByOpenTransaction) {
         return { kind: 'superseded' };
       }
     }
@@ -466,6 +568,7 @@ function buildPendingRollbackPlan(
     return dependency
       ? {
           kind: 'conflict',
+          unsettled: dependency.unsettled,
           conflictingTurnId: dependency.conflictingTurnId,
           conflictingEffect: dependency.conflictingEffect,
         }
@@ -480,13 +583,12 @@ function buildPendingRollbackPlan(
         const overlap = classifyLaterOverlap(effect);
         if (overlap.kind === 'conflict') {
           return {
-            conflict: {
-              kind: 'later-confirmed-dependency',
+            conflict: dependencyConflict(overlap.unsettled, {
               pendingTurnId: pendingTurn.id,
               pendingEffect: effect,
               conflictingTurnId: overlap.conflictingTurnId,
               conflictingEffect: overlap.conflictingEffect,
-            },
+            }),
           };
         }
         if (overlap.kind === 'superseded') {
@@ -501,13 +603,12 @@ function buildPendingRollbackPlan(
         const overlap = classifyStructuralOverlap(effect);
         if (overlap.kind === 'conflict') {
           return {
-            conflict: {
-              kind: 'later-confirmed-dependency',
+            conflict: dependencyConflict(overlap.unsettled, {
               pendingTurnId: pendingTurn.id,
               pendingEffect: effect,
               conflictingTurnId: overlap.conflictingTurnId,
               conflictingEffect: overlap.conflictingEffect,
-            },
+            }),
           };
         }
         if (overlap.kind === 'superseded') {
@@ -524,6 +625,10 @@ function buildPendingRollbackPlan(
 
 class TransactionAuthority {
   private confirmedTurns: TransactionTurnRecord[] = [];
+  /** L15: evidence retained beyond correctness. 0 = correctness-only. */
+  private historyRetain = 0;
+  /** Set once a record has actually been dropped. Never inferred from ids. */
+  private evictedConfirmed = false;
   private pendingTurns = new Map<number, TransactionTurnRecord>();
   private nextTurnId = 1;
 
@@ -607,6 +712,8 @@ class TransactionAuthority {
       return undefined;
     }
     this.insertConfirmed(turn);
+    // The obligation set just changed; release what it no longer covers.
+    this.releaseConfirmedBeyondObligation();
     return cloneTurnRecord(turn);
   }
 
@@ -659,6 +766,54 @@ class TransactionAuthority {
     }
   }
 
+  setHistoryRetention(retain: number): void {
+    this.historyRetain = Number.isFinite(retain) && retain > 0 ? retain : 0;
+    this.releaseConfirmedBeyondObligation();
+  }
+
+  /** Explicit retention metadata for the reader; never inferred from ids. */
+  getConfirmedRetention(): {
+    truncated: boolean;
+    firstAvailableTurnId?: number;
+  } {
+    return {
+      truncated: this.evictedConfirmed,
+      firstAvailableTurnId: this.confirmedTurns[0]?.id,
+    };
+  }
+
+  /**
+   * L15: correctness retention follows live responsibility.
+   *
+   * `getPendingRollbackPlan` is the only correctness consumer of this ledger
+   * and selects `confirmedTurns.filter(t => t.id > turnId)`. Ids are monotonic,
+   * so a confirmed turn can only ever be needed by a pending turn OLDER than
+   * itself; once none remains it can never appear in a future plan.
+   *
+   * Derived, not a cap. `historyRetain` is a separate, explicitly requested
+   * evidence facility layered on top.
+   */
+  private releaseConfirmedBeyondObligation(): void {
+    if (this.confirmedTurns.length === 0) return;
+    let minPending = Infinity;
+    for (const id of this.pendingTurns.keys()) {
+      if (id < minPending) minPending = id;
+    }
+    const required = (turn: TransactionTurnRecord) => turn.id > minPending;
+    const before = this.confirmedTurns.length;
+    if (this.historyRetain <= 0) {
+      this.confirmedTurns = this.confirmedTurns.filter(required);
+    } else {
+      const keep = new Set<number>();
+      for (const turn of this.confirmedTurns)
+        if (required(turn)) keep.add(turn.id);
+      for (const turn of this.confirmedTurns.slice(-this.historyRetain))
+        keep.add(turn.id);
+      this.confirmedTurns = this.confirmedTurns.filter((t) => keep.has(t.id));
+    }
+    if (this.confirmedTurns.length < before) this.evictedConfirmed = true;
+  }
+
   confirmPending(turnId: number): TransactionTurnRecord | undefined {
     const turn = this.pendingTurns.get(turnId);
     if (!turn) {
@@ -673,8 +828,23 @@ class TransactionAuthority {
     // the handoff.
     this.releasePendingClaims(turnId);
     this.insertConfirmed(turn);
+    // The obligation set just changed; release what it no longer covers.
+    this.releaseConfirmedBeyondObligation();
     this.releaseLedgerIfQuiet();
     return cloneTurnRecord(turn);
+  }
+
+  /**
+   * Read a pending turn without retiring it.
+   *
+   * Compensation needs the turn's `__baselineValues` and claim set, and used
+   * to get them from `discardPending`'s return value — which forced the retire
+   * to happen BEFORE the attempt, and so made a refused attempt unrecoverable.
+   * Reading and retiring are now separate acts.
+   */
+  peekPending(turnId: number): TransactionTurnRecord | undefined {
+    const turn = this.pendingTurns.get(turnId);
+    return turn ? cloneTurnRecord(turn) : undefined;
   }
 
   discardPending(turnId: number): TransactionTurnRecord | undefined {
@@ -686,6 +856,8 @@ class TransactionAuthority {
     this.pendingOpenedAtSeq.delete(turnId);
     this.releasePendingClaims(turnId);
     this.releaseLedgerIfQuiet();
+    // Discarding can raise min(pendingIds) and discharge the obligation.
+    this.releaseConfirmedBeyondObligation();
     return cloneTurnRecord(turn);
   }
 
@@ -750,9 +922,31 @@ class TransactionAuthority {
       .filter((entry) => entry.seq > openedAt)
       .map((entry) => ({ turnId, effect: entry.effect }));
 
+    // H4/H5/H6 — OTHER OPEN TRANSACTIONS ARE LATER WORK TOO.
+    //
+    // This selector was `confirmedTurns` plus realizations, so a SECOND OPEN
+    // TRANSACTION was invisible to the first one's rollback plan: it is not
+    // confirmed, and its writes are authored rather than realized, so neither
+    // source carried it. The plan therefore reversed straight through it.
+    // Measured on 15.2.1 — P1 writes x=1,y=1; P2 writes y=2,z=2; `p1.rollback()`
+    // reported 'ok' and left {x:0, y:0, z:2}, silently destroying P2's y=2. A
+    // following `p2.confirm()` then committed a transaction missing one of the
+    // two fields it wrote.
+    //
+    // Ids are monotonic and a callback runs synchronously at creation, so
+    // `id > turnId` is exactly "opened after this one".
+    const pendingLater: LaterAppliedEffect[] = [];
+    for (const [otherId, otherTurn] of this.pendingTurns) {
+      if (otherId <= turnId) continue;
+      for (const effect of otherTurn.__effects ?? []) {
+        pendingLater.push({ turnId: otherId, effect, unsettled: true });
+      }
+    }
+
     return buildPendingRollbackPlan(this.pendingTurns.get(turnId), [
       ...authoredLater,
       ...observedLater,
+      ...pendingLater,
     ]);
   }
 
@@ -1736,6 +1930,26 @@ export function getOrCreateInternalTransactionRuntime<T>(
               // into a throwaway bucket and hand them to the dependency ledger
               // only; nothing here reaches confirmedTurns.
               //
+              // ...and never a COMPENSATION. Removing a contribution is the
+              // opposite of depending on it, so admitting a rollback's own
+              // realized writes here had the ledger assert a dependency that
+              // does not exist — and one rollback then made every EARLIER
+              // transaction permanently unreversible.
+              //
+              // This already bit. It needed two open transactions, because the
+              // rolled-back turn was retired before its compensation ran, so
+              // with only one open the count check below skipped this path by
+              // accident. With two, `compensation-provenance.spec.ts` pinned
+              // the resulting refusal as "CURRENT BEHAVIOUR ... not as
+              // desired". That test now asserts the correct restore instead.
+              //
+              // Restoration's recorder was taught to read this same `origin`
+              // for this same reason — see that spec's header. The ledger was
+              // the second consumer and had not been. Same shape as the
+              // `origin === 'restoration'` decline above.
+              if (origin === 'transaction-rollback') {
+                return;
+              }
               // Skipped entirely when nothing is pending, so a tree with no open
               // transaction pays nothing for this.
               if (authority.getPendingTurnCount() > 0) {
@@ -2085,6 +2299,31 @@ export function getOrCreateInternalTransactionRuntime<T>(
             throw new Error('Cannot rollback a confirmed transaction');
           }
 
+          // ══ H1/H3 — DECIDE, THEN SETTLE. ═════════════════════════════════
+          //
+          // This method used to retire first and compensate second: it set
+          // `lifecycle = 'rejected'`, announced 'rolled-back', called
+          // `discardPending`, and only THEN attempted the reversal. When the
+          // attempt refused, the throw left a transaction that had already
+          // surrendered its settlement authority while every write it authored
+          // was still live in the tree. Measured on 15.2.1, R6 scenario:
+          //
+          //     outcome  effect-validation-failed   (correctly refused)
+          //     pending  1 -> 0                     (turn retired anyway)
+          //     state    unchanged                  (nothing was reversed)
+          //     retry    'ok'                       (reversing nothing)
+          //
+          // `confirmedCount` also fell by one, because discarding raised
+          // min(pendingIds) and discharged the L15 obligation — a FAILED
+          // rollback destroyed retained evidence it was still responsible for.
+          //
+          // Everything below the PHASE 2 banner is now reached only once the
+          // compensation has actually applied. A refusal changes nothing the
+          // reader can observe, which is what makes the retry in H3 mean
+          // something and what lets an overlapping refusal in H4 leave both
+          // transactions intact.
+          // ═════════════════════════════════════════════════════════════════
+
           const rollbackPlan =
             pendingTurnId !== undefined
               ? authority.getPendingRollbackPlan(pendingTurnId)
@@ -2105,10 +2344,69 @@ export function getOrCreateInternalTransactionRuntime<T>(
             // is the tree/storage divergence this whole boundary exists to
             // prevent. Same argument confirm() already uses for the equivalent
             // situation.
+            //
+            // The scope settles; the TURN does not. Those were conflated.
+            // `settleCommitScope` is idempotent, so a later confirm() or a
+            // retried rollback() on this still-pending turn is safe.
             settleCommitScope(transactionOwnerToken, transactionId, 'commit');
             throw createRollbackError(rollbackPlan.conflict);
           }
 
+          const compensation = rollbackPlan.compensation;
+          const orderDeltas =
+            pendingTurnId === undefined
+              ? []
+              : pendingOrderDeltas.get(pendingTurnId) ?? [];
+
+          // ── PHASE 1 — attempt, with the turn STILL PENDING. ───────────────
+          if (compensation.length > 0 || orderDeltas.length > 0) {
+            // Read, do not retire. `peekPending` exists for exactly this.
+            const pendingRecord =
+              pendingTurnId === undefined
+                ? undefined
+                : authority.peekPending(pendingTurnId);
+            try {
+              rollbackPendingEffectsThroughRealizationPort(
+                pendingTurnId as number,
+                [...compensation].reverse(),
+                pendingRecord?.__baselineValues ?? new Map(),
+                orderDeltas,
+                undefined,
+                transactionId
+              );
+            } catch (error) {
+              // Refused. Same scope argument as the plan-level door above: the
+              // authored writes are still live, so durable consequences commit
+              // — and the turn stays pending, so the caller can retry or
+              // confirm.
+              settleCommitScope(transactionOwnerToken, transactionId, 'commit');
+              // ⚠️ DO NOT RE-WRAP AN ALREADY-RENDERED ROLLBACK REFUSAL. A
+              // refusal thrown deeper is a SignalTreeRollbackError whose
+              // message already names its kind; stuffing that message into
+              // `errorMessage` and wrapping again produced a DOUBLED
+              // sentence — prefix, reason, prefix, reason, and two `[kind]`
+              // tags. The constant message hid this for as long as it existed:
+              // both layers rendered identically, so the duplication was
+              // invisible until the reason became legible.
+              //
+              // Rethrowing preserves the INNERMOST, most specific refusal,
+              // which is the whole point of making the reason legible. Same
+              // error type, same refusal, same cause chain.
+              if (error instanceof SignalTreeRollbackError) throw error;
+              throw createRollbackError({
+                kind: 'effect-validation-failed',
+                pendingTurnId: pendingTurnId as number,
+                compensation,
+                errorMessage:
+                  error instanceof Error
+                    ? error.message
+                    : 'Unknown rollback validation failure',
+                cause: error,
+              });
+            }
+          }
+
+          // ── PHASE 2 — the reversal APPLIED. Now the turn may be retired. ──
           lifecycle = 'rejected';
           lifecycleChannel.announce({
             kind: 'rolled-back',
@@ -2118,73 +2416,17 @@ export function getOrCreateInternalTransactionRuntime<T>(
           let discardedTurn: TransactionTurnRecord | undefined;
           if (pendingTurnId !== undefined) {
             discardedTurn = authority.discardPending(pendingTurnId);
-          }
-
-          const compensation = rollbackPlan.compensation;
-          const orderDeltas =
-            pendingTurnId === undefined
-              ? []
-              : pendingOrderDeltas.get(pendingTurnId) ?? [];
-          if (pendingTurnId !== undefined) {
             pendingOrderDeltas.delete(pendingTurnId);
           }
-          // Starts true: "nothing to reverse" is a rollback that succeeded
-          // trivially, NOT a refusal.
-          let compensated = true;
           try {
-            if (compensation.length > 0 || orderDeltas.length > 0) {
-              try {
-                rollbackPendingEffectsThroughRealizationPort(
-                  pendingTurnId as number,
-                  [...compensation].reverse(),
-                  discardedTurn?.__baselineValues ?? new Map(),
-                  orderDeltas,
-                  undefined,
-                  transactionId
-                );
-              } catch (error) {
-                compensated = false;
-                // ⚠️ DO NOT RE-WRAP AN ALREADY-RENDERED ROLLBACK REFUSAL. A
-                // refusal thrown deeper is a SignalTreeRollbackError whose
-                // message already names its kind; stuffing that message into
-                // `errorMessage` and wrapping again produced a DOUBLED
-                // sentence — prefix, reason, prefix, reason, and two `[kind]`
-                // tags. The constant message hid this for as long as it existed:
-                // both layers rendered identically, so the duplication was
-                // invisible until the reason became legible.
-                //
-                // Rethrowing preserves the INNERMOST, most specific refusal,
-                // which is the whole point of making the reason legible. Same
-                // error type, same refusal, same cause chain.
-                if (error instanceof SignalTreeRollbackError) throw error;
-                throw createRollbackError({
-                  kind: 'effect-validation-failed',
-                  pendingTurnId: pendingTurnId as number,
-                  compensation,
-                  errorMessage:
-                    error instanceof Error
-                      ? error.message
-                      : 'Unknown rollback validation failure',
-                  cause: error,
-                });
-              }
-            }
+            // 'discard', unconditionally: reaching here means the baseline was
+            // restored, so the speculative consequences describe state the tree
+            // no longer shows. The old `compensated ? 'discard' : 'commit'`
+            // ternary lived in a `finally` that also ran on the refusal path;
+            // that path now returns above, so the condition it selected on can
+            // no longer be false here.
+            settleCommitScope(transactionOwnerToken, transactionId, 'discard');
           } finally {
-            // Late so consumers observe restored state, unconditional so a
-            // refused compensation cannot strand the scope. `lifecycle` is
-            // already 'rejected' at this point, so no later confirm() or
-            // rollback() could ever settle it — skipping here wedged autoSave
-            // permanently.
-            //
-            // Outcome tracks whether compensation APPLIED. A refusal reverses
-            // nothing, so the authored effects remain live truth and flush; a
-            // successful compensation restored the baseline, so they are
-            // discarded. See the thrown-callback path for the full note.
-            settleCommitScope(
-              transactionOwnerToken,
-              transactionId,
-              compensated ? 'discard' : 'commit'
-            );
             forgetUnclaimedDescriptorSubjects(
               discardedTurn?.restorationSubjectIds ?? [],
               descriptorOwnersBefore
@@ -2203,6 +2445,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
     getConfirmedTurnRecords: () => authority.getConfirmedTurnRecords(),
     describePendingTurn: (turnId: number) =>
       authority.describePendingTurn(turnId),
+    setHistoryRetention: (retain: number) =>
+      authority.setHistoryRetention(retain),
+    getConfirmedRetention: () => authority.getConfirmedRetention(),
     getConfirmedTurnCount: () => authority.getConfirmedTurnCount(),
     getPendingTurnCount: () => authority.getPendingTurnCount(),
     getConfirmedTurnIds: () => authority.getConfirmedTurnIds(),
@@ -2327,11 +2572,16 @@ function classifyProposedEffect(
   return present ? 'current' : 'superseded';
 }
 
-export function transactions(): Enhancer<TransactionMethods> {
+export function transactions(
+  config?: TransactionsConfig
+): Enhancer<TransactionMethods> {
   const enhancerFn = <T>(
     tree: ISignalTree<T>
   ): ISignalTree<T> & TransactionMethods => {
     const runtime = getOrCreateInternalTransactionRuntime(tree);
+    if (config?.history) {
+      runtime.setHistoryRetention(config.history.retain);
+    }
 
     // `transact`, not `transaction`: a verb beside `propose()` and the
     // handle's own `confirm()`/`rollback()`. The old spelling was REMOVED
