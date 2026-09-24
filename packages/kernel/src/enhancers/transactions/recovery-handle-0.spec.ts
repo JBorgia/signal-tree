@@ -242,3 +242,26 @@ describe('RECOVERY-HANDLE-0 / 4 — CONTROL: callback threw, compensation SUCCEE
     expect(store.__transactions.getPendingTurnCount()).toBe(0);
   });
 });
+
+describe('RECOVERY-HANDLE-0 / 5 — no handle when the handle cannot work', () => {
+  it('a destroyed tree attaches no recovery', async () => {
+    const store = await makeStore();
+
+    let thrown: unknown;
+    try {
+      store.transact(() => {
+        store.$.count(1);
+        (store as unknown as { destroy(): void }).destroy();
+        throw new Error('boom');
+      });
+    } catch (error) {
+      thrown = error;
+    }
+
+    // `rollback()` guards on the destroyed tree BEFORE lifecycle can move, so
+    // the lifecycle==='pending' test alone would offer a handle whose every
+    // method throws "Cannot settle a destroyed tree". Offering unusable
+    // authority is the same class of false claim the recovery exists to fix.
+    expect(recoveryOf(thrown)).toBeUndefined();
+  });
+});

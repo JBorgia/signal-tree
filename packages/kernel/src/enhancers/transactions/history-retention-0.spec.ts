@@ -183,6 +183,33 @@ describe('HISTORY-RETENTION-0 / 6 — the DEFAULT is deliberately unchanged', ()
   });
 });
 
+describe('HISTORY-RETENTION-0 / 7 — ORDINARY writes are bounded too', () => {
+  /**
+   * The prune was reachable only from confirmPending/discardPending, i.e. from
+   * settling a transact(). `recordConfirmed` — the path every ORDINARY write
+   * takes on flush — inserted and returned. So the obligation bound applied to
+   * transactional churn only, and `retain: 5` retained 49.
+   */
+  it('retain: 5 bounds churn that never uses a transaction', async () => {
+    const store = make({ history: { retain: 5 } });
+    for (let i = 0; i < 50; i++) {
+      store.$.y(i);
+      await flush();
+    }
+    expect(store.__transactions.getPendingTurnCount()).toBe(0);
+    expect(store.__transactions.getConfirmedTurnCount()).toBeLessThanOrEqual(5);
+  });
+
+  it('retain: 0 keeps nothing from ordinary writes', async () => {
+    const store = make({ history: { retain: 0 } });
+    for (let i = 0; i < 20; i++) {
+      store.$.y(i);
+      await flush();
+    }
+    expect(store.__transactions.getConfirmedTurnCount()).toBe(0);
+  });
+});
+
 describe('HISTORY-RETENTION-0 / 5 — R06: diagnostics must not change correctness', () => {
   it('settlement outcomes are identical with and without history enabled', async () => {
     const run = async (config?: unknown) => {
