@@ -9,6 +9,7 @@ import type {
   WriteMetadata,
 } from '../../lib/types';
 import type {
+  TransactionsConfig,
   PendingTransaction,
   TransactionMethods,
 } from './transactions.types';
@@ -189,7 +190,10 @@ export interface InternalTransactionRuntime {
   /** L15: opt-in evidence retention beyond the correctness obligation. */
   setHistoryRetention(retain: number): void;
   /** Explicit retention metadata; never inferred from ids. */
-  getConfirmedRetention(): { truncated: boolean; firstAvailableTurnId?: number };
+  getConfirmedRetention(): {
+    truncated: boolean;
+    firstAvailableTurnId?: number;
+  };
   getConfirmedTurnCount(): number;
   getPendingTurnCount(): number;
   getConfirmedTurnIds(): number[];
@@ -635,10 +639,6 @@ class TransactionAuthority {
     // Discarding can raise min(pendingIds) and discharge the obligation.
     this.releaseConfirmedBeyondObligation();
     return cloneTurnRecord(turn);
-  }
-
-  hasConfirmedTurnAfter(turnId: number): boolean {
-    return this.confirmedTurns.some((turn) => turn.id > turnId);
   }
 
   getPendingRollbackPlan(turnId: number): PendingRollbackPlan {
@@ -2148,17 +2148,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
   return runtime;
 }
 
-/**
- * Optional evidence retention (L15). Correctness records are bounded by live
- * obligation and are NOT configurable; this asks for diagnostic history ON TOP
- * of that, and is opt-in because the reader-visible policy may not change
- * silently.
- */
-export type TransactionsConfig = {
-  history?: { retain: number };
-};
-
-export function transactions(config?: TransactionsConfig): Enhancer<TransactionMethods> {
+export function transactions(
+  config?: TransactionsConfig
+): Enhancer<TransactionMethods> {
   const enhancerFn = <T>(
     tree: ISignalTree<T>
   ): ISignalTree<T> & TransactionMethods => {

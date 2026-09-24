@@ -42,9 +42,21 @@ export interface ConfirmedTurnView {
  *     BOUNDED RETENTION IS NOT CAUSAL COMPLETENESS.
  *
  * ⚠️ A consumer must never read "these are the turns" as "these are all the
- * turns that ever happened". `truncated` is DERIVED from the retained ids
- * rather than asserted, so if eviction is ever added to `confirmedTurns` this
- * becomes true on its own instead of silently lying.
+ * turns that ever happened".
+ *
+ * `truncated` is ASSERTED by the transaction authority, not derived. It is set
+ * when and only when a confirmed record has actually been dropped.
+ *
+ * It was previously derived from the retained ids (`firstAvailableTurnId > 1`),
+ * with a note predicting it would "become true on its own" once eviction was
+ * added. It would not: when the WHOLE window is evicted no ids remain,
+ * `firstAvailableTurnId` is undefined, and the comparison yields false —
+ * claiming a complete history precisely when none was kept. Pending and
+ * rejected turns leave id gaps too, so gaps were never truncation evidence.
+ *
+ * Under the default correctness-only policy this becomes true after the first
+ * settled turn. A tree that wants diagnostic history declares
+ * `transactions({ history: { retain: N } })`.
  */
 export interface ConfirmedTurnRetention {
   readonly truncated: boolean;

@@ -261,7 +261,10 @@ export { restoration } from './enhancers/restoration/restoration';
 export type { ReadonlyStore } from './lib/readonly';
 // PUBLIC for the same reason as `ReadonlyStore`: `TransactionMethods.transaction()`
 // RETURNS it, and a kept public API must have a nameable return type.
-export type { PendingTransaction } from './enhancers/transactions/transactions.types';
+export type {
+  TransactionsConfig,
+  PendingTransaction,
+} from './enhancers/transactions/transactions.types';
 export type { TransactionMethods } from './enhancers/transactions/transactions.types';
 export { transactions } from './enhancers/transactions/transactions';
 
