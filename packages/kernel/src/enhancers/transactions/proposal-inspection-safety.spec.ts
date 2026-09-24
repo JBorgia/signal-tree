@@ -12,7 +12,7 @@ const external = (write: () => void) =>
   withWriteContext({ intent: 'system', participation: 'realized' }, write);
 
 // Inspection reports contributions. It is not a rollback permission check.
-describe('proposal inspection safety', () => {
+describe('pending inspection safety', () => {
   it.each([false, true])(
     'sees later pending contributions and restores older status after newer rejection (flush=%s)',
     async (deliver) => {
@@ -22,12 +22,12 @@ describe('proposal inspection safety', () => {
       );
       try {
         await flush();
-        const older = tree.propose(() => {
+        const older = tree.transact(() => {
           tree.$.x(1);
           tree.$.y(1);
         });
         if (deliver) await flush();
-        const newer = tree.propose(() => {
+        const newer = tree.transact(() => {
           tree.$.y(2);
           tree.$.z(2);
         });
@@ -40,7 +40,7 @@ describe('proposal inspection safety', () => {
           { path: 'y', address: ['y'], status: 'current' },
           { path: 'z', address: ['z'], status: 'current' },
         ]);
-        newer.reject();
+        newer.rollback();
         expect({ x: tree.$.x(), y: tree.$.y(), z: tree.$.z() }).toEqual({
           x: 1,
           y: 1,
@@ -67,7 +67,7 @@ describe('proposal inspection safety', () => {
       const tree = signalTree({ x: 0, y: 0 }, { enhancers: [transactions()] });
       try {
         await flush();
-        const proposal = tree.propose(() => {
+        const pending = tree.transact(() => {
           tree.$.x(1);
           tree.$.y(1);
         });
@@ -75,7 +75,7 @@ describe('proposal inspection safety', () => {
         external(() => tree.$.y(9));
         if (deliver) await flush();
         expect(tree.$.y()).toBe(9);
-        expect(proposal.inspect().changes).toEqual([
+        expect(pending.inspect().changes).toEqual([
           { path: 'x', address: ['x'], status: 'current' },
           { path: 'y', address: ['y'], status: 'superseded' },
         ]);
@@ -96,12 +96,12 @@ describe('proposal inspection safety', () => {
       try {
         tree.$.rows.addOne({ id: 'A', 'n.a': 0, n: { a: 0 } });
         await flush();
-        const proposal = tree.propose(() => {
+        const pending = tree.transact(() => {
           tree.$.rows.updateOne('A', { 'n.a': 1, n: { a: 1 } });
         });
         await flush();
         const write = () => tree.$.rows.updateOne('A', { n: { a: 2 } });
-        if (writer === 'pending') tree.propose(write);
+        if (writer === 'pending') tree.transact(write);
         else external(write);
         if (writer === 'external-aba') {
           external(() => tree.$.rows.updateOne('A', { n: { a: 1 } }));
@@ -112,7 +112,7 @@ describe('proposal inspection safety', () => {
           'n.a': 1,
           n: { a: writer === 'external-aba' ? 1 : 2 },
         });
-        expect(proposal.inspect().changes).toEqual([
+        expect(pending.inspect().changes).toEqual([
           { path: 'rows.A.n.a', address: ['rows', 'n.a'], subject: expect.any(Number), status: 'current' },
           { path: 'rows.A.n', address: ['rows', 'n'], subject: expect.any(Number), status: 'superseded' },
         ]);
@@ -129,13 +129,13 @@ describe('proposal inspection safety', () => {
     );
     try {
       await flush();
-      const proposal = tree.propose(() =>
+      const pending = tree.transact(() =>
         tree.$.rows.addOne({ id: 'A', value: 1 })
       );
       await flush();
       external(() => tree.$.rows.updateOne('A', { value: 2 }));
       await flush();
-      expect(proposal.inspect().changes).toEqual([
+      expect(pending.inspect().changes).toEqual([
         { path: 'rows.A', address: ['rows'], subject: expect.any(Number), status: 'current' },
       ]);
     } finally {

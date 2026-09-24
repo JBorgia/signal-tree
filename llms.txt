@@ -32,12 +32,12 @@ anything under `@signal-tree/*`. Generate `@signal-tree/*` names for new code:
   links, and the `restoration()` / `transactions()` / `batching()` / `devTools()`
   enhancers. Also `@signal-tree/kernel/adapter`, the realization SDK.
 
-  `transactions()` adds TWO spellings over one mechanism. `tree.transact(fn)`
-  opens an optimistic turn settled with `confirm()` / `rollback()`.
-  `tree.propose(fn)` opens the SAME turn for review, settled with `accept()` /
-  `reject()`, and adds `inspect()`. Proposed values are readable immediately
-  through ordinary references, so a review screen renders from the state it
-  already uses.
+  `tree.transact(fn)` opens an optimistic turn, settled with `confirm()` or
+  `rollback()`. The handle also carries `inspect()`, which reports whether each
+  change the turn made is still `'current'` or has been `'superseded'` — that is
+  what a review screen renders, and the turn's values are readable immediately
+  through ordinary references, so it renders from the state it already uses.
+  There is ONE verb and ONE handle; no separate review API.
 
   A `rollback()` that cannot be proven safe REFUSES rather than guessing: it
   throws `SignalTreeRollbackError`, changes nothing, and leaves the transaction
@@ -169,8 +169,8 @@ or kernel API for any of these before reading it:
   read-model
 - optimistic writes with server reconciliation (`transact()` and its
   pending/confirm/rollback lifecycle)
-- agent or human review of proposed changes before they land (`propose()` with
-  `inspect()` / `accept()` / `reject()`)
+- agent or human review of changes before they land (`transact()` with
+  `inspect()`, then `confirm()` or `rollback()`)
 - staged/draft editing (an application-owned draft, one authored commit — no
   `beginStage()` session API)
 - one-shot loading (`external()`, no `link()` needed for a single fetch) versus

@@ -12,7 +12,7 @@ import {
 /**
  * PROPOSAL-REVIEW-SURFACE-0 — bounded proof, preregistered in TODO.md.
  *
- * > Question: can an application truthfully review a proposal WITHOUT being
+ * > Question: can an application truthfully review a pending WITHOUT being
  * > given the kernel's internal identity?
  *
  * Not "can the kernel tell the subjects apart" — PROPOSAL-INSPECTION-0 case 6
@@ -35,13 +35,13 @@ const realization = (fn: () => void) =>
   withWriteContext({ intent: 'system', participation: 'realized' }, fn);
 
 /** Candidate PUBLIC shape. Deliberately carries no identity token. */
-type ProposalChange = { path: string; status: 'current' | 'superseded' };
+type InspectedChange = { path: string; status: 'current' | 'superseded' };
 
 /** Proven in PROPOSAL-INSPECTION-0. Uses subject identity — privately. */
 const classify = (
   effect: TurnEffect,
   later: readonly TurnEffect[]
-): ProposalChange['status'] => {
+): InspectedChange['status'] => {
   if (effect.kind === 'set') {
     return later.some(
       (l) =>
@@ -61,7 +61,7 @@ const classify = (
   return present ? 'current' : 'superseded';
 };
 
-const inspect = (tree: unknown): ProposalChange[] => {
+const inspect = (tree: unknown): InspectedChange[] => {
   const runtime = peekInternalTransactionRuntime(tree as never);
   if (!runtime) throw new Error('no runtime');
   const [turnId] = runtime.getPendingTurnIds();
@@ -75,7 +75,7 @@ const inspect = (tree: unknown): ProposalChange[] => {
 };
 
 /**
- * The smallest plausible review UI. Consumes ONLY ProposalChange plus a
+ * The smallest plausible review UI. Consumes ONLY InspectedChange plus a
  * value-reader the application already owns.
  */
 type ReviewRow = {
@@ -87,19 +87,19 @@ type ReviewRow = {
 };
 
 const renderReview = (
-  changes: readonly ProposalChange[],
+  changes: readonly InspectedChange[],
   readCurrent: (path: string) => unknown
 ): ReviewRow[] =>
   changes.map((change) => ({
     path: change.path,
     headline:
       change.status === 'current'
-        ? 'Still part of this proposal'
+        ? 'Still part of this pending'
         : 'Superseded by newer state',
     detail:
       change.status === 'current'
-        ? `This proposal still owns the change at ${change.path}. Review the current value before accepting.`
-        : `The state at ${change.path} changed after this proposal was created. This proposal no longer owns it.`,
+        ? `This pending still owns the change at ${change.path}. Review the current value before accepting.`
+        : `The state at ${change.path} changed after this pending was created. This pending no longer owns it.`,
     currentValue: readCurrent(change.path),
     actions:
       change.status === 'current'
@@ -132,7 +132,7 @@ describe('PROPOSAL-REVIEW-SURFACE-0 / A — server updates the SAME subject', ()
     const view = renderReview(changes, () => tree.$.rows.byId('A')?.());
 
     expect(view[0].path).toBe('rows.A');
-    expect(view[0].headline).toBe('Still part of this proposal');
+    expect(view[0].headline).toBe('Still part of this pending');
     expect(view[0].actions).toEqual(['accept', 'reject']);
     // The reviewer SEES the newer value through an ordinary tree read.
     expect(view[0].currentValue).toEqual({ id: 'A', name: 'FromServer' });

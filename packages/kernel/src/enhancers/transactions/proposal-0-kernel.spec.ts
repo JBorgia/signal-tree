@@ -23,7 +23,7 @@ import { transactions } from './transactions';
  * and is a mandatory release criterion, not follow-up.
  *
  * Reject-side conflict behaviour is NOT re-derived here; it is owned by
- * `proposal-rejection-0.spec.ts` and `rekey-supersession-0.spec.ts`. This file
+ * `pending-rejection-0.spec.ts` and `rekey-supersession-0.spec.ts`. This file
  * covers the ACCEPT side, the composite lifecycle, and concurrency.
  */
 
@@ -37,7 +37,7 @@ const flush = async () => {
 const realization = (fn: () => void) =>
   withWriteContext({ intent: 'system', participation: 'realized' }, fn);
 
-const tryReject = (pending: { rollback(): void }): false | unknown => {
+const tryRollback = (pending: { rollback(): void }): false | unknown => {
   try {
     pending.rollback();
     return false;
@@ -73,7 +73,7 @@ describe('PROPOSAL-0 / A1 — clean accept', () => {
     const tree = plainTree();
     await flush();
 
-    const proposal = tree.transact(() => {
+    const pending = tree.transact(() => {
       tree.$.name('Samuel');
     });
     await flush();
@@ -81,7 +81,7 @@ describe('PROPOSAL-0 / A1 — clean accept', () => {
     // A reviewer sees the proposed value through ordinary references.
     expect(tree.$.name()).toBe('Samuel');
 
-    proposal.confirm();
+    pending.confirm();
     await flush();
 
     expect(tree.$.name()).toBe('Samuel');
@@ -89,22 +89,22 @@ describe('PROPOSAL-0 / A1 — clean accept', () => {
 });
 
 describe('PROPOSAL-0 / A2 — clean reject', () => {
-  it('withdraws the proposal through the same references', async () => {
+  it('withdraws the pending through the same references', async () => {
     const tree = plainTree();
     await flush();
 
-    const proposal = tree.transact(() => {
+    const pending = tree.transact(() => {
       tree.$.name('Samuel');
     });
     await flush();
 
     expect(tree.$.name()).toBe('Samuel');
-    expect(tryReject(proposal)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect(tree.$.name()).toBe('');
   });
 });
 
-describe('PROPOSAL-0 / A3 — multi-field proposal is one unit', () => {
+describe('PROPOSAL-0 / A3 — multi-field pending is one unit', () => {
   it('accept and reject both act on every field together', async () => {
     const accepted = plainTree();
     await flush();
@@ -124,13 +124,13 @@ describe('PROPOSAL-0 / A3 — multi-field proposal is one unit', () => {
 
     const rejected = plainTree();
     await flush();
-    const proposal = rejected.transact(() => {
+    const pending = rejected.transact(() => {
       rejected.$.name('Samuel');
       rejected.$.phone('555-0100');
       rejected.$.priority(3);
     });
     await flush();
-    expect(tryReject(proposal)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect({
       name: rejected.$.name(),
       phone: rejected.$.phone(),
@@ -139,29 +139,29 @@ describe('PROPOSAL-0 / A3 — multi-field proposal is one unit', () => {
   });
 });
 
-describe('PROPOSAL-0 / A4 — multi-entity proposal is one unit', () => {
+describe('PROPOSAL-0 / A4 — multi-entity pending is one unit', () => {
   it('no partial settlement across entities', async () => {
     const tree = plainTree();
     await flush();
 
-    const proposal = tree.transact(() => {
+    const pending = tree.transact(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       tree.$.rows.addOne({ id: 'b', name: 'Beta' });
     });
     await flush();
 
     expect(tree.$.rows.ids()).toEqual(['a', 'b']);
-    expect(tryReject(proposal)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect(tree.$.rows.ids()).toEqual([]);
   });
 });
 
-describe('PROPOSAL-0 / A5 — human edits an UNRELATED field during a proposal', () => {
+describe('PROPOSAL-0 / A5 — human edits an UNRELATED field during a pending', () => {
   it('the human edit survives rejection', async () => {
     const tree = plainTree();
     await flush();
 
-    const proposal = tree.transact(() => {
+    const pending = tree.transact(() => {
       tree.$.name('Samuel');
     });
     await flush();
@@ -169,18 +169,18 @@ describe('PROPOSAL-0 / A5 — human edits an UNRELATED field during a proposal',
     tree.$.untouched('edited-by-human');
     await flush();
 
-    expect(tryReject(proposal)).toBe(false);
+    expect(tryRollback(pending)).toBe(false);
     expect(tree.$.name()).toBe('');
     expect(tree.$.untouched()).toBe('edited-by-human');
   });
 });
 
-describe('PROPOSAL-0 / A6 — server realization during a proposal, then ACCEPT', () => {
+describe('PROPOSAL-0 / A6 — server realization during a pending, then ACCEPT', () => {
   it('records what accept does to a location the server already moved', async () => {
     const tree = plainTree();
     await flush();
 
-    const proposal = tree.transact(() => {
+    const pending = tree.transact(() => {
       tree.$.name('FromAgent');
       tree.$.priority(3);
     });
@@ -191,11 +191,11 @@ describe('PROPOSAL-0 / A6 — server realization during a proposal, then ACCEPT'
 
     expect(tree.$.name()).toBe('FromServer');
 
-    proposal.confirm();
+    pending.confirm();
     await flush();
 
     // MEASURED, not asserted as desirable: what a reader sees after accepting
-    // a proposal whose location newer truth already overwrote.
+    // a pending whose location newer truth already overwrote.
     expect({ name: tree.$.name(), priority: tree.$.priority() }).toEqual({
       name: 'FromServer',
       priority: 3,
@@ -203,7 +203,7 @@ describe('PROPOSAL-0 / A6 — server realization during a proposal, then ACCEPT'
   });
 });
 
-describe('PROPOSAL-0 / A7 — mixed scalar + structural proposal', () => {
+describe('PROPOSAL-0 / A7 — mixed scalar + structural pending', () => {
   it('accepts coherently as one turn', async () => {
     const tree = plainTree();
     await flush();
@@ -223,7 +223,7 @@ describe('PROPOSAL-0 / A7 — mixed scalar + structural proposal', () => {
   });
 });
 
-describe('PROPOSAL-0 / A8 — remove/re-add lifetime under a proposal', () => {
+describe('PROPOSAL-0 / A8 — remove/re-add lifetime under a pending', () => {
   it('a held reference does not retarget to a reused business key', async () => {
     const tree = plainTree();
     tree.$.rows.addOne({ id: 'a', name: 'Original' });
@@ -247,7 +247,7 @@ describe('PROPOSAL-0 / A8 — remove/re-add lifetime under a proposal', () => {
   });
 });
 
-describe('PROPOSAL-0 / A9 — accepted proposal and restoration', () => {
+describe('PROPOSAL-0 / A9 — accepted pending and restoration', () => {
   it('confirm alone adds NO undo step; undoable(confirm) adds exactly one', async () => {
     const tree = restorableTree();
     await flush();
@@ -286,7 +286,7 @@ describe('PROPOSAL-0 / A9 — accepted proposal and restoration', () => {
   });
 });
 
-describe('PROPOSAL-0 / A10 — two proposals outstanding at once', () => {
+describe('PROPOSAL-0 / A10 — two pendings outstanding at once', () => {
   it('independent handles settle independently', async () => {
     const tree = plainTree();
     await flush();
@@ -301,14 +301,14 @@ describe('PROPOSAL-0 / A10 — two proposals outstanding at once', () => {
     });
     await flush();
 
-    // The review-UI requirement: one proposal outstanding while other work
+    // The review-UI requirement: one pending outstanding while other work
     // continues. Code-supported but previously unpinned by any test.
     expect({ name: tree.$.name(), priority: tree.$.priority() }).toEqual({
       name: 'FromA',
       priority: 9,
     });
 
-    expect(tryReject(first)).toBe(false);
+    expect(tryRollback(first)).toBe(false);
     second.confirm();
     await flush();
 

@@ -28,7 +28,7 @@ const signal = testRealization.locations.createCell;
  * asks the harder one, and it cannot be answered by observing the runtime alone
  * — cases 3–5 are properties OF A RELATIONSHIP, so something has to play that
  * role. `makeLink` below is a TEST-LOCAL REFERENCE HARNESS, not an export and
- * not a proposal. Its only privilege is that it is allowed to use core
+ * not a pending. Its only privilege is that it is allowed to use core
  * internals, exactly as a core `link()` would.
  *
  * ⚠️ THE POINT OF THE HARNESS IS THAT IT CAN FAIL. If a case cannot be

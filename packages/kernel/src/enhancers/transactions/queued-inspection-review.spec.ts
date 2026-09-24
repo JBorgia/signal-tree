@@ -14,8 +14,8 @@ describe('independent queued inspection review', () => {
     const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
     try {
       external(() => tree.$.x(9));
-      const proposal = tree.propose(() => tree.$.x(1));
-      expect(proposal.inspect().changes).toEqual([
+      const pending = tree.transact(() => tree.$.x(1));
+      expect(pending.inspect().changes).toEqual([
         { path: 'x', address: ['x'], status: 'current' },
       ]);
     } finally {
@@ -27,13 +27,13 @@ describe('independent queued inspection review', () => {
     (order) => {
       const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
       try {
-        const proposal = tree.propose(() => {
+        const pending = tree.transact(() => {
           if (order === 'before') external(() => tree.$.x(9));
           tree.$.x(1);
           if (order === 'after') external(() => tree.$.x(9));
         });
         expect(tree.$.x()).toBe(order === 'before' ? 1 : 9);
-        expect(proposal.inspect().changes).toEqual([
+        expect(pending.inspect().changes).toEqual([
           { path: 'x', address: ['x'], status: order === 'before' ? 'current' : 'superseded' },
         ]);
       } finally {
@@ -46,17 +46,17 @@ describe('independent queued inspection review', () => {
     (delivery) => {
       const tree = signalTree({ x: 0, y: 0 }, { enhancers: [transactions()] });
       try {
-        const proposal = tree.propose(() => tree.$.x(1));
+        const pending = tree.transact(() => tree.$.x(1));
         external(() => {
           tree.$.x(9);
           tree.$.x(1);
         });
         expect
-          .soft(proposal.inspect().changes)
+          .soft(pending.inspect().changes)
           .toEqual([{ path: 'x', address: ['x'], status: 'superseded' }]);
         if (delivery === 'flush') flush();
-        else tree.propose(() => tree.$.y(1));
-        expect(proposal.inspect().changes).toEqual([
+        else tree.transact(() => tree.$.y(1));
+        expect(pending.inspect().changes).toEqual([
           { path: 'x', address: ['x'], status: 'superseded' },
         ]);
       } finally {
@@ -72,7 +72,7 @@ describe('independent queued inspection review', () => {
     try {
       tree.$.rows.addOne({ id: 'a', x: 0, y: 0 });
       flush();
-      const proposal = tree.propose(() =>
+      const pending = tree.transact(() =>
         tree.$.rows.updateOne('a', { x: 1, y: 1 })
       );
       external(() => {
@@ -80,7 +80,7 @@ describe('independent queued inspection review', () => {
         tree.$.rows.updateOne('a', { x: 1 });
       });
       flush();
-      expect(proposal.inspect().changes).toEqual([
+      expect(pending.inspect().changes).toEqual([
         { path: 'rows.a.x', address: ['rows', 'x'], subject: expect.any(Number), status: 'superseded' },
         { path: 'rows.a.y', address: ['rows', 'y'], subject: expect.any(Number), status: 'current' },
       ]);
@@ -88,11 +88,11 @@ describe('independent queued inspection review', () => {
       tree.destroy();
     }
   });
-  it('bounds accepted writer footprints while one older proposal remains pending', () => {
+  it('bounds accepted writer footprints while one older pending remains pending', () => {
     const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
     try {
-      const older = tree.propose(() => tree.$.x(1));
-      for (let x = 2; x <= 501; x++) tree.propose(() => tree.$.x(x)).accept();
+      const older = tree.transact(() => tree.$.x(1));
+      for (let x = 2; x <= 501; x++) tree.transact(() => tree.$.x(x)).confirm();
       const runtime = peekInternalTransactionRuntime(tree)!;
       expect(runtime.getInspectionFootprintCountsForTesting()).toEqual({
         writers: 2,
@@ -101,7 +101,7 @@ describe('independent queued inspection review', () => {
       expect(older.inspect().changes).toEqual([
         { path: 'x', address: ['x'], status: 'superseded' },
       ]);
-      older.accept();
+      older.confirm();
       expect(runtime.getInspectionFootprintCountsForTesting()).toEqual({
         writers: 0,
         footprints: 0,
@@ -118,13 +118,13 @@ describe('independent queued inspection review', () => {
     try {
       tree.$.rows.addOne({ id: 'a', x: 0 });
       flush();
-      const proposal = tree.propose(() => tree.$.rows.updateOne('a', { x: 1 }));
+      const pending = tree.transact(() => tree.$.rows.updateOne('a', { x: 1 }));
       external(() => tree.$.rows.removeOne('a'));
-      expect(proposal.inspect().changes).toEqual([
+      expect(pending.inspect().changes).toEqual([
         { path: 'rows.a.x', address: ['rows', 'x'], subject: expect.any(Number), status: 'superseded' },
       ]);
       flush();
-      expect(proposal.inspect().changes).toEqual([
+      expect(pending.inspect().changes).toEqual([
         { path: 'rows.a.x', address: ['rows', 'x'], subject: expect.any(Number), status: 'superseded' },
       ]);
     } finally {
@@ -133,13 +133,13 @@ describe('independent queued inspection review', () => {
   });
   // Preserve deliberate net-effect admission (0a131c34, SIC-B d8ad11da5).
   // A no-turn authored callback is not the realized ABA footprint case above.
-  it.each(['accept', 'reject'] as const)(
-    'preserves older status when a no-turn proposal is %sed',
+  it.each(['confirm', 'rollback'] as const)(
+    'preserves older status when a no-turn pending is %sed',
     (settlement) => {
       const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
       try {
-        const older = tree.propose(() => tree.$.x(1));
-        const newer = tree.propose(() => {
+        const older = tree.transact(() => tree.$.x(1));
+        const newer = tree.transact(() => {
           tree.$.x(2);
           tree.$.x(1);
         });

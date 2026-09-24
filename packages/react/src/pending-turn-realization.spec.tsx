@@ -17,10 +17,10 @@ import { useSignalTree } from './use-signal-tree';
  * Preregistered in `docs/research/react-pending-turn-realization-0.md` BEFORE
  * any change to the observation seam, so the fix has nowhere to hide.
  *
- * NOT a Proposal defect. `transact()` reproduces it with no facade involved,
+ * NOT a PendingTransaction defect. `transact()` reproduces it with no facade involved,
  * which is what scoped this to generic pending-turn realization. These controls
  * deliberately use RAW `transact()` for the same reason, and must stay that way
- * permanently: otherwise a later change could make `propose()` pass through some
+ * permanently: otherwise a later change could make `transact()` pass through some
  * special path while generic pending turns regressed again.
  *
  * The constraint that makes this hard:

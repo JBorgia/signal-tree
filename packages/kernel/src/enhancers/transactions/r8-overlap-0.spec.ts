@@ -68,17 +68,17 @@ const settle = (
   }
 };
 
-/** Both proposals outstanding, overlapping on `y`. */
+/** Both pendings outstanding, overlapping on `y`. */
 const twoOverlapping = async () => {
   const tree = scalarTree();
 
-  const p1 = tree.propose(() => {
+  const p1 = tree.transact(() => {
     tree.$.x(1);
     tree.$.y(1);
   });
   await flush();
 
-  const p2 = tree.propose(() => {
+  const p2 = tree.transact(() => {
     tree.$.y(2);
     tree.$.z(2);
   });
@@ -87,7 +87,7 @@ const twoOverlapping = async () => {
   return { tree, p1, p2 };
 };
 
-describe('R8-OVERLAP-0 / setup — both proposals outstanding', () => {
+describe('R8-OVERLAP-0 / setup — both pendings outstanding', () => {
   it('both speculative contributions are visible, P2 wins y', async () => {
     const { tree } = await twoOverlapping();
     expect(ledger(tree)).toMatchObject({ x: 1, y: 2, z: 2, pending: 2 });
@@ -97,11 +97,11 @@ describe('R8-OVERLAP-0 / setup — both proposals outstanding', () => {
 describe('R8 safety / A — older reject refuses, newer accepts, older retry', () => {
   it('preserves both pending contributions until settlement is safe', async () => {
     const { tree, p1, p2 } = await twoOverlapping();
-    expect(settle(() => p1.reject()).ok).toBe(false);
+    expect(settle(() => p1.rollback()).ok).toBe(false);
     expect(ledger(tree)).toMatchObject({ x: 1, y: 2, z: 2, pending: 2 });
-    expect(settle(() => p2.accept()).ok).toBe(true);
+    expect(settle(() => p2.confirm()).ok).toBe(true);
     expect(ledger(tree)).toMatchObject({ x: 1, y: 2, z: 2, pending: 1 });
-    expect(settle(() => p1.reject()).ok).toBe(true);
+    expect(settle(() => p1.rollback()).ok).toBe(true);
     expect(ledger(tree)).toMatchObject({ x: 0, y: 2, z: 2, pending: 0 });
   });
 });
@@ -110,8 +110,8 @@ describe('R8-OVERLAP-0 / B — accept P2, then reject P1', () => {
   it('preserves the newer confirmed contribution', async () => {
     const { tree, p1, p2 } = await twoOverlapping();
 
-    const first = settle(() => p2.accept());
-    const second = settle(() => p1.reject());
+    const first = settle(() => p2.confirm());
+    const second = settle(() => p1.rollback());
 
     expect(first.ok).toBe(true);
     expect(second.ok).toBe(true);
@@ -124,10 +124,10 @@ describe('R8-OVERLAP-0 / C — reject P2, then accept P1 (DISCRIMINATOR)', () =>
   it("rolling back P2 must restore y to P1's PENDING value, not the baseline", async () => {
     const { tree, p1, p2 } = await twoOverlapping();
 
-    const first = settle(() => p2.reject());
+    const first = settle(() => p2.rollback());
     const afterFirst = ledger(tree);
 
-    const second = settle(() => p1.accept());
+    const second = settle(() => p1.confirm());
 
     expect(first.ok).toBe(true);
     expect(second.ok).toBe(true);
@@ -143,8 +143,8 @@ describe('R8-OVERLAP-0 / D — accept P1, then reject P2', () => {
   it("P2's rollback returns y to P1's confirmed value", async () => {
     const { tree, p1, p2 } = await twoOverlapping();
 
-    const first = settle(() => p1.accept());
-    const second = settle(() => p2.reject());
+    const first = settle(() => p1.confirm());
+    const second = settle(() => p2.rollback());
 
     expect(first.ok).toBe(true);
     expect(second.ok).toBe(true);
@@ -156,12 +156,12 @@ describe('R8-OVERLAP-0 / D — accept P1, then reject P2', () => {
 describe('R8 safety / E — older reject refuses, newer rejects, older retry', () => {
   it('never resurrects a contribution that was actually rejected', async () => {
     const { tree, p1, p2 } = await twoOverlapping();
-    expect(settle(() => p1.reject()).ok).toBe(false);
+    expect(settle(() => p1.rollback()).ok).toBe(false);
     expect(ledger(tree)).toMatchObject({ x: 1, y: 2, z: 2, pending: 2 });
-    expect(settle(() => p2.reject()).ok).toBe(true);
+    expect(settle(() => p2.rollback()).ok).toBe(true);
     // P1 was refused, not rejected: it still owns these values.
     expect(ledger(tree)).toMatchObject({ x: 1, y: 1, z: 0, pending: 1 });
-    expect(settle(() => p1.reject()).ok).toBe(true);
+    expect(settle(() => p1.rollback()).ok).toBe(true);
     expect(ledger(tree)).toMatchObject({ x: 0, y: 0, z: 0, pending: 0 });
   });
 });
@@ -170,8 +170,8 @@ describe('R8-OVERLAP-0 / F — reject P2, then reject P1', () => {
   it('reaches the same baseline from the other order', async () => {
     const { tree, p1, p2 } = await twoOverlapping();
 
-    const first = settle(() => p2.reject());
-    const second = settle(() => p1.reject());
+    const first = settle(() => p2.rollback());
+    const second = settle(() => p1.rollback());
 
     expect(first.ok).toBe(true);
     expect(second.ok).toBe(true);
@@ -184,8 +184,8 @@ describe('R8-OVERLAP-0 / G — accept P1, then accept P2', () => {
   it('both committed, P2 wins y as the later write', async () => {
     const { tree, p1, p2 } = await twoOverlapping();
 
-    expect(settle(() => p1.accept()).ok).toBe(true);
-    expect(settle(() => p2.accept()).ok).toBe(true);
+    expect(settle(() => p1.confirm()).ok).toBe(true);
+    expect(settle(() => p2.confirm()).ok).toBe(true);
     // PREREGISTERED: x=1 y=2 z=2
     expect(ledger(tree)).toMatchObject({ x: 1, y: 2, z: 2, pending: 0 });
   });
@@ -195,8 +195,8 @@ describe('R8-OVERLAP-0 / H — accept P2, then accept P1', () => {
   it('order-independent with G', async () => {
     const { tree, p1, p2 } = await twoOverlapping();
 
-    expect(settle(() => p2.accept()).ok).toBe(true);
-    expect(settle(() => p1.accept()).ok).toBe(true);
+    expect(settle(() => p2.confirm()).ok).toBe(true);
+    expect(settle(() => p1.confirm()).ok).toBe(true);
     // PREREGISTERED: x=1 y=2 z=2
     expect(ledger(tree)).toMatchObject({ x: 1, y: 2, z: 2, pending: 0 });
   });

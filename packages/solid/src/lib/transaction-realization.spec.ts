@@ -6,11 +6,11 @@ import { describe } from 'vitest';
 // same way ssr-transfer.spec.ts reaches serialization.
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
-  proposalRealizationContract,
+  transactionRealizationContract,
   type ConformanceRow,
   type MixedFrame,
   type Observation,
-} from '../../../kernel/src/proposal-realization-contract';
+} from '../../../kernel/src/transaction-realization-contract';
 import { entityMap, signalTree, transactions } from '../index';
 
 /**
@@ -18,7 +18,7 @@ import { entityMap, signalTree, transactions } from '../index';
  *
  * Only physical hooks live here. Every assertion is the shared contract's, so
  * Solid having one existing spec file and Angular having 29 stops being the
- * measure of whether Proposal is supported.
+ * measure of whether PendingTransaction is supported.
  *
  * Solid leaves are real Solid accessors: read by calling, write with `.set()`
  * (README, and its types reject the callable-write form). That grammar
@@ -57,8 +57,8 @@ const observe = <T>(read: () => T): Observation<T> => {
   };
 };
 
-describe('@signal-tree/solid — proposal realization conformance', () => {
-  proposalRealizationContract<Tree>({
+describe('@signal-tree/solid — pending realization conformance', () => {
+  transactionRealizationContract<Tree>({
     framework: 'solid',
 
     createStore() {
@@ -76,7 +76,7 @@ describe('@signal-tree/solid — proposal realization conformance', () => {
       };
     },
 
-    propose: (tree, fn) => tree.propose(fn),
+    transact: (tree, fn) => tree.transact(fn),
 
     writeScalar: (tree, value) => tree.$.scalar.set(value),
     readScalar: (tree) => tree.$.scalar(),

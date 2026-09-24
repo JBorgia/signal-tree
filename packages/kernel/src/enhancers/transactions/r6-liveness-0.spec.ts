@@ -27,9 +27,9 @@ const realization = (fn: () => void) =>
   withWriteContext({ intent: 'system', participation: 'realized' }, fn);
 
 /** `false` when the reject was accepted, otherwise the refusal kind. */
-const tryReject = (proposal: { reject(): void }): false | unknown => {
+const tryRollback = (pending: { rollback(): void }): false | unknown => {
   try {
-    proposal.reject();
+    pending.rollback();
     return false;
   } catch (error) {
     return (error as { cause?: { kind?: unknown } })?.cause?.kind ?? 'error';
@@ -69,7 +69,7 @@ const arriveAtRefusal = async () => {
   tree.$.rows.addOne({ id: 'A', name: 'Original' });
   await flush();
 
-  const proposal = tree.propose(() => {
+  const pending = tree.transact(() => {
     tree.$.x(1);
     tree.$.rows.removeOne('A');
   });
@@ -81,9 +81,9 @@ const arriveAtRefusal = async () => {
   realization(() => tree.$.rows.addOne({ id: 'A', name: 'FromServer' }));
   await flush();
 
-  const refusal = tryReject(proposal);
+  const refusal = tryRollback(pending);
 
-  return { tree, proposal, pendingWhileOutstanding, refusal };
+  return { tree, pending, pendingWhileOutstanding, refusal };
 };
 
 describe('R6-LIVENESS-0 / 1 — the refusal itself (pins case 15)', () => {
@@ -98,12 +98,12 @@ describe('R6-LIVENESS-0 / 1 — the refusal itself (pins case 15)', () => {
   });
 });
 
-describe('R6-LIVENESS-0 / 2 — SETTLEMENT axis: is the proposal still open?', () => {
+describe('R6-LIVENESS-0 / 2 — SETTLEMENT axis: is the pending still open?', () => {
   it('refusal retains the pending turn and inspection', async () => {
-    const { tree, proposal, pendingWhileOutstanding } = await arriveAtRefusal();
+    const { tree, pending, pendingWhileOutstanding } = await arriveAtRefusal();
 
     const pendingAfterRefusal = pendingCount(tree);
-    const inspection = proposal.inspect();
+    const inspection = pending.inspect();
 
     expect(pendingWhileOutstanding).toBe(1);
     expect(pendingAfterRefusal).toBe(1);
@@ -116,14 +116,14 @@ describe('R6-LIVENESS-0 / 2 — SETTLEMENT axis: is the proposal still open?', (
     await flush();
     const confirmedBefore = confirmedCount(tree);
 
-    const proposal = tree.propose(() => {
+    const pending = tree.transact(() => {
       tree.$.x(1);
       tree.$.rows.removeOne('A');
     });
     await flush();
     realization(() => tree.$.rows.addOne({ id: 'A', name: 'FromServer' }));
     await flush();
-    tryReject(proposal);
+    tryRollback(pending);
 
     // The decisive question: is x=1 now merely orphaned live state, or did
     // the kernel promote the rejected turn into the confirmed ledger?
@@ -137,9 +137,9 @@ describe('R6-LIVENESS-0 / 2 — SETTLEMENT axis: is the proposal still open?', (
 
 describe('R6-LIVENESS-0 / 3 — is reject retryable while the conflict stands?', () => {
   it('unchanged conflict refuses again without changing truth', async () => {
-    const { tree, proposal } = await arriveAtRefusal();
+    const { tree, pending } = await arriveAtRefusal();
 
-    const second = tryReject(proposal);
+    const second = tryRollback(pending);
 
     expect(second).toBe('effect-validation-failed');
     expect(pendingCount(tree)).toBe(1);
@@ -150,12 +150,12 @@ describe('R6-LIVENESS-0 / 3 — is reject retryable while the conflict stands?',
 
 describe('R6-LIVENESS-0 / 4 — RECOVERY: clear the conflict, then reject', () => {
   it('removing the conflict permits complete rejection', async () => {
-    const { tree, proposal } = await arriveAtRefusal();
+    const { tree, pending } = await arriveAtRefusal();
 
     realization(() => tree.$.rows.removeOne('A'));
     await flush();
 
-    const retry = tryReject(proposal);
+    const retry = tryRollback(pending);
 
     expect(retry).toBe(false);
     expect(tree.$.x()).toBe(0);
@@ -166,16 +166,28 @@ describe('R6-LIVENESS-0 / 4 — RECOVERY: clear the conflict, then reject', () =
 
 describe('R6-LIVENESS-0 / 5 — is accept still legal after a refused reject?', () => {
   it('accept remains legal after refusal', async () => {
-    const { tree, proposal } = await arriveAtRefusal();
+    const { tree, pending } = await arriveAtRefusal();
 
-    expect(() => proposal.accept()).not.toThrow();
+    expect(() => pending.confirm()).not.toThrow();
     expect(pendingCount(tree)).toBe(0);
     expect(tree.$.x()).toBe(1);
   });
 });
 
-describe('R6-LIVENESS-0 / 6 — CONTROL: the same scenario through transact()', () => {
-  it('isolates whether this is the propose() facade or the kernel', async () => {
+/**
+ * WAS a facade/kernel control. Arms /2 and /3 opened the turn through
+ * `propose()` and this one through `transact()`, to isolate whether the
+ * behaviour came from the review facade or from the kernel beneath it.
+ *
+ * There is now ONE verb: the review projection was folded into `transact()`
+ * and `propose()` was removed before 16.0 shipped, so there is no second path
+ * left to control for. Kept because it still exercises something the split
+ * arms do not — the first refusal and the retry in a SINGLE sequence, against
+ * one handle — and retitled so it does not claim an isolation it no longer
+ * performs.
+ */
+describe('R6-LIVENESS-0 / 6 — first refusal and retry in one sequence', () => {
+  it('the same handle refuses identically twice and stays pending', async () => {
     const tree = rowTree();
     tree.$.rows.addOne({ id: 'A', name: 'Original' });
     await flush();
@@ -189,12 +201,11 @@ describe('R6-LIVENESS-0 / 6 — CONTROL: the same scenario through transact()', 
     realization(() => tree.$.rows.addOne({ id: 'A', name: 'FromServer' }));
     await flush();
 
-    const first = tryReject({ reject: () => pending.rollback() });
+    const first = tryRollback({ rollback: () => pending.rollback() });
     const pendingAfter = pendingCount(tree);
-    const second = tryReject({ reject: () => pending.rollback() });
+    const second = tryRollback({ rollback: () => pending.rollback() });
 
-    // If these match arm /2 and /3, the behaviour is kernel-level and the
-    // facade merely inherits it.
+    // Matches arms /2 and /3, measured against one handle end to end.
     expect(first).toBe('effect-validation-failed');
     expect(pendingAfter).toBe(1);
     expect(second).toBe('effect-validation-failed');

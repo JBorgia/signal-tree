@@ -266,31 +266,38 @@ export type {
   PendingTransaction,
 } from './enhancers/transactions/transactions.types';
 export type { TransactionMethods } from './enhancers/transactions/transactions.types';
-// PROPOSAL-0. Same rule again: `TransactionMethods.propose()` returns
-// `Proposal`, and `Proposal.inspect()`/`accept()` return the inspection types,
-// so each is a nameable return type of a kept public API.
+// PROPOSAL-0, folded. `PendingTransaction.inspect()` returns
+// `TransactionInspection`, so each of these is a nameable return type of a kept
+// public API — the same rule as `ReadonlyStore` above.
 //
-// `ProposalChange` DOES now carry kernel identity: `{ path, address, subject?,
+// The parallel `transact()` / `PendingTransaction` / `accept()` / `reject()` vocabulary was
+// REMOVED before 16.0 shipped. It named one mechanism twice: PROPOSAL-0's own
+// evidence is that the facade added no authority rule, no retained semantic
+// fact and no pending-only behaviour. AGENTS.md binds public naming to the
+// glossary's Everyday vocabulary, which defines `transaction` and `rollback`
+// and never defines propose/accept/reject, so the second set was a fourth
+// naming level the project had not agreed to teach. `inspect()` survives on
+// EVERY handle, which is strictly more capability than gating it behind a
+// second entry verb.
+//
+// `InspectedChange` carries kernel identity: `{ path, address, subject?,
 // status }`. `path` is presentation and deliberately ambiguous; `address` is
 // the lossless segment identity; `subject` is the entity lifetime.
 //
-// The older note here said the type was `{ path, status }` with subject
-// lifetime staying internal, and cited PROPOSAL-REVIEW-SURFACE-0 as proof that
-// was sufficient. That proof no longer backs this claim: that spec declares its
-// OWN local ProposalChange and projection, so it passes regardless of what the
-// kernel exports. Sufficiency was disproven by measurement — two different
-// locations projected to the same public path, so a reviewer could not be told
-// which one an agent changed.
+// An older note claimed `{ path, status }` was sufficient and cited
+// PROPOSAL-REVIEW-SURFACE-0 as proof. That proof did not back the claim: the
+// spec declares its OWN local change type and projection, so it passes
+// regardless of what the kernel exports. Sufficiency was disproven by
+// measurement — two different locations projected to the same public path, so
+// a reviewer could not be told which one an agent changed.
 //
 // `subject` is a per-tree monotonic counter. It is stable WITHIN one tree for
 // one run, and is not serializable, not comparable across trees, and not stable
 // across runs. Compare it to another subject from the same inspection; never
 // persist it.
-export type { Proposal } from './enhancers/transactions/transactions.types';
-export type { ProposalAcceptance } from './enhancers/transactions/transactions.types';
-export type { ProposalChange } from './enhancers/transactions/transactions.types';
-export type { ProposalInspection } from './enhancers/transactions/transactions.types';
-export type { ProposalStatus } from './enhancers/transactions/transactions.types';
+export type { ChangeStatus } from './enhancers/transactions/transactions.types';
+export type { InspectedChange } from './enhancers/transactions/transactions.types';
+export type { TransactionInspection } from './enhancers/transactions/transactions.types';
 export { transactions } from './enhancers/transactions/transactions';
 
 /**
@@ -341,9 +348,9 @@ export { devTools } from './enhancers/devtools/devtools';
  * - `batching(config?)` - Batch CD notifications
  * - `restoration(config?)` - Undo/redo
  * - `transactions()` - Optimistic transaction rollback without undo/redo
- *   history. Also provides `.transact(fn)` and `.propose(fn)`, the review vocabulary over the same
+ *   history. Also provides `.transact(fn)` and `.transact(fn)`, the review vocabulary over the same
  *   turn: `inspect()` / `accept()` / `reject()`. Restoration stays orthogonal —
- *   wrap `undoable()` around the proposal, not around `accept()`.
+ *   wrap `undoable()` around the pending, not around `accept()`.
  * - `devTools(config?)` - Redux DevTools integration
  *
  * **Derived State:**

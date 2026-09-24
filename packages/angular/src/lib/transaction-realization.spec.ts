@@ -6,11 +6,11 @@ import { TestBed } from '@angular/core/testing';
 // same way ssr-transfer.spec.ts reaches serialization.
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
-  proposalRealizationContract,
+  transactionRealizationContract,
   type ConformanceRow,
   type MixedFrame,
   type Observation,
-} from '../../../kernel/src/proposal-realization-contract';
+} from '../../../kernel/src/transaction-realization-contract';
 import { entityMap, signalTree, transactions } from '../index';
 
 /**
@@ -54,12 +54,12 @@ const observe = <T>(read: () => T): Observation<T> => {
   return { seen, current: () => latest, dispose: () => stop() };
 };
 
-describe('@signal-tree/angular — proposal realization conformance', () => {
+describe('@signal-tree/angular — pending realization conformance', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({});
   });
 
-  proposalRealizationContract<Tree>({
+  transactionRealizationContract<Tree>({
     framework: 'angular',
 
     createStore() {
@@ -67,7 +67,7 @@ describe('@signal-tree/angular — proposal realization conformance', () => {
       return { tree, dispose: () => tree.destroy() };
     },
 
-    propose: (tree, fn) => tree.propose(fn),
+    transact: (tree, fn) => tree.transact(fn),
 
     writeScalar: (tree, value) => tree.$.scalar.set(value),
     readScalar: (tree) => tree.$.scalar(),

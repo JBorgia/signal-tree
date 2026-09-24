@@ -434,13 +434,13 @@ const EXEMPT = new Map(
     registerPositionAddress:
       '@internal PositionRegistry member, not app-facing: records a position\'s typed segment address at materialization (signal-tree.ts, entity-signal.ts). Same L17 machinery as addressFor',
     getInspectionFootprintCountsForTesting:
-      '@internal test accessor, named so: exposes inspection writer/footprint counts so the retention of proposal inspection state can be asserted without reaching into closure-local structures',
+      '@internal test accessor, named so: exposes inspection writer/footprint counts so the retention of turn inspection state can be asserted without reaching into closure-local structures',
     getConfirmedRetention:
       '@internal member of InternalTransactionRuntime, not app-facing: supplies the explicit retention metadata internals.ts requires ("the authority must supply explicit retention metadata; never infer it from IDs"). The public surface it feeds is confirmedTurnReader().readConfirmedTurns().retention, and the behaviour change IS documented in the 16.0.0 CHANGELOG',
     setHistoryRetention:
       '@internal member of InternalTransactionRuntime, not app-facing: the public way to request diagnostic retention is the documented transactions({ history: { retain } }) option',
     describePendingTurn:
-      "@internal member of InternalTransactionRuntime, not app-facing: returns UNCLASSIFIED raw material (a pending turn's effects and the later effects admitted against it) so PROPOSAL-INSPECTION-0 could prove the review classification derivable without inventing it in production first. The public surface it enabled is Proposal.inspect(), which IS documented",
+      "@internal member of InternalTransactionRuntime, not app-facing: returns UNCLASSIFIED raw material (a pending turn's effects and the later effects admitted against it) so PROPOSAL-INSPECTION-0 could prove the review classification derivable without inventing it in production first. The public surface it enabled is PendingTransaction.inspect(), which IS documented",
     // ── under active disposition in HIST-C2 step 7 ──────────────────────
     // These are declines WITH a stated deadline, not silent gaps. Each is a
     // real public config member today; each is slated to be deleted or

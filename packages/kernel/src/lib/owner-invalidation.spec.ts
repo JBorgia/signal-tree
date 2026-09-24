@@ -312,7 +312,7 @@ describe('OWNER INVALIDATION LAW', () => {
    * canonical truth while pending: `tree.$.value()` returns 1, and Angular,
    * Vue and Solid all realize it. Only React withheld it, because it is the
    * one adapter routed through this seam. For a turn held open while a human
-   * reviews a proposal, "wait for settlement" is unbounded — the reviewer
+   * reviews a pending, "wait for settlement" is unbounded — the reviewer
    * could not see what they were being asked to accept.
    */
   it('invalidates for a pending turn AND for its compensation', async () => {

@@ -10,10 +10,8 @@ import type {
 } from '../../lib/types';
 import type {
   PendingTransaction,
-  Proposal,
-  ProposalAcceptance,
-  ProposalInspection,
-  ProposalStatus,
+  TransactionInspection,
+  ChangeStatus,
   TransactionMethods,
 } from './transactions.types';
 
@@ -191,13 +189,25 @@ export type TransactionTurnRecord = {
 
 type TransactionLifecycleListener = (turn: TransactionTurnRecord) => void;
 
+/**
+ * What the runtime itself mints: settlement only.
+ *
+ * NOT a `PendingTransaction` — that now carries `inspect()`, which is built by
+ * the `transact()` wrapper from `describePendingTurn`. Keeping the two apart
+ * stops the runtime from owing a projection it does not produce.
+ */
+type RuntimeSettleHandle = {
+  confirm(): void;
+  rollback(): void;
+};
+
 export interface InternalTransactionRuntime {
   /** @internal Count-only retention probe; no state or writer identities escape. */
   getInspectionFootprintCountsForTesting(): {
     writers: number;
     footprints: number;
   };
-  transaction(fn: () => void): PendingTransaction;
+  transaction(fn: () => void): RuntimeSettleHandle;
   /** @internal Raw retained records; projected by `/internals`. */
   getConfirmedTurnRecords(): readonly TransactionTurnRecord[];
   /** L15: opt-in evidence retention beyond the correctness obligation. */
@@ -224,7 +234,7 @@ const INTERNAL_TRANSACTION_RUNTIME = Symbol(
 );
 
 /**
- * PROPOSAL-0. Carries the pending turn id from `transaction()` to `proposal()`
+ * PROPOSAL-0. Carries the pending turn id from `transaction()` to `pending()`
  * without widening `PendingTransaction`, which is public. Module-private, so
  * nothing outside this file can read or forge it.
  */
@@ -439,7 +449,7 @@ function buildPendingRollbackPlan(
    * nothing there to destroy. Reversing the turn's remaining effects then
    * COMPLETES the reversal rather than half-applying it, and refusing instead
    * strands unrelated speculative values — measured at
-   * `proposal-rejection-0.spec.ts` cases 11 and 12, where `x` and `y` stayed
+   * `pending-rejection-0.spec.ts` cases 11 and 12, where `x` and `y` stayed
    * at their proposed values after a reject although nothing ever wrote to
    * them.
    *
@@ -451,7 +461,7 @@ function buildPendingRollbackPlan(
    * UNOBSERVABLE. Replacing the scan with a break on the first remove passes
    * every test in the suite, because stable entity lifetime means a removed
    * subject can never be referenced again — a later add of the same business
-   * key creates a DIFFERENT subject (`proposal-rejection-0.spec.ts` case 13,
+   * key creates a DIFFERENT subject (`pending-rejection-0.spec.ts` case 13,
    * `rekey-supersession-0.spec.ts` case 3). The scan is kept as the form that
    * stays correct if subject resurrection ever becomes representable, not
    * because a test currently distinguishes it.
@@ -1189,7 +1199,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
   // it has a turn id. Keep that evidence under the transaction id until admission.
   const callbackExternalEffects = new Map<number, TurnEffect[]>();
   // Inspection owns local mutation chronology, not conservative rollback evidence.
-  // Keep only the latest footprint per location/writer while a proposal is open.
+  // Keep only the latest footprint per location/writer while a pending is open.
   type InspectionWrite = { seq: number; effect: TurnEffect };
   let inspectionSeq = 0;
   let inspectionUnavailable = false;
@@ -1514,7 +1524,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
   const inspectPendingTurn = (turnId: number) => {
     if (inspectionUnavailable)
       throw new Error(
-        'SignalTree: proposal inspection unavailable because mutation chronology capture failed.'
+        'SignalTree: pending inspection unavailable because mutation chronology capture failed.'
       );
     const turn = authority.getPendingTurn(turnId);
     if (!turn) return undefined;
@@ -1527,7 +1537,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       if (!authored) {
         inspectionUnavailable = true;
         throw new Error(
-          'SignalTree: proposal inspection unavailable because an authored contribution has no mutation chronology.'
+          'SignalTree: pending inspection unavailable because an authored contribution has no mutation chronology.'
         );
       }
       for (const [writer, writes] of inspectionWrites) {
@@ -2385,7 +2395,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
   };
 
   const runtime: InternalTransactionRuntime = {
-    transaction(fn: () => void): PendingTransaction {
+    transaction(fn: () => void): RuntimeSettleHandle {
       if (destroyed) throw new Error('Cannot transact on a destroyed tree');
       const activeMeta = getActiveWriteContext();
       const notifier = getPathNotifier();
@@ -2695,7 +2705,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           ) {
             Object.defineProperty(rollbackError, 'recovery', {
               value: {
-                transaction: handle as PendingTransaction,
+                transaction: handle as RuntimeSettleHandle,
                 // Explicit: the callback may have thrown `undefined`.
                 callbackFailed: true,
                 callbackError: primaryError,
@@ -2710,8 +2720,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
         throw primaryError;
       }
       if (cleanupFailed) throw cleanupError;
-      // The pending-turn symbol remains private to the Proposal facade.
-      return handle as PendingTransaction;
+      // The pending-turn symbol stays private to the `transact()` wrapper.
+      return handle as RuntimeSettleHandle;
     },
     getConfirmedTurnRecords: () => authority.getConfirmedTurnRecords(),
     setHistoryRetention: (retain: number) =>
@@ -2833,7 +2843,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
  * ⚠️ This is NOT the rollback plan. A rollback plan answers "what can I safely
  * compensate?"; this answers "which parts of what I proposed are still
  * represented in current truth?". They come apart: a later UPDATE of a
- * proposed row makes the rollback REFUSE while leaving the proposal's
+ * proposed row makes the rollback REFUSE while leaving the pending's
  * structural contribution entirely current, and a refused plan has no
  * compensation list to reason from at all.
  *
@@ -2843,7 +2853,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
 function classifyProposedEffect(
   effect: TurnEffect,
   laterEffects: readonly TurnEffect[]
-): ProposalStatus {
+): ChangeStatus {
   if (effect.kind === 'set') {
     const replaced = laterEffects.some(
       (later) =>
@@ -2902,25 +2912,33 @@ export function transactions(
       runtime.setHistoryRetention(config.history.retain);
     }
 
-    // `transact`, not `transaction`: a verb beside `propose()` and the
+    // `transact`, not `transaction`: a verb beside `transact()` and the
     // handle's own `confirm()`/`rollback()`. The old spelling was REMOVED
     // outright in the 2026-09-22 breaking API reset rather than bridged — see
     // docs/research/api-breaking-reset-0.md.
     const host = tree as ISignalTree<T> & TransactionMethods;
-    host.transact = runtime.transaction;
 
-    // PROPOSAL-0. Naming and a review projection over the SAME turn — no
-    // second code path, no proposal-only rule. `pending` here is exactly what
-    // `transaction()` hands any other caller.
-    host.propose = (fn: () => void): Proposal => {
+    // ONE VERB, ONE HANDLE. `transact()` is the verb form of `transaction`,
+    // the noun the glossary teaches as Everyday vocabulary; the old
+    // `transaction()` spelling was REMOVED outright in the 2026-09-22 breaking
+    // API reset rather than bridged — see docs/research/api-breaking-reset-0.md.
+    //
+    // The review projection that briefly lived behind a second verb is folded
+    // in here, so `inspect()` is available to EVERY caller. Nothing about
+    // inspection ever depended on how the turn was opened; gating it behind a
+    // separate entry point was an arbitrary restriction, and the second
+    // vocabulary it carried was a fourth naming level AGENTS.md does not
+    // sanction. No second code path, no turn-opening-specific rule: `pending`
+    // below is exactly what the runtime hands anyone.
+    host.transact = (fn: () => void): PendingTransaction => {
       const pending = runtime.transaction(fn);
       const turnId = (pending as unknown as Record<PropertyKey, unknown>)[
         PENDING_TURN_ID
       ] as number | undefined;
 
-      let settled: ProposalInspection | undefined;
+      let settled: TransactionInspection | undefined;
 
-      const read = (): ProposalInspection => {
+      const read = (): TransactionInspection => {
         if (turnId === undefined) {
           return { changes: [] };
         }
@@ -2958,24 +2976,50 @@ export function transactions(
         };
       };
 
+      /**
+       * ⚠️ SETTLEMENT MUST NOT DEPEND ON INSPECTION.
+       *
+       * `read()` throws when mutation chronology capture has failed, and
+       * folding the review projection into `transact()` briefly made
+       * `confirm()` call it unguarded — so a tree whose inspection was
+       * unavailable could no longer be SETTLED at all. The handle wedged.
+       * `path-notifier-enqueue.spec.ts` caught it: "the low-level settlement
+       * handle does not depend on the inspection UI."
+       *
+       * Returning `undefined` rather than an empty inspection is deliberate.
+       * `{ changes: [] }` would be a FALSE claim that the turn changed
+       * nothing; leaving it unset makes a later `inspect()` fall through to
+       * `read()` and report the unavailability honestly.
+       */
+      const snapshot = (): TransactionInspection | undefined => {
+        try {
+          return read();
+        } catch {
+          return undefined;
+        }
+      };
+
       return {
-        inspect(): ProposalInspection {
+        inspect(): TransactionInspection {
           // After settlement the turn is no longer pending, so the inspection
           // as of that settlement is what there is to report.
           return settled ?? read();
         },
-        accept(): ProposalAcceptance {
+        confirm(): void {
           // Snapshot BEFORE confirming: this is the race inspect() alone
-          // cannot close, and after confirm the pending turn is gone.
-          const atSettlement = settled ?? read();
+          // cannot close, and after confirm the pending turn is gone. The
+          // snapshot is kept even though confirm() returns void, so a later
+          // inspect() still reports the truth as of settlement.
+          const atSettlement = settled ?? snapshot();
           pending.confirm();
           settled = atSettlement;
-          return atSettlement;
         },
-        reject(): void {
-          const atSettlement = settled ?? read();
+        rollback(): void {
+          const atSettlement = settled ?? snapshot();
           // Throws on a conservative refusal. Deliberately not caught: the
-          // caller must see a reversal that could not be applied.
+          // caller must see a reversal that could not be applied. `settled` is
+          // assigned only on success, so a refused rollback leaves the handle
+          // reporting live state — matching the turn, which stays pending.
           pending.rollback();
           settled = atSettlement;
         },

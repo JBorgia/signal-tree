@@ -20,9 +20,9 @@ import {
  * safely compensate?". A review answers "which parts of what I proposed are
  * still represented in current truth?". They overlap and are not the same:
  *
- *     proposal: add row A        server: update A.name
+ *     pending: add row A        server: update A.name
  *         -> rollback REFUSES (newer truth depends on the row)
- *         -> the proposal's structural contribution is entirely CURRENT
+ *         -> the pending's structural contribution is entirely CURRENT
  *
  * So `superseded = turn effects - compensation plan` is WRONG, and worse than
  * wrong when the plan returns a conflict, because then there is no
@@ -103,7 +103,7 @@ const rowTree = () =>
     { enhancers: [transactions()] }
   );
 
-describe('PROPOSAL-INSPECTION-0 / 1 — scalar proposal untouched', () => {
+describe('PROPOSAL-INSPECTION-0 / 1 — scalar pending untouched', () => {
   it('current', async () => {
     const tree = rowTree();
     await flush();
@@ -143,7 +143,7 @@ describe('PROPOSAL-INSPECTION-0 / 3 — structural add, later UPDATE of the subj
     await flush();
 
     // The rollback plan REFUSES here. Inspection must still say the
-    // proposal's structural contribution is current.
+    // pending's structural contribution is current.
     expect(inspect(tree)).toEqual([{ kind: 'add', status: 'current' }]);
   });
 });
@@ -193,7 +193,7 @@ describe('PROPOSAL-INSPECTION-0 / 6 — remove/re-add of the same business key',
     });
     await flush();
 
-    // The key is occupied again, by a DIFFERENT subject. The proposal's own
+    // The key is occupied again, by a DIFFERENT subject. The pending's own
     // subject is gone, so its contribution is superseded — a path-based rule
     // would wrongly report 'current' here.
     expect(inspect(tree)).toEqual([{ kind: 'add', status: 'superseded' }]);

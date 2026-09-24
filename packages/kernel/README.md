@@ -220,11 +220,11 @@ when this store is no longer needed.
 Adds an explicit pending operation that can be confirmed or rolled back. Use it
 for pending authority, not as a synonym for retained undo history.
 
-#### Reviewing a proposal
+#### Reviewing a turn before it settles
 
-`propose()` is the same pending turn `transact()` opens, named for the case
-where somebody reviews a change before it lands — an agent's suggestion, an
-import, a bulk edit. The proposed values are readable immediately through
+`inspect()` is available on every turn `transact()` opens, for the case where
+somebody reviews a change before it lands — an agent's suggestion, an
+import, a bulk edit. The turn’s values are readable immediately through
 ordinary references, so a review screen renders from the state it already uses.
 
 ```typescript
@@ -232,31 +232,31 @@ const tree = signalTree(state, { enhancers: [transactions()] });
 
 const result = await agent.suggestChanges();
 
-const proposal = tree.propose(() => {
+const pending = tree.transact(() => {
   tree.$.order.customer(result.customer);
   tree.$.order.priority(result.priority);
 });
 
-// The reviewer sees the proposed values through the normal tree.
-tree.$.order.priority(); // the proposed value
+// The reviewer sees the speculative values through the normal tree.
+tree.$.order.priority(); // the speculative value
 
-proposal.accept(); // or proposal.reject()
+pending.confirm(); // or pending.rollback()
 ```
 
-`inspect()` reports whether each proposed change still represents current
+`inspect()` reports whether each change the turn made still represents current
 truth, which matters when a server or another person writes while the review is
 open:
 
 ```typescript
-proposal.inspect();
+pending.inspect();
 // { changes: [ { path: 'order.priority', status: 'superseded' } ] }
 ```
 
-`accept()` returns that same inspection as settled, so a value that changed
+`confirm()` snapshots that same inspection as it settles, so a value that changed
 between the last read and the decision is still reported.
 
-> **`current` means the proposal's contribution still stands — not that the
-> value it proposed is still there.** An added row stays `current` while
+> **`current` means the turn's contribution still stands — not that the
+> value it wrote is still there.** An added row stays `current` while
 > another writer edits fields on that same row. Render `inspect()` next to
 > ordinary current-state reads; it is a review status, not a value snapshot.
 
@@ -265,25 +265,25 @@ between the last read and the decision is still reported.
 UI must use its knowledge of the application's fields and entity IDs to associate
 changes with values. Splitting paths on dots is not a universal resolver.
 
-`reject()` throws `SignalTreeRollbackError` when the reversal cannot be applied
+`rollback()` throws `SignalTreeRollbackError` when the reversal cannot be applied
 without destroying newer truth — for example when a server write now depends on
-a row the proposal created. Catch it and offer reconciliation rather than
+a row the turn created. Catch it and offer reconciliation rather than
 treating rejection as always available.
 
 Acceptance is **not** undo history. Restoration stays a separate decision, and
-`undoable()` wraps the proposal's writes rather than the acceptance, because it
+`undoable()` wraps the turn's writes rather than the settlement, because it
 designates the causal turn where the writes happened:
 
 ```typescript
-let proposal!: Proposal;
+let pending!: PendingTransaction;
 
 undoable(() => {
-  proposal = tree.propose(() => applyResult(result));
+  pending = tree.transact(() => applyResult(result));
 });
 
 // ...the human reviews for as long as they need...
 
-proposal.accept(); // one undo step
+pending.confirm(); // one undo step
 ```
 Confirmed records are retained only while a live obligation needs them — a
 confirmed turn is released once no older pending turn could still consult it.
