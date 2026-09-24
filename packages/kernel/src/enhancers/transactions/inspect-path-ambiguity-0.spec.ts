@@ -106,29 +106,32 @@ describe('inspect() path ambiguity', () => {
   });
 });
 
-describe('inspect() address — the ENTITY-FIELD case is NOT yet lossless', () => {
+describe('inspect() address — entity FIELDS are distinguishable too', () => {
   /**
-   * The root-level fix above is real: a literal key and a nested path now read
-   * differently. Inside an ENTITY ROW they do not.
+   * Previously pinned as a known gap with the justification that effects "do
+   * not carry field segments structurally". That was wrong and unchecked:
+   * `ScalarSetEffect.subjectFieldSegments` has existed all along, is populated
+   * for every row-field diff, and is already treated as AUTHORITATIVE identity
+   * by `scalarRelation` and `makeScalarKey` — which is why rollback can
+   * already tell a literal `'n.a'` from a nested `n`.
    *
-   * A row with both a literal `'n.a'` field and a nested `n: { a }` produces two
-   * changes whose address is the COLLECTION position and whose subject is the
-   * same row, so address + subject cannot tell them apart. Only `path` does,
-   * and `path` is the thing that is explicitly not identity.
+   * The residual gap was a projection omission in `read()`, not a missing
+   * capability. `address` now appends the row-relative segments, so:
    *
-   * Pinned as a known gap rather than left implied-fixed. Closing it needs the
-   * field segments WITHIN a subject, which the effect does not currently carry
-   * structurally — the relative part of `rows.A.n.a` is still a flattened
-   * string. That is the same L17 work one level down, and it belongs with the
-   * ownership model rather than bolted on here.
+   *     literal 'n.a'  ->  ['rows', 'n.a']
+   *     nested  n      ->  ['rows', 'n']
+   *
+   * `subject` still says WHICH row; `address` says which location within it.
    */
-  it('a literal and a nested entity field share address and subject', async () => {
+  it('a literal and a nested entity field have different addresses', async () => {
     type Row = { id: string; 'n.a': number; n: { a: number } };
     const tree = signalTree(
       { rows: entityMap<Row, string>() },
       { enhancers: [transactions()] }
     ) as never as {
-      $: { rows: { addOne(r: Row): void; updateOne(id: string, p: unknown): void } };
+      $: {
+        rows: { addOne(r: Row): void; updateOne(id: string, p: unknown): void };
+      };
       propose: (fn: () => void) => {
         inspect(): {
           changes: {
@@ -154,11 +157,14 @@ describe('inspect() address — the ENTITY-FIELD case is NOT yet lossless', () =
       );
       console.log('[entity-addr]', JSON.stringify(changes));
 
-      // MEASURED: identical identity for two genuinely different locations.
-      // When this starts failing, the entity-field address became lossless and
-      // this case should be rewritten as the proof rather than the gap.
-      expect(new Set(keys).size).toBe(1);
-      expect(changes.map((c) => c.path)).toEqual(['rows.A.n.a', 'rows.A.n']);
+      // Two different locations in one row are now two different identities.
+      expect(new Set(keys).size).toBe(2);
+      // Same row, so the SUBJECT is shared — that is correct, not a collision.
+      expect(new Set(changes.map((c) => c.subject)).size).toBe(1);
+      expect(changes.map((c) => JSON.stringify(c.address))).toEqual([
+        '["rows","n.a"]',
+        '["rows","n"]',
+      ]);
     } finally {
       tree.destroy();
     }

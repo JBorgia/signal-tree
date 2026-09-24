@@ -113,8 +113,8 @@ describe('proposal inspection safety', () => {
           n: { a: writer === 'external-aba' ? 1 : 2 },
         });
         expect(proposal.inspect().changes).toEqual([
-          { path: 'rows.A.n.a', address: ['rows'], subject: expect.any(Number), status: 'current' },
-          { path: 'rows.A.n', address: ['rows'], subject: expect.any(Number), status: 'superseded' },
+          { path: 'rows.A.n.a', address: ['rows', 'n.a'], subject: expect.any(Number), status: 'current' },
+          { path: 'rows.A.n', address: ['rows', 'n'], subject: expect.any(Number), status: 'superseded' },
         ]);
       } finally {
         tree.destroy();

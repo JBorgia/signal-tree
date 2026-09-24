@@ -2936,7 +2936,19 @@ export function transactions(
         return {
           changes: raw.effects.map((effect) => ({
             path: effect.path,
-            address: registry?.addressFor(effect.position),
+            // The position address locates the OWNER (for an entity field that
+            // is the collection); `subjectFieldSegments` is the producer-known
+            // row-relative address. Appending it is what makes two fields of
+            // one row distinguishable. The segments already existed and were
+            // already authoritative — `scalarRelation` and `makeScalarKey`
+            // key on them — so only the public projection was dropping them.
+            address: (() => {
+              const owner = registry?.addressFor(effect.position);
+              if (!owner) return owner;
+              const within =
+                effect.kind === 'set' ? effect.subjectFieldSegments : undefined;
+              return within ? [...owner, ...within] : owner;
+            })(),
             subject:
               'subject' in effect && typeof effect.subject === 'number'
                 ? effect.subject
