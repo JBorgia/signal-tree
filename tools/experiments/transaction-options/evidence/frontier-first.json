@@ -1,0 +1,4036 @@
+{
+  "profile": "live",
+  "totals": {
+    "passed": 640,
+    "failed": 0,
+    "error": 0,
+    "unsupported": 0,
+    "profile-mismatch": 36
+  },
+  "results": [
+    {
+      "id": "S01-one-accept",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 7.111958999999999
+    },
+    {
+      "id": "S02-local-supersedes-accept",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.3280840000000005
+    },
+    {
+      "id": "S01-one-reject",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.21749999999999758
+    },
+    {
+      "id": "S02-local-supersedes-reject",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.23316600000000065
+    },
+    {
+      "id": "S03-two-pending",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.1367919999999998
+    },
+    {
+      "id": "S04-three-pending",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.16995800000000116
+    },
+    {
+      "id": "S05-reject-1",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2065829999999984
+    },
+    {
+      "id": "S06-reject-2",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.16629199999999855
+    },
+    {
+      "id": "S07-reject-3",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.31416699999999764
+    },
+    {
+      "id": "S08-accept-1",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.14920800000000156
+    },
+    {
+      "id": "S09-accept-2",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.1479159999999986
+    },
+    {
+      "id": "S10-accept-3",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.15120800000000045
+    },
+    {
+      "id": "S11-12-AA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.296875
+    },
+    {
+      "id": "S11-12-AR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.22391700000000014
+    },
+    {
+      "id": "S11-12-RA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.20362499999999883
+    },
+    {
+      "id": "S11-12-RR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.31529199999999946
+    },
+    {
+      "id": "S11-21-AA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.1894580000000019
+    },
+    {
+      "id": "S11-21-AR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.1844999999999999
+    },
+    {
+      "id": "S11-21-RA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.15845799999999954
+    },
+    {
+      "id": "S11-21-RR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.20445800000000247
+    },
+    {
+      "id": "S12-123-AAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2824590000000029
+    },
+    {
+      "id": "S12-123-AAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2915420000000033
+    },
+    {
+      "id": "S12-123-ARA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.25574999999999903
+    },
+    {
+      "id": "S12-123-ARR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.24158299999999855
+    },
+    {
+      "id": "S12-123-RAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2103749999999991
+    },
+    {
+      "id": "S12-123-RAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.3089999999999975
+    },
+    {
+      "id": "S12-123-RRA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.22391700000000014
+    },
+    {
+      "id": "S12-123-RRR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.3064999999999998
+    },
+    {
+      "id": "S12-132-AAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.20924999999999727
+    },
+    {
+      "id": "S12-132-AAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.23066599999999937
+    },
+    {
+      "id": "S12-132-ARA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.28420900000000415
+    },
+    {
+      "id": "S12-132-ARR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2139580000000052
+    },
+    {
+      "id": "S12-132-RAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.21233399999999847
+    },
+    {
+      "id": "S12-132-RAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.21162499999999795
+    },
+    {
+      "id": "S12-132-RRA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.24866600000000005
+    },
+    {
+      "id": "S12-132-RRR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.20966700000000316
+    },
+    {
+      "id": "S12-213-AAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.18574999999999875
+    },
+    {
+      "id": "S12-213-AAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.19720900000000086
+    },
+    {
+      "id": "S12-213-ARA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.18970900000000057
+    },
+    {
+      "id": "S12-213-ARR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.244374999999998
+    },
+    {
+      "id": "S12-213-RAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.18466699999999747
+    },
+    {
+      "id": "S12-213-RAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.19529199999999491
+    },
+    {
+      "id": "S12-213-RRA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.1864580000000018
+    },
+    {
+      "id": "S12-213-RRR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.19437500000000085
+    },
+    {
+      "id": "S12-231-AAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2255000000000038
+    },
+    {
+      "id": "S12-231-AAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.20537500000000364
+    },
+    {
+      "id": "S12-231-ARA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.18208299999999866
+    },
+    {
+      "id": "S12-231-ARR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.22025000000000006
+    },
+    {
+      "id": "S12-231-RAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.24191700000000083
+    },
+    {
+      "id": "S12-231-RAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.6402500000000018
+    },
+    {
+      "id": "S12-231-RRA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.5289590000000004
+    },
+    {
+      "id": "S12-231-RRR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2464999999999975
+    },
+    {
+      "id": "S12-312-AAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2116669999999985
+    },
+    {
+      "id": "S12-312-AAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.572499999999998
+    },
+    {
+      "id": "S12-312-ARA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.27462500000000034
+    },
+    {
+      "id": "S12-312-ARR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2238750000000067
+    },
+    {
+      "id": "S12-312-RAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.21445900000000506
+    },
+    {
+      "id": "S12-312-RAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.20454200000000355
+    },
+    {
+      "id": "S12-312-RRA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.329540999999999
+    },
+    {
+      "id": "S12-312-RRR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2237089999999995
+    },
+    {
+      "id": "S12-321-AAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.20558400000000177
+    },
+    {
+      "id": "S12-321-AAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2101249999999979
+    },
+    {
+      "id": "S12-321-ARA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2393339999999995
+    },
+    {
+      "id": "S12-321-ARR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.21079199999999787
+    },
+    {
+      "id": "S12-321-RAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.1845829999999964
+    },
+    {
+      "id": "S12-321-RAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.1974170000000015
+    },
+    {
+      "id": "S12-321-RRA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.1986659999999958
+    },
+    {
+      "id": "S12-321-RRR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2775839999999974
+    },
+    {
+      "id": "S13-two-pending-local-frontier-accept",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2838750000000019
+    },
+    {
+      "id": "S14-newer-accepted-older-accept",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.1548750000000041
+    },
+    {
+      "id": "S13-two-pending-local-frontier-reject",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.16491699999999554
+    },
+    {
+      "id": "S14-newer-accepted-older-reject",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.13991700000000407
+    },
+    {
+      "id": "S13-frontier-between-proposals",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.1680420000000069
+    },
+    {
+      "id": "A1-A5-unrelated-snapshot",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.24366700000000208
+    },
+    {
+      "id": "A1-A5-unrelated-external",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.2137920000000051
+    },
+    {
+      "id": "A1-A5-unrelated-version",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.14804199999999668
+    },
+    {
+      "id": "A5-equal-value-is-not-an-ack",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.14145800000000008
+    },
+    {
+      "id": "A2-A4-accepts-only-named-owner",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.21154200000000145
+    },
+    {
+      "id": "A2-A4-rejects-only-named-owner",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.15933299999999662
+    },
+    {
+      "id": "A2-A4-includes-only-named-owner",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.22187500000000426
+    },
+    {
+      "id": "A4-includes-is-not-a-global-watermark",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.1424999999999983
+    },
+    {
+      "id": "A2-correlation-without-payload",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.18816699999999997
+    },
+    {
+      "id": "A6-T18-T21-version-order-not-arrival",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.26787499999999653
+    },
+    {
+      "id": "T20-stale-payload-independent-ack",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.20595799999999542
+    },
+    {
+      "id": "T22-unordered-refuses-unchanged",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.16900000000000404
+    },
+    {
+      "id": "F-terminal-accept-then-accept",
+      "family": "terminal",
+      "status": "passed",
+      "ms": 0.16450000000000387
+    },
+    {
+      "id": "F-terminal-accept-then-reject",
+      "family": "terminal",
+      "status": "passed",
+      "ms": 0.1160420000000002
+    },
+    {
+      "id": "F-terminal-reject-then-accept",
+      "family": "terminal",
+      "status": "passed",
+      "ms": 0.11479100000000386
+    },
+    {
+      "id": "F-terminal-reject-then-reject",
+      "family": "terminal",
+      "status": "passed",
+      "ms": 0.10216600000000398
+    },
+    {
+      "id": "O01-live-multifield-accept",
+      "family": "publication",
+      "status": "passed",
+      "ms": 0.11375000000000313
+    },
+    {
+      "id": "O02-live-multifield-reject",
+      "family": "publication",
+      "status": "passed",
+      "ms": 0.09354100000000187
+    },
+    {
+      "id": "O05-partially-superseded-accept",
+      "family": "publication",
+      "status": "passed",
+      "ms": 0.15200000000000102
+    },
+    {
+      "id": "O02-partially-superseded-reject",
+      "family": "publication",
+      "status": "passed",
+      "ms": 0.1110000000000042
+    },
+    {
+      "id": "O-authority-settles-two-units-atomically",
+      "family": "publication",
+      "status": "passed",
+      "ms": 0.1272080000000031
+    },
+    {
+      "id": "D-S01-O-multifield-accept",
+      "family": "publication",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "D-S01-O-multifield-reject",
+      "family": "publication",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "D-S03-isolated-proposals",
+      "family": "scalar",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "D-A1-canonical-advances-draft-keeps-base",
+      "family": "authority",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "T01-add-reject/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.44120900000000063
+    },
+    {
+      "id": "T01-add-reject/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.4806250000000034
+    },
+    {
+      "id": "T01-add-reject/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19037500000000307
+    },
+    {
+      "id": "T01-add-reject/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.4113749999999996
+    },
+    {
+      "id": "T01-add-reject/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3135419999999982
+    },
+    {
+      "id": "T01-add-reject/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22345800000000082
+    },
+    {
+      "id": "T01-add-reject/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3146249999999995
+    },
+    {
+      "id": "T01-add-reject/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17358399999999818
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.366458999999999
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.26233299999999815
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.31629099999999966
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23679200000000122
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24233299999999502
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.243583000000001
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3399169999999998
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23012500000000102
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.278416
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23987499999999784
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.32466699999999804
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3144580000000019
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.30341699999999605
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2640000000000029
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2482079999999982
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3286669999999958
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24808300000000116
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17883299999999736
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16875000000000284
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16495899999999608
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16433400000000375
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2101249999999979
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16133400000000364
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17020899999999983
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22770899999999727
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.28929100000000574
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.32525000000000404
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3639999999999972
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2866250000000008
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21745899999999807
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19899999999999807
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.25858300000000156
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.14879099999999568
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17745899999999892
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16037500000000193
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1638329999999968
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23141700000000043
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1891249999999971
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17154099999999772
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15791600000000017
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17283299999999713
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1887090000000029
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.28504099999999966
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20004199999999628
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19633400000000023
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18858300000000128
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.26337500000000347
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20033300000000054
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.327541999999994
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2714590000000001
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.314040999999996
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2717919999999978
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.27658300000000224
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3350420000000014
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3483329999999967
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.27429200000000264
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.13791700000000162
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12070800000000759
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11870899999999551
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1193749999999909
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1176669999999973
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.4498749999999916
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.29154099999999517
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12324999999999875
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.32450000000000045
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.26412499999999284
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3045410000000004
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2872079999999926
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22966700000000628
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22620899999999722
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.26191700000001106
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.30562499999999204
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15333400000000097
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12662499999999
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12237500000000523
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12279200000000401
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.13954100000000835
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.33229199999999537
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.14041699999999935
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19054199999999355
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11520799999999554
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.13995800000000713
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1596669999999989
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1485839999999996
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12566699999999287
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12291599999998937
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12362500000000409
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17395800000001316
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18866699999999526
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15425000000000466
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15266599999999642
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15158400000001393
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.157708999999997
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15304199999999923
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2227500000000049
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15291699999998798
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1369579999999928
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.174082999999996
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15312499999998863
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1495829999999927
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.14779199999999548
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1871670000000023
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.148208000000011
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15704099999999244
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-0",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.207917000000009
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-1",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.21170899999999904
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-2",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.4695420000000041
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-3",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.21795799999999588
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-4",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.20137499999999875
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-5",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.18745900000000404
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-6",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.18404200000000515
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-7",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.18599999999999284
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-0",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.2360000000000042
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-1",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.21441700000001163
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-2",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.18099999999999739
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-3",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.18862500000000182
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-4",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.19700000000000273
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-5",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.24362500000000864
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-6",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.18500000000000227
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-7",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.1772500000000008
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15050000000000807
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11329200000000128
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11079200000000355
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.10904100000000483
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.158457999999996
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11912499999999682
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11637499999999079
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11445900000001075
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.10325000000000273
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12333299999998815
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11133399999999938
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.10766599999999471
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15587499999999466
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.10695799999999167
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.10579199999999389
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.10687500000000227
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.30324999999999136
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2706659999999914
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2671670000000006
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.277000000000001
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19170800000000554
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22920799999999986
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19683299999999804
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22920899999999733
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.27020900000000836
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21299999999999386
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1979170000000039
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20470799999999656
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1881659999999954
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2373750000000001
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18766600000000722
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3624579999999895
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1875830000000036
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2002080000000035
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2767079999999993
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19370899999999835
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20250000000000057
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19095800000000906
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.25091700000000117
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24416700000000446
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17712500000000375
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19929100000000233
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20070800000000588
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19795799999999986
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2442920000000015
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18741599999999892
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18745799999999235
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19966699999999094
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16770800000000463
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17874999999999375
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21537499999999454
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20212499999999523
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1799999999999926
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18587500000001
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17825000000000557
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.26729200000001185
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17549999999999955
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1875
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1979999999999933
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19325000000000614
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2309580000000011
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1823750000000075
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18354100000000528
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18270900000000267
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16570899999999256
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24458300000000577
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18325000000000102
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1827080000000052
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18187500000000512
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18345800000000168
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22591699999999548
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3938749999999942
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16599999999999682
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3611670000000089
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2022089999999963
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2649159999999995
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3144579999999877
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1839169999999939
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1992919999999998
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20087499999999636
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18833399999999756
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24887499999999818
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1960419999999914
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19770800000000577
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3462079999999901
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24883400000000222
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2719579999999979
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20270800000000122
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17900000000000205
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.27137500000000614
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2133749999999992
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.26200000000000045
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.25858399999999904
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.44158399999999176
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21729200000000048
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21625000000000227
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23408299999999826
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19362499999999727
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20258299999998997
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18620900000000518
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18762499999999704
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3851669999999956
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18445800000000645
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1839169999999939
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2967079999999953
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2595829999999921
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.31529199999999946
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19362499999999727
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18949999999999534
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.31895799999999497
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21358399999999733
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.25833299999999326
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16645800000000577
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18258400000000563
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1787080000000003
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23841699999999832
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19070799999998655
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2220000000000084
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17670800000000497
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18133400000000677
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16091700000001197
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1764999999999901
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23233299999999701
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17412499999998943
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17333299999999952
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17420800000000725
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21562500000000284
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17791699999999366
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.25475000000000136
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20729199999999537
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20341700000000174
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19920799999999872
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18000000000000682
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.25379200000000424
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1753749999999883
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17525000000000546
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1684580000000011
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18370900000000745
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17650000000000432
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21633400000000336
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17570899999999767
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17920900000000017
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17283299999999713
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17270800000000008
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2144580000000076
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18149999999999977
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.184708999999998
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1818749999999909
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19258299999999906
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22316599999999198
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1849589999999921
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18454200000000753
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1964580000000069
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18895799999999952
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.45258299999998997
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2399159999999938
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18266699999999503
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18158400000000086
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18312500000000398
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18179100000000403
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21041700000000674
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18312499999998977
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18250000000000455
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18199999999998795
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18254199999999798
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18216699999999264
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21724999999999284
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18158400000000086
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16562500000000568
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18129199999999912
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18037500000001216
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.239167000000009
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.182707999999991
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18437500000000284
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2303749999999951
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2072080000000085
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16441600000000278
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23208300000000293
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16908300000000054
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1715420000000023
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1677090000000021
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17191600000001017
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21570800000000645
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16737500000000693
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16825000000000045
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18437500000000284
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19770800000000577
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1685420000000022
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21229200000000503
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20425000000000182
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.33558299999999974
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21325000000000216
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1700000000000017
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22108300000000725
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17070800000000474
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16779200000000571
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16774999999999807
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1684580000000011
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1664999999999992
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20983300000000327
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15050000000000807
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16724999999999568
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17737499999999784
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16745900000000802
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20716600000000085
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16704200000000924
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16712499999999864
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16599999999999682
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.171291999999994
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18445900000000393
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22000000000001307
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19504100000000335
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1844999999999999
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1995419999999939
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18183399999999494
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21854199999999935
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1572919999999982
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17220900000000938
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1729169999999982
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17449999999999477
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21125000000000682
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.25133399999999995
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19316700000000253
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18658299999999883
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16833400000000154
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1948330000000027
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24541700000000333
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1840830000000011
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17691600000000562
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17633400000001132
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17720900000000483
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2189170000000047
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.226333000000011
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3404999999999916
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18174999999999386
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18016599999999983
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1808330000000069
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2342919999999964
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.26729100000000017
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17774999999998897
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15416700000000105
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17483299999999247
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2157499999999999
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16891699999999332
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16937499999998806
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1681250000000034
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16766699999999446
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1693340000000063
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18908299999999656
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1683749999999975
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16858299999999815
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1680419999999998
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16825000000000045
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20324999999999704
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16754199999999742
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16616600000000403
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.14979200000000503
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16645899999998903
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16962499999999636
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2460839999999962
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1822080000000028
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1650410000000022
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17658299999999372
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16737499999999272
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19195799999999963
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16870799999998098
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17404200000001424
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16295800000000327
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17483300000000668
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1734170000000006
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.244624999999985
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1756249999999966
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17345800000001077
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20754099999999198
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1841670000000022
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23449999999999704
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19895800000000463
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.274249999999995
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21066600000000335
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.34079099999999585
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17054099999998584
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24795899999998028
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18462500000001114
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18462499999998272
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18454200000002174
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18504099999998402
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22512500000001978
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18691700000002243
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21987500000000182
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19575000000000387
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19079100000001858
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.4087499999999977
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1997920000000022
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21966699999998696
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18070799999998144
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17758399999999597
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1603330000000085
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23833299999998303
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1762499999999818
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17175000000000296
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17074999999999818
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1717920000000106
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2246669999999824
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17125000000001478
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1490840000000162
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16304199999999014
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1617080000000044
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16316699999998718
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20858400000000188
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16254200000000196
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1611249999999984
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.162666999999999
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.14775000000000205
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20641600000001858
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16058300000000258
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16045800000000554
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16020799999998303
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1606249999999818
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.160082999999986
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.38237499999999613
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1720420000000047
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17650000000000432
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1730839999999887
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17449999999999477
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22870799999998326
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17237499999998818
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17054200000001174
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16854100000000471
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1531659999999988
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17024999999998158
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21725000000000705
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18320799999997917
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3302089999999964
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2919169999999838
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1863750000000266
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24116700000001856
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19095900000002075
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19337500000000318
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1910000000000025
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19266600000000267
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21224999999998317
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.26250000000001705
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1937910000000045
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20966599999999858
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16749999999998977
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18308400000000802
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22774999999998613
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1815830000000176
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18166599999997857
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18087499999998613
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1818749999999909
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22699999999997544
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16620800000001168
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17454200000000242
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17316600000000903
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1741660000000138
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17250000000001364
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21487500000000637
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17379099999999426
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19258299999998485
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16083299999999667
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.34720900000002075
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2893749999999784
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18379199999998264
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17599999999998772
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17779200000001083
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17754099999999085
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2459169999999915
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15750000000002728
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20474999999999
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17095799999998462
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16662500000001046
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16566599999998743
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20470800000001077
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16508400000000734
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.164874999999995
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1485410000000229
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16495800000001282
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16304099999999266
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1997079999999869
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1629999999999825
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1659580000000176
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17745800000000145
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16479100000000813
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2015829999999994
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16437500000000682
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16270799999998076
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1599999999999966
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1630839999999978
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1636660000000063
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22145900000001006
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17241699999999582
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15658299999998349
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16841600000000767
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16929200000001288
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21562500000001705
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1605000000000132
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16354099999998084
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16716700000000628
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1634999999999991
+    },
+    {
+      "id": "I01-I06-coexisting-typed-keys",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.3760000000000048
+    },
+    {
+      "id": "draft-control-isolated-add/keys-0",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-isolated-add/keys-1",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-isolated-add/keys-2",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-isolated-add/keys-3",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-isolated-add/keys-4",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-isolated-add/keys-5",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-isolated-add/keys-6",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-isolated-add/keys-7",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-0",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-1",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-2",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-3",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-4",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-5",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-6",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-7",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-0",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-1",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-2",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-3",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-4",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-5",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-6",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-7",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-0",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-1",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-2",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-3",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-4",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-5",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-6",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-7",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "R01-50000-without-undo-history",
+      "family": "retention",
+      "status": "passed",
+      "ms": 1703.51325
+    },
+    {
+      "id": "R02-50000-without-undo-history",
+      "family": "retention",
+      "status": "passed",
+      "ms": 1575.849958
+    },
+    {
+      "id": "R03-failed-retry-no-growth",
+      "family": "retention",
+      "status": "passed",
+      "ms": 27.15491699999984
+    },
+    {
+      "id": "R04-terminal-records-leave-active-machinery",
+      "family": "retention",
+      "status": "passed",
+      "ms": 0.11612500000001091
+    },
+    {
+      "id": "R05-destroy-releases-pending-machinery",
+      "family": "retention",
+      "status": "passed",
+      "ms": 0.07916699999987031
+    },
+    {
+      "id": "R06-diagnostics-independent-functional-trace",
+      "family": "retention",
+      "status": "passed",
+      "ms": 0.11204200000020137
+    },
+    {
+      "id": "N01-N03-pending-x-repeated-independent-y",
+      "family": "progress",
+      "status": "passed",
+      "ms": 2.7741249999999127
+    },
+    {
+      "id": "N02-failed-x-settlement-does-not-block-y",
+      "family": "progress",
+      "status": "passed",
+      "ms": 1.2147079999999733
+    },
+    {
+      "id": "N04-N05-multiple-links-independent-settlement",
+      "family": "progress",
+      "status": "passed",
+      "ms": 0.2990000000004329
+    },
+    {
+      "id": "CCTX1-external-direct-preserves-pending",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.10866699999996854
+    },
+    {
+      "id": "CCTX1-external-direct-does-not-become-undoable",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.1661669999998594
+    },
+    {
+      "id": "CCTX3-undoable-direct-restores-own-write",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.1266249999998763
+    },
+    {
+      "id": "CCTX1-external-deferred-preserves-pending",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.12966700000015408
+    },
+    {
+      "id": "CCTX1-external-deferred-does-not-become-undoable",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.08683299999984229
+    },
+    {
+      "id": "CCTX3-undoable-deferred-restores-own-write",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.1030839999998534
+    },
+    {
+      "id": "CCTX2-local-deferred-supersedes-pending-authorship",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.08545800000001691
+    },
+    {
+      "id": "CCTX4-CCTX5-mixed-deferred-contexts-or-atomic-unsupported",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.16312500000003638
+    }
+  ],
+  "evidence": {
+    "scope": "bounded model; no production or full integration-matrix claim",
+    "sourceSha256": "e8d7be736a7aa8f2027b3fe25329824e53e32d9ee7e308fe5ec79be66b4471c1"
+  }
+}

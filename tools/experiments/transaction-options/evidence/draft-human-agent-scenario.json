@@ -1,0 +1,502 @@
+{
+  "status": "passed",
+  "trace": [
+    {
+      "step": "agent proposal",
+      "result": null,
+      "state": {
+        "status": "pending",
+        "authority": true,
+        "dispositions": [
+          "pending",
+          "pending"
+        ]
+      },
+      "visible": {
+        "values": [
+          {
+            "path": [
+              "x"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "y"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "z"
+            ],
+            "value": 0
+          }
+        ],
+        "entities": [
+          {
+            "ref": "original",
+            "key": "A",
+            "fields": {
+              "name": "Original",
+              "priority": 0
+            }
+          }
+        ]
+      },
+      "canonical": {
+        "values": [
+          {
+            "path": [
+              "x"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "y"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "z"
+            ],
+            "value": 0
+          }
+        ],
+        "entities": [
+          {
+            "ref": "original",
+            "key": "A",
+            "fields": {
+              "name": "Original",
+              "priority": 0
+            }
+          }
+        ]
+      },
+      "stats": {
+        "active": 1,
+        "retainedOperations": 2,
+        "history": 0
+      },
+      "events": 0
+    },
+    {
+      "step": "human writes name",
+      "result": null,
+      "state": {
+        "status": "pending",
+        "authority": true,
+        "dispositions": [
+          "pending",
+          "pending"
+        ]
+      },
+      "visible": {
+        "values": [
+          {
+            "path": [
+              "x"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "y"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "z"
+            ],
+            "value": 0
+          }
+        ],
+        "entities": [
+          {
+            "ref": "original",
+            "key": "A",
+            "fields": {
+              "name": "Human name",
+              "priority": 0
+            }
+          }
+        ]
+      },
+      "canonical": {
+        "values": [
+          {
+            "path": [
+              "x"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "y"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "z"
+            ],
+            "value": 0
+          }
+        ],
+        "entities": [
+          {
+            "ref": "original",
+            "key": "A",
+            "fields": {
+              "name": "Human name",
+              "priority": 0
+            }
+          }
+        ]
+      },
+      "stats": {
+        "active": 1,
+        "retainedOperations": 2,
+        "history": 0
+      },
+      "events": 1
+    },
+    {
+      "step": "whole proposal refused unchanged",
+      "result": {
+        "status": "refused",
+        "reason": "An intervening write touched a draft dependency; discard and author a new draft"
+      },
+      "state": {
+        "status": "pending",
+        "authority": true,
+        "dispositions": [
+          "pending",
+          "pending"
+        ]
+      },
+      "visible": {
+        "values": [
+          {
+            "path": [
+              "x"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "y"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "z"
+            ],
+            "value": 0
+          }
+        ],
+        "entities": [
+          {
+            "ref": "original",
+            "key": "A",
+            "fields": {
+              "name": "Human name",
+              "priority": 0
+            }
+          }
+        ]
+      },
+      "canonical": {
+        "values": [
+          {
+            "path": [
+              "x"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "y"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "z"
+            ],
+            "value": 0
+          }
+        ],
+        "entities": [
+          {
+            "ref": "original",
+            "key": "A",
+            "fields": {
+              "name": "Human name",
+              "priority": 0
+            }
+          }
+        ]
+      },
+      "stats": {
+        "active": 1,
+        "retainedOperations": 2,
+        "history": 0
+      },
+      "events": 1
+    },
+    {
+      "step": "discard after refusal",
+      "result": {
+        "status": "settled"
+      },
+      "state": {
+        "status": "rejected",
+        "authority": false,
+        "dispositions": [
+          "rejected",
+          "rejected"
+        ]
+      },
+      "visible": {
+        "values": [
+          {
+            "path": [
+              "x"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "y"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "z"
+            ],
+            "value": 0
+          }
+        ],
+        "entities": [
+          {
+            "ref": "original",
+            "key": "A",
+            "fields": {
+              "name": "Human name",
+              "priority": 0
+            }
+          }
+        ]
+      },
+      "canonical": {
+        "values": [
+          {
+            "path": [
+              "x"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "y"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "z"
+            ],
+            "value": 0
+          }
+        ],
+        "entities": [
+          {
+            "ref": "original",
+            "key": "A",
+            "fields": {
+              "name": "Human name",
+              "priority": 0
+            }
+          }
+        ]
+      },
+      "stats": {
+        "active": 0,
+        "retainedOperations": 0,
+        "history": 0
+      },
+      "events": 1
+    },
+    {
+      "step": "revised independent-field draft",
+      "result": null,
+      "state": {
+        "status": "pending",
+        "authority": true,
+        "dispositions": [
+          "pending"
+        ]
+      },
+      "visible": {
+        "values": [
+          {
+            "path": [
+              "x"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "y"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "z"
+            ],
+            "value": 0
+          }
+        ],
+        "entities": [
+          {
+            "ref": "original",
+            "key": "A",
+            "fields": {
+              "name": "Human name",
+              "priority": 0
+            }
+          }
+        ]
+      },
+      "canonical": {
+        "values": [
+          {
+            "path": [
+              "x"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "y"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "z"
+            ],
+            "value": 0
+          }
+        ],
+        "entities": [
+          {
+            "ref": "original",
+            "key": "A",
+            "fields": {
+              "name": "Human name",
+              "priority": 0
+            }
+          }
+        ]
+      },
+      "stats": {
+        "active": 1,
+        "retainedOperations": 1,
+        "history": 0
+      },
+      "events": 1
+    },
+    {
+      "step": "revised draft accepted",
+      "result": {
+        "status": "settled"
+      },
+      "state": {
+        "status": "accepted",
+        "authority": false,
+        "dispositions": [
+          "committed"
+        ]
+      },
+      "visible": {
+        "values": [
+          {
+            "path": [
+              "x"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "y"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "z"
+            ],
+            "value": 0
+          }
+        ],
+        "entities": [
+          {
+            "ref": "original",
+            "key": "A",
+            "fields": {
+              "name": "Human name",
+              "priority": 7
+            }
+          }
+        ]
+      },
+      "canonical": {
+        "values": [
+          {
+            "path": [
+              "x"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "y"
+            ],
+            "value": 0
+          },
+          {
+            "path": [
+              "z"
+            ],
+            "value": 0
+          }
+        ],
+        "entities": [
+          {
+            "ref": "original",
+            "key": "A",
+            "fields": {
+              "name": "Human name",
+              "priority": 7
+            }
+          }
+        ]
+      },
+      "stats": {
+        "active": 0,
+        "retainedOperations": 0,
+        "history": 0
+      },
+      "events": 2
+    }
+  ]
+}
