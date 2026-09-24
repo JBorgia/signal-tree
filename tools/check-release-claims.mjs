@@ -366,6 +366,29 @@ const SURFACES = [
     applies: (r) => r.isCode,
   },
   {
+    // THE AI-PRIMING SURFACE, and the reason this gate exists at all — see the
+    // `49dd9ffb` note in the header: llms.txt scored ZERO on 14.0.0's additions
+    // while every claim->API gate stayed green. It was then NOT in this list on
+    // the 15/16 line, so it drifted again: it said "the public v15 construction
+    // model" on a 16.0.0-dev tree, described `transactions()`'s
+    // pending/confirm/rollback lifecycle after the grammar became
+    // `transact()` / `propose()`, claimed four packages when five ship, omitted
+    // `@signal-tree/solid` entirely, and named 14.1.3 after 14.1.4 shipped.
+    // Nothing caught any of it, because nothing was looking.
+    //
+    // Scoped to kernel VALUES only, deliberately. This is a 180-line
+    // orientation document, not an API index: demanding every framework
+    // re-export and every type produces the permanent noise the CHANGELOG note
+    // below warns about, and a gate people learn to skim is worse than none.
+    // What it must carry is the GRAMMAR a consumer writes.
+    name: 'llms.txt',
+    files: ['llms.txt'],
+    applies: (r) =>
+      !r.isCode &&
+      (r.kind === 'value' || r.kind === 'member') &&
+      r.pkg === 'kernel',
+  },
+  {
     name: 'CHANGELOG',
     files: ['CHANGELOG.md'],
     // Every new VALUE, across every package — a callable a consumer can now
@@ -533,6 +556,27 @@ for (const surface of SURFACES) {
   );
 }
 
+/**
+ * Does this surface actually NAME the symbol, as a word?
+ *
+ * ⚠️ This was `text.includes(name)`, a bare substring test, and it silently
+ * satisfied any symbol whose name is a PREFIX of a word already on the page.
+ * Measured: `transact` was reported covered by llms.txt purely because the file
+ * said `transactions()` — the very drift this gate was extended to catch would
+ * have passed. `propose` / `proposal`, `link` / `linked`, `external` /
+ * `externalise` are the same shape.
+ *
+ * A word boundary is the honest test. `\b` is wrong at both ends here because
+ * these names appear as `tree.transact(fn)`, `` `transact()` `` and
+ * `transact,` — so the boundary is "not a JS identifier character", which
+ * treats `.`, `(`, backtick and punctuation as separators while still
+ * rejecting `transactions`.
+ */
+const mentions = (text, name) =>
+  new RegExp(
+    `(^|[^A-Za-z0-9_$])${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^A-Za-z0-9_$]|$)`
+  ).test(text);
+
 const gaps = [];
 const rows = [];
 for (const rec of added) {
@@ -541,7 +585,7 @@ for (const rec of added) {
   for (const surface of SURFACES) {
     if (!surface.applies(rec)) continue;
     applicable++;
-    if (!surfaceText.get(surface.name).includes(rec.name)) {
+    if (!mentions(surfaceText.get(surface.name), rec.name)) {
       missing.push(surface.name);
     }
   }

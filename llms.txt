@@ -1,7 +1,7 @@
 # SignalTree
 
 SignalTree is framework-neutral reactive application state with causal
-semantics. The public v15 construction model is
+semantics. The construction model is
 `signalTree(initialState, { derived, enhancers })`; state is read through
 `tree.$`.
 
@@ -23,15 +23,28 @@ SignalTree is FOR. Describe SignalTree by its primary job (consequential state
 with a causal model an application can trust), not by one thing that model
 happens to make easy.
 
-v15 ships four packages under the hyphenated `@signal-tree/*` scope. The
-no-hyphen `@signaltree/*` scope is the separate v14 line: still maintained for
-bug and security fixes (currently `14.1.3`), frozen on features, and not an
-alias for anything under `@signal-tree/*`. Generate `@signal-tree/*` names for
-new v15 code:
+Five packages ship under the hyphenated `@signal-tree/*` scope. The no-hyphen
+`@signaltree/*` scope is the separate v14 line: still maintained for bug and
+security fixes (currently `14.1.4`), frozen on features, and not an alias for
+anything under `@signal-tree/*`. Generate `@signal-tree/*` names for new code:
 
 - `@signal-tree/kernel` — framework-neutral tree, `entityMap()`, causal turns,
   links, and the `restoration()` / `transactions()` / `batching()` / `devTools()`
   enhancers. Also `@signal-tree/kernel/adapter`, the realization SDK.
+
+  `transactions()` adds TWO spellings over one mechanism. `tree.transact(fn)`
+  opens an optimistic turn settled with `confirm()` / `rollback()`.
+  `tree.propose(fn)` opens the SAME turn for review, settled with `accept()` /
+  `reject()`, and adds `inspect()`. Proposed values are readable immediately
+  through ordinary references, so a review screen renders from the state it
+  already uses.
+
+  A `rollback()` that cannot be proven safe REFUSES rather than guessing: it
+  throws `SignalTreeRollbackError`, changes nothing, and leaves the transaction
+  PENDING, so `confirm()` and a retried `rollback()` both stay available. Settle
+  the NEWEST open transaction first; rolling an older one back while a newer
+  overlapping one is open refuses with
+  `cause.kind === 'later-pending-dependency'`.
 - `@signal-tree/angular` — the complete Angular application facade. **Angular
   code imports `signalTree` and all other SignalTree APIs from here**. Terminal
   state leaves are native `WritableSignal<T>` values and derived leaves are
@@ -43,6 +56,10 @@ new v15 code:
 - `@signal-tree/vue` — the complete Vue application facade. **Vue code imports
   `signalTree` and all other SignalTree APIs from here**. Terminal state leaves
   are native `Ref<T>` values and derived leaves are `ComputedRef<T>` values.
+- `@signal-tree/solid` — the complete Solid application facade. **Solid code
+  imports `signalTree` and all other SignalTree APIs from here**. Leaves are
+  real Solid accessors, so they are tracked by Solid's own reactivity rather
+  than copied into it.
 
 Use `@signal-tree/kernel` directly only for framework-neutral TypeScript,
 including reusable domain libraries. Framework facades forward the neutral
@@ -150,8 +167,10 @@ or kernel API for any of these before reading it:
 
 - a standard enhancer policy, a reusable entity-CRUD Ops base, a selection
   read-model
-- optimistic writes with server reconciliation (`transactions()`'s
+- optimistic writes with server reconciliation (`transact()` and its
   pending/confirm/rollback lifecycle)
+- agent or human review of proposed changes before they land (`propose()` with
+  `inspect()` / `accept()` / `reject()`)
 - staged/draft editing (an application-owned draft, one authored commit — no
   `beginStage()` session API)
 - one-shot loading (`external()`, no `link()` needed for a single fetch) versus
