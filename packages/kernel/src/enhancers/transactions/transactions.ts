@@ -202,6 +202,8 @@ export interface InternalTransactionRuntime {
   getConfirmedTurnRecords(): readonly TransactionTurnRecord[];
   /** L15: opt-in evidence retention beyond the correctness obligation. */
   setHistoryRetention(retain: number): void;
+  /** Explicit retention metadata; the reader must not infer it from ids. */
+  getConfirmedRetention(): { truncated: boolean; firstAvailableTurnId?: number };
   /** @internal PROPOSAL-INSPECTION-0 raw material; unclassified. */
   describePendingTurn(
     turnId: number
@@ -624,7 +626,13 @@ class TransactionAuthority {
    * policy may not change silently, and `confirmedTurnReader` is a shipped
    * surface whose purpose is reading confirmed history.
    */
-  private historyConfigured = false;
+  /**
+   * Set once any confirmed record has actually been dropped. The reader must
+   * never infer truncation from id gaps — pending and rejected turns leave
+   * gaps too — so this is the explicit metadata internals.ts asks for,
+   * including the case where the whole window is gone.
+   */
+  private evictedConfirmed = false;
   private pendingTurns = new Map<number, TransactionTurnRecord>();
   private nextTurnId = 1;
   private queuedEvidence = new Map<number, Map<string, TurnEffect>>();
@@ -943,7 +951,6 @@ class TransactionAuthority {
 
   setHistoryRetention(retain: number): void {
     this.historyRetain = Number.isFinite(retain) && retain > 0 ? retain : 0;
-    this.historyConfigured = true;
     this.releaseConfirmedBeyondObligation();
   }
 
@@ -962,21 +969,23 @@ class TransactionAuthority {
    * layered on top of it.
    */
   private releaseConfirmedBeyondObligation(): void {
-    // No contract, no change. Pruning by default would empty a shipped reader
-    // whose whole purpose is confirmed history — measured: 19 existing tests
-    // across six files, including 10 in confirmed-turn-reader.spec.ts. What
-    // the default should be is an owner decision, recorded in
-    // docs/audits/2026-09-23-open-decisions.md, not something to settle by
-    // rewriting those tests.
-    if (!this.historyConfigured) return;
+    // Correctness-only is the DEFAULT (owner decision, 2026-09-24). Retaining
+    // records inside the correctness machinery for diagnostic purposes is the
+    // L15 violation itself, and the old default asserted a complete history
+    // that no contract backed — `truncated: false` was true only because
+    // nothing evicted. Diagnostics are now requested explicitly via
+    // `transactions({ history: { retain } })`, and the reader reports what it
+    // actually kept.
     if (this.confirmedTurns.length === 0) return;
     let minPending = Infinity;
     for (const id of this.pendingTurns.keys()) {
       if (id < minPending) minPending = id;
     }
     const required = (turn: TransactionTurnRecord) => turn.id > minPending;
+    const before = this.confirmedTurns.length;
     if (this.historyRetain <= 0) {
       this.confirmedTurns = this.confirmedTurns.filter(required);
+      if (this.confirmedTurns.length < before) this.evictedConfirmed = true;
       return;
     }
     const keep = new Set<number>();
@@ -985,6 +994,18 @@ class TransactionAuthority {
     for (const turn of this.confirmedTurns.slice(-this.historyRetain))
       keep.add(turn.id);
     this.confirmedTurns = this.confirmedTurns.filter((t) => keep.has(t.id));
+    if (this.confirmedTurns.length < before) this.evictedConfirmed = true;
+  }
+
+  /** Explicit retention metadata for the reader. Never inferred from ids. */
+  getConfirmedRetention(): {
+    truncated: boolean;
+    firstAvailableTurnId?: number;
+  } {
+    return {
+      truncated: this.evictedConfirmed,
+      firstAvailableTurnId: this.confirmedTurns[0]?.id,
+    };
   }
 
   releaseConfirmedTurnsOnDestroy(): void {
@@ -2678,6 +2699,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     getConfirmedTurnRecords: () => authority.getConfirmedTurnRecords(),
     setHistoryRetention: (retain: number) =>
       authority.setHistoryRetention(retain),
+    getConfirmedRetention: () => authority.getConfirmedRetention(),
     describePendingTurn: inspectPendingTurn,
     getInspectionFootprintCountsForTesting: () => ({
       writers: inspectionWrites.size,

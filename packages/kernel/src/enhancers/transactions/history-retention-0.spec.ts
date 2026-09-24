@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { confirmedTurnReader } from '../../internals';
 import { signalTree } from '../../lib/signal-tree';
 import { transactions } from './transactions';
 
@@ -165,47 +166,22 @@ describe('HISTORY-RETENTION-0 / 4 — diagnostics are opt-in and bounded', () =>
   });
 });
 
-describe('HISTORY-RETENTION-0 / 6 — the DEFAULT is deliberately unchanged', () => {
-  it('without an explicit contract the reader still sees confirmed history', async () => {
+describe('HISTORY-RETENTION-0 / 6 — the DEFAULT is correctness-only', () => {
+  it('supersedes the earlier gated default, which asserted a promise nothing backed', async () => {
     const store = make();
     const t = store.transact(() => store.$.y(1));
     t.confirm();
     await flush();
 
-    // `confirmedTurnReader` is a shipped surface whose purpose is reading
-    // confirmed history. Pruning by default empties it — measured as 19
-    // failures across six files, 10 of them in confirmed-turn-reader.spec.ts.
-    // The decision states the reader-visible policy may not change silently,
-    // so the obligation bound applies only once a contract is requested.
-    // What the default SHOULD be is an owner decision, not something to settle
-    // by rewriting those 19 tests.
-    expect(store.__transactions.getConfirmedTurnCount()).toBe(1);
-  });
-});
-
-describe('HISTORY-RETENTION-0 / 7 — ORDINARY writes are bounded too', () => {
-  /**
-   * The prune was reachable only from confirmPending/discardPending, i.e. from
-   * settling a transact(). `recordConfirmed` — the path every ORDINARY write
-   * takes on flush — inserted and returned. So the obligation bound applied to
-   * transactional churn only, and `retain: 5` retained 49.
-   */
-  it('retain: 5 bounds churn that never uses a transaction', async () => {
-    const store = make({ history: { retain: 5 } });
-    for (let i = 0; i < 50; i++) {
-      store.$.y(i);
-      await flush();
-    }
-    expect(store.__transactions.getPendingTurnCount()).toBe(0);
-    expect(store.__transactions.getConfirmedTurnCount()).toBeLessThanOrEqual(5);
-  });
-
-  it('retain: 0 keeps nothing from ordinary writes', async () => {
-    const store = make({ history: { retain: 0 } });
-    for (let i = 0; i < 20; i++) {
-      store.$.y(i);
-      await flush();
-    }
+    // This case previously asserted the OPPOSITE — that an unconfigured tree
+    // still retained confirmed history. That default was kept because flipping
+    // it broke 19 tests, which was the wrong reason: those tests encode a
+    // contract, and the contract was the thing under review.
+    //
+    // The old default asserted a COMPLETE history (`truncated: false`) that no
+    // retention policy backed; it was true only because nothing evicted.
+    // Correctness-only is now the default and diagnostics are requested
+    // explicitly. Owner decision, 2026-09-24.
     expect(store.__transactions.getConfirmedTurnCount()).toBe(0);
   });
 });
@@ -237,5 +213,69 @@ describe('HISTORY-RETENTION-0 / 5 — R06: diagnostics must not change correctne
     // correctness and evidence are entangled and L15 is broken regardless of
     // what the byte counts say.
     expect(withHistory).toEqual(withoutHistory);
+  });
+});
+
+const readRetention = (store: Store) =>
+  confirmedTurnReader(store as never)?.readConfirmedTurns().retention;
+
+const readTurnCount = (store: Store) =>
+  confirmedTurnReader(store as never)?.readConfirmedTurns().turns.length;
+
+describe('HISTORY-RETENTION-0 / 8 — correctness-only is the DEFAULT', () => {
+  it('a tree with no retention contract keeps no diagnostic history', async () => {
+    const store = make();
+    for (let i = 0; i < 5; i++) {
+      store.$.y(i);
+      await flush();
+    }
+    expect(store.__transactions.getPendingTurnCount()).toBe(0);
+    expect(store.__transactions.getConfirmedTurnCount()).toBe(0);
+  });
+
+  it('the reader says TRUNCATED rather than reporting an empty history', async () => {
+    const store = make();
+    store.$.y(1);
+    await flush();
+
+    // The distinction that makes this honest: "nothing retained because there
+    // is no contract" must be distinguishable from "nothing happened".
+    // Reporting truncated:false with zero turns would assert a complete
+    // history that was never kept.
+    expect(readTurnCount(store)).toBe(0);
+    expect(readRetention(store)?.truncated).toBe(true);
+  });
+
+  it('an untouched tree is NOT truncated — nothing was evicted', async () => {
+    const store = make();
+    expect(readTurnCount(store)).toBe(0);
+    expect(readRetention(store)?.truncated).toBe(false);
+  });
+});
+
+describe('HISTORY-RETENTION-0 / 9 — a contract makes the reader complete again', () => {
+  it('retain covering all work reports NOT truncated', async () => {
+    const store = make({ history: { retain: 100 } });
+    // Start at 1: y is already 0, so writing 0 is a no-op and builds no turn.
+    for (let i = 1; i <= 3; i++) {
+      store.$.y(i);
+      await flush();
+    }
+    expect(readTurnCount(store)).toBe(3);
+    expect(readRetention(store)?.truncated).toBe(false);
+    expect(readRetention(store)?.firstAvailableTurnId).toBe(1);
+  });
+
+  it('retain SMALLER than the work reports truncated, with the surviving first id', async () => {
+    const store = make({ history: { retain: 2 } });
+    for (let i = 1; i <= 6; i++) {
+      store.$.y(i);
+      await flush();
+    }
+    const retention = readRetention(store);
+    expect(readTurnCount(store)).toBeLessThanOrEqual(2);
+    expect(retention?.truncated).toBe(true);
+    // Reported from what actually survived, never inferred from id gaps.
+    expect(retention?.firstAvailableTurnId).toBeGreaterThan(1);
   });
 });
