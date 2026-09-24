@@ -370,6 +370,12 @@ const EXEMPT = new Map(
       'internal WriteMetadata transaction token used by transactions()',
     transactionOwner:
       'internal WriteMetadata tree token used to isolate transactions()',
+    addressFor:
+      '@internal PositionRegistry member, not app-facing: resolves a PositionId to its typed segment address for link egress (link.ts). This is the L17 identity machinery that replaced string-path splitting; the public surfaces it serves are link() payloads and entity addressing, both documented',
+    registerPositionAddress:
+      '@internal PositionRegistry member, not app-facing: records a position\'s typed segment address at materialization (signal-tree.ts, entity-signal.ts). Same L17 machinery as addressFor',
+    getInspectionFootprintCountsForTesting:
+      '@internal test accessor, named so: exposes inspection writer/footprint counts so the retention of proposal inspection state can be asserted without reaching into closure-local structures',
     getConfirmedRetention:
       '@internal member of InternalTransactionRuntime, not app-facing: supplies the explicit retention metadata internals.ts requires ("the authority must supply explicit retention metadata; never infer it from IDs"). The public surface it feeds is confirmedTurnReader().readConfirmedTurns().retention, and the behaviour change IS documented in the 16.0.0 CHANGELOG',
     setHistoryRetention:
