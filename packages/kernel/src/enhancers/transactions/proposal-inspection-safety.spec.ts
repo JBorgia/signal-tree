@@ -33,12 +33,12 @@ describe('proposal inspection safety', () => {
         });
         if (deliver) await flush();
         expect.soft(older.inspect().changes).toEqual([
-          { path: 'x', status: 'current' },
-          { path: 'y', status: 'superseded' },
+          { path: 'x', address: ['x'], status: 'current' },
+          { path: 'y', address: ['y'], status: 'superseded' },
         ]);
         expect(newer.inspect().changes).toEqual([
-          { path: 'y', status: 'current' },
-          { path: 'z', status: 'current' },
+          { path: 'y', address: ['y'], status: 'current' },
+          { path: 'z', address: ['z'], status: 'current' },
         ]);
         newer.reject();
         expect({ x: tree.$.x(), y: tree.$.y(), z: tree.$.z() }).toEqual({
@@ -47,13 +47,13 @@ describe('proposal inspection safety', () => {
           z: 0,
         });
         expect(older.inspect().changes).toEqual([
-          { path: 'x', status: 'current' },
-          { path: 'y', status: 'current' },
+          { path: 'x', address: ['x'], status: 'current' },
+          { path: 'y', address: ['y'], status: 'current' },
         ]);
         await flush();
         expect(older.inspect().changes).toEqual([
-          { path: 'x', status: 'current' },
-          { path: 'y', status: 'current' },
+          { path: 'x', address: ['x'], status: 'current' },
+          { path: 'y', address: ['y'], status: 'current' },
         ]);
       } finally {
         tree.destroy();
@@ -76,8 +76,8 @@ describe('proposal inspection safety', () => {
         if (deliver) await flush();
         expect(tree.$.y()).toBe(9);
         expect(proposal.inspect().changes).toEqual([
-          { path: 'x', status: 'current' },
-          { path: 'y', status: 'superseded' },
+          { path: 'x', address: ['x'], status: 'current' },
+          { path: 'y', address: ['y'], status: 'superseded' },
         ]);
       } finally {
         tree.destroy();
@@ -113,8 +113,8 @@ describe('proposal inspection safety', () => {
           n: { a: writer === 'external-aba' ? 1 : 2 },
         });
         expect(proposal.inspect().changes).toEqual([
-          { path: 'rows.A.n.a', status: 'current' },
-          { path: 'rows.A.n', status: 'superseded' },
+          { path: 'rows.A.n.a', address: ['rows'], subject: expect.any(Number), status: 'current' },
+          { path: 'rows.A.n', address: ['rows'], subject: expect.any(Number), status: 'superseded' },
         ]);
       } finally {
         tree.destroy();
@@ -136,7 +136,7 @@ describe('proposal inspection safety', () => {
       external(() => tree.$.rows.updateOne('A', { value: 2 }));
       await flush();
       expect(proposal.inspect().changes).toEqual([
-        { path: 'rows.A', status: 'current' },
+        { path: 'rows.A', address: ['rows'], subject: expect.any(Number), status: 'current' },
       ]);
     } finally {
       tree.destroy();

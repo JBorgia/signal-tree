@@ -147,7 +147,7 @@ describe('private enqueue observation', () => {
       getPathNotifier().emitReset();
       const fresh = tree.propose(() => tree.$.x(2));
       expect(fresh.inspect().changes).toEqual([
-        { path: 'x', status: 'current' },
+        { path: 'x', address: ['x'], status: 'current' },
       ]);
     } finally {
       tree.destroy();

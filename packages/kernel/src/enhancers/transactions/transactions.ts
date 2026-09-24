@@ -2928,9 +2928,19 @@ export function transactions(
         if (!raw) {
           return { changes: [] };
         }
+        // The registry already holds the typed segment address for every
+        // position — the same L17 machinery `link()` egress uses. Projecting
+        // only the dotted string was what made two different locations
+        // indistinguishable to a reviewer.
+        const registry = getPositionRegistry(tree.$);
         return {
           changes: raw.effects.map((effect) => ({
             path: effect.path,
+            address: registry?.addressFor(effect.position),
+            subject:
+              'subject' in effect && typeof effect.subject === 'number'
+                ? effect.subject
+                : undefined,
             status: classifyProposedEffect(effect, raw.laterEffects),
           })),
         };
