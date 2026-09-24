@@ -3,7 +3,28 @@
 **TL;DR** — **Breaking, and deliberately so.** `tree.transaction()` is renamed
 to `tree.transact()` and the old spelling is **removed, not deprecated**. One
 new method, `tree.propose()`, plus five new public types. Two transaction
-rollback correctness defects are fixed. The migration is one mechanical rename.
+rollback correctness defects are fixed. The rename is mechanical; if you read
+confirmed history through `@signaltree/kernel/internals`, see the retention
+change below as well.
+
+**Also breaking:** `transactions()` now retains confirmed turns only while a
+live obligation needs them. `confirmedTurnReader(tree).readConfirmedTurns()` on
+a plain `transactions()` tree returned the full confirmed history in 15.x; it
+now returns `{ turns: [], retention: { truncated: true } }`. `truncated: true`
+with zero turns means "no retention contract", which is deliberately
+distinguishable from "nothing happened" (`truncated: false`).
+
+Migration for readers of that surface — Studio, devtools, anything importing
+`@signaltree/kernel/internals`:
+
+```ts
+transactions({ history: { retain: 1000 } })
+```
+
+The previous default reported `truncated: false` — a claim of COMPLETE history
+— while no retention policy existed at all; it held only because nothing ever
+evicted. Diagnostic retention is now requested explicitly and costs memory
+visibly at the call site.
 
 ### Breaking changes
 

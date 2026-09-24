@@ -986,6 +986,7 @@ class TransactionAuthority {
     if (this.historyRetain <= 0) {
       this.confirmedTurns = this.confirmedTurns.filter(required);
       if (this.confirmedTurns.length < before) this.evictedConfirmed = true;
+      this.forgetStampsOutside();
       return;
     }
     const keep = new Set<number>();
@@ -995,6 +996,23 @@ class TransactionAuthority {
       keep.add(turn.id);
     this.confirmedTurns = this.confirmedTurns.filter((t) => keep.has(t.id));
     if (this.confirmedTurns.length < before) this.evictedConfirmed = true;
+    this.forgetStampsOutside();
+  }
+
+  /**
+   * `confirmedAtSeq` is CORRECTNESS state — `getPendingRollbackPlan` reads it
+   * to order `authoredLater` — so L15 binds it exactly as it binds the records
+   * themselves. Bounding the array while letting the stamps accumulate left
+   * ~50 B per settled turn growing linearly forever while the ledger reported
+   * zero retained records, which made "correctness-only retention" only half
+   * true.
+   */
+  private forgetStampsOutside(): void {
+    if (this.confirmedAtSeq.size === 0) return;
+    const live = new Set(this.confirmedTurns.map((turn) => turn.id));
+    for (const id of this.confirmedAtSeq.keys()) {
+      if (!live.has(id)) this.confirmedAtSeq.delete(id);
+    }
   }
 
   /** Explicit retention metadata for the reader. Never inferred from ids. */
@@ -1009,6 +1027,7 @@ class TransactionAuthority {
   }
 
   releaseConfirmedTurnsOnDestroy(): void {
+    this.confirmedAtSeq.clear();
     // Drop authority ownership without mutating records or arrays already
     // returned to callers. Live history retention remains unchanged.
     this.confirmedTurns = [];

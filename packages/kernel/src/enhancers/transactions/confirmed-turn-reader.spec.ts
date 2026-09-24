@@ -168,8 +168,15 @@ describe('confirmedTurnReader', () => {
 
     const retention = confirmedTurnReader(tree as never)?.readConfirmedTurns()
       .retention;
-    // No confirmed records are evicted today; pending/rejected ID gaps do not
-    // imply missing confirmed history. Future eviction needs explicit metadata.
+    // Eviction EXISTS now (L15, 95a60054). This tree declares retain:1000 and
+    // writes once, so nothing is evicted and `truncated` is legitimately false
+    // — but that makes this case a CONTROL for the non-truncated path, not a
+    // test of truthful truncation.
+    //
+    // The truthful-truncation path is exercised in history-retention-0.spec.ts
+    // ("retain SMALLER than the work reports truncated"). 95a60054's message
+    // claimed this test had been strengthened; it was not touched, and that
+    // claim is corrected in the commit that added this comment.
     expect(retention?.truncated).toBe(false);
     expect(retention?.firstAvailableTurnId).toBe(1);
   });
