@@ -4,7 +4,9 @@
 to `tree.transact()` and the old spelling is **removed, not deprecated**. One
 new method, `tree.propose()`, plus five new public types. The transaction rollback
 correctness defects described here SHIPPED IN 15.3.0 — see that entry; this
-section predates it and is kept for the vocabulary change only. The migration is one mechanical rename.
+section predates it and is kept for the vocabulary change only. The rename is
+mechanical; if you read confirmed history through `@signaltree/kernel/internals`,
+see the retention note below.
 
 ### Breaking changes
 

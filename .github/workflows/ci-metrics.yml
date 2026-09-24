@@ -31,6 +31,9 @@ jobs:
       - name: Run CI checks (JSDoc + sizes)
         run: node scripts/ci-checks.js --jsdoc --sizes
 
+      - name: Check benchmark API boundaries (mocked network)
+        run: node --test tools/check-benchmark-api-selftest.mjs
+
       - name: Run metrics unit tests
         run: pnpm exec vitest run scripts/__tests__/metrics.test.cjs --config vitest.config.ts
 

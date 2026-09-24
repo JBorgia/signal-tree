@@ -1,7 +1,10 @@
 /**
- * MIGRATED for the L15 default (15.x port). Correctness-only is the default,
- * so a tree that wants diagnostic history declares it. No assertion is
- * loosened; these trees now REQUEST the history they were always reading.
+ * MIGRATED 2026-09-24 for the L15 default. Correctness-only is now the default,
+ * so a tree that wants diagnostic history declares it. Every tree in this file
+ * does, because reading confirmed history is this file's entire subject.
+ *
+ * No assertion was loosened. The only change is that these trees now REQUEST
+ * the history they were always reading.
  */
 import { describe, expect, it } from 'vitest';
 
@@ -14,10 +17,9 @@ type Cart = { promoCode: string | null; discount: number; total: number };
 type Row = { id: string; name: string };
 
 const cartTree = () =>
-  signalTree(
-    { promoCode: null, discount: 0, total: 12000 } as Cart,
-    { enhancers: [transactions({ history: { retain: 1000 } })] }
-  ) as never as {
+  signalTree({ promoCode: null, discount: 0, total: 12000 } as Cart, {
+    enhancers: [transactions({ history: { retain: 1000 } })],
+  }) as never as {
     $: Record<string, (value?: unknown) => unknown>;
     transact(fn: () => void): { confirm(): void };
   };
@@ -164,14 +166,54 @@ describe('confirmedTurnReader', () => {
     const tree = cartTree();
     tree.transact(() => tree.$['total'](9600)).confirm();
 
-    const retention = confirmedTurnReader(tree as never)?.readConfirmedTurns().retention;
-    // `truncated` is asserted by the authority, not derived from ids. This
-    // tree declares retain:1000 and writes once, so nothing is evicted and
-    // false is correct — a CONTROL for the non-truncated direction. The
-    // truncation direction is covered in history-retention-15.spec.ts.
+    const retention = confirmedTurnReader(tree as never)?.readConfirmedTurns()
+      .retention;
+    // Eviction EXISTS now (L15, 95a60054). This tree declares retain:1000 and
+    // writes once, so nothing is evicted and `truncated` is legitimately false
+    // — but that makes this case a CONTROL for the non-truncated path, not a
+    // test of truthful truncation.
+    //
+    // The truthful-truncation path is exercised in history-retention-0.spec.ts
+    // ("retain SMALLER than the work reports truncated"). 95a60054's message
+    // claimed this test had been strengthened; it was not touched, and that
+    // claim is corrected in the commit that added this comment.
     expect(retention?.truncated).toBe(false);
     expect(retention?.firstAvailableTurnId).toBe(1);
   });
+
+  it.each(['rejected', 'pending'] as const)(
+    'does not report missing confirmed history when an earlier ID is %s',
+    (state) => {
+      const tree = signalTree({ x: 0, y: 0 }, { enhancers: [transactions({ history: { retain: 1000 } })] });
+      try {
+        const first = tree.transact(() => tree.$.x(1));
+        if (state === 'rejected') first.rollback();
+        tree.transact(() => tree.$.y(2)).confirm();
+        const reader = confirmedTurnReader(tree)!;
+        const snapshot = reader.readConfirmedTurns();
+        expect(snapshot.turns.map(({ id }) => id)).toEqual([2]);
+        expect(snapshot.retention).toEqual({
+          truncated: false,
+          firstAvailableTurnId: 2,
+        });
+        if (state === 'pending') {
+          first.confirm();
+          const complete = reader.readConfirmedTurns();
+          expect(complete.turns.map(({ id }) => id)).toEqual([1, 2]);
+          expect(complete.retention).toEqual({
+            truncated: false,
+            firstAvailableTurnId: 1,
+          });
+        }
+        tree.destroy();
+        expect(() => reader.readConfirmedTurns()).toThrow(
+          /STUDIO_TREE_DESTROYED/
+        );
+      } finally {
+        tree.destroy();
+      }
+    }
+  );
 
   /**
    * 10. Zero-cost when unused. A tree that never ran a transaction has no

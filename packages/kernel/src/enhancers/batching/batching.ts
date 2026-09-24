@@ -1,14 +1,22 @@
+import {
+  getActiveWriteContext,
+  withWriteContext,
+} from '../../lib/write-context';
+import {
+  isRestorationDesignated,
+  withCapturedRestorationDesignation,
+} from '../../lib/internals/restoration-eligibility';
 import { visitTree } from '../../lib/internals/visit-tree';
 import {
   interceptLocationWrites,
+  getLocationRuntime,
+  createWritableProjection,
   isWritableLocation,
 } from '../../lib/internals/location-runtime';
 
-import type {
-  ISignalTree,
-  Enhancer,
-  EnhancerMeta,
-} from '../../lib/types';
+import type { LocationWriteOperation } from '../../lib/internals/location-runtime';
+import type { Location } from '../../lib/internals/cell-runtime';
+import type { ISignalTree, Enhancer, EnhancerMeta } from '../../lib/types';
 import type { BatchingConfig, BatchingMethods } from './batching.types';
 import { ENHANCER_META } from '../../lib/types';
 import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
@@ -16,6 +24,27 @@ import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation
 type ChangeDetectionAwareTree = {
   __notifyChangeDetection?: () => void;
 };
+
+type WritePort = {
+  intercept?: (
+    node: Location<unknown>,
+    operation: LocationWriteOperation<unknown>,
+    proceed: () => void
+  ) => void;
+};
+
+// Keep escaped locations outside the enhancer's lexical environment. Clearing
+// this shared port on destruction detaches every lazy field without retaining
+// fields through a collection of disposal closures.
+function interceptThroughPort(
+  node: Location<unknown>,
+  port: WritePort
+): () => void {
+  return interceptLocationWrites(node, (operation, proceed) => {
+    if (port.intercept) port.intercept(node, operation, proceed);
+    else proceed();
+  });
+}
 
 /**
  * Batching enhancer for SignalTree.
@@ -77,9 +106,13 @@ export function batching(
     let notificationTimeoutId: ReturnType<typeof setTimeout> | undefined;
     let inBatch = false;
     let inCoalesce = false;
+    let coalesceTransaction: number | undefined;
+    let coalesceOwner: object | undefined;
 
-    // For coalesce: track pending writes by path
-    const coalescedUpdates = new Map<string, () => void>();
+    // Coalescing keys are physical locations, never presentation paths.
+    const coalescedUpdates = new Map<object, () => void>();
+    let active = true;
+    const intercepted = new WeakSet<object>();
     const releaseWriteInterceptors: Array<() => void> = [];
 
     /**
@@ -126,7 +159,17 @@ export function batching(
       const updates = Array.from(coalescedUpdates.values());
       coalescedUpdates.clear();
 
-      for (const update of updates) update();
+      let failed = false;
+      let firstFailure: unknown;
+      for (const update of updates) {
+        try {
+          update();
+        } catch (error) {
+          if (!failed) firstFailure = error;
+          failed = true;
+        }
+      }
+      if (failed) throw firstFailure;
     };
 
     // ========================================
@@ -138,33 +181,76 @@ export function batching(
      * identity. Values remain synchronous except replacement writes explicitly
      * deduplicated inside `coalesce()`.
      */
+    const writePort: WritePort = {
+      intercept(node, operation, proceed) {
+        const meta = inCoalesce ? getActiveWriteContext() : undefined;
+        // An updater can flush a preceding replacement, so it must pass the
+        // same scope check before either the pending write or updater runs.
+        if (
+          inCoalesce &&
+          (meta?.transactionId !== coalesceTransaction ||
+            meta?.transactionOwner !== coalesceOwner)
+        ) {
+          throw new Error(
+            'A transaction cannot defer its writes beyond its callback; put coalesce() inside the transaction'
+          );
+        }
+        if (operation.intent === 'replace' && inCoalesce) {
+          const capturedMeta = { ...(meta ?? {}) };
+          const designated = isRestorationDesignated();
+          coalescedUpdates.set(node, () =>
+            withWriteContext(capturedMeta, () =>
+              withCapturedRestorationDesignation(designated, proceed)
+            )
+          );
+        } else {
+          if (inCoalesce) {
+            const pendingReplace = coalescedUpdates.get(node);
+            if (pendingReplace) {
+              coalescedUpdates.delete(node);
+              pendingReplace();
+            }
+          }
+          proceed();
+        }
+        if (!inBatch) scheduleNotification();
+      },
+    };
+    const interceptWrite = (node: Location<unknown>): (() => void) => {
+      if (!active || intercepted.has(node)) return () => undefined;
+      intercepted.add(node);
+      return interceptThroughPort(node, writePort);
+    };
     const interceptWrites = (rootNode: Record<string, unknown>): void => {
       visitTree(
         rootNode,
-        (node, path) => {
+        (node) => {
           if (!isWritableLocation(node)) return true;
-          releaseWriteInterceptors.push(
-            interceptLocationWrites(node, (operation, proceed) => {
-              if (operation.intent === 'replace' && inCoalesce) {
-                coalescedUpdates.set(path, proceed);
-              } else {
-                if (inCoalesce) {
-                  const pendingReplace = coalescedUpdates.get(path);
-                  if (pendingReplace) {
-                    coalescedUpdates.delete(path);
-                    pendingReplace();
-                  }
-                }
-                proceed();
-              }
-              if (!inBatch) scheduleNotification();
-            })
-          );
+          releaseWriteInterceptors.push(interceptWrite(node));
           return false;
         },
         { skipKey: (key) => key.startsWith('_') }
       );
     };
+
+    // Entity fields materialize lazily using this tree's construction-local
+    // runtime. Intercept at creation without materializing or retaining rows.
+    const runtime = getLocationRuntime(tree);
+    const originalProjection = runtime?.createWritableProjection;
+    const createProjection = <V>(
+      compute: () => V,
+      write: (value: V, intent: 'replace' | 'derive') => void
+    ): Location<V> => {
+      if (!runtime) throw new Error('Missing tree location runtime');
+      const location = originalProjection
+        ? originalProjection<V>(compute, write)
+        : createWritableProjection(runtime.createDerived(compute), write);
+      // Do not store a release closure: it would keep retired fields alive.
+      // The shared port detaches the callback from this tree at disposal.
+      interceptWrite(location as Location<unknown>);
+      return location;
+    };
+    if (runtime) runtime.createWritableProjection = createProjection;
 
     // Wrap the tree's $ proxy
     if (tree.$) {
@@ -202,6 +288,12 @@ export function batching(
        */
       coalesce(fn: () => void): void {
         const wasCoalescing = inCoalesce;
+        const previousTransaction = coalesceTransaction;
+        const previousOwner = coalesceOwner;
+        if (!wasCoalescing) {
+          coalesceTransaction = getActiveWriteContext()?.transactionId;
+          coalesceOwner = getActiveWriteContext()?.transactionOwner;
+        }
         const wasBatching = inBatch;
         const failures: unknown[] = [];
         inCoalesce = true;
@@ -213,6 +305,8 @@ export function batching(
           failures.push(error);
         } finally {
           inCoalesce = wasCoalescing;
+          coalesceTransaction = previousTransaction;
+          coalesceOwner = previousOwner;
           inBatch = wasBatching;
         }
 
@@ -233,7 +327,10 @@ export function batching(
         }
 
         for (const secondary of failures.slice(1)) {
-          console.error('[SignalTree] Secondary error in coalesce():', secondary);
+          console.error(
+            '[SignalTree] Secondary error in coalesce():',
+            secondary
+          );
         }
         if (failures.length > 0) throw failures[0];
       },
@@ -255,6 +352,13 @@ export function batching(
     // Register cleanup for tree destruction
     if (typeof tree.registerCleanup === 'function') {
       tree.registerCleanup(() => {
+        active = false;
+        writePort.intercept = undefined;
+        if (runtime?.createWritableProjection === createProjection) {
+          if (originalProjection)
+            runtime.createWritableProjection = originalProjection;
+          else delete runtime.createWritableProjection;
+        }
         if (notificationTimeoutId !== undefined) {
           clearTimeout(notificationTimeoutId);
           notificationTimeoutId = undefined;

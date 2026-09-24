@@ -1,7 +1,7 @@
 /**
  * Dev-code foldability gate.
  *
- * Every dev-only diagnostic in core sits behind `ngDevMode`:
+ * The advisory guards checked here use `ngDevMode`:
  *
  *     if (typeof ngDevMode === 'undefined' || ngDevMode) { console.warn('[ST20xx] …') }
  *
@@ -24,20 +24,15 @@
  *   1. the defined build is smaller (folding actually happens), and
  *   2. no DEV-WARNING diagnostic survives in the defined build.
  *
- * (2) is deliberately narrow, and the distinction matters. Two different things
- * carry `[ST####]` codes:
+ * (2) is deliberately narrow: advisory warnings must disappear; required
+ * thrown errors must retain readable messages. The consumer probes below
+ * exercise both, including a real ST1001 failure in a no-process browser VM.
+ * Do not classify all ST2xxx codes as warnings or all error prose as dev-only.
  *
- *   - **Thrown errors** (`ST1xxx`, plus `ST2004`/`ST2005`/`ST2006`) SHOULD ship to
- *     production. An exception with no message is useless in a stack trace, which
- *     is why `constants.ts` sets `PROD_MESSAGES = DEV_MESSAGES` and keeps each
- *     string under ~25 chars. These surviving is correct, not a leak.
- *   - **Dev-mode warnings** (`ST2001`/`ST2002`/`ST2003`/`ST2007`) are advisory only
- *     and must disappear. They exist to catch mistakes at author time.
- *
- * So this gate asserts only that the WARN set folds away. A future contributor
- * writing a gate the bundler cannot fold — `if (isDev())`, a helper call, anything
- * that isn't a bare `ngDevMode` comparison — leaves advisory prose in production
- * and fails here.
+ * The default run reads built dist for the kernel and all four facades. It
+ * never rebuilds artifacts. --source-probes uses current source and labels its
+ * results as interim evidence, not built-package qualification. Neither mode
+ * qualifies automatic NODE_ENV-only removal; the production define is explicit.
  *
  * Keep WARN_ONLY_CODES in sync when adding an ST2xxx: warning → add it; throw →
  * don't.
@@ -46,10 +41,19 @@
  * one owns the *shape* of the dev gates.
  */
 import { build } from 'esbuild';
+import {
+  checkConsumerGuards,
+  checkConsumerGuardSelfTest,
+} from './check-devmode-consumers.mjs';
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
+
+if (process.argv.includes('--source-probes')) {
+  await checkConsumerGuards({ source: true });
+  process.exit(0);
+}
 
 const CORE = new URL('../dist/packages/kernel/dist/index.js', import.meta.url)
   .pathname;
@@ -92,7 +96,10 @@ async function measure(id, code, define) {
     ...(define ? { define: { ngDevMode: 'false' } } : {}),
   });
   const text = Buffer.from(out.outputFiles[0].contents).toString('utf8');
-  return { gzipKB: gzipSync(Buffer.from(text), { level: 9 }).length / 1024, text };
+  return {
+    gzipKB: gzipSync(Buffer.from(text), { level: 9 }).length / 1024,
+    text,
+  };
 }
 
 /**
@@ -124,7 +131,10 @@ function findDiagnostics(text) {
  * A checker that cannot detect either is reported as broken.
  */
 if (process.argv.includes('--self-test')) {
-  console.log('Self-test — the checker must FAIL against deliberately broken fixtures\n');
+  await checkConsumerGuardSelfTest();
+  console.log(
+    'Self-test — the checker must FAIL against deliberately broken fixtures\n'
+  );
   let bad = 0;
 
   // 1. An advisory code that cannot fold: a bare string literal survives every
@@ -136,7 +146,9 @@ if (process.argv.includes('--self-test')) {
   );
   const caughtLiteral = findDiagnostics(survives.text).includes('ST2001');
   console.log(
-    `  ${caughtLiteral ? '✓' : '✗'} detects an advisory literal surviving ngDevMode=false`
+    `  ${
+      caughtLiteral ? '✓' : '✗'
+    } detects an advisory literal surviving ngDevMode=false`
   );
   if (!caughtLiteral) bad++;
 
@@ -147,7 +159,9 @@ if (process.argv.includes('--self-test')) {
   const prodInert = await measure('selftest-inert', inert, true);
   const caughtNoShrink = !(devInert.gzipKB - prodInert.gzipKB > 0.01);
   console.log(
-    `  ${caughtNoShrink ? '✓' : '✗'} detects a bundle that does not shrink at all`
+    `  ${
+      caughtNoShrink ? '✓' : '✗'
+    } detects a bundle that does not shrink at all`
   );
   if (!caughtNoShrink) bad++;
 
@@ -159,7 +173,9 @@ if (process.argv.includes('--self-test')) {
   process.exit(bad ? 1 : 0);
 }
 
-console.log('🔍 Verifying dev-only code folds when ngDevMode is defined false\n');
+console.log(
+  '🔍 Verifying dev-only code folds when ngDevMode is defined false\n'
+);
 
 let failed = false;
 let totalSaved = 0;
@@ -187,7 +203,9 @@ for (const [id, code] of Object.entries(TARGETS)) {
   }
   if (leftovers.length > 0) {
     console.log(
-      `   ↳ diagnostic literals survived: ${leftovers.join(', ')} — these ship ` +
+      `   ↳ diagnostic literals survived: ${leftovers.join(
+        ', '
+      )} — these ship ` +
         `to production even with ngDevMode=false. Check that every guard is a ` +
         `bare \`ngDevMode\` comparison, not a function call.`
     );
@@ -195,8 +213,12 @@ for (const [id, code] of Object.entries(TARGETS)) {
 }
 
 console.log(
-  `\n${failed ? '❌' : '✅'} Dev code is ${failed ? 'NOT ' : ''}fully foldable` +
-    ` — consumers defining ngDevMode=false reclaim ~${(totalSaved / Object.keys(TARGETS).length).toFixed(2)}KB gzip per tree.`
+  `\n${failed ? '❌' : '✅'} Dev code is ${
+    failed ? 'NOT ' : ''
+  }fully foldable` +
+    ` — consumers defining ngDevMode=false reclaim ~${(
+      totalSaved / Object.keys(TARGETS).length
+    ).toFixed(2)}KB gzip per tree.`
 );
 
 if (failed) {
@@ -206,3 +228,5 @@ if (failed) {
   );
   process.exit(1);
 }
+
+await checkConsumerGuards();

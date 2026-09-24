@@ -268,17 +268,30 @@ export type {
 export type { TransactionMethods } from './enhancers/transactions/transactions.types';
 // PROPOSAL-0. Same rule again: `TransactionMethods.propose()` returns
 // `Proposal`, and `Proposal.inspect()`/`accept()` return the inspection types,
-// so each is a nameable return type of a kept public API. Nothing here carries
-// kernel identity — `ProposalChange` is `{ path, status }`, proven sufficient
-// by PROPOSAL-REVIEW-SURFACE-0 while subject lifetime stays internal.
+// so each is a nameable return type of a kept public API.
+//
+// `ProposalChange` DOES now carry kernel identity: `{ path, address, subject?,
+// status }`. `path` is presentation and deliberately ambiguous; `address` is
+// the lossless segment identity; `subject` is the entity lifetime.
+//
+// The older note here said the type was `{ path, status }` with subject
+// lifetime staying internal, and cited PROPOSAL-REVIEW-SURFACE-0 as proof that
+// was sufficient. That proof no longer backs this claim: that spec declares its
+// OWN local ProposalChange and projection, so it passes regardless of what the
+// kernel exports. Sufficiency was disproven by measurement — two different
+// locations projected to the same public path, so a reviewer could not be told
+// which one an agent changed.
+//
+// `subject` is a per-tree monotonic counter. It is stable WITHIN one tree for
+// one run, and is not serializable, not comparable across trees, and not stable
+// across runs. Compare it to another subject from the same inspection; never
+// persist it.
 export type { Proposal } from './enhancers/transactions/transactions.types';
 export type { ProposalAcceptance } from './enhancers/transactions/transactions.types';
 export type { ProposalChange } from './enhancers/transactions/transactions.types';
 export type { ProposalInspection } from './enhancers/transactions/transactions.types';
 export type { ProposalStatus } from './enhancers/transactions/transactions.types';
 export { transactions } from './enhancers/transactions/transactions';
-
-export type {} from './enhancers/serialization/serialization';
 
 /**
  * DevTools enhancer for development and debugging

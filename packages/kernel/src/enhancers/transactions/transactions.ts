@@ -9,7 +9,6 @@ import type {
   WriteMetadata,
 } from '../../lib/types';
 import type {
-  TransactionsConfig,
   PendingTransaction,
   Proposal,
   ProposalAcceptance,
@@ -24,6 +23,7 @@ import {
 } from '../../lib/write-participation';
 import { ENHANCER_META, SignalTreeRollbackError } from '../../lib/types';
 import {
+  cancelCommitScopes,
   openCommitScope,
   settleCommitScope,
 } from '../../lib/internals/commit-consequence';
@@ -74,6 +74,7 @@ import {
 } from '../../lib/write-context';
 import { visitTree } from '../../lib/internals/visit-tree';
 import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-port';
+import { getPhysicalCommitClock } from '../../lib/internals/physical-commit-clock';
 import { getLocationRuntime } from '../../lib/internals/location-runtime';
 
 type TurnEffectBase = {
@@ -85,6 +86,8 @@ type TurnEffectBase = {
 export type ScalarSetEffect = TurnEffectBase & {
   kind: 'set';
   subject?: number;
+  /** Producer-known row-relative address; display paths never encode identity. */
+  subjectFieldSegments?: readonly string[];
   before: unknown;
   after: unknown;
   mutationIntent?: 'replace' | 'derive';
@@ -124,59 +127,15 @@ export type TurnEffect =
 type LaterAppliedEffect = {
   turnId: number;
   effect: TurnEffect;
-  /**
-   * H4/H5/H6 — THE SUPERSEDER'S OWN SETTLEMENT STATE.
-   *
-   * A later effect used to arrive with no provenance, and the plan builder
-   * treated every one of them as ESTABLISHED: a later `replace` at the same
-   * location meant the older contribution was already invisible, so reversing
-   * it needed no compensation. That is true of a CONFIRMED later write. It is
-   * false of one belonging to a transaction that is itself still pending,
-   * because that write may yet be rolled back — and when it is, the location
-   * falls back to a before-image that records what the slot HELD (the older
-   * transaction's speculative value), not who owns it now. Measured: rolling
-   * back P1 then P2 resurrected P1's y=1, a value P1 had already given up.
-   *
-   * Repairing that properly means per-location ownership rather than per-turn
-   * before-images, which is the 16.0 model and deliberately not a patch. Here
-   * the flag only makes the plan builder REFUSE instead of guessing.
-   */
-  unsettled?: boolean;
 };
 
-/** The payload both dependency refusals carry; the `kind` is added per member. */
-type PendingRollbackDependencyDetail = {
+export type PendingRollbackDependencyConflict = {
+  kind: 'later-confirmed-dependency';
   pendingTurnId: number;
   pendingEffect: TurnEffect;
   conflictingTurnId?: number;
   conflictingEffect?: TurnEffect;
 };
-
-/**
- * `later-confirmed-dependency` — settled later work depends on state this
- * rollback would invalidate. `later-pending-dependency` — the later work is
- * ANOTHER OPEN TRANSACTION, so neither reversing nor skipping can be proven
- * safe. Separate kinds because the second is not a claim about confirmed state
- * and must not borrow a name that says it is.
- *
- * Two MEMBERS rather than one member with two `kind` values, so that testing
- * both kinds narrows the union to `never` and `explainRollbackFailure` can
- * prove it handles every one.
- */
-export type PendingRollbackDependencyConflict =
-  | (PendingRollbackDependencyDetail & {
-      kind: 'later-confirmed-dependency';
-    })
-  | (PendingRollbackDependencyDetail & { kind: 'later-pending-dependency' });
-
-/** Build the right member from the superseder's settlement state. */
-const dependencyConflict = (
-  unsettled: boolean,
-  detail: PendingRollbackDependencyDetail
-): PendingRollbackDependencyConflict =>
-  unsettled
-    ? { kind: 'later-pending-dependency', ...detail }
-    : { kind: 'later-confirmed-dependency', ...detail };
 
 type PendingRollbackPlan =
   | { compensation: TurnEffect[] }
@@ -233,22 +192,24 @@ export type TransactionTurnRecord = {
 type TransactionLifecycleListener = (turn: TransactionTurnRecord) => void;
 
 export interface InternalTransactionRuntime {
+  /** @internal Count-only retention probe; no state or writer identities escape. */
+  getInspectionFootprintCountsForTesting(): {
+    writers: number;
+    footprints: number;
+  };
   transaction(fn: () => void): PendingTransaction;
   /** @internal Raw retained records; projected by `/internals`. */
   getConfirmedTurnRecords(): readonly TransactionTurnRecord[];
+  /** L15: opt-in evidence retention beyond the correctness obligation. */
+  setHistoryRetention(retain: number): void;
+  /** Explicit retention metadata; the reader must not infer it from ids. */
+  getConfirmedRetention(): { truncated: boolean; firstAvailableTurnId?: number };
   /** @internal PROPOSAL-INSPECTION-0 raw material; unclassified. */
   describePendingTurn(
     turnId: number
   ):
     | { effects: readonly TurnEffect[]; laterEffects: readonly TurnEffect[] }
     | undefined;
-  /** L15: opt-in evidence retention beyond the correctness obligation. */
-  setHistoryRetention(retain: number): void;
-  /** Explicit retention metadata; never inferred from ids. */
-  getConfirmedRetention(): {
-    truncated: boolean;
-    firstAvailableTurnId?: number;
-  };
   getConfirmedTurnCount(): number;
   getPendingTurnCount(): number;
   getConfirmedTurnIds(): number[];
@@ -288,25 +249,6 @@ const ROLLBACK_ERROR_MESSAGE =
  * matching — the message is additive, not replaced.
  */
 export const explainRollbackFailure = (cause: RollbackFailureCause): string => {
-  // Narrowed on the UNIQUE kind first, so that the two dependency kinds below
-  // can each be tested and still leave `never` for the exhaustiveness check.
-  if (cause.kind === 'effect-validation-failed') {
-    return (
-      `${ROLLBACK_ERROR_MESSAGE}: compensating turn ${cause.pendingTurnId} ` +
-      `failed validation — ${cause.errorMessage} [effect-validation-failed]`
-    );
-  }
-  if (cause.kind === 'later-pending-dependency') {
-    const at =
-      cause.conflictingTurnId === undefined
-        ? 'another open transaction'
-        : `open transaction ${cause.conflictingTurnId}`;
-    return (
-      `${ROLLBACK_ERROR_MESSAGE}: ${at} overlaps turn ${cause.pendingTurnId}, ` +
-      `so reversing it cannot be proven safe while both are unsettled — ` +
-      `settle the newer transaction first [later-pending-dependency]`
-    );
-  }
   if (cause.kind === 'later-confirmed-dependency') {
     const at =
       cause.conflictingTurnId === undefined
@@ -318,13 +260,10 @@ export const explainRollbackFailure = (cause: RollbackFailureCause): string => {
       `[later-confirmed-dependency]`
     );
   }
-  // Exhaustive. A new refusal kind is a COMPILE error here rather than a
-  // silently generic sentence — the legibility this function exists for is
-  // only worth anything if it cannot quietly stop applying.
-  const unhandled: never = cause;
-  return `${ROLLBACK_ERROR_MESSAGE} [${
-    (unhandled as { kind: string }).kind
-  }]`;
+  return (
+    `${ROLLBACK_ERROR_MESSAGE}: compensating turn ${cause.pendingTurnId} ` +
+    `failed validation — ${cause.errorMessage} [effect-validation-failed]`
+  );
 };
 
 const createRollbackError = (
@@ -333,7 +272,9 @@ const createRollbackError = (
   new SignalTreeRollbackError(explainRollbackFailure(cause), { cause });
 
 function cloneTurnEffect(effect: TurnEffect): TurnEffect {
-  return { ...effect };
+  return effect.kind === 'set' && effect.subjectFieldSegments
+    ? { ...effect, subjectFieldSegments: [...effect.subjectFieldSegments] }
+    : { ...effect };
 }
 
 function combineScalarMutationIntent(
@@ -349,6 +290,25 @@ function combineScalarMutationIntent(
   return undefined;
 }
 
+/** Compare producer-known coordinates before consulting legacy display paths. */
+function scalarRelation(
+  left: ScalarSetEffect,
+  right: ScalarSetEffect
+): 'same' | 'overlap' | 'disjoint' {
+  const a = left.subjectFieldSegments;
+  const b = right.subjectFieldSegments;
+  if (a && b) {
+    const common = Math.min(a.length, b.length);
+    for (let i = 0; i < common; i++) if (a[i] !== b[i]) return 'disjoint';
+    return a.length === b.length ? 'same' : 'overlap';
+  }
+  if (left.path === right.path) return 'same';
+  return left.path.startsWith(`${right.path}.`) ||
+    right.path.startsWith(`${left.path}.`)
+    ? 'overlap'
+    : 'disjoint';
+}
+
 function buildPendingRollbackPlan(
   pendingTurn: TransactionTurnRecord | undefined,
   laterEffects: LaterAppliedEffect[]
@@ -359,25 +319,13 @@ function buildPendingRollbackPlan(
 
   const pendingEffects = pendingTurn.__effects ?? [];
   const makeScalarKey = (effect: ScalarSetEffect): string =>
-    `${effect.position}\u0000${effect.path}\u0000${effect.subject ?? ''}`;
-  // SETTLED superseders only — the ONE place an open transaction is denied
-  // supersession, deliberately.
-  //
-  // An unsettled superseder may itself be rolled back, and when it is, the
-  // location it "superseded" is restored from a before-image naming THIS turn's
-  // speculative value — see `LaterAppliedEffect.unsettled`. Missing that key
-  // makes the path-equal branch below fall through to a conflict instead of
-  // skipping compensation, which is the refusal H4/H5/H6 require.
-  //
-  // ⚠️ An early `if (laterEntry.unsettled) return conflictWith(laterEntry)` in
-  // that branch produces the same refusals and was written first. It is NOT
-  // kept: it is correct only because the loop visits every later entry, so an
-  // added `break` or a reordering would silently restore the defect. Honesty
-  // belongs in the SET, where it holds however the loop is rewritten. Measured
-  // — each guard alone passes H1..H9; with both removed H6 fails.
+    JSON.stringify([
+      effect.position,
+      effect.subject,
+      effect.subjectFieldSegments ?? effect.path,
+    ]);
   const supersededScalarKeys = new Set(
     laterEffects
-      .filter((entry) => !entry.unsettled)
       .map(({ effect }) => effect)
       .filter((effect): effect is ScalarSetEffect => effect.kind === 'set')
       .map(makeScalarKey)
@@ -390,18 +338,10 @@ function buildPendingRollbackPlan(
     | { kind: 'superseded' }
     | {
         kind: 'conflict';
-        unsettled: boolean;
         conflictingTurnId?: number;
         conflictingEffect?: TurnEffect;
       } => {
     let superseded = false;
-    const conflictWith = (laterEntry: LaterAppliedEffect) =>
-      ({
-        kind: 'conflict',
-        unsettled: laterEntry.unsettled === true,
-        conflictingTurnId: laterEntry.turnId,
-        conflictingEffect: laterEntry.effect,
-      } as const);
     for (const laterEntry of laterEffects) {
       const laterEffect = laterEntry.effect;
       if (laterEffect.position !== effect.position) {
@@ -414,9 +354,17 @@ function buildPendingRollbackPlan(
       ) {
         continue;
       }
-      if (laterEffect.path === effect.path) {
+      if (
+        laterEffect.kind === 'set'
+          ? scalarRelation(effect, laterEffect) === 'same'
+          : laterEffect.path === effect.path
+      ) {
         if (laterEffect.kind !== 'set') {
-          return conflictWith(laterEntry);
+          return {
+            kind: 'conflict',
+            conflictingTurnId: laterEntry.turnId,
+            conflictingEffect: laterEffect,
+          };
         }
         if (laterEffect.mutationIntent === 'replace') {
           if (supersededScalarKeys.has(makeScalarKey(effect))) {
@@ -424,13 +372,23 @@ function buildPendingRollbackPlan(
             continue;
           }
         }
-        return conflictWith(laterEntry);
+        return {
+          kind: 'conflict',
+          conflictingTurnId: laterEntry.turnId,
+          conflictingEffect: laterEffect,
+        };
       }
       if (
-        laterEffect.path.startsWith(`${effect.path}.`) ||
-        effect.path.startsWith(`${laterEffect.path}.`)
+        laterEffect.kind === 'set'
+          ? scalarRelation(effect, laterEffect) === 'overlap'
+          : laterEffect.path.startsWith(`${effect.path}.`) ||
+            effect.path.startsWith(`${laterEffect.path}.`)
       ) {
-        return conflictWith(laterEntry);
+        return {
+          kind: 'conflict',
+          conflictingTurnId: laterEntry.turnId,
+          conflictingEffect: laterEffect,
+        };
       }
     }
     return superseded ? { kind: 'superseded' } : { kind: 'none' };
@@ -439,30 +397,27 @@ function buildPendingRollbackPlan(
   const hasSameSubjectDependency = (
     effect: CollectionAddEffect | CollectionRemoveEffect | CollectionRekeyEffect
   ):
-    | {
-        unsettled: boolean;
-        conflictingTurnId?: number;
-        conflictingEffect?: TurnEffect;
-      }
+    | { conflictingTurnId?: number; conflictingEffect?: TurnEffect }
     | undefined => {
     for (const laterEntry of laterEffects) {
       const laterEffect = laterEntry.effect;
       if (laterEffect.ownerPath !== effect.ownerPath) {
         continue;
       }
-      const found = () => ({
-        unsettled: laterEntry.unsettled === true,
-        conflictingTurnId: laterEntry.turnId,
-        conflictingEffect: laterEffect,
-      });
       if (laterEffect.kind === 'set') {
         if (laterEffect.subject === effect.subject && effect.kind !== 'rekey') {
-          return found();
+          return {
+            conflictingTurnId: laterEntry.turnId,
+            conflictingEffect: laterEffect,
+          };
         }
         continue;
       }
       if (laterEffect.subject === effect.subject) {
-        return found();
+        return {
+          conflictingTurnId: laterEntry.turnId,
+          conflictingEffect: laterEffect,
+        };
       }
     }
     return undefined;
@@ -531,13 +486,11 @@ function buildPendingRollbackPlan(
     | { kind: 'superseded' }
     | {
         kind: 'conflict';
-        unsettled: boolean;
         conflictingTurnId?: number;
         conflictingEffect?: TurnEffect;
       } => {
     if (effect.kind === 'add' || effect.kind === 'rekey') {
       let erased = false;
-      let erasedByOpenTransaction = false;
       for (const laterEntry of laterEffects) {
         const laterEffect = laterEntry.effect;
         if (laterEffect.ownerPath !== effect.ownerPath) {
@@ -547,20 +500,56 @@ function buildPendingRollbackPlan(
           continue;
         }
         erased = laterEffect.kind === 'remove';
-        erasedByOpenTransaction = erased && laterEntry.unsettled === true;
       }
-      // AN OPEN TRANSACTION CANNOT ERASE, only conflict — the same rule the
-      // scalar path applies through `supersededScalarKeys`, stated here because
-      // this is the STRUCTURAL path's own supersession and it had no equivalent.
-      //
-      // "Superseded" means this turn's contribution is already invisible, so
-      // reversing it needs no compensation. A remove belonging to a STILL-OPEN
-      // transaction has not established that: roll that transaction back and
-      // the subject returns, at which point this add was skipped for a reason
-      // that no longer holds. Falling through to the dependency test instead
-      // yields a `later-pending-dependency` refusal, which is recoverable.
-      if (erased && !erasedByOpenTransaction) {
+      if (erased) {
         return { kind: 'superseded' };
+      }
+    }
+
+    // REKEY-OCCUPANCY-0. Compensating a rekey renames the subject back to its
+    // ORIGINAL key. If newer truth has since put a DIFFERENT subject at that
+    // key, the rename has nowhere to land and the turn genuinely depends on
+    // newer truth.
+    //
+    // This was already refused before this rule existed, but by accident: the
+    // compensating re-add failed physically on a taken key, AFTER compensation
+    // had begun. Deciding by accident is why that path stranded the turn's
+    // other effects (measured as `effect-validation-failed` with `x` left at
+    // its proposed value). Recognising it here, at plan time, refuses before
+    // anything is touched and keeps the turn retryable once the key frees up.
+    //
+    // Subject identity is what makes this decidable rather than a guess: the
+    // occupant is a different SUBJECT, not the same one renamed back.
+    if (effect.kind === 'rekey') {
+      // NET occupancy, not "an add appears in history". The later effects are
+      // a log: an add that was subsequently removed leaves the key free, and
+      // refusing on the stale add would make the refusal unrecoverable — the
+      // caller clears the conflict and the retry still refuses.
+      let occupant: LaterAppliedEffect | undefined;
+      for (const laterEntry of laterEffects) {
+        const later = laterEntry.effect;
+        if (later.ownerPath !== effect.ownerPath) continue;
+        if (later.kind === 'add' && later.key === effect.beforeKey) {
+          occupant = later.subject === effect.subject ? undefined : laterEntry;
+        } else if (later.kind === 'remove' && later.key === effect.beforeKey) {
+          occupant = undefined;
+        } else if (later.kind === 'rekey') {
+          // A rename can vacate the key or move a different subject onto it.
+          if (later.beforeKey === effect.beforeKey) occupant = undefined;
+          if (
+            later.afterKey === effect.beforeKey &&
+            later.subject !== effect.subject
+          ) {
+            occupant = laterEntry;
+          }
+        }
+      }
+      if (occupant) {
+        return {
+          kind: 'conflict',
+          conflictingTurnId: occupant.turnId,
+          conflictingEffect: occupant.effect,
+        };
       }
     }
 
@@ -568,7 +557,6 @@ function buildPendingRollbackPlan(
     return dependency
       ? {
           kind: 'conflict',
-          unsettled: dependency.unsettled,
           conflictingTurnId: dependency.conflictingTurnId,
           conflictingEffect: dependency.conflictingEffect,
         }
@@ -583,12 +571,13 @@ function buildPendingRollbackPlan(
         const overlap = classifyLaterOverlap(effect);
         if (overlap.kind === 'conflict') {
           return {
-            conflict: dependencyConflict(overlap.unsettled, {
+            conflict: {
+              kind: 'later-confirmed-dependency',
               pendingTurnId: pendingTurn.id,
               pendingEffect: effect,
               conflictingTurnId: overlap.conflictingTurnId,
               conflictingEffect: overlap.conflictingEffect,
-            }),
+            },
           };
         }
         if (overlap.kind === 'superseded') {
@@ -603,12 +592,13 @@ function buildPendingRollbackPlan(
         const overlap = classifyStructuralOverlap(effect);
         if (overlap.kind === 'conflict') {
           return {
-            conflict: dependencyConflict(overlap.unsettled, {
+            conflict: {
+              kind: 'later-confirmed-dependency',
               pendingTurnId: pendingTurn.id,
               pendingEffect: effect,
               conflictingTurnId: overlap.conflictingTurnId,
               conflictingEffect: overlap.conflictingEffect,
-            }),
+            },
           };
         }
         if (overlap.kind === 'superseded') {
@@ -625,12 +615,27 @@ function buildPendingRollbackPlan(
 
 class TransactionAuthority {
   private confirmedTurns: TransactionTurnRecord[] = [];
-  /** L15: evidence retained beyond correctness. 0 = correctness-only. */
+  /**
+   * L15. Records kept purely as evidence, beyond what correctness requires.
+   * 0 means correctness-only, which is the default.
+   */
   private historyRetain = 0;
-  /** Set once a record has actually been dropped. Never inferred from ids. */
+  /**
+   * Whether an explicit retention contract exists. Until one does, the ledger
+   * is left exactly as it has always behaved: the reader-visible history
+   * policy may not change silently, and `confirmedTurnReader` is a shipped
+   * surface whose purpose is reading confirmed history.
+   */
+  /**
+   * Set once any confirmed record has actually been dropped. The reader must
+   * never infer truncation from id gaps — pending and rejected turns leave
+   * gaps too — so this is the explicit metadata internals.ts asks for,
+   * including the case where the whole window is gone.
+   */
   private evictedConfirmed = false;
   private pendingTurns = new Map<number, TransactionTurnRecord>();
   private nextTurnId = 1;
+  private queuedEvidence = new Map<number, Map<string, TurnEffect>>();
 
   /**
    * TX-LEDGER C3 — later effects that are NOT authored turns.
@@ -712,7 +717,11 @@ class TransactionAuthority {
       return undefined;
     }
     this.insertConfirmed(turn);
-    // The obligation set just changed; release what it no longer covers.
+    // ORDINARY writes reach the ledger here, not through confirmPending, so
+    // without this the obligation bound applied to transactional churn only
+    // and `retain: 5` retained 49. Safe by the same argument as confirmPending:
+    // a turn recorded while something is pending has a higher id than
+    // min(pendingIds) and is kept by `required`.
     this.releaseConfirmedBeyondObligation();
     return cloneTurnRecord(turn);
   }
@@ -766,54 +775,6 @@ class TransactionAuthority {
     }
   }
 
-  setHistoryRetention(retain: number): void {
-    this.historyRetain = Number.isFinite(retain) && retain > 0 ? retain : 0;
-    this.releaseConfirmedBeyondObligation();
-  }
-
-  /** Explicit retention metadata for the reader; never inferred from ids. */
-  getConfirmedRetention(): {
-    truncated: boolean;
-    firstAvailableTurnId?: number;
-  } {
-    return {
-      truncated: this.evictedConfirmed,
-      firstAvailableTurnId: this.confirmedTurns[0]?.id,
-    };
-  }
-
-  /**
-   * L15: correctness retention follows live responsibility.
-   *
-   * `getPendingRollbackPlan` is the only correctness consumer of this ledger
-   * and selects `confirmedTurns.filter(t => t.id > turnId)`. Ids are monotonic,
-   * so a confirmed turn can only ever be needed by a pending turn OLDER than
-   * itself; once none remains it can never appear in a future plan.
-   *
-   * Derived, not a cap. `historyRetain` is a separate, explicitly requested
-   * evidence facility layered on top.
-   */
-  private releaseConfirmedBeyondObligation(): void {
-    if (this.confirmedTurns.length === 0) return;
-    let minPending = Infinity;
-    for (const id of this.pendingTurns.keys()) {
-      if (id < minPending) minPending = id;
-    }
-    const required = (turn: TransactionTurnRecord) => turn.id > minPending;
-    const before = this.confirmedTurns.length;
-    if (this.historyRetain <= 0) {
-      this.confirmedTurns = this.confirmedTurns.filter(required);
-    } else {
-      const keep = new Set<number>();
-      for (const turn of this.confirmedTurns)
-        if (required(turn)) keep.add(turn.id);
-      for (const turn of this.confirmedTurns.slice(-this.historyRetain))
-        keep.add(turn.id);
-      this.confirmedTurns = this.confirmedTurns.filter((t) => keep.has(t.id));
-    }
-    if (this.confirmedTurns.length < before) this.evictedConfirmed = true;
-  }
-
   confirmPending(turnId: number): TransactionTurnRecord | undefined {
     const turn = this.pendingTurns.get(turnId);
     if (!turn) {
@@ -821,6 +782,7 @@ class TransactionAuthority {
     }
     this.pendingTurns.delete(turnId);
     this.pendingOpenedAtSeq.delete(turnId);
+    this.queuedEvidence.delete(turnId);
     // SETTLED. Confirmation discards rollback state rather than becoming
     // permanent history — those are different product concepts. A tree that
     // also has `restoration()` has already claimed these subjects through its
@@ -828,23 +790,11 @@ class TransactionAuthority {
     // the handoff.
     this.releasePendingClaims(turnId);
     this.insertConfirmed(turn);
-    // The obligation set just changed; release what it no longer covers.
-    this.releaseConfirmedBeyondObligation();
     this.releaseLedgerIfQuiet();
+    // The pending set shrank and a confirmed record arrived: the obligation
+    // set changed in both directions.
+    this.releaseConfirmedBeyondObligation();
     return cloneTurnRecord(turn);
-  }
-
-  /**
-   * Read a pending turn without retiring it.
-   *
-   * Compensation needs the turn's `__baselineValues` and claim set, and used
-   * to get them from `discardPending`'s return value — which forced the retire
-   * to happen BEFORE the attempt, and so made a refused attempt unrecoverable.
-   * Reading and retiring are now separate acts.
-   */
-  peekPending(turnId: number): TransactionTurnRecord | undefined {
-    const turn = this.pendingTurns.get(turnId);
-    return turn ? cloneTurnRecord(turn) : undefined;
   }
 
   discardPending(turnId: number): TransactionTurnRecord | undefined {
@@ -854,58 +804,103 @@ class TransactionAuthority {
     }
     this.pendingTurns.delete(turnId);
     this.pendingOpenedAtSeq.delete(turnId);
+    this.queuedEvidence.delete(turnId);
     this.releasePendingClaims(turnId);
     this.releaseLedgerIfQuiet();
-    // Discarding can raise min(pendingIds) and discharge the obligation.
+    // Discarding a pending turn can raise min(pendingIds) and so discharge the
+    // obligation that was keeping confirmed records alive.
     this.releaseConfirmedBeyondObligation();
     return cloneTurnRecord(turn);
   }
 
-  hasConfirmedTurnAfter(turnId: number): boolean {
-    return this.confirmedTurns.some((turn) => turn.id > turnId);
-  }
 
-  /**
-   * PROPOSAL-INSPECTION-0. Raw material only: the pending turn's own effects
-   * and the later effects admitted against it, with NO classification.
-   *
-   * Exposed because the classifier is not proven yet and must not be invented
-   * in production first. A rollback plan answers "what can I safely
-   * compensate?"; a review answers "which parts of what I proposed are still
-   * represented in current truth?". Those questions overlap but are not the
-   * same — a later UPDATE of a proposed row makes the rollback REFUSE while
-   * leaving the proposal's structural contribution entirely current — so the
-   * plan cannot be reused as the answer. This returns the inputs both
-   * questions share and commits to neither.
-   *
-   * Reading only. No retained fact is added: both collections already exist
-   * for the rollback path's own use.
-   *
-   * @internal
-   */
-  describePendingTurn(
-    turnId: number
-  ):
-    | { effects: readonly TurnEffect[]; laterEffects: readonly TurnEffect[] }
-    | undefined {
-    const turn = this.pendingTurns.get(turnId);
-    if (!turn) {
-      return undefined;
+  observeQueuedEffects(turnId: number, queued: readonly TurnEffect[]): void {
+    if (!this.pendingTurns.has(turnId)) return;
+    // Evidence read before delivery belongs to THIS pending turn. Do not put
+    // it in the global sequence ledger: that would make retries duplicate it
+    // or incorrectly classify it as later than a subsequently opened turn.
+    let retained = this.queuedEvidence.get(turnId);
+    if (!retained && queued.length) {
+      retained = new Map();
+      this.queuedEvidence.set(turnId, retained);
     }
-    const authoredLater = this.confirmedTurns
-      .filter((t) => t.id > turnId)
-      .flatMap((t) => t.__effects ?? []);
-    const openedAt = this.pendingOpenedAtSeq.get(turnId) ?? 0;
-    const observedLater = this.dependencyLedger
-      .filter((entry) => entry.seq > openedAt)
-      .map((entry) => entry.effect);
-    return {
-      effects: (turn.__effects ?? []).map(cloneTurnEffect),
-      laterEffects: [...authoredLater, ...observedLater].map(cloneTurnEffect),
-    };
+    for (const effect of queued) {
+      retained?.set(
+        JSON.stringify([
+          effect.kind,
+          effect.position,
+          effect.subject ?? null,
+          effect.kind === 'set'
+            ? effect.subjectFieldSegments ?? effect.path
+            : effect.path,
+        ]),
+        effect
+      );
+    }
   }
 
-  getPendingRollbackPlan(turnId: number): PendingRollbackPlan {
+  getPendingRollbackPlan(
+    turnId: number,
+    queued: readonly TurnEffect[] = []
+  ): PendingRollbackPlan {
+    this.observeQueuedEffects(turnId, queued);
+    const pending = this.pendingTurns.get(turnId);
+    const retained = this.queuedEvidence.get(turnId);
+    // A later pending replacement is not settled authority. Reversing its
+    // baseline would make its own later rollback resurrect rejected state.
+    for (const later of this.pendingTurns.values()) {
+      if (later.id <= turnId) continue;
+      for (const effect of pending?.__effects ?? []) {
+        const overlap = later.__effects?.find(
+          (candidate) =>
+            candidate.position === effect.position &&
+            (candidate.subject === undefined ||
+              effect.subject === undefined ||
+              candidate.subject === effect.subject) &&
+            (candidate.kind === 'set' && effect.kind === 'set'
+              ? scalarRelation(candidate, effect) !== 'disjoint'
+              : candidate.path === effect.path ||
+                candidate.path.startsWith(`${effect.path}.`) ||
+                effect.path.startsWith(`${candidate.path}.`))
+        );
+        if (overlap)
+          return {
+            conflict: {
+              kind: 'later-confirmed-dependency',
+              pendingTurnId: turnId,
+              pendingEffect: effect,
+              conflictingTurnId: later.id,
+              conflictingEffect: overlap,
+            },
+          };
+
+        // KEY OCCUPANCY across pending turns. The check above matches by
+        // position/path, so a DIFFERENT subject sitting at a different
+        // position never matches — yet a pending add at the key a rekey
+        // vacated occupies that key just as physically as a confirmed one,
+        // because pending writes are applied optimistically. Without this the
+        // arm fell through to the physical-failure door.
+        if (effect.kind === 'rekey') {
+          const occupant = later.__effects?.find(
+            (candidate) =>
+              candidate.kind === 'add' &&
+              candidate.ownerPath === effect.ownerPath &&
+              candidate.key === effect.beforeKey &&
+              candidate.subject !== effect.subject
+          );
+          if (occupant)
+            return {
+              conflict: {
+                kind: 'later-confirmed-dependency',
+                pendingTurnId: turnId,
+                pendingEffect: effect,
+                conflictingTurnId: later.id,
+                conflictingEffect: occupant,
+              },
+            };
+        }
+      }
+    }
     const authoredLater = this.confirmedTurns
       .filter((turn) => turn.id > turnId)
       .flatMap((turn) =>
@@ -920,38 +915,130 @@ class TransactionAuthority {
     const openedAt = this.pendingOpenedAtSeq.get(turnId) ?? 0;
     const observedLater = this.dependencyLedger
       .filter((entry) => entry.seq > openedAt)
-      .map((entry) => ({ turnId, effect: entry.effect }));
+      .map((entry) => ({
+        entry: { turnId, effect: entry.effect },
+        seq: entry.seq,
+      }));
 
-    // H4/H5/H6 — OTHER OPEN TRANSACTIONS ARE LATER WORK TOO.
+    // REKEY-OCCUPANCY-0 follow-up. These three sources are concatenated by
+    // ORIGIN, so without a merge key every authored effect sorts before every
+    // realized one regardless of when each happened. Both folds downstream —
+    // `erased` and the net-occupancy loop — are last-write-wins and therefore
+    // read a wrong "latest" for any key touched by more than one source.
     //
-    // This selector was `confirmedTurns` plus realizations, so a SECOND OPEN
-    // TRANSACTION was invisible to the first one's rollback plan: it is not
-    // confirmed, and its writes are authored rather than realized, so neither
-    // source carried it. The plan therefore reversed straight through it.
-    // Measured on 15.2.1 — P1 writes x=1,y=1; P2 writes y=2,z=2; `p1.rollback()`
-    // reported 'ok' and left {x:0, y:0, z:2}, silently destroying P2's y=2. A
-    // following `p2.confirm()` then committed a transaction missing one of the
-    // two fields it wrote.
-    //
-    // Ids are monotonic and a callback runs synchronously at creation, so
-    // `id > turnId` is exactly "opened after this one".
-    const pendingLater: LaterAppliedEffect[] = [];
-    for (const [otherId, otherTurn] of this.pendingTurns) {
-      if (otherId <= turnId) continue;
-      for (const effect of otherTurn.__effects ?? []) {
-        pendingLater.push({ turnId: otherId, effect, unsettled: true });
-      }
-    }
-
-    return buildPendingRollbackPlan(this.pendingTurns.get(turnId), [
-      ...authoredLater,
+    // `ledgerSeq` is the shared clock: pending turns are already stamped with
+    // it on open, and confirmed turns are now stamped on insertion.
+    const ordered = [
+      ...authoredLater.map((entry) => ({
+        entry,
+        seq: this.confirmedAtSeq.get(entry.turnId) ?? 0,
+      })),
       ...observedLater,
-      ...pendingLater,
+    ]
+      .sort((a, b) => a.seq - b.seq)
+      .map((wrapped) => wrapped.entry);
+
+    // Queued evidence stays last: it is read before delivery and belongs to
+    // THIS turn, so it is not part of the shared chronology.
+    return buildPendingRollbackPlan(this.pendingTurns.get(turnId), [
+      ...ordered,
+      ...[...(retained?.values() ?? [])].map((effect) => ({ turnId, effect })),
     ]);
+  }
+
+  setHistoryRetention(retain: number): void {
+    this.historyRetain = Number.isFinite(retain) && retain > 0 ? retain : 0;
+    this.releaseConfirmedBeyondObligation();
+  }
+
+  /**
+   * L15: correctness retention follows live responsibility.
+   *
+   * `getPendingRollbackPlan` is the ONLY correctness consumer of this ledger,
+   * and it selects `confirmedTurns.filter(t => t.id > pendingId)`. Turn ids are
+   * monotonic, so a confirmed turn can only ever be needed by a pending turn
+   * OLDER than itself. Once no such pending turn remains, the record can never
+   * appear in any future plan, and keeping it is diagnostics, not correctness.
+   * (A `hasConfirmedTurnAfter` reader existed alongside it with no call sites
+   * anywhere and was deleted, so it imposes no obligation either.)
+   *
+   * This is not an arbitrary cap: the bound is derived from the obligation.
+   * `historyRetain` is a SEPARATE, explicitly requested evidence facility
+   * layered on top of it.
+   */
+  private releaseConfirmedBeyondObligation(): void {
+    // Correctness-only is the DEFAULT (owner decision, 2026-09-24). Retaining
+    // records inside the correctness machinery for diagnostic purposes is the
+    // L15 violation itself, and the old default asserted a complete history
+    // that no contract backed — `truncated: false` was true only because
+    // nothing evicted. Diagnostics are now requested explicitly via
+    // `transactions({ history: { retain } })`, and the reader reports what it
+    // actually kept.
+    if (this.confirmedTurns.length === 0) return;
+    let minPending = Infinity;
+    for (const id of this.pendingTurns.keys()) {
+      if (id < minPending) minPending = id;
+    }
+    const required = (turn: TransactionTurnRecord) => turn.id > minPending;
+    const before = this.confirmedTurns.length;
+    if (this.historyRetain <= 0) {
+      this.confirmedTurns = this.confirmedTurns.filter(required);
+      if (this.confirmedTurns.length < before) this.evictedConfirmed = true;
+      this.forgetStampsOutside();
+      return;
+    }
+    const keep = new Set<number>();
+    for (const turn of this.confirmedTurns)
+      if (required(turn)) keep.add(turn.id);
+    for (const turn of this.confirmedTurns.slice(-this.historyRetain))
+      keep.add(turn.id);
+    this.confirmedTurns = this.confirmedTurns.filter((t) => keep.has(t.id));
+    if (this.confirmedTurns.length < before) this.evictedConfirmed = true;
+    this.forgetStampsOutside();
+  }
+
+  /**
+   * `confirmedAtSeq` is CORRECTNESS state — `getPendingRollbackPlan` reads it
+   * to order `authoredLater` — so L15 binds it exactly as it binds the records
+   * themselves. Bounding the array while letting the stamps accumulate left
+   * ~50 B per settled turn growing linearly forever while the ledger reported
+   * zero retained records, which made "correctness-only retention" only half
+   * true.
+   */
+  private forgetStampsOutside(): void {
+    if (this.confirmedAtSeq.size === 0) return;
+    const live = new Set(this.confirmedTurns.map((turn) => turn.id));
+    for (const id of this.confirmedAtSeq.keys()) {
+      if (!live.has(id)) this.confirmedAtSeq.delete(id);
+    }
+  }
+
+  /** Explicit retention metadata for the reader. Never inferred from ids. */
+  getConfirmedRetention(): {
+    truncated: boolean;
+    firstAvailableTurnId?: number;
+  } {
+    return {
+      truncated: this.evictedConfirmed,
+      firstAvailableTurnId: this.confirmedTurns[0]?.id,
+    };
+  }
+
+  releaseConfirmedTurnsOnDestroy(): void {
+    this.confirmedAtSeq.clear();
+    // Drop authority ownership without mutating records or arrays already
+    // returned to callers. Live history retention remains unchanged.
+    this.confirmedTurns = [];
   }
 
   getConfirmedTurnCount(): number {
     return this.confirmedTurns.length;
+  }
+
+  getPendingTurn(
+    turnId: number | undefined
+  ): TransactionTurnRecord | undefined {
+    return turnId === undefined ? undefined : this.pendingTurns.get(turnId);
   }
 
   getPendingTurnCount(): number {
@@ -986,7 +1073,21 @@ class TransactionAuthority {
     return this.confirmedTurns;
   }
 
+  /**
+   * When each confirmed turn entered the ledger, on the SAME clock the
+   * dependency ledger uses. Without this, later-effects can only be ordered
+   * within their own source.
+   */
+  private confirmedAtSeq = new Map<number, number>();
+
   private insertConfirmed(turn: TransactionTurnRecord): void {
+    // The clock must tick for AUTHORED work too. It previously advanced only
+    // inside `observeLaterEffects`, so every authored confirmation shared
+    // whatever value a realization had last left behind — stamps tied, the
+    // stable sort fell back to source order, and the merge was no better than
+    // the concatenation it replaced.
+    this.ledgerSeq += 1;
+    this.confirmedAtSeq.set(turn.id, this.ledgerSeq);
     const insertIndex = this.confirmedTurns.findIndex(
       (candidate) => candidate.id > turn.id
     );
@@ -1073,15 +1174,37 @@ export function getOrCreateInternalTransactionRuntime<T>(
   );
   const transactionOwnerToken = {};
   let nextTransactionId = 1;
+  let destroyed = false;
   const isRestoring = false;
   let selfDirty = false;
   let unsubscribeFlush: (() => void) | null = null;
   let unsubscribeNotifications: (() => void) | null = null;
+  let unsubscribeEnqueue: (() => void) | null = null;
   let unsubscribeReset: (() => void) | null = null;
   let unsubscribeCollectionOrders: (() => void) | null = null;
   let restoreLeafInterceptors: (() => void) | null = null;
   const pendingCapture = createCaptureBucket();
   const pendingTransactions = new Map<number, CaptureBucket>();
+  // External writes can arrive while the callback is still collecting, before
+  // it has a turn id. Keep that evidence under the transaction id until admission.
+  const callbackExternalEffects = new Map<number, TurnEffect[]>();
+  // Inspection owns local mutation chronology, not conservative rollback evidence.
+  // Keep only the latest footprint per location/writer while a proposal is open.
+  type InspectionWrite = { seq: number; effect: TurnEffect };
+  let inspectionSeq = 0;
+  let inspectionUnavailable = false;
+  const inspectionWrites = new Map<
+    number | undefined,
+    Map<string, InspectionWrite>
+  >();
+  const inspectionTransactionByTurn = new Map<number, number>();
+  const releaseInspectionIfQuiet = (): void => {
+    if (authority.getPendingTurnCount() || pendingTransactions.size) return;
+    inspectionWrites.clear();
+    inspectionTransactionByTurn.clear();
+    inspectionSeq = 0;
+    inspectionUnavailable = false;
+  };
   const pendingOrderDeltas = new Map<number, CollectionOrderDelta[]>();
   const pendingCreatedListeners = new Set<TransactionLifecycleListener>();
   const pendingConfirmedListeners = new Set<TransactionLifecycleListener>();
@@ -1203,9 +1326,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
   const effectKey = (effect: TurnEffect): string => {
     switch (effect.kind) {
       case 'set':
-        return `${effect.kind}\u0000${effect.path}\u0000${
-          effect.position
-        }\u0000${effect.subject ?? ''}`;
+        return JSON.stringify([
+          effect.kind,
+          effect.position,
+          effect.subject,
+          effect.subjectFieldSegments ?? effect.path,
+        ]);
       // RESTORE-P0 P0-B: keyed by SUBJECT, deliberately without `kind`, so the
       // transaction's effects on one subject collide and can be composed into
       // the NET effect. With `kind` in the key, `rekey('a','a2')` and
@@ -1359,6 +1485,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           ownerPath: ownerPath ?? path,
           position,
           subject,
+          subjectFieldSegments: subject === undefined ? undefined : [key],
           before,
           after,
           mutationIntent: meta?.mutationIntent,
@@ -1382,6 +1509,53 @@ export function getOrCreateInternalTransactionRuntime<T>(
       after: next,
       mutationIntent: meta?.mutationIntent,
     });
+  };
+
+  const inspectPendingTurn = (turnId: number) => {
+    if (inspectionUnavailable)
+      throw new Error(
+        'SignalTree: proposal inspection unavailable because mutation chronology capture failed.'
+      );
+    const turn = authority.getPendingTurn(turnId);
+    if (!turn) return undefined;
+    const effects = turn.__effects ?? [];
+    const transactionId = inspectionTransactionByTurn.get(turnId);
+    const own = inspectionWrites.get(transactionId);
+    const later = new Set<InspectionWrite>();
+    for (const effect of effects) {
+      const authored = own?.get(effectKey(effect));
+      if (!authored) {
+        inspectionUnavailable = true;
+        throw new Error(
+          'SignalTree: proposal inspection unavailable because an authored contribution has no mutation chronology.'
+        );
+      }
+      for (const [writer, writes] of inspectionWrites) {
+        if (writer === transactionId) continue;
+        for (const candidate of writes.values()) {
+          if (candidate.seq <= authored.seq) continue;
+          const other = candidate.effect;
+          if (
+            other.position !== effect.position ||
+            other.subject !== effect.subject
+          )
+            continue;
+          if (effect.kind === 'set') {
+            if (
+              other.kind === 'remove' ||
+              (other.kind === 'set' && scalarRelation(other, effect) === 'same')
+            )
+              later.add(candidate);
+          } else if (other.kind !== 'set') later.add(candidate);
+        }
+      }
+    }
+    return {
+      effects,
+      laterEffects: [...later]
+        .sort((a, b) => a.seq - b.seq)
+        .map(({ effect }) => cloneTurnEffect(effect)),
+    };
   };
 
   const resolveOwnerPositionId = (ownerPath?: string): number | undefined => {
@@ -1517,6 +1691,21 @@ export function getOrCreateInternalTransactionRuntime<T>(
       effects.length > 0 ? effects : undefined,
       baselineValues.size > 0 ? baselineValues : undefined
     );
+    const externalEffects = callbackExternalEffects.get(transactionId) ?? [];
+    callbackExternalEffects.delete(transactionId);
+    if (pending && externalEffects.length) {
+      // The callback can author again after an ingress. Until that mixed
+      // ownership can be separated, refuse overlap rather than declaring its
+      // final speculative value settled because an earlier ingress replaced it.
+      authority.observeQueuedEffects(
+        pending.id,
+        externalEffects.map((effect) =>
+          effect.kind === 'set'
+            ? { ...effect, mutationIntent: 'derive' }
+            : effect
+        )
+      );
+    }
     if (pending && collectionOrders.length > 0) {
       pendingOrderDeltas.set(
         pending.id,
@@ -1534,35 +1723,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
     return pending;
   };
 
-  const drainTransactionRollbackInput = (
-    transactionId: number
-  ): {
-    effects: TurnEffect[];
-    baselineValues: Map<number, unknown>;
-    orderDeltas: CollectionOrderDelta[];
-  } => {
-    const bucket = pendingTransactions.get(transactionId);
-    pendingTransactions.delete(transactionId);
-    if (!bucket) {
-      return { effects: [], baselineValues: new Map(), orderDeltas: [] };
-    }
-    const { effects, baselineValues, collectionOrders } =
-      drainCaptureBucket(bucket);
-    return {
-      effects,
-      baselineValues,
-      orderDeltas: collectionOrders.map((order) =>
-        deriveCollectionOrderDelta(
-          order.owner,
-          order.beforeSubjects,
-          order.afterSubjects,
-          order.beforeFrontier,
-          order.afterFrontier
-        )
-      ),
-    };
-  };
-
   const toCausalEffect = (effect: TurnEffect): CausalEffect => {
     switch (effect.kind) {
       case 'set':
@@ -1571,6 +1731,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           before: effect.before,
           after: effect.after,
           subjectId: effect.subject,
+          subjectFieldSegments: effect.subjectFieldSegments,
           path: effect.path,
           ownerPath: effect.ownerPath,
         };
@@ -1757,14 +1918,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
       return;
     }
 
-    if (
-      orderDeltas.length > 0 ||
-      requiresDeclarativeStructuralTarget(effects.map(toRollbackEffect))
-    ) {
-      rollbackPendingTarget(effects, orderDeltas);
-      return;
-    }
-
     const positionRegistry = getPositionRegistry(tree.$);
     const authorityPosition = getOwnedPositionIds(tree.$)?.[0] as
       | CausalPositionId
@@ -1817,15 +1970,38 @@ export function getOrCreateInternalTransactionRuntime<T>(
         // that spreads `getActiveWriteContext()` carries the namespace.
         ownerId: positionRegistry?.id,
       },
-      () =>
-        rollbackPendingTurnAt({
+      () => {
+        if (
+          orderDeltas.length > 0 ||
+          requiresDeclarativeStructuralTarget(
+            effects.map(toRollbackEffect),
+            (owner) => {
+              let binding: CollectionTransitionTargetBinding | undefined;
+              visitTree(tree.$, (node) => {
+                const candidate = (
+                  node as {
+                    __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+                  }
+                ).__prepareTransitionTarget;
+                if (candidate?.owner === owner) binding = candidate;
+                return undefined;
+              });
+              return binding?.readSource();
+            }
+          )
+        ) {
+          rollbackPendingTarget(effects, orderDeltas);
+          return { ok: true as const };
+        }
+        return rollbackPendingTurnAt({
           authority: authorityPosition,
           turnId: transactionId,
           store,
           topology: positionRegistry,
           port: realizationPort,
           realizationContext,
-        })
+        });
+      }
     );
     if (!result.ok) {
       throw createRollbackError({
@@ -1876,6 +2052,68 @@ export function getOrCreateInternalTransactionRuntime<T>(
     const notifier = getPathNotifier();
     if (notifier) {
       const treeOwnerId = getPositionRegistry(tree.$)?.id;
+      if (treeOwnerId !== undefined) {
+        unsubscribeEnqueue = notifier.observeEnqueue(treeOwnerId, (entry) => {
+          if (
+            destroyed ||
+            (!authority.getPendingTurnCount() && !pendingTransactions.size)
+          )
+            return;
+          const meta = entry.meta;
+          if (
+            meta?.origin === 'restoration' ||
+            meta?.origin === 'transaction-rollback' ||
+            isInspectionWrite(meta)
+          )
+            return;
+          const realized = getWriteParticipation(meta) === 'realized';
+          if (
+            !realized &&
+            typeof meta?.transactionId === 'number' &&
+            meta.transactionOwner !== transactionOwnerToken
+          )
+            return;
+          const writer =
+            !realized && meta?.transactionOwner === transactionOwnerToken
+              ? meta.transactionId
+              : undefined;
+          try {
+            const probe = createCaptureBucket();
+            captureEffects(
+              probe,
+              probe.effects,
+              entry.path,
+              entry.newValue,
+              entry.oldValue,
+              meta,
+              entry.ownerPath,
+              entry.subjectIds,
+              entry.positionIds
+            );
+            const effects = drainCaptureBucket(probe).effects;
+            if (!effects.length) return;
+            const seq = ++inspectionSeq;
+            let writes = inspectionWrites.get(writer);
+            if (!writes) inspectionWrites.set(writer, (writes = new Map()));
+            for (const effect of effects) {
+              // No value snapshots or row references belong in inspection evidence.
+              const footprint: TurnEffect =
+                effect.kind === 'set'
+                  ? { ...effect, before: undefined, after: undefined }
+                  : effect.kind === 'rekey'
+                  ? { ...effect }
+                  : { ...effect, value: undefined };
+              writes.set(effectKey(effect), { seq, effect: footprint });
+            }
+          } catch (error) {
+            // The write already happened; never report a confident status after
+            // losing its chronology. The notifier isolates and reports the error.
+            inspectionUnavailable = true;
+            throw error;
+          }
+        });
+      }
+
       const subscribeCollectionNotifications = (): void => {
         unsubscribeNotifications?.();
         unsubscribeNotifications = notifier.subscribe(
@@ -1890,7 +2128,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             positionIds,
             meta
           ) => {
-            if (origin === 'restoration') {
+            if (origin === 'restoration' || origin === 'transaction-rollback') {
               return;
             }
             // NOTIFIER-SCOPE-0. The notifier is PROCESS-GLOBAL and this
@@ -1930,29 +2168,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
               // into a throwaway bucket and hand them to the dependency ledger
               // only; nothing here reaches confirmedTurns.
               //
-              // ...and never a COMPENSATION. Removing a contribution is the
-              // opposite of depending on it, so admitting a rollback's own
-              // realized writes here had the ledger assert a dependency that
-              // does not exist — and one rollback then made every EARLIER
-              // transaction permanently unreversible.
-              //
-              // This already bit. It needed two open transactions, because the
-              // rolled-back turn was retired before its compensation ran, so
-              // with only one open the count check below skipped this path by
-              // accident. With two, `compensation-provenance.spec.ts` pinned
-              // the resulting refusal as "CURRENT BEHAVIOUR ... not as
-              // desired". That test now asserts the correct restore instead.
-              //
-              // Restoration's recorder was taught to read this same `origin`
-              // for this same reason — see that spec's header. The ledger was
-              // the second consumer and had not been. Same shape as the
-              // `origin === 'restoration'` decline above.
-              if (origin === 'transaction-rollback') {
-                return;
-              }
               // Skipped entirely when nothing is pending, so a tree with no open
               // transaction pays nothing for this.
-              if (authority.getPendingTurnCount() > 0) {
+              if (
+                authority.getPendingTurnCount() > 0 ||
+                pendingTransactions.size > 0
+              ) {
                 const probe = createCaptureBucket();
                 captureIntoBucket(
                   probe,
@@ -1964,9 +2185,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
                   subjectIds,
                   positionIds
                 );
-                authority.observeLaterEffects(
-                  drainCaptureBucket(probe).effects
-                );
+                const effects = drainCaptureBucket(probe).effects;
+                authority.observeLaterEffects(effects);
+                for (const id of pendingTransactions.keys()) {
+                  const prior = callbackExternalEffects.get(id) ?? [];
+                  callbackExternalEffects.set(id, [...prior, ...effects]);
+                }
               }
               return;
             }
@@ -2095,8 +2319,74 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // fall through without capture support
   }
 
+  const readQueuedLaterEffects = (): TurnEffect[] => {
+    const ownerId = getPositionRegistry(tree.$)?.id;
+    return (getPathNotifier()?.readPending() ?? []).flatMap<TurnEffect>(
+      (entry) => {
+        const meta = entry.meta;
+        if (
+          (entry.ownerId ?? meta?.ownerId) !== ownerId ||
+          meta?.origin === 'restoration' ||
+          meta?.origin === 'transaction-rollback' ||
+          isInspectionWrite(meta) ||
+          (getWriteParticipation(meta) !== 'realized' &&
+            meta?.transactionOwner === transactionOwnerToken &&
+            typeof meta.transactionId === 'number')
+        )
+          return [];
+        const position = entry.positionIds?.[0];
+        if (position === undefined) return [];
+        const structural = entry.ownerPath
+          ? buildTurnEffectFromStructural(
+              meta,
+              entry.ownerPath,
+              entry.path,
+              entry.positionIds,
+              entry.subjectIds
+            )
+          : undefined;
+        if (structural) return [structural];
+        if (
+          entry.subjectFieldKeys !== undefined &&
+          entry.subjectIds?.length === 1
+        ) {
+          const before = entry.oldValue as Record<string, unknown>;
+          const after = entry.newValue as Record<string, unknown>;
+          // The notifier preserves the producer's literal field footprint even
+          // when coalescing returns to the original value (ABA).
+          return entry.subjectFieldKeys.map((key) => ({
+            kind: 'set' as const,
+            position,
+            path: `${entry.path}.${key}`,
+            ownerPath: entry.ownerPath ?? entry.path,
+            subject: entry.subjectIds?.[0],
+            subjectFieldSegments: [key],
+            before: before[key],
+            after: after[key],
+            mutationIntent: 'derive' as const,
+          }));
+        }
+        // A queued row may have returned to the same object/value. Its path and
+        // identity still witness a write; equality cannot grant rollback rights.
+        return [
+          {
+            kind: 'set' as const,
+            position,
+            path: entry.path,
+            ownerPath: entry.ownerPath ?? entry.path,
+            subject: entry.subjectIds?.[0],
+            before: entry.oldValue,
+            after: entry.newValue,
+            mutationIntent: 'derive' as const,
+          },
+        ];
+      }
+    );
+  };
+
   const runtime: InternalTransactionRuntime = {
     transaction(fn: () => void): PendingTransaction {
+      if (destroyed) throw new Error('Cannot transact on a destroyed tree');
       const activeMeta = getActiveWriteContext();
       const notifier = getPathNotifier();
       const captureRuntime = getMutationCaptureRuntime(tree);
@@ -2104,6 +2394,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
         throw new Error('Nested transaction is not supported');
       }
 
+      // The existing construction flush must not erase net-equal queued
+      // evidence for older pending turns while allocating this new turn.
+      const beforeOpen = readQueuedLaterEffects();
+      for (const id of authority.getPendingTurnIds()) {
+        authority.observeQueuedEffects(id, beforeOpen);
+      }
       notifier?.flushSync();
       const transactionId = nextTransactionId++;
       const descriptorOwnersBefore = new Set(realizationDescriptors.keys());
@@ -2125,8 +2421,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
 
       const releaseCapture = captureRuntime?.activateCapture();
       let primaryError: unknown;
+      let primaryFailed = false;
       let cleanupError: unknown;
-
+      let cleanupFailed = false;
       const executeTransaction = (): void => {
         try {
           withWriteContext(
@@ -2138,119 +2435,81 @@ export function getOrCreateInternalTransactionRuntime<T>(
             fn
           );
         } catch (error) {
+          primaryFailed = true;
           primaryError = error;
-          notifier?.flushSync();
-          const { effects, baselineValues, orderDeltas } =
-            drainTransactionRollbackInput(transactionId);
-          const rollbackSubjectIds = effects
-            .map((effect) => effect.subject)
-            .filter(
-              (subjectId): subjectId is number => subjectId !== undefined
-            );
-          // Starts true: "nothing to reverse" is a rollback that succeeded
-          // trivially, NOT a refusal. Only the port throwing means nothing was
-          // compensated.
-          let compensated = true;
-          try {
-            if (effects.length > 0 || orderDeltas.length > 0) {
-              try {
-                rollbackPendingEffectsThroughRealizationPort(
-                  transactionId,
-                  effects,
-                  baselineValues,
-                  orderDeltas,
-                  error
-                );
-              } catch (refusal) {
-                compensated = false;
-                throw refusal;
-              }
-            }
-          } finally {
-            try {
-              // Settle AFTER compensation, but UNCONDITIONALLY. Late, so consumers
-              // released by this scope observe the RESTORED state rather than the
-              // doomed one. In a `finally`, because compensation is fallible — it
-              // throws SignalTreeRollbackError on a conservative refusal, which is
-              // a supported fail-closed contract, not an edge case. Skipping the
-              // settle there left the scope open forever, and since nothing can
-              // ever settle it afterwards, autoSave was wedged for the life of the
-              // tree: post-commit silently degraded to never-commit.
-              //
-              // The OUTCOME depends on whether compensation actually applied, which
-              // a bare `finally` cannot see. Refused (or nothing to reverse) means
-              // the authored effects are still the live authoritative state, so
-              // their consequences must FLUSH; discarding them would make durable
-              // truth disagree with live truth to honour a reversal that did not
-              // happen. This is the same rule the plan-level door already applies.
-              settleCommitScope(
-                transactionOwnerToken,
-                transactionId,
-                compensated ? 'discard' : 'commit'
-              );
-              forgetUnclaimedDescriptorSubjects(
-                rollbackSubjectIds,
-                descriptorOwnersBefore
-              );
-            } finally {
-              lifecycleChannel.announce({
-                kind: 'rolled-back',
-                owner: transactionOwnerToken,
-                id: transactionId,
-              });
-            }
-          }
         }
       };
-
       try {
-        const locationRuntime = getLocationRuntime(tree.$);
-        if (locationRuntime) {
-          locationRuntime.runInvalidationGroup(executeTransaction);
-        } else {
-          executeTransaction();
+        const locations = getLocationRuntime(tree.$);
+        if (locations) locations.runInvalidationGroup(executeTransaction);
+        else executeTransaction();
+      } catch (error) {
+        if (!primaryFailed) {
+          primaryFailed = true;
+          primaryError = error;
         }
       } finally {
         try {
           releaseCapture?.();
         } catch (error) {
-          if (primaryError !== undefined) {
+          if (primaryFailed)
             reportCleanupFailure(
               'transaction capture release after failure',
               error
             );
-          } else {
+          else {
+            cleanupFailed = true;
             cleanupError = error;
           }
         }
       }
 
-      if (primaryError !== undefined) {
-        throw primaryError;
+      // Read before staging/flush: delivery intentionally drops net-equal ABA
+      // notifications, but compensation may not erase that writer's authority.
+      const callbackQueuedEvidence = readQueuedLaterEffects();
+      for (const id of authority.getPendingTurnIds()) {
+        authority.observeQueuedEffects(id, callbackQueuedEvidence);
       }
-      if (cleanupError !== undefined) {
-        throw cleanupError;
+      if (callbackQueuedEvidence.length) {
+        callbackExternalEffects.set(transactionId, [
+          ...(callbackExternalEffects.get(transactionId) ?? []),
+          ...callbackQueuedEvidence,
+        ]);
       }
 
       // TURN-FEED-0 'staged': the callback has returned, so this transaction's
       // contribution is complete and awaits a decision.
-      lifecycleChannel.announce({
-        kind: 'staged',
-        owner: transactionOwnerToken,
-        id: transactionId,
-      });
+      if (!primaryFailed)
+        lifecycleChannel.announce({
+          kind: 'staged',
+          owner: transactionOwnerToken,
+          id: transactionId,
+        });
 
       notifier?.flushSync();
       const pendingTurn = materializePendingTransaction(transactionId);
       const pendingTurnId = pendingTurn?.id;
       if (pendingTurn) {
+        inspectionTransactionByTurn.set(pendingTurn.id, transactionId);
+        const keys = new Set((pendingTurn.__effects ?? []).map(effectKey));
+        const writes = inspectionWrites.get(transactionId);
+        for (const key of writes?.keys() ?? [])
+          if (!keys.has(key)) writes?.delete(key);
         notifyListeners(pendingCreatedListeners, pendingTurn);
+      } else {
+        inspectionWrites.delete(transactionId);
       }
+      releaseInspectionIfQuiet();
       let lifecycle: 'pending' | 'confirmed' | 'rejected' = 'pending';
+      let settling = false;
 
       const handle = {
         [PENDING_TURN_ID]: pendingTurnId,
         confirm(): void {
+          const pendingTurn = authority.getPendingTurn(pendingTurnId);
+          if (destroyed) throw new Error('Cannot settle a destroyed tree');
+          if (settling)
+            throw new Error('Transaction settlement is already in progress');
           if (lifecycle === 'confirmed') {
             return;
           }
@@ -2266,6 +2525,18 @@ export function getOrCreateInternalTransactionRuntime<T>(
           try {
             if (pendingTurnId !== undefined) {
               const confirmedTurn = authority.confirmPending(pendingTurnId);
+              const accepted = inspectionWrites.get(transactionId);
+              if (accepted) {
+                let settled = inspectionWrites.get(undefined);
+                if (!settled)
+                  inspectionWrites.set(undefined, (settled = new Map()));
+                for (const [key, write] of accepted) {
+                  if ((settled.get(key)?.seq ?? -1) < write.seq)
+                    settled.set(key, write);
+                }
+                inspectionWrites.delete(transactionId);
+              }
+              inspectionTransactionByTurn.delete(pendingTurnId);
               if (confirmedTurn) {
                 notifyListeners(pendingConfirmedListeners, confirmedTurn);
               }
@@ -2274,6 +2545,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             if (pendingTurnId !== undefined) {
               pendingOrderDeltas.delete(pendingTurnId);
             }
+            releaseInspectionIfQuiet();
             // The physical state this transaction authored is committed truth,
             // so its durable consequences run — last, so a throwing storage
             // backend cannot leave the turn unconfirmed, and in a `finally` so
@@ -2292,162 +2564,167 @@ export function getOrCreateInternalTransactionRuntime<T>(
           }
         },
         rollback(): void {
-          if (lifecycle === 'rejected') {
-            return;
-          }
-          if (lifecycle === 'confirmed') {
+          const pendingTurn = authority.getPendingTurn(pendingTurnId);
+          if (destroyed) throw new Error('Cannot settle a destroyed tree');
+          if (settling)
+            throw new Error('Transaction settlement is already in progress');
+          if (lifecycle === 'rejected') return;
+          if (lifecycle === 'confirmed')
             throw new Error('Cannot rollback a confirmed transaction');
-          }
-
-          // ══ H1/H3 — DECIDE, THEN SETTLE. ═════════════════════════════════
-          //
-          // This method used to retire first and compensate second: it set
-          // `lifecycle = 'rejected'`, announced 'rolled-back', called
-          // `discardPending`, and only THEN attempted the reversal. When the
-          // attempt refused, the throw left a transaction that had already
-          // surrendered its settlement authority while every write it authored
-          // was still live in the tree. Measured on 15.2.1, R6 scenario:
-          //
-          //     outcome  effect-validation-failed   (correctly refused)
-          //     pending  1 -> 0                     (turn retired anyway)
-          //     state    unchanged                  (nothing was reversed)
-          //     retry    'ok'                       (reversing nothing)
-          //
-          // `confirmedCount` also fell by one, because discarding raised
-          // min(pendingIds) and discharged the L15 obligation — a FAILED
-          // rollback destroyed retained evidence it was still responsible for.
-          //
-          // Everything below the PHASE 2 banner is now reached only once the
-          // compensation has actually applied. A refusal changes nothing the
-          // reader can observe, which is what makes the retry in H3 mean
-          // something and what lets an overlapping refusal in H4 leave both
-          // transactions intact.
-          // ═════════════════════════════════════════════════════════════════
-
-          const rollbackPlan =
-            pendingTurnId !== undefined
-              ? authority.getPendingRollbackPlan(pendingTurnId)
-              : { compensation: [] };
-          if ('conflict' in rollbackPlan) {
-            // The SECOND refusal door. 1f94f74a wrapped only the
-            // effect-validation refusal thrown from compensation; this
-            // PLAN-level refusal escaped before any settle, leaking the scope
-            // and killing persistence() for the life of the tree. It is not an
-            // edge case — it is the shipped, tested "application refetch
-            // fallback" pattern, which catches this error, compensates by hand
-            // and never confirms.
-            //
-            // Settled as 'commit', not 'discard': nothing was compensated, so
-            // every write this transaction authored is still live in the tree
-            // and IS the committed truth a reader sees. Discarding would drop
-            // durable consequences for state the tree is still showing, which
-            // is the tree/storage divergence this whole boundary exists to
-            // prevent. Same argument confirm() already uses for the equivalent
-            // situation.
-            //
-            // The scope settles; the TURN does not. Those were conflated.
-            // `settleCommitScope` is idempotent, so a later confirm() or a
-            // retried rollback() on this still-pending turn is safe.
-            settleCommitScope(transactionOwnerToken, transactionId, 'commit');
-            throw createRollbackError(rollbackPlan.conflict);
-          }
-
-          const compensation = rollbackPlan.compensation;
+          const plan =
+            pendingTurnId === undefined
+              ? { compensation: [] }
+              : authority.getPendingRollbackPlan(
+                  pendingTurnId,
+                  readQueuedLaterEffects()
+                );
+          if ('conflict' in plan) throw createRollbackError(plan.conflict);
+          const compensation = plan.compensation;
           const orderDeltas =
             pendingTurnId === undefined
               ? []
               : pendingOrderDeltas.get(pendingTurnId) ?? [];
-
-          // ── PHASE 1 — attempt, with the turn STILL PENDING. ───────────────
-          if (compensation.length > 0 || orderDeltas.length > 0) {
-            // Read, do not retire. `peekPending` exists for exactly this.
-            const pendingRecord =
-              pendingTurnId === undefined
-                ? undefined
-                : authority.peekPending(pendingTurnId);
-            try {
+          let installed = false;
+          let observerFailed = false;
+          let observerError: unknown;
+          const clock =
+            getPhysicalCommitClock(tree.$) ?? getPhysicalCommitClock(tree);
+          const revision = clock?.revision();
+          settling = true;
+          try {
+            const apply = () => {
               rollbackPendingEffectsThroughRealizationPort(
-                pendingTurnId as number,
+                pendingTurnId ?? transactionId,
                 [...compensation].reverse(),
-                pendingRecord?.__baselineValues ?? new Map(),
+                pendingTurn?.__baselineValues ?? new Map(),
                 orderDeltas,
-                undefined,
+                primaryFailed ? primaryError : undefined,
                 transactionId
               );
+              installed = true;
+            };
+            try {
+              const locations = getLocationRuntime(tree.$);
+              if (locations) locations.runInvalidationGroup(apply);
+              else apply();
             } catch (error) {
-              // Refused. Same scope argument as the plan-level door above: the
-              // authored writes are still live, so durable consequences commit
-              // — and the turn stays pending, so the caller can retry or
-              // confirm.
-              settleCommitScope(transactionOwnerToken, transactionId, 'commit');
-              // ⚠️ DO NOT RE-WRAP AN ALREADY-RENDERED ROLLBACK REFUSAL. A
-              // refusal thrown deeper is a SignalTreeRollbackError whose
-              // message already names its kind; stuffing that message into
-              // `errorMessage` and wrapping again produced a DOUBLED
-              // sentence — prefix, reason, prefix, reason, and two `[kind]`
-              // tags. The constant message hid this for as long as it existed:
-              // both layers rendered identically, so the duplication was
-              // invisible until the reason became legible.
-              //
-              // Rethrowing preserves the INNERMOST, most specific refusal,
-              // which is the whole point of making the reason legible. Same
-              // error type, same refusal, same cause chain.
-              if (error instanceof SignalTreeRollbackError) throw error;
-              throw createRollbackError({
-                kind: 'effect-validation-failed',
-                pendingTurnId: pendingTurnId as number,
-                compensation,
-                errorMessage:
-                  error instanceof Error
-                    ? error.message
-                    : 'Unknown rollback validation failure',
-                cause: error,
-              });
+              // Physical commit precedes observer delivery. A delivery failure
+              // must not leave a successfully compensated turn retryable.
+              installed ||=
+                revision !== undefined && clock?.revision() !== revision;
+              if (!installed) {
+                if (error instanceof SignalTreeRollbackError) throw error;
+                throw createRollbackError({
+                  kind: 'effect-validation-failed',
+                  pendingTurnId: pendingTurnId ?? transactionId,
+                  compensation,
+                  errorMessage:
+                    error instanceof Error
+                      ? error.message
+                      : 'Unknown rollback validation failure',
+                  cause: error,
+                  callbackError: primaryFailed ? primaryError : undefined,
+                });
+              }
+              observerFailed = true;
+              observerError = error;
             }
-          }
-
-          // ── PHASE 2 — the reversal APPLIED. Now the turn may be retired. ──
-          lifecycle = 'rejected';
-          lifecycleChannel.announce({
-            kind: 'rolled-back',
-            owner: transactionOwnerToken,
-            id: transactionId,
-          });
-          let discardedTurn: TransactionTurnRecord | undefined;
-          if (pendingTurnId !== undefined) {
-            discardedTurn = authority.discardPending(pendingTurnId);
-            pendingOrderDeltas.delete(pendingTurnId);
-          }
-          try {
-            // 'discard', unconditionally: reaching here means the baseline was
-            // restored, so the speculative consequences describe state the tree
-            // no longer shows. The old `compensated ? 'discard' : 'commit'`
-            // ternary lived in a `finally` that also ran on the refusal path;
-            // that path now returns above, so the condition it selected on can
-            // no longer be false here.
-            settleCommitScope(transactionOwnerToken, transactionId, 'discard');
+            lifecycle = 'rejected';
+            inspectionWrites.delete(transactionId);
+            if (pendingTurnId !== undefined)
+              inspectionTransactionByTurn.delete(pendingTurnId);
+            const discarded =
+              pendingTurnId === undefined
+                ? undefined
+                : authority.discardPending(pendingTurnId);
+            if (pendingTurnId !== undefined)
+              pendingOrderDeltas.delete(pendingTurnId);
+            releaseInspectionIfQuiet();
+            lifecycleChannel.announce({
+              kind: 'rolled-back',
+              owner: transactionOwnerToken,
+              id: transactionId,
+            });
+            try {
+              if (discarded)
+                notifyListeners(pendingDiscardedListeners, discarded);
+            } finally {
+              try {
+                settleCommitScope(
+                  transactionOwnerToken,
+                  transactionId,
+                  'discard'
+                );
+              } finally {
+                forgetUnclaimedDescriptorSubjects(
+                  pendingTurn?.restorationSubjectIds ?? [],
+                  descriptorOwnersBefore
+                );
+              }
+            }
+            if (observerFailed) throw observerError;
           } finally {
-            forgetUnclaimedDescriptorSubjects(
-              discardedTurn?.restorationSubjectIds ?? [],
-              descriptorOwnersBefore
-            );
-          }
-
-          if (discardedTurn) {
-            notifyListeners(pendingDiscardedListeners, discardedTurn);
+            settling = false;
           }
         },
       };
-      // Cast, not a widened public type: PENDING_TURN_ID is module-private
-      // and PendingTransaction must not grow a field for it.
+      if (primaryFailed) {
+        try {
+          handle.rollback();
+        } catch (rollbackError) {
+          // RECOVERY-HANDLE-0. `transact()` has not returned, so a refused
+          // compensation would otherwise strand a transaction that is still
+          // pending and still settleable with no reference to it. Catching
+          // inside the callback only helps prospectively.
+          //
+          // `lifecycle` is the exact discriminator: rollback() assigns
+          // 'rejected' only AFTER compensation physically installs, so a
+          // refusal arrives here still 'pending' while an observer failure
+          // arrives 'rejected'. Attaching a handle to a settled turn would
+          // offer authority that no longer exists.
+          // `!destroyed` matters: rollback()'s first guard throws on a
+          // destroyed tree BEFORE lifecycle can move, so the lifecycle test
+          // alone would hand back a handle whose every method throws "Cannot
+          // settle a destroyed tree". Offering unusable authority is the same
+          // class of false claim this recovery exists to remove.
+          if (
+            lifecycle === 'pending' &&
+            !destroyed &&
+            typeof rollbackError === 'object' &&
+            rollbackError !== null
+          ) {
+            Object.defineProperty(rollbackError, 'recovery', {
+              value: {
+                transaction: handle as PendingTransaction,
+                // Explicit: the callback may have thrown `undefined`.
+                callbackFailed: true,
+                callbackError: primaryError,
+              },
+              enumerable: false,
+              configurable: true,
+              writable: true,
+            });
+          }
+          throw rollbackError;
+        }
+        throw primaryError;
+      }
+      if (cleanupFailed) throw cleanupError;
+      // The pending-turn symbol remains private to the Proposal facade.
       return handle as PendingTransaction;
     },
     getConfirmedTurnRecords: () => authority.getConfirmedTurnRecords(),
-    describePendingTurn: (turnId: number) =>
-      authority.describePendingTurn(turnId),
     setHistoryRetention: (retain: number) =>
       authority.setHistoryRetention(retain),
     getConfirmedRetention: () => authority.getConfirmedRetention(),
+    describePendingTurn: inspectPendingTurn,
+    getInspectionFootprintCountsForTesting: () => ({
+      writers: inspectionWrites.size,
+      footprints: [...inspectionWrites.values()].reduce(
+        (count, writes) => count + writes.size,
+        0
+      ),
+    }),
     getConfirmedTurnCount: () => authority.getConfirmedTurnCount(),
     getPendingTurnCount: () => authority.getPendingTurnCount(),
     getConfirmedTurnIds: () => authority.getConfirmedTurnIds(),
@@ -2475,6 +2752,27 @@ export function getOrCreateInternalTransactionRuntime<T>(
 
   if (typeof tree.registerCleanup === 'function') {
     tree.registerCleanup(() => {
+      destroyed = true;
+      authority.releaseConfirmedTurnsOnDestroy();
+      cancelCommitScopes(transactionOwnerToken);
+      for (const id of authority.getPendingTurnIds()) {
+        const discarded = authority.discardPending(id);
+        forgetUnclaimedDescriptorSubjects(
+          discarded?.restorationSubjectIds ?? [],
+          new Set()
+        );
+      }
+      pendingTransactions.clear();
+      callbackExternalEffects.clear();
+      inspectionWrites.clear();
+      inspectionTransactionByTurn.clear();
+      unsubscribeEnqueue?.();
+      unsubscribeEnqueue = null;
+      pendingCreatedListeners.clear();
+      pendingConfirmedListeners.clear();
+      pendingDiscardedListeners.clear();
+      drainCaptureBucket(pendingCapture);
+
       try {
         unsubscribeFlush?.();
       } catch (error) {
@@ -2549,12 +2847,15 @@ function classifyProposedEffect(
   if (effect.kind === 'set') {
     const replaced = laterEffects.some(
       (later) =>
-        later.kind === 'set' &&
         later.position === effect.position &&
-        later.path === effect.path &&
-        (later.subject === undefined ||
-          effect.subject === undefined ||
-          later.subject === effect.subject)
+        ((later.kind === 'remove' &&
+          effect.subject !== undefined &&
+          later.subject === effect.subject) ||
+          (later.kind === 'set' &&
+            scalarRelation(later, effect) === 'same' &&
+            (later.subject === undefined ||
+              effect.subject === undefined ||
+              later.subject === effect.subject)))
     );
     return replaced ? 'superseded' : 'current';
   }
@@ -2571,6 +2872,24 @@ function classifyProposedEffect(
   }
   return present ? 'current' : 'superseded';
 }
+
+/**
+ * Optional evidence retention (L15).
+ *
+ * Correctness records are bounded by live obligation and are NOT configurable:
+ * a confirmed turn is released once no older pending turn could still need it.
+ * This asks for diagnostic history ON TOP of that, and it is opt-in because
+ * the reader-visible policy may not change silently.
+ */
+export type TransactionsConfig = {
+  history?: {
+    /**
+     * Most recent confirmed turns to retain as evidence beyond what
+     * correctness requires. Omitted or 0 means correctness-only.
+     */
+    retain: number;
+  };
+};
 
 export function transactions(
   config?: TransactionsConfig
@@ -2609,9 +2928,31 @@ export function transactions(
         if (!raw) {
           return { changes: [] };
         }
+        // The registry already holds the typed segment address for every
+        // position — the same L17 machinery `link()` egress uses. Projecting
+        // only the dotted string was what made two different locations
+        // indistinguishable to a reviewer.
+        const registry = getPositionRegistry(tree.$);
         return {
           changes: raw.effects.map((effect) => ({
             path: effect.path,
+            // The position address locates the OWNER (for an entity field that
+            // is the collection); `subjectFieldSegments` is the producer-known
+            // row-relative address. Appending it is what makes two fields of
+            // one row distinguishable. The segments already existed and were
+            // already authoritative — `scalarRelation` and `makeScalarKey`
+            // key on them — so only the public projection was dropping them.
+            address: (() => {
+              const owner = registry?.addressFor(effect.position);
+              if (!owner) return owner;
+              const within =
+                effect.kind === 'set' ? effect.subjectFieldSegments : undefined;
+              return within ? [...owner, ...within] : owner;
+            })(),
+            subject:
+              'subject' in effect && typeof effect.subject === 'number'
+                ? effect.subject
+                : undefined,
             status: classifyProposedEffect(effect, raw.laterEffects),
           })),
         };

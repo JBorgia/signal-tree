@@ -282,10 +282,17 @@ pnpm nx build demo --configuration=production
 
 | Target                | Prod budget | Dev budget |
 | --------------------- | ----------- | ---------- |
-| `signaltree-bare`     | 10.0 KB     | 12.2 KB    |
-| `signaltree-entities` | 22.3 KB     | 24.9 KB    |
+| `signaltree-bare`     | 10.25 KB    | 12.45 KB   |
+| `signaltree-entities` | 22.60 KB    | 25.25 KB   |
 
-The authoritative gzip gate is [`tools/check-bundle-budget.mjs`](tools/check-bundle-budget.mjs) — the single source of truth for library size claims; every other doc's numbers must trace back to it. Current measured (own-code only; framework peers and `tslib` external): bare `signalTree` **9.98 KB** prod (budget 10.0), a tree using a plain `entityMap()` **22.20 KB** prod (budget 22.3). The v15 cost is attributed in the gate's own comments: universal callable locations own subscriptions, coherent publication, exception-safe settlement, collectible derived dependencies, terminal topology, and callable EntityMap fields; declarative construction also puts the enhancer resolver on every tree's mandatory path. Check with `node tools/check-bundle-budget.mjs`.
+The authoritative gzip gate is [`tools/check-bundle-budget.mjs`](tools/check-bundle-budget.mjs).
+The current audit's fresh built output exceeds these unchanged ceilings: bare
+**10.35 KB prod / 12.48 KB dev**, entities **23.01 KB prod / 25.60 KB dev**.
+These are failed measurements, not approved new budgets. Evidence is recorded in
+`docs/audits/2026-09-23-remediation.md`; rerun the generator against fresh output
+before relying on numbers after further source changes. Framework peers and
+`tslib` are external to this own-code measurement. Do not infer that a passing
+functional test suite resolves the size failure.
 
 ### Validation pipeline
 
@@ -481,12 +488,14 @@ alongside an Angular one, which was the one arguable case for a package-level
 `engines` — it would still have constrained browser consumers for a server-only
 reason. That package has no v15 successor, so the exception is moot.)
 
-Kernel declarations are bundled from the two public entry points directly to
-`dist/index.d.ts` and `dist/adapter.d.ts` within the package's single Rollup
-invocation. Nx's per-source declaration and dts-bundle plugins are removed from
-the kernel runtime configuration; `rollup-plugin-dts` emits the final public
-declaration surface without a post-build rewrite or copy step.
+Kernel declarations use one Rollup declaration graph for `index`, `adapter`, and
+`internals`. It emits their public `.d.ts` entry files plus private shared
+declaration chunks included by the package's `dist/**/*.d.ts` file pattern. The
+shared graph preserves nominal identities across entries without exporting
+private brands or rewriting declarations afterward. Nx's per-source declaration
+and dts-bundle plugins remain removed from the kernel runtime configuration.
 
 `node tools/verify-consumer-typecheck.mjs` packs that artifact and compiles a
 real consumer with `skipLibCheck: false` under both `bundler` and `node16`
-resolution. This is a release gate, not an optional audit.
+resolution, including the framework hydration and negative Link-admission
+fixtures. This is a release gate, not an optional audit.

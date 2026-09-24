@@ -1,5 +1,7 @@
+import { getOwnedPositionIds } from './owned-metadata';
 import {
   createPositionRegistry,
+  defineNodeAddress,
   type PositionRegistry,
 } from './position-registry';
 import type { PhysicalCommitClock } from './physical-commit-clock';
@@ -815,7 +817,8 @@ function isOrdinaryStateRequest(v: unknown): v is OrdinaryStateRequest {
 export type OrdinaryStateMaterializer = (
   value: unknown,
   path: string,
-  parentPositionId?: number
+  parentPositionId: number | undefined,
+  address: readonly string[]
 ) => unknown;
 
 /**
@@ -853,9 +856,15 @@ function materializeKeyedAware(
   authority: OrdinaryConstructionAuthority,
   request: OrdinaryStateRequest,
   path: string,
-  parentPositionId?: number
+  parentPositionId: number | undefined,
+  address: readonly string[]
 ): unknown {
-  const branch = authority.materialize(request.value, path, parentPositionId);
+  const branch = authority.materialize(
+    request.value,
+    path,
+    parentPositionId,
+    address
+  );
   if (request.keyedLookup && isTraversableNode(branch)) {
     attachKeyIndex(branch as object);
     // Lifetime authority is granted ONLY here — to a branch whose contract
@@ -921,7 +930,8 @@ export function materializeMarkers(
                   authority,
                   produced,
                   pathString,
-                  parentPositionId
+                  parentPositionId,
+                  currentPath
                 )
               : produced;
           // Stamp the owning processor so lookup is an O(1) property read
@@ -929,6 +939,15 @@ export function materializeMarkers(
           // it cannot reach a string-key walk; the `SignalTree:` prefix keeps
           // it out of the symbol walk too.
           if (isTraversableNode(materialized)) {
+            defineNodeAddress(materialized as object, currentPath);
+            if (context.positionTopologyEnabled) {
+              for (const position of getOwnedPositionIds(materialized) ?? []) {
+                context.positionRegistry.registerPositionAddress(
+                  position,
+                  currentPath
+                );
+              }
+            }
             bindLocationRuntime(
               materialized as object,
               context.locationRuntime

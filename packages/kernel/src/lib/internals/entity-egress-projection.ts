@@ -35,15 +35,40 @@ import {
 
 type Key = string | number;
 
+/** Undefined evidence cannot authorize adopting a captured whole row. */
+export function projectEntityFields(
+  previous: unknown,
+  row: unknown,
+  fields: readonly string[] | null | undefined
+): unknown {
+  if (fields === null) return row;
+  if (!fields?.length || !row || typeof row !== 'object') return previous;
+  const next = { ...(previous as Record<string, unknown>) };
+  for (const key of fields) {
+    if (Object.prototype.hasOwnProperty.call(row, key)) {
+      Object.defineProperty(next, key, {
+        value: (row as Record<string, unknown>)[key],
+        enumerable: true,
+        configurable: true,
+        writable: true,
+      });
+    } else delete next[key];
+  }
+  return next;
+}
+
 export type EntityEgressProjection = {
   /** The complete eligible `Row[]`, in eligible order. */
   value(): readonly unknown[];
+  /** Advance local order; only authored order may advance eligible authority. */
+  reorder(afterSubjects: readonly number[], inspection: boolean): boolean;
   /** Apply one notification. Returns true if eligible authority advanced. */
   apply(
     subjectId: number | undefined,
     row: unknown,
     effect: StructuralEffect | undefined,
-    inspection: boolean
+    inspection: boolean,
+    fields?: readonly string[] | null
   ): boolean;
   /** Inbound external truth replaces authority and topology alike. */
   reseed(seed: readonly EntityProjectionSeedEntry<Key, unknown>[]): void;
@@ -76,7 +101,8 @@ export function createEntityEgressProjection(
     if (order.includes(subject)) return;
     const at = topology.placement(subject, isEligible);
     if (at === 'end') return void order.push(subject);
-    if ('after' in at) return void order.splice(order.indexOf(at.after) + 1, 0, subject);
+    if ('after' in at)
+      return void order.splice(order.indexOf(at.after) + 1, 0, subject);
     order.splice(order.indexOf(at.before), 0, subject);
   }
 
@@ -105,12 +131,30 @@ export function createEntityEgressProjection(
   return {
     value: () => order.map((s) => rows.get(s)),
 
+    reorder(afterSubjects, inspection) {
+      topology.reorder(afterSubjects);
+      if (inspection) return false;
+      const present = new Set(afterSubjects);
+      const eligible = afterSubjects.filter(isEligible);
+      let cursor = 0;
+      let changed = false;
+      // Inspection may have removed a still-eligible lifetime. Reordering the
+      // live subset does not authorize deleting or adopting any lifetime.
+      order = order.map((subject) => {
+        if (!present.has(subject)) return subject;
+        const next = eligible[cursor++];
+        if (next !== subject) changed = true;
+        return next;
+      });
+      return changed;
+    },
+
     reseed(entries) {
       topology = createEntityTopology(entries);
       load(entries);
     },
 
-    apply(subjectId, row, effect, inspection) {
+    apply(subjectId, row, effect, inspection, fields) {
       // Local topology tracks reality, whoever wrote it.
       if (effect) topology.observe(effect);
 
@@ -136,11 +180,20 @@ export function createEntityEgressProjection(
         // Address moves; lifetime, payload and order do not. A collection key
         // is not part of the `Row[]` this relationship publishes.
         if (!isEligible(effect.subject)) return false;
-        if (effect.afterKey !== undefined) keyOf.set(effect.subject, effect.afterKey);
+        if (effect.afterKey !== undefined)
+          keyOf.set(effect.subject, effect.afterKey);
         return true;
       }
 
       if (subjectId === undefined) return false;
+      if (isEligible(subjectId)) {
+        const previous = rows.get(subjectId);
+        const next = projectEntityFields(previous, row, fields);
+        if (next === previous) return false;
+        rows.set(subjectId, next);
+        return true;
+      }
+      if (fields === undefined) return false;
       if (!isEligible(subjectId)) {
         if (!topology.has(subjectId)) return false;
         const k = topology.keyOf(subjectId);

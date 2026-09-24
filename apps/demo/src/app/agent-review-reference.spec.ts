@@ -61,7 +61,11 @@ const buildReview = (tree: Tree, proposal: Proposal): ReviewRow[] =>
     currentValue: readByPath(tree, change.path),
   }));
 
-/** An ordinary read. No kernel identity, no effect list — just the path. */
+/**
+ * Application adapter for this fixture's known collection and dot-free IDs.
+ * Display paths are ambiguous for arbitrary keys; this is not a universal
+ * SignalTree path resolver.
+ */
 const readByPath = (tree: Tree, path: string): unknown => {
   const [head, ...rest] = path.split('.');
   if (head === 'orders' && rest.length > 0) {

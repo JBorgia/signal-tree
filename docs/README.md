@@ -8,6 +8,9 @@ Use this index to navigate the documentation.
 
 **Current release:** 15.3.0 See [CHANGELOG](../CHANGELOG.md).
 
+**Workspace version:** 16.0.0-dev — development only. The workspace version does
+NOT establish that 16.0.0 was published or is safe to release.
+
 ---
 
 ## 📚 Getting Started

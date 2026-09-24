@@ -113,6 +113,34 @@ function classify(symbol, checker) {
   return null;
 }
 
+// TypeScript's __@iterator@N includes an allocation ID, not public identity.
+// Normalize only computed keys resolved to unique-symbol properties of the
+// standard-library SymbolConstructor. User unique symbols (even named iterator
+// or reached through a shadowed Symbol) retain their distinct checker identities.
+function wellKnownMemberName(member, checker, program) {
+  const declaration = member.getDeclarations()?.[0];
+  if (!declaration?.name || !ts.isComputedPropertyName(declaration.name))
+    return undefined;
+  const key = checker.getSymbolAtLocation(declaration.name.expression);
+  const declarations = key?.getDeclarations();
+  if (
+    !declarations?.length ||
+    !declarations.every(
+      (d) =>
+        ts.isPropertySignature(d) &&
+        ts.isInterfaceDeclaration(d.parent) &&
+        d.parent.name.text === 'SymbolConstructor' &&
+        program.isSourceFileDefaultLibrary(d.getSourceFile())
+    ) ||
+    !(
+      checker.getTypeOfSymbolAtLocation(key, declarations[0]).flags &
+      ts.TypeFlags.UniqueESSymbol
+    )
+  )
+    return undefined;
+  return `[Symbol.${key.getName()}]`;
+}
+
 function collect() {
   const rows = new Map();
   for (const pkg of PACKAGES) {
@@ -205,10 +233,13 @@ function collect() {
           const mtype = mdecl
             ? checker.getTypeOfSymbolAtLocation(member, mdecl)
             : undefined;
-          rows.set(`${pkg}:${name}.${member.getName()}`, {
+          const wellKnown = wellKnownMemberName(member, checker, program);
+          // Bracket identity differs from the dotted identity of a literal
+          // string property named "[Symbol.iterator]".
+          rows.set(`${pkg}:${name}${wellKnown ?? `.${member.getName()}`}`, {
             pkg,
             owner: name,
-            name: member.getName(),
+            name: wellKnown ?? member.getName(),
             memberKind: kind,
             signatures: mtype ? signaturesOf(mtype, checker) : [],
           });

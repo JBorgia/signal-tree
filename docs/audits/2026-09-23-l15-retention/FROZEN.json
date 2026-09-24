@@ -1,0 +1,29 @@
+{
+  "immutableHead": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+  "cases": [
+    "R01",
+    "R02",
+    "R03",
+    "R04",
+    "R05",
+    "R06"
+  ],
+  "scale": 50000,
+  "timeoutMs": 120000,
+  "execution": "Sequential fresh Node subprocess per case/diagnostic arm; expose-gc; 1GiB process ceiling is execution safety, not retention policy. Timeout/incomplete/error never pass.",
+  "instrumentation": "Virtual esbuild-only count methods; exact original/instrumented/bundle SHA256 recorded; production files and dist untouched. Null indicates unavailable baseline/current counters.",
+  "assertions": {
+    "R01": "50k confirmed on live tree; final truth/count/diagnostic reader match; active pending/dependency/capture machinery quiet. Confirmed retained diagnostic records explicitly allowed, not called leak.",
+    "R02": "50k rejected on live tree; baseline truth, no confirmed records, active machinery quiet.",
+    "R03": "1000 refused occupied-identity retries preserve pending/state/counts; successful retry after removing conflict drains active machinery.",
+    "R04": "One oldest pending plus50k newer accepted same-field writes; terminal accepted handles absent from pending and inspection compact where observable; older reject preserves latest confirmed value. Retained confirmed suffix still has rollback query obligation.",
+    "R05": "Destroy with pending retirement; count active obligations with runtime/handle held, assert later settlement/reader refused. Does not claim complete heap reclamation/GC collection.",
+    "R06": "Independent fresh processes diagnostics journal on/off with default existing retention settings; compare settlement outcomes and state exactly. Does not assert every outcome legal or cover Redux DevTools UI."
+  },
+  "classification": "Active correctness, diagnostics, mixed conditional reader obligation, and unknown are separate. Per-subsystem byte attribution and complete outside-workspace consumer inventory unknown. No cap proposed.",
+  "sources": {
+    "tools/experiments/l15-retention/probe.ts": "d947da8698a880ec240bff07f9b9155684bbdc9db5de4614217a332a61609de6",
+    "tools/experiments/l15-retention/run.mjs": "34fe8d9dc11c923fb7d6f823d77c9be2e1f5031451b70ab6bda59bef186af56a",
+    "docs/research/transaction-semantics-2/MATRIX.md": "a590fdaa195a00c8ed7f7228bcd690cd1bdc96d400d02a2fced53be9553ef747"
+  }
+}

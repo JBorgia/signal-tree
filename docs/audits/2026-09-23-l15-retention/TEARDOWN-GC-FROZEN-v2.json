@@ -1,0 +1,24 @@
+{
+  "immutableHead": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+  "scenarios": [
+    "destroyed-confirmed-held",
+    "live-confirmed-held",
+    "destroyed-external-held",
+    "destroyed-rejected-held",
+    "destroyed-confirmed-released"
+  ],
+  "timeoutMs": 30000,
+  "expectations": {
+    "destroyed-confirmed-held": "obsolete payload must be collectible with destroyed tree/runtime/reader held; reader must refuse; no explicit raw record/snapshot retained",
+    "live-confirmed-held": "positive retention control: live diagnostic/history obligation can retain old payload",
+    "destroyed-external-held": "negative control: same references with no authored confirmed history should not retain replaced payload",
+    "destroyed-rejected-held": "negative control: rejected temporary payload should collect",
+    "destroyed-confirmed-released": "negative control: dropped destroyed wrappers should not make payload globally rooted"
+  },
+  "instrumentation": "None. Production bundled byte-for-byte at source; only plain GC/WeakRef test code.16 full event-loop jobs with GC, no intermediate deref.256MiB process execution ceiling, no retention policy.",
+  "sources": {
+    "tools/experiments/l15-retention/teardown-gc.ts": "c6edf1e57311b880e02fa09df71ab40a3271ba7ddb5521647fd96e142d0ce379",
+    "tools/experiments/l15-retention/run-teardown-gc.mjs": "2b95491d9f1cc10124e88ad91e6c082c3fdc2c18aaa55302b0dea02b98c13d01"
+  },
+  "correction": "v1 positive control failed: opaque object wrapper identity not retained although child payloads retained. v2 target is direct1MiB Uint8Array leaf, allocated after construction, replaced with1byte leaf before GC. Same production and law, no weakened assertion."
+}

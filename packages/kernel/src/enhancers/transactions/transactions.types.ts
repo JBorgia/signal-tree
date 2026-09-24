@@ -80,16 +80,38 @@ export interface PendingTransaction {
 export type ProposalStatus = 'current' | 'superseded';
 
 /**
- * One proposed change, located by path.
+ * One proposed change, described by a display path and review status.
  *
- * Carries no identity token deliberately. Classification uses subject lifetime
- * internally — it must, or a business key reused by a different record would
- * be misread — but `PROPOSAL-REVIEW-SURFACE-0` measured that the RESULT does
- * not need it: two proposals with the same `path` and the same visible value
- * are still told apart by `status` alone.
+ * Classification distinguishes entity lifetimes internally. The public path
+ * is not a unique address: a literal key containing a dot can have the same
+ * display path as nested fields. Status does not resolve that ambiguity.
+ * Map changes to ordinary state reads using application knowledge; splitting
+ * this string on dots is not a general-purpose resolver.
  */
 export type ProposalChange = {
+  /**
+   * Human-readable location. PRESENTATION ONLY, and deliberately ambiguous:
+   * a literal key `'a.b'` and the nested path `a.b` both render as `"a.b"`.
+   * Use it for display; never to identify which location changed.
+   */
   path: string;
+  /**
+   * Lossless typed address — the segments that actually identify the location.
+   * `['a.b']` and `['a','b']` are different places and read differently here,
+   * which is what lets a reviewer be told the truth about what an agent
+   * changed (law L17: human-readable paths are presentation, never identity).
+   *
+   * `undefined` when the position cannot be resolved to an address, reported
+   * rather than guessed.
+   */
+  address: readonly string[] | undefined;
+  /**
+   * Subject identity when this location belongs to an entity subject. A reused
+   * business key is a DIFFERENT subject, so this distinguishes "the agent
+   * edited the row that is there now" from "the agent edited the row that used
+   * to be there" (law L7).
+   */
+  subject?: number;
   status: ProposalStatus;
 };
 
@@ -113,7 +135,7 @@ export interface Proposal {
    *
    * Does NOT enroll in restoration, and takes no option to. `undoable()`
    * designates the causal turn containing its WRITES, and a proposal's writes
-   * happen when `proposal()` runs — so an `accept()`-time flag could only be
+   * happen when `propose()` runs — so an `accept()`-time flag could only be
    * honoured by retroactively designating a turn, which is a new authority
    * rule this facade exists to avoid. Measured: wrapping `confirm()` alone
    * designates nothing.
@@ -124,7 +146,7 @@ export interface Proposal {
    * ```ts
    * let proposal!: Proposal;
    * undoable(() => {
-   *   proposal = store.proposal(() => applyResult(result));
+   *   proposal = store.propose(() => applyResult(result));
    * });
    * // ...human reviews for as long as needed...
    * proposal.accept();   // one undo unit

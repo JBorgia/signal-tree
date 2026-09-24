@@ -20,8 +20,7 @@ import { describe, expect, it } from 'vitest';
 
 import { of } from 'rxjs';
 
-import { batching, entityMap, signalTree } from '../index';
-import { serialization } from '../enhancers/serialization/serialization';
+import { batching, entityMap, link, signalTree } from '../index';
 import type { Location } from './internals/cell-runtime';
 import { interceptLocationWrites } from './internals/location-runtime';
 import { getPathNotifier, resetPathNotifier } from './path-notifier';
@@ -91,9 +90,9 @@ describe('walker conformance — core subsystems on a deep callable-branch tree'
         applied++;
         proceed();
       });
-      (t as unknown as { registerCleanup(fn: () => void): void }).registerCleanup(
-        release
-      );
+      (
+        t as unknown as { registerCleanup(fn: () => void): void }
+      ).registerCleanup(release);
       return t;
     };
 
@@ -114,26 +113,30 @@ describe('walker conformance — core subsystems on a deep callable-branch tree'
     expect(applied).toBe(1);
   });
 
-  it('serialization round-trips deep leaves and a Date sitting mid-path', () => {
+  it('Link restores deep leaves and a Date sitting mid-path', async () => {
     const initial = makeDeepState();
-    const tree = signalTree(initial, { enhancers: [serialization()] });
+    const tree = signalTree(initial);
+    const snapshot = tree.$();
+    const connection = link(tree.$, { get: () => snapshot });
+    try {
+      // Corrupt deep state, then restore — deserialize must recurse through
+      // callable branch accessors (not bail on typeof 'function') to reach
+      // the depth-5 leaves and the built-in Date leaf.
+      tree.$.org.teams.alpha.lead.profile.display('WRONG');
+      tree.$.org.teams.alpha.lead.profile.score(-1);
+      tree.$.org.meta.founded(new Date(0));
 
-    const json = tree.serialize();
+      await connection.retrieve();
 
-    // Corrupt deep state, then restore — deserialize must recurse through
-    // callable branch accessors (not bail on typeof 'function') to reach
-    // the depth-5 leaves and the built-in Date leaf.
-    tree.$.org.teams.alpha.lead.profile.display('WRONG');
-    tree.$.org.teams.alpha.lead.profile.score(-1);
-    tree.$.org.meta.founded(new Date(0));
-
-    tree.deserialize(json);
-
-    expect(tree.$.org.teams.alpha.lead.profile.display()).toBe('Ada');
-    expect(tree.$.org.teams.alpha.lead.profile.score()).toBe(1);
-    expect(tree.$.org.meta.founded().toISOString()).toBe(
-      initial.org.meta.founded.toISOString()
-    );
+      expect(tree.$.org.teams.alpha.lead.profile.display()).toBe('Ada');
+      expect(tree.$.org.teams.alpha.lead.profile.score()).toBe(1);
+      expect(tree.$.org.meta.founded().toISOString()).toBe(
+        initial.org.meta.founded.toISOString()
+      );
+    } finally {
+      connection.dispose();
+      tree.destroy();
+    }
   });
 
   it('PathNotifier observes a write five branches deep', async () => {
@@ -155,5 +158,4 @@ describe('walker conformance — core subsystems on a deep callable-branch tree'
     expect(paths).toContain('org.teams.alpha.lead.profile.score');
     unsubscribe();
   });
-
 });

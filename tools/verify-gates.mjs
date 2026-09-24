@@ -58,6 +58,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { RELEASE_PACKAGES } from '../scripts/release-plan.mjs';
+import { buildIntegrity } from '../scripts/publish-artifact-integrity.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const BUILD_PROJECTS = RELEASE_PACKAGES.join(',');
@@ -1178,7 +1179,7 @@ const GATES = [
   {
     name: 'retention-gc',
     covers:
-      'the GC-requiring retention proofs: diagnostic and persistence owners release values at their boundaries, and source locations do not retain abandoned derived recipes',
+      'the GC-requiring retention proofs: diagnostic and Link owners release values at their boundaries, and source locations do not retain abandoned derived recipes',
     // Runs outside `nx test kernel` because it needs --expose-gc, and it FAILS
     // rather than skips without it: a WeakRef that is merely eligible for
     // collection proves nothing, and a skipped retention test reads as evidence.
@@ -1193,9 +1194,9 @@ const GATES = [
     ],
     env: { NODE_OPTIONS: '--expose-gc' },
     mutation: {
-      file: 'packages/kernel/src/enhancers/serialization/a2-5-lifetime.spec.ts',
-      find: "    if (mode === 'destroyed') (tree as Persisted).destroy?.();",
-      replace: "    if (mode === 'destroyed') void tree;",
+      file: 'packages/kernel/src/lib/link-lifetime.spec.ts',
+      find: "  if (mode === 'disposed') connection?.dispose();",
+      replace: "  if (mode === 'disposed') void connection;",
     },
   },
   {
@@ -1661,7 +1662,34 @@ function buildOnceIfNeeded() {
   }
 }
 
-buildOnceIfNeeded();
+// The publisher has already built and sealed these artifacts. Explicitly skip
+// the wrapper's cached rebuild, and require every gate to preserve the seal.
+// Mutation proofs run separately, without this mode, before the final rebuild.
+const artifactArgs = process.argv.filter(
+  (arg) =>
+    arg === '--artifact-integrity' || arg.startsWith('--artifact-integrity=')
+);
+const artifactIntegrity = artifactArgs[0]?.slice(
+  '--artifact-integrity='.length
+);
+if (
+  artifactArgs.length > 1 ||
+  (artifactArgs.length &&
+    (!/^sha256-[a-f0-9]{64}$/.test(artifactIntegrity) || has('--self-test')))
+) {
+  throw new Error(
+    'Artifact integrity requires one SHA256 seal and non-mutation gates'
+  );
+}
+function assertArtifacts(label) {
+  if (
+    artifactIntegrity &&
+    buildIntegrity(ROOT, RELEASE_PACKAGES) !== artifactIntegrity
+  )
+    throw new Error(`Release artifacts changed ${label}`);
+}
+if (artifactIntegrity) assertArtifacts('before gates');
+else buildOnceIfNeeded();
 
 function run(gate) {
   try {
@@ -1869,7 +1897,9 @@ if (has('--self-test')) {
   console.log(`\nRunning ${selected.length} gates\n`);
   for (const gate of selected) {
     process.stdout.write(`  · ${gate.name.padEnd(20)} `);
+    assertArtifacts(`before ${gate.name}`);
     const result = run(gate);
+    assertArtifacts(`after ${gate.name}`);
     const ok = result.code === 0;
     results.push({
       gate,

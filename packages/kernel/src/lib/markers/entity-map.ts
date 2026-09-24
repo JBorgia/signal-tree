@@ -1,4 +1,5 @@
 import { definePositionRegistry } from '../internals/position-registry';
+import { MUTATION_CAPTURE_RUNTIME } from '../internals/mutation-capture-runtime';
 import type { CarrierKind, EntitySignalOf, ReadonlyOf } from '../types';
 
 import { createEntitySignal } from '../entity-signal';
@@ -295,6 +296,9 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
         entitySignal as unknown as object,
         context.positionRegistry
       );
+      Object.defineProperty(entitySignal, MUTATION_CAPTURE_RUNTIME, {
+        value: context.mutationCaptureRuntime,
+      });
 
       // Register as a reclamation target, but ONLY when something in this
       // tree can restore. Without restoration authority the retirement
@@ -397,12 +401,14 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
             }
             if (changed.length < incoming.length) {
               for (const entity of changed) node.upsertOne(entity as never);
-              // Guard against id divergence: if any incoming entity carried a
-              // DIFFERENT id than the row it replaced, upsert added rather
-              // than replaced and the count moved. Repair with the full
-              // rebuild rather than leave a half-applied restore — this is the
-              // one place a wrong shortcut would silently corrupt state.
-              diffed = node.count() === incoming.length;
+              // Count alone misses a reorder of existing rows. Check the
+              // complete resulting sequence, using the same shared row
+              // references as the fast path. This also handles custom selectId
+              // and key divergence without reconstructing keys from payloads.
+              const updated = node.all();
+              diffed =
+                updated.length === incoming.length &&
+                updated.every((entity, index) => entity === incoming[index]);
             }
           }
 

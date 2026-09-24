@@ -1,9 +1,18 @@
 import type { Location } from './cell-runtime';
 
-import { emitOwnedMutation } from './owned-mutation';
-import { getOwnedOwnerPath } from './owned-metadata';
-import { getPositionRegistry } from './position-registry';
+import {
+  emitOwnedMutation,
+  defineOwnedPositionIds,
+  defineOwnedOwnerId,
+} from './owned-mutation';
+import { getOwnedOwnerPath, getOwnedPositionIds } from './owned-metadata';
+import { getPositionRegistry, getNodeAddress } from './position-registry';
 import { isTraversableNode } from './node-shape';
+import {
+  dormantKeys,
+  hasDormantMembers,
+  isDormantMember,
+} from './member-membership';
 import { observeIntrinsicMutations } from './intrinsic-mutation';
 
 /**
@@ -81,7 +90,11 @@ function claimLeaf(node: object): (() => void) | undefined {
 
   if (state.claims === 0) {
     if (state.positionId === undefined) {
-      state.positionId = registry.allocate();
+      state.positionId = getOwnedPositionIds(node)?.[0] ?? registry.allocate();
+      const address = getNodeAddress(node);
+      if (address) registry.registerPositionAddress(state.positionId, address);
+      defineOwnedPositionIds(node, [state.positionId]);
+      defineOwnedOwnerId(node, registry.id);
     }
     const positionIds = [state.positionId];
     state.releaseMutationObserver =
@@ -135,6 +148,13 @@ export function acquireObservation(source: unknown): () => void {
     for (const key of Object.keys(node as Record<string, unknown>)) {
       visit((node as Record<string, unknown>)[key]);
     }
+    // Omission changes membership, not the lifetime of retained locations.
+    if (hasDormantMembers(node)) {
+      for (const key of dormantKeys(node)) {
+        const child = (node as Record<string, unknown>)[key];
+        if (isDormantMember(child)) visit(child);
+      }
+    }
   };
   visit(source);
 
@@ -159,4 +179,3 @@ export function observationStateForTesting(node: unknown): {
     observable: state !== undefined,
   };
 }
-

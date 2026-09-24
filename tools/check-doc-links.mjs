@@ -236,7 +236,18 @@ export function scan() {
       continue;
     const text = readFileSync(abs, 'utf8');
     const lines = text.split('\n');
+    // Fenced code is not prose and contains no links. Without this, ordinary
+    // source in an example scans as markdown: `tree.$['a.b'](1)` reads as the
+    // link `[a.b](1)`, and the gate reports a broken link to a file named `1`.
+    // Measured on docs/audits/2026-09-23-proposal-path.md, which is a code
+    // example and not a broken document.
+    let inFence = false;
     lines.forEach((line, i) => {
+      if (/^\s*(```|~~~)/.test(line)) {
+        inFence = !inFence;
+        return;
+      }
+      if (inFence) return;
       for (const m of line.matchAll(/\]\(([^)\s]+?)(#[^)]*)?\)/g)) {
         const target = m[1];
         if (IGNORE_TARGET.test(target)) continue;
