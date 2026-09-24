@@ -1,4 +1,31 @@
-## 14.1.3 (unreleased)
+## 14.1.4 (unreleased)
+
+**TL;DR** — **Security patch. Upgrade if you use `serialization()` or
+`persistence()`.** A crafted payload could write to `Object.prototype` during
+`deserialize()` or `restore()`. No API changes.
+
+### Prototype pollution in circular-reference resolution
+
+`resolveCircularReferences` walked caller-supplied metadata paths with plain
+property access and assigned through them, so a payload whose `circularRefs`
+path was `constructor.prototype.isAdmin` wrote to `Object.prototype`.
+Reproduced against the published 14.1.1 tarball.
+
+Reachable from `deserialize()` and from `restore()`. `restore()` matters
+independently: it has no `handleCircular` gate, so disabling that option would
+not have closed it.
+
+Fixed inside the function, so both callers are covered:
+
+- `__proto__`, `constructor` and `prototype` path segments are rejected
+- traversal uses own data properties only, so neither a prototype chain nor a
+  getter supplied to `restore()` is followed
+- the whole metadata list is validated before any caller-owned object is
+  mutated
+
+Present since core 1.1.1 (August 2025) through 14.1.3.
+
+## 14.1.3 (2026-08-21)
 
 ### Fixed
 
