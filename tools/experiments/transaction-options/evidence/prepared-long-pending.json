@@ -1,0 +1,86 @@
+{
+  "candidate": "tools/experiments/transaction-options/prepared.mjs",
+  "count": 1000,
+  "ms": 12.256916,
+  "rejectMs": 0.0975830000000002,
+  "result": {
+    "status": "settled"
+  },
+  "open": {
+    "active": 1,
+    "retainedOperations": 1,
+    "history": 0
+  },
+  "after": {
+    "active": 0,
+    "retainedOperations": 0,
+    "history": 0
+  },
+  "visible": {
+    "values": [
+      {
+        "path": [
+          "x"
+        ],
+        "value": 1001
+      },
+      {
+        "path": [
+          "y"
+        ],
+        "value": 0
+      },
+      {
+        "path": [
+          "z"
+        ],
+        "value": 0
+      }
+    ],
+    "entities": [
+      {
+        "ref": "original",
+        "key": "A",
+        "fields": {
+          "name": "Original",
+          "priority": 0
+        }
+      }
+    ]
+  },
+  "final": {
+    "values": [
+      {
+        "path": [
+          "x"
+        ],
+        "value": 1001
+      },
+      {
+        "path": [
+          "y"
+        ],
+        "value": 0
+      },
+      {
+        "path": [
+          "z"
+        ],
+        "value": 0
+      }
+    ],
+    "entities": [
+      {
+        "ref": "original",
+        "key": "A",
+        "fields": {
+          "name": "Original",
+          "priority": 0
+        }
+      }
+    ]
+  },
+  "node": "v24.15.0",
+  "platform": "darwin",
+  "arch": "arm64"
+}

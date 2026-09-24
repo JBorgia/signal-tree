@@ -7,7 +7,10 @@ import type { WriteMetadata } from './lib/mutation-types';
 
 const cleanups: (() => void)[] = [];
 const createTree = () => {
-  const tree = signalTree({ count: 0 }, { enhancers: [transactions()] });
+  const tree = signalTree(
+    { count: 0 },
+    { enhancers: [transactions({ history: { retain: 1000 } })] }
+  );
   cleanups.push(() => tree.destroy());
   return tree;
 };

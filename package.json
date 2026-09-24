@@ -1,6 +1,6 @@
 {
   "name": "@signaltree/workspace",
-  "version": "16.0.0",
+  "version": "16.0.0-dev",
   "packageManager": "pnpm@10.17.0",
   "license": "Apache-2.0",
   "funding": {

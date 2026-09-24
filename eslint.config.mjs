@@ -23,6 +23,12 @@ export default [
       // ignored here too so a probe in flight cannot fail the lint gate. A test
       // worth keeping gets a real name and is not matched by this pattern.
       '**/zz-*.ts',
+      // User-owned research harnesses, gitignored. They import kernel source by
+      // relative path on purpose (they bundle a pinned snapshot rather than
+      // consuming published entry points), which trips
+      // @nx/enforce-module-boundaries. Scratch research is not repo code and
+      // must not gate repo lint. Same fix as the v16 line.
+      'tools/experiments/**',
       'scripts/ai-codegen-benchmark/results/**',
       // Generated when Vite configuration is loaded through a TypeScript shim.
       '**/vite.config.*.timestamp*',

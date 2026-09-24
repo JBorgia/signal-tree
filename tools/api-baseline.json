@@ -536,6 +536,15 @@
         "internalDecl": false
       },
       {
+        "name": "TransactionsConfig",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "TreeCapability",
         "subpath": ".",
         "kind": "type-only",
@@ -1089,6 +1098,15 @@
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/kernel/src/enhancers/transactions/transactions.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TransactionsConfig",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -2028,6 +2046,15 @@
         "internalDecl": false
       },
       {
+        "name": "TransactionsConfig",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "TreeCapability",
         "subpath": ".",
         "kind": "type-only",
@@ -2611,6 +2638,15 @@
         "internalDecl": false
       },
       {
+        "name": "TransactionsConfig",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "TreeCapability",
         "subpath": ".",
         "kind": "type-only",
@@ -3180,6 +3216,15 @@
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/kernel/src/enhancers/transactions/transactions.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TransactionsConfig",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false

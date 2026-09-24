@@ -44,10 +44,7 @@ describe('transactions enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree(
-      { count: 0 },
-      { enhancers: [transactions()] }
-    ) as unknown as {
+    const store = signalTree({ count: 0 }, { enhancers: [transactions({ history: { retain: 1000 } })] }) as unknown as {
       $: { (): { count: number }; count: () => number };
       transact: (fn: () => void) => { confirm(): void; rollback(): void };
       __transactions: {
@@ -161,7 +158,7 @@ describe('transactions enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [transactions()] }
+      { enhancers: [transactions({ history: { retain: 1000 } })] }
     ) as unknown as {
       $: {
         (): {
@@ -247,7 +244,7 @@ describe('transactions enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [transactions()] }
+      { enhancers: [transactions({ history: { retain: 1000 } })] }
     ) as {
       $: {
         count: () => number;
@@ -328,7 +325,7 @@ describe('transactions enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [transactions()] }
+      { enhancers: [transactions({ history: { retain: 1000 } })] }
     ) as {
       (): { count: number; rows: { all: Array<{ id: string; name: string }> } };
       $: {

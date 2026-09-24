@@ -1,3 +1,8 @@
+/**
+ * MIGRATED for the L15 default (15.x port). Correctness-only is the default,
+ * so a tree that wants diagnostic history declares it. No assertion is
+ * loosened; these trees now REQUEST the history they were always reading.
+ */
 import { describe, expect, it } from 'vitest';
 
 import { confirmedTurnReader } from '../../internals';
@@ -9,9 +14,10 @@ type Cart = { promoCode: string | null; discount: number; total: number };
 type Row = { id: string; name: string };
 
 const cartTree = () =>
-  signalTree({ promoCode: null, discount: 0, total: 12000 } as Cart, {
-    enhancers: [transactions()],
-  }) as never as {
+  signalTree(
+    { promoCode: null, discount: 0, total: 12000 } as Cart,
+    { enhancers: [transactions({ history: { retain: 1000 } })] }
+  ) as never as {
     $: Record<string, (value?: unknown) => unknown>;
     transact(fn: () => void): { confirm(): void };
   };
@@ -120,7 +126,7 @@ describe('confirmedTurnReader', () => {
   it('6. structural effects keep their address and kind', () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [transactions()] }
+      { enhancers: [transactions({ history: { retain: 1000 } })] }
     ) as never as {
       $: { rows: { addOne(row: Row): void } };
       transact(fn: () => void): { confirm(): void };
@@ -158,11 +164,11 @@ describe('confirmedTurnReader', () => {
     const tree = cartTree();
     tree.transact(() => tree.$['total'](9600)).confirm();
 
-    const retention = confirmedTurnReader(tree as never)?.readConfirmedTurns()
-      .retention;
-    // Nothing evicts from confirmedTurns today, so history is complete — and
-    // `truncated` is derived from the retained ids, so it starts reporting true
-    // on its own if eviction is ever added.
+    const retention = confirmedTurnReader(tree as never)?.readConfirmedTurns().retention;
+    // `truncated` is asserted by the authority, not derived from ids. This
+    // tree declares retain:1000 and writes once, so nothing is evicted and
+    // false is correct — a CONTROL for the non-truncated direction. The
+    // truncation direction is covered in history-retention-15.spec.ts.
     expect(retention?.truncated).toBe(false);
     expect(retention?.firstAvailableTurnId).toBe(1);
   });

@@ -280,6 +280,17 @@ undoable(() => {
 
 proposal.accept(); // one undo step
 ```
+Confirmed records are retained only while a live obligation needs them — a
+confirmed turn is released once no older pending turn could still consult it.
+Diagnostic history is a separate, explicitly bounded facility:
+
+```ts
+transactions({ history: { retain: 100 } });
+```
+
+Without it, `confirmedTurnReader` reports `retention.truncated === true` with no
+turns. That is deliberately distinguishable from "nothing happened", which
+reports `truncated === false`.
 
 ### `devTools()`
 
@@ -367,6 +378,12 @@ Failed pending-transaction rollback throws `SignalTreeRollbackError`, whose
 stable `code` and structured `cause` distinguish refusal from application
 errors.
 
+A refusal is atomic: it changes no state, retires nothing, and leaves the
+transaction **pending**, so `confirm()` and a retried `rollback()` both remain
+available. Reversing an older transaction while a newer overlapping one is
+still open refuses (`cause.kind === 'later-pending-dependency'`); settle the
+newer one first.
+
 ## Exports
 
 The package publishes three code entry points:
@@ -431,7 +448,7 @@ are not additions to the kernel root API.
 
 - `treeRuntimeId` exposes runtime identity for equality and map keys, never a persisted identity.
 - `treeCapabilities` reports construction capabilities; an empty list is a bare tree.
-- `confirmedTurnReader` reads retained committed consequences without installing history. Its `ConfirmedTurnReader`, `ConfirmedTurnSnapshot`, `ConfirmedTurnView`, `ConfirmedTurnEffectView`, `ConfirmedTurnEffectKind` and `ConfirmedTurnRetention` types describe that window, including retention limits. Reads after destruction throw `StudioTreeDestroyedError`.
+- `confirmedTurnReader` reads retained committed consequences without installing history. Its `ConfirmedTurnReader`, `ConfirmedTurnSnapshot`, `ConfirmedTurnView`, `ConfirmedTurnEffectView`, `ConfirmedTurnEffectKind` and `ConfirmedTurnRetention` types describe that window, including retention limits. A tree that has not asked for diagnostic history retains nothing for the reader, and `ConfirmedTurnRetention.truncated` says so rather than presenting an empty window as a complete one — it is asserted by the transaction authority, never inferred from gaps in turn ids. Reads after destruction throw `StudioTreeDestroyedError`.
 - `observeWrites` subscribes to `ObservedWriteFrame` observation. A notification does not establish a causal relationship, intermediate attempted write, or complete history.
 - `activeTransactionContext` returns the synchronous transaction callback's owner and local ID, or `undefined` outside that scope. It does not report confirmation or propagate across `await`.
 - `withWriteObservationScope` associates writes with a bounded, owner-qualified tooling token during a synchronous callback. `ObservedWriteFrame.declaredScopes` uses `DeclaredWriteScopes` to preserve retained `tokens`, `includesUnscoped` contributions and `omitted` overflow when notifications coalesce. Declarations describe scope membership, not proven input dependencies or exclusive causes. Observer delivery does not inherit the scope.
