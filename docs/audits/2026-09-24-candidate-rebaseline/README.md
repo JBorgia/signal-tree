@@ -1,89 +1,97 @@
-# Current-source characterization rebaselined — same verdicts, only two still mean what they meant
+# Current-source characterization — CORRECTED after a source-selection error
 
-Step 3, first half. The four architecture candidates and the `current` adapter
-live in `tools/experiments/transaction-options/` (user-owned research, read but
-not modified). `current.mjs` bundles the LIVE repo source with esbuild, so
-re-running it is the rebaseline; the four candidate models are standalone and
-do not move with the kernel.
+> **RETRACTION.** The first version of this file claimed a rebaseline against
+> `849c16f4` and drew two conclusions from it: a harness defect in the adapter's
+> authority projection, and a "safe refusal" reading of the R8 failures.
+> **Both were wrong, and so was the premise.** `current.mjs` does not bundle
+> live source. It pins
+>
+>     export const baseline = '7ade0e3ecb25ff0d06da4355b5f7d67844e147b7';
+>
+> and its esbuild plugin — named `frozen-current-source` — loads every
+> `packages/kernel/src/**/*.ts` through `git show ${baseline}:${path}`. That run
+> measured 7ade0e3e. I read `esbuild`, `root` and `execFileSync` in the imports
+> and concluded "bundles the live repo", never asking why a bundler needs a
+> subprocess. The answer was `git show`.
+>
+> **The checkout's HEAD is not necessarily the code an experiment executes.**
+>
+> Everything below is re-measured with the revision explicitly selected, and the
+> two runs are kept separate and labelled.
 
-Run against `849c16f4`, clean tree. Protocol's evidence gate honoured:
-`runner-selftest.mjs` first (PASS — status separation, all-constructor-failure,
-cleanup failure, strict unsupported exit).
+## Two runs, two revisions
 
-    current-characterization.mjs   9 passed, 5 failed, 0 errors, 0 unsupported
-    baseline (7ade0e3e worktree)   9 passed, 5 failed, 0 errors, 0 unsupported
+| file | kernel source | result |
+|---|---|---|
+| `current-char-AT-7ade0e3e.json` | `7ade0e3e`, the frozen pin | 9 passed / 5 failed |
+| `current-char-AT-6531851f.json` | `6531851f`, current HEAD | **10 passed / 4 failed** |
 
-Identical totals, and the SAME FIVE IDS. That is where a totals comparison
-would stop, and it would be wrong: only two of the five still describe what the
-baseline said they described.
+The current-source run used a COPY of the frozen experiment with `baseline`
+repointed, placed in a gitignored sibling directory so the frozen experiment is
+untouched. It records what it loaded:
 
-## 1 — `R6-refused-rollback-retains-same-authority` is a HARNESS divergence
+    [source-selected] baseline=6531851f1b8d5be7607af19cdbb7f55ee3df1116
+                      bundleSha256=c8eac5b8a8f1f94638d1751a6a2bc75bd59d01454bb26166a52fa3b3d1478764
+                      bytes=511993
 
-The control requires `reject()` to refuse, `x` to stay 1, and
-`state(p).authority` to stay true. The adapter reports `authority: false`.
+Runner self-test PASSED first, per the protocol's evidence gate.
 
-The kernel does NOT retire the turn. Verified at kernel level, by turn IDENTITY
-rather than count, using the adapter's own `flushSync` timing rather than
-microtasks:
+## What actually changed between the two revisions
 
-    turn id created    [2]
-    pending ids        [2]      after the later same-key add
-    pending after      [2]      after the refusal
-    SAME turn kept     true
+**One control moved outright.**
 
-`state().authority` is `runtime.getPendingTurnIds().includes(record.turnId)`,
-and the adapter's projection disagrees with the kernel it is projecting. The
-divergence is in the harness.
+    R6-refused-rollback-retains-same-authority   failed -> PASSED
 
-⚠️ Counting was not enough here either. The first kernel probe compared pending
-COUNT, saw 1, and concluded agreement — a count cannot tell "the same turn" from
-"a different turn". The identity check is what settles it.
+At 7ade0e3e it failed `false !== true` on `state(p).authority`: the old kernel
+retired the turn on a refusal. Current source keeps it. **There is no adapter
+harness defect.** I invented one by comparing an old-kernel adapter result
+against a new-kernel probe and treating the disagreement as a projection bug.
 
-## 2, 3 — `R8-01-reject-accept` and `R8-01-reject-reject` are the REAL target
+**Three silent corruptions became safe refusals.**
 
-These are the discriminator. The control wraps each settlement in
-`settled(...)`, which asserts the result is `settled` — so a REFUSAL fails it by
-construction. We refuse, correctly and safely, and still fail.
+Every remaining failure changed its FAILURE MODE, which a pass/fail column
+cannot show:
 
-That is exactly the "H1..H9 is a floor, not a success criterion" point, now
-quantified: **2 of the 8 R8 orders** demand surgical multi-writer settlement
-that containment does not provide. This is what the ownership model has to buy
-back, and no amount of safety work will turn these green.
+    case                          at 7ade0e3e        at 6531851f
+    R8-01-reject-accept           0 !== 2            'refused' !== 'settled'
+    R8-01-reject-reject           0 !== 2            'refused' !== 'settled'
+    same-tick-local-flush-false   0 !== 2            'refused' !== 'settled'
+    same-tick-external-flush-false 0 !== 2           'refused' !== 'settled'
 
-## 4, 5 — `same-tick-{local,external}-flush-false`: BEHAVIOUR CHANGED, verdict did not
+`0 !== 2` is a VALUE assertion reached AFTER `settled()` passed — the settlement
+succeeded and destroyed a later write. `'refused' !== 'settled'` fails at
+`settled()` itself — nothing was destroyed, the operation declined.
 
-The baseline recorded: *"Same-tick rollback loses a later ordinary or external
-write when the notifier has not flushed."* That is NO LONGER TRUE. Measured at
-kernel level, all four cells:
+So the merged work turned three silent data losses into refusals, and fixed a
+fourth case outright. That is a real improvement the totals row hides.
 
-    local    flush=false   ->  REFUSES later-confirmed-dependency   x = 2 (preserved)
-    local    flush=true    ->  settles                              x = 2
-    external flush=false   ->  REFUSES later-confirmed-dependency   x = 2 (preserved)
-    external flush=true    ->  settles                              x = 2
+## The remaining four are the v16 target, stated precisely
 
-The clobber is gone. The unflushed cells still fail the control because it
-demands settlement, but "loses the write" became "refuses and preserves it".
+All four now fail for ONE reason: **the control requires settlement and we
+refuse.** They are the cases where containment is correct but insufficient.
 
-## What this changes about the work list
+    R8-01-reject-{accept,reject}     2 of the 8 R8 orders: surgical
+                                     multi-writer settlement
+    same-tick-*-flush-false          reversal must see a later write that the
+                                     notifier has not yet delivered
 
-Of the five current-source failures:
+No safety work turns these green. Only the ownership model does. This is the
+"H1..H9 is a floor, not a success criterion" point with a number on it: **4 of
+14 current-source controls demand settlement we decline.**
 
-    1 is a harness defect                       R6 authority projection
-    2 are the surgical-settlement target        R8-01-reject-{accept,reject}
-    2 are safe refusals where settlement is
-      required, improved from a clobber         same-tick-*-flush-false
+## Method notes worth keeping
 
-So the honest summary is NOT "five behaviour failures, unchanged". It is: one
-harness bug to fix in the experiment, two cases that define what 16 must
-deliver, and two that got materially better while their verdict stood still.
-
-This is the third time in this rebaseline that an unchanged verdict concealed a
-changed behaviour. Compare traces and identities, never counts.
+- The frozen experiment was NOT modified. The revision-selected copy lives in a
+  gitignored sibling; only its OUTPUT is committed here.
+- Record the resolved SHA and a hash of the loaded bundle in any run whose
+  source selection matters. Neither run would have been ambiguous if the first
+  had done so.
+- An unchanged verdict can conceal a changed behaviour, and a changed verdict
+  can conceal a changed SOURCE. Both happened in this one investigation.
 
 ## Not yet done
 
-The four candidate models have not been re-run against these scenarios. They
-are standalone and their scores should not move, but "should not" is not
-"measured". The full 424-row comparison — held stays held, unsupported becomes
-genuinely exercised, publication/retention/integration correct — is still
-outstanding, and must not be narrowed to the reds.
+The four candidate models have not been re-run. They are standalone and should
+not move with the kernel — but "should not" is not "measured", and this file is
+the record of what that assumption costs. The full 424-row comparison remains
+outstanding and must not be narrowed to the reds.
