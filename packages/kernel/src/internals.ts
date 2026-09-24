@@ -104,7 +104,8 @@ function projectConfirmedTurns(
       after?: unknown;
       subject?: unknown;
     }[];
-  }[]
+  }[],
+  retention: { truncated: boolean; firstAvailableTurnId?: number }
 ): ConfirmedTurnSnapshot {
   const turns: ConfirmedTurnView[] = [];
   for (const record of records) {
@@ -127,18 +128,16 @@ function projectConfirmedTurns(
     });
   }
 
-  // TransactionAuthority currently never evicts confirmed records. Missing IDs
-  // can belong to pending or rejected turns, so they are not truncation evidence.
-  // If eviction is introduced, the authority must supply explicit retention
-  // metadata (including an entirely evicted window); never infer it from IDs.
-  const firstAvailableTurnId = turns[0]?.id;
-  return {
-    turns,
-    retention: {
-      truncated: false,
-      firstAvailableTurnId,
-    },
-  };
+  // Eviction EXISTS now (L15, 2026-09-24): correctness-only is the default and
+  // diagnostic history is requested explicitly. As this comment previously
+  // required, the authority supplies the metadata and it is never inferred
+  // from id gaps — pending and rejected turns leave gaps too, and an entirely
+  // evicted window leaves no ids at all to reason from.
+  //
+  // This is what makes the reader honest rather than merely quieter: a tree
+  // with no retention contract reports `truncated: true` with zero turns,
+  // which a consumer can distinguish from "nothing happened".
+  return { turns, retention };
 }
 
 /**
@@ -201,7 +200,19 @@ export function confirmedTurnReader<
       if (destroyed?.() === true) {
         throw new StudioTreeDestroyedError();
       }
-      return projectConfirmedTurns(runtime.getConfirmedTurnRecords() as never);
+      const authority = runtime as unknown as {
+        getConfirmedRetention?: () => {
+          truncated: boolean;
+          firstAvailableTurnId?: number;
+        };
+      };
+      return projectConfirmedTurns(
+        runtime.getConfirmedTurnRecords() as never,
+        authority.getConfirmedRetention?.() ?? {
+          truncated: false,
+          firstAvailableTurnId: undefined,
+        }
+      );
     },
   };
 }

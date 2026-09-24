@@ -44,9 +44,12 @@ describe('transactions enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
+    // Declares diagnostic history because it COUNTS confirmed turns. Under the
+    // L15 default those records are released once nothing pending can need
+    // them, so counting them is a diagnostic question, not a correctness one.
     const store = signalTree(
       { count: 0 },
-      { enhancers: [transactions()] }
+      { enhancers: [transactions({ history: { retain: 1000 } })] }
     ) as unknown as {
       $: { (): { count: number }; count: () => number };
       transact: (fn: () => void) => { confirm(): void; rollback(): void };

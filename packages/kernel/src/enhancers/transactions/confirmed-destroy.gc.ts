@@ -11,7 +11,7 @@ export async function run(mode: string) {
   async function arrange() {
     const tree = signalTree(
       { payload: [] as unknown[] },
-      { enhancers: [transactions()] }
+      { enhancers: [transactions({ history: { retain: 1000 } })] }
     );
     const runtime = peekInternalTransactionRuntime(tree);
     const reader = confirmedTurnReader(tree);

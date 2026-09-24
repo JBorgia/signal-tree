@@ -15,7 +15,7 @@ type Cart = { total: number };
 
 const cart = () =>
   signalTree({ total: 0 } as Cart, {
-    enhancers: [transactions()],
+    enhancers: [transactions({ history: { retain: 1000 } })],
   }) as never as {
     $: Record<string, (v?: unknown) => unknown>;
     transact(fn: () => void): { confirm(): void };

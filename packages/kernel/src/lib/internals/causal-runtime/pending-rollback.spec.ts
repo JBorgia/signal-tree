@@ -1262,7 +1262,7 @@ describe('production address witness for the abstract topology fixtures', () => 
           string
         >(),
       },
-      { enhancers: [transactions()] }
+      { enhancers: [transactions({ history: { retain: 1000 } })] }
     );
     try {
       tree

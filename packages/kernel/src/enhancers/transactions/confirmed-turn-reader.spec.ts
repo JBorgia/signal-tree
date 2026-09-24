@@ -1,3 +1,11 @@
+/**
+ * MIGRATED 2026-09-24 for the L15 default. Correctness-only is now the default,
+ * so a tree that wants diagnostic history declares it. Every tree in this file
+ * does, because reading confirmed history is this file's entire subject.
+ *
+ * No assertion was loosened. The only change is that these trees now REQUEST
+ * the history they were always reading.
+ */
 import { describe, expect, it } from 'vitest';
 
 import { confirmedTurnReader } from '../../internals';
@@ -10,7 +18,7 @@ type Row = { id: string; name: string };
 
 const cartTree = () =>
   signalTree({ promoCode: null, discount: 0, total: 12000 } as Cart, {
-    enhancers: [transactions()],
+    enhancers: [transactions({ history: { retain: 1000 } })],
   }) as never as {
     $: Record<string, (value?: unknown) => unknown>;
     transact(fn: () => void): { confirm(): void };
@@ -120,7 +128,7 @@ describe('confirmedTurnReader', () => {
   it('6. structural effects keep their address and kind', () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [transactions()] }
+      { enhancers: [transactions({ history: { retain: 1000 } })] }
     ) as never as {
       $: { rows: { addOne(row: Row): void } };
       transact(fn: () => void): { confirm(): void };
@@ -169,7 +177,7 @@ describe('confirmedTurnReader', () => {
   it.each(['rejected', 'pending'] as const)(
     'does not report missing confirmed history when an earlier ID is %s',
     (state) => {
-      const tree = signalTree({ x: 0, y: 0 }, { enhancers: [transactions()] });
+      const tree = signalTree({ x: 0, y: 0 }, { enhancers: [transactions({ history: { retain: 1000 } })] });
       try {
         const first = tree.transact(() => tree.$.x(1));
         if (state === 'rejected') first.rollback();
