@@ -562,37 +562,10 @@ export class RealisticBenchmarkService {
     return 'Budget/Laptop';
   }
 
-  /**
-   * Submit benchmark results to backend
-   */
-  async submitBenchmark(
-    submission: RealisticBenchmarkSubmission
-  ): Promise<{ success: boolean; id?: string; error?: string }> {
-    // API disabled - skip submission
-    if (!this.API_URL) {
-      return { success: false, error: 'API not configured' };
-    }
-
-    try {
-      const response = await fetch(this.API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(submission),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        return { success: false, error: result.error || 'Unknown error' };
-      }
-
-      return { success: true, id: result.id };
-    } catch (_error) {
-      return { success: false, error: String(_error) };
-    }
-  }
+  // submitBenchmark() removed 2026-09-24 together with the server POST it
+  // called. It had no callers anywhere in the app, and the endpoint created
+  // gists with the server's GITHUB_TOKEN gated only by a client-supplied
+  // `consentGiven` flag this service hardcoded to true.
 
   /**
    * Retrieve benchmark history with optional filtering

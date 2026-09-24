@@ -1,0 +1,407 @@
+/** Frozen supplemental workloads. Constants do not read a pending dependency. */
+import {
+  UnsupportedSemantic,
+  type Handle,
+  type Snapshot,
+} from './semantics-contract';
+import {
+  NotExercised,
+  type Fixture,
+  type Context,
+  type SupplementalCase,
+} from './semantics-supplemental';
+const jobs = (f: Fixture) => {
+  if (!f.composition)
+    throw new UnsupportedSemantic('No composition semantic jobs');
+  return f.composition;
+};
+const drain = async (f: Fixture) => {
+  for (let i = 0; i < 6; i++) await f.flush();
+};
+const snapshot = (f: Fixture) => structuredClone(f.candidate.readVisible());
+// Endpoint callbacks here are synchronous. A required independent delivery must
+// drain; an intentionally pending Link is NEVER awaited. Timer is a watchdog,
+// not an implementation of scheduling or an observation source.
+const complete = async (
+  connection: { settled(): Promise<void> },
+  c: Context
+) => {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const done = await Promise.race([
+      connection.settled().then(() => true),
+      new Promise<false>((resolve) => {
+        timer = setTimeout(() => resolve(false), 250);
+      }),
+    ]);
+    c.check(done, 'required independent Link completion within 250ms watchdog');
+    return done;
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+  }
+};
+export const COMPOSITION_CASES: SupplementalCase[] = [];
+const add = (id: string, scope: string, run: SupplementalCase['run']) =>
+  COMPOSITION_CASES.push({ id, scope, run });
+for (const mode of ['direct', 'batch', 'coalesce'] as const) {
+  // Capability check with an empty scope happens before the workload; no fallback.
+  const ready = (f: Fixture) => jobs(f).group(mode, () => undefined);
+  add(
+    `CCTX1/${mode}/external-history`,
+    'External truth is not an undo record; visible-state projection only',
+    async (f, c) => {
+      ready(f);
+      const j = jobs(f);
+      j.undoable(() => f.write('y', 5));
+      await drain(f);
+      j.group(mode, () => j.external(() => f.write('x', 2)));
+      await drain(f);
+      c.equal(snapshot(f), { x: 2, y: 5, z: 0 }, 'external write realized');
+      c.equal(j.undo(), true, 'undo reaches authored work');
+      await drain(f);
+      c.equal(
+        snapshot(f),
+        { x: 2, y: 0, z: 0 },
+        'undo preserves external truth'
+      );
+    }
+  );
+  add(
+    `CCTX1/${mode}/pending-canonical`,
+    'Canonical/overlay obligations remain explicit, not inferred from visible state',
+    async (f, c) => {
+      ready(f);
+      const j = jobs(f);
+      const p = f.candidate.beginContribution(() => f.write('x', 1));
+      await drain(f);
+      j.group(mode, () => j.external(() => f.write('x', 2)));
+      await drain(f);
+      c.equal(
+        f.hasPendingAuthority(p),
+        true,
+        'external input retains this handle authority'
+      );
+      c.equal(
+        f.candidate.readCanonical().x,
+        2,
+        'external input establishes canonical x=2'
+      );
+      c.equal(snapshot(f).x, 1, 'pending overlay remains visible');
+      const result = f.candidate.settleReject(p);
+      c.note({ result });
+      c.requireSuccess(result, 'reject reveals external truth');
+      c.equal(snapshot(f).x, 2, 'external truth survives rejection');
+    }
+  );
+  add(
+    `CCTX2/${mode}/transaction`,
+    'Accepted transaction retains deferred writes and rejects all its own writes',
+    async (f, c) => {
+      ready(f);
+      const j = jobs(f);
+      const p = f.candidate.beginContribution(() =>
+        j.group(mode, () => {
+          f.write('x', 1);
+          f.write('y', 2);
+        })
+      );
+      await drain(f);
+      c.equal(
+        snapshot(f),
+        { x: 1, y: 2, z: 0 },
+        'both transaction writes present'
+      );
+      c.equal(f.hasPendingAuthority(p), true, 'actual pending authority');
+      const result = f.candidate.settleReject(p);
+      c.note({ result });
+      c.requireSuccess(result, 'reject succeeds');
+      await drain(f);
+      c.equal(snapshot(f), { x: 0, y: 0, z: 0 }, 'both owned writes reversed');
+      c.equal(f.hasPendingAuthority(p), false, 'pending authority released');
+    }
+  );
+  add(
+    `CCTX3/${mode}/restoration`,
+    'Undo designation survives scheduling; owner callbacks see complete undo',
+    async (f, c) => {
+      ready(f);
+      const j = jobs(f);
+      j.external(() => f.write('x', 7));
+      await drain(f);
+      j.group(mode, () =>
+        j.undoable(() => {
+          f.write('x', 8);
+          f.write('y', 9);
+        })
+      );
+      await drain(f);
+      c.equal(snapshot(f), { x: 8, y: 9, z: 0 }, 'designated writes visible');
+      const seen: Snapshot[] = [];
+      const off = f.candidate.observeVisible((s) =>
+        seen.push(structuredClone(s))
+      );
+      try {
+        c.equal(j.undo(), true, 'undo succeeds');
+        await drain(f);
+        c.equal(snapshot(f), { x: 7, y: 0, z: 0 }, 'undo restores both writes');
+        c.check(seen.length > 0, 'undo actually publishes');
+        for (const s of seen)
+          c.equal(s, { x: 7, y: 0, z: 0 }, 'no partial undo callback');
+      } finally {
+        off();
+      }
+    }
+  );
+}
+add(
+  'CCTX2/coalesce/later-local-constant',
+  'Independent of read-dependency policy: later literal assignment survives older acceptance',
+  async (f, c) => {
+    const j = jobs(f);
+    j.group('coalesce', () => undefined);
+    const p = f.candidate.beginContribution(() => f.write('x', 1));
+    await drain(f);
+    j.group('coalesce', () => f.write('x', 2));
+    await drain(f);
+    c.equal(snapshot(f).x, 2, 'later literal visible');
+    c.equal(f.hasPendingAuthority(p), true, 'old authority retained');
+    const r = f.candidate.settleAccept(p);
+    c.note({ r });
+    c.requireSuccess(r, 'accept older transaction');
+    c.equal(snapshot(f).x, 2, 'accept cannot replay older literal');
+  }
+);
+for (const mode of ['batch', 'coalesce'] as const) {
+  add(
+    `CCTX4-CCTX5/${mode}/inner-transaction`,
+    'Accepted composition owns only its writes; native refusal queues none of its writes',
+    async (f, c) => {
+      const j = jobs(f);
+      j.group(mode, () => undefined);
+      let h: Handle | undefined;
+      let refused = false;
+      let reachedEnd = false;
+      const seen: Snapshot[] = [];
+      const off = f.candidate.observeVisible((s) =>
+        seen.push(structuredClone(s))
+      );
+      const confirmed = f.confirmedCount();
+      try {
+        j.group(mode, () => {
+          f.write('z', 5); // Already-authorized outer write MUST survive inner refusal.
+          try {
+            h = f.candidate.beginContribution(() => {
+              f.write('x', 7);
+              f.write('y', 8);
+              reachedEnd = true;
+            });
+          } catch (error) {
+            if (!j.isCompositionRefusal(error)) throw error;
+            refused = true;
+            c.note({ nativeRefusal: error });
+          }
+        });
+        await drain(f);
+        if (refused) {
+          c.equal(
+            snapshot(f),
+            { x: 0, y: 0, z: 5 },
+            'zero writes from refused unit; prior outer z survives'
+          );
+          c.equal(reachedEnd, false, 'refused unit did not complete');
+          for (const s of seen) {
+            c.equal(s.x, 0, 'refused x never published');
+            c.equal(s.y, 0, 'refused y never published');
+          }
+          // A later normal write must not drain a hidden refused queue.
+          f.write('z', 6);
+          await drain(f);
+          c.equal(
+            snapshot(f),
+            { x: 0, y: 0, z: 6 },
+            'refused unit leaves no latent write'
+          );
+          c.note({
+            scope:
+              'safe composition refusal only, not successful transaction conformance',
+            confirmedBefore: confirmed,
+            confirmedAfter: f.confirmedCount(),
+          });
+        } else {
+          c.equal(reachedEnd, true, 'accepted callback completes');
+          c.equal(
+            snapshot(f),
+            { x: 7, y: 8, z: 5 },
+            'accepted work plus prior outer write'
+          );
+          if (!h) throw new Error('No native transaction handle');
+          const result = f.candidate.settleReject(h);
+          c.note({ result });
+          c.requireSuccess(result, 'accepted inner transaction can reject');
+          await drain(f);
+          c.equal(
+            snapshot(f),
+            { x: 0, y: 0, z: 5 },
+            'rejection preserves prior outer write'
+          );
+        }
+      } finally {
+        off();
+      }
+    }
+  );
+}
+add(
+  'CCTX4/coalesce/mixed-external-undoable',
+  'Queued external and undoable writes preserve their classifications',
+  async (f, c) => {
+    const j = jobs(f);
+    j.group('coalesce', () => undefined);
+    j.group('coalesce', () => {
+      j.external(() => f.write('x', 2));
+      j.undoable(() => f.write('y', 3));
+    });
+    await drain(f);
+    c.equal(snapshot(f), { x: 2, y: 3, z: 0 }, 'both classifications execute');
+    c.equal(j.undo(), true, 'undo reaches authored y');
+    await drain(f);
+    c.equal(snapshot(f), { x: 2, y: 0, z: 0 }, 'external x survives undo of y');
+  }
+);
+add(
+  'N01-N03-N05/pending-x-constant-y',
+  'Finite 100-turn non-interference control, not arbitrary liveness or dependency-policy proof',
+  async (f, c) => {
+    const j = jobs(f);
+    const xs: number[] = [],
+      ys: number[] = [];
+    const x = j.outbound('x', (v) => xs.push(v));
+    const y = j.outbound('y', (v) => ys.push(v));
+    try {
+      f.write('x', 5);
+      f.write('y', 5);
+      await drain(f);
+      if (!(await complete(x, c))) return;
+      if (!(await complete(y, c))) return;
+      c.equal(xs.at(-1), 5, 'positive x delivery control');
+      c.equal(ys.at(-1), 5, 'positive y delivery control');
+      xs.length = 0;
+      ys.length = 0;
+      const p = f.candidate.beginContribution(() => f.write('x', 1));
+      await drain(f);
+      for (let i = 1; i <= 100; i++) {
+        const constant = i + 10;
+        f.write('y', constant);
+        await drain(f);
+        if (!(await complete(y, c))) return;
+        c.equal(
+          ys.at(-1),
+          constant,
+          `independent constant y delivered at turn ${i}`
+        );
+        c.equal(f.hasPendingAuthority(p), true, 'abandoned x remains pending');
+        c.equal(xs, [], 'pending x does not escape');
+      }
+      const result = f.candidate.settleReject(p);
+      c.note({ result });
+      c.requireSuccess(result, 'reject x independently');
+      await drain(f);
+      if (!(await complete(x, c))) return;
+      c.equal(
+        snapshot(f),
+        { x: 5, y: 110, z: 0 },
+        'rejection preserves all independent y progress'
+      );
+      c.equal(xs, [], 'rejected x never outbound');
+    } finally {
+      x.dispose();
+      y.dispose();
+    }
+  }
+);
+add(
+  'N02/refused-x-constant-y',
+  'Actual occupied-entity refusal plus unrelated scalar or held-field delivery',
+  async (f, c) => {
+    if (!f.prepareConflict)
+      throw new UnsupportedSemantic(
+        'No occupied-entity refusal setup in this combination'
+      );
+    const j = jobs(f);
+    const ys: number[] = [];
+    const y = j.outbound('y', (v) => ys.push(v));
+    try {
+      const p = await f.prepareConflict();
+      const before = snapshot(f);
+      const entityBefore = structuredClone(j.readEntityState());
+      const count = f.confirmedCount();
+      const r = f.candidate.settleReject(p);
+      c.note({ r });
+      if (r.status !== 'refused')
+        throw new NotExercised('Native setup did not refuse');
+      await drain(f);
+      c.equal(snapshot(f), before, 'refusal makes zero state writes');
+      c.equal(
+        j.readEntityState(),
+        entityBefore,
+        'refusal preserves entire entity state'
+      );
+      c.equal(
+        f.hasPendingAuthority(p),
+        true,
+        'refusal retains actual pending ID'
+      );
+      c.equal(f.confirmedCount(), count, 'refusal creates no confirmed turn');
+      f.write('y', 2);
+      await drain(f);
+      if (!(await complete(y, c))) return;
+      c.equal(ys.at(-1), 2, 'independent literal y=2 delivered after refusal');
+      c.equal(snapshot(f).x, before.x, 'refused x unchanged');
+      c.equal(
+        f.hasPendingAuthority(p),
+        true,
+        'refused x authority still retained'
+      );
+    } finally {
+      y.dispose();
+    }
+  }
+);
+add(
+  'N04-N05/independent-pending-links',
+  'Independent constant transactions settle and publish separately',
+  async (f, c) => {
+    const j = jobs(f);
+    const xs: number[] = [],
+      ys: number[] = [];
+    const x = j.outbound('x', (v) => xs.push(v));
+    const y = j.outbound('y', (v) => ys.push(v));
+    try {
+      const p = f.candidate.beginContribution(() => f.write('x', 1));
+      await drain(f);
+      const q = f.candidate.beginContribution(() => f.write('y', 2));
+      await drain(f);
+      c.equal(xs, [], 'x pending withheld');
+      c.equal(ys, [], 'y pending withheld');
+      const a = f.candidate.settleAccept(q);
+      c.note({ a });
+      c.requireSuccess(a, 'accept independent y');
+      await drain(f);
+      if (!(await complete(y, c))) return;
+      c.equal(ys, [2], 'only independent y delivered');
+      c.equal(xs, [], 'x still withheld');
+      c.equal(f.hasPendingAuthority(p), true, 'x authority retained');
+      c.equal(f.hasPendingAuthority(q), false, 'y authority released');
+      const r = f.candidate.settleReject(p);
+      c.note({ r });
+      c.requireSuccess(r, 'reject x independently');
+      await drain(f);
+      if (!(await complete(x, c))) return;
+      c.equal(snapshot(f), { x: 0, y: 2, z: 0 }, 'independent y survives');
+      c.equal(xs, [], 'rejected x never sent');
+    } finally {
+      x.dispose();
+      y.dispose();
+    }
+  }
+);

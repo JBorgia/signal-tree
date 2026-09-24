@@ -1,0 +1,22 @@
+check-spec-types: 3 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/enhancers/transactions/transaction-safety.spec.ts: 3 error(s), baseline allows 0
+  packages/kernel/src/lib/hydration-snapshot.typing.spec.ts: 7 error(s), baseline allows 0
+  packages/kernel/src/lib/link-structured-address-audit.spec.ts: 1 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/enhancers/transactions/transaction-safety.spec.ts(73,12): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+packages/kernel/src/enhancers/transactions/transaction-safety.spec.ts(82,12): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+packages/kernel/src/enhancers/transactions/transaction-safety.spec.ts(322,12): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+packages/kernel/src/lib/hydration-snapshot.typing.spec.ts(17,7): error TS2322: Type '{ rows: EntityMapBuilder<Row, string, Record<string, never>>; nested: { rows: EntityMapBuilder<Row, string, Record<string, never>>; label: string; }; terminal: { ...; }; date: Date; }' is not assignable to type '{ rows: { all: Row[]; }; nested: { rows: { all: Row[]; }; label: string; }; terminal: { all: string; }; date: Date; }'.
+packages/kernel/src/lib/hydration-snapshot.typing.spec.ts(18,8): error TS2769: No overload matches this call.
+packages/kernel/src/lib/hydration-snapshot.typing.spec.ts(19,24): error TS2769: No overload matches this call.
+packages/kernel/src/lib/hydration-snapshot.typing.spec.ts(20,8): error TS2769: No overload matches this call.
+packages/kernel/src/lib/hydration-snapshot.typing.spec.ts(21,17): error TS2769: No overload matches this call.
+packages/kernel/src/lib/hydration-snapshot.typing.spec.ts(22,8): error TS2769: No overload matches this call.
+packages/kernel/src/lib/hydration-snapshot.typing.spec.ts(23,40): error TS2339: Property 'all' does not exist on type 'EntityMapBuilder<Row, string, Record<string, never>>'.
+packages/kernel/src/lib/link-structured-address-audit.spec.ts(165,9): error TS2322: Type 'Enhancer<TransactionMethods>[]' is not assignable to type 'undefined'.

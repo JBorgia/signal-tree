@@ -8,23 +8,24 @@ directory for the measurements this rests on.
 
 ## Summary
 
-`@signal-tree/kernel` versions **15.0.0 through 15.2.1** contain two
-correctness defects in transaction rollback. Both cause **silent incorrect
-state with no thrown error**.
+Recorded artifact probes reproduce both transaction rollback defects in
+`@signal-tree/kernel` **15.0.0, 15.1.2, 15.1.4 and 15.2.1**. Defect 1 throws on
+the first failed rollback, then silently reports success on retry without
+reversing the surviving speculative state. Defect 2 silently produces incorrect
+state in the measured overlapping-transaction cases.
 
-Applications are affected **only if they install the `transactions()`
-enhancer**. Applications that do not use `transactions()` are unaffected, as
-are all versions of the earlier `@signaltree/core` (v14 and below), which ship
-no transactions enhancer at all.
+## Affected scope and evidence limits
 
-## Affected
+These two reproducers require the `transactions()` enhancer. The recorded
+artifact checks cover the four exact versions above; a continuous affected
+semver range, prereleases and a fixed release need artifact verification before
+an advisory is published. See [recorded measurements](README.md).
 
-    @signal-tree/kernel   >=15.0.0 <=15.2.1     with transactions() installed
-
-## Not affected
-
-    @signal-tree/kernel   any version, without transactions()
-    @signaltree/core      all versions (no transactions enhancer exists)
+Absence of `transactions()` excludes these two specific rollback paths; it is
+not a general safety verdict for an application, version or the earlier
+`@signaltree/core` packages. The September 23 source audit also found independent
+serialization, link and lifecycle defects. Their affected published artifacts
+and exposure are separate investigations.
 
 ## Defect 1 — a failed rollback destroys its own settlement authority
 
@@ -71,12 +72,12 @@ You are at risk if you install `transactions()` AND either:
   - more than one transaction can be outstanding at the same time, and they
     can touch the same location; or
   - you roll back a transaction containing a structural add/remove whose
-    subject was re-created or modified by a later write.
+    entity lifetime was replaced or modified by a later write.
 
 ## Mitigation without upgrading
 
 1. **Keep at most one transaction outstanding at a time.** This avoids
-   defect 2 entirely.
+   the measured overlapping-pending case, but does not establish rollback safety.
 2. **Do not treat a rollback as authoritative.** After any rollback —
    successful or thrown — re-fetch authoritative state rather than trusting
    local compensation.
@@ -88,25 +89,22 @@ You are at risk if you install `transactions()` AND either:
 
 ## Fix status
 
-Fixed in **15.2.2**. The patch makes transaction settlement safe rather than
-more capable:
+**No fixed release is established by this evidence.** The earlier wording
+“Fixed in 15.2.2” described an intended conservative patch as though it had
+already shipped. That claim is withdrawn, not silently relabeled as complete.
+The September 23 source audit at `7ade0e3e` still reproduced R6 lost settlement
+authority and R8 overlapping-pending corruption. No new registry verification
+was performed for this correction.
 
-    if a rollback can be proven safe   it completes fully
-    if it cannot                       NOTHING changes, the transaction
-                                       stays pending, and a refusal is thrown
+The intended safety requirement remains: a successful rollback compensates
+fully; a refused rollback leaves state and pending settlement authority intact.
+That requirement is not proof of an implementation or a published fix. The
+same audit found refused compensation could release speculative outbound link
+publication, so verification must cover publication as well as local state.
 
-This is deliberately more conservative than 15.2.1 appeared to be. Rolling
-back a transaction that overlaps a newer still-pending transaction now
-REFUSES where it previously appeared to succeed and corrupted state. That is
-the intended direction for a patch: behaviour that was unsafe becomes safely
-rejected.
-
-Both defects share one root cause — compensation is computed from a
-per-transaction baseline captured against live state, with no record of which
-transaction currently owns a value. A baseline is not ownership. Solving that
-properly (surgical multi-owner settlement) is an architectural change and is
-out of scope for a patch release; 15.2.2 makes the unsafe paths refuse
-instead of corrupt.
+A patch version, affected range and advisory publication remain unresolved
+until fixes pass the relevant composition regressions and exact published
+artifacts are verified. The draft remains unpublished and release is held.
 
 ## Credit
 

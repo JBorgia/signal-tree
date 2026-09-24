@@ -12,36 +12,11 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  * "Realistic Comparison" benchmarks (SignalTree vs NgRx vs Akita vs NgXs).
  */
 
-interface BenchmarkSubmission {
-  timestamp: string;
-  depth: number;
-  sessionId: string;
-  consentGiven: boolean;
-
-  machineInfo: {
-    browser: string;
-    os: string;
-    cpuCores: number;
-    memory: string;
-    screenResolution: string;
-    devicePixelRatio: number;
-    userAgent: string;
-  };
-
-  results: {
-    creationTime: number;
-    accessTime: number;
-    updateTime: number;
-    totalTests: number;
-  };
-
-  version: string;
-}
-
+// BenchmarkSubmission removed with the POST handler that was its only user.
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
@@ -115,67 +90,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // POST: Submit new benchmark
-  if (req.method === 'POST') {
-    try {
-      const benchmark: BenchmarkSubmission = req.body;
-
-      // Validate required fields
-      if (!benchmark.consentGiven) {
-        return res.status(403).json({
-          success: false,
-          error: 'Consent required',
-        });
-      }
-
-      if (!benchmark.machineInfo || !benchmark.results) {
-        return res.status(400).json({
-          success: false,
-          error: 'Invalid benchmark data',
-        });
-      }
-
-      // Create a GitHub Gist to store the benchmark
-      const gistResponse = await fetch('https://api.github.com/gists', {
-        method: 'POST',
-        headers: {
-          Accept: 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json',
-          Authorization: `token ${process.env.GITHUB_TOKEN}`,
-        },
-        body: JSON.stringify({
-          description: `SignalTree Benchmark: ${
-            benchmark.depth
-          } levels - ${benchmark.results.creationTime.toFixed(3)}ms`,
-          public: false,
-          files: {
-            'benchmark.json': {
-              content: JSON.stringify(benchmark, null, 2),
-            },
-          },
-        }),
-      });
-
-      if (!gistResponse.ok) {
-        const errorData = await gistResponse.json();
-        console.error('GitHub API error:', errorData);
-        throw new Error('Failed to create gist');
-      }
-
-      const gistData = await gistResponse.json();
-
-      return res.status(201).json({
-        success: true,
-        id: gistData.id,
-        url: gistData.html_url,
-      });
-    } catch (error) {
-      console.error('Error storing benchmark:', error);
-      return res.status(500).json({
-        success: false,
-        error: 'Failed to store benchmark',
-      });
-    }
-  }
+  // POST removed 2026-09-24. The handler created GitHub gists with the
+  // server's GITHUB_TOKEN, and its only gate was `consentGiven` — a
+  // client-supplied boolean the demo client hardcoded to true. No caller
+  // existed: `submitBenchmark()` was defined in the demo service and
+  // invoked from nowhere. Unauthenticated writes to the owner's gist
+  // account were therefore reachable with nothing using the feature.
+  // CORS, Origin and sessionId are not authentication. Submission falls
+  // through to the existing 405 below; GET is unchanged.
 
   return res.status(405).json({ error: 'Method not allowed' });
 }

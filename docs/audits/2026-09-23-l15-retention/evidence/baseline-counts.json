@@ -1,0 +1,1717 @@
+{
+  "mode": "baseline",
+  "revision": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+  "timestamp": "2026-09-24T02:29:01.751Z",
+  "frozen": "docs/audits/2026-09-23-l15-retention/FROZEN.json",
+  "inputs": {
+    "tools/experiments/l15-retention/probe.ts": {
+      "source": "working-tree",
+      "sha256": "d947da8698a880ec240bff07f9b9155684bbdc9db5de4614217a332a61609de6"
+    },
+    "tools/experiments/l15-retention/run.mjs": {
+      "source": "working-tree",
+      "sha256": "34fe8d9dc11c923fb7d6f823d77c9be2e1f5031451b70ab6bda59bef186af56a"
+    },
+    "docs/research/transaction-semantics-2/MATRIX.md": {
+      "source": "working-tree",
+      "sha256": "a590fdaa195a00c8ed7f7228bcd690cd1bdc96d400d02a2fced53be9553ef747"
+    },
+    "docs/audits/2026-09-23-l15-retention/FROZEN.json": {
+      "source": "working-tree",
+      "sha256": "9e369fe8e0a54730b279a8c4a859afd675f42abb74793c26884a886ab2ecf396"
+    },
+    "packages/kernel/src/lib/internals/diagnostics/diagnostic-journal.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "f38cbba5937cfa5ca50a54e197d01fe89e47e83ff64a9886286cafcf32f88e9a"
+    },
+    "packages/kernel/src/enhancers/transactions/transactions.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "51f1ea2c17bdc22fccb86cf5419c12c6d722343f19b5f5cdda7ce75e1b8d3ab4"
+    },
+    "packages/kernel/src/lib/signal-tree.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "fc0527f2b47f04a6a092265fb954ead05db81dfdb670d1983d1401c17e05a7f1"
+    },
+    "packages/kernel/src/lib/path-notifier.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "6f8bdea8e768130af3bcf0e49f3cd7fd734798e0d2a3f0cd547d98f31d90a26b"
+    },
+    "packages/kernel/src/lib/internals/subject-restoration-claims.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "78da09b87c6e0a902b6ed7353a04ddd382fc7c5b8e8c4ed66de8634b87298cbf"
+    },
+    "packages/kernel/src/internals.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "00073594e2cb861db76dfdba60aee23a2b2d738f71a81b433e2103961c2e12c9"
+    },
+    "packages/kernel/src/lib/external.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "dea4c23ea9ef115ea0200561068d6a1e64da0ba9e0ce53161f66a413cbf9d704"
+    },
+    "packages/kernel/src/lib/internals/commit-consequence.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "a97dd8ed785a70bb2e73520b8e467cc17a1d6fde2a839dc26976f173f88b8180"
+    },
+    "packages/kernel/src/lib/markers/entity-map.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "b01adac9055c970845e1f1e3cae44477bcee0b460e0bda9660e6d9249aa03943"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/transaction-lifecycle.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "2beca18cdf035ee8227c5026f401d61161cf6a1460276ce632966ae0e94cedd2"
+    },
+    "packages/kernel/src/lib/internals/node-shape.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "435224e100d4a45f7a52691236b3a9289d05cfb11100eb26fd5fc7275921c5d1"
+    },
+    "packages/kernel/src/lib/internals/confirmed-turn-view.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "e3e813cde9a964beba4a02c6eae9921d986fe71c5ed38d5a91055844054b510e"
+    },
+    "packages/kernel/src/lib/internals/write-observation.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "a35d2471c4b1a912351b55b6205faabd97c8d7056bfc28c4b4da9893654b878e"
+    },
+    "packages/kernel/src/lib/internals/write-observation-scope.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "3cd7be31fe6a76ef174912c8281f0b22e4e7236888fb63c54a8f90d68b046406"
+    },
+    "packages/kernel/src/lib/write-context.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "8bb6f9dd964192f2ef92f399f2866e1577c2eb594bdff24fa060a357ab0129ad"
+    },
+    "packages/kernel/src/lib/internals/tree-capabilities.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "e11c6e045c7e88e19458ee841936a3e3afe50de74b17cf9279c3e2e5fc37e9d9"
+    },
+    "packages/kernel/src/lib/internals/position-registry.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "7f2f948424e0c97b7608f7446e0ea0765be71ee9d77d0dd702fc61cc28ef5973"
+    },
+    "packages/kernel/src/lib/internals/restoration-eligibility.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "1e02f50184ca8a558f9eb361f375534c131e15e40cc11e15a35b84d35493133c"
+    },
+    "packages/kernel/src/lib/internals/path-observation-port.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "304869e96fddf6b7f8951a7e3e98f7dfe2a8d2adaf1c9b0fbe9bbedf212f5973"
+    },
+    "packages/kernel/src/lib/write-participation.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "874604cae15f14835731ed26a7f7b7bc65ec138ae966a2db2c9fb93032b7fb6e"
+    },
+    "packages/kernel/src/lib/types.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "9569bdbf96844d018269c7ff2c45da2bec63142b5393c0ccf7f3432645007d9b"
+    },
+    "packages/kernel/src/lib/internals/owned-metadata.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "192ca95912014282eca73f56005df91a565ec048b558dee8c88a02883e86a376"
+    },
+    "packages/kernel/src/lib/internals/owned-mutation.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "8491afa231ffef3734a5be76bbb541631913dbc77cd81b02578af2b22080ca24"
+    },
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "6d18d1b5c7e1c169ebae26fa8d7e83b991f7cb8d579b8a6c5c93a8505c63456c"
+    },
+    "packages/kernel/src/lib/internals/location-runtime.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "19315d91502a57757c8d9f73aff2b36b2e4b2a5b47e066aab5d80d75b66f98e1"
+    },
+    "packages/kernel/src/lib/internals/physical-commit-clock.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "44466c7b0b6bdde4d7a24b7d324c575a8cf782c5b60c2b85bf08c9c12442119e"
+    },
+    "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "aedefcfe25998346c2db43568efc85b6e49174649624a42425cdfa60d12205bc"
+    },
+    "packages/kernel/src/lib/internals/observation-adapter.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "cc505e5d8951e6b25a17b6741cdcd9d9070fe76bdcf73e3ceabb2c028efd1016"
+    },
+    "packages/kernel/src/lib/internals/merge-derived.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "a4bd3d4bbc0d4d5739d6c728cac4585d2eed9384274f4c2095b4ff7b14f59968"
+    },
+    "packages/kernel/src/lib/constants.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "eafea826dfd2fb8e363234638e446a395d2cf9924ffb5d4ab377d8c1c7856411"
+    },
+    "packages/kernel/src/lib/internals/materialize-markers.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "5fb8f1da0a3972feef78f8c831cc8e9c12eb9cbfcf1b9ef05dd36e55b03f0560"
+    },
+    "packages/kernel/src/lib/leaf.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "c2a8c94a23b8adab93e21961b3835fc99a4e39af559de1d7d177a699e7e1d30e"
+    },
+    "packages/kernel/src/lib/internals/observation-substrate.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "1426633f750d6e37d1b9c8ee01afc3924202acdafe338729789e01be16508387"
+    },
+    "packages/kernel/src/lib/utils.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "7ab714126368b983e75d9a3bf0d74aab75ee0911a60f1fb96e64e72ca258f008"
+    },
+    "packages/kernel/src/enhancers/index.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "b3f2d8805cd540733e58950d1673e8f6b7ebe850f8589d3067680b2c2b94768f"
+    },
+    "packages/kernel/src/lib/internals/member-membership.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "d5b2a944fc117c2acb3677aa8db2845c261b7ca85f8bf77cc28de0d5d8409116"
+    },
+    "packages/kernel/src/lib/internals/owner-invalidation-port.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "8e1a2ace8ffc3640649449944e99905ee239fec53c9e375bd011556d30c315f7"
+    },
+    "packages/kernel/src/lib/internals/root-source.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "96ce05e9464bb874f09c6e418b0cf68ebe36e8d3995bcab30e2d9fa4fbc279c2"
+    },
+    "packages/kernel/src/lib/internals/snapshot-authority.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "13e9eeb8f460511898cfe80843de0efe65436f9f328537b1e22aee0d278a84ab"
+    },
+    "packages/kernel/src/lib/internals/mutation-capture-runtime.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "d29008b03b2df740930e1e1f0f2c358fc486dcf81e6ef4442e60a6d10e056818"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/applied-turn-projection.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "d4b0314fdb72f518740ab3db6c90dc011d42abe94a4e3f17d995d3ac538dd5c8"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/realization-context.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "6ec5b9efd721421f6766d7ceaa81c3e7441cb59c93b36b3ca3a924a9855229da"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/target-transition.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "ae9fe2a041ed16d5ccd0e680caf231773a74fdf80b7f0b49e8bdb01905d19ff0"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "fb027a403f91d616003ef57c796b38d4dbf41001dacdf5a9f6d59491bfe20900"
+    },
+    "packages/kernel/src/lib/internals/visit-tree.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "1c542d5082a0b4acb2f627eb70e88fcfabd4f49acb2b120d43d90f25b6199078"
+    },
+    "packages/kernel/src/lib/internals/intercept-leaf-signals.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "6c4b840a31d3fd235b83803ec1150be60d3c8252081280529d4145d06dd543da"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "7f9ae2906d086ec201b6ce9273f0d698bd14c14fcf92c76f1bd6a88a4b6ca925"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/turn-store.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "49520bc9420ebd430b982edf9a0a21f4a8ca889539a54b5198d205a9bd8f667f"
+    },
+    "packages/kernel/src/lib/entity-signal.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "a6ea82b135129b403175160513a95d7da6b49208157462fe2038d62522349d1f"
+    },
+    "packages/kernel/src/lib/enhancer-types.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "7583d38293a9853af8bfb3e534f3bd4bb1361d75eb0cfb1b6a5b8802ad7cf8d0"
+    },
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "ce5d130c453a2469319533f22d9687bc16932bd164be0a6d88dfad077af44d6c"
+    },
+    "packages/kernel/src/lib/internals/cell-identity.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "60a94340b3830b8f9a6efe2ec0b2206b141f64aae7ce46593a1517f9f964c492"
+    },
+    "packages/kernel/src/lib/internals/production-substrate-stats.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "0ff31359dac07b31f4c04e870735618ecdef3fa3645ac1693f8fd5217d3c5b07"
+    },
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "27f5e8dcebaf91645744636980244bdc7cdd012bf3b10efde34edce2faa9c31b"
+    },
+    "packages/kernel/src/lib/internals/utilities/is-built-in-object.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "6690b24d9e52fe23c1d01d296826b44aa4c79b457ada685307697012d9846111"
+    },
+    "packages/kernel/src/lib/internals/runtime-tree-plan.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "e407dd6b87df6b8cb9ea674f5c93321c9f38447740cd782a4ca32ebf4e160272"
+    },
+    "packages/kernel/src/lib/internals/utilities/deep-equal.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "d3281de95e87aab27bc493810e4b3e1b13c9ce874d9e68c8435140c94f48271c"
+    },
+    "packages/kernel/src/lib/internals/causal-runtime/scoped-value-addressing.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "1505a2da26081d0f282e034277cc6ada8abca342f19e13a2f369cb3402132456"
+    },
+    "packages/kernel/src/lib/internals/utilities/deep-clone.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "4d4052a19f5bc484792d3cfc2d821890ce255d69d0640565ccbeda18b81b2635"
+    },
+    "packages/kernel/src/lib/physical/entity-handle-resolution.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "8ac798d660e0050bc864c6c09b199ccd0f3c069ebd7abf07d311d74529931005"
+    },
+    "packages/kernel/src/lib/physical/entity-mutation-frame.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "b8d06d220a11cf63d16a7a50adb7a5c78784966d7141b940866b1389f2014f1b"
+    },
+    "packages/kernel/src/lib/physical/entity-value-store.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "f6400264ea2fc4f54091f13c1c0004cca68b75eb40cd011ee4e4f85efe264e6f"
+    },
+    "packages/kernel/src/lib/physical/structural-store.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "217feea4b0b0a41caa03f22aa5587c87bcd504264b63005b6bc2aa48211f410b"
+    },
+    "packages/kernel/src/lib/internals/entity-projection-seed.ts": {
+      "source": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+      "sha256": "83a9dba34451ce87449104ed5fea8f08cb5f769a032e277da8186e65b373f36d"
+    }
+  },
+  "instrumentation": [
+    {
+      "path": "packages/kernel/src/enhancers/transactions/transactions.ts",
+      "originalSha256": "51f1ea2c17bdc22fccb86cf5419c12c6d722343f19b5f5cdda7ce75e1b8d3ab4",
+      "instrumentedSha256": "ed2b844c23c1bc58c900290d8f62d24202ccc71680e23a66c51798d0a4e738cf",
+      "operations": "Add two count-only methods; no retention writes, replacement or cap",
+      "unavailableCounts": {
+        "queuedEvidence": true,
+        "inspection": true
+      }
+    }
+  ],
+  "bundleSha256": "654810bf133d3f599f53c95fde27a58aeeea3bb3611eea399f0794b706f54569",
+  "changedInputs": [],
+  "diagnosticParity": true,
+  "rows": [
+    {
+      "id": "R01",
+      "diagnostics": false,
+      "status": "held",
+      "findings": [],
+      "samples": [
+        {
+          "phase": "constructed-live",
+          "heapUsedAfterGC": 4773424,
+          "counts": {
+            "confirmedTurns": 0,
+            "confirmedEffectSlots": 0,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 0,
+          "claims": null,
+          "openCommitScope": false
+        },
+        {
+          "phase": "live-1",
+          "heapUsedAfterGC": 4846144,
+          "counts": {
+            "confirmedTurns": 1,
+            "confirmedEffectSlots": 1,
+            "confirmedBaselineEntries": 1,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 1,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        },
+        {
+          "phase": "live-1000",
+          "heapUsedAfterGC": 5810000,
+          "counts": {
+            "confirmedTurns": 1000,
+            "confirmedEffectSlots": 1000,
+            "confirmedBaselineEntries": 1000,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 1000,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        },
+        {
+          "phase": "live-10000",
+          "heapUsedAfterGC": 9920848,
+          "counts": {
+            "confirmedTurns": 10000,
+            "confirmedEffectSlots": 10000,
+            "confirmedBaselineEntries": 10000,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 10000,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        },
+        {
+          "phase": "live-50000",
+          "heapUsedAfterGC": 28255496,
+          "counts": {
+            "confirmedTurns": 50000,
+            "confirmedEffectSlots": 50000,
+            "confirmedBaselineEntries": 50000,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 50000,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        },
+        {
+          "phase": "terminal-live",
+          "heapUsedAfterGC": 28143848,
+          "counts": {
+            "confirmedTurns": 50000,
+            "confirmedEffectSlots": 50000,
+            "confirmedBaselineEntries": 50000,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 50000,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        },
+        {
+          "phase": "after-destroy",
+          "heapUsedAfterGC": 28159456,
+          "counts": {
+            "confirmedTurns": 50000,
+            "confirmedEffectSlots": 50000,
+            "confirmedBaselineEntries": 50000,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 50000,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        }
+      ],
+      "outcomes": [],
+      "diagnosticReaderCount": 50000,
+      "diagnosticJournal": null,
+      "afterDestroy": {
+        "phase": "after-destroy",
+        "heapUsedAfterGC": 28159456,
+        "counts": {
+          "confirmedTurns": 50000,
+          "confirmedEffectSlots": 50000,
+          "confirmedBaselineEntries": 50000,
+          "pendingTurns": 0,
+          "pendingOpened": 0,
+          "dependencyEffects": 0,
+          "queuedBuckets": null,
+          "queuedEffects": null,
+          "pendingCaptureBuckets": 0,
+          "pendingOrders": 0,
+          "captureEffects": 0,
+          "captureBaselines": 0,
+          "descriptors": 0,
+          "lifecycleListeners": 0,
+          "inspectionWriters": null,
+          "inspectionFootprints": null
+        },
+        "pending": 0,
+        "confirmed": 50000,
+        "claims": {
+          "owners": 0,
+          "claimedSubjects": 0
+        },
+        "openCommitScope": false
+      },
+      "scope": "Record counts and fresh-process live heap; no cap verdict or complete heap reachability proof.",
+      "pid": 41400,
+      "elapsedMs": 2301,
+      "childExit": 0,
+      "signal": null
+    },
+    {
+      "id": "R02",
+      "diagnostics": false,
+      "status": "held",
+      "findings": [],
+      "samples": [
+        {
+          "phase": "constructed-live",
+          "heapUsedAfterGC": 4773424,
+          "counts": {
+            "confirmedTurns": 0,
+            "confirmedEffectSlots": 0,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 0,
+          "claims": null,
+          "openCommitScope": false
+        },
+        {
+          "phase": "live-1",
+          "heapUsedAfterGC": 4901984,
+          "counts": {
+            "confirmedTurns": 0,
+            "confirmedEffectSlots": 0,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 0,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        },
+        {
+          "phase": "live-1000",
+          "heapUsedAfterGC": 5656824,
+          "counts": {
+            "confirmedTurns": 0,
+            "confirmedEffectSlots": 0,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 0,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        },
+        {
+          "phase": "live-10000",
+          "heapUsedAfterGC": 5706888,
+          "counts": {
+            "confirmedTurns": 0,
+            "confirmedEffectSlots": 0,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 0,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        },
+        {
+          "phase": "live-50000",
+          "heapUsedAfterGC": 5799648,
+          "counts": {
+            "confirmedTurns": 0,
+            "confirmedEffectSlots": 0,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 0,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        },
+        {
+          "phase": "terminal-live",
+          "heapUsedAfterGC": 5784704,
+          "counts": {
+            "confirmedTurns": 0,
+            "confirmedEffectSlots": 0,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 0,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        },
+        {
+          "phase": "after-destroy",
+          "heapUsedAfterGC": 5726376,
+          "counts": {
+            "confirmedTurns": 0,
+            "confirmedEffectSlots": 0,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 0,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        }
+      ],
+      "outcomes": [],
+      "diagnosticReaderCount": 0,
+      "diagnosticJournal": null,
+      "afterDestroy": {
+        "phase": "after-destroy",
+        "heapUsedAfterGC": 5726376,
+        "counts": {
+          "confirmedTurns": 0,
+          "confirmedEffectSlots": 0,
+          "confirmedBaselineEntries": 0,
+          "pendingTurns": 0,
+          "pendingOpened": 0,
+          "dependencyEffects": 0,
+          "queuedBuckets": null,
+          "queuedEffects": null,
+          "pendingCaptureBuckets": 0,
+          "pendingOrders": 0,
+          "captureEffects": 0,
+          "captureBaselines": 0,
+          "descriptors": 0,
+          "lifecycleListeners": 0,
+          "inspectionWriters": null,
+          "inspectionFootprints": null
+        },
+        "pending": 0,
+        "confirmed": 0,
+        "claims": {
+          "owners": 0,
+          "claimedSubjects": 0
+        },
+        "openCommitScope": false
+      },
+      "scope": "Record counts and fresh-process live heap; no cap verdict or complete heap reachability proof.",
+      "pid": 41416,
+      "elapsedMs": 344,
+      "childExit": 0,
+      "signal": null
+    },
+    {
+      "id": "R03",
+      "diagnostics": false,
+      "status": "violated",
+      "findings": [
+        "expected1000 refusals, got1",
+        "refused attempts change retained counts",
+        "refusal lost pending authority",
+        "retry did not restore baseline"
+      ],
+      "samples": [
+        {
+          "phase": "constructed-live",
+          "heapUsedAfterGC": 4773424,
+          "counts": {
+            "confirmedTurns": 0,
+            "confirmedEffectSlots": 0,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 0,
+          "claims": null,
+          "openCommitScope": false
+        },
+        {
+          "phase": "before-refusal",
+          "heapUsedAfterGC": 4907848,
+          "counts": {
+            "confirmedTurns": 1,
+            "confirmedEffectSlots": 1,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 1,
+            "pendingOpened": 1,
+            "dependencyEffects": 1,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 2,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 1,
+          "confirmed": 1,
+          "claims": {
+            "owners": 1,
+            "claimedSubjects": 1
+          },
+          "openCommitScope": true
+        },
+        {
+          "phase": "after-1000-refusals",
+          "heapUsedAfterGC": 5021032,
+          "counts": {
+            "confirmedTurns": 1,
+            "confirmedEffectSlots": 1,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 1,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 1,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        },
+        {
+          "phase": "after-retry",
+          "heapUsedAfterGC": 5035712,
+          "counts": {
+            "confirmedTurns": 1,
+            "confirmedEffectSlots": 1,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 1,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 1,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        },
+        {
+          "phase": "after-destroy",
+          "heapUsedAfterGC": 5038096,
+          "counts": {
+            "confirmedTurns": 1,
+            "confirmedEffectSlots": 1,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 1,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 1,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        }
+      ],
+      "outcomes": [
+        "retry-restored"
+      ],
+      "diagnosticReaderCount": 0,
+      "diagnosticJournal": null,
+      "afterDestroy": {
+        "phase": "after-destroy",
+        "heapUsedAfterGC": 5038096,
+        "counts": {
+          "confirmedTurns": 1,
+          "confirmedEffectSlots": 1,
+          "confirmedBaselineEntries": 0,
+          "pendingTurns": 0,
+          "pendingOpened": 0,
+          "dependencyEffects": 0,
+          "queuedBuckets": null,
+          "queuedEffects": null,
+          "pendingCaptureBuckets": 0,
+          "pendingOrders": 0,
+          "captureEffects": 0,
+          "captureBaselines": 0,
+          "descriptors": 1,
+          "lifecycleListeners": 0,
+          "inspectionWriters": null,
+          "inspectionFootprints": null
+        },
+        "pending": 0,
+        "confirmed": 1,
+        "claims": {
+          "owners": 0,
+          "claimedSubjects": 0
+        },
+        "openCommitScope": false
+      },
+      "scope": "Record counts and fresh-process live heap; no cap verdict or complete heap reachability proof.",
+      "pid": 41417,
+      "elapsedMs": 52,
+      "childExit": 0,
+      "signal": null
+    },
+    {
+      "id": "R04",
+      "diagnostics": false,
+      "status": "held",
+      "findings": [],
+      "samples": [
+        {
+          "phase": "constructed-live",
+          "heapUsedAfterGC": 4773424,
+          "counts": {
+            "confirmedTurns": 0,
+            "confirmedEffectSlots": 0,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 0,
+          "claims": null,
+          "openCommitScope": false
+        },
+        {
+          "phase": "one-pending-1-accepted",
+          "heapUsedAfterGC": 4849088,
+          "counts": {
+            "confirmedTurns": 1,
+            "confirmedEffectSlots": 1,
+            "confirmedBaselineEntries": 1,
+            "pendingTurns": 1,
+            "pendingOpened": 1,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 1,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 1,
+          "confirmed": 1,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": true
+        },
+        {
+          "phase": "one-pending-1000-accepted",
+          "heapUsedAfterGC": 5802952,
+          "counts": {
+            "confirmedTurns": 1000,
+            "confirmedEffectSlots": 1000,
+            "confirmedBaselineEntries": 1000,
+            "pendingTurns": 1,
+            "pendingOpened": 1,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 1,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 1,
+          "confirmed": 1000,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": true
+        },
+        {
+          "phase": "one-pending-10000-accepted",
+          "heapUsedAfterGC": 9927072,
+          "counts": {
+            "confirmedTurns": 10000,
+            "confirmedEffectSlots": 10000,
+            "confirmedBaselineEntries": 10000,
+            "pendingTurns": 1,
+            "pendingOpened": 1,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 1,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 1,
+          "confirmed": 10000,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": true
+        },
+        {
+          "phase": "one-pending-50000-accepted",
+          "heapUsedAfterGC": 28253504,
+          "counts": {
+            "confirmedTurns": 50000,
+            "confirmedEffectSlots": 50000,
+            "confirmedBaselineEntries": 50000,
+            "pendingTurns": 1,
+            "pendingOpened": 1,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 1,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 1,
+          "confirmed": 50000,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": true
+        },
+        {
+          "phase": "oldest-pending-live",
+          "heapUsedAfterGC": 28181616,
+          "counts": {
+            "confirmedTurns": 50000,
+            "confirmedEffectSlots": 50000,
+            "confirmedBaselineEntries": 50000,
+            "pendingTurns": 1,
+            "pendingOpened": 1,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 1,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 1,
+          "confirmed": 50000,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": true
+        },
+        {
+          "phase": "older-settled-live",
+          "heapUsedAfterGC": 28141136,
+          "counts": {
+            "confirmedTurns": 50000,
+            "confirmedEffectSlots": 50000,
+            "confirmedBaselineEntries": 50000,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 50000,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        },
+        {
+          "phase": "after-destroy",
+          "heapUsedAfterGC": 28137800,
+          "counts": {
+            "confirmedTurns": 50000,
+            "confirmedEffectSlots": 50000,
+            "confirmedBaselineEntries": 50000,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 50000,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        }
+      ],
+      "outcomes": [],
+      "diagnosticReaderCount": 0,
+      "diagnosticJournal": null,
+      "afterDestroy": {
+        "phase": "after-destroy",
+        "heapUsedAfterGC": 28137800,
+        "counts": {
+          "confirmedTurns": 50000,
+          "confirmedEffectSlots": 50000,
+          "confirmedBaselineEntries": 50000,
+          "pendingTurns": 0,
+          "pendingOpened": 0,
+          "dependencyEffects": 0,
+          "queuedBuckets": null,
+          "queuedEffects": null,
+          "pendingCaptureBuckets": 0,
+          "pendingOrders": 0,
+          "captureEffects": 0,
+          "captureBaselines": 0,
+          "descriptors": 0,
+          "lifecycleListeners": 0,
+          "inspectionWriters": null,
+          "inspectionFootprints": null
+        },
+        "pending": 0,
+        "confirmed": 50000,
+        "claims": {
+          "owners": 0,
+          "claimedSubjects": 0
+        },
+        "openCommitScope": false
+      },
+      "scope": "Record counts and fresh-process live heap; no cap verdict or complete heap reachability proof.",
+      "pid": 41418,
+      "elapsedMs": 1594,
+      "childExit": 0,
+      "signal": null
+    },
+    {
+      "id": "R05",
+      "diagnostics": false,
+      "status": "violated",
+      "findings": [
+        "destroyed-with-runtime-and-handle-held: pendingTurns=1",
+        "destroyed-with-runtime-and-handle-held: pendingOpened=1",
+        "destroyed-with-runtime-and-handle-held: dependencyEffects=1",
+        "destroyed-with-runtime-and-handle-held: commit scope open",
+        "confirmed after destroy"
+      ],
+      "samples": [
+        {
+          "phase": "constructed-live",
+          "heapUsedAfterGC": 4773424,
+          "counts": {
+            "confirmedTurns": 0,
+            "confirmedEffectSlots": 0,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 0,
+          "claims": null,
+          "openCommitScope": false
+        },
+        {
+          "phase": "pending-before-destroy",
+          "heapUsedAfterGC": 4900680,
+          "counts": {
+            "confirmedTurns": 1,
+            "confirmedEffectSlots": 1,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 1,
+            "pendingOpened": 1,
+            "dependencyEffects": 1,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 3,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 1,
+          "confirmed": 1,
+          "claims": {
+            "owners": 1,
+            "claimedSubjects": 1
+          },
+          "openCommitScope": true
+        },
+        {
+          "phase": "destroyed-with-runtime-and-handle-held",
+          "heapUsedAfterGC": 4910408,
+          "counts": {
+            "confirmedTurns": 1,
+            "confirmedEffectSlots": 1,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 1,
+            "pendingOpened": 1,
+            "dependencyEffects": 1,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 3,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 1,
+          "confirmed": 1,
+          "claims": {
+            "owners": 1,
+            "claimedSubjects": 1
+          },
+          "openCommitScope": true
+        },
+        {
+          "phase": "after-destroy",
+          "heapUsedAfterGC": 4917992,
+          "counts": {
+            "confirmedTurns": 2,
+            "confirmedEffectSlots": 3,
+            "confirmedBaselineEntries": 2,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 1,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 2,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        }
+      ],
+      "outcomes": [
+        "reader-after-destroy-refused"
+      ],
+      "diagnosticReaderCount": 0,
+      "diagnosticJournal": null,
+      "afterDestroy": {
+        "phase": "after-destroy",
+        "heapUsedAfterGC": 4917992,
+        "counts": {
+          "confirmedTurns": 2,
+          "confirmedEffectSlots": 3,
+          "confirmedBaselineEntries": 2,
+          "pendingTurns": 0,
+          "pendingOpened": 0,
+          "dependencyEffects": 0,
+          "queuedBuckets": null,
+          "queuedEffects": null,
+          "pendingCaptureBuckets": 0,
+          "pendingOrders": 0,
+          "captureEffects": 0,
+          "captureBaselines": 0,
+          "descriptors": 1,
+          "lifecycleListeners": 0,
+          "inspectionWriters": null,
+          "inspectionFootprints": null
+        },
+        "pending": 0,
+        "confirmed": 2,
+        "claims": {
+          "owners": 0,
+          "claimedSubjects": 0
+        },
+        "openCommitScope": false
+      },
+      "scope": "Record counts and fresh-process live heap; no cap verdict or complete heap reachability proof.",
+      "pid": 41420,
+      "elapsedMs": 50,
+      "childExit": 0,
+      "signal": null
+    },
+    {
+      "id": "R06",
+      "diagnostics": false,
+      "status": "held",
+      "findings": [],
+      "samples": [
+        {
+          "phase": "constructed-live",
+          "heapUsedAfterGC": 4773424,
+          "counts": {
+            "confirmedTurns": 0,
+            "confirmedEffectSlots": 0,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 0,
+          "claims": null,
+          "openCommitScope": false
+        },
+        {
+          "phase": "diagnostic-comparison-live",
+          "heapUsedAfterGC": 5050160,
+          "counts": {
+            "confirmedTurns": 2,
+            "confirmedEffectSlots": 2,
+            "confirmedBaselineEntries": 1,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 1,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 2,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        },
+        {
+          "phase": "after-destroy",
+          "heapUsedAfterGC": 5052744,
+          "counts": {
+            "confirmedTurns": 2,
+            "confirmedEffectSlots": 2,
+            "confirmedBaselineEntries": 1,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 1,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 2,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        }
+      ],
+      "outcomes": [
+        {
+          "name": "newer-confirmed",
+          "value": 2,
+          "pending": 0
+        },
+        {
+          "name": "realized-ABA",
+          "result": "settled",
+          "value": 0
+        },
+        {
+          "name": "occupied-identity",
+          "refused": true,
+          "value": 2,
+          "pending": 0
+        }
+      ],
+      "diagnosticReaderCount": 0,
+      "diagnosticJournal": null,
+      "afterDestroy": {
+        "phase": "after-destroy",
+        "heapUsedAfterGC": 5052744,
+        "counts": {
+          "confirmedTurns": 2,
+          "confirmedEffectSlots": 2,
+          "confirmedBaselineEntries": 1,
+          "pendingTurns": 0,
+          "pendingOpened": 0,
+          "dependencyEffects": 0,
+          "queuedBuckets": null,
+          "queuedEffects": null,
+          "pendingCaptureBuckets": 0,
+          "pendingOrders": 0,
+          "captureEffects": 0,
+          "captureBaselines": 0,
+          "descriptors": 1,
+          "lifecycleListeners": 0,
+          "inspectionWriters": null,
+          "inspectionFootprints": null
+        },
+        "pending": 0,
+        "confirmed": 2,
+        "claims": {
+          "owners": 0,
+          "claimedSubjects": 0
+        },
+        "openCommitScope": false
+      },
+      "scope": "Record counts and fresh-process live heap; no cap verdict or complete heap reachability proof.",
+      "pid": 41421,
+      "elapsedMs": 48,
+      "childExit": 0,
+      "signal": null
+    },
+    {
+      "id": "R06",
+      "diagnostics": true,
+      "status": "held",
+      "findings": [],
+      "samples": [
+        {
+          "phase": "constructed-live",
+          "heapUsedAfterGC": 4777256,
+          "counts": {
+            "confirmedTurns": 0,
+            "confirmedEffectSlots": 0,
+            "confirmedBaselineEntries": 0,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 0,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 0,
+          "claims": null,
+          "openCommitScope": false
+        },
+        {
+          "phase": "diagnostic-comparison-live",
+          "heapUsedAfterGC": 5065096,
+          "counts": {
+            "confirmedTurns": 2,
+            "confirmedEffectSlots": 2,
+            "confirmedBaselineEntries": 1,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 1,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 2,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        },
+        {
+          "phase": "after-destroy",
+          "heapUsedAfterGC": 5068472,
+          "counts": {
+            "confirmedTurns": 2,
+            "confirmedEffectSlots": 2,
+            "confirmedBaselineEntries": 1,
+            "pendingTurns": 0,
+            "pendingOpened": 0,
+            "dependencyEffects": 0,
+            "queuedBuckets": null,
+            "queuedEffects": null,
+            "pendingCaptureBuckets": 0,
+            "pendingOrders": 0,
+            "captureEffects": 0,
+            "captureBaselines": 0,
+            "descriptors": 1,
+            "lifecycleListeners": 0,
+            "inspectionWriters": null,
+            "inspectionFootprints": null
+          },
+          "pending": 0,
+          "confirmed": 2,
+          "claims": {
+            "owners": 0,
+            "claimedSubjects": 0
+          },
+          "openCommitScope": false
+        }
+      ],
+      "outcomes": [
+        {
+          "name": "newer-confirmed",
+          "value": 2,
+          "pending": 0
+        },
+        {
+          "name": "realized-ABA",
+          "result": "settled",
+          "value": 0
+        },
+        {
+          "name": "occupied-identity",
+          "refused": true,
+          "value": 2,
+          "pending": 0
+        }
+      ],
+      "diagnosticReaderCount": 0,
+      "diagnosticJournal": {
+        "turns": 7,
+        "events": 12
+      },
+      "afterDestroy": {
+        "phase": "after-destroy",
+        "heapUsedAfterGC": 5068472,
+        "counts": {
+          "confirmedTurns": 2,
+          "confirmedEffectSlots": 2,
+          "confirmedBaselineEntries": 1,
+          "pendingTurns": 0,
+          "pendingOpened": 0,
+          "dependencyEffects": 0,
+          "queuedBuckets": null,
+          "queuedEffects": null,
+          "pendingCaptureBuckets": 0,
+          "pendingOrders": 0,
+          "captureEffects": 0,
+          "captureBaselines": 0,
+          "descriptors": 1,
+          "lifecycleListeners": 0,
+          "inspectionWriters": null,
+          "inspectionFootprints": null
+        },
+        "pending": 0,
+        "confirmed": 2,
+        "claims": {
+          "owners": 0,
+          "claimedSubjects": 0
+        },
+        "openCommitScope": false
+      },
+      "scope": "Record counts and fresh-process live heap; no cap verdict or complete heap reachability proof.",
+      "pid": 41422,
+      "elapsedMs": 62,
+      "childExit": 0,
+      "signal": null
+    }
+  ],
+  "scope": "Bounded characterization, not a retention policy or whole-law proof. null counters mean unavailable, never zero. Heap is fresh-process measured with a live tree/runtime, not attributable bytes per subsystem."
+}

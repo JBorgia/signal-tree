@@ -7,7 +7,13 @@ import type {
 export type { Location, ReadonlyLocation } from './internals/cell-runtime';
 
 import type { WriteMetadata } from './mutation-types';
-import type { NodeAccessor } from './node-accessor';
+import type {
+  BuiltInObjectValue,
+  SnapshotValue,
+  ConstructionAccessor,
+  ConstructionOf,
+  NodeConstruction,
+} from './internals/construction-accessor';
 import type { CallableSyntax, LeafDefinition } from './leaf';
 
 import type { EnhancerWithMeta, TreeCapability } from './enhancer-types';
@@ -184,20 +190,13 @@ export type CarrierKind = keyof LeafCarriers<unknown> &
   keyof ReadonlyViewLeafCarriers<unknown>;
 export type LeafOf<T, C extends CarrierKind> = LeafCarriers<T>[C];
 
-/** Object terminals recognized by the runtime in every environment. */
-type BuiltInObjectValue =
-  | Date
-  | RegExp
-  | Map<unknown, unknown>
-  | Set<unknown>
-  | WeakMap<object, unknown>
-  | WeakSet<object>
-  | ArrayBuffer
-  | ArrayBufferView
-  | Error
-  | Promise<unknown>;
+type StateAccessor<T> = ConstructionAccessor<
+  SnapshotValue<T>,
+  SnapshotValue<T, true>,
+  T
+>;
 
-export type TreeNodeOf<T, C extends CarrierKind> = {
+export type TreeNodeOf<T, C extends CarrierKind> = NodeConstruction<T> & {
   [K in keyof T]: T[K] extends LeafDefinition<infer Value>
     ? LeafOf<Value, C>
     : T[K] extends EntityMapMarker<infer E, infer Key>
@@ -210,7 +209,7 @@ export type TreeNodeOf<T, C extends CarrierKind> = {
         | CallableSyntax
     ? LeafOf<ResolveLeafDefinitions<T[K]>, C>
     : T[K] extends object
-    ? NodeAccessor<ResolveLeafDefinitions<T[K]>> & TreeNodeOf<T[K], C>
+    ? StateAccessor<T[K]> & TreeNodeOf<T[K], C>
     : LeafOf<ResolveLeafDefinitions<T[K]>, C>;
 };
 
@@ -268,7 +267,7 @@ export interface ISignalTreeOf<
   TAccum = TreeNodeOf<T, C>
 > {
   /** Canonical root state accessor: read, whole-value replace, or derive. */
-  readonly $: NodeAccessor<T> & TAccum;
+  readonly $: StateAccessor<ConstructionOf<TAccum, T>> & TAccum;
   /**
    * `with()` IS GONE, ON PURPOSE — this note is the tombstone.
    *
@@ -375,8 +374,36 @@ export type EnhancerCleanup = () => void;
  * Richer causal details may be attached as an internal `cause` payload for
  * tooling, but that shape is not part of the application-facing API.
  */
+/**
+ * Handle back to a transaction that is STILL PENDING after a settlement
+ * attempt failed. Present only when the caller cannot already hold the
+ * transaction: `transact()` throws before returning when its callback throws
+ * and compensation then refuses, so without this the caller has no reference
+ * to a transaction that remains settleable.
+ *
+ * Absent when the turn actually settled. In particular an observer that throws
+ * AFTER compensation has installed leaves a rejected turn, and offering
+ * authority there would be a lie.
+ */
+export type SignalTreeRollbackRecovery = {
+  /** The same still-pending transaction. Retry or confirm through this. */
+  readonly transaction: { confirm(): void; rollback(): void };
+  /**
+   * Explicit, because a callback may legally `throw undefined`. The absence of
+   * `callbackError` cannot distinguish that from "the callback did not throw".
+   */
+  readonly callbackFailed: boolean;
+  /** Whatever the callback threw, including `undefined`. */
+  readonly callbackError?: unknown;
+};
+
 export class SignalTreeRollbackError extends Error {
   readonly code = 'SIGNALTREE_ROLLBACK_FAILED';
+  /**
+   * Non-enumerable when set, so structured logging cannot drag a live
+   * transaction handle into a serialized error payload. Read it directly.
+   */
+  readonly recovery?: SignalTreeRollbackRecovery;
   // NOT declared as a field. Whether `cause` exists on `Error` depends on the
   // lib target, and the workspace disagrees: the demo's compiler requires
   // `override` (TS4114) while core's rollup build rejects it as not present in
@@ -708,10 +735,13 @@ export type EntityNodeOf<E, C extends CarrierKind> = {
   (value: E): void;
   (updater: (current: E) => E): void;
 } & {
-  [P in keyof E]: E[P] extends object
-    ? E[P] extends readonly unknown[]
-      ? LeafOf<E[P], C>
-      : EntityNodeOf<E[P], C>
+  [P in keyof E]: E[P] extends
+    | readonly unknown[]
+    | BuiltInObjectValue
+    | CallableSyntax
+    ? LeafOf<E[P], C>
+    : E[P] extends object
+    ? EntityNodeOf<E[P], C>
     : LeafOf<E[P], C>;
 };
 
@@ -1024,7 +1054,7 @@ type PathInterceptor = (
  */
 export type WritableLeaf<T> = LeafOf<T, 'location'>;
 
-export type AccessibleNodeOf<T, C extends CarrierKind> = NodeAccessor<T> &
+export type AccessibleNodeOf<T, C extends CarrierKind> = StateAccessor<T> &
   TreeNodeOf<T, C>;
 
 export type AccessibleNode<T> = AccessibleNodeOf<T, 'location'>;

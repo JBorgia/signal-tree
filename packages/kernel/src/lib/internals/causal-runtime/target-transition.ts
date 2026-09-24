@@ -100,7 +100,8 @@ export type CollectionOrderDelta = {
 };
 
 export function requiresDeclarativeStructuralTarget(
-  effects: readonly ReversalEffect[]
+  effects: readonly ReversalEffect[],
+  readSource?: (owner: PositionId) => CollectionTransitionSource | undefined
 ): boolean {
   const structural = effects.filter(
     (effect) => effect.structural !== undefined
@@ -132,19 +133,42 @@ export function requiresDeclarativeStructuralTarget(
     (effect) => effect.structural === 'add' && typeof effect.subjectId === 'number'
   );
   if (additions.length < 2) {
+    const addition = additions[0];
+    const context = addition?.structuralContext;
+    // Callers can supply current owner-qualified truth. If a singleton's
+    // recorded anchors are gone, require the same complete-target proof as
+    // multiple restores instead of admitting the physical tail fallback.
+    // Surviving anchors retain the existing physical placement behavior.
+    if (
+      readSource &&
+      (context?.kind === 'remove' || context?.kind === 'add') &&
+      (context.beforeSubject !== undefined || context.afterSubject !== undefined)
+    ) {
+      const source = readSource(addition.owner);
+      return ![context.beforeSubject, context.afterSubject].some(
+        (anchor) => anchor !== undefined && source?.order.includes(anchor)
+      );
+    }
     return false;
   }
-  const addedSubjects = new Set(additions.map(({ subjectId }) => subjectId));
+  const addedSubjects = new Map<PositionId, Set<number>>();
+  for (const addition of additions) {
+    if (typeof addition.subjectId !== 'number') continue;
+    let subjects = addedSubjects.get(addition.owner);
+    if (!subjects) addedSubjects.set(addition.owner, (subjects = new Set()));
+    subjects.add(addition.subjectId);
+  }
   return additions.some((effect) => {
     const context = effect.structuralContext;
     if (context?.kind !== 'add' && context?.kind !== 'remove') {
       return false;
     }
+    const subjects = addedSubjects.get(effect.owner);
     return (
       (context.beforeSubject !== undefined &&
-        !addedSubjects.has(context.beforeSubject)) ||
+        !subjects?.has(context.beforeSubject)) ||
       (context.afterSubject !== undefined &&
-        !addedSubjects.has(context.afterSubject))
+        !subjects?.has(context.afterSubject))
     );
   });
 }
@@ -635,7 +659,9 @@ function applyValueEffect(
       )} in owner ${effect.owner}`
     );
   }
-  const fieldPath = deriveSubjectFieldPath(effect.path, effect.ownerPath);
+  const fieldPath =
+    effect.subjectFieldSegments ??
+    deriveSubjectFieldPath(effect.path, effect.ownerPath);
   collection.subjects.set(effect.subjectId, {
     ...subject,
     value:

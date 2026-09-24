@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
-exec node scripts/publish-candidate.mjs --ci --prebuilt "$@"
+exec node scripts/publish-candidate.mjs --ci "$@"

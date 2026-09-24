@@ -61,8 +61,9 @@ in them.
 
 ### Executable examples (already in this repo, not invented)
 
-- [`packages/kernel/src/enhancers/serialization/persistence-as-link-swap-0.spec.ts`](../../packages/kernel/src/enhancers/serialization/persistence-as-link-swap-0.spec.ts) —
-  the exact swap this guide describes, proven.
+- [`packages/kernel/src/lib/link-authority-carrier.spec.ts`](../../packages/kernel/src/lib/link-authority-carrier.spec.ts) —
+  the retained authority and publication controls, now exercised through Link
+  with endpoint-owned JSON storage instead of the removed serializer.
 - [`packages/kernel/src/lib/link-persistence-conformance.spec.ts`](../../packages/kernel/src/lib/link-persistence-conformance.spec.ts) —
   persistence-shaped `link()` usage against the general `Link` contract.
 - [`packages/kernel/src/lib/persistence-decompose-0.spec.ts`](../../packages/kernel/src/lib/persistence-decompose-0.spec.ts) —

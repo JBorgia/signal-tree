@@ -25,9 +25,9 @@ export default [
       '**/zz-*.ts',
       // User-owned research harnesses, gitignored. They import kernel source by
       // relative path on purpose (they bundle a pinned snapshot rather than
-      // consuming published entry points), which trips
-      // @nx/enforce-module-boundaries. Scratch research is not repo code and
-      // must not gate repo lint. Same fix as the v16 line.
+      // consuming the published entry points), which trips
+      // @nx/enforce-module-boundaries. Same reasoning as the probe specs
+      // above: scratch research that is not repo code must not gate repo lint.
       'tools/experiments/**',
       'scripts/ai-codegen-benchmark/results/**',
       // Generated when Vite configuration is loaded through a TypeScript shim.

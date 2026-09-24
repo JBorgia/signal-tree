@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { of } from 'rxjs';
 
-import { serialization } from '../enhancers/serialization/serialization';
-import { entityMap, signalTree } from '../index';
+import { entityMap, link, signalTree } from '../index';
 
 /**
  * M4 — CLOSING THE OWNERSHIP HALF.
@@ -28,25 +26,24 @@ import { entityMap, signalTree } from '../index';
  */
 type Row = { id: string; n: number };
 
-// `serialize()` emits `{ data, metadata }`. A bare state object is silently
-// ignored — measured: it applies nothing and reports nothing.
-const payload = (data: unknown) =>
-  JSON.stringify({ data, metadata: { version: '2.0.0' } });
-
 describe('M4 — is the decline a uniform rule?', () => {
-  it('THE PROPERTY DECIDES, NOT THE KIND — a loaderless collection ACCEPTS rehydrate', () => {
-    const tree = signalTree(
-      {
-        rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-      },
-      { enhancers: [serialization()] }
-    );
+  it('THE PROPERTY DECIDES, NOT THE KIND — a loaderless collection ACCEPTS rehydrate', async () => {
+    const tree = signalTree({
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+    });
     tree.$.rows.addOne({ id: 'live', n: 1 });
 
     // Same declaration kind, same mode, no live source -> the payload applies.
-    tree.deserialize(payload({ rows: { all: [{ id: 'stored', n: 2 }] } }));
+    const connection = link(tree.$.rows, {
+      get: () => [{ id: 'stored', n: 2 }],
+    });
+    try {
+      await connection.retrieve();
 
-    expect(tree.$.rows.ids()).toEqual(['stored']);
+      expect(tree.$.rows.ids()).toEqual(['stored']);
+    } finally {
+      connection.dispose();
+      tree.destroy();
+    }
   });
-
 });

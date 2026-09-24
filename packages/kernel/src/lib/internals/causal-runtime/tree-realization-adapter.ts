@@ -214,6 +214,10 @@ class PreparedRealizationContext {
   }
 }
 
+type StructuralOwnerIndex = ReadonlyMap<PositionId, string> & {
+  readonly nodes: ReadonlyMap<PositionId, CollectionNode>;
+};
+
 type SubjectRealizationDescriptor = {
   path: string;
   ownerPath: string;
@@ -525,7 +529,7 @@ export function getTreeRealizationPort(
 function planHeterogeneousFrame(
   tree: ISignalTree<object>,
   descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
-  structuralOwnerPaths: ReadonlyMap<PositionId, string>,
+  structuralOwnerPaths: StructuralOwnerIndex,
   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
   physicalCommitClock: ReturnType<typeof getPhysicalCommitClock>,
   effects: readonly ReversalEffect[]
@@ -979,7 +983,7 @@ function planHeterogeneousFrame(
 function planScalarFrame(
   tree: ISignalTree<object>,
   descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
-  structuralOwnerPaths: ReadonlyMap<PositionId, string>,
+  structuralOwnerPaths: StructuralOwnerIndex,
   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
   effects: readonly ReversalEffect[]
 ): { commit(): void } | undefined {
@@ -991,6 +995,7 @@ function planScalarFrame(
     effects.some(
       (effect) =>
         effect.structural ||
+        effect.subjectFieldSegments !== undefined ||
         hasInlineScopedAddress(effect) ||
         hasInlineSubjectAddress(effect)
     )
@@ -1049,7 +1054,7 @@ function planScalarFrame(
 function canApplyEffect(
   tree: ISignalTree<object>,
   descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
-  structuralOwnerPaths: ReadonlyMap<PositionId, string>,
+  structuralOwnerPaths: StructuralOwnerIndex,
   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
   effect: ReversalEffect,
   preparedContext?: PreparedRealizationContext
@@ -1058,6 +1063,7 @@ function canApplyEffect(
   if (
     !descriptor &&
     !effect.structural &&
+    effect.subjectFieldSegments === undefined &&
     !scalarSlotRuntime?.resolveScalarLeaf(effect.owner) &&
     !hasInlineSubjectAddress(effect) &&
     !hasInlineScopedAddress(effect)
@@ -1081,7 +1087,8 @@ function canApplyEffect(
       tree,
       descriptor,
       scalarSlotRuntime,
-      effect
+      effect,
+      structuralOwnerPaths
     );
     return isWritableLeaf(target) || isWritableEntityNode(target);
   }
@@ -1167,7 +1174,7 @@ function canApplyEffect(
 function applyEffect(
   tree: ISignalTree<object>,
   descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
-  structuralOwnerPaths: ReadonlyMap<PositionId, string>,
+  structuralOwnerPaths: StructuralOwnerIndex,
   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
   effect: ReversalEffect
 ): void {
@@ -1175,6 +1182,7 @@ function applyEffect(
   if (
     !descriptor &&
     !effect.structural &&
+    effect.subjectFieldSegments === undefined &&
     !scalarSlotRuntime?.resolveScalarLeaf(effect.owner) &&
     !hasInlineSubjectAddress(effect) &&
     !hasInlineScopedAddress(effect)
@@ -1196,7 +1204,8 @@ function applyEffect(
           tree,
           descriptor,
           scalarSlotRuntime,
-          effect
+          effect,
+          structuralOwnerPaths
         );
         if (isWritableLeaf(target)) {
           target.set(effect.after);
@@ -1283,14 +1292,16 @@ function resolveLiveScalarNode(
   tree: ISignalTree<object>,
   descriptor: TreeRealizationDescriptor | undefined,
   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
-  effect: ReversalEffect
+  effect: ReversalEffect,
+  structuralOwnerPaths: StructuralOwnerIndex
 ): unknown {
   if (typeof effect.subjectId === 'number') {
     return resolveCurrentSubjectTarget(
       tree,
       descriptor,
       effect.subjectId,
-      effect
+      effect,
+      structuralOwnerPaths
     );
   }
 
@@ -1345,7 +1356,7 @@ function canResolvePreparedSubjectTarget(
   }
 
   return (
-    resolveNodeAtPath(
+    resolveNodeAtSegments(
       preparedSubject.value as Record<string, unknown>,
       fieldPathFromRow
     ) !== undefined
@@ -1355,9 +1366,12 @@ function canResolvePreparedSubjectTarget(
 function resolveCollectionNode(
   tree: ISignalTree<object>,
   descriptor: TreeRealizationDescriptor | undefined,
-  structuralOwnerPaths: ReadonlyMap<PositionId, string>,
+  structuralOwnerPaths: StructuralOwnerIndex,
   effect: ReversalEffect
 ): CollectionNode | undefined {
+  const owned = structuralOwnerPaths.nodes.get(effect.owner);
+  if (owned) return owned;
+  if (effect.subjectFieldSegments !== undefined) return undefined;
   const collectionPath = resolveCollectionPath(
     descriptor,
     structuralOwnerPaths,
@@ -1376,7 +1390,7 @@ function resolveCollectionNode(
 
 function resolveCollectionPath(
   descriptor: TreeRealizationDescriptor | undefined,
-  structuralOwnerPaths: ReadonlyMap<PositionId, string>,
+  structuralOwnerPaths: StructuralOwnerIndex,
   effect: ReversalEffect
 ): string | undefined {
   return (
@@ -1444,7 +1458,7 @@ function snapshotCollectionEntityValue(
 function updatePreparedRealizationContext(
   tree: ISignalTree<object>,
   descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
-  structuralOwnerPaths: ReadonlyMap<PositionId, string>,
+  structuralOwnerPaths: StructuralOwnerIndex,
   preparedContext: PreparedRealizationContext,
   effect: ReversalEffect
 ): void {
@@ -1456,7 +1470,9 @@ function updatePreparedRealizationContext(
       effect,
       getPositionRegistry(tree.$)
     );
-    if (preparedSubject && fieldPathFromRow) {
+    if (preparedSubject && fieldPathFromRow?.length === 0) {
+      preparedSubject.value = effect.after;
+    } else if (preparedSubject && fieldPathFromRow) {
       assignPreparedSubjectValue(
         preparedSubject.value,
         fieldPathFromRow,
@@ -1556,7 +1572,7 @@ function updatePreparedRealizationContext(
 function buildPreparedRealizationContext(
   tree: ISignalTree<object>,
   descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
-  structuralOwnerPaths: ReadonlyMap<PositionId, string>,
+  structuralOwnerPaths: StructuralOwnerIndex,
   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
   effects: readonly ReversalEffect[]
 ): PreparedRealizationContext | undefined {
@@ -1591,26 +1607,25 @@ function resolveSubjectFieldPath(
   descriptor: TreeRealizationDescriptor | undefined,
   effect: ReversalEffect,
   registry: PositionRegistry | undefined
-): string | undefined {
-  if (typeof effect.subjectId !== 'number') {
-    return undefined;
+): readonly string[] | undefined {
+  if (typeof effect.subjectId !== 'number') return undefined;
+  if (effect.subjectFieldSegments !== undefined) {
+    return effect.subjectFieldSegments;
   }
-
-  const inlineFieldPathFromRow = deriveFieldPathFromEffect(effect, registry);
-  return (
-    inlineFieldPathFromRow ??
+  const legacy =
+    deriveFieldPathFromEffect(effect, registry) ??
     descriptor?.subjectDescriptors?.get(String(effect.subjectId))
       ?.fieldPathFromRow ??
-    descriptor?.fieldPathFromRow
-  );
+    descriptor?.fieldPathFromRow;
+  return legacy === undefined ? undefined : legacy === '' ? [] : legacy.split('.');
 }
 
 function assignPreparedSubjectValue(
   subjectValue: unknown,
-  fieldPathFromRow: string,
+  fieldPathFromRow: readonly string[],
   nextValue: unknown
 ): void {
-  if (fieldPathFromRow === '') {
+  if (fieldPathFromRow.length === 0) {
     return;
   }
 
@@ -1618,7 +1633,7 @@ function assignPreparedSubjectValue(
     return;
   }
 
-  const segments = fieldPathFromRow.split('.');
+  const segments = fieldPathFromRow;
   let cursor: unknown = subjectValue;
   for (const segment of segments.slice(0, -1)) {
     if (!isTraversableNode(cursor)) {
@@ -1628,7 +1643,7 @@ function assignPreparedSubjectValue(
   }
 
   const leafKey = segments.at(-1);
-  if (!leafKey || !isTraversableNode(cursor)) {
+  if (leafKey === undefined || !isTraversableNode(cursor)) {
     return;
   }
 
@@ -1646,8 +1661,10 @@ function isPreparedSubjectScalarEffect(
   );
 }
 
-function indexStructuralOwnerPaths(root: unknown): Map<PositionId, string> {
-  const ownerPaths = new Map<PositionId, string>();
+function indexStructuralOwnerPaths(root: unknown): StructuralOwnerIndex {
+  const ownerPaths = Object.assign(new Map<PositionId, string>(), {
+    nodes: new Map<PositionId, CollectionNode>(),
+  });
 
   visitTree(
     root,
@@ -1664,10 +1681,10 @@ function indexStructuralOwnerPaths(root: unknown): Map<PositionId, string> {
         return undefined;
       }
 
-      // This is only a current realization address for an actual collection
-      // node, not structural identity. PositionId, subject lifetime, and
-      // ownerPath can diverge if topology support expands further.
+      // Preserve the exact collection alongside its diagnostic address. This
+      // index owns no entity values or retired row references.
       ownerPaths.set(positionId, ownerPath);
+      ownerPaths.nodes.set(positionId, node);
       return undefined;
     },
     {
@@ -1683,8 +1700,16 @@ function resolveCurrentSubjectTarget(
   tree: ISignalTree<object>,
   descriptor: TreeRealizationDescriptor | undefined,
   subjectId: number,
-  effect: ReversalEffect
+  effect: ReversalEffect,
+  structuralOwnerPaths: StructuralOwnerIndex
 ): unknown {
+  if (effect.subjectFieldSegments !== undefined) {
+    const collection = structuralOwnerPaths.nodes.get(effect.owner);
+    const key = collection?.__findKeyBySubjectId?.(subjectId);
+    if (!collection || key === undefined) return undefined;
+    const row = collection.byIdOrFail(key);
+    return resolveStructuredSubjectTarget(row, effect.subjectFieldSegments);
+  }
   const registry = getPositionRegistry(tree.$);
   const inlineCollectionPath = deriveCollectionPathFromEffect(effect, registry);
   const inlineFieldPathFromRow = deriveFieldPathFromEffect(effect, registry);
@@ -1735,7 +1760,7 @@ function resolveCurrentSubjectTarget(
 function resolveNotifyPath(
   tree: ISignalTree<object>,
   descriptor: TreeRealizationDescriptor | undefined,
-  structuralOwnerPaths: ReadonlyMap<PositionId, string>,
+  structuralOwnerPaths: StructuralOwnerIndex,
   effect: ReversalEffect
 ): string | undefined {
   if (hasInlineScopedAddress(effect)) {
@@ -1746,6 +1771,13 @@ function resolveNotifyPath(
     return descriptor?.path;
   }
 
+  if (effect.subjectFieldSegments !== undefined) {
+    const collection = structuralOwnerPaths.nodes.get(effect.owner);
+    const key = collection?.__findKeyBySubjectId?.(effect.subjectId);
+    const path = structuralOwnerPaths.get(effect.owner);
+    if (key === undefined || path === undefined) return undefined;
+    return [path, String(key), ...effect.subjectFieldSegments].join('.');
+  }
   const registry = getPositionRegistry(tree.$);
   const inlineCollectionPath = deriveCollectionPathFromEffect(effect, registry);
   const inlineFieldPathFromRow = deriveFieldPathFromEffect(effect, registry);
@@ -1832,6 +1864,18 @@ function deriveCollectionPathFromEffect(
   ).collectionPath;
 }
 
+/** Literal property keys supplied by capture; diagnostic paths are not identities. */
+export function deriveFieldSegmentsFromEffect(
+  effect: ReversalEffect,
+  registry: PositionRegistry | undefined
+): readonly string[] | undefined {
+  if (effect.subjectFieldSegments !== undefined) {
+    return effect.subjectFieldSegments;
+  }
+  const legacy = deriveFieldPathFromEffect(effect, registry);
+  return legacy === undefined ? undefined : legacy === '' ? [] : legacy.split('.');
+}
+
 export function deriveFieldPathFromEffect(
   effect: ReversalEffect,
   registry: PositionRegistry | undefined
@@ -1899,6 +1943,47 @@ function resolveCurrentScopedTarget(
     scopeNode as Record<string, unknown>,
     normalizedRelativePath
   );
+}
+
+function resolveNodeAtSegments(
+  root: unknown,
+  segments: readonly string[]
+): unknown {
+  let cursor = root;
+  for (const segment of segments) {
+    if (cursor === null || cursor === undefined) return undefined;
+    cursor = (cursor as Record<string, unknown>)[segment];
+  }
+  return cursor;
+}
+
+function resolveStructuredSubjectTarget(
+  row: unknown,
+  segments: readonly string[]
+): unknown {
+  if (segments.length === 0) return row;
+  const direct = resolveNodeAtSegments(row, segments);
+  if (isWritableLeaf(direct) || isWritableEntityNode(direct)) return direct;
+  if (!isWritableEntityNode(row)) return undefined;
+  const read = row as unknown as () => unknown;
+  const parent = resolveNodeAtSegments(read(), segments.slice(0, -1));
+  if (!isTraversableNode(parent)) return undefined;
+  // Entity fields can be opaque object leaves. Realize a nested value through
+  // the owned row's replacement operation rather than inventing a native leaf.
+  return (value: unknown) => row(replaceValueAtSegments(read(), segments, value));
+}
+
+function replaceValueAtSegments(
+  value: unknown,
+  segments: readonly string[],
+  next: unknown
+): unknown {
+  if (segments.length === 0) return next;
+  const [key, ...rest] = segments;
+  const record = isTraversableNode(value)
+    ? value as Record<string, unknown>
+    : {};
+  return { ...record, [key]: replaceValueAtSegments(record[key], rest, next) };
 }
 
 function resolveNodeAtPath(

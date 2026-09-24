@@ -22,9 +22,13 @@ import type {
   ISignalTree,
   DevToolsConfig,
   EnhancerMeta,
-  TreeNode,
 } from '../../lib/types';
-import type { DevToolsLogEntry, DevToolsMethods, DevToolsModuleMetadata, DevToolsPerformanceMetrics } from './devtools.types';
+import type {
+  DevToolsLogEntry,
+  DevToolsMethods,
+  DevToolsModuleMetadata,
+  DevToolsPerformanceMetrics,
+} from './devtools.types';
 import { ENHANCER_META } from '../../lib/types';
 
 // Heavy devtools implementation. Imported by ./devtools.ts ONLY past its
@@ -202,7 +206,6 @@ function createCompositionLogger(options?: {
   };
 
   return {
-
     logMethodExecution: (
       module: string,
       method: string,
@@ -597,7 +600,9 @@ const GLOBAL_GROUPS_KEY = '__SIGNALTREE_DEVTOOLS_GROUPS__';
 const GLOBAL_MARKER_KEY = '__SIGNALTREE_DEVTOOLS_GLOBAL_MARKER__';
 
 function getRegistryHost(): DevToolsRegistryHost {
-  return (typeof window !== 'undefined' ? window : globalThis) as DevToolsRegistryHost;
+  return (
+    typeof window !== 'undefined' ? window : globalThis
+  ) as DevToolsRegistryHost;
 }
 
 function ensureGlobalMarker(): string {
@@ -694,7 +699,10 @@ function getOrCreateDevToolsGroup(
   const pendingPathsByTree = new Map<string, string[]>();
 
   let browserDevToolsConnection: ReduxDevToolsConnection | null = null;
-  let browserDevTools: Pick<ReduxDevToolsConnection, 'send' | 'subscribe'> | null = null;
+  let browserDevTools: Pick<
+    ReduxDevToolsConnection,
+    'send' | 'subscribe'
+  > | null = null;
   let unsubscribeDevTools: (() => void) | null = null;
   let isConnected = false;
   let isApplyingInspectionState = false;
@@ -839,7 +847,9 @@ function getOrCreateDevToolsGroup(
     }
 
     if (actionType === 'IMPORT_STATE') {
-      const lifted = msg.payload?.nextLiftedState as LiftedStatePayload | undefined;
+      const lifted = msg.payload?.nextLiftedState as
+        | LiftedStatePayload
+        | undefined;
       const computedStates = Array.isArray(lifted?.computedStates)
         ? lifted.computedStates
         : [];
@@ -1269,7 +1279,10 @@ export function createDevToolsEnhancer(
 
     // Browser DevTools integration
     let browserDevToolsConnection: ReduxDevToolsConnection | null = null;
-    let browserDevTools: Pick<ReduxDevToolsConnection, 'send' | 'subscribe'> | null = null;
+    let browserDevTools: Pick<
+      ReduxDevToolsConnection,
+      'send' | 'subscribe'
+    > | null = null;
     let isConnected = false;
     let isApplyingInspectionState = false;
     let unsubscribeDevTools: (() => void) | null = null;
@@ -1545,7 +1558,8 @@ export function createDevToolsEnhancer(
           { intent: 'system', origin: 'devtools', participation: 'inspection' },
           () => {
             if ('$' in tree) {
-              applyState((tree as ISignalTree<T>).$ as TreeNode<T>, state as T);
+              // Imported inspection state is untyped input at this boundary.
+              applyState<unknown>(tree.$, state);
             } else {
               rootAuthority.replace(state as T);
             }
@@ -1624,7 +1638,9 @@ export function createDevToolsEnhancer(
       }
 
       if (actionType === 'IMPORT_STATE') {
-        const lifted = msg.payload?.nextLiftedState as LiftedStatePayload | undefined;
+        const lifted = msg.payload?.nextLiftedState as
+          | LiftedStatePayload
+          | undefined;
         const computedStates = Array.isArray(lifted?.computedStates)
           ? lifted.computedStates
           : [];
@@ -1754,7 +1770,6 @@ export function createDevToolsEnhancer(
       activityTracker,
       logger,
       metrics: metrics.signal,
-
 
       startModuleProfiling: (module: string) => {
         const profileId = `${module}_${Date.now()}`;

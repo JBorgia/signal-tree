@@ -1,0 +1,33 @@
+packages/kernel/src/internals.ts:204:      return projectConfirmedTurns(runtime.getConfirmedTurnRecords() as never);
+packages/kernel/src/enhancers/transactions/transactions.ts:202:  getConfirmedTurnRecords(): readonly TransactionTurnRecord[];
+packages/kernel/src/enhancers/transactions/transactions.ts:209:  getConfirmedTurnCount(): number;
+packages/kernel/src/enhancers/transactions/transactions.ts:211:  getConfirmedTurnIds(): number[];
+packages/kernel/src/enhancers/transactions/transactions.ts:566:  private confirmedTurns: TransactionTurnRecord[] = [];
+packages/kernel/src/enhancers/transactions/transactions.ts:576:   * and the old answer came only from `confirmedTurns` — which excludes
+packages/kernel/src/enhancers/transactions/transactions.ts:736:    return this.confirmedTurns.some((turn) => turn.id > turnId);
+packages/kernel/src/enhancers/transactions/transactions.ts:800:    const authoredLater = this.confirmedTurns
+packages/kernel/src/enhancers/transactions/transactions.ts:823:  getConfirmedTurnCount(): number {
+packages/kernel/src/enhancers/transactions/transactions.ts:824:    return this.confirmedTurns.length;
+packages/kernel/src/enhancers/transactions/transactions.ts:837:  getConfirmedTurnIds(): number[] {
+packages/kernel/src/enhancers/transactions/transactions.ts:838:    return this.confirmedTurns.map((turn) => turn.id);
+packages/kernel/src/enhancers/transactions/transactions.ts:861:  getConfirmedTurnRecords(): readonly TransactionTurnRecord[] {
+packages/kernel/src/enhancers/transactions/transactions.ts:862:    return this.confirmedTurns;
+packages/kernel/src/enhancers/transactions/transactions.ts:866:    const insertIndex = this.confirmedTurns.findIndex(
+packages/kernel/src/enhancers/transactions/transactions.ts:870:      this.confirmedTurns.push(turn);
+packages/kernel/src/enhancers/transactions/transactions.ts:872:      this.confirmedTurns.splice(insertIndex, 0, turn);
+packages/kernel/src/enhancers/transactions/transactions.ts:1929:              // only; nothing here reaches confirmedTurns.
+packages/kernel/src/enhancers/transactions/transactions.ts:2439:    getConfirmedTurnRecords: () => authority.getConfirmedTurnRecords(),
+packages/kernel/src/enhancers/transactions/transactions.ts:2448:    getConfirmedTurnCount: () => authority.getConfirmedTurnCount(),
+packages/kernel/src/enhancers/transactions/transactions.ts:2450:    getConfirmedTurnIds: () => authority.getConfirmedTurnIds(),
+packages/kernel/src/enhancers/transactions/transactions.ts:2660:      getConfirmedTurnCount: () => runtime.getConfirmedTurnCount(),
+packages/kernel/src/enhancers/transactions/transactions.ts:2662:      getConfirmedTurnIds: () => runtime.getConfirmedTurnIds(),
+packages/kernel/src/lib/internals/confirmed-turn-view.ts:11: * `confirmedTurns` becomes a ring buffer, or the record grows a field for
+packages/kernel/src/lib/internals/causal-runtime/turn-store.ts:48:  private readonly confirmedTurns = new Map<TurnId, CausalTurn>();
+packages/kernel/src/lib/internals/causal-runtime/turn-store.ts:167:    return this.confirmedTurns.get(turnId);
+packages/kernel/src/lib/internals/causal-runtime/turn-store.ts:172:      .map((turnId) => this.confirmedTurns.get(turnId))
+packages/kernel/src/lib/internals/causal-runtime/turn-store.ts:194:      .map((turnId) => this.confirmedTurns.get(turnId))
+packages/kernel/src/lib/internals/causal-runtime/turn-store.ts:232:    if (this.confirmedTurns.has(turnId) || this.pendingTurns.has(turnId)) {
+packages/kernel/src/lib/internals/causal-runtime/turn-store.ts:238:    if (this.confirmedTurns.has(turnId)) {
+packages/kernel/src/lib/internals/causal-runtime/turn-store.ts:245:    this.confirmedTurns.set(turn.id, turn);
+packages/kernel/src/lib/internals/causal-runtime/turn-store.ts:279:      const evictedTurn = this.confirmedTurns.get(evictedTurnId);
+packages/kernel/src/lib/internals/causal-runtime/turn-store.ts:288:      this.confirmedTurns.delete(evictedTurnId);

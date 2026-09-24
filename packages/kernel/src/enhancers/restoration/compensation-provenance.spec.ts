@@ -223,24 +223,7 @@ describe('compensation is not external truth', () => {
     store.destroy();
   });
 
-  /**
-   * WAS: `CURRENT BEHAVIOUR: an out-of-order rollback is refused`, pinned "as
-   * observed, not as desired... so a storage refactor cannot change it
-   * silently". It did not change silently — it changed here, with a reason.
-   *
-   * The refusal was THIS FILE'S OWN DEFECT, in the one place the fix had not
-   * reached. The thesis above is that a compensation is `realized` but is not
-   * external truth, and restoration's recorder was taught to read
-   * `origin: 'transaction-rollback'`. The TRANSACTIONS dependency ledger was
-   * not: its TX-LEDGER C3 probe admitted every realized write, so T2's own
-   * compensation was filed as later work depending on T1 — and T1 could never
-   * be reversed again. Same mislabelling, second consumer.
-   *
-   * With the probe declining compensations the same way, the outer rollback
-   * restores what T1 actually displaced: the external `blue`. Not merely
-   * permitted — correct.
-   */
-  it('an outer rollback after an inner one restores its own displacement', async () => {
+  it('newer-first compensation leaves the older rollback authority intact', async () => {
     const store = tree();
     await flush();
 
@@ -256,11 +239,9 @@ describe('compensation is not external truth', () => {
     await flush();
     expect(store.$.theme()).toBe('red');
 
+    // Compensation restores the older pending's ownership; it is not a new
+    // external writer that makes that pending depend on itself.
     first.rollback();
-    await flush();
-    // T1 displaced the EXTERNAL 'blue', so that is what it gives back — not
-    // 'light' (the original baseline, which T1 never displaced) and not 'red'
-    // (its own speculative value).
     expect(store.$.theme()).toBe('blue');
     store.destroy();
   });

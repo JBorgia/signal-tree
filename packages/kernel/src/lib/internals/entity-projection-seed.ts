@@ -30,6 +30,8 @@
  * holds the proxy. A symbol property forwards through the proxy's `get` trap,
  * which is the same reason the existing internal handles work.
  */
+import { isTraversableNode } from './node-shape';
+
 export type EntityProjectionSeedEntry<K, E> = {
   readonly subjectId: number;
   readonly key: K;
@@ -42,6 +44,33 @@ type SeedProducer = () => readonly EntityProjectionSeedEntry<
 >[];
 
 const SEED = Symbol('signaltree.entityProjectionSeed');
+
+/** A location's collection and lifetime identity, never reconstructed from a path. */
+export type EntityLocationBinding = {
+  readonly owner: number;
+  readonly subjectId: number;
+  readonly fieldKey?: string;
+};
+
+const LOCATION_BINDING = Symbol('signaltree.entityLocationBinding');
+
+export function defineEntityLocationBinding(
+  node: object,
+  binding: EntityLocationBinding
+): void {
+  Object.defineProperty(node, LOCATION_BINDING, { value: binding });
+}
+
+export function getEntityLocationBinding(
+  node: unknown
+): EntityLocationBinding | undefined {
+  if (!isTraversableNode(node)) {
+    return undefined;
+  }
+  return (node as Record<symbol, EntityLocationBinding | undefined>)[
+    LOCATION_BINDING
+  ];
+}
 
 /** @internal Registered by `entityMap` materialization. */
 export function defineEntityProjectionSeed(

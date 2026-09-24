@@ -7,9 +7,9 @@
       "name": "(call)",
       "memberKind": "callable-type",
       "signatures": [
-        "(): T",
-        "(updater: (current: T) => T): void",
-        "(value: T): void"
+        "(): SnapshotValue<T, false>",
+        "(updater: (current: SnapshotValue<T, false>) => SnapshotValue<T, true>): void",
+        "(value: SnapshotValue<T, true>): void"
       ]
     },
     {
@@ -987,16 +987,6 @@
       ]
     },
     {
-      "id": "kernel:ProposalStatus.__@iterator@16",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "__@iterator@16",
-      "memberKind": "method",
-      "signatures": [
-        "(): StringIterator<string>"
-      ]
-    },
-    {
       "id": "kernel:ProposalStatus.anchor",
       "pkg": "kernel",
       "owner": "ProposalStatus",
@@ -1490,6 +1480,16 @@
       ]
     },
     {
+      "id": "kernel:ProposalStatus[Symbol.iterator]",
+      "pkg": "kernel",
+      "owner": "ProposalStatus",
+      "name": "[Symbol.iterator]",
+      "memberKind": "method",
+      "signatures": [
+        "(): StringIterator<string>"
+      ]
+    },
+    {
       "id": "kernel:ReadonlyLocation",
       "pkg": "kernel",
       "owner": "ReadonlyLocation",
@@ -1636,9 +1636,9 @@
       "name": "$",
       "memberKind": "callable-property",
       "signatures": [
-        "(): T",
-        "(updater: (current: T) => T): void",
-        "(value: T): void"
+        "(): SnapshotValue<ConstructionOf<TreeNode<T>, T>, false>",
+        "(updater: (current: SnapshotValue<ConstructionOf<TreeNode<T>, T>, false>) => SnapshotValue<ConstructionOf<TreeNode<T>, T>, true>): void",
+        "(value: SnapshotValue<ConstructionOf<TreeNode<T>, T>, true>): void"
       ]
     },
     {
@@ -1709,16 +1709,6 @@
       "memberKind": "method",
       "signatures": [
         "(fn: () => void): PendingTransaction"
-      ]
-    },
-    {
-      "id": "kernel:TreeCapability.__@iterator@16",
-      "pkg": "kernel",
-      "owner": "TreeCapability",
-      "name": "__@iterator@16",
-      "memberKind": "method",
-      "signatures": [
-        "(): StringIterator<string>"
       ]
     },
     {
@@ -2215,6 +2205,16 @@
       ]
     },
     {
+      "id": "kernel:TreeCapability[Symbol.iterator]",
+      "pkg": "kernel",
+      "owner": "TreeCapability",
+      "name": "[Symbol.iterator]",
+      "memberKind": "method",
+      "signatures": [
+        "(): StringIterator<string>"
+      ]
+    },
+    {
       "id": "kernel:TreeId.toExponential",
       "pkg": "kernel",
       "owner": "TreeId",
@@ -2427,7 +2427,7 @@
       "name": "transactions",
       "memberKind": "function",
       "signatures": [
-        "(): Enhancer<TransactionMethods>"
+        "(config?: TransactionsConfig | undefined): Enhancer<TransactionMethods>"
       ]
     },
     {

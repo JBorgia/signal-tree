@@ -1,3 +1,7 @@
+import type {
+  ConstructionOf,
+  SnapshotValue,
+} from '../../lib/internals/construction-accessor';
 import { getOrCreateSubjectReclamationSink } from '../../lib/internals/subject-reclamation-sink';
 import {
   getOrCreateSubjectRestorationClaims,
@@ -32,7 +36,7 @@ import {
 } from '../../lib/internals/position-registry';
 import {
   createTreeRealizationAdapter,
-  deriveFieldPathFromEffect,
+  deriveFieldSegmentsFromEffect,
   defineTreeRealizationDescriptors,
   defineTreeRealizationPort,
   forgetSubjectsInTreeRealizationDescriptors,
@@ -164,6 +168,7 @@ type TurnEffectBase = {
 type ScalarSetEffect = TurnEffectBase & {
   kind: 'set';
   subject?: number;
+  subjectFieldSegments?: readonly string[];
   before: unknown;
   after: unknown;
   mutationIntent?: 'replace' | 'derive';
@@ -246,6 +251,7 @@ function toReversalEffect(
         before: direction === 'undo' ? effect.after : effect.before,
         after: direction === 'undo' ? effect.before : effect.after,
         subjectId: effect.subject,
+        subjectFieldSegments: effect.subjectFieldSegments,
         path: effect.path,
         ownerPath: effect.ownerPath,
       };
@@ -340,7 +346,10 @@ type CaptureBucket = {
 function cloneTurnEffect(effect: TurnEffect): TurnEffect {
   switch (effect.kind) {
     case 'set':
-      return { ...effect };
+      return {
+        ...effect,
+        subjectFieldSegments: effect.subjectFieldSegments?.slice(),
+      };
     case 'add':
     case 'remove':
       return { ...effect };
@@ -412,7 +421,9 @@ function normaliseMaxHistorySize(value: number | undefined): number {
   }
   return Math.floor(value);
 }
-class RestorationManager<T> {
+// The source model can contain construction markers; retained state is the
+// canonical read value. Keep those private parameters separate.
+class RestorationManager<TSource, T> {
   private history: CanonicalTurn<T>[] = [];
   private turns = new Map<number, CanonicalTurn<T>>();
   private pendingTurns = new Map<number, CanonicalTurn<T>>();
@@ -527,7 +538,7 @@ class RestorationManager<T> {
   private maxHistorySize: number;
 
   constructor(
-    private tree: ISignalTree<T>,
+    private tree: ISignalTree<TSource>,
     private positionRegistry: PositionRegistry,
     private config: RestorationConfig = {},
     private restoreStateFn?: (state: T) => void,
@@ -571,6 +582,7 @@ class RestorationManager<T> {
     explicitTurnId?: number,
     beforeInsert?: () => void
   ): boolean {
+    this.prepareConfirmedInsertion();
     const entry = this.buildTurn(
       subjectIds,
       positionIds,
@@ -629,8 +641,11 @@ class RestorationManager<T> {
     }
 
     beforeInsert?.();
+    // Keep its historical boundary retained while redo truncation prunes.
+    this.prepareConfirmedInsertion();
+    const confirmed = this.insertConfirmedTurn(entry);
     this.pendingTurns.delete(turnId);
-    return this.insertConfirmedTurn(entry);
+    return confirmed;
   }
 
   discardPendingTurn(turnId: number): boolean {
@@ -650,9 +665,6 @@ class RestorationManager<T> {
     return this.pendingTurns.has(turnId);
   }
 
-  hasConfirmedTurnAfter(turnId: number): boolean {
-    return this.history.some((turn) => turn.id > turnId);
-  }
 
   // `getPendingRollbackPlan()` was DELETED in 15.0 with restoration()'s duplicate
   // `transaction()` (TX-SURFACE-0).
@@ -678,27 +690,6 @@ class RestorationManager<T> {
     explicitTurnId?: number,
     retainPendingState = false
   ): CanonicalTurn<T> | undefined {
-    if (this.hasScopedRedoFuture()) {
-      this.truncateScopedRedoFuture();
-    }
-
-    if (
-      this.isTemporalViewActive &&
-      this.currentIndex < this.history.length - 1
-    ) {
-      // DEFENSIVE, and honestly so: a probe that threw here on any discarded
-      // entry carrying `restorationSubjectIds` fired ZERO times across the
-      // whole suite, and mutating this call away fails nothing. Only
-      // position-indexed entries name subjects, and `truncateScopedRedoFuture`
-      // above has already removed those. The call stays because the coupling
-      // that makes it redundant is not a property either function states, and
-      // it costs one no-op release. Do not cite it as covered.
-      const discarded = this.history.slice(this.currentIndex + 1);
-      this.history = this.history.slice(0, this.currentIndex + 1);
-      this.releaseRetainedRestorationEntries(discarded);
-      this.bumpRestorationHistory();
-    }
-
     // A restoration history entry IS the snapshot — no clone.
     //
     // This used to `structuredClone` the whole tree per entry, which made every
@@ -831,6 +822,30 @@ class RestorationManager<T> {
     }
 
     return entry;
+  }
+
+  private prepareConfirmedInsertion(): void {
+    // Only admitted work replaces redo. Staging may still be abandoned.
+    if (this.hasScopedRedoFuture()) {
+      this.truncateScopedRedoFuture();
+    }
+
+    if (
+      this.isTemporalViewActive &&
+      this.currentIndex < this.history.length - 1
+    ) {
+      // DEFENSIVE, and honestly so: a probe that threw here on any discarded
+      // entry carrying `restorationSubjectIds` fired ZERO times across the
+      // whole suite, and mutating this call away fails nothing. Only
+      // position-indexed entries name subjects, and `truncateScopedRedoFuture`
+      // above has already removed those. The call stays because the coupling
+      // that makes it redundant is not a property either function states, and
+      // it costs one no-op release. Do not cite it as covered.
+      const discarded = this.history.slice(this.currentIndex + 1);
+      this.history = this.history.slice(0, this.currentIndex + 1);
+      this.releaseRetainedRestorationEntries(discarded);
+      this.bumpRestorationHistory();
+    }
   }
 
   private insertConfirmedTurn(entry: CanonicalTurn<T>): boolean {
@@ -2279,6 +2294,7 @@ export function restoration(
   const enhancerFn = <T>(
     tree: ISignalTree<T>
   ): ISignalTree<T> & RestorationMethods => {
+    type Snapshot = SnapshotValue<ConstructionOf<TreeNode<T>, T>>;
     // Disabled (noop) path
     if (!enabled) {
       const noopMethods = {
@@ -2305,7 +2321,7 @@ export function restoration(
         canRedo(): boolean {
           return false;
         },
-        getRestorationHistory(): RestorationHistoryEntry<T>[] {
+        getRestorationHistory(): RestorationHistoryEntry<Snapshot>[] {
           return [];
         },
         resetRestorationHistory(): void {
@@ -2358,6 +2374,7 @@ export function restoration(
     const applyTurnEffectsThroughRealizationPort = (
       applications: DirectedTurnApplication[]
     ): void => {
+      readQueuedExternalAuthority();
       const reversalEffects = applications.flatMap((application) =>
         application.effects.map((effect) =>
           toReversalEffect(effect, application.direction)
@@ -2366,6 +2383,47 @@ export function restoration(
       const orderDeltas = applications.flatMap(
         (application) => application.orderDeltas
       );
+      // A pending contribution owns its current value until settlement. Undo
+      // cannot compensate it, and must refuse before state or frontiers move.
+      for (const pending of [
+        ...stagedTransactionEffects.values(),
+        ...[...pendingTransactions.values()].map((bucket) => ({
+          effects: [...bucket.effects.values()],
+          collectionOrders: [...bucket.collectionOrders.values()],
+        })),
+      ]) {
+        const overlaps =
+          pending.effects.some(
+            (effect) =>
+              reversalEffects.some(
+                (target) =>
+                  effect.position === target.owner &&
+                  (effect.subject === undefined ||
+                    target.subjectId === undefined ||
+                    effect.subject === target.subjectId) &&
+                  (effect.kind !== 'set' ||
+                    target.structural !== undefined ||
+                    (effect.subjectFieldSegments !== undefined &&
+                    target.subjectFieldSegments !== undefined
+                      ? fieldsOverlap(
+                          effect.subjectFieldSegments,
+                          target.subjectFieldSegments
+                        )
+                      : pathsOverlap(effect.path, target.path ?? '')))
+              ) || orderDeltas.some((delta) => delta.owner === effect.position)
+          ) ||
+          pending.collectionOrders.some(
+            (order) =>
+              reversalEffects.some((effect) => effect.owner === order.owner) ||
+              orderDeltas.some((delta) => delta.owner === order.owner)
+          );
+        if (overlaps) {
+          throw new Error(
+            'ST1034: restoration refused — overlapping transaction is pending. ' +
+              'Nothing was changed; the history position is unmoved.'
+          );
+        }
+      }
       const orderEndpoints = new Map<number, 'before' | 'after'>();
       for (const application of applications) {
         for (const delta of application.orderDeltas) {
@@ -2383,7 +2441,19 @@ export function restoration(
       const usesDeclarativeTarget =
         (applications.length > 1 ||
           orderDeltas.length > 0 ||
-          requiresDeclarativeStructuralTarget(reversalEffects)) &&
+          requiresDeclarativeStructuralTarget(reversalEffects, (owner) => {
+            let binding: CollectionTransitionTargetBinding | undefined;
+            visitTree((tree as ISignalTree<T>).$, (node) => {
+              const candidate = (
+                node as {
+                  __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+                }
+              ).__prepareTransitionTarget;
+              if (candidate?.owner === owner) binding = candidate;
+              return undefined;
+            });
+            return binding?.readSource();
+          })) &&
         reversalEffects.every(
           (effect) =>
             typeof effect.subjectId === 'number' ||
@@ -2505,7 +2575,10 @@ export function restoration(
       // location currently holds EXTERNAL truth that this restoration is not
       // reversing. A location holding a later AUTHORED value is fine — that is
       // what a closure undo looks like mid-flight.
-      const readNested = (source: unknown, segments: string[]): unknown => {
+      const readNested = (
+        source: unknown,
+        segments: readonly string[]
+      ): unknown => {
         let cursor = source;
         for (const segment of segments) {
           if (cursor === null || typeof cursor !== 'object') return undefined;
@@ -2527,7 +2600,7 @@ export function restoration(
           if (typeof path !== 'string') continue;
 
           // Tree-level scalar: the path-keyed index resolves directly.
-          if (externalTruthByPath.has(path)) {
+          if (effect.subjectId === undefined && externalTruthByPath.has(path)) {
             const live = resolveLiveNodeAtPath(path);
             if (typeof live === 'function') {
               const current = (live as () => unknown)();
@@ -2552,21 +2625,18 @@ export function restoration(
           if (subjectKey === undefined) continue;
           const rowTruth = externalTruthBySubject.get(subjectKey);
           if (!rowTruth) continue;
-          const fieldPath = deriveFieldPathFromEffect(effect, positionRegistry);
-          if (fieldPath === undefined || fieldPath === '') continue;
+          const fieldPath = deriveFieldSegmentsFromEffect(
+            effect,
+            positionRegistry
+          );
+          if (fieldPath === undefined) continue;
           for (const [externalPath, value] of rowTruth.fields) {
-            if (!pathsOverlap(fieldPath, externalPath)) continue;
-            const current = fieldPath.startsWith(`${externalPath}.`)
-              ? readNested(
-                  value,
-                  fieldPath.slice(externalPath.length + 1).split('.')
-                )
+            if (!fieldsOverlap(fieldPath, externalPath)) continue;
+            const current = fieldPrefix(externalPath, fieldPath)
+              ? readNested(value, fieldPath.slice(externalPath.length))
               : value;
-            const expected = externalPath.startsWith(`${fieldPath}.`)
-              ? readNested(
-                  effect.after,
-                  externalPath.slice(fieldPath.length + 1).split('.')
-                )
+            const expected = fieldPrefix(fieldPath, externalPath)
+              ? readNested(effect.after, externalPath.slice(fieldPath.length))
               : effect.after;
             if (!Object.is(current, expected)) {
               return { kind: 'value-drift', path, current, expected };
@@ -2664,7 +2734,10 @@ export function restoration(
           typeof effect.path === 'string'
         ) {
           const truth = externalTruthBySubject.get(restoredSubjectKey);
-          const fieldPath = deriveFieldPathFromEffect(effect, positionRegistry);
+          const fieldPath = deriveFieldSegmentsFromEffect(
+            effect,
+            positionRegistry
+          );
           if (truth && effect.structural === undefined && fieldPath) {
             clearExternalFields(truth.fields, fieldPath);
             if (truth.fields.size === 0)
@@ -2682,11 +2755,11 @@ export function restoration(
     }
 
     // Create restoration manager with restoration function
-    const restorationManager = new RestorationManager(
+    const restorationManager = new RestorationManager<T, Snapshot>(
       tree,
       positionRegistry,
       config,
-      (state: T) => {
+      (state) => {
         isRestoring = true;
         try {
           rootAuthority.replace(state);
@@ -2742,18 +2815,31 @@ export function restoration(
     // stable position+subject so sibling writes cannot claim or erase authority.
     const externalTruthBySubject = new Map<
       string,
-      { readonly rowPath: string; readonly fields: Map<string, unknown> }
+      {
+        readonly rowPath: string;
+        readonly fields: Map<readonly string[], unknown>;
+      }
     >();
     const pathsOverlap = (left: string, right: string): boolean =>
       left === right ||
       left.startsWith(`${right}.`) ||
       right.startsWith(`${left}.`);
+    const fieldPrefix = (
+      prefix: readonly string[],
+      path: readonly string[]
+    ): boolean =>
+      prefix.length <= path.length &&
+      prefix.every((key, index) => key === path[index]);
+    const fieldsOverlap = (
+      left: readonly string[],
+      right: readonly string[]
+    ): boolean => fieldPrefix(left, right) || fieldPrefix(right, left);
     const clearExternalFields = (
-      fields: Map<string, unknown>,
-      path: string
+      fields: Map<readonly string[], unknown>,
+      path: readonly string[]
     ): void => {
       for (const field of fields.keys()) {
-        if (pathsOverlap(field, path)) fields.delete(field);
+        if (fieldsOverlap(field, path)) fields.delete(field);
       }
     };
     const updateExternalRowFields = (
@@ -2761,27 +2847,52 @@ export function restoration(
       rowPath: string,
       before: unknown,
       after: Record<string, unknown>,
-      realized: boolean
+      realized: boolean,
+      transactionId?: number
     ): void => {
       const previousTruth = externalTruthBySubject.get(subjectKey);
       if (!realized && !previousTruth) return;
-      const fields = previousTruth?.fields ?? new Map<string, unknown>();
-      const visit = (prev: unknown, next: unknown, path: string): void => {
+      const fields =
+        previousTruth?.fields ?? new Map<readonly string[], unknown>();
+      const visit = (
+        prev: unknown,
+        next: unknown,
+        path: readonly string[]
+      ): void => {
         if (Object.is(prev, next)) return;
         if (isPlainRecord(prev) && isPlainRecord(next)) {
           for (const key of new Set([
             ...Object.keys(prev),
             ...Object.keys(next),
           ])) {
-            visit(prev[key], next[key], path ? `${path}.${key}` : key);
+            visit(prev[key], next[key], [...path, key]);
           }
           return;
+        }
+        if (!realized && transactionId !== undefined) {
+          for (const [field, value] of fields) {
+            if (!fieldsOverlap(field, path)) continue;
+            let rows = supersededExternalRows.get(transactionId);
+            if (!rows)
+              supersededExternalRows.set(transactionId, (rows = new Map()));
+            let row = rows.get(subjectKey);
+            if (!row)
+              rows.set(subjectKey, (row = { rowPath, fields: new Map() }));
+            if (
+              ![...row.fields.keys()].some(
+                (saved) =>
+                  saved.length === field.length && fieldPrefix(saved, field)
+              )
+            ) {
+              row.fields.set(field, value);
+            }
+          }
         }
         clearExternalFields(fields, path);
         if (realized) fields.set(path, next);
       };
       // Initial row acquisition has no prior record; index its fields too.
-      visit(isPlainRecord(before) ? before : {}, after, '');
+      visit(isPlainRecord(before) ? before : {}, after, []);
       if (previousTruth && previousTruth.rowPath !== rowPath) {
         externalTruthByPath.delete(previousTruth.rowPath);
       }
@@ -2817,6 +2928,24 @@ export function restoration(
     // rather than assuming provenance would be sufficient.
 
     const pendingTransactions = new Map<number, CaptureBucket>();
+    // Capture evidence for all staged transactions, including non-undoable ones.
+    const stagedTransactionEffects = new Map<
+      number,
+      {
+        effects: TurnEffect[];
+        collectionOrders: PendingCollectionOrder[];
+      }
+    >();
+    const supersededExternalRows = new Map<
+      number,
+      Map<
+        string,
+        {
+          rowPath: string;
+          fields: Map<readonly string[], unknown>;
+        }
+      >
+    >();
     /**
      * External provenance displaced by a speculative authored write, by PATH.
      *
@@ -2829,11 +2958,8 @@ export function restoration(
      *   rollback     restores prior authority (the entry is replayed)
      *   confirmation replaces prior authority (the entry is dropped)
      *
-     * Keyed by PATH, not by transaction id, because the id cannot be the join:
-     * a speculative write resolves through `resolveTransactionId`, which needs
-     * a matching `transactionOwner`, while the compensation carries a bare
-     * `transactionId` under `origin: 'transaction-rollback'`. Measured, they
-     * disagree — remember recorded under 1, the compensation asked for 2.
+     * Keyed by transaction id and then path. Compensation carries the same
+     * transaction id, but must resolve it without requiring an open callback.
      *
      * The restore also cannot live in the `rolled-back` lifecycle handler:
      * measured, that fires BEFORE the compensation writes land, and each of
@@ -2910,6 +3036,128 @@ export function restoration(
       // speculative value, not the external one.
       if (!displaced.has(path)) {
         displaced.set(path, externalTruthByPath.get(path));
+      }
+    };
+    const restoreSupersededRowTruth = (
+      transactionId: number | undefined,
+      subjectKey: string,
+      rowPath: string,
+      after: Record<string, unknown>
+    ): void => {
+      if (transactionId === undefined) return;
+      const rows = supersededExternalRows.get(transactionId);
+      const displaced = rows?.get(subjectKey);
+      if (!displaced) return;
+      const fields =
+        externalTruthBySubject.get(subjectKey)?.fields ??
+        new Map<readonly string[], unknown>();
+      for (const [path, value] of displaced.fields) {
+        let current: unknown = after;
+        for (const key of path) {
+          current = isPlainRecord(current) ? current[key] : undefined;
+        }
+        if (Object.is(current, value)) {
+          clearExternalFields(fields, path);
+          fields.set(path, value);
+          displaced.fields.delete(path);
+        }
+      }
+      if (fields.size)
+        externalTruthBySubject.set(subjectKey, { rowPath, fields });
+      if (displaced.fields.size === 0) rows?.delete(subjectKey);
+      if (rows?.size === 0) supersededExternalRows.delete(transactionId);
+    };
+    // Read evidence without draining PathNotifier: deciding whether undo is
+    // safe must not execute user observers or advance any history boundary.
+    const readQueuedExternalAuthority = (): void => {
+      const ownerId = getPositionRegistry(tree.$)?.id;
+      for (const entry of getPathNotifier()?.readPending() ?? []) {
+        const meta = entry.meta;
+        if (
+          (entry.ownerId ?? meta?.ownerId) !== ownerId ||
+          entry.origin === 'restoration' ||
+          meta?.origin === 'restoration' ||
+          isInspectionWrite(meta) ||
+          isCompensationWrite(meta)
+        )
+          continue;
+        const realized = getWriteParticipation(meta) === 'realized';
+        // Pending authority is checked separately. Its normal capture path
+        // must still remember the external authority that it displaced.
+        if (!realized && resolveTransactionId(meta) !== undefined) continue;
+        const subjectKey = subjectTruthKey(
+          entry.positionIds?.[0],
+          entry.subjectIds?.[0]
+        );
+        if (subjectKey === undefined) {
+          if (realized) externalTruthByPath.set(entry.path, entry.newValue);
+          else externalTruthByPath.delete(entry.path);
+          continue;
+        }
+        if (!isPlainRecord(entry.newValue)) continue;
+        if (entry.subjectFieldKeys !== undefined) {
+          const fields =
+            externalTruthBySubject.get(subjectKey)?.fields ??
+            new Map<readonly string[], unknown>();
+          // The queue retains every touched literal field across coalescing,
+          // including ABA hidden by the final before/after pair. An empty
+          // footprint is complete evidence that no field was touched.
+          for (const key of entry.subjectFieldKeys) {
+            const segments = [key];
+            clearExternalFields(fields, segments);
+            if (realized) fields.set(segments, entry.newValue[key]);
+          }
+          if (fields.size) {
+            externalTruthBySubject.set(subjectKey, {
+              rowPath: entry.path,
+              fields,
+            });
+          } else {
+            externalTruthBySubject.delete(subjectKey);
+          }
+          continue;
+        }
+        updateExternalRowFields(
+          subjectKey,
+          entry.path,
+          entry.oldValue,
+          entry.newValue,
+          realized
+        );
+        if (!realized) continue;
+        // A coalesced row can contain no net field difference after ABA. The
+        // queue still witnesses an external row write. Preserve that evidence
+        // conservatively by leaf, so later authored sibling writes release
+        // only their own fields rather than erasing the entire row witness.
+        const changed = (before: unknown, after: unknown): boolean => {
+          if (Object.is(before, after)) return false;
+          if (!isPlainRecord(before) || !isPlainRecord(after)) return true;
+          return [
+            ...new Set([...Object.keys(before), ...Object.keys(after)]),
+          ].some((key) => changed(before[key], after[key]));
+        };
+        if (!changed(entry.oldValue, entry.newValue)) {
+          const fields =
+            externalTruthBySubject.get(subjectKey)?.fields ??
+            new Map<readonly string[], unknown>();
+          const retain = (
+            value: unknown,
+            segments: readonly string[]
+          ): void => {
+            if (isPlainRecord(value) && Object.keys(value).length > 0) {
+              for (const key of Object.keys(value))
+                retain(value[key], [...segments, key]);
+            } else {
+              clearExternalFields(fields, segments);
+              fields.set(segments, value);
+            }
+          };
+          retain(entry.newValue, []);
+          externalTruthBySubject.set(subjectKey, {
+            rowPath: entry.path,
+            fields,
+          });
+        }
       }
     };
     const pendingDescriptorInputs = new Map<
@@ -3042,9 +3290,9 @@ export function restoration(
     const effectKey = (effect: TurnEffect): string => {
       switch (effect.kind) {
         case 'set':
-          return `${effect.kind}\u0000${effect.path}\u0000${
-            effect.position
-          }\u0000${effect.subject ?? ''}`;
+          return `${effect.kind}\u0000${JSON.stringify(
+            effect.subjectFieldSegments ?? effect.path
+          )}\u0000${effect.position}\u0000${effect.subject ?? ''}`;
         // RESTORE-P0: structural effects key by SUBJECT, deliberately WITHOUT
         // `kind`. Including the kind gave `add(a)` and `remove(a)` different
         // slots, so one turn kept two contradictory inverses. Keying by subject
@@ -3190,7 +3438,8 @@ export function restoration(
       const enqueueScalarDiff = (
         diffPath: string,
         before: unknown,
-        after: unknown
+        after: unknown,
+        subjectFieldSegments: readonly string[] | undefined
       ): void => {
         const position = positionIds?.[0];
         if (position === undefined || before === after) {
@@ -3200,7 +3449,14 @@ export function restoration(
         if (isPlainRecord(before) && isPlainRecord(after)) {
           const keys = new Set([...Object.keys(before), ...Object.keys(after)]);
           for (const key of keys) {
-            enqueueScalarDiff(`${diffPath}.${key}`, before[key], after[key]);
+            enqueueScalarDiff(
+              `${diffPath}.${key}`,
+              before[key],
+              after[key],
+              subjectFieldSegments === undefined
+                ? undefined
+                : [...subjectFieldSegments, key]
+            );
           }
           return;
         }
@@ -3211,6 +3467,7 @@ export function restoration(
           ownerPath: ownerPath ?? path,
           position,
           subject: subjectIds?.[0],
+          subjectFieldSegments,
           before,
           after,
           mutationIntent: meta?.mutationIntent,
@@ -3236,7 +3493,14 @@ export function restoration(
       }
 
       if (isPlainRecord(next) && isPlainRecord(prev)) {
-        enqueueScalarDiff(path, prev, next);
+        // Subject notifications carry the complete row. Its property keys are
+        // the address; the display path may contain dots in either ID or key.
+        enqueueScalarDiff(
+          path,
+          prev,
+          next,
+          subjectIds?.[0] === undefined ? undefined : []
+        );
         return;
       }
 
@@ -3255,6 +3519,7 @@ export function restoration(
         ownerPath: ownerPath ?? path,
         position,
         subject: subjectIds?.[0],
+        subjectFieldSegments: subjectIds?.[0] === undefined ? undefined : [],
         before: prev,
         after: next,
         mutationIntent: meta?.mutationIntent,
@@ -3390,7 +3655,7 @@ export function restoration(
     };
     const materializePendingTransaction = (
       transactionId: number
-    ): CanonicalTurn<T> | undefined => {
+    ): CanonicalTurn<Snapshot> | undefined => {
       const bucket = pendingTransactions.get(transactionId);
       pendingTransactions.delete(transactionId);
       // NOT `supersededExternalTruth.delete` here. This runs at 'staged' —
@@ -3408,6 +3673,10 @@ export function restoration(
         descriptorInputs,
         designated,
       } = drainCaptureBucket(bucket);
+      stagedTransactionEffects.set(transactionId, {
+        effects,
+        collectionOrders,
+      });
       if (!isTurnEligible(designated)) {
         return undefined;
       }
@@ -3477,6 +3746,7 @@ export function restoration(
       }
 
       activeForeignTransactions.delete(key);
+      stagedTransactionEffects.delete(event.id);
       if (event.kind === 'rolled-back') {
         pendingTransactions.delete(event.id);
         // NOT restored here. Measured: this event fires BEFORE the rollback's
@@ -3488,7 +3758,8 @@ export function restoration(
       if (event.kind !== 'rolled-back') {
         // Confirmation REPLACES prior authority: the authored turn genuinely
         // superseded the realization, so the displaced provenance is dropped.
-        supersededExternalTruth.clear();
+        supersededExternalTruth.delete(event.id);
+        supersededExternalRows.delete(event.id);
       }
       const stagedTurnId = stagedForeignTurns.get(key);
       stagedForeignTurns.delete(key);
@@ -3616,6 +3887,14 @@ export function restoration(
                 const compensation = isCompensationWrite(meta);
                 if (compensation) {
                   restoreSupersededTruth(compensationTransactionId(meta), path);
+                  if (subjectKey !== undefined && isPlainRecord(next)) {
+                    restoreSupersededRowTruth(
+                      compensationTransactionId(meta),
+                      subjectKey,
+                      path,
+                      next
+                    );
+                  }
                 } else if (next === undefined) {
                   externalTruthByPath.delete(path);
                 } else {
@@ -3669,7 +3948,8 @@ export function restoration(
                   path,
                   prev,
                   next,
-                  false
+                  false,
+                  resolveTransactionId(meta)
                 );
               }
               const transactionId = resolveTransactionId(meta);
@@ -3907,6 +4187,8 @@ export function restoration(
       stagedForeignTurns.clear();
       pendingTransactions.clear();
       supersededExternalTruth.clear();
+      supersededExternalRows.clear();
+      stagedTransactionEffects.clear();
       activeForeignTransactions.clear();
       externalTruthByPath.clear();
       externalTruthBySubject.clear();
@@ -4006,6 +4288,8 @@ export function restoration(
         resetRestorationRetention();
         pendingTransactions.clear();
         supersededExternalTruth.clear();
+        supersededExternalRows.clear();
+        stagedTransactionEffects.clear();
         activeForeignTransactions.clear();
       });
     }

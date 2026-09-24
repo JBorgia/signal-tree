@@ -1,4 +1,11 @@
-import { batch, createMemo, createRoot, createSignal } from 'solid-js';
+import {
+  batch,
+  createMemo,
+  createRoot,
+  createSignal,
+  getOwner,
+  onCleanup,
+} from 'solid-js';
 
 import type {
   EpochHandle,
@@ -35,7 +42,18 @@ interface SolidWritableCell<T> extends SolidReadonlyCell<T> {
  * is a dependency edge, and letting Solid suppress a notification on value
  * equality would drop invalidations the kernel had decided to publish.
  */
-export const createSolidObservationAdapter = (): ObservationAdapter => {
+export const createSolidObservationAdapter = (): ObservationAdapter & {
+  dispose(): void;
+} => {
+  const disposers = new Set<() => void>();
+  let disposed = false;
+  const dispose = (): void => {
+    if (disposed) return;
+    disposed = true;
+    for (const release of disposers) release();
+    disposers.clear();
+  };
+  if (getOwner()) onCleanup(dispose);
   const createObservationToken = (): ObservationToken => {
     const [track, bump] = createSignal(0, { equals: false });
     return {
@@ -45,6 +63,7 @@ export const createSolidObservationAdapter = (): ObservationAdapter => {
   };
 
   return {
+    dispose,
     createToken: createObservationToken,
 
     createWritableCell: <T>(read: () => T) => {
@@ -115,15 +134,21 @@ export const createSolidObservationAdapter = (): ObservationAdapter => {
      * zone. Deferring creation to first read puts the first evaluation after
      * initialization, where every other adapter already puts it.
      *
-     * The root is still explicit: a memo created outside one is never disposed,
-     * which would leak a computation per derived leaf.
+     * Retain every lazy root disposer at adapter scope, independent of the
+     * owner present at first read. Disposing the adapter releases all memos.
      */
     createReadonlyCell: <T>(computeValue: () => T) => {
       let memo: (() => T) | undefined;
-      return (() =>
-        (memo ??= createRoot(() =>
-          createMemo(computeValue)
-        ))()) as SolidReadonlyCell<T>;
+      return (() => {
+        if (!memo) {
+          if (disposed) return computeValue();
+          memo = createRoot((disposeRoot) => {
+            disposers.add(disposeRoot);
+            return createMemo(computeValue, undefined, { equals: Object.is });
+          });
+        }
+        return memo();
+      }) as SolidReadonlyCell<T>;
     },
 
     runInvalidationGroup(run): void {

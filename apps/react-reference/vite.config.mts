@@ -12,6 +12,12 @@ export default defineConfig(() => ({
         '../../packages/kernel/src/adapter.ts',
         import.meta.url
       ).pathname,
+      // Runtime imports share the source kernel. The React library's tsconfig
+      // maps its build-time type imports to emitted declarations instead.
+      '@signal-tree/kernel': new URL(
+        '../../packages/kernel/src/index.ts',
+        import.meta.url
+      ).pathname,
     },
   },
   server: {

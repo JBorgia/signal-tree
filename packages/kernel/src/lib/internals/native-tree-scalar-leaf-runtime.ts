@@ -155,6 +155,7 @@ function createNativeScalarLeaf<T>(
     notify: () => publication.publishSlot({ changed: true, slot: slotIndex }),
     replace: (value) => {
       const observer = mutationSource.observer;
+      const dormant = observer ? isDormantMember(leaf) : false;
       const before = observer ? realized.peek() : undefined;
       // The authoritative commit primitive: no result object on the hot path.
       const changed = kernel.commitSlotValue(slotIndex, value);
@@ -163,15 +164,23 @@ function createNativeScalarLeaf<T>(
         observer({
           intent: 'replace',
           before: before as T,
-          after: changed ? value : (before as T),
-          changed,
+          after: changed || dormant ? value : (before as T),
+          changed: changed || dormant,
         });
       }
     },
     derive: (update) => {
       if (isDormantMember(leaf)) {
         const next = update(undefined as T);
-        publishResult(kernel.commitSlot(slotIndex, next));
+        const result = kernel.commitSlot(slotIndex, next);
+        publishResult(result);
+        mutationSource.observer?.({
+          intent: 'derive',
+          before: undefined as T,
+          after: kernel.readSlot<T>(slotIndex),
+          // Membership changed even when the retained slot value did not.
+          changed: true,
+        });
         return;
       }
       const observer = mutationSource.observer;

@@ -87,16 +87,13 @@ export const deriveReleaseVersion = (current, releaseType, tags = []) => {
 };
 
 export const updateCurrentReleaseClaim = (text, version) => {
-  const label = semver.prerelease(version)
-    ? 'Current prerelease'
-    : 'Current release';
-  const updated = text.replace(
-    /\*\*Current (?:pre)?release:\*\*\s+\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?/,
-    `**${label}:** ${version}`
-  );
-  if (updated === text) {
-    throw new Error('docs/README.md has no current release claim to update');
+  // Preparation changes the source version, not the publication status.
+  const pattern =
+    /\*\*Workspace version:\*\*\s+\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?/;
+  if (!pattern.test(text)) {
+    throw new Error('docs/README.md has no workspace version claim to update');
   }
+  const updated = text.replace(pattern, `**Workspace version:** ${version}`);
   return updated;
 };
 
@@ -190,16 +187,18 @@ const selfTest = () => {
     throw new Error(`remote tag parsing failed: ${JSON.stringify(parsedTags)}`);
   }
   const prereleaseClaim = updateCurrentReleaseClaim(
-    '**Current prerelease:** 15.0.0-rc.15 See CHANGELOG.\n',
+    '**Workspace version:** 15.0.0-rc.15 See CHANGELOG.\n**Publication status:** Held.\n',
     '15.0.0-rc.16'
   );
-  if (!prereleaseClaim.includes('**Current prerelease:** 15.0.0-rc.16')) {
+  if (!prereleaseClaim.includes('**Workspace version:** 15.0.0-rc.16')) {
     throw new Error('prerelease documentation claim was not updated');
   }
   const stableClaim = updateCurrentReleaseClaim(prereleaseClaim, '15.0.0');
-  if (!stableClaim.includes('**Current release:** 15.0.0')) {
+  if (!stableClaim.includes('**Workspace version:** 15.0.0')) {
     throw new Error('stable documentation claim was not promoted');
   }
+  if (!stableClaim.includes('**Publication status:** Held.'))
+    throw new Error('Preparation changed publication status');
   console.log(
     `Release-version derivation self-test passed (${cases.length} cases).`
   );

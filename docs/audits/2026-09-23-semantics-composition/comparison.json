@@ -1,0 +1,2969 @@
+{
+  "baseline": "baseline-combinations.json",
+  "current": "current-combinations.json",
+  "transitions": {
+    "unsupported -> unsupported": 108,
+    "held -> held": 19,
+    "violated -> violated": 4,
+    "violated -> held": 2,
+    "error -> unsupported": 25,
+    "error -> held": 7,
+    "error -> violated": 6
+  },
+  "lostGreens": [],
+  "rows": [
+    {
+      "id": "C1-transactions/CCTX1/direct/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/CCTX1/direct/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/CCTX2/direct/transaction",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C1-transactions/CCTX3/direct/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/CCTX1/batch/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/CCTX1/batch/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/CCTX2/batch/transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/CCTX3/batch/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/CCTX1/coalesce/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/CCTX1/coalesce/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/CCTX2/coalesce/transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/CCTX3/coalesce/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/CCTX2/coalesce/later-local-constant",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/CCTX4-CCTX5/batch/inner-transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/CCTX4-CCTX5/coalesce/inner-transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/CCTX4/coalesce/mixed-external-undoable",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/N01-N03-N05/pending-x-constant-y",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no Link capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no Link capability"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/N02/refused-x-constant-y",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ]
+    },
+    {
+      "id": "C1-transactions/N04-N05/independent-pending-links",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no Link capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C1-transactions has no Link capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX1/direct/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX1/direct/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX2/direct/transaction",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX3/direct/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX1/batch/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX1/batch/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX2/batch/transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX3/batch/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX1/coalesce/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX1/coalesce/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX2/coalesce/transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX3/coalesce/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX2/coalesce/later-local-constant",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX4-CCTX5/batch/inner-transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX4-CCTX5/coalesce/inner-transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/CCTX4/coalesce/mixed-external-undoable",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/N01-N03-N05/pending-x-constant-y",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no Link capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no Link capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/N02/refused-x-constant-y",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no Link capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no Link capability"
+        }
+      ]
+    },
+    {
+      "id": "C2-transactions-entityMap/N04-N05/independent-pending-links",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no Link capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C2-transactions-entityMap has no Link capability"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX1/direct/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX1/direct/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX2/direct/transaction",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C3-transactions-link/CCTX3/direct/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX1/batch/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX1/batch/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX2/batch/transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX3/batch/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX1/coalesce/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX1/coalesce/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX2/coalesce/transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX3/coalesce/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX2/coalesce/later-local-constant",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX4-CCTX5/batch/inner-transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX4-CCTX5/coalesce/inner-transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/CCTX4/coalesce/mixed-external-undoable",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C3-transactions-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/N01-N03-N05/pending-x-constant-y",
+      "baseline": "violated",
+      "current": "violated",
+      "baselineFindings": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/N02/refused-x-constant-y",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ]
+    },
+    {
+      "id": "C3-transactions-link/N04-N05/independent-pending-links",
+      "baseline": "violated",
+      "current": "violated",
+      "baselineFindings": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX1/direct/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX1/direct/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX2/direct/transaction",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C4-transactions-batching/CCTX3/direct/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX1/batch/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX1/batch/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX2/batch/transaction",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C4-transactions-batching/CCTX3/batch/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX1/coalesce/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX1/coalesce/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX2/coalesce/transaction",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C4-transactions-batching/CCTX3/coalesce/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/CCTX2/coalesce/later-local-constant",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C4-transactions-batching/CCTX4-CCTX5/batch/inner-transaction",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C4-transactions-batching/CCTX4-CCTX5/coalesce/inner-transaction",
+      "baseline": "violated",
+      "current": "held",
+      "baselineFindings": [
+        {
+          "label": "rejection preserves prior outer write",
+          "status": "violated",
+          "detail": "{\"actual\":{\"x\":7,\"y\":8,\"z\":5},\"expected\":{\"x\":0,\"y\":0,\"z\":5}}"
+        }
+      ],
+      "currentFindings": []
+    },
+    {
+      "id": "C4-transactions-batching/CCTX4/coalesce/mixed-external-undoable",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/N01-N03-N05/pending-x-constant-y",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no Link capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no Link capability"
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/N02/refused-x-constant-y",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ]
+    },
+    {
+      "id": "C4-transactions-batching/N04-N05/independent-pending-links",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no Link capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C4-transactions-batching has no Link capability"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX1/direct/external-history",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX1/direct/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX2/direct/transaction",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX3/direct/restoration",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX1/batch/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX1/batch/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX2/batch/transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX3/batch/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX1/coalesce/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX1/coalesce/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX2/coalesce/transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX3/coalesce/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX2/coalesce/later-local-constant",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX4-CCTX5/batch/inner-transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX4-CCTX5/coalesce/inner-transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/CCTX4/coalesce/mixed-external-undoable",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/N01-N03-N05/pending-x-constant-y",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no Link capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no Link capability"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/N02/refused-x-constant-y",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ]
+    },
+    {
+      "id": "C5-transactions-restoration/N04-N05/independent-pending-links",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no Link capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C5-transactions-restoration has no Link capability"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX1/direct/external-history",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX1/direct/pending-canonical",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX2/direct/transaction",
+      "baseline": "error",
+      "current": "held",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": []
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX3/direct/restoration",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX1/batch/external-history",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX1/batch/pending-canonical",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX2/batch/transaction",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX3/batch/restoration",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX1/coalesce/external-history",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX1/coalesce/pending-canonical",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX2/coalesce/transaction",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX3/coalesce/restoration",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX2/coalesce/later-local-constant",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX4-CCTX5/batch/inner-transaction",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX4-CCTX5/coalesce/inner-transaction",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/CCTX4/coalesce/mixed-external-undoable",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C6-transactions-entityMap-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/N01-N03-N05/pending-x-constant-y",
+      "baseline": "error",
+      "current": "violated",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/N02/refused-x-constant-y",
+      "baseline": "error",
+      "current": "violated",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ]
+    },
+    {
+      "id": "C6-transactions-entityMap-link/N04-N05/independent-pending-links",
+      "baseline": "error",
+      "current": "violated",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX1/direct/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX1/direct/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX2/direct/transaction",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX3/direct/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX1/batch/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX1/batch/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX2/batch/transaction",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX3/batch/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX1/coalesce/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX1/coalesce/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX2/coalesce/transaction",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX3/coalesce/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX2/coalesce/later-local-constant",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX4-CCTX5/batch/inner-transaction",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX4-CCTX5/coalesce/inner-transaction",
+      "baseline": "violated",
+      "current": "held",
+      "baselineFindings": [
+        {
+          "label": "rejection preserves prior outer write",
+          "status": "violated",
+          "detail": "{\"actual\":{\"x\":7,\"y\":8,\"z\":5},\"expected\":{\"x\":0,\"y\":0,\"z\":5}}"
+        }
+      ],
+      "currentFindings": []
+    },
+    {
+      "id": "C7-transactions-batching-external/CCTX4/coalesce/mixed-external-undoable",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/N01-N03-N05/pending-x-constant-y",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no Link capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no Link capability"
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/N02/refused-x-constant-y",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ]
+    },
+    {
+      "id": "C7-transactions-batching-external/N04-N05/independent-pending-links",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no Link capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C7-transactions-batching-external has no Link capability"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX1/direct/external-history",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX1/direct/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX2/direct/transaction",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX3/direct/restoration",
+      "baseline": "held",
+      "current": "held",
+      "baselineFindings": [],
+      "currentFindings": []
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX1/batch/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX1/batch/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX2/batch/transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX3/batch/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX1/coalesce/external-history",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX1/coalesce/pending-canonical",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX2/coalesce/transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX3/coalesce/restoration",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX2/coalesce/later-local-constant",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX4-CCTX5/batch/inner-transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no batch capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no batch capability"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX4-CCTX5/coalesce/inner-transaction",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/CCTX4/coalesce/mixed-external-undoable",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C8-transactions-restoration-link has no coalesce capability"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/N01-N03-N05/pending-x-constant-y",
+      "baseline": "violated",
+      "current": "violated",
+      "baselineFindings": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/N02/refused-x-constant-y",
+      "baseline": "unsupported",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No occupied-entity refusal setup in this combination"
+        }
+      ]
+    },
+    {
+      "id": "C8-transactions-restoration-link/N04-N05/independent-pending-links",
+      "baseline": "violated",
+      "current": "violated",
+      "baselineFindings": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX1/direct/external-history",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C9-transactions-entityMap-link-batching has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX1/direct/pending-canonical",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX2/direct/transaction",
+      "baseline": "error",
+      "current": "held",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX3/direct/restoration",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C9-transactions-entityMap-link-batching has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX1/batch/external-history",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C9-transactions-entityMap-link-batching has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX1/batch/pending-canonical",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX2/batch/transaction",
+      "baseline": "error",
+      "current": "held",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX3/batch/restoration",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C9-transactions-entityMap-link-batching has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX1/coalesce/external-history",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C9-transactions-entityMap-link-batching has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX1/coalesce/pending-canonical",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Current implementation exposes no canonical/pending split"
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX2/coalesce/transaction",
+      "baseline": "error",
+      "current": "held",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX3/coalesce/restoration",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C9-transactions-entityMap-link-batching has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX2/coalesce/later-local-constant",
+      "baseline": "error",
+      "current": "held",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX4-CCTX5/batch/inner-transaction",
+      "baseline": "error",
+      "current": "held",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX4-CCTX5/coalesce/inner-transaction",
+      "baseline": "error",
+      "current": "held",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": []
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/CCTX4/coalesce/mixed-external-undoable",
+      "baseline": "error",
+      "current": "unsupported",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: C9-transactions-entityMap-link-batching has no restoration capability"
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/N01-N03-N05/pending-x-constant-y",
+      "baseline": "error",
+      "current": "violated",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/N02/refused-x-constant-y",
+      "baseline": "error",
+      "current": "violated",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ]
+    },
+    {
+      "id": "C9-transactions-entityMap-link-batching/N04-N05/independent-pending-links",
+      "baseline": "error",
+      "current": "violated",
+      "baselineFindings": [
+        {
+          "label": "execution",
+          "status": "error",
+          "detail": "Error: Construction failed: Error: link: X must be an owned SignalTree location. A bare signal() or computed() has no owning tree, so there is nothing to settle against."
+        }
+      ],
+      "currentFindings": [
+        {
+          "label": "required independent endpoint delivery within 250ms watchdog",
+          "status": "violated"
+        }
+      ]
+    }
+  ]
+}

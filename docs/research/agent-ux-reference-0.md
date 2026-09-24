@@ -135,6 +135,15 @@ authority for that behaviour. Do NOT respond to path handling by adding value
 snapshots to `ProposalInspection`; that would make the inspection pretend to be
 a value snapshot, which is exactly the presentation trap above.
 
+**2026-09-23 audit qualification:** the historical result above remains valid
+for its tested application domain. It does not prove unique target lookup for
+every legal key spelling: literal dotted keys and dotted entity IDs can collide
+with other public paths. The [public two-history counterexample](../audits/2026-09-23-proposal-path.md)
+has identical inspection and current state but different owned targets. Mapping
+status to a current value therefore requires unambiguous application paths or
+extra target context. This qualification changes neither the path format nor
+the historical test result and proposes no new API.
+
 **So no new primitive is added.** The standing rule holds: don't answer an
 awkwardness with another primitive.
 

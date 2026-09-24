@@ -1493,8 +1493,18 @@ describe('restoration enhancer', () => {
     // message instead. Asserting the machine-readable field rather than the
     // sentence — and the legibility difference is recorded as a follow-up rather
     // than quietly accepted.
+    // UPDATED 2026-09-24 by REKEY-OCCUPANCY-0. Same scenario, same verdict,
+    // same resulting state — a different door. Net key occupancy is now
+    // recognised while the rollback plan is built, so the refusal happens
+    // BEFORE compensation is attempted rather than when the compensating
+    // re-add hits a taken key. That is strictly more atomic than what this
+    // test was written to pin, and unlike the old path it is recoverable:
+    // free the key and the same turn settles.
+    //
+    // Keeping this test's own discipline: asserting the machine-readable kind
+    // rather than the sentence.
     expectRollbackError(() => pending.rollback(), {
-      kind: 'effect-validation-failed',
+      kind: 'later-confirmed-dependency',
     });
     expect(store.$.rows.ids()).toEqual([42, 7]);
     expect(store.$.rows.byIdOrFail(42).name()).toBe('target');
@@ -1623,9 +1633,11 @@ describe('restoration enhancer', () => {
     expect(store.$.rows.byIdOrFail(16).name()).toBe('replacement-anchor');
   });
 
-  it.todo(
-    'characterizes rollback when both remove anchors are gone and no retained structural fact proves placement'
-  );
+  // Missing-anchor characterization is covered by the 26 executable controls
+  // in ./restoration-missing-anchors.spec.ts: rollback/undo/redo refuse without
+  // changing state, publication, or retry authority when placement is unproved.
+  // Bounded closure and remaining limits:
+  // docs/audits/2026-09-23-remaining-expected-failures.md#restoration-todo-disposition
 
   it('makes confirm and rollback idempotent in their own terminal direction', () => {
     const store = signalTree(

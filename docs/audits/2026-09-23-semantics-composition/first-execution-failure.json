@@ -1,0 +1,9 @@
+{
+  "baseline": {
+    "exitCode": 13
+  },
+  "current": {
+    "exitCode": 13
+  },
+  "failure": "Unsettled top-level await; no per-case JSON was emitted. Oracle v1 awaited held Link.settled() while pending. No counts are inferred from these failed executions."
+}

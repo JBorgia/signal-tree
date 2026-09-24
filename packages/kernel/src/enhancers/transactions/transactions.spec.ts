@@ -44,7 +44,13 @@ describe('transactions enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ count: 0 }, { enhancers: [transactions({ history: { retain: 1000 } })] }) as unknown as {
+    // Declares diagnostic history because it COUNTS confirmed turns. Under the
+    // L15 default those records are released once nothing pending can need
+    // them, so counting them is a diagnostic question, not a correctness one.
+    const store = signalTree(
+      { count: 0 },
+      { enhancers: [transactions({ history: { retain: 1000 } })] }
+    ) as unknown as {
       $: { (): { count: number }; count: () => number };
       transact: (fn: () => void) => { confirm(): void; rollback(): void };
       __transactions: {
@@ -304,7 +310,10 @@ describe('transactions enhancer', () => {
       expect(store.__transactions.getConfirmedTurnCount()).toBe(
         baselineConfirmed
       );
-      expect(store.__transactions.getPendingTurnCount()).toBe(baselinePending);
+      // Refused compensation preserves the same pending settlement authority.
+      expect(store.__transactions.getPendingTurnCount()).toBe(
+        baselinePending + 1
+      );
     }
 
     validateEffects.mockRestore();

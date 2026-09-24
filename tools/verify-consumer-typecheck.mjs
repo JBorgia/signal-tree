@@ -31,6 +31,7 @@ import {
   mkdirSync,
   writeFileSync,
   readdirSync,
+  readFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -404,11 +405,45 @@ const firstChange: ProposalChange | undefined = review.changes[0];
 const changeStatus: ProposalStatus | undefined = firstChange?.status;
 const changePath: string | undefined = firstChange?.path;
 const settled: ProposalAcceptance = pendingProposal.accept();
+
+// CONSTRUCTION, not just consumption. Reading a ProposalChange type-checks
+// whatever fields it has, so a required field added to the type is invisible
+// to a read-only probe — which is how the 16.0.0 address change shipped as a
+// declared break that nothing measured. A consumer with a test double, a
+// fixture or an adapter mapping must build one, so this builds one.
+const constructedChange: ProposalChange = {
+  path: 'a.b',
+  address: ['a', 'b'],
+  status: 'current',
+};
+const changeAddress: readonly string[] | undefined = constructedChange.address;
+const changeSubject: number | undefined = constructedChange.subject;
+
 void changeStatus;
 void changePath;
+void changeAddress;
+void changeSubject;
 void settled.changes.length;
 `;
 writeFileSync(join(proj, 'src', 'main.ts'), SAMPLE);
+
+// Run the owning source proofs unchanged against the actual packed facades.
+// In particular, all negative Link admissions must still fail when construction
+// metadata crosses the kernel root / adapter declaration boundary.
+for (const facade of ['angular', 'react', 'vue', 'solid']) {
+  const fixture = readFileSync(
+    join(ROOT, 'packages', facade, 'src/lib/hydration-accessor.typing.spec.ts'),
+    'utf8'
+  );
+  const localImport = "from '../index'";
+  if (fixture.split(localImport).length !== 2) {
+    throw new Error(`${facade} hydration proof must have one facade import`);
+  }
+  writeFileSync(
+    join(proj, 'src', `${facade}-hydration.ts`),
+    fixture.replace(localImport, `from '@signal-tree/${facade}'`)
+  );
+}
 
 const FACADE_IDENTITY_PROBE = `
 import * as kernel from '@signal-tree/kernel';

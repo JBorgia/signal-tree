@@ -57,6 +57,8 @@ import { terminateOwnerInvalidation } from './internals/owner-invalidation-port'
 import { defineRootTree } from './internals/root-source';
 import {
   definePositionRegistry,
+  defineNodeAddress,
+  getNodeAddress,
   type PositionRegistry,
 } from './internals/position-registry';
 import {
@@ -186,8 +188,12 @@ function finalizeLeafSignal<TValue>(
   positionIds: readonly number[] | undefined,
   buildPlan: TreeBuildPlan,
   captureRuntime: MutationCaptureRuntime,
-  registry?: PositionRegistry
+  registry: PositionRegistry | undefined,
+  address: readonly string[]
 ): void {
+  defineNodeAddress(leaf as object, address);
+  for (const position of positionIds ?? [])
+    registry?.registerPositionAddress(position, address);
   // A LOCATION MUST BE ABLE TO NAME ITS OWNER. Attaching the registry to the
   // leaf — not only to `tree` / `tree.$` — is what makes
   // `resolveScopeKey(leaf)` resolve the SAME scope object as
@@ -499,6 +505,9 @@ function makeNodeAccessor<T>(
       configurable: true,
     });
   }
+
+  const address = getNodeAddress(store);
+  if (address) defineNodeAddress(accessor as object, address);
 
   if (positionIds && positionIds.length > 0) {
     defineOwnedPositionIds(accessor as object, positionIds);
@@ -1223,7 +1232,8 @@ function materializeOrdinaryBranch(
   captureRuntime: MutationCaptureRuntime,
   scalarSlotRuntime: TreeScalarLeafRuntime | undefined,
   childPositionIds: number[] | undefined,
-  childPath: string
+  childPath: string,
+  address: readonly string[]
 ): unknown {
   const nested = createSignalStore(
     value,
@@ -1233,7 +1243,8 @@ function materializeOrdinaryBranch(
     captureRuntime,
     scalarSlotRuntime,
     childPositionIds,
-    childPath
+    childPath,
+    address
   );
   const accessor = makeNodeAccessor(
     nested as TreeNode<object>,
@@ -1269,8 +1280,15 @@ function createSignalStore<T>(
    * development diagnostics also use it to identify the affected leaf.
    * Removing parent segments for diagnostics would corrupt nested egress.
    */
-  path = ''
+  path = '',
+  address: readonly string[] = []
 ): TreeNode<T> {
+  for (const position of positionIds ?? []) {
+    materializationContext.positionRegistry.registerPositionAddress(
+      position,
+      address
+    );
+  }
   const createLeafSignal = <TValue>(
     value: TValue,
     leafPositionIds: readonly number[] | undefined,
@@ -1302,7 +1320,8 @@ function createSignalStore<T>(
       positionIds,
       buildPlan,
       captureRuntime,
-      materializationContext.positionRegistry
+      materializationContext.positionRegistry,
+      address
     );
     return leaf as unknown as TreeNode<T>;
   }
@@ -1320,7 +1339,8 @@ function createSignalStore<T>(
       positionIds,
       buildPlan,
       captureRuntime,
-      materializationContext.positionRegistry
+      materializationContext.positionRegistry,
+      address
     );
     return leaf as unknown as TreeNode<T>;
   }
@@ -1338,17 +1358,20 @@ function createSignalStore<T>(
       positionIds,
       buildPlan,
       captureRuntime,
-      materializationContext.positionRegistry
+      materializationContext.positionRegistry,
+      address
     );
     return leaf as unknown as TreeNode<T>;
   }
 
   // Regular object - recursive
   const store: Record<string, unknown> = {};
+  defineNodeAddress(store, address);
 
   for (const [key, definedValue] of Object.entries(
     obj as Record<string, unknown>
   )) {
+    const childAddress = [...address, key];
     const childPath = path ? `${path}.${key}` : key;
     const terminal = isLeafDefinition(definedValue);
     const value = terminal ? leafDefinitionValue(definedValue) : definedValue;
@@ -1448,7 +1471,8 @@ function createSignalStore<T>(
         childPositionIds,
         buildPlan,
         captureRuntime,
-        materializationContext.positionRegistry
+        materializationContext.positionRegistry,
+        childAddress
       );
       store[key] = leaf;
       continue;
@@ -1475,7 +1499,8 @@ function createSignalStore<T>(
         childPositionIds,
         buildPlan,
         captureRuntime,
-        materializationContext.positionRegistry
+        materializationContext.positionRegistry,
+        childAddress
       );
       store[key] = leaf;
       continue;
@@ -1491,7 +1516,8 @@ function createSignalStore<T>(
       captureRuntime,
       scalarSlotRuntime,
       getChildPositionIds(),
-      childPath
+      childPath,
+      childAddress
     );
   }
 
@@ -1570,7 +1596,8 @@ function create<T extends object>(
   const materializeOrdinaryState: OrdinaryStateMaterializer = (
     value,
     path,
-    parentPositionId
+    parentPositionId,
+    address
   ) => {
     // ⚠️ ALLOCATE THE BRANCH'S OWN POSITION FIRST. An earlier revision passed
     // `[parentPositionId]` straight through and returned `createSignalStore`'s
@@ -1590,7 +1617,8 @@ function create<T extends object>(
       captureRuntime,
       scalarSlotRuntime,
       childPositionIds,
-      path
+      path,
+      address
     );
   };
 
@@ -1622,6 +1650,9 @@ function create<T extends object>(
       // from the canonical branch itself, so no caller can supply either.
       const ownerPositionId = getOwnedPositionIds(ownerBranch)?.[0];
       const ownerPath = getOwnedOwnerPath(ownerBranch) ?? '';
+      const ownerAddress = getNodeAddress(ownerBranch);
+      if (!ownerAddress)
+        throw new Error('Missing dynamic branch construction address.');
       return (key: string, value: unknown) => {
         const childPositionIds = materializationContext.positionTopologyEnabled
           ? [materializationContext.allocatePositionId(ownerPositionId)]
@@ -1635,7 +1666,8 @@ function create<T extends object>(
           captureRuntime,
           scalarSlotRuntime,
           childPositionIds,
-          childPath
+          childPath,
+          [...ownerAddress, key]
         );
       };
     },
@@ -1665,6 +1697,7 @@ function create<T extends object>(
   );
 
   const tree = {} as ISignalTree<T>;
+  defineNodeAddress(tree, []);
 
   bindLocationRuntime(tree as object, materializationContext.locationRuntime);
   bindLocationRuntime(
@@ -1763,17 +1796,20 @@ function create<T extends object>(
   Object.defineProperty(tree, 'destroy', {
     value: function (): void {
       if (destroyedSig()) return; // Already destroyed
-      replaceLocation(destroyedSig, true);
-      terminateOwnerInvalidation(tree as object);
-      // Run registered cleanup functions (enhancers, subscriptions, etc.)
-      for (const fn of cleanupFns) {
-        try {
-          fn();
-        } catch {
-          // Swallow errors during cleanup to ensure all cleanups run
+      try {
+        replaceLocation(destroyedSig, true);
+      } finally {
+        terminateOwnerInvalidation(tree as object);
+        // Run registered cleanup functions (enhancers, subscriptions, etc.)
+        for (const fn of cleanupFns) {
+          try {
+            fn();
+          } catch {
+            // Swallow errors during cleanup to ensure all cleanups run
+          }
         }
+        cleanupFns.length = 0;
       }
-      cleanupFns.length = 0;
       if (config.debugMode) {
         console.log(SIGNAL_TREE_MESSAGES.TREE_DESTROYED);
       }

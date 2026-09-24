@@ -17,6 +17,8 @@ export interface CausalEffect {
   readonly before: unknown;
   readonly after: unknown;
   readonly subjectId?: unknown;
+  /** Producer-known row-relative property keys; [] names the whole row. */
+  readonly subjectFieldSegments?: readonly string[];
   /**
    * Captured realization address — REQUIRED, because every live producer sets
    * it on every variant.
@@ -63,6 +65,8 @@ export interface ReversalEffect {
   readonly before: unknown;
   readonly after: unknown;
   readonly subjectId?: unknown;
+  /** Producer-known row-relative property keys; [] names the whole row. */
+  readonly subjectFieldSegments?: readonly string[];
   /**
    * Captured realization address.
    *

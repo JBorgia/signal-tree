@@ -135,7 +135,11 @@ type PersistOption =
   | { adapter: StorageAdapter; key: string; hydrateThenRevalidate?: boolean };
 ```
 
-Reuses the existing [`StorageAdapter` + `createIndexedDBAdapter`](../../packages/kernel/src/enhancers/serialization/serialization.ts) — **no new persistence mechanism, no merge of `stored`/`persistence`.** When `hydrateThenRevalidate: true`, on materialize the collection seeds `all` from the persisted snapshot _instantly_ (offline-first), marks itself stale, and revalidates via `load()` in the background — the SWR/offline story from gap 5, delivered through this marker rather than a persistence rewrite.
+Reuses the existing `StorageAdapter` + `createIndexedDBAdapter` — **no new persistence mechanism, no merge of `stored`/`persistence`.** When `hydrateThenRevalidate: true`, on materialize the collection seeds `all` from the persisted snapshot _instantly_ (offline-first), marks itself stale, and revalidates via `load()` in the background — the SWR/offline story from gap 5, delivered through this marker rather than a persistence rewrite.
+
+Historical reference: the serialization implementation this paragraph referred to
+has since been removed from the kernel. The paragraph records the proposal at
+the time; it does not describe the current persistence API.
 
 ## 5. Interaction with existing primitives
 

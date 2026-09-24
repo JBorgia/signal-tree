@@ -36,9 +36,20 @@ import type { PhysicalCommitClock } from './internals/physical-commit-clock';
 import type { PathObservationPort } from './internals/path-observation-port';
 import { getActiveWriteContext } from '../lib/write-context';
 import { recordProductionSubstrateStat } from './internals/production-substrate-stats';
-import { defineEntityProjectionSeed } from './internals/entity-projection-seed';
+import {
+  defineEntityLocationBinding,
+  defineEntityProjectionSeed,
+} from './internals/entity-projection-seed';
+import {
+  definePositionRegistry,
+  getNodeAddress,
+  getPositionRegistry,
+} from './internals/position-registry';
 import { markOwnerInvalidated } from './internals/owner-invalidation-port';
-import type { MutationCaptureRuntime } from './internals/mutation-capture-runtime';
+import {
+  MUTATION_CAPTURE_RUNTIME,
+  type MutationCaptureRuntime,
+} from './internals/mutation-capture-runtime';
 import type {
   CollectionTransitionTarget,
   CollectionTransitionTargetBinding,
@@ -509,7 +520,8 @@ export function createEntitySignal<
         for (const publication of subjectChanges) {
           // Only a realized subject has an epoch, so this stays as lazy as the
           // per-entity signal it replaces.
-          if (publication.valueEpoch) advanceEpochHandle(publication.valueEpoch);
+          if (publication.valueEpoch)
+            advanceEpochHandle(publication.valueEpoch);
           if (publication.bindingChanged) {
             if (publication.stateSignal) {
               deriveLocation(publication.stateSignal, (value) => value + 1);
@@ -710,7 +722,7 @@ export function createEntitySignal<
   const ownerId = options?.ownerId;
   const physicalCommitClock = options?.physicalCommitClock;
   const mutationCaptureRuntime = options?.mutationCaptureRuntime;
-  const positionId = (
+  let positionId = (
     options?.positionIdAllocator ??
     (positionMetadataEnabled
       ? entityPositionIdAllocatorOverride ?? standaloneEntityPositionIdAllocator
@@ -723,6 +735,27 @@ export function createEntitySignal<
     PendingStructuralEffect,
     { kind: 'add' }
   >;
+
+  // Callable intent belongs to this producer's egress footprint. Do not stamp
+  // generic causal metadata: that would change transaction dependency policy.
+  let callableWriteIntent: 'replace' | 'derive' | undefined;
+  function withCallableWriteIntent(
+    intent: 'replace' | 'derive',
+    write: () => void
+  ): void {
+    const previous = callableWriteIntent;
+    callableWriteIntent = intent;
+    try {
+      write();
+    } finally {
+      callableWriteIntent = previous;
+    }
+  }
+  function consumeCallableWriteIntent(): 'replace' | 'derive' | undefined {
+    const intent = callableWriteIntent;
+    callableWriteIntent = undefined;
+    return intent;
+  }
 
   /**
    * The ambient write context, ALWAYS carrying this collection's owning tree.
@@ -739,11 +772,24 @@ export function createEntitySignal<
   }
 
   function getPositionIds(): number[] | undefined {
+    if (positionId === undefined) {
+      const registry = getPositionRegistry(api);
+      if (registry) {
+        const allocated = registry.allocate();
+        registry.registerCollectionPath(allocated, basePath);
+        const address = getNodeAddress(proxy);
+        if (address) registry.registerPositionAddress(allocated, address);
+        positionId = allocated;
+      }
+    }
     return positionId === undefined ? undefined : [positionId];
   }
 
   function getPositionIdsForNotify(): number[] | undefined {
-    return entityPositionIdNotifyEnabled ? getPositionIds() : undefined;
+    return entityPositionIdNotifyEnabled &&
+      (positionId !== undefined || mutationCaptureRuntime?.isCaptureActive())
+      ? getPositionIds()
+      : undefined;
   }
 
   function createStructuralEffectMeta(
@@ -1757,21 +1803,50 @@ export function createEntitySignal<
         typeof valueOrUpdater === 'function'
           ? (valueOrUpdater as (c: E) => E)(current)
           : (valueOrUpdater as E);
-      api.replaceOne(key, next);
+      withCallableWriteIntent(
+        typeof valueOrUpdater === 'function' ? 'derive' : 'replace',
+        () => api.replaceOne(key, next)
+      );
       return undefined;
     }) as unknown as EntityNode<E>;
+
+    // A retained row/field belongs to a lifetime, not its mutable storage key.
+    // Carry only identities; binding metadata must not retain retired values.
+    const registry = getPositionRegistry(api);
+    const owner = registry ? getPositionIds()?.[0] : undefined;
+    const bindLocation = (location: object, fieldKey?: string): void => {
+      if (!registry || owner === undefined) return;
+      definePositionRegistry(location, registry);
+      defineEntityLocationBinding(location, { owner, subjectId, fieldKey });
+      if (mutationCaptureRuntime) {
+        Object.defineProperty(location, MUTATION_CAPTURE_RUNTIME, {
+          value: mutationCaptureRuntime,
+        });
+      }
+    };
+    bindLocation(node);
 
     // Field projections derive their read from the subject-owned entity location.
     // Writes delegate to api.updateOne so interceptors and tap handlers still run.
     for (const key of Object.keys(entity)) {
       const fieldKey = key as keyof E;
-      const computeField = () => entitySig()?.[fieldKey];
-      const writeField = (value: E[typeof fieldKey] | undefined) => {
+      const computeField = () => {
+        const current = entitySig();
+        return current && Object.prototype.hasOwnProperty.call(current, fieldKey)
+          ? current[fieldKey]
+          : undefined;
+      };
+      const writeField = (
+        value: E[typeof fieldKey] | undefined,
+        intent: 'replace' | 'derive'
+      ) => {
         const key = currentKey();
         if (key === undefined) {
           throw new Error(`Entity with subject ${String(subjectId)} not found`);
         }
-        api.updateOne(key, { [fieldKey]: value } as Partial<E>);
+        withCallableWriteIntent(intent, () =>
+          api.updateOne(key, { [fieldKey]: value } as Partial<E>)
+        );
       };
       const fieldSignal = locations.createWritableProjection
         ? locations.createWritableProjection(computeField, writeField)
@@ -1779,6 +1854,7 @@ export function createEntitySignal<
             locations.createDerived(computeField),
             writeField
           );
+      bindLocation(fieldSignal, key);
 
       if (ownerMetadataEnabled) {
         Object.defineProperty(fieldSignal, '__ownerPath', {
@@ -1856,7 +1932,8 @@ export function createEntitySignal<
       activeKey: subjectState.active ? subjectState.key : undefined,
       retainedSubjectState: structuralStore.hasSubject(subjectId),
       entitySignal: subjectEpochs.has(subjectId),
-      activationToken: subjectStateSignals.get(subjectId)?.deref() !== undefined,
+      activationToken:
+        subjectStateSignals.get(subjectId)?.deref() !== undefined,
       nodeFacadeMaterialized: node !== undefined,
       fieldFacadesMaterialized,
       positionIds: getPositionIds(),
@@ -2503,6 +2580,7 @@ export function createEntitySignal<
     // ==================
 
     updateOne(id: K, changes: Partial<E>): void {
+      const callableIntent = consumeCallableWriteIntent();
       const entity = getProjectedEntity(id);
       if (!entity) {
         throw new Error(`Entity with id ${String(id)} not found`);
@@ -2547,7 +2625,11 @@ export function createEntitySignal<
         basePath,
         lastSubjectIds,
         getPositionIdsForNotify(),
-        ambientMeta()
+        ambientMeta(),
+        undefined,
+        (callableIntent ?? getActiveWriteContext()?.mutationIntent) === 'derive'
+          ? undefined
+          : Object.keys(transformedChanges)
       );
 
       // Run tap handlers
@@ -2570,6 +2652,7 @@ export function createEntitySignal<
      * wrong-slot write built into it. This one cannot drift.
      */
     replaceOne(id: K, entity: E): void {
+      const callableIntent = consumeCallableWriteIntent();
       const prev = getProjectedEntity(id);
       if (!prev) {
         throw new Error(`Entity with id ${String(id)} not found`);
@@ -2629,7 +2712,11 @@ export function createEntitySignal<
         // undo both REFUSE, at TOP level as well as nested.
         [subjectId],
         getPositionIdsForNotify(),
-        ambientMeta()
+        ambientMeta(),
+        undefined,
+        (callableIntent ?? getActiveWriteContext()?.mutationIntent) === 'derive'
+          ? undefined
+          : null
       );
       for (const handler of tapHandlers) {
         handler.onUpdate?.(id, next as Partial<E>, next);
@@ -2713,7 +2800,8 @@ export function createEntitySignal<
 
       // Notify PathNotifier for each updated entity
       for (let i = 0; i < updatedEntities.length; i++) {
-        const { id, prev, finalUpdated } = updatedEntities[i];
+        const { id, prev, finalUpdated, transformedChanges } =
+          updatedEntities[i];
         pathNotifier.notify(
           `${basePath}.${String(id)}`,
           finalUpdated,
@@ -2721,7 +2809,11 @@ export function createEntitySignal<
           basePath,
           [subjectIdsForWrite[i]],
           getPositionIdsForNotify(),
-          ambientMeta()
+          ambientMeta(),
+          undefined,
+          getActiveWriteContext()?.mutationIntent === 'derive'
+            ? undefined
+            : Object.keys(transformedChanges)
         );
       }
 
@@ -3076,14 +3168,20 @@ export function createEntitySignal<
 
       // Notify PathNotifier for updated entities
       for (let i = 0; i < updatedEntities.length; i++) {
-        const { id, prev, finalUpdated } = updatedEntities[i];
+        const { id, prev, finalUpdated, transformedChanges } =
+          updatedEntities[i];
         pathNotifier.notify(
           `${basePath}.${String(id)}`,
           finalUpdated,
           prev,
           basePath,
           [updatedSubjectIdsForWrite[i]],
-          getPositionIdsForNotify()
+          getPositionIdsForNotify(),
+          ambientMeta(),
+          undefined,
+          getActiveWriteContext()?.mutationIntent === 'derive'
+            ? undefined
+            : Object.keys(transformedChanges)
         );
       }
 
@@ -3403,6 +3501,7 @@ export function createEntitySignal<
       const afterSubjects = stagedIncomingIds
         .map((id) => resolveSubjectId(id))
         .filter((subjectId): subjectId is number => subjectId !== undefined);
+      if (mutationCaptureRuntime?.isCaptureActive()) getPositionIds();
       if (
         positionId !== undefined &&
         beforeSubjects.length === afterSubjects.length &&
@@ -3492,7 +3591,11 @@ export function createEntitySignal<
           basePath,
           subjectId === undefined ? undefined : [subjectId],
           getPositionIdsForNotify(),
-          ambientMeta()
+          ambientMeta(),
+          undefined,
+          getActiveWriteContext()?.mutationIntent === 'derive'
+            ? undefined
+            : null
         );
       }
 
@@ -3560,16 +3663,12 @@ export function createEntitySignal<
       configurable: true,
     });
   }
-  if (positionMetadataEnabled) {
-    Object.defineProperty(api, '__positionIds', {
-      get: getPositionIds,
-      enumerable: false,
-      configurable: true,
-    });
-  }
-  if (ownerMetadataEnabled) {
-    defineOwnedOwnerPath(api, basePath);
-  }
+  Object.defineProperty(api, '__positionIds', {
+    get: getPositionIds,
+    enumerable: false,
+    configurable: true,
+  });
+  defineOwnedOwnerPath(api, basePath);
   // ⚠️ THE PROJECTION SEED — internal, WeakMap-carried, never public.
   //
   // Built from the SAME ordered active-key snapshot `getProjectedEntries()`
