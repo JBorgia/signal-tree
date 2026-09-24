@@ -364,6 +364,10 @@ const EXEMPT = new Map(
       'method bag type; the methods are documented individually',
     transactionId:
       'internal WriteMetadata transaction token used by transactions()',
+    getConfirmedRetention:
+      '@internal member of InternalTransactionRuntime, not app-facing: supplies the explicit retention metadata the reader needs, because truncation must be asserted by the authority and never inferred from turn-id gaps. The public surface it feeds is confirmedTurnReader().readConfirmedTurns().retention, documented in the kernel README and the 15.3.0 CHANGELOG entry',
+    setHistoryRetention:
+      '@internal member of InternalTransactionRuntime, not app-facing: the documented public way to request diagnostic retention is the transactions({ history: { retain } }) option',
     transactionOwner:
       'internal WriteMetadata tree token used to isolate transactions()',
     // ── under active disposition in HIST-C2 step 7 ──────────────────────

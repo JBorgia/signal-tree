@@ -1,3 +1,50 @@
+## 15.3.0 (unreleased)
+
+**TL;DR** — **Minor, with one behaviour change to a published surface.**
+`transactions()` now retains confirmed turns only while a live obligation needs
+them, so `confirmedTurnReader` returns no turns unless a tree asks for
+diagnostic history. If you read confirmed history, add
+`transactions({ history: { retain: N } })`. Nothing else changes.
+
+### Correctness retention follows live responsibility
+
+A confirmed turn was retained for the lifetime of the tree. It is now released
+once no older pending turn could still consult it.
+
+The bound is derived, not chosen. `getPendingRollbackPlan` is the only
+correctness consumer of the confirmed ledger and selects `turn.id > pendingId`;
+turn ids are monotonic, so a confirmed turn can only ever matter to a pending
+turn older than itself. Ordinary writes are bounded on the same rule as
+transactional ones.
+
+### Diagnostic history is opt-in
+
+```ts
+transactions({ history: { retain: 100 } });
+```
+
+`TransactionsConfig` is exported, alongside `BatchingConfig`, `DevToolsConfig`
+and `RestorationConfig`.
+
+### The reader now tells the truth about what it kept
+
+`ConfirmedTurnRetention.truncated` is asserted by the transaction authority. It
+was previously derived from the retained ids, which could not survive eviction:
+when the whole window is gone there are no ids left, so the comparison reported
+`false` — a claim of complete history precisely when none was kept. Pending and
+rejected turns leave id gaps too, so gaps were never truncation evidence.
+
+    no retention contract      truncated: true,  turns: []
+    nothing ever written       truncated: false, turns: []
+
+Those two states are deliberately distinguishable.
+
+### Migration
+
+Anything reading `@signaltree/kernel/internals` — Studio, devtools — declares
+the retention it needs. Application code that does not read confirmed history
+needs no change.
+
 ## 15.2.1 (2026-09-22)
 
 **TL;DR** — Safe patch. No API changes, no behaviour changes, no size change.
