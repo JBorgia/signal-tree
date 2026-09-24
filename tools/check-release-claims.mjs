@@ -118,7 +118,37 @@ function resolveBase() {
   const candidates = isPrerelease
     ? tags.filter((t) => t !== `v${current}`)
     : tags.filter((t) => t !== `v${current}` && !/-/.test(t));
-  const base = candidates[0];
+
+  /**
+   * ...AND THE BASE MUST BE ON THIS RELEASE LINE. Third instance of the same
+   * class of bug as the two above, and the first one that made the gate report
+   * a WRONG answer rather than a blind one.
+   *
+   * `--sort=-v:refname` ranks tags across the WHOLE repository, so on a
+   * maintenance branch the highest tag belongs to a newer line entirely. Run on
+   * the 14.x line for the 14.1.4 security patch, this resolved to `v15.3.0` and
+   * diffed the 14.x API against the 15.x API: 406 "added" symbols, every one of
+   * them an ordinary 14.x export that 15.x had renamed or dropped. The gate was
+   * unsatisfiable on that line by construction, which is why the sanctioned
+   * publish path had never once completed there.
+   *
+   * ANCESTRY is the version-independent statement of the question this gate
+   * asks — "what reaches a user upgrading from the last version they could
+   * install" means the last release THIS COMMIT DESCENDS FROM. On a linear
+   * line it selects exactly what the old rule selected, so 15.x and 16.x are
+   * unaffected; on a maintenance line it selects that line's own last release.
+   *
+   * Cheap enough to do eagerly: one `merge-base` per candidate, stopping at the
+   * first hit, over a few dozen tags.
+   */
+  const base = candidates.find((tag) => {
+    try {
+      git('merge-base', '--is-ancestor', tag, 'HEAD');
+      return true;
+    } catch {
+      return false;
+    }
+  });
   if (!base) {
     console.error(
       'No prior version tag found to diff against.\n' +
@@ -126,6 +156,8 @@ function resolveBase() {
         '  so it needs tags. In CI that means `fetch-depth: 0` and\n' +
         '  `fetch-tags: true` on actions/checkout — a shallow clone has none, and\n' +
         '  the failure then reproduces on no developer machine.\n' +
+        '  The tag must also be an ANCESTOR of HEAD — a tag on another release\n' +
+        '  line is not a base this commit can be a delta from.\n' +
         '  Locally: `git fetch --tags`. Or pass --base=<ref> explicitly.'
     );
     process.exit(1);
