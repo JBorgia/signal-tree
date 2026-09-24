@@ -30,6 +30,27 @@ import { transactions } from './transactions';
  * This is a CHARACTERIZATION pass. Assertions record measured behaviour; they
  * are not aspirations. R6 must not be "fixed" before it is characterized — it
  * may indicate the optimistic-live proposal model is wrong rather than buggy.
+ *
+ * ══ RE-CHARACTERIZED 2026-09-24 — THE DEFECT IS FIXED ON THIS LINE. ══
+ *
+ * The original measurement (2026-09-23, against 15.2.1 and the then-current v16
+ * tree) found PARTIALLY_SETTLED: the refusal retired the turn, the retry
+ * reported success while reversing nothing, and clearing the conflict never
+ * made the reversal available again. Those numbers are preserved per case in
+ * the `WAS` comments below, and independently in
+ * `docs/research/v15-safety-audit/README.md`, which measured them against
+ * PUBLISHED npm tarballs rather than source.
+ *
+ * The containment fix — rollback decides before it settles — landed here with
+ * the 15.3.0 merge, so every one of those assertions became a FALSE statement
+ * about this code. A characterization file whose own rule is "assertions record
+ * measured behaviour" cannot keep asserting behaviour that no longer exists, so
+ * they are re-measured rather than deleted or skipped: the file stays a live
+ * tripwire, and the original finding stays legible beside each new value.
+ *
+ * The CONTRACT that came out of this characterization is H1..H9 in
+ * `hotfix-15-2-2-safety.spec.ts`. This file remains the axis-by-axis
+ * measurement that produced it; that file is what 16.0 must satisfy.
  */
 
 type Row = { id: string; name: string };
@@ -108,18 +129,21 @@ describe('R6-LIVENESS-0 / 1 — the refusal itself (pins case 15)', () => {
 });
 
 describe('R6-LIVENESS-0 / 2 — SETTLEMENT axis: is the proposal still open?', () => {
-  it('MEASURED: the refusal RETIRES the pending turn', async () => {
+  it('MEASURED: the refusal KEEPS the pending turn', async () => {
     const { tree, proposal, pendingWhileOutstanding } = await arriveAtRefusal();
 
     const pendingAfterRefusal = pendingCount(tree);
     const inspection = proposal.inspect();
 
     expect(pendingWhileOutstanding).toBe(1);
-    // MEASURED 2026-09-23, and the opposite of the preregistered prediction:
-    // `reject()` threw, so the facade never assigned `settled` — yet the
-    // kernel has already dropped the turn from the pending ledger. The facade
-    // believes the proposal is outstanding; the kernel believes it is gone.
-    expect(pendingAfterRefusal).toBe(0);
+    // WAS 0 (measured 2026-09-23): `reject()` threw, the facade never assigned
+    // `settled`, and the kernel had ALREADY dropped the turn — the facade
+    // believed the proposal was outstanding while the kernel believed it was
+    // gone. PARTIALLY_SETTLED, and the origin of law L2.
+    //
+    // NOW 1. Rollback decides before it settles, so a refusal retires nothing
+    // and the facade's view and the kernel's view agree again.
+    expect(pendingAfterRefusal).toBe(1);
     expect(inspection).toBeDefined();
   });
 
@@ -145,21 +169,26 @@ describe('R6-LIVENESS-0 / 2 — SETTLEMENT axis: is the proposal still open?', (
 });
 
 describe('R6-LIVENESS-0 / 3 — is reject retryable while the conflict stands?', () => {
-  it('MEASURED: the second reject reports SUCCESS and reverses nothing', async () => {
+  it('MEASURED: the second reject refuses identically, not "ok"', async () => {
     const { tree, proposal } = await arriveAtRefusal();
 
     const second = tryReject(proposal);
 
-    // MEASURED: not the same refusal. It returns cleanly.
-    expect(second).toBe(false);
-    // ...while the speculative value is still live.
+    // WAS false — it returned cleanly, having reversed nothing, so code that
+    // retries on failure believed it had recovered. That was the most dangerous
+    // single measurement in this file.
+    //
+    // NOW the same refusal as the first attempt, because the turn still holds
+    // its settlement authority and the conflict still stands.
+    expect(second).toBe('effect-validation-failed');
+    // The speculative value is still live, which is correct: nothing reversed.
     expect(tree.$.x()).toBe(1);
     expect(tree.$.rows.byId('A')?.()?.name).toBe('FromServer');
   });
 });
 
 describe('R6-LIVENESS-0 / 4 — RECOVERY: clear the conflict, then reject', () => {
-  it('MEASURED: clearing the conflict does NOT make the rejection reversible', async () => {
+  it('MEASURED: clearing the conflict DOES make the rejection reversible', async () => {
     const { tree, proposal } = await arriveAtRefusal();
 
     realization(() => tree.$.rows.removeOne('A'));
@@ -167,16 +196,21 @@ describe('R6-LIVENESS-0 / 4 — RECOVERY: clear the conflict, then reject', () =
 
     const retry = tryReject(proposal);
 
-    // Reports success...
+    // WAS: reported success while `x` never returned to baseline — the
+    // reversal was permanently lost, because the turn had been retired by the
+    // FIRST refusal and there was nothing left to reverse.
+    //
+    // NOW the retry genuinely succeeds and `x` returns to 0. This is the case
+    // that makes the refusal RECOVERABLE rather than poisoned, and it is the
+    // whole point of keeping the turn pending.
     expect(retry).toBe(false);
-    // ...but x never returns to baseline. The reversal is permanently lost.
-    expect(tree.$.x()).toBe(1);
+    expect(tree.$.x()).toBe(0);
     expect(pendingCount(tree)).toBe(0);
   });
 });
 
 describe('R6-LIVENESS-0 / 5 — is accept still legal after a refused reject?', () => {
-  it('MEASURED: accept throws a bare error, with no diagnostic cause', async () => {
+  it('MEASURED: accept is LEGAL after a refused reject', async () => {
     const { tree, proposal } = await arriveAtRefusal();
 
     let message = '';
@@ -186,8 +220,14 @@ describe('R6-LIVENESS-0 / 5 — is accept still legal after a refused reject?', 
       message = (error as Error)?.message ?? '';
     }
 
-    // No `cause.kind`: this is not one of the two designed refusal doors.
-    expect(message).not.toBe('');
+    // WAS a bare throw with no `cause.kind` — not one of the two designed
+    // refusal doors — because the turn had already been retired and `accept()`
+    // had nothing to settle.
+    //
+    // NOW it succeeds. A refused rollback leaves the transaction pending, so
+    // confirming it is a legitimate way to resolve the refusal, and the value
+    // it authored stays live as committed truth.
+    expect(message).toBe('');
     expect(tree.$.x()).toBe(1);
   });
 });
@@ -211,11 +251,12 @@ describe('R6-LIVENESS-0 / 6 — CONTROL: the same scenario through transact()', 
     const pendingAfter = pendingCount(tree);
     const second = tryReject({ reject: () => pending.rollback() });
 
-    // If these match arm /2 and /3, the behaviour is kernel-level and the
-    // facade merely inherits it.
+    // These match arms /2 and /3, so the behaviour is KERNEL-level and the
+    // facade merely inherits it — true of the defect then, and of the fix now.
+    // WAS: pendingAfter 0, second false.
     expect(first).toBe('effect-validation-failed');
-    expect(pendingAfter).toBe(0);
-    expect(second).toBe(false);
+    expect(pendingAfter).toBe(1);
+    expect(second).toBe('effect-validation-failed');
     expect(tree.$.x()).toBe(1);
   });
 });

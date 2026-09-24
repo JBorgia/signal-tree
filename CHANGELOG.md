@@ -1,9 +1,10 @@
-## 16.0.0 (unreleased)
+## 16.0.0-dev (unreleased)
 
 **TL;DR** — **Breaking, and deliberately so.** `tree.transaction()` is renamed
 to `tree.transact()` and the old spelling is **removed, not deprecated**. One
-new method, `tree.propose()`, plus five new public types. Two transaction
-rollback correctness defects are fixed. The migration is one mechanical rename.
+new method, `tree.propose()`, plus five new public types. The transaction rollback
+correctness defects described here SHIPPED IN 15.3.0 — see that entry; this
+section predates it and is kept for the vocabulary change only. The migration is one mechanical rename.
 
 ### Breaking changes
 
@@ -80,6 +81,119 @@ the deprecation path applies normally. See
   methods, callable properties, callable types and constructable classes, with
   normalized signatures, so a changed parameter, return type, overload or
   constructor fails the build. Mutation-proven 13/13.
+## 15.3.0 (2026-09-24)
+
+**TL;DR** — **Minor, with two behaviour changes to published surfaces.**
+(1) A `rollback()` that cannot be proven safe now REFUSES WITHOUT CHANGING
+ANYTHING and leaves the transaction pending, where 15.0.0–15.2.1 retired the
+transaction and reported success on retry; rolling back an older transaction
+while a newer overlapping one is still open now refuses rather than silently
+destroying the newer one's writes. (2) `transactions()` retains confirmed turns
+only while a live obligation needs them, so `confirmedTurnReader` returns no
+turns unless a tree asks for diagnostic history — if you read confirmed
+history, add `transactions({ history: { retain: N } })`.
+
+### A refused rollback is now a no-op — SAFETY FIX, affects every published 15.x
+
+Three defects. The first two were reproduced on 2026-09-23 against tarballs
+installed from the npm registry — 15.0.0, 15.1.2, 15.1.4 and 15.2.1, identical
+measurements on all four — with no repo source, no local `dist/` and no
+workspace `node_modules`; the evidence and the probe are in
+[`docs/research/v15-safety-audit/`](docs/research/v15-safety-audit/). The third
+was found here while fixing them. The contract is frozen as H1–H9 in
+`packages/kernel/src/enhancers/transactions/hotfix-15-2-2-safety.spec.ts`.
+
+None of this needs a privileged API: 15.2.1 does not export `withWriteContext`
+at runtime, so an application applying a server response with an ordinary write
+reaches the first defect.
+
+**A refusal used to half-apply.** `rollback()` set the transaction to rejected,
+announced `rolled-back` and discarded the pending turn BEFORE attempting the
+reversal. When the attempt refused, the throw left a transaction that had given
+up its settlement authority while every write it authored was still live:
+
+        outcome  refused        pending  1 -> 0      state  unchanged
+        retry    reports "ok", having reversed nothing
+
+Discarding also discharged the retention obligation, so a FAILED rollback
+evicted a confirmed turn it was still responsible for. Rollback now decides
+before it settles: nothing is retired, announced or released unless the
+compensation actually applied.
+
+**An older rollback used to destroy a newer transaction's writes.** Another
+OPEN transaction was invisible to the rollback plan — it is not confirmed, and
+its writes are authored rather than realized, so neither source carried it.
+Measured on 15.2.1: P1 writes `x=1, y=1`; P2 writes `y=2, z=2`; `p1.rollback()`
+returned `"ok"` and left `{x:0, y:0, z:2}`, silently destroying P2's `y=2`. A
+following `p2.confirm()` then committed a transaction missing one of the two
+fields it wrote, and a following `p2.rollback()` resurrected P1's `y=1` — a
+value P1 had already given up.
+
+Open transactions are now part of the plan, and an open one can never
+*supersede* a contribution, only conflict with it: the before-image it holds
+records what the location HELD, not who owns it. That refusal carries a new
+cause kind, `later-pending-dependency`, distinct from
+`later-confirmed-dependency` because it is not a claim about confirmed state.
+Reversing the NEWER transaction first still succeeds and is the supported
+ordering.
+
+Surgical multi-writer settlement is deliberately out of scope here; it is the
+16.0 ownership model. On this line, unsafe becomes safely rejected.
+
+**A compensation is no longer filed as a dependency.** The transactions
+dependency ledger admitted every realized write, including a rollback's own
+restore half — so one rollback made every earlier transaction permanently
+unreversible. Restoration had already learned to read
+`origin: 'transaction-rollback'` for exactly this reason; the ledger now does
+too. An out-of-order rollback consequently succeeds and restores what it
+actually displaced. This replaces a test that pinned the refusal as
+`CURRENT BEHAVIOUR ... not as desired`.
+
+#### Migration
+
+Catch the refusal and settle the transaction yourself — it is still pending, so
+`confirm()` and a retried `rollback()` both remain available. Code that
+rolled back an older transaction while a newer one was open was getting a
+corrupt result and now gets an error instead.
+
+### Correctness retention follows live responsibility
+
+A confirmed turn was retained for the lifetime of the tree. It is now released
+once no older pending turn could still consult it.
+
+The bound is derived, not chosen. `getPendingRollbackPlan` is the only
+correctness consumer of the confirmed ledger and selects `turn.id > pendingId`;
+turn ids are monotonic, so a confirmed turn can only ever matter to a pending
+turn older than itself. Ordinary writes are bounded on the same rule as
+transactional ones.
+
+### Diagnostic history is opt-in
+
+```ts
+transactions({ history: { retain: 100 } });
+```
+
+`TransactionsConfig` is exported, alongside `BatchingConfig`, `DevToolsConfig`
+and `RestorationConfig`.
+
+### The reader now tells the truth about what it kept
+
+`ConfirmedTurnRetention.truncated` is asserted by the transaction authority. It
+was previously derived from the retained ids, which could not survive eviction:
+when the whole window is gone there are no ids left, so the comparison reported
+`false` — a claim of complete history precisely when none was kept. Pending and
+rejected turns leave id gaps too, so gaps were never truncation evidence.
+
+    no retention contract      truncated: true,  turns: []
+    nothing ever written       truncated: false, turns: []
+
+Those two states are deliberately distinguishable.
+
+### Migration
+
+Anything reading `@signaltree/kernel/internals` — Studio, devtools — declares
+the retention it needs. Application code that does not read confirmed history
+needs no change.
 
 ## 15.2.1 (2026-09-22)
 
