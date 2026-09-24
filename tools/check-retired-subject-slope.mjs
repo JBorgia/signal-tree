@@ -177,7 +177,30 @@ const runArm = (rounds) => {
     );
     return JSON.parse(out.trim().split('\n').at(-1));
   });
-  const growthMB = median(samples.map((sample) => sample.growthMB));
+  // FLOOR, NOT MIDDLE — the estimator has to be right for the quantity.
+  //
+  // Retained memory is bounded BELOW by what is genuinely held: GC timing,
+  // heap-page granularity and whatever the runtime has not yet swept can only
+  // ever make a sample look BIGGER than the truth, never smaller. So the
+  // samples are a true floor plus one-sided noise, and the minimum is the best
+  // estimator of the floor. A median is the right statistic for symmetric
+  // noise, and this noise is not symmetric.
+  //
+  // Measured, and this is why it matters here. Samples at one point came back
+  // [3.23, 15.22, 15.22] and at the other [8.1, 4.11, 4.11]: not scatter around
+  // a value but DISCRETE LEVELS ~4 MB apart. A median of three then reports
+  // whichever level happened to appear twice, so the verdict swung between 116
+  // B/retired and -51 B/retired on one unchanged tree — and the gate's budget
+  // is 20 B/retired x 100k = 2 MB, four times finer than the quantisation. The
+  // instrument was coarser than the thing it measured, which makes a PASS as
+  // uninformative as a FAIL. Confirmed pre-existing by reproducing both verdicts
+  // against the published v15.2.1 tag.
+  //
+  // Detection power is preserved: if retention genuinely scales with retired
+  // subjects, the FLOOR rises with it, so the minimum moves and `judge` still
+  // rejects. `--self-test` continues to prove that against fixed tables, and it
+  // exercises `judge`, which this does not touch.
+  const growthMB = Math.min(...samples.map((sample) => sample.growthMB));
   return {
     ...samples[0],
     growthMB,
@@ -201,7 +224,7 @@ for (const point of [low, high]) {
     `  ${String(point.retiredSubjects).padStart(7)} retired   ` +
       `${String(point.growthMB).padStart(7)} MB   ` +
       `${String(point.bytesPerRetiredSubject).padStart(5)} B/retired   ` +
-      `[${point.sampleGrowthMB.join(', ')} MB]`
+      `[${point.sampleGrowthMB.join(', ')} MB, min taken]`
   );
 }
 
