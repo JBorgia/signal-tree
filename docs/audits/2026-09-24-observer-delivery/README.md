@@ -28,7 +28,7 @@ refusal — leaving a transaction pending AFTER its state had already reversed.
 Any throw out of the compensation call is therefore classified as a refusal.
 That part of the diagnosis is confirmed against the artifact users install.
 
-**2. It is NOT reachable from the kernel's public API.** Every route tried:
+**2. It is NOT reachable from the kernel's PUBLIC API.** Every route tried:
 
     link() endpoint `set` throws   observer is ASYNC and isolated. The rollback
                                    returned "ok", x reversed, the turn retired,
@@ -56,10 +56,13 @@ confirmed here against the tarball.
 
 ## What is NOT established, and the blocker
 
-**Unreachable in general — NOT shown.** Reaching it needs a post-install
-observer delivered SYNCHRONOUSLY inside the compensation's invalidation group.
-The kernel's public surface offers none: everything synchronous there is
-gate-shaped, and everything post-install is async.
+**Unreachable in general — NOT shown, and do not read it that way.** Public-API
+reachability is about what a CONSUMER can trigger. It is a different question
+from whether the path can be exercised in a test: the kernel notifier exposes
+`setBatchingEnabled(false)`, which delivers synchronously, and the v16 line
+uses exactly that to drive this path in `transaction-safety.spec.ts`. The
+routes below were the ones tried from the published surface; a throwing
+`link()` endpoint is asynchronous, which says nothing about other paths.
 
 A framework adapter could supply one — an Angular `effect` or a computed read
 running inside the invalidation group is the obvious candidate. THAT IS NOT
