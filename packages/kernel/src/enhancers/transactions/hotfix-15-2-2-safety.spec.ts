@@ -5,13 +5,11 @@ import { signalTree } from '../../lib/signal-tree';
 import { transactions } from './transactions';
 
 /**
- * 15.2.2 HOTFIX SAFETY CONTRACT — H1..H9.
+ * SAFETY CONTRACT — H1..H9. SATISFIED IN 15.3.0.
  *
  * Ported from R6-LIVENESS-0 and R8-OVERLAP-0, which were measured against the
- * v16 tree and then reproduced against the PUBLISHED 15.0.0..15.2.1 tarballs.
- * This file is written on a branch from the 15.2.1 release commit and is
- * expected to FAIL before the fix. Those failures are the evidence that the
- * patch repairs a defect users could actually install.
+ * v16 tree and then reproduced against the PUBLISHED 15.0.0, 15.1.2, 15.1.4 and
+ * 15.2.1 tarballs — see `docs/research/v15-safety-audit/`.
  *
  * The contract is SAFETY, not capability:
  *
@@ -22,7 +20,27 @@ import { transactions } from './transactions';
  * Deliberately NOT in scope: surgical multi-owner settlement, contribution
  * layers, drafts/MVCC. An overlapping rollback that cannot be proven safe is
  * allowed to refuse. That is less permissive than 15.2.1 appeared to be, and
- * is the correct direction for a patch: unsafe becomes safely rejected.
+ * is the correct direction: unsafe becomes safely rejected. The permissive
+ * version is the 16.0 ownership model, not a patch to this line.
+ *
+ * ## History of this file, because it changes how to read a failure here
+ *
+ * Written first as deliberately RED evidence against 15.2.1, then marked
+ * `it.fails` so the release tag could be verified without the contract's own
+ * point being read as a broken build. Five cases carried that marker: H1, H3,
+ * H4, H5 and H6. They are now ORDINARY `it` — the containment work landed and
+ * they pass.
+ *
+ * Which is exactly what the marker was for. `it.fails` turns RED when a case
+ * starts passing, so the change could not be absorbed silently; a `skip` would
+ * have hidden it. H2, H7, H8 and H9 held throughout.
+ *
+ * H4, H5 and H6 each accept TWO outcomes — a correct reversal or an atomic
+ * refusal — because the contract is about which outcomes are permissible, not
+ * about which one this implementation picks. Today all three take the REFUSAL
+ * branch. Do not simplify them to the branch currently taken: the other branch
+ * is what 16.0 is expected to satisfy, and this file should not have to be
+ * rewritten to notice that.
  */
 
 type Row = { id: string; name: string };
@@ -103,7 +121,7 @@ const r8Scenario = async () => {
 };
 
 describe('H1 — a failed rollback KEEPS settlement authority', () => {
-  it.fails('the pending turn survives a refusal', async () => {
+  it('the pending turn survives a refusal', async () => {
     const { tree, pending } = await r6Scenario();
 
     expect(pendingCount(tree)).toBe(1);
@@ -134,7 +152,7 @@ describe('H2 — a failed rollback changes NO state', () => {
 });
 
 describe('H3 — a retried failed rollback does not falsely report success', () => {
-  it.fails('the second attempt refuses in the same way, not "ok"', async () => {
+  it('the second attempt refuses in the same way, not "ok"', async () => {
     const { tree, pending } = await r6Scenario();
 
     settle(() => pending.rollback());
@@ -147,7 +165,7 @@ describe('H3 — a retried failed rollback does not falsely report success', () 
 });
 
 describe('H4 — older-overlap rollback reverses correctly OR refuses atomically', () => {
-  it.fails('never a third outcome', async () => {
+  it('never a third outcome', async () => {
     const { tree, p1, p2 } = await r8Scenario();
     const before = xyz(tree);
 
@@ -167,7 +185,7 @@ describe('H4 — older-overlap rollback reverses correctly OR refuses atomically
 });
 
 describe('H5 — an accepted transaction never silently loses a field', () => {
-  it.fails("P2's own contributions all survive its confirm()", async () => {
+  it("P2's own contributions all survive its confirm()", async () => {
     const { tree, p1, p2 } = await r8Scenario();
 
     settle(() => p1.rollback());
@@ -182,7 +200,7 @@ describe('H5 — an accepted transaction never silently loses a field', () => {
 });
 
 describe('H6 — a rolled-back value is never resurrected', () => {
-  it.fails('settling P2 cannot restore a value P1 already gave up', async () => {
+  it('settling P2 cannot restore a value P1 already gave up', async () => {
     const { tree, p1, p2 } = await r8Scenario();
 
     const firstOutcome = settle(() => p1.rollback());

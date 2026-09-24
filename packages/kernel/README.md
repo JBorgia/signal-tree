@@ -318,6 +318,12 @@ Failed pending-transaction rollback throws `SignalTreeRollbackError`, whose
 stable `code` and structured `cause` distinguish refusal from application
 errors.
 
+A refusal is atomic: it changes no state, retires nothing, and leaves the
+transaction **pending**, so `confirm()` and a retried `rollback()` both remain
+available. Reversing an older transaction while a newer overlapping one is
+still open refuses (`cause.kind === 'later-pending-dependency'`); settle the
+newer one first.
+
 ## Exports
 
 The package publishes three code entry points:
