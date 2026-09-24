@@ -504,6 +504,53 @@ function buildPendingRollbackPlan(
       }
     }
 
+    // REKEY-OCCUPANCY-0. Compensating a rekey renames the subject back to its
+    // ORIGINAL key. If newer truth has since put a DIFFERENT subject at that
+    // key, the rename has nowhere to land and the turn genuinely depends on
+    // newer truth.
+    //
+    // This was already refused before this rule existed, but by accident: the
+    // compensating re-add failed physically on a taken key, AFTER compensation
+    // had begun. Deciding by accident is why that path stranded the turn's
+    // other effects (measured as `effect-validation-failed` with `x` left at
+    // its proposed value). Recognising it here, at plan time, refuses before
+    // anything is touched and keeps the turn retryable once the key frees up.
+    //
+    // Subject identity is what makes this decidable rather than a guess: the
+    // occupant is a different SUBJECT, not the same one renamed back.
+    if (effect.kind === 'rekey') {
+      // NET occupancy, not "an add appears in history". The later effects are
+      // a log: an add that was subsequently removed leaves the key free, and
+      // refusing on the stale add would make the refusal unrecoverable — the
+      // caller clears the conflict and the retry still refuses.
+      let occupant: LaterAppliedEffect | undefined;
+      for (const laterEntry of laterEffects) {
+        const later = laterEntry.effect;
+        if (later.ownerPath !== effect.ownerPath) continue;
+        if (later.kind === 'add' && later.key === effect.beforeKey) {
+          occupant = later.subject === effect.subject ? undefined : laterEntry;
+        } else if (later.kind === 'remove' && later.key === effect.beforeKey) {
+          occupant = undefined;
+        } else if (later.kind === 'rekey') {
+          // A rename can vacate the key or move a different subject onto it.
+          if (later.beforeKey === effect.beforeKey) occupant = undefined;
+          if (
+            later.afterKey === effect.beforeKey &&
+            later.subject !== effect.subject
+          ) {
+            occupant = laterEntry;
+          }
+        }
+      }
+      if (occupant) {
+        return {
+          kind: 'conflict',
+          conflictingTurnId: occupant.turnId,
+          conflictingEffect: occupant.effect,
+        };
+      }
+    }
+
     const dependency = hasSameSubjectDependency(effect);
     return dependency
       ? {
