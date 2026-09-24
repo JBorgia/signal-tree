@@ -1208,7 +1208,7 @@ describe('restoration enhancer', () => {
         }),
       },
       {
-        enhancers: [transactions(), restoration()],
+        enhancers: [transactions({ history: { retain: 1000 } }), restoration()],
         capabilities: ['causal-runtime'],
       }
     ) as unknown as {

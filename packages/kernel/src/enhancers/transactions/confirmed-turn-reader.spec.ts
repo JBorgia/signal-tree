@@ -147,9 +147,10 @@ describe('confirmedTurnReader', () => {
     tree.transaction(() => tree.$['total'](9600)).confirm();
 
     const retention = confirmedTurnReader(tree as never)?.readConfirmedTurns().retention;
-    // Nothing evicts from confirmedTurns today, so history is complete — and
-    // `truncated` is derived from the retained ids, so it starts reporting true
-    // on its own if eviction is ever added.
+    // `truncated` is asserted by the authority, not derived from ids. This
+    // tree declares retain:1000 and writes once, so nothing is evicted and
+    // false is correct — a CONTROL for the non-truncated direction. The
+    // truncation direction is covered in history-retention-15.spec.ts.
     expect(retention?.truncated).toBe(false);
     expect(retention?.firstAvailableTurnId).toBe(1);
   });

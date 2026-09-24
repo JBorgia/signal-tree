@@ -158,7 +158,7 @@ describe('transactions enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [transactions()] }
+      { enhancers: [transactions({ history: { retain: 1000 } })] }
     ) as unknown as {
       $: {
         (): { count: number; rows: { all: Array<{ id: string; name: string }> } };
@@ -241,7 +241,7 @@ describe('transactions enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [transactions()] }
+      { enhancers: [transactions({ history: { retain: 1000 } })] }
     ) as {
       $: {
         count: () => number;
@@ -322,7 +322,7 @@ describe('transactions enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [transactions()] }
+      { enhancers: [transactions({ history: { retain: 1000 } })] }
     ) as {
       (): { count: number; rows: { all: Array<{ id: string; name: string }> } };
       $: {
