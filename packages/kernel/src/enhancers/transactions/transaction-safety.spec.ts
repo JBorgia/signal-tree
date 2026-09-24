@@ -288,6 +288,8 @@ describe('settlement evidence and terminal ownership', () => {
     const off = notifier.subscribe('**', (_n, _p, _path, _owner, origin) => {
       if (origin === 'transaction-rollback') throw failure;
     });
+    const before = p.inspect();
+    expect(before.changes.length).toBeGreaterThan(0);
     try {
       expect(() => p.rollback()).toThrow(failure);
       expect(t.$.x()).toBe(0);
@@ -295,6 +297,17 @@ describe('settlement evidence and terminal ownership', () => {
       expect(peekInternalTransactionRuntime(t)?.getPendingTurnCount()).toBe(0);
       expect(hasOpenCommitScope(t)).toBe(false);
       expect(() => p.rollback()).not.toThrow();
+
+      // INSPECTION SURVIVES A TERMINAL SETTLEMENT THAT THREW.
+      //
+      // The compensation installed and the turn retired; only delivery failed.
+      // The handle must still report the settlement snapshot, not the empty
+      // read a gone turn would otherwise produce. Caching only on the normal
+      // return path loses it — measured: `{ changes: [] }`.
+      //
+      // Asserted HERE rather than in a spec of its own because this is already
+      // the fixture that drives the real notification path synchronously.
+      expect(p.inspect()).toEqual(before);
     } finally {
       off();
       notifier.setBatchingEnabled(true);

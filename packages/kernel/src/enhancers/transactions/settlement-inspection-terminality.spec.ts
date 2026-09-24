@@ -33,24 +33,20 @@ import { transactions } from './transactions';
  *     unconditional `finally` instead of the guard   CAUGHT (1 red)
  *     guard removed, assign only on success          SURVIVES
  *
- * The surviving mutant is the terminal-after-throw branch, and it survives
- * because THAT BRANCH IS NOT REACHABLE FROM THE PUBLIC API. Every synchronous
- * user callback in the settle path is gate-shaped, and everything post-install
- * — `link()` endpoints, framework effects — is delivered asynchronously and
- * cannot throw back into the settle call. Both were tried: a throwing `link`
- * `set` leaves `confirm()` returning normally.
+ * The terminal-after-throw branch is NOT covered by this file. It is covered,
+ * with teeth, by `transaction-safety.spec.ts` — "synchronous notifier throw
+ * after a mixed installation is not a validation refusal" — which drives the
+ * REAL notification path by disabling notifier batching and throwing from a
+ * subscriber. Removing the terminal guard turns that test red.
  *
- * It IS real at the source level. Reproduced by injecting a throw after
- * `installed = true` in the compensation apply: compensation succeeded
- * (x=0, y=0), the turn retired, `rollback()` threw, and `inspect()` afterwards
- * reported `{ changes: [] }`. Independently reproduced by review against
- * d394047c. The same shape is recorded for the 15.x line in
- * `docs/audits/2026-09-24-observer-delivery/`.
- *
- * So: the guard is justified by injection, the refusal branch is covered here,
- * and the terminal branch is honestly uncovered. A framework adapter that
- * delivers observers synchronously inside the invalidation group would make it
- * reachable — that is the test to add, and it does not belong in the kernel.
+ * ⚠️ AN EARLIER VERSION OF THIS COMMENT CLAIMED THAT BRANCH COULD NOT BE
+ * COVERED IN THE KERNEL AT ALL, because no public API reaches it. That
+ * conflated two questions. Public-API reachability is about what a CONSUMER
+ * can trigger; kernel regression coverage may use internal seams, and
+ * `setBatchingEnabled(false)` is one this suite already relies on. What was
+ * actually tested was a `link()` endpoint, which is asynchronous — that says
+ * nothing about every other notification path, and the conclusion drawn from
+ * it was far too broad.
  */
 
 const make = () =>
@@ -144,17 +140,11 @@ describe('settlement terminality decides whether inspection freezes', () => {
     tree.destroy();
   });
 
-  it('CONTROL: settlement does not depend on inspection succeeding', async () => {
-    // The inverse hazard, kept beside the others because a fix for one can
-    // reintroduce the other: making confirm() read the inspection unguarded
-    // wedges any tree whose chronology capture has failed.
-    const tree = make();
-    const pending = tree.transact(() => tree.$.x(1));
-    await flush();
-
-    expect(() => pending.confirm()).not.toThrow();
-    expect(pendingCount(tree)).toBe(0);
-
-    tree.destroy();
-  });
+  // The 'settlement does not depend on inspection succeeding' control that
+  // stood here was FAKE: it built an ordinary HEALTHY transaction and confirmed
+  // it, never making inspection unavailable, so it could not prove the property
+  // in its own title. That property has a real fixture — the hostile-chronology
+  // case in `path-notifier-enqueue.spec.ts`, which genuinely disables
+  // inspection and then settles — and is asserted there rather than restated
+  // here without teeth.
 });
