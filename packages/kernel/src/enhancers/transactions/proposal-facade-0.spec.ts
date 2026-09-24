@@ -69,7 +69,7 @@ describe('PROPOSAL-0 facade / accept', () => {
     await flush();
 
     expect(t.$.name()).toBe('Samuel');
-    expect(result.changes).toEqual([{ path: 'name', status: 'current' }]);
+    expect(result.changes).toEqual([{ path: 'name', address: ['name'], status: 'current' }]);
   });
 });
 
@@ -108,16 +108,16 @@ describe('PROPOSAL-0 facade / inspect', () => {
     await flush();
 
     expect(proposal.inspect().changes).toEqual([
-      { path: 'name', status: 'current' },
-      { path: 'priority', status: 'current' },
+      { path: 'name', address: ['name'], status: 'current' },
+      { path: 'priority', address: ['priority'], status: 'current' },
     ]);
 
     realization(() => t.$.name('FromServer'));
     await flush();
 
     expect(proposal.inspect().changes).toEqual([
-      { path: 'name', status: 'superseded' },
-      { path: 'priority', status: 'current' },
+      { path: 'name', address: ['name'], status: 'superseded' },
+      { path: 'priority', address: ['priority'], status: 'current' },
     ]);
   });
 
@@ -135,7 +135,7 @@ describe('PROPOSAL-0 facade / inspect', () => {
 
     // 'current' = the proposal's CONTRIBUTION stands, not the proposed value.
     expect(proposal.inspect().changes).toEqual([
-      { path: 'rows.A', status: 'current' },
+      { path: 'rows.A', address: ['rows'], subject: expect.any(Number), status: 'current' },
     ]);
     expect(t.$.rows.byId('A')?.()?.name).toBe('FromServer');
   });
@@ -156,7 +156,7 @@ describe('PROPOSAL-0 facade / inspect', () => {
     await flush();
 
     expect(proposal.inspect().changes).toEqual([
-      { path: 'rows.A', status: 'superseded' },
+      { path: 'rows.A', address: ['rows'], subject: expect.any(Number), status: 'superseded' },
     ]);
   });
 });
@@ -172,7 +172,7 @@ describe('PROPOSAL-0 facade / accept closes the inspect race', () => {
     await flush();
 
     const early = proposal.inspect();
-    expect(early.changes).toEqual([{ path: 'name', status: 'current' }]);
+    expect(early.changes).toEqual([{ path: 'name', address: ['name'], status: 'current' }]);
 
     // Newer truth lands between the reviewer reading and acting.
     realization(() => t.$.name('FromServer'));
@@ -180,7 +180,7 @@ describe('PROPOSAL-0 facade / accept closes the inspect race', () => {
 
     const result = proposal.accept();
 
-    expect(result.changes).toEqual([{ path: 'name', status: 'superseded' }]);
+    expect(result.changes).toEqual([{ path: 'name', address: ['name'], status: 'superseded' }]);
     // And the acceptance snapshot is stable afterwards.
     expect(proposal.inspect()).toEqual(result);
   });
@@ -253,7 +253,7 @@ describe('PROPOSAL-0 facade / restoration stays orthogonal', () => {
 
     expect(t.getRestorationHistory().length).toBe(base);
     expect(proposal.inspect().changes).toEqual([
-      { path: 'name', status: 'current' },
+      { path: 'name', address: ['name'], status: 'current' },
     ]);
   });
 
@@ -460,7 +460,7 @@ describe('PROPOSAL-0 facade / double settlement', () => {
     expect(tryReject(proposal)).toBe('later-confirmed-dependency');
 
     const settled = proposal.accept();
-    expect(settled.changes).toEqual([{ path: 'rows.A', status: 'current' }]);
+    expect(settled.changes).toEqual([{ path: 'rows.A', address: ['rows'], subject: expect.any(Number), status: 'current' }]);
     expect(t.$.rows.byId('A')?.()?.name).toBe('FromServer');
   });
 
@@ -478,7 +478,7 @@ describe('PROPOSAL-0 facade / double settlement', () => {
 
     expect(tryReject(proposal)).toBe('later-confirmed-dependency');
     expect(proposal.inspect().changes).toEqual([
-      { path: 'rows.A', status: 'current' },
+      { path: 'rows.A', address: ['rows'], subject: expect.any(Number), status: 'current' },
     ]);
 
     // Newer truth arriving after the refusal must still be observed.
@@ -486,7 +486,7 @@ describe('PROPOSAL-0 facade / double settlement', () => {
     await flush();
 
     expect(proposal.inspect().changes).toEqual([
-      { path: 'rows.A', status: 'superseded' },
+      { path: 'rows.A', address: ['rows'], subject: expect.any(Number), status: 'superseded' },
     ]);
   });
 });

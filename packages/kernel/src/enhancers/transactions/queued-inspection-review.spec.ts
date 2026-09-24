@@ -16,7 +16,7 @@ describe('independent queued inspection review', () => {
       external(() => tree.$.x(9));
       const proposal = tree.propose(() => tree.$.x(1));
       expect(proposal.inspect().changes).toEqual([
-        { path: 'x', status: 'current' },
+        { path: 'x', address: ['x'], status: 'current' },
       ]);
     } finally {
       tree.destroy();
@@ -34,7 +34,7 @@ describe('independent queued inspection review', () => {
         });
         expect(tree.$.x()).toBe(order === 'before' ? 1 : 9);
         expect(proposal.inspect().changes).toEqual([
-          { path: 'x', status: order === 'before' ? 'current' : 'superseded' },
+          { path: 'x', address: ['x'], status: order === 'before' ? 'current' : 'superseded' },
         ]);
       } finally {
         tree.destroy();
@@ -53,11 +53,11 @@ describe('independent queued inspection review', () => {
         });
         expect
           .soft(proposal.inspect().changes)
-          .toEqual([{ path: 'x', status: 'superseded' }]);
+          .toEqual([{ path: 'x', address: ['x'], status: 'superseded' }]);
         if (delivery === 'flush') flush();
         else tree.propose(() => tree.$.y(1));
         expect(proposal.inspect().changes).toEqual([
-          { path: 'x', status: 'superseded' },
+          { path: 'x', address: ['x'], status: 'superseded' },
         ]);
       } finally {
         tree.destroy();
@@ -81,8 +81,8 @@ describe('independent queued inspection review', () => {
       });
       flush();
       expect(proposal.inspect().changes).toEqual([
-        { path: 'rows.a.x', status: 'superseded' },
-        { path: 'rows.a.y', status: 'current' },
+        { path: 'rows.a.x', address: ['rows'], subject: expect.any(Number), status: 'superseded' },
+        { path: 'rows.a.y', address: ['rows'], subject: expect.any(Number), status: 'current' },
       ]);
     } finally {
       tree.destroy();
@@ -99,7 +99,7 @@ describe('independent queued inspection review', () => {
         footprints: 2,
       });
       expect(older.inspect().changes).toEqual([
-        { path: 'x', status: 'superseded' },
+        { path: 'x', address: ['x'], status: 'superseded' },
       ]);
       older.accept();
       expect(runtime.getInspectionFootprintCountsForTesting()).toEqual({
@@ -121,11 +121,11 @@ describe('independent queued inspection review', () => {
       const proposal = tree.propose(() => tree.$.rows.updateOne('a', { x: 1 }));
       external(() => tree.$.rows.removeOne('a'));
       expect(proposal.inspect().changes).toEqual([
-        { path: 'rows.a.x', status: 'superseded' },
+        { path: 'rows.a.x', address: ['rows'], subject: expect.any(Number), status: 'superseded' },
       ]);
       flush();
       expect(proposal.inspect().changes).toEqual([
-        { path: 'rows.a.x', status: 'superseded' },
+        { path: 'rows.a.x', address: ['rows'], subject: expect.any(Number), status: 'superseded' },
       ]);
     } finally {
       tree.destroy();
@@ -147,11 +147,11 @@ describe('independent queued inspection review', () => {
         expect(runtime.getPendingTurnCount()).toBe(1);
         expect(newer.inspect().changes).toEqual([]);
         expect(older.inspect().changes).toEqual([
-          { path: 'x', status: 'current' },
+          { path: 'x', address: ['x'], status: 'current' },
         ]);
         newer[settlement]();
         expect(older.inspect().changes).toEqual([
-          { path: 'x', status: 'current' },
+          { path: 'x', address: ['x'], status: 'current' },
         ]);
         expect(runtime.getPendingTurnCount()).toBe(1);
       } finally {

@@ -89,7 +89,29 @@ export type ProposalStatus = 'current' | 'superseded';
  * this string on dots is not a general-purpose resolver.
  */
 export type ProposalChange = {
+  /**
+   * Human-readable location. PRESENTATION ONLY, and deliberately ambiguous:
+   * a literal key `'a.b'` and the nested path `a.b` both render as `"a.b"`.
+   * Use it for display; never to identify which location changed.
+   */
   path: string;
+  /**
+   * Lossless typed address — the segments that actually identify the location.
+   * `['a.b']` and `['a','b']` are different places and read differently here,
+   * which is what lets a reviewer be told the truth about what an agent
+   * changed (law L17: human-readable paths are presentation, never identity).
+   *
+   * `undefined` when the position cannot be resolved to an address, reported
+   * rather than guessed.
+   */
+  address: readonly string[] | undefined;
+  /**
+   * Subject identity when this location belongs to an entity subject. A reused
+   * business key is a DIFFERENT subject, so this distinguishes "the agent
+   * edited the row that is there now" from "the agent edited the row that used
+   * to be there" (law L7).
+   */
+  subject?: number;
   status: ProposalStatus;
 };
 
