@@ -430,3 +430,54 @@ itself:
 
 That is a healthier model than adding work to every mutation, which is what B
 would have required. No benchmark until the shape is established.
+
+---
+
+# CANDIDATE STATUS — frozen 2026-09-24, before the C spike
+
+    A  node -> PositionId
+       FALSIFIED for structural ownership. Entity fields collapse to one
+       collection-level position (OWNER-SEAM-2B), destroying leaf, subject and
+       lifetime separation.
+
+    B  node-keyed frontier + write-site owner context
+       VIABLE but invasive. Retained as fallback. Needs owner context on the
+       hot write path, which the existing write->transaction boundary does not
+       carry.
+
+    C  node -> lossless semantic identity -> existing effect owner
+       PROMOTED TO IMPLEMENTATION SPIKE. **Not selected.**
+
+"C leading on both halves" overstated it and is withdrawn. C has enough evidence
+to EARN implementation; its decisive join equality is the first thing that
+implementation must prove, not something already shown.
+
+## The two gates the C spike must clear FIRST
+
+Both were preregistered and NEITHER has passed.
+
+    ROW 8 EQUALITY  the semantic identity derived from the TurnEffect must
+                    EQUAL the identity bound to the captured anchor node.
+                    OWNER-KEY-1 half 2 only showed BOTH EXIST and are separately
+                    stable. Equality was untestable with no binding to derive a
+                    key from.
+
+    SCALAR ROW      x node <-> the effect position for x. Unmeasured entirely.
+
+## Scope limit for the spike
+
+Three namespaces only. No generalized semantic-identity framework, no tagged
+union forced over every fact, no public API:
+
+    scalar            DependencyNode -> PositionId
+    subject existence DependencyNode -> SubjectId
+    entity leaf       DependencyNode -> SubjectId + scoped leaf segments
+
+The transaction side normalizes existing TurnEffects into those same three
+classes. No display path, no business key, and no reverse inference participates
+in owner identity at any point.
+
+ROW3b, though exploratory rather than preregistered, is why this is worth
+building: reading `A.score` captures the subject ANCHOR as well as the leaf, so
+"P2 depends on S1 existing" falls out of ordinary read capture instead of
+needing a separate existence detector.
