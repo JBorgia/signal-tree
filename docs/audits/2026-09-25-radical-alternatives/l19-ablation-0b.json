@@ -1,0 +1,111 @@
+{
+  "probe": "L19-ABLATION-0B",
+  "preregistered": {
+    "TRIALS": 15,
+    "DISCARD": 3,
+    "statistic": "median",
+    "dispersion": "relative IQR",
+    "thresholdRule": "3x worst relIQR"
+  },
+  "N": 200000,
+  "raw": {
+    "BASE": [
+      35.529625,
+      18.9805,
+      19.455,
+      18.602833,
+      18.100041,
+      32.059542,
+      27.115083,
+      17.198292,
+      17.631667,
+      17.686958,
+      17.806584,
+      17.658291,
+      17.640291,
+      17.277167,
+      17.033833
+    ],
+    "EMPTY-ENHANCER": [
+      18.727667,
+      18.069625,
+      18.614958,
+      18.611042,
+      18.454833,
+      27.911417,
+      18.589084,
+      17.450417,
+      17.79925,
+      18.336083,
+      17.493417,
+      17.315625,
+      17.10375,
+      17.410125,
+      17.697
+    ],
+    "BATCHING": [
+      19.34825,
+      19.17325,
+      18.794875,
+      18.463459,
+      18.668209,
+      19.189666,
+      17.46075,
+      17.609167,
+      16.959375,
+      17.529833,
+      18.414792,
+      17.69675,
+      19.309625,
+      17.132958,
+      17.11125
+    ],
+    "TX-FULL": [
+      60.871916,
+      60.728208,
+      62.829125,
+      57.419541,
+      59.581209,
+      56.992167,
+      62.69,
+      65.874458,
+      55.5905,
+      55.2275,
+      57.213084,
+      56.185834,
+      57.735333,
+      54.805833,
+      54.567625
+    ]
+  },
+  "medians": {
+    "BASE": 17.686958,
+    "EMPTY-ENHANCER": 17.79925,
+    "BATCHING": 17.69675,
+    "TX-FULL": 57.213084
+  },
+  "dispersion": {
+    "BASE": 5.490859423084514,
+    "EMPTY-ENHANCER": 6.397275166088448,
+    "BATCHING": 6.823055080735163,
+    "TX-FULL": 6.975168477196584
+  },
+  "threshold": 20.92550543158975,
+  "checks": [
+    {
+      "label": "installing an enhancer is indistinguishable from BASE",
+      "ok": true,
+      "detail": "1% < 20.9%"
+    },
+    {
+      "label": "batching(), a real enhancer on the same write path, is indistinguishable from BASE",
+      "ok": true,
+      "detail": "0% < 20.9%"
+    },
+    {
+      "label": "transactions() is distinguishable, and by far more than the threshold",
+      "ok": true,
+      "detail": "223% > 20.9%"
+    }
+  ]
+}
