@@ -4,12 +4,12 @@
     "path": "bridged",
     "model": "/Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/prepared.mjs",
     "profile": "live",
-    "kernelRevision": "6ae860c8202d174ccf3bf48d2314374a6f2caf10",
+    "kernelRevision": "0969079094d4c30a07ff954c0f84e51848ed620b",
     "node": "v24.15.0",
-    "generatedAt": "2026-09-25T02:04:52.585Z",
+    "generatedAt": "2026-09-25T02:15:04.256Z",
     "sha256_16": {
-      "bridge": "3d7627247d94703b",
-      "runner": "3d604ba93085ba3f",
+      "bridge": "deb9065f5b62b5ba",
+      "runner": "fcd065c7f5eae50e",
       "model": "ca3a3aea190da358",
       "contract": "d94c8e8d26d9ed46",
       "supplemental": "5459e2ebe639a3d3",
@@ -20,9 +20,9 @@
     "note": "Composition is NOT bridged; see the disposition audit."
   },
   "totals": {
-    "violated": 84,
+    "violated": 68,
     "held": 106,
-    "unsupported": 63
+    "unsupported": 79
   },
   "rows": [
     {
@@ -1498,7 +1498,7 @@
       "suite": "structural",
       "id": "T14/accept/\"A\"",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -1506,8 +1506,7 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":1,\"y\":0,\"z\":0},\"expected\":{\"x\":1,\"y\":0,\"z\":0,\"entities\":[{\"key\":\"A\",\"value\":{\"name\":\"mixed\",\"score\":0}}]}}"
+          "status": "held"
         },
         {
           "label": "held lifetime agrees with state",
@@ -1538,7 +1537,7 @@
       "suite": "structural",
       "id": "T14/reject/\"A\"",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -1546,13 +1545,11 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "coherent mixed callback 0",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "changed mixed truth is observed",
@@ -1578,7 +1575,8 @@
             {
               "x": 0,
               "y": 0,
-              "z": 0
+              "z": 0,
+              "entities": []
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
@@ -1924,7 +1922,7 @@
       "suite": "structural",
       "id": "T14/accept/\"a.b\"",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -1932,8 +1930,7 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":1,\"y\":0,\"z\":0},\"expected\":{\"x\":1,\"y\":0,\"z\":0,\"entities\":[{\"key\":\"a.b\",\"value\":{\"name\":\"mixed\",\"score\":0}}]}}"
+          "status": "held"
         },
         {
           "label": "held lifetime agrees with state",
@@ -1964,7 +1961,7 @@
       "suite": "structural",
       "id": "T14/reject/\"a.b\"",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -1972,13 +1969,11 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "coherent mixed callback 0",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "changed mixed truth is observed",
@@ -2004,7 +1999,8 @@
             {
               "x": 0,
               "y": 0,
-              "z": 0
+              "z": 0,
+              "entities": []
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
@@ -2350,7 +2346,7 @@
       "suite": "structural",
       "id": "T14/accept/\"a/b\"",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -2358,8 +2354,7 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":1,\"y\":0,\"z\":0},\"expected\":{\"x\":1,\"y\":0,\"z\":0,\"entities\":[{\"key\":\"a/b\",\"value\":{\"name\":\"mixed\",\"score\":0}}]}}"
+          "status": "held"
         },
         {
           "label": "held lifetime agrees with state",
@@ -2390,7 +2385,7 @@
       "suite": "structural",
       "id": "T14/reject/\"a/b\"",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -2398,13 +2393,11 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "coherent mixed callback 0",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "changed mixed truth is observed",
@@ -2430,7 +2423,8 @@
             {
               "x": 0,
               "y": 0,
-              "z": 0
+              "z": 0,
+              "entities": []
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
@@ -2776,7 +2770,7 @@
       "suite": "structural",
       "id": "T14/accept/\"a::b\"",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -2784,8 +2778,7 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":1,\"y\":0,\"z\":0},\"expected\":{\"x\":1,\"y\":0,\"z\":0,\"entities\":[{\"key\":\"a::b\",\"value\":{\"name\":\"mixed\",\"score\":0}}]}}"
+          "status": "held"
         },
         {
           "label": "held lifetime agrees with state",
@@ -2816,7 +2809,7 @@
       "suite": "structural",
       "id": "T14/reject/\"a::b\"",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -2824,13 +2817,11 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "coherent mixed callback 0",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "changed mixed truth is observed",
@@ -2856,7 +2847,8 @@
             {
               "x": 0,
               "y": 0,
-              "z": 0
+              "z": 0,
+              "entities": []
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
@@ -3202,7 +3194,7 @@
       "suite": "structural",
       "id": "T14/accept/\"jo.doe@example.com\"",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -3210,8 +3202,7 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":1,\"y\":0,\"z\":0},\"expected\":{\"x\":1,\"y\":0,\"z\":0,\"entities\":[{\"key\":\"jo.doe@example.com\",\"value\":{\"name\":\"mixed\",\"score\":0}}]}}"
+          "status": "held"
         },
         {
           "label": "held lifetime agrees with state",
@@ -3242,7 +3233,7 @@
       "suite": "structural",
       "id": "T14/reject/\"jo.doe@example.com\"",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -3250,13 +3241,11 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "coherent mixed callback 0",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "changed mixed truth is observed",
@@ -3282,7 +3271,8 @@
             {
               "x": 0,
               "y": 0,
-              "z": 0
+              "z": 0,
+              "entities": []
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
@@ -3628,7 +3618,7 @@
       "suite": "structural",
       "id": "T14/accept/\"1.2.3\"",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -3636,8 +3626,7 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":1,\"y\":0,\"z\":0},\"expected\":{\"x\":1,\"y\":0,\"z\":0,\"entities\":[{\"key\":\"1.2.3\",\"value\":{\"name\":\"mixed\",\"score\":0}}]}}"
+          "status": "held"
         },
         {
           "label": "held lifetime agrees with state",
@@ -3668,7 +3657,7 @@
       "suite": "structural",
       "id": "T14/reject/\"1.2.3\"",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -3676,13 +3665,11 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "coherent mixed callback 0",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "changed mixed truth is observed",
@@ -3708,7 +3695,8 @@
             {
               "x": 0,
               "y": 0,
-              "z": 0
+              "z": 0,
+              "entities": []
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
@@ -4054,7 +4042,7 @@
       "suite": "structural",
       "id": "T14/accept/1",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -4062,8 +4050,7 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":1,\"y\":0,\"z\":0},\"expected\":{\"x\":1,\"y\":0,\"z\":0,\"entities\":[{\"key\":1,\"value\":{\"name\":\"mixed\",\"score\":0}}]}}"
+          "status": "held"
         },
         {
           "label": "held lifetime agrees with state",
@@ -4094,7 +4081,7 @@
       "suite": "structural",
       "id": "T14/reject/1",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -4102,13 +4089,11 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "coherent mixed callback 0",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "changed mixed truth is observed",
@@ -4134,7 +4119,8 @@
             {
               "x": 0,
               "y": 0,
-              "z": 0
+              "z": 0,
+              "entities": []
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
@@ -4480,7 +4466,7 @@
       "suite": "structural",
       "id": "T14/accept/\"1\"",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -4488,8 +4474,7 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":1,\"y\":0,\"z\":0},\"expected\":{\"x\":1,\"y\":0,\"z\":0,\"entities\":[{\"key\":\"1\",\"value\":{\"name\":\"mixed\",\"score\":0}}]}}"
+          "status": "held"
         },
         {
           "label": "held lifetime agrees with state",
@@ -4520,7 +4505,7 @@
       "suite": "structural",
       "id": "T14/reject/\"1\"",
       "scope": "independent mixed scalar + structural settlement and coherent owner publication",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "mixed settlement succeeds",
@@ -4528,13 +4513,11 @@
         },
         {
           "label": "whole mixed state",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "coherent mixed callback 0",
-          "status": "violated",
-          "detail": "{\"actual\":{\"x\":0,\"y\":0,\"z\":0},\"expected\":{\"x\":0,\"y\":0,\"z\":0,\"entities\":[]}}"
+          "status": "held"
         },
         {
           "label": "changed mixed truth is observed",
@@ -4560,7 +4543,8 @@
             {
               "x": 0,
               "y": 0,
-              "z": 0
+              "z": 0,
+              "entities": []
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."

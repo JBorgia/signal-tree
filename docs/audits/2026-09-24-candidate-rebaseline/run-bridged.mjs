@@ -82,7 +82,10 @@ if (target === '--native') {
   // same construction serves all three fixture roles. That is the protocol's
   // shape, not a convenience.
   const make = async () => createBridge(create, { profile });
-  factoryFor = { scalar: make, occupied: make, structural: make };
+  // Mirror the native split: makeCurrent projects scalars, makeStructural also
+  // projects entities into the snapshot.
+  const makeStructural = async () => createBridge(create, { profile, projectEntities: true });
+  factoryFor = { scalar: make, occupied: make, structural: makeStructural };
 }
 
 const suites = [

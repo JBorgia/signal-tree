@@ -107,6 +107,37 @@ for (const [label, over] of [
   );
 }
 
+// D4: state() is a model call too. Found by CALIBRATION, not by hand: 17 rows
+// where native reported `unsupported` came back as `error` because these two
+// call sites bypassed the translator.
+for (const label of ['readSettlementState', 'hasPendingAuthority']) {
+  const f = createBridge(
+    model({ state: () => { throw new ModelUnsupported('no per-op dispositions'); } }).create
+  );
+  const h = f.candidate.beginContribution(() => f.write('x', 1));
+  refuses(
+    () => (label === 'readSettlementState' ? f.candidate.readSettlementState(h) : f.hasPendingAuthority(h)),
+    `D4 model gap via ${label} is translated to the contract class`
+  );
+}
+
+// D5: a LAZY model object whose property access throws. current.mjs exposes
+// `dispositions` as a getter, so wrapping only the model.state() CALL left the
+// real throw outside the translator and 17 rows came back `error` where native
+// said `unsupported`. Only calibration surfaced this; no hand review did.
+{
+  const lazy = () => ({
+    status: 'pending',
+    authority: true,
+    get dispositions() {
+      throw new ModelUnsupported('no per-operation dispositions');
+    },
+  });
+  const f = createBridge(model({ state: lazy }).create);
+  const h = f.candidate.beginContribution(() => f.write('x', 1));
+  refuses(() => f.candidate.readSettlementState(h), 'D5 a throwing GETTER is translated, not just a throwing call');
+}
+
 // ---------------------------------------------------------------------- D2
 // The frozen fixtures start from {x,y,z:0} with an EMPTY entity map. Using
 // PROTOCOL's default seed (one entity at key 'A') put every membership count
@@ -131,6 +162,34 @@ for (const [label, over] of [
   const mine = { values: [{ path: ['q'], value: 9 }], entities: [] };
   createBridge(m.create, { seed: mine });
   check(m.seenSeeds[0] === mine, 'D2 an explicit caller seed is not overridden');
+}
+
+// D6: the snapshot must mirror the native fixture's shape FOR ITS ROLE.
+// makeCurrent projects scalars only; makeStructural also merges `entities`.
+// Dropping entities silently manufactured `violated` verdicts on every mixed
+// scalar+entity comparison -- it accounted for ALL 16 of frontier's apparent
+// violations. The observer path needs the same shape as the direct reads.
+{
+  const withEntity = {
+    read: () => ({ values: [{ path: ['x'], value: 1 }], entities: [{ ref: 'r', key: 'A', fields: { name: 'n', score: 0 } }] }),
+  };
+  const scalarRole = createBridge(model(withEntity).create);
+  check(scalarRole.candidate.readVisible().entities === undefined,
+    'D6 scalar role does NOT project entities');
+
+  const structuralRole = createBridge(model(withEntity).create, { projectEntities: true });
+  const snap = structuralRole.candidate.readVisible();
+  check(Array.isArray(snap.entities) && snap.entities.length === 1 && snap.entities[0].key === 'A',
+    'D6 structural role DOES project entities', JSON.stringify(snap));
+
+  let observed;
+  const m2 = model({ ...withEntity, observe: (cb) => { observed = cb; return () => undefined; } });
+  const obsRole = createBridge(m2.create, { projectEntities: true });
+  let seen;
+  obsRole.candidate.observeVisible((s) => { seen = s; });
+  observed();
+  check(Array.isArray(seen?.entities) && seen.entities.length === 1,
+    'D6 the OBSERVER uses the same role-aware shape as the reads', JSON.stringify(seen));
 }
 
 // ------------------------------------------------------------ honesty rules
