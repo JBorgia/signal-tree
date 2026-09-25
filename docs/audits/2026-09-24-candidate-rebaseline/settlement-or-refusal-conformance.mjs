@@ -155,6 +155,12 @@ const evaluate = async (factory, spec) => {
     }
 
     if (f.second) {
+      // A SECOND PUBLICATION BOUNDARY. Checking snapshots only around the first
+      // settlement left the second unguarded: an adapter that published
+      // {x:99,y:99,z:99} during P2's settlement and then restored the correct
+      // final values scored clean, because the ending looked right — the same
+      // shape as the mid-sequence state hole, one step later.
+      const mark2 = delivered.length;
       let secondResult;
       try { secondResult = f.second(); }
       catch (error) {
@@ -168,6 +174,14 @@ const evaluate = async (factory, spec) => {
         bad(`the second settlement returned '${secondResult?.status}', expected 'settled'`);
       if (authorityOf(c, f.other) !== false)
         bad('the OTHER handle is not terminal after its own settlement');
+      if (!spec.unflushed) {
+        out.deliveredBySecond = delivered.slice(mark2);
+        const permitted2 = [spec.expectedAfterFirst, spec.expectedFinal];
+        const torn2 = out.deliveredBySecond.filter((d) => !permitted2.some((q) => eq(d, q)));
+        out.tornPublicationsSecond = torn2;
+        if (torn2.length)
+          bad(`the second settlement published ${torn2.length} incoherent snapshot(s): ${JSON.stringify(torn2.slice(0, 2))}`);
+      }
     }
 
     const final = snap(c);
@@ -184,9 +198,22 @@ const evaluate = async (factory, spec) => {
   return out;
 };
 
-const rows = [];
-for (const spec of CASES) rows.push(await evaluate(create, spec));
-const violations = rows.flatMap((r) => r.violations);
+/** Exported so a self-test can drive the SAME cases with deliberate doubles. */
+export const runConformance = async (factory) => {
+  const rows = [];
+  for (const spec of CASES) rows.push(await evaluate(factory, spec));
+  return { rows, violations: rows.flatMap((r) => r.violations) };
+};
+
+// Only run the incumbent when invoked DIRECTLY. Importing this module for its
+// `runConformance` export must not drag the kernel bundle and a full run along
+// with it — the self-test imports it and would otherwise be coupled to both.
+const invokedDirectly =
+  process.argv[1] && import.meta.url.endsWith(process.argv[1].split('/').pop());
+if (!invokedDirectly) {
+  // eslint-disable-next-line no-empty
+} else {
+const { rows, violations } = await runConformance(create);
 
 const report = {
   provenance: provenanceFor(import.meta.url),
@@ -203,3 +230,4 @@ console.log(JSON.stringify({ outcomes: report.outcomes, violations, publicationU
 const out = process.argv[2];
 if (out) writeFileSync(out, JSON.stringify(report, null, 2) + '\n');
 process.exitCode = violations.length ? 1 : 0;
+}

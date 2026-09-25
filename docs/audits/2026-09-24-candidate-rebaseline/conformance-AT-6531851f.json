@@ -5,12 +5,12 @@
     "bundleSha256": "c8eac5b8a8f1f94638d1751a6a2bc75bd59d01454bb26166a52fa3b3d1478764",
     "bundleBytes": 511993,
     "scenario": "settlement-or-refusal-conformance.mjs",
-    "scenarioSha256_16": "b3eff9ed4c80b9d9",
+    "scenarioSha256_16": "e228ee764af6250a",
     "adapterSha256_16": "4255ac89b238ed3a",
     "runnerSha256_16": "5afb9872b7d770a8",
     "assertionsSha256_16": "2182d9bbbe33aa92",
     "node": "v24.15.0",
-    "generatedAt": "2026-09-25T00:47:04.289Z"
+    "generatedAt": "2026-09-25T01:05:11.179Z"
   },
   "kind": "settlement-or-refusal-conformance",
   "publicationScope": "observe() is flush-driven and filters unchanged snapshots; a clean result means no DISALLOWED CHANGED SNAPSHOT reached that projection, not zero native notifications",
