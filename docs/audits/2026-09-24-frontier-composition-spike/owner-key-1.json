@@ -1,0 +1,75 @@
+{
+  "probe": "OWNER-KEY-1-half1",
+  "scalar": {
+    "effects": [
+      {
+        "kind": "set",
+        "path": "x",
+        "ownerPath": "x",
+        "position": 2,
+        "before": 0,
+        "after": 5,
+        "mutationIntent": "replace"
+      }
+    ],
+    "laterEffects": []
+  },
+  "field": {
+    "effects": [
+      {
+        "kind": "set",
+        "path": "rows.A.score",
+        "ownerPath": "rows",
+        "position": 3,
+        "subject": 1,
+        "subjectFieldSegments": [
+          "score"
+        ],
+        "before": 1,
+        "after": 9
+      }
+    ],
+    "laterEffects": []
+  },
+  "added": {
+    "effects": [
+      {
+        "kind": "add",
+        "subject": 2,
+        "key": "Z",
+        "value": {
+          "id": "Z",
+          "name": "z",
+          "score": 0
+        },
+        "beforeSubject": 1,
+        "ownerPath": "rows",
+        "path": "rows.Z",
+        "position": 3
+      }
+    ],
+    "laterEffects": []
+  },
+  "checks": [
+    {
+      "label": "C entity FIELD effect carries a SubjectId",
+      "ok": true,
+      "detail": "subject=1"
+    },
+    {
+      "label": "C entity FIELD effect carries a scoped leaf coordinate",
+      "ok": true,
+      "detail": "segments=[\"score\"]"
+    },
+    {
+      "label": "C scalar effect has NO subject (distinct identity class)",
+      "ok": true,
+      "detail": "subject=undefined"
+    },
+    {
+      "label": "C subject EXISTENCE effect carries a SubjectId (the F3 row)",
+      "ok": true,
+      "detail": "subject=2"
+    }
+  ]
+}
