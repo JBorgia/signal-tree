@@ -1,0 +1,49 @@
+{
+  "probe": "L19-DORMANT-COST",
+  "N": 200000,
+  "TRIALS": 11,
+  "mBase": 16.191042,
+  "mDorm": 53.340167,
+  "delta": 229.44245960204412,
+  "noise": 12.936165566119834,
+  "bytesBase": -0.08172,
+  "bytesDorm": -0.074,
+  "base": [
+    14.653167,
+    16.12625,
+    16.265667,
+    16.747667,
+    16.279583,
+    16.3865,
+    16.140541,
+    16.111,
+    16.170417,
+    16.285333,
+    16.191042
+  ],
+  "dormant": [
+    56.034042,
+    55.13,
+    56.321334,
+    52.943125,
+    53.340167,
+    54.191167,
+    52.812916,
+    52.421958,
+    52.786875,
+    52.864542,
+    53.78025
+  ],
+  "checks": [
+    {
+      "label": "L19 TIME installing transactions() with nothing transactional is within the noise floor",
+      "ok": false,
+      "detail": "delta 229.4% vs noise 12.9%"
+    },
+    {
+      "label": "L19 ALLOCATION a dormant enhancer retains no meaningful per-write state",
+      "ok": true,
+      "detail": "-0.07 bytes/write retained (base -0.08)"
+    }
+  ]
+}
