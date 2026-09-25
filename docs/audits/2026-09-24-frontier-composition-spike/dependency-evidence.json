@@ -1,0 +1,33 @@
+{
+  "question": "is later-pending-dependency load-bearing?",
+  "verdict": "INDISTINGUISHABLE — the refusal is a conservative over-approximation",
+  "results": [
+    {
+      "label": "literal   y(1)",
+      "rollback": "settled",
+      "final": {
+        "x": 0,
+        "y": 1
+      },
+      "pendingY": 1
+    },
+    {
+      "label": "dependent y(x())",
+      "rollback": "settled",
+      "final": {
+        "x": 0,
+        "y": 1
+      },
+      "pendingY": 1
+    },
+    {
+      "label": "unrelated y(y()+5)",
+      "rollback": "settled",
+      "final": {
+        "x": 0,
+        "y": 5
+      },
+      "pendingY": 5
+    }
+  ]
+}
