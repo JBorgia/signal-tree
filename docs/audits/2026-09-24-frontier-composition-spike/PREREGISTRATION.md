@@ -282,3 +282,68 @@ Implement only enough of B to make F3 real, then run F5 IMMEDIATELY. If F5 shows
 no meaningful independent-progress gain, stop and reassess rather than
 continuing to refine ownership. The ownership model is not the deliverable; the
 Link/L16 behaviour is.
+
+---
+
+# OWNER-SEAM-1 — the answer is NO for B, and it REVERSES the recommendation
+
+Question: can `{node, semanticOwner}` meet at the existing mutation boundary
+without new global hot-path coupling?
+
+## Two corrections to OWNER-SEAM-0 accepted first
+
+Candidate A does NOT require durable per-location metadata with explicit
+retirement cleanup. `WeakMap<DependencyNode, PositionId>` works: the PositionId
+already exists, the mapping is weak, and a dead node drops its entry. A also
+needs no key-reuse special cases -- that flaw belonged to ADDRESS matching, not
+to node->position mapping. The retirement criterion therefore does NOT decide
+between them, and OWNER-SEAM-0 overstated B's advantage on exactly the criterion
+it called decisive.
+
+B is also not cleanup-free: settlement needs the reverse relation
+`P1 -> {nodeX, nodeY, subjectAnchor}` so claims can be released. That is
+transient correctness state and it does require terminal cleanup.
+
+## The finding
+
+**The entire write-to-transaction delivery path speaks PositionId, not
+DependencyNode.** PathNotifier's payload carries `positionIds`, and the
+transaction runtime builds turns from `positionIds` (transactions.ts:158, 687,
+710). Transactions already receive writes this way.
+
+So B's real cost is not obtaining the node -- it is that the boundary which
+already delivers writes to the transaction layer does not speak in nodes. B
+would need either the notifier payload extended to carry nodes, which changes a
+measured hot path, or an ambient current-owner consulted per write.
+
+**The kernel already tried the ambient mechanism and rejected it**
+(intrinsic-mutation.ts:18-22):
+
+> "A first fix short-circuited on a process-wide installed-observer count. It
+> MEASURED WELL but it is the wrong ownership boundary: one observer installed
+> anywhere puts the probe back on every unrelated tree in the process. Pay for
+> use belongs at the smallest practical boundary."
+
+That is a documented, measured rejection of precisely the shape B needs. The
+existing observer boundary is per-leaf and pay-for-use, and a transaction cannot
+pre-register on leaves it has not yet seen, so B cannot ride it either.
+
+## Revised recommendation: Candidate A
+
+Not because B's identity story is wrong -- OWNER-KEY-0's subject-anchor result
+still makes node identity the natural ownership key -- but because A joins the
+captured read identity to the stream the transaction layer ALREADY consumes,
+with one weak mapping and no hot-path change:
+
+    captured DependencyNode
+      -> WeakMap<DependencyNode, PositionId>     <- the only new thing
+      -> existing positionIds already on the turn
+      -> owner
+
+B's elegance was real but it was measured against the wrong cost. The seam is
+not three lines in one file; it is a new ambient ownership channel on the
+hottest path, of the exact kind this kernel already removed on measurement.
+
+**Candidate A: LEADING. Neither selected.** The remaining unknown for A is
+whether a node can be mapped to its PositionId at creation, where both are in
+scope -- unverified, and the next thing to check.
