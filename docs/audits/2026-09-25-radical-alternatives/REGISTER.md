@@ -79,3 +79,30 @@ semantics, or imposes cost on trees with no Link.
 Promote if: it dissolves BOTH F5-A and F5-B.
 Partial: if it dissolves only F5-A, the obligation model shrinks to dependency
 only, which is still a large deletion and must be taken.
+
+---
+
+## FROZEN RULE — authority is a partial order (from AUTHORITY-1 row E)
+
+> **A semantic fact has a selectable frontier only when there is a UNIQUE
+> MAXIMAL candidate under the explicit authority relation.**
+
+If two live candidates are incomparable, SignalTree must NOT invent an order.
+L12 is explicit: "The kernel never infers authority order from arrival order.
+Authority order comes from the semantic contract of the INGRESS OPERATION, or
+from explicit authority evidence."
+
+The obvious contribution-store implementation violated this SILENTLY, resolving
+incomparable domains by insertion order. Nothing in the other authority rows
+exposed it; only modelling authority as a relation rather than a scalar did.
+
+**Resolution, decided now rather than deferred:** no public conflict value is
+added. The ingress contract must supply enough authority evidence to establish a
+legal frontier, and an ingress that does not is REFUSED before incoherent truth
+is published. A first-class user-visible conflict state is introduced only if
+unresolved multi-authority truth is later decided to be a product feature in its
+own right.
+
+Also recorded from AUTHORITY-1: the base must carry the authority that produced
+it, or compaction erases ordering and a later lower-authority write wins. That
+is one tag on current truth, not retained history.
