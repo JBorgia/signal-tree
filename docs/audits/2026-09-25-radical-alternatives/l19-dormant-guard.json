@@ -1,0 +1,127 @@
+{
+  "probe": "L19-DORMANT-GUARD",
+  "summary": {
+    "dormant": {
+      "baseline": 72.310375,
+      "guarded": 31.862125,
+      "delta": -55.936993826957746
+    },
+    "active-1%": {
+      "baseline": 101.605167,
+      "guarded": 82.851209,
+      "delta": -18.457681389372645
+    },
+    "active-100%": {
+      "baseline": 985.495667,
+      "guarded": 1007.279291,
+      "delta": 2.2104231129003957
+    }
+  },
+  "checks": [
+    {
+      "label": "CORRECTNESS BASELINE: the turn is recorded and rolls back to 0",
+      "ok": true,
+      "detail": "pendingTurns=1 rollback=settled x=0"
+    },
+    {
+      "label": "CORRECTNESS GUARDED: the turn is recorded and rolls back to 0",
+      "ok": true,
+      "detail": "pendingTurns=1 rollback=settled x=0"
+    },
+    {
+      "label": "GATE a guard raised AFTER the write LOSES causal evidence silently -- x does not revert",
+      "ok": true,
+      "detail": "x=1 rollback=settled (this is the failure the gate forbids)"
+    },
+    {
+      "label": "COST dormant is substantially cheaper with the guard",
+      "ok": true,
+      "detail": "-56%"
+    },
+    {
+      "label": "COST fully active is not materially penalised",
+      "ok": true,
+      "detail": "2%"
+    }
+  ],
+  "raw": {
+    "dormant/BASELINE": [
+      63.540792,
+      69.330375,
+      63.909292,
+      59.94825,
+      72.50475,
+      65.773709,
+      62.414667,
+      102.461208,
+      76.333625,
+      72.310375,
+      69.419541
+    ],
+    "dormant/GUARDED": [
+      19.76275,
+      30.177291,
+      31.4585,
+      24.520167,
+      37.116417,
+      26.758708,
+      31.862125,
+      49.127667,
+      34.373334,
+      29.496875,
+      29.71675
+    ],
+    "active-1%/BASELINE": [
+      73.85775,
+      137.270083,
+      74.498708,
+      73.142541,
+      120.799209,
+      79.597625,
+      101.605167,
+      94.070084,
+      369.231625,
+      97.87725,
+      109.699333
+    ],
+    "active-1%/GUARDED": [
+      63.529375,
+      82.09125,
+      81.013542,
+      71.387458,
+      71.089125,
+      79.288584,
+      125.194417,
+      89.54,
+      81.707,
+      89.609,
+      82.851209
+    ],
+    "active-100%/BASELINE": [
+      789.530041,
+      895.445708,
+      998.7785,
+      894.905541,
+      878.036167,
+      985.495667,
+      1168.737417,
+      960.619125,
+      950.907541,
+      1031.41075,
+      1021.491417
+    ],
+    "active-100%/GUARDED": [
+      1055.673458,
+      973.551583,
+      848.776458,
+      847.563125,
+      910.886041,
+      1102.634333,
+      1055.1835,
+      971.823375,
+      963.832083,
+      1302.546042,
+      1007.279291
+    ]
+  }
+}
