@@ -28,6 +28,15 @@ const PATCHES={
     const a='notifier.subscribe(';
     if(!s.includes(a)) throw new Error('ANCHOR MISS subscribe');
     return s.replace(a,'((..._a: never[]) => (() => undefined))('); },
+  // The arm that was MISSING: neither notifier registration. Without it,
+  // nothing licenses a claim about what survives removing both.
+  'NO-BOTH': (s)=>{
+    const a='notifier.observeEnqueue(treeOwnerId,';
+    const b2='notifier.subscribe(';
+    if(!s.includes(a)) throw new Error('ANCHOR MISS enqueue');
+    if(!s.includes(b2)) throw new Error('ANCHOR MISS subscribe');
+    return s.replace(a,'((_id: never, _cb: never) => (() => undefined))(treeOwnerId as never,')
+            .replace(b2,'((..._a: never[]) => (() => undefined))('); },
 };
 const bundles={};
 for(const [name,patch] of Object.entries(PATCHES)){
