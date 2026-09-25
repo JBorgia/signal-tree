@@ -1,0 +1,74 @@
+{
+  "probe": "DEPENDENCY-1",
+  "semantics": [
+    {
+      "label": "A literal      y(1)",
+      "expect": [],
+      "observed": [],
+      "rawCount": 0,
+      "pass": true
+    },
+    {
+      "label": "B dependency   y(x())",
+      "expect": [
+        "x"
+      ],
+      "observed": [
+        "x"
+      ],
+      "rawCount": 1,
+      "pass": true
+    },
+    {
+      "label": "C unrelated    y(z())",
+      "expect": [
+        "z"
+      ],
+      "observed": [
+        "z"
+      ],
+      "rawCount": 1,
+      "pass": true
+    },
+    {
+      "label": "D hoisted      v=x(); y(v)",
+      "expect": [],
+      "observed": [],
+      "rawCount": 0,
+      "pass": true
+    },
+    {
+      "label": "E repeated     y(x()+x())",
+      "expect": [
+        "x"
+      ],
+      "observed": [
+        "x"
+      ],
+      "rawCount": 1,
+      "pass": true
+    }
+  ],
+  "cost": [
+    {
+      "label": "point write, no capture",
+      "nsPerOp": 511.97
+    },
+    {
+      "label": "point write, inside capture",
+      "nsPerOp": 319.48
+    },
+    {
+      "label": "capture with ZERO reads",
+      "nsPerOp": 41.96
+    },
+    {
+      "label": "capture with ONE read",
+      "nsPerOp": 414.49
+    },
+    {
+      "label": "capture with TEN reads",
+      "nsPerOp": 1334.67
+    }
+  ]
+}
