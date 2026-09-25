@@ -10,8 +10,10 @@ declare const ngDevMode: boolean | undefined;
  *
  * ⚠️ NOT "every error the library catches" — that was the original aspiration
  * and it was never true. The measured producer inventory is deliberately narrow:
- * `link` and `stored`. Every other catch site still handles its own error
- * locally and does not participate here.
+ * `link` and `stored`, plus (15.3.1) an observer error that the path notifier
+ * or a transaction lifecycle listener CONTAINED rather than let escape
+ * ({@link reportContainedObserverError}). Every other catch site still handles
+ * its own error locally and does not participate here.
  *
  * ## Why this exists
  *
@@ -111,9 +113,12 @@ export function onTreeError(
  * that would make adding error REPORTING a source of errors, and the failure
  * would surface at whichever marker happened to report first, which is the
  * least debuggable outcome available.
+ *
+ * @returns whether any listener observed the report, so a producer that must
+ * not go silent can fall back when nobody is listening.
  */
-export function reportTreeError(event: TreeErrorEvent): void {
-  if (listeners.size === 0) return;
+export function reportTreeError(event: TreeErrorEvent): boolean {
+  if (listeners.size === 0) return false;
   for (const listener of listeners) {
     try {
       listener(event);
@@ -127,6 +132,44 @@ export function reportTreeError(event: TreeErrorEvent): void {
       }
     }
   }
+  return true;
+}
+
+/**
+ * Report an error an OBSERVER threw and SignalTree contained
+ * (TX-OBSERVER-STRAND-0): a write subscriber during deferred delivery, or a
+ * transaction lifecycle listener. The write or turn it observed already
+ * exists, so the error must not escape into whoever flushed.
+ *
+ * Goes to `onTreeError` like any other report. The FALLBACK is explicit:
+ * when no listener is registered, or the failure carries no tree to attribute
+ * it to, it is written to `console.error` as [ST2034] — in production too.
+ * These errors used to throw; containing them must not make them silent.
+ */
+export function reportContainedObserverError(event: {
+  readonly error: unknown;
+  readonly operation: 'notify:subscriber' | 'transaction:listener';
+  readonly treeId?: TreeId;
+  readonly path?: string;
+}): void {
+  const { error, operation, treeId, path } = event;
+  if (
+    treeId !== undefined &&
+    reportTreeError({
+      error,
+      operation,
+      treeId,
+      ...(path === undefined ? {} : { path }),
+    })
+  ) {
+    return;
+  }
+  console.error(
+    operation === 'notify:subscriber'
+      ? `SignalTree: a write subscriber threw while observing '${path}'; delivery continued. [ST2034]`
+      : 'SignalTree: a transaction lifecycle listener threw; the transaction continued. [ST2034]',
+    error
+  );
 }
 
 /** Test seam — listeners are module-global, so a spec must be able to reset. */
