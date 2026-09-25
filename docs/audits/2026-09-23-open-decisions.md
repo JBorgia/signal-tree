@@ -142,3 +142,35 @@ such.
 Evidence: `docs/audits/2026-09-25-radical-alternatives/` —
 `l19-dormant-cost`, `l19-ablation-0b`, `l19-ablation-2`, `l19-dormant-guard`,
 `l19-profile-diff.md`.
+
+### UPDATE 2026-09-25 — Phase 2/3 outcome: blocked on a semantics decision
+
+The earlier porting sequence ("port a guarded implementation") is SUPERSEDED.
+The guarded implementation it assumed is unsafe (see the correction above), and
+investigating a safe one found the cost is load-bearing.
+
+**The v16-only regression is fixed** on main in `45f4ed8e`: dormant penalty
++223% -> +86%, back to v15.3.0's +88%.
+
+**That fix has nothing to port to v15.** v15.3.0 contains no `observeEnqueue`
+anywhere in the kernel. Its entire +88% is notification EMISSION.
+
+**Emission cannot be reduced mechanically**, because it is load-bearing twice:
+
+    1. OTHER CONSUMERS -- link(), restoration, devtools, provenance,
+       write-observation and diagnostics all subscribe to the same notifier.
+       Silencing emission silences them (measured: Link stops delivering).
+    2. TRANSACTIONS ITSELF -- its permanent '**' subscription is NOT a no-op
+       when dormant. Ordinary writes outside any transaction are captured and
+       recorded as CONFIRMED TURNS (`authority.recordConfirmed`), observable
+       through the confirmed count and `transactions({history:{retain:N}})`.
+
+**The decision this needs (owner):** in the default correctness-only retention
+mode (L15), must an ordinary write made while NO turn is pending produce a
+confirmed-turn record at all? If not -- because no future rollback can depend on
+a write that precedes every pending turn -- then the '**' subscription can be
+made lazy like the evidence observer, and the notifier could skip enqueueing for
+owners with no consumer. If yes, the ~87% is the cost of that contract and the
+v15 patch does not exist.
+
+Until that is decided there is no safe v15 patch to prepare, and none was.
