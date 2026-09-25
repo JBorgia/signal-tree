@@ -358,3 +358,40 @@ The native kernel holds all 16. Draft cannot, without simulating a live overlay
 around the draft -- which the frozen promotion rule names in advance as the
 finding that **draft is not actually simpler for this product**, and forbids
 implementing quietly. It is recorded here as that finding, not repaired.
+
+---
+
+# Incumbent-unavailable rows — exact accounting, 2026-09-24
+
+An earlier write-up said "the 52 incumbent-unavailable rows... are exactly the
+L15 retention rows and the link rows." Both halves of that were imprecise.
+
+**The count is 53, not 52.** The calibration matrix shows
+
+    held     -> unsupported   52
+    violated -> unsupported    1
+
+and only the first was carried into the prose.
+
+**The 52 are not purely L15/Link:**
+
+    41  confirmedCount (L15 retention)
+     9  Link
+     2  "No native occupied-key refusal fixture"
+
+**The 53rd row is `A1/unrelated-snapshot`, and it is an AUTHORITY row.** It is
+worth naming rather than absorbing into a total, because the two paths refuse at
+DIFFERENT points:
+
+    native   records a real violation first -- `visible y: actual 7, expected 1`
+             -- and only then hits "exposes no canonical/pending split"
+    bridged  refuses earlier, at "CURRENT has no authority payload / revision /
+             settlement-relation API", and never reaches that assertion
+
+So on this row **the bridge hides a genuine incumbent violation** by refusing
+sooner. This is not a distortion in the dangerous direction -- it does not turn
+a violation into a pass -- but it does mean the bridged path under-reports
+incumbent violations by exactly one, which is the whole of the 57-vs-58 gap
+between bridged and native. The calibration matrix is still clean; "unsupported"
+is an honest answer for a refusal the bridge reaches first. It is recorded here
+so the gap is explained rather than merely small.
