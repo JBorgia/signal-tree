@@ -1,0 +1,4846 @@
+{
+  "provenance": {
+    "harness": "SEMANTICS-2 frozen cases via shared protocol bridge",
+    "path": "bridged",
+    "model": "/Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/replay.mjs",
+    "profile": "live",
+    "kernelRevision": "6ae860c8202d174ccf3bf48d2314374a6f2caf10",
+    "node": "v24.15.0",
+    "generatedAt": "2026-09-25T02:04:52.725Z",
+    "sha256_16": {
+      "bridge": "3d7627247d94703b",
+      "runner": "3d604ba93085ba3f",
+      "model": "86186a033e6d7c50",
+      "contract": "d94c8e8d26d9ed46",
+      "supplemental": "5459e2ebe639a3d3",
+      "structural": "0cd3ab1983ba635f",
+      "authority": "6c0e348eccd14bee",
+      "currentAdapter": "7838c1309e36f92f"
+    },
+    "note": "Composition is NOT bridged; see the disposition audit."
+  },
+  "totals": {
+    "held": 43,
+    "unsupported": 210
+  },
+  "rows": [
+    {
+      "suite": "scalar",
+      "id": "S11/12/AA",
+      "scope": "successful scalar settlement, not refusal safety",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "writer 1 visible",
+          "status": "held"
+        },
+        {
+          "label": "writer 2 visible",
+          "status": "held"
+        },
+        {
+          "label": "author 1 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "author 2 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "author": 1,
+          "operation": "A",
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 2,
+          "operation": "A",
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "S11/12/AR",
+      "scope": "successful scalar settlement, not refusal safety",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "writer 1 visible",
+          "status": "held"
+        },
+        {
+          "label": "writer 2 visible",
+          "status": "held"
+        },
+        {
+          "label": "author 1 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "author 2 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "author": 1,
+          "operation": "A",
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 2,
+          "operation": "R",
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "S11/12/RA",
+      "scope": "successful scalar settlement, not refusal safety",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "writer 1 visible",
+          "status": "held"
+        },
+        {
+          "label": "writer 2 visible",
+          "status": "held"
+        },
+        {
+          "label": "author 1 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "author 2 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "author": 1,
+          "operation": "R",
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 2,
+          "operation": "A",
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "S11/12/RR",
+      "scope": "successful scalar settlement, not refusal safety",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "writer 1 visible",
+          "status": "held"
+        },
+        {
+          "label": "writer 2 visible",
+          "status": "held"
+        },
+        {
+          "label": "author 1 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "author 2 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "author": 1,
+          "operation": "R",
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 2,
+          "operation": "R",
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "S11/21/AA",
+      "scope": "successful scalar settlement, not refusal safety",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "writer 1 visible",
+          "status": "held"
+        },
+        {
+          "label": "writer 2 visible",
+          "status": "held"
+        },
+        {
+          "label": "author 2 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "author 1 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "author": 2,
+          "operation": "A",
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 1,
+          "operation": "A",
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "S11/21/AR",
+      "scope": "successful scalar settlement, not refusal safety",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "writer 1 visible",
+          "status": "held"
+        },
+        {
+          "label": "writer 2 visible",
+          "status": "held"
+        },
+        {
+          "label": "author 2 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "author 1 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "author": 2,
+          "operation": "R",
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 1,
+          "operation": "A",
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "S11/21/RA",
+      "scope": "successful scalar settlement, not refusal safety",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "writer 1 visible",
+          "status": "held"
+        },
+        {
+          "label": "writer 2 visible",
+          "status": "held"
+        },
+        {
+          "label": "author 2 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "author 1 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "author": 2,
+          "operation": "A",
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 1,
+          "operation": "R",
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "S11/21/RR",
+      "scope": "successful scalar settlement, not refusal safety",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "writer 1 visible",
+          "status": "held"
+        },
+        {
+          "label": "writer 2 visible",
+          "status": "held"
+        },
+        {
+          "label": "author 2 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "author 1 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "author": 2,
+          "operation": "R",
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 1,
+          "operation": "R",
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "S12/reject/123",
+      "scope": "three-writer rejection ordering; no claim about mixed outcomes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "three pending writers visible",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 3",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "author": 1,
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 2,
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 3,
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "S12/reject/132",
+      "scope": "three-writer rejection ordering; no claim about mixed outcomes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "three pending writers visible",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 3",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "author": 1,
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 3,
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 2,
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "S12/reject/213",
+      "scope": "three-writer rejection ordering; no claim about mixed outcomes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "three pending writers visible",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 3",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "author": 2,
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 1,
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 3,
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "S12/reject/231",
+      "scope": "three-writer rejection ordering; no claim about mixed outcomes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "three pending writers visible",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 3",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "author": 2,
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 3,
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 1,
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "S12/reject/312",
+      "scope": "three-writer rejection ordering; no claim about mixed outcomes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "three pending writers visible",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 3",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "author": 3,
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 1,
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 2,
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "S12/reject/321",
+      "scope": "three-writer rejection ordering; no claim about mixed outcomes",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "three pending writers visible",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        },
+        {
+          "label": "surgical rejection succeeds",
+          "status": "held"
+        },
+        {
+          "label": "visible after rejection 3",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 3",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "author": 3,
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 2,
+          "result": {
+            "status": "settled"
+          }
+        },
+        {
+          "author": 1,
+          "result": {
+            "status": "settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "S06",
+      "scope": "three-writer single settlement",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "requested successful settlement",
+          "status": "held"
+        },
+        {
+          "label": "newest author still visible",
+          "status": "held"
+        },
+        {
+          "label": "pending author 1",
+          "status": "held"
+        },
+        {
+          "label": "pending author 2",
+          "status": "held"
+        },
+        {
+          "label": "pending author 3",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "scalar",
+      "id": "S08",
+      "scope": "three-writer single settlement",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "requested successful settlement",
+          "status": "held"
+        },
+        {
+          "label": "newest author still visible",
+          "status": "held"
+        },
+        {
+          "label": "pending author 1",
+          "status": "held"
+        },
+        {
+          "label": "pending author 2",
+          "status": "held"
+        },
+        {
+          "label": "pending author 3",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "scalar",
+      "id": "S09",
+      "scope": "three-writer single settlement",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "requested successful settlement",
+          "status": "held"
+        },
+        {
+          "label": "newest author still visible",
+          "status": "held"
+        },
+        {
+          "label": "pending author 1",
+          "status": "held"
+        },
+        {
+          "label": "pending author 2",
+          "status": "held"
+        },
+        {
+          "label": "pending author 3",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "scalar",
+      "id": "S02/ordinary/A",
+      "scope": "later ordinary write survives older settlement",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "older settlement succeeds",
+          "status": "held"
+        },
+        {
+          "label": "ordinary write preserved",
+          "status": "held"
+        },
+        {
+          "label": "old handle no longer pending",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "scalar",
+      "id": "S13/local-frontier/A",
+      "scope": "two pending writers then ordinary committed newer write",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "older settlement succeeds",
+          "status": "held"
+        },
+        {
+          "label": "newer ordinary truth preserved",
+          "status": "held"
+        },
+        {
+          "label": "older settlement succeeds",
+          "status": "held"
+        },
+        {
+          "label": "newer ordinary truth preserved",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "scalar",
+      "id": "S14/confirmed-newer/A",
+      "scope": "newer authored contribution accepted before settling older",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "newer accepted",
+          "status": "held"
+        },
+        {
+          "label": "newer acceptance intermediate",
+          "status": "held"
+        },
+        {
+          "label": "older remains pending",
+          "status": "held"
+        },
+        {
+          "label": "older settlement succeeds",
+          "status": "held"
+        },
+        {
+          "label": "confirmation did not reorder authorship",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "scalar",
+      "id": "S02/ordinary/R",
+      "scope": "later ordinary write survives older settlement",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "older settlement succeeds",
+          "status": "held"
+        },
+        {
+          "label": "ordinary write preserved",
+          "status": "held"
+        },
+        {
+          "label": "old handle no longer pending",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "scalar",
+      "id": "S13/local-frontier/R",
+      "scope": "two pending writers then ordinary committed newer write",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "older settlement succeeds",
+          "status": "held"
+        },
+        {
+          "label": "newer ordinary truth preserved",
+          "status": "held"
+        },
+        {
+          "label": "older settlement succeeds",
+          "status": "held"
+        },
+        {
+          "label": "newer ordinary truth preserved",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "scalar",
+      "id": "S14/confirmed-newer/R",
+      "scope": "newer authored contribution accepted before settling older",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "newer accepted",
+          "status": "held"
+        },
+        {
+          "label": "newer acceptance intermediate",
+          "status": "held"
+        },
+        {
+          "label": "older remains pending",
+          "status": "held"
+        },
+        {
+          "label": "older settlement succeeds",
+          "status": "held"
+        },
+        {
+          "label": "confirmation did not reorder authorship",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "scalar",
+      "id": "S03/refusal-authority",
+      "scope": "conditional refusal safety; never surgical conformance",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: stats().history is not a confirmed-turn count; that inference is not made"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "scalar",
+      "id": "terminal/AA",
+      "scope": "non-mutation only; no inferred terminal disposition",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "first settlement succeeds",
+          "status": "held"
+        },
+        {
+          "label": "first settlement state",
+          "status": "held"
+        },
+        {
+          "label": "first settlement releases native pending membership",
+          "status": "held"
+        },
+        {
+          "label": "later sentinel survives duplicate/opposite call",
+          "status": "held"
+        },
+        {
+          "label": "terminal attempt does not restore pending authority",
+          "status": "held"
+        },
+        {
+          "label": "terminal attempt produces no owner publication",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "secondResult": {
+            "status": "already-settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "terminal/AR",
+      "scope": "non-mutation only; no inferred terminal disposition",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "first settlement succeeds",
+          "status": "held"
+        },
+        {
+          "label": "first settlement state",
+          "status": "held"
+        },
+        {
+          "label": "first settlement releases native pending membership",
+          "status": "held"
+        },
+        {
+          "label": "later sentinel survives duplicate/opposite call",
+          "status": "held"
+        },
+        {
+          "label": "terminal attempt does not restore pending authority",
+          "status": "held"
+        },
+        {
+          "label": "terminal attempt produces no owner publication",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "secondResult": {
+            "status": "already-settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "terminal/RA",
+      "scope": "non-mutation only; no inferred terminal disposition",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "first settlement succeeds",
+          "status": "held"
+        },
+        {
+          "label": "first settlement state",
+          "status": "held"
+        },
+        {
+          "label": "first settlement releases native pending membership",
+          "status": "held"
+        },
+        {
+          "label": "later sentinel survives duplicate/opposite call",
+          "status": "held"
+        },
+        {
+          "label": "terminal attempt does not restore pending authority",
+          "status": "held"
+        },
+        {
+          "label": "terminal attempt produces no owner publication",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "secondResult": {
+            "status": "already-settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "terminal/RR",
+      "scope": "non-mutation only; no inferred terminal disposition",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "first settlement succeeds",
+          "status": "held"
+        },
+        {
+          "label": "first settlement state",
+          "status": "held"
+        },
+        {
+          "label": "first settlement releases native pending membership",
+          "status": "held"
+        },
+        {
+          "label": "later sentinel survives duplicate/opposite call",
+          "status": "held"
+        },
+        {
+          "label": "terminal attempt does not restore pending authority",
+          "status": "held"
+        },
+        {
+          "label": "terminal attempt produces no owner publication",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "secondResult": {
+            "status": "already-settled"
+          }
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "terminal/disposition-reader",
+      "scope": "capability evidence, not fabricated terminal state",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "first rejection succeeds",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "disposition": "rejected",
+          "retainsAuthority": false
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "F09/unchanged-conflict",
+      "scope": "failed-settlement authority, state and retry; real occupied-key fixture",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No native occupied-key refusal fixture"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "scalar",
+      "id": "F10/occupied-retry",
+      "scope": "failed-settlement authority, state and retry; real occupied-key fixture",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: No native occupied-key refusal fixture"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "scalar",
+      "id": "observer/control-disposal",
+      "scope": "actual callback delivery and disposal control",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "subscription synthesizes no initial callback",
+          "status": "held"
+        },
+        {
+          "label": "real authored write delivers an owner callback",
+          "status": "held"
+        },
+        {
+          "label": "callback reads actual visible state",
+          "status": "held"
+        },
+        {
+          "label": "disposed observer receives no callbacks",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "scalar",
+      "id": "O01/multifield-accept",
+      "scope": "coherence at native owner publication boundary",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "successful multi-field settlement",
+          "status": "held"
+        },
+        {
+          "label": "settlement final state",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "snapshots": []
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "O02/multifield-reject",
+      "scope": "coherence at native owner publication boundary",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "successful multi-field settlement",
+          "status": "held"
+        },
+        {
+          "label": "settlement final state",
+          "status": "held"
+        },
+        {
+          "label": "callback 0 is coherent",
+          "status": "held"
+        },
+        {
+          "label": "changed visible truth is observed",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "snapshots": [
+            {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "suite": "scalar",
+      "id": "O05/superseded-accept",
+      "scope": "native observer never sees an old contribution resurrect",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "superseded acceptance succeeds",
+          "status": "held"
+        },
+        {
+          "label": "newer truth survives acceptance",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "snapshots": []
+        }
+      ]
+    },
+    {
+      "suite": "structural",
+      "id": "T01/\"A\"",
+      "scope": "pending add rejected: membership and held lifetime disappear",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T02a/\"A\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/pending/\"A\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/confirmed/\"A\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T03/\"A\"",
+      "scope": "pending add superseded by later removal must not resurrect",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T04/\"A\"",
+      "scope": "later same-key lifetime survives rejection of the old pending add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T05/\"A\"",
+      "scope": "occupied restoration destination: preserve new lifetime and honest authority",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06a/\"A\"",
+      "scope": "independent field write survives reversal of a rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06b/\"A\"",
+      "scope": "vacated source occupied by another lifetime is a real dependency",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T07/\"A\"",
+      "scope": "removal supersedes the rekey; rejecting it cannot resurrect a lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T08/\"A\"",
+      "scope": "destination re-use belongs to a new lifetime, not the old rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T11-I07/\"A\"",
+      "scope": "held references do not follow same-key remove/re-add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T13/\"A\"",
+      "scope": "server realization against pending-created lifetime; canonical assertion remains explicit",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/accept/\"A\"",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/reject/\"A\"",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T01/\"a.b\"",
+      "scope": "pending add rejected: membership and held lifetime disappear",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T02a/\"a.b\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/pending/\"a.b\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/confirmed/\"a.b\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T03/\"a.b\"",
+      "scope": "pending add superseded by later removal must not resurrect",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T04/\"a.b\"",
+      "scope": "later same-key lifetime survives rejection of the old pending add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T05/\"a.b\"",
+      "scope": "occupied restoration destination: preserve new lifetime and honest authority",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06a/\"a.b\"",
+      "scope": "independent field write survives reversal of a rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06b/\"a.b\"",
+      "scope": "vacated source occupied by another lifetime is a real dependency",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T07/\"a.b\"",
+      "scope": "removal supersedes the rekey; rejecting it cannot resurrect a lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T08/\"a.b\"",
+      "scope": "destination re-use belongs to a new lifetime, not the old rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T11-I07/\"a.b\"",
+      "scope": "held references do not follow same-key remove/re-add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T13/\"a.b\"",
+      "scope": "server realization against pending-created lifetime; canonical assertion remains explicit",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/accept/\"a.b\"",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/reject/\"a.b\"",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T01/\"a/b\"",
+      "scope": "pending add rejected: membership and held lifetime disappear",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T02a/\"a/b\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/pending/\"a/b\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/confirmed/\"a/b\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T03/\"a/b\"",
+      "scope": "pending add superseded by later removal must not resurrect",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T04/\"a/b\"",
+      "scope": "later same-key lifetime survives rejection of the old pending add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T05/\"a/b\"",
+      "scope": "occupied restoration destination: preserve new lifetime and honest authority",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06a/\"a/b\"",
+      "scope": "independent field write survives reversal of a rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06b/\"a/b\"",
+      "scope": "vacated source occupied by another lifetime is a real dependency",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T07/\"a/b\"",
+      "scope": "removal supersedes the rekey; rejecting it cannot resurrect a lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T08/\"a/b\"",
+      "scope": "destination re-use belongs to a new lifetime, not the old rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T11-I07/\"a/b\"",
+      "scope": "held references do not follow same-key remove/re-add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T13/\"a/b\"",
+      "scope": "server realization against pending-created lifetime; canonical assertion remains explicit",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/accept/\"a/b\"",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/reject/\"a/b\"",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T01/\"a::b\"",
+      "scope": "pending add rejected: membership and held lifetime disappear",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T02a/\"a::b\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/pending/\"a::b\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/confirmed/\"a::b\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T03/\"a::b\"",
+      "scope": "pending add superseded by later removal must not resurrect",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T04/\"a::b\"",
+      "scope": "later same-key lifetime survives rejection of the old pending add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T05/\"a::b\"",
+      "scope": "occupied restoration destination: preserve new lifetime and honest authority",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06a/\"a::b\"",
+      "scope": "independent field write survives reversal of a rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06b/\"a::b\"",
+      "scope": "vacated source occupied by another lifetime is a real dependency",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T07/\"a::b\"",
+      "scope": "removal supersedes the rekey; rejecting it cannot resurrect a lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T08/\"a::b\"",
+      "scope": "destination re-use belongs to a new lifetime, not the old rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T11-I07/\"a::b\"",
+      "scope": "held references do not follow same-key remove/re-add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T13/\"a::b\"",
+      "scope": "server realization against pending-created lifetime; canonical assertion remains explicit",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/accept/\"a::b\"",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/reject/\"a::b\"",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T01/\"jo.doe@example.com\"",
+      "scope": "pending add rejected: membership and held lifetime disappear",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T02a/\"jo.doe@example.com\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/pending/\"jo.doe@example.com\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/confirmed/\"jo.doe@example.com\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T03/\"jo.doe@example.com\"",
+      "scope": "pending add superseded by later removal must not resurrect",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T04/\"jo.doe@example.com\"",
+      "scope": "later same-key lifetime survives rejection of the old pending add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T05/\"jo.doe@example.com\"",
+      "scope": "occupied restoration destination: preserve new lifetime and honest authority",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06a/\"jo.doe@example.com\"",
+      "scope": "independent field write survives reversal of a rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06b/\"jo.doe@example.com\"",
+      "scope": "vacated source occupied by another lifetime is a real dependency",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T07/\"jo.doe@example.com\"",
+      "scope": "removal supersedes the rekey; rejecting it cannot resurrect a lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T08/\"jo.doe@example.com\"",
+      "scope": "destination re-use belongs to a new lifetime, not the old rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T11-I07/\"jo.doe@example.com\"",
+      "scope": "held references do not follow same-key remove/re-add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T13/\"jo.doe@example.com\"",
+      "scope": "server realization against pending-created lifetime; canonical assertion remains explicit",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/accept/\"jo.doe@example.com\"",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/reject/\"jo.doe@example.com\"",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T01/\"1.2.3\"",
+      "scope": "pending add rejected: membership and held lifetime disappear",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T02a/\"1.2.3\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/pending/\"1.2.3\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/confirmed/\"1.2.3\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T03/\"1.2.3\"",
+      "scope": "pending add superseded by later removal must not resurrect",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T04/\"1.2.3\"",
+      "scope": "later same-key lifetime survives rejection of the old pending add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T05/\"1.2.3\"",
+      "scope": "occupied restoration destination: preserve new lifetime and honest authority",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06a/\"1.2.3\"",
+      "scope": "independent field write survives reversal of a rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06b/\"1.2.3\"",
+      "scope": "vacated source occupied by another lifetime is a real dependency",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T07/\"1.2.3\"",
+      "scope": "removal supersedes the rekey; rejecting it cannot resurrect a lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T08/\"1.2.3\"",
+      "scope": "destination re-use belongs to a new lifetime, not the old rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T11-I07/\"1.2.3\"",
+      "scope": "held references do not follow same-key remove/re-add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T13/\"1.2.3\"",
+      "scope": "server realization against pending-created lifetime; canonical assertion remains explicit",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/accept/\"1.2.3\"",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/reject/\"1.2.3\"",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T01/1",
+      "scope": "pending add rejected: membership and held lifetime disappear",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T02a/1",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/pending/1",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/confirmed/1",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T03/1",
+      "scope": "pending add superseded by later removal must not resurrect",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T04/1",
+      "scope": "later same-key lifetime survives rejection of the old pending add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T05/1",
+      "scope": "occupied restoration destination: preserve new lifetime and honest authority",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06a/1",
+      "scope": "independent field write survives reversal of a rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06b/1",
+      "scope": "vacated source occupied by another lifetime is a real dependency",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T07/1",
+      "scope": "removal supersedes the rekey; rejecting it cannot resurrect a lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T08/1",
+      "scope": "destination re-use belongs to a new lifetime, not the old rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T11-I07/1",
+      "scope": "held references do not follow same-key remove/re-add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T13/1",
+      "scope": "server realization against pending-created lifetime; canonical assertion remains explicit",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/accept/1",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/reject/1",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T01/\"1\"",
+      "scope": "pending add rejected: membership and held lifetime disappear",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T02a/\"1\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/pending/\"1\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T12/confirmed/\"1\"",
+      "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T03/\"1\"",
+      "scope": "pending add superseded by later removal must not resurrect",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T04/\"1\"",
+      "scope": "later same-key lifetime survives rejection of the old pending add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T05/\"1\"",
+      "scope": "occupied restoration destination: preserve new lifetime and honest authority",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06a/\"1\"",
+      "scope": "independent field write survives reversal of a rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T06b/\"1\"",
+      "scope": "vacated source occupied by another lifetime is a real dependency",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T07/\"1\"",
+      "scope": "removal supersedes the rekey; rejecting it cannot resurrect a lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T08/\"1\"",
+      "scope": "destination re-use belongs to a new lifetime, not the old rekey",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T11-I07/\"1\"",
+      "scope": "held references do not follow same-key remove/re-add",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T13/\"1\"",
+      "scope": "server realization against pending-created lifetime; canonical assertion remains explicit",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/accept/\"1\"",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T14/reject/\"1\"",
+      "scope": "independent mixed scalar + structural settlement and coherent owner publication",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/123/\"A\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/132/\"A\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/213/\"A\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/231/\"A\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/312/\"A\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/321/\"A\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/12/\"A\"",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/21/\"A\"",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/adds/\"A\"",
+      "scope": "two pending membership additions retain the other lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/123/\"a.b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/132/\"a.b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/213/\"a.b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/231/\"a.b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/312/\"a.b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/321/\"a.b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/12/\"a.b\"",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/21/\"a.b\"",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/adds/\"a.b\"",
+      "scope": "two pending membership additions retain the other lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/123/\"a/b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/132/\"a/b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/213/\"a/b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/231/\"a/b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/312/\"a/b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/321/\"a/b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/12/\"a/b\"",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/21/\"a/b\"",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/adds/\"a/b\"",
+      "scope": "two pending membership additions retain the other lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/123/\"a::b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/132/\"a::b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/213/\"a::b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/231/\"a::b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/312/\"a::b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/321/\"a::b\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/12/\"a::b\"",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/21/\"a::b\"",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/adds/\"a::b\"",
+      "scope": "two pending membership additions retain the other lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/123/\"jo.doe@example.com\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/132/\"jo.doe@example.com\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/213/\"jo.doe@example.com\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/231/\"jo.doe@example.com\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/312/\"jo.doe@example.com\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/321/\"jo.doe@example.com\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/12/\"jo.doe@example.com\"",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/21/\"jo.doe@example.com\"",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/adds/\"jo.doe@example.com\"",
+      "scope": "two pending membership additions retain the other lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/123/\"1.2.3\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/132/\"1.2.3\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/213/\"1.2.3\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/231/\"1.2.3\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/312/\"1.2.3\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/321/\"1.2.3\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/12/\"1.2.3\"",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/21/\"1.2.3\"",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/adds/\"1.2.3\"",
+      "scope": "two pending membership additions retain the other lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/123/1",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/132/1",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/213/1",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/231/1",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/312/1",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/321/1",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/12/1",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/21/1",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/adds/1",
+      "scope": "two pending membership additions retain the other lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/123/\"1\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/132/\"1\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/213/\"1\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/231/\"1\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/312/\"1\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T10/reject/321/\"1\"",
+      "scope": "three pending rekeys; explicit intermediate topology, successful settlement required",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/12/\"1\"",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/rekey/21/\"1\"",
+      "scope": "two overlapping rekeys; no settlement-order resurrection",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "T09/adds/\"1\"",
+      "scope": "two pending membership additions retain the other lifetime",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "I01",
+      "scope": "typed business key lookup/write/settlement isolation",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "I02",
+      "scope": "typed business key lookup/write/settlement isolation",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "I03",
+      "scope": "typed business key lookup/write/settlement isolation",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "I04",
+      "scope": "typed business key lookup/write/settlement isolation",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "I05",
+      "scope": "typed business key lookup/write/settlement isolation",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "I06",
+      "scope": "typed business key lookup/write/settlement isolation",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "I08/\"A\"",
+      "scope": "transactions + real Link + EntityMap + held lifetime; endpoint evidence",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "I08/\"a.b\"",
+      "scope": "transactions + real Link + EntityMap + held lifetime; endpoint evidence",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "I08/\"a/b\"",
+      "scope": "transactions + real Link + EntityMap + held lifetime; endpoint evidence",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "I08/\"a::b\"",
+      "scope": "transactions + real Link + EntityMap + held lifetime; endpoint evidence",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "I08/\"jo.doe@example.com\"",
+      "scope": "transactions + real Link + EntityMap + held lifetime; endpoint evidence",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "I08/\"1.2.3\"",
+      "scope": "transactions + real Link + EntityMap + held lifetime; endpoint evidence",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "I08/1",
+      "scope": "transactions + real Link + EntityMap + held lifetime; endpoint evidence",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "I08/\"1\"",
+      "scope": "transactions + real Link + EntityMap + held lifetime; endpoint evidence",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "structural",
+      "id": "I08/typed-pair",
+      "scope": "numeric/string business keys stay isolated across two real relationships",
+      "status": "unsupported",
+      "assertions": [
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: Replay control supports scalar assignments only"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "authority",
+      "id": "A1/unrelated-snapshot",
+      "scope": "L11 canonical advancement and pending survival are independent",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "visible y",
+          "status": "held"
+        },
+        {
+          "label": "P pending independently of canonical advancement",
+          "status": "held"
+        },
+        {
+          "label": "canonical y",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "authority",
+      "id": "A2/correlated-accept",
+      "scope": "L11 snapshot and explicit acceptance on one event",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "visible y",
+          "status": "held"
+        },
+        {
+          "label": "accepted P has a committed/superseded disposition",
+          "status": "held",
+          "detail": "{\"disposition\":\"superseded\",\"retainsAuthority\":false}"
+        },
+        {
+          "label": "accepted P releases authority",
+          "status": "held"
+        },
+        {
+          "label": "canonical y",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "authority",
+      "id": "A3/correlated-reject",
+      "scope": "L11 rejection removes contribution while truth advances",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "visible y",
+          "status": "held"
+        },
+        {
+          "label": "P explicitly rejected without authority",
+          "status": "held"
+        },
+        {
+          "label": "canonical y",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "authority",
+      "id": "A4/included-through",
+      "scope": "L11 included truth prevents resurrection; no unique disposition imposed",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "visible y",
+          "status": "held"
+        },
+        {
+          "label": "canonical y",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "disposition": "superseded",
+          "retainsAuthority": false
+        }
+      ]
+    },
+    {
+      "suite": "authority",
+      "id": "A5/fresh-revision-no-relation",
+      "scope": "L11/L12 numeric freshness does not establish settlement",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "visible y",
+          "status": "held"
+        },
+        {
+          "label": "P pending independently of canonical advancement",
+          "status": "held"
+        },
+        {
+          "label": "canonical y",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "authority",
+      "id": "A6/stale-version",
+      "scope": "L12 stale numeric revision cannot regress canonical truth",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "visible y",
+          "status": "held"
+        },
+        {
+          "label": "canonical y",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "authority",
+      "id": "T18/newer-version",
+      "scope": "L12 exact numeric revision checkpoints, neither lexical nor arrival order",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "visible y",
+          "status": "held"
+        },
+        {
+          "label": "canonical y",
+          "status": "held"
+        },
+        {
+          "label": "visible y",
+          "status": "held"
+        },
+        {
+          "label": "canonical y",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "revision": 2,
+          "value": 2,
+          "expected": 2
+        },
+        {
+          "revision": 10,
+          "value": 10,
+          "expected": 10
+        }
+      ]
+    },
+    {
+      "suite": "authority",
+      "id": "T19/stale-after-newer",
+      "scope": "L12 exact numeric revision checkpoints, neither lexical nor arrival order",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "visible y",
+          "status": "held"
+        },
+        {
+          "label": "canonical y",
+          "status": "held"
+        },
+        {
+          "label": "visible y",
+          "status": "held"
+        },
+        {
+          "label": "canonical y",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "revision": 10,
+          "value": 10,
+          "expected": 10
+        },
+        {
+          "revision": 2,
+          "value": 2,
+          "expected": 10
+        }
+      ]
+    },
+    {
+      "suite": "authority",
+      "id": "T21/out-of-order",
+      "scope": "L12 exact numeric revision checkpoints, neither lexical nor arrival order",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "visible y",
+          "status": "held"
+        },
+        {
+          "label": "canonical y",
+          "status": "held"
+        },
+        {
+          "label": "visible y",
+          "status": "held"
+        },
+        {
+          "label": "canonical y",
+          "status": "held"
+        },
+        {
+          "label": "visible y",
+          "status": "held"
+        },
+        {
+          "label": "canonical y",
+          "status": "held"
+        }
+      ],
+      "trace": [
+        {
+          "revision": 2,
+          "value": 2,
+          "expected": 2
+        },
+        {
+          "revision": 11,
+          "value": 11,
+          "expected": 11
+        },
+        {
+          "revision": 10,
+          "value": 10,
+          "expected": 11
+        }
+      ]
+    },
+    {
+      "suite": "authority",
+      "id": "T20/older-response-newer-intent",
+      "scope": "L11/L12 local authorship, authority revision and settlement relation are orthogonal",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "visible y",
+          "status": "held"
+        },
+        {
+          "label": "accepted P has a committed/superseded disposition",
+          "status": "held",
+          "detail": "{\"disposition\":\"superseded\",\"retainsAuthority\":false}"
+        },
+        {
+          "label": "accepted P releases authority",
+          "status": "held"
+        },
+        {
+          "label": "Q pending independently of canonical advancement",
+          "status": "held"
+        },
+        {
+          "label": "canonical y",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    },
+    {
+      "suite": "authority",
+      "id": "T22/unordered-no-invented-authority",
+      "scope": "L12 unknown/conflict is not authority order; no visible conflict policy imposed",
+      "status": "held",
+      "assertions": [
+        {
+          "label": "unordered claim cannot invent terminal settlement",
+          "status": "held",
+          "detail": "{\"disposition\":\"pending\",\"retainsAuthority\":true}"
+        },
+        {
+          "label": "unresolved P retains settlement authority",
+          "status": "held"
+        },
+        {
+          "label": "canonical y",
+          "status": "held"
+        }
+      ],
+      "trace": []
+    }
+  ]
+}
