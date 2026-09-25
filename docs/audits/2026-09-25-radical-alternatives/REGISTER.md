@@ -106,3 +106,55 @@ own right.
 Also recorded from AUTHORITY-1: the base must carry the authority that produced
 it, or compaction erases ordering and a later lower-authority write wins. That
 is one tag on current truth, not retained history.
+
+---
+
+## PROPOSED L19 — dormant capability must not impose active-state machinery
+
+> **L19.** Correctness metadata is allocated and maintained only while a
+> semantic fact participates in live causal responsibility. Facts outside that
+> responsibility retain the ordinary SignalTree representation and hot path.
+
+Three distinct meanings of "free", all of which are targets:
+
+    1. capability not imported/enabled    genuinely zero runtime AND code cost
+    2. enabled but unused                 zero allocations, zero traversal, at
+                                          most a predictable branch
+    3. used, then quiescent               collapse back to ordinary
+                                          representation, release the machinery
+
+The representation this implies is LAZY PROMOTION:
+
+    PlainValue
+        | first speculative/unresolved requirement
+        v
+    PromotedCausalState   base + contributions + obligations + turn + authority
+        | all causal responsibility terminates
+        v
+    PlainValue
+
+So the sophisticated semantics are TRANSIENT STATE, not the permanent storage
+format of every value. This is consistent with what COMPACTION-1 already
+showed: correctness responsibility can outlive a contribution where necessary,
+while settled contribution storage collapses completely.
+
+Specifics: no `Set<Obligation>` from birth -- allocate on first inherited
+obligation, release when the last is removed. An obligation-liveness reactive
+node exists only if an obligation exists. Ordinary writes carry an implicit
+DEFAULT_LOCAL_AUTHORITY rather than allocating `{domain,rank}` per write. And
+with no Link there is no outbound safe-frontier work at all; with a Link but no
+unresolved causal state, visible == exposable and Link sees the ordinary value.
+
+That last point matters given WAKEUP-1P: production Link requires an OWNED
+location, and the wrong fix would be permanently creating a shadow exposable
+location per fact. That would destroy free-when-unused outright.
+
+Not demanding zero CPU instructions -- a capability hook may cost a predictable
+branch. Demanding, when unused: 0 steady-state allocations, 0 causal maps
+populated, 0 contribution objects, 0 obligation nodes, 0 frontier scans, 0
+per-Link causal state.
+
+**This is a DESIGN CONSTRAINT, not a later optimization, and it is also a
+selection criterion.** A design that makes every SignalTree value pay for rare
+transactional causality is probably the wrong design, and L19 can be used to
+choose between Candidate C, contribution-store and anything that follows.
