@@ -1,0 +1,50 @@
+{
+  "probe": "CONTRIBUTION-REPAIRS",
+  "checks": [
+    {
+      "label": "RC-1 compaction bounds depth under 100k writes behind an unresolved contribution",
+      "ok": true,
+      "detail": "depth=0 visible=100001"
+    },
+    {
+      "label": "RC-1 the OBLIGATION stays live even though its contribution was compacted away",
+      "ok": true,
+      "detail": "liveObligations=1"
+    },
+    {
+      "label": "RC-1 rollback of a superseded compacted contribution is a NO-OP, not a restore",
+      "ok": true,
+      "detail": "before=100001 after=100001"
+    },
+    {
+      "label": "RC-1 an unresolved contribution ON TOP is retained, not compacted away",
+      "ok": true,
+      "detail": "depth=1 visible=9 exposable=5"
+    },
+    {
+      "label": "RC-1 rolling it back reverts to the compacted base",
+      "ok": true,
+      "detail": "visible=5"
+    },
+    {
+      "label": "RC-2 grouping prevents exposing HALF a causal turn",
+      "ok": true,
+      "detail": "x=0 y=0"
+    },
+    {
+      "label": "RC-2 a DIFFERENT turn still progresses -- grouping is not a global snapshot",
+      "ok": true,
+      "detail": "z=7"
+    },
+    {
+      "label": "RC-2 resolving the obligation exposes the WHOLE turn at once",
+      "ok": true,
+      "detail": "x=10 y=20"
+    },
+    {
+      "label": "RC-2 an ordinary write outside a turn is unaffected by grouping",
+      "ok": true,
+      "detail": "b=2"
+    }
+  ]
+}
