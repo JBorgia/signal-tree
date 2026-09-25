@@ -521,17 +521,30 @@ export function link<S>(
     dirty = false;
     // Registered BEFORE the consequence is scheduled, so an observation is
     // already visible to `settled()` while it waits behind settlement.
-    let releaseHeld!: () => void;
-    const heldPromise = new Promise<void>((r) => (releaseHeld = r));
-    const entry = { promise: heldPromise, resolve: releaseHeld };
-    held.add(entry);
+    //
+    // The consequence below is keyed, so a later flush REPLACES a still-held
+    // one and only the last run() ever executes. A fresh release signal per
+    // flush therefore orphaned every earlier one, and `settled()` waited on
+    // them forever. Coalesced observations belong to one relationship and are
+    // reconciled together on release, so they share one signal. (Same repair
+    // as main's link.ts.)
+    let entry = held.values().next().value as
+      | { promise: Promise<void>; resolve: () => void }
+      | undefined;
+    if (!entry) {
+      let releaseHeld!: () => void;
+      const heldPromise = new Promise<void>((r) => (releaseHeld = r));
+      entry = { promise: heldPromise, resolve: releaseHeld };
+      held.add(entry);
+    }
+    const pending = entry;
 
     scheduleDurableConsequence({
       claimant: x as object,
       key: link,
       run: () => {
-        held.delete(entry);
-        entry.resolve();
+        held.delete(pending);
+        pending.resolve();
         if (disposed) return;
         chain = chain
           .then(async () => {

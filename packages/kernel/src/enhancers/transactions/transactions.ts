@@ -794,6 +794,14 @@ class TransactionAuthority {
     return [...this.pendingTurns.keys()].sort((left, right) => left - right);
   }
 
+  /** Positions any still-pending turn wrote; its rollback needs their realization. */
+  getPendingPositionIds(): Set<number> {
+    const positions = new Set<number>();
+    for (const turn of this.pendingTurns.values())
+      for (const position of turn.__positionIds ?? []) positions.add(position);
+    return positions;
+  }
+
   /**
    * @internal Raw retained records, for the `/internals` read seam.
    *
@@ -932,6 +940,16 @@ export function getOrCreateInternalTransactionRuntime<T>(
   defineTreeRealizationPort(treeWrapper, realizationPort);
   defineTreeRealizationPort(stateRoot, realizationPort);
 
+  // LINK-OVERLAP-ROLLBACK-0. A descriptor this settlement would forget can
+  // still be needed by an OVERLAPPING transaction: its rollback resolves the
+  // path to notify on through the descriptor, and with the descriptor gone the
+  // compensation is applied silently -- no subscriber, Link included, learns
+  // the value changed back. Such descriptors are deferred instead of deleted,
+  // and a later settlement collects them once nothing pending refers to them.
+  // `descriptorOwnersBefore` is per transaction, so without the deferred set a
+  // descriptor spared here would be protected forever by the next
+  // transaction's snapshot.
+  const deferredDescriptorOwners = new Set<number>();
   const forgetUnclaimedDescriptorSubjects = (
     subjectIds: readonly number[],
     descriptorOwnersBefore: ReadonlySet<number>
@@ -944,8 +962,17 @@ export function getOrCreateInternalTransactionRuntime<T>(
       realizationDescriptors,
       unclaimed
     );
+    const stillNeeded = authority.getPendingPositionIds();
+    // An OPEN transaction's writes are normally captured (and their
+    // descriptors recreated) at its post-callback flush, after anything its
+    // callback settles. This covers a flush that runs inside the callback.
+    for (const bucket of pendingTransactions.values())
+      for (const position of bucket.positionIds) stillNeeded.add(position);
     for (const [owner, descriptor] of realizationDescriptors) {
-      if (descriptorOwnersBefore.has(owner)) {
+      if (
+        descriptorOwnersBefore.has(owner) &&
+        !deferredDescriptorOwners.has(owner)
+      ) {
         continue;
       }
       if (
@@ -953,7 +980,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
         (descriptor.structuralEffects?.size ?? 0) === 0 &&
         (descriptor.structuralEffectBySubject?.size ?? 0) === 0
       ) {
+        if (stillNeeded.has(owner)) {
+          deferredDescriptorOwners.add(owner);
+          continue;
+        }
         realizationDescriptors.delete(owner);
+        deferredDescriptorOwners.delete(owner);
       }
     }
   };
