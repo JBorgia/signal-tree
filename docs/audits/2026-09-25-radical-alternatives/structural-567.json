@@ -1,0 +1,60 @@
+{
+  "probe": "STRUCTURAL-567",
+  "checks": [
+    {
+      "label": "ROW5 a pending-created subject is VISIBLE but not exposable",
+      "ok": true,
+      "detail": "visible=true exposable=undefined"
+    },
+    {
+      "label": "ROW5 a dependent deriving from the pending subject is withheld even after IT settles",
+      "ok": true,
+      "detail": "exposable=undefined"
+    },
+    {
+      "label": "ROW5 settling the creator exposes both the subject and its dependent",
+      "ok": true,
+      "detail": "existence=true derived=101"
+    },
+    {
+      "label": "ROW5 rolling back the creator removes the subject -- no compensation needed",
+      "ok": true,
+      "detail": "visible=undefined"
+    },
+    {
+      "label": "ROW6 rekey A->B moves occupancy only",
+      "ok": true,
+      "detail": "A=undefined B=S1"
+    },
+    {
+      "label": "ROW6 the SUBJECT and its fields are untouched by the rekey -- no repair step",
+      "ok": true,
+      "detail": "existence=true score=5"
+    },
+    {
+      "label": "ROW6 and the rekey leaves no retained contributions",
+      "ok": true,
+      "detail": "retained=0"
+    },
+    {
+      "label": "ROW7 the reused key now holds a DIFFERENT subject",
+      "ok": true,
+      "detail": "occupancy(A)=S2 S2.score=99"
+    },
+    {
+      "label": "ROW7 the fresh subject does NOT inherit the old subject pending obligation",
+      "ok": true,
+      "detail": "exposable(S2.score)=99"
+    },
+    {
+      "label": "ROW7 the OLD lifetime field stays blocked by its own obligation",
+      "ok": true,
+      "detail": "exposable(S1.score)=undefined"
+    },
+    {
+      "label": "ROW7 rolling back the old pending work does not disturb the fresh occupant",
+      "ok": true,
+      "detail": "occupancy(A)=S2"
+    }
+  ]
+}
