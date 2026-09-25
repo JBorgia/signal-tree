@@ -1,0 +1,20 @@
+{
+  "probe": "OPTION-A",
+  "checks": [
+    {
+      "label": "a lazily materialized entity field carries a position registry",
+      "ok": true,
+      "detail": "registry=true"
+    },
+    {
+      "label": "link() ACCEPTS a location created after tree construction",
+      "ok": true,
+      "detail": "accepted"
+    },
+    {
+      "label": "and delivers through it",
+      "ok": true,
+      "detail": "sent=[42]"
+    }
+  ]
+}
