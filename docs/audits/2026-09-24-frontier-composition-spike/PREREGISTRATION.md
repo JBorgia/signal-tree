@@ -665,3 +665,70 @@ at creation is O(open obligations), not O(tree size).
 
 Address may answer "is this mutation inside this source". It may never become
 the identity answering "which subject, lifetime or leaf owns this truth".
+
+---
+
+# EMIT-FOOTPRINT-0 — PREREGISTERED before implementation
+
+## Gate 1 sharpened again
+
+    A Link source must maintain the exact set of LIVE UNRESOLVED OBLIGATIONS
+    represented by its current eligible payload.
+
+That contains the emission-footprint idea and adds the lifecycle property the
+F5 spike lacked. No stale blockers, no missing blockers.
+
+## Why Set<LinkClaimant> is not enough
+
+The spike held `blockedSources = { y }`. That proved F5 but cannot answer which
+obligation caused the block, when it may be removed, or what happens when two
+obligations block the same source. The representation must be:
+
+    Link source -> Set<UnresolvedObligation>
+
+## Obligation propagation, without retaining settled turns
+
+    P1 owns x                  -> x carries O1
+    P2 reads x, writes y       -> y inherits O1
+    P2 CONFIRMS                -> y still carries O1
+    P1 resolves                -> O1 terminal, cleared from x, y and anything
+                                  that inherited it
+
+P2 confirming does NOT clear O1, because P2 settling does not make its
+dependency on P1 disappear. The unresolved ROOT obligation propagates; the chain
+of settled turns does not have to stay alive. That is L15: retain correctness
+responsibility, not historical machinery.
+
+## Rows
+
+    A  scalar pending x                      link(x) blocked
+    B  independent branch, x pending         link(other) progresses
+    C  whole branch {x,y}, x pending         blocked
+    D  dependent y, P2 CONFIRMED             still blocked   (shown by F5)
+    E  mutant: suppress the P2->P1 edge      y wrongly eligible
+    F  Link created AFTER P1 pending         must SEED from live obligations,
+                                             not reconstruct history
+    G  rekey / key reuse                     blocker follows SubjectId, never the
+                                             reusable business address
+    H1 removal WITH unrelated open work      P3 pending z; resolving P1 releases
+                                             y even though P3 is still open
+    H2 MULTI-BLOCKER                         y derives from x (P1) and w (P4);
+                                             resolve P1 -> y STILL blocked;
+                                             resolve P4 -> eligible
+    T  TRANSITIVE inheritance                P2: y=x+1 confirm; P3: z=y+1 confirm;
+                                             link(z) blocked until P1 resolves,
+                                             WITHOUT retaining P2
+
+H1 is what proves release came from removing the actual blocker rather than from
+`hasOpen(tree)` going false -- the exact confusion that made the F5 spike look
+correct. H2 is what proves the representation is obligation-specific rather than
+a boolean flag; its mutant drops all blockers when P1 resolves and must let y
+escape while P4 is unresolved.
+
+## Preserved rule
+
+    Containment decides whether an effect participates in a Link source.
+    Semantic identity decides which obligations that truth carries.
+
+Address may answer the first. It may never become the identity answering the
+second.
