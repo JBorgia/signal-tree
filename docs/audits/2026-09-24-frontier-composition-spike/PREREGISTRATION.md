@@ -324,9 +324,18 @@ measured hot path, or an ambient current-owner consulted per write.
 > anywhere puts the probe back on every unrelated tree in the process. Pay for
 > use belongs at the smallest practical boundary."
 
-That is a documented, measured rejection of precisely the shape B needs. The
-existing observer boundary is per-leaf and pay-for-use, and a transaction cannot
-pre-register on leaves it has not yet seen, so B cannot ride it either.
+CORRECTED SCOPE of that evidence. What was rejected is a PROCESS-WIDE
+installed-observer gate, where one observer anywhere imposed work on unrelated
+trees. That establishes a design rule -- pay-for-use belongs at the smallest
+practical boundary -- and is strong evidence against GLOBAL AMBIENT solutions.
+It is NOT a blanket falsification of every possible B implementation, and this
+file should not claim the kernel already tried the exact shape B needs.
+
+The accurate statement: B would require changing the existing write->transaction
+boundary to carry node/owner information, or introducing another owner-context
+seam. The existing observer boundary is per-leaf and pay-for-use, and a
+transaction cannot pre-register on leaves it has not yet seen, so B cannot ride
+it unchanged.
 
 ## Revised recommendation: Candidate A
 
@@ -347,3 +356,77 @@ hottest path, of the exact kind this kernel already removed on measurement.
 **Candidate A: LEADING. Neither selected.** The remaining unknown for A is
 whether a node can be mapped to its PositionId at creation, where both are in
 scope -- unverified, and the next thing to check.
+
+---
+
+# OWNER-SEAM-2 — outcome B for scalar leaves; entity/anchor coverage UNVERIFIED
+
+Question: at what construction boundary, if any, are the stable DependencyNode
+and its correct PositionId simultaneously available?
+
+## Verified: scalar leaves are outcome B, one call boundary apart
+
+Two existing sites already hold what the mapping needs, with NO signature
+changes and no new subsystem:
+
+    location-runtime.ts createCell   `location` and `node` are both in scope
+                                     (the node lives in the location's closure)
+
+    signal-tree.ts  (leaf, path, positionIds, ..., registry, address)
+                                     receives the SAME Location object as `leaf`
+                                     together with its positionIds, and already
+                                     calls defineNodeAddress(leaf) and
+                                     defineOwnedPositionIds(leaf, positionIds)
+
+So the join is two weak writes at sites that already have both objects:
+
+    createCell        NODE_OF.set(location, node)
+    leaf construction POSITIONS_OF_NODE.set(NODE_OF.get(leaf), positionIds)
+
+That is materially smaller than "new registry plumbing", and it is weak-keyed,
+so retired nodes drop their entries without a cleanup path.
+
+## NOT VERIFIED, and it is the part that decides whether A solves F3
+
+DEPENDENCY-1F established that the identities frontier needs are THREE:
+
+    scalar leaf        verified above
+    entity field leaf  UNVERIFIED
+    subject anchor     UNVERIFIED
+
+Entity positions are allocated separately at `entity-signal.ts:778`, not through
+the leaf-construction path inspected above, so entity field leaves and the
+subject anchor may follow outcome C (independent construction boundaries) or
+outcome D (node without PositionId, or PositionId without node). OWNER-KEY-0
+showed entity fields DO have DependencyNodes; whether those nodes reach a
+PositionId at any shared construction boundary is simply not established here.
+
+**If only scalar cells map cleanly, A has not solved F3.** F3 is a structural
+property and its dependency is on a pending-created SUBJECT, so the anchor and
+field identities are the ones that matter. This must be measured before A is
+selected, not assumed from the scalar result.
+
+## Non-vacuity controls required before adopting any mapping
+
+A WeakMap being weak does not make the MAPPED POSITION semantics
+lifetime-correct. Recreate the DEPENDENCY-1F discriminators against the mapping
+itself:
+
+    key reuse   old A.score node -> position_old
+                remove old A, create fresh A
+                fresh A.score node -> position_fresh
+                REQUIRE node_old != node_fresh
+                AND position_old must not resolve the fresh subject's ownership
+
+    rekey       A -> B, same node
+                mapping still names the same semantic position/lifetime,
+                with no remap keyed by business key
+
+## Cost model, if the shape holds
+
+    ordinary write, no capture   zero new lookup cost
+    location creation            one weak registration
+    transaction with reads       one lookup per DISTINCT captured node
+
+That is a healthier model than adding work to every mutation, which is what B
+would have required. No benchmark until the shape is established.
