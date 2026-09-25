@@ -1,0 +1,27 @@
+{
+  "probe": "RADICAL-COMMITTED-VIEW-0",
+  "independent": {
+    "sent": [
+      7
+    ],
+    "committedY": 7
+  },
+  "derived": {
+    "sent": [
+      0
+    ],
+    "committedY": 2
+  },
+  "checks": [
+    {
+      "label": "F5-A DISSOLVED committed-view exports independent y=7 with NO blocker machinery",
+      "ok": true,
+      "detail": "sent={\"sent\":[7],\"committedY\":7}"
+    },
+    {
+      "label": "F5-B committed-view must not treat y=2 as committed truth while x is uncommitted",
+      "ok": false,
+      "detail": "committed view reports y=2"
+    }
+  ]
+}

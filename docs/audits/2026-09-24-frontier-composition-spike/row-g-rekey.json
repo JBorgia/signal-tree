@@ -1,0 +1,32 @@
+{
+  "probe": "ROW-G",
+  "atCreate": 1,
+  "afterRekey": 1,
+  "freshSubject": 2,
+  "checks": [
+    {
+      "label": "ROW G the obligation-carrying SUBJECT identity survives rekey A->B",
+      "ok": true,
+      "detail": "1 -> 1"
+    },
+    {
+      "label": "ROW G ...so the obligation still applies after the business key moved",
+      "ok": true
+    },
+    {
+      "label": "ROW G a fresh subject at the REUSED key has a different subject identity",
+      "ok": true,
+      "detail": "old=1 fresh=2"
+    },
+    {
+      "label": "ROW G ...and carries NO obligation inherited from the old lifetime",
+      "ok": true,
+      "detail": "blockers=[]"
+    },
+    {
+      "label": "ROW G non-vacuity: the kernel itself reports distinct subjects for the two lifetimes",
+      "ok": true,
+      "detail": "old=1 fresh=2"
+    }
+  ]
+}
