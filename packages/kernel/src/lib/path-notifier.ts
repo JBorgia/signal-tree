@@ -377,7 +377,8 @@ export class PathNotifier {
     meta?: WriteMetadata,
     declaredScopes?: DeclaredWriteScopes,
     ownerId?: number,
-    subjectFieldFootprint?: readonly string[] | null
+    subjectFieldFootprint?: readonly string[] | null,
+    isolateSubscribers = false
   ): void {
     // ⚠️ THE INTERCEPTOR LOOP WAS DELETED IN 15.0 — PATH-NOTIFIER-INTERCEPT-
     // SURVIVAL-0. It ran here, before subscribers, and could suppress delivery
@@ -398,24 +399,43 @@ export class PathNotifier {
     const transformed = value;
 
     // Run subscribers
+    //
+    // TX-OBSERVER-STRAND-0. A DEFERRED delivery isolates each handler. The
+    // write is already applied, so a subscriber's throw cannot undo it; it
+    // could only escape into whoever flushed. That was a `transact()` that
+    // then returned no handle and left its commit scope open (holding every
+    // later Link consequence), or a microtask that dropped the rest of the
+    // batch and the flush callbacks. Report it and keep delivering.
+    //
+    // SYNCHRONOUS delivery (batching disabled, an internal seam) still throws
+    // into the writer's own stack, which is where rollback() deliberately
+    // settles first and then surfaces it (transaction-safety.spec.ts).
     for (const [pattern, handlers] of this.subscribers) {
       if (this.matches(pattern, path)) {
         for (const handler of handlers) {
-          withoutWriteObservationScopes(() =>
-            handler(
-              transformed,
-              prev,
-              path,
-              ownerPath,
-              origin,
-              subjectIds,
-              positionIds,
-              meta,
-              declaredScopes,
-              ownerId,
-              subjectFieldFootprint
-            )
-          );
+          try {
+            withoutWriteObservationScopes(() =>
+              handler(
+                transformed,
+                prev,
+                path,
+                ownerPath,
+                origin,
+                subjectIds,
+                positionIds,
+                meta,
+                declaredScopes,
+                ownerId,
+                subjectFieldFootprint
+              )
+            );
+          } catch (error) {
+            if (!isolateSubscribers) throw error;
+            console.error(
+              `SignalTree: a write subscriber threw while observing '${path}'; delivery continued.`,
+              error
+            );
+          }
         }
       }
     }
@@ -463,7 +483,8 @@ export class PathNotifier {
           materializeDeliveryMeta(entry.meta),
           entry.declaredScopes,
           entry.ownerId,
-          entry.subjectFieldFootprint
+          entry.subjectFieldFootprint,
+          true
         );
       }
     }
