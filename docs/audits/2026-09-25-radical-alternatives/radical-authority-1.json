@@ -1,0 +1,65 @@
+{
+  "probe": "AUTHORITY-1",
+  "checks": [
+    {
+      "label": "A frontier follows AUTHORITY, not append order (C2/20, not C3/30)",
+      "ok": true,
+      "detail": "visible=20"
+    },
+    {
+      "label": "A MUTANT append-order selection picks 30 — the row is not vacuous",
+      "ok": true,
+      "detail": "mutant visible=30"
+    },
+    {
+      "label": "B a later LOWER-authority settled write does not replace higher-authority truth",
+      "ok": true,
+      "detail": "visible=10 exposable=10"
+    },
+    {
+      "label": "B ...and compaction keeps nothing that can no longer win",
+      "ok": true,
+      "detail": "retained=0"
+    },
+    {
+      "label": "C exposable falls back to the settled lower-authority truth",
+      "ok": true,
+      "detail": "exposable=10"
+    },
+    {
+      "label": "C exactly ONE live candidate retained, not a history of contenders",
+      "ok": true,
+      "detail": "retained=1"
+    },
+    {
+      "label": "C rolling back the pending candidate leaves 10 and retains nothing",
+      "ok": true,
+      "detail": "exposable=10 retained=0"
+    },
+    {
+      "label": "D1 authoritative truth advances the frontier WITHOUT settling the pending contribution",
+      "ok": true,
+      "detail": "exposable=3 P1settled=false"
+    },
+    {
+      "label": "D2 the SAME advance settles P1 only via an explicit settlement relation",
+      "ok": true,
+      "detail": "exposable=3 P1settled=true"
+    },
+    {
+      "label": "E two incomparable authority domains are reported as CONFLICTED, not silently ranked",
+      "ok": false,
+      "detail": "conflicted=false visible=20"
+    },
+    {
+      "label": "F authoritative supersession of x does NOT release y, which still depends on O1",
+      "ok": true,
+      "detail": "x=9 y=0"
+    },
+    {
+      "label": "F ...only resolving the root obligation releases y",
+      "ok": true,
+      "detail": "y=2"
+    }
+  ]
+}
