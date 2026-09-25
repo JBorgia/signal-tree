@@ -89,3 +89,84 @@ Three options, and the first two both mean touching the harness:
 Option 3 spends the least on models that are already disqualified by their own
 suite. It is also the only one that does not start by expanding the measuring
 instrument again.
+
+---
+
+# PROMOTION RULE — frozen 2026-09-24, before any adapter was written
+
+Recorded ahead of the work so no threshold can be invented after seeing results.
+
+## How the native suite may and may not be used
+
+> The transaction-options suite is used ONLY as a candidate promotion screen.
+> Its counts are NOT compared numerically with SEMANTICS-2 and do not establish
+> superiority over the incumbent or over another candidate.
+
+> Candidates promoted from the screen are evaluated under the UNCHANGED
+> SEMANTICS-2 contract before any architecture decision.
+
+Cross-architecture conclusions come only from SEMANTICS-2. The native suite is
+retained afterwards as a candidate-specific regression suite:
+
+                    native suite        SEMANTICS-2
+    frontier        must remain green   cross-architecture judgment
+    draft           must remain green   cross-architecture judgment
+    incumbent       n/a                 cross-architecture baseline
+
+## The rule
+
+    A candidate earns SEMANTICS-2 adapter investment if:
+
+      1. its native suite shows no broad correctness failure in the semantics
+         it claims to implement;
+      AND
+      2. it either
+         a) broadly implements the target live profile, or
+         b) represents a materially different architecture whose product
+            semantics are intentionally being tested.
+
+    frontier  1 + 2a   PROMOTED
+    draft     1 + 2b   PROMOTED — the architectural control
+    prepared  FAILS 1  332 exercised behaviours are wrong. Negative evidence
+                       already paid for; not disproven-by-harness unless a
+                       specific native-harness flaw is later identified.
+    replay    FAILS 2a 109 implemented / 531 unsupported. INCOMPLETE, not
+                       disproven. Archived; revisit if the gaps are filled.
+
+Six adapters, not twelve: three suites x two candidates.
+
+## The question the comparison must answer
+
+Not "which candidate has the most green tests", but:
+
+> Can **frontier** convert the incumbent's unnecessary refusals into correct
+> settlements while preserving all existing safety and composition semantics?
+
+> Can **draft** achieve the same correctness with materially simpler semantics
+> WITHOUT violating SignalTree's shared-state / direct-write product contract?
+
+    frontier passes, draft only works by changing what application code sees
+      -> strong evidence for frontier
+    draft passes naturally, frontier needs dependency graphs, precedence
+    bookkeeping and special cases everywhere
+      -> evidence the other way
+    both fail structural/composition rows
+      -> neither wins; the missing concept is located instead
+
+## ⚠️ Rules for the DRAFT adapter specifically
+
+Draft's **617 profile mismatches are not failures**. They report a different
+visibility model, which is the entire reason it is worth comparing.
+
+The adapter MUST NOT present draft-private state as though it were ordinary
+shared application state. For every relevant scenario it must expose separately:
+
+    canonical / shared state
+    candidate-private / draft state
+    what ORDINARY APPLICATION READERS see
+    what accept / merge exposes
+
+If satisfying SignalTree's direct-write / shared-state contract turns out to
+require the adapter to simulate a live overlay around the draft, that is not an
+adapter detail to be quietly implemented — it is the finding that **draft is not
+actually simpler for this product**, and it must be reported as such.
