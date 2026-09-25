@@ -5,6 +5,16 @@
 // a requirement that the checker's verdict on each is what it should be. Change
 // the checker in a way that stops catching one of these and this goes red.
 //
+// It imports ONLY the pure core — never the incumbent adapter. A checker that
+// judges implementations must not depend on one of the implementations being
+// judged, and the previous single-file version could not run from a clean
+// checkout at all because it statically imported the revision-pinned adapter
+// out of a gitignored scratch directory.
+//
+// These adapters establish SPECIFIC DETECTION CAPABILITIES. Passing them means
+// the checker catches these four shapes; it does not mean the checker is
+// complete.
+//
 // Each broken adapter reproduces a hole the checker actually had:
 //
 //   midstep     destroys P2's y=2 while rejecting P1 and repairs it while
@@ -16,7 +26,7 @@
 //
 // The control settles correctly and must PASS, so the suite cannot be satisfied
 // by a checker that simply rejects everything.
-import { runConformance } from './settlement-or-refusal-conformance.mjs';
+import { runConformance } from './candidate-conformance-core.mjs';
 
 const base = (mode) => async () => {
   let values = { x: 0, y: 0, z: 0 };
