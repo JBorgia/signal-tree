@@ -39,3 +39,50 @@ This does not authorize wider Link admission.
 
 No answer to an outstanding question is inferred from elapsed time. Safe local
 repairs, independent adversarial tests, and packed-artifact checks continue.
+
+---
+
+## OPEN — v15 dormant-transactions performance investigation (added 2026-09-25)
+
+**Decision:** whether to open a v15 investigation and likely PATCH RELEASE for
+the cost of `transactions()` when installed but idle.
+
+**Framing, deliberately narrow:**
+
+- This is a possible v15 **performance** update. There is **no demonstrated v15
+  correctness fix**, and nothing here claims a data-loss defect in shipped code.
+- It does **not** warrant changing v15's public API.
+- It is **conditional on reproduction** on the released v15 branch. Everything
+  measured so far was on the workspace tree.
+
+**What was measured (workspace, not the release branch):** installing
+`transactions()` and never opening a transaction cost **+223%** on 200k ordinary
+writes. `batching()` on the same write path costs ~0%, so this is specific to
+the transactions implementation rather than to enhancers or the substrate.
+Ablation attributes the largest share to notification EMISSION at
+`owned-mutation.ts:206`, installed by `wrapOwnedWritableSignal` when the build
+plan carries `mutation-capture`. A guarded spike measured **-56% dormant, -18%
+at 1% active, +2% fully active**.
+
+**Sequence, if taken up. Do NOT backport the experimental ablations — they are
+semantics-breaking mutants built to answer cost questions.**
+
+    1. reproduce the dormant benchmark on the RELEASED v15 branch. If the
+       released write path differs, the rest does not apply.
+    2. only then port a guarded implementation, and only if it
+         - enables capture BEFORE the first causal write
+         - keeps it enabled until every pending transaction AND consequence
+           resolves
+         - passes the existing transaction tests unchanged
+         - improves dormant writes without unacceptable active cost
+    3. patch release, if 1 and 2 hold
+
+**Why step 2's first two conditions are not boilerplate:** the guard spike
+demonstrated the failure mode directly. Raised ONE STATEMENT too late, the
+rollback still reported success while the value did not revert — causal evidence
+lost silently, invisible to any timing benchmark. That is a risk of a careless
+IMPLEMENTATION of this repair, not a property of shipped v15.
+
+Evidence: `docs/audits/2026-09-25-radical-alternatives/` —
+`l19-dormant-cost`, `l19-ablation-0b`, `l19-ablation-2`, `l19-dormant-guard`,
+`l19-profile-diff.md`.
