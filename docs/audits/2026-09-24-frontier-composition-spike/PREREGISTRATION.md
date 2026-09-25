@@ -204,3 +204,81 @@ to the same API.
 
 `contribution`, `owner`, `frontier` and `disposition` remain INTERNAL
 vocabulary. This is closed; it is not to be reopened by a spike result.
+
+---
+
+# OWNER-SEAM-0 — scoped 2026-09-24, no production commitment
+
+Scopes the plumbing each owner-resolution candidate needs, after OWNER-KEY-0
+showed neither populates itself for free.
+
+## Candidate B is far smaller than OWNER-KEY-0's failure implied
+
+The prerequisite failed because a write registers no dependency node. But the
+reason is not that the write path LACKS the node -- it is that the write branch
+simply never calls anything with it. In `location-runtime.ts` the callable is
+one function closing over one `node`:
+
+    const location = markTreeCell(function (value) {
+      if (arguments.length === 0) {
+        trackDependency(node, token);   // READ branch uses node
+        return read();
+      }
+      binding.replace(value);           // WRITE branch: node IS in scope,
+                                        // nothing is called with it
+    });
+
+`binding.notify` in the same closure already does `node.version += 1;
+notifyDependents(node)`. So the node is in lexical scope on both branches at
+every site.
+
+    DependencyNode creation sites in location-runtime.ts:  3
+    sites where the write path lacks the node:             0
+    files touched:                                         1
+
+Entity field leaves are covered by the same seam rather than needing separate
+structural plumbing: OWNER-KEY-0 showed `A.score()` registers dependency nodes,
+which means entity fields already ARE locations on this machinery. The seam sits
+at the location layer, which is the universal one.
+
+## Candidate A pays a permanent-metadata cost B does not
+
+A needs a durable `DependencyNode -> PositionId` mapping: new metadata per
+location, allocated on creation, with an explicit cleanup obligation at subject
+retirement.
+
+That collides with the hard criterion. v15 earned whole-lifetime forgetting, and
+a registry that outlives retired subjects would REGRESS a hard-won property, not
+merely add implementation work.
+
+B has no equivalent exposure. Ownership keyed directly by node can live in a
+`WeakMap<DependencyNode, owner>`, so when a subject retires and its nodes become
+unreachable the frontier entries disappear with them. Zero-residue is structural
+rather than a cleanup path that must be written, tested and kept correct.
+
+    criterion                         A                         B
+    new permanent identities          one per location          none
+    translation steps                 node -> position -> turn  node -> owner
+    cleanup at retirement             explicit, must not leak   automatic
+    subject/key-reuse special cases   required                  none (F3-B, D)
+    production touchpoints            registry + write + retire 3, one file
+
+## Recommendation
+
+**Candidate B**, on the criteria as written: fewer permanent identities, fewer
+translation steps, fewer special cases, cleaner cleanup. OWNER-KEY-0's
+structural result independently supports it -- the kernel already exposes a
+subject anchor node plus distinct leaf nodes, which is the identity a frontier
+wants, so nothing has to reconstruct `(SubjectId, leaf)`.
+
+UNMEASURED, and not to be asserted: the runtime cost of registering ownership on
+every write. DEPENDENCY-1's timings were too noisy to use and this seam sits on
+the hottest path in the kernel. A real isolated benchmark is required before
+adoption, and the zero-owner case must stay free.
+
+## Standing constraint
+
+Implement only enough of B to make F3 real, then run F5 IMMEDIATELY. If F5 shows
+no meaningful independent-progress gain, stop and reassess rather than
+continuing to refine ownership. The ownership model is not the deliverable; the
+Link/L16 behaviour is.
