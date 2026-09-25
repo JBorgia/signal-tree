@@ -308,3 +308,53 @@ It does not exercise Link, framework realization, restoration or serialization,
 because PROTOCOL disclaims all of them. Rows that the bridge cannot represent
 honestly are reported `unsupported`; none of them is faked, and `unsupported`
 never counts toward a pass.
+
+---
+
+# Bridged run — CORRECTED denominators, 2026-09-24
+
+The first table published from the bridge compared `native 160/253` with
+`frontier 177/253`. **Those denominators were not the same population** and the
+comparison was invalid.
+
+50 of the 253 rows are refused by the BRIDGE, not by any candidate: 41 by
+honesty rule 3 (`confirmedCount`; `stats().history` is not a confirmed-turn
+count) and 9 by rule 4 (`linkName`). The native adapter has real implementations
+of both -- `runtime.getConfirmedTurnCount()` and a real outbound relationship --
+so it answers those rows. No bridged candidate can. Excluding them is not the
+earlier over-strong rule about incumbent-unobservable rows: these are rows the
+TRANSLATION cannot carry, so they are denied to every candidate equally.
+
+On the 203 rows the bridge carries for everyone:
+
+    path          held  violated  unsupported  error
+    native         110        58           35      0
+    frontier       177        16           10      0
+    prepared       106        76           21      0
+    draft           69       120           14      0
+    replay          43         0          160      0
+
+Native loses exactly the 50 it previously held; frontier loses none, because its
+50 were already unsupported. The correction therefore STRENGTHENS frontier's
+relative position rather than softening it.
+
+## The coverage hole this exposes, which matters more than the ranking
+
+The 50 excluded rows are ones NATIVE PASSES and NO candidate was tested on, and
+they are exactly the L15 retention rows and the link rows. **Frontier is
+currently unmeasured on retention and on links.** L15 is one of the eighteen
+laws. This is a gap in the evidence, not a wash, and it does not close by
+running more candidates.
+
+## draft's 16 errors are NOT a bridge defect
+
+All 16 are `T12/pending/*` and `T12/confirmed/*`; the same case with an ORDINARY
+later write (`T02a`) does not error. The trigger is a second contribution
+editing the entity a still-pending first contribution added. A draft is based on
+CANONICAL, so `store.entities.get(op.ref)` misses and draft.mjs:92 throws
+`Conflict('Entity lifetime no longer exists')`.
+
+The native kernel holds all 16. Draft cannot, without simulating a live overlay
+around the draft -- which the frozen promotion rule names in advance as the
+finding that **draft is not actually simpler for this product**, and forbids
+implementing quietly. It is recorded here as that finding, not repaired.
