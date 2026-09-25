@@ -273,7 +273,8 @@ export class PathNotifier {
     positionIds?: number[],
     meta?: WriteMetadata,
     declaredScopes?: DeclaredWriteScopes,
-    ownerId?: number
+    ownerId?: number,
+    isolateSubscribers = false
   ): void {
     // ⚠️ THE INTERCEPTOR LOOP WAS DELETED IN 15.0 — PATH-NOTIFIER-INTERCEPT-
     // SURVIVAL-0. It ran here, before subscribers, and could suppress delivery
@@ -295,12 +296,16 @@ export class PathNotifier {
 
     // Run subscribers
     //
-    // TX-OBSERVER-STRAND-0. Each handler is isolated. The write is already
-    // applied, so a subscriber's throw cannot undo it; it could only escape
-    // into whoever flushed. That was a `transaction()` that then returned no
-    // handle and left its commit scope open (holding every later Link
-    // consequence), or a microtask that dropped the rest of the batch and the
-    // flush callbacks. Report it and keep delivering.
+    // TX-OBSERVER-STRAND-0. A DEFERRED delivery isolates each handler. The
+    // write is already applied, so a subscriber's throw cannot undo it; it
+    // could only escape into whoever flushed. That was a `transaction()` that
+    // then returned no handle and left its commit scope open (holding every
+    // later Link consequence), or a microtask that dropped the rest of the
+    // batch and the flush callbacks. Report it and keep delivering.
+    //
+    // SYNCHRONOUS delivery (batching disabled, an internal seam) still throws
+    // into the writer's own stack, unchanged; the 16.x line pins rollback()
+    // settling first and then surfacing it there.
     for (const [pattern, handlers] of this.subscribers) {
       if (this.matches(pattern, path)) {
         for (const handler of handlers) {
@@ -318,6 +323,7 @@ export class PathNotifier {
               ownerId
             ));
           } catch (error) {
+            if (!isolateSubscribers) throw error;
             console.error(
               `SignalTree: a write subscriber threw while observing '${path}'; delivery continued.`,
               error
@@ -370,7 +376,8 @@ export class PathNotifier {
           entry.positionIds,
           materializeDeliveryMeta(entry.meta),
           entry.declaredScopes,
-          entry.ownerId
+          entry.ownerId,
+          true
         );
       }
     }
