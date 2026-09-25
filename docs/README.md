@@ -20,6 +20,7 @@ NOT establish that 16.0.0 was published or is safe to release.
 | [Overview](overview.md)             | High-level project overview and specifications      |
 | [Root README](../README.md)         | Main project README                                 |
 | [Repository Map](repository-map.md) | Source, validation, history, and artifact ownership |
+| [Product Vision](product-vision.md) | Business/product TARGET — aspiration, not shipped capability |
 
 ---
 
