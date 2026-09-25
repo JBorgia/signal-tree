@@ -61,6 +61,7 @@ import {
 } from '../../lib/internals/mutation-capture-runtime';
 import { getOwnedPositionIds } from '../../lib/internals/owned-mutation';
 import { getPositionRegistry } from '../../lib/internals/position-registry';
+import { reportContainedObserverError } from '../../lib/internals/error-reporter';
 import { getPathNotifier } from '../../lib/path-notifier';
 import { isTraversableNode } from '../../lib/utils';
 import {
@@ -1001,10 +1002,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
       try {
         listener(payload);
       } catch (error) {
-        console.error(
-          'SignalTree: a transaction lifecycle listener threw; the transaction continued.',
-          error
-        );
+        reportContainedObserverError({
+          error,
+          operation: 'transaction:listener',
+          treeId: getPositionRegistry(tree.$)?.id,
+        });
       }
     }
   };

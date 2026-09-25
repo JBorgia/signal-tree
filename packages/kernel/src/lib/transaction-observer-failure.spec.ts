@@ -1,10 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getTreeRealizationPort } from './internals/causal-runtime/tree-realization-adapter';
+import {
+  clearTreeErrorListenersForTesting,
+  onTreeError,
+  type TreeErrorEvent,
+} from './internals/error-reporter';
 import { MUTATION_CAPTURE_RUNTIME } from './internals/mutation-capture-runtime';
+import { getPositionRegistry } from './internals/position-registry';
 import { observeWrites } from './internals/write-observation';
 import { link } from './link';
-import { getPathNotifier } from './path-notifier';
+import { getPathNotifier, PathNotifier } from './path-notifier';
 import { signalTree } from './signal-tree';
 import {
   peekInternalTransactionRuntime,
@@ -270,6 +276,111 @@ describe('a throwing observer cannot strand a transaction or silence Link', () =
     } finally {
       port.validateEffects = original;
       relation.dispose();
+      tree.destroy();
+    }
+  });
+});
+
+describe('a contained observer error is reported, never silent', () => {
+  let report: ReturnType<typeof vi.spyOn>;
+  beforeEach(() => {
+    report = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+  });
+  afterEach(() => {
+    clearTreeErrorListenersForTesting();
+    report.mockRestore();
+  });
+
+  it('reaches onTreeError with the tree and path, and writes nothing to the console', async () => {
+    const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
+    const events: TreeErrorEvent[] = [];
+    const offErrors = onTreeError((event) => void events.push(event));
+    const failure = new Error('observer');
+    const off = observeWrites(() => {
+      throw failure;
+    });
+    try {
+      tree.$.x(1);
+      await flush();
+      expect(events).toEqual([
+        {
+          error: failure,
+          operation: 'notify:subscriber',
+          treeId: getPositionRegistry(tree.$)!.id,
+          path: 'x',
+        },
+      ]);
+      expect(report).not.toHaveBeenCalled();
+    } finally {
+      off();
+      offErrors();
+      tree.destroy();
+    }
+  });
+
+  it('falls back to console.error as ST2034 when no onTreeError listener exists', async () => {
+    const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
+    const failure = new Error('observer');
+    const off = observeWrites(() => {
+      throw failure;
+    });
+    try {
+      tree.$.x(1);
+      await flush();
+      expect(report).toHaveBeenCalledWith(
+        expect.stringContaining('[ST2034]'),
+        failure
+      );
+    } finally {
+      off();
+      tree.destroy();
+    }
+  });
+
+  it('falls back to the console for a write no tree can be attributed to', () => {
+    const events: TreeErrorEvent[] = [];
+    const offErrors = onTreeError((event) => void events.push(event));
+    const notifier = new PathNotifier();
+    const failure = new Error('observer');
+    notifier.subscribe('**', () => {
+      throw failure;
+    });
+    try {
+      notifier.notify('loose', 1, 0);
+      expect(() => notifier.flushSync()).not.toThrow();
+      expect(events).toEqual([]);
+      expect(report).toHaveBeenCalledWith(
+        expect.stringContaining('[ST2034]'),
+        failure
+      );
+    } finally {
+      offErrors();
+      notifier.clear();
+    }
+  });
+
+  it('reports a throwing lifecycle listener through onTreeError', async () => {
+    const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
+    const events: TreeErrorEvent[] = [];
+    const offErrors = onTreeError((event) => void events.push(event));
+    const failure = new Error('listener');
+    const off = peekInternalTransactionRuntime(tree)!.onPendingCreated(() => {
+      throw failure;
+    });
+    try {
+      tree.transaction(() => tree.$.x(1)).confirm();
+      await flush();
+      expect(events).toEqual([
+        {
+          error: failure,
+          operation: 'transaction:listener',
+          treeId: getPositionRegistry(tree.$)!.id,
+        },
+      ]);
+      expect(report).not.toHaveBeenCalled();
+    } finally {
+      off();
+      offErrors();
       tree.destroy();
     }
   });
