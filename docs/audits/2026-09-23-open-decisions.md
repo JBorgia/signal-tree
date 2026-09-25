@@ -44,6 +44,21 @@ repairs, independent adversarial tests, and packed-artifact checks continue.
 
 ## OPEN — v15 dormant-transactions performance investigation (added 2026-09-25)
 
+> **CORRECTION 2026-09-25 — the guarded spike cited below is UNSAFE and is
+> withdrawn as a repair.** It gated notification EMISSION on "a transaction is
+> live". Emission also feeds `link()`, restoration, devtools, provenance,
+> write-observation and diagnostics, not only transactions. With that guard, an
+> ordinary write in a dormant tree NEVER reaches a Link endpoint
+> (`l19-guard-link-safety.mjs`: unguarded delivers `[7]`, guarded delivers `[]`).
+> Its "-56% dormant" was partly bought by silencing every other consumer. The
+> spike only ever checked rollback, so this went unseen. Any emission guard must
+> be keyed on "some consumer needs this owner's notifications", not on
+> transaction liveness.
+>
+> The observer-registration half is a SEPARATE, safe change and is already fixed
+> on main in `45f4ed8e` -- the observer only builds a snapshot copy and never
+> affects delivery.
+
 **Decision:** whether to open a v15 investigation and likely PATCH RELEASE for
 the cost of `transactions()` when installed but idle.
 
