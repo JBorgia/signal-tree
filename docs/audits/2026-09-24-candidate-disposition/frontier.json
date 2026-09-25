@@ -1,0 +1,4064 @@
+{
+  "profile": "live",
+  "totals": {
+    "passed": 614,
+    "failed": 0,
+    "error": 0,
+    "unsupported": 26,
+    "profile-mismatch": 36
+  },
+  "results": [
+    {
+      "id": "S01-one-accept",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 6.878083
+    },
+    {
+      "id": "S02-local-supersedes-accept",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.7959579999999988
+    },
+    {
+      "id": "S01-one-reject",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.19149999999999778
+    },
+    {
+      "id": "S02-local-supersedes-reject",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.21291599999999988
+    },
+    {
+      "id": "S03-two-pending",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.13020799999999966
+    },
+    {
+      "id": "S04-three-pending",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.15045800000000042
+    },
+    {
+      "id": "S05-reject-1",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.20075000000000642
+    },
+    {
+      "id": "S06-reject-2",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.16441700000000026
+    },
+    {
+      "id": "S07-reject-3",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.1598330000000061
+    },
+    {
+      "id": "S08-accept-1",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.3327499999999972
+    },
+    {
+      "id": "S09-accept-2",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.1736670000000018
+    },
+    {
+      "id": "S10-accept-3",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.15654200000000174
+    },
+    {
+      "id": "S11-12-AA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.30433299999999974
+    },
+    {
+      "id": "S11-12-AR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.3237919999999974
+    },
+    {
+      "id": "S11-12-RA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2600000000000051
+    },
+    {
+      "id": "S11-12-RR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.22820899999999966
+    },
+    {
+      "id": "S11-21-AA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.33424999999999727
+    },
+    {
+      "id": "S11-21-AR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2040410000000037
+    },
+    {
+      "id": "S11-21-RA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.18520800000000293
+    },
+    {
+      "id": "S11-21-RR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.18608299999999645
+    },
+    {
+      "id": "S12-123-AAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.21845900000000285
+    },
+    {
+      "id": "S12-123-AAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.30529199999999435
+    },
+    {
+      "id": "S12-123-ARA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2204580000000007
+    },
+    {
+      "id": "S12-123-ARR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.31408400000000114
+    },
+    {
+      "id": "S12-123-RAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2521249999999995
+    },
+    {
+      "id": "S12-123-RAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.23475000000000534
+    },
+    {
+      "id": "S12-123-RRA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.28266699999999645
+    },
+    {
+      "id": "S12-123-RRR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.3943749999999966
+    },
+    {
+      "id": "S12-132-AAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2162919999999957
+    },
+    {
+      "id": "S12-132-AAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2352910000000037
+    },
+    {
+      "id": "S12-132-ARA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2817090000000064
+    },
+    {
+      "id": "S12-132-ARR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.25475000000000136
+    },
+    {
+      "id": "S12-132-RAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.23075000000000045
+    },
+    {
+      "id": "S12-132-RAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.22620900000000432
+    },
+    {
+      "id": "S12-132-RRA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.21416700000000333
+    },
+    {
+      "id": "S12-132-RRR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2804999999999964
+    },
+    {
+      "id": "S12-213-AAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.19729200000000446
+    },
+    {
+      "id": "S12-213-AAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.20845899999999773
+    },
+    {
+      "id": "S12-213-ARA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.19691600000000165
+    },
+    {
+      "id": "S12-213-ARR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2598339999999979
+    },
+    {
+      "id": "S12-213-RAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.19766600000000523
+    },
+    {
+      "id": "S12-213-RAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.20895900000000012
+    },
+    {
+      "id": "S12-213-RRA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.1950829999999968
+    },
+    {
+      "id": "S12-213-RRR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.20937500000000142
+    },
+    {
+      "id": "S12-231-AAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.25091700000000117
+    },
+    {
+      "id": "S12-231-AAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.221584
+    },
+    {
+      "id": "S12-231-ARA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.19770800000000577
+    },
+    {
+      "id": "S12-231-ARR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2304589999999962
+    },
+    {
+      "id": "S12-231-RAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2597499999999968
+    },
+    {
+      "id": "S12-231-RAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.23408400000000285
+    },
+    {
+      "id": "S12-231-RRA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.19466699999999548
+    },
+    {
+      "id": "S12-231-RRR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.22008299999999537
+    },
+    {
+      "id": "S12-312-AAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.19804200000000094
+    },
+    {
+      "id": "S12-312-AAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2669169999999994
+    },
+    {
+      "id": "S12-312-ARA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.19395800000000207
+    },
+    {
+      "id": "S12-312-ARR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.21783299999999883
+    },
+    {
+      "id": "S12-312-RAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2134580000000028
+    },
+    {
+      "id": "S12-312-RAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.24587499999999807
+    },
+    {
+      "id": "S12-312-RRA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.19187500000000313
+    },
+    {
+      "id": "S12-312-RRR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2169579999999982
+    },
+    {
+      "id": "S12-321-AAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.23279199999999634
+    },
+    {
+      "id": "S12-321-AAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.23370800000000003
+    },
+    {
+      "id": "S12-321-ARA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2546250000000043
+    },
+    {
+      "id": "S12-321-ARR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.22108300000000014
+    },
+    {
+      "id": "S12-321-RAA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.19291700000000134
+    },
+    {
+      "id": "S12-321-RAR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.20383299999999593
+    },
+    {
+      "id": "S12-321-RRA",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.19812500000000455
+    },
+    {
+      "id": "S12-321-RRR",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.2667500000000018
+    },
+    {
+      "id": "S13-two-pending-local-frontier-accept",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.24620800000000287
+    },
+    {
+      "id": "S14-newer-accepted-older-accept",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.1542920000000052
+    },
+    {
+      "id": "S13-two-pending-local-frontier-reject",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.1663329999999945
+    },
+    {
+      "id": "S14-newer-accepted-older-reject",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.12950000000000017
+    },
+    {
+      "id": "S13-frontier-between-proposals",
+      "family": "scalar",
+      "status": "passed",
+      "ms": 0.18508299999999878
+    },
+    {
+      "id": "A1-A5-unrelated-snapshot",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.3172920000000019
+    },
+    {
+      "id": "A1-A5-unrelated-external",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.1395000000000053
+    },
+    {
+      "id": "A1-A5-unrelated-version",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.1758750000000049
+    },
+    {
+      "id": "A5-equal-value-is-not-an-ack",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.16370899999999722
+    },
+    {
+      "id": "A2-A4-accepts-only-named-owner",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.5930410000000066
+    },
+    {
+      "id": "A2-A4-rejects-only-named-owner",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.43200000000000216
+    },
+    {
+      "id": "A2-A4-includes-only-named-owner",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.4362080000000006
+    },
+    {
+      "id": "A4-includes-is-not-a-global-watermark",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.6160830000000033
+    },
+    {
+      "id": "A2-correlation-without-payload",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.20437499999999886
+    },
+    {
+      "id": "A6-T18-T21-version-order-not-arrival",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.19966700000000515
+    },
+    {
+      "id": "T20-stale-payload-independent-ack",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.2937079999999952
+    },
+    {
+      "id": "T22-unordered-refuses-unchanged",
+      "family": "authority",
+      "status": "passed",
+      "ms": 0.18849999999999767
+    },
+    {
+      "id": "F-terminal-accept-then-accept",
+      "family": "terminal",
+      "status": "passed",
+      "ms": 0.1715419999999952
+    },
+    {
+      "id": "F-terminal-accept-then-reject",
+      "family": "terminal",
+      "status": "passed",
+      "ms": 0.12774999999999892
+    },
+    {
+      "id": "F-terminal-reject-then-accept",
+      "family": "terminal",
+      "status": "passed",
+      "ms": 0.1197920000000039
+    },
+    {
+      "id": "F-terminal-reject-then-reject",
+      "family": "terminal",
+      "status": "passed",
+      "ms": 0.16704200000000213
+    },
+    {
+      "id": "O01-live-multifield-accept",
+      "family": "publication",
+      "status": "passed",
+      "ms": 0.118583000000001
+    },
+    {
+      "id": "O02-live-multifield-reject",
+      "family": "publication",
+      "status": "passed",
+      "ms": 0.09695899999999824
+    },
+    {
+      "id": "O05-partially-superseded-accept",
+      "family": "publication",
+      "status": "passed",
+      "ms": 0.10716599999999943
+    },
+    {
+      "id": "O02-partially-superseded-reject",
+      "family": "publication",
+      "status": "passed",
+      "ms": 0.11574999999999847
+    },
+    {
+      "id": "O-authority-settles-two-units-atomically",
+      "family": "publication",
+      "status": "passed",
+      "ms": 0.1325830000000039
+    },
+    {
+      "id": "D-S01-O-multifield-accept",
+      "family": "publication",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "D-S01-O-multifield-reject",
+      "family": "publication",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "D-S03-isolated-proposals",
+      "family": "scalar",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "D-A1-canonical-advances-draft-keeps-base",
+      "family": "authority",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "T01-add-reject/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.5032090000000053
+    },
+    {
+      "id": "T01-add-reject/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.33608300000000213
+    },
+    {
+      "id": "T01-add-reject/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20095799999999997
+    },
+    {
+      "id": "T01-add-reject/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.8689579999999992
+    },
+    {
+      "id": "T01-add-reject/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2151669999999939
+    },
+    {
+      "id": "T01-add-reject/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19874999999999687
+    },
+    {
+      "id": "T01-add-reject/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20308299999999946
+    },
+    {
+      "id": "T01-add-reject/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1747920000000036
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-0",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical field support depends on pending-created existence\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:232:9)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:139:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.3311660000000032
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-1",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical field support depends on pending-created existence\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:232:9)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:139:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.14141700000000412
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-2",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical field support depends on pending-created existence\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:232:9)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:139:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.19312499999999488
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-3",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical field support depends on pending-created existence\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:232:9)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:139:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.1161249999999967
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-4",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical field support depends on pending-created existence\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:232:9)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:139:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.11462500000000375
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-5",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical field support depends on pending-created existence\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:232:9)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:139:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.11512500000000614
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-6",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical field support depends on pending-created existence\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:232:9)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:139:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.11312499999999659
+    },
+    {
+      "id": "T02a-add-committed-edit-refusal/keys-7",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical field support depends on pending-created existence\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:232:9)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:139:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.11108400000000529
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.33766699999999616
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.31970900000000313
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2590840000000014
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2533329999999978
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2531670000000048
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.35045799999999616
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.27325000000000443
+    },
+    {
+      "id": "T12-add-pending-edit-refusal-retry/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23349999999999937
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22345800000000082
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24629199999999685
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.26858299999999957
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1896249999999995
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17383399999999938
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17124999999999346
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17020899999999983
+    },
+    {
+      "id": "T03-T04-add-remove-absent-accept/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2277079999999998
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21379199999999798
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2167089999999945
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.29058300000000514
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20145900000000694
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2519580000000019
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19583399999999784
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19633300000000276
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-accept/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2164590000000004
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15304199999999923
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.25808400000000375
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18420800000000526
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15987499999999955
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15900000000000603
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15937500000000426
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20583299999999838
+    },
+    {
+      "id": "T03-T04-add-remove-absent-reject/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16133299999999906
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.170499999999997
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20716700000000543
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20545800000000725
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2701250000000073
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18799999999998818
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24483299999999986
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23908300000000793
+    },
+    {
+      "id": "T03-T04-add-remove-replacement-reject/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.29204199999999503
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-0",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:190:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.19529200000000912
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-1",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:190:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.10287499999999739
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-2",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:190:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.09658300000000963
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-3",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:190:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.17304099999999778
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-4",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:190:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.09312500000000057
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-5",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:190:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.0885420000000039
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-6",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:190:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.08687500000000625
+    },
+    {
+      "id": "T05-R6-remove-readd-atomic-authority-retry/keys-7",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:190:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.09479200000001242
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.14124999999999943
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12891700000000128
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18387500000000045
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11924999999999386
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2383750000000049
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19275000000000375
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15491599999998584
+    },
+    {
+      "id": "T06a-rekey-field-independent/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.14545800000000497
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-0",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:218:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.16441700000000026
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-1",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:218:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.11074999999999591
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-2",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:218:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.09933399999999892
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-3",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:218:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.1565829999999977
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-4",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:218:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.10508400000000506
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-5",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:218:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.09950000000000614
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-6",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:218:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.10179100000000574
+    },
+    {
+      "id": "T06b-rekey-old-key-occupancy-dependent/keys-7",
+      "family": "structural",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at checkDependent (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:44:30)\n    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:218:3\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/structural-cases.mjs:118:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.09658300000000963
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16316600000000392
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.13229099999999505
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12716600000000255
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18300000000000693
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12587499999999352
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12341600000000597
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12366699999999753
+    },
+    {
+      "id": "T07-rekey-remove-accept/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12329099999999471
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11270799999999781
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.13637500000000102
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12820800000000077
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17045800000001066
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12354100000000301
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12187500000000284
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12416699999999992
+    },
+    {
+      "id": "T07-rekey-remove-reject/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.12212500000001114
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18329199999999446
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15687499999999943
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24524999999999864
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20045799999999758
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.167082999999991
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16070799999999963
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16183300000000145
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-accept/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15962499999999125
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1442080000000061
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2338749999999976
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1681250000000034
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15774999999999295
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16820899999999028
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15662500000000534
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16558299999999804
+    },
+    {
+      "id": "T07-T08-rekey-remove-destination-replacement-reject/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.25175000000000125
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-0",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.26241600000000176
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-1",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.1958750000000009
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-2",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.18662499999999227
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-3",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.18733399999999278
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-4",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.2529580000000067
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-5",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.18745799999999235
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-6",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.18370799999999576
+    },
+    {
+      "id": "T11-held-lifetime-accept/keys-7",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.19816699999999798
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-0",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.17933399999999722
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-1",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.24908299999999883
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-2",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.18741599999999892
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-3",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.1910830000000061
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-4",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.18350000000000932
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-5",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.1857920000000064
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-6",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.23212499999999636
+    },
+    {
+      "id": "T11-held-lifetime-reject/keys-7",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.18291700000000333
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18591700000000344
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.14100000000000534
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11508299999999849
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11512499999999193
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.13025000000000375
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15879199999999116
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1353330000000028
+    },
+    {
+      "id": "T14-mixed-scalar-structural-accept/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2698750000000132
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11583300000000918
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.13195899999999483
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11695899999999426
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11516699999999958
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.13287499999999852
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2050829999999877
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.14274999999999238
+    },
+    {
+      "id": "T14-mixed-scalar-structural-reject/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.11741600000000574
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3234170000000063
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1988330000000076
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20266599999999357
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2690419999999989
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1996250000000117
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21787500000000648
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22262499999999363
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-0/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19866700000000037
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2351669999999899
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19270800000001032
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1980840000000086
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18941700000000594
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1958750000000009
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2389999999999901
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1888749999999959
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-1/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18883300000000247
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17333299999999952
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18962499999999238
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24716699999999037
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18795900000000643
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.196542000000008
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18741600000001313
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18695900000000165
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-2/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23245799999999406
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17133400000000165
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1884589999999946
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18866699999999526
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1999579999999952
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.27008299999999963
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20620800000000372
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19174999999999898
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-3/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23362500000000352
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1664169999999956
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.27070799999999906
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20045799999999758
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18841599999998948
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1859579999999994
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18558399999999153
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24962499999999466
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-4/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18329200000000867
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16249999999999432
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17791699999999366
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17937499999999318
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24662500000000875
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17833300000000918
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17833399999999244
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17791699999999366
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-5/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18437500000000284
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20749999999999602
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17812500000000853
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17825000000000557
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2203750000000042
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20470799999999656
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.29895799999999895
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17974999999999852
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-6/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19145799999999724
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1735000000000042
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18054200000000264
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2241250000000008
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17841700000001026
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17795800000000384
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1770000000000067
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24070799999999792
+    },
+    {
+      "id": "T10-three-rekeys/order-012/accept-mask-7/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.33362499999999784
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1875
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20425000000000182
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19341699999999662
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1947499999999991
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3082079999999934
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2126659999999987
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20045799999999758
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-0/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1977499999999992
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18229199999998968
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2532910000000044
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21212500000000034
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2242909999999938
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23254200000000935
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20070900000000336
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.26574999999999704
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-1/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2011669999999981
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17387499999999534
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1908329999999978
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20266699999999105
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.26174999999999216
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20179100000000005
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2012500000000017
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20370900000000347
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-2/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24608299999999872
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17516600000000437
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20108299999999701
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21454200000000867
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1976670000000098
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.4402499999999918
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19920799999999872
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18920899999999108
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-3/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18758400000000108
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1638329999999968
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24079200000001322
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1878329999999977
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18183299999999747
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2560409999999962
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1833339999999879
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2809170000000023
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-4/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2502089999999981
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23841699999999832
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1823750000000075
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1893749999999983
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2853330000000085
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17987500000000978
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18704100000000778
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20224999999999227
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-5/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20437499999999886
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1822920000000039
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.31987500000001035
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.34566600000000847
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1907500000000084
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18191699999999855
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18316700000001163
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.6230000000000047
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-6/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18891700000000355
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15500000000000114
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17079100000000835
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17633299999999963
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24262500000000387
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1697499999999934
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1683749999999975
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1702499999999958
+    },
+    {
+      "id": "T10-three-rekeys/order-021/accept-mask-7/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17895900000000609
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.29845900000000825
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1927919999999972
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19441699999998718
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18029199999999435
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20420799999999417
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24174999999999613
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17900000000000205
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-0/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17687499999999545
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19183300000000258
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1818749999999909
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2412080000000003
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18041600000000813
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17825000000000557
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2136249999999933
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1893749999999983
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-1/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1839170000000081
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2330829999999935
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18591599999999175
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18129199999999912
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17958300000000804
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19141700000000128
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23666699999999707
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18020800000000747
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-2/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19029199999999946
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16266600000000153
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17962499999998727
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22204099999999016
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17816700000000196
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.185292000000004
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18387500000000045
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1785420000000073
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-3/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22204100000000437
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1537919999999957
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16987500000000466
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1685420000000022
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1687079999999952
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1673329999999993
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2142079999999993
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16841600000000767
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-4/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16954200000000696
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15225000000000932
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1782089999999954
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23529200000000117
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16987500000000466
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1688749999999999
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17045899999999392
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17070800000000474
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-5/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2452909999999946
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1703329999999994
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17154099999999062
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16841700000000515
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16945800000000588
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2049999999999983
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17199999999999704
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16808300000000997
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-6/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16645800000000577
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1511249999999933
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18975000000000364
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.25941600000000165
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18850000000000477
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1757080000000002
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17241599999999835
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17241599999999835
+    },
+    {
+      "id": "T10-three-rekeys/order-102/accept-mask-7/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22675000000000978
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17766699999999958
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1862079999999935
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1850419999999957
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18370799999999576
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22829199999999616
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.182707999999991
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.27191699999998775
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-0/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19958300000000406
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1655839999999955
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19379200000000196
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2538330000000002
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.195959000000002
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18591600000000597
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1807500000000033
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17849999999999966
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-1/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2298329999999993
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17600000000000193
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17858300000000327
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1905840000000012
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17670900000000245
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2173750000000041
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17549999999999955
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17449999999999477
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-2/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17625000000001023
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1600000000000108
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24354199999999082
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18729199999999935
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17987499999999557
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17737499999999784
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18037499999999795
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2464999999999975
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-3/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.178875000000005
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15270900000000154
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1683749999999975
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17112500000000352
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16825000000000045
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23799999999999955
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2079999999999984
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16866600000000176
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-4/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16424999999999557
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.14841699999999491
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21512500000000045
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16424999999999557
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16108300000000497
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16570799999999508
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16416699999999196
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16216599999999914
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-5/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2034580000000119
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.14716699999999605
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16800000000000637
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20350000000000534
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20745800000000258
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24037500000000023
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1705000000000041
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16749999999998977
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-6/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1666659999999922
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15004200000001333
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2265000000000157
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17129099999999653
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1659580000000176
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16629199999999855
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1634999999999991
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21216699999999378
+    },
+    {
+      "id": "T10-three-rekeys/order-120/accept-mask-7/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16208299999999554
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17141599999999357
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1791249999999991
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17712499999998954
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17787500000000023
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23229200000000105
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19491700000000378
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18449999999998568
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-0/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18191600000000108
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16825000000000045
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.232167000000004
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18195800000000872
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18295799999998508
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18179100000000403
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18162499999999682
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.22470799999999258
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-1/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1856249999999875
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19829200000000924
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1924579999999878
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17566700000000424
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23091700000000515
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17412500000000364
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17354199999999764
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1747919999999965
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-2/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3843750000000057
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2271250000000009
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18225000000001046
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17970800000000509
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17754100000001927
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1764169999999865
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21787499999999227
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.4061670000000106
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-3/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17850000000001387
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.15287500000002296
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16775000000001228
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23591600000000312
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2696249999999907
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18037499999999795
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.28191699999999287
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17279200000001538
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-4/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16937500000000227
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21529200000000515
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16612499999999386
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16304099999999266
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16066699999998946
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16133399999998232
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1663329999999803
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20870800000000145
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-5/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16304199999999014
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1477079999999944
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16695799999999394
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1655420000000163
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20854200000002265
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.164291999999989
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16379200000000083
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16304099999999266
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-6/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16529199999999378
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1474580000000003
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21170799999998735
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16608300000001464
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16949999999999932
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23612500000001546
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17916700000000674
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2552090000000078
+    },
+    {
+      "id": "T10-three-rekeys/order-201/accept-mask-7/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17125000000001478
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1877499999999941
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1914589999999805
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19529099999999744
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.23808399999998642
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.5082920000000115
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.34754100000000676
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3176249999999925
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-0/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20704200000000128
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2363330000000019
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18387500000000045
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18416600000000471
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1834999999999809
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18320900000000506
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2315409999999929
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1822080000000028
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-1/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.18116699999998787
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1606249999999818
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17654199999998355
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.175707999999986
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.21862500000000296
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17466699999999946
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1753750000000025
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1745830000000126
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-2/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1752079999999978
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20204200000000583
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1756249999999966
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17491699999999355
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.24074999999999136
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.20845800000000736
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.5403750000000116
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1780000000000257
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-3/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.6447909999999979
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.4562909999999931
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3308749999999918
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17337499999999295
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.7165830000000142
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.48112500000002
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2451250000000016
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3628750000000025
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-4/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.34704199999998764
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.5666659999999979
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17524999999997704
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17029099999999175
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16849999999999454
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17125000000001478
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.225750000000005
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16791699999998855
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-5/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16774999999998386
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1511250000000075
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.16891599999999585
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19804199999998673
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.2185000000000059
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.311916999999994
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1675000000000182
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.4017499999999927
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-6/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.517832999999996
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-0",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.6127089999999953
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-1",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.1717090000000212
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-2",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.5167500000000018
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-3",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.47520799999998076
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-4",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.19045799999997826
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-5",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.3405840000000069
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-6",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17250000000001364
+    },
+    {
+      "id": "T10-three-rekeys/order-210/accept-mask-7/keys-7",
+      "family": "structural",
+      "status": "passed",
+      "ms": 0.17054199999998332
+    },
+    {
+      "id": "I01-I06-coexisting-typed-keys",
+      "family": "identity",
+      "status": "passed",
+      "ms": 0.40645799999998644
+    },
+    {
+      "id": "draft-control-isolated-add/keys-0",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-isolated-add/keys-1",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-isolated-add/keys-2",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-isolated-add/keys-3",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-isolated-add/keys-4",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-isolated-add/keys-5",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-isolated-add/keys-6",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-isolated-add/keys-7",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-0",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-1",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-2",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-3",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-4",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-5",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-6",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-remove-does-not-vacate-key/keys-7",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-0",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-1",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-2",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-3",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-4",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-5",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-6",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-rekey-does-not-vacate-key/keys-7",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-0",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-1",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-2",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-3",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-4",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-5",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-6",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "draft-control-mixed-accept-publication/keys-7",
+      "family": "structural",
+      "status": "profile-mismatch"
+    },
+    {
+      "id": "R01-50000-without-undo-history",
+      "family": "retention",
+      "status": "passed",
+      "ms": 2052.160958
+    },
+    {
+      "id": "R02-50000-without-undo-history",
+      "family": "retention",
+      "status": "passed",
+      "ms": 1518.6072090000002
+    },
+    {
+      "id": "R03-failed-retry-no-growth",
+      "family": "retention",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at refusalUnchanged (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/assertions.mjs:10:94)\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/composition-cases.mjs:68:5)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.3285839999998643
+    },
+    {
+      "id": "R04-terminal-records-leave-active-machinery",
+      "family": "retention",
+      "status": "passed",
+      "ms": 0.10854199999994307
+    },
+    {
+      "id": "R05-destroy-releases-pending-machinery",
+      "family": "retention",
+      "status": "passed",
+      "ms": 0.06629199999997581
+    },
+    {
+      "id": "R06-diagnostics-independent-functional-trace",
+      "family": "retention",
+      "status": "passed",
+      "ms": 0.11116700000002311
+    },
+    {
+      "id": "N01-N03-pending-x-repeated-independent-y",
+      "family": "progress",
+      "status": "passed",
+      "ms": 2.633624999999938
+    },
+    {
+      "id": "N02-failed-x-settlement-does-not-block-y",
+      "family": "progress",
+      "status": "unsupported",
+      "message": "Unsupported: Canonical key support depends on pending-vacated topology\n    at unsupported (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:15:23)\n    at canonicalSnapshot (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:228:26)\n    at Object.canonical (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/frontier.mjs:415:35)\n    at refusalUnchanged (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/assertions.mjs:10:94)\n    at Object.run (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/composition-cases.mjs:163:7)\n    at runCases (file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:12:74)\n    at async file:///Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/runner.mjs:32:18",
+      "ms": 0.14737500000001091
+    },
+    {
+      "id": "N04-N05-multiple-links-independent-settlement",
+      "family": "progress",
+      "status": "passed",
+      "ms": 0.26795799999990777
+    },
+    {
+      "id": "CCTX1-external-direct-preserves-pending",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.10291700000016135
+    },
+    {
+      "id": "CCTX1-external-direct-does-not-become-undoable",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.1514999999999418
+    },
+    {
+      "id": "CCTX3-undoable-direct-restores-own-write",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.12391600000000835
+    },
+    {
+      "id": "CCTX1-external-deferred-preserves-pending",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.13354100000015023
+    },
+    {
+      "id": "CCTX1-external-deferred-does-not-become-undoable",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.08483299999988958
+    },
+    {
+      "id": "CCTX3-undoable-deferred-restores-own-write",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.10420800000019881
+    },
+    {
+      "id": "CCTX2-local-deferred-supersedes-pending-authorship",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.08275000000003274
+    },
+    {
+      "id": "CCTX4-CCTX5-mixed-deferred-contexts-or-atomic-unsupported",
+      "family": "context",
+      "status": "passed",
+      "ms": 0.16337499999963256
+    }
+  ],
+  "runtime": {
+    "node": "v24.15.0",
+    "v8": "13.6.233.17-node.48",
+    "platform": "darwin",
+    "arch": "arm64"
+  }
+}
