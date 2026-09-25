@@ -1,0 +1,39 @@
+{
+  "probe": "F3",
+  "checks": [
+    {
+      "label": "F3-A P1 is pending",
+      "ok": true,
+      "detail": "turns=[1]"
+    },
+    {
+      "label": "F3-A P2 captured a read of the pending-created subject",
+      "ok": true,
+      "detail": "nodes=2"
+    },
+    {
+      "label": "F3-A owner resolution identifies a PENDING owner for a captured read",
+      "ok": false,
+      "detail": "resolved=0/2 reasons=[\"node has no address\"]"
+    },
+    {
+      "label": "F3-A the sparse edge P2 -> P1 is formed (owner is P1s turn)",
+      "ok": false,
+      "detail": "owners=[] p1=1"
+    },
+    {
+      "label": "F3-A rolling back P1 either refuses, or removes the subject it created",
+      "ok": true,
+      "detail": "rollback=refused subjectStillPresent=true"
+    },
+    {
+      "label": "F3-B a dependency on the OLD lifetime never becomes one on a fresh same-key subject",
+      "ok": true,
+      "detail": "sameNode=false"
+    },
+    {
+      "label": "F3-B NOTE addresses equal=true (address alone cannot separate lifetimes)",
+      "ok": true
+    }
+  ]
+}
