@@ -22,6 +22,8 @@ import {
 import { getWriteParticipation } from './write-participation';
 
 import { installPathDeliveryRuntime } from './internals/path-observation-port';
+import { reportContainedObserverError } from './internals/error-reporter';
+import type { TreeId } from './internals/position-registry';
 import type { WriteMetadata } from './mutation-types';
 
 export type PathNotifierHandler = (
@@ -301,7 +303,8 @@ export class PathNotifier {
     // could only escape into whoever flushed. That was a `transaction()` that
     // then returned no handle and left its commit scope open (holding every
     // later Link consequence), or a microtask that dropped the rest of the
-    // batch and the flush callbacks. Report it and keep delivering.
+    // batch and the flush callbacks. Report it (onTreeError, else [ST2034])
+    // and keep delivering.
     //
     // SYNCHRONOUS delivery (batching disabled, an internal seam) still throws
     // into the writer's own stack, unchanged; the 16.x line pins rollback()
@@ -324,10 +327,12 @@ export class PathNotifier {
             ));
           } catch (error) {
             if (!isolateSubscribers) throw error;
-            console.error(
-              `SignalTree: a write subscriber threw while observing '${path}'; delivery continued.`,
-              error
-            );
+            reportContainedObserverError({
+              error,
+              operation: 'notify:subscriber',
+              treeId: ownerId as TreeId | undefined,
+              path,
+            });
           }
         }
       }
