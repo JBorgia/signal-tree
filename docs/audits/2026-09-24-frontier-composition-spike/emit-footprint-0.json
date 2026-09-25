@@ -1,0 +1,57 @@
+{
+  "probe": "EMIT-FOOTPRINT-0",
+  "h1": {
+    "beforeResolve": [],
+    "afterResolve": [
+      701
+    ],
+    "p3StillOpen": true
+  },
+  "h2": {
+    "both": [],
+    "afterFirst": [],
+    "afterSecond": [
+      742
+    ]
+  },
+  "t": {
+    "beforeResolve": [],
+    "afterResolve": [
+      731
+    ]
+  },
+  "checks": [
+    {
+      "label": "H1 y is blocked while O1 is unresolved",
+      "ok": true
+    },
+    {
+      "label": "H1 resolving the ACTUAL blocker releases y even with P3 still open",
+      "ok": true,
+      "detail": "after=[701]"
+    },
+    {
+      "label": "H2 y blocked while BOTH O1 and O4 are unresolved",
+      "ok": true
+    },
+    {
+      "label": "H2 resolving only O1 does NOT release y (not a boolean flag)",
+      "ok": true,
+      "detail": "afterO1=[]"
+    },
+    {
+      "label": "H2 resolving O4 as well releases y",
+      "ok": true,
+      "detail": "afterO4=[742]"
+    },
+    {
+      "label": "T z transitively carries O1 through a SETTLED P2",
+      "ok": true
+    },
+    {
+      "label": "T resolving the root O1 releases z",
+      "ok": true,
+      "detail": "after=[731]"
+    }
+  ]
+}
