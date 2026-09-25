@@ -1,0 +1,29 @@
+{
+  "summary": [
+    {
+      "mode": "control",
+      "violations": 0,
+      "failed": false,
+      "expectedToFail": false
+    },
+    {
+      "mode": "midstep",
+      "violations": 6,
+      "failed": true,
+      "expectedToFail": true
+    },
+    {
+      "mode": "already",
+      "violations": 4,
+      "failed": true,
+      "expectedToFail": true
+    },
+    {
+      "mode": "torn2",
+      "violations": 2,
+      "failed": true,
+      "expectedToFail": true
+    }
+  ],
+  "problems": []
+}
