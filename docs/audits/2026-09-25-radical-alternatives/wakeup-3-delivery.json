@@ -1,0 +1,40 @@
+{
+  "probe": "WAKEUP-3",
+  "A": {
+    "whileBlocked": [],
+    "afterResolve": [
+      1
+    ],
+    "stillOpen": 0,
+    "parkedCount": 0
+  },
+  "B": {
+    "whileBlocked": [],
+    "afterResolve": [
+      1
+    ],
+    "stillOpen": 1,
+    "parkedCount": 0
+  },
+  "checks": [
+    {
+      "label": "A speculative x is withheld while blocked",
+      "ok": true,
+      "detail": "sent=[]"
+    },
+    {
+      "label": "A DELIVERY: Link receives x=1 after release, with NO write or read of x",
+      "ok": true,
+      "detail": "sent=[1]"
+    },
+    {
+      "label": "B withheld while blocked, with another turn open",
+      "ok": true
+    },
+    {
+      "label": "B DELIVERY while ANOTHER TURN IS STILL OPEN -- only the gate can release here",
+      "ok": true,
+      "detail": "sent=[1] otherOpen=1"
+    }
+  ]
+}
