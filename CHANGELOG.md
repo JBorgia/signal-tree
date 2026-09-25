@@ -1,3 +1,91 @@
+## Unreleased (15.3.1)
+
+**TL;DR** — **Patch. No API change; two correctness fixes and one new
+diagnostic.** (1) `link.settled()` could wait forever: on 15.3.0 two writes to a
+linked source while ANY transaction was pending were enough. A rolled-back
+overlapping transaction could also leave a linked endpoint on the discarded
+value. (2) A write observer that threw could make `transaction()` throw after
+its writes were applied, with no handle, and hold every later `link()` on that
+tree. Observer errors are now contained and reported through `onTreeError`, or
+to the console as [ST2034] when nothing is listening. Take it if you use
+`link()` with `transactions()`.
+
+### `link.settled()` hang, and a stale endpoint after an overlapping rollback
+
+Both reproduced against the 15.3.0 tarball installed from npm, through public
+entry points only:
+
+    case                                              15.3.0                         15.3.1
+    2 writes to a linked source while any             settled() never resolves       resolves
+      transaction is pending (1 write is fine)
+    T1 writes x=1, T2 writes x=5; T1 confirms,        endpoint stays 5,              endpoint 1,
+      T2 rolls back (tree correctly ends at 1)          settled() never resolves       resolves
+
+The tree value was always right. Only what observers saw was wrong, and there
+were two independent causes:
+
+- **The release signal behind `settled()` was orphaned.** Link's durable
+  consequence is keyed, so a later flush replaces a held one and only the last
+  run executes. Each flush minted a fresh release signal, and `settled()`
+  waited on the ones that could never be released. Coalesced observations now
+  share one signal.
+- **A rollback compensated silently.** Confirming T1 forgot a realization
+  descriptor that T2 still needed, and a compensation with no descriptor has no
+  path to notify on. No subscriber, Link included, learned the value changed
+  back. A descriptor a pending turn still refers to is now deferred, and it is
+  collected once nothing pending refers to it.
+
+### A throwing write observer stranded the transaction
+
+On 15.3.0, an `observeWrites()` subscriber (from `@signal-tree/kernel/internals`)
+that threw while `transaction()` flushed its writes did this:
+
+    transaction() threw   yes, after its writes were applied; no handle returned
+    commit scope          never settled, so every later link() consequence was held
+    same flush            the rest of the batch and every flush callback were lost
+
+The policy is now defined in two parts:
+
+- **An observer cannot fail the write or transaction it observes.** In
+  deferred (batched) delivery, each write subscriber and each transaction
+  lifecycle listener is isolated. Its error is reported, and delivery continues
+  to the other subscribers, the rest of the batch and the flush callbacks.
+  Reporting goes through `onTreeError` (operation `notify:subscriber` or
+  `transaction:listener`, with the tree's id). When no `onTreeError` listener
+  is registered, or the write names no tree, the explicit fallback is
+  `console.error` with [ST2034], in production too. These errors used to
+  throw, so containing them must not make them silent. Synchronous delivery
+  (batching disabled, an internal test seam) still throws into the writer.
+- **Once the callback returns, `transaction()` returns a handle or throws
+  with its writes rolled back, and the commit scope settles either way.** This
+  also covers a failure after the callback, such as the internal mutation
+  capture failing to release. That case used to throw with the writes applied
+  and no handle.
+
+### Behaviour changes to know about
+
+- An observer error in batched delivery no longer propagates. Before, it
+  escaped from `transaction()` or from the microtask that flushed, as an
+  uncaught error. If you relied on that throw, register `onTreeError`.
+- `reportTreeError` (internal) now returns whether any listener observed the
+  report. `onTreeError` and `TreeErrorEvent` are unchanged.
+
+### Known issue, not fixed here
+
+A tree with `transactions()` keeps 4 realization-descriptor entries for every
+entity it has ever removed. Measured on the installed 15.3.0: 4 entries per
+retired entity, and about 2.2 KB of retained heap per retired entity against
+under 0.4 KB without `transactions()` (5 runs). Confirming a transaction does
+not reclaim them. This is tracked for 15.3.2.
+
+### Verification
+
+Pinned by `link-overlapping-rollback.spec.ts` (10 cases) and
+`transaction-observer-failure.spec.ts` (12 cases). Every fix mechanism was
+mutation-checked: removing it fails at least one pinned case. Both
+installed-package reproductions report the defect on 15.3.0 and pass on a build
+of this branch.
+
 ## 15.3.0 (2026-09-24)
 
 **TL;DR** — **Minor, with two behaviour changes to published surfaces.**
