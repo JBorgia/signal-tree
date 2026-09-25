@@ -1,0 +1,53 @@
+{
+  "probe": "RADICAL-CONTRIBUTION-STORE-0",
+  "checks": [
+    {
+      "label": "1 F1 overlap: rolling back the older contribution leaves the newer intact, no compensation",
+      "ok": true,
+      "detail": "x=0 y=2 z=2"
+    },
+    {
+      "label": "2 authoritative supersession survives rollback of the authored contribution",
+      "ok": true,
+      "detail": "visible=3 exposable=3"
+    },
+    {
+      "label": "3 dependent y is VISIBLE at 2 but NOT exposable while O1 is unresolved",
+      "ok": true,
+      "detail": "visible=2 exposable=0"
+    },
+    {
+      "label": "3b resolving O1 makes the same contribution exposable, with no waiter bookkeeping",
+      "ok": true,
+      "detail": "exposable=2"
+    },
+    {
+      "label": "4 independent y is exposable immediately while speculative x is not",
+      "ok": true,
+      "detail": "exposable x=0 y=7"
+    },
+    {
+      "label": "8 multi-blocker: exposable only after BOTH obligations resolve",
+      "ok": true,
+      "detail": "before=0 afterO1=0 afterO4=5"
+    },
+    {
+      "label": "9 transitive: z is not exposable while the ROOT O1 is unresolved",
+      "ok": true
+    },
+    {
+      "label": "9b resolving the root makes z exposable",
+      "ok": true
+    },
+    {
+      "label": "RETENTION settled obligation-clean contributions FOLD into base and disappear",
+      "ok": true,
+      "detail": "maxDepth=0 totalLiveContribs=0"
+    },
+    {
+      "label": "10 ordinary writes leave NO accumulated contributions (stack stays O(live), not O(writes))",
+      "ok": true,
+      "detail": "live=0 visible=999"
+    }
+  ]
+}
