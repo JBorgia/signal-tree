@@ -593,3 +593,75 @@ last several rounds each punished exactly this inference step, so EMIT-FOOTPRINT
 must test it rather than assume it -- including the falsifier that omitting a
 pending write from the containment check makes the branch wrongly eligible and
 lets speculative state escape.
+
+---
+
+# HYPOTHESIS CORRECTED — it was worse than the code already run
+
+The hypothesis recorded in 9e004d95 was:
+
+    eligible(source) := no OPEN contribution owns a write inside this source
+
+**That is insufficient, and it is wrong in the dangerous direction.** Take the
+F5 dependent case: P1 pending x, P2 writes y = x() + 1, P2 CONFIRMS. No open
+contribution then owns y, so the rule releases y -- while y still derives from
+unresolved P1. It quietly collapses dependency back into ownership, which is the
+exact conflation F3 and F5 were run to separate.
+
+The correct predicate is the absence of unresolved OBLIGATIONS represented by
+the source, from either origin:
+
+    1. DIRECT OWNERSHIP   an open contribution owns truth this source represents
+    2. DEPENDENCY         truth this source represents depends on an unresolved
+                          contribution
+
+## Row D is ALREADY DEMONSTRATED, by a different mechanism than I described
+
+The F5 DEPENDENT arm IS Row D: P2 derives y from pending x, `p2.confirm()` runs,
+and y is measured afterwards. It stayed held. The implementation keyed its edges
+by CLAIMANT (`edges.add(tree.$.y)`), not by turn, so the blocker survived P2's
+settlement. That is blocker tracking, not open-write scanning.
+
+So the code that passed F5 was already the better mechanism, and the prose
+committed afterwards described a weaker one. The discrepancy is recorded because
+the write-up, not the experiment, was the defect.
+
+## NOT demonstrated: blocker REMOVAL
+
+    DEPENDENT before P1 settles   x=[]  y=[]
+    DEPENDENT after  P1 settles   x=[1] y=[2]
+
+y is released -- but NOT because the blocker was removed. Once `p1.confirm()`
+makes `hasOpen(scopeKey)` false, the tree-wide hold lifts and eligibility is
+never consulted at all. The blocker set still contains a stale edge for y, and
+it is never cleared.
+
+So if ANY other contribution were open at that moment, y would remain blocked by
+an obligation that no longer exists. Blocker lifecycle is untested and the
+current spike leaks, which in production is a hang rather than a leak of
+speculative state. EMIT-FOOTPRINT-0 must test removal, not only installation.
+
+## EMIT-FOOTPRINT-0 rows
+
+    A scalar pending x                     link(x) blocked
+    B independent branch                   link(other) progresses
+    C whole branch {x,y}, x pending        blocked
+    D dependent y, P2 CONFIRMED            still blocked   (already shown)
+    E mutant: suppress P2->P1              y wrongly eligible
+    F Link created AFTER P1 is pending     must SEED the blocker
+    G rekey / key reuse                    blocker follows SubjectId, not the
+                                           reusable business address
+    H blocker REMOVAL on resolution        released, with another turn still
+                                           open, so the hold is not doing it
+
+Row F matters because incremental tracking learns only from future mutations; a
+relationship created after a pending contribution starts ignorant of it. Seeding
+at creation is O(open obligations), not O(tree size).
+
+## Architectural rule to preserve
+
+> Containment decides whether an event participates in a Link source. Semantic
+> identity decides what obligation that event represents.
+
+Address may answer "is this mutation inside this source". It may never become
+the identity answering "which subject, lifetime or leaf owns this truth".
