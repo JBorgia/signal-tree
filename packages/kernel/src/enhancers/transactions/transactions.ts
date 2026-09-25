@@ -201,7 +201,10 @@ export interface InternalTransactionRuntime {
   /** L15: opt-in evidence retention beyond the correctness obligation. */
   setHistoryRetention(retain: number): void;
   /** Explicit retention metadata; the reader must not infer it from ids. */
-  getConfirmedRetention(): { truncated: boolean; firstAvailableTurnId?: number };
+  getConfirmedRetention(): {
+    truncated: boolean;
+    firstAvailableTurnId?: number;
+  };
   /** @internal PROPOSAL-INSPECTION-0 raw material; unclassified. */
   describePendingTurn(
     turnId: number
@@ -811,7 +814,6 @@ class TransactionAuthority {
     return cloneTurnRecord(turn);
   }
 
-
   observeQueuedEffects(turnId: number, queued: readonly TurnEffect[]): void {
     if (!this.pendingTurns.has(turnId)) return;
     // Evidence read before delivery belongs to THIS pending turn. Do not put
@@ -1196,12 +1198,43 @@ export function getOrCreateInternalTransactionRuntime<T>(
     Map<string, InspectionWrite>
   >();
   const inspectionTransactionByTurn = new Map<number, number>();
+  // L19. The enqueue observer records inspection evidence, and its callback is
+  // a no-op unless a transaction or pending turn exists. But merely REGISTERING
+  // it makes PathNotifier build a frozen evidence snapshot on every write for
+  // this owner, idle or not -- measured at roughly 2.6x ordinary write cost on
+  // a tree that never transacts. So it is registered on demand: before the
+  // first write that can create causal responsibility (a transaction opening),
+  // and released at the same quiescence point that clears inspection state.
+  // The snapshot copy never alters queued entries or delivery, so registering
+  // lazily cannot change what any other notifier consumer observes.
+  //
+  // Release is DEFERRED to a microtask and cancelled if a transaction reopens
+  // first. Releasing synchronously at every quiescence made a tree that
+  // transacts on every write pay a register/release pair per transaction --
+  // measured at ~6-7% on that path, repeatably. Deferring keeps a synchronous
+  // burst registered throughout, while a tree that goes idle still releases.
+  let registerEnqueueObserver: (() => void) | null = null;
+  let enqueueReleaseScheduled = false;
+  const ensureEnqueueObserver = (): void => {
+    if (!unsubscribeEnqueue && !destroyed) registerEnqueueObserver?.();
+  };
+  const releaseEnqueueObserverWhenIdle = (): void => {
+    if (enqueueReleaseScheduled || !unsubscribeEnqueue) return;
+    enqueueReleaseScheduled = true;
+    queueMicrotask(() => {
+      enqueueReleaseScheduled = false;
+      if (authority.getPendingTurnCount() || pendingTransactions.size) return;
+      unsubscribeEnqueue?.();
+      unsubscribeEnqueue = null;
+    });
+  };
   const releaseInspectionIfQuiet = (): void => {
     if (authority.getPendingTurnCount() || pendingTransactions.size) return;
     inspectionWrites.clear();
     inspectionTransactionByTurn.clear();
     inspectionSeq = 0;
     inspectionUnavailable = false;
+    releaseEnqueueObserverWhenIdle();
   };
   const pendingOrderDeltas = new Map<number, CollectionOrderDelta[]>();
   const pendingCreatedListeners = new Set<TransactionLifecycleListener>();
@@ -2051,65 +2084,67 @@ export function getOrCreateInternalTransactionRuntime<T>(
     if (notifier) {
       const treeOwnerId = getPositionRegistry(tree.$)?.id;
       if (treeOwnerId !== undefined) {
-        unsubscribeEnqueue = notifier.observeEnqueue(treeOwnerId, (entry) => {
-          if (
-            destroyed ||
-            (!authority.getPendingTurnCount() && !pendingTransactions.size)
-          )
-            return;
-          const meta = entry.meta;
-          if (
-            meta?.origin === 'restoration' ||
-            meta?.origin === 'transaction-rollback' ||
-            isInspectionWrite(meta)
-          )
-            return;
-          const realized = getWriteParticipation(meta) === 'realized';
-          if (
-            !realized &&
-            typeof meta?.transactionId === 'number' &&
-            meta.transactionOwner !== transactionOwnerToken
-          )
-            return;
-          const writer =
-            !realized && meta?.transactionOwner === transactionOwnerToken
-              ? meta.transactionId
-              : undefined;
-          try {
-            const probe = createCaptureBucket();
-            captureEffects(
-              probe,
-              probe.effects,
-              entry.path,
-              entry.newValue,
-              entry.oldValue,
-              meta,
-              entry.ownerPath,
-              entry.subjectIds,
-              entry.positionIds
-            );
-            const effects = drainCaptureBucket(probe).effects;
-            if (!effects.length) return;
-            const seq = ++inspectionSeq;
-            let writes = inspectionWrites.get(writer);
-            if (!writes) inspectionWrites.set(writer, (writes = new Map()));
-            for (const effect of effects) {
-              // No value snapshots or row references belong in inspection evidence.
-              const footprint: TurnEffect =
-                effect.kind === 'set'
-                  ? { ...effect, before: undefined, after: undefined }
-                  : effect.kind === 'rekey'
-                  ? { ...effect }
-                  : { ...effect, value: undefined };
-              writes.set(effectKey(effect), { seq, effect: footprint });
+        registerEnqueueObserver = () => {
+          unsubscribeEnqueue = notifier.observeEnqueue(treeOwnerId, (entry) => {
+            if (
+              destroyed ||
+              (!authority.getPendingTurnCount() && !pendingTransactions.size)
+            )
+              return;
+            const meta = entry.meta;
+            if (
+              meta?.origin === 'restoration' ||
+              meta?.origin === 'transaction-rollback' ||
+              isInspectionWrite(meta)
+            )
+              return;
+            const realized = getWriteParticipation(meta) === 'realized';
+            if (
+              !realized &&
+              typeof meta?.transactionId === 'number' &&
+              meta.transactionOwner !== transactionOwnerToken
+            )
+              return;
+            const writer =
+              !realized && meta?.transactionOwner === transactionOwnerToken
+                ? meta.transactionId
+                : undefined;
+            try {
+              const probe = createCaptureBucket();
+              captureEffects(
+                probe,
+                probe.effects,
+                entry.path,
+                entry.newValue,
+                entry.oldValue,
+                meta,
+                entry.ownerPath,
+                entry.subjectIds,
+                entry.positionIds
+              );
+              const effects = drainCaptureBucket(probe).effects;
+              if (!effects.length) return;
+              const seq = ++inspectionSeq;
+              let writes = inspectionWrites.get(writer);
+              if (!writes) inspectionWrites.set(writer, (writes = new Map()));
+              for (const effect of effects) {
+                // No value snapshots or row references belong in inspection evidence.
+                const footprint: TurnEffect =
+                  effect.kind === 'set'
+                    ? { ...effect, before: undefined, after: undefined }
+                    : effect.kind === 'rekey'
+                    ? { ...effect }
+                    : { ...effect, value: undefined };
+                writes.set(effectKey(effect), { seq, effect: footprint });
+              }
+            } catch (error) {
+              // The write already happened; never report a confident status after
+              // losing its chronology. The notifier isolates and reports the error.
+              inspectionUnavailable = true;
+              throw error;
             }
-          } catch (error) {
-            // The write already happened; never report a confident status after
-            // losing its chronology. The notifier isolates and reports the error.
-            inspectionUnavailable = true;
-            throw error;
-          }
-        });
+          });
+        };
       }
 
       const subscribeCollectionNotifications = (): void => {
@@ -2397,7 +2432,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
     pending: { confirm(): void; rollback(): void },
     turnId: number | undefined
   ): PendingTransaction => {
-
     let settled: TransactionInspection | undefined;
 
     const read = (): TransactionInspection => {
@@ -2541,6 +2575,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
       const transactionId = nextTransactionId++;
       const descriptorOwnersBefore = new Set(realizationDescriptors.keys());
       pendingTransactions.set(transactionId, createCaptureBucket());
+      // Before the callback: the first write inside it must already reach the
+      // evidence observer, or inspect() would silently miss it.
+      ensureEnqueueObserver();
 
       // TURN-FEED-0. Announced BEFORE the callback runs, because an observer has
       // to know the transaction is open in order to treat the writes inside it
