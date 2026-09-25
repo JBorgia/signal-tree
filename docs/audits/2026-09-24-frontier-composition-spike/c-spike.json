@@ -1,0 +1,35 @@
+{
+  "probe": "C-SPIKE-GATES",
+  "checks": [
+    {
+      "label": "GATE1a the anchor node HAS a bound semantic identity",
+      "ok": true,
+      "detail": "{\"kind\":\"subject\",\"subject\":1}"
+    },
+    {
+      "label": "GATE1 ROW8 EQUALITY: effect SubjectId === anchor node bound SubjectId",
+      "ok": true,
+      "detail": "effect=1 bound=1"
+    },
+    {
+      "label": "GATE1 non-vacuity: a different subject binds a DIFFERENT identity",
+      "ok": true,
+      "detail": "A=1 B=2"
+    },
+    {
+      "label": "GATE1 key reuse: fresh anchor binds the FRESH effect subject, not the old one",
+      "ok": true,
+      "detail": "old=1 freshEffect=3 freshBound=3"
+    },
+    {
+      "label": "GATE2 SCALAR ROW: the scalar node has a bound identity",
+      "ok": true,
+      "detail": "{\"kind\":\"scalar\",\"positions\":[2]}"
+    },
+    {
+      "label": "GATE2 SCALAR EQUALITY: effect position is among the scalar node bound positions",
+      "ok": true,
+      "detail": "effect=2 bound=[2]"
+    }
+  ]
+}
