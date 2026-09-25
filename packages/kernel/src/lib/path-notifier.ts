@@ -294,21 +294,35 @@ export class PathNotifier {
     const transformed = value;
 
     // Run subscribers
+    //
+    // TX-OBSERVER-STRAND-0. Each handler is isolated. The write is already
+    // applied, so a subscriber's throw cannot undo it; it could only escape
+    // into whoever flushed. That was a `transaction()` that then returned no
+    // handle and left its commit scope open (holding every later Link
+    // consequence), or a microtask that dropped the rest of the batch and the
+    // flush callbacks. Report it and keep delivering.
     for (const [pattern, handlers] of this.subscribers) {
       if (this.matches(pattern, path)) {
         for (const handler of handlers) {
-          withoutWriteObservationScopes(() => handler(
-            transformed,
-            prev,
-            path,
-            ownerPath,
-            origin,
-            subjectIds,
-            positionIds,
-            meta,
-            declaredScopes,
-            ownerId
-          ));
+          try {
+            withoutWriteObservationScopes(() => handler(
+              transformed,
+              prev,
+              path,
+              ownerPath,
+              origin,
+              subjectIds,
+              positionIds,
+              meta,
+              declaredScopes,
+              ownerId
+            ));
+          } catch (error) {
+            console.error(
+              `SignalTree: a write subscriber threw while observing '${path}'; delivery continued.`,
+              error
+            );
+          }
         }
       }
     }

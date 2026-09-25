@@ -996,7 +996,16 @@ export function getOrCreateInternalTransactionRuntime<T>(
   ): void => {
     const payload = cloneTurnRecord(turn);
     for (const listener of listeners) {
-      listener(payload);
+      // TX-OBSERVER-STRAND-0. A listener observes a turn that already exists;
+      // its throw would cost the caller the handle for it.
+      try {
+        listener(payload);
+      } catch (error) {
+        console.error(
+          'SignalTree: a transaction lifecycle listener threw; the transaction continued.',
+          error
+        );
+      }
     }
   };
 
@@ -1397,6 +1406,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
   const drainTransactionRollbackInput = (
     transactionId: number
   ): {
+    captured: boolean;
     effects: TurnEffect[];
     baselineValues: Map<number, unknown>;
     orderDeltas: CollectionOrderDelta[];
@@ -1404,11 +1414,17 @@ export function getOrCreateInternalTransactionRuntime<T>(
     const bucket = pendingTransactions.get(transactionId);
     pendingTransactions.delete(transactionId);
     if (!bucket) {
-      return { effects: [], baselineValues: new Map(), orderDeltas: [] };
+      return {
+        captured: false,
+        effects: [],
+        baselineValues: new Map(),
+        orderDeltas: [],
+      };
     }
     const { effects, baselineValues, collectionOrders } =
       drainCaptureBucket(bucket);
     return {
+      captured: true,
       effects,
       baselineValues,
       orderDeltas: collectionOrders.map((order) =>
@@ -1954,6 +1970,71 @@ export function getOrCreateInternalTransactionRuntime<T>(
       let primaryError: unknown;
       let cleanupError: unknown;
 
+      // Reverse this open transaction's writes and terminate it. Shared by a
+      // throwing callback and by a failure after the callback returned.
+      const abortOpenTransaction = (cause: unknown): void => {
+        // Starts false and becomes true only once compensation has actually
+        // applied. "Nothing to reverse" is a rollback that succeeded trivially,
+        // NOT a refusal -- but only while the capture is still here to say
+        // there was nothing. A refusal, or a failure before compensation
+        // (flush, drain), means the authored effects are still live.
+        let compensated = false;
+        let rollbackSubjectIds: number[] = [];
+        try {
+          notifier?.flushSync();
+          const { captured, effects, baselineValues, orderDeltas } =
+            drainTransactionRollbackInput(transactionId);
+          rollbackSubjectIds = effects
+            .map((effect) => effect.subject)
+            .filter(
+              (subjectId): subjectId is number => subjectId !== undefined
+            );
+          if (effects.length > 0 || orderDeltas.length > 0) {
+            rollbackPendingEffectsThroughRealizationPort(
+              transactionId,
+              effects,
+              baselineValues,
+              orderDeltas,
+              cause
+            );
+          }
+          compensated = captured;
+        } finally {
+          try {
+            // Settle AFTER compensation, but UNCONDITIONALLY. Late, so consumers
+            // released by this scope observe the RESTORED state rather than the
+            // doomed one. In a `finally`, because compensation is fallible — it
+            // throws SignalTreeRollbackError on a conservative refusal, which is
+            // a supported fail-closed contract, not an edge case. Skipping the
+            // settle there left the scope open forever, and since nothing can
+            // ever settle it afterwards, autoSave was wedged for the life of the
+            // tree: post-commit silently degraded to never-commit.
+            //
+            // The OUTCOME depends on whether compensation actually applied, which
+            // a bare `finally` cannot see. Refused (or nothing to reverse) means
+            // the authored effects are still the live authoritative state, so
+            // their consequences must FLUSH; discarding them would make durable
+            // truth disagree with live truth to honour a reversal that did not
+            // happen. This is the same rule the plan-level door already applies.
+            settleCommitScope(
+              transactionOwnerToken,
+              transactionId,
+              compensated ? 'discard' : 'commit'
+            );
+            forgetUnclaimedDescriptorSubjects(
+              rollbackSubjectIds,
+              descriptorOwnersBefore
+            );
+          } finally {
+            lifecycleChannel.announce({
+              kind: 'rolled-back',
+              owner: transactionOwnerToken,
+              id: transactionId,
+            });
+          }
+        }
+      };
+
       const executeTransaction = (): void => {
         try {
           withWriteContext(
@@ -1966,67 +2047,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           );
         } catch (error) {
           primaryError = error;
-          notifier?.flushSync();
-          const { effects, baselineValues, orderDeltas } =
-            drainTransactionRollbackInput(transactionId);
-          const rollbackSubjectIds = effects
-            .map((effect) => effect.subject)
-            .filter(
-              (subjectId): subjectId is number => subjectId !== undefined
-            );
-          // Starts true: "nothing to reverse" is a rollback that succeeded
-          // trivially, NOT a refusal. Only the port throwing means nothing was
-          // compensated.
-          let compensated = true;
-          try {
-            if (effects.length > 0 || orderDeltas.length > 0) {
-              try {
-                rollbackPendingEffectsThroughRealizationPort(
-                  transactionId,
-                  effects,
-                  baselineValues,
-                  orderDeltas,
-                  error
-                );
-              } catch (refusal) {
-                compensated = false;
-                throw refusal;
-              }
-            }
-          } finally {
-            try {
-              // Settle AFTER compensation, but UNCONDITIONALLY. Late, so consumers
-              // released by this scope observe the RESTORED state rather than the
-              // doomed one. In a `finally`, because compensation is fallible — it
-              // throws SignalTreeRollbackError on a conservative refusal, which is
-              // a supported fail-closed contract, not an edge case. Skipping the
-              // settle there left the scope open forever, and since nothing can
-              // ever settle it afterwards, autoSave was wedged for the life of the
-              // tree: post-commit silently degraded to never-commit.
-              //
-              // The OUTCOME depends on whether compensation actually applied, which
-              // a bare `finally` cannot see. Refused (or nothing to reverse) means
-              // the authored effects are still the live authoritative state, so
-              // their consequences must FLUSH; discarding them would make durable
-              // truth disagree with live truth to honour a reversal that did not
-              // happen. This is the same rule the plan-level door already applies.
-              settleCommitScope(
-                transactionOwnerToken,
-                transactionId,
-                compensated ? 'discard' : 'commit'
-              );
-              forgetUnclaimedDescriptorSubjects(
-                rollbackSubjectIds,
-                descriptorOwnersBefore
-              );
-            } finally {
-              lifecycleChannel.announce({
-                kind: 'rolled-back',
-                owner: transactionOwnerToken,
-                id: transactionId,
-              });
-            }
-          }
+          abortOpenTransaction(error);
         }
       };
 
@@ -2055,20 +2076,36 @@ export function getOrCreateInternalTransactionRuntime<T>(
       if (primaryError !== undefined) {
         throw primaryError;
       }
-      if (cleanupError !== undefined) {
-        throw cleanupError;
+
+      // TX-OBSERVER-STRAND-0. The callback returned, so its writes are applied.
+      // From here `transaction()` returns a handle, or throws with those writes
+      // rolled back; either way the commit scope settles. A throw here used to
+      // leave them applied with no handle, strand the capture bucket, and hold
+      // every later Link consequence behind a scope nothing could settle.
+      // Observers can no longer throw here (the notifier and the lifecycle
+      // listeners isolate them); this covers what is left, such as a failing
+      // capture release. If the capture itself is what failed, nothing is left
+      // to reverse, and the scope commits so consequences match the live tree.
+      let pendingTurn: TransactionTurnRecord | undefined;
+      try {
+        if (cleanupError !== undefined) {
+          throw cleanupError;
+        }
+
+        // TURN-FEED-0 'staged': the callback has returned, so this transaction's
+        // contribution is complete and awaits a decision.
+        lifecycleChannel.announce({
+          kind: 'staged',
+          owner: transactionOwnerToken,
+          id: transactionId,
+        });
+
+        notifier?.flushSync();
+        pendingTurn = materializePendingTransaction(transactionId);
+      } catch (failure) {
+        abortOpenTransaction(failure);
+        throw failure;
       }
-
-      // TURN-FEED-0 'staged': the callback has returned, so this transaction's
-      // contribution is complete and awaits a decision.
-      lifecycleChannel.announce({
-        kind: 'staged',
-        owner: transactionOwnerToken,
-        id: transactionId,
-      });
-
-      notifier?.flushSync();
-      const pendingTurn = materializePendingTransaction(transactionId);
       const pendingTurnId = pendingTurn?.id;
       if (pendingTurn) {
         notifyListeners(pendingCreatedListeners, pendingTurn);
