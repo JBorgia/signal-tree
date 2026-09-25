@@ -1,0 +1,50 @@
+{
+  "probe": "COMPOSITION-1",
+  "checks": [
+    {
+      "label": "A dependent stays blocked after the ROOT contribution was compacted away",
+      "ok": true,
+      "detail": "exposable(d)=0"
+    },
+    {
+      "label": "A settling the ROOT OWNER terminates its obligation without naming it externally",
+      "ok": true,
+      "detail": "live=0 exposable(d)=42"
+    },
+    {
+      "label": "B1 before supersession the turn is atomic: y withheld",
+      "ok": true,
+      "detail": "y=0"
+    },
+    {
+      "label": "B1 once the dirty member is SUPERSEDED, {x:99,y:20} is a state that existed -- expose it",
+      "ok": true,
+      "detail": "x=99 y=20"
+    },
+    {
+      "label": "B2 while the TURN ITSELF is unresolved, supersession does NOT release the sibling",
+      "ok": true,
+      "detail": "q=0 (rollback of T9 would still retract it)"
+    },
+    {
+      "label": "C resolving the shared root releases BOTH inheritors",
+      "ok": true,
+      "detail": "y=5 z=6"
+    },
+    {
+      "label": "C ...and the unrelated obligation stays live",
+      "ok": true,
+      "detail": "w=0 live=1"
+    },
+    {
+      "label": "D the obligation stays addressable though nothing it affects remains",
+      "ok": true,
+      "detail": "live=1 retained=0"
+    },
+    {
+      "label": "D MUTANT forgetting the root->obligation relation ORPHANS the obligation: d never releases",
+      "ok": true,
+      "detail": "exposable(d)=0 live=1"
+    }
+  ]
+}
