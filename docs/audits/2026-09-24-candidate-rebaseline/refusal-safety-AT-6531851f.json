@@ -4,14 +4,21 @@
     "kernelSourceSelection": "git show 6531851f1b8d5be7607af19cdbb7f55ee3df1116:packages/kernel/src/**",
     "bundleSha256": "c8eac5b8a8f1f94638d1751a6a2bc75bd59d01454bb26166a52fa3b3d1478764",
     "bundleBytes": 511993,
-    "adapterSha256_16": "1c3bf8941fff1d64",
-    "scenarioSha256_16": "e603aee4ea9361c1",
+    "scenario": "refusal-safety-characterization.mjs",
+    "scenarioSha256_16": "a515e4d45100a8cb",
+    "adapterSha256_16": "4255ac89b238ed3a",
     "runnerSha256_16": "5afb9872b7d770a8",
     "assertionsSha256_16": "2182d9bbbe33aa92",
     "node": "v24.15.0",
-    "generatedAt": "2026-09-24T23:55:41.022Z"
+    "generatedAt": "2026-09-25T00:19:50.751Z"
   },
   "kind": "refusal-safety-characterization",
+  "requires": "refusal preserves state, pending authority and (where measurable) publication",
+  "violations": [],
+  "publicationUnverified": [
+    "same-tick-local-flush-false",
+    "same-tick-external-flush-false"
+  ],
   "rows": [
     {
       "id": "R8-01-reject-accept",
@@ -29,6 +36,8 @@
       },
       "refusedHandleKeepsAuthority": true,
       "otherHandleKeepsAuthority": true,
+      "publishedByRefusal": 0,
+      "publicationVerified": true,
       "secondSettles": "settled",
       "observationsDuringWholeRun": 2
     },
@@ -48,6 +57,8 @@
       },
       "refusedHandleKeepsAuthority": true,
       "otherHandleKeepsAuthority": true,
+      "publishedByRefusal": 0,
+      "publicationVerified": true,
       "secondSettles": "settled",
       "observationsDuringWholeRun": 2
     },
@@ -63,6 +74,8 @@
         "x": 2
       },
       "refusedHandleKeepsAuthority": true,
+      "publishedByRefusal": null,
+      "publicationVerified": false,
       "observationsDuringWholeRun": 1
     },
     {
@@ -77,6 +90,8 @@
         "x": 2
       },
       "refusedHandleKeepsAuthority": true,
+      "publishedByRefusal": null,
+      "publicationVerified": false,
       "observationsDuringWholeRun": 1
     }
   ]

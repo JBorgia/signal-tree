@@ -1,0 +1,115 @@
+{
+  "provenance": {
+    "resolvedKernelSha": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+    "kernelSourceSelection": "git show 7ade0e3ecb25ff0d06da4355b5f7d67844e147b7:packages/kernel/src/**",
+    "bundleSha256": "b0dacf4f7948a232e8a08e9649535811620c747500a1c6d07b76cf2f8974a7e3",
+    "bundleBytes": 474380,
+    "scenario": "refusal-safety-characterization.mjs",
+    "scenarioSha256_16": "a515e4d45100a8cb",
+    "adapterSha256_16": "bde1767d47633589",
+    "runnerSha256_16": "5afb9872b7d770a8",
+    "assertionsSha256_16": "2182d9bbbe33aa92",
+    "node": "v24.15.0",
+    "generatedAt": "2026-09-25T00:20:31.127Z"
+  },
+  "kind": "refusal-safety-characterization",
+  "requires": "refusal preserves state, pending authority and (where measurable) publication",
+  "violations": [
+    "R8-01-reject-accept: expected a refusal, got settled",
+    "R8-01-reject-accept: refusal changed visible state",
+    "R8-01-reject-accept: refused handle lost pending authority",
+    "R8-01-reject-accept: refusal published 1 change(s)",
+    "R8-01-reject-reject: expected a refusal, got settled",
+    "R8-01-reject-reject: refusal changed visible state",
+    "R8-01-reject-reject: refused handle lost pending authority",
+    "R8-01-reject-reject: refusal published 1 change(s)",
+    "same-tick-local-flush-false: expected a refusal, got settled",
+    "same-tick-local-flush-false: refusal changed visible state",
+    "same-tick-local-flush-false: refused handle lost pending authority",
+    "same-tick-local-flush-false: the later write was not preserved",
+    "same-tick-external-flush-false: expected a refusal, got settled",
+    "same-tick-external-flush-false: refusal changed visible state",
+    "same-tick-external-flush-false: refused handle lost pending authority",
+    "same-tick-external-flush-false: the later write was not preserved"
+  ],
+  "publicationUnverified": [
+    "same-tick-local-flush-false",
+    "same-tick-external-flush-false"
+  ],
+  "rows": [
+    {
+      "id": "R8-01-reject-accept",
+      "firstStatus": "settled",
+      "stateUnchangedByRefusal": false,
+      "before": {
+        "x": 1,
+        "y": 2,
+        "z": 2
+      },
+      "after": {
+        "x": 0,
+        "y": 0,
+        "z": 2
+      },
+      "refusedHandleKeepsAuthority": false,
+      "otherHandleKeepsAuthority": true,
+      "publishedByRefusal": 1,
+      "publicationVerified": true,
+      "secondSettles": "settled",
+      "observationsDuringWholeRun": 3
+    },
+    {
+      "id": "R8-01-reject-reject",
+      "firstStatus": "settled",
+      "stateUnchangedByRefusal": false,
+      "before": {
+        "x": 1,
+        "y": 2,
+        "z": 2
+      },
+      "after": {
+        "x": 0,
+        "y": 0,
+        "z": 2
+      },
+      "refusedHandleKeepsAuthority": false,
+      "otherHandleKeepsAuthority": true,
+      "publishedByRefusal": 1,
+      "publicationVerified": true,
+      "secondSettles": "refused",
+      "observationsDuringWholeRun": 3
+    },
+    {
+      "id": "same-tick-local-flush-false",
+      "firstStatus": "settled",
+      "laterWritePreserved": false,
+      "stateUnchangedByRefusal": false,
+      "before": {
+        "x": 2
+      },
+      "after": {
+        "x": 0
+      },
+      "refusedHandleKeepsAuthority": false,
+      "publishedByRefusal": null,
+      "publicationVerified": false,
+      "observationsDuringWholeRun": 1
+    },
+    {
+      "id": "same-tick-external-flush-false",
+      "firstStatus": "settled",
+      "laterWritePreserved": false,
+      "stateUnchangedByRefusal": false,
+      "before": {
+        "x": 2
+      },
+      "after": {
+        "x": 0
+      },
+      "refusedHandleKeepsAuthority": false,
+      "publishedByRefusal": null,
+      "publicationVerified": false,
+      "observationsDuringWholeRun": 1
+    }
+  ]
+}

@@ -36,10 +36,13 @@ must be able to identify both without relying on a filename:
 
     resolvedKernelSha   6531851f1b8d5be7607af19cdbb7f55ee3df1116
     bundleSha256        c8eac5b8a8f1f946...  (511993 bytes)
-    adapterSha256_16    1c3bf8941fff1d64
-    scenarioSha256_16   e603aee4ea9361c1
-    runnerSha256_16     5afb9872b7d770a8
-    node                v24.15.0
+    scenario            supplied by the ENTRY POINT, with its own hash
+    adapterSha256_16 / runnerSha256_16 / assertionsSha256_16 / node
+
+⚠️ The scenario identity was briefly hardcoded in the shared adapter, so the
+companion report named `current-characterization.mjs` — a scenario it had not
+run. Each entry point now passes `import.meta.url`, and the companion's source
+is preserved here beside its output.
 
 ## What actually changed between the two revisions
 
@@ -117,9 +120,40 @@ hide the gap:
     same-tick-local-flush-false      yes      yes       yes       n/a       yes
     same-tick-external-flush-false   yes      yes       yes       n/a       yes
 
-In both R8 cases the OTHER handle then settles cleanly. Publication is reported
-as a raw count over the whole run rather than asserted: isolating publication to
-the refusal itself needs a marker the adapter does not expose.
+In both R8 cases the OTHER handle then settles cleanly.
+
+**Publication IS isolated where the fixture allows it.** For R8 everything
+earlier is already flushed, so the observation boundary can be taken
+immediately before the rejection, and a flush after it attributes anything
+delivered to the refusal:
+
+    R8-01-reject-accept              publishedByRefusal = 0   verified
+    R8-01-reject-reject              publishedByRefusal = 0   verified
+    same-tick-local-flush-false      NOT MEASURED             unverified
+    same-tick-external-flush-false   NOT MEASURED             unverified
+
+The same-tick cases deliberately leave the earlier write unflushed, so a flush
+after the refusal delivers that write AND anything the refusal did with nothing
+to separate them. That needs a matched control running the identical scenario
+WITHOUT the rejection. Until it runs, those two are explicitly `unverified`
+rather than assumed clean — an earlier draft said isolation required an adapter
+marker, which was wrong; it required a better fixture.
+
+**These properties are REQUIRED, not merely recorded.** The companion exits
+non-zero on any violation, which does not weaken the settlement oracle — both
+results are meant to stand together:
+
+    successful settlement required      -> FAIL  (4 of 14)
+    refusal preserves state/authority   -> PASS  (0 violations)
+
+A candidate that won the first by abandoning the second is caught by the second
+rather than celebrated by the first.
+
+Load-bearing, proven against history rather than by injection — the adapter
+reads committed source, so the mutation is a revision. Repointed at
+`7ade0e3e`, the same suite reports **16 violations, exit 1**
+(`refusal-safety-AT-7ade0e3e.json`): settled instead of refused, state changed,
+authority lost, later write destroyed, and a publication emitted.
 
 ## Method notes worth keeping
 
