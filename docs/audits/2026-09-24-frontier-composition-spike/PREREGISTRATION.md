@@ -193,23 +193,14 @@ and explicitly NOT over raw lines of code.
 
 ---
 
-## Naming is deliberately NOT decided here
+## Naming — DECIDED: `transact()` stays
 
-`speculate()` is a serious candidate and may describe this model better than
-`transact()` does. `transact()` carries a database implication -- writes hidden
-until commit -- which is the opposite of what happens here: a pending
-contribution is live, visible, shared state that other state may build on.
-`speculate()` means "make this true now, provisionally", which is the actual
-behaviour. `contribute()` is arguably the most accurate of all for the frontier
-model and is retained as INTERNAL vocabulary (contribution, owner, frontier,
-disposition) regardless of what the public verb becomes.
+Settled by the owner 2026-09-24. `speculate()` was considered seriously and is
+arguably more descriptive of live-until-settled semantics -- `transact()` carries
+a database implication (writes hidden until commit) that is the inverse of this
+model. It is not adopted. The vocabulary was consolidated onto `transact()` this
+session and shipped in 15.3.0, and no rename is worth a second breaking change
+to the same API.
 
-No rename happens now, for two reasons. The vocabulary was consolidated onto
-`transact()` this session and shipped in 15.3.0; a second rename is only
-justified if the architecture underneath it actually changes, which is precisely
-what F5 decides. And if frontier does not survive the probe, renaming would be
-churn purchased for nothing.
-
-If frontier survives, `speculate()` becomes materially more compelling, because
-the implementation semantics would then justify the word rather than the word
-being chosen ahead of the architecture.
+`contribution`, `owner`, `frontier` and `disposition` remain INTERNAL
+vocabulary. This is closed; it is not to be reopened by a spike result.

@@ -1,0 +1,166 @@
+{
+  "property": "F1 overlapping pending scalar writers",
+  "mechanism": "incumbent (baseline compensation), REAL kernel",
+  "orders": 8,
+  "ordersWithRefusal": 2,
+  "results": [
+    {
+      "order": "p1:confirm,p2:confirm",
+      "steps": [
+        {
+          "step": "p1:confirm",
+          "result": "settled"
+        },
+        {
+          "step": "p2:confirm",
+          "result": "settled"
+        }
+      ],
+      "final": {
+        "x": 1,
+        "y": 2,
+        "z": 2
+      },
+      "refusals": []
+    },
+    {
+      "order": "p2:confirm,p1:confirm",
+      "steps": [
+        {
+          "step": "p2:confirm",
+          "result": "settled"
+        },
+        {
+          "step": "p1:confirm",
+          "result": "settled"
+        }
+      ],
+      "final": {
+        "x": 1,
+        "y": 2,
+        "z": 2
+      },
+      "refusals": []
+    },
+    {
+      "order": "p1:confirm,p2:rollback",
+      "steps": [
+        {
+          "step": "p1:confirm",
+          "result": "settled"
+        },
+        {
+          "step": "p2:rollback",
+          "result": "settled"
+        }
+      ],
+      "final": {
+        "x": 1,
+        "y": 1,
+        "z": 0
+      },
+      "refusals": []
+    },
+    {
+      "order": "p2:rollback,p1:confirm",
+      "steps": [
+        {
+          "step": "p2:rollback",
+          "result": "settled"
+        },
+        {
+          "step": "p1:confirm",
+          "result": "settled"
+        }
+      ],
+      "final": {
+        "x": 1,
+        "y": 1,
+        "z": 0
+      },
+      "refusals": []
+    },
+    {
+      "order": "p1:rollback,p2:confirm",
+      "steps": [
+        {
+          "step": "p1:rollback",
+          "result": "refused",
+          "message": "SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 1 is no longer safe [later-conf"
+        },
+        {
+          "step": "p2:confirm",
+          "result": "settled"
+        }
+      ],
+      "final": {
+        "x": 1,
+        "y": 2,
+        "z": 2
+      },
+      "refusals": [
+        "p1:rollback"
+      ]
+    },
+    {
+      "order": "p2:confirm,p1:rollback",
+      "steps": [
+        {
+          "step": "p2:confirm",
+          "result": "settled"
+        },
+        {
+          "step": "p1:rollback",
+          "result": "settled"
+        }
+      ],
+      "final": {
+        "x": 0,
+        "y": 2,
+        "z": 2
+      },
+      "refusals": []
+    },
+    {
+      "order": "p1:rollback,p2:rollback",
+      "steps": [
+        {
+          "step": "p1:rollback",
+          "result": "refused",
+          "message": "SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 1 is no longer safe [later-conf"
+        },
+        {
+          "step": "p2:rollback",
+          "result": "settled"
+        }
+      ],
+      "final": {
+        "x": 1,
+        "y": 1,
+        "z": 0
+      },
+      "refusals": [
+        "p1:rollback"
+      ]
+    },
+    {
+      "order": "p2:rollback,p1:rollback",
+      "steps": [
+        {
+          "step": "p2:rollback",
+          "result": "settled"
+        },
+        {
+          "step": "p1:rollback",
+          "result": "settled"
+        }
+      ],
+      "final": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "refusals": []
+    }
+  ]
+}
