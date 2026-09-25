@@ -1,0 +1,66 @@
+{
+  "probe": "L19-ABLATION-0",
+  "N": 200000,
+  "TRIALS": 9,
+  "medians": {
+    "BASE": 18.33975,
+    "EMPTY-ENHANCER": 18.301083,
+    "BATCHING": 17.469667,
+    "TX-FULL": 56.579667
+  },
+  "noise": 22.381189135091077,
+  "results": {
+    "BASE": [
+      17.38975,
+      17.19725,
+      19.424542,
+      18.439416,
+      18.33975,
+      18.742625,
+      17.856583,
+      18.015167
+    ],
+    "EMPTY-ENHANCER": [
+      17.226375,
+      17.49825,
+      21.322375,
+      19.083167,
+      19.496875,
+      18.001375,
+      17.352416,
+      18.301083
+    ],
+    "BATCHING": [
+      17.312292,
+      17.210875,
+      19.269083,
+      17.469667,
+      18.246666,
+      17.494875,
+      17.249792,
+      16.982541
+    ],
+    "TX-FULL": [
+      54.242584,
+      61.110958,
+      56.579667,
+      57.97175,
+      61.169292,
+      55.943375,
+      55.781667,
+      55.55925
+    ]
+  },
+  "checks": [
+    {
+      "label": "ABLATION an EMPTY enhancer is free -- the penalty is NOT generic enhancer dispatch or JIT shape",
+      "ok": true,
+      "detail": "empty -0% vs noise 22.4%"
+    },
+    {
+      "label": "ABLATION transactions() specifically carries the dormant penalty",
+      "ok": true,
+      "detail": "tx 209%"
+    }
+  ]
+}
