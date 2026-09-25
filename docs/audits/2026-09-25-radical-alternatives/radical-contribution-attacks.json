@@ -1,0 +1,35 @@
+{
+  "probe": "CONTRIBUTION-ATTACKS",
+  "checks": [
+    {
+      "label": "CHURN visible tracks the latest write",
+      "ok": true,
+      "detail": "visible=100001"
+    },
+    {
+      "label": "CHURN retained depth is O(live obligations), NOT O(writes)",
+      "ok": false,
+      "detail": "depth after 100000 settled writes behind one unresolved contribution = 100001"
+    },
+    {
+      "label": "AUTHORITY exposable ignores the unresolved authored contribution",
+      "ok": true,
+      "detail": "exposable=3"
+    },
+    {
+      "label": "AUTHORITY newer authoritative truth advances the frontier",
+      "ok": true,
+      "detail": "visible=5 exposable=5"
+    },
+    {
+      "label": "AUTHORITY the unresolved authored contribution is not silently lost under later truth",
+      "ok": true,
+      "detail": "depth=2"
+    },
+    {
+      "label": "COHERENCE per-fact selection must not expose HALF of one causal turn",
+      "ok": false,
+      "detail": "exposable x=0 (turn null) y=20 (turn null) -- {old x, new y} is a state that never existed"
+    }
+  ]
+}
