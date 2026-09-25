@@ -1,0 +1,29 @@
+{
+  "probe": "DEPENDENCY-1F",
+  "problems": [
+    {
+      "label": "F-d score and name are DISTINCT dependencies",
+      "ok": true,
+      "detail": "score=1 name=1 shared=0"
+    },
+    {
+      "label": "F-a the same field yields the SAME dependency node",
+      "ok": true
+    },
+    {
+      "label": "F-b dependency SURVIVES rekey (same SubjectId, not the key string)",
+      "ok": true,
+      "detail": "before=2 after=2 shared=2"
+    },
+    {
+      "label": "F-c dependency does NOT retarget to a fresh subject reusing the key",
+      "ok": true,
+      "detail": "shared nodes=0 (must be 0; nonzero means key identity)"
+    },
+    {
+      "label": "F-e literal key \"a.b\" does NOT collide with nested a->b",
+      "ok": true,
+      "detail": "shared nodes=0 (must be 0)"
+    }
+  ]
+}
