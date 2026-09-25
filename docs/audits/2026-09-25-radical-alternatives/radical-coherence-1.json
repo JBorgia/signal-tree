@@ -1,0 +1,50 @@
+{
+  "probe": "COHERENCE-1",
+  "checks": [
+    {
+      "label": "ARM1 one causal turn cannot be torn: neither half is exposable",
+      "ok": true,
+      "detail": "x=0 y=0"
+    },
+    {
+      "label": "ARM1 the whole turn becomes exposable together",
+      "ok": true,
+      "detail": "x=10 y=20"
+    },
+    {
+      "label": "ARM2 an UNRELATED turn still progresses while T1 is unresolved",
+      "ok": true,
+      "detail": "y=20"
+    },
+    {
+      "label": "ARM2 ...and the unresolved turn is still withheld",
+      "ok": true,
+      "detail": "x=0"
+    },
+    {
+      "label": "ARM3 an ordinary write outside a turn is unaffected",
+      "ok": true,
+      "detail": "b=2"
+    },
+    {
+      "label": "ARM4 ONE dirty member withholds the ENTIRE turn, not just itself",
+      "ok": true,
+      "detail": "p=0 q=0 r=0 s=0"
+    },
+    {
+      "label": "ARM4 ...while unrelated work is untouched",
+      "ok": true,
+      "detail": "u=5"
+    },
+    {
+      "label": "ARM5 coherence costs only the live contributions themselves -- no second snapshot or tree",
+      "ok": true,
+      "detail": "retained=2 (one per still-unexposable fact)"
+    },
+    {
+      "label": "ARM5 and they compact away once the turn is clean",
+      "ok": true,
+      "detail": "retained=0"
+    }
+  ]
+}

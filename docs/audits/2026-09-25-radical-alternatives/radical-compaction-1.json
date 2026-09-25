@@ -1,0 +1,50 @@
+{
+  "probe": "COMPACTION-1",
+  "checks": [
+    {
+      "label": "visible(x) = 100001",
+      "ok": true,
+      "detail": "visible=100001"
+    },
+    {
+      "label": "exposable(x) = 100001 (the later writes are independent and safe)",
+      "ok": true,
+      "detail": "exposable=100001"
+    },
+    {
+      "label": "retained state is O(live obligations), NOT O(writes)",
+      "ok": true,
+      "detail": "retained contribution objects after 100000 writes = 0"
+    },
+    {
+      "label": "the obligation itself stays live after its contribution is compacted away",
+      "ok": true,
+      "detail": "live=1"
+    },
+    {
+      "label": "NO HIDDEN HISTORY: the full serialized state retains no predecessor values",
+      "ok": true,
+      "detail": "size=17 chars, leaked=[], dump=[[\"x\",100001,[]]]"
+    },
+    {
+      "label": "after rollback of the compacted contribution, x remains 100001",
+      "ok": true,
+      "detail": "visible=100001"
+    },
+    {
+      "label": "authoritative truth arriving after compaction still wins",
+      "ok": true,
+      "detail": "visible=7 exposable=7"
+    },
+    {
+      "label": "DEPENDENCY a dependent fact stays blocked though the ROOT contribution was compacted away",
+      "ok": true,
+      "detail": "retained=1 exposable(b)=0"
+    },
+    {
+      "label": "...and resolving the obligation releases it",
+      "ok": true,
+      "detail": "exposable(b)=42"
+    }
+  ]
+}
