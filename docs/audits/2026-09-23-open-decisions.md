@@ -61,8 +61,18 @@ writes. `batching()` on the same write path costs ~0%, so this is specific to
 the transactions implementation rather than to enhancers or the substrate.
 Ablation attributes the largest share to notification EMISSION at
 `owned-mutation.ts:206`, installed by `wrapOwnedWritableSignal` when the build
-plan carries `mutation-capture`. A guarded spike measured **-56% dormant, -18%
-at 1% active, +2% fully active**.
+plan carries `mutation-capture`. A guarded spike measured, with trial spread now reported:
+
+    level              BASELINE            GUARDED             delta
+    dormant      72.3ms relIQR 14.6%   31.9ms relIQR 23.9%     -56%   ROBUST
+    active-1%   101.6ms relIQR 26.3%   82.9ms relIQR 12.5%     -18%   within noise
+    active-100%  985.5ms relIQR 8.2%  1007.3ms relIQR 13.8%     +2%   within noise
+
+Only the dormant improvement is established: its delta greatly exceeds both
+arms' spread. The -18% and +2% figures are INSIDE the spread and are not
+measured effects. In particular "+2% fully active" must not be reported as a
+measured penalty -- the honest statement is that no active-path penalty is
+detectable at this precision, which is weaker and is what the data supports.
 
 **Sequence, if taken up. Do NOT backport the experimental ablations — they are
 semantics-breaking mutants built to answer cost questions.**
@@ -77,11 +87,23 @@ semantics-breaking mutants built to answer cost questions.**
          - improves dormant writes without unacceptable active cost
     3. patch release, if 1 and 2 hold
 
+**L19 IS NOT CLOSED by this spike.** The guard is PROCESS-GLOBAL and raised
+MANUALLY by the test. A production candidate additionally needs:
+
+    tree-scoped activation AND deactivation, not a process flag
+    tests for OVERLAPPING turns
+    tests for pending CONSEQUENCES outliving their turn
+    comparison against an UNENHANCED tree, not only against enhanced-baseline
+
 **Why step 2's first two conditions are not boilerplate:** the guard spike
 demonstrated the failure mode directly. Raised ONE STATEMENT too late, the
 rollback still reported success while the value did not revert — causal evidence
-lost silently, invisible to any timing benchmark. That is a risk of a careless
-IMPLEMENTATION of this repair, not a property of shipped v15.
+lost silently, invisible to any timing benchmark.
+
+To be unambiguous: that was a DELIBERATELY INCORRECT MUTANT. It is evidence
+about how this repair could be implemented badly. It is NOT evidence that
+released SignalTree silently loses rollback data, and must not be cited as
+such.
 
 Evidence: `docs/audits/2026-09-25-radical-alternatives/` —
 `l19-dormant-cost`, `l19-ablation-0b`, `l19-ablation-2`, `l19-dormant-guard`,
