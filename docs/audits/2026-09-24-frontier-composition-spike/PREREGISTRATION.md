@@ -106,6 +106,43 @@ Each is pass / fail / unsupported-with-reason. `unsupported` is never a pass.
 F5 and F8 are the two the bridge structurally could not reach (9 Link rows and
 41 confirmedCount rows). They are the point of the spike, not an extra.
 
+## Order of execution — and why it is NOT F3 first
+
+    PHASE 0  DECISION PROBE     F1 -> F5          <- run this first
+    PHASE A  ownership is real  F3, F2, F4
+    PHASE B  ownership composes F6, F7, F9
+    PHASE C  no permanent baggage  F8
+
+The natural instinct is F3 first, because it is the best pure integration test:
+it forces the candidate through real SubjectId, StructuralStore, entity lifetime
+and field ownership, and an F5 failure before ownership is stable is ambiguous
+between frontier being wrong, the integration being incomplete, the Link handoff
+being wrong, and publication timing being wrong.
+
+That reasoning is correct for PROVING the architecture. It is the wrong order
+for DECIDING WHETHER TO BUILD IT, and that is the open question.
+
+Reason: the measured value of the structural rows is low. Of the 58 contract
+violations frontier fixes, 48 are rekey scenarios with two or three
+simultaneously-pending operations -- 40 of them "three pending rekeys" alone.
+That is a pathological pattern, not an application pattern. The property with
+real user value is F5, the tree-wide Link hold, which is everyday-path and
+entirely unmeasured.
+
+So what is PROVEN is low-value and what is HIGH-VALUE is unproven, and the order
+should resolve that asymmetry first.
+
+F1 and F5 are both purely SCALAR. F5 needs scalar ownership plus Link; it does
+not need entity lifetime, SubjectId or StructuralStore, which is what makes F3
+expensive. F1 supplies exactly the control that disambiguates an F5 failure: if
+F1 holds and F5 fails, the failure is in ownership-to-Link composition and not in
+ownership itself. The diagnostic argument is therefore satisfied without first
+building structural ownership for the exotic-rekey family.
+
+KILL CONDITION. If F5 fails after F1 holds, STOP. Frontier's remaining
+demonstrated value is 58 exotic rekey rows, which does not justify replacing a
+working ownership mechanism in a GA product. Phases A-C are not attempted.
+
 ## What would make frontier EARNED
 
 All of the following, together. Any one failing sends it back:
@@ -119,8 +156,27 @@ All of the following, together. Any one failing sends it back:
 7. does not require developers to stop using normal direct writes
 8. is SIMPLER in semantic exceptions than the current compensation machinery
 
-Criterion 8 is a judgment, so it is recorded as a count of special cases and
-guards in each mechanism, decided against that count and not against a feeling.
+Criterion 8 is a judgment, so it is decided against a count, not a feeling --
+and the count separates two categories, because they are not the same thing:
+
+    MECHANISM RULES  rules intrinsic to the ownership model, e.g.
+                     "the latest surviving contribution determines the
+                     visible value"
+    PATCH RULES      conditionals whose only purpose is repairing an
+                     interaction or edge case, e.g. "...unless a later pending
+                     writer overlaps, except the external versioned case,
+                     except rekey collision, except..."
+
+Ten lines of general ownership machinery can be mechanically larger and
+semantically SIMPLER than five scattered compensating guards. So the comparison
+is over:
+
+    number of semantic concepts
+    number of exception branches
+    number of cross-subsystem special cases
+    number of retained state classes
+
+and explicitly NOT over raw lines of code.
 
 ## Rules for running this
 
@@ -134,3 +190,26 @@ guards in each mechanism, decided against that count and not against a feeling.
   frozen contract's own cases. Expected behaviour comes from the contract.
 - No aggregate score. Per-property verdicts only.
 - Verdicts are exit codes, never greps of output.
+
+---
+
+## Naming is deliberately NOT decided here
+
+`speculate()` is a serious candidate and may describe this model better than
+`transact()` does. `transact()` carries a database implication -- writes hidden
+until commit -- which is the opposite of what happens here: a pending
+contribution is live, visible, shared state that other state may build on.
+`speculate()` means "make this true now, provisionally", which is the actual
+behaviour. `contribute()` is arguably the most accurate of all for the frontier
+model and is retained as INTERNAL vocabulary (contribution, owner, frontier,
+disposition) regardless of what the public verb becomes.
+
+No rename happens now, for two reasons. The vocabulary was consolidated onto
+`transact()` this session and shipped in 15.3.0; a second rename is only
+justified if the architecture underneath it actually changes, which is precisely
+what F5 decides. And if frontier does not survive the probe, renaming would be
+churn purchased for nothing.
+
+If frontier survives, `speculate()` becomes materially more compelling, because
+the implementation semantics would then justify the word rather than the word
+being chosen ahead of the architecture.
