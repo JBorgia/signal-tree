@@ -1,0 +1,64 @@
+{
+  "probe": "OWNER-KEY-0",
+  "checks": [
+    {
+      "label": "PREREQ a WRITE registers the same node a READ does (frontier keyable from capture alone)",
+      "ok": false,
+      "detail": "read=1 write=0 shared=0"
+    },
+    {
+      "label": "NOTE write-only nodes = 0",
+      "ok": true
+    },
+    {
+      "label": "NOTE byIdOrFail alone captures 1 node(s)",
+      "ok": true
+    },
+    {
+      "label": "NOTE byIdOrFail + .score() captures 2 node(s)",
+      "ok": true
+    },
+    {
+      "label": "F score and name reads SHARE a node (a subject-level anchor exists)",
+      "ok": true,
+      "detail": "score=2 name=2 shared=1"
+    },
+    {
+      "label": "F ...and each ALSO has its own leaf node (anchor + leaf, not one blob)",
+      "ok": true,
+      "detail": "leaf-only nodes for score = 1"
+    },
+    {
+      "label": "NOTE the shared node IS the one byIdOrFail registers",
+      "ok": true
+    },
+    {
+      "label": "A scalar read resolves to the writing owner",
+      "ok": false
+    },
+    {
+      "label": "B entity-leaf read resolves to the creating owner",
+      "ok": false,
+      "detail": "owners=[]"
+    },
+    {
+      "label": "C ownership SURVIVES rekey with no repair step",
+      "ok": false,
+      "detail": "owners=[]"
+    },
+    {
+      "label": "E score and name remain distinguishable frontier entries",
+      "ok": true
+    },
+    {
+      "label": "D a fresh subject reusing the key does NOT inherit the old owner",
+      "ok": true,
+      "detail": "owners=[]"
+    },
+    {
+      "label": "G settling every owner leaves NO ownership state behind",
+      "ok": true,
+      "detail": "remaining entries=0"
+    }
+  ]
+}
