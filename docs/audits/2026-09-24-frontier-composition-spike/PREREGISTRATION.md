@@ -534,3 +534,62 @@ itself enforces any of this.
     validation
 
 No further search for prettier models unless one of the three gates breaks C.
+
+---
+
+# GATE 1 RESTATED — emission footprint, not read capture
+
+The F5-C failure is a CONCEPTUAL BOUNDARY, not a missing feature. The wrong fix
+would be making branch reads capture descendant leaves: that distorts the
+reactive dependency model to serve Link, and manufactures reads, nodes and
+O(tree-size) work at Link registration.
+
+Three footprints, ONE semantic identity vocabulary, three different truthful
+sets:
+
+    READ FOOTPRINT       what a computation consumed    -> dependency edges
+    OWNERSHIP FOOTPRINT  what a pending turn owns       -> settlement authority
+    EMISSION FOOTPRINT   what a consequence would expose-> outbound eligibility
+
+For a scalar these coincide trivially. For a branch they do not, and that is
+correct rather than a defect to repair.
+
+    Gate 1  OPEN -- requires consequence EMISSION FOOTPRINT, not dependency-read
+            capture.
+
+## What Link's existing machinery does and does not provide
+
+MEASURED. Link advances scalar and branch sources incrementally through
+`internals/source-mutation.ts`: `relativeSourceAddress(...)` resolves an
+incoming mutation's address relative to the source, and
+`applyAtRelativePath(previous, segments, value)` patches it into the eligible
+value. The projection starts from one `read()` and patches thereafter.
+
+So Link NEVER enumerates the leaf set of a branch source. An emission footprint
+by enumeration is therefore not derivable from what exists, which is consistent
+with the warning against building it by walking and reading.
+
+Link's entity egress is already SUBJECT-KEYED -- `EntityEgressProjection`, kept
+that way explicitly because "Row[] carries no identity, and a rekey moves an
+address without touching the payload". `StructuralEffect` and `EntityTopology`
+in source-mutation.ts are likewise keyed by `subject`. So the egress path
+already speaks part of C's vocabulary.
+
+## HYPOTHESIS for EMIT-FOOTPRINT-0 — unverified, do not build on it yet
+
+Enumerating what a source WILL emit may be the wrong direction. The inverse
+needs no enumeration:
+
+    eligible(source) := no OPEN contribution owns a write whose address
+                        resolves WITHIN this source
+
+Link already computes exactly that containment for every incoming mutation, via
+`relativeSourceAddress`. The question becomes "does any owned identity lie
+inside this source", which is answerable per pending write rather than per
+source leaf, and is O(open writes) instead of O(tree size).
+
+This is a HYPOTHESIS derived from reading the machinery, not a measurement. The
+last several rounds each punished exactly this inference step, so EMIT-FOOTPRINT-0
+must test it rather than assume it -- including the falsifier that omitting a
+pending write from the containment check makes the branch wrongly eligible and
+lets speculative state escape.
