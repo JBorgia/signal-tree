@@ -481,3 +481,56 @@ ROW3b, though exploratory rather than preregistered, is why this is worth
 building: reading `A.score` captures the subject ANCHOR as well as the leaf, so
 "P2 depends on S1 existing" falls out of ordinary read capture instead of
 needing a separate existence detector.
+
+---
+
+# STATUS AFTER F5 — C earns a production-integration track
+
+F5 proved both sides at once: more progress without less safety, with a mutant
+showing the dependency edge is what controls the behaviour.
+
+    CONTROL    x held   y held
+    CANDIDATE  x held   y progresses
+    DEPENDENT  x held   dependent y held
+    MUTANT     edge removed -> dependent y escapes
+
+## The old proxy is now falsified in three directions
+
+Not a collection of edge cases -- three independent failures of ONE mechanism,
+which is what justifies DELETING it rather than layering C beside it:
+
+    F1  overlap without dependency    -> blocks safe settlement
+    F3  dependency without overlap    -> misses unsafe settlement
+    F5  unrelated source, same tree   -> blocks safe outbound progress
+
+## Hard production invariant, earned from a safety failure
+
+> Ownership must become visible ATOMICALLY with the authored write, before any
+> consequence can test eligibility.
+
+The first candidate run leaked speculative `x` because ownership was registered
+after the flush. Anything asynchronous or post-flush is structurally unsafe, and
+it fails in the dangerous direction rather than the conservative one.
+
+## THREE mandatory gates before C is integration-ready
+
+An earlier note listed two and demoted the third to a caveat. That was wrong:
+
+    1. F5-C whole-source control        link(root) may legitimately stay held
+    2. entity-leaf semantic binding     SubjectId + scoped leaf segments
+    3. KERNEL-NATIVE ENFORCEMENT        F3 and F5 both applied policy at
+                                        harness level, so the model and policy
+                                        are proven but the real settlement and
+                                        consequence machinery implementing them
+                                        is NOT
+
+Gate 3 is not optional and is not a footnote. Nothing so far shows the kernel
+itself enforces any of this.
+
+## Then the normal hardening sequence, not more architecture discovery
+
+    production-native C mechanism -> mutation tests / ablations -> retention and
+    cleanup -> hot-path benchmark -> full semantic suite -> framework and app
+    validation
+
+No further search for prettier models unless one of the three gates breaks C.
