@@ -126,14 +126,42 @@ unchanged from the frozen scenarios:
     unsupported  an explicit capability gap, recorded and not counted against
     error        its own failure, NEVER relabelled a refusal
 
+⚠️ **AN EARLIER VERSION OF THIS CHECKER PASSED TWO DELIBERATELY BROKEN
+ADAPTERS**, both with zero violations and exit 0. Every hole is now a named
+check, and both adapters are kept here as negative fixtures:
+
+    1  it compared only the FINAL state, so an adapter that destroyed P2's y=2
+       while rejecting P1 and repaired it while accepting P2 scored clean.
+       State is asserted IMMEDIATELY after the first settlement now.
+    2  "other authority preserved" tested `typeof === 'boolean'` — which
+       `false` satisfies — and never reached the verdict. It now requires the
+       OTHER handle to be STILL PENDING right after the first settles, with its
+       own terminality checked after its own settlement.
+    3  "coherent publication" tested `count >= 0`, always true, and never
+       reached the verdict. Delivered SNAPSHOTS are recorded and compared
+       against the permitted coherent states.
+    4  `already-settled` on a freshly opened handle fell into an else-branch
+       requiring nothing, and an exception from the SECOND settlement was
+       swallowed. Both fail now.
+
+    fixture                                        exit  violations
+    conformance-BROKEN-adapter-midstep-corruption     1   6
+    conformance-BROKEN-adapter-already-settled        1   4
+
 Demonstrated to branch, not merely to pass:
 
-    at 6531851f   outcomes all `refused`   -> refusal guarantees   -> 0 violations
-    at 7ade0e3e   outcomes all `settled`   -> SETTLEMENT guarantees -> 4 violations,
-                  each "settled with wrong surviving state"
+    at 6531851f   all `refused`  -> refusal guarantees    -> 0 violations
+    at 7ade0e3e   all `settled`  -> SETTLEMENT guarantees -> violations naming
+                  mid-sequence corruption, incoherent publication, wrong final
+                  state, and a second settlement that refused
 
-The old implementation is judged on settlement and fails on STATE. It is not
-penalised for failing to refuse. A candidate that settles correctly passes.
+The old implementation is judged on settlement and fails on STATE, not for
+declining to refuse. A candidate that settles correctly passes.
+
+⚠️ The historical red run shows the checker catches historical bad behaviour.
+It does NOT establish that successful-settlement validation is SUFFICIENT — the
+broken adapters above are the evidence that it can be insufficient, and they
+are why these checks exist in this form.
 
 ## Refusal safety, measured separately
 

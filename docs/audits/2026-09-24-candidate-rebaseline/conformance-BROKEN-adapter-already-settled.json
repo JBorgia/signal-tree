@@ -1,26 +1,21 @@
 {
   "provenance": {
-    "resolvedKernelSha": "6531851f1b8d5be7607af19cdbb7f55ee3df1116",
-    "kernelSourceSelection": "git show 6531851f1b8d5be7607af19cdbb7f55ee3df1116:packages/kernel/src/**",
-    "bundleSha256": "c8eac5b8a8f1f94638d1751a6a2bc75bd59d01454bb26166a52fa3b3d1478764",
-    "bundleBytes": 511993,
-    "scenario": "settlement-or-refusal-conformance.mjs",
-    "scenarioSha256_16": "b3eff9ed4c80b9d9",
-    "adapterSha256_16": "4255ac89b238ed3a",
-    "runnerSha256_16": "5afb9872b7d770a8",
-    "assertionsSha256_16": "2182d9bbbe33aa92",
-    "node": "v24.15.0",
-    "generatedAt": "2026-09-25T00:47:04.289Z"
+    "reviewProbe": true
   },
   "kind": "settlement-or-refusal-conformance",
   "publicationScope": "observe() is flush-driven and filters unchanged snapshots; a clean result means no DISALLOWED CHANGED SNAPSHOT reached that projection, not zero native notifications",
   "outcomes": {
-    "R8-01-reject-accept": "refused",
-    "R8-01-reject-reject": "refused",
-    "same-tick-local-flush-false": "refused",
-    "same-tick-external-flush-false": "refused"
+    "R8-01-reject-accept": "already-settled",
+    "R8-01-reject-reject": "already-settled",
+    "same-tick-local-flush-false": "already-settled",
+    "same-tick-external-flush-false": "already-settled"
   },
-  "violations": [],
+  "violations": [
+    "R8-01-reject-accept: illegal first-settlement result 'already-settled' on a newly pending handle",
+    "R8-01-reject-reject: illegal first-settlement result 'already-settled' on a newly pending handle",
+    "same-tick-local-flush-false: illegal first-settlement result 'already-settled' on a newly pending handle",
+    "same-tick-external-flush-false: illegal first-settlement result 'already-settled' on a newly pending handle"
+  ],
   "publicationUnverified": [
     "same-tick-local-flush-false",
     "same-tick-external-flush-false"
@@ -28,13 +23,15 @@
   "rows": [
     {
       "id": "R8-01-reject-accept",
-      "violations": [],
+      "violations": [
+        "R8-01-reject-accept: illegal first-settlement result 'already-settled' on a newly pending handle"
+      ],
       "before": {
         "x": 1,
         "y": 2,
         "z": 2
       },
-      "outcome": "refused",
+      "outcome": "already-settled",
       "afterFirst": {
         "x": 1,
         "y": 2,
@@ -45,13 +42,15 @@
     },
     {
       "id": "R8-01-reject-reject",
-      "violations": [],
+      "violations": [
+        "R8-01-reject-reject: illegal first-settlement result 'already-settled' on a newly pending handle"
+      ],
       "before": {
         "x": 1,
         "y": 2,
         "z": 2
       },
-      "outcome": "refused",
+      "outcome": "already-settled",
       "afterFirst": {
         "x": 1,
         "y": 2,
@@ -62,13 +61,15 @@
     },
     {
       "id": "same-tick-local-flush-false",
-      "violations": [],
+      "violations": [
+        "same-tick-local-flush-false: illegal first-settlement result 'already-settled' on a newly pending handle"
+      ],
       "before": {
         "x": 2,
         "y": 0,
         "z": 0
       },
-      "outcome": "refused",
+      "outcome": "already-settled",
       "afterFirst": {
         "x": 2,
         "y": 0,
@@ -79,13 +80,15 @@
     },
     {
       "id": "same-tick-external-flush-false",
-      "violations": [],
+      "violations": [
+        "same-tick-external-flush-false: illegal first-settlement result 'already-settled' on a newly pending handle"
+      ],
       "before": {
         "x": 2,
         "y": 0,
         "z": 0
       },
-      "outcome": "refused",
+      "outcome": "already-settled",
       "afterFirst": {
         "x": 2,
         "y": 0,
