@@ -1,0 +1,49 @@
+{
+  "probe": "F3-ABLATION",
+  "control": {
+    "outcome": "settled",
+    "edgeRecorded": false,
+    "resolvedOwners": [
+      1
+    ],
+    "t1": 1,
+    "t2": 2
+  },
+  "candidate": {
+    "outcome": "refused",
+    "edgeRecorded": true,
+    "resolvedOwners": [
+      1
+    ],
+    "t1": 1,
+    "t2": 2
+  },
+  "mutant": {
+    "outcome": "settled",
+    "edgeRecorded": false,
+    "resolvedOwners": [
+      1
+    ],
+    "t1": 1,
+    "t2": 2
+  },
+  "checks": [
+    {
+      "label": "CONTROL the incumbent guard does NOT protect a cross-location derived dependent (the gap)",
+      "ok": true
+    },
+    {
+      "label": "CANDIDATE a P2->P1 edge was resolved via semantic identity",
+      "ok": true,
+      "detail": "owners=[1]"
+    },
+    {
+      "label": "CANDIDATE refuses with the old guard OFF (C is doing the work)",
+      "ok": true
+    },
+    {
+      "label": "MUTANT without the edge there is NO protection (edge is load-bearing)",
+      "ok": true
+    }
+  ]
+}
