@@ -1,0 +1,20 @@
+{
+  "probe": "OWNER-SEAM-2B",
+  "checks": [
+    {
+      "label": "scalar leaves have DISTINCT positions",
+      "ok": true,
+      "detail": "x=[2] y=[3]"
+    },
+    {
+      "label": "entity field leaves score/name have DISTINCT positions",
+      "ok": false,
+      "detail": "A.score=[4] A.name=[4]"
+    },
+    {
+      "label": "DIFFERENT SUBJECTS have distinct positions",
+      "ok": false,
+      "detail": "A.score=[4] B.score=[4]"
+    }
+  ]
+}
