@@ -142,6 +142,37 @@ check, and — more importantly — the adapters are EXECUTABLE and enforced:
        that published {99,99,99} DURING the second and then restored the right
        final values scored clean — the same shape as hole 1, one step later
 
+### Packaging: the self-test must run from a CLEAN CHECKOUT
+
+An earlier version could not. `conformance-selftest.mjs` imported
+`settlement-or-refusal-conformance.mjs`, which statically imported the
+revision-pinned `current.mjs` out of a gitignored scratch directory — so from
+tracked files alone it died with `ERR_MODULE_NOT_FOUND`. The committed evidence
+did not meet the standard being imposed everywhere else: a reader must be able
+to run it without reconstructing hidden local state.
+
+Split into three:
+
+    candidate-conformance-core.mjs        cases, runConformance(factory),
+                                          settlement/refusal and publication
+                                          validation. Depends on NO adapter.
+    conformance-selftest.mjs              imports ONLY the core, plus its four
+                                          executable adapters
+    settlement-or-refusal-conformance.mjs core + the incumbent adapter, CLI only
+
+A checker that judges implementations must not depend on one of the
+implementations being judged.
+
+**Verified in a genuine clone** (`git clone --depth 1`, no `node_modules`,
+tracked files only):
+
+    node docs/audits/2026-09-24-candidate-rebaseline/conformance-selftest.mjs
+    -> exit 0    control pass · midstep fail(6) · already fail(4) · torn2 fail(2)
+
+And the committed artifact is load-bearing there, not just locally: disabling
+the second-publication guard IN THE CLONE gives exit 1 and
+*"checker did NOT catch torn2"*.
+
 `conformance-selftest.mjs` is the enforcement. Saved JSON is evidence of a past
 run and enforces nothing; this drives the SAME cases with four executable
 adapters and requires each verdict:
