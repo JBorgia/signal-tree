@@ -1,0 +1,94 @@
+{
+  "provenance": {
+    "resolvedKernelSha": "6531851f1b8d5be7607af19cdbb7f55ee3df1116",
+    "kernelSourceSelection": "git show 6531851f1b8d5be7607af19cdbb7f55ee3df1116:packages/kernel/src/**",
+    "bundleSha256": "c8eac5b8a8f1f94638d1751a6a2bc75bd59d01454bb26166a52fa3b3d1478764",
+    "bundleBytes": 511993,
+    "scenario": "settlement-or-refusal-conformance.mjs",
+    "scenarioSha256_16": "69a68cc03b825935",
+    "adapterSha256_16": "4255ac89b238ed3a",
+    "runnerSha256_16": "5afb9872b7d770a8",
+    "assertionsSha256_16": "2182d9bbbe33aa92",
+    "node": "v24.15.0",
+    "generatedAt": "2026-09-25T00:30:56.827Z"
+  },
+  "kind": "settlement-or-refusal-conformance",
+  "publicationScope": "observe() is flush-driven and filters unchanged snapshots; 0 means no changed snapshot was delivered through that projection, NOT zero native notifications",
+  "outcomes": {
+    "R8-01-reject-accept": "refused",
+    "R8-01-reject-reject": "refused",
+    "same-tick-local-flush-false": "refused",
+    "same-tick-external-flush-false": "refused"
+  },
+  "violations": [],
+  "publicationUnverified": [
+    "same-tick-local-flush-false",
+    "same-tick-external-flush-false"
+  ],
+  "rows": [
+    {
+      "id": "R8-01-reject-accept",
+      "outcome": "refused",
+      "after": {
+        "x": 1,
+        "y": 2,
+        "z": 2
+      },
+      "publishedByAct": 0,
+      "publicationVerified": true,
+      "required": "refusal guarantees",
+      "stateUnchanged": true,
+      "targetRetainsAuthority": true,
+      "otherRetainsAuthority": true,
+      "noForbiddenPublication": true
+    },
+    {
+      "id": "R8-01-reject-reject",
+      "outcome": "refused",
+      "after": {
+        "x": 1,
+        "y": 2,
+        "z": 2
+      },
+      "publishedByAct": 0,
+      "publicationVerified": true,
+      "required": "refusal guarantees",
+      "stateUnchanged": true,
+      "targetRetainsAuthority": true,
+      "otherRetainsAuthority": true,
+      "noForbiddenPublication": true
+    },
+    {
+      "id": "same-tick-local-flush-false",
+      "outcome": "refused",
+      "after": {
+        "x": 2,
+        "y": 0,
+        "z": 0
+      },
+      "publishedByAct": null,
+      "publicationVerified": false,
+      "required": "refusal guarantees",
+      "stateUnchanged": true,
+      "targetRetainsAuthority": true,
+      "otherRetainsAuthority": null,
+      "noForbiddenPublication": null
+    },
+    {
+      "id": "same-tick-external-flush-false",
+      "outcome": "refused",
+      "after": {
+        "x": 2,
+        "y": 0,
+        "z": 0
+      },
+      "publishedByAct": null,
+      "publicationVerified": false,
+      "required": "refusal guarantees",
+      "stateUnchanged": true,
+      "targetRetainsAuthority": true,
+      "otherRetainsAuthority": null,
+      "noForbiddenPublication": null
+    }
+  ]
+}

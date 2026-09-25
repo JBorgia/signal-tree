@@ -106,6 +106,35 @@ improvements — overlapping-writer settlement and unflushed-write visibility ar
 not obviously the same problem. The ownership direction stands as the chosen
 product decision; the mechanism is for candidate evidence to decide.
 
+## ⚠️ The refusal companion is INCUMBENT-ONLY. Candidates use the branching checker.
+
+`refusal-safety-characterization.mjs` asserts `firstStatus === 'refused'`.
+Applied unchanged to a competing architecture that is INCOHERENT — the
+settlement suite would demand settlement, this would demand refusal, and a
+candidate that correctly removes the contribution would be penalised for
+succeeding. It is a regression characterization OF THE INCUMBENT and nothing
+more.
+
+`settlement-or-refusal-conformance.mjs` is what candidates are judged by. It
+branches on the ACTUAL result, with the successful-settlement expectations
+unchanged from the frozen scenarios:
+
+    refused      state unchanged, same pending authority retained,
+                 no forbidden publication
+    settled      correct surviving state, targeted authority TERMINAL,
+                 unrelated authority preserved, coherent publication
+    unsupported  an explicit capability gap, recorded and not counted against
+    error        its own failure, NEVER relabelled a refusal
+
+Demonstrated to branch, not merely to pass:
+
+    at 6531851f   outcomes all `refused`   -> refusal guarantees   -> 0 violations
+    at 7ade0e3e   outcomes all `settled`   -> SETTLEMENT guarantees -> 4 violations,
+                  each "settled with wrong surviving state"
+
+The old implementation is judged on settlement and fails on STATE. It is not
+penalised for failing to refuse. A candidate that settles correctly passes.
+
 ## Refusal safety, measured separately
 
 `refusal-safety-AT-6531851f.json` records what survives each refusal, WITHOUT
@@ -149,11 +178,20 @@ results are meant to stand together:
 A candidate that won the first by abandoning the second is caught by the second
 rather than celebrated by the first.
 
-Load-bearing, proven against history rather than by injection — the adapter
-reads committed source, so the mutation is a revision. Repointed at
-`7ade0e3e`, the same suite reports **16 violations, exit 1**
-(`refusal-safety-AT-7ade0e3e.json`): settled instead of refused, state changed,
-authority lost, later write destroyed, and a publication emitted.
+Sensitive, proven against history rather than by injection — the adapter reads
+committed source, so the mutation is a revision. Repointed at `7ade0e3e` the
+same suite reports **16 violations, exit 1**
+(`refusal-safety-AT-7ade0e3e.json`).
+
+⚠️ That is a REGRESSION SENSITIVITY control, not an isolated mutation proof.
+Switching revisions changes many things at once. It shows these checks detect
+historical bad behaviour; it does NOT show that each individual assertion is
+independently necessary.
+
+⚠️ PUBLICATION SCOPE. `observe()` is flush-driven and filters unchanged
+snapshots, so `publishedByRefusal = 0` means NO CHANGED SNAPSHOT WAS DELIVERED
+THROUGH THAT PROJECTION. It is not a claim about native notification counts, nor
+about intermediate states that never reached a flush boundary.
 
 ## Method notes worth keeping
 
