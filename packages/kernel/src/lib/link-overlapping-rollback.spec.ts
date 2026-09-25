@@ -247,6 +247,33 @@ describe('link across overlapping transactions', () => {
     tree.destroy();
   });
 
+  it('settled() resolves after repeated flushes behind an UNRELATED pending transaction', async () => {
+    // The widest trigger of the orphaned release signal: no overlap and no
+    // rollback. On 15.3.0 two flushes of the linked source while any
+    // transaction was pending left settled() waiting forever, although the
+    // endpoint itself received the right value.
+    const tree = signalTree(
+      { x: 0, other: 0 },
+      { enhancers: [transactions()] }
+    );
+    const sent: number[] = [];
+    const relation = link(tree.$.x, { set: (v) => void sent.push(v) });
+    await flush();
+    sent.length = 0;
+    const pending = tree.transaction(() => tree.$.other(1));
+    await flush();
+    tree.$.x(10);
+    await flush();
+    tree.$.x(20);
+    await flush();
+    pending.confirm();
+    await flush();
+    expect(await settledWithin(relation)).toBe(true);
+    expect(sent.at(-1)).toBe(20);
+    relation.dispose();
+    tree.destroy();
+  });
+
   it('control: a lone rollback still notifies and settles', async () => {
     const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
     const sent: number[] = [];
