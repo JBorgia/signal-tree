@@ -5,15 +5,15 @@
     "bundleSha256": "b0dacf4f7948a232e8a08e9649535811620c747500a1c6d07b76cf2f8974a7e3",
     "bundleBytes": 474380,
     "scenario": "settlement-or-refusal-conformance.mjs",
-    "scenarioSha256_16": "69a68cc03b825935",
+    "scenarioSha256_16": "b3eff9ed4c80b9d9",
     "adapterSha256_16": "bde1767d47633589",
     "runnerSha256_16": "5afb9872b7d770a8",
     "assertionsSha256_16": "2182d9bbbe33aa92",
     "node": "v24.15.0",
-    "generatedAt": "2026-09-25T00:31:18.491Z"
+    "generatedAt": "2026-09-25T00:46:50.493Z"
   },
   "kind": "settlement-or-refusal-conformance",
-  "publicationScope": "observe() is flush-driven and filters unchanged snapshots; 0 means no changed snapshot was delivered through that projection, NOT zero native notifications",
+  "publicationScope": "observe() is flush-driven and filters unchanged snapshots; a clean result means no DISALLOWED CHANGED SNAPSHOT reached that projection, not zero native notifications",
   "outcomes": {
     "R8-01-reject-accept": "settled",
     "R8-01-reject-reject": "settled",
@@ -21,10 +21,18 @@
     "same-tick-external-flush-false": "settled"
   },
   "violations": [
-    "R8-01-reject-accept: settled with wrong surviving state {\"x\":0,\"y\":0,\"z\":2}",
-    "R8-01-reject-reject: settled with wrong surviving state {\"x\":0,\"y\":0,\"z\":2}",
-    "same-tick-local-flush-false: settled with wrong surviving state {\"x\":0,\"y\":0,\"z\":0}",
-    "same-tick-external-flush-false: settled with wrong surviving state {\"x\":0,\"y\":0,\"z\":0}"
+    "R8-01-reject-accept: state after the FIRST settlement is {\"x\":0,\"y\":0,\"z\":2}, expected {\"x\":0,\"y\":2,\"z\":2}",
+    "R8-01-reject-accept: published 1 incoherent snapshot(s): [{\"x\":0,\"y\":0,\"z\":2}]",
+    "R8-01-reject-accept: final state is {\"x\":0,\"y\":0,\"z\":2}, expected {\"x\":0,\"y\":2,\"z\":2}",
+    "R8-01-reject-reject: state after the FIRST settlement is {\"x\":0,\"y\":0,\"z\":2}, expected {\"x\":0,\"y\":2,\"z\":2}",
+    "R8-01-reject-reject: published 1 incoherent snapshot(s): [{\"x\":0,\"y\":0,\"z\":2}]",
+    "R8-01-reject-reject: the second settlement returned 'refused', expected 'settled'",
+    "R8-01-reject-reject: the OTHER handle is not terminal after its own settlement",
+    "R8-01-reject-reject: final state is {\"x\":0,\"y\":0,\"z\":2}, expected {\"x\":0,\"y\":0,\"z\":0}",
+    "same-tick-local-flush-false: state after the FIRST settlement is {\"x\":0,\"y\":0,\"z\":0}, expected {\"x\":2}",
+    "same-tick-local-flush-false: final state is {\"x\":0,\"y\":0,\"z\":0}, expected {\"x\":2}",
+    "same-tick-external-flush-false: state after the FIRST settlement is {\"x\":0,\"y\":0,\"z\":0}, expected {\"x\":2}",
+    "same-tick-external-flush-false: final state is {\"x\":0,\"y\":0,\"z\":0}, expected {\"x\":2}"
   ],
   "publicationUnverified": [
     "same-tick-local-flush-false",
@@ -33,87 +41,135 @@
   "rows": [
     {
       "id": "R8-01-reject-accept",
+      "violations": [
+        "R8-01-reject-accept: state after the FIRST settlement is {\"x\":0,\"y\":0,\"z\":2}, expected {\"x\":0,\"y\":2,\"z\":2}",
+        "R8-01-reject-accept: published 1 incoherent snapshot(s): [{\"x\":0,\"y\":0,\"z\":2}]",
+        "R8-01-reject-accept: final state is {\"x\":0,\"y\":0,\"z\":2}, expected {\"x\":0,\"y\":2,\"z\":2}"
+      ],
+      "before": {
+        "x": 1,
+        "y": 2,
+        "z": 2
+      },
       "outcome": "settled",
-      "after": {
+      "afterFirst": {
         "x": 0,
         "y": 0,
         "z": 2
       },
-      "publishedByAct": 1,
+      "deliveredByFirst": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 2
+        }
+      ],
       "publicationVerified": true,
-      "required": "settlement guarantees",
+      "tornPublications": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 2
+        }
+      ],
+      "secondOutcome": "settled",
       "final": {
         "x": 0,
         "y": 0,
         "z": 2
-      },
-      "survivingStateCorrect": false,
-      "targetAuthorityTerminal": true,
-      "otherAuthorityPreserved": true,
-      "coherentPublication": true
+      }
     },
     {
       "id": "R8-01-reject-reject",
+      "violations": [
+        "R8-01-reject-reject: state after the FIRST settlement is {\"x\":0,\"y\":0,\"z\":2}, expected {\"x\":0,\"y\":2,\"z\":2}",
+        "R8-01-reject-reject: published 1 incoherent snapshot(s): [{\"x\":0,\"y\":0,\"z\":2}]",
+        "R8-01-reject-reject: the second settlement returned 'refused', expected 'settled'",
+        "R8-01-reject-reject: the OTHER handle is not terminal after its own settlement",
+        "R8-01-reject-reject: final state is {\"x\":0,\"y\":0,\"z\":2}, expected {\"x\":0,\"y\":0,\"z\":0}"
+      ],
+      "before": {
+        "x": 1,
+        "y": 2,
+        "z": 2
+      },
       "outcome": "settled",
-      "after": {
+      "afterFirst": {
         "x": 0,
         "y": 0,
         "z": 2
       },
-      "publishedByAct": 1,
+      "deliveredByFirst": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 2
+        }
+      ],
       "publicationVerified": true,
-      "required": "settlement guarantees",
+      "tornPublications": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 2
+        }
+      ],
+      "secondOutcome": "refused",
       "final": {
         "x": 0,
         "y": 0,
         "z": 2
-      },
-      "survivingStateCorrect": false,
-      "targetAuthorityTerminal": true,
-      "otherAuthorityPreserved": true,
-      "coherentPublication": true
+      }
     },
     {
       "id": "same-tick-local-flush-false",
+      "violations": [
+        "same-tick-local-flush-false: state after the FIRST settlement is {\"x\":0,\"y\":0,\"z\":0}, expected {\"x\":2}",
+        "same-tick-local-flush-false: final state is {\"x\":0,\"y\":0,\"z\":0}, expected {\"x\":2}"
+      ],
+      "before": {
+        "x": 2,
+        "y": 0,
+        "z": 0
+      },
       "outcome": "settled",
-      "after": {
+      "afterFirst": {
         "x": 0,
         "y": 0,
         "z": 0
       },
-      "publishedByAct": null,
+      "deliveredByFirst": null,
       "publicationVerified": false,
-      "required": "settlement guarantees",
       "final": {
         "x": 0,
         "y": 0,
         "z": 0
-      },
-      "survivingStateCorrect": false,
-      "targetAuthorityTerminal": true,
-      "otherAuthorityPreserved": null,
-      "coherentPublication": null
+      }
     },
     {
       "id": "same-tick-external-flush-false",
+      "violations": [
+        "same-tick-external-flush-false: state after the FIRST settlement is {\"x\":0,\"y\":0,\"z\":0}, expected {\"x\":2}",
+        "same-tick-external-flush-false: final state is {\"x\":0,\"y\":0,\"z\":0}, expected {\"x\":2}"
+      ],
+      "before": {
+        "x": 2,
+        "y": 0,
+        "z": 0
+      },
       "outcome": "settled",
-      "after": {
+      "afterFirst": {
         "x": 0,
         "y": 0,
         "z": 0
       },
-      "publishedByAct": null,
+      "deliveredByFirst": null,
       "publicationVerified": false,
-      "required": "settlement guarantees",
       "final": {
         "x": 0,
         "y": 0,
         "z": 0
-      },
-      "survivingStateCorrect": false,
-      "targetAuthorityTerminal": true,
-      "otherAuthorityPreserved": null,
-      "coherentPublication": null
+      }
     }
   ]
 }
