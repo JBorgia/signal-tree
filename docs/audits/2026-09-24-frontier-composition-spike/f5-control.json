@@ -1,0 +1,20 @@
+{
+  "probe": "F5-A-CONTROL",
+  "checks": [
+    {
+      "label": "F5-A SAFETY speculative x=1 is NOT exported while pending",
+      "ok": true,
+      "detail": "endpointX=[]"
+    },
+    {
+      "label": "F5-A CAPABILITY independent y=7 DOES progress before P1 settles",
+      "ok": false,
+      "detail": "endpointY=[]"
+    },
+    {
+      "label": "F5-A after confirm, x is exported",
+      "ok": true,
+      "detail": "endpointX=[1]"
+    }
+  ]
+}
