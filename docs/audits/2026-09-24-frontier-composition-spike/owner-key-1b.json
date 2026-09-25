@@ -1,0 +1,35 @@
+{
+  "probe": "OWNER-KEY-1-half2",
+  "checks": [
+    {
+      "label": "ROW8 a pending ADD yields both an effect SubjectId and a capturable anchor node",
+      "ok": true,
+      "detail": "effectSubject=1 anchorNode=present"
+    },
+    {
+      "label": "ROW4 different subjects have DISTINCT anchor nodes",
+      "ok": true
+    },
+    {
+      "label": "ROW3 A.score and A.name are DISTINCT leaf nodes",
+      "ok": true
+    },
+    {
+      "label": "ROW3b a leaf read ALSO registers the subject anchor (existence dependency is implicit)",
+      "ok": true
+    },
+    {
+      "label": "ROW5 rekey preserves the anchor node (no key-based identity)",
+      "ok": true
+    },
+    {
+      "label": "ROW6 a fresh subject at a reused key has a FRESH anchor node",
+      "ok": true
+    },
+    {
+      "label": "ROW6b ...and a FRESH SubjectId on its effect",
+      "ok": true,
+      "detail": "old=1 fresh=3"
+    }
+  ]
+}
