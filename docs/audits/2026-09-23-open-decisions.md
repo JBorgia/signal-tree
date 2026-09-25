@@ -78,8 +78,14 @@ per-trial differences are:
     active-1%     median   -4.5ms  range [-287.5,  +23.6]  faster in 7/8
     active-100%   median  +12.9ms  range [-113.6, +271.1]  faster in 3/8
 
-ESTABLISHED: the dormant improvement. Every trial favours the guard and the
-entire range of paired differences is negative.
+ESTABLISHED IN THIS RUN: the dormant improvement. All 8 measured pairs favour
+the guard, by 30.6-53.3ms, and the entire range of paired differences is
+negative.
+
+The scope of that word is deliberate. Pairing by trial index accounts for drift
+BETWEEN ARMS THAT SHARE THE SAME RUN CONDITIONS. It does not extend the claim to
+other machines, other Node versions, or a fresh run, and it does not replace
+replication. A production candidate must reproduce this independently.
 
 NOT ESTABLISHED, in either direction: active-1% and active-100%. Their paired
 differences change sign across trials, and active-100% favours the guard in only
