@@ -188,3 +188,67 @@ tax on every ordinary application write, whatever its semantic merits.
 
 Evidence: `l19-dormant-cost`, `l19-ablation-0b`, `l19-ablation-2`,
 `l19-dormant-guard`, `l19-tree-scoped-guard`, `l19-profile-diff.md`.
+
+---
+
+# CANDIDATE STATUS — end of the 2026-09-25 run
+
+## Eliminated
+
+    pure draft        FALSIFIED. 69 held / 112 violated; T12 shows a draft based
+                      on canonical cannot see an entity created by a
+                      still-pending contribution, where the kernel holds 16/16.
+    Candidate A       FALSIFIED. Entity fields collapse to ONE collection-level
+                      PositionId, destroying leaf, subject and lifetime
+                      separation -- the precise distinctions ROW7 requires.
+    committed-view    INSUFFICIENT ALONE. Dissolves independent progress with no
+                      machinery, but exports truth derived from uncommitted
+                      state. Its deletion of the independent-progress machinery
+                      still stands and should be taken.
+    contribution-store
+      AS A DELIVERY   FALSIFIED. "exposable is an ordinary derived, Link is an
+        MODEL         ordinary consumer" is incompatible with link()'s
+                      settlement contract, and no API adds an owned location
+                      after construction, so the alternative would be permanent
+                      per-fact shadow locations -- which L19 forbids.
+
+## The two that survive, and they have CONVERGED on delivery
+
+WAKEUP-2 settled it: both use the F5 ELIGIBILITY GATE. Link observes the
+ordinary location; a gate decides consequence scheduling. What distinguishes
+the candidates is the STATE MODEL, not how consequences reach Link.
+
+    Candidate C          semantic identity -> ownership -> obligations, with
+                         dependency edges resolved through existing TurnEffect
+                         identity
+    contribution-store   base + live contributions per fact, with visible and
+                         exposable as two SELECTIONS over one structure
+
+## The asymmetry that decides what to do next
+
+    Candidate C          evidence is against the REAL KERNEL. Read capture,
+                         subject anchors, rekey and key-reuse identity, Row 8
+                         equality, F3 ablation and F5 ablation all ran against
+                         real kernel APIs.
+    contribution-store   evidence is PURE MODEL. It has cleared more semantic
+                         rows -- including structural 5/6/7 at 11/11, the wall
+                         that killed draft and Candidate A -- but nothing has
+                         been driven through the real EntityMap, SubjectId or
+                         StructuralStore.
+
+So the models are not comparable on equal evidence. contribution-store looks
+better on semantics; Candidate C is the only one with real-kernel integration
+evidence at all. The next decisive work is driving contribution-store's
+structural model through the real kernel, which is where every previous
+candidate died.
+
+## Gates that now apply to BOTH
+
+    kernel-native enforcement   untouched for either. All F3/F5 enforcement so
+                                far is harness-level.
+    the L19 dormant seam        an idle capability must avoid BOTH emission and
+                                observer work, and enable BOTH before the first
+                                causally responsible write.
+    authority partial order     a fact has a selectable frontier only when a
+                                unique maximal candidate exists; an ingress that
+                                cannot establish one is refused.
