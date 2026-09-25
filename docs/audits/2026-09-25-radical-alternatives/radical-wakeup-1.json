@@ -1,0 +1,45 @@
+{
+  "probe": "WAKEUP-1",
+  "checks": [
+    {
+      "label": "A neither y nor z published while O1 is live (u legitimately does)",
+      "ok": true,
+      "detail": "published=[[\"u\",5]]"
+    },
+    {
+      "label": "A resolving O1 publishes the ORIGINAL y=2 with NO write to y",
+      "ok": true,
+      "detail": "published=[[\"u\",5],[\"y\",2],[\"z\",3]]"
+    },
+    {
+      "label": "B MUTANT not reading obligation liveness publishes y EARLY, while O1 is live",
+      "ok": true,
+      "detail": "whileLive=[[\"y\",2],[\"z\",3],[\"u\",5]]"
+    },
+    {
+      "label": "C FANOUT y and z both wake exactly once",
+      "ok": true,
+      "detail": "y=1 z=1"
+    },
+    {
+      "label": "D SELECTIVITY u does not depend on O1, so it is not recomputed",
+      "ok": true,
+      "detail": "exposableRecomputes stable at 5"
+    },
+    {
+      "label": "H VISIBLE NON-INTERFERENCE an obligation transition does not dirty ordinary visible state",
+      "ok": true,
+      "detail": "visibleRecomputes stable at 2"
+    },
+    {
+      "label": "E MULTI-BLOCKER no publication after O1 alone; exactly one after O4",
+      "ok": true,
+      "detail": "afterO1=0 afterO4=1"
+    },
+    {
+      "label": "SHARED two Links share ONE exposable frontier -- no per-Link causal state",
+      "ok": true,
+      "detail": "exposable recomputes caused by the resolution = 1"
+    }
+  ]
+}
