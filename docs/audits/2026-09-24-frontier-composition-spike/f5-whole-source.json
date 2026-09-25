@@ -1,0 +1,64 @@
+{
+  "probe": "F5-C",
+  "whole": {
+    "before": {
+      "whole": [],
+      "other": []
+    },
+    "after": {
+      "whole": [
+        {
+          "x": 1,
+          "y": 0,
+          "other": {
+            "b": 42
+          }
+        }
+      ],
+      "other": [
+        {
+          "b": 42
+        }
+      ]
+    }
+  },
+  "other": {
+    "before": {
+      "whole": [],
+      "other": []
+    },
+    "after": {
+      "whole": [
+        {
+          "b": 42
+        }
+      ],
+      "other": [
+        {
+          "b": 42
+        }
+      ]
+    }
+  },
+  "checks": [
+    {
+      "label": "F5-C SAFETY a whole-object source never emits speculative x=1",
+      "ok": true,
+      "detail": "before=[]"
+    },
+    {
+      "label": "F5-C a whole-object source containing pending state stays HELD",
+      "ok": true
+    },
+    {
+      "label": "F5-C ...and is released once the pending state settles",
+      "ok": true,
+      "detail": "after=[{\"x\":1,\"y\":0,\"other\":{\"b\":42}}]"
+    },
+    {
+      "label": "F5-C NON-VACUITY an object source with NO pending state still progresses",
+      "ok": false,
+      "detail": "before=[]"
+    }
+  ]
+}
