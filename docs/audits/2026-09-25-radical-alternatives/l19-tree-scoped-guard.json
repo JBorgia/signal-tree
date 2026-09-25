@@ -1,0 +1,50 @@
+{
+  "probe": "L19-TREE-SCOPED-GUARD",
+  "checks": [
+    {
+      "label": "ROLLBACK BASELINE reverts to 0",
+      "ok": true,
+      "detail": "rollback=settled x=0"
+    },
+    {
+      "label": "ROLLBACK GUARDED reverts to 0",
+      "ok": true,
+      "detail": "rollback=settled x=0"
+    },
+    {
+      "label": "UNENHANCED reference: a plain tree just writes",
+      "ok": true,
+      "detail": "x=1"
+    },
+    {
+      "label": "OVERLAP settling one of two open turns keeps the tree live",
+      "ok": true,
+      "detail": "live: both=1 afterFirst=1"
+    },
+    {
+      "label": "OVERLAP the flag lowers only when the tree is quiescent",
+      "ok": true,
+      "detail": "afterBoth=0"
+    },
+    {
+      "label": "CONSEQUENCE the flag is raised for the whole open turn",
+      "ok": true,
+      "detail": "during=1"
+    },
+    {
+      "label": "CONSEQUENCE and lowers once the turn resolves",
+      "ok": true,
+      "detail": "after=0"
+    },
+    {
+      "label": "CONSEQUENCE settlement completes without throwing",
+      "ok": true,
+      "detail": "rollback=settled"
+    },
+    {
+      "label": "ISOLATION one tree being live does not raise or lower the other",
+      "ok": true,
+      "detail": "one=1 stillOne=1 after=0"
+    }
+  ]
+}

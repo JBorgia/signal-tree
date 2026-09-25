@@ -158,3 +158,33 @@ per-Link causal state.
 selection criterion.** A design that makes every SignalTree value pay for rare
 transactional causality is probably the wrong design, and L19 can be used to
 choose between Candidate C, contribution-store and anything that follows.
+
+---
+
+## ACCEPTANCE GATE — the dormant-emission seam (from L19)
+
+Applies to Candidate C, contribution-store, and every future candidate. This is
+a gate, not a preference: L19-DORMANT-COST measured the incumbent failing it by
++223%.
+
+> An idle capability must avoid BOTH notification emission and observer work,
+> and must enable BOTH before the first causally responsible write.
+
+Both halves are required and they were measured separately:
+
+    EMISSION     ablating the emission call alone took TX-FULL from +219% to
+                 +51%. Emission survives removing every observer registration,
+                 so "register observers lazily" is NOT sufficient.
+    OBSERVATION  a registered enqueue observer makes notify itself far more
+                 expensive (67.2ms vs 7.6ms self time).
+
+And the enabling half is a CORRECTNESS requirement, not a performance one. A
+guard raised one statement too late made rollback report success while the value
+did not revert -- causal evidence lost silently, invisible to any timing
+benchmark.
+
+A candidate architecture that cannot satisfy this seam is paying an unavoidable
+tax on every ordinary application write, whatever its semantic merits.
+
+Evidence: `l19-dormant-cost`, `l19-ablation-0b`, `l19-ablation-2`,
+`l19-dormant-guard`, `l19-tree-scoped-guard`, `l19-profile-diff.md`.
