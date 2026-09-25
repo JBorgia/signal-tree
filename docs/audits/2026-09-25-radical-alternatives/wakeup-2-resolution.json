@@ -1,0 +1,30 @@
+{
+  "probe": "WAKEUP-2",
+  "checks": [
+    {
+      "label": "(a) link() still refuses a DERIVED frontier",
+      "ok": true,
+      "detail": "link: X must be an owned SignalTree location. A bare signal() or compu"
+    },
+    {
+      "label": "(a) no API adds an owned location after construction, so a per-fact shadow location would have to be PERMANENT -- which L19 forbids",
+      "ok": true,
+      "detail": "addLocation=undefined define=undefined"
+    },
+    {
+      "label": "(c) speculative x is withheld by the gate",
+      "ok": true,
+      "detail": "x=[]"
+    },
+    {
+      "label": "(c) independent y progresses",
+      "ok": true,
+      "detail": "y=[7]"
+    },
+    {
+      "label": "(c) x becomes exposable once the turn settles and O1 resolves",
+      "ok": true,
+      "detail": "exposable=1"
+    }
+  ]
+}
