@@ -1,0 +1,58 @@
+{
+  "probe": "COMPOUND-SOURCE-0",
+  "real": {
+    "afterAttach": [],
+    "afterFirstDetach": [],
+    "afterSecondDetach": [
+      {
+        "a": 11,
+        "b": 2
+      }
+    ],
+    "o1StillLive": true,
+    "parked": 0
+  },
+  "mutant": {
+    "afterAttach": [],
+    "afterFirstDetach": [
+      {
+        "a": 11,
+        "b": 2
+      }
+    ],
+    "afterSecondDetach": [
+      {
+        "a": 11,
+        "b": 2
+      }
+    ],
+    "o1StillLive": true,
+    "parked": 0
+  },
+  "checks": [
+    {
+      "label": "LATE-LINK a source created AFTER P1 is pending seeds its blockers from live carriers",
+      "ok": true
+    },
+    {
+      "label": "MULTIPLICITY O1 x2 -> x1: one fact detaching does NOT release the source",
+      "ok": true,
+      "detail": "afterA=[]"
+    },
+    {
+      "label": "MULTIPLICITY O1 x0: the last represented carrier detaching WAKES the held consequence",
+      "ok": true,
+      "detail": "afterB=[{\"a\":11,\"b\":2}]"
+    },
+    {
+      "label": "BROADER WAKEUP the source woke WHILE O1 is still live on another fact",
+      "ok": true,
+      "detail": "woke=true o1Live=true"
+    },
+    {
+      "label": "MUTANT dropping the obligation on first detach lets the branch escape early",
+      "ok": true,
+      "detail": "afterA=[{\"a\":11,\"b\":2}]"
+    }
+  ]
+}
