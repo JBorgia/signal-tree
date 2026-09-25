@@ -1,0 +1,119 @@
+{
+  "provenance": {
+    "resolvedKernelSha": "7ade0e3ecb25ff0d06da4355b5f7d67844e147b7",
+    "kernelSourceSelection": "git show 7ade0e3ecb25ff0d06da4355b5f7d67844e147b7:packages/kernel/src/**",
+    "bundleSha256": "b0dacf4f7948a232e8a08e9649535811620c747500a1c6d07b76cf2f8974a7e3",
+    "bundleBytes": 474380,
+    "scenario": "settlement-or-refusal-conformance.mjs",
+    "scenarioSha256_16": "69a68cc03b825935",
+    "adapterSha256_16": "bde1767d47633589",
+    "runnerSha256_16": "5afb9872b7d770a8",
+    "assertionsSha256_16": "2182d9bbbe33aa92",
+    "node": "v24.15.0",
+    "generatedAt": "2026-09-25T00:31:18.491Z"
+  },
+  "kind": "settlement-or-refusal-conformance",
+  "publicationScope": "observe() is flush-driven and filters unchanged snapshots; 0 means no changed snapshot was delivered through that projection, NOT zero native notifications",
+  "outcomes": {
+    "R8-01-reject-accept": "settled",
+    "R8-01-reject-reject": "settled",
+    "same-tick-local-flush-false": "settled",
+    "same-tick-external-flush-false": "settled"
+  },
+  "violations": [
+    "R8-01-reject-accept: settled with wrong surviving state {\"x\":0,\"y\":0,\"z\":2}",
+    "R8-01-reject-reject: settled with wrong surviving state {\"x\":0,\"y\":0,\"z\":2}",
+    "same-tick-local-flush-false: settled with wrong surviving state {\"x\":0,\"y\":0,\"z\":0}",
+    "same-tick-external-flush-false: settled with wrong surviving state {\"x\":0,\"y\":0,\"z\":0}"
+  ],
+  "publicationUnverified": [
+    "same-tick-local-flush-false",
+    "same-tick-external-flush-false"
+  ],
+  "rows": [
+    {
+      "id": "R8-01-reject-accept",
+      "outcome": "settled",
+      "after": {
+        "x": 0,
+        "y": 0,
+        "z": 2
+      },
+      "publishedByAct": 1,
+      "publicationVerified": true,
+      "required": "settlement guarantees",
+      "final": {
+        "x": 0,
+        "y": 0,
+        "z": 2
+      },
+      "survivingStateCorrect": false,
+      "targetAuthorityTerminal": true,
+      "otherAuthorityPreserved": true,
+      "coherentPublication": true
+    },
+    {
+      "id": "R8-01-reject-reject",
+      "outcome": "settled",
+      "after": {
+        "x": 0,
+        "y": 0,
+        "z": 2
+      },
+      "publishedByAct": 1,
+      "publicationVerified": true,
+      "required": "settlement guarantees",
+      "final": {
+        "x": 0,
+        "y": 0,
+        "z": 2
+      },
+      "survivingStateCorrect": false,
+      "targetAuthorityTerminal": true,
+      "otherAuthorityPreserved": true,
+      "coherentPublication": true
+    },
+    {
+      "id": "same-tick-local-flush-false",
+      "outcome": "settled",
+      "after": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "publishedByAct": null,
+      "publicationVerified": false,
+      "required": "settlement guarantees",
+      "final": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "survivingStateCorrect": false,
+      "targetAuthorityTerminal": true,
+      "otherAuthorityPreserved": null,
+      "coherentPublication": null
+    },
+    {
+      "id": "same-tick-external-flush-false",
+      "outcome": "settled",
+      "after": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "publishedByAct": null,
+      "publicationVerified": false,
+      "required": "settlement guarantees",
+      "final": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "survivingStateCorrect": false,
+      "targetAuthorityTerminal": true,
+      "otherAuthorityPreserved": null,
+      "coherentPublication": null
+    }
+  ]
+}
