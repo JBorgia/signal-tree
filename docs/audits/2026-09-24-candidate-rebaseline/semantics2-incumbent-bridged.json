@@ -2,15 +2,15 @@
   "provenance": {
     "harness": "SEMANTICS-2 frozen cases via shared protocol bridge",
     "path": "bridged",
-    "model": "/Users/jonathanborgia/code/signaltree/tools/experiments/transaction-options/prepared.mjs",
+    "model": "/Users/jonathanborgia/code/signaltree/docs/audits/2026-09-24-candidate-rebaseline/incumbent-at-head.mjs",
     "profile": "live",
     "kernelRevision": "0969079094d4c30a07ff954c0f84e51848ed620b",
     "node": "v24.15.0",
-    "generatedAt": "2026-09-25T02:15:04.256Z",
+    "generatedAt": "2026-09-25T02:15:03.972Z",
     "sha256_16": {
       "bridge": "deb9065f5b62b5ba",
       "runner": "fcd065c7f5eae50e",
-      "model": "ca3a3aea190da358",
+      "model": "49d483ce735a0380",
       "contract": "d94c8e8d26d9ed46",
       "supplemental": "5459e2ebe639a3d3",
       "structural": "0cd3ab1983ba635f",
@@ -20,16 +20,16 @@
     "note": "Composition is NOT bridged; see the disposition audit."
   },
   "totals": {
-    "violated": 68,
-    "held": 106,
-    "unsupported": 79
+    "held": 108,
+    "violated": 57,
+    "unsupported": 88
   },
   "rows": [
     {
       "suite": "scalar",
       "id": "S11/12/AA",
       "scope": "successful scalar settlement, not refusal safety",
-      "status": "violated",
+      "status": "held",
       "assertions": [
         {
           "label": "writer 1 visible",
@@ -41,8 +41,35 @@
         },
         {
           "label": "author 1 settles successfully",
-          "status": "violated",
-          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+          "status": "held"
+        },
+        {
+          "label": "visible after step 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "author 2 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
         }
       ],
       "trace": [
@@ -50,8 +77,14 @@
           "author": 1,
           "operation": "A",
           "result": {
-            "status": "refused",
-            "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+            "status": "settled"
+          }
+        },
+        {
+          "author": 2,
+          "operation": "A",
+          "result": {
+            "status": "settled"
           }
         }
       ]
@@ -60,7 +93,7 @@
       "suite": "scalar",
       "id": "S11/12/AR",
       "scope": "successful scalar settlement, not refusal safety",
-      "status": "violated",
+      "status": "held",
       "assertions": [
         {
           "label": "writer 1 visible",
@@ -72,8 +105,35 @@
         },
         {
           "label": "author 1 settles successfully",
-          "status": "violated",
-          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+          "status": "held"
+        },
+        {
+          "label": "visible after step 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
+        },
+        {
+          "label": "author 2 settles successfully",
+          "status": "held"
+        },
+        {
+          "label": "visible after step 2",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 1",
+          "status": "held"
+        },
+        {
+          "label": "native pending membership of author 2",
+          "status": "held"
         }
       ],
       "trace": [
@@ -81,8 +141,14 @@
           "author": 1,
           "operation": "A",
           "result": {
-            "status": "refused",
-            "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+            "status": "settled"
+          }
+        },
+        {
+          "author": 2,
+          "operation": "R",
+          "result": {
+            "status": "settled"
           }
         }
       ]
@@ -113,7 +179,7 @@
           "operation": "R",
           "result": {
             "status": "refused",
-            "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+            "reason": "SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 1 is no longer safe [later-confirmed-dependency]"
           }
         }
       ]
@@ -144,7 +210,7 @@
           "operation": "R",
           "result": {
             "status": "refused",
-            "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+            "reason": "SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 1 is no longer safe [later-confirmed-dependency]"
           }
         }
       ]
@@ -426,7 +492,7 @@
           "author": 1,
           "result": {
             "status": "refused",
-            "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+            "reason": "SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 1 is no longer safe [later-confirmed-dependency]"
           }
         }
       ]
@@ -452,7 +518,7 @@
           "author": 1,
           "result": {
             "status": "refused",
-            "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+            "reason": "SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 1 is no longer safe [later-confirmed-dependency]"
           }
         }
       ]
@@ -478,7 +544,7 @@
           "author": 2,
           "result": {
             "status": "refused",
-            "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+            "reason": "SignalTree could not rollback the pending transaction: turn 3 depends on state this rollback would invalidate, so reversing turn 2 is no longer safe [later-confirmed-dependency]"
           }
         }
       ]
@@ -504,7 +570,7 @@
           "author": 2,
           "result": {
             "status": "refused",
-            "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+            "reason": "SignalTree could not rollback the pending transaction: turn 3 depends on state this rollback would invalidate, so reversing turn 2 is no longer safe [later-confirmed-dependency]"
           }
         }
       ]
@@ -556,7 +622,7 @@
           "author": 1,
           "result": {
             "status": "refused",
-            "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+            "reason": "SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 1 is no longer safe [later-confirmed-dependency]"
           }
         }
       ]
@@ -671,12 +737,27 @@
       "suite": "scalar",
       "id": "S08",
       "scope": "three-writer single settlement",
-      "status": "violated",
+      "status": "held",
       "assertions": [
         {
           "label": "requested successful settlement",
-          "status": "violated",
-          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+          "status": "held"
+        },
+        {
+          "label": "newest author still visible",
+          "status": "held"
+        },
+        {
+          "label": "pending author 1",
+          "status": "held"
+        },
+        {
+          "label": "pending author 2",
+          "status": "held"
+        },
+        {
+          "label": "pending author 3",
+          "status": "held"
         }
       ],
       "trace": []
@@ -685,12 +766,27 @@
       "suite": "scalar",
       "id": "S09",
       "scope": "three-writer single settlement",
-      "status": "violated",
+      "status": "held",
       "assertions": [
         {
           "label": "requested successful settlement",
-          "status": "violated",
-          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+          "status": "held"
+        },
+        {
+          "label": "newest author still visible",
+          "status": "held"
+        },
+        {
+          "label": "pending author 1",
+          "status": "held"
+        },
+        {
+          "label": "pending author 2",
+          "status": "held"
+        },
+        {
+          "label": "pending author 3",
+          "status": "held"
         }
       ],
       "trace": []
@@ -795,23 +891,12 @@
       "suite": "scalar",
       "id": "S13/local-frontier/R",
       "scope": "two pending writers then ordinary committed newer write",
-      "status": "held",
+      "status": "violated",
       "assertions": [
         {
           "label": "older settlement succeeds",
-          "status": "held"
-        },
-        {
-          "label": "newer ordinary truth preserved",
-          "status": "held"
-        },
-        {
-          "label": "older settlement succeeds",
-          "status": "held"
-        },
-        {
-          "label": "newer ordinary truth preserved",
-          "status": "held"
+          "status": "violated",
+          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
         }
       ],
       "trace": []
@@ -893,7 +978,7 @@
       "trace": [
         {
           "secondResult": {
-            "status": "already-settled"
+            "status": "settled"
           }
         }
       ]
@@ -932,7 +1017,8 @@
       "trace": [
         {
           "secondResult": {
-            "status": "already-settled"
+            "status": "refused",
+            "reason": "Cannot rollback a confirmed transaction"
           }
         }
       ]
@@ -971,7 +1057,8 @@
       "trace": [
         {
           "secondResult": {
-            "status": "already-settled"
+            "status": "refused",
+            "reason": "Cannot confirm a rolled back transaction"
           }
         }
       ]
@@ -1010,7 +1097,7 @@
       "trace": [
         {
           "secondResult": {
-            "status": "already-settled"
+            "status": "settled"
           }
         }
       ]
@@ -1019,19 +1106,19 @@
       "suite": "scalar",
       "id": "terminal/disposition-reader",
       "scope": "capability evidence, not fabricated terminal state",
-      "status": "held",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "first rejection succeeds",
           "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
-      "trace": [
-        {
-          "disposition": "rejected",
-          "retainsAuthority": false
-        }
-      ]
+      "trace": []
     },
     {
       "suite": "scalar",
@@ -1236,12 +1323,16 @@
       "suite": "structural",
       "id": "T12/confirmed/\"A\"",
       "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "dependent writer confirmed",
-          "status": "violated",
-          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: stats().history is not a confirmed-turn count; that inference is not made"
         }
       ],
       "trace": []
@@ -1489,7 +1580,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []
@@ -1519,17 +1610,13 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
         {
           "snapshots": [],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "committed",
-          "retainsAuthority": false
         }
       ]
     },
@@ -1566,7 +1653,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
@@ -1580,10 +1667,6 @@
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "rejected",
-          "retainsAuthority": false
         }
       ]
     },
@@ -1660,12 +1743,16 @@
       "suite": "structural",
       "id": "T12/confirmed/\"a.b\"",
       "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "dependent writer confirmed",
-          "status": "violated",
-          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: stats().history is not a confirmed-turn count; that inference is not made"
         }
       ],
       "trace": []
@@ -1913,7 +2000,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []
@@ -1943,17 +2030,13 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
         {
           "snapshots": [],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "committed",
-          "retainsAuthority": false
         }
       ]
     },
@@ -1990,7 +2073,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
@@ -2004,10 +2087,6 @@
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "rejected",
-          "retainsAuthority": false
         }
       ]
     },
@@ -2084,12 +2163,16 @@
       "suite": "structural",
       "id": "T12/confirmed/\"a/b\"",
       "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "dependent writer confirmed",
-          "status": "violated",
-          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: stats().history is not a confirmed-turn count; that inference is not made"
         }
       ],
       "trace": []
@@ -2337,7 +2420,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []
@@ -2367,17 +2450,13 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
         {
           "snapshots": [],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "committed",
-          "retainsAuthority": false
         }
       ]
     },
@@ -2414,7 +2493,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
@@ -2428,10 +2507,6 @@
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "rejected",
-          "retainsAuthority": false
         }
       ]
     },
@@ -2508,12 +2583,16 @@
       "suite": "structural",
       "id": "T12/confirmed/\"a::b\"",
       "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "dependent writer confirmed",
-          "status": "violated",
-          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: stats().history is not a confirmed-turn count; that inference is not made"
         }
       ],
       "trace": []
@@ -2761,7 +2840,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []
@@ -2791,17 +2870,13 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
         {
           "snapshots": [],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "committed",
-          "retainsAuthority": false
         }
       ]
     },
@@ -2838,7 +2913,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
@@ -2852,10 +2927,6 @@
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "rejected",
-          "retainsAuthority": false
         }
       ]
     },
@@ -2932,12 +3003,16 @@
       "suite": "structural",
       "id": "T12/confirmed/\"jo.doe@example.com\"",
       "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "dependent writer confirmed",
-          "status": "violated",
-          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: stats().history is not a confirmed-turn count; that inference is not made"
         }
       ],
       "trace": []
@@ -3185,7 +3260,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []
@@ -3215,17 +3290,13 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
         {
           "snapshots": [],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "committed",
-          "retainsAuthority": false
         }
       ]
     },
@@ -3262,7 +3333,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
@@ -3276,10 +3347,6 @@
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "rejected",
-          "retainsAuthority": false
         }
       ]
     },
@@ -3356,12 +3423,16 @@
       "suite": "structural",
       "id": "T12/confirmed/\"1.2.3\"",
       "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "dependent writer confirmed",
-          "status": "violated",
-          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: stats().history is not a confirmed-turn count; that inference is not made"
         }
       ],
       "trace": []
@@ -3609,7 +3680,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []
@@ -3639,17 +3710,13 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
         {
           "snapshots": [],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "committed",
-          "retainsAuthority": false
         }
       ]
     },
@@ -3686,7 +3753,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
@@ -3700,10 +3767,6 @@
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "rejected",
-          "retainsAuthority": false
         }
       ]
     },
@@ -3780,12 +3843,16 @@
       "suite": "structural",
       "id": "T12/confirmed/1",
       "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "dependent writer confirmed",
-          "status": "violated",
-          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: stats().history is not a confirmed-turn count; that inference is not made"
         }
       ],
       "trace": []
@@ -4033,7 +4100,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []
@@ -4063,17 +4130,13 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
         {
           "snapshots": [],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "committed",
-          "retainsAuthority": false
         }
       ]
     },
@@ -4110,7 +4173,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
@@ -4124,10 +4187,6 @@
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "rejected",
-          "retainsAuthority": false
         }
       ]
     },
@@ -4204,12 +4263,16 @@
       "suite": "structural",
       "id": "T12/confirmed/\"1\"",
       "scope": "L8 dependent field truth: preserve honestly or refuse atomically",
-      "status": "violated",
+      "status": "unsupported",
       "assertions": [
         {
           "label": "dependent writer confirmed",
-          "status": "violated",
-          "detail": "{\"actual\":\"refused\",\"expected\":\"settled\"}"
+          "status": "held"
+        },
+        {
+          "label": "execution",
+          "status": "unsupported",
+          "detail": "Error: stats().history is not a confirmed-turn count; that inference is not made"
         }
       ],
       "trace": []
@@ -4457,7 +4520,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []
@@ -4487,17 +4550,13 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
         {
           "snapshots": [],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "committed",
-          "retainsAuthority": false
         }
       ]
     },
@@ -4534,7 +4593,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: Per-contribution terminal dispositions are not exposed by this fixture contract"
+          "detail": "Error: CURRENT does not expose per-operation dispositions."
         }
       ],
       "trace": [
@@ -4548,10 +4607,6 @@
             }
           ],
           "limitation": "No per-contribution terminal disposition reader; this is mixed state/publication evidence, not full L9."
-        },
-        {
-          "disposition": "rejected",
-          "retainsAuthority": false
         }
       ]
     },
@@ -4570,7 +4625,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -4589,7 +4644,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -4608,7 +4663,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -4627,7 +4682,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -4681,7 +4736,7 @@
         },
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -4931,7 +4986,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -4950,7 +5005,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -4969,7 +5024,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -4988,7 +5043,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -5042,7 +5097,7 @@
         },
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -5292,7 +5347,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -5311,7 +5366,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -5330,7 +5385,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -5349,7 +5404,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -5403,7 +5458,7 @@
         },
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -5653,7 +5708,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -5672,7 +5727,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -5691,7 +5746,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -5710,7 +5765,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -5764,7 +5819,7 @@
         },
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -6014,7 +6069,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -6033,7 +6088,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -6052,7 +6107,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -6071,7 +6126,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -6125,7 +6180,7 @@
         },
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -6375,7 +6430,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -6394,7 +6449,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -6413,7 +6468,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -6432,7 +6487,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -6486,7 +6541,7 @@
         },
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -6736,7 +6791,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -6755,7 +6810,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -6774,7 +6829,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -6793,7 +6848,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -6847,7 +6902,7 @@
         },
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -7097,7 +7152,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -7116,7 +7171,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -7135,7 +7190,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -7154,7 +7209,7 @@
       "trace": [
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 3 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -7208,7 +7263,7 @@
         },
         {
           "status": "refused",
-          "reason": "unsafe later pending overlap; before-images cannot be surgically rewritten"
+          "reason": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]"
         }
       ]
     },
@@ -7896,7 +7951,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []
@@ -7910,7 +7965,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []
@@ -7924,7 +7979,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []
@@ -7938,7 +7993,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []
@@ -7952,7 +8007,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []
@@ -7966,7 +8021,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []
@@ -7980,7 +8035,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": [
@@ -8000,7 +8055,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": [
@@ -8020,7 +8075,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": [
@@ -8040,7 +8095,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []
@@ -8054,7 +8109,7 @@
         {
           "label": "execution",
           "status": "unsupported",
-          "detail": "Error: authority ordering and correlation unsupported; nothing changed"
+          "detail": "Error: CURRENT has no authority payload/revision/settlement-relation API."
         }
       ],
       "trace": []

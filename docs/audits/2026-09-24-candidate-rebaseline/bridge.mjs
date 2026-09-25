@@ -120,7 +120,14 @@ const fixtureSeed = () => ({
 });
 
 export function createBridge(create, options = {}) {
-  const model = create({ seed: fixtureSeed(), ...options });
+  // The native fixtures differ BY ROLE: makeCurrent projects scalars only,
+  // makeStructural additionally merges `entities` into the snapshot. A single
+  // bridge cannot infer the role, so the caller states it. Getting this wrong
+  // silently drops entities from every mixed scalar+entity comparison --
+  // calibration caught it as 16 rows where native was `unsupported` and the
+  // bridge manufactured a `violated`.
+  const { projectEntities = false, ...modelOptions } = options;
+  const model = create({ seed: fixtureSeed(), ...modelOptions });
   const recorder = { ops: null };
   const record = (op) => {
     if (recorder.ops === null)
@@ -159,6 +166,16 @@ export function createBridge(create, options = {}) {
   };
 
   const entitiesOf = (snapshot) => snapshot?.entities ?? [];
+  /** Mirrors the native fixture's snapshot shape for this role. */
+  const snapshotOf = (snapshot) => {
+    const out = projectValues(snapshot);
+    if (projectEntities)
+      out.entities = entitiesOf(snapshot).map((e) => ({
+        key: e.key,
+        value: { ...e.fields },
+      }));
+    return out;
+  };
 
   const candidate = {
     beginContribution(fn) {
@@ -198,22 +215,33 @@ export function createBridge(create, options = {}) {
       return undefined;
     },
 
-    readCanonical: () => via(() => projectValues(model.canonical())),
-    readVisible: () => via(() => projectValues(model.read())),
+    readCanonical: () => via(() => snapshotOf(model.canonical())),
+    readVisible: () => via(() => snapshotOf(model.read())),
 
     readSettlementState(handle) {
-      const state = model.state(idOf(handle));
-      if (!state || typeof state !== 'object') return no('Model exposes no settlement state');
-      if (typeof state.authority !== 'boolean')
-        return no('Model exposes no boolean settlement authority');
-      return {
-        disposition: collapseDisposition(state),
-        retainsAuthority: state.authority,
-      };
+      // The whole READ is wrapped, not just the call. A model may return a lazy
+      // object whose property access throws -- current.mjs exposes
+      // `dispositions` as a getter -- so wrapping only model.state() leaves the
+      // real throw outside the translator. Found by calibration.
+      return via(() => {
+        const state = model.state(idOf(handle));
+        if (!state || typeof state !== 'object') return no('Model exposes no settlement state');
+        // Order matters and is NOT arbitrary: the native adapter validates the
+        // handle/authority BEFORE reading a disposition, so checking
+        // dispositions first changes which refusal fires and turns a native
+        // `unsupported` into a bridged `violated`. Calibration caught exactly
+        // that regression.
+        if (typeof state.authority !== 'boolean')
+          return no('Model exposes no boolean settlement authority');
+        const retainsAuthority = state.authority;
+        return { disposition: collapseDisposition(state), retainsAuthority };
+      });
     },
 
     observeVisible(cb) {
-      return model.observe(() => cb(projectValues(model.read())));
+      // Same role-aware shape as the direct reads; an observer that drops
+      // entities manufactures a violation in every mixed-state callback.
+      return model.observe(() => cb(snapshotOf(model.read())));
     },
   };
 
@@ -265,10 +293,12 @@ export function createBridge(create, options = {}) {
     dispose: () => model.destroy(),
 
     hasPendingAuthority(handle) {
-      const state = model.state(idOf(handle));
-      if (typeof state?.authority !== 'boolean')
-        return no('Model exposes no boolean settlement authority');
-      return state.authority;
+      return via(() => {
+        const state = model.state(idOf(handle));
+        if (typeof state?.authority !== 'boolean')
+          return no('Model exposes no boolean settlement authority');
+        return state.authority;
+      });
     },
     // Rule 3.
     confirmedCount: () =>
