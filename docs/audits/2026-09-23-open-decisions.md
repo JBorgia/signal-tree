@@ -68,11 +68,24 @@ plan carries `mutation-capture`. A guarded spike measured, with trial spread now
     active-1%   101.6ms relIQR 26.3%   82.9ms relIQR 12.5%     -18%   within noise
     active-100%  985.5ms relIQR 8.2%  1007.3ms relIQR 13.8%     +2%   within noise
 
-Only the dormant improvement is established: its delta greatly exceeds both
-arms' spread. The -18% and +2% figures are INSIDE the spread and are not
-measured effects. In particular "+2% fully active" must not be reported as a
-measured penalty -- the honest statement is that no active-path penalty is
-detectable at this precision, which is weaker and is what the data supports.
+Comparing each arm's IQR against the between-arm delta is NOT a test of the
+difference, so that comparison is withdrawn. The arms were measured in
+alternating order within each trial and are therefore paired; the paired
+per-trial differences are:
+
+    level         paired delta (GUARDED - BASELINE)
+    dormant       median  -39.0ms  range [ -53.3,  -30.6]  faster in 8/8 trials
+    active-1%     median   -4.5ms  range [-287.5,  +23.6]  faster in 7/8
+    active-100%   median  +12.9ms  range [-113.6, +271.1]  faster in 3/8
+
+ESTABLISHED: the dormant improvement. Every trial favours the guard and the
+entire range of paired differences is negative.
+
+NOT ESTABLISHED, in either direction: active-1% and active-100%. Their paired
+differences change sign across trials, and active-100% favours the guard in only
+3 of 8. These remain MEASURED MEDIAN DIFFERENCES that this run does not show to
+be repeatable -- which is not the same as showing them to be zero. Establishing
+them needs repeated independent runs, not a larger single run.
 
 **Sequence, if taken up. Do NOT backport the experimental ablations — they are
 semantics-breaking mutants built to answer cost questions.**
