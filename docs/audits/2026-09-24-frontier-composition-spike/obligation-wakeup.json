@@ -1,0 +1,37 @@
+{
+  "probe": "OBLIGATION-WAKEUP",
+  "real": {
+    "beforeResolve": [],
+    "afterResolve": [
+      2
+    ],
+    "p3Open": true,
+    "parked": 0
+  },
+  "mutant": {
+    "beforeResolve": [],
+    "afterResolve": [],
+    "p3Open": true,
+    "parked": 1
+  },
+  "checks": [
+    {
+      "label": "held while O1 is unresolved",
+      "ok": true
+    },
+    {
+      "label": "an unrelated contribution is STILL OPEN, so the tree-wide hold cannot be the releaser",
+      "ok": true
+    },
+    {
+      "label": "WAKEUP resolving O1 releases the ALREADY-HELD consequence y=2 with NO new write",
+      "ok": true,
+      "detail": "after=[2]"
+    },
+    {
+      "label": "MUTANT without waiter notification the held consequence stays stuck",
+      "ok": true,
+      "detail": "after=[] parked=1"
+    }
+  ]
+}
