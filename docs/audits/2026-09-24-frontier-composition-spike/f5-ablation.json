@@ -1,0 +1,90 @@
+{
+  "probe": "F5-ABLATION",
+  "control": {
+    "beforeSettle": {
+      "x": [],
+      "y": []
+    },
+    "afterSettle": {
+      "x": [
+        1
+      ],
+      "y": [
+        7
+      ]
+    }
+  },
+  "candidate": {
+    "beforeSettle": {
+      "x": [],
+      "y": [
+        7
+      ]
+    },
+    "afterSettle": {
+      "x": [
+        1
+      ],
+      "y": [
+        7
+      ]
+    }
+  },
+  "depend": {
+    "beforeSettle": {
+      "x": [],
+      "y": []
+    },
+    "afterSettle": {
+      "x": [
+        1
+      ],
+      "y": [
+        2
+      ]
+    }
+  },
+  "mutant": {
+    "beforeSettle": {
+      "x": [],
+      "y": [
+        2
+      ]
+    },
+    "afterSettle": {
+      "x": [
+        1
+      ],
+      "y": [
+        2
+      ]
+    }
+  },
+  "checks": [
+    {
+      "label": "CONTROL independent y is HELD (the measured gap)",
+      "ok": true
+    },
+    {
+      "label": "CONTROL RELEASE y is delivered after P1 confirms (held, not dropped)",
+      "ok": true,
+      "detail": "afterConfirm=[7]"
+    },
+    {
+      "label": "CANDIDATE SAFETY speculative x is still withheld",
+      "ok": true
+    },
+    {
+      "label": "CANDIDATE CAPABILITY independent y progresses before P1 settles",
+      "ok": true
+    },
+    {
+      "label": "DEPENDENT y derived from pending x is correctly HELD",
+      "ok": true
+    },
+    {
+      "label": "MUTANT without the edge the dependent y wrongly escapes (edge is load-bearing)",
+      "ok": true
+    }
+  ]
+}
