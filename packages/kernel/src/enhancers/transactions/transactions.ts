@@ -154,6 +154,8 @@ export type RollbackFailureCause =
 type PendingEffectMap = Map<string, TurnEffect>;
 
 type CaptureBucket = {
+  /** TX-AUTO-ROLLBACK-0: window sequence of this bucket's last write per position. */
+  ownWriteSeq: Map<number, number>;
   ownerPaths: Set<string>;
   subjectIds: Set<number>;
   positionIds: Set<number>;
@@ -1140,6 +1142,7 @@ function cloneTurnRecord(turn: TransactionTurnRecord): TransactionTurnRecord {
 
 function createCaptureBucket(): CaptureBucket {
   return {
+    ownWriteSeq: new Map<number, number>(),
     ownerPaths: new Set<string>(),
     subjectIds: new Set<number>(),
     positionIds: new Set<number>(),
@@ -1282,6 +1285,36 @@ export function getOrCreateInternalTransactionRuntime<T>(
     });
   defineTreeRealizationPort(treeWrapper, realizationPort);
   defineTreeRealizationPort(stateRoot, realizationPort);
+
+  // TX-AUTO-ROLLBACK-0. An AUTOMATIC rollback (a callback that threw, or a
+  // failure after it returned) runs while this transact() call is still in
+  // progress, so observers have had a chance to write the same locations: a
+  // location subscriber or framework effect as the invalidation group closes,
+  // an observeWrites subscriber in the flush, a transaction one of them
+  // opened, even a rollback of another transaction. Restoring this
+  // transaction's before-image over such a write would silently destroy it.
+  // So every write to this tree is sequenced while any transaction is open,
+  // and an automatic rollback refuses (writes left as they are; the recovery
+  // handle is attached) when a later write touched one of its positions.
+  // Cleared whenever no transaction is open, so nothing accumulates.
+  let windowWriteSeq = 0;
+  const lastWindowWriteSeq = new Map<number, number>();
+  const recordWindowWrite = (positionIds?: readonly number[]): void => {
+    const seq = ++windowWriteSeq;
+    for (const position of positionIds ?? []) {
+      lastWindowWriteSeq.set(position, seq);
+    }
+  };
+  const writtenSinceBy = (bucket: CaptureBucket): boolean => {
+    for (const [position, own] of bucket.ownWriteSeq) {
+      const last = lastWindowWriteSeq.get(position);
+      if (last !== undefined && last > own) return true;
+    }
+    return false;
+  };
+  const releaseWindowIfClosed = (): void => {
+    if (pendingTransactions.size === 0) lastWindowWriteSeq.clear();
+  };
 
   // LINK-OVERLAP-ROLLBACK-0. A descriptor this settlement would forget can
   // still be needed by an OVERLAPPING transaction: its rollback resolves the
@@ -1696,6 +1729,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           })();
     for (const positionId of resolvedPositionIds) {
       bucket.positionIds.add(positionId);
+      bucket.ownWriteSeq.set(positionId, windowWriteSeq);
     }
     rememberTreeRealizationDescriptor({
       descriptors: realizationDescriptors,
@@ -1773,6 +1807,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
   ): TransactionTurnRecord | undefined => {
     const bucket = pendingTransactions.get(transactionId);
     pendingTransactions.delete(transactionId);
+    releaseWindowIfClosed();
     if (!bucket) {
       return undefined;
     }
@@ -2228,6 +2263,17 @@ export function getOrCreateInternalTransactionRuntime<T>(
             positionIds,
             meta
           ) => {
+            if (pendingTransactions.size > 0 && !isInspectionWrite(meta)) {
+              const windowOwner = (meta as { ownerId?: number } | undefined)
+                ?.ownerId;
+              if (
+                windowOwner === undefined ||
+                treeOwnerId === undefined ||
+                windowOwner === treeOwnerId
+              ) {
+                recordWindowWrite(positionIds);
+              }
+            }
             if (origin === 'restoration' || origin === 'transaction-rollback') {
               return;
             }
@@ -2622,394 +2668,383 @@ export function getOrCreateInternalTransactionRuntime<T>(
     };
   };
 
-  // Set for the whole duration of a transact() call (see TX-OPEN-WINDOW-0).
-  let recordingTransaction = false;
-
-  const recordTransaction = (fn: () => void): PendingTransaction => {
-    if (destroyed) throw new Error('Cannot transact on a destroyed tree');
-    const activeMeta = getActiveWriteContext();
-    const notifier = getPathNotifier();
-    const captureRuntime = getMutationCaptureRuntime(tree);
-    if (typeof activeMeta?.transactionId === 'number') {
-      throw new Error('Nested transaction is not supported');
-    }
-
-    // The existing construction flush must not erase net-equal queued
-    // evidence for older pending turns while allocating this new turn.
-    const beforeOpen = readQueuedLaterEffects();
-    for (const id of authority.getPendingTurnIds()) {
-      authority.observeQueuedEffects(id, beforeOpen);
-    }
-    notifier?.flushSync();
-    // From here until transact() returns, a nested call is refused. Set after
-    // the pre-open flush, so observers of writes made before this call can
-    // still open a transaction (it finishes first and inverts nothing).
-    recordingTransaction = true;
-    const transactionId = nextTransactionId++;
-    const descriptorOwnersBefore = new Set(realizationDescriptors.keys());
-    pendingTransactions.set(transactionId, createCaptureBucket());
-    // Before the callback: the first write inside it must already reach the
-    // evidence observer, or inspect() would silently miss it.
-    ensureEnqueueObserver();
-
-    // TURN-FEED-0. Announced BEFORE the callback runs, because an observer has
-    // to know the transaction is open in order to treat the writes inside it
-    // as speculative. Announcing after would be announcing too late.
-    const lifecycleChannel = getTransactionLifecycleChannel(tree as object);
-    lifecycleChannel.announce({
-      kind: 'opened',
-      owner: transactionOwnerToken,
-      id: transactionId,
-    });
-
-    // Persistence is post-commit: open the deferral scope BEFORE the callback
-    // runs, so speculative writes inside it queue instead of reaching storage.
-    openCommitScope(transactionOwnerToken, transactionId, tree as object);
-
-    const releaseCapture = captureRuntime?.activateCapture();
-    let primaryError: unknown;
-    let primaryFailed = false;
-    let cleanupError: unknown;
-    let cleanupFailed = false;
-    const executeTransaction = (): void => {
-      try {
-        withWriteContext(
-          {
-            ...(activeMeta ?? {}),
-            transactionId,
-            transactionOwner: transactionOwnerToken,
-          },
-          fn
-        );
-      } catch (error) {
-        primaryFailed = true;
-        primaryError = error;
+  const runtime: InternalTransactionRuntime = {
+    transaction(fn: () => void): PendingTransaction {
+      if (destroyed) throw new Error('Cannot transact on a destroyed tree');
+      const activeMeta = getActiveWriteContext();
+      const notifier = getPathNotifier();
+      const captureRuntime = getMutationCaptureRuntime(tree);
+      if (typeof activeMeta?.transactionId === 'number') {
+        throw new Error('Nested transaction is not supported');
       }
-    };
-    try {
-      const locations = getLocationRuntime(tree.$);
-      if (locations) locations.runInvalidationGroup(executeTransaction);
-      else executeTransaction();
-    } catch (error) {
-      // The invalidation group settles its publishers AFTER the callback
-      // returns, so a throw here with no callback failure is a post-callback
-      // failure (recovery.callbackFailed stays false), not the callback's.
-      if (!primaryFailed) {
-        cleanupFailed = true;
-        cleanupError = error;
-      }
-    } finally {
-      try {
-        releaseCapture?.();
-      } catch (error) {
-        if (primaryFailed || cleanupFailed)
-          reportCleanupFailure(
-            'transaction capture release after failure',
-            error
-          );
-        else {
-          cleanupFailed = true;
-          cleanupError = error;
-        }
-      }
-    }
 
-    // Read before staging/flush: delivery intentionally drops net-equal ABA
-    // notifications, but compensation may not erase that writer's authority.
-    const callbackQueuedEvidence = readQueuedLaterEffects();
-    for (const id of authority.getPendingTurnIds()) {
-      authority.observeQueuedEffects(id, callbackQueuedEvidence);
-    }
-    if (callbackQueuedEvidence.length) {
-      callbackExternalEffects.set(transactionId, [
-        ...(callbackExternalEffects.get(transactionId) ?? []),
-        ...callbackQueuedEvidence,
-      ]);
-    }
+      // The existing construction flush must not erase net-equal queued
+      // evidence for older pending turns while allocating this new turn.
+      const beforeOpen = readQueuedLaterEffects();
+      for (const id of authority.getPendingTurnIds()) {
+        authority.observeQueuedEffects(id, beforeOpen);
+      }
+      notifier?.flushSync();
+      const transactionId = nextTransactionId++;
+      const descriptorOwnersBefore = new Set(realizationDescriptors.keys());
+      pendingTransactions.set(transactionId, createCaptureBucket());
+      // Before the callback: the first write inside it must already reach the
+      // evidence observer, or inspect() would silently miss it.
+      ensureEnqueueObserver();
 
-    // TURN-FEED-0 'staged': the callback has returned, so this transaction's
-    // contribution is complete and awaits a decision.
-    if (!primaryFailed)
+      // TURN-FEED-0. Announced BEFORE the callback runs, because an observer has
+      // to know the transaction is open in order to treat the writes inside it
+      // as speculative. Announcing after would be announcing too late.
+      const lifecycleChannel = getTransactionLifecycleChannel(tree as object);
       lifecycleChannel.announce({
-        kind: 'staged',
+        kind: 'opened',
         owner: transactionOwnerToken,
         id: transactionId,
       });
 
-    notifier?.flushSync();
-    const pendingTurn = materializePendingTransaction(transactionId);
-    const pendingTurnId = pendingTurn?.id;
-    if (pendingTurn) {
-      inspectionTransactionByTurn.set(pendingTurn.id, transactionId);
-      const keys = new Set((pendingTurn.__effects ?? []).map(effectKey));
-      const writes = inspectionWrites.get(transactionId);
-      for (const key of writes?.keys() ?? [])
-        if (!keys.has(key)) writes?.delete(key);
-      notifyListeners(pendingCreatedListeners, pendingTurn);
-    } else {
-      inspectionWrites.delete(transactionId);
-    }
-    releaseInspectionIfQuiet();
-    let lifecycle: 'pending' | 'confirmed' | 'rejected' = 'pending';
-    let settling = false;
+      // Persistence is post-commit: open the deferral scope BEFORE the callback
+      // runs, so speculative writes inside it queue instead of reaching storage.
+      openCommitScope(transactionOwnerToken, transactionId, tree as object);
 
-    const handle = {
-      [PENDING_TURN_ID]: pendingTurnId,
-      confirm(): void {
-        const pendingTurn = authority.getPendingTurn(pendingTurnId);
-        if (destroyed) throw new Error('Cannot settle a destroyed tree');
-        if (settling)
-          throw new Error('Transaction settlement is already in progress');
-        if (lifecycle === 'confirmed') {
-          return;
+      const releaseCapture = captureRuntime?.activateCapture();
+      let primaryError: unknown;
+      let primaryFailed = false;
+      let cleanupError: unknown;
+      let cleanupFailed = false;
+      const executeTransaction = (): void => {
+        try {
+          withWriteContext(
+            {
+              ...(activeMeta ?? {}),
+              transactionId,
+              transactionOwner: transactionOwnerToken,
+            },
+            fn
+          );
+        } catch (error) {
+          primaryFailed = true;
+          primaryError = error;
         }
-        if (lifecycle === 'rejected') {
-          throw new Error('Cannot confirm a rolled back transaction');
+      };
+      try {
+        const locations = getLocationRuntime(tree.$);
+        if (locations) locations.runInvalidationGroup(executeTransaction);
+        else executeTransaction();
+      } catch (error) {
+        // The invalidation group settles its publishers AFTER the callback
+        // returns, so a throw here with no callback failure is a post-callback
+        // failure (recovery.callbackFailed stays false), not the callback's.
+        if (!primaryFailed) {
+          cleanupFailed = true;
+          cleanupError = error;
         }
-        lifecycle = 'confirmed';
+      } finally {
+        try {
+          releaseCapture?.();
+        } catch (error) {
+          if (primaryFailed || cleanupFailed)
+            reportCleanupFailure(
+              'transaction capture release after failure',
+              error
+            );
+          else {
+            cleanupFailed = true;
+            cleanupError = error;
+          }
+        }
+      }
+
+      // Read before staging/flush: delivery intentionally drops net-equal ABA
+      // notifications, but compensation may not erase that writer's authority.
+      const callbackQueuedEvidence = readQueuedLaterEffects();
+      for (const id of authority.getPendingTurnIds()) {
+        authority.observeQueuedEffects(id, callbackQueuedEvidence);
+      }
+      if (callbackQueuedEvidence.length) {
+        callbackExternalEffects.set(transactionId, [
+          ...(callbackExternalEffects.get(transactionId) ?? []),
+          ...callbackQueuedEvidence,
+        ]);
+      }
+
+      // TURN-FEED-0 'staged': the callback has returned, so this transaction's
+      // contribution is complete and awaits a decision.
+      if (!primaryFailed)
         lifecycleChannel.announce({
-          kind: 'confirmed',
+          kind: 'staged',
           owner: transactionOwnerToken,
           id: transactionId,
         });
-        try {
-          if (pendingTurnId !== undefined) {
-            const confirmedTurn = authority.confirmPending(pendingTurnId);
-            const accepted = inspectionWrites.get(transactionId);
-            if (accepted) {
-              let settled = inspectionWrites.get(undefined);
-              if (!settled)
-                inspectionWrites.set(undefined, (settled = new Map()));
-              for (const [key, write] of accepted) {
-                if ((settled.get(key)?.seq ?? -1) < write.seq)
-                  settled.set(key, write);
-              }
-              inspectionWrites.delete(transactionId);
-            }
-            inspectionTransactionByTurn.delete(pendingTurnId);
-            if (confirmedTurn) {
-              notifyListeners(pendingConfirmedListeners, confirmedTurn);
-            }
+
+      notifier?.flushSync();
+      // Decided before materialize, which releases the window's write record.
+      const openBucket = pendingTransactions.get(transactionId);
+      const autoRollbackUnsafe =
+        (primaryFailed || cleanupFailed) &&
+        openBucket !== undefined &&
+        writtenSinceBy(openBucket);
+      const pendingTurn = materializePendingTransaction(transactionId);
+      const pendingTurnId = pendingTurn?.id;
+      if (pendingTurn) {
+        inspectionTransactionByTurn.set(pendingTurn.id, transactionId);
+        const keys = new Set((pendingTurn.__effects ?? []).map(effectKey));
+        const writes = inspectionWrites.get(transactionId);
+        for (const key of writes?.keys() ?? [])
+          if (!keys.has(key)) writes?.delete(key);
+        notifyListeners(pendingCreatedListeners, pendingTurn);
+      } else {
+        inspectionWrites.delete(transactionId);
+      }
+      releaseInspectionIfQuiet();
+      let lifecycle: 'pending' | 'confirmed' | 'rejected' = 'pending';
+      let settling = false;
+
+      const handle = {
+        [PENDING_TURN_ID]: pendingTurnId,
+        confirm(): void {
+          const pendingTurn = authority.getPendingTurn(pendingTurnId);
+          if (destroyed) throw new Error('Cannot settle a destroyed tree');
+          if (settling)
+            throw new Error('Transaction settlement is already in progress');
+          if (lifecycle === 'confirmed') {
+            return;
           }
-        } finally {
-          if (pendingTurnId !== undefined) {
-            pendingOrderDeltas.delete(pendingTurnId);
+          if (lifecycle === 'rejected') {
+            throw new Error('Cannot confirm a rolled back transaction');
           }
-          releaseInspectionIfQuiet();
-          // The physical state this transaction authored is committed truth,
-          // so its durable consequences run — last, so a throwing storage
-          // backend cannot leave the turn unconfirmed, and in a `finally` so
-          // a throwing confirmPending or listener cannot strand the scope.
-          //
-          // 'commit' even on that error path, deliberately: the writes were
-          // physically realized during the callback and nothing compensates
-          // them here (`lifecycle` is already 'confirmed', so a following
-          // rollback() throws). Discarding would drop durable consequences
-          // for state the tree is still showing.
-          settleCommitScope(transactionOwnerToken, transactionId, 'commit');
-          forgetUnclaimedDescriptorSubjects(
-            pendingTurn?.restorationSubjectIds ?? [],
-            descriptorOwnersBefore,
-            pendingTurn?.__positionIds ?? []
-          );
-        }
-      },
-      rollback(): void {
-        const pendingTurn = authority.getPendingTurn(pendingTurnId);
-        if (destroyed) throw new Error('Cannot settle a destroyed tree');
-        if (settling)
-          throw new Error('Transaction settlement is already in progress');
-        if (lifecycle === 'rejected') return;
-        if (lifecycle === 'confirmed')
-          throw new Error('Cannot rollback a confirmed transaction');
-        const plan =
-          pendingTurnId === undefined
-            ? { compensation: [] }
-            : authority.getPendingRollbackPlan(
-                pendingTurnId,
-                readQueuedLaterEffects()
-              );
-        if ('conflict' in plan) throw createRollbackError(plan.conflict);
-        const compensation = plan.compensation;
-        const orderDeltas =
-          pendingTurnId === undefined
-            ? []
-            : pendingOrderDeltas.get(pendingTurnId) ?? [];
-        let installed = false;
-        let observerFailed = false;
-        let observerError: unknown;
-        const clock =
-          getPhysicalCommitClock(tree.$) ?? getPhysicalCommitClock(tree);
-        const revision = clock?.revision();
-        settling = true;
-        try {
-          const apply = () => {
-            rollbackPendingEffectsThroughRealizationPort(
-              pendingTurnId ?? transactionId,
-              [...compensation].reverse(),
-              pendingTurn?.__baselineValues ?? new Map(),
-              orderDeltas,
-              primaryFailed ? primaryError : undefined,
-              transactionId
-            );
-            installed = true;
-          };
-          try {
-            const locations = getLocationRuntime(tree.$);
-            if (locations) locations.runInvalidationGroup(apply);
-            else apply();
-          } catch (error) {
-            // Physical commit precedes observer delivery. A delivery failure
-            // must not leave a successfully compensated turn retryable.
-            installed ||=
-              revision !== undefined && clock?.revision() !== revision;
-            if (!installed) {
-              if (error instanceof SignalTreeRollbackError) throw error;
-              throw createRollbackError({
-                kind: 'effect-validation-failed',
-                pendingTurnId: pendingTurnId ?? transactionId,
-                compensation,
-                errorMessage:
-                  error instanceof Error
-                    ? error.message
-                    : 'Unknown rollback validation failure',
-                cause: error,
-                callbackError: primaryFailed ? primaryError : undefined,
-              });
-            }
-            observerFailed = true;
-            observerError = error;
-          }
-          lifecycle = 'rejected';
-          inspectionWrites.delete(transactionId);
-          if (pendingTurnId !== undefined)
-            inspectionTransactionByTurn.delete(pendingTurnId);
-          const discarded =
-            pendingTurnId === undefined
-              ? undefined
-              : authority.discardPending(pendingTurnId);
-          if (pendingTurnId !== undefined)
-            pendingOrderDeltas.delete(pendingTurnId);
-          releaseInspectionIfQuiet();
+          lifecycle = 'confirmed';
           lifecycleChannel.announce({
-            kind: 'rolled-back',
+            kind: 'confirmed',
             owner: transactionOwnerToken,
             id: transactionId,
           });
           try {
-            if (discarded)
-              notifyListeners(pendingDiscardedListeners, discarded);
-          } finally {
-            try {
-              settleCommitScope(
-                transactionOwnerToken,
-                transactionId,
-                'discard'
-              );
-            } finally {
-              forgetUnclaimedDescriptorSubjects(
-                pendingTurn?.restorationSubjectIds ?? [],
-                descriptorOwnersBefore,
-                pendingTurn?.__positionIds ?? []
-              );
+            if (pendingTurnId !== undefined) {
+              const confirmedTurn = authority.confirmPending(pendingTurnId);
+              const accepted = inspectionWrites.get(transactionId);
+              if (accepted) {
+                let settled = inspectionWrites.get(undefined);
+                if (!settled)
+                  inspectionWrites.set(undefined, (settled = new Map()));
+                for (const [key, write] of accepted) {
+                  if ((settled.get(key)?.seq ?? -1) < write.seq)
+                    settled.set(key, write);
+                }
+                inspectionWrites.delete(transactionId);
+              }
+              inspectionTransactionByTurn.delete(pendingTurnId);
+              if (confirmedTurn) {
+                notifyListeners(pendingConfirmedListeners, confirmedTurn);
+              }
             }
+          } finally {
+            if (pendingTurnId !== undefined) {
+              pendingOrderDeltas.delete(pendingTurnId);
+            }
+            releaseInspectionIfQuiet();
+            // The physical state this transaction authored is committed truth,
+            // so its durable consequences run — last, so a throwing storage
+            // backend cannot leave the turn unconfirmed, and in a `finally` so
+            // a throwing confirmPending or listener cannot strand the scope.
+            //
+            // 'commit' even on that error path, deliberately: the writes were
+            // physically realized during the callback and nothing compensates
+            // them here (`lifecycle` is already 'confirmed', so a following
+            // rollback() throws). Discarding would drop durable consequences
+            // for state the tree is still showing.
+            settleCommitScope(transactionOwnerToken, transactionId, 'commit');
+            forgetUnclaimedDescriptorSubjects(
+              pendingTurn?.restorationSubjectIds ?? [],
+              descriptorOwnersBefore,
+              pendingTurn?.__positionIds ?? []
+            );
           }
-          if (observerFailed) throw observerError;
-        } finally {
-          settling = false;
+        },
+        rollback(): void {
+          const pendingTurn = authority.getPendingTurn(pendingTurnId);
+          if (destroyed) throw new Error('Cannot settle a destroyed tree');
+          if (settling)
+            throw new Error('Transaction settlement is already in progress');
+          if (lifecycle === 'rejected') return;
+          if (lifecycle === 'confirmed')
+            throw new Error('Cannot rollback a confirmed transaction');
+          const plan =
+            pendingTurnId === undefined
+              ? { compensation: [] }
+              : authority.getPendingRollbackPlan(
+                  pendingTurnId,
+                  readQueuedLaterEffects()
+                );
+          if ('conflict' in plan) throw createRollbackError(plan.conflict);
+          const compensation = plan.compensation;
+          const orderDeltas =
+            pendingTurnId === undefined
+              ? []
+              : pendingOrderDeltas.get(pendingTurnId) ?? [];
+          let installed = false;
+          let observerFailed = false;
+          let observerError: unknown;
+          const clock =
+            getPhysicalCommitClock(tree.$) ?? getPhysicalCommitClock(tree);
+          const revision = clock?.revision();
+          settling = true;
+          try {
+            const apply = () => {
+              rollbackPendingEffectsThroughRealizationPort(
+                pendingTurnId ?? transactionId,
+                [...compensation].reverse(),
+                pendingTurn?.__baselineValues ?? new Map(),
+                orderDeltas,
+                primaryFailed ? primaryError : undefined,
+                transactionId
+              );
+              installed = true;
+            };
+            try {
+              const locations = getLocationRuntime(tree.$);
+              if (locations) locations.runInvalidationGroup(apply);
+              else apply();
+            } catch (error) {
+              // Physical commit precedes observer delivery. A delivery failure
+              // must not leave a successfully compensated turn retryable.
+              installed ||=
+                revision !== undefined && clock?.revision() !== revision;
+              if (!installed) {
+                if (error instanceof SignalTreeRollbackError) throw error;
+                throw createRollbackError({
+                  kind: 'effect-validation-failed',
+                  pendingTurnId: pendingTurnId ?? transactionId,
+                  compensation,
+                  errorMessage:
+                    error instanceof Error
+                      ? error.message
+                      : 'Unknown rollback validation failure',
+                  cause: error,
+                  callbackError: primaryFailed ? primaryError : undefined,
+                });
+              }
+              observerFailed = true;
+              observerError = error;
+            }
+            lifecycle = 'rejected';
+            inspectionWrites.delete(transactionId);
+            if (pendingTurnId !== undefined)
+              inspectionTransactionByTurn.delete(pendingTurnId);
+            const discarded =
+              pendingTurnId === undefined
+                ? undefined
+                : authority.discardPending(pendingTurnId);
+            if (pendingTurnId !== undefined)
+              pendingOrderDeltas.delete(pendingTurnId);
+            releaseInspectionIfQuiet();
+            lifecycleChannel.announce({
+              kind: 'rolled-back',
+              owner: transactionOwnerToken,
+              id: transactionId,
+            });
+            try {
+              if (discarded)
+                notifyListeners(pendingDiscardedListeners, discarded);
+            } finally {
+              try {
+                settleCommitScope(
+                  transactionOwnerToken,
+                  transactionId,
+                  'discard'
+                );
+              } finally {
+                forgetUnclaimedDescriptorSubjects(
+                  pendingTurn?.restorationSubjectIds ?? [],
+                  descriptorOwnersBefore,
+                  pendingTurn?.__positionIds ?? []
+                );
+              }
+            }
+            if (observerFailed) throw observerError;
+          } finally {
+            settling = false;
+          }
+        },
+      };
+      // TX-OBSERVER-STRAND-0. A capture-release failure after a successful
+      // callback threw here with the turn still pending and no handle to it,
+      // so nothing could ever settle its commit scope and every later Link
+      // consequence was held behind it. It now fails closed the same way a
+      // throwing callback does. (Observers cannot throw here any more: the
+      // notifier and the lifecycle listeners isolate them.)
+      if (primaryFailed || cleanupFailed) {
+        try {
+          if (autoRollbackUnsafe) {
+            // Refused before anything is reversed; the recovery handle below
+            // leaves the decision with the caller.
+            throw createRollbackError({
+              kind: 'effect-validation-failed',
+              pendingTurnId: pendingTurnId ?? transactionId,
+              compensation: [],
+              errorMessage:
+                'Transaction rollback refused: a location it wrote was written again before the transaction returned',
+              ...(primaryFailed ? { callbackError: primaryError } : {}),
+            });
+          }
+          handle.rollback();
+        } catch (rollbackError) {
+          if (lifecycle !== 'pending') {
+            // 'rejected': the compensation installed and the turn retired; only its
+            // delivery failed. The failure that required the rollback keeps
+            // precedence, and the delivery error is reported.
+            reportCleanupFailure(
+              'rollback delivery after a failed transaction',
+              rollbackError
+            );
+            throw primaryFailed ? primaryError : cleanupError;
+          }
+          if (!primaryFailed) {
+            // The refusal is thrown; without this the failure that made the
+            // rollback necessary would leave no trace at all.
+            reportCleanupFailure(
+              'a post-callback step whose rollback was then refused',
+              cleanupError
+            );
+          }
+          // RECOVERY-HANDLE-0. `transact()` has not returned, so a refused
+          // compensation would otherwise strand a transaction that is still
+          // pending and still settleable with no reference to it. Catching
+          // inside the callback only helps prospectively.
+          //
+          // `lifecycle` is the exact discriminator: rollback() assigns
+          // 'rejected' only AFTER compensation physically installs, so a
+          // refusal arrives here still 'pending' while an observer failure
+          // arrives 'rejected'. Attaching a handle to a settled turn would
+          // offer authority that no longer exists.
+          // `!destroyed` matters: rollback()'s first guard throws on a
+          // destroyed tree BEFORE lifecycle can move, so the lifecycle test
+          // alone would hand back a handle whose every method throws "Cannot
+          // settle a destroyed tree". Offering unusable authority is the same
+          // class of false claim this recovery exists to remove.
+          if (
+            lifecycle === 'pending' &&
+            !destroyed &&
+            typeof rollbackError === 'object' &&
+            rollbackError !== null
+          ) {
+            Object.defineProperty(rollbackError, 'recovery', {
+              value: {
+                transaction: decorateHandle(handle, pendingTurnId),
+                // Explicit: the callback may have thrown `undefined`.
+                callbackFailed: primaryFailed,
+                callbackError: primaryFailed ? primaryError : undefined,
+              },
+              enumerable: false,
+              configurable: true,
+              writable: true,
+            });
+          }
+          throw rollbackError;
         }
-      },
-    };
-    // TX-OBSERVER-STRAND-0. A capture-release failure after a successful
-    // callback threw here with the turn still pending and no handle to it,
-    // so nothing could ever settle its commit scope and every later Link
-    // consequence was held behind it. It now fails closed the same way a
-    // throwing callback does. (Observers cannot throw here any more: the
-    // notifier and the lifecycle listeners isolate them.)
-    if (primaryFailed || cleanupFailed) {
-      try {
-        handle.rollback();
-      } catch (rollbackError) {
-        if (lifecycle !== 'pending') {
-          // 'rejected': the compensation installed and the turn retired; only its
-          // delivery failed. The failure that required the rollback keeps
-          // precedence, and the delivery error is reported.
-          reportCleanupFailure(
-            'rollback delivery after a failed transaction',
-            rollbackError
-          );
-          throw primaryFailed ? primaryError : cleanupError;
-        }
-        if (!primaryFailed) {
-          // The refusal is thrown; without this the failure that made the
-          // rollback necessary would leave no trace at all.
-          reportCleanupFailure(
-            'a post-callback step whose rollback was then refused',
-            cleanupError
-          );
-        }
-        // RECOVERY-HANDLE-0. `transact()` has not returned, so a refused
-        // compensation would otherwise strand a transaction that is still
-        // pending and still settleable with no reference to it. Catching
-        // inside the callback only helps prospectively.
-        //
-        // `lifecycle` is the exact discriminator: rollback() assigns
-        // 'rejected' only AFTER compensation physically installs, so a
-        // refusal arrives here still 'pending' while an observer failure
-        // arrives 'rejected'. Attaching a handle to a settled turn would
-        // offer authority that no longer exists.
-        // `!destroyed` matters: rollback()'s first guard throws on a
-        // destroyed tree BEFORE lifecycle can move, so the lifecycle test
-        // alone would hand back a handle whose every method throws "Cannot
-        // settle a destroyed tree". Offering unusable authority is the same
-        // class of false claim this recovery exists to remove.
-        if (
-          lifecycle === 'pending' &&
-          !destroyed &&
-          typeof rollbackError === 'object' &&
-          rollbackError !== null
-        ) {
-          Object.defineProperty(rollbackError, 'recovery', {
-            value: {
-              transaction: decorateHandle(handle, pendingTurnId),
-              // Explicit: the callback may have thrown `undefined`.
-              callbackFailed: primaryFailed,
-              callbackError: primaryFailed ? primaryError : undefined,
-            },
-            enumerable: false,
-            configurable: true,
-            writable: true,
-          });
-        }
-        throw rollbackError;
+        throw primaryFailed ? primaryError : cleanupError;
       }
-      throw primaryFailed ? primaryError : cleanupError;
-    }
-    // The pending-turn symbol stays private to the decorator.
-    return decorateHandle(handle, pendingTurnId);
-  };
-
-  const runtime: InternalTransactionRuntime = {
-    transaction(fn: () => void): PendingTransaction {
-      // TX-OPEN-WINDOW-0. transact() is not re-entrant on a tree for its WHOLE
-      // call, not only while the callback runs. An observer that ran after the
-      // callback returned (as the invalidation group closed, or in the flush
-      // before the handle exists) could open a second transaction. That one
-      // reached the authority FIRST, so the two traded places: rolling back the
-      // older one, including the automatic rollback after a failure, undid the
-      // newer one's write, even a confirmed one. Writes flushed before this
-      // call begins are delivered first, so an observer of those may still
-      // open one.
-      if (recordingTransaction) {
-        throw new Error(
-          'Nested transaction is not supported: another transaction on this tree has not returned yet'
-        );
-      }
-      try {
-        return recordTransaction(fn);
-      } finally {
-        recordingTransaction = false;
-      }
+      // The pending-turn symbol stays private to the decorator.
+      return decorateHandle(handle, pendingTurnId);
     },
     getConfirmedTurnRecords: () => authority.getConfirmedTurnRecords(),
     setHistoryRetention: (retain: number) =>
@@ -3068,6 +3103,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
         );
       }
       pendingTransactions.clear();
+      lastWindowWriteSeq.clear();
       callbackExternalEffects.clear();
       inspectionWrites.clear();
       inspectionTransactionByTurn.clear();

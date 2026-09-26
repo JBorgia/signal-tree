@@ -24,10 +24,7 @@ import {
 import { getWriteParticipation } from './write-participation';
 
 import { installPathDeliveryRuntime } from './internals/path-observation-port';
-import {
-  isReportingContainedError,
-  reportContainedObserverError,
-} from './internals/error-reporter';
+import { reportContainedObserverError } from './internals/error-reporter';
 import type { TreeId } from './internals/position-registry';
 import type { WriteMetadata } from './mutation-types';
 
@@ -78,8 +75,6 @@ type PendingEntry = {
    */
   subjectFieldKeys?: readonly string[];
   subjectFieldFootprint?: readonly string[] | null;
-  /** Written by an onTreeError listener while it handled a contained report. */
-  reportCaused?: boolean;
 };
 
 type PendingSlot = PendingEntry | PendingEntry[];
@@ -128,37 +123,6 @@ const materializeDeliveryMeta = (
  * Used internally by SignalTree for entity hooks and enhancers.
  * Access via getPathNotifier().
  */
-/** The tree a pending entry belongs to, however its emitter supplied it. */
-function effectiveOwner(entry: {
-  ownerId?: number;
-  meta?: WriteMetadata;
-}): number | undefined {
-  return (
-    entry.ownerId ?? (entry.meta as { ownerId?: number } | undefined)?.ownerId
-  );
-}
-
-/**
- * The metadata two coalesced writes agree on: every field with the same value
- * on both, nothing either one alone claims. `undefined` when nothing agrees.
- */
-function agreedMeta(
-  left: WriteMetadata,
-  right: WriteMetadata
-): WriteMetadata | undefined {
-  const agreed: Record<string, unknown> = {};
-  let any = false;
-  const l = left as Record<string, unknown>;
-  const r = right as Record<string, unknown>;
-  for (const key of Object.keys(l)) {
-    if (key in r && Object.is(l[key], r[key])) {
-      agreed[key] = l[key];
-      any = true;
-    }
-  }
-  return any ? (agreed as WriteMetadata) : undefined;
-}
-
 export class PathNotifier {
   private static readonly ownerBoundarySeparator = '\u0000';
 
@@ -388,7 +352,6 @@ export class PathNotifier {
       positionIds,
       subjectFieldKeys: fieldKeys,
       subjectFieldFootprint: knownFootprint,
-      ...(isReportingContainedError() ? { reportCaused: true } : {}),
     };
 
     this.enqueuePending(entry);
@@ -417,8 +380,7 @@ export class PathNotifier {
     declaredScopes?: DeclaredWriteScopes,
     ownerId?: number,
     subjectFieldFootprint?: readonly string[] | null,
-    isolateSubscribers = false,
-    reportCaused = false
+    isolateSubscribers = false
   ): void {
     // ⚠️ THE INTERCEPTOR LOOP WAS DELETED IN 15.0 — PATH-NOTIFIER-INTERCEPT-
     // SURVIVAL-0. It ran here, before subscribers, and could suppress delivery
@@ -483,7 +445,6 @@ export class PathNotifier {
                 | TreeId
                 | undefined,
               path,
-              reportCaused,
             });
           }
         }
@@ -534,8 +495,7 @@ export class PathNotifier {
           entry.declaredScopes,
           entry.ownerId,
           entry.subjectFieldFootprint,
-          true,
-          entry.reportCaused === true
+          true
         );
       }
     }
@@ -698,12 +658,7 @@ export class PathNotifier {
     // too. Entries from emitters that do not supply one both carry `undefined`
     // and compare exactly as they did before — the fix cannot make a
     // single-tree case newly distinct.
-    //
-    // Entity writes name their tree only in meta.ownerId, so the parameter
-    // alone let two same-shaped trees' same-key writes in one tick merge into
-    // one delivery: whichever tree wrote last won, and the other tree's Link
-    // and undo never saw its write.
-    if (effectiveOwner(left) !== effectiveOwner(right)) {
+    if (left.ownerId !== right.ownerId) {
       return false;
     }
 
@@ -805,7 +760,6 @@ export class PathNotifier {
     target.positionId = next.positionId;
     target.subjectIds = next.subjectIds;
     target.positionIds = next.positionIds;
-    if (next.reportCaused) target.reportCaused = true;
   }
 
   private mergeOrigin(left?: string, right?: string): string | undefined {
@@ -825,7 +779,7 @@ export class PathNotifier {
       return undefined;
     }
     if (left.origin !== right.origin) {
-      return agreedMeta(left, right);
+      return undefined;
     }
     if (
       left.transactionId !== right.transactionId ||
@@ -833,11 +787,7 @@ export class PathNotifier {
       left.mutationIntent !== right.mutationIntent ||
       getWriteParticipation(left) !== getWriteParticipation(right)
     ) {
-      // Keep what both writes agree on rather than dropping everything. Two
-      // compensations from different transactions (newest rolled back first,
-      // same tick) lost their tree id this way, and Link, which only accepts
-      // writes naming its tree, never saw the value change back.
-      return agreedMeta(left, right);
+      return undefined;
     }
     if (left.structuralEffect && !right.structuralEffect) {
       return {

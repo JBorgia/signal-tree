@@ -4,6 +4,7 @@ import { getTreeRealizationPort } from './internals/causal-runtime/tree-realizat
 import {
   clearTreeErrorListenersForTesting,
   onTreeError,
+  resetContainedReportBudgetForTesting,
   type TreeErrorEvent,
 } from './internals/error-reporter';
 import { MUTATION_CAPTURE_RUNTIME } from './internals/mutation-capture-runtime';
@@ -311,6 +312,7 @@ describe('a contained observer error is reported, never silent', () => {
   });
   afterEach(() => {
     clearTreeErrorListenersForTesting();
+    resetContainedReportBudgetForTesting();
     report.mockRestore();
   });
 
@@ -479,7 +481,7 @@ describe('a contained observer error is reported, never silent', () => {
     let calls = 0;
     const offErrors = onTreeError(() => {
       calls++;
-      if (calls > 50) return; // a runaway would pass this; the guard must stop it first
+      if (calls > 500) return; // a runaway would pass this; the budget must stop it first
       errors.$.count(errors.$.count() + 1);
     });
     const off = observeWrites(() => {
@@ -489,13 +491,35 @@ describe('a contained observer error is reported, never silent', () => {
       const pending = tree.transact(() => tree.$.x(1));
       pending.confirm();
       await flush();
-      // One report per observed write of the tree; the listener's own write
-      // is reported to the console only.
-      expect(calls).toBeLessThanOrEqual(3);
+      expect(calls).toBeLessThanOrEqual(50);
       expect(report).toHaveBeenCalledWith(
-        expect.stringContaining('[ST2034]'),
+        expect.stringContaining('the rest of this task'),
         expect.anything()
       );
+    } finally {
+      off();
+      offErrors();
+      errors.destroy();
+      tree.destroy();
+    }
+  });
+
+  it('a listener that writes a microtask later cannot loop either', async () => {
+    const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
+    const errors = signalTree({ count: 0 }, { enhancers: [transactions()] });
+    let calls = 0;
+    const offErrors = onTreeError(() => {
+      calls++;
+      if (calls > 500) return;
+      void Promise.resolve().then(() => errors.$.count(errors.$.count() + 1));
+    });
+    const off = observeWrites(() => {
+      throw new Error('always');
+    });
+    try {
+      tree.$.x(1);
+      for (let i = 0; i < 2000; i++) await Promise.resolve();
+      expect(calls).toBeLessThanOrEqual(50);
     } finally {
       off();
       offErrors();
@@ -658,85 +682,6 @@ describe('failures after the callback returns (16.x)', () => {
       expect(hasOpenCommitScope(tree as object)).toBe(false);
     } finally {
       offInv();
-      tree.destroy();
-    }
-  });
-
-  it('an observer cannot open a second transaction on the tree before the first returns', async () => {
-    // An observer opening one there used to be ordered BEFORE the transaction
-    // it observed: rolling back the older one then undid the newer one's
-    // write, and so did the automatic rollback after a post-callback failure.
-    let armed = true;
-    const tree = signalTree(
-      { x: 0 },
-      {
-        enhancers: [transactions()],
-        derived: ($) => ({
-          inv: () => {
-            if ($.x() !== 0 && armed) {
-              armed = false;
-              throw new Error('derived');
-            }
-            return $.x();
-          },
-        }),
-      }
-    ) as unknown as {
-      $: {
-        x: {
-          (): number;
-          (v: number): void;
-          subscribe(fn: () => void): () => void;
-        };
-        inv: { subscribe(fn: () => void): () => void };
-      };
-      transact(fn: () => void): { confirm(): void; rollback(): void };
-      destroy(): void;
-    };
-    let opened: { confirm(): void } | undefined;
-    let refusal: unknown;
-    const offX = tree.$.x.subscribe(() => {
-      if (tree.$.x() === 1 && !opened && !refusal) {
-        try {
-          opened = tree.transact(() => tree.$.x(2));
-        } catch (error) {
-          refusal = error;
-        }
-      }
-    });
-    const offInv = tree.$.inv.subscribe(() => undefined);
-    try {
-      expect(() => tree.transact(() => tree.$.x(1))).toThrow('derived');
-      expect(opened).toBeUndefined();
-      expect(String(refusal)).toContain('Nested transaction is not supported');
-      expect(tree.$.x()).toBe(0);
-      expect(hasOpenCommitScope(tree as object)).toBe(false);
-      // Once the first call has returned, a new transaction opens normally.
-      const later = tree.transact(() => tree.$.x(3));
-      later.confirm();
-      expect(tree.$.x()).toBe(3);
-    } finally {
-      offX();
-      offInv();
-      tree.destroy();
-    }
-  });
-
-  it('an observer of writes flushed before the call may still open a transaction', async () => {
-    const tree = signalTree({ x: 0, y: 0 }, { enhancers: [transactions()] });
-    let opened: { confirm(): void } | undefined;
-    const off = getPathNotifier().subscribe('**', (_v, _p, path) => {
-      if (path === 'y' && !opened) opened = tree.transact(() => tree.$.x(5));
-    });
-    try {
-      tree.$.y(1); // queued; delivered by the flush before the next call opens
-      tree.transact(() => tree.$.x(7)).confirm();
-      expect(opened).toBeDefined();
-      opened?.confirm();
-      await flush();
-      expect(tree.$.x()).toBe(7);
-    } finally {
-      off();
       tree.destroy();
     }
   });
@@ -944,6 +889,134 @@ describe('failures after the callback returns (16.x)', () => {
       recovery?.transaction.confirm();
       expect(hasOpenCommitScope(tree as object)).toBe(false);
     } finally {
+      tree.destroy();
+    }
+  });
+
+  it('an automatic rollback refuses rather than overwrite an observer transaction on the same location', async () => {
+    // An observer at the group close opens a second transaction on x. When the
+    // first then fails, reversing it would destroy the second one's write.
+    let armed = true;
+    const tree = signalTree(
+      { x: 0 },
+      {
+        enhancers: [transactions()],
+        derived: ($) => ({
+          inv: () => {
+            if ($.x() !== 0 && armed) {
+              armed = false;
+              throw new Error('derived');
+            }
+            return $.x();
+          },
+        }),
+      }
+    ) as unknown as {
+      $: {
+        x: {
+          (): number;
+          (v: number): void;
+          subscribe(fn: () => void): () => void;
+        };
+        inv: { subscribe(fn: () => void): () => void };
+      };
+      transact(fn: () => void): { confirm(): void; rollback(): void };
+      destroy(): void;
+    };
+    let second: { confirm(): void } | undefined;
+    const offX = tree.$.x.subscribe(() => {
+      if (tree.$.x() === 1 && !second) {
+        second = tree.transact(() => tree.$.x(2));
+      }
+    });
+    const offInv = tree.$.inv.subscribe(() => undefined);
+    let thrown: unknown;
+    try {
+      try {
+        tree.transact(() => tree.$.x(1));
+      } catch (error) {
+        thrown = error;
+      }
+      expect(String(thrown)).toContain(
+        'written again before the transaction returned'
+      );
+      expect(second).toBeDefined();
+      second?.confirm();
+      (
+        thrown as { recovery?: { transaction: { confirm(): void } } }
+      )?.recovery?.transaction.confirm();
+      await flush();
+      expect(tree.$.x()).toBe(2);
+      expect(hasOpenCommitScope(tree as object)).toBe(false);
+    } finally {
+      offX();
+      offInv();
+      tree.destroy();
+    }
+  });
+
+  it('an automatic rollback refuses rather than overwrite an observer plain write', async () => {
+    const tree = signalTree({ a: 0, b: 0 }, { enhancers: [transactions()] });
+    const host = tree as unknown as Record<symbol, unknown>;
+    const previous = host[MUTATION_CAPTURE_RUNTIME];
+    host[MUTATION_CAPTURE_RUNTIME] = {
+      isCaptureActive: () => false,
+      activateCapture: () => () => {
+        throw new Error('capture release failed');
+      },
+    };
+    // In the flush before the handle exists, an observer writes b after the
+    // transaction did.
+    const off = observeWrites((frame) => {
+      if (frame.path === 'a' && tree.$.b() !== 10) tree.$.b(10);
+    });
+    let thrown: unknown;
+    try {
+      tree.transact(() => {
+        tree.$.a(1);
+        tree.$.b(1);
+      });
+    } catch (error) {
+      thrown = error;
+    } finally {
+      host[MUTATION_CAPTURE_RUNTIME] = previous;
+      off();
+    }
+    try {
+      expect(String(thrown)).toContain(
+        'written again before the transaction returned'
+      );
+      expect(tree.$.b()).toBe(10);
+      (
+        thrown as { recovery?: { transaction: { confirm(): void } } }
+      )?.recovery?.transaction.confirm();
+      expect(hasOpenCommitScope(tree as object)).toBe(false);
+    } finally {
+      tree.destroy();
+    }
+  });
+
+  it('control: an observer write elsewhere does not stop the automatic rollback', async () => {
+    const tree = signalTree({ a: 0, c: 0 }, { enhancers: [transactions()] });
+    const host = tree as unknown as Record<symbol, unknown>;
+    const previous = host[MUTATION_CAPTURE_RUNTIME];
+    const failure = new Error('capture release failed');
+    host[MUTATION_CAPTURE_RUNTIME] = {
+      isCaptureActive: () => false,
+      activateCapture: () => () => {
+        throw failure;
+      },
+    };
+    const off = observeWrites((frame) => {
+      if (frame.path === 'a' && tree.$.c() !== 10) tree.$.c(10);
+    });
+    try {
+      expect(() => tree.transact(() => tree.$.a(1))).toThrow(failure);
+      expect(tree.$.a()).toBe(0);
+      expect(tree.$.c()).toBe(10);
+    } finally {
+      host[MUTATION_CAPTURE_RUNTIME] = previous;
+      off();
       tree.destroy();
     }
   });
