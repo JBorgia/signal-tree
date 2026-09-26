@@ -7,6 +7,8 @@ import {
   type TreeErrorEvent,
 } from './internals/error-reporter';
 import { MUTATION_CAPTURE_RUNTIME } from './internals/mutation-capture-runtime';
+import { hasOpenCommitScope } from './internals/commit-consequence';
+import { entityMap } from './markers/entity-map';
 import { getPositionRegistry } from './internals/position-registry';
 import { observeWrites } from './internals/write-observation';
 import { link } from './link';
@@ -391,6 +393,270 @@ describe('a contained observer error is reported, never silent', () => {
     } finally {
       off();
       offErrors();
+      tree.destroy();
+    }
+  });
+
+  it('routes entity-row and rollback-compensation errors to onTreeError too', async () => {
+    // These writes name their tree only in meta.ownerId.
+    type Row = { id: string; v: number };
+    const tree = signalTree(
+      { rows: entityMap<Row, string>({ selectId: (r) => r.id }), x: 0 },
+      { enhancers: [transactions()] }
+    );
+    const events: TreeErrorEvent[] = [];
+    const offErrors = onTreeError((event) => void events.push(event));
+    const off = observeWrites(() => {
+      throw new Error('observer');
+    });
+    try {
+      tree.$.rows.addOne({ id: 'A', v: 0 });
+      tree.$.rows.updateOne('A', { v: 1 });
+      await flush();
+      tree.transact(() => tree.$.x(9)).rollback();
+      await flush();
+      expect(events.length).toBeGreaterThan(0);
+      expect(
+        events.every((e) => e.treeId === getPositionRegistry(tree.$)!.id)
+      ).toBe(true);
+      expect(events.map((e) => e.path)).toEqual(
+        expect.arrayContaining(['rows.A', 'x'])
+      );
+      expect(report).not.toHaveBeenCalled();
+    } finally {
+      off();
+      offErrors();
+      tree.destroy();
+    }
+  });
+
+  it('still logs the original error when every onTreeError listener throws', async () => {
+    const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
+    const offErrors = onTreeError(() => {
+      throw new Error('listener bug');
+    });
+    const failure = new Error('observer');
+    const off = observeWrites(() => {
+      throw failure;
+    });
+    try {
+      tree.$.x(1);
+      await flush();
+      expect(report).toHaveBeenCalledWith(
+        expect.stringContaining('[ST2034]'),
+        failure
+      );
+    } finally {
+      off();
+      offErrors();
+      tree.destroy();
+    }
+  });
+
+  it('a throwing console cannot abort the flush', async () => {
+    report.mockImplementation(() => {
+      throw new Error('fail-on-console');
+    });
+    const tree = signalTree({ x: 0, y: 0 }, { enhancers: [transactions()] });
+    const notifier = getPathNotifier();
+    const offThrowing = notifier.subscribe('**', () => {
+      throw new Error('observer');
+    });
+    const later: string[] = [];
+    const offLater = notifier.subscribe('**', (_v, _p, path) => {
+      if (path === 'x' || path === 'y') later.push(path);
+    });
+    let flushed = 0;
+    const offFlush = notifier.onFlush(() => void flushed++);
+    try {
+      tree.$.x(1);
+      tree.$.y(2);
+      expect(() => notifier.flushSync()).not.toThrow();
+      expect(later).toEqual(['x', 'y']);
+      expect(flushed).toBeGreaterThan(0);
+    } finally {
+      offThrowing();
+      offLater();
+      offFlush();
+      tree.destroy();
+    }
+  });
+});
+
+describe('failures after the callback returns (16.x)', () => {
+  let report: ReturnType<typeof vi.spyOn>;
+  beforeEach(() => {
+    report = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+  });
+  afterEach(() => report.mockRestore());
+
+  it('a subscribed derived that throws as the group closes rolls back and keeps Link alive', async () => {
+    const tree = signalTree(
+      { x: 0, y: 0 },
+      {
+        enhancers: [transactions()],
+        derived: ($) => ({
+          inv: () => {
+            if ($.x() === 1) throw new Error('derived');
+            return $.x();
+          },
+        }),
+      }
+    ) as unknown as {
+      $: {
+        x: { (): number; (v: number): void };
+        y: { (): number; (v: number): void };
+        inv: { subscribe(fn: () => void): () => void };
+      };
+      transact(fn: () => void): { confirm(): void };
+      destroy(): void;
+    };
+    const offInv = tree.$.inv.subscribe(() => undefined);
+    const sent: number[] = [];
+    const relation = link(tree.$.y as never, {
+      set: (v: number) => void sent.push(v),
+    });
+    await flush();
+    sent.length = 0;
+    try {
+      expect(() => tree.transact(() => tree.$.x(1))).toThrow('derived');
+      await flush();
+      expect(tree.$.x()).toBe(0);
+      expect(hasOpenCommitScope(tree as object)).toBe(false);
+      tree.$.y(7);
+      await flush();
+      expect(await settledWithin(relation)).toBe(true);
+      expect(sent).toContain(7);
+    } finally {
+      offInv();
+      relation.dispose();
+      tree.destroy();
+    }
+  });
+
+  it('a refused rollback after the group fails to close reports callbackFailed false', async () => {
+    const tree = signalTree(
+      { x: 0 },
+      {
+        enhancers: [transactions()],
+        derived: ($) => ({
+          inv: () => {
+            if ($.x() === 1) throw new Error('derived');
+            return $.x();
+          },
+        }),
+      }
+    ) as unknown as {
+      $: {
+        x: { (): number; (v: number): void };
+        inv: { subscribe(fn: () => void): () => void };
+      };
+      transact(fn: () => void): { confirm(): void };
+      destroy(): void;
+    };
+    const offInv = tree.$.inv.subscribe(() => undefined);
+    const port = getTreeRealizationPort(tree.$ as object) as {
+      validateEffects: (...args: unknown[]) => unknown;
+    };
+    const original = port.validateEffects;
+    port.validateEffects = () => ({ kind: 'structural-drift' });
+    let thrown: unknown;
+    try {
+      tree.transact(() => tree.$.x(1));
+    } catch (error) {
+      thrown = error;
+    } finally {
+      port.validateEffects = original;
+    }
+    try {
+      const recovery = (
+        thrown as {
+          recovery?: {
+            transaction: { confirm(): void };
+            callbackFailed: boolean;
+          };
+        }
+      )?.recovery;
+      expect(recovery).toBeDefined();
+      expect(recovery?.callbackFailed).toBe(false);
+      recovery?.transaction.confirm();
+      await flush();
+      expect(hasOpenCommitScope(tree as object)).toBe(false);
+    } finally {
+      offInv();
+      tree.destroy();
+    }
+  });
+
+  it('a callback that throws undefined still fails the transaction', async () => {
+    const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
+    let threw = false;
+    let handle: unknown;
+    try {
+      handle = tree.transact(() => {
+        tree.$.x(1);
+        throw undefined;
+      });
+    } catch {
+      threw = true;
+    }
+    await flush();
+    expect(threw).toBe(true);
+    expect(handle).toBeUndefined();
+    expect(tree.$.x()).toBe(0);
+    expect(hasOpenCommitScope(tree as object)).toBe(false);
+    tree.destroy();
+  });
+
+  it('a refused rollback after a capture-release failure hands back recovery that does not blame the callback', async () => {
+    const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
+    const sent: number[] = [];
+    const relation = link(tree.$.x, { set: (v) => void sent.push(v) });
+    await flush();
+    sent.length = 0;
+    const host = tree as unknown as Record<symbol, unknown>;
+    const previous = host[MUTATION_CAPTURE_RUNTIME];
+    host[MUTATION_CAPTURE_RUNTIME] = {
+      isCaptureActive: () => false,
+      activateCapture: () => () => {
+        throw new Error('capture release failed');
+      },
+    };
+    const port = getTreeRealizationPort(tree.$ as object) as {
+      validateEffects: (...args: unknown[]) => unknown;
+    };
+    const original = port.validateEffects;
+    port.validateEffects = () => ({ kind: 'structural-drift' });
+    let thrown: unknown;
+    try {
+      tree.transact(() => tree.$.x(1));
+    } catch (error) {
+      thrown = error;
+    } finally {
+      port.validateEffects = original;
+      host[MUTATION_CAPTURE_RUNTIME] = previous;
+    }
+    try {
+      const recovery = (
+        thrown as {
+          recovery?: {
+            transaction: { confirm(): void };
+            callbackFailed: boolean;
+            callbackError?: unknown;
+          };
+        }
+      )?.recovery;
+      expect(recovery).toBeDefined();
+      expect(recovery?.callbackFailed).toBe(false);
+      expect(recovery?.callbackError).toBeUndefined();
+      expect(tree.$.x()).toBe(1);
+      recovery?.transaction.confirm();
+      await flush();
+      expect(hasOpenCommitScope(tree as object)).toBe(false);
+      expect(await settledWithin(relation)).toBe(true);
+      expect(sent.at(-1)).toBe(1);
+    } finally {
+      relation.dispose();
       tree.destroy();
     }
   });

@@ -11,7 +11,7 @@ declare const ngDevMode: boolean | undefined;
  * ⚠️ NOT "every error the library catches" — that was the original aspiration
  * and it was never true. The measured producer inventory is deliberately narrow:
  * `link` and `stored`, plus (15.3.1) an observer error that the path notifier
- * or a transaction lifecycle listener CONTAINED rather than let escape
+ * or a transaction turn listener CONTAINED rather than let escape
  * ({@link reportContainedObserverError}). Every other catch site still handles
  * its own error locally and does not participate here.
  *
@@ -114,17 +114,19 @@ export function onTreeError(
  * would surface at whichever marker happened to report first, which is the
  * least debuggable outcome available.
  *
- * @returns whether any listener observed the report, so a producer that must
- * not go silent can fall back when nobody is listening.
+ * @returns whether at least one listener took the report without throwing,
+ * so a producer that must not go silent can fall back when nobody did.
  */
 export function reportTreeError(event: TreeErrorEvent): boolean {
   if (listeners.size === 0) return false;
+  let received = false;
   for (const listener of listeners) {
     try {
       listener(event);
+      received = true;
     } catch (err) {
       if (typeof ngDevMode === 'undefined' || ngDevMode) {
-        console.error(
+        safeConsoleError(
           'SignalTree: an onTreeError listener threw. The original error was ' +
             'still handled normally; this is the listener failing. [ST2025]',
           err
@@ -132,19 +134,34 @@ export function reportTreeError(event: TreeErrorEvent): boolean {
       }
     }
   }
-  return true;
+  return received;
+}
+
+/**
+ * `console.error` that cannot throw. Reporting must never become a new source
+ * of errors: a throwing console (a fail-on-console test harness, an override)
+ * inside a flush would drop the rest of the batch, the failure this reporter
+ * exists to prevent.
+ */
+function safeConsoleError(message: string, error: unknown): void {
+  try {
+    console.error(message, error);
+  } catch {
+    // Nothing further can be reported without risking the same failure.
+  }
 }
 
 /**
  * Report an error an OBSERVER threw and SignalTree contained
  * (TX-OBSERVER-STRAND-0): a write subscriber during deferred delivery, or a
- * transaction lifecycle listener. The write or turn it observed already
+ * transaction turn listener (onPendingCreated/Confirmed/Discarded). The write or turn it observed already
  * exists, so the error must not escape into whoever flushed.
  *
- * Goes to `onTreeError` like any other report. The FALLBACK is explicit:
- * when no listener is registered, or the failure carries no tree to attribute
- * it to, it is written to `console.error` as [ST2034] — in production too.
- * These errors used to throw; containing them must not make them silent.
+ * Goes to `onTreeError` like any other report. The FALLBACK is explicit: when
+ * no listener took the report (none registered, or every one threw), or when
+ * the failure carries no tree to attribute it to, it is written to
+ * `console.error` as [ST2034] — in production too. These errors used to throw;
+ * containing them must not make them silent.
  */
 export function reportContainedObserverError(event: {
   readonly error: unknown;
@@ -164,10 +181,10 @@ export function reportContainedObserverError(event: {
   ) {
     return;
   }
-  console.error(
+  safeConsoleError(
     operation === 'notify:subscriber'
       ? `SignalTree: a write subscriber threw while observing '${path}'; delivery continued. [ST2034]`
-      : 'SignalTree: a transaction lifecycle listener threw; the transaction continued. [ST2034]',
+      : 'SignalTree: a transaction turn listener threw; the transaction continued. [ST2034]',
     error
   );
 }

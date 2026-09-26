@@ -36,6 +36,22 @@ the deprecation path applies normally. See
 [`docs/support-policy.md`](docs/support-policy.md) and
 [`docs/research/api-breaking-reset-0.md`](docs/research/api-breaking-reset-0.md).
 
+### Carried from 15.3.1
+
+The 15.3.1 correctness fixes are carried on this line (see that entry for the
+reproductions): `link()` endpoints and `settled()` under a pending transaction,
+a rolled-back overlapping transaction notifying its compensation, and a
+throwing write observer no longer stranding `transact()`. The contained-error
+policy is the same: batched observer errors go to `onTreeError`, with
+`console.error` [ST2034] as the fallback. Two differences from 15.x, both
+following this line's recovery-handle contract:
+
+- A failure after the callback returns (the invalidation group closing, or the
+  mutation capture failing to release) rolls back through the handle. If that
+  rollback is refused, the thrown error carries `recovery` with
+  `callbackFailed: false`.
+- `SignalTreeRollbackRecovery` documents that case. Its shape is unchanged.
+
 ### For users
 
 - **`transact()` — the same optimistic turn, named as a verb.** It matches the
