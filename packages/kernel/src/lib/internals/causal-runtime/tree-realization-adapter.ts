@@ -1768,7 +1768,9 @@ function resolveNotifyPath(
   }
 
   if (typeof effect.subjectId !== 'number') {
-    return descriptor?.path;
+    // A settlement can forget a scalar descriptor that restoration history
+    // still needs; the effect's own path is the same location.
+    return descriptor?.path ?? effect.path;
   }
 
   if (effect.subjectFieldSegments !== undefined) {

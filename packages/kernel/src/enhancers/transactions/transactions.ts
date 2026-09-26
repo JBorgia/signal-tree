@@ -2924,6 +2924,24 @@ export function getOrCreateInternalTransactionRuntime<T>(
         try {
           handle.rollback();
         } catch (rollbackError) {
+          if (lifecycle !== 'pending') {
+            // 'rejected': the compensation installed and the turn retired; only its
+            // delivery failed. The failure that required the rollback keeps
+            // precedence, and the delivery error is reported.
+            reportCleanupFailure(
+              'rollback delivery after a failed transaction',
+              rollbackError
+            );
+            throw primaryFailed ? primaryError : cleanupError;
+          }
+          if (!primaryFailed) {
+            // The refusal is thrown; without this the failure that made the
+            // rollback necessary would leave no trace at all.
+            reportCleanupFailure(
+              'a post-callback step whose rollback was then refused',
+              cleanupError
+            );
+          }
           // RECOVERY-HANDLE-0. `transact()` has not returned, so a refused
           // compensation would otherwise strand a transaction that is still
           // pending and still settleable with no reference to it. Catching
@@ -2995,10 +3013,16 @@ export function getOrCreateInternalTransactionRuntime<T>(
   };
 
   const reportCleanupFailure = (step: string, error: unknown): void => {
-    console.error(
-      `SignalTree: transactions() cleanup failed during ${step}.`,
-      error
-    );
+    // Guarded: a throwing console (a fail-on-console harness) must not turn
+    // a report into a new failure on the path that is cleaning up.
+    try {
+      console.error(
+        `SignalTree: transactions() cleanup failed during ${step}.`,
+        error
+      );
+    } catch {
+      // Nothing further can be reported safely.
+    }
   };
 
   if (typeof tree.registerCleanup === 'function') {

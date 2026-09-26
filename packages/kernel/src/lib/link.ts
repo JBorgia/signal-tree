@@ -34,7 +34,10 @@ import {
 } from './internals/source-mutation';
 import { isNodeAccessor, isTraversableNode } from './internals/node-shape';
 import { getRootTree } from './internals/root-source';
-import { scheduleDurableConsequence } from './internals/commit-consequence';
+import {
+  scheduleDurableConsequence,
+  withdrawHeldConsequence,
+} from './internals/commit-consequence';
 import type { EntityMapBuilder } from './markers/entity-map';
 import type { NodeAccessor } from './node-accessor';
 import type { ConstructionOf } from './internals/construction-accessor';
@@ -745,6 +748,10 @@ export function link<S>(
     releaseObservation();
     offSub();
     offFlush?.();
+    // Its held consequences would only no-op now, but they keep this whole
+    // relationship reachable until the tree's transactions settle.
+    withdrawHeldConsequence(x as object, consequenceKey);
+    withdrawHeldConsequence(x as object, sendConsequenceKey);
     for (const release of releaseOrders) release();
     // Release waiters before invoking user cleanup, which can throw or reenter.
     for (const h of held) h.resolve();
