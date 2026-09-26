@@ -108,6 +108,16 @@ Each was reproduced on the installed 15.3.0 and is unchanged by this release:
   against under 0.4 KB without `transactions()`. Later transactions do not
   reclaim them.
 
+- **Link, while an asynchronous endpoint `set()` is in flight** (the 16.x line
+  already fixes all three):
+  - a pending transaction's uncommitted write to the linked location can be
+    sent before the transaction is decided; the endpoint still ends on the
+    surviving value;
+  - `settled()` can resolve before a later value is sent, when the send it was
+    awaiting rejects;
+  - `dispose()` does not release a `settled()` waiter until that `set()`
+    settles.
+
 These are targeted for a later patch; none is promised for a specific version.
 
 ### Verification
