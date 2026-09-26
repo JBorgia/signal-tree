@@ -1,9 +1,9 @@
 ## Unreleased (15.3.1)
 
-**TL;DR** — **Patch. No API change, but three behaviour changes you could
-notice: observer errors are contained instead of thrown, a throw from code
-that runs as the transaction closes now rolls the transaction back, and an
-observer can no longer open a second transaction on the tree mid-call.** The
+**TL;DR** — **Patch. No API change, but two behaviour changes you could
+notice: observer errors are contained instead of thrown, and a throw from code
+that runs as the transaction closes now rolls the transaction back (or refuses
+to, if something else wrote the same location meanwhile).** The
 fixes: (1) a `link()` endpoint could miss values, and `link.settled()` could
 wait forever, while a transaction was pending on the same tree; rollbacks and
 undo/redo could change the tree without telling any observer. (2) A write
@@ -24,12 +24,8 @@ The tree value was always right; only what observers saw was wrong.
       locations, then confirms                              receives its value              both resolve
     T1 writes x=1, T2 writes x=5; T1 confirms,            endpoint stays 5,                endpoint 1
       T2 rolls back                                         settled() never resolves
-    two overlapping transactions rolled back              endpoint stays on the            endpoint 0
-      newest-first in one tick                              discarded value
     undo or redo after a transaction settled              tree changes, no observer        observed
       (e.g. transaction(() => undoable(...)).confirm())     is told
-    same-tick entity writes on two same-shaped trees      one tree's write is lost         both delivered
-                                                            to its link and undo
 
 The causes, each fixed:
 
@@ -44,11 +40,6 @@ The causes, each fixed:
   still needed**, and a scalar compensation or undo with no descriptor had no
   path to notify on. Such a descriptor is now kept while a pending turn needs
   it, and a scalar compensation or undo notifies on its own effect's path.
-- **Coalesced notifications lost facts.** Two compensations from different
-  transactions merged into one delivery without their tree id, so Link ignored
-  it. Entity writes from two trees merged because their tree id travels in
-  metadata. Coalescing now compares that tree id, and a merged delivery keeps
-  every fact both writes agree on.
 
 ### A throwing write observer stranded the transaction
 
@@ -74,28 +65,28 @@ The policy is now:
   the event. In production it is written when no listener took the report
   (none registered, or every one threw) or the write names no tree. A throwing
   `console.error` cannot abort the flush.
-- **A report cannot feed itself.** A write that an `onTreeError` listener makes
-  while handling a contained report is reported to the console only, so a
-  listener that writes on every report, with an observer that throws on every
-  write, cannot loop.
+- **Reports are budgeted.** At most 50 contained errors reach `onTreeError`
+  per task; the rest of that task's go to the console only, with one line
+  saying so. A listener that writes on every report, with an observer that
+  throws on every write, would otherwise loop, synchronously or as a
+  microtask chain.
 - **Once the callback returns, `transaction()` returns a handle, or rolls its
   writes back and throws; the commit scope settles either way.** This covers a
   failure as the invalidation group closes and a failure releasing the internal
   mutation capture. The rollback runs inside an invalidation group, so a
-  consumer that throws while it is delivered does not mask the failure. Two
-  limits remain on 15.x. If the rollback is refused, `SignalTreeRollbackError`
-  is thrown and the writes stay applied, since 15.x has no recovery handle; the
-  failure that made the rollback necessary is reported. And a failure inside
-  the step that records the pending turn is not rolled back; no supported
-  trigger for it is known.
+  consumer that throws while it is delivered does not mask the failure.
+- **An automatic rollback never overwrites someone else's write.** It runs
+  while `transaction()` is still in progress, after observers have had a
+  chance to write the same locations (or open a transaction that does). If any
+  location it would reverse was written again after the transaction wrote it,
+  the rollback is refused: `SignalTreeRollbackError` is thrown and the writes
+  stay as the tree shows them.
 
-- **`transaction()` is not re-entrant on a tree for its whole call.** An
-  observer that runs after the callback returns could open a second
-  transaction on the same tree. That one was ordered first, so rolling back
-  the older one, or the automatic rollback above, undid the newer one's
-  write, even a confirmed one. Opening one there now throws
-  `Nested transaction is not supported`, as it already did inside the
-  callback. Observers of writes made before the call still may.
+Two limits remain on 15.x. A refused rollback throws `SignalTreeRollbackError`
+with the writes applied, since 15.x has no recovery handle; the failure that
+made the rollback necessary is reported. And a failure inside the step that
+records the pending turn is not rolled back; no supported trigger for it is
+known.
 
 A callback that throws `undefined` now fails the transaction too. It used to be
 rolled back and then reported as a success, with a handle.
@@ -120,10 +111,8 @@ Synchronous delivery (batching disabled, an internal test seam) is unchanged.
   batch; and Vue only rethrows watcher errors in development (production logs
   them), so the same error rolls back in development and commits in
   production.
-- A `transaction()` call from an observer while another transaction on the
-  same tree has not returned now throws (see above). Under Solid or Vue, an
-  effect or sync watcher that does this as the group closes therefore makes
-  the outer transaction roll back and throw.
+- At most 50 contained observer errors per task reach `onTreeError`; the
+  rest go to the console.
 - `reportTreeError` (internal) now returns whether any listener took the report
   without throwing. `onTreeError` and `TreeErrorEvent` are unchanged.
 
@@ -143,6 +132,19 @@ Each was reproduced on the installed 15.3.0 and is unchanged by this release:
   reconciled with it** (the 16.x line fixes this). Rolling the transaction
   back afterwards reverses straight through the undo or redo, and confirming
   it commits a write the tree no longer holds.
+- **Work done by observers while `transaction()` is still running is ordered
+  before it.** An observer that runs after the callback returns (a location
+  subscriber, a framework effect, an `observeWrites()` subscriber) can open
+  another transaction, settle an older one, or write the same location. That
+  work reaches the transaction authority first, so an explicit `rollback()` of
+  the transaction afterwards can undo it; a rollback of the two can also be
+  refused or allowed in the wrong order. The automatic rollback is guarded
+  (see above); explicit rollbacks are not.
+- **Same-tick coalescing can lose a write for observers.** Two overlapping
+  transactions rolled back newest-first in one tick merge into one delivery
+  that Link ignores, so the endpoint stays on the discarded value. Same-tick
+  entity writes on two same-shaped trees merge too, so one tree's write never
+  reaches its link or its undo.
 - **Realization descriptors are retained for retired entities.** In the
   measured fixture, a tree with `transactions()` kept 4 descriptor entries for
   every entity added and removed by ordinary (non-transaction) writes, 3 when
@@ -166,11 +168,12 @@ These are targeted for a later patch; none is promised for a specific version.
 
 Pinned by `link-overlapping-rollback.spec.ts` and
 `transaction-observer-failure.spec.ts`. Each fix mechanism with an observable
-effect was mutation-checked: reverting it fails at least one pinned case. Four
+effect was mutation-checked: reverting it fails at least one pinned case. Three
 branches have no public trigger and are not pinned: the commit-or-discard
-outcome of the post-callback rollback, the materialize-failure branch, the
-synchronous-delivery path, and the merge of two writes with different origins.
-The guard on `coalesce()`'s secondary-error console call is not pinned either.
+outcome of the post-callback rollback, the materialize-failure branch, and the
+synchronous-delivery path. The guard on `coalesce()`'s secondary-error
+console call, and the clearing of the automatic-rollback write record when no
+transaction is open, are not pinned either.
 The installed-package checks fail on 15.3.0 and pass on the release candidate.
 
 ## 15.3.0 (2026-09-24)

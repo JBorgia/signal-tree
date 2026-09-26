@@ -151,49 +151,72 @@ function safeConsoleError(message: string, error: unknown): void {
   }
 }
 
+// TX-REPORT-BUDGET-0. At most this many contained errors reach onTreeError
+// listeners per macrotask; the rest go to the console only. A listener that
+// writes on every report, with an observer that throws on every write, loops:
+// synchronously inside a flush, or as a microtask chain through link() or a
+// deferred write. Counting per task needs no knowledge of which write caused
+// which report, so every shape of that loop is bounded the same way.
+const CONTAINED_REPORT_BUDGET = 50;
+let containedReportsThisTask = 0;
+let budgetResetScheduled = false;
+let budgetNoticeWritten = false;
+
+function takeContainedReportBudget(): boolean {
+  if (!budgetResetScheduled) {
+    budgetResetScheduled = true;
+    setTimeout(() => {
+      containedReportsThisTask = 0;
+      budgetResetScheduled = false;
+      budgetNoticeWritten = false;
+    }, 0);
+  }
+  if (containedReportsThisTask >= CONTAINED_REPORT_BUDGET) return false;
+  containedReportsThisTask++;
+  return true;
+}
+
 /**
  * Report an error an OBSERVER threw and SignalTree contained
  * (TX-OBSERVER-STRAND-0): a write subscriber during deferred delivery, or a
- * transaction turn listener (onPendingCreated/Confirmed/Discarded). The write or turn it observed already
- * exists, so the error must not escape into whoever flushed.
+ * transaction turn listener (onPendingCreated/Confirmed/Discarded). The write
+ * or turn it observed already exists, so the error must not escape into
+ * whoever flushed.
  *
- * Goes to `onTreeError` like any other report. The console line [ST2034] is
- * explicit and never silent:
+ * Goes to `onTreeError` like any other report, up to a per-task budget (see
+ * TX-REPORT-BUDGET-0). The console line [ST2034] is explicit and never silent:
  *
  * - in development it is ALWAYS written, because a listener that returns
  *   normally may still have ignored the event (one filtering on `link:set`,
  *   or routing by tree);
  * - in production it is written when no listener took the report (none
- *   registered, or every one threw) or the failure names no tree.
+ *   registered, or every one threw), the failure names no tree, or the
+ *   task's report budget is spent.
  *
  * These errors used to throw; containing them must not make them silent.
- *
- * A contained error on a write that an `onTreeError` listener itself made
- * while handling a contained report goes to the console only. Otherwise a
- * listener that writes on every report, with an observer that throws on
- * every write, reported forever and `transaction()` never returned.
  */
 export function reportContainedObserverError(event: {
   readonly error: unknown;
   readonly operation: 'notify:subscriber' | 'transaction:listener';
   readonly treeId?: TreeId;
   readonly path?: string;
-  /** The observed write was made by an onTreeError listener's report. */
-  readonly reportCaused?: boolean;
 }): void {
-  const { error, operation, treeId, path, reportCaused } = event;
+  const { error, operation, treeId, path } = event;
   let received = false;
-  if (treeId !== undefined && !reportCaused) {
-    reportingContained++;
-    try {
+  if (treeId !== undefined) {
+    if (takeContainedReportBudget()) {
       received = reportTreeError({
         error,
         operation,
         treeId,
         ...(path === undefined ? {} : { path }),
       });
-    } finally {
-      reportingContained--;
+    } else if (!budgetNoticeWritten) {
+      budgetNoticeWritten = true;
+      safeConsoleError(
+        `SignalTree: more than ${CONTAINED_REPORT_BUDGET} contained observer errors in one task; the rest of this task's go to the console only, not onTreeError. [ST2034]`,
+        error
+      );
     }
   }
   if (received && !(typeof ngDevMode === 'undefined' || ngDevMode)) {
@@ -207,13 +230,10 @@ export function reportContainedObserverError(event: {
   );
 }
 
-// Depth of contained reports being delivered to onTreeError listeners right
-// now. The notifier tags writes made in that window (see reportCaused above).
-let reportingContained = 0;
-
-/** @internal Whether a contained observer error is being delivered to listeners. */
-export function isReportingContainedError(): boolean {
-  return reportingContained > 0;
+/** Test seam: reset the contained-report budget between specs. */
+export function resetContainedReportBudgetForTesting(): void {
+  containedReportsThisTask = 0;
+  budgetNoticeWritten = false;
 }
 
 /** Test seam — listeners are module-global, so a spec must be able to reset. */

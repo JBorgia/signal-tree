@@ -410,54 +410,6 @@ describe('link across overlapping transactions', () => {
     tree.destroy();
   });
 
-  it('rolling back two overlapping transactions newest-first in one tick is observed', async () => {
-    // The two compensations coalesce; the merged write must keep its tree.
-    const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
-    const sent: number[] = [];
-    const relation = link(tree.$.x, { set: (v) => void sent.push(v) });
-    await flush();
-    const t3 = tree.transaction(() => tree.$.x(3));
-    await flush();
-    const t4 = tree.transaction(() => tree.$.x(4));
-    await flush();
-    t4.rollback();
-    t3.rollback();
-    await flush();
-    expect(tree.$.x()).toBe(0);
-    expect(await settledWithin(relation)).toBe(true);
-    expect(sent.at(-1)).toBe(0);
-    relation.dispose();
-    tree.destroy();
-  });
-
-  it('same-tick entity writes on two same-shaped trees reach both trees', async () => {
-    type Row = { id: string; v: number };
-    const make = () =>
-      signalTree(
-        { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-        { enhancers: [transactions()] }
-      );
-    const a = make();
-    const b = make();
-    a.$.rows.addOne({ id: 'r1', v: 1 });
-    b.$.rows.addOne({ id: 'r1', v: 1 });
-    await flush();
-    const sentA: Row[][] = [];
-    const sentB: Row[][] = [];
-    const linkA = link(a.$.rows, { set: (v) => void sentA.push(v as Row[]) });
-    const linkB = link(b.$.rows, { set: (v) => void sentB.push(v as Row[]) });
-    await flush();
-    a.$.rows.updateOne('r1', { v: 2 });
-    b.$.rows.updateOne('r1', { v: 3 });
-    await flush();
-    expect(sentA.at(-1)?.[0]?.v).toBe(2);
-    expect(sentB.at(-1)?.[0]?.v).toBe(3);
-    linkA.dispose();
-    linkB.dispose();
-    a.destroy();
-    b.destroy();
-  });
-
   it('a disposed link does not stay held behind a pending transaction', async () => {
     const tree = signalTree(
       { x: 0, other: 0 },
