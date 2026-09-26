@@ -662,6 +662,85 @@ describe('failures after the callback returns (16.x)', () => {
     }
   });
 
+  it('an observer cannot open a second transaction on the tree before the first returns', async () => {
+    // An observer opening one there used to be ordered BEFORE the transaction
+    // it observed: rolling back the older one then undid the newer one's
+    // write, and so did the automatic rollback after a post-callback failure.
+    let armed = true;
+    const tree = signalTree(
+      { x: 0 },
+      {
+        enhancers: [transactions()],
+        derived: ($) => ({
+          inv: () => {
+            if ($.x() !== 0 && armed) {
+              armed = false;
+              throw new Error('derived');
+            }
+            return $.x();
+          },
+        }),
+      }
+    ) as unknown as {
+      $: {
+        x: {
+          (): number;
+          (v: number): void;
+          subscribe(fn: () => void): () => void;
+        };
+        inv: { subscribe(fn: () => void): () => void };
+      };
+      transact(fn: () => void): { confirm(): void; rollback(): void };
+      destroy(): void;
+    };
+    let opened: { confirm(): void } | undefined;
+    let refusal: unknown;
+    const offX = tree.$.x.subscribe(() => {
+      if (tree.$.x() === 1 && !opened && !refusal) {
+        try {
+          opened = tree.transact(() => tree.$.x(2));
+        } catch (error) {
+          refusal = error;
+        }
+      }
+    });
+    const offInv = tree.$.inv.subscribe(() => undefined);
+    try {
+      expect(() => tree.transact(() => tree.$.x(1))).toThrow('derived');
+      expect(opened).toBeUndefined();
+      expect(String(refusal)).toContain('Nested transaction is not supported');
+      expect(tree.$.x()).toBe(0);
+      expect(hasOpenCommitScope(tree as object)).toBe(false);
+      // Once the first call has returned, a new transaction opens normally.
+      const later = tree.transact(() => tree.$.x(3));
+      later.confirm();
+      expect(tree.$.x()).toBe(3);
+    } finally {
+      offX();
+      offInv();
+      tree.destroy();
+    }
+  });
+
+  it('an observer of writes flushed before the call may still open a transaction', async () => {
+    const tree = signalTree({ x: 0, y: 0 }, { enhancers: [transactions()] });
+    let opened: { confirm(): void } | undefined;
+    const off = getPathNotifier().subscribe('**', (_v, _p, path) => {
+      if (path === 'y' && !opened) opened = tree.transact(() => tree.$.x(5));
+    });
+    try {
+      tree.$.y(1); // queued; delivered by the flush before the next call opens
+      tree.transact(() => tree.$.x(7)).confirm();
+      expect(opened).toBeDefined();
+      opened?.confirm();
+      await flush();
+      expect(tree.$.x()).toBe(7);
+    } finally {
+      off();
+      tree.destroy();
+    }
+  });
+
   it('a callback that throws undefined still fails the transaction', async () => {
     const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
     let threw = false;
