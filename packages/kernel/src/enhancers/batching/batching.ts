@@ -327,10 +327,15 @@ export function batching(
         }
 
         for (const secondary of failures.slice(1)) {
-          console.error(
-            '[SignalTree] Secondary error in coalesce():',
-            secondary
-          );
+          // Guarded: a throwing console must not replace the primary failure.
+          try {
+            console.error(
+              '[SignalTree] Secondary error in coalesce():',
+              secondary
+            );
+          } catch {
+            // The primary failure is still thrown below.
+          }
         }
         if (failures.length > 0) throw failures[0];
       },

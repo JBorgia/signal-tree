@@ -52,6 +52,13 @@ carried on this line:
   `onTreeError` listener makes while handling a contained report is reported
   to the console only, so the two cannot loop.
 - A disposed link withdraws its held consequences.
+- `transact()` is not re-entrant on a tree for its whole call. An observer
+  that ran after the callback returned could open a second transaction that
+  was then ordered first, so rolling back the older one (including the
+  automatic rollback after a failure) undid the newer one's write, even a
+  confirmed one. Opening one there now throws
+  `Nested transaction is not supported`. Observers of writes made before the
+  call still may.
 
 Differences from 15.x, following this line's recovery-handle contract:
 
