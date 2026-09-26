@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { getTreeRealizationDescriptors } from './internals/causal-runtime/tree-realization-adapter';
+import { getHeldConsequenceCountForTesting } from './internals/commit-consequence';
 import { entityMap } from './markers/entity-map';
 import { link } from './link';
 import { getPathNotifier } from './path-notifier';
@@ -219,31 +220,18 @@ describe('link across overlapping transactions', () => {
     tree.destroy();
   });
 
-  it('spared descriptors stay bounded by the positions written', async () => {
-    const tree = signalTree({ x: 0, z: 0 }, { enhancers: [transactions()] });
+  it('a lone transaction still forgets the descriptor it created', async () => {
+    // Sparing applies only while a pending turn needs a descriptor; without
+    // one the settlement still collects, so the map does not grow per write.
+    const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
     const descriptors = () =>
       getTreeRealizationDescriptors(tree as unknown as object)?.size ?? 0;
-    const cycle = async (confirmFirst: boolean) => {
-      const p1 = tree.transact(() => tree.$.x(2));
-      await flush();
-      const p2 = tree.transact(() => {
-        tree.$.z(9);
-        tree.$.x(5);
-      });
-      await flush();
-      if (confirmFirst) p1.confirm(); // must spare x's descriptor: p2 needs it
-      else p1.rollback();
-      await flush();
-      p2.rollback();
-      await flush();
-    };
-    await cycle(true);
-    const afterOne = descriptors();
-    // Spared descriptors are kept, not collected, but they cannot grow past
-    // one per written position (x and z here), however many cycles run.
-    expect(afterOne).toBeLessThanOrEqual(2);
-    for (let i = 0; i < 25; i++) await cycle(i % 2 === 0);
-    expect(descriptors()).toBeLessThanOrEqual(2);
+    const before = descriptors();
+    tree.transact(() => tree.$.x(1)).confirm();
+    await flush();
+    tree.transact(() => tree.$.x(2)).rollback();
+    await flush();
+    expect(descriptors()).toBe(before);
     tree.destroy();
   });
 
@@ -355,6 +343,136 @@ describe('link across overlapping transactions', () => {
     expect(second.at(-1)).toBe(7);
     l1.dispose();
     l2.dispose();
+    tree.destroy();
+  });
+
+  it('undo and redo stay observable whichever overlapping transaction settles first', async () => {
+    // A settlement can forget a scalar descriptor that restoration history
+    // still needs; the undo must then notify on the effect's own path.
+    const orders = [
+      ['c2', 'c1'],
+      ['r2', 'c1'],
+      ['c2', 'r1'],
+      ['r2', 'r1'],
+      ['c1', 'c2'],
+      ['c1', 'r2'],
+    ] as const;
+    for (const order of orders) {
+      const tree = signalTree(
+        { x: 0 },
+        { enhancers: [restoration({ maxHistorySize: 10 }), transactions()] }
+      );
+      const sent: number[] = [];
+      const relation = link(tree.$.x, { set: (v) => void sent.push(v) });
+      await flush();
+      const p1 = tree.transact(() => undoable(() => tree.$.x(1)));
+      await flush();
+      const p2 = tree.transact(() => undoable(() => tree.$.x(2)));
+      await flush();
+      for (const step of order) {
+        const pending = step.endsWith('1') ? p1 : p2;
+        if (step.startsWith('c')) pending.confirm();
+        else pending.rollback();
+        await flush();
+      }
+      tree.undo();
+      await flush();
+      expect([order.join(','), sent.at(-1)]).toEqual([
+        order.join(','),
+        tree.$.x(),
+      ]);
+      tree.redo();
+      await flush();
+      expect([order.join(','), sent.at(-1)]).toEqual([
+        order.join(','),
+        tree.$.x(),
+      ]);
+      relation.dispose();
+      tree.destroy();
+    }
+  });
+
+  it('undo after an undoable write inside a confirmed transaction is observed', async () => {
+    const tree = signalTree(
+      { x: 0 },
+      { enhancers: [restoration({ maxHistorySize: 10 }), transactions()] }
+    );
+    const sent: number[] = [];
+    const relation = link(tree.$.x, { set: (v) => void sent.push(v) });
+    await flush();
+    tree.transact(() => undoable(() => tree.$.x(1))).confirm();
+    await flush();
+    tree.undo();
+    await flush();
+    expect(tree.$.x()).toBe(0);
+    expect(sent.at(-1)).toBe(0);
+    relation.dispose();
+    tree.destroy();
+  });
+
+  it('rolling back two overlapping transactions newest-first in one tick is observed', async () => {
+    // The two compensations coalesce; the merged write must keep its tree.
+    const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
+    const sent: number[] = [];
+    const relation = link(tree.$.x, { set: (v) => void sent.push(v) });
+    await flush();
+    const t3 = tree.transact(() => tree.$.x(3));
+    await flush();
+    const t4 = tree.transact(() => tree.$.x(4));
+    await flush();
+    t4.rollback();
+    t3.rollback();
+    await flush();
+    expect(tree.$.x()).toBe(0);
+    expect(await settledWithin(relation)).toBe(true);
+    expect(sent.at(-1)).toBe(0);
+    relation.dispose();
+    tree.destroy();
+  });
+
+  it('same-tick entity writes on two same-shaped trees reach both trees', async () => {
+    type Row = { id: string; v: number };
+    const make = () =>
+      signalTree(
+        { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
+        { enhancers: [transactions()] }
+      );
+    const a = make();
+    const b = make();
+    a.$.rows.addOne({ id: 'r1', v: 1 });
+    b.$.rows.addOne({ id: 'r1', v: 1 });
+    await flush();
+    const sentA: Row[][] = [];
+    const sentB: Row[][] = [];
+    const linkA = link(a.$.rows, { set: (v) => void sentA.push(v as Row[]) });
+    const linkB = link(b.$.rows, { set: (v) => void sentB.push(v as Row[]) });
+    await flush();
+    a.$.rows.updateOne('r1', { v: 2 });
+    b.$.rows.updateOne('r1', { v: 3 });
+    await flush();
+    expect(sentA.at(-1)?.[0]?.v).toBe(2);
+    expect(sentB.at(-1)?.[0]?.v).toBe(3);
+    linkA.dispose();
+    linkB.dispose();
+    a.destroy();
+    b.destroy();
+  });
+
+  it('a disposed link does not stay held behind a pending transaction', async () => {
+    const tree = signalTree(
+      { x: 0, other: 0 },
+      { enhancers: [transactions()] }
+    );
+    const pending = tree.transact(() => tree.$.other(1));
+    await flush();
+    for (let i = 1; i <= 5; i++) {
+      const relation = link(tree.$.x, { set: () => undefined });
+      tree.$.x(i);
+      await flush();
+      relation.dispose();
+    }
+    expect(getHeldConsequenceCountForTesting(tree.$)).toBe(0);
+    pending.confirm();
     tree.destroy();
   });
 

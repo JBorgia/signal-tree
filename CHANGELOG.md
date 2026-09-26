@@ -38,19 +38,37 @@ the deprecation path applies normally. See
 
 ### Carried from 15.3.1
 
-The 15.3.1 correctness fixes are carried on this line (see that entry for the
-reproductions): `link()` endpoints and `settled()` under a pending transaction,
-a rolled-back overlapping transaction notifying its compensation, and a
-throwing write observer no longer stranding `transact()`. The contained-error
-policy is the same: batched observer errors go to `onTreeError`, with
-`console.error` [ST2034] as the fallback. Two differences from 15.x, both
-following this line's recovery-handle contract:
+The 15.3.1 patch (released from the 15.x line; its full entry lives there) is
+carried on this line:
 
-- A failure after the callback returns (the invalidation group closing, or the
-  mutation capture failing to release) rolls back through the handle. If that
-  rollback is refused, the thrown error carries `recovery` with
-  `callbackFailed: false`.
-- `SignalTreeRollbackRecovery` documents that case. Its shape is unchanged.
+- What observers see under `transact()` and `restoration()`: `link()`
+  endpoints and `settled()` while a transaction is pending, rolled-back
+  overlapping transactions (including newest-first in one tick), undo/redo
+  after a settled transaction, and same-tick entity writes on two same-shaped
+  trees.
+- A throwing write observer no longer strands `transact()`. Batched observer
+  errors go to `onTreeError` and to the console as [ST2034]: always in
+  development, and in production when no listener took the report. A write an
+  `onTreeError` listener makes while handling a contained report is reported
+  to the console only, so the two cannot loop.
+- A disposed link withdraws its held consequences.
+
+Differences from 15.x, following this line's recovery-handle contract:
+
+- A failure after the callback returns (the invalidation group closing, or
+  the mutation capture failing to release) rolls back through the handle. If
+  that rollback is refused, the thrown error carries `recovery` with
+  `callbackFailed: false`, and the original failure is reported.
+- If the rollback installs but its delivery fails, the original failure is
+  thrown and the delivery error is reported.
+- `SignalTreeRollbackRecovery` documents the post-callback case. Its shape is
+  unchanged.
+- Still open on this line, with no known supported trigger: a failure while
+  recording the pending turn, and a throw out of the post-callback flush.
+
+Known issues that also reproduce here: an entity row restored by rollback or
+undo/redo is not seen by linked endpoints, and realization descriptors are
+retained for retired entities.
 
 ### For users
 

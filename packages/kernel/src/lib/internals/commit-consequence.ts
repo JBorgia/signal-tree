@@ -309,6 +309,25 @@ export function cancelCommitScopes(owner: object): void {
   scopes.clear();
 }
 
+/**
+ * Withdraw a HELD consequence that has not run, for a claimant that no longer
+ * wants its work (a disposed Link). Without it the held `run` closure, and
+ * everything it captures, stays reachable until every scope on the tree
+ * settles, which for an abandoned transaction is never. Only the tree-wide
+ * hold is searched: a consequence queued inside an owning scope is dropped or
+ * run when that scope settles.
+ */
+export function withdrawHeldConsequence(claimant: unknown, key: unknown): void {
+  const scopeKey = resolveScopeKey(claimant);
+  if (scopeKey) heldByKey.get(scopeKey)?.delete(key);
+}
+
+/** @internal Test seam: how many consequences are held for this node's tree. */
+export function getHeldConsequenceCountForTesting(node: unknown): number {
+  const scopeKey = resolveScopeKey(node);
+  return (scopeKey && heldByKey.get(scopeKey)?.size) || 0;
+}
+
 /** True while any explicit transaction on this node's tree is unsettled. */
 export function hasOpenCommitScope(node: object): boolean {
   const key = resolveScopeKey(node);
