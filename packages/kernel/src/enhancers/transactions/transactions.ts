@@ -1981,6 +1981,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
     }
 
     notifier?.flushSync();
+    // From here until transaction() returns, a nested call is refused. Set
+    // after the pre-open flush, so observers of writes made before this call
+    // can still open a transaction (it finishes first and inverts nothing).
+    recordingTransaction = true;
     const transactionId = nextTransactionId++;
     const descriptorOwnersBefore = new Set(realizationDescriptors.keys());
     pendingTransactions.set(transactionId, createCaptureBucket());
@@ -2427,8 +2431,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
           'Nested transaction is not supported: another transaction on this tree has not returned yet'
         );
       }
-      getPathNotifier()?.flushSync();
-      recordingTransaction = true;
       try {
         return recordTransaction(fn);
       } finally {
