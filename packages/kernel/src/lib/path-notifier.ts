@@ -341,7 +341,7 @@ export class PathNotifier {
     // could only escape into whoever flushed. That was a `transaction()` that
     // then returned no handle and left its commit scope open (holding every
     // later Link consequence), or a microtask that dropped the rest of the
-    // batch and the flush callbacks. Report it (onTreeError, else [ST2034])
+    // batch and the flush callbacks. Report it (onTreeError and [ST2034])
     // and keep delivering.
     //
     // SYNCHRONOUS delivery (batching disabled, an internal seam) is not

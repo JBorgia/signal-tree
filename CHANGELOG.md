@@ -1,15 +1,16 @@
 ## Unreleased (15.3.1)
 
-**TL;DR** — **Patch. No API change; correctness fixes for what observers see
-under `transactions()` and `restoration()`, and one new diagnostic.** (1) A
-`link()` endpoint could miss values, and `link.settled()` could wait forever,
-while a transaction was pending on the same tree. Rollbacks and undo/redo could
-also change the tree without telling any observer. (2) A write observer that
-threw could make `transaction()` throw after its writes were applied, with no
-handle, and hold every later `link()` on that tree. Observer errors are now
-contained and reported through `onTreeError`, and to the console as [ST2034].
-Take it if you use `link()`, devtools or `observeWrites()` with
-`transactions()` or `restoration()`.
+**TL;DR** — **Patch. No API change, but three behaviour changes you could
+notice: observer errors are contained instead of thrown, a throw from code
+that runs as the transaction closes now rolls the transaction back, and an
+observer can no longer open a second transaction on the tree mid-call.** The
+fixes: (1) a `link()` endpoint could miss values, and `link.settled()` could
+wait forever, while a transaction was pending on the same tree; rollbacks and
+undo/redo could change the tree without telling any observer. (2) A write
+observer that threw could make `transaction()` throw after its writes were
+applied, with no handle, and hold every later `link()` on that tree. Take it
+if you use `link()`, devtools or `observeWrites()` with `transactions()` or
+`restoration()`.
 
 ### What observers saw, and now see
 
@@ -63,9 +64,9 @@ invalidation group closed produced the same strand.
 
 The policy is now:
 
-- **An observer cannot fail the write or transaction it observes.** In
-  deferred (batched) delivery, each write subscriber and each transaction turn
-  listener is isolated. Delivery continues to the other subscribers, the rest
+- **A write observer cannot fail the write or transaction it observes.** In
+  deferred (batched) delivery, each write subscriber (`observeWrites()`,
+  devtools, `link()`) and each transaction turn listener is isolated. Delivery continues to the other subscribers, the rest
   of the batch and the flush callbacks. The error goes to `onTreeError`
   (operation `notify:subscriber` or `transaction:listener`, with the tree's id)
   and to the console as [ST2034]. The console line is always written in
@@ -88,6 +89,14 @@ The policy is now:
   the step that records the pending turn is not rolled back; no supported
   trigger for it is known.
 
+- **`transaction()` is not re-entrant on a tree for its whole call.** An
+  observer that runs after the callback returns could open a second
+  transaction on the same tree. That one was ordered first, so rolling back
+  the older one, or the automatic rollback above, undid the newer one's
+  write, even a confirmed one. Opening one there now throws
+  `Nested transaction is not supported`, as it already did inside the
+  callback. Observers of writes made before the call still may.
+
 A callback that throws `undefined` now fails the transaction too. It used to be
 rolled back and then reported as a success, with a handle.
 
@@ -100,6 +109,21 @@ Synchronous delivery (batching disabled, an internal test seam) is unchanged.
   uncaught error. It is now reported to `onTreeError` and the console.
 - In development, [ST2034] is written even when an `onTreeError` listener is
   registered.
+- **Code that runs as the invalidation group closes can now fail the
+  transaction, and the transaction is rolled back first.** That code is a
+  subscribed derived location, and under `@signal-tree/solid` and
+  `@signal-tree/vue` it includes your own computations, effects and sync
+  watchers. On 15.3.0 such an error made `transaction()` throw with the writes
+  applied and the commit scope stranded. Now it rolls the writes back and
+  rethrows. Two framework details: inside an enclosing Solid `batch()`,
+  `transaction()` still returns a handle and the error surfaces from the
+  batch; and Vue only rethrows watcher errors in development (production logs
+  them), so the same error rolls back in development and commits in
+  production.
+- A `transaction()` call from an observer while another transaction on the
+  same tree has not returned now throws (see above). Under Solid or Vue, an
+  effect or sync watcher that does this as the group closes therefore makes
+  the outer transaction roll back and throw.
 - `reportTreeError` (internal) now returns whether any listener took the report
   without throwing. `onTreeError` and `TreeErrorEvent` are unchanged.
 
@@ -111,6 +135,14 @@ Each was reproduced on the installed 15.3.0 and is unchanged by this release:
   `transaction(() => rows.removeOne('A')).rollback()`, or an undo/redo that
   brings a removed row back, the tree has the row again but a linked endpoint
   keeps the row set without it.
+- **`coalesce()` (the `batching()` enhancer) around a transaction moves its
+  writes out of it.** They are applied after the transaction's callback has
+  returned, so `rollback()` reverses nothing and a failed transaction's
+  writes still land. `coalesce(() => undoable(...))` also records no history.
+- **Undo or redo while a transaction on the same location is pending is not
+  reconciled with it** (the 16.x line fixes this). Rolling the transaction
+  back afterwards reverses straight through the undo or redo, and confirming
+  it commits a write the tree no longer holds.
 - **Realization descriptors are retained for retired entities.** In the
   measured fixture, a tree with `transactions()` kept 4 descriptor entries for
   every entity added and removed by ordinary (non-transaction) writes, 3 when
@@ -138,6 +170,7 @@ effect was mutation-checked: reverting it fails at least one pinned case. Four
 branches have no public trigger and are not pinned: the commit-or-discard
 outcome of the post-callback rollback, the materialize-failure branch, the
 synchronous-delivery path, and the merge of two writes with different origins.
+The guard on `coalesce()`'s secondary-error console call is not pinned either.
 The installed-package checks fail on 15.3.0 and pass on the release candidate.
 
 ## 15.3.0 (2026-09-24)
