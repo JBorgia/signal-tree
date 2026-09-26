@@ -157,28 +157,46 @@ function safeConsoleError(message: string, error: unknown): void {
  * transaction turn listener (onPendingCreated/Confirmed/Discarded). The write or turn it observed already
  * exists, so the error must not escape into whoever flushed.
  *
- * Goes to `onTreeError` like any other report. The FALLBACK is explicit: when
- * no listener took the report (none registered, or every one threw), or when
- * the failure carries no tree to attribute it to, it is written to
- * `console.error` as [ST2034] — in production too. These errors used to throw;
- * containing them must not make them silent.
+ * Goes to `onTreeError` like any other report. The console line [ST2034] is
+ * explicit and never silent:
+ *
+ * - in development it is ALWAYS written, because a listener that returns
+ *   normally may still have ignored the event (one filtering on `link:set`,
+ *   or routing by tree);
+ * - in production it is written when no listener took the report (none
+ *   registered, or every one threw) or the failure names no tree.
+ *
+ * These errors used to throw; containing them must not make them silent.
+ *
+ * A contained error on a write that an `onTreeError` listener itself made
+ * while handling a contained report goes to the console only. Otherwise a
+ * listener that writes on every report, with an observer that throws on
+ * every write, reported forever and `transaction()` never returned.
  */
 export function reportContainedObserverError(event: {
   readonly error: unknown;
   readonly operation: 'notify:subscriber' | 'transaction:listener';
   readonly treeId?: TreeId;
   readonly path?: string;
+  /** The observed write was made by an onTreeError listener's report. */
+  readonly reportCaused?: boolean;
 }): void {
-  const { error, operation, treeId, path } = event;
-  if (
-    treeId !== undefined &&
-    reportTreeError({
-      error,
-      operation,
-      treeId,
-      ...(path === undefined ? {} : { path }),
-    })
-  ) {
+  const { error, operation, treeId, path, reportCaused } = event;
+  let received = false;
+  if (treeId !== undefined && !reportCaused) {
+    reportingContained++;
+    try {
+      received = reportTreeError({
+        error,
+        operation,
+        treeId,
+        ...(path === undefined ? {} : { path }),
+      });
+    } finally {
+      reportingContained--;
+    }
+  }
+  if (received && !(typeof ngDevMode === 'undefined' || ngDevMode)) {
     return;
   }
   safeConsoleError(
@@ -187,6 +205,15 @@ export function reportContainedObserverError(event: {
       : 'SignalTree: a transaction turn listener threw; the transaction continued. [ST2034]',
     error
   );
+}
+
+// Depth of contained reports being delivered to onTreeError listeners right
+// now. The notifier tags writes made in that window (see reportCaused above).
+let reportingContained = 0;
+
+/** @internal Whether a contained observer error is being delivered to listeners. */
+export function isReportingContainedError(): boolean {
+  return reportingContained > 0;
 }
 
 /** Test seam — listeners are module-global, so a spec must be able to reset. */

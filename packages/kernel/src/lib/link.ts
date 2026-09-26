@@ -23,7 +23,10 @@ import {
   isTraversableNode,
 } from './internals/node-shape';
 import { getRootTree } from './internals/root-source';
-import { scheduleDurableConsequence } from './internals/commit-consequence';
+import {
+  scheduleDurableConsequence,
+  withdrawHeldConsequence,
+} from './internals/commit-consequence';
 import type { EntityMapBuilder } from './markers/entity-map';
 import type { NodeAccessor } from './node-accessor';
 
@@ -657,6 +660,9 @@ export function link<S>(
       offSub();
       offFlush?.();
       offSource?.();
+      // Its held consequence would only no-op now, but it keeps this whole
+      // relationship reachable until the tree's transactions settle.
+      withdrawHeldConsequence(x as object, consequenceKey);
       // Release anyone already inside `settled()`: a disposed link owns no
       // further work, and a held observation's count never returns to zero on
       // its own.

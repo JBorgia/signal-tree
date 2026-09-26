@@ -22,7 +22,10 @@ import {
 import { getWriteParticipation } from './write-participation';
 
 import { installPathDeliveryRuntime } from './internals/path-observation-port';
-import { reportContainedObserverError } from './internals/error-reporter';
+import {
+  isReportingContainedError,
+  reportContainedObserverError,
+} from './internals/error-reporter';
 import type { TreeId } from './internals/position-registry';
 import type { WriteMetadata } from './mutation-types';
 
@@ -64,6 +67,8 @@ type PendingEntry = {
   ownerId?: number;
   subjectIds?: number[];
   positionIds?: number[];
+  /** Written by an onTreeError listener while it handled a contained report. */
+  reportCaused?: boolean;
 };
 
 type PendingSlot = PendingEntry | PendingEntry[];
@@ -86,6 +91,37 @@ const materializeDeliveryMeta = (
  * Used internally by SignalTree for entity hooks and enhancers.
  * Access via getPathNotifier().
  */
+/** The tree a pending entry belongs to, however its emitter supplied it. */
+function effectiveOwner(entry: {
+  ownerId?: number;
+  meta?: WriteMetadata;
+}): number | undefined {
+  return (
+    entry.ownerId ?? (entry.meta as { ownerId?: number } | undefined)?.ownerId
+  );
+}
+
+/**
+ * The metadata two coalesced writes agree on: every field with the same value
+ * on both, nothing either one alone claims. `undefined` when nothing agrees.
+ */
+function agreedMeta(
+  left: WriteMetadata,
+  right: WriteMetadata
+): WriteMetadata | undefined {
+  const agreed: Record<string, unknown> = {};
+  let any = false;
+  const l = left as Record<string, unknown>;
+  const r = right as Record<string, unknown>;
+  for (const key of Object.keys(l)) {
+    if (key in r && Object.is(l[key], r[key])) {
+      agreed[key] = l[key];
+      any = true;
+    }
+  }
+  return any ? (agreed as WriteMetadata) : undefined;
+}
+
 export class PathNotifier {
   private static readonly ownerBoundarySeparator = '\u0000';
 
@@ -249,6 +285,7 @@ export class PathNotifier {
       ownerId,
       subjectIds,
       positionIds,
+      ...(isReportingContainedError() ? { reportCaused: true } : {}),
     };
 
     this.enqueuePending(entry);
@@ -276,7 +313,8 @@ export class PathNotifier {
     meta?: WriteMetadata,
     declaredScopes?: DeclaredWriteScopes,
     ownerId?: number,
-    isolateSubscribers = false
+    isolateSubscribers = false,
+    reportCaused = false
   ): void {
     // ⚠️ THE INTERCEPTOR LOOP WAS DELETED IN 15.0 — PATH-NOTIFIER-INTERCEPT-
     // SURVIVAL-0. It ran here, before subscribers, and could suppress delivery
@@ -306,9 +344,11 @@ export class PathNotifier {
     // batch and the flush callbacks. Report it (onTreeError, else [ST2034])
     // and keep delivering.
     //
-    // SYNCHRONOUS delivery (batching disabled, an internal seam) still throws
-    // into the writer's own stack, unchanged; the 16.x line pins rollback()
-    // settling first and then surfacing it there.
+    // SYNCHRONOUS delivery (batching disabled, an internal seam) is not
+    // isolated here, which is unchanged: an entity write's observer error
+    // throws into the writer, while a scalar write's is caught earlier by the
+    // intrinsic-mutation observer composition. The 16.x line pins rollback()
+    // settling first and then surfacing a synchronous delivery error.
     for (const [pattern, handlers] of this.subscribers) {
       if (this.matches(pattern, path)) {
         for (const handler of handlers) {
@@ -336,6 +376,7 @@ export class PathNotifier {
                 | TreeId
                 | undefined,
               path,
+              reportCaused,
             });
           }
         }
@@ -386,7 +427,8 @@ export class PathNotifier {
           materializeDeliveryMeta(entry.meta),
           entry.declaredScopes,
           entry.ownerId,
-          true
+          true,
+          entry.reportCaused === true
         );
       }
     }
@@ -532,7 +574,12 @@ export class PathNotifier {
     // too. Entries from emitters that do not supply one both carry `undefined`
     // and compare exactly as they did before — the fix cannot make a
     // single-tree case newly distinct.
-    if (left.ownerId !== right.ownerId) {
+    //
+    // Entity writes name their tree only in meta.ownerId, so the parameter
+    // alone let two same-shaped trees' same-key writes in one tick merge into
+    // one delivery: whichever tree wrote last won, and the other tree's Link
+    // and undo never saw its write.
+    if (effectiveOwner(left) !== effectiveOwner(right)) {
       return false;
     }
 
@@ -597,6 +644,7 @@ export class PathNotifier {
     target.positionId = next.positionId;
     target.subjectIds = next.subjectIds;
     target.positionIds = next.positionIds;
+    if (next.reportCaused) target.reportCaused = true;
   }
 
   private mergeOrigin(left?: string, right?: string): string | undefined {
@@ -616,7 +664,7 @@ export class PathNotifier {
       return undefined;
     }
     if (left.origin !== right.origin) {
-      return undefined;
+      return agreedMeta(left, right);
     }
     if (
       left.transactionId !== right.transactionId ||
@@ -624,7 +672,11 @@ export class PathNotifier {
       left.mutationIntent !== right.mutationIntent ||
       getWriteParticipation(left) !== getWriteParticipation(right)
     ) {
-      return undefined;
+      // Keep what both writes agree on rather than dropping everything. Two
+      // compensations from different transactions (newest rolled back first,
+      // same tick) lost their tree id this way, and Link, which only accepts
+      // writes naming its tree, never saw the value change back.
+      return agreedMeta(left, right);
     }
     if (left.structuralEffect && !right.structuralEffect) {
       return {
