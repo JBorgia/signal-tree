@@ -636,6 +636,11 @@ class TransactionAuthority {
    */
   private evictedConfirmed = false;
   private pendingTurns = new Map<number, TransactionTurnRecord>();
+  // How many pending turns wrote each position. Kept in step with
+  // `pendingTurns` at its only three mutation sites, so asking whether a
+  // settlement may forget a descriptor is O(1) rather than a rebuild of every
+  // pending turn's positions (which made settling P overlapping turns O(P^2)).
+  private readonly pendingPositionCounts = new Map<number, number>();
   private nextTurnId = 1;
   private queuedEvidence = new Map<number, Map<string, TurnEffect>>();
 
@@ -744,6 +749,7 @@ class TransactionAuthority {
       return undefined;
     }
     this.pendingTurns.set(turn.id, turn);
+    this.countPendingPositions(turn, 1);
     this.pendingOpenedAtSeq.set(turn.id, this.ledgerSeq);
     this.retainPendingClaims(turn.id, turn.restorationSubjectIds ?? []);
     return cloneTurnRecord(turn);
@@ -783,6 +789,7 @@ class TransactionAuthority {
       return undefined;
     }
     this.pendingTurns.delete(turnId);
+    this.countPendingPositions(turn, -1);
     this.pendingOpenedAtSeq.delete(turnId);
     this.queuedEvidence.delete(turnId);
     // SETTLED. Confirmation discards rollback state rather than becoming
@@ -805,6 +812,7 @@ class TransactionAuthority {
       return undefined;
     }
     this.pendingTurns.delete(turnId);
+    this.countPendingPositions(turn, -1);
     this.pendingOpenedAtSeq.delete(turnId);
     this.queuedEvidence.delete(turnId);
     this.releasePendingClaims(turnId);
@@ -1054,12 +1062,20 @@ class TransactionAuthority {
     return [...this.pendingTurns.keys()].sort((left, right) => left - right);
   }
 
-  /** Positions any still-pending turn wrote; its rollback needs their realization. */
-  getPendingPositionIds(): Set<number> {
-    const positions = new Set<number>();
-    for (const turn of this.pendingTurns.values())
-      for (const position of turn.__positionIds ?? []) positions.add(position);
-    return positions;
+  /** Whether a still-pending turn wrote this position; its rollback needs the realization. */
+  isPositionPending(position: number): boolean {
+    return this.pendingPositionCounts.has(position);
+  }
+
+  private countPendingPositions(
+    turn: TransactionTurnRecord,
+    delta: 1 | -1
+  ): void {
+    for (const position of new Set(turn.__positionIds ?? [])) {
+      const next = (this.pendingPositionCounts.get(position) ?? 0) + delta;
+      if (next > 0) this.pendingPositionCounts.set(position, next);
+      else this.pendingPositionCounts.delete(position);
+    }
   }
 
   /**
@@ -1271,15 +1287,24 @@ export function getOrCreateInternalTransactionRuntime<T>(
   // still be needed by an OVERLAPPING transaction: its rollback resolves the
   // path to notify on through the descriptor, and with the descriptor gone the
   // compensation is applied silently -- no subscriber, Link included, learns
-  // the value changed back. Such descriptors are deferred instead of deleted,
-  // and a later settlement collects them once nothing pending refers to them.
-  // `descriptorOwnersBefore` is per transaction, so without the deferred set a
-  // descriptor spared here would be protected forever by the next
-  // transaction's snapshot.
-  const deferredDescriptorOwners = new Set<number>();
+  // the value changed back. Such a descriptor is kept.
+  //
+  // It is deliberately NOT collected later. A later transaction's
+  // before-snapshot protects it like any descriptor that predates it, and
+  // restoration's undo relies on that protection: an earlier revision
+  // collected spared descriptors once nothing pending needed them, and a
+  // later undo of the same location then notified nobody. The cost is at most
+  // one descriptor per written position, the steady state ordinary writes
+  // already produce.
+  //
+  // Only the settling transaction's OWN positions are examined: every
+  // descriptor its capture created is keyed by one of them. Scanning the whole
+  // map made each settlement O(descriptors), and settling P overlapping
+  // transactions O(P^2). Deleting less can never silence a notification.
   const forgetUnclaimedDescriptorSubjects = (
     subjectIds: readonly number[],
-    descriptorOwnersBefore: ReadonlySet<number>
+    descriptorOwnersBefore: ReadonlySet<number>,
+    ownPositions: readonly number[]
   ): void => {
     const claims = getSubjectRestorationClaims(tree);
     const unclaimed = [...new Set(subjectIds)].filter(
@@ -1289,30 +1314,29 @@ export function getOrCreateInternalTransactionRuntime<T>(
       realizationDescriptors,
       unclaimed
     );
-    const stillNeeded = authority.getPendingPositionIds();
-    // An OPEN transaction's writes are normally captured (and their
-    // descriptors recreated) at its post-callback flush, after anything its
-    // callback settles. This covers a flush that runs inside the callback.
-    for (const bucket of pendingTransactions.values())
-      for (const position of bucket.positionIds) stillNeeded.add(position);
-    for (const [owner, descriptor] of realizationDescriptors) {
-      if (
-        descriptorOwnersBefore.has(owner) &&
-        !deferredDescriptorOwners.has(owner)
-      ) {
+    const neededByPending = (owner: number): boolean => {
+      if (authority.isPositionPending(owner)) return true;
+      // An OPEN transaction's writes are normally captured (and their
+      // descriptors recreated) at its post-callback flush, after anything its
+      // callback settles. This covers a flush inside the callback. Nesting is
+      // rejected, so there is at most one open bucket.
+      for (const bucket of pendingTransactions.values())
+        if (bucket.positionIds.has(owner)) return true;
+      return false;
+    };
+    for (const owner of new Set(ownPositions)) {
+      if (descriptorOwnersBefore.has(owner)) {
         continue;
       }
+      const descriptor = realizationDescriptors.get(owner);
       if (
+        descriptor &&
         (descriptor.subjectDescriptors?.size ?? 0) === 0 &&
         (descriptor.structuralEffects?.size ?? 0) === 0 &&
-        (descriptor.structuralEffectBySubject?.size ?? 0) === 0
+        (descriptor.structuralEffectBySubject?.size ?? 0) === 0 &&
+        !neededByPending(owner)
       ) {
-        if (stillNeeded.has(owner)) {
-          deferredDescriptorOwners.add(owner);
-          continue;
-        }
         realizationDescriptors.delete(owner);
-        deferredDescriptorOwners.delete(owner);
       }
     }
   };
@@ -2661,15 +2685,18 @@ export function getOrCreateInternalTransactionRuntime<T>(
         if (locations) locations.runInvalidationGroup(executeTransaction);
         else executeTransaction();
       } catch (error) {
+        // The invalidation group settles its publishers AFTER the callback
+        // returns, so a throw here with no callback failure is a post-callback
+        // failure (recovery.callbackFailed stays false), not the callback's.
         if (!primaryFailed) {
-          primaryFailed = true;
-          primaryError = error;
+          cleanupFailed = true;
+          cleanupError = error;
         }
       } finally {
         try {
           releaseCapture?.();
         } catch (error) {
-          if (primaryFailed)
+          if (primaryFailed || cleanupFailed)
             reportCleanupFailure(
               'transaction capture release after failure',
               error
@@ -2776,7 +2803,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
             settleCommitScope(transactionOwnerToken, transactionId, 'commit');
             forgetUnclaimedDescriptorSubjects(
               pendingTurn?.restorationSubjectIds ?? [],
-              descriptorOwnersBefore
+              descriptorOwnersBefore,
+              pendingTurn?.__positionIds ?? []
             );
           }
         },
@@ -2875,7 +2903,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
               } finally {
                 forgetUnclaimedDescriptorSubjects(
                   pendingTurn?.restorationSubjectIds ?? [],
-                  descriptorOwnersBefore
+                  descriptorOwnersBefore,
+                  pendingTurn?.__positionIds ?? []
                 );
               }
             }
@@ -2981,7 +3010,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
         const discarded = authority.discardPending(id);
         forgetUnclaimedDescriptorSubjects(
           discarded?.restorationSubjectIds ?? [],
-          new Set()
+          new Set(),
+          discarded?.__positionIds ?? []
         );
       }
       pendingTransactions.clear();

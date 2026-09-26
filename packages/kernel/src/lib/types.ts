@@ -377,9 +377,11 @@ export type EnhancerCleanup = () => void;
 /**
  * Handle back to a transaction that is STILL PENDING after a settlement
  * attempt failed. Present only when the caller cannot already hold the
- * transaction: `transact()` throws before returning when its callback throws
- * and compensation then refuses, so without this the caller has no reference
- * to a transaction that remains settleable.
+ * transaction: `transact()` throws before returning when its callback throws,
+ * or when something fails after the callback returned (the invalidation group
+ * closing, or releasing the mutation capture), and compensation then refuses.
+ * Without this the caller has no reference to a transaction that remains
+ * settleable. `callbackFailed` tells the two apart.
  *
  * Absent when the turn actually settled. In particular an observer that throws
  * AFTER compensation has installed leaves a rejected turn, and offering
@@ -407,6 +409,8 @@ export type SignalTreeRollbackRecovery = {
   /**
    * Explicit, because a callback may legally `throw undefined`. The absence of
    * `callbackError` cannot distinguish that from "the callback did not throw".
+   * False when the callback returned and a later step failed (a capture
+   * release, for example).
    */
   readonly callbackFailed: boolean;
   /** Whatever the callback threw, including `undefined`. */
