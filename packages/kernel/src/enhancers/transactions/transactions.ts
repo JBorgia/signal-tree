@@ -503,6 +503,11 @@ class TransactionAuthority {
   /** Set once a record has actually been dropped. Never inferred from ids. */
   private evictedConfirmed = false;
   private pendingTurns = new Map<number, TransactionTurnRecord>();
+  // How many pending turns wrote each position. Kept in step with
+  // `pendingTurns` at its only three mutation sites, so asking whether a
+  // settlement may forget a descriptor is O(1) rather than a rebuild of every
+  // pending turn's positions (which made settling P overlapping turns O(P^2)).
+  private readonly pendingPositionCounts = new Map<number, number>();
   private nextTurnId = 1;
 
   /**
@@ -606,6 +611,7 @@ class TransactionAuthority {
       return undefined;
     }
     this.pendingTurns.set(turn.id, turn);
+    this.countPendingPositions(turn, 1);
     this.pendingOpenedAtSeq.set(turn.id, this.ledgerSeq);
     this.retainPendingClaims(turn.id, turn.restorationSubjectIds ?? []);
     return cloneTurnRecord(turn);
@@ -693,6 +699,7 @@ class TransactionAuthority {
       return undefined;
     }
     this.pendingTurns.delete(turnId);
+    this.countPendingPositions(turn, -1);
     this.pendingOpenedAtSeq.delete(turnId);
     // SETTLED. Confirmation discards rollback state rather than becoming
     // permanent history — those are different product concepts. A tree that
@@ -726,6 +733,7 @@ class TransactionAuthority {
       return undefined;
     }
     this.pendingTurns.delete(turnId);
+    this.countPendingPositions(turn, -1);
     this.pendingOpenedAtSeq.delete(turnId);
     this.releasePendingClaims(turnId);
     this.releaseLedgerIfQuiet();
@@ -795,12 +803,20 @@ class TransactionAuthority {
     return [...this.pendingTurns.keys()].sort((left, right) => left - right);
   }
 
-  /** Positions any still-pending turn wrote; its rollback needs their realization. */
-  getPendingPositionIds(): Set<number> {
-    const positions = new Set<number>();
-    for (const turn of this.pendingTurns.values())
-      for (const position of turn.__positionIds ?? []) positions.add(position);
-    return positions;
+  /** Whether a still-pending turn wrote this position; its rollback needs the realization. */
+  isPositionPending(position: number): boolean {
+    return this.pendingPositionCounts.has(position);
+  }
+
+  private countPendingPositions(
+    turn: TransactionTurnRecord,
+    delta: 1 | -1
+  ): void {
+    for (const position of new Set(turn.__positionIds ?? [])) {
+      const next = (this.pendingPositionCounts.get(position) ?? 0) + delta;
+      if (next > 0) this.pendingPositionCounts.set(position, next);
+      else this.pendingPositionCounts.delete(position);
+    }
   }
 
   /**
@@ -945,15 +961,24 @@ export function getOrCreateInternalTransactionRuntime<T>(
   // still be needed by an OVERLAPPING transaction: its rollback resolves the
   // path to notify on through the descriptor, and with the descriptor gone the
   // compensation is applied silently -- no subscriber, Link included, learns
-  // the value changed back. Such descriptors are deferred instead of deleted,
-  // and a later settlement collects them once nothing pending refers to them.
-  // `descriptorOwnersBefore` is per transaction, so without the deferred set a
-  // descriptor spared here would be protected forever by the next
-  // transaction's snapshot.
-  const deferredDescriptorOwners = new Set<number>();
+  // the value changed back. Such a descriptor is kept.
+  //
+  // It is deliberately NOT collected later. A later transaction's
+  // before-snapshot protects it like any descriptor that predates it, and
+  // restoration's undo relies on that protection: an earlier revision
+  // collected spared descriptors once nothing pending needed them, and a
+  // later undo of the same location then notified nobody. The cost is at most
+  // one descriptor per written position, the steady state ordinary writes
+  // already produce.
+  //
+  // Only the settling transaction's OWN positions are examined: every
+  // descriptor its capture created is keyed by one of them. Scanning the whole
+  // map made each settlement O(descriptors), and settling P overlapping
+  // transactions O(P^2). Deleting less can never silence a notification.
   const forgetUnclaimedDescriptorSubjects = (
     subjectIds: readonly number[],
-    descriptorOwnersBefore: ReadonlySet<number>
+    descriptorOwnersBefore: ReadonlySet<number>,
+    ownPositions: readonly number[]
   ): void => {
     const claims = getSubjectRestorationClaims(tree);
     const unclaimed = [...new Set(subjectIds)].filter(
@@ -963,30 +988,29 @@ export function getOrCreateInternalTransactionRuntime<T>(
       realizationDescriptors,
       unclaimed
     );
-    const stillNeeded = authority.getPendingPositionIds();
-    // An OPEN transaction's writes are normally captured (and their
-    // descriptors recreated) at its post-callback flush, after anything its
-    // callback settles. This covers a flush that runs inside the callback.
-    for (const bucket of pendingTransactions.values())
-      for (const position of bucket.positionIds) stillNeeded.add(position);
-    for (const [owner, descriptor] of realizationDescriptors) {
-      if (
-        descriptorOwnersBefore.has(owner) &&
-        !deferredDescriptorOwners.has(owner)
-      ) {
+    const neededByPending = (owner: number): boolean => {
+      if (authority.isPositionPending(owner)) return true;
+      // An OPEN transaction's writes are normally captured (and their
+      // descriptors recreated) at its post-callback flush, after anything its
+      // callback settles. This covers a flush inside the callback. Nesting is
+      // rejected, so there is at most one open bucket.
+      for (const bucket of pendingTransactions.values())
+        if (bucket.positionIds.has(owner)) return true;
+      return false;
+    };
+    for (const owner of new Set(ownPositions)) {
+      if (descriptorOwnersBefore.has(owner)) {
         continue;
       }
+      const descriptor = realizationDescriptors.get(owner);
       if (
+        descriptor &&
         (descriptor.subjectDescriptors?.size ?? 0) === 0 &&
         (descriptor.structuralEffects?.size ?? 0) === 0 &&
-        (descriptor.structuralEffectBySubject?.size ?? 0) === 0
+        (descriptor.structuralEffectBySubject?.size ?? 0) === 0 &&
+        !neededByPending(owner)
       ) {
-        if (stillNeeded.has(owner)) {
-          deferredDescriptorOwners.add(owner);
-          continue;
-        }
         realizationDescriptors.delete(owner);
-        deferredDescriptorOwners.delete(owner);
       }
     }
   };
@@ -1409,6 +1433,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     transactionId: number
   ): {
     captured: boolean;
+    positionIds: number[];
     effects: TurnEffect[];
     baselineValues: Map<number, unknown>;
     orderDeltas: CollectionOrderDelta[];
@@ -1418,15 +1443,17 @@ export function getOrCreateInternalTransactionRuntime<T>(
     if (!bucket) {
       return {
         captured: false,
+        positionIds: [],
         effects: [],
         baselineValues: new Map(),
         orderDeltas: [],
       };
     }
-    const { effects, baselineValues, collectionOrders } =
+    const { positionIds, effects, baselineValues, collectionOrders } =
       drainCaptureBucket(bucket);
     return {
       captured: true,
+      positionIds,
       effects,
       baselineValues,
       orderDeltas: collectionOrders.map((order) =>
@@ -1969,12 +1996,22 @@ export function getOrCreateInternalTransactionRuntime<T>(
       openCommitScope(transactionOwnerToken, transactionId, tree as object);
 
       const releaseCapture = captureRuntime?.activateCapture();
+      // Flags, not `error !== undefined`: a callback may `throw undefined`.
+      let primaryFailed = false;
       let primaryError: unknown;
-      let cleanupError: unknown;
+      // A refused rollback of a failed callback is thrown out of the group and
+      // must keep precedence over the callback's own error, as before.
+      let abortRefused = false;
+      let postCallbackFailed = false;
+      let postCallbackError: unknown;
 
       // Reverse this open transaction's writes and terminate it. Shared by a
-      // throwing callback and by a failure after the callback returned.
-      const abortOpenTransaction = (cause: unknown): void => {
+      // throwing callback and by a failure after the callback returned; only
+      // the former is reported to a refusal as the callback's error.
+      const abortOpenTransaction = (
+        cause: unknown,
+        callbackFailed: boolean
+      ): void => {
         // Starts false and becomes true only once compensation has actually
         // applied. "Nothing to reverse" is a rollback that succeeded trivially,
         // NOT a refusal -- but only while the capture is still here to say
@@ -1982,10 +2019,17 @@ export function getOrCreateInternalTransactionRuntime<T>(
         // (flush, drain), means the authored effects are still live.
         let compensated = false;
         let rollbackSubjectIds: number[] = [];
+        let rollbackPositionIds: number[] = [];
         try {
           notifier?.flushSync();
-          const { captured, effects, baselineValues, orderDeltas } =
-            drainTransactionRollbackInput(transactionId);
+          const {
+            captured,
+            positionIds,
+            effects,
+            baselineValues,
+            orderDeltas,
+          } = drainTransactionRollbackInput(transactionId);
+          rollbackPositionIds = positionIds;
           rollbackSubjectIds = effects
             .map((effect) => effect.subject)
             .filter(
@@ -1997,7 +2041,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
               effects,
               baselineValues,
               orderDeltas,
-              cause
+              callbackFailed ? cause : undefined
             );
           }
           compensated = captured;
@@ -2025,7 +2069,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
             );
             forgetUnclaimedDescriptorSubjects(
               rollbackSubjectIds,
-              descriptorOwnersBefore
+              descriptorOwnersBefore,
+              rollbackPositionIds
             );
           } finally {
             lifecycleChannel.announce({
@@ -2048,8 +2093,14 @@ export function getOrCreateInternalTransactionRuntime<T>(
             fn
           );
         } catch (error) {
+          primaryFailed = true;
           primaryError = error;
-          abortOpenTransaction(error);
+          try {
+            abortOpenTransaction(error, true);
+          } catch (refusal) {
+            abortRefused = true;
+            throw refusal;
+          }
         }
       };
 
@@ -2060,38 +2111,64 @@ export function getOrCreateInternalTransactionRuntime<T>(
         } else {
           executeTransaction();
         }
+      } catch (error) {
+        // The invalidation group settles its publishers AFTER the callback
+        // returns, so a subscribed derived whose compute throws lands here.
+        // It used to escape before any handling below, leaving the writes
+        // applied with no handle and the commit scope open. A failed callback
+        // has already been rolled back and keeps precedence, unless that
+        // rollback was refused: then the group rethrows the refusal, unchanged.
+        if (abortRefused) {
+          throw error;
+        }
+        if (primaryFailed) {
+          reportCleanupFailure(
+            'transaction invalidation group after failure',
+            error
+          );
+        } else {
+          postCallbackFailed = true;
+          postCallbackError = error;
+        }
       } finally {
         try {
           releaseCapture?.();
         } catch (error) {
-          if (primaryError !== undefined) {
+          if (primaryFailed || postCallbackFailed) {
             reportCleanupFailure(
-              'transaction capture release after failure',
+              primaryFailed
+                ? 'transaction capture release after failure'
+                : 'transaction capture release after a post-callback failure',
               error
             );
           } else {
-            cleanupError = error;
+            postCallbackFailed = true;
+            postCallbackError = error;
           }
         }
       }
 
-      if (primaryError !== undefined) {
+      if (primaryFailed) {
         throw primaryError;
       }
 
       // TX-OBSERVER-STRAND-0. The callback returned, so its writes are applied.
-      // From here `transaction()` returns a handle, or throws with those writes
-      // rolled back; either way the commit scope settles. A throw here used to
+      // From here `transaction()` returns a handle, or rolls those writes back
+      // and throws; either way the commit scope settles. A throw here used to
       // leave them applied with no handle, strand the capture bucket, and hold
       // every later Link consequence behind a scope nothing could settle.
       // Observers can no longer throw here (the notifier and the lifecycle
-      // listeners isolate them); this covers what is left, such as a failing
-      // capture release. If the capture itself is what failed, nothing is left
+      // listeners isolate them); this covers what is left: the invalidation
+      // group's epilogue, a failing capture release, and the steps below.
+      //
+      // Two limits, both inherent to 15.x. If the rollback is REFUSED, the
+      // refusal is thrown and the writes stay (15.x has no recovery handle).
+      // If materialize itself fails after taking the capture, nothing is left
       // to reverse, and the scope commits so consequences match the live tree.
       let pendingTurn: TransactionTurnRecord | undefined;
       try {
-        if (cleanupError !== undefined) {
-          throw cleanupError;
+        if (postCallbackFailed) {
+          throw postCallbackError;
         }
 
         // TURN-FEED-0 'staged': the callback has returned, so this transaction's
@@ -2105,7 +2182,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
         notifier?.flushSync();
         pendingTurn = materializePendingTransaction(transactionId);
       } catch (failure) {
-        abortOpenTransaction(failure);
+        abortOpenTransaction(failure, false);
         throw failure;
       }
       const pendingTurnId = pendingTurn?.id;
@@ -2152,7 +2229,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
             settleCommitScope(transactionOwnerToken, transactionId, 'commit');
             forgetUnclaimedDescriptorSubjects(
               pendingTurn?.restorationSubjectIds ?? [],
-              descriptorOwnersBefore
+              descriptorOwnersBefore,
+              pendingTurn?.__positionIds ?? []
             );
           }
         },
@@ -2294,7 +2372,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
           } finally {
             forgetUnclaimedDescriptorSubjects(
               discardedTurn?.restorationSubjectIds ?? [],
-              descriptorOwnersBefore
+              descriptorOwnersBefore,
+              discardedTurn?.__positionIds ?? []
             );
           }
 

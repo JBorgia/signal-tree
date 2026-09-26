@@ -330,7 +330,11 @@ export class PathNotifier {
             reportContainedObserverError({
               error,
               operation: 'notify:subscriber',
-              treeId: ownerId as TreeId | undefined,
+              // Entity and compensation writes name their tree in meta only.
+              treeId: (ownerId ??
+                (meta as { ownerId?: number } | undefined)?.ownerId) as
+                | TreeId
+                | undefined,
               path,
             });
           }

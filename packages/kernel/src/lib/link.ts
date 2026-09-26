@@ -404,6 +404,13 @@ export function link<S>(
    * releases it, so `settled()` waits on a signal instead of spinning.
    */
   const held = new Set<{ promise: Promise<void>; resolve: () => void }>();
+  // Distinct relationships may share a source, but never a collapse key. With
+  // the shared `link` function as the key, a second relationship's flush
+  // replaced the first one's held consequence while any transaction was open:
+  // the first endpoint never received its value and its settled() never
+  // resolved. (Main's link.ts made this change together with the shared
+  // release signal below; the 15.x port first took only the signal.)
+  const consequenceKey = {};
 
   /**
    * In-flight retrievals, as RELEASE SIGNALS rather than a counter - same
@@ -526,8 +533,8 @@ export function link<S>(
     // one and only the last run() ever executes. A fresh release signal per
     // flush therefore orphaned every earlier one, and `settled()` waited on
     // them forever. Coalesced observations belong to one relationship and are
-    // reconciled together on release, so they share one signal. (Same repair
-    // as main's link.ts.)
+    // reconciled together on release, so they share one signal. Together with
+    // the per-relationship `consequenceKey`, this is main's repair.
     let entry = held.values().next().value as
       | { promise: Promise<void>; resolve: () => void }
       | undefined;
@@ -541,7 +548,7 @@ export function link<S>(
 
     scheduleDurableConsequence({
       claimant: x as object,
-      key: link,
+      key: consequenceKey,
       run: () => {
         held.delete(pending);
         pending.resolve();

@@ -1,39 +1,48 @@
 ## Unreleased (15.3.1)
 
-**TL;DR** — **Patch. No API change; two correctness fixes and one new
-diagnostic.** (1) `link.settled()` could wait forever: on 15.3.0 two writes to a
-linked source while ANY transaction was pending were enough. A rolled-back
-overlapping transaction could also leave a linked endpoint on the discarded
-value. (2) A write observer that threw could make `transaction()` throw after
-its writes were applied, with no handle, and hold every later `link()` on that
-tree. Observer errors are now contained and reported through `onTreeError`, or
-to the console as [ST2034] when nothing is listening. Take it if you use
-`link()` with `transactions()`.
+**TL;DR** — **Patch. No API change; correctness fixes for `link()` with
+`transactions()`, and one new diagnostic.** (1) A linked endpoint could stop
+receiving values, and `link.settled()` could wait forever, whenever a
+transaction was pending on the same tree: two separately flushed writes to one
+linked source were enough, as was a second link on that tree. A rolled-back
+overlapping transaction could also leave an endpoint on the discarded value.
+(2) A write observer that threw could make `transaction()` throw after its
+writes were applied, with no handle, and hold every later `link()` on that tree.
+Observer errors are now contained and reported through `onTreeError`, or to the
+console as [ST2034] when nothing takes them. Take it if you use `link()` with
+`transactions()`.
 
-### `link.settled()` hang, and a stale endpoint after an overlapping rollback
+### `link()` endpoints and `settled()` while a transaction is pending
 
-Both reproduced against the 15.3.0 tarball installed from npm, through public
-entry points only:
+Reproduced against the 15.3.0 tarball installed from npm, through public entry
+points only:
 
-    case                                              15.3.0                         15.3.1
-    2 writes to a linked source while any             settled() never resolves       resolves
-      transaction is pending (1 write is fine)
-    T1 writes x=1, T2 writes x=5; T1 confirms,        endpoint stays 5,              endpoint 1,
-      T2 rolls back (tree correctly ends at 1)          settled() never resolves       resolves
+    case (a transaction pending on the same tree)       15.3.0                            15.3.1
+    2 separately flushed writes to one linked source     settled() never resolves          resolves
+      (1 write, or 2 in one flush, was fine)
+    one transaction writes two separately linked         first endpoint never receives     both receive,
+      locations, then confirms                             its value; settled() hangs        both resolve
+    T1 writes x=1, T2 writes x=5; T1 confirms,           endpoint stays 5,                 endpoint 1,
+      T2 rolls back (tree correctly ends at 1)             settled() never resolves          resolves
 
-The tree value was always right. Only what observers saw was wrong, and there
-were two independent causes:
+The tree value was always right; only what observers saw was wrong. Three
+independent causes:
 
-- **The release signal behind `settled()` was orphaned.** Link's durable
-  consequence is keyed, so a later flush replaces a held one and only the last
-  run executes. Each flush minted a fresh release signal, and `settled()`
-  waited on the ones that could never be released. Coalesced observations now
+- **Every link on a tree shared one collapse key.** Link's durable consequence
+  is collapsed per key while a transaction is pending, and the key was the
+  `link` function itself. A second relationship's flush replaced the first
+  one's consequence, so the first endpoint never received its value. Each
+  relationship now has its own key.
+- **The release signal behind `settled()` was orphaned.** A later flush of the
+  same relationship replaces its held consequence, and each flush minted a
+  fresh release signal that nothing could release. Coalesced observations now
   share one signal.
 - **A rollback compensated silently.** Confirming T1 forgot a realization
   descriptor that T2 still needed, and a compensation with no descriptor has no
-  path to notify on. No subscriber, Link included, learned the value changed
-  back. A descriptor a pending turn still refers to is now deferred, and it is
-  collected once nothing pending refers to it.
+  path to notify on. A descriptor a pending turn still refers to is now kept.
+  It is protected afterwards like any descriptor that predates a later
+  transaction, so the extra retention is at most one descriptor per written
+  position.
 
 ### A throwing write observer stranded the transaction
 
@@ -44,47 +53,72 @@ that threw while `transaction()` flushed its writes did this:
     commit scope          never settled, so every later link() consequence was held
     same flush            the rest of the batch and every flush callback were lost
 
+A subscribed derived location whose compute threw as the transaction's
+invalidation group closed produced the same strand.
+
 The policy is now defined in two parts:
 
 - **An observer cannot fail the write or transaction it observes.** In
-  deferred (batched) delivery, each write subscriber and each transaction
-  lifecycle listener is isolated. Its error is reported, and delivery continues
-  to the other subscribers, the rest of the batch and the flush callbacks.
-  Reporting goes through `onTreeError` (operation `notify:subscriber` or
-  `transaction:listener`, with the tree's id). When no `onTreeError` listener
-  is registered, or the write names no tree, the explicit fallback is
-  `console.error` with [ST2034], in production too. These errors used to
-  throw, so containing them must not make them silent. Synchronous delivery
-  (batching disabled, an internal test seam) still throws into the writer.
-- **Once the callback returns, `transaction()` returns a handle or throws
-  with its writes rolled back, and the commit scope settles either way.** This
-  also covers a failure after the callback, such as the internal mutation
-  capture failing to release. That case used to throw with the writes applied
-  and no handle.
+  deferred (batched) delivery, each write subscriber and each transaction turn
+  listener is isolated. Its error is reported, and delivery continues to the
+  other subscribers, the rest of the batch and the flush callbacks. Reporting
+  goes through `onTreeError` (operation `notify:subscriber` or
+  `transaction:listener`, with the tree's id). The explicit fallback is
+  `console.error` with [ST2034], in production too, when no `onTreeError`
+  listener took the report (none registered, or every one threw) or the write
+  names no tree. These errors used to throw, so containing them must not make
+  them silent. A throwing `console.error` cannot abort the flush either.
+  Synchronous delivery (batching disabled, an internal test seam) still throws
+  into the writer.
+- **Once the callback returns, `transaction()` returns a handle, or rolls its
+  writes back and throws; the commit scope settles either way.** This covers a
+  failure as the invalidation group closes and a failure releasing the internal
+  mutation capture. Two limits remain on 15.x. If the rollback is refused,
+  `SignalTreeRollbackError` is thrown and the writes stay applied, since 15.x
+  has no recovery handle. And a failure inside the step that records the
+  pending turn is not rolled back; no supported trigger for it is known.
+
+A callback that throws `undefined` now fails the transaction too. It used to be
+rolled back and then reported as a success, with a handle.
 
 ### Behaviour changes to know about
 
 - An observer error in batched delivery no longer propagates. Before, it
   escaped from `transaction()` or from the microtask that flushed, as an
   uncaught error. If you relied on that throw, register `onTreeError`.
-- `reportTreeError` (internal) now returns whether any listener observed the
-  report. `onTreeError` and `TreeErrorEvent` are unchanged.
+- `reportTreeError` (internal) now returns whether any listener took the report
+  without throwing. `onTreeError` and `TreeErrorEvent` are unchanged.
 
-### Known issue, not fixed here
+### Known issues, not fixed here
 
-A tree with `transactions()` keeps 4 realization-descriptor entries for every
-entity it has ever removed. Measured on the installed 15.3.0: 4 entries per
-retired entity, and about 2.2 KB of retained heap per retired entity against
-under 0.4 KB without `transactions()` (5 runs). Confirming a transaction does
-not reclaim them. This is tracked for 15.3.2.
+Each was reproduced on the installed 15.3.0 and is unchanged by this release:
+
+- **Undo after a settled transaction is invisible to observers.**
+  `transaction(() => undoable(() => x(1))).confirm(); undo()` restores the tree
+  to 0, but a linked endpoint stays on 1. The same happens when any transaction
+  settles while restoration history for that location is recorded.
+- **Rolling back an entity removal does not restore the row for observers.**
+  After `transaction(() => rows.removeOne('A')).rollback()`, the tree has A
+  again, but a linked endpoint keeps the row set without A.
+- **Realization descriptors are retained for retired entities.** In the
+  measured fixture, a tree with `transactions()` kept 4 descriptor entries for
+  every entity added and removed by ordinary (non-transaction) writes, 3 when
+  the add was inside a confirmed transaction, and none when the removal was
+  inside one. That came to about 2.2 KB of retained heap per retired entity,
+  against under 0.4 KB without `transactions()`. Later transactions do not
+  reclaim them.
+
+These are targeted for a later patch; none is promised for a specific version.
 
 ### Verification
 
-Pinned by `link-overlapping-rollback.spec.ts` (10 cases) and
-`transaction-observer-failure.spec.ts` (12 cases). Every fix mechanism was
-mutation-checked: removing it fails at least one pinned case. Both
-installed-package reproductions report the defect on 15.3.0 and pass on a build
-of this branch.
+Pinned by `link-overlapping-rollback.spec.ts` (13 cases) and
+`transaction-observer-failure.spec.ts` (18 cases). Each observable fix
+mechanism was mutation-checked: reverting it fails at least one pinned case.
+Three mechanisms have no public trigger and are not pinned: the commit-or-discard
+outcome of the post-callback abort, the materialize-failure branch, and the
+synchronous-delivery rethrow. The installed-package reproductions fail on 15.3.0
+and pass on the release candidate.
 
 ## 15.3.0 (2026-09-24)
 
