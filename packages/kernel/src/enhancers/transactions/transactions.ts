@@ -975,6 +975,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
   // descriptor its capture created is keyed by one of them. Scanning the whole
   // map made each settlement O(descriptors), and settling P overlapping
   // transactions O(P^2). Deleting less can never silence a notification.
+  // (Forgetting retired SUBJECTS below still visits every descriptor when a
+  // settlement retires any; that step is unchanged.)
   const forgetUnclaimedDescriptorSubjects = (
     subjectIds: readonly number[],
     descriptorOwnersBefore: ReadonlySet<number>,
@@ -2182,7 +2184,37 @@ export function getOrCreateInternalTransactionRuntime<T>(
         notifier?.flushSync();
         pendingTurn = materializePendingTransaction(transactionId);
       } catch (failure) {
-        abortOpenTransaction(failure, false);
+        // The rollback runs inside an invalidation group, like the callback's
+        // own, so compensation reaches location-runtime consumers when the
+        // group closes. A consumer that throws there is a delivery failure
+        // after the rollback applied, not a rollback that failed.
+        let rolledBack = false;
+        const rollBack = (): void => {
+          abortOpenTransaction(failure, false);
+          rolledBack = true;
+        };
+        try {
+          const locationRuntime = getLocationRuntime(tree.$);
+          if (locationRuntime) {
+            locationRuntime.runInvalidationGroup(rollBack);
+          } else {
+            rollBack();
+          }
+        } catch (error) {
+          if (!rolledBack) {
+            // Refused. The refusal is thrown; without this the failure that
+            // made the rollback necessary would leave no trace at all.
+            reportCleanupFailure(
+              'a post-callback step whose rollback was then refused',
+              failure
+            );
+            throw error;
+          }
+          reportCleanupFailure(
+            'rollback delivery after a post-callback failure',
+            error
+          );
+        }
         throw failure;
       }
       const pendingTurnId = pendingTurn?.id;
@@ -2406,10 +2438,16 @@ export function getOrCreateInternalTransactionRuntime<T>(
   };
 
   const reportCleanupFailure = (step: string, error: unknown): void => {
-    console.error(
-      `SignalTree: transactions() cleanup failed during ${step}.`,
-      error
-    );
+    // Guarded: a throwing console (a fail-on-console harness) must not turn
+    // a report into a new failure on the path that is cleaning up.
+    try {
+      console.error(
+        `SignalTree: transactions() cleanup failed during ${step}.`,
+        error
+      );
+    } catch {
+      // Nothing further can be reported safely.
+    }
   };
 
   if (typeof tree.registerCleanup === 'function') {

@@ -1743,7 +1743,7 @@ function resolveNotifyPath(
   }
 
   if (typeof effect.subjectId !== 'number') {
-    return descriptor?.path;
+    return descriptor?.path ?? effect.path;
   }
 
   const registry = getPositionRegistry(tree.$);
