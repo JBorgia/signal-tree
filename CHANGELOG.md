@@ -2,8 +2,8 @@
 
 **TL;DR** — **Patch. No API change, but two behaviour changes you could
 notice: observer errors are contained instead of thrown, and a throw from code
-that runs as the transaction closes now rolls the transaction back (or refuses
-to, if something else wrote the same location meanwhile).** The
+that runs as the transaction closes now rolls the transaction back, or, if
+something else wrote the same location meanwhile, commits it and throws.** The
 fixes: (1) a `link()` endpoint could miss values, and `link.settled()` could
 wait forever, while a transaction was pending on the same tree; rollbacks and
 undo/redo could change the tree without telling any observer. (2) A write
@@ -39,7 +39,8 @@ The causes, each fixed:
 - **Settling one transaction forgot a realization descriptor that another
   still needed**, and a scalar compensation or undo with no descriptor had no
   path to notify on. Such a descriptor is now kept while a pending turn needs
-  it, and a scalar compensation or undo notifies on its own effect's path.
+  it (and not collected afterwards; at most one per written position), and a
+  scalar compensation or undo notifies on its own effect's path.
 
 ### A throwing write observer stranded the transaction
 
@@ -49,6 +50,11 @@ that threw while `transaction()` flushed its writes did this:
     transaction() threw   yes, after its writes were applied; no handle returned
     commit scope          never settled, so every later link() consequence was held
     same flush            the rest of the batch and every flush callback were lost
+
+With `restoration()` installed, 15.3.0 behaved differently: restoration's
+listener performed the flush and swallowed the error, so `transaction()`
+returned a handle, nothing was logged, and the rest of the batch was still
+lost.
 
 A subscribed derived location whose compute threw as the transaction's
 invalidation group closed produced the same strand.
@@ -65,22 +71,39 @@ The policy is now:
   the event. In production it is written when no listener took the report
   (none registered, or every one threw) or the write names no tree. A throwing
   `console.error` cannot abort the flush.
-- **Reports are budgeted.** At most 50 contained errors reach `onTreeError`
-  per task; the rest of that task's go to the console only, with one line
-  saying so. A listener that writes on every report, with an observer that
-  throws on every write, would otherwise loop, synchronously or as a
-  microtask chain.
+- **Reports are budgeted.** At most 50 contained errors per tree reach
+  `onTreeError` within a second; the rest go to the console only, with one
+  line saying so. A listener that writes on every report, with an observer
+  that throws on every write, would otherwise loop, synchronously or as a
+  microtask chain. Fast chains exhaust the budget; slower chains can continue
+  across windows. This is rate limiting, not a termination guarantee.
+  Reporting records are released when their tree is destroyed.
+  The console path is not budgeted, so a `console.error` hook that writes
+  into an observed tree can still loop; and `link()`'s own `link:set` reports
+  are not budgeted (unchanged).
 - **Once the callback returns, `transaction()` returns a handle, or rolls its
-  writes back and throws; the commit scope settles either way.** This covers a
+  writes back and throws; if rollback is refused, writes remain applied as
+  described below. The commit scope settles either way.** This covers a
   failure as the invalidation group closes and a failure releasing the internal
   mutation capture. The rollback runs inside an invalidation group, so a
   consumer that throws while it is delivered does not mask the failure.
-- **An automatic rollback never overwrites someone else's write.** It runs
-  while `transaction()` is still in progress, after observers have had a
-  chance to write the same locations (or open a transaction that does). If any
-  location it would reverse was written again after the transaction wrote it,
-  the rollback is refused: `SignalTreeRollbackError` is thrown and the writes
-  stay as the tree shows them.
+- **The rollback after a post-callback failure never overwrites someone
+  else's write.** It runs while `transaction()` is still in progress, after
+  observers have had a chance to write the same locations (or open a
+  transaction that does). If any location it would reverse (a leaf, or an
+  entity row) was written again after the transaction wrote it, the rollback
+  is refused: `SignalTreeRollbackError` is thrown, the writes stay as the tree
+  shows them, and they are recorded as committed, so an earlier transaction's
+  rollback and restoration see them. Being conservative, a later write that
+  was itself rolled back still counts. Throwing-callback compensation admission
+  is unchanged: its compatibility test records that it can overwrite a later
+  observer write to the same entity row. **If compensation refuses**, however,
+  this patch now consistently records the surviving writes as committed for
+  callback failures as well as post-callback failures. It announces confirmation,
+  retains eligible undo history, and releases consequences before throwing the
+  refusal. This intentionally changes history/undo behavior after refusal;
+  it does not change explicit rollback refusal on a returned pending handle.
+- `coalesce()`'s secondary-error console call cannot throw either.
 
 Two limits remain on 15.x. A refused rollback throws `SignalTreeRollbackError`
 with the writes applied, since 15.x has no recovery handle; the failure that
@@ -109,10 +132,10 @@ Synchronous delivery (batching disabled, an internal test seam) is unchanged.
   rethrows. Two framework details: inside an enclosing Solid `batch()`,
   `transaction()` still returns a handle and the error surfaces from the
   batch; and Vue only rethrows watcher errors in development (production logs
-  them), so the same error rolls back in development and commits in
-  production.
-- At most 50 contained observer errors per task reach `onTreeError`; the
-  rest go to the console.
+  them), so the same error can trigger automatic rollback in development
+  but does not trigger this automatic rollback in production.
+- At most 50 contained observer errors per tree per second reach
+  `onTreeError`; the rest go to the console.
 - `reportTreeError` (internal) now returns whether any listener took the report
   without throwing. `onTreeError` and `TreeErrorEvent` are unchanged.
 
@@ -140,11 +163,24 @@ Each was reproduced on the installed 15.3.0 and is unchanged by this release:
   the transaction afterwards can undo it; a rollback of the two can also be
   refused or allowed in the wrong order. The automatic rollback is guarded
   (see above); explicit rollbacks are not.
-- **Same-tick coalescing can lose a write for observers.** Two overlapping
-  transactions rolled back newest-first in one tick merge into one delivery
-  that Link ignores, so the endpoint stays on the discarded value. Same-tick
-  entity writes on two same-shaped trees merge too, so one tree's write never
-  reaches its link or its undo.
+- **Same-tick coalescing can lose a write for observers.** Two deliveries to
+  one path in the same tick merge when one of them is a rollback compensation,
+  an undo or redo, or an entity write (those name their tree only in
+  metadata). A merge of writes from different origins or transactions drops
+  the tree id, so Link ignores it; a merge across two same-shaped trees loses
+  one tree's write. In each case a linked endpoint keeps the discarded value
+  while the tree is correct. Examples: two overlapping transactions rolled back
+  newest-first; a rollback and then an undo of the same location; two
+  same-shaped trees each rolling back, or each undoing, in one tick; same-tick
+  entity writes on two same-shaped trees.
+- **A whole-value branch write that leaves out a key loses it for good.**
+  Writing a plain object branch with a value that omits a key it had (for
+  example `m({ a: 5 })` on `{ a: 1, c: 3 }`) removes the key, but no write
+  subscriber is told, so a branch-level `link()` can be sent state the tree
+  does not hold. Rollback, the automatic rollback and undo restore the other
+  keys but never the removed one, and the automatic-rollback guard above does
+  not see such a removal. Write the key explicitly (or use `entityMap()` for
+  keyed collections) until this is fixed.
 - **Realization descriptors are retained for retired entities.** In the
   measured fixture, a tree with `transactions()` kept 4 descriptor entries for
   every entity added and removed by ordinary (non-transaction) writes, 3 when
@@ -168,12 +204,13 @@ These are targeted for a later patch; none is promised for a specific version.
 
 Pinned by `link-overlapping-rollback.spec.ts` and
 `transaction-observer-failure.spec.ts`. Each fix mechanism with an observable
-effect was mutation-checked: reverting it fails at least one pinned case. Three
-branches have no public trigger and are not pinned: the commit-or-discard
-outcome of the post-callback rollback, the materialize-failure branch, and the
-synchronous-delivery path. The guard on `coalesce()`'s secondary-error
-console call, and the clearing of the automatic-rollback write record when no
-transaction is open, are not pinned either.
+effect was mutation-checked: reverting it fails at least one pinned case. Two
+branches remain unpinned: the materialize-failure branch and the
+synchronous-delivery path. Callback/release failures now have direct durable
+consequence, lifecycle, ledger, and designated undo/redo controls for automatic
+refusal, plus successful-compensation controls. The guard on `coalesce()`'s secondary-error
+console call and the clearing of the automatic-rollback write record when no
+transaction is open are not pinned either.
 The installed-package checks fail on 15.3.0 and pass on the release candidate.
 
 ## 15.3.0 (2026-09-24)

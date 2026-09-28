@@ -175,8 +175,8 @@ describe('link across overlapping transactions', () => {
     sent.length = 0;
     const p1 = tree.transaction(() => tree.$.x(1));
     await flush();
-    // p2's writes are still in its OPEN bucket, not yet a pending turn, when
-    // p1 settles.
+    // Control, not a pin: p2's writes are still unflushed when p1 settles, so
+    // they are captured afterwards and need no sparing. This passes on 15.3.0.
     const p2 = tree.transaction(() => {
       tree.$.z(9);
       tree.$.x(5);
@@ -236,9 +236,10 @@ describe('link across overlapping transactions', () => {
   });
 
   it('restoration undo after two overlapping confirmed transactions still notifies', async () => {
-    // The spared descriptor must keep the protection a later transaction's
-    // before-snapshot gives it. Collecting it silenced this undo: the tree
-    // went back to 1 while the endpoint stayed on 2.
+    // Regression control for a descriptor-collection change that silenced
+    // this undo (the tree went back to 1, the endpoint stayed on 2). With the
+    // descriptor kept it uses the descriptor's path, so it does not exercise
+    // the notify-path fallback; the settle-order case below does.
     const tree = signalTree(
       { x: 0 },
       { enhancers: [restoration({ maxHistorySize: 10 }), transactions()] }

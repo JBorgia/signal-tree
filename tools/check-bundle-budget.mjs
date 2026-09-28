@@ -203,8 +203,11 @@ const TARGETS = {
     // itself. Raised to the measurement plus the usual narrow headroom rather
     // than clawed back, because reclaiming it is a performance change and
     // belongs in its own release.
+    // 15.3.1: owner-approved containment/reporting lifetime cost, 2026-09-28.
+    // Fresh output: 10501 B gzip, 5 B above the former 10496 B ceiling.
+    // Retain narrow headroom; no other target or development budget changes.
     devKB: 12.45,
-    prodKB: 10.25,
+    prodKB: 10.26,
     code: `
       import { signalTree } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, user: { name: 'a' } });

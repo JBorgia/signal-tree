@@ -324,6 +324,15 @@ available. Reversing an older transaction while a newer overlapping one is
 still open refuses (`cause.kind === 'later-pending-dependency'`); settle the
 newer one first.
 
+**15.3.1 automatic-abort exception (unreleased):** if the callback throws or a
+post-callback step fails before `transaction()` returns its handle, SignalTree
+attempts rollback. If that automatic rollback is refused, the surviving writes
+are recorded as committed, eligible undo history is retained, durable
+consequences are released, and `transaction()` throws `SignalTreeRollbackError`.
+There is no recovery handle on this v15 path. A thrown error therefore does not
+guarantee that the writes were undone. This exception does not apply to an
+explicit `pending.rollback()` call. See the [settlement policy](../../docs/support-policy.md#transaction-failure-policy).
+
 ## Exports
 
 The package publishes three code entry points:
