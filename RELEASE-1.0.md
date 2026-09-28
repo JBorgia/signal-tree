@@ -6,6 +6,22 @@ credible `1.0.0` release candidate.
 This is the release controller, not the full historical backlog. Use it to
 bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
+## v15.3.1 authorized finalization — September 28, 2026
+
+Owner authorized release after reviewing published-15.3.0 versus candidate
+performance. Candidate `703a38f9` passed 83/83 release gates, 83/83 mutation
+proofs, fresh packed consumers, 137/137 browser checks and clean-checkout rehearsal.
+Local performance evidence remains outside the tree; no performance-equivalence
+claim is made. Transaction overhead was measured and disclosed.
+
+Finalize the existing 15.3.1 version without invoking `release:patch` (which would
+increment it again). Date the changelog. Tagged verification and publication now
+run release-only mutation proofs and destroy/rebuild dist after all artifact
+mutation tests, before final consumers and publication. No runtime code changed.
+This metadata/workflow commit supersedes the previous candidate: exact-SHA local
+and Linux verification must pass before signing/tagging and sanctioned publication.
+Record run IDs and results outside the tree while the candidate is frozen.
+
 ## v15.3.1 release preparation — September 28, 2026
 
 Preparation checkpoint: `31a24086`. Bounded runtime repair remains `0faa878d`;

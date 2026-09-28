@@ -70,7 +70,7 @@ jobs:
         run: pnpm run gates -- --release
 
       - name: Prove every gate can still fail
-        run: pnpm run gates:self-test
+        run: pnpm run gates:self-test -- --release
 
       - name: Verify version claims
         run: node scripts/verify-version-claims.js
@@ -82,6 +82,15 @@ jobs:
         run: |
           node tools/verify-tarball-consumer.mjs --self-test
           node tools/verify-tarball-consumer.mjs
+
+      - name: Rebuild clean artifacts after all mutation checks
+        run: |
+          git diff --exit-code
+          rm -rf dist
+          pnpm exec nx run-many -t build --projects=kernel,angular,react,vue,solid --skip-nx-cache
+          node tools/verify-tarball-consumer.mjs
+          node tools/verify-consumer-typecheck.mjs
+          git diff --exit-code
 
       - name: Verify CHANGELOG has an entry for this version
         run: |
