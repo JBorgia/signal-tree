@@ -28,6 +28,15 @@ all mutation proofs, delete dist and rebuild, then packed consumers and clean
 checkout verification. Remote exact-SHA CI and publication require the relevant
 owner authorization. Do not claim release qualification from this preflight.
 
+### Exact-commit proof correction
+
+`5ffe4def` passed 83/83 ordinary release gates but is superseded: full self-test
+reported 82/83 proven, one stale raw-signals mutation anchor, exit 1. The anchor
+now targets the existing `arm.write()` loop; the exact measured-write
+postcondition kills the mutation and the restored control passes. See the audit
+for preserved first-run evidence. No production behavior or size ceiling changed.
+Next: freeze the commit containing this correction and restart exact-SHA checks.
+
 ## v15 refusal/reporting checkpoint — September 28, 2026
 
 Completed local repair checkpoint: `0faa878d` on
