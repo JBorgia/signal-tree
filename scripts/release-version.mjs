@@ -87,11 +87,13 @@ export const deriveReleaseVersion = (current, releaseType, tags = []) => {
 };
 
 export const updateCurrentReleaseClaim = (text, version) => {
-  const label = semver.prerelease(version)
+  const label = text.includes('**Development version:**')
+    ? 'Development version'
+    : semver.prerelease(version)
     ? 'Current prerelease'
     : 'Current release';
   const updated = text.replace(
-    /\*\*Current (?:pre)?release:\*\*\s+\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?/,
+    /\*\*(?:Current (?:pre)?release|Development version):\*\*\s+\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?/,
     `**${label}:** ${version}`
   );
   if (updated === text) {
@@ -188,6 +190,20 @@ const selfTest = () => {
     parsedTags[1] !== 'v15.0.0'
   ) {
     throw new Error(`remote tag parsing failed: ${JSON.stringify(parsedTags)}`);
+  }
+  const developmentClaim = updateCurrentReleaseClaim(
+    '**Development version:** 15.3.0 (unreleased).\n**Latest published release:** 15.3.0.',
+    '15.3.1'
+  );
+  if (
+    !developmentClaim.includes(
+      '**Development version:** 15.3.1 (unreleased)'
+    ) ||
+    !developmentClaim.includes('**Latest published release:** 15.3.0.')
+  ) {
+    throw new Error(
+      'preparation must not mislabel an unpublished version as published'
+    );
   }
   const prereleaseClaim = updateCurrentReleaseClaim(
     '**Current prerelease:** 15.0.0-rc.15 See CHANGELOG.\n',

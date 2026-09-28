@@ -15,8 +15,7 @@
  * Canonical claim sites checked:
  *   - README.md
  *   - packages/kernel/README.md
- *   (the llms.txt / llms-full.txt claim sites were removed in 15.0 with the
- *    artifacts themselves — see RELEASE-1.0.md, "AI DISCOVERABILITY")
+ *   - llms.txt (restored canonical AI-facing reference)
  *
  * EXPLICIT EXCLUSIONS (claims that carry semantics NOT derivable from core's
  * peerDependencies — deliberately not checked):
@@ -45,6 +44,7 @@ const ROOT = path.resolve(__dirname, '..');
 
 const CLAIM_SITES = [
   'README.md',
+  'llms.txt',
   'packages/kernel/README.md',
   // Added 2026-07-28: this page had drifted to "Latest release (7.6.0)" and
   // "Angular 20.3+" while the packages shipped 13.2.0 on Angular 20/21/22.
@@ -54,21 +54,26 @@ const CLAIM_SITES = [
 const RELEASE_CLAIM_SITE = 'docs/README.md';
 
 function checkReleaseClaim(text, site, version) {
-  const expectedLabel = semver.prerelease(version)
+  const expectedLabel = /Development version:\*{0,2}/i.test(text)
+    ? 'development'
+    : semver.prerelease(version)
     ? 'prerelease'
     : 'release';
   const claims = [
     ...text.matchAll(
-      /Current (pre)?release:\*{0,2}\s+(\d+\.\d+\.\d+(?:-[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?)/gi
+      /(Current (pre)?release|Development version):\*{0,2}\s+(\d+\.\d+\.\d+(?:-[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?)/gi
     ),
   ].map((match) => ({
-    label: match[1] ? 'prerelease' : 'release',
-    version: match[2],
+    label: /^Development/i.test(match[1])
+      ? 'development'
+      : match[2]
+      ? 'prerelease'
+      : 'release',
+    version: match[3],
   }));
   const violations = claims
     .filter(
-      (claim) =>
-        claim.version !== version || claim.label !== expectedLabel
+      (claim) => claim.version !== version || claim.label !== expectedLabel
     )
     .map(
       (claim) =>
@@ -77,8 +82,7 @@ function checkReleaseClaim(text, site, version) {
     );
   if (
     !claims.some(
-      (claim) =>
-        claim.version === version && claim.label === expectedLabel
+      (claim) => claim.version === version && claim.label === expectedLabel
     )
   ) {
     violations.push(
@@ -87,8 +91,7 @@ function checkReleaseClaim(text, site, version) {
   }
   if (
     claims.filter(
-      (claim) =>
-        claim.version === version && claim.label === expectedLabel
+      (claim) => claim.version === version && claim.label === expectedLabel
     ).length > 1
   ) {
     violations.push(
@@ -265,6 +268,28 @@ function selfTest(majors) {
   )} (\`@angular/core ${semverPhrase(majors)}\`).`;
   const v3 = checkSite(clean, 'fixture-clean.md', majors);
   expect('passes a clean site (control)', v3.length === 0);
+  expect(
+    'separates development version from published release',
+    checkReleaseClaim(
+      '**Development version:** 15.3.1 (unreleased)\n**Latest published release:** 15.3.0',
+      'fixture',
+      '15.3.1'
+    ).length === 0
+  );
+  expect(
+    'rejects stale development version',
+    checkReleaseClaim('**Development version:** 15.3.0', 'fixture', '15.3.1')
+      .length > 0
+  );
+  expect(
+    'rejects contradictory current release beside development claim',
+    checkReleaseClaim(
+      '**Development version:** 15.3.1\n**Current release:** 15.3.0',
+      'fixture',
+      '15.3.1'
+    ).length > 0
+  );
+
   expect(
     'flags a stale prerelease claim',
     checkReleaseClaim(

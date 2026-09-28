@@ -21,6 +21,10 @@ This Angular application uses `@signal-tree/angular`. Do not generate
 - Construct Angular trees with `@signal-tree/angular`.
 - Use `@signal-tree/kernel` only for framework-neutral runtimes and contracts.
 - Use `@signal-tree/react` for React owner-bound observation.
+- Use `@signal-tree/vue` for Vue and `@signal-tree/solid` for Solid.
+- Angular/Solid leaves: read `leaf()`, write `leaf.set(value)`; Vue leaves:
+  read/write `.value`; React/kernel leaves: read `leaf()`, write `leaf(value)`.
+  Root and object branches remain callable across all five packages.
 - Do not invent packages or revive historical `@signaltree/*` names.
 
 ## Construction
@@ -147,6 +151,19 @@ Declare built-in capabilities in `enhancers`:
 
 `undoable()` designates a synchronous authored turn for restoration. It is not
 an async scope. Restoration and transactions are different authority models.
+Do not use `undo()`/`jumpTo()` for request reconciliation or blindly retry an
+operation after an error. Explicit rollback refusal preserves state and the
+pending handle but releases consequences in v15. In the unreleased 15.3.1
+candidate, automatic refusal before a handle returns commits surviving writes,
+retains eligible undo history, releases consequences, and still throws;
+successful automatic rollback reverses recorded writes. An error is no promise
+of undo. A confirmed dependency can persist after a pending-created row is
+edited and removed. Recoverable pending refusal is a v16 target, not v15 API.
+Containment covers deferred write subscribers and transaction turn listeners,
+not every framework effect. Vue watcher errors differ by dev/production mode;
+Solid outer batches can deliver errors after a handle returns. Consult
+[Transaction failures and current v15 limitations](../guides/transaction-failures-v15.md)
+for the remaining defects before composing transactions, undo, or persistence.
 
 ## Lifetime
 
@@ -167,14 +184,17 @@ historical migration documents as current API guidance.
 This Angular app uses SignalTree 15 from `@signal-tree/angular`. State,
 `enhancers`, and one `derived` factory are declared together in
 `signalTree(...)`; there is no `.with()` or fluent `.derived()`. Read through
-`tree.$`; every location accepts whole values or updater functions. Use
+`tree.$`; Angular leaves read with `leaf()` and write with `leaf.set(value)`.
+Root and object branches accept whole values or updater functions. Use
 `leaf(value)` for atomic objects and callable data. Put writes and async orchestration in Ops
 services; keep HTTP, persistence, forms, routing, and effects application-owned.
 Use `entityMap()` for normalized collections, `external()` for synchronous
 external-truth writes, `restoration()` + `undoable()` for retained undo history,
 and `transactions()` for pending confirm/rollback. Prefer read-only component
 access via `asReadonly` or read-only `defineStore`. Destroy every bounded-life
-tree. Current package types and READMEs override historical documentation.
+tree. Error does not guarantee undo; never blindly retry entire operations.
+Read the current v15 transaction-failure guide before adding reconciliation or
+persistence. Current package types and READMEs override historical documentation.
 ```
 
 ## Related Guidance

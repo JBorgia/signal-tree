@@ -123,7 +123,7 @@ if (process.argv[1] && import.meta.filename === resolve(process.argv[1])) {
       write('unexpected');
       assert.throws(() => assertReleasePlan(root), /package set mismatch/);
       console.log(
-        'Release plan self-test passed: exact four-package public set, Studio rejection, missing/extra package rejection, dependency order.'
+        'Release plan self-test passed: exact five-package public set, Studio rejection, missing/extra package rejection, dependency order.'
       );
     } finally {
       rmSync(root, { recursive: true, force: true });

@@ -13,29 +13,16 @@ const tree = signalTree(state, { enhancers: [batching(), restoration()] });
 
 All enhancers are exported from `@signal-tree/kernel` — no separate packages needed.
 
-Key pieces
+## Public capability selection
 
-- `createEnhancer(meta, fn)` — helper that attaches metadata to an enhancer function.
-- `ENHANCER_META` — symbol under which metadata is also attached for 3rd-party compatibility.
-- `signalTree(state, { enhancers: [...] })` — apply 1..N enhancers to a tree;
-  supports optional metadata-based re-ordering via `requires`/`provides`.
+Declare the built-in factories `batching()`, `restoration()`, `transactions()`,
+and `devTools()` in the initial `enhancers` array. The low-level `Enhancer` type
+remains public, but `createEnhancer`, `ENHANCER_META`, and metadata-authoring
+helpers are not public APIs. Do not import them from internal paths.
 
-Metadata schema
-
-- `name` (string) — optional but recommended: a stable name used for ordering/diagnostics.
-- `requires` (string[]) — names of capabilities the enhancer needs present before it runs.
-- `provides` (string[]) — names of capabilities the enhancer will add to the tree.
-
-Behavior
-
-- Enhancers may mutate the passed tree (preferred) or return a new object. If the enhancer
-  returns the same instance, mutation is assumed. If it returns a new value, that value is used
-  for subsequent enhancers.
-- If any metadata `requires` are already available from core configuration (for example,
-  microtask notification batching when `config.batchUpdates` is true), the sorter treats them
-  as satisfied.
-- A topological sort orders enhancers that declare metadata. On cycles the system falls back to
-  the user-provided order and warns in debug mode.
+The planner validates the declared set before constructing state. Built-in
+metadata is an implementation detail; applications select capabilities through
+the factories rather than authoring `requires`/`provides` metadata.
 
 ## Examples
 
@@ -81,8 +68,9 @@ Undo covers only the operations you mark with `undoable()`, and requires
 
 ## Best practices
 
-- Prefer mutation (augment `tree` and return it). This preserves identity for consumers holding
-  references to the original tree.
-- Provide `name` and `provides` for any enhancer that adds public capabilities.
-- Use `requires` for enhancers that depend on other features (core or other enhancers).
-- All built-in enhancers are available from `@signal-tree/kernel` — no need for separate packages.
+- Declare the complete capability set at construction.
+- Use the framework facade for application imports, or `@signal-tree/kernel`
+  for framework-neutral code; no separate capability packages are needed.
+- Designate undoable work explicitly and read the
+  [current v15 limitations](../../docs/guides/transaction-failures-v15.md) before
+  combining transactions, restoration, or notification batching.

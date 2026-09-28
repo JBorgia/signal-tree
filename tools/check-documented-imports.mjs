@@ -48,6 +48,7 @@ const ROOT = new URL('..', import.meta.url).pathname;
  */
 const LIVE_DOCS = [
   'README.md',
+  'llms.txt',
   'packages/kernel/README.md',
   'packages/kernel/ENHANCERS.md',
   'packages/angular/README.md',

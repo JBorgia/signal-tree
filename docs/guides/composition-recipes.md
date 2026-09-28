@@ -160,10 +160,19 @@ export function entityCrudState<T extends { id: string }>(api: ApiService, confi
 }
 ```
 
-The old `loader()` helper is not part of the current RC public API. Keep request
+The old `loader()` helper is not part of the current v15 public API. Keep request
 coalescing, freshness, and retry policy in the Ops/service layer.
 
 ### Ops: an abstract base over a tree slice
+
+This snapshot example requires application-enforced exclusive writes to the
+row for the whole request. Restoring a snapshot otherwise overwrites newer
+work. For concurrent optimistic edits, use §4's transaction lifecycle and
+explicit conflict handling; v15 does not promise unconditional isolation.
+
+Save status is ordinary state: read `save.state()` and replace the `save`
+branch to update its state and error together. No status-marker methods are
+required. `isSaving` below is a boolean getter; `saveError` exposes the error leaf.
 
 The base operates on a **slice of your existing tree**, not its own store, so all
 domains share one DevTools timeline and one restoration history.
@@ -179,7 +188,7 @@ export abstract class EntityCrudOps<T extends { id: string }> {
     return this.slice.entities.all;
   }
   get isSaving() {
-    return this.slice.save.loading;
+    return this.slice.save.state() === 'saving';
   }
   get saveError() {
     return this.slice.save.error;
@@ -190,18 +199,18 @@ export abstract class EntityCrudOps<T extends { id: string }> {
     // SNAPSHOT FIRST — this is the rollback data.
     const previous = entities.byId(id)?.() ?? null;
     if (previous) entities.upsertOne({ ...previous, ...changes } as T);
-    save.setLoading();
+    save({ state: 'saving', error: null });
 
     return this.api.patch$<Partial<T>, T>(`${this.config.endpoint}/${id}`, changes).pipe(
       take(1),
       tap((saved) => {
         entities.upsertOne(saved);
-        save.setLoaded();
+        save({ state: 'saved', error: null });
       }),
       catchError((e) => {
         if (previous) entities.upsertOne(previous); // restore the snapshot
         const error = toAppError(e, `${this.config.name}.update`);
-        save.setError(error);
+        save({ state: 'error', error });
         return of(error);
       })
     );
@@ -306,16 +315,18 @@ Jest: `moduleNameMapper`).
 ## 4. Optimistic writes with server reconciliation
 
 **The need:** apply a change to the UI immediately, send it to the server, and
-either confirm it or cleanly revert it — without losing whatever else the user
-did while the request was in flight.
+confirm it or attempt rollback, with explicit reconciliation when rollback
+cannot safely complete.
 
-This is a full match for `transactions()`, not something to hand-roll. A
-transaction's pending writes are excluded from confirmed causal turns until you
-say otherwise, and rolling one back reverts **only its own writes** — later,
-unrelated activity survives:
+Use `transactions()` for the pending handle lifecycle. Supported rollback cases
+preserve unrelated activity, but overlapping work can make rollback refuse and
+v15 has known ordering and notification defects. Read
+[Transaction failures and current v15 limitations](transaction-failures-v15.md)
+before applying this recipe. Neither transaction failure nor rollback refusal
+proves that persistence stayed deferred.
 
 ```typescript
-import { signalTree, transactions } from '@signal-tree/kernel';
+import { SignalTreeRollbackError, signalTree, transactions } from '@signal-tree/kernel';
 
 const tree = signalTree(
   {
@@ -332,15 +343,22 @@ const pending = tree.transaction(() => {
 
 api.assignOrder(17).subscribe({
   next: () => pending.confirm(),
-  error: () => pending.rollback(),
+  error: (requestError) => {
+    try {
+      pending.rollback();
+    } catch (rollbackError) {
+      if (!(rollbackError instanceof SignalTreeRollbackError)) throw rollbackError;
+      // Application-owned handler: retain the handle and surface a conflict.
+      // Persistence consequences may already have been released.
+      reportConflict({ pending, requestError, rollbackError });
+    }
+  },
 });
 ```
 
-If the request fails, `pending.rollback()` puts `order.status`/`driver.orderId`
-back to their pre-transaction values — and if something else in the tree
-changed in the meantime (a live telemetry feed landing a new row, say), that
-change is untouched. This is a pinned, tested guarantee, not an assumption:
-see `transactions enhancer › supports an optimistic workflow where rollback
+When rollback succeeds in this scalar example, it restores
+`order.status`/`driver.orderId` while preserving unrelated changes. This
+supported case is pinned by `transactions enhancer › supports an optimistic workflow where rollback
 reverts optimistic state but preserves later unrelated activity` in
 [`packages/kernel/src/enhancers/transactions/transactions.spec.ts`](../../packages/kernel/src/enhancers/transactions/transactions.spec.ts).
 
@@ -351,24 +369,38 @@ what the transaction wrote — a server response that re-created a row it
 removed, or a second transaction still open over the same field — it throws
 `SignalTreeRollbackError` instead of guessing.
 
-A refusal changes **nothing**: no value moves, and the transaction stays
-pending, so you can retry it, `confirm()` it, or reconcile by hand.
+An explicit refusal changes no state and the handle stays pending, so another
+rollback attempt or `confirm()` remains available. **Existing v15 behavior
+releases the commit scope and its deferred consequences on refusal.** Do not
+infer that storage stayed unchanged. A pending-created row later edited by
+confirmed work and then removed can still refuse because of the confirmed
+dependency; removing the entity is not a general recovery strategy.
 
 ```typescript
 try {
   pending.rollback();
 } catch (error) {
-  // Still pending. Settle it deliberately — refetch and confirm, or retry the
-  // rollback once the conflicting work has settled.
-  await refetchOrder();
-  pending.confirm();
+  if (!(error instanceof SignalTreeRollbackError)) throw error;
+  // Application policy must inspect local and remote state before settling.
+  // Keep the handle; retrying rollback is not guaranteed to succeed.
+  reportConflict({ pending, rollbackError: error });
 }
 ```
 
-The one ordering to know: settle the **newest** open transaction first. Rolling
+For overlapping pending transactions, settle the **newest** open one first. Rolling
 an older one back while a newer overlapping one is open refuses with
 `cause.kind === 'later-pending-dependency'`, because the newer transaction's
-before-image records what the field *held*, not who owns it.
+before-image records what the field *held*, not who owns it. This does not fix
+the reentrant-ordering or pending-undo defects documented in the limitations
+guide.
+
+If `transaction()` itself throws before returning a handle, there may be no
+pending object to recover with. In the unreleased 15.3.1 candidate, successful
+automatic rollback reverses recorded writes and discards deferred consequences;
+refused automatic rollback records surviving writes as committed, retains
+eligible undo history, releases consequences, and still throws. Do not blindly
+retry the operation. A recovery handle that holds consequences until explicit
+confirmation is a v16 target, not a v15 API.
 
 ### What `transactions()` does not decide for you
 
@@ -386,8 +418,9 @@ api.assignOrder(17).subscribe({
     external(() => tree.$.order(serverOrder));
   },
   error: (err) => {
-    if (isRetryable(err)) return retry();
-    pending.rollback();
+    // Do not replay the entire operation just because a request errored.
+    // The server may have accepted it; reconcile using application policy.
+    reportConflict({ pending, requestError: err });
   },
 });
 ```
@@ -400,14 +433,11 @@ decision (retry, rollback, or surface a conflict for the user), not something
 
 ### Why not just write and `catchError` a manual snapshot?
 
-You can — §2's `EntityCrudOps.update$` does exactly that, by hand, because it
-predates a cross-cutting need for `transactions()` in that recipe. The
-difference `transactions()` earns is **isolation**: a hand-rolled snapshot/
-restore reverts your own field to what YOU remembered, which is wrong the
-moment something else touched the tree while your request was in flight (see
-§2's own "roll back the whole of what you touched" warning — this is the same
-bug at a different scope). `transactions()` reverts exactly its own turn's
-writes, nothing else, unconditionally.
+A snapshot restore can overwrite later work; §2's example requires exclusive
+writes during the request. `transactions()` adds a pending handle and rollback
+admission checks, including dependency refusal. It does not provide
+unconditional isolation in v15. Keep error and reconciliation policy explicit,
+and do not substitute `undo()` or `jumpTo()` for request settlement.
 
 ---
 
@@ -432,7 +462,7 @@ validation / review / edits        (entirely your domain's business)
       ↓
 one intentional commit             (writes the draft into canonical state —
                                      `transactions()` if the commit itself
-                                     needs atomic all-or-nothing, undoable()
+                                     needs pending settlement, undoable()
                                      if it should be one entry in restoration
                                      history, or a plain location()/upsertOne()
                                      if neither)
@@ -465,10 +495,11 @@ function discard() {
 }
 ```
 
-If the commit itself needs multi-location atomicity (several tree paths must
-land together or not at all), wrap it in `transactions()` per §4 above — the
-transaction body **is** the commit, and `confirm()` fires once validation
-passes.
+Validate the draft before writing canonical state. For a multi-location edit
+that needs a pending decision, use `transactions()` per §4 and confirm after
+acceptance. Writes become locally visible before confirmation; rollback can
+refuse and release consequences. This is not an unconditional all-or-nothing
+guarantee for every v15 composition.
 
 ### Why this earns "canonical," not just "possible"
 

@@ -6,7 +6,9 @@
 
 Use this index to navigate the documentation.
 
-**Current release:** 15.3.0 See [CHANGELOG](../CHANGELOG.md).
+**Development version:** 15.3.1 (unreleased). See [CHANGELOG](../CHANGELOG.md).
+
+**Latest published release:** 15.3.0.
 
 ---
 
@@ -32,6 +34,7 @@ Use this index to navigate the documentation.
 
 | Document                                                                          | Description                                                                                          |
 | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| [Transaction failures in v15](guides/transaction-failures-v15.md) | Automatic abort, explicit refusal, retry and synchronization limits |
 | [Support policy](support-policy.md)                                               | The two supported release lines (`@signal-tree/*` v15, `@signaltree/*` v14), what v14 still receives, and EOL intent |
 | [Migration `@signaltree/*` → `@signal-tree/*` (v15)](guides/migration-v14-v15.md) | **Current migration target for every earlier version** — rename, package consolidation, removed APIs |
 | [Composition Recipes](guides/composition-recipes.md)                              | Ops-service patterns, entity-CRUD base, optimistic UI                                                |
@@ -61,6 +64,7 @@ Use this index to navigate the documentation.
 | [Kernel](../packages/kernel/README.md)   | `@signal-tree/kernel` — framework-neutral tree, EntityMap, enhancers     |
 | [Angular](../packages/angular/README.md) | `@signal-tree/angular` — the Angular realization (Angular apps use this) |
 | [React](../packages/react/README.md)     | `@signal-tree/react` — owner-bound React observation (`useSignalTree`)   |
+| [Solid](../packages/solid/README.md) | `@signal-tree/solid` — native Solid realization |
 | [Vue](../packages/vue/README.md)         | `@signal-tree/vue` — native Vue refs over kernel-owned state             |
 
 Historical inter-version migration guides live in [Guides](#-guides); the
@@ -80,6 +84,7 @@ Historical inter-version migration guides live in [Guides](#-guides); the
 
 | Document               | Description                       |
 | ---------------------- | --------------------------------- |
+| [Canonical llms.txt](../llms.txt) | Concise current API and failure-policy reference |
 | [LLM Guide](ai/LLM.md) | Quick reference for AI assistants |
 
 ---

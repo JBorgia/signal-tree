@@ -192,15 +192,18 @@ the window's duration. Verified: an unrelated `tree.$.rev(999)` inside a paused 
 was suppressed too. A synchronous `for` loop has sole ownership by construction; a
 multi-second `mergeMap` over N HTTP requests does not.
 
-**What to do instead, today:** nothing. Writes that share a microtask are already one
-entry — a 25-row import in a synchronous loop records one step and `undo()`/`redo()`
-round-trips it. Verified after removal: 25 `addOne` calls → 1 entry, undo → 3 rows,
-redo → 28.
+**What to do instead, today:** install `restoration()` and designate the
+synchronous import with `undoable(() => { /* add the rows here */ })` when it
+should be undoable. Sharing a microtask does not make undesignated writes into
+history. Invoke undo from a later user action, after the designated turn settles;
+see [current v15 limitations](transaction-failures-v15.md) before combining it
+with pending transactions or Link.
 
-**What is coming:** that microtask boundary is decided by whether a caller happens to
-`await`, which is an accident rather than a design. Intent-scoped grouping is a
-transaction handle — see
-[history-the-greenfield-target.md](../architecture/history-the-greenfield-target.md).
+**Historical evidence after the removal:** the then-current automatic recording
+model grouped 25 `addOne` calls into one entry, undo → 3 rows, redo → 28. That
+measurement predates v15 opt-in designation. The
+[greenfield history design](../architecture/history-the-greenfield-target.md)
+records the design discussion, not an additional current API.
 
 ### 4. ~~Drop uninteresting transitions — `shouldSkip`~~ — REMOVED in 15.0
 
@@ -226,11 +229,11 @@ record-then-filter step.
 | What you are building                               | Pattern                                                                                                      | Supported                                                                             |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
 | Editor undo over a small document                   | `maxHistorySize`; designate document edits with `undoable()` and leave caret/selection undesignated          | Yes                                                                                   |
-| Bulk-edit grid with cancel                          | `transaction()` — `confirm()` or `rollback()`                                                                | Yes, and independent of `restoration`                                                 |
+| Bulk-edit grid with cancel                          | `transaction()` — `confirm()` or `rollback()`                                                                | Independent of `restoration`; rollback can refuse — see [v15 limits](transaction-failures-v15.md)                                                 |
 | Undo one panel, not the whole app                   | designate only the panel's operations with `undoable()`                                                      | Yes                                                                                   |
 | Large server collection + small editable **branch** | apply the collection with `external()`; designate the branch's edits with `undoable()`                       | Yes — the headline pattern                                                            |
 | Large server collection + small editable draft      | `external()` for the collection; ordinary draft state; designate accepted edits with `undoable()`            | Yes. Independent panel-local undo remains application-owned.                          |
-| Optimistic write, roll back on error                | `undo()` in the error path, or `jumpTo(getCurrentIndex() - 1)`                                               | Yes — only if nothing else recorded in between                                        |
+| Optimistic request reconciliation | Use a returned transaction handle and application conflict policy; never `undo()` or `jumpTo()` | Rollback can refuse; see [current v15 limitations](transaction-failures-v15.md) |
 | Import/generate, then one undo                      | —                                                                                                            | **No.** `pauseRecording()` was removed in 14.1.1 (see lever 3) and has no replacement |
 | Audit trail rather than undo                        | `getRestorationHistory()` for retained undo entries; use an application event log for a complete audit trail | Restoration history is not a complete audit log                                       |
 | Show the user how far they can go                   | `getCurrentIndex()` back, `getRestorationHistory().length - 1 - getCurrentIndex()` fwd                       | Yes — reactive since 14.0.0                                                           |

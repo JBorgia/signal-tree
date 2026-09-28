@@ -1,6 +1,12 @@
 # Correctness advisory — transaction rollback, `@signal-tree/kernel` 15.0.0–15.2.1
 
-**Status: FIXED in 15.3.0.** Upgrade is the whole mitigation.
+**Status: FIXED in 15.3.0 for the three defects characterized below.**
+
+Current qualification: explicit refusal preserves application state and pending
+authority, but releases the commit scope and its consequences. This advisory
+is not a guarantee of deferred persistence after refusal or of general
+transaction isolation. See the [current v15 failure guide](../guides/transaction-failures-v15.md)
+for remaining limitations and the unreleased 15.3.1 automatic-abort correction.
 
 Three defects in `rollback()`. All three cause **silent incorrect state with no
 thrown error**, or a thrown error that leaves the transaction unrecoverable.

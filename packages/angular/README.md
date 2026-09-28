@@ -182,3 +182,12 @@ Validation stops at explicit `leaf(...)`, marker definitions, arrays and built-i
 terminal values. Their contents remain data, not separately owned tree locations.
 Ordinary functions remain valid callable data. These checks apply to initial
 construction, not arbitrary later writes or foreign reactivity from other libraries.
+
+## Transaction failures
+
+Read [Transaction failures and current v15 limitations](https://github.com/JBorgia/signal-tree/blob/fix/15.3.1-link-rollback-and-strand/docs/guides/transaction-failures-v15.md)
+before combining transactions, undo, or persistence. Explicit rollback refusal
+leaves state unchanged and the handle pending but releases consequences in v15. The
+unreleased 15.3.1 candidate commits surviving writes on automatic refusal
+before a handle returns and still throws. An error does not guarantee undo;
+never blindly retry the entire operation.

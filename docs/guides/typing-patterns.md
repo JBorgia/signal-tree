@@ -93,15 +93,15 @@ tree.$.firmware.set(dto);
 tree.$.firmware.update((firmware) => ({ ...firmware, version: '1.1' }));
 ```
 
-Callable values always use `leaf()` because an unwrapped function argument is the
-updater grammar:
+Declare callable data with `leaf()` at construction. For Angular leaves,
+`.set(fn)` stores the function directly; it is not the callable updater grammar:
 
 ```typescript
 const tree = signalTree({
   onSave: leaf((id: string) => console.log(id)),
 });
 
-tree.$.onSave(leaf((id) => persist(id)));
+tree.$.onSave.set((id) => persist(id));
 tree.$.onSave()('ticket-42');
 ```
 

@@ -19,25 +19,26 @@ while the packages shipped 13.x. Don't reintroduce it; link the changelog instea
 - Recursive typing with deep nesting and accurate type inference
 - Generated exact-leaf inference proofs for every selectable demo depth from 1 through 40
 - Memory efficiency via proportional causal history and explicit ownership lifetimes
-- Four focused packages with strong TypeScript support
+- Five focused packages with strong TypeScript support
 - Extensible via the declared `enhancers` set
 
 ## Core capabilities
 
 - Hierarchical location trees with type-safe access and updates
-- Framework-neutral causal semantics observed by Angular, React, and Vue packages
+- Framework-neutral causal semantics observed by Angular, React, Vue, and Solid packages
 - Deterministic resource release through `destroy()`
 - Tree-shakeable: unused enhancers are eliminated by modern bundlers
 
 ## Package ecosystem
 
-SignalTree 15 has four public packages:
+SignalTree 15 has five public packages, defined by `scripts/release-plan.mjs`:
 
 - **`@signal-tree/kernel`**: framework-neutral state, EntityMap, links,
   restoration, batching, transactions, and DevTools
 - **`@signal-tree/angular`**: native Angular signal leaves and `defineStore`
 - **`@signal-tree/react`**: owner-bound React observation
 - **`@signal-tree/vue`**: native Vue ref leaves and computed derivations
+- **`@signal-tree/solid`**: native Solid accessors with `.set()` writes
 
 ## Technical specifications
 
@@ -45,9 +46,9 @@ SignalTree 15 has four public packages:
 - Browser: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
 - Tree-shakeable, own code only, gzip (measured by
   `tools/check-bundle-budget.mjs`, esbuild + minify, Angular/RxJS external).
-  Production budgets are 10.0 KB for a bare tree and 22.1 KB with EntityMap;
-  development budgets are 12.2 KB and 24.8 KB. The generator reports current
-  measured values and enforces both ceilings; see
+  Production budgets are 10.26 KB for a bare tree and 22.60 KB with EntityMap;
+  development budgets are 12.45 KB and 25.25 KB. These are ceilings, not current
+  measurements. The generator reports current measured values and enforces both ceilings; see
   [dropping dev code](performance/dropping-dev-code.md).
 - Performance targets: operations maintain sub‑millisecond times across common depths
 

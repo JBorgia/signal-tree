@@ -290,10 +290,18 @@ The authoritative gzip gate is [`tools/check-bundle-budget.mjs`](tools/check-bun
 ### Validation pipeline
 
 ```bash
-npm run validate
+node tools/verify-gates.mjs --release
+node tools/verify-gates.mjs --self-test --release
 ```
 
-Runs the 13-step pre-publish pipeline: clean tree, frozen lockfile install, tsconfig sanity, lint, tests, coverage thresholds (80% statements / 75% branches / 80% functions / 80% lines), all-package build, package-config checks, dist-file checks, bundle-size limits, sanity checks, perf benchmarks (warn), docs completeness (warn). See [`.github/VALIDATION_GUIDE.md`](.github/VALIDATION_GUIDE.md).
+`tools/verify-gates.mjs` is the canonical registry. Run the full gates and mutation
+self-tests serially, then rebuild packages from restored source before final
+tarball, strict consumer, and Angular AOT checks. Validate the production demo
+and smoke routes, release state/changelog, and exact release SHA as described
+in [`.github/VALIDATION_GUIDE.md`](.github/VALIDATION_GUIDE.md). The historical
+coverage targets (80% statements / 75% branches / 80% functions / 80% lines) are
+not currently enforced by this registry; report coverage measurements separately.
+Validation does not authorize publication.
 
 ### Docs & demo currency (hard rule)
 

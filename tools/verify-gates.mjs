@@ -92,6 +92,28 @@ if (process.env['NX_WORKSPACE_ROOT_PATH']) {
  */
 const GATES = [
   {
+    name: 'v15-refusal-artifacts',
+    covers:
+      'packed v15 refusal lifecycle preserves verified controls and fixes while explicitly bounding unchanged limitations',
+    cmd: ['node', 'tools/check-v15-refusal-lifecycle.mjs'],
+    needsBuild: true,
+    releaseOnly: true,
+    slow: true,
+    provenBy: 'v15-refusal-artifacts:self',
+  },
+  {
+    name: 'v15-refusal-artifacts:self',
+    covers:
+      'artifact comparison rejects regressions, missing cases, process failures and unsafe known-limit evidence',
+    cmd: ['node', 'tools/check-v15-refusal-lifecycle.mjs', '--self-test'],
+    releaseOnly: true,
+    mutation: {
+      file: 'tools/check-v15-refusal-lifecycle.mjs',
+      find: 'assert.equal(c.get(name).pass, true, `candidate: regression ${name}`);',
+      replace: 'assert.equal(true, true, `candidate: regression ${name}`);',
+    },
+  },
+  {
     name: 'typecheck',
     covers:
       'core sources AND typing specs compile (both projects, not just one)',
@@ -1828,7 +1850,7 @@ if (has('--self-test')) {
   for (const r of results.filter((r) => r.state === 'blind')) {
     console.log(`  BLIND:    ${r.gate.name} — passed while broken`);
   }
-  const bad = count('blind') + count('error');
+  const bad = count('blind') + count('error') + count('unproven');
   process.exit(bad > 0 ? 1 : 0);
 } else {
   console.log(
