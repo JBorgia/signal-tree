@@ -8,7 +8,8 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## v15.3.1 release preparation — September 28, 2026
 
-Bounded runtime repair remains `0faa878d`; this follow-up prepares 15.3.1
+Preparation checkpoint: `31a24086`. Bounded runtime repair remains `0faa878d`;
+this follow-up prepares 15.3.1
 (unreleased), strengthens failure-cause and installed-artifact evidence, and
 aligns live documentation, AI guidance and the verification workflow. Published
 15.3.0 is the pinned artifact comparison baseline: five fixes, three preserved
