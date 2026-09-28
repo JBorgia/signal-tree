@@ -154,10 +154,14 @@ The 15.3.1 development patch distinguishes two failure boundaries:
 
 | Boundary | Refusal outcome |
 | --- | --- |
-| Explicit rollback on a returned pending handle | State unchanged; authority remains pending; retry or confirm remains available; consequences remain deferred. |
+| Explicit rollback on a returned pending handle | Compensation changes no state; authority remains pending; retry or confirm remains available. Existing v15 behavior releases the commit scope and its consequences on refusal. |
 | Automatic abort before `transaction()` returns a handle | Surviving writes are recorded as committed; eligible undo history survives; consequences are released; the refusal is thrown. No recovery handle is returned. |
 
-The second row is a v15 containment exception. Previously this path could
+These are v15 containment exceptions. An explicit refusal does not guarantee
+that persistence or other durable consequences are still deferred. That
+existing behavior is preserved in this patch, not the v16 target.
+
+For the automatic-abort path, previously a refusal could
 release consequences while reporting rollback and omitting the confirmed
 record. Making its outcome consistent intentionally changes history and undo
 behavior after such a refusal, including a throwing callback. It does not mean

@@ -6,6 +6,26 @@ credible `1.0.0` release candidate.
 This is the release controller, not the full historical backlog. Use it to
 bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
+## Transaction failure policy alignment — September 28, 2026
+
+Owner approved the v15 automatic-abort containment policy: when compensation
+refuses before a handle can be returned, record surviving writes as committed,
+retain eligible restoration history, release consequences, and throw the refusal.
+The v16 target remains pending authority with a usable recovery handle; only an
+explicit confirmation releases durable consequences.
+
+Policy checkpoint `77946530` on `fix/d1-d2-forward-port` added this distinction.
+A subsequent direct characterization corrected one statement: existing v15
+explicit-handle refusal retains the handle **but releases consequences**. The
+support policy now records that compatibility exception instead of claiming the
+v16 target already holds. No explicit-rollback runtime change was made.
+
+Implementation and tests remain in the separate `fix/15.3.1-link-rollback-and-strand`
+worktree. Its bare production bundle still exceeds the unchanged budget; it is
+not release-qualified. See that worktree's
+`docs/audits/2026-09-28-v15-round4-followup.md` for the first reds and final checks.
+No runtime forward-port, tag, push, or publication is implied by this policy update.
+
 ## Packed Angular AOT consumer release coverage — September 17, 2026
 
 Owner authorized shipping the AOT fix and strengthening runtime consumer evidence.
