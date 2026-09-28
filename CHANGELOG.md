@@ -1,4 +1,4 @@
-## 15.3.1 (unreleased)
+## 15.3.1 (2026-09-28)
 
 **TL;DR** — **Patch. No API change, but two behaviour changes you could
 notice: deferred write-subscriber and transaction-listener errors are contained instead of thrown, and a throw from code
