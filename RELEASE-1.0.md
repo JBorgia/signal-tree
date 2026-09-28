@@ -6,6 +6,31 @@ credible `1.0.0` release candidate.
 This is the release controller, not the full historical backlog. Use it to
 bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
+## v15 refusal/reporting checkpoint — September 28, 2026
+
+Completed local repair checkpoint: `0faa878d` on
+`fix/15.3.1-link-rollback-and-strand`. Automatic-abort refusal now records the
+surviving contribution and restoration lifecycle before releasing consequences;
+secondary consequence failures do not replace the primary refusal. Reporting
+records follow tree lifetime, including late reports after destruction.
+
+The owner approved increasing only the bare production ceiling from 10.25 to
+10.26 KiB for the measured 10501-byte artifact. The new size gate passed; the
+original red remains in `docs/audits/2026-09-28-v15-round4-followup.md`.
+
+Validation: kernel 2425 passed (7 expected failures, 13 skipped, 1 TODO), Angular
+152/React 9/Vue 33/Solid 7 passed (Angular 3 skipped), source/spec typechecks,
+lint, five-package build, packed facade/type/export consumers, and four packed
+runtime controls passed. Four targeted source mutations were killed before the
+final artifact builds. No publication or remote verification is implied.
+
+Remaining: review/port only compatible fixes to the development line; prepare
+15.3.1 version metadata and an exact release candidate; run the full required
+release/CI checks and publish only with authorization. Existing documented v15
+composition/retention limitations remain open. Explicit rollback refusal still
+releases consequences while retaining its handle; the v16 pending-consequence
+policy is a target, not something this patch implements.
+
 ## Packed Angular AOT consumer release coverage — September 17, 2026
 
 Owner authorized shipping the AOT fix and strengthening runtime consumer evidence.
