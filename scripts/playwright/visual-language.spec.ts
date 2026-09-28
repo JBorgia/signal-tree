@@ -264,3 +264,29 @@ test('every idle sidebar destination uses one row treatment', async ({ page }) =
     }
   }
 });
+
+// Hold the README response so the loading UI is audited even on a fast host.
+test('documentation loading keeps a flat container and circular indicator', async ({
+  page,
+}) => {
+  let releaseResponse!: () => void;
+  const responseGate = new Promise<void>((resolve) => {
+    releaseResponse = resolve;
+  });
+  await page.route('**/assets/docs/core/README.md', async (route) => {
+    await responseGate;
+    await route.continue();
+  });
+  try {
+    await page.goto('/docs', { waitUntil: 'domcontentloaded' });
+    const loading = page.locator('.documentation-content [role="status"]');
+    await expect(loading).toBeVisible();
+    await expect(loading).toHaveCSS('border-radius', '0px');
+    await expect(loading.locator('.spinner')).toHaveCSS('border-radius', '50%');
+  } finally {
+    releaseResponse();
+  }
+  await expect(
+    page.locator('.documentation-content .markdown-content')
+  ).toBeVisible();
+});

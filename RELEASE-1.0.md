@@ -37,6 +37,16 @@ postcondition kills the mutation and the restored control passes. See the audit
 for preserved first-run evidence. No production behavior or size ceiling changed.
 Next: freeze the commit containing this correction and restart exact-SHA checks.
 
+### Documentation loading-state correction
+
+`51532c3f` passed 83/83 gates, 83/83 mutation proofs and clean-checkout/artifact
+checks, but the final browser run was 135/136. A rectangular documentation loading
+container accidentally matched the global circular-spinner rule. The held-response
+regression is red on the old build; the localized container-class rename preserves
+the circular indicator. Preserve the failed run and restart exact-SHA verification
+after this correction. Validation: production demo build, 137/137 browser checks,
+lint budget and spec types passed. No transaction semantics changed.
+
 ## v15 refusal/reporting checkpoint — September 28, 2026
 
 Completed local repair checkpoint: `0faa878d` on
