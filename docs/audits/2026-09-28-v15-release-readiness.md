@@ -122,3 +122,36 @@ sentinel and postcondition. The negative run fails specifically with
 `raw writeOne did not land`; restored control exits 0, and the focused mutation
 proof reports 1/1 proven. No benchmark assertion, threshold or production code
 changed. Restart complete verification against the next committed candidate.
+
+## Second exact-commit artifact result
+
+`51532c3f15fdc75b51cd4805a37a25c41453c610` passed 83/83 ordinary gates and
+83/83 proofs (12 indirect; zero unproven/vacuous/blind/errored), both exit 0.
+After deleting dist, the five-package build and demo build passed; all five
+versions were 15.3.1 and every package/hosted `llms.txt` matched source. Packed
+consumer types, production Angular AOT, the 5-fixed/3-preserved/2-limitation
+artifact comparison, publish dry run, and independent clean-checkout rehearsal
+passed. Logs use `/private/tmp/st-1531-51532c3f-*.log`.
+
+The first package-rebuild command mistakenly used an unsupported `--csv` flag
+for the release-plan helper. Nx ran no tasks; the explicit version assertion
+failed on absent artifacts. The corrected command joins the canonical helper's
+array and builds all five packages without cache. Preserve both build logs.
+
+The production browser suite then reported 135/136 passed, exit 1: the `/docs`
+loading container inherited a global `spinner` substring rule that gives circles
+a 50% radius. This is a real loading-state visual defect; earlier passing runs
+missed the short state. The final test ordinal was initially misread as the pass
+count in commentary and corrected when the summary appeared.
+
+A held README response reproduces the defect deterministically on the old
+build: the status container has radius 50%, not 0px. Rename only the container
+class to `documentation-loading`; retain the actual circular `.spinner`. A
+permanent browser test holds the response and checks both shapes, then verifies
+that documentation loads. No visual assertion is removed or weakened. Candidate
+51532c3f is superseded; complete verification restarts after this bounded fix.
+
+Focused validation after the loading fix: production demo build passed; full
+browser summary 137/137 passed, exit 0; lint-budget and spec-type gates 2/2
+passed, exit 0. The added test also requires the actual indicator to remain
+circular and the README to finish loading. Existing test formatting is retained.
