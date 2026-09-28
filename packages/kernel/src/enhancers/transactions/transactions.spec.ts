@@ -299,7 +299,9 @@ describe('transactions enhancer', () => {
       expect(store.$.count()).toBe(1);
       expect(store.$.rows.ids()).toEqual(['c']);
       expect(store.__transactions.getConfirmedTurnCount()).toBe(
-        baselineConfirmed
+        // v15 automatic refusal commits surviving writes; explicit pending
+        // handle refusal still retains pending authority.
+        baselineConfirmed + 1
       );
       expect(store.__transactions.getPendingTurnCount()).toBe(baselinePending);
     }

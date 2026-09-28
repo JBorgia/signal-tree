@@ -126,3 +126,30 @@ When you are ready, see
 [Migration `@signaltree/*` → `@signal-tree/*` (v15)](guides/migration-v14-v15.md).
 It is the single migration target for every earlier version; the historical
 inter-version guides under [`legacy/`](legacy/README.md) are kept for provenance.
+
+## Transaction failure policy
+
+The 15.3.1 development patch distinguishes two failure boundaries:
+
+| Boundary | Refusal outcome |
+| --- | --- |
+| Explicit rollback on a returned pending handle | Compensation changes no state; authority remains pending; retry or confirm remains available. Existing v15 behavior releases the commit scope and its consequences on refusal. |
+| Automatic abort before `transaction()` returns a handle | Surviving writes are recorded as committed; eligible undo history survives; consequences are released; the refusal is thrown. No recovery handle is returned. |
+
+These are v15 containment exceptions. An explicit refusal does not guarantee
+that persistence or other durable consequences are still deferred. That
+existing behavior is preserved in this patch, not the v16 target.
+
+For the automatic-abort path, previously a refusal could
+release consequences while reporting rollback and omitting the confirmed
+record. Making its outcome consistent intentionally changes history and undo
+behavior after such a refusal, including a throwing callback. It does not mean
+that a backend has accepted the writes. Successful automatic compensation still
+rolls back and discards consequences.
+
+The v16 product target is recoverable refusal: preserve pending authority,
+expose a usable recovery handle, and require explicit confirmation before
+releasing durable consequences. The v15 exception is not the architectural
+rule to carry forward. Error reporting by observers should be independent of
+settlement; existing framework delivery-error differences are not changed by
+this patch and remain documented limitations.

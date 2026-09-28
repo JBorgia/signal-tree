@@ -192,8 +192,11 @@ export type RollbackFailureCause =
 type PendingEffectMap = Map<string, TurnEffect>;
 
 type CaptureBucket = {
-  /** TX-AUTO-ROLLBACK-0: window sequence of this bucket's last write per position. */
-  ownWriteSeq: Map<number, number>;
+  /**
+   * TX-AUTO-ROLLBACK-0: window sequence of this bucket's last write per
+   * location key (see windowKeys).
+   */
+  ownWriteSeq: Map<string, number>;
   ownerPaths: Set<string>;
   subjectIds: Set<number>;
   positionIds: Set<number>;
@@ -307,9 +310,7 @@ export const explainRollbackFailure = (cause: RollbackFailureCause): string => {
   // silently generic sentence — the legibility this function exists for is
   // only worth anything if it cannot quietly stop applying.
   const unhandled: never = cause;
-  return `${ROLLBACK_ERROR_MESSAGE} [${
-    (unhandled as { kind: string }).kind
-  }]`;
+  return `${ROLLBACK_ERROR_MESSAGE} [${(unhandled as { kind: string }).kind}]`;
 };
 
 const createRollbackError = (
@@ -869,7 +870,7 @@ function cloneTurnRecord(turn: TransactionTurnRecord): TransactionTurnRecord {
 
 function createCaptureBucket(): CaptureBucket {
   return {
-    ownWriteSeq: new Map<number, number>(),
+    ownWriteSeq: new Map<string, number>(),
     ownerPaths: new Set<string>(),
     subjectIds: new Set<number>(),
     positionIds: new Set<number>(),
@@ -960,34 +961,77 @@ export function getOrCreateInternalTransactionRuntime<T>(
   defineTreeRealizationPort(treeWrapper, realizationPort);
   defineTreeRealizationPort(stateRoot, realizationPort);
 
-  // TX-AUTO-ROLLBACK-0. An AUTOMATIC rollback (a callback that threw, or a
-  // failure after it returned) runs while this transaction() call is still in
-  // progress, so observers have had a chance to write the same locations: a
-  // location subscriber or framework effect as the invalidation group closes,
-  // an observeWrites subscriber in the flush, a transaction one of them
-  // opened, even a rollback of another transaction. Restoring this
-  // transaction's before-image over such a write would silently destroy it.
-  // So every write to this tree is sequenced while any transaction is open,
-  // and an automatic rollback refuses (writes left as they are) when a later
-  // write touched one of its positions. Cleared whenever no transaction is
-  // open, so nothing accumulates.
+  // TX-AUTO-ROLLBACK-0. The rollback after a failure that happens AFTER the
+  // callback returned (the invalidation group closing, the capture failing
+  // to release) runs while transaction() is still in progress, when observers
+  // have already had a chance to write the same locations: a location
+  // subscriber or framework effect at the group close, an observeWrites
+  // subscriber in the flush, a transaction one of them opened. Restoring this
+  // transaction's before-image over such a write would destroy it, so that
+  // rollback refuses when a later write touched one of its locations. The
+  // throwing-callback rollback admission is unchanged from 15.3.0; a
+  // refusal now records surviving writes consistently as committed.
+  //
+  // A location is a position, or a position and an entity subject: every
+  // entityMap write carries the collection's single position and names the
+  // row only in subjectIds, so keying by position alone made a write to ANY
+  // other row look like a conflict. A write naming no subject (a scalar, or a
+  // collection-level write) conflicts with every row at its position.
+  //
+  // Writes are sequenced only while a transaction is open, and the record is
+  // cleared whenever none is, so nothing accumulates.
   let windowWriteSeq = 0;
-  const lastWindowWriteSeq = new Map<number, number>();
-  const recordWindowWrite = (positionIds?: readonly number[]): void => {
-    const seq = ++windowWriteSeq;
+  const lastWindowWriteSeq = new Map<string, number>();
+  const lastWindowRowWriteSeq = new Map<number, number>();
+  const windowKeys = (
+    positionIds?: readonly number[],
+    subjectIds?: readonly number[]
+  ): string[] => {
+    const keys: string[] = [];
     for (const position of positionIds ?? []) {
-      lastWindowWriteSeq.set(position, seq);
+      if (subjectIds && subjectIds.length > 0) {
+        for (const subject of subjectIds) keys.push(`${position}:${subject}`);
+      } else {
+        keys.push(String(position));
+      }
+    }
+    return keys;
+  };
+  const recordWindowWrite = (
+    positionIds?: readonly number[],
+    subjectIds?: readonly number[]
+  ): void => {
+    const seq = ++windowWriteSeq;
+    for (const key of windowKeys(positionIds, subjectIds)) {
+      lastWindowWriteSeq.set(key, seq);
+      const colon = key.indexOf(':');
+      if (colon !== -1) {
+        lastWindowRowWriteSeq.set(Number(key.slice(0, colon)), seq);
+      }
     }
   };
   const writtenSinceBy = (bucket: CaptureBucket): boolean => {
-    for (const [position, own] of bucket.ownWriteSeq) {
-      const last = lastWindowWriteSeq.get(position);
-      if (last !== undefined && last > own) return true;
+    for (const [key, own] of bucket.ownWriteSeq) {
+      const colon = key.indexOf(':');
+      const position = colon === -1 ? key : key.slice(0, colon);
+      // The same location, or a subject-less write at its position.
+      if ((lastWindowWriteSeq.get(key) ?? 0) > own) return true;
+      if ((lastWindowWriteSeq.get(position) ?? 0) > own) return true;
+      // A subject-less location is touched by a write to any of its rows.
+      if (
+        colon === -1 &&
+        (lastWindowRowWriteSeq.get(Number(position)) ?? 0) > own
+      ) {
+        return true;
+      }
     }
     return false;
   };
   const releaseWindowIfClosed = (): void => {
-    if (pendingTransactions.size === 0) lastWindowWriteSeq.clear();
+    if (pendingTransactions.size === 0) {
+      lastWindowWriteSeq.clear();
+      lastWindowRowWriteSeq.clear();
+    }
   };
 
   // LINK-OVERLAP-ROLLBACK-0. A descriptor this settlement would forget can
@@ -1027,8 +1071,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
       if (authority.isPositionPending(owner)) return true;
       // An OPEN transaction's writes are normally captured (and their
       // descriptors recreated) at its post-callback flush, after anything its
-      // callback settles. This covers a flush inside the callback. Nesting is
-      // rejected, so there is at most one open bucket.
+      // callback settles. This covers a flush inside the callback; there can
+      // be more than one open bucket when an observer opened a transaction
+      // while another had not returned yet.
       for (const bucket of pendingTransactions.values())
         if (bucket.positionIds.has(owner)) return true;
       return false;
@@ -1082,6 +1127,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
   } => {
     const ownerPaths = Array.from(bucket.ownerPaths).sort();
     bucket.ownerPaths.clear();
+    bucket.ownWriteSeq.clear();
     const subjectIds = Array.from(bucket.subjectIds).sort((a, b) => a - b);
     bucket.subjectIds.clear();
     const positionIds = Array.from(bucket.positionIds).sort((a, b) => a - b);
@@ -1354,7 +1400,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
           })();
     for (const positionId of resolvedPositionIds) {
       bucket.positionIds.add(positionId);
-      bucket.ownWriteSeq.set(positionId, windowWriteSeq);
+    }
+    if (pendingTransactions.size > 0) {
+      for (const key of windowKeys(resolvedPositionIds, subjectIds)) {
+        bucket.ownWriteSeq.set(key, windowWriteSeq);
+      }
     }
     rememberTreeRealizationDescriptor({
       descriptors: realizationDescriptors,
@@ -1466,7 +1516,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     return pending;
   };
 
-  const drainTransactionRollbackInput = (
+  const prepareTransactionRollbackInput = (
     transactionId: number
   ): {
     captured: boolean;
@@ -1476,8 +1526,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
     orderDeltas: CollectionOrderDelta[];
   } => {
     const bucket = pendingTransactions.get(transactionId);
-    pendingTransactions.delete(transactionId);
-    releaseWindowIfClosed();
     if (!bucket) {
       return {
         captured: false,
@@ -1487,8 +1535,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
         orderDeltas: [],
       };
     }
-    const { positionIds, effects, baselineValues, collectionOrders } =
-      drainCaptureBucket(bucket);
+    // Keep the capture until compensation succeeds or refusal is committed.
+    // Draining it before validation loses the only ledger input on refusal.
+    const positionIds = [...bucket.positionIds];
+    const effects = [...bucket.effects.values()].map(cloneTurnEffect);
+    const baselineValues = new Map(bucket.baselineValues);
+    const collectionOrders = [...bucket.collectionOrders.values()];
     return {
       captured: true,
       positionIds,
@@ -1808,7 +1860,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
                 treeOwnerId === undefined ||
                 windowOwner === treeOwnerId
               ) {
-                recordWindowWrite(positionIds);
+                recordWindowWrite(positionIds, subjectIds);
               }
             }
             if (origin === 'restoration') {
@@ -2067,22 +2119,24 @@ export function getOrCreateInternalTransactionRuntime<T>(
         // there was nothing. A refusal, or a failure before compensation
         // (flush, drain), means the authored effects are still live.
         let compensated = false;
+        let committedInstead = false;
         let rollbackSubjectIds: number[] = [];
         let rollbackPositionIds: number[] = [];
         try {
           notifier?.flushSync();
           const bucket = pendingTransactions.get(transactionId);
-          if (bucket && writtenSinceBy(bucket)) {
+          if (!callbackFailed && bucket && writtenSinceBy(bucket)) {
             // Refused, as a rollback that cannot be proven safe always is:
             // nothing is reversed and the writes stay as the tree shows them.
-            const { effects } = drainTransactionRollbackInput(transactionId);
+            // They are recorded as committed, so the ledger (an earlier
+            // transaction's rollback) and restoration see what the tree holds.
+            const effects = [...bucket.effects.values()];
             throw createRollbackError({
               kind: 'effect-validation-failed',
               pendingTurnId: transactionId,
               compensation: effects,
               errorMessage:
                 'Transaction rollback refused: a location it wrote was written again before the transaction returned',
-              ...(callbackFailed ? { callbackError: cause } : {}),
             });
           }
           const {
@@ -2091,7 +2145,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             effects,
             baselineValues,
             orderDeltas,
-          } = drainTransactionRollbackInput(transactionId);
+          } = prepareTransactionRollbackInput(transactionId);
           rollbackPositionIds = positionIds;
           rollbackSubjectIds = effects
             .map((effect) => effect.subject)
@@ -2109,38 +2163,66 @@ export function getOrCreateInternalTransactionRuntime<T>(
           }
           compensated = captured;
         } finally {
+          // v15 containment: no recovery handle is returned by this path.
+          // If compensation refused, the surviving writes become committed.
+          // Preserve ledger input until that outcome is known, including when
+          // refusal came from realization rather than the later-write guard.
+          const surviving = pendingTransactions.get(transactionId);
           try {
-            // Settle AFTER compensation, but UNCONDITIONALLY. Late, so consumers
-            // released by this scope observe the RESTORED state rather than the
-            // doomed one. In a `finally`, because compensation is fallible — it
-            // throws SignalTreeRollbackError on a conservative refusal, which is
-            // a supported fail-closed contract, not an edge case. Skipping the
-            // settle there left the scope open forever, and since nothing can
-            // ever settle it afterwards, autoSave was wedged for the life of the
-            // tree: post-commit silently degraded to never-commit.
-            //
-            // The OUTCOME depends on whether compensation actually applied, which
-            // a bare `finally` cannot see. Refused (or nothing to reverse) means
-            // the authored effects are still the live authoritative state, so
-            // their consequences must FLUSH; discarding them would make durable
-            // truth disagree with live truth to honour a reversal that did not
-            // happen. This is the same rule the plan-level door already applies.
-            settleCommitScope(
-              transactionOwnerToken,
-              transactionId,
-              compensated ? 'discard' : 'commit'
-            );
-            forgetUnclaimedDescriptorSubjects(
-              rollbackSubjectIds,
-              descriptorOwnersBefore,
-              rollbackPositionIds
-            );
+            if (!compensated && surviving) {
+              recordConfirmedBucket(surviving);
+              committedInstead = true;
+            }
           } finally {
-            lifecycleChannel.announce({
-              kind: 'rolled-back',
-              owner: transactionOwnerToken,
-              id: transactionId,
-            });
+            pendingTransactions.delete(transactionId);
+            releaseWindowIfClosed();
+            try {
+              // Restoration must observe the same terminal outcome BEFORE
+              // committed consequences inspect history or perform another write.
+              if (committedInstead) {
+                lifecycleChannel.announce({
+                  kind: 'staged',
+                  owner: transactionOwnerToken,
+                  id: transactionId,
+                });
+                lifecycleChannel.announce({
+                  kind: 'confirmed',
+                  owner: transactionOwnerToken,
+                  id: transactionId,
+                });
+              } else {
+                lifecycleChannel.announce({
+                  kind: 'rolled-back',
+                  owner: transactionOwnerToken,
+                  id: transactionId,
+                });
+              }
+            } finally {
+              // Close the scope even on refusal. v15 has no recovery handle
+              // on this path, so leaving it open would hold Link indefinitely.
+              try {
+                settleCommitScope(
+                  transactionOwnerToken,
+                  transactionId,
+                  compensated ? 'discard' : 'commit'
+                );
+              } catch (error) {
+                // The refusal/callback error remains primary. Consequences
+                // have already been attempted and the scope is closed.
+                reportCleanupFailure(
+                  'consequences after automatic transaction abort',
+                  error
+                );
+              } finally {
+                if (compensated) {
+                  forgetUnclaimedDescriptorSubjects(
+                    rollbackSubjectIds,
+                    descriptorOwnersBefore,
+                    rollbackPositionIds
+                  );
+                }
+              }
+            }
           }
         }
       };
@@ -2216,8 +2298,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
       }
 
       // TX-OBSERVER-STRAND-0. The callback returned, so its writes are applied.
-      // From here `transaction()` returns a handle, or rolls those writes back
-      // and throws; either way the commit scope settles. A throw here used to
+      // From here `transaction()` returns a handle, or attempts compensation
+      // and throws. Refusal commits surviving writes; the scope settles.
+      // A throw here used to
       // leave them applied with no handle, strand the capture bucket, and hold
       // every later Link consequence behind a scope nothing could settle.
       // Observers can no longer throw here (the notifier and the lifecycle
