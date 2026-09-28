@@ -21,8 +21,10 @@ support policy now records that compatibility exception instead of claiming the
 v16 target already holds. No explicit-rollback runtime change was made.
 
 Implementation and tests remain in the separate `fix/15.3.1-link-rollback-and-strand`
-worktree. Its bare production bundle still exceeds the unchanged budget; it is
-not release-qualified. See that worktree's
+worktree. Repair checkpoint `0faa878d` passed the recorded source and packed
+checks. The owner then approved the five-byte excess: the bare production
+ceiling is 10.26 KiB and the size gate passes. Exact-release verification and
+publication remain outstanding. See that worktree's
 `docs/audits/2026-09-28-v15-round4-followup.md` for the first reds and final checks.
 No runtime forward-port, tag, push, or publication is implied by this policy update.
 
