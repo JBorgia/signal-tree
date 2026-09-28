@@ -18,6 +18,11 @@
         "inlineStyleLanguage": "scss",
         "assets": [
           {
+            "glob": "llms.txt",
+            "input": ".",
+            "output": "/"
+          },
+          {
             "glob": "**/*",
             "input": "apps/demo/public"
           },

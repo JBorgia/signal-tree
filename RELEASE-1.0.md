@@ -6,6 +6,27 @@ credible `1.0.0` release candidate.
 This is the release controller, not the full historical backlog. Use it to
 bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
+## v15.3.1 release preparation — September 28, 2026
+
+Bounded runtime repair remains `0faa878d`; this follow-up prepares 15.3.1
+(unreleased), strengthens failure-cause and installed-artifact evidence, and
+aligns live documentation, AI guidance and the verification workflow. Published
+15.3.0 is the pinned artifact comparison baseline: five fixes, three preserved
+controls, two explicitly unchanged limitations. No ownership-model rewrite.
+
+Preflight: 83/83 full release gates passed, zero failed/known-red, with Node
+24.15.0 and pnpm 10.17.0. Full seven-project tests, 136 production browser checks,
+frozen install, metadata checks and separate kernel coverage passed. Canonical
+`llms.txt` now has five fully resolved, strictly checked examples; its collector
+cannot silently exclude `.txt` or accept missing context. Missing mutation proof
+now exits 1. Original failures and corrections are preserved in
+`docs/audits/2026-09-28-v15-release-readiness.md`.
+
+Next: freeze the committed candidate, complete exact-SHA ordinary gates and
+all mutation proofs, delete dist and rebuild, then packed consumers and clean
+checkout verification. Remote exact-SHA CI and publication require the relevant
+owner authorization. Do not claim release qualification from this preflight.
+
 ## v15 refusal/reporting checkpoint — September 28, 2026
 
 Completed local repair checkpoint: `0faa878d` on

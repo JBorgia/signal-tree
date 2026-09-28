@@ -147,3 +147,12 @@ release tree resources; bounded owners must call `destroy()`.
 
 React Native validation, custom equality, shared cross-component subscriptions,
 and first-party memoized selectors are not part of the initial surface.
+
+## Transaction failures
+
+Read [Transaction failures and current v15 limitations](https://github.com/JBorgia/signal-tree/blob/fix/15.3.1-link-rollback-and-strand/docs/guides/transaction-failures-v15.md)
+before combining transactions, undo, or persistence. Explicit rollback refusal
+leaves state unchanged and the handle pending but releases consequences in v15. The
+unreleased 15.3.1 candidate commits surviving writes on automatic refusal
+before a handle returns and still throws. An error does not guarantee undo;
+never blindly retry the entire operation.

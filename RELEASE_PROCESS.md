@@ -44,8 +44,8 @@ node scripts/publish-candidate.mjs --ci --prebuilt
 ```
 
 The engine prepares manifests, runs package/declaration/consumer checks, packs
-the ordered public `kernel`, `angular`, `react`, and `vue` artifacts from `scripts/release-plan.mjs`, records SHA-512
-integrity, and publishes those tarballs with provenance. A rerun skips an
+the ordered public artifacts from `scripts/release-plan.mjs` (kernel, angular,
+react, vue, solid), records SHA-512 integrity, and publishes those tarballs with provenance. A rerun skips an
 existing version only when registry integrity matches exactly; any mismatch or
 registry lookup failure aborts.
 
@@ -66,7 +66,7 @@ preparation. For SSH signing, configure `gpg.format=ssh`, `user.signingkey`, and
 
 ## After Publication
 
-Verify all four npm versions and dist-tags, install the exact version into a
-fresh external project, confirm runtime and strict typechecking, then create or
+Verify all five npm versions and dist-tags from `scripts/release-plan.mjs`,
+install the exact version into a fresh external project, confirm runtime and strict typechecking, then create or
 verify the GitHub release notes. Never unpublish a partial release as routine
 recovery; inspect candidate and registry integrity and resume the same version.

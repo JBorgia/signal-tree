@@ -318,11 +318,15 @@ Failed pending-transaction rollback throws `SignalTreeRollbackError`, whose
 stable `code` and structured `cause` distinguish refusal from application
 errors.
 
-A refusal is atomic: it changes no state, retires nothing, and leaves the
+An explicit refusal changes no state, retires no pending authority, and leaves the
 transaction **pending**, so `confirm()` and a retried `rollback()` both remain
 available. Reversing an older transaction while a newer overlapping one is
 still open refuses (`cause.kind === 'later-pending-dependency'`); settle the
-newer one first.
+newer one first. Existing v15 behavior nevertheless releases the commit scope
+and its deferred consequences on refusal; pending does not mean persistence is
+still deferred. A pending-created row later edited by confirmed work and then
+removed can still refuse due to that dependency. Deleting an entity is not a
+general way to make rollback retryable.
 
 **15.3.1 automatic-abort exception (unreleased):** if the callback throws or a
 post-callback step fails before `transaction()` returns its handle, SignalTree
@@ -331,7 +335,13 @@ are recorded as committed, eligible undo history is retained, durable
 consequences are released, and `transaction()` throws `SignalTreeRollbackError`.
 There is no recovery handle on this v15 path. A thrown error therefore does not
 guarantee that the writes were undone. This exception does not apply to an
-explicit `pending.rollback()` call. See the [settlement policy](../../docs/support-policy.md#transaction-failure-policy).
+explicit `pending.rollback()` call. Successful automatic rollback reverses
+recorded writes and discards deferred consequences. Never blindly retry the
+entire operation after an error or use undo for request reconciliation.
+Recoverable pending refusal is a v16 target, not current API. See
+[Transaction failures and current v15 limitations](https://github.com/JBorgia/signal-tree/blob/fix/15.3.1-link-rollback-and-strand/docs/guides/transaction-failures-v15.md)
+for remaining defects and the bounded observer-containment rule, including Vue
+mode differences and enclosing Solid batches.
 
 ## Exports
 

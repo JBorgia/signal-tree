@@ -12,6 +12,9 @@ SignalTree is not NgRx SignalStore.
 - Framework-neutral kernel: `@signal-tree/kernel`
 - React observation: `@signal-tree/react`
 - Vue: `@signal-tree/vue`
+- Solid: `@signal-tree/solid`
+
+These five packages are the public set defined by `scripts/release-plan.mjs`.
 
 Do not generate historical `@signaltree/*` package names or invent capability
 packages.
@@ -83,7 +86,16 @@ For an external derived factory, type `$` with `TreeNode<State>` from
 
 ## State Access
 
-`$` is the state facade.
+`$` is the state facade. Terminal leaf grammar depends on the facade:
+
+| Runtime | Read | Write |
+| --- | --- | --- |
+| Angular / Solid | `leaf()` | `leaf.set(value)` |
+| Vue | `leaf.value` | `leaf.value = value` |
+| React / kernel | `leaf()` | `leaf(value)` |
+
+Here `leaf` means a resolved state leaf, not the construction marker. Root and
+object branches remain callable in every facade.
 
 ```typescript
 // Angular leaves: call to read; use native signal methods to write.
@@ -251,7 +263,19 @@ undoable authored history.
 
 Use `transactions()` when an operation is pending and must later be confirmed or
 rolled back. Transactions and restoration are different authority models; do
-not use undo as a substitute for request reconciliation.
+not use `undo()` or `jumpTo()` as a substitute for request reconciliation.
+
+Read [Transaction failures and current v15 limitations](../guides/transaction-failures-v15.md).
+Explicit rollback refusal changes no state and leaves the handle pending, but
+releases consequences in existing v15. In the unreleased 15.3.1 candidate,
+automatic refusal before a handle returns commits surviving writes locally,
+retains eligible undo history, releases consequences, and throws. Successful
+automatic rollback reverses recorded writes. An error does not guarantee undo;
+never blindly retry the entire operation. Confirmed dependencies can still
+block rollback after a pending-created row is edited and removed. Recoverable
+pending refusal is a v16 target, not current API. Candidate containment covers
+deferred write subscribers and transaction turn listeners, not all framework
+effects; see the guide for Vue dev/production and enclosing Solid batch limits.
 
 ## Persistence And SSR
 
@@ -263,10 +287,13 @@ durability.
 const saved = localStorage.getItem('settings');
 if (saved) tree.$.settings(JSON.parse(saved));
 
+// This direct effect can persist pending writes; it has no settlement gate.
 effect(() => {
   localStorage.setItem('settings', JSON.stringify(tree.$.settings()));
 });
 ```
+
+For transaction-aware storage composition, read the [persistence guide](../guides/persistence-guide.md) and its v15 limitations.
 
 For SSR, validate an application-defined payload and construct the client tree
 from it.

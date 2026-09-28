@@ -94,3 +94,17 @@ rely on component unmount hooks for request cleanup or share a module-level tree
 between requests. With streaming rendering, wait for completion or abort before
 destroying the request owner. Construct the client tree from the same initial
 state used for the server output before hydration.
+
+## Transaction failures
+
+Read [Transaction failures and current v15 limitations](https://github.com/JBorgia/signal-tree/blob/fix/15.3.1-link-rollback-and-strand/docs/guides/transaction-failures-v15.md)
+before combining transactions, undo, or persistence. Explicit rollback refusal
+leaves state unchanged and the handle pending but releases consequences in v15. The
+unreleased 15.3.1 candidate commits surviving writes on automatic refusal
+before a handle returns and still throws. An error does not guarantee undo;
+never blindly retry the entire operation.
+
+Candidate containment applies to deferred write subscribers and transaction
+turn listeners, not all Vue effects. Vue rethrows watcher errors in development
+but logs them in production, so only the former can trigger automatic rollback
+at transaction closure.

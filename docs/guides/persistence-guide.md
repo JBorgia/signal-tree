@@ -20,7 +20,7 @@ the same primitive the removed `loader()` decomposed into for collections.
 Persistence is just the case where the endpoint is storage instead of HTTP:
 
 ```typescript
-import { link, type Link, type Location } from '@signal-tree/kernel';
+import { link, signalTree, type Link, type Location } from '@signal-tree/kernel';
 
 function attachLocalStorageSync<T>(location: Location<T>, key: string): Link {
   const connection = link(location, {
@@ -75,3 +75,23 @@ resource, or a WebSocket — only `get`/`set`/`subscribe` differ. See
 [composition-recipes.md](composition-recipes.md) for the sibling recipes this
 guide shares its model with (staged editing, optimistic writes with server
 reconciliation).
+
+## Transaction and durability limits
+
+Read [Transaction failures and current v15 limitations](transaction-failures-v15.md)
+before relying on settlement to gate storage. Explicit rollback refusal leaves
+state unchanged and the handle pending but releases consequences in existing
+v15. Automatic refusal before a handle returns in the unreleased 15.3.1
+candidate records surviving writes as committed, retains eligible undo history,
+releases consequences, and still throws. Successful automatic rollback reverses
+recorded writes and discards deferred consequences. Error does not guarantee
+undo or backend rejection; never blindly retry the whole operation.
+
+Link currently can miss restored rows, omitted branch keys, and same-tick
+notifications. During an asynchronous endpoint `set()`, pending writes can
+escape before settlement, `settled()` can resolve early after rejection, and
+disposal can leave a waiter blocked until that send settles. Direct framework
+effects writing storage have no transaction settlement gate. Applications must
+own reconciliation, idempotency, and durable acknowledgements; neither an error
+nor `settled()` is proof of the remote outcome. A recovery handle that keeps
+consequences pending until confirmation is a v16 target, not a v15 API.

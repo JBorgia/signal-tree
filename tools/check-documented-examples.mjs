@@ -69,6 +69,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
  */
 const LIVE_DOCS = [
   'README.md',
+  'llms.txt',
   'packages/kernel/README.md',
   'packages/kernel/ENHANCERS.md',
   'packages/angular/README.md',
@@ -121,7 +122,7 @@ function collect(target) {
 
 function liveDocuments() {
   return LIVE_DOCS.flatMap(collect)
-    .filter((rel) => rel.endsWith('.md'))
+    .filter((rel) => rel.endsWith('.md') || rel === 'llms.txt')
     .filter((rel) => !isMigrationGuide(rel));
 }
 
@@ -159,7 +160,7 @@ function examplesIn(rel) {
   while ((match = fence.exec(source))) {
     index += 1;
     const code = match[2];
-    if (!/from\s+['"]@signal-tree\//.test(code)) continue;
+    if (rel !== 'llms.txt' && !/from\s+['"]@signal-tree\//.test(code)) continue;
     found.push({
       file: rel,
       index,
@@ -216,6 +217,8 @@ function diagnose(block, options) {
   const all = ts
     .getPreEmitDiagnostics(program)
     .filter((d) => d.file?.fileName === virtual);
+  // Canonical AI examples must be complete: missing context cannot suppress checks.
+  if (block.file === 'llms.txt') return all;
   const elided = all.some((d) => POISONS_TYPES.has(d.code));
   return all.filter(
     (d) => IMPORT_SHAPE.has(d.code) || (!elided && PROPERTY_SHAPE.has(d.code))
@@ -235,6 +238,10 @@ function run({ list = false } = {}) {
   const documents = liveDocuments();
   const blocks = documents.flatMap(examplesIn);
   const failures = [];
+  if (!blocks.some((block) => block.file === 'llms.txt')) {
+    console.error('Canonical llms.txt examples were not checked');
+    return 1;
+  }
 
   for (const block of blocks) {
     const diagnostics = diagnose(block, options);
@@ -315,6 +322,25 @@ function selfTest() {
   ];
 
   let failed = 0;
+  if (
+    !liveDocuments().includes('llms.txt') ||
+    examplesIn('llms.txt').length === 0
+  ) {
+    console.error('FAIL canonical llms.txt has no executable example coverage');
+    failed++;
+  }
+  for (const code of [
+    "import { signalTree } from '@signal-tree/angular'; const tree = signalTree({ count: 0 }); tree.$.count(5);",
+    'missingTree.$.count(1);',
+  ]) {
+    if (
+      diagnose({ file: 'llms.txt', index: 0, code, tsx: false }, options)
+        .length === 0
+    ) {
+      console.error('FAIL llms.txt accepted invalid or unresolved context');
+      failed++;
+    }
+  }
   for (const [index, testCase] of cases.entries()) {
     const diagnostics = diagnose(
       { file: 'self-test', index, code: testCase.code, tsx: false },

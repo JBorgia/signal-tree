@@ -1028,7 +1028,8 @@ describe('failures after the callback returns (15.x)', () => {
         };
       }
       try {
-        expect(() =>
+        let caught: unknown;
+        try {
           tree.transaction(() => {
             tree.$.x(1);
             scheduleDurableConsequence({
@@ -1046,8 +1047,25 @@ describe('failures after the callback returns (15.x)', () => {
               },
             });
             if (phase === 'callback') throw failure;
-          })
-        ).toThrow('Transaction rollback refused');
+          });
+        } catch (error) {
+          caught = error;
+        }
+        expect(caught).toMatchObject({
+          cause: {
+            kind: 'effect-validation-failed',
+            callbackError: phase === 'callback' ? failure : undefined,
+            cause: { kind: 'structural-drift' },
+          },
+        });
+        expect(String(caught)).toContain('Transaction rollback refused');
+        if (phase === 'release') {
+          expect(report.mock.calls.some((args: unknown[]) =>
+            args.includes(failure) && args.some((arg: unknown) =>
+              String(arg).includes('a post-callback step whose rollback was then refused')
+            )
+          )).toBe(true);
+        }
         expect(tree.$.x()).toBe(1);
         expect(consequences).toBe(1);
         expect(hasOpenCommitScope(tree as object)).toBe(false);

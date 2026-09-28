@@ -4,8 +4,9 @@
 
 **If you are on any `@signaltree/*` package, this is the migration you need.**
 `@signaltree/*` (no hyphen) is the pre-15 line. SignalTree 15 ships under the
-scoped, hyphenated `@signal-tree/*` name, and the multi-package surface is
-consolidated into four packages.
+scoped, hyphenated `@signal-tree/*` name, and the multi-package surface
+now provides five public packages, including Solid (added in 15.2).
+The canonical inventory is `scripts/release-plan.mjs`.
 
 15.0 is also an API-reduction release: every API change below removes something
 that was either a duplicate of an existing path or a type that described a
@@ -22,12 +23,12 @@ publication. If one does not compile for you, that is a bug — please report it
 
 Every import specifier changes. No dist-tag or alias bridges the two names: the
 scopes are independent. `@signaltree/*` is the v14 line — still maintained for
-bug and security fixes (currently `14.1.3`) but frozen on features — and
+bug and security fixes (see the [registry](https://www.npmjs.com/package/@signaltree/core) for the current patch) but frozen on features — and
 `@signal-tree/*` is v15 and forward. Migrate when you are ready; you are not
 racing an EOL. See the [support policy](../support-policy.md) for what v14 still
 receives.
 
-### Four packages, not eight
+### Current five-package surface
 
 | v14 package (`@signaltree/*`) | v15                                                                                                                                                                                       |
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -35,6 +36,7 @@ receives.
 | `@signaltree/angular`         | **`@signal-tree/angular`** — native Angular signal leaves over kernel-owned state; **Angular apps import `signalTree` from here**                                                         |
 | _(new)_                       | **`@signal-tree/react`** — owner-bound React observation (`useSignalTree`)                                                                                                                |
 | _(new)_                       | **`@signal-tree/vue`** — native Vue ref leaves over kernel-owned state                                                                                                                    |
+| _(new in 15.2)_ | **`@signal-tree/solid`** — native Solid accessors; read `leaf()`, write `leaf.set(value)` |
 | `@signaltree/ng-forms`        | **Removed.** SignalTree 15 does not publish a forms capability. Own form-control wiring and validation in the application.                                                                |
 | `@signaltree/schema`          | **Removed.** No published validation capability; validate in application code.                                                                                                            |
 | `@signaltree/events`          | **Removed.** No published event-bus capability.                                                                                                                                           |

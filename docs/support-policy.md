@@ -92,7 +92,7 @@ evolves, its support status changes here rather than degrading silently.
 
 - New features, new APIs, or new capability packages.
 - Backports of v15 architecture (framework-native carriers, the kernel/adapter
-  split, the four-package consolidation).
+  split, the five-package public workspace).
 - Support for Angular versions newer than its existing `peerDependencies` range,
   beyond what is required for a security fix.
 
@@ -129,7 +129,10 @@ inter-version guides under [`legacy/`](legacy/README.md) are kept for provenance
 
 ## Transaction failure policy
 
-The 15.3.1 development patch distinguishes two failure boundaries:
+The 15.3.1 development patch distinguishes two failure boundaries. See the
+[transaction failure guide](guides/transaction-failures-v15.md) for retry,
+framework delivery and synchronization limitations. A thrown transaction does
+not prove rollback; do not blindly retry the whole operation.
 
 | Boundary | Refusal outcome |
 | --- | --- |

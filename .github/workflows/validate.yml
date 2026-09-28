@@ -5,6 +5,7 @@ name: Validate
 # push to main. Previously no CI ran these gates at all.
 
 on:
+  # Manual runs include release-only checks but never tag or publish.
   workflow_dispatch: {}
   push:
     branches: [main]
@@ -47,10 +48,36 @@ jobs:
         run: pnpm run build:all
 
       - name: All gates (lint budget, typecheck, tests, barrels, exports, docs, budgets, harnesses)
-        run: pnpm run gates
+        env:
+          RELEASE_CHECKS: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          if [ "$RELEASE_CHECKS" = "true" ]; then
+            pnpm run gates -- --release
+          else
+            pnpm run gates
+          fi
 
       - name: Prove every gate can still fail
-        run: pnpm run gates:self-test
+        env:
+          RELEASE_CHECKS: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          if [ "$RELEASE_CHECKS" = "true" ]; then
+            pnpm run gates:self-test -- --release
+          else
+            pnpm run gates:self-test
+          fi
+
+      - name: Rebuild clean artifacts after mutations
+        run: |
+          git diff --exit-code
+          rm -rf dist
+          pnpm exec nx run-many -t build --projects=kernel,angular,react,vue,solid --skip-nx-cache
+
+      - name: Verify fresh packed consumers
+        run: |
+          node tools/verify-tarball-consumer.mjs
+          node tools/verify-consumer-typecheck.mjs
+          git diff --exit-code
 
   demo-route-smoke:
     name: Demo route smoke (Playwright)

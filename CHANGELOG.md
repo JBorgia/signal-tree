@@ -1,7 +1,7 @@
-## Unreleased (15.3.1)
+## 15.3.1 (unreleased)
 
 **TL;DR** — **Patch. No API change, but two behaviour changes you could
-notice: observer errors are contained instead of thrown, and a throw from code
+notice: deferred write-subscriber and transaction-listener errors are contained instead of thrown, and a throw from code
 that runs as the transaction closes now rolls the transaction back, or, if
 something else wrote the same location meanwhile, commits it and throws.** The
 fixes: (1) a `link()` endpoint could miss values, and `link.settled()` could
@@ -105,9 +105,15 @@ The policy is now:
   it does not change explicit rollback refusal on a returned pending handle.
 - `coalesce()`'s secondary-error console call cannot throw either.
 
-Two limits remain on 15.x. A refused rollback throws `SignalTreeRollbackError`
-with the writes applied, since 15.x has no recovery handle; the failure that
-made the rollback necessary is reported. And a failure inside the step that
+Automatic abort has a v15 limitation: when compensation refuses before a handle
+can be returned, `SignalTreeRollbackError` is thrown with surviving writes
+recorded as committed; there is no recovery handle for that failed call. The
+original triggering failure is retained as a cause or reported separately.
+Explicit rollback refusal on a returned handle instead retains that pending
+handle, while releasing its commit scope and durable consequences.
+See [Transaction failures in v15](docs/guides/transaction-failures-v15.md).
+**A thrown transaction does not prove rollback. Do not blindly retry the whole
+operation.** And a failure inside the step that
 records the pending turn is not rolled back; no supported trigger for it is
 known.
 
@@ -143,6 +149,10 @@ Synchronous delivery (batching disabled, an internal test seam) is unchanged.
 
 Each was reproduced on the installed 15.3.0 and is unchanged by this release:
 
+- **A confirmed dependency can keep rollback refused after its entity is removed.**
+  Repeating rollback preserves state and pending authority; removing the entity
+  does not erase the recorded dependency. The same handle can still confirm.
+  Retry availability does not guarantee that a conflict can be resolved.
 - **Restoring an entity row is not seen by observers.** After
   `transaction(() => rows.removeOne('A')).rollback()`, or an undo/redo that
   brings a removed row back, the tree has the row again but a linked endpoint
@@ -152,7 +162,7 @@ Each was reproduced on the installed 15.3.0 and is unchanged by this release:
   returned, so `rollback()` reverses nothing and a failed transaction's
   writes still land. `coalesce(() => undoable(...))` also records no history.
 - **Undo or redo while a transaction on the same location is pending is not
-  reconciled with it** (the 16.x line fixes this). Rolling the transaction
+  reconciled with it** (outside this patch's scope). Rolling the transaction
   back afterwards reverses straight through the undo or redo, and confirming
   it commits a write the tree no longer holds.
 - **Work done by observers while `transaction()` is still running is ordered

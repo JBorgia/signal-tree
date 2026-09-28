@@ -107,3 +107,17 @@ protection that is not there. Tracked for a follow-up release.
 ## License
 
 Apache-2.0
+
+## Transaction failures
+
+Read [Transaction failures and current v15 limitations](https://github.com/JBorgia/signal-tree/blob/fix/15.3.1-link-rollback-and-strand/docs/guides/transaction-failures-v15.md)
+before combining transactions, undo, or persistence. Explicit rollback refusal
+leaves state unchanged and the handle pending but releases consequences in v15. The
+unreleased 15.3.1 candidate commits surviving writes on automatic refusal
+before a handle returns and still throws. An error does not guarantee undo;
+never blindly retry the entire operation.
+
+Candidate containment applies to deferred write subscribers and transaction
+turn listeners, not all Solid effects. An enclosing Solid `batch()` can defer
+effects until after `transaction()` returns a handle; errors then surface from
+the outer batch, outside automatic transaction rollback.

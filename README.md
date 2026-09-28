@@ -14,7 +14,7 @@
 
 ## See the difference
 
-Read and edit a field at the same typed path. Here is Angular; [React](packages/react/README.md), [Vue](packages/vue/README.md), and [plain TypeScript](packages/kernel/README.md) have their own entry points.
+Read and edit a field at the same typed path. Here is Angular; [React](packages/react/README.md), [Vue](packages/vue/README.md), [Solid](packages/solid/README.md), and [plain TypeScript](packages/kernel/README.md) have their own entry points.
 
 ```typescript
 import { computed, isSignal } from '@angular/core';
@@ -54,7 +54,7 @@ Already comfortable with `signal()` and `computed()`? [See what SignalTree adds]
 - Loading, caching, saving, and merging collaborative edits remain application concerns.
 - Undo applies only to operations you mark with `undoable()` and requires `restoration()`.
 
-[Compare with NgRx SignalStore](docs/compare/ngrx-signalstore.md) · [Collection API](packages/kernel/README.md#entitymap) · [Persistence boundaries](docs/guides/persistence-guide.md)
+[Compare with NgRx SignalStore](docs/compare/ngrx-signalstore.md) · [Collection API](packages/kernel/README.md#entitymap) · [Persistence boundaries](docs/guides/persistence-guide.md) · [Transaction failures and current v15 limitations](docs/guides/transaction-failures-v15.md)
 
 [Run the browser benchmarks](https://signaltree.io/benchmarks) to compare the work your app does on your own device.
 

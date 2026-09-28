@@ -10,7 +10,7 @@ declare const ngDevMode: boolean | undefined;
  *
  * ⚠️ NOT "every error the library catches" — that was the original aspiration
  * and it was never true. The measured producer inventory is deliberately narrow:
- * `link` and `stored`, plus (15.3.1) an observer error that the path notifier
+ * `link`, plus (15.3.1) an observer error that the path notifier
  * or a transaction turn listener CONTAINED rather than let escape
  * ({@link reportContainedObserverError}). Every other catch site still handles
  * its own error locally and does not participate here.
@@ -18,12 +18,10 @@ declare const ngDevMode: boolean | undefined;
  * ## Why this exists
  *
  * A capability audit against NGXS found `NgxsUnhandledErrorHandler` and nothing
- * equivalent anywhere else, ours included. The gap is real and narrow: a
- * `stored()` write that fails, an `asyncSource` loader that rejects, an
- * an async loader that rejects — each is caught at its own site and turned into
- * local error state, which is correct, and each is therefore invisible to
- * anything that wants to see ALL of them. Reporting to Sentry meant wiring a
- * per-marker `onError` at every call site and remembering to do it forever.
+ * equivalent anywhere else, ours included. Earlier marker-based APIs had local
+ * error hooks; those markers were removed in v15. Current producers are the
+ * explicit reporting sites listed above. This observer does not imply that
+ * every application request failure or framework callback error is reported.
  *
  * This does NOT change how errors are handled. Every existing catch still runs,
  * still sets its local error state, still calls its own `onError`. This is an
@@ -59,8 +57,8 @@ export interface TreeErrorEvent {
   /** The thrown value, unwrapped as far as it was thrown. */
   readonly error: unknown;
   /**
-   * What was being attempted — `link:set`, `read`, `write`, `migrate`,
-   * `remove`.
+   * What was being attempted, for example `link`, `link:set`,
+   * `notify:subscriber`, or `transaction:listener`.
    *
    * ⚠️ Deliberately `string`, NOT a union. It is a diagnostic vocabulary, and
    * an exhaustively enumerated forever-list of every internal operation has not

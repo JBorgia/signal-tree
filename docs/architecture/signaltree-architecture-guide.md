@@ -32,6 +32,7 @@ persistence enhancer, form package, or framework-neutral global installation.
 | `@signal-tree/kernel`  | Framework-neutral state, EntityMap, links, restoration, transactions, batching, and DevTools |
 | `@signal-tree/angular` | Angular signal realization, `defineStore`, and Angular interop                               |
 | `@signal-tree/react`   | React owner-bound observation                                                                |
+| `@signal-tree/solid` | Native Solid signals, accessors, and lifecycle integration |
 | `@signal-tree/vue`     | Vue ref realization and computed derived/query values                                        |
 
 Applications should import construction from their framework package. The

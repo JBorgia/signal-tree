@@ -29,7 +29,8 @@ pnpm run publish:dry-run
 ```
 
 This builds, validates, packs, and executes `npm publish --dry-run` for all
-four packages. It creates no tag, commit, push, or registry version.
+five packages from `scripts/release-plan.mjs` (kernel, angular, react, vue, solid).
+It creates no tag, commit, push, or registry version.
 
 ## Authentication
 

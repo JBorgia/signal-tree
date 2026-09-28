@@ -8,14 +8,37 @@ import { assertReleasePlan } from '../scripts/release-plan.mjs';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 const REQUIRED = [
-  ['positioning', /IS NOT: primarily an undo library, event log, query library, sync engine, or\s+persistence framework/],
-  ['Angular facade', /Angular\s+code imports `signalTree` and all other SignalTree APIs from here/],
-  ['React facade', /React code\s+imports `signalTree`, markers, enhancers, and `useSignalTree/],
-  ['Vue facade', /Vue code\s+imports\s+`signalTree` and all other SignalTree APIs from here/],
-  ['neutral facade', /Use `@signal-tree\/kernel` directly only for framework-neutral TypeScript/],
-  ['link relationship', /persistent relationship with an external authority \(`link\(\)`'s three/],
+  ['Solid facade', /@signal-tree\/solid/],
+  ['v15 failure policy', /transaction-failures-v15\.md/],
+  [
+    'positioning',
+    /IS NOT: primarily an undo library, event log, query library, sync engine, or\s+persistence framework/,
+  ],
+  [
+    'Angular facade',
+    /Angular\s+code imports `signalTree` and all other SignalTree APIs from here/,
+  ],
+  [
+    'React facade',
+    /React code\s+imports `signalTree`, markers, enhancers, and `useSignalTree/,
+  ],
+  [
+    'Vue facade',
+    /Vue code\s+imports\s+`signalTree` and all other SignalTree APIs from here/,
+  ],
+  [
+    'neutral facade',
+    /Use `@signal-tree\/kernel` directly only for framework-neutral TypeScript/,
+  ],
+  [
+    'link relationship',
+    /persistent relationship with an external authority \(`link\(\)`'s three/,
+  ],
   ['persistence composition', /`link\(\)`-as-storage specialization/],
-  ['external authority', /external write is not automatically a retained causal-history turn/],
+  [
+    'external authority',
+    /external write is not automatically a retained causal-history turn/,
+  ],
   ['causal projection', /does not store\s+prose, actor names, or timestamps/],
 ];
 
@@ -30,9 +53,9 @@ function text(file) {
 }
 
 function inspect(manifest, readmes, rootReadme) {
-  const problems = REQUIRED.filter(([, pattern]) => !pattern.test(manifest)).map(
-    ([name]) => `canonical manifest omits ${name}`
-  );
+  const problems = REQUIRED.filter(
+    ([, pattern]) => !pattern.test(manifest)
+  ).map(([name]) => `canonical manifest omits ${name}`);
   for (const pkg of PACKAGES) {
     if (!/\[llms\.txt\]\(llms\.txt\)/.test(readmes[pkg]))
       problems.push(`${pkg} README does not link its co-packed llms.txt`);
@@ -47,13 +70,17 @@ function inspect(manifest, readmes, rootReadme) {
 function current() {
   return inspect(
     text('llms.txt'),
-    Object.fromEntries(PACKAGES.map((pkg) => [pkg, text(`packages/${pkg}/README.md`)])),
+    Object.fromEntries(
+      PACKAGES.map((pkg) => [pkg, text(`packages/${pkg}/README.md`)])
+    ),
     text('README.md')
   );
 }
 
 if (process.argv.includes('--self-test')) {
   const manifest = `
+@signal-tree/solid
+docs/guides/transaction-failures-v15.md
 IS NOT: primarily an undo library, event log, query library, sync engine, or
       persistence framework
 Angular code imports \`signalTree\` and all other SignalTree APIs from here
@@ -70,10 +97,24 @@ does not store prose, actor names, or timestamps
   );
   const baseline = inspect(manifest, readmes, '');
   const missing = inspect(manifest.replace('timestamps', 'dates'), readmes, '');
-  const passes = baseline.length === 0 && missing.length === 1;
+  const missingSolid = inspect(
+    manifest.replace('@signal-tree/solid', ''),
+    readmes,
+    ''
+  );
+  const missingPolicy = inspect(
+    manifest.replace('transaction-failures-v15.md', ''),
+    readmes,
+    ''
+  );
+  const passes =
+    baseline.length === 0 &&
+    missing.length === 1 &&
+    missingSolid.length === 1 &&
+    missingPolicy.length === 1;
   console.log(
     passes
-      ? '✅ self-test: the checker accepts complete guidance and rejects a missing causal-projection rule.'
+      ? '✅ self-test: the checker accepts complete guidance and rejects missing causal-projection, Solid and failure-policy guidance.'
       : '❌ self-test FAILED — semantic guidance assertions are not discriminating.'
   );
   process.exit(passes ? 0 : 1);
@@ -81,7 +122,9 @@ does not store prose, actor names, or timestamps
 
 const problems = current();
 if (problems.length === 0) {
-  console.log('✅ semantic discoverability: canonical guidance and package reachability are complete.');
+  console.log(
+    '✅ semantic discoverability: canonical guidance and package reachability are complete.'
+  );
   process.exit(0);
 }
 
