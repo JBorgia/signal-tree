@@ -106,3 +106,19 @@ The remaining source edit is JSDoc-only: remove current claims about deleted
 markers from the error-reporting documentation. No runtime body changed in this
 follow-up. Full exact-commit verification and post-mutation artifacts remain
 separate requirements.
+
+## First exact-commit proof result
+
+Candidate `5ffe4def6bf05fd6dc166a54b3e8f884d98acfaf` passed 83/83 ordinary
+release gates, exit 0, but failed the full release self-test: 82/83 proven,
+zero unproven/vacuous/blind, one errored, exit 1. Preserve
+`/private/tmp/st-1531-5ffe4def-gates.log` and
+`/private/tmp/st-1531-5ffe4def-self-test.log`. This candidate is superseded.
+
+The raw-signals mutation still targeted `field.set()` after commit `81780c4e`
+changed the measured loop to `arm.write()`. Updating only the mutation anchor
+restores its original purpose: suppress measured writes while retaining the
+sentinel and postcondition. The negative run fails specifically with
+`raw writeOne did not land`; restored control exits 0, and the focused mutation
+proof reports 1/1 proven. No benchmark assertion, threshold or production code
+changed. Restart complete verification against the next committed candidate.

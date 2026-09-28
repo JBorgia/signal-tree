@@ -1044,7 +1044,7 @@ const GATES = [
     // against the arm-order contamination this tool's first draft shipped.
     mutation: {
       file: 'tools/bench-raw-signals.mjs',
-      find: '  for (let i = 0; i < WRITES; i++) field.set(i + round * WRITES);\n  const ns = Number(process.hrtime.bigint() - t) / WRITES;\n  sink += field();',
+      find: '  for (let i = 0; i < WRITES; i++) arm.write(field, i + round * WRITES);\n  const ns = Number(process.hrtime.bigint() - t) / WRITES;\n  sink += field();',
       replace:
         '  for (let i = 0; i < WRITES; i++) void (i + round * WRITES);\n  const ns = Number(process.hrtime.bigint() - t) / WRITES;\n  sink += field();',
     },
