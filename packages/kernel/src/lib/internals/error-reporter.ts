@@ -10,7 +10,7 @@ declare const ngDevMode: boolean | undefined;
  *
  * ⚠️ NOT "every error the library catches" — that was the original aspiration
  * and it was never true. The measured producer inventory is deliberately narrow:
- * `link` and `stored`, plus (15.3.1) an observer error that the path notifier
+ * `link`, plus (15.3.1) an observer error that the path notifier
  * or a transaction turn listener CONTAINED rather than let escape
  * ({@link reportContainedObserverError}). Every other catch site still handles
  * its own error locally and does not participate here.
@@ -18,12 +18,10 @@ declare const ngDevMode: boolean | undefined;
  * ## Why this exists
  *
  * A capability audit against NGXS found `NgxsUnhandledErrorHandler` and nothing
- * equivalent anywhere else, ours included. The gap is real and narrow: a
- * `stored()` write that fails, an `asyncSource` loader that rejects, an
- * an async loader that rejects — each is caught at its own site and turned into
- * local error state, which is correct, and each is therefore invisible to
- * anything that wants to see ALL of them. Reporting to Sentry meant wiring a
- * per-marker `onError` at every call site and remembering to do it forever.
+ * equivalent anywhere else, ours included. Earlier marker-based APIs had local
+ * error hooks; those markers were removed in v15. Current producers are the
+ * explicit reporting sites listed above. This observer does not imply that
+ * every application request failure or framework callback error is reported.
  *
  * This does NOT change how errors are handled. Every existing catch still runs,
  * still sets its local error state, still calls its own `onError`. This is an
@@ -59,8 +57,8 @@ export interface TreeErrorEvent {
   /** The thrown value, unwrapped as far as it was thrown. */
   readonly error: unknown;
   /**
-   * What was being attempted — `link:set`, `read`, `write`, `migrate`,
-   * `remove`.
+   * What was being attempted, for example `link`, `link:set`,
+   * `notify:subscriber`, or `transaction:listener`.
    *
    * ⚠️ Deliberately `string`, NOT a union. It is a diagnostic vocabulary, and
    * an exhaustively enumerated forever-list of every internal operation has not
@@ -143,36 +141,62 @@ export function reportTreeError(event: TreeErrorEvent): boolean {
  * inside a flush would drop the rest of the batch, the failure this reporter
  * exists to prevent.
  */
-function safeConsoleError(message: string, error: unknown): void {
+function safeConsoleError(message: string, error?: unknown): void {
   try {
-    console.error(message, error);
+    if (error === undefined) console.error(message);
+    else console.error(message, error);
   } catch {
     // Nothing further can be reported without risking the same failure.
   }
 }
 
-// TX-REPORT-BUDGET-0. At most this many contained errors reach onTreeError
-// listeners per macrotask; the rest go to the console only. A listener that
-// writes on every report, with an observer that throws on every write, loops:
-// synchronously inside a flush, or as a microtask chain through link() or a
-// deferred write. Counting per task needs no knowledge of which write caused
-// which report, so every shape of that loop is bounded the same way.
+// TX-REPORT-BUDGET-0. At most this many contained errors per tree reach
+// onTreeError listeners within one window; the rest of that window's go to
+// the console only. A listener that writes on every report, with an observer
+// that throws on every write, otherwise loops: synchronously inside a flush,
+// or as a microtask chain through link() or a deferred write. Fast chains
+// exhaust the budget; slower chains can continue across windows. This is
+// rate limiting, not a termination guarantee.
+//
+// The window is read from the clock at report time rather than reset by a
+// timer: a timer can be missing (worklets, sandboxes), throw, or be faked and
+// never fire, and a reporter must never throw or wedge. Per tree, so one
+// noisy tree cannot starve another's reports.
 const CONTAINED_REPORT_BUDGET = 50;
-let containedReportsThisTask = 0;
-let budgetResetScheduled = false;
-let budgetNoticeWritten = false;
+const CONTAINED_REPORT_WINDOW_MS = 1000;
+type ReportWindow = { start: number; count: number };
+// Registration follows tree lifetime. A report cannot create a new owner.
+// The undefined key is one shared window for detached reports, never a dead ID.
+const containedReportWindows = new Map<TreeId | undefined, ReportWindow | null>();
 
-function takeContainedReportBudget(): boolean {
-  if (!budgetResetScheduled) {
-    budgetResetScheduled = true;
-    setTimeout(() => {
-      containedReportsThisTask = 0;
-      budgetResetScheduled = false;
-      budgetNoticeWritten = false;
-    }, 0);
+export function registerContainedReportBudget(treeId: TreeId): void {
+  containedReportWindows.set(treeId, null);
+}
+
+function takeContainedReportBudget(treeId: TreeId): boolean {
+  let now = 0;
+  try {
+    now = Date.now();
+  } catch {
+    // A clock that throws leaves one window open; still bounded.
   }
-  if (containedReportsThisTask >= CONTAINED_REPORT_BUDGET) return false;
-  containedReportsThisTask++;
+  const owner = containedReportWindows.has(treeId) ? treeId : undefined;
+  let window = containedReportWindows.get(owner);
+  if (!window || now - window.start >= CONTAINED_REPORT_WINDOW_MS) {
+    window = { start: now, count: 0 };
+    containedReportWindows.set(owner, window);
+  }
+  if (window.count >= CONTAINED_REPORT_BUDGET) {
+    // One count past the budget records that its exhaustion was announced.
+    if (window.count === CONTAINED_REPORT_BUDGET && listeners.size > 0) {
+      window.count++;
+      safeConsoleError(
+        `SignalTree: more than ${CONTAINED_REPORT_BUDGET} contained observer errors for one tree within a second; further ones go to the console only, not onTreeError. [ST2034]`
+      );
+    }
+    return false;
+  }
+  window.count++;
   return true;
 }
 
@@ -183,15 +207,15 @@ function takeContainedReportBudget(): boolean {
  * or turn it observed already exists, so the error must not escape into
  * whoever flushed.
  *
- * Goes to `onTreeError` like any other report, up to a per-task budget (see
- * TX-REPORT-BUDGET-0). The console line [ST2034] is explicit and never silent:
+ * Goes to `onTreeError` like any other report, up to a per-tree budget per
+ * window (see TX-REPORT-BUDGET-0). The console line [ST2034] is explicit and never silent:
  *
  * - in development it is ALWAYS written, because a listener that returns
  *   normally may still have ignored the event (one filtering on `link:set`,
  *   or routing by tree);
  * - in production it is written when no listener took the report (none
  *   registered, or every one threw), the failure names no tree, or the
- *   task's report budget is spent.
+ *   tree's report budget for the window is spent.
  *
  * These errors used to throw; containing them must not make them silent.
  */
@@ -204,19 +228,13 @@ export function reportContainedObserverError(event: {
   const { error, operation, treeId, path } = event;
   let received = false;
   if (treeId !== undefined) {
-    if (takeContainedReportBudget()) {
+    if (takeContainedReportBudget(treeId)) {
       received = reportTreeError({
         error,
         operation,
         treeId,
         ...(path === undefined ? {} : { path }),
       });
-    } else if (!budgetNoticeWritten) {
-      budgetNoticeWritten = true;
-      safeConsoleError(
-        `SignalTree: more than ${CONTAINED_REPORT_BUDGET} contained observer errors in one task; the rest of this task's go to the console only, not onTreeError. [ST2034]`,
-        error
-      );
     }
   }
   if (received && !(typeof ngDevMode === 'undefined' || ngDevMode)) {
@@ -232,11 +250,23 @@ export function reportContainedObserverError(event: {
 
 /** Test seam: reset the contained-report budget between specs. */
 export function resetContainedReportBudgetForTesting(): void {
-  containedReportsThisTask = 0;
-  budgetNoticeWritten = false;
+  for (const id of containedReportWindows.keys())
+    containedReportWindows.set(id, null);
 }
 
 /** Test seam — listeners are module-global, so a spec must be able to reset. */
 export function clearTreeErrorListenersForTesting(): void {
   listeners.clear();
+}
+
+/** Internal lifetime diagnostic; never forwarded by a package entrypoint. */
+export function getContainedReportBudgetSizeForTesting(): number {
+  return (
+    containedReportWindows.size - Number(containedReportWindows.has(undefined))
+  );
+}
+
+/** Release diagnostics owned by a tree, after its cleanup callbacks finish. */
+export function releaseContainedReportBudget(treeId: TreeId): void {
+  containedReportWindows.delete(treeId);
 }

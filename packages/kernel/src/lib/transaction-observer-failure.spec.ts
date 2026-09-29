@@ -5,11 +5,19 @@ import {
   clearTreeErrorListenersForTesting,
   onTreeError,
   resetContainedReportBudgetForTesting,
+  getContainedReportBudgetSizeForTesting,
+  reportContainedObserverError,
   type TreeErrorEvent,
 } from './internals/error-reporter';
 import { MUTATION_CAPTURE_RUNTIME } from './internals/mutation-capture-runtime';
-import { hasOpenCommitScope } from './internals/commit-consequence';
+import {
+  hasOpenCommitScope,
+  scheduleDurableConsequence,
+} from './internals/commit-consequence';
+import { getTransactionLifecycleChannel } from './internals/causal-runtime/transaction-lifecycle';
 import { entityMap } from './markers/entity-map';
+import { restoration } from '../enhancers/restoration/restoration';
+import { undoable } from './undoable';
 import { getPositionRegistry } from './internals/position-registry';
 import { observeWrites } from './internals/write-observation';
 import { link } from './link';
@@ -372,46 +380,48 @@ describe('a contained observer error is reported, never silent', () => {
   });
 
   it('falls back to console.error as ST2034 when no onTreeError listener exists', async () => {
-    const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
-    const failure = new Error('observer');
-    const off = observeWrites(() => {
-      throw failure;
+    await inProduction(async () => {
+      const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
+      const failure = new Error('observer');
+      const off = observeWrites(() => {
+        throw failure;
+      });
+      try {
+        tree.$.x(1);
+        await flush();
+        expect(report).toHaveBeenCalledWith(
+          expect.stringContaining('[ST2034]'),
+          failure
+        );
+      } finally {
+        off();
+        tree.destroy();
+      }
     });
-    try {
-      tree.$.x(1);
-      await flush();
-      expect(report).toHaveBeenCalledWith(
-        expect.stringContaining('[ST2034]'),
-        failure
-      );
-    } finally {
-      off();
-      tree.destroy();
-    }
   });
-
-  it('falls back to the console for a write no tree can be attributed to', () => {
-    const events: TreeErrorEvent[] = [];
-    const offErrors = onTreeError((event) => void events.push(event));
-    const notifier = new PathNotifier();
-    const failure = new Error('observer');
-    notifier.subscribe('**', () => {
-      throw failure;
+  it('falls back to the console for a write no tree can be attributed to', async () => {
+    await inProduction(async () => {
+      const events: TreeErrorEvent[] = [];
+      const offErrors = onTreeError((event) => void events.push(event));
+      const notifier = new PathNotifier();
+      const failure = new Error('observer');
+      notifier.subscribe('**', () => {
+        throw failure;
+      });
+      try {
+        notifier.notify('loose', 1, 0);
+        expect(() => notifier.flushSync()).not.toThrow();
+        expect(events).toEqual([]);
+        expect(report).toHaveBeenCalledWith(
+          expect.stringContaining('[ST2034]'),
+          failure
+        );
+      } finally {
+        offErrors();
+        notifier.clear();
+      }
     });
-    try {
-      notifier.notify('loose', 1, 0);
-      expect(() => notifier.flushSync()).not.toThrow();
-      expect(events).toEqual([]);
-      expect(report).toHaveBeenCalledWith(
-        expect.stringContaining('[ST2034]'),
-        failure
-      );
-    } finally {
-      offErrors();
-      notifier.clear();
-    }
   });
-
   it('reports a throwing lifecycle listener through onTreeError', async () => {
     await inProduction(async () => {
       const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
@@ -491,10 +501,11 @@ describe('a contained observer error is reported, never silent', () => {
       const pending = tree.transact(() => tree.$.x(1));
       pending.confirm();
       await flush();
-      expect(calls).toBeLessThanOrEqual(50);
+      // The first report is the app tree's; the listener's writes then spend
+      // the errors tree's budget, and the loop stops.
+      expect(calls).toBeLessThanOrEqual(51);
       expect(report).toHaveBeenCalledWith(
-        expect.stringContaining('the rest of this task'),
-        expect.anything()
+        expect.stringContaining('further ones go to the console only')
       );
     } finally {
       off();
@@ -519,7 +530,7 @@ describe('a contained observer error is reported, never silent', () => {
     try {
       tree.$.x(1);
       for (let i = 0; i < 2000; i++) await Promise.resolve();
-      expect(calls).toBeLessThanOrEqual(50);
+      expect(calls).toBeLessThanOrEqual(51);
     } finally {
       off();
       offErrors();
@@ -529,26 +540,124 @@ describe('a contained observer error is reported, never silent', () => {
   });
 
   it('still logs the original error when every onTreeError listener throws', async () => {
-    const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
-    const offErrors = onTreeError(() => {
-      throw new Error('listener bug');
+    await inProduction(async () => {
+      const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
+      const offErrors = onTreeError(() => {
+        throw new Error('listener bug');
+      });
+      const failure = new Error('observer');
+      const off = observeWrites(() => {
+        throw failure;
+      });
+      try {
+        tree.$.x(1);
+        await flush();
+        expect(report).toHaveBeenCalledWith(
+          expect.stringContaining('[ST2034]'),
+          failure
+        );
+      } finally {
+        off();
+        offErrors();
+        tree.destroy();
+      }
     });
-    const failure = new Error('observer');
+  });
+  it('reports without a timer, so a host with no setTimeout cannot strand the transaction', async () => {
+    const scope = globalThis as { setTimeout?: unknown };
+    const saved = scope.setTimeout;
+    const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
+    const events: TreeErrorEvent[] = [];
+    const offErrors = onTreeError((event) => void events.push(event));
     const off = observeWrites(() => {
-      throw failure;
+      throw new Error('observer');
+    });
+    scope.setTimeout = undefined;
+    let handle: { confirm(): void } | undefined;
+    try {
+      handle = tree.transact(() => tree.$.x(1));
+    } finally {
+      scope.setTimeout = saved;
+      off();
+      offErrors();
+    }
+    try {
+      expect(handle).toBeDefined();
+      handle?.confirm();
+      expect(events.length).toBeGreaterThan(0);
+      expect(hasOpenCommitScope(tree as object)).toBe(false);
+    } finally {
+      tree.destroy();
+    }
+  });
+
+  it("one noisy tree cannot use up another tree's report budget", async () => {
+    const noisy = signalTree({ n: 0 }, { enhancers: [transactions()] });
+    const quiet = signalTree({ q: 0 }, { enhancers: [transactions()] });
+    const quietId = getPositionRegistry(quiet.$)!.id;
+    const events: TreeErrorEvent[] = [];
+    const offErrors = onTreeError((event) => void events.push(event));
+    const off = observeWrites(() => {
+      throw new Error('observer');
     });
     try {
-      tree.$.x(1);
+      for (let i = 1; i <= 80; i++) {
+        noisy.$.n(i);
+        getPathNotifier().flushSync();
+      }
+      quiet.$.q(1);
       await flush();
-      expect(report).toHaveBeenCalledWith(
-        expect.stringContaining('[ST2034]'),
-        failure
-      );
+      expect(events.some((e) => e.treeId === quietId)).toBe(true);
     } finally {
       off();
       offErrors();
+      noisy.destroy();
+      quiet.destroy();
+    }
+  });
+
+  it('rate limits within a window but does not promise slow-loop termination', () => {
+    const tree = signalTree({ x: 0 });
+    let now = 0;
+    const clock = vi.spyOn(Date, 'now').mockImplementation(() => now);
+    const listener = vi.fn();
+    const off = onTreeError(listener);
+    try {
+      for (let i = 0; i < 100; i++) {
+        now += 25;
+        reportContainedObserverError({
+          treeId: getPositionRegistry(tree.$)?.id,
+          operation: 'notify:subscriber',
+          error: new Error('slow report'),
+        });
+      }
+      expect(listener).toHaveBeenCalledTimes(100);
+    } finally {
+      off();
+      clock.mockRestore();
       tree.destroy();
     }
+  });
+
+  it('destroy releases the tree reporting record after cleanup reports', async () => {
+    const before = getContainedReportBudgetSizeForTesting();
+    const tree = signalTree({ x: 0 });
+    const treeId = getPositionRegistry(tree.$)?.id;
+    expect(treeId).toBeDefined();
+    const emit = () =>
+      reportContainedObserverError({
+        treeId,
+        operation: 'notify:subscriber',
+        error: new Error('observer'),
+      });
+    emit();
+    expect(getContainedReportBudgetSizeForTesting()).toBe(before + 1);
+    tree.registerCleanup(emit);
+    tree.registerCleanup(() => queueMicrotask(emit));
+    tree.destroy();
+    expect(getContainedReportBudgetSizeForTesting()).toBe(before);
+    await Promise.resolve();
+    expect(getContainedReportBudgetSizeForTesting()).toBe(before);
   });
 
   it('a throwing console cannot abort the flush', async () => {
@@ -1016,6 +1125,75 @@ describe('failures after the callback returns (16.x)', () => {
       expect(tree.$.c()).toBe(10);
     } finally {
       host[MUTATION_CAPTURE_RUNTIME] = previous;
+      off();
+      tree.destroy();
+    }
+  });
+
+  it('control: an observer write to another row does not stop the automatic rollback', async () => {
+    type Row = { id: string; v: number };
+    const tree = signalTree(
+      { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
+      { enhancers: [transactions()] }
+    );
+    tree.$.rows.addOne({ id: 'A', v: 0 });
+    tree.$.rows.addOne({ id: 'B', v: 0 });
+    await flush();
+    const host = tree as unknown as Record<symbol, unknown>;
+    const previous = host[MUTATION_CAPTURE_RUNTIME];
+    const failure = new Error('capture release failed');
+    host[MUTATION_CAPTURE_RUNTIME] = {
+      isCaptureActive: () => false,
+      activateCapture: () => () => {
+        throw failure;
+      },
+    };
+    const off = observeWrites((frame) => {
+      if (frame.path === 'rows.A' && tree.$.rows.byIdOrFail('B')().v !== 9) {
+        tree.$.rows.updateOne('B', { v: 9 });
+      }
+    });
+    try {
+      expect(() =>
+        tree.transact(() => tree.$.rows.updateOne('A', { v: 1 }))
+      ).toThrow(failure);
+      expect(tree.$.rows.byIdOrFail('A')().v).toBe(0);
+      expect(tree.$.rows.byIdOrFail('B')().v).toBe(9);
+    } finally {
+      host[MUTATION_CAPTURE_RUNTIME] = previous;
+      off();
+      tree.destroy();
+    }
+  });
+
+  it('the throwing-callback rollback is unchanged from 9df8fbff', async () => {
+    // An observer writes the same row while the failed callback is rolled
+    // back; 9df8fbff rolled the callback back regardless, and so does this.
+    type Row = { id: string; v: number };
+    const tree = signalTree(
+      { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
+      { enhancers: [transactions()] }
+    );
+    tree.$.rows.addOne({ id: 'A', v: 0 });
+    await flush();
+    const off = observeWrites((frame) => {
+      if (frame.path === 'rows.A' && tree.$.rows.byIdOrFail('A')().v === 1) {
+        tree.$.rows.updateOne('A', { v: 5 });
+      }
+    });
+    const boom = new Error('boom');
+    try {
+      expect(() =>
+        tree.transact(() => {
+          tree.$.rows.updateOne('A', { v: 1 });
+          throw boom;
+        })
+      ).toThrow(boom);
+      await flush();
+      // Compatibility characterization, NOT a safety assertion: this path
+      // still overwrites the observer's later v=5 with the baseline.
+      expect(tree.$.rows.byIdOrFail('A')().v).toBe(0);
+    } finally {
       off();
       tree.destroy();
     }

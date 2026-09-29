@@ -277,6 +277,10 @@ describe('PUBLIC: the surface is exactly three symbols', () => {
     expect(exported).not.toContain('reportTreeError');
     expect(exported).not.toContain('clearTreeErrorListenersForTesting');
     expect(exported).not.toContain('resetContainedReportBudgetForTesting');
+    expect(exported).not.toContain('getContainedReportBudgetSizeForTesting');
+    expect(exported).not.toContain('releaseContainedReportBudget');
+    expect(exported).not.toContain('registerContainedReportBudget');
+    expect(exported).not.toContain('reportContainedObserverError');
     // Deleted entirely, so it cannot leak.
     expect(exported).not.toContain('TreeErrorSource');
     // NOT dragged public merely because TreeId is.

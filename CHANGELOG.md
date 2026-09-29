@@ -45,13 +45,15 @@ carried on this line:
   endpoints and `settled()` while a transaction is pending, a rolled-back
   overlapping transaction, and undo/redo after a settled transaction.
 - A throwing write observer no longer strands `transact()`. Batched observer
-  errors go to `onTreeError` (at most 50 per task) and to the console as
-  [ST2034]: always in development, and in production when no listener took
-  the report.
+  errors go to `onTreeError` (at most 50 per tree per second) and to the
+  console as [ST2034]: always in development, and in production when no
+  listener took the report.
 - A disposed link withdraws its held consequences.
-- An automatic rollback (after the callback or a later step failed) refuses
-  if any location it would reverse was written again before `transact()`
-  returned, for example by an observer or a transaction an observer opened.
+- The rollback after a post-callback failure refuses if any location it would
+  reverse (a leaf, or an entity row) was written again before `transact()`
+  returned, for example by an observer or a transaction an observer opened;
+  the error carries the recovery handle. The throwing-callback rollback is
+  unchanged.
 
 Differences from 15.x, following this line's recovery-handle contract:
 
@@ -70,8 +72,11 @@ Known issues that also reproduce here: an entity row restored by rollback or
 undo/redo is not seen by linked endpoints; work an observer does while
 `transact()` is still running is ordered before it, so an explicit rollback
 afterwards can undo it; same-tick coalescing can lose a write for observers
-(a newest-first double rollback, and entity writes on two same-shaped trees);
-and realization descriptors are retained for retired entities.
+(for example a newest-first double rollback, a rollback and then an undo of
+the same location, and entity writes on two same-shaped trees); a whole-value
+branch write that leaves out a key loses it for good (no observer is told, and
+rollback and undo never restore it); and realization descriptors are retained
+for retired entities.
 
 ### For users
 

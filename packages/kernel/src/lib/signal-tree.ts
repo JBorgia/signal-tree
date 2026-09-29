@@ -36,6 +36,10 @@ const readWritableCell = <T>(cell: Location<T> | WritableCell<T>): T =>
   'peek' in cell && typeof cell.peek === 'function' ? cell.peek() : cell();
 
 import { SIGNAL_TREE_MESSAGES } from './constants';
+import {
+  registerContainedReportBudget,
+  releaseContainedReportBudget,
+} from './internals/error-reporter';
 import { resolveEnhancerOrder } from '../enhancers';
 import {
   setMemberPresence,
@@ -1551,6 +1555,7 @@ function createSignalStore<T>(
  * requirement to design deliberately — not a conclusion to smuggle in now.
  */
 interface TreeConstructionResult<T extends object> {
+  activateReporting(): void;
   readonly tree: ISignalTree<T>;
   readonly authority: OrdinaryConstructionAuthority;
 }
@@ -1809,6 +1814,7 @@ function create<T extends object>(
           }
         }
         cleanupFns.length = 0;
+        releaseContainedReportBudget(materializationContext.positionRegistry.id);
       }
       if (config.debugMode) {
         console.log(SIGNAL_TREE_MESSAGES.TREE_DESTROYED);
@@ -1884,7 +1890,17 @@ function create<T extends object>(
     configurable: true,
   });
 
-  return { tree, authority: constructionAuthority };
+  return {
+    tree,
+    authority: constructionAuthority,
+    activateReporting() {
+      if (!readWritableCell(destroyedSig)) {
+        registerContainedReportBudget(
+          materializationContext.positionRegistry.id
+        );
+      }
+    },
+  };
 }
 
 // =============================================================================
@@ -2058,13 +2074,16 @@ function signalTreeImpl<T extends object>(
     tree = applyEnhancers(tree, ordered);
   }
 
-  return createConfiguredTree<T, TreeNode<T>>(
+  const configured = createConfiguredTree<T, TreeNode<T>>(
     tree as ISignalTree<T>,
     materializationContext,
     hasEnhancers,
     authority,
     config.derived
   );
+  // Do not retain an ID for construction that failed in an enhancer.
+  constructed.activateReporting();
+  return configured;
 }
 
 // =============================================================================
