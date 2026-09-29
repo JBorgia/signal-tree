@@ -78,10 +78,9 @@ export interface TreeErrorEvent {
    * The SignalTree STATE LOCATION associated with the report, when the
    * reporting site knows it.
    *
-   * ⚠️ ONE meaning for every producer — Link reports the linked source's
-   * `ownerPath`, `stored` reports its node's `ownerPath`, NOT its storage key.
-   * A field whose meaning varied by producer would be the same defect as the
-   * `source` and `detail` fields this event deleted.
+   * Link reports the linked source's state path, not an endpoint or storage
+   * key. Other reporting sites may omit the path when no single location
+   * describes the failure.
    *
    * Location, never identity: two trees of the same shape share this string,
    * which is exactly why `treeId` is required.
@@ -92,10 +91,12 @@ export interface TreeErrorEvent {
 const listeners = new Set<(event: TreeErrorEvent) => void>();
 
 /**
- * Observe every error the library catches. Returns an unsubscribe function.
+ * Observe library-reported diagnostics. Returns an unsubscribe function.
  *
- * Fires for errors that were ALREADY handled locally — the marker has set its
- * error state and the app may show it. This is for reporting, not recovery.
+ * Reports outbound Link failures and contained deferred write-subscriber and
+ * transaction-listener failures. Observer reports are subject to the per-tree
+ * reporting budget. This is not a catch-all for application errors or a recovery
+ * callback, and a report does not itself establish transaction settlement.
  */
 export function onTreeError(
   listener: (event: TreeErrorEvent) => void
