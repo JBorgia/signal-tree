@@ -6,6 +6,31 @@ credible `1.0.0` release candidate.
 This is the release controller, not the full historical backlog. Use it to
 bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
+## v15.3.1 published and registry-verified — September 28, 2026
+
+Published all five public packages from signed tag `v15.3.1`, commit
+`40e668036290b43f9e389e97a35341ea9e5fea7d`. Exact-SHA Validate run
+`36517576873` passed 83/83 release gates, 83/83 mutation proofs and 137/137
+browser checks. Tagged release run `36519833762` and sanctioned publisher run
+`36521125534` independently passed 83/83 gates and 83/83 proofs with zero
+unproven, vacuous, blind or errored results. Artifacts were rebuilt after mutations.
+
+All five npm latest tags resolve to 15.3.1. Downloaded registry tarballs match
+all five immutable candidate SHA-512 hashes. Fresh installed consumers passed
+facade runtime identity and strict bundler/node16 compilation. The installed
+kernel comparison confirms five fixes, three preserved controls and two unchanged
+limitations; it is not a ten-case correctness claim. Clean-checkout rehearsal
+and publish dry run passed before tagging.
+
+Preserved failed evidence: the first local gate run was 82/83 because the
+published-baseline fixture exceeded its 15-second process deadline after emitting
+JSON. A diagnostic exited normally with no active resources; the unchanged
+comparison passed once after the clean rebuild. All exact-SHA Linux gate runs
+passed. Initial Vue/Solid registry checks failed while npm processed the uploads;
+final registry verification passed without republishing. No exclusive-host
+performance claim is made. Logs remain in the external release evidence directory
+`/private/tmp/st-15.3.1-40e66803`; workflow IDs provide the remote audit trail.
+
 ## v15.3.1 authorized finalization — September 28, 2026
 
 Owner authorized release after reviewing published-15.3.0 versus candidate
