@@ -154,8 +154,11 @@ export type RollbackFailureCause =
 type PendingEffectMap = Map<string, TurnEffect>;
 
 type CaptureBucket = {
-  /** TX-AUTO-ROLLBACK-0: window sequence of this bucket's last write per position. */
-  ownWriteSeq: Map<number, number>;
+  /**
+   * TX-AUTO-ROLLBACK-0: window sequence of this bucket's last write per
+   * location key (see windowKeys).
+   */
+  ownWriteSeq: Map<string, number>;
   ownerPaths: Set<string>;
   subjectIds: Set<number>;
   positionIds: Set<number>;
@@ -1142,7 +1145,7 @@ function cloneTurnRecord(turn: TransactionTurnRecord): TransactionTurnRecord {
 
 function createCaptureBucket(): CaptureBucket {
   return {
-    ownWriteSeq: new Map<number, number>(),
+    ownWriteSeq: new Map<string, number>(),
     ownerPaths: new Set<string>(),
     subjectIds: new Set<number>(),
     positionIds: new Set<number>(),
@@ -1286,34 +1289,77 @@ export function getOrCreateInternalTransactionRuntime<T>(
   defineTreeRealizationPort(treeWrapper, realizationPort);
   defineTreeRealizationPort(stateRoot, realizationPort);
 
-  // TX-AUTO-ROLLBACK-0. An AUTOMATIC rollback (a callback that threw, or a
-  // failure after it returned) runs while this transact() call is still in
-  // progress, so observers have had a chance to write the same locations: a
-  // location subscriber or framework effect as the invalidation group closes,
-  // an observeWrites subscriber in the flush, a transaction one of them
-  // opened, even a rollback of another transaction. Restoring this
-  // transaction's before-image over such a write would silently destroy it.
-  // So every write to this tree is sequenced while any transaction is open,
-  // and an automatic rollback refuses (writes left as they are; the recovery
-  // handle is attached) when a later write touched one of its positions.
-  // Cleared whenever no transaction is open, so nothing accumulates.
+  // TX-AUTO-ROLLBACK-0. The rollback after a failure that happens AFTER the
+  // callback returned (the invalidation group closing, the capture failing
+  // to release) runs while transact() is still in progress, when observers
+  // have already had a chance to write the same locations: a location
+  // subscriber or framework effect at the group close, an observeWrites
+  // subscriber in the flush, a transaction one of them opened. Restoring this
+  // transaction's before-image over such a write would destroy it, so that
+  // rollback refuses when a later write touched one of its locations; the
+  // recovery handle attached to the refusal leaves the decision with the
+  // caller. The throwing-callback rollback is unchanged from 9df8fbff.
+  //
+  // A location is a position, or a position and an entity subject: every
+  // entityMap write carries the collection's single position and names the
+  // row only in subjectIds, so keying by position alone made a write to ANY
+  // other row look like a conflict. A write naming no subject (a scalar, or a
+  // collection-level write) conflicts with every row at its position.
+  //
+  // Writes are sequenced only while a transaction is open, and the record is
+  // cleared whenever none is, so nothing accumulates.
   let windowWriteSeq = 0;
-  const lastWindowWriteSeq = new Map<number, number>();
-  const recordWindowWrite = (positionIds?: readonly number[]): void => {
-    const seq = ++windowWriteSeq;
+  const lastWindowWriteSeq = new Map<string, number>();
+  const lastWindowRowWriteSeq = new Map<number, number>();
+  const windowKeys = (
+    positionIds?: readonly number[],
+    subjectIds?: readonly number[]
+  ): string[] => {
+    const keys: string[] = [];
     for (const position of positionIds ?? []) {
-      lastWindowWriteSeq.set(position, seq);
+      if (subjectIds && subjectIds.length > 0) {
+        for (const subject of subjectIds) keys.push(`${position}:${subject}`);
+      } else {
+        keys.push(String(position));
+      }
+    }
+    return keys;
+  };
+  const recordWindowWrite = (
+    positionIds?: readonly number[],
+    subjectIds?: readonly number[]
+  ): void => {
+    const seq = ++windowWriteSeq;
+    for (const key of windowKeys(positionIds, subjectIds)) {
+      lastWindowWriteSeq.set(key, seq);
+      const colon = key.indexOf(':');
+      if (colon !== -1) {
+        lastWindowRowWriteSeq.set(Number(key.slice(0, colon)), seq);
+      }
     }
   };
   const writtenSinceBy = (bucket: CaptureBucket): boolean => {
-    for (const [position, own] of bucket.ownWriteSeq) {
-      const last = lastWindowWriteSeq.get(position);
-      if (last !== undefined && last > own) return true;
+    for (const [key, own] of bucket.ownWriteSeq) {
+      const colon = key.indexOf(':');
+      const position = colon === -1 ? key : key.slice(0, colon);
+      // The same location, or a subject-less write at its position.
+      if ((lastWindowWriteSeq.get(key) ?? 0) > own) return true;
+      if ((lastWindowWriteSeq.get(position) ?? 0) > own) return true;
+      // A subject-less location is touched by a write to any of its rows.
+      if (
+        colon === -1 &&
+        (lastWindowRowWriteSeq.get(Number(position)) ?? 0) > own
+      ) {
+        return true;
+      }
     }
     return false;
   };
   const releaseWindowIfClosed = (): void => {
-    if (pendingTransactions.size === 0) lastWindowWriteSeq.clear();
+    if (pendingTransactions.size === 0) {
+      lastWindowWriteSeq.clear();
+      lastWindowRowWriteSeq.clear();
+    }
   };
 
   // LINK-OVERLAP-ROLLBACK-0. A descriptor this settlement would forget can
@@ -1351,8 +1397,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
       if (authority.isPositionPending(owner)) return true;
       // An OPEN transaction's writes are normally captured (and their
       // descriptors recreated) at its post-callback flush, after anything its
-      // callback settles. This covers a flush inside the callback. Nesting is
-      // rejected, so there is at most one open bucket.
+      // callback settles. This covers a flush inside the callback; there can
+      // be more than one open bucket when an observer opened a transaction
+      // while another had not returned yet.
       for (const bucket of pendingTransactions.values())
         if (bucket.positionIds.has(owner)) return true;
       return false;
@@ -1406,6 +1453,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
   } => {
     const ownerPaths = Array.from(bucket.ownerPaths).sort();
     bucket.ownerPaths.clear();
+    bucket.ownWriteSeq.clear();
     const subjectIds = Array.from(bucket.subjectIds).sort((a, b) => a - b);
     bucket.subjectIds.clear();
     const positionIds = Array.from(bucket.positionIds).sort((a, b) => a - b);
@@ -1729,7 +1777,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
           })();
     for (const positionId of resolvedPositionIds) {
       bucket.positionIds.add(positionId);
-      bucket.ownWriteSeq.set(positionId, windowWriteSeq);
+    }
+    if (pendingTransactions.size > 0) {
+      for (const key of windowKeys(resolvedPositionIds, subjectIds)) {
+        bucket.ownWriteSeq.set(key, windowWriteSeq);
+      }
     }
     rememberTreeRealizationDescriptor({
       descriptors: realizationDescriptors,
@@ -2271,7 +2323,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
                 treeOwnerId === undefined ||
                 windowOwner === treeOwnerId
               ) {
-                recordWindowWrite(positionIds);
+                recordWindowWrite(positionIds, subjectIds);
               }
             }
             if (origin === 'restoration' || origin === 'transaction-rollback') {
@@ -2779,8 +2831,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
       notifier?.flushSync();
       // Decided before materialize, which releases the window's write record.
       const openBucket = pendingTransactions.get(transactionId);
+      // Only the post-callback rollback; a throwing callback's rollback
+      // admission is unchanged from 9df8fbff.
       const autoRollbackUnsafe =
-        (primaryFailed || cleanupFailed) &&
+        cleanupFailed &&
+        !primaryFailed &&
         openBucket !== undefined &&
         writtenSinceBy(openBucket);
       const pendingTurn = materializePendingTransaction(transactionId);
@@ -2983,7 +3038,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
               compensation: [],
               errorMessage:
                 'Transaction rollback refused: a location it wrote was written again before the transaction returned',
-              ...(primaryFailed ? { callbackError: primaryError } : {}),
             });
           }
           handle.rollback();
@@ -3104,6 +3158,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       }
       pendingTransactions.clear();
       lastWindowWriteSeq.clear();
+      lastWindowRowWriteSeq.clear();
       callbackExternalEffects.clear();
       inspectionWrites.clear();
       inspectionTransactionByTurn.clear();
