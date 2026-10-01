@@ -712,9 +712,8 @@ function warnEntityArrayLeaf(key: string, value: readonly unknown[]): void {
   console.warn(
     `SignalTree: "${key}" holds ${value.length} objects with a stable ` +
       `"${idKey}" — use entityMap({ selectId: (e) => e.${idKey} }). An array ` +
-      `leaf rebuilds and re-compares the whole array on every update — two ` +
-      `orders of magnitude at 50k. Read-only or replaced wholesale? ` +
-      `Leave it plain; otherwise model it as an entityMap. [ST2018]`
+      `leaf rebuilds and compares the array on replacement. Read-only or ` +
+      `replaced wholesale? Keep the array; use entityMap for per-entity edits. [ST2018]`
   );
 }
 

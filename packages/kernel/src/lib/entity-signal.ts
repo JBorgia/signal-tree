@@ -936,42 +936,17 @@ export function createEntitySignal<
   }
 
   /**
-   * ST2026 — the inline-predicate trap, caught in dev.
-   *
-   * `where`/`find` memoise per predicate IDENTITY, so the natural template form
-   *
-   *     @for (row of tree.$.rows.where(r => !r.done)(); track row.id) { … }
-   *
-   * allocates a NEW arrow on every change-detection cycle, misses the cache
-   * every time, and re-filters the whole collection. Measured over 1,000
-   * entities: 0.27ms with a hoisted predicate against 20.54ms inline — **75x**.
-   *
-   * It is not a leak (the cache is a `WeakMap`; 50,000 inline calls retain ~0MB
-   * after forced GC) which is exactly why it needs a diagnostic: nothing grows,
-   * nothing breaks, the app is simply slow forever.
-   *
-   * Detection is by SOURCE TEXT plus RATE, and the rate half is load-bearing.
-   *
-   * Byte-identical source across many distinct identities is necessary but NOT
-   * sufficient: `v => v.x > threshold`, rebuilt whenever `threshold` changes, has
-   * identical source too. Counting identities alone cannot tell the two apart,
-   * and it eventually accuses BOTH — the first version of this warned after 12
-   * distinct identities however long they took to accumulate, so a legitimately
-   * dynamic predicate warned during any long session, and the advice it gave
-   * ("hoist it") was actively wrong for that shape, because the closure really
-   * does differ each time.
-   *
-   * Rate separates them cleanly, and it is derivable rather than guessed. The
-   * trap is driven by CHANGE DETECTION, so it produces a new identity every CD
-   * cycle — tens per second. A predicate rebuilt from user input or a filter
-   * control produces one per interaction, which is orders of magnitude slower.
-   * Anything above ~6/second is a frame loop; nothing a user does reaches it.
+   * Warn about repeated predicate identities with identical source. Identity
+   * drives memoization, but equal source does not imply equal captured values.
+   * Count within a time window so legitimate slow replacement does not
+   * accumulate forever. This is a heuristic, not proof of a rendering loop;
+   * advice must preserve predicates whose captures actually change.
    */
   const predicateWindows = new Map<string, { count: number; start: number }>();
   const warnedPredicates = new Set<string>();
   /** Distinct identities within {@link PREDICATE_CHURN_WINDOW_MS} to accuse. */
   const PREDICATE_CHURN_THRESHOLD = 12;
-  /** ~6 identities/second is well above user-driven, well below a frame loop. */
+  /** Bounded sampling window; timing alone cannot establish a cause. */
   const PREDICATE_CHURN_WINDOW_MS = 2000;
 
   function warnOnPredicateChurn(
@@ -1000,14 +975,11 @@ export function createEntitySignal<
       (window.count / Math.max(now - window.start, 1)) * 1000
     );
     console.warn(
-      `SignalTree: \`${method}()\` received ${window.count} DIFFERENT functions ` +
+      `SignalTree: \`${method}()\` received ${window.count} different functions ` +
         `with identical source in ${Math.round(now - window.start)}ms ` +
-        `(~${perSecond}/second) — a rate only change detection produces. ` +
-        `Results are memoised per predicate IDENTITY, so an inline arrow misses ` +
-        `the cache every cycle and re-scans the collection: measured at 75x a ` +
-        `hoisted predicate over 1,000 entities. Hoist it to a stable reference ` +
-        `(a class field or module constant) and call ` +
-        `\`${method}(thePredicate)()\`. Source: ${source.slice(0, 80)} [ST2026]`
+        `(~${perSecond}/second). New predicate identities bypass query memoization. ` +
+        `Reuse a stable predicate when its captured inputs are unchanged. ` +
+        `Source: ${source.slice(0, 80)} [ST2026]`
     );
   }
 
@@ -4033,10 +4005,10 @@ export function createEntitySignal<
       // library → actionable hint instead of a later "undefined is not a
       // function". Only fires for names that are NOT real api members.
       if (
+        (typeof ngDevMode === 'undefined' || ngDevMode) &&
         typeof prop === 'string' &&
         !(prop in (target as object)) &&
         WRONG_ENTITY_METHODS[prop] &&
-        (typeof ngDevMode === 'undefined' || ngDevMode) &&
         !warnedWrongMethods.has(prop)
       ) {
         warnedWrongMethods.add(prop);

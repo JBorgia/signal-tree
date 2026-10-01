@@ -92,7 +92,10 @@ async function measure(id, code, define) {
     ...(define ? { define: { ngDevMode: 'false' } } : {}),
   });
   const text = Buffer.from(out.outputFiles[0].contents).toString('utf8');
-  return { gzipKB: gzipSync(Buffer.from(text), { level: 9 }).length / 1024, text };
+  return {
+    gzipKB: gzipSync(Buffer.from(text), { level: 9 }).length / 1024,
+    text,
+  };
 }
 
 /**
@@ -104,27 +107,35 @@ const WARN_ONLY_CODES = ['ST2001', 'ST2002', 'ST2003', 'ST2007'];
 
 /** Advisory literals that must NOT survive an ngDevMode=false build. */
 function findDiagnostics(text) {
-  return WARN_ONLY_CODES.filter((code) => text.includes(`[${code}]`));
+  return [
+    ...WARN_ONLY_CODES.map((code) => `[${code}]`),
+    // The warning call can fold while its earlier computed table read survives.
+    'upsertOne(entity) / upsertMany(entities)',
+    'not an RxJS Subject',
+  ].filter((literal) => text.includes(literal));
 }
 
 /**
- * `--self-test` proves this checker can fail, by pushing two DELIBERATELY broken
+ * `--self-test` proves this checker can fail, by pushing DELIBERATELY broken
  * fixtures through the very same build pipeline.
  *
  * This gate had no self-test for a while, and the reason given was that it
  * "asserts on a bundle it builds itself, so there is no input file to mutate".
  * That was true and it was also the wrong conclusion: if the tool builds its own
- * inputs, the self-test builds a BAD one. Both failure modes it claims to catch
+ * inputs, the self-test builds a BAD one. All three failure modes it claims to catch
  * are checked here —
  *
- *   1. a diagnostic literal that survives `ngDevMode: false`, and
- *   2. a bundle that does not shrink at all, which is what happens when the
+ *   1. a diagnostic literal that survives `ngDevMode: false`,
+ *   2. a diagnostic table surviving after its warning call folds, and
+ *   3. a bundle that does not shrink at all, which is what happens when the
  *      guards stop being statically foldable.
  *
- * A checker that cannot detect either is reported as broken.
+ * A checker that cannot detect each is reported as broken.
  */
 if (process.argv.includes('--self-test')) {
-  console.log('Self-test — the checker must FAIL against deliberately broken fixtures\n');
+  console.log(
+    'Self-test — the checker must FAIL against deliberately broken fixtures\n'
+  );
   let bad = 0;
 
   // 1. An advisory code that cannot fold: a bare string literal survives every
@@ -134,11 +145,29 @@ if (process.argv.includes('--self-test')) {
     'globalThis.__sink = "[ST2001] planted, cannot fold";',
     true
   );
-  const caughtLiteral = findDiagnostics(survives.text).includes('ST2001');
+  const caughtLiteral = findDiagnostics(survives.text).includes('[ST2001]');
   console.log(
-    `  ${caughtLiteral ? '✓' : '✗'} detects an advisory literal surviving ngDevMode=false`
+    `  ${
+      caughtLiteral ? '✓' : '✗'
+    } detects an advisory literal surviving ngDevMode=false`
   );
   if (!caughtLiteral) bad++;
+
+  for (const literal of [
+    'upsertOne(entity) / upsertMany(entities)',
+    'set leaves directly — not an RxJS Subject',
+  ]) {
+    const table = await measure(
+      'selftest-table',
+      `globalThis.__sink = ${JSON.stringify(literal)};`,
+      true
+    );
+    const caughtTable = findDiagnostics(table.text).length > 0;
+    console.log(
+      `  ${caughtTable ? '✓' : '✗'} detects surviving table text: ${literal}`
+    );
+    if (!caughtTable) bad++;
+  }
 
   // 2. A bundle with no dev code at all does not shrink, which is the signal
   //    that the guards stopped folding.
@@ -147,19 +176,23 @@ if (process.argv.includes('--self-test')) {
   const prodInert = await measure('selftest-inert', inert, true);
   const caughtNoShrink = !(devInert.gzipKB - prodInert.gzipKB > 0.01);
   console.log(
-    `  ${caughtNoShrink ? '✓' : '✗'} detects a bundle that does not shrink at all`
+    `  ${
+      caughtNoShrink ? '✓' : '✗'
+    } detects a bundle that does not shrink at all`
   );
   if (!caughtNoShrink) bad++;
 
   console.log(
     bad
       ? `\n✗ ${bad} self-test failure(s) — this checker cannot be trusted.`
-      : '\n✓ Self-test passed: both failure modes are detectable.'
+      : '\n✓ Self-test passed: all three failure modes are detectable.'
   );
   process.exit(bad ? 1 : 0);
 }
 
-console.log('🔍 Verifying dev-only code folds when ngDevMode is defined false\n');
+console.log(
+  '🔍 Verifying dev-only code folds when ngDevMode is defined false\n'
+);
 
 let failed = false;
 let totalSaved = 0;
@@ -187,7 +220,9 @@ for (const [id, code] of Object.entries(TARGETS)) {
   }
   if (leftovers.length > 0) {
     console.log(
-      `   ↳ diagnostic literals survived: ${leftovers.join(', ')} — these ship ` +
+      `   ↳ diagnostic literals survived: ${leftovers.join(
+        ', '
+      )} — these ship ` +
         `to production even with ngDevMode=false. Check that every guard is a ` +
         `bare \`ngDevMode\` comparison, not a function call.`
     );
@@ -195,8 +230,12 @@ for (const [id, code] of Object.entries(TARGETS)) {
 }
 
 console.log(
-  `\n${failed ? '❌' : '✅'} Dev code is ${failed ? 'NOT ' : ''}fully foldable` +
-    ` — consumers defining ngDevMode=false reclaim ~${(totalSaved / Object.keys(TARGETS).length).toFixed(2)}KB gzip per tree.`
+  `\n${failed ? '❌' : '✅'} Dev code is ${
+    failed ? 'NOT ' : ''
+  }fully foldable` +
+    ` — consumers defining ngDevMode=false reclaim ~${(
+      totalSaved / Object.keys(TARGETS).length
+    ).toFixed(2)}KB gzip per tree.`
 );
 
 if (failed) {
