@@ -443,6 +443,9 @@ and do not substitute `undo()` or `jumpTo()` for request settlement.
 
 ## 5. Staged / draft editing
 
+For concurrent editors, revision/lifetime checks and device cleanup, use the
+[owned sessions guide](owned-sessions.md) and the demo’s **Editors & devices** page.
+
 **The need:** let a user accumulate several edits — a multi-field form, a
 batch of row changes — reviewable before anything becomes real, discardable
 without a trace if they back out.
@@ -477,7 +480,7 @@ plain component field, or its own tiny `signalTree()` you never merge with
 the main one.
 
 ```typescript
-// The draft never touches the tree — it's just state your form/component owns.
+// The draft never touches the canonical tree — it's just state your form/component owns.
 const draft = signal<Partial<Ticket>>({});
 
 function reviewField(key: keyof Ticket, value: Ticket[typeof key]) {
@@ -506,7 +509,7 @@ guarantee for every v15 composition.
 Committing a draft is functionally identical to any other authored write from
 SignalTree's side — there's no special-cased "draft commit" concept to get
 wrong, and nothing to keep in sync between a draft-tracking marker and the
-canonical value, because the draft was never IN the tree. The causal model
+canonical value, because the draft was never in the canonical tree. The causal model
 does the real work here indirectly: because an authored turn is a first-class
 concept, "the user's edit became real" is always one coherent fact to point
 at later — in restoration history, in DevTools, or in a human-readable

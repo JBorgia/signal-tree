@@ -363,3 +363,11 @@ The configured factory applies lazily on first `$` access, after every enhancer.
 [ ] move derived state into the constructor's singular `derived` factory
 [ ] typecheck — every change above is compile-time visible
 ```
+
+### Independent dialogs and device connections
+
+Start from the ownership boundary rather than reproducing dynamic store-module
+registration. Keep shared entities canonical, and give independently closable
+editors and connections their own local state and cleanup. The
+[owned sessions guide](owned-sessions.md) demonstrates revision conflicts,
+same-ID replacement and teardown using the existing public API.

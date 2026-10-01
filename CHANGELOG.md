@@ -1,3 +1,77 @@
+## 15.4.0 (unreleased)
+
+**TL;DR** — **Minor. New read-only tooling readers; no application API
+change. Fixes several silent wrong-result undo/rollback cases reproduced on npm
+15.3.1: across two or more `entityMap()` collections, after `setAll()`, and when
+a subscriber throws as a reversal finishes. Take it if you use undo or
+transaction rollback with entity collections.** Known issue: reversing a write
+that added an optional field to an entity row leaves the key present with
+`undefined` rather than absent.
+
+These changes are under verification and are not part of the published 15.3.1 artifact.
+
+- **Correctness fix: reversals across collections.** Every `entityMap()`
+  allocates entity lifetimes from 1, so two collections routinely hold the
+  same lifetime ID, and realization looked prepared rows up by that bare ID.
+  Reproduced against the npm 15.3.1 tarball (`left` holds `a` with `n: 1`, `right` holds `b`
+  with `n: 2`):
+
+      operation, then reverse                           15.3.1                          15.4.0
+      left.removeOne('a'); right.updateOne('b',{n:8})
+        undo()                                          left restored, right.b.n = 8    both restored
+        transaction rollback()                          left.a.n = 2, right.b.n = 8     both restored
+      left.clear(); right.clear()
+        undo() / rollback()                             refused (structural-drift)      both restored
+
+  The first two reported success. Prepared rows are now scoped by the
+  collection node, resolved by owner position, so a collection under a literal
+  `'a.b'` key is no longer confused with a nested `a.b` one (on 15.3.1 a
+  rollback in the literal collection reversed the nested one and reported
+  success). Entity-membership events for a reversal are delivered once every
+  collection is installed, in commit order, even if a consumer throws.
+
+- **Correctness fix: `setAll()` reversal order.** Reproduced on npm 15.3.1:
+  starting from `[a,b,c]`, undo or rollback of `setAll([c,a])` gave `[b,c,a]`,
+  rollback of `setAll([q,a])` gave `[a,c,b]`, and undo of a `setAll()` that
+  replaced every row gave `[c,b,a]`, with no error. A `setAll()` that reorders
+  surviving rows now records an order delta, and removed rows are anchored to
+  their immediate neighbours as `clear()` and `removeMany()` already were.
+
+- **Correctness fix: a consumer throwing after a reversal applied.** If a
+  subscribed derived threw as an undo or an explicit `rollback()` finished
+  delivering, the reversal had applied but was treated as if it had not: on
+  15.3.1 the rollback threw a refusal with the transaction still pending, and
+  a following `confirm()` was accepted for writes already reversed. The undo or
+  rollback now completes (history moves, the transaction retires) and the
+  consumer's error is rethrown afterwards.
+
+- `confirm()` or `rollback()` called on a transaction from a subscriber while
+  its own rollback compensation is being applied now throws instead of
+  settling it a second way (15.3.1 accepted the confirm).
+
+- Add read-only transaction lifecycle, restoration lineage, entity membership,
+  and Link activity readers for tooling through `@signal-tree/kernel/internals`.
+  Snapshots describe current runtime facts; subscriptions retain no event history
+  and local transaction confirmation is not a backend acceptance receipt.
+  A transition takes its reader sequence when the settlement state changes, so a
+  restoration or membership listener reading the transaction reader sees the
+  same state the restoration owner acted on; listener delivery order is
+  unchanged. Undo/redo/jump events name the entries they applied even if a
+  synchronous subscriber resets history during the operation, and report a
+  validation refusal as `refused` by origin, not by error-message text.
+
+- Fix the same-turn Link race where `settled()` could resolve before a newly
+  queued asynchronous endpoint write finished. This does not promise backend
+  durability or resolve every known Link/transaction interaction.
+- Warn once per EntityMap in development when `setAll()` receives duplicate keys
+  (ST2001). Last-value-wins behavior and numeric/string key distinction remain
+  unchanged. Applications must still validate incoming IDs.
+- Add the `/owned-sessions` demo and [ownership guide](docs/guides/owned-sessions.md):
+  shared records, independent editor drafts, stale-save and replacement checks,
+  per-device cleanup, and read-only aggregation. No new slice-mounting API.
+- Refresh framework READMEs and bundled AI guidance; verify bundled `llms.txt`
+  matches the canonical source before publication.
+
 ## 15.3.1 (2026-09-28)
 
 **TL;DR** — **Patch. No API change, but two behaviour changes you could

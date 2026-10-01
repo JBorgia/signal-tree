@@ -1,17 +1,16 @@
 # Transaction failures and current v15 limitations
 
-This guide describes existing v15 behavior and the **unreleased 15.3.1
-candidate**. Candidate fixes are not a
-claim that 15.3.1 is published. Check the [changelog](../../CHANGELOG.md),
-[support policy](../support-policy.md#transaction-failure-policy), and
-[npm registry](https://www.npmjs.com/org/signal-tree) for release status.
+This guide describes **published 15.3.1**. Check the
+[changelog](../../CHANGELOG.md) and
+[support policy](../support-policy.md#transaction-failure-policy) for versioned
+behavior. Local follow-up fixes do not change an already-published artifact.
 
 ## A thrown error does not guarantee undo
 
 | Failure boundary | State and handle | Consequences and history |
 | --- | --- | --- |
 | Explicit `pending.rollback()` refuses (existing v15 behavior) | Compensation changes no state; the returned handle remains pending. `confirm()` or another rollback attempt remains available. | The commit scope and its deferred consequences are released despite refusal. Pending authority does **not** mean persistence is still deferred. |
-| Automatic rollback refuses before `transaction()` returns a handle (unreleased candidate) | Surviving writes remain applied; `SignalTreeRollbackError` is thrown; no recovery handle is returned. | Surviving writes are recorded as committed, confirmation is announced, eligible designated undo history is retained, and consequences are released. This applies to callback and post-callback failures. |
+| Automatic rollback refuses before `transaction()` returns a handle (15.3.1) | Surviving writes remain applied; `SignalTreeRollbackError` is thrown; no recovery handle is returned. | Surviving writes are recorded as committed, confirmation is announced, eligible designated undo history is retained, and consequences are released. This applies to callback and post-callback failures. |
 | Automatic rollback succeeds | Recorded writes are reversed and the failure is thrown. | The commit scope rolls back and discards its deferred consequences. See the omitted-branch-key defect below: compensation cannot restore changes it did not record. |
 
 Committed here describes local transaction settlement, not backend acceptance.
@@ -35,7 +34,7 @@ held until explicit confirmation is a **v16 target**, not a current v15 API.
 
 ## Observer failures have a bounded containment rule
 
-In the unreleased candidate, errors in **deferred write subscribers** (including
+In 15.3.1, errors in **deferred write subscribers** (including
 `observeWrites()` subscribers) and **transaction turn listeners** are contained:
 remaining delivery continues, with reports through `onTreeError` and ST2034.
 This does not contain every framework computation, effect, or watcher error.
@@ -56,9 +55,9 @@ is exhausted. This is rate limiting, not a termination guarantee. Console hooks
 that write state and Link's own `link:set` reports are not covered by that
 budget.
 
-## Known failures still present in the candidate
+## Known failures in published 15.3.1
 
-These are the live limitations recorded in the candidate
+These are the live limitations recorded in the release
 [changelog](../../CHANGELOG.md#known-issues-not-fixed-here), reproduced on
 15.3.0 and not fixed by this patch. No fix version is promised.
 
@@ -84,7 +83,7 @@ These are the live limitations recorded in the candidate
 - **Reentrant observer work can be ordered before the transaction it observes.**
   Work during `transaction()` closure can reach transaction authority first;
   explicit rollback may undo it or make dependency decisions in the wrong
-  order. The candidate guards post-callback automatic rollback against later
+  order. 15.3.1 guards post-callback automatic rollback against later
   writes, including later writes subsequently rolled back. Throwing-callback
   compensation admission remains compatible with v15 and can overwrite a later
   observer write to the same entity row. Do not claim unconditional isolation.
@@ -92,7 +91,10 @@ These are the live limitations recorded in the candidate
   installed, ordinary removals can leave descriptors retained; later
   transactions do not reclaim them. Bound tree ownership and call `destroy()`
   at teardown. This is separate from configured diagnostic history retention.
-- **Asynchronous Link endpoints have settlement gaps.** While endpoint `set()`
+- **Asynchronous Link endpoints have settlement gaps.** Calling `settled()`
+  immediately after a write can return before the newly queued send finishes.
+  The local follow-up has a tested repair for this same-turn race; it is not
+  present in the published 15.3.1 package. While endpoint `set()`
   is in flight, pending uncommitted writes may be sent before a transaction is
   decided (the endpoint still ends on the surviving value); a rejected send can
   let `settled()` resolve before a later value is sent; and `dispose()` does not

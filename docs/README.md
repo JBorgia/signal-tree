@@ -6,7 +6,7 @@
 
 Use this index to navigate the documentation.
 
-**Development version:** 15.3.1 (unreleased). See [CHANGELOG](../CHANGELOG.md).
+**Development version:** 15.4.0 (unreleased). See [CHANGELOG](../CHANGELOG.md).
 
 **Latest published release:** 15.3.0.
 
@@ -121,3 +121,5 @@ Historical documents preserved for reference:
 | [Release Process](../.github/instructions/release-process.instructions.md) | How to release new versions  |
 | [Validation Guide](../.github/VALIDATION_GUIDE.md)                         | Pre-release validation steps |
 | [Scripts](../scripts/README.md)                                            | Build and utility scripts    |
+
+- [Runtime observation](guides/runtime-observation.md) — current snapshots and subsequent events for tooling; 15.4.0 (unreleased).
