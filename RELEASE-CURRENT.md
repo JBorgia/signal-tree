@@ -225,3 +225,18 @@ The final metadata commit needs exact-SHA verification; subsequent verification
 logs stay outside the repository. Installed-enhancer bulk overhead remains a
 measured limitation, not a claimed performance improvement. No new architecture
 is part of this release finalization.
+
+## Exact-candidate Linux blocker
+
+`26cc7ffb196e9e665bd92fff59dad8ed66412dec` passed local full gates (86/86),
+mutation proofs (86/86, zero unproven/vacuous/blind/errored), clean rebuild,
+packed consumers, Angular AOT and 146 browser tests. Its clean clone remained
+unchanged. The authorized release branch was pushed; no tag or npm publication
+was performed.
+
+Linux Validate [36939452876](https://github.com/JBorgia/signal-tree/actions/runs/36939452876)
+failed **85/86, exit 1**, at `retired-subject-slope:node-reads`. This candidate
+is NOT release-qualified. Preserve the first red and follow the
+[preregistered diagnostic](docs/audits/2026-10-01-retired-node-release-check/README.md).
+No threshold increase or rerun-to-green is an accepted resolution. V16 integration
+continues to wait for v15 publication.

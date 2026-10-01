@@ -1,0 +1,53 @@
+name: Retired node memory characterization
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  characterize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      NX_DAEMON: 'false'
+      NX_ISOLATE_PLUGINS: 'false'
+    steps:
+      - name: Checkout selected revision
+        uses: actions/checkout@v4
+
+      - name: Create evidence directory
+        run: mkdir -p artifacts/retention-characterization
+
+      - name: Setup pnpm from packageManager
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: pnpm
+
+      - name: Frozen dependency install
+        run: |
+          set -o pipefail
+          pnpm install --frozen-lockfile --ignore-scripts 2>&1 | tee artifacts/retention-characterization/install.log
+
+      - name: Build kernel explicitly without Nx cache
+        run: |
+          set -o pipefail
+          pnpm exec nx build kernel --skip-nx-cache 2>&1 | tee artifacts/retention-characterization/build.log
+
+      - name: Collect preregistered raw fresh-process batch
+        run: |
+          set -o pipefail
+          node tools/characterize-retired-node-memory.mjs --out artifacts/retention-characterization/data 2>&1 | tee artifacts/retention-characterization/driver.log
+
+      - name: Upload raw evidence even after failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: retired-node-memory-${{ github.sha }}-${{ github.run_attempt }}
+          path: artifacts/retention-characterization/
+          if-no-files-found: warn
