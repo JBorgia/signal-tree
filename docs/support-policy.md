@@ -129,7 +129,7 @@ inter-version guides under [`legacy/`](legacy/README.md) are kept for provenance
 
 ## Transaction failure policy
 
-The 15.3.1 development patch distinguishes two failure boundaries. See the
+Published SignalTree 15.3.1 distinguishes two failure boundaries. See the
 [transaction failure guide](guides/transaction-failures-v15.md) for retry,
 framework delivery and synchronization limitations. A thrown transaction does
 not prove rollback; do not blindly retry the whole operation.
@@ -141,7 +141,7 @@ not prove rollback; do not blindly retry the whole operation.
 
 These are v15 containment exceptions. An explicit refusal does not guarantee
 that persistence or other durable consequences are still deferred. That
-existing behavior is preserved in this patch, not the v16 target.
+existing behavior is preserved in 15.3.1, not the v16 target.
 
 For the automatic-abort path, previously a refusal could
 release consequences while reporting rollback and omitting the confirmed

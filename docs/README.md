@@ -8,7 +8,7 @@ Use this index to navigate the documentation.
 
 **Development version:** 15.4.0 (unreleased). See [CHANGELOG](../CHANGELOG.md).
 
-**Latest published release:** 15.3.0.
+**Latest published release:** 15.3.1.
 
 ---
 

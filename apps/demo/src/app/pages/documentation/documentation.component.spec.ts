@@ -6,6 +6,8 @@ import {
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
+import { SIGNALTREE_CORE_VERSION } from '../../version';
+
 import { DocumentationComponent } from './documentation.component';
 
 /**
@@ -180,10 +182,10 @@ describe('DocumentationComponent', () => {
       expect(href('Same document')).toBe(`/docs?package=${id}#ownership`);
       expect(href('Manifest')).toBe('/llms.txt');
       expect(href('Package metadata')).toBe(
-        'https://github.com/JBorgia/signal-tree/blob/main/packages/angular/package.json'
+        `https://github.com/JBorgia/signal-tree/blob/v${SIGNALTREE_CORE_VERSION}/packages/angular/package.json`
       );
       expect(href('License')).toBe(
-        'https://github.com/JBorgia/signal-tree/blob/main/LICENSE'
+        `https://github.com/JBorgia/signal-tree/blob/v${SIGNALTREE_CORE_VERSION}/LICENSE`
       );
       expect(href('React guide')).toBe('/docs?package=react#ownership');
       expect(href('External')).toBe('https://example.com/guide?q=1#setup');
@@ -194,7 +196,7 @@ describe('DocumentationComponent', () => {
       expect(
         root.querySelector('.markdown-content img')?.getAttribute('src')
       ).toBe(
-        `https://raw.githubusercontent.com/JBorgia/signal-tree/main/packages/${id}/diagram.svg`
+        `https://raw.githubusercontent.com/JBorgia/signal-tree/v${SIGNALTREE_CORE_VERSION}/packages/${id}/diagram.svg`
       );
     }
   );
@@ -216,7 +218,7 @@ describe('DocumentationComponent', () => {
         .querySelector('.markdown-content a')
         ?.getAttribute('href')
     ).toBe(
-      'https://github.com/JBorgia/signal-tree/blob/main/docs/architecture/signaltree-architecture-guide.md'
+      `https://github.com/JBorgia/signal-tree/blob/v${SIGNALTREE_CORE_VERSION}/docs/architecture/signaltree-architecture-guide.md`
     );
   });
 
