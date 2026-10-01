@@ -54,6 +54,20 @@ These changes are under verification and are not part of the published 15.3.1 ar
   reversal removes the key when it was absent; an explicit `undefined` stays a
   present member.
 
+- **Fix: large entity collections.** Reproduced on npm 15.3.1 unless noted:
+  - `setAll()` that replaced or cleared a collection was O(n²) (40k rows: ~2 s),
+    and undoing it was too (an 8k-row replacement spent 1.7 s in a pairwise
+    check; 250k rows exhausted memory). Both are now linear.
+  - undo of a `setAll()`/`removeMany()` past ~120k rows threw "Maximum call
+    stack size exceeded" (an argument spread); on the 15.4.0 line a 200k-row
+    `setAll()` also threw while entity membership was observed.
+  - undo then redo of `addMany()` reinserted rows out of order
+    (`[k1..k5] + addMany([x, y])` redid as `[k1,k2,k3,k4,x,k5,y]`).
+  - `where(pred)` / `find(pred)` kept their old result when `pred` read another
+    signal that changed.
+  - a row whose node was read kept ~100 B after it was removed, forever; a grid
+    that reads its rows and refetches new ids grew without bound.
+
 - Add read-only transaction lifecycle, restoration lineage, entity membership,
   and Link activity readers for tooling through `@signal-tree/kernel/internals`:
   `transactionLifecycleReader`, `restorationReader`, `entityMembershipReader`,

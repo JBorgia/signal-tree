@@ -502,3 +502,28 @@ From `benchmarks/store-comparison/FINDINGS.md` (bench 08a9c75d):
 - With transactions() + restoration() installed but unused, bulk operations are 3.3–3.5x
   slower and the route carries +37 KB gzip; ~70% of that load is confirmed-turn capture, which
   the v15 undo model requires.
+
+## Full audit and fix pass — October 1
+
+Owner direction: do every optimisation and fix now, in 15.4.0, and backport the 15.3.1 bugs as a
+15.3.2 patch. Four independent read-only audits (entity collections, tree core and construction,
+transactions/restoration runtime, bundle reachability) and a like-for-like size matrix (bench
+9d011a92: 9 scenarios x 6 libraries, every fixture executed and checked before measuring) were
+run first.
+
+Defects found by the audit and fixed red-first (7463f4eb, 87a6b116):
+- `setAll` replace/clear O(n²) and restoration's pairwise key-handoff check O(n²) (undo of large
+  replacements: seconds to out-of-memory) — 15.3.1 too;
+- `push(...array)` stack overflow past ~1.2e5 items (restoration/target-transition/serialization/
+  devtools on 15.3.1; membership on 15.4.0);
+- `addMany` undo/redo order — 15.3.1 too;
+- `where`/`find` stale on predicate dependencies — 15.3.1 too;
+- activation-carrier entry kept per retired subject (~100 B each, unbounded) — gate arm
+  `retired-subject-slope:node-reads` added (red 104 B/retired, flat after).
+Kernel 324 files / 3174 tests pass.
+
+Optimisation work is split by file ownership across three implementers (entity collections; tree
+core and Angular adapter; causal runtime), each committing per change with a pinning spec, a
+mutation proof, the full suite with enhancers installed, and a measured effect, and a fourth
+preparing the 15.3.2 backport on `fix/15.3.2-backport` from `v15.3.1`. Merges, the browser
+benchmark and the size matrix are run centrally on the integrated result.
