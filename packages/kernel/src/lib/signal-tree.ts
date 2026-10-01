@@ -57,7 +57,7 @@ import {
   type OrdinaryStateMaterializer,
 } from './internals/materialize-markers';
 import { installDormantObservation } from './internals/observation-substrate';
-import { capturePlainBranchMembership } from './internals/plain-branch-membership';
+import { captureBranchMembershipIfObserved } from './internals/path-observation-port';
 import { terminateOwnerInvalidation } from './internals/owner-invalidation-port';
 import { defineRootTree } from './internals/root-source';
 import {
@@ -928,7 +928,7 @@ function recursiveUpdate(
     : (target as Record<string, unknown>);
 
   const publishMembership = reconcileMembership
-    ? capturePlainBranchMembership(
+    ? captureBranchMembershipIfObserved(
         (targetObj as Record<symbol, object>)[NODE_ACCESSOR_PEER] ?? targetObj,
         updates
       )
