@@ -92,6 +92,29 @@ if (process.env['NX_WORKSPACE_ROOT_PATH']) {
  */
 const GATES = [
   {
+    name: 'v15-followup-artifacts',
+    covers:
+      'installed candidate passes all eleven follow-up fixes while immutable npm 15.3.1 reproduces the defects',
+    cmd: ['node', 'tools/check-v15-followups.mjs'],
+    needsBuild: true,
+    releaseOnly: true,
+    slow: true,
+    provenBy: 'v15-followup-artifacts:self',
+  },
+  {
+    name: 'v15-followup-artifacts:self',
+    covers:
+      'follow-up artifact classifier rejects missing, altered, regressed and mismatched evidence',
+    cmd: ['node', 'tools/check-v15-followups.mjs', '--self-test'],
+    releaseOnly: true,
+    mutation: {
+      file: 'tools/check-v15-followups.mjs',
+      find: 'function classify(baseline, candidate) {',
+      replace:
+        'function classify(baseline, candidate) { return { accepted: true };',
+    },
+  },
+  {
     name: 'v15-refusal-artifacts',
     covers:
       'packed v15 refusal lifecycle preserves verified controls and fixes while explicitly bounding unchanged limitations',

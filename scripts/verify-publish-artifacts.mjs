@@ -132,6 +132,14 @@ for (const pkg of packages) {
       (missing.length ? `  ❌ missing: ${missing.join(', ')}` : '')
   );
   if (missing.length) failures.push(`${pkg}: ${missing.join(', ')}`);
+  // The build copies canonical AI guidance. Existence alone permits stale
+  // guidance to ship from an older dist directory.
+  if (files.includes('llms.txt') && existsSync(join(root, 'llms.txt'))) {
+    if (readFileSync(join(root, 'llms.txt'), 'utf8') !==
+        readFileSync(join(process.cwd(), 'llms.txt'), 'utf8')) {
+      failures.push(`${pkg}: bundled llms.txt differs from canonical guidance; rebuild`);
+    }
+  }
 }
 
 if (failures.length) {
