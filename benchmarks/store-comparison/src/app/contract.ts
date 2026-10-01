@@ -150,7 +150,8 @@ export type ArmId =
   | 'ngrx'
   | 'st14'
   | 'st15-released'
-  | 'st15-candidate';
+  | 'st15-candidate'
+  | 'st15-undo';
 export interface ArmLibrary {
   /** npm package name, e.g. `@ngrx/signals` (for an alias, the real package name). */
   readonly name: string;

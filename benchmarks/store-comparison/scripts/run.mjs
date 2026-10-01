@@ -49,7 +49,7 @@ if (!existsSync(join(root, 'index.html'))) {
 }
 if (
   !customRoot &&
-  opts.arms.includes('st15-candidate') &&
+  opts.arms.some((a) => a === 'st15-candidate' || a === 'st15-undo') &&
   !existsSync(
     join(appRoot, 'node_modules', 'st15-candidate', '.candidate.json')
   )
@@ -78,7 +78,9 @@ const environment = collectEnvironment({
   appRoot,
   cpu: opts.cpu,
   customRoot,
-  candidateSelected: opts.arms.includes('st15-candidate'),
+  candidateSelected: opts.arms.some(
+    (a) => a === 'st15-candidate' || a === 'st15-undo'
+  ),
 });
 environment.chromium = await chromiumVersion(chromium);
 const server = await startServer({ root, port: 0 });
@@ -87,6 +89,7 @@ const raw = {
   startedAt: new Date().toISOString(),
   development: opts.quick,
   config: {
+    footer: opts.footer,
     rounds: opts.rounds,
     rows: opts.rows,
     cpu: opts.cpu,
@@ -135,6 +138,7 @@ try {
       const base = {
         url: server.url,
         route,
+        query: opts.footer === 'off' ? '?footer=0' : '',
         cpu: opts.cpu,
         timeoutMs: opts.timeoutMs,
       };

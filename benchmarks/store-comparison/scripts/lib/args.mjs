@@ -4,6 +4,7 @@ export const ALL_ARMS = [
   'st14',
   'st15-released',
   'st15-candidate',
+  'st15-undo',
 ];
 
 export function parseArgs(argv) {
@@ -30,6 +31,7 @@ export function parseArgs(argv) {
     'quick',
     'root',
     'timeout',
+    'footer',
     'help',
   ];
   for (const k of Object.keys(raw))
@@ -64,8 +66,12 @@ export function parseArgs(argv) {
       throw new Error(`unknown arm ${a} (known: ${ALL_ARMS.join(', ')})`);
   if (new Set(arms).size !== arms.length)
     throw new Error('--arms has duplicates');
+  const footer = raw.footer === undefined ? 'on' : raw.footer;
+  if (footer !== 'on' && footer !== 'off')
+    throw new Error('--footer must be on or off');
   return {
     help: !!raw.help,
+    footer,
     quick,
     rounds,
     rows,

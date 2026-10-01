@@ -14,7 +14,7 @@ export const EDIT_KINDS = [
 ];
 const SEED = 20260930;
 
-async function openPage(browser, { cpu, timeoutMs }) {
+async function openPage(browser, { cpu, timeoutMs, query }) {
   const context = await browser.newContext();
   const page = await context.newPage();
   const errors = [];
@@ -105,7 +105,7 @@ async function openPage(browser, { cpu, timeoutMs }) {
   /** Navigate to /<route>, wait for the bench API, verify it is the expected arm, await ready(). */
   const open = async (url, route) => {
     await withTimeout(
-      page.goto(`${url}/${route}`, { waitUntil: 'load' }),
+      page.goto(`${url}/${route}${query ?? ''}`, { waitUntil: 'load' }),
       `goto /${route}`
     );
     await withTimeout(
@@ -158,9 +158,9 @@ async function launched(chromium, fn) {
 const timedSummary = (timed) => ({ ms: timed.ms, counters: timed.counters });
 const samples = (s) => ({ ms: s.ms, counters: s.counters, ...latency(s.ms) });
 
-export function runStartup(chromium, { url, route, cpu, timeoutMs }) {
+export function runStartup(chromium, { url, route, query, cpu, timeoutMs }) {
   return launched(chromium, async (browser) => {
-    const s = await openPage(browser, { cpu, timeoutMs });
+    const s = await openPage(browser, { cpu, timeoutMs, query });
     try {
       await s.cdp.send('Network.enable');
       await s.cdp.send('Network.setCacheDisabled', { cacheDisabled: true });
@@ -206,12 +206,12 @@ export function runStartup(chromium, { url, route, cpu, timeoutMs }) {
 
 export function runGrid(
   chromium,
-  { url, route, cpu, timeoutMs, rows, counts }
+  { url, route, query, cpu, timeoutMs, rows, counts }
 ) {
   return launched(chromium, async (browser) => {
     const out = {};
     for (const n of rows) {
-      const s = await openPage(browser, { cpu, timeoutMs });
+      const s = await openPage(browser, { cpu, timeoutMs, query });
       try {
         await s.open(url, route);
         const baseline = await s.heap();
@@ -257,9 +257,12 @@ export function runGrid(
   });
 }
 
-export function runEditors(chromium, { url, route, cpu, timeoutMs, counts }) {
+export function runEditors(
+  chromium,
+  { url, route, query, cpu, timeoutMs, counts }
+) {
   return launched(chromium, async (browser) => {
-    const s = await openPage(browser, { cpu, timeoutMs });
+    const s = await openPage(browser, { cpu, timeoutMs, query });
     try {
       await s.open(url, route);
       await s.bench('load', 1000, SEED, 0);

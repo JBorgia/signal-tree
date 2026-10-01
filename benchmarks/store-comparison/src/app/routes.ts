@@ -33,4 +33,8 @@ export const ROUTES: Routes = [
     loadChildren: () =>
       import('./arms/st15-candidate/arm').then((m) => m.ROUTES),
   },
+  {
+    path: 'st15-undo',
+    loadChildren: () => import('./arms/st15-undo/arm').then((m) => m.ROUTES),
+  },
 ];

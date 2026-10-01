@@ -10,13 +10,14 @@ under this workload, not about an application's own components.
 
 ## Arms
 
-| id               | what                                                     | resolved from                   |
-| ---------------- | -------------------------------------------------------- | ------------------------------- |
-| `signals`        | hand-written Angular signals store: the no-library floor | app source                      |
-| `ngrx`           | `@ngrx/signals` SignalStore + `withEntities`             | npm                             |
-| `st14`           | `@signaltree/core` 14.1.3                                | npm                             |
-| `st15-released`  | `@signal-tree/angular` 15.3.1                            | npm (aliased)                   |
-| `st15-candidate` | an unreleased build, from packed tarballs                | `scripts/install-candidate.mjs` |
+| id               | what                                                                          | resolved from                                                                               |
+| ---------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `signals`        | hand-written Angular signals store: the no-library floor                      | app source                                                                                  |
+| `ngrx`           | `@ngrx/signals` SignalStore + `withEntities`                                  | npm                                                                                         |
+| `st14`           | `@signaltree/core` 14.1.3                                                     | npm                                                                                         |
+| `st15-released`  | `@signal-tree/angular` 15.3.1                                                 | npm (aliased)                                                                               |
+| `st15-candidate` | an unreleased build, from packed tarballs                                     | `scripts/install-candidate.mjs`                                                             |
+| `st15-undo`      | the candidate with `transactions()` and `restoration()` installed, never used | a second install of the same tarballs (`st15-candidate-enhanced`), so its chunk is separate |
 
 The app is standalone (`pnpm install --ignore-workspace`): no arm can resolve SignalTree from
 workspace source. One `@angular/core` instance serves every arm; each SignalTree arm resolves
@@ -129,6 +130,19 @@ For each row count in `--rows` (default 1000, 10000, 50000):
   checksums. The console report gives medians across rounds and the min–max across rounds.
 - A crashed, timed-out or INVALID arm fails the run (exit 1) and is reported as such, never
   silently dropped.
+
+## Variants and attribution tools
+
+- `--footer off` leaves the status chips out, so nothing reads `statusCounts` while timing. Every
+  arm's counts recount all rows, so this isolates the store's own write cost.
+- `scripts/profile.mjs` records a CPU profile around one driver operation and reports self and
+  inclusive time by function and by owner (arm chunk, Angular + harness, GC), with `--callers`
+  for the code that pays for a helper. Build with `NG_BUILD_MANGLE=0` first so names survive.
+- `scripts/heap-per-row.mjs` diffs heap snapshots before and after a load and reports bytes per
+  row by object kind.
+
+Both are for attribution only; quote timings from `run.mjs`. Results and analysis so far are in
+`FINDINGS.md`.
 
 ## Running
 

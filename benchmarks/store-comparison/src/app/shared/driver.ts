@@ -15,7 +15,7 @@ import {
   type Status,
   type Timed,
 } from '../contract';
-import { VISIBLE } from './tokens';
+import { FOOTER, VISIBLE } from './tokens';
 import { EditorRegistry } from './editor-registry';
 import {
   addCounters,
@@ -174,7 +174,10 @@ export class BenchDriver implements BenchApi {
    * The footer must show counts that match the rows, and the store's own statusCounts must agree
    * (fairness review: an arm with a stale tally passed the row-only digest).
    */
-  private expectFooter(context: string): void {
+  private expectFooter(context: string, endOfScenario = true): void {
+    // Without the footer, per-edit checks would read statusCounts between timed writes and so
+    // keep it hot; check once per scenario instead, against the rows only.
+    if (!FOOTER && !endOfScenario) return;
     const expected: Record<string, number> = Object.fromEntries(
       STATUSES.map((s) => [s, 0])
     );
@@ -184,7 +187,10 @@ export class BenchDriver implements BenchApi {
       const shown = document
         .querySelector(`[data-chip="${s}"]`)
         ?.textContent?.trim();
-      if (store[s] !== expected[s] || shown !== `${s}: ${expected[s]}`) {
+      if (
+        store[s] !== expected[s] ||
+        (FOOTER && shown !== `${s}: ${expected[s]}`)
+      ) {
         throw new Error(
           `${context}: status ${s} rows=${expected[s]} statusCounts=${
             store[s]
@@ -321,7 +327,7 @@ export class BenchDriver implements BenchApi {
       counters = addCounters(counters, t.counters);
       if (op.visible) this.expectRow(`edits(${kind})`, op.id, op.patch);
       // A status edit changes a count: check the tally on every one (untimed).
-      if (kind === 'status-visible') this.expectFooter(`edits(${kind})`);
+      if (kind === 'status-visible') this.expectFooter(`edits(${kind})`, false);
     }
     this.expectFooter(`edits(${kind})`);
     return { ms, counters };

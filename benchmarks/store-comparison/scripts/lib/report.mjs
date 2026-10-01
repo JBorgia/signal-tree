@@ -154,6 +154,13 @@ export function printReport({
   const ver = (k) => (lib(k) ? lib(k).version : 'n/a');
   log(`  node ${env.node} | chromium ${env.chromium} | ${env.os}`);
   log(
+    `  footer ${config.footer ?? 'on'}${
+      config.footer === 'off'
+        ? ' (statusCounts not rendered while timing: isolates store write cost)'
+        : ''
+    }`
+  );
+  log(
     `  cpu ${env.cpu.model} x${env.cpu.cores} | throttle ${
       env.throttle
     } | load1m ${env.loadAverage1m.toFixed(2)}`

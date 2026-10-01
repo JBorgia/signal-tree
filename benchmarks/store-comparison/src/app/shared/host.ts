@@ -7,7 +7,7 @@ import {
   inject,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { ARM, GRID } from './tokens';
+import { ARM, GRID, FOOTER } from './tokens';
 import { GridComponent } from './grid';
 import { FooterComponent } from './footer';
 import { EditorComponent } from './editor';
@@ -37,7 +37,9 @@ import { BenchDriver } from './driver';
   ],
   template: `
     <bench-grid />
+    @if (footer) {
     <bench-footer />
+    }
     <div class="editors" data-editors>
       @for (e of registry.stack(); track e.key) {
       <bench-editor [seed]="e.seed" [editorKey]="e.key" />
@@ -46,6 +48,7 @@ import { BenchDriver } from './driver';
   `,
 })
 export class BenchHost {
+  protected readonly footer = FOOTER;
   protected readonly registry = inject(EditorRegistry);
 
   constructor() {

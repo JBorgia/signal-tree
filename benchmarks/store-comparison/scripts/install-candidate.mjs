@@ -44,17 +44,33 @@ const find = (name) => {
   return join(dir, matches[0]);
 };
 const tarballs = { angular: find('angular'), kernel: find('kernel') };
-const root = join(process.cwd(), 'node_modules', 'st15-candidate');
-const kernel = join(root, 'node_modules', '@signal-tree', 'kernel');
-rmSync(root, { recursive: true, force: true });
-for (const [target, tarball] of [
-  [root, tarballs.angular],
-  [kernel, tarballs.kernel],
-]) {
-  mkdirSync(target, { recursive: true });
-  // npm tarballs hold one top-level `package/` directory.
-  execFileSync('tar', ['-xzf', tarball, '-C', target, '--strip-components=1']);
+// Installed twice from the same tarballs. `st15-candidate-enhanced` is a separate module graph
+// for the arm that installs transactions()/restoration(): importing one package from two lazy
+// routes makes the bundler share its chunk, so the plain candidate route would load (and be
+// measured with) enhancer code it never uses.
+const ALIASES = ['st15-candidate', 'st15-candidate-enhanced'];
+const rootOf = (alias) => join(process.cwd(), 'node_modules', alias);
+const kernelOf = (alias) =>
+  join(rootOf(alias), 'node_modules', '@signal-tree', 'kernel');
+for (const alias of ALIASES) {
+  rmSync(rootOf(alias), { recursive: true, force: true });
+  for (const [target, tarball] of [
+    [rootOf(alias), tarballs.angular],
+    [kernelOf(alias), tarballs.kernel],
+  ]) {
+    mkdirSync(target, { recursive: true });
+    // npm tarballs hold one top-level `package/` directory.
+    execFileSync('tar', [
+      '-xzf',
+      tarball,
+      '-C',
+      target,
+      '--strip-components=1',
+    ]);
+  }
 }
+const root = rootOf(ALIASES[0]);
+const kernel = kernelOf(ALIASES[0]);
 const version = (path) =>
   JSON.parse(readFileSync(join(path, 'package.json'), 'utf8')).version;
 const angularVersion = version(root);
@@ -81,10 +97,13 @@ const record = {
     sha256: sha256(tarballs.kernel),
   },
 };
-writeFileSync(
-  join(root, '.candidate.json'),
-  JSON.stringify(record, null, 2) + '\n'
-);
+for (const alias of ALIASES)
+  writeFileSync(
+    join(rootOf(alias), '.candidate.json'),
+    JSON.stringify(record, null, 2) + '\n'
+  );
 console.log(
-  `st15-candidate: @signal-tree/angular ${angularVersion} + kernel ${kernelVersion}`
+  `${ALIASES.join(
+    ', '
+  )}: @signal-tree/angular ${angularVersion} + kernel ${kernelVersion}`
 );
