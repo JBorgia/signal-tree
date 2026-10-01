@@ -527,3 +527,28 @@ core and Angular adapter; causal runtime), each committing per change with a pin
 mutation proof, the full suite with enhancers installed, and a measured effect, and a fourth
 preparing the 15.3.2 backport on `fix/15.3.2-backport` from `v15.3.1`. Merges, the browser
 benchmark and the size matrix are run centrally on the integrated result.
+
+### Paused — October 1 (owner usage limit)
+
+Implementers stopped mid-run. Committed work is UNREVIEWED and UNMERGED; each worktree also has
+uncommitted in-progress edits (unverified — inspect before keeping):
+
+| branch / worktree | committed (on 87a6b116) | uncommitted files |
+| --- | --- | --- |
+| `opt/entity` `/private/tmp/st-opt-entity` | 3d4f33bb notify payloads only when observed; 8769a2af setAll from one structural walk | 3 |
+| `opt/core` `/private/tmp/st-opt-core` | d251de6e delete SIGNAL_TREE_MESSAGES | 10 |
+| `opt/enhancers` `/private/tmp/st-opt-enhancers` | ccb3f5c3 confirmed ledger O(1) per record under a pending turn | 2 |
+| `fix/15.3.2-backport` `/private/tmp/st-15.3.2` | 9dfa4853 backport, 7fa0f279 claims spread + test margin — reviewed, suite 2442 pass; versions 15.3.2; NOT tagged/published | 0 |
+
+To resume:
+1. Review each `opt/*` commit.
+2. Re-run the full kernel suite and the gates on it.
+3. Merge it into this branch.
+4. Finish the remaining items in the implementer briefs. The briefs are the item lists in the
+   four audits, summarised in the "Full audit and fix pass" section above.
+5. Build a candidate with a clean tree.
+6. Run the bench (`benchmarks/store-comparison`, branch `bench/store-comparison`) and the size
+   matrix.
+
+Pending: on 15.4.0, `restoration.ts` `newlyUnowned.push(...claims.release(...))` still spreads
+(fixed on 15.3.2). 15.3.2 deliberately leaves out the `setAll`-replacement undo-order fix.
