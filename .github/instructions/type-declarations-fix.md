@@ -1,34 +1,23 @@
-# Type Declaration Publishing
+# Declaration contract
 
-Kernel runtime JavaScript and public declarations are emitted by one Rollup
-invocation. Runtime modules remain preserved under `dist/**/*.js`; declaration
-bundles are emitted directly as `dist/index.d.ts` and `dist/adapter.d.ts`.
+Kernel Rollup configuration emits runtime modules and a single shared declaration
+graph for `index`, `adapter` and `internals`. The graph preserves nominal types
+across entries. Private shared declaration chunks must ship with the public entry
+files through the manifest's `dist/**/*.d.ts` pattern.
 
-## Required Configuration
+- Keep Nx per-source declaration and dts-bundle plugins out of the kernel runtime
+  configuration. Runtime transpilation and declaration generation have distinct jobs.
+- Use the checked-in `packages/kernel/rollup.custom.mjs` as configuration authority.
+  Do not split nominal identities into independent per-entry bundles or export
+  private brands to repair them.
+- Do not rewrite, prune or copy declarations after generation.
+- Verify actual packed consumers with `node tools/verify-consumer-typecheck.mjs`:
+  both bundler and node16 resolution, `skipLibCheck: false`, facade identity,
+  hydration and negative Link-admission fixtures.
+- Run affected artifact gates from `tools/verify-gates.mjs`, including declaration
+  documentation. Tarball resolution alone is not type correctness.
 
-- Remove Nx's `typescript` and `dts-bundle` plugins from the kernel runtime
-  configuration.
-- Add `@rollup/plugin-typescript` for runtime transpilation with declarations
-  disabled.
-- Add one `rollup-plugin-dts` configuration per public TypeScript entry point.
-- Emit declarations directly into the final package layout.
-- Point `types`, `exports.*.types`, and `files` at `dist/**/*.d.ts`.
-- Do not copy, rewrite, or prune declarations after Rollup completes.
-
-Framework package production builds resolve kernel types from the built kernel
-declaration entries. Their Nx targets depend on the kernel build, so the
-artifact is available before Angular or React compiles.
-
-## Validation
-
-```bash
-pnpm nx build kernel --skip-nx-cache
-node tools/verify-consumer-typecheck.mjs
-npm run validate:types
-bash scripts/verify-dist.sh
-node scripts/verify-package-hygiene.js
-node tools/check-declaration-docs.mjs
-```
-
-The consumer verifier packs the package and compiles with
-`skipLibCheck: false` under both `bundler` and `node16` module resolution.
+The absence of an `engines` field remains deliberate for these browser libraries.
+Repository tooling versions belong to `.nvmrc` and `packageManager`; framework
+consumer requirements belong to declared peer support. Do not add Node runtime
+constraints just to mirror the build machine.

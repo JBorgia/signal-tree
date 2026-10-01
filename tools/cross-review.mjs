@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 /**
+ * HISTORICAL TOOL: see tools/cross-review/README.md. Not the current review workflow.
  * CROSS-REVIEW — entry point.
  *
  *   node tools/cross-review.mjs --self-test [--model <provider/model>]

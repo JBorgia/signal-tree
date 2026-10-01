@@ -93,17 +93,20 @@ EntityMap query and field leaves follow the same carrier rule; EntityMap command
 methods such as `setAll()` and `updateOne()` do not change.
 
 Plain objects normally become traversable branches. `leaf(value)` explicitly
-ends topology so an object remains one atomic location. Callable values always
-use `leaf()` because a bare function argument is the updater syntax:
+ends topology so an object remains one atomic location. Declare function-valued
+fields with `leaf(fn)`. At a callable write boundary, use `leaf(fn)` to distinguish
+a stored function from an updater. Native Angular `.set(fn)` assigns the function
+directly, as shown below:
 
 ```typescript
-const tree = signalTree({
+import { signalTree, leaf } from '@signal-tree/angular';
+const angularTree = signalTree({
   range: leaf({ start: 0, end: 10 }),
   callback: leaf((value: number) => console.log(value)),
 });
 
 angularTree.$.range.set({ start: 5, end: 15 });
-angularTree.$.callback.set((value) => persist(value));
+angularTree.$.callback.set((value) => console.log(value));
 ```
 
 The wrapper is consumed at construction or invocation and never enters state,

@@ -1,8 +1,4 @@
-# SignalTree Cursor Instructions
+# SignalTree
 
-Read [`AGENTS.md`](AGENTS.md) first. It is the canonical instruction set for
-this repository, including current package names, build and validation commands,
-release execution rules, and generated-evidence policy.
-
-Do not duplicate those rules here. If this file conflicts with `AGENTS.md`,
-`AGENTS.md` wins and this file is the bug.
+Read AGENTS.md for the repository contract and task-specific references.
+It is the canonical default guidance; this file adds no separate rules.

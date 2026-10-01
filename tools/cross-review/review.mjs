@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 /**
+ * HISTORICAL TOOL: see tools/cross-review/README.md. Not the current review workflow.
  * CROSS-REVIEW HARNESS — batch adversarial review at derivation-row boundaries.
  *
  * WHY IT SENDS ARTIFACTS, NOT SUMMARIES. The measured weakness of the manual

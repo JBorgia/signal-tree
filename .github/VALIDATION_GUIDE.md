@@ -1,322 +1,112 @@
-# SignalTree Validation & Quality Gates Quick Reference
+# Release validation
 
-## Quick Commands
+The active candidate and scope are recorded in [RELEASE-CURRENT.md](../RELEASE-CURRENT.md).
+A version in `package.json` is not evidence of publication. The canonical gate registry is
+[`tools/verify-gates.mjs`](../tools/verify-gates.mjs); the public package set and
+build order come from [`scripts/release-plan.mjs`](../scripts/release-plan.mjs).
+Use those sources rather than a copied gate count or package inventory.
 
-### Run Full Validation
+## Verify the candidate
 
-```bash
-npm run validate
-# or
-bash scripts/pre-publish-validation.sh
-```
+Use the repository's Node version and pnpm version, a frozen lockfile install,
+and Playwright Chromium for browser checks. Run from the intended checkout;
+`NX_WORKSPACE_ROOT_PATH` must not point to another checkout.
 
-### Run Individual Checks
+Run these steps **serially**, with no concurrent edits, builds, gate runs, or
+artifact readers during mutation self-tests:
 
-```bash
-# Dependencies
-pnpm install --frozen-lockfile
-
-# Linting
-npm run lint:all
-
-# Tests
-npm run test:all
-
-# Test Coverage
-bash scripts/test-coverage.sh
-
-# Build
-npm run build:all
-
-# Package Verification
-bash scripts/verify-packages.sh
-
-# Distribution Files
-npm run validate:dist
-
-# Package Exports
-npm run validate:exports
-
-# Documentation
-npm run validate:docs
-
-# Bundle Analysis
-node scripts/consolidated-bundle-analysis.js
-```
-
-## Pre-Release Checklist
-
-- [ ] Working directory is clean (no uncommitted changes)
-- [ ] All dependencies installed and lockfile up to date
-- [ ] All tests passing
-- [ ] Linting passing
-- [ ] All packages build successfully
-- [ ] Bundle sizes within limits
-- [ ] Documentation up to date (especially CHANGELOG.md)
-- [ ] npm authentication configured
-
-## Release Process
-
-### Standard Release
-
-```bash
-# Patch (4.0.12 → 4.0.13)
-npm run release
-
-# Minor (4.0.12 → 4.1.0)
-npm run release:minor
-
-# Major (4.0.12 → 5.0.0)
-npm run release:major
-```
-
-### What Happens During Release
-
-1. **Pre-Publish Validation** - Runs all 13 validation checks
-2. **Version Backup** - Creates rollback point
-3. **Version Update** - Bumps all package versions
-4. **Build** - Builds all packages for production
-5. **Commit** - Commits version changes
-6. **Tag** - Creates git tag
-7. **Push** - Pushes to GitHub
-8. **Publish** - Publishes to npm
-9. **Cleanup** - Removes backup files
-
-### If Something Fails
-
-The release script **automatically rolls back**:
-
-- Restores original versions
-- Cleans build artifacts
-- Removes git tags
-- Resets working directory
-
-**No manual cleanup needed!**
-
-## Validation Pipeline Details
-
-### 1. Clean Working Directory ✅
-
-**Check**: `git status --porcelain`  
-**Purpose**: Ensures no uncommitted changes  
-**Severity**: Error (blocks release)
-
-### 2. Dependencies ✅
-
-**Check**: `pnpm install --frozen-lockfile`  
-**Purpose**: Verifies lockfile consistency  
-**Severity**: Error (blocks release)
-
-### 3. TypeScript Configs ✅
-
-**Check**: Verify tsconfig.json files exist  
-**Purpose**: Ensures type checking configuration  
-**Severity**: Error (blocks release)
-
-### 4. Linting ✅
-
-**Check**: `npm run lint:all`  
-**Purpose**: Code quality and standards  
-**Severity**: Error (blocks release)
-
-### 5. Unit Tests ✅
-
-**Check**: `npm run test:all`  
-**Purpose**: All tests must pass  
-**Severity**: Error (blocks release)
-
-### 6. Test Coverage ✅
-
-**Check**: `bash scripts/test-coverage.sh`  
-**Purpose**: Coverage meets thresholds  
-**Severity**: Error (blocks release)  
-**Thresholds**:
-
-- Statements: 80%
-- Branches: 75%
-- Functions: 80%
-- Lines: 80%
-
-### 7. Build ✅
-
-**Check**: `npm run build:all`  
-**Purpose**: Production builds succeed  
-**Severity**: Error (blocks release)
-
-### 8. Package Verification ✅
-
-**Check**: `bash scripts/verify-packages.sh`  
-**Purpose**: package.json validation  
-**Severity**: Error (blocks release)
-
-### 9. Distribution Files ✅
-
-**Check**: `bash scripts/verify-dist.sh`  
-**Purpose**: All expected files exist  
-**Severity**: Error (blocks release)
-
-### 10. Bundle Analysis ✅
-
-**Check**: `node scripts/consolidated-bundle-analysis.js`  
-**Purpose**: Bundle sizes within limits  
-**Severity**: Error (blocks release)  
-**Limits**:
-
-- core: 15KB (5KB gzipped)
-- ng-forms: 10KB (4KB gzipped)
-- callable-syntax: 5KB (2KB gzipped)
-- enterprise: 8KB (3KB gzipped)
-- guardrails: 12KB (4KB gzipped)
-
-### 11. Sanity Checks ✅
-
-**Check**: `node scripts/sanity-checks.js`  
-**Purpose**: Build output validation  
-**Severity**: Error (blocks release)
-
-### 12. Performance Benchmarks ⚠️
-
-**Check**: `node scripts/perf-suite.js`  
-**Purpose**: Performance metrics  
-**Severity**: Warning (logs only)
-
-### 13. Documentation ⚠️
-
-**Check**: `bash scripts/validate-docs.sh`  
-**Purpose**: Documentation completeness  
-**Severity**: Warning (logs only)
-
-## Common Issues
-
-### "Working directory has uncommitted changes"
-
-```bash
-# Review changes
-git status
-
-# Commit or stash
-git add -A && git commit -m "your message"
-# or
-git stash
-```
-
-### "Tests failed"
-
-```bash
-# Run tests to see details
-npm run test:all
-
-# Run specific package tests
-npm run test:core
-```
-
-### "Build failed"
-
-```bash
-# Clean and rebuild
-npm run clean:build
-
-# Check for TypeScript errors
-npx tsc --noEmit
-```
-
-### "Bundle size exceeded"
-
-```bash
-# Analyze bundle
-npm run analyze:bundle
-
-# Review what changed
-git diff HEAD~1 packages/*/src/
-```
-
-### "Linting failed"
-
-```bash
-# Auto-fix what's possible
-npm run lint:fix:all
-
-# Review remaining issues
-npm run lint:all
-```
-
-## Manual Rollback (if needed)
-
-If automatic rollback fails:
-
-```bash
-# Reset to previous commit
-git reset --hard HEAD~1
-
-# Remove tag locally
-git tag -d v4.0.12
-
-# Remove tag remotely (careful!)
-git push origin --delete v4.0.12
-
-# Clean build artifacts
-rm -rf dist packages/*/dist
-
-# Reinstall dependencies
-pnpm install
-```
-
-## Configuration Files
-
-- **`.release-rules.json`** - Validation rules and thresholds
-- **`RELEASE_PROCESS.md`** - Comprehensive release documentation
-- **`scripts/pre-publish-validation.sh`** - Main validation script
-- **`scripts/release.sh`** - Release automation script
-
-## Best Practices
-
-1. **Always validate before releasing**
+1. Run the full registry, including release-only measurements:
 
    ```bash
-   npm run validate
+   node tools/verify-gates.mjs --release
    ```
 
-2. **Keep CHANGELOG.md updated**
+   The runner builds packages when selected gates consume `dist/`. It covers
+   source and typing checks, package/demo tests, lint budgets, public API and
+   documentation checks, package artifacts, consumer checks, bundle budgets,
+   and release-only performance/memory harnesses. Use `--list` to inspect the
+   actual registry. `--fast` or a partial `--only` run is not release sign-off.
 
-   - Add entries before releasing
-   - Include version and date
-
-3. **Run validation after major changes**
+2. Prove the gates can reject their seeded defects:
 
    ```bash
-   npm run quality:check
+   node tools/verify-gates.mjs --self-test --release
    ```
 
-4. **Test in clean environment periodically**
+   This temporarily mutates files and restores them, verifying restoration by
+   hash. Inspect failures and any unproven or vacuous coverage in the summary;
+   an ordinary green run alone does not establish that a gate can fail.
+
+3. After all mutations finish, delete the generated `dist/` directory from
+   the repository root, then rebuild from restored source before the final
+   artifact checks. `dist/` is ignored output: a clean Git status and ordinary
+   `git clean` do not prove that mutation residue is absent.
 
    ```bash
-   rm -rf node_modules pnpm-lock.yaml
-   pnpm install
-   npm run validate
+   rm -rf -- dist/
+   pnpm run build:all --skip-nx-cache
+   node tools/verify-tarball-consumer.mjs
+   node tools/verify-consumer-typecheck.mjs
+   node tools/verify-angular-aot-consumer.mjs
    ```
 
-5. **Monitor bundle sizes**
+   Tarball resolution is not enough: strict consumers compile with
+   `skipLibCheck: false` under `bundler` and `node16`. The Angular consumer
+   installs tarballs, builds production AOT, and runs in Chromium without a
+   runtime compiler. Do not reuse output from a failed or interrupted mutation
+   run. Re-run affected artifact gates after any source or build change.
+
+4. Validate the production demo and its served routes:
+
    ```bash
-   npm run size:report
+   pnpm nx build demo --configuration=production
+   pnpm run smoke:routes
    ```
 
-## Need Help?
+   The smoke suite serves the already-built demo and checks route resolution,
+   rendered content, and browser errors. A package build or unit test pass does
+   not establish that the production demo works.
 
-- Check [RELEASE_PROCESS.md](../RELEASE_PROCESS.md) for detailed documentation
-- Review script output for specific error messages
-- Check logs in `/tmp/` directory for detailed output
-- Open an issue on GitHub if stuck
+5. Check version/release documentation and inspect the final checkout:
 
-## Emergency Contacts
+   ```bash
+   node scripts/verify-version-claims.js
+   node scripts/verify-release-state.js
+   bash scripts/verify-changelog-entry.sh "$(node -p 'require("./package.json").version')"
+   git diff --check
+   git status --short
+   git rev-parse HEAD
+   ```
 
-For critical release issues:
+   An untagged candidate may remain unreleased. Release preparation finalizes
+   its changelog and version metadata. Record commands, exits, limitations,
+   and the exact source SHA. A dirty-tree result is development evidence, not
+   proof of the final release commit: validate the exact committed/tagged SHA
+   and candidate bytes used for publication. Later edits require corresponding
+   revalidation.
 
-1. Check recent commits for similar issues
-2. Review GitHub Actions logs
-3. Verify npm authentication
-4. Contact maintainers via GitHub
+## Coverage targets versus enforced gates
 
----
+The historical documented targets are **80% statements, 75% branches,
+80% functions, and 80% lines**. These percentages are **not currently enforced
+by the canonical gate registry**. A green registry run must not be reported as
+meeting them. Report a separate coverage run with its command, source SHA,
+package scope, exclusions, and measured results; a kernel-only measurement is
+not whole-workspace coverage. This guide records no current coverage result.
 
-**Last Updated**: 2024-11-13  
-**Version**: 1.0.0
+## Publication and recovery
+
+Validation does not authorize pushing, tagging, merging, or publishing. Those
+actions require explicit owner authorization. Release preparation and registry
+publication have separate authorities; see [Release Process](../RELEASE_PROCESS.md).
+Only the canonical [`scripts/publish-candidate.mjs`](../scripts/publish-candidate.mjs)
+publisher may publish packages, through the authorized
+[`publish.yml`](workflows/publish.yml) workflow for the exact tag/SHA. It records
+candidate package order and integrity and verifies candidate artifacts; do not
+substitute package-local `npm publish` or publish newly rebuilt, unverified bytes.
+
+A failed check does not authorize a Git reset, tag deletion, or cleanup of
+someone else's work. Inspect the failure and checkout, restore only known
+mutation residue if necessary, rebuild, and repeat the relevant verification.
+Release preparation's own recovery behavior is documented in the release
+process; it is not a blanket automatic rollback of the working tree.
