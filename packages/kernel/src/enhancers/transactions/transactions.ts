@@ -1468,7 +1468,19 @@ export function getOrCreateInternalTransactionRuntime<T>(
       return;
     }
 
-    if (isPlainRecord(next) && isPlainRecord(prev)) {
+    // Payload shape is not topology: a registered terminal slot owns the
+    // whole value. Only branch/subject values need field decomposition.
+    if (
+      isPlainRecord(next) &&
+      isPlainRecord(prev) &&
+      !(
+        !subjectIds?.length &&
+        positionIds?.[0] !== undefined &&
+        (getTreeScalarSlotRuntime(tree) ??
+          getTreeScalarSlotRuntime(tree.$))?.resolveScalarSlot(positionIds[0]) !==
+          undefined
+      )
+    ) {
       const position = positionIds?.[0];
       const subject = subjectIds?.[0];
       if (position === undefined) {
