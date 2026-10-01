@@ -4,9 +4,7 @@
 change. Fixes several silent wrong-result undo/rollback cases reproduced on npm
 15.3.1: across two or more `entityMap()` collections, after `setAll()`, and when
 a subscriber throws as a reversal finishes. Take it if you use undo or
-transaction rollback with entity collections.** Known issue: reversing a write
-that added an optional field to an entity row leaves the key present with
-`undefined` rather than absent.
+transaction rollback with entity collections.**
 
 These changes are under verification and are not part of the published 15.3.1 artifact.
 
@@ -48,6 +46,13 @@ These changes are under verification and are not part of the published 15.3.1 ar
 - `confirm()` or `rollback()` called on a transaction from a subscriber while
   its own rollback compensation is being applied now throws instead of
   settling it a second way (15.3.1 accepted the confirm).
+
+- **Correctness fix: optional entity fields across reversal.** Undo or rollback
+  of `updateOne()` that added an optional field, and redo of a `replaceOne()`
+  that omitted one, left the key present with `undefined` (reproduced on
+  15.3.1). Entity field effects now record own-property presence and a
+  reversal removes the key when it was absent; an explicit `undefined` stays a
+  present member.
 
 - Add read-only transaction lifecycle, restoration lineage, entity membership,
   and Link activity readers for tooling through `@signal-tree/kernel/internals`:

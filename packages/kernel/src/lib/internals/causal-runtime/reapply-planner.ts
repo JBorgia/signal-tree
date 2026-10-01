@@ -52,6 +52,7 @@ function createReapplyEffects(
       subjectId: effect.subjectId,
       fieldSegments: effect.fieldSegments,
       plainBranchMembership: effect.plainBranchMembership,
+      fieldPresence: effect.fieldPresence,
       path: (effect as CausalEffect & { path?: string }).path,
       ownerPath: (effect as CausalEffect & { ownerPath?: string }).ownerPath,
       structural: effect.structural,

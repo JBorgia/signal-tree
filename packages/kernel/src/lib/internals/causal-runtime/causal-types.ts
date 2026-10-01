@@ -13,6 +13,17 @@ export type TurnState = 'pending' | 'confirmed';
  */
 export type StructuralEffectKind = 'add' | 'remove' | 'rekey';
 
+/**
+ * Own-property presence of an entity field around an effect, recorded only when
+ * one side lacks the key. Absent and present-with-undefined differ for
+ * `Object.hasOwn`, enumeration and patches, so a reversal deletes the key
+ * instead of writing `undefined`.
+ */
+export type FieldPresence = {
+  readonly before: boolean;
+  readonly after: boolean;
+};
+
 export interface CausalEffect {
   readonly owner: PositionId;
   readonly before: unknown;
@@ -22,6 +33,7 @@ export interface CausalEffect {
    * Display paths and entity keys are never parsed to produce this coordinate. */
   readonly fieldSegments?: readonly string[];
   readonly plainBranchMembership?: PlainBranchMemberPresence;
+  readonly fieldPresence?: FieldPresence;
   /**
    * Captured realization address — REQUIRED, because every live producer sets
    * it on every variant.
@@ -71,6 +83,7 @@ export interface ReversalEffect {
   /** Captured entity-relative property keys, preserved through reversal. */
   readonly fieldSegments?: readonly string[];
   readonly plainBranchMembership?: PlainBranchMemberPresence;
+  readonly fieldPresence?: FieldPresence;
   /**
    * Captured realization address.
    *

@@ -57,6 +57,12 @@ function createReversalEffects(
             after: effect.plainBranchMembership.before,
           }
         : undefined,
+      fieldPresence: effect.fieldPresence
+        ? {
+            before: effect.fieldPresence.after,
+            after: effect.fieldPresence.before,
+          }
+        : undefined,
       path: (effect as CausalEffect & { path?: string }).path,
       ownerPath: (effect as CausalEffect & { ownerPath?: string }).ownerPath,
       structural: deriveUndoStructural(effect.structural),
@@ -85,6 +91,12 @@ function createReversalEffects(
           ? {
               before: effect.plainBranchMembership.after,
               after: effect.plainBranchMembership.before,
+            }
+          : undefined,
+        fieldPresence: effect.fieldPresence
+          ? {
+              before: effect.fieldPresence.after,
+              after: effect.fieldPresence.before,
             }
           : undefined,
         structural: deriveUndoStructural(effect.structural),
