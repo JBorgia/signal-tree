@@ -1,6 +1,6 @@
----
-applyTo: 'packages/*/project.json'
----
+> **Historical build case.** This records a previous Nx configuration and removed
+> package examples. Consult current Rollup configuration and the [build contract](build-pipeline.instructions.md)
+> before changing entry points. Do not recreate these packages or assume this workaround is required.
 
 # Nx Rollup additionalEntryPoints - Filename Collision Issue
 
