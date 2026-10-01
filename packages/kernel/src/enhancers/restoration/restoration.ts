@@ -2207,6 +2207,17 @@ class RestorationManager<T> {
         if (effect.plainBranchMembership) {
           return canRealizePlainBranchMember(this.tree.$, effect.position);
         }
+        // A registered terminal location restores one value, regardless of
+        // its payload's shape. Object values do not make it a branch.
+        if (
+          effect.subject === undefined &&
+          (getTreeScalarSlotRuntime(this.tree) ??
+            getTreeScalarSlotRuntime(this.tree.$))?.resolveScalarSlot(
+            effect.position
+          ) !== undefined
+        ) {
+          return true;
+        }
         return (
           (this.isScalarValue(effect.before) &&
             this.isScalarValue(effect.after)) ||
@@ -3711,7 +3722,17 @@ export function restoration(
         return;
       }
 
-      if (isPlainRecord(next) && isPlainRecord(prev)) {
+      // Payload shape is not topology: a registered terminal slot owns the
+      // whole value. Only branch/subject values need field decomposition.
+      if (
+        isPlainRecord(next) &&
+        isPlainRecord(prev) &&
+        !(
+          !subjectIds?.length &&
+          positionIds?.[0] !== undefined &&
+          scalarSlotRuntime?.resolveScalarSlot(positionIds[0]) !== undefined
+        )
+      ) {
         enqueueScalarDiff(path, prev, next);
         return;
       }
@@ -4261,9 +4282,19 @@ export function restoration(
                   // baseline into a later authored write in the same flush
                   // (and cancel a restored entity's subsequent removal).
                   return;
-                } else if (next === undefined) {
+                } else if (
+                  next === undefined &&
+                  !(
+                    !subjectIds?.length &&
+                    positionIds?.[0] !== undefined &&
+                    scalarSlotRuntime?.resolveScalarSlot(positionIds[0]) !==
+                      undefined
+                  )
+                ) {
                   externalTruthByPath.delete(path);
                 } else {
+                  // A terminal can hold undefined as external truth. Collection
+                  // notifications with no value still take the branch above.
                   externalTruthByPath.set(path, next);
                 }
                 // Only a row-shaped payload is useful here; the collection also

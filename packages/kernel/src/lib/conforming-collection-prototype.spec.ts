@@ -155,46 +155,65 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
     expect(rows.byId('a')()?.n).toBe(1);
   });
 
-  it('CANONICALITY — BLOCKED by a 15-branch UNDO REGRESSION, not by array leaves', async () => {
+  it('CANONICALITY — ordinary array replacements undo and redo', async () => {
     const tree = signalTree(
       { rows: [] as Row[], draft: '' },
       { enhancers: [restoration()] }
     );
-    const rows = collectionOver(tree.$.rows);
+    try {
+      const rows = collectionOver(tree.$.rows);
 
-    undoable(() => rows.addOne({ id: 'a', n: 1 }));
-    await tick();
-    undoable(() => rows.addOne({ id: 'b', n: 2 }));
-    await tick();
-    expect(rows.ids()).toEqual(['a', 'b']);
+      undoable(() => rows.addOne({ id: 'a', n: 1 }));
+      await tick();
+      undoable(() => rows.addOne({ id: 'b', n: 2 }));
+      await tick();
+      expect(rows.ids()).toEqual(['a', 'b']);
 
-    // On THIS BRANCH undo REFUSES a non-scalar leaf effect:
-    //
-    //   isSupportedEffect(), restoration.ts:1680-1694
-    //     case 'set': return (isScalarValue(before) && isScalarValue(after))
-    //                     || (subject === undefined && ownerPath !== path);
-    //
-    // An array is not scalar, and a top-level leaf is its own owner, so both
-    // clauses fail and applyTurnEffects throws.
-    expect(() => tree.undo()).toThrow(/Unsupported scoped undo effect at rows/);
+      tree.undo();
+      expect(rows.ids()).toEqual(['a']);
+      expect(rows.all()).toEqual([{ id: 'a', n: 1 }]);
+      expect(rows.byId('b')()).toBeUndefined();
+      tree.redo();
+      expect(rows.ids()).toEqual(['a', 'b']);
+      expect(rows.all()).toEqual([
+        { id: 'a', n: 1 },
+        { id: 'b', n: 2 },
+      ]);
+      expect(tree.$.draft()).toBe('');
 
-    // ⚠️ THIS IS A REGRESSION, NOT A PROPERTY OF ARRAY LEAVES.
-    //
-    // The identical write undoes correctly on the 14.x lineage — measured by
-    // running this file's scenario on `main`, where both the array row and the
-    // scalar control pass. `isSupportedEffect` was introduced by 06785300
-    // (2026-08-11 22:29, "feat(history): cut over public undo to frontier
-    // authority") — the same third-bucket commit that introduced SubjectId.
-    //
-    // So CANONICALITY for an ordinary array leaf is ESTABLISHED on 14.x and
-    // BLOCKED here by 15-effort work. The prototype's 7th property is contingent
-    // on fixing that regression, and this row must not be read as evidence that
-    // a declaration kind is needed to be canonical.
-    //
-    // It also contaminates E: on THIS branch, entityMap passes canonicality
-    // because it emits SUBJECT-BEARING effects, which isSupportedEffect admits,
-    // while an ordinary array does not. That is a property of the new undo
-    // engine, not of the two shapes.
+      // October 1 disposition: registered terminal replacements now preserve
+      // their topology through capture and reversal. The original finding below
+      // is retained as history, not a current limitation or EntityMap comparison.
+      // On THIS BRANCH undo REFUSES a non-scalar leaf effect:
+      //
+      //   isSupportedEffect(), restoration.ts:1680-1694
+      //     case 'set': return (isScalarValue(before) && isScalarValue(after))
+      //                     || (subject === undefined && ownerPath !== path);
+      //
+      // An array is not scalar, and a top-level leaf is its own owner, so both
+      // clauses fail and applyTurnEffects throws.
+      // Former assertion: expect(() => tree.undo()).toThrow(/Unsupported scoped undo effect at rows/);
+
+      // ⚠️ THIS IS A REGRESSION, NOT A PROPERTY OF ARRAY LEAVES.
+      //
+      // The identical write undoes correctly on the 14.x lineage — measured by
+      // running this file's scenario on `main`, where both the array row and the
+      // scalar control pass. `isSupportedEffect` was introduced by 06785300
+      // (2026-08-11 22:29, "feat(history): cut over public undo to frontier
+      // authority") — the same third-bucket commit that introduced SubjectId.
+      //
+      // So CANONICALITY for an ordinary array leaf is ESTABLISHED on 14.x and
+      // BLOCKED here by 15-effort work. The prototype's 7th property is contingent
+      // on fixing that regression, and this row must not be read as evidence that
+      // a declaration kind is needed to be canonical.
+      //
+      // It also contaminates E: on THIS branch, entityMap passes canonicality
+      // because it emits SUBJECT-BEARING effects, which isSupportedEffect admits,
+      // while an ordinary array does not. That is a property of the new undo
+      // engine, not of the two shapes.
+    } finally {
+      tree.destroy();
+    }
   });
 
   it('REPRESENTATION — tree.$() obtains it by the SAME generic rule as ordinary state', () => {
