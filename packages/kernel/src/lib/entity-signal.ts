@@ -1662,6 +1662,30 @@ export function createEntitySignal<
     return transformedEntity;
   }
 
+  /** `onUpdate` interceptors for a whole-entity replacement. */
+  function interceptReplacedEntity(id: K, entity: E): E {
+    let replacement = entity;
+    for (const handler of interceptHandlers) {
+      const ctx: InterceptContext<Partial<E>> = {
+        block: (reason?: string) => {
+          throw new Error(
+            `Cannot replace entity: ${reason || 'blocked by interceptor'}`
+          );
+        },
+        transform: (value: Partial<E>) => {
+          replacement = value as E;
+        },
+        blocked: false,
+        blockReason: undefined,
+      };
+      assertSynchronousInterceptorResult(
+        handler.onUpdate?.(id, entity as Partial<E>, ctx),
+        'onUpdate'
+      );
+    }
+    return replacement;
+  }
+
   function interceptUpdatedEntity(id: K, changes: Partial<E>): Partial<E> {
     let transformedChanges = changes;
     for (const handler of interceptHandlers) {
@@ -1758,6 +1782,8 @@ export function createEntitySignal<
    * single-entity writes O(1) regardless of collection size.
    */
   function syncEntitySignal(id: K): void {
+    // Nothing realized, nothing to stage — and no key lookup either.
+    if (subjectEpochs.size === 0) return;
     const subjectId = resolveSubjectId(id);
     if (subjectId === undefined) {
       return;
@@ -3475,47 +3501,41 @@ export function createEntitySignal<
     },
 
     setAll(entities: E[], opts?: AddOptions<E, K>): void {
-      const currentEntries = getProjectedEntries();
+      // Pre-state from ONE walk of the structural order: each row's key and
+      // subject come off its node, so nothing below re-resolves a current row.
+      // (This used to build [key, value] tuples, then a Set of keys, then a
+      // second lookup pass for the subjects — ~20 hash operations per row.)
+      const currentKeys: K[] = [];
+      const currentSubjects: number[] = [];
+      structuralStore.snapshotActiveOrder(currentKeys, currentSubjects);
       const beforeOrderFrontier = structuralStore.activeOrderFrontier();
-      const beforeSubjects = currentEntries
-        .map(([id]) => resolveSubjectId(id))
-        .filter((subjectId): subjectId is number => subjectId !== undefined);
-      const currentIds = new Set(currentEntries.map(([id]) => id));
-      const stagedIncomingIds: K[] = [];
-      const stagedIncomingById = new Map<K, E>();
+      const intercepting = interceptHandlers.length > 0;
 
+      // The incoming order, deduplicated (last value wins), in parallel
+      // arrays. `incomingSubjects` holds the existing subject of an update and
+      // is filled in for each add once its fresh subject exists.
+      const incomingIndex = new Map<K, number>();
+      const incomingIds: K[] = [];
+      const incomingEntities: E[] = [];
+      const incomingSubjects: Array<number | undefined> = [];
       for (const entity of entities) {
         const id = deriveId(entity, opts);
-        const transformedEntity = currentIds.has(id)
-          ? (() => {
-              let replacement = entity;
-              for (const handler of interceptHandlers) {
-                const ctx: InterceptContext<Partial<E>> = {
-                  block: (reason?: string) => {
-                    throw new Error(
-                      `Cannot replace entity: ${
-                        reason || 'blocked by interceptor'
-                      }`
-                    );
-                  },
-                  transform: (value: Partial<E>) => {
-                    replacement = value as E;
-                  },
-                  blocked: false,
-                  blockReason: undefined,
-                };
-                assertSynchronousInterceptorResult(
-                  handler.onUpdate?.(id, entity as Partial<E>, ctx),
-                  'onUpdate'
-                );
-              }
-              return replacement;
-            })()
+        const existing = structuralStore.subjectIdForKey(id);
+        const transformedEntity = !intercepting
+          ? entity
+          : existing !== undefined
+          ? interceptReplacedEntity(id, entity)
           : interceptAddedEntity(entity);
 
-        if (!stagedIncomingById.has(id)) {
-          stagedIncomingIds.push(id);
-        } else if (
+        const index = incomingIndex.get(id);
+        if (index === undefined) {
+          incomingIndex.set(id, incomingIds.length);
+          incomingIds.push(id);
+          incomingEntities.push(transformedEntity);
+          incomingSubjects.push(existing);
+          continue;
+        }
+        if (
           (typeof ngDevMode === 'undefined' || ngDevMode) &&
           !warnedDuplicateSetAllId
         ) {
@@ -3525,121 +3545,98 @@ export function createEntitySignal<
               'Supply unique IDs instead of a shared fallback. [ST2001]'
           );
         }
-        stagedIncomingById.set(id, transformedEntity);
+        incomingEntities[index] = transformedEntity;
       }
 
-      const stagedRemovals = currentEntries
-        .filter(([id]) => !stagedIncomingById.has(id))
-        .map(([id, entity]) => {
-          for (const handler of interceptHandlers) {
-            const ctx: InterceptContext<void> = {
-              block: (reason?: string) => {
-                throw new Error(
-                  `Cannot remove entity: ${reason || 'blocked by interceptor'}`
-                );
-              },
-              transform: () => {
-                // void transform - no transformation possible
-              },
-              blocked: false,
-              blockReason: undefined,
-            };
-            assertSynchronousInterceptorResult(
-              handler.onRemove?.(id, entity, ctx),
-              'onRemove'
-            );
-          }
-
-          const subjectId = resolveSubjectId(id);
-          if (subjectId === undefined) {
-            throw new Error(`Entity with id ${String(id)} has no subject id`);
-          }
-          return {
-            id,
-            entity,
-            subjectId,
+      const stagedRemovals: Array<{
+        id: K;
+        entity: E;
+        subjectId: number;
+        /** Position in the pre-state order, for the removal's neighbours. */
+        index: number;
+      }> = [];
+      for (let index = 0; index < currentKeys.length; index += 1) {
+        const id = currentKeys[index];
+        if (incomingIndex.has(id)) continue;
+        const subjectId = currentSubjects[index];
+        const entity = valueStore.backingForSubject(subjectId);
+        if (entity === undefined) continue;
+        for (const handler of interceptHandlers) {
+          const ctx: InterceptContext<void> = {
+            block: (reason?: string) => {
+              throw new Error(
+                `Cannot remove entity: ${reason || 'blocked by interceptor'}`
+              );
+            },
+            transform: () => {
+              // void transform - no transformation possible
+            },
+            blocked: false,
+            blockReason: undefined,
           };
-        });
+          assertSynchronousInterceptorResult(
+            handler.onRemove?.(id, entity, ctx),
+            'onRemove'
+          );
+        }
+        stagedRemovals.push({ id, entity, subjectId, index });
+      }
 
-      const stagedUpdates = stagedIncomingIds
-        .filter((id) => currentIds.has(id))
-        .map((id) => {
-          const prev = getProjectedEntity(id);
-          const entity = stagedIncomingById.get(id);
-          if (prev === undefined || entity === undefined) {
-            throw new Error(`Entity with id ${String(id)} not found`);
-          }
-
-          const subjectId = resolveSubjectId(id);
-          if (subjectId === undefined) {
-            throw new Error(`Entity with id ${String(id)} has no subject id`);
-          }
-
-          return {
-            id,
-            prev,
-            entity,
-            subjectId,
-          };
-        });
-
-      const stagedAdds = stagedIncomingIds
-        .filter((id) => !currentIds.has(id))
-        .map((id) => {
-          const entity = stagedIncomingById.get(id);
-          if (entity === undefined) {
-            throw new Error(`Entity with id ${String(id)} not found`);
-          }
-
-          return { id, entity };
-        });
+      const stagedUpdates: Array<{
+        id: K;
+        prev: E;
+        entity: E;
+        subjectId: number;
+      }> = [];
+      const stagedAdds: Array<{ id: K; entity: E; index: number }> = [];
+      for (let index = 0; index < incomingIds.length; index += 1) {
+        const id = incomingIds[index];
+        const entity = incomingEntities[index];
+        const subjectId = incomingSubjects[index];
+        if (subjectId === undefined) {
+          stagedAdds.push({ id, entity, index });
+          continue;
+        }
+        const prev = valueStore.backingForSubject(subjectId);
+        if (prev === undefined) {
+          throw new Error(`Entity with id ${String(id)} not found`);
+        }
+        stagedUpdates.push({ id, prev, entity, subjectId });
+      }
 
       const membershipUnit = beginMembershipUnit();
       try {
-      const freshSubjectIds = commitFreshSubjects(
+      // Index-aligned with `stagedAdds`.
+      const addedSubjectIds = commitFreshSubjects(
         stagedAdds.map(({ id }) => id)
       );
-      const freshSubjectIdsByKey = new Map<K, number>();
-      for (let index = 0; index < stagedAdds.length; index += 1) {
-        freshSubjectIdsByKey.set(stagedAdds[index].id, freshSubjectIds[index]);
+      for (let k = 0; k < stagedAdds.length; k += 1) {
+        incomingSubjects[stagedAdds[k].index] = addedSubjectIds[k];
       }
+      // Every incoming row now has its subject: this IS the after-order.
+      const afterSubjects = incomingSubjects as number[];
 
       // Everything from here to the notify loops that exists only to be
       // published is built only when something can receive it.
       const observed = pathObserved();
-      // One index of the pre-state order, not a search per removed row: that
-      // made replacing or clearing a collection O(n^2) (~2 s at 40k rows).
-      const currentIndexById =
-        observed && stagedRemovals.length > 0
-          ? new Map(currentEntries.map(([entryId], index) => [entryId, index]))
-          : undefined;
-      const stagedRemovalStructuralEffects = !observed ? [] : stagedRemovals.map(
-        ({ id, entity, subjectId }) => {
-          const currentIndex = currentIndexById?.get(id) ?? -1;
+      const stagedRemovalStructuralEffects: PendingStructuralEffect[] = [];
+      if (observed) {
+        for (const { id, entity, subjectId, index } of stagedRemovals) {
           // Immediate pre-state neighbours, removed or surviving, exactly as
           // clear() and removeMany() record them. Anchoring only to survivors
           // left adjacent removals with identical anchors, so their reversal
           // order depended on replay order: [a,b,c] -> [q,a] rolled back to
           // [a,c,b], and replacing every row undid to [c,b,a].
-          const beforeId =
-            currentIndex > 0 ? currentEntries[currentIndex - 1]?.[0] : undefined;
-          const afterId =
-            currentIndex >= 0 ? currentEntries[currentIndex + 1]?.[0] : undefined;
-          const beforeSubject =
-            beforeId === undefined ? undefined : resolveSubjectId(beforeId);
-          const afterSubject =
-            afterId === undefined ? undefined : resolveSubjectId(afterId);
-
-          return {
-            kind: 'remove' as const,
+          stagedRemovalStructuralEffects.push({
+            kind: 'remove',
             subject: subjectId,
             key: id,
             value: deepClone(entity),
-            beforeSubject,
-            afterSubject,
-          };
+            beforeSubject: index > 0 ? currentSubjects[index - 1] : undefined,
+            afterSubject: currentSubjects[index + 1],
+          });
         }
-      );
+      }
 
       for (const { id, subjectId, entity } of stagedRemovals) {
         const currentState = resolveSubjectState(subjectId);
@@ -3656,36 +3653,29 @@ export function createEntitySignal<
         captureCommittedEntity(subjectId, prev, entity, false);
       }
 
-      const addedSubjectIds = stagedAdds.map(({ id, entity }) => {
-        const subjectId = freshSubjectIdsByKey.get(id);
-        if (subjectId === undefined) {
-          throw new Error(`Entity with id ${String(id)} has no subject id`);
-        }
-        valueStore.retainSubjectValue(subjectId, entity);
-        captureCommittedEntity(subjectId, undefined, entity, true);
-        return subjectId;
-      });
+      for (let k = 0; k < stagedAdds.length; k += 1) {
+        const entity = stagedAdds[k].entity;
+        valueStore.retainSubjectValue(addedSubjectIds[k], entity);
+        captureCommittedEntity(addedSubjectIds[k], undefined, entity, true);
+      }
 
-      structuralStore.reorderActiveKeys(stagedIncomingIds);
+      structuralStore.reorderActiveKeys(incomingIds);
 
-      lastSubjectIds = [
-        ...stagedRemovals.map(({ subjectId }) => subjectId),
-        ...stagedUpdates.map(({ subjectId }) => subjectId),
-        ...addedSubjectIds,
-      ];
+      // Only `__subjectIds` reads this, and it exists only with subject
+      // metadata.
+      if (subjectMetadataEnabled) {
+        const participants: number[] = [];
+        for (const { subjectId } of stagedRemovals) participants.push(subjectId);
+        for (const { subjectId } of stagedUpdates) participants.push(subjectId);
+        appendAll(participants, addedSubjectIds);
+        lastSubjectIds = participants;
+      }
 
-      const afterSubjects = stagedIncomingIds
-        .map((id) => resolveSubjectId(id))
-        .filter((subjectId): subjectId is number => subjectId !== undefined);
       const membershipChanges: EntityMembershipChange[] = [];
       if (membershipInventory.observed()) {
         appendAll(membershipChanges, stagedRemovals.map(({ id, subjectId }) => ({ kind: 'remove' as const, lifetimeId: subjectId, key: id })));
         appendAll(membershipChanges, stagedAdds.map(({ id }, index) => membershipAddition(addedSubjectIds[index], id)));
-        const beforeSet = new Set(beforeSubjects);
-        const afterSet = new Set(afterSubjects);
-        const survivingBefore = beforeSubjects.filter((id) => afterSet.has(id));
-        const survivingAfter = afterSubjects.filter((id) => beforeSet.has(id));
-        if (survivingBefore.some((id, index) => id !== survivingAfter[index])) membershipChanges.push({ kind: 'reorder', before: beforeSubjects, after: afterSubjects });
+        if (survivingOrderChanged(currentSubjects, afterSubjects)) membershipChanges.push({ kind: 'reorder', before: currentSubjects, after: afterSubjects });
       }
 
       // Captured whenever SURVIVING subjects change relative order, not only
@@ -3702,12 +3692,12 @@ export function createEntitySignal<
       if (
         positionId !== undefined &&
         mutationCaptureRuntime?.publishCollectionOrder &&
-        survivingOrderChanged(beforeSubjects, afterSubjects)
+        survivingOrderChanged(currentSubjects, afterSubjects)
       ) {
         mutationCaptureRuntime.publishCollectionOrder({
           owner: positionId,
           ownerPath: basePath,
-          beforeSubjects,
+          beforeSubjects: currentSubjects,
           afterSubjects,
           beforeFrontier: beforeOrderFrontier,
           afterFrontier: structuralStore.activeOrderFrontier(),
@@ -3717,58 +3707,33 @@ export function createEntitySignal<
 
       membershipUnit.commit(membershipChanges);
       for (const { subjectId } of stagedRemovals) { tombstoneSubjectSignal(subjectId); publishSubjectPhysicalChange(subjectId); }
-      reclaimRetiredSubjectsWithoutOwner(
-        stagedRemovals.map(({ subjectId }) => subjectId)
-      );
-      for (const { id } of stagedAdds) syncEntitySignal(id);
-      for (const { id } of stagedUpdates) syncEntitySignal(id);
+      if (!hasRestorationAuthority && stagedRemovals.length > 0) {
+        reclaimRetiredSubjectsWithoutOwner(
+          stagedRemovals.map(({ subjectId }) => subjectId)
+        );
+      }
+      // Only a realized subject has an epoch to stage.
+      if (subjectEpochs.size > 0) {
+        for (const subjectId of addedSubjectIds) stageSubjectEpoch(subjectId);
+        for (const { subjectId } of stagedUpdates) stageSubjectEpoch(subjectId);
+      }
 
-      const finalIndexById = observed
-        ? new Map(stagedIncomingIds.map((id, index) => [id, index] as const))
-        : undefined;
-      const stagedAddStructuralEffects = !observed ? [] : stagedAdds.map(
-        ({ id, entity }, index) => {
-          const subjectId = addedSubjectIds[index];
-          const finalIndex = finalIndexById?.get(id) ?? -1;
-          let beforeSubject: number | undefined;
-          let afterSubject: number | undefined;
-
-          for (let cursor = finalIndex - 1; cursor >= 0; cursor -= 1) {
-            const neighborId = stagedIncomingIds[cursor];
-            if (neighborId === undefined) {
-              continue;
-            }
-            beforeSubject = resolveSubjectId(neighborId);
-            if (beforeSubject !== undefined) {
-              break;
-            }
-          }
-
-          for (
-            let cursor = finalIndex + 1;
-            cursor < stagedIncomingIds.length;
-            cursor += 1
-          ) {
-            const neighborId = stagedIncomingIds[cursor];
-            if (neighborId === undefined) {
-              continue;
-            }
-            afterSubject = resolveSubjectId(neighborId);
-            if (afterSubject !== undefined) {
-              break;
-            }
-          }
-
-          return {
-            kind: 'add' as const,
-            subject: subjectId,
+      const stagedAddStructuralEffects: PendingStructuralEffect[] = [];
+      if (observed) {
+        for (let k = 0; k < stagedAdds.length; k += 1) {
+          const { id, entity, index } = stagedAdds[k];
+          stagedAddStructuralEffects.push({
+            kind: 'add',
+            subject: addedSubjectIds[k],
             key: id,
             value: deepClone(entity),
-            beforeSubject,
-            afterSubject,
-          };
+            // Every incoming row is active by now, so the nearest neighbour
+            // with a subject is the adjacent one.
+            beforeSubject: index > 0 ? afterSubjects[index - 1] : undefined,
+            afterSubject: afterSubjects[index + 1],
+          });
         }
-      );
+      }
 
       updateSignals();
 
@@ -3793,41 +3758,43 @@ export function createEntitySignal<
             entity,
             prev,
             basePath,
-            subjectId === undefined ? undefined : [subjectId],
+            [subjectId],
             getPositionIdsForNotify(),
             meta
           );
         }
 
-        for (let i = 0; i < stagedAdds.length; i++) {
-          const { id, entity } = stagedAdds[i];
+        for (let k = 0; k < stagedAdds.length; k++) {
+          const { id, entity } = stagedAdds[k];
           pathNotifier.notify(
             `${basePath}.${String(id)}`,
             entity,
             undefined,
             basePath,
-            [addedSubjectIds[i]],
+            [addedSubjectIds[k]],
             getPositionIdsForNotify(),
-            effectMeta(meta, stagedAddStructuralEffects[i])
+            effectMeta(meta, stagedAddStructuralEffects[k])
           );
         }
       }
 
-      for (const { id, entity } of stagedRemovals) {
-        for (const handler of tapHandlers) {
-          handler.onRemove?.(id, entity);
+      if (tapHandlers.length > 0) {
+        for (const { id, entity } of stagedRemovals) {
+          for (const handler of tapHandlers) {
+            handler.onRemove?.(id, entity);
+          }
         }
-      }
 
-      for (const { id, entity } of stagedAdds) {
-        for (const handler of tapHandlers) {
-          handler.onAdd?.(entity, id);
+        for (const { id, entity } of stagedAdds) {
+          for (const handler of tapHandlers) {
+            handler.onAdd?.(entity, id);
+          }
         }
-      }
 
-      for (const { id, entity } of stagedUpdates) {
-        for (const handler of tapHandlers) {
-          handler.onUpdate?.(id, entity as Partial<E>, entity);
+        for (const { id, entity } of stagedUpdates) {
+          for (const handler of tapHandlers) {
+            handler.onUpdate?.(id, entity as Partial<E>, entity);
+          }
         }
       }
       } finally { membershipUnit.cancel(); }

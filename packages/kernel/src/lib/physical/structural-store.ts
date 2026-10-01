@@ -190,6 +190,14 @@ export class StructuralStore<K extends string | number> {
     return keys;
   }
 
+  /** Fills both arrays from one walk of the active order. */
+  snapshotActiveOrder(keys: K[], subjectIds: number[]): void {
+    for (let node = this.activeHead; node !== undefined; node = node.next) {
+      keys.push(node.key);
+      subjectIds.push(node.subjectId);
+    }
+  }
+
   firstActiveKey(): K | undefined {
     return this.activeHead?.key;
   }
