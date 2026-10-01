@@ -1,4 +1,4 @@
-import { SIGNAL_TREE_MESSAGES } from '../lib/constants';
+import { ENHANCER_CYCLE_DETECTED_MESSAGE } from '../lib/constants';
 import { ENHANCER_META } from '../lib/enhancer-types';
 
 /**
@@ -162,7 +162,7 @@ export function resolveEnhancerOrder(
   // Check for cycles
   if (ordered.length !== nodes.length) {
     if (debugMode) {
-      console.warn(SIGNAL_TREE_MESSAGES.ENHANCER_CYCLE_DETECTED);
+      console.warn(ENHANCER_CYCLE_DETECTED_MESSAGE);
     }
     return enhancers;
   }
