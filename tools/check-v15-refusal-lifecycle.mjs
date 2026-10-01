@@ -39,8 +39,9 @@ const FIXED = [
   'throwing-observer-handle-and-later-link',
   'confirmed-transaction-undo-redo-link',
   'automatic-refusal-history-before-link',
+  'restored-entity-link',
 ];
-const LIMITATIONS = ['dependent-add/resolve-retry', 'restored-entity-link'];
+const LIMITATIONS = ['dependent-add/resolve-retry'];
 const NAMES = [...PRESERVED, ...FIXED, ...LIMITATIONS];
 const REFUSAL_ERROR =
   'AssertionError [ERR_ASSERTION]: conservative confirmed dependency still refuses after later removal';
@@ -146,8 +147,25 @@ function classify(baseline, candidate) {
       false,
       `baseline: expected fixed failure ${name}`
     );
+  // Preserve the pinned 15.3.0 failure evidence, but require the repaired candidate.
+  boundedLimitation(b.get('restored-entity-link'));
   for (const name of [...PRESERVED, ...FIXED])
     assert.equal(c.get(name).pass, true, `candidate: regression ${name}`);
+  const restored = c.get('restored-entity-link').evidence;
+  assert.deepEqual(
+    restored.state,
+    RESTORED_EVIDENCE.state,
+    'candidate: restored entity state'
+  );
+  assert.ok(
+    Array.isArray(restored.sent) && restored.sent.length > 0,
+    'candidate: missing restored Link output'
+  );
+  assert.deepEqual(
+    restored.sent.at(-1),
+    restored.state,
+    'candidate: restored Link output differs from state'
+  );
   for (const name of LIMITATIONS) {
     boundedLimitation(b.get(name));
     boundedLimitation(c.get(name));
@@ -195,7 +213,7 @@ function selfTest() {
     error: REFUSAL_ERROR,
     evidence: structuredClone(DEPENDENT_EVIDENCE),
   });
-  Object.assign(lookup(baseline, LIMITATIONS[1]), {
+  Object.assign(lookup(baseline, 'restored-entity-link'), {
     error:
       'AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal: synthetic mismatch',
     evidence: structuredClone(RESTORED_EVIDENCE),
@@ -204,6 +222,10 @@ function selfTest() {
   for (const name of FIXED)
     Object.assign(lookup(candidate, name), row(name, true));
   for (const name of FIXED) delete lookup(candidate, name).error;
+  lookup(candidate, 'restored-entity-link').evidence = {
+    state: structuredClone(RESTORED_EVIDENCE.state),
+    sent: [[], structuredClone(RESTORED_EVIDENCE.state)],
+  };
   assert.equal(classify(baseline, candidate).accepted, true);
   const checks = [];
   const rejects = (name, mutate) => {
@@ -244,10 +266,19 @@ function selfTest() {
     lookup(c, LIMITATIONS[0]).evidence.remainingRefusal.final.x = 2;
   });
   rejects('changed restored row', (_b, c) => {
-    lookup(c, LIMITATIONS[1]).evidence.state = [];
+    lookup(c, 'restored-entity-link').evidence.state = [];
   });
   rejects('changed endpoint mismatch', (_b, c) => {
-    lookup(c, LIMITATIONS[1]).evidence.sent.push([{ id: 'B' }]);
+    lookup(c, 'restored-entity-link').evidence.sent.push([{ id: 'B' }]);
+  });
+  rejects('restored Link still red', (_b, c) => {
+    Object.assign(
+      lookup(c, 'restored-entity-link'),
+      lookup(baseline, 'restored-entity-link')
+    );
+  });
+  rejects('changed pinned restored failure', (b) => {
+    lookup(b, 'restored-entity-link').evidence.sent = [];
   });
   rejects('equally unsafe baseline and candidate', (b, c) => {
     for (const run of [b, c])
