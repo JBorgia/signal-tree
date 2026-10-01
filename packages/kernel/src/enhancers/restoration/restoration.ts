@@ -1,3 +1,4 @@
+import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
 import {
   applyInInvalidationGroup,
   wasAppliedBeforeFailure,
@@ -204,6 +205,7 @@ type ScalarSetEffect = TurnEffectBase & {
   subject?: number;
   fieldSegments?: readonly string[];
   plainBranchMembership?: PlainBranchMemberPresence;
+  fieldPresence?: FieldPresence;
   before: unknown;
   after: unknown;
   mutationIntent?: 'replace' | 'derive';
@@ -312,6 +314,14 @@ function toReversalEffect(
                 after: effect.plainBranchMembership.before,
               }
             : effect.plainBranchMembership
+          : undefined,
+        fieldPresence: effect.fieldPresence
+          ? direction === 'undo'
+            ? {
+                before: effect.fieldPresence.after,
+                after: effect.fieldPresence.before,
+              }
+            : effect.fieldPresence
           : undefined,
         path: effect.path,
         ownerPath: effect.ownerPath,
@@ -3505,6 +3515,11 @@ export function restoration(
         if (existing.kind === 'set' && effect.kind === 'set') {
           if (!composePlainBranchMemberEffect(existing, effect)) {
             existing.after = effect.after;
+            // First presence before, latest presence after.
+            const before = existing.fieldPresence?.before ?? true;
+            const after = effect.fieldPresence?.after ?? true;
+            if (before && after) delete existing.fieldPresence;
+            else existing.fieldPresence = { before, after };
           }
           existing.mutationIntent = combineScalarMutationIntent(
             existing.mutationIntent,
@@ -3615,20 +3630,31 @@ export function restoration(
         diffPath: string,
         before: unknown,
         after: unknown,
-        fieldSegments: readonly string[] = []
+        fieldSegments: readonly string[] = [],
+        presence?: FieldPresence
       ): void => {
         const position = positionIds?.[0];
-        if (position === undefined || before === after) {
+        if (
+          position === undefined ||
+          (before === after &&
+            (presence === undefined || presence.before === presence.after))
+        ) {
           return;
         }
 
         if (isPlainRecord(before) && isPlainRecord(after)) {
           const keys = new Set([...Object.keys(before), ...Object.keys(after)]);
           for (const key of keys) {
-            enqueueScalarDiff(`${diffPath}.${key}`, before[key], after[key], [
-              ...fieldSegments,
-              key,
-            ]);
+            enqueueScalarDiff(
+              `${diffPath}.${key}`,
+              before[key],
+              after[key],
+              [...fieldSegments, key],
+              {
+                before: Object.prototype.hasOwnProperty.call(before, key),
+                after: Object.prototype.hasOwnProperty.call(after, key),
+              }
+            );
           }
           return;
         }
@@ -3640,6 +3666,11 @@ export function restoration(
           position,
           subject: subjectIds?.[0],
           fieldSegments: subjectIds?.length ? fieldSegments : undefined,
+          ...(subjectIds?.length &&
+          presence !== undefined &&
+          !(presence.before && presence.after)
+            ? { fieldPresence: { ...presence } }
+            : {}),
           before,
           after,
           mutationIntent: meta?.mutationIntent,

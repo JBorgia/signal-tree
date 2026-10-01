@@ -707,8 +707,22 @@ function applyValueEffect(
     value:
       fieldPath.length === 0
         ? effect.after
+        : effect.fieldPresence?.after === false
+        ? removeValueAtPath(subject.value, fieldPath)
         : setValueAtPath(subject.value, fieldPath, effect.after),
   });
+}
+
+/** Absent at the target endpoint: drop the key instead of storing undefined. */
+function removeValueAtPath(value: unknown, path: readonly string[]): unknown {
+  if (path.length === 0 || !isRecord(value)) return value;
+  const [head, ...rest] = path;
+  if (!Object.prototype.hasOwnProperty.call(value, head)) return value;
+  if (rest.length === 0) {
+    const { [head]: _removed, ...remaining } = value;
+    return remaining;
+  }
+  return { ...value, [head]: removeValueAtPath(value[head], rest) };
 }
 
 function deriveSubjectFieldPath(

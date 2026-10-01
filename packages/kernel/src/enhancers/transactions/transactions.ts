@@ -1,3 +1,4 @@
+import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
 import {
   applyInInvalidationGroup,
   wasAppliedBeforeFailure,
@@ -103,6 +104,7 @@ export type ScalarSetEffect = TurnEffectBase & {
   /** Exact keys within this entity lifetime, independent of its current key. */
   fieldSegments?: readonly string[];
   plainBranchMembership?: PlainBranchMemberPresence;
+  fieldPresence?: FieldPresence;
   before: unknown;
   after: unknown;
   mutationIntent?: 'replace' | 'derive';
@@ -1313,6 +1315,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
       if (existing.kind === 'set' && effect.kind === 'set') {
         if (!composePlainBranchMemberEffect(existing, effect)) {
           existing.after = effect.after;
+          // First presence before, latest presence after.
+          const before = existing.fieldPresence?.before ?? true;
+          const after = effect.fieldPresence?.after ?? true;
+          if (before && after) delete existing.fieldPresence;
+          else existing.fieldPresence = { before, after };
         }
         existing.mutationIntent = combineScalarMutationIntent(
           existing.mutationIntent,
@@ -1452,7 +1459,15 @@ export function getOrCreateInternalTransactionRuntime<T>(
         ])) {
           const before = previous[key];
           const after = current[key];
-          if (before === after) continue;
+          const beforePresent = Object.prototype.hasOwnProperty.call(
+            previous,
+            key
+          );
+          const afterPresent = Object.prototype.hasOwnProperty.call(
+            current,
+            key
+          );
+          if (before === after && beforePresent === afterPresent) continue;
           const fieldSegments = [...segments, key];
           if (
             subject !== undefined &&
@@ -1469,6 +1484,14 @@ export function getOrCreateInternalTransactionRuntime<T>(
             position,
             subject,
             fieldSegments: subject === undefined ? undefined : fieldSegments,
+            ...(subject !== undefined && !(beforePresent && afterPresent)
+              ? {
+                  fieldPresence: {
+                    before: beforePresent,
+                    after: afterPresent,
+                  },
+                }
+              : {}),
             before,
             after,
             mutationIntent: meta?.mutationIntent,
@@ -1789,6 +1812,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           subjectId: effect.subject,
           fieldSegments: effect.fieldSegments,
           plainBranchMembership: effect.plainBranchMembership,
+          fieldPresence: effect.fieldPresence,
           path: effect.path,
           ownerPath: effect.ownerPath,
         };
@@ -1857,6 +1881,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
         ? {
             before: causal.plainBranchMembership.after,
             after: causal.plainBranchMembership.before,
+          }
+        : undefined,
+      fieldPresence: causal.fieldPresence
+        ? {
+            before: causal.fieldPresence.after,
+            after: causal.fieldPresence.before,
           }
         : undefined,
       structural:

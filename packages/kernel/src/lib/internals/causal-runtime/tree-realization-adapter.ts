@@ -1284,6 +1284,26 @@ function applyEffect(
       participation: 'realized',
     },
     () => {
+      if (
+        !effect.structural &&
+        effect.fieldPresence?.after === false &&
+        typeof effect.subjectId === 'number' &&
+        effect.fieldSegments?.length
+      ) {
+        // The field was absent at the target endpoint: remove the key from the
+        // row rather than writing undefined into it.
+        const row = resolveCurrentSubjectTarget(
+          tree,
+          descriptor,
+          effect.subjectId,
+          { ...effect, fieldSegments: [] }
+        );
+        if (isWritableEntityNode(row)) {
+          const read = row as unknown as () => unknown;
+          row(withoutFieldAtSegments(read(), effect.fieldSegments));
+          return;
+        }
+      }
       if (!effect.structural) {
         const target = resolveLiveScalarNode(
           tree,
@@ -1557,6 +1577,11 @@ function updatePreparedRealizationContext(
     );
     if (preparedSubject && fieldSegments !== undefined) {
       if (fieldSegments.length === 0) preparedSubject.value = effect.after;
+      else if (effect.fieldPresence?.after === false)
+        preparedSubject.value = withoutFieldAtSegments(
+          preparedSubject.value,
+          fieldSegments
+        );
       else
         assignPreparedSubjectValue(
           preparedSubject.value,
@@ -2088,6 +2113,22 @@ function resolveNodeAtSegments(
   }
 
   return cursor;
+}
+
+/** A copy of `value` without the field at `segments`; other keys untouched. */
+function withoutFieldAtSegments(
+  value: unknown,
+  segments: readonly string[]
+): unknown {
+  if (segments.length === 0 || !isTraversableNode(value)) return value;
+  const [head, ...tail] = segments;
+  const record = value as Record<string, unknown>;
+  if (!Object.prototype.hasOwnProperty.call(record, head)) return value;
+  if (tail.length === 0) {
+    const { [head]: _removed, ...rest } = record;
+    return rest;
+  }
+  return { ...record, [head]: withoutFieldAtSegments(record[head], tail) };
 }
 
 function replaceFieldAtSegments(

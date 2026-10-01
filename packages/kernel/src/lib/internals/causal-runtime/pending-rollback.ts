@@ -198,6 +198,12 @@ function createPendingRollbackEffect(
             after: effect.plainBranchMembership.before,
           }
         : undefined,
+      fieldPresence: effect.fieldPresence
+        ? {
+            before: effect.fieldPresence.after,
+            after: effect.fieldPresence.before,
+          }
+        : undefined,
       path: effect.path,
       ownerPath: effect.ownerPath,
       structural,
