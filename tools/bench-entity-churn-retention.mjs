@@ -82,6 +82,13 @@ const ARMS = {
     history: false,
     readNodes: true,
   },
+  'no-history-node-reads': {
+    label: 'plain tree, byId(id)() every row every round',
+    detail: 'nothing can restore; every row node READ (creates its activation carrier)',
+    history: false,
+    readNodes: true,
+    readValues: true,
+  },
   'time-travel': {
     label: 'restoration() attached, no node reads',
     detail: 'a restorer EXISTS — does retention differ?',
@@ -121,8 +128,11 @@ if (armFlag !== -1) {
   };
 
   tree.$.rows.setAll(generation(0));
-  if (a.readNodes)
-    for (let i = 0; i < WIDTH; i++) void tree.$.rows.byId(`g0-${i}`);
+  const touch = (id) => {
+    const node = tree.$.rows.byId(id);
+    if (a.readValues) void node?.();
+  };
+  if (a.readNodes) for (let i = 0; i < WIDTH; i++) touch(`g0-${i}`);
 
   // Baseline AFTER the first generation, so the figure is growth per RETIRED
   // subject and excludes the live collection entirely. Baselining before the
@@ -131,8 +141,7 @@ if (armFlag !== -1) {
 
   for (let g = 1; g <= ROUNDS; g++) {
     tree.$.rows.setAll(generation(g));
-    if (a.readNodes)
-      for (let i = 0; i < WIDTH; i++) void tree.$.rows.byId(`g${g}-${i}`);
+    if (a.readNodes) for (let i = 0; i < WIDTH; i++) touch(`g${g}-${i}`);
     // A turn per round: the notifier flushes on a microtask and history records
     // on a flush, so rounds without one coalesce and the arm measures fewer
     // logical generations than it claims to.

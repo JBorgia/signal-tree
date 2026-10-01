@@ -962,9 +962,6 @@ export function createEntitySignal<
     );
   }
 
-  /** Subjects that have moved to a new key and must not fall back to the old one. */
-  const rekeyedSubjects = new Set<number>();
-
   function planRekey(
     from: K,
     to: K
@@ -1020,7 +1017,6 @@ export function createEntitySignal<
         for (const changedSubjectId of result.physicallyChangedSubjectIds) {
           publishSubjectPhysicalChange(changedSubjectId);
         }
-        rekeyedSubjects.add(subjectId);
         // Narrow last-write participation to the one rekeyed subject. The
         // leaf-signal interceptor re-reads `__subjectIds` after `changeId`
         // returns; without this it reports every subject of the prior
@@ -1098,7 +1094,6 @@ export function createEntitySignal<
         for (const changedSubjectId of result.physicallyChangedSubjectIds) {
           publishSubjectPhysicalChange(changedSubjectId);
         }
-        rekeyedSubjects.add(subjectId);
         // Narrow last-write participation to the one rekeyed subject. The
         // leaf-signal interceptor re-reads `__subjectIds` after `changeId`
         // returns; without this it reports every subject of the prior
@@ -2241,6 +2236,11 @@ export function createEntitySignal<
       };
       frame.stageRetainedValueRetirement(retirement);
       subjectEpochs.delete(subjectId);
+      // The lifetime is forgotten and its id is never reused, so nothing can
+      // bump this subject again; keeping the entry was ~100 B per retired
+      // subject once its node had been read (retired-subject-slope:node-reads).
+      // A node still held by a caller keeps its own carrier in its closure.
+      subjectStateSignals.delete(subjectId);
       staged += 1;
     }
 
