@@ -223,7 +223,6 @@ type CaptureBucket = {
    * location key (see windowKeys).
    */
   ownWriteSeq: Map<string, number>;
-  ownerPaths: Set<string>;
   subjectIds: Set<number>;
   positionIds: Set<number>;
   baselineValues: Map<number, unknown>;
@@ -626,19 +625,22 @@ class TransactionAuthority {
     };
   }
 
+  /**
+   * Record a settled ordinary turn. Returns nothing: no caller reads the
+   * record, and the clone this used to return was built and dropped per flush.
+   */
   recordConfirmed(
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[]
-  ): TransactionTurnRecord | undefined {
+  ): void {
     const turn = this.buildTurn(subjectIds, positionIds, effects);
     if (!turn) {
-      return undefined;
+      return;
     }
     this.insertConfirmed(turn);
     // The obligation set just changed; release what it no longer covers.
     this.releaseConfirmedBeyondObligation();
-    return cloneTurnRecord(turn);
   }
 
   reservePending(bucket: CaptureBucket): number {
@@ -743,24 +745,29 @@ class TransactionAuthority {
    * evidence facility layered on top.
    */
   private releaseConfirmedBeyondObligation(): void {
-    if (this.confirmedTurns.length === 0) return;
+    const turns = this.confirmedTurns;
+    if (turns.length === 0) return;
     let minPending = Infinity;
     for (const id of this.pendingTurns.keys()) {
       if (id < minPending) minPending = id;
     }
-    const required = (turn: TransactionTurnRecord) => turn.id > minPending;
-    const before = this.confirmedTurns.length;
-    if (this.historyRetain <= 0) {
-      this.confirmedTurns = this.confirmedTurns.filter(required);
-    } else {
-      const keep = new Set<number>();
-      for (const turn of this.confirmedTurns)
-        if (required(turn)) keep.add(turn.id);
-      for (const turn of this.confirmedTurns.slice(-this.historyRetain))
-        keep.add(turn.id);
-      this.confirmedTurns = this.confirmedTurns.filter((t) => keep.has(t.id));
+    // `insertConfirmed` keeps the ledger sorted by id, so the required turns
+    // (`id > minPending`) are a suffix and so are the `historyRetain` newest:
+    // what survives is the longer suffix. Trimming the front replaces a whole
+    // filter per record, which made every flush under a pending turn O(ledger).
+    let start = 0;
+    while (start < turns.length && turns[start].id <= minPending) start++;
+    if (this.historyRetain > 0) {
+      // Exactly `slice(-historyRetain)`, which truncates the count: a
+      // fractional retain below 1 is `slice(-0)` and keeps everything.
+      const newest = Math.trunc(this.historyRetain);
+      start =
+        newest === 0 ? 0 : Math.min(start, Math.max(0, turns.length - newest));
     }
-    if (this.confirmedTurns.length < before) this.evictedConfirmed = true;
+    if (start > 0) {
+      this.confirmedTurns = turns.slice(start);
+      this.evictedConfirmed = true;
+    }
   }
 
   confirmPending(turnId: number): TransactionTurnRecord | undefined {
@@ -910,6 +917,13 @@ class TransactionAuthority {
   }
 
   private insertConfirmed(turn: TransactionTurnRecord): void {
+    // Ordinary records always carry the newest id; only a confirmed pending
+    // turn can land in the middle.
+    const last = this.confirmedTurns[this.confirmedTurns.length - 1];
+    if (!last || last.id < turn.id) {
+      this.confirmedTurns.push(turn);
+      return;
+    }
     const insertIndex = this.confirmedTurns.findIndex(
       (candidate) => candidate.id > turn.id
     );
@@ -939,7 +953,6 @@ function createCaptureBucket(): CaptureBucket {
   return {
     entityFootprints: new Map(),
     ownWriteSeq: new Map<string, number>(),
-    ownerPaths: new Set<string>(),
     subjectIds: new Set<number>(),
     positionIds: new Set<number>(),
     baselineValues: new Map(),
@@ -1043,6 +1056,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
   const pendingDiscardedListeners = new Set<TransactionLifecycleListener>();
   const treeWrapper = tree as unknown as object;
   const stateRoot = tree.$ as unknown as object;
+  // Defined on the root at construction, before any enhancer runs, and never
+  // replaced; reading it once here keeps a symbol lookup off every capture.
+  const positionRegistry = getPositionRegistry(tree.$);
   const realizationDescriptors =
     getTreeRealizationDescriptors(stateRoot) ??
     getTreeRealizationDescriptors(treeWrapper) ??
@@ -1223,15 +1239,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
   const drainCaptureBucket = (
     bucket: CaptureBucket
   ): {
-    ownerPaths: string[];
     subjectIds: number[];
     positionIds: number[];
     baselineValues: Map<number, unknown>;
     effects: TurnEffect[];
     collectionOrders: Array<Omit<CollectionOrderCapture, 'meta'>>;
   } => {
-    const ownerPaths = Array.from(bucket.ownerPaths).sort();
-    bucket.ownerPaths.clear();
     bucket.ownWriteSeq.clear();
     const subjectIds = Array.from(bucket.subjectIds).sort((a, b) => a - b);
     bucket.subjectIds.clear();
@@ -1242,16 +1255,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
     const effects = Array.from(bucket.effects.values()).map(cloneTurnEffect);
     bucket.effects.clear();
     bucket.entityFootprints.clear();
-    const collectionOrders = Array.from(bucket.collectionOrders.values()).map(
-      (order) => ({
-        ...order,
-        beforeSubjects: [...order.beforeSubjects],
-        afterSubjects: [...order.afterSubjects],
-      })
-    );
+    // The bucket copied both subject lists when it captured them and is cleared
+    // here, so the drained entries are already exclusively owned.
+    const collectionOrders = Array.from(bucket.collectionOrders.values());
     bucket.collectionOrders.clear();
     return {
-      ownerPaths,
       subjectIds,
       positionIds,
       baselineValues,
@@ -1598,7 +1606,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
     const members = plainBranchMembershipEffects(meta);
     if (members) {
       for (const effect of members) {
-        bucket.ownerPaths.add(effect.ownerPath);
         bucket.positionIds.add(effect.position);
         if (pendingTransactions.size > 0) {
           for (const key of windowKeys([effect.position], undefined)) {
@@ -1609,7 +1616,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
       }
       return;
     }
-    bucket.ownerPaths.add(ownerPath ?? path);
     for (const subjectId of subjectIds ?? []) {
       bucket.subjectIds.add(subjectId);
     }
@@ -1635,7 +1641,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       positionIds: resolvedPositionIds,
       subjectIds,
       meta,
-      registry: getPositionRegistry(tree.$),
+      registry: positionRegistry,
     });
     captureEffects(
       bucket,
@@ -1653,22 +1659,18 @@ export function getOrCreateInternalTransactionRuntime<T>(
   const recordConfirmedBucket = (
     bucket: CaptureBucket,
     reservedId?: number
-  ): TransactionTurnRecord | undefined => {
+  ): void => {
     const { subjectIds, positionIds, effects } = drainCaptureBucket(bucket);
     const subjects = subjectIds.length > 0 ? subjectIds : undefined;
     const positions = positionIds.length > 0 ? positionIds : undefined;
     const capturedEffects = effects.length > 0 ? effects : undefined;
-    const turn =
-      reservedId === undefined
-        ? authority.recordConfirmed(subjects, positions, capturedEffects)
-        : authority.createPending(
-            reservedId,
-            subjects,
-            positions,
-            capturedEffects
-          )
-        ? authority.confirmPending(reservedId)
-        : undefined;
+    if (reservedId === undefined) {
+      authority.recordConfirmed(subjects, positions, capturedEffects);
+    } else if (
+      authority.createPending(reservedId, subjects, positions, capturedEffects)
+    ) {
+      authority.confirmPending(reservedId);
+    }
     // Subject addresses serve pending rollback and retained undo/redo claims.
     // Confirmed effects only classify dependencies; retaining their ledger is
     // not a reason to retain these addresses. If restoration's flush runs
@@ -1677,7 +1679,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // shells still route notifications, and physical reclamation has a
     // separate eligibility boundary.
     forgetUnclaimedDescriptorSubjects(subjectIds);
-    return turn;
   };
 
   const getTransactionBucket = (transactionId: number): CaptureBucket => {
@@ -1714,7 +1715,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
         beforeFrontier: existing?.beforeFrontier ?? capture.beforeFrontier,
         afterFrontier: capture.afterFrontier,
       });
-      bucket.ownerPaths.add(capture.ownerPath);
       bucket.positionIds.add(capture.owner);
     }) ?? null;
 
