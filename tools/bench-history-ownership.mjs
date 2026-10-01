@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, rmSync, symlinkSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { tmpdir } from 'node:os';
 import { performance } from 'node:perf_hooks';
-import ts from 'typescript';
+import { build } from 'esbuild';
 
 if (typeof globalThis.gc !== 'function') {
   console.error('Run with --expose-gc.');
@@ -14,12 +15,6 @@ if (typeof globalThis.gc !== 'function') {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const CORE_LIB = join(ROOT, 'dist/packages/kernel/dist/lib/path-notifier.js');
-const TMP_ROOT = process.env.TMPDIR ?? '/tmp';
-const COMMITTED_3ARG_LIB = join(
-  TMP_ROOT,
-  'signaltree-history-bench',
-  'path-notifier-head.mjs'
-);
 
 const arg = (name, dflt) => {
   const i = process.argv.indexOf(name);
@@ -195,107 +190,70 @@ function classifyStructuralOverheadVerdict({
   };
 }
 
-function ensureCommitted3ArgPathNotifierModule() {
-  const source = execFileSync(
-    'git',
-    ['show', 'HEAD:packages/kernel/src/lib/path-notifier.ts'],
-    { cwd: ROOT, encoding: 'utf8' }
-  );
-
-  const compiled = ts.transpileModule(source, {
-    compilerOptions: {
-      module: ts.ModuleKind.ESNext,
-      target: ts.ScriptTarget.ES2022,
-    },
-    fileName: 'path-notifier.ts',
-  });
-
-  mkdirSync(dirname(COMMITTED_3ARG_LIB), { recursive: true });
-  writeFileSync(
-    join(dirname(COMMITTED_3ARG_LIB), 'write-context.mjs'),
-    `let activeContext;\n` +
-      `export function withWriteContext(meta, fn) {\n` +
-      `  const previous = activeContext;\n` +
-      `  activeContext = meta;\n` +
-      `  try { return fn(); } finally { activeContext = previous; }\n` +
-      `}\n` +
-      `export function getActiveWriteContext() { return activeContext; }\n`,
-    'utf8'
-  );
-  // RC-HARNESS-2. Stage the real committed dependencies rather than maintaining
-  // behavioral shims beside the benchmark. Stub drift previously made this arm
-  // die during module resolution before it measured an ownership assertion.
-  mkdirSync(join(dirname(COMMITTED_3ARG_LIB), 'internals'), { recursive: true });
-  for (const [sourcePath, outputPath] of [
-    [
-      'packages/kernel/src/lib/internals/error-reporter.ts',
-      join(dirname(COMMITTED_3ARG_LIB), 'internals', 'error-reporter.mjs'),
-    ],
-    [
-      'packages/kernel/src/lib/internals/write-observation-scope.ts',
-      join(dirname(COMMITTED_3ARG_LIB), 'internals', 'write-observation-scope.mjs'),
-    ],
-    [
-      'packages/kernel/src/lib/internals/restoration-eligibility.ts',
-      join(dirname(COMMITTED_3ARG_LIB), 'internals', 'restoration-eligibility.mjs'),
-    ],
-    [
-      'packages/kernel/src/lib/internals/path-observation-port.ts',
-      join(dirname(COMMITTED_3ARG_LIB), 'internals', 'path-observation-port.mjs'),
-    ],
-  ]) {
-    const dependencySource = execFileSync('git', ['show', `HEAD:${sourcePath}`], {
-      cwd: ROOT,
-      encoding: 'utf8',
-    });
-    const dependency = ts.transpileModule(dependencySource, {
-      compilerOptions: {
-        module: ts.ModuleKind.ESNext,
-        target: ts.ScriptTarget.ES2022,
-      },
-      fileName: sourcePath,
-    });
-    writeFileSync(
-      outputPath,
-      `// transpiled from HEAD:${sourcePath}\n${dependency.outputText}`,
-      'utf8'
-    );
-  }
-  writeFileSync(
-    join(dirname(COMMITTED_3ARG_LIB), 'write-participation.mjs'),
-    `export function getWriteParticipation(meta) { return meta?.participation ?? 'authored'; }\n`,
-    'utf8'
-  );
-  writeFileSync(
-    COMMITTED_3ARG_LIB,
-    `// transpiled from HEAD:packages/kernel/src/lib/path-notifier.ts\n${compiled.outputText
-      .replace("'./write-context'", "'./write-context.mjs'")
-      .replace("'./internals/error-reporter'", "'./internals/error-reporter.mjs'")
-      .replace("'./write-participation'", "'./write-participation.mjs'")
-      .replace(
-        "'./internals/restoration-eligibility'",
-        "'./internals/restoration-eligibility.mjs'"
-      )
-      .replace(
-        "'./internals/write-observation-scope'",
-        "'./internals/write-observation-scope.mjs'"
-      )
-      .replace(
-        "'./internals/path-observation-port'",
-        "'./internals/path-observation-port.mjs'"
-      )}`,
-    'utf8'
-  );
-  return COMMITTED_3ARG_LIB;
-}
+// Resolve once in the parent and pass the immutable commit to every child.
+// A concurrent checkpoint must not change the baseline between sample rounds.
+const COMMITTED_HEAD = execFileSync(
+  'git',
+  ['rev-parse', '--verify', `${arg('--head-commit', 'HEAD')}^{commit}`],
+  { cwd: ROOT, encoding: 'utf8' }
+).trim();
+let committedSourceIdentity;
 
 async function loadCommitted3ArgPathNotifier() {
-  const modulePath = ensureCommitted3ArgPathNotifierModule();
-  const committedModule = await import(`${modulePath}?ts=${Date.now()}`);
-  if (!committedModule.PathNotifier) {
-    throw new Error('Failed to load committed 3-arg PathNotifier baseline');
+  const stage = mkdtempSync(join(tmpdir(), 'signaltree-history-bench-'));
+  try {
+    // Stage a complete committed source tree, not a hand-maintained subset or
+    // behavior shims. Relative imports can only resolve inside this archive.
+    const archive = execFileSync(
+      'git',
+      ['archive', '--format=tar', COMMITTED_HEAD, 'packages/kernel/src'],
+      { cwd: ROOT, maxBuffer: 64 * 1024 * 1024 }
+    );
+    execFileSync('tar', ['-xf', '-', '-C', stage], { input: archive });
+    // Only external packages use the installed dependencies. No workspace
+    // source or tsconfig aliases participate in the committed source graph.
+    symlinkSync(join(ROOT, 'node_modules'), join(stage, 'node_modules'), 'dir');
+    const modulePath = join(stage, 'path-notifier-head.mjs');
+    const bundled = await build({
+      absWorkingDir: stage,
+      entryPoints: ['packages/kernel/src/lib/path-notifier.ts'],
+      outfile: modulePath,
+      bundle: true,
+      platform: 'node',
+      format: 'esm',
+      target: 'es2022',
+      packages: 'external',
+      tsconfigRaw: {},
+      metafile: true,
+      logLevel: 'silent',
+    });
+    const inputs = Object.keys(bundled.metafile.inputs).sort();
+    if (inputs.some((input) => !input.startsWith('packages/kernel/src/'))) {
+      throw new Error('Committed baseline resolved source outside its archive');
+    }
+    committedSourceIdentity = {
+      commit: COMMITTED_HEAD,
+      kernelSourceTree: execFileSync(
+        'git',
+        ['rev-parse', `${COMMITTED_HEAD}:packages/kernel/src`],
+        { cwd: ROOT, encoding: 'utf8' }
+      ).trim(),
+      entry: 'packages/kernel/src/lib/path-notifier.ts',
+      bundledInputs: inputs,
+      externalImports: Object.values(bundled.metafile.outputs).flatMap(
+        (output) => output.imports
+          .filter((entry) => entry.external)
+          .map((entry) => entry.path)
+      ),
+    };
+    const committedModule = await import(pathToFileURL(modulePath).href);
+    if (!committedModule.PathNotifier) {
+      throw new Error('Failed to load committed 3-arg PathNotifier baseline');
+    }
+    return committedModule.PathNotifier;
+  } finally {
+    rmSync(stage, { recursive: true, force: true });
   }
-  return committedModule.PathNotifier;
 }
 
 function buildWorkload({
@@ -482,6 +440,7 @@ async function runSample(arm) {
     batches: BATCHES,
     width: WIDTH,
     entityCount: ENTITY_COUNT,
+    ...(committedSourceIdentity ? { committedSourceIdentity } : {}),
   };
 }
 
@@ -494,6 +453,8 @@ function runChild(arm) {
       script,
       '--arm',
       arm,
+      '--head-commit',
+      COMMITTED_HEAD,
       '--batches',
       String(BATCHES),
       '--width',
@@ -610,6 +571,7 @@ const structuralOverheadVerdict = classifyStructuralOverheadVerdict({
 });
 
 const report = {
+  committedSourceIdentity: results['current-3arg'][0].committedSourceIdentity,
   config: {
     samples: SAMPLE_COUNT,
     warmupRuns: WARMUP_RUNS,
