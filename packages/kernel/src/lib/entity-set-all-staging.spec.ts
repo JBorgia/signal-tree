@@ -282,3 +282,93 @@ describe('setAll staging', () => {
     expect(runs).toBe(before + 1);
   });
 });
+
+describe('setAll interceptor reentry', () => {
+  it('keeps membership coherent when an update interceptor rekeys the row', () => {
+    const { api } = harness();
+    api.setAll([row('a')]);
+    api.intercept({
+      onUpdate: () => {
+        api.changeId('a', 'b');
+      },
+    });
+    // A refusal is allowed; applying stale staging is not. The interceptor's
+    // completed write remains authoritative even if the outer operation fails.
+    try {
+      api.setAll([row('a', 1)]);
+    } catch {
+      /* inspect state below */
+    }
+    expect(api.has('b')()).toBe(true);
+    expect(api.ids()).toEqual(['b']);
+    expect(api.count()).toBe(1);
+    // changeId moves the collection key; it does not rewrite row data.
+    expect(api.byId('b')?.()).toEqual(row('a'));
+  });
+});
+
+describe('setAll invalidated staging', () => {
+  it('preserves an add interceptor write without committing the stale outer add', () => {
+    const { api } = harness();
+    api.setAll([row('a')]);
+    api.intercept({
+      onAdd: (entity) => {
+        if (entity.id === 'q') api.addOne(row('extra'));
+      },
+    });
+    expect(() => api.setAll([row('q')])).toThrow(/topology changed/);
+    expect(api.ids()).toEqual(['a', 'extra']);
+    expect(api.all()).toEqual([row('a'), row('extra')]);
+  });
+
+  it('preserves a removal interceptor rekey before any outer removals commit', () => {
+    const { api } = harness();
+    api.setAll([row('a'), row('b')]);
+    api.intercept({
+      onRemove: () => {
+        api.changeId('b', 'c');
+      },
+    });
+    expect(() => api.setAll([row('b', 1)])).toThrow(/topology changed/);
+    expect(api.ids()).toEqual(['a', 'c']);
+    expect(api.all()).toEqual([row('a'), row('b')]);
+  });
+
+  it('allows field-only reentry that does not invalidate the topology plan', () => {
+    const { api } = harness();
+    api.setAll([row('a')]);
+    let nested = false;
+    api.intercept({
+      onUpdate: () => {
+        if (!nested) {
+          nested = true;
+          api.updateOne('a', { n: 2 });
+        }
+      },
+    });
+    api.setAll([row('a', 3)]);
+    expect(api.all()).toEqual([row('a', 3)]);
+  });
+});
+
+it('preserves membership when a selector rekeys an earlier staged row', () => {
+  const api = createEntitySignal<Row, string>(
+    { selectId: (r) => r.id },
+    { notify: vi.fn() } as never,
+    'rows'
+  );
+  api.setAll([row('a'), row('z')]);
+  try {
+    api.setAll([row('a', 1), row('z', 1)], {
+      selectId: (r) => {
+        if (r.id === 'z') api.changeId('a', 'b');
+        return r.id;
+      },
+    });
+  } catch {
+    /* the completed selector write must remain coherent */
+  }
+  expect(api.has('b')()).toBe(true);
+  expect(api.ids()).toEqual(['b', 'z']);
+  expect(api.count()).toBe(2);
+});

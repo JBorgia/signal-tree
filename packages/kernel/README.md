@@ -443,6 +443,13 @@ The local follow-up adds a once-per-collection development warning (ST2001)
 without changing replacement semantics. Published 15.3.1 does not warn for
 non-null duplicate keys. Numeric `1` and string `"1"` remain distinct keys.
 
+The unreleased follow-up also checks `setAll()` staging after user callbacks.
+If an interceptor or ID selector changes collection membership, keys or order,
+the outer replacement refuses before applying its staged writes. The callback's
+already-completed writes remain. Field-only callback writes do not trigger this
+structural refusal. Prefer interceptors that validate or transform input instead
+of changing the same collection's topology.
+
 ## Independent editors and connections
 
 Keep shared records in an owned tree. Give each independently closable editor or

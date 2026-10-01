@@ -3037,11 +3037,6 @@ export function createEntitySignal<
       if (!entity) {
         throw new Error(`Entity with id ${String(id)} not found`);
       }
-      const observed = pathObserved();
-      const { beforeSubject, afterSubject } = observed
-        ? getNeighborSubjects(id)
-        : NO_NEIGHBORS;
-
       // Run interceptors
       for (const handler of interceptHandlers) {
         const ctx: InterceptContext<void> = {
@@ -3061,6 +3056,13 @@ export function createEntitySignal<
           'onRemove'
         );
       }
+
+      // Interceptors may install observers. Decide demand after they return,
+      // while the removed row and its neighbours are still available.
+      const observed = pathObserved();
+      const { beforeSubject, afterSubject } = observed
+        ? getNeighborSubjects(id)
+        : NO_NEIGHBORS;
 
       // Delete and update signals
       const subjectIdsForWrite = rememberSubjectIds([id]);
@@ -3112,7 +3114,6 @@ export function createEntitySignal<
 
     removeMany(ids: K[]): void {
       if (ids.length === 0) return;
-      const observed = pathObserved();
 
       // Collect entities and run interceptors first
       const preparedRemovals: Array<{
@@ -3131,10 +3132,6 @@ export function createEntitySignal<
         if (subjectId === undefined) {
           throw new Error(`Entity with id ${String(id)} has no subject id`);
         }
-        const { beforeSubject, afterSubject } = observed
-          ? getNeighborSubjects(id)
-          : NO_NEIGHBORS;
-
         // Run interceptors
         for (const handler of interceptHandlers) {
           const ctx: InterceptContext<void> = {
@@ -3159,9 +3156,16 @@ export function createEntitySignal<
           id,
           entity,
           subjectId,
-          beforeSubject,
-          afterSubject,
         });
+      }
+
+      // The last interceptor can subscribe to the entire atomic removal.
+      // Capture every row's neighbours before any tombstones are committed.
+      const observed = pathObserved();
+      if (observed) {
+        for (const removal of preparedRemovals) {
+          Object.assign(removal, getNeighborSubjects(removal.id));
+        }
       }
 
       const subjectIdsForWrite = preparedRemovals.map(
@@ -3588,6 +3592,18 @@ export function createEntitySignal<
           );
         }
         stagedRemovals.push({ id, entity, subjectId, index });
+      }
+
+      // A callback may have changed membership, keys, or order. Those writes
+      // stand, but this operation must not commit its now-stale topology plan.
+      if (
+        structuralStore.activeOrderFrontier() !== beforeOrderFrontier ||
+        currentKeys.some(
+          (key, index) =>
+            structuralStore.subjectIdForKey(key) !== currentSubjects[index]
+        )
+      ) {
+        throw new Error('Cannot setAll: collection topology changed during staging');
       }
 
       const stagedUpdates: Array<{
