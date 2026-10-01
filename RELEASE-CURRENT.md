@@ -9,7 +9,7 @@ It does not describe every branch or authorize publication.
 - Public packages and their order: `scripts/release-plan.mjs`.
 - The ledger records v15.3.1 published from `40e668036290b43f9e389e97a35341ea9e5fea7d`.
   That is historical release evidence, not a fresh registry query.
-- Current runtime checkpoint: `8fe2664faecbb72c22b14100a41b7060177b1b39`.
+- Historical runtime checkpoint at audit entry: `8fe2664faecbb72c22b14100a41b7060177b1b39`.
   Interceptor/selector reentry now refuses stale outer topology staging; removal
   observation samples demand after callbacks. Kernel: 3,220 passed. This is not
   an RC freeze or a full-release verdict.
@@ -26,7 +26,8 @@ It does not describe every branch or authorize publication.
 1. Final experimental archives pass one five-round CPU4 comparison with all
    correctness digests equal. At 50k rows, median per-round visible edit p95 is
    11.28ms candidate, 14.25ms released and 14.18ms A/A; ranges separate for this
-   metric. Maximum candidate edit is still 22.88ms. Load/refetch/movement improve;
+   metric. Maximum candidate edit is still 22.88ms. Plain-candidate load/refetch/
+   movement improve versus released;
    startup is not uniformly faster. Installed transactions/restoration still
    cost roughly 13.9×/9.1×/8.7× plain bulk load/refetch/movement. Avoided
    allocation is proven, but no material reduction of that installed-enhancer
