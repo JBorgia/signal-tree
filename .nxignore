@@ -1,1 +1,4 @@
 .angular
+
+# Standalone benchmark app with its own node_modules; not a workspace project.
+benchmarks/store-comparison
