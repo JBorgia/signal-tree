@@ -271,7 +271,9 @@ Angular-specific evidence, not a cross-framework lifecycle proof.
 Tooling can use `transactionLifecycleReader`, `restorationReader`,
 `entityMembershipReader`, and `linkStateReader` from
 `@signal-tree/kernel/internals`. Each reader exposes a current `snapshot()` and
-`subscribe(listener)` for subsequent events. Missing capability is not empty
+`subscribe(listener)` for subsequent events. `stateLocationReader(tree).locate()`
+maps an effect's or write's position, entity lifetime and `fieldSegments` to its
+current structured location, or `undefined` when no longer reachable. Missing capability is not empty
 history. These readers do not install enhancers or retain terminal history.
 
 Use actual tree + collection + entity lifetime identity and typed keys; displayed

@@ -50,7 +50,12 @@ These changes are under verification and are not part of the published 15.3.1 ar
   settling it a second way (15.3.1 accepted the confirm).
 
 - Add read-only transaction lifecycle, restoration lineage, entity membership,
-  and Link activity readers for tooling through `@signal-tree/kernel/internals`.
+  and Link activity readers for tooling through `@signal-tree/kernel/internals`:
+  `transactionLifecycleReader`, `restorationReader`, `entityMembershipReader`,
+  `linkStateReader`, and `stateLocationReader`, which maps a confirmed effect's
+  or observed write's position, entity lifetime and `fieldSegments` to its
+  current structured location without reading path labels. Confirmed-turn
+  effects add `fieldSegments` and `plainBranchMembership`.
   Snapshots describe current runtime facts; subscriptions retain no event history
   and local transaction confirmation is not a backend acceptance receipt.
   A transition takes its reader sequence when the settlement state changes, so a

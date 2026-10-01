@@ -402,7 +402,12 @@ the existing `all` representation and time-travel hydration remain unchanged.
 ## Tooling observation
 
 **15.4.0 (unreleased):** pending transaction lifecycle, restoration lineage,
-entity membership and Link activity are available through four read-only readers.
+entity membership and Link activity are available through four read-only readers:
+`transactionLifecycleReader`, `restorationReader`, `entityMembershipReader` and
+`linkStateReader`. `stateLocationReader` maps a recorded effect or write to its
+current structured location. Confirmed-turn effects add `fieldSegments` for entity
+fields and `plainBranchMembership` (presence before/after) for plain optional
+members, so an omission is distinguishable from a member set to `undefined`.
 See the [runtime observation guide](../../docs/guides/runtime-observation.md).
 These exports supply facts to tooling; they do not retain a diagnostic history
 or confirm backend acceptance.
