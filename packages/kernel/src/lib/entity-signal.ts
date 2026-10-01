@@ -1,3 +1,10 @@
+import { defineEntityObservation } from './internals/entity-observation';
+import {
+  createEntityMembershipInventory,
+  defineEntityMembershipInventory,
+  type EntityMembershipChange,
+} from './internals/entity-membership-inventory';
+import { getPositionRegistry } from './internals/position-registry';
 import type {
   Location,
   ReadableCell,
@@ -29,7 +36,7 @@ import {
   type AcquiredSubjectHandle,
   type SubjectLifetimeRecord,
 } from './physical/structural-store';
-import { defineOwnedOwnerPath } from './internals/owned-mutation';
+import { defineOwnedOwnerPath, defineOwnedPositionIds } from './internals/owned-mutation';
 import type { PhysicalCommitClock } from './internals/physical-commit-clock';
 // Only `notify` is ever called on this — the neutral port contract, not the
 // delivery engine's full surface.
@@ -38,7 +45,10 @@ import { getActiveWriteContext } from '../lib/write-context';
 import { recordProductionSubstrateStat } from './internals/production-substrate-stats';
 import { defineEntityProjectionSeed } from './internals/entity-projection-seed';
 import { markOwnerInvalidated } from './internals/owner-invalidation-port';
-import type { MutationCaptureRuntime } from './internals/mutation-capture-runtime';
+import type {
+  CommittedEntityMutation,
+  MutationCaptureRuntime,
+} from './internals/mutation-capture-runtime';
 import type {
   CollectionTransitionTarget,
   CollectionTransitionTargetBinding,
@@ -499,13 +509,44 @@ export function createEntitySignal<
         targetNeighbors: targetNeighborBySubject.get(subjectId),
       };
     });
+    let membershipChanges: EntityMembershipChange[] = [];
+    let membershipPublished = false;
 
     return {
       install(): void {
-        structuralStore.installPreparedTarget(structuralTarget);
-        valueStore.installPreparedTargetValues(valueTarget);
+        const unit = beginMembershipUnit();
+        try {
+          structuralStore.installPreparedTarget(structuralTarget);
+          valueStore.installPreparedTargetValues(valueTarget);
+          if (membershipInventory.observed()) {
+            membershipChanges = subjectChanges.flatMap((change): EntityMembershipChange[] => {
+              if (change.afterKey === undefined) return [{ kind: 'remove', lifetimeId: change.subjectId, key: change.beforeKey as K }];
+              if (change.beforeKey === undefined) return [{
+                kind: 'add', lifetimeId: change.subjectId, key: change.afterKey,
+                beforeLifetimeId: change.targetNeighbors?.beforeSubject,
+                afterLifetimeId: change.targetNeighbors?.afterSubject,
+              }];
+              return change.beforeKey !== change.afterKey ? [{ kind: 'rekey', lifetimeId: change.subjectId, beforeKey: change.beforeKey, afterKey: change.afterKey }] : [];
+            });
+            const before = [...currentSubjects.keys()];
+            const survivingBefore = before.filter((id) => preparedBySubject.has(id));
+            const survivingAfter = target.order.filter((id) => currentSubjects.has(id));
+            if (survivingBefore.some((id, index) => id !== survivingAfter[index])) {
+              membershipChanges.push({ kind: 'reorder', before, after: [...target.order] });
+            }
+          }
+        } finally {
+          // The coordinator installs all targets before their publish methods.
+          // Close this read guard now; deliver the captured deltas in publish.
+          unit.commit([]);
+        }
       },
       publish(options): void {
+        if (!membershipPublished) {
+          membershipPublished = true;
+          beginMembershipUnit().commit(membershipChanges);
+          membershipChanges = [];
+        }
         for (const publication of subjectChanges) {
           // Only a realized subject has an epoch, so this stays as lazy as the
           // per-entity signal it replaces.
@@ -595,11 +636,22 @@ export function createEntitySignal<
     frame: EntityMutationFrame<K, E>,
     options?: { advancePhysicalRevision?: boolean }
   ) {
-    const result = frame.commit();
-    if (options?.advancePhysicalRevision !== false) {
-      physicalCommitClock?.advance();
+    const capture = committedEntityObserver();
+    const unit = beginMembershipUnit();
+    try {
+      let membership: readonly EntityMembershipChange[] = [];
+      const result = frame.commit(capture, membershipInventory.observed()
+        ? (changes) => { membership = changes; }
+        : undefined);
+      if (options?.advancePhysicalRevision !== false) {
+        physicalCommitClock?.advance();
+      }
+      unit.commit(membership);
+      return result;
+    } catch (error) {
+      unit.cancel();
+      throw error;
     }
-    return result;
   }
 
   /** Reactive signals for queries — all derived, none eagerly maintained. */
@@ -670,6 +722,36 @@ export function createEntitySignal<
     locations.advanceEpoch?.(handle);
   };
   const structuralStore = new StructuralStore<K>();
+  const membershipInventory = createEntityMembershipInventory(() =>
+    structuralStore.activeKeysSnapshot().map((key) => {
+      const lifetimeId = structuralStore.subjectIdForKey(key);
+      if (lifetimeId === undefined) throw new Error('Active entity membership has no lifetime.');
+      return { lifetimeId, key };
+    })
+  );
+  let membershipGroupDepth = 0;
+  let groupedMembershipUnit: ReturnType<typeof membershipInventory.begin> | undefined;
+  function beginMembershipUnit() {
+    // Compound operations arm only at the first physical commit, so planning
+    // and interceptors may still inspect a complete pre-operation inventory.
+    if (membershipGroupDepth && !groupedMembershipUnit) groupedMembershipUnit = membershipInventory.begin();
+    return membershipInventory.begin();
+  }
+  function withMembershipGroup<R>(run: () => R): R {
+    membershipGroupDepth++;
+    try { return run(); }
+    finally {
+      if (--membershipGroupDepth === 0) {
+        const unit = groupedMembershipUnit;
+        groupedMembershipUnit = undefined;
+        unit?.commit([]);
+      }
+    }
+  }
+  function membershipAddition(lifetimeId: number, key: K): EntityMembershipChange {
+    const neighbors = structuralStore.neighborSubjectsForKey(key);
+    return { kind: 'add', lifetimeId, key, beforeLifetimeId: neighbors.beforeSubject, afterLifetimeId: neighbors.afterSubject };
+  }
   const valueStore = new EntityValueStore<E>();
   /**
    * `SUBJECT-STATE-SEMANTIC-0`. Held WEAKLY.
@@ -710,7 +792,7 @@ export function createEntitySignal<
   const ownerId = options?.ownerId;
   const physicalCommitClock = options?.physicalCommitClock;
   const mutationCaptureRuntime = options?.mutationCaptureRuntime;
-  const positionId = (
+  let positionId = (
     options?.positionIdAllocator ??
     (positionMetadataEnabled
       ? entityPositionIdAllocatorOverride ?? standaloneEntityPositionIdAllocator
@@ -1014,7 +1096,14 @@ export function createEntitySignal<
    * signals pick the new order up from the version bump.
    */
   function moveToFront(ids: K[]): void {
+    const before = membershipInventory.observed() ? structuralStore.activeKeysSnapshot().map((key) => rememberSubjectId(key)) : undefined;
     structuralStore.moveKeysToFront(ids);
+    if (before) {
+      const after = structuralStore.activeKeysSnapshot().map((key) => rememberSubjectId(key));
+      if (before.some((id, index) => id !== after[index])) {
+        beginMembershipUnit().commit([{ kind: 'reorder', before, after }]);
+      }
+    }
     physicalCommitClock?.advance();
     updateSignals();
   }
@@ -1135,6 +1224,37 @@ export function createEntitySignal<
     return resolved;
   }
 
+  // Source-owned capture runs after physical application and before any
+  // invalidation/publication. Ambient attribution is frozen before callbacks.
+  function committedEntityObserver():
+    | ((changes: readonly CommittedEntityMutation[]) => void)
+    | undefined {
+    if (
+      positionId === undefined ||
+      !mutationCaptureRuntime?.hasCommittedEntityObservers?.()
+    )
+      return undefined;
+    const owner = positionId;
+    const meta = ambientMeta();
+    return (changes) =>
+      mutationCaptureRuntime.publishCommittedEntity?.({
+        owner,
+        ownerPath: basePath,
+        changes,
+        meta,
+      });
+  }
+
+  function captureCommittedEntity(
+    subject: number,
+    before: unknown,
+    after: unknown,
+    structural: boolean
+  ): void {
+    const capture = committedEntityObserver();
+    if (capture) capture([{ subject, before, after, structural }]);
+  }
+
   /**
    * The value-replacement commit for a subject that already exists.
    *
@@ -1164,7 +1284,12 @@ export function createEntitySignal<
    * For a one-field update that machinery is the mutation.
    */
   function commitExistingSubjectValue(subjectId: number, nextValue: E): void {
+    const capture = committedEntityObserver();
+    const before = capture ? valueStore.backingForSubject(subjectId) : undefined;
     valueStore.retainSubjectValue(subjectId, nextValue);
+    capture?.([
+      { subject: subjectId, before, after: nextValue, structural: false },
+    ]);
     physicalCommitClock?.advance();
   }
 
@@ -1262,6 +1387,8 @@ export function createEntitySignal<
         updateSignals();
       },
       publish(metaOverride?: WriteMetadata): void {
+        // A restored lifetime re-enters collection membership. Value-only
+        // delivery cannot reinsert it into an observer's collection topology.
         pathNotifier.notify(
           `${basePath}.${String(key)}`,
           entity,
@@ -1269,7 +1396,17 @@ export function createEntitySignal<
           basePath,
           [subjectId],
           getPositionIdsForNotify(),
-          metaOverride
+          {
+            ...(metaOverride ?? ambientMeta() ?? {}),
+            structuralEffect: {
+              kind: 'add',
+              subject: subjectId,
+              key,
+              value: deepClone(entity),
+              beforeSubject,
+              afterSubject,
+            },
+          }
         );
       },
     };
@@ -1622,6 +1759,7 @@ export function createEntitySignal<
 
   // Dev-mode guard state: warn once if entities resolve to a null/undefined id.
   let warnedMissingId = false;
+  let warnedDuplicateSetAllId = false;
 
   /**
    * Resolve an entity's id (per-call selectId override → config selectId →
@@ -2315,6 +2453,7 @@ export function createEntitySignal<
      * interceptors, notifier and tap handlers on exactly one path.
      */
     prependOne(entity: E, opts?: AddOptions<E, K>): K {
+      return withMembershipGroup(() => {
       const previousFirstKey = structuralStore.firstActiveKey();
       const { id, structuralEffect } = addOneWithStructuralEffect(entity, opts);
       moveToFront([id]);
@@ -2326,14 +2465,17 @@ export function createEntitySignal<
           : allocateSubjectId(previousFirstKey)
       );
       return id;
+      });
     },
 
     prependMany(entities: E[], opts?: AddManyOptions<E, K>): K[] {
+      return withMembershipGroup(() => {
       const ids = api.addMany(entities, opts);
       // Front, in the order given — so `prependMany([a, b])` reads back as
       // [a, b, ...existing], which is what the call site looks like.
       moveToFront(ids);
       return ids;
+      });
     },
 
     /**
@@ -3001,6 +3143,8 @@ export function createEntitySignal<
         };
       });
 
+      const membershipUnit = beginMembershipUnit();
+      try {
       const freshSubjectIds = commitFreshSubjects(
         stagedAdds.map(({ id }) => id)
       );
@@ -3017,8 +3161,7 @@ export function createEntitySignal<
           throw new Error(`Entity with id ${String(id)} has no subject id`);
         }
         valueStore.retainSubjectValue(subjectId, transformedEntity);
-        invalidateNodeCache(id);
-        syncEntitySignal(id);
+        captureCommittedEntity(subjectId, undefined, transformedEntity, true);
         addedEntities.push({ id, entity: transformedEntity, subjectId });
       }
 
@@ -3037,7 +3180,7 @@ export function createEntitySignal<
         transformedChanges,
       } of stagedUpdates) {
         valueStore.retainSubjectValue(subjectId, finalUpdated);
-        syncEntitySignal(id);
+        captureCommittedEntity(subjectId, prev, finalUpdated, false);
         updatedEntities.push({
           id,
           subjectId,
@@ -3046,6 +3189,12 @@ export function createEntitySignal<
           transformedChanges,
         });
       }
+
+      membershipUnit.commit(membershipInventory.observed()
+        ? addedEntities.map(({ id, subjectId }) => membershipAddition(subjectId, id))
+        : []);
+      for (const { id } of addedEntities) { invalidateNodeCache(id); syncEntitySignal(id); }
+      for (const { id } of updatedEntities) syncEntitySignal(id);
 
       // Single signal update after all entities are processed
       updateSignals();
@@ -3102,6 +3251,7 @@ export function createEntitySignal<
       }
 
       return [...toAdd.map((a) => a.id), ...toUpdate.map((u) => u.id)];
+      } finally { membershipUnit.cancel(); }
     },
 
     // ==================
@@ -3132,15 +3282,22 @@ export function createEntitySignal<
         return { id, subjectId, entity, beforeSubject, afterSubject };
       });
 
-      for (const { id, subjectId } of activeSubjects) {
+      const membershipUnit = beginMembershipUnit();
+      try {
+      for (const { id, subjectId, entity } of activeSubjects) {
         const currentState = resolveSubjectState(subjectId);
         structuralStore.tombstoneSubject(
           subjectId,
           id,
           currentState?.restoreAllowed ?? true
         );
-        publishSubjectPhysicalChange(subjectId);
+        captureCommittedEntity(subjectId, entity, undefined, true);
       }
+
+      membershipUnit.commit(membershipInventory.observed()
+        ? activeSubjects.map(({ id, subjectId }) => ({ kind: 'remove' as const, lifetimeId: subjectId, key: id }))
+        : []);
+      for (const { subjectId } of activeSubjects) publishSubjectPhysicalChange(subjectId);
 
       // Per-subject, exactly as `removeOne` does — never a bulk reset (see the
       // tombstone above). A held reference has to keep reading through the SAME
@@ -3189,6 +3346,7 @@ export function createEntitySignal<
           handler.onRemove?.(id, entity);
         }
       }
+      } finally { membershipUnit.cancel(); }
     },
 
     setAll(entities: E[], opts?: AddOptions<E, K>): void {
@@ -3232,6 +3390,15 @@ export function createEntitySignal<
 
         if (!stagedIncomingById.has(id)) {
           stagedIncomingIds.push(id);
+        } else if (
+          (typeof ngDevMode === 'undefined' || ngDevMode) &&
+          !warnedDuplicateSetAllId
+        ) {
+          warnedDuplicateSetAllId = true;
+          console.warn(
+            'SignalTree entityMap.setAll: duplicate keys; last value wins. ' +
+              'Supply unique IDs instead of a shared fallback. [ST2001]'
+          );
         }
         stagedIncomingById.set(id, transformedEntity);
       }
@@ -3290,7 +3457,6 @@ export function createEntitySignal<
             subjectId,
           };
         });
-      const survivingOriginalIds = new Set(stagedUpdates.map(({ id }) => id));
 
       const stagedAdds = stagedIncomingIds
         .filter((id) => !currentIds.has(id))
@@ -3307,6 +3473,8 @@ export function createEntitySignal<
         stagedIncomingIds.map((id, index) => [id, index] as const)
       );
 
+      const membershipUnit = beginMembershipUnit();
+      try {
       const freshSubjectIds = commitFreshSubjects(
         stagedAdds.map(({ id }) => id)
       );
@@ -3320,34 +3488,19 @@ export function createEntitySignal<
           const currentIndex = currentEntries.findIndex(
             ([entryId]) => entryId === id
           );
-          let beforeSubject: number | undefined;
-          let afterSubject: number | undefined;
-
-          for (let index = currentIndex - 1; index >= 0; index -= 1) {
-            const neighborId = currentEntries[index]?.[0];
-            if (
-              neighborId !== undefined &&
-              survivingOriginalIds.has(neighborId)
-            ) {
-              beforeSubject = resolveSubjectId(neighborId);
-              break;
-            }
-          }
-
-          for (
-            let index = currentIndex + 1;
-            index < currentEntries.length;
-            index += 1
-          ) {
-            const neighborId = currentEntries[index]?.[0];
-            if (
-              neighborId !== undefined &&
-              survivingOriginalIds.has(neighborId)
-            ) {
-              afterSubject = resolveSubjectId(neighborId);
-              break;
-            }
-          }
+          // Immediate pre-state neighbours, removed or surviving, exactly as
+          // clear() and removeMany() record them. Anchoring only to survivors
+          // left adjacent removals with identical anchors, so their reversal
+          // order depended on replay order: [a,b,c] -> [q,a] rolled back to
+          // [a,c,b], and replacing every row undid to [c,b,a].
+          const beforeId =
+            currentIndex > 0 ? currentEntries[currentIndex - 1]?.[0] : undefined;
+          const afterId =
+            currentIndex >= 0 ? currentEntries[currentIndex + 1]?.[0] : undefined;
+          const beforeSubject =
+            beforeId === undefined ? undefined : resolveSubjectId(beforeId);
+          const afterSubject =
+            afterId === undefined ? undefined : resolveSubjectId(afterId);
 
           return {
             kind: 'remove' as const,
@@ -3360,22 +3513,19 @@ export function createEntitySignal<
         }
       );
 
-      for (const { id, subjectId } of stagedRemovals) {
-        tombstoneSubjectSignal(subjectId);
+      for (const { id, subjectId, entity } of stagedRemovals) {
         const currentState = resolveSubjectState(subjectId);
         structuralStore.tombstoneSubject(
           subjectId,
           id,
           currentState?.restoreAllowed ?? true
         );
-        publishSubjectPhysicalChange(subjectId);
+        captureCommittedEntity(subjectId, entity, undefined, true);
       }
-      reclaimRetiredSubjectsWithoutOwner(
-        stagedRemovals.map(({ subjectId }) => subjectId)
-      );
 
-      for (const { subjectId, entity } of stagedUpdates) {
+      for (const { subjectId, entity, prev } of stagedUpdates) {
         valueStore.retainSubjectValue(subjectId, entity);
+        captureCommittedEntity(subjectId, prev, entity, false);
       }
 
       const addedSubjectIds = stagedAdds.map(({ id, entity }) => {
@@ -3384,13 +3534,9 @@ export function createEntitySignal<
           throw new Error(`Entity with id ${String(id)} has no subject id`);
         }
         valueStore.retainSubjectValue(subjectId, entity);
-        syncEntitySignal(id);
+        captureCommittedEntity(subjectId, undefined, entity, true);
         return subjectId;
       });
-
-      for (const { id } of stagedUpdates) {
-        syncEntitySignal(id);
-      }
 
       structuralStore.reorderActiveKeys(stagedIncomingIds);
 
@@ -3403,14 +3549,35 @@ export function createEntitySignal<
       const afterSubjects = stagedIncomingIds
         .map((id) => resolveSubjectId(id))
         .filter((subjectId): subjectId is number => subjectId !== undefined);
+      const membershipChanges: EntityMembershipChange[] = [];
+      if (membershipInventory.observed()) {
+        membershipChanges.push(...stagedRemovals.map(({ id, subjectId }) => ({ kind: 'remove' as const, lifetimeId: subjectId, key: id })));
+        membershipChanges.push(...stagedAdds.map(({ id }, index) => membershipAddition(addedSubjectIds[index], id)));
+        const beforeSet = new Set(beforeSubjects);
+        const afterSet = new Set(afterSubjects);
+        const survivingBefore = beforeSubjects.filter((id) => afterSet.has(id));
+        const survivingAfter = afterSubjects.filter((id) => beforeSet.has(id));
+        if (survivingBefore.some((id, index) => id !== survivingAfter[index])) membershipChanges.push({ kind: 'reorder', before: beforeSubjects, after: afterSubjects });
+      }
+
+      // Captured whenever SURVIVING subjects change relative order, not only
+      // for a pure reorder. Neighbour hints on the structural effects cannot
+      // restore survivors that moved: reversing [a,b,c] -> [c,a] yielded
+      // [b,c,a]. The order delta carries both endpoints, including subjects
+      // present at only one of them. Membership-only changes keep relying on
+      // the structural effects.
+      const survivorsAfter = new Set(afterSubjects);
+      const survivorsBefore = new Set(beforeSubjects);
+      const survivingBeforeOrder = beforeSubjects.filter((subjectId) =>
+        survivorsAfter.has(subjectId)
+      );
+      const survivingAfterOrder = afterSubjects.filter((subjectId) =>
+        survivorsBefore.has(subjectId)
+      );
       if (
         positionId !== undefined &&
-        beforeSubjects.length === afterSubjects.length &&
-        beforeSubjects.every((subjectId) =>
-          afterSubjects.includes(subjectId)
-        ) &&
-        beforeSubjects.some(
-          (subjectId, index) => subjectId !== afterSubjects[index]
+        survivingBeforeOrder.some(
+          (subjectId, index) => subjectId !== survivingAfterOrder[index]
         )
       ) {
         mutationCaptureRuntime?.publishCollectionOrder?.({
@@ -3423,6 +3590,14 @@ export function createEntitySignal<
           meta: ambientMeta(),
         });
       }
+
+      membershipUnit.commit(membershipChanges);
+      for (const { subjectId } of stagedRemovals) { tombstoneSubjectSignal(subjectId); publishSubjectPhysicalChange(subjectId); }
+      reclaimRetiredSubjectsWithoutOwner(
+        stagedRemovals.map(({ subjectId }) => subjectId)
+      );
+      for (const { id } of stagedAdds) syncEntitySignal(id);
+      for (const { id } of stagedUpdates) syncEntitySignal(id);
 
       const stagedAddStructuralEffects = stagedAdds.map(
         ({ id, entity }, index) => {
@@ -3526,6 +3701,7 @@ export function createEntitySignal<
           handler.onUpdate?.(id, entity as Partial<E>, entity);
         }
       }
+      } finally { membershipUnit.cancel(); }
     },
 
     // ==================
@@ -3560,6 +3736,15 @@ export function createEntitySignal<
       configurable: true,
     });
   }
+  defineEntityMembershipInventory(api, membershipInventory);
+  defineEntityObservation(api, () => {
+    if (positionId !== undefined) return;
+    const registry = getPositionRegistry(api);
+    if (!registry) return;
+    positionId = registry.allocate();
+    registry.registerCollectionPath(positionId, basePath);
+    defineOwnedPositionIds(api, [positionId]);
+  });
   if (positionMetadataEnabled) {
     Object.defineProperty(api, '__positionIds', {
       get: getPositionIds,

@@ -1,3 +1,4 @@
+import { withDeferredWriteScope } from './internals/deferred-write-scope';
 import type { WriteMetadata } from './mutation-types';
 
 /**
@@ -55,14 +56,11 @@ let activeContext: WriteMetadata | undefined;
  *
  * @returns The value returned by `fn`.
  */
-export function withWriteContext<R>(
-  meta: WriteMetadata,
-  fn: () => R
-): R {
+export function withWriteContext<R>(meta: WriteMetadata, fn: () => R): R {
   const previous = activeContext;
   activeContext = meta;
   try {
-    return fn();
+    return withDeferredWriteScope(fn);
   } finally {
     activeContext = previous;
   }

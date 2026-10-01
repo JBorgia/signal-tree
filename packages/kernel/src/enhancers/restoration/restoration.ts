@@ -1,4 +1,25 @@
+import {
+  applyInInvalidationGroup,
+  wasAppliedBeforeFailure,
+} from '../../lib/internals/causal-runtime/post-application-failure';
+import { holdEntityMembershipDelivery } from '../../lib/internals/entity-membership-view';
+import {
+  plainBranchMembershipEffects,
+  composePlainBranchMemberEffect,
+  plainBranchMemberEffectIsNoop,
+  canRealizePlainBranchMember,
+  readPlainBranchMember,
+  applyPlainBranchMemberSnapshot,
+  preparePlainBranchMembers,
+  type PlainBranchMemberPresence,
+} from '../../lib/internals/plain-branch-membership';
 import { getOrCreateSubjectReclamationSink } from '../../lib/internals/subject-reclamation-sink';
+import {
+  installRestorationReader,
+  type RestorationEntryId,
+  type RestorationReaderChange,
+  type RestorationReaderState,
+} from '../../lib/internals/restoration-reader';
 import {
   getOrCreateSubjectRestorationClaims,
   type RestorationClaimOwner,
@@ -7,14 +28,20 @@ import {
   deriveLocation,
   getLocationRuntime,
   NEUTRAL_LOCATION_RUNTIME,
+  isWritableLocation,
   replaceLocation,
 } from '../../lib/internals/location-runtime';
 import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-port';
 import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
 import { rootAuthorityFor } from '../../lib/internals/root-source';
 
-import { isTraversableNode, snapshotState } from '../../lib/utils';
+import { deepEqual, isTraversableNode, snapshotState } from '../../lib/utils';
 import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
+import { observeIntrinsicMutations } from '../../lib/internals/intrinsic-mutation';
+import {
+  getOwnedPositionIds,
+  getOwnedSubjectIds,
+} from '../../lib/internals/owned-metadata';
 import { getMutationCaptureRuntime } from '../../lib/internals/mutation-capture-runtime';
 import type { CollectionOrderCapture } from '../../lib/internals/mutation-capture-runtime';
 import {
@@ -32,7 +59,6 @@ import {
 } from '../../lib/internals/position-registry';
 import {
   createTreeRealizationAdapter,
-  deriveFieldPathFromEffect,
   defineTreeRealizationDescriptors,
   defineTreeRealizationPort,
   forgetSubjectsInTreeRealizationDescriptors,
@@ -110,6 +136,16 @@ import type {
   ReversalRefusal,
 } from '../../lib/internals/causal-runtime/causal-types';
 
+// A refusal is the error object restoration itself created when it declined an
+// operation and changed nothing. Messages are not evidence: a validator or a
+// listener may throw any text, including one that imitates ST1034.
+const RESTORATION_REFUSALS = new WeakSet<Error>();
+function restorationRefusal(message: string): Error {
+  const error = new Error(message);
+  RESTORATION_REFUSALS.add(error);
+  return error;
+}
+
 // Re-export for convenience (do not redefine locally)
 export type { RestorationConfig, RestorationHistoryEntry };
 
@@ -122,6 +158,8 @@ export type { RestorationConfig, RestorationHistoryEntry };
 type CanonicalTurn<T> = Omit<RestorationHistoryEntry<T>, 'state'> & {
   state?: T;
   id: number;
+  entryId: RestorationEntryId;
+  __transactionId?: number;
   historyIndex: number;
   /**
    * RESTORATION CLAIM SET — the subjects whose backing must conservatively
@@ -164,6 +202,8 @@ type TurnEffectBase = {
 type ScalarSetEffect = TurnEffectBase & {
   kind: 'set';
   subject?: number;
+  fieldSegments?: readonly string[];
+  plainBranchMembership?: PlainBranchMemberPresence;
   before: unknown;
   after: unknown;
   mutationIntent?: 'replace' | 'derive';
@@ -206,6 +246,15 @@ type DirectedTurnApplication = {
   readonly direction: 'undo' | 'redo';
 };
 
+// Admission evidence only: pending values remain owned by transactions().
+type PendingRestorationFootprint = {
+  position: number;
+  path: string;
+  subject?: number;
+  fieldSegments?: readonly string[];
+  structural: boolean;
+};
+
 type TreeRealizationDescriptorStore = Map<
   PositionId,
   {
@@ -235,6 +284,15 @@ type TreeRealizationDescriptorStore = Map<
 // Rollback is `transactions()`' concern and it declares its own equivalents,
 // built from its own captured effects rather than from restoration history.
 
+function fieldSegmentsOverlap(
+  left: readonly string[],
+  right: readonly string[]
+): boolean {
+  return left
+    .slice(0, Math.min(left.length, right.length))
+    .every((key, index) => key === right[index]);
+}
+
 function toReversalEffect(
   effect: TurnEffect,
   direction: 'undo' | 'redo'
@@ -246,6 +304,15 @@ function toReversalEffect(
         before: direction === 'undo' ? effect.after : effect.before,
         after: direction === 'undo' ? effect.before : effect.after,
         subjectId: effect.subject,
+        fieldSegments: effect.fieldSegments,
+        plainBranchMembership: effect.plainBranchMembership
+          ? direction === 'undo'
+            ? {
+                before: effect.plainBranchMembership.after,
+                after: effect.plainBranchMembership.before,
+              }
+            : effect.plainBranchMembership
+          : undefined,
         path: effect.path,
         ownerPath: effect.ownerPath,
       };
@@ -419,6 +486,12 @@ class RestorationManager<T> {
   private positionTurnIds = new Map<number, number[]>();
   private positionFrontiers = new Map<number, number>();
   private nextTurnId = 1;
+  private nextEntryId = 1;
+  private nextOperationId = 1;
+  private activeOperation?: Set<RestorationEntryId>;
+  private readonly publishObservation: (
+    change: RestorationReaderChange
+  ) => void;
   private historicalEvents: HistoricalEvent[] = [];
   private nextHistoricalOrdinal = 1;
 
@@ -538,6 +611,111 @@ class RestorationManager<T> {
     this.historyVersion = locations.createCell(0);
     this.frontierVersion = locations.createCell(0);
     this.maxHistorySize = normaliseMaxHistorySize(config.maxHistorySize);
+    this.publishObservation = installRestorationReader(
+      tree,
+      this.positionRegistry.id,
+      () => this.readObservation()
+    );
+  }
+
+  private readObservation(): RestorationReaderState {
+    return {
+      entries: this.history.map((entry) => {
+        const status = this.getTurnStatus(entry.id);
+        return {
+          entryId: entry.entryId,
+          transactionIds:
+            entry.__transactionId === undefined ? [] : [entry.__transactionId],
+          status:
+            status === 'applied' || status === 'unapplied'
+              ? status
+              : 'inconsistent',
+        };
+      }),
+      currentIndex: this.currentIndex,
+      canUndo: this.canUndoConfirmed(),
+      canRedo: this.canRedoConfirmed(),
+    };
+  }
+
+  private observeOperation(
+    operation: 'undo' | 'redo' | 'jump',
+    run: () => boolean
+  ): boolean {
+    const operationId = `restoration-operation:${this
+      .nextOperationId++}` as const;
+    const affected = new Set<RestorationEntryId>();
+    const previous = this.activeOperation;
+    const previousFailure = this.deliveryFailure;
+    this.activeOperation = affected;
+    this.deliveryFailure = undefined;
+    let outcome: 'applied' | 'noop' | 'refused' | 'failed' = 'failed';
+    try {
+      const result = run();
+      outcome = affected.size ? 'applied' : 'noop';
+      // The operation completed its bookkeeping; a consumer that threw after
+      // the reversal applied is surfaced now, with the outcome it really had.
+      // Read through a widened type: run() may have set it.
+      const failure = this.deliveryFailure as { error: unknown } | undefined;
+      if (failure) throw failure.error;
+      return result;
+    } catch (error) {
+      if (outcome !== 'failed') throw error;
+      outcome =
+        affected.size === 0 &&
+        error instanceof Error &&
+        RESTORATION_REFUSALS.has(error)
+          ? 'refused'
+          : 'failed';
+      throw error;
+    } finally {
+      this.activeOperation = previous;
+      this.deliveryFailure = previousFailure;
+      this.publishObservation({
+        kind: 'operation',
+        operationId,
+        operation,
+        outcome,
+        affectedEntryIds: [...affected],
+      });
+    }
+  }
+
+  /**
+   * Resolve BEFORE applying. Application delivers synchronously, and a
+   * subscriber may reset or trim history there; the operation still applied
+   * these entries, so the event must name them.
+   */
+  private entryIdsFor(turnIds: readonly number[]): RestorationEntryId[] {
+    const ids: RestorationEntryId[] = [];
+    for (const id of turnIds) {
+      const entry = this.turns.get(id);
+      if (entry) ids.push(entry.entryId);
+    }
+    return ids;
+  }
+
+  /** A consumer threw after the active operation's reversal applied. */
+  private deliveryFailure: { error: unknown } | undefined;
+
+  /**
+   * Apply, treating a consumer's throw after the reversal was installed as a
+   * delivery failure: the caller finishes its bookkeeping and the operation
+   * rethrows at its end. A throw before installation propagates unchanged.
+   */
+  private applyReversal(apply: () => void): void {
+    try {
+      apply();
+    } catch (error) {
+      if (!wasAppliedBeforeFailure(error)) throw error;
+      this.deliveryFailure ??= { error };
+    }
+  }
+
+  /** Called only once application returned; a throw leaves them unrecorded. */
+  private recordAppliedEntries(entryIds: readonly RestorationEntryId[]): void {
+    if (!this.activeOperation) return;
+    for (const id of entryIds) this.activeOperation.add(id);
   }
 
   /**
@@ -592,7 +770,8 @@ class RestorationManager<T> {
     positionIds?: number[],
     effects?: TurnEffect[],
     collectionOrders?: PendingCollectionOrder[],
-    explicitTurnId?: number
+    explicitTurnId?: number,
+    transactionId?: number
   ): CanonicalTurn<T> | undefined {
     const entry = this.buildTurn(
       subjectIds,
@@ -605,8 +784,9 @@ class RestorationManager<T> {
     if (!entry) {
       return undefined;
     }
-
+    entry.__transactionId = transactionId;
     this.pendingTurns.set(entry.id, entry);
+    this.publishObservation({ kind: 'history-changed' });
     return {
       ...entry,
       restorationSubjectIds: entry.restorationSubjectIds
@@ -757,6 +937,7 @@ class RestorationManager<T> {
     ).sort((left, right) => left - right);
     const entry: CanonicalTurn<T> = {
       id: turnId,
+      entryId: `restoration-entry:${this.nextEntryId++}`,
       historyIndex: this.history.length,
       ...(pendingState === undefined ? {} : { state: pendingState }),
     };
@@ -862,6 +1043,7 @@ class RestorationManager<T> {
 
     this.rebuildTurnIndexes();
     this.pruneHistoricalEventsBeforeOldestBoundary();
+    this.publishObservation({ kind: 'history-changed' });
     return true;
   }
 
@@ -1370,6 +1552,10 @@ class RestorationManager<T> {
   }
 
   undoAt(positionId: number): boolean {
+    return this.observeOperation('undo', () => this.runUndoAt(positionId));
+  }
+
+  private runUndoAt(positionId: number): boolean {
     if (!this.canUndoAt(positionId)) {
       return false;
     }
@@ -1395,6 +1581,10 @@ class RestorationManager<T> {
   }
 
   redoAt(positionId: number): boolean {
+    return this.observeOperation('redo', () => this.runRedoAt(positionId));
+  }
+
+  private runRedoAt(positionId: number): boolean {
     if (!this.canRedoAt(positionId)) {
       return false;
     }
@@ -1476,6 +1666,10 @@ class RestorationManager<T> {
   }
 
   undoConfirmed(): boolean {
+    return this.observeOperation('undo', () => this.runUndoConfirmed());
+  }
+
+  private runUndoConfirmed(): boolean {
     if (!this.canUndoConfirmed()) {
       return false;
     }
@@ -1525,6 +1719,10 @@ class RestorationManager<T> {
   }
 
   redoConfirmed(): boolean {
+    return this.observeOperation('redo', () => this.runRedoConfirmed());
+  }
+
+  private runRedoConfirmed(): boolean {
     if (!this.canRedoConfirmed()) {
       return false;
     }
@@ -1562,7 +1760,12 @@ class RestorationManager<T> {
           `Historical state ${entry.id} could not be materialized`
         );
       }
-      return { ...entry, state };
+      const { entryId, __transactionId, ...existingView } = entry;
+      // Lineage belongs to the dedicated reader; preserve the existing history
+      // API's runtime shape as well as its declared type.
+      void entryId;
+      void __transactionId;
+      return { ...existingView, state };
     });
   }
 
@@ -1649,7 +1852,15 @@ class RestorationManager<T> {
         if (typeof effect.path !== 'string') {
           throw new Error('Historical scalar effect has no path');
         }
-        natural = setDetachedNaturalValue(natural, effect.path, effect.after);
+        natural = effect.plainBranchMembership
+          ? applyPlainBranchMemberSnapshot(
+              this.tree.$,
+              natural,
+              effect.owner,
+              effect.plainBranchMembership.after,
+              effect.after
+            )
+          : setDetachedNaturalValue(natural, effect.path, effect.after);
       }
     };
 
@@ -1721,14 +1932,26 @@ class RestorationManager<T> {
         if (typeof effect.path !== 'string') {
           throw new Error('Historical scalar effect has no path');
         }
-        natural = setDetachedNaturalValue(natural, effect.path, effect.after);
+        natural = effect.plainBranchMembership
+          ? applyPlainBranchMemberSnapshot(
+              this.tree.$,
+              natural,
+              effect.owner,
+              effect.plainBranchMembership.after,
+              effect.after
+            )
+          : setDetachedNaturalValue(natural, effect.path, effect.after);
       }
     }
 
     return states;
   }
 
+  /** Advanced by every reset, so an operation can tell history was replaced under it. */
+  private resetGeneration = 0;
+
   resetRestorationHistory(): void {
+    this.resetGeneration++;
     // Before `nextTurnId` goes back to 1. Owner strings are derived from turn
     // ids, so releasing after the counter reset would leave the old claims
     // attached to owners the next entries are about to mint.
@@ -1744,9 +1967,14 @@ class RestorationManager<T> {
     this.isTemporalViewActive = false;
     this.bumpRestorationHistory();
     this.currentIndex = -1;
+    this.publishObservation({ kind: 'history-changed' });
   }
 
   jumpTo(index: number): boolean {
+    return this.observeOperation('jump', () => this.runJumpTo(index));
+  }
+
+  private runJumpTo(index: number): boolean {
     if (index < 0 || index >= this.history.length) {
       return false;
     }
@@ -1769,8 +1997,12 @@ class RestorationManager<T> {
       .sort((left, right) => left.historyIndex - right.historyIndex)
       .map(({ id }) => id);
 
+    const generation = this.resetGeneration;
     this.applyDirectedTurnTransition(turnIdsToUndo, turnIdsToRedo);
 
+    // A synchronous subscriber may reset history while the jump applies. The
+    // jump still happened; its index belongs to history that no longer exists.
+    if (this.resetGeneration !== generation) return true;
     this.currentIndex = index;
     this.isTemporalViewActive = true;
     return true;
@@ -1902,7 +2134,12 @@ class RestorationManager<T> {
       }
     }
 
-    this.applyEffectsFn([{ effects, direction, orderDeltas }]);
+    const entryIds = this.entryIdsFor(turnIds);
+    const applyEffects = this.applyEffectsFn;
+    this.applyReversal(() =>
+      applyEffects([{ effects, direction, orderDeltas }])
+    );
+    this.recordAppliedEntries(entryIds);
   }
 
   private applyDirectedTurnTransition(
@@ -1941,13 +2178,19 @@ class RestorationManager<T> {
       applications.push({ effects, orderDeltas, direction });
     }
     if (applications.length > 0) {
-      this.applyEffectsFn(applications);
+      const entryIds = this.entryIdsFor([...turnIdsToUndo, ...turnIdsToRedo]);
+      const applyEffects = this.applyEffectsFn;
+      this.applyReversal(() => applyEffects(applications));
+      this.recordAppliedEntries(entryIds);
     }
   }
 
   private isSupportedEffect(effect: TurnEffect): boolean {
     switch (effect.kind) {
       case 'set':
+        if (effect.plainBranchMembership) {
+          return canRealizePlainBranchMember(this.tree.$, effect.position);
+        }
         return (
           (this.isScalarValue(effect.before) &&
             this.isScalarValue(effect.after)) ||
@@ -2358,6 +2601,43 @@ export function restoration(
     const applyTurnEffectsThroughRealizationPort = (
       applications: DirectedTurnApplication[]
     ): void => {
+      if (
+        pendingRestorationFootprints.size > 0 ||
+        pendingTransactions.size > 0
+      ) {
+        const touches = applications.flatMap(({ effects, orderDeltas }) => [
+          ...effects.map(restorationFootprint),
+          ...orderDeltas.map(({ owner }) => ({
+            position: owner,
+            path:
+              positionRegistry?.collectionPathFor(owner as PositionId) ?? '',
+            structural: true,
+          })),
+        ]);
+        const pendingTouches = [
+          ...pendingRestorationFootprints.values(),
+          ...[...pendingTransactions.values()].map((bucket) => [
+            ...[...bucket.effects.values()].map(restorationFootprint),
+            ...[...bucket.collectionOrders.values()].map((order) => ({
+              position: order.owner,
+              path: order.ownerPath,
+              structural: true,
+            })),
+          ]),
+        ];
+        for (const pending of pendingTouches) {
+          const conflict = touches.find((touch) =>
+            pending.some((other) => restorationFootprintsOverlap(touch, other))
+          );
+          if (conflict) {
+            throw restorationRefusal(
+              `ST1034: restoration refused — '${conflict.path}' overlaps a pending ` +
+                'transaction. Settle that transaction before retrying. Nothing ' +
+                'was changed; the history position is unmoved.'
+            );
+          }
+        }
+      }
       const reversalEffects = applications.flatMap((application) =>
         application.effects.map((effect) =>
           toReversalEffect(effect, application.direction)
@@ -2406,7 +2686,7 @@ export function restoration(
           externalOrderOwners.has(owner)
         );
         if (conflictingOrderOwner !== undefined) {
-          throw new Error(
+          throw restorationRefusal(
             `ST1034: restoration refused — collection order ${conflictingOrderOwner} ` +
               'changed after the operation being reversed. Nothing was changed; ' +
               'the history position is unmoved.'
@@ -2475,7 +2755,11 @@ export function restoration(
         const prepared = prepareDeclarativeTransitionInstallation(
           target,
           bindings,
-          scalarBinding
+          scalarBinding,
+          {
+            prepareTarget: (members) =>
+              preparePlainBranchMembers(tree.$, members),
+          }
         );
         isRestoring = true;
         try {
@@ -2487,11 +2771,11 @@ export function restoration(
               },
               () => prepared.install()
             );
-          const locations = getLocationRuntime(tree.$);
-          if (locations) {
-            locations.runInvalidationGroup(apply);
-          } else {
-            apply();
+          const releaseMembership = holdEntityMembershipDelivery(tree.$);
+          try {
+            applyInInvalidationGroup(tree.$, apply);
+          } finally {
+            releaseMembership();
           }
         } finally {
           isRestoring = false;
@@ -2505,7 +2789,10 @@ export function restoration(
       // location currently holds EXTERNAL truth that this restoration is not
       // reversing. A location holding a later AUTHORED value is fine — that is
       // what a closure undo looks like mid-flight.
-      const readNested = (source: unknown, segments: string[]): unknown => {
+      const readNested = (
+        source: unknown,
+        segments: readonly string[]
+      ): unknown => {
         let cursor = source;
         for (const segment of segments) {
           if (cursor === null || typeof cursor !== 'object') return undefined;
@@ -2515,6 +2802,32 @@ export function restoration(
       };
 
       const externalConflict = ((): ReversalRefusal | undefined => {
+        for (const effect of reversalEffects) {
+          if (effect.subjectId !== undefined || effect.structural !== undefined)
+            continue;
+          const truth = externalMembershipTruth.get(effect.owner);
+          if (!truth) continue;
+          const current = readPlainBranchMember(tree.$, effect.owner);
+          if (!current || current.present !== truth.present) continue;
+          const targetPresent = effect.plainBranchMembership?.after ?? true;
+          // Presence has its own authority. A fresh branch snapshot is not
+          // evidence that the realized membership has been superseded.
+          if (
+            targetPresent !== truth.present ||
+            (targetPresent &&
+              current.present &&
+              deepEqual(current.value, truth.value) &&
+              !deepEqual(effect.after, truth.value))
+          ) {
+            return {
+              kind: 'value-drift',
+              path: effect.path ?? '',
+              current: truth.value,
+              expected: effect.after,
+            };
+          }
+        }
+
         if (
           externalTruthByPath.size === 0 &&
           externalTruthBySubject.size === 0
@@ -2552,22 +2865,21 @@ export function restoration(
           if (subjectKey === undefined) continue;
           const rowTruth = externalTruthBySubject.get(subjectKey);
           if (!rowTruth) continue;
-          const fieldPath = deriveFieldPathFromEffect(effect, positionRegistry);
-          if (fieldPath === undefined || fieldPath === '') continue;
-          for (const [externalPath, value] of rowTruth.fields) {
-            if (!pathsOverlap(fieldPath, externalPath)) continue;
-            const current = fieldPath.startsWith(`${externalPath}.`)
-              ? readNested(
-                  value,
-                  fieldPath.slice(externalPath.length + 1).split('.')
-                )
-              : value;
-            const expected = externalPath.startsWith(`${fieldPath}.`)
-              ? readNested(
-                  effect.after,
-                  externalPath.slice(fieldPath.length + 1).split('.')
-                )
-              : effect.after;
+          const fieldPath = effect.fieldSegments;
+          if (!fieldPath) continue;
+          for (const {
+            segments: externalPath,
+            value,
+          } of rowTruth.fields.values()) {
+            if (!fieldSegmentsOverlap(fieldPath, externalPath)) continue;
+            const current =
+              fieldPath.length > externalPath.length
+                ? readNested(value, fieldPath.slice(externalPath.length))
+                : value;
+            const expected =
+              externalPath.length > fieldPath.length
+                ? readNested(effect.after, externalPath.slice(fieldPath.length))
+                : effect.after;
             if (!Object.is(current, expected)) {
               return { kind: 'value-drift', path, current, expected };
             }
@@ -2591,7 +2903,7 @@ export function restoration(
           //     different door
           //   let the inverse win -> history overwrites external truth it does
           //     not own, which is the case-6 defect
-          throw new Error(
+          throw restorationRefusal(
             `ST1034: restoration refused — '${refusal.path}' changed after the ` +
               `operation being reversed. Expected ${JSON.stringify(
                 refusal.expected
@@ -2600,7 +2912,10 @@ export function restoration(
               )}. Nothing was changed; the history position is unmoved.`
           );
         }
-        throw new Error(`Unsupported scoped undo effect at ${refusal.kind}`);
+        // A structured refusal from validation: nothing was applied.
+        throw restorationRefusal(
+          `Unsupported scoped undo effect at ${refusal.kind}`
+        );
       }
 
       if (usesDeclarativeTarget) {
@@ -2612,6 +2927,9 @@ export function restoration(
       const replayOwnerId = getPositionRegistry(
         (tree as { $?: object }).$ ?? tree
       )?.id;
+      // Set only when the reversal applied and a consumer then threw: the
+      // bookkeeping below still runs, and the failure is rethrown after it.
+      let deliveryFailure: { error: unknown } | undefined;
       try {
         // State the origin so the port propagates it. `isRestoring` is a
         // synchronous flag and is already false by the time the notifier
@@ -2633,6 +2951,9 @@ export function restoration(
             realizationPort.applyAtomically(reversalEffects);
           }
         );
+      } catch (error) {
+        if (!wasAppliedBeforeFailure(error)) throw error;
+        deliveryFailure = { error };
       } finally {
         isRestoring = false;
       }
@@ -2664,7 +2985,7 @@ export function restoration(
           typeof effect.path === 'string'
         ) {
           const truth = externalTruthBySubject.get(restoredSubjectKey);
-          const fieldPath = deriveFieldPathFromEffect(effect, positionRegistry);
+          const fieldPath = effect.fieldSegments;
           if (truth && effect.structural === undefined && fieldPath) {
             clearExternalFields(truth.fields, fieldPath);
             if (truth.fields.size === 0)
@@ -2672,6 +2993,7 @@ export function restoration(
           }
         }
       }
+      if (deliveryFailure) throw deliveryFailure.error;
     };
 
     const positionRegistry = getPositionRegistry(tree.$);
@@ -2736,24 +3058,59 @@ export function restoration(
      * value does not leave a stale conflict behind.
      */
     const externalTruthByPath = new Map<string, unknown>();
+    type MembershipTruth = { present: boolean; value: unknown };
+    const externalMembershipTruth = new Map<number, MembershipTruth>();
+    const displacedMembershipTruth = new Map<
+      number,
+      Map<number, MembershipTruth | undefined>
+    >();
+    const rememberMembershipTruth = (
+      transactionId: number | undefined,
+      position: number
+    ): void => {
+      if (transactionId === undefined) return;
+      let previous = displacedMembershipTruth.get(transactionId);
+      if (!previous)
+        displacedMembershipTruth.set(transactionId, (previous = new Map()));
+      if (!previous.has(position))
+        previous.set(position, externalMembershipTruth.get(position));
+    };
+    const restoreMembershipTruth = (
+      transactionId: number | undefined,
+      position: number
+    ): void => {
+      const previous =
+        transactionId === undefined
+          ? undefined
+          : displacedMembershipTruth.get(transactionId);
+      if (!previous?.has(position)) return;
+      const truth = previous.get(position);
+      if (truth) externalMembershipTruth.set(position, truth);
+      else externalMembershipTruth.delete(position);
+      previous.delete(position);
+      if (previous.size === 0)
+        displacedMembershipTruth.delete(transactionId as number);
+    };
 
     // Entity writes publish whole rows while reversal effects address fields.
     // Keep provenance at the same field granularity as those effects, keyed by
     // stable position+subject so sibling writes cannot claim or erase authority.
     const externalTruthBySubject = new Map<
       string,
-      { readonly rowPath: string; readonly fields: Map<string, unknown> }
+      {
+        readonly rowPath: string;
+        readonly fields: Map<
+          string,
+          { segments: readonly string[]; value: unknown }
+        >;
+      }
     >();
-    const pathsOverlap = (left: string, right: string): boolean =>
-      left === right ||
-      left.startsWith(`${right}.`) ||
-      right.startsWith(`${left}.`);
     const clearExternalFields = (
-      fields: Map<string, unknown>,
-      path: string
+      fields: Map<string, { segments: readonly string[]; value: unknown }>,
+      path: readonly string[]
     ): void => {
-      for (const field of fields.keys()) {
-        if (pathsOverlap(field, path)) fields.delete(field);
+      for (const [key, field] of fields) {
+        if (fieldSegmentsOverlap(field.segments, path)) fields.delete(key);
       }
     };
     const updateExternalRowFields = (
@@ -2765,23 +3122,30 @@ export function restoration(
     ): void => {
       const previousTruth = externalTruthBySubject.get(subjectKey);
       if (!realized && !previousTruth) return;
-      const fields = previousTruth?.fields ?? new Map<string, unknown>();
-      const visit = (prev: unknown, next: unknown, path: string): void => {
+      const fields =
+        previousTruth?.fields ??
+        new Map<string, { segments: readonly string[]; value: unknown }>();
+      const visit = (
+        prev: unknown,
+        next: unknown,
+        path: readonly string[]
+      ): void => {
         if (Object.is(prev, next)) return;
         if (isPlainRecord(prev) && isPlainRecord(next)) {
           for (const key of new Set([
             ...Object.keys(prev),
             ...Object.keys(next),
           ])) {
-            visit(prev[key], next[key], path ? `${path}.${key}` : key);
+            visit(prev[key], next[key], [...path, key]);
           }
           return;
         }
         clearExternalFields(fields, path);
-        if (realized) fields.set(path, next);
+        if (realized)
+          fields.set(JSON.stringify(path), { segments: path, value: next });
       };
       // Initial row acquisition has no prior record; index its fields too.
-      visit(isPlainRecord(before) ? before : {}, after, '');
+      visit(isPlainRecord(before) ? before : {}, after, []);
       if (previousTruth && previousTruth.rowPath !== rowPath) {
         externalTruthByPath.delete(previousTruth.rowPath);
       }
@@ -2817,6 +3181,56 @@ export function restoration(
     // rather than assuming provenance would be sufficient.
 
     const pendingTransactions = new Map<number, CaptureBucket>();
+    // Pending ownership survives history reset and explicit rollback refusal.
+    // Only a confirmed/rolled-back lifecycle event (or destroy) releases it.
+    // Keep addresses only, never a second copy of the transaction's values.
+    const pendingRestorationFootprints = new Map<
+      number,
+      PendingRestorationFootprint[]
+    >();
+    const restorationFootprint = (
+      effect: TurnEffect
+    ): PendingRestorationFootprint => ({
+      position: effect.position,
+      path: effect.path,
+      subject: effect.subject,
+      fieldSegments: effect.kind === 'set' ? effect.fieldSegments : undefined,
+      structural: effect.kind !== 'set',
+    });
+    const restorationFootprintsOverlap = (
+      left: PendingRestorationFootprint,
+      right: PendingRestorationFootprint
+    ): boolean => {
+      if (left.position === right.position) {
+        // Structural transitions can change collection ordering as well as
+        // membership. Field writes on independent rows do not overlap.
+        if (left.structural && right.structural) return true;
+        if (left.subject !== undefined && right.subject !== undefined) {
+          if (left.subject !== right.subject) return false;
+          return (
+            left.structural ||
+            right.structural ||
+            left.fieldSegments === undefined ||
+            right.fieldSegments === undefined ||
+            fieldSegmentsOverlap(left.fieldSegments, right.fieldSegments)
+          );
+        }
+        // A pure order footprint does not claim a row's field values.
+        if (left.structural || right.structural) return false;
+      }
+      // Diagnostic path text is not location identity: a literal 'a.b' key
+      // and a nested a.b leaf have different positions in this registry.
+      return (
+        positionRegistry.contains(
+          left.position as PositionId,
+          right.position as PositionId
+        ) ||
+        positionRegistry.contains(
+          right.position as PositionId,
+          left.position as PositionId
+        )
+      );
+    };
     /**
      * External provenance displaced by a speculative authored write, by PATH.
      *
@@ -3042,9 +3456,11 @@ export function restoration(
     const effectKey = (effect: TurnEffect): string => {
       switch (effect.kind) {
         case 'set':
-          return `${effect.kind}\u0000${effect.path}\u0000${
-            effect.position
-          }\u0000${effect.subject ?? ''}`;
+          return `${effect.kind}\u0000${
+            effect.fieldSegments
+              ? JSON.stringify(effect.fieldSegments)
+              : effect.path
+          }\u0000${effect.position}\u0000${effect.subject ?? ''}`;
         // RESTORE-P0: structural effects key by SUBJECT, deliberately WITHOUT
         // `kind`. Including the kind gave `add(a)` and `remove(a)` different
         // slots, so one turn kept two contradictory inverses. Keying by subject
@@ -3087,12 +3503,14 @@ export function restoration(
       const existing = effectMap.get(key);
       if (existing) {
         if (existing.kind === 'set' && effect.kind === 'set') {
-          existing.after = effect.after;
+          if (!composePlainBranchMemberEffect(existing, effect)) {
+            existing.after = effect.after;
+          }
           existing.mutationIntent = combineScalarMutationIntent(
             existing.mutationIntent,
             effect.mutationIntent
           );
-          if (existing.before === existing.after) {
+          if (plainBranchMemberEffectIsNoop(existing)) {
             effectMap.delete(key);
           }
           return;
@@ -3187,10 +3605,17 @@ export function restoration(
       subjectIds?: number[],
       positionIds?: number[]
     ): void => {
+      const membership = plainBranchMembershipEffects(meta);
+      if (membership) {
+        for (const effect of membership)
+          enqueueEffect(effectMap, { ...effect });
+        return;
+      }
       const enqueueScalarDiff = (
         diffPath: string,
         before: unknown,
-        after: unknown
+        after: unknown,
+        fieldSegments: readonly string[] = []
       ): void => {
         const position = positionIds?.[0];
         if (position === undefined || before === after) {
@@ -3200,7 +3625,10 @@ export function restoration(
         if (isPlainRecord(before) && isPlainRecord(after)) {
           const keys = new Set([...Object.keys(before), ...Object.keys(after)]);
           for (const key of keys) {
-            enqueueScalarDiff(`${diffPath}.${key}`, before[key], after[key]);
+            enqueueScalarDiff(`${diffPath}.${key}`, before[key], after[key], [
+              ...fieldSegments,
+              key,
+            ]);
           }
           return;
         }
@@ -3211,6 +3639,7 @@ export function restoration(
           ownerPath: ownerPath ?? path,
           position,
           subject: subjectIds?.[0],
+          fieldSegments: subjectIds?.length ? fieldSegments : undefined,
           before,
           after,
           mutationIntent: meta?.mutationIntent,
@@ -3255,6 +3684,7 @@ export function restoration(
         ownerPath: ownerPath ?? path,
         position,
         subject: subjectIds?.[0],
+        fieldSegments: subjectIds?.length ? [] : undefined,
         before: prev,
         after: next,
         mutationIntent: meta?.mutationIntent,
@@ -3279,6 +3709,16 @@ export function restoration(
       // time, after the designation scope has returned.
       if (isMetaDesignated(meta)) {
         bucket.designated = true;
+      }
+
+      const membership = plainBranchMembershipEffects(meta);
+      if (membership) {
+        for (const effect of membership) {
+          bucket.positionIds.add(effect.position);
+          bucket.ownerPaths.add(effect.ownerPath);
+          enqueueEffect(bucket.effects, { ...effect });
+        }
+        return;
       }
 
       const resolvedPositionIds =
@@ -3408,6 +3848,16 @@ export function restoration(
         descriptorInputs,
         designated,
       } = drainCaptureBucket(bucket);
+      // Even undesignated pending work is protected. Restoration history
+      // admission is not evidence that transaction-owned writes are settled.
+      pendingRestorationFootprints.set(transactionId, [
+        ...effects.map(restorationFootprint),
+        ...collectionOrders.map((order) => ({
+          position: order.owner,
+          path: order.ownerPath,
+          structural: true,
+        })),
+      ]);
       if (!isTurnEligible(designated)) {
         return undefined;
       }
@@ -3421,7 +3871,9 @@ export function restoration(
         subjectIds.length > 0 ? subjectIds : undefined,
         positionIds.length > 0 ? positionIds : undefined,
         effects.length > 0 ? effects : undefined,
-        collectionOrders.length > 0 ? collectionOrders : undefined
+        collectionOrders.length > 0 ? collectionOrders : undefined,
+        undefined,
+        transactionId
       );
       if (entry) {
         pendingDescriptorInputs.set(entry.id, descriptorInputs);
@@ -3444,6 +3896,71 @@ export function restoration(
     // observer. Installing here rather than resolving is what makes the
     // subscription independent of enhancer order: whichever authority sets up
     // first creates the one channel, and the other joins it.
+    let unsubscribeCommittedEntities: (() => void) | undefined;
+    const observePendingEntities = (): void => {
+      unsubscribeCommittedEntities ??= getMutationCaptureRuntime(
+        tree
+      )?.subscribeCommittedEntity?.((capture) => {
+        if (
+          isRestoring ||
+          capture.meta?.origin === 'restoration' ||
+          isInspectionWrite(capture.meta) ||
+          isCompensationWrite(capture.meta) ||
+          getWriteParticipation(capture.meta) === 'realized'
+        )
+          return;
+        const transactionId = resolveTransactionId(capture.meta);
+        if (transactionId === undefined) return;
+        const touches = pendingRestorationFootprints.get(transactionId) ?? [];
+        for (const change of capture.changes) {
+          const add = (fieldSegments?: readonly string[]): void => {
+            if (
+              touches.some(
+                (touch) =>
+                  touch.position === capture.owner &&
+                  touch.subject === change.subject &&
+                  touch.structural === change.structural &&
+                  (touch.fieldSegments === fieldSegments ||
+                    (touch.fieldSegments &&
+                      fieldSegments &&
+                      touch.fieldSegments.length === fieldSegments.length &&
+                      touch.fieldSegments.every(
+                        (key, index) => key === fieldSegments[index]
+                      )))
+              )
+            )
+              return;
+            touches.push({
+              position: capture.owner,
+              path: capture.ownerPath,
+              subject: change.subject,
+              fieldSegments,
+              structural: change.structural,
+            });
+          };
+          const visit = (
+            before: unknown,
+            after: unknown,
+            segments: readonly string[]
+          ): void => {
+            if (Object.is(before, after)) return;
+            if (isPlainRecord(before) && isPlainRecord(after)) {
+              for (const key of new Set([
+                ...Object.keys(before),
+                ...Object.keys(after),
+              ])) {
+                visit(before[key], after[key], [...segments, key]);
+              }
+            } else add(segments);
+          };
+          if (change.structural) add();
+          else visit(change.before, change.after, []);
+        }
+        if (touches.length)
+          pendingRestorationFootprints.set(transactionId, touches);
+      });
+    };
+
     const unsubscribeTransactionLifecycle = installTransactionLifecycleChannel(
       tree as object
     ).subscribe((event) => {
@@ -3456,6 +3973,7 @@ export function restoration(
         // Registered BEFORE the transaction's writes arrive, which is why the
         // announcement has to precede the callback.
         activeForeignTransactions.set(key, event.id);
+        observePendingEntities();
         return;
       }
 
@@ -3477,6 +3995,11 @@ export function restoration(
       }
 
       activeForeignTransactions.delete(key);
+      pendingRestorationFootprints.delete(event.id);
+      if (activeForeignTransactions.size === 0) {
+        unsubscribeCommittedEntities?.();
+        unsubscribeCommittedEntities = undefined;
+      }
       if (event.kind === 'rolled-back') {
         pendingTransactions.delete(event.id);
         // NOT restored here. Measured: this event fires BEFORE the rollback's
@@ -3486,6 +4009,7 @@ export function restoration(
         // that knows the path actually came back.
       }
       if (event.kind !== 'rolled-back') {
+        displacedMembershipTruth.delete(event.id);
         // Confirmation REPLACES prior authority: the authored turn genuinely
         // superseded the realization, so the displaced provenance is dropped.
         supersededExternalTruth.clear();
@@ -3532,6 +4056,9 @@ export function restoration(
       unsubscribeCollectionOrders =
         getMutationCaptureRuntime(tree)?.subscribeCollectionOrder?.(
           (capture) => {
+            // Pending work never entered completed history. Its compensation
+            // returns to that baseline; it is not a new order gap or authority.
+            if (isCompensationWrite(capture.meta)) return;
             if (getWriteParticipation(capture.meta) === 'realized') {
               externalOrderOwners.add(capture.owner);
               selfDirty = true;
@@ -3599,6 +4126,72 @@ export function restoration(
               if (isInspectionWrite(meta)) {
                 return;
               }
+              const membership = plainBranchMembershipEffects(meta);
+              if (membership) {
+                const transactionId = resolveTransactionId(meta);
+                const compensation = isCompensationWrite(meta);
+                const realized = getWriteParticipation(meta) === 'realized';
+                for (const effect of membership) {
+                  if (compensation) {
+                    restoreMembershipTruth(
+                      compensationTransactionId(meta),
+                      effect.position
+                    );
+                  } else if (realized) {
+                    externalMembershipTruth.set(effect.position, {
+                      present: effect.plainBranchMembership.after,
+                      value: effect.after,
+                    });
+                  } else {
+                    rememberMembershipTruth(transactionId, effect.position);
+                    externalMembershipTruth.delete(effect.position);
+                  }
+                }
+                if (compensation) return;
+                if (realized) {
+                  for (const effect of membership) {
+                    pendingCapture.positionIds.add(effect.position);
+                    enqueueEffect(pendingCapture.effects, { ...effect });
+                  }
+                  selfDirty = true;
+                } else {
+                  captureIntoBucket(
+                    transactionId === undefined
+                      ? pendingCapture
+                      : getTransactionBucket(transactionId),
+                    path,
+                    next,
+                    prev,
+                    meta,
+                    ownerPath,
+                    subjectIds,
+                    positionIds
+                  );
+                  if (transactionId === undefined) selfDirty = true;
+                }
+                return;
+              }
+              if (!subjectIds?.length) {
+                for (const position of positionIds ?? []) {
+                  if (isCompensationWrite(meta)) {
+                    restoreMembershipTruth(
+                      compensationTransactionId(meta),
+                      position
+                    );
+                  } else if (getWriteParticipation(meta) !== 'realized') {
+                    rememberMembershipTruth(
+                      resolveTransactionId(meta),
+                      position
+                    );
+                    externalMembershipTruth.delete(position);
+                  } else if (externalMembershipTruth.has(position)) {
+                    externalMembershipTruth.set(position, {
+                      present: true,
+                      value: next,
+                    });
+                  }
+                }
+              }
               if (getWriteParticipation(meta) === 'realized') {
                 // RESTORE-P0 P0-C. Recorded HERE rather than only in the leaf
                 // interceptor: measured, that interceptor is not installed for
@@ -3616,6 +4209,11 @@ export function restoration(
                 const compensation = isCompensationWrite(meta);
                 if (compensation) {
                   restoreSupersededTruth(compensationTransactionId(meta), path);
+                  // A discarded pending turn is absent from completed history.
+                  // Capturing its inverse here would fold the speculative
+                  // baseline into a later authored write in the same flush
+                  // (and cancel a restored entity's subsequent removal).
+                  return;
                 } else if (next === undefined) {
                   externalTruthByPath.delete(path);
                 } else {
@@ -3907,8 +4505,9 @@ export function restoration(
       stagedForeignTurns.clear();
       pendingTransactions.clear();
       supersededExternalTruth.clear();
-      activeForeignTransactions.clear();
       externalTruthByPath.clear();
+      externalMembershipTruth.clear();
+      displacedMembershipTruth.clear();
       externalTruthBySubject.clear();
       externalOrderOwners.clear();
     };
@@ -3933,7 +4532,30 @@ export function restoration(
     (enhancedTree as unknown as Record<string, unknown>)['__restoration'] =
       restorationManager;
 
-    visitTree((enhancedTree as ISignalTree<T>).$, (node) => {
+    const releasePendingScalarObservers: Array<() => void> = [];
+    visitTree((enhancedTree as ISignalTree<T>).$, (node, path) => {
+      const position = getOwnedPositionIds(node)?.[0];
+      if (
+        position !== undefined &&
+        !getOwnedSubjectIds(node)?.length &&
+        isWritableLocation(node)
+      ) {
+        const release = observeIntrinsicMutations(
+          node as object,
+          (mutation) => {
+            if (!mutation.changed || isRestoring) return;
+            const transactionId = resolveTransactionId(getActiveWriteContext());
+            if (transactionId === undefined) return;
+            const touches =
+              pendingRestorationFootprints.get(transactionId) ?? [];
+            if (!touches.some((touch) => touch.position === position)) {
+              touches.push({ position, path, structural: false });
+              pendingRestorationFootprints.set(transactionId, touches);
+            }
+          }
+        );
+        if (release) releasePendingScalarObservers.push(release);
+      }
       const scopedNode = node as {
         __positionIds?: number[];
         history?: {
@@ -4002,8 +4624,12 @@ export function restoration(
         unsubscribeReset = null;
         unsubscribeCollectionOrders = null;
         restoreLeafInterceptors = null;
+        unsubscribeCommittedEntities?.();
+        unsubscribeCommittedEntities = undefined;
         releaseCapture?.();
+        for (const release of releasePendingScalarObservers) release();
         resetRestorationRetention();
+        pendingRestorationFootprints.clear();
         pendingTransactions.clear();
         supersededExternalTruth.clear();
         activeForeignTransactions.clear();

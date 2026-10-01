@@ -26,6 +26,8 @@ import {
  * core's own walkers and the enhancer authoring surface.
  */
 interface VisitTreeOptions {
+  /** Include retained non-enumerable locations, such as omitted optional fields. */
+  includeNonEnumerable?: boolean;
   /** Max recursion depth (default 32). Guards runaway / cyclic structures. */
   maxDepth?: number;
   /**
@@ -73,7 +75,9 @@ export function visitTree(
 
     let keys: string[];
     try {
-      keys = Object.keys(node);
+      keys = options.includeNonEnumerable
+        ? Object.getOwnPropertyNames(node)
+        : Object.keys(node);
     } catch {
       return;
     }

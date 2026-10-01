@@ -145,7 +145,7 @@ describe('PathNotifier (batching)', () => {
     );
   });
 
-  it('marks coalesced writes from different sources as mixed', async () => {
+  it('preserves distinct origins instead of coalescing them as mixed', async () => {
     const notifier = new PathNotifier();
     const spy = vi.fn();
     const { withWriteContext } = await import('./write-context');
@@ -166,8 +166,9 @@ describe('PathNotifier (batching)', () => {
 
     await Promise.resolve();
 
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith('mixed', [17], [3]);
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(spy).toHaveBeenNthCalledWith(1, 'restoration', [17], [3]);
+    expect(spy).toHaveBeenNthCalledWith(2, 'devtools', [17], [3]);
   });
 
   it('does not coalesce authoring and realization writes on the same path within one batch', async () => {

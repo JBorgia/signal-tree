@@ -1,6 +1,7 @@
+import { activateEntityObservation } from './entity-observation';
 import type { Location } from './cell-runtime';
 
-import { emitOwnedMutation } from './owned-mutation';
+import { defineOwnedPositionIds, emitOwnedMutation } from './owned-mutation';
 import { getOwnedOwnerPath } from './owned-metadata';
 import { getPositionRegistry } from './position-registry';
 import { isTraversableNode } from './node-shape';
@@ -82,6 +83,9 @@ function claimLeaf(node: object): (() => void) | undefined {
   if (state.claims === 0) {
     if (state.positionId === undefined) {
       state.positionId = registry.allocate();
+      // The allocated identity belongs to the location, not just its emitter.
+      // Consumers resolve the same position without reparsing display paths.
+      defineOwnedPositionIds(node, [state.positionId], 'sidecar');
     }
     const positionIds = [state.positionId];
     state.releaseMutationObserver =
@@ -127,13 +131,20 @@ export function acquireObservation(source: unknown): () => void {
     if (seen.has(node)) return;
     seen.add(node);
 
+    if (activateEntityObservation(node)) return;
     const claim = claimLeaf(node as object);
     if (claim) {
       releases.push(claim);
       return;
     }
-    for (const key of Object.keys(node as Record<string, unknown>)) {
-      visit((node as Record<string, unknown>)[key]);
+    // Omission hides a seeded member without destroying its location. A Link
+    // created during that absence must still observe it when restored.
+    for (const key of Object.getOwnPropertyNames(node)) {
+      const child = (node as Record<string, unknown>)[key];
+      if (
+        Object.prototype.propertyIsEnumerable.call(node, key) ||
+        getOwnedOwnerPath(child) !== undefined
+      ) visit(child);
     }
   };
   visit(source);
@@ -159,4 +170,3 @@ export function observationStateForTesting(node: unknown): {
     observable: state !== undefined,
   };
 }
-

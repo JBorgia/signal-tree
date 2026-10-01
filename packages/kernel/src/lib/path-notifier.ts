@@ -22,6 +22,7 @@ import {
 import { getWriteParticipation } from './write-participation';
 
 import { installPathDeliveryRuntime } from './internals/path-observation-port';
+import { plainBranchMembershipChange } from './internals/plain-branch-membership';
 import { reportContainedObserverError } from './internals/error-reporter';
 import type { TreeId } from './internals/position-registry';
 import type { WriteMetadata } from './mutation-types';
@@ -100,6 +101,7 @@ export class PathNotifier {
     'path-position-subject';
   private pendingFlush = false;
   private pending = new Map<string, PendingSlot>();
+  private pendingBeforeMembership: PendingSlot[] = [];
   private flushCallbacks = new Set<() => void>();
 
   constructor(options?: { batching?: boolean }) {
@@ -354,11 +356,12 @@ export class PathNotifier {
    */
   private flush(): void {
     // Snapshot and clear before notifying to allow re-entrant behavior
-    const toNotify = new Map(this.pending);
+    const toNotify = [...this.pendingBeforeMembership, ...this.pending.values()];
+    this.pendingBeforeMembership = [];
     this.pending.clear();
     this.pendingFlush = false;
 
-    for (const slot of toNotify.values()) {
+    for (const slot of toNotify) {
       const entries = Array.isArray(slot) ? slot : [slot];
       for (const entry of entries) {
         const isOwnerOnlyMarkerSignal =
@@ -408,9 +411,9 @@ export class PathNotifier {
    */
   flushSync(): void {
     // Process until no pending notifications exist
-    while (this.pending.size > 0 || this.pendingFlush) {
+    while (this.hasPending() || this.pendingFlush) {
       // If a pendingFlush was scheduled but not yet processed, clear flag and process
-      if (this.pendingFlush && this.pending.size === 0) {
+      if (this.pendingFlush && !this.hasPending()) {
         // nothing queued - clear and continue
         this.pendingFlush = false;
         break;
@@ -431,7 +434,7 @@ export class PathNotifier {
    * Check if there are pending notifications
    */
   hasPending(): boolean {
-    return this.pending.size > 0;
+    return this.pending.size > 0 || this.pendingBeforeMembership.length > 0;
   }
 
   /**
@@ -454,6 +457,19 @@ export class PathNotifier {
   }
 
   private enqueuePending(entry: PendingEntry): void {
+    if (plainBranchMembershipChange(entry.meta)) {
+      // A presence transition is a chronological barrier across paths. Drain
+      // the current coalescing segment into the queue without delivering it:
+      // grouping branch membership separately from descendant values would
+      // move a value past a later removal and resurrect an absent member.
+      for (const slot of this.pending.values()) {
+        this.pendingBeforeMembership.push(slot);
+      }
+      this.pendingBeforeMembership.push(entry);
+      this.pending.clear();
+      return;
+    }
+
     const path = entry.path;
     const existing = this.pending.get(path);
     if (!existing) {
@@ -517,6 +533,16 @@ export class PathNotifier {
   }
 
   private hasSameSemanticIdentity(left: PendingEntry, right: PendingEntry): boolean {
+    // Membership payloads describe individual presence transitions, not scalar
+    // before/after values. Keep their symbol metadata and retained branch owner
+    // on each frame, including bare branches sharing a diagnostic path.
+    if (
+      plainBranchMembershipChange(left.meta) ||
+      plainBranchMembershipChange(right.meta)
+    ) {
+      return false;
+    }
+
     if (this.crossesStructuralBoundary(left, right)) {
       return false;
     }
@@ -534,7 +560,11 @@ export class PathNotifier {
     // too. Entries from emitters that do not supply one both carry `undefined`
     // and compare exactly as they did before — the fix cannot make a
     // single-tree case newly distinct.
-    if (left.ownerId !== right.ownerId) {
+    // Entity and compensation writers carry ownership in metadata instead.
+    if (
+      (left.ownerId ?? left.meta?.ownerId) !==
+      (right.ownerId ?? right.meta?.ownerId)
+    ) {
       return false;
     }
 
@@ -586,7 +616,15 @@ export class PathNotifier {
   }
 
   private crossesCausalModeBoundary(left: PendingEntry, right: PendingEntry): boolean {
-    return getWriteParticipation(left.meta) !== getWriteParticipation(right.meta);
+    // Equal participation does not make distinct causes interchangeable.
+    // Keep each compensation/restoration/external transition intact: merging
+    // their metadata either loses attribution or invents a causal claim.
+    return (
+      getWriteParticipation(left.meta) !== getWriteParticipation(right.meta) ||
+      left.origin !== right.origin ||
+      left.meta?.transactionId !== right.meta?.transactionId ||
+      left.meta?.transactionOwner !== right.meta?.transactionOwner
+    );
   }
 
   private coalesceEntry(target: PendingEntry, next: PendingEntry): void {
@@ -650,6 +688,7 @@ export class PathNotifier {
   clear(): void {
     this.subscribers.clear();
     this.pending.clear();
+    this.pendingBeforeMembership = [];
     // Note: do NOT clear flush callbacks here. Enhancers may have
     // registered onFlush listeners that should survive a runtime reset
     // (e.g., resetPathNotifier) to avoid losing subscriptions silently.

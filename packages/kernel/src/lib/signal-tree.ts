@@ -57,6 +57,7 @@ import {
   type OrdinaryStateMaterializer,
 } from './internals/materialize-markers';
 import { installDormantObservation } from './internals/observation-substrate';
+import { capturePlainBranchMembership } from './internals/plain-branch-membership';
 import { terminateOwnerInvalidation } from './internals/owner-invalidation-port';
 import { defineRootTree } from './internals/root-source';
 import {
@@ -926,6 +927,13 @@ function recursiveUpdate(
     ? (target as unknown as Record<string, unknown>)
     : (target as Record<string, unknown>);
 
+  const publishMembership = reconcileMembership
+    ? capturePlainBranchMembership(
+        (targetObj as Record<symbol, object>)[NODE_ACCESSOR_PEER] ?? targetObj,
+        updates
+      )
+    : undefined;
+
   for (const [key, rawValue] of Object.entries(
     updates as Record<string, unknown>
   )) {
@@ -1014,7 +1022,10 @@ function recursiveUpdate(
       // location for the value without enrolling the write path as a reactive
       // consumer.
       const current = readWritableCell(sig);
-      if (current === value) {
+      // A dormant leaf reads undefined even when its retained storage differs.
+      // An explicitly supplied value must reach that storage before membership
+      // is reactivated; otherwise supplying undefined resurrects the old value.
+      if (current === value && !isDormantMember(sig)) {
         // Dev-mode footgun guard: a merge write whose value is reference-
         // identical to the current value is a no-op. For objects/arrays this
         // almost always means the caller mutated the value in place and re-set
@@ -1144,6 +1155,7 @@ function recursiveUpdate(
   // already depend on are what carries it — no new reactive state exists, and
   // no first-transition problem, because that dependency edge was established on
   // each leaf's FIRST computation.
+  publishMembership?.();
   if (membershipChanged.length > 0) {
     republishMembers(targetObj, membershipChanged);
   }

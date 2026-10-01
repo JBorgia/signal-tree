@@ -82,6 +82,12 @@ import { join } from 'node:path';
  * (whole subject), `'name'` (a field) — and today two of them collide at one
  * call site.
  *
+ * September 30 correction: the disagreement above describes the historical
+ * implementation. The structured-field repair now distinguishes [] (whole
+ * entity) from an absent address, and its remaining descriptor fallback checks
+ * the whole-entity case before rejecting a missing path. The assertion below
+ * was intentionally red on this change and has been updated with that finding.
+ *
  * ## This file is an inventory, not behaviour
  *
  * The assertions below pin the CONSUMER SHAPE so the inventory cannot silently
@@ -111,26 +117,23 @@ const ADAPTER = readFileSync(
 );
 
 describe('DESCRIPTOR-ROLE-0: the consumer shape', () => {
-  it('⚠️ `` \'\' `` is STILL falsy at one consumer and whole-subject at another', () => {
-    // ⚠️ ADDRESS-REPAIR-1 did NOT remove this wart, and that is deliberate.
-    //
-    // The DERIVATION is now explicit — `deriveSubjectAddress` returns
-    // `undefined | {kind:'whole'} | {kind:'field'}` — but the STORAGE encoding
-    // is still `string | undefined` with `''` meaning whole, converted at one
-    // place (`encodeSubjectAddress`). So the disagreement below survives in the
-    // consumers.
-    //
-    // It is safe now only because the derivation no longer produces `''` for
-    // anything meaning "no address": the owner-only ping returns `undefined`
-    // before `subjectId` is ever consulted. Migrating the stored shape is a
-    // representation change, not a correctness fix, and belongs in its own step.
-    expect(ADAPTER).toMatch(/if \(!fieldPathFromRow\) \{\s*return false;/);
-    expect(ADAPTER).toContain("if (fieldPathFromRow === '')");
-
-    // The derivation-side representation that replaced the string heuristics.
-    expect(ADAPTER).toContain("type SubjectAddress");
-    expect(ADAPTER).toContain("function deriveSubjectAddress(");
-    expect(ADAPTER).toContain("function encodeSubjectAddress(");
+  it('distinguishes a whole entity from an absent field address', () => {
+    // September 30 correction to the historical finding above: exact field
+    // segments now take precedence. [] denotes the whole entity; undefined
+    // permits the legacy descriptor fallback. The old assertion deliberately
+    // pinned the disagreement so this inventory would be revisited when fixed.
+    // Executable behavior is pinned separately in typed-entity-address.spec.ts.
+    const resolver = ADAPTER.slice(
+      ADAPTER.indexOf('function resolveCurrentSubjectTarget'),
+      ADAPTER.indexOf('function resolveNotifyPath')
+    );
+    expect(resolver).toContain('if (effect.fieldSegments !== undefined)');
+    expect(resolver).toContain('if (segments.length === 0) return rowNode');
+    const whole = resolver.indexOf("if (fieldPathFromRow === '')");
+    const absent = resolver.indexOf('if (!fieldPathFromRow)');
+    expect(whole).toBeGreaterThanOrEqual(0);
+    expect(absent).toBeGreaterThan(whole);
+    expect(resolver.slice(absent)).toContain('return undefined');
   });
 
   it('subject field resolution is keyed by subjectId, never by path shape', () => {

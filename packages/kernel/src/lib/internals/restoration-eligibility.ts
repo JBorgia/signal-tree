@@ -1,3 +1,4 @@
+import { withDeferredWriteScope } from './deferred-write-scope';
 /**
  * Restoration eligibility designation — the mechanism behind `undoable()`.
  *
@@ -45,7 +46,9 @@ export type DesignatedWriteMeta = WriteMetadata & {
 
 /** @internal Read the designation off a delivered metadata object. */
 export function isMetaDesignated(meta: WriteMetadata | undefined): boolean {
-  return (meta as DesignatedWriteMeta | undefined)?.restorationDesignated === true;
+  return (
+    (meta as DesignatedWriteMeta | undefined)?.restorationDesignated === true
+  );
 }
 
 /** @internal Stamp the ambient designation onto a metadata object. */
@@ -58,10 +61,10 @@ export function markMetaDesignated(
   // MUT-2, which asserts that shape exactly.
   const stamped: DesignatedWriteMeta = { restorationDesignated: true };
   if (meta) {
-    for (const [key, value] of Object.entries(meta)) {
-      if (value !== undefined) {
-        (stamped as Record<string, unknown>)[key] = value;
-      }
+    for (const key of Reflect.ownKeys(meta)) {
+      if (!Object.prototype.propertyIsEnumerable.call(meta, key)) continue;
+      const value: unknown = Reflect.get(meta, key);
+      if (value !== undefined) Reflect.set(stamped, key, value);
     }
   }
   return stamped;
@@ -97,11 +100,19 @@ export function isRestorationDesignated(): boolean {
  * this docblock is parsed as the tag itself.
  */
 export function withRestorationDesignation<R>(fn: () => R): R {
+  return withRestorationDesignationState(true, fn);
+}
+
+/** @internal Restore the classification captured by a queued write. */
+export function withRestorationDesignationState<R>(
+  value: boolean,
+  fn: () => R
+): R {
   const previous = designated;
-  designated = true;
+  designated = value;
   let result: R;
   try {
-    result = fn();
+    result = withDeferredWriteScope(fn);
   } finally {
     designated = previous;
   }
@@ -111,7 +122,10 @@ export function withRestorationDesignation<R>(fn: () => R): R {
   // (`isTraversableNode()`) is wrong here — a Promise is not a traversable
   // node. Optional chaining covers null/undefined, and dropping the clause also
   // catches a thenable function, which the narrower form missed.
-  if (typeof (result as { then?: unknown } | null | undefined)?.then === 'function') {
+  if (
+    typeof (result as { then?: unknown } | null | undefined)?.then ===
+    'function'
+  ) {
     throw new Error(
       'ST1033: a restoration designation scope must be synchronous. The ' +
         'designation is restored before the scope returns, so writes after an ' +

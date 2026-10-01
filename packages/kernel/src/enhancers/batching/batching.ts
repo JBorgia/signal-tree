@@ -1,14 +1,23 @@
+import {
+  getActiveWriteContext,
+  withWriteContext,
+} from '../../lib/write-context';
+import {
+  isRestorationDesignated,
+  withRestorationDesignationState,
+} from '../../lib/internals/restoration-eligibility';
+import {
+  deferredWriteScopeIdentity,
+  onWriteScopeClosing,
+  registerDeferredTreeWrites,
+} from '../../lib/internals/deferred-write-scope';
 import { visitTree } from '../../lib/internals/visit-tree';
 import {
   interceptLocationWrites,
   isWritableLocation,
 } from '../../lib/internals/location-runtime';
 
-import type {
-  ISignalTree,
-  Enhancer,
-  EnhancerMeta,
-} from '../../lib/types';
+import type { ISignalTree, Enhancer, EnhancerMeta } from '../../lib/types';
 import type { BatchingConfig, BatchingMethods } from './batching.types';
 import { ENHANCER_META } from '../../lib/types';
 import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
@@ -20,8 +29,8 @@ type ChangeDetectionAwareTree = {
 /**
  * Batching enhancer for SignalTree.
  *
- * KEY PRINCIPLE: Signal writes are ALWAYS synchronous.
- * Batching only affects change detection notification timing.
+ * Ordinary writes and batch() writes are synchronous. coalesce() explicitly
+ * defers replacement writes; semantic scopes drain their writes before closing.
  *
  * This aligns with the canonical location contract:
  * - location(x) updates the value immediately
@@ -78,8 +87,11 @@ export function batching(
     let inBatch = false;
     let inCoalesce = false;
 
-    // For coalesce: track pending writes by path
-    const coalescedUpdates = new Map<string, () => void>();
+    // Physical location identity remains lossless, including dotted keys.
+    const coalescedUpdates = new Map<
+      object,
+      { apply: () => void; release: () => void; scope: object | undefined }
+    >();
     const releaseWriteInterceptors: Array<() => void> = [];
 
     /**
@@ -126,8 +138,15 @@ export function batching(
       const updates = Array.from(coalescedUpdates.values());
       coalescedUpdates.clear();
 
-      for (const update of updates) update();
+      // All entries have left the queue, including those a failed application
+      // prevents us from reaching. None may remain enrolled in the outer scope.
+      for (const update of updates) update.release();
+      for (const update of updates) update.apply();
     };
+    const releaseTreeDrain = registerDeferredTreeWrites(
+      tree.$ as object,
+      flushCoalescedUpdates
+    );
 
     // ========================================
     // INTERCEPT LOCATION WRITES TO TRACK NOTIFICATIONS
@@ -141,18 +160,44 @@ export function batching(
     const interceptWrites = (rootNode: Record<string, unknown>): void => {
       visitTree(
         rootNode,
-        (node, path) => {
+        (node) => {
           if (!isWritableLocation(node)) return true;
           releaseWriteInterceptors.push(
             interceptLocationWrites(node, (operation, proceed) => {
               if (operation.intent === 'replace' && inCoalesce) {
-                coalescedUpdates.set(path, proceed);
+                const meta = { ...getActiveWriteContext() };
+                const designated = isRestorationDesignated();
+                const scope = deferredWriteScopeIdentity();
+                const previous = coalescedUpdates.get(node);
+                if (previous) {
+                  coalescedUpdates.delete(node);
+                  previous.release();
+                  // Another semantic unit cannot erase a queued predecessor:
+                  // it needs that value as its actual starting state.
+                  if (previous.scope !== scope) previous.apply();
+                }
+                const pending = {
+                  scope,
+                  apply: () =>
+                    withWriteContext(meta, () =>
+                      withRestorationDesignationState(designated, proceed)
+                    ),
+                  release: () => undefined as void,
+                };
+                coalescedUpdates.set(node, pending);
+                pending.release = onWriteScopeClosing(() => {
+                  if (coalescedUpdates.get(node) !== pending) return;
+                  coalescedUpdates.delete(node);
+                  pending.release();
+                  pending.apply();
+                });
               } else {
                 if (inCoalesce) {
-                  const pendingReplace = coalescedUpdates.get(path);
+                  const pendingReplace = coalescedUpdates.get(node);
                   if (pendingReplace) {
-                    coalescedUpdates.delete(path);
-                    pendingReplace();
+                    coalescedUpdates.delete(node);
+                    pendingReplace.release();
+                    pendingReplace.apply();
                   }
                 }
                 proceed();
@@ -235,7 +280,10 @@ export function batching(
         for (const secondary of failures.slice(1)) {
           // Guarded: a throwing console must not replace the primary failure.
           try {
-            console.error('[SignalTree] Secondary error in coalesce():', secondary);
+            console.error(
+              '[SignalTree] Secondary error in coalesce():',
+              secondary
+            );
           } catch {
             // The primary failure is still thrown below.
           }
@@ -260,10 +308,12 @@ export function batching(
     // Register cleanup for tree destruction
     if (typeof tree.registerCleanup === 'function') {
       tree.registerCleanup(() => {
+        releaseTreeDrain();
         if (notificationTimeoutId !== undefined) {
           clearTimeout(notificationTimeoutId);
           notificationTimeoutId = undefined;
         }
+        for (const pending of coalescedUpdates.values()) pending.release();
         coalescedUpdates.clear();
         for (const release of releaseWriteInterceptors) release();
         releaseWriteInterceptors.length = 0;

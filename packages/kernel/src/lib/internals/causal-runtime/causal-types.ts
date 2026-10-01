@@ -1,3 +1,4 @@
+import type { PlainBranchMemberPresence } from '../plain-branch-membership';
 import type { PositionId, StructuralEffect } from '../../types';
 
 export type { PositionId };
@@ -17,6 +18,10 @@ export interface CausalEffect {
   readonly before: unknown;
   readonly after: unknown;
   readonly subjectId?: unknown;
+  /** Exact property keys relative to the entity lifetime; [] addresses the row.
+   * Display paths and entity keys are never parsed to produce this coordinate. */
+  readonly fieldSegments?: readonly string[];
+  readonly plainBranchMembership?: PlainBranchMemberPresence;
   /**
    * Captured realization address — REQUIRED, because every live producer sets
    * it on every variant.
@@ -63,6 +68,9 @@ export interface ReversalEffect {
   readonly before: unknown;
   readonly after: unknown;
   readonly subjectId?: unknown;
+  /** Captured entity-relative property keys, preserved through reversal. */
+  readonly fieldSegments?: readonly string[];
+  readonly plainBranchMembership?: PlainBranchMemberPresence;
   /**
    * Captured realization address.
    *
@@ -110,8 +118,7 @@ export type ReversalRefusal =
     }
   | { readonly kind: 'not-found' };
 
-export type ReversalResult<
-  TRefusal extends ReversalRefusal = ReversalRefusal,
-> =
-  | { readonly ok: true; readonly turnId: TurnId }
-  | { readonly ok: false; readonly refusal: TRefusal };
+export type ReversalResult<TRefusal extends ReversalRefusal = ReversalRefusal> =
+
+    | { readonly ok: true; readonly turnId: TurnId }
+    | { readonly ok: false; readonly refusal: TRefusal };

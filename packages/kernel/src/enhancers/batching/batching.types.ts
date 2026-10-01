@@ -1,8 +1,6 @@
 import { batching } from './batching';
 
-import type {
-  Enhancer,
-} from '../../lib/types';
+import type { Enhancer } from '../../lib/types';
 
 /**
  * `batching()` returns the NEUTRAL enhancer contract.
@@ -27,7 +25,6 @@ type _IsNeutral = BatchingEnhancer extends Enhancer<BatchingMethods>
 const _neutralTest: _IsNeutral = true;
 
 export {};
-
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MOVED HERE IN 15.0 — TYPE-BARREL-CONVERGENCE-0.
@@ -76,8 +73,8 @@ export interface BatchingMethods {
    *
    * @example
    * tree.batch(() => {
-  *   tree.$.a(1);  // Value updates immediately
-  *   tree.$.b(2);  // Value updates immediately
+   *   tree.$.a(1);  // Value updates immediately
+   *   tree.$.b(2);  // Value updates immediately
    *   console.log(tree.$.a()); // Returns 1 ✅
    * });
    * // Single CD notification after batch completes
@@ -105,21 +102,27 @@ export interface BatchingMethods {
    * defers only change-detection notification; `coalesce()` defers the WRITE
    * itself and applies the last value per path on exit.
    *
+   * Semantic scopes are an additional boundary: writes inside `transaction()`,
+   * `external()` or `undoable()` drain before that inner scope returns. Their
+   * classification and settlement authority cannot outlive the scope. Thus a
+   * read after such an inner scope may see its writes before outer coalesce ends.
+   * This does not create a separate causal turn or a cross-tree transaction.
+   *
    * So `coalesce()` is wrong for any callback that reads back what it wrote, and
    * `batch()` is wrong when you specifically want intermediate values discarded.
    *
-  * ⚠️ An updater passed to a location inside `coalesce()` is NOT coalesced,
-  * deliberately. An
+   * ⚠️ An updater passed to a location inside `coalesce()` is NOT coalesced,
+   * deliberately. An
    * updater is a read-modify-write, so keeping only the last of three `+1`s would
    * mean `+1`. Updaters apply immediately, after draining any pending coalesced
-  * replacement on the same path.
+   * replacement on the same path.
    * Use for high-frequency updates (typing, dragging, etc.)
    *
    * @example
    * tree.coalesce(() => {
-  *   tree.$.query('h');
-  *   tree.$.query('he');
-  *   tree.$.query('hel');
+   *   tree.$.query('h');
+   *   tree.$.query('he');
+   *   tree.$.query('hel');
    * });
    * // Only 'hel' is written to the signal
    */
