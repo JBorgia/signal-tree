@@ -58,6 +58,14 @@ import type {
 } from './internals/causal-runtime/target-transition';
 import { appendAll } from './internals/utilities/append-all';
 
+/**
+ * The port plus an optional observer probe. A port that cannot answer is
+ * treated as observed — see `pathObserved()`.
+ */
+export type EntityObservationPort = PathObservationPort & {
+  hasObservers?(): boolean;
+};
+
 // Angular's global dev-mode flag (defined by the Angular CLI; undefined in
 // plain test/node contexts, treated as dev there).
 declare const ngDevMode: boolean | undefined;
@@ -288,6 +296,8 @@ const DORMANT_MEMBERSHIP: Pick<EntityMembershipInventory, 'observed' | 'begin'> 
   observed: () => false,
   begin: () => DORMANT_MEMBERSHIP_UNIT,
 };
+/** Neighbours an unobserved removal does not need to look up. */
+const NO_NEIGHBORS: { beforeSubject?: number; afterSubject?: number } = {};
 
 
 /**
@@ -318,7 +328,7 @@ export function createEntitySignal<
   K extends string | number = string
 >(
   config: EntityConfig<E, K>,
-  pathNotifier: PathObservationPort,
+  pathNotifier: EntityObservationPort,
   basePath: string,
   options?: {
     physicalCommitClock?: PhysicalCommitClock;
@@ -866,6 +876,29 @@ export function createEntitySignal<
     const active = getActiveWriteContext();
     if (ownerId === undefined) return active;
     return { ...(active ?? {}), ownerId };
+  }
+
+  /**
+   * Whether anything can receive this collection's notifications.
+   *
+   * Asked of the INJECTED port, once per operation, before any payload is
+   * built: a structural effect deep-clones its row, its meta spreads the
+   * ambient context, and in a plain tree nobody receives either — that was
+   * ~68% of a 50k-row `setAll`. A port that cannot answer is observed, so a
+   * bare `{ notify }` keeps every publication.
+   *
+   * Same semantics as the scalar route (`emitOwnedMutation`): an observer
+   * attached between a write and its flush does not receive that write.
+   */
+  function pathObserved(): boolean {
+    return pathNotifier.hasObservers?.() ?? true;
+  }
+
+  function effectMeta(
+    base: WriteMetadata | undefined,
+    structuralEffect: PendingStructuralEffect
+  ): WriteMetadata {
+    return { ...(base ?? {}), structuralEffect };
   }
 
   function getPositionIds(): number[] | undefined {
@@ -1656,7 +1689,7 @@ export function createEntitySignal<
   function addOneWithStructuralEffect(
     entity: E,
     opts?: AddOptions<E, K>
-  ): { id: K; structuralEffect: PendingAddStructuralEffect } {
+  ): { id: K; structuralEffect: PendingAddStructuralEffect | undefined } {
     const id = deriveId(entity, opts);
     const previousLastKey = structuralStore.lastActiveKey();
     recordProductionSubstrateStat('publicAddPreviousTailReads');
@@ -1682,30 +1715,35 @@ export function createEntitySignal<
     };
     frame.stageFreshSubject(freshSubject);
     commitAndProjectEntityMutationFrame(frame);
-    const structuralEffect: PendingAddStructuralEffect = {
-      kind: 'add',
-      subject: subjectId,
-      key: id,
-      value: deepClone(transformedEntity),
-      beforeSubject:
-        previousLastKey === undefined
-          ? undefined
-          : allocateSubjectId(previousLastKey),
-    };
+    const structuralEffect: PendingAddStructuralEffect | undefined =
+      pathObserved()
+        ? {
+            kind: 'add',
+            subject: subjectId,
+            key: id,
+            value: deepClone(transformedEntity),
+            beforeSubject:
+              previousLastKey === undefined
+                ? undefined
+                : allocateSubjectId(previousLastKey),
+          }
+        : undefined;
     lastSubjectIds = [subjectId];
     invalidateNodeCache(id);
     syncEntitySignal(id);
     updateSignals();
 
-    pathNotifier.notify(
-      `${basePath}.${String(id)}`,
-      transformedEntity,
-      undefined,
-      basePath,
-      [subjectId],
-      getPositionIdsForNotify(),
-      createStructuralEffectMeta(structuralEffect)
-    );
+    if (structuralEffect) {
+      pathNotifier.notify(
+        `${basePath}.${String(id)}`,
+        transformedEntity,
+        undefined,
+        basePath,
+        [subjectId],
+        getPositionIdsForNotify(),
+        createStructuralEffectMeta(structuralEffect)
+      );
+    }
 
     for (const handler of tapHandlers) {
       handler.onAdd?.(transformedEntity, id);
@@ -2505,13 +2543,15 @@ export function createEntitySignal<
       const previousFirstKey = structuralStore.firstActiveKey();
       const { id, structuralEffect } = addOneWithStructuralEffect(entity, opts);
       moveToFront([id]);
-      rewritePendingAddEffect(
-        structuralEffect,
-        undefined,
-        previousFirstKey === undefined
-          ? undefined
-          : allocateSubjectId(previousFirstKey)
-      );
+      if (structuralEffect) {
+        rewritePendingAddEffect(
+          structuralEffect,
+          undefined,
+          previousFirstKey === undefined
+            ? undefined
+            : allocateSubjectId(previousFirstKey)
+        );
+      }
       return id;
       });
     },
@@ -2542,7 +2582,8 @@ export function createEntitySignal<
     changeId(from: K, to: K): void {
       const planned = planRekey(from, to);
       planned.commit();
-      planned.publish();
+      // `publish` only notifies, so an unobserved rekey skips it whole.
+      if (pathObserved()) planned.publish();
     },
 
     addMany(entities: E[], opts?: AddManyOptions<E, K>): K[] {
@@ -2656,32 +2697,35 @@ export function createEntitySignal<
       lastSubjectIds = subjectIdsForWrite;
 
       // Notify PathNotifier for each processed entity
-      for (let i = 0; i < addedEntities.length; i++) {
-        const { id, entity } = addedEntities[i];
-        // Reproduced on 15.3.1: indexing the pre-add key list at
-        // `i + previous - added` anchored [x, y] after k4 and k5 instead of
-        // after k5 and x, so redo reinserted them out of order.
-        const beforeSubject =
-          i > 0
-            ? subjectIdsForWrite[i - 1]
-            : lastPreviousKey === undefined
-            ? undefined
-            : allocateSubjectId(lastPreviousKey);
-        pathNotifier.notify(
-          `${basePath}.${String(id)}`,
-          entity,
-          undefined,
-          basePath,
-          [subjectIdsForWrite[i]],
-          getPositionIdsForNotify(),
-          createStructuralEffectMeta({
-            kind: 'add',
-            subject: subjectIdsForWrite[i],
-            key: id,
-            value: deepClone(entity),
-            beforeSubject,
-          })
-        );
+      if (pathObserved()) {
+        const meta = ambientMeta();
+        for (let i = 0; i < addedEntities.length; i++) {
+          const { id, entity } = addedEntities[i];
+          // Reproduced on 15.3.1: indexing the pre-add key list at
+          // `i + previous - added` anchored [x, y] after k4 and k5 instead of
+          // after k5 and x, so redo reinserted them out of order.
+          const beforeSubject =
+            i > 0
+              ? subjectIdsForWrite[i - 1]
+              : lastPreviousKey === undefined
+              ? undefined
+              : allocateSubjectId(lastPreviousKey);
+          pathNotifier.notify(
+            `${basePath}.${String(id)}`,
+            entity,
+            undefined,
+            basePath,
+            [subjectIdsForWrite[i]],
+            getPositionIdsForNotify(),
+            effectMeta(meta, {
+              kind: 'add',
+              subject: subjectIdsForWrite[i],
+              key: id,
+              value: deepClone(entity),
+              beforeSubject,
+            })
+          );
+        }
       }
 
       // Run tap handlers for each processed entity
@@ -2736,15 +2780,17 @@ export function createEntitySignal<
       updateSignals();
 
       // Notify PathNotifier
-      pathNotifier.notify(
-        `${basePath}.${String(id)}`,
-        finalUpdated,
-        prev,
-        basePath,
-        lastSubjectIds,
-        getPositionIdsForNotify(),
-        ambientMeta()
-      );
+      if (pathObserved()) {
+        pathNotifier.notify(
+          `${basePath}.${String(id)}`,
+          finalUpdated,
+          prev,
+          basePath,
+          lastSubjectIds,
+          getPositionIdsForNotify(),
+          ambientMeta()
+        );
+      }
 
       // Run tap handlers
       for (const handler of tapHandlers) {
@@ -2807,7 +2853,7 @@ export function createEntitySignal<
       commitAndProjectEntityMutationFrame(frame);
       syncEntitySignal(id);
       updateSignals();
-      pathNotifier.notify(
+      if (pathObserved()) pathNotifier.notify(
         `${basePath}.${String(id)}`,
         next,
         prev,
@@ -2908,17 +2954,20 @@ export function createEntitySignal<
       const subjectIdsForWrite = rememberSubjectIds(ids);
 
       // Notify PathNotifier for each updated entity
-      for (let i = 0; i < updatedEntities.length; i++) {
-        const { id, prev, finalUpdated } = updatedEntities[i];
-        pathNotifier.notify(
-          `${basePath}.${String(id)}`,
-          finalUpdated,
-          prev,
-          basePath,
-          [subjectIdsForWrite[i]],
-          getPositionIdsForNotify(),
-          ambientMeta()
-        );
+      if (pathObserved()) {
+        const meta = ambientMeta();
+        for (let i = 0; i < updatedEntities.length; i++) {
+          const { id, prev, finalUpdated } = updatedEntities[i];
+          pathNotifier.notify(
+            `${basePath}.${String(id)}`,
+            finalUpdated,
+            prev,
+            basePath,
+            [subjectIdsForWrite[i]],
+            getPositionIdsForNotify(),
+            meta
+          );
+        }
       }
 
       // Run tap handlers for each updated entity
@@ -2954,7 +3003,10 @@ export function createEntitySignal<
       if (!entity) {
         throw new Error(`Entity with id ${String(id)} not found`);
       }
-      const { beforeSubject, afterSubject } = getNeighborSubjects(id);
+      const observed = pathObserved();
+      const { beforeSubject, afterSubject } = observed
+        ? getNeighborSubjects(id)
+        : NO_NEIGHBORS;
 
       // Run interceptors
       for (const handler of interceptHandlers) {
@@ -2978,14 +3030,16 @@ export function createEntitySignal<
 
       // Delete and update signals
       const subjectIdsForWrite = rememberSubjectIds([id]);
-      const structuralEffect: PendingStructuralEffect = {
-        kind: 'remove',
-        subject: subjectIdsForWrite[0],
-        key: id,
-        value: deepClone(entity),
-        beforeSubject,
-        afterSubject,
-      };
+      const structuralEffect: PendingStructuralEffect | undefined = observed
+        ? {
+            kind: 'remove',
+            subject: subjectIdsForWrite[0],
+            key: id,
+            value: deepClone(entity),
+            beforeSubject,
+            afterSubject,
+          }
+        : undefined;
       const currentState = resolveSubjectState(subjectIdsForWrite[0]);
       const tombstone: PreparedSubjectTombstone<K> = {
         kind: 'tombstone-subject',
@@ -3004,15 +3058,17 @@ export function createEntitySignal<
       updateSignals();
 
       // Notify PathNotifier
-      pathNotifier.notify(
-        `${basePath}.${String(id)}`,
-        undefined,
-        entity,
-        basePath,
-        subjectIdsForWrite,
-        getPositionIdsForNotify(),
-        createStructuralEffectMeta(structuralEffect)
-      );
+      if (structuralEffect) {
+        pathNotifier.notify(
+          `${basePath}.${String(id)}`,
+          undefined,
+          entity,
+          basePath,
+          subjectIdsForWrite,
+          getPositionIdsForNotify(),
+          createStructuralEffectMeta(structuralEffect)
+        );
+      }
 
       // Run tap handlers
       for (const handler of tapHandlers) {
@@ -3022,6 +3078,7 @@ export function createEntitySignal<
 
     removeMany(ids: K[]): void {
       if (ids.length === 0) return;
+      const observed = pathObserved();
 
       // Collect entities and run interceptors first
       const preparedRemovals: Array<{
@@ -3040,7 +3097,9 @@ export function createEntitySignal<
         if (subjectId === undefined) {
           throw new Error(`Entity with id ${String(id)} has no subject id`);
         }
-        const { beforeSubject, afterSubject } = getNeighborSubjects(id);
+        const { beforeSubject, afterSubject } = observed
+          ? getNeighborSubjects(id)
+          : NO_NEIGHBORS;
 
         // Run interceptors
         for (const handler of interceptHandlers) {
@@ -3104,24 +3163,28 @@ export function createEntitySignal<
       updateSignals();
 
       // Notify PathNotifier for each removed entity
-      for (let i = 0; i < preparedRemovals.length; i++) {
-        const { id, entity, beforeSubject, afterSubject } = preparedRemovals[i];
-        pathNotifier.notify(
-          `${basePath}.${String(id)}`,
-          undefined,
-          entity,
-          basePath,
-          [subjectIdsForWrite[i]],
-          getPositionIdsForNotify(),
-          createStructuralEffectMeta({
-            kind: 'remove',
-            subject: subjectIdsForWrite[i],
-            key: id,
-            value: deepClone(entity),
-            beforeSubject,
-            afterSubject,
-          })
-        );
+      if (observed) {
+        const meta = ambientMeta();
+        for (let i = 0; i < preparedRemovals.length; i++) {
+          const { id, entity, beforeSubject, afterSubject } =
+            preparedRemovals[i];
+          pathNotifier.notify(
+            `${basePath}.${String(id)}`,
+            undefined,
+            entity,
+            basePath,
+            [subjectIdsForWrite[i]],
+            getPositionIdsForNotify(),
+            effectMeta(meta, {
+              kind: 'remove',
+              subject: subjectIdsForWrite[i],
+              key: id,
+              value: deepClone(entity),
+              beforeSubject,
+              afterSubject,
+            })
+          );
+        }
       }
 
       // Run tap handlers for each removed entity
@@ -3264,30 +3327,32 @@ export function createEntitySignal<
         ...updatedSubjectIdsForWrite,
       ];
 
-      // Notify PathNotifier for added entities
-      for (let i = 0; i < addedEntities.length; i++) {
-        const { id, entity } = addedEntities[i];
-        pathNotifier.notify(
-          `${basePath}.${String(id)}`,
-          entity,
-          undefined,
-          basePath,
-          [addedSubjectIdsForWrite[i]],
-          getPositionIdsForNotify()
-        );
-      }
+      if (pathObserved()) {
+        // Notify PathNotifier for added entities
+        for (let i = 0; i < addedEntities.length; i++) {
+          const { id, entity } = addedEntities[i];
+          pathNotifier.notify(
+            `${basePath}.${String(id)}`,
+            entity,
+            undefined,
+            basePath,
+            [addedSubjectIdsForWrite[i]],
+            getPositionIdsForNotify()
+          );
+        }
 
-      // Notify PathNotifier for updated entities
-      for (let i = 0; i < updatedEntities.length; i++) {
-        const { id, prev, finalUpdated } = updatedEntities[i];
-        pathNotifier.notify(
-          `${basePath}.${String(id)}`,
-          finalUpdated,
-          prev,
-          basePath,
-          [updatedSubjectIdsForWrite[i]],
-          getPositionIdsForNotify()
-        );
+        // Notify PathNotifier for updated entities
+        for (let i = 0; i < updatedEntities.length; i++) {
+          const { id, prev, finalUpdated } = updatedEntities[i];
+          pathNotifier.notify(
+            `${basePath}.${String(id)}`,
+            finalUpdated,
+            prev,
+            basePath,
+            [updatedSubjectIdsForWrite[i]],
+            getPositionIdsForNotify()
+          );
+        }
       }
 
       // Run tap handlers for added entities
@@ -3325,6 +3390,7 @@ export function createEntitySignal<
       // The entity VALUES and the neighbour subjects have to be captured BEFORE
       // anything is tombstoned: a `remove` effect carries the value it removed
       // and where it sat, and after the tombstone neither is reachable.
+      const observed = pathObserved();
       const activeIds = structuralStore.activeKeysSnapshot();
       const activeSubjects = activeIds.map((id) => {
         const subjectId = resolveSubjectId(id);
@@ -3332,7 +3398,9 @@ export function createEntitySignal<
           throw new Error(`Entity with id ${String(id)} has no subject id`);
         }
         const entity = getProjectedEntity(id);
-        const { beforeSubject, afterSubject } = getNeighborSubjects(id);
+        const { beforeSubject, afterSubject } = observed
+          ? getNeighborSubjects(id)
+          : NO_NEIGHBORS;
         return { id, subjectId, entity, beforeSubject, afterSubject };
       });
 
@@ -3368,30 +3436,33 @@ export function createEntitySignal<
       lastSubjectIds = activeSubjects.map(({ subjectId }) => subjectId);
       updateSignals();
 
-      for (const {
-        id,
-        subjectId,
-        entity,
-        beforeSubject,
-        afterSubject,
-      } of activeSubjects) {
-        if (!entity) continue;
-        pathNotifier.notify(
-          `${basePath}.${String(id)}`,
-          undefined,
+      if (observed) {
+        const meta = ambientMeta();
+        for (const {
+          id,
+          subjectId,
           entity,
-          basePath,
-          [subjectId],
-          getPositionIdsForNotify(),
-          createStructuralEffectMeta({
-            kind: 'remove',
-            subject: subjectId,
-            key: id,
-            value: deepClone(entity),
-            beforeSubject,
-            afterSubject,
-          })
-        );
+          beforeSubject,
+          afterSubject,
+        } of activeSubjects) {
+          if (!entity) continue;
+          pathNotifier.notify(
+            `${basePath}.${String(id)}`,
+            undefined,
+            entity,
+            basePath,
+            [subjectId],
+            getPositionIdsForNotify(),
+            effectMeta(meta, {
+              kind: 'remove',
+              subject: subjectId,
+              key: id,
+              value: deepClone(entity),
+              beforeSubject,
+              afterSubject,
+            })
+          );
+        }
       }
 
       for (const { id, entity } of activeSubjects) {
@@ -3523,10 +3594,6 @@ export function createEntitySignal<
           return { id, entity };
         });
 
-      const finalIndexById = new Map(
-        stagedIncomingIds.map((id, index) => [id, index] as const)
-      );
-
       const membershipUnit = beginMembershipUnit();
       try {
       const freshSubjectIds = commitFreshSubjects(
@@ -3537,13 +3604,16 @@ export function createEntitySignal<
         freshSubjectIdsByKey.set(stagedAdds[index].id, freshSubjectIds[index]);
       }
 
+      // Everything from here to the notify loops that exists only to be
+      // published is built only when something can receive it.
+      const observed = pathObserved();
       // One index of the pre-state order, not a search per removed row: that
       // made replacing or clearing a collection O(n^2) (~2 s at 40k rows).
       const currentIndexById =
-        stagedRemovals.length > 0
+        observed && stagedRemovals.length > 0
           ? new Map(currentEntries.map(([entryId], index) => [entryId, index]))
           : undefined;
-      const stagedRemovalStructuralEffects = stagedRemovals.map(
+      const stagedRemovalStructuralEffects = !observed ? [] : stagedRemovals.map(
         ({ id, entity, subjectId }) => {
           const currentIndex = currentIndexById?.get(id) ?? -1;
           // Immediate pre-state neighbours, removed or surviving, exactly as
@@ -3653,10 +3723,13 @@ export function createEntitySignal<
       for (const { id } of stagedAdds) syncEntitySignal(id);
       for (const { id } of stagedUpdates) syncEntitySignal(id);
 
-      const stagedAddStructuralEffects = stagedAdds.map(
+      const finalIndexById = observed
+        ? new Map(stagedIncomingIds.map((id, index) => [id, index] as const))
+        : undefined;
+      const stagedAddStructuralEffects = !observed ? [] : stagedAdds.map(
         ({ id, entity }, index) => {
           const subjectId = addedSubjectIds[index];
-          const finalIndex = finalIndexById.get(id) ?? -1;
+          const finalIndex = finalIndexById?.get(id) ?? -1;
           let beforeSubject: number | undefined;
           let afterSubject: number | undefined;
 
@@ -3699,43 +3772,45 @@ export function createEntitySignal<
 
       updateSignals();
 
-      for (let index = 0; index < stagedRemovals.length; index += 1) {
-        const { id, entity, subjectId } = stagedRemovals[index];
-        const structuralEffect = stagedRemovalStructuralEffects[index];
-        pathNotifier.notify(
-          `${basePath}.${String(id)}`,
-          undefined,
-          entity,
-          basePath,
-          [subjectId],
-          getPositionIdsForNotify(),
-          createStructuralEffectMeta(structuralEffect)
-        );
-      }
+      if (observed) {
+        const meta = ambientMeta();
+        for (let index = 0; index < stagedRemovals.length; index += 1) {
+          const { id, entity, subjectId } = stagedRemovals[index];
+          pathNotifier.notify(
+            `${basePath}.${String(id)}`,
+            undefined,
+            entity,
+            basePath,
+            [subjectId],
+            getPositionIdsForNotify(),
+            effectMeta(meta, stagedRemovalStructuralEffects[index])
+          );
+        }
 
-      for (const { id, prev, entity, subjectId } of stagedUpdates) {
-        pathNotifier.notify(
-          `${basePath}.${String(id)}`,
-          entity,
-          prev,
-          basePath,
-          subjectId === undefined ? undefined : [subjectId],
-          getPositionIdsForNotify(),
-          ambientMeta()
-        );
-      }
+        for (const { id, prev, entity, subjectId } of stagedUpdates) {
+          pathNotifier.notify(
+            `${basePath}.${String(id)}`,
+            entity,
+            prev,
+            basePath,
+            subjectId === undefined ? undefined : [subjectId],
+            getPositionIdsForNotify(),
+            meta
+          );
+        }
 
-      for (let i = 0; i < stagedAdds.length; i++) {
-        const { id, entity } = stagedAdds[i];
-        pathNotifier.notify(
-          `${basePath}.${String(id)}`,
-          entity,
-          undefined,
-          basePath,
-          [addedSubjectIds[i]],
-          getPositionIdsForNotify(),
-          createStructuralEffectMeta(stagedAddStructuralEffects[i])
-        );
+        for (let i = 0; i < stagedAdds.length; i++) {
+          const { id, entity } = stagedAdds[i];
+          pathNotifier.notify(
+            `${basePath}.${String(id)}`,
+            entity,
+            undefined,
+            basePath,
+            [addedSubjectIds[i]],
+            getPositionIdsForNotify(),
+            effectMeta(meta, stagedAddStructuralEffects[i])
+          );
+        }
       }
 
       for (const { id, entity } of stagedRemovals) {

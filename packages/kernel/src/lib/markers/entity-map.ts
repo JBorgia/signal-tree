@@ -1,8 +1,16 @@
 import { definePositionRegistry } from '../internals/position-registry';
 import type { CarrierKind, EntitySignalOf, ReadonlyOf } from '../types';
 
-import { createEntitySignal } from '../entity-signal';
+import {
+  createEntitySignal,
+  type EntityObservationPort,
+} from '../entity-signal';
 import { registerBuiltinMarkerProcessor } from '../internals/materialize-markers';
+import {
+  hasPathObservers,
+  pathObservation,
+  type PathObservationPort,
+} from '../internals/path-observation-port';
 import { isEntityMapMarker } from '../utils';
 
 // Build-time dev flag. Declared locally rather than inherited from
@@ -12,6 +20,27 @@ declare const ngDevMode: boolean | undefined;
 
 // Re-export isEntityMapMarker for convenience
 export { isEntityMapMarker };
+
+let globalObservablePort: EntityObservationPort | undefined;
+
+/**
+ * The shared port, answering whether anything observes it.
+ *
+ * A collection builds its notify payloads only when its port reports an
+ * observer. The shared facade forwards to whatever delivery runtime is
+ * installed NOW and has no probe of its own, so it is paired here with the
+ * matching one. Any other port is passed through; without a probe it counts
+ * as observed.
+ */
+function observablePort(notifier: PathObservationPort): EntityObservationPort {
+  const shared = pathObservation();
+  if (notifier !== shared) return notifier;
+  return (globalObservablePort ??= {
+    notify: (...args: Parameters<PathObservationPort['notify']>) =>
+      shared.notify(...args),
+    hasObservers: hasPathObservers,
+  });
+}
 
 /**
  * EntityMap Marker Factory
@@ -250,7 +279,7 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
       const hasMutationCapture = context.hasCapability('mutation-capture');
       const entitySignal = createEntitySignal(
         cfg as EntityConfig<Record<string, unknown>, string | number>,
-        notifier,
+        observablePort(notifier),
         path,
         {
           physicalCommitClock: context.physicalCommitClock,
