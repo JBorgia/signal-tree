@@ -46,12 +46,17 @@
  * redefine what counts as success.
  *
  * Usage: node --expose-gc tools/bench-entity-churn-retention.mjs [--width 1000]
- *          [--rounds 50] [--json]
+ *          [--rounds 50] [--json] [--retain N] [--neutralize-retention]
+ * Retention diagnostic: select the first N handles touched in generations
+ * 1..rounds-1 (after baseline, all retired at the endpoint). Acquisition and
+ * node reads are unchanged; neutralization omits only the strong references.
+ * N must fit those generations. This is a diagnostic control, not a gate.
  *        node --expose-gc tools/bench-entity-churn-retention.mjs --arm <name> ...
  */
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { getHeapStatistics, getHeapSpaceStatistics } from 'node:v8';
 import { quiesce, requireExposeGc, MB } from './lib/heap-quiescence.mjs';
 
 requireExposeGc('tools/bench-entity-churn-retention.mjs');
@@ -68,6 +73,50 @@ const arg = (name, dflt) => {
 };
 const WIDTH = Number(arg('--width', 1000));
 const ROUNDS = Number(arg('--rounds', 50));
+const RETAIN = Number(arg('--retain', 0));
+const NEUTRALIZE_RETENTION = process.argv.includes('--neutralize-retention');
+for (const [name, value, minimum] of [
+  ['width', WIDTH, 1],
+  ['rounds', ROUNDS, 1],
+  ['retain', RETAIN, 0],
+]) {
+  if (!Number.isSafeInteger(value) || value < minimum) {
+    throw new Error(`--${name} must be an integer >= ${minimum}`);
+  }
+}
+if (RETAIN > WIDTH * (ROUNDS - 1)) {
+  throw new Error('--retain exceeds post-baseline retired-generation capacity');
+}
+const GC_PROTOCOL = {
+  module: 'tools/lib/heap-quiescence.mjs',
+  exposedGc: true,
+  collectionsPerRound: 4,
+  boundary: 'setTimeout(0)',
+  epsilonBytes: 64 * 1024,
+  stableRounds: 3,
+  maxRounds: 40,
+};
+const MEASUREMENT_PROTOCOL = 'retired-node-diagnostics-v1';
+// V8 snapshots and counters add fixed diagnostic overhead relative to the old
+// heap-only tool. This is a new measurement protocol, not interchangeable data.
+const runtime = () => ({
+  node: process.version,
+  v8: process.versions.v8,
+  platform: process.platform,
+  arch: process.arch,
+  pid: process.pid,
+  heapLimitBytes: getHeapStatistics().heap_size_limit,
+  execArgv: process.execArgv,
+  nodeOptions: process.env.NODE_OPTIONS ?? null,
+  gcProtocol: GC_PROTOCOL,
+});
+const memorySnapshot = (settled) => ({
+  quiesceHeapUsed: settled.heapUsed,
+  quiesceRounds: settled.rounds,
+  memoryUsage: process.memoryUsage(),
+  heapStatistics: getHeapStatistics(),
+  heapSpaceStatistics: getHeapSpaceStatistics(),
+});
 
 const ARMS = {
   'no-history': {
@@ -84,7 +133,8 @@ const ARMS = {
   },
   'no-history-node-reads': {
     label: 'plain tree, byId(id)() every row every round',
-    detail: 'nothing can restore; every row node READ (creates its activation carrier)',
+    detail:
+      'nothing can restore; every row node READ (creates its activation carrier)',
     history: false,
     readNodes: true,
     readValues: true,
@@ -112,6 +162,12 @@ if (armFlag !== -1) {
     console.error(`unknown arm: ${name}`);
     process.exit(1);
   }
+  if (RETAIN > 0 && !a.readNodes) {
+    throw new Error(
+      '--retain requires an arm that already acquires byId handles'
+    );
+  }
+  const runtimeInfo = runtime();
   const { signalTree, entityMap, restoration } = await import(CORE);
 
   // v15: declared, so the no-history arm no longer carries the causal-runtime
@@ -127,28 +183,64 @@ if (armFlag !== -1) {
     return d;
   };
 
+  const retainedNodes = [];
+  let selectedHandles = 0;
+  let byIdCalls = 0;
+  let nodeReads = 0;
+  let firstSelectedGeneration;
+  let lastSelectedGeneration;
   tree.$.rows.setAll(generation(0));
-  const touch = (id) => {
+  const touch = (id, g) => {
     const node = tree.$.rows.byId(id);
-    if (a.readValues) void node?.();
+    byIdCalls++;
+    if (!node) throw new Error(`Missing live handle: ${id}`);
+    if (a.readValues) {
+      void node();
+      nodeReads++;
+    }
+    if (g > 0 && g < ROUNDS && selectedHandles < RETAIN) {
+      selectedHandles++;
+      firstSelectedGeneration ??= g;
+      lastSelectedGeneration = g;
+      if (!NEUTRALIZE_RETENTION) retainedNodes.push(node);
+    }
   };
-  if (a.readNodes) for (let i = 0; i < WIDTH; i++) touch(`g0-${i}`);
+  if (a.readNodes) for (let i = 0; i < WIDTH; i++) touch(`g0-${i}`, 0);
 
   // Baseline AFTER the first generation, so the figure is growth per RETIRED
   // subject and excludes the live collection entirely. Baselining before the
   // first setAll would fold the live rows in and overstate it.
-  const before = (await quiesce({ label: `${name} (baseline)` })).heapUsed;
+  const baseline = await quiesce({ label: `${name} (baseline)` });
+  const before = baseline.heapUsed;
+  const beforeMemory = memorySnapshot(baseline);
 
   for (let g = 1; g <= ROUNDS; g++) {
     tree.$.rows.setAll(generation(g));
-    if (a.readNodes) for (let i = 0; i < WIDTH; i++) touch(`g${g}-${i}`);
+    if (a.readNodes) for (let i = 0; i < WIDTH; i++) touch(`g${g}-${i}`, g);
     // A turn per round: the notifier flushes on a microtask and history records
     // on a flush, so rounds without one coalesce and the arm measures fewer
     // logical generations than it claims to.
     await new Promise((r) => setTimeout(r, 0));
   }
 
-  const after = (await quiesce({ label: `${name} (after churn)` })).heapUsed;
+  const endpoint = await quiesce({ label: `${name} (after churn)` });
+  const after = endpoint.heapUsed;
+  const afterMemory = memorySnapshot(endpoint);
+  // Read the strong roots AFTER the endpoint so they remain observable across GC.
+  const expectedHeld = NEUTRALIZE_RETENTION ? 0 : RETAIN;
+  const expectedTouches = a.readNodes ? WIDTH * (ROUNDS + 1) : 0;
+  const uniqueHeld = new Set(retainedNodes).size;
+  if (
+    selectedHandles !== RETAIN ||
+    retainedNodes.length !== expectedHeld ||
+    uniqueHeld !== expectedHeld ||
+    byIdCalls !== expectedTouches ||
+    nodeReads !== (a.readValues ? expectedTouches : 0) ||
+    (selectedHandles > 0 &&
+      !(firstSelectedGeneration > 0 && lastSelectedGeneration < ROUNDS))
+  ) {
+    throw new Error('Retention/touch count postcondition failed');
+  }
 
   // POSTCONDITION. Live membership must be exactly what it was: the entire
   // claim is "constant live cardinality, growing heap", and an arm whose
@@ -158,10 +250,53 @@ if (armFlag !== -1) {
     console.error(`❌ live membership drifted: ${live}, expected ${WIDTH}`);
     process.exit(1);
   }
+  // All validation reads occur after BOTH memory snapshots, not in the workload.
+  const finalIds = tree.$.rows.ids();
+  const finalRows = tree.$.rows.all();
+  const expectedRows = generation(ROUNDS);
+  if (
+    JSON.stringify(finalIds) !==
+      JSON.stringify(expectedRows.map((row) => row.id)) ||
+    JSON.stringify(finalRows) !== JSON.stringify(expectedRows)
+  ) {
+    throw new Error('Final generation IDs/content postcondition failed');
+  }
+  let postconditionNodeReads = 0;
+  for (const node of retainedNodes) {
+    postconditionNodeReads++;
+    if (node() !== undefined)
+      throw new Error('Intentionally held handle is not retired');
+  }
   const retired = WIDTH * ROUNDS;
   console.log(
     JSON.stringify({
       arm: name,
+      status: 'ok',
+      measurementProtocol: MEASUREMENT_PROTOCOL,
+      resolvedKernelEntry: CORE,
+      protocolNote:
+        'V8 snapshots/counters add diagnostic fixed overhead; not the old heap-only instrument.',
+      runtime: runtimeInfo,
+      before: beforeMemory,
+      after: afterMemory,
+      retention: {
+        requested: RETAIN,
+        neutralized: NEUTRALIZE_RETENTION,
+        selection:
+          'first N touches in generations 1..rounds-1; all retired at endpoint',
+        selectedHandles,
+        heldHandles: retainedNodes.length,
+        uniqueHeldHandles: uniqueHeld,
+        firstSelectedGeneration: firstSelectedGeneration ?? null,
+        lastSelectedGeneration: lastSelectedGeneration ?? null,
+        liveGenerationHeld: 0,
+        byIdCalls,
+        nodeReads,
+        countsValidated: true,
+        postconditionNodeReads,
+        heldHandlesReadUndefined: true,
+        finalGenerationValidated: true,
+      },
       label: a.label,
       detail: a.detail,
       liveRows: WIDTH,
@@ -171,6 +306,7 @@ if (armFlag !== -1) {
       bytesPerRetiredSubject: Math.round((after - before) / retired),
     })
   );
+  tree.destroy();
   process.exit(0);
 }
 
@@ -189,6 +325,9 @@ for (const name of Object.keys(ARMS)) {
         String(WIDTH),
         '--rounds',
         String(ROUNDS),
+        '--retain',
+        String(RETAIN),
+        ...(NEUTRALIZE_RETENTION ? ['--neutralize-retention'] : []),
       ],
       {
         encoding: 'utf8',
