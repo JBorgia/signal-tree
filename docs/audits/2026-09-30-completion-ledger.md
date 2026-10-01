@@ -478,3 +478,27 @@ Both 15.x versions, same workload: per-row heap 294 B (14.1.3: 146 B, NgRx: 156 
 4.7x and refetch 1.9x slower than 14.1.3 at 50k rows; single edits ~3x 14.1.3; a kernel
 `WeakMap` table reaches ~280 KB under editor churn (bounded, no per-cycle growth after
 warm-up). No arm retains its store after teardown.
+
+### Candidate refetch regression — attributed and fixed (115791e1)
+
+Profiled refetch at 50k rows: the candidate spent ~7 ms more than 15.3.1 in `setAll`, in the
+survivor-order comparison added by this release's order-capture fix (two Sets and two filters
+over the collection), computed before checking for its only consumer
+(`mutationCaptureRuntime.publishCollectionOrder`). Gated on the consumer, the packed candidate's
+refetch matched 15.3.1 (10.5 vs 10.7 ms at 10k, 46.0 vs 48.0 ms at 50k; identical digests).
+Kernel suite 3156 tests pass; a mutant that disables the gate for consumers fails 20 of 36
+set-all-order-reversal tests. Not yet in a packed candidate.
+
+### v15 performance opportunities (measured, not implemented; owner decision)
+
+From `benchmarks/store-comparison/FINDINGS.md` (bench 08a9c75d):
+
+- `setAll` builds observation payloads (row deep-clone, metadata spreads, per-row notify) with
+  no consumer installed: ~68% of a plain 50k load. Gating them on a consumer cut load 62%.
+- every field write rebuilds `ids()` (linked-list walk + copy): v15's own write is O(n). A cached
+  key array with identity-stable `ids` made edits 10x faster at 50k, flat, faster than 14.1.3.
+- `all()` is four O(n) passes with two hash lookups per row; any summary over all rows pays it
+  per write (~2.6 ms at 50k).
+- With transactions() + restoration() installed but unused, bulk operations are 3.3–3.5x
+  slower and the route carries +37 KB gzip; ~70% of that load is confirmed-turn capture, which
+  the v15 undo model requires.
