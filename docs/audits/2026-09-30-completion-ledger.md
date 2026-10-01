@@ -422,5 +422,39 @@ smokes still address rows by display path and are being migrated.
   ceilings (≈10.4 vs 10.26 KB bare, ≈23.6 vs 22.6 KB entities). The remainder
   has not been proven unavoidable; it has been attributed to modules, not to
   necessity. Ceiling decision remains with the owner.
-- Studio: historical identity vs current location and the end-to-end export
-  redaction regression are in progress.
+- Bundle after the two remediations (public 3129e8fc plain-branch capture
+  behind the path-observation port; 172a8268 membership producer installed on
+  first observation), `tools/check-bundle-budget.mjs` exit 1 at 172a8268:
+  bare 10.37/10.26 KB prod, 12.49/12.45 KB dev; entities 23.92/22.6 KB prod,
+  26.57/25.25 KB dev. Still over. No correctness was removed to get there and
+  no ceiling was changed; the ceiling decision stays with the owner.
+- Studio identity vs current location (private 532d94b, 0d50996). A write
+  record keeps its kernel target (position, lifetime) adapter-side and is
+  located at read time, newest first, in one batched `stateLocationReader`
+  call; the panel takes the adapter's current address for each held record or
+  marks it unlocated, and never keeps a stale one. Saved sessions are never
+  re-located; legacy imports keep `address` absent (unknown, not joined by
+  label). Controls against the installed candidate: rekey follows the entity;
+  removal and same-key replacement give `null` for the old lifetime; later
+  evidence locates to the replacement; reopening a saved session keeps its
+  recorded addresses.
+- Export redaction, end to end through the controller's own exclusion and
+  save path (`export-redaction.spec.ts`): no excluded live value, checkpoint
+  value, recorded transaction or write value, membership key or note reaches
+  the file; public data does; withheld evidence is counted
+  (`evidenceRedaction`) and shown on reopen. Follow-up (private daa9aec):
+  everything strictly beneath an exclusion is withheld, names included, from
+  the structure, checkpoint structure paths, pins, the selection and
+  checkpoint markers; an entity-level exclusion is exported as its whole
+  collection. Red first (4 failed at 0d50996); three mutants killed.
+  Known limitation, pinned with `it.fails`: an exclusion naming a key inside
+  a record value exports that key (an address cannot tell a record key from a
+  schema name); workaround shown in the exclusion box. Owner disposition
+  needed: accept the deferral or require a node/value distinction in the
+  structure protocol.
+- Private lint was red since 8682e97 (a spec importing query source by
+  relative path); fixed in 47841c1, lint exit 0.
+- Private verification at daa9aec on candidate 6: query 51, adapter 365, app
+  522 + 1 expected fail, both typechecks, lint, `verify:private`, and
+  `build:preview` (initial panel 559,952 bytes), and the preview,
+  accessibility and topology smokes exit 0.
