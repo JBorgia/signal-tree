@@ -362,3 +362,38 @@ smokes still address rows by display path and are being migrated.
   longer reach a sibling outside the discovery sample (typed text is not an
   address). Undiscovered siblings remain reachable only through the paged
   sibling browser unless an explicit address-input syntax is designed.
+
+## Evidence location, local checkpoints and candidate 5
+
+- `stateLocationReader` (commit dd45a194) maps a confirmed effect's or observed
+  write's position, entity lifetime and `fieldSegments` to its current
+  structured location. Independent review (diff and contract only) confirmed
+  four defects, all fixed in 3a8451d2 with promoted cases that fail against
+  dd45a194: a lifetime lookup on a non-collection node invoked a leaf accessor
+  and WROTE application state; omitted optional members were still located; a
+  field the row no longer had was still located; result segments aliased within
+  one call. Documented scope: positions are tree-scoped (filter `observeWrites`
+  by `ownerId`); values inside a leaf locate to the leaf.
+- The `release-claims` gate diffs the last release tag against committed HEAD,
+  so it passed vacuously on the uncommitted delta; after the first commit it
+  required naming the new readers on the kernel README and CHANGELOG (done).
+- Public local commits on fix/v15-link-settlement-diagnostics: cf98697a
+  (kernel), 822369c3 (artifact tooling), 9cc17689 (15.4.0 docs/manifests),
+  58e3de45 (demo), dd45a194 and 3a8451d2 (location reader). Nothing pushed,
+  tagged or published.
+- Development candidate 5 (`/private/tmp/st-observation-candidate-5`) packed
+  from the clean commit 3a8451d2: installed four-reader fixture exit 0; both
+  artifact gates exit 0. Full kernel: 320 files, 3145 passed.
+- Bundle attribution against npm 15.3.1 (production gzip): bare +0.38 KB,
+  entities +1.82 KB. Making the membership producer injectable saves at most
+  0.33 KB (measured by stubbing it in a scratch build); the remainder is the
+  correctness fixes. Budget decision pending with the owner.
+- Private Studio, branch feat/studio-runtime-evidence-15.4 (8682e97, fb9fe9e,
+  6001306, 3ae6f52): evidence carries located/null/absent addresses; tree
+  activity, why, evidence cards, selected-event summary and Changes rows join
+  by address. On candidate 5: query 51, adapter 360, app 470, both typechecks,
+  build (initial panel 556,067 bytes) and the accessibility, preview and
+  topology smokes exit 0. verify-panel still targets views removed earlier.
+  Remaining label-based joins (event detail, circuit, value history,
+  investigation model, analytics, watchpoints, bookmarks, history relations)
+  are being migrated.
