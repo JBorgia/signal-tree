@@ -21,8 +21,14 @@ import {
 
 import { getWriteParticipation } from './write-participation';
 
-import { installPathDeliveryRuntime } from './internals/path-observation-port';
-import { plainBranchMembershipChange } from './internals/plain-branch-membership';
+import {
+  installBranchMembershipCapture,
+  installPathDeliveryRuntime,
+} from './internals/path-observation-port';
+import {
+  capturePlainBranchMembership,
+  plainBranchMembershipChange,
+} from './internals/plain-branch-membership';
 import { reportContainedObserverError } from './internals/error-reporter';
 import type { TreeId } from './internals/position-registry';
 import type { WriteMetadata } from './mutation-types';
@@ -746,6 +752,7 @@ export function getPathNotifier(): PathNotifier {
   // delivery implementation tree-shake out of a subscriber-less bundle.
   // Re-installing the same singleton keeps ONE DELIVERY AUTHORITY.
   installPathDeliveryRuntime(globalPathNotifier);
+  installBranchMembershipCapture(capturePlainBranchMembership);
   return globalPathNotifier;
 }
 
