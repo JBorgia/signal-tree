@@ -295,6 +295,23 @@ const DORMANT_MEMBERSHIP: Pick<EntityMembershipInventory, 'observed' | 'begin'> 
  *
  * @internal
  */
+
+/**
+ * True when the subjects present at both endpoints appear in a different
+ * relative order. Subjects present at only one endpoint are ignored.
+ */
+function survivingOrderChanged(
+  before: readonly number[],
+  after: readonly number[]
+): boolean {
+  const inAfter = new Set(after);
+  const inBefore = new Set(before);
+  const survivingBefore = before.filter((subject) => inAfter.has(subject));
+  const survivingAfter = after.filter((subject) => inBefore.has(subject));
+  return survivingBefore.some(
+    (subject, index) => subject !== survivingAfter[index]
+  );
+}
 export function createEntitySignal<
   E extends Record<string, unknown>,
   K extends string | number = string
@@ -3580,21 +3597,17 @@ export function createEntitySignal<
       // [b,c,a]. The order delta carries both endpoints, including subjects
       // present at only one of them. Membership-only changes keep relying on
       // the structural effects.
-      const survivorsAfter = new Set(afterSubjects);
-      const survivorsBefore = new Set(beforeSubjects);
-      const survivingBeforeOrder = beforeSubjects.filter((subjectId) =>
-        survivorsAfter.has(subjectId)
-      );
-      const survivingAfterOrder = afterSubjects.filter((subjectId) =>
-        survivorsBefore.has(subjectId)
-      );
+      //
+      // The comparison walks the whole collection twice, so it runs only when
+      // an order consumer is installed. Computed unconditionally, it made every
+      // plain-tree setAll pay for it: refetch +8% at 10k rows and +11% at 50k
+      // against 15.3.1 in benchmarks/store-comparison.
       if (
         positionId !== undefined &&
-        survivingBeforeOrder.some(
-          (subjectId, index) => subjectId !== survivingAfterOrder[index]
-        )
+        mutationCaptureRuntime?.publishCollectionOrder &&
+        survivingOrderChanged(beforeSubjects, afterSubjects)
       ) {
-        mutationCaptureRuntime?.publishCollectionOrder?.({
+        mutationCaptureRuntime.publishCollectionOrder({
           owner: positionId,
           ownerPath: basePath,
           beforeSubjects,
