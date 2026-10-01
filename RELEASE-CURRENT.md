@@ -23,19 +23,41 @@ It does not describe every branch or authorize publication.
 
 ## Current work and blockers
 
-1. Complete the current installed-artifact store comparison: ordinary and
-   enhanced arms, footer on/off, throttle sensitivity, memory and bundle sizes.
-   Preserve development/host-contention labels and first failures.
-2. Resolve the **entity bundle budget failure** by measured, behavior-preserving
-   changes or an independently justified owner decision. Ceilings are unchanged.
-   Scratch ablations are opportunities, not validated production fixes.
+1. Final experimental archives pass one five-round CPU4 comparison with all
+   correctness digests equal. At 50k rows, median per-round visible edit p95 is
+   11.28ms candidate, 14.25ms released and 14.18ms A/A; ranges separate for this
+   metric. Maximum candidate edit is still 22.88ms. Load/refetch/movement improve;
+   startup is not uniformly faster. Installed transactions/restoration still
+   cost roughly 13.9×/9.1×/8.7× plain bulk load/refetch/movement. Avoided
+   allocation is proven, but no material reduction of that installed-enhancer
+   overhead is established. Preserve that limitation and the controlled
+   workstation labels (launch Defender enterprise CPU 82.1% despite the earlier
+   idle sample); do not call this continuously quiet or promote working-tree
+   results to exact-RC evidence. A bounded diagnostic attributes most enhanced
+   cost to notification-time capture, descriptors and repeated field diffing;
+   the remaining pre-drain copy is only a small share. A broader capture
+   refactor remains open and must preserve whole-turn designation semantics.
+2. **Development entity ceiling approved October 1:** 25.50 KiB, measured
+   25.37 KiB; production remains 22.60 KiB, measured 22.54 KiB. Safe reductions
+   and diagnostic folding checks preceded the decision. Preserve the original
+   25.25 KiB failure; the focused budget check now passes under the approved
+   policy. This policy change is not a runtime optimization.
 3. **Complete:** owner-approved guidance consolidation. Historical bodies and
    semantic constraints preserved; branch-specific facts, links, skills, live
    examples and production demo builds checked. See the guidance audit for the
    preserved sandbox/native-build failures and successful host controls.
-4. Reconcile full private Studio acceptance, public observation coverage, demo
-   and consumer guidance against this candidate. Earlier handoffs are claims
-   to check, not proof that every item is complete.
+4. Private Studio's reviewed acceptance-tooling repairs are applied; 14 focused
+   tooling tests pass. Strict all-five packed consumers pass after correcting the shared declaration
+   graph and opaque-leaf/carrier admission. Acceptance also exposed a shipped
+   opaque-leaf replacement undo defect, now repaired and mutation-tested. Full
+   kernel is 3,277 passed plus seven expected failures, thirteen skips and one
+   TODO; all framework suites, clean packages and demo pass. Complete isolated private browser/native DevTools and packed-consumer
+   acceptance now pass on the final experimental archives (kernel SHA-256
+   `f29d0d3bcedbe2573879f2c064f54ec96260e1c8652742103659e10cfe3a68a9`).
+   The first default public registry is preserved as 69/71: development size
+   and a React reference-app runtime alias failure. The alias is now corrected;
+   all 26 reference tests and its production build pass. No package runtime
+   changed for that fix. The development-size policy was subsequently approved as recorded in item 2.
 5. After source/artifact changes stop, select an exact candidate and run the full
    release registry and release-only mutation proofs. Rebuild after mutations;
    check strict packed consumers, Angular AOT, demo/browser behavior and clean
@@ -54,6 +76,15 @@ commit. Do not stop for routine permission or open a new product phase by inerti
 Record exact exits, totals, artifact identity, skipped coverage and remaining
 blockers. Use external logs while a candidate is frozen.
 
+## v14 performance audit
+
+The owner requested a separate audit of transferable v15 optimizations while
+v14 remains a simpler store. See [the v14 transfer audit](docs/audits/2026-10-01-v14-performance-transfer.md).
+No v14 runtime changes or new semantic machinery are part of that audit.
+Local checkpoint `e189fe36` includes the audit and a durable exact-14.1.4
+clear-notification reproduction. Its failing clear and passing tap control were
+executed; optimization speedups remain unmeasured.
+
 ## Evidence and preserved obligations
 
 Human comprehension sessions remain unchecked; automated tests cannot close
@@ -62,8 +93,11 @@ cleanup, scalar construction-density investigation, restoration lifetime profili
 and additional transaction/staged-editing demo components retain their existing
 deferred or separately scheduled scope; this consolidation does not promote them
 all to release blockers. Solid memory characterization is explicitly absent.
-The old `OWNERSHIP-CENSUS-GATE-0` and `KERNEL-TYPESCRIPT-PEER-POLICY-0` statuses
-need reconciliation before being called current blockers. Earlier AI discoverability
+`KERNEL-TYPESCRIPT-PEER-POLICY-0` was implemented by the build-tool allowlist
+in `2dd94c1555`; current kernel lint passes. `OWNERSHIP-CENSUS-GATE-0` remains
+a historical unresolved obligation without a demonstrated closure. It is not
+registered in current release gates; that does not waive its ownership invariant
+or make its historical count a newly reproduced release failure. Earlier AI discoverability
 and causal-representation queues have recorded closures; do not resurrect them.
 
 - [October 1 takeover](docs/audits/2026-10-01-performance-takeover.md)
@@ -75,3 +109,69 @@ and causal-representation queues have recorded closures; do not resurrect them.
   by this routing change; reconcile them before claiming release completion.
 - [Contributor contracts](docs/contributor-contracts.md): current compatibility,
   framework ownership, product decisions and scoped architecture records.
+
+## October 1 continuation checkpoints
+
+Owner paused v14 implementation until v15 work is complete. No v14 source was
+changed. Existing v14 audit evidence remains separate.
+
+The following local checkpoints preserve the independently reviewed changes
+already exercised by the full kernel/framework, typing, lint, packed-consumer
+and private acceptance runs above; none is an exact-RC release verdict:
+
+- `03deb906`: projection and capture allocation reductions with positive,
+  lifecycle, promotion and retention controls.
+- `2892b650`: terminal replacement restoration/rollback repair and kernel/Vue
+  regressions; four targeted mutations were killed.
+- `5f6c68ca`: shared declaration graph and observer admission, strict all-five
+  packed consumers and declaration-documentation mutation repair.
+- `2051e605`: unused private structural-store implementation removed; integrity
+  checks remain in tests.
+- `14a06051`: production diagnostic folding and corrected advisory claims.
+- `7cfc864a`: React reference runtime alias; 26 tests and production build pass.
+
+Independent source review found no additional blocker in terminal restoration,
+tooling declaration identity, materialization eligibility, or the React alias.
+The owner approved the development-only entity ceiling at 25.50 KiB. The
+private Studio minimum-version decision remains pending; its manifests have not
+been changed.
+
+## Full working-tree verification, before the approved budget change
+
+At HEAD `7cfc864a` plus recorded working-tree changes, the release registry
+finished **84/86 passed, 2 failed, 0 known-red, exit 1**. The failures were the
+old development ceiling and historical benchmark source staging: a committed
+restoration dependency was not copied. An initial bounded staging repair
+exposed another missing transitive dependency; that red is preserved too.
+The benchmark produced no valid performance result. Repairing its committed
+dependency graph does not change its workload or required verdict.
+
+Logs: `/private/tmp/st-takeover-2026-10-01/resume-release-gates.log` and
+`repaired-gates.log`. These are development results, not a frozen candidate.
+
+The dependency staging repair now runs all six ownership arms (three samples
+each) and retains the required INCONCLUSIVE smoke verdict. A wrong-owner
+mutation fails on the ownership assertion; restoration is byte-identical.
+This repairs executable evidence, not the historical performance conclusion.
+The approved bundle ceiling also rejects its seeded oversized-artifact mutation
+(1/1 proven; zero unproven, vacuous, blind or errored).
+
+`4d3e066b` checkpoints unchanged-child capture: 49 focused tests, full workspace
+test/type/lint gates, source-construction probe and revert mutation passed.
+It does not close installed-enhancer bulk overhead.
+
+The approved budget and coherent benchmark staging are local checkpoints
+`ccac4ebd` and `d40aaa0f`. The updated demo production build first exited one
+inside the sandbox without a compiler diagnostic; the unchanged-source verbose
+host build exited zero. The cause of the sandbox exit was not established.
+Fresh production browser smoke: **146/146 passed, exit zero**. Logs are under
+`/private/tmp/st-takeover-2026-10-01/resume-demo-{build,build-host,smoke}.log`.
+These checks do not replace final post-mutation package and demo verification.
+
+`53834fda` checkpoints the reviewed consumer guidance and version-bound demo
+links. Six focused documentation checks pass (five registered checks in the
+first selection, then the correctly named `documented-examples` check); the
+first selection misspelled that name and did not execute it. Both logs are
+retained. The unrelated v14 audit edit remains outside these checkpoints.
+Next verification covers the complete registry and its release-only mutation
+proofs, followed by destruction/rebuild of generated artifacts.

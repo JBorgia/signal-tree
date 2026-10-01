@@ -4201,9 +4201,10 @@ and regressed bounded churn by about 65%. The retention provenance audit found
 no additional total-past-activity slope. `CAUSAL-REPRESENTATION-0` is closed;
 the remaining Phase 7 hold is `AI-SEMANTIC-DISCOVERABILITY-0`.
 
-#### `OWNERSHIP-CENSUS-GATE-0` — ACTIVE, SEPARATE PRE-GA GATE INFRASTRUCTURE
+#### `OWNERSHIP-CENSUS-GATE-0` — HISTORICAL OPEN FINDING; NOT REGISTERED IN CURRENT RELEASE GATES
 
-`node tools/check-kernel-ownership.mjs` currently stops in its census-family
+At the September 2 checkpoint (`2344eaa4c`),
+`node tools/check-kernel-ownership.mjs` stopped in its census-family
 mutation proof because 22 existing public-symbol rows have no ownership rows.
 This did not falsify `OBSERVED-BATCH-DIAGNOSTIC-RETENTION-0`: regenerated census
 and ledger evidence remove that deleted subject cleanly. Establish whether the
@@ -4213,15 +4214,28 @@ mutation-prove the result. Do not manufacture classifications merely to satisfy
 the mutation machinery, and do not mix this gate work with causal attribution
 or `KERNEL-TYPESCRIPT-PEER-POLICY-0`.
 
-#### `KERNEL-TYPESCRIPT-PEER-POLICY-0` — QUEUED, SEPARATE PACKAGE POLICY
+October 1 reconciliation: later census/ledger changes do not establish closure;
+no explicit closure or successful mutation-proof record was found. The checker
+is absent from current gate registration, package scripts and workflows. That
+means unregistered, not resolved or waived. Preserve the ownership invariant;
+establish current applicability instead of treating the old count as a new red.
 
-`pnpm nx lint kernel` is red because dependency-check asserts that the kernel
+#### `KERNEL-TYPESCRIPT-PEER-POLICY-0` — IMPLEMENTED: BUILD-TOOL ALLOWLIST (`2dd94c1555`)
+
+The original finding: `pnpm nx lint kernel` was red because dependency-check asserted that the kernel
 package should list TypeScript in `peerDependencies`. First determine whether a
 consumer actually requires a compatible TypeScript installation for the shipped
 runtime and declaration contract to function. If not, repair the dependency
 check policy or allowlist; `.d.ts` files alone do not create a runtime-neutral
 peer dependency. If yes, prove the consumer requirement before changing the
 published manifest. This row must not be mixed with causal attribution.
+
+October 1 reconciliation: `2dd94c1555` added TypeScript to the build-tool
+allowlist on September 3 without adding a published peer. Current kernel lint
+exits zero (`final-kernel-lint.log` in the October 1 audit evidence). The old
+queued status is superseded. Strict packed consumers still govern declaration
+compatibility; lint success does not prove those types compile.
+
 
 ### Sequence
 
