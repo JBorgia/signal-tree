@@ -319,9 +319,10 @@ confirm it or attempt rollback, with explicit reconciliation when rollback
 cannot safely complete.
 
 Use `transactions()` for the pending handle lifecycle. Supported rollback cases
-preserve unrelated activity, but overlapping work can make rollback refuse and
-v15 has known ordering and notification defects. Read
-[Transaction failures and current v15 limitations](transaction-failures-v15.md)
+preserve unrelated activity, but overlapping work can make rollback refuse.
+Version 15.3.1 had ordering and notification defects; see the
+[changelog](../../CHANGELOG.md) for subsequent repairs. Read
+[Transaction failure policy and the 15.3.1 failure inventory](transaction-failures-v15.md)
 before applying this recipe. Neither transaction failure nor rollback refusal
 proves that persistence stayed deferred.
 
@@ -391,11 +392,11 @@ For overlapping pending transactions, settle the **newest** open one first. Roll
 an older one back while a newer overlapping one is open refuses with
 `cause.kind === 'later-pending-dependency'`, because the newer transaction's
 before-image records what the field *held*, not who owns it. This does not fix
-the reentrant-ordering or pending-undo defects documented in the limitations
-guide.
+the reentrant-ordering or pending-undo defects documented for 15.3.1 in the
+limitations guide; consult the [changelog](../../CHANGELOG.md) for versioned repairs.
 
 If `transaction()` itself throws before returning a handle, there may be no
-pending object to recover with. In the unreleased 15.3.1 candidate, successful
+pending object to recover with. In 15.3.1, successful
 automatic rollback reverses recorded writes and discards deferred consequences;
 refused automatic rollback records surviving writes as committed, retains
 eligible undo history, releases consequences, and still throws. Do not blindly

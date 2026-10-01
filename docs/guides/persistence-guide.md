@@ -78,20 +78,20 @@ reconciliation).
 
 ## Transaction and durability limits
 
-Read [Transaction failures and current v15 limitations](transaction-failures-v15.md)
+Read [Transaction failure policy and the 15.3.1 failure inventory](transaction-failures-v15.md)
 before relying on settlement to gate storage. Explicit rollback refusal leaves
 state unchanged and the handle pending but releases consequences in existing
-v15. Automatic refusal before a handle returns in the unreleased 15.3.1
-candidate records surviving writes as committed, retains eligible undo history,
+v15. In 15.3.1, automatic refusal before a handle returns
+records surviving writes as committed, retains eligible undo history,
 releases consequences, and still throws. Successful automatic rollback reverses
 recorded writes and discards deferred consequences. Error does not guarantee
 undo or backend rejection; never blindly retry the whole operation.
 
-Link currently can miss restored rows, omitted branch keys, and same-tick
-notifications. During an asynchronous endpoint `set()`, pending writes can
-escape before settlement, `settled()` can resolve early after rejection, and
-disposal can leave a waiter blocked until that send settles. Direct framework
-effects writing storage have no transaction settlement gate. Applications must
+The [15.3.1 failure inventory](transaction-failures-v15.md#known-failures-in-published-1531)
+records missed restored rows, omitted branch keys, same-tick notifications and
+asynchronous Link settlement gaps in that version; it is not a 15.4.0 defect
+inventory. Check the [changelog](../../CHANGELOG.md) for versioned repairs.
+Direct framework effects writing storage have no transaction settlement gate. Applications must
 own reconciliation, idempotency, and durable acknowledgements; neither an error
 nor `settled()` is proof of the remote outcome. A recovery handle that keeps
 consequences pending until confirmation is a v16 target, not a v15 API.

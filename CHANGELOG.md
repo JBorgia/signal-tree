@@ -1,4 +1,4 @@
-## 15.4.0 (unreleased)
+## 15.4.0 (2026-10-01)
 
 **TL;DR** — **Minor. New read-only tooling readers; no application API
 change. Fixes several silent wrong-result undo/rollback cases reproduced on npm
@@ -6,7 +6,7 @@ change. Fixes several silent wrong-result undo/rollback cases reproduced on npm
 a subscriber throws as a reversal finishes. Take it if you use undo or
 transaction rollback with entity collections.**
 
-These changes are under verification and are not part of the published 15.3.1 artifact.
+These changes are introduced in 15.4.0 and are absent from the 15.3.1 artifact.
 
 - **Correctness fix: atomic terminal replacements.** Undo/redo and transaction
   rollback preserve `leaf(object)` as one location rather than interpreting its

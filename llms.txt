@@ -1,5 +1,9 @@
 # SignalTree
 
+This reference describes the 15.4.0 package version, with explicitly marked
+15.3.1 comparisons. Consult the [npm package page](https://www.npmjs.com/package/@signal-tree/kernel?activeTab=versions)
+for published versions.
+
 SignalTree keeps nested state, entity identity, transactions, undo, external
 updates and reactive publication consistent across frameworks. The v15 construction model is
 `signalTree(initialState, { derived, enhancers })`; state is read through
@@ -211,11 +215,11 @@ of the same model.
 ## Transaction failure guidance
 
 The failure behavior in this section describes published SignalTree 15.3.1.
-The additive 15.4.0 tooling APIs described below are unreleased. The release-tag link below
-is fixed to that version because `main` tracks v16. Future fixes must be checked
-against the installed version; source changes do not update an existing tarball.
+The release-tag link below is fixed to 15.3.1 to preserve that historical
+comparison; it is not a list of defects in 15.4.0. Check versioned changes against
+the installed version; source changes do not update an existing tarball.
 
-Read [Transaction failures and current v15 limitations](https://github.com/JBorgia/signal-tree/blob/v15.3.1/docs/guides/transaction-failures-v15.md)
+Read [Transaction failures and limitations in 15.3.1](https://github.com/JBorgia/signal-tree/blob/v15.3.1/docs/guides/transaction-failures-v15.md)
 before generating optimistic writes or persistence. Explicit `pending.rollback()`
 refusal leaves state unchanged and the handle pending, but releases consequences
 in existing v15. In 15.3.1, automatic refusal before a
@@ -229,8 +233,8 @@ rollback dependency. Recoverable pending refusal is a v16 target, not v15 API.
 15.3.1 containment covers deferred write subscribers and transaction turn
 listeners, not all framework effects. Vue watcher failures differ between
 development and production; an enclosing Solid `batch()` can defer errors until
-after a handle returns. The guide lists the remaining Link, branch-key,
-coalesce, pending undo, ordering, notification, and retention failures.
+after a handle returns. The guide lists the Link, branch-key, coalesce, pending undo, ordering,
+notification, and retention failures documented for 15.3.1.
 
 
 ## Collection identity and independent store instances
@@ -247,7 +251,7 @@ validate missing IDs at ingress rather than assigning a shared fallback. Numeric
 and string keys remain distinct. Do not depend on a development warning to reject
 invalid input. Version 15.3.1 does not warn for non-null duplicate incoming keys.
 
-The unreleased follow-up also checks `setAll()` staging after user callbacks.
+Version 15.4.0 checks `setAll()` staging after user callbacks.
 If an interceptor or ID selector changes collection membership, keys or order,
 the outer replacement refuses before applying its staged writes. The callback's
 already-completed writes remain. Field-only callback writes do not trigger this
@@ -255,9 +259,10 @@ structural refusal. Prefer interceptors that validate or transform input instead
 of changing the same collection's topology.
 
 In published 15.3.1, calling Link `settled()` immediately after a write can return
-before the newly queued send finishes. Do not use it as proof of backend durability
-or assume that one generic delay is a universal synchronization barrier. The local
-follow-up fix and its regression tests do not change the published 15.3.1 artifact.
+before the newly queued send finishes. Version 15.4.0 repairs this same-turn race:
+`settled()` waits for the send queued by the preceding write. It is still not proof
+of backend durability, and one generic delay is not a universal synchronization
+barrier. The repair does not change the published 15.3.1 artifact.
 
 ## Choosing ownership for editors and devices
 
@@ -280,7 +285,7 @@ Use one framework import root. Angular and Solid write `leaf.set(value)`, Vue
 writes `leaf.value = value`, and React/neutral write `leaf(value)`. The demo is
 Angular-specific evidence, not a cross-framework lifecycle proof.
 
-## Runtime observation (15.4.0, unreleased)
+## Runtime observation (15.4.0)
 
 Tooling can use `transactionLifecycleReader`, `restorationReader`,
 `entityMembershipReader`, and `linkStateReader` from
@@ -296,4 +301,4 @@ means local settlement, never server acceptance. Link queued jobs are reconcilia
 work, not a FIFO of application values. A tool recording these events owns its
 bounded retention and must show interruptions, omissions and unsupported sources.
 Unsubscribe on view teardown and destroy bounded-lifetime trees. See
-[Runtime observation](docs/guides/runtime-observation.md) for contracts and examples.
+[Runtime observation in 15.4.0](https://github.com/JBorgia/signal-tree/blob/v15.4.0/docs/guides/runtime-observation.md) for contracts and examples.
