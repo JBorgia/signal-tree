@@ -1,4 +1,5 @@
 import type { PositionId, ReversalEffect } from './causal-types';
+import { appendAll } from '../utilities/append-all';
 
 export type CollectionTargetSubject = {
   readonly subject: number;
@@ -130,6 +131,24 @@ export function requiresDeclarativeStructuralTarget(
   const structural = effects.filter(
     (effect) => effect.structural !== undefined
   );
+  // Occupying effects indexed by owner and key, not a scan per vacating effect:
+  // the pairwise search was O(n^2), ~1.7 s of an 8k-row replacement's undo.
+  // Map keys compare by SameValueZero, so each hit is re-checked with
+  // Object.is, the comparison this rule has always used (+0 and -0 differ).
+  const occupiedKeyOf = (effect: ReversalEffect): unknown =>
+    effect.structural === 'add' || effect.structural === 'rekey'
+      ? effect.after
+      : undefined;
+  const occupying = new Map<PositionId, Map<unknown, number[]>>();
+  structural.forEach((effect, index) => {
+    const key = occupiedKeyOf(effect);
+    if (key === undefined) return;
+    let byKey = occupying.get(effect.owner);
+    if (!byKey) occupying.set(effect.owner, (byKey = new Map()));
+    const indices = byKey.get(key);
+    if (indices) indices.push(index);
+    else byKey.set(key, [index]);
+  });
   const hasKeyHandoff = structural.some((vacating, vacatingIndex) => {
     const vacatedKey =
       vacating.structural === 'remove' || vacating.structural === 'rekey'
@@ -138,19 +157,14 @@ export function requiresDeclarativeStructuralTarget(
     if (vacatedKey === undefined) {
       return false;
     }
-    return structural.some((occupying, occupyingIndex) => {
-      if (
-        vacatingIndex === occupyingIndex ||
-        vacating.owner !== occupying.owner
-      ) {
-        return false;
-      }
-      const occupiedKey =
-        occupying.structural === 'add' || occupying.structural === 'rekey'
-          ? occupying.after
-          : undefined;
-      return occupiedKey !== undefined && Object.is(vacatedKey, occupiedKey);
-    });
+    const candidates = occupying.get(vacating.owner)?.get(vacatedKey);
+    return (
+      candidates?.some(
+        (occupyingIndex) =>
+          occupyingIndex !== vacatingIndex &&
+          Object.is(vacatedKey, occupiedKeyOf(structural[occupyingIndex]))
+      ) ?? false
+    );
   });
   if (hasKeyHandoff) {
     return true;
@@ -567,7 +581,7 @@ function deriveStructuralTargetOrder(
     });
     if (readyIndex < 0) {
       if (order.length === 0) {
-        order.push(...derivePendingAnchorOrder(pending));
+        appendAll(order, derivePendingAnchorOrder(pending));
         pending.length = 0;
         continue;
       }

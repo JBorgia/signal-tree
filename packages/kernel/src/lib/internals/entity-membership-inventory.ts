@@ -1,3 +1,5 @@
+import { appendAll } from './utilities/append-all';
+
 /** Source-owned membership facts. Keys are addresses, never read from row values. */
 export interface EntityMembership {
   readonly lifetimeId: number;
@@ -91,7 +93,7 @@ export function createEntityMembershipInventory(
       const finish = (unitChanges: readonly EntityMembershipChange[]) => {
         if (finished || closed) return;
         finished = true;
-        if (listeners.size) changes.push(...copyMembershipChanges(unitChanges));
+        if (listeners.size) appendAll(changes, copyMembershipChanges(unitChanges));
         if (--depth > 0) return;
         const committedChanges = changes;
         changes = [];

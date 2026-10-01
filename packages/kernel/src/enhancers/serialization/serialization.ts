@@ -74,6 +74,7 @@ import { ENHANCER_META } from '../../lib/types';
 import { link, type LinkEndpoint } from '../../lib/link';
 import { TYPE_MARKERS } from './constants';
 import type { StorageAdapter } from './storage-adapters';
+import { appendAll } from '../../lib/internals/utilities/append-all';
 
 /**
  * SignalTree Serialization Module
@@ -403,7 +404,7 @@ function detectCircularReferences(
         seen,
         paths
       );
-      circular.push(...childCircular);
+      appendAll(circular, childCircular);
     }
   } else {
     for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
@@ -414,7 +415,7 @@ function detectCircularReferences(
         seen,
         paths
       );
-      circular.push(...childCircular);
+      appendAll(circular, childCircular);
     }
   }
 

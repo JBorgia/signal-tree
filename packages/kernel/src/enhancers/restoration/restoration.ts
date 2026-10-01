@@ -107,6 +107,7 @@ import type {
 // `SignalTreeRollbackError` is no longer imported here: rollback errors are
 // raised by `transactions()`, which owns rollback (TX-SURFACE-0).
 import { ENHANCER_META } from '../../lib/types';
+import { appendAll } from '../../lib/internals/utilities/append-all';
 
 // Angular's build-time flag takes precedence. Framework-neutral runtimes use an
 // explicit Node environment when available; unknown browser environments take
@@ -572,7 +573,7 @@ class RestorationManager<T> {
       designated &&
       collectionOrders.length === 0
     ) {
-      lastEvent.effects.push(...effects.map(cloneTurnEffect));
+      appendAll(lastEvent.effects, effects.map(cloneTurnEffect));
       return;
     }
     this.appendHistoricalEvent(effects, collectionOrders);
@@ -2134,7 +2135,7 @@ class RestorationManager<T> {
           effects.push(turnEffects[i]);
         }
       } else {
-        effects.push(...turnEffects);
+        appendAll(effects, turnEffects);
       }
     }
 
@@ -2177,9 +2178,10 @@ class RestorationManager<T> {
         }
         const turnEffects = turn.__effects ?? [];
         if (direction === 'undo') {
-          effects.push(...[...turnEffects].reverse());
+          for (let i = turnEffects.length - 1; i >= 0; i--)
+            effects.push(turnEffects[i]);
         } else {
-          effects.push(...turnEffects);
+          appendAll(effects, turnEffects);
         }
         orderDeltas.push(
           ...(turn.__orderDeltas ?? []).map(cloneCollectionOrderDelta)
