@@ -15,6 +15,14 @@ Use the reader that answers your question:
 | `entityMembershipReader(tree)` | Collection locations, typed entity keys, lifetime IDs and membership order | Add, remove, rekey and reorder |
 | `linkStateReader(tree)` | Active relationships, supported directions, dirty/held/queued/send/retrieval activity | Activity changes, failures and disposal |
 
+To show recorded evidence at a location, use `stateLocationReader(tree).locate(targets)`.
+A target is what a confirmed effect or an observed write already carries: its
+`position`, the entity `lifetimeId` (an effect's `subjectId`) and, for an entity field,
+the effect's `fieldSegments`. Each result is the target's CURRENT location as
+`property`/`entity` segments, or `undefined` when it is no longer reachable. It is
+one walk of the live tree per call and keeps nothing; `path` labels are never parsed,
+so a literal `'a.b'` key and nested `a` → `b` stay distinct.
+
 Transaction and restoration readers return `undefined` when the corresponding
 capability is absent. This differs from an available reader with an empty
 snapshot. Readers never install missing capabilities. Disposed relationships

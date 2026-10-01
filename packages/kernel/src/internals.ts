@@ -101,6 +101,7 @@ function projectConfirmedTurns(
       before?: unknown;
       after?: unknown;
       subject?: unknown;
+      fieldSegments?: readonly string[];
       plainBranchMembership?: {
         readonly before: boolean;
         readonly after: boolean;
@@ -121,6 +122,9 @@ function projectConfirmedTurns(
         before: 'before' in effect ? effect.before : undefined,
         after: 'after' in effect ? effect.after : undefined,
         subjectId: 'subject' in effect ? effect.subject : undefined,
+        ...(effect.fieldSegments
+          ? { fieldSegments: [...effect.fieldSegments] }
+          : {}),
         ...(effect.plainBranchMembership
           ? {
               plainBranchMembership: { ...effect.plainBranchMembership },
@@ -203,6 +207,13 @@ export function confirmedTurnReader<T>(
     },
   };
 }
+
+export {
+  stateLocationReader,
+  type StateLocationReader,
+  type StateLocationSegment,
+  type StateLocationTarget,
+} from './lib/internals/state-location-view';
 
 export {
   linkStateReader,

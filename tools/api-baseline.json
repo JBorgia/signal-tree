@@ -1616,6 +1616,42 @@
         "internalDecl": true
       },
       {
+        "name": "stateLocationReader",
+        "subpath": "./internals",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/internals/state-location-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "StateLocationReader",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/state-location-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "StateLocationSegment",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/state-location-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "StateLocationTarget",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/state-location-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
         "name": "StudioTreeDestroyedError",
         "subpath": "./internals",
         "kind": "runtime",
