@@ -8,8 +8,13 @@ export default defineConfig(() => ({
   cacheDir: '../../node_modules/.vite/apps/react-reference',
   resolve: {
     alias: {
+      // Runtime imports must not follow the package's declaration-build paths.
       '@signal-tree/kernel/adapter': new URL(
         '../../packages/kernel/src/adapter.ts',
+        import.meta.url
+      ).pathname,
+      '@signal-tree/kernel': new URL(
+        '../../packages/kernel/src/index.ts',
         import.meta.url
       ).pathname,
     },
