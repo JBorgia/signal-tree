@@ -1,6 +1,9 @@
 import type { ISignalTree } from '../types';
 import { StudioTreeDestroyedError } from './confirmed-turn-view';
-import { getEntityMembershipInventory } from './entity-membership-inventory';
+import {
+  getEntityMembershipInventory,
+  hasEntityMembershipSource,
+} from './entity-membership-inventory';
 import { isDormantMember } from './member-membership';
 import { getOwnedOwnerPath, getOwnedPositionIds } from './owned-metadata';
 import { isNodeAccessor } from './node-shape';
@@ -90,7 +93,9 @@ export function stateLocationReader<T>(
         // An omitted optional member and everything under it are not in the
         // current state, so they have no current location.
         if (node !== tree.$ && isDormantMember(node)) return false;
-        const collection = getEntityMembershipInventory(object) !== undefined;
+        const collection =
+          getEntityMembershipInventory(object) !== undefined ||
+          hasEntityMembershipSource(object);
         if (
           node !== tree.$ &&
           !collection &&

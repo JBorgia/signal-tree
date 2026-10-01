@@ -142,3 +142,30 @@ export function getEntityMembershipInventory(
 ): EntityMembershipInventory | undefined {
   return (node as { [INVENTORY]?: EntityMembershipInventory })[INVENTORY];
 }
+
+// A collection carries only this source until membership is first observed.
+// The producer (createEntityMembershipInventory) is reached from the reader,
+// so applications that never read membership do not ship it.
+const SOURCE = Symbol('SignalTree:EntityMembershipSource');
+type EntityMembershipSource = {
+  install(create: typeof createEntityMembershipInventory): EntityMembershipInventory;
+};
+export function defineEntityMembershipSource(
+  node: object,
+  source: EntityMembershipSource
+): void {
+  Object.defineProperty(node, SOURCE, { value: source });
+}
+export function hasEntityMembershipSource(node: object): boolean {
+  return (node as { [SOURCE]?: EntityMembershipSource })[SOURCE] !== undefined;
+}
+/** Installs the producer on first observation; idempotent. */
+export function activateEntityMembership(
+  node: object
+): EntityMembershipInventory | undefined {
+  const existing = getEntityMembershipInventory(node);
+  if (existing) return existing;
+  return (node as { [SOURCE]?: EntityMembershipSource })[SOURCE]?.install(
+    createEntityMembershipInventory
+  );
+}

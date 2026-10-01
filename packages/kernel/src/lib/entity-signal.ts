@@ -1,9 +1,12 @@
 import { defineEntityObservation } from './internals/entity-observation';
 import {
-  createEntityMembershipInventory,
   defineEntityMembershipInventory,
+  defineEntityMembershipSource,
   type EntityMembershipChange,
+  type EntityMembershipInventory,
+  type EntityMembershipUnit,
 } from './internals/entity-membership-inventory';
+
 import { getPositionRegistry } from './internals/position-registry';
 import type {
   Location,
@@ -276,6 +279,15 @@ import type {
   PositionId,
   StructuralEffect,
 } from '../lib/types';
+const DORMANT_MEMBERSHIP_UNIT: EntityMembershipUnit = {
+  commit: () => undefined,
+  cancel: () => undefined,
+};
+const DORMANT_MEMBERSHIP: Pick<EntityMembershipInventory, 'observed' | 'begin'> = {
+  observed: () => false,
+  begin: () => DORMANT_MEMBERSHIP_UNIT,
+};
+
 
 /**
  * Creates an EntitySignal using composition pattern.
@@ -722,15 +734,17 @@ export function createEntitySignal<
     locations.advanceEpoch?.(handle);
   };
   const structuralStore = new StructuralStore<K>();
-  const membershipInventory = createEntityMembershipInventory(() =>
+  // Dormant until a membership reader first observes this collection; then
+  // the reader installs the producer through the source defined below.
+  let membershipInventory: Pick<EntityMembershipInventory, 'observed' | 'begin'> = DORMANT_MEMBERSHIP;
+  const readMembers = () =>
     structuralStore.activeKeysSnapshot().map((key) => {
       const lifetimeId = structuralStore.subjectIdForKey(key);
       if (lifetimeId === undefined) throw new Error('Active entity membership has no lifetime.');
       return { lifetimeId, key };
-    })
-  );
+    });
   let membershipGroupDepth = 0;
-  let groupedMembershipUnit: ReturnType<typeof membershipInventory.begin> | undefined;
+  let groupedMembershipUnit: EntityMembershipUnit | undefined;
   function beginMembershipUnit() {
     // Compound operations arm only at the first physical commit, so planning
     // and interceptors may still inspect a complete pre-operation inventory.
@@ -3736,7 +3750,14 @@ export function createEntitySignal<
       configurable: true,
     });
   }
-  defineEntityMembershipInventory(api, membershipInventory);
+  defineEntityMembershipSource(api, {
+    install(create) {
+      const inventory = create(readMembers);
+      membershipInventory = inventory;
+      defineEntityMembershipInventory(api, inventory);
+      return inventory;
+    },
+  });
   defineEntityObservation(api, () => {
     if (positionId !== undefined) return;
     const registry = getPositionRegistry(api);
