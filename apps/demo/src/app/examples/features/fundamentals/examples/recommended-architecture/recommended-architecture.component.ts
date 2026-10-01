@@ -1,3 +1,4 @@
+import { RouterLink } from '@angular/router';
 import {
   Component,
   computed,
@@ -134,7 +135,7 @@ export class AppComponent {
  * Recommended Architecture Demo
  *
  * The canonical SignalTree production pattern (mirrors v3 trax-mobile). One
- * tree per app, and one rule applied everywhere:
+ * shared application tree, with independent sessions owning separate lifetimes:
  *
  *   - **READ**  → `store.$.<domain>.<path>()`     (all computed on `$`, tiered)
  *   - **WRITE** → `store.ops.<domain>.<method>()` (mutations + async only)
@@ -148,7 +149,7 @@ export class AppComponent {
 @Component({
   selector: 'app-recommended-architecture',
   standalone: true,
-  imports: [FormsModule, ExampleComponent],
+  imports: [FormsModule, ExampleComponent, RouterLink],
   templateUrl: './recommended-architecture.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './recommended-architecture.component.scss',
@@ -225,7 +226,7 @@ export class RecommendedArchitectureComponent {
   /** StackBlitz playground config. */
   readonly stackblitzConfig: StackblitzConfig = {
     title: 'SignalTree — READ / WRITE / REACT',
-    description: 'The recommended one-tree architecture, self-contained.',
+    description: 'Shared application-state ownership, self-contained.',
     files: { 'src/app/app.component.ts': PLAYGROUND_APP },
   };
 

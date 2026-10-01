@@ -74,6 +74,11 @@ export class NavigationComponent {
       collapsed: true,
       items: [
         {
+          id: 'owned-sessions',
+          title: 'Editors & devices',
+          route: '/owned-sessions',
+        },
+        {
           id: 'state-derived',
           title: 'Nested state',
           route: '/examples/fundamentals',

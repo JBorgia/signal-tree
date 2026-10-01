@@ -57,7 +57,17 @@
             "output": "assets/docs/guides"
           },
           {
+            "glob": "owned-sessions.md",
+            "input": "docs/guides",
+            "output": "assets/docs/guides"
+          },
+          {
             "glob": "persistence-guide.md",
+            "input": "docs/guides",
+            "output": "assets/docs/guides"
+          },
+          {
+            "glob": "runtime-observation.md",
             "input": "docs/guides",
             "output": "assets/docs/guides"
           }

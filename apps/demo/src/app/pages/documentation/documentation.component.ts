@@ -113,12 +113,28 @@ export class DocumentationComponent implements OnInit {
       repositoryPath: 'docs/guides/composition-recipes.md',
     },
     {
+      id: 'owned-sessions',
+      name: 'Owned Sessions',
+      description:
+        'Independent editor drafts and device connections over shared records',
+      readmePath: 'assets/docs/guides/owned-sessions.md',
+      repositoryPath: 'docs/guides/owned-sessions.md',
+    },
+    {
       id: 'persistence-guide',
       name: 'Persistence Guide',
       description:
         'External storage acquisition and synchronization through link()',
       readmePath: 'assets/docs/guides/persistence-guide.md',
       repositoryPath: 'docs/guides/persistence-guide.md',
+    },
+    {
+      id: 'runtime-observation',
+      name: 'Runtime Observation',
+      description:
+        'Read-only tooling readers for transactions, history, membership and Link (15.4.0, unreleased)',
+      readmePath: 'assets/docs/guides/runtime-observation.md',
+      repositoryPath: 'docs/guides/runtime-observation.md',
     },
   ];
 
