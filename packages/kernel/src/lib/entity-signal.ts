@@ -56,6 +56,7 @@ import type {
   CollectionTransitionTarget,
   CollectionTransitionTargetBinding,
 } from './internals/causal-runtime/target-transition';
+import { appendAll } from './internals/utilities/append-all';
 
 // Angular's global dev-mode flag (defined by the Angular CLI; undefined in
 // plain test/node contexts, treated as dev there).
@@ -413,6 +414,22 @@ export function createEntitySignal<
       return value;
     });
   };
+
+  /**
+   * A query whose predicate is user code. The version-keyed cache above is only
+   * right for projections that read nothing but this collection: a predicate
+   * may also read another signal, and a cached result would ignore it (and drop
+   * the dependency). Reproduced on 15.3.1: `where(r => r.v >= tree.$.min())`
+   * kept the old rows after `min` changed. The derived itself memoises on every
+   * dependency the predicate reads, plus the collection version read here.
+   */
+  const createQueryProjection = <TValue>(
+    compute: () => TValue
+  ): ReadableCell<TValue> =>
+    locations.createDerived(() => {
+      version();
+      return compute();
+    });
 
   function getProjectedEntity(id: K): E | undefined {
     const subjectId = structuralStore.subjectIdForKey(id);
@@ -2418,7 +2435,7 @@ export function createEntitySignal<
       //
       // `version()` is read directly for the same invalidation `allSignal()`
       // has; the sorted branch gets it transitively.
-      const s = createVersionedProjection(() => {
+      const s = createQueryProjection(() => {
         if (config.sortComparer) return allSignal().filter(predicate);
         const out: E[] = [];
         for (const entity of getProjectedEntities()) {
@@ -2451,7 +2468,7 @@ export function createEntitySignal<
       // Sorted collections keep the old path: `find` returns the FIRST match,
       // which is order-dependent, so with a `sortComparer` the sorted array is
       // the only correct thing to scan. See the note on `where` above.
-      const s = createVersionedProjection(() => {
+      const s = createQueryProjection(() => {
         if (config.sortComparer) return allSignal().find(predicate);
         for (const entity of getProjectedEntities()) {
           if (predicate(entity)) return entity;
@@ -2530,7 +2547,10 @@ export function createEntitySignal<
 
     addMany(entities: E[], opts?: AddManyOptions<E, K>): K[] {
       const mode = opts?.mode ?? 'strict';
-      const previousKeys = [...structuralStore.activeKeysSnapshot()];
+      // addMany appends: an added row's predecessor is the previous added row,
+      // or for the first one the last row before the call. Only that key is
+      // needed, not a copy of every key.
+      const lastPreviousKey = structuralStore.lastActiveKey();
 
       // First pass: validate/filter based on mode
       const toProcess: Array<{
@@ -2638,9 +2658,15 @@ export function createEntitySignal<
       // Notify PathNotifier for each processed entity
       for (let i = 0; i < addedEntities.length; i++) {
         const { id, entity } = addedEntities[i];
-        const beforeKey = previousKeys.at(
-          i + previousKeys.length - addedEntities.length
-        );
+        // Reproduced on 15.3.1: indexing the pre-add key list at
+        // `i + previous - added` anchored [x, y] after k4 and k5 instead of
+        // after k5 and x, so redo reinserted them out of order.
+        const beforeSubject =
+          i > 0
+            ? subjectIdsForWrite[i - 1]
+            : lastPreviousKey === undefined
+            ? undefined
+            : allocateSubjectId(lastPreviousKey);
         pathNotifier.notify(
           `${basePath}.${String(id)}`,
           entity,
@@ -2653,10 +2679,7 @@ export function createEntitySignal<
             subject: subjectIdsForWrite[i],
             key: id,
             value: deepClone(entity),
-            beforeSubject:
-              beforeKey === undefined
-                ? undefined
-                : allocateSubjectId(beforeKey),
+            beforeSubject,
           })
         );
       }
@@ -3514,11 +3537,15 @@ export function createEntitySignal<
         freshSubjectIdsByKey.set(stagedAdds[index].id, freshSubjectIds[index]);
       }
 
+      // One index of the pre-state order, not a search per removed row: that
+      // made replacing or clearing a collection O(n^2) (~2 s at 40k rows).
+      const currentIndexById =
+        stagedRemovals.length > 0
+          ? new Map(currentEntries.map(([entryId], index) => [entryId, index]))
+          : undefined;
       const stagedRemovalStructuralEffects = stagedRemovals.map(
         ({ id, entity, subjectId }) => {
-          const currentIndex = currentEntries.findIndex(
-            ([entryId]) => entryId === id
-          );
+          const currentIndex = currentIndexById?.get(id) ?? -1;
           // Immediate pre-state neighbours, removed or surviving, exactly as
           // clear() and removeMany() record them. Anchoring only to survivors
           // left adjacent removals with identical anchors, so their reversal
@@ -3582,8 +3609,8 @@ export function createEntitySignal<
         .filter((subjectId): subjectId is number => subjectId !== undefined);
       const membershipChanges: EntityMembershipChange[] = [];
       if (membershipInventory.observed()) {
-        membershipChanges.push(...stagedRemovals.map(({ id, subjectId }) => ({ kind: 'remove' as const, lifetimeId: subjectId, key: id })));
-        membershipChanges.push(...stagedAdds.map(({ id }, index) => membershipAddition(addedSubjectIds[index], id)));
+        appendAll(membershipChanges, stagedRemovals.map(({ id, subjectId }) => ({ kind: 'remove' as const, lifetimeId: subjectId, key: id })));
+        appendAll(membershipChanges, stagedAdds.map(({ id }, index) => membershipAddition(addedSubjectIds[index], id)));
         const beforeSet = new Set(beforeSubjects);
         const afterSet = new Set(afterSubjects);
         const survivingBefore = beforeSubjects.filter((id) => afterSet.has(id));
