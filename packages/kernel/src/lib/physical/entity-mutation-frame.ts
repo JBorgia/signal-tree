@@ -1,3 +1,5 @@
+import type { CommittedEntityMutation } from '../internals/mutation-capture-runtime';
+import type { EntityMembershipChange } from '../internals/entity-membership-inventory';
 import { EntityValueStore } from './entity-value-store';
 import {
   type ResolvedSubjectRestorePlacement,
@@ -140,8 +142,42 @@ export class EntityMutationFrame<
     this.mutations.push(restoration);
   }
 
-  commit(): EntityMutationCommitResult {
+  commit(
+    observeCommitted?: (changes: readonly CommittedEntityMutation[]) => void,
+    observeMembership?: (changes: readonly EntityMembershipChange[]) => void
+  ): EntityMutationCommitResult {
     const preparedMutations = this.prepareCommitInstructions();
+    const membership: EntityMembershipChange[] | undefined = observeMembership ? [] : undefined;
+    const recordAddition = (subjectId: number, key: K): void => {
+      if (!membership) return;
+      const neighbors = this.structuralStore.neighborSubjectsForKey(key);
+      membership.push({
+        kind: 'add', lifetimeId: subjectId, key,
+        beforeLifetimeId: neighbors.beforeSubject,
+        afterLifetimeId: neighbors.afterSubject,
+      });
+    };
+    // Capture only touched subjects, and only when a source observer is active.
+    // Nothing is delivered until every prepared instruction has applied.
+    const before = observeCommitted
+      ? new Map<number, { value: E | undefined; structural: boolean }>()
+      : undefined;
+    if (before) {
+      for (const mutation of preparedMutations) {
+        const previous = before.get(mutation.subjectId);
+        before.set(mutation.subjectId, {
+          value: previous
+            ? previous.value
+            : this.structuralStore.activeKeyForSubject(mutation.subjectId) ===
+              undefined
+            ? undefined
+            : this.valueStore.backingForSubject(mutation.subjectId),
+          structural:
+            (previous?.structural ?? false) ||
+            mutation.kind !== 'replace-value',
+        });
+      }
+    }
     const physicallyChangedSubjectIds = new Set<number>();
     const allocatedSubjectIds: number[] = [];
 
@@ -153,6 +189,7 @@ export class EntityMutationFrame<
           mutation.nextValue
         );
         allocatedSubjectIds.push(mutation.subjectId);
+        recordAddition(mutation.subjectId, mutation.key);
         continue;
       }
 
@@ -169,7 +206,7 @@ export class EntityMutationFrame<
             mutation.resolvedValue
           );
         }
-
+        recordAddition(mutation.subjectId, mutation.key);
         physicallyChangedSubjectIds.add(mutation.subjectId);
         continue;
       }
@@ -203,6 +240,10 @@ export class EntityMutationFrame<
           mutation.fromKey,
           mutation.toKey
         );
+        if (mutation.fromKey !== mutation.toKey) membership?.push({
+          kind: 'rekey', lifetimeId: mutation.subjectId,
+          beforeKey: mutation.fromKey, afterKey: mutation.toKey,
+        });
         physicallyChangedSubjectIds.add(mutation.subjectId);
         continue;
       }
@@ -212,9 +253,24 @@ export class EntityMutationFrame<
         mutation.key,
         mutation.restoreAllowed
       );
+      membership?.push({ kind: 'remove', lifetimeId: mutation.subjectId, key: mutation.key });
       physicallyChangedSubjectIds.add(mutation.subjectId);
     }
 
+    if (before && observeCommitted) {
+      observeCommitted(
+        [...before].map(([subject, entry]) => ({
+          subject,
+          before: entry.value,
+          after:
+            this.structuralStore.activeKeyForSubject(subject) === undefined
+              ? undefined
+              : this.valueStore.backingForSubject(subject),
+          structural: entry.structural,
+        }))
+      );
+    }
+    if (membership) observeMembership?.(membership);
     return {
       physicallyChangedSubjectIds: [...physicallyChangedSubjectIds],
       allocatedSubjectIds,

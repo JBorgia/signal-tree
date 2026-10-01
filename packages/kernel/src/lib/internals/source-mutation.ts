@@ -38,17 +38,12 @@ type Key = string | number;
  * INTERNAL reconstruction only — no consumer's public boundary becomes a patch
  * protocol because of this.
  */
-export function applyAtRelativePath<T>(
+export function applyAtSegments<T>(
   previous: T,
-  ownerPath: string,
-  path: string,
+  segments: readonly string[],
   value: unknown
 ): T {
-  // A whole-source notification already carries the complete value: the scalar
-  // case, where `path === ownerPath`.
-  if (path === ownerPath) return value as T;
-  const relative = ownerPath === '' ? path : path.slice(ownerPath.length + 1);
-  return setAtPath(previous, relative.split('.'), value) as T;
+  return setAtPath(previous, segments, value) as T;
 }
 
 function setAtPath(
@@ -151,7 +146,8 @@ export function createEntityTopology(
         keys.delete(effect.subject);
         return;
       }
-      if (effect.afterKey !== undefined) keys.set(effect.subject, effect.afterKey);
+      if (effect.afterKey !== undefined)
+        keys.set(effect.subject, effect.afterKey);
     },
 
     placement(subject, isIncluded) {

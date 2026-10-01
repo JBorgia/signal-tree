@@ -929,9 +929,10 @@ describe('failures after the callback returns (15.x)', () => {
     }
   });
 
-  it('the throwing-callback rollback is unchanged from 15.3.0', async () => {
-    // An observer writes the same row while the failed callback is rolled
-    // back; 15.3.0 rolled the callback back regardless, and so does this.
+  it('a throwing callback refuses rollback over a later observer write', async () => {
+    // Deliberate correction of the 15.3.0 compatibility characterization:
+    // callback failure cannot authorize overwriting a later writer. The red
+    // transaction-reentrant-order safety tests demonstrated that corruption.
     type Row = { id: string; v: number };
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
@@ -946,16 +947,25 @@ describe('failures after the callback returns (15.x)', () => {
     });
     const boom = new Error('boom');
     try {
-      expect(() =>
+      let failure: unknown;
+      try {
         tree.transaction(() => {
           tree.$.rows.updateOne('A', { v: 1 });
           throw boom;
-        })
-      ).toThrow(boom);
+        });
+      } catch (error) {
+        failure = error;
+      }
+      expect(failure).toMatchObject({
+        code: 'SIGNALTREE_ROLLBACK_FAILED',
+        cause: { kind: 'effect-validation-failed', callbackError: boom },
+      });
       await flush();
-      // Compatibility characterization, NOT a safety assertion: this path
-      // still overwrites the observer's later v=5 with the baseline.
-      expect(tree.$.rows.byIdOrFail('A')().v).toBe(0);
+      expect(tree.$.rows.byIdOrFail('A')().v).toBe(5);
+      expect(peekInternalTransactionRuntime(tree)?.getPendingTurnCount()).toBe(
+        0
+      );
+      expect(hasOpenCommitScope(tree)).toBe(false);
     } finally {
       off();
       tree.destroy();

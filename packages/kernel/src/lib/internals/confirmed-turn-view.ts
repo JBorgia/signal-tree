@@ -17,13 +17,18 @@ export type ConfirmedTurnEffectKind = 'set' | 'add' | 'remove' | 'rekey';
 export interface ConfirmedTurnEffectView {
   /** Tree-scoped position identity. Not unique across trees. */
   readonly position: number;
-  /** Captured address for reading. NOT semantic identity — use `subjectId`. */
+  /** Diagnostic path label. Identity is tree + position + entity lifetime, when present. */
   readonly path: string;
   readonly ownerPath: string;
   readonly kind: ConfirmedTurnEffectKind;
   readonly before?: unknown;
   readonly after?: unknown;
   readonly subjectId?: unknown;
+  /** Explicit presence distinguishes omission from a present undefined value. */
+  readonly plainBranchMembership?: {
+    readonly before: boolean;
+    readonly after: boolean;
+  };
 }
 
 export interface ConfirmedTurnView {

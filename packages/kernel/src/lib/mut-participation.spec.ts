@@ -1,3 +1,4 @@
+import { plainBranchMembershipChange } from './internals/plain-branch-membership';
 import { undoable } from '../lib/undoable';
 
 import { createReactiveTestRealization } from '../reactive-test-realization';
@@ -262,13 +263,18 @@ describe('MUT-1 — which WRITE PATHS reach the notifier?', () => {
       { capabilities: ['causal-runtime'] }
     );
     const notified: string[] = [];
-    const off = getPathNotifier().subscribe('**', (_n, _p, path) =>
-      notified.push(String(path))
-    );
+    const membership: Array<{ path: string; keys: string[] }> = [];
+    const off = getPathNotifier().subscribe('**', (_n, _p, path, _owner, _origin, _subjects, _positions, meta) => {
+      notified.push(String(path));
+      const change = plainBranchMembershipChange(meta);
+      if (change) membership.push({ path, keys: change.members.map(member => member.key) });
+    });
     op(tree as never);
     await tick();
     off();
-    return { notified, value: tree.$() };
+    const value = tree.$();
+    tree.destroy();
+    return { notified, membership, value };
   };
 
   it('DIRECT leaf .set()', async () => {
@@ -286,16 +292,20 @@ describe('MUT-1 — which WRITE PATHS reach the notifier?', () => {
     const r = await capture((t) => {
       undoable(() => (t as unknown as { $: { a: (v: object) => void } }).$.a({ n: 3 }));
     });
-    expect(r.notified).toEqual(['a.n']);
+    expect(r.notified).toEqual(['a.n', 'a']);
+    expect(r.membership).toEqual([{ path: 'a', keys: ['s'] }]);
+    expect(r.value).toEqual({ a: { n: 3 }, top: 0 });
   });
 
   it('ROOT call form — the recursive update pipeline', async () => {
     const r = await capture((t) => {
       undoable(() => t.$({ a: { n: 4 }, top: 7 }));
     });
-    // Only the LANDED leaves: `a.s` was rewritten with its own value and is
-    // absent.
-    expect(r.notified).toEqual(['a.n', 'top']);
+    // Whole-branch replacement removes omitted s; its presence is a real
+    // mutation even though no scalar value is assigned to the retained slot.
+    expect(r.notified).toEqual(['a.n', 'a', 'top']);
+    expect(r.membership).toEqual([{ path: 'a', keys: ['s'] }]);
+    expect(r.value).toEqual({ a: { n: 4 }, top: 7 });
   });
 
   it('ROOT updater form', async () => {
@@ -304,7 +314,9 @@ describe('MUT-1 — which WRITE PATHS reach the notifier?', () => {
         top: c.top + 5,
       }));
     });
-    expect(r.notified).toEqual(['top']);
+    expect(r.notified).toEqual(['top', '']);
+    expect(r.membership).toEqual([{ path: '', keys: ['a'] }]);
+    expect(r.value).toEqual({ top: 5 });
   });
 });
 

@@ -341,6 +341,17 @@ export function unwrap<T>(node: unknown): T {
 }
 
 /**
+ * Read current plain-branch values before grouped memo invalidation is delivered.
+ * Capture uses the canonical builder without consulting nested branch memos;
+ * ordinary reads keep their memoized structural sharing.
+ */
+export function unwrapBranchForWriteCapture<T>(node: unknown): T {
+  return isNodeAccessor(node)
+    ? buildFromStore<T>(snapshotNodeKey(node), true)
+    : unwrap<T>(node);
+}
+
+/**
  * @internal THE builder. Every snapshot of a tree node is produced here —
  * `tree.$()`, `snapshotState()`, `unwrap()` of an accessor, and every nested
  * child — so there is exactly one place that decides what a property
@@ -351,7 +362,7 @@ export function unwrap<T>(node: unknown): T {
  * only one of them carried the ST2008 diagnostic, and only one of them copied
  * symbol keys. See the comment on the accessor branch of `unwrap()`.
  */
-function buildFromStore<T>(node: object): T {
+function buildFromStore<T>(node: object, uncachedBranches = false): T {
   // A materialised marker snapshots itself — see snapshotMarkerNode().
   const own = snapshotMarkerNode(node);
   if (own) return own.value as T;
@@ -447,7 +458,9 @@ function buildFromStore<T>(node: object): T {
       // (The identical-looking recursion in the `isSignal` branch below IS
       // load-bearing: a leaf's VALUE is user data, and copying it is what keeps
       // a snapshot from aliasing live state.)
-      result[key] = value();
+      result[key] = uncachedBranches
+        ? unwrapBranchForWriteCapture(value)
+        : value();
     } else if (isReactiveStateValue(value)) {
       const unwrappedValue = (value as ReadableCell<unknown>)();
       if (
@@ -536,7 +549,9 @@ function buildFromStore<T>(node: object): T {
       // (The identical-looking recursion in the `isSignal` branch below IS
       // load-bearing: a leaf's VALUE is user data, and copying it is what keeps
       // a snapshot from aliasing live state.)
-      (result as Record<symbol, unknown>)[sym] = value();
+      (result as Record<symbol, unknown>)[sym] = uncachedBranches
+        ? unwrapBranchForWriteCapture(value)
+        : value();
     } else if (isReactiveStateValue(value)) {
       const unwrappedValue = (value as ReadableCell<unknown>)();
       if (

@@ -6,7 +6,10 @@ import {
 
 import { deepEqual } from './utils';
 import { external } from './external';
-import { getOwnedOwnerPath } from './internals/owned-metadata';
+import {
+  getOwnedOwnerPath,
+  getOwnedPositionIds,
+} from './internals/owned-metadata';
 import { getPathNotifier } from './path-notifier';
 import { reportTreeError } from './internals/error-reporter';
 import { getPositionRegistry } from './internals/position-registry';
@@ -17,13 +20,17 @@ import {
   createEntityEgressProjection,
   type EntityEgressProjection,
 } from './internals/entity-egress-projection';
-import { applyAtRelativePath } from './internals/source-mutation';
+import { applyAtSegments } from './internals/source-mutation';
+import { isNodeAccessor } from './internals/node-shape';
+import { visitTree } from './internals/visit-tree';
 import {
-  isNodeAccessor,
-  isTraversableNode,
-} from './internals/node-shape';
+  applyPlainBranchMembership,
+  plainBranchMembershipChange,
+} from './internals/plain-branch-membership';
+import { registerLinkState } from './internals/link-state-view';
 import { getRootTree } from './internals/root-source';
 import {
+  hasOpenCommitScope,
   scheduleDurableConsequence,
   withdrawHeldConsequence,
 } from './internals/commit-consequence';
@@ -102,21 +109,20 @@ export interface Link {
  * flow into the endpoint callbacks, so `link(tree.$.rows, { set: (v) => ... })`
  * infers `v: Row[]` with no explicit generic.
  */
-export type NaturalValue<S> =
-  S extends Location<infer T>
-    ? T
-    : S extends NodeAccessor<infer T>
-      ? T
-      : S extends {
-    readonly all: unknown;
-    setAll(...args: infer Args): unknown;
-  }
-        ? Args[0]
-        : S extends () => infer T
-          ? T
-          : S extends { readonly value: infer T }
-            ? T
-            : never;
+export type NaturalValue<S> = S extends Location<infer T>
+  ? T
+  : S extends NodeAccessor<infer T>
+  ? T
+  : S extends {
+      readonly all: unknown;
+      setAll(...args: infer Args): unknown;
+    }
+  ? Args[0]
+  : S extends () => infer T
+  ? T
+  : S extends { readonly value: infer T }
+  ? T
+  : never;
 
 /**
  * Does this declared value still contain a CONSTRUCTION MARKER?
@@ -132,16 +138,16 @@ export type NaturalValue<S> =
 type ContainsEntityMapMarker<T> = [T] extends [never]
   ? false
   : T extends EntityMapBuilder<infer _R, infer _K, infer _S>
+  ? true
+  : T extends readonly unknown[]
+  ? false
+  : T extends object
+  ? true extends {
+      [K in keyof T]-?: ContainsEntityMapMarker<T[K]>;
+    }[keyof T]
     ? true
-    : T extends readonly unknown[]
-      ? false
-      : T extends object
-        ? true extends {
-            [K in keyof T]-?: ContainsEntityMapMarker<T[K]>;
-          }[keyof T]
-          ? true
-          : false
-        : false;
+    : false
+  : false;
 
 /**
  * A source whose declared natural value is TRUTHFUL.
@@ -162,8 +168,11 @@ type ContainsEntityMapMarker<T> = [T] extends [never]
  * link(tree.$.nested.users, endpoint)   // User[], truthful
  * ```
  */
-export type TruthfulLinkSource<S> =
-  ContainsEntityMapMarker<NaturalValue<S>> extends true ? never : S;
+export type TruthfulLinkSource<S> = ContainsEntityMapMarker<
+  NaturalValue<S>
+> extends true
+  ? never
+  : S;
 
 /**
  * Read/write accessors resolved from the NODE, not configured by the caller.
@@ -283,6 +292,8 @@ export function link<S>(
   let dirty = false;
   let chain: Promise<unknown> = Promise.resolve();
   let inboundSeq = 0;
+  let queued = 0;
+  let sending = false;
 
   /**
    * THE EGRESS-ELIGIBLE PROJECTION — the complete value permitted to acquire
@@ -355,44 +366,47 @@ export function link<S>(
    * which a later eligible write would then carry outward. The nested
    * collection's ELIGIBLE value is adopted, never its current one.
    */
-  const nestedCollections = new Map<string, EntityEgressProjection>();
-  if (!collection) {
-    const prefix = ownerPath === '' ? '' : `${ownerPath}.`;
-    const discover = (node: unknown, path: string): void => {
-      if (!isTraversableNode(node)) return;
-      const seed = getEntityProjectionSeed(node);
-      if (seed) {
-        nestedCollections.set(path, createEntityEgressProjection(seed));
-        return; // its interior is its own business
-      }
-      for (const key of Object.keys(node as Record<string, unknown>)) {
-        discover(
-          (node as Record<string, unknown>)[key],
-          path === '' ? key : `${path}.${key}`
-        );
-      }
-    };
-    discover(x, ownerPath);
-    void prefix;
-  }
-
-  /** The nested collection owning this notification, if any. */
-  const nestedFor = (notificationOwnerPath: string | undefined) =>
-    notificationOwnerPath === undefined
-      ? undefined
-      : nestedCollections.get(notificationOwnerPath);
-
-  const advanceEligible = (path: string, value: unknown): void => {
-    eligible = applyAtRelativePath(eligible, ownerPath, path, value);
+  // Addresses come from actual property keys and owned positions. A dotted
+  // display path cannot distinguish data['a.b'] from data.a.b.
+  type LinkedAddress = {
+    segments: readonly string[];
+    projection?: EntityEgressProjection;
   };
+  const addresses = new Map<number, LinkedAddress>();
+  const segmentsByNode = new WeakMap<object, readonly string[]>();
+  visitTree(
+    x,
+    (node, _path, key, parent) => {
+      // An omitted optional member retains its owned location. Index it too;
+      // function implementation properties are not state locations.
+      const seed = getEntityProjectionSeed(node);
+      if (
+        node !== x &&
+        seed === undefined &&
+        getOwnedOwnerPath(node) === undefined
+      )
+        return false;
+      const segments =
+        key === null
+          ? []
+          : [...(segmentsByNode.get(parent as object) ?? []), key];
+      segmentsByNode.set(node as object, segments);
+      const address: LinkedAddress = {
+        segments,
+        projection:
+          seed && node !== x ? createEntityEgressProjection(seed) : undefined,
+      };
+      for (const position of getOwnedPositionIds(node) ?? [])
+        addresses.set(position, address);
+      if (seed || (isWritableLocation(node) && !isNodeAccessor(node)))
+        return false;
+      return true;
+    },
+    { maxDepth: Infinity, includeNonEnumerable: true }
+  );
 
-  /** Write a nested collection's eligible value into the branch snapshot. */
-  const advanceNested = (collectionPath: string, projection: EntityEgressProjection): void => {
-    // The snapshot grammar for a collection is `{ all: Row[] }` — the same
-    // shape `tree.$()` produces, so the published branch value stays canonical.
-    eligible = applyAtRelativePath(eligible, ownerPath, collectionPath, {
-      all: projection.value(),
-    });
+  const advanceEligible = (address: LinkedAddress, value: unknown): void => {
+    eligible = applyAtSegments(eligible, address.segments, value);
   };
 
   /**
@@ -430,6 +444,25 @@ export function link<S>(
    * the WEAK outbound reading was.
    */
   const retrievals = new Set<{ promise: Promise<void>; resolve: () => void }>();
+  // Only active settlement waiters are retained; disposal releases their wait,
+  // without cancelling an endpoint operation already running externally.
+  const settlementWaiters = new Set<() => void>();
+  const observation = registerLinkState(registry, (id) => ({
+    id,
+    path: ownerPath,
+    positions: getOwnedPositionIds(x) ?? [],
+    directions: {
+      get: !!endpoint.get,
+      set: !!endpoint.set,
+      subscribe: !!endpoint.subscribe,
+    },
+    dirty,
+    held: held.size > 0,
+    queued,
+    sending,
+    retrieving: retrievals.size,
+    disposed,
+  }));
 
   /**
    * Inbound Y -> X.
@@ -460,20 +493,26 @@ export function link<S>(
 
   const offSub = notifier.subscribe(
     '**',
-    (v, prev, path, _o, _origin, subjectIds, _pos, meta) => {
+    (v, prev, _path, _o, _origin, subjectIds, positions, meta) => {
       if (disposed || !endpoint.set) return;
       // OWNER-PING-0. Two same-shaped trees give their collections the SAME
       // local position id, so identity is (registry, position) — never the
       // position alone.
       const m = (meta ?? {}) as Record<string, unknown>;
       if (m['ownerId'] !== registry.id) return;
-      if (
-        ownerPath !== '' &&
-        path !== ownerPath &&
-        !path.startsWith(`${ownerPath}.`)
-      ) {
+      const membership = plainBranchMembershipChange(meta);
+      if (membership) {
+        const segments = segmentsByNode.get(membership.branch);
+        if (segments === undefined || isInspectionWrite(meta)) return;
+        eligible = applyPlainBranchMembership(eligible, segments, membership);
+        dirty = true;
+        observation.publish();
         return;
       }
+      const address = positions
+        ?.map((position) => addresses.get(position))
+        .find((value) => value !== undefined);
+      if (!address) return;
       // A value-less ping is a notification, not a state change.
       if (v === undefined && prev === undefined) return;
       // ⚠️ INSPECTION DOES NOT ADVANCE EXTERNAL AUTHORITY. Local state has
@@ -484,15 +523,16 @@ export function link<S>(
       const inspection = isInspectionWrite(meta);
 
       // A notification owned by a collection NESTED in this branch source.
-      const nested = nestedFor(_o);
+      const nested = address.projection;
       if (nested) {
         const effect = (meta as Record<string, unknown> | undefined)?.[
           'structuralEffect'
         ] as Parameters<EntityEgressProjection['apply']>[2];
         const advanced = nested.apply(subjectIds?.[0], v, effect, inspection);
         if (advanced) {
-          advanceNested(_o as string, nested);
+          advanceEligible(address, { all: nested.value() });
           dirty = true;
+          observation.publish();
         }
         return;
       }
@@ -510,12 +550,16 @@ export function link<S>(
           effect,
           inspection
         );
-        if (advanced) dirty = true;
+        if (advanced) {
+          dirty = true;
+          observation.publish();
+        }
         return;
       }
       if (inspection) return;
-      advanceEligible(path, v);
+      advanceEligible(address, v);
       dirty = true;
+      observation.publish();
     }
   );
 
@@ -526,7 +570,7 @@ export function link<S>(
    * rolled back never reaches the endpoint, and a multi-write turn sends one
    * value rather than an intermediate for each write.
    */
-  const offFlush = notifier.onFlush?.(() => {
+  const scheduleSend = () => {
     if (disposed || !dirty) return;
     dirty = false;
     // Registered BEFORE the consequence is scheduled, so an observation is
@@ -556,27 +600,54 @@ export function link<S>(
         held.delete(pending);
         pending.resolve();
         if (disposed) return;
+        queued++;
         chain = chain
           .then(async () => {
-            // LINK-RACE-1. Reconcile until X equals Y's acknowledged state.
-            // Terminates on EQUALITY, not on a counter — a write that lands
-            // while an earlier one is in flight is picked up by the next lap.
-            for (;;) {
-              if (disposed) return;
-              // ⚠️ THE PROJECTION, NOT CURRENT LOCAL STATE. Re-read each
-              // lap so a write landing mid-flight is still picked up — that is
-              // LINK-RACE-1 and it is preserved. What changed is WHAT is
-              // reconciled: an inspection write that moved local state cannot
-              // enter here, because it never advanced `eligible`.
-              const now = entityProjection
-                ? (entityProjection.value() as unknown as T)
-                : eligible;
-              if (knownY !== undefined && deepEqual(now, knownY.value)) return;
-              await endpoint.set?.(now);
-              knownY = { value: now };
+            queued--;
+            // Publish after entering I/O or completing reconciliation, never
+            // between removal from the queue and the first endpoint call.
+            try {
+              // LINK-RACE-1. Reconcile until X equals Y's acknowledged state.
+              // Terminates on EQUALITY, not on a counter — a write that lands
+              // while an earlier one is in flight is picked up by the next lap.
+              for (;;) {
+                if (disposed) return;
+                // ⚠️ THE PROJECTION, NOT CURRENT LOCAL STATE. Re-read each
+                // lap so a write landing mid-flight is still picked up — that is
+                // LINK-RACE-1 and it is preserved. What changed is WHAT is
+                // reconciled: an inspection write that moved local state cannot
+                // enter here, because it never advanced `eligible`.
+                const now = entityProjection
+                  ? (entityProjection.value() as unknown as T)
+                  : eligible;
+                if (knownY !== undefined && deepEqual(now, knownY.value))
+                  return;
+                // A scope may have opened while this send waited in the chain,
+                // or while the previous endpoint call was in flight. Re-enter
+                // the consequence authority before sending any newer value.
+                // Use commit scopes, not pending transaction handles: v15
+                // releases consequences even when explicit rollback refuses.
+                if (hasOpenCommitScope(x as object)) {
+                  dirty = true;
+                  scheduleSend();
+                  return;
+                }
+                sending = true;
+                observation.publish();
+                try {
+                  if (disposed) return;
+                  await endpoint.set?.(now);
+                  knownY = { value: now };
+                } finally {
+                  sending = false;
+                }
+              }
+            } finally {
+              observation.publish();
             }
           })
           .catch((error) => {
+            observation.publish('send-failed');
             // LINK-2 case 3. A rejected outbound `set()` reaches the EXISTING
             // central reporter, so `Link` needs NO error surface of its own:
             // no `failures`, no error signal, no status. Reusing the reporter
@@ -604,16 +675,62 @@ export function link<S>(
               path: ownerPath === '' ? undefined : ownerPath,
             });
           });
+        observation.publish();
       },
     });
-  });
+    observation.publish();
+  };
+  const offFlush = notifier.onFlush?.(scheduleSend);
 
-  const offSource = endpoint.subscribe
-    ? endpoint.subscribe((v) => acquire(v, ++inboundSeq))
-    : undefined;
+  let offSource: (() => void) | undefined;
+  try {
+    offSource = endpoint.subscribe?.((v) => acquire(v, ++inboundSeq));
+  } catch (error) {
+    // Construction did not return a handle. Release every acquired resource;
+    // a failed endpoint subscription is not an active relationship.
+    disposed = true;
+    releaseObservation();
+    offSub();
+    offFlush?.();
+    withdrawHeldConsequence(x as object, consequenceKey);
+    for (const pending of held) pending.resolve();
+    held.clear();
+    observation.forget();
+    throw error;
+  }
+  observation.publish('created');
+
+  const drain = async () => {
+    // STRONG, not `await chain`. LINK-HANDLE-0 measured that the weak form
+    // means only "the chain I can currently see is drained", which misses
+    // observations HELD behind settlement and anything a completed send
+    // caused the reconciler to enqueue.
+    for (;;) {
+      if (disposed) return;
+      const observedChain = chain;
+      await observedChain;
+      if (disposed) return;
+      // A queued notifier flush can append a send while this await yields.
+      // Its held signal is released when enqueued, not when the endpoint
+      // finishes. Re-check chain identity before declaring the link idle.
+      if (chain !== observedChain) continue;
+      // Retrieval first: an acquisition can enqueue outbound work, so
+      // draining the chain before the retrieval lands would miss it.
+      if (retrievals.size > 0) {
+        await Promise.race([...retrievals].map((r) => r.promise));
+        continue;
+      }
+      if (held.size === 0) break;
+      // The RELEASE SIGNAL, not a poll. Every appended send is preceded by a
+      // held observation, so this also carries the loop across work enqueued
+      // behind a completed send.
+      await Promise.race([...held].map((h) => h.promise));
+    }
+  };
 
   return {
     async retrieve() {
+      if (disposed) return;
       if (!endpoint.get) {
         throw new Error('link: endpoint supplies no get().');
       }
@@ -622,50 +739,50 @@ export function link<S>(
       const promise = new Promise<void>((r) => (resolve = r));
       const entry = { promise, resolve };
       retrievals.add(entry);
+      observation.publish();
       try {
+        if (disposed) return;
         acquire((await endpoint.get()) as T, seq);
+      } catch (error) {
+        observation.publish('retrieve-failed');
+        throw error;
       } finally {
         // `finally`, so a rejected get() releases the waiter too - otherwise a
         // failing endpoint would wedge every future `settled()`.
         retrievals.delete(entry);
         entry.resolve();
+        observation.publish();
       }
     },
     async settled() {
-      // STRONG, not `await chain`. LINK-HANDLE-0 measured that the weak form
-      // means only "the chain I can currently see is drained", which misses
-      // observations HELD behind settlement and anything a completed send
-      // caused the reconciler to enqueue.
-      for (;;) {
-        await chain;
-        if (disposed) return;
-        // Retrieval first: an acquisition can enqueue outbound work, so
-        // draining the chain before the retrieval lands would miss it.
-        if (retrievals.size > 0) {
-          await Promise.race([...retrievals].map((r) => r.promise));
-          continue;
-        }
-        if (held.size === 0) break;
-        // The RELEASE SIGNAL, not a poll. Every appended send is preceded by a
-        // held observation, so this also carries the loop across work enqueued
-        // behind a completed send.
-        await Promise.race([...held].map((h) => h.promise));
+      if (disposed) return;
+      let release!: () => void;
+      const released = new Promise<void>((resolve) => (release = resolve));
+      settlementWaiters.add(release);
+      try {
+        // Keep the drain's awaits intact: adding a microtask before its
+        // retrieval check can miss work authored immediately after retrieve().
+        await Promise.race([drain(), released]);
+      } finally {
+        settlementWaiters.delete(release);
       }
     },
     dispose() {
+      if (disposed) return;
       disposed = true;
       // Releases only THIS relationship's claim. A leaf shared with another
       // Link stays armed for it; the last release returns the leaf to dormant.
       releaseObservation();
       offSub();
       offFlush?.();
-      offSource?.();
       // Its held consequence would only no-op now, but it keeps this whole
       // relationship reachable until the tree's transactions settle.
       withdrawHeldConsequence(x as object, consequenceKey);
       // Release anyone already inside `settled()`: a disposed link owns no
       // further work, and a held observation's count never returns to zero on
       // its own.
+      for (const release of settlementWaiters) release();
+      settlementWaiters.clear();
       for (const h of [...held]) {
         held.delete(h);
         h.resolve();
@@ -674,6 +791,9 @@ export function link<S>(
         retrievals.delete(r);
         r.resolve();
       }
+      observation.publish('disposed');
+      // User cleanup may throw; all owned state and waiters are already released.
+      offSource?.();
     },
   };
 }

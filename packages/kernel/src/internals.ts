@@ -10,7 +10,10 @@
  * Studio has a stable contract without `causal-runtime` or the transactions
  * enhancer's storage types becoming public surface.
  */
-export { withWriteObservationScope, type DeclaredWriteScopes } from './lib/internals/write-observation-scope';
+export {
+  withWriteObservationScope,
+  type DeclaredWriteScopes,
+} from './lib/internals/write-observation-scope';
 import type { ISignalTree } from './lib/types';
 import { getActiveWriteContext } from './lib/write-context';
 import { peekInternalTransactionRuntime } from './enhancers/transactions/transactions';
@@ -45,9 +48,13 @@ export function activeTransactionContext():
   const owner = context?.transactionOwner;
   const id = context?.transactionId;
   if (
-    typeof owner !== 'object' || owner === null ||
-    typeof id !== 'number' || !Number.isSafeInteger(id) || id < 0
-  ) return undefined;
+    typeof owner !== 'object' ||
+    owner === null ||
+    typeof id !== 'number' ||
+    !Number.isSafeInteger(id) ||
+    id < 0
+  )
+    return undefined;
   return { owner, id };
 }
 
@@ -94,6 +101,10 @@ function projectConfirmedTurns(
       before?: unknown;
       after?: unknown;
       subject?: unknown;
+      plainBranchMembership?: {
+        readonly before: boolean;
+        readonly after: boolean;
+      };
     }[];
   }[],
   retention: { truncated: boolean; firstAvailableTurnId?: number }
@@ -110,6 +121,11 @@ function projectConfirmedTurns(
         before: 'before' in effect ? effect.before : undefined,
         after: 'after' in effect ? effect.after : undefined,
         subjectId: 'subject' in effect ? effect.subject : undefined,
+        ...(effect.plainBranchMembership
+          ? {
+              plainBranchMembership: { ...effect.plainBranchMembership },
+            }
+          : {}),
       });
     }
     turns.push({
@@ -169,7 +185,8 @@ export function confirmedTurnReader<T>(
     return undefined;
   }
 
-  const destroyed = (tree as unknown as { destroyed?: () => boolean }).destroyed;
+  const destroyed = (tree as unknown as { destroyed?: () => boolean })
+    .destroyed;
 
   return {
     treeId: treeRuntimeId(tree),
@@ -186,3 +203,39 @@ export function confirmedTurnReader<T>(
     },
   };
 }
+
+export {
+  linkStateReader,
+  type LinkStateReader,
+  type LinkStateView,
+  type LinkStateEvent,
+  type LinkStateSnapshot,
+} from './lib/internals/link-state-view';
+
+export {
+  transactionLifecycleReader,
+  type PendingTransactionView,
+  type TransactionLifecycleReader,
+  type TransactionLifecycleSnapshot,
+  type TransactionLifecycleObservation,
+  type TransactionRefusalReason,
+} from './lib/internals/transaction-lifecycle-view';
+export {
+  restorationReader,
+  type RestorationReader,
+  type RestorationReaderSnapshot,
+  type RestorationReaderEvent,
+  type RestorationEntryView,
+  type RestorationEntryId,
+  type RestorationOperationId,
+} from './lib/internals/restoration-reader';
+export {
+  entityMembershipReader,
+  type EntityMembershipReader,
+  type EntityMembershipSnapshot,
+  type EntityMembershipEvent,
+  type EntityMembershipCollection,
+  type EntityMembershipLocation,
+  type EntityMembership,
+  type EntityMembershipChange,
+} from './lib/internals/entity-membership-view';
