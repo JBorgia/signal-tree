@@ -458,3 +458,23 @@ smokes still address rows by display path and are being migrated.
   522 + 1 expected fail, both typechecks, lint, `verify:private`, and
   `build:preview` (initial panel 559,952 bytes), and the preview,
   accessibility and topology smokes exit 0.
+
+## Browser store comparison — candidate vs 15.3.1 (development run)
+
+New harness on its own branch (`bench/store-comparison`, 301be14b, off `main`): a zoneless
+Angular 22 grid/editor app run in Chromium, five arms from installed packages, 5 rounds, A/A
+control, digests equal across arms. The machine was busy (load 6.1 on 10 cores), so the tool
+labels the run development-only; ranges were tight and A/A bands are given.
+
+Candidate (packed 15.4.0, tarballs from candidate 6) against 15.3.1:
+
+- `setAll` refetch slower: 14.0 vs 13.0 ms at 10k rows (+8%, A/A band 3.5%), 69.3 vs 62.6 ms
+  at 50k (+11%, band 1.9%). `move`, which is a `setAll` of the reordered list, is +7–10%.
+  Likely the 15.4.0 `setAll` order-capture and removal-anchoring fixes; not yet attributed.
+- JS transferred +1.4 KB gzip (93.8 → 95.2 KB for the whole route).
+- Initial load, single-row edits, burst, remove, editors, heap per row: within noise.
+
+Both 15.x versions, same workload: per-row heap 294 B (14.1.3: 146 B, NgRx: 156 B); load
+4.7x and refetch 1.9x slower than 14.1.3 at 50k rows; single edits ~3x 14.1.3; a kernel
+`WeakMap` table reaches ~280 KB under editor churn (bounded, no per-cycle growth after
+warm-up). No arm retains its store after teardown.
