@@ -379,7 +379,10 @@ const TARGETS = {
     // 25.10KB dev. entity-signal.ts carries the per-subject epoch registry
     // (subjectEpochs / pendingSubjectEpochs) on top of the shared kernel
     // growth above. Same disposition and same reason.
-    devKB: 25.25,
+    // October 1 owner approval: 22.54KiB prod / 25.37KiB dev after safe
+    // reductions and diagnostic folding checks. Only development headroom
+    // increases; the production ceiling remains unchanged. See the takeover audit.
+    devKB: 25.5,
     prodKB: 22.6,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
