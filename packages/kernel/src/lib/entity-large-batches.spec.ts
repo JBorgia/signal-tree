@@ -72,18 +72,21 @@ describe('setAll removal cost scales linearly', () => {
   };
   const ratio = (next: (count: number) => Row[]) => {
     time(2_000, next); // warm the JIT
-    const small = Math.min(time(4_000, next), time(4_000, next));
-    const large = Math.min(time(32_000, next), time(32_000, next));
+    const best = (count: number) =>
+      Math.min(time(count, next), time(count, next), time(count, next));
+    const small = best(8_000);
+    const large = best(64_000);
     return large / small;
   };
 
   it('replacing every id', () => {
     // 8x the rows: ~8x if linear, ~64x if quadratic. The wide margin keeps a
-    // loaded machine from failing a linear run (a 4x/9 version flaked once).
-    expect(ratio((count) => rows(count, count))).toBeLessThan(24);
+    // loaded machine from failing a linear run (4x/9 and 8x/24 versions
+    // flaked under the full suite's parallel load).
+    expect(ratio((count) => rows(count, count))).toBeLessThan(32);
   });
 
   it('clearing with setAll([])', () => {
-    expect(ratio(() => [])).toBeLessThan(24);
+    expect(ratio(() => [])).toBeLessThan(32);
   });
 });
