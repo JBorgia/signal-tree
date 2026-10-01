@@ -2284,8 +2284,9 @@ class RestorationManager<T> {
     }
     const newlyUnowned: number[] = [];
     for (const entry of entries) {
-      newlyUnowned.push(
-        ...claims.release(this.restorationClaimOwner(entry.id))
+      appendAll(
+        newlyUnowned,
+        claims.release(this.restorationClaimOwner(entry.id))
       );
     }
     if (newlyUnowned.length > 0) {
