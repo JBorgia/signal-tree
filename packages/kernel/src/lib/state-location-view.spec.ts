@@ -6,6 +6,7 @@ import { restoration } from '../enhancers/restoration/restoration';
 import { confirmedTurnReader, observeWrites } from '../internals';
 import { stateLocationReader } from './internals/state-location-view';
 import { StudioTreeDestroyedError } from './internals/confirmed-turn-view';
+import { getOwnedPositionIds } from './internals/owned-metadata';
 
 // Tooling joins recorded evidence (a position, a subject lifetime, captured
 // field keys) to a current location without parsing the `path` label: a
@@ -133,5 +134,110 @@ describe('state location reader', () => {
     tree.destroy();
     expect(() => reader.locate([target])).toThrow(StudioTreeDestroyedError);
     expect(() => stateLocationReader(tree)).toThrow(StudioTreeDestroyedError);
+  });
+});
+
+// Promoted from the independent review of the first implementation.
+describe('state location reader stays read-only and reports only current state', () => {
+  it('never invokes a same-named member of a non-collection node (a leaf would write)', async () => {
+    const tree = signalTree(
+      { b: { __findKeyBySubjectId: 0 } },
+      { enhancers: [transactions()] }
+    );
+    const frames: unknown[] = [];
+    const stop = observeWrites((frame) => frames.push(frame));
+    try {
+      // The BRANCH owns the position; its same-named member is a leaf accessor.
+      const position = getOwnedPositionIds(tree.$.b)![0];
+      expect(
+        stateLocationReader(tree)!.locate([{ position, lifetimeId: 42 }])
+      ).toEqual([undefined]);
+      await flush();
+      expect(tree.$.b.__findKeyBySubjectId()).toBe(0);
+      expect(frames).toEqual([]);
+    } finally {
+      stop();
+      tree.destroy();
+    }
+  });
+
+  it('does not locate an omitted optional member or anything under it', async () => {
+    const tree = signalTree(
+      {
+        box: { keep: 1, opt: { v: 1, rows: entityMap<Row, string>() } } as {
+          keep: number;
+          opt?: { v: number; rows: ReturnType<typeof entityMap<Row, string>> };
+        },
+      },
+      { enhancers: [transactions()] }
+    );
+    const frames: { positionIds?: readonly number[] }[] = [];
+    const stop = observeWrites((frame) => frames.push(frame));
+    try {
+      (tree.$.box as any).opt.rows.addOne({ id: 'k', n: 1 });
+      (tree.$.box as any).opt.v(2);
+      await flush();
+      const targets = [
+        { position: frames.at(-1)!.positionIds![0] },
+        { position: frames[0].positionIds![0], lifetimeId: 1 },
+      ];
+      const reader = stateLocationReader(tree)!;
+      expect(reader.locate(targets)).toEqual([
+        [p('box'), p('opt'), p('v')],
+        [p('box'), p('opt'), p('rows'), e('k')],
+      ]);
+      (tree.$.box as any)({ keep: 2 });
+      expect(reader.locate(targets)).toEqual([undefined, undefined]);
+    } finally {
+      stop();
+      tree.destroy();
+    }
+  });
+
+  it('does not locate an entity field that the current row no longer has', async () => {
+    const tree = make();
+    try {
+      tree.$.rows.addOne({ id: 'r', n: 1, d: { m: 1 } });
+      await flush();
+      tree
+        .transaction(() => tree.$.rows.updateOne('r', { d: { m: 2 } }))
+        .confirm();
+      const effect = confirmedTurnReader(tree)!
+        .readConfirmedTurns()
+        .turns.at(-1)!.effects[0];
+      const target = {
+        position: effect.position,
+        lifetimeId: effect.subjectId as number,
+        fieldSegments: effect.fieldSegments,
+      };
+      const reader = stateLocationReader(tree)!;
+      expect(reader.locate([target])).toEqual([
+        [p('rows'), e('r'), p('d'), p('m')],
+      ]);
+      tree.$.rows.replaceOne('r', { id: 'r', n: 1 });
+      expect(reader.locate([target])).toEqual([undefined]);
+    } finally {
+      tree.destroy();
+    }
+  });
+
+  it('returns segments detached between results of one call', async () => {
+    const tree = make();
+    const frames: { positionIds?: readonly number[] }[] = [];
+    const stop = observeWrites((frame) => frames.push(frame));
+    try {
+      tree.$.cart.total(5);
+      await flush();
+      const target = { position: frames[0].positionIds![0] };
+      const [first, second] = stateLocationReader(tree)!.locate([
+        target,
+        target,
+      ]) as unknown as { key: string }[][];
+      first[0].key = 'mutated';
+      expect(second).toEqual([p('cart'), p('total')]);
+    } finally {
+      stop();
+      tree.destroy();
+    }
   });
 });
