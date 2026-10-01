@@ -324,9 +324,9 @@ Pre-existing, fixed (each also reproduced on npm 15.3.1 where marked):
 Not changed, with reasons: restoration temporal-view statuses after `jumpTo`
 (reviewer: by design); rollback of a fully superseded write is a no-op rather
 than a refusal (no confirmed truth overwritten); discarding a pending staged
-entry publishes no history event (snapshot unchanged). Deferred, real: entity
-row optional fields return as explicit `undefined` after reversal (needs field
-presence tracking for entity rows; recorded as a known issue in the changelog).
+entry publishes no history event (snapshot unchanged). Entity row optional
+fields returned as explicit `undefined` after reversal; first recorded as a
+deferred known issue, then fixed (see below).
 
 Reviewer probe files after fixes: p3b, p3c, p4, p5, p6, p6v, p7, p8, p12 now
 fully pass (all red before); p3 1416/1416 throughout. Full kernel run 8: 319
@@ -397,3 +397,30 @@ smokes still address rows by display path and are being migrated.
   Remaining label-based joins (event detail, circuit, value history,
   investigation model, analytics, watchpoints, bookmarks, history relations)
   are being migrated.
+
+## Owner corrections — September 30 (evening)
+
+- Topology smoke race: the unchanged `checkSampledTopology` read row counts
+  straight after `fill()`; captured red on run 2 of 2 (`16 !== 0`,
+  `/private/tmp/studio-topology-race-FIRST-RED.log`). The check now waits for
+  the search result for that query, retries the count, and separately asserts
+  the undiscovered reference has no row: 10/10 consecutive runs exit 0 (private
+  396e0c4). A passing rerun was not treated as resolution.
+- Optional entity fields: fixed rather than deferred (public f14280ee).
+  Effects record own-property presence; reversal removes keys that were absent;
+  explicit `undefined` stays present. Reproduced on npm 15.3.1; new spec 11/11
+  (11/11 red against the previous HEAD); reviewer probes p10b and p10 pass.
+- Bundle: what the BARE build reaches from new code, by reading an unminified
+  bare bundle: `capturePlainBranchMembership` (on the branch-write path; does
+  work only when a path observer exists) and the committed-entity capture port
+  in the mutation capture runtime. In entities, the mutation frame's committed
+  capture and membership-delta construction, and entity-signal's membership
+  producer and committed capture. Measured by stubbing each in scratch builds
+  (production gzip): plain-branch capture −0.22 KB (both targets), membership
+  producer −0.33 KB (entities), committed-entity observer −0.04 KB (frame code
+  stays reachable). Even with all made injectable the targets stay above their
+  ceilings (≈10.4 vs 10.26 KB bare, ≈23.6 vs 22.6 KB entities). The remainder
+  has not been proven unavoidable; it has been attributed to modules, not to
+  necessity. Ceiling decision remains with the owner.
+- Studio: historical identity vs current location and the end-to-end export
+  redaction regression are in progress.
