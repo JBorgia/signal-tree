@@ -552,3 +552,19 @@ To resume:
 
 Pending: on 15.4.0, `restoration.ts` `newlyUnowned.push(...claims.release(...))` still spreads
 (fixed on 15.3.2). 15.3.2 deliberately leaves out the `setAll`-replacement undo-order fix.
+
+### Resumed and closed (tight pass) — October 1
+
+Merged after the full suite, not line-by-line review: 97affed3 (payloads only when observed;
+gate defaults to observed), 737e0074 (setAll single structural walk), dda146ed (message table),
+dc8c3e5a (confirmed ledger O(1) under a pending turn). Added cb3de973 (shared key snapshot,
+identity-stable `ids()`, no-op reorder skipped) and c2f72e6e (claims spread). Kernel 3204 pass
+(timing spec hardened, 36409c42), angular 152, lint, spec-types, api-baseline, tree-shaking,
+dead-exports, both retired-subject-slope gates exit 0. Bundle: bare 9.63/10.26 KB (under), entities
+23.39/22.6 KB (still over).
+
+Not done (audit items remain open): entity bundle removals E1–E6 (enough to clear the entities
+budget), cheaper `all()`/`where`/`find`, per-row memory, construction/leaf records, enhancer
+idle-capture laziness, and a quiet browser re-run of the bench and size matrix. The stopped
+implementers' uncommitted edits remain unmerged in `/private/tmp/st-opt-*`. 15.3.2 is ready on
+`fix/15.3.2-backport` (aabb14d8), not tagged or published.

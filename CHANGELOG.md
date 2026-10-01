@@ -68,6 +68,12 @@ These changes are under verification and are not part of the published 15.3.1 ar
   - a row whose node was read kept ~100 B after it was removed, forever; a grid
     that reads its rows and refetches new ids grew without bound.
 
+- **Performance (no behaviour change).** Entity collections build observation
+  payloads (row clones, metadata, notifications) only when something observes
+  them; `setAll` stages from one structural walk; `ids()` keeps its identity
+  across field writes and no longer re-walks the collection after each one; a
+  same-order `setAll` no longer relinks. Bare bundle 10.37 → 9.63 KB gzip.
+
 - Add read-only transaction lifecycle, restoration lineage, entity membership,
   and Link activity readers for tooling through `@signal-tree/kernel/internals`:
   `transactionLifecycleReader`, `restorationReader`, `entityMembershipReader`,
