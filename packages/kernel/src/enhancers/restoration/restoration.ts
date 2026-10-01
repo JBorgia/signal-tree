@@ -554,6 +554,10 @@ class RestorationManager<T> {
     return this.maxHistorySize > 0;
   }
 
+  hasRetainedOrPendingHistory(): boolean {
+    return this.history.length > 0 || this.pendingTurns.size > 0;
+  }
+
   appendHistoricalGap(
     effects: TurnEffect[],
     collectionOrders: PendingCollectionOrder[],
@@ -3351,6 +3355,15 @@ export function restoration(
       !(value instanceof Date) &&
       !(value instanceof Map) &&
       !(value instanceof Set);
+    const clearCaptureBucket = (bucket: CaptureBucket): void => {
+      bucket.ownerPaths.clear();
+      bucket.subjectIds.clear();
+      bucket.positionIds.clear();
+      bucket.effects.clear();
+      bucket.collectionOrders.clear();
+      bucket.descriptorInputs.length = 0;
+      bucket.designated = false;
+    };
     const drainCaptureBucket = (
       bucket: CaptureBucket
     ): {
@@ -4457,6 +4470,16 @@ export function restoration(
             // people's trees is the worst kind.
             if (!selfDirty) return;
             selfDirty = false;
+            // Decide only at flush: a later designated write can promote the
+            // whole turn. Retained (including redo) and pending history still
+            // need ordinary gaps to reconstruct their historical boundaries.
+            if (
+              !isTurnEligible(pendingCapture.designated) &&
+              !restorationManager.hasRetainedOrPendingHistory()
+            ) {
+              clearCaptureBucket(pendingCapture);
+              return;
+            }
             const {
               subjectIds,
               positionIds,

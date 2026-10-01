@@ -460,7 +460,15 @@ export function createEntitySignal<
   }
 
   function getProjectedEntities(): E[] {
-    return getProjectedEntries().map(([, entity]) => entity);
+    // Value-only projections do not need an intermediate tuple per entity.
+    // Keep a fresh array: held snapshots and sorted projections must not share
+    // a mutable backing buffer with later reads.
+    const entities: E[] = [];
+    for (const id of structuralStore.activeKeysSnapshot()) {
+      const entity = getProjectedEntity(id);
+      if (entity !== undefined) entities.push(entity);
+    }
+    return entities;
   }
 
   function acquireEntityHandleForTesting(

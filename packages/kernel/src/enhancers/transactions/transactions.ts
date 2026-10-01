@@ -634,6 +634,24 @@ class TransactionAuthority {
     positionIds?: number[],
     effects?: TurnEffect[]
   ): void {
+    if (
+      this.pendingTurns.size === 0 &&
+      this.historyRetain === 0 &&
+      this.confirmedTurns.length === 0
+    ) {
+      // Match building and immediately evicting a nonempty ordinary record,
+      // including the sequence and reader's explicit truncation evidence.
+      // Capture/drain and descriptor cleanup still run in the caller.
+      if (
+        (subjectIds?.length ?? 0) > 0 ||
+        (positionIds?.length ?? 0) > 0 ||
+        (effects?.length ?? 0) > 0
+      ) {
+        this.nextTurnId++;
+        this.evictedConfirmed = true;
+      }
+      return;
+    }
     const turn = this.buildTurn(subjectIds, positionIds, effects);
     if (!turn) {
       return;
