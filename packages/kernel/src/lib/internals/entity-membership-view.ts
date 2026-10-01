@@ -3,7 +3,9 @@ import { StudioTreeDestroyedError } from './confirmed-turn-view';
 import { activateEntityObservation } from './entity-observation';
 import {
   copyMembershipChanges,
+  activateEntityMembership,
   getEntityMembershipInventory,
+  hasEntityMembershipSource,
   type EntityMembership,
   type EntityMembershipChange,
   type EntityMembershipInventory,
@@ -175,10 +177,12 @@ export function entityMembershipReader<T>(
       tree.$,
       (node, path, key, parent) => {
         const object = node as object;
-        const inventory = getEntityMembershipInventory(object);
+        const isCollection =
+          getEntityMembershipInventory(object) !== undefined ||
+          hasEntityMembershipSource(object);
         if (
           node !== tree.$ &&
-          !inventory &&
+          !isCollection &&
           getOwnedOwnerPath(node) === undefined
         )
           return false;
@@ -190,13 +194,16 @@ export function entityMembershipReader<T>(
                 { kind: 'property' as const, key },
               ];
         locations.set(object, location);
-        if (!inventory)
+        if (!isCollection)
           return typeof node === 'function' && !isNodeAccessor(node)
             ? false
             : undefined;
         // A reused marker or foreign owned node cannot enroll another tree's
         // supplier, and therefore cannot close it during this tree's cleanup.
         if (getPositionRegistry(object) !== registry) return false;
+        // First observation installs this collection's membership producer.
+        const inventory = activateEntityMembership(object);
+        if (!inventory) return false;
         const owner = inventoryOwners.get(inventory);
         if (owner && owner !== registry) return false;
         if (owned.collections.has(inventory)) return false;
