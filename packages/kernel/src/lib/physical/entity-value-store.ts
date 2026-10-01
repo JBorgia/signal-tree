@@ -34,7 +34,4 @@ export class EntityValueStore<E extends Record<string, unknown>> {
     return this.retainedEntities.delete(subjectId);
   }
 
-  clear(): void {
-    this.retainedEntities.clear();
-  }
 }

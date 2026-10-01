@@ -378,37 +378,6 @@ export class StructuralStore<K extends string | number> {
     this.orderFrontier = {};
   }
 
-  restoreIndexForSubjects(
-    beforeSubject?: number,
-    afterSubject?: number
-  ): number {
-    const beforeNode =
-      beforeSubject === undefined
-        ? undefined
-        : this.activeNodesBySubject.get(beforeSubject);
-    const afterNode =
-      afterSubject === undefined
-        ? undefined
-        : this.activeNodesBySubject.get(afterSubject);
-
-    if (beforeNode !== undefined && afterNode !== undefined) {
-      if (this.nodePrecedes(beforeNode, afterNode)) {
-        return this.indexOfNode(beforeNode) + 1;
-      }
-      return this.indexOfNode(afterNode);
-    }
-
-    if (afterNode !== undefined) {
-      return this.indexOfNode(afterNode);
-    }
-
-    if (beforeNode !== undefined) {
-      return this.indexOfNode(beforeNode) + 1;
-    }
-
-    return this.activeCount;
-  }
-
   neighborSubjectsForKey(key: K): {
     beforeSubject?: number;
     afterSubject?: number;
@@ -479,25 +448,6 @@ export class StructuralStore<K extends string | number> {
       restoreAllowed,
     });
     this.orderFrontier = {};
-  }
-
-  restoreSubject(
-    subjectId: number,
-    key: K,
-    beforeSubject?: number,
-    afterSubject?: number,
-    restoreAllowed = true
-  ): void {
-    const placement = this.resolveSubjectRestorePlacement(
-      beforeSubject,
-      afterSubject
-    );
-    this.restoreSubjectAtResolvedPlacement(
-      subjectId,
-      key,
-      placement,
-      restoreAllowed
-    );
   }
 
   resolveSubjectRestorePlacement(
@@ -632,106 +582,6 @@ export class StructuralStore<K extends string | number> {
     this.activeNodesBySubject.delete(subjectId);
   }
 
-  clear(): void {
-    this.keysCache = undefined;
-    this.subjectIds.clear();
-    this.subjectStates.clear();
-    this.subjectRevisions.clear();
-    this.activeNodesByKey.clear();
-    this.activeNodesBySubject.clear();
-    this.activeHead = undefined;
-    this.activeTail = undefined;
-    this.activeCount = 0;
-    this.nextSubjectId = 1;
-    this.collectionIncarnation += 1;
-    this.orderFrontier = {};
-  }
-
-  __assertActiveOrderIntegrityForTesting(): void {
-    if (this.activeHead?.prev !== undefined) {
-      throw new Error('Active head must not have a previous node.');
-    }
-
-    if (this.activeTail?.next !== undefined) {
-      throw new Error('Active tail must not have a next node.');
-    }
-
-    const reachableKeys = new Set<K>();
-    const reachableSubjects = new Set<number>();
-    let previous: ActiveNode<K> | undefined;
-    let count = 0;
-    let node = this.activeHead;
-
-    while (node !== undefined) {
-      if (node.prev !== previous) {
-        throw new Error('Broken prev link in active node chain.');
-      }
-
-      if (previous !== undefined && previous.next !== node) {
-        throw new Error('Broken next link in active node chain.');
-      }
-
-      if (reachableKeys.has(node.key)) {
-        throw new Error(`Duplicate reachable key ${String(node.key)}.`);
-      }
-
-      if (reachableSubjects.has(node.subjectId)) {
-        throw new Error(
-          `Duplicate reachable subject ${String(node.subjectId)}.`
-        );
-      }
-
-      if (this.activeNodesByKey.get(node.key) !== node) {
-        throw new Error(`Key lookup mismatch for ${String(node.key)}.`);
-      }
-
-      if (this.activeNodesBySubject.get(node.subjectId) !== node) {
-        throw new Error(
-          `Subject lookup mismatch for ${String(node.subjectId)}.`
-        );
-      }
-
-      if (this.subjectIds.get(node.key) !== node.subjectId) {
-        throw new Error(
-          `Subject id mapping mismatch for key ${String(node.key)}.`
-        );
-      }
-
-      const state = this.subjectStates.get(node.subjectId);
-      if (!state?.active || state.key !== node.key) {
-        throw new Error(
-          `Active state mismatch for subject ${String(node.subjectId)}.`
-        );
-      }
-
-      reachableKeys.add(node.key);
-      reachableSubjects.add(node.subjectId);
-      count += 1;
-      previous = node;
-      node = node.next;
-    }
-
-    if (previous !== this.activeTail) {
-      throw new Error('Active tail does not match the reachable chain tail.');
-    }
-
-    if (count !== this.activeCount) {
-      throw new Error('Active count does not match the reachable chain size.');
-    }
-
-    if (this.activeNodesByKey.size !== count) {
-      throw new Error(
-        'Active key index size does not match reachable node count.'
-      );
-    }
-
-    if (this.activeNodesBySubject.size !== count) {
-      throw new Error(
-        'Active subject index size does not match reachable node count.'
-      );
-    }
-  }
-
   private createAndAppendActiveNode(subjectId: number, key: K): void {
     this.keysCache = undefined;
     const node: ActiveNode<K> = {
@@ -835,20 +685,6 @@ export class StructuralStore<K extends string | number> {
     }
 
     return false;
-  }
-
-  private indexOfNode(target: ActiveNode<K>): number {
-    let index = 0;
-    let node = this.activeHead;
-    while (node !== undefined) {
-      if (node === target) {
-        return index;
-      }
-      index += 1;
-      node = node.next;
-    }
-
-    return -1;
   }
 
   private activateSubject(
