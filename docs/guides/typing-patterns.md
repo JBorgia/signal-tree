@@ -117,3 +117,15 @@ The wrapper is consumed at construction or invocation. The raw value, not the
 wrapper, appears in reads, snapshots, persistence, restoration, and links. See
 [Myth 19](../myths-and-misconceptions.md#myth-19-any-object-i-put-in-the-initial-state-becomes-one-settable-value)
 for the longer discussion.
+
+Replace terminal values through their location when changing them. Mutating a
+returned object or collection in place bypasses write tracking; restoration does
+not deep-copy arbitrary mutable payloads into isolated historical values.
+
+### Module resolution and the build runtime
+
+The [packed-consumer gate](../../tools/verify-consumer-typecheck.mjs) checks
+declarations with TypeScript's `bundler` and `node16` module-resolution modes.
+Here, `node16` names a compiler setting; it is not a claim of runtime support for
+Node.js 16. The repository build runtime is Node.js 24.15.0, pinned in
+[`.nvmrc`](../../.nvmrc).

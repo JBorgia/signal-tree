@@ -20,6 +20,8 @@ import typescript from 'highlight.js/lib/languages/typescript';
 import { marked } from 'marked';
 import { lastValueFrom } from 'rxjs';
 
+import { SIGNALTREE_CORE_VERSION } from '../../version';
+
 /**
  * The heading-anchor slug rule, shared by everything that needs to agree on
  * what `#ownership` means. Kept at module scope because the anchors are now
@@ -286,7 +288,9 @@ export class DocumentationComponent implements OnInit {
     // Markdown comes from copied assets, but relative links belong to the
     // original repository document. Package llms.txt is a generated copy of
     // the shared root manifest; it is also served directly by the demo.
-    const repositoryRoot = 'https://github.com/JBorgia/signal-tree/blob/main/';
+    // Link to the release this demo documents, never a different line on main.
+    // An unreleased local preview's tag links become available at publication.
+    const repositoryRoot = `https://github.com/JBorgia/signal-tree/blob/v${SIGNALTREE_CORE_VERSION}/`;
     const sourceUrl = new URL(pkg.repositoryPath, repositoryRoot);
     const routeTo = (target: DocPackage, fragment: string) =>
       this.router.serializeUrl(
@@ -325,7 +329,7 @@ export class DocumentationComponent implements OnInit {
       if (src && !/^(?:[a-z][a-z\d+.-]*:|\/)/i.test(src)) {
         const base = new URL(
           pkg.repositoryPath,
-          'https://raw.githubusercontent.com/JBorgia/signal-tree/main/'
+          `https://raw.githubusercontent.com/JBorgia/signal-tree/v${SIGNALTREE_CORE_VERSION}/`
         );
         image.setAttribute('src', new URL(src, base).href);
       }

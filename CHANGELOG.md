@@ -8,6 +8,28 @@ transaction rollback with entity collections.**
 
 These changes are under verification and are not part of the published 15.3.1 artifact.
 
+- **Correctness fix: atomic terminal replacements.** Undo/redo and transaction
+  rollback preserve `leaf(object)` as one location rather than interpreting its
+  payload as branch topology. Registered terminal replacements also support
+  non-primitive values such as arrays, Dates, Maps and Sets. An external write
+  of `undefined` remains authoritative and can refuse undo without changing
+  sibling values or the history position. This does not add tracking of in-place
+  mutations or deep-copy isolation for mutable payloads.
+
+- **Tooling declarations:** root, adapter and internals declarations share one
+  type graph, preserving nominal identities across package entries. Observation
+  readers accept the factory's actual leaf topology and framework carriers,
+  including opaque object leaves and Vue refs.
+
+- **Allocation reductions:** entity value projections avoid discarded entry
+  tuples. Transactions avoid constructing immediately discarded ordinary
+  history records when none are needed; restoration avoids copying capture
+  records when there is no designated, retained or pending history obligation.
+  Restoration also avoids recursive capture construction for unchanged fields
+  while preserving reads and own-property presence.
+  Pending work, retained history and observable lifecycle sequencing remain
+  protected by regression and mutation controls.
+
 - **Correctness fix: reversals across collections.** Every `entityMap()`
   allocates entity lifetimes from 1, so two collections routinely hold the
   same lifetime ID, and realization looked prepared rows up by that bare ID.

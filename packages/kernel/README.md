@@ -88,6 +88,10 @@ At construction, `leaf(object)` stops dot-path expansion. At invocation,
 The wrapper never enters canonical state, snapshots, persistence, restoration,
 or links; reads return the original raw value by identity.
 
+Change an atomic value by replacing it through its location. Mutating an object,
+array, Map or Set returned by a read is not a recorded write. Restoration records
+replacement writes; it does not provide deep-copy isolation for mutable payloads.
+
 ## Construction
 
 State, capabilities, and derived values are declared in one construction call:
@@ -339,7 +343,7 @@ explicit `pending.rollback()` call. Successful automatic rollback reverses
 recorded writes and discards deferred consequences. Never blindly retry the
 entire operation after an error or use undo for request reconciliation.
 Recoverable pending refusal is a v16 target, not current API. See
-[Transaction failures and current v15 limitations](https://github.com/JBorgia/signal-tree/blob/fix/15.3.1-link-rollback-and-strand/docs/guides/transaction-failures-v15.md)
+[Transaction failures and current v15 limitations](https://github.com/JBorgia/signal-tree/blob/v15.3.1/docs/guides/transaction-failures-v15.md)
 for remaining defects and the bounded observer-containment rule, including Vue
 mode differences and enclosing Solid batches.
 

@@ -94,6 +94,10 @@ locations and observes selected state through `useSignalTree(owner, selector)`.
 EntityMap query and field leaves follow the same carrier rule; EntityMap command
 methods such as `setAll()` and `updateOne()` do not change.
 
+Replace atomic values through their location. In-place mutation of a returned
+object, array, Map or Set is not a recorded write; restoration does not provide
+deep-copy isolation for mutable payloads.
+
 Plain objects normally become traversable branches. `leaf(value)` explicitly
 ends topology so an object remains one atomic location. Declare function-valued
 fields with `leaf(fn)`. At a callable write boundary, use `leaf(fn)` to distinguish
@@ -191,7 +195,8 @@ of the same model.
 ## Canonical Sources
 
 - `AGENTS.md` — contributor and consumer rules
-- `RELEASE-1.0.md` — v15 release invariants and current release state
+- `RELEASE-CURRENT.md` — active candidate, current release work and blockers
+- `RELEASE-1.0.md` — historical derivations, failures and prior checkpoints
 - `README.md` — public package overview
 - `packages/kernel/README.md` — kernel API and examples
 - `packages/angular/README.md` — Angular realization

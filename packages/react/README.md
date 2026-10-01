@@ -150,7 +150,7 @@ and first-party memoized selectors are not part of the initial surface.
 
 ## Transaction failures
 
-Read [Transaction failures and current v15 limitations](https://github.com/JBorgia/signal-tree/blob/fix/15.3.1-link-rollback-and-strand/docs/guides/transaction-failures-v15.md)
+Read [Transaction failures and current v15 limitations](https://github.com/JBorgia/signal-tree/blob/v15.3.1/docs/guides/transaction-failures-v15.md)
 before combining transactions, undo, or persistence. Explicit rollback refusal
 leaves state unchanged and the handle pending but releases consequences in v15. The
 15.3.1 release commits surviving writes on automatic refusal
