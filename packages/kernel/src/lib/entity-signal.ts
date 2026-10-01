@@ -375,6 +375,22 @@ export function createEntitySignal<
     });
   };
 
+  /**
+   * A query whose predicate is user code. The version-keyed cache above is only
+   * right for projections that read nothing but this collection: a predicate
+   * may also read another signal, and a cached result would ignore it (and drop
+   * the dependency). Reproduced on 15.3.1: `where(r => r.v >= tree.$.min())`
+   * kept the old rows after `min` changed. The derived itself memoises on every
+   * dependency the predicate reads, plus the collection version read here.
+   */
+  const createQueryProjection = <TValue>(
+    compute: () => TValue
+  ): ReadableCell<TValue> =>
+    locations.createDerived(() => {
+      version();
+      return compute();
+    });
+
   function getProjectedEntity(id: K): E | undefined {
     const subjectId = structuralStore.subjectIdForKey(id);
     return subjectId === undefined
@@ -2249,7 +2265,7 @@ export function createEntitySignal<
       //
       // `version()` is read directly for the same invalidation `allSignal()`
       // has; the sorted branch gets it transitively.
-      const s = createVersionedProjection(() => {
+      const s = createQueryProjection(() => {
         if (config.sortComparer) return allSignal().filter(predicate);
         const out: E[] = [];
         for (const entity of getProjectedEntities()) {
@@ -2282,7 +2298,7 @@ export function createEntitySignal<
       // Sorted collections keep the old path: `find` returns the FIRST match,
       // which is order-dependent, so with a `sortComparer` the sorted array is
       // the only correct thing to scan. See the note on `where` above.
-      const s = createVersionedProjection(() => {
+      const s = createQueryProjection(() => {
         if (config.sortComparer) return allSignal().find(predicate);
         for (const entity of getProjectedEntities()) {
           if (predicate(entity)) return entity;
@@ -2357,7 +2373,10 @@ export function createEntitySignal<
 
     addMany(entities: E[], opts?: AddManyOptions<E, K>): K[] {
       const mode = opts?.mode ?? 'strict';
-      const previousKeys = [...structuralStore.activeKeysSnapshot()];
+      // addMany appends: an added row's predecessor is the previous added row,
+      // or for the first one the last row before the call. Only that key is
+      // needed, not a copy of every key.
+      const lastPreviousKey = structuralStore.lastActiveKey();
 
       // First pass: validate/filter based on mode
       const toProcess: Array<{
@@ -2465,9 +2484,15 @@ export function createEntitySignal<
       // Notify PathNotifier for each processed entity
       for (let i = 0; i < addedEntities.length; i++) {
         const { id, entity } = addedEntities[i];
-        const beforeKey = previousKeys.at(
-          i + previousKeys.length - addedEntities.length
-        );
+        // Reproduced on 15.3.1: indexing the pre-add key list at
+        // `i + previous - added` anchored [x, y] after k4 and k5 instead of
+        // after k5 and x, so redo reinserted them out of order.
+        const beforeSubject =
+          i > 0
+            ? subjectIdsForWrite[i - 1]
+            : lastPreviousKey === undefined
+            ? undefined
+            : allocateSubjectId(lastPreviousKey);
         pathNotifier.notify(
           `${basePath}.${String(id)}`,
           entity,
@@ -2480,10 +2505,7 @@ export function createEntitySignal<
             subject: subjectIdsForWrite[i],
             key: id,
             value: deepClone(entity),
-            beforeSubject:
-              beforeKey === undefined
-                ? undefined
-                : allocateSubjectId(beforeKey),
+            beforeSubject,
           })
         );
       }
@@ -3315,39 +3337,52 @@ export function createEntitySignal<
         freshSubjectIdsByKey.set(stagedAdds[index].id, freshSubjectIds[index]);
       }
 
+      // One index of the pre-state order, not a search per removed row: that
+      // made replacing or clearing a collection O(n^2) (~2 s at 40k rows). The
+      // nearest surviving neighbour on each side is found in two linear passes
+      // for the same reason: walking outward from every removed row rescans the
+      // whole removed run, so replacing every row was quadratic even with the
+      // index. The neighbours chosen are unchanged.
+      let currentIndexById: Map<K, number> | undefined;
+      let survivorBefore: Array<K | undefined> | undefined;
+      let survivorAfter: Array<K | undefined> | undefined;
+      if (stagedRemovals.length > 0) {
+        currentIndexById = new Map(
+          currentEntries.map(([entryId], index) => [entryId, index])
+        );
+        // survivorBefore[i]: nearest surviving id at an index below i.
+        // survivorAfter[i]: nearest surviving id at an index of i or above.
+        survivorBefore = new Array(currentEntries.length + 1);
+        survivorAfter = new Array(currentEntries.length + 1);
+        let nearest: K | undefined;
+        for (let index = 0; index < currentEntries.length; index += 1) {
+          survivorBefore[index] = nearest;
+          const neighborId = currentEntries[index]?.[0];
+          if (neighborId !== undefined && survivingOriginalIds.has(neighborId)) {
+            nearest = neighborId;
+          }
+        }
+        survivorBefore[currentEntries.length] = nearest;
+        nearest = undefined;
+        survivorAfter[currentEntries.length] = undefined;
+        for (let index = currentEntries.length - 1; index >= 0; index -= 1) {
+          const neighborId = currentEntries[index]?.[0];
+          if (neighborId !== undefined && survivingOriginalIds.has(neighborId)) {
+            nearest = neighborId;
+          }
+          survivorAfter[index] = nearest;
+        }
+      }
       const stagedRemovalStructuralEffects = stagedRemovals.map(
         ({ id, entity, subjectId }) => {
-          const currentIndex = currentEntries.findIndex(
-            ([entryId]) => entryId === id
-          );
-          let beforeSubject: number | undefined;
-          let afterSubject: number | undefined;
-
-          for (let index = currentIndex - 1; index >= 0; index -= 1) {
-            const neighborId = currentEntries[index]?.[0];
-            if (
-              neighborId !== undefined &&
-              survivingOriginalIds.has(neighborId)
-            ) {
-              beforeSubject = resolveSubjectId(neighborId);
-              break;
-            }
-          }
-
-          for (
-            let index = currentIndex + 1;
-            index < currentEntries.length;
-            index += 1
-          ) {
-            const neighborId = currentEntries[index]?.[0];
-            if (
-              neighborId !== undefined &&
-              survivingOriginalIds.has(neighborId)
-            ) {
-              afterSubject = resolveSubjectId(neighborId);
-              break;
-            }
-          }
+          const currentIndex = currentIndexById?.get(id) ?? -1;
+          const beforeId =
+            currentIndex > 0 ? survivorBefore?.[currentIndex] : undefined;
+          const afterId = survivorAfter?.[currentIndex + 1];
+          const beforeSubject =
+            beforeId === undefined ? undefined : resolveSubjectId(beforeId);
+          const afterSubject =
+            afterId === undefined ? undefined : resolveSubjectId(afterId);
 
           return {
             kind: 'remove' as const,

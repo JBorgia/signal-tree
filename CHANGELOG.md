@@ -1,3 +1,48 @@
+## 15.3.2 (2026-10-01)
+
+**TL;DR** — **Patch. No breaking changes and no API change; one behaviour you
+could notice: `where()` and `find()` now re-run when a signal their predicate
+reads changes, where before they kept the old result. No new cost: `setAll`
+removal bookkeeping got cheaper, not dearer.** Fixes for large
+entity collections (`setAll`, undo/redo past ~10^5 rows) and for `addMany`
+undo/redo order, backported from the 15.4.0 line. Take it if you use
+`entityMap` with `restoration()`, replace or clear large collections, or pass
+a predicate that reads another signal to `where()` / `find()`.
+
+Each case was reproduced against the 15.3.1 tarball installed from npm.
+
+### Fixed
+
+- **`setAll` replacing or clearing a large collection was quadratic.** Each
+  removed row searched the whole pre-state order for its neighbours: replacing
+  every row took ~190 ms at 8k rows and ~3 s at 32k (4x per doubling). The
+  order is indexed once, and the nearest surviving neighbour on each side is
+  found in two linear passes; the neighbours recorded are unchanged.
+- **Undo of a large replacement spent most of its time comparing every pair of
+  structural effects** for a key handoff. Effects are now indexed by owner and
+  key, and each hit is re-checked with `Object.is`, the comparison the rule has
+  always used.
+- **`Maximum call stack size exceeded` with entity-sized arrays.** Undo/redo of
+  a `setAll` over 130k rows threw a `RangeError` because restoration, target
+  transitions, serialization circular-reference detection and devtools path
+  collection spread arrays into `push(...)`, which V8 limits to ~10^5
+  arguments. They append in a loop now.
+- **`addMany` undo/redo restored rows in the wrong order.** Each added row was
+  anchored to the wrong predecessor, so with 5 existing rows,
+  `addMany([x, y])`, undo, redo gave `[k1, k2, k3, k4, x, k5, y]`. A row is
+  now anchored to the previous added row, or for the first to the last row
+  before the call.
+- **`where()` / `find()` ignored other signals read by the predicate.** The
+  result was cached by the collection version alone, so
+  `where(r => r.v >= tree.$.min())` kept its old rows after `min` changed. They
+  are plain derived values now; other projections keep the version cache.
+
+### Not in this patch
+
+Undo of a `setAll` that replaced every row still restores the rows in reversed
+order on 15.3.x. That is a separate defect fixed in 15.4.0 (removal anchors
+changed there) and is not backported.
+
 ## 15.3.1 (2026-09-28)
 
 **TL;DR** — **Patch. No API change, but two behaviour changes you could

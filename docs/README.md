@@ -6,9 +6,9 @@
 
 Use this index to navigate the documentation.
 
-**Development version:** 15.3.1 (unreleased). See [CHANGELOG](../CHANGELOG.md).
+**Development version:** 15.3.2 (unreleased). See [CHANGELOG](../CHANGELOG.md).
 
-**Latest published release:** 15.3.0.
+**Latest published release:** 15.3.1.
 
 ---
 

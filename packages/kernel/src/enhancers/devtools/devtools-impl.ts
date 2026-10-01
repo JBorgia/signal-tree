@@ -26,6 +26,7 @@ import type {
 } from '../../lib/types';
 import type { DevToolsLogEntry, DevToolsMethods, DevToolsModuleMetadata, DevToolsPerformanceMetrics } from './devtools.types';
 import { ENHANCER_META } from '../../lib/types';
+import { appendAll } from '../../lib/internals/utilities/append-all';
 
 // Heavy devtools implementation. Imported by ./devtools.ts ONLY past its
 // ngDevMode prod-strip guard, so a production build (ngDevMode=false) drops the
@@ -957,7 +958,7 @@ function getOrCreateDevToolsGroup(
         const formatted = Array.from(new Set(allowedRaw)).map((path) =>
           tree.formatPathFn(`${treeKey}.${path}`)
         );
-        allFormattedPaths.push(...formatted);
+        appendAll(allFormattedPaths, formatted);
       }
     }
 
