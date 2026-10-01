@@ -355,3 +355,10 @@ type tests to prove read-only consumers cannot reach mutation methods.
 
 The target architecture is derived from current semantics and ownership. A
 legacy application may falsify it, but does not define it.
+
+### Executable ownership reference
+
+The [owned sessions guide](../guides/owned-sessions.md) and demo at
+`/owned-sessions` show multiple editors of one record, local revision/lifetime
+conflict checks, independent device subscriptions and owner teardown. They use
+existing public APIs and do not merge trees or create shared settlement authority.

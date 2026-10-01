@@ -1,7 +1,7 @@
 # SignalTree
 
-SignalTree is framework-neutral reactive application state with causal
-semantics. The public v15 construction model is
+SignalTree keeps nested state, entity identity, transactions, undo, external
+updates and reactive publication consistent across frameworks. The v15 construction model is
 `signalTree(initialState, { derived, enhancers })`; state is read through
 `tree.$`.
 
@@ -203,16 +203,15 @@ of the same model.
 
 ## Transaction failure guidance
 
-The guide below links to the active v15 candidate branch because `main` tracks
-v16. The absolute repository URL also works independently of the hosted
-`llms.txt` path; the demo does not serve this guide at `/docs/guides/`. The
-candidate documentation and release publication are pending; this branch link
-is not evidence that 15.3.1 has shipped.
+The failure behavior in this section describes published SignalTree 15.3.1.
+The additive 15.4.0 tooling APIs described below are unreleased. The release-tag link below
+is fixed to that version because `main` tracks v16. Future fixes must be checked
+against the installed version; source changes do not update an existing tarball.
 
-Read [Transaction failures and current v15 limitations](https://github.com/JBorgia/signal-tree/blob/fix/15.3.1-link-rollback-and-strand/docs/guides/transaction-failures-v15.md)
+Read [Transaction failures and current v15 limitations](https://github.com/JBorgia/signal-tree/blob/v15.3.1/docs/guides/transaction-failures-v15.md)
 before generating optimistic writes or persistence. Explicit `pending.rollback()`
 refusal leaves state unchanged and the handle pending, but releases consequences
-in existing v15. In the unreleased 15.3.1 candidate, automatic refusal before a
+in existing v15. In 15.3.1, automatic refusal before a
 handle returns records surviving writes as committed, retains eligible undo
 history, releases consequences, and still throws. Successful automatic rollback
 reverses recorded writes. Error does not guarantee undo: never blindly retry the
@@ -220,8 +219,65 @@ whole operation or use `undo()`/`jumpTo()` for request reconciliation. Removing 
 pending-created row after a confirmed edit does not necessarily clear its
 rollback dependency. Recoverable pending refusal is a v16 target, not v15 API.
 
-Candidate containment covers deferred write subscribers and transaction turn
+15.3.1 containment covers deferred write subscribers and transaction turn
 listeners, not all framework effects. Vue watcher failures differ between
 development and production; an enclosing Solid `batch()` can defer errors until
 after a handle returns. The guide lists the remaining Link, branch-key,
 coalesce, pending undo, ordering, notification, and retention failures.
+
+
+## Collection identity and independent store instances
+
+Declare the store structure and enhancers at construction. `entityMap()` supports
+dynamic entity membership; it is not an API for installing new composite slices
+with nested marker/enhancer lifecycles. Component/dialog-owned trees are valid:
+create one per independent editing session, and call `destroy()` at its owner’s
+teardown. A repeated entity ID is not an editing-session ID.
+
+`setAll()` is replacement by key. Repeated incoming keys collapse to the last
+value for that key, not distinct rows. Use a required stable ID where available;
+validate missing IDs at ingress rather than assigning a shared fallback. Numeric
+and string keys remain distinct. Do not depend on a development warning to reject
+invalid input. Version 15.3.1 does not warn for non-null duplicate incoming keys.
+
+In published 15.3.1, calling Link `settled()` immediately after a write can return
+before the newly queued send finishes. Do not use it as proof of backend durability
+or assume that one generic delay is a universal synchronization barrier. The local
+follow-up fix and its regression tests do not change the published 15.3.1 artifact.
+
+## Choosing ownership for editors and devices
+
+See `docs/guides/owned-sessions.md` and the demo `/owned-sessions`. Keep shared
+entities in one owned tree. Give each independent editor a unique session ID and
+a local draft (native form state or a separate tree); do not key drafts only by
+entity ID. Validate against the current application revision and entity lifetime
+before applying. Refuse stale saves while keeping the draft, and never silently
+retarget it to a replacement record. These are application policies, not kernel
+MVCC or remote concurrency protection. A backend must enforce its own version
+check. The demo's Apply locally does not acknowledge a server write.
+
+Each connection owns its subscription and tree. Register cleanup and guard late
+callbacks. Destroy that session when closed and all remaining sessions at owner
+teardown. Keep resources out of serializable rows. Combine display with computed
+reads over a registry, not copied state, root grafting or Link mirroring.
+
+Do not invent dynamic slice APIs, draft/fork primitives, or cross-tree settlement.
+Use one framework import root. Angular and Solid write `leaf.set(value)`, Vue
+writes `leaf.value = value`, and React/neutral write `leaf(value)`. The demo is
+Angular-specific evidence, not a cross-framework lifecycle proof.
+
+## Runtime observation (15.4.0, unreleased)
+
+Tooling can use `transactionLifecycleReader`, `restorationReader`,
+`entityMembershipReader`, and `linkStateReader` from
+`@signal-tree/kernel/internals`. Each reader exposes a current `snapshot()` and
+`subscribe(listener)` for subsequent events. Missing capability is not empty
+history. These readers do not install enhancers or retain terminal history.
+
+Use actual tree + collection + entity lifetime identity and typed keys; displayed
+paths are labels and must never be split into addressing segments. Confirmation
+means local settlement, never server acceptance. Link queued jobs are reconciliation
+work, not a FIFO of application values. A tool recording these events owns its
+bounded retention and must show interruptions, omissions and unsupported sources.
+Unsubscribe on view teardown and destroy bounded-lifetime trees. See
+[Runtime observation](docs/guides/runtime-observation.md) for contracts and examples.

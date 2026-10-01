@@ -188,6 +188,18 @@ construction, not arbitrary later writes or foreign reactivity from other librar
 Read [Transaction failures and current v15 limitations](https://github.com/JBorgia/signal-tree/blob/fix/15.3.1-link-rollback-and-strand/docs/guides/transaction-failures-v15.md)
 before combining transactions, undo, or persistence. Explicit rollback refusal
 leaves state unchanged and the handle pending but releases consequences in v15. The
-unreleased 15.3.1 candidate commits surviving writes on automatic refusal
+15.3.1 release commits surviving writes on automatic refusal
 before a handle returns and still throws. An error does not guarantee undo;
 never blindly retry the entire operation.
+
+## Independent editors and connections
+
+Keep shared records in an owned tree. Give each independently closable editor or
+connection its own lifetime; native local form state may be enough for a draft.
+A declared EntityMap supports dynamic data membership, not runtime installation
+of composite slices. Separate trees do not share transactions or undo history.
+Destroy directly created trees at their ownership boundary.
+
+See the [owned sessions guide](../../docs/guides/owned-sessions.md) for the Angular
+reference demo, stale-save policy, same-ID replacement and cleanup tests. Use this
+package’s own reactive/lifecycle integration when applying the pattern.

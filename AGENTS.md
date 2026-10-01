@@ -498,3 +498,14 @@ declaration surface without a post-build rewrite or copy step.
 `node tools/verify-consumer-typecheck.mjs` packs that artifact and compiles a
 real consumer with `skipLibCheck: false` under both `bundler` and `node16`
 resolution. This is a release gate, not an optional audit.
+
+## Independent editor and connection ownership
+
+Follow [the owned sessions guide](docs/guides/owned-sessions.md) for application
+composition. Shared canonical records, editor drafts and connection resources
+have distinct owners. Prefer native local form state when sufficient; otherwise
+create one tree per independent session and destroy it at its ownership boundary.
+Dynamic EntityMap membership is not runtime composite-slice mounting. Do not add
+root grafting, state mirroring or new kernel APIs merely to group several sessions
+in a view. The executable Angular demo includes conflict and cleanup controls;
+do not translate it into unsupported cross-tree or backend guarantees.

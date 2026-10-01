@@ -328,7 +328,7 @@ still deferred. A pending-created row later edited by confirmed work and then
 removed can still refuse due to that dependency. Deleting an entity is not a
 general way to make rollback retryable.
 
-**15.3.1 automatic-abort exception (unreleased):** if the callback throws or a
+**15.3.1 automatic-abort exception:** if the callback throws or a
 post-callback step fails before `transaction()` returns its handle, SignalTree
 attempts rollback. If that automatic rollback is refused, the surviving writes
 are recorded as committed, eligible undo history is retained, durable
@@ -401,6 +401,12 @@ the existing `all` representation and time-travel hydration remain unchanged.
 
 ## Tooling observation
 
+**15.4.0 (unreleased):** pending transaction lifecycle, restoration lineage,
+entity membership and Link activity are available through four read-only readers.
+See the [runtime observation guide](../../docs/guides/runtime-observation.md).
+These exports supply facts to tooling; they do not retain a diagnostic history
+or confirm backend acceptance.
+
 `@signal-tree/kernel/internals` is a supported observation seam for tools such as
 Studio. Application code continues to use its framework facade; these exports
 are not additions to the kernel root API.
@@ -421,3 +427,25 @@ Studio is a separate private product with an explicit development-only attachmen
 ## License
 
 Apache-2.0. See [LICENSE](../../LICENSE) and [NOTICE](../../NOTICE).
+
+
+### Duplicate replacement input
+
+`setAll()` replaces a collection by key. Within one incoming payload, the last
+row for a repeated key wins; an existing row with that key is an ordinary update.
+Supply distinct stable keys rather than a shared fallback for missing IDs.
+The local follow-up adds a once-per-collection development warning (ST2001)
+without changing replacement semantics. Published 15.3.1 does not warn for
+non-null duplicate keys. Numeric `1` and string `"1"` remain distinct keys.
+
+## Independent editors and connections
+
+Keep shared records in an owned tree. Give each independently closable editor or
+connection its own lifetime; native local form state may be enough for a draft.
+A declared EntityMap supports dynamic data membership, not runtime installation
+of composite slices. Separate trees do not share transactions or undo history.
+Destroy directly created trees at their ownership boundary.
+
+See the [owned sessions guide](../../docs/guides/owned-sessions.md) for the Angular
+reference demo, stale-save policy, same-ID replacement and cleanup tests. Use this
+package’s own reactive/lifecycle integration when applying the pattern.
