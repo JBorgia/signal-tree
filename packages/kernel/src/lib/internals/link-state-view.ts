@@ -1,4 +1,4 @@
-import type { ISignalTree } from '../types';
+import type { ToolingTree } from './tooling-tree';
 import {
   getPositionRegistry,
   type PositionRegistry,
@@ -153,11 +153,13 @@ export function registerLinkState(
  * Observe active Link relationships owned by this tree. Reading creates no Link,
  * performs no I/O and grants no mutation authority. Destroyed trees refuse reads.
  */
-export function linkStateReader<T>(tree: ISignalTree<T>): LinkStateReader {
+export function linkStateReader<T, TAccum = unknown>(
+  tree: ToolingTree<T, TAccum>
+): LinkStateReader {
   const registry = getPositionRegistry(tree.$);
   if (!registry)
     throw new Error('Link observation requires an owned SignalTree.');
-  if (tree.destroyed()) throw new StudioTreeDestroyedError();
+  if ((tree.destroyed as () => boolean)()) throw new StudioTreeDestroyedError();
   const state = stateFor(registry);
   if (!state.cleanupRegistered) {
     state.cleanupRegistered = true;
@@ -169,7 +171,8 @@ export function linkStateReader<T>(tree: ISignalTree<T>): LinkStateReader {
     });
   }
   const assertLive = () => {
-    if (state.closed || tree.destroyed()) throw new StudioTreeDestroyedError();
+    if (state.closed || (tree.destroyed as () => boolean)())
+      throw new StudioTreeDestroyedError();
   };
   return {
     snapshot() {

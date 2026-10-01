@@ -1,4 +1,4 @@
-import type { ISignalTree } from '../types';
+import type { ToolingTree } from './tooling-tree';
 import { StudioTreeDestroyedError } from './confirmed-turn-view';
 import {
   getEntityMembershipInventory,
@@ -70,10 +70,10 @@ function hasField(value: unknown, fields: readonly string[]): boolean {
 }
 
 /** Supported tooling reader. Reads the live tree; retains nothing. */
-export function stateLocationReader<T>(
-  tree: ISignalTree<T>
+export function stateLocationReader<T, TAccum = unknown>(
+  tree: ToolingTree<T, TAccum>
 ): StateLocationReader | undefined {
-  if (tree.destroyed()) throw new StudioTreeDestroyedError();
+  if ((tree.destroyed as () => boolean)()) throw new StudioTreeDestroyedError();
   const registry = getPositionRegistry(tree.$);
   if (!registry) return undefined;
   const walk = () => {
@@ -128,7 +128,8 @@ export function stateLocationReader<T>(
   };
   return {
     locate(targets) {
-      if (tree.destroyed()) throw new StudioTreeDestroyedError();
+      if ((tree.destroyed as () => boolean)())
+        throw new StudioTreeDestroyedError();
       const located = walk();
       const rows = new Map<object, Map<number, unknown>>();
       const rowValue = (node: object, lifetimeId: number): unknown => {

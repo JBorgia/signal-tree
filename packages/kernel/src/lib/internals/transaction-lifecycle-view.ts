@@ -1,4 +1,5 @@
 import type { ISignalTree } from '../types';
+import type { ToolingTree } from './tooling-tree';
 import { StudioTreeDestroyedError } from './confirmed-turn-view';
 import {
   getPositionRegistry,
@@ -172,15 +173,16 @@ function snapshotOf(
 }
 
 /** Local transaction state, with no retrospective event or payload history. */
-export function transactionLifecycleReader<T>(
-  tree: ISignalTree<T>
+export function transactionLifecycleReader<T, TAccum = unknown>(
+  tree: ToolingTree<T, TAccum>
 ): TransactionLifecycleReader | undefined {
-  if (tree.destroyed()) throw new StudioTreeDestroyedError();
+  if ((tree.destroyed as () => boolean)()) throw new StudioTreeDestroyedError();
   const registry = getPositionRegistry(tree.$);
   const state = registry && states.get(registry);
   if (!registry || !state) return undefined;
   const assertLive = () => {
-    if (state.closed || tree.destroyed()) throw new StudioTreeDestroyedError();
+    if (state.closed || (tree.destroyed as () => boolean)())
+      throw new StudioTreeDestroyedError();
   };
   return {
     snapshot() {
