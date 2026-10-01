@@ -47,7 +47,11 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 const BENCH = join(process.cwd(), 'tools/bench-entity-churn-retention.mjs');
-const ARM = 'no-history-reads';
+// `--arm` selects the churn workload; the default reads nodes with byId() only.
+// `no-history-node-reads` also READS each node, which creates its activation
+// carrier: the case the default arm could not see (audit, 2026-10-01).
+const armArg = process.argv.indexOf('--arm');
+const ARM = armArg === -1 ? 'no-history-reads' : process.argv[armArg + 1];
 const LOW_ROUNDS = 50;
 const HIGH_ROUNDS = 150;
 const MAX_GROWTH_RATIO = 2;

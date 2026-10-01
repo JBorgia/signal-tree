@@ -868,6 +868,21 @@ const GATES = [
     provenBy: 'retired-subject-slope:self',
   },
   {
+    name: 'retired-subject-slope:node-reads',
+    covers:
+      'retired-subject retention stays flat when every row node is READ, not only looked up: an activation-carrier entry per retired subject is a slope',
+    cmd: [
+      'node',
+      '--expose-gc',
+      'tools/check-retired-subject-slope.mjs',
+      '--arm',
+      'no-history-node-reads',
+    ],
+    slow: true,
+    needsBuild: true,
+    provenBy: 'retired-subject-slope:self',
+  },
+  {
     name: 'retired-subject-slope:self',
     covers:
       'the slope checker rejects the pre-fix linear table and accepts the measured flat one',
