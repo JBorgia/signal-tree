@@ -1,7 +1,7 @@
 # Contributing to SignalTree
 
-Start with [`AGENTS.md`](AGENTS.md), which is the full instruction set for this
-repository. This file covers the one path that most needs written rules rather
+Start with [`AGENTS.md`](AGENTS.md) for task routing and
+[contributor contracts](docs/contributor-contracts.md) for ownership constraints. This file covers the one path that most needs written rules rather
 than tacit knowledge: **adding or maintaining a framework adapter.**
 
 ## Adding or maintaining a framework adapter
@@ -50,18 +50,17 @@ test, because it reports coverage you do not have.
 
 For every publication path the adapter ships, prove the suite **fails** when
 that path is broken. Register it in `tools/verify-gates.mjs` with a `mutation`
-block, then run:
-
-```bash
-npm run gates:self-test
-```
+block, then run its focused self-test with
+`node tools/verify-gates.mjs --self-test --only=<registered-gate-name>`. The
+placeholder is the name you just registered; inspect `--list` for existing gates.
 
 A gate reported as `BLIND: passed while broken` is a release blocker. This is
 not hypothetical: in 15.2 a new fast path silently left an older publication
 path uncovered, and only the self-test caught it.
 
-Note that `npm run gates:self-test` and `npm run gates -- --release` are
-different suites. CI runs both on the tagged commit. Run both locally.
+The ordinary gates and mutation proofs are different suites. Run both full
+release suites for release closure; a focused mutation proof is development
+evidence for the changed path, not complete release qualification.
 
 ### 5. Prove a packed external consumer
 
@@ -120,9 +119,15 @@ developers.
 
 ## Before you open a pull request
 
+Run focused tests and the relevant type, lint, artifact and documentation gates
+for the change. Report what ran and what did not. Ordinary maintenance does not
+require every release measurement merely to open a PR.
+
+Release closure requires the complete registry and its mutation proofs, serially:
+
 ```bash
 npm run gates -- --release
-npm run gates:self-test
+node tools/verify-gates.mjs --self-test --release
 ```
 
-Both must pass. Commit messages say *why*, not just *what*, and link the issue.
+Both must pass for release sign-off. Commit messages say *why*, not just *what*, and link an issue when one exists.

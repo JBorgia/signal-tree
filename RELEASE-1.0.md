@@ -1,3 +1,8 @@
+> **Historical ledger — October 1, 2026.** Current release execution is governed
+> by [RELEASE-CURRENT.md](RELEASE-CURRENT.md). The original record below is preserved
+> for evidence and links. Old phase labels, next-action lists and review choreography
+> are historical, not instructions for the current release.
+
 # SignalTree 1.0 Release
 
 Single source of truth for the remaining work between current HEAD and a

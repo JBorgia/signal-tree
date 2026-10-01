@@ -1,7 +1,7 @@
 # Release validation
 
-The workspace is preparing **15.3.1 (unreleased)**. A version in `package.json`
-is not evidence of publication. The canonical gate registry is
+The active candidate and scope are recorded in [RELEASE-CURRENT.md](../RELEASE-CURRENT.md).
+A version in `package.json` is not evidence of publication. The canonical gate registry is
 [`tools/verify-gates.mjs`](../tools/verify-gates.mjs); the public package set and
 build order come from [`scripts/release-plan.mjs`](../scripts/release-plan.mjs).
 Use those sources rather than a copied gate count or package inventory.

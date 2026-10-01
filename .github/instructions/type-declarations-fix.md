@@ -1,34 +1,30 @@
-# Type Declaration Publishing
+# Declaration contract
 
-Kernel runtime JavaScript and public declarations are emitted by one Rollup
-invocation. Runtime modules remain preserved under `dist/**/*.js`; declaration
-bundles are emitted directly as `dist/index.d.ts` and `dist/adapter.d.ts`.
+This v15 release worktree emits runtime modules and three declaration bundles:
+`index`, `adapter` and `internals`. Its adapter identity plugin redirects marker
+types to the root declarations; its tooling resolver reuses the root tree types.
+These are deliberate nominal-identity fixes, not removable formatting work.
+The manifest ships declarations through `dist/**/*.d.ts`.
 
-## Required Configuration
+The separate development branch has a single shared declaration graph. That
+implementation and its extra fixtures have not been forward-ported here. Do not
+describe this worktree as though they had.
 
-- Remove Nx's `typescript` and `dts-bundle` plugins from the kernel runtime
-  configuration.
-- Add `@rollup/plugin-typescript` for runtime transpilation with declarations
-  disabled.
-- Add one `rollup-plugin-dts` configuration per public TypeScript entry point.
-- Emit declarations directly into the final package layout.
-- Point `types`, `exports.*.types`, and `files` at `dist/**/*.d.ts`.
-- Do not copy, rewrite, or prune declarations after Rollup completes.
+- Keep Nx per-source declaration and dts-bundle plugins out of the kernel runtime
+  configuration. Runtime transpilation and declaration generation have distinct jobs.
+- Use the checked-in `packages/kernel/rollup.custom.mjs` as configuration authority.
+  Do not introduce new nominal-identity splits or export private brands as an
+  ad hoc repair. Preserve the existing identity plugins until a replacement is
+  demonstrated by the packed consumers.
+- Do not add post-build declaration copying, pruning or unverified rewrites.
+- Verify actual packed consumers with `node tools/verify-consumer-typecheck.mjs`:
+  both bundler and node16 resolution, `skipLibCheck: false`, and the current
+  facade/marker identity fixtures. Do not claim fixtures present only on another
+  branch; inspect the verifier's SAMPLE and negative cases.
+- Run affected artifact gates from `tools/verify-gates.mjs`, including declaration
+  documentation. Tarball resolution alone is not type correctness.
 
-Framework package production builds resolve kernel types from the built kernel
-declaration entries. Their Nx targets depend on the kernel build, so the
-artifact is available before Angular or React compiles.
-
-## Validation
-
-```bash
-pnpm nx build kernel --skip-nx-cache
-node tools/verify-consumer-typecheck.mjs
-npm run validate:types
-bash scripts/verify-dist.sh
-node scripts/verify-package-hygiene.js
-node tools/check-declaration-docs.mjs
-```
-
-The consumer verifier packs the package and compiles with
-`skipLibCheck: false` under both `bundler` and `node16` module resolution.
+The absence of an `engines` field remains deliberate for these browser libraries.
+Repository tooling versions belong to `.nvmrc` and `packageManager`; framework
+consumer requirements belong to declared peer support. Do not add Node runtime
+constraints just to mirror the build machine.

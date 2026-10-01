@@ -4,7 +4,12 @@ SignalTree separates release preparation from npm publication.
 
 ## Prepare A Release
 
-From a clean branch that exactly matches its remote:
+These commands change versions, create a commit, sign a tag and push. They
+require explicit release authorization; they are not exact-candidate verification
+commands. For verification only, follow [.github/VALIDATION_GUIDE.md](.github/VALIDATION_GUIDE.md).
+
+Choose **one** preparation operation from a clean branch that exactly matches
+its remote:
 
 ```bash
 pnpm run release:rc
@@ -36,24 +41,30 @@ deliberate recovery.
 ## Publish A Tagged Candidate
 
 The sanctioned registry path is `.github/workflows/publish.yml`. It checks out
-the tagged commit once, installs dependencies, builds once, runs the release
-matrix and gate self-tests, then calls:
+the tagged commit, installs dependencies, builds, runs the release matrix and
+mutation self-tests, then deletes/rebuilds `dist` without cache and verifies the
+fresh tarball consumers. Only after that does it call:
 
 ```bash
 node scripts/publish-candidate.mjs --ci --prebuilt
 ```
 
 The engine prepares manifests, runs package/declaration/consumer checks, packs
-the ordered public artifacts from `scripts/release-plan.mjs` (kernel, angular,
-react, vue, solid), records SHA-512 integrity, and publishes those tarballs with provenance. A rerun skips an
+the ordered public artifacts from `scripts/release-plan.mjs`, records SHA-512
+integrity, and publishes those tarballs with provenance. A rerun skips an
 existing version only when registry integrity matches exactly; any mismatch or
 registry lookup failure aborts.
 
-Exercise the same path without registry writes:
+Exercise packaging and consumer checks without registry writes:
 
 ```bash
 pnpm run publish:dry-run
 ```
+
+
+This is not full release verification. Run the full gate registry and mutation
+proofs separately under the validation guide; a packaging dry run does not
+reproduce the tagged CI environment or establish exact-release qualification.
 
 Do not run `nx release`, `npm version`, or package-local `npm publish`.
 
@@ -66,7 +77,8 @@ preparation. For SSH signing, configure `gpg.format=ssh`, `user.signingkey`, and
 
 ## After Publication
 
-Verify all five npm versions and dist-tags from `scripts/release-plan.mjs`,
-install the exact version into a fresh external project, confirm runtime and strict typechecking, then create or
+Verify every npm version and dist-tag in `scripts/release-plan.mjs`, install
+those exact versions into a fresh external project, confirm runtime and strict
+typechecking, then create or
 verify the GitHub release notes. Never unpublish a partial release as routine
 recovery; inspect candidate and registry integrity and resume the same version.
