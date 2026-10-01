@@ -25,6 +25,19 @@ export const appRoutes: Route[] = [
     },
   },
 
+  {
+    path: 'owned-sessions',
+    loadComponent: () =>
+      import('./pages/owned-sessions/owned-sessions.component').then(
+        (c) => c.OwnedSessionsComponent
+      ),
+    data: {
+      title: 'Independent editors and devices',
+      description:
+        'Shared records, isolated editor drafts, and independently owned device connections with explicit teardown.',
+    },
+  },
+
   // Evaluate one owned feature
   {
     path: 'start',
@@ -218,7 +231,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Recommended architecture',
       description:
-        'The recommended SignalTree pattern: one runtime tree, typed feature slices, and root-level enhancers.',
+        'The recommended SignalTree pattern: shared application state, typed feature slices, and independently owned sessions.',
     },
   },
   {

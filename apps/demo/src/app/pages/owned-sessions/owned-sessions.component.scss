@@ -1,0 +1,92 @@
+:host {
+  display: block;
+}
+.layout-frame {
+  color: var(--color-ink);
+}
+header {
+  max-width: 52rem;
+  margin-bottom: 2.5rem;
+}
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin: 0.5rem 0;
+  line-height: 1.1;
+}
+h2 {
+  font-size: 1.5rem;
+}
+p,
+li {
+  line-height: 1.65;
+}
+.eyebrow {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+section {
+  margin: 2rem 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-neutral-300);
+}
+.canonical,
+article {
+  padding: 1.25rem;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: 0.75rem;
+}
+.canonical {
+  border-left: 0.3rem solid var(--color-primary-700);
+}
+.sessions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1rem 0;
+}
+button,
+input {
+  font: inherit;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--color-neutral-400);
+  border-radius: 0.35rem;
+}
+button {
+  cursor: pointer;
+  color: inherit;
+  background: transparent;
+}
+button:hover {
+  background: var(--color-primary-50);
+}
+input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0.4rem;
+  color: inherit;
+  background: transparent;
+}
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--color-primary-700);
+  outline-offset: 3px;
+}
+.boundary,
+small {
+  font-size: 0.9rem;
+}
+[role='status'] {
+  min-height: 1.5rem;
+}
+a {
+  color: var(--color-primary-700);
+}

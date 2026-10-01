@@ -1,0 +1,131 @@
+<div class="layout-frame">
+  <header>
+    <p class="eyebrow">APPLICATION OWNERSHIP · SIGNALTREE v15</p>
+    <h1>One session. One owner.</h1>
+    <p>
+      Keep shared records in one place. Give each editor its own draft and each
+      device its own connection lifetime.
+    </p>
+    <a routerLink="/docs" [queryParams]="{ package: 'owned-sessions' }"
+      >Read the implementation guide →</a
+    >
+  </header>
+
+  <section aria-labelledby="editor-title">
+    <h2 id="editor-title">Two editors, one shared record</h2>
+    <p>
+      Open two editors. Changing or discarding a draft leaves the shared record
+      alone. A save checks the revision and record lifetime before applying one
+      local update.
+    </p>
+    <div class="canonical">
+      <h3>Current application state</h3>
+      <p data-testid="canonical-title">{{ document()?.title }}</p>
+      <small
+        >Record order-1 · lifetime {{ document()?.lifetime }} · revision
+        {{ document()?.revision }}</small
+      >
+    </div>
+    <div class="actions">
+      <button type="button" (click)="openEditor()">Open editor</button>
+      <button type="button" (click)="serverUpdate()">
+        Simulate server update
+      </button>
+      <button type="button" (click)="replaceDocument()">
+        Replace record with same ID
+      </button>
+    </div>
+    <p class="boundary">
+      Demo policy: any revision change refuses the save. The check is local and
+      synchronous. A real backend must validate its version token before
+      accepting a write.
+    </p>
+    <div class="sessions">
+      @for (editor of editors(); track editor.id) {
+      <article [attr.aria-label]="editor.id">
+        <h3>{{ editor.id }}</h3>
+        <label [attr.for]="editor.id.replace(' ', '-')">Draft title</label>
+        <input
+          [id]="editor.id.replace(' ', '-')"
+          [value]="editor.draft.$.title()"
+          (input)="editor.draft.$.title.set($any($event.target).value)"
+        />
+        <div class="actions">
+          <button type="button" (click)="apply(editor)">Apply locally</button>
+          <button type="button" (click)="reload(editor)">
+            Discard edits and reload
+          </button>
+          <button type="button" (click)="closeEditor(editor)">
+            Close and discard
+          </button>
+        </div>
+        <p role="status">{{ editor.notice() }}</p>
+      </article>
+      } @empty {
+      <p>
+        No editors open. Each new editor gets a different session ID, even for
+        the same record.
+      </p>
+      }
+    </div>
+  </section>
+
+  <section aria-labelledby="device-title">
+    <h2 id="device-title">Independent device sessions</h2>
+    <p>
+      Each simulated connection owns its tree and timer. Stop one device: the
+      others keep receiving samples. Leaving this page releases every remaining
+      session.
+    </p>
+    <button type="button" (click)="startDevice()">
+      Start simulated device
+    </button>
+    <p data-testid="sample-total">
+      Samples in active sessions: {{ received() }}
+    </p>
+    <p class="boundary">
+      The total is a read-only computed value over the active trees. It is not a
+      second store, shared transaction, or shared undo history.
+    </p>
+    <div class="sessions">
+      @for (device of devices(); track device.id) {
+      <article [attr.aria-label]="device.id">
+        <h3>{{ device.id }}</h3>
+        <p>
+          Received: {{ device.tree.$.received() }} · last sample:
+          {{ device.tree.$.lastSample() }}
+        </p>
+        <button type="button" (click)="stopDevice(device)">
+          Stop {{ device.id }}
+        </button>
+      </article>
+      }
+    </div>
+  </section>
+
+  <section aria-labelledby="choose-title">
+    <h2 id="choose-title">Choose a boundary before a container</h2>
+    <ul>
+      <li>
+        Independent form or connection lifetime → a separately owned tree or
+        native local form state.
+      </li>
+      <li>
+        Dynamic data rows under one owner → a declared <code>entityMap()</code>.
+      </li>
+      <li>
+        Combined display → computed reads or a tree registry, without copying
+        state.
+      </li>
+      <li>
+        One atomic operation across trees → not supplied by this pattern. Design
+        that boundary explicitly.
+      </li>
+    </ul>
+    <p>
+      This example adds no runtime slice API, private kernel hooks,
+      transactions, or restoration. Add an enhancer only when the application
+      needs its behavior.
+    </p>
+  </section>
+</div>

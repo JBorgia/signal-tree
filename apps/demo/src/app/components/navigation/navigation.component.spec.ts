@@ -27,6 +27,7 @@ describe('NavigationComponent', () => {
         '/migrate',
       ],
       [
+        '/owned-sessions',
         '/examples/fundamentals',
         '/batching',
         '/entities',

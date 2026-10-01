@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 const FRAME_ROUTES = [
   '/start',
+  '/owned-sessions',
   '/external-truth',
   '/examples/fundamentals',
   '/batching',
