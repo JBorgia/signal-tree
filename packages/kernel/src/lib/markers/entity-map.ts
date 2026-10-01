@@ -43,21 +43,9 @@ function observablePort(notifier: PathObservationPort): EntityObservationPort {
 }
 
 /**
- * EntityMap Marker Factory
- *
- * Self-registering marker for entity collections. If you never use `entityMap()`,
- * this code is tree-shaken from your bundle. Passing a `load` turns the
- * collection into a cache-aware (single-scope), self-loading one; the loader
- * machinery lives in `./entity-loader`.
- *
- * Tree-shake boundary (RFC 0005 §6): the loader machinery is reached ONLY
- * through the `loader()` helper (`./loader`) — `entityMap({ load: loader(fn,
- * opts) })`. This file does NOT import `attachLoader`; the `loader()` feature
- * carries the only reference to it, so a plain `entityMap()` (or one whose
- * `load` is never a loader feature) tree-shakes the loader/cache/SWR/persist
- * code out entirely. A raw function passed to `load` fails closed ([ST2004]) —
- * it cannot silently no-op. (v12 removed the deprecated raw `load: fn` path;
- * this is the reclaim RFC 0005 was staged to earn.)
+ * Self-registering marker for keyed entity collections. Collection operations
+ * and projections are materialized when the marker enters a tree. Optional
+ * computed slices extend its read surface; data loading belongs to the caller.
  */
 
 import type { EntityConfig, EntityMapMarker } from '../types';
@@ -439,10 +427,8 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
         } else if (typeof ngDevMode === 'undefined' || ngDevMode) {
           console.warn(
             `SignalTree: entityMap hydrate ignored a payload with no ` +
-              `\`all\` array. The collection was left unchanged. This is a ` +
-              `PAYLOAD problem, not a registration one — a pre-2.0.0 ` +
-              `snapshot emitted \`map\`, which JSON renders as \`{}\`, so the ` +
-              `entities were never in it. [ST2024]`
+              `\`all\` array. Collection unchanged; provide an entity array ` +
+              `or { all: [...] }. [ST2024]`
           );
         }
       },
