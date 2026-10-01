@@ -126,7 +126,9 @@ export function printReport({
   const banners = [];
   if (raw.development)
     banners.push(
-      'DEVELOPMENT RUN (--quick): not a result. Do not quote these numbers.'
+      `DEVELOPMENT RUN (${
+        raw.developmentReasons?.join(', ') || 'quick sampling'
+      }): do not quote these numbers.`
     );
   else if (config.rounds < 5)
     banners.push(
@@ -145,7 +147,9 @@ export function printReport({
       )}. Treat as development.`
     );
   if (env.customRoot)
-    banners.push(`Custom --root ${env.customRoot}: not the built app.`);
+    banners.push(
+      `Custom --root ${env.customRoot}: served artifact recorded separately; package-to-build linkage unknown.`
+    );
   const bar = '='.repeat(78);
   for (const b of banners) log(`${bar}\n${b}\n${bar}`);
 
@@ -156,7 +160,7 @@ export function printReport({
   log(
     `  footer ${config.footer ?? 'on'}${
       config.footer === 'off'
-        ? ' (statusCounts not rendered while timing: isolates store write cost)'
+        ? ' (statusCounts not rendered while timing: removes the footer recount; grid rendering remains)'
         : ''
     }`
   );
@@ -180,15 +184,18 @@ export function printReport({
       lib('st15-released')?.kernel?.version ?? 'n/a'
     })`
   );
+  const claimedHash = (name) => {
+    const hash = env.candidate?.[name]?.sha256;
+    return typeof hash === 'string' ? hash.slice(0, 12) : 'unknown';
+  };
   log(
     `  st15-candidate ${ver('st15-candidate')} (kernel ${
       lib('st15-candidate')?.kernel?.version ?? 'n/a'
     })` +
       (env.candidate
-        ? ` sha256 angular ${env.candidate.angular.sha256.slice(
-            0,
-            12
-          )} kernel ${env.candidate.kernel.sha256.slice(0, 12)}`
+        ? ` claimed tarball sha256 angular ${claimedHash(
+            'angular'
+          )} kernel ${claimedHash('kernel')} (build linkage unknown)`
         : '')
   );
   log(

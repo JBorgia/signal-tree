@@ -24,6 +24,8 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { readSourceIdentity } from './lib/source-provenance.mjs';
+import { fileManifest } from './lib/fingerprints.mjs';
 
 const source = process.argv[2];
 if (!source) {
@@ -86,6 +88,7 @@ if (!existsSync(join(process.cwd(), 'node_modules', '@angular', 'core')))
 const sha256 = (file) =>
   createHash('sha256').update(readFileSync(file)).digest('hex');
 const record = {
+  source: readSourceIdentity(dir),
   angular: {
     version: angularVersion,
     tarball: tarballs.angular,
@@ -100,10 +103,24 @@ const record = {
 for (const alias of ALIASES)
   writeFileSync(
     join(rootOf(alias), '.candidate.json'),
-    JSON.stringify(record, null, 2) + '\n'
+    JSON.stringify(
+      {
+        ...record,
+        installedAtInstall: {
+          angularSha256: fileManifest(rootOf(alias), {
+            ignoreRoot: ['.candidate.json'],
+          }).sha256,
+          kernelSha256: fileManifest(kernelOf(alias)).sha256,
+        },
+      },
+      null,
+      2
+    ) + '\n'
   );
 console.log(
   `${ALIASES.join(
     ', '
-  )}: @signal-tree/angular ${angularVersion} + kernel ${kernelVersion}`
+  )}: @signal-tree/angular ${angularVersion} + kernel ${kernelVersion}; claimed source ${
+    record.source.claimedCommit
+  } (${record.source.verification})`
 );

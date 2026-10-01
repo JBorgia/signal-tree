@@ -4,8 +4,8 @@ Each scenario is one behaviour implemented by every library the way that library
 recommend (the cheapest documented form an expert would use). A fixture is an ES module at
 `fixtures/<scenario>/<lib>.mjs` that performs the behaviour and sets `globalThis.__result` to the
 plain-JSON value given below (for `async`, it sets `globalThis.__done` to a Promise that resolves
-after `__result` is set). `scripts/size-matrix.mjs` RUNS every fixture in Node and requires the
-result to deep-equal `expected.mjs` before measuring it, so a misused API that tree-shakes to
+after `__result` is set). `scripts/size-matrix.mjs` builds each production browser bundle once, executes those exact
+bytes in Node, and requires the result to deep-equal `expected.mjs` before accepting its sizes, so a misused API that tree-shakes to
 nothing can never report a small size.
 
 Libraries (`<lib>`): `signals` (Angular signals, hand-written), `ngrx-signals` (@ngrx/signals
@@ -15,9 +15,16 @@ Libraries (`<lib>`): `signals` (Angular signals, hand-written), `ngrx-signals` (
 (st15-candidate). `st15` and `cand` share one source: write `fixtures/<scenario>/st15.mjs`
 importing from `__ST15__`; the runner substitutes the specifier.
 
-Measured: esbuild bundle, ESM, browser platform, minify, tree-shaking; `@angular/*`, `rxjs`,
-`rxjs/*`, `tslib` external (shared by every Angular app, so the comparison is each library's own
-code plus the fixture's own glue). gzip level 9 and brotli quality 11.
+Measured: esbuild bundle, ESM, browser platform, minify, tree-shaking, explicit
+`ngDevMode=false` and `process.env.NODE_ENV="production"`; `@angular/*`, `rxjs`,
+`rxjs/*`, `tslib` external. The result is library code plus fixture glue, conditional on the
+consumer already sharing those dependencies. In particular, RxJS is not assumed to be present
+in every Angular app; its cost is excluded here and must be included in an application-level
+comparison when newly introduced. gzip level 9 and brotli quality 11. Each output records
+candidate manifest/source-SHA claims, tarball extraction comparisons, observed installed-file
+hashes, bundle/input hashes and build settings;
+unknown source/build linkages stay unknown. Historical matrices predate this production parity
+and provenance repair and must not be presented as final-candidate measurements.
 
 Where a library has no first-party feature (undo in NgRx), the fixture hand-rolls the minimal
 correct version and the table marks it "hand-rolled": that is the code an app would have to write.

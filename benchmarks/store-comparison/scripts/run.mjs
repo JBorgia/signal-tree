@@ -13,6 +13,8 @@ import { chromium } from 'playwright';
 import { startServer } from './serve.mjs';
 import { parseArgs } from './lib/args.mjs';
 import { collectEnvironment } from './lib/env.mjs';
+import { verifyBuildProvenance } from './lib/build-provenance.mjs';
+import { collectEvidence, developmentReasons } from './lib/evidence.mjs';
 import {
   chromiumVersion,
   runEditors,
@@ -43,7 +45,7 @@ if (!existsSync(join(root, 'index.html'))) {
     `error: ${join(
       root,
       'index.html'
-    )} not found. Build the app first: pnpm build`
+    )} not found. Build the app first: node scripts/build-with-provenance.mjs`
   );
   process.exit(2);
 }
@@ -82,6 +84,11 @@ const environment = collectEnvironment({
     (a) => a === 'st15-candidate' || a === 'st15-undo'
   ),
 });
+environment.evidence = collectEvidence(appRoot, root);
+if (!customRoot && environment.evidence.buildProvenance?.status !== 'match')
+  throw new Error(
+    'Missing production build provenance; run node scripts/build-with-provenance.mjs'
+  );
 environment.chromium = await chromiumVersion(chromium);
 const server = await startServer({ root, port: 0 });
 
@@ -217,8 +224,22 @@ try {
   await server.close();
 }
 
+try {
+  const finalProvenance = verifyBuildProvenance(appRoot, root);
+  if (
+    environment.evidence.buildProvenance?.status === 'match' &&
+    finalProvenance.status !== 'match'
+  )
+    throw new Error('Build provenance disappeared during comparison');
+  environment.finalBuildProvenanceStatus = finalProvenance.status;
+} catch (error) {
+  for (const label of labels) fail(label, String(error.message));
+}
+
 environment.endLoadAverage1m = os.loadavg()[0];
 environment.endBusy = environment.endLoadAverage1m > environment.cpu.cores / 2;
+raw.developmentReasons = developmentReasons(opts, environment);
+raw.development = raw.developmentReasons.length > 0;
 raw.finishedAt = new Date().toISOString();
 raw.failures = Object.fromEntries(failures);
 
@@ -226,7 +247,11 @@ const invalid = Object.fromEntries(
   labels.filter((l) => failures.has(l)).map((l) => [l, true])
 );
 const summary = summarize(raw);
-const bands = hasAA ? aaBands(summary, RELEASED, AA) : null;
+// Failed controls cannot establish a noise band from partial rounds.
+const bands =
+  hasAA && !failures.has(RELEASED) && !failures.has(AA)
+    ? aaBands(summary, RELEASED, AA)
+    : null;
 raw.summary = summary;
 raw.aaBands = bands;
 
@@ -235,10 +260,10 @@ mkdirSync(outDir, { recursive: true });
 const outFile = join(
   outDir,
   `${raw.startedAt.replace(/[:.]/g, '-')}${
-    opts.quick ? '.DEVELOPMENT' : ''
+    raw.development ? '.DEVELOPMENT' : ''
   }.json`
 );
-writeFileSync(outFile, JSON.stringify(raw, null, 2));
+writeFileSync(outFile, JSON.stringify(raw, null, 2), { flag: 'wx' });
 
 console.log('');
 printReport({ raw, summary, bands, invalid });

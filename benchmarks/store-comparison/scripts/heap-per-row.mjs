@@ -9,6 +9,11 @@
  */
 import { chromium } from 'playwright';
 import { startServer } from './serve.mjs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { collectEvidence, diffHeapCategories } from './lib/evidence.mjs';
+import { verifyBuildProvenance } from './lib/build-provenance.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => {
@@ -22,6 +27,32 @@ const root = opt('root', 'dist/browser');
 const rows = Number(opt('rows', 20000));
 const top = Number(opt('top', 14));
 const arms = args.length ? args : ['signals', 'ngrx', 'st14', 'st15-released'];
+if (
+  !Number.isSafeInteger(rows) ||
+  rows < 1 ||
+  !Number.isSafeInteger(top) ||
+  top < 1
+)
+  throw new Error('--rows and --top must be positive integers');
+const appRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const record = {
+  startedAt: new Date().toISOString(),
+  development: true,
+  rows,
+  root: resolve(root),
+  evidence: collectEvidence(appRoot, root),
+  arms: {},
+  scope:
+    'Single-N signed change in snapshot self_size, excluding code, hidden, synthetic and system / categories; includes grid/harness; not a retained-size ownership analysis or a whole-heap slope.',
+};
+
+if (
+  resolve(root) === resolve(appRoot, 'dist/browser') &&
+  record.evidence.buildProvenance?.status !== 'match'
+)
+  throw new Error(
+    'Missing production build provenance; run node scripts/build-with-provenance.mjs'
+  );
 
 async function summary(cdp) {
   for (let i = 0; i < 3; i++) await cdp.send('HeapProfiler.collectGarbage');
@@ -79,23 +110,31 @@ try {
       const cdp = await page.context().newCDPSession(page);
       await page.goto(`${server.url}/${arm}`);
       await page.waitForFunction(() => window.__bench);
+      const actualArm = await page.evaluate(() => window.__bench.arm?.id);
+      if (actualArm !== arm)
+        throw new Error(`requested ${arm}, loaded ${actualArm}`);
       await page.evaluate(() => window.__bench.ready());
       const before = await summary(cdp);
       await page.evaluate((n) => window.__bench.load(n, 20260930, 0), rows);
       const after = await summary(cdp);
-      const diff = [...after]
-        .map(([k, [size, count]]) => [
-          k,
-          size - (before.get(k)?.[0] ?? 0),
-          count - (before.get(k)?.[1] ?? 0),
-        ])
-        .filter(([, size]) => size > 0)
-        .sort((a, b) => b[1] - a[1]);
-      const total = diff.reduce((sum, [, size]) => sum + size, 0);
+      const {
+        categories: diff,
+        netBytes,
+        positiveBytes,
+      } = diffHeapCategories(before, after);
+      record.arms[arm] = {
+        chromium: browser.version(),
+        netBytes,
+        positiveBytes,
+        categories: diff,
+      };
       console.log(
-        `${arm}: ${(total / rows).toFixed(
-          0
-        )} B/row of application objects at ${rows} rows`
+        `${arm}: ${(netBytes / rows).toFixed(
+          1
+        )} B/row net filtered snapshot delta; ` +
+          `${(positiveBytes / rows).toFixed(
+            1
+          )} B/row positive categories only, at ${rows} rows`
       );
       for (const [k, size, count] of diff.slice(0, top))
         console.log(
@@ -110,3 +149,19 @@ try {
 } finally {
   await server.close();
 }
+
+const finalProvenance = verifyBuildProvenance(appRoot, resolve(root));
+if (
+  record.evidence.buildProvenance?.status === 'match' &&
+  finalProvenance.status !== 'match'
+)
+  throw new Error('Build provenance disappeared during attribution');
+record.finalBuildProvenanceStatus = finalProvenance.status;
+const outDir = resolve(appRoot, 'results');
+mkdirSync(outDir, { recursive: true });
+const outFile = resolve(
+  outDir,
+  `heap-per-row-${record.startedAt.replace(/[:.]/g, '-')}.json`
+);
+writeFileSync(outFile, JSON.stringify(record, null, 2), { flag: 'wx' });
+console.log(`raw attribution: ${outFile}`);

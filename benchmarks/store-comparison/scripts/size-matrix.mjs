@@ -2,7 +2,8 @@
 // Like-for-like bundle-size matrix. See size/SCENARIOS.md.
 // Usage: node scripts/size-matrix.mjs [--json]
 import { build } from 'esbuild';
-import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { PRODUCTION_DEFINE, verifyBundle } from './lib/size-verification.mjs';
 import {
   existsSync,
   mkdirSync,
@@ -12,8 +13,10 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { dirname, join, resolve, relative } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { gzipSync, brotliCompressSync, constants as z } from 'node:zlib';
+import { collectEvidence } from './lib/evidence.mjs';
+import { collectEnvironment } from './lib/env.mjs';
 import { EXPECTED, SCENARIOS, LIBS } from '../size/expected.mjs';
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -50,6 +53,14 @@ const VERSIONS = {
   node: process.version,
 };
 
+const environment = collectEnvironment({
+  appRoot: APP,
+  cpu: null,
+  customRoot: null,
+  candidateSelected: true,
+});
+const evidence = collectEvidence(APP);
+
 // Temp files live inside the app so bare imports (@angular/*, rxjs) resolve from its node_modules.
 mkdirSync(join(APP, 'results'), { recursive: true });
 const tmp = mkdtempSync(join(APP, 'results', '.size-tmp-'));
@@ -80,57 +91,8 @@ const esbuildBase = {
   external: EXTERNAL,
   absWorkingDir: APP,
   logLevel: 'silent',
+  define: PRODUCTION_DEFINE,
 };
-
-function verify(file, scenario, lib) {
-  const bundled = join(tmp, `${scenario}.${lib}.verify.mjs`);
-  // A real node_modules/ sibling is needed so the externals resolve at run time.
-  return build({
-    ...esbuildBase,
-    entryPoints: [file],
-    outfile: bundled,
-    platform: 'node',
-    write: true,
-  }).then(() => {
-    const runnerFile = join(tmp, `${scenario}.${lib}.run.mjs`);
-    writeFileSync(
-      runnerFile,
-      `
-await import('@angular/compiler');
-await import(${JSON.stringify(pathToFileURL(bundled).href)});
-if (globalThis.__done) await globalThis.__done;
-process.stdout.write('\\n@@RESULT@@' + JSON.stringify(globalThis.__result === undefined ? null : globalThis.__result));
-`
-    );
-    const inApp = runnerFile;
-    try {
-      const out = execFileSync(process.execPath, [inApp], {
-        cwd: APP,
-        encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'pipe'],
-        timeout: 60000,
-      });
-      const i = out.lastIndexOf('@@RESULT@@');
-      if (i < 0) throw new Error('no result marker in output');
-      return JSON.parse(out.slice(i + 10));
-    } finally {
-      /* tmp dir removed on exit */
-    }
-  });
-}
-
-const deepEqual = (a, b) =>
-  JSON.stringify(canon(a)) === JSON.stringify(canon(b));
-const canon = (v) =>
-  Array.isArray(v)
-    ? v.map(canon)
-    : v && typeof v === 'object'
-    ? Object.fromEntries(
-        Object.keys(v)
-          .sort()
-          .map((k) => [k, canon(v[k])])
-      )
-    : v;
 
 const pkgRel = (p) => {
   const m = p.replace(/\\/g, '/');
@@ -156,6 +118,15 @@ async function measure(file, withAttribution) {
   const out = r.outputFiles[0].contents;
   const res = {
     raw: out.length,
+    bundleSha256: createHash('sha256').update(out).digest('hex'),
+    inputs: Object.keys(r.metafile.inputs)
+      .sort()
+      .map((path) => ({
+        path,
+        sha256: createHash('sha256')
+          .update(readFileSync(resolve(APP, path)))
+          .digest('hex'),
+      })),
     gzip: gzipSync(out, { level: 9 }).length,
     brotli: brotliCompressSync(out, {
       params: {
@@ -177,7 +148,7 @@ async function measure(file, withAttribution) {
       .slice(0, 12)
       .map(([module, bytes]) => ({ module, bytes }));
   }
-  return res;
+  return { metrics: res, bytes: out };
 }
 
 const results = {};
@@ -201,14 +172,13 @@ for (const scenario of SCENARIOS) {
       continue;
     }
     try {
-      const got = await verify(file, scenario, lib);
-      if (!deepEqual(got, EXPECTED[scenario])) {
-        cell.status = 'INVALID';
-        cell.error = `result mismatch: got ${JSON.stringify(got)}`;
-        problems.push(`${scenario}/${lib}: ${cell.error}`);
-        continue;
-      }
-      Object.assign(cell, await measure(file, ST_LIBS.has(lib)));
+      const measured = await measure(file, ST_LIBS.has(lib));
+      verifyBundle(measured.bytes, {
+        directory: tmp,
+        name: `${scenario}.${lib}`,
+        expected: EXPECTED[scenario],
+      });
+      Object.assign(cell, measured.metrics);
       cell.status = 'ok';
     } catch (e) {
       cell.status = 'INVALID';
@@ -271,13 +241,30 @@ mkdirSync(outDir, { recursive: true });
 const outFile = join(outDir, `size-matrix-${ts}.json`);
 const payload = {
   generated: new Date().toISOString(),
+  environment,
+  evidence,
+  measurement: {
+    platform: 'browser',
+    format: 'esm',
+    minify: true,
+    treeShaking: true,
+    external: EXTERNAL,
+    gzipLevel: 9,
+    brotliQuality: 11,
+    includesFixtureGlue: true,
+    define: PRODUCTION_DEFINE,
+    verificationRuntime: 'node',
+    verifiesExactMeasuredBundle: true,
+    dependencyFootprint:
+      'Excludes Angular, rxjs and tslib; incremental cost only if the consumer already shares these dependencies.',
+  },
   versions: VERSIONS,
   libs: LIBS,
   scenarios: SCENARIOS,
   problems,
   results,
 };
-writeFileSync(outFile, JSON.stringify(payload, null, 2));
+writeFileSync(outFile, JSON.stringify(payload, null, 2), { flag: 'wx' });
 if (JSON_ONLY) console.log(JSON.stringify(payload, null, 2));
 else {
   log(`\nJSON: ${relative(process.cwd(), outFile)}`);
