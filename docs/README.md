@@ -6,9 +6,10 @@
 
 Use this index to navigate the documentation.
 
-**Development version:** 15.4.0 (unreleased). See [CHANGELOG](../CHANGELOG.md).
-
-**Latest published release:** 15.3.1.
+**Development version:** 15.4.0. This index describes the 15.4.0 package version.
+See [CHANGELOG](../CHANGELOG.md) for versioned changes and the
+[npm package page](https://www.npmjs.com/package/@signal-tree/kernel?activeTab=versions)
+for published versions.
 
 ---
 
@@ -122,4 +123,4 @@ Historical documents preserved for reference:
 | [Validation Guide](../.github/VALIDATION_GUIDE.md)                         | Pre-release validation steps |
 | [Scripts](../scripts/README.md)                                            | Build and utility scripts    |
 
-- [Runtime observation](guides/runtime-observation.md) — current snapshots and subsequent events for tooling; 15.4.0 (unreleased).
+- [Runtime observation](guides/runtime-observation.md) — current snapshots and subsequent events for tooling; available in 15.4.0.

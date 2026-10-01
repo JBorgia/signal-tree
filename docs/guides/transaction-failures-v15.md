@@ -1,9 +1,10 @@
-# Transaction failures and current v15 limitations
+# Transaction failures and limitations in 15.3.1
 
 This guide describes **published 15.3.1**. Check the
 [changelog](../../CHANGELOG.md) and
 [support policy](../support-policy.md#transaction-failure-policy) for versioned
-behavior. Local follow-up fixes do not change an already-published artifact.
+behavior. This historical inventory is not a list of defects in 15.4.0.
+Repairs in later versions do not change an already-published artifact.
 
 ## A thrown error does not guarantee undo
 
@@ -57,9 +58,10 @@ budget.
 
 ## Known failures in published 15.3.1
 
-These are the live limitations recorded in the release
-[changelog](../../CHANGELOG.md#known-issues-not-fixed-here), reproduced on
-15.3.0 and not fixed by this patch. No fix version is promised.
+These limitations were recorded in the 15.3.1 release
+[changelog](https://github.com/JBorgia/signal-tree/blob/v15.3.1/CHANGELOG.md#known-issues-not-fixed-here),
+reproduced on 15.3.0 and not fixed by 15.3.1. See the
+[current changelog](../../CHANGELOG.md) for later versioned repairs.
 
 - **Restored entity rows may not reach Link.** Rollback or undo/redo can restore
   a removed row in the tree while a linked endpoint keeps the row set without it.
@@ -93,8 +95,8 @@ These are the live limitations recorded in the release
   at teardown. This is separate from configured diagnostic history retention.
 - **Asynchronous Link endpoints have settlement gaps.** Calling `settled()`
   immediately after a write can return before the newly queued send finishes.
-  The local follow-up has a tested repair for this same-turn race; it is not
-  present in the published 15.3.1 package. While endpoint `set()`
+  Version 15.4.0 repairs this same-turn race; the repair is not
+  present in the published 15.3.1 package. In 15.3.1, while endpoint `set()`
   is in flight, pending uncommitted writes may be sent before a transaction is
   decided (the endpoint still ends on the surviving value); a rejected send can
   let `settled()` resolve before a later value is sent; and `dispose()` does not

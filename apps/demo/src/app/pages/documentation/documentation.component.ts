@@ -134,7 +134,7 @@ export class DocumentationComponent implements OnInit {
       id: 'runtime-observation',
       name: 'Runtime Observation',
       description:
-        'Read-only tooling readers for transactions, history, membership and Link (15.4.0, unreleased)',
+        'Read-only tooling readers for transactions, history, membership and Link (15.4.0)',
       readmePath: 'assets/docs/guides/runtime-observation.md',
       repositoryPath: 'docs/guides/runtime-observation.md',
     },

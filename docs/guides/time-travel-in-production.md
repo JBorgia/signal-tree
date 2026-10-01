@@ -196,7 +196,7 @@ multi-second `mergeMap` over N HTTP requests does not.
 synchronous import with `undoable(() => { /* add the rows here */ })` when it
 should be undoable. Sharing a microtask does not make undesignated writes into
 history. Invoke undo from a later user action, after the designated turn settles;
-see [current v15 limitations](transaction-failures-v15.md) before combining it
+see [the 15.3.1 failure inventory](transaction-failures-v15.md) before combining it
 with pending transactions or Link.
 
 **Historical evidence after the removal:** the then-current automatic recording
@@ -233,7 +233,7 @@ record-then-filter step.
 | Undo one panel, not the whole app                   | designate only the panel's operations with `undoable()`                                                      | Yes                                                                                   |
 | Large server collection + small editable **branch** | apply the collection with `external()`; designate the branch's edits with `undoable()`                       | Yes — the headline pattern                                                            |
 | Large server collection + small editable draft      | `external()` for the collection; ordinary draft state; designate accepted edits with `undoable()`            | Yes. Independent panel-local undo remains application-owned.                          |
-| Optimistic request reconciliation | Use a returned transaction handle and application conflict policy; never `undo()` or `jumpTo()` | Rollback can refuse; see [current v15 limitations](transaction-failures-v15.md) |
+| Optimistic request reconciliation | Use a returned transaction handle and application conflict policy; never `undo()` or `jumpTo()` | Rollback can refuse; see [the 15.3.1 failure inventory](transaction-failures-v15.md) |
 | Import/generate, then one undo                      | —                                                                                                            | **No.** `pauseRecording()` was removed in 14.1.1 (see lever 3) and has no replacement |
 | Audit trail rather than undo                        | `getRestorationHistory()` for retained undo entries; use an application event log for a complete audit trail | Restoration history is not a complete audit log                                       |
 | Show the user how far they can go                   | `getCurrentIndex()` back, `getRestorationHistory().length - 1 - getCurrentIndex()` fwd                       | Yes — reactive since 14.0.0                                                           |

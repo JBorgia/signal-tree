@@ -2,7 +2,31 @@
 
 Updated October 1, 2026. This is the active controller for the public
 `fix/v15-link-settlement-diagnostics` worktree, currently **15.4.0 unreleased**.
-It does not describe every branch or authorize publication.
+It does not describe every branch. Publication authority is recorded below.
+
+## Owner priority and release authority
+
+The owner authorized publishing v15 when ready, then continuing in this order:
+
+1. Finish and verify the v15 release, then publish its exact verified artifacts.
+2. Reconcile fixes and their tests together on a dedicated v16 integration branch.
+3. Preserve v16 inspection, recovery and current-truth observation contracts.
+4. Run the complete semantic matrix against that integrated baseline.
+5. Evaluate remaining ownership-model changes against the stronger incumbent.
+6. Measure v16 performance and size independently; v15 measurements and the
+   approved v15 development ceiling do not transfer.
+
+V14 remains paused until v15 is complete. Public release authority now includes
+pushing the release branch, signing/tagging and dispatching the canonical npm
+publisher after verification. It does not waive failed gates or authorize a
+private Studio compatibility change. The latter decision remains pending.
+
+The prepared version is already **15.4.0**. Do not invoke a next-version command
+that would increment it again. Finalize this version's release metadata, commit
+it, verify the exact candidate locally and on Linux, prepare its immutable
+archives with `scripts/publish-candidate.mjs --prebuilt --prepare-only`, then use
+the signed tag and canonical tagged CI publisher. Preserve the unrelated v14
+audit edit; use a clean isolated checkout for release verification.
 
 ## Scope and checkpoints
 
@@ -65,7 +89,8 @@ It does not describe every branch or authorize publication.
    checkout reproduction. Then obtain exact-SHA release-environment evidence.
 
 No item here is waived by a smaller focused suite. Publication, tagging and push
-remain separately authorized actions. A changed candidate needs corresponding
+are owner-authorized subject to the verification requirements above. A changed
+candidate needs corresponding
 fresh verification; do not commit verification prose into a frozen RC.
 
 ## Execute
@@ -176,3 +201,27 @@ first selection misspelled that name and did not execute it. Both logs are
 retained. The unrelated v14 audit edit remains outside these checkpoints.
 Next verification covers the complete registry and its release-only mutation
 proofs, followed by destruction/rebuild of generated artifacts.
+
+## Completed local evidence before final release preparation
+
+Full release registry at `63e28edcfd5ec218296ef7a81fcab09c6b505f4b`:
+**86/86 passed, zero failed/known-red, exit 0**. Full release mutation proofs:
+**86/86 proven (14 indirect), zero unproven/vacuous/blind/errored, exit 0**.
+The only subsequent change through `0bb24f3486304f38bb5a79b513724cd816683a5d`
+was this controller's evidence wording.
+
+After all mutations, generated output was deleted and rebuilt at `0bb24f34`.
+All five packages reported 15.4.0; tarball resolution, strict consumers,
+Angular AOT, budget, production demo and **146/146 browser tests** passed.
+An isolated clean-checkout rehearsal passed frozen install, build, fast gates
+and publish dry-run; that rehearsal did not run the full release registry.
+Complete private Studio acceptance passed against the supplied rebuilt public
+archives: query 51, adapter 365, application 522 plus one existing expected
+failure, browser/native DevTools and packed consumers. No registry publication
+occurred in those checks.
+
+Raw evidence: `/private/tmp/st-takeover-2026-10-01/completion-evidence.json`.
+The final metadata commit needs exact-SHA verification; subsequent verification
+logs stay outside the repository. Installed-enhancer bulk overhead remains a
+measured limitation, not a claimed performance improvement. No new architecture
+is part of this release finalization.

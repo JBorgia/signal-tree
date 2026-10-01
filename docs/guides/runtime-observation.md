@@ -1,6 +1,6 @@
 # Observe runtime activity without changing state
 
-**Introduced in 15.4.0 (unreleased).** Tooling can inspect pending transactions,
+**Introduced in 15.4.0.** Tooling can inspect pending transactions,
 undo history, collection membership and linked-state activity without installing
 an enhancer or issuing application commands. Import these readers from the
 supported `@signal-tree/kernel/internals` entry. Application state reads and

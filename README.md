@@ -12,6 +12,10 @@
   </p>
 </div>
 
+This README describes the 15.4.0 package version. See the [changelog](CHANGELOG.md)
+for versioned changes and the [npm package page](https://www.npmjs.com/package/@signal-tree/kernel?activeTab=versions)
+for published versions.
+
 ## See the difference
 
 Read and edit a field at the same typed path. Here is Angular; [React](packages/react/README.md), [Vue](packages/vue/README.md), [Solid](packages/solid/README.md), and [plain TypeScript](packages/kernel/README.md) have their own entry points.
@@ -54,7 +58,7 @@ Already comfortable with `signal()` and `computed()`? [See what SignalTree adds]
 - Loading, caching, saving, and merging collaborative edits remain application concerns.
 - Undo applies only to operations you mark with `undoable()` and requires `restoration()`.
 
-[Compare with NgRx SignalStore](docs/compare/ngrx-signalstore.md) · [Collection API](packages/kernel/README.md#entitymap) · [Independent editors and devices](docs/guides/owned-sessions.md) · [Persistence boundaries](docs/guides/persistence-guide.md) · [Transaction failures and current v15 limitations](docs/guides/transaction-failures-v15.md)
+[Compare with NgRx SignalStore](docs/compare/ngrx-signalstore.md) · [Collection API](packages/kernel/README.md#entitymap) · [Independent editors and devices](docs/guides/owned-sessions.md) · [Persistence boundaries](docs/guides/persistence-guide.md) · [Transaction failure policy and the 15.3.1 failure inventory](docs/guides/transaction-failures-v15.md)
 
 [Run the browser benchmarks](https://signaltree.io/benchmarks) to compare the work your app does on your own device.
 

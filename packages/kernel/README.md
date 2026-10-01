@@ -343,9 +343,11 @@ explicit `pending.rollback()` call. Successful automatic rollback reverses
 recorded writes and discards deferred consequences. Never blindly retry the
 entire operation after an error or use undo for request reconciliation.
 Recoverable pending refusal is a v16 target, not current API. See
-[Transaction failures and current v15 limitations](https://github.com/JBorgia/signal-tree/blob/v15.3.1/docs/guides/transaction-failures-v15.md)
-for remaining defects and the bounded observer-containment rule, including Vue
-mode differences and enclosing Solid batches.
+[Transaction failure policy and the 15.3.1 failure inventory](https://github.com/JBorgia/signal-tree/blob/v15.3.1/docs/guides/transaction-failures-v15.md)
+for the historical defect inventory and bounded observer-containment rule,
+including Vue mode differences and enclosing Solid batches. Consult the
+[15.4.0 changelog](https://github.com/JBorgia/signal-tree/blob/v15.4.0/CHANGELOG.md)
+for subsequent repairs.
 
 ## Exports
 
@@ -405,14 +407,14 @@ the existing `all` representation and time-travel hydration remain unchanged.
 
 ## Tooling observation
 
-**15.4.0 (unreleased):** pending transaction lifecycle, restoration lineage,
+**In 15.4.0:** pending transaction lifecycle, restoration lineage,
 entity membership and Link activity are available through four read-only readers:
 `transactionLifecycleReader`, `restorationReader`, `entityMembershipReader` and
 `linkStateReader`. `stateLocationReader` maps a recorded effect or write to its
 current structured location. Confirmed-turn effects add `fieldSegments` for entity
 fields and `plainBranchMembership` (presence before/after) for plain optional
 members, so an omission is distinguishable from a member set to `undefined`.
-See the [runtime observation guide](../../docs/guides/runtime-observation.md).
+See the [15.4.0 runtime observation guide](https://github.com/JBorgia/signal-tree/blob/v15.4.0/docs/guides/runtime-observation.md).
 These exports supply facts to tooling; they do not retain a diagnostic history
 or confirm backend acceptance.
 
@@ -443,11 +445,11 @@ Apache-2.0. See [LICENSE](../../LICENSE) and [NOTICE](../../NOTICE).
 `setAll()` replaces a collection by key. Within one incoming payload, the last
 row for a repeated key wins; an existing row with that key is an ordinary update.
 Supply distinct stable keys rather than a shared fallback for missing IDs.
-The local follow-up adds a once-per-collection development warning (ST2001)
+Version 15.4.0 adds a once-per-collection development warning (ST2001)
 without changing replacement semantics. Published 15.3.1 does not warn for
 non-null duplicate keys. Numeric `1` and string `"1"` remain distinct keys.
 
-The unreleased follow-up also checks `setAll()` staging after user callbacks.
+Version 15.4.0 checks `setAll()` staging after user callbacks.
 If an interceptor or ID selector changes collection membership, keys or order,
 the outer replacement refuses before applying its staged writes. The callback's
 already-completed writes remain. Field-only callback writes do not trigger this
