@@ -1,4 +1,4 @@
-import type { ISignalTree } from '../types';
+import type { ToolingTree } from './tooling-tree';
 import { StudioTreeDestroyedError } from './confirmed-turn-view';
 import { activateEntityObservation } from './entity-observation';
 import {
@@ -134,10 +134,10 @@ export function holdEntityMembershipDelivery(root: object): () => void {
 }
 
 /** Supported tooling reader. No row values, event journal, or mutation authority. */
-export function entityMembershipReader<T>(
-  tree: ISignalTree<T>
+export function entityMembershipReader<T, TAccum = unknown>(
+  tree: ToolingTree<T, TAccum>
 ): EntityMembershipReader | undefined {
-  if (tree.destroyed()) throw new StudioTreeDestroyedError();
+  if ((tree.destroyed as () => boolean)()) throw new StudioTreeDestroyedError();
   const registry = getPositionRegistry(tree.$);
   if (!registry) return undefined;
   let state = states.get(registry);
@@ -166,7 +166,8 @@ export function entityMembershipReader<T>(
   }
   const owned = state;
   const assertLive = () => {
-    if (owned.closed || tree.destroyed()) throw new StudioTreeDestroyedError();
+    if (owned.closed || (tree.destroyed as () => boolean)())
+      throw new StudioTreeDestroyedError();
   };
   const discover = () => {
     const locations = new WeakMap<

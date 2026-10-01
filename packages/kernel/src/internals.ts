@@ -14,7 +14,7 @@ export {
   withWriteObservationScope,
   type DeclaredWriteScopes,
 } from './lib/internals/write-observation-scope';
-import type { ISignalTree } from './lib/types';
+import type { ToolingTree } from './lib/internals/tooling-tree';
 import { getActiveWriteContext } from './lib/write-context';
 import { peekInternalTransactionRuntime } from './enhancers/transactions/transactions';
 import { getPositionRegistry } from './lib/internals/position-registry';
@@ -66,7 +66,9 @@ export function activeTransactionContext():
  * ⚠️ Generic kernel truth, deliberately. A consumer translates capabilities
  * into its own capability model; no consumer-shaped predicate belongs here.
  */
-export function treeCapabilities<T>(tree: ISignalTree<T>) {
+export function treeCapabilities<T, TAccum = unknown>(
+  tree: ToolingTree<T, TAccum>
+) {
   return getTreeCapabilities(tree);
 }
 export type {
@@ -161,7 +163,9 @@ function projectConfirmedTurns(
  * Equality and `Map`-key use only — never serialize it. A consumer needing
  * persistence maps this to its own session identity.
  */
-export function treeRuntimeId<T>(tree: ISignalTree<T>): TreeId | undefined {
+export function treeRuntimeId<T, TAccum = unknown>(
+  tree: ToolingTree<T, TAccum>
+): TreeId | undefined {
   return getPositionRegistry(tree.$)?.id;
 }
 
@@ -181,8 +185,8 @@ export function treeRuntimeId<T>(tree: ISignalTree<T>): TreeId | undefined {
  * Returns a live view: it reads what the enhancer already retains and keeps no
  * history of its own. Repeated calls are cheap and always current.
  */
-export function confirmedTurnReader<T>(
-  tree: ISignalTree<T>
+export function confirmedTurnReader<T, TAccum = unknown>(
+  tree: ToolingTree<T, TAccum>
 ): ConfirmedTurnReader | undefined {
   const runtime = peekInternalTransactionRuntime(tree);
   if (!runtime) {

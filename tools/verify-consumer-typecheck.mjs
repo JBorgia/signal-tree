@@ -115,6 +115,7 @@ import {
   restoration,
   batching,
   type ReadonlyLocation,
+  type TreeId,
 } from '@signal-tree/kernel';
 import {
   createSignalTreeFactory,
@@ -122,6 +123,18 @@ import {
   type ObservationAdapter,
   type ObservationToken,
 } from '@signal-tree/kernel/adapter';
+// Supported tooling is a separate shipped declaration entry, not covered by
+// importing the root and adapter alone. Keep branded tree identity across it.
+import {
+  treeCapabilities,
+  treeRuntimeId,
+  stateLocationReader,
+  confirmedTurnReader,
+  transactionLifecycleReader,
+  restorationReader,
+  entityMembershipReader,
+  linkStateReader,
+} from '@signal-tree/kernel/internals';
 import {
   defineStore,
   leaf as angularLeaf,
@@ -133,7 +146,8 @@ import {
   type EntitySignalWithSlices as AngularEntitySignalWithSlices,
 } from '@signal-tree/angular';
 import type { Signal as AngularSignal, WritableSignal } from '@angular/core';
-import { useSignalTree } from '@signal-tree/react';
+import { useSignalTree, signalTree as reactSignalTree, leaf as reactLeaf } from '@signal-tree/react';
+import { signalTree as solidSignalTree, leaf as solidLeaf } from '@signal-tree/solid';
 import type { ComputedRef, Ref } from 'vue';
 import {
   asReadonly as vueAsReadonly,
@@ -365,6 +379,58 @@ void vueTerminals.$.weakMap.get;
 void vueTerminals.$.bytes[0];
 void [vueOptional, vueUnion, vueWeakMap, vueBytes, vueCallback, vueSnapshot];
 vueTerminals.destroy();
+
+// A real root-created tree must be accepted through the tooling entry too.
+// Access every new observation reader so missing bundled type references fail.
+void treeCapabilities(tree);
+void stateLocationReader(tree);
+const runtimeTreeId: TreeId | undefined = treeRuntimeId(tree);
+const observedTreeId: TreeId | undefined = transactionLifecycleReader(tree)?.snapshot().treeId;
+const linkedTreeId: TreeId = linkStateReader(tree).snapshot().treeId;
+void [runtimeTreeId, observedTreeId, linkedTreeId];
+void confirmedTurnReader(tree)?.readConfirmedTurns();
+void transactionLifecycleReader(tree)?.snapshot();
+void restorationReader(tree)?.snapshot();
+void entityMembershipReader(tree)?.snapshot();
+void linkStateReader(tree)?.snapshot();
+
+// Public facade carriers and opaque leaf boundaries must survive packing too.
+const reactObserved = reactSignalTree({ bounds: reactLeaf({ min: 0, max: 1 }) });
+const solidObserved = solidSignalTree({ bounds: solidLeaf({ min: 0, max: 1 }) });
+void treeCapabilities(angularTree);
+void treeRuntimeId(angularTree);
+void confirmedTurnReader(angularTree);
+void stateLocationReader(angularTree);
+void transactionLifecycleReader(angularTree);
+void restorationReader(angularTree);
+void entityMembershipReader(angularTree);
+void linkStateReader(angularTree);
+void treeCapabilities(vueTree);
+void treeRuntimeId(vueTree);
+void confirmedTurnReader(vueTree);
+void stateLocationReader(vueTree);
+void transactionLifecycleReader(vueTree);
+void restorationReader(vueTree);
+void entityMembershipReader(vueTree);
+void linkStateReader(vueTree);
+void treeCapabilities(reactObserved);
+void treeRuntimeId(reactObserved);
+void confirmedTurnReader(reactObserved);
+void stateLocationReader(reactObserved);
+void transactionLifecycleReader(reactObserved);
+void restorationReader(reactObserved);
+void entityMembershipReader(reactObserved);
+void linkStateReader(reactObserved);
+void treeCapabilities(solidObserved);
+void treeRuntimeId(solidObserved);
+void confirmedTurnReader(solidObserved);
+void stateLocationReader(solidObserved);
+void transactionLifecycleReader(solidObserved);
+void restorationReader(solidObserved);
+void entityMembershipReader(solidObserved);
+void linkStateReader(solidObserved);
+reactObserved.destroy();
+solidObserved.destroy();
 
 // Enhancer methods
 tree.undo();

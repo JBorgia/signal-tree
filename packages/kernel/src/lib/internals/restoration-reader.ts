@@ -1,4 +1,5 @@
 import type { ISignalTree } from '../types';
+import type { ToolingTree } from './tooling-tree';
 import type { TreeId } from './position-registry';
 import { StudioTreeDestroyedError } from './confirmed-turn-view';
 
@@ -163,10 +164,10 @@ function createFeed<T>(
 }
 
 /** Read current owner facts without installing restoration or retaining history. */
-export function restorationReader<T>(
-  tree: ISignalTree<T>
+export function restorationReader<T, TAccum = unknown>(
+  tree: ToolingTree<T, TAccum>
 ): RestorationReader | undefined {
-  if (tree.destroyed()) throw new StudioTreeDestroyedError();
+  if ((tree.destroyed as () => boolean)()) throw new StudioTreeDestroyedError();
   return FEEDS.get(tree.$)?.reader;
 }
 

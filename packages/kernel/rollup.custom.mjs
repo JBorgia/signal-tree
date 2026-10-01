@@ -3,64 +3,11 @@ import { fileURLToPath } from 'node:url';
 
 import typescript from '@rollup/plugin-typescript';
 import { dts } from 'rollup-plugin-dts';
-import ts from 'typescript';
 import { createLibraryRollupConfig } from '../../tools/build/create-rollup-config.mjs';
 
 const packageRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const baseConfigFactory = createLibraryRollupConfig({ packageRoot });
-
-const adapterMarkerIdentityPlugin = {
-  name: 'signaltree-adapter-marker-identity',
-  renderChunk(code, chunk) {
-    if (!chunk.fileName.endsWith('adapter.d.ts')) {
-      return null;
-    }
-
-    const source = ts.createSourceFile(
-      chunk.fileName,
-      code,
-      ts.ScriptTarget.Latest,
-      false,
-      ts.ScriptKind.TS
-    );
-    const brandDeclarations = source.statements.filter(
-      (statement) =>
-        ts.isVariableStatement(statement) &&
-        statement.declarationList.declarations.some(
-          (declaration) =>
-            ts.isIdentifier(declaration.name) &&
-            ['ENTITY_MAP_BRAND', 'LEAF_DEFINITION_TYPE'].includes(declaration.name.text)
-        )
-    );
-    const markerDeclarations = source.statements.filter(
-      (statement) =>
-        ts.isInterfaceDeclaration(statement) &&
-        ['EntityMapMarker', 'LeafDefinition'].includes(statement.name.text)
-    );
-
-    if (brandDeclarations.length !== 2 || markerDeclarations.length !== 2) {
-      this.error(
-        'adapter declaration must contain one local EntityMapMarker and LeafDefinition, each with its brand.'
-      );
-    }
-
-    let transformed = code;
-    for (const declaration of [
-      ...brandDeclarations,
-      ...markerDeclarations,
-    ].sort((left, right) => right.getFullStart() - left.getFullStart())) {
-      transformed =
-        transformed.slice(0, declaration.getFullStart()) +
-        transformed.slice(declaration.getEnd());
-    }
-
-    return {
-      code: `import type { EntityMapMarker, LeafDefinition } from './index.js';\n${transformed}`,
-      map: null,
-    };
-  },
-};
 
 export default (config, options) => {
   const baseConfig = baseConfigFactory(config, options);
@@ -163,49 +110,23 @@ export default (config, options) => {
     ],
   };
 
+  // One declaration graph preserves every nominal identity across the public
+  // entry points, including private construction metadata. Separate bundles
+  // duplicate unique symbols; rewriting them as root imports would require
+  // exporting private types. Shared chunks stay private package files instead.
   return [
     runtimeConfig,
     {
-      input: path.join(packageRoot, 'src/internals.ts'),
-      output: {
-        file: path.join(packageRoot, '../../dist/packages/kernel/dist/internals.d.ts'),
-        format: 'es',
+      input: {
+        index: path.join(packageRoot, 'src/index.ts'),
+        adapter: path.join(packageRoot, 'src/adapter.ts'),
+        internals: path.join(packageRoot, 'src/internals.ts'),
       },
-      plugins: [
-        {
-          name: 'signaltree-tooling-public-type-identity',
-          resolveId(source, importer) {
-            // Tooling accepts the very same branded tree types applications use.
-            // Rebundling ISignalTree would duplicate its unique-symbol markers.
-            if (source === './lib/types' && importer === path.join(packageRoot, 'src/internals.ts')) {
-              return { id: './index.js', external: true };
-            }
-            return null;
-          },
-        },
-        dts({ respectExternal: true }),
-      ],
-    },
-    {
-      input: path.join(packageRoot, 'src/index.ts'),
       output: {
-        file: path.join(
-          packageRoot,
-          '../../dist/packages/kernel/dist/index.d.ts'
-        ),
+        dir: path.join(packageRoot, '../../dist/packages/kernel/dist'),
         format: 'es',
-      },
-      plugins: [dts({ respectExternal: true })],
-    },
-    {
-      input: path.join(packageRoot, 'src/adapter.ts'),
-      output: {
-        file: path.join(
-          packageRoot,
-          '../../dist/packages/kernel/dist/adapter.d.ts'
-        ),
-        format: 'es',
-        plugins: [adapterMarkerIdentityPlugin],
+        entryFileNames: '[name].d.ts',
+        chunkFileNames: '_[name]-[hash].d.ts',
       },
       plugins: [dts({ respectExternal: true })],
     },

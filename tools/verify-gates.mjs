@@ -48,7 +48,7 @@
  */
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -1327,12 +1327,23 @@ const GATES = [
     // package-hygiene checks presence. Comments now stay in both outputs and the
     // strip plugin in tools/build/create-rollup-config.mjs removes them from JS.
     //
-    // Strip the shipped root declarations, reproducing removeComments rather
-    // than moving the checker threshold. The old 168 -> 169 mutation became
-    // inert when the tooling entrypoint increased shipped documentation to 197.
-    // Keep the production floor intact and test the actual damaged artifact.
+    // Shared declarations may hold most documentation outside index.d.ts.
+    // Resolve the richest shipped file only after the harness has built dist;
+    // deleting its actual JSDoc must still trip the unchanged documentation floor.
     mutation: {
-      file: 'dist/packages/kernel/dist/index.d.ts',
+      get file() {
+        const directory = 'dist/packages/kernel/dist';
+        const candidates = readdirSync(join(ROOT, directory))
+          .filter((name) => name.endsWith('.d.ts'))
+          .map((name) => ({
+            name,
+            blocks: (readFileSync(join(ROOT, directory, name), 'utf8')
+              .match(/\/\*\*[\s\S]*?\*\//g) ?? []).length,
+          }))
+          .sort((a, b) => b.blocks - a.blocks || a.name.localeCompare(b.name));
+        if (!candidates[0]?.blocks) throw new Error('No documented kernel declaration to mutate');
+        return join(directory, candidates[0].name);
+      },
       generate: (original) => original.replace(/\/\*\*[\s\S]*?\*\//g, ''),
     },
   },
@@ -1660,9 +1671,11 @@ const hash = (s) => createHash('sha256').update(s).digest('hex');
 
 /** Apply, run, restore. Restoration is verified, not assumed. */
 function withMutation(mutation, fn) {
-  const path = join(ROOT, mutation.file);
+  // Resolve generated-artifact targets once, before mutating their contents.
+  const file = mutation.file;
+  const path = join(ROOT, file);
   if (!existsSync(path))
-    throw new Error(`mutation target missing: ${mutation.file}`);
+    throw new Error(`mutation target missing: ${file}`);
   const original = readFileSync(path, 'utf8');
   const before = hash(original);
 
@@ -1678,14 +1691,14 @@ function withMutation(mutation, fn) {
   } else {
     if (!original.includes(mutation.find)) {
       throw new Error(
-        `mutation anchor not found in ${mutation.file} — the gate's target moved, ` +
+        `mutation anchor not found in ${file} — the gate's target moved, ` +
           `so this self-test has been silently testing nothing. Fix the anchor.`
       );
     }
     mutated = original.replace(mutation.find, mutation.replace);
   }
   if (mutated === original)
-    throw new Error(`mutation was a no-op in ${mutation.file}`);
+    throw new Error(`mutation was a no-op in ${file}`);
 
   try {
     writeFileSync(path, mutated);
@@ -1694,7 +1707,7 @@ function withMutation(mutation, fn) {
     writeFileSync(path, original);
     if (hash(readFileSync(path, 'utf8')) !== before) {
       console.error(
-        `\n  FATAL: could not restore ${mutation.file}. Tree is dirty.`
+        `\n  FATAL: could not restore ${file}. Tree is dirty.`
       );
       process.exit(2);
     }
@@ -1739,7 +1752,7 @@ function withMutation(mutation, fn) {
         );
       } catch (err) {
         console.error(
-          `\n  FATAL: restored ${mutation.file} but could not rebuild dist/. ` +
+          `\n  FATAL: restored ${file} but could not rebuild dist/. ` +
             `Built output still contains the mutation — run \`npm run build\`.\n\n` +
             String(err.stderr ?? err.stdout ?? err.message).slice(-2000)
         );

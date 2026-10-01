@@ -1,4 +1,5 @@
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
+import type { ToolingTree } from '../../lib/internals/tooling-tree';
 import {
   applyInInvalidationGroup,
   wasAppliedBeforeFailure,
@@ -987,8 +988,8 @@ function createCaptureBucket(): CaptureBucket {
  * transaction, which is exactly the "no retained state when unused" rule the
  * Studio seam has to satisfy. Observation peeks; it does not install.
  */
-export function peekInternalTransactionRuntime<T>(
-  tree: ISignalTree<T>
+export function peekInternalTransactionRuntime<T, TAccum = unknown>(
+  tree: ToolingTree<T, TAccum>
 ): InternalTransactionRuntime | undefined {
   return (tree as unknown as Record<PropertyKey, unknown>)[
     INTERNAL_TRANSACTION_RUNTIME
