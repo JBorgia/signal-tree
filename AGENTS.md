@@ -1,501 +1,86 @@
-# AGENTS.md
-
-Guidance for AI agents working with this repository. Two audiences: contributors changing SignalTree source, and agents consuming `@signaltree/*` packages in downstream apps.
-
-## Target-state-first migration
-
-> **Migration pressure may reveal a missing property, but it never determines
-> the replacement architecture.** A legacy application can falsify an
-> architecture. It cannot define one.
-
-For every framework integration or application migration:
-
-1. Derive the canonical greenfield v15 architecture without legacy constraints.
-2. Implement and validate that architecture independently.
-3. Freeze the target contract only from greenfield evidence.
-4. Migrate applications toward that target.
-5. Prefer deleting obsolete concepts over adapting them.
-
-Do not create temporary compatibility APIs, intermediate architectures, legacy
-bridges, or migration-only conveniences. Do not preserve old ownership because
-moving it is expensive. Migration complexity is evidence to document, not a
-reason to pollute the architecture applications should use five years from now.
-
-`@signal-tree/kernel/adapter` is the realization SDK, not a compatibility
-layer. A new export belongs there only when it is framework-neutral, expresses
-a semantic fact already owned by the kernel, is required by a correct
-realization, and is neither application convenience nor compatibility machinery.
-
-Framework packages may realize SignalTree truth for their runtime. They must
-not create another state authority. Do not use mutable process-global framework
-installation when construction-bound ownership can express the long-term
-architecture, and never let a migration determine realization ownership.
-
-## Framework ownership ratchet
-
-Place code by the question it answers, not by whether its names or types look
-framework-neutral:
-
-- `@signal-tree/kernel` owns behavior SignalTree requires regardless of
-  framework: state and identity, EntityMap, causal turns, links, restoration,
-  and owner invalidation semantics.
-- `@signal-tree/kernel/adapter` owns only neutral ports that multiple runtime
-  realizations can implement for a semantic requirement owned by the kernel.
-- A framework package owns anything that exists because of that framework's
-  API, lifecycle, diagnostics, scheduler, rendering model, identity rules, or
-  quirks. A neutral interface may live in the kernel; its framework
-  implementation must not.
-
-For every field proposed for `TreeRealization` or another kernel adapter
-contract:
-
-1. State the SignalTree semantic job it serves.
-2. Provide a neutral implementation.
-3. Prove that a tiny fake realization importing no framework can implement it.
-4. Identify the kernel authority that decides when and why it is invoked.
-5. Reject it when its purpose is only framework lifecycle, diagnostics,
-   rendering, hooks, dependency injection, context, scheduling, primitive
-   identity detection, or compatibility with one framework primitive.
-
-Ask two questions. If Angular, React, and Vue disappeared, would the contract still
-describe a meaningful SignalTree requirement or useful port for another
-reactive runtime? Could Solid, Preact, Svelte, or a tiny fake implement it
-naturally without pretending to be one of those frameworks? A neutral name alone is
-not evidence of neutral ownership. Vanilla need not use every adapter port;
-the kernel must own the semantic question the port answers.
-
-## Do not write RFCs
-
-We make the change. `TODO.md` is where decided-but-not-done work lives; put it
-there and go do it.
-
-`docs/rfcs/` is an ARCHIVE of decisions already taken, kept for the options that
-were **rejected** and why — that is what stops them being re-proposed. An RFC is
-what an OUTSIDE contributor writes to propose something. Creating
-`docs/rfcs/00NN-my-idea.md` for internal work produces a document that reads as
-pending when the work has shipped: four RFC statuses said "proposed" or "Accepted"
-for work already in a release, and 0012 claimed it had not shipped when all three
-of its items had.
-
-## Public library / private Studio boundary
-
-The September 11 owner decision supersedes earlier free-Studio documentation.
-Only kernel, angular, react, vue and solid belong in this public release
-workspace.
-The existing kernel observation interfaces remain public integration primitives.
-Studio application, attachment/bridge, recording, sessions and query engine live
-in a separate private workspace. Do not copy that source back or include its
-packages in public releases, even with private manifests.
-
-The six-package v15.1.0-rc.1 and rc.2 candidates were NOT published. Never resume
-or dispatch their old release/publish workflows. A later public release must
-use the corrected five-package plan (`scripts/release-plan.mjs` is the
-authority; do not hand-maintain the list). Existing public history and Apache notices
-are not erased or retroactively revoked by the separation.
-
-## Documentation language
-
-SignalTree has three vocabularies. [`docs/glossary.md`](docs/glossary.md)
-defines them and is the reference when you are unsure which level a term
-belongs to.
-
-**Binding rule:** users learn the behaviour first; names for the machinery come
-later; internal implementation vocabulary never appears in introductory
-material unless the user must interact with it.
-
-- **Everyday** (state, field, entity, entity ID, write, external update,
-  transaction, rollback, undo/redo, linked state) — dominates the root README,
-  package READMEs, quickstarts and examples. A developer should be able to
-  build a serious application knowing only these.
-- **Advanced** (entity lifetime, authored write, realized update, causal turn,
-  restoration, retained history) — used when explaining *why* SignalTree
-  behaves differently. Always teach the behaviour before the term: "a server
-  response establishes the current value — a *realized update*", never the
-  reverse.
-- **Architecture and adapter** (`SubjectId`, `PositionId`, `ownerId`,
-  `EntityValueStore`, `StructuralStore`, `EpochHandle`, `ObservationToken`,
-  realization carrier, restoration designation) — architecture documents,
-  contributor documentation and the adapter SDK only.
-
-Say **entity lifetime**, not *subject*, in anything public. The internal name
-is accurate, but RxJS owns that word for Angular developers and a `Subject` in
-an Angular codebase means something else entirely.
-
-Opening copy describes behaviour, not authority. Write "SignalTree keeps state
-behaviour consistent across frameworks: entity identity, transactions, undo,
-external updates and reactive publication all follow the same rules" rather
-than "the kernel owns meaning — identity, subject lifetime, canonical values,
-causality and publication". The second sentence is true and belongs in the
-architecture guide.
-
-## Release work
-
-Read [`RELEASE-1.0.md`](RELEASE-1.0.md) before release-related work.
-
-### Continuous execution rule
-
-Continue working autonomously through the current release phase.
-
-After completing an item:
-
-1. Run focused validation.
-2. Run the required authoritative test/build/lint gates.
-3. Inspect `git status` and `git diff`.
-4. Commit only files belonging to that conceptual change.
-5. Update `RELEASE-1.0.md` with the completed item, commit hash, validation performed, and any newly discovered work.
-6. Immediately select the next highest-priority unchecked item in the same phase.
-7. Continue without asking for permission.
-
-Do not stop merely to:
-
-- report progress
-- ask whether to continue
-- ask permission to run normal tests
-- ask permission to make an obvious follow-up fix
-- ask permission to commit a validated isolated change
-- choose between equivalent implementation details
-
-For every release slice:
-
-1. Inspect current HEAD, relevant implementation, and the nearest existing tests.
-2. Identify the cheapest falsifier.
-3. Add characterization before production changes when practical.
-4. Make the smallest change that closes the demonstrated problem.
-5. Run focused validation first.
-6. Run the authoritative relevant test/build/lint gates before checkpointing.
-7. Review `git diff` and `git status`.
-8. Commit only files belonging to the slice.
-9. Update `RELEASE-1.0.md` after the checkpoint.
-10. Report the invariant proven, files changed, tests run, commit hash, and next recommended unchecked item.
-
-## STOP and ask Jonathan only when a real decision is required
-
-A decision is required if:
-
-- two materially different public API designs are viable
-- a frozen architecture invariant appears to be wrong
-- fixing a test requires changing documented semantics
-- a backward-compatibility/product-scope decision is required
-- a feature must be removed, deferred, or substantially redesigned
-- the change affects package naming/versioning/public exports
-- security or destructive operations require authorization
-- the next step cannot be determined from `RELEASE-1.0.md`
-- tests expose contradictory requirements
-- proceeding would require modifying unrelated user work
-
-When stopping, provide:
-
-```text
-DECISION REQUIRED
-
-Question:
-<one precise question>
-
-Why it matters:
-<short explanation>
-
-Option A:
-<consequences>
-
-Option B:
-<consequences>
-
-Recommendation:
-<recommended option and reason>
-
-Work completed before stopping:
-<commits/tests>
-```
-
-### Failed test rule
-
-A failed test is not itself a reason to stop.
-
-If the failure has an unambiguous local fix consistent with the current architecture and task, repair it, rerun validation, and continue.
-
-Stop only if resolving the failure requires choosing or changing semantics, API, scope, compatibility, or another release invariant.
-
-### Commit authority
-
-The agent may create local git commits without requesting approval when:
-
-- the change is one conceptual release item
-- relevant focused tests pass
-- authoritative required gates pass
-- staged files have been inspected
-- unrelated dirty files are excluded
-
-Do not push, publish, tag, merge, or rewrite shared history without explicit user authorization.
-
-Do not:
-
-- optimize already-green paths
-- mix infrastructure work with kernel work
-- alter unrelated dirty files
-- change frozen causal semantics without a red correctness test
-- weaken public types to simplify runtime implementation
-- start the next release phase in the same session unless the current phase gate is satisfied
-
-## For Contributors
-
-Quick-reference distilled from [`.cursorrules`](.cursorrules). That file remains the full rulebook — read it before non-trivial changes.
-
-### Stack
-
-- **Package manager**: pnpm 8+ (required — do not use npm/yarn for workspace ops)
-- **Monorepo tool**: Nx
-- **Language**: TypeScript (strict, no `any`; prefer `unknown`)
-- **Builds**: Rollup for packages & guardrails, Angular CLI for the demo app
-- **Tests**: Vitest
-- **Node**: 24.15.0 (see `.nvmrc`)
-
-Repository placement and authority are mapped in
-[`docs/repository-map.md`](docs/repository-map.md). Use it to distinguish
-production, validation, historical evidence, generated output, and experiments
-before adding or moving files.
-
-### Common commands
-
-```bash
-# Install
-pnpm install
-
-# Build
-pnpm run build:all            # all packages (kernel, angular, react, vue)
-nx build kernel               # single package
-pnpm run build:production     # production build
-
-# Test
-pnpm run test:all
-nx test kernel                # run from the repo root; bare vitest here fails with `ngModule null`
-
-# Lint / format
-pnpm run lint:all
-pnpm run lint:fix:all
-
-# Demo
-pnpm start                    # dev server
-pnpm nx build demo --configuration=production
-```
-
-### Bundle size limits (enforced in validation)
-
-| Target                | Prod budget | Dev budget |
-| --------------------- | ----------- | ---------- |
-| `signaltree-bare`     | 10.25 KB    | 12.45 KB   |
-| `signaltree-entities` | 22.60 KB    | 25.25 KB   |
-
-The authoritative gzip gate is [`tools/check-bundle-budget.mjs`](tools/check-bundle-budget.mjs).
-The current audit's fresh built output exceeds these unchanged ceilings: bare
-**10.35 KB prod / 12.48 KB dev**, entities **23.01 KB prod / 25.60 KB dev**.
-These are failed measurements, not approved new budgets. Evidence is recorded in
-`docs/audits/2026-09-23-remediation.md`; rerun the generator against fresh output
-before relying on numbers after further source changes. Framework peers and
-`tslib` are external to this own-code measurement. Do not infer that a passing
-functional test suite resolves the size failure.
-
-### Validation pipeline
-
-```bash
-npm run validate
-```
-
-Runs the 13-step pre-publish pipeline: clean tree, frozen lockfile install, tsconfig sanity, lint, tests, coverage thresholds (80% statements / 75% branches / 80% functions / 80% lines), all-package build, package-config checks, dist-file checks, bundle-size limits, sanity checks, perf benchmarks (warn), docs completeness (warn). See [`.github/VALIDATION_GUIDE.md`](.github/VALIDATION_GUIDE.md).
-
-### Docs & demo currency (hard rule)
-
-Before signing off any release or size/perf change:
-
-- **Refresh published metrics from the GENERATORS, never from `artifacts/*.json`.**
-  Every figure in a doc must name the tool that produces it — `tools/size-report.mjs`
-  (per-feature bundle deltas), `tools/check-bundle-budget.mjs` (enforced ceilings),
-  `tools/bench-compare.mjs` (cross-library collection and undo/redo),
-  `tools/bench-vs-signalstore.mjs` (task-level vs `@ngrx/signals`),
-  `tools/bench-depth-latency.mjs`, `tools/bench-leaf-equality.mjs`,
-  `tools/bench-ssr-payload.mjs`. `tools/check-numeric-claims.mjs` enforces this
-  and ratchets the backlog.
-
-  This line used to say "against the latest `artifacts/*.json`", and that was
-  the instruction-level cause of a whole class of wrong published numbers.
-  `artifacts/` is **gitignored** — untracked local scratch that varies per
-  machine, is often absent, and goes stale silently. The copy on this machine
-  in August 2026 still listed `enterprise`, a package dropped in 14.0.0, and put
-  core at 489 bytes gzip where the real figure is ~5,900 because
-  `scripts/perf-suite.js` measures the re-export barrel rather than what a
-  consumer ships. Sourcing docs from it propagated all three.
-
-  Read `artifacts/*.json` for exploration if you like. Do not publish from it.
-
-- Rebuild the demo (`pnpm nx build demo --configuration=production`) against the current workspace.
-- Flag mismatches or failures — treat them as blocking.
-
-### Internal utilities
-
-Kernel-only utilities live under `packages/kernel/src/lib/internals/utilities/`.
-Do not recreate a private workspace package for them; they are implementation
-details emitted naturally with the kernel's preserved-module build.
-
-### Release flow
-
-```bash
-npm run release         # patch
-npm run release:minor   # minor
-npm run release:major   # major
-```
-
-The release command prepares the version, runs the release matrix, commits, and
-pushes a signed tag. Tagged CI publishes exact candidate tarballs through the
-single canonical publisher. See [`RELEASE_PROCESS.md`](RELEASE_PROCESS.md).
-
-### Commit conventions
-
-Conventional commits: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`, `perf:`.
-
-## For Agents Consuming SignalTree
-
-### Framework facade rule
-
-Use one SignalTree import root for application code:
-
-- Angular applications: `@signal-tree/angular`
-- React applications: `@signal-tree/react`
-- Vue applications: `@signal-tree/vue`
-- Framework-neutral TypeScript and reusable libraries: `@signal-tree/kernel`
-
-The framework packages are complete application facades over the neutral
-kernel. Do not mix application imports between a framework package and the
-kernel; direct kernel imports are for code that intentionally has no framework
-runtime. The facades forward kernel symbols rather than reimplementing them, so
-there remains one semantic and nominal type authority.
-
-**There is currently no consumer-facing skill, and that is deliberate.** The
-`using-signaltree` skill, its per-package sub-skills, and the harness shims were
-deleted in `7696225d` along with the rest of the AI-discoverability artifacts.
-They taught APIs that no longer exist and, more importantly, most of what they
-taught that was still accurate described concepts that have not been
-survival-audited.
-
-Until the surviving public surface freezes, fall back to the package types and
-the READMEs. That is the intended behaviour, not a gap to route around: a
-missing skill makes an agent read the types; a stale one makes it emit deleted
-APIs with conviction.
-
-Writing a replacement is a deferred obligation owed after the API freeze — see
-`RELEASE-1.0.md` § "AI DISCOVERABILITY". Do not recreate a pointer shim to the
-deleted path; two have already been committed pointing at targets that did not
-exist.
-
-## Tree lifetime — `destroy()` is a contract, not a suggestion
-
-A `SignalTree` owns runtime resources for the lifetime of the tree. Dropping the
-last reference is **not** sufficient for prompt reclamation.
-
-```text
-LONG-LIVED APPLICATION STORE   created once, lives with the app
-                               destroy() at teardown, if at all
-
-BOUNDED-LIFETIME STORE         a test, an SSR request, a route- or
-                               component-owned store, a temporary workflow
-                               destroy() REQUIRED at the ownership boundary
-```
-
-Any harness that builds trees in a loop is in the second category. Measured, six
-identical 10k-row stores in one process
-(`tools/probe-history-sample-isolation.mjs`):
-
-```text
-build            1        2        3        4        5        6
-abandoned    89.65   174.08   263.14   355.81   452.13      OOM
-destroyed     7.08     7.21     7.28     7.28     7.37     7.38
-isolated     89.65    89.66    89.63    89.62    89.65    89.65
-```
-
-`isolated` is one store per process — a single tree costs the same every time,
-so nothing grows unboundedly inside a tree. `abandoned` is those six builds
-without `destroy()`.
-
-**Phrase it as ownership, never as a leak.** "SignalTree leaks unless destroyed"
-is disproved by the `destroyed` row; what is true is that resources are owned
-until released, and the cost of ignoring that scales with how many trees you
-create rather than how long one lives.
-
-This bit a benchmark before it bit a user: `tools/bench-update-matrix.mjs`
-abandoned its stores between samples, OOM'd on the largest cells, and the failure
-was written up as if the library's history representation were at fault. See the
-CORRECTION in `docs/architecture/v15-update-matrix-baseline.md`.
-
-## Type-checking gates
-
-`npm run typecheck` runs two passes, and the split is deliberate:
-
-- **`typecheck:typing`** — `packages/kernel/tsconfig.typecheck.json`, which
-  includes ONLY `src/**/*.typing.spec.ts`. Those files are excluded from vitest
-  (esbuild strips types without checking them), so `tsc` is the only thing that
-  reads them. They carry the `@ts-expect-error` assertions that pin what must
-  NOT compile.
-- **`typecheck:source`** — `tsconfig.typecheck-all.json`, every package's `src`
-  plus `apps/demo/src`, excluding specs.
-
-The second pass was added in 14.0.0 after `npm run typecheck` reported **zero
-errors** for a breaking type change that broke 22 call sites — because it had
-never covered anything but core's typing specs. The demo build was the only
-thing that caught them, and nothing required it to run.
-
-Three things this config has to get right, each of which produced a wave of
-false positives while it was being written:
-
-1. **`strict: true` explicitly.** `tsconfig.base.json` sets `strict: false` and
-   every package turns it back on individually. Inheriting the loose setting
-   broke discriminated-union narrowing and invented an error in
-   `async-query.ts` that does not exist.
-2. **Include `.d.ts`.** Excluding them dropped `apps/demo/src/benchmarks.d.ts`
-   and made three declared `window` globals look undeclared.
-3. **`types: ['node', 'vitest/globals']`**, or every spec-adjacent file reports
-   `Cannot find name 'describe'`.
-
-**Known debt:** spec files carry ~409 type errors and are excluded from
-`typecheck:source` for now. They pass at runtime because vitest never
-type-checks them. Narrowing that exclusion is worth doing; do it a directory at
-a time rather than in one sweep.
-
-## Publishing to npm
-
-The canonical candidate publisher runs these gates before packing and registry
-publication. Compatibility wrappers contain no independent publish logic:
-
-1. `scripts/resolve-workspace-specs.mjs` — rewrites `workspace:*` to a real
-   range and proves none survive. A published `workspace:*` is not valid semver
-   and fails every install.
-2. `scripts/verify-publish-artifacts.mjs` — every glob in `files` must resolve
-   to a real file in dist. npm ships a tarball missing an unmatched glob without
-   a word.
-3. `tools/verify-consumer-typecheck.mjs` — packs the tarball, installs it into a
-   throwaway project and TYPE-CHECKS consumer code under both `bundler` and
-   `node16` resolution. `verify-tarball-consumer.mjs` only proves the resolver
-   finds the files; this proves the shipped types compile.
-
-### Two decisions recorded so they are not re-litigated
-
-**No `engines` field, deliberately.** These are browser libraries; nothing in
-them depends on a Node version at runtime (core only reads
-`globalThis.process?.env.NODE_ENV` behind a guard). The real constraint belongs
-to the Angular version the consumer already chose, and our supported range spans
-Angular 20–22, whose own Node requirements differ. Declaring a range would
-either duplicate Angular's or contradict it, and being wrong here produces
-spurious install warnings for a valid setup. `@ngrx/signals` declares none
-either. (The pre-15 `@signaltree/events` package shipped a NestJS subpath
-alongside an Angular one, which was the one arguable case for a package-level
-`engines` — it would still have constrained browser consumers for a server-only
-reason. That package has no v15 successor, so the exception is moot.)
-
-Kernel declarations use one Rollup declaration graph for `index`, `adapter`, and
-`internals`. It emits their public `.d.ts` entry files plus private shared
-declaration chunks included by the package's `dist/**/*.d.ts` file pattern. The
-shared graph preserves nominal identities across entries without exporting
-private brands or rewriting declarations afterward. Nx's per-source declaration
-and dts-bundle plugins remain removed from the kernel runtime configuration.
-
-`node tools/verify-consumer-typecheck.mjs` packs that artifact and compiles a
-real consumer with `skipLibCheck: false` under both `bundler` and `node16`
-resolution, including the framework hydration and negative Link-admission
-fixtures. This is a release gate, not an optional audit.
+# SignalTree agent guidance
+
+This is the default repository contract. Load task-specific references below
+only when relevant. Use the current checkout's manifests and configuration;
+other worktrees may implement a different release line.
+
+## Scope and authority
+
+- Inspect HEAD, branch and dirty files before editing. Preserve unrelated work.
+- Current compatibility is defined by [support policy](docs/support-policy.md).
+  Do not apply the historical greenfield reset as a license to break stable v15.
+- Preserve kernel/framework ownership and the public-library/private-Studio
+  boundary in [contributor contracts](docs/contributor-contracts.md). Read those
+  contracts before changes to architecture, adapters or package ownership.
+- Frozen semantics require a concrete counterexample before reopening. Product,
+  public API/export, versioning and compatibility changes need owner authority;
+  an approval already given in the task remains valid.
+- User-facing documentation teaches behavior before internal machinery. Use
+  “entity lifetime” in consumer material; see [the glossary](docs/glossary.md).
+
+## Work and verification
+
+- For deliberate or load-bearing code, inspect relevant history and tests before
+  changing it. Use the commit/PR/issue evidence that exists; do not invent any.
+- Make authorized progress without asking to continue after routine steps.
+  Choose the cheapest meaningful falsifier, validate the changed contract, and
+  inspect the diff. Do not weaken a test or a budget just to obtain green.
+- Preserve first failures and distinguish run results from source inspection.
+  A test must assert useful behavior, not pass vacuously when nothing happens.
+- Numbers need the generating command, workload, artifact identity and limits.
+  A generator citation alone does not establish freshness or correctness.
+  Do not publish figures copied from ignored `artifacts/` or old instructions.
+- Independent reviews are claims to verify. Delegate when independent reasoning
+  or parallel work adds value, using available tools; no fixed model, file-count
+  trigger or mandatory reviewer headcount. Architecture review follows
+  [the scoped protocol](.github/skills/adversarial-confirmation/references/protocol.md).
+- A failing test is not a reason to stop when the correction is unambiguous and
+  authorized. Escalate actual semantic/product/compatibility conflicts with the
+  concrete finding, viable options and a recommendation; continue independent work.
+- Local conceptual commits are permitted after relevant checks and staged-diff
+  review. Exclude unrelated changes. Push, tag, publish, merge and shared-history
+  rewrites require explicit authorization; verification alone grants none.
+
+## Commands and task routing
+
+Use the Node version in `.nvmrc` and pnpm pinned in `package.json`.
+Runtime source is strict TypeScript; preserve public types rather than weakening
+them to accommodate an implementation shortcut.
+
+| Task | Start here |
+| --- | --- |
+| Package tests | `pnpm nx test kernel` (or the affected framework project); run through Nx rather than root bare Vitest |
+| Build | `pnpm run build:all` or `pnpm nx build kernel` |
+| Types | `pnpm run typecheck`; ordinary spec types also have a separate `spec-types` gate |
+| Gate scope | `node tools/verify-gates.mjs --list`; focused checks are not release sign-off |
+| Release | [Current controller](RELEASE-CURRENT.md), then [validation](.github/VALIDATION_GUIDE.md) and [release process](RELEASE_PROCESS.md) |
+| Build/package changes | [Build contract](.github/instructions/build-pipeline.instructions.md) and [declarations](.github/instructions/type-declarations-fix.md) |
+| Framework work | [Contributor contracts](docs/contributor-contracts.md) and [CONTRIBUTING](CONTRIBUTING.md) |
+| File placement | [Repository map](docs/repository-map.md) |
+| Consumer code | Installed package types, package README, then [llms.txt](llms.txt) for checked examples |
+| Measurement | [Measurement guidance](docs/performance/measurement-contract.md) and the relevant generator |
+
+Bundle ceilings are defined only by `tools/check-bundle-budget.mjs`; measure a
+fresh build. Default instructions do not carry changing size/timing tables.
+Changes affecting size/performance or release-visible docs also require the
+current production demo build and relevant documentation gates before sign-off.
+
+## Application use and lifetime
+
+Use the application's framework facade: `@signal-tree/angular`, `/react`, `/vue`
+or `/solid`; use `@signal-tree/kernel` for intentionally neutral code. These are
+complete facades over one kernel authority. Do not mix import roots casually.
+Angular/Solid leaves write with `.set`, Vue with `.value`, React/kernel with a
+call. Read exact types for the installed version.
+
+Destroy trees owned by tests, requests, routes, components and editor sessions
+at teardown. Follow this checkout's package READMEs and lifetime contract; do not
+infer runtime root-slice mounting from dynamic EntityMap membership.
+
+## Records
+
+Decided work belongs in `TODO.md` or the current task/controller. Internal work
+is not a new pending RFC: `docs/rfcs/` preserves past decisions and rejected
+options. Record why a non-obvious choice was made where it belongs.
+`RELEASE-1.0.md` and the architecture context record preserve history; their old
+“next” lists and model choreography do not override the current controller.

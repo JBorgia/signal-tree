@@ -1,146 +1,70 @@
-# Adversarial Confirmation Protocol
+# Independent architecture review
 
-This reference expands the portable protocol used to prevent false certainty in
-architecture and product-surface decisions.
+This is the current review procedure, consolidated October 1, 2026 with owner
+approval. It supersedes historical headcount, chat-itinerary and word-ban rules;
+it does not change product decisions, frozen premises or reopening conditions.
+Use it for consequential architecture, public-surface and semantic boundaries,
+not as compulsory ceremony for every ordinary code edit.
 
-## Vocabulary
+## Scope the question
 
-**Frozen premise**: A quoted input the row may reason from. If it is paraphrased,
-it is not frozen.
+Distinguish implementation correctness, a derivation from frozen premises, and a
+product/value decision. Evidence can answer the first two; it cannot manufacture
+owner authority for the third. Stable-line compatibility remains binding even
+when an earlier architecture experiment intentionally rejected legacy continuity.
 
-**Product decision**: A human-authoritative product/DX premise. It is allowed to
-settle what the product promises, but must be cited as a decision, not as a theorem.
+Quote relevant frozen premises **verbatim** and identify their source revision.
+Name the observable property at issue. A candidate must not borrow an unresolved
+sibling's function, and an opposite contract must not stipulate the answer.
+Check the actual assumption, not whether a particular word appears.
 
-**Candidate**: The function being tested. It must name an observable semantic
-property, not an incumbent mechanism.
+For derivation, missing required premises make the row underdetermined as posed;
+do not fill them from the incumbent implementation. For an authorized empirical
+investigation, missing evidence may be collected. These are different tasks.
 
-**Carrier**: The mechanism, data structure, public spelling, or internal field that
-might implement the function. Carriers do not survive just because the function does.
+## Independent scrutiny
 
-**Opposite contract**: The strongest coherent world where the candidate is absent.
-It must not decide the question by stipulation.
+At consequential architecture boundaries, independently challenge both framing
+and interpretation. Give each reviewer the evidence needed for its specific
+question, without the author's preferred conclusion or other reviewers' verdicts.
+Different evidence packets must share the same quoted premises where applicable.
+Do not withhold source or raw output from a reviewer asked to verify that evidence.
 
-**Absence witness**: A demonstration that some or all workflows can be handled without
-the candidate. It is not a recommended design.
+Select distinct questions—necessity, a strong alternative, the positive case,
+measurement validity, or interpretation limits. Use additional reviewers or a
+second pass when they answer a distinct unresolved question; headcount alone
+is not independence. Centralize architectural writes and final synthesis.
 
-**Normalized rival packet**: The stripped form of a rival claim used for defender
-pass 2.
+A positive survival claim needs a concrete capability, a supported connection
+between that capability and the candidate, and a response to actual alternatives.
+Opposition failing is not positive evidence. Where rivals are raised, normalize
+**rival claims, not premises**: claim, quoted premises, capability covered,
+falsifier and limits. Remove verdict/rhetorical cues; let the positive case
+answer the substantive rivals without supplying an expected answer.
 
-## The Layering Test
+## Evidence and closure
 
-Classify outputs as one of:
+- Separate executable observation, inference, policy and unknowns. File/name
+  searches discover leads; they do not prove absence or semantic ownership.
+- Use source and raw results when the question is empirical. Report whether the
+  falsifier actually ran; preserve failed controls and counterexamples.
+- Justify each inference. One experiment can support more than one conclusion
+  only when each is independently warranted; no compulsory ladder traversal.
+- Preserve the question that was opened. A narrow probe cannot close a broader
+  contract, and an absence witness's scaffolding is not a product requirement.
+- A frozen decision reopens only on its stated conditions or explicit owner
+  authority. Neither reviewer agreement nor a familiar legacy API grants that.
+- “Not established” is not “refuted”; “not openable as posed” is not a verdict
+  against the underlying capability. Unknown is an honest result.
+- Additional rounds require a new concrete finding/question. Wording repairs
+  do not automatically trigger another full review. Interpretation review must
+  not invent work solely to make an underdetermined candidate decidable.
 
-```text
-KP  KERNEL PRIMITIVE
-KA  KERNEL-SUPPORTED ADAPTER
-AS  AUTHORING SUGAR
-AR  APP RESPONSIBILITY
-LC  LEGACY COMPATIBILITY / DELETE CANDIDATE
-⚠   UNPLACED
-```
+Record the narrow disposition, evidence, owner decisions and parked reopening
+conditions. Parked conditions are not a backlog. Once the product requirement is
+settled, return to implementation and meaningful falsifiers instead of expanding
+this procedure.
 
-Use these meanings:
-
-- `KP`: Lower layers cannot supply the information. The kernel must represent it.
-- `KA`: The kernel supplies facts or seams; a replaceable adapter owns the feature.
-- `AS`: Already-surviving primitives can express it; this is authoring convenience.
-- `AR`: The application owns the function.
-- `LC`: Current physical residue, not a future commitment.
-- `⚠`: Open semantic question. Do not silently convert to app responsibility.
-
-## Candidate Hygiene
-
-A candidate is bad if it is either incumbent-laden or function-anonymous.
-
-Bad incumbent-laden examples:
-
-```text
-turn id must survive
-causal attribution must be retained
-transaction object must coordinate effects
-```
-
-Bad function-anonymous examples:
-
-```text
-some semantic fact must be retained
-some coordination semantics must exist
-the container must own something about acceptance
-```
-
-Good examples:
-
-```text
-one user-recognizable action should undo as one step
-a failed mutation should leave no reachable state residue
-an acquired member handle should not retarget to a later same-key occupant
-a durable write should not get ahead of committed tree truth
-```
-
-## Defender Semantics
-
-The defender is not merely a rebuttal reviewer and not a rubber stamp.
-
-`SURVIVAL ESTABLISHED` is allowed only when all five are true:
-
-```text
-1. candidate names a concrete semantic function
-2. positive burden is met by a concrete workflow/capability that becomes impossible or wrong without it
-3. candidate supplies that function
-4. actual normalized rival claims are defeated when raised
-5. defence imports no unearned premise or incumbent carrier
-```
-
-If there are no rivals, requirement 4 must be disclosed. A lack of opposition does
-not by itself strengthen the result.
-
-## Reopening Conditions
-
-A closed or underdetermined row may record reopening conditions. These are conditions,
-not tasks.
-
-Allowed:
-
-```text
-If an independently derived workflow later requires X, reopen this row.
-```
-
-Forbidden:
-
-```text
-Run this cheap check to see whether X exists.
-Search the implementation for an example of X.
-Benchmark current behavior to decide whether X is needed.
-```
-
-## When To Stop Reviewing And Build
-
-Use this protocol until one of these happens:
-
-- A product property is named clearly enough to falsify in code.
-- The row is not openable as worded.
-- The row is underdetermined under the current premises.
-- A human product decision is required.
-
-After a product decision, prefer a narrow implementation slice over more procedure.
-
-## Importing Into Another Project
-
-Copy:
-
-```text
-.github/skills/adversarial-confirmation/
-```
-
-Then run the skill whenever deciding architecture, API survival, DX feature
-retention, kernel boundaries, or layer placement.
-
-If the project has no `.github/skills` support, copy the folder under one of:
-
-```text
-.agents/skills/adversarial-confirmation/
-.claude/skills/adversarial-confirmation/
-~/.copilot/skills/adversarial-confirmation/
-~/.agents/skills/adversarial-confirmation/
-~/.claude/skills/adversarial-confirmation/
-```
+Use [the optional packet template](../assets/packet-templates.md) when it helps.
+The original charters and historical corrections remain in Git and the
+[architecture record](../../../../docs/architecture/SIGNALTREE-15-CONTEXT.md).

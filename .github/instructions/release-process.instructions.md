@@ -1,26 +1,19 @@
 ---
-applyTo: '**'
+applyTo: 'scripts/*release*,scripts/*publish*,.github/workflows/*release*,.github/workflows/*publish*,packages/**/package.json'
 ---
 
-# SignalTree Release Process
+# Release routing
 
-- Never run `nx release`, `npm version`, or package-local `npm publish`.
-- Prepare versions and signed tags only through `npm run release:rc` / `npm run release:minor-rc`,
-  `release:patch`, `release:minor`, or `release:major`.
-- `scripts/prepare-release.mjs` must remain incapable of npm publication.
-- Registry publication must route through `scripts/publish-candidate.mjs`.
-- Tagged CI is the sanctioned publisher and must validate and publish from one
-  checkout and one build.
-- The canonical ordered package set is `scripts/release-plan.mjs`.
-- Resolve workspace dependency specifications only after the final build.
-- Before the first registry write, validate artifact entries, tarball hygiene,
-  runtime JSDoc stripping, declaration documentation, strict root and adapter
-  consumer types, and tarball resolution.
-- A rerun may skip an existing package version only when registry integrity
-  equals candidate integrity. Any mismatch or lookup failure must abort.
-- Never commit npm tokens. CI uses trusted publishing; local token fallback must
-  use temporary ignored configuration removed on exit.
-- Do not publish, tag, or push unless the user explicitly authorizes an official
-  release operation.
+Read [RELEASE-CURRENT.md](../../RELEASE-CURRENT.md) for the active candidate and
+[RELEASE_PROCESS.md](../../RELEASE_PROCESS.md) for the canonical procedure.
+The ordered public package set is `scripts/release-plan.mjs`; do not maintain a
+second list. `scripts/prepare-release.mjs` cannot publish to npm;
+`scripts/publish-candidate.mjs` is the sole registry publisher.
 
-For an additive evaluation release from a stable baseline, `npm run release:minor-rc` starts the next minor at `rc.1`, or advances its highest remote RC. It refuses an already tagged stable minor and an active local prerelease; use `release:rc` for that active candidate. All clean-tree, synchronized-branch, validation, signed-tag, and canonical publication checks remain mandatory.
+Never use `nx release`, `npm version` or package-local `npm publish` to bypass
+that path. Tagged CI validates and publishes the same candidate artifacts.
+A registry version can be skipped only when its integrity matches the candidate;
+lookup failure or mismatch aborts. Never commit credentials.
+
+User authorization for publication, tagging and pushing is separate from passing
+validation. See [the exact-artifact checks](../VALIDATION_GUIDE.md).

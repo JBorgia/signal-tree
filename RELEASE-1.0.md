@@ -1,3 +1,7 @@
+> **Historical ledger — October 1, 2026.** Use [RELEASE-CURRENT.md](RELEASE-CURRENT.md)
+> for this checkout's active scope. Original evidence and anchors below are preserved;
+> old phase labels, next-action lists and review choreography are historical.
+
 # SignalTree 1.0 Release
 
 Single source of truth for the remaining work between current HEAD and a

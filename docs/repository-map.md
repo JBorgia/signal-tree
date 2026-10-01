@@ -8,7 +8,7 @@ relocation.
 
 | Location                                                                                   | Role                                        | Authority and shipping status                                                                                                                            |
 | ------------------------------------------------------------------------------------------ | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/kernel/src/`                                                                     | Framework-neutral production source         | Ships in `@signal-tree/kernel`. Public exports are owned by `src/index.ts` and `src/adapter.ts`; unexported files are implementation details.            |
+| `packages/kernel/src/`                                                                     | Framework-neutral production source         | Ships in `@signal-tree/kernel`. Public exports are owned by `src/index.ts`, `src/adapter.ts` and `src/internals.ts`; unexported files are implementation details.            |
 | `packages/angular/src/`                                                                    | Angular realization source                  | Ships in `@signal-tree/angular`. Framework behavior belongs here, not in the kernel.                                                                     |
 | `packages/react/src/`                                                                      | React observation source                    | Ships in `@signal-tree/react`. SignalTree remains state authority.                                                                                       |
 | `packages/kernel/src/lib/internals/utilities/`                                             | Kernel implementation utilities             | Ships only as internal preserved modules inside `@signal-tree/kernel`; never a package or public entry point.                                            |
@@ -26,6 +26,9 @@ relocation.
 | `specs/`                                                                                   | Historical audit-process specifications     | Not product tests and not the current public contract. Treat as audit evidence pending any later archival move.                                          |
 | `api/`                                                                                     | Hosted benchmark API functions              | Deployed support surface, not package source.                                                                                                            |
 | `dist/`, `coverage/`, `artifacts/`, `tmp/`                                                 | Generated/local output                      | Never source authority. `dist/` is rebuilt for package verification; `artifacts/` is scratch and must not source published metrics.                      |
+
+The manual `tools/cross-review/` harness is historical derivation tooling, not
+a required review gate. See its [scope and invocation limits](../tools/cross-review/README.md).
 
 ## Where New Work Goes
 
@@ -57,7 +60,7 @@ Do not infer authority from a plausible filename. Check in this order:
 5. Is the path explicitly historical, generated, ignored, or non-exported?
 
 When answers conflict, package manifests and executable release gates decide what
-ships; `RELEASE-1.0.md` decides current release status; `AGENTS.md` decides agent
+ships; `RELEASE-CURRENT.md` decides current release status; `AGENTS.md` decides agent
 workflow. A conflict is a repository defect to resolve, not permission to choose
 the most convenient source.
 

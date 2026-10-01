@@ -1,3 +1,9 @@
+> **Scoped historical context — October 1, 2026.** Read relevant frozen decisions
+> and reopening conditions on demand. Current ownership/compatibility is indexed in
+> [contributor contracts](../contributor-contracts.md), and current procedure in
+> [the review protocol](../../.github/skills/adversarial-confirmation/references/protocol.md).
+> The original record below is preserved; historical workflow is not universal guidance.
+
 # SignalTree 15 — Current Architectural Context
 
 **This file is AUTHORITATIVE.** It is the worldview a fresh model — human or

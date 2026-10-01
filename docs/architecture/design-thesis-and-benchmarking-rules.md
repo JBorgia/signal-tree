@@ -1,3 +1,7 @@
+> **Historical measurement and design record.** New work uses
+> [the measurement contract](../performance/measurement-contract.md); old APIs,
+> numbers and proposed remedies below describe their original experiments.
+
 # SignalTree: the design thesis, and the rules for reasoning about it
 
 **Read this before benchmarking SignalTree, before "optimising" anything, and
