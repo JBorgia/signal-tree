@@ -2,8 +2,8 @@
  * One scenario group = one fresh Chromium. Each function launches, drives window.__bench over
  * CDP/Playwright, closes, and returns raw data. Any failure throws (the runner marks the arm).
  *
- * Grid group: a fresh browser CONTEXT (new renderer process) per row count inside the group's
- * browser, so heap from a smaller N cannot sit in the process measured for a larger N.
+ * Grid group: a fresh browser context per row count inside the group's browser. This isolates
+ * context/page state; renderer PIDs are not measured, so process isolation per N is unproven.
  */
 import { latency } from './stats.mjs';
 
@@ -51,11 +51,11 @@ async function openPage(browser, { cpu, timeoutMs, query }) {
     return (await cdp.send('Runtime.getHeapUsage')).usedSize;
   };
   /**
-   * Bytes the APPLICATION retains: a heap snapshot summed by node type, excluding V8's compiled
-   * code and internal system objects. `Runtime.getHeapUsage` also counts code, and repeated editor
-   * cycles keep optimising functions for many cycles, which read as a per-cycle "leak" in every
-   * arm (first integration run: growth after 45 warm cycles was all code/TrustedByteArray plus the
-   * browser's LayoutShift entries, with no application objects).
+   * Selected snapshot self-size bytes, partitioned by node type/name. The legacy `app` key is
+   * the remainder after the exclusions below, not an ownership or dominator-retained-size
+   * analysis. It can include unrelated objects and exclude application-relevant allocations.
+   * Separating code/system categories helps describe observed growth; a flat selected sum
+   * alone does not prove the absence of leaks. Keep the keys/algorithm for historical comparison.
    */
   const appHeap = async () => {
     for (let i = 0; i < 3; i++) await cdp.send('HeapProfiler.collectGarbage');
@@ -269,9 +269,8 @@ export function runEditors(
       // One cycle first, so the first-use cost of the editor code path is not counted as growth.
       await s.bench('editorCycles', 1, 3, SEED + 99);
       const a1 = await s.appHeap();
-      // A library can fill a bounded cache over its first tens of trees (v15: ~200 KB once, inside
-      // cycles 5-25, then ~0 per cycle like every other arm). That is reported as one-time growth,
-      // and per-cycle retention is measured only after the warm-up.
+      // Report selected-byte changes during warm-up separately from the measured interval.
+      // Neither interval alone establishes bounded caching or the absence of retained growth.
       await s.bench('editorCycles', counts.warm - 1, 3, SEED + 100);
       const m5 = await s.heap();
       const a5 = await s.appHeap();

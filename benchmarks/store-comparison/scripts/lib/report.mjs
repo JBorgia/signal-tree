@@ -314,14 +314,17 @@ export function printReport({
     row('close p50', 'ed.close.p50');
     row('close p95', 'ed.close.p95');
     row(
-      `app retained in warm-up 1-${config.counts.warm}, KB`,
+      `selected snapshot growth in warm-up 1-${config.counts.warm}, KB`,
       'ed.appOneTimeKB'
     );
-    row('app retained after warm-up, B/cycle', 'ed.appBytesPerCycle');
+    row('selected snapshot growth after warm-up, B/cycle', 'ed.appBytesPerCycle');
     row('compiled code growth, B/cycle', 'ed.codeBytesPerCycle');
     row('JS heap growth incl. code, B/cycle', 'ed.bytesPerCycle');
     row('DOM nodes after teardown', 'ed.dom.nodes', { noise: false });
     row('listeners after teardown', 'ed.dom.listeners', { noise: false });
+    log(
+      'Selected snapshot bytes are filtered self-size sums (legacy app* keys), not uniquely application-owned retained bytes or proof of no leaks.'
+    );
   }
   if (!bands)
     log(

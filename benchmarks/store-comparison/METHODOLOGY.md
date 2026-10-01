@@ -47,6 +47,21 @@ its own kernel.
 
 ## Independent fairness review — dispositions
 
+October 1 correction: checking editor DOM against the store only after a sequence
+did not validate each timed write. The driver now plans expected field/line
+states from copied seeds before opening stores and validates both store and DOM
+after every edit, outside timing. Counter increments and expected-state planning
+are also outside timing. `node --test scripts/lib/editor-validation.selftest.mjs`
+executes the real driver with fixture stores/DOM: buffered writes, dropped writes
+and stale DOM must be rejected immediately. It also kills removal of the per-edit
+check. The original five failures and passing immediate-write control are kept in
+`scripts/lib/fixtures/editor-validation-red.txt`.
+
+Earlier editor per-edit timings lack this stronger certification; preserve them
+as historical evidence rather than relabeling them verified. This finding does
+not demonstrate that any real library arm buffered edits. Fresh browser execution
+is still required after the harness change.
+
 A read-only reviewer audited every arm and the shared harness for asymmetry in either
 direction. Its findings, and what was done:
 

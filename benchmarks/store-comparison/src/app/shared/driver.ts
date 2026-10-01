@@ -5,6 +5,7 @@ import {
   STATUSES,
   type Arm,
   type BenchApi,
+  type EditorResult,
   type EditorStore,
   type EditKind,
   type GridStore,
@@ -25,6 +26,7 @@ import {
 } from './counters';
 import { editorSeedFor, generateRows, mulberry32, otherStatus } from './data';
 import { RunningHash, canonical, sha256Hex } from './digest';
+import { planEditorEdits } from './editor-plan';
 
 export interface DriverDeps {
   readonly arm: Arm;
@@ -200,8 +202,17 @@ export class BenchDriver implements BenchApi {
     }
   }
 
-  private expectEditor(context: string, store: EditorStore): void {
-    const result = store.result();
+  private expectEditor(
+    context: string,
+    store: EditorStore,
+    result: EditorResult,
+    dirty: boolean
+  ): void {
+    // `result` is the seed-derived plan, never the arm's answer to its own correctness check.
+    if (canonical(store.result()) !== canonical(result))
+      throw new Error(
+        `${context}: editor state/result differs from the independent plan`
+      );
     const section = document.querySelector(`[data-editor="${result.rowId}"]`);
     if (!section)
       throw new Error(`${context}: editor ${result.rowId} not rendered`);
@@ -209,7 +220,10 @@ export class BenchDriver implements BenchApi {
       const input = section.querySelector<HTMLInputElement>(
         `[data-field="${key}"]`
       );
-      if (input?.value !== String(result.fields[key])) {
+      if (
+        store.field(key)() !== result.fields[key] ||
+        input?.value !== String(result.fields[key])
+      ) {
         throw new Error(
           `${context}: editor field ${key} shows ${JSON.stringify(
             input?.value
@@ -217,16 +231,38 @@ export class BenchDriver implements BenchApi {
         );
       }
     }
+    const expectedIds = result.lines.map((line) => line.id);
+    const shownIds = Array.from(section.querySelectorAll('[data-line]'), (line) =>
+      line.getAttribute('data-line')
+    );
+    if (
+      canonical(store.lineIds()) !== canonical(expectedIds) ||
+      canonical(shownIds) !== canonical(expectedIds)
+    )
+      throw new Error(
+        `${context}: editor line membership/order differs from the independent plan`
+      );
     for (const line of result.lines) {
+      if (canonical(store.line(line.id)()) !== canonical(line))
+        throw new Error(
+          `${context}: line ${line.id} state differs from the independent plan`
+        );
+      const product = section
+        .querySelector(`[data-line="${line.id}"] [data-f="product"]`)
+        ?.textContent?.trim();
       const qty = section
         .querySelector(`[data-line="${line.id}"] [data-f="qty"]`)
         ?.textContent?.trim();
       const price = section
         .querySelector(`[data-line="${line.id}"] [data-f="price"]`)
         ?.textContent?.trim();
-      if (qty !== String(line.qty) || price !== String(line.price))
+      if (
+        product !== line.product ||
+        qty !== String(line.qty) ||
+        price !== String(line.price)
+      )
         throw new Error(
-          `${context}: line ${line.id} shows ${qty}/${price}, expected ${line.qty}/${line.price}`
+          `${context}: line ${line.id} shows ${product}/${qty}/${price}, expected ${line.product}/${line.qty}/${line.price}`
         );
     }
     const total = result.lines.reduce((sum, l) => sum + l.qty * l.price, 0);
@@ -240,9 +276,9 @@ export class BenchDriver implements BenchApi {
     const shownDirty = section
       .querySelector('[data-dirty]')
       ?.textContent?.trim();
-    if (shownDirty !== String(store.dirty()))
+    if (store.dirty() !== dirty || shownDirty !== String(dirty))
       throw new Error(
-        `${context}: dirty shown=${shownDirty} store=${store.dirty()}`
+        `${context}: dirty shown=${shownDirty} store=${store.dirty()} expected=${dirty}`
       );
   }
 
@@ -454,6 +490,9 @@ export class BenchDriver implements BenchApi {
         if (!row) throw new Error('editorCycles: seed row missing');
         seeds.push(editorSeedFor(row, seed, c * stack + i));
       }
+      // Copy seed truth and allocate every value/patch before any arm can mutate the seeds.
+      // Counter increments, planning and expected-state construction are never timed.
+      const plans = seeds.map((s) => planEditorEdits(s, () => ++this.counter));
 
       for (let i = 0; i < stack; i++) {
         const s = seeds[i];
@@ -476,30 +515,17 @@ export class BenchDriver implements BenchApi {
 
       // Edit 5 fields and 3 lines in each editor. Each edit is one keystroke-sized write, timed
       // to stable like a grid edit (fairness review: editor update cost was unmeasured).
-      for (const store of registry.stores.values()) {
-        const lineIds = store.lineIds();
-        const writes: (() => void)[] = [
-          () => store.set('driver', 'D' + ++this.counter),
-          () => store.set('plant', 'P' + ++this.counter),
-          () => store.set('notes', 'note-' + ++this.counter),
-          () => store.set('qty', 1000 + ++this.counter),
-          () => store.set('eta', 10000 + ++this.counter),
-          ...[0, 1, 2].map(
-            (l) => () =>
-              store.updateLine(lineIds[l], {
-                qty: 500 + ++this.counter,
-                price: 700 + ++this.counter,
-              })
-          ),
-        ];
-        for (const write of writes) {
-          const t = await this.timed(write);
+      const stores = [...registry.stores.values()];
+      for (let i = 0; i < stores.length; i++) {
+        const store = stores[i];
+        const plan = plans[i];
+        this.expectEditor('editorCycles.open', store, plan.initial, false);
+        for (const op of plan.edits) {
+          const t = await this.timed(() => op.write(store));
+          this.expectEditor(`editorCycles.edit ${op.label}`, store, op.expected, true);
           editMs.push(t.ms);
           editCounters = addCounters(editCounters, t.counters);
         }
-        if (!store.dirty())
-          throw new Error('editorCycles: editor not dirty after edits');
-        this.expectEditor('editorCycles.edit', store);
       }
 
       // Save the top editor back into the grid, folding its result into the running hash.

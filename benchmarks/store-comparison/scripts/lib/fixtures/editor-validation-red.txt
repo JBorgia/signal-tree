@@ -1,0 +1,95 @@
+driver source sha256: 7246ab4d32dcc4d749a368b63c2ff9a1154e7667495f541b1c75ccfe784472f8
+✔ immediate writes complete all eight edits per editor across stacked cycles (66.991417ms)
+✖ buffered first edit must fail before a second edit can replay it (23.517791ms)
+✖ buffered first line edit must fail before the next line edit (22.178666ms)
+✖ matching wrong store and DOM cannot pass after a dropped write (22.314875ms)
+✖ correct state with stale DOM must fail at that edit (18.822625ms)
+✖ planning, counters and validation stay outside the real timed interval (14.139375ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 1
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 640.832375
+
+✖ failing tests:
+
+test at scripts/lib/editor-validation.selftest.mjs:153:1
+✖ buffered first edit must fail before a second edit can replay it (23.517791ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/signaltree-store-bench/benchmarks/store-comparison/scripts/lib/editor-validation.selftest.mjs:155:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /editorCycles.*(?:field|result|state)/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at scripts/lib/editor-validation.selftest.mjs:159:1
+✖ buffered first line edit must fail before the next line edit (22.178666ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/signaltree-store-bench/benchmarks/store-comparison/scripts/lib/editor-validation.selftest.mjs:161:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /editorCycles.*(?:line|result|state)/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at scripts/lib/editor-validation.selftest.mjs:165:1
+✖ matching wrong store and DOM cannot pass after a dropped write (22.314875ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/signaltree-store-bench/benchmarks/store-comparison/scripts/lib/editor-validation.selftest.mjs:167:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /editorCycles.*(?:field|result|state)/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at scripts/lib/editor-validation.selftest.mjs:171:1
+✖ correct state with stale DOM must fail at that edit (18.822625ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/signaltree-store-bench/benchmarks/store-comparison/scripts/lib/editor-validation.selftest.mjs:173:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /editorCycles.*field/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at scripts/lib/editor-validation.selftest.mjs:177:1
+✖ planning, counters and validation stay outside the real timed interval (14.139375ms)
+  AssertionError [ERR_ASSERTION]: edit counter/planning must be outside the timed interval
+
+  true !== false
+
+      at untimed (file:///private/tmp/signaltree-store-bench/benchmarks/store-comparison/scripts/lib/editor-validation.selftest.mjs:28:12)
+      at BenchDriver.set [as counter] (file:///private/tmp/signaltree-store-bench/benchmarks/store-comparison/scripts/lib/editor-validation.selftest.mjs:140:20)
+      at evalmachine.<anonymous>:368:60
+      at BenchDriver.timed (evalmachine.<anonymous>:86:9)
+      at async BenchDriver.editorCycles (evalmachine.<anonymous>:379:31)
+      at async TestContext.<anonymous> (file:///private/tmp/signaltree-store-bench/benchmarks/store-comparison/scripts/lib/editor-validation.selftest.mjs:179:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
