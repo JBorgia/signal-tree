@@ -35,7 +35,10 @@ const isWritableCell = (
 const readWritableCell = <T>(cell: Location<T> | WritableCell<T>): T =>
   'peek' in cell && typeof cell.peek === 'function' ? cell.peek() : cell();
 
-import { SIGNAL_TREE_MESSAGES } from './constants';
+import {
+  NULL_OR_UNDEFINED_MESSAGE,
+  TREE_DESTROYED_MESSAGE,
+} from './constants';
 import {
   registerContainedReportBudget,
   releaseContainedReportBudget,
@@ -1560,7 +1563,7 @@ function create<T extends object>(
   ) => TreeScalarLeafRuntime = createTreeScalarLeafRuntime
 ): TreeConstructionResult<T> {
   if (initialState === null || initialState === undefined) {
-    throw new Error(SIGNAL_TREE_MESSAGES.NULL_OR_UNDEFINED);
+    throw new Error(NULL_OR_UNDEFINED_MESSAGE);
   }
 
   const equalityFn = createEqualityFn(config.useShallowComparison ?? false);
@@ -1793,7 +1796,7 @@ function create<T extends object>(
       cleanupFns.length = 0;
       releaseContainedReportBudget(materializationContext.positionRegistry.id);
       if (config.debugMode) {
-        console.log(SIGNAL_TREE_MESSAGES.TREE_DESTROYED);
+        console.log(TREE_DESTROYED_MESSAGE);
       }
     },
     enumerable: false,
