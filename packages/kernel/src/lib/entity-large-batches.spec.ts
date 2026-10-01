@@ -57,36 +57,102 @@ describe('entity batches larger than the argument limit', () => {
   }, 120_000);
 });
 
-// Removal neighbours were found with a linear search per removed row, so
-// replacing or clearing a collection was O(n^2): 40k rows took ~2 s. Doubling
-// the size of a linear operation roughly doubles its time; quadratic quadruples.
-describe('setAll removal cost scales linearly', () => {
-  const time = (count: number, next: (count: number) => Row[]) => {
-    const tree = signalTree({ rows: entityMap<Row, number>() });
-    tree.$.rows.setAll(rows(count));
-    const start = performance.now();
-    tree.$.rows.setAll(next(count));
-    const elapsed = performance.now() - start;
-    tree.destroy();
-    return elapsed;
+// Guard the historical per-removal findIndex search, not wall-clock time or
+// every possible quadratic implementation. Allow one full scan per setAll;
+// searching from the start for each removed row visits n * (n + 1) / 2 items.
+// Fixtures are built before counting. Only synchronous setAll work is counted;
+// no await or assertion runs with the prototype instrumented. Do not make these
+// tests concurrent. Other Vitest files run in isolated workers.
+function findIndexVisits(action: () => void): number {
+  const original = Array.prototype.findIndex;
+  let visits = 0;
+  Array.prototype.findIndex = function <T>(
+    this: T[],
+    predicate: (value: T, index: number, array: T[]) => unknown,
+    thisArg?: unknown
+  ): number {
+    return original.call(this, (value: T, index: number, array: T[]) => {
+      visits += 1;
+      return predicate.call(thisArg, value, index, array);
+    });
   };
-  const ratio = (next: (count: number) => Row[]) => {
-    time(2_000, next); // warm the JIT
-    const best = (count: number) =>
-      Math.min(time(count, next), time(count, next), time(count, next));
-    const small = best(8_000);
-    const large = best(64_000);
-    return large / small;
-  };
+  try {
+    action();
+    return visits;
+  } finally {
+    Array.prototype.findIndex = original;
+  }
+}
 
-  it('replacing every id', () => {
-    // 8x the rows: ~8x if linear, ~64x if quadratic. The wide margin keeps a
-    // loaded machine from failing a linear run (4x/9 and 8x/24 versions
-    // flaked under the full suite's parallel load).
-    expect(ratio((count) => rows(count, count))).toBeLessThan(32);
+describe('setAll removal neighbour search work', () => {
+  it('counts predicate visits and restores instrumentation even on failure', () => {
+    const original = Array.prototype.findIndex;
+    const values = [10, 20, 30];
+    const context = { target: 20 };
+    let found = -1;
+    const visits = findIndexVisits(() => {
+      found = values.findIndex(function (this: typeof context, value) {
+        return value === this.target;
+      }, context);
+    });
+    expect(found).toBe(1);
+    expect(visits).toBe(2);
+    expect(Array.prototype.findIndex).toBe(original);
+    const error = new Error('instrumented predicate failed');
+    expect(() =>
+      findIndexVisits(() => {
+        values.findIndex(() => {
+          throw error;
+        });
+      })
+    ).toThrow(error);
+    expect(Array.prototype.findIndex).toBe(original);
   });
 
-  it('clearing with setAll([])', () => {
-    expect(ratio(() => [])).toBeLessThan(32);
+  describe.each(['plain', 'observed'] as const)('%s tree', (mode) => {
+    const check = async (count: number, replacement: Row[]) => {
+      const initial = rows(count);
+      const initialIds = initial.map((row) => row.id);
+      const replacementIds = replacement.map((row) => row.id);
+      const tree = signalTree(
+        { rows: entityMap<Row, number>() },
+        { enhancers: mode === 'observed' ? [restoration()] : [] }
+      );
+      try {
+        tree.$.rows.setAll(initial);
+        await flush();
+        const apply = () => tree.$.rows.setAll(replacement);
+        const visits = findIndexVisits(() => {
+          if (mode === 'observed') undoable(apply);
+          else apply();
+        });
+        expect(
+          visits,
+          'findIndex predicate visits during setAll'
+        ).toBeLessThanOrEqual(count);
+        expect(tree.$.rows.ids()).toEqual(replacementIds);
+        if (mode === 'observed') {
+          // Restoration receives the structural removal payloads. Verify it
+          // actually captured the operation so demand gating cannot make this
+          // path vacuous; undo also checks all pre-state neighbour positions.
+          await flush();
+          tree.undo();
+          expect(tree.$.rows.ids()).toEqual(initialIds);
+        }
+      } finally {
+        tree.destroy();
+      }
+    };
+
+    it.each([256, 1_024])('replacing every id (%i rows)', async (count) => {
+      await check(count, rows(count, count));
+    });
+
+    it.each([256, 1_024])(
+      'clearing with setAll([]) (%i rows)',
+      async (count) => {
+        await check(count, []);
+      }
+    );
   });
 });

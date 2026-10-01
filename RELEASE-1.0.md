@@ -6,6 +6,17 @@ credible `1.0.0` release candidate.
 This is the release controller, not the full historical backlog. Use it to
 bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
+## October 1 takeover — v15.4 verification, not release approval
+
+Current work is on `fix/v15-link-settlement-diagnostics`, with the isolated
+store comparison under `bench/store-comparison`. The inherited optimization
+checkpoint is `f59dba9e`. See
+[the takeover evidence](docs/audits/2026-10-01-performance-takeover.md).
+Correctness review found interceptor/selector reentry and removal-observation
+regressions; their first failures are retained. The entity bundle budget remains
+red. Do not infer release readiness from functional tests or historical timings.
+No tag, push, publication, or budget increase is part of this checkpoint.
+
 ## v15.3.1 published and registry-verified — September 28, 2026
 
 Published all five public packages from signed tag `v15.3.1`, commit

@@ -8,6 +8,11 @@
 // observed one still publishes exactly what it did.
 import { describe, expect, it, vi } from 'vitest';
 
+import {
+  observeWrites,
+  type ObservedWriteFrame,
+} from './internals/write-observation';
+
 import { createEntitySignal } from './entity-signal';
 import { entityMap } from './markers/entity-map';
 import { getPathNotifier } from './path-notifier';
@@ -213,4 +218,83 @@ describe('entity observation gate', () => {
       tree.destroy();
     }
   });
+});
+
+describe('removal observation installed by an interceptor', () => {
+  it.each(['one', 'many'] as const)(
+    '%s publishes removals after subscription',
+    (mode) => {
+      const notifier = getPathNotifier();
+      notifier.clear();
+      const tree = signalTree({ rows: entityMap<Row, number>() });
+      const seen: ObservedWriteFrame[] = [];
+      let stop = () => undefined as void;
+      try {
+        tree.$.rows.setAll([row(1), row(2)]);
+        notifier.flushSync();
+        tree.$.rows.intercept({
+          onRemove: (id) => {
+            if (id === 2)
+              stop = observeWrites((frame) => {
+                seen.push(frame);
+              });
+          },
+        });
+        if (mode === 'one') tree.$.rows.removeOne(2);
+        else tree.$.rows.removeMany([1, 2]);
+        notifier.flushSync();
+        expect(
+          seen.map(({ path, before, after }) => ({ path, before, after }))
+        ).toEqual(
+          (mode === 'one' ? [2] : [1, 2]).map((id) => ({
+            path: `rows.${id}`,
+            before: row(id),
+            after: undefined,
+          }))
+        );
+      } finally {
+        stop();
+        tree.destroy();
+        notifier.clear();
+      }
+    }
+  );
+});
+
+it('captures every pre-removal neighbour when the last interceptor enables observation', () => {
+  let observed = false;
+  const port: Port = { notify: vi.fn(), hasObservers: () => observed };
+  const api = createEntitySignal<Row, number>(
+    { selectId: (r) => r.id },
+    port as never,
+    'rows'
+  );
+  api.setAll([row(1), row(2), row(3)]);
+  api.intercept({
+    onRemove: (id) => {
+      if (id === 2) observed = true;
+    },
+  });
+  api.removeMany([1, 2]);
+  const effects = port.notify.mock.calls.map(
+    (call) => call[6].structuralEffect
+  );
+  expect(effects).toEqual([
+    {
+      kind: 'remove',
+      subject: 1,
+      key: 1,
+      value: row(1),
+      beforeSubject: undefined,
+      afterSubject: 2,
+    },
+    {
+      kind: 'remove',
+      subject: 2,
+      key: 2,
+      value: row(2),
+      beforeSubject: 1,
+      afterSubject: 3,
+    },
+  ]);
 });
