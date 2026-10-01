@@ -3672,14 +3672,23 @@ export function restoration(
         if (isPlainRecord(before) && isPlainRecord(after)) {
           const keys = new Set([...Object.keys(before), ...Object.keys(after)]);
           for (const key of keys) {
+            const beforeChild = before[key];
+            const afterChild = after[key];
+            const beforePresent = Object.prototype.hasOwnProperty.call(before, key);
+            const afterPresent = Object.prototype.hasOwnProperty.call(after, key);
+            // Keep read order and presence semantics while avoiding child
+            // capture allocations for values the recursive guard would skip.
+            if (beforeChild === afterChild && beforePresent === afterPresent) {
+              continue;
+            }
             enqueueScalarDiff(
               `${diffPath}.${key}`,
-              before[key],
-              after[key],
+              beforeChild,
+              afterChild,
               [...fieldSegments, key],
               {
-                before: Object.prototype.hasOwnProperty.call(before, key),
-                after: Object.prototype.hasOwnProperty.call(after, key),
+                before: beforePresent,
+                after: afterPresent,
               }
             );
           }
