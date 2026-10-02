@@ -64,3 +64,15 @@ This archive still carries the pre-preparation version 15.4.0 and is explicitly
 a local working-tree artifact, not an npm release. Evidence:
 `/private/tmp/st-v15-repaired-outcome-probe/result.json`. Exact 15.4.1 qualification
 follows after version preparation and candidate freeze.
+
+## Candidate superseded before npm publication
+
+`14003fc2` completed all local and Linux checks; run `36959449740` identifies
+the exact SHA and 88/88 gates/proofs. Signed tag `v15.4.1` is preserved. A later
+public-API counterexample (external 5, first undoable 6, undo returns 0) reproduced
+on both the published 15.4.0 archive and this candidate under four enhancer
+configurations. Tag release `36960642038` was cancelled; npm publication was not
+dispatched. This does not invalidate the outcome-provenance repair; it exposes
+an additional release blocker outside that fixture. Next candidate is 15.4.2
+after repair, without moving the existing tag. Full records remain in
+`/private/tmp/st-release-15-4-1-qualified/`.
