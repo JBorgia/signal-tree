@@ -4,6 +4,36 @@ Updated October 1, 2026. Active branch `fix/v15-outcome-provenance`, based on
 published v15.4.0 `4ceb24a2a62dc893bf28c50ad971a955190539a7`.
 The historical controller below is retained as evidence, not current instructions.
 
+## Publication hold — new public-API counterexample
+
+Candidate `14003fc26f5f97bc8f816c18ba8bb876a7b27e3d` completed local and Linux
+88/88 gates and 88/88 proofs, strict archives/AOT and 146 browser cases. Signed
+tag `v15.4.1` points to it. Before npm publication, a new public-API probe
+reproduced this failure on both npm 15.4.0 and the qualified candidate:
+
+```ts
+external(() => tree.$.x(5));
+undoable(() => tree.$.x(6));
+// allow queued observation to finish
+tree.undo(); // actual 0; expected external baseline 5
+```
+
+It reproduces with restoration alone, both transaction/restoration orders, and
+batching installed. No internal fault injection is required. Independent
+contract/history review supports 5: external realization must not become
+authored history. Existing tests undoing an earlier entry are not this case.
+
+The candidate is superseded. Tagged release run `36960642038` was cancelled;
+the npm publisher was not dispatched. Preserve signed tag `v15.4.1` and all
+prior green evidence. Do not rewrite or reuse the tag. Raw reproduction:
+`/private/tmp/st-release-15-4-1-qualified/candidate-outcome-probe/external-baseline-result.json`.
+
+Repair with a failing public regression while preserving compact historical
+reconstruction and prior-entry supersession behavior. After review, prepare
+**15.4.2**, freeze a new exact candidate and repeat full qualification. Version
+manifests still say 15.4.1 until that preparation; none of the older instructions
+below authorize publishing the superseded candidate.
+
 ## Authority and scope
 
 The owner authorized completing and publishing verified v15 work before v16
@@ -20,7 +50,9 @@ that reproduction; no common application trigger is claimed. Evidence and
 archive integrity: `/private/tmp/st-v15-published-outcome-probe/result.json`.
 
 The patch replaces persistent error branding with an invocation-local receipt,
-unwrapped at public exits to preserve original thrown values. No new public API,
+unwrapped at public exits to preserve original thrown values. The additional
+repair keeps external realization out of a newly authored undo entry while
+preserving historical reconstruction. No new public API,
 refusal policy, ownership model, retention policy or budget is introduced. V16
 recovery behavior must not leak into stable v15. Independent review is required.
 
@@ -33,16 +65,16 @@ bundle budgets pass. The same controlled published-artifact probe passes on the
 repaired packed kernel; first failure and exact archive identities are preserved.
 See [the repair record](docs/audits/2026-10-01-v15-outcome-provenance.md).
 
-Version metadata is now prepared at **15.4.1**. Do not increment it again.
-Subsequent exact-candidate logs stay outside the tracked tree.
+Version metadata still reflects superseded **15.4.1**. After the additional
+repair, prepare **15.4.2** once. Exact-candidate logs stay outside the tracked tree.
 
 ## Execution
 
 1. Preserve red tests against published source; focused repair and mutation proof.
 2. Full kernel/static/build checks; test the repaired built archive against the
    same controlled reproduction and preserve published/control differences.
-3. Prepare **15.4.1** metadata after the runtime checkpoint. The old instruction
-   not to increment 15.4.0 is superseded: that version has already published.
+3. Prepare **15.4.2** metadata after the additional runtime checkpoint. The
+   signed 15.4.1 candidate is superseded and its tag must not move.
 4. Freeze an exact candidate; full local release gates and mutation proofs.
 5. Destroy generated output, rebuild, inspect all five versions, verify strict
    packed consumers, Angular AOT, demo/browser, and clean checkout.
