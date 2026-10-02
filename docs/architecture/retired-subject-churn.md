@@ -1,5 +1,13 @@
 # Retired-subject churn — unbounded, half of it reclaimable, no driver
 
+> **October 1, 2026 measurement correction:** the historical two-endpoint
+> retired-subject slope estimator below is superseded. Independent fresh-process
+> results do not support its asymptotic claim. Current release checks combine
+> direct lifetime/revision/tracking-entry cleanup mutations with a separately
+> validated gross-retention ceiling. They do not prove absence of small leaks or
+> constant asymptotic memory. See [the complete measurement record](../audits/2026-10-01-retired-node-release-check/README.md).
+
+
 **Status:** STILL OPEN. 15.0 reclaims the value backing on a zero-owner
 retirement — a 6.1x reduction — but the growth is still LINEAR and the
 pre-registered success criterion is NOT met.
@@ -323,6 +331,11 @@ Measured on the shipped path:
 |     50 | `no-history-reads`|  0.30 MB |         6 B |
 |    150 | `no-history`      | -0.83 MB |        -6 B |
 |    150 | `no-history-reads`| -0.86 MB |        -6 B |
+
+**Historical claim, superseded October 1, 2026:** the paragraph below overstates
+what the cross-process estimator establishes. See the measurement correction
+at the start of this record; the current checks protect gross retention and
+specific entry cleanup, not an asymptotic bound.
 
 `tools/check-retired-subject-slope.mjs` is the regression gate, and it pins the
 ASYMPTOTIC claim rather than a byte budget — 117 B/retired passes any budget

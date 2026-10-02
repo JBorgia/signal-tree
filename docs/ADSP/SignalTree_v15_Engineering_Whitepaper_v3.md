@@ -1,5 +1,13 @@
 # SignalTree v15
 
+> **October 1, 2026 measurement correction:** the historical two-endpoint
+> retired-subject slope estimator below is superseded. Independent fresh-process
+> results do not support its asymptotic claim. Current release checks combine
+> direct lifetime/revision/tracking-entry cleanup mutations with a separately
+> validated gross-retention ceiling. They do not prove absence of small leaks or
+> constant asymptotic memory. See [the complete measurement record](../audits/2026-10-01-retired-node-release-check/README.md).
+
+
 ## Engineering a Reactive State Engine
 
 ### Architecture, semantics, falsification, performance, lifecycle, and the evidence behind the rewrite
@@ -2254,7 +2262,7 @@ The evidence IDs below point to repository artifacts or captured engineering run
 - **E13 - `retired-subject-churn.md`**: pre-reclaim linear churn and 249 -> 117 B first-stage result
 - **E14 - `87a790eb`**: automatic zero-owner value/signal reclamation
 - **E15 - lifetime-ledger falsifier `982c378b`**: null that permanent tombstone ledger is unnecessary
-- **E16 - `91043109`; `check-retired-subject-slope.mjs`**: whole-subject zero-owner forgetting and bounded asymptote
+- **E16 - `91043109`; `check-retired-subject-slope.mjs`**: whole-subject zero-owner forgetting; historical asymptotic measurement claim superseded October 1, 2026
 - **E17 - `d487a4ae`; `transactions-entity-field-rollback.spec.ts`**: entity-field rollback and multi-field dedupe defect/fix
 - **E18 - `v15-performance-baseline.md`**: current public operation/memory/bundle baseline and methodology warning
 - **E19 - latest repeated-build discriminator supplied during v15 audit**: `destroy()` lifecycle contract and abandoned/destroyed/isolated memory curves
@@ -2286,7 +2294,7 @@ The evidence IDs below point to repository artifacts or captured engineering run
 - **`tools/bench-compare.mjs`** - small cross-library comparison including raw signals and Elf
 - **`tools/bench-entity-churn-retention.mjs`** - retired-subject churn with/without history and reads
 - **`tools/check-signal-identity-durability.mjs`** - forced-GC reactive identity correctness
-- **`tools/check-retired-subject-slope.mjs`** - asymptotic zero-owner retirement regression guard
+- **`tools/check-retired-subject-slope.mjs`** - historical estimator, superseded October 1, 2026; not an asymptotic proof
 - **`tools/lib/heap-quiescence.mjs`** - settled retained-memory protocol
 - **`tools/verify-gates.mjs`** - release/architecture gate orchestrator
 - **`tools/check-numeric-claims.mjs`** - measured-number provenance ratchet

@@ -1,8 +1,8 @@
 # V15 retired-node release measurement
 
-Status: OPEN; preregistered after the first exact-candidate Linux failure and
-before the diagnostic batch. No release waiver or new threshold is authorized
-by this record.
+Status: CLOSED for replacement measurement qualification after independent
+Linux validation and review. Full release qualification remains separate. The
+original failed candidate is preserved below; no failure has been waived.
 
 ## Preserved failed candidate
 
@@ -255,3 +255,50 @@ The first development build emitted output but was terminated after remaining
 idle and exited 1; its emitted artifact is diagnostic evidence only. A successful
 build was then completed outside the sandbox (exit 0, `kernel-build-host.log`);
 the exact cause of the earlier idle process was not established. Raw local evidence: `/private/tmp/st-late-read-fix-proof/`.
+
+## Independent Linux validation — October 1, 2026
+
+Run [36948765496](https://github.com/JBorgia/signal-tree/actions/runs/36948765496),
+head `6e5d9aef00beea455c3ad43a69c8e1c63bce2243`, completed successfully.
+Node 24.15.0 / V8 13.6.233.17-node.48, Linux x64, heap limit 4,496,293,888 bytes.
+All 150 preregistered fresh processes completed with 150 distinct PIDs, valid
+workload postconditions and matching artifact identities. Zero execution,
+identity, completeness, cleanup or heap-expectation failures.
+
+| Cell | n | Growth range, MiB | Frozen result |
+| --- | ---: | ---: | --- |
+| Node reads, 50 rounds | 20 | 16.2181–16.2284 | pass |
+| Node reads, 150 rounds | 30 | 15.3433–15.3499 | pass |
+| Lookup only, 50 rounds | 20 | 4.1825–4.1934 | pass |
+| Lookup only, 150 rounds | 30 | 3.2912–3.3005 | pass |
+| Node reads, retain 10,000 | 10 | 96.4215–96.4640 | detected |
+| Lookup only, retain 10,000 | 10 | 82.7826–82.8206 | detected |
+| Node reads, neutralized | 10 | 15.3456–16.2320 | pass |
+| Lookup only, neutralized | 10 | 3.2913–3.3007 | pass |
+| Actual cleanup deletion | 10 | 26.8971–27.7820 | descriptive only |
+
+Generator: `node tools/characterize-retired-node-memory.mjs --validation`.
+No ceiling, workload, sampling or selection change was made from these results.
+Direct cleanup checks pass on the candidate and fail on the actual isolated
+cleanup-deletion artifact. The three separate mutation controls each produce
+0/1/0 (control/mutant/restored): late registration (8 failed assertions),
+activation deletion (33), revision resurrection (134). Originals remain intact.
+
+[Committed evidence](linux-validation.json) retains the complete parsed samples,
+artifact manifests and cleanup receipts. Raw stdout/stderr and build/install
+logs are attached to the CI run; full result SHA256 is
+`c9bdd853c66e34206a418a47ede16d26d39d7b90e6089de765654f2a0cad9854`.
+Comparing all 102 artifact file hashes with characterization identifies only
+`dist/lib/entity-signal.js` as changed, containing the narrow late-read fix; this is not a rerun of the failed RC.
+
+This validates the frozen gross-retention contract for the sampled release
+environment and these two workloads, alongside deterministic protection of the
+three measured cleanup mechanisms. It does not establish small-leak sensitivity,
+a universal heap ceiling, or bounded asymptotic memory. The original 26cc7ffb
+release failure remains part of the record.
+
+Independent review verified raw stdout, all interleaved process counts and
+identities, and mechanism-specific mutation failures. Promotion replaces the
+old two slope gates and table-only self-test with two gross-retention arms and
+a real-retention self-test, plus direct cleanup and its three actual mutations.
+The release registry must still prove its own blinding mutations fail.

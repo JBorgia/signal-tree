@@ -271,3 +271,26 @@ qualification. Logs remain under `/private/tmp/st-late-read-fix-proof/` and
 `/private/tmp/st-retention-validation-driver-proof/validation-smoke-three-mutants/`.
 Next: commit this frozen validation candidate, run its independent Linux batch,
 and promote the replacement measurement only if the preregistered checks pass.
+
+## Replacement measurement qualified
+
+Validation candidate `6e5d9aef00beea455c3ad43a69c8e1c63bce2243` passed Linux run
+[36948765496](https://github.com/JBorgia/signal-tree/actions/runs/36948765496):
+150/150 fresh processes, unchanged 40 MiB threshold, no execution/identity or
+expectation failures, and three actual cleanup mutations each 0/1/0. Independent
+review checked raw outputs, interleaving, identities and failure mechanisms.
+The gross ceiling does not detect the smaller cleanup mutation; the direct
+cleanup gate does. This qualifies the replacement measurement, not the release.
+
+The old slope estimator and its unsupported asymptotic claim are retired. The
+new registry contains two gross-retention arms and their real-retention proof,
+plus direct cleanup and its three-mutant proof. Historical records carry dated
+corrections. Next: validate the new registry wiring, freeze a new exact candidate,
+and repeat complete local/Linux release qualification before any tag/publication.
+
+Promotion checks: 5/5 new checks pass, 5/5 registry proofs pass (3 indirect),
+zero unproven/vacuous/blind/errored; all 5 documentation gates pass. Logs:
+`/private/tmp/st-retention-promotion/`. No threshold adjustment followed the
+validation batch. The next commit is the new exact release candidate. Keep
+subsequent verification logs outside the tracked tree, rebuild after mutations,
+and require full local and Linux qualification before publishing 15.4.0.
