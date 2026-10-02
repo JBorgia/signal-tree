@@ -1,0 +1,387 @@
+import { afterEach, describe, expect, it } from 'vitest';
+import {
+  batching,
+  entityMap,
+  external,
+  restoration,
+  signalTree,
+  transactions,
+  undoable,
+} from '../../index';
+import { withWriteContext } from '../../lib/write-context';
+
+const owned: Array<{ destroy(): void }> = [];
+const flush = async () => {
+  for (let i = 0; i < 12; i++) await Promise.resolve();
+};
+afterEach(async () => {
+  for (const tree of owned.splice(0)) tree.destroy();
+  await flush();
+});
+const variants = [
+  ['restoration', () => [restoration()] as const],
+  ['transactions-first', () => [transactions(), restoration()] as const],
+  ['restoration-first', () => [restoration(), transactions()] as const],
+  ['all', () => [batching(), transactions(), restoration()] as const],
+] as const;
+
+// Public calls only. Realized truth is excluded from authored restoration;
+// HIST-C2 still promotes all ordinary authored work in the same turn.
+for (const [name, enhancers] of variants) {
+  describe(name, () => {
+    const make = () => {
+      const tree = signalTree(
+        {
+          x: 0,
+          y: 0,
+          z: 0,
+          rows: entityMap<{ id: string; a: number; b: number }>(),
+        },
+        { enhancers: enhancers() }
+      );
+      owned.push(tree);
+      return tree;
+    };
+    it('undo restores the external baseline established before the first authored turn', async () => {
+      const tree = make();
+      external(() => tree.$.x(5));
+      undoable(() => tree.$.x(6));
+      await flush();
+      expect(tree.getRestorationHistory()).toHaveLength(1);
+      expect(tree.getRestorationHistory()[0].state.x).toBe(6);
+      tree.undo();
+      expect(tree.$.x()).toBe(5);
+      tree.redo();
+      expect(tree.$.x()).toBe(6);
+    });
+    it('retains earlier boundary reconstruction across external and authored work in one flush', async () => {
+      const tree = make();
+      undoable(() => tree.$.y(1));
+      await flush();
+      external(() => tree.$.x(5));
+      undoable(() => tree.$.x(6));
+      tree.$.z(2);
+      await flush();
+      expect(
+        tree
+          .getRestorationHistory()
+          .map(({ state }) => [state.x, state.y, state.z])
+      ).toEqual([
+        [0, 1, 0],
+        [6, 1, 2],
+      ]);
+      tree.undo();
+      expect([tree.$.x(), tree.$.y(), tree.$.z()]).toEqual([5, 1, 0]);
+      tree.redo();
+      expect([tree.$.x(), tree.$.y(), tree.$.z()]).toEqual([6, 1, 2]);
+    });
+    it('entity undo keeps external sibling fields while reversing designated and ordinary authored fields', async () => {
+      const tree = make();
+      tree.$.rows.addOne({ id: 'r', a: 0, b: 0 });
+      await flush();
+      external(() => tree.$.rows.updateOne('r', { a: 5, b: 7 }));
+      undoable(() => tree.$.rows.updateOne('r', { a: 6 }));
+      tree.$.z(2);
+      await flush();
+      expect(tree.getRestorationHistory()).toHaveLength(1);
+      tree.undo();
+      expect(tree.$.rows.byIdOrFail('r')()).toEqual({ id: 'r', a: 5, b: 7 });
+      expect(tree.$.z()).toBe(0);
+      tree.redo();
+      expect(tree.$.rows.byIdOrFail('r')()).toEqual({ id: 'r', a: 6, b: 7 });
+      expect(tree.$.z()).toBe(2);
+    });
+    it('external-only tail changes no undo eligibility and does not rewrite an older snapshot', async () => {
+      const tree = make();
+      undoable(() => tree.$.y(1));
+      await flush();
+      external(() => tree.$.x(5));
+      await flush();
+      expect(tree.getRestorationHistory()).toHaveLength(1);
+      expect(tree.getRestorationHistory()[0].state.x).toBe(0);
+      tree.undo();
+      expect([tree.$.x(), tree.$.y()]).toEqual([5, 0]);
+    });
+    for (const nested of [false, true]) {
+      it(`disjoint external truth remains outside designated history (nested=${nested})`, async () => {
+        const tree = make();
+        if (nested)
+          undoable(() => {
+            external(() => tree.$.x(5));
+            tree.$.y(6);
+          });
+        else {
+          external(() => tree.$.x(5));
+          undoable(() => tree.$.y(6));
+        }
+        await flush();
+        expect(tree.getRestorationHistory()).toHaveLength(1);
+        tree.undo();
+        expect([tree.$.x(), tree.$.y()]).toEqual([5, 0]);
+        tree.redo();
+        expect([tree.$.x(), tree.$.y()]).toEqual([5, 6]);
+      });
+    }
+    it('later external truth still refuses reversal of an earlier authored value', async () => {
+      const tree = make();
+      undoable(() => {
+        tree.$.x(1);
+        tree.$.y(1);
+      });
+      external(() => tree.$.x(5));
+      await flush();
+      const index = tree.getCurrentIndex();
+      expect(() => tree.undo()).toThrow(/ST1034/);
+      expect([tree.$.x(), tree.$.y()]).toEqual([5, 1]);
+      expect(tree.getCurrentIndex()).toBe(index);
+    });
+    it('keeps the baseline of an already recorded earlier authored turn', async () => {
+      const tree = make();
+      undoable(() => tree.$.x(1));
+      await flush();
+      external(() => tree.$.x(5));
+      tree.$.x(6);
+      await flush();
+      expect(tree.getRestorationHistory()).toHaveLength(1);
+      expect(tree.getRestorationHistory()[0].state.x).toBe(1);
+      tree.undo();
+      expect(tree.$.x()).toBe(0);
+    });
+    for (const designateFirst of [false, true]) {
+      it(`authored work on both sides of realization retains its own first baseline (designateFirst=${designateFirst})`, async () => {
+        const tree = make();
+        if (designateFirst) undoable(() => tree.$.x(1));
+        else tree.$.x(1);
+        external(() => tree.$.x(5));
+        if (designateFirst) tree.$.x(6);
+        else undoable(() => tree.$.x(6));
+        await flush();
+        // HIST-C2: unlike external(5) as the first write, authored 0 -> 1
+        // belongs to this promoted turn. Its authored baseline remains 0.
+        expect(tree.getRestorationHistory()).toHaveLength(1);
+        tree.undo();
+        expect(tree.$.x()).toBe(0);
+        tree.redo();
+        expect(tree.$.x()).toBe(6);
+      });
+    }
+    it('later ordinary replacement cannot erase designation of the same scalar', async () => {
+      const tree = make();
+      undoable(() => tree.$.x(1));
+      tree.$.x(2);
+      tree.$.y(3);
+      await flush();
+      expect(tree.canUndo()).toBe(true);
+      expect(tree.getRestorationHistory()).toHaveLength(1);
+      tree.undo();
+      expect([tree.$.x(), tree.$.y()]).toEqual([0, 0]);
+      tree.redo();
+      expect([tree.$.x(), tree.$.y()]).toEqual([2, 3]);
+    });
+    it('designation does not turn an external-only update into authored history', async () => {
+      const tree = make();
+      undoable(() => external(() => tree.$.x(5)));
+      external(() => tree.$.x(6));
+      await flush();
+      expect(tree.canUndo()).toBe(false);
+      expect(tree.getRestorationHistory()).toEqual([]);
+      expect(tree.$.x()).toBe(6);
+    });
+    it('ordinary authored work remains part of the designated whole turn', async () => {
+      const tree = make();
+      tree.$.x(1);
+      undoable(() => tree.$.y(2));
+      tree.$.z(3);
+      await flush();
+      expect(tree.getRestorationHistory()).toHaveLength(1);
+      tree.undo();
+      expect([tree.$.x(), tree.$.y(), tree.$.z()]).toEqual([0, 0, 0]);
+    });
+  });
+}
+
+for (const retained of [false, true]) {
+  it(`physical net-zero external/authored work retains an authored boundary (retained=${retained})`, async () => {
+    const tree = signalTree({ x: 0, y: 0 }, { enhancers: [restoration()] });
+    owned.push(tree);
+    if (retained) {
+      undoable(() => tree.$.y(1));
+      await flush();
+    }
+    external(() => tree.$.x(5));
+    undoable(() => tree.$.x(0));
+    await flush();
+    expect(tree.getRestorationHistory().map(({ state }) => state)).toEqual(
+      retained
+        ? [
+            { x: 0, y: 1 },
+            { x: 0, y: 1 },
+          ]
+        : [{ x: 0, y: 0 }]
+    );
+    tree.undo();
+    expect(tree.$.x()).toBe(5);
+    tree.redo();
+    expect(tree.$.x()).toBe(0);
+  });
+}
+
+it('historical external gaps preserve entity membership, presence and order through jumpTo', async () => {
+  const tree = signalTree(
+    { x: 0, rows: entityMap<{ id: string; v?: number }>() },
+    { enhancers: [restoration()] }
+  );
+  owned.push(tree);
+  tree.$.rows.setAll([
+    { id: 'a', v: 0 },
+    { id: 'b', v: 2 },
+  ]);
+  await flush();
+  undoable(() => tree.$.x(1));
+  await flush();
+  external(() =>
+    tree.$.rows.setAll([{ id: 'b', v: 2 }, { id: 'a' }, { id: 'c', v: 3 }])
+  );
+  await flush();
+  undoable(() => tree.$.x(2));
+  await flush();
+  expect(tree.getRestorationHistory().map(({ state }) => state)).toEqual([
+    { x: 1, rows: { all: [{ id: 'a', v: 0 }, { id: 'b', v: 2 }] } },
+    {
+      x: 2,
+      rows: { all: [{ id: 'b', v: 2 }, { id: 'a' }, { id: 'c', v: 3 }] },
+    },
+  ]);
+  tree.jumpTo(0);
+  expect(tree.$.x()).toBe(1);
+  expect(tree.$.rows.all()).toEqual([
+    { id: 'b', v: 2 },
+    { id: 'a' },
+    { id: 'c', v: 3 },
+  ]);
+});
+
+for (const [name, enhancers] of variants) {
+  it(`inspection reorder is not reversed by an unrelated authored turn (${name})`, async () => {
+    const tree = signalTree(
+      { x: 0, rows: entityMap<{ id: string }>() },
+      { enhancers: enhancers() }
+    );
+    owned.push(tree);
+    tree.$.rows.setAll([{ id: 'a' }, { id: 'b' }]);
+    await flush();
+    withWriteContext(
+      { intent: 'system', origin: 'devtools', participation: 'inspection' },
+      () => tree.$.rows.setAll([{ id: 'b' }, { id: 'a' }])
+    );
+    undoable(() => tree.$.x(1));
+    await flush();
+    expect(tree.$.rows.ids()).toEqual(['b', 'a']);
+    expect(tree.getRestorationHistory()).toHaveLength(1);
+    tree.undo();
+    expect(tree.$.x()).toBe(0);
+    expect(tree.$.rows.ids()).toEqual(['b', 'a']);
+    tree.redo();
+    expect(tree.$.x()).toBe(1);
+    expect(tree.$.rows.ids()).toEqual(['b', 'a']);
+  });
+
+  it(`designated inspection order alone creates no history (${name})`, async () => {
+    const tree = signalTree(
+      { rows: entityMap<{ id: string }>() },
+      { enhancers: enhancers() }
+    );
+    owned.push(tree);
+    tree.$.rows.setAll([{ id: 'a' }, { id: 'b' }]);
+    await flush();
+    undoable(() =>
+      withWriteContext(
+        { intent: 'system', participation: 'inspection' },
+        () => tree.$.rows.setAll([{ id: 'b' }, { id: 'a' }])
+      )
+    );
+    await flush();
+    expect(tree.getRestorationHistory()).toEqual([]);
+    expect(tree.canUndo()).toBe(false);
+    expect(tree.$.rows.ids()).toEqual(['b', 'a']);
+  });
+}
+
+it('inspection reorder does not erase external order protection', async () => {
+  const tree = signalTree(
+    { x: 0, rows: entityMap<{ id: string }>() },
+    { enhancers: [restoration()] }
+  );
+  owned.push(tree);
+  tree.$.rows.setAll([{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
+  await flush();
+  undoable(() => tree.$.rows.setAll([{ id: 'b' }, { id: 'a' }, { id: 'c' }]));
+  await flush();
+  external(() => tree.$.rows.setAll([{ id: 'c' }, { id: 'b' }, { id: 'a' }]));
+  await flush();
+  withWriteContext(
+    { intent: 'system', participation: 'inspection' },
+    () => tree.$.rows.setAll([{ id: 'b' }, { id: 'c' }, { id: 'a' }])
+  );
+  await flush();
+  const index = tree.getCurrentIndex();
+  expect(() => tree.undo()).toThrow(/ST1034/);
+  expect(tree.getCurrentIndex()).toBe(index);
+  expect(tree.$.rows.ids()).toEqual(['b', 'c', 'a']);
+});
+
+it('reset after an external historical gap starts a fresh authored baseline', async () => {
+  const tree = signalTree({ x: 0, y: 0 }, { enhancers: [restoration()] });
+  owned.push(tree);
+  undoable(() => tree.$.y(1));
+  await flush();
+  external(() => tree.$.x(5));
+  await flush();
+  expect(tree.getRestorationHistory().map(({ state }) => state)).toEqual([
+    { x: 0, y: 1 },
+  ]);
+  tree.resetRestorationHistory();
+  await flush();
+  expect(tree.getRestorationHistory()).toEqual([]);
+  undoable(() => tree.$.x(7));
+  await flush();
+  expect(tree.getRestorationHistory().map(({ state }) => state)).toEqual([
+    { x: 7, y: 1 },
+  ]);
+  tree.undo();
+  expect(tree.$.x()).toBe(5);
+  tree.redo();
+  expect(tree.$.x()).toBe(7);
+});
+
+for (const reverse of [false, true])
+  for (const confirm of [false, true]) {
+    it(`external gaps during pending work survive settlement (reverse=${reverse}, confirm=${confirm})`, async () => {
+      const tree = signalTree(
+        { x: 0, y: 0, z: 0 },
+        {
+          enhancers: reverse
+            ? [restoration(), transactions()]
+            : [transactions(), restoration()],
+        }
+      );
+      owned.push(tree);
+      undoable(() => tree.$.z(1));
+      await flush();
+      const pending = tree.transaction(() => undoable(() => tree.$.x(1)));
+      external(() => tree.$.y(5));
+      await flush();
+      if (confirm) pending.confirm();
+      else pending.rollback();
+      await flush();
+      expect([tree.$.x(), tree.$.y(), tree.$.z()]).toEqual([
+        confirm ? 1 : 0,
+        5,
+        1,
+      ]);
+      const history = tree.getRestorationHistory();
+      expect(history).toHaveLength(confirm ? 2 : 1);
+      expect(history[0].state).toEqual({ x: 0, y: 0, z: 1 });
+      if (confirm) expect(history[1].state).toEqual({ x: 1, y: 0, z: 1 });
+    });
+  }

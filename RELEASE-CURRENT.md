@@ -1,8 +1,27 @@
 # Current release work — v15 outcome provenance patch
 
-Updated October 1, 2026. Active branch `fix/v15-outcome-provenance`, based on
+Updated October 2, 2026. Active branch `fix/v15-outcome-provenance`, based on
 published v15.4.0 `4ceb24a2a62dc893bf28c50ad971a955190539a7`.
 The historical controller below is retained as evidence, not current instructions.
+
+## Active 15.4.2 preparation
+
+The external-baseline, whole-turn designation and inspection-order repair is
+implemented. Independent source review demonstrated no additional blocker.
+Fresh kernel validation reports 3389 passes, seven expected failures, thirteen
+skips and one TODO. Full development-source release gates passed 88/88; mutation
+proofs passed 88/88 with zero unproven, vacuous, blind or errored checks. Generated
+output was deleted and all five packages rebuilt afterward.
+
+The owner explicitly deferred additional comparative benchmarks on October 2.
+The short external common-write comparison remains noisy development evidence,
+not performance parity or a speedup claim. Required registered release gates
+remain enforced. Scope now is v15 fixes, tests and release only.
+
+Prepare 15.4.2 metadata, freeze the exact source, requalify and publish only
+through tagged canonical CI. Evidence stays outside the frozen candidate at
+`/private/tmp/st-v15-external-baseline-repair-evidence/` and the new candidate's
+qualification directory. The superseded 15.4.1 tag must remain unchanged.
 
 ## Publication hold — new public-API counterexample
 
