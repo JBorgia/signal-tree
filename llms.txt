@@ -1,6 +1,6 @@
 # SignalTree
 
-This reference describes the 15.4.1 package version, with explicitly marked
+This reference describes the 15.4.2 package version, with explicitly marked
 15.3.1 comparisons. Consult the [npm package page](https://www.npmjs.com/package/@signal-tree/kernel?activeTab=versions)
 for published versions.
 
@@ -303,7 +303,7 @@ bounded retention and must show interruptions, omissions and unsupported sources
 Unsubscribe on view teardown and destroy bounded-lifetime trees. See
 [Runtime observation in 15.4.0](https://github.com/JBorgia/signal-tree/blob/v15.4.0/docs/guides/runtime-observation.md) for contracts and examples.
 
-## Observer failures during undo and rollback (15.4.1)
+## Observer failures during undo and rollback (15.4.2)
 
 A reactive observer can throw after undo, redo or transaction rollback has
 already applied. SignalTree completes the operation's bookkeeping and rethrows

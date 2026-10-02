@@ -600,7 +600,9 @@ class RestorationManager<T> {
         )
       )
       .filter((delta) => delta.participants.length > 0);
-    if (effects.length === 0 && orderDeltas.length === 0) {
+    // A physically net-zero batch can still contain an authored turn (external
+    // 0 -> 5, authored 5 -> 0). Its boundary must remain materializable.
+    if (effects.length === 0 && orderDeltas.length === 0 && boundaryTurnId === undefined) {
       return undefined;
     }
     const ordinal = this.nextHistoricalOrdinal++;
@@ -763,7 +765,11 @@ class RestorationManager<T> {
     effects?: TurnEffect[],
     collectionOrders?: PendingCollectionOrder[],
     explicitTurnId?: number,
-    beforeInsert?: () => void
+    beforeInsert?: () => void,
+    historicalCapture?: {
+      effects: TurnEffect[];
+      collectionOrders: PendingCollectionOrder[];
+    }
   ): boolean {
     const entry = this.buildTurn(
       subjectIds,
@@ -771,7 +777,8 @@ class RestorationManager<T> {
       effects,
       collectionOrders,
       explicitTurnId,
-      false
+      false,
+      historicalCapture
     );
     if (!entry) {
       return false;
@@ -872,7 +879,11 @@ class RestorationManager<T> {
     effects?: TurnEffect[],
     collectionOrders?: PendingCollectionOrder[],
     explicitTurnId?: number,
-    retainPendingState = false
+    retainPendingState = false,
+    historicalCapture?: {
+      effects: TurnEffect[];
+      collectionOrders: PendingCollectionOrder[];
+    }
   ): CanonicalTurn<T> | undefined {
     if (this.hasScopedRedoFuture()) {
       this.truncateScopedRedoFuture();
@@ -1019,8 +1030,8 @@ class RestorationManager<T> {
     // semantic, and collapsing an identical snapshot loses nothing.
 
     const eventOrdinal = this.appendHistoricalEvent(
-      effects ?? [],
-      collectionOrders ?? [],
+      historicalCapture?.effects ?? effects ?? [],
+      historicalCapture?.collectionOrders ?? collectionOrders ?? [],
       turnId
     );
     if (eventOrdinal !== undefined) {
@@ -3068,6 +3079,20 @@ export function restoration(
       designated: false,
     });
     const pendingCapture = createCaptureBucket();
+    // Reconstruction needs every physical change, including external truth.
+    // Reversal owns authored work only. Sharing their effect map lets an
+    // external 0 -> 5 contaminate a later authored 5 -> 6 undo with before=0.
+    // Before any retained/pending boundary exists, authored effects alone are
+    // sufficient: there is no earlier historical snapshot to reconstruct.
+    let historicalCapture: CaptureBucket | undefined;
+    const getHistoricalCapture = (): CaptureBucket | undefined => {
+      if (!restorationManager.hasRetainedOrPendingHistory()) return undefined;
+      return historicalCapture ??= createCaptureBucket();
+    };
+    const clearHistoricalCapture = (): void => {
+      if (historicalCapture) clearCaptureBucket(historicalCapture);
+      historicalCapture = undefined;
+    };
 
     /**
      * RESTORE-P0 P0-C — the last value a REALIZATION wrote at a scalar path,
@@ -4136,11 +4161,23 @@ export function restoration(
           (capture) => {
             // Pending work never entered completed history. Its compensation
             // returns to that baseline; it is not a new order gap or authority.
-            if (isCompensationWrite(capture.meta)) return;
+            // Inspection owns neither history nor external-order authority.
+            if (
+              isCompensationWrite(capture.meta) ||
+              isInspectionWrite(capture.meta)
+            ) {
+              return;
+            }
+            if (
+              getWriteParticipation(capture.meta) === 'realized' ||
+              resolveTransactionId(capture.meta) === undefined
+            ) {
+              const historical = getHistoricalCapture();
+              if (historical) captureCollectionOrderIntoBucket(historical, capture);
+            }
             if (getWriteParticipation(capture.meta) === 'realized') {
               externalOrderOwners.add(capture.owner);
               selfDirty = true;
-              captureCollectionOrderIntoBucket(pendingCapture, capture);
               return;
             }
             externalOrderOwners.delete(capture.owner);
@@ -4204,6 +4241,17 @@ export function restoration(
               if (isInspectionWrite(meta)) {
                 return;
               }
+              if (
+                !isCompensationWrite(meta) &&
+                (getWriteParticipation(meta) === 'realized' ||
+                  resolveTransactionId(meta) === undefined)
+              ) {
+                const historical = getHistoricalCapture();
+                if (historical) captureEffects(
+                  historical.effects, path, next, prev, meta,
+                  ownerPath, subjectIds, positionIds
+                );
+              }
               const membership = plainBranchMembershipEffects(meta);
               if (membership) {
                 const transactionId = resolveTransactionId(meta);
@@ -4227,10 +4275,6 @@ export function restoration(
                 }
                 if (compensation) return;
                 if (realized) {
-                  for (const effect of membership) {
-                    pendingCapture.positionIds.add(effect.position);
-                    enqueueEffect(pendingCapture.effects, { ...effect });
-                  }
                   selfDirty = true;
                 } else {
                   captureIntoBucket(
@@ -4324,16 +4368,6 @@ export function restoration(
                   );
                 }
                 selfDirty = true;
-                captureEffects(
-                  pendingCapture.effects,
-                  path,
-                  next,
-                  prev,
-                  meta,
-                  ownerPath,
-                  subjectIds,
-                  positionIds
-                );
                 return;
               }
               // An authored write returns this location to history's control —
@@ -4500,6 +4534,7 @@ export function restoration(
               suppressNextFlushRecord = false;
               selfDirty = false;
               drainCaptureBucket(pendingCapture);
+              clearHistoricalCapture();
               return;
             }
             // `onFlush` is on the GLOBAL PathNotifier, so this fires for writes
@@ -4519,6 +4554,7 @@ export function restoration(
               !restorationManager.hasRetainedOrPendingHistory()
             ) {
               clearCaptureBucket(pendingCapture);
+              clearHistoricalCapture();
               return;
             }
             const {
@@ -4529,6 +4565,10 @@ export function restoration(
               descriptorInputs,
               designated,
             } = drainCaptureBucket(pendingCapture);
+            const historical = historicalCapture
+              ? drainCaptureBucket(historicalCapture)
+              : undefined;
+            historicalCapture = undefined;
             const eligible =
               isTurnEligible(designated) &&
               restorationManager.retainsCompletedHistory() &&
@@ -4540,13 +4580,14 @@ export function restoration(
                   effects.length > 0 ? effects : undefined,
                   collectionOrders.length > 0 ? collectionOrders : undefined,
                   undefined,
-                  () => retainDescriptorInputs(descriptorInputs)
+                  () => retainDescriptorInputs(descriptorInputs),
+                  historical
                 )
               : false;
             if (!recorded) {
               restorationManager.appendHistoricalGap(
-                effects,
-                collectionOrders,
+                historical?.effects ?? effects,
+                historical?.collectionOrders ?? collectionOrders,
                 designated
               );
             }
@@ -4599,6 +4640,8 @@ export function restoration(
     ] = () => restorationManager.getRestorationHistory();
     const resetRestorationRetention = (): void => {
       restorationManager.resetRestorationHistory();
+      clearCaptureBucket(pendingCapture);
+      clearHistoricalCapture();
       pendingDescriptorInputs.clear();
       stagedForeignTurns.clear();
       pendingTransactions.clear();

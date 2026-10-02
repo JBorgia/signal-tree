@@ -6,7 +6,7 @@
 
 Use this index to navigate the documentation.
 
-**Development version:** 15.4.1. This index describes the 15.4.1 package version.
+**Development version:** 15.4.2. This index describes the 15.4.2 package version.
 See [CHANGELOG](../CHANGELOG.md) for versioned changes and the
 [npm package page](https://www.npmjs.com/package/@signal-tree/kernel?activeTab=versions)
 for published versions.
@@ -33,16 +33,16 @@ for published versions.
 
 ## 📖 Guides
 
-| Document                                                                          | Description                                                                                          |
-| --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| [Transaction failures in v15](guides/transaction-failures-v15.md) | Automatic abort, explicit refusal, retry and synchronization limits |
+| Document                                                                          | Description                                                                                                          |
+| --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| [Transaction failures in v15](guides/transaction-failures-v15.md)                 | Automatic abort, explicit refusal, retry and synchronization limits                                                  |
 | [Support policy](support-policy.md)                                               | The two supported release lines (`@signal-tree/*` v15, `@signaltree/*` v14), what v14 still receives, and EOL intent |
-| [Migration `@signaltree/*` → `@signal-tree/*` (v15)](guides/migration-v14-v15.md) | **Current migration target for every earlier version** — rename, package consolidation, removed APIs |
-| [Composition Recipes](guides/composition-recipes.md)                              | Ops-service patterns, entity-CRUD base, optimistic UI                                                |
-| [Legacy docs (`@signaltree/*`, pre-15)](legacy/README.md)                         | Per-version migration guides and the 14.0.0 capability audit, quarantined                            |
-| [Persistence and Security](guides/persistence-and-security.md)                    | Withdrawn: its subject, the `stored()` marker, is deleted                                            |
-| [Typing Patterns](guides/typing-patterns.md)                                      | Preferred TypeScript typing patterns                                                                 |
-| [Local Development Symlinks](guides/local-development-symlinks.md)                | Troubleshooting dual Angular instance issues                                                         |
+| [Migration `@signaltree/*` → `@signal-tree/*` (v15)](guides/migration-v14-v15.md) | **Current migration target for every earlier version** — rename, package consolidation, removed APIs                 |
+| [Composition Recipes](guides/composition-recipes.md)                              | Ops-service patterns, entity-CRUD base, optimistic UI                                                                |
+| [Legacy docs (`@signaltree/*`, pre-15)](legacy/README.md)                         | Per-version migration guides and the 14.0.0 capability audit, quarantined                                            |
+| [Persistence and Security](guides/persistence-and-security.md)                    | Withdrawn: its subject, the `stored()` marker, is deleted                                                            |
+| [Typing Patterns](guides/typing-patterns.md)                                      | Preferred TypeScript typing patterns                                                                                 |
+| [Local Development Symlinks](guides/local-development-symlinks.md)                | Troubleshooting dual Angular instance issues                                                                         |
 
 ---
 
@@ -65,7 +65,7 @@ for published versions.
 | [Kernel](../packages/kernel/README.md)   | `@signal-tree/kernel` — framework-neutral tree, EntityMap, enhancers     |
 | [Angular](../packages/angular/README.md) | `@signal-tree/angular` — the Angular realization (Angular apps use this) |
 | [React](../packages/react/README.md)     | `@signal-tree/react` — owner-bound React observation (`useSignalTree`)   |
-| [Solid](../packages/solid/README.md) | `@signal-tree/solid` — native Solid realization |
+| [Solid](../packages/solid/README.md)     | `@signal-tree/solid` — native Solid realization                          |
 | [Vue](../packages/vue/README.md)         | `@signal-tree/vue` — native Vue refs over kernel-owned state             |
 
 Historical inter-version migration guides live in [Guides](#-guides); the
@@ -83,10 +83,10 @@ Historical inter-version migration guides live in [Guides](#-guides); the
 
 ## 🤖 AI/LLM References
 
-| Document               | Description                       |
-| ---------------------- | --------------------------------- |
+| Document                          | Description                                      |
+| --------------------------------- | ------------------------------------------------ |
 | [Canonical llms.txt](../llms.txt) | Concise current API and failure-policy reference |
-| [LLM Guide](ai/LLM.md) | Quick reference for AI assistants |
+| [LLM Guide](ai/LLM.md)            | Quick reference for AI assistants                |
 
 ---
 

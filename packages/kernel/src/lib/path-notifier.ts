@@ -16,6 +16,7 @@ import {
 } from './internals/write-observation-scope';
 import {
   isRestorationDesignated,
+  isMetaDesignated,
   markMetaDesignated,
 } from './internals/restoration-eligibility';
 
@@ -672,13 +673,14 @@ export class PathNotifier {
     ) {
       return undefined;
     }
-    if (left.structuralEffect && !right.structuralEffect) {
-      return {
-        ...right,
-        structuralEffect: left.structuralEffect,
-      };
-    }
-    return right;
+    const merged = left.structuralEffect && !right.structuralEffect
+      ? { ...right, structuralEffect: left.structuralEffect }
+      : right;
+    // HIST-C2: designation promotes the whole authored turn. A later ordinary
+    // replacement on the same location cannot demote its earlier contribution.
+    return isMetaDesignated(left) && !isMetaDesignated(merged)
+      ? markMetaDesignated(merged)
+      : merged;
   }
 
   private getCompositeBatchKey(entry: PendingEntry): string {

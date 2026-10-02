@@ -1,4 +1,23 @@
+## 15.4.2 (2026-10-02)
+
+**Patch — preserve authored undo boundaries and operation outcomes.**
+
+- An external update before a turn's first authored contribution now supplies
+  that contribution's undo baseline, including when both occur in the same
+  turn. Earlier authored contributions still belong to the whole designated
+  turn. Historical snapshots reconstruct earlier boundaries across external
+  updates.
+- An ordinary write following an undoable write at the same location no longer
+  removes that turn's undo eligibility.
+- Inspection-only collection reordering is not reversed by an unrelated user
+  edit and does not create undo history or external-order authority.
+- Includes the observer-failure repairs described below for the unpublished
+  15.4.1 candidate. No public API or transaction-refusal policy change.
+
 ## 15.4.1 (2026-10-01)
+
+**Unpublished, superseded candidate.** Its existing signed tag is preserved;
+these fixes ship in 15.4.2 instead.
 
 **Patch — preserve operation outcomes when observers throw.**
 
@@ -96,6 +115,7 @@ These changes are introduced in 15.4.0 and are absent from the 15.3.1 artifact.
   present member.
 
 - **Fix: large entity collections.** Reproduced on npm 15.3.1 unless noted:
+
   - `setAll()` that replaced or cleared a collection was O(n²) (40k rows: ~2 s),
     and undoing it was too (an 8k-row replacement spent 1.7 s in a pairwise
     check; 250k rows exhausted memory). Both are now linear.
@@ -417,7 +437,7 @@ fields it wrote, and a following `p2.rollback()` resurrected P1's `y=1` — a
 value P1 had already given up.
 
 Open transactions are now part of the plan, and an open one can never
-*supersede* a contribution, only conflict with it: the before-image it holds
+_supersede_ a contribution, only conflict with it: the before-image it holds
 records what the location HELD, not who owns it. That refusal carries a new
 cause kind, `later-pending-dependency`, distinct from
 `later-confirmed-dependency` because it is not a claim about confirmed state.
@@ -492,13 +512,13 @@ but superseded before publication.
 ### For users
 
 - **A "Why SignalTree?" page.** [`docs/why-signaltree.md`](docs/why-signaltree.md)
-  answers the adoption question in ordinary language, including when *not* to
+  answers the adoption question in ordinary language, including when _not_ to
   adopt: for a small component or simple application, your framework's built-in
   state is probably all you need.
 - **A glossary.** [`docs/glossary.md`](docs/glossary.md) separates the three
   vocabularies — everyday, advanced, and architecture — so the precise terms
   are optional rather than prerequisite. Public documentation now says **entity
-  lifetime** rather than *subject*, because RxJS owns that word for Angular
+  lifetime** rather than _subject_, because RxJS owns that word for Angular
   developers.
 - **Introductory copy rewritten around behaviour.** The Solid and kernel
   READMEs opened with semantic-authority language; they now describe what the
