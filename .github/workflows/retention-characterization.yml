@@ -1,7 +1,16 @@
 name: Retired node memory characterization
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: Raw characterization or frozen independent heap validation
+        type: choice
+        required: true
+        default: characterization
+        options:
+          - characterization
+          - validation
 
 permissions:
   contents: read
@@ -40,14 +49,21 @@ jobs:
           pnpm exec nx build kernel --skip-nx-cache 2>&1 | tee artifacts/retention-characterization/build.log
 
       - name: Collect preregistered raw fresh-process batch
+        env:
+          PHASE: ${{ inputs.phase }}
         run: |
           set -o pipefail
-          node tools/characterize-retired-node-memory.mjs --out artifacts/retention-characterization/data 2>&1 | tee artifacts/retention-characterization/driver.log
+          case "$PHASE" in
+            characterization) mode=() ;;
+            validation) mode=(--validation) ;;
+            *) echo "Unknown diagnostic phase: $PHASE"; exit 1 ;;
+          esac
+          node tools/characterize-retired-node-memory.mjs "${mode[@]}" --out artifacts/retention-characterization/data 2>&1 | tee artifacts/retention-characterization/driver.log
 
       - name: Upload raw evidence even after failure
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: retired-node-memory-${{ github.sha }}-${{ github.run_attempt }}
+          name: retired-node-memory-${{ inputs.phase }}-${{ github.sha }}-${{ github.run_attempt }}
           path: artifacts/retention-characterization/
           if-no-files-found: warn

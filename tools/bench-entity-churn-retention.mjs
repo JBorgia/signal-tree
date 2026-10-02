@@ -97,8 +97,8 @@ const GC_PROTOCOL = {
   maxRounds: 40,
 };
 const MEASUREMENT_PROTOCOL = 'retired-node-diagnostics-v1';
-// V8 snapshots and counters add fixed diagnostic overhead relative to the old
-// heap-only tool. This is a new measurement protocol, not interchangeable data.
+// V8 snapshots and counters add diagnostic allocation/timing overhead; constancy
+// not established. This is a new measurement protocol, not interchangeable data.
 const runtime = () => ({
   node: process.version,
   v8: process.versions.v8,
@@ -275,7 +275,7 @@ if (armFlag !== -1) {
       measurementProtocol: MEASUREMENT_PROTOCOL,
       resolvedKernelEntry: CORE,
       protocolNote:
-        'V8 snapshots/counters add diagnostic fixed overhead; not the old heap-only instrument.',
+        'V8 snapshots/counters add diagnostic allocation/timing overhead; constancy not established; not the old heap-only instrument.',
       runtime: runtimeInfo,
       before: beforeMemory,
       after: afterMemory,
