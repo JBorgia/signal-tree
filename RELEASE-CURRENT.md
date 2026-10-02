@@ -240,3 +240,34 @@ is NOT release-qualified. Preserve the first red and follow the
 [preregistered diagnostic](docs/audits/2026-10-01-retired-node-release-check/README.md).
 No threshold increase or rerun-to-green is an accepted resolution. V16 integration
 continues to wait for v15 publication.
+
+The 100-process characterization on `79b754cb` completed in Linux run
+[36941924557](https://github.com/JBorgia/signal-tree/actions/runs/36941924557)
+with all identities/postconditions valid. The small cleanup mutation overlaps
+healthy total-heap measurements; 10,000 deliberately retained handles separate
+strongly. Two independent reviews support separating direct entry-cleanup
+correctness from gross-retention measurement. The proposed 40 MiB check is
+**not promoted**: a frozen, interleaved 150-process Linux validation is required,
+plus actual deletion and revision-resurrection mutation proofs. See the audit
+record for raw samples, declared blind region and exact acceptance rules. The
+old release failure remains unresolved until that evidence passes review.
+
+A separate deterministic boundary probe found late first reads recreating an
+activation entry after permanent removal. The narrow fix preserves tracking for
+restoration-owned tombstones. Six focused tests produced 4 failures before and
+6 passes after; three actual isolated-artifact mutations each produce 0/1/0
+(control/mutant/restored). Independent source review found no blocker. The first
+build was terminated after emitting output (exit 1); the host build then
+completed successfully (exit 0). Neither result is release qualification.
+The independent Linux validation now includes this runtime fix and all three
+cleanup mutation proofs. Its 150-process plan and 40 MiB threshold are unchanged.
+
+Pre-validation checks on the corrected working tree: kernel 335 files, 3,295
+passed / 7 expected failures / 13 skipped / 1 todo, exit 0; typecheck, lint
+budget, spec types and bundle budget 4/4, exit 0. The successfully rebuilt
+artifact passes all three cleanup mutations at 0/1/0. Driver smoke completes
+9/9 with zero execution, identity or cleanup failures, explicitly not heap
+qualification. Logs remain under `/private/tmp/st-late-read-fix-proof/` and
+`/private/tmp/st-retention-validation-driver-proof/validation-smoke-three-mutants/`.
+Next: commit this frozen validation candidate, run its independent Linux batch,
+and promote the replacement measurement only if the preregistered checks pass.

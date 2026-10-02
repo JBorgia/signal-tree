@@ -8,6 +8,11 @@ transaction rollback with entity collections.**
 
 These changes are introduced in 15.4.0 and are absent from the 15.3.1 artifact.
 
+- **Entity cleanup:** reading a held reference for the first time after its
+  entity has been permanently removed no longer recreates a tracking entry.
+  Removed entities retained for undo still notify held reactive consumers when
+  restored.
+
 - **Correctness fix: atomic terminal replacements.** Undo/redo and transaction
   rollback preserve `leaf(object)` as one location rather than interpreting its
   payload as branch topology. Registered terminal replacements also support

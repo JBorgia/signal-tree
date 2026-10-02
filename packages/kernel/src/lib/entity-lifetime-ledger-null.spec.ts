@@ -263,7 +263,7 @@ describe('a forgotten lifetime stays forgotten', () => {
       __listSubjectReclamationCandidates(): readonly number[];
     };
 
-  it('THE 79 B BUG — nothing re-interns the subject before the operation ends', () => {
+  it('a forgotten lifetime resolves as missing after the whole retirement', () => {
     // `publishSubjectPhysicalChange` -> `bumpSubjectRevision` does
     // `subjectRevisions.set(id, revision + 1)`, which RESURRECTS an entry the
     // forget just deleted. It ran after the commit inside the very same
@@ -271,18 +271,19 @@ describe('a forgotten lifetime stays forgotten', () => {
     // measurement read 79 B/retired instead of 6 B — a two-thirds-implemented
     // null that looked like a legitimate partial result.
     //
-    // Asserted at the END of the whole retirement operation, not mid-way, since
-    // that is where the resurrection happened. Any future step appended to the
-    // retirement path that touches the subject by id fails here.
+    // This row asserts observable missing-lifetime behavior at the END of the
+    // operation. It cannot inspect revision-map retention: handle resolution
+    // returns early when the lifetime is absent. The built-artifact check in
+    // tools/check-retired-lifetime-cleanup.mjs directly inspects populated maps
+    // and mutation-tests post-forget revision publication.
     const rows = internals(makeRows());
     undoable(() => rows.setAll([{ id: 'A', name: 'Alpha' }]));
     const handle = rows.__acquireEntityHandleForTesting('A');
 
     undoable(() => rows.removeOne('A'));
 
-    // No lifetime record, and no revision entry regrown behind it: a revision
-    // that had been re-interned would resolve the handle with a `revision`
-    // field instead of reporting it unrecognised.
+    // No lifetime record remains observable. These public/test-seam reads do
+    // not prove the separate revision-map entry is gone.
     expect(rows.__inspectSubjectResources(handle.subjectId)).toBeUndefined();
     expect(rows.__resolveEntityHandleForTesting(handle)).toEqual({
       state: 'missing',

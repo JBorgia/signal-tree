@@ -1241,7 +1241,12 @@ export function createEntitySignal<
     // a nonce: every observer that could have compared against the old count
     // was retaining the old carrier, which is why this branch was not taken.
     const created = locations.createCell(0);
-    subjectStateSignals.set(subjectId, new WeakRef(created));
+    // A first read may arrive after this lifetime was irreversibly forgotten.
+    // Keep that carrier caller-owned; retained tombstones still register for undo.
+    // Check after createCell so retirement during creation cannot leave an entry.
+    if (resolveSubjectState(subjectId) !== undefined) {
+      subjectStateSignals.set(subjectId, new WeakRef(created));
+    }
     return created;
   }
 
