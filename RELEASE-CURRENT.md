@@ -1,48 +1,50 @@
-# Current work — development checkout
+# Current work — v16 integration
 
-Updated October 1, 2026. This checkout is `fix/d1-d2-forward-port` at baseline
-`148d57c5b5fe07437f1b4a07ec335d23ba826c9f`, version **16.0.0-dev**.
-It is not the current v15 release candidate. The unrelated untracked `frontier`
-file is not owned by the guidance cleanup.
+Updated October 1, 2026. Owner-authorized branch `integrate/v15-4-into-v16`,
+baseline `628d302dadb082a48c58528651c9088234d0a777`, version **16.0.0-dev**.
+The original checkout and its untracked `frontier` remain untouched.
 
-## Scope
+## Prerequisite complete
 
-The authorized task here is guidance consolidation and correction of generated
-demo version labels to the already-declared development version. The active public v15
-implementation/performance verification is in the separate
-`fix/v15-link-settlement-diagnostics` worktree, currently 15.4.0 unreleased.
-That worktree has its own RELEASE-CURRENT.md and artifact evidence. Do not copy
-its runtime, API claims, candidate status or verification result into this branch.
-No v16 publication or new product architecture is authorized by this controller.
+V15.4.0 published from `4ceb24a2a62dc893bf28c50ad971a955190539a7`. All five
+registry tarballs match verified local archives; local/Linux/tag/publisher
+gates and proofs, registry regressions, strict consumers and Angular AOT pass.
+The v15 release record is on `fix/v15-link-settlement-diagnostics` at `024ce69c`.
 
-## Continue safely
+## Authorized scope
 
-Use [AGENTS.md](AGENTS.md) for task routing and [support policy](docs/support-policy.md)
-for compatibility. Before resuming code or release work on this branch, establish
-its intended scope from the current user task and verify implementation differences
-against the intended baseline. A historically completed gate is not evidence for
-this checkout's current artifacts.
+Follow [the selective integration manifest](docs/audits/2026-10-01-v16-integration/PLAN.md).
+Carry fixes **with their falsifiers**, preserve v16 `transact()` spelling,
+inspection, recovery authority, current-truth observation, typed identity and
+existing framework realization contracts. Do not wholesale replace divergent
+v16 files with v15 versions or copy v15 automatic-abort settlement policy.
 
-Use [validation](.github/VALIDATION_GUIDE.md) and [release tooling](RELEASE_PROCESS.md)
-when release verification is actually requested. Exact-source/artifact checks and
-explicit push/tag/publication authorization remain mandatory.
+1. Record exact current semantic results before production changes.
+2. Integrate dependency-ordered correctness/observation/allocation slices;
+   preserve first reds and destination controls.
+3. Run the complete semantic matrix and explain every changed verdict.
+4. Evaluate ownership-model changes only against this stronger incumbent.
+5. Independently measure v16 performance and size; v15 budgets/results do not transfer.
 
-## Preserved records
+No v16 publication or new architecture is authorized by this integration work.
+V14 remains paused. Private Studio compatibility is a separate pending decision.
+Use AGENTS.md and the scoped contributor/review contracts. Historical roadmaps
+do not add scope. Keep all exact-SHA evidence distinct from working-tree checks.
 
-[RELEASE-1.0.md](RELEASE-1.0.md), [TODO.md](TODO.md), and the
-[architecture context](docs/architecture/SIGNALTREE-15-CONTEXT.md) retain historical
-findings, decisions and unresolved reservations. Their old current-phase/next-step
-headings are not an automatic work queue. Frozen product constraints remain
-indexed in [contributor contracts](docs/contributor-contracts.md).
+## Progress
 
-## Guidance checkpoint validation
-
-The short entry points, scoped contracts and historical banners are applied.
-Import, semantic-discoverability and numeric-claim checks passed. Documentation
-examples: 29 checked across 25 live documents. The production demo build first
-aborted in native LMDB inside the sandbox; the same uncached build outside the
-sandbox passed. Both results are preserved in the local October 1 audit logs.
-No kernel/framework behavior, package version or public export changed. The demo
-version generator corrected stale 16.0.0 labels to existing 16.0.0-dev; those two
-generated files are included in this checkpoint. The unrelated `frontier` file
-remains untouched. This is not release qualification.
+- Isolated branch and frozen dependency install complete.
+- Baseline characterization complete at unchanged `628d302d`: scalar 25 held /
+  9 violated / 1 unsupported; structural 135 / 48 / 24; composition 28 / 10 /
+  133; authority 0 / 1 / 10. All four runners exit 1 with zero execution errors.
+  Original 13 cases: 9 held / 1 violated / 3 unsupported; 9 adapter tests pass.
+  Raw results, commands, input hashes and exit codes are preserved in
+  `docs/audits/2026-10-01-v16-integration/baseline/`.
+- Slice 1 committed as `042e8ede`: collection identity and own-field presence.
+  Full kernel 2936 passed / 6 expected failures / 13 skipped; all-package build
+  and typecheck/spec-types/lint pass. Review strengthened presence controls to
+  23/23. Stale fixture declarations corrected separately in `479d449d`.
+  See [the evidence record](docs/audits/2026-10-01-v16-integration/PROGRESS.md).
+- Slice 2 in progress: four reproduced undo/redo history failures after reactive
+  delivery throws. Direct subscriber isolation and reentrant settlement already
+  pass. Same-tick rollback→undoable failure is preserved for slice 3.

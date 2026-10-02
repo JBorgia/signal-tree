@@ -1,0 +1,243 @@
+
+> @signaltree/workspace@16.0.0-dev build:all /private/tmp/signaltree-v16-integration
+> nx run-many -t build --projects=kernel,angular,react,vue,solid
+
+
+ NX   Running target build for 5 projects:
+
+- kernel
+- angular
+- react
+- vue
+- solid
+
+
+
+> nx run kernel:build
+
+> rollup -c rollup.config.cjs
+
+
+/private/tmp/signaltree-v16-integration/packages/kernel/src/index.ts, /private/tmp/signaltree-v16-integration/packages/kernel/src/adapter.ts, /private/tmp/signaltree-v16-integration/packages/kernel/src/internals.ts → ../../dist/packages/kernel...
+(node:45292) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  dist/index.js 711 Bytes
+  dist/internals.js 6.092 KB
+  dist/adapter.js 3.42 KB
+  dist/lib/signal-tree.js 76.352 KB
+  dist/lib/leaf.js 833 Bytes
+  dist/lib/readonly.js 68 Bytes
+  dist/lib/types.js 855 Bytes
+  dist/lib/undoable.js 2.767 KB
+  dist/lib/external.js 5.909 KB
+  dist/lib/internals/error-reporter.js 5.895 KB
+  dist/lib/link.js 24.15 KB
+  dist/enhancers/batching/batching.js 11.544 KB
+  dist/enhancers/restoration/restoration.js 131.908 KB
+  dist/enhancers/transactions/transactions.js 107.907 KB
+  dist/enhancers/devtools/devtools.js 2.561 KB
+  dist/lib/internals/write-observation-scope.js 2.384 KB
+  dist/lib/write-context.js 2.497 KB
+  dist/lib/internals/position-registry.js 2.483 KB
+  dist/lib/internals/tree-capabilities.js 3.656 KB
+  dist/lib/internals/write-observation.js 1.446 KB
+  dist/lib/internals/confirmed-turn-view.js 1.245 KB
+  dist/lib/internals/observation-substrate.js 3.553 KB
+  dist/lib/internals/owner-invalidation.js 3.213 KB
+  dist/lib/internals/canonical-snapshot.js 316 Bytes
+  dist/lib/internals/native-location-realization.js 8.669 KB
+  dist/lib/internals/native-tree-scalar-leaf-runtime.js 6.208 KB
+  dist/lib/internals/observation-adapter.js 210 Bytes
+  dist/lib/internals/location-runtime.js 14.371 KB
+  dist/lib/internals/restoration-eligibility.js 4.858 KB
+  dist/lib/internals/node-shape.js 2.039 KB
+  dist/lib/internals/construction-branch.js 525 Bytes
+  dist/lib/enhancer-types.js 148 Bytes
+  dist/lib/markers/entity-map.js 12.722 KB
+  dist/lib/internals/visit-tree.js 930 Bytes
+  dist/lib/internals/owner-invalidation-port.js 427 Bytes
+  dist/lib/constants.js 2.888 KB
+  dist/enhancers/index.js 3.354 KB
+  dist/lib/internals/member-membership.js 11.52 KB
+  dist/lib/internals/owned-mutation.js 6.944 KB
+  dist/lib/internals/owned-metadata.js 1.842 KB
+  dist/lib/internals/materialize-markers.js 21.842 KB
+  dist/lib/internals/root-source.js 713 Bytes
+  dist/lib/internals/mutation-capture-runtime.js 1.16 KB
+  dist/lib/internals/tree-scalar-slot-port.js 528 Bytes
+  dist/lib/internals/tree-scalar-leaf-runtime.js 4.115 KB
+  dist/lib/internals/physical-commit-clock.js 726 Bytes
+  dist/lib/internals/merge-derived.js 6.423 KB
+  dist/lib/utils.js 23.832 KB
+  dist/lib/internals/snapshot-authority.js 2.269 KB
+  dist/lib/path-notifier.js 23.557 KB
+  dist/lib/write-participation.js 2.433 KB
+  dist/lib/internals/entity-projection-seed.js 2.897 KB
+  dist/lib/internals/entity-egress-projection.js 4.792 KB
+  dist/lib/internals/source-mutation.js 3.292 KB
+  dist/lib/internals/commit-consequence.js 7.315 KB
+  dist/enhancers/devtools/devtools-impl.js 51.474 KB
+  dist/lib/internals/production-substrate-stats.prod.js 97 Bytes
+  dist/lib/internals/subject-reclamation-sink.js 4.575 KB
+  dist/lib/internals/subject-restoration-claims.js 5.724 KB
+  dist/lib/internals/intercept-leaf-signals.js 11.349 KB
+  dist/lib/internals/causal-runtime/target-transition.js 20.761 KB
+  dist/lib/internals/causal-runtime/tree-realization-adapter.js 54.059 KB
+  dist/lib/internals/causal-runtime/transaction-lifecycle.js 10.069 KB
+  dist/lib/internals/causal-runtime/applied-turn-projection.js 5.63 KB
+  dist/lib/internals/causal-runtime/pending-rollback.js 9.548 KB
+  dist/lib/internals/causal-runtime/realization-context.js 2.385 KB
+  dist/lib/internals/causal-runtime/turn-store.js 7.141 KB
+  dist/lib/internals/intrinsic-mutation.js 2.765 KB
+  dist/lib/internals/cell-identity.js 2.79 KB
+  dist/lib/internals/tree-scalar-slot-runtime.js 5.187 KB
+  dist/lib/internals/utilities/is-built-in-object.js 1.689 KB
+  dist/lib/entity-signal.js 118.651 KB
+  dist/lib/internals/utilities/deep-equal.js 12.457 KB
+  dist/lib/internals/path-observation-port.js 1.446 KB
+  dist/lib/internals/runtime-tree-plan.js 309 Bytes
+  dist/lib/internals/utilities/deep-clone.js 2.731 KB
+  dist/lib/internals/causal-runtime/scoped-value-addressing.js 221 Bytes
+  dist/lib/physical/entity-mutation-frame.js 3.58 KB
+  dist/lib/physical/entity-handle-resolution.js 478 Bytes
+  dist/lib/physical/entity-value-store.js 792 Bytes
+  dist/lib/physical/structural-store.js 18.289 KB
+(!) [plugin typescript] src/enhancers/transactions/semantics-authority.ts (27:37): @rollup/plugin-typescript TS4111: Property 'y' comes from an index signature, so it must be accessed with ['y'].
+/private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-authority.ts:27:37
+
+[7m27[0m   c.equal(f.candidate.readVisible().y, y, 'visible y');
+[7m  [0m [91m                                    ~[0m
+
+(!) [plugin typescript] src/enhancers/transactions/semantics-authority.ts (29:39): @rollup/plugin-typescript TS4111: Property 'y' comes from an index signature, so it must be accessed with ['y'].
+/private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-authority.ts:29:39
+
+[7m29[0m   c.equal(f.candidate.readCanonical().y, y, 'canonical y');
+[7m  [0m [91m                                      ~[0m
+
+(!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (77:37): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+/private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:77:37
+
+[7m77[0m         f.candidate.readCanonical().x,
+[7m  [0m [91m                                    ~[0m
+
+(!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (81:27): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+/private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:81:27
+
+[7m81[0m       c.equal(snapshot(f).x, 1, 'pending overlay remains visible');
+[7m  [0m [91m                          ~[0m
+
+(!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (85:27): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+/private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:85:27
+
+[7m85[0m       c.equal(snapshot(f).x, 2, 'external truth survives rejection');
+[7m  [0m [91m                          ~[0m
+
+(!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (158:25): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+/private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:158:25
+
+[7m158[0m     c.equal(snapshot(f).x, 2, 'later literal visible');
+[7m   [0m [91m                        ~[0m
+
+(!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (163:25): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+/private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:163:25
+
+[7m163[0m     c.equal(snapshot(f).x, 2, 'accept cannot replay older literal');
+[7m   [0m [91m                        ~[0m
+
+(!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (205:23): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+/private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:205:23
+
+[7m205[0m             c.equal(s.x, 0, 'refused x never published');
+[7m   [0m [91m                      ~[0m
+
+(!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (206:23): @rollup/plugin-typescript TS4111: Property 'y' comes from an index signature, so it must be accessed with ['y'].
+/private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:206:23
+
+[7m206[0m             c.equal(s.y, 0, 'refused y never published');
+[7m   [0m [91m                      ~[0m
+
+(!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (350:27): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+/private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:350:27
+
+[7m350[0m       c.equal(snapshot(f).x, before.x, 'refused x unchanged');
+[7m   [0m [91m                          ~[0m
+
+(!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (350:37): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+/private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:350:37
+
+[7m350[0m       c.equal(snapshot(f).x, before.x, 'refused x unchanged');
+[7m   [0m [91m                                    ~[0m
+
+created ../../dist/packages/kernel in 1.7s
+
+/private/tmp/signaltree-v16-integration/packages/kernel/src/index.ts, /private/tmp/signaltree-v16-integration/packages/kernel/src/adapter.ts, /private/tmp/signaltree-v16-integration/packages/kernel/src/internals.ts → ../../dist/packages/kernel/dist...
+created ../../dist/packages/kernel/dist in 670ms
+
+> nx run react:build
+
+> rollup -c rollup.config.cjs
+
+
+/private/tmp/signaltree-v16-integration/packages/react/src/index.ts → ../../dist/packages/react...
+(node:45388) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  dist/index.js 90 Bytes
+  dist/use-signal-tree.js 695 Bytes
+created ../../dist/packages/react in 590ms
+
+> nx run vue:build
+
+> rollup -c rollup.config.cjs
+
+
+/private/tmp/signaltree-v16-integration/packages/vue/src/index.ts → ../../dist/packages/vue...
+(node:45390) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  dist/index.js 782 Bytes
+  dist/lib/construction-input.js 1.661 KB
+  dist/lib/vue-observation.js 4.52 KB
+created ../../dist/packages/vue in 631ms
+
+> nx run angular:build
+
+> rollup -c rollup.config.cjs
+
+
+/private/tmp/signaltree-v16-integration/packages/angular/src/index.ts → ../../dist/packages/angular...
+(node:45389) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  dist/index.js 862 Bytes
+  dist/lib/observation-adapter.js 1.885 KB
+  dist/lib/construction-input.js 1.646 KB
+  dist/lib/define-store.js 1.853 KB
+  dist/lib/to-writable-signal.js 3.67 KB
+created ../../dist/packages/angular in 797ms
+
+> nx run solid:build
+
+> rollup -c rollup.config.cjs
+
+
+/private/tmp/signaltree-v16-integration/packages/solid/src/index.ts → ../../dist/packages/solid...
+(node:45476) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  dist/index.js 985 Bytes
+  dist/lib/construction-input.js 2.068 KB
+  dist/lib/solid-observation.js 4.644 KB
+created ../../dist/packages/solid in 502ms
+
+
+
+ NX   Successfully ran target build for 5 projects
+
+
+  Run duration:      5.4s
+  Cache:             0/5 hit (0%)
+  Critical path:     4.6s (2 tasks)
+  Recoverable time:  840ms (16% of the run)
+
+  Recommendations:
+    - Drastically reduce your run duration by sharing a cache across your team and CI → https://nx.dev/ci/features/remote-cache?utm_source=nx-cli&utm_medium=cli&utm_campaign=performance-report&utm_content=remote-cache.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:build     3.2s
+        angular:build    1.3s

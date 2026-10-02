@@ -1,0 +1,9 @@
+
+Running 3 gates
+
+  · typecheck            pass ✓  (core sources AND typing specs compile (both projects, not just one))
+  · lint:budget          pass ✓  (eslint errors across all 10 projects, AND warnings never grow)
+  · spec-types           pass ✓  (spec files are typechecked (they were covered by NOTHING) — ratcheted per file, so a renamed public config option cannot silently void a test)
+
+──────────────────────────────────────────────────────────────────────────────
+3/3 passed, 0 failed, 0 known-red.
