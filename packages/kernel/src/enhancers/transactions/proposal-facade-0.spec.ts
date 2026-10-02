@@ -225,7 +225,7 @@ describe('PROPOSAL-0 facade / restoration stays orthogonal', () => {
     }).confirm();
     await flush();
 
-    let pending!: ReturnType<typeof t.propose>;
+    let pending!: ReturnType<typeof t.transact>;
     undoable(() => {
       pending = t.transact(() => {
         t.$.name('Agent');
@@ -258,7 +258,7 @@ describe('PROPOSAL-0 facade / restoration stays orthogonal', () => {
     await flush();
     const base = t.getRestorationHistory().length;
 
-    let pending!: ReturnType<typeof t.propose>;
+    let pending!: ReturnType<typeof t.transact>;
     undoable(() => {
       pending = t.transact(() => {
         t.$.name('Agent');
@@ -278,7 +278,7 @@ describe('PROPOSAL-0 facade / restoration stays orthogonal', () => {
     await flush();
     const base = t.getRestorationHistory().length;
 
-    let pending!: ReturnType<typeof t.propose>;
+    let pending!: ReturnType<typeof t.transact>;
     undoable(() => {
       pending = t.transact(() => {
         t.$.name('Agent');

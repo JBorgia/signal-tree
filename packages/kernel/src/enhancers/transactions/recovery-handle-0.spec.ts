@@ -41,6 +41,7 @@ import { transactions } from './transactions';
 type Row = { id: string; name: string };
 
 type Store = {
+  destroy(): void;
   $: {
     count: (v?: number) => number;
     rows: {

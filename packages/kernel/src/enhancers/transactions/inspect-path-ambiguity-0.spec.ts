@@ -35,7 +35,7 @@ describe('inspect() path ambiguity', () => {
         { enhancers: [transactions()] }
       ) as never as {
         $: Record<string, never> & (() => unknown);
-        propose: (fn: () => void) => {
+        transact: (fn: () => void) => {
           inspect(): { changes: { path: string; status: string }[] };
           rollback(): void;
         };
@@ -48,7 +48,7 @@ describe('inspect() path ambiguity', () => {
             'a.b': (v?: number) => number;
             a: { b: (v?: number) => number };
           };
-          propose: (fn: () => void) => {
+          transact: (fn: () => void) => {
             inspect(): { changes: { path: string; status: string }[] };
             rollback(): void;
           };
@@ -132,7 +132,7 @@ describe('inspect() address — entity FIELDS are distinguishable too', () => {
       $: {
         rows: { addOne(r: Row): void; updateOne(id: string, p: unknown): void };
       };
-      propose: (fn: () => void) => {
+      transact: (fn: () => void) => {
         inspect(): {
           changes: {
             path: string;
