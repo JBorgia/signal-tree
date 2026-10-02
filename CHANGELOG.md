@@ -1,3 +1,17 @@
+## 15.4.1 (2026-10-01)
+
+**Patch — preserve operation outcomes when observers throw.**
+
+- Undo/redo no longer reuses an earlier observer failure's completed-operation
+  status when the same error is later thrown before another operation applies.
+  Failed validation leaves the value and history position unchanged, so retry
+  remains possible.
+- Undo/redo and explicit transaction rollback preserve the exact value thrown
+  by reactive delivery, including primitive values and `undefined`, after
+  completing their applied-operation bookkeeping.
+- No new public API or transaction-refusal policy. This repair does not promise
+  recovery from arbitrary partially applied user callbacks.
+
 ## 15.4.0 (2026-10-01)
 
 **TL;DR** — **Minor. New read-only tooling readers; no application API

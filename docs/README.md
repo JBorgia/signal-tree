@@ -6,7 +6,7 @@
 
 Use this index to navigate the documentation.
 
-**Development version:** 15.4.0. This index describes the 15.4.0 package version.
+**Development version:** 15.4.1. This index describes the 15.4.1 package version.
 See [CHANGELOG](../CHANGELOG.md) for versioned changes and the
 [npm package page](https://www.npmjs.com/package/@signal-tree/kernel?activeTab=versions)
 for published versions.

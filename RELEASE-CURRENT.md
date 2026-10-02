@@ -24,6 +24,18 @@ unwrapped at public exits to preserve original thrown values. No new public API,
 refusal policy, ownership model, retention policy or budget is introduced. V16
 recovery behavior must not leak into stable v15. Independent review is required.
 
+## Verified repair checkpoint
+
+Runtime and regressions: `48b8af0f`. Before/after focused results: 3/25 then
+25/25. Full kernel: 3320 ordinary passes plus seven expected failures, thirteen
+skips, one TODO; types/spec-types/lint pass. All five host builds and unchanged
+bundle budgets pass. The same controlled published-artifact probe passes on the
+repaired packed kernel; first failure and exact archive identities are preserved.
+See [the repair record](docs/audits/2026-10-01-v15-outcome-provenance.md).
+
+Version metadata is now prepared at **15.4.1**. Do not increment it again.
+Subsequent exact-candidate logs stay outside the tracked tree.
+
 ## Execution
 
 1. Preserve red tests against published source; focused repair and mutation proof.
