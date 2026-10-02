@@ -45,6 +45,11 @@ do not add scope. Keep all exact-SHA evidence distinct from working-tree checks.
   and typecheck/spec-types/lint pass. Review strengthened presence controls to
   23/23. Stale fixture declarations corrected separately in `479d449d`.
   See [the evidence record](docs/audits/2026-10-01-v16-integration/PROGRESS.md).
-- Slice 2 in progress: four reproduced undo/redo history failures after reactive
-  delivery throws. Direct subscriber isolation and reentrant settlement already
-  pass. Same-tick rollback→undoable failure is preserved for slice 3.
+- Slice 2 committed as `65cf7b38`: coherent restoration outcomes after reactive
+  delivery throws, with per-invocation provenance and original thrown-value
+  identity. 25 focused tests, full kernel (2963 passed), all four frameworks,
+  all five package builds and static gates pass. Same-tick rollback→undoable
+  failure is preserved for slice 3; its fixture does not install batching.
+- A reused-error provenance defect was reproduced on the published 15.4.0
+  artifact under controlled validation fault injection. Its bounded v15 patch
+  takes priority before continuing integration; see the evidence record.
