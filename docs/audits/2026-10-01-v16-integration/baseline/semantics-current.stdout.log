@@ -1,0 +1,21 @@
+
+> nx run kernel:test --testFile=src/enhancers/transactions/semantics-current.spec.ts --reporter=json --outputFile=/private/tmp/st-v16-integration-evidence/baseline/semantics-current-vitest.json
+
+> node tools/run-core-vitest.mjs --testFile=src/enhancers/transactions/semantics-current.spec.ts --reporter=json --outputFile=/private/tmp/st-v16-integration-evidence/baseline/semantics-current-vitest.json
+
+JSON report written to /private/tmp/st-v16-integration-evidence/baseline/semantics-current-vitest.json
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      892ms
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     884ms (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    884ms

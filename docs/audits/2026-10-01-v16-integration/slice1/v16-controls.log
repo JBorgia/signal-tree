@@ -1,0 +1,49 @@
+
+> nx run kernel:test --testFile=packages/kernel/src/enhancers/transactions/recovery-handle-0.spec.ts --testFile=packages/kernel/src/enhancers/transactions/settlement-inspection-terminality.spec.ts --testFile=packages/kernel/src/enhancers/transactions/proposal-inspection-0.spec.ts --testFile=packages/kernel/src/enhancers/transactions/proposal-inspection-safety.spec.ts --testFile=packages/kernel/src/enhancers/transactions/queued-inspection-review.spec.ts --testFile=packages/kernel/src/enhancers/transactions/rekey-occupancy-0.spec.ts --testFile=packages/kernel/src/enhancers/transactions/rekey-supersession-0.spec.ts --testFile=packages/kernel/src/lib/owner-invalidation.spec.ts
+
+> node tools/run-core-vitest.mjs --testFile=packages/kernel/src/enhancers/transactions/recovery-handle-0.spec.ts --testFile=packages/kernel/src/enhancers/transactions/settlement-inspection-terminality.spec.ts --testFile=packages/kernel/src/enhancers/transactions/proposal-inspection-0.spec.ts --testFile=packages/kernel/src/enhancers/transactions/proposal-inspection-safety.spec.ts --testFile=packages/kernel/src/enhancers/transactions/queued-inspection-review.spec.ts --testFile=packages/kernel/src/enhancers/transactions/rekey-occupancy-0.spec.ts --testFile=packages/kernel/src/enhancers/transactions/rekey-supersession-0.spec.ts --testFile=packages/kernel/src/lib/owner-invalidation.spec.ts
+
+(node:14356) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14358) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/signaltree-v16-integration/packages/kernel
+
+(node:14367) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14372) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14366) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14369) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14368) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14371) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14370) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14365) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  8 passed (8)
+      Tests  72 passed (72)
+   Start at  20:29:36
+   Duration  617ms (transform 1.29s, setup 0ms, import 1.93s, tests 143ms, environment 1.71s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      976ms
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     968ms (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    968ms

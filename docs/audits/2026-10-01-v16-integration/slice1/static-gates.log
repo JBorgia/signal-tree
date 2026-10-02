@@ -1,0 +1,41 @@
+
+Running 3 gates
+
+  · typecheck            pass ✓  (core sources AND typing specs compile (both projects, not just one))
+  · lint:budget          pass ✓  (eslint errors across all 10 projects, AND warnings never grow)
+  · spec-types           FAIL (exit 1) ✗  spec files are typechecked (they were covered by NOTHING) — ratcheted per file, so a renamed public config option cannot silently void a test
+
+check-spec-types: 4 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/enhancers/transactions/history-retention-15.spec.ts: 7 error(s), baseline allows 0
+  packages/kernel/src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts: 7 error(s), baseline allows 0
+  packages/kernel/src/enhancers/transactions/proposal-facade-0.spec.ts: 3 error(s), baseline allows 0
+  packages/kernel/src/enhancers/transactions/recovery-handle-0.spec.ts: 1 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/enhancers/transactions/history-retention-15.spec.ts(55,25): error TS2339: Property 'transact' does not exist on type 'Store'.
+packages/kernel/src/enhancers/transactions/history-retention-15.spec.ts(57,25): error TS2339: Property 'transact' does not exist on type 'Store'.
+packages/kernel/src/enhancers/transactions/history-retention-15.spec.ts(75,23): error TS2339: Property 'transact' does not exist on type 'Store'.
+packages/kernel/src/enhancers/transactions/history-retention-15.spec.ts(86,25): error TS2339: Property 'transact' does not exist on type 'Store'.
+packages/kernel/src/enhancers/transactions/history-retention-15.spec.ts(88,25): error TS2339: Property 'transact' does not exist on type 'Store'.
+packages/kernel/src/enhancers/transactions/history-retention-15.spec.ts(154,27): error TS2339: Property 'transact' does not exist on type 'Store'.
+packages/kernel/src/enhancers/transactions/history-retention-15.spec.ts(156,27): error TS2339: Property 'transact' does not exist on type 'Store'.
+packages/kernel/src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts(57,27): error TS2339: Property 'transact' does not exist on type '{ $: { (): unknown; 'a.b': (v?: number | undefined) => number; a: { b: (v?: number | undefined) => number; }; }; propose: (fn: () => void) => { inspect(): { changes: { path: string; status: string; }[]; }; rollback(): void; }; destroy(): void; }'.
+packages/kernel/src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts(68,43): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts(70,14): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts(149,28): error TS2339: Property 'transact' does not exist on type '{ $: { rows: { addOne(r: Row): void; updateOne(id: string, p: unknown): void; }; }; propose: (fn: () => void) => { inspect(): { changes: { path: string; address?: readonly string[] | undefined; subject?: number | undefined; }[]; }; }; destroy(): void; }'.
+packages/kernel/src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts(156,10): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts(163,35): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts(164,27): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/enhancers/transactions/proposal-facade-0.spec.ts(228,39): error TS2339: Property 'propose' does not exist on type 'ISignalTreeOf<{ name: string; priority: number; }, "location", TreeNodeOf<{ name: string; priority: number; }, "location">> & TransactionMethods & RestorationMethods'.
+packages/kernel/src/enhancers/transactions/proposal-facade-0.spec.ts(261,39): error TS2339: Property 'propose' does not exist on type 'ISignalTreeOf<{ name: string; priority: number; }, "location", TreeNodeOf<{ name: string; priority: number; }, "location">> & TransactionMethods & RestorationMethods'.
+packages/kernel/src/enhancers/transactions/proposal-facade-0.spec.ts(281,39): error TS2339: Property 'propose' does not exist on type 'ISignalTreeOf<{ name: string; priority: number; }, "location", TreeNodeOf<{ name: string; priority: number; }, "location">> & TransactionMethods & RestorationMethods'.
+packages/kernel/src/enhancers/transactions/recovery-handle-0.spec.ts(309,11): error TS2339: Property 'destroy' does not exist on type 'Store'.
+
+
+──────────────────────────────────────────────────────────────────────────────
+2/3 passed, 1 failed, 0 known-red.

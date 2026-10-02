@@ -1,0 +1,37 @@
+
+> nx run kernel:test --testFile=packages/kernel/src/enhancers/restoration/cross-collection-lifetime.spec.ts --testFile=packages/kernel/src/enhancers/restoration/literal-dotted-collection.spec.ts
+
+> node tools/run-core-vitest.mjs --testFile=packages/kernel/src/enhancers/restoration/cross-collection-lifetime.spec.ts --testFile=packages/kernel/src/enhancers/restoration/literal-dotted-collection.spec.ts
+
+(node:9585) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:9587) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/signaltree-v16-integration/packages/kernel
+
+(node:9595) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:9594) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  2 passed (2)
+      Tests  48 passed (48)
+   Start at  20:28:07
+   Duration  512ms (transform 434ms, setup 0ms, import 526ms, tests 58ms, environment 289ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      845ms
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     837ms (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    837ms

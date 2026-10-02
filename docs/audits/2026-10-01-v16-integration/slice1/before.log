@@ -1,0 +1,298 @@
+(node:98318) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 exit listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> nx run kernel:test --testFile=packages/kernel/src/enhancers/restoration/cross-collection-lifetime.spec.ts --testFile=packages/kernel/src/enhancers/restoration/literal-dotted-collection.spec.ts --testFile=packages/kernel/src/enhancers/restoration/entity-field-presence.spec.ts
+
+> node tools/run-core-vitest.mjs --testFile=packages/kernel/src/enhancers/restoration/cross-collection-lifetime.spec.ts --testFile=packages/kernel/src/enhancers/restoration/literal-dotted-collection.spec.ts --testFile=packages/kernel/src/enhancers/restoration/entity-field-presence.spec.ts
+
+(node:98805) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:98807) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/signaltree-v16-integration/packages/kernel
+
+(node:98819) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:98817) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:98818) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/enhancers/restoration/entity-field-presence.spec.ts (11 tests | 11 failed) 25ms
+     × undo of a write that added an optional field removes the key 16ms
+     × rollback of a write that added an optional field removes the key 2ms
+     × a replace that omitted a field undoes to present and redoes to absent 1ms
+     × a nested optional field returns absent, leaving its siblings 1ms
+     × present-with-undefined stays present, and its reversal restores the old value 1ms
+     × undo of a write that added an optional field removes the key 1ms
+     × rollback of a write that added an optional field removes the key 1ms
+     × a replace that omitted a field undoes to present and redoes to absent 1ms
+     × a nested optional field returns absent, leaving its siblings 1ms
+     × present-with-undefined stays present, and its reversal restores the old value 0ms
+   × transaction-only rollback also removes an added optional field 0ms
+ ❯ src/enhancers/restoration/cross-collection-lifetime.spec.ts (8 tests | 6 failed) 30ms
+     × undo and redo: both collections cleared 11ms
+     × transaction rollback: both collections cleared 4ms
+     × undo and redo: both collections added to 6ms
+     × transaction rollback: both collections added to 1ms
+     × undo and redo: a removal in one and a field write in the other 3ms
+     × transaction rollback: a removal in one and a field write in the other 1ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 17 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/enhancers/restoration/cross-collection-lifetime.spec.ts > identical lifetimes in two collections > undo and redo: both collections cleared
+ FAIL  src/enhancers/restoration/cross-collection-lifetime.spec.ts > identical lifetimes in two collections > undo and redo: both collections added to
+Error: Unsupported scoped undo effect at structural-drift
+ ❯ RestorationManager.applyTurnEffectsThroughRealizationPort [as applyEffectsFn] src/enhancers/restoration/restoration.ts:2673:15
+    2671|           );
+    2672|         }
+    2673|         throw new Error(`Unsupported scoped undo effect at ${refusal.k…
+       |               ^
+    2674|       }
+    2675|
+ ❯ RestorationManager.applyTurnEffects src/enhancers/restoration/restoration.ts:1920:10
+ ❯ RestorationManager.undoPosition src/enhancers/restoration/restoration.ts:1319:10
+ ❯ RestorationManager.undoConfirmed src/enhancers/restoration/restoration.ts:1504:12
+ ❯ Object.enhancedTree.undo src/enhancers/restoration/restoration.ts:4154:26
+ ❯ src/enhancers/restoration/cross-collection-lifetime.spec.ts:82:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/17]⎯
+
+ FAIL  src/enhancers/restoration/cross-collection-lifetime.spec.ts > identical lifetimes in two collections > transaction rollback: both collections cleared
+ FAIL  src/enhancers/restoration/cross-collection-lifetime.spec.ts > identical lifetimes in two collections > transaction rollback: both collections added to
+SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Transaction rollback refused: structural-drift [effect-validation-failed]
+ ❯ createRollbackError src/enhancers/transactions/transactions.ts:279:3
+    277|   cause: RollbackFailureCause
+    278| ): SignalTreeRollbackError =>
+    279|   new SignalTreeRollbackError(explainRollbackFailure(cause), { cause }…
+       |   ^
+    280|
+    281| function cloneTurnEffect(effect: TurnEffect): TurnEffect {
+ ❯ applyRollbackCompensation src/enhancers/transactions/transactions.ts:2192:13
+ ❯ rollbackPendingEffectsThroughRealizationPort src/enhancers/transactions/transactions.ts:2225:5
+ ❯ apply src/enhancers/transactions/transactions.ts:2948:15
+ ❯ Object.runInvalidationGroup src/lib/internals/location-runtime.ts:371:7
+ ❯ Object.rollback src/enhancers/transactions/transactions.ts:2960:40
+ ❯ Object.rollback src/enhancers/transactions/transactions.ts:2713:19
+ ❯ src/enhancers/restoration/cross-collection-lifetime.spec.ts:97:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/17]⎯
+
+ FAIL  src/enhancers/restoration/cross-collection-lifetime.spec.ts > identical lifetimes in two collections > undo and redo: a removal in one and a field write in the other
+AssertionError: expected { left: [ { id: 'a', n: 1 } ], …(1) } to deeply equal { left: [ { id: 'a', n: 1 } ], …(1) }
+
+- Expected
++ Received
+
+@@ -6,9 +6,9 @@
+      },
+    ],
+    "right": [
+      {
+        "id": "b",
+-       "n": 2,
++       "n": 8,
+      },
+    ],
+  }
+
+ ❯ src/enhancers/restoration/cross-collection-lifetime.spec.ts:83:28
+     81|         expect(rows(tree)).toEqual(after);
+     82|         tree.undo();
+     83|         expect(rows(tree)).toEqual(seeded);
+       |                            ^
+     84|         tree.redo();
+     85|         expect(rows(tree)).toEqual(after);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/17]⎯
+
+ FAIL  src/enhancers/restoration/cross-collection-lifetime.spec.ts > identical lifetimes in two collections > transaction rollback: a removal in one and a field write in the other
+AssertionError: expected { left: [ { id: 'a', n: 2 } ], …(1) } to deeply equal { left: [ { id: 'a', n: 1 } ], …(1) }
+
+- Expected
++ Received
+
+  {
+    "left": [
+      {
+        "id": "a",
+-       "n": 1,
++       "n": 2,
+      },
+    ],
+    "right": [
+      {
+        "id": "b",
+-       "n": 2,
++       "n": 8,
+      },
+    ],
+  }
+
+ ❯ src/enhancers/restoration/cross-collection-lifetime.spec.ts:98:28
+     96|         expect(rows(tree)).toEqual(after);
+     97|         pending.rollback();
+     98|         expect(rows(tree)).toEqual(seeded);
+       |                            ^
+     99|       } finally {
+    100|         tree.destroy();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/17]⎯
+
+ FAIL  src/enhancers/restoration/entity-field-presence.spec.ts > entity field presence across reversal (transactions, restoration) > undo of a write that added an optional field removes the key
+ FAIL  src/enhancers/restoration/entity-field-presence.spec.ts > entity field presence across reversal (restoration, transactions) > undo of a write that added an optional field removes the key
+AssertionError: expected [ 'id', 'n', 'opt' ] to deeply equal [ 'id', 'n' ]
+
+- Expected
++ Received
+
+  [
+    "id",
+    "n",
++   "opt",
+  ]
+
+ ❯ src/enhancers/restoration/entity-field-presence.spec.ts:41:35
+     39|         await flush();
+     40|         tree.undo();
+     41|         expect(keysOf(row(tree))).toEqual(['id', 'n']);
+       |                                   ^
+     42|         expect(hasOwn(row(tree), 'opt')).toBe(false);
+     43|         tree.redo();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/17]⎯
+
+ FAIL  src/enhancers/restoration/entity-field-presence.spec.ts > entity field presence across reversal (transactions, restoration) > rollback of a write that added an optional field removes the key
+ FAIL  src/enhancers/restoration/entity-field-presence.spec.ts > entity field presence across reversal (restoration, transactions) > rollback of a write that added an optional field removes the key
+AssertionError: expected [ 'id', 'n', 'opt' ] to deeply equal [ 'id', 'n' ]
+
+- Expected
++ Received
+
+  [
+    "id",
+    "n",
++   "opt",
+  ]
+
+ ❯ src/enhancers/restoration/entity-field-presence.spec.ts:58:35
+     56|           .transact(() => tree.$.rows.updateOne('a', { opt: 'tx' }))
+     57|           .rollback();
+     58|         expect(keysOf(row(tree))).toEqual(['id', 'n']);
+       |                                   ^
+     59|       } finally {
+     60|         tree.destroy();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/17]⎯
+
+ FAIL  src/enhancers/restoration/entity-field-presence.spec.ts > entity field presence across reversal (transactions, restoration) > a replace that omitted a field undoes to present and redoes to absent
+ FAIL  src/enhancers/restoration/entity-field-presence.spec.ts > entity field presence across reversal (restoration, transactions) > a replace that omitted a field undoes to present and redoes to absent
+AssertionError: expected [ 'id', 'n', 'opt' ] to deeply equal [ 'id', 'n' ]
+
+- Expected
++ Received
+
+  [
+    "id",
+    "n",
++   "opt",
+  ]
+
+ ❯ src/enhancers/restoration/entity-field-presence.spec.ts:75:35
+     73|         expect(row(tree)).toEqual({ id: 'a', n: 1, opt: 'o' });
+     74|         tree.redo();
+     75|         expect(keysOf(row(tree))).toEqual(['id', 'n']);
+       |                                   ^
+     76|       } finally {
+     77|         tree.destroy();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/17]⎯
+
+ FAIL  src/enhancers/restoration/entity-field-presence.spec.ts > entity field presence across reversal (transactions, restoration) > a nested optional field returns absent, leaving its siblings
+ FAIL  src/enhancers/restoration/entity-field-presence.spec.ts > entity field presence across reversal (restoration, transactions) > a nested optional field returns absent, leaving its siblings
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/enhancers/restoration/entity-field-presence.spec.ts:90:43
+     88|         tree.undo();
+     89|         expect(row(tree).d).toEqual({});
+     90|         expect(hasOwn(row(tree).d!, 'm')).toBe(false);
+       |                                           ^
+     91|       } finally {
+     92|         tree.destroy();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/17]⎯
+
+ FAIL  src/enhancers/restoration/entity-field-presence.spec.ts > entity field presence across reversal (transactions, restoration) > present-with-undefined stays present, and its reversal restores the old value
+ FAIL  src/enhancers/restoration/entity-field-presence.spec.ts > entity field presence across reversal (restoration, transactions) > present-with-undefined stays present, and its reversal restores the old value
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/enhancers/restoration/entity-field-presence.spec.ts:105:42
+    103|         expect(hasOwn(row(tree), 'opt')).toBe(true);
+    104|         tree.undo();
+    105|         expect(hasOwn(row(tree), 'opt')).toBe(false);
+       |                                          ^
+    106|         tree.redo();
+    107|         expect(hasOwn(row(tree), 'opt')).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/17]⎯
+
+ FAIL  src/enhancers/restoration/entity-field-presence.spec.ts > transaction-only rollback also removes an added optional field
+AssertionError: expected [ 'id', 'n', 'opt' ] to deeply equal [ 'id', 'n' ]
+
+- Expected
++ Received
+
+  [
+    "id",
+    "n",
++   "opt",
+  ]
+
+ ❯ src/enhancers/restoration/entity-field-presence.spec.ts:134:51
+    132|       .transact(() => tree.$.rows.updateOne('a', { opt: 'tx' }))
+    133|       .rollback();
+    134|     expect(keysOf(tree.$.rows.byIdOrFail('a')())).toEqual(['id', 'n']);
+       |                                                   ^
+    135|   } finally {
+    136|     tree.destroy();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/17]⎯
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  17 failed | 42 passed (59)
+   Start at  20:22:32
+   Duration  613ms (transform 742ms, setup 0ms, import 911ms, tests 93ms, environment 574ms)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=packages/kernel/src/enhancers/restoration/cross-collection-lifetime.spec.ts --testFile=packages/kernel/src/enhancers/restoration/literal-dotted-collection.spec.ts --testFile=packages/kernel/src/enhancers/restoration/entity-field-presence.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s
