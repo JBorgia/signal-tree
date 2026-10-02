@@ -1,4 +1,9 @@
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
+import {
+  applyInInvalidationGroup,
+  applicationFailureCause,
+  wasAppliedBeforeFailure,
+} from '../../lib/internals/causal-runtime/post-application-failure';
 import type {
   ConstructionOf,
   SnapshotValue,
@@ -543,6 +548,33 @@ class RestorationManager<TSource, T> {
       boundaryTurnId,
     });
     return ordinal;
+  }
+
+  /** A delivery failure belongs to the operation whose reversal applied. */
+  private deliveryFailure: { error: unknown } | undefined;
+
+  private runOperation(run: () => boolean): boolean {
+    const previousFailure = this.deliveryFailure;
+    this.deliveryFailure = undefined;
+    try {
+      const result = run();
+      // Application completed; frontiers/indexes now describe the installed state.
+      const failure = this.deliveryFailure as { error: unknown } | undefined;
+      if (failure) throw applicationFailureCause(failure.error);
+      return result;
+    } finally {
+      this.deliveryFailure = previousFailure;
+    }
+  }
+
+  private applyReversal(apply: () => void): void {
+    try {
+      apply();
+    } catch (error) {
+      if (!wasAppliedBeforeFailure(error)) throw error;
+      // Finish operation bookkeeping before surfacing a post-application error.
+      this.deliveryFailure ??= { error };
+    }
   }
 
   private maxHistorySize: number;
@@ -1395,6 +1427,10 @@ class RestorationManager<TSource, T> {
   }
 
   undoAt(positionId: number): boolean {
+    return this.runOperation(() => this.runUndoAt(positionId));
+  }
+
+  private runUndoAt(positionId: number): boolean {
     if (!this.canUndoAt(positionId)) {
       return false;
     }
@@ -1420,6 +1456,10 @@ class RestorationManager<TSource, T> {
   }
 
   redoAt(positionId: number): boolean {
+    return this.runOperation(() => this.runRedoAt(positionId));
+  }
+
+  private runRedoAt(positionId: number): boolean {
     if (!this.canRedoAt(positionId)) {
       return false;
     }
@@ -1501,6 +1541,10 @@ class RestorationManager<TSource, T> {
   }
 
   undoConfirmed(): boolean {
+    return this.runOperation(() => this.runUndoConfirmed());
+  }
+
+  private runUndoConfirmed(): boolean {
     if (!this.canUndoConfirmed()) {
       return false;
     }
@@ -1550,6 +1594,10 @@ class RestorationManager<TSource, T> {
   }
 
   redoConfirmed(): boolean {
+    return this.runOperation(() => this.runRedoConfirmed());
+  }
+
+  private runRedoConfirmed(): boolean {
     if (!this.canRedoConfirmed()) {
       return false;
     }
@@ -1772,6 +1820,10 @@ class RestorationManager<TSource, T> {
   }
 
   jumpTo(index: number): boolean {
+    return this.runOperation(() => this.runJumpTo(index));
+  }
+
+  private runJumpTo(index: number): boolean {
     if (index < 0 || index >= this.history.length) {
       return false;
     }
@@ -1927,7 +1979,10 @@ class RestorationManager<TSource, T> {
       }
     }
 
-    this.applyEffectsFn([{ effects, direction, orderDeltas }]);
+    const applyEffects = this.applyEffectsFn;
+    this.applyReversal(() =>
+      applyEffects([{ effects, direction, orderDeltas }])
+    );
   }
 
   private applyDirectedTurnTransition(
@@ -1966,7 +2021,8 @@ class RestorationManager<TSource, T> {
       applications.push({ effects, orderDeltas, direction });
     }
     if (applications.length > 0) {
-      this.applyEffectsFn(applications);
+      const applyEffects = this.applyEffectsFn;
+      this.applyReversal(() => applyEffects(applications));
     }
   }
 
@@ -2567,12 +2623,7 @@ export function restoration(
               },
               () => prepared.install()
             );
-          const locations = getLocationRuntime(tree.$);
-          if (locations) {
-            locations.runInvalidationGroup(apply);
-          } else {
-            apply();
-          }
+          applyInInvalidationGroup(tree.$, apply);
         } finally {
           isRestoring = false;
         }
@@ -2692,6 +2743,7 @@ export function restoration(
       const replayOwnerId = getPositionRegistry(
         (tree as { $?: object }).$ ?? tree
       )?.id;
+      let deliveryFailure: { error: unknown } | undefined;
       try {
         // State the origin so the port propagates it. `isRestoring` is a
         // synchronous flag and is already false by the time the notifier
@@ -2713,6 +2765,9 @@ export function restoration(
             realizationPort.applyAtomically(reversalEffects);
           }
         );
+      } catch (error) {
+        if (!wasAppliedBeforeFailure(error)) throw error;
+        deliveryFailure = { error };
       } finally {
         isRestoring = false;
       }
@@ -2755,6 +2810,7 @@ export function restoration(
           }
         }
       }
+      if (deliveryFailure) throw deliveryFailure.error;
     };
 
     const positionRegistry = getPositionRegistry(tree.$);
