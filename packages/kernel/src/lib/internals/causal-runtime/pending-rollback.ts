@@ -153,7 +153,12 @@ function createPendingRollbackEffects(
     .map((effect) =>
       createPendingRollbackEffect(effect, turn.id, realizationContext)
     )
-    .filter((effect) => effect.before !== effect.after);
+    .filter(
+      (effect) =>
+        effect.before !== effect.after ||
+        (effect.fieldPresence !== undefined &&
+          effect.fieldPresence.before !== effect.fieldPresence.after)
+    );
 }
 
 function rollbackAddressKey(effect: CausalTurn['effects'][number]): string {
@@ -183,6 +188,12 @@ function createPendingRollbackEffect(
       after: deriveStructuralRollbackAfter(effect),
       subjectId: effect.subjectId,
       subjectFieldSegments: effect.subjectFieldSegments,
+      fieldPresence: effect.fieldPresence
+        ? {
+            before: effect.fieldPresence.after,
+            after: effect.fieldPresence.before,
+          }
+        : undefined,
       structural,
       structuralContext: effect.structuralContext,
     };
@@ -195,6 +206,12 @@ function createPendingRollbackEffect(
       after: effect.before,
       subjectId: effect.subjectId,
       subjectFieldSegments: effect.subjectFieldSegments,
+      fieldPresence: effect.fieldPresence
+        ? {
+            before: effect.fieldPresence.after,
+            after: effect.fieldPresence.before,
+          }
+        : undefined,
       path: effect.path,
       ownerPath: effect.ownerPath,
       structural,
@@ -208,6 +225,12 @@ function createPendingRollbackEffect(
     after: realizationContext.getValueWithoutPendingTurn(turnId, effect.owner),
     subjectId: effect.subjectId,
     subjectFieldSegments: effect.subjectFieldSegments,
+    fieldPresence: effect.fieldPresence
+      ? {
+          before: effect.fieldPresence.after,
+          after: effect.fieldPresence.before,
+        }
+      : undefined,
     structural,
     structuralContext: effect.structuralContext,
   };

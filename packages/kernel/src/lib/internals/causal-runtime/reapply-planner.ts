@@ -48,6 +48,7 @@ function createReapplyEffects(
       after: effect.after,
       subjectId: effect.subjectId,
       subjectFieldSegments: effect.subjectFieldSegments,
+      fieldPresence: effect.fieldPresence,
       path: (effect as CausalEffect & { path?: string }).path,
       ownerPath: (effect as CausalEffect & { ownerPath?: string }).ownerPath,
       structural: effect.structural,
@@ -65,6 +66,7 @@ function createReapplyEffects(
         after: effect.after,
         subjectId: effect.subjectId,
         subjectFieldSegments: effect.subjectFieldSegments,
+        fieldPresence: effect.fieldPresence,
         structural: effect.structural,
         structuralContext: effect.structuralContext,
       };
@@ -82,6 +84,7 @@ function createReapplyEffects(
       after: effect.after,
       subjectId: effect.subjectId,
       subjectFieldSegments: effect.subjectFieldSegments,
+      fieldPresence: effect.fieldPresence,
       path: (effect as CausalEffect & { path?: string }).path,
       ownerPath: (effect as CausalEffect & { ownerPath?: string }).ownerPath,
       structural: undefined,
