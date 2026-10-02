@@ -1,32 +1,53 @@
-# Current release work
+# Current release work — v15 outcome provenance patch
 
-Updated October 1, 2026. This is the active controller for the public
-`fix/v15-link-settlement-diagnostics` worktree, currently **15.4.0 unreleased**.
-It does not describe every branch. Publication authority is recorded below.
+Updated October 1, 2026. Active branch `fix/v15-outcome-provenance`, based on
+published v15.4.0 `4ceb24a2a62dc893bf28c50ad971a955190539a7`.
+The historical controller below is retained as evidence, not current instructions.
 
-## Owner priority and release authority
+## Authority and scope
 
-The owner authorized publishing v15 when ready, then continuing in this order:
+The owner authorized completing and publishing verified v15 work before v16
+integration, with no repeated permission for routine fixes or verification.
+V15.4.0 is published: all five registry archives matched the qualified candidate;
+local, Linux, tag and publisher gates/proofs passed 88/88, with strict consumers,
+Angular AOT and registry regressions. Receipt: `024ce69c` on the prior worktree;
+raw evidence: `/private/tmp/st-release-15-4-qualified/`.
 
-1. Finish and verify the v15 release, then publish its exact verified artifacts.
-2. Reconcile fixes and their tests together on a dedicated v16 integration branch.
-3. Preserve v16 inspection, recovery and current-truth observation contracts.
-4. Run the complete semantic matrix against that integrated baseline.
-5. Evaluate remaining ownership-model changes against the stronger incumbent.
-6. Measure v16 performance and size independently; v15 measurements and the
-   approved v15 development ceiling do not transfer.
+A controlled reproduction on the actual 15.4.0 npm archive found that reusing an
+observer error during a later validation failure can advance restoration history
+without applying the operation. Internal validation fault injection is part of
+that reproduction; no common application trigger is claimed. Evidence and
+archive integrity: `/private/tmp/st-v15-published-outcome-probe/result.json`.
 
-V14 remains paused until v15 is complete. Public release authority now includes
-pushing the release branch, signing/tagging and dispatching the canonical npm
-publisher after verification. It does not waive failed gates or authorize a
-private Studio compatibility change. The latter decision remains pending.
+The patch replaces persistent error branding with an invocation-local receipt,
+unwrapped at public exits to preserve original thrown values. No new public API,
+refusal policy, ownership model, retention policy or budget is introduced. V16
+recovery behavior must not leak into stable v15. Independent review is required.
 
-The prepared version is already **15.4.0**. Do not invoke a next-version command
-that would increment it again. Finalize this version's release metadata, commit
-it, verify the exact candidate locally and on Linux, prepare its immutable
-archives with `scripts/publish-candidate.mjs --prebuilt --prepare-only`, then use
-the signed tag and canonical tagged CI publisher. Preserve the unrelated v14
-audit edit; use a clean isolated checkout for release verification.
+## Execution
+
+1. Preserve red tests against published source; focused repair and mutation proof.
+2. Full kernel/static/build checks; test the repaired built archive against the
+   same controlled reproduction and preserve published/control differences.
+3. Prepare **15.4.1** metadata after the runtime checkpoint. The old instruction
+   not to increment 15.4.0 is superseded: that version has already published.
+4. Freeze an exact candidate; full local release gates and mutation proofs.
+5. Destroy generated output, rebuild, inspect all five versions, verify strict
+   packed consumers, Angular AOT, demo/browser, and clean checkout.
+6. Exact-SHA Linux validation, signed tag and canonical tagged publisher; verify
+   registry bytes and installed regression. No package-local publication.
+7. Record release evidence outside the frozen candidate, then resume the v16
+   selective integration at `65cf7b38`. V14 remains paused. Private Studio's
+   minimum-version decision remains separate and pending.
+
+Do not rerun failures until green without a diagnosis. Preserve first exits and
+actual counts. All mutation work precedes final artifact rebuild. Existing
+15.4.0 performance evidence is historical; no new speedup claim is made here.
+
+## Historical 15.4.0 preparation record
+
+The following entries describe the completed previous release. Their pending
+wording and next steps do not reopen it or override the patch sequence above.
 
 ## Scope and checkpoints
 
