@@ -2,6 +2,7 @@ import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-ty
 import type { ToolingTree } from '../../lib/internals/tooling-tree';
 import {
   applyInInvalidationGroup,
+  applicationFailureCause,
   wasAppliedBeforeFailure,
 } from '../../lib/internals/causal-runtime/post-application-failure';
 import { holdEntityMembershipDelivery } from '../../lib/internals/entity-membership-view';
@@ -3014,7 +3015,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           if (discardedTurn) {
             notifyListeners(pendingDiscardedListeners, discardedTurn);
           }
-          if (deliveryFailure) throw deliveryFailure.error;
+          if (deliveryFailure) throw applicationFailureCause(deliveryFailure.error);
         },
       };
     },

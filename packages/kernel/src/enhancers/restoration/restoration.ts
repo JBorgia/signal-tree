@@ -1,6 +1,7 @@
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
 import {
   applyInInvalidationGroup,
+  applicationFailureCause,
   wasAppliedBeforeFailure,
 } from '../../lib/internals/causal-runtime/post-application-failure';
 import { holdEntityMembershipDelivery } from '../../lib/internals/entity-membership-view';
@@ -672,7 +673,7 @@ class RestorationManager<T> {
       // the reversal applied is surfaced now, with the outcome it really had.
       // Read through a widened type: run() may have set it.
       const failure = this.deliveryFailure as { error: unknown } | undefined;
-      if (failure) throw failure.error;
+      if (failure) throw applicationFailureCause(failure.error);
       return result;
     } catch (error) {
       if (outcome !== 'failed') throw error;
