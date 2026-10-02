@@ -3986,6 +3986,11 @@ export function restoration(
                       next
                     );
                   }
+                  // A discarded pending turn never entered completed history.
+                  // Keep its inverse out of the ordinary capture bucket: a
+                  // same-tick authored write must start at the restored value,
+                  // not cancel against or inherit the speculative baseline.
+                  return;
                 } else if (next === undefined) {
                   externalTruthByPath.delete(path);
                 } else {
