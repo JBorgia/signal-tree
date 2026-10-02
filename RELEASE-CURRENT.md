@@ -59,3 +59,10 @@ do not add scope. Keep all exact-SHA evidence distinct from working-tree checks.
   batching or changing v16 recovery. Kernel 2973 passed, destination controls
   75/75, static gates and kernel build pass. Remaining slice 3 work: explicit
   semantic-scope closure and plain-branch membership, each tested independently.
+
+- Slice 3b committed as `76dcaa04`: deferred classifications and cross-location
+  order survive coalescing. Final source-revert proof 20 red / 21 controls,
+  repaired 41/41. Destination controls 150/150; full kernel/static/build pass.
+  V16 keeps refusal of transaction-inside-outer-coalesce and existing visibility.
+  Direct scalar designation loss and external→new-undoable baseline uncertainty
+  remain open, with original counterexamples preserved in the evidence record.

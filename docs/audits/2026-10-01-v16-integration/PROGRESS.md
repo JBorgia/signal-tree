@@ -116,3 +116,42 @@ kernel build exit 0. Raw evidence:
 
 This closes the preserved same-tick rollback→undoable fixture. It does not close
 the remaining deferral/scope or plain-branch membership integration.
+
+## Slice 3b: deferred write classification and chronological segments
+
+Committed as `76dcaa04`. V16 already captures enqueue-time metadata and undo
+designation and deliberately refuses a transaction opened inside outer coalesce.
+No donor scope-drain helper, early scope-exit visibility, or transaction-entry
+drain was imported. The repair instead deduplicates replacements within
+uninterrupted compatible context/designation segments, preserving their order
+across locations. Updaters drain preceding segments and the same-location
+predecessor; accepted work still drains before the original error is rethrown.
+
+Initial tests overreached: their expected external→new-undoable baseline of 5
+also failed without coalesce. That result does not establish that 0 is correct.
+The final suite checks direct/coalesced equivalence and actual nonempty enqueue
+evidence for that case, without declaring either baseline authoritative. A
+second direct control found ordinary scalar designation loss even without
+coalesce; dynamic entity controls pass. Original counterexamples are preserved
+under `preserved/first-with-direct-control.spec.ts.txt` and
+`preserved/pre-interpretation.spec.ts.txt`, with original logs under
+`/private/tmp/st-v16-integration-evidence/scope-deferral/`. These two issues remain
+open for notifier/capture investigation and the full semantic matrix.
+
+The first per-location queue prototype reordered different contexts across
+locations; two chronology tests rejected it. The final segmented queue passes
+independent source review. Review added updater-drain reentry and throwing
+updater controls, including `throw undefined`. The exact final 41-case fixture
+against original runtime gives 20 failures / 21 passes (exit 1), then repaired
+runtime 41 passes (exit 0); file restoration hashes match.
+
+Existing destination controls: 150/150. Full kernel before the final three
+review cases: 3011 ordinary passes plus six expected failures, thirteen skips
+(Vitest JSON reports 3017 passed). Types, spec types, kernel lint and all five
+package builds pass. The final comments/three review cases were followed by
+fixture and spec-type rechecks. No v16 size/performance qualification is claimed.
+
+Next: plain-membership production evidence and chronological delivery, then
+its capture/reversal/Link integration. Investigate the preserved static
+designation loss when touching notifier attribution; do not silently bless the
+external-baseline counterexample from an incumbent measurement alone.
