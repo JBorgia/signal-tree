@@ -66,3 +66,19 @@ do not add scope. Keep all exact-SHA evidence distinct from working-tree checks.
   V16 keeps refusal of transaction-inside-outer-coalesce and existing visibility.
   Direct scalar designation loss and external→new-undoable baseline uncertainty
   remain open, with original counterexamples preserved in the evidence record.
+
+## Shared v15 blocker discovered during integration
+
+Independent contract review identified the first external→new-undoable baseline
+as a genuine defect, not a permitted baseline choice: realization is excluded
+from authored history. A public-only installed-artifact probe reproduces undo 0
+instead of 5 on npm 15.4.0 and the exact 15.4.1 candidate under four enhancer
+configurations. Main release run `36960642038` was cancelled before npm
+publication; signed tag 15.4.1 is preserved as superseded. V15.4.2 repair takes
+priority, with tests carried here afterward. Euclid's membership integration
+remains isolated; it must not independently invent a conflicting baseline fix.
+
+The static scalar designation loss is separately explained by notifier metadata
+coalescing and contradicts existing HIST-C2 whole-turn eligibility. Keep it in
+notifier attribution controls; do not treat the plain/dynamic discrepancy as an
+accepted product distinction.
