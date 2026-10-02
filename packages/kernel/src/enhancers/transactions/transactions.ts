@@ -1,3 +1,4 @@
+import { applicationFailureCause } from '../../lib/internals/causal-runtime/post-application-failure';
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
 import {
   getOrCreateSubjectRestorationClaims,
@@ -3044,7 +3045,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
                 );
               }
             }
-            if (observerFailed) throw observerError;
+            if (observerFailed) throw applicationFailureCause(observerError);
           } finally {
             settling = false;
           }

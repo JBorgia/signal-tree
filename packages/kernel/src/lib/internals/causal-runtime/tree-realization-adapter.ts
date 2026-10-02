@@ -20,6 +20,7 @@ import { markOwnerInvalidatedFrom } from '../owner-invalidation-port';
 import { getLocationRuntime } from '../location-runtime';
 
 import type { ReversalEffect, ReversalRefusal } from './causal-types';
+import { applyInInvalidationGroup } from './post-application-failure';
 import { normalizeScopedValuePath } from './scoped-value-addressing';
 
 type StructuralDriftRefusal = Extract<
@@ -499,12 +500,7 @@ export function createTreeRealizationAdapter(
         }
       };
 
-      const locations = getLocationRuntime(options.tree.$);
-      if (locations) {
-        locations.runInvalidationGroup(apply);
-      } else {
-        apply();
-      }
+      applyInInvalidationGroup(options.tree.$, apply);
     },
   };
 }
