@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
- * PROPOSED gross-retention contract, awaiting independent validation/promotion.
+ * Gross-retention contract independently validated on the Linux release runner.
  * 40 MiB was selected from prior Linux characterization: healthy max 16.235 MiB,
  * intentionally held 10k-handle min 96.423 MiB. These are threshold-selection
- * observations, not independent validation or a claim about a 20 B slope.
+ * observations. Independent validation is recorded in
+ * docs/audits/2026-10-01-retired-node-release-check/README.md; no 20 B slope claim.
  *
  * node tools/check-retired-lifetime-gross-retention.mjs [--arm ARM]
  * node tools/check-retired-lifetime-gross-retention.mjs --self-test
@@ -26,7 +27,7 @@
  * or mutated; built-kernel and tool hashes must match before/after the batch.
  * Exit 0: requested check passes; 1: valid numeric expectation fails;
  * 2: malformed diagnostics, execution or provenance failure. This standalone
- * proposed ceiling does not waive any existing checker or establish promotion.
+ * ceiling complements direct cleanup checks; it cannot detect all small leaks.
  */
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
@@ -62,7 +63,7 @@ const GC_PROTOCOL = {
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const emit = (value) => console.log(JSON.stringify(value));
 
-// Stable anchor for a future registry blinding mutation. Validate bytes first.
+// Stable anchor for the registry blinding mutation. Validate bytes first.
 export function judge(growthMiB) {
   return growthMiB <= MAX_GROWTH_MIB;
 }
@@ -544,7 +545,7 @@ async function main() {
     results = [];
   emit({
     type: 'registered-plan',
-    status: 'proposed-awaiting-independent-validation',
+    status: 'independently-validated-linux-release-contract',
     thresholdSelection: {
       healthyMaximumMiB: 16.235,
       heldMinimumMiB: 96.423,
@@ -671,7 +672,7 @@ async function main() {
       identityError,
       pairError,
       independentValidation:
-        'required before promotion; no asymptotic or 20 B sensitivity claim',
+        'validated by Linux run 36948765496; no asymptotic or 20 B sensitivity claim',
     });
   }
 }

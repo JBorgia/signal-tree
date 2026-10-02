@@ -1,5 +1,13 @@
 # 15.0 performance baseline
 
+> **October 1, 2026 measurement correction:** the historical two-endpoint
+> retired-subject slope estimator below is superseded. Independent fresh-process
+> results do not support its asymptotic claim. Current release checks combine
+> direct lifetime/revision/tracking-entry cleanup mutations with a separately
+> validated gross-retention ceiling. They do not prove absence of small leaks or
+> constant asymptotic memory. See [the complete measurement record](../audits/2026-10-01-retired-node-release-check/README.md).
+
+
 > **Start at [`ENTITY-REALIZATION-RECORD.md`](ENTITY-REALIZATION-RECORD.md).**
 > It carries the decision, what is established, and — importantly — every
 > retracted number in one place. This document is retained as detail and
@@ -1659,6 +1667,9 @@ pre-registered criterion in
 [entity-churn-retention.md](./entity-churn-retention.md) is MET.
 
 **Do not treat 6 B as the budget.** The claim is the asymptote, and
+**October 1, 2026 correction:** this historical gate no longer supports the
+asymptotic conclusion below; see the dated measurement correction above.
+
 `tools/check-retired-subject-slope.mjs` gates it by measuring at two subject
 counts — 117 B/retired would pass any byte budget stable enough to keep, and
 117 B/retired is unbounded growth.

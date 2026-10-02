@@ -2295,7 +2295,7 @@ export function createEntitySignal<
       subjectEpochs.delete(subjectId);
       // The lifetime is forgotten and its id is never reused, so nothing can
       // bump this subject again; keeping the entry was ~100 B per retired
-      // subject once its node had been read (retired-subject-slope:node-reads).
+      // subject once its node had been read (now guarded directly by retired-lifetime-cleanup).
       // A node still held by a caller keeps its own carrier in its closure.
       subjectStateSignals.delete(subjectId);
       staged += 1;

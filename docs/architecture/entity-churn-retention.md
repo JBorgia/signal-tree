@@ -1,5 +1,13 @@
 # Entity churn retention — pre-registered interpretation
 
+> **October 1, 2026 measurement correction:** the historical two-endpoint
+> retired-subject slope estimator below is superseded. Independent fresh-process
+> results do not support its asymptotic claim. Current release checks combine
+> direct lifetime/revision/tracking-entry cleanup mutations with a separately
+> validated gross-retention ceiling. They do not prove absence of small leaks or
+> constant asymptotic memory. See [the complete measurement record](../audits/2026-10-01-retired-node-release-check/README.md).
+
+
 **Status:** RESOLVED for the zero-owner case in 15.0. All four criteria below
 are met, criterion 1 included — see "Criterion 1, re-checked" at the bottom. The
 owned case (a tree with `timeTravel`) is untouched and still open.
@@ -168,7 +176,7 @@ what "stops growing per retired subject" asks for.
 
 | # | criterion                                              | verdict | evidence                                                     |
 | - | ------------------------------------------------------ | ------- | ------------------------------------------------------------ |
-| 1 | no-history arm stops growing per retired subject        | **MET** | gated by `tools/check-retired-subject-slope.mjs`              |
+| 1 | no-history arm stops growing per retired subject        | **NOT ESTABLISHED by the old estimator** | historical `tools/check-retired-subject-slope.mjs`; see dated correction              |
 | 2 | `timeTravel()` still restores a removed row after churn | met     | both time-travel arms unchanged; durability gate 4/4          |
 | 3 | live-collection retention does not regress              | met     | `bench-entity-layers.mjs` L4 487 B/entity, unmoved            |
 | 4 | reclamation is not opt-in                               | met     | runs at the retirement boundary; no public `compact()`        |

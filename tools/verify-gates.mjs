@@ -846,7 +846,7 @@ const GATES = [
     // is a fixture of the exact table it accepted.
     cmd: ['node', 'tools/probe-bounded-history-retention.mjs', '--self-test'],
     // Blind the VERDICT rather than one fixture — same reason recorded on
-    // `retired-subject-slope:self`.
+    // the gross-retention companion self-test below.
     mutation: {
       file: 'tools/probe-bounded-history-retention.mjs',
       find: '  return ratio < 2;',
@@ -854,50 +854,64 @@ const GATES = [
     },
   },
   {
-    name: 'retired-subject-slope',
+    name: 'retired-lifetime-gross-retention',
     covers:
-      'retention does not grow with the number of subjects that have retired — the asymptotic claim a byte budget cannot express',
-    // 117 B/retired passes any budget stable enough to keep, and 117 B/retired
-    // is unbounded growth. So this measures the same workload at 50 and 150
-    // rounds and fails if the total scales with the retirements rather than
-    // sitting flat. It regressed once already, when a step inside the retirement
-    // re-interned the forgotten subject by id and turned 6 B into 79 B.
-    cmd: ['node', '--expose-gc', 'tools/check-retired-subject-slope.mjs'],
+      'lookup-only churn stays below the Linux-validated gross-retention ceiling in every fresh process; not a per-lifetime slope claim',
+    cmd: ['node', 'tools/check-retired-lifetime-gross-retention.mjs'],
     slow: true,
     needsBuild: true,
-    provenBy: 'retired-subject-slope:self',
+    provenBy: 'retired-lifetime-gross-retention:self',
   },
   {
-    name: 'retired-subject-slope:node-reads',
+    name: 'retired-lifetime-gross-retention:node-reads',
     covers:
-      'retired-subject retention stays flat when every row node is READ, not only looked up: an activation-carrier entry per retired subject is a slope',
+      'node-read churn stays below the Linux-validated gross-retention ceiling in every fresh process',
     cmd: [
       'node',
-      '--expose-gc',
-      'tools/check-retired-subject-slope.mjs',
+      'tools/check-retired-lifetime-gross-retention.mjs',
       '--arm',
       'no-history-node-reads',
     ],
     slow: true,
     needsBuild: true,
-    provenBy: 'retired-subject-slope:self',
+    provenBy: 'retired-lifetime-gross-retention:self',
   },
   {
-    name: 'retired-subject-slope:self',
+    name: 'retired-lifetime-gross-retention:self',
     covers:
-      'the slope checker rejects the pre-fix linear table and accepts the measured flat one',
-    cmd: ['node', 'tools/check-retired-subject-slope.mjs', '--self-test'],
-    // Blind the VERDICT, not one input to it.
-    //
-    // Registered blind on the first attempt by widening MAX_BYTES_PER_RETIRED
-    // alone: the ratio condition still caught the linear fixture, so the
-    // self-test kept passing while its target was broken. Two conditions means a
-    // single-input mutation proves nothing — same trap recorded on
-    // `signal-identity-durability:self` above.
+      'both churn arms reject actual retention of 10000 retired handles and pass controls and neutralized retention',
+    cmd: [
+      'node',
+      'tools/check-retired-lifetime-gross-retention.mjs',
+      '--self-test',
+    ],
+    slow: true,
+    needsBuild: true,
     mutation: {
-      file: 'tools/check-retired-subject-slope.mjs',
-      find: '  return problems;',
-      replace: '  return [];',
+      file: 'tools/check-retired-lifetime-gross-retention.mjs',
+      find: '  return growthMiB <= MAX_GROWTH_MIB;',
+      replace: '  return true;',
+    },
+  },
+  {
+    name: 'retired-lifetime-cleanup',
+    covers:
+      'retirement removes actual lifetime/revision/carrier entries, late reads do not recreate them, and undo subscriptions survive',
+    cmd: ['node', 'tools/check-retired-lifetime-cleanup.mjs'],
+    needsBuild: true,
+    provenBy: 'retired-lifetime-cleanup:self',
+  },
+  {
+    name: 'retired-lifetime-cleanup:self',
+    covers:
+      'actual isolated-artifact late-registration, activation-deletion and revision-resurrection mutations fail with restored controls passing',
+    cmd: ['node', 'tools/check-retired-lifetime-cleanup.mjs', '--self-test'],
+    needsBuild: true,
+    mutation: {
+      file: 'tools/check-retired-lifetime-cleanup.mjs',
+      find: "record.checks.push({ name, actual, expected, passed });\n    };\n    const restorable = operation === 'restorable';",
+      replace:
+        "record.checks.push({ name, actual, expected, passed: true });\n    };\n    const restorable = operation === 'restorable';",
     },
   },
   {
