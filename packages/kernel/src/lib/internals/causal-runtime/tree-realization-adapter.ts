@@ -106,6 +106,8 @@ type WritableEntityNode = {
 
 type PreparedSubjectRealization = {
   collectionPath: string;
+  /** The collection node this subject belongs to; the scope of its key. */
+  scope: object;
   subjectId: number;
   reachable: boolean;
   currentKey: string | number | undefined;
@@ -114,64 +116,88 @@ type PreparedSubjectRealization = {
 
 type PreparedOccupancyState = number | 'vacant';
 
+/**
+ * Subject lifetimes are allocated per collection, so two collections routinely
+ * hold the same lifetime ID, and two collections can share a path label (a
+ * literal `'a.b'` key beside a nested `a.b`). Prepared subjects and key
+ * occupancy are therefore scoped by the collection NODE each effect resolves
+ * to, by owner position where the effect states one. A bare lifetime once let
+ * one collection's restored row absorb another collection's field reversal.
+ */
 class PreparedRealizationContext {
-  private readonly subjects = new Map<number, PreparedSubjectRealization>();
+  constructor(
+    private readonly scopeOf: (effect: ReversalEffect) => object | undefined
+  ) {}
+
+  private readonly subjects = new Map<
+    object,
+    Map<number, PreparedSubjectRealization>
+  >();
   private readonly occupancy = new Map<
-    string,
+    object,
     Map<string | number, PreparedOccupancyState>
   >();
 
-  private occupancyEntries(
-    collectionPath: string,
-    createIfMissing = false
-  ): Map<string | number, PreparedOccupancyState> | undefined {
-    let entries = this.occupancy.get(collectionPath);
-    if (!entries && createIfMissing) {
-      entries = new Map<string | number, PreparedOccupancyState>();
-      this.occupancy.set(collectionPath, entries);
-    }
-
-    return entries;
-  }
-
   private setOccupancy(
-    collectionPath: string,
+    scope: object,
     key: string | number,
     state: PreparedOccupancyState
   ): void {
-    this.occupancyEntries(collectionPath, true)?.set(key, state);
+    let entries = this.occupancy.get(scope);
+    if (!entries) {
+      entries = new Map<string | number, PreparedOccupancyState>();
+      this.occupancy.set(scope, entries);
+    }
+    entries.set(key, state);
+  }
+
+  private subjectsIn(scope: object): Map<number, PreparedSubjectRealization> {
+    let subjects = this.subjects.get(scope);
+    if (!subjects) {
+      subjects = new Map();
+      this.subjects.set(scope, subjects);
+    }
+    return subjects;
   }
 
   rememberRestoredSubject(
+    effect: ReversalEffect,
     subjectId: number,
     collectionPath: string,
     key: string | number,
     value: unknown
   ): void {
-    this.subjects.set(subjectId, {
+    const scope = this.scopeOf(effect);
+    if (!scope) return;
+    this.subjectsIn(scope).set(subjectId, {
       collectionPath,
+      scope,
       subjectId,
       reachable: true,
       currentKey: key,
       value,
     });
-    this.setOccupancy(collectionPath, key, subjectId);
+    this.setOccupancy(scope, key, subjectId);
   }
 
-  rememberRekeyedSubject(subjectId: number, key: string | number): void {
-    const existing = this.subjects.get(subjectId);
+  rememberRekeyedSubject(
+    effect: ReversalEffect,
+    subjectId: number,
+    key: string | number
+  ): void {
+    const existing = this.resolveSubject(effect, subjectId);
     if (!existing) {
       return;
     }
 
     this.setOccupancy(
-      existing.collectionPath,
+      existing.scope,
       existing.currentKey as string | number,
       'vacant'
     );
-    this.setOccupancy(existing.collectionPath, key, subjectId);
+    this.setOccupancy(existing.scope, key, subjectId);
 
-    this.subjects.set(subjectId, {
+    this.subjectsIn(existing.scope).set(subjectId, {
       ...existing,
       reachable: true,
       currentKey: key,
@@ -179,22 +205,22 @@ class PreparedRealizationContext {
   }
 
   rememberRemovedSubject(
+    effect: ReversalEffect,
     subjectId: number,
     collectionPath: string,
     key: string | number,
     value: unknown
   ): void {
-    const existing = this.subjects.get(subjectId);
+    const scope = this.scopeOf(effect);
+    if (!scope) return;
+    const existing = this.subjectsIn(scope).get(subjectId);
     const currentValue = existing?.value ?? value;
 
-    if (existing?.currentKey !== undefined) {
-      this.setOccupancy(existing.collectionPath, existing.currentKey, 'vacant');
-    } else {
-      this.setOccupancy(collectionPath, key, 'vacant');
-    }
+    this.setOccupancy(scope, existing?.currentKey ?? key, 'vacant');
 
-    this.subjects.set(subjectId, {
+    this.subjectsIn(scope).set(subjectId, {
       collectionPath,
+      scope,
       subjectId,
       reachable: false,
       currentKey: undefined,
@@ -202,15 +228,21 @@ class PreparedRealizationContext {
     });
   }
 
-  resolveSubject(subjectId: number): PreparedSubjectRealization | undefined {
-    return this.subjects.get(subjectId);
+  resolveSubject(
+    effect: ReversalEffect,
+    subjectId: number
+  ): PreparedSubjectRealization | undefined {
+    const scope = this.scopeOf(effect);
+    return scope === undefined
+      ? undefined
+      : this.subjects.get(scope)?.get(subjectId);
   }
 
   resolveOccupancy(
-    collectionPath: string,
+    scope: object,
     key: string | number
   ): PreparedOccupancyState | undefined {
-    return this.occupancyEntries(collectionPath)?.get(key);
+    return this.occupancy.get(scope)?.get(key);
   }
 }
 
@@ -569,7 +601,9 @@ function planHeterogeneousFrame(
     ReversalEffect & { structural: 'remove'; subjectId: number },
     string | number
   >();
-  const planningPreparedContext = new PreparedRealizationContext();
+  const planningPreparedContext = new PreparedRealizationContext(
+    preparedSubjectScope(tree, descriptors, structuralOwnerPaths)
+  );
   for (const effect of effects) {
     const removeEffect =
       effect.structural === 'remove' && typeof effect.subjectId === 'number'
@@ -719,7 +753,10 @@ function planHeterogeneousFrame(
       return undefined;
     }
 
-    const preparedSubject = preparedContext.resolveSubject(effect.subjectId);
+    const preparedSubject = preparedContext.resolveSubject(
+      effect,
+      effect.subjectId
+    );
     if (!preparedSubject) {
       scalarFrame?.discard();
       return undefined;
@@ -797,7 +834,7 @@ function planHeterogeneousFrame(
 
     const preparedSubject =
       typeof effect.subjectId === 'number'
-        ? preparedContext.resolveSubject(effect.subjectId)
+        ? preparedContext.resolveSubject(effect, effect.subjectId)
         : undefined;
     const plan =
       preparedSubject &&
@@ -826,6 +863,7 @@ function planHeterogeneousFrame(
 
     if (typeof effect.subjectId === 'number') {
       preparedContext.rememberRekeyedSubject(
+        effect,
         effect.subjectId,
         effect.after as string | number
       );
@@ -1108,19 +1146,14 @@ function canApplyEffect(
       ? resolvePreparedOrLiveSubjectKey(
           ownerNode,
           preparedContext,
+          effect,
           effect.subjectId
         )
       : undefined;
-  const collectionPath = resolveCollectionPath(
-    descriptor,
-    structuralOwnerPaths,
-    effect
-  );
   const destinationOccupied =
     effect.structural === 'rekey' || effect.structural === 'add'
       ? isCollectionKeyOccupied(
           ownerNode,
-          collectionPath,
           effect.after as string | number,
           preparedContext
         )
@@ -1199,6 +1232,27 @@ function applyEffect(
       participation: 'realized',
     },
     () => {
+      if (
+        !effect.structural &&
+        effect.fieldPresence?.after === false &&
+        typeof effect.subjectId === 'number' &&
+        effect.subjectFieldSegments?.length
+      ) {
+        // The field was absent at the target endpoint: remove the key from the
+        // row rather than writing undefined into it.
+        const row = resolveCurrentSubjectTarget(
+          tree,
+          descriptor,
+          effect.subjectId,
+          { ...effect, subjectFieldSegments: [] },
+          structuralOwnerPaths
+        );
+        if (isWritableEntityNode(row)) {
+          const read = row as unknown as () => unknown;
+          row(withoutFieldAtSegments(read(), effect.subjectFieldSegments));
+          return;
+        }
+      }
       if (!effect.structural) {
         const target = resolveLiveScalarNode(
           tree,
@@ -1337,7 +1391,10 @@ function canResolvePreparedSubjectTarget(
     return false;
   }
 
-  const preparedSubject = preparedContext?.resolveSubject(effect.subjectId);
+  const preparedSubject = preparedContext?.resolveSubject(
+    effect,
+    effect.subjectId
+  );
   if (!preparedSubject) {
     return false;
   }
@@ -1402,21 +1459,15 @@ function resolveCollectionPath(
 
 function isCollectionKeyOccupied(
   ownerNode: CollectionNode,
-  collectionPath: string | undefined,
   key: string | number,
   preparedContext: PreparedRealizationContext | undefined
 ): boolean {
-  if (collectionPath) {
-    const preparedOccupancy = preparedContext?.resolveOccupancy(
-      collectionPath,
-      key
-    );
-    if (preparedOccupancy === 'vacant') {
-      return false;
-    }
-    if (preparedOccupancy !== undefined) {
-      return true;
-    }
+  const preparedOccupancy = preparedContext?.resolveOccupancy(ownerNode, key);
+  if (preparedOccupancy === 'vacant') {
+    return false;
+  }
+  if (preparedOccupancy !== undefined) {
+    return true;
   }
 
   return hasCollectionKey(ownerNode, key);
@@ -1425,9 +1476,10 @@ function isCollectionKeyOccupied(
 function resolvePreparedOrLiveSubjectKey(
   ownerNode: CollectionNode,
   preparedContext: PreparedRealizationContext | undefined,
+  effect: ReversalEffect,
   subjectId: number
 ): string | number | undefined {
-  const preparedSubject = preparedContext?.resolveSubject(subjectId);
+  const preparedSubject = preparedContext?.resolveSubject(effect, subjectId);
   if (preparedSubject) {
     return preparedSubject.currentKey;
   }
@@ -1443,6 +1495,7 @@ function resolveEffectiveRemoveKey(
   return resolvePreparedOrLiveSubjectKey(
     ownerNode,
     preparedContext,
+    effect,
     effect.subjectId
   );
 }
@@ -1464,7 +1517,10 @@ function updatePreparedRealizationContext(
 ): void {
   if (typeof effect.subjectId === 'number' && !effect.structural) {
     const descriptor = descriptors.get(effect.owner);
-    const preparedSubject = preparedContext.resolveSubject(effect.subjectId);
+    const preparedSubject = preparedContext.resolveSubject(
+      effect,
+      effect.subjectId
+    );
     const fieldPathFromRow = resolveSubjectFieldPath(
       descriptor,
       effect,
@@ -1472,6 +1528,15 @@ function updatePreparedRealizationContext(
     );
     if (preparedSubject && fieldPathFromRow?.length === 0) {
       preparedSubject.value = effect.after;
+    } else if (
+      preparedSubject &&
+      fieldPathFromRow &&
+      effect.fieldPresence?.after === false
+    ) {
+      preparedSubject.value = withoutFieldAtSegments(
+        preparedSubject.value,
+        fieldPathFromRow
+      );
     } else if (preparedSubject && fieldPathFromRow) {
       assignPreparedSubjectValue(
         preparedSubject.value,
@@ -1503,6 +1568,7 @@ function updatePreparedRealizationContext(
       }
       const preparedValue = deepClone(structuralEffect.value);
       preparedContext.rememberRestoredSubject(
+        effect,
         effect.subjectId,
         collectionPath,
         effect.after as string | number,
@@ -1513,6 +1579,7 @@ function updatePreparedRealizationContext(
     }
     case 'rekey':
       preparedContext.rememberRekeyedSubject(
+        effect,
         effect.subjectId,
         effect.after as string | number
       );
@@ -1559,6 +1626,7 @@ function updatePreparedRealizationContext(
       }
 
       preparedContext.rememberRemovedSubject(
+        effect,
         effect.subjectId,
         collectionPath,
         effectiveRemoveKey,
@@ -1569,6 +1637,20 @@ function updatePreparedRealizationContext(
   }
 }
 
+function preparedSubjectScope(
+  tree: ISignalTree<object>,
+  descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
+  structuralOwnerPaths: StructuralOwnerIndex
+): (effect: ReversalEffect) => object | undefined {
+  return (effect) =>
+    resolveCollectionNode(
+      tree,
+      descriptors.get(effect.owner),
+      structuralOwnerPaths,
+      effect
+    );
+}
+
 function buildPreparedRealizationContext(
   tree: ISignalTree<object>,
   descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
@@ -1576,7 +1658,9 @@ function buildPreparedRealizationContext(
   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
   effects: readonly ReversalEffect[]
 ): PreparedRealizationContext | undefined {
-  const preparedContext = new PreparedRealizationContext();
+  const preparedContext = new PreparedRealizationContext(
+    preparedSubjectScope(tree, descriptors, structuralOwnerPaths)
+  );
   for (const effect of effects) {
     if (
       !canApplyEffect(
@@ -1617,7 +1701,11 @@ function resolveSubjectFieldPath(
     descriptor?.subjectDescriptors?.get(String(effect.subjectId))
       ?.fieldPathFromRow ??
     descriptor?.fieldPathFromRow;
-  return legacy === undefined ? undefined : legacy === '' ? [] : legacy.split('.');
+  return legacy === undefined
+    ? undefined
+    : legacy === ''
+    ? []
+    : legacy.split('.');
 }
 
 function assignPreparedSubjectValue(
@@ -1657,7 +1745,7 @@ function isPreparedSubjectScalarEffect(
   return (
     typeof effect.subjectId === 'number' &&
     !effect.structural &&
-    preparedContext.resolveSubject(effect.subjectId) !== undefined
+    preparedContext.resolveSubject(effect, effect.subjectId) !== undefined
   );
 }
 
@@ -1875,7 +1963,11 @@ export function deriveFieldSegmentsFromEffect(
     return effect.subjectFieldSegments;
   }
   const legacy = deriveFieldPathFromEffect(effect, registry);
-  return legacy === undefined ? undefined : legacy === '' ? [] : legacy.split('.');
+  return legacy === undefined
+    ? undefined
+    : legacy === ''
+    ? []
+    : legacy.split('.');
 }
 
 export function deriveFieldPathFromEffect(
@@ -1947,6 +2039,22 @@ function resolveCurrentScopedTarget(
   );
 }
 
+/** A copy of `value` without the field at `segments`; other keys untouched. */
+function withoutFieldAtSegments(
+  value: unknown,
+  segments: readonly string[]
+): unknown {
+  if (segments.length === 0 || !isTraversableNode(value)) return value;
+  const [head, ...tail] = segments;
+  const record = value as Record<string, unknown>;
+  if (!Object.prototype.hasOwnProperty.call(record, head)) return value;
+  if (tail.length === 0) {
+    const { [head]: _removed, ...rest } = record;
+    return rest;
+  }
+  return { ...record, [head]: withoutFieldAtSegments(record[head], tail) };
+}
+
 function resolveNodeAtSegments(
   root: unknown,
   segments: readonly string[]
@@ -1972,7 +2080,8 @@ function resolveStructuredSubjectTarget(
   if (!isTraversableNode(parent)) return undefined;
   // Entity fields can be opaque object leaves. Realize a nested value through
   // the owned row's replacement operation rather than inventing a native leaf.
-  return (value: unknown) => row(replaceValueAtSegments(read(), segments, value));
+  return (value: unknown) =>
+    row(replaceValueAtSegments(read(), segments, value));
 }
 
 function replaceValueAtSegments(
@@ -1983,7 +2092,7 @@ function replaceValueAtSegments(
   if (segments.length === 0) return next;
   const [key, ...rest] = segments;
   const record = isTraversableNode(value)
-    ? value as Record<string, unknown>
+    ? (value as Record<string, unknown>)
     : {};
   return { ...record, [key]: replaceValueAtSegments(record[key], rest, next) };
 }

@@ -12,6 +12,12 @@ export type TurnState = 'pending' | 'confirmed';
  */
 export type StructuralEffectKind = 'add' | 'remove' | 'rekey';
 
+/** Own-property presence of an entity field; omitted when both endpoints exist. */
+export type FieldPresence = {
+  readonly before: boolean;
+  readonly after: boolean;
+};
+
 export interface CausalEffect {
   readonly owner: PositionId;
   readonly before: unknown;
@@ -19,6 +25,7 @@ export interface CausalEffect {
   readonly subjectId?: unknown;
   /** Producer-known row-relative property keys; [] names the whole row. */
   readonly subjectFieldSegments?: readonly string[];
+  readonly fieldPresence?: FieldPresence;
   /**
    * Captured realization address — REQUIRED, because every live producer sets
    * it on every variant.
@@ -67,6 +74,7 @@ export interface ReversalEffect {
   readonly subjectId?: unknown;
   /** Producer-known row-relative property keys; [] names the whole row. */
   readonly subjectFieldSegments?: readonly string[];
+  readonly fieldPresence?: FieldPresence;
   /**
    * Captured realization address.
    *

@@ -1,3 +1,4 @@
+import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
 import {
   getOrCreateSubjectRestorationClaims,
   getSubjectRestorationClaims,
@@ -87,6 +88,7 @@ export type ScalarSetEffect = TurnEffectBase & {
   subject?: number;
   /** Producer-known row-relative address; display paths never encode identity. */
   subjectFieldSegments?: readonly string[];
+  fieldPresence?: FieldPresence;
   before: unknown;
   after: unknown;
   mutationIntent?: 'replace' | 'derive';
@@ -1534,11 +1536,22 @@ export function getOrCreateInternalTransactionRuntime<T>(
     if (existing) {
       if (existing.kind === 'set' && effect.kind === 'set') {
         existing.after = effect.after;
+        // Preserve first own-presence before and latest own-presence after.
+        const beforePresent = existing.fieldPresence?.before ?? true;
+        const afterPresent = effect.fieldPresence?.after ?? true;
+        if (beforePresent && afterPresent) delete existing.fieldPresence;
+        else existing.fieldPresence = {
+          before: beforePresent,
+          after: afterPresent,
+        };
         existing.mutationIntent = combineScalarMutationIntent(
           existing.mutationIntent,
           effect.mutationIntent
         );
-        if (existing.before === existing.after) {
+        if (
+          existing.before === existing.after &&
+          beforePresent === afterPresent
+        ) {
           effectMap.delete(key);
         }
         return;
@@ -1655,7 +1668,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
       for (const key of keys) {
         const before = prev[key];
         const after = next[key];
-        if (before === after) {
+        const beforePresent = Object.prototype.hasOwnProperty.call(prev, key);
+        const afterPresent = Object.prototype.hasOwnProperty.call(next, key);
+        if (before === after && beforePresent === afterPresent) {
           continue;
         }
         enqueueEffect(bucket, effectMap, {
@@ -1665,6 +1680,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
           position,
           subject,
           subjectFieldSegments: subject === undefined ? undefined : [key],
+          ...(subject !== undefined && !(beforePresent && afterPresent)
+            ? { fieldPresence: { before: beforePresent, after: afterPresent } }
+            : {}),
           before,
           after,
           mutationIntent: meta?.mutationIntent,
@@ -1917,6 +1935,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           after: effect.after,
           subjectId: effect.subject,
           subjectFieldSegments: effect.subjectFieldSegments,
+          fieldPresence: effect.fieldPresence,
           path: effect.path,
           ownerPath: effect.ownerPath,
         };
@@ -1981,6 +2000,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
       ...causal,
       before: causal.after,
       after: causal.before,
+      fieldPresence: causal.fieldPresence
+        ? {
+            before: causal.fieldPresence.after,
+            after: causal.fieldPresence.before,
+          }
+        : undefined,
       structural:
         causal.structural === 'add'
           ? 'remove'
@@ -2559,6 +2584,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
             ownerPath: entry.ownerPath ?? entry.path,
             subject: entry.subjectIds?.[0],
             subjectFieldSegments: [key],
+            fieldPresence: {
+              before: Object.prototype.hasOwnProperty.call(before, key),
+              after: Object.prototype.hasOwnProperty.call(after, key),
+            },
             before: before[key],
             after: after[key],
             mutationIntent: 'derive' as const,

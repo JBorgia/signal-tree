@@ -1,3 +1,4 @@
+import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
 import type {
   ConstructionOf,
   SnapshotValue,
@@ -169,6 +170,7 @@ type ScalarSetEffect = TurnEffectBase & {
   kind: 'set';
   subject?: number;
   subjectFieldSegments?: readonly string[];
+  fieldPresence?: FieldPresence;
   before: unknown;
   after: unknown;
   mutationIntent?: 'replace' | 'derive';
@@ -252,6 +254,14 @@ function toReversalEffect(
         after: direction === 'undo' ? effect.before : effect.after,
         subjectId: effect.subject,
         subjectFieldSegments: effect.subjectFieldSegments,
+        fieldPresence: effect.fieldPresence
+          ? direction === 'undo'
+            ? {
+                before: effect.fieldPresence.after,
+                after: effect.fieldPresence.before,
+              }
+            : effect.fieldPresence
+          : undefined,
         path: effect.path,
         ownerPath: effect.ownerPath,
       };
@@ -3336,11 +3346,22 @@ export function restoration(
       if (existing) {
         if (existing.kind === 'set' && effect.kind === 'set') {
           existing.after = effect.after;
+          // Preserve first own-presence before and latest own-presence after.
+          const beforePresent = existing.fieldPresence?.before ?? true;
+          const afterPresent = effect.fieldPresence?.after ?? true;
+          if (beforePresent && afterPresent) delete existing.fieldPresence;
+          else existing.fieldPresence = {
+            before: beforePresent,
+            after: afterPresent,
+          };
           existing.mutationIntent = combineScalarMutationIntent(
             existing.mutationIntent,
             effect.mutationIntent
           );
-          if (existing.before === existing.after) {
+          if (
+            existing.before === existing.after &&
+            beforePresent === afterPresent
+          ) {
             effectMap.delete(key);
           }
           return;
@@ -3439,10 +3460,15 @@ export function restoration(
         diffPath: string,
         before: unknown,
         after: unknown,
-        subjectFieldSegments: readonly string[] | undefined
+        subjectFieldSegments: readonly string[] | undefined,
+        presence?: FieldPresence
       ): void => {
         const position = positionIds?.[0];
-        if (position === undefined || before === after) {
+        if (
+          position === undefined ||
+          (before === after &&
+            (presence === undefined || presence.before === presence.after))
+        ) {
           return;
         }
 
@@ -3455,7 +3481,11 @@ export function restoration(
               after[key],
               subjectFieldSegments === undefined
                 ? undefined
-                : [...subjectFieldSegments, key]
+                : [...subjectFieldSegments, key],
+              {
+                before: Object.prototype.hasOwnProperty.call(before, key),
+                after: Object.prototype.hasOwnProperty.call(after, key),
+              }
             );
           }
           return;
@@ -3468,6 +3498,11 @@ export function restoration(
           position,
           subject: subjectIds?.[0],
           subjectFieldSegments,
+          ...(subjectIds?.length &&
+          presence !== undefined &&
+          !(presence.before && presence.after)
+            ? { fieldPresence: { ...presence } }
+            : {}),
           before,
           after,
           mutationIntent: meta?.mutationIntent,
