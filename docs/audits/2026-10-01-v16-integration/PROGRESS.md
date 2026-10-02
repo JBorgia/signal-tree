@@ -96,3 +96,23 @@ evidence of a common application trigger. A narrow v15 backport is underway on
 `fix/v15-outcome-provenance`; v16 recovery/refusal policy is not copied into v15.
 Published-artifact reproduction and integrity are preserved under
 `/private/tmp/st-v15-published-outcome-probe/`.
+
+## Slice 3a: rollback is not a new authored history contribution
+
+Committed as `a42094b9`. Independent diagnosis showed the no-batching same-tick
+fixture was not a lost subscription or scope-timing bug. Compensation restored
+provenance, then fell through into ordinary restoration capture. An immediate
+authored write either cancelled against that inverse or inherited the rejected
+value as its undo baseline. Six new cases failed before repair; four external
+truth controls already passed.
+
+Return after both existing v16 provenance restorations prevents that capture.
+Pending-history discard remains in its existing lifecycle handler. Review found
+no blocker; recovery, queued truth, inspection and whole-turn refusal remain
+unchanged. Final focused set 33/33; existing v16 controls 75/75; kernel 2973
+passed, six expected failures, thirteen skipped; typecheck/spec-types/lint 3/3,
+kernel build exit 0. Raw evidence:
+`/private/tmp/st-v16-integration-evidence/slice3/compensation-exclusion/`.
+
+This closes the preserved same-tick rollback→undoable fixture. It does not close
+the remaining deferral/scope or plain-branch membership integration.

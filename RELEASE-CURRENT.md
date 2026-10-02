@@ -53,3 +53,9 @@ do not add scope. Keep all exact-SHA evidence distinct from working-tree checks.
 - A reused-error provenance defect was reproduced on the published 15.4.0
   artifact under controlled validation fault injection. Its bounded v15 patch
   takes priority before continuing integration; see the evidence record.
+
+- Slice 3a committed as `a42094b9`: compensation no longer enters ordinary
+  history capture. Same-tick rollback→undoable regression closes without adding
+  batching or changing v16 recovery. Kernel 2973 passed, destination controls
+  75/75, static gates and kernel build pass. Remaining slice 3 work: explicit
+  semantic-scope closure and plain-branch membership, each tested independently.
