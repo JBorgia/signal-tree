@@ -58,9 +58,41 @@ after rollback, a new `undoable()` sequence changes the value but undo does not
 restore it. Both enhancer orders fail. The complete failing fixture is retained
 at `/private/tmp/st-v16-integration-evidence/slice3/same-turn-rollback-then-undoable.spec.ts`.
 The slice-1 net-presence control separates turns with a flush; that is **not**
-a fix or qualification of the same-tick case. Scope-drain work must restore the
-original no-flush case and resolve it. No failing expectation was marked skipped.
+a fix or qualification of the same-tick case. The fixture does not install batching. Restore the original no-flush case
+and trace capture chronology before choosing a repair; scope draining is a
+hypothesis, not an established cause. No failing expectation was marked skipped.
 
-Next: complete reversal-delivery outcome integration, then semantic-scope and
+Next: diagnose the preserved same-tick case, then semantic-scope and
 membership work. No v16 publication, ownership-model selection, or v15 budget
 transfer is implied by this checkpoint.
+
+## Slice 2: operation-scoped application outcomes
+
+Committed as `65cf7b38`. The corrected reactive-realization probe had four
+genuine history failures before repair; direct subscriber isolation and
+reentrant settlement were preservation controls. Restoration now completes its
+history bookkeeping after applied writes whose delivery throws, then rethrows
+the original consumer value. Pre-application failure does not advance history.
+
+The donor used a persistent WeakSet brand on consumer errors. Reusing an error
+from an earlier delivery failure during a later pre-application failure could
+misclassify that second operation. An internal per-invocation receipt replaces
+that brand; public boundaries unwrap it, preserving object identity and primitive
+throws. Same-tree nesting and incomplete outer application are covered. This
+does not claim recovery from arbitrary partial application.
+
+Final focused suite: 25 passed. Reinstating persistent error branding produces
+four failures and 21 passes; source was restored. Independent review found no
+additional blocker or public receipt leak within this scope. Full kernel:
+333 files, 2963 passed, six expected failures, thirteen skipped, exit 0. Angular:
+164 passed / three skipped; React 26, Vue 20, Solid 46 passed. All five package
+builds and typecheck/spec-types/lint:budget pass. Raw commands and logs remain
+under `/private/tmp/st-v16-integration-evidence/slice2/`.
+
+The reused-error finding was separately reproduced against the published
+15.4.0 kernel tarball using public restoration/factory APIs plus controlled
+internal validation fault injection. It is a bounded provenance defect, not
+evidence of a common application trigger. A narrow v15 backport is underway on
+`fix/v15-outcome-provenance`; v16 recovery/refusal policy is not copied into v15.
+Published-artifact reproduction and integrity are preserved under
+`/private/tmp/st-v15-published-outcome-probe/`.
