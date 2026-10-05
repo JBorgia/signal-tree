@@ -224,6 +224,14 @@ export function confirmedTurnReader<
  * from unwrapped state.
  */
 export {
+  linkStateReader,
+  type LinkStateReader,
+  type LinkStateView,
+  type LinkStateEvent,
+  type LinkStateSnapshot,
+} from './lib/internals/link-state-view';
+
+export {
   transactionLifecycleReader,
   type PendingTransactionView,
   type TransactionLifecycleReader,
