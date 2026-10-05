@@ -4,6 +4,24 @@ Updated October 5, 2026. Active branch `fix/v15-outcome-provenance`, based on
 published v15.4.0 `4ceb24a2a62dc893bf28c50ad971a955190539a7`.
 The historical controller below is retained as evidence, not current instructions.
 
+## 15.4.2 published
+
+`@signal-tree/*` 15.4.2 is on npm `latest` from signed tag `v15.4.2` at
+`012fd11db2aba7acf59b374b84880aaaa6b62360`. Exact local qualification, Linux
+Validate [37321395870](https://github.com/JBorgia/signal-tree/actions/runs/37321395870),
+the tag release [37324153821](https://github.com/JBorgia/signal-tree/actions/runs/37324153821)
+and the publisher [37326890452](https://github.com/JBorgia/signal-tree/actions/runs/37326890452)
+each passed 88/88 gates and 88/88 proofs. All five registry archives are
+byte-identical to the qualified candidate and carry provenance; the registry
+kernel passes the packed refusal gate against npm 15.3.0 (10/10). A first
+publisher dispatch from `main` was refused by the workflow's tag guard before
+publishing (run 37326803412). Receipt: `docs/audits/2026-10-05-v15-release.json`.
+The demo deploy workflow runs only from `main` and has failed since 2026-09-22;
+it was not run for this patch.
+
+Next: carry 15.4.1 and 15.4.2 into the v16 integration with their tests, and
+update TruckTrax v3 to 15.4.2.
+
 ## 15.4.2 scope extended before tagging
 
 Candidate `5c22eac5` completed exact local qualification (88/88 gates, 88/88
