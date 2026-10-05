@@ -1,0 +1,248 @@
+{
+  "version": "15.4.3",
+  "sourceSHA": "2a4b99716a0bc6f103eae5b12381dc1a23b2191a",
+  "tag": "v15.4.3",
+  "releaseURL": "https://github.com/JBorgia/signal-tree/releases/tag/v15.4.3",
+  "runs": {
+    "linuxValidate": 37342331087,
+    "tagRelease": 37344614029,
+    "publish": 37346516120
+  },
+  "local": {
+    "phases": [
+      {
+        "name": "gates",
+        "command": "node",
+        "args": [
+          "tools/verify-gates.mjs",
+          "--release"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 252.373
+      },
+      {
+        "name": "proofs",
+        "command": "node",
+        "args": [
+          "tools/verify-gates.mjs",
+          "--self-test",
+          "--release"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 187.407
+      },
+      {
+        "name": "build",
+        "command": "pnpm",
+        "args": [
+          "run",
+          "build:all",
+          "--skip-nx-cache"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 7.056
+      },
+      {
+        "name": "tarball",
+        "command": "node",
+        "args": [
+          "tools/verify-tarball-consumer.mjs"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 1.901
+      },
+      {
+        "name": "types",
+        "command": "node",
+        "args": [
+          "tools/verify-consumer-typecheck.mjs"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 6.77
+      },
+      {
+        "name": "aot",
+        "command": "node",
+        "args": [
+          "tools/verify-angular-aot-consumer.mjs"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 22.289
+      },
+      {
+        "name": "budget",
+        "command": "node",
+        "args": [
+          "tools/check-bundle-budget.mjs"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 0.177
+      },
+      {
+        "name": "demo",
+        "command": "pnpm",
+        "args": [
+          "nx",
+          "build",
+          "demo",
+          "--configuration=production",
+          "--skip-nx-cache"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 7.518
+      },
+      {
+        "name": "browser",
+        "command": "pnpm",
+        "args": [
+          "run",
+          "smoke:routes"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 37.83
+      },
+      {
+        "name": "candidate",
+        "command": "node",
+        "args": [
+          "scripts/publish-candidate.mjs",
+          "--prebuilt",
+          "--prepare-only"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 12.995
+      },
+      {
+        "name": "dryrun",
+        "command": "node",
+        "args": [
+          "scripts/publish-candidate.mjs",
+          "--prebuilt",
+          "--dry-run"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 14.59
+      }
+    ],
+    "builtVersions": {
+      "kernel": "15.4.3",
+      "angular": "15.4.3",
+      "react": "15.4.3",
+      "vue": "15.4.3",
+      "solid": "15.4.3"
+    },
+    "cleanEnd": true
+  },
+  "gateTotals": {
+    "local": "88/88",
+    "linux": "88/88",
+    "tag": "88/88"
+  },
+  "proofTotals": {
+    "local": "88/88",
+    "linux": "88/88",
+    "tag": "88/88"
+  },
+  "browserPassed": 146,
+  "budgets": {
+    "bare": "9.67/10.26 KB prod, 11.75/12.45 KB dev",
+    "entities": "22.59/22.6 KB prod, 25.42/25.5 KB dev"
+  },
+  "registry": {
+    "version": "15.4.3",
+    "sourceSHA": "2a4b99716a0bc6f103eae5b12381dc1a23b2191a",
+    "allMatch": true,
+    "packages": [
+      {
+        "name": "@signal-tree/kernel",
+        "version": "15.4.3",
+        "registryIntegrity": "sha512-JvtFM4UPLH/cjLLWs8DEMHMLPQUzGnB9iCjnmjEES2DZcLmKSou14MoBBsGRF/msEZ+i8Wq8Y2vnyLzYq9/76A==",
+        "downloadedIntegrity": "sha512-JvtFM4UPLH/cjLLWs8DEMHMLPQUzGnB9iCjnmjEES2DZcLmKSou14MoBBsGRF/msEZ+i8Wq8Y2vnyLzYq9/76A==",
+        "candidateIntegrity": "sha512-JvtFM4UPLH/cjLLWs8DEMHMLPQUzGnB9iCjnmjEES2DZcLmKSou14MoBBsGRF/msEZ+i8Wq8Y2vnyLzYq9/76A==",
+        "matchesLocalCandidate": true,
+        "provenance": true,
+        "fileCount": 102
+      },
+      {
+        "name": "@signal-tree/angular",
+        "version": "15.4.3",
+        "registryIntegrity": "sha512-e4qECurS/qQV8TUf+eB2MpRK1XFQtAVbQiETOpMFpMpBqsTtH1aOiSiQuMcslB23NU2RnDflCY0J05XH31SUBA==",
+        "downloadedIntegrity": "sha512-e4qECurS/qQV8TUf+eB2MpRK1XFQtAVbQiETOpMFpMpBqsTtH1aOiSiQuMcslB23NU2RnDflCY0J05XH31SUBA==",
+        "candidateIntegrity": "sha512-e4qECurS/qQV8TUf+eB2MpRK1XFQtAVbQiETOpMFpMpBqsTtH1aOiSiQuMcslB23NU2RnDflCY0J05XH31SUBA==",
+        "matchesLocalCandidate": true,
+        "provenance": true,
+        "fileCount": 16
+      },
+      {
+        "name": "@signal-tree/react",
+        "version": "15.4.3",
+        "registryIntegrity": "sha512-bBoydZwgWSvhHECkCytqJNx5Z6MBQ2hh/ovnsDAd1F0NjCutvRJj61IbC/vFqcGKty3RWyuWeQkqkSnj0ab5sw==",
+        "downloadedIntegrity": "sha512-bBoydZwgWSvhHECkCytqJNx5Z6MBQ2hh/ovnsDAd1F0NjCutvRJj61IbC/vFqcGKty3RWyuWeQkqkSnj0ab5sw==",
+        "candidateIntegrity": "sha512-bBoydZwgWSvhHECkCytqJNx5Z6MBQ2hh/ovnsDAd1F0NjCutvRJj61IbC/vFqcGKty3RWyuWeQkqkSnj0ab5sw==",
+        "matchesLocalCandidate": true,
+        "provenance": true,
+        "fileCount": 9
+      },
+      {
+        "name": "@signal-tree/vue",
+        "version": "15.4.3",
+        "registryIntegrity": "sha512-i7GSwqcLuBWrjJE+roaFGiUQWlgKiImDAM3aqUcKTKAg6xdrTUMMTbiaE5kJGIbp7+9+3X0XZ/EfwfWcfYzCdw==",
+        "downloadedIntegrity": "sha512-i7GSwqcLuBWrjJE+roaFGiUQWlgKiImDAM3aqUcKTKAg6xdrTUMMTbiaE5kJGIbp7+9+3X0XZ/EfwfWcfYzCdw==",
+        "candidateIntegrity": "sha512-i7GSwqcLuBWrjJE+roaFGiUQWlgKiImDAM3aqUcKTKAg6xdrTUMMTbiaE5kJGIbp7+9+3X0XZ/EfwfWcfYzCdw==",
+        "matchesLocalCandidate": true,
+        "provenance": true,
+        "fileCount": 12
+      },
+      {
+        "name": "@signal-tree/solid",
+        "version": "15.4.3",
+        "registryIntegrity": "sha512-4mdw8cWUXTQDeRbUDWhAO26xh1mFQICBLfvWE3fU9Q40XJJt8CLPD1242BnYV6tMv5hi7Bdi820PBOjmbYWzhw==",
+        "downloadedIntegrity": "sha512-4mdw8cWUXTQDeRbUDWhAO26xh1mFQICBLfvWE3fU9Q40XJJt8CLPD1242BnYV6tMv5hi7Bdi820PBOjmbYWzhw==",
+        "candidateIntegrity": "sha512-4mdw8cWUXTQDeRbUDWhAO26xh1mFQICBLfvWE3fU9Q40XJJt8CLPD1242BnYV6tMv5hi7Bdi820PBOjmbYWzhw==",
+        "matchesLocalCandidate": true,
+        "provenance": true,
+        "fileCount": 12
+      }
+    ]
+  },
+  "registryRefusalGate": "7 fixed, 3 pass, 0 unchanged limitations (10/10) against npm 15.3.0",
+  "installedProbe": {
+    "package": "@signal-tree/kernel@15.4.3 from npm",
+    "result": {
+      "none": {
+        "ownerInvalidations": 1,
+        "leafNotifications": 1,
+        "snapshot": {
+          "p": {
+            "name": "a"
+          }
+        }
+      },
+      "transactions": {
+        "ownerInvalidations": 1,
+        "leafNotifications": 1,
+        "snapshot": {
+          "p": {
+            "name": "a"
+          }
+        }
+      }
+    }
+  },
+  "rawEvidence": [
+    "/private/tmp/st-v15-15.4.3-qualification",
+    "/private/tmp/st-v15-ownerinv-evidence",
+    "/private/tmp/st-v15-15.4.3-evidence"
+  ]
+}
