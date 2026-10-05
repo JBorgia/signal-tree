@@ -1,3 +1,9 @@
+import {
+  installRestorationReader,
+  type RestorationEntryId,
+  type RestorationReaderChange,
+  type RestorationReaderState,
+} from '../../lib/internals/restoration-reader';
 import { holdEntityMembershipDelivery } from '../../lib/internals/entity-membership-view';
 import {
   applyPlainBranchMemberSnapshot,
@@ -141,9 +147,23 @@ export type { RestorationConfig, RestorationHistoryEntry };
  * Internal restoration state management
  */
 
+// A refusal is the error object restoration itself created when it declined an
+// operation and changed nothing. Messages are not evidence: a validator or a
+// listener may throw any text, including one that imitates ST1034.
+const RESTORATION_REFUSALS = new WeakSet<Error>();
+function restorationRefusal(message: string): Error {
+  const error = new Error(message);
+  RESTORATION_REFUSALS.add(error);
+  return error;
+}
+
 type CanonicalTurn<T> = Omit<RestorationHistoryEntry<T>, 'state'> & {
   state?: T;
   id: number;
+  /** Reader identity. Never reused, including after a history reset. */
+  entryId: RestorationEntryId;
+  /** Only a relation the owner recorded: the transaction that staged it. */
+  __transactionId?: number;
   historyIndex: number;
   /**
    * RESTORATION CLAIM SET — the subjects whose backing must conservatively
@@ -466,6 +486,12 @@ class RestorationManager<TSource, T> {
   private positionTurnIds = new Map<number, number[]>();
   private positionFrontiers = new Map<number, number>();
   private nextTurnId = 1;
+  private nextEntryId = 1;
+  private nextOperationId = 1;
+  private activeOperation?: Set<RestorationEntryId>;
+  private readonly publishObservation: (
+    change: RestorationReaderChange
+  ) => void;
   private historicalEvents: HistoricalEvent[] = [];
   private nextHistoricalOrdinal = 1;
 
@@ -588,18 +614,91 @@ class RestorationManager<TSource, T> {
   /** A delivery failure belongs to the operation whose reversal applied. */
   private deliveryFailure: { error: unknown } | undefined;
 
-  private runOperation(run: () => boolean): boolean {
+  /**
+   * Run one undo/redo/jump and report what it actually did to the tree to the
+   * restoration reader: the entries whose reversal installed, not what history
+   * looks like after callbacks the operation triggered (a subscriber may reset
+   * or trim history during delivery).
+   */
+  private runOperation(
+    operation: 'undo' | 'redo' | 'jump',
+    run: () => boolean
+  ): boolean {
+    const operationId = `restoration-operation:${this
+      .nextOperationId++}` as const;
+    const affected = new Set<RestorationEntryId>();
+    const previous = this.activeOperation;
     const previousFailure = this.deliveryFailure;
+    this.activeOperation = affected;
     this.deliveryFailure = undefined;
+    let outcome: 'applied' | 'noop' | 'refused' | 'failed' = 'failed';
     try {
       const result = run();
+      outcome = affected.size ? 'applied' : 'noop';
       // Application completed; frontiers/indexes now describe the installed state.
       const failure = this.deliveryFailure as { error: unknown } | undefined;
       if (failure) throw applicationFailureCause(failure.error);
       return result;
+    } catch (error) {
+      if (outcome === 'failed')
+        outcome =
+          affected.size === 0 &&
+          error instanceof Error &&
+          RESTORATION_REFUSALS.has(error)
+            ? 'refused'
+            : 'failed';
+      throw error;
     } finally {
+      this.activeOperation = previous;
       this.deliveryFailure = previousFailure;
+      this.publishObservation({
+        kind: 'operation',
+        operationId,
+        operation,
+        outcome,
+        affectedEntryIds: [...affected],
+      });
     }
+  }
+
+  /**
+   * Resolve BEFORE applying. Application delivers synchronously, and a
+   * subscriber may reset or trim history there; the operation still applied
+   * these entries, so the event must name them.
+   */
+  private entryIdsFor(turnIds: readonly number[]): RestorationEntryId[] {
+    const ids: RestorationEntryId[] = [];
+    for (const id of turnIds) {
+      const entry = this.turns.get(id);
+      if (entry) ids.push(entry.entryId);
+    }
+    return ids;
+  }
+
+  /** Called only once application returned; a throw leaves them unrecorded. */
+  private recordAppliedEntries(entryIds: readonly RestorationEntryId[]): void {
+    if (!this.activeOperation) return;
+    for (const id of entryIds) this.activeOperation.add(id);
+  }
+
+  private readObservation(): RestorationReaderState {
+    return {
+      entries: this.history.map((entry) => {
+        const status = this.getTurnStatus(entry.id);
+        return {
+          entryId: entry.entryId,
+          transactionIds:
+            entry.__transactionId === undefined ? [] : [entry.__transactionId],
+          status:
+            status === 'applied' || status === 'unapplied'
+              ? status
+              : 'inconsistent',
+        };
+      }),
+      currentIndex: this.currentIndex,
+      canUndo: this.canUndoConfirmed(),
+      canRedo: this.canRedoConfirmed(),
+    };
   }
 
   private applyReversal(apply: () => void): void {
@@ -626,6 +725,11 @@ class RestorationManager<TSource, T> {
     this.historyVersion = locations.createCell(0);
     this.frontierVersion = locations.createCell(0);
     this.maxHistorySize = normaliseMaxHistorySize(config.maxHistorySize);
+    this.publishObservation = installRestorationReader(
+      tree,
+      this.positionRegistry.id,
+      () => this.readObservation()
+    );
   }
 
   /**
@@ -686,7 +790,8 @@ class RestorationManager<TSource, T> {
     positionIds?: number[],
     effects?: TurnEffect[],
     collectionOrders?: PendingCollectionOrder[],
-    explicitTurnId?: number
+    explicitTurnId?: number,
+    transactionId?: number
   ): CanonicalTurn<T> | undefined {
     const entry = this.buildTurn(
       subjectIds,
@@ -700,7 +805,9 @@ class RestorationManager<TSource, T> {
       return undefined;
     }
 
+    entry.__transactionId = transactionId;
     this.pendingTurns.set(entry.id, entry);
+    this.publishObservation({ kind: 'history-changed' });
     return {
       ...entry,
       restorationSubjectIds: entry.restorationSubjectIds
@@ -833,6 +940,7 @@ class RestorationManager<TSource, T> {
     ).sort((left, right) => left - right);
     const entry: CanonicalTurn<T> = {
       id: turnId,
+      entryId: `restoration-entry:${this.nextEntryId++}`,
       historyIndex: this.history.length,
       ...(pendingState === undefined ? {} : { state: pendingState }),
     };
@@ -965,6 +1073,7 @@ class RestorationManager<TSource, T> {
 
     this.rebuildTurnIndexes();
     this.pruneHistoricalEventsBeforeOldestBoundary();
+    this.publishObservation({ kind: 'history-changed' });
     return true;
   }
 
@@ -1473,7 +1582,7 @@ class RestorationManager<TSource, T> {
   }
 
   undoAt(positionId: number): boolean {
-    return this.runOperation(() => this.runUndoAt(positionId));
+    return this.runOperation('undo', () => this.runUndoAt(positionId));
   }
 
   private runUndoAt(positionId: number): boolean {
@@ -1502,7 +1611,7 @@ class RestorationManager<TSource, T> {
   }
 
   redoAt(positionId: number): boolean {
-    return this.runOperation(() => this.runRedoAt(positionId));
+    return this.runOperation('redo', () => this.runRedoAt(positionId));
   }
 
   private runRedoAt(positionId: number): boolean {
@@ -1587,7 +1696,7 @@ class RestorationManager<TSource, T> {
   }
 
   undoConfirmed(): boolean {
-    return this.runOperation(() => this.runUndoConfirmed());
+    return this.runOperation('undo', () => this.runUndoConfirmed());
   }
 
   private runUndoConfirmed(): boolean {
@@ -1640,7 +1749,7 @@ class RestorationManager<TSource, T> {
   }
 
   redoConfirmed(): boolean {
-    return this.runOperation(() => this.runRedoConfirmed());
+    return this.runOperation('redo', () => this.runRedoConfirmed());
   }
 
   private runRedoConfirmed(): boolean {
@@ -1681,7 +1790,12 @@ class RestorationManager<TSource, T> {
           `Historical state ${entry.id} could not be materialized`
         );
       }
-      return { ...entry, state };
+      const { entryId, __transactionId, ...existingView } = entry;
+      // Lineage belongs to the dedicated reader; preserve the existing history
+      // API's runtime shape as well as its declared type.
+      void entryId;
+      void __transactionId;
+      return { ...existingView, state };
     });
   }
 
@@ -1879,10 +1993,11 @@ class RestorationManager<TSource, T> {
     this.isTemporalViewActive = false;
     this.bumpRestorationHistory();
     this.currentIndex = -1;
+    this.publishObservation({ kind: 'history-changed' });
   }
 
   jumpTo(index: number): boolean {
-    return this.runOperation(() => this.runJumpTo(index));
+    return this.runOperation('jump', () => this.runJumpTo(index));
   }
 
   private runJumpTo(index: number): boolean {
@@ -2041,10 +2156,12 @@ class RestorationManager<TSource, T> {
       }
     }
 
+    const entryIds = this.entryIdsFor(turnIds);
     const applyEffects = this.applyEffectsFn;
     this.applyReversal(() =>
       applyEffects([{ effects, direction, orderDeltas }])
     );
+    this.recordAppliedEntries(entryIds);
   }
 
   private applyDirectedTurnTransition(
@@ -2084,8 +2201,10 @@ class RestorationManager<TSource, T> {
       applications.push({ effects, orderDeltas, direction });
     }
     if (applications.length > 0) {
+      const entryIds = this.entryIdsFor([...turnIdsToUndo, ...turnIdsToRedo]);
       const applyEffects = this.applyEffectsFn;
       this.applyReversal(() => applyEffects(applications));
+      this.recordAppliedEntries(entryIds);
     }
   }
 
@@ -2554,7 +2673,7 @@ export function restoration(
               orderDeltas.some((delta) => delta.owner === order.owner)
           );
         if (overlaps) {
-          throw new Error(
+          throw restorationRefusal(
             'ST1034: restoration refused — overlapping transaction is pending. ' +
               'Nothing was changed; the history position is unmoved.'
           );
@@ -2612,7 +2731,7 @@ export function restoration(
           externalOrderOwners.has(owner)
         );
         if (conflictingOrderOwner !== undefined) {
-          throw new Error(
+          throw restorationRefusal(
             `ST1034: restoration refused — collection order ${conflictingOrderOwner} ` +
               'changed after the operation being reversed. Nothing was changed; ' +
               'the history position is unmoved.'
@@ -2829,7 +2948,7 @@ export function restoration(
           //     different door
           //   let the inverse win -> history overwrites external truth it does
           //     not own, which is the case-6 defect
-          throw new Error(
+          throw restorationRefusal(
             `ST1034: restoration refused — '${refusal.path}' changed after the ` +
               `operation being reversed. Expected ${JSON.stringify(
                 refusal.expected
@@ -2838,7 +2957,10 @@ export function restoration(
               )}. Nothing was changed; the history position is unmoved.`
           );
         }
-        throw new Error(`Unsupported scoped undo effect at ${refusal.kind}`);
+        // A structured refusal from validation: nothing was applied.
+        throw restorationRefusal(
+          `Unsupported scoped undo effect at ${refusal.kind}`
+        );
       }
 
       if (usesDeclarativeTarget) {
@@ -3999,7 +4121,9 @@ export function restoration(
         subjectIds.length > 0 ? subjectIds : undefined,
         positionIds.length > 0 ? positionIds : undefined,
         effects.length > 0 ? effects : undefined,
-        collectionOrders.length > 0 ? collectionOrders : undefined
+        collectionOrders.length > 0 ? collectionOrders : undefined,
+        undefined,
+        transactionId
       );
       if (entry) {
         pendingDescriptorInputs.set(entry.id, descriptorInputs);
