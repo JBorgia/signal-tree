@@ -226,6 +226,9 @@ compensation writes are not new order history (`cf98697a`, slice 5) and
 correctness-first port may allocate unconditionally). Carry the repair with or
 after slice 5 rather than pulling those slices out of order.
 
+Carried after slice 5 (`0571bced`); see "15.4.2 restoration carry" below,
+which also corrects the case count (69, not 63).
+
 ## 15.4.3 carry-over: membership-only writes reach every reader (2026-10-05)
 
 The two defects fixed in v15 15.4.3 (`849e825e`) reproduced identically on v16:
@@ -393,3 +396,323 @@ the callback runs.
    evidence, footprints and both observers across `resetRestorationHistory()`
    (reset is not a settlement). Destroy still releases everything. No test
    covers an abandoned handle.
+
+## Slice 5: collection order, scale and staging coherence
+
+Committed as `06173c99` (order and staging), `67eadea6` (shared key snapshot,
+`ids()` identity), `b4543600` (bounded work and argument spreads) and the
+review follow-up `d287e3f4` (addMany anchors in overwrite mode), on
+`integrate/v16-slice5` from `78482a55`. Raw logs, first reds, mutation logs and
+patched-runtime snapshots: `/private/tmp/st-v16-integration-evidence/slice5/`.
+
+Donor fixtures copied from v15 `012fd11d` with `.transaction(` → `.transact(`.
+All seven pass unchanged on an export of `012fd11d` (36, 12, 11, 12, 7, 10;
+external-authored-baseline 69): `slice5/donor-on-v15-012fd11d/`.
+
+First red on `78482a55`: set-all-order-reversal and entity-large-batches do
+not load (they import the slice-6 `entityMembershipReader`); carried without
+the reader they fail 22/36 and 9/10. add-many-redo-order 8/12,
+entity-set-all-staging 3/12, entity-ids-identity 1/7. entity-observation-gate
+6/10: five are the slice-9 demand gate; the sixth fails only because the
+ungated port also records the preceding `setAll`.
+
+### Classification
+
+| Fixture / case                                                                                                      | First-red cause                                                                                                                                                                                                                                                                                           | Class                     |
+| ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| set-all-order-reversal: undo/redo and rollback of remove-one/swap/add-one/add-and-remove with survivor reorder (16) | `setAll` published an order delta only for a pure permutation; neighbour hints cannot restore moved survivors ([a,b,c] → [c,a] reversed to [b,c,a]).                                                                                                                                                      | a                         |
+| set-all-order-reversal: undo of remove-all and replace-all, rollback of replace-keep-order (6)                      | Removal anchors pointed only at survivors, so adjacent removals shared anchors and replay order decided the result ([c,b,a], [a,c,b]).                                                                                                                                                                    | a                         |
+| set-all-order-reversal: membership snapshot equals physical order after rollback                                    | Needs `entityMembershipReader` (slice 6). Carried spec checks ids and values instead; the donor is `preserved/set-all-order-reversal.spec.ts.txt`.                                                                                                                                                        | c                         |
+| add-many-redo-order (8)                                                                                             | Anchors read the pre-add key list at `i + previous - added`; redo gave [k1,k2,k3,k4,x,k5,y].                                                                                                                                                                                                              | a                         |
+| entity-large-batches: 130k undo/redo of a full replacement                                                          | Wrong order (undo gave [129999, …]) and 159 s: survivor-only anchors plus a per-removal `findIndex` and the pairwise key-handoff scan.                                                                                                                                                                    | a                         |
+| entity-large-batches: neighbour-search work guards (8)                                                              | One `findIndex` per removed row: n(n+1)/2 predicate visits.                                                                                                                                                                                                                                               | a                         |
+| entity-large-batches: 130k setAll/replace/clear with membership observed                                            | Needs the slice-6 reader; preserved as `preserved/entity-large-batches.spec.ts.txt`. v16's own spread sites are covered by the v16 controls below.                                                                                                                                                        | c                         |
+| entity-set-all-staging: adjacent removals carry removed neighbours                                                  | Survivor-only anchors (as above).                                                                                                                                                                                                                                                                         | a                         |
+| entity-set-all-staging: add interceptor adds a row during staging                                                   | v16 committed the stale plan: on `78482a55` the interceptor's `extra` row is dropped from the order (ids `['q']`, count 1) while its key stays registered. Now the operation throws "collection topology changed during staging" and the completed write stands. Probe: `first-red/staging-state-probe*`. | a                         |
+| entity-set-all-staging: removal interceptor rekeys during staging                                                   | v16 refused only incidentally ("Entity with id b not found") with coherent state; the guard now refuses explicitly before anything commits.                                                                                                                                                               | a                         |
+| entity-ids-identity: reused across field writes                                                                     | `ids()` copied the walk on every version bump, re-notifying `ids()` consumers on value-only writes.                                                                                                                                                                                                       | a                         |
+| entity-observation-gate: five demand-gate cases                                                                     | v16 has no `hasObservers` gate on entity payloads (97affed3/172a8268, slice 9). Preserved as `preserved/entity-observation-gate.spec.ts.txt`.                                                                                                                                                             | c                         |
+| entity-observation-gate: every pre-removal neighbour captured when the last interceptor enables observation         | Only the ungated port's record of the preceding `setAll` differs. Carried with `mockClear()` after that `setAll`; the removal assertions are unchanged and hold with or without the gate.                                                                                                                 | c (adapted, not weakened) |
+
+The two removal-observation staging controls pass before and after (v16 builds
+every payload, so a mid-operation observer cannot miss one).
+
+### Ported (conceptual hunks, against v16)
+
+- `K/lib/entity-signal.ts` `setAll`: one walk of the structural order into
+  parallel key/lifetime arrays (`StructuralStore.snapshotActiveOrder`);
+  index-aligned incoming staging (first position, last value; interceptors
+  per occurrence via the shared `interceptReplacedEntity`); removal anchors
+  are immediate pre-state neighbours and add anchors adjacent after-order
+  entries, both read by index; the order delta is published whenever
+  surviving rows change relative order; 8fe2664f's topology guard (order
+  frontier or key→lifetime changed during interceptors/selectors) runs after
+  every callback and before any commit. v16's commit/publication sequence is
+  kept (`tombstoneSubjectSignal` before reclamation, per-row
+  `publishSubjectPhysicalChange`, `syncEntitySignal`, notify arguments). Not
+  ported: the slice-9 demand gate (`pathObserved`, epoch/reclamation skips),
+  the slice-6 membership units, the `ST2001` duplicate-key warning, and
+  8fe2664f's `removeOne`/`removeMany` reordering (it only moves demand sampling
+  after interceptors; v16 has no demand sampling).
+- `addMany`: anchors are the previous added row, or the last row before the
+  call (no key-list copy). v16 refinement after review (`d287e3f4`): "added"
+  means a FRESH row; an `overwrite` replacement stays in place and is not an
+  anchor (the donor anchored x after k2 in [k1..k4] + [k2', x]).
+  `entity-add-many-anchors.spec.ts` (4) fails 1/4 on `0571bced` and 4/4 with
+  `78482a55`'s addMany.
+- `K/lib/physical/structural-store.ts`: cached active-key snapshot cleared at
+  the start of all twelve list/key mutators (including v16's `clear()`);
+  `reorderActiveKeys` returns early, with no new frontier, when the order is
+  unchanged. `ids()` reuses its array while the snapshot is unchanged.
+- New `I/utilities/append-all.ts`; `appendAll` replaces call spreads in
+  restoration (historical gap, undo/redo, directed `jumpTo` in both directions
+  via a reverse loop, claim release — c2f72e6e), the structural target's
+  pending-anchor order and devtools path registration. v16 has no
+  serialization enhancer.
+- `C/target-transition.ts`: key handoff indexed by owner and key, hits
+  re-checked with `Object.is`.
+- v16 addition (same mechanism class, no donor hunk; v15 has the same scan):
+  `C/pending-rollback.ts` chose each effect's dominant structural effect with
+  a scan of every structural effect in the turn. Indexed by lifetime;
+  `sameSubjectScope` still decides within one lifetime. Without it a 130k-row
+  rollback did not finish.
+- `tools/verify-setall-neighbour-search.mjs` from 8fe2664f (not the
+  a2117020/36409c42 timing margins), adapted to v16: one carried argument-limit
+  case (10 tests, 1 skipped) and no demand gate, so the neighbour mutation
+  fails both modes (8, 4 per mode). Passes: control 9/9, both mutations 8.
+
+### v16 controls
+
+- `K/lib/entity-large-batches-v16-controls.spec.ts` (16): 130k
+  setAll/replace/clear with a notifier subscriber; 130k rollback of a full
+  replacement that reuses one removed key (a key handoff sends it through the
+  declarative target with no live anchor, so the pending-anchor order is
+  appended in one batch), both enhancer orders; pending-rollback dominance
+  work guards (find-predicate visits ≤ 2n) for replace and clear at 256/1024
+  in three enhancer configurations, plus the instrumentation self-test.
+- `E/restoration/large-batch-restoration-v16-controls.spec.ts` (2, own
+  worker): `jumpTo` across a 130k `clear()` turn in both directions; history
+  truncation releasing that turn's 130k claims.
+- `C/target-transition-key-handoff.spec.ts` (6): the handoff rule (same owner,
+  never self, `Object.is` for ±0 and NaN, rekey chains) and an `Array#some`
+  work guard.
+
+On `78482a55`: the notifier control passes but takes 103.6 s (1.0 s now); both
+restoration controls throw `RangeError: Maximum call stack size exceeded`;
+all 12 dominance guards fail (131328/2098176 visits for replace,
+32896/524800 for clear); the handoff work case visits 2100224 (its five rule
+cases pass). The first-draft rollback control (a plain replacement, without
+the key reuse) timed out after 310 s on `78482a55`; the final key-reuse form
+was not run there. Final: 16/16, 2/2, 6/6.
+
+### Mutations (each restored; logs `slice5/mutations-part1/`)
+
+Counts are killed cases.
+
+- M1 survivor-only removal anchors: 7. M2 order delta only for a pure
+  permutation: 16. M3 addMany pre-add offset (15.3.1): 8. M4 every add after
+  the last pre-call row: 8. M5 no topology guard: 4. M6 frontier-only guard: 3. M7 no snapshot invalidation on `changeId`: 3. M8 fresh `ids()` copy: 1.
+  M9 handoff without `Object.is`: 1. M10 handoff across owners: 1. M12
+  rollback index without the scope check: 3. M13 pending-anchor order with a
+  spread: 0 against the first rollback control, which never reached that site;
+  rerun as M13b against the key-reuse control: 2. M14 directed undo with a
+  spread: 1. M15 claim release with a spread: 1. M16 redo with a spread: 1.
+  M17 unindexed dominance scan: 12. Review follow-up (`mutations-review/`):
+  advancing the addMany anchor on overwritten rows (the donor rule) 1; never
+  advancing it 12.
+- Survivor: M11 (index keeps only the last structural effect per lifetime).
+  It differs only when one lifetime has structural effects in two collections
+  AND a field effect in the turn. The only such turn is update-then-remove of
+  a row, which is already wrong on both lines (open item 2); an add-then-update
+  falsifier coalesces into one add. Attempt and log:
+  `slice5/open-item-update-then-remove-rollback/m11-attempted-falsifier*`.
+
+### Results
+
+Per fixture after: 36/36, 12/12, 10/10, 12/12, 7/7, 3/3; controls 16/16, 2/2,
+6/6, 4/4. Full kernel, each commit alone: `06173c99` 359 files / 3540 passed,
+`67eadea6` 360 / 3547, `b4543600` 364 / 3581, and with the 15.4.2 carry
+`0571bced` 367 / 3686, `d287e3f4` 368 / 3690; 6 expected failures and 13
+skipped each, exit 0 (`78482a55`: 355 / 3477; the differences are exactly the
+new cases). Frameworks: angular 179 (+3 skipped), react 23, vue 61, solid 41.
+`tsc -p tsconfig.typecheck-all.json`, `tools/check-spec-types.mjs` and
+`nx lint kernel` exit 0 (spec-types reports three pre-existing files below
+their baseline; the baseline was not ratcheted here).
+
+## 15.4.2 restoration carry
+
+Committed as `0571bced`. Ports 5c22eac5's restoration hunks and the
+order-capture rule it depended on (cf98697a: compensation is not new order
+history), which slice 5 part 1 did not provide.
+
+The preserved spec (`preserved/external-authored-baseline.spec.ts.txt`) is
+restored as `E/restoration/external-authored-baseline.spec.ts`, unchanged but
+for a header. Correction to the carry-over status above: it has 69 cases, not
+63; the slice-3d log reads "69 tests | 28 failed" for this file (its 91 total
+included another file). First red on `b4543600`: 27/69. The 28th, jumpTo
+through historical membership/order gaps, fails on `78482a55` and passes from
+`06173c99` (survivor order delta with membership change).
+
+### Classification
+
+All 27 are real v16 defects (class a). No expectation conflicted with a v16
+contract or law.
+
+| Cases (× enhancer variants)                                                        | First-red cause                                                                                                         | Law / contract            |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| undo restores the external baseline before the first authored turn (4)             | External 0 → 5 shared the authored effect map, so undo of 5 → 6 restored 0.                                             | L3, L4, L11; P0-C         |
+| earlier boundary reconstruction across external and authored work in one flush (4) | Same contamination; undo gave [0, 1, 0] instead of [5, 1, 0].                                                           | L3, L11                   |
+| entity undo keeps external sibling fields (4)                                      | External `{a: 5, b: 7}` folded into the authored row diff.                                                              | L3, L4                    |
+| disjoint external truth stays outside designated history, nested and not (8)       | The external `x` entered the designated turn and was reversed.                                                          | L3, L18 (nested external) |
+| net-zero external/authored work keeps an authored boundary (2)                     | External 0 → 5 + authored 5 → 0 coalesced to nothing; the turn had no boundary event.                                   | L3                        |
+| inspection reorder is not reversed by an unrelated authored turn (4)               | Inspection order captures entered authored order.                                                                       | DEVTOOLS-JUMP-0.1         |
+| inspection reorder does not erase external order protection (1)                    | The inspection capture took the authored branch and deleted the external-order owner, so undo no longer refused ST1034. | P0-C, DEVTOOLS-JUMP-0.1   |
+
+### Ported
+
+- `E/restoration/restoration.ts`: a historical bucket, allocated only while
+  retained or pending history exists (`hasRetainedOrPendingHistory()`, the
+  03deb906 predicate; its flush-time skip is slice 9 and not ported),
+  receives realized writes and ordinary (non-transaction) authored writes,
+  never compensation or inspection; realized scalar, row and plain-branch
+  membership writes no longer enter the authored bucket. Boundary events
+  (`addEntry` → `buildTurn`) and gaps use the historical capture; turn
+  effects stay authored-only. A net-zero flush with a boundary keeps its
+  event. Collection order captures from compensation or inspection are
+  ignored; realized ones go to the historical bucket and keep marking
+  external-order ownership. `resetRestorationHistory()` also clears the
+  ordinary and historical buckets (v16 still keeps open-transaction capture).
+  `clearCaptureBucket` comes from 03deb906.
+- HIST-C2's notifier half was already carried in slice 3c.
+
+### Preserved counterexamples resolved
+
+Slice 3b preserved two readings of the external → undoable baseline.
+`preserved/first-with-direct-control.spec.ts.txt` (baseline 5) fails 12/28 on
+`b4543600` and passes 28/28 after; it is restored as
+`E/batching/external-baseline-coalescing.spec.ts` (coalesced and direct,
+scalar and dynamic entity field, both enhancer orders — L18).
+`preserved/pre-interpretation.spec.ts.txt` (baseline 0) now fails exactly
+those 12 and is annotated as superseded: undo removes the authored
+contribution and leaves surviving external truth (L3, L4, L11), as published
+15.4.2 does.
+
+### v16 controls
+
+`E/restoration/external-authored-baseline-v16-controls.spec.ts` (8, both
+enhancer orders): an external gap while a refused automatic compensation's
+recovery handle keeps the turn pending (contract 2) stays external through
+recovery `confirm()` and undo; `resetRestorationHistory()` inside an open
+transaction keeps that transaction's turn, and external truth written after
+the reset stays out of its reversal; a rollback's compensation never reaches a
+later boundary's reconstruction; external plain-branch membership stays out of
+an authored turn. All pass on `b4543600` too (composition and exclusion
+controls); the membership case kills mutation M11 below.
+
+### Mutations (logs `slice5/mutations-part2/`)
+
+- Killed: M1 realized writes still in the authored bucket 34 (22 carried, 12
+  coalescing); M2 no historical bucket 21; M4 net-zero boundary dropped 1;
+  M5 inspection order captured 5; M7 gaps from authored effects 16; M8
+  boundary event from authored effects 5; M10 pending authored writes in the
+  historical bucket 2; M11 realized membership still authored 2 (v16
+  control).
+- Survivors, each explained: M3 allocating the historical bucket
+  unconditionally changes no tested result. Review noted that history which
+  first appears mid-flush (a subscriber stages a transaction during delivery)
+  leaves the bucket without that flush's earlier writes; those writes precede
+  every boundary, so the conditional (the donor's) leaves nothing to
+  reconstruct, whereas unconditional allocation would file them AFTER the new
+  boundary. Kept as donated; not probed further;
+  M6 dropping the compensation order exclusion — no v16 path publishes an
+  order capture under compensation (rollback installs prepared targets; a
+  subscriber or owner-invalidation listener runs outside the compensation
+  context: `part2/compensation-order-*probe*`), so the rule is defensive;
+  M9 compensation in the historical bucket — compensation does reach the
+  subscription (`part2/compensation-delivery-probe*`), but it returns a
+  location to the value the bucket already reconstructs, so no observed state
+  differs.
+
+### Results
+
+Carried spec 69/69; coalescing 28/28; v16 controls 8/8. Full kernel 367 files,
+3686 passed, 6 expected failures, 13 skipped, exit 0 (`d287e3f4`: 368 /
+3690). Frameworks angular 179 (+3), react 23, vue 61, solid 41. Types,
+spec-types, kernel lint exit 0, at both commits.
+
+### Independent review
+
+One read-only review of `78482a55..0571bced` (code-reviewer agent). No
+critical finding; it confirmed the setAll commit/publication order, snapshot
+invalidation coverage, handoff and rollback-index equivalence, the 15.4.2 port
+hunk for hunk, and fixture fidelity. Dispositions:
+
+- Major, addMany `overwrite`: fresh rows anchored to an overwritten mid-list
+  row, and undo deletes overwritten rows. The anchor is fixed in `d287e3f4`
+  with its spec; the deletion predates this slice on both lines and stays
+  open item 3.
+- Minor, historical bucket allocated only once history exists: kept as
+  donated (see the M3 survivor above).
+- Minor, the collection-order subscription has no `origin === 'restoration'`
+  filter: undo, redo and `jumpTo` publish no order capture on v16 (prepared
+  targets), probed in three enhancer configurations
+  (`review-fixes/restoration-order-capture-probe*`). Unchanged.
+- Minor, `setAll` skips a current row whose backing is absent (it would then
+  drop out of the reordered list): the old projected-entries filter did the
+  same; an active subject without backing is not reachable. Unchanged.
+- Info, `ids()` returns one shared array between key changes (it already did
+  between version bumps); a consumer that mutates it corrupts later reads.
+- Info, the set-all-order-reversal header overstated "unchanged"; reworded in
+  `d287e3f4`. The commit message of `0571bced` says allocating
+  unconditionally "changes no result"; read it as "no tested result".
+
+The reviewer's own probe directory could not be deleted under its
+permissions; it was moved out of the worktree to the session scratchpad,
+unchanged.
+
+### User-visible behaviour changes in v16 (slice 5 and 15.4.2)
+
+1. `setAll` throws "Cannot setAll: collection topology changed during
+   staging" when an interceptor or selector changes membership, keys or order
+   mid-operation; the callback's own write stands and nothing else commits.
+2. `ids()` keeps its array identity across value-only writes.
+3. `setAll` structural effects carry immediate pre-state removal neighbours
+   and adjacent add neighbours; `setAll` publishes an order capture whenever
+   survivors reorder, so undo/rollback restore order exactly. `addMany`
+   anchors each fresh row to the previous fresh row or the pre-call tail.
+4. A `setAll` that leaves the order unchanged mints no new order frontier.
+5. Entity batches past ~1.2e5 rows no longer throw `RangeError` in
+   restoration, transaction rollback or devtools; large replacements undo and
+   roll back in linear-ish work.
+6. Undo/redo never reverses external truth captured in the same flush or as
+   plain-branch membership; inspection reorders create no history and no
+   longer clear external order protection; a net-zero authored turn keeps its
+   history boundary; reset clears pending ordinary capture.
+
+### Open items
+
+1. `where()`/`find()` external reactive dependencies (7463f4eb) reproduce on
+   v16 (2/2 fail, `slice5/where-find-probe*`). PLAN assigns them to slice 9 or
+   an independent entity slice; not ported here.
+2. Pending rollback of update-then-remove in one transaction restores the
+   UPDATED value (n 1, not 0); with lifetimes shared across collections it
+   refuses with effect-validation-failed. Reproduced identically on
+   `78482a55` and v15 `012fd11d`
+   (`slice5/open-item-update-then-remove-rollback/`). Not a slice-5 hunk.
+3. `addMany(..., { mode: 'overwrite' })` publishes an overwritten existing row
+   as a structural add, so undo deletes that row and redo re-adds it at the
+   wrong position (`78482a55`: anchor-cycle refusal on redo; v15 `012fd11d`
+   and `0571bced`: identical reorder; `d287e3f4`: fresh rows redo in order,
+   the overwritten row returns after them). Both lines
+   (`slice5/open-item-addmany-overwrite/`). What an overwrite should publish
+   (a value replacement with `prev`; which tap fires) is a behaviour decision.
+4. Scale limits beyond the call-argument class, seen while building the
+   controls: retention across `jumpTo` of a 130k replacement (~25 KB/row,
+   4 GB heap exhausted) and `deriveStructuralTargetOrder`'s per-addition
+   search/splice (redo of a 130k `addMany` via `jumpTo`: 392 s). Slice 9 or
+   later; no v16 performance claim is made here.
+5. Spread sites left unchanged because their counts are not entity-sized:
+   applied-turn-projection's redo-id `splice(...)` (redo turns) and
+   location-runtime's `errors.push(...flushConsumers())` (publisher errors).
+6. A write queued before `resetRestorationHistory()` in the same tick is still
+   captured at delivery, after the reset, before and after this carry.
