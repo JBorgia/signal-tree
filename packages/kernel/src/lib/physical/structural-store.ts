@@ -63,6 +63,7 @@ export type PreparedStructuralTarget<K extends string | number> = {
 };
 
 export class StructuralStore<K extends string | number> {
+  private keysCache: readonly K[] | undefined;
   private subjectIds = new Map<K, number>();
   private subjectStates = new Map<number, SubjectLifetimeRecord<K>>();
   private subjectRevisions = new Map<number, number>();
@@ -182,11 +183,19 @@ export class StructuralStore<K extends string | number> {
     return this.activeCount;
   }
 
+  /**
+   * Active keys in order, shared until the next list or key mutation. Every
+   * mutator of the active list (or of a node's key) clears it; a field write
+   * changes neither, so reading `ids()` after one no longer re-walks the list.
+   * Callers must not mutate the result.
+   */
   activeKeysSnapshot(): readonly K[] {
+    if (this.keysCache) return this.keysCache;
     const keys: K[] = [];
     for (let node = this.activeHead; node !== undefined; node = node.next) {
       keys.push(node.key);
     }
+    this.keysCache = keys;
     return keys;
   }
 
@@ -301,6 +310,7 @@ export class StructuralStore<K extends string | number> {
   }
 
   installPreparedTarget(target: PreparedStructuralTarget<K>): void {
+    this.keysCache = undefined;
     this.subjectIds = target.subjectIds;
     this.subjectStates = target.subjectStates;
     this.subjectRevisions = target.subjectRevisions;
@@ -313,6 +323,7 @@ export class StructuralStore<K extends string | number> {
   }
 
   moveKeysToFront(keys: readonly K[]): void {
+    this.keysCache = undefined;
     const nodes = keys
       .map((key) => this.activeNodesByKey.get(key))
       .filter((node): node is ActiveNode<K> => node !== undefined);
@@ -328,6 +339,22 @@ export class StructuralStore<K extends string | number> {
   }
 
   reorderActiveKeys(keys: readonly K[]): void {
+    // Already in this order (every load into an empty collection, and most
+    // refetches): nothing to relink and no order change, so the key snapshot
+    // and the order frontier stay as they are.
+    let current = this.activeHead;
+    let unchanged = true;
+    for (const key of keys) {
+      const node = this.activeNodesByKey.get(key);
+      if (node === undefined) continue;
+      if (node !== current) {
+        unchanged = false;
+        break;
+      }
+      current = current.next;
+    }
+    if (unchanged && current === undefined) return;
+    this.keysCache = undefined;
     this.activeHead = undefined;
     this.activeTail = undefined;
 
@@ -431,6 +458,7 @@ export class StructuralStore<K extends string | number> {
 
     this.activeNodesByKey.delete(from);
     node.key = to;
+    this.keysCache = undefined;
     this.activeNodesByKey.set(to, node);
     this.activeNodesBySubject.set(subjectId, node);
   }
@@ -605,6 +633,7 @@ export class StructuralStore<K extends string | number> {
   }
 
   clear(): void {
+    this.keysCache = undefined;
     this.subjectIds.clear();
     this.subjectStates.clear();
     this.subjectRevisions.clear();
@@ -704,6 +733,7 @@ export class StructuralStore<K extends string | number> {
   }
 
   private createAndAppendActiveNode(subjectId: number, key: K): void {
+    this.keysCache = undefined;
     const node: ActiveNode<K> = {
       key,
       subjectId,
@@ -718,11 +748,13 @@ export class StructuralStore<K extends string | number> {
   }
 
   private unregisterActiveNode(node: ActiveNode<K>): void {
+    this.keysCache = undefined;
     this.activeNodesByKey.delete(node.key);
     this.activeNodesBySubject.delete(node.subjectId);
   }
 
   private prependDetachedNode(node: ActiveNode<K>): void {
+    this.keysCache = undefined;
     node.prev = undefined;
     node.next = this.activeHead;
     if (this.activeHead !== undefined) {
@@ -734,6 +766,7 @@ export class StructuralStore<K extends string | number> {
   }
 
   private appendDetachedNode(node: ActiveNode<K>): void {
+    this.keysCache = undefined;
     node.next = undefined;
     node.prev = this.activeTail;
     if (this.activeTail !== undefined) {
@@ -748,6 +781,7 @@ export class StructuralStore<K extends string | number> {
     node: ActiveNode<K>,
     anchor: ActiveNode<K>
   ): void {
+    this.keysCache = undefined;
     node.prev = anchor;
     node.next = anchor.next;
     if (anchor.next !== undefined) {
@@ -762,6 +796,7 @@ export class StructuralStore<K extends string | number> {
     node: ActiveNode<K>,
     anchor: ActiveNode<K>
   ): void {
+    this.keysCache = undefined;
     node.next = anchor;
     node.prev = anchor.prev;
     if (anchor.prev !== undefined) {
@@ -773,6 +808,7 @@ export class StructuralStore<K extends string | number> {
   }
 
   private detachNode(node: ActiveNode<K>): void {
+    this.keysCache = undefined;
     if (node.prev !== undefined) {
       node.prev.next = node.next;
     } else {
