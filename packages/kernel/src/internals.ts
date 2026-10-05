@@ -233,6 +233,16 @@ export {
 } from './lib/internals/transaction-lifecycle-view';
 
 export {
+  restorationReader,
+  type RestorationReader,
+  type RestorationReaderSnapshot,
+  type RestorationReaderEvent,
+  type RestorationEntryView,
+  type RestorationEntryId,
+  type RestorationOperationId,
+} from './lib/internals/restoration-reader';
+
+export {
   entityMembershipReader,
   type EntityMembershipReader,
   type EntityMembershipSnapshot,
