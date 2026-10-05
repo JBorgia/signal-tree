@@ -2493,6 +2493,10 @@ export function restoration(
           effects: [...bucket.effects.values()],
           collectionOrders: [...bucket.collectionOrders.values()],
         })),
+        ...[...pendingFootprints.values()].map((footprints) => ({
+          effects: [...footprints.values()],
+          collectionOrders: [],
+        })),
       ]) {
         const overlaps =
           pending.effects.some(
@@ -3093,6 +3097,20 @@ export function restoration(
     // rather than assuming provenance would be sufficient.
 
     const pendingTransactions = new Map<number, CaptureBucket>();
+    /**
+     * Admission evidence for a foreign transaction that is open or pending,
+     * recorded when its write COMMITS (entity rows) or is ENQUEUED (any
+     * location) — before notifier delivery can re-enter restoration. The
+     * capture buckets below only learn a write when it is delivered, so an
+     * undo/redo run inside the transaction callback, or by an earlier
+     * subscriber of the same delivery, found the location unowned and
+     * overwrote pending truth.
+     *
+     * Addresses only: values stay owned by transactions(), and nothing here
+     * becomes history. Released by the owner's confirmed/rolled-back event or
+     * by destroy. A history reset is not a settlement and keeps it.
+     */
+    const pendingFootprints = new Map<number, Map<string, TurnEffect>>();
     // Capture evidence for all staged transactions, including non-undoable ones.
     const stagedTransactionEffects = new Map<
       number,
@@ -3928,6 +3946,112 @@ export function restoration(
       }
       return entry;
     };
+    const rememberPendingFootprints = (
+      transactionId: number,
+      effects: Iterable<TurnEffect>
+    ): void => {
+      let footprints = pendingFootprints.get(transactionId);
+      for (const effect of effects) {
+        if (!footprints)
+          pendingFootprints.set(transactionId, (footprints = new Map()));
+        const footprint: TurnEffect =
+          effect.kind === 'set'
+            ? { ...effect, before: undefined, after: undefined }
+            : effect.kind === 'rekey'
+            ? { ...effect }
+            : { ...effect, value: undefined };
+        footprints.set(effectKey(footprint), footprint);
+      }
+    };
+    // Foreign owners only: their lifecycle events are what release footprints.
+    const pendingFootprintTransaction = (
+      meta: WriteMetadata | undefined
+    ): number | undefined =>
+      isRestoring ||
+      meta?.transactionOwner === transactionOwnerToken ||
+      meta?.origin === 'restoration' ||
+      isInspectionWrite(meta) ||
+      isCompensationWrite(meta) ||
+      getWriteParticipation(meta) === 'realized'
+        ? undefined
+        : resolveTransactionId(meta);
+    /**
+     * Installed when a foreign transaction opens and released when none is
+     * open or pending, so a tree that never transacts pays for neither channel.
+     * Two producers, one evidence store: committed entity capture (published
+     * after a whole multi-row commit applies, before its first notification)
+     * and the notifier's enqueue witness (synchronous with every write). A
+     * reader of the queue at admission time would miss an entry already
+     * dequeued for delivery to an earlier subscriber.
+     */
+    let releasePendingObservation: (() => void) | undefined;
+    const observePendingFootprints = (): void => {
+      if (releasePendingObservation) return;
+      const releaseCommitted = getMutationCaptureRuntime(
+        tree
+      )?.subscribeCommittedEntity?.((capture) => {
+        const transactionId = pendingFootprintTransaction(capture.meta);
+        if (transactionId === undefined) return;
+        const scratch: PendingEffectMap = new Map();
+        for (const change of capture.changes) {
+          if (change.structural) {
+            // Membership or key change: the whole lifetime is claimed.
+            const footprint: TurnEffect = {
+              kind: 'set',
+              position: capture.owner,
+              ownerPath: capture.ownerPath,
+              path: capture.ownerPath,
+              subject: change.subject,
+              subjectFieldSegments: [],
+              before: undefined,
+              after: undefined,
+            };
+            scratch.set(effectKey(footprint), footprint);
+          } else {
+            captureEffects(
+              scratch,
+              capture.ownerPath,
+              change.after,
+              change.before,
+              capture.meta,
+              capture.ownerPath,
+              [change.subject],
+              [capture.owner]
+            );
+          }
+        }
+        rememberPendingFootprints(transactionId, scratch.values());
+      });
+      const ownerId = getPositionRegistry(tree.$)?.id;
+      const releaseEnqueued =
+        ownerId === undefined
+          ? undefined
+          : getPathNotifier()?.observeEnqueue(ownerId, (entry) => {
+              const transactionId = pendingFootprintTransaction(entry.meta);
+              if (transactionId === undefined) return;
+              const scratch: PendingEffectMap = new Map();
+              captureEffects(
+                scratch,
+                entry.path,
+                entry.newValue,
+                entry.oldValue,
+                entry.meta,
+                entry.ownerPath,
+                entry.subjectIds ? [...entry.subjectIds] : undefined,
+                entry.positionIds ? [...entry.positionIds] : undefined
+              );
+              rememberPendingFootprints(transactionId, scratch.values());
+            });
+      releasePendingObservation = () => {
+        releasePendingObservation = undefined;
+        try {
+          releaseCommitted?.();
+        } finally {
+          releaseEnqueued?.();
+        }
+      };
+    };
+
     /**
      * TURN-FEED-0 — observe a FOREIGN transaction's lifecycle.
      *
@@ -3956,6 +4080,7 @@ export function restoration(
         // Registered BEFORE the transaction's writes arrive, which is why the
         // announcement has to precede the callback.
         activeForeignTransactions.set(key, event.id);
+        observePendingFootprints();
         return;
       }
 
@@ -3978,6 +4103,8 @@ export function restoration(
 
       activeForeignTransactions.delete(key);
       stagedTransactionEffects.delete(event.id);
+      pendingFootprints.delete(event.id);
+      if (activeForeignTransactions.size === 0) releasePendingObservation?.();
       if (event.kind === 'rolled-back') {
         pendingTransactions.delete(event.id);
         // NOT restored here. Measured: this event fires BEFORE the rollback's
@@ -4491,8 +4618,11 @@ export function restoration(
       pendingTransactions.clear();
       supersededExternalTruth.clear();
       supersededExternalRows.clear();
-      stagedTransactionEffects.clear();
-      activeForeignTransactions.clear();
+      // NOT stagedTransactionEffects / activeForeignTransactions /
+      // pendingFootprints: a history reset is not a settlement. Clearing the
+      // open set made a still-open transaction's later writes look ordinary,
+      // and clearing staged evidence let undo overwrite still-pending truth.
+      // Only the owner's lifecycle event or destroy releases pending ownership.
       externalTruthByPath.clear();
       externalMembershipTruth.clear();
       displacedMembershipTruth.clear();
@@ -4596,6 +4726,8 @@ export function restoration(
         supersededExternalRows.clear();
         stagedTransactionEffects.clear();
         activeForeignTransactions.clear();
+        pendingFootprints.clear();
+        releasePendingObservation?.();
       });
     }
 
