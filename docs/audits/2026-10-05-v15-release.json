@@ -1,0 +1,230 @@
+{
+  "version": "15.4.2",
+  "sourceSHA": "012fd11db2aba7acf59b374b84880aaaa6b62360",
+  "tag": "v15.4.2",
+  "tagObject": "9067bfc248cee04d51716bdb79267eb2e5db4662",
+  "releaseURL": "https://github.com/JBorgia/signal-tree/releases/tag/v15.4.2",
+  "supersedes": {
+    "5c22eac5b319bab4fc2f8b6e02cb0e0b896ee9fe": "qualified locally and on Linux (run 37036128088), never tagged; scope extended by the owner with the structural-supersession port",
+    "14003fc26f5f97bc8f816c18ba8bb876a7b27e3d": "signed v15.4.1 tag preserved; never published"
+  },
+  "runs": {
+    "linuxValidate": 37321395870,
+    "tagRelease": 37324153821,
+    "publish": 37326890452,
+    "publishDispatchRefused": {
+      "run": 37326803412,
+      "reason": "dispatched from main; the workflow requires the release tag ref and exited before publishing"
+    }
+  },
+  "local": {
+    "phases": [
+      {
+        "name": "gates",
+        "command": "node",
+        "args": [
+          "tools/verify-gates.mjs",
+          "--release"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 243.722
+      },
+      {
+        "name": "proofs",
+        "command": "node",
+        "args": [
+          "tools/verify-gates.mjs",
+          "--self-test",
+          "--release"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 176.006
+      },
+      {
+        "name": "build",
+        "command": "pnpm",
+        "args": [
+          "run",
+          "build:all",
+          "--skip-nx-cache"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 6.838
+      },
+      {
+        "name": "tarball",
+        "command": "node",
+        "args": [
+          "tools/verify-tarball-consumer.mjs"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 1.75
+      },
+      {
+        "name": "types",
+        "command": "node",
+        "args": [
+          "tools/verify-consumer-typecheck.mjs"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 6.656
+      },
+      {
+        "name": "aot",
+        "command": "node",
+        "args": [
+          "tools/verify-angular-aot-consumer.mjs"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 21.112
+      },
+      {
+        "name": "budget",
+        "command": "node",
+        "args": [
+          "tools/check-bundle-budget.mjs"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 0.137
+      },
+      {
+        "name": "demo",
+        "command": "pnpm",
+        "args": [
+          "nx",
+          "build",
+          "demo",
+          "--configuration=production",
+          "--skip-nx-cache"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 6.482
+      },
+      {
+        "name": "browser",
+        "command": "pnpm",
+        "args": [
+          "run",
+          "smoke:routes"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 30.671
+      },
+      {
+        "name": "candidate",
+        "command": "node",
+        "args": [
+          "scripts/publish-candidate.mjs",
+          "--prebuilt",
+          "--prepare-only"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 10.583
+      },
+      {
+        "name": "dryrun",
+        "command": "node",
+        "args": [
+          "scripts/publish-candidate.mjs",
+          "--prebuilt",
+          "--dry-run"
+        ],
+        "exit": 0,
+        "signal": null,
+        "seconds": 14.567
+      }
+    ],
+    "builtVersions": {
+      "kernel": "15.4.2",
+      "angular": "15.4.2",
+      "react": "15.4.2",
+      "vue": "15.4.2",
+      "solid": "15.4.2"
+    },
+    "cleanEnd": true
+  },
+  "gateTotals": {
+    "local": "88/88",
+    "linux": "88/88",
+    "tag": "88/88"
+  },
+  "proofTotals": {
+    "local": "88/88",
+    "linux": "88/88",
+    "tag": "88/88"
+  },
+  "browserPassed": 146,
+  "registry": {
+    "version": "15.4.2",
+    "sourceSHA": "012fd11db2aba7acf59b374b84880aaaa6b62360",
+    "allMatch": true,
+    "packages": [
+      {
+        "name": "@signal-tree/kernel",
+        "version": "15.4.2",
+        "registryIntegrity": "sha512-w2ZoYeRUnaCN2sk7qP+lNjM01igi5V378+xp415qUj2PEGVfov/fhkjhB8qRhESDbYcDs0B3KsGwlVsywv/PTQ==",
+        "downloadedIntegrity": "sha512-w2ZoYeRUnaCN2sk7qP+lNjM01igi5V378+xp415qUj2PEGVfov/fhkjhB8qRhESDbYcDs0B3KsGwlVsywv/PTQ==",
+        "candidateIntegrity": "sha512-w2ZoYeRUnaCN2sk7qP+lNjM01igi5V378+xp415qUj2PEGVfov/fhkjhB8qRhESDbYcDs0B3KsGwlVsywv/PTQ==",
+        "matchesLocalCandidate": true,
+        "provenance": true,
+        "fileCount": 102
+      },
+      {
+        "name": "@signal-tree/angular",
+        "version": "15.4.2",
+        "registryIntegrity": "sha512-rtOSo9dUTIT6JzcV1Lu+wpD3qoDz5KgjV7C9/jNhkWPHoV9wNhWsJZOhAq/iG3iHoaQ8+cwOJ3lLjT+hZ9mclg==",
+        "downloadedIntegrity": "sha512-rtOSo9dUTIT6JzcV1Lu+wpD3qoDz5KgjV7C9/jNhkWPHoV9wNhWsJZOhAq/iG3iHoaQ8+cwOJ3lLjT+hZ9mclg==",
+        "candidateIntegrity": "sha512-rtOSo9dUTIT6JzcV1Lu+wpD3qoDz5KgjV7C9/jNhkWPHoV9wNhWsJZOhAq/iG3iHoaQ8+cwOJ3lLjT+hZ9mclg==",
+        "matchesLocalCandidate": true,
+        "provenance": true,
+        "fileCount": 16
+      },
+      {
+        "name": "@signal-tree/react",
+        "version": "15.4.2",
+        "registryIntegrity": "sha512-ZOJl4hFmfuA7lWAvPIGVF1avl8kiqafNRcODZhLijTSyEuyOzhw7pmwxHJz/1pilu3M1iwykKFRX5iFXoj0zGA==",
+        "downloadedIntegrity": "sha512-ZOJl4hFmfuA7lWAvPIGVF1avl8kiqafNRcODZhLijTSyEuyOzhw7pmwxHJz/1pilu3M1iwykKFRX5iFXoj0zGA==",
+        "candidateIntegrity": "sha512-ZOJl4hFmfuA7lWAvPIGVF1avl8kiqafNRcODZhLijTSyEuyOzhw7pmwxHJz/1pilu3M1iwykKFRX5iFXoj0zGA==",
+        "matchesLocalCandidate": true,
+        "provenance": true,
+        "fileCount": 9
+      },
+      {
+        "name": "@signal-tree/vue",
+        "version": "15.4.2",
+        "registryIntegrity": "sha512-pNRb+BUEB/Kpk1/zfmeJDHWUPW0zyOd8ntlOwjXhj5G3YFVOonu9aLttnPiIhqMSSEkm8NeKsshw3Ahy+jihcg==",
+        "downloadedIntegrity": "sha512-pNRb+BUEB/Kpk1/zfmeJDHWUPW0zyOd8ntlOwjXhj5G3YFVOonu9aLttnPiIhqMSSEkm8NeKsshw3Ahy+jihcg==",
+        "candidateIntegrity": "sha512-pNRb+BUEB/Kpk1/zfmeJDHWUPW0zyOd8ntlOwjXhj5G3YFVOonu9aLttnPiIhqMSSEkm8NeKsshw3Ahy+jihcg==",
+        "matchesLocalCandidate": true,
+        "provenance": true,
+        "fileCount": 12
+      },
+      {
+        "name": "@signal-tree/solid",
+        "version": "15.4.2",
+        "registryIntegrity": "sha512-T8ACNd8Y5zOtq+kh2yiPdS9InxFw+CE6jjiQ36IxAHEm6AJZF2JysgHPOOZcRi9BW9+1hMeMuUZAtHVacsu48w==",
+        "downloadedIntegrity": "sha512-T8ACNd8Y5zOtq+kh2yiPdS9InxFw+CE6jjiQ36IxAHEm6AJZF2JysgHPOOZcRi9BW9+1hMeMuUZAtHVacsu48w==",
+        "candidateIntegrity": "sha512-T8ACNd8Y5zOtq+kh2yiPdS9InxFw+CE6jjiQ36IxAHEm6AJZF2JysgHPOOZcRi9BW9+1hMeMuUZAtHVacsu48w==",
+        "matchesLocalCandidate": true,
+        "provenance": true,
+        "fileCount": 12
+      }
+    ]
+  },
+  "registryRefusalGate": "7 fixed, 3 pass, 0 unchanged limitations (10/10) against npm 15.3.0",
+  "rawEvidence": [
+    "/private/tmp/st-v15-15.4.2-r2-qualification",
+    "/private/tmp/st-v15-structural-supersession-evidence",
+    "/private/tmp/st-proposal-rejection-0-v15-evidence"
+  ]
+}
