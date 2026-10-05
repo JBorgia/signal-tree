@@ -24,6 +24,12 @@ export interface ConfirmedTurnEffectView {
   readonly before?: unknown;
   readonly after?: unknown;
   readonly subjectId?: unknown;
+  /**
+   * Entity-relative property keys of an entity field effect, as captured
+   * (`[]` is the whole entity). With the collection position and subject
+   * lifetime this locates the field without reading `path`, which is a label.
+   */
+  readonly fieldSegments?: readonly string[];
   /** Explicit presence distinguishes omission from present undefined. */
   readonly plainBranchMembership?: {
     readonly before: boolean;
