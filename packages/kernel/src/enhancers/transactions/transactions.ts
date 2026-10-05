@@ -497,6 +497,49 @@ function buildPendingRollbackPlan(
     return undefined;
   };
 
+  /**
+   * PROPOSAL-REJECTION-0 disposition PR-A and REKEY-SUPERSESSION-0, ported
+   * from main for 15.4.2. The axis is SUPERSESSION vs DEPENDENCY, not scalar
+   * vs structural.
+   *
+   * `hasSameSubjectDependency` is a presence test: any later effect on the
+   * subject refuses. That is right when newer truth RESTS ON the structure this
+   * turn created. It is wrong when newer truth ERASED it: a later remove of a
+   * subject this turn added, or retargeted by rekey, has already performed the
+   * compensation the rollback would issue. Refusing then strands the turn's
+   * unrelated speculative values (`proposal-rejection-0.spec.ts` cases 11, 12,
+   * 13 and 16; `rekey-supersession-0.spec.ts` cases 2 and 3).
+   *
+   * Only the final later effect for the subject decides. Stable entity
+   * lifetime makes a removed subject unreferenceable, so a re-add of the same
+   * business key is a different subject and never reaches this scan.
+   *
+   * SETTLED erasers only, as for scalars above: an open turn's remove may still
+   * roll back and re-add the subject exactly as this turn proposed it, so it
+   * stays a dependency (`later-pending-dependency`; settle the newer turn
+   * first). `structural-supersession-unsettled.spec.ts` pins both orders.
+   *
+   * A pending `remove` is deliberately excluded: compensating it re-adds the
+   * subject, and a later re-add by another writer is newer truth that re-add
+   * would clobber.
+   */
+  const isErasedBySettledWork = (
+    effect: CollectionAddEffect | CollectionRekeyEffect
+  ): boolean => {
+    let erased = false;
+    for (const laterEntry of laterEffects) {
+      const laterEffect = laterEntry.effect;
+      if (laterEffect.ownerPath !== effect.ownerPath) {
+        continue;
+      }
+      if (laterEffect.subject !== effect.subject) {
+        continue;
+      }
+      erased = laterEffect.kind === 'remove' && laterEntry.unsettled !== true;
+    }
+    return erased;
+  };
+
   const compensation: TurnEffect[] = [];
   for (let i = pendingEffects.length - 1; i >= 0; i--) {
     const effect = pendingEffects[i];
@@ -522,6 +565,9 @@ function buildPendingRollbackPlan(
       case 'add':
       case 'remove':
       case 'rekey': {
+        if (effect.kind !== 'remove' && isErasedBySettledWork(effect)) {
+          continue;
+        }
         const dependency = hasSameSubjectDependency(effect);
         if (dependency) {
           return {

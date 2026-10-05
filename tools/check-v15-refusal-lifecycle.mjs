@@ -40,8 +40,13 @@ const FIXED = [
   'confirmed-transaction-undo-redo-link',
   'automatic-refusal-history-before-link',
   'restored-entity-link',
+  // 15.4.2: a pending-created row that settled later work removed no longer
+  // blocks rollback (PROPOSAL-REJECTION-0 PR-A, ported from main). This was
+  // the bounded limitation; its 15.3.0 failure evidence stays pinned below.
+  'dependent-add/resolve-retry',
 ];
-const LIMITATIONS = ['dependent-add/resolve-retry'];
+const DEPENDENT = 'dependent-add/resolve-retry';
+const LIMITATIONS = [];
 const NAMES = [...PRESERVED, ...FIXED, ...LIMITATIONS];
 const REFUSAL_ERROR =
   'AssertionError [ERR_ASSERTION]: conservative confirmed dependency still refuses after later removal';
@@ -67,13 +72,13 @@ const RESTORED_EVIDENCE = {
   sent: [[]],
 };
 
-function inspectRun(run, label) {
+function inspectRun(run, label, expectedExit) {
   assert.equal(run.signal, null, `${label}: process signal`);
   assert.equal(run.error, null, `${label}: process error/timeout`);
   assert.equal(
     run.exitCode,
-    1,
-    `${label}: expected fixture failure exit for known limitations`
+    expectedExit,
+    `${label}: expected fixture exit ${expectedExit}`
   );
   assert.equal(run.stderr, '', `${label}: unexpected stderr`);
   const { results, uncaught, reportedErrors } = run.data;
@@ -110,9 +115,9 @@ function inspectRun(run, label) {
   return new Map(results.map((row) => [row.name, row]));
 }
 
-function boundedLimitation(row) {
-  assert.equal(row.pass, false, `${row.name}: expected unchanged limitation`);
-  if (row.name === LIMITATIONS[0]) {
+function pinnedFailure(row) {
+  assert.equal(row.pass, false, `${row.name}: expected pinned failure`);
+  if (row.name === DEPENDENT) {
     assert.equal(
       row.error,
       REFUSAL_ERROR,
@@ -137,8 +142,8 @@ function boundedLimitation(row) {
 }
 
 function classify(baseline, candidate) {
-  const b = inspectRun(baseline, 'baseline');
-  const c = inspectRun(candidate, 'candidate');
+  const b = inspectRun(baseline, 'baseline', 1);
+  const c = inspectRun(candidate, 'candidate', LIMITATIONS.length ? 1 : 0);
   for (const name of PRESERVED)
     assert.equal(b.get(name).pass, true, `baseline: expected pass ${name}`);
   for (const name of FIXED)
@@ -148,7 +153,8 @@ function classify(baseline, candidate) {
       `baseline: expected fixed failure ${name}`
     );
   // Preserve the pinned 15.3.0 failure evidence, but require the repaired candidate.
-  boundedLimitation(b.get('restored-entity-link'));
+  pinnedFailure(b.get('restored-entity-link'));
+  pinnedFailure(b.get(DEPENDENT));
   for (const name of [...PRESERVED, ...FIXED])
     assert.equal(c.get(name).pass, true, `candidate: regression ${name}`);
   const restored = c.get('restored-entity-link').evidence;
@@ -166,22 +172,38 @@ function classify(baseline, candidate) {
     restored.state,
     'candidate: restored Link output differs from state'
   );
+  // The repair is narrow: while the later edit stands, both refusals and their
+  // observable state are exactly the 15.3.0 ones. Only the retry after the
+  // later removal changes, and no refusal may remain.
+  const dependent = c.get(DEPENDENT).evidence;
+  assert.deepEqual(
+    dependent.before,
+    DEPENDENT_EVIDENCE.before,
+    'candidate: dependent-add state before rollback'
+  );
+  assert.deepEqual(
+    dependent.refusals,
+    DEPENDENT_EVIDENCE.refusals,
+    'candidate: dependent-add refusals while the later edit stands'
+  );
+  assert.equal(
+    dependent.remainingRefusal,
+    undefined,
+    'candidate: dependent-add still refuses after later removal'
+  );
   for (const name of LIMITATIONS) {
-    boundedLimitation(b.get(name));
-    boundedLimitation(c.get(name));
+    pinnedFailure(b.get(name));
+    pinnedFailure(c.get(name));
     assert.deepEqual(
       c.get(name),
       b.get(name),
       `${name}: limitation differs from baseline`
     );
   }
+  const passes = FIXED.length + PRESERVED.length;
   return {
     accepted: true,
-    summary: `${FIXED.length} fixed, ${PRESERVED.length} pass, ${
-      LIMITATIONS.length
-    } unchanged limitations (${
-      FIXED.length + PRESERVED.length
-    } candidate passes; not ${NAMES.length}/${NAMES.length} green)`,
+    summary: `${FIXED.length} fixed, ${PRESERVED.length} pass, ${LIMITATIONS.length} unchanged limitations (${passes}/${NAMES.length} candidate passes)`,
     fixed: FIXED,
     pass: PRESERVED,
     unchangedLimitations: LIMITATIONS,
@@ -209,7 +231,7 @@ function selfTest() {
     },
   };
   const lookup = (run, name) => run.data.results.find((r) => r.name === name);
-  Object.assign(lookup(baseline, LIMITATIONS[0]), {
+  Object.assign(lookup(baseline, DEPENDENT), {
     error: REFUSAL_ERROR,
     evidence: structuredClone(DEPENDENT_EVIDENCE),
   });
@@ -219,12 +241,17 @@ function selfTest() {
     evidence: structuredClone(RESTORED_EVIDENCE),
   });
   const candidate = structuredClone(baseline);
+  candidate.exitCode = 0;
   for (const name of FIXED)
     Object.assign(lookup(candidate, name), row(name, true));
   for (const name of FIXED) delete lookup(candidate, name).error;
   lookup(candidate, 'restored-entity-link').evidence = {
     state: structuredClone(RESTORED_EVIDENCE.state),
     sent: [[], structuredClone(RESTORED_EVIDENCE.state)],
+  };
+  lookup(candidate, DEPENDENT).evidence = {
+    before: structuredClone(DEPENDENT_EVIDENCE.before),
+    refusals: structuredClone(DEPENDENT_EVIDENCE.refusals),
   };
   assert.equal(classify(baseline, candidate).accepted, true);
   const checks = [];
@@ -253,17 +280,26 @@ function selfTest() {
   rejects('uncaught baseline', (b) =>
     b.data.uncaught.push('Error: unexpected')
   );
-  rejects('unsafe known limitation', (_b, c) => {
-    lookup(c, LIMITATIONS[0]).evidence.remainingRefusal.safetyVerified = false;
+  rejects('dependent-add still refuses', (b, c) => {
+    Object.assign(lookup(c, DEPENDENT), structuredClone(lookup(b, DEPENDENT)));
+    c.exitCode = 1;
   });
-  rejects('missing safety evidence', (_b, c) => {
-    delete lookup(c, LIMITATIONS[0]).evidence.remainingRefusal;
+  rejects('dependent-add remaining refusal evidence', (_b, c) => {
+    lookup(c, DEPENDENT).evidence.remainingRefusal = structuredClone(
+      DEPENDENT_EVIDENCE.remainingRefusal
+    );
   });
-  rejects('changed refusal reason', (_b, c) => {
-    lookup(c, LIMITATIONS[0]).evidence.remainingRefusal.kind = 'other';
+  rejects('changed refusal while the edit stands', (_b, c) => {
+    lookup(c, DEPENDENT).evidence.refusals[0].x = 2;
   });
-  rejects('changed refusal state', (_b, c) => {
-    lookup(c, LIMITATIONS[0]).evidence.remainingRefusal.final.x = 2;
+  rejects('missing refusal while the edit stands', (_b, c) => {
+    lookup(c, DEPENDENT).evidence.refusals.pop();
+  });
+  rejects('changed pinned dependent failure', (b) => {
+    lookup(b, DEPENDENT).evidence.remainingRefusal.final.x = 2;
+  });
+  rejects('changed pinned dependent reason', (b) => {
+    lookup(b, DEPENDENT).error = 'AssertionError [ERR_ASSERTION]: other';
   });
   rejects('changed restored row', (_b, c) => {
     lookup(c, 'restored-entity-link').evidence.state = [];
@@ -280,15 +316,11 @@ function selfTest() {
   rejects('changed pinned restored failure', (b) => {
     lookup(b, 'restored-entity-link').evidence.sent = [];
   });
-  rejects('equally unsafe baseline and candidate', (b, c) => {
-    for (const run of [b, c])
-      lookup(
-        run,
-        LIMITATIONS[0]
-      ).evidence.remainingRefusal.safetyVerified = false;
-  });
   rejects('unexpected baseline pass', (b) =>
     Object.assign(lookup(b, FIXED[0]), row(FIXED[0], true))
+  );
+  rejects('baseline dependent-add passes', (b) =>
+    Object.assign(lookup(b, DEPENDENT), row(DEPENDENT, true))
   );
   rejects('process crash', (_b, c) => {
     c.signal = 'SIGKILL';
@@ -296,8 +328,11 @@ function selfTest() {
   rejects('process timeout', (_b, c) => {
     c.error = 'ETIMEDOUT';
   });
-  rejects('wrong exit', (_b, c) => {
-    c.exitCode = 0;
+  rejects('wrong candidate exit', (_b, c) => {
+    c.exitCode = 1;
+  });
+  rejects('wrong baseline exit', (b) => {
+    b.exitCode = 0;
   });
   rejects('unexpected stderr', (_b, c) => {
     c.stderr = 'Unhandled rejection';
