@@ -240,3 +240,156 @@ On `b7095766` without the fix: 26/54 and 66/144 kernel carrier failures; with it
 54/54 and 144/144. Full kernel 3319 passed, six expected failures, thirteen
 skips; frameworks angular 179, react 23, vue 61, solid 41; types and lint pass.
 Logs: `/private/tmp/st-v16-integration-evidence/2026-10-05-*membership*`.
+
+## Slice 4: committed entity capture, pending overlap and descriptor lifetime
+
+Committed as `5cd573d9` (committed entity capture), `c1553346` (reserved
+transaction order), `574b74e3` (descriptor release) and `2e220e2f`
+(restoration admission), on `integrate/v16-slice4` from `c596ab2a`. Raw logs,
+mutation logs and the patched-runtime snapshot:
+`/private/tmp/st-v16-integration-evidence/slice4/run2/`.
+
+Donor fixtures copied from v15 `012fd11d` (identical to `cf98697a`) with
+`.transaction(` → `.transact(` and `typeof tree.transaction` →
+`typeof tree.transact`. All eight pass unchanged on v15 `012fd11d` (21, 9, 4,
+64, 27, 12, 10, 4).
+
+First red on `c596ab2a` (re-measured on this worktree; matches the earlier run):
+descriptor-retention 13/21 failed, reentrant-order-bookkeeping 7/9,
+committed-entity-capture 3/4 (`subscribeCommittedEntity` missing),
+pending-active-entity 44/64, pending-overlap 4/27, pending-overlap-admission
+2/12, transaction-reentrant-order 3/4; entity-membership-capture does not load
+(imports `lib/internals/entity-membership-view`, slice 6).
+
+### Classification
+
+| Fixture / case                                                                                                                                                             | First-red cause                                                                                                                                                                                                                                                                                                   | Class         |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| transaction-reentrant-order: later ordinary / transaction scalar write on explicit rollback (2)                                                                            | The pending turn id was allocated at materialization, after the post-callback flush, so an observer's write got the OLDER id and was invisible to the plan; x reverted to 0 (L4).                                                                                                                                 | a             |
+| transaction-reentrant-order: observer entity write when the callback throws                                                                                                | Same ordering defect on the throwing-callback path: v=2 erased. v16 now refuses through the dependency plan and attaches recovery (contract 2), not v15's record-as-committed.                                                                                                                                    | a             |
+| reentrant-order-bookkeeping: earlier rollback sees a later capture / observed later pending turn (2)                                                                       | Ordering defect plus no pending record while the later callback is open. Expected kind `later-pending-dependency` is v15-only; v16's `RollbackFailureCause` reports later pending overlap as `later-confirmed-dependency`.                                                                                        | a + b (kind)  |
+| reentrant-order-bookkeeping: entity rollback sees an open entity capture (overlap=true)                                                                                    | Open callback's committed entity write not visible to an older rollback; n:2 erased. Kind as above.                                                                                                                                                                                                               | a + b (kind)  |
+| reentrant-order-bookkeeping: opened-listener writes precede the callback (batching false/true)                                                                             | Runtime already refused; only the v15 kind differed.                                                                                                                                                                                                                                                              | b (kind only) |
+| reentrant-order-bookkeeping: opened-listener ordinary writes form the baseline (false/true)                                                                                | Writes queued by an `opened` listener were read as LATER queued evidence against the new turn, refusing its rollback over its own baseline.                                                                                                                                                                       | a             |
+| committed-entity-capture (3)                                                                                                                                               | Committed entity evidence channel absent (`subscribeCommittedEntity`, frame observer).                                                                                                                                                                                                                            | a             |
+| descriptor-retention: ordinary churn, net-zero structural, release-vs-reclamation, live unclaimed addresses, pending addresses through churn, redo-owned through churn (9) | Ordinary confirmed flushes recorded subject descriptors and never released them (L15): 40 subjects after 40 churned rows, 21 instead of 1 under a pending turn.                                                                                                                                                   | a             |
+| descriptor-retention: open capture during a reentrant ordinary/confirmed write (3)                                                                                         | First fails on the unrelated row's leaked descriptor; the open-capture protection is the deeper half (mutation M4 below).                                                                                                                                                                                         | a             |
+| descriptor-retention: confirmed consequence throws                                                                                                                         | `settleCommitScope` throwing skipped the descriptor release in `confirm()`.                                                                                                                                                                                                                                       | a             |
+| pending-active-entity (44)                                                                                                                                                 | Restoration admission saw a foreign transaction's entity write only when the notifier DELIVERED it, so undo/redo inside the callback or from an earlier subscriber overwrote pending truth; committed-observation lifetime API absent.                                                                            | a             |
+| pending-overlap: undo/redo inside the running callback (2)                                                                                                                 | Same, for a scalar write still queued in the notifier.                                                                                                                                                                                                                                                            | a             |
+| pending-overlap: explicit rollback refusal releases consequences                                                                                                           | v15 settles the commit scope on refusal; v16 holds it until real settlement (`rollback-refusal-scope.spec.ts` anchor). Adapted: 0 released after refusal, 1 after `confirm()`.                                                                                                                                    | b             |
+| pending-overlap: redo truncation when designated pending work is staged                                                                                                    | v15 truncates redo at staging, permanently even after rollback. v16 truncates only on admission ("Only admitted work replaces redo. Staging may still be abandoned.", `d2218eb0`), consistent with L3. Adapted: redo refused ST1034 while pending; after rollback redo still applies; after confirm redo is gone. | b             |
+| pending-overlap-admission (2)                                                                                                                                              | In-callback scalar overlap not refused; the fix must not flush/deliver another tree.                                                                                                                                                                                                                              | a             |
+| entity-membership-capture (whole file)                                                                                                                                     | Needs the slice-6 reader. With the reader stubbed, its 3 reader-free cases pass on both `c596ab2a` and this slice; the 7 reader cases wait. Preserved as `preserved/entity-membership-capture.spec.ts.txt`.                                                                                                       | c             |
+
+Two existing v16 tests changed because they recorded the defects above:
+`lib/transaction-observer-failure.spec.ts` "the throwing-callback rollback is
+unchanged from 9df8fbff" (a "compatibility characterization, NOT a safety
+assertion" that pinned v=5 being overwritten) and
+`lib/e2c-real-causal-path.spec.ts` E2-C3 (recorded destructive undo over a
+pending ABA write "without endorsing it"). v15 corrected both in `cf98697a`.
+The throwing-callback case keeps v16's recovery handle instead of v15's
+record-as-committed (pending count 1, scope held until
+`recovery.transaction.confirm()`); the window-based TX-AUTO-ROLLBACK-0 refusal
+is still post-callback only, and what changed is order. E2-C3 now refuses the
+undo with ST1034 while the pending turn owns x. Both new forms fail on
+`c596ab2a` and pass here.
+
+### Ported (conceptual hunks of `cf98697a`, against v16)
+
+- `I/mutation-capture-runtime.ts`: `CommittedEntityMutation`/`CommittedEntityCapture`, `hasCommittedEntityObservers`, `publishCommittedEntity` (observer failures contained and reported), `subscribeCommittedEntity`.
+- `K/lib/physical/entity-mutation-frame.ts`: `commit(observeCommitted?)` reports every touched lifetime once, after all instructions apply; inactive retained backing reads as absent.
+- `K/lib/entity-signal.ts`: `committedEntityObserver`/`captureCommittedEntity` (pay-for-use; attribution frozen before callbacks) on the frame path, `commitExistingSubjectValue`, `upsertMany`, `clear` and `setAll`. No membership-inventory or setAll-order hunks (slices 5/6).
+- `E/transactions/transactions.ts`: `reservePending` (id reserved after `opened` listeners, before the callback; placeholder exposes the open bucket's effects and entity footprints); `createPending(reservedId, …)` and discard of empty reservations; any throw before materialization abandons the reservation and its bucket (v16 addition after review); drain of `opened`-listener writes (queued evidence still goes to OLDER pending turns); open-callback committed entity footprints (no baselines); `descriptorOwnersBefore` taken after reservation; ordinary confirmed flushes release unclaimed subject details but not subjects held by an open capture, never shells; `confirm()` releases even when a durable consequence throws. Not ported: `later-pending-dependency`, abort record-as-committed, lifecycle reader, `!callbackFailed` removal.
+- `E/restoration/restoration.ts`: `pendingFootprints` (addresses only) fed by committed entity capture and the PathNotifier enqueue witness, installed on a foreign `opened` and released when no foreign transaction is open or pending (or on destroy); included in the existing pending-overlap admission; history reset no longer clears `activeForeignTransactions`/`stagedTransactionEffects`. v16 adaptation: the enqueue witness replaces v15's per-leaf intrinsic observers (scalars do not reach restoration's leaf interceptor on v16, and v16 already owns enqueue-time evidence).
+
+### v16 controls
+
+`E/transactions/reentrant-order-v16-controls.spec.ts` (6) and
+`E/restoration/pending-footprint-v16-controls.spec.ts` (10, both enhancer
+orders): superseded failed contribution is terminal with no recovery; a
+dependent row write refuses automatic compensation with a usable recovery
+handle; reservation does not outlive an empty callback; the PLAN falsifier (an
+observer confirms another transaction during capture: unrelated row reversible
+and its compensation notifies, conflicting field keeps refusal authority);
+undo re-entered from an EARLIER subscriber of the pending write is refused;
+every row of an UNBATCHED multi-row commit is owned before the first delivery;
+staged ownership and an open transaction both survive a history reset;
+observation installed only while a foreign transaction is open or pending; a
+post-callback throw does not strand the reservation. On `c596ab2a`: 4/6 and
+10/10 fail (the notification control preserves existing behaviour; the
+stranded-reservation control guards this slice's own change).
+
+### Mutations (each restored; logs `slice4/run2/mutations/`)
+
+Counts are killed cases.
+
+- M1 placeholder without the open-bucket view: 2. M2 reserve before the
+  `opened` listeners: 4. M3 no `opened`-listener drain: 2. M4 release ignores
+  open captures: 1. M5 ordinary flush also collects shells: 3. M10 row-wide
+  entity footprints (L16 over-refusal): 1. M11 release skipped on a throwing
+  consequence: 1. M12 reservation not abandoned on a post-callback throw: 1.
+- R1 enqueue witness only (no committed capture): every donor admission case
+  still passes; the unbatched multi-row control fails in both orders, plus the
+  observation-lifetime cases (8 donor, 2 control).
+- R2 committed capture only: 6 (in-callback scalars, delivery isolation,
+  earlier-subscriber control).
+- R3 read the queue at admission instead of the enqueue witness: every donor
+  fixture passes; only the earlier-subscriber control fails (both orders).
+- R4 reset clears the open set: 2. R5 reset clears pending evidence: 2. R6
+  frame reports nothing: the unit fixture (2) and the unbatched control (2).
+
+### Results
+
+Per fixture after: 21/21, 9/9, 4/4, 64/64, 28/28, 12/12, 4/4; controls 6/6 and
+10/10; changed v16 specs 34/34 and 5/5. Destination anchors (22 files incl.
+recovery-handle-0, settlement-inspection-terminality, proposal-inspection-0/
+safety, queued-inspection-review, rollback-refusal-scope, history-retention-0/15,
+rekey-supersession/occupancy-0, path-notifier-enqueue/queued-witness,
+entity-egress-footprint(-delivery), entity-inspection-egress, owner-invalidation
+(-membership), batching adversarial/context-safety/detachment,
+restoration-queued/structured-authority): 248/248. Full kernel: 355 files, 3477
+passed, 6 expected failures, 13 skipped, exit 0 (`c596ab2a`: 346 files, 3319
+passed; +158 is exactly the new cases). Each of the four runtime commits was
+also run alone: 3323, 3342, 3363, 3477 passed. Frameworks: angular 179 (+3
+skipped), react 23, vue 61, solid 41, exit 0. `tsc -p tsconfig.typecheck-all.json` and
+`nx lint kernel` exit 0. `tools/check-spec-types.mjs` exits 1 on
+`owner-invalidation-membership.spec.ts` (2 errors, `TransactionalOwner` has no
+`transact`) identically on `c596ab2a`; no new spec-type errors.
+
+### Independent review
+
+No critical finding. One major, fixed before commit: a throw between
+reservation and materialization stranded the placeholder as the minimum
+pending id (reproduced by making `flushSync` throw after the callback),
+pinning later confirmed records and the dependency ledger. Minor findings
+fixed: committed-entity observer failures are now reported
+(`reportContainedObserverError`) instead of swallowed; the
+`committedEntityObserver` comment no longer claims batch writers report the
+whole commit at once (they report row by row, interleaved only with staged
+publications that a transaction's invalidation group defers); E2-C3 destroys
+its tree. The reviewer judged both changed v16 characterizations justified by
+L2/L4/L10, contract 2 and the identical v15 corrections. Observable side
+effects recorded rather than changed: every `transact()` now consumes a turn
+id (empty and failed callbacks leave id gaps; readers already must not infer
+from gaps), and the open reservation counts in `getPendingTurnCount()` while
+the callback runs.
+
+### Open items
+
+1. Refusal vocabulary: v15's public `later-pending-dependency` kind is not on
+   v16; later PENDING overlap still reports `later-confirmed-dependency`.
+   Decide with the lifecycle reader (slice 6) and the unsettled-remover probe.
+2. Structural committed footprints claim the whole lifetime as a `set` with
+   `[]` segments (as v15). A pending rekey-occupancy conflict against an OPEN
+   callback's add is therefore seen only once the add is delivered.
+3. Pre-existing spec-type error in `owner-invalidation-membership.spec.ts`
+   (15.4.3 carry), not touched here.
+4. entity-membership-capture waits for slice 6.
+5. CHANGELOG "Carried from 15.3.1" still says the throwing-callback rollback
+   is unchanged. The window refusal is; the dependency refusal now reaches
+   that path (recovery attached). Reword when the release notes are drafted.
+6. A foreign handle that is never settled now keeps restoration's staged
+   evidence, footprints and both observers across `resetRestorationHistory()`
+   (reset is not a settlement). Destroy still releases everything. No test
+   covers an abandoned handle.
