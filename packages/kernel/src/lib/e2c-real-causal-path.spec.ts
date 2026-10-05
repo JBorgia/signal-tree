@@ -31,6 +31,7 @@ type TT<S> = {
   undo(): void;
   redo(): void;
   canUndo(): boolean;
+  destroy(): void;
   getRestorationHistory(): unknown[];
 };
 
@@ -176,7 +177,7 @@ describe('E2-C2 — nested path', () => {
 // E2-C3 — ABA against the real kernel. The row that decides E2.
 // ============================================================================
 describe('E2-C3 — real ABA authorship', () => {
-  it('RECORDED: the real kernel does NOT distinguish authorship of an identical value', async () => {
+  it('refuses confirmed undo while a pending ABA write owns the same location', async () => {
     const tree = signalTree(
       { x: 'A' },
       { enhancers: [restoration(), transactions()] }
@@ -197,17 +198,20 @@ describe('E2-C3 — real ABA authorship', () => {
     expect(tree.$.x()).toBe('B');
     expect(tree.getRestorationHistory().length).toBe(hist); // still not historied
 
+    // This row previously RECORDED destructive undo here without endorsing
+    // it: the staged effect log coalesced C->B back to a no-op, so admission
+    // could not see that the pending turn authored x. Integration slice 4
+    // carries pending-overlap admission from the enqueue witness, which keeps
+    // per-write authorship (the same evidence transactions() refuses on), so
+    // ownership is protected even when values match. Same correction as v15
+    // cf98697a.
+    expect(() => tree.undo()).toThrow(/ST1034/);
+    expect(tree.$.x()).toBe('B');
+    expect(tree.canUndo()).toBe(true);
+    expect(tree.getRestorationHistory().length).toBe(hist);
+    later.confirm();
     tree.undo();
-    await tick();
-
-    // The pending turn's surviving contribution is DESTROYED — the same outcome
-    // as E2-B's ABA falsifier against the snapshot null.
     expect(tree.$.x()).toBe('A');
-    expect(typeof later.confirm).toBe('function'); // the pending turn still exists
-
-    // ⚠️ So the effect log does NOT carry authorship into confirmed reversal.
-    // The information E2-B showed snapshots lack is not being used by the real
-    // system either. Whether landing on 'A' here is a DEFECT is a separate
-    // question this row deliberately does not answer — it records the behaviour.
+    tree.destroy();
   });
 });
