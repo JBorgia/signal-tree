@@ -203,3 +203,25 @@ against the v16 laws and semantic matrix; do not copy v15's kinds blindly.
 Next: carry the rest of 15.4.1/15.4.2 (outcome-provenance fixture,
 external-authored baseline and inspection-write exclusion in restoration) with
 their tests, then the open designation and external-baseline counterexamples.
+
+## 15.4.1 and 15.4.2 carry-over status (2026-10-05)
+
+15.4.1's outcome-provenance runtime originated in v16 slice 2; v16's
+per-invocation receipt matches v15's. Its v15 fixture
+`restoration/outcome-provenance.spec.ts` is now carried (only `transaction()` →
+`transact()`) and passes unchanged.
+
+15.4.2's restoration repair (separate historical capture so external truth
+cannot become an authored undo baseline; inspection writes excluded from order
+capture; net-zero authored boundaries kept) is NOT yet carried. Its 387-line spec,
+ported with the same spelling change, fails 28 of 63 cases on v16 — the expected
+defects (undo returns 0 instead of the external 5, lost historical boundaries,
+inspection reorder reversed). Preserved as
+`preserved/external-authored-baseline.spec.ts.txt`; first-red log at
+`/private/tmp/st-v16-integration-evidence/2026-10-05-slice3d-first-red.log`.
+
+It depends on two v15 restoration changes v16 lacks: the order-capture rule that
+compensation writes are not new order history (`cf98697a`, slice 5) and
+`hasRetainedOrPendingHistory()` (`03deb906`, slice 9; an allocation guard, so a
+correctness-first port may allocate unconditionally). Carry the repair with or
+after slice 5 rather than pulling those slices out of order.
