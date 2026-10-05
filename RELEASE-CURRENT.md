@@ -21,6 +21,16 @@ reduction or an owner decision on the ceiling. Receipt:
 Next, per the owner's order: update TruckTrax v3 to 15.4.3, then the demo
 site if all goes well, then the v16 integration.
 
+## Demo site on 15.4.3
+
+signaltree.io (Vercel project `signaltree`) served `main` at `6ae860c8`
+(16.0.0-dev) until 2026-10-05. With owner approval, the Vercel build of the
+`v15.4.3` tag commit was promoted to production (`dpl_4nsfnpcCbJPapiRBDQYRLJZViguy`;
+it serves `@signal-tree/kernel v15.4.3`), and the project's Ignored Build Step
+now skips `main` so v16-dev pushes no longer replace the live site. Previous
+production for rollback: `dpl_3dVrUc4xzHBLDskZLwr6ytcpokki`. See "Demo Site" in
+RELEASE_PROCESS.md.
+
 ## 15.4.3 preparation
 
 The owner authorized fixing and publishing two defects found after 15.4.2 in

@@ -82,3 +82,21 @@ those exact versions into a fresh external project, confirm runtime and strict
 typechecking, then create or
 verify the GitHub release notes. Never unpublish a partial release as routine
 recovery; inspect candidate and registry integrity and resume the same version.
+
+## Demo Site
+
+signaltree.io is the Vercel project `signaltree`, linked to this repository.
+Vercel builds a preview of every pushed branch; production changes only by
+promotion. The project's Ignored Build Step skips builds for `main`
+(`[ "$VERCEL_GIT_COMMIT_REF" = "main" ] && exit 0 || exit 1`), so development
+pushes never replace the live site. After a release is published, promote the
+preview built from the release tag's commit and confirm the served kernel
+version:
+
+```bash
+vercel promote <preview URL of the tagged commit> --yes
+```
+
+`vercel rollback <deployment id>` restores the previous production deployment.
+The GitHub Pages workflow (`deploy-demo.yml`) is not the hosting path; Pages is
+not enabled for this repository.
