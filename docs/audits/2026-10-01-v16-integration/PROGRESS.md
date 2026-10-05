@@ -716,3 +716,295 @@ unchanged.
    location-runtime's `errors.push(...flushConsumers())` (publisher errors).
 6. A write queued before `resetRestorationHistory()` in the same tick is still
    captured at delivery, after the reset, before and after this carry.
+
+## Slice 6: read-only runtime observation readers
+
+Committed as `4ce48aa5` (entity membership), `d20dac0f` (transaction
+lifecycle), `c0809eca` (restoration lineage), `c761404f` (Link activity),
+`f06a47e7` (state location and confirmed `fieldSegments`), `fbb88104`
+(tooling admission, typing/consumer fixtures, API baseline) and the review
+follow-up `c277d1ce`, on `integrate/v16-slice6` from `515a6969`. Raw logs,
+first reds, probes and mutation logs:
+`/private/tmp/st-v16-integration-evidence/slice6/`.
+
+Donor fixtures copied from v15 `012fd11d` with `.transaction(` →
+`.transact(`. All pass unchanged on an export of `012fd11d`
+(`slice6/donor-on-v15-012fd11d/`): transaction-lifecycle-view 17,
+restoration-reader 11, restoration-operation-outcome 8,
+entity-membership-view 14, entity-membership-producer 6,
+membership-reversal-delivery 216, entity-membership-link-restoration 12,
+link-state-view 26, state-location-view 8, entity-membership-capture 10,
+set-all-order-reversal 36, entity-large-batches 11 (confirmed-turn-reader and
+membership-history-projection were already carried on v16 and still pass).
+
+First red on `515a6969` (`slice6/first-red/`): eleven files do not load (the
+reader modules do not exist); entity-membership-link-restoration loads and
+fails 6/12 (no reader involved).
+
+### Classification
+
+| Fixture / case                                                                                                        | Cause on v16                                                                                                                                                                                                                                                                                                                                                                                                 | Class   |
+| --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| all reader cases (eleven files)                                                                                       | Reader modules and producer hooks absent.                                                                                                                                                                                                                                                                                                                                                                    | a       |
+| entity-membership-link-restoration: rollback of remove, undo/redo of remove and add (6)                               | `planRestore` published a restored lifetime as a value-only write, so Link's egress projection dropped the re-added row (sent `[]`/`[a,c]`). cf98697a hunk ported: structural `add` on restore.                                                                                                                                                                                                              | a       |
+| restoration-operation-outcome (8)                                                                                     | Needs an owner-held refusal set; v16 refusal sites threw plain `Error`s.                                                                                                                                                                                                                                                                                                                                     | a       |
+| transaction-lifecycle-view: refused pending authority; public opened observer (2)                                     | v15 `later-pending-dependency` kind. v16's owner reports later PENDING overlap as `later-confirmed-dependency` (slice-4 open item 1); the reader reports the owner's kind.                                                                                                                                                                                                                                   | b       |
+| transaction-lifecycle-view: refused pending authority; realization refusal (2)                                        | v15 settles the commit scope on refusal; v16 keeps it open until real settlement (`rollback-refusal-scope.spec.ts`), so `consequencesReleased` is false.                                                                                                                                                                                                                                                     | b       |
+| transaction-lifecycle-view: automatic abort refusal                                                                   | On v16 the later replacing write supersedes the failed contribution: it retires as rolled back with no refusal (L3/L4, `reentrant-order-v16-controls.spec.ts`), not v15's refused-then-committed.                                                                                                                                                                                                            | b       |
+| transaction-lifecycle-view: pending handle after destruction; restoration-reader: late confirmation after destroy (2) | A destroyed v16 tree refuses settlement ("Cannot settle a destroyed tree").                                                                                                                                                                                                                                                                                                                                  | b       |
+| entity-membership-capture: protects pending membership before reader callbacks can redo                               | v15 refused redo of lifetime `a` while lifetime `b` was pending, as a collection-wide overlap, with or without a reader (`probes/redo2*`). v16 footprints are lifetime-scoped; independent lifetimes progress (L16) and rollback removes only `b`. A same-lifetime redo control (refused on both lines, `probes/redo4*`) keeps the protection.                                                               | b       |
+| state-location-view: confirmed effects; removed field (2)                                                             | `updateOne(id, { d: { m } })` carries v16's producer-known coordinate `['d']` (contract 4, slice 1); v15's capture descended to `['d', 'm']`.                                                                                                                                                                                                                                                                | b       |
+| entity-membership-view (whole file, harness)                                                                          | Imports v15's `entity-observation` activation hook. v16 positions are owned differently (a collection allocates its own position on `__positionIds`), so the hook is not ported; the neutral test source owns a position directly. No assertion changed.                                                                                                                                                     | harness |
+| tooling-admission.typing: generic helper                                                                              | v16 keeps its `<T, C, TAccum>` parameter order and its root accessor is typed from the construction carried by `TAccum`, so a generic helper forwards all three parameters; explicit `<T>` against a concrete tree is kept.                                                                                                                                                                                  | b       |
+| vue tooling-admission: opaque-leaf undo/redo                                                                          | Refused before this slice with no reader ("Unsupported scoped undo effect at structural-drift"); a later scalar undo is refused too once an external leaf write sits in the history gap (`vue-leaf-undo-probe/`). Atomic registered-terminal reversal is slice 8. Block preserved as `preserved/vue-tooling-admission-leaf-undo.spec.ts.txt`; the spec exercises the restoration reader with a scalar entry. | c       |
+
+The three fixtures preserved by slices 4 and 5 are restored:
+entity-membership-capture (whole file), set-all-order-reversal's membership
+snapshot assertion and entity-large-batches' observed 130k case
+(`preserved/*.txt` stay as the historical record). entity-observation-gate
+stays preserved for slice 9.
+
+### Ported (conceptual, against v16)
+
+- `I/tooling-tree.ts`: `ToolingTree<T, C, TAccum>` = `ISignalTreeOf<T, C, TAccum>`,
+  v16's parameter order; all eight helpers and `peekInternalTransactionRuntime`
+  admit it (`treeCapabilities` gains the accumulated surface it fixed to
+  `unknown`).
+- Entity membership (`I/entity-membership-inventory.ts`,
+  `I/entity-membership-view.ts`): the dormant source of 172a8268 (inventory
+  installed on first observation; deltas only while a reader listens), units
+  from the mutation frame (add/rekey/remove, neighbours read at the add),
+  prepared transition targets (captured at install, delivered from publish),
+  `clear()`/`setAll()`/`upsertMany()` (one unit after the operation installs;
+  the removed rows' `publishSubjectPhysicalChange` and setAll's zero-owner
+  reclamation now follow the unit, before notification), `prependOne`/
+  `prependMany` (one grouped unit), and cancellation on a throw. Restoration's
+  declarative target, transaction rollback's declarative target and the
+  realization adapter hold reader delivery for the whole reversal.
+  `visitTree` regains `includeNonEnumerable` (dormant members).
+- Transaction lifecycle (`I/transaction-lifecycle-view.ts`): transitions
+  recorded at the change, before the engine announcement; public delivery
+  after the announcement (opened), materialization (staged), consequences
+  (confirmed, rolled-back). Refusals report the owner's kind,
+  `pendingRetained: true` and `consequencesReleased` read from the scope
+  (`isCommitScopeOpen`, new, read-only). A throwing callback is never staged,
+  so a retained refused compensation stays `opened`. A transaction abandoned
+  before it has a handle leaves the snapshot under a new sequence
+  (`advance()`, review follow-up) with no invented event: the engine
+  announces no terminal transition on those paths.
+- Restoration (`I/restoration-reader.ts`): stable never-reused entry ids,
+  recorded transaction relations, operation outcomes folded into v16's
+  `runOperation` (entries resolved before application, recorded after it
+  returns; `refused` only for an owner-made refusal in a WeakSet: pending
+  overlap, order ownership, value drift, structured validation).
+  `getRestorationHistory()` keeps its runtime shape.
+- Link (`I/link-state-view.ts`): v16's per-send permission scheduler — `held`
+  includes a send waiting for permission, `sending` only while an endpoint
+  call is in flight, no publication between leaving the queue and the first
+  call, construction failure leaves no record, `disposed` before user
+  cleanup, and a listener's dispose on the sending/retrieving publication
+  prevents the endpoint call.
+- State location (`I/state-location-view.ts`): re-founded on v16 address
+  ownership — the registry's typed address for the position, walked through
+  the current tree (each step an enumerable, non-dormant member; the node must
+  still own the position), lifetimes only on collections, own-property field
+  presence. No whole-tree walk, no label parsing, no leaf descent;
+  `observation-substrate.ts` untouched.
+- Confirmed view: `fieldSegments` projected (copied) from v16's
+  `subjectFieldSegments`; no rename of the internal field.
+- Not ported: v15's `entity-observation` activation hook and its
+  observation-substrate hunk, the slice-9 demand gate, `later-pending-dependency`,
+  v15's commit-on-refusal lifecycle, v15's whole-tree location walk, the user
+  guide `docs/guides/runtime-observation.md`.
+
+### Public internals delta (`@signal-tree/kernel/internals`, additive)
+
+Functions: `transactionLifecycleReader`, `restorationReader`,
+`entityMembershipReader`, `linkStateReader`, `stateLocationReader`. Types:
+`PendingTransactionView`, `TransactionLifecycleReader`,
+`TransactionLifecycleSnapshot`, `TransactionLifecycleObservation`,
+`TransactionRefusalReason`; `RestorationReader`, `RestorationReaderSnapshot`,
+`RestorationReaderEvent`, `RestorationEntryView`, `RestorationEntryId`,
+`RestorationOperationId`; `EntityMembershipReader`,
+`EntityMembershipSnapshot`, `EntityMembershipEvent`,
+`EntityMembershipCollection`, `EntityMembershipLocation`, `EntityMembership`,
+`EntityMembershipChange`; `LinkStateReader`, `LinkStateView`,
+`LinkStateEvent`, `LinkStateSnapshot`; `StateLocationReader`,
+`StateLocationSegment`, `StateLocationTarget` (30 symbols, the same set v15
+exports). `ConfirmedTurnEffectView` gains optional `fieldSegments`. The
+existing helpers' admission widens from `ISignalTreeOf<T, C, unknown|TAccum>`
+to the identical `ToolingTree<T, C, TAccum>`.
+
+`TransactionRefusalReason` is v16's owner vocabulary,
+`'later-confirmed-dependency' | 'effect-validation-failed'`; v15's union also
+named `later-pending-dependency` (not a v16 kind) and `structural-drift`
+(unreachable on both lines: validation refusals are `effect-validation-failed`).
+
+`tools/api-baseline.json` gains exactly those 30 `./internals` entries. The
+API gate still fails on pre-existing drift from `d394047c` (25 `Proposal*`
+symbols removed, 15 `ChangeStatus`/`InspectedChange`/`TransactionInspection`
+added across the five roots) — present at `515a6969`, unrelated to this
+slice, left for its own decision. `tools/api-callable-baseline.json` is
+unchanged: its inventory reads only package roots; its drift is the same
+`d394047c` fold.
+
+### v16 controls
+
+`E/transactions/transaction-lifecycle-view-v16-controls.spec.ts` (8),
+`E/restoration/restoration-reader-v16-controls.spec.ts` (4, both enhancer
+orders), `E/restoration/membership-declarative-delivery-v16-controls.spec.ts`
+(4), `K/lib/link-state-view-v16-controls.spec.ts` (2),
+`K/lib/state-location-view-v16-controls.spec.ts` (5),
+`K/lib/entity-membership-view-v16-controls.spec.ts` (5), one same-lifetime
+redo case in entity-membership-capture, and a native Vue leaf location in
+the Vue admission spec.
+
+### Mutations (each restored by content hash; logs `slice6/mutations/`)
+
+Counts are killed cases.
+
+- Lifecycle: L1 record 'opened' after the engine announcement 2; L2 retire
+  the confirmed view after the announcement 1; L3 v15 refusal facts 4; L4
+  `consequencesReleased` from the scope query alone 1; L5 a throwing
+  callback's view reported staged 1; L6 abandoned reservation keeps its view
+  1; L7 staged delivered without the hold 1 (the donor's in-listener
+  assertion is swallowed by listener isolation, so a v16 control asserts
+  outside the listener). Review follow-up: L8 abandonment without a sequence
+  advance 2; L9 a throw before the reservation keeps its view 1.
+- Restoration: R1 refusal by message text 1; R2 record entries before
+  application 5; R3 resolve entries after application 2; R4 no transaction
+  relation 4; R5 structured refusal unmarked 3.
+- Link: K1 send awaiting permission not held 1; K2 no disposed check after
+  the sending publication 1; K3 construction failure publishes 1; K4
+  'disposed' after user cleanup 1; K5 false-idle publication 1; K6 sending
+  claimed before permission 1.
+- Membership: M1 restoration declarative target unheld 2 and M2 rollback
+  declarative target unheld 2 (both survived the donor fixtures, which route
+  through the realization adapter; killed by the declarative-delivery
+  control); M9 realization adapter unheld 146; M3 clear() committed before
+  tombstoning 1; M4 interrupted unit not cancelled 1; M5 frame omits rekey
+  39; M6 restore published value-only 6; M7 prependOne ungrouped 1 and M7b
+  prependMany ungrouped 1; M8 setAll committed before the reorder 2.
+- Location: S1 dormant step resolves 2; S2 lifetime on a non-collection 1;
+  S3 field presence unchecked 1; S4 label parsing 3. Survivor: S5 (no
+  ownership check on the reached node) — every registered address leads to
+  the node that owns it on v16 today; the check is defensive.
+- Confirmed view: F1 not projected 4; F2 not copied 1.
+- Admission: T1 `ToolingTree` weakened to a structural object → 3 type errors
+  in the kernel typing project (unused `@ts-expect-error`); the packed
+  consumer still passes under T1, because its negative cases (`{}`,
+  `{ $: {} }`, a bare `tree.$`) are rejected by the weakened type too. T2
+  `ISignalTree<T>` (TreeNode rebuilt from T) → 10 type errors. T3 admission
+  fixed to the `location` carrier, rebuilt and packed → 48 consumer errors
+  (Angular, Vue and Solid trees, both resolutions).
+
+### Results
+
+Per fixture after: transaction-lifecycle-view 17/17, restoration-reader
+11/11, restoration-operation-outcome 8/8, entity-membership-view 14/14,
+entity-membership-producer 6/6, membership-reversal-delivery 216/216,
+entity-membership-link-restoration 12/12, link-state-view 26/26,
+state-location-view 8/8, entity-membership-capture 11/11 (10 + the
+same-lifetime control), set-all-order-reversal 36/36, entity-large-batches
+11/11, Vue tooling-admission 2/2; the kernel typing spec compiles. Controls:
+8, 4, 4, 2, 5, 5.
+
+Full kernel at `c277d1ce`: 384 files, 4048 passed, 6 expected failures, 13
+skipped, exit 0 (`515a6969`: 368 / 3690; +16 files and +358 tests are exactly
+the new specs and cases). Each commit was also checked alone from a `git
+archive` export (typecheck-all, kernel typing project, full kernel;
+`slice6/commits/`): `4ce48aa5` 374 / 3954, `d20dac0f` 376 / 3977 with one
+timeout (the restored observed 130k case took 7.0 s against the 5 s default
+while other suites ran; 2.5 s alone; timeout added in `c277d1ce`),
+`c0809eca` 379 / 4001, `c761404f` 381 / 4029, `f06a47e7` and `fbb88104` 384 /
+4047; type checks exit 0 at every commit. Frameworks: angular 179 (+3
+skipped), react 23, vue 63, solid 41. `tsc -p tsconfig.typecheck-all.json`,
+the kernel typing project, `tools/check-spec-types.mjs` (three pre-existing
+improvements, baseline not ratcheted), `nx lint kernel`, `nx lint vue`,
+kernel-neutrality, dead-exports and the five-package build exit 0.
+Tree-shaking: kernel-only 12.75 KB gzipped on both `515a6969` and this slice;
+kernel + batching 14.23 → 14.24 KB.
+
+`node tools/api-inventory.mjs --check` fails only on the 40 pre-existing
+`d394047c` lines; `api-callable-inventory --check` only on the same fold.
+`node tools/verify-consumer-typecheck.mjs` fails only on its pre-existing
+PROPOSAL-0 sample (`propose()` and the `Proposal*` types left the API in
+`d394047c`); a scratch copy without that block passes under bundler and
+node16 with every new reader case (`slice6/full/consumer-typecheck-isolated.log`).
+`check-source-controls` fails only on the pre-existing control characters in
+`docs/audits/2026-10-01-v16-integration/slice1/build.log`.
+
+### Independent review
+
+One read-only review of `515a6969..fbb88104` (code-reviewer agent; it also
+ran the full kernel on an export: 384 / 4047). No critical finding; it
+confirmed hold release and unit completion on every path, transition-time
+capture, refusal facts, membership commit order, the planRestore notification
+against every notifier consumer, Link facts, state location, admission and
+the fixture adaptations. Dispositions:
+
+- Major: an abandoned reservation removed the pending view without a new
+  sequence (snapshot changed under an unchanged sequence). Fixed in
+  `c277d1ce`: `advance()`; no invented terminal event (see open item 2).
+- Major: a throw between registering the view and the reservation left a
+  permanent `opened` view. Fixed (covered from the 'opened' record to the
+  reservation) with a control.
+- Minor, membership deltas of a prepared target are delivered at publish, so
+  a sibling install that throws leaves an installed change unannounced; and
+  `cancel()` on a mid-unit throw publishes nothing. Both match the notifier,
+  which publishes nothing for those failed operations either; the `cancel()`
+  contract is now documented as such. Unchanged.
+- Minor, mid-unit snapshot refusal and per-call discovery walk: documented.
+- Minor, internal turns now carry `entryId`/`__transactionId`: internal only;
+  a control now pins the public history shape.
+- Minor, `history-changed` is also published when a pending entry is staged
+  (no visible entry change), and `linkStateReader` throws rather than
+  returning `undefined` for a registry-less tree: donor behaviour, unchanged.
+
+### User-visible behaviour changes in v16 (slice 6)
+
+1. Five new read-only readers on `@signal-tree/kernel/internals` and
+   `fieldSegments` on confirmed effects. Readers install no transaction or
+   restoration capability; observing membership installs only that
+   collection's membership producer.
+2. Undo/redo/rollback that re-adds a removed row now notifies with a
+   structural `add` (previously a value-only write), so Link and other
+   notifier consumers see the row return.
+3. `retrieve()` on a disposed Link performs no endpoint call.
+4. `clear()`/`setAll()`: removed rows' subject revision/state-signal bumps
+   (and setAll's zero-owner reclamation) run after the whole structural
+   operation, not between rows.
+5. Restoration refusals are `Error`s registered as owner refusals; messages
+   are unchanged.
+
+### Open items
+
+1. Pre-existing gate drift from `d394047c` (one vocabulary, `propose()` folded
+   into `transact()`): `tools/api-baseline.json` (25 removed, 15 added),
+   `tools/api-callable-baseline.json` and the consumer typecheck's PROPOSAL-0
+   sample are stale at `515a6969`. Needs its own deliberate refresh.
+2. Abandoned transactions (pre-existing owner behaviour, now visible): a
+   throw before the reservation or before materialization abandons the
+   transaction with no engine announcement and no commit-scope settlement
+   (the scope stays open, holding Link consequences); the pre-reservation
+   path also leaves its `pendingTransactions` bucket, and restoration keeps
+   its foreign-transaction state. The reader reports the transaction leaving
+   under a new sequence, without an event. Options: (a) a public `abandoned`
+   lifecycle kind; (b) the owner settles and announces on abandonment
+   (changes owner semantics, also releases scope and restoration state);
+   (c) keep. Decision pending.
+3. Refusal vocabulary (slice-4 item 1): later PENDING overlap is reported as
+   `later-confirmed-dependency`; `TransactionRefusalReason` follows the
+   owner.
+4. Redo of an independent lifetime while another is pending: v15 refuses
+   (collection-wide), v16 admits (lifetime-scoped, L16). Recorded divergence;
+   no order dependency was found in the probes.
+5. A refused automatic compensation of a throwing callback stays `opened`
+   (never staged). If tooling needs "callback finished", that is a new fact,
+   not a reinterpretation of `phase`.
+6. Vue opaque-leaf undo/redo (`preserved/vue-tooling-admission-leaf-undo.spec.ts.txt`)
+   and entity-observation-gate remain preserved for slices 8 and 9.
+7. The observed 130k setAll is ~3.7x v15's time without slice 9's demand
+   gate (`probes/perf.log`); no performance claim either way.
+8. Mutation survivor S5 (defensive ownership check in state location).
+9. The v15 user guide `docs/guides/runtime-observation.md` is not carried.
