@@ -21,6 +21,7 @@ import {
   getNodeAddress,
 } from './internals/position-registry';
 import { acquireObservation } from './internals/observation-substrate';
+import { registerLinkState } from './internals/link-state-view';
 import { isInspectionWrite } from './write-participation';
 import {
   getEntityProjectionSeed,
@@ -440,6 +441,27 @@ export function link<S>(
    */
   const retrievals = new Set<{ promise: Promise<void>; resolve: () => void }>();
 
+  // Read-only scheduler facts for `linkStateReader`. No values, no endpoint
+  // results: each publication reports what this relationship is doing now.
+  let queued = 0;
+  let sending = false;
+  const observation = registerLinkState(registry, (id) => ({
+    id,
+    path: ownerPath,
+    positions: getOwnedPositionIds(x) ?? [],
+    directions: {
+      get: !!endpoint.get,
+      set: !!endpoint.set,
+      subscribe: !!endpoint.subscribe,
+    },
+    dirty,
+    held: held.size > 0 || waitingSends.size > 0,
+    queued,
+    sending,
+    retrieving: retrievals.size,
+    disposed,
+  }));
+
   /**
    * Inbound Y -> X.
    *
@@ -499,6 +521,7 @@ export function link<S>(
         if (relative === undefined) return;
         eligible = applyPlainBranchMembership(eligible, relative, membership);
         dirty = true;
+        observation.publish();
         return;
       }
       // A value-less ping is a notification, not a state change.
@@ -539,6 +562,7 @@ export function link<S>(
           eligible = next as T;
         }
         dirty = true;
+        observation.publish();
         return;
       }
       const position = _pos?.[0];
@@ -573,6 +597,7 @@ export function link<S>(
         if (advanced) {
           advanceNested(nested);
           dirty = true;
+          observation.publish();
         }
         return;
       }
@@ -591,12 +616,16 @@ export function link<S>(
           inspection,
           fields
         );
-        if (advanced) dirty = true;
+        if (advanced) {
+          dirty = true;
+          observation.publish();
+        }
         return;
       }
       if (inspection) return;
       eligible = applyAtRelativePath(eligible, relative, v);
       dirty = true;
+      observation.publish();
     }
   );
 
@@ -635,18 +664,37 @@ export function link<S>(
                 return;
               }
               waitingSends.delete(cancel);
+              // Entering I/O is observable; a listener may dispose here, and
+              // then no endpoint call may start.
+              sending = true;
+              observation.publish();
+              if (disposed) {
+                sending = false;
+                resolve(false);
+                return;
+              }
               try {
                 // Invoke inside the authority's callback. Awaiting permission
                 // first would let a new scope open before the actual send.
-                Promise.resolve(endpoint.set?.(now)).then(() => {
-                  knownY = { value: now };
-                  resolve(true);
-                }, reject);
+                Promise.resolve(endpoint.set?.(now)).then(
+                  () => {
+                    sending = false;
+                    knownY = { value: now };
+                    resolve(true);
+                  },
+                  (error) => {
+                    sending = false;
+                    reject(error);
+                  }
+                );
               } catch (error) {
+                sending = false;
                 reject(error);
               }
             },
           });
+          // Held behind an open scope: the send waits for permission.
+          if (waitingSends.has(cancel)) observation.publish();
         } catch (error) {
           waitingSends.delete(cancel);
           reject(error);
@@ -688,19 +736,28 @@ export function link<S>(
         held.delete(pending);
         pending.resolve();
         if (disposed) return;
+        queued++;
         chain = chain
           .then(async () => {
-            // LINK-RACE-1. Reconcile until X equals Y's acknowledged state.
-            // Terminates on EQUALITY, not on a counter — a write that lands
-            // while an earlier one is in flight is picked up by the next lap.
-            for (;;) {
-              if (disposed) return;
-              // Each lap can follow an async acknowledgement or queued turn;
-              // admission of the original flush cannot authorize this send.
-              if (!(await sendEligible())) return;
+            queued--;
+            // Publish after entering I/O or completing reconciliation, never
+            // between removal from the queue and the first endpoint call.
+            try {
+              // LINK-RACE-1. Reconcile until X equals Y's acknowledged state.
+              // Terminates on EQUALITY, not on a counter — a write that lands
+              // while an earlier one is in flight is picked up by the next lap.
+              for (;;) {
+                if (disposed) return;
+                // Each lap can follow an async acknowledgement or queued turn;
+                // admission of the original flush cannot authorize this send.
+                if (!(await sendEligible())) return;
+              }
+            } finally {
+              observation.publish();
             }
           })
           .catch((error) => {
+            observation.publish('send-failed');
             // LINK-2 case 3. A rejected outbound `set()` reaches the EXISTING
             // central reporter, so `Link` needs NO error surface of its own:
             // no `failures`, no error signal, no status. Reusing the reporter
@@ -728,8 +785,10 @@ export function link<S>(
               path: ownerPath === '' ? undefined : ownerPath,
             });
           });
+        observation.publish();
       },
     });
+    observation.publish();
   };
   const offFlush = notifier.onFlush?.(flushOutbound);
 
@@ -757,6 +816,7 @@ export function link<S>(
             if (nested) advanceNested(nested);
           }
           dirty = true;
+          observation.publish();
           flushOutbound();
         } finally {
           pendingOrders.delete(pending);
@@ -794,14 +854,20 @@ export function link<S>(
     pendingOrders.clear();
     for (const r of retrievals) r.resolve();
     retrievals.clear();
+    // Retires the observation record before user cleanup, which may throw.
+    observation.publish('disposed');
     offSource?.();
   };
   try {
     offSource = endpoint.subscribe?.((v) => acquire(v, ++inboundSeq));
   } catch (error) {
+    // Construction did not return a handle: not an active relationship, so it
+    // leaves no observation record and publishes nothing.
+    observation.forget();
     dispose();
     throw error;
   }
+  observation.publish('created');
 
   return {
     async retrieve() {
@@ -813,13 +879,21 @@ export function link<S>(
       const promise = new Promise<void>((r) => (resolve = r));
       const entry = { promise, resolve };
       retrievals.add(entry);
+      observation.publish();
       try {
+        // A disposed relationship starts no endpoint call, including one
+        // disposed by a listener of the publication above.
+        if (disposed) return;
         acquire((await endpoint.get()) as T, seq);
+      } catch (error) {
+        observation.publish('retrieve-failed');
+        throw error;
       } finally {
         // `finally`, so a rejected get() releases the waiter too - otherwise a
         // failing endpoint would wedge every future `settled()`.
         retrievals.delete(entry);
         entry.resolve();
+        observation.publish();
       }
     },
     async settled() {
