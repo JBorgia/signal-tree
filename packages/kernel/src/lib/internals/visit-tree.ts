@@ -35,6 +35,12 @@ interface VisitTreeOptions {
    * `.update`. Returning true means "don't read, don't recurse into this key".
    */
   skipKey?: (key: string) => boolean;
+  /**
+   * Include retained non-enumerable locations, such as omitted optional
+   * members (dormant by enumerability). Callers must still decide per node
+   * whether to descend; non-enumerable keys include metadata accessors.
+   */
+  includeNonEnumerable?: boolean;
 }
 
 type TreeVisitor = (
@@ -73,7 +79,9 @@ export function visitTree(
 
     let keys: string[];
     try {
-      keys = Object.keys(node);
+      keys = options.includeNonEnumerable
+        ? Object.getOwnPropertyNames(node)
+        : Object.keys(node);
     } catch {
       return;
     }

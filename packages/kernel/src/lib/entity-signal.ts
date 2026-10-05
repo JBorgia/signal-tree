@@ -30,6 +30,13 @@ import {
   type SubjectLifetimeRecord,
 } from './physical/structural-store';
 import { defineOwnedOwnerPath } from './internals/owned-mutation';
+import {
+  defineEntityMembershipInventory,
+  defineEntityMembershipSource,
+  type EntityMembershipChange,
+  type EntityMembershipInventory,
+  type EntityMembershipUnit,
+} from './internals/entity-membership-inventory';
 import type { PhysicalCommitClock } from './internals/physical-commit-clock';
 // Only `notify` is ever called on this — the neutral port contract, not the
 // delivery engine's full surface.
@@ -278,6 +285,23 @@ import type {
   PositionId,
   StructuralEffect,
 } from '../lib/types';
+
+/**
+ * A collection carries only a membership SOURCE until a membership reader
+ * first observes it (`entityMembershipReader`). Until then its units are
+ * no-ops: no inventory reads, no retained deltas, no event history.
+ */
+const DORMANT_MEMBERSHIP_UNIT: EntityMembershipUnit = {
+  commit: () => undefined,
+  cancel: () => undefined,
+};
+const DORMANT_MEMBERSHIP: Pick<
+  EntityMembershipInventory,
+  'observed' | 'begin'
+> = {
+  observed: () => false,
+  begin: () => DORMANT_MEMBERSHIP_UNIT,
+};
 
 /**
  * True when the subjects present at both endpoints appear in a different
@@ -529,12 +553,71 @@ export function createEntitySignal<
       };
     });
 
+    let membershipChanges: EntityMembershipChange[] = [];
+    let membershipPublished = false;
+
     return {
       install(): void {
-        structuralStore.installPreparedTarget(structuralTarget);
-        valueStore.installPreparedTargetValues(valueTarget);
+        // Guards full reads while the target installs (a reader snapshot
+        // refuses mid-unit); the deltas are delivered from publish().
+        const unit = beginMembershipUnit();
+        try {
+          structuralStore.installPreparedTarget(structuralTarget);
+          valueStore.installPreparedTargetValues(valueTarget);
+          if (membershipInventory.observed()) {
+            membershipChanges = subjectChanges.flatMap(
+              (change): EntityMembershipChange[] => {
+                if (change.afterKey === undefined)
+                  return [
+                    {
+                      kind: 'remove',
+                      lifetimeId: change.subjectId,
+                      key: change.beforeKey as K,
+                    },
+                  ];
+                if (change.beforeKey === undefined)
+                  return [
+                    {
+                      kind: 'add',
+                      lifetimeId: change.subjectId,
+                      key: change.afterKey,
+                      beforeLifetimeId: change.targetNeighbors?.beforeSubject,
+                      afterLifetimeId: change.targetNeighbors?.afterSubject,
+                    },
+                  ];
+                return change.beforeKey !== change.afterKey
+                  ? [
+                      {
+                        kind: 'rekey',
+                        lifetimeId: change.subjectId,
+                        beforeKey: change.beforeKey,
+                        afterKey: change.afterKey,
+                      },
+                    ]
+                  : [];
+              }
+            );
+            const before = [...currentSubjects.keys()];
+            if (survivingOrderChanged(before, target.order)) {
+              membershipChanges.push({
+                kind: 'reorder',
+                before,
+                after: [...target.order],
+              });
+            }
+          }
+        } finally {
+          // The coordinator installs every target before any publish; close
+          // this read guard now and deliver the captured deltas in publish.
+          unit.commit([]);
+        }
       },
       publish(options): void {
+        if (!membershipPublished) {
+          membershipPublished = true;
+          beginMembershipUnit().commit(membershipChanges);
+          membershipChanges = [];
+        }
         for (const publication of subjectChanges) {
           // Only a realized subject has an epoch, so this stays as lazy as the
           // per-entity signal it replaces.
@@ -625,11 +708,26 @@ export function createEntitySignal<
     frame: EntityMutationFrame<K, E>,
     options?: { advancePhysicalRevision?: boolean }
   ) {
-    const result = frame.commit(committedEntityObserver());
-    if (options?.advancePhysicalRevision !== false) {
-      physicalCommitClock?.advance();
+    const unit = beginMembershipUnit();
+    try {
+      let membership: readonly EntityMembershipChange[] = [];
+      const result = frame.commit(
+        committedEntityObserver(),
+        membershipInventory.observed()
+          ? (changes) => {
+              membership = changes;
+            }
+          : undefined
+      );
+      if (options?.advancePhysicalRevision !== false) {
+        physicalCommitClock?.advance();
+      }
+      unit.commit(membership);
+      return result;
+    } catch (error) {
+      unit.cancel();
+      throw error;
     }
-    return result;
   }
 
   /** Reactive signals for queries — all derived, none eagerly maintained. */
@@ -708,6 +806,61 @@ export function createEntitySignal<
     locations.advanceEpoch?.(handle);
   };
   const structuralStore = new StructuralStore<K>();
+  // Membership production (read-only observation). Dormant until a reader
+  // installs the producer through the source defined at the end of this
+  // factory. Deltas are computed only while a reader listens (`observed()`).
+  let membershipInventory: Pick<
+    EntityMembershipInventory,
+    'observed' | 'begin'
+  > = DORMANT_MEMBERSHIP;
+  const readMembers = () =>
+    structuralStore.activeKeysSnapshot().map((key) => {
+      const lifetimeId = structuralStore.subjectIdForKey(key);
+      if (lifetimeId === undefined)
+        throw new Error('Active entity membership has no lifetime.');
+      return { lifetimeId, key };
+    });
+  let membershipGroupDepth = 0;
+  let groupedMembershipUnit: EntityMembershipUnit | undefined;
+  /**
+   * A unit spans one structural operation; its deltas reach readers when it
+   * commits, after the whole operation has installed and before reactive
+   * publication. Compound operations (prepend = add + move) arm one outer unit
+   * at their first physical commit, so planning and interceptors still see a
+   * complete pre-operation inventory and readers see one coherent event.
+   * A unit that is begun must be committed or cancelled, including on a throw:
+   * an unfinished unit keeps the inventory "still being installed".
+   */
+  function beginMembershipUnit(): EntityMembershipUnit {
+    if (membershipGroupDepth && !groupedMembershipUnit)
+      groupedMembershipUnit = membershipInventory.begin();
+    return membershipInventory.begin();
+  }
+  function withMembershipGroup<R>(run: () => R): R {
+    membershipGroupDepth++;
+    try {
+      return run();
+    } finally {
+      if (--membershipGroupDepth === 0) {
+        const unit = groupedMembershipUnit;
+        groupedMembershipUnit = undefined;
+        unit?.commit([]);
+      }
+    }
+  }
+  function membershipAddition(
+    lifetimeId: number,
+    key: K
+  ): EntityMembershipChange {
+    const neighbors = structuralStore.neighborSubjectsForKey(key);
+    return {
+      kind: 'add',
+      lifetimeId,
+      key,
+      beforeLifetimeId: neighbors.beforeSubject,
+      afterLifetimeId: neighbors.afterSubject,
+    };
+  }
   const valueStore = new EntityValueStore<E>();
   /**
    * `SUBJECT-STATE-SEMANTIC-0`. Held WEAKLY.
@@ -1086,7 +1239,16 @@ export function createEntitySignal<
    * signals pick the new order up from the version bump.
    */
   function moveToFront(ids: K[]): void {
+    const observed = membershipInventory.observed();
+    const before: number[] = [];
+    if (observed) structuralStore.snapshotActiveOrder([], before);
     structuralStore.moveKeysToFront(ids);
+    if (observed) {
+      const after: number[] = [];
+      structuralStore.snapshotActiveOrder([], after);
+      if (before.some((id, index) => id !== after[index]))
+        beginMembershipUnit().commit([{ kind: 'reorder', before, after }]);
+    }
     physicalCommitClock?.advance();
     updateSignals();
   }
@@ -1382,6 +1544,9 @@ export function createEntitySignal<
         updateSignals();
       },
       publish(metaOverride?: WriteMetadata): void {
+        // A restored lifetime re-enters collection membership. Value-only
+        // delivery cannot reinsert it into an observer's collection topology
+        // (a Link's egress projection drops a value for an absent subject).
         pathNotifier.notify(
           `${basePath}.${String(key)}`,
           entity,
@@ -1389,7 +1554,17 @@ export function createEntitySignal<
           basePath,
           [subjectId],
           getPositionIdsForNotify(),
-          metaOverride
+          {
+            ...(metaOverride ?? ambientMeta() ?? {}),
+            structuralEffect: {
+              kind: 'add',
+              subject: subjectId,
+              key,
+              value: deepClone(entity),
+              beforeSubject,
+              afterSubject,
+            },
+          }
         );
       },
     };
@@ -2491,25 +2666,34 @@ export function createEntitySignal<
      * interceptors, notifier and tap handlers on exactly one path.
      */
     prependOne(entity: E, opts?: AddOptions<E, K>): K {
-      const previousFirstKey = structuralStore.firstActiveKey();
-      const { id, structuralEffect } = addOneWithStructuralEffect(entity, opts);
-      moveToFront([id]);
-      rewritePendingAddEffect(
-        structuralEffect,
-        undefined,
-        previousFirstKey === undefined
-          ? undefined
-          : allocateSubjectId(previousFirstKey)
-      );
-      return id;
+      // One membership event for add + move: readers never see the row at
+      // the end of the list first.
+      return withMembershipGroup(() => {
+        const previousFirstKey = structuralStore.firstActiveKey();
+        const { id, structuralEffect } = addOneWithStructuralEffect(
+          entity,
+          opts
+        );
+        moveToFront([id]);
+        rewritePendingAddEffect(
+          structuralEffect,
+          undefined,
+          previousFirstKey === undefined
+            ? undefined
+            : allocateSubjectId(previousFirstKey)
+        );
+        return id;
+      });
     },
 
     prependMany(entities: E[], opts?: AddManyOptions<E, K>): K[] {
-      const ids = api.addMany(entities, opts);
-      // Front, in the order given — so `prependMany([a, b])` reads back as
-      // [a, b, ...existing], which is what the call site looks like.
-      moveToFront(ids);
-      return ids;
+      return withMembershipGroup(() => {
+        const ids = api.addMany(entities, opts);
+        // Front, in the order given — so `prependMany([a, b])` reads back as
+        // [a, b, ...existing], which is what the call site looks like.
+        moveToFront(ids);
+        return ids;
+      });
     },
 
     /**
@@ -3205,26 +3389,41 @@ export function createEntitySignal<
         };
       });
 
-      const freshSubjectIds = commitFreshSubjects(
-        stagedAdds.map(({ id }) => id)
-      );
-      const addedSubjectIdsByKey = new Map<K, number>();
-      for (let i = 0; i < stagedAdds.length; i++) {
-        addedSubjectIdsByKey.set(stagedAdds[i].id, freshSubjectIds[i]);
-      }
-
-      // Process adds
+      // Adds are committed as one membership unit; readers hear of them
+      // once every row is installed. A throw cancels the unit.
+      const membershipUnit = beginMembershipUnit();
       const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
-      for (const { entity: transformedEntity, id } of stagedAdds) {
-        const subjectId = addedSubjectIdsByKey.get(id);
-        if (subjectId === undefined) {
-          throw new Error(`Entity with id ${String(id)} has no subject id`);
+      try {
+        const freshSubjectIds = commitFreshSubjects(
+          stagedAdds.map(({ id }) => id)
+        );
+        const addedSubjectIdsByKey = new Map<K, number>();
+        for (let i = 0; i < stagedAdds.length; i++) {
+          addedSubjectIdsByKey.set(stagedAdds[i].id, freshSubjectIds[i]);
         }
-        valueStore.retainSubjectValue(subjectId, transformedEntity);
-        captureCommittedEntity(subjectId, undefined, transformedEntity, true);
-        invalidateNodeCache(id);
-        syncEntitySignal(id);
-        addedEntities.push({ id, entity: transformedEntity, subjectId });
+
+        // Process adds
+        for (const { entity: transformedEntity, id } of stagedAdds) {
+          const subjectId = addedSubjectIdsByKey.get(id);
+          if (subjectId === undefined) {
+            throw new Error(`Entity with id ${String(id)} has no subject id`);
+          }
+          valueStore.retainSubjectValue(subjectId, transformedEntity);
+          captureCommittedEntity(subjectId, undefined, transformedEntity, true);
+          invalidateNodeCache(id);
+          syncEntitySignal(id);
+          addedEntities.push({ id, entity: transformedEntity, subjectId });
+        }
+        membershipUnit.commit(
+          membershipInventory.observed()
+            ? addedEntities.map(({ id, subjectId }) =>
+                membershipAddition(subjectId, id)
+              )
+            : []
+        );
+      } catch (error) {
+        membershipUnit.cancel();
+        throw error;
       }
 
       const updatedEntities: Array<{
@@ -3344,16 +3543,34 @@ export function createEntitySignal<
         return { id, subjectId, entity, beforeSubject, afterSubject };
       });
 
-      for (const { id, subjectId, entity } of activeSubjects) {
-        const currentState = resolveSubjectState(subjectId);
-        structuralStore.tombstoneSubject(
-          subjectId,
-          id,
-          currentState?.restoreAllowed ?? true
-        );
-        captureCommittedEntity(subjectId, entity, undefined, true);
-        publishSubjectPhysicalChange(subjectId);
+      const membershipUnit = beginMembershipUnit();
+      try {
+        for (const { id, subjectId, entity } of activeSubjects) {
+          const currentState = resolveSubjectState(subjectId);
+          structuralStore.tombstoneSubject(
+            subjectId,
+            id,
+            currentState?.restoreAllowed ?? true
+          );
+          captureCommittedEntity(subjectId, entity, undefined, true);
+        }
+      } catch (error) {
+        membershipUnit.cancel();
+        throw error;
       }
+      // Readers hear of the removals once every row is tombstoned, before the
+      // rows' reactive publication.
+      membershipUnit.commit(
+        membershipInventory.observed()
+          ? activeSubjects.map(({ id, subjectId }) => ({
+              kind: 'remove' as const,
+              lifetimeId: subjectId,
+              key: id,
+            }))
+          : []
+      );
+      for (const { subjectId } of activeSubjects)
+        publishSubjectPhysicalChange(subjectId);
 
       // Per-subject, exactly as `removeOne` does — never a bulk reset (see the
       // tombstone above). A held reference has to keep reading through the SAME
@@ -3513,94 +3730,127 @@ export function createEntitySignal<
         stagedUpdates.push({ id, prev, entity, subjectId });
       }
 
-      // Index-aligned with `stagedAdds`.
-      const addedSubjectIds = commitFreshSubjects(
-        stagedAdds.map(({ id }) => id)
-      );
-      for (let k = 0; k < stagedAdds.length; k += 1) {
-        incomingSubjects[stagedAdds[k].index] = addedSubjectIds[k];
-      }
-      // Every incoming row now has its subject: this IS the after-order.
-      const afterSubjects = incomingSubjects as number[];
-
-      // Immediate pre-state neighbours, removed or surviving, exactly as
-      // clear() and removeMany() record them. Anchoring only to survivors left
-      // adjacent removals with identical anchors, so their reversal order
-      // depended on replay order: [a,b,c] -> [q,a] rolled back to [a,c,b], and
-      // replacing every row undid to [c,b,a].
+      // From the first fresh subject to the order capture is one membership
+      // unit; a throw cancels it.
+      const membershipUnit = beginMembershipUnit();
+      let addedSubjectIds: number[];
+      let afterSubjects: number[];
       const stagedRemovalStructuralEffects: PendingStructuralEffect[] = [];
-      for (const { id, entity, subjectId, index } of stagedRemovals) {
-        stagedRemovalStructuralEffects.push({
-          kind: 'remove',
-          subject: subjectId,
-          key: id,
-          value: deepClone(entity),
-          beforeSubject: index > 0 ? currentSubjects[index - 1] : undefined,
-          afterSubject: currentSubjects[index + 1],
-        });
+      try {
+        // Index-aligned with `stagedAdds`.
+        addedSubjectIds = commitFreshSubjects(stagedAdds.map(({ id }) => id));
+        for (let k = 0; k < stagedAdds.length; k += 1) {
+          incomingSubjects[stagedAdds[k].index] = addedSubjectIds[k];
+        }
+        // Every incoming row now has its subject: this IS the after-order.
+        afterSubjects = incomingSubjects as number[];
+
+        // Immediate pre-state neighbours, removed or surviving, exactly as
+        // clear() and removeMany() record them. Anchoring only to survivors left
+        // adjacent removals with identical anchors, so their reversal order
+        // depended on replay order: [a,b,c] -> [q,a] rolled back to [a,c,b], and
+        // replacing every row undid to [c,b,a].
+        for (const { id, entity, subjectId, index } of stagedRemovals) {
+          stagedRemovalStructuralEffects.push({
+            kind: 'remove',
+            subject: subjectId,
+            key: id,
+            value: deepClone(entity),
+            beforeSubject: index > 0 ? currentSubjects[index - 1] : undefined,
+            afterSubject: currentSubjects[index + 1],
+          });
+        }
+
+        for (const { id, subjectId, entity } of stagedRemovals) {
+          tombstoneSubjectSignal(subjectId);
+          const currentState = resolveSubjectState(subjectId);
+          structuralStore.tombstoneSubject(
+            subjectId,
+            id,
+            currentState?.restoreAllowed ?? true
+          );
+          captureCommittedEntity(subjectId, entity, undefined, true);
+        }
+
+        for (const { subjectId, entity, prev } of stagedUpdates) {
+          valueStore.retainSubjectValue(subjectId, entity);
+          captureCommittedEntity(subjectId, prev, entity, false);
+        }
+
+        for (let k = 0; k < stagedAdds.length; k += 1) {
+          const { id, entity } = stagedAdds[k];
+          valueStore.retainSubjectValue(addedSubjectIds[k], entity);
+          captureCommittedEntity(addedSubjectIds[k], undefined, entity, true);
+          syncEntitySignal(id);
+        }
+
+        for (const { id } of stagedUpdates) {
+          syncEntitySignal(id);
+        }
+
+        structuralStore.reorderActiveKeys(incomingIds);
+
+        lastSubjectIds = [
+          ...stagedRemovals.map(({ subjectId }) => subjectId),
+          ...stagedUpdates.map(({ subjectId }) => subjectId),
+          ...addedSubjectIds,
+        ];
+
+        if (mutationCaptureRuntime?.isCaptureActive()) getPositionIds();
+        // Captured whenever SURVIVING subjects change relative order, not only
+        // for a pure reorder. Neighbour hints on the structural effects cannot
+        // restore survivors that moved: reversing [a,b,c] -> [c,a] yielded
+        // [b,c,a]. The order delta carries both endpoints, including subjects
+        // present at only one of them. Membership-only changes keep relying on
+        // the structural effects.
+        if (
+          positionId !== undefined &&
+          mutationCaptureRuntime?.publishCollectionOrder &&
+          survivingOrderChanged(currentSubjects, afterSubjects)
+        ) {
+          mutationCaptureRuntime.publishCollectionOrder({
+            owner: positionId,
+            ownerPath: basePath,
+            beforeSubjects: currentSubjects,
+            afterSubjects,
+            beforeFrontier: beforeOrderFrontier,
+            afterFrontier: structuralStore.activeOrderFrontier(),
+            meta: ambientMeta(),
+          });
+        }
+      } catch (error) {
+        membershipUnit.cancel();
+        throw error;
       }
 
-      for (const { id, subjectId, entity } of stagedRemovals) {
-        tombstoneSubjectSignal(subjectId);
-        const currentState = resolveSubjectState(subjectId);
-        structuralStore.tombstoneSubject(
-          subjectId,
-          id,
-          currentState?.restoreAllowed ?? true
-        );
-        captureCommittedEntity(subjectId, entity, undefined, true);
-        publishSubjectPhysicalChange(subjectId);
+      // The whole replacement has installed: removals, adds (with neighbours
+      // in the final order) and any survivor reorder reach readers as one
+      // unit, before the removed rows' reactive publication.
+      const membershipChanges: EntityMembershipChange[] = [];
+      if (membershipInventory.observed()) {
+        for (const { id, subjectId } of stagedRemovals)
+          membershipChanges.push({
+            kind: 'remove',
+            lifetimeId: subjectId,
+            key: id,
+          });
+        for (let k = 0; k < stagedAdds.length; k += 1)
+          membershipChanges.push(
+            membershipAddition(addedSubjectIds[k], stagedAdds[k].id)
+          );
+        if (survivingOrderChanged(currentSubjects, afterSubjects))
+          membershipChanges.push({
+            kind: 'reorder',
+            before: currentSubjects,
+            after: afterSubjects,
+          });
       }
+      membershipUnit.commit(membershipChanges);
+      for (const { subjectId } of stagedRemovals)
+        publishSubjectPhysicalChange(subjectId);
       reclaimRetiredSubjectsWithoutOwner(
         stagedRemovals.map(({ subjectId }) => subjectId)
       );
-
-      for (const { subjectId, entity, prev } of stagedUpdates) {
-        valueStore.retainSubjectValue(subjectId, entity);
-        captureCommittedEntity(subjectId, prev, entity, false);
-      }
-
-      for (let k = 0; k < stagedAdds.length; k += 1) {
-        const { id, entity } = stagedAdds[k];
-        valueStore.retainSubjectValue(addedSubjectIds[k], entity);
-        captureCommittedEntity(addedSubjectIds[k], undefined, entity, true);
-        syncEntitySignal(id);
-      }
-
-      for (const { id } of stagedUpdates) {
-        syncEntitySignal(id);
-      }
-
-      structuralStore.reorderActiveKeys(incomingIds);
-
-      lastSubjectIds = [
-        ...stagedRemovals.map(({ subjectId }) => subjectId),
-        ...stagedUpdates.map(({ subjectId }) => subjectId),
-        ...addedSubjectIds,
-      ];
-
-      if (mutationCaptureRuntime?.isCaptureActive()) getPositionIds();
-      // Captured whenever SURVIVING subjects change relative order, not only
-      // for a pure reorder. Neighbour hints on the structural effects cannot
-      // restore survivors that moved: reversing [a,b,c] -> [c,a] yielded
-      // [b,c,a]. The order delta carries both endpoints, including subjects
-      // present at only one of them. Membership-only changes keep relying on
-      // the structural effects.
-      if (
-        positionId !== undefined &&
-        mutationCaptureRuntime?.publishCollectionOrder &&
-        survivingOrderChanged(currentSubjects, afterSubjects)
-      ) {
-        mutationCaptureRuntime.publishCollectionOrder({
-          owner: positionId,
-          ownerPath: basePath,
-          beforeSubjects: currentSubjects,
-          afterSubjects,
-          beforeFrontier: beforeOrderFrontier,
-          afterFrontier: structuralStore.activeOrderFrontier(),
-          meta: ambientMeta(),
-        });
-      }
 
       // Every incoming row is active by now, so the nearest neighbour with a
       // subject is the adjacent one in the after-order.
@@ -3719,6 +3969,15 @@ export function createEntitySignal<
     configurable: true,
   });
   defineOwnedOwnerPath(api, basePath);
+  // Membership observation installs this collection's producer on first use.
+  defineEntityMembershipSource(api, {
+    install(create) {
+      const inventory = create(readMembers);
+      membershipInventory = inventory;
+      defineEntityMembershipInventory(api, inventory);
+      return inventory;
+    },
+  });
   // ⚠️ THE PROJECTION SEED — internal, WeakMap-carried, never public.
   //
   // Built from the SAME ordered active-key snapshot `getProjectedEntries()`
