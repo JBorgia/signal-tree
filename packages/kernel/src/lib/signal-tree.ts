@@ -4,8 +4,12 @@ import type { SignalTreeFactory } from './types';
 import {
   bindLocationRuntime,
   createLocationRuntime,
+  getLocationRuntime,
   isWritableLocation,
+  NEUTRAL_LOCATION_RUNTIME,
   replaceLocation,
+  writableLocationPublisher,
+  type LocationPublisher,
   type LocationRuntime,
 } from './internals/location-runtime';
 import {
@@ -61,7 +65,10 @@ import {
 } from './internals/materialize-markers';
 import { installDormantObservation } from './internals/observation-substrate';
 import { captureBranchMembershipIfObserved } from './internals/path-observation-port';
-import { terminateOwnerInvalidation } from './internals/owner-invalidation-port';
+import {
+  markOwnerInvalidatedFrom,
+  terminateOwnerInvalidation,
+} from './internals/owner-invalidation-port';
 import { defineRootTree } from './internals/root-source';
 import {
   definePositionRegistry,
@@ -829,14 +836,31 @@ function republishMembers(parent: object, keys: readonly string[]): void {
   // Sweeping every slot under the branch published siblings whose membership and
   // value were both untouched, and double-published the one that did change.
   const changedSlots: number[] = [];
+  // ⚠️ A SLOT IS POSITION-ADDRESSABLE ONLY UNDER `position-topology`.
+  //
+  // Every tree has scalar slots since 5efeb7f5, but a leaf receives a PositionId
+  // only with that capability (transactions, restoration). Without it the slot
+  // lookup below finds nothing, and the leaf was treated as tokenless: its own
+  // token was never published, so a derived, a `subscribe` listener and every
+  // native carrier (Angular, Vue, Solid) kept the retained value after
+  // `p({ name: 'a' })` removed `age`. The leaf's location binding IS that token
+  // — the one its own writes publish — so it is published instead.
+  const unaddressedLeaves: LocationPublisher[] = [];
   for (const key of keys) {
     const child = (parent as Record<string, unknown>)[key];
     const positionId = getOwnedPositionIds(child)?.[0];
-    if (positionId === undefined) continue;
-
-    const slot = runtime.resolveScalarSlot(positionId);
-    if (slot !== undefined) changedSlots.push(slot);
+    const slot =
+      positionId === undefined
+        ? undefined
+        : runtime.resolveScalarSlot(positionId);
+    if (slot !== undefined) {
+      changedSlots.push(slot);
+      continue;
+    }
+    const publisher = writableLocationPublisher(child);
+    if (publisher) unaddressedLeaves.push(publisher);
   }
+  const tokenCarrying = changedSlots.length + unaddressedLeaves.length;
 
   // ⚠️ PUBLISHED INDEPENDENTLY OF VALUE EQUALITY.
   //
@@ -867,14 +891,41 @@ function republishMembers(parent: object, keys: readonly string[]): void {
   // PositionId — an earlier version of this check tested for one and therefore
   // never fired. What a branch lacks is a per-slot PUBLICATION TOKEN, which is
   // what the dependency graph actually carries.
-  if (changedSlots.length < keys.length) {
+  if (tokenCarrying < keys.length) {
     publishMembershipChange(parent);
+  } else {
+    // ⚠️ OWNER INVALIDATION DOES NOT DEPEND ON WHICH CARRIER WAKES THE GRAPH.
+    //
+    // `publishMembershipChange` also invalidates the owner. This branch is the
+    // case where it does not run: every changed member is a leaf whose token
+    // is published below. Before this branch existed that was the ordinary
+    // case under `position-topology` (transactions, restoration), and the
+    // owner was never told — measured: `p({ name: 'a' })` over
+    // `{ name: 'a', age: 1 }` gave 0 invalidations with either enhancer and 1
+    // without, while `tree.$()` already read the removal. Without the
+    // capability the leaf was mistaken for tokenless, so the branch above ran
+    // and invalidated by accident.
+    //
+    // The commit revision is still NOT advanced: owner invalidation is a
+    // reread request, not a commit. The membership revision is not bumped
+    // either: a branch snapshot re-reads every member leaf, so the leaf tokens
+    // published below are what wake it. A dormant BRANCH member has no token and
+    // takes the `publishMembershipChange` path above instead.
+    markOwnerInvalidatedFrom(parent);
   }
 
   if (changedSlots.length > 0) {
     // `advanceRevision` is NOT wanted: nothing was committed, so the physical
     // commit clock must not move.
     runtime.publishPrepared({ revision: runtime.revision(), changedSlots });
+  }
+
+  if (unaddressedLeaves.length > 0) {
+    // The tree's own runtime, so the publication joins its invalidation group;
+    // the neutral fallback mirrors `publishMembershipChange`.
+    (getLocationRuntime(parent) ?? NEUTRAL_LOCATION_RUNTIME).publish(
+      unaddressedLeaves
+    );
   }
 
   // The node's own snapshot is memoised over the members it enumerated, and a

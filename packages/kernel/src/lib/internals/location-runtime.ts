@@ -67,6 +67,17 @@ export function isWritableLocation(value: unknown): value is Location<unknown> {
   return WRITABLE_LOCATION_BINDINGS.has(value as object);
 }
 
+/**
+ * @internal The publisher a writable location's own writes already publish
+ * through. Exposed so a membership transition can wake a location's observers
+ * without writing it; it creates no reactive state.
+ */
+export function writableLocationPublisher(
+  value: unknown
+): LocationPublisher | undefined {
+  return WRITABLE_LOCATION_BINDINGS.get(value as object);
+}
+
 export function replaceLocation<T>(location: Location<T>, value: T): void {
   writableLocationBinding(location).replace(value);
 }
