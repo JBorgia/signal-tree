@@ -137,9 +137,11 @@ describe('refused automatic compensation reports the retained transaction', () =
     }
   });
 
-  it('an abandoned reservation leaves no phantom pending transaction', () => {
+  it('an abandoned reservation leaves no phantom pending transaction, under a new sequence', () => {
     const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
     const reader = transactionLifecycleReader(tree)!;
+    const events: TransactionLifecycleObservation[] = [];
+    reader.subscribe((event) => events.push(event));
     const notifier = getPathNotifier();
     const flushSync = notifier.flushSync.bind(notifier);
     let armed = false;
@@ -161,9 +163,44 @@ describe('refused automatic compensation reports the retained transaction', () =
       expect(peekInternalTransactionRuntime(tree)!.getPendingTurnCount()).toBe(
         0
       );
-      expect(reader.snapshot().pending).toEqual([]);
+      // 'staged' was recorded (and delivered) with the transaction pending;
+      // it then leaves the snapshot under the next sequence, with no invented
+      // terminal event (the engine announces none on this path).
+      expect(kinds(events)).toEqual(['opened:1', 'staged:1']);
+      expect(events[1].snapshot.pending).toHaveLength(1);
+      expect(reader.snapshot()).toMatchObject({ sequence: 3, pending: [] });
     } finally {
       spy.mockRestore();
+      tree.destroy();
+    }
+  });
+
+  it('a throw before the reservation leaves no phantom pending transaction', () => {
+    const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
+    const reader = transactionLifecycleReader(tree)!;
+    const notifier = getPathNotifier();
+    const flushSync = notifier.flushSync.bind(notifier);
+    let armed = false;
+    const failure = new Error('drain failed');
+    // Armed by the 'opened' announcement: the next flush is the drain of
+    // 'opened'-listener writes, before the turn is reserved.
+    const stop = getTransactionLifecycleChannel(tree).subscribe((event) => {
+      if (event.kind === 'opened') armed = true;
+    });
+    const spy = vi.spyOn(notifier, 'flushSync').mockImplementation(() => {
+      if (armed) {
+        armed = false;
+        throw failure;
+      }
+      flushSync();
+    });
+    try {
+      expect(() => tree.transact(() => tree.$.x(1))).toThrow(failure);
+      expect(tree.$.x()).toBe(0);
+      expect(reader.snapshot()).toMatchObject({ sequence: 2, pending: [] });
+    } finally {
+      spy.mockRestore();
+      stop();
       tree.destroy();
     }
   });

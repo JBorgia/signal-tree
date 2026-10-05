@@ -58,6 +58,11 @@ describe.each([
           [olderId + 1],
         ]);
         expect(entries.every((entry) => entry.status === 'applied')).toBe(true);
+        // Lineage stays on the reader; the public history keeps its shape.
+        for (const entry of tree.getRestorationHistory()) {
+          expect(entry).not.toHaveProperty('entryId');
+          expect(entry).not.toHaveProperty('__transactionId');
+        }
         expect(
           peekInternalTransactionRuntime(tree)!.getPendingTurnCount()
         ).toBe(0);

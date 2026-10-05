@@ -137,6 +137,12 @@ export function holdEntityMembershipDelivery(root: object): () => void {
  * Supported tooling reader. No row values, event journal, or mutation
  * authority. `undefined` when the tree has no entity collection. Observing a
  * collection installs only its own membership producer, on first observation.
+ *
+ * A full read refuses while a structural unit is installing ("still being
+ * installed"): construction, `snapshot()` and `subscribe()` throw rather than
+ * expose a partial inventory. Each `snapshot()`/`subscribe()` re-discovers
+ * collections with one walk of the tree, so collections created later are
+ * enrolled; events themselves carry deltas only.
  */
 export function entityMembershipReader<
   T,

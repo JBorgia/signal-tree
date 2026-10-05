@@ -74,6 +74,13 @@ export interface TransactionLifecycleReader {
 export interface TransactionLifecyclePublisher {
   (fact: LifecycleFact): void;
   hold(): () => void;
+  /**
+   * Advance the sequence for a state change that has no lifecycle fact: the
+   * owner abandoned a transaction without settling it, so it leaves the
+   * snapshot. Snapshots stay coherent with their sequence; no event is
+   * invented for a transition the owner never announces.
+   */
+  advance(): void;
 }
 
 type Listener = (event: TransactionLifecycleObservation) => void;
@@ -120,7 +127,8 @@ export function installTransactionLifecycleObservation<T>(
   readPending: () => readonly PendingTransactionView[]
 ): TransactionLifecyclePublisher {
   const registry = getPositionRegistry(tree.$);
-  if (!registry) return Object.assign(noop, { hold: () => noop });
+  if (!registry)
+    return Object.assign(noop, { hold: () => noop, advance: noop });
   const state: State = {
     sequence: 0,
     closed: false,
@@ -188,7 +196,10 @@ export function installTransactionLifecycleObservation<T>(
       deliver();
     };
   };
-  return Object.assign(publish, { hold });
+  const advance = (): void => {
+    if (!state.closed) state.sequence++;
+  };
+  return Object.assign(publish, { hold, advance });
 }
 
 /**

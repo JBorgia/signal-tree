@@ -35,7 +35,11 @@ export type EntityMembershipChange =
 export interface EntityMembershipUnit {
   /** Call after the entire structural unit commits, before reactive publication. */
   commit(changes: readonly EntityMembershipChange[]): void;
-  /** Only for a refused/aborted unit that did not change membership. */
+  /**
+   * For a refused or aborted unit. Nothing is published for it: an operation
+   * that threw part-way publishes no notifications either, so a reader hears
+   * nothing of a partial change and its next snapshot reads current truth.
+   */
   cancel(): void;
 }
 

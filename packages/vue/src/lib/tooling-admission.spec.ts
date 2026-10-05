@@ -92,10 +92,11 @@ describe('tooling admits public Vue trees directly', () => {
         // v16 control (slice 6): a native Vue leaf's position resolves too.
         const scalar = confirmed
           .readConfirmedTurns()
-          .turns[0].effects.find((effect) => effect.path === 'count')!;
-        expect(locations.locate([{ position: scalar.position }])).toEqual([
-          [{ kind: 'property', key: 'count' }],
-        ]);
+          .turns[0].effects.find((effect) => effect.path === 'count');
+        expect(scalar).toBeDefined();
+        expect(
+          locations.locate([{ position: scalar?.position ?? -1 }])
+        ).toEqual([[{ kind: 'property', key: 'count' }]]);
         expect(links.snapshot()).toMatchObject({ treeId: id, links: [] });
 
         undoable(() => {
