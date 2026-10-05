@@ -48,6 +48,7 @@ import {
 import { markOwnerInvalidated } from './internals/owner-invalidation-port';
 import {
   MUTATION_CAPTURE_RUNTIME,
+  type CommittedEntityMutation,
   type MutationCaptureRuntime,
 } from './internals/mutation-capture-runtime';
 import type {
@@ -607,7 +608,7 @@ export function createEntitySignal<
     frame: EntityMutationFrame<K, E>,
     options?: { advancePhysicalRevision?: boolean }
   ) {
-    const result = frame.commit();
+    const result = frame.commit(committedEntityObserver());
     if (options?.advancePhysicalRevision !== false) {
       physicalCommitClock?.advance();
     }
@@ -1210,8 +1211,56 @@ export function createEntitySignal<
    * For a one-field update that machinery is the mutation.
    */
   function commitExistingSubjectValue(subjectId: number, nextValue: E): void {
+    const capture = committedEntityObserver();
+    const before = capture
+      ? valueStore.backingForSubject(subjectId)
+      : undefined;
     valueStore.retainSubjectValue(subjectId, nextValue);
+    capture?.([
+      { subject: subjectId, before, after: nextValue, structural: false },
+    ]);
     physicalCommitClock?.advance();
+  }
+
+  /**
+   * Source-owned committed evidence for open transaction/restoration capture.
+   *
+   * Runs after the physical write it describes and before this collection
+   * notifies the path notifier for the operation, so an observer re-entering
+   * from notifier delivery of the first row cannot find a later row of the
+   * same operation unclaimed. Frame commits and single-row writes report once,
+   * after every touched row has applied. The batch writers (`upsertMany`,
+   * `clear`, `setAll`) report row by row, interleaved only with staged epoch
+   * and state-token publications, which a transaction callback's invalidation
+   * group defers until the callback returns. Attribution is frozen here,
+   * before any callback can change the ambient write context. Pay-for-use:
+   * undefined unless an observer is active.
+   */
+  function committedEntityObserver():
+    | ((changes: readonly CommittedEntityMutation[]) => void)
+    | undefined {
+    if (!mutationCaptureRuntime?.hasCommittedEntityObservers?.())
+      return undefined;
+    const owner = getPositionIds()?.[0];
+    if (owner === undefined) return undefined;
+    const meta = ambientMeta();
+    return (changes) =>
+      mutationCaptureRuntime.publishCommittedEntity?.({
+        owner,
+        ownerPath: basePath,
+        changes,
+        meta,
+      });
+  }
+
+  function captureCommittedEntity(
+    subject: number,
+    before: unknown,
+    after: unknown,
+    structural: boolean
+  ): void {
+    const capture = committedEntityObserver();
+    if (capture) capture([{ subject, before, after, structural }]);
   }
 
   function rememberSubjectIds(ids: K[]): number[] {
@@ -3109,6 +3158,7 @@ export function createEntitySignal<
           throw new Error(`Entity with id ${String(id)} has no subject id`);
         }
         valueStore.retainSubjectValue(subjectId, transformedEntity);
+        captureCommittedEntity(subjectId, undefined, transformedEntity, true);
         invalidateNodeCache(id);
         syncEntitySignal(id);
         addedEntities.push({ id, entity: transformedEntity, subjectId });
@@ -3129,6 +3179,7 @@ export function createEntitySignal<
         transformedChanges,
       } of stagedUpdates) {
         valueStore.retainSubjectValue(subjectId, finalUpdated);
+        captureCommittedEntity(subjectId, prev, finalUpdated, false);
         syncEntitySignal(id);
         updatedEntities.push({
           id,
@@ -3230,13 +3281,14 @@ export function createEntitySignal<
         return { id, subjectId, entity, beforeSubject, afterSubject };
       });
 
-      for (const { id, subjectId } of activeSubjects) {
+      for (const { id, subjectId, entity } of activeSubjects) {
         const currentState = resolveSubjectState(subjectId);
         structuralStore.tombstoneSubject(
           subjectId,
           id,
           currentState?.restoreAllowed ?? true
         );
+        captureCommittedEntity(subjectId, entity, undefined, true);
         publishSubjectPhysicalChange(subjectId);
       }
 
@@ -3458,7 +3510,7 @@ export function createEntitySignal<
         }
       );
 
-      for (const { id, subjectId } of stagedRemovals) {
+      for (const { id, subjectId, entity } of stagedRemovals) {
         tombstoneSubjectSignal(subjectId);
         const currentState = resolveSubjectState(subjectId);
         structuralStore.tombstoneSubject(
@@ -3466,14 +3518,16 @@ export function createEntitySignal<
           id,
           currentState?.restoreAllowed ?? true
         );
+        captureCommittedEntity(subjectId, entity, undefined, true);
         publishSubjectPhysicalChange(subjectId);
       }
       reclaimRetiredSubjectsWithoutOwner(
         stagedRemovals.map(({ subjectId }) => subjectId)
       );
 
-      for (const { subjectId, entity } of stagedUpdates) {
+      for (const { subjectId, entity, prev } of stagedUpdates) {
         valueStore.retainSubjectValue(subjectId, entity);
+        captureCommittedEntity(subjectId, prev, entity, false);
       }
 
       const addedSubjectIds = stagedAdds.map(({ id, entity }) => {
@@ -3482,6 +3536,7 @@ export function createEntitySignal<
           throw new Error(`Entity with id ${String(id)} has no subject id`);
         }
         valueStore.retainSubjectValue(subjectId, entity);
+        captureCommittedEntity(subjectId, undefined, entity, true);
         syncEntitySignal(id);
         return subjectId;
       });

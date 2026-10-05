@@ -1,3 +1,4 @@
+import type { CommittedEntityMutation } from '../internals/mutation-capture-runtime';
 import { EntityValueStore } from './entity-value-store';
 import {
   type ResolvedSubjectRestorePlacement,
@@ -140,8 +141,38 @@ export class EntityMutationFrame<
     this.mutations.push(restoration);
   }
 
-  commit(): EntityMutationCommitResult {
+  /**
+   * @param observeCommitted Supplied only when a committed-entity observer is
+   * active. Receives every touched lifetime once, after EVERY prepared
+   * instruction has applied and before the caller publishes or notifies, so a
+   * multi-row frame is never visible to admission one row at a time. A
+   * preparation failure throws before anything applies or is reported.
+   */
+  commit(
+    observeCommitted?: (changes: readonly CommittedEntityMutation[]) => void
+  ): EntityMutationCommitResult {
     const preparedMutations = this.prepareCommitInstructions();
+    // Before-images of touched lifetimes only. An inactive lifetime's retained
+    // backing is not current truth, so it reads as absent (undefined).
+    const before = observeCommitted
+      ? new Map<number, { value: E | undefined; structural: boolean }>()
+      : undefined;
+    if (before) {
+      for (const mutation of preparedMutations) {
+        const previous = before.get(mutation.subjectId);
+        before.set(mutation.subjectId, {
+          value: previous
+            ? previous.value
+            : this.structuralStore.activeKeyForSubject(mutation.subjectId) ===
+              undefined
+            ? undefined
+            : this.valueStore.backingForSubject(mutation.subjectId),
+          structural:
+            (previous?.structural ?? false) ||
+            mutation.kind !== 'replace-value',
+        });
+      }
+    }
     const physicallyChangedSubjectIds = new Set<number>();
     const allocatedSubjectIds: number[] = [];
 
@@ -213,6 +244,20 @@ export class EntityMutationFrame<
         mutation.restoreAllowed
       );
       physicallyChangedSubjectIds.add(mutation.subjectId);
+    }
+
+    if (before && observeCommitted) {
+      observeCommitted(
+        [...before].map(([subject, entry]) => ({
+          subject,
+          before: entry.value,
+          after:
+            this.structuralStore.activeKeyForSubject(subject) === undefined
+              ? undefined
+              : this.valueStore.backingForSubject(subject),
+          structural: entry.structural,
+        }))
+      );
     }
 
     return {
