@@ -60,7 +60,10 @@ import {
   type CollectionTransitionTargetBinding,
   type ScalarTransitionTargetBinding,
 } from '../../lib/internals/causal-runtime/target-transition';
-import { rollbackPendingTurnAt } from '../../lib/internals/causal-runtime/pending-rollback';
+import {
+  placeFieldReversalsAfterReAdds,
+  rollbackPendingTurnAt,
+} from '../../lib/internals/causal-runtime/pending-rollback';
 import {
   getTransactionLifecycleChannel,
   installTransactionLifecycleChannel,
@@ -1980,7 +1983,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
     effects: TurnEffect[],
     orderDeltas: CollectionOrderDelta[]
   ): void => {
-    const reversalEffects = effects.map(toRollbackEffect);
+    // Field reversals follow their row's re-add. In capture order they reached
+    // a removed row first and update-then-remove refused ("Value effect has no
+    // active subject") whenever this declarative path was taken.
+    const reversalEffects = placeFieldReversalsAfterReAdds(
+      effects.map(toRollbackEffect)
+    );
     const bindings = new Map<number, CollectionTransitionTargetBinding>();
     visitTree(tree.$, (node) => {
       const binding = (

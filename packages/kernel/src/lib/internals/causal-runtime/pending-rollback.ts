@@ -1,4 +1,5 @@
 import { plainBranchMemberEffectIsNoop } from '../plain-branch-membership';
+import { appendAll } from '../utilities/append-all';
 import type { PositionRegistry } from '../position-registry';
 
 import type {
@@ -143,24 +144,77 @@ function createPendingRollbackEffects(
     }
   });
 
-  return turn.effects
-    .filter((effect, index) => {
-      if (effect.subjectId !== undefined) {
-        const dominantStructuralEffect = dominantStructuralEffects.find(
-          (candidate) => sameSubjectScope(candidate, effect)
-        );
-        if (dominantStructuralEffect) {
-          return dominantStructuralEffect === effect;
+  return placeFieldReversalsAfterReAdds(
+    turn.effects
+      .filter((effect, index) => {
+        if (effect.subjectId !== undefined) {
+          const dominantStructuralEffect = dominantStructuralEffects.find(
+            (candidate) => sameSubjectScope(candidate, effect)
+          );
+          // An `add` created the subject in this turn, so removing it reverses
+          // everything the turn did to it. A `remove` does NOT dominate the
+          // writes to the row it removed (same owner and lifetime): its re-add
+          // restores the row AS REMOVED, so those writes still have to be
+          // reversed. Dropping them rolled update-then-remove back to the
+          // UPDATED row (npm 15.4.3). The re-add once rebuilt the pre-turn
+          // fields itself (`deriveSubjectState`, deleted in 896ab368 with the
+          // subject-position transport); nothing replaced it until this.
+          if (
+            dominantStructuralEffect &&
+            (dominantStructuralEffect === effect ||
+              dominantStructuralEffect.structural === 'add' ||
+              dominantStructuralEffect.owner !== effect.owner)
+          ) {
+            return dominantStructuralEffect === effect;
+          }
         }
-      }
 
-      const effectKey = keyOf(effect);
-      return firstEffectIndexByOwner.get(effectKey) === index;
-    })
-    .map((effect) =>
-      createPendingRollbackEffect(effect, turn.id, realizationContext)
-    )
-    .filter((effect) => !plainBranchMemberEffectIsNoop(effect));
+        const effectKey = keyOf(effect);
+        return firstEffectIndexByOwner.get(effectKey) === index;
+      })
+      .map((effect) =>
+        createPendingRollbackEffect(effect, turn.id, realizationContext)
+      )
+      .filter((effect) => !plainBranchMemberEffectIsNoop(effect))
+  );
+}
+
+/**
+ * Orders a rollback so each re-added row receives its field reversals AFTER
+ * it is back. Capture order is not usable for this: a field write precedes the
+ * removal it is reversed across, and composition can leave the removal in an
+ * earlier slot (rekey then remove keeps the rekey's). A field reversal ahead of
+ * its row's re-add reaches a row that is not there and the rollback refuses.
+ *
+ * Scoped by owner AND lifetime: lifetimes are allocated per collection, so a
+ * bare lifetime would attach one collection's field reversal to another's
+ * re-add. Everything else keeps its relative order.
+ */
+export function placeFieldReversalsAfterReAdds<T extends ReversalEffect>(
+  effects: readonly T[]
+): readonly T[] {
+  const reAdded = new Map<string, T[]>();
+  const scopeOf = (effect: T) => `${effect.owner}\u0000${effect.subjectId}`;
+  for (const effect of effects) {
+    if (effect.structural === 'add' && effect.subjectId !== undefined) {
+      reAdded.set(scopeOf(effect), []);
+    }
+  }
+  if (reAdded.size === 0) return effects;
+  const followersOf = (effect: T): T[] | undefined =>
+    effect.structural === undefined && effect.subjectId !== undefined
+      ? reAdded.get(scopeOf(effect))
+      : undefined;
+  for (const effect of effects) followersOf(effect)?.push(effect);
+  const ordered: T[] = [];
+  for (const effect of effects) {
+    if (followersOf(effect)) continue;
+    ordered.push(effect);
+    if (effect.structural === 'add' && effect.subjectId !== undefined) {
+      appendAll(ordered, reAdded.get(scopeOf(effect)) ?? []);
+    }
+  }
+  return ordered;
 }
 
 function createPendingRollbackEffect(

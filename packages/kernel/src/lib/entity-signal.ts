@@ -2654,6 +2654,13 @@ export function createEntitySignal<
           existingSubjectId,
           subjectId:
             existingSubjectId ?? plannedFreshSubjectIds[plannedFreshIndex++],
+          // The value an overwrite replaces in place, announced below as the
+          // previous value. Defined exactly for an overwritten row: an active
+          // row always has a value.
+          prev:
+            existingSubjectId === undefined
+              ? undefined
+              : valueStore.backingForSubject(existingSubjectId),
         })
       );
 
@@ -2715,35 +2722,45 @@ export function createEntitySignal<
       });
       lastSubjectIds = subjectIdsForWrite;
 
-      // Notify PathNotifier for each processed entity
+      // Notify PathNotifier for each processed entity.
+      //
+      // An 'overwrite' replaces an existing row in place (`replace-value`
+      // above), so it is announced as every other replacement is — the new
+      // value with the previous one and no structural effect. Announced as an
+      // `add`, undo and rollback removed the row (npm 15.4.3).
+      //
+      // Reproduced on 15.3.1: indexing the pre-add key list at
+      // `i + previous - added` anchored [x, y] after k4 and k5 instead of
+      // after k5 and x, so redo reinserted them out of order. A fresh row's
+      // predecessor is the previous FRESH row of this call, else the last row
+      // before it: an overwritten row stays where it was.
       if (pathObserved()) {
         const meta = ambientMeta();
-        for (let i = 0; i < addedEntities.length; i++) {
-          const { id, entity } = addedEntities[i];
-          // Reproduced on 15.3.1: indexing the pre-add key list at
-          // `i + previous - added` anchored [x, y] after k4 and k5 instead of
-          // after k5 and x, so redo reinserted them out of order.
-          const beforeSubject =
-            i > 0
-              ? subjectIdsForWrite[i - 1]
-              : lastPreviousKey === undefined
-              ? undefined
-              : allocateSubjectId(lastPreviousKey);
+        let beforeSubject =
+          lastPreviousKey === undefined
+            ? undefined
+            : allocateSubjectId(lastPreviousKey);
+        for (const { id, entity, prev } of preparedAdds) {
+          // Validated by `subjectIdsForWrite` above; read by key, as it was.
+          const subjectId = subjectIdsByKey.get(id) as number;
           pathNotifier.notify(
             `${basePath}.${String(id)}`,
             entity,
-            undefined,
+            prev,
             basePath,
-            [subjectIdsForWrite[i]],
+            [subjectId],
             getPositionIdsForNotify(),
-            effectMeta(meta, {
-              kind: 'add',
-              subject: subjectIdsForWrite[i],
-              key: id,
-              value: deepClone(entity),
-              beforeSubject,
-            })
+            prev === undefined
+              ? effectMeta(meta, {
+                  kind: 'add',
+                  subject: subjectId,
+                  key: id,
+                  value: deepClone(entity),
+                  beforeSubject,
+                })
+              : meta
           );
+          if (prev === undefined) beforeSubject = subjectId;
         }
       }
 
