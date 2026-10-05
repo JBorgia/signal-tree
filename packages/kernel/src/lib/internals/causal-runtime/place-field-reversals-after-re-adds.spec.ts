@@ -44,7 +44,7 @@ describe('placeFieldReversalsAfterReAdds', () => {
           field(2, 1, 'f2'),
         ])
       )
-    ).toEqual(['s', 'add', 'f1', 'f2']);
+    ).toStrictEqual(['s', 'add', 'f1', 'f2']);
   });
 
   it('scopes by owner AND lifetime', () => {
@@ -56,7 +56,7 @@ describe('placeFieldReversalsAfterReAdds', () => {
           reAdd(2, 1, 'add'),
         ])
       )
-    ).toEqual(['other-collection', 'add', 'f']);
+    ).toStrictEqual(['other-collection', 'add', 'f']);
   });
 
   it('leaves the list alone when nothing is re-added', () => {
@@ -75,6 +75,6 @@ describe('placeFieldReversalsAfterReAdds', () => {
           field(2, 1, 'f3'),
         ])
       )
-    ).toEqual(['first', 'f1', 'f2', 'f3', 'second']);
+    ).toStrictEqual(['first', 'f1', 'f2', 'f3', 'second']);
   });
 });
