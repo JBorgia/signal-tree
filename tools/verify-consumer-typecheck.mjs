@@ -123,6 +123,7 @@ import {
   type ProposalChange,
   type ProposalInspection,
   type ProposalStatus,
+  type TreeId,
 } from '@signal-tree/kernel';
 import {
   createSignalTreeFactory,
@@ -130,6 +131,23 @@ import {
   type ObservationAdapter,
   type ObservationToken,
 } from '@signal-tree/kernel/adapter';
+// Supported tooling is a separate shipped declaration entry, not covered by
+// importing the root and adapter alone. Keep branded tree identity across it.
+import {
+  treeCapabilities,
+  treeRuntimeId,
+  stateLocationReader,
+  confirmedTurnReader,
+  transactionLifecycleReader,
+  restorationReader,
+  entityMembershipReader,
+  linkStateReader,
+  type EntityMembershipEvent,
+  type LinkStateEvent,
+  type RestorationReaderEvent,
+  type StateLocationSegment,
+  type TransactionLifecycleObservation,
+} from '@signal-tree/kernel/internals';
 import {
   defineStore,
   leaf as angularLeaf,
@@ -141,7 +159,15 @@ import {
   type EntitySignalWithSlices as AngularEntitySignalWithSlices,
 } from '@signal-tree/angular';
 import type { Signal as AngularSignal, WritableSignal } from '@angular/core';
-import { useSignalTree } from '@signal-tree/react';
+import {
+  useSignalTree,
+  signalTree as reactSignalTree,
+  leaf as reactLeaf,
+} from '@signal-tree/react';
+import {
+  signalTree as solidSignalTree,
+  leaf as solidLeaf,
+} from '@signal-tree/solid';
 import type { ComputedRef, Ref } from 'vue';
 import {
   asReadonly as vueAsReadonly,
@@ -373,6 +399,80 @@ void vueTerminals.$.weakMap.get;
 void vueTerminals.$.bytes[0];
 void [vueOptional, vueUnion, vueWeakMap, vueBytes, vueCallback, vueSnapshot];
 vueTerminals.destroy();
+
+// THE EIGHT OBSERVATION HELPERS, admitted from every facade through the packed
+// tooling entry. A real tree with an opaque leaf() object and an entity map
+// must be accepted as constructed (its accumulated surface, not TreeNode<T>
+// rebuilt from unwrapped state), and the TreeId brand must agree across the
+// root and tooling declaration entries.
+const runtimeTreeId: TreeId | undefined = treeRuntimeId(tree);
+const observedTreeId: TreeId | undefined =
+  transactionLifecycleReader(tree)?.snapshot().treeId;
+const linkedTreeId: TreeId = linkStateReader(tree).snapshot().treeId;
+const membershipTreeId: TreeId | undefined =
+  entityMembershipReader(tree)?.snapshot().treeId;
+const historyTreeId: TreeId | undefined = restorationReader(tree)?.treeId;
+const confirmedTreeId: TreeId | undefined = confirmedTurnReader(tree)?.treeId;
+void [runtimeTreeId, observedTreeId, linkedTreeId, membershipTreeId, historyTreeId, confirmedTreeId];
+void treeCapabilities(tree);
+const located: readonly (readonly StateLocationSegment[] | undefined)[] =
+  stateLocationReader(tree)?.locate([{ position: 1, lifetimeId: 1, fieldSegments: ['name'] }]) ?? [];
+void located;
+void confirmedTurnReader(tree)?.readConfirmedTurns().turns[0]?.effects[0]?.fieldSegments;
+transactionLifecycleReader(tree)?.subscribe((event: TransactionLifecycleObservation) => {
+  if (event.kind === 'refused') void [event.reason, event.pendingRetained, event.consequencesReleased];
+});
+restorationReader(tree)?.subscribe((event: RestorationReaderEvent) => {
+  if (event.kind === 'operation') void [event.outcome, event.affectedEntryIds];
+});
+entityMembershipReader(tree)?.subscribe((event: EntityMembershipEvent) => {
+  void [event.collection.location, event.changes];
+});
+linkStateReader(tree).subscribe((event: LinkStateEvent) => void event.link.held);
+
+const reactObserved = reactSignalTree({ count: 0, bounds: reactLeaf({ min: 0, max: 1 }) });
+const solidObserved = solidSignalTree({ count: 0, bounds: solidLeaf({ min: 0, max: 1 }) });
+void treeCapabilities(angularTree);
+void treeRuntimeId(angularTree);
+void confirmedTurnReader(angularTree);
+void stateLocationReader(angularTree);
+void transactionLifecycleReader(angularTree);
+void restorationReader(angularTree);
+void entityMembershipReader(angularTree);
+void linkStateReader(angularTree);
+void treeCapabilities(vueTree);
+void treeRuntimeId(vueTree);
+void confirmedTurnReader(vueTree);
+void stateLocationReader(vueTree);
+void transactionLifecycleReader(vueTree);
+void restorationReader(vueTree);
+void entityMembershipReader(vueTree);
+void linkStateReader(vueTree);
+void treeCapabilities(reactObserved);
+void treeRuntimeId(reactObserved);
+void confirmedTurnReader(reactObserved);
+void stateLocationReader(reactObserved);
+void transactionLifecycleReader(reactObserved);
+void restorationReader(reactObserved);
+void entityMembershipReader(reactObserved);
+void linkStateReader(reactObserved);
+void treeCapabilities(solidObserved);
+void treeRuntimeId(solidObserved);
+void confirmedTurnReader(solidObserved);
+void stateLocationReader(solidObserved);
+void transactionLifecycleReader(solidObserved);
+void restorationReader(solidObserved);
+void entityMembershipReader(solidObserved);
+void linkStateReader(solidObserved);
+// Admission is not weakened to arbitrary objects or bare root accessors.
+// @ts-expect-error a root accessor alone is not a tree controller
+void treeRuntimeId(tree.$);
+// @ts-expect-error arbitrary objects are not tree controllers
+void transactionLifecycleReader({});
+// @ts-expect-error arbitrary objects are not tree controllers
+void entityMembershipReader({ $: {} });
+reactObserved.destroy();
+solidObserved.destroy();
 
 // Enhancer methods
 tree.undo();

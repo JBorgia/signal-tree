@@ -13,6 +13,7 @@ import {
   getSubjectRestorationClaims,
 } from '../../lib/internals/subject-restoration-claims';
 import type {
+  CarrierKind,
   Enhancer,
   EnhancerMeta,
   ISignalTree,
@@ -40,6 +41,7 @@ import {
   installTransactionLifecycleObservation,
   type TransactionRefusalReason,
 } from '../../lib/internals/transaction-lifecycle-view';
+import type { ToolingTree } from '../../lib/internals/tooling-tree';
 import { holdEntityMembershipDelivery } from '../../lib/internals/entity-membership-view';
 import { AppliedTurnProjection } from '../../lib/internals/causal-runtime/applied-turn-projection';
 import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
@@ -1224,9 +1226,11 @@ function createCaptureBucket(): CaptureBucket {
  * transaction, which is exactly the "no retained state when unused" rule the
  * Studio seam has to satisfy. Observation peeks; it does not install.
  */
-export function peekInternalTransactionRuntime<T>(
-  tree: ISignalTree<T>
-): InternalTransactionRuntime | undefined {
+export function peekInternalTransactionRuntime<
+  T,
+  C extends CarrierKind = CarrierKind,
+  TAccum = unknown
+>(tree: ToolingTree<T, C, TAccum>): InternalTransactionRuntime | undefined {
   return (tree as unknown as Record<PropertyKey, unknown>)[
     INTERNAL_TRANSACTION_RUNTIME
   ] as InternalTransactionRuntime | undefined;

@@ -1499,6 +1499,123 @@
         "internalDecl": true
       },
       {
+        "name": "EntityMembership",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/entity-membership-inventory.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "EntityMembershipChange",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/entity-membership-inventory.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "EntityMembershipCollection",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/entity-membership-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "EntityMembershipEvent",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/entity-membership-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "EntityMembershipLocation",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/entity-membership-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "entityMembershipReader",
+        "subpath": "./internals",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/internals/entity-membership-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "EntityMembershipReader",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/entity-membership-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "EntityMembershipSnapshot",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/entity-membership-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "LinkStateEvent",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/link-state-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "linkStateReader",
+        "subpath": "./internals",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/internals/link-state-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "LinkStateReader",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/link-state-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "LinkStateSnapshot",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/link-state-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "LinkStateView",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/link-state-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
         "name": "ObservedWriteFrame",
         "subpath": "./internals",
         "kind": "type-only",
@@ -1517,10 +1634,163 @@
         "internalDecl": true
       },
       {
+        "name": "PendingTransactionView",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/transaction-lifecycle-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "RestorationEntryId",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/restoration-reader.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "RestorationEntryView",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/restoration-reader.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "RestorationOperationId",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/restoration-reader.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "restorationReader",
+        "subpath": "./internals",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/internals/restoration-reader.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "RestorationReader",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/restoration-reader.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "RestorationReaderEvent",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/restoration-reader.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "RestorationReaderSnapshot",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/restoration-reader.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "stateLocationReader",
+        "subpath": "./internals",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/internals/state-location-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "StateLocationReader",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/state-location-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "StateLocationSegment",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/state-location-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "StateLocationTarget",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/state-location-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
         "name": "StudioTreeDestroyedError",
         "subpath": "./internals",
         "kind": "runtime",
         "declFile": "packages/kernel/src/lib/internals/confirmed-turn-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "TransactionLifecycleObservation",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/transaction-lifecycle-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "transactionLifecycleReader",
+        "subpath": "./internals",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/internals/transaction-lifecycle-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "TransactionLifecycleReader",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/transaction-lifecycle-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "TransactionLifecycleSnapshot",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/transaction-lifecycle-view.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "TransactionRefusalReason",
+        "subpath": "./internals",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/transaction-lifecycle-view.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": true
