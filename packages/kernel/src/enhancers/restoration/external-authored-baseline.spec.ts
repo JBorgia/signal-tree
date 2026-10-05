@@ -1,6 +1,11 @@
-// RESTORED in slice 5 (2026-10-05) as packages/kernel/src/enhancers/restoration/
-// external-authored-baseline.spec.ts with the 15.4.2 restoration carry: 27/69
-// failed on b4543600 (slice-5 part 1 head), 69/69 after. Kept as the record.
+// Carried from v15 5c22eac5 (15.4.2; identical at 012fd11d) in v16 integration
+// slice 5 with the restoration repair it pins. Only change: `.transaction(` ->
+// `.transact(`. First red on 03d9696f: 28 failed (slice 3d); on b4543600 (after
+// slice 5's order port fixed the jumpTo membership/order case): 27 of 69, all
+// real v16 defects — external truth entered authored reversal (undo restored
+// 0, not 5), net-zero authored boundaries vanished, and inspection order was
+// captured as authored order. No expectation needed a v16 adaptation; see
+// PROGRESS.md "15.4.2 restoration carry".
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   batching,
@@ -249,7 +254,15 @@ it('historical external gaps preserve entity membership, presence and order thro
   undoable(() => tree.$.x(2));
   await flush();
   expect(tree.getRestorationHistory().map(({ state }) => state)).toEqual([
-    { x: 1, rows: { all: [{ id: 'a', v: 0 }, { id: 'b', v: 2 }] } },
+    {
+      x: 1,
+      rows: {
+        all: [
+          { id: 'a', v: 0 },
+          { id: 'b', v: 2 },
+        ],
+      },
+    },
     {
       x: 2,
       rows: { all: [{ id: 'b', v: 2 }, { id: 'a' }, { id: 'c', v: 3 }] },
@@ -298,9 +311,8 @@ for (const [name, enhancers] of variants) {
     tree.$.rows.setAll([{ id: 'a' }, { id: 'b' }]);
     await flush();
     undoable(() =>
-      withWriteContext(
-        { intent: 'system', participation: 'inspection' },
-        () => tree.$.rows.setAll([{ id: 'b' }, { id: 'a' }])
+      withWriteContext({ intent: 'system', participation: 'inspection' }, () =>
+        tree.$.rows.setAll([{ id: 'b' }, { id: 'a' }])
       )
     );
     await flush();
@@ -322,9 +334,8 @@ it('inspection reorder does not erase external order protection', async () => {
   await flush();
   external(() => tree.$.rows.setAll([{ id: 'c' }, { id: 'b' }, { id: 'a' }]));
   await flush();
-  withWriteContext(
-    { intent: 'system', participation: 'inspection' },
-    () => tree.$.rows.setAll([{ id: 'b' }, { id: 'c' }, { id: 'a' }])
+  withWriteContext({ intent: 'system', participation: 'inspection' }, () =>
+    tree.$.rows.setAll([{ id: 'b' }, { id: 'c' }, { id: 'a' }])
   );
   await flush();
   const index = tree.getCurrentIndex();

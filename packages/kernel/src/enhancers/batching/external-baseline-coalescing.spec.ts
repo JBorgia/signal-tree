@@ -1,6 +1,16 @@
-// RESTORED in slice 5 (2026-10-05) as packages/kernel/src/enhancers/batching/
-// external-baseline-coalescing.spec.ts after the 15.4.2 restoration carry:
-// 12/28 failed on b4543600, 28/28 after. Kept as the slice-3b record.
+// External truth as the undo baseline under coalesce and direct writes (L18).
+//
+// Restored in v16 integration slice 5 from
+// docs/audits/2026-10-01-v16-integration/preserved/first-with-direct-control.spec.ts.txt
+// (slice 3b), unchanged below this header. Slice 3b preserved it because the
+// external -> undoable baseline it expects (5) failed with and without
+// coalesce, and the alternative reading (0, preserved as
+// pre-interpretation.spec.ts.txt) was not established either. The 15.4.2
+// restoration carry settles it: restoration captures external truth for
+// historical reconstruction only, so undo removes the authored contribution
+// and leaves surviving external truth (L3, L4, L11), as published 15.4.2 does.
+// First red on b4543600 (slice-5 part 1 head): 12/28 (every external-baseline
+// case, scalar and dynamic entity field, both enhancer orders); 28/28 after.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { external } from '../../lib/external';
 import { entityMap } from '../../lib/markers/entity-map';
@@ -35,7 +45,10 @@ describe('coalescing preserves semantic contributions', () => {
         owned.push(tree);
         tree.$.rows.addOne({ id: 'r', x: 0 });
         settle();
-        return { tree, field: dynamic ? tree.$.rows.byIdOrFail('r').x : tree.$.x };
+        return {
+          tree,
+          field: dynamic ? tree.$.rows.byIdOrFail('r').x : tree.$.x,
+        };
       };
       const label = `reverse=${reverse}, dynamic=${dynamic}`;
 
@@ -104,11 +117,13 @@ describe('coalescing preserves semantic contributions', () => {
       it(`body failure retains accepted designation and drains ordinary replacement (${label})`, () => {
         const { tree, field } = make();
         const failure = new Error('body failure');
-        expect(() => tree.coalesce(() => {
-          undoable(() => field(1));
-          field(2);
-          throw failure;
-        })).toThrow(failure);
+        expect(() =>
+          tree.coalesce(() => {
+            undoable(() => field(1));
+            field(2);
+            throw failure;
+          })
+        ).toThrow(failure);
         settle();
         expect(field()).toBe(2);
         expect(tree.canUndo()).toBe(true);
@@ -122,10 +137,12 @@ describe('coalescing preserves semantic contributions', () => {
         tree.coalesce(() => {
           field(1);
           for (const derive of [false, true]) {
-            expect(() => tree.transact(() => {
-              if (derive) field(update);
-              else field(7);
-            })).toThrow(/put coalesce\(\) inside the transaction/);
+            expect(() =>
+              tree.transact(() => {
+                if (derive) field(update);
+                else field(7);
+              })
+            ).toThrow(/put coalesce\(\) inside the transaction/);
             expect(field()).toBe(0);
             expect(update).not.toHaveBeenCalled();
           }
