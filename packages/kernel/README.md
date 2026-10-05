@@ -328,9 +328,12 @@ available. Reversing an older transaction while a newer overlapping one is
 still open refuses (`cause.kind === 'later-pending-dependency'`); settle the
 newer one first. Existing v15 behavior nevertheless releases the commit scope
 and its deferred consequences on refusal; pending does not mean persistence is
-still deferred. A pending-created row later edited by confirmed work and then
-removed can still refuse due to that dependency. Deleting an entity is not a
-general way to make rollback retryable.
+still deferred. Since 15.4.2, a pending-created or pending-rekeyed row that
+settled later work removed no longer blocks rollback; the rest of the turn
+reverses and the row stays absent. While the removing transaction is open,
+rollback refuses with `later-pending-dependency`. Deleting an entity is still
+not a general way to make rollback retryable: a pending-created row later work
+edited and kept, or a pending remove whose key was re-occupied, keeps refusing.
 
 **15.3.1 automatic-abort exception:** if the callback throws or a
 post-callback step fails before `transaction()` returns its handle, SignalTree

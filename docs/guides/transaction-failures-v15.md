@@ -23,12 +23,22 @@ first. Use application reconciliation and idempotency policy. Do not use
 
 For an explicit refusal, inspect the structured `SignalTreeRollbackError.cause`.
 Settling a newer overlapping pending transaction can permit another attempt,
-but **not every refusal becomes retryable**. A pending-created row that is
-later edited by confirmed work and then removed can still refuse rollback
-because of that confirmed dependency. Removing the entity does not erase the
-dependency. Keep the handle and choose reconciliation or confirmation
-explicitly; do not promise that waiting or deleting a row will make rollback
-succeed.
+but **not every refusal becomes retryable**. Since 15.4.2, a pending-created
+or pending-rekeyed row that settled later work removed no longer blocks
+rollback: the removal already undid that part, so the rest of the transaction
+reverses and the row stays absent. If the removing transaction is still open,
+rollback refuses with `later-pending-dependency` until it settles. A
+pending-created row that later confirmed work edited and kept still refuses,
+and so does a pending remove whose key newer truth re-occupied. `cause.kind`
+names the first matching later effect, so a `later-confirmed-dependency`
+refusal can still clear once a newer open transaction settles. Keep the handle and choose
+reconciliation or confirmation explicitly; do not promise that waiting or
+deleting a row will make rollback succeed.
+
+After a rejection, `undo()` of a later write restores the state that write
+replaced, which can include the rejected transaction's speculative value, for
+scalars and pending-created rows alike. Undo is not a way back to the state before the
+transaction.
 
 Recoverable pending refusal with a usable recovery handle and consequences
 held until explicit confirmation is a **v16 target**, not a current v15 API.

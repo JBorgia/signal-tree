@@ -1,8 +1,31 @@
 # Current release work — v15 outcome provenance patch
 
-Updated October 2, 2026. Active branch `fix/v15-outcome-provenance`, based on
+Updated October 5, 2026. Active branch `fix/v15-outcome-provenance`, based on
 published v15.4.0 `4ceb24a2a62dc893bf28c50ad971a955190539a7`.
 The historical controller below is retained as evidence, not current instructions.
+
+## 15.4.2 scope extended before tagging
+
+Candidate `5c22eac5` completed exact local qualification (88/88 gates, 88/88
+proofs, packed consumers, AOT, 146 browser cases) and Linux Validate
+[37036128088](https://github.com/JBorgia/signal-tree/actions/runs/37036128088).
+It was never tagged. `main`'s `PROPOSAL-REJECTION-0` suite then ran on it: 12 of
+16 pass, failing exactly the cases `main` fixed on 2026-09-22 (a pending add or
+rekey whose subject settled later work removed still refused rollback and
+stranded the turn's other values). The owner directed the port into 15.4.2:
+15.4.2 is unpublished, so the version does not change.
+
+The port restricts supersession to settled erasers, matching v15's scalar rule.
+First red: 7 of 27 focused cases. After: 27 of 27, and three mutants (no
+settled-only guard, always supersede, add only) are each killed. Independent
+review found only minor test and wording gaps; both missing cases were added.
+A characterization test pins a pre-existing limitation: undo of a later write
+after a rejection can restore the rejected value (scalars before, pending-created
+rows now). The packed refusal gate pinned the fixed case as a known limitation
+and failed (87/88); with owner approval it now classifies it as fixed while
+still pinning 15.3.0's refusal evidence. Evidence:
+`/private/tmp/st-v15-structural-supersession-evidence/`. The new candidate needs
+the full exact qualification and Linux validation again before the signed tag.
 
 ## Active 15.4.2 preparation
 
