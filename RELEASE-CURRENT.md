@@ -4,6 +4,23 @@ Updated October 5, 2026 (15.4.3 preparation). Active branch `fix/v15-outcome-pro
 published v15.4.0 `4ceb24a2a62dc893bf28c50ad971a955190539a7`.
 The historical controller below is retained as evidence, not current instructions.
 
+## 15.4.3 published
+
+`@signal-tree/*` 15.4.3 is on npm `latest` from signed tag `v15.4.3` at
+`2a4b99716a0bc6f103eae5b12381dc1a23b2191a`. Local qualification, Linux Validate
+[37342331087](https://github.com/JBorgia/signal-tree/actions/runs/37342331087),
+the tag release and the publisher
+[37346516120](https://github.com/JBorgia/signal-tree/actions/runs/37346516120)
+each passed 88/88 gates and proofs. All five registry archives match the
+qualified candidate byte for byte, with provenance. The installed npm kernel
+passes the packed refusal gate and a probe of both fixed defects. Entities
+production bundle: 22.59 of 22.6 KB, so the next kernel change needs a size
+reduction or an owner decision on the ceiling. Receipt:
+`docs/audits/2026-10-05-v15.4.3-release.json`.
+
+Next, per the owner's order: update TruckTrax v3 to 15.4.3, then the demo
+site if all goes well, then the v16 integration.
+
 ## 15.4.3 preparation
 
 The owner authorized fixing and publishing two defects found after 15.4.2 in
