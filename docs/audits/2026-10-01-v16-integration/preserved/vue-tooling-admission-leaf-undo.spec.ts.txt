@@ -1,0 +1,28 @@
+// PRESERVED for slice 8 (v15 → v16 integration, slice 6 run, 2026-10-05).
+// Donor: v15 012fd11d packages/vue/src/lib/tooling-admission.spec.ts, the
+// opaque-leaf undo/redo block only (`.transaction(` → `.transact(` applies to
+// the surrounding file). On v16 515a6969 and on this slice, `tree.undo()` of
+// `tree.$.bounds.value = { min: 1, max: 9 }` (a `leaf({ min, max })`) throws
+// "Unsupported scoped undo effect at structural-drift" with no reader
+// involved, and once such an external leaf write sits in the history gap a
+// later SCALAR undo is refused the same way (probes and logs:
+// /private/tmp/st-v16-integration-evidence/slice6/vue-leaf-undo-probe/).
+// Atomic registered-terminal reversal is slice 8
+// (donor 2892b650). Restore this block into
+// packages/vue/src/lib/tooling-admission.spec.ts, in place of the scalar
+// undo/redo that stands in for it (and move the plain leaf write back before
+// it), when slice 8 lands.
+
+        undoable(() => {
+          tree.$.bounds.value = { min: 1, max: 9 };
+        });
+        await flush();
+        expect(history.snapshot().treeId).toBe(id);
+        expect(history.snapshot().entries).toHaveLength(1);
+        expect(tree.$.bounds.value).toEqual({ min: 1, max: 9 });
+        tree.undo();
+        await flush();
+        expect(tree.$.bounds.value).toEqual({ min: 0, max: 10 });
+        tree.redo();
+        await flush();
+        expect(tree.$.bounds.value).toEqual({ min: 1, max: 9 });

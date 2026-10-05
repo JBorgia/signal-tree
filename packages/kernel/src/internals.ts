@@ -14,7 +14,8 @@ export {
   withWriteObservationScope,
   type DeclaredWriteScopes,
 } from './lib/internals/write-observation-scope';
-import type { CarrierKind, ISignalTree, ISignalTreeOf } from './lib/types';
+import type { CarrierKind } from './lib/types';
+import type { ToolingTree } from './lib/internals/tooling-tree';
 import { getActiveWriteContext } from './lib/write-context';
 import { peekInternalTransactionRuntime } from './enhancers/transactions/transactions';
 import { getPositionRegistry } from './lib/internals/position-registry';
@@ -66,9 +67,11 @@ export function activeTransactionContext():
  * ⚠️ Generic kernel truth, deliberately. A consumer translates capabilities
  * into its own capability model; no consumer-shaped predicate belongs here.
  */
-export function treeCapabilities<T, C extends CarrierKind = CarrierKind>(
-  tree: ISignalTreeOf<T, C, unknown>
-) {
+export function treeCapabilities<
+  T,
+  C extends CarrierKind = CarrierKind,
+  TAccum = unknown
+>(tree: ToolingTree<T, C, TAccum>) {
   return getTreeCapabilities(tree);
 }
 export type {
@@ -166,7 +169,7 @@ export function treeRuntimeId<
   T,
   C extends CarrierKind = CarrierKind,
   TAccum = unknown
->(tree: ISignalTreeOf<T, C, TAccum>): TreeId | undefined {
+>(tree: ToolingTree<T, C, TAccum>): TreeId | undefined {
   return getPositionRegistry(tree.$)?.id;
 }
 
@@ -190,11 +193,9 @@ export function confirmedTurnReader<
   T,
   C extends CarrierKind = CarrierKind,
   TAccum = unknown
->(tree: ISignalTreeOf<T, C, TAccum>): ConfirmedTurnReader | undefined {
+>(tree: ToolingTree<T, C, TAccum>): ConfirmedTurnReader | undefined {
   // The peek reads only the runtime's symbol on the tree, never its carriers.
-  const runtime = peekInternalTransactionRuntime(
-    tree as unknown as ISignalTree<T>
-  );
+  const runtime = peekInternalTransactionRuntime(tree);
   if (!runtime) {
     return undefined;
   }
