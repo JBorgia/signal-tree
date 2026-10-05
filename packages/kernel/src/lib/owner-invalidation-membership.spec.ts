@@ -41,7 +41,7 @@ interface PendingTransaction {
 }
 
 interface TransactionalOwner {
-  transaction(fn: () => void): PendingTransaction;
+  transact(fn: () => void): PendingTransaction;
 }
 
 interface Configuration {
