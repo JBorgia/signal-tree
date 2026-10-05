@@ -224,6 +224,15 @@ export function confirmedTurnReader<
  * from unwrapped state.
  */
 export {
+  transactionLifecycleReader,
+  type PendingTransactionView,
+  type TransactionLifecycleReader,
+  type TransactionLifecycleSnapshot,
+  type TransactionLifecycleObservation,
+  type TransactionRefusalReason,
+} from './lib/internals/transaction-lifecycle-view';
+
+export {
   entityMembershipReader,
   type EntityMembershipReader,
   type EntityMembershipSnapshot,
