@@ -103,6 +103,7 @@ function projectConfirmedTurns(
       before?: unknown;
       after?: unknown;
       subject?: unknown;
+      subjectFieldSegments?: readonly string[];
       plainBranchMembership?: {
         readonly before: boolean;
         readonly after: boolean;
@@ -123,6 +124,10 @@ function projectConfirmedTurns(
         before: 'before' in effect ? effect.before : undefined,
         after: 'after' in effect ? effect.after : undefined,
         subjectId: 'subject' in effect ? effect.subject : undefined,
+        // The producer-known row-relative address, never a parsed path.
+        ...(effect.subjectFieldSegments
+          ? { fieldSegments: [...effect.subjectFieldSegments] }
+          : {}),
         ...(effect.plainBranchMembership
           ? { plainBranchMembership: { ...effect.plainBranchMembership } }
           : {}),
@@ -223,6 +228,13 @@ export function confirmedTurnReader<
  * surface and carrier of the constructed tree, never `TreeNode<T>` rebuilt
  * from unwrapped state.
  */
+export {
+  stateLocationReader,
+  type StateLocationReader,
+  type StateLocationSegment,
+  type StateLocationTarget,
+} from './lib/internals/state-location-view';
+
 export {
   linkStateReader,
   type LinkStateReader,
