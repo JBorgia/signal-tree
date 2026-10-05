@@ -1,3 +1,7 @@
+import {
+  applyPlainBranchMembership,
+  plainBranchMembershipChange,
+} from './internals/plain-branch-membership';
 import type { Location } from './internals/cell-runtime';
 import {
   isWritableLocation,
@@ -465,13 +469,38 @@ export function link<S>(
 
   const offSub = notifier.subscribe(
     '**',
-    (v, prev, _path, _o, _origin, subjectIds, _pos, meta, _scopes, _owner, fields) => {
+    (
+      v,
+      prev,
+      _path,
+      _o,
+      _origin,
+      subjectIds,
+      _pos,
+      meta,
+      _scopes,
+      _owner,
+      fields
+    ) => {
       if (disposed || !endpoint.set) return;
       // OWNER-PING-0. Two same-shaped trees give their collections the SAME
       // local position id, so identity is (registry, position) — never the
       // position alone.
       const m = (meta ?? {}) as Record<string, unknown>;
       if (m['ownerId'] !== registry.id) return;
+      const membership = plainBranchMembershipChange(meta);
+      if (membership) {
+        if (entityLocation || isInspectionWrite(meta)) return;
+        const address = getNodeAddress(membership.branch);
+        const relative =
+          sourceAddress !== undefined && address !== undefined
+            ? relativeSourceAddress(sourceAddress, address)
+            : undefined;
+        if (relative === undefined) return;
+        eligible = applyPlainBranchMembership(eligible, relative, membership);
+        dirty = true;
+        return;
+      }
       // A value-less ping is a notification, not a state change.
       if (v === undefined && prev === undefined) return;
       if (entityLocation) {
@@ -494,7 +523,8 @@ export function link<S>(
             !removed &&
             footprint !== null &&
             !footprint?.includes(entityLocation.fieldKey)
-          ) return;
+          )
+            return;
           eligible = (
             v != null &&
             Object.prototype.hasOwnProperty.call(v, entityLocation.fieldKey)

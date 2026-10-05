@@ -11,7 +11,10 @@ export type ConfirmedReapplyPlanningResult =
   | { readonly ok: true; readonly plan: ConfirmedReapplyPlan }
   | {
       readonly ok: false;
-      readonly refusal: Extract<Extract<ReversalResult, { readonly ok: false }>['refusal'], { kind: 'turn-evicted' }>;
+      readonly refusal: Extract<
+        Extract<ReversalResult, { readonly ok: false }>['refusal'],
+        { kind: 'turn-evicted' }
+      >;
     };
 
 export interface PlanConfirmedReapplyOptions {
@@ -48,6 +51,7 @@ function createReapplyEffects(
       after: effect.after,
       subjectId: effect.subjectId,
       subjectFieldSegments: effect.subjectFieldSegments,
+      plainBranchMembership: effect.plainBranchMembership,
       fieldPresence: effect.fieldPresence,
       path: (effect as CausalEffect & { path?: string }).path,
       ownerPath: (effect as CausalEffect & { ownerPath?: string }).ownerPath,
@@ -59,6 +63,7 @@ function createReapplyEffects(
   const currentByOwner = new Map<number, unknown>();
 
   return turn.effects.map((effect) => {
+    if (effect.plainBranchMembership) return { ...effect };
     if (effect.structural !== undefined) {
       return {
         owner: effect.owner,
@@ -66,6 +71,7 @@ function createReapplyEffects(
         after: effect.after,
         subjectId: effect.subjectId,
         subjectFieldSegments: effect.subjectFieldSegments,
+        plainBranchMembership: effect.plainBranchMembership,
         fieldPresence: effect.fieldPresence,
         structural: effect.structural,
         structuralContext: effect.structuralContext,
@@ -84,6 +90,7 @@ function createReapplyEffects(
       after: effect.after,
       subjectId: effect.subjectId,
       subjectFieldSegments: effect.subjectFieldSegments,
+      plainBranchMembership: effect.plainBranchMembership,
       fieldPresence: effect.fieldPresence,
       path: (effect as CausalEffect & { path?: string }).path,
       ownerPath: (effect as CausalEffect & { ownerPath?: string }).ownerPath,

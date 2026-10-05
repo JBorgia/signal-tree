@@ -1,3 +1,13 @@
+import {
+  applyPlainBranchMemberSnapshot,
+  canRealizePlainBranchMember,
+  composePlainBranchMemberEffect,
+  plainBranchMemberEffectIsNoop,
+  plainBranchMembershipEffects,
+  preparePlainBranchMembers,
+  readPlainBranchMember,
+  type PlainBranchMemberPresence,
+} from '../../lib/internals/plain-branch-membership';
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
 import {
   applyInInvalidationGroup,
@@ -23,7 +33,7 @@ import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-p
 import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
 import { rootAuthorityFor } from '../../lib/internals/root-source';
 
-import { isTraversableNode, snapshotState } from '../../lib/utils';
+import { deepEqual, isTraversableNode, snapshotState } from '../../lib/utils';
 import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
 import { getMutationCaptureRuntime } from '../../lib/internals/mutation-capture-runtime';
 import type { CollectionOrderCapture } from '../../lib/internals/mutation-capture-runtime';
@@ -175,6 +185,7 @@ type ScalarSetEffect = TurnEffectBase & {
   kind: 'set';
   subject?: number;
   subjectFieldSegments?: readonly string[];
+  plainBranchMembership?: PlainBranchMemberPresence;
   fieldPresence?: FieldPresence;
   before: unknown;
   after: unknown;
@@ -259,6 +270,14 @@ function toReversalEffect(
         after: direction === 'undo' ? effect.before : effect.after,
         subjectId: effect.subject,
         subjectFieldSegments: effect.subjectFieldSegments,
+        plainBranchMembership: effect.plainBranchMembership
+          ? direction === 'undo'
+            ? {
+                before: effect.plainBranchMembership.after,
+                after: effect.plainBranchMembership.before,
+              }
+            : effect.plainBranchMembership
+          : undefined,
         fieldPresence: effect.fieldPresence
           ? direction === 'undo'
             ? {
@@ -706,7 +725,6 @@ class RestorationManager<TSource, T> {
   hasPendingTurn(turnId: number): boolean {
     return this.pendingTurns.has(turnId);
   }
-
 
   // `getPendingRollbackPlan()` was DELETED in 15.0 with restoration()'s duplicate
   // `transaction()` (TX-SURFACE-0).
@@ -1722,7 +1740,15 @@ class RestorationManager<TSource, T> {
         if (typeof effect.path !== 'string') {
           throw new Error('Historical scalar effect has no path');
         }
-        natural = setDetachedNaturalValue(natural, effect.path, effect.after);
+        natural = effect.plainBranchMembership
+          ? applyPlainBranchMemberSnapshot(
+              this.tree.$,
+              natural,
+              effect.owner,
+              effect.plainBranchMembership.after,
+              effect.after
+            )
+          : setDetachedNaturalValue(natural, effect.path, effect.after);
       }
     };
 
@@ -1794,7 +1820,15 @@ class RestorationManager<TSource, T> {
         if (typeof effect.path !== 'string') {
           throw new Error('Historical scalar effect has no path');
         }
-        natural = setDetachedNaturalValue(natural, effect.path, effect.after);
+        natural = effect.plainBranchMembership
+          ? applyPlainBranchMemberSnapshot(
+              this.tree.$,
+              natural,
+              effect.owner,
+              effect.plainBranchMembership.after,
+              effect.after
+            )
+          : setDetachedNaturalValue(natural, effect.path, effect.after);
       }
     }
 
@@ -2029,6 +2063,8 @@ class RestorationManager<TSource, T> {
   private isSupportedEffect(effect: TurnEffect): boolean {
     switch (effect.kind) {
       case 'set':
+        if (effect.plainBranchMembership)
+          return canRealizePlainBranchMember(this.tree.$, effect.position);
         return (
           (this.isScalarValue(effect.before) &&
             this.isScalarValue(effect.after)) ||
@@ -2611,7 +2647,11 @@ export function restoration(
         const prepared = prepareDeclarativeTransitionInstallation(
           target,
           bindings,
-          scalarBinding
+          scalarBinding,
+          {
+            prepareTarget: (members) =>
+              preparePlainBranchMembers(tree.$ as object, members),
+          }
         );
         isRestoring = true;
         try {
@@ -2649,6 +2689,32 @@ export function restoration(
       };
 
       const externalConflict = ((): ReversalRefusal | undefined => {
+        for (const effect of reversalEffects) {
+          if (effect.subjectId !== undefined || effect.structural !== undefined)
+            continue;
+          const truth = externalMembershipTruth.get(effect.owner);
+          if (!truth) continue;
+          const current = readPlainBranchMember(tree.$, effect.owner);
+          if (!current || current.present !== truth.present) continue;
+          const targetPresent = effect.plainBranchMembership?.after ?? true;
+          // Presence has its own authority. A fresh branch snapshot is not
+          // evidence that the realized membership has been superseded.
+          if (
+            targetPresent !== truth.present ||
+            (targetPresent &&
+              current.present &&
+              deepEqual(current.value, truth.value) &&
+              !deepEqual(effect.after, truth.value))
+          ) {
+            return {
+              kind: 'value-drift',
+              path: effect.path ?? '',
+              current: truth.value,
+              expected: effect.after,
+            };
+          }
+        }
+
         if (
           externalTruthByPath.size === 0 &&
           externalTruthBySubject.size === 0
@@ -2875,6 +2941,39 @@ export function restoration(
      * value does not leave a stale conflict behind.
      */
     const externalTruthByPath = new Map<string, unknown>();
+    type MembershipTruth = { present: boolean; value: unknown };
+    const externalMembershipTruth = new Map<number, MembershipTruth>();
+    const displacedMembershipTruth = new Map<
+      number,
+      Map<number, MembershipTruth | undefined>
+    >();
+    const rememberMembershipTruth = (
+      transactionId: number | undefined,
+      position: number
+    ): void => {
+      if (transactionId === undefined) return;
+      let previous = displacedMembershipTruth.get(transactionId);
+      if (!previous)
+        displacedMembershipTruth.set(transactionId, (previous = new Map()));
+      if (!previous.has(position))
+        previous.set(position, externalMembershipTruth.get(position));
+    };
+    const restoreMembershipTruth = (
+      transactionId: number | undefined,
+      position: number
+    ): void => {
+      const previous =
+        transactionId === undefined
+          ? undefined
+          : displacedMembershipTruth.get(transactionId);
+      if (!previous?.has(position)) return;
+      const truth = previous.get(position);
+      if (truth) externalMembershipTruth.set(position, truth);
+      else externalMembershipTruth.delete(position);
+      previous.delete(position);
+      if (previous.size === 0)
+        displacedMembershipTruth.delete(transactionId as number);
+    };
 
     // Entity writes publish whole rows while reversal effects address fields.
     // Keep provenance at the same field granularity as those effects, keyed by
@@ -3151,6 +3250,28 @@ export function restoration(
         // Pending authority is checked separately. Its normal capture path
         // must still remember the external authority that it displaced.
         if (!realized && resolveTransactionId(meta) !== undefined) continue;
+        const membership = plainBranchMembershipEffects(meta);
+        if (membership) {
+          for (const effect of membership) {
+            if (realized)
+              externalMembershipTruth.set(effect.position, {
+                present: effect.plainBranchMembership.after,
+                value: effect.after,
+              });
+            else externalMembershipTruth.delete(effect.position);
+          }
+          continue;
+        }
+        if (!entry.subjectIds?.length) {
+          for (const position of entry.positionIds ?? []) {
+            if (!realized) externalMembershipTruth.delete(position);
+            else if (externalMembershipTruth.has(position))
+              externalMembershipTruth.set(position, {
+                present: true,
+                value: entry.newValue,
+              });
+          }
+        }
         const subjectKey = subjectTruthKey(
           entry.positionIds?.[0],
           entry.subjectIds?.[0]
@@ -3401,22 +3522,26 @@ export function restoration(
       const existing = effectMap.get(key);
       if (existing) {
         if (existing.kind === 'set' && effect.kind === 'set') {
-          existing.after = effect.after;
-          // Preserve first own-presence before and latest own-presence after.
-          const beforePresent = existing.fieldPresence?.before ?? true;
-          const afterPresent = effect.fieldPresence?.after ?? true;
-          if (beforePresent && afterPresent) delete existing.fieldPresence;
-          else existing.fieldPresence = {
-            before: beforePresent,
-            after: afterPresent,
-          };
+          if (!composePlainBranchMemberEffect(existing, effect)) {
+            existing.after = effect.after;
+            // Preserve first own-presence before and latest own-presence after.
+            const beforePresent = existing.fieldPresence?.before ?? true;
+            const afterPresent = effect.fieldPresence?.after ?? true;
+            if (beforePresent && afterPresent) delete existing.fieldPresence;
+            else
+              existing.fieldPresence = {
+                before: beforePresent,
+                after: afterPresent,
+              };
+          }
           existing.mutationIntent = combineScalarMutationIntent(
             existing.mutationIntent,
             effect.mutationIntent
           );
           if (
-            existing.before === existing.after &&
-            beforePresent === afterPresent
+            plainBranchMemberEffectIsNoop(existing) &&
+            (existing.fieldPresence?.before ?? true) ===
+              (existing.fieldPresence?.after ?? true)
           ) {
             effectMap.delete(key);
           }
@@ -3512,6 +3637,12 @@ export function restoration(
       subjectIds?: number[],
       positionIds?: number[]
     ): void => {
+      const membership = plainBranchMembershipEffects(meta);
+      if (membership) {
+        for (const effect of membership)
+          enqueueEffect(effectMap, { ...effect });
+        return;
+      }
       const enqueueScalarDiff = (
         diffPath: string,
         before: unknown,
@@ -3637,6 +3768,15 @@ export function restoration(
         bucket.designated = true;
       }
 
+      const membership = plainBranchMembershipEffects(meta);
+      if (membership) {
+        for (const effect of membership) {
+          bucket.positionIds.add(effect.position);
+          bucket.ownerPaths.add(effect.ownerPath);
+          enqueueEffect(bucket.effects, { ...effect });
+        }
+        return;
+      }
       const resolvedPositionIds =
         positionIds && positionIds.length > 0
           ? positionIds
@@ -3851,6 +3991,7 @@ export function restoration(
         // superseded the realization, so the displaced provenance is dropped.
         supersededExternalTruth.delete(event.id);
         supersededExternalRows.delete(event.id);
+        displacedMembershipTruth.delete(event.id);
       }
       const stagedTurnId = stagedForeignTurns.get(key);
       stagedForeignTurns.delete(key);
@@ -3960,6 +4101,72 @@ export function restoration(
               // legitimate undo. Measured: the undo overwrites the scrub.
               if (isInspectionWrite(meta)) {
                 return;
+              }
+              const membership = plainBranchMembershipEffects(meta);
+              if (membership) {
+                const transactionId = resolveTransactionId(meta);
+                const compensation = isCompensationWrite(meta);
+                const realized = getWriteParticipation(meta) === 'realized';
+                for (const effect of membership) {
+                  if (compensation) {
+                    restoreMembershipTruth(
+                      compensationTransactionId(meta),
+                      effect.position
+                    );
+                  } else if (realized) {
+                    externalMembershipTruth.set(effect.position, {
+                      present: effect.plainBranchMembership.after,
+                      value: effect.after,
+                    });
+                  } else {
+                    rememberMembershipTruth(transactionId, effect.position);
+                    externalMembershipTruth.delete(effect.position);
+                  }
+                }
+                if (compensation) return;
+                if (realized) {
+                  for (const effect of membership) {
+                    pendingCapture.positionIds.add(effect.position);
+                    enqueueEffect(pendingCapture.effects, { ...effect });
+                  }
+                  selfDirty = true;
+                } else {
+                  captureIntoBucket(
+                    transactionId === undefined
+                      ? pendingCapture
+                      : getTransactionBucket(transactionId),
+                    path,
+                    next,
+                    prev,
+                    meta,
+                    ownerPath,
+                    subjectIds,
+                    positionIds
+                  );
+                  if (transactionId === undefined) selfDirty = true;
+                }
+                return;
+              }
+              if (!subjectIds?.length) {
+                for (const position of positionIds ?? []) {
+                  if (isCompensationWrite(meta)) {
+                    restoreMembershipTruth(
+                      compensationTransactionId(meta),
+                      position
+                    );
+                  } else if (getWriteParticipation(meta) !== 'realized') {
+                    rememberMembershipTruth(
+                      resolveTransactionId(meta),
+                      position
+                    );
+                    externalMembershipTruth.delete(position);
+                  } else if (externalMembershipTruth.has(position)) {
+                    externalMembershipTruth.set(position, {
+                      present: true,
+                      value: next,
+                    });
+                  }
+                }
               }
               if (getWriteParticipation(meta) === 'realized') {
                 // RESTORE-P0 P0-C. Recorded HERE rather than only in the leaf
@@ -4287,6 +4494,8 @@ export function restoration(
       stagedTransactionEffects.clear();
       activeForeignTransactions.clear();
       externalTruthByPath.clear();
+      externalMembershipTruth.clear();
+      displacedMembershipTruth.clear();
       externalTruthBySubject.clear();
       externalOrderOwners.clear();
     };

@@ -1,4 +1,8 @@
-import type { ConfirmedReversalPlan, ReversalResult, TurnId } from './causal-types';
+import type {
+  ConfirmedReversalPlan,
+  ReversalResult,
+  TurnId,
+} from './causal-types';
 import type { CausalEffect } from './causal-types';
 import type { RealizationContext } from './realization-context';
 import type { TurnStore } from './turn-store';
@@ -7,7 +11,10 @@ export type ConfirmedReversalPlanningResult =
   | { readonly ok: true; readonly plan: ConfirmedReversalPlan }
   | {
       readonly ok: false;
-      readonly refusal: Extract<Extract<ReversalResult, { readonly ok: false }>['refusal'], { kind: 'turn-evicted' }>;
+      readonly refusal: Extract<
+        Extract<ReversalResult, { readonly ok: false }>['refusal'],
+        { kind: 'turn-evicted' }
+      >;
     };
 
 export interface PlanConfirmedReversalOptions {
@@ -38,25 +45,29 @@ function createReversalEffects(
   realizationContext?: RealizationContext
 ): ConfirmedReversalPlan['effects'] {
   if (!realizationContext) {
-    return [...turn.effects]
-      .reverse()
-      .map((effect) => ({
-        owner: effect.owner,
-        before: effect.after,
-        after: effect.before,
-        subjectId: effect.subjectId,
-        subjectFieldSegments: effect.subjectFieldSegments,
-        fieldPresence: effect.fieldPresence
-          ? {
-              before: effect.fieldPresence.after,
-              after: effect.fieldPresence.before,
-            }
-          : undefined,
-        path: (effect as CausalEffect & { path?: string }).path,
-        ownerPath: (effect as CausalEffect & { ownerPath?: string }).ownerPath,
-        structural: deriveUndoStructural(effect.structural),
-        structuralContext: effect.structuralContext,
-      }));
+    return [...turn.effects].reverse().map((effect) => ({
+      owner: effect.owner,
+      before: effect.after,
+      after: effect.before,
+      subjectId: effect.subjectId,
+      subjectFieldSegments: effect.subjectFieldSegments,
+      plainBranchMembership: effect.plainBranchMembership
+        ? {
+            before: effect.plainBranchMembership.after,
+            after: effect.plainBranchMembership.before,
+          }
+        : undefined,
+      fieldPresence: effect.fieldPresence
+        ? {
+            before: effect.fieldPresence.after,
+            after: effect.fieldPresence.before,
+          }
+        : undefined,
+      path: (effect as CausalEffect & { path?: string }).path,
+      ownerPath: (effect as CausalEffect & { ownerPath?: string }).ownerPath,
+      structural: deriveUndoStructural(effect.structural),
+      structuralContext: effect.structuralContext,
+    }));
   }
 
   const firstEffectIndexByOwner = new Map<number, number>();
@@ -68,16 +79,28 @@ function createReversalEffects(
   const currentByOwner = new Map<number, unknown>();
 
   return [...turn.effects].reverse().map((effect) => {
+    if (effect.plainBranchMembership)
+      return {
+        ...effect,
+        before: effect.after,
+        after: effect.before,
+        plainBranchMembership: {
+          before: effect.plainBranchMembership.after,
+          after: effect.plainBranchMembership.before,
+        },
+      };
     const originalIndex = turn.effects.indexOf(effect);
     const structural = deriveUndoStructural(effect.structural);
-    const before = effect.structural !== undefined
-      ? deriveStructuralUndoBefore(effect)
-      : currentByOwner.has(effect.owner)
+    const before =
+      effect.structural !== undefined
+        ? deriveStructuralUndoBefore(effect)
+        : currentByOwner.has(effect.owner)
         ? currentByOwner.get(effect.owner)
         : realizationContext.getCurrentValue(effect.owner);
-    const after = effect.structural !== undefined
-      ? deriveStructuralUndoAfter(effect)
-      : firstEffectIndexByOwner.get(effect.owner) === originalIndex
+    const after =
+      effect.structural !== undefined
+        ? deriveStructuralUndoAfter(effect)
+        : firstEffectIndexByOwner.get(effect.owner) === originalIndex
         ? realizationContext.getValueWithoutConfirmedTurn(turn.id, effect.owner)
         : effect.before;
 
@@ -106,8 +129,12 @@ function createReversalEffects(
 }
 
 function deriveUndoStructural(
-  structural: NonNullable<ReturnType<Pick<TurnStore, 'getTurn'>['getTurn']>>['effects'][number]['structural']
-): NonNullable<ReturnType<Pick<TurnStore, 'getTurn'>['getTurn']>>['effects'][number]['structural'] {
+  structural: NonNullable<
+    ReturnType<Pick<TurnStore, 'getTurn'>['getTurn']>
+  >['effects'][number]['structural']
+): NonNullable<
+  ReturnType<Pick<TurnStore, 'getTurn'>['getTurn']>
+>['effects'][number]['structural'] {
   switch (structural) {
     case 'add':
       return 'remove';
@@ -121,7 +148,9 @@ function deriveUndoStructural(
 }
 
 function deriveStructuralUndoBefore(
-  effect: NonNullable<ReturnType<Pick<TurnStore, 'getTurn'>['getTurn']>>['effects'][number]
+  effect: NonNullable<
+    ReturnType<Pick<TurnStore, 'getTurn'>['getTurn']>
+  >['effects'][number]
 ): unknown {
   switch (effect.structural) {
     case 'add':
@@ -135,7 +164,9 @@ function deriveStructuralUndoBefore(
 }
 
 function deriveStructuralUndoAfter(
-  effect: NonNullable<ReturnType<Pick<TurnStore, 'getTurn'>['getTurn']>>['effects'][number]
+  effect: NonNullable<
+    ReturnType<Pick<TurnStore, 'getTurn'>['getTurn']>
+  >['effects'][number]
 ): unknown {
   switch (effect.structural) {
     case 'add':
@@ -153,5 +184,4 @@ function seedCurrentBoundary(
   effect: ConfirmedReversalPlan['effects'][number]
 ): void {
   currentByOwner.set(effect.owner, effect.after);
-
 }

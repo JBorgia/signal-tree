@@ -155,3 +155,51 @@ Next: plain-membership production evidence and chronological delivery, then
 its capture/reversal/Link integration. Investigate the preserved static
 designation loss when touching notifier attribution; do not silently bless the
 external-baseline counterexample from an incumbent measurement alone.
+
+## Slice 3c: plain-branch membership and notifier designation
+
+Conceptual port of v15.4.0 plain-branch membership plus the notifier part of
+v15.4.2's HIST-C2 designation fix. Donor files are byte-identical to v15.4.0 or
+differ only by `transaction()` → `transact()`; independent review confirmed it.
+
+First full kernel run of the uncommitted slice (2026-10-05): 5 failures in three
+files that all pass at `03d9696f` (72/72), so the slice caused them. Each pinned
+pre-port behaviour that v15 itself changed in `cf98697a`: branch writes now also
+publish the parent membership path, and differing origin/transaction metadata
+splits frames instead of coalescing to `mixed`. Each v16 test block was verified
+equal to v15's pre-change block (whitespace/commas only) before v15's updated
+block replaced it. Review then found one v15 test the transplant had dropped
+(coalescible metadata deliberately discarded); it is restored beside the renamed
+one. Logs: `/private/tmp/st-v16-integration-evidence/2026-10-05-*`.
+
+Results: full kernel 3098 passed, six expected failures, thirteen skips; all four
+framework suites pass (164, 26, 20, 46); types and kernel lint pass. The two final
+review fixes (restored test, merged imports) were rechecked with focused suites
+(139), types and lint, not a further full run.
+
+Independent review found no regression in 3c and no weakened destination
+contract (inspect statuses, recovery, observeEnqueue, literal-dotted owners and
+own-undefined reversal were probed). Open items it raised:
+
+1. **Owner invalidation gap, both lines, pre-existing.** A membership-only branch
+   write fires `observeOwnerInvalidation` once with no enhancers and zero times
+   with `transactions()` or `restoration()`; the value has already changed. Probed
+   identically on v15 (`5c22eac5`) and v16 (`03d9696f`). This breaks destination
+   contract 3 for membership and affects published 15.4.2. Root cause not yet
+   established; it needs a carrier test and a repair on both lines.
+2. Minor divergences kept for now: v15's unreachable `plainBranchMembershipChange`
+   guard in `hasSameSemanticIdentity` is absent; `mergeOrigin`'s `mixed` result is
+   now unreachable; the diagnostic journal records membership frames as a branch
+   effect with undefined before/after (as v15 does).
+
+Separate finding, recorded for the rollback integration: v15.4.2 restricts
+structural supersession to settled erasers. The same six v15 cases on v16
+`03d9696f`: 2 pass, 4 differ. v16 refuses with `later-confirmed-dependency` while
+a removing transaction is open (no resurrection hazard, different kind), keeps
+refusing after the remover rolls back, and keeps refusing after an open editor
+confirms. Probe: `2026-10-05-v16-unsettled-probe.spec.ts.txt`. Decide these
+against the v16 laws and semantic matrix; do not copy v15's kinds blindly.
+
+Next: carry the rest of 15.4.1/15.4.2 (outcome-provenance fixture,
+external-authored baseline and inspection-write exclusion in restoration) with
+their tests, then the open designation and external-baseline counterexamples.

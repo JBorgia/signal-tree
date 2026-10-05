@@ -1,3 +1,8 @@
+import {
+  canRealizePlainBranchMember,
+  preparePlainBranchMembers,
+  realizePlainBranchMember,
+} from '../plain-branch-membership';
 import type {
   ISignalTree,
   PositionId,
@@ -463,41 +468,68 @@ export function createTreeRealizationAdapter(
       return undefined;
     },
     applyAtomically(effects) {
+      const memberTargets = new Map<
+        number,
+        { present: boolean; value: unknown }
+      >();
+      const valueEffects: ReversalEffect[] = [];
+      for (const effect of effects) {
+        if (effect.plainBranchMembership) {
+          memberTargets.set(effect.owner, {
+            present: effect.plainBranchMembership.after,
+            value: effect.after,
+          });
+        } else {
+          valueEffects.push(effect);
+        }
+      }
+      const members = memberTargets.size
+        ? preparePlainBranchMembers(options.tree.$, memberTargets)
+        : undefined;
       const apply = () => {
-        const heterogeneousFrame = planHeterogeneousFrame(
-          options.tree,
-          options.descriptors,
-          structuralOwnerPaths,
-          scalarSlotRuntime,
-          physicalCommitClock,
-          effects
-        );
+        // Prepare the remaining frame before any member is installed. All member
+        // values and presence are installed before any effect is published.
+        const heterogeneousFrame = valueEffects.length
+          ? planHeterogeneousFrame(
+              options.tree,
+              options.descriptors,
+              structuralOwnerPaths,
+              scalarSlotRuntime,
+              physicalCommitClock,
+              valueEffects
+            )
+          : undefined;
+        const scalarFrame =
+          !heterogeneousFrame && valueEffects.length
+            ? planScalarFrame(
+                options.tree,
+                options.descriptors,
+                structuralOwnerPaths,
+                scalarSlotRuntime,
+                valueEffects
+              )
+            : undefined;
+        members?.install();
+        // A membership-only frame has no value frame to advance the shared
+        // physical clock. Publish its installed presence under a new revision.
+        if (members && valueEffects.length === 0)
+          physicalCommitClock?.advance();
         if (heterogeneousFrame) {
           heterogeneousFrame.commit();
-          return;
-        }
-
-        const scalarFrame = planScalarFrame(
-          options.tree,
-          options.descriptors,
-          structuralOwnerPaths,
-          scalarSlotRuntime,
-          effects
-        );
-        if (scalarFrame) {
+        } else if (scalarFrame) {
           scalarFrame.commit();
-          return;
+        } else {
+          for (const effect of valueEffects) {
+            applyEffect(
+              options.tree,
+              options.descriptors,
+              structuralOwnerPaths,
+              scalarSlotRuntime,
+              effect
+            );
+          }
         }
-
-        for (const effect of effects) {
-          applyEffect(
-            options.tree,
-            options.descriptors,
-            structuralOwnerPaths,
-            scalarSlotRuntime,
-            effect
-          );
-        }
+        members?.publish();
       };
 
       applyInInvalidationGroup(options.tree.$, apply);
@@ -1093,6 +1125,8 @@ function canApplyEffect(
   effect: ReversalEffect,
   preparedContext?: PreparedRealizationContext
 ): boolean {
+  if (effect.plainBranchMembership)
+    return canRealizePlainBranchMember(tree.$, effect.owner);
   const descriptor = descriptors.get(effect.owner);
   if (
     !descriptor &&
@@ -1207,6 +1241,15 @@ function applyEffect(
   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
   effect: ReversalEffect
 ): void {
+  if (effect.plainBranchMembership) {
+    realizePlainBranchMember(
+      tree.$,
+      effect.owner,
+      effect.plainBranchMembership.after,
+      effect.after
+    );
+    return;
+  }
   const descriptor = descriptors.get(effect.owner);
   if (
     !descriptor &&

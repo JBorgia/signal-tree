@@ -155,6 +155,9 @@ function createPendingRollbackEffects(
     )
     .filter(
       (effect) =>
+        (effect.plainBranchMembership !== undefined &&
+          effect.plainBranchMembership.before !==
+            effect.plainBranchMembership.after) ||
         effect.before !== effect.after ||
         (effect.fieldPresence !== undefined &&
           effect.fieldPresence.before !== effect.fieldPresence.after)
@@ -188,6 +191,12 @@ function createPendingRollbackEffect(
       after: deriveStructuralRollbackAfter(effect),
       subjectId: effect.subjectId,
       subjectFieldSegments: effect.subjectFieldSegments,
+      plainBranchMembership: effect.plainBranchMembership
+        ? {
+            before: effect.plainBranchMembership.after,
+            after: effect.plainBranchMembership.before,
+          }
+        : undefined,
       fieldPresence: effect.fieldPresence
         ? {
             before: effect.fieldPresence.after,
@@ -199,13 +208,22 @@ function createPendingRollbackEffect(
     };
   }
 
-  if (hasInlineScopedLeafAddress(effect)) {
+  if (
+    effect.plainBranchMembership !== undefined ||
+    hasInlineScopedLeafAddress(effect)
+  ) {
     return {
       owner: effect.owner,
       before: effect.after,
       after: effect.before,
       subjectId: effect.subjectId,
       subjectFieldSegments: effect.subjectFieldSegments,
+      plainBranchMembership: effect.plainBranchMembership
+        ? {
+            before: effect.plainBranchMembership.after,
+            after: effect.plainBranchMembership.before,
+          }
+        : undefined,
       fieldPresence: effect.fieldPresence
         ? {
             before: effect.fieldPresence.after,

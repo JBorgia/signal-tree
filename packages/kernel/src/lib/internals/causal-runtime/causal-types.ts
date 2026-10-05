@@ -1,3 +1,4 @@
+import type { PlainBranchMemberPresence } from '../plain-branch-membership';
 import type { PositionId, StructuralEffect } from '../../types';
 
 export type { PositionId };
@@ -25,6 +26,7 @@ export interface CausalEffect {
   readonly subjectId?: unknown;
   /** Producer-known row-relative property keys; [] names the whole row. */
   readonly subjectFieldSegments?: readonly string[];
+  readonly plainBranchMembership?: PlainBranchMemberPresence;
   readonly fieldPresence?: FieldPresence;
   /**
    * Captured realization address — REQUIRED, because every live producer sets
@@ -74,6 +76,7 @@ export interface ReversalEffect {
   readonly subjectId?: unknown;
   /** Producer-known row-relative property keys; [] names the whole row. */
   readonly subjectFieldSegments?: readonly string[];
+  readonly plainBranchMembership?: PlainBranchMemberPresence;
   readonly fieldPresence?: FieldPresence;
   /**
    * Captured realization address.

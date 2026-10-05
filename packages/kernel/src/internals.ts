@@ -103,6 +103,10 @@ function projectConfirmedTurns(
       before?: unknown;
       after?: unknown;
       subject?: unknown;
+      plainBranchMembership?: {
+        readonly before: boolean;
+        readonly after: boolean;
+      };
     }[];
   }[],
   retention: { truncated: boolean; firstAvailableTurnId?: number }
@@ -119,6 +123,9 @@ function projectConfirmedTurns(
         before: 'before' in effect ? effect.before : undefined,
         after: 'after' in effect ? effect.after : undefined,
         subjectId: 'subject' in effect ? effect.subject : undefined,
+        ...(effect.plainBranchMembership
+          ? { plainBranchMembership: { ...effect.plainBranchMembership } }
+          : {}),
       });
     }
     turns.push({

@@ -24,6 +24,11 @@ export interface ConfirmedTurnEffectView {
   readonly before?: unknown;
   readonly after?: unknown;
   readonly subjectId?: unknown;
+  /** Explicit presence distinguishes omission from present undefined. */
+  readonly plainBranchMembership?: {
+    readonly before: boolean;
+    readonly after: boolean;
+  };
 }
 
 export interface ConfirmedTurnView {
