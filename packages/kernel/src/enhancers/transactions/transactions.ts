@@ -1435,15 +1435,26 @@ export function getOrCreateInternalTransactionRuntime<T>(
   // descriptor its capture created is keyed by one of them. Scanning the whole
   // map made each settlement O(descriptors), and settling P overlapping
   // transactions O(P^2). Deleting less can never silence a notification.
+  //
+  // Subject details are released only when unclaimed AND not captured by a
+  // still-open callback: such a capture has recorded reversal inputs before
+  // materialization registers its pending claims, and a reentrant ordinary
+  // flush can complete in that interval. Position shells are only examined for
+  // a settling transaction's own positions; an ordinary flush releases subject
+  // details and leaves every shell routing notifications.
   const forgetUnclaimedDescriptorSubjects = (
     subjectIds: readonly number[],
-    descriptorOwnersBefore: ReadonlySet<number>,
-    ownPositions: readonly number[]
+    descriptorOwnersBefore?: ReadonlySet<number>,
+    ownPositions: readonly number[] = []
   ): void => {
+    if (subjectIds.length === 0 && ownPositions.length === 0) return;
     const claims = getSubjectRestorationClaims(tree);
-    const unclaimed = [...new Set(subjectIds)].filter(
-      (subjectId) => !claims?.isClaimed(subjectId)
-    );
+    const unclaimed = [...new Set(subjectIds)].filter((subjectId) => {
+      if (claims?.isClaimed(subjectId)) return false;
+      for (const bucket of pendingTransactions.values())
+        if (bucket.subjectIds.has(subjectId)) return false;
+      return true;
+    });
     forgetSubjectsInTreeRealizationDescriptors(
       realizationDescriptors,
       unclaimed
@@ -1460,7 +1471,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       return false;
     };
     for (const owner of new Set(ownPositions)) {
-      if (descriptorOwnersBefore.has(owner)) {
+      if (descriptorOwnersBefore?.has(owner)) {
         continue;
       }
       const descriptor = realizationDescriptors.get(owner);
@@ -1955,11 +1966,19 @@ export function getOrCreateInternalTransactionRuntime<T>(
     bucket: CaptureBucket
   ): TransactionTurnRecord | undefined => {
     const { subjectIds, positionIds, effects } = drainCaptureBucket(bucket);
-    return authority.recordConfirmed(
+    const turn = authority.recordConfirmed(
       subjectIds.length > 0 ? subjectIds : undefined,
       positionIds.length > 0 ? positionIds : undefined,
       effects.length > 0 ? effects : undefined
     );
+    // Subject addresses serve pending rollback and retained undo/redo claims.
+    // A confirmed record only classifies dependencies: retaining it (for
+    // correctness or diagnostics) is not a reason to retain these addresses.
+    // Restoration reinstalls its own captured descriptor inputs when it admits
+    // a history entry, whichever flush listener runs first. Physical
+    // reclamation has its own eligibility boundary.
+    forgetUnclaimedDescriptorSubjects(subjectIds);
+    return turn;
   };
 
   const getTransactionBucket = (transactionId: number): CaptureBucket => {
@@ -3132,12 +3151,17 @@ export function getOrCreateInternalTransactionRuntime<T>(
             // them here (`lifecycle` is already 'confirmed', so a following
             // rollback() throws). Discarding would drop durable consequences
             // for state the tree is still showing.
-            settleCommitScope(transactionOwnerToken, transactionId, 'commit');
-            forgetUnclaimedDescriptorSubjects(
-              pendingTurn?.restorationSubjectIds ?? [],
-              descriptorOwnersBefore,
-              pendingTurn?.__positionIds ?? []
-            );
+            try {
+              settleCommitScope(transactionOwnerToken, transactionId, 'commit');
+            } finally {
+              // A throwing durable consequence must not strand the released
+              // turn's descriptor details: the turn is already settled.
+              forgetUnclaimedDescriptorSubjects(
+                pendingTurn?.restorationSubjectIds ?? [],
+                descriptorOwnersBefore,
+                pendingTurn?.__positionIds ?? []
+              );
+            }
           }
         },
         rollback(): void {
