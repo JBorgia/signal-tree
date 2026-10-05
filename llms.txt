@@ -226,9 +226,12 @@ in existing v15. In 15.3.1, automatic refusal before a
 handle returns records surviving writes as committed, retains eligible undo
 history, releases consequences, and still throws. Successful automatic rollback
 reverses recorded writes. Error does not guarantee undo: never blindly retry the
-whole operation or use `undo()`/`jumpTo()` for request reconciliation. Removing a
-pending-created row after a confirmed edit does not necessarily clear its
-rollback dependency. Recoverable pending refusal is a v16 target, not v15 API.
+whole operation or use `undo()`/`jumpTo()` for request reconciliation. Since
+15.4.2, a pending-created or pending-rekeyed row removed by settled later work
+no longer blocks rollback; a pending-created row confirmed work edited and kept
+still refuses, so removal is not a general recovery strategy. After a rejection,
+`undo()` of a later write can restore the rejected transaction's speculative
+value. Recoverable pending refusal is a v16 target, not v15 API.
 
 15.3.1 containment covers deferred write subscribers and transaction turn
 listeners, not all framework effects. Vue watcher failures differ between

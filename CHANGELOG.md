@@ -1,7 +1,23 @@
 ## 15.4.2 (2026-10-02)
 
-**Patch — preserve authored undo boundaries and operation outcomes.**
+**Patch — preserve authored undo boundaries and operation outcomes; stop
+rollback refusing when newer truth already removed the turn's row.**
 
+- Rolling back a pending transaction no longer refuses because settled later
+  work removed a row the transaction added or rekeyed. The removal already
+  undid that part, so the rest of the transaction reverses and the row stays
+  absent. Before, the refusal left the transaction's other values in place
+  with no way to reject it. This applies the rule `main` adopted on
+  2026-09-22 (PROPOSAL-REJECTION-0 and REKEY-SUPERSESSION-0).
+- This includes a row that later work edited and then removed, which used to
+  refuse. Rollback still refuses while the removing transaction is open
+  (`later-pending-dependency`; settle it first), when later work edited a
+  pending-created row and kept it, and when a pending remove's key was
+  re-occupied.
+- Known limitation, unchanged: after a rejection, `undo()` of a later write
+  restores the state that write replaced, which can include the rejected
+  transaction's speculative value. Pending-created rows now behave as scalars
+  already did.
 - An external update before a turn's first authored contribution now supplies
   that contribution's undo baseline, including when both occur in the same
   turn. Earlier authored contributions still belong to the whole designated
@@ -12,7 +28,8 @@
 - Inspection-only collection reordering is not reversed by an unrelated user
   edit and does not create undo history or external-order authority.
 - Includes the observer-failure repairs described below for the unpublished
-  15.4.1 candidate. No public API or transaction-refusal policy change.
+  15.4.1 candidate. No public API change; the only refusal change is the
+  rollback correction above.
 
 ## 15.4.1 (2026-10-01)
 
