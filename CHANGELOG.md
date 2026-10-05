@@ -1,4 +1,23 @@
-## 15.4.2 (2026-10-02)
+## 15.4.3 (2026-10-05)
+
+**Patch — every reader sees a field a branch write removed.** Take it if you
+write whole plain branches that omit an optional field present in the initial
+state.
+
+- Without `transactions()` or `restoration()` (no enhancers, `batching()`
+  alone, and other enhancers), `tree.$.p({ name: 'a' })` over
+  `{ name: 'a', age: 1 }` left `tree.$.p.age()`, computed/derived consumers and
+  leaf subscribers at `1` while `tree.$.p()` already showed `age` absent. In
+  Angular, Vue and Solid the direct read stayed stale too. The removed field now
+  reads as absent everywhere, published once.
+- With `transactions()` or `restoration()`, the same write did not invalidate
+  the tree's owners, so framework adapters (including React) were not told to
+  re-read. They now are, once. A write inside a pending transaction is observed
+  exactly like a pending value write: owners are invalidated when it settles,
+  as before.
+- No public API change. Identical writes still notify nothing, and re-adding
+  the field is unchanged.
+
 
 **Patch — preserve authored undo boundaries and operation outcomes; stop
 rollback refusing when newer truth already removed the turn's row.**

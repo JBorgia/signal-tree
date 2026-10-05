@@ -12,7 +12,7 @@
   </p>
 </div>
 
-This README describes the 15.4.2 package version. See the [changelog](CHANGELOG.md)
+This README describes the 15.4.3 package version. See the [changelog](CHANGELOG.md)
 for versioned changes and the [npm package page](https://www.npmjs.com/package/@signal-tree/kernel?activeTab=versions)
 for published versions.
 

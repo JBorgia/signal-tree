@@ -1,8 +1,29 @@
 # Current release work — v15 outcome provenance patch
 
-Updated October 5, 2026. Active branch `fix/v15-outcome-provenance`, based on
+Updated October 5, 2026 (15.4.3 preparation). Active branch `fix/v15-outcome-provenance`, based on
 published v15.4.0 `4ceb24a2a62dc893bf28c50ad971a955190539a7`.
 The historical controller below is retained as evidence, not current instructions.
+
+## 15.4.3 preparation
+
+The owner authorized fixing and publishing two defects found after 15.4.2 in
+plain-branch membership-only writes (a whole-branch write omitting an optional
+field present in the initial state), both reproduced on published 15.4.2 and v16:
+
+1. With `position-topology` (`transactions()`, `restoration()`), owners were
+   never invalidated, so framework adapters were not told to re-read.
+2. Without it, the removed leaf's own token was never published: direct reads in
+   Angular, Vue and Solid, computed/derived consumers and leaf subscribers stayed
+   at the retained value while the branch snapshot showed the field absent.
+
+Both repairs are in `republishMembers` (plus one internal location-runtime
+export). Carriers were written first: 23/54 and 48/108 kernel failures before,
+all green after, with framework carriers in all four packages; four of five
+mutations killed, one equivalent alternative survives. v15's settle-time
+invalidation law is unchanged. Development budgets pass (entities production
+22.59/22.6 KB, the closest margin so far). Evidence:
+`/private/tmp/st-v15-ownerinv-evidence/` and `/private/tmp/st-v15-15.4.3-evidence/`.
+Independent review and the full exact qualification precede the signed tag.
 
 ## 15.4.2 published
 
