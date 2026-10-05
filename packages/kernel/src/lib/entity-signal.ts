@@ -2641,18 +2641,25 @@ export function createEntitySignal<
       });
       lastSubjectIds = subjectIdsForWrite;
 
-      // Notify PathNotifier for each processed entity
+      // Notify PathNotifier for each processed entity.
+      //
+      // Reproduced on 15.3.1: indexing the pre-add key list at
+      // `i + previous - added` anchored [x, y] after k4 and k5 instead of after
+      // k5 and x, so redo reinserted them out of order. A fresh row's
+      // predecessor is the previous FRESH row of this call, else the last row
+      // before it: an 'overwrite' replacement stays where it was, so it is not
+      // an anchor for the rows appended after it (v16 refinement of 7463f4eb,
+      // which anchored to the previous processed row).
+      let previousAppendedSubject =
+        lastPreviousKey === undefined
+          ? undefined
+          : allocateSubjectId(lastPreviousKey);
       for (let i = 0; i < addedEntities.length; i++) {
         const { id, entity } = addedEntities[i];
-        // Reproduced on 15.3.1: indexing the pre-add key list at
-        // `i + previous - added` anchored [x, y] after k4 and k5 instead of
-        // after k5 and x, so redo reinserted them out of order.
-        const beforeSubject =
-          i > 0
-            ? subjectIdsForWrite[i - 1]
-            : lastPreviousKey === undefined
-            ? undefined
-            : allocateSubjectId(lastPreviousKey);
+        const beforeSubject = previousAppendedSubject;
+        if (preparedAdds[i].existingSubjectId === undefined) {
+          previousAppendedSubject = subjectIdsForWrite[i];
+        }
         pathNotifier.notify(
           `${basePath}.${String(id)}`,
           entity,

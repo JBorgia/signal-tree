@@ -14,8 +14,9 @@ import { restoration } from './restoration';
 // `entityMembershipReader` snapshot with the physical order. That reader is
 // slice 6; the unmodified donor is preserved as
 // docs/audits/2026-10-01-v16-integration/preserved/set-all-order-reversal.spec.ts.txt
-// and its membership assertion returns with the reader. The physical order,
-// values and redo below are unchanged.
+// and its membership assertion returns with the reader. Every donor order,
+// value and redo assertion below is unchanged; the rollback case adds a value
+// check where the reader assertion was.
 type Row = { id: string; n: number };
 const row = (id: string, n = 0): Row => ({ id, n });
 const flush = async () => {
