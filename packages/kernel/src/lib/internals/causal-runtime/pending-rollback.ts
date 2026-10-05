@@ -118,13 +118,21 @@ function createPendingRollbackEffects(
   turn: CausalTurn,
   realizationContext: RealizationContext
 ): readonly ReversalEffect[] {
-  const dominantStructuralEffects: CausalTurn['effects'][number][] = [];
+  // Indexed by lifetime, in turn order: a scan of every structural effect per
+  // effect made rolling back a large replacement quadratic. `sameSubjectScope`
+  // still decides within one lifetime (collections can share lifetimes).
+  const dominantStructuralEffects = new Map<
+    unknown,
+    CausalTurn['effects'][number][]
+  >();
   for (const effect of turn.effects) {
     if (
       effect.subjectId !== undefined &&
       (effect.structural === 'add' || effect.structural === 'remove')
     ) {
-      dominantStructuralEffects.push(effect);
+      const candidates = dominantStructuralEffects.get(effect.subjectId);
+      if (candidates) candidates.push(effect);
+      else dominantStructuralEffects.set(effect.subjectId, [effect]);
     }
   }
 
@@ -139,9 +147,9 @@ function createPendingRollbackEffects(
   return turn.effects
     .filter((effect, index) => {
       if (effect.subjectId !== undefined) {
-        const dominantStructuralEffect = dominantStructuralEffects.find(
-          (candidate) => sameSubjectScope(candidate, effect)
-        );
+        const dominantStructuralEffect = dominantStructuralEffects
+          .get(effect.subjectId)
+          ?.find((candidate) => sameSubjectScope(candidate, effect));
         if (dominantStructuralEffect) {
           return dominantStructuralEffect === effect;
         }
