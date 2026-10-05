@@ -1460,12 +1460,16 @@ function canResolvePreparedSubjectTarget(
     return false;
   }
 
-  return (
-    resolveNodeAtSegments(
-      preparedSubject.value as Record<string, unknown>,
-      fieldSegments
-    ) !== undefined
-  );
+  const value = preparedSubject.value as Record<string, unknown>;
+  // A reversal that RE-CREATES a field targets a key the prepared row lacks:
+  // the turn dropped the field and then removed the row, so the row is back
+  // as removed. Its parent is the target. Requiring the key itself refused
+  // replaceOne/overwrite-without-a-field then removeOne, on undo and rollback.
+  return effect.fieldPresence?.after === true && fieldSegments.length > 0
+    ? isTraversableNode(
+        resolveNodeAtSegments(value, fieldSegments.slice(0, -1))
+      )
+    : resolveNodeAtSegments(value, fieldSegments) !== undefined;
 }
 
 function resolveCollectionNode(

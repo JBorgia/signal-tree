@@ -197,7 +197,8 @@ export function placeFieldReversalsAfterReAdds<T extends ReversalEffect>(
   const scopeOf = (effect: T) => `${effect.owner}\u0000${effect.subjectId}`;
   for (const effect of effects) {
     if (effect.structural === 'add' && effect.subjectId !== undefined) {
-      reAdded.set(scopeOf(effect), []);
+      const scope = scopeOf(effect);
+      if (!reAdded.has(scope)) reAdded.set(scope, []);
     }
   }
   if (reAdded.size === 0) return effects;
@@ -211,7 +212,11 @@ export function placeFieldReversalsAfterReAdds<T extends ReversalEffect>(
     if (followersOf(effect)) continue;
     ordered.push(effect);
     if (effect.structural === 'add' && effect.subjectId !== undefined) {
-      appendAll(ordered, reAdded.get(scopeOf(effect)) ?? []);
+      const scope = scopeOf(effect);
+      appendAll(ordered, reAdded.get(scope) ?? []);
+      // Neither caller re-adds one scope twice today; if one ever does, its
+      // followers still go out once, after the FIRST re-add.
+      reAdded.set(scope, []);
     }
   }
   return ordered;
