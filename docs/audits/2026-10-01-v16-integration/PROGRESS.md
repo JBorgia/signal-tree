@@ -225,3 +225,18 @@ compensation writes are not new order history (`cf98697a`, slice 5) and
 `hasRetainedOrPendingHistory()` (`03deb906`, slice 9; an allocation guard, so a
 correctness-first port may allocate unconditionally). Carry the repair with or
 after slice 5 rather than pulling those slices out of order.
+
+## 15.4.3 carry-over: membership-only writes reach every reader (2026-10-05)
+
+The two defects fixed in v15 15.4.3 (`849e825e`) reproduced identically on v16:
+with position-topology, owners were not invalidated; without it, a removed
+leaf's own token was never published. `republishMembers` is now identical to
+15.4.3's, with one internal location-runtime export. The six carriers (kernel,
+angular, react, vue, solid) are carried with only `transaction()` → `transact()`.
+They assert parity with value writes, so they hold under v16's while-pending
+owner invalidation as well as v15's settle-time law.
+
+On `b7095766` without the fix: 26/54 and 66/144 kernel carrier failures; with it,
+54/54 and 144/144. Full kernel 3319 passed, six expected failures, thirteen
+skips; frameworks angular 179, react 23, vue 61, solid 41; types and lint pass.
+Logs: `/private/tmp/st-v16-integration-evidence/2026-10-05-*membership*`.
