@@ -1362,6 +1362,16 @@ export function getOrCreateInternalTransactionRuntime<T>(
     lifecycleViews.delete(transactionId);
     lifecycleScopes.delete(transactionId);
   };
+  /**
+   * A transaction the owner gave up before it had a handle: it leaves the
+   * snapshot under a new sequence. The engine announces no terminal transition
+   * on these paths, so the reader invents none (see `advance`).
+   */
+  const abandonLifecycleView = (transactionId: number): void => {
+    if (!lifecycleViews.has(transactionId)) return;
+    retireLifecycleView(transactionId);
+    publishLifecycle.advance();
+  };
   /** The owner's own classification of a refusal it threw; never re-derived. */
   const refusalReason = (error: unknown): TransactionRefusalReason => {
     const cause =
@@ -3024,44 +3034,56 @@ export function getOrCreateInternalTransactionRuntime<T>(
       // it, and before the drain below, like any other 'opened' listener.
       const lifecycleView: LifecycleView = { transactionId, phase: 'opened' };
       lifecycleViews.set(transactionId, lifecycleView);
-      const releaseOpenedDelivery = publishLifecycle.hold();
-      publishLifecycle({ kind: 'opened', transactionId });
+      let descriptorOwnersBefore: Set<number>;
+      let releaseCapture: (() => void) | undefined;
+      let releaseEntityCapture: (() => void) | undefined;
+      let reservedTurnId: number;
       try {
-        lifecycleChannel.announce({
-          kind: 'opened',
-          owner: transactionOwnerToken,
-          id: transactionId,
-        });
-      } finally {
-        releaseOpenedDelivery();
+        const releaseOpenedDelivery = publishLifecycle.hold();
+        publishLifecycle({ kind: 'opened', transactionId });
+        try {
+          lifecycleChannel.announce({
+            kind: 'opened',
+            owner: transactionOwnerToken,
+            id: transactionId,
+          });
+        } finally {
+          releaseOpenedDelivery();
+        }
+
+        // 'opened' listeners can author ordinary writes or complete transactions.
+        // Neither belongs to this callback's contribution, so drain them before
+        // its order is reserved: queued at transaction entry they would read as
+        // LATER evidence against this turn, and refuse its rollback over its own
+        // baseline. Older pending turns still receive them as later evidence.
+        const afterOpened = readQueuedLaterEffects();
+        for (const id of authority.getPendingTurnIds()) {
+          authority.observeQueuedEffects(id, afterOpened);
+        }
+        notifier?.flushSync();
+
+        // Persistence is post-commit: open the deferral scope BEFORE the callback
+        // runs, so speculative writes inside it queue instead of reaching storage.
+        openCommitScope(transactionOwnerToken, transactionId, tree as object);
+        lifecycleScopes.add(transactionId);
+
+        descriptorOwnersBefore = new Set(realizationDescriptors.keys());
+        releaseCapture = captureRuntime?.activateCapture();
+        releaseEntityCapture = observeOpenEntityCapture(
+          transactionId,
+          captureBucket
+        );
+        // After the 'opened' listeners return, before the callback and before
+        // any observer of its first write: see `reservePending`. Nothing from
+        // here to the end of the callback's `finally` lets a throw escape.
+        reservedTurnId = authority.reservePending(captureBucket);
+      } catch (error) {
+        // Lifecycle observation only: a throw before the reservation leaves no
+        // handle, so the reader must not keep a pending record. (The owner's
+        // own bookkeeping on this path is unchanged by this slice.)
+        abandonLifecycleView(transactionId);
+        throw error;
       }
-
-      // 'opened' listeners can author ordinary writes or complete transactions.
-      // Neither belongs to this callback's contribution, so drain them before
-      // its order is reserved: queued at transaction entry they would read as
-      // LATER evidence against this turn, and refuse its rollback over its own
-      // baseline. Older pending turns still receive them as later evidence.
-      const afterOpened = readQueuedLaterEffects();
-      for (const id of authority.getPendingTurnIds()) {
-        authority.observeQueuedEffects(id, afterOpened);
-      }
-      notifier?.flushSync();
-
-      // Persistence is post-commit: open the deferral scope BEFORE the callback
-      // runs, so speculative writes inside it queue instead of reaching storage.
-      openCommitScope(transactionOwnerToken, transactionId, tree as object);
-      lifecycleScopes.add(transactionId);
-
-      const descriptorOwnersBefore = new Set(realizationDescriptors.keys());
-      const releaseCapture = captureRuntime?.activateCapture();
-      const releaseEntityCapture = observeOpenEntityCapture(
-        transactionId,
-        captureBucket
-      );
-      // After the 'opened' listeners return, before the callback and before
-      // any observer of its first write: see `reservePending`. Nothing from
-      // here to the end of the callback's `finally` lets a throw escape.
-      const reservedTurnId = authority.reservePending(captureBucket);
       let primaryError: unknown;
       let primaryFailed = false;
       let cleanupError: unknown;
@@ -3175,8 +3197,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
         authority.discardPending(reservedTurnId);
         // No handle and no authority remain, so the reader must not keep
         // reporting a pending transaction. The engine announces no terminal
-        // transition on this path, so neither does the reader.
-        retireLifecycleView(transactionId);
+        // transition on this path, so neither does the reader; the sequence
+        // still advances with the snapshot.
+        abandonLifecycleView(transactionId);
         throw error;
       } finally {
         releaseStagedDelivery?.();

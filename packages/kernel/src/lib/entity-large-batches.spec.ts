@@ -26,6 +26,10 @@ const flush = async () => {
 const LARGE = 130_000;
 
 describe('entity batches larger than the argument limit', () => {
+  // Timeout added on v16 (no assertion changed): without slice 9's demand
+  // gate v16 builds every row's notification payload, so this case measured
+  // ~1–2.5 s alone and 7 s under parallel load (v15: ~0.7 s); membership
+  // observation itself adds little (probes/perf.log).
   it('setAll, replace and clear with membership observed', () => {
     const tree = signalTree({ rows: entityMap<Row, number>() });
     const reader = entityMembershipReader(tree)!;
@@ -41,7 +45,7 @@ describe('entity batches larger than the argument limit', () => {
       stop();
       tree.destroy();
     }
-  });
+  }, 60_000);
 
   it('undo and redo of a setAll that replaced every row', async () => {
     const tree = signalTree(
