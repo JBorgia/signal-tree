@@ -167,6 +167,13 @@ type PendingEffectMap = Map<string, TurnEffect>;
 
 type CaptureBucket = {
   /**
+   * Committed entity touches of a callback that is still open, recorded before
+   * any notifier listener can see them. Admission evidence only: it is exposed
+   * through the reserved pending record and dropped at materialization, which
+   * takes the normally captured effects. It never supplies baselines.
+   */
+  entityFootprints: PendingEffectMap;
+  /**
    * TX-AUTO-ROLLBACK-0: window sequence of this bucket's last write per
    * location key (see windowKeys).
    */
@@ -712,7 +719,8 @@ class TransactionAuthority {
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[],
-    baselineValues?: ReadonlyMap<number, unknown>
+    baselineValues?: ReadonlyMap<number, unknown>,
+    reservedId?: number
   ): TransactionTurnRecord | undefined {
     if (
       (subjectIds?.length ?? 0) === 0 &&
@@ -723,7 +731,7 @@ class TransactionAuthority {
     }
 
     return {
-      id: this.nextTurnId++,
+      id: reservedId ?? this.nextTurnId++,
       restorationSubjectIds: subjectIds ? [...subjectIds] : undefined,
       __positionIds: positionIds ? [...positionIds] : undefined,
       __effects: effects ? effects.map(cloneTurnEffect) : undefined,
@@ -750,7 +758,39 @@ class TransactionAuthority {
     return cloneTurnRecord(turn);
   }
 
+  /**
+   * Reserve a transaction's contribution order before anything can re-enter.
+   *
+   * The id used to be allocated at materialization, AFTER the post-callback
+   * flush. A write made by an observer of the callback's own writes was then
+   * recorded first, received the OLDER id, and was invisible to this turn's
+   * rollback: `confirmedTurns.filter(t => t.id > pendingId)` excluded it, the
+   * obligation bound could evict it, and an external write never entered the
+   * dependency ledger because nothing was pending yet. Observed writes must
+   * stay later than the transaction they observe.
+   *
+   * The placeholder owns no second ledger: its effects are a live view of the
+   * open capture, so an older handle settled from inside this callback (or by
+   * an observer before this handle exists) sees the writes captured so far.
+   * `createPending` replaces it; `discardPending` releases it.
+   */
+  reservePending(bucket: CaptureBucket): number {
+    const id = this.nextTurnId++;
+    this.pendingTurns.set(id, {
+      id,
+      get __effects() {
+        return [
+          ...bucket.effects.values(),
+          ...bucket.entityFootprints.values(),
+        ];
+      },
+    });
+    this.pendingOpenedAtSeq.set(id, this.ledgerSeq);
+    return id;
+  }
+
   createPending(
+    reservedId: number,
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[],
@@ -760,14 +800,16 @@ class TransactionAuthority {
       subjectIds,
       positionIds,
       effects,
-      baselineValues
+      baselineValues,
+      reservedId
     );
     if (!turn) {
+      this.discardPending(reservedId);
       return undefined;
     }
+    // Replaces the reservation; its ledger sequence is the opening point.
     this.pendingTurns.set(turn.id, turn);
     this.countPendingPositions(turn, 1);
-    this.pendingOpenedAtSeq.set(turn.id, this.ledgerSeq);
     this.retainPendingClaims(turn.id, turn.restorationSubjectIds ?? []);
     return cloneTurnRecord(turn);
   }
@@ -1157,6 +1199,7 @@ function cloneTurnRecord(turn: TransactionTurnRecord): TransactionTurnRecord {
 
 function createCaptureBucket(): CaptureBucket {
   return {
+    entityFootprints: new Map(),
     ownWriteSeq: new Map<string, number>(),
     ownerPaths: new Set<string>(),
     subjectIds: new Set<number>(),
@@ -1466,6 +1509,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     const ownerPaths = Array.from(bucket.ownerPaths).sort();
     bucket.ownerPaths.clear();
     bucket.ownWriteSeq.clear();
+    bucket.entityFootprints.clear();
     const subjectIds = Array.from(bucket.subjectIds).sort((a, b) => a - b);
     bucket.subjectIds.clear();
     const positionIds = Array.from(bucket.positionIds).sort((a, b) => a - b);
@@ -1605,7 +1649,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
       }
       return;
     }
-    rememberBaselineValue(bucket, effect);
+    if (effectMap !== bucket.entityFootprints) {
+      rememberBaselineValue(bucket, effect);
+    }
     effectMap.set(key, effect);
   };
 
@@ -1777,6 +1823,53 @@ export function getOrCreateInternalTransactionRuntime<T>(
     };
   };
 
+  // Replay is still captured through the normal notifier. This transient view
+  // serves admission only while a callback is open: an older handle may be
+  // rolled back after entity storage committed but before any notifier
+  // listener has seen the write. Discarded with the bucket at materialization.
+  const observeOpenEntityCapture = (
+    transactionId: number,
+    bucket: CaptureBucket
+  ): (() => void) | undefined =>
+    getMutationCaptureRuntime(tree)?.subscribeCommittedEntity?.((capture) => {
+      if (
+        capture.meta?.origin === 'transaction-rollback' ||
+        capture.meta?.origin === 'restoration' ||
+        isInspectionWrite(capture.meta) ||
+        getWriteParticipation(capture.meta) === 'realized' ||
+        resolveTransactionId(capture.meta) !== transactionId
+      )
+        return;
+      for (const change of capture.changes) {
+        bucket.subjectIds.add(change.subject);
+        if (change.structural) {
+          const effect: ScalarSetEffect = {
+            kind: 'set',
+            position: capture.owner,
+            ownerPath: capture.ownerPath,
+            path: capture.ownerPath,
+            subject: change.subject,
+            subjectFieldSegments: [],
+            before: change.before,
+            after: change.after,
+          };
+          bucket.entityFootprints.set(effectKey(effect), effect);
+        } else {
+          captureEffects(
+            bucket,
+            bucket.entityFootprints,
+            capture.ownerPath,
+            change.after,
+            change.before,
+            capture.meta,
+            capture.ownerPath,
+            [change.subject],
+            [capture.owner]
+          );
+        }
+      }
+    });
+
   const resolveOwnerPositionId = (ownerPath?: string): number | undefined => {
     if (!ownerPath) {
       return undefined;
@@ -1908,12 +2001,14 @@ export function getOrCreateInternalTransactionRuntime<T>(
     }) ?? null;
 
   const materializePendingTransaction = (
-    transactionId: number
+    transactionId: number,
+    reservedId: number
   ): TransactionTurnRecord | undefined => {
     const bucket = pendingTransactions.get(transactionId);
     pendingTransactions.delete(transactionId);
     releaseWindowIfClosed();
     if (!bucket) {
+      authority.discardPending(reservedId);
       return undefined;
     }
     const {
@@ -1924,6 +2019,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       collectionOrders,
     } = drainCaptureBucket(bucket);
     const pending = authority.createPending(
+      reservedId,
       subjectIds.length > 0 ? subjectIds : undefined,
       positionIds.length > 0 ? positionIds : undefined,
       effects.length > 0 ? effects : undefined,
@@ -2823,8 +2919,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
       }
       notifier?.flushSync();
       const transactionId = nextTransactionId++;
-      const descriptorOwnersBefore = new Set(realizationDescriptors.keys());
-      pendingTransactions.set(transactionId, createCaptureBucket());
+      const captureBucket = createCaptureBucket();
+      pendingTransactions.set(transactionId, captureBucket);
       // Before the callback: the first write inside it must already reach the
       // evidence observer, or inspect() would silently miss it.
       ensureEnqueueObserver();
@@ -2839,11 +2935,31 @@ export function getOrCreateInternalTransactionRuntime<T>(
         id: transactionId,
       });
 
+      // 'opened' listeners can author ordinary writes or complete transactions.
+      // Neither belongs to this callback's contribution, so drain them before
+      // its order is reserved: queued at transaction entry they would read as
+      // LATER evidence against this turn, and refuse its rollback over its own
+      // baseline. Older pending turns still receive them as later evidence.
+      const afterOpened = readQueuedLaterEffects();
+      for (const id of authority.getPendingTurnIds()) {
+        authority.observeQueuedEffects(id, afterOpened);
+      }
+      notifier?.flushSync();
+
       // Persistence is post-commit: open the deferral scope BEFORE the callback
       // runs, so speculative writes inside it queue instead of reaching storage.
       openCommitScope(transactionOwnerToken, transactionId, tree as object);
 
+      const descriptorOwnersBefore = new Set(realizationDescriptors.keys());
       const releaseCapture = captureRuntime?.activateCapture();
+      const releaseEntityCapture = observeOpenEntityCapture(
+        transactionId,
+        captureBucket
+      );
+      // After the 'opened' listeners return, before the callback and before
+      // any observer of its first write: see `reservePending`. Nothing from
+      // here to the end of the callback's `finally` lets a throw escape.
+      const reservedTurnId = authority.reservePending(captureBucket);
       let primaryError: unknown;
       let primaryFailed = false;
       let cleanupError: unknown;
@@ -2877,7 +2993,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
         }
       } finally {
         try {
-          releaseCapture?.();
+          try {
+            releaseEntityCapture?.();
+          } finally {
+            releaseCapture?.();
+          }
         } catch (error) {
           if (primaryFailed || cleanupFailed)
             reportCleanupFailure(
@@ -2891,39 +3011,59 @@ export function getOrCreateInternalTransactionRuntime<T>(
         }
       }
 
-      // Read before staging/flush: delivery intentionally drops net-equal ABA
-      // notifications, but compensation may not erase that writer's authority.
-      const callbackQueuedEvidence = readQueuedLaterEffects();
-      for (const id of authority.getPendingTurnIds()) {
-        authority.observeQueuedEffects(id, callbackQueuedEvidence);
-      }
-      if (callbackQueuedEvidence.length) {
-        callbackExternalEffects.set(transactionId, [
-          ...(callbackExternalEffects.get(transactionId) ?? []),
-          ...callbackQueuedEvidence,
-        ]);
-      }
+      // Until materialization the reservation is the minimum pending id. A
+      // throw that stranded it would pin every later confirmed record and the
+      // dependency ledger, and show older handles a later turn that can never
+      // settle. Abandon it, with its capture bucket, before rethrowing.
+      let pendingTurn: TransactionTurnRecord | undefined;
+      let autoRollbackUnsafe = false;
+      try {
+        // Read before staging/flush: delivery intentionally drops net-equal ABA
+        // notifications, but compensation may not erase that writer's authority.
+        const callbackQueuedEvidence = readQueuedLaterEffects();
+        for (const id of authority.getPendingTurnIds()) {
+          // This turn's own reservation receives its callback evidence through
+          // `callbackExternalEffects` at materialization, as before.
+          if (id !== reservedTurnId)
+            authority.observeQueuedEffects(id, callbackQueuedEvidence);
+        }
+        if (callbackQueuedEvidence.length) {
+          callbackExternalEffects.set(transactionId, [
+            ...(callbackExternalEffects.get(transactionId) ?? []),
+            ...callbackQueuedEvidence,
+          ]);
+        }
 
-      // TURN-FEED-0 'staged': the callback has returned, so this transaction's
-      // contribution is complete and awaits a decision.
-      if (!primaryFailed)
-        lifecycleChannel.announce({
-          kind: 'staged',
-          owner: transactionOwnerToken,
-          id: transactionId,
-        });
+        // TURN-FEED-0 'staged': the callback has returned, so this transaction's
+        // contribution is complete and awaits a decision.
+        if (!primaryFailed)
+          lifecycleChannel.announce({
+            kind: 'staged',
+            owner: transactionOwnerToken,
+            id: transactionId,
+          });
 
-      notifier?.flushSync();
-      // Decided before materialize, which releases the window's write record.
-      const openBucket = pendingTransactions.get(transactionId);
-      // Only the post-callback rollback; a throwing callback's rollback
-      // admission is unchanged from 9df8fbff.
-      const autoRollbackUnsafe =
-        cleanupFailed &&
-        !primaryFailed &&
-        openBucket !== undefined &&
-        writtenSinceBy(openBucket);
-      const pendingTurn = materializePendingTransaction(transactionId);
+        notifier?.flushSync();
+        // Decided before materialize, which releases the window's write record.
+        const openBucket = pendingTransactions.get(transactionId);
+        // Only the post-callback rollback; a throwing callback's rollback
+        // admission is unchanged from 9df8fbff.
+        autoRollbackUnsafe =
+          cleanupFailed &&
+          !primaryFailed &&
+          openBucket !== undefined &&
+          writtenSinceBy(openBucket);
+        pendingTurn = materializePendingTransaction(
+          transactionId,
+          reservedTurnId
+        );
+      } catch (error) {
+        pendingTransactions.delete(transactionId);
+        callbackExternalEffects.delete(transactionId);
+        releaseWindowIfClosed();
+        authority.discardPending(reservedTurnId);
+        throw error;
+      }
       const pendingTurnId = pendingTurn?.id;
       if (pendingTurn) {
         inspectionTransactionByTurn.set(pendingTurn.id, transactionId);

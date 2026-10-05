@@ -1166,9 +1166,15 @@ describe('failures after the callback returns (16.x)', () => {
     }
   });
 
-  it('the throwing-callback rollback is unchanged from 9df8fbff', async () => {
-    // An observer writes the same row while the failed callback is rolled
-    // back; 9df8fbff rolled the callback back regardless, and so does this.
+  it('a throwing callback refuses rollback over a later observer write', async () => {
+    // Deliberate correction of the 9df8fbff compatibility characterization,
+    // as v15 corrected it in cf98697a: callback failure cannot authorize
+    // overwriting a later writer (L4). The window-based refusal is still
+    // post-callback only; what changed is order. The observer's write used to
+    // receive an OLDER turn id than the transaction it observed, so the
+    // dependency plan could not see it (transaction-reentrant-order.spec.ts).
+    // v16 keeps pending authority and hands back recovery rather than v15's
+    // record-as-committed containment.
     type Row = { id: string; v: number };
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
@@ -1183,16 +1189,41 @@ describe('failures after the callback returns (16.x)', () => {
     });
     const boom = new Error('boom');
     try {
-      expect(() =>
+      let failure: unknown;
+      try {
         tree.transact(() => {
           tree.$.rows.updateOne('A', { v: 1 });
           throw boom;
-        })
-      ).toThrow(boom);
+        });
+      } catch (error) {
+        failure = error;
+      }
+      expect(failure).toMatchObject({
+        code: 'SIGNALTREE_ROLLBACK_FAILED',
+        cause: { kind: 'later-confirmed-dependency' },
+      });
+      const recovery = (
+        failure as {
+          recovery?: {
+            transaction: { confirm(): void };
+            callbackFailed: boolean;
+            callbackError: unknown;
+          };
+        }
+      ).recovery;
+      expect(recovery?.callbackFailed).toBe(true);
+      expect(recovery?.callbackError).toBe(boom);
       await flush();
-      // Compatibility characterization, NOT a safety assertion: this path
-      // still overwrites the observer's later v=5 with the baseline.
-      expect(tree.$.rows.byIdOrFail('A')().v).toBe(0);
+      expect(tree.$.rows.byIdOrFail('A')().v).toBe(5);
+      expect(peekInternalTransactionRuntime(tree)?.getPendingTurnCount()).toBe(
+        1
+      );
+      expect(hasOpenCommitScope(tree as object)).toBe(true);
+      recovery?.transaction.confirm();
+      expect(peekInternalTransactionRuntime(tree)?.getPendingTurnCount()).toBe(
+        0
+      );
+      expect(hasOpenCommitScope(tree as object)).toBe(false);
     } finally {
       off();
       tree.destroy();
