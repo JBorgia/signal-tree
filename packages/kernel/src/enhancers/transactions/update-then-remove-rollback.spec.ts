@@ -212,7 +212,7 @@ describe.each(Object.entries(configurations))(
           await flush();
           pending.rollback();
           await flush();
-          expect(state(tree)).toEqual(SEEDED);
+          expect(state(tree)).toStrictEqual(SEEDED);
         } finally {
           tree.destroy();
         }
@@ -257,10 +257,10 @@ describe.each([
         const after = state(tree);
         tree.undo();
         await flush();
-        expect(state(tree)).toEqual(SEEDED);
+        expect(state(tree)).toStrictEqual(SEEDED);
         tree.redo();
         await flush();
-        expect(state(tree)).toEqual(after);
+        expect(state(tree)).toStrictEqual(after);
       } finally {
         tree.destroy();
       }

@@ -214,8 +214,10 @@ export function placeFieldReversalsAfterReAdds<T extends ReversalEffect>(
     if (effect.structural === 'add' && effect.subjectId !== undefined) {
       const scope = scopeOf(effect);
       appendAll(ordered, reAdded.get(scope) ?? []);
-      // Neither caller re-adds one scope twice today; if one ever does, its
-      // followers still go out once, after the FIRST re-add.
+      // Unreachable today: neither caller re-adds one scope twice. If one ever
+      // does, ALL of that scope's followers are consolidated after its FIRST
+      // re-add, whatever their capture position — a follower captured after
+      // the second re-add is emitted before it — and none is emitted twice.
       reAdded.set(scope, []);
     }
   }

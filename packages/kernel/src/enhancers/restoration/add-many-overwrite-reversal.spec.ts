@@ -134,7 +134,7 @@ describe.each([
       await flush();
       tree.undo();
       await flush();
-      expect(tree.$.rows.all()).toEqual([{ id: 'a', n: 1 }]);
+      expect(tree.$.rows.all()).toStrictEqual([{ id: 'a', n: 1 }]);
     } finally {
       tree.destroy();
     }
@@ -148,16 +148,16 @@ describe.each([
         await seed(tree);
         undoable(() => act(tree));
         await flush();
-        expect(tree.$.rows.all()).toEqual(after);
+        expect(tree.$.rows.all()).toStrictEqual(after);
         tree.undo();
         await flush();
-        expect(tree.$.rows.all()).toEqual(SEEDED);
+        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
         tree.redo();
         await flush();
-        expect(tree.$.rows.all()).toEqual(after);
+        expect(tree.$.rows.all()).toStrictEqual(after);
         tree.undo();
         await flush();
-        expect(tree.$.rows.all()).toEqual(SEEDED);
+        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
       } finally {
         tree.destroy();
       }
@@ -174,14 +174,14 @@ describe.each([
       await flush();
       tree.undo();
       await flush();
-      expect(tree.$.rows.all()).toEqual([
+      expect(tree.$.rows.all()).toStrictEqual([
         { id: 'z', n: 0 },
         { id: 'a', n: 9 },
         { id: 'c', n: 3 },
       ]);
       tree.undo();
       await flush();
-      expect(tree.$.rows.all()).toEqual(SEEDED);
+      expect(tree.$.rows.all()).toStrictEqual(SEEDED);
     } finally {
       tree.destroy();
     }
@@ -203,13 +203,13 @@ describe.each([
       );
       await flush();
       const after = tree.$.rows.all();
-      expect(after).toEqual([...SEEDED, { id: 'b', n: 2 }]);
+      expect(after).toStrictEqual([...SEEDED, { id: 'b', n: 2 }]);
       tree.undo();
       await flush();
-      expect(tree.$.rows.all()).toEqual(SEEDED);
+      expect(tree.$.rows.all()).toStrictEqual(SEEDED);
       tree.redo();
       await flush();
-      expect(tree.$.rows.all()).toEqual(after);
+      expect(tree.$.rows.all()).toStrictEqual(after);
     } finally {
       tree.destroy();
     }
@@ -227,7 +227,7 @@ describe.each([
         ])
       ).toThrow('Entity with id a already exists');
       await flush();
-      expect(tree.$.rows.all()).toEqual(SEEDED);
+      expect(tree.$.rows.all()).toStrictEqual(SEEDED);
       expect(tree.canUndo()).toBe(before);
     } finally {
       tree.destroy();
@@ -242,10 +242,10 @@ describe.each([
       await flush();
       tree.undo();
       await flush();
-      expect(tree.$.rows.all()).toEqual(SEEDED);
+      expect(tree.$.rows.all()).toStrictEqual(SEEDED);
       tree.redo();
       await flush();
-      expect(tree.$.rows.all()).toEqual([...SEEDED, { id: 'b', n: 2 }]);
+      expect(tree.$.rows.all()).toStrictEqual([...SEEDED, { id: 'b', n: 2 }]);
     } finally {
       tree.destroy();
     }
@@ -265,10 +265,10 @@ describe.each([
         await seed(tree);
         const pending = tree.transaction(() => act(tree));
         await flush();
-        expect(tree.$.rows.all()).toEqual(after);
+        expect(tree.$.rows.all()).toStrictEqual(after);
         pending.rollback();
         await flush();
-        expect(tree.$.rows.all()).toEqual(SEEDED);
+        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
       } finally {
         tree.destroy();
       }
@@ -291,7 +291,7 @@ describe.each([
       await flush();
       pending.rollback();
       await flush();
-      expect(tree.$.rows.all()).toEqual(SEEDED);
+      expect(tree.$.rows.all()).toStrictEqual(SEEDED);
     } finally {
       tree.destroy();
     }
@@ -305,7 +305,7 @@ describe.each([
       await flush();
       pending.rollback();
       await flush();
-      expect(tree.$.rows.all()).toEqual(SEEDED);
+      expect(tree.$.rows.all()).toStrictEqual(SEEDED);
     } finally {
       tree.destroy();
     }
@@ -331,9 +331,9 @@ describe('addMany overwrite forward behaviour (control)', () => {
           { mode: 'overwrite' }
         );
         await flush();
-        expect(ids).toEqual(['a', 'x']);
-        expect(tree.$.rows.ids()).toEqual(['z', 'a', 'c', 'x']);
-        expect(tree.$.rows.byId('a')?.()).toEqual({ id: 'a', n: 9 });
+        expect(ids).toStrictEqual(['a', 'x']);
+        expect(tree.$.rows.ids()).toStrictEqual(['z', 'a', 'c', 'x']);
+        expect(tree.$.rows.byId('a')?.()).toStrictEqual({ id: 'a', n: 9 });
       } finally {
         tree.destroy();
       }

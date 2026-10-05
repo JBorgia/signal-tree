@@ -2,17 +2,24 @@ import { describe, expect, it } from 'vitest';
 import { signalTree } from '../../lib/signal-tree';
 import { entityMap } from '../../lib/markers/entity-map';
 import { undoable } from '../../lib/undoable';
+import { SignalTreeRollbackError } from '../../lib/types';
 import { transactions } from '../transactions/transactions';
 import { restoration } from './restoration';
 
 /**
  * TRACKING — reversal failures that are PRE-EXISTING ON npm 15.4.3 and are not
- * fixed by the update-then-remove / addMany-overwrite repairs. Each is written
- * as the CORRECT behaviour and marked `it.fails`, so this file stays green
- * while the defect stands and turns RED the moment one is fixed — at which
- * point flip that case to `it` and move it to a carrier file.
+ * fixed by the update-then-remove / addMany-overwrite repairs. Found while
+ * probing those repairs; reproduced identically on d63166c9.
  *
- * Found while probing those repairs; reproduced identically on d63166c9.
+ * Each limitation is a PAIR:
+ *
+ * - `... — current behaviour` is an ordinary passing test that pins the
+ *   SPECIFIC failure today (the exact error, or the exact wrong state), so an
+ *   unrelated throw, a typo or a different regression cannot hide behind the
+ *   tracking test. It is EXPECTED TO START FAILING when the defect is fixed;
+ *   delete it then.
+ * - `... — desired` states the correct behaviour and is marked `it.fails`.
+ *   It turns red when the defect is fixed; flip it to `it` then.
  */
 type Row = { id: string; n: number };
 const flush = async () => {
@@ -39,6 +46,14 @@ const seed = async (tree: Tree) => {
   for (const row of SEEDED) tree.$.rows.addOne({ ...row });
   await flush();
 };
+const thrownBy = (run: () => void): unknown => {
+  try {
+    run();
+  } catch (error) {
+    return error;
+  }
+  throw new Error('expected a throw, none happened');
+};
 
 const undoConfigurations = [
   ['restoration()', () => [restoration()]],
@@ -51,73 +66,151 @@ const rollbackConfigurations = [
   ['restoration(), transactions()', () => [restoration(), transactions()]],
 ] as const;
 
+// ── updateOne then clear: undo order ─────────────────────────────────────────
+// The notifier batches by path, so the removal of `rows.a` is delivered in the
+// slot of the earlier `rows.a` update; the turn's removals are out of order
+// and the restore anchoring depends on it. Values come back right.
+const updateThenClear = (tree: Tree) =>
+  undoable(() => {
+    tree.$.rows.updateOne('a', { n: 2 });
+    tree.$.rows.clear();
+  });
+
+// ── changeId, updateOne, removeOne: undo throws ──────────────────────────────
+// The rekey-then-remove composition keeps the rekey's earlier slot, so the
+// reversed turn reverses the field before the row is back.
+const changeIdUpdateRemove = (tree: Tree) =>
+  undoable(() => {
+    tree.$.rows.changeId('a', 'a2');
+    tree.$.rows.updateOne('a2', { n: 2 });
+    tree.$.rows.removeOne('a2');
+  });
+
+// ── add x and y, update x, removeMany a and c: redo throws ───────────────────
+const addUpdateRemoveMany = (tree: Tree) => {
+  tree.$.rows.addOne({ id: 'x', n: 1 });
+  tree.$.rows.addOne({ id: 'y', n: 1 });
+  tree.$.rows.updateOne('x', { n: 9 });
+  tree.$.rows.removeMany(['a', 'c']);
+};
+const ADDED_AND_REMOVED: Row[] = [
+  { id: 'z', n: 0 },
+  { id: 'x', n: 9 },
+  { id: 'y', n: 1 },
+];
+
 describe.each(undoConfigurations)(
-  'known pre-existing undo/redo failures (%s)',
+  'known pre-existing undo/redo limitations (%s)',
   (_name, enhancers) => {
-    // PRE-EXISTING ON 15.4.3. Values come back right, ORDER does not:
-    // [a, c, z]. The notifier batches by path, so the removal of `rows.a` is
-    // delivered in the slot of the earlier `rows.a` update; the turn's
-    // removals are then out of order and the restore anchoring depends on it.
-    it.fails('updateOne then clear: undo restores the order', async () => {
+    it('KNOWN LIMITATION (pre-existing on 15.4.3): updateOne then clear — current behaviour: undo restores [a, c, z]', async () => {
       const tree = make(enhancers());
       try {
         await seed(tree);
-        undoable(() => {
-          tree.$.rows.updateOne('a', { n: 2 });
-          tree.$.rows.clear();
-        });
+        updateThenClear(tree);
         await flush();
         tree.undo();
         await flush();
-        expect(tree.$.rows.all()).toEqual(SEEDED);
+        expect(tree.$.rows.all()).toStrictEqual([
+          { id: 'a', n: 1 },
+          { id: 'c', n: 3 },
+          { id: 'z', n: 0 },
+        ]);
       } finally {
         tree.destroy();
       }
     });
 
-    // PRE-EXISTING ON 15.4.3. Undo throws "Unsupported scoped undo effect at
-    // structural-drift": the rekey-then-remove composition keeps the rekey's
-    // earlier slot, so the reversed turn reverses the field before the row is
-    // back.
-    it.fails('changeId, updateOne, removeOne: undo restores', async () => {
-      const tree = make(enhancers());
-      try {
-        await seed(tree);
-        undoable(() => {
-          tree.$.rows.changeId('a', 'a2');
-          tree.$.rows.updateOne('a2', { n: 2 });
-          tree.$.rows.removeOne('a2');
-        });
-        await flush();
-        tree.undo();
-        await flush();
-        expect(tree.$.rows.all()).toEqual(SEEDED);
-      } finally {
-        tree.destroy();
-      }
-    });
-
-    // PRE-EXISTING ON 15.4.3. Undo is correct; redo throws "Collection
-    // structural target has no live placement anchor".
     it.fails(
-      'add x and y, update x, removeMany a and c: redo reapplies',
+      'KNOWN LIMITATION (pre-existing on 15.4.3): updateOne then clear — desired: undo restores [z, a, c]',
       async () => {
         const tree = make(enhancers());
         try {
           await seed(tree);
-          undoable(() => {
-            tree.$.rows.addOne({ id: 'x', n: 1 });
-            tree.$.rows.addOne({ id: 'y', n: 1 });
-            tree.$.rows.updateOne('x', { n: 9 });
-            tree.$.rows.removeMany(['a', 'c']);
-          });
+          updateThenClear(tree);
           await flush();
-          const after = tree.$.rows.all();
+          tree.undo();
+          await flush();
+          expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
+
+    it('KNOWN LIMITATION (pre-existing on 15.4.3): changeId, updateOne, removeOne — current behaviour: undo refuses as structural drift and changes nothing', async () => {
+      const tree = make(enhancers());
+      try {
+        await seed(tree);
+        changeIdUpdateRemove(tree);
+        await flush();
+        const error = thrownBy(() => tree.undo());
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toBe(
+          'Unsupported scoped undo effect at structural-drift'
+        );
+        await flush();
+        expect(tree.$.rows.all()).toStrictEqual([
+          { id: 'z', n: 0 },
+          { id: 'c', n: 3 },
+        ]);
+        expect(tree.canUndo()).toBe(true);
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    it.fails(
+      'KNOWN LIMITATION (pre-existing on 15.4.3): changeId, updateOne, removeOne — desired: undo restores',
+      async () => {
+        const tree = make(enhancers());
+        try {
+          await seed(tree);
+          changeIdUpdateRemove(tree);
+          await flush();
+          tree.undo();
+          await flush();
+          expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
+
+    it('KNOWN LIMITATION (pre-existing on 15.4.3): add x and y, update x, removeMany — current behaviour: undo is right, redo throws "no live placement anchor" and changes nothing', async () => {
+      const tree = make(enhancers());
+      try {
+        await seed(tree);
+        undoable(() => addUpdateRemoveMany(tree));
+        await flush();
+        tree.undo();
+        await flush();
+        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+        const error = thrownBy(() => tree.redo());
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toBe(
+          'Collection structural target has no live placement anchor'
+        );
+        await flush();
+        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+        expect(tree.canRedo()).toBe(true);
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    it.fails(
+      'KNOWN LIMITATION (pre-existing on 15.4.3): add x and y, update x, removeMany — desired: redo reapplies',
+      async () => {
+        const tree = make(enhancers());
+        try {
+          await seed(tree);
+          undoable(() => addUpdateRemoveMany(tree));
+          await flush();
           tree.undo();
           await flush();
           tree.redo();
           await flush();
-          expect(tree.$.rows.all()).toEqual(after);
+          expect(tree.$.rows.all()).toStrictEqual(ADDED_AND_REMOVED);
         } finally {
           tree.destroy();
         }
@@ -125,53 +218,77 @@ describe.each(undoConfigurations)(
     );
   }
 );
+
+// ── Declarative rollback of add-then-update refuses ──────────────────────────
+// The declarative rollback target applies the field reversal of a row created
+// in the turn AFTER that row's removal ("Value effect has no active subject"):
+// the mirror of update-then-remove. The reversal must precede the removal, or
+// be dropped as the pending planner does.
+const removeReAddUpdate = (tree: Tree) => {
+  tree.$.rows.removeOne('a');
+  tree.$.rows.addOne({ id: 'a', n: 5 });
+  tree.$.rows.updateOne('a', { n: 6 });
+};
+const REMOVED_READDED_UPDATED: Row[] = [
+  { id: 'z', n: 0 },
+  { id: 'c', n: 3 },
+  { id: 'a', n: 6 },
+];
+const ROLLBACK_REFUSAL =
+  /^SignalTree could not rollback the pending transaction: compensating turn \d+ failed validation — Value effect has no active subject \d+ in owner \d+ \[effect-validation-failed\]$/;
 
 describe.each(rollbackConfigurations)(
-  'known pre-existing rollback failures (%s)',
+  'known pre-existing rollback limitations (%s)',
   (_name, enhancers) => {
-    // PRE-EXISTING ON 15.4.3. The declarative rollback target applies the
-    // field reversal of a row created in the turn AFTER that row's removal
-    // and refuses with "Value effect has no active subject" (the mirror of
-    // update-then-remove: the reversal must precede the removal, or be
-    // dropped as the pending planner does).
-    it.fails(
-      'removeOne a, re-add a, updateOne a: rollback restores',
-      async () => {
+    it.each([
+      [
+        'removeOne a, re-add a, updateOne a',
+        removeReAddUpdate,
+        REMOVED_READDED_UPDATED,
+      ],
+      [
+        'add x and y, update x, removeMany a and c',
+        addUpdateRemoveMany,
+        ADDED_AND_REMOVED,
+      ],
+    ] as const)(
+      'KNOWN LIMITATION (pre-existing on 15.4.3): %s — current behaviour: rollback refuses ("Value effect has no active subject") and changes nothing',
+      async (_case, act, during) => {
         const tree = make(enhancers());
         try {
           await seed(tree);
-          const pending = tree.transaction(() => {
-            tree.$.rows.removeOne('a');
-            tree.$.rows.addOne({ id: 'a', n: 5 });
-            tree.$.rows.updateOne('a', { n: 6 });
-          });
+          const pending = tree.transaction(() => act(tree));
           await flush();
-          pending.rollback();
+          const error = thrownBy(() => pending.rollback());
+          expect(error).toBeInstanceOf(SignalTreeRollbackError);
+          expect((error as SignalTreeRollbackError).message).toMatch(
+            ROLLBACK_REFUSAL
+          );
+          expect((error as { code?: string }).code).toBe(
+            'SIGNALTREE_ROLLBACK_FAILED'
+          );
           await flush();
-          expect(tree.$.rows.all()).toEqual(SEEDED);
+          expect(tree.$.rows.all()).toStrictEqual(during);
         } finally {
           tree.destroy();
         }
       }
     );
 
-    // PRE-EXISTING ON 15.4.3, same cause as above.
-    it.fails(
-      'add x and y, update x, removeMany a and c: rollback restores',
-      async () => {
+    it.fails.each([
+      ['removeOne a, re-add a, updateOne a', removeReAddUpdate],
+      ['add x and y, update x, removeMany a and c', addUpdateRemoveMany],
+    ] as const)(
+      'KNOWN LIMITATION (pre-existing on 15.4.3): %s — desired: rollback restores',
+      async (_case, act) => {
         const tree = make(enhancers());
         try {
           await seed(tree);
-          const pending = tree.transaction(() => {
-            tree.$.rows.addOne({ id: 'x', n: 1 });
-            tree.$.rows.addOne({ id: 'y', n: 1 });
-            tree.$.rows.updateOne('x', { n: 9 });
-            tree.$.rows.removeMany(['a', 'c']);
-          });
+          const pending = tree.transaction(() => act(tree));
           await flush();
           pending.rollback();
           await flush();
-          expect(tree.$.rows.all()).toEqual(SEEDED);
+          expect(tree.$.rows.all()).toStrictEqual(SEEDED);
         } finally {
           tree.destroy();
         }
@@ -180,6 +297,9 @@ describe.each(rollbackConfigurations)(
   }
 );
 
+// ── Undo of a replacement that drops an OBJECT-valued field ──────────────────
+// Found while probing the repairs, not on the original list. A primitive field
+// undoes correctly, and transactions() rollback restores both.
 type NestedRow = { id: string; n: number; nest?: { x: number } };
 const nestedDeclaration = () => ({
   rows: entityMap<NestedRow, string>({ selectId: (row) => row.id }),
@@ -189,29 +309,52 @@ const typedNested = () =>
     enhancers: [transactions(), restoration()],
   });
 type NestedTree = ReturnType<typeof typedNested>;
+const makeNested = (enhancers: readonly unknown[]): NestedTree =>
+  signalTree(nestedDeclaration(), {
+    enhancers: enhancers as never,
+  }) as unknown as NestedTree;
+const dropObjectField = async (tree: NestedTree) => {
+  tree.$.rows.addOne({ id: 'a', n: 1, nest: { x: 1 } });
+  await flush();
+  undoable(() => tree.$.rows.replaceOne('a', { id: 'a', n: 2 }));
+  await flush();
+};
 
 describe.each(undoConfigurations)(
-  'known pre-existing undo failure: object-valued field (%s)',
+  'known pre-existing undo limitation: object-valued field (%s)',
   (_name, enhancers) => {
-    // PRE-EXISTING ON 15.4.3 (found while probing the repairs, not on the
-    // original list). Undo of a replacement that DROPS an object-valued field
-    // throws "Unsupported scoped undo effect at rows.a.nest"; a primitive field
-    // undoes correctly, and transactions() rollback restores both.
-    it.fails('replaceOne dropping an object field: undo restores', async () => {
-      const tree = signalTree(nestedDeclaration(), {
-        enhancers: enhancers() as never,
-      }) as unknown as NestedTree;
+    it('KNOWN LIMITATION (pre-existing on 15.4.3): replaceOne dropping an object field — current behaviour: undo refuses at the field and changes nothing', async () => {
+      const tree = makeNested(enhancers());
       try {
-        tree.$.rows.addOne({ id: 'a', n: 1, nest: { x: 1 } });
+        await dropObjectField(tree);
+        const error = thrownBy(() => tree.undo());
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toBe(
+          'Unsupported scoped undo effect at rows.a.nest'
+        );
         await flush();
-        undoable(() => tree.$.rows.replaceOne('a', { id: 'a', n: 2 }));
-        await flush();
-        tree.undo();
-        await flush();
-        expect(tree.$.rows.all()).toEqual([{ id: 'a', n: 1, nest: { x: 1 } }]);
+        expect(tree.$.rows.all()).toStrictEqual([{ id: 'a', n: 2 }]);
+        expect(tree.canUndo()).toBe(true);
       } finally {
         tree.destroy();
       }
     });
+
+    it.fails(
+      'KNOWN LIMITATION (pre-existing on 15.4.3): replaceOne dropping an object field — desired: undo restores',
+      async () => {
+        const tree = makeNested(enhancers());
+        try {
+          await dropObjectField(tree);
+          tree.undo();
+          await flush();
+          expect(tree.$.rows.all()).toStrictEqual([
+            { id: 'a', n: 1, nest: { x: 1 } },
+          ]);
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
   }
 );
