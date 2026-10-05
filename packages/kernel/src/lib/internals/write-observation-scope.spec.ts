@@ -296,7 +296,53 @@ describe('write observation declaration scopes', () => {
       frames.find((frame) => frame.ownerId === ownerB)?.declaredScopes
     ).toBeUndefined();
   });
-  it('preserves owner and declarations when mixed metadata is deliberately discarded', () => {
+  it('preserves owner and declarations when coalescible metadata is deliberately discarded', () => {
+    // Declaration retention is independent of metadata agreement. Different
+    // origins now form semantic boundaries; unspecified/replace intent still
+    // coalesces and exercises the metadata-discard path this test protects.
+    const metadata: unknown[] = [];
+    cleanup.push(
+      notifier.subscribe(
+        'count',
+        (_v, _p, _path, _owner, _origin, _subjects, _positions, meta) => {
+          metadata.push(meta);
+        }
+      )
+    );
+    withWriteObservationScope(101, 'a', () =>
+      notifier.notify('count', 1, 0, 'count', undefined, [1], {}, 101)
+    );
+    withWriteObservationScope(101, 'b', () =>
+      notifier.notify(
+        'count',
+        2,
+        1,
+        'count',
+        undefined,
+        [1],
+        { mutationIntent: 'replace' },
+        101
+      )
+    );
+    notifier.flushSync();
+    expect(metadata).toEqual([undefined]);
+    expect(frames).toHaveLength(1);
+    expect(frames[0]).toMatchObject({
+      ownerId: 101,
+      origin: undefined,
+      before: 0,
+      after: 2,
+      declaredScopes: {
+        tokens: ['a', 'b'],
+        includesUnscoped: false,
+        omitted: false,
+      },
+    });
+    expect(frames[0]?.participation).toBeUndefined();
+    expect(frames[0]?.transactionId).toBeUndefined();
+  });
+
+  it('preserves each declaration when different origins require separate frames', () => {
     withWriteObservationScope(101, 'a', () =>
       notifier.notify(
         'count',
@@ -322,19 +368,29 @@ describe('write observation declaration scopes', () => {
       )
     );
     notifier.flushSync();
-    expect(frames).toHaveLength(1);
-    expect(frames[0]).toMatchObject({
-      ownerId: 101,
-      origin: 'mixed',
-      before: 0,
-      after: 2,
-      declaredScopes: {
-        tokens: ['a', 'b'],
-        includesUnscoped: false,
-        omitted: false,
+    expect(frames).toMatchObject([
+      {
+        ownerId: 101,
+        origin: 'external',
+        before: 0,
+        after: 1,
+        declaredScopes: {
+          tokens: ['a'],
+          includesUnscoped: false,
+          omitted: false,
+        },
       },
-    });
-    expect(frames[0]?.participation).toBeUndefined();
-    expect(frames[0]?.transactionId).toBeUndefined();
+      {
+        ownerId: 101,
+        origin: 'restoration',
+        before: 1,
+        after: 2,
+        declaredScopes: {
+          tokens: ['b'],
+          includesUnscoped: false,
+          omitted: false,
+        },
+      },
+    ]);
   });
 });

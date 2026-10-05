@@ -56,6 +56,7 @@ import {
   type OrdinaryConstructionAuthority,
   type OrdinaryStateMaterializer,
 } from './internals/materialize-markers';
+import { captureBranchMembershipIfObserved } from './internals/path-observation-port';
 import { installDormantObservation } from './internals/observation-substrate';
 import { terminateOwnerInvalidation } from './internals/owner-invalidation-port';
 import { defineRootTree } from './internals/root-source';
@@ -935,6 +936,13 @@ function recursiveUpdate(
     ? (target as unknown as Record<string, unknown>)
     : (target as Record<string, unknown>);
 
+  const publishMembership = reconcileMembership
+    ? captureBranchMembershipIfObserved(
+        (targetObj as Record<symbol, object>)[NODE_ACCESSOR_PEER] ?? targetObj,
+        updates
+      )
+    : undefined;
+
   for (const [key, rawValue] of Object.entries(
     updates as Record<string, unknown>
   )) {
@@ -1023,7 +1031,7 @@ function recursiveUpdate(
       // location for the value without enrolling the write path as a reactive
       // consumer.
       const current = readWritableCell(sig);
-      if (current === value) {
+      if (current === value && !isDormantMember(sig)) {
         // Dev-mode footgun guard: a merge write whose value is reference-
         // identical to the current value is a no-op. For objects/arrays this
         // almost always means the caller mutated the value in place and re-set
@@ -1153,6 +1161,7 @@ function recursiveUpdate(
   // already depend on are what carries it — no new reactive state exists, and
   // no first-transition problem, because that dependency edge was established on
   // each leaf's FIRST computation.
+  publishMembership?.();
   if (membershipChanged.length > 0) {
     republishMembers(targetObj, membershipChanged);
   }
@@ -1814,7 +1823,9 @@ function create<T extends object>(
           }
         }
         cleanupFns.length = 0;
-        releaseContainedReportBudget(materializationContext.positionRegistry.id);
+        releaseContainedReportBudget(
+          materializationContext.positionRegistry.id
+        );
       }
       if (config.debugMode) {
         console.log(SIGNAL_TREE_MESSAGES.TREE_DESTROYED);

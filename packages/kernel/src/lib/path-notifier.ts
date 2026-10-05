@@ -18,12 +18,20 @@ import {
 } from './internals/write-observation-scope';
 import {
   isRestorationDesignated,
+  isMetaDesignated,
   markMetaDesignated,
 } from './internals/restoration-eligibility';
 
 import { getWriteParticipation } from './write-participation';
 
-import { installPathDeliveryRuntime } from './internals/path-observation-port';
+import {
+  installPathDeliveryRuntime,
+  installBranchMembershipCapture,
+} from './internals/path-observation-port';
+import {
+  capturePlainBranchMembership,
+  plainBranchMembershipChange,
+} from './internals/plain-branch-membership';
 import { reportContainedObserverError } from './internals/error-reporter';
 import type { TreeId } from './internals/position-registry';
 import type { WriteMetadata } from './mutation-types';
@@ -135,6 +143,7 @@ export class PathNotifier {
   private batchIdentityMode: BatchIdentityMode = 'path-position-subject';
   private pendingFlush = false;
   private pending = new Map<string, PendingSlot>();
+  private pendingBeforeMembership: PendingSlot[] = [];
   private flushCallbacks = new Set<() => void>();
   private enqueueObservers = new Map<
     number,
@@ -461,11 +470,15 @@ export class PathNotifier {
    */
   private flush(): void {
     // Snapshot and clear before notifying to allow re-entrant behavior
-    const toNotify = new Map(this.pending);
+    const toNotify = [
+      ...this.pendingBeforeMembership,
+      ...this.pending.values(),
+    ];
+    this.pendingBeforeMembership = [];
     this.pending.clear();
     this.pendingFlush = false;
 
-    for (const slot of toNotify.values()) {
+    for (const slot of toNotify) {
       const entries = Array.isArray(slot) ? slot : [slot];
       for (const entry of entries) {
         const isOwnerOnlyMarkerSignal =
@@ -515,9 +528,9 @@ export class PathNotifier {
    */
   flushSync(): void {
     // Process until no pending notifications exist
-    while (this.pending.size > 0 || this.pendingFlush) {
+    while (this.hasPending() || this.pendingFlush) {
       // If a pendingFlush was scheduled but not yet processed, clear flag and process
-      if (this.pendingFlush && this.pending.size === 0) {
+      if (this.pendingFlush && !this.hasPending()) {
         // nothing queued - clear and continue
         this.pendingFlush = false;
         break;
@@ -538,13 +551,14 @@ export class PathNotifier {
    * Include net-equal entries: an ABA write still changed ownership.
    */
   readPending(): readonly Readonly<PendingEntry>[] {
-    return [...this.pending.values()].flatMap((slot) =>
-      (Array.isArray(slot) ? slot : [slot]).map((entry) => ({
-        ...entry,
-        subjectFieldKeys: entry.subjectFieldKeys
-          ? [...entry.subjectFieldKeys]
-          : undefined,
-      }))
+    return [...this.pendingBeforeMembership, ...this.pending.values()].flatMap(
+      (slot) =>
+        (Array.isArray(slot) ? slot : [slot]).map((entry) => ({
+          ...entry,
+          subjectFieldKeys: entry.subjectFieldKeys
+            ? [...entry.subjectFieldKeys]
+            : undefined,
+        }))
     );
   }
 
@@ -552,7 +566,7 @@ export class PathNotifier {
    * Check if there are pending notifications
    */
   hasPending(): boolean {
-    return this.pending.size > 0;
+    return this.pending.size > 0 || this.pendingBeforeMembership.length > 0;
   }
 
   /**
@@ -575,6 +589,16 @@ export class PathNotifier {
   }
 
   private enqueuePending(entry: PendingEntry): void {
+    if (plainBranchMembershipChange(entry.meta)) {
+      // Membership is a chronological barrier across paths. Keep queued
+      // descendant writes on the side of the transition where they occurred.
+      for (const slot of this.pending.values())
+        this.pendingBeforeMembership.push(slot);
+      this.pendingBeforeMembership.push(entry);
+      this.pending.clear();
+      return;
+    }
+
     const path = entry.path;
     const existing = this.pending.get(path);
     if (!existing) {
@@ -658,7 +682,10 @@ export class PathNotifier {
     // too. Entries from emitters that do not supply one both carry `undefined`
     // and compare exactly as they did before — the fix cannot make a
     // single-tree case newly distinct.
-    if (left.ownerId !== right.ownerId) {
+    if (
+      (left.ownerId ?? left.meta?.ownerId) !==
+      (right.ownerId ?? right.meta?.ownerId)
+    ) {
       return false;
     }
 
@@ -723,7 +750,10 @@ export class PathNotifier {
     right: PendingEntry
   ): boolean {
     return (
-      getWriteParticipation(left.meta) !== getWriteParticipation(right.meta)
+      getWriteParticipation(left.meta) !== getWriteParticipation(right.meta) ||
+      left.origin !== right.origin ||
+      left.meta?.transactionId !== right.meta?.transactionId ||
+      left.meta?.transactionOwner !== right.meta?.transactionOwner
     );
   }
 
@@ -789,13 +819,15 @@ export class PathNotifier {
     ) {
       return undefined;
     }
-    if (left.structuralEffect && !right.structuralEffect) {
-      return {
-        ...right,
-        structuralEffect: left.structuralEffect,
-      };
-    }
-    return right;
+    const merged =
+      left.structuralEffect && !right.structuralEffect
+        ? { ...right, structuralEffect: left.structuralEffect }
+        : right;
+    // Consistent attribution permits coalescing values, but eligibility belongs
+    // to the entire authored turn: a later undesignated write cannot erase it.
+    return isMetaDesignated(left)
+      ? { ...merged, ...markMetaDesignated(undefined) }
+      : merged;
   }
 
   private getCompositeBatchKey(entry: PendingEntry): string {
@@ -811,6 +843,7 @@ export class PathNotifier {
   clear(): void {
     this.subscribers.clear();
     this.pending.clear();
+    this.pendingBeforeMembership = [];
     // Note: do NOT clear flush callbacks here. Enhancers may have
     // registered onFlush listeners that should survive a runtime reset
     // (e.g., resetPathNotifier) to avoid losing subscriptions silently.
@@ -867,6 +900,7 @@ export function getPathNotifier(): PathNotifier {
   // delivery implementation tree-shake out of a subscriber-less bundle.
   // Re-installing the same singleton keeps ONE DELIVERY AUTHORITY.
   installPathDeliveryRuntime(globalPathNotifier);
+  installBranchMembershipCapture(capturePlainBranchMembership);
   return globalPathNotifier;
 }
 

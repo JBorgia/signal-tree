@@ -1,3 +1,11 @@
+import {
+  plainBranchMembershipEffects,
+  plainBranchMembershipChange,
+  composePlainBranchMemberEffect,
+  plainBranchMemberEffectIsNoop,
+  preparePlainBranchMembers,
+} from '../../lib/internals/plain-branch-membership';
+import type { PlainBranchMemberPresence } from '../../lib/internals/plain-branch-membership';
 import { applicationFailureCause } from '../../lib/internals/causal-runtime/post-application-failure';
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
 import {
@@ -89,6 +97,7 @@ export type ScalarSetEffect = TurnEffectBase & {
   subject?: number;
   /** Producer-known row-relative address; display paths never encode identity. */
   subjectFieldSegments?: readonly string[];
+  plainBranchMembership?: PlainBranchMemberPresence;
   fieldPresence?: FieldPresence;
   before: unknown;
   after: unknown;
@@ -1536,22 +1545,26 @@ export function getOrCreateInternalTransactionRuntime<T>(
     const existing = effectMap.get(key);
     if (existing) {
       if (existing.kind === 'set' && effect.kind === 'set') {
-        existing.after = effect.after;
-        // Preserve first own-presence before and latest own-presence after.
-        const beforePresent = existing.fieldPresence?.before ?? true;
-        const afterPresent = effect.fieldPresence?.after ?? true;
-        if (beforePresent && afterPresent) delete existing.fieldPresence;
-        else existing.fieldPresence = {
-          before: beforePresent,
-          after: afterPresent,
-        };
+        if (!composePlainBranchMemberEffect(existing, effect)) {
+          existing.after = effect.after;
+          // Preserve first own-presence before and latest own-presence after.
+          const beforePresent = existing.fieldPresence?.before ?? true;
+          const afterPresent = effect.fieldPresence?.after ?? true;
+          if (beforePresent && afterPresent) delete existing.fieldPresence;
+          else
+            existing.fieldPresence = {
+              before: beforePresent,
+              after: afterPresent,
+            };
+        }
         existing.mutationIntent = combineScalarMutationIntent(
           existing.mutationIntent,
           effect.mutationIntent
         );
         if (
-          existing.before === existing.after &&
-          beforePresent === afterPresent
+          plainBranchMemberEffectIsNoop(existing) &&
+          (existing.fieldPresence?.before ?? true) ===
+            (existing.fieldPresence?.after ?? true)
         ) {
           effectMap.delete(key);
         }
@@ -1641,6 +1654,14 @@ export function getOrCreateInternalTransactionRuntime<T>(
     subjectIds?: number[],
     positionIds?: number[]
   ): void => {
+    const membership = plainBranchMembershipEffects(meta);
+    if (membership) {
+      for (const effect of membership) {
+        bucket.positionIds.add(effect.position);
+        enqueueEffect(bucket, effectMap, effect);
+      }
+      return;
+    }
     const structuralEffect = ownerPath
       ? buildTurnEffectFromStructural(
           meta,
@@ -1783,6 +1804,19 @@ export function getOrCreateInternalTransactionRuntime<T>(
     subjectIds?: number[],
     positionIds?: number[]
   ): void => {
+    const membership = plainBranchMembershipEffects(meta);
+    if (membership) {
+      for (const effect of membership) {
+        bucket.positionIds.add(effect.position);
+        bucket.ownerPaths.add(effect.ownerPath);
+        if (pendingTransactions.size > 0) {
+          for (const key of windowKeys([effect.position], undefined))
+            bucket.ownWriteSeq.set(key, windowWriteSeq);
+        }
+        enqueueEffect(bucket, bucket.effects, effect);
+      }
+      return;
+    }
     bucket.ownerPaths.add(ownerPath ?? path);
     for (const subjectId of subjectIds ?? []) {
       bucket.subjectIds.add(subjectId);
@@ -1936,6 +1970,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           after: effect.after,
           subjectId: effect.subject,
           subjectFieldSegments: effect.subjectFieldSegments,
+          plainBranchMembership: effect.plainBranchMembership,
           fieldPresence: effect.fieldPresence,
           path: effect.path,
           ownerPath: effect.ownerPath,
@@ -2001,6 +2036,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
       ...causal,
       before: causal.after,
       after: causal.before,
+      plainBranchMembership: causal.plainBranchMembership
+        ? {
+            before: causal.plainBranchMembership.after,
+            after: causal.plainBranchMembership.before,
+          }
+        : undefined,
       fieldPresence: causal.fieldPresence
         ? {
             before: causal.fieldPresence.after,
@@ -2094,7 +2135,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
     const prepared = prepareDeclarativeTransitionInstallation(
       target,
       bindings,
-      scalarBinding
+      scalarBinding,
+      {
+        prepareTarget: (members) =>
+          preparePlainBranchMembers(tree.$ as object, members),
+      }
     );
     const apply = () => prepared.install();
     const locations = getLocationRuntime(tree.$);
@@ -2349,7 +2394,15 @@ export function getOrCreateInternalTransactionRuntime<T>(
                 treeOwnerId === undefined ||
                 windowOwner === treeOwnerId
               ) {
-                recordWindowWrite(positionIds, subjectIds);
+                const membership = plainBranchMembershipChange(meta);
+                recordWindowWrite(
+                  membership
+                    ? membership.members.flatMap((member) => [
+                        ...(member.positionIds ?? []),
+                      ])
+                    : positionIds,
+                  subjectIds
+                );
               }
             }
             if (origin === 'restoration' || origin === 'transaction-rollback') {
@@ -2558,6 +2611,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
             typeof meta.transactionId === 'number')
         )
           return [];
+        const membership = plainBranchMembershipEffects(meta);
+        if (membership) return [...membership];
         const position = entry.positionIds?.[0];
         if (position === undefined) return [];
         const structural = entry.ownerPath

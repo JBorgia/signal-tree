@@ -18,6 +18,10 @@ export type CollectionTransitionTarget = CollectionTransitionSource;
 export type DeclarativeTransitionTarget = {
   readonly collections: ReadonlyMap<PositionId, CollectionTransitionTarget>;
   readonly scalars: ReadonlyMap<PositionId, unknown>;
+  readonly plainBranchMembers?: ReadonlyMap<
+    PositionId,
+    PlainBranchMemberTransitionTarget
+  >;
 };
 
 export type PreparedCollectionTransitionTarget = {
@@ -40,10 +44,22 @@ export type ScalarTransitionTargetBinding = {
   ): PreparedCollectionTransitionTarget;
 };
 
+export type PlainBranchMemberTransitionTarget = {
+  readonly present: boolean;
+  readonly value: unknown;
+};
+
+export type PlainBranchMemberTransitionTargetBinding = {
+  prepareTarget(
+    target: ReadonlyMap<PositionId, PlainBranchMemberTransitionTarget>
+  ): PreparedCollectionTransitionTarget;
+};
+
 export function prepareDeclarativeTransitionInstallation(
   target: DeclarativeTransitionTarget,
   bindings: ReadonlyMap<PositionId, CollectionTransitionTargetBinding>,
-  scalarBinding?: ScalarTransitionTargetBinding
+  scalarBinding?: ScalarTransitionTargetBinding,
+  memberBinding?: PlainBranchMemberTransitionTargetBinding
 ): { install(): void } {
   const prepared: PreparedCollectionTransitionTarget[] = [];
   for (const [owner, collection] of target.collections) {
@@ -64,6 +80,13 @@ export function prepareDeclarativeTransitionInstallation(
     prepared.push(scalarBinding.prepareTarget(target.scalars));
   }
 
+  if (target.plainBranchMembers?.size) {
+    if (!memberBinding)
+      throw new Error(
+        'Declarative transition has member targets but no member binding'
+      );
+    prepared.push(memberBinding.prepareTarget(target.plainBranchMembers));
+  }
   return {
     install(): void {
       for (const collection of prepared) {
@@ -115,7 +138,10 @@ export function requiresDeclarativeStructuralTarget(
       return false;
     }
     return structural.some((occupying, occupyingIndex) => {
-      if (vacatingIndex === occupyingIndex || vacating.owner !== occupying.owner) {
+      if (
+        vacatingIndex === occupyingIndex ||
+        vacating.owner !== occupying.owner
+      ) {
         return false;
       }
       const occupiedKey =
@@ -130,7 +156,8 @@ export function requiresDeclarativeStructuralTarget(
   }
 
   const additions = structural.filter(
-    (effect) => effect.structural === 'add' && typeof effect.subjectId === 'number'
+    (effect) =>
+      effect.structural === 'add' && typeof effect.subjectId === 'number'
   );
   if (additions.length < 2) {
     const addition = additions[0];
@@ -142,7 +169,8 @@ export function requiresDeclarativeStructuralTarget(
     if (
       readSource &&
       (context?.kind === 'remove' || context?.kind === 'add') &&
-      (context.beforeSubject !== undefined || context.afterSubject !== undefined)
+      (context.beforeSubject !== undefined ||
+        context.afterSubject !== undefined)
     ) {
       const source = readSource(addition.owner);
       return ![context.beforeSubject, context.afterSubject].some(
@@ -202,7 +230,18 @@ export function deriveDeclarativeTransitionTarget(
   }
 
   const scalars = new Map<PositionId, unknown>();
+  const plainBranchMembers = new Map<
+    PositionId,
+    PlainBranchMemberTransitionTarget
+  >();
   for (const effect of options.effects) {
+    if (effect.plainBranchMembership) {
+      plainBranchMembers.set(effect.owner, {
+        present: effect.plainBranchMembership.after,
+        value: effect.after,
+      });
+      continue;
+    }
     if (effect.structural === undefined) {
       applyValueEffect(collections, scalars, effect);
       continue;
@@ -252,10 +291,10 @@ export function deriveDeclarativeTransitionTarget(
           : delta.afterFrontier
         : options.collections.find((source) => source.owner === owner)
             ?.orderFrontier === undefined ||
-            sameSubjects(collection.sourceSubjects, collection.subjects)
-          ? options.collections.find((source) => source.owner === owner)
-              ?.orderFrontier
-          : {},
+          sameSubjects(collection.sourceSubjects, collection.subjects)
+        ? options.collections.find((source) => source.owner === owner)
+            ?.orderFrontier
+        : {},
     });
   }
 
@@ -265,7 +304,11 @@ export function deriveDeclarativeTransitionTarget(
     }
   }
 
-  return { collections: targets, scalars };
+  return {
+    collections: targets,
+    scalars,
+    ...(plainBranchMembers.size ? { plainBranchMembers } : {}),
+  };
 }
 
 export function deriveCollectionOrderDelta(
@@ -519,12 +562,14 @@ function deriveStructuralTargetOrder(
         context.beforeSubject !== undefined &&
         order.includes(context.beforeSubject);
       const afterLive =
-        context.afterSubject !== undefined && order.includes(context.afterSubject);
+        context.afterSubject !== undefined &&
+        order.includes(context.afterSubject);
       if (beforeLive || afterLive) {
         return true;
       }
       const hasNoAnchors =
-        context.beforeSubject === undefined && context.afterSubject === undefined;
+        context.beforeSubject === undefined &&
+        context.afterSubject === undefined;
       if (hasNoAnchors) {
         return true;
       }
@@ -559,7 +604,9 @@ function deriveStructuralTargetOrder(
     const beforeIndex =
       beforeSubject === undefined ? -1 : order.indexOf(beforeSubject);
     if (beforeIndex >= 0 && afterIndex >= 0 && beforeIndex >= afterIndex) {
-      throw new Error('Collection structural target contains contradictory anchors');
+      throw new Error(
+        'Collection structural target contains contradictory anchors'
+      );
     }
     if (afterIndex >= 0) {
       order.splice(afterIndex, 0, subject);
@@ -573,16 +620,22 @@ function deriveStructuralTargetOrder(
       order.push(subject);
       continue;
     }
-    throw new Error('Collection structural target has no live placement anchor');
+    throw new Error(
+      'Collection structural target has no live placement anchor'
+    );
   }
 
   return order;
 }
 
-function derivePendingAnchorOrder(effects: readonly ReversalEffect[]): number[] {
+function derivePendingAnchorOrder(
+  effects: readonly ReversalEffect[]
+): number[] {
   const subjects = effects.map((effect) => effect.subjectId as number);
   const subjectSet = new Set(subjects);
-  const outgoing = new Map(subjects.map((subject) => [subject, new Set<number>()]));
+  const outgoing = new Map(
+    subjects.map((subject) => [subject, new Set<number>()])
+  );
   const indegree = new Map(subjects.map((subject) => [subject, 0]));
   const addEdge = (before: number, after: number): void => {
     const edges = outgoing.get(before);
@@ -613,7 +666,9 @@ function derivePendingAnchorOrder(effects: readonly ReversalEffect[]): number[] 
     }
   }
 
-  const sourceRank = new Map(subjects.map((subject, index) => [subject, index]));
+  const sourceRank = new Map(
+    subjects.map((subject, index) => [subject, index])
+  );
   const ready = subjects.filter((subject) => indegree.get(subject) === 0);
   const result: number[] = [];
   while (ready.length > 0) {

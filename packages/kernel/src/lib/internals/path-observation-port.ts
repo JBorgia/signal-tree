@@ -104,6 +104,32 @@ export function resetPathDeliveryRuntime(): void {
   runtime = undefined;
 }
 
+type BranchMembershipCapture = (
+  branch: object,
+  supplied: object
+) => (() => void) | undefined;
+let branchMembershipCapture: BranchMembershipCapture | undefined;
+
+/**
+ * @internal Installed with the delivery runtime. Whole-branch writes record
+ * member presence only for observers, so a tree that never asks for the engine
+ * does not ship the capture. Not cleared by a runtime reset: the capture
+ * checks for observers itself.
+ */
+export function installBranchMembershipCapture(
+  capture: BranchMembershipCapture
+): void {
+  branchMembershipCapture = capture;
+}
+
+/** @internal Undefined until the delivery runtime has been requested. */
+export function captureBranchMembershipIfObserved(
+  branch: object,
+  supplied: object
+): (() => void) | undefined {
+  return branchMembershipCapture?.(branch, supplied);
+}
+
 /** @internal True only when a runtime is installed AND it has observers. */
 export function hasPathObservers(): boolean {
   return runtime?.hasObservers() ?? false;
