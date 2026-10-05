@@ -26,6 +26,7 @@ import { getLocationRuntime } from '../location-runtime';
 
 import type { ReversalEffect, ReversalRefusal } from './causal-types';
 import { applyInInvalidationGroup } from './post-application-failure';
+import { holdEntityMembershipDelivery } from '../entity-membership-view';
 import { normalizeScopedValuePath } from './scoped-value-addressing';
 
 type StructuralDriftRefusal = Extract<
@@ -532,7 +533,14 @@ export function createTreeRealizationAdapter(
         members?.publish();
       };
 
-      applyInInvalidationGroup(options.tree.$, apply);
+      // Membership listeners run once the whole reversal is installed and
+      // published, in commit order, whatever throws on the way out.
+      const releaseMembership = holdEntityMembershipDelivery(options.tree.$);
+      try {
+        applyInInvalidationGroup(options.tree.$, apply);
+      } finally {
+        releaseMembership();
+      }
     },
   };
 }

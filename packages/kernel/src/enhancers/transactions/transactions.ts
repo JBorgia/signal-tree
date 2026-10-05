@@ -35,6 +35,7 @@ import {
   openCommitScope,
   settleCommitScope,
 } from '../../lib/internals/commit-consequence';
+import { holdEntityMembershipDelivery } from '../../lib/internals/entity-membership-view';
 import { AppliedTurnProjection } from '../../lib/internals/causal-runtime/applied-turn-projection';
 import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
 import type {
@@ -2258,10 +2259,16 @@ export function getOrCreateInternalTransactionRuntime<T>(
     );
     const apply = () => prepared.install();
     const locations = getLocationRuntime(tree.$);
-    if (locations) {
-      locations.runInvalidationGroup(apply);
-    } else {
-      apply();
+    // Membership listeners run once every target is installed and published.
+    const releaseMembership = holdEntityMembershipDelivery(tree.$ as object);
+    try {
+      if (locations) {
+        locations.runInvalidationGroup(apply);
+      } else {
+        apply();
+      }
+    } finally {
+      releaseMembership();
     }
   };
 

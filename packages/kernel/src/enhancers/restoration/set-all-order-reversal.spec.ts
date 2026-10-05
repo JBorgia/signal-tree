@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { signalTree } from '../../lib/signal-tree';
 import { entityMap } from '../../lib/markers/entity-map';
 import { undoable } from '../../lib/undoable';
+import { entityMembershipReader } from '../../lib/internals/entity-membership-view';
 import { transactions } from '../transactions/transactions';
 import { restoration } from './restoration';
 
@@ -10,13 +11,11 @@ import { restoration } from './restoration';
 // [a,b,c] -> setAll([c,a]) -> undo or rollback gave [b,c,a].
 //
 // Carried from v15 012fd11d (v16 integration slice 5): `.transaction(` ->
-// `.transact(`. The donor's rollback case also compared the 15.4.0
-// `entityMembershipReader` snapshot with the physical order. That reader is
-// slice 6; the unmodified donor is preserved as
-// docs/audits/2026-10-01-v16-integration/preserved/set-all-order-reversal.spec.ts.txt
-// and its membership assertion returns with the reader. Every donor order,
-// value and redo assertion below is unchanged; the rollback case adds a value
-// check where the reader assertion was.
+// `.transact(`. The donor's rollback case also compares the
+// `entityMembershipReader` snapshot with the physical order; that assertion
+// was preserved in slice 5 (preserved/set-all-order-reversal.spec.ts.txt) and
+// is restored with the reader in slice 6. Every donor order, value and redo
+// assertion below is unchanged; slice 5's value check stays beside it.
 type Row = { id: string; n: number };
 const row = (id: string, n = 0): Row => ({ id, n });
 const flush = async () => {
@@ -77,6 +76,11 @@ describe.each(ORDERS)(
           pending.rollback();
           expect(tree.$.rows.ids()).toEqual(['a', 'b', 'c']);
           expect(tree.$.rows.all().map(({ n }) => n)).toEqual([0, 0, 0]);
+          // Membership agrees with the physical order.
+          const reader = entityMembershipReader(tree)!;
+          expect(
+            reader.snapshot().collections[0].members.map(({ key }) => key)
+          ).toEqual(['a', 'b', 'c']);
         } finally {
           tree.destroy();
         }

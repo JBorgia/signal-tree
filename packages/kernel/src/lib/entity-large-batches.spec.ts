@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { signalTree } from './signal-tree';
 import { entityMap } from './markers/entity-map';
 import { undoable } from './undoable';
+import { entityMembershipReader } from './internals/entity-membership-view';
 import { restoration } from '../enhancers/restoration/restoration';
 
 // `array.push(...items)` passes every item as an argument, and V8 throws
@@ -10,10 +11,9 @@ import { restoration } from '../enhancers/restoration/restoration';
 // observed (Studio's entity evidence).
 //
 // Carried from v15 012fd11d (v16 integration slice 5). The donor's first case
-// observed membership through the 15.4.0 `entityMembershipReader` (slice 6);
-// it is preserved unmodified in
-// docs/audits/2026-10-01-v16-integration/preserved/entity-large-batches.spec.ts.txt.
-// v16's own large-batch call sites (notifier delivery, transaction rollback,
+// observes membership through `entityMembershipReader`; preserved in slice 5
+// (preserved/entity-large-batches.spec.ts.txt), it is restored unchanged with
+// the reader in slice 6. v16's own large-batch call sites (notifier delivery, transaction rollback,
 // restoration turn composition) are covered by
 // entity-large-batches-v16-controls.spec.ts.
 type Row = { id: number; n: number };
@@ -26,6 +26,23 @@ const flush = async () => {
 const LARGE = 130_000;
 
 describe('entity batches larger than the argument limit', () => {
+  it('setAll, replace and clear with membership observed', () => {
+    const tree = signalTree({ rows: entityMap<Row, number>() });
+    const reader = entityMembershipReader(tree)!;
+    let events = 0;
+    const stop = reader.subscribe(() => events++);
+    try {
+      tree.$.rows.setAll(rows(LARGE));
+      tree.$.rows.setAll(rows(LARGE, LARGE));
+      tree.$.rows.setAll([]);
+      expect(tree.$.rows.count()).toBe(0);
+      expect(events).toBeGreaterThan(0);
+    } finally {
+      stop();
+      tree.destroy();
+    }
+  });
+
   it('undo and redo of a setAll that replaced every row', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, number>() },

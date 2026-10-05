@@ -212,3 +212,24 @@ export function confirmedTurnReader<
     },
   };
 }
+
+/*
+ * READ-ONLY RUNTIME OBSERVATION READERS (v15 → v16 integration, slice 6).
+ *
+ * Each reader observes an existing owner; none is an authority. A reader
+ * retains no event history and never installs the capability it reads: a tree
+ * without `transactions()`, `restoration()` or entity collections answers
+ * `undefined`. Admission is `ToolingTree<T, C, TAccum>`: the accumulated
+ * surface and carrier of the constructed tree, never `TreeNode<T>` rebuilt
+ * from unwrapped state.
+ */
+export {
+  entityMembershipReader,
+  type EntityMembershipReader,
+  type EntityMembershipSnapshot,
+  type EntityMembershipEvent,
+  type EntityMembershipCollection,
+  type EntityMembershipLocation,
+  type EntityMembership,
+  type EntityMembershipChange,
+} from './lib/internals/entity-membership-view';

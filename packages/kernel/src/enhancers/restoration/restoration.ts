@@ -1,3 +1,4 @@
+import { holdEntityMembershipDelivery } from '../../lib/internals/entity-membership-view';
 import {
   applyPlainBranchMemberSnapshot,
   canRealizePlainBranchMember,
@@ -2696,7 +2697,14 @@ export function restoration(
               },
               () => prepared.install()
             );
-          applyInInvalidationGroup(tree.$, apply);
+          // Membership listeners run once every collection of the reversal
+          // has installed and published, in commit order, whatever throws.
+          const releaseMembership = holdEntityMembershipDelivery(tree.$);
+          try {
+            applyInInvalidationGroup(tree.$, apply);
+          } finally {
+            releaseMembership();
+          }
         } finally {
           isRestoring = false;
         }
