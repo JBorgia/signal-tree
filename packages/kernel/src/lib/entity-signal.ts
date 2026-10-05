@@ -644,10 +644,18 @@ export function createEntitySignal<
     // O(1) — this used to be `entities.length` on a freshly built array.
     return structuralStore.activeKeyCount();
   });
+  // Identity-stable across value-only writes: the key snapshot is shared until
+  // the list or a key changes, so the copy (and every consumer) is reused.
+  let idsSource: readonly K[] | undefined;
+  let idsValue: K[] = [];
   const idsSignal: ReadableCell<K[]> = createVersionedProjection(() => {
-    return config.sortComparer
-      ? allSignal().map((e) => selectId(e))
-      : [...structuralStore.activeKeysSnapshot()];
+    if (config.sortComparer) return allSignal().map((e) => selectId(e));
+    const keys = structuralStore.activeKeysSnapshot();
+    if (keys !== idsSource) {
+      idsSource = keys;
+      idsValue = [...keys];
+    }
+    return idsValue;
   });
   const mapSignal: ReadableCell<ReadonlyMap<K, E>> = createVersionedProjection(
     () => {
