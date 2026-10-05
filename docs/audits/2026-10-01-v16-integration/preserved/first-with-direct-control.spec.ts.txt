@@ -1,3 +1,6 @@
+// RESTORED in slice 5 (2026-10-05) as packages/kernel/src/enhancers/batching/
+// external-baseline-coalescing.spec.ts after the 15.4.2 restoration carry:
+// 12/28 failed on b4543600, 28/28 after. Kept as the slice-3b record.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { external } from '../../lib/external';
 import { entityMap } from '../../lib/markers/entity-map';

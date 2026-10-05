@@ -1,3 +1,6 @@
+// RESTORED in slice 5 (2026-10-05) as packages/kernel/src/enhancers/restoration/
+// external-authored-baseline.spec.ts with the 15.4.2 restoration carry: 27/69
+// failed on b4543600 (slice-5 part 1 head), 69/69 after. Kept as the record.
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   batching,

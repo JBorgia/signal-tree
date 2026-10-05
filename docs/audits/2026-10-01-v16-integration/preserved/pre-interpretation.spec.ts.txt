@@ -1,3 +1,11 @@
+// SUPERSEDED by the 15.4.2 restoration carry (v16 integration slice 5,
+// 2026-10-05). Its 12 external-baseline cases expect undo to return 0 (the
+// pre-external value). Published 15.4.2 and the carried
+// enhancers/restoration/external-authored-baseline.spec.ts select 5: undo
+// removes the authored contribution and surviving external truth stays (L3,
+// L4, L11). On the slice-5 head these 12 fail and the other 28 pass; the
+// opposite reading is active as enhancers/batching/
+// external-baseline-coalescing.spec.ts. Kept as the record of the alternative.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { external } from '../../lib/external';
 import { entityMap } from '../../lib/markers/entity-map';
