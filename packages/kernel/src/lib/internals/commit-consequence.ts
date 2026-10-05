@@ -328,6 +328,17 @@ export function getHeldConsequenceCountForTesting(node: unknown): number {
   return (scopeKey && heldByKey.get(scopeKey)?.size) || 0;
 }
 
+/**
+ * True while this owner's scope for `transactionId` is open: its deferred
+ * consequences have been neither released nor discarded. Read-only.
+ */
+export function isCommitScopeOpen(
+  owner: object,
+  transactionId: number
+): boolean {
+  return scopesByOwner.get(owner)?.has(transactionId) === true;
+}
+
 /** True while any explicit transaction on this node's tree is unsettled. */
 export function hasOpenCommitScope(node: object): boolean {
   const key = resolveScopeKey(node);
