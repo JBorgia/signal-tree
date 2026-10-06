@@ -97,6 +97,11 @@ export type EntityTopology = {
    */
   settle(): boolean;
   /**
+   * Adopt a collection's complete committed order (a membership `reorder`,
+   * 15.4.4). Positions every subject it names, held ones included.
+   */
+  reorder(after: readonly number[]): void;
+  /**
    * Where would `subject` sit if every subject failing `isIncluded` were
    * projected away? Walks outward through CURRENT local order and returns the
    * nearest included neighbour on either side.
@@ -219,6 +224,14 @@ export function createEntityTopology(
     keyOf: (subject) => keys.get(subject),
     has: (subject) => held.has(subject) || order.includes(subject),
     placed: (subject) => order.includes(subject),
+
+    reorder(after) {
+      // Complete membership at that commit: anything absent was removed, and
+      // its own removal notification still clears its key when delivered.
+      order = [...after];
+      held.clear();
+      heldOn.clear();
+    },
 
     settle() {
       if (held.size === 0) return false;
