@@ -95,6 +95,22 @@ describe.each(ORDERS)('absent collection — Solid (%s)', (_, enhancers) => {
         tree.destroy();
       }
     }));
+  it('an omission nested in a whole value wakes held reads after it', () =>
+    inRoot(async () => {
+      const { tree, view } = build();
+      try {
+        // `rows` is omitted one level down, inside a nested structural write,
+        // which reads rows physically.
+        (tree.$ as unknown as (value: unknown) => void)({
+          a: { s: 1 },
+          count: 0,
+        });
+        await flush();
+        expect(view()).toEqual(['{"a":{"s":1},"count":0}', [], 0, undefined]);
+      } finally {
+        tree.destroy();
+      }
+    }));
   it('a row-adding write re-adds the path with only its row; undo omits it again', () =>
     inRoot(async () => {
       const { tree, rows, view } = build();
