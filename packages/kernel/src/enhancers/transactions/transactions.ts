@@ -1,4 +1,5 @@
 import {
+  collectionBindingAt,
   plainBranchMembershipEffects,
   plainBranchMembershipChange,
   composePlainBranchMemberEffect,
@@ -2299,7 +2300,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
         .map(({ owner }) => owner),
     ]);
     const collections = [...collectionOwners].map((owner) => {
-      const binding = bindings.get(owner);
+      // A collection hidden by an omitted member is skipped by the
+      // current-tree walk. Rollback still compensates its retained storage:
+      // a rejected value must not come back on a later re-add (owner law,
+      // slice 8b/8c).
+      const binding = bindings.get(owner) ?? collectionBindingAt(tree.$, owner);
+      if (binding) bindings.set(owner, binding);
       if (!binding) {
         throw new Error(
           `Transaction rollback has no collection binding ${owner}`
