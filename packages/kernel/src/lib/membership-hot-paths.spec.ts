@@ -69,12 +69,39 @@ describe('absence after an omission (v16 8g, perf item 1)', () => {
       expect(leaf()).toBe(499);
       // One walk for the read path's first answer; the cache holds after.
       expect(stats.absenceWalks).toBeLessThanOrEqual(2);
-      // A membership change invalidates the answer: one more walk.
-      tree.$({ side: { x: 0 }, count: 0 }); // omits a again
+      // A membership change invalidates the answer: one more walk. This
+      // write only omits (side stays omitted), so nothing else advances it.
+      tree.$({ count: 0 }); // omits a again
       resetProductionSubstrateStatsForTesting(stats);
       expect(leaf()).toBeUndefined();
       expect(leaf()).toBeUndefined();
       expect(stats.absenceWalks).toBe(1);
+    } finally {
+      tree.destroy();
+    }
+  });
+});
+
+describe('liveness stays while any member is omitted (v16 8g, perf item 1)', () => {
+  it('re-adding one of two omitted members leaves the other absent', () => {
+    const tree = signalTree({
+      a: { n: 1 },
+      side: { x: 2 },
+      count: 0,
+    }) as unknown as {
+      $: ((value?: unknown) => unknown) & {
+        a: { n: (value?: number) => number };
+        side: { x: (value?: number) => number };
+      };
+      destroy(): void;
+    };
+    try {
+      const x = tree.$.side.x;
+      tree.$({ count: 1 }); // omits a and side
+      tree.$({ a: { n: 3 }, count: 1 }); // re-adds a only
+      expect(tree.$()).toEqual({ a: { n: 3 }, count: 1 });
+      expect(x()).toBeUndefined();
+      expect(tree.$.a.n()).toBe(3);
     } finally {
       tree.destroy();
     }
