@@ -163,6 +163,76 @@ describe('reads under an omitted member', () => {
   });
 });
 
+describe("liveness installs on a tree's first omission (v16 8e)", () => {
+  // A tree's leaves consult member liveness only after its first omission,
+  // which installs it. Consumers created and writes made before that must
+  // carry over: the first omission happens mid-life, on a tree whose held
+  // consumers already depend on its leaves.
+  it('held consumers created before the first omission follow it', () => {
+    const tree = reactiveTree(initial());
+    trees.push(tree);
+    const h = handles(tree);
+    const read = computed(() => [
+      JSON.stringify(h.a()),
+      JSON.stringify(h.a.b()),
+      h.a.b.keep(),
+      h.a.side(),
+      JSON.stringify(h.root()),
+    ]);
+    expect(read()).toEqual([
+      '{"b":{"value":0,"keep":0},"side":0}',
+      '{"value":0,"keep":0}',
+      0,
+      0,
+      '{"a":{"b":{"value":0,"keep":0},"side":0},"count":0}',
+    ]);
+    // Ordinary writes before any omission.
+    h.a.b.keep(1);
+    h.a.side(2);
+    expect(read()).toEqual([
+      '{"b":{"value":0,"keep":1},"side":2}',
+      '{"value":0,"keep":1}',
+      1,
+      2,
+      '{"a":{"b":{"value":0,"keep":1},"side":2},"count":0}',
+    ]);
+    // The first omission in this tree.
+    omitA(h);
+    expect(read()).toEqual([
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      '{"count":0}',
+    ]);
+    expect(h.a.b.keep()).toBeUndefined();
+    // A write through a handle held from before it re-adds the path.
+    h.a.b.keep(9);
+    expect(read()).toEqual([
+      '{"b":{"keep":9}}',
+      '{"keep":9}',
+      9,
+      undefined,
+      '{"a":{"b":{"keep":9}},"count":0}',
+    ]);
+  });
+
+  it('a directly omitted leaf, first omission in its tree, re-adds on write', () => {
+    const tree = reactiveTree({ user: { name: 'Ada', age: 42 } } as {
+      user: { name: string; age?: number };
+    });
+    trees.push(tree);
+    const age = tree.$.user.age as unknown as Leaf;
+    const held = computed(() => age());
+    expect(held()).toBe(42);
+    (tree.$.user as unknown as Leaf)({ name: 'Ada' });
+    expect(held()).toBeUndefined();
+    age(43);
+    expect(held()).toBe(43);
+    expect(tree.$()).toEqual({ user: { name: 'Ada', age: 43 } });
+  });
+});
+
 describe('writes under an omitted member re-add the path, siblings stay absent', () => {
   it.each(['held', 'detached'] as const)(
     'a leaf write through a %s handle',
@@ -383,7 +453,7 @@ describe('writes under an omitted member re-add the path, siblings stay absent',
     expect(side()).toBeUndefined();
   });
 
-  it('path observers are told of the value, then of each level, innermost first', async () => {
+  it('path observers are told of each level, innermost first, then of the value', async () => {
     const tree = signalTree(initial(), { enhancers: [restoration()] });
     trees.push(tree);
     const h = handles(tree);
@@ -397,8 +467,10 @@ describe('writes under an omitted member re-add the path, siblings stay absent',
     await flush();
     off();
     // As a whole value `{ b: { keep: 9 } }` at `a` would announce it: `b`
-    // drops `value`, `a` drops `side`, the root re-adds `a`.
-    expect(paths).toEqual(['a.b.keep', 'a.b', 'a', '']);
+    // drops `value`, `a` drops `side`, the root re-adds `a`. Announced inside
+    // the write, before its value notification (v16 8e: no per-leaf writer
+    // wrapper); history composes either order.
+    expect(paths).toEqual(['a.b', 'a', '', 'a.b.keep']);
   });
 });
 

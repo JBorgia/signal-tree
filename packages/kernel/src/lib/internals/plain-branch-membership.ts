@@ -7,10 +7,7 @@ import {
   getPositionRegistry,
   type PositionRegistry,
 } from './position-registry';
-import {
-  republishMemberSubtree,
-  setMemberPresence,
-} from './member-membership';
+import { republishMembers, setMemberPresence } from './member-membership';
 import { publishMembershipChange } from './snapshot-authority';
 import { getTreeScalarSlotRuntime } from './tree-scalar-slot-port';
 import { withWriteContext } from '../write-context';
@@ -75,17 +72,26 @@ function isRecordedMember(node: unknown): boolean {
   );
 }
 
-/** Capture only members whose presence the supplied whole value could change. */
+/**
+ * Capture only members whose presence the supplied whole value could change.
+ * A `partial` write omits nothing; it can only re-add supplied keys
+ * (`updateAndReport`, a path re-add's outermost level).
+ */
 export function capturePlainBranchMembership(
   branch: object,
-  supplied: object
+  supplied: object,
+  partial?: boolean
 ): (() => void) | undefined {
   if (!hasPathObservers()) return undefined;
   const registry = getPositionRegistry(branch);
   const path = getOwnedOwnerPath(branch);
   if (!registry || path === undefined) return undefined;
 
-  const keys = new Set(Object.keys(supplied));
+  const keys = new Set(
+    partial
+      ? [...Object.keys(branch), ...Object.keys(supplied)]
+      : Object.keys(supplied)
+  );
   const before = new Map<string, MemberValue>();
   for (const key of Object.getOwnPropertyNames(branch)) {
     const descriptor = Object.getOwnPropertyDescriptor(branch, key);
@@ -152,6 +158,30 @@ export function capturePlainBranchMembership(
       notification,
       registry.id
     );
+  };
+}
+
+/**
+ * Capture what a path re-add changes (`reactivatePathOnWrite`), as a whole
+ * value holding only that path at the outermost omitted member would: below
+ * it each level keeps only the path; at its parent every present member stays
+ * and the member comes back. Announced innermost first.
+ */
+export function capturePathReAdd(
+  path: readonly { readonly parent: object; readonly key: string }[],
+  outer: number
+): (() => void) | undefined {
+  if (!hasPathObservers()) return undefined;
+  const publishers: Array<(() => void) | undefined> = [];
+  for (let i = 0; i <= outer; i++) {
+    // Links name the accessor half (`linkMember`).
+    const { parent, key } = path[i];
+    publishers.push(
+      capturePlainBranchMembership(parent, { [key]: true }, i === outer)
+    );
+  }
+  return () => {
+    for (const publish of publishers) publish?.();
   };
 }
 
@@ -827,7 +857,7 @@ export function preparePlainBranchMembers(
           for (const branch of changedBranches) publishMembershipChange(branch);
           // What a branch member's presence changes below it (v16 8d).
           for (const { branch, key, node } of changedBranchMembers) {
-            republishMemberSubtree(branch, key);
+            republishMembers(branch, [key]);
             // Every participant is installed: these are the rows it keeps.
             if (!Object.getOwnPropertyDescriptor(branch, key)?.enumerable)
               rememberHiddenRows(node);

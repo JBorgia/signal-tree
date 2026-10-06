@@ -1,9 +1,19 @@
-import { isWritableLocation } from './location-runtime';
-import { isNodeAccessor, isTraversableNode, NODE_STORE_SYMBOL } from './node-shape';
 import {
-  captureBranchMembershipIfObserved,
-  hasPathObservers,
-} from './path-observation-port';
+  getLocationRuntime,
+  isWritableLocation,
+  NEUTRAL_LOCATION_RUNTIME,
+  writableLocationPublisher,
+  type LocationPublisher,
+} from './location-runtime';
+import { isNodeAccessor, isTraversableNode, NODE_STORE_SYMBOL } from './node-shape';
+import { getOwnedPositionIds } from './owned-metadata';
+import { markOwnerInvalidatedFrom } from './owner-invalidation-port';
+import { capturePathReAddIfObserved } from './path-observation-port';
+import { publishMembershipChange } from './snapshot-authority';
+import {
+  getTreeScalarSlotRuntime,
+  type MemberAbsence,
+} from './tree-scalar-slot-port';
 
 /**
  * BRANCH MEMBER MEMBERSHIP — §C / C5, GREENFIELD-BRANCH-WRITE-0.
@@ -146,7 +156,7 @@ export function isAbsentMember(node: unknown): boolean {
   for (
     let binding = memberBinding(node);
     binding;
-    binding = memberBinding(nodeOf(binding.parent))
+    binding = memberBinding(binding.parent)
   ) {
     const descriptor = Object.getOwnPropertyDescriptor(
       binding.parent,
@@ -158,51 +168,13 @@ export function isAbsentMember(node: unknown): boolean {
 }
 
 /**
- * A structural write (a whole value, a reversal installing members) reconciles
- * membership itself, level by level, and announces it. A location written
- * inside one keeps the own-member reactivation it always had and announces
- * nothing, so no transition is announced twice.
+ * @internal A structural write (a whole value, a reversal installing members)
+ * reconciles membership itself, level by level, and announces it. A location
+ * written inside one keeps the own-member reactivation it always had and
+ * announces nothing, so no transition is announced twice. A counter the
+ * writer increments and decrements in a `finally`; nothing is allocated.
  */
-let structuralWrites = 0;
-
-/**
- * @internal Begin a write that reconciles and announces membership itself.
- * Pair with `exitStructuralWrite` in a `finally`. A counter, not a callback,
- * so the whole-value path allocates nothing for it.
- */
-export function enterStructuralWrite(): void {
-  structuralWrites++;
-}
-
-/** @internal See `enterStructuralWrite`. */
-export function exitStructuralWrite(): void {
-  structuralWrites--;
-}
-
-/** @internal True while a structural write is in progress. */
-export function inStructuralWrite(): boolean {
-  return structuralWrites > 0;
-}
-
-let republishMember: ((parent: object, key: string) => void) | undefined;
-
-/**
- * @internal Installed by `signal-tree`, which owns the publication carriers.
- * Wakes the observers of a member whose presence changed, and of every
- * present location below it, without writing anything.
- */
-export function installMemberRepublisher(
-  republish: (parent: object, key: string) => void
-): void {
-  republishMember = republish;
-}
-
-/** @internal See `installMemberRepublisher`. */
-export function republishMemberSubtree(parent: object, key: string): void {
-  republishMember?.(parent, key);
-}
-
-const NOOP = (): void => undefined;
+export const structuralWrites = { depth: 0 };
 
 /**
  * @internal Re-add a written location that is absent from the current tree.
@@ -225,20 +197,24 @@ const NOOP = (): void => undefined;
  * left the siblings unregistered, and undo of an earlier write to one of them
  * refused with "its retained location is no longer available" (measured).
  *
- * @returns undefined when nothing changed. Otherwise a function the writer
- * calls after announcing its value write: it wakes held observers and
- * announces the membership changes to path observers, innermost first, so
- * restoration and transactions record them with the write (value first, then
- * membership, as a whole-value write does).
+ * ⚠️ ANNOUNCED HERE, BEFORE THE WRITER ANNOUNCES ITS VALUE (v16 8e). 8d
+ * announced membership after the value, as a whole value does, which needed a
+ * wrapper (two closures) around every leaf's writers in every tree. Both
+ * history capture paths compose a member's value and presence per position in
+ * either order (`composePlainBranchMemberEffect`), and the 8d mutation that
+ * announced first was killed only by the test that pinned the order.
+ *
+ * @returns whether membership changed, so the writer publishes its own token
+ * even when the retained value equalled the written one.
  */
-export function reactivatePathOnWrite(node: unknown): (() => void) | undefined {
-  if (structuralWrites > 0) return reactivateOnWrite(node) ? NOOP : undefined;
+export function reactivatePathOnWrite(node: unknown): boolean {
+  if (structuralWrites.depth > 0) return reactivateOnWrite(node);
   const path: DormantBinding[] = [];
   let outer = -1;
   for (
     let binding = memberBinding(node);
     binding;
-    binding = memberBinding(nodeOf(binding.parent))
+    binding = memberBinding(binding.parent)
   ) {
     const descriptor = Object.getOwnPropertyDescriptor(
       binding.parent,
@@ -247,19 +223,9 @@ export function reactivatePathOnWrite(node: unknown): (() => void) | undefined {
     if (descriptor?.enumerable === false) outer = path.length;
     path.push(binding);
   }
-  if (outer < 0) return undefined;
-  const owner = nodeOf(path[outer].parent);
-  const key = path[outer].key;
-  // Captured before anything changes; each publishes what changed at its level.
-  const announce: Array<(() => void) | undefined> = [];
-  if (hasPathObservers())
-    for (let i = 0; i <= outer; i++) {
-      const branch = nodeOf(path[i].parent);
-      const present: Record<string, true> = { [path[i].key]: true };
-      if (i === outer)
-        for (const member of Object.keys(branch)) present[member] = true;
-      announce.push(captureBranchMembershipIfObserved(branch, present));
-    }
+  if (outer < 0) return false;
+  // Captured before anything changes, only when something observes paths.
+  const announce = capturePathReAddIfObserved(path, outer);
   for (let i = outer - 1; i >= 0; i--) {
     const { parent, key: kept } = path[i];
     for (const member of Object.keys(parent))
@@ -270,12 +236,166 @@ export function reactivatePathOnWrite(node: unknown): (() => void) | undefined {
   // A re-added leaf is the written location itself, and its writer publishes
   // its token once (`whole-value-membership.spec.ts` 16). A re-added branch
   // has no token: its observers and those below it are woken here.
-  const republish = !isWritableLocation(node) || outer > 0;
-  return () => {
-    if (republish) republishMember?.(owner, key);
-    for (const publish of announce) publish?.();
-  };
+  if (!isWritableLocation(node) || outer > 0)
+    republishMembers(path[outer].parent, [path[outer].key]);
+  announce?.();
+  return true;
 }
+
+/**
+ * The liveness a tree's leaves consult once a member of that tree has been
+ * omitted. Until then their read and write paths see one empty slot and run
+ * none of it (`MemberAbsence`, v16 8e).
+ */
+const ABSENCE: MemberAbsence = {
+  isAbsent: isAbsentMember,
+  reAdd: reactivatePathOnWrite,
+};
+
+/**
+ * @internal Invalidate the OBSERVATION of every scalar member under `parent`
+ * after a membership transition, without writing anything.
+ *
+ * ⚠️ THIS IS AN INVALIDATION CARRIER, NOT A MEMBERSHIP AUTHORITY. Enumerability
+ * decides membership; this only wakes the consumers so they re-read it.
+ *
+ * It reuses the per-slot publication tokens that already exist and that each
+ * leaf ALREADY depends on — `createAngularLeaf` calls `publication.observe(slot)`
+ * INSIDE its computation, so the dependency edge is established on the leaf's
+ * first read. That is what makes membership free: no new reactive state, and no
+ * first-transition problem. A lazily created membership signal would NOT be a
+ * dependency of a computation that had already run — measured, and the reason
+ * the per-leaf design was abandoned.
+ *
+ * Moved here from `signal-tree.ts` in v16 8e: path re-adds and reversals call
+ * it too, and a port to reach it cost more than the move.
+ */
+export function republishMembers(parent: object, keys: readonly string[]): void {
+  const runtime = getTreeScalarSlotRuntime(parent);
+  if (!runtime) return;
+
+  // ⚠️ ONLY THE SLOTS WHOSE MEMBERSHIP CHANGED.
+  //
+  //     changedSlots = value-changed slots UNION membership-changed slots
+  //     each semantic slot published ONCE per transition
+  //
+  // Sweeping every slot under the branch published siblings whose membership and
+  // value were both untouched, and double-published the one that did change.
+  const changedSlots: number[] = [];
+  // ⚠️ A SLOT IS POSITION-ADDRESSABLE ONLY UNDER `position-topology`.
+  //
+  // Every tree has scalar slots since 5efeb7f5, but a leaf receives a PositionId
+  // only with that capability (transactions, restoration). Without it the slot
+  // lookup below finds nothing, and the leaf was treated as tokenless: its own
+  // token was never published, so a derived, a `subscribe` listener and every
+  // native carrier (Angular, Vue, Solid) kept the retained value after
+  // `p({ name: 'a' })` removed `age`. The leaf's location binding IS that token
+  // — the one its own writes publish — so it is published instead.
+  const unaddressedLeaves: LocationPublisher[] = [];
+  // ⚠️ A BRANCH MEMBER'S PRESENCE IS EVERY PRESENT LOCATION'S BELOW IT.
+  //
+  // Omitting or re-adding a branch changes what each present location under
+  // it reads, but none of them was written. Measured before v16 8d: a held
+  // `computed(() => box.drop())` kept `{v:2}` after `box({keep})` omitted
+  // `drop`, and held reads under an omitted `a` kept retained storage. Each
+  // present branch below re-reads through its membership revision, each leaf
+  // through its own token. Dormant members below are skipped: they read
+  // absent before and after.
+  const branches: object[] = [];
+  // Publish a member's own token; a branch has none, so its subtree is
+  // visited instead. True for a token-carrying member.
+  const publish = (child: unknown): boolean => {
+    const positionId = getOwnedPositionIds(child)?.[0];
+    const slot =
+      positionId === undefined
+        ? undefined
+        : runtime.resolveScalarSlot(positionId);
+    if (slot !== undefined) return changedSlots.push(slot) > 0;
+    const publisher = writableLocationPublisher(child);
+    if (publisher) return unaddressedLeaves.push(publisher) > 0;
+    if (isNodeAccessor(child)) {
+      branches.push(child);
+      for (const key of Object.keys(child))
+        publish((child as unknown as Record<string, unknown>)[key]);
+    }
+    return false;
+  };
+  let tokenCarrying = 0;
+  for (const key of keys)
+    if (publish((parent as Record<string, unknown>)[key])) tokenCarrying++;
+
+  // ⚠️ PUBLISHED INDEPENDENTLY OF VALUE EQUALITY.
+  //
+  //     SEMANTIC MEMBERSHIP CHANGE IS AN OBSERVABLE SLOT CHANGE EVEN WHEN THE
+  //     RETAINED VALUE IS IDENTICAL.
+  //
+  // The ordinary write path SUPPRESSES an unchanged commit — correctly, for a
+  // value. But reintroducing `age: 42` over a dormant slot that still holds 42
+  // changes what the leaf OBSERVES (undefined -> 42) without changing what it
+  // stores, so routing membership through the value comparator would leave an
+  // already-subscribed consumer stuck at `undefined`.
+  // ⚠️ A BRANCH MEMBER HAS NO PUBLICATION TOKEN, so its membership transition is
+  // unobservable through the dependency graph.
+  //
+  // A dormant LEAF is carried by its retained per-slot token: the parent's
+  // dormant-child read returns a CHANGED value and propagates. A dormant BRANCH
+  // returns `undefined` now too, but that call reads no signal whose value
+  // changed — the child's own memo still depends on unchanged leaf tokens — so
+  // nothing invalidates the parent. Measured: `drop()` correctly became
+  // `undefined` while `box()` still listed `drop`.
+  //
+  // This is the SAME structural condition as first appearance, not a generic
+  // structural-edit hammer:
+  //
+  //     A MEMBERSHIP TRANSITION WHOSE MEMBER CARRIES NO OBSERVABLE DEPENDENCY
+  //     MUST INVALIDATE ANY SNAPSHOT WHOSE DEPENDENCY SET COULD NOT REFLECT IT.
+  // ⚠️ TOKENLESS MEANS NO SLOT, NOT NO POSITION. A branch member DOES own a
+  // PositionId — an earlier version of this check tested for one and therefore
+  // never fired. What a branch lacks is a per-slot PUBLICATION TOKEN, which is
+  // what the dependency graph actually carries.
+  if (tokenCarrying < keys.length) {
+    publishMembershipChange(parent);
+  } else {
+    // ⚠️ OWNER INVALIDATION DOES NOT DEPEND ON WHICH CARRIER WAKES THE GRAPH.
+    //
+    // `publishMembershipChange` also invalidates the owner. This branch is the
+    // case where it does not run: every changed member is a leaf whose token
+    // is published below. Before this branch existed that was the ordinary
+    // case under `position-topology` (transactions, restoration), and the
+    // owner was never told — measured: `p({ name: 'a' })` over
+    // `{ name: 'a', age: 1 }` gave 0 invalidations with either enhancer and 1
+    // without, while `tree.$()` already read the removal. Without the
+    // capability the leaf was mistaken for tokenless, so the branch above ran
+    // and invalidated by accident.
+    //
+    // The commit revision is still NOT advanced: owner invalidation is a
+    // reread request, not a commit. The membership revision is not bumped
+    // either: a branch snapshot re-reads every member leaf, so the leaf tokens
+    // published below are what wake it. A dormant BRANCH member has no token and
+    // takes the `publishMembershipChange` path above instead.
+    markOwnerInvalidatedFrom(parent);
+  }
+
+  for (const branch of branches) publishMembershipChange(branch);
+
+  if (changedSlots.length > 0) {
+    // `advanceRevision` is NOT wanted: nothing was committed, so the physical
+    // commit clock must not move.
+    runtime.publishPrepared({ revision: runtime.revision(), changedSlots });
+  }
+
+  if (unaddressedLeaves.length > 0) {
+    // The tree's own runtime, so the publication joins its invalidation group;
+    // the neutral fallback mirrors `publishMembershipChange`.
+    (getLocationRuntime(parent) ?? NEUTRAL_LOCATION_RUNTIME).publish(
+      unaddressedLeaves
+    );
+  }
+
+  // The node's own snapshot is memoised over the members it enumerated, and a
+  // membership change is invisible to that memo — see publishMembershipChange.
+}
+
 
 /**
  * @internal Remove `key` from `parent`'s current value.
@@ -297,6 +417,8 @@ function deactivateOne(parent: object, key: string): boolean {
 
   Object.defineProperty(parent, key, { ...descriptor, enumerable: false });
   markHasDormant(parent);
+  // The first omission in a tree is what installs liveness on its leaves.
+  getTreeScalarSlotRuntime(parent)?.enableAbsence?.(ABSENCE);
   const child = (parent as Record<string, unknown>)[key];
   if (isTraversableNode(child)) {
     linkMember(parent, key, child);
@@ -305,9 +427,13 @@ function deactivateOne(parent: object, key: string): boolean {
   return true;
 }
 
+/**
+ * The link names the parent's accessor half, the one its own parent's link
+ * names in turn, so a walk follows links without resolving peers.
+ */
 function linkMember(parent: object, key: string, child: object): void {
   Object.defineProperty(child, DORMANT, {
-    value: { parent, key } satisfies DormantBinding,
+    value: { parent: nodeOf(parent), key } satisfies DormantBinding,
     enumerable: false,
     configurable: true,
     writable: true,
