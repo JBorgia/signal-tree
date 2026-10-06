@@ -1,4 +1,9 @@
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
+import {
+  forgetTransientRows,
+  rememberTransientRow,
+  withTransientRows,
+} from '../../lib/internals/causal-runtime/transient-rows';
 import type { ToolingTree } from '../../lib/internals/tooling-tree';
 import {
   applyInInvalidationGroup,
@@ -1373,8 +1378,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
     bucket.positionIds.clear();
     const baselineValues = new Map(bucket.baselineValues);
     bucket.baselineValues.clear();
-    const effects = Array.from(bucket.effects.values()).map(cloneTurnEffect);
+    const effects = withTransientRows(
+      Array.from(bucket.effects.values()).map(cloneTurnEffect),
+      bucket.effects
+    );
     bucket.effects.clear();
+    forgetTransientRows(bucket.effects);
     bucket.entityFootprints.clear();
     // The bucket copied both subject lists when it captured them and is cleared
     // here, so the drained entries are already exclusively owned.
@@ -1462,9 +1471,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
 
       if (existing.kind !== 'set' && effect.kind !== 'set') {
         // Created and destroyed inside one transaction: no net structural
-        // effect, so rollback must do nothing for this subject.
+        // effect, so rollback must do nothing for this subject. Remembered,
+        // because another row's recorded neighbour may be it
+        // (transient-rows.ts).
         if (existing.kind === 'add' && effect.kind === 'remove') {
           effectMap.delete(key);
+          rememberTransientRow(effectMap, existing, effect);
           return;
         }
 
@@ -1869,7 +1881,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // through it.
     const subjectIds = [...bucket.subjectIds].sort((a, b) => a - b);
     const positionIds = [...bucket.positionIds].sort((a, b) => a - b);
-    const effects = [...bucket.effects.values()].map(cloneTurnEffect);
+    const effects = withTransientRows(
+      [...bucket.effects.values()].map(cloneTurnEffect),
+      bucket.effects
+    );
     const baselineValues = new Map(bucket.baselineValues);
     const orderDeltas = [...bucket.collectionOrders.values()].map((order) =>
       deriveCollectionOrderDelta(
@@ -1918,7 +1933,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // Keep the capture until compensation succeeds or refusal is committed.
     // Draining it before validation loses the only ledger input on refusal.
     const positionIds = [...bucket.positionIds];
-    const effects = [...bucket.effects.values()].map(cloneTurnEffect);
+    const effects = withTransientRows(
+      [...bucket.effects.values()].map(cloneTurnEffect),
+      bucket.effects
+    );
     const baselineValues = new Map(bucket.baselineValues);
     const collectionOrders = [...bucket.collectionOrders.values()];
     return {

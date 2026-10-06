@@ -1,4 +1,9 @@
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
+import {
+  forgetTransientRows,
+  rememberTransientRow,
+  withTransientRows,
+} from '../../lib/internals/causal-runtime/transient-rows';
 import { placeFieldReversalsWhileRowsExist } from '../../lib/internals/causal-runtime/pending-rollback';
 import {
   applyInInvalidationGroup,
@@ -4038,6 +4043,7 @@ export function restoration(
       bucket.subjectIds.clear();
       bucket.positionIds.clear();
       bucket.effects.clear();
+      forgetTransientRows(bucket.effects);
       bucket.collectionOrders.clear();
       bucket.descriptorInputs.length = 0;
       bucket.designated = false;
@@ -4063,8 +4069,12 @@ export function restoration(
         (left, right) => left - right
       );
       bucket.positionIds.clear();
-      const effects = Array.from(bucket.effects.values()).map(cloneTurnEffect);
+      const effects = withTransientRows(
+        Array.from(bucket.effects.values()).map(cloneTurnEffect),
+        bucket.effects
+      );
       bucket.effects.clear();
+      forgetTransientRows(bucket.effects);
       const collectionOrders = Array.from(bucket.collectionOrders.values()).map(
         (order) => ({
           ...order,
@@ -4242,6 +4252,8 @@ export function restoration(
           // structural effect on it. P0-A.
           if (existing.kind === 'add' && effect.kind === 'remove') {
             effectMap.delete(key);
+            // Remembered: another row's recorded neighbour may be it.
+            rememberTransientRow(effectMap, existing, effect);
             return;
           }
 
