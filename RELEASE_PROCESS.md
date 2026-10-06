@@ -38,6 +38,14 @@ It does not publish to npm. Failures before the release commit restore every
 release-owned file. Failures after the commit leave local state intact for
 deliberate recovery.
 
+The gates build `dist` through the nx cache. Each package's build target lists
+the workspace files the build copies or reads outside the package
+(`packageBuildGlobals` in `nx.json`: `llms.txt`, `LICENSE`, `NOTICE`,
+`tsconfig.base.json` and `tools/build/`), plus its build toolchain packages, so
+a change to any of them invalidates the cached build. A file the build starts
+reading from outside the package must be added there too; the
+`publish-artifacts` gate catches a stale bundled `llms.txt` either way.
+
 ## Publish A Tagged Candidate
 
 The sanctioned registry path is `.github/workflows/publish.yml`. It checks out

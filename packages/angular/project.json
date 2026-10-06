@@ -27,9 +27,13 @@
       "inputs": [
         "production",
         "^production",
+        "packageBuildGlobals",
         {
           "externalDependencies": [
-            "rollup"
+            "rollup",
+            "@nx/rollup",
+            "esbuild",
+            "typescript"
           ]
         }
       ]

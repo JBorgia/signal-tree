@@ -10,6 +10,15 @@
       "executor": "@angular/build:application",
       "outputs": ["{options.outputPath}"],
       "dependsOn": ["generate-versions", "generate-deep-typing-proofs"],
+      "inputs": [
+        "production",
+        "^production",
+        "{workspaceRoot}/llms.txt",
+        "{workspaceRoot}/docs/guides/composition-recipes.md",
+        "{workspaceRoot}/docs/guides/owned-sessions.md",
+        "{workspaceRoot}/docs/guides/persistence-guide.md",
+        "{workspaceRoot}/docs/guides/runtime-observation.md"
+      ],
       "defaultConfiguration": "production",
       "options": {
         "outputPath": "dist/apps/demo",
