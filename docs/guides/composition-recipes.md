@@ -395,6 +395,9 @@ an older one back while a newer overlapping one is open refuses with
 before-image records what the field *held*, not who owns it. This does not fix
 the reentrant-ordering or pending-undo defects documented for 15.3.1 in the
 limitations guide; consult the [changelog](../../CHANGELOG.md) for versioned repairs.
+Once a rollback succeeds, undo, redo and `jumpTo()` of the writes that followed
+never bring back what only the rejected transaction wrote (15.4.4; see the
+[transaction failures guide](./transaction-failures-v15.md)).
 
 If `transaction()` itself throws before returning a handle, there may be no
 pending object to recover with. In 15.3.1, successful
