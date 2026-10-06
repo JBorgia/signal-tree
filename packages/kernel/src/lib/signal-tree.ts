@@ -874,7 +874,9 @@ function recursiveUpdate(
   updates: unknown,
   out?: string[],
   pathPrefix = '',
-  reconcileMembership = true
+  reconcileMembership = true,
+  // When this whole value began: its levels share it (`readded`).
+  since = ++structuralWrites.stamp
 ): void {
   if (!updates || typeof updates !== 'object') return;
   // A whole value reconciles membership level by level below; a location it
@@ -986,7 +988,7 @@ function recursiveUpdate(
         if (typeof value === 'function') {
           warnDiscardedBranchWrite(childPath, value);
         } else if (value && typeof value === 'object') {
-          recursiveUpdate(prop, value, out, childPath);
+          recursiveUpdate(prop, value, out, childPath, true, since);
           installed?.add(key);
         } else if (value === undefined) {
           continue;
@@ -1131,7 +1133,7 @@ function recursiveUpdate(
         if (
           descriptor.enumerable &&
           // A write made while this whole value ran re-added it: it stays.
-          !readdedDuringStructuralWrite(targetObj, key) &&
+          !readdedDuringStructuralWrite(targetObj, key, since) &&
           setMemberPresence(targetObj, key, 'dormant')
         ) {
           membershipChanged.push(key);

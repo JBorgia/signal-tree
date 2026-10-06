@@ -903,6 +903,258 @@ describe('taps during a reversal read rows absent-aware (v16 8f)', () => {
     });
 });
 
+describe('a re-adding write, as on an empty collection (v16 8f review)', () => {
+  // The same calls on a present empty collection (`clear()` first) and on an
+  // absent one must end alike, interceptors and taps included.
+  const twice = <T>(run: (tree: Tree, rows: Rows) => T): [T, T] => {
+    const go = (hide: boolean) => {
+      const tree = build();
+      const rows = tree.$.a.rows;
+      if (hide) omit(tree);
+      else rows.clear();
+      return run(tree, rows);
+    };
+    return [go(false), go(true)];
+  };
+
+  it("a tap's write to the same collection runs its interceptors", () => {
+    const [present, absent] = twice((_tree, rows) => {
+      rows.intercept({
+        onAdd: (row, ctx) => {
+          if (row.id === 'bad') ctx.block('no bad');
+        },
+      });
+      let refused = '';
+      rows.tap({
+        onAdd: (_row, id) => {
+          if (id !== 'z') return;
+          try {
+            rows.addOne({ id: 'bad', n: 0 });
+          } catch (error) {
+            refused = (error as Error).message;
+          }
+        },
+      });
+      rows.addOne(Z);
+      return { refused, ids: rows.ids() };
+    });
+    expect(absent).toEqual(present);
+    expect(present).toEqual({
+      refused: 'Cannot add entity: no bad',
+      ids: ['z'],
+    });
+  });
+
+  it('a tap reads the collection present and can write the row it was told of', () => {
+    const [present, absent] = twice((_tree, rows) => {
+      const seen: unknown[] = [];
+      rows.tap({
+        onAdd: (_row, id) => {
+          seen.push(rows.has(id)(), rows.byId(id) !== undefined, rows.ids());
+          seen.push(rows.count());
+          rows.updateOne(id, { n: 10 });
+        },
+      });
+      rows.addOne(Z);
+      return { seen, all: rows.all() };
+    });
+    expect(absent).toEqual(present);
+    expect(present.seen).toEqual([true, true, ['z'], 1]);
+    expect(present.all).toEqual([{ id: 'z', n: 10 }]);
+  });
+
+  it('a tap that throws leaves the written row as on a present collection', () => {
+    const [present, absent] = twice((tree, rows) => {
+      rows.tap({
+        onAdd: () => {
+          throw new Error('tap');
+        },
+      });
+      let message = '';
+      try {
+        rows.addOne(Z);
+      } catch (error) {
+        message = (error as Error).message;
+      }
+      return {
+        message,
+        all: rows.all(),
+        visible: (tree.$() as { a?: { rows?: unknown } }).a?.rows,
+      };
+    });
+    expect(absent).toEqual(present);
+    expect(present).toEqual({
+      message: 'tap',
+      all: [Z],
+      visible: { all: [Z] },
+    });
+  });
+
+  it('one object an interceptor returns for two ids is written for each', () => {
+    const [present, absent] = twice((_tree, rows) => {
+      const shared = { id: 'shared', n: 7 };
+      rows.intercept({ onAdd: (_row, ctx) => ctx.transform(shared) });
+      return {
+        ids: rows.addMany([
+          { id: 'x', n: 1 },
+          { id: 'y', n: 2 },
+        ]),
+        keys: rows.ids(),
+      };
+    });
+    expect(absent).toEqual(present);
+    expect(present).toEqual({ ids: ['x', 'y'], keys: ['x', 'y'] });
+  });
+
+  it("an interceptor's own write to the collection is kept", () => {
+    const [present, absent] = twice((_tree, rows) => {
+      let wrote = false;
+      rows.intercept({
+        onAdd: (row) => {
+          if (wrote || row.id !== 'z') return;
+          wrote = true;
+          rows.addOne({ id: 'side', n: 0 });
+        },
+      });
+      rows.addOne(Z);
+      return rows.ids();
+    });
+    expect(absent).toEqual(present);
+    expect(present).toEqual(['side', 'z']);
+  });
+
+  const empties: Array<[string, (rows: Rows) => unknown]> = [
+    ['addMany', (rows) => rows.addMany([])],
+    ['prependMany', (rows) => rows.prependMany([])],
+    ['upsertMany', (rows) => rows.upsertMany([])],
+  ];
+  for (const [name, write] of empties)
+    it(`${name}([]) on an absent collection changes nothing`, async () => {
+      const tree = build([restoration()]);
+      const rows = tree.$.a.rows;
+      await flush();
+      omit(tree);
+      await flush();
+      const index = tree.getCurrentIndex();
+      expect(write(rows)).toEqual([]);
+      await flush();
+      expect(tree.$()).toEqual({ count: 0 });
+      expect(stored(rows)).toEqual([A, B]);
+      expect(tree.getCurrentIndex()).toBe(index);
+    });
+
+  it('interceptor calls equal those on a present empty collection, for every write', () => {
+    const calls = (hide: boolean) => {
+      const tree = build();
+      const rows = tree.$.a.rows;
+      const log: string[] = [];
+      rows.intercept({
+        onAdd: (row) => {
+          log.push(`add ${row.id}:${row.n}`);
+        },
+        onUpdate: (id, changes) => {
+          log.push(`update ${String(id)}:${changes.n}`);
+        },
+      });
+      const reset = () => {
+        if (hide) omit(tree);
+        else rows.clear();
+      };
+      const run = (label: string, write: () => unknown) => {
+        reset();
+        log.push(`-- ${label}`);
+        try {
+          write();
+        } catch (error) {
+          log.push(`threw ${(error as Error).message}`);
+        }
+        log.push(`ids ${rows.ids().join(',')}`);
+      };
+      run('addOne', () => rows.addOne(Z));
+      run('prependOne', () => rows.prependOne(Z));
+      run('upsertOne', () => rows.upsertOne(Z));
+      run('prependMany', () => rows.prependMany([Z, { id: 'y', n: 2 }]));
+      run('addMany strict dup', () => rows.addMany([Z, { id: 'z', n: 2 }]));
+      run('addMany skip dup', () =>
+        rows.addMany([Z, { id: 'z', n: 2 }], { mode: 'skip' })
+      );
+      run('addMany overwrite dup', () =>
+        rows.addMany([Z, { id: 'z', n: 2 }], { mode: 'overwrite' })
+      );
+      run('upsertMany dup', () => rows.upsertMany([Z, { id: 'z', n: 3 }]));
+      run('setAll dup', () => rows.setAll([Z, { id: 'z', n: 4 }]));
+      return log;
+    };
+    expect(calls(true)).toEqual(calls(false));
+  });
+});
+
+describe('re-entrant whole values and reversals started from a tap (v16 8f review)', () => {
+  it('a whole value a tap starts omits what it leaves out', () => {
+    const tree = signalTree(
+      {
+        a: { rows: entityMap<Row, string>(), s: 0 },
+        b: { s: 0 },
+        count: 0,
+      },
+      { capabilities: ['causal-runtime', 'position-topology'] as never }
+    ) as unknown as Tree & {
+      $: { b: { s: (value?: number) => number } };
+    };
+    trees.push(tree);
+    tree.$.a.rows.setAll([A]);
+    tree.$({ a: { rows: [A], s: 0 }, count: 0 });
+    let ran = false;
+    tree.$.a.rows.tap({
+      onAdd: () => {
+        if (ran) return;
+        ran = true;
+        // Re-adds `b` inside the outer whole value, then a whole value of
+        // its own leaves `b` out: the later whole value decides.
+        tree.$.b.s(5);
+        tree.$({ a: { rows: [A, Z], s: 0 }, count: 0 });
+      },
+    });
+    tree.$({ a: { rows: [A, Z], s: 0 }, count: 0 });
+    expect(ran).toBe(true);
+    expect(tree.$()).toEqual({ a: { rows: { all: [A, Z] }, s: 0 }, count: 0 });
+  });
+
+  it('undo and redo started from a tap of another tree', async () => {
+    // A reversal opens its tree's physical-rows window at the tap depth it
+    // starts at, so its own reads stay physical inside the tap.
+    const tree = build([restoration()]);
+    const rows = tree.$.a.rows;
+    await flush();
+    omit(tree);
+    await flush();
+    undoable(() => rows.addOne(Z));
+    await flush();
+    const host = build();
+    const outcomes: string[] = [];
+    let step: (() => void) | undefined;
+    host.$.a.rows.tap({
+      onAdd: () => {
+        const run = step;
+        step = undefined;
+        if (!run) return;
+        try {
+          run();
+          outcomes.push(`ok ${rows.ids().join(',')}`);
+        } catch (error) {
+          outcomes.push(`threw ${(error as Error).message}`);
+        }
+      },
+    });
+    step = () => tree.undo();
+    host.$.a.rows.addOne({ id: 'u', n: 0 });
+    step = () => tree.redo();
+    host.$.a.rows.addOne({ id: 'r', n: 0 });
+    expect(outcomes).toEqual(['ok ', 'ok z']);
+    expect(tree.$()).toEqual({ a: { rows: { all: [Z] } }, count: 0 });
+  });
+});
+
 describe('a root holding only collections (v16 8e review)', () => {
   // No scalar leaf anywhere: the tree's root carries no slot of its own.
   type Pair = Omit<Tree, '$'> & {

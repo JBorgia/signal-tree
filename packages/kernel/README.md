@@ -241,25 +241,31 @@ Some details of that rule:
 - **Retained rows are removed silently.** A re-adding write removes the
   retained rows before it adds its own. Taps do not see that removal, but
   history records it, so a reversal restores the rows.
-- **A write that fails changes nothing.** A re-adding write is validated and
-  intercepted as it would be on an empty collection before the retained rows
-  are removed. So input that makes it throw (a missing row, a `selectId` that
-  throws, a duplicate id in strict mode) or an interceptor that blocks it
-  throws with nothing changed and nothing in history. Its interceptors run
-  once per row, as on an empty collection.
+- **It is checked first, as on an empty collection.** A re-adding write is
+  validated and intercepted as it would be on an empty collection before
+  anything changes. Input that makes it throw (a missing row, a `selectId`
+  that throws, a duplicate id in strict mode), or an interceptor that blocks
+  it, throws with nothing changed and nothing in history. Its interceptors
+  run once per row. A call that adds nothing (`addMany([])`) changes nothing.
+  Once its rows are written, the path is re-added before any tap hears of
+  them: a tap reads the collection present, its own writes are ordinary ones,
+  and a tap that throws leaves the written rows, as on a present collection.
 - **The selection is kept.** `activeId()` keeps its value and `activeEntity()`
   reads `undefined`. A re-adding write clears the selection, as `clear()`
   does.
-- **Taps read rows as consumers do.** Even while undo, redo, `jumpTo()` or
-  `rollback()` writes an absent collection's retained rows, a tap on it reads
-  `byId()` and its rows as absent.
+- **Taps read the collection as it is.** A tap reads rows absent-aware, even
+  while undo, redo, `jumpTo()` or `rollback()` writes an absent collection's
+  retained rows. Its projections (`all()`, `count()`, `where()` and the rest)
+  are read fresh, so inside a transaction or a reversal they include the
+  change the tap reports.
 - **Writes from inside a whole value or a reversal.** A tap or sync effect
   that runs while a whole value or a reversal is being applied may write any
   tree, including the same one. That write is an ordinary write: an absent
   location's path is re-added, and the whole value does not omit it again.
   A member that is still present when written goes with the rest if that
   whole value then omits it, because a whole value applies its omissions
-  after its own writes.
+  after its own writes. A whole value the tap starts itself decides for
+  itself: it omits what it leaves out.
 
 Undo, redo and `jumpTo()` treat a location under an omitted member like this:
 

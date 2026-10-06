@@ -106,6 +106,28 @@ for retired entities.
   and `rollback()` of a re-adding write make it absent again. This holds
   for a collection omitted itself, and in a tree whose root holds only
   collections. Before this, its methods read and wrote the retained rows.
+- **A row-adding write to an absent collection is checked first.** It is
+  validated and intercepted as on an empty collection before the retained
+  rows are removed, so a write an interceptor blocks, or one with bad input,
+  changes nothing. Before this, the retained rows were already gone.
+- **A write made inside a whole value or a reversal no longer vanishes.** A
+  tap or sync effect that writes an absent location while a whole value or a
+  reversal is applied re-adds that location's path, in any tree. Before this,
+  a write to the same tree went to retained storage and stayed invisible.
+- **Taps read the collection as it is.** Inside a transaction, an undo, a
+  redo, a jump or a rollback, a tap's `all()`, `count()`, `where()` and the
+  other projections include the change the tap reports; before, they read
+  the collection as it was before the group. Its row reads are absent-aware
+  during a reversal too.
+- **A duplicated id in one batch call applies sequentially.** `addMany` and
+  `prependMany` in strict mode throw before any interceptor runs or anything
+  is written; `skip` keeps the first copy; `overwrite` keeps the last copy in
+  the first copy's place; `upsertMany` merges each later copy over the
+  earlier result. Interceptors run once per applied copy, and each key is
+  written, announced, tapped and returned once. Before this, the call put two
+  rows under one key, and `prependMany` corrupted the order so that the next
+  read threw `RangeError: Invalid array length` (v15 `778f86ef`,
+  `e02238f4`).
 - **Reversing a turn that omits a member and writes under it is exact.**
   Undo or rollback of such a turn restored the members it had written under
   as `undefined`; history now records what storage held.

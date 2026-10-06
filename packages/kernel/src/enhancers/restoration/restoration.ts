@@ -25,7 +25,10 @@ import {
   beginStructuralWrite,
   endStructuralWrite,
 } from '../../lib/internals/member-membership';
-import { physicalRows } from '../../lib/internals/physical-rows';
+import {
+  openPhysicalRows,
+  physicalRows,
+} from '../../lib/internals/physical-rows';
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
 import {
   applyInInvalidationGroup,
@@ -673,7 +676,7 @@ class RestorationManager<TSource, T> {
     // reads and writes a hidden collection's retained rows (`physicalRows`),
     // and re-adds no path implicitly (`structuralWrites`, v16 8e).
     beginStructuralWrite();
-    physicalRows.push(this.positionRegistry);
+    openPhysicalRows(this.positionRegistry);
     let failed = true;
     try {
       apply();

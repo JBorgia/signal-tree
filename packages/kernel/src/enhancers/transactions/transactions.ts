@@ -12,7 +12,10 @@ import {
   beginStructuralWrite,
   endStructuralWrite,
 } from '../../lib/internals/member-membership';
-import { physicalRows } from '../../lib/internals/physical-rows';
+import {
+  openPhysicalRows,
+  physicalRows,
+} from '../../lib/internals/physical-rows';
 import type { PlainBranchMemberPresence } from '../../lib/internals/plain-branch-membership';
 import { applicationFailureCause } from '../../lib/internals/causal-runtime/post-application-failure';
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
@@ -2490,7 +2493,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // Physical truth, as a reversal (`structuralWrites`, `physicalRows`,
     // v16 8e).
     beginStructuralWrite();
-    physicalRows.push(positionRegistry);
+    openPhysicalRows(positionRegistry);
     let result: ReturnType<typeof rollbackPendingTurnAt> | { ok: true };
     let failed = true;
     try {

@@ -35,6 +35,7 @@ type Rows = {
   addOne(row: Row): string;
   updateOne(id: string, changes: Partial<Row>): void;
   tap(handlers: { onAdd?: () => void; onRemove?: () => void }): () => void;
+  removeOne(id: string): void;
 };
 type View = {
   (): unknown;
@@ -215,6 +216,37 @@ describe.each(ORDERS)('absent collection — React (%s)', (label, enhancers) => 
     } finally {
       view.unmount();
       owner.destroy();
+    }
+  });
+
+  it('a tap inside transact reads the collection as it is (v16 8f)', () => {
+    const tree = signalTree(
+      { a: { rows: entityMap<Row, string>(), s: 0 }, count: 0 },
+      { enhancers: enhancers() as never }
+    ) as unknown as {
+      $: { a: { rows: Rows } };
+      transact(run: () => void): unknown;
+      destroy(): void;
+    };
+    try {
+      const rows = tree.$.a.rows;
+      rows.addOne(A);
+      rows.addOne(Z);
+      rows.all();
+      rows.count();
+      const seen: unknown[] = [];
+      rows.tap({
+        onRemove: () => {
+          seen.push(
+            rows.all().map((row) => row.id),
+            rows.count()
+          );
+        },
+      });
+      tree.transact(() => rows.removeOne('a'));
+      expect(seen).toEqual([['z'], 1]);
+    } finally {
+      tree.destroy();
     }
   });
 
