@@ -1886,11 +1886,11 @@ export function createEntitySignal<
     for (const [processed, entity] of copies) {
       processed.entity = interceptAddedEntity(entity);
     }
-    const plannedFreshSubjectIds = structuralStore.planFreshSubjectIds(
-      toProcess.filter(
-        ({ existingSubjectId }) => existingSubjectId === undefined
-      ).length
-    );
+    const freshCount = toProcess.filter(
+      ({ existingSubjectId }) => existingSubjectId === undefined
+    ).length;
+    const plannedFreshSubjectIds =
+      structuralStore.planFreshSubjectIds(freshCount);
     let plannedFreshIndex = 0;
     const preparedAdds = toProcess.map(
       ({ id, entity, existingSubjectId }) => ({
@@ -1918,10 +1918,13 @@ export function createEntitySignal<
     // prependMany: an OVERWRITTEN row that moves to the front is an order
     // change no anchor expresses, published as one order delta under setAll's
     // condition (surviving rows changed relative order). Unrecorded, it stayed
-    // at the front on undo and rollback (15.4.3).
+    // at the front on undo and rollback (15.4.3). Only a call that overwrites
+    // an existing row can move one, so only it walks the order: fresh rows
+    // alone never reorder the survivors, and prependOne stays O(1) (bf64f92e
+    // walked it twice per call under any capture).
     const beforeSubjects: number[] = [];
     const beforeFrontier = structuralStore.activeOrderFrontier();
-    const consumed = front && orderConsumed();
+    const consumed = front && freshCount < toProcess.length && orderConsumed();
     if (consumed) structuralStore.snapshotActiveOrder([], beforeSubjects);
 
     const frame = createEntityMutationFrame();
