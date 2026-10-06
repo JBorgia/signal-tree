@@ -5115,7 +5115,14 @@ export function restoration(
       clearHistoricalCapture();
       pendingDescriptorInputs.clear();
       stagedForeignTurns.clear();
-      speculativeContributions.clear();
+      // A reset clears HISTORY, not pending transactions: a transaction still
+      // open across it can be rejected afterwards, and every record from then
+      // on is later than it. Turn ids and ordinals restart at 1, so its
+      // watermark moves to the new start. Clearing this (through 4b28e3bf)
+      // let undo restore the rejected value after a reset.
+      for (const contribution of speculativeContributions.values()) {
+        contribution.since = { turnId: 0, ordinal: 0 };
+      }
       pendingTransactions.clear();
       supersededExternalTruth.clear();
       externalTruthByPath.clear();
