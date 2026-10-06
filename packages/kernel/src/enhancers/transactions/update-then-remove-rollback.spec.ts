@@ -123,6 +123,17 @@ const writeThenRemove: Record<string, (tree: Tree) => void> = {
     tree.$.rows.updateOne('a2', { n: 2 });
     tree.$.rows.removeOne('a2');
   },
+  'changeId twice, updateOne, then removeOne': (tree) => {
+    tree.$.rows.changeId('a', 'a2');
+    tree.$.rows.changeId('a2', 'a3');
+    tree.$.rows.updateOne('a3', { n: 2 });
+    tree.$.rows.removeOne('a3');
+  },
+  'changeId, updateOne adding a field, then removeOne': (tree) => {
+    tree.$.rows.changeId('a', 'a2');
+    tree.$.rows.updateOne('a2', { n: 2, tag: 'x' });
+    tree.$.rows.removeOne('a2');
+  },
   'updateOne, changeId, then removeOne': (tree) => {
     tree.$.rows.updateOne('a', { n: 2 });
     tree.$.rows.changeId('a', 'a2');
@@ -221,11 +232,16 @@ describe.each(Object.entries(configurations))(
   }
 );
 
-// Undo was correct before the repair; these rows keep it that way. Cases whose
-// undo already failed for unrelated reasons on 15.4.3 are listed in the report,
-// not here: `updateOne then clear` (restored ORDER) and `changeId, updateOne,
-// then removeOne` (refused as structural drift).
+// Undo was correct before the repair for most of these rows; they keep it that
+// way. The changeId-first rows REFUSED on 15.4.3 ("Unsupported scoped undo
+// effect at structural-drift"): rekey-then-remove composes into one removal
+// that keeps the rekey's EARLIER slot, so the reversed turn reversed the field
+// before the row was back. `updateOne then clear` is tracked in
+// reversal-known-limitations.spec.ts.
 const undoCases = [
+  'changeId, updateOne, then removeOne',
+  'changeId twice, updateOne, then removeOne',
+  'changeId, updateOne adding a field, then removeOne',
   'updateOne then removeOne',
   'replaceOne then removeOne',
   'row set through byId then removeOne',
