@@ -1762,14 +1762,18 @@ export function createEntitySignal<
 
   function addOneRow(entity: E, opts?: AddOptions<E, K>): K {
     const id = deriveId(entity, opts);
-    const previousLastKey = structuralStore.lastActiveKey();
-    recordProductionSubstrateStat('publicAddPreviousTailReads');
 
     if (structuralStore.hasActiveKey(id)) {
       throw new Error(`Entity with id ${String(id)} already exists`);
     }
 
     const transformedEntity = interceptAddedEntity(entity);
+    // The anchor is read AFTER the interceptors, which may write: read
+    // before, a row one appended was skipped over (redo put this row ahead of
+    // it), and a last row one removed got a fresh subject allocated for its
+    // vanished key, which resurrected it as an empty row (15.4.3).
+    const previousLastKey = structuralStore.lastActiveKey();
+    recordProductionSubstrateStat('publicAddPreviousTailReads');
     const subjectId = structuralStore.planFreshSubjectIds(1)[0];
     if (subjectId === undefined) {
       throw new Error(
@@ -1839,10 +1843,6 @@ export function createEntitySignal<
     front?: boolean
   ): K[] {
     const mode = opts?.mode ?? 'strict';
-    // addMany appends: an added row's predecessor is the previous added row,
-    // or for the first one the last row before the call. Only that key is
-    // needed, not a copy of every key.
-    const lastPreviousKey = structuralStore.lastActiveKey();
 
     // First pass: validate/filter based on mode. The rows apply as if one
     // at a time, so an earlier copy of an id in this call counts as
@@ -1907,6 +1907,12 @@ export function createEntitySignal<
             : valueStore.backingForSubject(existingSubjectId),
       })
     );
+
+    // addMany appends: an added row's predecessor is the previous added row,
+    // or for the first one the last row before the call. Only that key is
+    // needed, not a copy of every key. Read after the interceptors, as
+    // addOne's is.
+    const lastPreviousKey = structuralStore.lastActiveKey();
 
     // prependMany: an OVERWRITTEN row that moves to the front is an order
     // change no anchor expresses, published as one order delta under setAll's
@@ -3217,7 +3223,6 @@ export function createEntitySignal<
 
     upsertMany(entities: E[], opts?: AddOptions<E, K>): K[] {
       if (entities.length === 0) return [];
-      const lastPreviousKey = structuralStore.lastActiveKey();
 
       // Separate adds from updates
       const toAdd: Array<{ entity: E; id: K }> = [];
@@ -3263,6 +3268,8 @@ export function createEntitySignal<
         };
       });
 
+      // Read after the interceptors, as addOne's is.
+      const lastPreviousKey = structuralStore.lastActiveKey();
       const membershipUnit = beginMembershipUnit();
       try {
       const freshSubjectIds = commitFreshSubjects(
