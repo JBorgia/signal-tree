@@ -393,3 +393,95 @@ describe.each([
     });
   }
 );
+
+// Rows appended after a row the SAME turn removes. Their recorded anchor is that
+// row, which a redo (or forward jumpTo) applies as removed: on 15.4.3 the
+// declarative target found no live anchor and threw "Collection structural
+// target has no live placement anchor". The row's last known position (after
+// its nearest surviving predecessor) is where they belong.
+const appendThenRemoveAnchor: Record<string, (tree: Tree) => void> = {
+  'add x and y, update x, removeMany a and c': (tree) => {
+    tree.$.rows.addOne({ id: 'x', n: 1 });
+    tree.$.rows.addOne({ id: 'y', n: 1 });
+    tree.$.rows.updateOne('x', { n: 9 });
+    tree.$.rows.removeMany(['a', 'c']);
+  },
+  'add x and y, removeOne c': (tree) => {
+    tree.$.rows.addOne({ id: 'x', n: 1 });
+    tree.$.rows.addOne({ id: 'y', n: 1 });
+    tree.$.rows.removeOne('c');
+  },
+  'add x and y, then clear': (tree) => {
+    tree.$.rows.addOne({ id: 'x', n: 1 });
+    tree.$.rows.addOne({ id: 'y', n: 1 });
+    tree.$.rows.removeMany(['z', 'a', 'c']);
+  },
+  'addMany x, y, w, then removeMany z and c': (tree) => {
+    tree.$.rows.addMany([
+      { id: 'x', n: 1 },
+      { id: 'y', n: 2 },
+      { id: 'w', n: 3 },
+    ]);
+    tree.$.rows.removeMany(['z', 'c']);
+  },
+};
+
+describe.each([
+  ['restoration()', () => [restoration()]],
+  ['transactions(), restoration()', () => [transactions(), restoration()]],
+  ['restoration(), transactions()', () => [restoration(), transactions()]],
+] as const)(
+  'redo of rows appended after a removed anchor (%s)',
+  (_name, enhancers) => {
+    it.each(Object.keys(appendThenRemoveAnchor))(
+      '%s: undo, redo, undo, jumpTo(last) all exact',
+      async (name) => {
+        const tree = make(enhancers);
+        try {
+          await seed(tree);
+          undoable(() => appendThenRemoveAnchor[name](tree));
+          await flush();
+          const after = state(tree);
+          tree.undo();
+          await flush();
+          expect(state(tree)).toStrictEqual(SEEDED);
+          tree.redo();
+          await flush();
+          expect(state(tree)).toStrictEqual(after);
+          tree.undo();
+          await flush();
+          expect(state(tree)).toStrictEqual(SEEDED);
+          tree.jumpTo(tree.getRestorationHistory().length - 1);
+          await flush();
+          expect(state(tree)).toStrictEqual(after);
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
+  }
+);
+
+describe.each(Object.entries(configurations))(
+  'rollback of rows appended after a removed anchor (%s)',
+  (_name, enhancers) => {
+    it.each(Object.keys(appendThenRemoveAnchor))(
+      '%s restores the pre-transaction rows',
+      async (name) => {
+        const tree = make(enhancers);
+        try {
+          await seed(tree);
+          const pending = tree.transaction(() =>
+            appendThenRemoveAnchor[name](tree)
+          );
+          await flush();
+          pending.rollback();
+          await flush();
+          expect(state(tree)).toStrictEqual(SEEDED);
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
+  }
+);

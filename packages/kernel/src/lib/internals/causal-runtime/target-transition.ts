@@ -619,12 +619,62 @@ function deriveStructuralTargetOrder(
       order.push(subject);
       continue;
     }
+    const lastKnown = removedAnchorPosition(
+      sourceOrder,
+      order,
+      beforeSubject,
+      afterSubject
+    );
+    if (lastKnown !== undefined) {
+      order.splice(lastKnown, 0, subject);
+      continue;
+    }
     throw new Error(
       'Collection structural target has no live placement anchor'
     );
   }
 
   return order;
+}
+
+/**
+ * Where an anchor that THIS transition removes used to be: after its nearest
+ * surviving predecessor in the source order (the front if none), else before
+ * its nearest surviving successor (the end if none). Redo of
+ * `addOne x; addOne y; removeMany(['a', 'c'])` anchors x to c, which the same
+ * transition removes, and threw "no live placement anchor". An anchor absent
+ * from the source order entirely stays an error.
+ */
+function removedAnchorPosition(
+  sourceOrder: readonly number[],
+  order: readonly number[],
+  beforeSubject: number | undefined,
+  afterSubject: number | undefined
+): number | undefined {
+  const live = new Set(order);
+  if (beforeSubject !== undefined) {
+    const at = sourceOrder.indexOf(beforeSubject);
+    if (at >= 0) {
+      for (let index = at - 1; index >= 0; index -= 1) {
+        if (live.has(sourceOrder[index])) {
+          return order.indexOf(sourceOrder[index]) + 1;
+        }
+      }
+      return 0;
+    }
+  }
+  if (afterSubject !== undefined) {
+    const at = sourceOrder.indexOf(afterSubject);
+    if (at >= 0) {
+      for (let index = at + 1; index < sourceOrder.length; index += 1) {
+        if (live.has(sourceOrder[index])) {
+          return order.indexOf(sourceOrder[index]);
+        }
+      }
+      return order.length;
+    }
+  }
+  return undefined;
 }
 
 function derivePendingAnchorOrder(
