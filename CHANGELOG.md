@@ -234,6 +234,13 @@ bullet below says **Compatibility** or **Behaviour change**.
 - After rejecting a transaction that removed or reordered rows, history,
   undo, redo and `jumpTo()` of later work restore those rows next to the
   neighbours the rollback restored them beside (history and undo threw).
+- An undoable write made while viewing a `jumpTo()` position keeps the viewed
+  entry and every entry before it in history, applied, and discards only the
+  entries after it. After a forward jump (`undo(); jumpTo(1)`) it discarded
+  the viewed entry too while its effects stayed live, so history read
+  `["a6", "a6 + write"]` and undo went from a6 straight to a1; and a
+  transaction rolled back in a view left undo walking entries already
+  discarded. A plain write still leaves the view as it is.
 - A devtools timeline jump that only reorders a collection no longer makes
   undo of an authored reorder refuse or `getRestorationHistory()` throw: the
   undo overwrites the scrub, and history states hold authored orders.
