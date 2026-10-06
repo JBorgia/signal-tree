@@ -201,3 +201,181 @@ describe.each([
     }
   });
 });
+
+// ── The index is the latest applied entry after every history change ────────
+// (review of 30c6a90e: insertConfirmedTurn set it to the last entry, so a
+// confirmation after an undo claimed an undone entry was applied; and leaving
+// a jumpTo view did not move it, so a throwing undo left it at the view).
+describe.each([
+  [
+    'transactions(), restoration()',
+    (maxHistorySize?: number) => [
+      transactions(),
+      restoration(maxHistorySize === undefined ? {} : { maxHistorySize }),
+    ],
+  ],
+  [
+    'restoration(), transactions()',
+    (maxHistorySize?: number) => [
+      restoration(maxHistorySize === undefined ? {} : { maxHistorySize }),
+      transactions(),
+    ],
+  ],
+] as const)(
+  'getCurrentIndex after history changes (%s)',
+  (_name, enhancers) => {
+    const make = (maxHistorySize?: number): Tree =>
+      signalTree(
+        { n: 0 },
+        { enhancers: enhancers(maxHistorySize) as never }
+      ) as unknown as Tree;
+    const write = async (tree: Tree, value: number) => {
+      undoable(() => tree.$.n(value));
+      await flush();
+    };
+
+    it('a transaction confirmed after a later write was undone lands at the applied prefix', async () => {
+      const tree = signalTree(
+        { n: 0, m: 0 },
+        { enhancers: enhancers() as never }
+      );
+      try {
+        let pending: { confirm(): void } | undefined;
+        undoable(() => {
+          pending = tree.transaction(() => tree.$.m(1));
+        });
+        await flush();
+        undoable(() => tree.$.n(2));
+        await flush();
+        tree.undo();
+        await flush();
+        expect(tree.getCurrentIndex()).toBe(-1);
+        pending?.confirm();
+        await flush();
+        expect(tree.getRestorationHistory()).toHaveLength(2);
+        expect(tree.getCurrentIndex()).toBe(0);
+        expect([tree.canUndo(), tree.canRedo()]).toStrictEqual([true, true]);
+        tree.redo();
+        await flush();
+        expect([tree.getCurrentIndex(), tree.$.n(), tree.$.m()]).toStrictEqual([
+          1, 2, 1,
+        ]);
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    it('a write during a jumpTo view truncates the future and lands at the end', async () => {
+      const tree = make();
+      try {
+        for (const value of [1, 2, 3]) await write(tree, value);
+        tree.jumpTo(0);
+        await flush();
+        await write(tree, 9);
+        expect(steps(tree)).toStrictEqual({
+          index: 1,
+          back: 2,
+          forward: 0,
+          n: 9,
+        });
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    it('eviction keeps the index on the latest applied entry', async () => {
+      const tree = make(2);
+      try {
+        for (const value of [1, 2, 3]) await write(tree, value);
+        expect(steps(tree)).toStrictEqual({
+          index: 1,
+          back: 2,
+          forward: 0,
+          n: 3,
+        });
+        tree.undo();
+        await flush();
+        expect(steps(tree)).toStrictEqual({
+          index: 0,
+          back: 1,
+          forward: 1,
+          n: 2,
+        });
+        await write(tree, 7);
+        expect(steps(tree)).toStrictEqual({
+          index: 1,
+          back: 2,
+          forward: 0,
+          n: 7,
+        });
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    it('a reset empties history and the index', async () => {
+      const tree = make();
+      try {
+        for (const value of [1, 2]) await write(tree, value);
+        tree.undo();
+        await flush();
+        (
+          tree as unknown as { resetRestorationHistory(): void }
+        ).resetRestorationHistory();
+        expect(steps(tree)).toStrictEqual({
+          index: -1,
+          back: 0,
+          forward: 0,
+          n: 1,
+        });
+        await write(tree, 5);
+        expect(steps(tree)).toStrictEqual({
+          index: 0,
+          back: 1,
+          forward: 0,
+          n: 5,
+        });
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    it('an undo that throws after leaving a jumpTo view leaves the index at the undo position', async () => {
+      const tree = make();
+      const realIndexOf = Array.prototype.indexOf;
+      try {
+        for (const value of [1, 2, 3]) await write(tree, value);
+        tree.undo();
+        await flush();
+        tree.jumpTo(2);
+        await flush();
+        expect([tree.getCurrentIndex(), tree.$.n()]).toStrictEqual([2, 3]);
+        // The next indexOf inside undoPosition throws: after the view has gone
+        // back to the undo position, before the undo itself applies. (Fault
+        // injection by instrumenting a builtin, as entity-large-batches does.)
+        Array.prototype.indexOf = function (
+          this: unknown[],
+          ...args: [unknown, number?]
+        ) {
+          if ((new Error().stack ?? '').includes('undoPosition')) {
+            Array.prototype.indexOf = realIndexOf;
+            throw new Error('INJECTED undo fault');
+          }
+          return realIndexOf.apply(this, args);
+        } as typeof realIndexOf;
+        expect(() => tree.undo()).toThrow('INJECTED undo fault');
+        Array.prototype.indexOf = realIndexOf;
+        await flush();
+        expect(steps(tree)).toStrictEqual({
+          index: 1,
+          back: 2,
+          forward: 1,
+          n: 2,
+        });
+      } finally {
+        Array.prototype.indexOf = realIndexOf;
+        tree.destroy();
+      }
+    });
+  }
+);

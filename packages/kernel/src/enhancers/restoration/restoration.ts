@@ -1440,13 +1440,18 @@ class RestorationManager<T> {
     const insertIndex = this.history.findIndex(
       (candidate) => candidate.id > entry.id
     );
+    // The common case: a new entry after a fully applied history (a write
+    // truncates any redo future first). Anything else re-reads the prefix.
+    const appendedAfterAppliedPrefix =
+      insertIndex === -1 &&
+      !this.isTemporalViewActive &&
+      this.currentIndex === this.history.length - 1;
     if (insertIndex === -1) {
       this.history.push(entry);
     } else {
       this.history.splice(insertIndex, 0, entry);
     }
     this.bumpRestorationHistory();
-    this.currentIndex = this.history.length - 1;
     this.isTemporalViewActive = false;
 
     delete entry.state;
@@ -1460,13 +1465,28 @@ class RestorationManager<T> {
         this.releaseRetainedRestorationEntries([evicted]);
       }
       this.bumpRestorationHistory();
-      this.currentIndex--;
     }
 
     this.rebuildTurnIndexes();
+    // The latest APPLIED entry, not the last one: confirming a transaction
+    // after a later write was undone inserts it before that undone entry
+    // (through 30c6a90e this claimed the undone entry was applied).
+    this.currentIndex = appendedAfterAppliedPrefix
+      ? this.history.length - 1
+      : this.latestAppliedIndex();
     this.pruneHistoricalEventsBeforeOldestBoundary();
     this.publishObservation({ kind: 'history-changed' });
     return true;
+  }
+
+  /** The latest applied history entry, or -1 when none is applied. */
+  private latestAppliedIndex(): number {
+    for (let index = this.history.length - 1; index >= 0; index -= 1) {
+      if (this.getTurnStatus(this.history[index].id) === 'applied') {
+        return index;
+      }
+    }
+    return -1;
   }
 
   private pruneHistoricalEventsBeforeOldestBoundary(): void {
@@ -1871,9 +1891,15 @@ class RestorationManager<T> {
     this.applyDirectedTurnTransition(turnIdsToUndo, turnIdsToRedo);
 
     this.isTemporalViewActive = false;
+    // Back at the undo position: so is the index, even if the step that
+    // follows throws (a view never moves frontiers, so they still say where).
+    this.currentIndex = this.latestAppliedIndex();
   }
 
-  undoPosition(positionId: number): number[] {
+  undoPosition(
+    positionId: number,
+    beforePublish?: (closure: number[]) => void
+  ): number[] {
     const closure = this.resolveUndoClosure(positionId);
     if (closure.length === 0) {
       return closure;
@@ -1910,6 +1936,7 @@ class RestorationManager<T> {
     for (const [candidatePositionId, frontier] of frontierUpdates.entries()) {
       this.positionFrontiers.set(candidatePositionId, frontier);
     }
+    beforePublish?.(closure);
     this.bumpFrontiers();
 
     if (RUN_RESTORATION_CONSISTENCY_CHECKS) {
@@ -1918,7 +1945,10 @@ class RestorationManager<T> {
     return closure;
   }
 
-  redoPosition(positionId: number): number[] {
+  redoPosition(
+    positionId: number,
+    beforePublish?: (closure: number[]) => void
+  ): number[] {
     const closure = this.resolveRedoClosure(positionId);
     if (closure.length === 0) {
       return closure;
@@ -1955,6 +1985,7 @@ class RestorationManager<T> {
     for (const [candidatePositionId, frontier] of frontierUpdates.entries()) {
       this.positionFrontiers.set(candidatePositionId, frontier);
     }
+    beforePublish?.(closure);
     this.bumpFrontiers();
 
     if (RUN_RESTORATION_CONSISTENCY_CHECKS) {
@@ -2102,7 +2133,11 @@ class RestorationManager<T> {
     const seedPositionId = latestTurn?.__positionIds?.[0];
 
     if (latestTurn && seedPositionId !== undefined) {
-      this.moveCurrentIndex(this.undoPosition(seedPositionId), 'undo');
+      // The index moves with the frontiers, before either is published: a
+      // synchronous watcher saw canUndo() change while the index was stale.
+      this.undoPosition(seedPositionId, (closure) =>
+        this.moveCurrentIndex(closure, 'undo')
+      );
       return true;
     }
 
@@ -2185,7 +2220,9 @@ class RestorationManager<T> {
     const seedPositionId = earliestTurn?.__positionIds?.[0];
 
     if (earliestTurn && seedPositionId !== undefined) {
-      this.moveCurrentIndex(this.redoPosition(seedPositionId), 'redo');
+      this.redoPosition(seedPositionId, (closure) =>
+        this.moveCurrentIndex(closure, 'redo')
+      );
       return true;
     }
 
