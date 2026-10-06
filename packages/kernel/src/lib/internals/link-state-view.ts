@@ -1,10 +1,8 @@
 import type { CarrierKind } from '../types';
 import { isToolingTreeDestroyed, type ToolingTree } from './tooling-tree';
-import {
-  getPositionRegistry,
-  type PositionRegistry,
-  type TreeId,
-} from './position-registry';
+import { getPositionRegistry, type TreeId } from './position-registry';
+import { getOwnedPositionIds } from './owned-metadata';
+import { getLinkStateSlot, type LinkRecord } from './link-state-source';
 import { StudioTreeDestroyedError } from './confirmed-turn-view';
 
 /** Read-only activity of one relationship. IDs are scoped to its tree. */
@@ -62,34 +60,35 @@ type Delivery = {
   event: LinkStateEvent;
   audience: readonly Subscription[];
 };
-type Registration = { readonly read: () => LinkStateView };
 type State = {
-  nextId: number;
   sequence: number;
   closed: boolean;
-  cleanupRegistered: boolean;
   delivering: boolean;
   deliveries: Delivery[];
-  links: Map<number, Registration>;
   listeners: Set<Subscription>;
 };
-const states = new WeakMap<PositionRegistry, State>();
-function stateFor(registry: PositionRegistry): State {
-  let state = states.get(registry);
-  if (!state) {
-    state = {
-      nextId: 1,
-      sequence: 0,
-      closed: false,
-      cleanupRegistered: false,
-      delivering: false,
-      deliveries: [],
-      links: new Map(),
-      listeners: new Set(),
-    };
-    states.set(registry, state);
-  }
-  return state;
+const states = new WeakMap<object, State>();
+
+/** The read-only view of one relationship, from its facts at this moment. */
+function viewOf(record: LinkRecord): LinkStateView {
+  const [dirty, held, queued, sending, retrieving, disposed] =
+    record.activity();
+  return {
+    id: record.id,
+    path: record.path,
+    positions: getOwnedPositionIds(record.source) ?? [],
+    directions: {
+      get: !!record.endpoint.get,
+      set: !!record.endpoint.set,
+      subscribe: !!record.endpoint.subscribe,
+    },
+    dirty,
+    held,
+    queued,
+    sending,
+    retrieving,
+    disposed,
+  };
 }
 function detach(view: LinkStateView): LinkStateView {
   return {
@@ -99,66 +98,46 @@ function detach(view: LinkStateView): LinkStateView {
   };
 }
 
-/** @internal A relationship reports its actual scheduler facts, without values. */
-export function registerLinkState(
-  registry: PositionRegistry,
-  read: (id: number) => LinkStateView
-): { publish(kind?: LinkStateEvent['kind']): void; forget(): void } {
-  const state = stateFor(registry);
-  const id = state.nextId++;
-  const registration = { read: () => read(id) };
-  if (!state.closed) state.links.set(id, registration);
-  let retired = state.closed;
-  return {
-    forget() {
-      retired = true;
-      state.links.delete(id);
-    },
-    publish(kind = 'changed') {
-      if (state.closed || retired) return;
-      if (kind === 'disposed') {
-        retired = true;
-        state.links.delete(id);
-      }
-      const sequence = ++state.sequence;
-      // No event allocation or retained payload when nobody is listening.
-      if (state.listeners.size === 0) return;
-      state.deliveries.push({
-        event: {
-          treeId: registry.id,
-          sequence,
-          kind,
-          link: detach(registration.read()),
-        },
-        audience: [...state.listeners],
-      });
-      if (state.delivering) return;
-      state.delivering = true;
-      try {
-        // Reentrant operations enqueue behind this fact for every observer.
-        // Audience is captured at publication, so new listeners receive no past.
-        for (let index = 0; index < state.deliveries.length; index++) {
-          const { event, audience } = state.deliveries[index];
-          for (const subscription of audience) {
-            if (state.closed || !state.listeners.has(subscription)) continue;
-            try {
-              subscription.listener({ ...event, link: detach(event.link) });
-            } catch {
-              /* Observation cannot fail synchronization. */
-            }
-          }
+function publish(
+  state: State,
+  treeId: TreeId,
+  record: LinkRecord,
+  kind: LinkStateEvent['kind']
+): void {
+  if (state.closed) return;
+  const sequence = ++state.sequence;
+  // No event allocation or retained payload when nobody is listening.
+  if (state.listeners.size === 0) return;
+  state.deliveries.push({
+    event: { treeId, sequence, kind, link: viewOf(record) },
+    audience: [...state.listeners],
+  });
+  if (state.delivering) return;
+  state.delivering = true;
+  try {
+    // Reentrant operations enqueue behind this fact for every observer.
+    // Audience is captured at publication, so new listeners receive no past.
+    for (let index = 0; index < state.deliveries.length; index++) {
+      const { event, audience } = state.deliveries[index];
+      for (const subscription of audience) {
+        if (state.closed || !state.listeners.has(subscription)) continue;
+        try {
+          subscription.listener({ ...event, link: detach(event.link) });
+        } catch {
+          /* Observation cannot fail synchronization. */
         }
-      } finally {
-        state.deliveries.length = 0;
-        state.delivering = false;
       }
-    },
-  };
+    }
+  } finally {
+    state.deliveries.length = 0;
+    state.delivering = false;
+  }
 }
 
 /**
  * Observe active Link relationships owned by this tree. Reading creates no Link,
  * performs no I/O and grants no mutation authority. Destroyed trees refuse reads.
+ * Sequences count from the first reader of the tree; there is no event history.
  */
 export function linkStateReader<
   T,
@@ -169,16 +148,34 @@ export function linkStateReader<
   if (!registry)
     throw new Error('Link observation requires an owned SignalTree.');
   if (isToolingTreeDestroyed(tree)) throw new StudioTreeDestroyedError();
-  const state = stateFor(registry);
-  if (!state.cleanupRegistered) {
-    state.cleanupRegistered = true;
+  const slot = getLinkStateSlot(registry);
+  let existing = states.get(registry);
+  if (!existing) {
+    const state: State = {
+      sequence: 0,
+      closed: false,
+      delivering: false,
+      deliveries: [],
+      listeners: new Set(),
+    };
+    existing = state;
+    states.set(registry, state);
+    slot.observer = (record, kind) =>
+      publish(
+        state,
+        registry.id,
+        record,
+        (kind ?? 'changed') as LinkStateEvent['kind']
+      );
     tree.registerCleanup(() => {
       state.closed = true;
-      state.links.clear();
+      slot.observer = undefined;
+      slot.links.clear();
       state.listeners.clear();
       state.deliveries.length = 0;
     });
   }
+  const state = existing;
   const assertLive = () => {
     if (state.closed || isToolingTreeDestroyed(tree))
       throw new StudioTreeDestroyedError();
@@ -189,7 +186,7 @@ export function linkStateReader<
       return {
         treeId: registry.id,
         sequence: state.sequence,
-        links: [...state.links.values()].map((item) => detach(item.read())),
+        links: [...slot.links.values()].map((record) => detach(viewOf(record))),
       };
     },
     subscribe(listener) {
