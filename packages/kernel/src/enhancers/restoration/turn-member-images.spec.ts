@@ -164,6 +164,30 @@ describe('one turn that omits and re-adds (v16 8g)', () => {
       });
 });
 
+describe('a turn whose re-add and omission cancel (v16 8g)', () => {
+  for (const [order, enhancers] of Object.entries(orders))
+    it(`records nothing (${order})`, async () => {
+      const tree = make(enhancers());
+      await flush();
+      undoable(() => tree.$({ count: 1 }));
+      await flush();
+      const index = tree.getCurrentIndex();
+      const state = snap(tree);
+      // g comes back exactly as it is retained, and goes again: nothing
+      // under it changes, so its absent -> absent effect is dropped.
+      undoable(() => {
+        tree.$({
+          g: { rows: [], k: 0, s: 0, h: { x: 0, y: 0 } },
+          count: 1,
+        });
+        tree.$({ count: 1 });
+      });
+      await flush();
+      expect(snap(tree)).toBe(state);
+      expect(tree.getCurrentIndex()).toBe(index);
+    });
+});
+
 /** A small deterministic PRNG (mulberry32). */
 const random = (seed: number) => () => {
   seed |= 0;
