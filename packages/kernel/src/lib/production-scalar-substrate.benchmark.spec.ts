@@ -1369,8 +1369,9 @@ describe('Complexity audit: public undo-of-remove realization', () => {
 
 /**
  * Elements visited while `run` executes, counted where an O(size) walk or
- * copy goes: Map and Set iteration, `Array.from`, and the Array methods that
- * build or walk arrays. An indexed loop that builds nothing is not counted.
+ * copy goes: Map and Set iteration, `Array.from`, `Object.keys`, `values` and
+ * `entries`, and the Array methods that build, search or walk arrays. An
+ * indexed loop that builds nothing is not counted.
  */
 function countIteratedElements(run: () => void): number {
   let visited = 0;
@@ -1412,11 +1413,38 @@ function countIteratedElements(run: () => void): number {
         return original.apply(this, args);
       }
     );
-  for (const key of ['map', 'filter', 'forEach', 'slice', 'concat', 'reduce'])
+  // Whole-array walks, counted at their full length: a search that stops
+  // early still scales with the array it searches.
+  for (const key of [
+    'map',
+    'filter',
+    'forEach',
+    'slice',
+    'concat',
+    'reduce',
+    'indexOf',
+    'lastIndexOf',
+    'includes',
+    'find',
+    'findIndex',
+    'some',
+    'every',
+    'splice',
+    'sort',
+    'join',
+  ])
     patch(Array.prototype, key, (original) =>
       function (this: unknown[], ...args: unknown[]) {
         visited += this.length;
         return original.apply(this, args);
+      }
+    );
+  for (const key of ['keys', 'values', 'entries'])
+    patch(Object, key, (original) =>
+      function (this: unknown, ...args: unknown[]) {
+        const result = original.apply(this, args) as unknown[];
+        visited += result.length;
+        return result;
       }
     );
   patch(Array.prototype, 'push', (original) =>
