@@ -4328,6 +4328,42 @@ export function restoration(
      * removed is not this rule's (ordinary-removal-undo.spec.ts,
      * ordinary-removal-provenance.spec.ts).
      */
+    /**
+     * The current collection at `owner`, reached along its registered
+     * address, not by a walk of the whole tree: that walk ran on every undo,
+     * redo or jump that touched a row, 870x 15.4.3 on a 2,000-key tree (perf
+     * review of 15.4.4, item 1). As the walk, it follows enumerable keys
+     * only, so a collection an omission hides is not current; one added
+     * later is found by its own address.
+     */
+    const currentCollectionAt = (
+      owner: number
+    ):
+      | {
+          __findKeyBySubjectId?(subject: number): string | number | undefined;
+          __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+        }
+      | undefined => {
+      let node: unknown = tree.$;
+      for (const key of positionRegistry?.addressFor(owner as PositionId) ??
+        []) {
+        const descriptor = isTraversableNode(node)
+          ? Object.getOwnPropertyDescriptor(node, key)
+          : undefined;
+        node = descriptor?.enumerable
+          ? 'value' in descriptor
+            ? descriptor.value
+            : (node as Record<string, unknown>)[key]
+          : undefined;
+      }
+      const collection = node as
+        | { __prepareTransitionTarget?: CollectionTransitionTargetBinding }
+        | undefined;
+      return collection?.__prepareTransitionTarget?.owner === owner
+        ? collection
+        : undefined;
+    };
+
     const reconcileOrdinaryLifetimes = (
       applications: DirectedTurnApplication[]
     ): DirectedTurnApplication[] => {
@@ -4361,17 +4397,10 @@ export function restoration(
         __findKeyBySubjectId?(subject: number): string | number | undefined;
         __prepareTransitionTarget?: CollectionTransitionTargetBinding;
       };
-      let collections: Map<number, Collection> | undefined;
+      const collections = new Map<number, Collection | undefined>();
       const collectionOf = (owner: number) => {
-        if (!collections) {
-          const found = new Map<number, Collection>();
-          visitTree(tree.$, (node) => {
-            const binding = (node as Collection).__prepareTransitionTarget;
-            if (binding) found.set(binding.owner, node as Collection);
-            return undefined;
-          });
-          collections = found;
-        }
+        if (!collections.has(owner))
+          collections.set(owner, currentCollectionAt(owner));
         return collections.get(owner);
       };
       /** True, false, or undefined when the collection cannot say. */
@@ -4961,20 +4990,20 @@ export function restoration(
           ...(members.size > 0 ? { plainBranchMembers: members } : {}),
         };
       };
+      // Current bindings by owner, looked up as needed (`currentCollectionAt`).
       const collectBindings = () => {
         const bindings = new Map<number, CollectionTransitionTargetBinding>();
-        visitTree((tree as ISignalTree<T>).$, (node) => {
-          const binding = (
-            node as {
-              __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+        return {
+          bindings,
+          get(owner: number) {
+            if (!bindings.has(owner)) {
+              const binding =
+                currentCollectionAt(owner)?.__prepareTransitionTarget;
+              if (binding) bindings.set(owner, binding);
             }
-          ).__prepareTransitionTarget;
-          if (binding) {
-            bindings.set(binding.owner, binding);
-          }
-          return undefined;
-        });
-        return bindings;
+            return bindings.get(owner);
+          },
+        };
       };
       const applyDeclarativeTarget = (): void => {
         const deltaOwners = new Set(orderDeltas.map(({ owner }) => owner));
@@ -4998,14 +5027,15 @@ export function restoration(
               'the history position is unmoved.'
           );
         }
-        const bindings = collectBindings();
+        const current = collectBindings();
+        const bindings = current.bindings;
         const sources = [...targetOwners].map((owner) => {
           // A collection under a member being re-added is hidden from the
-          // current-tree walk; its binding is found along its address. The
+          // current tree; its binding is found along its address. The
           // replayed turn may re-add it itself: redo of a write that re-added
           // a hidden collection starts with it hidden (v16 8e review, M2).
           const binding =
-            bindings.get(owner) ?? collectionBindingAt(tree.$, owner);
+            current.get(owner) ?? collectionBindingAt(tree.$, owner);
           if (binding) bindings.set(owner, binding);
           if (!binding) {
             throw new Error(`Declarative order replay has no binding ${owner}`);
