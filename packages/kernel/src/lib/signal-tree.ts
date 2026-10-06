@@ -1,3 +1,7 @@
+import {
+  PRODUCTION_SUBSTRATE_STATS_ENABLED,
+  recordProductionSubstrateStat,
+} from './internals/production-substrate-stats';
 import type { Location, WritableCell } from './internals/cell-runtime';
 import type { SignalTreeFactory } from './types';
 
@@ -69,6 +73,7 @@ import { terminateOwnerInvalidation } from './internals/owner-invalidation-port'
 import { defineRootTree } from './internals/root-source';
 import {
   definePositionRegistry,
+  childAddressOf,
   defineNodeAddress,
   getNodeAddress,
   type PositionRegistry,
@@ -893,17 +898,26 @@ function recursiveUpdate(
     // supplied value, or the write lands in hidden storage and vanishes:
     // measured, `updateAndReport({ a: { b: { keep: 4 } } })` with `a` omitted
     // returned `[]` and left `a` absent.
-    const publishMembership = captureBranchMembershipIfObserved(
-      (targetObj as Record<symbol, object>)[NODE_ACCESSOR_PEER] ?? targetObj,
-      updates,
-      !reconcileMembership
-    );
+    // ⚠️ A PARTIAL WRITE CHANGES MEMBERSHIP ONLY BY RE-ADDING A DORMANT
+    // MEMBER (v16 8g). With none, its capture and its membership loop below
+    // can change nothing, and both walked every key of the branch on every
+    // write: 82-97x on a 200-key branch whenever anything was observed
+    // (perf-15.4.4, fx5). `hasDormantMembers` is a hint that only errs
+    // towards true. A whole value still reconciles every key.
+    const dormant = hasDormantMembers(targetObj);
+    const publishMembership =
+      reconcileMembership || dormant
+        ? captureBranchMembershipIfObserved(
+            (targetObj as Record<symbol, object>)[NODE_ACCESSOR_PEER] ??
+              targetObj,
+            updates,
+            !reconcileMembership
+          )
+        : undefined;
     // The supplied keys whose value was installed: only they may be re-added.
     // Only a branch that has omitted a member can have one to re-add, so a
     // tree that never omits allocates nothing here (v16 8e).
-    const installed = hasDormantMembers(targetObj)
-      ? new Set<string>()
-      : undefined;
+    const installed = dormant ? new Set<string>() : undefined;
 
     for (const [key, rawValue] of Object.entries(
       updates as Record<string, unknown>
@@ -1118,39 +1132,45 @@ function recursiveUpdate(
     // Reactivation is handled by the supplied-key loop above having ALREADY
     // installed the value: REACTIVATION MUST CARRY THE SUPPLIED VALUE, because
     // re-enumerating alone resurrects the dormant retained one.
-    const supplied = new Set(Object.keys(updates as Record<string, unknown>));
     const membershipChanged: string[] = [];
-
     // A partial write (`updateAndReport`'s outer level) omits nothing, so only
-    // its supplied keys can change presence.
-    for (const key of reconcileMembership
-      ? Object.getOwnPropertyNames(targetObj)
-      : supplied) {
-      const descriptor = Object.getOwnPropertyDescriptor(targetObj, key);
-      if (!descriptor || !('value' in descriptor)) continue;
+    // its supplied keys can change presence, and only by re-adding.
+    const supplied =
+      reconcileMembership || installed
+        ? new Set(Object.keys(updates as Record<string, unknown>))
+        : undefined;
 
-      if (!supplied.has(key)) {
-        if (
-          descriptor.enumerable &&
-          // A write made while this whole value ran re-added it: it stays.
-          !readdedDuringStructuralWrite(targetObj, key, since) &&
-          setMemberPresence(targetObj, key, 'dormant')
+    if (supplied)
+      for (const key of reconcileMembership
+        ? Object.getOwnPropertyNames(targetObj)
+        : supplied) {
+        if (PRODUCTION_SUBSTRATE_STATS_ENABLED)
+          recordProductionSubstrateStat('membershipKeysVisited');
+        const descriptor = Object.getOwnPropertyDescriptor(targetObj, key);
+        if (!descriptor || !('value' in descriptor)) continue;
+
+        if (!supplied.has(key)) {
+          if (
+            descriptor.enumerable &&
+            // A write made while this whole value ran re-added it: it stays.
+            !readdedDuringStructuralWrite(targetObj, key, since) &&
+            setMemberPresence(targetObj, key, 'dormant')
+          ) {
+            membershipChanged.push(key);
+          }
+        } else if (
+          // Only a member whose supplied value was installed is re-added: a key
+          // supplied as `undefined`, or with a value the loop discarded, would
+          // otherwise come back with its retained storage. Measured before v16 8d:
+          // `$({ a: undefined, count: 0 })` re-added an omitted `a` as `{ v: 1 }`.
+          // "DORMANT STORAGE MUST NOT SUPPLY THE REACTIVATED VALUE" (case 18).
+          !descriptor.enumerable &&
+          installed?.has(key) &&
+          setMemberPresence(targetObj, key, 'active')
         ) {
           membershipChanged.push(key);
         }
-      } else if (
-        // Only a member whose supplied value was installed is re-added: a key
-        // supplied as `undefined`, or with a value the loop discarded, would
-        // otherwise come back with its retained storage. Measured before v16 8d:
-        // `$({ a: undefined, count: 0 })` re-added an omitted `a` as `{ v: 1 }`.
-        // "DORMANT STORAGE MUST NOT SUPPLY THE REACTIVATED VALUE" (case 18).
-        !descriptor.enumerable &&
-        installed?.has(key) &&
-        setMemberPresence(targetObj, key, 'active')
-      ) {
-        membershipChanged.push(key);
       }
-    }
 
     // One publication for the whole transition. The per-slot tokens the leaves
     // already depend on are what carries it — no new reactive state exists, and
@@ -1382,7 +1402,7 @@ function createSignalStore<T>(
   for (const [key, definedValue] of Object.entries(
     obj as Record<string, unknown>
   )) {
-    const childAddress = [...address, key];
+    const childAddress = childAddressOf(address, key);
     const childPath = path ? `${path}.${key}` : key;
     const terminal = isLeafDefinition(definedValue);
     const value = terminal ? leafDefinitionValue(definedValue) : definedValue;
@@ -1679,7 +1699,7 @@ function create<T extends object>(
           scalarSlotRuntime,
           childPositionIds,
           childPath,
-          [...ownerAddress, key]
+          childAddressOf(ownerAddress, key)
         );
       };
     },

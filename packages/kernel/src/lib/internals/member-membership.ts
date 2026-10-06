@@ -1,4 +1,8 @@
 import {
+  PRODUCTION_SUBSTRATE_STATS_ENABLED,
+  recordProductionSubstrateStat,
+} from './production-substrate-stats';
+import {
   getLocationRuntime,
   isWritableLocation,
   NEUTRAL_LOCATION_RUNTIME,
@@ -83,7 +87,41 @@ import {
 // `Symbol('signaltree.…')`: the marker appeared verbatim in `tree.$.user()`.
 const DORMANT = Symbol.for('SignalTree:DormantMember');
 
-type DormantBinding = { parent: object; key: string };
+type DormantBinding = {
+  parent: object;
+  key: string;
+  /**
+   * `isAbsentMember`'s last answer for the node this link is stamped on, and
+   * the `membershipEpoch` it was computed at. Not membership: enumerability
+   * answers that, and any change to it advances the epoch (v16 8g).
+   */
+  epoch: number;
+  absent: boolean;
+};
+
+declare const ngDevMode: boolean | undefined;
+
+/**
+ * ⚠️ ADVANCED BY EVERY CHANGE THAT CAN CHANGE AN ABSENCE ANSWER: each
+ * enumerability flip (`activateOne`, `deactivateOne`, the only two writers of
+ * a member's enumerability) and each new link (`linkMember`). A cached answer
+ * from an older epoch is recomputed from the descriptors, so the cache can be
+ * stale for one read at most, never wrong.
+ */
+let membershipEpoch = 1;
+
+/**
+ * ⚠️ HOW MANY MEMBERS EACH TREE HAS OMITTED, per physical half: the exact
+ * count of enumerability flips (`deactivateOne` +1, `activateOne` -1) on
+ * halves that reach the tree's runtime. At 0 nothing in the tree is absent
+ * and nothing can need re-adding, so its leaves' liveness is removed again
+ * and their reads and writes pay none of it: after an omit and a re-add they
+ * still cost 2.6x (perf-15.4.4, fx4's optional part; v16 8g).
+ */
+const omittedMembers = new WeakMap<object, number>();
+/** Dev-mode cross-check of cached answers, one read in this many (8g). */
+const ABSENCE_CHECK_EVERY = 64;
+let absenceChecks = 0;
 
 /**
  * @internal An entity collection's hook for a change in its presence: it, or
@@ -118,7 +156,9 @@ const NODE_ACCESSOR_PEER = Symbol.for('SignalTree:NodeAccessorPeer');
  * ⚠️ READS THE DESCRIPTOR, NEVER A CACHED FLAG. The binding below only answers
  * "where do I consult the authoritative descriptor"; it must never answer "is
  * this member active". Enumerability owns that, and a cached boolean beside it
- * would be a second membership truth able to disagree.
+ * would be a second membership truth able to disagree. (`isAbsentMember`'s
+ * cache is not one: it is recomputed from the descriptors after any
+ * membership change, `membershipEpoch`.)
  */
 export function isDormantMember(leaf: unknown): boolean {
   const binding = memberBinding(leaf);
@@ -175,8 +215,35 @@ function nodeOf(parent: object): object {
  * member has no link and pays one symbol lookup, as before.
  */
 export function isAbsentMember(node: unknown): boolean {
+  const first = memberBinding(node);
+  if (first === undefined) return false;
+  // ⚠️ A CACHED ANSWER, VALIDATED BY THE MEMBERSHIP EPOCH (v16 8g). Every
+  // read and write of a location under a link walked every descriptor above
+  // it: reads after an omit and re-add cost 8.8x, writes 2.3x (perf-15.4.4,
+  // fx4). Enumerability still answers: the walk below runs whenever any
+  // membership changed since the last answer.
+  if (first.epoch === membershipEpoch) {
+    if (
+      (typeof ngDevMode === 'undefined' || ngDevMode) &&
+      ++absenceChecks % ABSENCE_CHECK_EVERY === 0 &&
+      walkAbsence(first) !== first.absent
+    )
+      throw new Error(
+        'SignalTree internal: a cached absence answer disagrees with ' +
+          'enumerability (membershipEpoch was not advanced).'
+      );
+    return first.absent;
+  }
+  if (PRODUCTION_SUBSTRATE_STATS_ENABLED)
+    recordProductionSubstrateStat('absenceWalks');
+  first.absent = walkAbsence(first);
+  first.epoch = membershipEpoch;
+  return first.absent;
+}
+
+function walkAbsence(first: DormantBinding): boolean {
   for (
-    let binding = memberBinding(node);
+    let binding: DormantBinding | undefined = first;
     binding;
     binding = memberBinding(binding.parent)
   ) {
@@ -295,7 +362,13 @@ export const storedReads = { depth: 0 };
  * even when the retained value equalled the written one.
  */
 export function reactivatePathOnWrite(node: unknown): boolean {
+  // A present location has nothing to re-add on either branch below (a
+  // structural write's own member would find its descriptor enumerable).
+  // Answered first, from the cache, before allocating the path (v16 8g).
+  if (!isAbsentMember(node)) return false;
   if (inStructuralWrite(node)) return reactivateOnWrite(node);
+  if (PRODUCTION_SUBSTRATE_STATS_ENABLED)
+    recordProductionSubstrateStat('absenceWalks');
   const path: DormantBinding[] = [];
   let outer = -1;
   for (
@@ -515,9 +588,14 @@ function deactivateOne(parent: object, key: string): boolean {
   }
 
   Object.defineProperty(parent, key, { ...descriptor, enumerable: false });
+  membershipEpoch++;
   markHasDormant(parent);
-  // The first omission in a tree is what installs liveness on its leaves.
-  getTreeScalarSlotRuntime(parent)?.enableAbsence?.(ABSENCE);
+  // An omission is what installs liveness on the tree's leaves.
+  const runtime = getTreeScalarSlotRuntime(parent);
+  if (runtime) {
+    omittedMembers.set(runtime, (omittedMembers.get(runtime) ?? 0) + 1);
+    runtime.enableAbsence?.(ABSENCE);
+  }
   const child = (parent as Record<string, unknown>)[key];
   if (isTraversableNode(child)) {
     linkMember(parent, key, child);
@@ -531,8 +609,15 @@ function deactivateOne(parent: object, key: string): boolean {
  * names in turn, so a walk follows links without resolving peers.
  */
 function linkMember(parent: object, key: string, child: object): void {
+  // A new link lengthens a walk `isAbsentMember` may have cached.
+  membershipEpoch++;
   Object.defineProperty(child, DORMANT, {
-    value: { parent: nodeOf(parent), key } satisfies DormantBinding,
+    value: {
+      parent: nodeOf(parent),
+      key,
+      epoch: 0,
+      absent: false,
+    } satisfies DormantBinding,
     enumerable: false,
     configurable: true,
     writable: true,
@@ -603,6 +688,13 @@ function activateOne(parent: object, key: string): boolean {
   }
 
   Object.defineProperty(parent, key, { ...descriptor, enumerable: true });
+  membershipEpoch++;
+  const runtime = getTreeScalarSlotRuntime(parent);
+  const omitted = runtime ? omittedMembers.get(runtime) : undefined;
+  if (runtime && omitted !== undefined) {
+    omittedMembers.set(runtime, omitted - 1);
+    if (omitted === 1) runtime.disableAbsence?.();
+  }
   // ⚠️ The binding is NOT cleared. It locates the descriptor; it is not a
   // dormancy flag. Clearing it here would make "has a binding" mean "is
   // dormant", which is exactly the second membership truth this design forbids.

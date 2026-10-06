@@ -1,9 +1,7 @@
 import type { PositionId } from '../types';
 import type { Location } from './cell-runtime';
 import { isTraversableNode } from './node-shape';
-import type {
-  ScalarSlotCommitResult,
-} from './tree-scalar-slot-runtime';
+import type { ScalarSlotCommitResult } from './tree-scalar-slot-runtime';
 
 /**
  * The NODE-ATTACHED SCALAR-SLOT PORT.
@@ -46,8 +44,13 @@ export interface MemberAbsence {
 }
 
 export interface TreeScalarLeafRuntime {
-  /** Install member liveness on every leaf of this tree, once. */
+  /** Install member liveness on every leaf of this tree. */
   enableAbsence?(absence: MemberAbsence): void;
+  /**
+   * Remove it again: no member of this tree is omitted, so no leaf can be
+   * absent or need re-adding (v16 8g).
+   */
+  disableAbsence?(): void;
   createLeaf<T>(
     initialValue: T,
     equal: (current: T, next: T) => boolean,
