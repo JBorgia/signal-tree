@@ -31,7 +31,6 @@ let fired = 0;
 const armRecordingFault = (
   where: 'before-pending' | 'after-pending' = 'before-pending'
 ): void => {
-  // eslint-disable-next-line no-extend-native
   Array.prototype.sort = function (
     this: unknown[],
     compare?: (left: unknown, right: unknown) => number
