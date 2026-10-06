@@ -3886,9 +3886,22 @@ export function createEntitySignal<
     const many = name.endsWith('Many') || name === 'setAll';
     (api as Record<string, unknown>)[name] = (...args: unknown[]) => {
       if (!absent() || inStructuralWrite(api)) return write(...args);
-      if (name !== 'clear')
-        for (const row of (many ? args[0] : [args[0]]) as E[])
-          deriveId(row, args[1] as AddOptions<E, K> | undefined);
+      // Everything the write itself refuses on its input refuses here first,
+      // a strict duplicate included: thrown after the removal, it left the
+      // retained rows removed and a history entry (port review, item 2).
+      if (name !== 'clear') {
+        const opts = args[1] as AddManyOptions<E, K> | undefined;
+        const strict =
+          (name === 'addMany' || name === 'prependMany') &&
+          (opts?.mode ?? 'strict') === 'strict';
+        const ids = new Set<K>();
+        for (const row of (many ? args[0] : [args[0]]) as E[]) {
+          const id = deriveId(row, opts);
+          if (strict && ids.has(id))
+            throw new Error(`Entity with id ${String(id)} already exists`);
+          ids.add(id);
+        }
+      }
       // The retained rows were never visible, so their removal is no row
       // change to observe: taps do not see it (`silentClear`). History still
       // records it, so a reversal restores them.

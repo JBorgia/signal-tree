@@ -263,8 +263,8 @@ Some details of that rule:
   retained rows before it adds its own. Taps do not see that removal, but
   history records it, so a reversal restores the rows.
 - **Invalid input changes nothing.** A re-adding write whose input makes it
-  throw (a missing row, or a `selectId` that throws) throws before anything
-  changes.
+  throw (a missing row, a `selectId` that throws, or an id given twice to a
+  strict `addMany()` or `prependMany()`) throws before anything changes.
 - **A blocked write still removes the retained rows.** An interceptor that
   blocks the write's own rows runs after the retained rows were removed. The
   collection stays absent and empty, and history holds the removal. Undoing
