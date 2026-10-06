@@ -1638,6 +1638,8 @@ export function createEntitySignal<
   }
 
   function interceptAddedEntity(entity: E): E {
+    // Already run for this call (a re-adding write, below).
+    if (interceptsSuppressed) return entity;
     let transformedEntity = entity;
     for (const handler of interceptHandlers) {
       const ctx: InterceptContext<E> = {
@@ -1660,6 +1662,8 @@ export function createEntitySignal<
 
   /** `setAll`'s whole-row replacement interceptor (a transform replaces it). */
   function interceptReplacedEntity(id: K, entity: E): E {
+    // Already run for this call (a re-adding write, below).
+    if (interceptsSuppressed) return entity;
     let replacement = entity;
     for (const handler of interceptHandlers) {
       const ctx: InterceptContext<Partial<E>> = {
@@ -1683,6 +1687,8 @@ export function createEntitySignal<
   }
 
   function interceptUpdatedEntity(id: K, changes: Partial<E>): Partial<E> {
+    // Already run for this call (a re-adding write, below).
+    if (interceptsSuppressed) return changes;
     let transformedChanges = changes;
     for (const handler of interceptHandlers) {
       const ctx: InterceptContext<Partial<E>> = {
@@ -1887,6 +1893,8 @@ export function createEntitySignal<
 
   /** Handlers for observation */
   const tapHandlers: TapHandlers<E, K>[] = [];
+  /** A re-adding write already ran this call's interceptors (v16 8f). */
+  let interceptsSuppressed = 0;
   /** A re-adding write's removal of retained rows: no tap sees it (v16 8e). */
   let silentClear = 0;
 
@@ -3896,21 +3904,72 @@ export function createEntitySignal<
 
   // ⚠️ A ROW-ADDING WRITE TO AN ABSENT COLLECTION RE-ADDS ITS PATH, CARRYING
   // ONLY THE WRITTEN ROWS (v16 8e). The collection reads empty while it is
-  // absent, so the write applies to an empty collection: its retained rows
-  // are removed first, through the ordinary `clear()` (which records them),
-  // then the write runs, then every omitted member on its path comes back
-  // with only that path (`reactivatePathOnWrite`). Retained rows never
-  // resurface, and undo, redo, jumpTo and rollback reverse all three. Writes
-  // that name an existing row refuse instead, as on an empty collection.
-  //
-  // A structural write (a whole value, a reversal) reconciles presence itself. A write that would fail on its input
-  // fails before the retained rows are removed: every row's id is derived
-  // first, as the write itself does before it changes anything (v16 8e
-  // review). An interceptor that blocks the write still runs after the
-  // removal; see the README. Only a structural write on this collection's own
-  // tree (the whole value hydrating it, a reversal) writes it as it is: a
-  // write from a tap or sync effect of another tree is an ordinary one.
+  // absent, so the write applies to an empty collection:
+  // 1. it is validated and intercepted as on an empty collection, before
+  //    anything changes, so a block or bad input changes nothing (v16 8f;
+  //    8e intercepted after the removal below, which then stayed);
+  // 2. the retained rows are removed through the ordinary `clear()`, which
+  //    records them, so a reversal restores them; no tap sees it;
+  // 3. the write runs with the rows already intercepted, interceptors
+  //    suppressed, so each runs exactly once;
+  // 4. every omitted member on its path comes back with only that path
+  //    (`reactivatePathOnWrite`).
+  // Retained rows never resurface, and undo, redo, jumpTo and rollback
+  // reverse all of it. Writes that name an existing row refuse instead, as on
+  // an empty collection. Only a structural write on this collection's own
+  // tree (the whole value hydrating it, a reversal) writes it as it is.
   const clearRetained = api.clear;
+  let reAdding = false;
+  /**
+   * The call's rows after its interceptors, as the write would intercept them
+   * on an empty collection: ids resolved first (a strict duplicate throws
+   * before any interceptor runs), then once per applied copy in input order —
+   * `onAdd` for a key's first copy; for upserts, `onUpdate` with each later
+   * raw copy, merged; otherwise the last copy wins in the first copy's place.
+   * Ids stay those the raw rows give (`selectId`), as the write would key them.
+   */
+  const interceptAsEmpty = (
+    name: string,
+    args: unknown[]
+  ): [unknown, AddManyOptions<E, K>] => {
+    const opts = args[1] as AddManyOptions<E, K> | undefined;
+    const many = name.endsWith('Many') || name === 'setAll';
+    const input = (many ? args[0] : [args[0]]) as E[];
+    const upsert = name.startsWith('upsert');
+    const mode =
+      name === 'addMany' || name === 'prependMany'
+        ? opts?.mode ?? 'strict'
+        : 'overwrite';
+    const copies: Array<[K, E]> = [];
+    const firsts = new Set<K>();
+    for (const row of input) {
+      const id = deriveId(row, opts);
+      if (firsts.has(id)) {
+        if (mode === 'strict')
+          throw new Error(`Entity with id ${String(id)} already exists`);
+        if (mode === 'skip') continue;
+      }
+      firsts.add(id);
+      copies.push([id, row]);
+    }
+    const rows = new Map<K, E>();
+    for (const [id, row] of copies) {
+      const running = rows.get(id);
+      rows.set(
+        id,
+        upsert && running !== undefined
+          ? { ...running, ...interceptUpdatedEntity(id, row) }
+          : interceptAddedEntity(row)
+      );
+    }
+    const keys = new Map<E, K>();
+    for (const [id, row] of rows) keys.set(row, id);
+    const resolved = {
+      ...opts,
+      selectId: (row: E) => keys.get(row) ?? deriveId(row, opts),
+    };
+    return [many ? [...rows.values()] : rows.values().next().value, resolved];
+  };
   for (const name of [
     'addOne',
     'prependOne',
@@ -3922,24 +3981,32 @@ export function createEntitySignal<
     'clear',
   ] as const) {
     const write = api[name] as (...args: unknown[]) => unknown;
-    const many = name.endsWith('Many') || name === 'setAll';
     (api as Record<string, unknown>)[name] = (...args: unknown[]) => {
-      if (!absent() || inStructuralWrite(api)) return write(...args);
-      if (name !== 'clear')
-        for (const row of (many ? args[0] : [args[0]]) as E[])
-          deriveId(row, args[1] as AddOptions<E, K> | undefined);
-      // The retained rows were never visible, so their removal is no row
-      // change to observe: taps do not see it (`silentClear`). History still
-      // records it, so a reversal restores them.
-      silentClear++;
+      if (reAdding || !absent() || inStructuralWrite(api))
+        return write(...args);
+      const prepared = name === 'clear' ? [] : interceptAsEmpty(name, args);
+      reAdding = true;
       try {
-        clearRetained();
+        // The retained rows were never visible, so their removal is no row
+        // change to observe: taps do not see it (`silentClear`).
+        silentClear++;
+        try {
+          clearRetained();
+        } finally {
+          silentClear--;
+        }
+        interceptsSuppressed++;
+        let result: unknown;
+        try {
+          result = write(...prepared);
+        } finally {
+          interceptsSuppressed--;
+        }
+        reactivatePathOnWrite(api);
+        return result;
       } finally {
-        silentClear--;
+        reAdding = false;
       }
-      const result = write(...args);
-      reactivatePathOnWrite(api);
-      return result;
     };
   }
   // Its presence changed (it, or a member above it, was omitted or re-added):

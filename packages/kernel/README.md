@@ -241,14 +241,12 @@ Some details of that rule:
 - **Retained rows are removed silently.** A re-adding write removes the
   retained rows before it adds its own. Taps do not see that removal, but
   history records it, so a reversal restores the rows.
-- **Invalid input changes nothing.** A re-adding write whose input makes it
-  throw (a missing row, or a `selectId` that throws) throws before anything
-  changes.
-- **A blocked write still removes the retained rows.** An interceptor that
-  blocks the write's own rows runs after the retained rows were removed. The
-  collection stays absent and empty, and history holds the removal. Undoing
-  it restores the rows and re-adds the path to the collection, as undoing
-  any write under an omitted member does.
+- **A write that fails changes nothing.** A re-adding write is validated and
+  intercepted as it would be on an empty collection before the retained rows
+  are removed. So input that makes it throw (a missing row, a `selectId` that
+  throws, a duplicate id in strict mode) or an interceptor that blocks it
+  throws with nothing changed and nothing in history. Its interceptors run
+  once per row, as on an empty collection.
 - **The selection is kept.** `activeId()` keeps its value and `activeEntity()`
   reads `undefined`. A re-adding write clears the selection, as `clear()`
   does.
