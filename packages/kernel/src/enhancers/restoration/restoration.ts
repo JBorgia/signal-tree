@@ -57,6 +57,7 @@ import {
   deriveDeclarativeTransitionTarget,
   prepareDeclarativeTransitionInstallation,
   requiresDeclarativeStructuralTarget,
+  type CollectionTransitionSource,
   type CollectionTransitionTargetBinding,
   type CollectionOrderDelta,
   type ScalarTransitionTargetBinding,
@@ -1092,6 +1093,24 @@ class RestorationManager<T> {
   }
 
   private maxHistorySize: number;
+
+  /**
+   * How history materialization reads a collection: through an inspection
+   * reorder still in place, when the enhancer installs one
+   * (`setCollectionSourceReader`). Inspection creates no history, so history
+   * states hold authored orders only.
+   */
+  private readCollectionSource = (
+    binding: CollectionTransitionTargetBinding
+  ): CollectionTransitionSource => binding.readSource();
+
+  setCollectionSourceReader(
+    read: (
+      binding: CollectionTransitionTargetBinding
+    ) => CollectionTransitionSource
+  ): void {
+    this.readCollectionSource = read;
+  }
 
   constructor(
     private tree: ISignalTree<T>,
@@ -2457,9 +2476,20 @@ class RestorationManager<T> {
       return undefined;
     });
     let natural = snapshotState(this.tree.$ as unknown as TreeNode<T>) as T;
-    const collections = new Map(
-      [...bindings].map(([owner, binding]) => [owner, binding.readSource()])
-    );
+    const collections = new Map<number, CollectionTransitionSource>();
+    for (const [owner, binding] of bindings) {
+      const live = binding.readSource();
+      const source = this.readCollectionSource(binding);
+      collections.set(owner, source);
+      if (source !== live) {
+        const valueOf = new Map(
+          source.subjects.map((subject) => [subject.subject, subject.value])
+        );
+        natural = setDetachedNaturalValue(natural, binding.ownerPath, {
+          all: source.order.map((subject) => valueOf.get(subject)),
+        });
+      }
+    }
     const states = new Array<T>(this.history.length);
     const historyIndexByTurnId = new Map(
       this.history.map((turn, index) => [turn.id, index])
@@ -3419,7 +3449,11 @@ export function restoration(
           if (!binding) {
             throw new Error(`Declarative order replay has no binding ${owner}`);
           }
-          return binding.readSource();
+          // An order reversal lands on the authored order beneath a scrub
+          // (it overwrites the scrub); other reversals keep the live order.
+          return deltaOwners.has(owner)
+            ? readThroughInspection(binding)
+            : binding.readSource();
         });
         const target = deriveDeclarativeTransitionTarget({
           collections: sources,
@@ -3878,6 +3912,70 @@ export function restoration(
       else externalTruthBySubject.delete(subjectKey);
     };
     const externalOrderOwners = new Set<number>();
+    /**
+     * Inspection-only reorders (a devtools jump) still in place, per
+     * collection: the authored order and frontier underneath, and the frontier
+     * the scrub left. Inspection owns no history and no external-order
+     * authority (15.4.2), and must never refuse a legitimate undo
+     * (DEVTOOLS-JUMP-0.1): an order reversal, and history materialization,
+     * read through the scrub while it is still the latest order change. Pure
+     * reorders only; a scrub that changed membership is not tracked.
+     */
+    const inspectionScrubs = new Map<
+      number,
+      {
+        beforeSubjects: readonly number[];
+        beforeFrontier: unknown;
+        afterFrontier: unknown;
+      }
+    >();
+    const sameMembers = (
+      left: readonly number[],
+      right: readonly number[]
+    ): boolean => {
+      if (left.length !== right.length) return false;
+      const members = new Set(left);
+      return right.every((subject) => members.has(subject));
+    };
+    const recordInspectionScrub = (capture: CollectionOrderCapture): void => {
+      const previous = inspectionScrubs.get(capture.owner);
+      const chained =
+        previous !== undefined &&
+        previous.afterFrontier === capture.beforeFrontier;
+      const beforeSubjects = chained
+        ? previous.beforeSubjects
+        : capture.beforeSubjects;
+      if (!sameMembers(beforeSubjects, capture.afterSubjects)) {
+        inspectionScrubs.delete(capture.owner);
+        return;
+      }
+      inspectionScrubs.set(capture.owner, {
+        beforeSubjects: [...beforeSubjects],
+        beforeFrontier: chained
+          ? previous.beforeFrontier
+          : capture.beforeFrontier,
+        afterFrontier: capture.afterFrontier,
+      });
+    };
+    const readThroughInspection = (
+      binding: CollectionTransitionTargetBinding
+    ): CollectionTransitionSource => {
+      const source = binding.readSource();
+      const scrub = inspectionScrubs.get(source.owner);
+      if (
+        !scrub ||
+        scrub.afterFrontier !== source.orderFrontier ||
+        !sameMembers(scrub.beforeSubjects, source.order)
+      ) {
+        return source;
+      }
+      return {
+        ...source,
+        order: [...scrub.beforeSubjects],
+        orderFrontier: scrub.beforeFrontier,
+      };
+    };
+    restorationManager.setCollectionSourceReader(readThroughInspection);
     // Accepts `unknown` because `PositionId` is a branded type on the reversal
     // side and a plain number on the notification side; the key only needs the
     // two to stringify identically.
@@ -4887,10 +4985,11 @@ export function restoration(
             // Pending work never entered completed history. Its compensation
             // returns to that baseline; it is not a new order gap or authority.
             // Inspection owns neither history nor external-order authority.
-            if (
-              isCompensationWrite(capture.meta) ||
-              isInspectionWrite(capture.meta)
-            ) {
+            if (isInspectionWrite(capture.meta)) {
+              recordInspectionScrub(capture);
+              return;
+            }
+            if (isCompensationWrite(capture.meta)) {
               return;
             }
             if (
@@ -5384,6 +5483,7 @@ export function restoration(
       displacedMembershipTruth.clear();
       externalTruthBySubject.clear();
       externalOrderOwners.clear();
+      inspectionScrubs.clear();
     };
     (enhancedTree as ISignalTree<T> & RestorationMethods)[
       'resetRestorationHistory'
