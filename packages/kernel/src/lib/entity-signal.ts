@@ -3198,6 +3198,7 @@ export function createEntitySignal<
 
     upsertMany(entities: E[], opts?: AddOptions<E, K>): K[] {
       if (entities.length === 0) return [];
+      const lastPreviousKey = structuralStore.lastActiveKey();
 
       // Separate adds from updates
       const toAdd: Array<{ entity: E; id: K }> = [];
@@ -3302,17 +3303,34 @@ export function createEntitySignal<
       ];
 
       if (pathObserved()) {
-        // Notify PathNotifier for added entities
+        // An added row is announced as a structural add, anchored like
+        // addMany's appended rows. Announced as a bare value, its undo threw
+        // ("Unsupported scoped undo effect at rows.x") and its rollback left
+        // the row — and the call's updates — in place (15.4.3).
+        const meta = ambientMeta();
+        let beforeSubject =
+          lastPreviousKey === undefined
+            ? undefined
+            : allocateSubjectId(lastPreviousKey);
         for (let i = 0; i < addedEntities.length; i++) {
           const { id, entity } = addedEntities[i];
+          const subject = addedSubjectIdsForWrite[i];
           pathNotifier.notify(
             `${basePath}.${String(id)}`,
             entity,
             undefined,
             basePath,
-            [addedSubjectIdsForWrite[i]],
-            getPositionIdsForNotify()
+            [subject],
+            getPositionIdsForNotify(),
+            effectMeta(meta, {
+              kind: 'add',
+              subject,
+              key: id,
+              value: deepClone(entity),
+              beforeSubject,
+            })
           );
+          beforeSubject = subject;
         }
 
         // Notify PathNotifier for updated entities
