@@ -80,6 +80,18 @@ for retired entities.
 
 ### For users
 
+- **Undo, redo and `jumpTo()` never write state an omission has hidden.** A
+  location under an omitted member is restored by re-adding only the way to
+  it when an ordinary write omitted it, or refused with ST1034 when external
+  truth did. Before this, they wrote retained storage and reported success.
+  A pending `rollback()` under an omitted branch restores retained storage, so
+  a rejected value cannot return on a later re-add.
+- **Settle the newest open transaction first, including across omitted
+  branches.** Rolling back an older transaction while a newer pending one has
+  omitted or re-added a branch enclosing its writes now refuses with the
+  retryable `later-confirmed-dependency`, as an overlapping write already
+  did. Before this, the older rollback succeeded and the newer one's rollback
+  then brought the rejected value back. Retry once the newer one settles.
 - **`transact()` — the same optimistic turn, named as a verb.** It matches the
   handle operations it opens (`confirm()`, `rollback()`), and it is the verb
   form of the noun the glossary already teaches. `transaction()` was a noun used
