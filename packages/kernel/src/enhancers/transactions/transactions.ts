@@ -599,28 +599,24 @@ function buildPendingRollbackPlan(
   };
 
   /**
-   * A pending RENAME vacated its original key. Later work that put a DIFFERENT
-   * lifetime at that key (an add, or another row renamed onto it) depended on
-   * the rename having happened: "it never ran" is not a consistent state, even
-   * after the re-occupier was removed again, because its own records still
-   * name the key. Re-review of 23b750f0: accepted, the rejection rebase wrote
-   * the original key back into a later removal and history held two lifetimes
-   * at one key ("duplicate keys"). Checked BEFORE the rekey's erasure skip,
-   * which is exactly the case that accepted it.
+   * A pending RENAME or REMOVE vacated a key. Later work that put a DIFFERENT
+   * lifetime at that key (an add, or another row renamed onto it) rests on
+   * the key being free, so it is a dependency while that row stands, while
+   * open work touches it, or while undo history can bring it back (a
+   * restoration claim holds its subject). Accepting the rollback then left
+   * two lifetimes at one key in history ("duplicate keys", for good):
+   * re-review of 23b750f0 for renames (checked BEFORE the rekey's erasure
+   * skip, which is exactly the case that accepted it), rollback/rebase
+   * review item 2 for removals. While the row stood, both refused as
+   * `effect-validation-failed` (the compensation found the key taken); they
+   * refuse first as the dependency now (proposal-rejection-0 case 15, the
+   * refusal-lifecycle gate's `replacement` cases and restoration.spec carry
+   * the reason).
    *
-   * A pending REMOVE vacated its key the same way (rollback/rebase review,
-   * item 2): a later row at that key rests on the removal. While it stands,
-   * the rollback refused as `effect-validation-failed` (the re-add found
-   * the key taken), which named a broken compensation rather than the
-   * dependency; it is the dependency kind now (proposal-rejection-0 case 15
-   * and the refusal-lifecycle gate's `replacement` cases carry the reason).
-   * Removed again, it stays a dependency while undo history can bring it
-   * back (its subject is claimed): accepted, history held two lifetimes at
-   * one key ("duplicate keys", for good). Once settled work removed it and
-   * nothing can restore it, re-adding the row is consistent and the rollback
-   * proceeds: the refusal-lifecycle gate's PRESERVED `replacement/
-   * resolve-retry` (15.3.0: delete the replacement, then retry). Renames
-   * keep the stricter rule above.
+   * Once settled work removed that row and nothing can restore it, putting
+   * the key back is consistent and the rollback proceeds: the
+   * refusal-lifecycle gate's PRESERVED `replacement/resolve-retry` (15.3.0:
+   * delete the replacement, then retry), and renames alike (owner decision).
    */
   const reoccupierOfVacatedKey = (
     effect: CollectionRekeyEffect | CollectionRemoveEffect
@@ -635,11 +631,7 @@ function buildPendingRollbackPlan(
       ) {
         return false;
       }
-      return (
-        effect.kind === 'rekey' ||
-        isRestorable(later.subject) ||
-        !isErasedBySettledWork(later)
-      );
+      return isRestorable(later.subject) || !isErasedBySettledWork(later);
     });
   };
 

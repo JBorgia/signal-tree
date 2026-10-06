@@ -37,12 +37,11 @@ different row: that work rests on the key being free. Since 15.4.4 both refuse
 as a dependency (`later-confirmed-dependency`, or `later-pending-dependency`
 while that work is open); through 15.4.3 the removal refused as
 `effect-validation-failed` while the new row stood. Once the new row is removed
-again, a rename still refuses, and a removal refuses while undo history can
-restore that row (it was added or removed `undoable()`): through 15.4.3 that
-rollback was accepted and left two rows at one key in history
-(`getRestorationHistory()` and `undo()` threw "duplicate keys" for good). When
-nothing can restore it, deleting the replacement and retrying the removal's
-rollback works, as in 15.3.0. A row added and removed again within one flush
+again, both refuse while undo history can restore that row (it was added or
+removed `undoable()`): through 15.4.3 that rollback was accepted and left two
+rows at one key in history (`getRestorationHistory()` and `undo()` threw
+"duplicate keys" for good). When nothing can restore it, deleting the
+replacement and retrying the rollback works, as a removal's did in 15.3.0. A row added and removed again within one flush
 leaves nothing at the key and does not block. `cause.kind`
 names the first matching later effect, so a `later-confirmed-dependency`
 refusal can still clear once a newer open transaction settles. Keep the handle and choose

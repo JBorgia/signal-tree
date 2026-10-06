@@ -13,8 +13,11 @@ import { transactions } from './transactions';
  * row at that key depended on the rename having happened, so "the rename never
  * ran" is not a consistent counterfactual: rolling it back refuses as a
  * dependency (`later-confirmed-dependency`, or `later-pending-dependency`
- * while the re-occupying work is unsettled), even after the re-occupier was
- * removed again, because its own history still names the key.
+ * while the re-occupying work is unsettled), while that row stands or undo
+ * history can bring it back (its own records still name the key). Once it is
+ * removed for good (plain or realized writes, nothing can restore it), the
+ * rollback proceeds, as for a removal below (owner decision: renames match
+ * removals; through c07e6169 renames refused even then).
  *
  * Found by the re-review of 23b750f0: the rollback was accepted (the renamed
  * row was gone, REKEY-SUPERSESSION-0), and the rejection rebase then wrote the
@@ -36,8 +39,7 @@ import { transactions } from './transactions';
  * occupier: that refuses now, as a dependency. Removed for good (nothing
  * can restore it: plain or realized writes), re-adding the row is
  * consistent, and the rollback proceeds as on 15.3.0 (the gate's PRESERVED
- * `replacement/resolve-retry`: delete the replacement, then retry). The
- * stricter rename rule above is unchanged.
+ * `replacement/resolve-retry`: delete the replacement, then retry).
  */
 type Row = { id: string; n: number };
 const flush = async () => {
@@ -115,7 +117,13 @@ describe.each(configurations)(
       else write(tree);
     };
 
-    it.each(Object.keys(reoccupying))(
+    // Without restoration() the writes are plain: a new row removed again is
+    // gone for good, and those shapes roll back now (below; they refused
+    // through c07e6169, when renames kept the stricter rule).
+    const removedForGood = (shape: string) =>
+      !withHistory &&
+      (shape.includes('removed again') || shape.includes('both rows removed'));
+    it.each(Object.keys(reoccupying).filter((shape) => !removedForGood(shape)))(
       '%s: refuses as a settled dependency and changes nothing',
       async (shape) => {
         const tree = make();
@@ -145,6 +153,66 @@ describe.each(configurations)(
         }
       }
     );
+
+    it.each(Object.keys(reoccupying).filter(removedForGood))(
+      '%s, plain writes: the new row is gone for good, the rollback proceeds',
+      async (shape) => {
+        const tree = make();
+        try {
+          await flush();
+          const proposal = tree.transaction(() => {
+            tree.$.x(1);
+            tree.$.rows.changeId('a', 'a2');
+          });
+          await flush();
+          for (const write of reoccupying[shape]) {
+            later(tree, write);
+            await flush();
+          }
+          const before = state(tree);
+          expect(refusalKind(() => proposal.rollback())).toBeUndefined();
+          await flush();
+          // The renamed row was removed by settled work (its compensation is
+          // skipped); the rest of the transaction reverses.
+          expect(state(tree)).toStrictEqual({ ...before, x: 0 });
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
+
+    it('rolls back once the re-occupier is removed for good (plain writes)', async () => {
+      const tree = make();
+      try {
+        await flush();
+        const proposal = tree.transaction(() => {
+          tree.$.x(1);
+          tree.$.rows.changeId('a', 'a2');
+        });
+        await flush();
+        tree.$.rows.addOne({ id: 'a', n: 50 });
+        await flush();
+        expect(refusalKind(() => proposal.rollback())).toBe(
+          'later-confirmed-dependency'
+        );
+        tree.$.rows.removeOne('a');
+        await flush();
+        expect(refusalKind(() => proposal.rollback())).toBeUndefined();
+        await flush();
+        expect(state(tree)).toStrictEqual({
+          x: 0,
+          rows: [
+            { id: 'z', n: 0 },
+            { id: 'a', n: 1 },
+          ],
+        });
+        if (withHistory) {
+          expect(tree.getRestorationHistory()).toHaveLength(0);
+        }
+      } finally {
+        tree.destroy();
+      }
+    });
 
     it('refuses as a pending dependency while the re-occupier is unsettled', async () => {
       const tree = make();
@@ -392,9 +460,9 @@ describe.each(configurations)(
 // judged write by write and refused. Observed work now composes per flush
 // the same way. Writes in separate flushes, or a re-add left standing, still
 // refuse whoever wrote them.
-// A removal's key re-occupied and removed again in a LATER flush is gone for
-// good here (plain or realized writes, nothing can restore it): the removal
-// rolls back; a rename keeps refusing.
+// A key re-occupied and removed again in a LATER flush is gone for good here
+// (plain or realized writes, nothing can restore it): the rollback proceeds,
+// for a rename as for a removal (a rename refused through c07e6169).
 const withinFlush: Record<
   string,
   { writes: string; refused: { rename: boolean; removal: boolean } }
@@ -409,7 +477,7 @@ const withinFlush: Record<
   },
   'added, then removed in the next flush': {
     writes: '+|-',
-    refused: { rename: true, removal: false },
+    refused: { rename: false, removal: false },
   },
 };
 const withOther = () => ({
