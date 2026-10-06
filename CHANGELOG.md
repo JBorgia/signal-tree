@@ -92,8 +92,9 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   overwrite (`addMany` with `overwrite` returned the id while the row stayed
   removed), a removed last row resurrected as an empty member, a row the
   interceptor added misplaced on redo, or an `updateMany` that announced a
-  renamed row and lost the rename. `upsertMany` merges an updated row over its
-  value as its interceptors left it.
+  renamed row and lost the rename. `upsertMany` and `updateMany` merge an
+  updated row over its value as all of the call's interceptors left it, so a
+  field an interceptor writes to a named row is kept.
   **Compatibility:** an interceptor that adds or removes rows of the same
   collection while one of these calls runs now makes the call throw (the
   interceptor's own writes stand; the call writes nothing) — for example an

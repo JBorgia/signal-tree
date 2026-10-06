@@ -735,7 +735,8 @@ export interface InterceptContext<T> {
  * writing anything. (`setAll` refuses more: a key change to any current row.)
  * The callback's own writes stand; field-only writes, and a key change to a
  * row the call does not name, are allowed. An updated row merges over its
- * value as the interceptors left it.
+ * value as all of the call's interceptors left it — including a write one
+ * row's interceptor made to another named row.
  *
  * Interceptors do not run on a replay of recorded state — `undo()`, `redo()`,
  * `jumpTo()`, a transaction rollback, or a devtools jump (JUMP_TO_STATE,
@@ -860,10 +861,10 @@ export interface EntitySignalOf<
    */
   replaceOne(id: K, entity: E, opts?: MutationOptions): void;
   /**
-   * Merge `changes` into each listed entity. A repeated id is idempotent, on
-   * purpose: its row is updated once, from its value before the call (the
-   * last listing's intercepted changes apply), and announced once. Every
-   * listing is still intercepted and tapped.
+   * Merge `changes` into each listed entity, over its value as all the call's
+   * interceptors left it. A repeated id is idempotent, on purpose: its row is
+   * updated once (the last listing's intercepted changes apply) and announced
+   * once. Every listing is still intercepted and tapped.
    */
   updateMany(ids: K[], changes: Partial<E>, opts?: MutationOptions): void;
   updateWhere(predicate: (entity: E) => boolean, changes: Partial<E>): number;
