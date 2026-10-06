@@ -26,9 +26,12 @@ Settling a newer overlapping pending transaction can permit another attempt,
 but **not every refusal becomes retryable**. Since 15.4.2, a pending-created
 or pending-rekeyed row that settled later work removed no longer blocks
 rollback: the removal already undid that part, so the rest of the transaction
-reverses and the row stays absent. If the removing transaction is still open,
-rollback refuses with `later-pending-dependency` until it settles. A
-pending-created row that later confirmed work edited and kept still refuses,
+reverses and the row stays absent. Since 15.4.4 the same holds for a field
+write to an EXISTING row that settled later work removed (even a plain
+`removeOne`): the row's compensation is skipped, the rest reverses, and the row
+stays absent (15.4.3 refused with `later-confirmed-dependency`). If the removing
+transaction is still open, rollback refuses with `later-pending-dependency`
+until it settles. A row that later confirmed work edited and kept still refuses,
 and so does a pending remove whose key newer truth re-occupied. `cause.kind`
 names the first matching later effect, so a `later-confirmed-dependency`
 refusal can still clear once a newer open transaction settles. Keep the handle and choose
@@ -120,8 +123,11 @@ reproduced on 15.3.0 and not fixed by 15.3.1. See the
   release a `settled()` waiter until that send settles. Do not treat `settled()`
   as a durability receipt or assume all pending writes stay out of storage.
 
-A failure inside the internal pending-turn recording step is also outside the
-automatic rollback coverage; no supported trigger is known.
+A failure inside the internal pending-turn recording step was also outside the
+automatic rollback coverage in 15.3.1 through 15.4.3 (no supported trigger is
+known). 15.4.4 keeps the transaction's capture until its pending turn exists,
+so such a failure is rolled back automatically like any other post-callback
+failure.
 
 ## Evidence
 

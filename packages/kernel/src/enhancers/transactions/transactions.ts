@@ -527,7 +527,7 @@ function buildPendingRollbackPlan(
    * would clobber.
    */
   const isErasedBySettledWork = (
-    effect: CollectionAddEffect | CollectionRekeyEffect
+    effect: CollectionAddEffect | CollectionRekeyEffect | ScalarSetEffect
   ): boolean => {
     let erased = false;
     for (const laterEntry of laterEffects) {
@@ -548,6 +548,17 @@ function buildPendingRollbackPlan(
     const effect = pendingEffects[i];
     switch (effect.kind) {
       case 'set': {
+        // 15.4.4: the same supersession for a FIELD write to a row that
+        // settled later work removed (only the final later effect for the
+        // subject decides, as above). The row is gone, so there is nothing to
+        // restore; the rest of the turn reverses. classifyLaterOverlap read the
+        // removal's path as a parent of the field and refused
+        // (later-confirmed-dependency), stranding the turn's other writes.
+        // An unsettled removal, or later work that edited the row and kept
+        // it, still reaches it and still refuses.
+        if (effect.subject !== undefined && isErasedBySettledWork(effect)) {
+          continue;
+        }
         const overlap = classifyLaterOverlap(effect);
         if (overlap.kind === 'conflict') {
           return {
