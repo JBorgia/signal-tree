@@ -266,3 +266,33 @@ describe('removeMany: cascade deletes, before and after migration', () => {
     }
   });
 });
+
+describe('updateMany merges over the row as its interceptors left it', () => {
+  it.each([
+    ['no enhancers', () => []],
+    ['restoration()', () => [restoration()]],
+    ['transactions(), restoration()', () => [transactions(), restoration()]],
+  ] as const)('%s: a field an interceptor wrote to a named row is kept', async (_name, enhancers) => {
+    const tree = make(enhancers());
+    try {
+      await seed(tree);
+      let fired = false;
+      tree.$.rows.intercept({
+        onUpdate: (id) => {
+          if (fired || id !== 'z') return;
+          fired = true;
+          tree.$.rows.updateOne('z', { n: 100, tag: 'self' } as Partial<Row>);
+        },
+      });
+      tree.$.rows.updateMany(['z', 'a'], { n: 5 });
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual([
+        { id: 'z', n: 5, tag: 'self' },
+        { id: 'a', n: 5 },
+        { id: 'c', n: 3 },
+      ]);
+    } finally {
+      tree.destroy();
+    }
+  });
+});
