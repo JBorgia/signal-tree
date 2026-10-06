@@ -148,6 +148,42 @@ for retired entities.
   newer one settles; that includes a branch holding entity collections,
   whose rollback no longer fails with "Plain branch target contains an
   unavailable member".
+- **Link and path observers see what the tree exposes.** A Link (`link()`)
+  endpoint whose location an omission hides (the location, or a member
+  above it) receives `undefined`, or `[]` for a collection. A re-add sends
+  what the location then reads. Undo, redo, `jumpTo()` and `rollback()`
+  publish nothing for a location they leave absent, although they also write
+  its retained storage. **Behaviour change:** an endpoint receives a send
+  when an omission hides its location, or a reversal hides it again. Before
+  this, it kept the last value it was sent, and later received the retained
+  value from a reversal's announcement while the location read absent (v15
+  `c6258aab`).
+- **`jumpTo()` restores what undo and redo restore.** A jump applies every
+  turn it crosses as one installation. Across omissions, re-adds and reused
+  row ids it could report success with a partial, wrong state: a re-added
+  member's older value overwrote the jump's own target, a member it re-added
+  was hidden again, an earlier turn's value won over a later re-add, or rows
+  came back in another order.
+- **A turn that omits and re-adds within itself undoes, redoes and rolls
+  back to its own start and end.** Before this, undo of
+  `x(5); omit g; re-add g` gave back `x` 5, and redo of two path re-adds
+  under one omitted member lost the second. A transaction's rollback had the
+  same defect.
+- **A turn holding two `setAll`s redoes exactly.** Redo of
+  `setAll([a, c]); setAll([a])` in one turn, or a jump over such a turn,
+  threw "no live placement anchor".
+- **A collection order an undo, redo or jump cannot reconstruct is a typed
+  refusal.** It refuses with ST1034, names the collection and says why, and
+  the restoration reader reports `refused`. Nothing changes. **Behaviour
+  change:** before, it threw a plain error (with nothing changed too) that
+  named no collection. The shapes that still refuse are tracked for the
+  15.4.x carry.
+- **Reads, writes and partial merges after an omission cost what they did
+  before omissions existed.** Once every omitted member is back, reads and
+  writes no longer check presence. While one is omitted, each location's
+  check is cached. A partial merge (`updateAndReport()`) no longer examines
+  every key of its branch unless the branch has an omitted member. Each node
+  keeps one copy of its address.
 - **`transact()` — the same optimistic turn, named as a verb.** It matches the
   handle operations it opens (`confirm()`, `rollback()`), and it is the verb
   form of the noun the glossary already teaches. `transaction()` was a noun used

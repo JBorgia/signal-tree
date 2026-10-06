@@ -250,6 +250,11 @@ Some details of that rule:
   Once its rows are written, the path is re-added before any tap hears of
   them: a tap reads the collection present, its own writes are ordinary ones,
   and a tap that throws leaves the written rows, as on a present collection.
+- **Link and path observers see what the tree exposes.** A Link endpoint
+  whose location is absent receives `undefined` (`[]` for a collection), and
+  a re-add sends what the location then reads. Undo, redo, `jumpTo()` and
+  `rollback()` write an absent location's retained storage without
+  publishing it.
 - **The selection is kept.** `activeId()` keeps its value and `activeEntity()`
   reads `undefined`. A re-adding write clears the selection, as `clear()`
   does.
