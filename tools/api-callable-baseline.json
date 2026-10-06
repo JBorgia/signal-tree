@@ -53,6 +53,509 @@
       ]
     },
     {
+      "id": "kernel:ChangeStatus.anchor",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "anchor",
+      "memberKind": "method",
+      "signatures": [
+        "(name: string): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.at",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "at",
+      "memberKind": "method",
+      "signatures": [
+        "(index: number): string | undefined"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.big",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "big",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.blink",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "blink",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.bold",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "bold",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.charAt",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "charAt",
+      "memberKind": "method",
+      "signatures": [
+        "(pos: number): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.charCodeAt",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "charCodeAt",
+      "memberKind": "method",
+      "signatures": [
+        "(index: number): number"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.codePointAt",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "codePointAt",
+      "memberKind": "method",
+      "signatures": [
+        "(pos: number): number | undefined"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.concat",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "concat",
+      "memberKind": "method",
+      "signatures": [
+        "(...strings: string[]): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.endsWith",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "endsWith",
+      "memberKind": "method",
+      "signatures": [
+        "(searchString: string, endPosition?: number | undefined): boolean"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.fixed",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "fixed",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.fontcolor",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "fontcolor",
+      "memberKind": "method",
+      "signatures": [
+        "(color: string): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.fontsize",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "fontsize",
+      "memberKind": "method",
+      "signatures": [
+        "(size: number): string",
+        "(size: string): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.includes",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "includes",
+      "memberKind": "method",
+      "signatures": [
+        "(searchString: string, position?: number | undefined): boolean"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.indexOf",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "indexOf",
+      "memberKind": "method",
+      "signatures": [
+        "(searchString: string, position?: number | undefined): number"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.italics",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "italics",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.lastIndexOf",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "lastIndexOf",
+      "memberKind": "method",
+      "signatures": [
+        "(searchString: string, position?: number | undefined): number"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.link",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "link",
+      "memberKind": "method",
+      "signatures": [
+        "(url: string): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.localeCompare",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "localeCompare",
+      "memberKind": "method",
+      "signatures": [
+        "(that: string): number",
+        "(that: string, locales?: LocalesArgument, options?: CollatorOptions | undefined): number",
+        "(that: string, locales?: string | string[] | undefined, options?: CollatorOptions | undefined): number"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.match",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "match",
+      "memberKind": "method",
+      "signatures": [
+        "(matcher: { [Symbol.match](string: string): RegExpMatchArray | null; }): RegExpMatchArray | null",
+        "(regexp: string | RegExp): RegExpMatchArray | null"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.matchAll",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "matchAll",
+      "memberKind": "method",
+      "signatures": [
+        "(regexp: RegExp): RegExpStringIterator<RegExpExecArray>"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.normalize",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "normalize",
+      "memberKind": "method",
+      "signatures": [
+        "(form: \"NFC\" | \"NFD\" | \"NFKC\" | \"NFKD\"): string",
+        "(form?: string | undefined): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.padEnd",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "padEnd",
+      "memberKind": "method",
+      "signatures": [
+        "(maxLength: number, fillString?: string | undefined): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.padStart",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "padStart",
+      "memberKind": "method",
+      "signatures": [
+        "(maxLength: number, fillString?: string | undefined): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.repeat",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "repeat",
+      "memberKind": "method",
+      "signatures": [
+        "(count: number): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.replace",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "replace",
+      "memberKind": "method",
+      "signatures": [
+        "(searchValue: string | RegExp, replaceValue: string): string",
+        "(searchValue: string | RegExp, replacer: (substring: string, ...args: any[]) => string): string",
+        "(searchValue: { [Symbol.replace](string: string, replaceValue: string): string; }, replaceValue: string): string",
+        "(searchValue: { [Symbol.replace](string: string, replacer: (substring: string, ...args: any[]) => string): string; }, replacer: (substring: string, ...args: any[]) => string): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.replaceAll",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "replaceAll",
+      "memberKind": "method",
+      "signatures": [
+        "(searchValue: string | RegExp, replaceValue: string): string",
+        "(searchValue: string | RegExp, replacer: (substring: string, ...args: any[]) => string): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.search",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "search",
+      "memberKind": "method",
+      "signatures": [
+        "(regexp: string | RegExp): number",
+        "(searcher: { [Symbol.search](string: string): number; }): number"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.slice",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "slice",
+      "memberKind": "method",
+      "signatures": [
+        "(start?: number | undefined, end?: number | undefined): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.small",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "small",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.split",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "split",
+      "memberKind": "method",
+      "signatures": [
+        "(separator: string | RegExp, limit?: number | undefined): string[]",
+        "(splitter: { [Symbol.split](string: string, limit?: number | undefined): string[]; }, limit?: number | undefined): string[]"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.startsWith",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "startsWith",
+      "memberKind": "method",
+      "signatures": [
+        "(searchString: string, position?: number | undefined): boolean"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.strike",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "strike",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.sub",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "sub",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.substr",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "substr",
+      "memberKind": "method",
+      "signatures": [
+        "(from: number, length?: number | undefined): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.substring",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "substring",
+      "memberKind": "method",
+      "signatures": [
+        "(start: number, end?: number | undefined): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.sup",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "sup",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.toLocaleLowerCase",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "toLocaleLowerCase",
+      "memberKind": "method",
+      "signatures": [
+        "(locales?: LocalesArgument): string",
+        "(locales?: string | string[] | undefined): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.toLocaleUpperCase",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "toLocaleUpperCase",
+      "memberKind": "method",
+      "signatures": [
+        "(locales?: LocalesArgument): string",
+        "(locales?: string | string[] | undefined): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.toLowerCase",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "toLowerCase",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.toString",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "toString",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.toUpperCase",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "toUpperCase",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.trim",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "trim",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.trimEnd",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "trimEnd",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.trimLeft",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "trimLeft",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.trimRight",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "trimRight",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.trimStart",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "trimStart",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus.valueOf",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "valueOf",
+      "memberKind": "method",
+      "signatures": [
+        "(): string"
+      ]
+    },
+    {
+      "id": "kernel:ChangeStatus[Symbol.iterator]",
+      "pkg": "kernel",
+      "owner": "ChangeStatus",
+      "name": "[Symbol.iterator]",
+      "memberKind": "method",
+      "signatures": [
+        "(): StringIterator<string>"
+      ]
+    },
+    {
       "id": "kernel:ComputedSliceConfig.compute",
       "pkg": "kernel",
       "owner": "ComputedSliceConfig",
@@ -947,6 +1450,16 @@
       ]
     },
     {
+      "id": "kernel:PendingTransaction.inspect",
+      "pkg": "kernel",
+      "owner": "PendingTransaction",
+      "name": "inspect",
+      "memberKind": "method",
+      "signatures": [
+        "(): TransactionInspection"
+      ]
+    },
+    {
       "id": "kernel:PendingTransaction.rollback",
       "pkg": "kernel",
       "owner": "PendingTransaction",
@@ -954,539 +1467,6 @@
       "memberKind": "method",
       "signatures": [
         "(): void"
-      ]
-    },
-    {
-      "id": "kernel:Proposal.accept",
-      "pkg": "kernel",
-      "owner": "Proposal",
-      "name": "accept",
-      "memberKind": "method",
-      "signatures": [
-        "(): ProposalInspection"
-      ]
-    },
-    {
-      "id": "kernel:Proposal.inspect",
-      "pkg": "kernel",
-      "owner": "Proposal",
-      "name": "inspect",
-      "memberKind": "method",
-      "signatures": [
-        "(): ProposalInspection"
-      ]
-    },
-    {
-      "id": "kernel:Proposal.reject",
-      "pkg": "kernel",
-      "owner": "Proposal",
-      "name": "reject",
-      "memberKind": "method",
-      "signatures": [
-        "(): void"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.anchor",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "anchor",
-      "memberKind": "method",
-      "signatures": [
-        "(name: string): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.at",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "at",
-      "memberKind": "method",
-      "signatures": [
-        "(index: number): string | undefined"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.big",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "big",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.blink",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "blink",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.bold",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "bold",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.charAt",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "charAt",
-      "memberKind": "method",
-      "signatures": [
-        "(pos: number): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.charCodeAt",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "charCodeAt",
-      "memberKind": "method",
-      "signatures": [
-        "(index: number): number"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.codePointAt",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "codePointAt",
-      "memberKind": "method",
-      "signatures": [
-        "(pos: number): number | undefined"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.concat",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "concat",
-      "memberKind": "method",
-      "signatures": [
-        "(...strings: string[]): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.endsWith",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "endsWith",
-      "memberKind": "method",
-      "signatures": [
-        "(searchString: string, endPosition?: number | undefined): boolean"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.fixed",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "fixed",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.fontcolor",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "fontcolor",
-      "memberKind": "method",
-      "signatures": [
-        "(color: string): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.fontsize",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "fontsize",
-      "memberKind": "method",
-      "signatures": [
-        "(size: number): string",
-        "(size: string): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.includes",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "includes",
-      "memberKind": "method",
-      "signatures": [
-        "(searchString: string, position?: number | undefined): boolean"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.indexOf",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "indexOf",
-      "memberKind": "method",
-      "signatures": [
-        "(searchString: string, position?: number | undefined): number"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.italics",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "italics",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.lastIndexOf",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "lastIndexOf",
-      "memberKind": "method",
-      "signatures": [
-        "(searchString: string, position?: number | undefined): number"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.link",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "link",
-      "memberKind": "method",
-      "signatures": [
-        "(url: string): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.localeCompare",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "localeCompare",
-      "memberKind": "method",
-      "signatures": [
-        "(that: string): number",
-        "(that: string, locales?: LocalesArgument, options?: CollatorOptions | undefined): number",
-        "(that: string, locales?: string | string[] | undefined, options?: CollatorOptions | undefined): number"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.match",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "match",
-      "memberKind": "method",
-      "signatures": [
-        "(matcher: { [Symbol.match](string: string): RegExpMatchArray | null; }): RegExpMatchArray | null",
-        "(regexp: string | RegExp): RegExpMatchArray | null"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.matchAll",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "matchAll",
-      "memberKind": "method",
-      "signatures": [
-        "(regexp: RegExp): RegExpStringIterator<RegExpExecArray>"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.normalize",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "normalize",
-      "memberKind": "method",
-      "signatures": [
-        "(form: \"NFC\" | \"NFD\" | \"NFKC\" | \"NFKD\"): string",
-        "(form?: string | undefined): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.padEnd",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "padEnd",
-      "memberKind": "method",
-      "signatures": [
-        "(maxLength: number, fillString?: string | undefined): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.padStart",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "padStart",
-      "memberKind": "method",
-      "signatures": [
-        "(maxLength: number, fillString?: string | undefined): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.repeat",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "repeat",
-      "memberKind": "method",
-      "signatures": [
-        "(count: number): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.replace",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "replace",
-      "memberKind": "method",
-      "signatures": [
-        "(searchValue: string | RegExp, replaceValue: string): string",
-        "(searchValue: string | RegExp, replacer: (substring: string, ...args: any[]) => string): string",
-        "(searchValue: { [Symbol.replace](string: string, replaceValue: string): string; }, replaceValue: string): string",
-        "(searchValue: { [Symbol.replace](string: string, replacer: (substring: string, ...args: any[]) => string): string; }, replacer: (substring: string, ...args: any[]) => string): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.replaceAll",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "replaceAll",
-      "memberKind": "method",
-      "signatures": [
-        "(searchValue: string | RegExp, replaceValue: string): string",
-        "(searchValue: string | RegExp, replacer: (substring: string, ...args: any[]) => string): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.search",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "search",
-      "memberKind": "method",
-      "signatures": [
-        "(regexp: string | RegExp): number",
-        "(searcher: { [Symbol.search](string: string): number; }): number"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.slice",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "slice",
-      "memberKind": "method",
-      "signatures": [
-        "(start?: number | undefined, end?: number | undefined): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.small",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "small",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.split",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "split",
-      "memberKind": "method",
-      "signatures": [
-        "(separator: string | RegExp, limit?: number | undefined): string[]",
-        "(splitter: { [Symbol.split](string: string, limit?: number | undefined): string[]; }, limit?: number | undefined): string[]"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.startsWith",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "startsWith",
-      "memberKind": "method",
-      "signatures": [
-        "(searchString: string, position?: number | undefined): boolean"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.strike",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "strike",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.sub",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "sub",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.substr",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "substr",
-      "memberKind": "method",
-      "signatures": [
-        "(from: number, length?: number | undefined): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.substring",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "substring",
-      "memberKind": "method",
-      "signatures": [
-        "(start: number, end?: number | undefined): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.sup",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "sup",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.toLocaleLowerCase",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "toLocaleLowerCase",
-      "memberKind": "method",
-      "signatures": [
-        "(locales?: LocalesArgument): string",
-        "(locales?: string | string[] | undefined): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.toLocaleUpperCase",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "toLocaleUpperCase",
-      "memberKind": "method",
-      "signatures": [
-        "(locales?: LocalesArgument): string",
-        "(locales?: string | string[] | undefined): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.toLowerCase",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "toLowerCase",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.toString",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "toString",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.toUpperCase",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "toUpperCase",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.trim",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "trim",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.trimEnd",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "trimEnd",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.trimLeft",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "trimLeft",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.trimRight",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "trimRight",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.trimStart",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "trimStart",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus.valueOf",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "valueOf",
-      "memberKind": "method",
-      "signatures": [
-        "(): string"
-      ]
-    },
-    {
-      "id": "kernel:ProposalStatus[Symbol.iterator]",
-      "pkg": "kernel",
-      "owner": "ProposalStatus",
-      "name": "[Symbol.iterator]",
-      "memberKind": "method",
-      "signatures": [
-        "(): StringIterator<string>"
       ]
     },
     {
@@ -1689,16 +1669,6 @@
       "memberKind": "constructable-type",
       "signatures": [
         "(message?: string | undefined, options?: { cause?: unknown; } | undefined): SignalTreeRollbackError"
-      ]
-    },
-    {
-      "id": "kernel:TransactionMethods.propose",
-      "pkg": "kernel",
-      "owner": "TransactionMethods",
-      "name": "propose",
-      "memberKind": "method",
-      "signatures": [
-        "(fn: () => void): Proposal"
       ]
     },
     {

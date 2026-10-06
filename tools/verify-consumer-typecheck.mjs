@@ -118,11 +118,10 @@ import {
   transactions,
   undoable,
   type ReadonlyLocation,
-  type Proposal,
-  type ProposalAcceptance,
-  type ProposalChange,
-  type ProposalInspection,
-  type ProposalStatus,
+  type ChangeStatus,
+  type InspectedChange,
+  type PendingTransaction,
+  type TransactionInspection,
   type TreeId,
 } from '@signal-tree/kernel';
 import {
@@ -481,7 +480,8 @@ tree.batch(() => tree.$.count(0));
 
 export const _used = [n, whole, rows, names, currentNames, angularCount, angularUsers, vueCount, vueDoubled, createSignalTreeFactory, defineStore, useSignalTree];
 
-// PROPOSAL-0 — the review vocabulary, exercised exactly as the docs teach it.
+// PROPOSAL-0, folded into transact() (d394047c) — review through inspect(),
+// exercised exactly as the docs teach it.
 // Packed-tarball proof: these types must be nameable and these calls must
 // compile against the PUBLISHED export map, not against workspace internals.
 const reviewTree = signalTree(
@@ -489,29 +489,31 @@ const reviewTree = signalTree(
   { enhancers: [restoration({ maxHistorySize: 10 }), transactions()] }
 );
 
-// Restoration is orthogonal: undoable() wraps the PROPOSAL's writes, never
-// accept(). An accept()-time flag could not work — undoable() designates the
+// Restoration is orthogonal: undoable() wraps the transaction's writes, never
+// confirm(). A confirm()-time flag could not work — undoable() designates the
 // causal turn containing its writes.
-let pendingProposal!: Proposal;
+let pendingTransaction!: PendingTransaction;
 undoable(() => {
-  pendingProposal = reviewTree.propose(() => {
+  pendingTransaction = reviewTree.transact(() => {
     reviewTree.$.note('proposed');
     reviewTree.$.rows.addOne({ id: 'a', name: 'Alpha' });
   });
 });
 
-const review: ProposalInspection = pendingProposal.inspect();
-const firstChange: ProposalChange | undefined = review.changes[0];
-const changeStatus: ProposalStatus | undefined = firstChange?.status;
+const review: TransactionInspection = pendingTransaction.inspect();
+const firstChange: InspectedChange | undefined = review.changes[0];
+const changeStatus: ChangeStatus | undefined = firstChange?.status;
 const changePath: string | undefined = firstChange?.path;
-const settled: ProposalAcceptance = pendingProposal.accept();
+pendingTransaction.confirm();
+// After settlement inspect() reports the inspection as of that settlement.
+const settled: TransactionInspection = pendingTransaction.inspect();
 
-// CONSTRUCTION, not just consumption. Reading a ProposalChange type-checks
+// CONSTRUCTION, not just consumption. Reading an InspectedChange type-checks
 // whatever fields it has, so a required field added to the type is invisible
 // to a read-only probe — which is how the 16.0.0 address change shipped as a
 // declared break that nothing measured. A consumer with a test double, a
 // fixture or an adapter mapping must build one, so this builds one.
-const constructedChange: ProposalChange = {
+const constructedChange: InspectedChange = {
   path: 'a.b',
   address: ['a', 'b'],
   status: 'current',

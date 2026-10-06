@@ -68,6 +68,15 @@
         "internalDecl": false
       },
       {
+        "name": "ChangeStatus",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "ComputedSliceConfig",
         "subpath": ".",
         "kind": "type-only",
@@ -266,6 +275,15 @@
         "internalDecl": false
       },
       {
+        "name": "InspectedChange",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "ISignalTree",
         "subpath": ".",
         "kind": "type-only",
@@ -374,51 +392,6 @@
         "internalDecl": false
       },
       {
-        "name": "Proposal",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalAcceptance",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalChange",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalInspection",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalStatus",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "ReadonlyLocation",
         "subpath": ".",
         "kind": "type-only",
@@ -515,6 +488,15 @@
         "declFile": "packages/angular/src/lib/to-writable-signal.ts",
         "angularInDecl": true,
         "angularInType": true,
+        "internalDecl": false
+      },
+      {
+        "name": "TransactionInspection",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
         "internalDecl": false
       },
       {
@@ -675,6 +657,15 @@
         "subpath": ".",
         "kind": "type-only",
         "declFile": "packages/kernel/src/enhancers/batching/batching.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "ChangeStatus",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -860,6 +851,15 @@
         "internalDecl": false
       },
       {
+        "name": "InspectedChange",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "leaf",
         "subpath": ".",
         "kind": "runtime",
@@ -959,51 +959,6 @@
         "internalDecl": false
       },
       {
-        "name": "Proposal",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalAcceptance",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalChange",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalInspection",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalStatus",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "ReadonlyLocation",
         "subpath": ".",
         "kind": "type-only",
@@ -1080,6 +1035,15 @@
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TransactionInspection",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1893,6 +1857,15 @@
         "internalDecl": false
       },
       {
+        "name": "ChangeStatus",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "ComputedSliceConfig",
         "subpath": ".",
         "kind": "type-only",
@@ -2073,6 +2046,15 @@
         "internalDecl": false
       },
       {
+        "name": "InspectedChange",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "leaf",
         "subpath": ".",
         "kind": "runtime",
@@ -2172,51 +2154,6 @@
         "internalDecl": false
       },
       {
-        "name": "Proposal",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalAcceptance",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalChange",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalInspection",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalStatus",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "ReadonlyLocation",
         "subpath": ".",
         "kind": "type-only",
@@ -2293,6 +2230,15 @@
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TransactionInspection",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -2467,6 +2413,15 @@
         "internalDecl": false
       },
       {
+        "name": "ChangeStatus",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "ComputedSliceConfig",
         "subpath": ".",
         "kind": "type-only",
@@ -2647,6 +2602,15 @@
         "internalDecl": false
       },
       {
+        "name": "InspectedChange",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "ISignalTree",
         "subpath": ".",
         "kind": "type-only",
@@ -2755,51 +2719,6 @@
         "internalDecl": false
       },
       {
-        "name": "Proposal",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalAcceptance",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalChange",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalInspection",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalStatus",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "ReadonlyLocation",
         "subpath": ".",
         "kind": "type-only",
@@ -2885,6 +2804,15 @@
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TransactionInspection",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -3050,6 +2978,15 @@
         "internalDecl": false
       },
       {
+        "name": "ChangeStatus",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "ComputedSliceConfig",
         "subpath": ".",
         "kind": "type-only",
@@ -3230,6 +3167,15 @@
         "internalDecl": false
       },
       {
+        "name": "InspectedChange",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "ISignalTree",
         "subpath": ".",
         "kind": "type-only",
@@ -3338,51 +3284,6 @@
         "internalDecl": false
       },
       {
-        "name": "Proposal",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalAcceptance",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalChange",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalInspection",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProposalStatus",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "ReadonlyLocation",
         "subpath": ".",
         "kind": "type-only",
@@ -3468,6 +3369,15 @@
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/kernel/src/lib/types.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TransactionInspection",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/enhancers/transactions/transactions.types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
