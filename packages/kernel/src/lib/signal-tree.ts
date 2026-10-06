@@ -45,11 +45,12 @@ import {
   beginStructuralWrite,
   hasDormantMembers,
   endStructuralWrite,
-  inStructuralWrite,
   isAbsentMember,
   reactivatePathOnWrite,
+  readdedDuringStructuralWrite,
   republishMembers,
   setMemberPresence,
+  structuralWrites,
 } from './internals/member-membership';
 import { getOwnedPositionIds } from './internals/owned-mutation';
 import { getOwnedOwnerPath } from './internals/owned-metadata';
@@ -453,10 +454,10 @@ function makeNodeAccessor<T>(
 
       // WRITING AN ABSENT BRANCH RE-ADDS IT ALONG ITS PATH (v16 8d). Inside a
       // structural write the writer reconciles membership itself.
-      const absent =
-        !isRoot &&
-        isAbsentMember(self.accessor) &&
-        !inStructuralWrite(self.accessor);
+      // A structural writer never writes a branch through here: it recurses
+      // into the branch's store (`recursiveUpdate`), so this is always an
+      // ordinary write.
+      const absent = !isRoot && isAbsentMember(self.accessor);
       let updates = arg;
       if (typeof arg === 'function') {
         const updater = arg as (current: T) => T;
@@ -878,7 +879,7 @@ function recursiveUpdate(
   if (!updates || typeof updates !== 'object') return;
   // A whole value reconciles membership level by level below; a location it
   // writes must not re-add its own path as well (`structuralWrites`).
-  beginStructuralWrite(target);
+  beginStructuralWrite();
   try {
     const targetObj = isNodeAccessor(target)
       ? (target as unknown as Record<string, unknown>)
@@ -933,7 +934,16 @@ function recursiveUpdate(
       // and `restoration` undo silently leaves the marker at its post-change
       // value, landing the user in a state that never existed and reporting
       // success. Measured before this: `n=3 rows=3` → undo → `n=2 rows=3`.
-      if (hydrateMarkerNode(prop, value, 'restore')) {
+      // The marker's own writes are this whole value's (`structuralWrites`).
+      const ownHydrate = structuralWrites.own;
+      structuralWrites.own = prop;
+      let hydrated: boolean;
+      try {
+        hydrated = hydrateMarkerNode(prop, value, 'restore');
+      } finally {
+        structuralWrites.own = ownHydrate;
+      }
+      if (hydrated) {
         if (out) out.push(childPath);
         installed?.add(key);
         continue;
@@ -1019,8 +1029,14 @@ function recursiveUpdate(
         // A leaf under an omitted member reads absent until its path is
         // re-added after this write, so its re-add is reported as a change.
         const wasAbsent = out !== undefined && isAbsentMember(sig);
-        if (isWritableLocation(sig)) replaceLocation(sig, value);
-        else sig.set(value);
+        const ownWrite = structuralWrites.own;
+        structuralWrites.own = sig;
+        try {
+          if (isWritableLocation(sig)) replaceLocation(sig, value);
+          else sig.set(value);
+        } finally {
+          structuralWrites.own = ownWrite;
+        }
         installed?.add(key);
 
         if (out) {
@@ -1114,6 +1130,8 @@ function recursiveUpdate(
       if (!supplied.has(key)) {
         if (
           descriptor.enumerable &&
+          // A write made while this whole value ran re-added it: it stays.
+          !readdedDuringStructuralWrite(targetObj, key) &&
           setMemberPresence(targetObj, key, 'dormant')
         ) {
           membershipChanged.push(key);

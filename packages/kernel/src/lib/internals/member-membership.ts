@@ -191,15 +191,16 @@ export function isAbsentMember(node: unknown): boolean {
 
 /**
  * @internal A structural write (a whole value, a reversal installing members)
- * reconciles membership itself, level by level, and announces it. A location
- * of the same tree written inside one keeps the own-member reactivation it
- * always had and announces nothing, so no transition is announced twice.
+ * reconciles membership itself, level by level, and announces it.
  *
- * ⚠️ PER TREE (v16 8e review). `trees` holds the tree of each open
- * structural write, by its slot runtime, which every branch of a tree
- * carries. A write to another tree from a tap or a sync effect running
- * inside one is an ordinary write and re-adds its path: a global counter made
- * it vanish into retained storage.
+ * ⚠️ ONLY ITS OWN WRITES (v16 8f). The writer marks each location it writes
+ * itself (`own`) for the duration of that write: that write keeps the
+ * own-member reactivation it always had and announces nothing, so no
+ * transition is announced twice. Any other write made while it runs, from a
+ * tap or a sync effect in this tree or another, is an ordinary write: it
+ * re-adds its path, and the structural write never omits that path again
+ * (`readded`). Scoped per tree, 8e still let a same-tree write vanish into
+ * retained storage; a global counter (8d) let any tree's.
  *
  * `end` runs when the outermost structural write closes. Only entity
  * collections install it, to wake their consumers after it rather than inside
@@ -207,20 +208,16 @@ export function isAbsentMember(node: unknown): boolean {
  */
 export const structuralWrites: {
   depth: number;
-  trees: unknown[];
+  own?: unknown;
+  readded?: Map<object, Set<string>>;
   end?: (failed?: boolean) => void;
 } = {
   depth: 0,
-  trees: [],
 };
 
-/**
- * @internal Open a structural write on the tree `node` belongs to; close it
- * with `endStructuralWrite` in a `finally`.
- */
-export function beginStructuralWrite(node: unknown): void {
+/** @internal Open a structural write; close it with `endStructuralWrite` in a `finally`. */
+export function beginStructuralWrite(): void {
   structuralWrites.depth++;
-  structuralWrites.trees.push(getTreeScalarSlotRuntime(node));
 }
 
 /**
@@ -229,23 +226,25 @@ export function beginStructuralWrite(node: unknown): void {
  * runs does not replace the write's own error (`entity-signal`).
  */
 export function endStructuralWrite(failed?: boolean): void {
-  structuralWrites.trees.pop();
-  if (!--structuralWrites.depth) structuralWrites.end?.(failed);
+  if (--structuralWrites.depth) return;
+  structuralWrites.readded = undefined;
+  structuralWrites.end?.(failed);
+}
+
+/** @internal True for the location a structural writer is writing itself. */
+export function inStructuralWrite(node: unknown): boolean {
+  return node !== undefined && structuralWrites.own === node;
 }
 
 /**
- * @internal True when a structural write is open on the tree `node`
- * belongs to: a branch carries its tree's runtime, anything else is reached
- * through the branch its member link names.
+ * @internal True when a write made during the open structural write re-added
+ * `key` of `branch`: that structural write must not omit it again.
  */
-export function inStructuralWrite(node: unknown): boolean {
-  return (
-    structuralWrites.depth > 0 &&
-    structuralWrites.trees.includes(
-      getTreeScalarSlotRuntime(node) ??
-        getTreeScalarSlotRuntime(memberBinding(node)?.parent)
-    )
-  );
+export function readdedDuringStructuralWrite(
+  branch: object,
+  key: string
+): boolean {
+  return structuralWrites.readded?.get(nodeOf(branch))?.has(key) === true;
 }
 
 /**
@@ -313,8 +312,16 @@ export function reactivatePathOnWrite(node: unknown): boolean {
     for (const member of Object.keys(parent))
       if (member !== kept) setMemberPresence(parent, member, 'dormant');
   }
-  for (let i = outer; i >= 0; i--)
-    setMemberPresence(path[i].parent, path[i].key, 'active');
+  for (let i = outer; i >= 0; i--) {
+    const { parent, key } = path[i];
+    setMemberPresence(parent, key, 'active');
+    if (structuralWrites.depth) {
+      const readded = (structuralWrites.readded ??= new Map());
+      let keys = readded.get(parent);
+      if (!keys) readded.set(parent, (keys = new Set()));
+      keys.add(key);
+    }
+  }
   // A re-added leaf is the written location itself, and its writer publishes
   // its token once (`whole-value-membership.spec.ts` 16). A re-added branch
   // has no token: its observers and those below it are woken here.

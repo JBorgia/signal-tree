@@ -3982,7 +3982,7 @@ export function createEntitySignal<
   ] as const) {
     const write = api[name] as (...args: unknown[]) => unknown;
     (api as Record<string, unknown>)[name] = (...args: unknown[]) => {
-      if (reAdding || !absent() || inStructuralWrite(api))
+      if (reAdding || !absent() || inStructuralWrite(proxy))
         return write(...args);
       const prepared = name === 'clear' ? [] : interceptAsEmpty(name, args);
       reAdding = true;

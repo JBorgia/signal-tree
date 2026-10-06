@@ -2489,7 +2489,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // observes one tree.
     // Physical truth, as a reversal (`structuralWrites`, `physicalRows`,
     // v16 8e).
-    beginStructuralWrite(tree.$);
+    beginStructuralWrite();
     physicalRows.push(positionRegistry);
     let result: ReturnType<typeof rollbackPendingTurnAt> | { ok: true };
     let failed = true;

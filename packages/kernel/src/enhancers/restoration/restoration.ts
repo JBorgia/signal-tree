@@ -672,7 +672,7 @@ class RestorationManager<TSource, T> {
     // A reversal installs physical truth and its own membership effects: it
     // reads and writes a hidden collection's retained rows (`physicalRows`),
     // and re-adds no path implicitly (`structuralWrites`, v16 8e).
-    beginStructuralWrite(this.tree.$);
+    beginStructuralWrite();
     physicalRows.push(this.positionRegistry);
     let failed = true;
     try {
