@@ -206,8 +206,19 @@ const TARGETS = {
     // 15.3.1: owner-approved containment/reporting lifetime cost, 2026-09-28.
     // Fresh output: 10501 B gzip, 5 B above the former 10496 B ceiling.
     // Retain narrow headroom; no other target or development budget changes.
-    devKB: 12.45,
-    prodKB: 10.26,
+    // 15.4.4 hidden-location port (v16 integration slices 8b-8e), owner-
+    // approved within 10.9 KB: b2107f43 measured 9,929 B prod / 12,079 B dev,
+    // the port 10,706 B / 12,856 B (+777 B each). Every tree now carries the
+    // absent-read liveness slot, the re-add along a written path and the
+    // per-tree structural scope (member-membership, +1,448 minified bytes;
+    // v16 measured +576 B gzip for 8b-8e at source level), plus the
+    // structured position-address registry v15 lacked (position-registry,
+    // signal-tree and materialize-markers: about +210 B gzip over v16's
+    // cost). Data, not diagnostics: it does not fold. Raised only as far as
+    // needed: 10.46 KB = 10,711 B prod, 12.56 KB = 12,861 B dev (the gate
+    // compares bytes / 1024).
+    devKB: 12.56,
+    prodKB: 10.46,
     code: `
       import { signalTree } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, user: { name: 'a' } });
@@ -419,8 +430,32 @@ const TARGETS = {
     // (26,112 B) by 38 B; tools/check-devmode-foldable.mjs confirms the dev
     // code folds (entities 25.53 -> 22.64 KB). Raised only as far as needed:
     // 25.54 KB = 26,152 B (the gate compares bytes / 1024).
-    devKB: 25.54,
-    prodKB: 22.66,
+    // 15.4.4 hidden-location port (v16 integration slices 8b-8e), approved by
+    // the owner (2026-10-06, up to 23.89 KB): b2107f43 measured 23,199 B
+    // prod / 26,150 B dev, the port 24,424 B / 27,335 B (+1,225 / +1,185 B).
+    // Two parts, both data rather than diagnostics, so neither folds:
+    // - the structured position-address registry v15 lacked (67012241:
+    //   registerPositionAddress / addressFor, node addresses threaded through
+    //   materialization), which the hidden-member walk reads. About +190 B,
+    //   the whole difference from v16's own cost for 8b-8e (source-level
+    //   attribution: position-registry +206, signal-tree and
+    //   materialize-markers +251 minified bytes beyond v16's);
+    // - the hidden-location and data-loss fixes themselves (5f34fb7e): absent
+    //   reads, the re-add along a written path and the per-tree structural
+    //   scope (member-membership +1,472 minified bytes), and the absent
+    //   entity collection (entity-signal +924). Without them a reversal or a
+    //   write under an omitted member reached storage nothing could read, and
+    //   a rejected value could come back through a later re-add. v16 measured
+    //   +1,024 B for them.
+    // Offsets taken, -38 B together: addresses stored as given rather than as
+    // frozen copies (-13 B at source level), and no address for the two
+    // lazily allocated positions, which only a tree without position topology
+    // allocates and no address reader reaches. A walk-based address lookup
+    // confined to the enhancers (estimated -190 B) was not pursued, by the
+    // owner's decision. Raised only as far as needed: 23.86 KB = 24,432 B
+    // prod, 26.70 KB = 27,340 B dev (bytes / 1024).
+    devKB: 26.7,
+    prodKB: 23.86,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });
