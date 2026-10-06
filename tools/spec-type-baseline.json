@@ -1,5 +1,5 @@
 {
-  "total": 223,
+  "total": 222,
   "files": {
     "packages/kernel/src/enhancers/batching/batching.spec.ts": 4,
     "packages/kernel/src/enhancers/devtools/devtools.spec.ts": 4,
@@ -28,7 +28,7 @@
     "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.spec.ts": 4,
     "packages/kernel/src/lib/marker-snapshot-memo.spec.ts": 15,
     "packages/kernel/src/lib/markers/marker-contract.spec.ts": 2,
-    "packages/kernel/src/lib/mut-participation.spec.ts": 7,
+    "packages/kernel/src/lib/mut-participation.spec.ts": 6,
     "packages/kernel/src/lib/noop-copy-write.spec.ts": 2,
     "packages/kernel/src/lib/noop-write-warning.spec.ts": 3,
     "packages/kernel/src/lib/physical/entity-mutation-frame.spec.ts": 2,
