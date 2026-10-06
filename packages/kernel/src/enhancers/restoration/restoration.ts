@@ -8,7 +8,9 @@ import { holdEntityMembershipDelivery } from '../../lib/internals/entity-members
 import {
   applyPlainBranchMemberSnapshot,
   canRealizePlainBranchMember,
+  composeHiddenMemberValue,
   composePlainBranchMemberEffect,
+  hidingMembers,
   plainBranchMemberEffectIsNoop,
   plainBranchMembershipEffects,
   preparePlainBranchMembers,
@@ -2658,6 +2660,81 @@ export function restoration(
           );
         }
       }
+      // A registered location under an omitted member (the location itself
+      // or a branch above it) is not current, whatever its retained slot
+      // holds: writing the slot would report success while nothing can read
+      // the value. An external omission keeps external truth's protection
+      // (ST1034). An ordinary authored omission is reversed like any later
+      // ordinary write (15.4.2): the hidden member is re-added with the
+      // reversal's target, as one membership effect. (v16 integration 8b.)
+      let hiddenRefusal: ReversalRefusal | undefined;
+      let appliedEffects = reversalEffects;
+      {
+        const reversedMembers = new Set<number>();
+        for (const effect of reversalEffects)
+          if (effect.plainBranchMembership) reversedMembers.add(effect.owner);
+        const readded = new Map<
+          number,
+          {
+            member: { node: object; path: string | undefined };
+            targets: { below: readonly string[]; value: unknown }[];
+          }
+        >();
+        const replaced = new Set<ReversalEffect>();
+        for (const effect of reversalEffects) {
+          if (
+            effect.plainBranchMembership ||
+            effect.structural !== undefined ||
+            effect.subjectId !== undefined ||
+            scalarSlotRuntime?.resolveScalarSlot(effect.owner) === undefined
+          )
+            continue;
+          const hiding = hidingMembers(tree.$, effect.owner)?.filter(
+            ({ position }) =>
+              position === undefined || !reversedMembers.has(position)
+          );
+          if (!hiding?.length) continue;
+          const external = hiding.find(
+            ({ position }) =>
+              position !== undefined &&
+              externalMembershipTruth.get(position)?.present === false
+          );
+          if (external || hiding[0].position === undefined) {
+            hiddenRefusal ??= external
+              ? {
+                  kind: 'value-drift',
+                  path: external.path ?? effect.path ?? '',
+                  current: undefined,
+                  expected: effect.after,
+                }
+              : { kind: 'structural-drift' };
+            continue;
+          }
+          const [outer] = hiding;
+          let entry = readded.get(outer.position as number);
+          if (!entry)
+            readded.set(
+              outer.position as number,
+              (entry = { member: outer, targets: [] })
+            );
+          entry.targets.push({ below: outer.below, value: effect.after });
+          replaced.add(effect);
+        }
+        if (readded.size) {
+          appliedEffects = reversalEffects.filter(
+            (effect) => !replaced.has(effect)
+          );
+          for (const [owner, { member, targets }] of readded)
+            appliedEffects.push({
+              owner,
+              before: undefined,
+              after: composeHiddenMemberValue(member.node, targets),
+              plainBranchMembership: { before: false, after: true },
+              path: member.path,
+              ownerPath: member.path,
+            });
+        }
+      }
       const orderEndpoints = new Map<number, 'before' | 'after'>();
       for (const application of applications) {
         for (const delta of application.orderDeltas) {
@@ -2737,7 +2814,7 @@ export function restoration(
         });
         const target = deriveDeclarativeTransitionTarget({
           collections: sources,
-          effects: reversalEffects,
+          effects: appliedEffects,
           orderDeltas,
           orderEndpoints,
         });
@@ -2913,10 +2990,11 @@ export function restoration(
       })();
 
       const refusal =
+        hiddenRefusal ??
         externalConflict ??
         (usesDeclarativeTarget
           ? undefined
-          : realizationPort.validateEffects(reversalEffects));
+          : realizationPort.validateEffects(appliedEffects));
       if (refusal) {
         if (refusal.kind === 'value-drift') {
           // RESTORE-P0 P0-C. An undo either reverses the authored operation or
@@ -2970,7 +3048,7 @@ export function restoration(
         withWriteContext(
           { origin: 'restoration', ownerId: replayOwnerId },
           () => {
-            realizationPort.applyAtomically(reversalEffects);
+            realizationPort.applyAtomically(appliedEffects);
           }
         );
       } catch (error) {
