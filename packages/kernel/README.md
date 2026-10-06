@@ -215,6 +215,27 @@ that turn settles: call undo from a later user action, not immediately after
 `undoable()` in the same synchronous function. The tree owner calls `destroy()`
 when this store is no longer needed.
 
+#### Locations an omission has hidden
+
+A whole-value write that leaves out a key omits that member: it and everything
+under it are absent, even though their storage is retained. Undo, redo and
+`jumpTo()` treat a location under an omitted member like this:
+
+- **Omitted by external truth** (inside `external()`): the reversal refuses
+  with ST1034, names the omitted member and the location, and changes
+  nothing.
+- **Omitted by an ordinary write**: the reversal restores its own locations
+  over that write, as it would over any later ordinary write. It re-adds
+  only the members on the way to those locations; every other member the
+  omission removed stays absent. Retained storage never supplies a value.
+- **Not re-addable** (an omitted entity collection, for example): the
+  reversal refuses and says why.
+
+A pending transaction's `rollback()` reverses its writes even when a later
+omission has hidden them: under an omitted branch it restores the retained
+storage and leaves the branch absent. Nothing a rejected transaction wrote can
+come back later, whether through undo, redo, `jumpTo()` or a re-add.
+
 ### `transactions()`
 
 Adds an explicit pending operation that can be confirmed or rolled back. Use it
@@ -268,7 +289,8 @@ changes with values. Splitting paths on dots is not a universal resolver.
 `rollback()` throws `SignalTreeRollbackError` when the reversal cannot be applied
 without destroying newer truth — for example when a server write now depends on
 a row the turn created. Catch it and offer reconciliation rather than
-treating rejection as always available.
+treating rejection as always available. When several transactions are open,
+settle the newest first; see [Lifetime](#lifetime) for the retryable refusal.
 
 Acceptance is **not** undo history. Restoration stays a separate decision, and
 `undoable()` wraps the turn's writes rather than the settlement, because it
@@ -386,8 +408,15 @@ errors.
 A refusal is atomic: it changes no state, retires nothing, and leaves the
 transaction **pending**, so `confirm()` and a retried `rollback()` both remain
 available. Reversing an older transaction while a newer overlapping one is
-still open refuses (`cause.kind === 'later-pending-dependency'`); settle the
-newer one first.
+still open refuses (`cause.kind === 'later-confirmed-dependency'`, which this
+line also uses for a newer *pending* overlap); settle the newer one first.
+
+The same retryable refusal applies when the newer pending transaction omitted,
+or re-added, a plain branch that encloses a location the older one wrote. The
+newer transaction's before-image of that branch holds the older value. So
+reversing the older one first would let the newer one's rollback bring the
+rejected value back. Once the newer one settles (confirmed or rolled back),
+retrying the older rollback succeeds.
 
 ## Exports
 

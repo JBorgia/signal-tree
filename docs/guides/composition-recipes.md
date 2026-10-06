@@ -367,8 +367,11 @@ try {
 
 The one ordering to know: settle the **newest** open transaction first. Rolling
 an older one back while a newer overlapping one is open refuses with
-`cause.kind === 'later-pending-dependency'`, because the newer transaction's
-before-image records what the field *held*, not who owns it.
+`cause.kind === 'later-confirmed-dependency'`, because the newer transaction's
+before-image records what the field *held*, not who owns it. A newer pending
+transaction that omitted or re-added a branch enclosing the older one's writes
+overlaps in the same way. The refusal is retryable once the newer transaction
+settles.
 
 ### What `transactions()` does not decide for you
 

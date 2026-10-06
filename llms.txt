@@ -44,7 +44,9 @@ anything under `@signal-tree/*`. Generate `@signal-tree/*` names for new code:
   PENDING, so `confirm()` and a retried `rollback()` both stay available. Settle
   the NEWEST open transaction first; rolling an older one back while a newer
   overlapping one is open refuses with
-  `cause.kind === 'later-pending-dependency'`.
+  `cause.kind === 'later-confirmed-dependency'`. A newer pending transaction
+  that omitted or re-added a branch enclosing the older one's writes counts as
+  overlapping.
 - `@signal-tree/angular` — the complete Angular application facade. **Angular
   code imports `signalTree` and all other SignalTree APIs from here**. Terminal
   state leaves are native `WritableSignal<T>` values and derived leaves are
