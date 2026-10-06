@@ -170,6 +170,45 @@ describe.each(ORDERS)('absent collection — Vue (%s)', (_, enhancers) => {
 });
 
 describe('absent collection — Vue sync effects (v16 8e)', () => {
+  it('a collection woken twice in one reversal re-runs a sync effect once', async () => {
+    const initial: State = {
+      a: { rows: entityMap<Row, string>(), s: 0 },
+      count: 0,
+    };
+    const tree = signalTree(initial, { enhancers: [restoration()] });
+    try {
+      const rows = tree.$.a.rows as unknown as Rows;
+      rows.addOne(A);
+      await flush();
+      // One turn omits the collection itself, then the member around it.
+      undoable(() => {
+        (tree.$.a as unknown as (value: unknown) => void)({ s: 0 });
+        (tree.$ as unknown as (value: unknown) => void)({ count: 0 });
+      });
+      await flush();
+      let runs = 0;
+      const stop = watchEffect(
+        () => {
+          runs++;
+          rows.all();
+        },
+        { flush: 'sync' }
+      );
+      try {
+        runs = 0;
+        // Its undo re-adds both: the collection's presence changes twice
+        // inside one reversal, and its consumers are woken once, after it.
+        tree.undo();
+        await flush();
+        expect(rows.all()).toEqual([A]);
+        expect(runs).toBe(1);
+      } finally {
+        stop();
+      }
+    } finally {
+      tree.destroy();
+    }
+  });
   it('an omission nested in a whole value wakes sync effects only after it', async () => {
     const initial: State = {
       a: { rows: entityMap<Row, string>(), s: 0 },

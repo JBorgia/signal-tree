@@ -10,6 +10,7 @@ import {
 } from '../index';
 import { getEntityProjectionSeed } from './internals/entity-projection-seed';
 import {
+  beginStructuralWrite,
   endStructuralWrite,
   structuralWrites,
 } from './internals/member-membership';
@@ -577,7 +578,7 @@ describe('a re-adding write an interceptor blocks (v16 8e review, documented edg
 });
 
 describe('the retained rows a re-adding write removes are not row changes (v16 8e review)', () => {
-  it('taps and interceptors do not see them', () => {
+  it('taps do not see them, and no interceptor can block them', () => {
     const tree = build();
     const rows = tree.$.a.rows;
     const seen: string[] = [];
@@ -608,20 +609,46 @@ describe('closing a structural write (v16 8e review)', () => {
       };
     };
     try {
-      structuralWrites.depth += 2;
+      beginStructuralWrite(undefined);
+      beginStructuralWrite(undefined);
       queue();
       endStructuralWrite(true);
       expect(seen).toEqual([]);
       endStructuralWrite(true);
       expect(seen).toEqual([true]);
-      structuralWrites.depth++;
+      beginStructuralWrite(undefined);
       queue();
       endStructuralWrite();
       expect(seen).toEqual([true, undefined]);
       expect(structuralWrites.depth).toBe(0);
+      expect(structuralWrites.trees).toEqual([]);
     } finally {
       structuralWrites.end = undefined;
     }
+  });
+});
+
+describe('a write to another tree from inside a whole value is ordinary (v16 8e review)', () => {
+  // The whole value decides membership in its own tree only. A tap of it
+  // that writes another tree's absent locations re-adds their paths there,
+  // collection and leaf alike, instead of writing retained storage.
+  it("re-adds the other tree's paths", () => {
+    const tree = build();
+    const other = build();
+    omit(other);
+    let wrote = false;
+    tree.$.a.rows.tap({
+      onAdd: () => {
+        if (wrote) return;
+        wrote = true;
+        other.$.a.rows.addOne(Z);
+        other.$.a.s(5);
+      },
+    });
+    tree.$({ a: { rows: [B, Z], s: 0 }, count: 0 });
+    expect(wrote).toBe(true);
+    expect(other.$()).toEqual({ a: { rows: { all: [Z] }, s: 5 }, count: 0 });
+    expect(stored(other.$.a.rows)).toEqual([Z]);
   });
 });
 

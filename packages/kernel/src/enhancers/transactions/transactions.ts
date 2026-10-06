@@ -9,8 +9,8 @@ import {
   changedOmittedCollection,
 } from '../../lib/internals/plain-branch-membership';
 import {
+  beginStructuralWrite,
   endStructuralWrite,
-  structuralWrites,
 } from '../../lib/internals/member-membership';
 import { physicalRows } from '../../lib/internals/physical-rows';
 import type { PlainBranchMemberPresence } from '../../lib/internals/plain-branch-membership';
@@ -2489,7 +2489,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // observes one tree.
     // Physical truth, as a reversal (`structuralWrites`, `physicalRows`,
     // v16 8e).
-    structuralWrites.depth++;
+    beginStructuralWrite(tree.$);
     physicalRows.push(positionRegistry);
     let result: ReturnType<typeof rollbackPendingTurnAt> | { ok: true };
     let failed = true;

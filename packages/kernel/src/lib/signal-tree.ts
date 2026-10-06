@@ -42,13 +42,14 @@ import {
 } from './internals/error-reporter';
 import { resolveEnhancerOrder } from '../enhancers';
 import {
+  beginStructuralWrite,
   hasDormantMembers,
   endStructuralWrite,
+  inStructuralWrite,
   isAbsentMember,
   reactivatePathOnWrite,
   republishMembers,
   setMemberPresence,
-  structuralWrites,
 } from './internals/member-membership';
 import { getOwnedPositionIds } from './internals/owned-mutation';
 import { getOwnedOwnerPath } from './internals/owned-metadata';
@@ -453,7 +454,9 @@ function makeNodeAccessor<T>(
       // WRITING AN ABSENT BRANCH RE-ADDS IT ALONG ITS PATH (v16 8d). Inside a
       // structural write the writer reconciles membership itself.
       const absent =
-        !isRoot && !structuralWrites.depth && isAbsentMember(self.accessor);
+        !isRoot &&
+        !inStructuralWrite(self.accessor) &&
+        isAbsentMember(self.accessor);
       let updates = arg;
       if (typeof arg === 'function') {
         const updater = arg as (current: T) => T;
@@ -875,7 +878,7 @@ function recursiveUpdate(
   if (!updates || typeof updates !== 'object') return;
   // A whole value reconciles membership level by level below; a location it
   // writes must not re-add its own path as well (`structuralWrites`).
-  structuralWrites.depth++;
+  beginStructuralWrite(target);
   try {
     const targetObj = isNodeAccessor(target)
       ? (target as unknown as Record<string, unknown>)
