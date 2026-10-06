@@ -207,6 +207,12 @@ type ScalarSetEffect = TurnEffectBase & {
   kind: 'set';
   subject?: number;
   fieldSegments?: readonly string[];
+  /**
+   * Exact keys below `position` for a decomposed write to a plain branch.
+   * `path` is a display string, so the literal key 'd.e' and the nested d.e
+   * read the same there; these keys keep the address lossless.
+   */
+  branchSegments?: readonly string[];
   plainBranchMembership?: PlainBranchMemberPresence;
   fieldPresence?: FieldPresence;
   before: unknown;
@@ -417,101 +423,340 @@ type CaptureBucket = {
   designated: boolean;
 };
 
+/** A captured pre-image's place: a scope plus exact keys inside it. */
+type RebaseAddress = { scope: string; segments: readonly string[] };
+type RebaseValue = { value: unknown; present: boolean };
+type RebaseAtom = RebaseAddress & { before: RebaseValue; after: RebaseValue };
+
+const ABSENT: RebaseValue = { value: undefined, present: false };
+
+const isRebaseRecord = (value: unknown): value is Record<string, unknown> => {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+};
+
+const hasPrefix = (
+  segments: readonly string[],
+  prefix: readonly string[]
+): boolean =>
+  prefix.length <= segments.length &&
+  prefix.every((segment, index) => segments[index] === segment);
+
+const navigateRebaseValue = (
+  at: RebaseValue,
+  keys: readonly string[]
+): RebaseValue => {
+  let current = at;
+  for (const key of keys) {
+    if (
+      !current.present ||
+      !isRebaseRecord(current.value) ||
+      !Object.prototype.hasOwnProperty.call(current.value, key)
+    ) {
+      return ABSENT;
+    }
+    current = { value: current.value[key], present: true };
+  }
+  return current;
+};
+
+/** Copy-on-write: shared snapshots are never mutated. */
+const replaceRebaseValue = (
+  at: RebaseValue,
+  keys: readonly string[],
+  next: RebaseValue
+): RebaseValue => {
+  if (keys.length === 0) return next;
+  const [key, ...rest] = keys;
+  const container: Record<string, unknown> =
+    at.present && isRebaseRecord(at.value) ? { ...at.value } : {};
+  const child = replaceRebaseValue(
+    Object.prototype.hasOwnProperty.call(container, key)
+      ? { value: container[key], present: true }
+      : ABSENT,
+    rest,
+    next
+  );
+  if (child.present) container[key] = child.value;
+  else delete container[key];
+  return { value: container, present: true };
+};
+
+const sameRebaseValue = (left: RebaseValue, right: RebaseValue): boolean =>
+  left.present === right.present &&
+  (!left.present || deepEqual(left.value, right.value));
+
 /**
  * Re-bases chronological effect lists recorded after a REJECTED turn onto
- * what that turn replaced. See `RestorationManager.rebaseAfterRejection`.
+ * what that turn replaced, for every pre-image a record can hold. See
+ * `RestorationManager.rebaseAfterRejection`.
+ *
+ *   field write (`set`)   its `before` and presence, at the exact address or
+ *                         any address inside or around one the turn wrote
+ *   row removal           the row's value snapshot, field by field (written,
+ *                         added and dropped fields alike) and its key
+ *   row rename            its from-key
+ *   add / remove anchors  a row only the turn created is followed to its
+ *                         nearest neighbour that survives the rejection
+ *   rows the turn created every later record of them is dropped
+ *
+ * Each address is claimed by its FIRST later record: later records there were
+ * based on that one. A record's own field writes claim before its removal
+ * snapshot does, since the snapshot was taken after them.
+ *
+ * Addresses are lossless: a row is its owner position and lifetime plus the
+ * exact field keys; a plain value is its position plus exact keys below it.
+ * Never a display path: the literal key 'd.e' and the nested d.e are
+ * different places (4b28e3bf keyed plain values by path, so they collided).
+ * Every plain write notifies at its own leaf position, so a record write and a
+ * leaf write to one place share the leaf's position.
+ *
+ * Exported for its unit spec only (`rebase-onto-rejection.spec.ts`), which
+ * also covers the overlap shapes a rollback refuses before they can reach it.
  */
-function rebaseOntoRejection(
+export function rebaseOntoRejection(
   rejected: readonly TurnEffect[],
   lists: readonly TurnEffect[][]
 ): TurnEffect[][] {
-  const rowOf = (effect: TurnEffect) =>
-    `${effect.position}\u0000${(effect as { subject?: number }).subject}`;
-  const addressOf = (effect: ScalarSetEffect) =>
+  const rowScope = (position: number, subject: number) =>
+    `r${position}:${subject}`;
+  const addressOf = (effect: ScalarSetEffect): RebaseAddress =>
     effect.subject === undefined
-      ? `p\u0000${effect.path}`
-      : `s\u0000${effect.position}\u0000${effect.subject}\u0000${JSON.stringify(
-          effect.fieldSegments ?? []
-        )}`;
-  const created = new Set<string>();
-  const writes = new Map<string, ScalarSetEffect>();
-  for (const effect of rejected) {
-    if (effect.kind === 'add') created.add(rowOf(effect));
-    else if (effect.kind === 'set') writes.set(addressOf(effect), effect);
-  }
-  if (created.size === 0 && writes.size === 0) return [...lists];
-  return lists.map((effects) => {
-    const dropped = new Map<string, CollectionRemoveEffect>();
-    const kept = effects.filter((effect) => {
-      const ownRow =
-        effect.kind !== 'set' || effect.subject !== undefined
-          ? created.has(rowOf(effect))
-          : false;
-      if (ownRow) {
-        if (effect.kind === 'remove') dropped.set(rowOf(effect), effect);
-        return false;
-      }
-      if (effect.kind !== 'set') return true;
-      const address = addressOf(effect);
-      const source = writes.get(address);
-      if (!source) return true;
-      writes.delete(address);
-      const sourceMembership = source.plainBranchMembership;
-      const membership = effect.plainBranchMembership;
-      const basedOnRejected =
-        (sourceMembership === undefined) === (membership === undefined) &&
-        (sourceMembership === undefined ||
-          sourceMembership.after === membership?.before) &&
-        (source.fieldPresence?.after ?? true) ===
-          (effect.fieldPresence?.before ?? true) &&
-        deepEqual(effect.before, source.after);
-      if (!basedOnRejected) return true;
-      effect.before = source.before;
-      if (sourceMembership && membership) {
-        effect.plainBranchMembership = {
-          before: sourceMembership.before,
-          after: membership.after,
+      ? { scope: `p${effect.position}`, segments: effect.branchSegments ?? [] }
+      : {
+          scope: rowScope(effect.position, effect.subject),
+          segments: effect.fieldSegments ?? [],
         };
+  const presenceOf = (
+    effect: ScalarSetEffect,
+    side: 'before' | 'after'
+  ): boolean =>
+    effect.plainBranchMembership?.[side] ??
+    effect.fieldPresence?.[side] ??
+    true;
+
+  const created = new Map<string, CollectionAddEffect>();
+  for (const effect of rejected) {
+    if (effect.kind === 'add') {
+      created.set(rowScope(effect.position, effect.subject), effect);
+    }
+  }
+  const rekeys = new Map<string, CollectionRekeyEffect>();
+  const atoms: RebaseAtom[] = [];
+  for (const effect of rejected) {
+    if (effect.kind === 'rekey') {
+      const scope = rowScope(effect.position, effect.subject);
+      if (!created.has(scope)) rekeys.set(scope, effect);
+    } else if (effect.kind === 'set') {
+      const address = addressOf(effect);
+      if (created.has(address.scope)) continue;
+      atoms.push({
+        ...address,
+        before: { value: effect.before, present: presenceOf(effect, 'before') },
+        after: { value: effect.after, present: presenceOf(effect, 'after') },
+      });
+    }
+  }
+  if (created.size === 0 && rekeys.size === 0 && atoms.length === 0) {
+    return [...lists];
+  }
+
+  const live = [...atoms];
+  const liveRekeys = new Map(rekeys);
+  const droppedRemovals = new Map<string, CollectionRemoveEffect>();
+
+  /** Split an atom one level, or undefined when its values are not records. */
+  const refine = (atom: RebaseAtom): RebaseAtom[] | undefined => {
+    const sides = [atom.before, atom.after].map((side) =>
+      !side.present ? {} : isRebaseRecord(side.value) ? side.value : undefined
+    );
+    if (sides[0] === undefined || sides[1] === undefined) return undefined;
+    const children: RebaseAtom[] = [];
+    for (const key of new Set([
+      ...Object.keys(sides[0]),
+      ...Object.keys(sides[1]),
+    ])) {
+      const before = navigateRebaseValue(atom.before, [key]);
+      const after = navigateRebaseValue(atom.after, [key]);
+      if (sameRebaseValue(before, after)) continue;
+      children.push({
+        scope: atom.scope,
+        segments: [...atom.segments, key],
+        before,
+        after,
+      });
+    }
+    return children;
+  };
+
+  /** Re-base `current` (the pre-image at `address`) against live atoms. */
+  const claim = (address: RebaseAddress, current: RebaseValue): RebaseValue => {
+    // An atom ABOVE this address covers it only in part: split it down so the
+    // rest stays claimable by later records.
+    for (let index = 0; index < live.length; ) {
+      const atom = live[index];
+      if (
+        atom.scope !== address.scope ||
+        atom.segments.length >= address.segments.length ||
+        !hasPrefix(address.segments, atom.segments)
+      ) {
+        index += 1;
+        continue;
       }
-      const beforePresent = source.fieldPresence?.before ?? true;
-      const afterPresent = effect.fieldPresence?.after ?? true;
-      if (beforePresent && afterPresent) delete effect.fieldPresence;
-      else
-        effect.fieldPresence = { before: beforePresent, after: afterPresent };
-      return true;
+      const children = refine(atom);
+      if (children) {
+        live.splice(index, 1, ...children);
+        continue;
+      }
+      live.splice(index, 1);
+      const rest = address.segments.slice(atom.segments.length);
+      if (sameRebaseValue(current, navigateRebaseValue(atom.after, rest))) {
+        current = navigateRebaseValue(atom.before, rest);
+      }
+    }
+    for (let index = live.length - 1; index >= 0; index -= 1) {
+      const atom = live[index];
+      if (
+        atom.scope !== address.scope ||
+        !hasPrefix(atom.segments, address.segments)
+      ) {
+        continue;
+      }
+      live.splice(index, 1);
+      const rest = atom.segments.slice(address.segments.length);
+      if (sameRebaseValue(navigateRebaseValue(current, rest), atom.after)) {
+        current = replaceRebaseValue(current, rest, atom.before);
+      }
+    }
+    return current;
+  };
+
+  const rebaseSet = (effect: ScalarSetEffect): ScalarSetEffect => {
+    const presence = presenceOf(effect, 'before');
+    const next = claim(addressOf(effect), {
+      value: effect.before,
+      present: presence,
     });
-    if (dropped.size > 0) {
-      const follow = (
-        position: number,
-        subject: number | undefined,
-        side: 'beforeSubject' | 'afterSubject'
-      ): number | undefined => {
-        let current = subject;
-        for (
-          let removal = dropped.get(`${position}\u0000${current}`);
-          removal;
-          removal = dropped.get(`${position}\u0000${current}`)
-        ) {
-          current = removal[side];
-        }
-        return current;
+    if (next.value === effect.before && next.present === presence) {
+      return effect;
+    }
+    if (effect.plainBranchMembership) {
+      return {
+        ...effect,
+        before: next.value,
+        plainBranchMembership: {
+          before: next.present,
+          after: effect.plainBranchMembership.after,
+        },
       };
-      for (const effect of kept) {
-        if (effect.kind === 'add' || effect.kind === 'remove') {
-          effect.beforeSubject = follow(
-            effect.position,
-            effect.beforeSubject,
-            'beforeSubject'
-          );
-          effect.afterSubject = follow(
-            effect.position,
-            effect.afterSubject,
-            'afterSubject'
-          );
+    }
+    if (effect.subject !== undefined) {
+      const after = effect.fieldPresence?.after ?? true;
+      const { fieldPresence: _presence, ...rest } = effect;
+      return next.present && after
+        ? { ...rest, before: next.value }
+        : {
+            ...rest,
+            before: next.value,
+            fieldPresence: { before: next.present, after },
+          };
+    }
+    // A plain value write cannot express absence; its value still re-bases.
+    return next.present ? { ...effect, before: next.value } : effect;
+  };
+
+  const rebaseKey = (scope: string, key: string | number): string | number => {
+    const rekey = liveRekeys.get(scope);
+    if (!rekey) return key;
+    liveRekeys.delete(scope);
+    return key === rekey.afterKey ? rekey.beforeKey : key;
+  };
+
+  const follow = (
+    position: number,
+    subject: number | undefined,
+    side: 'beforeSubject' | 'afterSubject'
+  ): number | undefined => {
+    let current = subject;
+    const seen = new Set<number>();
+    while (current !== undefined && !seen.has(current)) {
+      const scope = rowScope(position, current);
+      const creation = created.get(scope);
+      if (!creation) break;
+      seen.add(current);
+      // Removed by an earlier (dropped) record: its neighbours then.
+      // Otherwise still alive here: its neighbours when the turn created it.
+      current = (droppedRemovals.get(scope) ?? creation)[side];
+    }
+    return current;
+  };
+
+  return lists.map((effects) => {
+    const kept: TurnEffect[] = [];
+    for (const effect of effects) {
+      const row =
+        effect.kind !== 'set' || effect.subject !== undefined
+          ? rowScope(effect.position, effect.subject as number)
+          : undefined;
+      if (row !== undefined && created.has(row)) {
+        if (effect.kind === 'remove') droppedRemovals.set(row, effect);
+        continue;
+      }
+      kept.push(effect);
+    }
+    for (let index = 0; index < kept.length; index += 1) {
+      const effect = kept[index];
+      if (effect.kind === 'set') kept[index] = rebaseSet(effect);
+    }
+    for (let index = 0; index < kept.length; index += 1) {
+      const effect = kept[index];
+      if (effect.kind === 'rekey') {
+        const beforeKey = rebaseKey(
+          rowScope(effect.position, effect.subject),
+          effect.beforeKey
+        );
+        if (beforeKey !== effect.beforeKey) {
+          kept[index] = { ...effect, beforeKey };
+        }
+      } else if (effect.kind === 'remove') {
+        const scope = rowScope(effect.position, effect.subject);
+        const snapshot = claim(
+          { scope, segments: [] },
+          { value: effect.value, present: true }
+        );
+        const key = rebaseKey(scope, effect.key);
+        if (snapshot.value !== effect.value || key !== effect.key) {
+          kept[index] = { ...effect, value: snapshot.value, key };
         }
       }
     }
-    return kept;
+    for (let index = 0; index < kept.length; index += 1) {
+      const effect = kept[index];
+      if (effect.kind !== 'add' && effect.kind !== 'remove') continue;
+      const beforeSubject = follow(
+        effect.position,
+        effect.beforeSubject,
+        'beforeSubject'
+      );
+      const afterSubject = follow(
+        effect.position,
+        effect.afterSubject,
+        'afterSubject'
+      );
+      if (
+        beforeSubject !== effect.beforeSubject ||
+        afterSubject !== effect.afterSubject
+      ) {
+        kept[index] = { ...effect, beforeSubject, afterSubject };
+      }
+    }
+    return kept.filter(
+      (effect) =>
+        effect.kind !== 'rekey' || effect.beforeKey !== effect.afterKey
+    );
   });
 }
 
@@ -3928,6 +4173,9 @@ export function restoration(
           position,
           subject: subjectIds?.[0],
           fieldSegments: subjectIds?.length ? fieldSegments : undefined,
+          ...(!subjectIds?.length && fieldSegments.length > 0
+            ? { branchSegments: fieldSegments }
+            : {}),
           ...(subjectIds?.length &&
           presence !== undefined &&
           !(presence.before && presence.after)
