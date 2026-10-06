@@ -223,6 +223,23 @@ describe('jumps that cross rows, a path re-add and an omission (v16 8g)', () => 
         from: 5,
         to: 2,
       },
+    // One turn writes y, omits and re-adds g with y 3, then writes y 5: its
+    // scalar effect holds y 5, its member effect the older 3. A jump that
+    // crosses it and another turn keeps the turn's own scalar.
+    'a turn whose own scalar is newer than its member re-add': {
+      steps: (tree) => [
+        () => tree.$.count(1),
+        () => tree.$.count(2),
+        () => {
+          tree.$.g.h.y(1);
+          tree.$({ count: 3 });
+          tree.$({ g: { h: { x: 0, y: 3 } }, count: 9 });
+          tree.$.g.h.y(5);
+        },
+      ],
+      from: 0,
+      to: 2,
+    },
     // Forward from 1 to 3 re-adds the rows with e, then `setAll` places a, b
     // and d around it: d's recorded neighbour e was added by the other turn.
     'additions anchored on a row another turn added': {
