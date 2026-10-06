@@ -46,6 +46,17 @@ const FIXED = [
   'dependent-add/resolve-retry',
 ];
 const DEPENDENT = 'dependent-add/resolve-retry';
+/**
+ * The replacement cases refuse in both versions; the KIND changed in 15.4.4
+ * (rollback/rebase review, item 2): a later add of a different row at the
+ * removed key rests on the removal, so the planner refuses it as a
+ * dependency before the re-add can fail.
+ */
+const REPLACEMENT = ['replacement/confirm', 'replacement/resolve-retry'];
+const REPLACEMENT_KINDS = {
+  baseline: 'effect-validation-failed',
+  candidate: 'later-confirmed-dependency',
+};
 const LIMITATIONS = [];
 const NAMES = [...PRESERVED, ...FIXED, ...LIMITATIONS];
 const REFUSAL_ERROR =
@@ -157,6 +168,20 @@ function classify(baseline, candidate) {
   pinnedFailure(b.get(DEPENDENT));
   for (const name of [...PRESERVED, ...FIXED])
     assert.equal(c.get(name).pass, true, `candidate: regression ${name}`);
+  for (const name of REPLACEMENT)
+    for (const [side, rows] of [
+      ['baseline', b],
+      ['candidate', c],
+    ]) {
+      const kinds = (rows.get(name).evidence.refusals ?? []).map(
+        (refusal) => refusal.kind
+      );
+      assert.deepEqual(
+        kinds,
+        [REPLACEMENT_KINDS[side], REPLACEMENT_KINDS[side]],
+        `${side}: ${name} refusal kind`
+      );
+    }
   const restored = c.get('restored-entity-link').evidence;
   assert.deepEqual(
     restored.state,
@@ -214,7 +239,14 @@ function selfTest() {
   const row = (name, pass) => ({
     name,
     pass,
-    evidence: {},
+    evidence: REPLACEMENT.includes(name)
+      ? {
+          refusals: [
+            { kind: REPLACEMENT_KINDS.baseline },
+            { kind: REPLACEMENT_KINDS.baseline },
+          ],
+        }
+      : {},
     ...(pass
       ? {}
       : { error: 'AssertionError [ERR_ASSERTION]: synthetic failure' }),
@@ -253,6 +285,11 @@ function selfTest() {
     before: structuredClone(DEPENDENT_EVIDENCE.before),
     refusals: structuredClone(DEPENDENT_EVIDENCE.refusals),
   };
+  for (const name of REPLACEMENT)
+    lookup(candidate, name).evidence.refusals = [
+      { kind: REPLACEMENT_KINDS.candidate },
+      { kind: REPLACEMENT_KINDS.candidate },
+    ];
   assert.equal(classify(baseline, candidate).accepted, true);
   const checks = [];
   const rejects = (name, mutate) => {
@@ -294,6 +331,10 @@ function selfTest() {
   });
   rejects('missing refusal while the edit stands', (_b, c) => {
     lookup(c, DEPENDENT).evidence.refusals.pop();
+  });
+  rejects('replacement kind not changed', (_b, c) => {
+    lookup(c, REPLACEMENT[0]).evidence.refusals[0].kind =
+      REPLACEMENT_KINDS.baseline;
   });
   rejects('changed pinned dependent failure', (b) => {
     lookup(b, DEPENDENT).evidence.remainingRefusal.final.x = 2;

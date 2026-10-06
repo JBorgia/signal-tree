@@ -954,8 +954,13 @@ describe('restoration enhancer', () => {
     // message instead. Asserting the machine-readable field rather than the
     // sentence — and the legibility difference is recorded as a follow-up rather
     // than quietly accepted.
+    //
+    // KIND CHANGED in 15.4.4 (rollback/rebase review, item 2): the later add
+    // rests on the removal having vacated key 17, so the planner refuses it
+    // first as the dependency it is; it surfaced from the failed re-add as
+    // `effect-validation-failed`.
     expectRollbackError(() => pending.rollback(), {
-      kind: 'effect-validation-failed',
+      kind: 'later-confirmed-dependency',
     });
     expect(store.$.rows.ids()).toEqual([17]);
     expect(store.$.rows.byIdOrFail(17).name()).toBe('replacement');

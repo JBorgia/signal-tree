@@ -215,10 +215,12 @@ describe.each(configurations)(
         tree.$.rows.addOne({ id: 'a', n: 9 });
         await flush();
         const refused = state(tree);
-        // The pinned kind for a pending REMOVE whose key was re-occupied
-        // (proposal-rejection-0 case 15, the refusal-lifecycle gate).
+        // A pending REMOVE whose key was re-occupied: a dependency (the
+        // re-occupier rests on the vacated key), refused by the planner. It
+        // surfaced from the failed re-add as effect-validation-failed until
+        // 15.4.4 (proposal-rejection-0 case 15, the refusal-lifecycle gate).
         expect(refusalKind(() => proposal.rollback())).toBe(
-          'effect-validation-failed'
+          'later-confirmed-dependency'
         );
         await flush();
         expect(state(tree)).toStrictEqual(refused);
@@ -314,6 +316,65 @@ describe.each(configurations)(
         tree.destroy();
       }
     });
+
+    // Rollback/rebase review, item 5: within one flush the authored record
+    // was stamped when the flush closed it, after every realization of that
+    // flush, so an authored edit followed by a realized removal read as the
+    // removal first and refused. Effects are stamped as they are written.
+    const sameFlush: Record<
+      string,
+      { write: (tree: Tree) => void; refused?: string }
+    > = {
+      'an authored edit, then a realized removal': {
+        write: (tree) => {
+          tree.$.rows.updateOne('a', { n: 7 });
+          realization(() => tree.$.rows.removeOne('a'));
+        },
+      },
+      'a realized edit, then an authored removal': {
+        write: (tree) => {
+          realization(() => tree.$.rows.updateOne('a', { n: 7 }));
+          tree.$.rows.removeOne('a');
+        },
+      },
+      'an authored removal of another row, then a realized edit of this one': {
+        write: (tree) => {
+          tree.$.rows.removeOne('c');
+          realization(() => tree.$.rows.updateOne('a', { n: 7 }));
+        },
+        refused: 'later-confirmed-dependency',
+      },
+      'a realized removal of another row, then an authored edit of this one': {
+        write: (tree) => {
+          realization(() => tree.$.rows.removeOne('c'));
+          tree.$.rows.updateOne('a', { n: 7 });
+        },
+        refused: 'later-confirmed-dependency',
+      },
+    };
+    it.each(Object.keys(sameFlush))(
+      'in one flush, %s: judged in the order written',
+      async (name) => {
+        const tree = make();
+        try {
+          await seed(tree);
+          const proposal = open(tree);
+          await flush();
+          sameFlush[name].write(tree);
+          await flush();
+          const before = state(tree);
+          expect(refusalKind(() => proposal.rollback())).toBe(
+            sameFlush[name].refused
+          );
+          await flush();
+          expect(state(tree)).toStrictEqual(
+            sameFlush[name].refused ? before : { ...before, x: 0 }
+          );
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
 
     it('a realized removal of another row, then a confirmed edit of this one: still refused', async () => {
       const tree = make();

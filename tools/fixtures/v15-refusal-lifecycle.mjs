@@ -121,12 +121,17 @@ for (const conflict of ['replacement', 'dependent-add'])
         }
         await tick();
         evidence.refusals.push({ kind: failure?.cause?.kind, ...snapshot() });
-        assert.equal(
-          failure?.cause?.kind,
-          conflict === 'replacement'
-            ? 'effect-validation-failed'
-            : 'later-confirmed-dependency'
-        );
+        // A re-occupied removal key refuses either way; its kind changed in
+        // 15.4.4 (effect-validation-failed -> later-confirmed-dependency), and
+        // the gate pins which version reports which (`REPLACEMENT_KINDS`).
+        if (conflict === 'replacement')
+          assert.ok(
+            ['effect-validation-failed', 'later-confirmed-dependency'].includes(
+              failure?.cause?.kind
+            ),
+            `replacement refuses, got ${failure?.cause?.kind}`
+          );
+        else assert.equal(failure?.cause?.kind, 'later-confirmed-dependency');
         assert.deepEqual(
           { x: tree.$.x(), rows: tree.$.rows.all() },
           before,

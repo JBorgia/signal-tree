@@ -462,7 +462,7 @@ describe('PROPOSAL-REJECTION-0 / 14 — one superseded AND one depended-upon sub
 });
 
 describe('PROPOSAL-REJECTION-0 / 15 — pending REMOVE is not superseded by a later add', () => {
-  it('still refuses, through the effect-validation door (PRE-EXISTING)', async () => {
+  it('still refuses, as a dependency (15.4.4; the effect-validation door before)', async () => {
     const tree = rowTree();
     tree.$.rows.addOne({ id: 'A', name: 'Original' });
     await flush();
@@ -486,7 +486,13 @@ describe('PROPOSAL-REJECTION-0 / 15 — pending REMOVE is not superseded by a la
     // IS preserved, but `x` is stranded at its proposed value — the same
     // symptom PR-A fixed for pending adds, reached by a different door.
     // Recorded as a follow-up in TODO.md; NOT fixed here.
-    expect(tryRollback(pending)).toBe('effect-validation-failed');
+    //
+    // KIND CHANGED in 15.4.4 (rollback/rebase review, item 2): the later add
+    // of a different row at the removed key rests on the removal, so the
+    // planner refuses it first as `later-confirmed-dependency`, as for a
+    // rename whose old key was re-occupied (67e2ade3). Still a refusal,
+    // still nothing changed; `x` stays stranded, as before.
+    expect(tryRollback(pending)).toBe('later-confirmed-dependency');
     expect(tree.$.rows.byId('A')?.()?.name).toBe('FromServer');
     expect(tree.$.x()).toBe(1);
   });
