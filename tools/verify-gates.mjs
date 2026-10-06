@@ -1165,7 +1165,7 @@ const GATES = [
   {
     name: 'retention-gc',
     covers:
-      'the GC-requiring retention proofs: diagnostic and persistence owners release values at their boundaries, and source locations do not retain abandoned derived recipes',
+      'the GC-requiring retention proofs: diagnostic and persistence owners release values at their boundaries, source locations do not retain abandoned derived recipes, and an entity collection retains no clone of an added row it announced',
     // Runs outside `nx test kernel` because it needs --expose-gc, and it FAILS
     // rather than skips without it: a WeakRef that is merely eligible for
     // collection proves nothing, and a skipped retention test reads as evidence.
