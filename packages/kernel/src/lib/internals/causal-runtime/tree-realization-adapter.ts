@@ -28,6 +28,7 @@ import { getLocationRuntime } from '../location-runtime';
 
 import type { ReversalEffect, ReversalRefusal } from './causal-types';
 import { normalizeScopedValuePath } from './scoped-value-addressing';
+import { orderInsertions } from './insertion-order';
 
 type StructuralDriftRefusal = Extract<
   ReversalRefusal,
@@ -695,7 +696,11 @@ function planHeterogeneousFrame(
   // legitimately hold the same key, and freeing 'a' in one must not license
   // overwriting 'a' in another.
   const vacatingKeysByOwner = new Map<number, Set<string | number>>();
+  // Subjects this frame removes: restoring one of them (a move to a new key)
+  // has to wait for its removal.
+  const removedSubjects = new Set<string>();
   for (const [removeEffect, removedKey] of removeKeysByEffect) {
+    removedSubjects.add(`${removeEffect.owner}\u0000${removeEffect.subjectId}`);
     let keys = vacatingKeysByOwner.get(removeEffect.owner);
     if (!keys) {
       keys = new Set<string | number>();
@@ -716,15 +721,6 @@ function planHeterogeneousFrame(
   );
   // Restores commit in this order, and each resolves its anchors against the
   // rows live at that moment — so the order decides the placement.
-  const removedScopes = new Set(
-    effects
-      .filter((effect) => effect.structural === 'remove')
-      .map((effect) => rowScope(effect.owner, effect.subjectId))
-  );
-  const collectionNodesByOwner = new Map<
-    PositionId,
-    CollectionNode | undefined
-  >();
   const restoreEffects = orderRestoresForPlacement(
     effects.filter(
       (
@@ -732,26 +728,7 @@ function planHeterogeneousFrame(
       ): effect is ReversalEffect & { structural: 'add'; subjectId: number } =>
         effect.structural === 'add' && typeof effect.subjectId === 'number'
     ),
-    (effect) => getStructuralAddEffect(descriptors.get(effect.owner), effect),
-    (effect, subject) => {
-      if (removedScopes.has(rowScope(effect.owner, subject))) return false;
-      if (!collectionNodesByOwner.has(effect.owner)) {
-        collectionNodesByOwner.set(
-          effect.owner,
-          resolveCollectionNode(
-            tree,
-            descriptors.get(effect.owner),
-            structuralOwnerPaths,
-            effect
-          )
-        );
-      }
-      return (
-        collectionNodesByOwner
-          .get(effect.owner)
-          ?.__findKeyBySubjectId?.(subject) !== undefined
-      );
-    }
+    (effect) => getStructuralAddEffect(descriptors.get(effect.owner), effect)
   );
   const baseRevision = scalarSlotRuntime?.revision();
   const scalarFrameRuntime =
@@ -765,15 +742,11 @@ function planHeterogeneousFrame(
     return undefined;
   }
   const resolvedScalarFrameRuntime = scalarFrameRuntime;
-  const plannedRestores: Array<{
+  // Restores and fresh adds, in restore order (one list: a fresh add may
+  // anchor to a restore and the reverse).
+  const plannedInsertions: Array<{
     effect: ReversalEffect & { structural: 'add'; subjectId: number };
-    plan: {
-      commit(options?: { advancePhysicalRevision?: boolean }): void;
-      publish(metaOverride?: WriteMetadata): void;
-    };
-  }> = [];
-  const plannedFreshAdds: Array<{
-    effect: ReversalEffect & { structural: 'add'; subjectId: number };
+    vacatedKey: boolean;
     plan: {
       commit(options?: { advancePhysicalRevision?: boolean }): void;
       publish(metaOverride?: WriteMetadata): void;
@@ -840,8 +813,12 @@ function planHeterogeneousFrame(
         return undefined;
       }
 
-      plannedFreshAdds.push({
+      plannedInsertions.push({
         effect,
+        vacatedKey:
+          vacatingKeysByOwner
+            .get(effect.owner)
+            ?.has(effect.after as string | number) ?? false,
         plan: planFreshAdd(
           effect.after as string | number,
           preparedSubject.value,
@@ -857,8 +834,14 @@ function planHeterogeneousFrame(
       return undefined;
     }
 
-    plannedRestores.push({
+    plannedInsertions.push({
       effect,
+      vacatedKey:
+        (vacatingKeysByOwner
+          .get(effect.owner)
+          ?.has(effect.after as string | number) ??
+          false) ||
+        removedSubjects.has(`${effect.owner}\u0000${effect.subjectId}`),
       plan: planRestore(
         effect.after as string | number,
         preparedSubject.value,
@@ -989,15 +972,26 @@ function planHeterogeneousFrame(
           publish: false,
         });
 
+        // Insertions first, deletions last (insertion-order.ts): a restore
+        // anchored to a row this frame removes still finds it (redo of
+        // `prependMany x; removeMany a, e` anchors x to a). A restore into a
+        // key this frame vacates, or of a subject it removes (a move), waits
+        // for the removal (RESTORE-P0 P0-D).
+        const insertions = plannedInsertions.filter(
+          ({ vacatedKey }) => !vacatedKey
+        );
+        const afterRemovals = plannedInsertions.filter(
+          ({ vacatedKey }) => vacatedKey
+        );
+        for (const { plan } of insertions) {
+          plan.commit({ advancePhysicalRevision: false });
+        }
+
         for (const { plan } of plannedRemoves) {
           plan.commit({ advancePhysicalRevision: false });
         }
 
-        for (const { plan } of plannedFreshAdds) {
-          plan.commit({ advancePhysicalRevision: false });
-        }
-
-        for (const { plan } of plannedRestores) {
+        for (const { plan } of afterRemovals) {
           plan.commit({ advancePhysicalRevision: false });
         }
 
@@ -1018,15 +1012,7 @@ function planHeterogeneousFrame(
           });
         }
 
-        for (const { plan } of plannedRestores) {
-          plan.publish({
-            ...(getActiveWriteContext() ?? {}),
-            intent: 'system',
-            participation: 'realized',
-          });
-        }
-
-        for (const { plan } of plannedFreshAdds) {
+        for (const { plan } of plannedInsertions) {
           plan.publish({
             ...(getActiveWriteContext() ?? {}),
             intent: 'system',
@@ -2182,26 +2168,17 @@ function replaceFieldAtSegments(
   };
 }
 
-const rowScope = (owner: unknown, subject: unknown): string =>
-  `${String(owner)}\u0000${String(subject)}`;
-
 /**
  * Orders a frame's restores so each one, when it commits, finds its recorded
- * neighbours live. Restores commit in sequence and each resolves its anchors
- * against the rows live at that moment, so the order decides the placement.
- * Capture order cannot be used: the notifier delivers a row's removal in the
- * slot of that row's EARLIER write, so `updateOne('a'); clear()` reversed
- * restored [a, c, z].
- *
- * Next is, in order of preference: a restore whose restored anchors are all
- * placed and that has a live anchor (or no live-able anchor at all); one with
- * at least one live anchor while another is still waiting; else the first
- * unplaced restore — reached only when nothing is live (every neighbour was
- * removed with it), where any start chains back through the anchors. An anchor
- * that is a surviving row, or a restore already placed, is live. The tiers
- * matter both ways: `updateOne c; removeOne a; removeOne c` anchors a to c (c
- * was there when a went), so c goes first; `removeMany([z, a])` beside a
- * surviving c anchors z and a to each other, so a goes first, against c.
+ * neighbours: the replay order of `orderInsertions` (later removals first;
+ * rows removed together as one block; creations in creation order). Restores
+ * commit in sequence and each resolves its anchors against the rows live at
+ * that moment, so the order decides the placement. Capture order cannot be
+ * used: the notifier delivers a row's removal in the slot of that row's
+ * EARLIER write. 64313c7f replaced d2cbd16f's chain-head choice with "the
+ * first unplaced restore", which put `removeOne(e); clear()` back as
+ * [e, a, b, c, d]. An anchor that is neither live nor restored by the frame is
+ * left to the commit-time resolution, as before.
  */
 function orderRestoresForPlacement<
   T extends ReversalEffect & { subjectId: number }
@@ -2209,65 +2186,30 @@ function orderRestoresForPlacement<
   restores: readonly T[],
   anchorsOf: (
     effect: T
-  ) => { beforeSubject?: number; afterSubject?: number } | undefined,
-  isLive: (effect: T, subject: number) => boolean
+  ) => { beforeSubject?: number; afterSubject?: number } | undefined
 ): T[] {
   if (restores.length < 2) return [...restores];
-  const pending = new Map<string, T>();
-  for (const effect of restores) {
-    pending.set(rowScope(effect.owner, effect.subjectId), effect);
-  }
-  const waiting = new Map<T, number>();
-  const hasLiveAnchor = new Set<T>();
-  const dependents = new Map<string, T[]>();
-  const full: T[] = [];
-  const partial: T[] = [];
-  for (const effect of restores) {
-    const anchors = anchorsOf(effect);
-    let count = 0;
-    for (const subject of [anchors?.beforeSubject, anchors?.afterSubject]) {
-      if (subject === undefined) continue;
-      const key = rowScope(effect.owner, subject);
-      if (pending.has(key)) {
-        count += 1;
-        const list = dependents.get(key);
-        if (list) list.push(effect);
-        else dependents.set(key, [effect]);
-      } else if (isLive(effect, subject)) {
-        hasLiveAnchor.add(effect);
-      }
-    }
-    waiting.set(effect, count);
-    if (count === 0) full.push(effect);
-    else if (hasLiveAnchor.has(effect)) partial.push(effect);
-  }
-  const placed = new Set<T>();
   const ordered: T[] = [];
-  let fullHead = 0;
-  let partialHead = 0;
-  while (ordered.length < restores.length) {
-    while (fullHead < full.length && placed.has(full[fullHead])) fullHead += 1;
-    while (partialHead < partial.length && placed.has(partial[partialHead])) {
-      partialHead += 1;
-    }
-    const next =
-      fullHead < full.length
-        ? full[fullHead++]
-        : partialHead < partial.length
-        ? partial[partialHead++]
-        : (restores.find((effect) => !placed.has(effect)) as T);
-    placed.add(next);
-    ordered.push(next);
-    for (const dependent of dependents.get(
-      rowScope(next.owner, next.subjectId)
-    ) ?? []) {
-      if (placed.has(dependent)) continue;
-      const left = (waiting.get(dependent) ?? 1) - 1;
-      waiting.set(dependent, left);
-      hasLiveAnchor.add(dependent);
-      if (left === 0) full.push(dependent);
-      else partial.push(dependent);
-    }
+  const byOwner = new Map<PositionId, T[]>();
+  for (const effect of restores) {
+    const list = byOwner.get(effect.owner);
+    if (list) list.push(effect);
+    else byOwner.set(effect.owner, [effect]);
+  }
+  for (const effects of byOwner.values()) {
+    orderInsertions(
+      effects.map((effect) => ({
+        item: effect,
+        subject: effect.subjectId,
+        anchors: anchorsOf(effect),
+        creation: effect.structuralContext?.kind === 'add',
+      })),
+      // Only the order is used here; placement resolves at commit time.
+      () => true,
+      (input) => {
+        ordered.push(input.item);
+      }
+    );
   }
   return ordered;
 }

@@ -8,11 +8,12 @@ import type { ReversalEffect } from './causal-types';
 
 /**
  * An addition whose recorded anchor is a row the SAME transition removes is
- * placed at that row's last known position: after its nearest surviving
- * predecessor in the source order (the front if none), else before its nearest
- * surviving successor (the end if none). On 15.4.3 this threw "Collection
- * structural target has no live placement anchor" — redo of
- * `addOne x; addOne y; removeMany(['a', 'c'])` anchors x to c.
+ * placed beside that anchor: a reversal inserts before it deletes
+ * (`insertion-order.ts`), so the anchor is still there. On 15.4.3 this threw
+ * "Collection structural target has no live placement anchor" — redo of
+ * `addOne x; addOne y; removeMany(['a', 'c'])` anchors x to c. (c4c6cca9 placed
+ * it at the anchor's last known position instead, which ordered two such rows
+ * in one gap by processing order; the reversal-engine review, item 2.)
  */
 const OWNER = 7;
 const source = (subjects: readonly number[]): CollectionTransitionSource => ({

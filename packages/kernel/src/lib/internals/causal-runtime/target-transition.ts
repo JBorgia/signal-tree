@@ -1,5 +1,5 @@
 import type { PositionId, ReversalEffect } from './causal-types';
-import { appendAll } from '../utilities/append-all';
+import { orderInsertions, type InsertionInput } from './insertion-order';
 
 export type CollectionTargetSubject = {
   readonly subject: number;
@@ -55,7 +55,6 @@ export type PlainBranchMemberTransitionTargetBinding = {
     target: ReadonlyMap<PositionId, PlainBranchMemberTransitionTarget>
   ): PreparedCollectionTransitionTarget;
 };
-
 export function prepareDeclarativeTransitionInstallation(
   target: DeclarativeTransitionTarget,
   bindings: ReadonlyMap<PositionId, CollectionTransitionTargetBinding>,
@@ -233,6 +232,10 @@ export function deriveDeclarativeTransitionTarget(
     PositionId,
     PlainBranchMemberTransitionTarget
   >();
+  // Insertions first, deletions last (insertion-order.ts): a row this
+  // transition both inserts and deletes (a ghost) is inserted before it is
+  // deleted whatever order the caller listed them in.
+  const deletions: ReversalEffect[] = [];
   for (const effect of options.effects) {
     if (effect.plainBranchMembership) {
       plainBranchMembers.set(effect.owner, {
@@ -245,8 +248,13 @@ export function deriveDeclarativeTransitionTarget(
       applyValueEffect(collections, scalars, effect);
       continue;
     }
+    if (effect.structural === 'remove') {
+      deletions.push(effect);
+      continue;
+    }
     applyStructuralEffect(collections, effect);
   }
+  for (const effect of deletions) applyStructuralEffect(collections, effect);
 
   const orderDeltas = new Map<PositionId, CollectionOrderDelta>();
   for (const delta of options.orderDeltas ?? []) {
@@ -534,231 +542,94 @@ function applyStructuralEffect(
   collection.subjects.set(subject, { ...existing, key });
 }
 
+/**
+ * The collection's target order: the replay `orderInsertions` describes, on a
+ * linked list of the source order (every row present now, including rows this
+ * transition deletes), keeping only the target's members at the end. Rows the
+ * transition both inserts and deletes (a row a turn created and removed,
+ * recorded so its neighbours can be placed) take part virtually. Linear in
+ * rows plus effects: the array scan it replaced was quadratic (redo of a
+ * 40k-row addMany took 40 s).
+ */
 function deriveStructuralTargetOrder(
   sourceOrder: readonly number[],
   subjects: ReadonlyMap<number, CollectionTargetSubject>,
   effects: readonly ReversalEffect[]
 ): number[] {
-  const order = sourceOrder.filter((subject) => subjects.has(subject));
-  const additions = effects.filter(
-    (effect) =>
-      effect.structural === 'add' &&
-      typeof effect.subjectId === 'number' &&
-      subjects.has(effect.subjectId)
-  );
-  const pending = [...additions];
-
-  while (pending.length > 0) {
-    const pendingSubjects = new Set(
-      pending.map((effect) => effect.subjectId as number)
-    );
-    const waitsOnPending = (effect: ReversalEffect): boolean => {
-      const context = effect.structuralContext;
-      return (
-        (context?.kind === 'add' || context?.kind === 'remove') &&
-        ((context.beforeSubject !== undefined &&
-          pendingSubjects.has(context.beforeSubject)) ||
-          (context.afterSubject !== undefined &&
-            pendingSubjects.has(context.afterSubject)))
-      );
-    };
-    // An addition whose anchors include ANOTHER pending addition waits for it
-    // while any addition is waiting on nothing: `updateOne c; removeOne a;
-    // removeOne c` anchors a to c (c was there when a went), so c is placed
-    // first; placing a first beside its live anchor z restored [z, c, a].
-    const unblockedIndex = pending.findIndex(
-      (effect) => !waitsOnPending(effect)
-    );
-    const readyIndex =
-      unblockedIndex >= 0
-        ? unblockedIndex
-        : pending.findIndex((effect) => {
-            const context = effect.structuralContext;
-            if (context?.kind !== 'add' && context?.kind !== 'remove') {
-              return true;
-            }
-            const beforeLive =
-              context.beforeSubject !== undefined &&
-              order.includes(context.beforeSubject);
-            const afterLive =
-              context.afterSubject !== undefined &&
-              order.includes(context.afterSubject);
-            if (beforeLive || afterLive) {
-              return true;
-            }
-            const hasNoAnchors =
-              context.beforeSubject === undefined &&
-              context.afterSubject === undefined;
-            if (hasNoAnchors) {
-              return true;
-            }
-            const anchorMayBecomeLive =
-              (context.beforeSubject !== undefined &&
-                pendingSubjects.has(context.beforeSubject)) ||
-              (context.afterSubject !== undefined &&
-                pendingSubjects.has(context.afterSubject));
-            return !anchorMayBecomeLive;
-          });
-    if (readyIndex < 0) {
-      if (order.length === 0) {
-        appendAll(order, derivePendingAnchorOrder(pending));
-        pending.length = 0;
-        continue;
-      }
-      throw new Error('Collection structural target contains an anchor cycle');
-    }
-    const effect = pending.splice(readyIndex, 1)[0];
-    const subject = effect.subjectId as number;
-    const context = effect.structuralContext;
-    const beforeSubject =
-      context?.kind === 'add' || context?.kind === 'remove'
-        ? context.beforeSubject
-        : undefined;
-    const afterSubject =
-      context?.kind === 'add' || context?.kind === 'remove'
-        ? context.afterSubject
-        : undefined;
-    const afterIndex =
-      afterSubject === undefined ? -1 : order.indexOf(afterSubject);
-    const beforeIndex =
-      beforeSubject === undefined ? -1 : order.indexOf(beforeSubject);
-    if (beforeIndex >= 0 && afterIndex >= 0 && beforeIndex >= afterIndex) {
-      throw new Error(
-        'Collection structural target contains contradictory anchors'
-      );
-    }
-    if (afterIndex >= 0) {
-      order.splice(afterIndex, 0, subject);
-      continue;
-    }
-    if (beforeIndex >= 0) {
-      order.splice(beforeIndex + 1, 0, subject);
-      continue;
-    }
-    if (beforeSubject === undefined && afterSubject === undefined) {
-      order.push(subject);
-      continue;
-    }
-    const lastKnown = removedAnchorPosition(
-      sourceOrder,
-      order,
-      beforeSubject,
-      afterSubject
-    );
-    if (lastKnown !== undefined) {
-      order.splice(lastKnown, 0, subject);
-      continue;
-    }
-    throw new Error(
-      'Collection structural target has no live placement anchor'
-    );
+  const next = new Map<number, number | undefined>();
+  const previous = new Map<number, number | undefined>();
+  let head: number | undefined;
+  let tail: number | undefined;
+  for (const subject of sourceOrder) {
+    previous.set(subject, tail);
+    next.set(subject, undefined);
+    if (tail === undefined) head = subject;
+    else next.set(tail, subject);
+    tail = subject;
   }
-
-  return order;
-}
-
-/**
- * Where an anchor that THIS transition removes used to be: after its nearest
- * surviving predecessor in the source order (the front if none), else before
- * its nearest surviving successor (the end if none). Redo of
- * `addOne x; addOne y; removeMany(['a', 'c'])` anchors x to c, which the same
- * transition removes, and threw "no live placement anchor". An anchor absent
- * from the source order entirely stays an error.
- */
-function removedAnchorPosition(
-  sourceOrder: readonly number[],
-  order: readonly number[],
-  beforeSubject: number | undefined,
-  afterSubject: number | undefined
-): number | undefined {
-  const live = new Set(order);
-  if (beforeSubject !== undefined) {
-    const at = sourceOrder.indexOf(beforeSubject);
-    if (at >= 0) {
-      for (let index = at - 1; index >= 0; index -= 1) {
-        if (live.has(sourceOrder[index])) {
-          return order.indexOf(sourceOrder[index]) + 1;
-        }
-      }
-      return 0;
-    }
-  }
-  if (afterSubject !== undefined) {
-    const at = sourceOrder.indexOf(afterSubject);
-    if (at >= 0) {
-      for (let index = at + 1; index < sourceOrder.length; index += 1) {
-        if (live.has(sourceOrder[index])) {
-          return order.indexOf(sourceOrder[index]);
-        }
-      }
-      return order.length;
-    }
-  }
-  return undefined;
-}
-
-function derivePendingAnchorOrder(
-  effects: readonly ReversalEffect[]
-): number[] {
-  const subjects = effects.map((effect) => effect.subjectId as number);
-  const subjectSet = new Set(subjects);
-  const outgoing = new Map(
-    subjects.map((subject) => [subject, new Set<number>()])
-  );
-  const indegree = new Map(subjects.map((subject) => [subject, 0]));
-  const addEdge = (before: number, after: number): void => {
-    const edges = outgoing.get(before);
-    if (!edges || edges.has(after)) {
-      return;
-    }
-    edges.add(after);
-    indegree.set(after, (indegree.get(after) ?? 0) + 1);
+  const link = (
+    subject: number,
+    before: number | undefined,
+    after: number | undefined
+  ): void => {
+    previous.set(subject, before);
+    next.set(subject, after);
+    if (before === undefined) head = subject;
+    else next.set(before, subject);
+    if (after === undefined) tail = subject;
+    else previous.set(after, subject);
   };
 
+  const inputs: InsertionInput<number>[] = [];
+  const seen = new Set<number>();
   for (const effect of effects) {
-    const subject = effect.subjectId as number;
-    const context = effect.structuralContext;
-    if (context?.kind !== 'add' && context?.kind !== 'remove') {
+    if (effect.structural !== 'add' || typeof effect.subjectId !== 'number') {
       continue;
     }
-    if (
-      context.beforeSubject !== undefined &&
-      subjectSet.has(context.beforeSubject)
-    ) {
-      addEdge(context.beforeSubject, subject);
-    }
-    if (
-      context.afterSubject !== undefined &&
-      subjectSet.has(context.afterSubject)
-    ) {
-      addEdge(subject, context.afterSubject);
-    }
+    const subject = effect.subjectId;
+    if (seen.has(subject) || next.has(subject)) continue;
+    seen.add(subject);
+    const context = effect.structuralContext;
+    inputs.push({
+      item: subject,
+      subject,
+      anchors:
+        context?.kind === 'add' || context?.kind === 'remove'
+          ? {
+              beforeSubject: context.beforeSubject,
+              afterSubject: context.afterSubject,
+            }
+          : undefined,
+      creation: context?.kind !== 'remove',
+    });
   }
-
-  const sourceRank = new Map(
-    subjects.map((subject, index) => [subject, index])
-  );
-  const ready = subjects.filter((subject) => indegree.get(subject) === 0);
-  const result: number[] = [];
-  while (ready.length > 0) {
-    ready.sort(
-      (left, right) =>
-        (sourceRank.get(left) ?? 0) - (sourceRank.get(right) ?? 0)
-    );
-    const subject = ready.shift() as number;
-    result.push(subject);
-    for (const after of outgoing.get(subject) ?? []) {
-      const nextIndegree = (indegree.get(after) ?? 0) - 1;
-      indegree.set(after, nextIndegree);
-      if (nextIndegree === 0) {
-        ready.push(after);
+  orderInsertions(
+    inputs,
+    (subject) => next.has(subject),
+    (input, placement) => {
+      switch (placement.kind) {
+        case 'front':
+          link(input.subject, undefined, head);
+          return;
+        case 'after':
+          link(input.subject, placement.subject, next.get(placement.subject));
+          return;
+        case 'before':
+          link(
+            input.subject,
+            previous.get(placement.subject),
+            placement.subject
+          );
+          return;
       }
     }
+  );
+
+  const order: number[] = [];
+  for (let at = head; at !== undefined; at = next.get(at)) {
+    if (subjects.has(at)) order.push(at);
   }
-  if (result.length !== subjects.length) {
-    throw new Error('Collection structural target contains an anchor cycle');
-  }
-  return result;
+  return order;
 }
 
 function applyValueEffect(
