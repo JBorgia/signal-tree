@@ -296,3 +296,89 @@ describe('updateMany merges over the row as its interceptors left it', () => {
     }
   });
 });
+
+/**
+ * Round-4 probe C2: each named row merges over its value as ALL the
+ * interceptors left it. 85db805e re-read a row right after its own
+ * interceptors, so a later row's interceptor writing an earlier row was lost:
+ * with b's interceptor writing a.r and a's writing b.r, a lost r.
+ */
+describe('updateMany: interceptors writing each other\'s rows', () => {
+  type Crossed = Row & { r?: number };
+  const AFTER: Crossed[] = [
+    { id: 'z', n: 0 },
+    { id: 'a', n: 5, r: 1 },
+    { id: 'c', n: 5, r: 2 },
+  ];
+  const crossed = (tree: Tree) => {
+    const seen = new Set<string>();
+    tree.$.rows.intercept({
+      onUpdate: (id, changes) => {
+        if (changes.n !== 5 || seen.has(String(id))) return;
+        seen.add(String(id));
+        if (id === 'c') tree.$.rows.updateOne('a', { r: 1 } as Partial<Row>);
+        if (id === 'a') tree.$.rows.updateOne('c', { r: 2 } as Partial<Row>);
+      },
+    });
+  };
+  const call = (tree: Tree) => tree.$.rows.updateMany(['a', 'c'], { n: 5 });
+
+  it('no enhancers: both cross-writes are kept', async () => {
+    const tree = make();
+    try {
+      await seed(tree);
+      crossed(tree);
+      call(tree);
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(AFTER);
+    } finally {
+      tree.destroy();
+    }
+  });
+
+  it.each([
+    ['restoration()', () => [restoration()]],
+    ['transactions(), restoration()', () => [transactions(), restoration()]],
+    ['restoration(), transactions()', () => [restoration(), transactions()]],
+  ] as const)('%s: undo, redo, undo exact', async (_name, enhancers) => {
+    const tree = make(enhancers());
+    try {
+      await seed(tree);
+      crossed(tree);
+      undoable(() => call(tree));
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(AFTER);
+      tree.undo();
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+      tree.redo();
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(AFTER);
+      tree.undo();
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+    } finally {
+      tree.destroy();
+    }
+  });
+
+  it.each([
+    ['transactions()', () => [transactions()]],
+    ['transactions(), restoration()', () => [transactions(), restoration()]],
+    ['restoration(), transactions()', () => [restoration(), transactions()]],
+  ] as const)('%s: rollback exact', async (_name, enhancers) => {
+    const tree = make(enhancers());
+    try {
+      await seed(tree);
+      crossed(tree);
+      const pending = tree.transaction(() => call(tree));
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(AFTER);
+      pending.rollback();
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+    } finally {
+      tree.destroy();
+    }
+  });
+});

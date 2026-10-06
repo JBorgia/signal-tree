@@ -2960,24 +2960,30 @@ export function createEntitySignal<
       // Collect entities and run interceptors first
       const updatedEntities = ids.map((id) => {
         requireEntity(id);
-        const subjectId = requireSubjectId(id);
-        const transformedChanges = interceptUpdatedEntity(id, changes);
-        // Merged over the row as its interceptors left it, as upsertMany
-        // does: read before, a field one of them wrote was lost. (A row they
-        // removed reads undefined here and is refused below.)
-        const prev = getProjectedEntity(id) as E;
         return {
           id,
-          subjectId,
-          prev,
-          finalUpdated: { ...prev, ...transformedChanges },
-          transformedChanges,
+          subjectId: requireSubjectId(id),
+          transformedChanges: interceptUpdatedEntity(id, changes),
+        } as {
+          id: K;
+          subjectId: number;
+          transformedChanges: Partial<E>;
+          prev: E;
+          finalUpdated: E;
         };
       });
       // As the add calls: an interceptor that changed membership, order or a
       // named row's key leaves this plan stale (a rename was lost, a vanished
       // row announced) - refuse before writing.
       refuseTopologyChange('updateMany', frontier, updatedEntities);
+      // Every row merges over its value as ALL the interceptors left it, as
+      // upsertMany does: read per row, right after its own interceptors, a
+      // later row's interceptor writing an earlier row was lost (85db805e).
+      for (const row of updatedEntities)
+        row.finalUpdated = {
+          ...(row.prev = getProjectedEntity(row.id) as E),
+          ...row.transformedChanges,
+        };
 
       const frame = createEntityMutationFrame();
       for (const { id, subjectId, finalUpdated } of updatedEntities) {
