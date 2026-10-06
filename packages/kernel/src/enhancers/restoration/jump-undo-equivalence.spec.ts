@@ -312,6 +312,26 @@ describe('jumps that cross rows, a path re-add and an omission (v16 8g)', () => 
       from: 3,
       to: 1,
     },
+    // Forward from 0 to 3: a setAll's rows anchor on each other, the omission
+    // keeps them, and the re-adding addOne removes them and adds e again. One
+    // placement over all three turns finds the setAll's anchors in a cycle;
+    // replayed turn by turn they place and go (J5b, at fc695494 and later).
+    'a setAll, an omission and a re-adding addOne, jumped over at once': {
+      steps: (tree) => [
+        () => tree.$.count(5),
+        () =>
+          tree.$.g.rows.setAll([
+            { id: 'a', n: 11 },
+            { id: 'c', n: 12 },
+            { id: 'd', n: 13 },
+            { id: 'e', n: 14 },
+          ]),
+        () => tree.$({ g: { h: { x: 0, y: 12 } }, count: 9 }),
+        () => tree.$.g.rows.addOne({ id: 'e', n: 1 }),
+      ],
+      from: 0,
+      to: 3,
+    },
     // Forward from 1 to 4: d's recorded neighbour e is added by one turn and
     // removed by a later one, so only a turn-by-turn replay can place d.
     'an anchor another turn added and a later turn removed': {
