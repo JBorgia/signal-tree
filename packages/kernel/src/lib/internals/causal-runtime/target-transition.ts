@@ -146,6 +146,56 @@ export function withoutSupersededScalars(
   return kept ?? scalars;
 }
 
+/**
+ * A collection whose order this transition cannot reconstruct. Raised before
+ * anything is installed, so the caller can refuse with nothing changed. The
+ * message stays the underlying failure's; `reason` says it for a reader
+ * (v16 8g). v15 15.4.x reconstructs these orders (`6b6badc7`, `7fdcb36d`,
+ * `faa9b1f7`, `d33138f6`); the carry list names which shape needs which.
+ */
+export class CollectionOrderConflict extends Error {
+  constructor(
+    readonly owner: PositionId,
+    readonly reason: string,
+    failure: Error
+  ) {
+    super(failure.message);
+    this.name = 'CollectionOrderConflict';
+  }
+}
+
+const ORDER_FAILURES: ReadonlyArray<readonly [string, string]> = [
+  [
+    'frontier does not match the transition endpoint',
+    'the order change being reversed no longer applies to its current order',
+  ],
+  [
+    'no live placement anchor',
+    "a restored row's recorded neighbours are no longer in it",
+  ],
+  [
+    'Collection order does not match active SubjectIds',
+    'its reconstructed order and its rows disagree',
+  ],
+  ['contains an anchor cycle', "its rows' recorded neighbours form a cycle"],
+  [
+    'contains contradictory anchors',
+    "its rows' recorded neighbours contradict each other",
+  ],
+];
+
+/** Tag a known order failure with its collection; anything else passes. */
+function asOrderConflict(owner: PositionId, failure: unknown): unknown {
+  if (!(failure instanceof Error) || failure instanceof CollectionOrderConflict)
+    return failure;
+  const known = ORDER_FAILURES.find(([message]) =>
+    failure.message.includes(message)
+  );
+  return known
+    ? new CollectionOrderConflict(owner, known[1], failure)
+    : failure;
+}
+
 export type DeriveDeclarativeTransitionTargetOptions = {
   readonly collections: readonly CollectionTransitionSource[];
   readonly effects: readonly ReversalEffect[];
@@ -292,7 +342,11 @@ export function deriveDeclarativeTransitionTarget(
     const subjects = new Map(
       source.subjects.map((subject) => [subject.subject, { ...subject }])
     );
-    assertCollectionOrderMatchesSubjects(source.order, subjects);
+    try {
+      assertCollectionOrderMatchesSubjects(source.order, subjects);
+    } catch (failure) {
+      throw asOrderConflict(source.owner, failure);
+    }
     collections.set(source.owner, {
       subjects,
       order: [...source.order],
@@ -329,7 +383,11 @@ export function deriveDeclarativeTransitionTarget(
         scalarTurns.set(effect.owner, effect.turn);
       continue;
     }
-    applyStructuralEffect(collections, effect);
+    try {
+      applyStructuralEffect(collections, effect);
+    } catch (failure) {
+      throw asOrderConflict(effect.owner, failure);
+    }
   }
 
   const orderDeltas = new Map<PositionId, CollectionOrderDelta>();
@@ -347,20 +405,25 @@ export function deriveDeclarativeTransitionTarget(
     const delta = orderDeltas.get(owner);
     const orderEndpoint =
       options.orderEndpoints?.get(owner) ?? options.orderEndpoint ?? 'after';
-    const order = delta
-      ? applyCollectionOrderDelta(
-          collection.order,
-          delta,
-          orderEndpoint,
-          options.collections.find((source) => source.owner === owner)
-            ?.orderFrontier
-        )
-      : deriveStructuralTargetOrder(
-          collection.order,
-          collection.subjects,
-          options.effects.filter((effect) => effect.owner === owner)
-        );
-    assertCollectionOrderMatchesSubjects(order, collection.subjects);
+    let order: number[];
+    try {
+      order = delta
+        ? applyCollectionOrderDelta(
+            collection.order,
+            delta,
+            orderEndpoint,
+            options.collections.find((source) => source.owner === owner)
+              ?.orderFrontier
+          )
+        : deriveStructuralTargetOrder(
+            collection.order,
+            collection.subjects,
+            options.effects.filter((effect) => effect.owner === owner)
+          );
+      assertCollectionOrderMatchesSubjects(order, collection.subjects);
+    } catch (failure) {
+      throw asOrderConflict(owner, failure);
+    }
     assertUniqueTargetKeys(collection.subjects);
     targets.set(owner, {
       owner,
