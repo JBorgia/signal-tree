@@ -1727,6 +1727,32 @@ class RestorationManager<T> {
    * rows or order, in words, for a refusal: "added 'S'", "removed 'a'",
    * "renamed 'b' to 'r0'", "reordered".
    */
+  /**
+   * The latest removal of a row lifetime by a change outside undo history (a
+   * historical gap): the row as it stood when an ordinary write removed it,
+   * and the neighbours it stood between. Undefined when no ordinary write
+   * removed it (an external one, or an undoable entry).
+   */
+  standingRemovalOf(
+    owner: number,
+    subject: number
+  ): CollectionRemoveEffect | undefined {
+    for (let at = this.historicalEvents.length - 1; at >= 0; at -= 1) {
+      const event = this.historicalEvents[at];
+      if (event.boundaryTurnId !== undefined) continue;
+      for (const effect of event.effects) {
+        if (
+          effect.kind === 'remove' &&
+          effect.position === owner &&
+          effect.subject === subject
+        ) {
+          return effect;
+        }
+      }
+    }
+    return undefined;
+  }
+
   describeStandingChange(owner: number): string | undefined {
     for (let at = this.historicalEvents.length - 1; at >= 0; at -= 1) {
       const event = this.historicalEvents[at];
@@ -4011,41 +4037,65 @@ export function restoration(
     };
 
     /**
-     * An ordinary later write (authored, not undoable) does not remove a
-     * turn's undo eligibility, and undo restores the turn's pre-image
-     * (15.4.2). For a row the turn added, that pre-image is "this lifetime
-     * absent": when an ordinary write already removed it, it holds, so the
-     * row's removal and its field writes are dropped and the rest of the turn
-     * reverses. The removal found no such row and undo threw, untyped,
-     * "Unsupported scoped undo effect at structural-drift" (15.4.3 too). The
-     * same for a redo that removes a lifetime already gone. A redo re-adds
-     * the row as the turn recorded it, as it re-applies a scalar over an
-     * ordinary write, unless a lifetime created AFTER it (later work; subject
-     * ids are allocated in order) now holds its key: that row is not this
-     * turn's, so it is left alone and this one stays absent. A holder that
-     * existed before still refuses (restoration.spec "fails atomically when
-     * redoing a mixed add turn cannot restore the added subject"). A
-     * lifetime the same operation brings back is not settled. Run after the
-     * pending-overlap refusal: a row a pending transaction removed is not
-     * settled (ordinary-removal-undo.spec.ts).
+     * ORDINARY LATER WRITES AND ROW LIFETIMES (15.4.4). An ordinary later
+     * write (authored, not undoable) does not remove a turn's undo
+     * eligibility, and a reversal restores the turn's own image over it, as
+     * for a scalar (15.4.2: `undoable(x(1)); x(2); undo()` gives 0, redo 1).
+     * Where a row lifetime the operation touches is ABSENT because an
+     * ordinary write removed it:
+     *
+     *   - a reversal that removes it (undo of an add, redo of a removal) is
+     *     already satisfied: that removal and the lifetime's field writes are
+     *     dropped, the rest reverses (it threw an untyped "Unsupported scoped
+     *     undo effect at structural-drift");
+     *   - a reversal that only writes its fields (undo or redo of an edit)
+     *     re-adds the row as it stood when removed, by the removal's anchors,
+     *     else the nearest surviving neighbours, and then writes the fields:
+     *     ordinary edits to other fields are kept (owner decision; v16's 8b
+     *     plain-branch omission likewise);
+     *   - a reversal that would put it back at a key a NEWER lifetime holds
+     *     (undo of a removal, redo of an add, or the re-add above) refuses,
+     *     typed, and changes nothing: it would displace an unrelated row, as
+     *     a rollback refuses to (owner decision). A holder older than the
+     *     lifetime is not a later write's; the realization port refuses that
+     *     (restoration.spec "fails atomically when redoing a mixed add turn
+     *     cannot restore the added subject").
+     *
+     * A lifetime the operation itself brings back, takes away or renames is
+     * judged after it (a newer row an undoable entry added, undone in the
+     * same jump, or renamed off the key by the same turn, is no conflict). Runs after the pending-overlap refusal: a row a
+     * pending transaction removed is not this rule's
+     * (ordinary-removal-undo.spec.ts).
      */
-    const withoutSettledLifetimes = (
+    const reconcileOrdinaryLifetimes = (
       applications: DirectedTurnApplication[]
     ): DirectedTurnApplication[] => {
       const lifetime = (owner: number, subject: number) =>
         `${owner}:${subject}`;
-      let structural = false;
       const brought = new Set<string>();
-      for (const { effects, direction } of applications) {
+      const taken = new Set<string>();
+      const edited = new Map<
+        string,
+        { index: number; effect: TurnEffect; direction: 'undo' | 'redo' }
+      >();
+      applications.forEach(({ effects, direction }, index) => {
         for (const effect of effects) {
-          if (effect.kind !== 'add' && effect.kind !== 'remove') continue;
-          structural = true;
-          if ((effect.kind === 'add') === (direction === 'redo')) {
-            brought.add(lifetime(effect.position, effect.subject));
+          if (effect.subject === undefined) continue;
+          const id = lifetime(effect.position, effect.subject);
+          if (effect.kind === 'add' || effect.kind === 'remove') {
+            ((effect.kind === 'add') === (direction === 'redo')
+              ? brought
+              : taken
+            ).add(id);
+          } else if (effect.kind === 'rekey') {
+            // It leaves the key it holds now: no conflict at that key.
+            taken.add(id);
+          } else if (effect.kind === 'set' && !edited.has(id)) {
+            edited.set(id, { index, effect, direction });
           }
         }
-      }
-      if (!structural) return applications;
+      });
+      if (brought.size + taken.size + edited.size === 0) return applications;
       type Collection = {
         __findKeyBySubjectId?(subject: number): string | number | undefined;
         __prepareTransitionTarget?: CollectionTransitionTargetBinding;
@@ -4063,6 +4113,11 @@ export function restoration(
         }
         return collections.get(owner);
       };
+      /** True, false, or undefined when the collection cannot say. */
+      const isActive = (owner: number, subject: number) => {
+        const find = collectionOf(owner)?.__findKeyBySubjectId;
+        return find ? find(subject) !== undefined : undefined;
+      };
       const holders = new Map<number, Map<string | number, number>>();
       const holderOf = (owner: number, key: string | number) => {
         let byKey = holders.get(owner);
@@ -4076,36 +4131,95 @@ export function restoration(
         }
         return byKey.get(key);
       };
+      const refuseNewerHolder = (
+        owner: number,
+        key: string | number,
+        subject: number
+      ) => {
+        const holder = holderOf(owner, key);
+        if (
+          holder === undefined ||
+          holder <= subject ||
+          taken.has(lifetime(owner, holder))
+        ) {
+          return;
+        }
+        const path =
+          positionRegistry?.collectionPathFor(owner as PositionId) ??
+          String(owner);
+        throw restorationRefusal(
+          `ST1034: restoration refused — key '${String(key)}' of '${path}' ` +
+            "is held by a newer row, which putting this entry's row back " +
+            'would displace. Nothing was changed; the history position is ' +
+            'unmoved.'
+        );
+      };
+      /** A neighbour, else the one an ordinary removal left it next to. */
+      const surviving = (
+        owner: number,
+        subject: number | undefined,
+        side: 'beforeSubject' | 'afterSubject'
+      ): number | undefined => {
+        const seen = new Set<number>();
+        let at = subject;
+        while (at !== undefined && !seen.has(at)) {
+          seen.add(at);
+          if (isActive(owner, at)) return at;
+          at = restorationManager.standingRemovalOf(owner, at)?.[side];
+        }
+        return undefined;
+      };
       const settled = new Set<string>();
       for (const { effects, direction } of applications) {
         for (const effect of effects) {
           if (effect.kind !== 'add' && effect.kind !== 'remove') continue;
-          const collection = collectionOf(effect.position);
-          if (
-            !collection?.__findKeyBySubjectId ||
-            collection.__findKeyBySubjectId(effect.subject) !== undefined
-          ) {
-            continue;
-          }
+          if (isActive(effect.position, effect.subject) !== false) continue;
           const id = lifetime(effect.position, effect.subject);
-          const adds = (effect.kind === 'add') === (direction === 'redo');
-          if (!adds) {
+          if ((effect.kind === 'add') !== (direction === 'redo')) {
             if (!brought.has(id)) settled.add(id);
-            continue;
+          } else {
+            refuseNewerHolder(effect.position, effect.key, effect.subject);
           }
-          if (direction !== 'redo') continue;
-          const holder = holderOf(effect.position, effect.key);
-          if (holder !== undefined && holder > effect.subject) settled.add(id);
         }
       }
-      if (settled.size === 0) return applications;
-      return applications.map((application) => ({
+      const readds = new Map<number, TurnEffect[]>();
+      for (const [id, { index, effect, direction }] of edited) {
+        if (brought.has(id) || taken.has(id)) continue;
+        const subject = effect.subject as number;
+        if (isActive(effect.position, subject) !== false) continue;
+        const removal = restorationManager.standingRemovalOf(
+          effect.position,
+          subject
+        );
+        if (!removal) continue;
+        refuseNewerHolder(removal.position, removal.key, subject);
+        const restore = {
+          ...removal,
+          kind: direction === 'undo' ? 'remove' : 'add',
+          beforeSubject: surviving(
+            removal.position,
+            removal.beforeSubject,
+            'beforeSubject'
+          ),
+          afterSubject: surviving(
+            removal.position,
+            removal.afterSubject,
+            'afterSubject'
+          ),
+        } as TurnEffect;
+        readds.set(index, [...(readds.get(index) ?? []), restore]);
+      }
+      if (settled.size === 0 && readds.size === 0) return applications;
+      return applications.map((application, index) => ({
         ...application,
-        effects: application.effects.filter(
-          (effect) =>
-            effect.subject === undefined ||
-            !settled.has(lifetime(effect.position, effect.subject))
-        ),
+        effects: [
+          ...(readds.get(index) ?? []),
+          ...application.effects.filter(
+            (effect) =>
+              effect.subject === undefined ||
+              !settled.has(lifetime(effect.position, effect.subject))
+          ),
+        ],
       }));
     };
 
@@ -4149,7 +4263,7 @@ export function restoration(
           }
         }
       }
-      const applications = withoutSettledLifetimes(requested);
+      const applications = reconcileOrdinaryLifetimes(requested);
       // A row's field reversals land after its re-add. Capture order is not
       // chronological — rekey-then-remove composes into one removal that keeps
       // the rekey's EARLIER slot — so reversing it put the field reversal
