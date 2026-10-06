@@ -65,6 +65,12 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   transforming `onUpdate` re-transformed it (an undone `{ n: 1 }` came back
   with the transform applied) and a blocking interceptor made the reversal
   throw, as on 15.4.3. Taps and subscribers are still notified.
+  A write a tap or subscriber makes while the reversal runs is still
+  intercepted.
+- Taps fire symmetrically for the changes a reversal applies: a row it brings
+  back taps `onAdd` (15.4.3 tapped only the removals, and nothing at all when
+  several rows were reversed together), one it takes away `onRemove`, one
+  whose value it changes `onUpdate`.
 - `addOne`, `addMany`, `prependOne`, `prependMany` and `upsertMany` throw
   `Cannot <method>: collection topology changed during staging` before writing
   when one of their interceptors or id selectors changed the same

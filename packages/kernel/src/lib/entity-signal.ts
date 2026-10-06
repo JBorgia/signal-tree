@@ -22,6 +22,7 @@ import {
   type LocationRuntime,
 } from './internals/location-runtime';
 import { deepClone } from './internals/utilities/deep-clone';
+import { deepEqual } from './internals/utilities/deep-equal';
 
 import {
   EntityMutationFrame,
@@ -669,6 +670,15 @@ export function createEntitySignal<
               ? createStructuralEffectMeta(structuralEffect)
               : ambientMeta()
           );
+          // Taps see what a replay applied, as subscribers do: a row brought
+          // back, a row taken away, a row whose value changed (15.4.3 tapped
+          // nothing on this path). A rekey taps nothing, as changeId does.
+          const { beforeValue, afterValue } = publication;
+          const kind = structuralEffect?.kind;
+          if (kind === 'add') emitTap('onAdd', afterValue as E, key);
+          else if (kind === 'remove') emitTap('onRemove', key, beforeValue as E);
+          else if (!kind && !deepEqual(beforeValue, afterValue))
+            emitTap('onUpdate', key, afterValue as E, afterValue as E);
         }
         if (activeIdBefore !== activeIdAfter) {
           replaceLocation(activeIdSignal, activeIdAfter);
@@ -1517,6 +1527,10 @@ export function createEntitySignal<
             afterSubject,
           })
         );
+        // Symmetric with planRemove: a replay that brings a row back taps
+        // onAdd, as one that takes it away taps onRemove (15.4.3 tapped only
+        // the removal).
+        emitTap('onAdd', entity, key);
       },
     };
   }
@@ -1563,6 +1577,7 @@ export function createEntitySignal<
           getPositionIdsForNotify(),
           metaOverride
         );
+        emitTap('onAdd', entity, key);
       },
     };
   }
