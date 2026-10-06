@@ -2233,6 +2233,18 @@ class RestorationManager<T> {
         ) {
           return true;
         }
+        // A row FIELD (subject + field path) is realized through its subject
+        // whatever the value's shape: an object or array field added, dropped
+        // or replaced is one effect carrying the whole value. Requiring scalars
+        // here refused every such undo ("Unsupported scoped undo effect at
+        // rows.a.nest"), while transactions() rolled the same effects back.
+        if (
+          effect.subject !== undefined &&
+          effect.fieldSegments !== undefined &&
+          effect.fieldSegments.length > 0
+        ) {
+          return true;
+        }
         return (
           (this.isScalarValue(effect.before) &&
             this.isScalarValue(effect.after)) ||
