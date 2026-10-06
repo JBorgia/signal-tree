@@ -322,3 +322,38 @@ describe.each([
     }
   });
 });
+
+/**
+ * Round-4 probe B2: an import, then jumps. The imported state is input, so
+ * the import runs the interceptors, and so does a later jump back to that
+ * entry - the tree never serialized it as imported. The state the tree held
+ * after the import (transformed) it did serialize, so a jump to it replays.
+ */
+describe('devtools: jumps around an import (per-tree instance)', () => {
+  it('jump to the imported entry runs the interceptors; jump to the state after it replays', async () => {
+    installExtension();
+    const tree = make(false);
+    try {
+      tree.$.rows.addOne({ id: 'a', n: 1 });
+      await flush();
+      const calls = intercept(tree, 'transform');
+      const imported = { rows: { all: [{ id: 'b', n: 2 }] } };
+      dispatch(messages.IMPORT_STATE(imported));
+      await flush();
+      expect(calls).toStrictEqual(['add:b', 'remove:a']);
+      expect(tree.$.rows.all()).toStrictEqual([{ id: 'b', n: 2, p: 9 }]);
+      calls.length = 0;
+      dispatch(messages.JUMP_TO_ACTION(imported));
+      await flush();
+      expect(calls).toStrictEqual(['update:b']);
+      calls.length = 0;
+      dispatch(
+        messages.JUMP_TO_ACTION({ rows: { all: [{ id: 'b', n: 2, p: 9 }] } })
+      );
+      await flush();
+      expect(calls).toStrictEqual([]);
+    } finally {
+      tree.destroy();
+    }
+  });
+});
