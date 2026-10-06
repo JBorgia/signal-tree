@@ -347,6 +347,12 @@ type TurnEffect =
   | CollectionRemoveEffect
   | CollectionRekeyEffect;
 
+/**
+ * The turn each effect of an operation came from, numbered in the order the
+ * operation applies its turns (`buildApplications`; `supersedeAcrossTurns`).
+ */
+const effectTurn = new WeakMap<TurnEffect, number>();
+
 type DirectedTurnApplication = {
   readonly effects: TurnEffect[];
   readonly orderDeltas: CollectionOrderDelta[];
@@ -1247,6 +1253,8 @@ class RestorationManager<T> {
   ) => void;
   private historicalEvents: HistoricalEvent[] = [];
   private nextHistoricalOrdinal = 1;
+  /** Numbers the turns of each operation in application order (`effectTurn`). */
+  private nextTurnOrdinal = 0;
   /** Each open non-undoable transaction's gap (`appendTransactionGap`). */
   private readonly transactionGaps = new Map<number, HistoricalEvent>();
 
@@ -3605,6 +3613,8 @@ class RestorationManager<T> {
       }
       held = turnHeld;
       heldKey = turnHeldKey;
+      const ordinal = this.nextTurnOrdinal++;
+      for (const effect of turnEffects) effectTurn.set(effect, ordinal);
       if (direction === 'undo') {
         for (let i = turnEffects.length - 1; i >= 0; i--)
           effects.push(turnEffects[i]);
@@ -4385,6 +4395,77 @@ export function restoration(
       }));
     };
 
+    /**
+     * ONE OPERATION, SEVERAL TURNS (v15 port review, item 1). undo and redo
+     * apply one turn; jumpTo applies several, in order, in one installation
+     * that stages every plain-branch member before any value write (as
+     * `applyAtomically` does, and now the declarative target too). Within one
+     * turn that is right: its membership effects already carry its values.
+     * Across turns it is not, so a turn's write is dropped where a LATER turn
+     * of the same operation sets the membership of the location or a member
+     * above it (that member's image supersedes it, as applied turn by turn),
+     * and only the latest turn's membership effect of each member is kept, so
+     * members stage in the order the turns set them. jumpTo back across a
+     * write of `h.x` and a re-add of `h` gave the written `x` where the undo
+     * chain gives the re-added image's (jump-undo-equivalence.spec.ts).
+     */
+    const supersedeAcrossTurns = (
+      applications: DirectedTurnApplication[]
+    ): DirectedTurnApplication[] => {
+      const latest = new Map<number, number>();
+      let first: number | undefined;
+      let several = false;
+      for (const { effects } of applications)
+        for (const effect of effects) {
+          const turn = effectTurn.get(effect);
+          if (turn !== undefined) {
+            first ??= turn;
+            several ||= turn !== first;
+          }
+          if (
+            effect.kind === 'set' &&
+            effect.plainBranchMembership &&
+            turn !== undefined &&
+            turn > (latest.get(effect.position) ?? -1)
+          )
+            latest.set(effect.position, turn);
+        }
+      // One turn (undo, redo): nothing to supersede.
+      if (!several || latest.size === 0) return applications;
+      const members = [...latest].map(([owner, turn]) => ({
+        owner,
+        turn,
+        address: positionRegistry?.addressFor(owner as PositionId),
+      }));
+      const kept = (effect: TurnEffect): boolean => {
+        const turn = effectTurn.get(effect);
+        if (
+          effect.kind !== 'set' ||
+          effect.subject !== undefined ||
+          turn === undefined
+        )
+          return true;
+        if (effect.plainBranchMembership)
+          return latest.get(effect.position) === turn;
+        const address = positionRegistry?.addressFor(
+          effect.position as PositionId
+        );
+        return !members.some(
+          (member) =>
+            member.turn > turn &&
+            (member.owner === effect.position ||
+              (!!address &&
+                !!member.address &&
+                member.address.length < address.length &&
+                member.address.every((key, at) => key === address[at])))
+        );
+      };
+      return applications.map((application) => ({
+        ...application,
+        effects: application.effects.filter(kept),
+      }));
+    };
+
     const applyTurnEffectsThroughRealizationPort = (
       requested: DirectedTurnApplication[]
     ): void => {
@@ -4425,7 +4506,9 @@ export function restoration(
           }
         }
       }
-      const applications = reconcileOrdinaryLifetimes(requested);
+      const applications = supersedeAcrossTurns(
+        reconcileOrdinaryLifetimes(requested)
+      );
       // A row's field reversals land after its re-add. Capture order is not
       // chronological — rekey-then-remove composes into one removal that keeps
       // the rekey's EARLIER slot — so reversing it put the field reversal

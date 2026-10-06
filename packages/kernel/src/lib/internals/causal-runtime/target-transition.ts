@@ -77,15 +77,12 @@ export function prepareDeclarativeTransitionInstallation(
     }
     prepared.push(binding.prepareTarget(collection));
   }
-  if (target.scalars.size > 0) {
-    if (!scalarBinding) {
-      throw new Error(
-        'Declarative transition has scalar targets but no scalar binding'
-      );
-    }
-    prepared.push(scalarBinding.prepareTarget(target.scalars));
-  }
-
+  // Members before scalars, as `applyAtomically` installs them, so a value
+  // write lands on its member's image rather than under it: installed after
+  // the scalars, `g`'s earlier image overwrote a jump's `h.y: 10` with 0 (v15
+  // port review, item 1). A write an earlier turn of the same reversal made
+  // below a member a later turn sets is dropped before this
+  // (`supersedeAcrossTurns` in restoration).
   if (target.plainBranchMembers?.size) {
     if (!memberBinding) {
       throw new Error(
@@ -93,6 +90,15 @@ export function prepareDeclarativeTransitionInstallation(
       );
     }
     prepared.push(memberBinding.prepareTarget(target.plainBranchMembers));
+  }
+
+  if (target.scalars.size > 0) {
+    if (!scalarBinding) {
+      throw new Error(
+        'Declarative transition has scalar targets but no scalar binding'
+      );
+    }
+    prepared.push(scalarBinding.prepareTarget(target.scalars));
   }
 
   return {
