@@ -55,6 +55,7 @@ import {
 } from './internals/position-registry';
 import { markOwnerInvalidated } from './internals/owner-invalidation-port';
 import {
+  inStructuralWrite,
   isAbsentMember,
   MEMBERSHIP_CHANGED,
   reactivatePathOnWrite,
@@ -1886,6 +1887,8 @@ export function createEntitySignal<
 
   /** Handlers for observation */
   const tapHandlers: TapHandlers<E, K>[] = [];
+  /** A re-adding write's removal of retained rows: no tap sees it (v16 8e). */
+  let silentClear = false;
 
   /** Handlers for blocking/transforming */
   const interceptHandlers: InterceptHandlers<E, K>[] = [];
@@ -3519,7 +3522,7 @@ export function createEntitySignal<
       }
 
       for (const { id, entity } of activeSubjects) {
-        if (!entity) continue;
+        if (!entity || silentClear) continue;
         for (const handler of tapHandlers) {
           handler.onRemove?.(id, entity);
         }
@@ -3862,12 +3865,13 @@ export function createEntitySignal<
   // resurface, and undo, redo, jumpTo and rollback reverse all three. Writes
   // that name an existing row refuse instead, as on an empty collection.
   //
-  // A structural write (a whole value, a reversal) reconciles presence itself
-  // and writes the collection as it is. A write that would fail on its input
+  // A structural write (a whole value, a reversal) reconciles presence itself. A write that would fail on its input
   // fails before the retained rows are removed: every row's id is derived
   // first, as the write itself does before it changes anything (v16 8e
   // review). An interceptor that blocks the write still runs after the
-  // removal; see the README.
+  // removal; see the README. Only a structural write on this collection's own
+  // tree (the whole value hydrating it, a reversal) writes it as it is: a
+  // write from a tap or sync effect of another tree is an ordinary one.
   const clearRetained = api.clear;
   for (const name of [
     'addOne',
@@ -3882,20 +3886,18 @@ export function createEntitySignal<
     const write = api[name] as (...args: unknown[]) => unknown;
     const many = name.endsWith('Many') || name === 'setAll';
     (api as Record<string, unknown>)[name] = (...args: unknown[]) => {
-      if (structuralWrites.depth || !rowAbsent()) return write(...args);
+      if (!absent() || inStructuralWrite(api)) return write(...args);
       if (name !== 'clear')
         for (const row of (many ? args[0] : [args[0]]) as E[])
           deriveId(row, args[1] as AddOptions<E, K> | undefined);
       // The retained rows were never visible, so their removal is no row
-      // change to observe or police: taps and interceptors do not see it.
-      // History still records it, so a reversal restores them.
-      const taps = tapHandlers.splice(0);
-      const intercepts = interceptHandlers.splice(0);
+      // change to observe: taps do not see it (`silentClear`). History still
+      // records it, so a reversal restores them.
+      silentClear = true;
       try {
         clearRetained();
       } finally {
-        tapHandlers.push(...taps);
-        interceptHandlers.push(...intercepts);
+        silentClear = false;
       }
       const result = write(...args);
       reactivatePathOnWrite(api);

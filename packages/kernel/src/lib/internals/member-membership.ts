@@ -192,9 +192,14 @@ export function isAbsentMember(node: unknown): boolean {
 /**
  * @internal A structural write (a whole value, a reversal installing members)
  * reconciles membership itself, level by level, and announces it. A location
- * written inside one keeps the own-member reactivation it always had and
- * announces nothing, so no transition is announced twice. A counter the
- * writer increments and decrements in a `finally`; nothing is allocated.
+ * of the same tree written inside one keeps the own-member reactivation it
+ * always had and announces nothing, so no transition is announced twice.
+ *
+ * ⚠️ PER TREE (v16 8e review). `trees` holds the tree of each open
+ * structural write, by its slot runtime, which every branch of a tree
+ * carries. A write to another tree from a tap or a sync effect running
+ * inside one is an ordinary write and re-adds its path: a global counter made
+ * it vanish into retained storage.
  *
  * `end` runs when the outermost structural write closes. Only entity
  * collections install it, to wake their consumers after it rather than inside
@@ -202,18 +207,45 @@ export function isAbsentMember(node: unknown): boolean {
  */
 export const structuralWrites: {
   depth: number;
+  trees: unknown[];
   end?: (failed?: boolean) => void;
 } = {
   depth: 0,
+  trees: [],
 };
 
 /**
- * @internal Close a structural write opened with `structuralWrites.depth++`.
+ * @internal Open a structural write on the tree `node` belongs to; close it
+ * with `endStructuralWrite` in a `finally`.
+ */
+export function beginStructuralWrite(node: unknown): void {
+  structuralWrites.depth++;
+  structuralWrites.trees.push(getTreeScalarSlotRuntime(node));
+}
+
+/**
+ * @internal Close a structural write opened with `beginStructuralWrite`.
  * `failed` when it is closing because the write threw, so that what `end`
  * runs does not replace the write's own error (`entity-signal`).
  */
 export function endStructuralWrite(failed?: boolean): void {
+  structuralWrites.trees.pop();
   if (!--structuralWrites.depth) structuralWrites.end?.(failed);
+}
+
+/**
+ * @internal True when a structural write is open on the tree `node`
+ * belongs to: a branch carries its tree's runtime, anything else is reached
+ * through the branch its member link names.
+ */
+export function inStructuralWrite(node: unknown): boolean {
+  return (
+    structuralWrites.depth > 0 &&
+    structuralWrites.trees.includes(
+      getTreeScalarSlotRuntime(node) ??
+        getTreeScalarSlotRuntime(memberBinding(node)?.parent)
+    )
+  );
 }
 
 /**
@@ -258,7 +290,7 @@ export const storedReads = { depth: 0 };
  * even when the retained value equalled the written one.
  */
 export function reactivatePathOnWrite(node: unknown): boolean {
-  if (structuralWrites.depth > 0) return reactivateOnWrite(node);
+  if (inStructuralWrite(node)) return reactivateOnWrite(node);
   const path: DormantBinding[] = [];
   let outer = -1;
   for (

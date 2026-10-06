@@ -239,10 +239,11 @@ again.
 
 Some details of that rule:
 - **Retained rows are removed silently.** A re-adding write removes the
-  retained rows before it adds its own. Taps and interceptors do not see
-  that removal, but history records it, so a reversal restores the rows.
-- **Invalid input changes nothing.** A re-adding write whose input is
-  invalid (a row with no id, for example) throws before anything changes.
+  retained rows before it adds its own. Taps do not see that removal, but
+  history records it, so a reversal restores the rows.
+- **Invalid input changes nothing.** A re-adding write whose input makes it
+  throw (a missing row, or a `selectId` that throws) throws before anything
+  changes.
 - **A blocked write still removes the retained rows.** An interceptor that
   blocks the write's own rows runs after the retained rows were removed. The
   collection stays absent and empty, and history holds the removal. Undoing
@@ -255,6 +256,11 @@ Some details of that rule:
   or `rollback()` writes an absent collection's retained rows, a tap on it
   that calls `byId()` sees those rows. Its projections (`all()`, `count()`,
   `has()`) still read it absent.
+- **Writes from inside a whole value or a reversal of the same tree.** A tap
+  or sync effect that runs during a whole value or a reversal and writes an
+  absent location of that same tree does not re-add its path: the whole
+  value or reversal decides that tree's membership. A write to another tree
+  is an ordinary write.
 
 Undo, redo and `jumpTo()` treat a location under an omitted member like this:
 

@@ -22,8 +22,8 @@ import {
   type PlainBranchMemberPresence,
 } from '../../lib/internals/plain-branch-membership';
 import {
+  beginStructuralWrite,
   endStructuralWrite,
-  structuralWrites,
 } from '../../lib/internals/member-membership';
 import { physicalRows } from '../../lib/internals/physical-rows';
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
@@ -672,7 +672,7 @@ class RestorationManager<TSource, T> {
     // A reversal installs physical truth and its own membership effects: it
     // reads and writes a hidden collection's retained rows (`physicalRows`),
     // and re-adds no path implicitly (`structuralWrites`, v16 8e).
-    structuralWrites.depth++;
+    beginStructuralWrite(this.tree.$);
     physicalRows.push(this.positionRegistry);
     let failed = true;
     try {
