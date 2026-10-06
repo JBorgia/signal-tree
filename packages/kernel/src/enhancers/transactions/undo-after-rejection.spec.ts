@@ -339,6 +339,52 @@ describe.each(Object.entries(orders))(
       }
     });
 
+    it('a later turn left with no effects is dropped, not kept as a no-op step', async () => {
+      const tree = make(enhancers);
+      try {
+        await seedRows(tree);
+        undoable(() => tree.$.x(5));
+        await flush();
+        const proposal = tree.transaction(() =>
+          tree.$.rows.addOne({ id: 'A', n: 1 })
+        );
+        await flush();
+        undoable(() => tree.$.rows.removeOne('A'));
+        await flush();
+        undoable(() => tree.$.y(2));
+        await flush();
+        expect(tree.getRestorationHistory()).toHaveLength(3);
+        proposal.rollback();
+        await flush();
+        expect(
+          tree.getRestorationHistory().map((entry) => entry.state?.y)
+        ).toStrictEqual([0, 2]);
+        expect(tree.getCurrentIndex()).toBe(1);
+        tree.undo();
+        await flush();
+        expect([tree.$.x(), tree.$.y(), tree.getCurrentIndex()]).toStrictEqual([
+          5, 0, 0,
+        ]);
+        tree.undo();
+        await flush();
+        expect([tree.$.x(), tree.$.y(), tree.getCurrentIndex()]).toStrictEqual([
+          0, 0, -1,
+        ]);
+        expect(tree.canUndo()).toBe(false);
+        tree.redo();
+        tree.redo();
+        await flush();
+        expect([tree.$.x(), tree.$.y(), tree.canRedo()]).toStrictEqual([
+          5,
+          2,
+          false,
+        ]);
+        expect(tree.$.rows.ids()).toStrictEqual(['z', 'a', 'c']);
+      } finally {
+        tree.destroy();
+      }
+    });
+
     it('control: a CONFIRMED transaction stays in the undo chain', async () => {
       const tree = make(enhancers);
       try {

@@ -1246,6 +1246,52 @@ class RestorationManager<T> {
     events.forEach((event, index) => {
       (event as { effects: TurnEffect[] }).effects = eventEffects[index];
     });
+    this.dropEmptiedTurns(later);
+  }
+
+  /**
+   * A later turn whose every effect was the rejected transaction's own row
+   * (now gone) is no operation at all; kept, it cost a no-op undo step. Dropped
+   * like a discarded pending turn: its event goes too when it is empty, ids
+   * stay, indices and frontiers are rebuilt, and the index is re-read.
+   */
+  private dropEmptiedTurns(candidates: readonly CanonicalTurn<T>[]): void {
+    const isEmpty = (turn: CanonicalTurn<T>) =>
+      (turn.__effects?.length ?? 0) === 0 &&
+      (turn.__orderDeltas?.length ?? 0) === 0;
+    const emptied = new Set(
+      candidates
+        .filter((turn) => this.turns.get(turn.id) === turn && isEmpty(turn))
+        .map(({ id }) => id)
+    );
+    if (emptied.size === 0) return;
+    const dropped = this.history.filter(({ id }) => emptied.has(id));
+    const viewIndex = this.isTemporalViewActive ? this.currentIndex : undefined;
+    const droppedAtOrBeforeView =
+      viewIndex === undefined
+        ? 0
+        : dropped.filter((turn) => turn.historyIndex <= viewIndex).length;
+    this.history = this.history.filter(({ id }) => !emptied.has(id));
+    this.historicalEvents = this.historicalEvents.flatMap((event) => {
+      if (
+        event.boundaryTurnId === undefined ||
+        !emptied.has(event.boundaryTurnId)
+      ) {
+        return [event];
+      }
+      return event.effects.length === 0 && event.orderDeltas.length === 0
+        ? []
+        : [{ ...event, boundaryTurnId: undefined }];
+    });
+    this.releaseRetainedRestorationEntries(dropped);
+    this.rebuildTurnIndexes();
+    this.currentIndex =
+      viewIndex === undefined
+        ? this.latestAppliedIndex()
+        : viewIndex - droppedAtOrBeforeView;
+    this.bumpRestorationHistory();
+    this.pruneHistoricalEventsBeforeOldestBoundary();
+    this.publishObservation({ kind: 'history-changed' });
   }
 
   hasConfirmedTurnAfter(turnId: number): boolean {
