@@ -373,6 +373,11 @@ export function link<S>(
     projection?: EntityEgressProjection;
   };
   const addresses = new Map<number, LinkedAddress>();
+  // Every collection nested in this source, with the projection it advances.
+  const nestedCollections: Array<{
+    node: object;
+    address: LinkedAddress & { projection: EntityEgressProjection };
+  }> = [];
   const segmentsByNode = new WeakMap<object, readonly string[]>();
   visitTree(
     x,
@@ -396,6 +401,13 @@ export function link<S>(
         projection:
           seed && node !== x ? createEntityEgressProjection(seed) : undefined,
       };
+      if (address.projection)
+        nestedCollections.push({
+          node: node as object,
+          address: address as LinkedAddress & {
+            projection: EntityEgressProjection;
+          },
+        });
       for (const position of getOwnedPositionIds(node) ?? [])
         addresses.set(position, address);
       if (seed || (isWritableLocation(node) && !isNodeAccessor(node)))
@@ -680,7 +692,29 @@ export function link<S>(
     });
     observation.publish();
   };
-  const offFlush = notifier.onFlush?.(scheduleSend);
+
+  /**
+   * A delivery is complete: place any collection row still held for
+   * neighbours later in that delivery which never arrived (15.4.4, see
+   * `createEntityTopology`). Runs before the turn's send is scheduled, so a
+   * held row is never published out of place or left out.
+   */
+  const settleCollections = () => {
+    if (disposed || !endpoint.set) return;
+    let settled = entityProjection?.settle() ?? false;
+    for (const { address } of nestedCollections) {
+      if (!address.projection.settle()) continue;
+      advanceEligible(address, { all: address.projection.value() });
+      settled = true;
+    }
+    if (!settled) return;
+    dirty = true;
+    observation.publish();
+  };
+  const offFlush = notifier.onFlush?.(() => {
+    settleCollections();
+    scheduleSend();
+  });
 
   let offSource: (() => void) | undefined;
   try {
