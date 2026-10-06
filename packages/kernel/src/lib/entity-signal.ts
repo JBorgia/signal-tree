@@ -3267,78 +3267,34 @@ export function createEntitySignal<
         }
       }
 
-      const stagedAdds = toAdd as Array<{ id: K; entity: E }>;
-      const stagedUpdates = toUpdate.map(
-        ({ id, subjectId, prev, entity, changes }) => ({
-          id,
-          subjectId: subjectId as number,
-          prev: prev as E,
-          transformedChanges: changes as Partial<E>,
-          finalUpdated: entity as E,
-        })
-      );
-
       // Read after the interceptors, as addOne's is.
       const lastPreviousKey = structuralStore.lastActiveKey();
       const membershipUnit = beginMembershipUnit();
       try {
-      const freshSubjectIds = commitFreshSubjects(
-        stagedAdds.map(({ id }) => id)
-      );
-      // Process adds. Ids are unique, so the fresh subjects index-align.
-      const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
-      for (let i = 0; i < stagedAdds.length; i++) {
-        const { entity: transformedEntity, id } = stagedAdds[i];
-        const subjectId = freshSubjectIds[i];
-        valueStore.retainSubjectValue(subjectId, transformedEntity);
-        captureCommittedEntity(subjectId, undefined, transformedEntity, true);
-        addedEntities.push({ id, entity: transformedEntity, subjectId });
-      }
-
-      const updatedEntities: Array<{
-        id: K;
-        subjectId: number;
-        prev: E;
-        finalUpdated: E;
-        transformedChanges: Partial<E>;
-      }> = [];
-      for (const {
-        id,
-        subjectId,
-        prev,
-        finalUpdated,
-        transformedChanges,
-      } of stagedUpdates) {
-        valueStore.retainSubjectValue(subjectId, finalUpdated);
-        captureCommittedEntity(subjectId, prev, finalUpdated, false);
-        updatedEntities.push({
-          id,
-          subjectId,
+      // Ids are unique, so the fresh subjects index-align.
+      const freshSubjectIds = commitFreshSubjects(toAdd.map(({ id }) => id));
+      toAdd.forEach((row, i) => (row.subjectId = freshSubjectIds[i]));
+      const rows = [...toAdd, ...toUpdate];
+      for (const { subjectId, prev, entity } of rows) {
+        valueStore.retainSubjectValue(subjectId as number, entity as E);
+        captureCommittedEntity(
+          subjectId as number,
           prev,
-          finalUpdated,
-          transformedChanges,
-        });
+          entity as E,
+          prev === undefined
+        );
       }
 
       membershipUnit.commit(membershipInventory.observed()
-        ? addedEntities.map(({ id, subjectId }) => membershipAddition(subjectId, id))
+        ? toAdd.map(({ id, subjectId }) => membershipAddition(subjectId as number, id))
         : []);
-      for (const { id } of addedEntities) { invalidateNodeCache(id); syncEntitySignal(id); }
-      for (const { id } of updatedEntities) syncEntitySignal(id);
+      for (const { id } of toAdd) { invalidateNodeCache(id); syncEntitySignal(id); }
+      for (const { id } of toUpdate) syncEntitySignal(id);
 
       // Single signal update after all entities are processed
       updateSignals();
 
-      const addedSubjectIdsForWrite = addedEntities.map(
-        ({ subjectId }) => subjectId
-      );
-      const updatedSubjectIdsForWrite = updatedEntities.map(
-        ({ subjectId }) => subjectId
-      );
-      lastSubjectIds = [
-        ...addedSubjectIdsForWrite,
-        ...updatedSubjectIdsForWrite,
-      ];
+      lastSubjectIds = rows.map(({ subjectId }) => subjectId as number);
 
       if (pathObserved()) {
         // An added row is announced as a structural add, anchored like
@@ -3350,9 +3306,8 @@ export function createEntitySignal<
           lastPreviousKey === undefined
             ? undefined
             : allocateSubjectId(lastPreviousKey);
-        for (let i = 0; i < addedEntities.length; i++) {
-          const { id, entity } = addedEntities[i];
-          const subject = addedSubjectIdsForWrite[i];
+        for (const { id, entity, subjectId } of toAdd) {
+          const subject = subjectId as number;
           pathNotifier.notify(
             `${basePath}.${String(id)}`,
             entity,
@@ -3372,34 +3327,31 @@ export function createEntitySignal<
         }
 
         // Notify PathNotifier for updated entities
-        for (let i = 0; i < updatedEntities.length; i++) {
-          const { id, prev, finalUpdated } = updatedEntities[i];
+        for (const { id, prev, entity, subjectId } of toUpdate) {
           pathNotifier.notify(
             `${basePath}.${String(id)}`,
-            finalUpdated,
+            entity,
             prev,
             basePath,
-            [updatedSubjectIdsForWrite[i]],
+            [subjectId as number],
             getPositionIdsForNotify()
           );
         }
       }
 
-      // Run tap handlers for added entities
-      for (const { id, entity } of addedEntities) {
+      // Run tap handlers for added entities, then updated ones
+      for (const { id, entity } of toAdd) {
         for (const handler of tapHandlers) {
-          handler.onAdd?.(entity, id);
+          handler.onAdd?.(entity as E, id);
+        }
+      }
+      for (const { id, changes, entity } of toUpdate) {
+        for (const handler of tapHandlers) {
+          handler.onUpdate?.(id, changes as Partial<E>, entity as E);
         }
       }
 
-      // Run tap handlers for updated entities
-      for (const { id, transformedChanges, finalUpdated } of updatedEntities) {
-        for (const handler of tapHandlers) {
-          handler.onUpdate?.(id, transformedChanges, finalUpdated);
-        }
-      }
-
-      return [...toAdd.map((a) => a.id), ...toUpdate.map((u) => u.id)];
+      return rows.map(({ id }) => id);
       } finally { membershipUnit.cancel(); }
     },
 
