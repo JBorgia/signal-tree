@@ -55,18 +55,23 @@ const applyPressure = async () => {
   collect();
 };
 
-const make = (enhancers: readonly unknown[]) =>
-  signalTree(
-    { rows: entityMap<Row, string>({ selectId: (row) => row.id }) },
-    { enhancers: enhancers as never }
-  );
+const declaration = () => ({
+  rows: entityMap<Row, string>({ selectId: (row) => row.id }),
+});
+const typed = () =>
+  signalTree(declaration(), { enhancers: [transactions(), restoration()] });
+type Tree = ReturnType<typeof typed>;
+const make = (enhancers: readonly unknown[]): Tree =>
+  signalTree(declaration(), {
+    enhancers: enhancers as never,
+  }) as unknown as Tree;
 
 /**
  * Adds row `k` through `addMany` and keeps only a WeakRef to the clone its
  * published `add` effect carries.
  */
 const captureAdd = async (
-  tree: ReturnType<typeof make>,
+  tree: Tree,
   add: (run: () => void) => void = (run) => run()
 ): Promise<WeakRef<object>> => {
   const refs: WeakRef<object>[] = [];
