@@ -450,3 +450,48 @@ describe.each([
     });
   }
 );
+
+/**
+ * Review of e02238f4/e2317d6d: merging every copy's changes into a fresh
+ * object handed an existing row's tap a copy even when the call named it
+ * once. A single copy passes on the very object the interceptor produced (or
+ * the caller's own row when nothing transforms), as before 15.4.4.
+ */
+describe('upsertMany, an existing id named once: tap changes identity', () => {
+  it('the caller row itself when no interceptor transforms', async () => {
+    const tree = make();
+    try {
+      await seed(tree);
+      const seen: unknown[] = [];
+      tree.$.rows.tap({ onUpdate: (_id, changes) => void seen.push(changes) });
+      const row = { id: 'a', n: 5 };
+      tree.$.rows.upsertMany([row]);
+      expect(seen).toHaveLength(1);
+      expect(seen[0]).toBe(row);
+    } finally {
+      tree.destroy();
+    }
+  });
+
+  it('the object the interceptor transformed to', async () => {
+    const tree = make();
+    try {
+      await seed(tree);
+      const produced: unknown[] = [];
+      tree.$.rows.intercept({
+        onUpdate: (_id, changes, ctx) => {
+          const next = { ...changes, t: 'x' };
+          produced.push(next);
+          ctx.transform(next);
+        },
+      });
+      const seen: unknown[] = [];
+      tree.$.rows.tap({ onUpdate: (_id, changes) => void seen.push(changes) });
+      tree.$.rows.upsertMany([{ id: 'a', n: 5 }, { id: 'x', n: 1 }]);
+      expect(seen).toHaveLength(1);
+      expect(seen[0]).toBe(produced[0]);
+    } finally {
+      tree.destroy();
+    }
+  });
+});

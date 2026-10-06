@@ -3270,7 +3270,8 @@ export function createEntitySignal<
           row.entity = interceptAddedEntity(entity);
         } else {
           const changes = interceptUpdatedEntity(row.id, entity);
-          row.changes = { ...row.changes, ...changes };
+          // A single copy hands on the interceptor's own object (tap identity).
+          row.changes = row.changes ? { ...row.changes, ...changes } : changes;
           row.entity = { ...row.entity, ...changes };
         }
       }
