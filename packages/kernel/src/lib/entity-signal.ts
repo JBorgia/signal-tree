@@ -990,10 +990,7 @@ export function createEntitySignal<
     commit(options?: { advancePhysicalRevision?: boolean }): void;
     publish(metaOverride?: WriteMetadata): void;
   } {
-    const entity = getProjectedEntity(from);
-    if (!entity) {
-      throw new Error(`Entity with id ${String(from)} not found`);
-    }
+    const entity = requireEntity(from);
     if (from === to) {
       // A no-op rekey still ADDRESSES this subject, and the leaf-signal
       // interceptor fires on every mutator call — including one that changes
@@ -1170,6 +1167,22 @@ export function createEntitySignal<
     }
     physicalCommitClock?.advance();
     updateSignals();
+  }
+
+  function requireEntity(id: K): E {
+    const entity = getProjectedEntity(id);
+    if (!entity) {
+      throw new Error(`Entity with id ${String(id)} not found`);
+    }
+    return entity;
+  }
+
+  function requireSubjectId(id: K): number {
+    const subjectId = structuralStore.subjectIdForKey(id);
+    if (subjectId === undefined) {
+      throw new Error(`Entity with id ${String(id)} has no subject id`);
+    }
+    return subjectId;
   }
 
   function resolveSubjectId(id: K): number | undefined {
@@ -1534,10 +1547,7 @@ export function createEntitySignal<
     commit(options?: { advancePhysicalRevision?: boolean }): void;
     publish(metaOverride?: WriteMetadata): void;
   } {
-    const entity = getProjectedEntity(key);
-    if (!entity) {
-      throw new Error(`Entity with id ${String(key)} not found`);
-    }
+    const entity = requireEntity(key);
 
     const { beforeSubject, afterSubject } = getNeighborSubjects(key);
     const structuralEffect: PendingStructuralEffect = {
@@ -2076,10 +2086,7 @@ export function createEntitySignal<
   }
 
   function getOrCreateNode(id: K, entity: E): EntityNode<E> {
-    const subjectId = resolveSubjectId(id);
-    if (subjectId === undefined) {
-      throw new Error(`Entity with id ${String(id)} has no subject id`);
-    }
+    const subjectId = requireSubjectId(id);
 
     let node = nodeCache.get(subjectId)?.deref();
     if (!node) {
@@ -2795,10 +2802,7 @@ export function createEntitySignal<
     // ==================
 
     updateOne(id: K, changes: Partial<E>): void {
-      const entity = getProjectedEntity(id);
-      if (!entity) {
-        throw new Error(`Entity with id ${String(id)} not found`);
-      }
+      const entity = requireEntity(id);
 
       const prev = entity;
 
@@ -2846,17 +2850,11 @@ export function createEntitySignal<
      * wrong-slot write built into it. This one cannot drift.
      */
     replaceOne(id: K, entity: E): void {
-      const prev = getProjectedEntity(id);
-      if (!prev) {
-        throw new Error(`Entity with id ${String(id)} not found`);
-      }
+      const prev = requireEntity(id);
 
       const next = interceptReplacedEntity(id, entity);
 
-      const subjectId = structuralStore.subjectIdForKey(id);
-      if (subjectId === undefined) {
-        throw new Error(`Entity with id ${String(id)} has no subject id`);
-      }
+      const subjectId = requireSubjectId(id);
 
       const replacement: PreparedValueReplacement<K, E> = {
         kind: 'replace-value',
@@ -2907,20 +2905,14 @@ export function createEntitySignal<
       }> = [];
 
       for (const id of ids) {
-        const entity = getProjectedEntity(id);
-        if (!entity) {
-          throw new Error(`Entity with id ${String(id)} not found`);
-        }
+        const entity = requireEntity(id);
         const prev = entity;
 
         // Run interceptors
         const transformedChanges = interceptUpdatedEntity(id, changes);
 
         const finalUpdated = { ...entity, ...transformedChanges };
-        const subjectId = structuralStore.subjectIdForKey(id);
-        if (subjectId === undefined) {
-          throw new Error(`Entity with id ${String(id)} has no subject id`);
-        }
+        const subjectId = requireSubjectId(id);
 
         updatedEntities.push({
           id,
@@ -2997,10 +2989,7 @@ export function createEntitySignal<
     // ==================
 
     removeOne(id: K): void {
-      const entity = getProjectedEntity(id);
-      if (!entity) {
-        throw new Error(`Entity with id ${String(id)} not found`);
-      }
+      const entity = requireEntity(id);
       // Run interceptors
       interceptRemovedEntity(id, entity);
 
@@ -3071,14 +3060,8 @@ export function createEntitySignal<
         afterSubject?: number;
       }> = [];
       for (const id of ids) {
-        const entity = getProjectedEntity(id);
-        if (!entity) {
-          throw new Error(`Entity with id ${String(id)} not found`);
-        }
-        const subjectId = resolveSubjectId(id);
-        if (subjectId === undefined) {
-          throw new Error(`Entity with id ${String(id)} has no subject id`);
-        }
+        const entity = requireEntity(id);
+        const subjectId = requireSubjectId(id);
         // Run interceptors
         interceptRemovedEntity(id, entity);
 
@@ -3211,10 +3194,7 @@ export function createEntitySignal<
         }
         const existing = getProjectedEntity(id);
         if (existing !== undefined) {
-          const subjectId = resolveSubjectId(id);
-          if (subjectId === undefined) {
-            throw new Error(`Entity with id ${String(id)} has no subject id`);
-          }
+          const subjectId = requireSubjectId(id);
           const update = { entity, id, prev: existing, subjectId };
           toUpdate.push(update);
           earlier.set(id, update);
@@ -3246,18 +3226,11 @@ export function createEntitySignal<
       const freshSubjectIds = commitFreshSubjects(
         stagedAdds.map(({ id }) => id)
       );
-      const addedSubjectIdsByKey = new Map<K, number>();
-      for (let i = 0; i < stagedAdds.length; i++) {
-        addedSubjectIdsByKey.set(stagedAdds[i].id, freshSubjectIds[i]);
-      }
-
-      // Process adds
+      // Process adds. Ids are unique, so the fresh subjects index-align.
       const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
-      for (const { entity: transformedEntity, id } of stagedAdds) {
-        const subjectId = addedSubjectIdsByKey.get(id);
-        if (subjectId === undefined) {
-          throw new Error(`Entity with id ${String(id)} has no subject id`);
-        }
+      for (let i = 0; i < stagedAdds.length; i++) {
+        const { entity: transformedEntity, id } = stagedAdds[i];
+        const subjectId = freshSubjectIds[i];
         valueStore.retainSubjectValue(subjectId, transformedEntity);
         captureCommittedEntity(subjectId, undefined, transformedEntity, true);
         addedEntities.push({ id, entity: transformedEntity, subjectId });
@@ -3391,10 +3364,7 @@ export function createEntitySignal<
       const observed = pathObserved();
       const activeIds = structuralStore.activeKeysSnapshot();
       const activeSubjects = activeIds.map((id) => {
-        const subjectId = resolveSubjectId(id);
-        if (subjectId === undefined) {
-          throw new Error(`Entity with id ${String(id)} has no subject id`);
-        }
+        const subjectId = requireSubjectId(id);
         const entity = getProjectedEntity(id);
         const { beforeSubject, afterSubject } = observed
           ? getNeighborSubjects(id)
