@@ -22,8 +22,12 @@
  * a hop through it is visible here only once it writes the tree.
  *
  * transact() drains the queue with flushSync, so hops of a write authored in
- * a transaction run synchronously while its scope holds the send. Rollback
- * does not drain: its compensation's hops arrive one flush at a time. Production
+ * a transaction run synchronously while its scope holds the send; those cases
+ * are preservation controls. confirm() and rollback() do not drain: hops of a
+ * compensation, of an ordinary write made while the transaction was pending,
+ * or before a hop that opens a transaction, arrive one flush at a time. Of the
+ * 48 cases, 26 fail with the flush wait removed; the rest are preservation and
+ * boundary controls (one hop, writes nothing, order-only, dispose). Production
  * hops come from enhancers, adapters and other relationships (the two
  * public-API cases at the end); the other controls use notifier subscribers so
  * depth is exact.
@@ -414,32 +418,114 @@ describe('hops and pending transactions', () => {
   );
 
   it.each([
-    ['confirm', 2],
-    ['rollback', 2],
-    ['confirm', 4],
-    ['rollback', 4],
+    ['confirm', 0],
+    ['rollback', 0],
+    ['confirm', 3],
+    ['rollback', 3],
   ] as const)(
-    'a hop that opens its own transaction, then %s (%i further hops)',
-    async (outcome, depth) => {
-      const { tree, at } = transactionalChain(depth + 1);
+    'a hop that opens its own transaction, then %s (%i hops before it)',
+    async (outcome, before) => {
+      // Hops after the transacting hop run inside its transact() (flushSync).
+      // With hops BEFORE it, nothing is held yet when settled() first looks.
+      const { tree, at } = transactionalChain(before + 3);
+      chainFrom(at, 0, before);
       let pending: { confirm(): void; rollback(): void } | undefined;
-      hop(at(0), 's0', (value) => {
-        pending = tree.transact(() => at(1)(value as number));
+      hop(at(before), `s${before}`, (value) => {
+        pending = tree.transact(() => at(before + 1)(value as number));
       });
-      chainFrom(at, 1, depth + 1);
+      chainFrom(at, before + 1, before + 3);
       const endpoint = slowEndpoint<number>();
-      const connection = link(at(depth + 1) as never, { set: endpoint.set });
+      const connection = link(at(before + 3) as never, { set: endpoint.set });
       cleanup.push(() => connection.dispose());
       at(0)(7);
       const { isSettled } = watch(connection);
-      for (let index = 0; index <= depth + 1; index++) await nextTask();
+      for (let index = 0; index <= before + 3; index++) {
+        await nextTask();
+        expect(isSettled()).toBe(false);
+      }
       expect(pending).toBeDefined();
       expect(endpoint.sent).toEqual([]);
-      expect(isSettled()).toBe(false);
       pending![outcome]();
       await acknowledgeAll(endpoint, isSettled);
-      expect(at(1)()).toBe(outcome === 'confirm' ? 7 : 0);
-      expect(endpoint.sent.at(-1)).toBe(at(depth + 1)());
+      expect(at(before + 1)()).toBe(outcome === 'confirm' ? 7 : 0);
+      expect(endpoint.sent.at(-1)).toBe(at(before + 3)());
+    }
+  );
+
+  it.each([
+    ['slow', 2],
+    ['slow', 6],
+    ['synchronous', 2],
+    ['synchronous', 6],
+  ] as const)(
+    'hops triggered by the rollback compensation itself (%s endpoint, %i hops)',
+    async (form, depth) => {
+      // The first hop reacts only to the reverted value, so nothing reaches
+      // the linked location until rollback() compensates; the chain then
+      // runs one flush per hop with nothing held.
+      const { tree, at } = transactionalChain(depth);
+      hop(at(0), 's0', (value) => {
+        if (value === 0) at(1)(-1);
+      });
+      chainFrom(at, 1, depth);
+      const endpoint = slowEndpoint<number>();
+      const sent: number[] = [];
+      const connection = link(at(depth) as never, {
+        set:
+          form === 'slow'
+            ? endpoint.set
+            : (value: number) => void sent.push(value),
+      });
+      cleanup.push(() => connection.dispose());
+      const pending = tree.transact(() => at(0)(7));
+      await nextTask();
+      expect(at(depth)()).toBe(0);
+      pending.rollback();
+      if (form === 'slow') {
+        const { isSettled } = watch(connection);
+        await acknowledgeAll(endpoint, isSettled);
+        expect(endpoint.sent).toEqual([-1]);
+      } else {
+        await expectQuietAfterSettled(connection, sent, () => at(depth)());
+        expect(sent).toEqual([-1]);
+      }
+      expect(at(depth)()).toBe(-1);
+    }
+  );
+
+  it.each([
+    ['confirm', 2],
+    ['rollback', 2],
+    ['confirm', 6],
+    ['rollback', 6],
+  ] as const)(
+    'an ordinary write made while a transaction is pending, then %s (%i hops)',
+    async (outcome, depth) => {
+      // Written outside the callback, so transact() did not drain its hops;
+      // they run after the decision, one flush per hop.
+      const initial: Record<string, number> = { other: 0 };
+      for (let index = 0; index <= depth; index++) initial[`s${index}`] = 0;
+      const tree = signalTree(initial, { enhancers: [transactions()] });
+      cleanup.push(() => tree.destroy());
+      const at = (index: number) =>
+        (tree.$ as unknown as Record<string, (value?: number) => number>)[
+          `s${index}`
+        ];
+      chainFrom(at, 0, depth);
+      const endpoint = slowEndpoint<number>();
+      const connection = link(at(depth) as never, { set: endpoint.set });
+      cleanup.push(() => connection.dispose());
+      const pending = tree.transact(() =>
+        (tree.$ as unknown as Record<string, (value: number) => void>)[
+          'other'
+        ](1)
+      );
+      at(0)(7);
+      pending[outcome]();
+      const { isSettled } = watch(connection);
+      await acknowledgeAll(endpoint, isSettled);
+      expect(endpoint.sent).toEqual([7]);
+      expect(at(depth)()).toBe(7);
     }
   );
 });
@@ -465,6 +551,10 @@ describe('destroy() in the middle of a chain', () => {
       const { done, isSettled } = watch(connection);
       await acknowledgeAll(endpoint, isSettled);
       await done;
+      // Either nothing (the relationship disposed with the tree) or the one
+      // value written in the chain; never a duplicate or another value.
+      expect(endpoint.sent.length).toBeLessThanOrEqual(1);
+      expect(endpoint.sent.every((value) => value === 7)).toBe(true);
     }
   );
 
@@ -478,6 +568,8 @@ describe('destroy() in the middle of a chain', () => {
     const { done, isSettled } = watch(connection);
     await acknowledgeAll(endpoint, isSettled);
     await done;
+    // The linked write preceded destroy(): its send was already in flight.
+    expect(endpoint.sent).toEqual([7]);
   });
 });
 
