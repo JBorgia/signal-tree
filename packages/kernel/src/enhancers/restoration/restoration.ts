@@ -1,4 +1,5 @@
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
+import { placeFieldReversalsAfterReAdds } from '../../lib/internals/causal-runtime/pending-rollback';
 import {
   applyInInvalidationGroup,
   applicationFailureCause,
@@ -1829,8 +1830,8 @@ class RestorationManager<T> {
         direction === 'undo'
           ? [...(turn.__effects ?? [])].reverse()
           : [...(turn.__effects ?? [])];
-      const reversalEffects = effects.map((effect) =>
-        toReversalEffect(effect, direction)
+      const reversalEffects = placeFieldReversalsAfterReAdds(
+        effects.map((effect) => toReversalEffect(effect, direction))
       );
       const collectionOwners = new Set([
         ...(turn.__orderDeltas ?? []).map(({ owner }) => owner),
@@ -1908,9 +1909,11 @@ class RestorationManager<T> {
           states[historyIndex] = natural;
         }
       }
-      const reversalEffects = [...event.effects]
-        .reverse()
-        .map((effect) => toReversalEffect(effect, 'undo'));
+      const reversalEffects = placeFieldReversalsAfterReAdds(
+        [...event.effects]
+          .reverse()
+          .map((effect) => toReversalEffect(effect, 'undo'))
+      );
       const collectionOwners = new Set([
         ...event.orderDeltas.map(({ owner }) => owner),
         ...reversalEffects
@@ -2678,9 +2681,15 @@ export function restoration(
           }
         }
       }
-      const reversalEffects = applications.flatMap((application) =>
-        application.effects.map((effect) =>
-          toReversalEffect(effect, application.direction)
+      // A row's field reversals land after its re-add. Capture order is not
+      // chronological — rekey-then-remove composes into one removal that keeps
+      // the rekey's EARLIER slot — so reversing it put the field reversal
+      // before the row was back, and undo refused as structural drift.
+      const reversalEffects = placeFieldReversalsAfterReAdds(
+        applications.flatMap((application) =>
+          application.effects.map((effect) =>
+            toReversalEffect(effect, application.direction)
+          )
         )
       );
       const orderDeltas = applications.flatMap(

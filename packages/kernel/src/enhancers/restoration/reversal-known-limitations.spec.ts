@@ -137,44 +137,20 @@ describe.each(undoConfigurations)(
       }
     );
 
-    it('KNOWN LIMITATION (pre-existing on 15.4.3): changeId, updateOne, removeOne — current behaviour: undo refuses as structural drift and changes nothing', async () => {
+    // FIXED (was pre-existing on 15.4.3: undo refused as structural drift).
+    it('changeId, updateOne, removeOne: undo restores', async () => {
       const tree = make(enhancers());
       try {
         await seed(tree);
         changeIdUpdateRemove(tree);
         await flush();
-        const error = thrownBy(() => tree.undo());
-        expect(error).toBeInstanceOf(Error);
-        expect((error as Error).message).toBe(
-          'Unsupported scoped undo effect at structural-drift'
-        );
+        tree.undo();
         await flush();
-        expect(tree.$.rows.all()).toStrictEqual([
-          { id: 'z', n: 0 },
-          { id: 'c', n: 3 },
-        ]);
-        expect(tree.canUndo()).toBe(true);
+        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
       } finally {
         tree.destroy();
       }
     });
-
-    it.fails(
-      'KNOWN LIMITATION (pre-existing on 15.4.3): changeId, updateOne, removeOne — desired: undo restores',
-      async () => {
-        const tree = make(enhancers());
-        try {
-          await seed(tree);
-          changeIdUpdateRemove(tree);
-          await flush();
-          tree.undo();
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual(SEEDED);
-        } finally {
-          tree.destroy();
-        }
-      }
-    );
 
     it('KNOWN LIMITATION (pre-existing on 15.4.3): add x and y, update x, removeMany — current behaviour: undo is right, redo throws "no live placement anchor" and changes nothing', async () => {
       const tree = make(enhancers());
