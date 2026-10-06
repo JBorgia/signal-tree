@@ -43,7 +43,10 @@ import {
   beginStructuralWrite,
   endStructuralWrite,
 } from '../../lib/internals/member-membership';
-import { physicalRows } from '../../lib/internals/physical-rows';
+import {
+  openPhysicalRows,
+  physicalRows,
+} from '../../lib/internals/physical-rows';
 import { flushDeferredTreeWrites } from '../../lib/internals/deferred-write-scope';
 import {
   getOrCreateSubjectRestorationClaims,
@@ -2619,8 +2622,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
         // member is written through its retained rows, and no write re-adds
         // a member (`structuralWrites`, `physicalRows`; v16 integration 8e).
         // v15 keeps its own two compensation branches, so both run here.
-        beginStructuralWrite(tree.$);
-        physicalRows.push(getPositionRegistry(tree.$) as object);
+        beginStructuralWrite();
+        openPhysicalRows(getPositionRegistry(tree.$) as object);
         let failed = true;
         try {
           const result = publishingExposedOnly(tree.$ as object, apply);

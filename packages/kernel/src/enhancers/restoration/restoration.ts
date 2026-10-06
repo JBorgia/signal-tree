@@ -44,7 +44,10 @@ import {
   beginStructuralWrite,
   endStructuralWrite,
 } from '../../lib/internals/member-membership';
-import { physicalRows } from '../../lib/internals/physical-rows';
+import {
+  openPhysicalRows,
+  physicalRows,
+} from '../../lib/internals/physical-rows';
 import { getOrCreateSubjectReclamationSink } from '../../lib/internals/subject-reclamation-sink';
 import {
   installRestorationReader,
@@ -1589,8 +1592,8 @@ class RestorationManager<T> {
     // A reversal installs physical truth and its own membership effects: it
     // reads and writes a hidden collection's retained rows (`physicalRows`),
     // and re-adds no path implicitly (`structuralWrites`; v16 8e, ported).
-    beginStructuralWrite(this.tree.$);
-    physicalRows.push(this.positionRegistry);
+    beginStructuralWrite();
+    openPhysicalRows(this.positionRegistry);
     let failed = true;
     try {
       publishingExposedOnly(this.tree.$ as object, apply);
