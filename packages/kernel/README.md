@@ -458,9 +458,12 @@ the outer replacement refuses before applying its staged writes. The callback's
 already-completed writes remain. Field-only callback writes do not trigger this
 structural refusal. Prefer interceptors that validate or transform input instead
 of changing the same collection's topology.
-Version 15.4.4 applies the same rule to `addOne`, `addMany`, `prependOne`,
-`prependMany` and `upsertMany`: a callback that changes membership or order, or
-the key of a row the call names, makes the call throw before it writes.
+Version 15.4.4 adds a narrower refusal to `addOne`, `addMany`, `prependOne`,
+`prependMany`, `upsertMany`, `updateMany` and `removeMany`. When a callback
+changes the collection's membership or order, or the key of a row the call
+names, the call throws `Cannot <method>: collection topology changed during
+staging` before it writes. Unlike `setAll`, these calls allow a key change to
+a row they do not name.
 
 ## Independent editors and connections
 
