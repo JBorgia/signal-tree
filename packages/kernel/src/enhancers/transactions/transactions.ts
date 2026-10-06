@@ -721,7 +721,8 @@ class TransactionAuthority {
       subjectIds: readonly number[]
     ) => void = () => undefined,
     private readonly releasePendingClaims: (turnId: number) => void = () =>
-      undefined
+      undefined,
+    private readonly encloses?: (outer: number, inner: number) => boolean
   ) {}
 
   private buildTurn(
@@ -930,15 +931,21 @@ class TransactionAuthority {
       for (const effect of pending?.__effects ?? []) {
         const overlap = later.__effects?.find(
           (candidate) =>
-            candidate.position === effect.position &&
-            (candidate.subject === undefined ||
-              effect.subject === undefined ||
-              candidate.subject === effect.subject) &&
-            (candidate.kind === 'set' && effect.kind === 'set'
-              ? scalarRelation(candidate, effect) !== 'disjoint'
-              : candidate.path === effect.path ||
-                candidate.path.startsWith(`${effect.path}.`) ||
-                effect.path.startsWith(`${candidate.path}.`))
+            (candidate.position === effect.position &&
+              (candidate.subject === undefined ||
+                effect.subject === undefined ||
+                candidate.subject === effect.subject) &&
+              (candidate.kind === 'set' && effect.kind === 'set'
+                ? scalarRelation(candidate, effect) !== 'disjoint'
+                : candidate.path === effect.path ||
+                  candidate.path.startsWith(`${effect.path}.`) ||
+                  effect.path.startsWith(`${candidate.path}.`))) ||
+            // A later pending membership change of an enclosing member
+            // captured this location in its own before-image just the same.
+            // (v16 integration 8b.)
+            (candidate.kind === 'set' &&
+              candidate.plainBranchMembership !== undefined &&
+              this.encloses?.(candidate.position, effect.position) === true)
         );
         if (overlap)
           return {
@@ -1266,6 +1273,19 @@ export function getOrCreateInternalTransactionRuntime<T>(
       // enough that every capture has run.
       getOrCreateSubjectRestorationClaims(tree)?.release(
         `transaction:${turnId}`
+      );
+    },
+    // Structured addresses, never display paths: `outer` encloses `inner`
+    // when its address is a strict prefix of inner's.
+    (outer, inner) => {
+      const registry = getPositionRegistry(tree.$);
+      const prefix = registry?.addressFor(outer);
+      const address = registry?.addressFor(inner);
+      return (
+        !!prefix &&
+        !!address &&
+        prefix.length < address.length &&
+        prefix.every((key, index) => key === address[index])
       );
     }
   );

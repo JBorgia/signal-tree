@@ -39,6 +39,7 @@ import {
   replaceLocation,
 } from '../../lib/internals/location-runtime';
 import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-port';
+import { isNodeAccessor } from '../../lib/internals/node-shape';
 import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
 import { rootAuthorityFor } from '../../lib/internals/root-source';
 
@@ -2676,6 +2677,7 @@ export function restoration(
       // decision. (v16 integration 8b.)
       let hiddenRefusal: ReversalRefusal | undefined;
       let appliedEffects = reversalEffects;
+      const readdedNodes: object[] = [];
       {
         const registry = getPositionRegistry(tree.$);
         const reversedMembers = new Set<number>();
@@ -2691,7 +2693,16 @@ export function restoration(
         const replaced = new Set<ReversalEffect>();
         // One walk per location: a collection's many row effects share it.
         const walked = new Map<number, ReturnType<typeof hidingMembers>>();
-        for (const effect of reversalEffects) {
+        // A collection's order delta reaches its collection like a row effect.
+        const orderOnly = orderDeltas.map(
+          ({ owner }): ReversalEffect => ({
+            owner,
+            before: undefined,
+            after: undefined,
+            subjectId: owner,
+          })
+        );
+        for (const effect of [...reversalEffects, ...orderOnly]) {
           if (effect.plainBranchMembership) continue;
           const slot =
             effect.subjectId === undefined && effect.structural === undefined;
@@ -2785,7 +2796,8 @@ export function restoration(
           appliedEffects = reversalEffects.filter(
             (effect) => !replaced.has(effect)
           );
-          for (const [owner, { member, targets }] of readded)
+          for (const [owner, { member, targets }] of readded) {
+            readdedNodes.push(member.node);
             appliedEffects.push({
               owner,
               before: undefined,
@@ -2794,8 +2806,28 @@ export function restoration(
               path: member.path,
               ownerPath: member.path,
             });
+          }
         }
       }
+      // Collections under a member being re-added are not visited by the
+      // current-tree walk; their bindings are found under that member.
+      const readdedBindings = (): CollectionTransitionTargetBinding[] => {
+        const found: CollectionTransitionTargetBinding[] = [];
+        const walk = (node: object): void => {
+          for (const key of Object.getOwnPropertyNames(node)) {
+            const child = Object.getOwnPropertyDescriptor(node, key)?.value;
+            const binding = (
+              child as {
+                __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+              } | null
+            )?.__prepareTransitionTarget;
+            if (binding) found.push(binding);
+            else if (isNodeAccessor(child)) walk(child as object);
+          }
+        };
+        for (const node of readdedNodes) walk(node);
+        return found;
+      };
       const orderEndpoints = new Map<number, 'before' | 'after'>();
       for (const application of applications) {
         for (const delta of application.orderDeltas) {
@@ -2824,6 +2856,9 @@ export function restoration(
               if (candidate?.owner === owner) binding = candidate;
               return undefined;
             });
+            binding ??= readdedBindings().find(
+              (candidate) => candidate.owner === owner
+            );
             return binding?.readSource();
           })) &&
         reversalEffects.every(
@@ -2866,6 +2901,9 @@ export function restoration(
           }
           return undefined;
         });
+        for (const binding of readdedBindings())
+          if (!bindings.has(binding.owner))
+            bindings.set(binding.owner, binding);
         const sources = [...targetOwners].map((owner) => {
           const binding = bindings.get(owner);
           if (!binding) {
