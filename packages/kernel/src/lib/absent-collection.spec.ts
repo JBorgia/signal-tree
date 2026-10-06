@@ -552,28 +552,118 @@ describe('a row-adding write with invalid input changes nothing (v16 8e review)'
     });
 });
 
-describe('a re-adding write an interceptor blocks (v16 8e review, documented edge)', () => {
-  // The interceptor runs after the retained rows were removed. The removal
-  // stays, in history too; undoing it re-adds the way to the collection with
-  // the restored rows, as undoing any write under an omitted member does.
-  it('leaves the collection absent and empty; undo restores the rows', async () => {
+describe('a re-adding write is intercepted before anything changes (v16 8f)', () => {
+  // 8e removed the retained rows first and intercepted after, so a blocked
+  // write left the collection absent and empty and its removal in history;
+  // undoing that re-added the path with the old rows (8e's documented edge,
+  // flipped here by the owner's decision). The write is now validated and
+  // intercepted as on an empty collection before the rows are removed: a
+  // block changes nothing, and history holds nothing for it.
+  const blockedWrites: Array<[string, (rows: Rows) => unknown]> = [
+    ['addOne', (rows) => rows.addOne(Z)],
+    ['prependOne', (rows) => rows.prependOne(Z)],
+    ['upsertOne', (rows) => rows.upsertOne(Z)],
+    ['addMany', (rows) => rows.addMany([{ id: 'y', n: 2 }, Z])],
+    ['prependMany', (rows) => rows.prependMany([{ id: 'y', n: 2 }, Z])],
+    ['upsertMany', (rows) => rows.upsertMany([{ id: 'y', n: 2 }, Z])],
+    ['setAll', (rows) => rows.setAll([{ id: 'y', n: 2 }, Z])],
+  ];
+  for (const [name, write] of blockedWrites)
+    it(`${name}: a blocked write changes nothing`, async () => {
+      const tree = build([restoration()]);
+      const rows = tree.$.a.rows;
+      await flush();
+      undoable(() => omit(tree));
+      await flush();
+      const index = tree.getCurrentIndex();
+      rows.intercept({
+        onAdd: (row, ctx) => {
+          if (row.id === 'z') ctx.block('no z');
+        },
+      });
+      expect(() => undoable(() => write(rows))).toThrow(
+        /^Cannot add entity: no z$/
+      );
+      await flush();
+      expect(tree.$()).toEqual({ count: 0 });
+      expect(reads(rows)).toEqual(ABSENT);
+      expect(stored(rows)).toEqual([A, B]);
+      expect(tree.getCurrentIndex()).toBe(index);
+      tree.undo();
+      expect(tree.$()).toEqual({
+        a: { rows: { all: [A, B] }, s: 0 },
+        count: 0,
+      });
+    });
+
+  it('a later copy of upsertMany blocked by onUpdate changes nothing', async () => {
     const tree = build([restoration()]);
     const rows = tree.$.a.rows;
     await flush();
     undoable(() => omit(tree));
     await flush();
-    rows.intercept({ onAdd: (_row, ctx) => ctx.block('no adds') });
-    expect(() => undoable(() => rows.addOne(Z))).toThrow(
-      /^Cannot add entity: no adds$/
+    rows.intercept({
+      onUpdate: (_id, _changes, ctx) => ctx.block('no update'),
+    });
+    expect(() => rows.upsertMany([Z, { id: 'z', n: 10 }])).toThrow(
+      /^Cannot update entity: no update$/
     );
     await flush();
     expect(tree.$()).toEqual({ count: 0 });
-    expect(reads(rows)).toEqual(ABSENT);
-    expect(stored(rows)).toEqual([]);
-    tree.undo();
-    expect(tree.$()).toEqual({ a: { rows: { all: [A, B] } }, count: 0 });
-    tree.undo();
-    expect(tree.$()).toEqual({ a: { rows: { all: [A, B] }, s: 0 }, count: 0 });
+    expect(stored(rows)).toEqual([A, B]);
+  });
+
+  it('interceptors run as on an empty collection, once per applied copy', () => {
+    // The same calls, on a present empty collection and on an absent one.
+    const run = (hide: boolean) => {
+      const tree = build();
+      const rows = tree.$.a.rows;
+      if (hide) omit(tree);
+      else rows.clear();
+      const calls: string[] = [];
+      rows.intercept({
+        onAdd: (row, ctx) => {
+          calls.push(`add ${row.id}:${row.n}`);
+          ctx.transform({ ...row, n: row.n + 100 });
+        },
+        onUpdate: (id, changes, ctx) => {
+          calls.push(`update ${String(id)}:${changes.n}`);
+          ctx.transform({ ...changes, n: (changes.n ?? 0) + 1000 });
+        },
+      });
+      rows.addMany(
+        [
+          { id: 'x', n: 1 },
+          { id: 'x', n: 2 },
+        ],
+        {
+          mode: 'overwrite',
+        }
+      );
+      rows.clear();
+      if (hide) omit(tree);
+      rows.upsertMany([
+        { id: 'y', n: 3 },
+        { id: 'y', n: 4 },
+      ]);
+      if (hide) omit(tree);
+      else rows.clear();
+      rows.setAll([
+        { id: 'w', n: 5 },
+        { id: 'w', n: 6 },
+      ]);
+      return { calls, all: rows.all(), ids: rows.ids() };
+    };
+    const present = run(false);
+    expect(run(true)).toEqual(present);
+    expect(present.calls).toEqual([
+      'add x:1',
+      'add x:2',
+      'add y:3',
+      'update y:4',
+      'add w:5',
+      'add w:6',
+    ]);
   });
 });
 
