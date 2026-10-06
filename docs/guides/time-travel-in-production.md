@@ -257,6 +257,29 @@ index follows it. The step counts in the table hold outside a `jumpTo()` view.
 Through 15.4.3 `undo()` and `redo()` did not move the index at all, and the
 "back" count read `getCurrentIndex()` rather than `getCurrentIndex() + 1`.
 
+### Undo over ordinary writes
+
+An ordinary write (authored, not designated with `undoable()`) made after an
+undoable one does not take away its undo: `undo()` restores the undoable
+write's own pre-image over it, and `redo()` its own after-image. For a scalar,
+`undoable(() => x(1)); x(2); undo()` gives the value before 1, and `redo()`
+gives 1. For entity rows (since 15.4.4):
+
+- A row the undoable turn added, which an ordinary write then removed, stays
+  absent on undo (that is its pre-image); the rest of the turn reverses, and
+  redo adds it back as the turn recorded it.
+- A row the turn edited, which an ordinary write then removed, comes back on
+  undo as it stood when removed, with the turn's fields set back and other
+  fields' ordinary edits kept, next to the neighbours it was removed from (or
+  the nearest ones still there). Redo applies the edit again.
+- If putting the turn's row back would displace a newer row an ordinary write
+  put at the same key, `undo()` or `redo()` refuses with a typed ST1034
+  restoration refusal naming the collection and the key, and nothing changes.
+  Once the newer row is removed, the undo proceeds.
+
+Writes applied with `external()` are not ordinary writes: an undo that would
+overwrite external truth refuses instead.
+
 ## Reactive readers, and why that mattered
 
 `canUndo()`, `canRedo()` and `getRestorationHistory()` are signals. Before that they read plain values, so

@@ -238,14 +238,25 @@ bullet below says **Compatibility** or **Behaviour change**.
 - After rejecting a transaction that removed or reordered rows, history,
   undo, redo and `jumpTo()` of later work restore those rows next to the
   neighbours the rollback restored them beside (history and undo threw).
-- Undo of a turn that added a row an ordinary later write (not undoable)
-  removed no longer throws "Unsupported scoped undo effect at
+- Undo and redo over an ordinary later write (not undoable) that removed a
+  row the turn touched no longer throw "Unsupported scoped undo effect at
   structural-drift" (also on 15.4.3, and after a refused rollback then
   confirm). As for a scalar since 15.4.2, the ordinary write does not remove
-  the turn's undo eligibility: the row's pre-image, absent, already holds, so
-  undo leaves it as it is and reverses the rest of the turn; redo adds it
-  back as the turn recorded it. A row a later write put at the same key with
-  a new lifetime is not the turn's: undo and redo leave it alone.
+  the turn's undo eligibility, and the turn's own image is restored over it:
+  - a row the turn ADDED stays absent on undo (its pre-image already holds)
+    while the rest of the turn reverses; redo adds it back as recorded;
+  - a row the turn EDITED is re-added on undo as it stood when removed
+    (ordinary edits to other fields kept) with the turn's fields set back,
+    next to its recorded neighbours, else the nearest surviving ones; redo
+    applies the edit again (and re-adds the row the same way if an ordinary
+    write removed it after the undo).
+  **Behaviour change:** where putting the turn's row back would displace a
+  NEWER row an ordinary write put at the same key (undo of a removal, redo of
+  an add, or the re-add above), undo or redo refuses with a typed ST1034
+  restoration refusal naming the collection and the key ("ST1034:
+  restoration refused — key 'a' of 'rows' is held by a newer row …"); state
+  and the history position are unchanged, and the operation reads as
+  `refused`. Undo of a removal threw the untyped structural-drift there.
 - An undoable write made while viewing a `jumpTo()` position keeps the viewed
   entry and every entry before it in history, applied, and discards only the
   entries after it. After a forward jump (`undo(); jumpTo(1)`) it discarded
