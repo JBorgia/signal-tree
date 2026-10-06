@@ -1488,3 +1488,352 @@ Dispositions:
    (probes above).
 6. **Minor divergence:** `retrieve()` on a disposed relationship without
    `get()` throws on v16 and returns on v15.
+
+## Slice 8: atomic registered-terminal reversal
+
+Committed as `f589bbb1` (the repair with the carried fixtures), `8dc48472`
+(v16 controls), `b334b7c8` (the preserved Vue block restored) and the review
+follow-up `930aa086` (omitted-terminal controls),
+on `integrate/v16-slice8` from `269ef687`. Raw logs, first reds, probes,
+mutation logs and size attribution:
+`/private/tmp/st-v16-integration-evidence/slice8/`.
+
+Donor `2892b650`. Its four fixtures and its three runtime hunks are identical
+at `2892b650`, `4ceb24a2`, `012fd11d` and `d63166c9`. The fixtures are carried
+with `.transaction(` → `.transact(` only, each with a provenance header. v16's
+`undo-nonscalar-leaf.spec.ts` and `conforming-collection-prototype.spec.ts`
+were byte-identical to the donor's parent, so the donor's updates apply as
+written. The donor removed the per-case "former assertions" from
+undo-nonscalar-leaf, so its closure note now restates them beside the
+historical finding.
+
+There was no donor-on-v15 run. Its `git archive` export command was denied,
+and the coordinator then dropped the run: the fixtures are v15's own tests and
+shipped in 15.4.0.
+
+First red on `269ef687` (`first-red/`):
+- kernel opaque-leaf-restoration: 14 of 20 failed;
+- undo-nonscalar-leaf: 5 of 7 failed, `Unsupported scoped undo effect at
+  rows|when|lookup|seen`;
+- conforming-collection-prototype: 1 of 7 failed (CANONICALITY);
+- Vue opaque-leaf-restoration: 8 of 9 failed;
+- Vue tooling-admission with the preserved block restored: 2 of 2 failed.
+
+There were two mechanisms, plus one smaller v16 defect:
+1. **Capture split terminal objects into fields.** Capture split a
+   plain-object replacement of a registered terminal into per-field effects at
+   the terminal's own slot (`bounds.min`, `bounds.max`). Both transactions and
+   restoration did this. No realization path applies such effects, so undo,
+   redo, jumpTo and transaction rollback all refused with `structural-drift`.
+   Automatic compensation of a throwing callback was refused the same way and
+   handed back a recovery handle.
+2. **Admission refused non-scalar values.** Restoration admission
+   (`isSupportedEffect`) refused any non-scalar value at a top-level terminal:
+   arrays, Date, Map, Set, and null → object.
+3. **Delivered external `undefined` was dropped.** Restoration deleted it from
+   external truth, although the same write still in the queue was honoured.
+   For a scalar leaf this meant undo refused before the flush, but after the
+   flush it overwrote the external `undefined` (`probes/p2-*.txt`, S1/S1q).
+
+### Classification
+
+| Fixture / case | Cause on v16 | Class |
+| --- | --- | --- |
+| opaque-leaf-restoration: undo/redo whole object, both orders, with and without a preceding entity transaction (4); confirmed object-leaf transaction undo, both orders (2); restoration alone (1); shape change from `{min,max}` (1) | Restoration capture split the object at the terminal's slot, which gave `structural-drift`. Fixed by the restoration capture hunk. | a |
+| opaque-leaf-restoration: shape change from `null` | `null` → object was already one effect, but admission refused the non-scalar value (`…at bounds`). Fixed by the admission hunk. | a |
+| opaque-leaf-restoration: transaction-only rollback | Transactions capture split the object, so compensation refused with `structural-drift [effect-validation-failed]`. Fixed by the transactions capture hunk. | a |
+| opaque-leaf-restoration: external truth with a safe sibling; pending overlap refusal and retry; redo after external `undefined`; external `undefined` refuses undo (4) | The split effects refused before the external-truth and overlap checks were reached. The two external-`undefined` cases also need the external-truth hunk (RM8). | a |
+| opaque-leaf-restoration: ordinary branch children | Passed already. Plain-branch writes are per leaf on v16, because each child owns a slot. This is a topology preservation control (EM1 kills it). | a (present) |
+| opaque-leaf-restoration: structural drift beside an atomic leaf | Passed on `269ef687` only because the split terminal itself drifted. After the slice the refusal comes from the rekey (EM2 kills it), and a v16 no-drift control discriminates. | a (present, now discriminating) |
+| opaque-leaf-restoration: a retained slot does not permit restoring an externally omitted terminal | Passed already: external membership truth refuses it (EM3). RM7 shows that admission must not decide liveness. | a (present) |
+| opaque-leaf-restoration: rollback after external `undefined`, three orders | Passed on `269ef687` by refusal: the split `bounds.min` was a later-confirmed dependency of the external `bounds` write. After the slice the rollback completes: the external write supersedes the terminal contribution, as it does for a scalar. The donor case admits both outcomes; the v16 controls pin completion (EM4 kills both). | a (outcome changed) |
+| undo-nonscalar-leaf: Array, Date, Map, Set, mixed turn (5) | Admission refused non-scalar terminal values. Fixed by the admission hunk. | a |
+| conforming-collection-prototype: CANONICALITY | The same, for an array terminal. | a |
+| Vue opaque-leaf-restoration (8 of 9) | The same mechanisms as the kernel, through native Vue leaves. The branch control passed. | a |
+| Vue tooling-admission, the block preserved in slice 6 (class c there) | Restored live in place of the scalar stand-in. Failed on `269ef687` in both orders. | a |
+
+There is no class (b) or (c) case.
+
+### Ported (the donor's three conceptual hunks, against v16)
+
+The slot test is the existing scalar-slot authority, `resolveScalarSlot` on the
+tree's runtime. Each site also requires a subject-less write.
+- **`E/transactions/transactions.ts` `captureEffects`:** a plain-object pair
+  at a registered slot stays one `set` effect. Branches and entity rows still
+  decompose by field.
+- **`E/restoration/restoration.ts` `captureEffects`:** the same guard. It also
+  covers the 15.4.2 historical capture, which uses the same function.
+- **Restoration `isSupportedEffect`:** a subject-less `set` on a registered
+  slot is admitted, whatever its payload. Admission decides the effect kind
+  only. Liveness stays with the external membership truth and the value-truth
+  checks, both of which run before anything applies.
+- **The restoration notifier subscription** keeps a delivered external
+  `undefined` as truth at a registered terminal. A collection notification
+  with no value still clears it.
+
+Checked and left unchanged:
+- **The leaf interceptor** records realized truth, including `undefined`, and
+  has no deletion path. It is not what protects these shapes (EM5);
+  `readQueuedExternalAuthority` and the subscription are.
+- **`readQueuedExternalAuthority`** already kept a queued `undefined` for every
+  non-subject path. That was the source of the queued-versus-delivered split.
+- **`applyDirectedTurnTransition`** (jumpTo and temporal restore) has no
+  admission gate on either line. Validation and external truth decide there.
+  Adding the gate (XG1) changes no result in the eight jumpTo specs or the
+  full kernel and Vue runs.
+- **No liveness check on external `undefined`.** v16 announces an omission as
+  a membership change on the parent, not as an `undefined` write at the
+  terminal (`probes/p1-out-base.txt`). Every re-add path notifies the member's
+  value before its membership, which clears the path truth (`probes/p2`,
+  S2/S3). An externally omitted terminal is refused by membership truth. A
+  variant that keeps `undefined` only for a non-dormant terminal (RM11) is
+  equivalent on every test.
+
+### v16 controls
+
+`K/lib/opaque-leaf-restoration-v16-controls.spec.ts`: 62 cases at `8dc48472`,
+and 71 with the review follow-up (see "Independent review"). The orders
+are transactions alone, transactions first and restoration first, where each
+applies.
+- **Pending inspection:** one `bounds` change at address `['bounds']`, which
+  becomes `superseded` after an external replacement.
+- **Automatic compensation of a throwing callback:** the terminal is restored,
+  the callback's own error is rethrown, and there is no recovery handle.
+- **A refused compensation (forced, `throw undefined`):** recovery reports
+  `callbackFailed` with an undefined `callbackError`. Its `inspect()` shows
+  one terminal change, and its `rollback()` restores the whole object.
+- **Pending rollback after an external `undefined`:** the exact v16 outcome,
+  for an object terminal and for a scalar leaf. The terminal change is
+  `superseded`, rollback completes, the terminal stays present and
+  `undefined`, and the sibling reverts.
+- **Atomic replacements:** array, Date, Map, Set and plain-object terminals
+  roll back as one inspected change, and a confirmed replacement undoes and
+  redoes as one value.
+- **External `undefined`, still queued and delivered:** for an object
+  terminal and a scalar leaf, undo and redo refuse with ST1034. The value and
+  own presence are kept, the sibling is unchanged, and the index and
+  `canRedo()` are unchanged. A later authored write releases the terminal.
+- **jumpTo:** moves an object terminal as one value, and refuses an external
+  `undefined` atomically.
+- **Nested terminal:** a terminal nested in a plain branch restores
+  atomically while its siblings stay independent.
+- **Drift discriminator:** the no-drift twin of the donor structural-drift
+  case: the same turn undoes cleanly.
+- **Readers:** the confirmed-turn reader shows one terminal effect with no
+  `fieldSegments`, while entity rows keep `['name']` and `['meta']`. The
+  restoration reader keeps the entry status across undo and redo.
+
+On `269ef687` 43 of 62 fail (`controls/final-base.log`). The 19 that pass are
+preservation controls: scalar-leaf rollback (3), array/Date/Map/Set rollback
+(12) and the queued scalar refusals (4). The restored Vue tooling-admission
+block keeps the slice-6 reader entry-status checks on the leaf entry.
+
+### Mutations (each restored by content hash; logs `mutations/`)
+
+Counts are killed cases, on the 62-case controls (the follow-up's own
+mutations are under "Independent review"). The repair suite has six files: the four donor files
+(kernel and Vue opaque-leaf-restoration, undo-nonscalar-leaf,
+conforming-collection-prototype), the controls and Vue tooling-admission.
+"Full" means the whole kernel suite (4225 cases) plus Vue (72).
+
+Wrong repairs:
+- **Transactions capture:**
+  - RM1r split every plain record (the hunk reverted): 18. That is the donor
+    rollback case and 17 controls. Restoration history does not read
+    transaction effects, so the donor undo cases survive this mutation.
+  - RM1 never split, entity rows included: 2 (the row-field control). The
+    first run's log labels this mutation "reverted"; its `false` actually
+    disabled every split, and RM1r is the true revert.
+  - RM2 "no subject means terminal", slot ignored: 0 on the suite.
+- **Restoration capture:**
+  - RM3 the hunk reverted: 38.
+  - RM4 no subject means terminal: 0 on the suite.
+- **RM246, all three slot tests replaced by "no subject":** 0 on the suite.
+  On the full run it kills 1: `path-notifier-enqueue` "fails inspection
+  closed after a hostile record". A plain record at a position with no slot
+  must still be read field by field there, so the slot, not the missing
+  subject, is what decides.
+- **Admission:**
+  - RM5 the hunk reverted: 54.
+  - RM6 admit any subject-less `set`: 0. Every capture now emits either slot
+    effects or field paths, which the existing clause already admits.
+  - RM7 admit only a live (non-dormant) terminal: 1. The omitted-terminal
+    case then fails with "Unsupported…" instead of ST1034: liveness belongs
+    to membership truth.
+- **External `undefined`:**
+  - RM8 the hunk reverted: 12.
+  - RM9 kept only when the previous payload was an object: 4 (the scalar
+    delivered controls).
+  - RM10 kept for every path, collections included: 0, on the suite and on
+    the full run.
+  - RM11 kept only for a non-dormant terminal: 0. This is an equivalent
+    alternative, not a wrong one (see "Ported").
+
+Existing v16 code behind the donor cases that already passed:
+- EM1 construction builds nested plain objects as terminals: 11, including
+  the branch control in kernel and Vue.
+- EM2 rekey validation ignores a drifted key: 1 (the structural-drift
+  sibling).
+- EM3 external membership truth ignored: 1 (the omitted terminal).
+- EM4 rollback compensates a superseded contribution: 9 (the three donor
+  rollback orders and six controls).
+- EM5 the leaf interceptor records no realized truth: 0.
+- EM6 queued authority records no path truth: 8 (the queued controls).
+- EM56 both of the last two: 8. Queued truth is owned by
+  `readQueuedExternalAuthority`.
+
+Exploration: XG1, an admission gate in `applyDirectedTurnTransition`, killed
+0 on the jumpTo specs and 0 on the full run.
+
+### Results
+
+Per fixture after: kernel opaque-leaf-restoration 20/20, undo-nonscalar-leaf
+7/7, conforming-collection-prototype 7/7, Vue opaque-leaf-restoration 9/9,
+Vue tooling-admission 2/2; controls 62/62. `opaque-terminal-snapshot.spec.ts`
+and the recovery/inspection anchors pass in the full run.
+
+Verification at `b334b7c8` (`verify/run1/`), all exit 0 unless noted:
+- full kernel: 390 files, 4206 passed, 6 expected failures, 13 skipped
+  (`269ef687` was 388 / 4124, so +2 files and +82 cases = 20 + 62);
+- frameworks: angular 179 (+3 skipped), react 23, vue 72 (+9), solid 41;
+- `pnpm typecheck`;
+- `check-spec-types` (the same three pre-existing improvements; baseline not
+  ratcheted);
+- lint on all five projects;
+- kernel-neutrality, source-controls, `api-inventory --check`,
+  callable-inventory;
+- consumer typecheck (bundler and node16);
+- five-package build;
+- `check-bundle-budget` exit 1 on the pre-existing overage only.
+
+The follow-up `930aa086` changes only the controls spec. Rechecked at that
+commit (`verify/final/`): full kernel 390 files, 4215 passed, 6 expected
+failures, 13 skipped (+9 cases); controls 71/71; spec-types; kernel lint.
+
+Size (`size/`, esbuild attribution over the built dist, prod, with the
+package's `sideEffects`):
+
+| Scenario | `269ef687` | `b334b7c8` | Delta |
+| --- | --- | --- | --- |
+| transactions | 36.25 KB gzip | 36.27 KB | +22 B gzip, +84 B min, all `transactions.js` |
+| restoration | 35.69 KB | 35.73 KB | +50 B gzip, +234 B min, all `restoration.js` |
+| full | 64.92 KB | 64.98 KB | +62 B gzip, +318 B min |
+| entities, bare, link | — | — | 0 |
+
+`check-bundle-budget`, before and after: entities 23.59/22.6 KB prod and
+26.23/25.25 KB dev; bare 10.39/10.25 KB prod and 12.60/12.45 KB dev. These
+are unchanged and still over the inherited ceilings.
+
+### Independent review
+
+One read-only review (code-reviewer agent), given the raw diff, the plan text
+for section 8 and the destination contracts, without this record. It ran:
+- all the carried and control specs on the worktree;
+- the same specs on its own export, with only the two runtime files reverted
+  to `269ef687`: kernel opaque-leaf-restoration 14/20 failed, matching the
+  header, and about 45 controls failed;
+- probes written in the export only.
+
+Verdict: minor only. No critical or major finding, and no missed capture,
+admission or external-truth path: historical capture, jumpTo, rollback
+planning, pending inspection and recovery handles were checked. It also found
+no destination-contract regression, and no row or branch misclassification:
+an entity row field `meta: {a}|undefined` still splits.
+
+Dispositions:
+- **Minor: the omitted-terminal case covered only undo with restoration alone,
+  and passed before the slice.** Fixed in `930aa086` with nine controls:
+  pending rollback (three orders), undo and redo (both orders), and an
+  external re-add. On `269ef687` 5 of the 9 fail. Mutations on the final
+  controls:
+  - EM3 (membership truth ignored) kills undo and redo, 4;
+  - RM7 kills 4;
+  - RM1r kills the three rollbacks;
+  - the re-add survives EM3 and a mutation that ignores the tree-level value
+    truth (EV, 17 other kills). Disabling both kills it (EM3EV).
+  - EM4 does not kill the rollbacks: compensating the superseded terminal
+    would write only into its dormant slot, which no public read sees (open
+    item 1).
+- **Minor: a registered terminal inside an externally omitted plain branch is
+  still written by undo and redo.** The probe was
+  `{a:{bounds:leaf(), n:0}, count:0}` with `tree.$({count:1})` applied
+  externally. The detached handles read the restored values, while `tree.$()`
+  stays without `a`. A plain scalar in that branch behaves identically on
+  `269ef687`: membership truth is per member and is not inherited. Recorded
+  in open item 1; not pinned either way.
+- **Info: external-`undefined` retention covers every registered slot,
+  including plain scalars.** This is intended (donor rule). It is recorded as
+  user-visible change 5, and the controls pin it.
+- **Info: no Angular, React or Solid spec for terminal reversal.** The hunks
+  key on the framework-neutral `resolveScalarSlot`. Vue covers native leaves.
+  Unchanged.
+- **Info: the leaf interceptor and queued authority needed no change.** This
+  agrees with "Ported".
+
+### User-visible behaviour changes in v16 (slice 8)
+
+1. **Atomic undo, redo, jumpTo and rollback.** These now work for a
+   registered terminal holding a plain object (`leaf({...})`), an array, a
+   Date, a Map or a Set, and for null ↔ object, in both enhancer orders and in
+   Vue. Before, they refused with `Unsupported scoped undo effect at
+   structural-drift` or `at <path>`. A turn mixing such a terminal with
+   scalars is no longer refused as a whole.
+2. **A throwing `transact()` callback is compensated** when it wrote such a
+   terminal. The callback's own error is rethrown, with no recovery handle.
+   Before, compensation was refused, the error was a `SignalTreeRollbackError`
+   with `recovery`, and the turn stayed pending.
+3. **Inspection reports one change per terminal.**
+   `PendingTransaction.inspect()` and recovery-handle inspection report
+   `{ path: 'bounds', address: ['bounds'] }`, not `bounds.min`/`bounds.max`.
+   The confirmed-turn reader reports one effect with no `fieldSegments`, and
+   `getRestorationHistory()` entries hold one effect.
+4. **Rollback after an external replacement or `undefined`.** A later external
+   write to the terminal supersedes the pending terminal change: the change is
+   `superseded` and rollback completes the rest. Before, the split field
+   effects made it a `later-confirmed-dependency` refusal.
+5. **Delivered external `undefined` is protected, scalar leaves included.**
+   Undo, redo and jumpTo now refuse with ST1034 after the flush. Before the
+   flush they already refused; after it they overwrote the value.
+6. No API, type or export change.
+
+### Open items
+
+1. **Undo or compensation into a dormant terminal.** This is pre-existing and
+   beyond the donor. Admission by slot registration lets a reversal write
+   into a terminal that is not currently live when no membership truth
+   covers it. That happens in two cases:
+   - (i) an ordinary (non-designated) authored omission of the terminal
+     itself, then undo of an earlier write (`probes/p2-*.txt`, S4);
+   - (ii) an external omission of an ancestor branch, then undo or redo
+     (review probe). Membership truth is recorded per member, not inherited.
+
+   The reversal succeeds and writes the value into the dormant slot, which
+   reads cannot see. The member stays absent, and the siblings revert. Scalar
+   leaves behaved this way at `269ef687`; object terminals now match them,
+   where before they refused with `structural-drift`. The scalar frame
+   bypasses `reactivateOnWrite`, against member-membership's rule that
+   writing an absent descendant reactivates it. Options:
+   - (a) refuse when the target or an ancestor is dormant and the reversal
+     does not restore it;
+   - (b) keep the hidden write;
+   - (c) restore membership with the value.
+
+   Recommendation: (a) for (ii), where external truth owns the ancestor's
+   absence; decide (i) with (a) or (c) for scalars and terminals together.
+   The admission rule is the same in v15 `d63166c9` (source read only, not
+   run). Routed to the coordinator.
+2. **Slot clauses that no test discriminates.** No v16 producer emits a
+   subject-less plain record at a position without a slot. Only the synthetic
+   hostile-record case (`path-notifier-enqueue`, on the transactions path)
+   tells "no subject" apart from "registered slot". The restoration capture
+   and admission slot clauses (RM4, RM6) and the collection limit on external
+   `undefined` (RM10) are therefore scope guards that no test pins.
+3. **jumpTo has no admission gate** on either line (XG1 is inert). Recorded,
+   not changed.
+4. **Admission refusals are plain `Error`s.** `Unsupported scoped undo effect
+   at <path>` is not registered as an owner refusal, so the restoration reader
+   does not classify it as `refused`. Pre-existing and unchanged.
+5. **The leaf interceptor's realized-truth record** is redundant for the
+   tested shapes (EM5). It has no `undefined` deletion. Unchanged.
+6. **The bundle budget** is still over the inherited ceilings, unchanged by
+   this slice.
