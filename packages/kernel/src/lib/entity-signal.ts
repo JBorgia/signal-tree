@@ -3724,10 +3724,10 @@ export function createEntitySignal<
       // against 15.3.1 in benchmarks/store-comparison.
       if (
         positionId !== undefined &&
-        mutationCaptureRuntime?.publishCollectionOrder &&
+        mutationCaptureRuntime?.isCaptureActive() &&
         survivingOrderChanged(currentSubjects, afterSubjects)
       ) {
-        mutationCaptureRuntime.publishCollectionOrder({
+        mutationCaptureRuntime.publishCollectionOrder?.({
           owner: positionId,
           ownerPath: basePath,
           beforeSubjects: currentSubjects,
