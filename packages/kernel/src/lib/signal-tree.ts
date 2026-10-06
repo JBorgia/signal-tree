@@ -46,8 +46,12 @@ import {
 } from './internals/error-reporter';
 import { resolveEnhancerOrder } from '../enhancers';
 import {
+  inStructuralWrite,
+  installMemberRepublisher,
+  isAbsentMember,
+  reactivatePathOnWrite,
   setMemberPresence,
-  isDormantMember,
+  withStructuralWrite,
 } from './internals/member-membership';
 import { getOwnedPositionIds } from './internals/owned-mutation';
 import { getOwnedOwnerPath } from './internals/owned-metadata';
@@ -114,6 +118,7 @@ import {
 } from './utils';
 import {
   markTreeStore,
+  observeMembership,
   publishMembershipChange,
 } from './internals/snapshot-authority';
 import {
@@ -436,20 +441,35 @@ function makeNodeAccessor<T>(
         // ⚠️ The read boundary alone is NOT sufficient: a branch has no
         // publication token, so a held parent consumer sees nothing. The
         // membership carrier in `publishMembershipChange` is what wakes it.
+        //
+        // ⚠️ ABSENT, NOT ONLY DORMANT. A branch under an omitted member is
+        // absent too, and read its retained storage until v16 8d. The
+        // membership revision is the edge that wakes this read when the
+        // branch, or a member above it, is re-added.
         if (
           !isRoot &&
           self.accessor !== undefined &&
-          isDormantMember(self.accessor)
+          isAbsentMember(self.accessor)
         ) {
+          observeMembership(store as object);
           return undefined as unknown as T;
         }
         return materializeNode(store as object) as unknown as T;
       }
 
+      // WRITING AN ABSENT BRANCH RE-ADDS IT ALONG ITS PATH (v16 8d). Inside a
+      // structural write the writer reconciles membership itself.
+      const absent =
+        !isRoot &&
+        self.accessor !== undefined &&
+        !inStructuralWrite() &&
+        isAbsentMember(self.accessor);
       let updates = arg;
       if (typeof arg === 'function') {
         const updater = arg as (current: T) => T;
-        const current = unwrap(store) as T;
+        // An absent branch's updater receives its semantic value, as a
+        // dormant leaf's does (`whole-value-membership.spec.ts` 14).
+        const current = (absent ? undefined : unwrap(store)) as T;
         updates = updater(current);
       }
 
@@ -477,7 +497,14 @@ function makeNodeAccessor<T>(
       // one would invent a contract and could break untyped consumers — see the
       // C8 surface review for whether a dev-mode diagnostic is warranted.
       applyGrouped(() => {
+        if (!absent || !updates || typeof updates !== 'object') {
+          recursiveUpdate(store, updates, undefined, '');
+          return;
+        }
+        // Value first: the supplied whole value is installed and this
+        // branch's own members reconciled; then the path above is re-added.
         recursiveUpdate(store, updates, undefined, '');
+        reactivatePathOnWrite(self.accessor)?.();
       });
     },
   }.node as NodeAccessor<T>;
@@ -853,8 +880,8 @@ function republishMembers(parent: object, keys: readonly string[]): void {
   // `p({ name: 'a' })` removed `age`. The leaf's location binding IS that token
   // — the one its own writes publish — so it is published instead.
   const unaddressedLeaves: LocationPublisher[] = [];
-  for (const key of keys) {
-    const child = (parent as Record<string, unknown>)[key];
+  // A member's own token, if it has one; false for a branch.
+  const publishToken = (child: unknown): boolean => {
     const positionId = getOwnedPositionIds(child)?.[0];
     const slot =
       positionId === undefined
@@ -862,12 +889,37 @@ function republishMembers(parent: object, keys: readonly string[]): void {
         : runtime.resolveScalarSlot(positionId);
     if (slot !== undefined) {
       changedSlots.push(slot);
-      continue;
+      return true;
     }
     const publisher = writableLocationPublisher(child);
     if (publisher) unaddressedLeaves.push(publisher);
+    return publisher !== undefined;
+  };
+  const branchMembers: object[] = [];
+  for (const key of keys) {
+    const child = (parent as Record<string, unknown>)[key];
+    if (!publishToken(child) && isNodeAccessor(child)) branchMembers.push(child);
   }
   const tokenCarrying = changedSlots.length + unaddressedLeaves.length;
+
+  // ⚠️ A BRANCH MEMBER'S PRESENCE IS EVERY PRESENT LOCATION'S BELOW IT.
+  //
+  // Omitting or re-adding a branch changes what each present location under
+  // it reads, but none of them was written. Measured before v16 8d: a held
+  // `computed(() => box.drop())` kept `{v:2}` after `box({keep})` omitted
+  // `drop`, and held reads under an omitted `a` kept retained storage. Each
+  // present branch below re-reads through its membership revision, each leaf
+  // through its own token. Dormant members below are skipped: they read
+  // absent before and after.
+  const descendantBranches: object[] = [];
+  const visit = (branch: object): void => {
+    descendantBranches.push(branch);
+    for (const key of Object.keys(branch)) {
+      const child = (branch as Record<string, unknown>)[key];
+      if (!publishToken(child) && isNodeAccessor(child)) visit(child);
+    }
+  };
+  for (const branch of branchMembers) visit(branch);
 
   // ⚠️ PUBLISHED INDEPENDENTLY OF VALUE EQUALITY.
   //
@@ -921,6 +973,8 @@ function republishMembers(parent: object, keys: readonly string[]): void {
     markOwnerInvalidatedFrom(parent);
   }
 
+  for (const branch of descendantBranches) publishMembershipChange(branch);
+
   if (changedSlots.length > 0) {
     // `advanceRevision` is NOT wanted: nothing was committed, so the physical
     // commit clock must not move.
@@ -938,6 +992,10 @@ function republishMembers(parent: object, keys: readonly string[]): void {
   // The node's own snapshot is memoised over the members it enumerated, and a
   // membership change is invisible to that memo — see publishMembershipChange.
 }
+
+// A member re-added by a direct write wakes its observers through the same
+// carriers (`reactivatePathOnWrite`, `preparePlainBranchMembers`).
+installMemberRepublisher((parent, key) => republishMembers(parent, [key]));
 
 /**
  * @internal Apply a supplied complete value to an EXISTING dynamic member,
@@ -982,7 +1040,20 @@ function recursiveUpdate(
   reconcileMembership = true
 ): void {
   if (!updates || typeof updates !== 'object') return;
+  // A whole value reconciles membership level by level below; a location it
+  // writes must not re-add its own path as well (`withStructuralWrite`).
+  withStructuralWrite(() =>
+    applyWholeValue(target, updates, out, pathPrefix, reconcileMembership)
+  );
+}
 
+function applyWholeValue(
+  target: unknown,
+  updates: object,
+  out: string[] | undefined,
+  pathPrefix: string,
+  reconcileMembership: boolean
+): void {
   const targetObj = isNodeAccessor(target)
     ? (target as unknown as Record<string, unknown>)
     : (target as Record<string, unknown>);
@@ -1082,7 +1153,7 @@ function recursiveUpdate(
       // location for the value without enrolling the write path as a reactive
       // consumer.
       const current = readWritableCell(sig);
-      if (current === value && !isDormantMember(sig)) {
+      if (current === value && !isAbsentMember(sig)) {
         // Dev-mode footgun guard: a merge write whose value is reference-
         // identical to the current value is a no-op. For objects/arrays this
         // almost always means the caller mutated the value in place and re-set

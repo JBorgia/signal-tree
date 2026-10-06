@@ -9,6 +9,8 @@ import {
   undoable,
 } from '../../index';
 import { restorationReader, transactionLifecycleReader } from '../../internals';
+import { getOwnedPositionIds } from '../../lib/internals/owned-metadata';
+import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-port';
 import { getPathNotifier } from '../../lib/path-notifier';
 
 /**
@@ -25,8 +27,9 @@ import { getPathNotifier } from '../../lib/path-notifier';
  *   ordinary write at the location (15.4.2, `external-authored-baseline`
  *   "keeps the baseline of an already recorded earlier authored turn"): the
  *   hidden member is re-added with the reversal's target. Re-adding a hidden
- *   branch keeps its other members' retained values (what they held when the
- *   branch was omitted) and leaves its hidden members absent.
+ *   branch brings back only the reversal's own locations; its other members
+ *   stay absent and retained storage supplies nothing (slice 8c, which
+ *   withdrew 8b's "retained values on re-add").
  * - Pending rollback never overwrites a later write. A later membership
  *   change of the location or an enclosing member supersedes the pending
  *   contribution, as a later replacement does; the rest rolls back and the
@@ -71,6 +74,24 @@ type HistoryTree = {
   getCurrentIndex(): number;
   canRedo(): boolean;
   destroy(): void;
+};
+
+/**
+ * The retained slot behind a registered location. No public read exposes it
+ * while the location is absent (slice 8d), so the compensation that rollback
+ * writes there is read through the slot runtime.
+ */
+const retained = (tree: { $: unknown }, location: unknown): unknown => {
+  const runtime = getTreeScalarSlotRuntime(tree.$);
+  const position = getOwnedPositionIds(location)?.[0];
+  const slot =
+    position === undefined ? undefined : runtime?.resolveScalarSlot(position);
+  if (!runtime || slot === undefined) throw new Error('no retained slot');
+  const frame = runtime.beginFrame();
+  let value: unknown;
+  frame.update(slot, (current) => (value = current));
+  frame.discard();
+  return value;
 };
 
 /** Paths notified while `run` executes and its notifications are delivered. */
@@ -403,8 +424,10 @@ describe('pending rollback: the rest rolls back, no rolled-back value is retaine
             if (nested) {
               // Under an omitted branch the location's retained slot is
               // compensated, so a later re-add of the branch cannot bring the
-              // rolled-back value back. The branch stays omitted.
-              expect(t.value()).toEqual(pre(shape));
+              // rolled-back value back. The branch stays omitted, and a held
+              // read of the location is absent (slice 8d).
+              expect(retained(t.tree, t.value)).toEqual(pre(shape));
+              expect(t.value()).toBeUndefined();
             } else {
               // The omission of the location itself supersedes the pending
               // contribution (a later replacement at the location).
@@ -483,11 +506,12 @@ describe("the reversal's own membership effect wins over retained values", () =>
         tree.$({ count: 1 });
       });
       await flush();
-      // A later ordinary write through a detached handle lands in the hidden
-      // branch's retained slot; the branch stays omitted.
+      // A later ordinary write through a detached handle re-adds the branch
+      // with only that location (slice 8d). Undo restores the turn's own
+      // before-image of the branch over it (15.4.2).
       a.keep(9);
       await flush();
-      expect(tree.$()).toEqual({ count: 1 });
+      expect(tree.$()).toEqual({ a: { keep: 9 }, count: 1 });
       tree.undo();
       expect(tree.$()).toEqual({ a: { value: 0, keep: 0 }, count: 0 });
     });

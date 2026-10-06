@@ -86,6 +86,16 @@ for retired entities.
   truth did. Before this, they wrote retained storage and reported success.
   A pending `rollback()` under an omitted branch restores retained storage, so
   a rejected value cannot return on a later re-add.
+- **A location under an omitted member reads absent, and writing it re-adds
+  its path.** After a whole-value write omits `a`, `$.a.b.keep()` reads
+  `undefined` (through a held handle too, and in held consumers, which also
+  follow the omission and a re-add); an updater there receives `undefined`.
+  `$.a.b.keep(9)` makes `a` `{ b: { keep: 9 } }`: every omitted member on the
+  path comes back with only that path, and `a`'s other members stay absent.
+  Undo, redo, `jumpTo()` and `rollback()` of that write make them absent
+  again. Before this, such reads returned retained storage and the write went
+  to hidden storage, and undo or rollback of a write that re-added an omitted
+  member left its key present with `undefined`.
 - **Settle the newest open transaction first, including across omitted
   branches.** Rolling back an older transaction while a newer pending one has
   omitted or re-added a branch enclosing its writes now refuses with the

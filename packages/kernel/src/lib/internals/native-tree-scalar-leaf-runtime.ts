@@ -5,7 +5,7 @@ import {
   registerWritableLocationBinding,
   type WritableLocationBinding,
 } from './location-runtime';
-import { isDormantMember, reactivateOnWrite } from './member-membership';
+import { isAbsentMember, reactivatePathOnWrite } from './member-membership';
 import type {
   ObservationAdapter,
   ObservationToken,
@@ -105,7 +105,8 @@ function createNativeScalarLeaf<T>(
   const holder: { leaf?: Location<T> } = {};
   const realized = observation.createWritableCell?.(() => {
     const leaf = holder.leaf;
-    if (leaf && isDormantMember(leaf)) return undefined as T;
+    // Absent when this leaf or a member above it is omitted (v16 8d).
+    if (leaf && isAbsentMember(leaf)) return undefined as T;
     return kernel.readSlot<T>(slotIndex);
   });
   if (!realized) throw new Error('Expected a native writable cell realization');
@@ -116,15 +117,18 @@ function createNativeScalarLeaf<T>(
   holder.leaf = leaf;
   const mutationSource = registerIntrinsicMutationSource<T>(leaf as object);
 
+  // Each returns the re-added membership's announcement, which the writer
+  // runs after its own value notification (see `reactivatePathOnWrite`).
   const publishResult = (
     result: ReturnType<TreeScalarSlotRuntime['commitSlot']>
-  ): void => {
-    const reactivated = reactivateOnWrite(leaf);
+  ): (() => void) | undefined => {
+    const announce = reactivatePathOnWrite(leaf);
     publication.publishSlot(
-      reactivated && !result.changed
+      announce && !result.changed
         ? { ...result, changed: true, slot: slotIndex }
         : result
     );
+    return announce;
   };
 
   /**
@@ -137,17 +141,21 @@ function createNativeScalarLeaf<T>(
    * value still goes the invalidate route.
    */
   const commitNative = realized.commit;
-  const publishChanged = (changed: boolean, committed?: { value: T }): void => {
-    const reactivated = reactivateOnWrite(leaf);
-    if (!changed && !reactivated) return;
+  const publishChanged = (
+    changed: boolean,
+    committed?: { value: T }
+  ): (() => void) | undefined => {
+    const announce = reactivatePathOnWrite(leaf);
+    if (!changed && !announce) return undefined;
     if (committed !== undefined && commitNative !== undefined) {
       commitNative(committed.value);
       if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
         recordProductionSubstrateStat('publications');
       }
-      return;
+      return announce;
     }
     publication.publishSlot({ changed: true, slot: slotIndex });
+    return announce;
   };
 
   const binding: WritableLocationBinding<T> = {
@@ -155,11 +163,11 @@ function createNativeScalarLeaf<T>(
     notify: () => publication.publishSlot({ changed: true, slot: slotIndex }),
     replace: (value) => {
       const observer = mutationSource.observer;
-      const dormant = observer ? isDormantMember(leaf) : false;
+      const dormant = observer ? isAbsentMember(leaf) : false;
       const before = observer ? realized.peek() : undefined;
       // The authoritative commit primitive: no result object on the hot path.
       const changed = kernel.commitSlotValue(slotIndex, value);
-      publishChanged(changed, { value });
+      const announce = publishChanged(changed, { value });
       if (observer) {
         observer({
           intent: 'replace',
@@ -168,12 +176,13 @@ function createNativeScalarLeaf<T>(
           changed: changed || dormant,
         });
       }
+      announce?.();
     },
     derive: (update) => {
-      if (isDormantMember(leaf)) {
+      if (isAbsentMember(leaf)) {
         const next = update(undefined as T);
         const result = kernel.commitSlot(slotIndex, next);
-        publishResult(result);
+        const announce = publishResult(result);
         mutationSource.observer?.({
           intent: 'derive',
           before: undefined as T,
@@ -181,23 +190,25 @@ function createNativeScalarLeaf<T>(
           // Membership changed even when the retained slot value did not.
           changed: true,
         });
+        announce?.();
         return;
       }
       const observer = mutationSource.observer;
       if (!observer) {
-        publishResult(kernel.updateSlot(slotIndex, update));
+        publishResult(kernel.updateSlot(slotIndex, update))?.();
         return;
       }
       const before = realized.peek();
       const next = update(before);
       const result = kernel.commitSlot(slotIndex, next);
-      publishResult(result);
+      const announce = publishResult(result);
       observer({
         intent: 'derive',
         before,
         after: result.changed ? next : before,
         changed: result.changed,
       });
+      announce?.();
     },
   };
   registerWritableLocationBinding(binding);
