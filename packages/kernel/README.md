@@ -250,10 +250,9 @@ Some details of that rule:
 - **The selection is kept.** `activeId()` keeps its value and `activeEntity()`
   reads `undefined`. A re-adding write clears the selection, as `clear()`
   does.
-- **Taps during a reversal see physical rows.** While undo, redo, `jumpTo()`
-  or `rollback()` writes an absent collection's retained rows, a tap on it
-  that calls `byId()` sees those rows. Its projections (`all()`, `count()`,
-  `has()`) still read it absent.
+- **Taps read rows as consumers do.** Even while undo, redo, `jumpTo()` or
+  `rollback()` writes an absent collection's retained rows, a tap on it reads
+  `byId()` and its rows as absent.
 - **Writes from inside a whole value or a reversal.** A tap or sync effect
   that runs while a whole value or a reversal is being applied may write any
   tree, including the same one. That write is an ordinary write: an absent

@@ -296,6 +296,12 @@ import type {
 } from '../lib/types';
 
 /**
+ * While positive, a tap handler is running: row reads are absent-aware in
+ * every collection, whatever reversal is being applied (v16 8f).
+ */
+let tapDepth = 0;
+
+/**
  * True when the subjects present at both endpoints appear in a different
  * relative order. Subjects present at only one endpoint are ignored.
  */
@@ -458,10 +464,11 @@ export function createEntitySignal<
   // Projections never do, so nothing they cache can hold retained rows.
   const rowAbsent = (): boolean =>
     absent() &&
-    !(
-      physicalRows.length &&
-      physicalRows.includes(getPositionRegistry(api) as object)
-    );
+    (tapDepth > 0 ||
+      !(
+        physicalRows.length &&
+        physicalRows.includes(getPositionRegistry(api) as object)
+      ));
   const presentEntity = (id: K): E | undefined =>
     rowAbsent() ? undefined : getProjectedEntity(id);
   const presentEntries = (): Array<readonly [K, E]> =>
@@ -1585,9 +1592,7 @@ export function createEntitySignal<
           }
         );
 
-        for (const handler of tapHandlers) {
-          handler.onRemove?.(key, entity);
-        }
+        emitTap('onRemove', key, entity);
       },
     };
   }
@@ -1766,9 +1771,7 @@ export function createEntitySignal<
       createStructuralEffectMeta(structuralEffect)
     );
 
-    for (const handler of tapHandlers) {
-      handler.onAdd?.(transformedEntity, id);
-    }
+    emitTap('onAdd', transformedEntity, id);
 
     return { id, structuralEffect };
   }
@@ -1893,6 +1896,25 @@ export function createEntitySignal<
 
   /** Handlers for observation */
   const tapHandlers: TapHandlers<E, K>[] = [];
+  /**
+   * Run every tap's `method`. A tap reads collections as any consumer does:
+   * absent-aware, even while a reversal is applied to their tree and its own
+   * row writes read hidden rows physically (`tapDepth`, v16 8f).
+   */
+  const emitTap = <M extends keyof TapHandlers<E, K>>(
+    method: M,
+    ...args: Parameters<NonNullable<TapHandlers<E, K>[M]>>
+  ): void => {
+    tapDepth++;
+    try {
+      for (const handler of tapHandlers)
+        (handler[method] as ((...input: unknown[]) => void) | undefined)?.(
+          ...args
+        );
+    } finally {
+      tapDepth--;
+    }
+  };
   /** A re-adding write already ran this call's interceptors (v16 8f). */
   let interceptsSuppressed = 0;
   /** A re-adding write's removal of retained rows: no tap sees it (v16 8e). */
@@ -2813,9 +2835,7 @@ export function createEntitySignal<
 
       // Run tap handlers for each processed entity
       for (const { id, entity } of addedEntities) {
-        for (const handler of tapHandlers) {
-          handler.onAdd?.(entity, id);
-        }
+        emitTap('onAdd', entity, id);
       }
 
       return processedIds;
@@ -2879,9 +2899,7 @@ export function createEntitySignal<
       );
 
       // Run tap handlers
-      for (const handler of tapHandlers) {
-        handler.onUpdate?.(id, transformedChanges, finalUpdated);
-      }
+      emitTap('onUpdate', id, transformedChanges, finalUpdated);
     },
 
     /**
@@ -2964,9 +2982,7 @@ export function createEntitySignal<
           ? undefined
           : null
       );
-      for (const handler of tapHandlers) {
-        handler.onUpdate?.(id, next as Partial<E>, next);
-      }
+      emitTap('onUpdate', id, next as Partial<E>, next);
     },
 
     updateMany(ids: K[], changes: Partial<E>): void {
@@ -3065,9 +3081,7 @@ export function createEntitySignal<
 
       // Run tap handlers for each updated entity
       for (const { id, transformedChanges, finalUpdated } of updatedEntities) {
-        for (const handler of tapHandlers) {
-          handler.onUpdate?.(id, transformedChanges, finalUpdated);
-        }
+        emitTap('onUpdate', id, transformedChanges, finalUpdated);
       }
     },
 
@@ -3157,9 +3171,7 @@ export function createEntitySignal<
       );
 
       // Run tap handlers
-      for (const handler of tapHandlers) {
-        handler.onRemove?.(id, entity);
-      }
+      emitTap('onRemove', id, entity);
     },
 
     removeMany(ids: K[]): void {
@@ -3268,9 +3280,7 @@ export function createEntitySignal<
 
       // Run tap handlers for each removed entity
       for (const { id, entity } of preparedRemovals) {
-        for (const handler of tapHandlers) {
-          handler.onRemove?.(id, entity);
-        }
+        emitTap('onRemove', id, entity);
       }
     },
 
@@ -3464,16 +3474,12 @@ export function createEntitySignal<
 
       // Run tap handlers for added entities
       for (const { id, entity } of addedEntities) {
-        for (const handler of tapHandlers) {
-          handler.onAdd?.(entity, id);
-        }
+        emitTap('onAdd', entity, id);
       }
 
       // Run tap handlers for updated entities
       for (const { id, transformedChanges, finalUpdated } of updatedEntities) {
-        for (const handler of tapHandlers) {
-          handler.onUpdate?.(id, transformedChanges, finalUpdated);
-        }
+        emitTap('onUpdate', id, transformedChanges, finalUpdated);
       }
 
       return [...toAdd.map((a) => a.id), ...toUpdate.map((u) => u.id)];
@@ -3569,9 +3575,7 @@ export function createEntitySignal<
 
       for (const { id, entity } of activeSubjects) {
         if (!entity || silentClear) continue;
-        for (const handler of tapHandlers) {
-          handler.onRemove?.(id, entity);
-        }
+        emitTap('onRemove', id, entity);
       }
     },
 
@@ -3845,21 +3849,15 @@ export function createEntitySignal<
       }
 
       for (const { id, entity } of stagedRemovals) {
-        for (const handler of tapHandlers) {
-          handler.onRemove?.(id, entity);
-        }
+        emitTap('onRemove', id, entity);
       }
 
       for (const { id, entity } of stagedAdds) {
-        for (const handler of tapHandlers) {
-          handler.onAdd?.(entity, id);
-        }
+        emitTap('onAdd', entity, id);
       }
 
       for (const { id, entity } of stagedUpdates) {
-        for (const handler of tapHandlers) {
-          handler.onUpdate?.(id, entity as Partial<E>, entity);
-        }
+        emitTap('onUpdate', id, entity as Partial<E>, entity);
       }
     },
 

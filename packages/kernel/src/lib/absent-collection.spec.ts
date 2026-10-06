@@ -836,6 +836,59 @@ describe("a write from inside its own tree's whole value or reversal (v16 8f)", 
   });
 });
 
+describe('taps during a reversal read rows absent-aware (v16 8f)', () => {
+  // A reversal reads and writes a hidden collection's rows physically, and
+  // its row writes fire the collection's taps. 8e let a tap's byId() see
+  // those rows while has() read the collection absent. A tap now reads rows
+  // as any consumer does. (Its cached projections, all() and count(), can
+  // still hold the values from before the reversal's invalidation group, as
+  // for any tap inside a grouped write: see the 8f record.)
+  const watch = (rows: Rows) => {
+    const disagreements: string[] = [];
+    let taps = 0;
+    const check = () => {
+      taps++;
+      for (const id of ['a', 'b', 'z']) {
+        const byId = rows.byId(id) !== undefined;
+        const has = rows.has(id)();
+        if (byId !== has) disagreements.push(`${id}: byId ${byId}, has ${has}`);
+      }
+    };
+    rows.tap({ onAdd: check, onRemove: check, onUpdate: check });
+    return { disagreements, taps: () => taps };
+  };
+  for (const [order, enhancers] of Object.entries(historyOrders))
+    it(`undo of a re-adding write (${order})`, async () => {
+      const tree = build(enhancers());
+      const rows = tree.$.a.rows;
+      await flush();
+      omit(tree);
+      await flush();
+      undoable(() => rows.addOne(Z));
+      await flush();
+      const seen = watch(rows);
+      tree.undo();
+      expect(seen.taps()).toBeGreaterThan(0);
+      expect(seen.disagreements).toEqual([]);
+      expect(tree.$()).toEqual({ count: 0 });
+    });
+  for (const [order, enhancers] of Object.entries(rollbackOrders))
+    it(`rollback of a re-adding write (${order})`, async () => {
+      const tree = build(enhancers());
+      const rows = tree.$.a.rows;
+      await flush();
+      omit(tree);
+      await flush();
+      const pending = tree.transact(() => rows.addOne(Z));
+      await flush();
+      const seen = watch(rows);
+      pending.rollback();
+      await flush();
+      expect(seen.disagreements).toEqual([]);
+      expect(tree.$()).toEqual({ count: 0 });
+    });
+});
+
 describe('a root holding only collections (v16 8e review)', () => {
   // No scalar leaf anywhere: the tree's root carries no slot of its own.
   type Pair = Omit<Tree, '$'> & {
