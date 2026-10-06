@@ -585,10 +585,10 @@ describe('relationship lifecycle', () => {
     const tree = make('plain');
     const { sent, connection } = await linked(tree, 'ABC');
     const inventory = () => getEntityMembershipInventory(tree.$.rows as object);
-    expect(inventory()?.observed()).toBe(true);
+    expect(inventory()?.observed(true)).toBe(true);
     tree.$.rows.setAll(rows('CAB'));
     connection.dispose();
-    expect(inventory()?.observed()).toBe(false);
+    expect(inventory()?.observed(true)).toBe(false);
     await flush();
     expect(sent).toEqual([]);
     tree.destroy();
@@ -607,7 +607,8 @@ describe('relationship lifecycle', () => {
       })
     ).toThrow('subscribe');
     expect(
-      getEntityMembershipInventory(tree.$.rows as object)?.observed() ?? false
+      getEntityMembershipInventory(tree.$.rows as object)?.observed(true) ??
+        false
     ).toBe(false);
     tree.destroy();
   });

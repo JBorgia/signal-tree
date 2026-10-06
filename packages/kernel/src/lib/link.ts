@@ -724,9 +724,11 @@ export function link<S>(
    * notification that carries order, so since 15.3.1 or earlier a linked
    * endpoint kept ABCD after `setAll([D,C,B,A])`.
    *
-   * Each linked collection's committed membership publication carries the
-   * complete order after a `setAll()`, a prepend and every undo, redo, jump
-   * and rollback. The collection-order capture channel 16.x subscribes to is
+   * Each linked collection's membership inventory, on its ORDER tier only,
+   * reports the complete order after a `setAll()`, a prepend and every undo,
+   * redo, jump and rollback. The order tier leaves full membership unobserved,
+   * so linking a collection does not make its other structural operations
+   * build membership records. The collection-order capture channel 16.x subscribes to is
    * published only by a forward `setAll()`: following it alone sends DCBA and
    * then leaves the endpoint there when undo or rollback restores ABCD.
    *
@@ -747,15 +749,13 @@ export function link<S>(
   ) => {
     let release: (() => void) | undefined;
     try {
-      release = activateEntityMembership(node)?.subscribe(({ changes }) => {
+      // The ORDER tier only: subscribing here leaves full membership
+      // unobserved, so the collection builds no add/remove/rekey records for
+      // this relationship, only the `reorder` it reads.
+      release = activateEntityMembership(node)?.subscribeOrder(({ after }) => {
         if (disposed) return;
         const inspection = isInspectionWrite(getActiveWriteContext());
-        let advanced = false;
-        for (const change of changes) {
-          if (change.kind !== 'reorder') continue;
-          if (projection.reorder(change.after, inspection)) advanced = true;
-        }
-        if (!advanced) return;
+        if (!projection.reorder(after, inspection)) return;
         if (address) advanceEligible(address, { all: projection.value() });
         // No link-state publication here: this runs inside the entity write,
         // and the flush that follows publishes when it schedules the send.
