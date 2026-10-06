@@ -2573,3 +2573,371 @@ v15 transaction stream owns `restoration.ts` and `transactions.ts` there.
    branch keys" family. Slice 8d.
 5. **The installer skips any traversable non-managed child** (review minor),
    not only collections and markers.
+
+## Slice 8d: absent paths, omitted collections, counted guards
+
+Committed on `integrate/v16-slice8d` from `b8498ad3` (slice 8c merged):
+- `c0be453f`: item (a), reads and writes under an omitted member;
+- `ef1631b0`: item (c), counted work instead of wall-clock bounds;
+- `352fac93`: item (a) review follow-up;
+- `370d2f48`: item (b), reversing a designated omission of an entity
+  collection;
+- `eb259b3a`: item (c) review follow-up (more iteration primitives counted);
+- `29cc810b`: item (b) review follow-up (collections hidden inside a
+  re-added branch; the rollback-side check);
+- `19ed5156`: a type fix to `29cc810b`;
+- this record.
+
+Evidence (design note, probes, first reds, mutation logs, verification,
+size attribution and the three review passes) is in
+`/Users/jonathanborgia/code/signaltree/.claude/evidence/v16/slice8d/`. The
+slice 8, 8b and 8c evidence cited in earlier entries was copied beside it
+into `.claude/evidence/v16/` before the tmp cleaner removes
+`/private/tmp/st-v16-integration-evidence/`.
+
+### Item (a): writes and reads under an omitted member
+
+Owner decision: reactivate along the path, leaving sibling members absent.
+The design note (`DESIGN-NOTE.md`) was written before implementation and
+lists every read and write path; its appended sections record what changed
+during implementation and after review, and why.
+
+**Baseline on `b8498ad3` (`probe1.txt`, `probe2.txt`):**
+- Under an omitted `a`, held and detached handles read retained storage
+  (`a.b()`, `a.b.value()`, `a.side()`), and `a.b.keep(9)` went to hidden
+  storage; `tree.$()` stayed `{ count: 0 }`.
+- Undo of that write re-added `a` through the 8b/8c path, as if an ordinary
+  omission had hidden it.
+- A held consumer of an omitted branch kept its value: a held
+  `computed(() => box.drop())` stayed `{ v: 2 }` after `box({ keep })`, and a
+  held `a()` kept the whole branch after `a` was omitted.
+- A write re-adding a directly omitted leaf (`user.age(50)`) was recorded
+  without its membership, so undo and rollback left `age` present with
+  `undefined`.
+
+**What changed:**
+- **One liveness authority, along the path.** Omitting a member links it and
+  every state location below it to its parent, once (`linkDescendants`).
+  `isAbsentMember` follows the links; enumerability still answers. Leaf reads
+  (kernel and native runtimes, so every adapter), branch reads, `peek`,
+  updaters and the whole-value equal-value skip use it. A node never under an
+  omitted member pays one symbol lookup, as before.
+- **Writes re-add the path** (`reactivatePathOnWrite`): every omitted member
+  on the path comes back with only the written path; members off the path
+  are made dormant first, so retained storage supplies nothing. The result
+  is what a whole value holding only that path at the outermost omitted
+  member would give. Leaf set and updater, branch set and updater,
+  `updateAndReport` (review follow-up) and dynamic members are covered.
+- **Recorded like a whole value.** Each level's membership change is
+  announced after the value write, innermost first. Undo, redo, jumpTo and
+  rollback therefore make the path absent again, and the direct-leaf defect
+  above is fixed.
+- **Held consumers.** Omitting or re-adding a branch member republishes every
+  present location below it, for whole-value writes and for reversals; an
+  absent branch read depends on its membership revision.
+- **Structural scope.** A whole value reconciles and announces membership
+  itself, so a leaf it writes keeps the old silent own-member reactivation.
+- **Found while fixing `updateAndReport` (pre-existing):** a whole value that
+  supplies an omitted key as `undefined` re-added it with its retained value
+  (`probe5.txt`: `$({ a: undefined, count: 0 })` gave `a: { v: 1 }`).
+  Reconciliation now re-adds only keys whose supplied value was installed.
+
+**Not covered: entity collections under an omitted member.** The collection
+is absent from the tree's value, but its own methods still read and write its
+retained rows, and such a write does not re-add the path. Which value an
+absent collection's `all()`, `count()` and `byId()` return, and whether its
+writes re-add the path or refuse, is an owner decision. README and
+CHANGELOG say so (the first review found they had overclaimed).
+
+### Item (b): undo of a designated omission of an entity collection
+
+**Baseline (`probe3.txt`).** A whole value that leaves out a collection key
+omits it. The membership change was observed but dropped when lowered to
+effects (collections were not "accessor or writable location"), so undo,
+redo, jumpTo and rollback reported success and left it omitted, in every
+enhancer order.
+
+**What changed.** A collection member is now recorded: its presence change
+is an effect, its location is registered, a dormant collection being
+re-added is captured, and a reversal installs its presence. Its rows are its
+own retained state, restored by its own effects.
+
+**Restored fully or refused.** When a collection is hidden, omitted itself
+or with a branch around it, its rows are remembered from its physical truth
+(`readSource`, not the snapshot, which a reversal reads stale: measured,
+`probe6.txt`). They are remembered again when a reversal hides it or a
+rollback compensates its rows while hidden. A reversal that makes it current
+again, by re-adding it, a branch around it, or (8c planning) an outer member
+for an earlier turn, while rows the reversal does not write itself have
+changed, refuses with a typed restoration refusal ("Unsupported scoped undo
+effect at 'g.rows': the entity collection was omitted and changed after
+that, so re-adding it would not restore it as it was. Nothing was changed;
+the history position is unmoved."), reported as `refused` by the restoration
+reader. Rollback refuses the same case with `SignalTreeRollbackError`
+(`effect-validation-failed`) and the same sentence. A reversal's own row
+writes are excluded: an operation that omitted the collection and wrote a
+row through a held handle is reversed exactly.
+
+The first version (`370d2f48`) checked only a collection that was itself the
+omitted member, and on the rollback side relied on the newest-first rule.
+The second review pass showed both gaps with plain writes through a held
+handle (below), and the fix covers them.
+
+### Item (c): counted work instead of wall-clock bounds
+
+- `entity-granular-reactivity`, "a single-entity update does not rebuild the
+  collection": the 0.05 ms per-update bound becomes counted work. The same
+  200 updates must visit exactly as many elements at 20,000 rows as at 2,000
+  (counter below), with a control that the counter sees a copy.
+- `production-scalar-substrate`, "Timing guard" (median time at 100,000
+  positions within 40x of 10; it timed out under load) becomes a counted
+  "Scale guard": each compiled read, write and frame does identical substrate
+  work and iterates identical elements at every size. The opt-in timing
+  report is unchanged.
+
+The counter sees Map and Set iteration, `Array.from`, `Object.keys`,
+`values` and `entries`, and the Array methods that build, search or walk
+arrays (searches counted at full length). It does not see an indexed loop
+that builds nothing. Every O(size) regression the mutations reintroduced (a
+map, a spread, a slice, a filter, an `indexOf`, an `Object.keys`) was
+caught. The helper is duplicated in the two specs (review: minor, style).
+
+### Item (d): `getRestorationHistory()` scaling, measured, left for the performance pass
+
+Materializing the history of one very large clear (8c `probe2.txt`, copied
+to `.claude/evidence/v16/slice8c/`):
+
+| Rows | `getRestorationHistory()` |
+| --- | --- |
+| 16,000 | 0.56 s |
+| 32,000 | 0.83 s |
+| 64,000 | 3.4 s |
+| 130,000 | 20.6 s |
+
+Doubling from 64k to 130k costs about 6x, so the growth is worse than
+linear. Not changed in this slice.
+
+### First red (`first-red/`)
+
+| Carrier | Red against |
+| --- | --- |
+| kernel `absent-path-write` (41 at the time) | all 41 on `b8498ad3` source |
+| angular, vue, solid, react `absent-path-write` | 6 of 6 each on `b8498ad3` source |
+| kernel `designated-collection-omission` (27 at the time) | all 27 on `352fac93` source |
+| angular, vue, solid, react `designated-collection-omission` | 6 of 6 each on `352fac93` source |
+| own-row cases in `designated-collection-omission` | 6 false refusals of the first (b) design (`b-own-rows-red.log`) |
+| hidden-in-a-branch cases (review 2) | 9 of 9 on `370d2f48` (`b-review2-red.log`) |
+
+The item (a) review follow-up's cases are pinned by mutations R1–R7 instead:
+putting `c0be453f`'s `signal-tree.ts` back failed all 60 cases, because it
+no longer matches the follow-up's `member-membership.ts` exports, which is
+not a discriminating red.
+
+### Mutations (each restored by content hash; logs `mutations/`)
+
+Counts are killed cases.
+
+| Mutation | Killed |
+| --- | --- |
+| A1 liveness is own-only | 47 |
+| A2 no subtree links on omission | 58 |
+| A3 no sibling deactivation on re-add | 48 |
+| A4 no membership announcement on re-add | 58 |
+| A5 announce only the outermost level | 4 |
+| A6 activate only the outermost omitted member | 1 |
+| A7 no subtree republish on a path write | 21 |
+| A8 republish a re-added leaf too (double publication) | 13 |
+| A9 structural writes re-add and announce too | 3 |
+| A10 / A25 an added member (or its subtree) is not linked | 1 / 1 |
+| A11 re-add announced before the value | 1 |
+| A12 native leaf read own-only | 24 |
+| A13 native replace does not announce | 12 |
+| A14 native updater gets retained storage | 3 (0 before a bare-tree case was added) |
+| A15 absent branch read without a membership edge | 5 |
+| A16 branch read never absent via the path | 36 |
+| A17 branch write never re-adds | 24 |
+| A18 absent branch updater gets retained storage | 2 |
+| A19 equal-value skip ignores absence | 1 |
+| A20 whole-value change: no subtree republish | 27 |
+| A21 whole-value change: branch revisions not bumped | 14 |
+| A22 reversal-installed members: no subtree republish | 17 (0 before the designated-omission cases were added) |
+| R1–R7 review follow-up (partial re-add, its announcement, its report, branch updater in a whole value, installed-only re-add in partial and whole values, re-entrant announcement) | 4, 3, 1, 1, 1, 1, 1 |
+| B1 a collection member is not lowered to an effect | 66 |
+| B2 a dormant collection being re-added is not captured | 3 |
+| B3 a collection is not a member address | 36 |
+| B4 restoration does not refuse a changed hidden collection | 21 |
+| B5 rollback does not refuse a changed hidden collection | 3 (0 at `370d2f48`, where only the newest-first rule was exercised) |
+| B6 rollback does not refresh compensated rows | 4 |
+| B7 an observed omission does not remember hidden rows | 24 |
+| B8 a reversal that hides a member does not remember its rows | 3 |
+| B9 rows compared by snapshot, not physical truth | 56 |
+| B10 / B11 a reversal's own row writes count as a change (restoration / rollback) | 9 / 6 |
+| B12 collections below a re-added branch are neither checked nor remembered | 9 |
+| B13 the 8c earlier-turn re-add is not checked | 3 |
+| B14 refresh ignores a collection hidden by its branch | 4 |
+| C1–C6 an O(size) map, spread, slice, filter, `indexOf` or `Object.keys` in `updateOne`, a compiled read or a compiled write | 1 each |
+
+A23 and A24 mutated `realizePlainBranchMember`, which the note's M3 had
+changed; they survived because that function's membership branch is
+unreachable (`applyAtomically` sends every membership effect to
+`preparePlainBranchMembers`; `applyEffect` gets value effects only). M3 was
+reverted and they are void.
+
+### Results
+
+Verification at `19ed5156` (`verify/run3/`), all exit 0 unless noted:
+- **Full kernel:** 395 files, 4550 passed, 6 expected failures, 13 skipped.
+  At `b8498ad3` it was 393 / 4425: +2 files and +125 cases, the two
+  carriers (`absent-path-write` 63, `designated-collection-omission` 62).
+- **Frameworks:** angular 204 (+3 skipped), react 43, vue 95, solid 64: the
+  two carriers per adapter (+17 each; react +14, no bare-tree updater case).
+- **Static gates, build and consumers:** `pnpm typecheck`;
+  `check-spec-types` (the three pre-existing improvements; baseline not
+  ratcheted); lint on all five projects (8 pre-existing warnings, 0 errors);
+  kernel-neutrality; source-controls; `api-inventory --check`;
+  callable-inventory; the five-package build; the consumer typecheck
+  (bundler and node16).
+- **Doc gates:** doc-links, documented-examples, documented-imports and
+  documented-symbols.
+- **Bundle budget:** `check-bundle-budget` exits 1. Both scenarios were
+  already over; item (a) adds to both, because the path liveness and re-add
+  are core semantics and ship in the bare kernel.
+
+`verify/run2/` at `29cc810b` failed `pnpm typecheck`, `check-spec-types`
+and the Vue and Solid pre-test `tsc` on one cast (TS2352) in
+`plain-branch-membership.ts`; `19ed5156` fixes it. Vitest does not
+typecheck, so the earlier spec runs had passed.
+
+Size (`size/`: esbuild attribution over the built dist, prod, with the
+package's `sideEffects`; `final2-vs-base.txt`; base is 8c's `da273b12`
+build, code-identical to `b8498ad3`):
+
+| Scenario | `b8498ad3` | `19ed5156` | Delta |
+| --- | --- | --- | --- |
+| bare | 10.39 KB gzip | 11.04 KB | +660 B gzip, +1,871 B min (`member-membership.js` +910, `signal-tree.js` +751, `tree-scalar-leaf-runtime.js` +169) |
+| entities | 23.59 KB | 24.25 KB | +681 B gzip, +1,887 B min (same modules) |
+| transactions | 36.43 KB | 37.79 KB | +1,392 B gzip, +4,025 B min (also `plain-branch-membership.js` +1,453, `transactions.js` +662) |
+| restoration | 36.96 KB | 38.07 KB | +1,140 B gzip, +3,403 B min (also `plain-branch-membership.js` +978, `restoration.js` +515) |
+| link | 16.77 KB | 17.57 KB | +826 B gzip |
+| full | 66.34 KB | 67.72 KB | +1,411 B gzip, +4,376 B min |
+
+`check-bundle-budget` before and after: bare 10.39 → 11.04 KB prod against
+10.25 (dev 12.60 → 13.26 against 12.45); entities 23.59 → 24.25 KB prod
+against 22.6 (dev 26.23 → 26.91 against 25.25). Items (b) and (c) add
+nothing to bare or entities.
+
+### Independent review
+
+One read-only code-reviewer agent, given the raw diffs, the coordinator's
+items verbatim, the design note and the mutation logs, without this record.
+It probed only in its own exports (`/private/tmp/st-v16-slice8d-review-1..3`).
+
+**`c0be453f` (item a): needs fixes.** Fixed in `352fac93`:
+- **Major: `updateAndReport` still lost a write under an omitted member**
+  (partial outer level, never re-added). A path the design note missed (W4).
+- **Major: the README and CHANGELOG overclaimed** for entity collections
+  under an omitted member. Now stated as not covered.
+- **Minor:** a re-entrant write to the same leaf could drop the outer
+  re-add's announcement; a branch updater inside a whole value received
+  retained storage; the structural scope allocated a closure per level.
+- **Info:** A23 and A24 were void (they targeted reverted code).
+
+**`352fac93`: clean.** It also accepted the pre-existing `$({ a: undefined })`
+fix as matching case 18.
+
+**`ef1631b0` (item c): clean, with a coverage Minor**: searches
+(`indexOf`, `find`, ...) and `Object.keys` were not counted. Fixed in
+`eb259b3a` and pinned by mutations C5 and C6.
+
+**`370d2f48` (item b): needs fixes.** Fixed in `29cc810b`:
+- **Major: a collection hidden inside an omitted branch** came back with a
+  row a plain write had added while hidden, when undo re-added the branch.
+- **Major: rollback** re-added a changed collection after a plain write (no
+  later turn, so the newest-first rule did not refuse), contradicting the
+  commit message.
+- **Minor:** the snapshot-versus-physical-truth mutation had not been run.
+
+**`eb259b3a` and `29cc810b`: clean.** The reviewer re-ran its probes two
+levels down and in all orders, and tried to provoke false refusals (an
+off-path sibling from an 8d(a) re-add, recorded hidden row writes, repeated
+omission with rows changed while present, jumps across omissions,
+sequential and out-of-order rollbacks). It found none. `19ed5156` (the
+type fix) was not reviewed; it is a cast.
+
+The reviewer's remaining info notes: the iteration counter still ignores
+indexed loops and `flatMap`, `reduceRight`, `structuredClone` and
+`JSON.stringify`; external omission of a collection was not probed.
+
+### User-visible behaviour changes in v16 (slice 8d)
+
+1. **Absent reads absent.** A location under an omitted member reads
+   `undefined` through any handle, held consumers follow omission and
+   re-add, and updaters there receive `undefined`.
+2. **Writing it re-adds its path.** Only the written path comes back; the
+   omitted member's other members stay absent. Undo, redo, jumpTo and
+   rollback of the write make it absent again. `updateAndReport()` behaves
+   the same and reports the re-added leaves.
+3. **A re-added omitted leaf is undone to absent**, not to present
+   `undefined`.
+4. **`undefined` does not bring a member back.** A whole value supplying an
+   omitted key as `undefined` leaves it absent.
+5. **An omitted entity collection is restored by reversal**, itself or
+   inside a branch the reversal re-adds, or the reversal refuses, names it
+   and changes nothing.
+6. **Entity collections under an omitted member are not covered yet**
+   (documented).
+
+### v15 applicability (source reading only, not run)
+
+Read from exports of `v15.4.3` (`/private/tmp/st-v16-slice8d-v15-export-1`)
+and of the newest v15 work branch tip, `fix/v15-entity-review` at `85db805e`
+(`-export-2`).
+
+- **(a) applies.** `member-membership.ts` is byte-identical to `b8498ad3`, and
+  `tree-scalar-leaf-runtime.ts` and `snapshot-authority.ts` are identical.
+  Both v15 trees read and write through `isDormantMember` /
+  `reactivateOnWrite` (own member only) in both leaf runtimes, read the
+  branch at `isDormantMember(self.accessor)`, hand a branch updater
+  `unwrap(store)`, skip equal values on `!isDormantMember`, republish only
+  direct members, and return from a partial `recursiveUpdate`
+  (`updateAndReport`) without re-adding. The `$({ a: undefined })` re-add
+  with retained storage applies too (reconciliation activates every supplied
+  dormant key).
+- **(b) applies.** v15's `plainBranchMembershipEffects` drops any member that
+  is not an accessor or writable location, so a collection's omission is
+  never recorded, and its capture skips non-callable dormant members.
+
+### Port notes for v15 (8d)
+
+- **(a)** ports almost mechanically: `member-membership.ts` (links,
+  `isAbsentMember`, `reactivatePathOnWrite`, structural scope, republish
+  port), `tree-scalar-leaf-runtime.ts`, `snapshot-authority.ts`
+  (`observeMembership`), `materialize-markers.ts`, and `signal-tree.ts`
+  (R3, W3, R4, republish subtree, partial re-add, installed-only re-add).
+  v15's `native-tree-scalar-leaf-runtime.ts` lacks v16's dormant-observer
+  forcing in `replace` and `derive`; port those lines with the 8d change.
+  `plain-branch-membership.ts`: only the subtree republish in
+  `preparePlainBranchMembers` publish.
+- **(b)** needs the lowering, capture and member-address changes in
+  `plain-branch-membership.ts`, the remembered rows (for every collection a
+  member's omission hides), and the refusal in restoration's reversal
+  planning. v15 has no 8b/8c hidden-location block; put the check before
+  `externalConflict` in `applyTurnEffectsThroughRealizationPort`, for
+  re-adding membership effects only (there is no 8c outer re-add to check).
+  In transactions, the check goes at the top of `applyRollbackCompensation`
+  (its effects are the forward ones: a re-add is before true, after false),
+  and the refresh after compensation succeeds.
+- **Specs:** the five `absent-path-write` and five
+  `designated-collection-omission` carriers, with `.transact(` →
+  `.transaction(` and v15's refusal kind names.
+
+### Open items
+
+1. **Entity collections under an omitted member** (above): owner decision on
+   absent reads and on writes.
+2. **`getRestorationHistory()` scaling** (item (d)): performance pass.
+3. **Dead code:** `realizePlainBranchMember` and `applyEffect`'s membership
+   branch are unreachable.
+4. **External omission of an entity collection** was not probed by the
+   reviewer; the existing ST1034 external-truth handling applies to its
+   membership effect as to any member's, but no carrier pins it.
