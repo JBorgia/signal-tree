@@ -534,6 +534,10 @@ describe('a row-adding write with invalid input changes nothing (v16 8e review)'
     ['prependMany', (rows) => rows.prependMany([Z, invalid])],
     ['upsertMany', (rows) => rows.upsertMany([Z, invalid])],
     ['setAll', (rows) => rows.setAll([Z, invalid])],
+    // A strict duplicate within the call (v15 port review, item 2): it threw
+    // after the retained rows were removed, and recorded that removal.
+    ['addMany, a duplicate id', (rows) => rows.addMany([Z, Z])],
+    ['prependMany, a duplicate id', (rows) => rows.prependMany([Z, Z])],
   ];
   for (const [name, write] of writes)
     it(name, async () => {
@@ -550,6 +554,31 @@ describe('a row-adding write with invalid input changes nothing (v16 8e review)'
       expect(stored(rows)).toEqual([A, B]);
       expect(tree.getCurrentIndex()).toBe(index);
     });
+});
+
+describe('a row-adding write whose duplicates its mode accepts re-adds the path', () => {
+  // As on an empty collection: skip keeps the first copy, overwrite the last.
+  const cases: Array<[string, 'skip' | 'overwrite', Row]> = [
+    ['skip', 'skip', Z],
+    ['overwrite', 'overwrite', { id: 'z', n: 1 }],
+  ];
+  for (const [name, mode, kept] of cases)
+    for (const method of ['addMany', 'prependMany'] as const)
+      it(`${method}, mode ${name}`, async () => {
+        const tree = build([restoration()]);
+        const rows = tree.$.a.rows;
+        await flush();
+        omit(tree);
+        await flush();
+        const add = rows[method] as (
+          rows: Row[],
+          opts: { mode: 'skip' | 'overwrite' }
+        ) => string[];
+        expect(add([Z, { id: 'z', n: 1 }], { mode })).toEqual(['z']);
+        await flush();
+        expect(rows.all()).toEqual([kept]);
+        expect(stored(rows)).toEqual([kept]);
+      });
 });
 
 describe('a re-adding write an interceptor blocks (v16 8e review, documented edge)', () => {
