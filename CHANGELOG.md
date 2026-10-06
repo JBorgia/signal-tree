@@ -12,8 +12,16 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
 - After a rejection, no `undo()`, `redo()` or `jumpTo()` reinstates a value or
   row that only the rejected transaction wrote: undo of a later write restores
   what was there before the transaction. This replaces the known limitation
-  listed under 15.4.2/15.4.3. `getRestorationHistory()` no longer throws after
-  rejecting an undoable transaction that added a row.
+  listed under 15.4.2/15.4.3. It covers every pre-image a later record holds:
+  a field's previous value, the snapshot of a row a later write removed (field
+  by field, so an edit, an added field or a dropped field of the rejected
+  transaction does not come back), the key of a row it renamed, and the place
+  of a row anchored next to one only it created. Addresses are exact (the
+  literal key `'d.e'` is not the nested `d.e`), a history reset while the
+  transaction is pending does not forget it, and a later entry left with
+  nothing to undo is dropped rather than kept as a no-op step.
+  `getRestorationHistory()` no longer throws after rejecting an undoable
+  transaction that added a row, or one a later write appended next to.
 - Undo of `updateOne` followed by `clear()` (and other writes followed by
   removals of the same rows) restores the original order.
 - Undo of `changeId` → `updateOne` → `removeOne` no longer refuses.
@@ -39,6 +47,10 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   earlier transaction's rollback could reverse through it).
 - `getCurrentIndex()` follows `undo()` and `redo()` (it moved only on
   `jumpTo()` and history changes). Steps back are `getCurrentIndex() + 1`.
+  It is the latest applied entry after every change, including a transaction
+  confirmed after a later write was undone and an undo that fails after
+  leaving a `jumpTo()` view, and it changes together with `canUndo()` and
+  `canRedo()` for synchronous watchers.
 - Still refused, an open design question rather than a decision: a collection
   order change (`setAll` reordering survivors, `prependMany` moving an
   overwritten row) combined with another add or remove of the same collection,
