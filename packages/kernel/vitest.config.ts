@@ -66,6 +66,7 @@ export default defineConfig({
       '**/diag-journal-1-eviction.spec.ts',
       '**/a2-5-lifetime.spec.ts',
       '**/location-runtime-retention.spec.ts',
+      '**/entity-add-effect-retention.spec.ts',
     ],
     coverage: {
       provider: 'v8',

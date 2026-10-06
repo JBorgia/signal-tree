@@ -1163,9 +1163,6 @@ export function createEntitySignal<
    * prepending does not invalidate any row's consumers. The derived collection
    * signals pick the new order up from the version bump.
    */
-  /** addMany's fresh-row effects, for prependMany to re-anchor at the front. */
-  let appendedAdds: PendingAddStructuralEffect[] = [];
-
   /** Whether an order delta has a consumer (a history or transaction capture). */
   // publishCollectionOrder() returns at once while no capture is active, so
   // skip the O(n) order comparison callers would hand it (123fd318).
@@ -1636,15 +1633,6 @@ export function createEntitySignal<
     };
   }
 
-  function rewritePendingAddEffect(
-    effect: PendingAddStructuralEffect,
-    beforeSubject?: number,
-    afterSubject?: number
-  ): void {
-    effect.beforeSubject = beforeSubject;
-    effect.afterSubject = afterSubject;
-  }
-
   function assertSynchronousInterceptorFunction(
     handler: unknown,
     hookName: string
@@ -1772,10 +1760,7 @@ export function createEntitySignal<
     return transformedChanges;
   }
 
-  function addOneWithStructuralEffect(
-    entity: E,
-    opts?: AddOptions<E, K>
-  ): { id: K; structuralEffect: PendingAddStructuralEffect | undefined } {
+  function addOneRow(entity: E, opts?: AddOptions<E, K>): K {
     const id = deriveId(entity, opts);
     const previousLastKey = structuralStore.lastActiveKey();
     recordProductionSubstrateStat('publicAddPreviousTailReads');
@@ -1835,7 +1820,208 @@ export function createEntitySignal<
       handler.onAdd?.(transformedEntity, id);
     }
 
-    return { id, structuralEffect };
+    return id;
+  }
+
+  /**
+   * `addMany`, and with `front` `prependMany`: the rows are committed, moved to
+   * the front, and only then announced and tapped. A fresh row's `add` effect
+   * is anchored to its neighbours in that committed order, so a tap — and any
+   * write it makes — sees the call's result, never rows about to move. Before
+   * 15.4.4 the move came after the taps, and the effects were re-anchored from a
+   * closure array that only `prependMany` emptied: every observed `addMany`
+   * retained one deep clone per added row, and a nested `prependMany` in a tap
+   * emptied the outer call's list (its redo threw).
+   */
+  function addRows(
+    entities: E[],
+    opts: AddManyOptions<E, K> | undefined,
+    front?: boolean
+  ): K[] {
+    const mode = opts?.mode ?? 'strict';
+    // addMany appends: an added row's predecessor is the previous added row,
+    // or for the first one the last row before the call. Only that key is
+    // needed, not a copy of every key.
+    const lastPreviousKey = structuralStore.lastActiveKey();
+
+    // First pass: validate/filter based on mode. The rows apply as if one
+    // at a time, so an earlier copy of an id in this call counts as
+    // existing: strict throws (before anything is written), skip keeps the
+    // first copy, overwrite keeps the last in the first copy's place. Two
+    // rows under one key was the 15.4.3 result in every mode.
+    const toProcess: Array<{
+      entity: E;
+      id: K;
+      existingSubjectId?: number;
+    }> = [];
+    const earlier = new Map<K, (typeof toProcess)[number]>();
+    for (const entity of entities) {
+      const id = deriveId(entity, opts);
+      const existingSubjectId = structuralStore.subjectIdForKey(id);
+      const copy = earlier.get(id);
+      if (existingSubjectId !== undefined || copy) {
+        if (mode === 'strict') {
+          throw new Error(`Entity with id ${String(id)} already exists`);
+        } else if (mode === 'skip') {
+          continue;
+        }
+        // 'overwrite': fall through — the projection helper below replaces the existing entry
+        if (copy) {
+          copy.entity = entity;
+          continue;
+        }
+      }
+      const processed = { entity, id, existingSubjectId };
+      earlier.set(id, processed);
+      toProcess.push(processed);
+    }
+
+    if (toProcess.length === 0) return [];
+
+    // Stage all add work before mutating runtime state so a later failure
+    // cannot partially allocate fresh subject lifetimes.
+    const stagedAdds = toProcess.map(({ entity, id, existingSubjectId }) => ({
+      id,
+      entity: interceptAddedEntity(entity),
+      existingSubjectId,
+    }));
+    const plannedFreshSubjectIds = structuralStore.planFreshSubjectIds(
+      stagedAdds.filter(
+        ({ existingSubjectId }) => existingSubjectId === undefined
+      ).length
+    );
+    let plannedFreshIndex = 0;
+    const preparedAdds = stagedAdds.map(
+      ({ id, entity, existingSubjectId }) => ({
+        id,
+        entity,
+        existingSubjectId,
+        subjectId:
+          existingSubjectId ?? plannedFreshSubjectIds[plannedFreshIndex++],
+        // The value an overwrite replaces in place, announced below as the
+        // previous value. Defined exactly for an overwritten row: an active
+        // row always has a value.
+        prev:
+          existingSubjectId === undefined
+            ? undefined
+            : valueStore.backingForSubject(existingSubjectId),
+      })
+    );
+
+    // prependMany: an OVERWRITTEN row that moves to the front is an order
+    // change no anchor expresses, published as one order delta under setAll's
+    // condition (surviving rows changed relative order). Unrecorded, it stayed
+    // at the front on undo and rollback (15.4.3).
+    const beforeSubjects: number[] = [];
+    const beforeFrontier = structuralStore.activeOrderFrontier();
+    const consumed = front && orderConsumed();
+    if (consumed) structuralStore.snapshotActiveOrder([], beforeSubjects);
+
+    const frame = createEntityMutationFrame();
+    for (const {
+      id,
+      entity: transformedEntity,
+      existingSubjectId,
+      subjectId,
+    } of preparedAdds) {
+      if (existingSubjectId === undefined) {
+        frame.stageFreshSubject({
+          kind: 'create-fresh-subject',
+          key: id,
+          subjectId,
+          nextValue: transformedEntity,
+        });
+        continue;
+      }
+
+      frame.stageValueReplacement({
+        kind: 'replace-value',
+        key: id,
+        subjectId: existingSubjectId,
+        nextValue: transformedEntity,
+      });
+    }
+
+    commitAndProjectEntityMutationFrame(frame);
+
+    // Process all entities without triggering per-entity signal updates.
+    // Ids are unique by now, so each prepared add carries its own subject.
+    const processedIds: K[] = [];
+    const subjectIdsForWrite: number[] = [];
+    for (const { id, subjectId } of preparedAdds) {
+      invalidateNodeCache(id);
+      syncEntitySignal(id);
+      processedIds.push(id);
+      subjectIdsForWrite.push(subjectId);
+    }
+
+    if (front) {
+      moveToFront(processedIds);
+      if (consumed) {
+        const afterSubjects: number[] = [];
+        structuralStore.snapshotActiveOrder([], afterSubjects);
+        if (survivingOrderChanged(beforeSubjects, afterSubjects)) {
+          publishOrderChange(beforeSubjects, afterSubjects, beforeFrontier);
+        }
+      }
+    } else {
+      // Single signal update after all entities are processed
+      updateSignals();
+    }
+    lastSubjectIds = subjectIdsForWrite;
+
+    // Notify PathNotifier for each processed entity.
+    //
+    // An 'overwrite' replaces an existing row in place (`replace-value`
+    // above), so it is announced as every other replacement is — the new
+    // value with the previous one and no structural effect. Announced as an
+    // `add`, undo and rollback removed the row (npm 15.4.3).
+    //
+    // Reproduced on 15.3.1: indexing the pre-add key list at
+    // `i + previous - added` anchored [x, y] after k4 and k5 instead of
+    // after k5 and x, so redo reinserted them out of order. A fresh row's
+    // predecessor is the previous FRESH row of this call, else the last row
+    // before it: an overwritten row stays where it was. A prepended row's
+    // anchors are its neighbours at the front.
+    if (pathObserved()) {
+      const meta = ambientMeta();
+      let beforeSubject =
+        lastPreviousKey === undefined
+          ? undefined
+          : allocateSubjectId(lastPreviousKey);
+      for (const { id, entity, prev, subjectId } of preparedAdds) {
+        const effect: PendingAddStructuralEffect | undefined =
+          prev === undefined
+            ? {
+                kind: 'add',
+                subject: subjectId,
+                key: id,
+                value: deepClone(entity),
+                beforeSubject,
+                ...(front && getNeighborSubjects(id)),
+              }
+            : undefined;
+        pathNotifier.notify(
+          `${basePath}.${String(id)}`,
+          entity,
+          prev,
+          basePath,
+          [subjectId],
+          getPositionIdsForNotify(),
+          effect ? effectMeta(meta, effect) : meta
+        );
+        if (effect) beforeSubject = subjectId;
+      }
+    }
+
+    // Run tap handlers for each processed entity
+    for (const { id, entity } of preparedAdds) {
+      for (const handler of tapHandlers) {
+        handler.onAdd?.(entity, id);
+      }
+    }
+
+    return processedIds;
   }
 
   /**
@@ -2607,75 +2793,26 @@ export function createEntitySignal<
     // ==================
 
     addOne(entity: E, opts?: AddOptions<E, K>): K {
-      return addOneWithStructuralEffect(entity, opts).id;
+      return addOneRow(entity, opts);
     },
 
     /**
-     * Insert at the FRONT, reusing `addOne` and then moving the entry.
+     * Insert at the FRONT: `prependMany` of one row, so duplicate detection,
+     * interceptors, notifier and taps stay on exactly one path.
      *
-        if (structuralStore.hasActiveKey(id)) {
-     * so the entry order is rebuilt — O(n) in the number of entities. That is
+     * Moving the entry rebuilds the order — O(n) in the number of entities, and
      * still markedly cheaper than the `setAll([entity, ...existing])` this
-     * replaces, which rebuilds the storage map AND resets every per-entity
-     * signal: only the newcomer's signal changes here, so held nodes survive and
-     * no unrelated row's consumers are invalidated.
-     *
-     * Reusing `addOne` rather than duplicating it keeps duplicate-detection,
-     * interceptors, notifier and tap handlers on exactly one path.
+     * replaces: only the newcomer's signal changes, so held nodes survive and no
+     * unrelated row's consumers are invalidated.
      */
     prependOne(entity: E, opts?: AddOptions<E, K>): K {
-      return withMembershipGroup(() => {
-      const previousFirstKey = structuralStore.firstActiveKey();
-      const { id, structuralEffect } = addOneWithStructuralEffect(entity, opts);
-      moveToFront([id]);
-      if (structuralEffect) {
-        rewritePendingAddEffect(
-          structuralEffect,
-          undefined,
-          previousFirstKey === undefined
-            ? undefined
-            : allocateSubjectId(previousFirstKey)
-        );
-      }
-      return id;
-      });
+      return api.prependMany([entity], opts)[0];
     },
 
     prependMany(entities: E[], opts?: AddManyOptions<E, K>): K[] {
-      return withMembershipGroup(() => {
-      // The move to the front is an ORDER change addMany's anchors cannot
-      // express, so the call publishes it as one order delta. Unrecorded, redo
-      // re-appended the rows at the end and an overwritten row stayed at the
-      // front on undo and rollback (15.4.3).
-      const beforeSubjects: number[] = [];
-      const beforeFrontier = structuralStore.activeOrderFrontier();
-      const consumed = orderConsumed();
-      if (consumed) structuralStore.snapshotActiveOrder([], beforeSubjects);
-      appendedAdds = [];
-      const ids = api.addMany(entities, opts);
       // Front, in the order given — so `prependMany([a, b])` reads back as
       // [a, b, ...existing], which is what the call site looks like.
-      moveToFront(ids);
-      // addMany recorded its fresh rows with APPEND anchors, so redo
-      // re-appended them at the end (15.4.3). Their anchors are their final
-      // neighbours, as prependOne rewrites its own. An OVERWRITTEN row that
-      // moved is an order change no anchor expresses: published as an order
-      // delta, under setAll's condition (surviving rows changed order).
-      for (const effect of appendedAdds) {
-        const { beforeSubject, afterSubject } = getNeighborSubjects(
-          effect.key as K
-        );
-        rewritePendingAddEffect(effect, beforeSubject, afterSubject);
-      }
-      if (consumed) {
-        const afterSubjects: number[] = [];
-        structuralStore.snapshotActiveOrder([], afterSubjects);
-        if (survivingOrderChanged(beforeSubjects, afterSubjects)) {
-          publishOrderChange(beforeSubjects, afterSubjects, beforeFrontier);
-        }
-      }
-      return ids;
-      });
+      return withMembershipGroup(() => addRows(entities, opts, true));
     },
 
     /**
@@ -2699,171 +2836,7 @@ export function createEntitySignal<
     },
 
     addMany(entities: E[], opts?: AddManyOptions<E, K>): K[] {
-      const mode = opts?.mode ?? 'strict';
-      // addMany appends: an added row's predecessor is the previous added row,
-      // or for the first one the last row before the call. Only that key is
-      // needed, not a copy of every key.
-      const lastPreviousKey = structuralStore.lastActiveKey();
-
-      // First pass: validate/filter based on mode. The rows apply as if one
-      // at a time, so an earlier copy of an id in this call counts as
-      // existing: strict throws (before anything is written), skip keeps the
-      // first copy, overwrite keeps the last in the first copy's place. Two
-      // rows under one key was the 15.4.3 result in every mode.
-      const toProcess: Array<{
-        entity: E;
-        id: K;
-        existingSubjectId?: number;
-      }> = [];
-      const earlier = new Map<K, (typeof toProcess)[number]>();
-      for (const entity of entities) {
-        const id = deriveId(entity, opts);
-        const existingSubjectId = structuralStore.subjectIdForKey(id);
-        const copy = earlier.get(id);
-        if (existingSubjectId !== undefined || copy) {
-          if (mode === 'strict') {
-            throw new Error(`Entity with id ${String(id)} already exists`);
-          } else if (mode === 'skip') {
-            continue;
-          }
-          // 'overwrite': fall through — the projection helper below replaces the existing entry
-          if (copy) {
-            copy.entity = entity;
-            continue;
-          }
-        }
-        const processed = { entity, id, existingSubjectId };
-        earlier.set(id, processed);
-        toProcess.push(processed);
-      }
-
-      if (toProcess.length === 0) return [];
-
-      // Stage all add work before mutating runtime state so a later failure
-      // cannot partially allocate fresh subject lifetimes.
-      const stagedAdds = toProcess.map(({ entity, id, existingSubjectId }) => ({
-        id,
-        entity: interceptAddedEntity(entity),
-        existingSubjectId,
-      }));
-      const plannedFreshSubjectIds = structuralStore.planFreshSubjectIds(
-        stagedAdds.filter(
-          ({ existingSubjectId }) => existingSubjectId === undefined
-        ).length
-      );
-      let plannedFreshIndex = 0;
-      const preparedAdds = stagedAdds.map(
-        ({ id, entity, existingSubjectId }) => ({
-          id,
-          entity,
-          existingSubjectId,
-          subjectId:
-            existingSubjectId ?? plannedFreshSubjectIds[plannedFreshIndex++],
-          // The value an overwrite replaces in place, announced below as the
-          // previous value. Defined exactly for an overwritten row: an active
-          // row always has a value.
-          prev:
-            existingSubjectId === undefined
-              ? undefined
-              : valueStore.backingForSubject(existingSubjectId),
-        })
-      );
-
-      const frame = createEntityMutationFrame();
-      for (const {
-        id,
-        entity: transformedEntity,
-        existingSubjectId,
-        subjectId,
-      } of preparedAdds) {
-        if (existingSubjectId === undefined) {
-          frame.stageFreshSubject({
-            kind: 'create-fresh-subject',
-            key: id,
-            subjectId,
-            nextValue: transformedEntity,
-          });
-          continue;
-        }
-
-        frame.stageValueReplacement({
-          kind: 'replace-value',
-          key: id,
-          subjectId: existingSubjectId,
-          nextValue: transformedEntity,
-        });
-      }
-
-      commitAndProjectEntityMutationFrame(frame);
-
-      // Process all entities without triggering per-entity signal updates.
-      // Ids are unique by now, so each prepared add carries its own subject.
-      const processedIds: K[] = [];
-      const subjectIdsForWrite: number[] = [];
-      for (const { id, subjectId } of preparedAdds) {
-        invalidateNodeCache(id);
-        syncEntitySignal(id);
-        processedIds.push(id);
-        subjectIdsForWrite.push(subjectId);
-      }
-
-      // Single signal update after all entities are processed
-      updateSignals();
-      lastSubjectIds = subjectIdsForWrite;
-
-      // Notify PathNotifier for each processed entity.
-      //
-      // An 'overwrite' replaces an existing row in place (`replace-value`
-      // above), so it is announced as every other replacement is — the new
-      // value with the previous one and no structural effect. Announced as an
-      // `add`, undo and rollback removed the row (npm 15.4.3).
-      //
-      // Reproduced on 15.3.1: indexing the pre-add key list at
-      // `i + previous - added` anchored [x, y] after k4 and k5 instead of
-      // after k5 and x, so redo reinserted them out of order. A fresh row's
-      // predecessor is the previous FRESH row of this call, else the last row
-      // before it: an overwritten row stays where it was.
-      if (pathObserved()) {
-        const meta = ambientMeta();
-        let beforeSubject =
-          lastPreviousKey === undefined
-            ? undefined
-            : allocateSubjectId(lastPreviousKey);
-        for (const { id, entity, prev, subjectId } of preparedAdds) {
-          const effect: PendingAddStructuralEffect | undefined =
-            prev === undefined
-              ? {
-                  kind: 'add',
-                  subject: subjectId,
-                  key: id,
-                  value: deepClone(entity),
-                  beforeSubject,
-                }
-              : undefined;
-          pathNotifier.notify(
-            `${basePath}.${String(id)}`,
-            entity,
-            prev,
-            basePath,
-            [subjectId],
-            getPositionIdsForNotify(),
-            effect ? effectMeta(meta, effect) : meta
-          );
-          if (effect) {
-            appendedAdds.push(effect);
-            beforeSubject = subjectId;
-          }
-        }
-      }
-
-      // Run tap handlers for each processed entity
-      for (const { id, entity } of preparedAdds) {
-        for (const handler of tapHandlers) {
-          handler.onAdd?.(entity, id);
-        }
-      }
-
-      return processedIds;
+      return addRows(entities, opts);
     },
 
     // ==================
