@@ -183,6 +183,18 @@ const shapes: Array<
       ],
     },
   ],
+  [
+    'two rejections; the first empties two consecutive later turns',
+    {
+      tx: [['add', 'r0']],
+      second: [['rm', 'a']],
+      later: [
+        [['shuffle', 'd,b,c,r0,a']],
+        [['shuffle', 'd,b,r0,c,a']],
+        [['shuffle', 'r0,d,b,a,c']],
+      ],
+    },
+  ],
 ];
 
 describe.each(Object.entries(configurations))(

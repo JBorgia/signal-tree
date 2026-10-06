@@ -1755,7 +1755,10 @@ class RestorationManager<T> {
       .filter((turn) => !dropped.includes(turn))
       .sort((left, right) => left.id - right.id);
     let bindings: Map<number, CollectionTransitionTargetBinding> | undefined;
-    for (const turn of dropped) {
+    // Latest first: consecutive dropped turns collapse into the chain one at
+    // a time (earliest first, the earlier one found neither a next record
+    // nor the live token, and the token stayed one link short).
+    for (const turn of [...dropped].sort((left, right) => right.id - left.id)) {
       const event = this.historicalEvents.find(
         (candidate) => candidate.boundaryTurnId === turn.id
       ) as
