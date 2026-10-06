@@ -50,8 +50,9 @@ let activeContext: WriteMetadata | undefined;
 
 /**
  * REPLAY WRITES (15.4.4). A replay of recorded state — undo, redo, jumpTo
- * (`origin: 'restoration'`), a rollback (`'transaction-rollback'`) — writes
- * back exactly what was recorded, so its OWN writes skip the entity
+ * (`origin: 'restoration'`), a rollback (`'transaction-rollback'`), a devtools
+ * jump to a recorded state (`withWriteContext(meta, fn, true)`) — writes back
+ * exactly what was recorded, so its OWN writes skip the entity
  * interceptors. A write a user callback makes while it runs (a tap, a
  * subscriber, an observer) inherits the replay's context but is new, forward
  * work, and must be intercepted (b6aec5a3 skipped it too).
@@ -67,18 +68,25 @@ let replayDepth = -1;
 
 /**
  * Run `fn` with `meta` set as the active write context. The previous context
- * (if any) is restored when `fn` returns or throws.
+ * (if any) is restored when `fn` returns or throws. `replays` marks a context
+ * that replays recorded state without a replay origin (devtools' jumps).
  *
  * Synchronous capture only — see module JSDoc for the `await` boundary trap.
  *
  * @returns The value returned by `fn`.
  */
-export function withWriteContext<R>(meta: WriteMetadata, fn: () => R): R {
+export function withWriteContext<R>(
+  meta: WriteMetadata,
+  fn: () => R,
+  replays = false
+): R {
   const previous = activeContext;
   const previousReplay = replayDepth;
   activeContext = meta;
   replayDepth =
-    meta.origin === 'restoration' || meta.origin === 'transaction-rollback'
+    replays ||
+    meta.origin === 'restoration' ||
+    meta.origin === 'transaction-rollback'
       ? userCallbacks
       : -1;
   try {

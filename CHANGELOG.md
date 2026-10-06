@@ -67,6 +67,10 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   throw, as on 15.4.3. Taps and subscribers are still notified.
   A write a tap or subscriber makes while the reversal runs is still
   intercepted.
+- Devtools jumps to a recorded state (`JUMP_TO_STATE`, `JUMP_TO_ACTION`,
+  `ROLLBACK`) are replays too and skip interceptors, so a blocking interceptor
+  no longer makes devtools time travel throw. `IMPORT_STATE` applies imported
+  input and still runs them.
 - Taps fire symmetrically for the changes a reversal applies: a row it brings
   back taps `onAdd` (15.4.3 tapped only the removals, and nothing at all when
   several rows were reversed together), one it takes away `onRemove`, one
