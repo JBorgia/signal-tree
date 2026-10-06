@@ -86,6 +86,17 @@ export type EntityTopology = {
   /** Is this subject currently present locally at all? */
   has(subject: number): boolean;
   /**
+   * Does this present subject have a known local position? False while an
+   * added subject is HELD for neighbours that have not arrived yet.
+   */
+  placed(subject: number): boolean;
+  /**
+   * Give every held subject a position now, as if its missing neighbours will
+   * never arrive. Call once the notifications of a delivery have all been
+   * observed. Returns true if anything was held.
+   */
+  settle(): boolean;
+  /**
    * Where would `subject` sit if every subject failing `isIncluded` were
    * projected away? Walks outward through CURRENT local order and returns the
    * nearest included neighbour on either side.
@@ -102,15 +113,100 @@ export type EntityTopology = {
   reload(seed: readonly EntityProjectionSeedEntry<Key, unknown>[]): void;
 };
 
+/**
+ * ⚠️ NEIGHBOURS NAME THE FINAL ORDER, NOT THE ARRIVAL ORDER (15.4.4).
+ *
+ * An add carries the neighbours its subject has once the WHOLE operation has
+ * applied: `setAll()` and every reversal describe each added row against the
+ * target order, and a reversal publishes restored rows in lifetime-id order.
+ * Restoring A and B at the head of ABCD therefore arrives as
+ * `add A pred=- succ=B` while B is still absent. Placing only beside a
+ * neighbour that is already present, and appending otherwise, sent CDAB to a
+ * Link endpoint while the tree held ABCD.
+ *
+ * So an add is placed by the first rule that applies:
+ *
+ *   predecessor present     after it
+ *   successor present       before it
+ *   no predecessor          at the head — nothing precedes it in its order
+ *   no successor            at the tail
+ *   otherwise               HELD until either neighbour lands, then placed
+ *                           beside it, and so on along the chain
+ *
+ * A neighbour that is removed before its own add is observed (same-tick
+ * notifications fold an add into a later removal of the same row) can never
+ * land. Its removal names the neighbours it had, so a subject held on it moves
+ * its anchor across to them. `settle()` is the last resort for anything still
+ * held once a delivery is complete: it appends, which was the previous rule
+ * for every unplaceable add.
+ */
+type Anchors = { pred?: number; succ?: number };
+
 export function createEntityTopology(
   seed: readonly EntityProjectionSeedEntry<Key, unknown>[]
 ): EntityTopology {
   let order: number[] = [];
   const keys = new Map<number, Key>();
+  // Held subjects, and the reverse index from an absent anchor to them.
+  const held = new Map<number, Anchors>();
+  const heldOn = new Map<number, Set<number>>();
+
+  const index = (anchor: number | undefined, subject: number) => {
+    if (anchor === undefined) return;
+    let waiting = heldOn.get(anchor);
+    if (!waiting) heldOn.set(anchor, (waiting = new Set()));
+    waiting.add(subject);
+  };
+  const unindex = (anchor: number | undefined, subject: number) => {
+    if (anchor === undefined) return;
+    const waiting = heldOn.get(anchor);
+    waiting?.delete(subject);
+    if (waiting?.size === 0) heldOn.delete(anchor);
+  };
+  const release = (subject: number) => {
+    const anchors = held.get(subject);
+    if (!anchors) return;
+    held.delete(subject);
+    unindex(anchors.pred, subject);
+    unindex(anchors.succ, subject);
+  };
+
+  /** Place `first`, then every held subject that was waiting on it. */
+  const placeFrom = (first: number, at: number) => {
+    order.splice(at, 0, first);
+    const placed = [first];
+    while (placed.length > 0) {
+      const anchor = placed.pop() as number;
+      for (const subject of [...(heldOn.get(anchor) ?? [])]) {
+        const anchors = held.get(subject) as Anchors;
+        release(subject);
+        const i = order.indexOf(anchor);
+        order.splice(anchors.pred === anchor ? i + 1 : i, 0, subject);
+        placed.push(subject);
+      }
+    }
+  };
+
+  /** The position an add's neighbours give it, or -1 to hold it. */
+  const positionFor = ({ pred, succ }: Anchors): number => {
+    if (pred !== undefined) {
+      const i = order.indexOf(pred);
+      if (i !== -1) return i + 1;
+    }
+    if (succ !== undefined) {
+      const i = order.indexOf(succ);
+      if (i !== -1) return i;
+    }
+    if (pred === undefined && succ !== undefined) return 0;
+    if (succ === undefined) return order.length;
+    return -1;
+  };
 
   function reload(entries: readonly EntityProjectionSeedEntry<Key, unknown>[]) {
     order = [];
     keys.clear();
+    held.clear();
+    heldOn.clear();
     for (const e of entries) {
       order.push(e.subjectId);
       keys.set(e.subjectId, e.key);
@@ -121,29 +217,67 @@ export function createEntityTopology(
   return {
     reload,
     keyOf: (subject) => keys.get(subject),
-    has: (subject) => order.includes(subject),
+    has: (subject) => held.has(subject) || order.includes(subject),
+    placed: (subject) => order.includes(subject),
+
+    settle() {
+      if (held.size === 0) return false;
+      for (const subject of [...held.keys()]) {
+        if (!held.has(subject)) continue;
+        release(subject);
+        placeFrom(subject, order.length);
+      }
+      return true;
+    },
 
     observe(effect) {
       if (effect.kind === 'add') {
-        if (order.includes(effect.subject)) return;
         if (effect.key !== undefined) keys.set(effect.subject, effect.key);
+        if (held.has(effect.subject) || order.includes(effect.subject)) return;
         // `beforeSubject` is the PREDECESSOR and `afterSubject` the SUCCESSOR —
         // measured, not read off the names (`entity-order-carrier.spec.ts`).
-        if (effect.beforeSubject !== undefined) {
-          const i = order.indexOf(effect.beforeSubject);
-          if (i !== -1) return void order.splice(i + 1, 0, effect.subject);
-        }
-        if (effect.afterSubject !== undefined) {
-          const i = order.indexOf(effect.afterSubject);
-          if (i !== -1) return void order.splice(i, 0, effect.subject);
-        }
-        order.push(effect.subject);
+        const anchors = {
+          pred: effect.beforeSubject,
+          succ: effect.afterSubject,
+        };
+        const at = positionFor(anchors);
+        if (at !== -1) return placeFrom(effect.subject, at);
+        held.set(effect.subject, anchors);
+        index(anchors.pred, effect.subject);
+        index(anchors.succ, effect.subject);
         return;
       }
       if (effect.kind === 'remove') {
         const i = order.indexOf(effect.subject);
         if (i !== -1) order.splice(i, 1);
+        release(effect.subject);
         keys.delete(effect.subject);
+        // A neighbour removed before it ever landed: re-anchor across it.
+        const waiting = heldOn.get(effect.subject);
+        if (i === -1 && waiting) {
+          for (const subject of [...waiting]) {
+            const anchors = held.get(subject) as Anchors;
+            release(subject);
+            const next = {
+              pred:
+                anchors.pred === effect.subject
+                  ? effect.beforeSubject
+                  : anchors.pred,
+              succ:
+                anchors.succ === effect.subject
+                  ? effect.afterSubject
+                  : anchors.succ,
+            };
+            const at = positionFor(next);
+            if (at !== -1) {
+              placeFrom(subject, at);
+              continue;
+            }
+            held.set(subject, next);
+            index(next.pred, subject);
+            index(next.succ, subject);
+          }
+        }
         return;
       }
       if (effect.afterKey !== undefined)

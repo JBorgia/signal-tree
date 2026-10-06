@@ -45,6 +45,11 @@ export type EntityEgressProjection = {
     effect: StructuralEffect | undefined,
     inspection: boolean
   ): boolean;
+  /**
+   * End of a delivery: place anything still held for neighbours that never
+   * arrived. Returns true if the eligible value changed.
+   */
+  settle(): boolean;
   /** Inbound external truth replaces authority and topology alike. */
   reseed(seed: readonly EntityProjectionSeedEntry<Key, unknown>[]): void;
 };
@@ -72,12 +77,36 @@ export function createEntityEgressProjection(
 
   const isEligible = (s: number) => rows.has(s);
 
+  /**
+   * Eligible subjects whose local position is not known yet: the topology is
+   * holding them for neighbours later in the same delivery (15.4.4). They are
+   * eligible, but take no slot in `order` until the topology places them.
+   */
+  const unplaced = new Set<number>();
+  const isPositioned = (s: number) => rows.has(s) && !unplaced.has(s);
+
   function place(subject: number) {
     if (order.includes(subject)) return;
-    const at = topology.placement(subject, isEligible);
+    if (topology.has(subject) && !topology.placed(subject)) {
+      unplaced.add(subject);
+      return;
+    }
+    unplaced.delete(subject);
+    const at = topology.placement(subject, isPositioned);
     if (at === 'end') return void order.push(subject);
     if ('after' in at) return void order.splice(order.indexOf(at.after) + 1, 0, subject);
     order.splice(order.indexOf(at.before), 0, subject);
+  }
+
+  /** Place every unplaced subject the topology has positioned since. */
+  function placeReady(): boolean {
+    let changed = false;
+    for (const subject of [...unplaced]) {
+      if (!topology.placed(subject)) continue;
+      place(subject);
+      changed = true;
+    }
+    return changed;
   }
 
   function remove(subject: number) {
@@ -85,6 +114,7 @@ export function createEntityEgressProjection(
     if (i !== -1) order.splice(i, 1);
     rows.delete(subject);
     keyOf.delete(subject);
+    unplaced.delete(subject);
   }
 
   /**
@@ -107,16 +137,26 @@ export function createEntityEgressProjection(
 
     reseed(entries) {
       topology = createEntityTopology(entries);
+      unplaced.clear();
       load(entries);
+    },
+
+    settle() {
+      if (!topology.settle()) return false;
+      return placeReady();
     },
 
     apply(subjectId, row, effect, inspection) {
       // Local topology tracks reality, whoever wrote it.
       if (effect) topology.observe(effect);
+      // A held neighbour landing completes an AUTHORED placement deferred
+      // earlier in this delivery, whoever authored the neighbour. Position is
+      // still found by traversal, so nothing inspection created is promoted.
+      const completed = unplaced.size > 0 && placeReady();
 
       // Inspection stops here. It has said where things now sit; it has not
       // acquired the right to publish anything.
-      if (inspection) return false;
+      if (inspection) return completed;
 
       if (effect?.kind === 'add') {
         reconcileAddress(effect.key, effect.subject);
@@ -127,7 +167,7 @@ export function createEntityEgressProjection(
       }
 
       if (effect?.kind === 'remove') {
-        if (!isEligible(effect.subject)) return false;
+        if (!isEligible(effect.subject)) return completed;
         remove(effect.subject);
         return true;
       }
@@ -135,14 +175,14 @@ export function createEntityEgressProjection(
       if (effect?.kind === 'rekey') {
         // Address moves; lifetime, payload and order do not. A collection key
         // is not part of the `Row[]` this relationship publishes.
-        if (!isEligible(effect.subject)) return false;
+        if (!isEligible(effect.subject)) return completed;
         if (effect.afterKey !== undefined) keyOf.set(effect.subject, effect.afterKey);
         return true;
       }
 
-      if (subjectId === undefined) return false;
+      if (subjectId === undefined) return completed;
       if (!isEligible(subjectId)) {
-        if (!topology.has(subjectId)) return false;
+        if (!topology.has(subjectId)) return completed;
         const k = topology.keyOf(subjectId);
         reconcileAddress(k, subjectId);
         place(subjectId);
