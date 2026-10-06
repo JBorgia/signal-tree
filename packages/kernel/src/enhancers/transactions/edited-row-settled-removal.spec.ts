@@ -32,6 +32,7 @@ const flush = async () => {
 const declaration = () => ({
   x: 0,
   rows: entityMap<Row, string>({ selectId: (row) => row.id }),
+  other: entityMap<Row, string>({ selectId: (row) => row.id }),
 });
 const typed = () =>
   signalTree(declaration(), { enhancers: [transactions(), restoration()] });
@@ -52,6 +53,11 @@ const seed = async (tree: Tree) => {
   for (const row of SEEDED) tree.$.rows.addOne({ ...row });
   await flush();
 };
+const state = (tree: Tree) => ({
+  x: tree.$.x(),
+  rows: tree.$.rows.all(),
+  other: tree.$.other.all(),
+});
 const refusalKind = (run: () => void): string | undefined => {
   try {
     run();
@@ -111,11 +117,10 @@ describe.each(configurations)(
             await flush();
             settledRemovals[removalName](tree);
             await flush();
-            const rows = tree.$.rows.all();
+            const before = state(tree);
             expect(refusalKind(() => proposal.rollback())).toBeUndefined();
             await flush();
-            expect(tree.$.x()).toBe(0);
-            expect(tree.$.rows.all()).toStrictEqual(rows);
+            expect(state(tree)).toStrictEqual({ ...before, x: 0 });
             expect(tree.$.rows.ids()).not.toContain('a');
           } finally {
             tree.destroy();
@@ -136,9 +141,10 @@ describe.each(configurations)(
         tree.$.rows.removeOne('a');
         tree.$.rows.addOne({ id: 'a', n: 9 });
         await flush();
+        const before = state(tree);
         expect(refusalKind(() => proposal.rollback())).toBeUndefined();
         await flush();
-        expect(tree.$.x()).toBe(0);
+        expect(state(tree)).toStrictEqual({ ...before, x: 0 });
         expect(tree.$.rows.byId('a')?.()).toStrictEqual({ id: 'a', n: 9 });
       } finally {
         tree.destroy();
@@ -157,10 +163,12 @@ describe.each(configurations)(
         await flush();
         const removal = tree.transaction(() => tree.$.rows.removeOne('a'));
         await flush();
+        const refused = state(tree);
         expect(refusalKind(() => proposal.rollback())).toBe(
           'later-pending-dependency'
         );
-        expect(tree.$.x()).toBe(1);
+        await flush();
+        expect(state(tree)).toStrictEqual(refused);
         removal.confirm();
         await flush();
         expect(refusalKind(() => proposal.rollback())).toBeUndefined();
@@ -182,10 +190,12 @@ describe.each(configurations)(
         await flush();
         tree.transaction(() => tree.$.rows.updateOne('a', { n: 8 })).confirm();
         await flush();
+        const refused = state(tree);
         expect(refusalKind(() => proposal.rollback())).toBe(
           'later-confirmed-dependency'
         );
-        expect(tree.$.x()).toBe(1);
+        await flush();
+        expect(state(tree)).toStrictEqual(refused);
         expect(tree.$.rows.byId('a')?.()).toStrictEqual({ id: 'a', n: 8 });
       } finally {
         tree.destroy();
@@ -203,8 +213,41 @@ describe.each(configurations)(
         await flush();
         tree.$.rows.addOne({ id: 'a', n: 9 });
         await flush();
-        expect(refusalKind(() => proposal.rollback())).toBeDefined();
-        expect(tree.$.x()).toBe(1);
+        const refused = state(tree);
+        // The pinned kind for a pending REMOVE whose key was re-occupied
+        // (proposal-rejection-0 case 15, the refusal-lifecycle gate).
+        expect(refusalKind(() => proposal.rollback())).toBe(
+          'effect-validation-failed'
+        );
+        await flush();
+        expect(state(tree)).toStrictEqual(refused);
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    // Lifetimes are allocated per collection: another collection's row can
+    // carry the same lifetime number. Its removal is not this row's.
+    it('a settled removal in ANOTHER collection with the same lifetime number does not erase the row', async () => {
+      const tree = make();
+      try {
+        await seed(tree);
+        for (const row of SEEDED) tree.$.other.addOne({ ...row });
+        await flush();
+        const proposal = tree.transaction(() => {
+          tree.$.rows.updateOne('a', { n: 5 });
+          tree.$.x(1);
+        });
+        await flush();
+        tree.$.other.removeOne('a');
+        await flush();
+        expect(refusalKind(() => proposal.rollback())).toBeUndefined();
+        await flush();
+        expect(state(tree)).toStrictEqual({
+          x: 0,
+          rows: SEEDED,
+          other: SEEDED.filter((row) => row.id !== 'a'),
+        });
       } finally {
         tree.destroy();
       }
