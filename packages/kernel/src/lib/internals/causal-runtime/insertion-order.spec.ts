@@ -25,6 +25,8 @@ const replay = (
       const at =
         placement.kind === 'front'
           ? 0
+          : placement.kind === 'end'
+          ? list.length
           : placement.kind === 'after'
           ? list.indexOf(placement.subject) + 1
           : list.indexOf(placement.subject);
