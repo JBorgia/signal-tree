@@ -746,9 +746,11 @@ export interface InterceptContext<T> {
  * nor a block applies to it. Taps and path subscribers are still notified; a
  * write one of them makes meanwhile is intercepted as usual, while a replay
  * one of them starts is itself a replay. A devtools jump
- * to any other state — forged, hand-edited, older than the last 1,000 states
- * the tree serialized — and an IMPORT_STATE are new input: the interceptors
- * run.
+ * to any other state — forged, hand-edited, older than the devtools `maxAge`
+ * window (default 50, at most 1,000 states), or handed back re-serialized
+ * differently from the exact JSON the tree produced (the fail-safe) — and an
+ * IMPORT_STATE are new input: the interceptors run, and a blocking one refuses
+ * the jump.
  */
 export interface InterceptHandlers<E, K extends string | number> {
   onAdd?: (entity: E, ctx: InterceptContext<E>) => void;

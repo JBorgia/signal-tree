@@ -571,19 +571,20 @@ function sanitizeState(
   return value;
 }
 
-/**
- * A 53-bit hash of a state's JSON (cyrb53), or undefined when it has none.
- * Identifies the serialized states a tree produced, so a timeline jump can be
- * verified as one of them (15.4.4).
- */
-function stateHash(state: unknown): number | undefined {
-  let json: string;
+/** A state's JSON, or undefined when it has none. */
+function stateJson(state: unknown): string | undefined {
   try {
-    json = JSON.stringify(state);
+    return JSON.stringify(state);
   } catch {
     return undefined;
   }
-  if (json === undefined) return undefined;
+}
+
+/**
+ * A 53-bit hash (cyrb53) of a serialized state's JSON. Identifies the states a
+ * tree produced, so a timeline jump can be verified as one of them (15.4.4).
+ */
+function jsonHash(json: string): number {
   let h1 = 0xdeadbeef;
   let h2 = 0x41c6ce57;
   for (let i = 0; i < json.length; i++) {
@@ -598,7 +599,11 @@ function stateHash(state: unknown): number | undefined {
   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }
 
-/** How many serialized states a tree remembers for verifying jumps. */
+/**
+ * How many serialized states a tree remembers for verifying jumps: the
+ * configured `maxAge` (the extension's default, 50, when unset), at most
+ * 1,000.
+ */
 const RECORDED_STATE_LIMIT = 1000;
 
 function parseDevToolsState(state: unknown): unknown {
@@ -1357,21 +1362,35 @@ export function createDevToolsEnhancer(
 
     /**
      * Hashes of the serialized states this tree produced — what the timeline
-     * records, in per-tree and aggregated mode alike. A jump replays one of
-     * them only if its state is among them (15.4.4); the extension can also
-     * hold imported or hand-edited states, which are new input.
+     * records, in per-tree and aggregated mode alike, newest last. A jump
+     * replays one of them only if its state is among them (15.4.4); the
+     * extension can also hold imported or hand-edited states, which are new
+     * input.
+     *
+     * FAIL-SAFE: the match is on the exact JSON the tree produced. If the
+     * extension hands a recorded state back re-serialized differently (key
+     * order, number or date formatting, dropped `undefined`), or it is older
+     * than the window, it reads as unrecorded: the interceptors run, and a
+     * blocking one refuses the jump. Never the other way round.
      */
     const recordedStates = new Set<number>();
+    const recordWindow = Math.min(
+      Math.max(1, config.maxAge ?? 50),
+      RECORDED_STATE_LIMIT
+    );
+    const recordJson = (json: string | undefined): void => {
+      if (json === undefined) return;
+      const hash = jsonHash(json);
+      recordedStates.delete(hash);
+      recordedStates.add(hash);
+      if (recordedStates.size > recordWindow) {
+        recordedStates.delete(recordedStates.values().next().value as number);
+      }
+    };
+    /** Aggregated mode's serializer: it has no JSON of its own to reuse. */
     const buildSerializedState = (rawState: unknown): unknown => {
       const serialized = serializeState(rawState);
-      const hash = stateHash(serialized);
-      if (hash !== undefined) {
-        recordedStates.delete(hash);
-        recordedStates.add(hash);
-        if (recordedStates.size > RECORDED_STATE_LIMIT) {
-          recordedStates.delete(recordedStates.values().next().value as number);
-        }
-      }
+      recordJson(stateJson(serialized));
       return serialized;
     };
 
@@ -1393,7 +1412,7 @@ export function createDevToolsEnhancer(
 
       const rawSnapshot = readSnapshot();
       const currentSnapshot = rawSnapshot ?? {};
-      const sanitized = buildSerializedState(currentSnapshot);
+      const sanitized = serializeState(currentSnapshot);
 
       // Compare serialized JSON to detect actual state changes.
       // snapshotState()/unwrap() always creates new object references, so
@@ -1402,6 +1421,9 @@ export function createDevToolsEnhancer(
       let currentSerializedJson: string;
       try {
         currentSerializedJson = JSON.stringify(sanitized);
+        // The same string the change check needs: recorded without a second
+        // stringify (15.4.4).
+        recordJson(currentSerializedJson);
       } catch {
         currentSerializedJson = '';
       }
@@ -1552,14 +1574,11 @@ export function createDevToolsEnhancer(
     const sendInit = (): void => {
       if (!browserDevTools) return;
       const rawSnapshot = readSnapshot() ?? {};
-      const serialized = buildSerializedState(rawSnapshot);
+      const serialized = serializeState(rawSnapshot);
       browserDevTools.send('@@INIT', serialized);
       lastSnapshot = rawSnapshot;
-      try {
-        lastSerializedJson = JSON.stringify(serialized);
-      } catch {
-        lastSerializedJson = undefined;
-      }
+      lastSerializedJson = stateJson(serialized);
+      recordJson(lastSerializedJson);
       lastSendAt = Date.now();
 
       // Clear pending state as it's now part of the init snapshot
@@ -1579,8 +1598,8 @@ export function createDevToolsEnhancer(
      */
     const applyInspectionState = (state: unknown, replays = false): void => {
       if (state === undefined || state === null) return;
-      const verified =
-        replays && recordedStates.has(stateHash(state) as number);
+      const json = replays ? stateJson(state) : undefined;
+      const verified = json !== undefined && recordedStates.has(jsonHash(json));
       isApplyingInspectionState = true;
       try {
         // Tag every leaf write performed during this replay with
@@ -1645,14 +1664,11 @@ export function createDevToolsEnhancer(
           if (elapsed < 500) return;
 
           const rawSnapshot = readSnapshot() ?? {};
-          const serialized = buildSerializedState(rawSnapshot);
+          const serialized = serializeState(rawSnapshot);
           browserDevTools.send({ type: 'SignalTree/reconnect' }, serialized);
           lastSnapshot = rawSnapshot;
-          try {
-            lastSerializedJson = JSON.stringify(serialized);
-          } catch {
-            lastSerializedJson = undefined;
-          }
+          lastSerializedJson = stateJson(serialized);
+          recordJson(lastSerializedJson);
           lastSendAt = Date.now();
         }
         return;
