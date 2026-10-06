@@ -149,3 +149,43 @@ describe('restoration operation outcome after application', () => {
     }
   });
 });
+
+describe('a restoration reader attached late', () => {
+  it('counts its sequence and operation ids from attachment, with no history', async () => {
+    const tree = signalTree(
+      { x: 0 },
+      { enhancers: [transactions(), restoration()] }
+    );
+    try {
+      undoable(() => tree.$.x(1));
+      await flush();
+      undoable(() => tree.$.x(2));
+      await flush();
+      tree.undo();
+      // History and an operation exist before any reader does.
+      const reader = restorationReader(tree)!;
+      const snapshot = reader.snapshot();
+      expect(snapshot.sequence).toBe(0);
+      expect(snapshot.entries).toHaveLength(2);
+      const events: { sequence: number; operationId?: string }[] = [];
+      reader.subscribe((event) =>
+        events.push({
+          sequence: event.sequence,
+          ...(event.kind === 'operation'
+            ? { operationId: event.operationId }
+            : {}),
+        })
+      );
+      tree.undo();
+      expect(events.at(-1)).toEqual({
+        sequence: events.length,
+        operationId: 'restoration-operation:1',
+      });
+      expect(events.map((event) => event.sequence)).toEqual(
+        events.map((_, index) => index + 1)
+      );
+    } finally {
+      tree.destroy();
+    }
+  });
+});

@@ -43,7 +43,10 @@ export type EntityMembershipChange =
 export interface EntityMembershipUnit {
   /** Call after the entire structural unit commits, before reactive publication. */
   commit(changes: readonly EntityMembershipChange[]): void;
-  /** For a refused unit that changed no membership; publishes nothing new. */
+  /**
+   * End a unit that changed no membership; publishes nothing new. Collection
+   * producers close every unit with `commit` (see `activateEntityMembership`).
+   */
   cancel(): void;
 }
 
@@ -246,28 +249,30 @@ function frameChanges(
 ): EntityMembershipChange[] {
   const changes: EntityMembershipChange[] = [];
   for (const instruction of instructions) {
-    const { kind, subjectId: lifetimeId, key } = instruction;
-    if (kind === 'create-fresh-subject' || kind === 'restore-subject') {
-      const neighbors = store.neighborSubjectsForKey(key as string | number);
+    const { kind, subjectId: lifetimeId, key, fromKey, toKey } = instruction;
+    if (kind === 'transfer-key') {
+      if (fromKey !== undefined && toKey !== undefined && fromKey !== toKey)
+        changes.push({
+          kind: 'rekey',
+          lifetimeId,
+          beforeKey: fromKey,
+          afterKey: toKey,
+        });
+    } else if (key === undefined) {
+      continue;
+    } else if (kind === 'create-fresh-subject' || kind === 'restore-subject') {
+      // Neighbours in the committed order: like a bulk unit's diff, one event
+      // describes its end state (an earlier add may name a later sibling).
+      const neighbors = store.neighborSubjectsForKey(key);
       changes.push({
         kind: 'add',
         lifetimeId,
-        key: key as string | number,
+        key,
         beforeLifetimeId: neighbors.beforeSubject,
         afterLifetimeId: neighbors.afterSubject,
       });
     } else if (kind === 'tombstone-subject') {
-      changes.push({ kind: 'remove', lifetimeId, key: key as string | number });
-    } else if (
-      kind === 'transfer-key' &&
-      instruction.fromKey !== instruction.toKey
-    ) {
-      changes.push({
-        kind: 'rekey',
-        lifetimeId,
-        beforeKey: instruction.fromKey as string | number,
-        afterKey: instruction.toKey as string | number,
-      });
+      changes.push({ kind: 'remove', lifetimeId, key });
     }
   }
   return changes;
@@ -297,7 +302,12 @@ export function activateEntityMembership(
   const store: EntityMembershipStore = source((phase, instructions) => {
     const truth = store;
     if (phase === MEMBERSHIP_FACTS) {
-      if (inventory.observed() && instructions)
+      // Inside a diffed bulk unit the close diff already covers this frame.
+      if (
+        inventory.observed() &&
+        instructions &&
+        !units.some((open) => open.before)
+      )
         inventory.begin().commit(frameChanges(truth, instructions));
     } else if (phase === MEMBERSHIP_OPEN || phase === MEMBERSHIP_OPEN_ORDER) {
       units.push({

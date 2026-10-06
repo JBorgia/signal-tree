@@ -10,6 +10,7 @@ import { getOwnedPositionIds } from './internals/owned-metadata';
 import { restorationReader } from './internals/restoration-reader';
 import { stateLocationReader } from './internals/state-location-view';
 import { transactionLifecycleReader } from './internals/transaction-lifecycle-view';
+import { EntityValueStore } from './physical/entity-value-store';
 import { StructuralStore } from './physical/structural-store';
 
 /**
@@ -19,6 +20,61 @@ import { StructuralStore } from './physical/structural-store';
  * an interrupted structural unit never leaves the inventory half-installed.
  */
 type Row = { id: string; n: number };
+type Member = { lifetimeId: number; key: string | number };
+type Change = EntityMembershipEvent['changes'][number];
+
+/**
+ * Apply events to a copy of `start` as a consumer would: removals and rekeys
+ * in place, additions after `beforeLifetimeId` (deferred until it exists, as
+ * one event describes its end state), reorders verbatim.
+ */
+function replay(
+  start: readonly Member[],
+  events: readonly EntityMembershipEvent[]
+): Member[] {
+  const list = start.map((member) => ({ ...member }));
+  const at = (id: number) => list.findIndex((m) => m.lifetimeId === id);
+  for (const event of events) {
+    const waiting: Extract<Change, { kind: 'add' }>[] = [];
+    const place = () => {
+      for (let placed = true; placed; ) {
+        placed = false;
+        for (let i = 0; i < waiting.length; i++) {
+          const add = waiting[i];
+          const before =
+            add.beforeLifetimeId === undefined ? -1 : at(add.beforeLifetimeId);
+          if (add.beforeLifetimeId !== undefined && before === -1) continue;
+          expect(at(add.lifetimeId)).toBe(-1);
+          list.splice(before + 1, 0, {
+            lifetimeId: add.lifetimeId,
+            key: add.key,
+          });
+          waiting.splice(i--, 1);
+          placed = true;
+        }
+      }
+    };
+    for (const change of event.changes) {
+      if (change.kind === 'add') {
+        waiting.push(change);
+        place();
+        continue;
+      }
+      place();
+      if (change.kind === 'reorder') {
+        list.splice(0, list.length, ...change.after.map((id) => list[at(id)]));
+        continue;
+      }
+      const index = at(change.lifetimeId);
+      expect(index).not.toBe(-1);
+      if (change.kind === 'remove') list.splice(index, 1);
+      else list[index].key = change.afterKey;
+    }
+    place();
+    expect(waiting).toEqual([]);
+  }
+  return list;
+}
 
 describe('membership observation installs nothing else', () => {
   it('a bare tree gains a membership producer on first observation and no transaction or restoration capability', () => {
@@ -135,6 +191,46 @@ describe('point deltas', () => {
   });
 });
 
+describe('point deltas of a multi-row frame', () => {
+  it('each add names its neighbours in the committed order', () => {
+    const tree = signalTree({ rows: entityMap<Row, string>() });
+    try {
+      tree.$.rows.addOne({ id: 'a', n: 1 });
+      const reader = entityMembershipReader(tree)!;
+      const start = reader.snapshot().collections[0].members;
+      const events: EntityMembershipEvent[] = [];
+      reader.subscribe((event) => events.push(event));
+      tree.$.rows.addMany([
+        { id: 'm', n: 2 },
+        { id: 'n', n: 3 },
+      ]);
+      const end = reader.snapshot().collections[0].members;
+      const [a, m, n] = end.map((member) => member.lifetimeId);
+      expect(events.map((event) => event.changes)).toEqual([
+        [
+          {
+            kind: 'add',
+            lifetimeId: m,
+            key: 'm',
+            beforeLifetimeId: a,
+            afterLifetimeId: n,
+          },
+          {
+            kind: 'add',
+            lifetimeId: n,
+            key: 'n',
+            beforeLifetimeId: m,
+            afterLifetimeId: undefined,
+          },
+        ],
+      ]);
+      expect(replay(start, events)).toEqual(end);
+    } finally {
+      tree.destroy();
+    }
+  });
+});
+
 describe('an interrupted structural unit', () => {
   it('a commit that throws mid-unit still closes it: later snapshots and events still work', () => {
     const tree = signalTree({ rows: entityMap<Row, string>() });
@@ -206,6 +302,110 @@ describe('an interrupted structural unit', () => {
       ).toEqual(['b']);
     } finally {
       StructuralStore.prototype.tombstoneSubject = original;
+      tree.destroy();
+    }
+  });
+
+  type Rows = {
+    setAll(rows: Row[]): unknown;
+    upsertMany(rows: Row[]): unknown;
+  };
+  it.each([
+    [
+      'setAll, throwing at the reorder',
+      StructuralStore.prototype,
+      'reorderActiveKeys',
+      1,
+      (rows: Rows) =>
+        rows.setAll([
+          { id: 'b', n: 2 },
+          { id: 'c', n: 3 },
+        ]),
+    ],
+    [
+      'upsertMany, throwing at the second value',
+      EntityValueStore.prototype,
+      'retainSubjectValue',
+      2,
+      (rows: Rows) =>
+        rows.upsertMany([
+          { id: 'c', n: 3 },
+          { id: 'd', n: 4 },
+        ]),
+    ],
+  ] as const)(
+    '%s: the events replay to the snapshot',
+    (_name, prototype, method, failAt, operate) => {
+      const target = prototype as unknown as Record<
+        string,
+        (...args: unknown[]) => unknown
+      >;
+      const original = target[method];
+      const tree = signalTree({ rows: entityMap<Row, string>() });
+      try {
+        tree.$.rows.setAll([
+          { id: 'a', n: 1 },
+          { id: 'b', n: 2 },
+        ]);
+        const reader = entityMembershipReader(tree)!;
+        const start = reader.snapshot().collections[0].members;
+        const events: EntityMembershipEvent[] = [];
+        reader.subscribe((event) => events.push(event));
+        let calls = 0;
+        target[method] = function (this: unknown, ...args: unknown[]) {
+          if (++calls === failAt) throw new Error('injected');
+          return original.apply(this, args);
+        };
+        expect(() => operate(tree.$.rows as unknown as Rows)).toThrow(
+          'injected'
+        );
+        target[method] = original;
+        // Part of the unit installed before the throw; the event says so.
+        const end = reader.snapshot().collections[0].members;
+        expect(end).not.toEqual(start);
+        expect(events).toHaveLength(1);
+        expect(replay(start, events)).toEqual(end);
+      } finally {
+        target[method] = original;
+        tree.destroy();
+      }
+    }
+  );
+
+  it('a frame committed inside a bulk unit is reported once, by the unit', () => {
+    const tree = signalTree({ rows: entityMap<Row, string>() });
+    const original = StructuralStore.prototype.moveKeysToFront;
+    try {
+      tree.$.rows.setAll([{ id: 'a', n: 1 }]);
+      const reader = entityMembershipReader(tree)!;
+      const start = reader.snapshot().collections[0].members;
+      const events: EntityMembershipEvent[] = [];
+      reader.subscribe((event) => events.push(event));
+      let armed = true;
+      vi.spyOn(StructuralStore.prototype, 'moveKeysToFront').mockImplementation(
+        function (this: StructuralStore<string>, ...args) {
+          original.apply(this, args);
+          if (armed) {
+            armed = false;
+            // A reentrant write while the prepend's reorder unit is open.
+            tree.$.rows.addOne({ id: 'z', n: 26 });
+          }
+        }
+      );
+      tree.$.rows.prependOne({ id: 'x', n: 24 });
+      vi.restoreAllMocks();
+      const added = events.flatMap((event) =>
+        event.changes.flatMap((change) =>
+          change.kind === 'add' ? [change.lifetimeId] : []
+        )
+      );
+      expect(new Set(added).size).toBe(added.length);
+      expect(replay(start, events)).toEqual(
+        reader.snapshot().collections[0].members
+      );
+    } finally {
+      vi.restoreAllMocks();
+      StructuralStore.prototype.moveKeysToFront = original;
       tree.destroy();
     }
   });
