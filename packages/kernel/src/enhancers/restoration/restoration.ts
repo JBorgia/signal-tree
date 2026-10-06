@@ -2031,24 +2031,8 @@ class RestorationManager<T> {
     },
     frontiers: TurnFrontierTransition[] = []
   ): CanonicalTurn<T> | undefined {
-    if (this.hasScopedRedoFuture()) {
-      this.truncateScopedRedoFuture();
-    }
-
-    if (
-      this.isTemporalViewActive &&
-      this.currentIndex < this.history.length - 1
-    ) {
-      // A write during a jumpTo view discards the view's future. Reached
-      // whenever one lands: a view never moves frontiers, so the scoped
-      // truncation above finds no future to cut (redo-truncation-claims.spec.ts
-      // drives it; an earlier comment here called it unreachable). Its claims
-      // are released once the new entry has taken its own.
-      const discarded = this.history.slice(this.currentIndex + 1);
-      this.history = this.history.slice(0, this.currentIndex + 1);
-      appendAll(this.truncatedEntries, discarded);
-      this.bumpRestorationHistory();
-    }
+    if (this.isTemporalViewActive) this.commitTemporalView();
+    else if (this.hasScopedRedoFuture()) this.truncateScopedRedoFuture();
 
     // A restoration history entry IS the snapshot — no clone.
     //
@@ -3725,6 +3709,41 @@ class RestorationManager<T> {
       }
     }
     return false;
+  }
+
+  /**
+   * A write during a jumpTo view makes the view the present: the entries
+   * after the viewed one are its future and are discarded; the viewed entry
+   * and every entry before it are applied (the view shows them), so their
+   * frontiers move to the end and the view ends. The discarded entries'
+   * claims are released once the new entry has taken its own.
+   *
+   * A view never moves frontiers, so the scoped truncation reads the
+   * position the view was entered from: after `undo(); jumpTo(1)` (a forward
+   * jump) it discarded the viewed entry and everything after the confirmed
+   * position while their effects stayed live (history read ["a6/", "a6/L"],
+   * undo went from a6 to a1), and a pending entry left the view's indexes
+   * stale (write-in-view.spec.ts).
+   */
+  private commitTemporalView(): void {
+    const discarded = this.history.slice(this.currentIndex + 1);
+    this.history = this.history.slice(0, this.currentIndex + 1);
+    const discardedTurnIds = new Set(discarded.map(({ id }) => id));
+    this.historicalEvents = this.historicalEvents.filter(
+      (event) =>
+        event.boundaryTurnId === undefined ||
+        !discardedTurnIds.has(event.boundaryTurnId)
+    );
+    appendAll(this.truncatedEntries, discarded);
+    // Every entry kept is applied: rebuilding reads frontiers as applied ids.
+    for (const [positionId, turnIds] of this.positionTurnIds) {
+      this.positionFrontiers.set(positionId, turnIds.length);
+    }
+    this.isTemporalViewActive = false;
+    this.currentIndex = this.history.length - 1;
+    this.bumpRestorationHistory();
+    this.rebuildTurnIndexes();
+    this.pruneHistoricalEventsBeforeOldestBoundary();
   }
 
   private truncateScopedRedoFuture(): void {
