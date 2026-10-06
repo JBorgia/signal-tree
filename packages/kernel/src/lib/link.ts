@@ -34,6 +34,7 @@ import {
 } from './internals/plain-branch-membership';
 import { registerLinkState } from './internals/link-state-view';
 import { bindLinkToTree } from './internals/link-lifetime';
+import { StudioTreeDestroyedError } from './internals/confirmed-turn-view';
 import { getRootTree } from './internals/root-source';
 import {
   hasOpenCommitScope,
@@ -274,6 +275,17 @@ export function link<S>(
     throw new Error(
       'link: the endpoint must supply at least one of get, set or ' +
         'subscribe — a link with no direction synchronizes nothing.'
+    );
+  }
+
+  // ⚠️ A DESTROYED TREE IS REFUSED (15.4.4), as every v15 reader refuses one:
+  // a dead tree and an idle relationship are different facts, and a handle
+  // that can never send would still report settled(). Before any claim.
+  if (registry.closed) {
+    throw new StudioTreeDestroyedError(
+      'STUDIO_TREE_DESTROYED: link: this tree was destroyed, so there is ' +
+        'nothing to synchronize. link() refuses rather than returning a ' +
+        'relationship that can never send.'
     );
   }
 

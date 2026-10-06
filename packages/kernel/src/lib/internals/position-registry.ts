@@ -83,6 +83,8 @@ export interface PositionRegistry {
    * program without `link()` pays only for the optional call.
    */
   close?(): void;
+  /** @internal Set by `tree.destroy()`: the tree this namespace names is gone. */
+  closed?: boolean;
 }
 
 let nextRegistryId = 1;
