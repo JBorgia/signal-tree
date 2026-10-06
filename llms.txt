@@ -228,16 +228,26 @@ history, releases consequences, and still throws. Successful automatic rollback
 reverses recorded writes. Error does not guarantee undo: never blindly retry the
 whole operation or use `undo()`/`jumpTo()` for request reconciliation. Since
 15.4.2, a pending-created or pending-rekeyed row removed by settled later work
-no longer blocks rollback; a pending-created row confirmed work edited and kept
-still refuses, so removal is not a general recovery strategy. After a rejection,
-`undo()` of a later write can restore the rejected transaction's speculative
-value. Recoverable pending refusal is a v16 target, not v15 API.
+no longer blocks rollback, and since 15.4.4 neither does a field write to an
+existing row that settled later work removed; a pending-created row confirmed
+work edited and kept still refuses, so removal is not a general recovery
+strategy. Since 15.4.4 a pending removal or rename whose key later work gave to
+another row refuses as a dependency while that row stands or undo history can
+restore it; an order change refuses as a dependency while later work on the
+collection stands; and rolling back while a newer pending transaction omitted or
+re-added a plain branch enclosing an older write refuses with
+`later-pending-dependency`. Settle the newer transaction first. Since 15.4.4,
+after a rejection no `undo()`, `redo()` or `jumpTo()` reinstates a value or row
+that only the rejected transaction wrote. Recoverable pending refusal is a v16
+target, not v15 API.
 
 15.3.1 containment covers deferred write subscribers and transaction turn
 listeners, not all framework effects. Vue watcher failures differ between
 development and production; an enclosing Solid `batch()` can defer errors until
 after a handle returns. The guide lists the Link, branch-key, coalesce, pending undo, ordering,
-notification, and retention failures documented for 15.3.1.
+notification, and retention failures documented for 15.3.1, each marked with the
+version that repaired it (15.4.0), and Link failures found later that 15.4.4
+repairs.
 
 
 ## Collection identity and independent store instances
@@ -253,19 +263,42 @@ value for that key, not distinct rows. Use a required stable ID where available;
 validate missing IDs at ingress rather than assigning a shared fallback. Numeric
 and string keys remain distinct. Do not depend on a development warning to reject
 invalid input. Version 15.3.1 does not warn for non-null duplicate incoming keys.
+Since 15.4.4 a batch call naming one id twice applies its copies in order:
+`addMany`/`prependMany` strict throws before writing, skip keeps the first copy,
+overwrite keeps the last in the first copy's place, and `upsertMany` merges the
+copies.
 
 Version 15.4.0 checks `setAll()` staging after user callbacks.
 If an interceptor or ID selector changes collection membership, keys or order,
 the outer replacement refuses before applying its staged writes. The callback's
 already-completed writes remain. Field-only callback writes do not trigger this
 structural refusal. Prefer interceptors that validate or transform input instead
-of changing the same collection's topology.
+of changing the same collection's topology. Since 15.4.4 `addOne`, `addMany`,
+`prependOne`, `prependMany`, `upsertMany`, `updateMany` and `removeMany` also
+throw `Cannot <method>: collection topology changed during staging` before
+writing when a callback changes the collection's membership or order, or the
+key of a row the call names; move cascades to a tap or a separate call.
+
+Undo, redo, `jumpTo()` and rollback replay recorded values: since 15.4.4 they do
+not run a collection's interceptors, and taps fire for the changes they apply
+(`onAdd` for a row they bring back, `onRemove` for one they take away,
+`onUpdate` for a changed value). `getCurrentIndex()` follows `undo()` and
+`redo()`; steps back are `getCurrentIndex() + 1`. An ordinary write after an
+`undoable()` one does not remove its undo: undo restores the turn's own image
+over it, and refuses with ST1034 where that would displace a newer row at the
+same key. A location under an omitted member reads `undefined`, an entity
+collection there reads empty, and writing it re-adds only the written path (see
+the kernel README, "Locations an omission has hidden").
 
 In published 15.3.1, calling Link `settled()` immediately after a write can return
 before the newly queued send finishes. Version 15.4.0 repairs this same-turn race:
 `settled()` waits for the send queued by the preceding write. It is still not proof
 of backend durability, and one generic delay is not a universal synchronization
-barrier. The repair does not change the published 15.3.1 artifact.
+barrier. The repair does not change the published 15.3.1 artifact. Since 15.4.4
+`settled()` also waits for sends caused by writes still queued for delivery,
+`tree.destroy()` disposes the tree's Links, `link()` on a destroyed tree throws,
+and a collection endpoint receives reorders (and a `sortComparer` collection
+its `all()` order).
 
 ## Choosing ownership for editors and devices
 

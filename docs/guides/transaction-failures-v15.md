@@ -132,30 +132,48 @@ budget.
 
 These limitations were recorded in the 15.3.1 release
 [changelog](https://github.com/JBorgia/signal-tree/blob/v15.3.1/CHANGELOG.md#known-issues-not-fixed-here),
-reproduced on 15.3.0 and not fixed by 15.3.1. See the
-[current changelog](../../CHANGELOG.md) for later versioned repairs.
+reproduced on 15.3.0 and not fixed by 15.3.1. Each item below now says which
+version repaired it; every item is repaired by 15.4.4. The status was
+re-checked against the 15.3.1 and 15.4.0 sources with the tests named under
+[Evidence](#evidence). See the [current changelog](../../CHANGELOG.md) for the
+details of each repair.
 
 - **Restored entity rows may not reach Link.** Rollback or undo/redo can restore
   a removed row in the tree while a linked endpoint keeps the row set without it.
-  Version 15.4.0 delivers the restored rows, but until 15.4.4 they could reach
-  the endpoint out of order; see [Link failures found later](#link-failures-found-later).
+  **Fixed in 15.4.0**, which delivers the restored rows; until 15.4.4 they could
+  reach the endpoint out of order (see
+  [Link failures found later](#link-failures-found-later)).
 - **Omitted branch keys are not restored.** A whole-value plain-object branch
   write that omits an existing key removes it without notifying write
   subscribers. A branch Link can receive state the tree does not hold; explicit
   rollback, automatic rollback, and undo restore other keys but not the omitted
   key. The automatic rollback guard cannot see that removal. Write keys
-  explicitly or use `entityMap()` for keyed collections.
+  explicitly or use `entityMap()` for keyed collections. **Fixed in 15.4.0:**
+  explicit rollback, automatic rollback and undo restore the omitted key, and a
+  branch Link receives the branch without it. 15.4.3 made every reader see the
+  removal without enhancers too, and 15.4.4 settles what reads, writes and
+  reversals do under an omitted member (kernel README, "Locations an omission
+  has hidden").
 - **`coalesce()` loses transaction and undo context.** Wrapping a transaction
   in `coalesce()` delays writes until after its callback: rollback reverses
   nothing and failed-transaction writes can still land. Wrapping `undoable()`
-  in `coalesce()` records no history. Do not compose these scopes this way.
+  in `coalesce()` records no history. **Fixed in 15.4.0:** a transaction
+  opened inside `coalesce()` keeps its writes (rollback reverses them, and a
+  failed transaction's writes do not land), and `coalesce(() => undoable(...))`
+  records an undoable entry.
 - **Same-tick notifications can lose writes.** Merging rollback, undo/redo, or
   entity notifications can lose tree attribution across origins/transactions,
   or collapse writes across same-shaped trees. Link can miss values even when
-  tree state is correct.
+  tree state is correct. **Fixed in 15.4.0:** in each of the 15.3.1 changelog's
+  examples (two overlapping rollbacks newest-first, a rollback then an undo of
+  one location, two same-shaped trees each rolling back or undoing, same-tick
+  entity writes on two same-shaped trees) the endpoint ends on the tree's
+  value.
 - **Undo/redo is not reconciled with pending transactions on the same location.**
   Later rollback can reverse through undo/redo; confirmation can commit a write
-  the tree no longer holds. Avoid that overlap.
+  the tree no longer holds. **Fixed in 15.4.0:** undo, redo and `jumpTo()` over
+  a location a pending transaction wrote refuse with ST1034 until it settles,
+  and change nothing.
 - **Reentrant observer work can be ordered before the transaction it observes.**
   Work during `transaction()` closure can reach transaction authority first;
   explicit rollback may undo it or make dependency decisions in the wrong
@@ -163,10 +181,18 @@ reproduced on 15.3.0 and not fixed by 15.3.1. See the
   writes, including later writes subsequently rolled back. Throwing-callback
   compensation admission remains compatible with v15 and can overwrite a later
   observer write to the same entity row. Do not claim unconditional isolation.
+  **Fixed in 15.4.0:** observer work stays later than the transaction it
+  observes, so an explicit rollback no longer undoes a later observer write
+  (it reverses around it or refuses atomically), and a throwing callback's
+  compensation no longer erases a later observer write to the same row. The
+  15.3.1 automatic-abort exception above (a refused automatic rollback records
+  the surviving writes as committed) is unchanged.
 - **Retired entities can retain realization descriptors.** With `transactions()`
   installed, ordinary removals can leave descriptors retained; later
   transactions do not reclaim them. Bound tree ownership and call `destroy()`
   at teardown. This is separate from configured diagnostic history retention.
+  **Fixed in 15.4.0:** descriptors follow reversal responsibility; a retired
+  subject nothing can still reverse keeps none.
 - **Asynchronous Link endpoints have settlement gaps.** Calling `settled()`
   immediately after a write can return before the newly queued send finishes.
   Version 15.4.0 repairs this same-turn race; the repair is not
@@ -177,7 +203,11 @@ reproduced on 15.3.0 and not fixed by 15.3.1. See the
   release a `settled()` waiter until that send settles. Do not treat `settled()`
   as a durability receipt or assume all pending writes stay out of storage.
   `tree.destroy()` did not dispose Links either; see
-  [Link failures found later](#link-failures-found-later).
+  [Link failures found later](#link-failures-found-later). **Fixed in
+  15.4.0:** a pending transaction's write is held while a send is in flight
+  and sent only if it confirms, `settled()` waits for a later queued send after
+  an earlier one rejects, and `dispose()` releases every waiter at once.
+  `settled()` is still not a durability receipt.
 
 A failure inside the internal pending-turn recording step was also outside the
 automatic rollback coverage in 15.3.1 through 15.4.3 (no supported trigger is
@@ -205,8 +235,7 @@ rows did not reach Link at all; see above); the others were reproduced on the
   `removeMany(['A','B'])` followed by rollback or undo left the tree at
   `[A,B,C,D]` and sent `[C,D,A,B]`, with or without `restoration()`.
   `setAll([X,Y,A,B])` over `[A,B]` sent `[A,B,X,Y]`. Rows restored or added
-  ahead of their neighbours now arrive in the tree's order. Same-tick
-  notification merging (above) can still cost Link a value.
+  ahead of their neighbours now arrive in the tree's order.
 - **`tree.destroy()` did not dispose the tree's Links.** A `settled()` waiter on
   a send that never settles waited forever, later writes were still sent, and
   the endpoint's `subscribe()` cleanup never ran. In 15.4.4 `destroy()`
@@ -244,6 +273,22 @@ rows did not reach Link at all; see above); the others were reproduced on the
   [Link tree destroy](../../packages/kernel/src/lib/link-tree-destroy.spec.ts)
   and [reactive settlement](../../packages/kernel/src/lib/link-reactive-settlement.spec.ts)
   tests pin the 15.4.4 repairs of the later-found Link failures.
+
+- The 15.3.1 list's repairs, each failing on the 15.3.1 source and passing on
+  15.4.0:
+  [restored rows reach Link](../../packages/kernel/src/lib/entity-membership-link-restoration.spec.ts),
+  [same-tick attribution](../../packages/kernel/src/lib/path-notifier-attribution.spec.ts),
+  [undo over pending work](../../packages/kernel/src/enhancers/restoration/pending-overlap.spec.ts)
+  and [its admission](../../packages/kernel/src/enhancers/restoration/pending-overlap-admission.spec.ts),
+  [reentrant observer order](../../packages/kernel/src/lib/transaction-reentrant-order.spec.ts)
+  and [its bookkeeping](../../packages/kernel/src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts),
+  [descriptor retention](../../packages/kernel/src/enhancers/transactions/descriptor-retention.spec.ts)
+  and [asynchronous Link settlement](../../packages/kernel/src/lib/link-async-settlement.spec.ts).
+  [Branch omission](../../packages/kernel/src/lib/branch-omission-correctness.spec.ts)
+  and [`coalesce()` scopes](../../packages/kernel/src/enhancers/batching/batching-semantic-scopes.spec.ts)
+  use internals 15.3.1 lacks; the
+  [installed follow-up comparison](../../tools/check-v15-followups.mjs) runs
+  their public cases against the published 15.3.1 tarball, which fails them.
 
 - [Packed refusal lifecycle comparison](../../tools/check-v15-refusal-lifecycle.mjs)
   runs the same public fixture against the exact published 15.3.0 tarball and

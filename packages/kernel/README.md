@@ -219,6 +219,18 @@ that turn settles: call undo from a later user action, not immediately after
 `undoable()` in the same synchronous function. The tree owner calls `destroy()`
 when this store is no longer needed.
 
+`getCurrentIndex()` is the latest applied entry and follows `undo()` and
+`redo()` as well as `jumpTo()`; the steps back are `getCurrentIndex() + 1`.
+An ordinary (not `undoable()`) write after an undoable one does not remove its
+undo: `undo()` restores the turn's own pre-image over it and `redo()` its
+after-image. A row the turn added that an ordinary write removed stays absent on
+undo; a row it edited that an ordinary write removed comes back as it stood,
+with the turn's fields set back. Where putting a row back would displace a newer
+row at the same key, undo or redo refuses with ST1034 and changes nothing.
+Undo, redo, `jumpTo()` and transaction rollback restore recorded values without
+running a collection's interceptors; taps still fire for the changes they apply
+(`onAdd`, `onRemove`, `onUpdate`).
+
 #### Locations an omission has hidden
 
 A whole-value write that leaves out a key omits that member: it and everything
@@ -412,9 +424,18 @@ and its deferred consequences on refusal; pending does not mean persistence is
 still deferred. Since 15.4.2, a pending-created or pending-rekeyed row that
 settled later work removed no longer blocks rollback; the rest of the turn
 reverses and the row stays absent. While the removing transaction is open,
-rollback refuses with `later-pending-dependency`. Deleting an entity is still
-not a general way to make rollback retryable: a pending-created row later work
-edited and kept, or a pending remove whose key was re-occupied, keeps refusing.
+rollback refuses with `later-pending-dependency`. Since 15.4.4 the same holds
+for a field write to an existing row that settled later work removed. Deleting
+an entity is still not a general way to make rollback retryable: a
+pending-created row later work edited and kept keeps refusing, and a pending
+removal or rename whose key later work gave to another row refuses as a
+dependency while that row stands or undo history can restore it. An order change
+(`setAll` reordering rows, an overwriting `prependMany`) refuses as a dependency
+while later work on the collection stands.
+
+After a rejection, no `undo()`, `redo()` or `jumpTo()` reinstates a value or row
+that only the rejected transaction wrote (15.4.4): undo of a later write restores
+what was there before the transaction.
 
 Since 15.4.4 the same retryable refusal (`later-pending-dependency`) applies
 when the newer pending transaction omitted, or re-added, a plain branch that
@@ -539,6 +560,11 @@ Supply distinct stable keys rather than a shared fallback for missing IDs.
 Version 15.4.0 adds a once-per-collection development warning (ST2001)
 without changing replacement semantics. Published 15.3.1 does not warn for
 non-null duplicate keys. Numeric `1` and string `"1"` remain distinct keys.
+Since 15.4.4 a batch call naming one id twice applies its copies in order:
+`addMany` and `prependMany` in strict mode throw before writing, skip keeps the
+first copy, overwrite keeps the last copy in the first copy's place, and
+`upsertMany` merges the copies. `removeMany` and `updateMany` remove or update
+a repeated id once, while still intercepting and tapping every listing.
 
 Version 15.4.0 checks `setAll()` staging after user callbacks.
 If an interceptor or ID selector changes collection membership, keys or order,
