@@ -166,6 +166,12 @@ const reviewFailures: Array<['undo' | 'rollback', Op[]]> = [
       ['upd', 'x0'],
     ],
   ],
+  // Found by the deep fuzz run (seed 7): a batch removed at the front, then
+  // the rest cleared; the front run committed left to right appended its first
+  // row at the end on the adapter path.
+  ['undo', [['rmMany', 'b', 'a'], ['clear']]],
+  ['rollback', [['rmMany', 'b', 'a'], ['clear']]],
+  ['undo', [['rmMany', 'a', 'b'], ['rm', 'c'], ['clear']]],
   // Found by this repair's own fuzz runs (chain-head choice across batches).
   [
     'undo',
