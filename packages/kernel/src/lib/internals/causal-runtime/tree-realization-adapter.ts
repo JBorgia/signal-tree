@@ -501,7 +501,7 @@ export function createTreeRealizationAdapter(
               valueEffects
             )
           : undefined;
-        const scalarFrame =
+        let scalarFrame =
           !heterogeneousFrame && valueEffects.length
             ? planScalarFrame(
                 options.tree,
@@ -511,6 +511,41 @@ export function createTreeRealizationAdapter(
                 valueEffects
               )
             : undefined;
+        // ⚠️ SLOT SCALARS NEVER TAKE THE AUTHORED WRITE (v16 8g cause 4,
+        // ported with 8f). A mixed reversal whose collection cannot be
+        // planned yet (it lies under a member this reversal re-adds) applies
+        // effect by effect. An authored scalar write under a member the
+        // reversal hides is an ordinary write since 8f (`structuralWrites`
+        // marks only the writer's own locations), so it re-added that member's
+        // path: a jump back over a path re-add, a `setAll` and an omission came
+        // back with the member present and one child. Membership is the
+        // membership targets' to decide; the slot frame writes values only.
+        let perEffect: readonly ReversalEffect[] =
+          heterogeneousFrame || scalarFrame ? [] : valueEffects;
+        if (perEffect.length) {
+          const slotScalars = valueEffects.filter(
+            (effect) =>
+              effect.structural === undefined &&
+              effect.subjectId === undefined &&
+              effect.fieldSegments === undefined &&
+              !hasInlineScopedAddress(effect) &&
+              !hasInlineSubjectAddress(effect) &&
+              scalarSlotRuntime?.resolveScalarSlot(effect.owner) !== undefined
+          );
+          scalarFrame = slotScalars.length
+            ? planScalarFrame(
+                options.tree,
+                options.descriptors,
+                structuralOwnerPaths,
+                scalarSlotRuntime,
+                slotScalars
+              )
+            : undefined;
+          if (scalarFrame) {
+            const framed = new Set(slotScalars);
+            perEffect = valueEffects.filter((effect) => !framed.has(effect));
+          }
+        }
         members?.install();
         // A membership-only frame has no value frame to advance the shared
         // physical clock. Publish its installed presence under a new revision.
@@ -518,11 +553,10 @@ export function createTreeRealizationAdapter(
           physicalCommitClock?.advance();
         if (heterogeneousFrame) {
           heterogeneousFrame.commit();
-        } else if (scalarFrame) {
-          scalarFrame.commit();
         } else {
+          scalarFrame?.commit();
           for (const effect of inPlacementOrder(
-            valueEffects,
+            perEffect,
             options.descriptors
           )) {
             applyEffect(

@@ -265,11 +265,12 @@ Some details of that rule:
 - **Invalid input changes nothing.** A re-adding write whose input makes it
   throw (a missing row, a `selectId` that throws, or an id given twice to a
   strict `addMany()` or `prependMany()`) throws before anything changes.
-- **A blocked write still removes the retained rows.** An interceptor that
-  blocks the write's own rows runs after the retained rows were removed. The
-  collection stays absent and empty, and history holds the removal. Undoing
-  it restores the rows and re-adds the path to the collection, as undoing
-  any write under an omitted member does.
+- **It is checked first.** A re-adding write is validated and intercepted as
+  on an empty collection before the retained rows are removed, and each
+  interceptor runs once per applied row. A write an interceptor blocks
+  changes nothing, and history holds nothing for it. An interceptor that
+  writes the collection itself refuses the write ("collection topology
+  changed during staging"), as on a present collection.
 - **Link and path observers see what the tree exposes.** A Link endpoint
   whose location is absent receives `undefined` (`[]` for a collection), and
   a re-add sends what the location then reads. Undo, redo, `jumpTo()` and
@@ -278,16 +279,16 @@ Some details of that rule:
 - **The selection is kept.** `activeId()` keeps its value and `activeEntity()`
   reads `undefined`. A re-adding write clears the selection, as `clear()`
   does.
-- **Taps during a reversal see physical rows.** While undo, redo, `jumpTo()`
-  or `rollback()` writes an absent collection's retained rows, a tap on it
-  that calls `byId()` sees those rows. Its projections (`all()`, `count()`,
-  `has()`) still read it absent.
-- **Writes from inside a whole value or a reversal of the same tree.** The
-  whole value or reversal decides that tree's membership. So a tap or sync
-  effect that runs during it and writes an absent location of that same tree
-  does not re-add its path. The write goes to retained storage and stays
-  invisible; for a collection, its other retained rows are not removed
-  first. A write to another tree is an ordinary write.
+- **Taps read the collection as it is.** A tap reads every collection as
+  any consumer does: absent-aware, also while undo, redo, `jumpTo()` or
+  `rollback()` writes an absent collection's retained rows, and its
+  projections (`all()`, `count()`, `where()` and the rest) include the change
+  it reports, also inside a transaction or a reversal. A projection cell
+  obtained before the tap keeps its cached value until the group ends.
+- **A write made during a whole value or a reversal is ordinary.** A tap or
+  sync effect that runs during one and writes an absent location re-adds
+  that location's path, in any tree, and the whole value does not omit it
+  again.
 
 Undo, redo and `jumpTo()` treat a location under an omitted member like this:
 

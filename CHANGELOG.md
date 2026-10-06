@@ -361,8 +361,22 @@ bullet below says **Compatibility** or **Behaviour change**.
     Reads returned the retained rows, and adding a row whose id a retained
     row held threw "Entity with id ... already exists". The README's
     "Locations an omission has hidden" lists the details (retained rows are
-    removed silently, a blocked write, the selection, taps during a
-    reversal).
+    removed silently, the selection).
+  - A row-adding write to an absent collection is validated and intercepted
+    as on an empty collection before its retained rows are removed, so a
+    write an interceptor blocks, or one with bad input, changes nothing;
+    each interceptor runs once per applied row. An interceptor that writes
+    the collection itself refuses the write, as on a present collection.
+  - A tap or sync effect that writes an absent location while a whole value
+    or a reversal is applied re-adds that location's path, in any tree, and
+    the whole value does not omit it again.
+  - Taps read collections as any consumer does: absent-aware during a
+    reversal, and inside a transaction, an undo, a redo, a jump or a
+    rollback, a tap's `all()`, `count()`, `where()` and the other
+    projections include the change it reports. **Behaviour change:** on
+    15.4.3 they read the collection as it was before the transaction or
+    reversal. A projection cell obtained before the tap still reads its
+    cached value until the group ends.
   - Undo, redo and `jumpTo()` of work under a location that a later ORDINARY
     write omitted (the location or a plain branch above it) re-add only the
     way to the reversal's own locations, with their values; the omission's
