@@ -346,6 +346,172 @@ export function plainBranchMemberEffectIsNoop(
   return before === after && (!before || effect.before === effect.after);
 }
 
+/** A turn effect as both history captures record it; `set` carries values. */
+interface TurnEffectValues extends MemberEffectValues {
+  readonly kind: string;
+  readonly position: number;
+  readonly subject?: unknown;
+  readonly fieldPresence?: {
+    readonly before: boolean;
+    readonly after: boolean;
+  };
+}
+
+/**
+ * ⚠️ A TURN'S MEMBER IMAGES ARE ITS ENDPOINTS (v16 8g, 5075ce39; ported). A turn records one
+ * net effect per location, in first-occurrence order, and a member's images
+ * were taken when its presence changed: the before-image could hold a value
+ * the same turn had already written under it, and the after-image a value
+ * written before the turn's later writes under it (or before an enclosing
+ * member came back, read through it as `{}`). Undo of
+ * `x(5); omit g; re-add g; y(13)` came back with x 5; redo of `h.x(3); h.y(15)`
+ * with h omitted came back without y. A member effect's images now hold the
+ * turn's endpoints, so the staging order of nested members no longer decides
+ * them:
+ *
+ *   before  its captured image, with the pre-turn value of every location
+ *           under it that the turn changed before capturing it (those
+ *           effects precede it, and each holds its own pre-turn value).
+ *   after   what storage holds once the turn's writes are installed. Not
+ *           from the effects: the path notifier coalesces a flush's writes
+ *           to one location and drops a net no-op (`h.y(16); h.y(0)` after
+ *           a path re-add arrives as nothing), so only storage still knows
+ *           y's final value. A turn is drained at its flush, a transaction's
+ *           when it stages after its body: storage holds that turn's writes.
+ *
+ * Then a net no-op is dropped, as composition used to drop it eagerly, which
+ * lost the pre-turn value a later image needed. A member absent before and
+ * after is kept while the turn changed something under it: its reversal
+ * re-adds nothing.
+ */
+export function settleTurnMemberEffects<
+  E extends { readonly kind: string; readonly position: number }
+>(root: object, turnEffects: readonly E[]): E[] {
+  // Only `set` effects carry values; the structural kinds are read for their
+  // position alone.
+  const effects = turnEffects as unknown as readonly TurnEffectValues[];
+  const registry = getPositionRegistry(root);
+  const addresses = new Map<number, readonly string[] | undefined>();
+  const addressOf = (position: number) => {
+    if (!addresses.has(position))
+      addresses.set(position, registry?.addressFor(position));
+    return addresses.get(position);
+  };
+  const relative = (
+    outer: readonly string[],
+    position: number
+  ): readonly string[] | undefined => {
+    const address = addressOf(position);
+    if (!address || address.length <= outer.length) return undefined;
+    for (let i = 0; i < outer.length; i++)
+      if (address[i] !== outer[i]) return undefined;
+    return address.slice(outer.length);
+  };
+  const members = effects.some(
+    (effect) => effect.kind === 'set' && effect.plainBranchMembership
+  );
+  if (members && registry)
+    effects.forEach((member, index) => {
+      if (member.kind !== 'set' || !member.plainBranchMembership) return;
+      const at = addressOf(member.position);
+      if (!at) return;
+      if (member.plainBranchMembership.before && isPlainImage(member.before)) {
+        let image: Record<string, unknown> | undefined;
+        for (let j = 0; j < index; j++) {
+          const earlier = effects[j];
+          // An entity collection's rows are its own effects' to restore.
+          if (earlier.kind !== 'set' || earlier.subject !== undefined) continue;
+          const below = relative(at, earlier.position);
+          if (!below) continue;
+          image ??= cloneImage(member.before) as Record<string, unknown>;
+          placeInImage(
+            image,
+            below,
+            earlier.plainBranchMembership?.before ?? true,
+            earlier.before
+          );
+        }
+        if (image) member.before = image;
+      }
+    });
+  // After-images are what storage holds once the turn's writes are installed.
+  if (members)
+    for (const member of effects) {
+      if (member.kind !== 'set' || !member.plainBranchMembership?.after)
+        continue;
+      const address = memberAddress(root, member.position);
+      if (
+        !address ||
+        !Object.getOwnPropertyDescriptor(address.branch, address.key)
+          ?.enumerable
+      )
+        continue;
+      storedReads.depth++;
+      try {
+        member.after = unwrapBranchForWriteCapture(address.node);
+      } finally {
+        storedReads.depth--;
+      }
+    }
+  const noop = (effect: TurnEffectValues) =>
+    effect.kind === 'set' &&
+    plainBranchMemberEffectIsNoop(effect) &&
+    (effect.fieldPresence?.before ?? true) ===
+      (effect.fieldPresence?.after ?? true);
+  const kept = effects.filter(
+    (effect) =>
+      !noop(effect) ||
+      (effect.plainBranchMembership?.before === false && registry !== undefined)
+  );
+  return kept.filter((effect) => {
+    if (!noop(effect)) return true;
+    // Absent before and after: kept only while something under it changed.
+    const at = addressOf(effect.position);
+    return (
+      !!at &&
+      kept.some(
+        (other) =>
+          other !== effect && relative(at, other.position) !== undefined
+      )
+    );
+  }) as unknown as E[];
+}
+
+function isPlainImage(value: unknown): value is Record<string, unknown> {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    !Array.isArray(value) &&
+    (Object.getPrototypeOf(value) === Object.prototype ||
+      Object.getPrototypeOf(value) === null)
+  );
+}
+
+function cloneImage(value: unknown): unknown {
+  if (!isPlainImage(value)) return value;
+  const copy: Record<string, unknown> = {};
+  for (const key of Object.keys(value)) copy[key] = cloneImage(value[key]);
+  return copy;
+}
+
+/** Set or remove one location of a member image; an absent level stays absent. */
+function placeInImage(
+  image: Record<string, unknown>,
+  path: readonly string[],
+  present: boolean,
+  value: unknown
+): void {
+  let level = image;
+  for (let i = 0; i < path.length - 1; i++) {
+    const next = level[path[i]];
+    if (!isPlainImage(next)) return;
+    level = next;
+  }
+  const key = path[path.length - 1];
+  if (present) level[key] = cloneImage(value);
+  else delete level[key];
+}
+
 function memberAddress(
   root: object,
   position: number

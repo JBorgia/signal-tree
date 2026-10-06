@@ -27,7 +27,7 @@ import { holdEntityMembershipDelivery } from '../../lib/internals/entity-members
 import {
   plainBranchMembershipEffects,
   composePlainBranchMemberEffect,
-  plainBranchMemberEffectIsNoop,
+  settleTurnMemberEffects,
   canRealizePlainBranchMember,
   changedOmittedCollection,
   collectionBindingAt,
@@ -5797,9 +5797,14 @@ export function restoration(
         bucket.effects.values(),
         () => transitionBindingsOf(tree.$)
       );
+      // Member images become the turn's endpoints, and net no-ops are
+      // dropped only now (`settleTurnMemberEffects`, v16 8g, ported).
       const effects = withAnchorChains(
         withTransientRows(
-          Array.from(bucket.effects.values()).map(cloneTurnEffect),
+          settleTurnMemberEffects(
+            tree.$ as object,
+            Array.from(bucket.effects.values()).map(cloneTurnEffect)
+          ),
           bucket.effects
         )
       );
@@ -5973,9 +5978,11 @@ export function restoration(
             existing.mutationIntent,
             effect.mutationIntent
           );
-          if (plainBranchMemberEffectIsNoop(existing)) {
-            effectMap.delete(key);
-          }
+          // ⚠️ A NET NO-OP STAYS UNTIL THE TURN IS DRAINED. Its pre-turn
+          // value is what a member image the turn captured after the first
+          // write needs (`settleTurnMemberEffects`, which drops it). Dropped
+          // here, undo of `x(5); omit g; re-add g` came back with x 5 (v16
+          // 8g, ported).
           return;
         }
 
