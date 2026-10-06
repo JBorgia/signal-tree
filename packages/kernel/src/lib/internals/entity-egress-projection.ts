@@ -93,7 +93,7 @@ export function createEntityEgressProjection(
 
   function place(subject: number) {
     if (order.includes(subject)) return;
-    if (topology.has(subject) && !topology.placed(subject)) {
+    if (topology.isHeld(subject)) {
       unplaced.add(subject);
       return;
     }
@@ -104,11 +104,13 @@ export function createEntityEgressProjection(
     order.splice(order.indexOf(at.before), 0, subject);
   }
 
-  /** Place every unplaced subject the topology has positioned since. */
+  /** Place every unplaced subject the topology has released since. */
   function placeReady(): boolean {
+    const released = topology.takeReleased();
+    if (unplaced.size === 0) return false;
     let changed = false;
-    for (const subject of [...unplaced]) {
-      if (!topology.placed(subject)) continue;
+    for (const subject of released) {
+      if (!unplaced.has(subject)) continue;
       place(subject);
       changed = true;
     }
@@ -148,14 +150,22 @@ export function createEntityEgressProjection(
     },
 
     settle() {
-      if (!topology.settle()) return false;
-      return placeReady();
+      topology.settle();
+      let changed = placeReady();
+      // Still unplaced: its topology hold ended without a position (an
+      // inspection removal, or a reorder that no longer names it). Authority
+      // is not revoked by either, so it is still published, at the end.
+      for (const subject of [...unplaced]) {
+        place(subject);
+        changed = true;
+      }
+      return changed;
     },
 
     reorder(after, inspection) {
       // Local topology tracks reality, whoever reordered it.
       topology.reorder(after);
-      const completed = unplaced.size > 0 && placeReady();
+      const completed = placeReady();
       // An inspection reorder acquires no external-order authority.
       if (inspection) return completed;
       // Permute only the slots of eligible subjects the new order names. A
@@ -181,7 +191,7 @@ export function createEntityEgressProjection(
       // A held neighbour landing completes an AUTHORED placement deferred
       // earlier in this delivery, whoever authored the neighbour. Position is
       // still found by traversal, so nothing inspection created is promoted.
-      const completed = unplaced.size > 0 && placeReady();
+      const completed = placeReady();
 
       // Inspection stops here. It has said where things now sit; it has not
       // acquired the right to publish anything.
