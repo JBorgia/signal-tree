@@ -689,22 +689,16 @@ function deriveStructuralTargetOrder(
 ): number[] {
   if (effects.some((effect) => effect.turn !== undefined))
     return replayStructuralOrderByTurn(sourceOrder, subjects, effects);
-  const order = sourceOrder.filter((subject) => subjects.has(subject));
-  const additions = effects.filter(
-    (effect) =>
-      effect.structural === 'add' &&
-      typeof effect.subjectId === 'number' &&
-      subjects.has(effect.subjectId)
-  );
-  placeAdditions(order, additions);
-  return order;
+  return applyTurnOrder([...sourceOrder], effects, (subject) =>
+    subjects.has(subject)
+  ).filter((subject) => subjects.has(subject));
 }
 
 /**
  * ⚠️ A JUMP'S ORDER IS REPLAYED TURN BY TURN. An addition's anchors are its
  * neighbours when its own turn recorded it; across turns they may be added by
- * another turn, or removed by a later one. Each turn removes what it removed
- * and places what it added against the order the earlier turns left, as the
+ * another turn, or removed by a later one. Each turn places what it added and
+ * removes what it removed against the order the earlier turns left, as the
  * undo and redo chain does; the result keeps the target's subjects (v16 8g).
  */
 function replayStructuralOrderByTurn(
@@ -712,7 +706,7 @@ function replayStructuralOrderByTurn(
   subjects: ReadonlyMap<number, CollectionTargetSubject>,
   effects: readonly ReversalEffect[]
 ): number[] {
-  const order = [...sourceOrder];
+  let order = [...sourceOrder];
   const turns = new Map<number | undefined, ReversalEffect[]>();
   for (const effect of effects) {
     if (
@@ -725,22 +719,64 @@ function replayStructuralOrderByTurn(
     turn.push(effect);
   }
   for (const turn of turns.values()) {
-    for (const effect of turn) {
-      const index = order.indexOf(effect.subjectId as number);
-      if (index >= 0) order.splice(index, 1);
-    }
-    placeAdditions(
+    const removed = netRemovals(turn);
+    order = applyTurnOrder(
       order,
-      turn.filter((effect) => effect.structural === 'add')
-    );
+      turn,
+      (subject) => !removed.has(subject)
+    ).filter((subject) => !removed.has(subject));
   }
   return order.filter((subject) => subjects.has(subject));
 }
 
-/** Place additions by their recorded anchors, mutating `order`. */
+/** The rows one turn's effects leave removed: a removal not followed by an
+ * addition of the same row (a ghost is added, then removed). */
+function netRemovals(turn: readonly ReversalEffect[]): Set<number> {
+  const removed = new Set<number>();
+  for (const effect of turn) {
+    const subject = effect.subjectId as number;
+    if (effect.structural === 'remove') removed.add(subject);
+    else if (effect.structural === 'add') removed.delete(subject);
+  }
+  return removed;
+}
+
+/**
+ * ⚠️ ONE TURN'S ADDITIONS ARE PLACED AGAINST THE ORDER BEFORE ITS REMOVALS.
+ * A row the turn adds is taken out first and placed afresh by its recorded
+ * neighbours. Every other row stays while the additions are placed, so a
+ * neighbour the same turn removes still anchors them; the caller then keeps
+ * the rows that survive. That includes a turn's ghost: a row it created and
+ * removed, which a kept row's recorded neighbour names
+ * (`withTransientRows`, v16 8g). Placed against the rows that survive only,
+ * redo and undo of `setAll([a, c]); setAll([a])` threw "no live placement
+ * anchor". An anchor no row of the order or of the turn holds is still dead
+ * (a later turn removed it), and still refused.
+ */
+function applyTurnOrder(
+  order: number[],
+  effects: readonly ReversalEffect[],
+  survives: (subject: number) => boolean
+): number[] {
+  const additions = effects.filter(
+    (effect) =>
+      effect.structural === 'add' && typeof effect.subjectId === 'number'
+  );
+  const added = new Set(additions.map((effect) => effect.subjectId as number));
+  const next = order.filter((subject) => !added.has(subject));
+  placeAdditions(next, additions, survives);
+  return next;
+}
+
+/**
+ * Place additions by their recorded anchors, mutating `order`. Additions
+ * that only anchor on each other are ordered among themselves when no row
+ * that `survives` is in the order yet.
+ */
 function placeAdditions(
   order: number[],
-  additions: readonly ReversalEffect[]
+  additions: readonly ReversalEffect[],
+  survives: (subject: number) => boolean
 ): void {
   const pending = [...additions];
 
@@ -776,7 +812,7 @@ function placeAdditions(
       return !anchorMayBecomeLive;
     });
     if (readyIndex < 0) {
-      if (order.length === 0) {
+      if (!order.some(survives)) {
         appendAll(order, derivePendingAnchorOrder(pending));
         pending.length = 0;
         continue;
