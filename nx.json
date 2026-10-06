@@ -13,7 +13,14 @@
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/test-setup.[jt]s"
     ],
-    "sharedGlobals": []
+    "sharedGlobals": [],
+    "packageBuildGlobals": [
+      "{workspaceRoot}/llms.txt",
+      "{workspaceRoot}/LICENSE",
+      "{workspaceRoot}/NOTICE",
+      "{workspaceRoot}/tsconfig.base.json",
+      "{workspaceRoot}/tools/build/**/*"
+    ]
   },
   "targetDefaults": {
     "@angular/build:application": {
