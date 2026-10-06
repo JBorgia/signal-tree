@@ -1679,6 +1679,28 @@ export function createEntitySignal<
     return replacement;
   }
 
+  /** `onRemove` interceptors: a block throws; there is nothing to transform. */
+  function interceptRemovedEntity(id: K, entity: E): void {
+    for (const handler of interceptHandlers) {
+      const ctx: InterceptContext<void> = {
+        block: (reason?: string) => {
+          throw new Error(
+            `Cannot remove entity: ${reason || 'blocked by interceptor'}`
+          );
+        },
+        transform: () => {
+          // void transform - no transformation possible
+        },
+        blocked: false,
+        blockReason: undefined,
+      };
+      assertSynchronousInterceptorResult(
+        handler.onRemove?.(id, entity, ctx),
+        'onRemove'
+      );
+    }
+  }
+
   function interceptUpdatedEntity(id: K, changes: Partial<E>): Partial<E> {
     let transformedChanges = changes;
     for (const handler of interceptHandlers) {
@@ -2787,25 +2809,7 @@ export function createEntitySignal<
       const prev = entity;
 
       // Run interceptors
-      let transformedChanges = changes;
-      for (const handler of interceptHandlers) {
-        const ctx: InterceptContext<Partial<E>> = {
-          block: (reason?: string) => {
-            throw new Error(
-              `Cannot update entity: ${reason || 'blocked by interceptor'}`
-            );
-          },
-          transform: (value: Partial<E>) => {
-            transformedChanges = value;
-          },
-          blocked: false,
-          blockReason: undefined,
-        };
-        assertSynchronousInterceptorResult(
-          handler.onUpdate?.(id, changes, ctx),
-          'onUpdate'
-        );
-      }
+      const transformedChanges = interceptUpdatedEntity(id, changes);
 
       const finalUpdated = { ...entity, ...transformedChanges };
       // One value replacement, no structural consequence — commit it directly.
@@ -2853,25 +2857,7 @@ export function createEntitySignal<
         throw new Error(`Entity with id ${String(id)} not found`);
       }
 
-      let next = entity;
-      for (const handler of interceptHandlers) {
-        const ctx: InterceptContext<Partial<E>> = {
-          block: (reason?: string) => {
-            throw new Error(
-              `Cannot replace entity: ${reason || 'blocked by interceptor'}`
-            );
-          },
-          transform: (value: Partial<E>) => {
-            next = value as E;
-          },
-          blocked: false,
-          blockReason: undefined,
-        };
-        assertSynchronousInterceptorResult(
-          handler.onUpdate?.(id, entity as Partial<E>, ctx),
-          'onUpdate'
-        );
-      }
+      const next = interceptReplacedEntity(id, entity);
 
       const subjectId = structuralStore.subjectIdForKey(id);
       if (subjectId === undefined) {
@@ -2934,25 +2920,7 @@ export function createEntitySignal<
         const prev = entity;
 
         // Run interceptors
-        let transformedChanges = changes;
-        for (const handler of interceptHandlers) {
-          const ctx: InterceptContext<Partial<E>> = {
-            block: (reason?: string) => {
-              throw new Error(
-                `Cannot update entity: ${reason || 'blocked by interceptor'}`
-              );
-            },
-            transform: (value: Partial<E>) => {
-              transformedChanges = value;
-            },
-            blocked: false,
-            blockReason: undefined,
-          };
-          assertSynchronousInterceptorResult(
-            handler.onUpdate?.(id, changes, ctx),
-            'onUpdate'
-          );
-        }
+        const transformedChanges = interceptUpdatedEntity(id, changes);
 
         const finalUpdated = { ...entity, ...transformedChanges };
         const subjectId = structuralStore.subjectIdForKey(id);
@@ -3040,24 +3008,7 @@ export function createEntitySignal<
         throw new Error(`Entity with id ${String(id)} not found`);
       }
       // Run interceptors
-      for (const handler of interceptHandlers) {
-        const ctx: InterceptContext<void> = {
-          block: (reason?: string) => {
-            throw new Error(
-              `Cannot remove entity: ${reason || 'blocked by interceptor'}`
-            );
-          },
-          transform: () => {
-            // void transform - no transformation possible
-          },
-          blocked: false,
-          blockReason: undefined,
-        };
-        assertSynchronousInterceptorResult(
-          handler.onRemove?.(id, entity, ctx),
-          'onRemove'
-        );
-      }
+      interceptRemovedEntity(id, entity);
 
       // Interceptors may install observers. Decide demand after they return,
       // while the removed row and its neighbours are still available.
@@ -3135,24 +3086,7 @@ export function createEntitySignal<
           throw new Error(`Entity with id ${String(id)} has no subject id`);
         }
         // Run interceptors
-        for (const handler of interceptHandlers) {
-          const ctx: InterceptContext<void> = {
-            block: (reason?: string) => {
-              throw new Error(
-                `Cannot remove entity: ${reason || 'blocked by interceptor'}`
-              );
-            },
-            transform: () => {
-              // void transform - no transformation possible
-            },
-            blocked: false,
-            blockReason: undefined,
-          };
-          assertSynchronousInterceptorResult(
-            handler.onRemove?.(id, entity, ctx),
-            'onRemove'
-          );
-        }
+        interceptRemovedEntity(id, entity);
 
         preparedRemovals.push({
           id,
@@ -3575,24 +3509,7 @@ export function createEntitySignal<
         const subjectId = currentSubjects[index];
         const entity = valueStore.backingForSubject(subjectId);
         if (entity === undefined) continue;
-        for (const handler of interceptHandlers) {
-          const ctx: InterceptContext<void> = {
-            block: (reason?: string) => {
-              throw new Error(
-                `Cannot remove entity: ${reason || 'blocked by interceptor'}`
-              );
-            },
-            transform: () => {
-              // void transform - no transformation possible
-            },
-            blocked: false,
-            blockReason: undefined,
-          };
-          assertSynchronousInterceptorResult(
-            handler.onRemove?.(id, entity, ctx),
-            'onRemove'
-          );
-        }
+        interceptRemovedEntity(id, entity);
         stagedRemovals.push({ id, entity, subjectId, index });
       }
 
