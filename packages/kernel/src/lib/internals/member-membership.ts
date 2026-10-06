@@ -234,8 +234,9 @@ export function isAbsentMember(node: unknown): boolean {
       );
     return first.absent;
   }
-  if (PRODUCTION_SUBSTRATE_STATS_ENABLED)
+  if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
     recordProductionSubstrateStat('absenceWalks');
+  }
   first.absent = walkAbsence(first);
   first.epoch = membershipEpoch;
   return first.absent;
@@ -367,8 +368,9 @@ export function reactivatePathOnWrite(node: unknown): boolean {
   // Answered first, from the cache, before allocating the path (v16 8g).
   if (!isAbsentMember(node)) return false;
   if (inStructuralWrite(node)) return reactivateOnWrite(node);
-  if (PRODUCTION_SUBSTRATE_STATS_ENABLED)
+  if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
     recordProductionSubstrateStat('absenceWalks');
+  }
   const path: DormantBinding[] = [];
   let outer = -1;
   for (

@@ -104,8 +104,9 @@ export function capturePlainBranchMembership(
   storedReads.depth++;
   try {
     for (const key of Object.getOwnPropertyNames(branch)) {
-      if (PRODUCTION_SUBSTRATE_STATS_ENABLED)
+      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
         recordProductionSubstrateStat('membershipKeysVisited');
+      }
       const descriptor = Object.getOwnPropertyDescriptor(branch, key);
       if (!descriptor || !('value' in descriptor)) continue;
       const present = descriptor.enumerable === true;

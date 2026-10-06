@@ -1144,8 +1144,9 @@ function recursiveUpdate(
       for (const key of reconcileMembership
         ? Object.getOwnPropertyNames(targetObj)
         : supplied) {
-        if (PRODUCTION_SUBSTRATE_STATS_ENABLED)
+        if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
           recordProductionSubstrateStat('membershipKeysVisited');
+        }
         const descriptor = Object.getOwnPropertyDescriptor(targetObj, key);
         if (!descriptor || !('value' in descriptor)) continue;
 
