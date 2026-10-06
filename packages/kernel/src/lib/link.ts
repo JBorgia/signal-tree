@@ -757,8 +757,9 @@ export function link<S>(
         }
         if (!advanced) return;
         if (address) advanceEligible(address, { all: projection.value() });
+        // No link-state publication here: this runs inside the entity write,
+        // and the flush that follows publishes when it schedules the send.
         dirty = true;
-        observation.publish();
       });
     } catch {
       // A closed inventory belongs to a destroyed tree, and one inside a

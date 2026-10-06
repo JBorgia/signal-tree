@@ -85,11 +85,13 @@ export type EntityTopology = {
   keyOf(subject: number): Key | undefined;
   /** Is this subject currently present locally at all? */
   has(subject: number): boolean;
+  /** Is this added subject HELD for neighbours that have not arrived yet? */
+  isHeld(subject: number): boolean;
   /**
-   * Does this present subject have a known local position? False while an
-   * added subject is HELD for neighbours that have not arrived yet.
+   * The held subjects that have been given a position since the last call,
+   * in the order they were placed. Draining, so each is reported once.
    */
-  placed(subject: number): boolean;
+  takeReleased(): number[];
   /**
    * Give every held subject a position now, as if its missing neighbours will
    * never arrive. Call once the notifications of a delivery have all been
@@ -155,6 +157,7 @@ export function createEntityTopology(
   // Held subjects, and the reverse index from an absent anchor to them.
   const held = new Map<number, Anchors>();
   const heldOn = new Map<number, Set<number>>();
+  let released: number[] = [];
 
   const index = (anchor: number | undefined, subject: number) => {
     if (anchor === undefined) return;
@@ -177,16 +180,20 @@ export function createEntityTopology(
   };
 
   /** Place `first`, then every held subject that was waiting on it. */
-  const placeFrom = (first: number, at: number) => {
+  const placeFrom = (first: number, at: number, firstWasHeld = false) => {
     order.splice(at, 0, first);
+    if (firstWasHeld) released.push(first);
     const placed = [first];
     while (placed.length > 0) {
       const anchor = placed.pop() as number;
-      for (const subject of [...(heldOn.get(anchor) ?? [])]) {
+      const waiting = heldOn.get(anchor);
+      if (!waiting) continue;
+      for (const subject of [...waiting]) {
         const anchors = held.get(subject) as Anchors;
         release(subject);
         const i = order.indexOf(anchor);
         order.splice(anchors.pred === anchor ? i + 1 : i, 0, subject);
+        released.push(subject);
         placed.push(subject);
       }
     }
@@ -212,6 +219,7 @@ export function createEntityTopology(
     keys.clear();
     held.clear();
     heldOn.clear();
+    released = [];
     for (const e of entries) {
       order.push(e.subjectId);
       keys.set(e.subjectId, e.key);
@@ -223,14 +231,25 @@ export function createEntityTopology(
     reload,
     keyOf: (subject) => keys.get(subject),
     has: (subject) => held.has(subject) || order.includes(subject),
-    placed: (subject) => order.includes(subject),
+    isHeld: (subject) => held.has(subject),
+    takeReleased() {
+      const taken = released;
+      released = [];
+      return taken;
+    },
 
     reorder(after) {
       // Complete membership at that commit: anything absent was removed, and
-      // its own removal notification still clears its key when delivered.
+      // its own removal notification still clears its key when delivered. A
+      // held subject it names now has a position; one it omits is gone.
       order = [...after];
-      held.clear();
-      heldOn.clear();
+      if (held.size > 0) {
+        const named = new Set(after);
+        for (const subject of held.keys())
+          if (named.has(subject)) released.push(subject);
+        held.clear();
+        heldOn.clear();
+      }
     },
 
     settle() {
@@ -238,13 +257,15 @@ export function createEntityTopology(
       for (const subject of [...held.keys()]) {
         if (!held.has(subject)) continue;
         release(subject);
-        placeFrom(subject, order.length);
+        placeFrom(subject, order.length, true);
       }
       return true;
     },
 
     observe(effect) {
       if (effect.kind === 'add') {
+        // Keyed even when already present: a membership `reorder` can position
+        // a subject before its own add is delivered.
         if (effect.key !== undefined) keys.set(effect.subject, effect.key);
         if (held.has(effect.subject) || order.includes(effect.subject)) return;
         // `beforeSubject` is the PREDECESSOR and `afterSubject` the SUCCESSOR —
@@ -283,7 +304,7 @@ export function createEntityTopology(
             };
             const at = positionFor(next);
             if (at !== -1) {
-              placeFrom(subject, at);
+              placeFrom(subject, at, true);
               continue;
             }
             held.set(subject, next);

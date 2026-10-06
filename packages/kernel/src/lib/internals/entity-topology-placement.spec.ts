@@ -150,6 +150,56 @@ describe('neighbours that never arrive', () => {
   });
 });
 
+describe('held subjects whose hold ends without a neighbour landing', () => {
+  it('a reorder that names a held subject positions it', () => {
+    const projection = createEntityEgressProjection(seedOf([1, 5]));
+    projection.apply(3, 3, add([1, 2, 3, 4, 5], 3), false);
+    expect(projection.reorder([1, 3, 5], false)).toBe(true);
+    expect(projection.value()).toEqual([1, 3, 5]);
+    expect(projection.settle()).toBe(false);
+  });
+
+  it('an inspection removal of a held authored subject leaves it published at settle', () => {
+    // Inspection never revokes authority, so the row is not dropped; with no
+    // known position it is appended, as any unplaceable add is.
+    const projection = createEntityEgressProjection(seedOf([1, 5]));
+    projection.apply(3, 3, add([1, 2, 3, 4, 5], 3), false);
+    expect(projection.apply(3, undefined, remove(3, 2, 4), true)).toBe(false);
+    expect(projection.settle()).toBe(true);
+    expect(projection.value()).toEqual([1, 5, 3]);
+    expect(projection.settle()).toBe(false);
+  });
+
+  it('a reorder that omits a held subject leaves it for settle', () => {
+    const projection = createEntityEgressProjection(seedOf([1, 5]));
+    projection.apply(3, 3, add([1, 2, 3, 4, 5], 3), false);
+    projection.reorder([5, 1], false);
+    expect(projection.value()).toEqual([5, 1]);
+    projection.settle();
+    expect(projection.value()).toEqual([5, 1, 3]);
+  });
+});
+
+describe('placement at scale', () => {
+  it('restores 2000 subjects arriving in a shuffled order onto 500 survivors', () => {
+    const final = Array.from({ length: 2500 }, (_, i) => i + 1);
+    let state = 15_4_4;
+    const random = () =>
+      (state = (state * 1103515245 + 12345) % 2 ** 31) / 2 ** 31;
+    const restored = final.filter((s) => s % 5 !== 0);
+    const survivors = final.filter((s) => s % 5 === 0);
+    for (let i = restored.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [restored[i], restored[j]] = [restored[j], restored[i]];
+    }
+    const projection = createEntityEgressProjection(seedOf(survivors));
+    for (const subject of restored)
+      projection.apply(subject, subject, add(final, subject), false);
+    expect(projection.settle()).toBe(false);
+    expect(projection.value()).toEqual(final);
+  });
+});
+
 describe('inspection and held placement', () => {
   it('an inspection neighbour completes an authored placement without being published', () => {
     const projection = createEntityEgressProjection(seedOf([1, 5]));

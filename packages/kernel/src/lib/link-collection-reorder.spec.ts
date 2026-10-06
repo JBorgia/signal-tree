@@ -544,6 +544,22 @@ describe('relationship lifecycle', () => {
     }
   });
 
+  it('a prepend that moves a held row object unchanged is still sent', async () => {
+    const tree = make('plain');
+    const { sent, connection } = await linked(tree, 'ABC');
+    try {
+      const stored = tree.$.rows.all()[2];
+      tree.$.rows.prependMany([stored], { mode: 'overwrite' });
+      await flush();
+      await connection.settled();
+      expect(ids(tree.$.rows.all())).toBe('CAB');
+      expect(sent).toEqual(['CAB']);
+    } finally {
+      connection.dispose();
+      tree.destroy();
+    }
+  });
+
   it('every relationship over the collection receives the reorder', async () => {
     const tree = make('plain');
     const { sent, connection } = await linked(tree, 'ABC');
