@@ -391,7 +391,8 @@ const TARGETS = {
     // (+12 B: endpoints receive all() order). The Link order tier added 0 B;
     // skipping setAll's capture-order walk while capture is inactive, +3 B.
     // Offsets tried and rejected (each worse or a few bytes at the cost of
-    // opaque names) are recorded with the commit. 22.62 KB = 23,163 B.
+    // opaque names) are recorded with the commit. 22.62 KB is 23,162 B: the
+    // gate compares bytes / 1024 against it, and 23,163 / 1024 = 22.6201.
     devKB: 25.5,
     prodKB: 22.62,
     code: `
