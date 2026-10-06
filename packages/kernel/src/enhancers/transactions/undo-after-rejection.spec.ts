@@ -743,3 +743,146 @@ describe.each(Object.entries(orders))(
     );
   }
 );
+
+// ── A later omission's image of a branch T wrote under (v15 port review,
+// item 3) ─────────────────────────────────────────────────────────────────────
+// T writes below a plain branch; a later undoable write omits the branch (or
+// a branch above it) while T is pending, capturing T's value in its image; T
+// is rolled back. Undoing the omission brought T's value back: the image is
+// recorded at the branch's position and T's write at its leaf's, so the
+// re-base, keyed by position, never matched them. Each is checked against the
+// same history without T.
+describe.each(Object.entries(orders))(
+  'undo after a rejection: a later omission of an enclosing branch (%s)',
+  (_order, enhancers) => {
+    type OmitRow = { id: string; n: number };
+    const makeOmit = () => {
+      const tree = signalTree(
+        {
+          g: {
+            rows: entityMap<OmitRow, string>(),
+            k: 0,
+            h: { x: 0, y: 0 },
+            d: { rows: entityMap<OmitRow, string>() },
+          },
+          count: 0,
+        },
+        { enhancers: enhancers() as never }
+      ) as unknown as {
+        $: ((value?: unknown) => unknown) & {
+          count: (value?: number) => number;
+          g: ((value?: unknown) => unknown) & {
+            rows: {
+              setAll(rows: OmitRow[]): void;
+              addOne(row: OmitRow): void;
+              updateOne(id: string, changes: Partial<OmitRow>): void;
+            };
+            k: (value?: number) => number;
+            h: { x: (value?: number) => number; y: (value?: number) => number };
+            d: { rows: { addOne(row: OmitRow): void } };
+          };
+        };
+        transaction(fn: () => void): { rollback(): void };
+        undo(): void;
+        redo(): void;
+        jumpTo(index: number): void;
+        getCurrentIndex(): number;
+        getRestorationHistory(): Array<{ state?: unknown }>;
+        destroy(): void;
+      };
+      tree.$.g.rows.setAll([{ id: 'a', n: 0 }]);
+      return tree;
+    };
+    type OmitTree = ReturnType<typeof makeOmit>;
+    const read = (tree: OmitTree) => JSON.stringify(tree.$());
+    const shapes: Record<
+      string,
+      { tx: (tree: OmitTree) => void; later: Array<(tree: OmitTree) => void> }
+    > = {
+      'T writes g.k; a later write omits g': {
+        tx: (tree) => tree.$.g.k(5),
+        later: [(tree) => tree.$({ count: 1 })],
+      },
+      'T writes g.h.x; a later write omits g': {
+        tx: (tree) => tree.$.g.h.x(5),
+        later: [(tree) => tree.$({ count: 1 })],
+      },
+      'T writes g.h.x; a later write omits h': {
+        tx: (tree) => tree.$.g.h.x(5),
+        later: [(tree) => tree.$.g({ rows: [{ id: 'a', n: 0 }], k: 0 })],
+      },
+      'T writes g.h.x; later writes omit g, then re-add g.h.y': {
+        tx: (tree) => tree.$.g.h.x(5),
+        later: [(tree) => tree.$({ count: 1 }), (tree) => tree.$.g.h.y(9)],
+      },
+      // Rows were already re-based (a row is its own scope); kept as guards.
+      'T adds a row; a later write omits g': {
+        tx: (tree) => tree.$.g.rows.addOne({ id: 'z', n: 1 }),
+        later: [(tree) => tree.$({ count: 1 })],
+      },
+      'T adds a row two levels down; a later write omits g': {
+        tx: (tree) => tree.$.g.d.rows.addOne({ id: 'z', n: 1 }),
+        later: [(tree) => tree.$({ count: 1 })],
+      },
+      'T updates a row; a later write omits g': {
+        tx: (tree) => tree.$.g.rows.updateOne('a', { n: 5 }),
+        later: [(tree) => tree.$({ count: 1 })],
+      },
+    };
+    const run = async (shape: string, withT: boolean) => {
+      const tree = makeOmit();
+      const states: string[] = [];
+      try {
+        await flush();
+        undoable(() => tree.$.count(3));
+        await flush();
+        const start = tree.getCurrentIndex();
+        const proposal = withT
+          ? tree.transaction(() => shapes[shape].tx(tree))
+          : undefined;
+        await flush();
+        for (const write of shapes[shape].later) {
+          undoable(() => write(tree));
+          await flush();
+        }
+        proposal?.rollback();
+        await flush();
+        states.push(read(tree));
+        // History states read the same records.
+        states.push(
+          JSON.stringify(
+            tree.getRestorationHistory().map((entry) => entry.state)
+          )
+        );
+        const latest = tree.getCurrentIndex();
+        // Undo to the start, redo to the end, undo to the start again.
+        for (const step of ['undo', 'redo', 'undo'] as const)
+          for (let i = 0; i < shapes[shape].later.length; i++) {
+            tree[step]();
+            await flush();
+            states.push(read(tree));
+          }
+        // And a jump each way.
+        tree.jumpTo(latest);
+        await flush();
+        states.push(read(tree));
+        tree.jumpTo(start);
+        await flush();
+        states.push(read(tree));
+        return states;
+      } finally {
+        tree.destroy();
+      }
+    };
+    it.each(Object.keys(shapes))(
+      '%s: undo, redo and jumpTo match the history without T',
+      async (shape) => {
+        const control = await run(shape, false);
+        expect(await run(shape, true)).toStrictEqual(control);
+        expect(control.at(-1)).toBe(
+          '{"g":{"rows":{"all":[{"id":"a","n":0}]},"k":0,"h":{"x":0,"y":0},"d":{"rows":{"all":[]}}},"count":3}'
+        );
+      }
+    );
+  }
+);

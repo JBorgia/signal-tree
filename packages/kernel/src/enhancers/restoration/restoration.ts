@@ -117,6 +117,7 @@ import {
   markMetaDesignated,
 } from '../../lib/internals/restoration-eligibility';
 import { visitTree } from '../../lib/internals/visit-tree';
+import { isNodeAccessor } from '../../lib/internals/node-shape';
 import { recordProductionSubstrateStat } from '../../lib/internals/production-substrate-stats';
 import {
   getWriteParticipation,
@@ -767,13 +768,30 @@ export function rebaseOrdersOntoRejection(
  */
 export function rebaseOntoRejection(
   rejected: readonly TurnEffect[],
-  lists: readonly TurnEffect[][]
+  lists: readonly TurnEffect[][],
+  addressFor?: (position: number) => readonly string[] | undefined
 ): TurnEffect[][] {
   const rowScope = (position: number, subject: number) =>
     `r${position}:${subject}`;
+  // A plain value is addressed from the root when its position's address is
+  // known, so a member's image (a plain-branch membership effect, at the
+  // branch's position) claims the writes below it, which sit at their leaf
+  // positions. Keyed by position alone, a rejected `a.value` write survived
+  // in the image a later omission of `a` captured while the transaction was
+  // pending, and undoing the omission brought the rejected value back (v15
+  // port review, item 3).
+  const plainAddressOf = (
+    position: number,
+    segments: readonly string[]
+  ): RebaseAddress => {
+    const address = addressFor?.(position);
+    return address
+      ? { scope: 'p', segments: [...address, ...segments] }
+      : { scope: `p${position}`, segments };
+  };
   const addressOf = (effect: ScalarSetEffect): RebaseAddress =>
     effect.subject === undefined
-      ? { scope: `p${effect.position}`, segments: effect.branchSegments ?? [] }
+      ? plainAddressOf(effect.position, effect.branchSegments ?? [])
       : {
           scope: rowScope(effect.position, effect.subject),
           segments: effect.fieldSegments ?? [],
@@ -1783,9 +1801,12 @@ class RestorationManager<T> {
           (turn.__effects || turn.__orderDeltas || turn.__frontiers)
       )
       .sort((left, right) => left.id - right.id);
+    const addressFor = (position: number) =>
+      this.positionRegistry.addressFor(position as PositionId);
     const turnEffects = rebaseOntoRejection(
       rejected,
-      later.map((turn) => turn.__effects ?? [])
+      later.map((turn) => turn.__effects ?? []),
+      addressFor
     );
     const created = new Map<number, Set<number>>();
     const removed = new Map<number, Set<number>>();
@@ -1820,7 +1841,8 @@ class RestorationManager<T> {
     );
     const eventEffects = rebaseOntoRejection(
       rejected,
-      events.map((event) => event.effects)
+      events.map((event) => event.effects),
+      addressFor
     );
     const eventOrders = rebaseOrdersOntoRejection(
       events.map((event) => ({
@@ -3190,10 +3212,92 @@ class RestorationManager<T> {
         });
       }
     }
+    // Collections under a member an omission hid are retained, non-enumerable,
+    // so the walk above misses them: a history read then threw "no
+    // collection" on a record of their rows, and a member's image re-added
+    // them with the rows it held, not the rows their records give (v15 port
+    // review, item 3). They are not in the present state, so `natural` is
+    // left alone. Read through descriptors: no getter runs.
+    const retained = new Set<object>();
+    const findRetained = (node: object): void => {
+      if (retained.has(node)) return;
+      retained.add(node);
+      for (const key of Object.getOwnPropertyNames(node)) {
+        const child: unknown = Object.getOwnPropertyDescriptor(
+          node,
+          key
+        )?.value;
+        if (isNodeAccessor(child)) {
+          findRetained(child);
+          continue;
+        }
+        const binding =
+          child !== null && typeof child === 'object'
+            ? (
+                child as {
+                  __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+                }
+              ).__prepareTransitionTarget
+            : undefined;
+        if (binding && !bindings.has(binding.owner)) {
+          bindings.set(binding.owner, binding);
+          collections.set(binding.owner, this.readCollectionSource(binding));
+        }
+      }
+    };
+    findRetained(this.tree.$ as object);
     const states = new Array<T>(this.history.length);
     const historyIndexByTurnId = new Map(
       this.history.map((turn, index) => [turn.id, index])
     );
+    // A member's image holds the rows its collections had when it was taken,
+    // but a reversal re-adds a collection with the rows its own records give
+    // (`collections`): a rejected transaction's rows are gone from those, not
+    // from an image a later omission took while it was pending (v15 port
+    // review, item 3). Collections the image leaves out stay out.
+    const bindingAddresses = [...bindings.values()].map((binding) => ({
+      binding,
+      address: this.positionRegistry.addressFor(binding.owner as PositionId),
+    }));
+    const memberSnapshot = (effect: ReversalEffect, present: boolean): void => {
+      natural = applyPlainBranchMemberSnapshot(
+        this.tree.$,
+        natural,
+        effect.owner,
+        present,
+        effect.after
+      );
+      const member = this.positionRegistry.addressFor(
+        effect.owner as PositionId
+      );
+      if (!present || !member) return;
+      for (const { binding, address } of bindingAddresses) {
+        if (
+          !address ||
+          address.length <= member.length ||
+          !member.every((key, at) => key === address[at])
+        )
+          continue;
+        let image: unknown = effect.after;
+        for (const key of address.slice(member.length)) {
+          image =
+            image !== null &&
+            typeof image === 'object' &&
+            Object.prototype.hasOwnProperty.call(image, key)
+              ? (image as Record<string, unknown>)[key]
+              : undefined;
+          if (image === undefined) break;
+        }
+        const collection = collections.get(binding.owner);
+        if (image === undefined || !collection) continue;
+        const valueOf = new Map(
+          collection.subjects.map((subject) => [subject.subject, subject.value])
+        );
+        natural = setDetachedNaturalValue(natural, binding.ownerPath, {
+          all: collection.order.map((subject) => valueOf.get(subject)),
+        });
+      }
+    };
 
     const applyDetachedTurn = (
       turn: CanonicalTurn<T>,
@@ -3269,15 +3373,10 @@ class RestorationManager<T> {
         if (typeof effect.path !== 'string') {
           throw new Error('Historical scalar effect has no path');
         }
-        natural = effect.plainBranchMembership
-          ? applyPlainBranchMemberSnapshot(
-              this.tree.$,
-              natural,
-              effect.owner,
-              effect.plainBranchMembership.after,
-              effect.after
-            )
-          : setDetachedNaturalValue(natural, effect.path, effect.after);
+        if (effect.plainBranchMembership)
+          memberSnapshot(effect, effect.plainBranchMembership.after);
+        else
+          natural = setDetachedNaturalValue(natural, effect.path, effect.after);
       }
     };
 
@@ -3365,15 +3464,10 @@ class RestorationManager<T> {
         if (typeof effect.path !== 'string') {
           throw new Error('Historical scalar effect has no path');
         }
-        natural = effect.plainBranchMembership
-          ? applyPlainBranchMemberSnapshot(
-              this.tree.$,
-              natural,
-              effect.owner,
-              effect.plainBranchMembership.after,
-              effect.after
-            )
-          : setDetachedNaturalValue(natural, effect.path, effect.after);
+        if (effect.plainBranchMembership)
+          memberSnapshot(effect, effect.plainBranchMembership.after);
+        else
+          natural = setDetachedNaturalValue(natural, effect.path, effect.after);
       }
     }
 
