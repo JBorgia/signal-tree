@@ -50,22 +50,29 @@ documented limitation since 15.4.2); 15.4.4 adopts the rule above. Undo is still
 not a way back to the state before the transaction — it reverses authored
 history, and the rejected transaction is not part of it.
 
-A collection order change does not reverse once other work has added or
-removed rows of the same collection. That covers `setAll` reordering surviving
-rows, or an overwriting `prependMany` moving a row to the front, combined with
-an `addOne`, `removeOne` or similar on that collection, in two cases:
+A collection order change (`setAll` reordering surviving rows, or an
+overwriting `prependMany` moving a row to the front) reverses with the rest of
+its transaction or undoable turn, whatever else that turn did to the same
+collection, and after later work on the collection is undone or rolled back
+(15.4.4; 15.4.3 refused the `setAll` cases and reported success for the
+`prependMany` cases while deleting the overwritten row).
 
-- the add or remove is in the same transaction or undoable turn;
-- it is in a later one, even after that later work is undone or rolled back
-  and the order is back where the change left it.
+It is tracked by identity, not by content: an order change reverses only while
+the collection's order is exactly the one it left. While LATER work that
+added, removed or reordered rows of that collection stands, the later work
+rests on it, so:
 
-`undo()` throws and `rollback()` refuses with `effect-validation-failed`; state
-is unchanged. A separate earlier turn does not block it, and neither does a
-later `updateOne`. The `setAll` cases refused on 15.4.3 too. The `prependMany`
-cases reported success on 15.4.3 and deleted the overwritten row. This is an
-open design question: an order change is reversible only while the
-collection's order is exactly as that change left it, tracked by identity, not
-by content.
+- `rollback()` refuses as a **dependency**: `later-confirmed-dependency` when
+  that work is settled (a plain write, or a confirmed transaction), and
+  `later-pending-dependency` while it is another open transaction. Settle the
+  newer transaction first; once it rolls back, the order change rolls back
+  too. Through 15.4.3 this refusal reported `effect-validation-failed`.
+- `undo()` of the order change throws while that work stands.
+
+State is unchanged either way, and the transaction stays pending. A later
+`updateOne`, or work on another collection, does not block it. A write a
+subscriber makes while the order change is being delivered is later work of
+this kind: it is a turn of its own and, unless it is `undoable()`, it stands.
 
 Recoverable pending refusal with a usable recovery handle and consequences
 held until explicit confirmation is a **v16 target**, not a current v15 API.
