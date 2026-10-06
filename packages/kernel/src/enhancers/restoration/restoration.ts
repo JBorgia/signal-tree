@@ -51,7 +51,10 @@ import {
   getOwnedSubjectIds,
 } from '../../lib/internals/owned-metadata';
 import { getMutationCaptureRuntime } from '../../lib/internals/mutation-capture-runtime';
-import type { CollectionOrderCapture } from '../../lib/internals/mutation-capture-runtime';
+import type {
+  CollectionOrderCapture,
+  OrderChangeCapture,
+} from '../../lib/internals/mutation-capture-runtime';
 import {
   deriveCollectionOrderDelta,
   deriveDeclarativeTransitionTarget,
@@ -146,6 +149,12 @@ import type {
   ReversalEffect,
   ReversalRefusal,
 } from '../../lib/internals/causal-runtime/causal-types';
+
+/** An order change of surviving rows, not a frontier-only transition. */
+const carriesOrders = (
+  capture: CollectionOrderCapture
+): capture is OrderChangeCapture =>
+  capture.beforeSubjects !== undefined && capture.afterSubjects !== undefined;
 
 // A refusal is the error object restoration itself created when it declined an
 // operation and changed nothing. Messages are not evidence: a validator or a
@@ -410,7 +419,7 @@ function toReversalEffect(
 // effects rather than from restoration history.
 
 type PendingEffectMap = Map<string, TurnEffect>;
-type PendingCollectionOrder = Omit<CollectionOrderCapture, 'meta'>;
+type PendingCollectionOrder = Omit<OrderChangeCapture, 'meta'>;
 
 type CaptureBucket = {
   ownerPaths: Set<string>;
@@ -4009,7 +4018,7 @@ export function restoration(
       const members = new Set(left);
       return right.every((subject) => members.has(subject));
     };
-    const recordInspectionScrub = (capture: CollectionOrderCapture): void => {
+    const recordInspectionScrub = (capture: OrderChangeCapture): void => {
       const previous = inspectionScrubs.get(capture.owner);
       const chained =
         previous !== undefined &&
@@ -4733,7 +4742,7 @@ export function restoration(
     };
     const captureCollectionOrderIntoBucket = (
       bucket: CaptureBucket,
-      capture: CollectionOrderCapture
+      capture: OrderChangeCapture
     ): void => {
       if (isMetaDesignated(capture.meta)) {
         bucket.designated = true;
@@ -5058,7 +5067,16 @@ export function restoration(
             // returns to that baseline; it is not a new order gap or authority.
             // Inspection owns neither history nor external-order authority.
             if (isInspectionWrite(capture.meta)) {
-              recordInspectionScrub(capture);
+              // A frontier-only inspection change added or removed rows: a
+              // scrub that changed membership is not tracked.
+              if (carriesOrders(capture)) {
+                recordInspectionScrub(capture);
+              } else {
+                inspectionScrubs.delete(capture.owner);
+              }
+              return;
+            }
+            if (!carriesOrders(capture)) {
               return;
             }
             if (isCompensationWrite(capture.meta)) {

@@ -1,14 +1,27 @@
 import { isTraversableNode } from '../utils';
 import type { WriteMetadata } from '../mutation-types';
 
+/**
+ * One collection operation's order change. With subjects: an order change
+ * of surviving rows (setAll, prependMany's move), with the orders around it.
+ * Without: a FRONTIER-ONLY transition, published once per operation that
+ * replaced the collection's order frontier (an add, a remove, a move), so a
+ * turn's first and last frontier on the collection are known in time order.
+ */
 export type CollectionOrderCapture = {
   readonly owner: number;
   readonly ownerPath: string;
-  readonly beforeSubjects: readonly number[];
-  readonly afterSubjects: readonly number[];
+  readonly beforeSubjects?: readonly number[];
+  readonly afterSubjects?: readonly number[];
   readonly beforeFrontier: unknown;
   readonly afterFrontier: unknown;
   readonly meta?: WriteMetadata;
+};
+
+/** A capture that carries the orders (an order change of surviving rows). */
+export type OrderChangeCapture = CollectionOrderCapture & {
+  readonly beforeSubjects: readonly number[];
+  readonly afterSubjects: readonly number[];
 };
 
 /** Transient committed source evidence; consumers retain their own authority. */

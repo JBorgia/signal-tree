@@ -80,6 +80,10 @@ export class StructuralStore<K extends string | number> {
     return this.orderFrontier;
   }
 
+  /** Reads the order frontier; with a token, installs it first (a reversal). */
+  orderFrontierAt = (token?: object): unknown =>
+    (this.orderFrontier = token ?? this.orderFrontier);
+
   planFreshSubjectIds(count: number): readonly number[] {
     return Array.from(
       { length: count },
