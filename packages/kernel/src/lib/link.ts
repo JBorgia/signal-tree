@@ -30,6 +30,7 @@ import {
   plainBranchMembershipChange,
 } from './internals/plain-branch-membership';
 import { registerLinkState } from './internals/link-state-view';
+import { bindLinkToTree } from './internals/link-lifetime';
 import { getRootTree } from './internals/root-source';
 import {
   hasOpenCommitScope,
@@ -818,6 +819,40 @@ export function link<S>(
     }
   };
 
+  const dispose = (): void => {
+    if (disposed) return;
+    disposed = true;
+    unbindTree();
+    // Releases only THIS relationship's claim. A leaf shared with another
+    // Link stays armed for it; the last release returns the leaf to dormant.
+    releaseObservation();
+    offSub();
+    offFlush?.();
+    for (const release of releaseOrders) release();
+    // Its held consequence would only no-op now, but it keeps this whole
+    // relationship reachable until the tree's transactions settle.
+    withdrawHeldConsequence(x as object, consequenceKey);
+    // Release anyone already inside `settled()`: a disposed link owns no
+    // further work, and a held observation's count never returns to zero on
+    // its own.
+    for (const release of settlementWaiters) release();
+    settlementWaiters.clear();
+    for (const h of [...held]) {
+      held.delete(h);
+      h.resolve();
+    }
+    for (const r of [...retrievals]) {
+      retrievals.delete(r);
+      r.resolve();
+    }
+    observation.publish('disposed');
+    // User cleanup may throw; all owned state and waiters are already released.
+    offSource?.();
+  };
+  // `tree.destroy()` disposes this relationship exactly as `dispose()` does
+  // (15.4.4); see `internals/link-lifetime.ts`.
+  const unbindTree = bindLinkToTree(registry, dispose);
+
   return {
     async retrieve() {
       if (disposed) return;
@@ -857,34 +892,6 @@ export function link<S>(
         settlementWaiters.delete(release);
       }
     },
-    dispose() {
-      if (disposed) return;
-      disposed = true;
-      // Releases only THIS relationship's claim. A leaf shared with another
-      // Link stays armed for it; the last release returns the leaf to dormant.
-      releaseObservation();
-      offSub();
-      offFlush?.();
-      for (const release of releaseOrders) release();
-      // Its held consequence would only no-op now, but it keeps this whole
-      // relationship reachable until the tree's transactions settle.
-      withdrawHeldConsequence(x as object, consequenceKey);
-      // Release anyone already inside `settled()`: a disposed link owns no
-      // further work, and a held observation's count never returns to zero on
-      // its own.
-      for (const release of settlementWaiters) release();
-      settlementWaiters.clear();
-      for (const h of [...held]) {
-        held.delete(h);
-        h.resolve();
-      }
-      for (const r of [...retrievals]) {
-        retrievals.delete(r);
-        r.resolve();
-      }
-      observation.publish('disposed');
-      // User cleanup may throw; all owned state and waiters are already released.
-      offSource?.();
-    },
+    dispose,
   };
 }
