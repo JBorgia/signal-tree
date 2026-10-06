@@ -1857,11 +1857,41 @@ class RestorationManager<T> {
     const seedPositionId = latestTurn?.__positionIds?.[0];
 
     if (latestTurn && seedPositionId !== undefined) {
-      this.undoPosition(seedPositionId);
+      this.moveCurrentIndex(this.undoPosition(seedPositionId), 'undo');
       return true;
     }
 
     return false;
+  }
+
+  /**
+   * `getCurrentIndex()` is the latest APPLIED history entry (-1 when none):
+   * the entry jumpTo() would land on to show the current state. Public
+   * undo/redo is whole-tree, so the applied entries are a prefix of history
+   * and this one number gives both step counts (back = index + 1, forward =
+   * length - 1 - index). Only jumpTo and history changes moved it through
+   * 15.4.3; undo() and redo() left it stale.
+   *
+   * Read off the closure the step just applied (undo: one before its earliest
+   * entry; redo: its latest entry) rather than rescanning every entry's status,
+   * so a step's logical work stays what the complexity audit pins.
+   */
+  private moveCurrentIndex(
+    closure: readonly number[],
+    direction: 'undo' | 'redo'
+  ): void {
+    let next: number | undefined;
+    for (const turnId of closure) {
+      const index = this.turns.get(turnId)?.historyIndex;
+      if (index === undefined) continue;
+      if (next === undefined) next = index;
+      else
+        next =
+          direction === 'undo' ? Math.min(next, index) : Math.max(next, index);
+    }
+    if (next === undefined) return;
+    if (direction === 'undo') next -= 1;
+    if (next !== this.currentIndex) this.currentIndex = next;
   }
 
   undo(): boolean {
@@ -1910,7 +1940,7 @@ class RestorationManager<T> {
     const seedPositionId = earliestTurn?.__positionIds?.[0];
 
     if (earliestTurn && seedPositionId !== undefined) {
-      this.redoPosition(seedPositionId);
+      this.moveCurrentIndex(this.redoPosition(seedPositionId), 'redo');
       return true;
     }
 

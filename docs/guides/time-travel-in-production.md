@@ -236,9 +236,18 @@ record-then-filter step.
 | Optimistic request reconciliation | Use a returned transaction handle and application conflict policy; never `undo()` or `jumpTo()` | Rollback can refuse; see [the 15.3.1 failure inventory](transaction-failures-v15.md) |
 | Import/generate, then one undo                      | —                                                                                                            | **No.** `pauseRecording()` was removed in 14.1.1 (see lever 3) and has no replacement |
 | Audit trail rather than undo                        | `getRestorationHistory()` for retained undo entries; use an application event log for a complete audit trail | Restoration history is not a complete audit log                                       |
-| Show the user how far they can go                   | `getCurrentIndex()` back, `getRestorationHistory().length - 1 - getCurrentIndex()` fwd                       | Yes — reactive since 14.0.0                                                           |
+| Show the user how far they can go                   | `getCurrentIndex() + 1` back, `getRestorationHistory().length - 1 - getCurrentIndex()` fwd                   | Yes — reactive since 14.0.0; follows `undo()`/`redo()` since 15.4.4 (see below)       |
 | Undo per entity, independently                      | —                                                                                                            | **No.** Keep independent edit scopes in application-owned state                       |
 | Collaborative editing                               | A CRDT (Yjs, Automerge) underneath — undo is per-user, not per-document                                      | **Not a store feature.** Don't                                                        |
+
+`getCurrentIndex()` is the history entry the visible state corresponds to:
+after `undo()`, `redo()` or a new undoable write, the latest applied entry
+(`-1` when every entry is undone); after `jumpTo(i)`, the viewed entry `i`.
+`jumpTo()` is a view, separate from the undo position: the next `undo()` or
+`redo()` first returns to the undo position and steps from there, and the
+index follows it. The step counts in the table hold outside a `jumpTo()` view.
+Through 15.4.3 `undo()` and `redo()` did not move the index at all, and the
+"back" count read `getCurrentIndex()` rather than `getCurrentIndex() + 1`.
 
 ## Reactive readers, and why that mattered
 
