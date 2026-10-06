@@ -10,10 +10,10 @@ import {
   type EntityMembershipChange,
   type EntityMembershipInventory,
 } from './entity-membership-inventory';
+import { defineEntityMembershipHold } from './entity-membership-source';
 import { getOwnedOwnerPath, getOwnedPositionIds } from './owned-metadata';
-import { isNodeAccessor } from './node-shape';
+import { isNodeAccessor, isTraversableNode } from './node-shape';
 import { getPositionRegistry, type TreeId } from './position-registry';
-import { visitTree } from './visit-tree';
 
 export type {
   EntityMembership,
@@ -113,16 +113,15 @@ function drain(state: State): void {
 const noop = (): void => undefined;
 
 /**
- * @internal Realization holds delivery for the whole of one reversal. Each
- * collection's delta is still sequenced and queued when it commits, so order is
- * commit order; listeners run only once every collection is installed, and a
+ * Realization holds delivery for the whole of one reversal (through
+ * `holdEntityMembershipDelivery` in the production seam). Each collection's
+ * delta is still sequenced and queued when it commits, so order is commit
+ * order; listeners run only once every collection is installed, and a
  * listener's own reentrant write therefore queues after the reversal's deltas.
  */
-export function holdEntityMembershipDelivery(root: object): () => void {
-  const registry = getPositionRegistry(root);
-  const state = registry && states.get(registry);
+function holdDelivery(state: State): () => void {
   // Inside delivery the running loop already drains in order.
-  if (!state || state.dispatching) return noop;
+  if (state.dispatching) return noop;
   state.holds++;
   let released = false;
   return () => {
@@ -131,6 +130,48 @@ export function holdEntityMembershipDelivery(root: object): () => void {
     state.holds--;
     drain(state);
   };
+}
+
+/**
+ * Pre-order walk of owned nodes, including retained non-enumerable (dormant)
+ * members. `visit` returns false to stop descending.
+ */
+function walkOwned(
+  root: unknown,
+  visit: (
+    node: object,
+    path: string,
+    key: string | null,
+    parent: object | null
+  ) => boolean | void
+): void {
+  const seen = new WeakSet<object>();
+  const step = (
+    node: unknown,
+    path: string,
+    key: string | null,
+    parent: object | null
+  ): void => {
+    if (!isTraversableNode(node) || seen.has(node as object)) return;
+    seen.add(node as object);
+    if (visit(node as object, path, key, parent) === false) return;
+    let keys: string[];
+    try {
+      keys = Object.getOwnPropertyNames(node);
+    } catch {
+      return;
+    }
+    for (const child of keys) {
+      let value: unknown;
+      try {
+        value = (node as Record<string, unknown>)[child];
+      } catch {
+        continue;
+      }
+      step(value, path ? `${path}.${child}` : child, child, node as object);
+    }
+  };
+  step(root, '', null, null);
 }
 
 /**
@@ -165,6 +206,7 @@ export function entityMembershipReader<
     };
     states.set(registry, state);
     const owned = state;
+    defineEntityMembershipHold(registry, () => holdDelivery(owned));
     tree.registerCleanup(() => {
       owned.closed = true;
       owned.queue.length = 0;
@@ -186,66 +228,62 @@ export function entityMembershipReader<
       object,
       EntityMembershipCollection['location']
     >();
-    visitTree(
-      tree.$,
-      (node, path, key, parent) => {
-        const object = node as object;
-        const isCollection =
-          getEntityMembershipInventory(object) !== undefined ||
-          hasEntityMembershipSource(object);
-        if (
-          node !== tree.$ &&
-          !isCollection &&
-          getOwnedOwnerPath(node) === undefined
-        )
-          return false;
-        const location =
-          key === null
-            ? []
-            : [
-                ...(locations.get(parent as object) ?? []),
-                { kind: 'property' as const, key },
-              ];
-        locations.set(object, location);
-        if (!isCollection)
-          return typeof node === 'function' && !isNodeAccessor(node)
-            ? false
-            : undefined;
-        // A reused marker or foreign owned node cannot enroll another tree's
-        // supplier, and therefore cannot close it during this tree's cleanup.
-        if (getPositionRegistry(object) !== registry) return false;
-        // First observation installs this collection's membership producer.
-        const inventory = activateEntityMembership(object);
-        if (!inventory) return false;
-        const owner = inventoryOwners.get(inventory);
-        if (owner && owner !== registry) return false;
-        if (owned.collections.has(inventory)) return false;
-        // v16 position ownership: a collection allocates (and registers the
-        // address of) its own position when its owned positions are first
-        // read. No separate activation hook is needed or installed.
-        const positions = getOwnedPositionIds(object);
-        if (positions?.length !== 1)
-          throw new Error(
-            'Entity membership collection has no unique owned position.'
-          );
-        const address = { collectionPosition: positions[0], location, path };
-        const stop = inventory.subscribe((publication) => {
-          if (owned.closed) return;
-          const sequence = ++owned.sequence;
-          if (!owned.listeners.size) return;
-          publish(owned, {
-            treeId: registry.id,
-            sequence,
-            collection: detachLocation(address),
-            changes: copyMembershipChanges(publication.changes),
-          });
-        });
-        inventoryOwners.set(inventory, registry);
-        owned.collections.set(inventory, { ...address, inventory, stop });
+    walkOwned(tree.$, (node, path, key, parent) => {
+      const object = node as object;
+      const isCollection =
+        getEntityMembershipInventory(object) !== undefined ||
+        hasEntityMembershipSource(object);
+      if (
+        node !== tree.$ &&
+        !isCollection &&
+        getOwnedOwnerPath(node) === undefined
+      )
         return false;
-      },
-      { maxDepth: Infinity, includeNonEnumerable: true }
-    );
+      const location =
+        key === null
+          ? []
+          : [
+              ...(locations.get(parent as object) ?? []),
+              { kind: 'property' as const, key },
+            ];
+      locations.set(object, location);
+      if (!isCollection)
+        return typeof node === 'function' && !isNodeAccessor(node)
+          ? false
+          : undefined;
+      // A reused marker or foreign owned node cannot enroll another tree's
+      // supplier, and therefore cannot close it during this tree's cleanup.
+      if (getPositionRegistry(object) !== registry) return false;
+      // First observation installs this collection's membership producer.
+      const inventory = activateEntityMembership(object);
+      if (!inventory) return false;
+      const owner = inventoryOwners.get(inventory);
+      if (owner && owner !== registry) return false;
+      if (owned.collections.has(inventory)) return false;
+      // v16 position ownership: a collection allocates (and registers the
+      // address of) its own position when its owned positions are first
+      // read. No separate activation hook is needed or installed.
+      const positions = getOwnedPositionIds(object);
+      if (positions?.length !== 1)
+        throw new Error(
+          'Entity membership collection has no unique owned position.'
+        );
+      const address = { collectionPosition: positions[0], location, path };
+      const stop = inventory.subscribe((publication) => {
+        if (owned.closed) return;
+        const sequence = ++owned.sequence;
+        if (!owned.listeners.size) return;
+        publish(owned, {
+          treeId: registry.id,
+          sequence,
+          collection: detachLocation(address),
+          changes: copyMembershipChanges(publication.changes),
+        });
+      });
+      inventoryOwners.set(inventory, registry);
+      owned.collections.set(inventory, { ...address, inventory, stop });
+      return false;
+    });
   };
   discover();
   if (!owned.collections.size) return undefined;

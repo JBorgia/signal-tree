@@ -26,7 +26,7 @@ import { getLocationRuntime } from '../location-runtime';
 
 import type { ReversalEffect, ReversalRefusal } from './causal-types';
 import { applyInInvalidationGroup } from './post-application-failure';
-import { holdEntityMembershipDelivery } from '../entity-membership-view';
+import { holdEntityMembershipDelivery } from '../entity-membership-source';
 import { normalizeScopedValuePath } from './scoped-value-addressing';
 
 type StructuralDriftRefusal = Extract<

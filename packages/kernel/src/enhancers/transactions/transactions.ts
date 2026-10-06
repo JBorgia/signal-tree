@@ -42,7 +42,7 @@ import {
   type TransactionRefusalReason,
 } from '../../lib/internals/transaction-lifecycle-view';
 import type { ToolingTree } from '../../lib/internals/tooling-tree';
-import { holdEntityMembershipDelivery } from '../../lib/internals/entity-membership-view';
+import { holdEntityMembershipDelivery } from '../../lib/internals/entity-membership-source';
 import { AppliedTurnProjection } from '../../lib/internals/causal-runtime/applied-turn-projection';
 import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
 import type {
