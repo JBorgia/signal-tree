@@ -201,31 +201,26 @@ describe.each([
   ['transactions(), restoration()', () => [transactions(), restoration()]],
   ['restoration(), transactions()', () => [restoration(), transactions()]],
 ] as const)('duplicate ids in one call: undo/redo (%s)', (_name, enhancers) => {
-  // prependMany's undo/redo ORDER needs its move to the front recorded, which
-  // the next commit adds; its rows join this table there.
-  it.each(Object.keys(cases).filter((name) => !name.startsWith('prependMany')))(
-    '%s — undo, redo, undo exact',
-    async (name) => {
-      const tree = make(enhancers());
-      try {
-        await seed(tree);
-        undoable(() => cases[name].act(tree));
-        await flush();
-        tree.undo();
-        await flush();
-        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
-        tree.redo();
-        await flush();
-        expect(tree.$.rows.all()).toStrictEqual(cases[name].after);
-        tree.undo();
-        await flush();
-        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
-        expect(tree.$.rows.ids()).toStrictEqual(['z', 'a']);
-      } finally {
-        tree.destroy();
-      }
+  it.each(Object.keys(cases))('%s — undo, redo, undo exact', async (name) => {
+    const tree = make(enhancers());
+    try {
+      await seed(tree);
+      undoable(() => cases[name].act(tree));
+      await flush();
+      tree.undo();
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+      tree.redo();
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(cases[name].after);
+      tree.undo();
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+      expect(tree.$.rows.ids()).toStrictEqual(['z', 'a']);
+    } finally {
+      tree.destroy();
     }
-  );
+  });
 
   it('strict throw records no history', async () => {
     const tree = make(enhancers());
