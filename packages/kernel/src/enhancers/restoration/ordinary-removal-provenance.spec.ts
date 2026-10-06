@@ -217,6 +217,45 @@ describe.each(configurations)(
       }
     });
 
+    // The entry's OWN removal is not this rule's: undo of it compares the key
+    // with what the turn left, as a scalar undo compares the value (owner
+    // decision on the review follow-up).
+    it("undo of an entry's own removal after external truth added and removed the key: proceeds", async () => {
+      const tree = make(enhancers);
+      try {
+        tree.$.rows.addMany([row('z', 0), row('a', 1)]);
+        await flush();
+        undoable(() => tree.$.rows.removeOne('a'));
+        await flush();
+        external(() => tree.$.rows.addOne(row('a', 50)));
+        await flush();
+        external(() => tree.$.rows.removeOne('a'));
+        await flush();
+        // The key is absent again, as the turn left it.
+        tree.undo();
+        await flush();
+        expect(read(tree)).toBe('z0.0,a1.1');
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    it("undo of an entry's own removal while external truth holds the key: refuses, typed", async () => {
+      const tree = make(enhancers);
+      try {
+        tree.$.rows.addMany([row('z', 0), row('a', 1)]);
+        await flush();
+        undoable(() => tree.$.rows.removeOne('a'));
+        await flush();
+        external(() => tree.$.rows.addOne(row('a', 50)));
+        await flush();
+        await expectRefusal(tree, () => tree.undo(), 'undo', HELD);
+        expect(read(tree)).toBe('z0.0,a50.50');
+      } finally {
+        tree.destroy();
+      }
+    });
+
     it('an ordinary removal is still put back (control)', async () => {
       const tree = make(enhancers);
       try {

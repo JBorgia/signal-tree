@@ -290,7 +290,11 @@ Writes applied with `external()` (and Link inbound writes) are not ordinary
 writes: an undo that would overwrite external truth refuses instead. That
 includes a row external truth removed, or whose key it changed after the
 ordinary removal: undo or redo of the edit refuses with ST1034 rather than
-put the row back.
+put the row back. Undo of an undoable entry's own removal instead compares the
+key with what the turn left, as a scalar undo compares the value: once external
+truth has added and removed the key again it is absent as the turn left it and
+the row comes back, while a row external truth still holds there refuses like
+any other row at the key.
 
 The same holds when the ordinary write omitted a location (a whole value that
 left out its key, or a key above it). Since 15.4.4, `undo()`, `redo()` and
