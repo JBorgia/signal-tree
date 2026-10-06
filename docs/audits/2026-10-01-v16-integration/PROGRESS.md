@@ -3507,3 +3507,443 @@ and `fix/v15-entity-review` at `85db805e` (`-export-2`).
 7. **`getRestorationHistory()` scaling** (8d item (d)): performance pass.
 8. **Pre-existing, reported by the reviewer, not re-verified or changed:**
    `prependMany` with duplicate ids hangs, on any collection.
+
+## Slice 8f: writes during structural writes, blocked re-adds, taps, duplicate ids
+
+Committed on `integrate/v16-slice8f` from `7a11905c` (slice 8e):
+- `88a0efda`: item 4, a duplicated id in one batch call applies sequentially
+  (v15 `778f86ef`, `e02238f4`);
+- `5fc4b0d3`: item 2, a blocked re-adding write changes nothing;
+- `8f56cea4`: item 1, a write made during a structural write never vanishes;
+- `b29052be`: item 3, taps read rows absent-aware;
+- `acf84539`: tests (the v15 same-turn updater case, per-tree physical rows)
+  and two spec-type fixes;
+- `24bf060c`: the first review's fixes, and taps reading projections fresh;
+- `9cb94957`: the second review's fixes;
+- `6f65e2d8`: a carrier for mutation H7;
+- this record.
+
+Evidence (design note, probes, first reds, mutation logs, verification, size,
+the two review passes and the v15 probes) is in
+`/Users/jonathanborgia/code/signaltree/.claude/evidence/v16/slice8f/`. The
+defects the 15.4.x carry must close are listed, with probes, in
+`/Users/jonathanborgia/code/signaltree/.claude/evidence/v16/carry-15.4.x/DEFECTS.md`.
+
+### Item 4: a duplicated id in one batch call
+
+**Reproduced on v16, and on v15.**
+- On v16, `prependMany([x, x])` returned `['x', 'x']`, linked the row to
+  itself, and the next read threw `RangeError: Invalid array length`. A walk
+  that never ended was the reported hang.
+- `addMany` put two rows under one key in every mode.
+- v15 published `d63166c9` crashes the same way.
+- The v15 combined head `da335eb6` throws "already exists" (v15 `778f86ef`
+  and `e02238f4`). Probes: `probes/prepend-dup-*.txt` and
+  `probes/v15-prepend-dup-*.txt`.
+
+**Ported: the owner's sequential rule for 15.4.4.**
+- addMany/prependMany strict throws before any interceptor;
+- skip keeps the first copy;
+- overwrite keeps the last copy, in the first copy's place;
+- upsertMany merges each later copy;
+- interceptors run once per applied copy;
+- each key is written, announced, tapped and returned once.
+
+`moveKeysToFront` also dedupes. v15's two carrier specs come over, adapted to
+`.transact`. Their undo, redo and rollback cases that need v15's unported
+15.4.x line are expected failures, each naming the fixing commit:
+- `c775278e` for an overwrite of an existing row;
+- `005399a7` for prependMany's order;
+- `dbb8449b` for an upsert that adds a row.
+
+### Item 2: a blocked re-adding write changes nothing
+
+A row-adding write to an absent collection now proceeds in this order:
+1. **Checked as on an empty collection** (`interceptAsEmpty`): ids resolved,
+   a strict duplicate thrown, interceptors run once per applied copy.
+2. **Retained rows removed.** Taps do not see the removal (`silentClear`);
+   history records it.
+3. **The write runs** with the intercepted rows and its own interceptors
+   suppressed (`interceptsSuppressed`).
+4. **The path is re-added**, before any tap hears of the rows
+   (`pendingReAdd`, consumed in `emitTap`).
+
+A blocked write, or one with bad input, throws with nothing changed and no
+history. The 8e test that pinned the old edge (rows removed, removal in
+history) is flipped: the owner decided it.
+
+The review added these cases:
+- a tap reads the collection present and its writes are ordinary, with
+  interceptors running;
+- a tap that throws leaves the rows written;
+- one object an interceptor returns for two ids is written for each;
+- `addMany([])` and the like change nothing;
+- an interceptor's own write to the collection is kept.
+
+### Item 1: a write made during a structural write never vanishes
+
+8e scoped the structural scope per tree. A tap running inside a tree's own
+whole value or reversal could therefore write an absent location of that
+same tree into retained storage, where it stayed invisible.
+
+**Where structural writes write.** An instrumented full kernel run
+(`isw-sites.txt`) found only two places where a structural writer's own write
+consults the scope:
+- `recursiveUpdate`'s leaf write;
+- a marker's hydrate.
+
+Reversals and rollbacks never do: they write through slot frames, member
+installs and transition targets.
+
+**The fix:**
+- **Own write.** The writer marks the location it writes itself
+  (`structuralWrites.own`). Only that write keeps the silent own-member
+  reactivation.
+- **Ordinary writes.** Any other write while a structural write is open is
+  ordinary and re-adds its path.
+- **Kept re-adds.** Each such re-add is stamped (`readded`,
+  `structuralWrites.stamp`). A whole value honours re-adds made after it
+  began (`recursiveUpdate`'s `since`, shared by its levels), so a whole
+  value a tap starts decides for itself (second review).
+- **Removed.** The per-tree tokens and the dead branch-write check are gone.
+
+### Item 3: taps read rows absent-aware
+
+Every tap runs through `emitTap`, which marks the call (`taps.depth`, in
+`physical-rows.ts`). Row reads are absent-aware while any tap runs, even
+inside a reversal's physical-rows window.
+
+The window records the tap depth it opened at (`openPhysicalRows`), so a
+reversal a tap starts keeps its own reads physical. In the first review, redo
+from a tap threw "Entity with id a not found".
+
+### Taps read projections fresh (the coordinator's follow-up)
+
+**The problem.** A tap inside a grouped write (`transact`, undo, redo,
+jumpTo, rollback) read cached projections from before the group:
+`removeOne('a')`'s tap read `all()` as `['a', 'b']`.
+
+**How far it reaches.**
+- It is pre-existing, on present collections too, in the kernel and all
+  four adapters (`item6/adapters-out.txt`).
+- v15 `12187613` behaves the same (`item6/v15-tapcache-out.txt`, export
+  `/private/tmp/st-v15-tapcache-1`).
+
+**The two options:**
+- **(a) Settle in the location runtime.** This would change publication for
+  every grouped write in every tree. Dirty-marking early also loses observer
+  notifications: a derived recomputed mid-group compares equal at publish
+  time.
+- **(b) Read uncached inside taps — chosen.** While a tap runs, the
+  projection getters and factories hand out an uncached reader of the same
+  computation:
+  - the getters and factories are `all`, `count`, `ids`, `asMap`, `empty`,
+    `activeEntity`, `has`, `where` and `find`;
+  - the reader still reads the collection's version, so a derived first
+    computed in a tap (a tree snapshot) stays reactive (mutation G2);
+  - `ids` shares `computeIds` with its cached form; built from row payloads,
+    it was wrong after `changeId` (second review).
+
+**Measured** (`item6/bench.txt`, under a load average of about 24, so treat
+the figures as indicative):
+- cached reads outside taps: within noise;
+- a projection read inside a tap now computes in full.
+
+**Two limits, documented:**
+- A projection cell obtained before the tap (`const all = rows.all`) keeps
+  its cache until the group ends; pinned.
+- User code (not a tap) inside `transact` still reads cached projections from
+  before the group, on v16 and v15 alike (`item6/ryw-out.txt`). Fixing that
+  needs option (a); it is an open item.
+
+### Item 5
+
+`activeId` is kept while absent, as documented. No change.
+
+### The v15 updater case
+
+Carried from v15 `12187613` (`hidden-location-v15.spec.ts`, case 2): one
+turn omits a branch and writes under it with an updater, in three history
+orders and three rollback orders.
+
+It already passes on v16, because 8e records stored before-images. Mutation
+U1 (the updater records the absent value) fails all 6 cases, so v16 lacked
+the carrier, not the fix.
+
+### First red (`first-red/`)
+
+| Carrier | Red against |
+| --- | --- |
+| `batch-duplicate-ids` (v15) | 82 of 85 at `7a11905c` |
+| `batch-duplicate-interceptors` (v15) | 54 of 62 at `7a11905c` |
+| structural-store dedupe | 1 of 14 without the dedupe (bounded: the integrity walk stops on a cycle) |
+| item 2, blocked writes | 8 of 71 at `88a0efda` |
+| item 1, kernel | 3 of 74 at `5fc4b0d3` |
+| item 1, angular, vue, solid, react | 2 each at `5fc4b0d3` |
+| item 3 | 6 without the tap mark (mutation F3a) |
+| review fixes, kernel `absent-collection` | 10 of 91 at `acf84539` |
+| tap freshness, kernel `entity-tap-reads` | 7 of 11 at `acf84539` |
+| tap freshness, angular, vue, solid, react | 2 each at `acf84539` |
+| `ids()` after `changeId` in a tap | mutation G3 |
+
+### Mutations (each restored by content hash; logs `mutations-*/`)
+
+Counts are killed cases. The final run was at `24bf060c` in a separate
+export (`/private/tmp/st-v16-slice8f-mut-3`): `mutations-8f-24bf.log`,
+`mutations-b-24bf.log` and `mutations-a-24bf.log`.
+
+Mutations run against later commits:
+- G3 at `9cb94957`;
+- H7 with its carrier at `6f65e2d8`;
+- R2 rerun alone after a worker-start error under load (killed 3).
+
+The 8e sets that still apply ran again on the 8f code.
+
+| Mutation | Killed |
+| --- | --- |
+| **8f item 4** | |
+| F4a an earlier copy in one call is not existing | 35 |
+| F4b overwrite intercepts only the last copy | 16 |
+| F4c upsertMany replaces an earlier copy | 18 |
+| F4d moveKeysToFront prepends a node per mention | 1 |
+| **8f item 2 and its review fixes** | |
+| F2a intercepted after the removal | 18 |
+| F2b intercepts twice | 2 |
+| F2c a later upsert copy intercepted as an add | 3 |
+| F2d nested wrapped calls repeat the re-adding write | 0 (equivalent, below) |
+| H1 taps hear before the path is re-added | 2 |
+| H2 a tap's write keeps interceptors suppressed | 1 |
+| H3 a shared intercepted object written once | 1 |
+| H4 an empty call clears and re-adds | 3 |
+| H5 an interceptor's re-add is cleared again | 1 |
+| **8f item 1 and its review fixes** | |
+| F1a a whole value's leaf write is not its own | 6 |
+| F1b a marker hydrate is not its own | 1 |
+| F1c a foreign re-add is omitted again | 9 |
+| F1d every write during a structural write is structural | 11 |
+| F1e no write is the structural writer's own | 4 |
+| H6 every re-add binds every whole value | 1 |
+| H7 each recursion level starts a new whole value | 1 (0 before its carrier) |
+| **8f item 3, the depth window, fresh projections** | |
+| F3a taps read rows physically during a reversal | 6 |
+| H8 the physical-rows window ignores the tap depth | 1 |
+| G1 a tap reads projections through their caches | 7 |
+| G2 a fresh reader does not read the version | 1 |
+| G3 a fresh `ids()` reads row payload ids | 1 |
+| **8e sets on the 8f code** | |
+| C1–C14, T1–T5, X1 | 123, 57, 66, 80, 91, 2, 98, 92, 2, 3, 35, 1, 14, 1; 6, 12, 6, 22, 6; 58 |
+| D1–D7 | 99, 18, 4, 2, 98, 1, 76 |
+| R10–R20 | R10 15, R11 18, R12 6, R13 27, R13b 8, R14 1, R17 1, R18 1, R20 1 |
+| A1–A25, R2–R7, S1–S8 | all killed (A1 78 … S8 5) |
+| B1–B9, B12–B14 | all killed |
+| **Survivors** | R11b, D8, R18b (8e, unchanged); F2d; B10, B11 |
+
+Notes on the survivors:
+- **F2d (removing the `reAdding` guard) is equivalent.** Without it, a nested
+  wrapped call (`prependMany` → `addMany`, `upsertOne` → `addOne`) finds the
+  collection still absent and repeats the same empty-collection work. It
+  re-adds the path one call earlier, with the same outcome.
+- **R11b, D8, R18b, B10 and B11** are as recorded in 8e.
+
+### Results
+
+Slice-close verification at `6f65e2d8` (`verify/run2/`), all exit 0
+unless noted.
+
+**Full kernel.** The run was made under load averages of 40 to 60, from
+parallel agents:
+- 376 files passed;
+- 5 files timed out: `entity-large-batches`,
+  `entity-large-batches-v16-controls`, `large-batch-restoration-v16-controls`,
+  `target-transition` and `production-scalar-substrate`;
+- 18 files did not start (vitest "Failed to start forks worker").
+
+All 23 were then rerun alone, one per invocation (`verify/run2-rerun/`), and
+all 23 passed (572 tests).
+
+**Frameworks:** angular 218 (+3 skipped), react 55, vue 113, solid 80. That
+is +4, +4, +5 and +4 over 8e.
+
+**Gates:**
+- `pnpm typecheck`;
+- `check-spec-types` (the three pre-existing improvements; not ratcheted);
+- lint on all five projects (8 pre-existing warnings, 0 errors);
+- neutrality, source-controls, `api-inventory --check`, callable-inventory;
+- the five-package build and the consumer typecheck;
+- doc-links, documented-examples, documented-imports and documented-symbols.
+
+**Bundle budget:** exits 1, as since before 8d.
+
+**Earlier runs:**
+- `verify/run1` at `b29052be` failed `check-spec-types` (fixed in
+  `acf84539`), and 3 kernel files timed out under load (all pass alone,
+  `verify/timeouts-1`).
+
+### Size
+
+Measured with the same tools as 8e: `size/final-vs-base.txt` and
+`final-vs-8e.txt`, on the `6f65e2d8` build. Values are gzip.
+
+| Scenario | 8e over base | 8f over base | 8f over 8e |
+| --- | --- | --- | --- |
+| bare | +575 B | +655 B | +80 B |
+| entities | +1,024 B | +1,589 B | +565 B |
+| transactions | +1,289 B | +1,400 B | +111 B |
+| restoration | +994 B | +1,120 B | +126 B |
+| link | +827 B | +932 B | +105 B |
+| full | +1,791 B | +2,376 B | +585 B |
+
+Where the bytes went:
+- **bare:** the own-write marking, the stamped `readded` map with its
+  `since` threading, and `taps`/`openPhysicalRows`;
+- **entities:** also the duplicate rule, `interceptAsEmpty`, `emitTap`, the
+  fresh projection readers, `computeIds` and the re-add-before-tap
+  machinery.
+
+`check-bundle-budget`, prod against budget: bare 11.03 KB against 10.25,
+entities 25.14 KB against 22.6. Dev builds: bare 13.28 KB, entities
+27.83 KB.
+
+### Independent review
+
+One read-only code-reviewer agent made two passes, with the raw diffs, the
+coordinator's items verbatim, the design note and the mutation logs, in its
+own exports (`/private/tmp/st-v16-slice8f-review-1..4`).
+
+Process: in its first pass it used `rm` twice, both typos:
+- `rm -f /dev/null`, which failed;
+- once on its own probe log inside its export.
+
+Nothing in a worktree was touched. It was told, and used none in the second
+pass.
+
+**Pass 1 (`88a0efda`..`b29052be`): needs fixes. All fixed in `acf84539` and
+`24bf060c`.** Majors:
+1. A tap's write bypassed interceptors.
+2. A throw after the clear left partial state; an interceptor's shared
+   object lost rows.
+3. A re-entrant whole value failed to omit.
+4. A reversal started from a tap failed.
+5. The spec-type gate was red.
+6. The prependMany cases were filtered out instead of expected to fail.
+
+Minors fixed: empty calls; an interceptor's own write; taps reading the
+collection absent during its own re-adding write; thin interceptor-equality
+coverage; CHANGELOG and README.
+
+It verified as sound:
+- the item 4 port, hunk by hunk;
+- the `it.fails` lists, which reproduce on single-id calls at base;
+- every structural writer's own write, by a stack logger over all four
+  adapter suites;
+- the suppression scoping.
+
+**Pass 2 (`acf84539`, `24bf060c`): needs fixes, fixed in `9cb94957`.** It
+re-ran every first-pass probe and confirmed the fixes. Two findings:
+- **Major:** `ids()` in a tap after `changeId`.
+- **Major:** freshness depends on how the cell was obtained. Documented and
+  pinned; making held cells fresh needs option (a).
+- **Minor:** cost inside taps, measured only under load.
+
+It verified as sound:
+- `pendingReAdd`, nested and re-entrant;
+- the `since` stamps;
+- the `openPhysicalRows` depth;
+- the version dependency of the fresh reader;
+- the choice of (b) over (a).
+
+### User-visible behaviour changes in v16 (slice 8f)
+
+1. **A duplicated id in one batch call applies sequentially.** Strict throws
+   before anything happens, and `prependMany` no longer corrupts the order.
+2. **A row-adding write to an absent collection is checked first.** A
+   blocked write or bad input changes nothing. Taps hear of the written rows
+   with the collection present, and their writes are ordinary.
+3. **A write made from a tap or sync effect during a whole value or a
+   reversal** re-adds its path, in any tree, including the same one. A whole
+   value a tap starts omits what it leaves out.
+4. **Taps read rows absent-aware, and projections fresh** through the
+   collection. A reversal a tap starts works.
+
+### v15 applicability, and what v15 needs from 8f
+
+Read against v15 `12187613` (exports `/private/tmp/st-v15-tapcache-1`,
+`/private/tmp/st-v15-prepend-dup-5`).
+
+v15 `12187613` needs these from 8f. Full instructions, with v15 line
+numbers, are in `v15-port-instructions.md` in the evidence directory.
+
+1. **Item 1 (a write during a structural write).** v15 carries 8e's
+   per-tree scope.
+   - `member-membership.ts`: replace `beginStructuralWrite(node)`, `trees`
+     and the per-tree `inStructuralWrite` with 8f's `own`, the stamped
+     `readded` and `readdedDuringStructuralWrite(branch, key, since)`.
+   - `signal-tree.ts`:
+     - `recursiveUpdate` takes `since`;
+     - `own` is marked around `hydrateMarkerNode(prop, …)` and the leaf
+       write;
+     - the reconcile checks `readded`;
+     - the branch write drops `inStructuralWrite`.
+   - restoration and transactions call `beginStructuralWrite()` with no
+     argument.
+   - entity-signal checks `inStructuralWrite(proxy)`.
+2. **Item 2 (blocked re-adding write).** v15 carries 8e's `deriveId`
+   wrapper.
+   - Add `interceptAsEmpty`.
+   - Put `interceptsSuppressed` in v15's single `runInterceptors`.
+   - Add `reAdding` and `pendingReAdd`, the empty-call guard and the
+     already-present guard.
+   - Keep v15's `refuseTopologyChange`: on v15 an interceptor that writes
+     the same collection refuses, so v16's "an interceptor's own write is
+     kept" does not apply.
+3. **Item 3 (taps).**
+   - `physical-rows.ts`: `[registry, depth]` entries, `taps` and
+     `openPhysicalRows`.
+   - `rowAbsent`: match the registry at the current tap depth.
+   - v15's `emitTap` (already inside `runUserCallback`): consume
+     `pendingReAdd`, clear and restore suppression and `reAdding`, and count
+     `taps.depth`.
+4. **Fresh projections in taps.**
+   - Add `computeAll`, `computeCount`, `computeMap` and `computeIds`, plus
+     `fresh` and `inTap`.
+   - Give the getters and factories a tap branch.
+   - v15 has the same stale reads (`item6/v15-tapcache-out.txt`).
+5. **Item 4.** The rule is already in v15. Only the `moveKeysToFront` dedupe
+   is new, and it is optional.
+6. **Already present in v15:** the pending-rollback membership key (`keyOf`),
+   the same-turn updater case, and replay taps (`66144140`). So the two tap
+   cases that are expected failures on v16 should pass on v15.
+7. **Carriers:** the 8f describes in `absent-collection.spec.ts`, the whole
+   of `entity-tap-reads.spec.ts`, and the two new cases in each adapter's
+   `absent-collection` spec. Use `.transact(` → `.transaction(`.
+
+### Port note corrections (to the 8e record)
+
+- **Three of 8e's shapes are superseded by 8f:**
+  - the per-tree structural scope (`beginStructuralWrite(node)`, `trees`);
+  - the `deriveId` pre-validation wrapper;
+  - `physicalRows` as a list of registries.
+
+  v15 `12187613` ported those 8e shapes, so it carries the same-tree
+  vanishing write, the blocked-write edge and taps without the tap mark.
+- **v15 names:** v15's pending-rollback dedupe key is `keyOf` (already
+  carrying the membership branch); its interceptors share `runInterceptors`;
+  its taps run through `emitTap(name, ...args)` inside `runUserCallback`.
+
+### Open items
+
+1. **The 15.4.x carry** (`carry-15.4.x/DEFECTS.md`). The expected failures
+   naming `c775278e`, `005399a7`, `dbb8449b` and `66144140` flip there:
+   - undo of an overwrite deletes the row;
+   - undo of an upsert that added a row throws;
+   - redo of a prepend appends;
+   - replays fire no taps;
+   - the `da335eb6` and `b2107f43` rules for rows touched by ordinary writes.
+2. **Read-your-writes inside a transaction:** user code inside `transact`
+   reads cached projections from before the group (v16 and v15). A fix needs
+   the location runtime to settle groups.
+3. **Held projection cells inside a tap** keep their cache until the group
+   ends (documented).
+4. **Residual omission cost** in bare and entities (8e item 1): owner
+   decision.
+5. **`getRestorationHistory()` scaling** (8d item (d)).
