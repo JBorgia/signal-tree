@@ -382,8 +382,17 @@ const TARGETS = {
     // October 1 owner approval: 22.54KiB prod / 25.37KiB dev after safe
     // reductions and diagnostic folding checks. Only development headroom
     // increases; the production ceiling remains unchanged. See the takeover audit.
+    // 15.4.4 Link repairs, within the owner's ~100 B entities allowance: base
+    // f8ff7431 measured 23,134 B prod gzip, this branch 23,154 B (+20 B). The
+    // bytes are data the entity bundle must carry for Link to be correct,
+    // not diagnostics, so they do not fold: destroy() closing the tree's
+    // position registry (+8 B: link() refuses a destroyed tree, and Links are
+    // disposed), and entityMap handing its sortComparer to the Link seed
+    // (+12 B: endpoints receive all() order). The Link order tier added 0 B.
+    // Offsets tried and rejected (each worse or a few bytes at the cost of
+    // opaque names) are recorded with the commit. 22.62 KB = 23,163 B.
     devKB: 25.5,
-    prodKB: 22.6,
+    prodKB: 22.62,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });
