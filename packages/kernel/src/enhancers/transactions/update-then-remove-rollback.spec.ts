@@ -510,3 +510,38 @@ describe.each(Object.entries(configurations))(
     );
   }
 );
+
+// getRestorationHistory() after an undo materializes the UNDONE turn in the
+// redo direction (as jumpTo forward does): the composed removal precedes the
+// field write in capture order, so the field must still land while the row
+// exists.
+describe.each([
+  ['restoration()', () => [restoration()]],
+  ['transactions(), restoration()', () => [transactions(), restoration()]],
+  ['restoration(), transactions()', () => [restoration(), transactions()]],
+] as const)(
+  'history after undoing write-then-remove (%s)',
+  (_name, enhancers) => {
+    it.each([
+      'changeId, updateOne, then removeOne',
+      'changeId, updateOne adding a field, then removeOne',
+    ] as const)('%s: history and jumpTo(last) after undo', async (name) => {
+      const tree = make(enhancers);
+      try {
+        await seed(tree);
+        undoable(() => writeThenRemove[name](tree));
+        await flush();
+        const after = state(tree);
+        tree.undo();
+        await flush();
+        const history = tree.getRestorationHistory();
+        expect(history).toHaveLength(1);
+        tree.jumpTo(0);
+        await flush();
+        expect(state(tree)).toStrictEqual(after);
+      } finally {
+        tree.destroy();
+      }
+    });
+  }
+);
