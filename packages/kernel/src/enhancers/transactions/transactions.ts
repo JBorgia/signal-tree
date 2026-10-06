@@ -3,6 +3,7 @@ import {
   plainBranchMembershipEffects,
   plainBranchMembershipChange,
   composePlainBranchMemberEffect,
+  settleTurnMemberEffects,
   plainBranchMemberEffectIsNoop,
   preparePlainBranchMembers,
   refreshOmittedCollection,
@@ -1628,7 +1629,13 @@ export function getOrCreateInternalTransactionRuntime<T>(
     bucket.positionIds.clear();
     const baselineValues = new Map(bucket.baselineValues);
     bucket.baselineValues.clear();
-    const effects = Array.from(bucket.effects.values()).map(cloneTurnEffect);
+    // A transaction's member images are its endpoints, and net no-ops are
+    // dropped only now, as restoration's turns (`settleTurnMemberEffects`,
+    // v16 8g): rollback of `x(5); omit g; re-add g` came back with x 5.
+    const effects = settleTurnMemberEffects(
+      tree.$ as object,
+      Array.from(bucket.effects.values()).map(cloneTurnEffect)
+    );
     bucket.effects.clear();
     const collectionOrders = Array.from(bucket.collectionOrders.values()).map(
       (order) => ({
@@ -1717,7 +1724,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
           existing.mutationIntent,
           effect.mutationIntent
         );
+        // A net no-op stays in the transaction's effects until they are
+        // drained (`settleTurnMemberEffects`); a footprint drops it at once.
         if (
+          effectMap === bucket.entityFootprints &&
           plainBranchMemberEffectIsNoop(existing) &&
           (existing.fieldPresence?.before ?? true) ===
             (existing.fieldPresence?.after ?? true)
