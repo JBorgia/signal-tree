@@ -194,3 +194,61 @@ describe.each([
     }
   });
 });
+
+/**
+ * Only a state the tree itself produced is replayed without interceptors. The
+ * extension can hold imported or hand-edited states, and any client can send
+ * a JUMP_TO_STATE: a state the tree never serialized is new input, so the
+ * interceptors run — a transform applies and a block refuses it (round-3
+ * review probe C: a forged JUMP_TO_STATE bypassed a blocking interceptor).
+ */
+describe.each([
+  ['per-tree instance', false],
+  ['aggregated instance', true],
+] as const)('devtools: a jump to a state the tree never recorded (%s)', (_name, aggregated) => {
+  const forged = (rows: Row[]) => {
+    const tree = { rows: { all: rows } };
+    return aggregated ? { T: tree } : tree;
+  };
+
+  it.each(replays)('%s of a forged state runs a blocking interceptor', async (kind) => {
+    installExtension();
+    const tree = make(aggregated);
+    try {
+      tree.$.rows.addOne({ id: 'a', n: 1 });
+      await flush();
+      const calls = intercept(tree, 'block');
+      let refused: unknown;
+      try {
+        dispatch(messages[kind](forged([{ id: 'forged', n: -1 }])));
+      } catch (error) {
+        refused = error;
+      }
+      await flush();
+      expect(calls.length).toBeGreaterThan(0);
+      expect(String(refused)).toMatch(/no/);
+      expect(tree.$.rows.all()).toStrictEqual([{ id: 'a', n: 1 }]);
+    } finally {
+      tree.destroy();
+    }
+  });
+
+  it.each(replays)('%s of an edited recorded state runs a transforming interceptor', async (kind) => {
+    installExtension();
+    const tree = make(aggregated);
+    try {
+      tree.$.rows.addOne({ id: 'a', n: 1 });
+      await flush();
+      tree.$.rows.updateOne('a', { n: 2 });
+      await flush();
+      const calls = intercept(tree, 'transform');
+      // The recorded { a: 1 } with one field edited.
+      dispatch(messages[kind](forged([{ id: 'a', n: 7 }])));
+      await flush();
+      expect(calls).toStrictEqual(['update:a']);
+      expect(tree.$.rows.all()).toStrictEqual([{ id: 'a', n: 7, p: 9 }]);
+    } finally {
+      tree.destroy();
+    }
+  });
+});

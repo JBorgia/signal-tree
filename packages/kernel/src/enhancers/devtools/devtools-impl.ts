@@ -571,6 +571,36 @@ function sanitizeState(
   return value;
 }
 
+/**
+ * A 53-bit hash of a state's JSON (cyrb53), or undefined when it has none.
+ * Identifies the serialized states a tree produced, so a timeline jump can be
+ * verified as one of them (15.4.4).
+ */
+function stateHash(state: unknown): number | undefined {
+  let json: string;
+  try {
+    json = JSON.stringify(state);
+  } catch {
+    return undefined;
+  }
+  if (json === undefined) return undefined;
+  let h1 = 0xdeadbeef;
+  let h2 = 0x41c6ce57;
+  for (let i = 0; i < json.length; i++) {
+    const code = json.charCodeAt(i);
+    h1 = Math.imul(h1 ^ code, 2654435761);
+    h2 = Math.imul(h2 ^ code, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+  h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+  h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+}
+
+/** How many serialized states a tree remembers for verifying jumps. */
+const RECORDED_STATE_LIMIT = 1000;
+
 function parseDevToolsState(state: unknown): unknown {
   if (typeof state === 'string') {
     try {
@@ -1309,7 +1339,7 @@ export function createDevToolsEnhancer(
       return rootAuthority.read();
     };
 
-    const buildSerializedState = (rawState: unknown): unknown => {
+    const serializeState = (rawState: unknown): unknown => {
       if (serialize) {
         try {
           return serialize(rawState);
@@ -1323,6 +1353,26 @@ export function createDevToolsEnhancer(
         maxStringLength,
         entityKeyedView,
       });
+    };
+
+    /**
+     * Hashes of the serialized states this tree produced — what the timeline
+     * records, in per-tree and aggregated mode alike. A jump replays one of
+     * them only if its state is among them (15.4.4); the extension can also
+     * hold imported or hand-edited states, which are new input.
+     */
+    const recordedStates = new Set<number>();
+    const buildSerializedState = (rawState: unknown): unknown => {
+      const serialized = serializeState(rawState);
+      const hash = stateHash(serialized);
+      if (hash !== undefined) {
+        recordedStates.delete(hash);
+        recordedStates.add(hash);
+        if (recordedStates.size > RECORDED_STATE_LIMIT) {
+          recordedStates.delete(recordedStates.values().next().value as number);
+        }
+      }
+      return serialized;
     };
 
     const buildAction = (
@@ -1521,13 +1571,16 @@ export function createDevToolsEnhancer(
     };
 
     /**
-     * `replays`: the state is one this tree recorded (a timeline jump, a
-     * revert to the last commit), written back as recorded — its own entity
-     * writes skip interceptors, as undo's do (15.4.4). An imported state is
-     * new input and keeps them.
+     * `replays`: the message replays a recorded state (a timeline jump, a
+     * revert to the last commit). If the state is verifiably one this tree
+     * produced, it is written back as recorded and its entity writes skip
+     * interceptors, as undo's do (15.4.4). Anything else — a forged or
+     * edited state, an import — is new input and keeps them.
      */
     const applyInspectionState = (state: unknown, replays = false): void => {
       if (state === undefined || state === null) return;
+      const verified =
+        replays && recordedStates.has(stateHash(state) as number);
       isApplyingInspectionState = true;
       try {
         // Tag every leaf write performed during this replay with
@@ -1558,7 +1611,7 @@ export function createDevToolsEnhancer(
               rootAuthority.replace(state as T);
             }
           },
-          replays
+          verified
         );
       } finally {
         isApplyingInspectionState = false;
