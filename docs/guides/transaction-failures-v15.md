@@ -50,6 +50,23 @@ documented limitation since 15.4.2); 15.4.4 adopts the rule above. Undo is still
 not a way back to the state before the transaction — it reverses authored
 history, and the rejected transaction is not part of it.
 
+A collection order change does not reverse once other work has added or
+removed rows of the same collection. That covers `setAll` reordering surviving
+rows, or an overwriting `prependMany` moving a row to the front, combined with
+an `addOne`, `removeOne` or similar on that collection, in two cases:
+
+- the add or remove is in the same transaction or undoable turn;
+- it is in a later one, even after that later work is undone or rolled back
+  and the order is back where the change left it.
+
+`undo()` throws and `rollback()` refuses with `effect-validation-failed`; state
+is unchanged. A separate earlier turn does not block it, and neither does a
+later `updateOne`. The `setAll` cases refused on 15.4.3 too. The `prependMany`
+cases reported success on 15.4.3 and deleted the overwritten row. This is an
+open design question: an order change is reversible only while the
+collection's order is exactly as that change left it, tracked by identity, not
+by content.
+
 Recoverable pending refusal with a usable recovery handle and consequences
 held until explicit confirmation is a **v16 target**, not a current v15 API.
 

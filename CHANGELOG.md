@@ -41,8 +41,11 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   `jumpTo()` and history changes). Steps back are `getCurrentIndex() + 1`.
 - Still refused, an open design question rather than a decision: a collection
   order change (`setAll` reordering survivors, `prependMany` moving an
-  overwritten row) combined with another add or remove of the same collection
-  in one turn.
+  overwritten row) combined with another add or remove of the same collection,
+  in the same turn or in a later one (even after that later work is undone or
+  rolled back). Undo throws and rollback refuses (`effect-validation-failed`),
+  with state unchanged. The `setAll` cases refused on 15.4.3 too. The
+  `prependMany` cases reported success there and deleted the overwritten row.
 
 ## 15.4.3 (2026-10-05)
 
