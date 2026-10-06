@@ -240,6 +240,73 @@ describe('jumps that cross rows, a path re-add and an omission (v16 8g)', () => 
       from: 0,
       to: 2,
     },
+    // The same supersession as 'path re-adds, then a jump back past the
+    // omission', on the declarative path: the jump also reverses a reorder.
+    'a member write supersedes an older scalar, with a reorder in the jump': {
+      steps: (tree) => [
+        () => tree.$.count(1),
+        () =>
+          tree.$.g.rows.setAll([
+            { id: 'a', n: 1 },
+            { id: 'b', n: 2 },
+          ]),
+        () =>
+          tree.$.g.rows.setAll([
+            { id: 'b', n: 2 },
+            { id: 'a', n: 1 },
+          ]),
+        () => tree.$({ count: 2 }),
+        () => tree.$.g.h.x(7),
+        () => tree.$.g.h.y(4),
+        () => tree.$.g.h.y(9),
+      ],
+      from: 6,
+      to: 1,
+    },
+    // 'a turn whose own scalar is newer than its member re-add', on the
+    // declarative path.
+    'a turn keeps its own newer scalar, with a reorder in the jump': {
+      steps: (tree) => [
+        () => tree.$.count(1),
+        () =>
+          tree.$.g.rows.setAll([
+            { id: 'a', n: 1 },
+            { id: 'b', n: 2 },
+          ]),
+        () =>
+          tree.$.g.rows.setAll([
+            { id: 'b', n: 2 },
+            { id: 'a', n: 1 },
+          ]),
+        () => {
+          tree.$.g.h.y(1);
+          tree.$({ count: 3 });
+          tree.$({ g: { h: { x: 0, y: 3 } }, count: 9 });
+          tree.$.g.h.y(5);
+        },
+      ],
+      from: 1,
+      to: 3,
+    },
+    // Forward from 1 to 4: d's recorded neighbour e is added by one turn and
+    // removed by a later one, so only a turn-by-turn replay can place d.
+    'an anchor another turn added and a later turn removed': {
+      steps: (tree) => [
+        () => tree.$.count(1),
+        () => tree.$({ g: { h: { x: 0, y: 0 } }, count: 9 }),
+        () => tree.$.g.rows.addOne({ id: 'e', n: 0 }),
+        () =>
+          tree.$.g.rows.setAll([
+            { id: 'a', n: 1 },
+            { id: 'b', n: 2 },
+            { id: 'd', n: 3 },
+            { id: 'e', n: 4 },
+          ]),
+        () => tree.$.g.rows.removeOne('e'),
+      ],
+      from: 1,
+      to: 4,
+    },
     // Forward from 1 to 3 re-adds the rows with e, then `setAll` places a, b
     // and d around it: d's recorded neighbour e was added by the other turn.
     'additions anchored on a row another turn added': {
