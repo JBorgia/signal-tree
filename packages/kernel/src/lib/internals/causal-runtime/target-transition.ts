@@ -275,24 +275,28 @@ export function requiresDeclarativeStructuralTarget(
   // another turn added is not one this placement can rely on, so the
   // complete target decides (a jump forward over a re-add and a `setAll`
   // came back `d,e,a,b` for `a,b,d,e`; v16 8g, cause 5).
-  const addedSubjects = new Map<string, Set<unknown>>();
+  //
+  // ⚠️ AND ADDED BEFORE IT. Each addition lands in sequence, so an anchor
+  // the sequence adds later is not there yet: redo of `addOne(e);
+  // setAll([b, c, d, e])` on an empty collection placed b and c, anchored on
+  // c and d, behind e and gave `d,e,b,c` (15.4.3 and since; found by the
+  // jump fuzz's multi-write turns).
+  const addedSubjects = new Map<string, Map<unknown, number>>();
   const turnOf = (effect: ReversalEffect) => `${effect.owner}:${effect.turn}`;
-  for (const effect of additions) {
+  additions.forEach((effect, at) => {
     let subjects = addedSubjects.get(turnOf(effect));
-    if (!subjects) addedSubjects.set(turnOf(effect), (subjects = new Set()));
-    subjects.add(effect.subjectId);
-  }
-  return additions.some((effect) => {
+    if (!subjects) addedSubjects.set(turnOf(effect), (subjects = new Map()));
+    subjects.set(effect.subjectId, at);
+  });
+  return additions.some((effect, at) => {
     const context = effect.structuralContext;
     if (context?.kind !== 'add' && context?.kind !== 'remove') {
       return false;
     }
     const added = addedSubjects.get(turnOf(effect));
-    return (
-      (context.beforeSubject !== undefined &&
-        !added?.has(context.beforeSubject)) ||
-      (context.afterSubject !== undefined && !added?.has(context.afterSubject))
-    );
+    const placed = (anchor: number | undefined) =>
+      anchor === undefined || (added?.get(anchor) ?? at) < at;
+    return !placed(context.beforeSubject) || !placed(context.afterSubject);
   });
 }
 

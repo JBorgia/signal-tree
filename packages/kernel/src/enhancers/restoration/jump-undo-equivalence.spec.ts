@@ -329,6 +329,56 @@ describe.each(configurations)(
   }
 );
 
+// ─── one turn's additions anchored on rows it adds later ────────────────────
+// Found by the fuzz's multi-write turns (seed 100071); on 15.4.3 too. Redo of
+// `addOne(e); setAll([b, c, d, e])` on an empty collection gave `d,e,b,c`:
+// physical placement lands each addition in sequence, and b and c are
+// anchored on c and d, which land after them. Such a turn now takes the
+// declarative target (`requiresDeclarativeStructuralTarget`).
+describe.each(configurations)(
+  "one turn's additions anchored on rows it adds later (%s)",
+  (_name, enhancers) => {
+    it('undo, redo and jumpTo give the recorded order', async () => {
+      const { tree, h } = make(enhancers);
+      try {
+        undoable(() => h.count(1));
+        await flush();
+        const start = tree.getCurrentIndex();
+        const empty = state(tree);
+        undoable(() => {
+          h.g.rows.addOne({ id: 'e', n: 0 });
+          h.g.rows.setAll([
+            { id: 'b', n: 3 },
+            { id: 'c', n: 3 },
+            { id: 'd', n: 8 },
+            { id: 'e', n: 8 },
+          ]);
+        });
+        await flush();
+        const latest = tree.getCurrentIndex();
+        const recorded = state(tree);
+        expect(recorded).toContain(
+          '[{"id":"b","n":3},{"id":"c","n":3},{"id":"d","n":8},{"id":"e","n":8}]'
+        );
+        tree.undo();
+        await flush();
+        expect(state(tree)).toBe(empty);
+        tree.redo();
+        await flush();
+        expect(state(tree)).toBe(recorded);
+        tree.jumpTo(start);
+        await flush();
+        expect(state(tree)).toBe(empty);
+        tree.jumpTo(latest);
+        await flush();
+        expect(state(tree)).toBe(recorded);
+      } finally {
+        tree.destroy();
+      }
+    });
+  }
+);
+
 // ─── fuzz ─────────────────────────────────────────────────────────────────
 
 const ITERATIONS = Number(process.env['REVERSAL_JUMP_FUZZ_ITERATIONS'] ?? 40);
@@ -350,6 +400,22 @@ const palette = (next: () => number): Op => {
   // Sometimes an undo, so later writes discard a redo future and reuse what
   // the undo retained.
   if (next() < 0.15) return 'undo';
+  // Sometimes one turn of several writes, so a turn can omit and re-add
+  // within itself (v16 8g, B).
+  const parts = Array.from(
+    { length: next() < 0.25 ? 2 + Math.floor(next() * 2) : 1 },
+    () => write(next)
+  );
+  return {
+    label: parts.map(({ label }) => label).join(' + '),
+    run: (h) => {
+      for (const { run } of parts) run(h);
+    },
+  };
+};
+const write = (
+  next: () => number
+): { label: string; run: (h: Handles) => void } => {
   // Every choice is drawn here, never when the op runs: both trees replay
   // the same ops.
   const pick = <T>(items: readonly T[]) =>
