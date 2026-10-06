@@ -256,6 +256,18 @@ describe('rebaseOntoRejection', () => {
   });
 
   describe('row renames', () => {
+    it('never writes back a key a different lifetime holds in a later record', () => {
+      const occupier: Effect = { ...add(5), key: 'a' } as Effect;
+      const [, [removal]] = rebase(
+        [rekey(1, 'a', 'a2')],
+        [occupier],
+        [remove(1, { id: 'a' }, undefined, undefined, 'a2')]
+      );
+      expect(removal).toStrictEqual(
+        remove(1, { id: 'a' }, undefined, undefined, 'a2')
+      );
+    });
+
     it('re-bases the from-key, and drops a rename that became a round trip', () => {
       const [onward] = rebase([rekey(1, 'a', 'a2')], [rekey(1, 'a2', 'a3')]);
       expect(onward).toStrictEqual([rekey(1, 'a', 'a3')]);

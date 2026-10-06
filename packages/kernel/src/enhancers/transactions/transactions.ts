@@ -543,6 +543,35 @@ function buildPendingRollbackPlan(
     return erased;
   };
 
+  /**
+   * A pending RENAME vacated its original key. Later work that put a DIFFERENT
+   * lifetime at that key (an add, or another row renamed onto it) depended on
+   * the rename having happened: "it never ran" is not a consistent state, even
+   * after the re-occupier was removed again, because its own records still
+   * name the key. Re-review of 23b750f0: accepted, the rejection rebase wrote
+   * the original key back into a later removal and history held two lifetimes
+   * at one key ("duplicate keys"). Checked BEFORE the rekey's erasure skip,
+   * which is exactly the case that accepted it.
+   *
+   * Renames only. A pending REMOVE whose key was re-occupied keeps its pinned
+   * `effect-validation-failed` refusal (proposal-rejection-0 case 15, the
+   * refusal-lifecycle gate's `replacement` cases).
+   */
+  const reoccupierOfVacatedKey = (
+    effect: CollectionRekeyEffect
+  ): LaterAppliedEffect | undefined =>
+    laterEffects.find(({ effect: later }) => {
+      if (
+        later.ownerPath !== effect.ownerPath ||
+        later.subject === effect.subject
+      ) {
+        return false;
+      }
+      return later.kind === 'add'
+        ? later.key === effect.beforeKey
+        : later.kind === 'rekey' && later.afterKey === effect.beforeKey;
+    });
+
   const compensation: TurnEffect[] = [];
   for (let i = pendingEffects.length - 1; i >= 0; i--) {
     const effect = pendingEffects[i];
@@ -579,6 +608,18 @@ function buildPendingRollbackPlan(
       case 'add':
       case 'remove':
       case 'rekey': {
+        const reoccupier =
+          effect.kind === 'rekey' ? reoccupierOfVacatedKey(effect) : undefined;
+        if (reoccupier) {
+          return {
+            conflict: dependencyConflict(reoccupier.unsettled === true, {
+              pendingTurnId: pendingTurn.id,
+              pendingEffect: effect,
+              conflictingTurnId: reoccupier.turnId,
+              conflictingEffect: reoccupier.effect,
+            }),
+          };
+        }
         if (effect.kind !== 'remove' && isErasedBySettledWork(effect)) {
           continue;
         }

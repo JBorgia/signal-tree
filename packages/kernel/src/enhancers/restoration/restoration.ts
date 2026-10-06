@@ -566,6 +566,33 @@ export function rebaseOntoRejection(
 
   const live = [...atoms];
   const liveRekeys = new Map(rekeys);
+  // Defence in depth: never write back a renamed-away key that a DIFFERENT
+  // lifetime holds in a later record. The rollback planner refuses that shape
+  // (a re-occupied vacated key is a dependency); if it ever got here, keeping
+  // the later key is consistent where restoring the original would put two
+  // lifetimes at one key.
+  if (liveRekeys.size > 0) {
+    for (const effects of lists) {
+      for (const effect of effects) {
+        const occupied =
+          effect.kind === 'add'
+            ? effect.key
+            : effect.kind === 'rekey'
+            ? effect.afterKey
+            : undefined;
+        if (occupied === undefined) continue;
+        for (const [scope, rekey] of liveRekeys) {
+          if (
+            rekey.position === effect.position &&
+            rekey.subject !== effect.subject &&
+            rekey.beforeKey === occupied
+          ) {
+            liveRekeys.delete(scope);
+          }
+        }
+      }
+    }
+  }
   const droppedRemovals = new Map<string, CollectionRemoveEffect>();
 
   /** Split an atom one level, or undefined when its values are not records. */
