@@ -722,8 +722,10 @@ unchanged.
 Committed as `4ce48aa5` (entity membership), `d20dac0f` (transaction
 lifecycle), `c0809eca` (restoration lineage), `c761404f` (Link activity),
 `f06a47e7` (state location and confirmed `fieldSegments`), `fbb88104`
-(tooling admission, typing/consumer fixtures, API baseline) and the review
-follow-up `c277d1ce`, on `integrate/v16-slice6` from `515a6969`. Raw logs,
+(tooling admission, typing/consumer fixtures, API baseline), the review
+follow-up `c277d1ce`, and the size follow-up `6d3449ca`, `ea05968e`,
+`dca4a989`, `d48c4e56` with its review follow-up `34d37b73` (see "Size
+follow-up" below; it supersedes where the reader machinery lives), on `integrate/v16-slice6` from `515a6969`. Raw logs,
 first reds, probes and mutation logs:
 `/private/tmp/st-v16-integration-evidence/slice6/`.
 
@@ -778,10 +780,12 @@ stays preserved for slice 9.
   `clear()`/`setAll()`/`upsertMany()` (one unit after the operation installs;
   the removed rows' `publishSubjectPhysicalChange` and setAll's zero-owner
   reclamation now follow the unit, before notification), `prependOne`/
-  `prependMany` (one grouped unit), and cancellation on a throw. Restoration's
+  `prependMany` (one grouped unit), and cancellation on a throw (now: the
+  unit closes and announces what physically changed; size follow-up). Restoration's
   declarative target, transaction rollback's declarative target and the
   realization adapter hold reader delivery for the whole reversal.
-  `visitTree` regains `includeNonEnumerable` (dormant members).
+  `visitTree` regains `includeNonEnumerable` (dormant members) — reverted in
+  the size follow-up; the view walks own members itself.
 - Transaction lifecycle (`I/transaction-lifecycle-view.ts`): transitions
   recorded at the change, before the engine announcement; public delivery
   after the announcement (opened), materialization (staged), consequences
@@ -923,7 +927,9 @@ the kernel typing project, `tools/check-spec-types.mjs` (three pre-existing
 improvements, baseline not ratcheted), `nx lint kernel`, `nx lint vue`,
 kernel-neutrality, dead-exports and the five-package build exit 0.
 Tree-shaking: kernel-only 12.75 KB gzipped on both `515a6969` and this slice;
-kernel + batching 14.23 → 14.24 KB.
+kernel + batching 14.23 → 14.24 KB. Not reported here originally: the
+`signaltree-entities` bundle budget went 23.37 → 24.17 KB prod (+0.80 KB)
+at `c277d1ce`; fixed in the size follow-up below.
 
 `node tools/api-inventory.mjs --check` fails only on the 40 pre-existing
 `d394047c` lines; `api-callable-inventory --check` only on the same fold.
@@ -960,6 +966,205 @@ the fixture adaptations. Dispositions:
 - Minor, `history-changed` is also published when a pending entry is staged
   (no visible entry change), and `linkStateReader` throws rather than
   returning `undefined` for a registry-less tree: donor behaviour, unchanged.
+
+### Size follow-up: observation behind internals-only seams
+
+The coordinator caught a regression the slice report missed:
+`check-bundle-budget` `signaltree-entities` prod 23.37 → 24.17 KB, dev
+26.02 → 26.82 KB (bare unchanged) — +0.80 KB gzip for read-only tooling, against
+L19 (a dormant capability imposes no active-state machinery). Budgets were not
+touched (v16 is already over the inherited ceilings at `515a6969`; that is the
+later size pass). Evidence: `/private/tmp/st-v16-integration-evidence/slice6-size/`.
+
+Attribution (esbuild metafile over the built dist, prod `ngDevMode: false`,
+same scenario as the gate; `compare.sh`, `slice6-vs-base.txt`), gzip delta vs
+`515a6969` and per-module minified delta:
+
+| Scenario     | Before (`c277d1ce`) | Main contributors (min)                                                                                           |
+| ------------ | ------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| entities     | +825 B              | entity-signal +2131 (dormant units, delta construction), mutation frame +412 (membership changes), inventory +215 |
+| transactions | +1105 B             | transaction-lifecycle-view +1101, transactions +1071, entity-membership-view +610 (holds), inventory +198         |
+| restoration  | +1373 B             | restoration +1528, restoration-reader +1174, membership view +610, confirmed-turn-view +335 (destroyed error)     |
+| link         | +525 B              | link-state-view +913, link +581                                                                                   |
+| full         | +3283 B             | all of the above                                                                                                  |
+
+What moved. Each production owner now holds only a seam, a nullable
+observer/tap that is `undefined` until the internals reader first attaches;
+derivation, event construction, snapshots, sequences, queues, holds and
+formatting live in the reader modules, reachable only from
+`@signal-tree/kernel/internals`:
+
+- Membership (`6d3449ca`): `I/entity-membership-source.ts`. The collection
+  calls one optional tap per structural unit: FACTS after a frame commits
+  (its instructions; point deltas, no scan), OPEN/CLOSE around a grouped unit
+  (prepend), OPEN_ORDER/CLOSE around a bulk unit (setAll, clear, upsertMany,
+  moveToFront, a reversal target), which the observer diffs from order
+  snapshots taken only while someone listens. The inventory, `frameChanges`,
+  `diffOrders`, delivery holds and formatting are internals-only. The mutation
+  frame is back to `515a6969` (only `mutations` became readable); `visitTree`
+  is back to `515a6969`. Reversal holds register through the source module, so
+  transactions, restoration and the realization adapter import no reader code.
+- Transaction lifecycle (`ea05968e`): `I/transaction-lifecycle-source.ts`.
+  The owner keeps the pending phase record, the scope-backed
+  `consequencesReleased` and a transition count (needed to answer a late
+  reader); the view builds events, classifies the refusal from the owner's own
+  `SignalTreeRollbackError` cause, and holds/delivers.
+- Restoration (`dca4a989`): `I/restoration-source.ts` (entry ids, staging
+  transaction, the owner-refusal WeakSet); `runOperation` tracks applied
+  entries only while observed. `RestorationEntryId` is declared there, so its
+  `tools/api-baseline.json` `declFile` moved (metadata only; symbol set
+  unchanged).
+- Link (`d48c4e56`): `I/link-state-source.ts`, one static record per
+  relationship plus a notifier; views and sequences in the view.
+
+Final bytes (`check-bundle-budget`, run on the final build): **entities prod
+23.59 KB, dev 26.23 KB; bare 10.39 / 12.60 KB** (still failing on the
+pre-existing overage: ceilings 22.6 / 25.25 and 10.25 / 12.45). Gzip delta vs
+`515a6969`, dist (`final-vs-base.txt`), next to v15's own reader cost
+(source-level bundles of v15 `012fd11d` with and without its reader hooks,
+`stub-v15.py`; `source-level-final.txt` gives this line's source-level delta
+for a like-for-like comparison):
+
+| Scenario     | Before  | After (dist) | After (source-level) | v15 reader cost (source-level) |
+| ------------ | ------- | ------------ | -------------------- | ------------------------------ |
+| entities     | +825 B  | **+226 B**   | +210 B               | +825 B                         |
+| transactions | +1105 B | +429 B       | +456 B               | +620 B                         |
+| restoration  | +1373 B | +420 B       | +440 B               | +844 B                         |
+| link         | +525 B  | +269 B       | +281 B               | +310 B                         |
+| full         | +3283 B | +1172 B      | +1132 B              | +2311 B                        |
+| bare         | 0       | 0            | —                    | —                              |
+
+What remains in entities (+617 B min): one optional tap call at each of
+seven sites (frame commit, the group helper, moveToFront, upsertMany, clear,
+setAll, reversal install) and the source definition (entity-signal +482,
+entity-membership-source +126). The `planRestore` structural `add` (the
+cf98697a correctness port, not reader cost) is ~6 B gzip of it.
+
+Decided:
+
+1. A membership unit that throws still CLOSEs (in `finally`) and announces
+   exactly what physically changed, instead of being cancelled. Events now
+   agree with the snapshot after a partial failure (before, `cancel()`
+   published nothing while the snapshot already showed the change). New
+   control: "a unit that throws after a partial change announces exactly that
+   change". The donor inventory's `cancel()` API is kept (its spec uses it).
+2. Point-add neighbours are read when the frame commits (before: at each add
+   inside the frame). For a multi-row frame (`addMany`, `prependMany`) an
+   earlier add now names its later sibling as `afterLifetimeId` (before:
+   `undefined`). This is the convention bulk units already had (one event
+   describes its end state; the donor replica in
+   membership-reversal-delivery defers an add until its neighbour exists).
+   Pinned by two controls (single and multi-row).
+3. Restoration and Link reader sequences and operation ids count from reader
+   attach (the reader owns them); the lifecycle sequence stays owner-counted,
+   because the owner already counts transitions for the late-attach snapshot
+   (new control: a late reader sees sequence 5, current pending, no history).
+4. Refusal `consequencesReleased` keeps the old value for a transaction no
+   longer pending (`false`), via `!!retained?.consequencesReleased`; every
+   refusal site today has it pending.
+5. A reversal target's membership changes are derived at install (diff of
+   the orders before and after the install) and delivered under the same
+   reversal hold, before reactive publication, in commit order; the before
+   order is read at install rather than at prepare. Within one
+   event the order is canonical (removes, adds, rekeys, reorder) rather than
+   per subject; the end state is the same.
+6. Close-on-throw covers grouped and bulk units. A frame whose `commit`
+   throws part-way reports nothing, as before (preparation precedes every
+   apply, so this needs a failing store write).
+7. A frame committed while a diffed bulk unit is open (reachable only through
+   a reentrant write) is left to the unit's diff, so it is reported once.
+
+Controls added: lifecycle late attach (1); membership partial throw in
+clear(), setAll and upsertMany (3, the last two replaying events onto the
+snapshot), single and multi-row point neighbours (2), a reentrant frame
+inside a bulk unit (1); restoration "applied, then reactive delivery failed"
+stays `applied` (1; uses the reactive test realization, the only way to reach
+`AppliedDeliveryFailure`) and late attach (1); Link late attach (1).
+
+Mutations re-run on the restructured code (`slice6-size/mutations-seam/`,
+each restored by content hash; killed cases):
+
+- Lifecycle: L1 2, L2 1, L3 4, L4 1, L5 1, L6 1, L7 1, L8 2, L9 1; new seam
+  mutations L10 owner does not count transitions 8, L11 reason not read from
+  the cause 2, L12 holds are no-ops 3.
+- Restoration: R1 1, R2 5, R3 2, R4 4, R5 3; new R6 history changes not
+  reported 2, R7 a post-completion error reported as failure 1 (survived the
+  donor fixtures, whose delivery throw never reaches `AppliedDeliveryFailure`;
+  killed by the new control).
+- Link: K1–K6 1 each; new K7 a disposed relationship keeps its record 8.
+- Membership: M1 106, M2 94, M9 146 (holds), M3 clear() closes before
+  tombstoning 1, M4 an interrupted clear() not closed 2, M5 frame rekeys
+  omitted 39, M5b bulk rekeys omitted 8, M6 6, M7 1, M7b 1, M8 setAll closes
+  before the reorder 1; new M10 frame facts not reported 6, M11 bulk units
+  take no before-order 160, M12 point-add neighbours swapped 1 (survived the
+  donor fixtures; killed by the new control), M13 bulk-add neighbour dropped
+  106, M14 bulk reorder not announced 40, M15 moveToFront unobserved 1, M16
+  reversal target unobserved 112, M17 upsertMany unobserved 1, M18 reader
+  never registers its hold 190.
+- Review follow-up (new controls): M19 a frame inside a diffed unit reported
+  again 1, M20 setAll closed only on success 1, M21 upsertMany closed only on
+  success 1, M22 a frame add drops its after-neighbour 1, R8 operation ids not
+  counted from attachment 1, K8 Link sequence not counted from attachment 1.
+  M3–M5, M5b, M8, M10–M17 re-run after the review fixes to the inventory:
+  M3 1, M4 2, M5 39, M5b 8, M8 1, M10 9, M11 163, M12 2, M13 106, M14 41,
+  M15 2, M16 112, M17 1.
+- Not re-run: S1–S5, F1–F2, T1–T3 (state location, confirmed view and
+  admission code is untouched by the restructuring).
+
+Verification on the final tree `34d37b73` (`slice6-size/verify/run2/`):
+`pnpm typecheck` (deep-typing proofs, kernel typing project, typecheck-all)
+0; `check-spec-types` 0; `nx lint kernel` 0, `nx lint vue` 0;
+kernel-neutrality 0; dead-exports 0; devmode-foldable 0; kernel 384 files,
+4058 passed (+10 controls), 6 expected failures, 13 skipped; frameworks
+angular 179 (+3 skipped), react 23, vue 63 (with the tooling-admission
+spec), solid 41; five-package build 0; `check-bundle-budget` entities 23.59 /
+26.23 KB, bare 10.39 / 12.60 KB (fails only on the pre-existing overage);
+all six attribution scenarios identical to `d48c4e56`
+(`final2-vs-base.txt`). Unchanged pre-existing failures: `api-inventory
+--check` (the same 40 `d394047c` lines; `RestorationEntryId`'s `declFile`
+is the only metadata change and is in the baseline), `api-callable-inventory
+--check` (same fold), consumer typecheck (12 errors, all PROPOSAL-0), and
+`check-contract-neutrality` ("No \*.contract.ts modules found"; there are none
+at `515a6969` either).
+
+Each seam commit checked alone from a `git archive` export (typecheck-all,
+kernel typing project, full kernel; `slice6/commits/<sha>-*.log`):
+`6d3449ca` 384 / 4050, `dca4a989` and `d48c4e56` 384 / 4052, type checks 0
+throughout. `ea05968e` had one failure, the wall-clock assertion in
+entity-granular-reactivity ("repeated collection reads … cached", 6.0 ms
+against `< 5`) while the reviewer ran suites in parallel; that spec passes 3/3
+alone on the same export (`verify/ea05968e-granular-rerun.log`) and touches no
+transaction code. The `34d37b73` tree is the run2 tree above.
+
+### Independent review (size follow-up)
+
+One read-only review of `993d5717..d48c4e56` (code-reviewer agent, given the
+range, the L19 goal and the intended semantic changes; it ran the four reader
+suites, 300 tests, and a probe of ten membership operations on exports of
+both ends). No critical or major finding. It confirmed matching payloads,
+order and sequences for prepend, setAll, clear, upsertMany, removeMany,
+changeId and upsertOne; refusal facts at all three refusal sites; restoration
+outcome classification; Link event semantics; balanced units (each producer
+captures its tap once, so a reader attaching mid-unit cannot close what it did
+not open); destroy and re-create; and that only the four `*-source.ts` modules
+are reachable from the package root. Dispositions:
+
+- Minor, multi-row frame neighbours changed and were untested: kept (decision
+  2), control added.
+- Minor, close-on-throw tested only for clear(): setAll and upsertMany
+  controls added (M20, M21).
+- Minor, restoration/Link attach-relative counting untested: controls added
+  (R8, K8).
+- Minor, `cancel()` dead and two docs stale: docs fixed; `cancel()` kept for
+  the donor spec.
+- Minor, `key as string | number` casts in `frameChanges`: removed.
+- Minor, a frame that throws mid-commit reports nothing: as before; recorded
+  (decision 6).
+- Info, a reentrant frame inside a bulk unit would be double-reported:
+  guarded and pinned (decision 7, M19).
+- Info, reversal-target change order within an event: recorded (decision 5).
+- Minor, Link records register after a reader's destroy cleanup: benign (the
+  slot is per registry in a WeakMap and records leave on dispose); unchanged.
 
 ### User-visible behaviour changes in v16 (slice 6)
 
