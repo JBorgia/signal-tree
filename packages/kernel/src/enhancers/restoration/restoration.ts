@@ -2664,16 +2664,20 @@ export function restoration(
           );
         }
       }
-      // A registered location under an omitted member (the location itself
-      // or a branch above it) is not current, whatever its retained slot
-      // holds: writing the slot would report success while nothing can read
-      // the value. An external omission keeps external truth's protection
-      // (ST1034). An ordinary authored omission is reversed like any later
-      // ordinary write (15.4.2): the hidden member is re-added with the
-      // reversal's target, as one membership effect. (v16 integration 8b.)
+      // A location under an omitted member (the location itself or a plain
+      // branch above it) is not current, whatever its retained state holds:
+      // writing it would report success while nothing can read the value.
+      // Registered slots and entity collections alike. An external omission
+      // keeps external truth's protection (ST1034). An ordinary authored
+      // omission is reversed like any later ordinary write (15.4.2): the
+      // outermost hidden member is re-added, carrying the reversal's slot
+      // targets, unless re-adding it would expose pending work. Anything that
+      // cannot be re-added is refused. Nothing is applied before this
+      // decision. (v16 integration 8b.)
       let hiddenRefusal: ReversalRefusal | undefined;
       let appliedEffects = reversalEffects;
       {
+        const registry = getPositionRegistry(tree.$);
         const reversedMembers = new Set<number>();
         for (const effect of reversalEffects)
           if (effect.plainBranchMembership) reversedMembers.add(effect.owner);
@@ -2685,46 +2689,99 @@ export function restoration(
           }
         >();
         const replaced = new Set<ReversalEffect>();
+        // One walk per location: a collection's many row effects share it.
+        const walked = new Map<number, ReturnType<typeof hidingMembers>>();
         for (const effect of reversalEffects) {
+          if (effect.plainBranchMembership) continue;
+          const slot =
+            effect.subjectId === undefined && effect.structural === undefined;
           if (
-            effect.plainBranchMembership ||
-            effect.structural !== undefined ||
-            effect.subjectId !== undefined ||
+            slot &&
             scalarSlotRuntime?.resolveScalarSlot(effect.owner) === undefined
           )
             continue;
-          const hiding = hidingMembers(tree.$, effect.owner)?.filter(
+          if (!walked.has(effect.owner))
+            walked.set(effect.owner, hidingMembers(tree.$, effect.owner));
+          const found = walked.get(effect.owner);
+          if (!found) {
+            // An address that exists but no longer walks to its owner is not
+            // evidence that the location is current.
+            if (registry?.addressFor(effect.owner))
+              hiddenRefusal ??= { kind: 'structural-drift' };
+            continue;
+          }
+          const hiding = found.filter(
             ({ position }) =>
               position === undefined || !reversedMembers.has(position)
           );
-          if (!hiding?.length) continue;
+          if (!hiding.length) continue;
           const external = hiding.find(
             ({ position }) =>
               position !== undefined &&
               externalMembershipTruth.get(position)?.present === false
           );
-          if (external || hiding[0].position === undefined) {
-            hiddenRefusal ??= external
-              ? {
-                  kind: 'value-drift',
-                  path: external.path ?? effect.path ?? '',
-                  current: undefined,
-                  expected: effect.after,
-                }
-              : { kind: 'structural-drift' };
+          const [outer] = hiding;
+          if (external) {
+            hiddenRefusal ??= {
+              kind: 'value-drift',
+              path: external.path ?? effect.path ?? '',
+              current: undefined,
+              expected: effect.after,
+            };
             continue;
           }
-          const [outer] = hiding;
-          let entry = readded.get(outer.position as number);
+          if (
+            outer.position === undefined ||
+            !canRealizePlainBranchMember(tree.$, outer.position)
+          ) {
+            hiddenRefusal ??= { kind: 'structural-drift' };
+            continue;
+          }
+          let entry = readded.get(outer.position);
           if (!entry)
             readded.set(
-              outer.position as number,
+              outer.position,
               (entry = { member: outer, targets: [] })
             );
-          entry.targets.push({ below: outer.below, value: effect.after });
-          replaced.add(effect);
+          // A slot's value travels with the re-add; an entity effect applies
+          // as usual once its collection is current again.
+          if (slot) {
+            entry.targets.push({ below: outer.below, value: effect.after });
+            replaced.add(effect);
+          }
         }
-        if (readded.size) {
+        if (readded.size && !hiddenRefusal) {
+          // Re-adding a member exposes what it retains. Pending work under it
+          // owns that state until settlement.
+          const encloses = (outer: number, position: number): boolean => {
+            const prefix = registry?.addressFor(outer);
+            const address = registry?.addressFor(position);
+            return (
+              !!prefix &&
+              !!address &&
+              prefix.length <= address.length &&
+              prefix.every((key, index) => key === address[index])
+            );
+          };
+          const pendingPositions: number[] = [];
+          for (const pending of [
+            ...stagedTransactionEffects.values(),
+            ...pendingTransactions.values(),
+          ]) {
+            for (const effect of pending.effects.values())
+              pendingPositions.push(effect.position);
+            for (const order of pending.collectionOrders.values())
+              pendingPositions.push(order.owner);
+          }
+          for (const footprints of pendingFootprints.values())
+            for (const effect of footprints.values())
+              pendingPositions.push(effect.position);
+          for (const owner of readded.keys())
+            if (pendingPositions.some((position) => encloses(owner, position)))
+              throw restorationRefusal(
+                'ST1034: restoration refused — overlapping transaction is pending. ' +
+                  'Nothing was changed; the history position is unmoved.'
+              );
           appliedEffects = reversalEffects.filter(
             (effect) => !replaced.has(effect)
           );

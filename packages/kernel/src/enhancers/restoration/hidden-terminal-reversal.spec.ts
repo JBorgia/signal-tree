@@ -366,7 +366,7 @@ describe('external omission: refused, nothing written', () => {
   });
 });
 
-describe('pending rollback: a later omission supersedes, nothing hidden is written', () => {
+describe('pending rollback: the rest rolls back, no rolled-back value is retained', () => {
   for (const [order, enhancers] of Object.entries(rollbackOrders))
     for (const shape of Object.keys(shapes) as (keyof typeof shapes)[])
       for (const nested of [false, true])
@@ -394,15 +394,24 @@ describe('pending rollback: a later omission supersedes, nothing hidden is writt
             await flush();
             const paths = await notified(() => pending.rollback());
             expect(t.tree.$()).toEqual({ count: 0 });
-            expect(paths).not.toContain(t.valuePath);
             expect(lifecycle?.snapshot().pending).toHaveLength(0);
+            if (nested) {
+              // Under an omitted branch the location's retained slot is
+              // compensated, so a later re-add of the branch cannot bring the
+              // rolled-back value back. The branch stays omitted.
+              expect(t.value()).toEqual(pre(shape));
+            } else {
+              // The omission of the location itself supersedes the pending
+              // contribution (a later replacement at the location).
+              expect(paths).not.toContain(t.valuePath);
+            }
           });
         }
 });
 
-describe('only an enclosing member supersedes (structured addresses)', () => {
+describe('rollback compensates a location no later omission covers', () => {
   for (const [order, enhancers] of Object.entries(rollbackOrders)) {
-    it(`an unrelated omission does not supersede the pending value (${order})`, async () => {
+    it(`an unrelated omission leaves the pending value to roll back (${order})`, async () => {
       type State = { value: unknown; other?: number; count: number };
       const initial: State = {
         value: leaf<unknown>({ min: 0 }),
@@ -424,7 +433,7 @@ describe('only an enclosing member supersedes (structured addresses)', () => {
       expect(tree.$()).toEqual({ value: { min: 0 }, count: 0 });
     });
 
-    it(`a literal dotted sibling key is not enclosed by its prefix (${order})`, async () => {
+    it(`a literal dotted sibling key is not covered by its prefix (${order})`, async () => {
       type State = {
         a?: { b: number };
         'a.b': unknown;
@@ -477,4 +486,169 @@ describe("the reversal's own membership effect wins over retained values", () =>
       tree.undo();
       expect(tree.$()).toEqual({ a: { value: 0, keep: 0 }, count: 0 });
     });
+});
+
+describe('review follow-up: retained state, pending work and entity collections', () => {
+  for (const [order, enhancers] of Object.entries(historyOrders).filter(
+    ([name]) => name !== 'restoration alone'
+  )) {
+    it(`a rolled-back contribution does not resurface when its branch is re-added (${order})`, async () => {
+      type State = { a?: { value: number; keep: number }; count: number };
+      const initial: State = { a: { value: 0, keep: 0 }, count: 0 };
+      const tree = signalTree(initial, { enhancers: enhancers() });
+      trees.push(tree);
+      const a = tree.$.a as unknown as {
+        value(v?: number): number;
+        keep(v?: number): number;
+      };
+      undoable(() => {
+        a.value(1);
+        tree.$.count(1);
+      });
+      await flush();
+      const pending = tree.transact(() => a.keep(9));
+      await flush();
+      tree.$({ count: 1 });
+      await flush();
+      pending.rollback();
+      tree.undo();
+      expect(tree.$()).toEqual({ a: { value: 0, keep: 0 }, count: 0 });
+    });
+
+    it(`re-adding a branch that holds pending work refuses until it settles (${order})`, async () => {
+      type State = { a?: { value: number; keep: number }; count: number };
+      for (const settle of ['confirm', 'rollback'] as const) {
+        const initial: State = { a: { value: 0, keep: 0 }, count: 0 };
+        const tree = signalTree(initial, { enhancers: enhancers() });
+        trees.push(tree);
+        const a = tree.$.a as unknown as {
+          value(v?: number): number;
+          keep(v?: number): number;
+        };
+        undoable(() => {
+          a.value(1);
+          tree.$.count(1);
+        });
+        await flush();
+        const pending = tree.transact(() => a.keep(9));
+        await flush();
+        tree.$({ count: 1 });
+        await flush();
+        const index = tree.getCurrentIndex();
+        expect(() => tree.undo()).toThrow(/ST1034.*pending/);
+        expect(tree.$()).toEqual({ count: 1 });
+        expect(tree.getCurrentIndex()).toBe(index);
+        pending[settle]();
+        tree.undo();
+        expect(tree.$()).toEqual({
+          a: { value: 0, keep: settle === 'confirm' ? 9 : 0 },
+          count: 0,
+        });
+      }
+    });
+
+    it(`a member hidden by a pending transaction refuses until it settles (${order})`, async () => {
+      type State = { a?: { value: number; keep: number }; count: number };
+      for (const settle of ['confirm', 'rollback'] as const) {
+        const initial: State = { a: { value: 0, keep: 0 }, count: 0 };
+        const tree = signalTree(initial, { enhancers: enhancers() });
+        trees.push(tree);
+        const a = tree.$.a as unknown as { value(v?: number): number };
+        undoable(() => {
+          a.value(1);
+          tree.$.count(1);
+        });
+        await flush();
+        const pending = tree.transact(() => tree.$({ count: 1 }));
+        await flush();
+        expect(() => tree.undo()).toThrow(/ST1034.*pending/);
+        expect(tree.$()).toEqual({ count: 1 });
+        pending[settle]();
+        await flush();
+        tree.undo();
+        expect(tree.$()).toEqual({ a: { value: 0, keep: 0 }, count: 0 });
+      }
+    });
+  }
+
+  for (const [order, enhancers] of Object.entries(historyOrders)) {
+    type Row = { id: string; n: number };
+    const make = () => {
+      const tree = signalTree(
+        { g: { rows: entityMap<Row, string>(), k: 0 }, count: 0 },
+        { enhancers: enhancers() }
+      );
+      trees.push(tree);
+      return tree;
+    };
+    for (const change of ['update', 'add'] as const) {
+      it(`an ordinary omission of a branch holding a collection is reversed through it (${change}, ${order})`, async () => {
+        const tree = make();
+        const rows = tree.$.g.rows;
+        rows.addOne({ id: 'a', n: 0 });
+        await flush();
+        undoable(() => {
+          if (change === 'update') rows.updateOne('a', { n: 1 });
+          else rows.addOne({ id: 'b', n: 1 });
+          tree.$.count(1);
+        });
+        await flush();
+        tree.$({ count: 1 } as never);
+        await flush();
+        expect(tree.$()).toEqual({ count: 1 });
+        tree.undo();
+        expect(tree.$()).toEqual({
+          g: { rows: { all: [{ id: 'a', n: 0 }] }, k: 0 },
+          count: 0,
+        });
+        tree.redo();
+        expect(
+          (tree.$() as { g: { rows: { all: Row[] } } }).g.rows.all
+        ).toEqual(
+          change === 'update'
+            ? [{ id: 'a', n: 1 }]
+            : [
+                { id: 'a', n: 0 },
+                { id: 'b', n: 1 },
+              ]
+        );
+      });
+
+      it(`an external omission of a branch holding a collection refuses, nothing written (${change}, ${order})`, async () => {
+        const tree = make();
+        const rows = tree.$.g.rows;
+        rows.addOne({ id: 'a', n: 0 });
+        await flush();
+        undoable(() => {
+          if (change === 'update') rows.updateOne('a', { n: 1 });
+          else rows.addOne({ id: 'b', n: 1 });
+          tree.$.count(1);
+        });
+        await flush();
+        external(() => tree.$({ count: 1 } as never));
+        await flush();
+        const before = rows.all();
+        const index = tree.getCurrentIndex();
+        expect(() => tree.undo()).toThrow(/ST1034.*'g'/);
+        expect(tree.$()).toEqual({ count: 1 });
+        expect(rows.all()).toEqual(before);
+        expect(tree.getCurrentIndex()).toBe(index);
+      });
+    }
+
+    it(`a branch holding a collection is re-added for a slot target (${order})`, async () => {
+      const tree = make();
+      tree.$.g.rows.addOne({ id: 'a', n: 0 });
+      await flush();
+      undoable(() => tree.$.g.k(1));
+      await flush();
+      tree.$({ count: 0 } as never);
+      await flush();
+      tree.undo();
+      expect(tree.$()).toEqual({
+        g: { rows: { all: [{ id: 'a', n: 0 }] }, k: 0 },
+        count: 0,
+      });
+    });
+  }
 });

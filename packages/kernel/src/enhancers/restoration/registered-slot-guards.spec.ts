@@ -22,7 +22,8 @@ import { getPathNotifier } from '../../lib/path-notifier';
  *   field (a hostile getter is reached and reported); the same record at a
  *   registered terminal's position is one value and is never read;
  * - admission: a non-scalar value at an unregistered position is refused
- *   before validation, as an owner refusal the restoration reader counts.
+ *   before validation, as an owner refusal the restoration reader counts;
+ *   the same value at a registered terminal is admitted and applied.
  */
 
 const flush = async () => {
@@ -146,6 +147,15 @@ describe('restoration admission: the registered slot, not the subject, decides',
         outcome: 'refused',
         affectedEntryIds: [],
       });
+    });
+
+    it(`the same kind of value at a registered terminal is admitted and applied (${order})`, async () => {
+      const t = make(enhancers());
+      t.notify('bounds', [1], [0], t.boundsPosition);
+      await flush();
+      expect(t.history()).toEqual([['bounds']]);
+      t.tree.undo();
+      expect(t.root.$.bounds()).toEqual([0]);
     });
   }
 });
