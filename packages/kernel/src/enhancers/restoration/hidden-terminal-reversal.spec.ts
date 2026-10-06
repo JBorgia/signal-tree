@@ -864,7 +864,19 @@ describe('refusal messages name the location and the reason (slice 8c)', () => {
         /^Unsupported scoped undo effect at 'g\.rows[^']*': (it was omitted|its enclosing member 'g\.rows' was omitted) and cannot be re-added, because it is not a plain state location \(an entity collection, for example\)\. Nothing was changed; the history position is unmoved\.$/
       );
       expect(tree.$()).toEqual({ g: { k: 0 }, count: 1 });
-      expect(rows.byId('a')?.()).toEqual({ id: 'a', n: 1 });
+      // Retained, unchanged; the omitted collection reads absent (v16 8e).
+      expect(
+        (
+          rows as unknown as {
+            __prepareTransitionTarget: {
+              readSource(): { subjects: readonly { value: unknown }[] };
+            };
+          }
+        ).__prepareTransitionTarget
+          .readSource()
+          .subjects.map(({ value }) => value)
+      ).toEqual([{ id: 'a', n: 1 }]);
+      expect(rows.byId('a')).toBeUndefined();
       expect(tree.getCurrentIndex()).toBe(index);
     });
   }

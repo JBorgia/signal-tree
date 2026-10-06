@@ -114,16 +114,19 @@ describe.each(ORDERS)(
       }
     });
 
-    it('a collection changed after its omission is refused, nothing changes', async () => {
+    it('a row-naming write to the omitted collection refuses; undo still restores it', async () => {
       const owner = build();
       const view = render(<Whole owner={owner} />);
       try {
         await step(() => owner.$.count(5));
         await step(() => undoable(() => owner.$.g({ k: 0 })));
-        await step(() => owner.$.g.rows.updateOne('a', { n: 7 }));
-        expect(() => owner.undo()).toThrow(/'g\.rows'.*changed after that/);
-        await step(() => undefined);
+        // It reads absent and empty (v16 8e): no row to update.
+        expect(() => owner.$.g.rows.updateOne('a', { n: 7 })).toThrow(
+          /^Entity with id a not found$/
+        );
         expect(text()).toBe(WITHOUT);
+        await step(() => owner.undo());
+        expect(text()).toBe(WITH);
       } finally {
         view.unmount();
         owner.destroy();

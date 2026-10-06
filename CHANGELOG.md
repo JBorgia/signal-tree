@@ -97,9 +97,17 @@ for retired entities.
   to hidden storage, and undo or rollback of a write that re-added an omitted
   member left its key present with `undefined`. `updateAndReport()` re-adds
   an omitted path it supplies too, and a whole value that supplies an omitted
-  key as `undefined` no longer brings it back with its retained value. Not
-  yet for entity collections: under an omitted member, a collection's own
-  methods still read and write its retained rows.
+  key as `undefined` no longer brings it back with its retained value.
+- **An entity collection under an omitted member is absent and empty.**
+  `all()` is `[]`, `byId()` is `undefined`, `count()` is `0`, and held rows
+  read `undefined`. Adding rows re-adds the path with only those rows; the
+  retained rows never come back. Updating or removing a row throws "Entity
+  with id ... not found", as on an empty collection. Undo, redo, `jumpTo()`
+  and `rollback()` of a re-adding write make it absent again. Before this,
+  its methods read and wrote the retained rows.
+- **Reversing a turn that omits a member and writes under it is exact.**
+  Undo or rollback of such a turn restored the members it had written under
+  as `undefined`; history now records what storage held.
 - **Undo, redo, `jumpTo()` and `rollback()` of a write that omitted an entity
   collection bring it back.** A whole value that leaves out a collection key
   omits the collection; reversing that write now restores it with the rows it

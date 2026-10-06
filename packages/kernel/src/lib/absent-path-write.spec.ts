@@ -716,6 +716,46 @@ describe('updateAndReport records the re-add it makes', () => {
     });
 });
 
+describe('one turn that omits a branch and writes under it is reversed exactly (v16 8e)', () => {
+  // The write's history records what storage held, not the absent value it
+  // read: 8d recorded `undefined`, so reversing such a turn left the
+  // branch's members undefined (measured, `probe3.txt`).
+  const turn = (h: Handles) => {
+    omitA(h);
+    h.a.b.keep(9);
+  };
+  const reversedTo = { a: { b: { value: 0, keep: 0 }, side: 0 }, count: 0 };
+  for (const [order, enhancers] of Object.entries(historyOrders))
+    it(`undo and redo (${order})`, async () => {
+      const tree = signalTree(initial(), {
+        enhancers: enhancers() as never,
+      }) as unknown as HistoryTree;
+      trees.push(tree);
+      const h = handles(tree);
+      undoable(() => turn(h));
+      await flush();
+      expect(h.root()).toEqual({ a: { b: { keep: 9 } }, count: 0 });
+      tree.undo();
+      expect(h.root()).toEqual(reversedTo);
+      tree.redo();
+      expect(h.root()).toEqual({ a: { b: { keep: 9 } }, count: 0 });
+    });
+
+  for (const [order, enhancers] of Object.entries(rollbackOrders))
+    it(`rollback (${order})`, async () => {
+      const tree = signalTree(initial(), {
+        enhancers: enhancers() as never,
+      }) as unknown as TransactTree;
+      trees.push(tree);
+      const h = handles(tree);
+      const pending = tree.transact(() => turn(h));
+      await flush();
+      pending.rollback();
+      await flush();
+      expect(h.root()).toEqual(reversedTo);
+    });
+});
+
 describe('rollback of a re-adding write restores absence', () => {
   for (const [order, enhancers] of Object.entries(rollbackOrders))
     for (const [label, { write, reads }] of Object.entries(writes)) {

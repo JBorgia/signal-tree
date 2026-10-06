@@ -83,6 +83,42 @@ const build = (enhancers: unknown[], reactive = false): Tree => {
 };
 const withRows = { g: { rows: { all: [{ id: 'a', n: 0 }] }, k: 0 }, count: 0 };
 
+type TransitionSource = {
+  owner: number;
+  subjects: readonly { subject: number; key: string | number; value: unknown }[];
+  order: readonly number[];
+  orderFrontier: unknown;
+};
+type TransitionBinding = {
+  readSource(): TransitionSource;
+  prepareTarget(target: TransitionSource): {
+    install(): void;
+    publish(): void;
+  };
+};
+const binding = (rows: Rows) =>
+  (rows as unknown as { __prepareTransitionTarget: TransitionBinding })
+    .__prepareTransitionTarget;
+/**
+ * Change an omitted collection's retained rows the way no public write can
+ * since v16 8e (a row-naming write refuses; a row-adding write re-adds the
+ * path): through the collection's own transition target, as a reversal
+ * installs rows. It stands for any producer that bypasses the public API,
+ * the case the rows check guards.
+ */
+const changeRetainedRows = (rows: Rows, value: (row: Row) => Row): void => {
+  const source = binding(rows).readSource();
+  const prepared = binding(rows).prepareTarget({
+    ...source,
+    subjects: source.subjects.map((subject) => ({
+      ...subject,
+      value: value(subject.value as Row),
+    })),
+  });
+  prepared.install();
+  prepared.publish();
+};
+
 // `g` stays; only `rows` is left out of `g`'s whole value.
 const shapes = {
   'nested, by a branch write': (t: Tree) => t.$.g({ k: 0 }),
@@ -194,8 +230,10 @@ describe('rows written while the collection is present are its own', () => {
 
 describe("the reversal's own row writes are not a change to refuse", () => {
   // A write through a held handle inside the same operation that omitted the
-  // collection is that operation's own effect: reversing it restores the row,
-  // so the collection comes back exactly as it was.
+  // collection is that operation's own effect. Since v16 8e a row-adding
+  // write re-adds the collection with only its rows, removing the retained
+  // ones; reversing the operation reverses all of it, so the collection
+  // comes back exactly as it was.
   for (const [order, enhancers] of Object.entries(historyOrders))
     it(`undo of an omission that also wrote a row (${order})`, async () => {
       const tree = build(enhancers());
@@ -203,11 +241,20 @@ describe("the reversal's own row writes are not a change to refuse", () => {
       const rows = tree.$.g.rows;
       undoable(() => {
         tree.$.g({ k: 0 });
-        rows.updateOne('a', { n: 5 });
+        rows.addOne({ id: 'b', n: 5 });
       });
       await flush();
+      expect(tree.$()).toEqual({
+        g: { rows: { all: [{ id: 'b', n: 5 }] }, k: 0 },
+        count: 0,
+      });
       tree.undo();
       expect(tree.$()).toEqual(withRows);
+      tree.redo();
+      expect(tree.$()).toEqual({
+        g: { rows: { all: [{ id: 'b', n: 5 }] }, k: 0 },
+        count: 0,
+      });
     });
 
   for (const [order, enhancers] of Object.entries(rollbackOrders))
@@ -217,7 +264,7 @@ describe("the reversal's own row writes are not a change to refuse", () => {
       const rows = tree.$.g.rows;
       const pending = tree.transact(() => {
         tree.$.g({ k: 1 });
-        rows.updateOne('a', { n: 5 });
+        rows.addOne({ id: 'b', n: 5 });
       });
       await flush();
       pending.rollback();
@@ -226,20 +273,31 @@ describe("the reversal's own row writes are not a change to refuse", () => {
     });
 
   for (const [order, enhancers] of Object.entries(historyOrders))
-    it(`a later write to another row is still refused (${order})`, async () => {
+    it(`a later row-naming write refuses and changes nothing (${order})`, async () => {
       const tree = build(enhancers());
       await flush();
       const rows = tree.$.g.rows;
       rows.addOne({ id: 'b', n: 0 });
       await flush();
-      undoable(() => {
-        tree.$.g({ k: 0 });
-        rows.updateOne('a', { n: 5 });
+      undoable(() => tree.$.g({ k: 0 }));
+      await flush();
+      // The collection reads absent and empty: no row 'b' to update.
+      expect(() => rows.updateOne('b', { n: 9 })).toThrow(
+        /^Entity with id b not found$/
+      );
+      tree.undo();
+      expect(tree.$()).toEqual({
+        g: {
+          rows: {
+            all: [
+              { id: 'a', n: 0 },
+              { id: 'b', n: 0 },
+            ],
+          },
+          k: 0,
+        },
+        count: 0,
       });
-      await flush();
-      rows.updateOne('b', { n: 9 });
-      await flush();
-      expect(() => tree.undo()).toThrow(/'g\.rows'.*changed after that/);
     });
 });
 
@@ -251,8 +309,8 @@ describe('a collection changed while omitted is refused, typed and unchanged', (
       const rows = tree.$.g.rows;
       undoable(() => tree.$.g({ k: 0 }));
       await flush();
-      // An ordinary write through a held handle changes the retained rows.
-      rows.updateOne('a', { n: 7 });
+      // A producer outside the public API changes the retained rows.
+      changeRetainedRows(rows, (row) => ({ ...row, n: 7 }));
       await flush();
       const index = tree.getCurrentIndex();
       let error: unknown;
@@ -276,7 +334,7 @@ describe('a collection changed while omitted is refused, typed and unchanged', (
     )!;
     undoable(() => tree.$.g({ k: 0 }));
     await flush();
-    tree.$.g.rows.updateOne('a', { n: 7 });
+    changeRetainedRows(tree.$.g.rows, (row) => ({ ...row, n: 7 }));
     await flush();
     const events: unknown[] = [];
     reader.subscribe((event) => events.push(event));
@@ -305,32 +363,39 @@ describe('a collection under a branch the reversal re-adds', () => {
       expect(tree.$()).toEqual(withRows);
     });
 
-    it(`a write to its rows while hidden refuses the undo (${order})`, async () => {
+    it(`a hidden write re-adds the branch; undo restores the branch's before-image over it (${order})`, async () => {
       const tree = build(enhancers());
       await flush();
       const rows = tree.$.g.rows;
       undoable(() => tree.$({ count: 1 }));
       await flush();
+      // A row-adding write re-adds the way, with only the written row
+      // (v16 8e); the branch's other members stay absent.
       rows.addOne({ id: 'z', n: 9 });
       await flush();
-      const index = tree.getCurrentIndex();
-      expect(() => tree.undo()).toThrow(
-        /^Unsupported scoped undo effect at 'g\.rows': the entity collection was omitted and changed after that/
-      );
-      expect(tree.$()).toEqual({ count: 1 });
-      expect(tree.getCurrentIndex()).toBe(index);
+      expect(tree.$()).toEqual({
+        g: { rows: { all: [{ id: 'z', n: 9 }] } },
+        count: 1,
+      });
+      tree.undo();
+      // The branch's own before-image comes back over the later write; the
+      // collection keeps its own rows, which its own effects restore (8c).
+      expect(tree.$()).toEqual({
+        g: { rows: { all: [{ id: 'z', n: 9 }] }, k: 0 },
+        count: 0,
+      });
     });
 
-    it(`a re-add for an earlier turn refuses too (ordinary omission) (${order})`, async () => {
+    it(`a changed hidden collection refuses a re-add for an earlier turn (${order})`, async () => {
       const tree = build(enhancers());
       await flush();
       const rows = tree.$.g.rows;
       undoable(() => tree.$.g.k(1));
       await flush();
-      // An ordinary omission, then a write through the held handle.
+      // An ordinary omission, then a change no public write can make.
       tree.$({ count: 0 });
       await flush();
-      rows.addOne({ id: 'z', n: 9 });
+      changeRetainedRows(rows, (row) => ({ ...row, n: 9 }));
       await flush();
       expect(() => tree.undo()).toThrow(/'g\.rows'.*changed after that/);
       expect(tree.$()).toEqual({ count: 0 });
@@ -348,13 +413,31 @@ describe('a collection under a branch the reversal re-adds', () => {
       expect(tree.$()).toEqual(withRows);
     });
 
-    it(`a plain write to its rows while hidden refuses the rollback (${order})`, async () => {
+    it(`a later write re-adding the branch supersedes the rollback's re-add (${order})`, async () => {
       const tree = build(enhancers());
       await flush();
       const rows = tree.$.g.rows;
       const pending = tree.transact(() => tree.$({ count: 1 }));
       await flush();
       rows.addOne({ id: 'z', n: 9 });
+      await flush();
+      // A later membership change of the branch supersedes the pending
+      // contribution (8b); the rest rolls back.
+      pending.rollback();
+      await flush();
+      expect(tree.$()).toEqual({
+        g: { rows: { all: [{ id: 'z', n: 9 }] } },
+        count: 0,
+      });
+    });
+
+    it(`a changed hidden collection refuses the rollback (${order})`, async () => {
+      const tree = build(enhancers());
+      await flush();
+      const rows = tree.$.g.rows;
+      const pending = tree.transact(() => tree.$({ count: 1 }));
+      await flush();
+      changeRetainedRows(rows, (row) => ({ ...row, n: 9 }));
       await flush();
       let error: unknown;
       try {
@@ -422,6 +505,8 @@ describe('rollback of a collection omission', () => {
       const rows = tree.$.g.rows;
       const pending = tree.transact(() => tree.$.g({ k: 1 }));
       await flush();
+      // Re-adds the collection with only that row (v16 8e), a later write
+      // at the collection the rollback would invalidate.
       rows.addOne({ id: 'z', n: 9 });
       await flush();
       let error: unknown;
@@ -431,7 +516,10 @@ describe('rollback of a collection omission', () => {
         error = caught;
       }
       expect(error).toMatchObject({ code: 'SIGNALTREE_ROLLBACK_FAILED' });
-      expect(tree.$()).toEqual({ g: { k: 1 }, count: 0 });
+      expect(tree.$()).toEqual({
+        g: { rows: { all: [{ id: 'z', n: 9 }] }, k: 1 },
+        count: 0,
+      });
     });
 
   for (const [order, enhancers] of Object.entries(rollbackOrders))
@@ -441,9 +529,10 @@ describe('rollback of a collection omission', () => {
       const rows = tree.$.g.rows;
       const pending = tree.transact(() => tree.$.g({ k: 1 }));
       await flush();
-      // A later write to the omitted collection depends on the omission the
-      // rollback would reverse: the existing dependency refusal.
-      rows.updateOne('a', { n: 7 });
+      // A producer outside the public API changes the retained rows; it is
+      // a later write at the collection, so the dependency refusal answers
+      // first (the nested case above reaches the rows check).
+      changeRetainedRows(rows, (row) => ({ ...row, n: 7 }));
       await flush();
       let error: unknown;
       try {

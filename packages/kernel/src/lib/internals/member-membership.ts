@@ -82,6 +82,23 @@ const DORMANT = Symbol.for('SignalTree:DormantMember');
 type DormantBinding = { parent: object; key: string };
 
 /**
+ * @internal An entity collection's hook for a change in its presence: it, or
+ * a member above it, was omitted or re-added (v16 8e). Its rows are its own
+ * state and it reads absent while hidden, so it must re-read. The hook is
+ * also what marks a collection as a member to link and wake here, without
+ * this module knowing anything about collections.
+ */
+export const MEMBERSHIP_CHANGED = Symbol.for('SignalTree:MembershipChanged');
+
+function membershipHook(node: unknown): (() => void) | undefined {
+  return isTraversableNode(node)
+    ? ((node as Record<symbol, unknown>)[MEMBERSHIP_CHANGED] as
+        | (() => void)
+        | undefined)
+    : undefined;
+}
+
+/**
  * @internal The two physical objects one branch is represented by.
  *
  * A branch is ONE semantic object and TWO physical ones: the `NodeAccessor`
@@ -177,6 +194,32 @@ export function isAbsentMember(node: unknown): boolean {
 export const structuralWrites = { depth: 0 };
 
 /**
+ * Collections whose presence changed inside a structural write, woken when it
+ * ends. A structural write reads hidden rows physically (`entity-signal`), so
+ * a consumer re-run inside it would cache what storage holds rather than the
+ * collection's absence (v16 8e).
+ */
+const deferredHooks = new Set<() => void>();
+
+/** @internal Close a structural write opened with `structuralWrites.depth++`. */
+export function endStructuralWrite(): void {
+  if (--structuralWrites.depth > 0 || deferredHooks.size === 0) return;
+  const hooks = [...deferredHooks];
+  deferredHooks.clear();
+  for (const hook of hooks) hook();
+}
+
+/**
+ * @internal While positive, every location reads its stored value whatever
+ * its presence. History capture reads before-images this way: a membership
+ * change recorded while its location was absent must restore what storage
+ * held, as a whole value does. Reading the absent value instead recorded
+ * `undefined`, so undo or rollback of a turn that omitted a branch and then
+ * wrote under it left that branch's members undefined (v16 8e, measured).
+ */
+export const storedReads = { depth: 0 };
+
+/**
  * @internal Re-add a written location that is absent from the current tree.
  *
  *     WRITING AN ABSENT DESCENDANT REACTIVATES ITS MEMBERSHIP
@@ -248,7 +291,8 @@ export function reactivatePathOnWrite(node: unknown): boolean {
  * none of it (`MemberAbsence`, v16 8e).
  */
 const ABSENCE: MemberAbsence = {
-  isAbsent: isAbsentMember,
+  // History capture reads what storage holds (`storedReads`).
+  isAbsent: (node) => !storedReads.depth && isAbsentMember(node),
   reAdd: reactivatePathOnWrite,
 };
 
@@ -313,6 +357,11 @@ export function republishMembers(parent: object, keys: readonly string[]): void 
     if (slot !== undefined) return changedSlots.push(slot) > 0;
     const publisher = writableLocationPublisher(child);
     if (publisher) return unaddressedLeaves.push(publisher) > 0;
+    const hook = membershipHook(child);
+    if (hook) {
+      if (structuralWrites.depth) deferredHooks.add(hook);
+      else hook();
+    }
     if (isNodeAccessor(child)) {
       branches.push(child);
       for (const key of Object.keys(child))
@@ -444,14 +493,17 @@ function linkMember(parent: object, key: string, child: object): void {
  * Link every state location below a newly omitted member to its parent, once,
  * so a location under it can find the omission (`isAbsentMember`). A linked
  * location's own subtree was linked when it was, so it is not walked again.
- * Collections and markers are not membership-managed and are not entered.
+ * An entity collection is linked so it can read absent (v16 8e), but not
+ * entered: its rows are its own state. Other markers are left alone.
  */
 function linkDescendants(node: object): void {
   if (!isNodeAccessor(node)) return;
   for (const key of Object.getOwnPropertyNames(node)) {
     const child = Object.getOwnPropertyDescriptor(node, key)?.value;
     if (
-      (!isNodeAccessor(child) && !isWritableLocation(child)) ||
+      (!isNodeAccessor(child) &&
+        !isWritableLocation(child) &&
+        !membershipHook(child)) ||
       memberBinding(child)
     )
       continue;

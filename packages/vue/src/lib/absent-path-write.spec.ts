@@ -30,12 +30,19 @@ type Ref = {
   update(updater: (current: unknown) => unknown): void;
 };
 type Handles = {
-  a: { (): unknown; b: { (): unknown; (value: unknown): void; keep: Ref }; side: Ref };
+  a: {
+    (): unknown;
+    b: { (): unknown; (value: unknown): void; keep: Ref };
+    side: Ref;
+  };
 };
 
 describe.each(orders)('absent-path writes — Vue (%s)', (_, enhancers) => {
   const build = () => {
-    const initial: State = { a: { b: { value: 0, keep: 0 }, side: 0 }, count: 0 };
+    const initial: State = {
+      a: { b: { value: 0, keep: 0 }, side: 0 },
+      count: 0,
+    };
     const tree = signalTree(initial, { enhancers: enhancers() });
     const { a } = tree.$ as unknown as Handles;
     const view = computed(() => [
@@ -48,7 +55,12 @@ describe.each(orders)('absent-path writes — Vue (%s)', (_, enhancers) => {
     return { tree, a, view, omit };
   };
   const absent = ['{"count":0}', undefined, undefined, undefined];
-  const readded = ['{"a":{"b":{"keep":9}},"count":0}', '{"keep":9}', 9, undefined];
+  const readded = [
+    '{"a":{"b":{"keep":9}},"count":0}',
+    '{"keep":9}',
+    9,
+    undefined,
+  ];
 
   it('held consumers read absent; a held leaf write re-adds only its path', async () => {
     const { tree, a, view, omit } = build();
@@ -105,7 +117,12 @@ describe.each(orders)('absent-path writes — Vue (%s)', (_, enhancers) => {
       await flush();
       undoable(() => a.side.update((current) => (current ?? 40) as number));
       await flush();
-      expect(view.value).toEqual(['{"a":{"side":40},"count":0}', undefined, undefined, 40]);
+      expect(view.value).toEqual([
+        '{"a":{"side":40},"count":0}',
+        undefined,
+        undefined,
+        40,
+      ]);
       tree.undo();
       await flush();
       expect(view.value).toEqual(absent);
@@ -124,6 +141,25 @@ describe.each(orders)('absent-path writes — Vue (%s)', (_, enhancers) => {
       tree.undo();
       await flush();
       expect(view.value).toEqual(present);
+    } finally {
+      tree.destroy();
+    }
+  });
+
+  it('undo of a turn that omits the branch and writes under it is exact', async () => {
+    const { tree, a, view } = build();
+    try {
+      const before = view.value;
+      undoable(() => {
+        tree.$({ count: 0 } as never);
+        a.b.keep.value = 9;
+      });
+      await flush();
+      expect(view.value).toEqual(readded);
+      tree.undo();
+      await flush();
+      // History recorded what storage held, not the absent value (8e).
+      expect(view.value).toEqual(before);
     } finally {
       tree.destroy();
     }
@@ -150,7 +186,10 @@ describe.each(orders)('absent-path writes — Vue (%s)', (_, enhancers) => {
 
 describe('absent-path writes — Vue (no enhancers)', () => {
   it('a held leaf updater under an omitted member receives undefined', () => {
-    const initial: State = { a: { b: { value: 0, keep: 0 }, side: 0 }, count: 0 };
+    const initial: State = {
+      a: { b: { value: 0, keep: 0 }, side: 0 },
+      count: 0,
+    };
     const tree = signalTree(initial);
     try {
       const { a } = tree.$ as unknown as Handles;

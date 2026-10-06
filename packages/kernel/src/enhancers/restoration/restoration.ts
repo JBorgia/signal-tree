@@ -21,6 +21,10 @@ import {
   readPlainBranchMember,
   type PlainBranchMemberPresence,
 } from '../../lib/internals/plain-branch-membership';
+import {
+  endStructuralWrite,
+  structuralWrites,
+} from '../../lib/internals/member-membership';
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
 import {
   applyInInvalidationGroup,
@@ -664,12 +668,18 @@ class RestorationManager<TSource, T> {
   }
 
   private applyReversal(apply: () => void): void {
+    // A reversal installs physical truth and its own membership effects: it
+    // reads and writes a hidden collection's retained rows, and re-adds no
+    // path implicitly (`structuralWrites`, v16 8e).
+    structuralWrites.depth++;
     try {
       apply();
     } catch (error) {
       if (!wasAppliedBeforeFailure(error)) throw error;
       // Finish operation bookkeeping before surfacing a post-application error.
       this.deliveryFailure ??= { error };
+    } finally {
+      endStructuralWrite();
     }
   }
 
