@@ -1669,9 +1669,25 @@ export function createEntitySignal<
     assertSynchronousInterceptorFunction(handlers.onRemove, 'onRemove');
   }
 
+  /**
+   * The interceptors a write runs. None for a reversal — undo, redo and
+   * jumpTo (`origin: 'restoration'`) or a rollback (`'transaction-rollback'`):
+   * it writes back exactly the value or pre-image that was recorded, which the
+   * interceptors already shaped when it was first written. Through them, a
+   * transforming `onUpdate` re-transformed the pre-image an undo restored and a
+   * blocking one made undo and rollback throw (15.4.3). Taps and subscribers
+   * are still told.
+   */
+  function activeInterceptors(): readonly InterceptHandlers<E, K>[] {
+    const origin = getActiveWriteContext()?.origin;
+    return origin === 'restoration' || origin === 'transaction-rollback'
+      ? []
+      : interceptHandlers;
+  }
+
   function interceptAddedEntity(entity: E): E {
     let transformedEntity = entity;
-    for (const handler of interceptHandlers) {
+    for (const handler of activeInterceptors()) {
       const ctx: InterceptContext<E> = {
         block: (reason?: string) => {
           throw new Error(
@@ -1693,7 +1709,7 @@ export function createEntitySignal<
   /** `onUpdate` interceptors for a whole-entity replacement. */
   function interceptReplacedEntity(id: K, entity: E): E {
     let replacement = entity;
-    for (const handler of interceptHandlers) {
+    for (const handler of activeInterceptors()) {
       const ctx: InterceptContext<Partial<E>> = {
         block: (reason?: string) => {
           throw new Error(
@@ -1716,7 +1732,7 @@ export function createEntitySignal<
 
   /** `onRemove` interceptors: a block throws; there is nothing to transform. */
   function interceptRemovedEntity(id: K, entity: E): void {
-    for (const handler of interceptHandlers) {
+    for (const handler of activeInterceptors()) {
       const ctx: InterceptContext<void> = {
         block: (reason?: string) => {
           throw new Error(
@@ -1738,7 +1754,7 @@ export function createEntitySignal<
 
   function interceptUpdatedEntity(id: K, changes: Partial<E>): Partial<E> {
     let transformedChanges = changes;
-    for (const handler of interceptHandlers) {
+    for (const handler of activeInterceptors()) {
       const ctx: InterceptContext<Partial<E>> = {
         block: (reason?: string) => {
           throw new Error(
@@ -3468,7 +3484,7 @@ export function createEntitySignal<
       const currentSubjects: number[] = [];
       structuralStore.snapshotActiveOrder(currentKeys, currentSubjects);
       const beforeOrderFrontier = structuralStore.activeOrderFrontier();
-      const intercepting = interceptHandlers.length > 0;
+      const intercepting = activeInterceptors().length > 0;
 
       // The incoming order, deduplicated (last value wins), in parallel
       // arrays. `incomingSubjects` holds the existing subject of an update and

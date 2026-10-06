@@ -719,6 +719,12 @@ export interface InterceptContext<T> {
  * `setAll` does. The callback's own writes stand; field-only writes are
  * allowed, and an updated row merges over its value as the interceptors left
  * it.
+ *
+ * Interceptors do not run on a reversal — `undo()`, `redo()`, `jumpTo()` or a
+ * transaction rollback. It writes back exactly the value, or the pre-image,
+ * that was recorded, which the interceptors already shaped when it was first
+ * written; neither a transform nor a block applies to it. Taps and path
+ * subscribers are still notified.
  */
 export interface InterceptHandlers<E, K extends string | number> {
   onAdd?: (entity: E, ctx: InterceptContext<E>) => void;
