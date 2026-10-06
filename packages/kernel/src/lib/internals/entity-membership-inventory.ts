@@ -43,12 +43,35 @@ export interface EntityMembershipPublication {
   readonly changes: readonly EntityMembershipChange[];
 }
 
+export type EntityMembershipReorder = Extract<
+  EntityMembershipChange,
+  { readonly kind: 'reorder' }
+>;
+
 export interface EntityMembershipInventory {
-  observed(): boolean;
+  /**
+   * `observed()`: does anything want FULL membership changes (add, remove,
+   * rekey, reorder)? `observed(true)`: does anything want ORDER changes,
+   * through either tier? A producer builds a `reorder` record when
+   * `observed(true)` holds and every other record only when `observed()` does.
+   * One method rather than two keeps the dormant collection stub, which every
+   * entity bundle ships, unchanged.
+   */
+  observed(order?: boolean): boolean;
   snapshot(): readonly EntityMembership[];
   begin(): EntityMembershipUnit;
   subscribe(
     listener: (publication: EntityMembershipPublication) => void
+  ): () => void;
+  /**
+   * The ORDER tier (15.4.4): each committed `reorder`, in commit order, and
+   * nothing else. Subscribing here makes `observed(true)` true but not
+   * `observed()`, so a
+   * consumer that reads only order (Link) does not make the collection build
+   * add, remove and rekey records for every structural operation.
+   */
+  subscribeOrder(
+    listener: (change: EntityMembershipReorder) => void
   ): () => void;
   close(): void;
 }
@@ -76,11 +99,13 @@ export function createEntityMembershipInventory(
   const listeners = new Set<
     (publication: EntityMembershipPublication) => void
   >();
+  const orderListeners = new Set<(change: EntityMembershipReorder) => void>();
   let depth = 0;
   let changes: EntityMembershipChange[] = [];
   let closed = false;
   return {
-    observed: () => !closed && listeners.size > 0,
+    observed: (order) =>
+      !closed && (listeners.size > 0 || (!!order && orderListeners.size > 0)),
     snapshot() {
       if (closed) throw new Error('Entity membership inventory is closed.');
       if (depth)
@@ -93,11 +118,12 @@ export function createEntityMembershipInventory(
       const finish = (unitChanges: readonly EntityMembershipChange[]) => {
         if (finished || closed) return;
         finished = true;
-        if (listeners.size) appendAll(changes, copyMembershipChanges(unitChanges));
+        if (listeners.size || orderListeners.size)
+          appendAll(changes, copyMembershipChanges(unitChanges));
         if (--depth > 0) return;
         const committedChanges = changes;
         changes = [];
-        if (!committedChanges.length || !listeners.size) return;
+        if (!committedChanges.length) return;
         const audience = [...listeners];
         for (const listener of audience) {
           if (closed) break;
@@ -106,6 +132,23 @@ export function createEntityMembershipInventory(
             listener({ changes: copyMembershipChanges(committedChanges) });
           } catch {
             /* Tooling cannot fail a committed source mutation. */
+          }
+        }
+        const orderAudience = [...orderListeners];
+        for (const change of committedChanges) {
+          if (change.kind !== 'reorder') continue;
+          for (const listener of orderAudience) {
+            if (closed) return;
+            if (!orderListeners.has(listener)) continue;
+            try {
+              listener({
+                kind: 'reorder',
+                before: [...change.before],
+                after: [...change.after],
+              });
+            } catch {
+              /* An order consumer cannot fail a committed source mutation. */
+            }
           }
         }
       };
@@ -121,9 +164,19 @@ export function createEntityMembershipInventory(
         listeners.delete(listener);
       };
     },
+    subscribeOrder(listener) {
+      if (closed) throw new Error('Entity membership inventory is closed.');
+      if (depth)
+        throw new Error('Entity membership unit is still being installed.');
+      orderListeners.add(listener);
+      return () => {
+        orderListeners.delete(listener);
+      };
+    },
     close() {
       closed = true;
       listeners.clear();
+      orderListeners.clear();
       changes = [];
       depth = 0;
       read = () => [];

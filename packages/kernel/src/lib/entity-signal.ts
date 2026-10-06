@@ -592,6 +592,8 @@ export function createEntitySignal<
               }];
               return change.beforeKey !== change.afterKey ? [{ kind: 'rekey', lifetimeId: change.subjectId, beforeKey: change.beforeKey, afterKey: change.afterKey }] : [];
             });
+          }
+          if (membershipInventory.observed(true)) {
             const before = [...currentSubjects.keys()];
             const survivingBefore = before.filter((id) => preparedBySubject.has(id));
             const survivingAfter = target.order.filter((id) => currentSubjects.has(id));
@@ -796,6 +798,8 @@ export function createEntitySignal<
   const structuralStore = new StructuralStore<K>();
   // Dormant until a membership reader first observes this collection; then
   // the reader installs the producer through the source defined below.
+  // `observed()` gates add/remove/rekey records; `observed(true)` gates
+  // `reorder` records, which an order-only consumer (Link) needs alone.
   let membershipInventory: Pick<EntityMembershipInventory, 'observed' | 'begin'> = DORMANT_MEMBERSHIP;
   const readMembers = () =>
     structuralStore.activeKeysSnapshot().map((key) => {
@@ -1160,7 +1164,7 @@ export function createEntitySignal<
    * signals pick the new order up from the version bump.
    */
   function moveToFront(ids: K[]): void {
-    const before = membershipInventory.observed() ? structuralStore.activeKeysSnapshot().map((key) => rememberSubjectId(key)) : undefined;
+    const before = membershipInventory.observed(true) ? structuralStore.activeKeysSnapshot().map((key) => rememberSubjectId(key)) : undefined;
     structuralStore.moveKeysToFront(ids);
     if (before) {
       const after = structuralStore.activeKeysSnapshot().map((key) => rememberSubjectId(key));
@@ -3701,8 +3705,8 @@ export function createEntitySignal<
       if (membershipInventory.observed()) {
         appendAll(membershipChanges, stagedRemovals.map(({ id, subjectId }) => ({ kind: 'remove' as const, lifetimeId: subjectId, key: id })));
         appendAll(membershipChanges, stagedAdds.map(({ id }, index) => membershipAddition(addedSubjectIds[index], id)));
-        if (survivingOrderChanged(currentSubjects, afterSubjects)) membershipChanges.push({ kind: 'reorder', before: currentSubjects, after: afterSubjects });
       }
+      if (membershipInventory.observed(true) && survivingOrderChanged(currentSubjects, afterSubjects)) membershipChanges.push({ kind: 'reorder', before: currentSubjects, after: afterSubjects });
 
       // Captured whenever SURVIVING subjects change relative order, not only
       // for a pure reorder. Neighbour hints on the structural effects cannot
