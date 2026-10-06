@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { LeafDefinition } from '../index';
 import {
   entityMap,
   external,
@@ -452,4 +453,82 @@ describe('restoration around registered terminals', () => {
       expect(history!.snapshot().entries.slice(-1)[0].status).toBe('applied');
     }
   );
+});
+
+describe('an externally omitted terminal is never restored (review follow-up)', () => {
+  type Omittable = { bounds?: LeafDefinition<Bounds>; count: number };
+  const initial = (): Omittable => ({
+    bounds: leaf<Bounds>({ min: 0, max: 10 }),
+    count: 0,
+  });
+
+  for (const [order, enhancers] of Object.entries(orders)) {
+    it(`pending rollback reverts the sibling and leaves the terminal omitted (${order})`, async () => {
+      const tree = signalTree(initial(), { enhancers: enhancers() });
+      trees.push(tree);
+      const bounds = tree.$.bounds!;
+      const lifecycle = transactionLifecycleReader(tree);
+      const pending = tree.transact(() => {
+        bounds({ min: 1, max: 9 });
+        tree.$.count(1);
+      });
+      await flush();
+      external(() => tree.$({ count: 1 }));
+      await flush();
+      expect(hasOwn(tree.$(), 'bounds')).toBe(false);
+      pending.rollback();
+      expect(tree.$()).toEqual({ count: 0 });
+      expect(bounds()).toBeUndefined();
+      expect(lifecycle?.snapshot().pending).toHaveLength(0);
+    });
+  }
+
+  for (const [order, enhancers] of Object.entries(historyOrders)) {
+    for (const operation of ['undo', 'redo'] as const) {
+      it(`${operation} refuses atomically and writes nothing (${order})`, async () => {
+        const tree = signalTree(initial(), { enhancers: enhancers() });
+        trees.push(tree);
+        const bounds = tree.$.bounds!;
+        undoable(() => {
+          bounds({ min: 1, max: 9 });
+          tree.$.count(1);
+        });
+        await flush();
+        if (operation === 'redo') {
+          tree.undo();
+          await flush();
+        }
+        const count = tree.$.count();
+        external(() => tree.$({ count }));
+        await flush();
+        const index = tree.getCurrentIndex();
+        expect(() => tree[operation]()).toThrow(/ST1034/);
+        expect(tree.$()).toEqual({ count });
+        expect(bounds()).toBeUndefined();
+        expect(tree.getCurrentIndex()).toBe(index);
+        expect(tree.canRedo()).toBe(operation === 'redo');
+      });
+    }
+
+    it(`an external re-add with another value still refuses undo (${order})`, async () => {
+      const tree = signalTree(initial(), { enhancers: enhancers() });
+      trees.push(tree);
+      const bounds = tree.$.bounds!;
+      undoable(() => {
+        bounds({ min: 1, max: 9 });
+        tree.$.count(1);
+      });
+      await flush();
+      external(() => tree.$({ count: 1 }));
+      await flush();
+      external(() => tree.$({ count: 1, bounds: { min: 5 } } as never));
+      await flush();
+      expect(bounds()).toEqual({ min: 5 });
+      const index = tree.getCurrentIndex();
+      expect(() => tree.undo()).toThrow(/ST1034/);
+      expect(bounds()).toEqual({ min: 5 });
+      expect(tree.$.count()).toBe(1);
+      expect(tree.getCurrentIndex()).toBe(index);
+    });
+  }
 });
