@@ -21,7 +21,7 @@ import {
   getNodeAddress,
 } from './internals/position-registry';
 import { acquireObservation } from './internals/observation-substrate';
-import { registerLinkState } from './internals/link-state-view';
+import { registerLinkState } from './internals/link-state-source';
 import { isInspectionWrite } from './write-participation';
 import {
   getEntityProjectionSeed,
@@ -445,22 +445,20 @@ export function link<S>(
   // results: each publication reports what this relationship is doing now.
   let queued = 0;
   let sending = false;
-  const observation = registerLinkState(registry, (id) => ({
-    id,
-    path: ownerPath,
-    positions: getOwnedPositionIds(x) ?? [],
-    directions: {
-      get: !!endpoint.get,
-      set: !!endpoint.set,
-      subscribe: !!endpoint.subscribe,
-    },
-    dirty,
-    held: held.size > 0 || waitingSends.size > 0,
-    queued,
-    sending,
-    retrieving: retrievals.size,
-    disposed,
-  }));
+  const observeLink = registerLinkState(
+    registry,
+    x as object,
+    ownerPath,
+    endpoint,
+    () => [
+      dirty,
+      held.size > 0 || waitingSends.size > 0,
+      queued,
+      sending,
+      retrievals.size,
+      disposed,
+    ]
+  );
 
   /**
    * Inbound Y -> X.
@@ -521,7 +519,7 @@ export function link<S>(
         if (relative === undefined) return;
         eligible = applyPlainBranchMembership(eligible, relative, membership);
         dirty = true;
-        observation.publish();
+        observeLink();
         return;
       }
       // A value-less ping is a notification, not a state change.
@@ -562,7 +560,7 @@ export function link<S>(
           eligible = next as T;
         }
         dirty = true;
-        observation.publish();
+        observeLink();
         return;
       }
       const position = _pos?.[0];
@@ -597,7 +595,7 @@ export function link<S>(
         if (advanced) {
           advanceNested(nested);
           dirty = true;
-          observation.publish();
+          observeLink();
         }
         return;
       }
@@ -618,14 +616,14 @@ export function link<S>(
         );
         if (advanced) {
           dirty = true;
-          observation.publish();
+          observeLink();
         }
         return;
       }
       if (inspection) return;
       eligible = applyAtRelativePath(eligible, relative, v);
       dirty = true;
-      observation.publish();
+      observeLink();
     }
   );
 
@@ -667,7 +665,7 @@ export function link<S>(
               // Entering I/O is observable; a listener may dispose here, and
               // then no endpoint call may start.
               sending = true;
-              observation.publish();
+              observeLink();
               if (disposed) {
                 sending = false;
                 resolve(false);
@@ -694,7 +692,7 @@ export function link<S>(
             },
           });
           // Held behind an open scope: the send waits for permission.
-          if (waitingSends.has(cancel)) observation.publish();
+          if (waitingSends.has(cancel)) observeLink();
         } catch (error) {
           waitingSends.delete(cancel);
           reject(error);
@@ -753,11 +751,11 @@ export function link<S>(
                 if (!(await sendEligible())) return;
               }
             } finally {
-              observation.publish();
+              observeLink();
             }
           })
           .catch((error) => {
-            observation.publish('send-failed');
+            observeLink('send-failed');
             // LINK-2 case 3. A rejected outbound `set()` reaches the EXISTING
             // central reporter, so `Link` needs NO error surface of its own:
             // no `failures`, no error signal, no status. Reusing the reporter
@@ -785,10 +783,10 @@ export function link<S>(
               path: ownerPath === '' ? undefined : ownerPath,
             });
           });
-        observation.publish();
+        observeLink();
       },
     });
-    observation.publish();
+    observeLink();
   };
   const offFlush = notifier.onFlush?.(flushOutbound);
 
@@ -816,7 +814,7 @@ export function link<S>(
             if (nested) advanceNested(nested);
           }
           dirty = true;
-          observation.publish();
+          observeLink();
           flushOutbound();
         } finally {
           pendingOrders.delete(pending);
@@ -855,7 +853,7 @@ export function link<S>(
     for (const r of retrievals) r.resolve();
     retrievals.clear();
     // Retires the observation record before user cleanup, which may throw.
-    observation.publish('disposed');
+    observeLink('disposed');
     offSource?.();
   };
   try {
@@ -863,11 +861,11 @@ export function link<S>(
   } catch (error) {
     // Construction did not return a handle: not an active relationship, so it
     // leaves no observation record and publishes nothing.
-    observation.forget();
+    observeLink(null);
     dispose();
     throw error;
   }
-  observation.publish('created');
+  observeLink('created');
 
   return {
     async retrieve() {
@@ -879,21 +877,21 @@ export function link<S>(
       const promise = new Promise<void>((r) => (resolve = r));
       const entry = { promise, resolve };
       retrievals.add(entry);
-      observation.publish();
+      observeLink();
       try {
         // A disposed relationship starts no endpoint call, including one
         // disposed by a listener of the publication above.
         if (disposed) return;
         acquire((await endpoint.get()) as T, seq);
       } catch (error) {
-        observation.publish('retrieve-failed');
+        observeLink('retrieve-failed');
         throw error;
       } finally {
         // `finally`, so a rejected get() releases the waiter too - otherwise a
         // failing endpoint would wedge every future `settled()`.
         retrievals.delete(entry);
         entry.resolve();
-        observation.publish();
+        observeLink();
       }
     },
     async settled() {
