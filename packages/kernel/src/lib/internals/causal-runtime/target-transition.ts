@@ -552,33 +552,53 @@ function deriveStructuralTargetOrder(
     const pendingSubjects = new Set(
       pending.map((effect) => effect.subjectId as number)
     );
-    const readyIndex = pending.findIndex((effect) => {
+    const waitsOnPending = (effect: ReversalEffect): boolean => {
       const context = effect.structuralContext;
-      if (context?.kind !== 'add' && context?.kind !== 'remove') {
-        return true;
-      }
-      const beforeLive =
-        context.beforeSubject !== undefined &&
-        order.includes(context.beforeSubject);
-      const afterLive =
-        context.afterSubject !== undefined &&
-        order.includes(context.afterSubject);
-      if (beforeLive || afterLive) {
-        return true;
-      }
-      const hasNoAnchors =
-        context.beforeSubject === undefined &&
-        context.afterSubject === undefined;
-      if (hasNoAnchors) {
-        return true;
-      }
-      const anchorMayBecomeLive =
-        (context.beforeSubject !== undefined &&
+      return (
+        (context?.kind === 'add' || context?.kind === 'remove') &&
+        ((context.beforeSubject !== undefined &&
           pendingSubjects.has(context.beforeSubject)) ||
-        (context.afterSubject !== undefined &&
-          pendingSubjects.has(context.afterSubject));
-      return !anchorMayBecomeLive;
-    });
+          (context.afterSubject !== undefined &&
+            pendingSubjects.has(context.afterSubject)))
+      );
+    };
+    // An addition whose anchors include ANOTHER pending addition waits for it
+    // while any addition is waiting on nothing: `updateOne c; removeOne a;
+    // removeOne c` anchors a to c (c was there when a went), so c is placed
+    // first; placing a first beside its live anchor z restored [z, c, a].
+    const unblockedIndex = pending.findIndex(
+      (effect) => !waitsOnPending(effect)
+    );
+    const readyIndex =
+      unblockedIndex >= 0
+        ? unblockedIndex
+        : pending.findIndex((effect) => {
+            const context = effect.structuralContext;
+            if (context?.kind !== 'add' && context?.kind !== 'remove') {
+              return true;
+            }
+            const beforeLive =
+              context.beforeSubject !== undefined &&
+              order.includes(context.beforeSubject);
+            const afterLive =
+              context.afterSubject !== undefined &&
+              order.includes(context.afterSubject);
+            if (beforeLive || afterLive) {
+              return true;
+            }
+            const hasNoAnchors =
+              context.beforeSubject === undefined &&
+              context.afterSubject === undefined;
+            if (hasNoAnchors) {
+              return true;
+            }
+            const anchorMayBecomeLive =
+              (context.beforeSubject !== undefined &&
+                pendingSubjects.has(context.beforeSubject)) ||
+              (context.afterSubject !== undefined &&
+                pendingSubjects.has(context.afterSubject));
+            return !anchorMayBecomeLive;
+          });
     if (readyIndex < 0) {
       if (order.length === 0) {
         appendAll(order, derivePendingAnchorOrder(pending));

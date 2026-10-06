@@ -118,6 +118,26 @@ const writeThenRemove: Record<string, (tree: Tree) => void> = {
     tree.$.rows.updateOne('a', { n: 2 });
     tree.$.rows.clear();
   },
+  // Undo ORDER shapes: the notifier delivers a row's removal in the slot of
+  // that row's earlier write, so the turn's removals are out of order.
+  'updateOne c, then removeOne a and c': (tree) => {
+    tree.$.rows.updateOne('c', { n: 4 });
+    tree.$.rows.removeOne('a');
+    tree.$.rows.removeOne('c');
+  },
+  'updateOne a, then removeMany z and a': (tree) => {
+    tree.$.rows.updateOne('a', { n: 2 });
+    tree.$.rows.removeMany(['z', 'a']);
+  },
+  'updateOne a and c, then clear': (tree) => {
+    tree.$.rows.updateOne('a', { n: 2 });
+    tree.$.rows.updateOne('c', { n: 4 });
+    tree.$.rows.clear();
+  },
+  'updateOne z, then clear': (tree) => {
+    tree.$.rows.updateOne('z', { n: 9 });
+    tree.$.rows.clear();
+  },
   'changeId, updateOne, then removeOne': (tree) => {
     tree.$.rows.changeId('a', 'a2');
     tree.$.rows.updateOne('a2', { n: 2 });
@@ -236,9 +256,14 @@ describe.each(Object.entries(configurations))(
 // way. The changeId-first rows REFUSED on 15.4.3 ("Unsupported scoped undo
 // effect at structural-drift"): rekey-then-remove composes into one removal
 // that keeps the rekey's EARLIER slot, so the reversed turn reversed the field
-// before the row was back. `updateOne then clear` is tracked in
-// reversal-known-limitations.spec.ts.
+// before the row was back. `updateOne then clear` and the other ORDER shapes
+// restored the right rows in the wrong order on 15.4.3 ([a, c, z]).
 const undoCases = [
+  'updateOne then clear',
+  'updateOne c, then removeOne a and c',
+  'updateOne a, then removeMany z and a',
+  'updateOne a and c, then clear',
+  'updateOne z, then clear',
   'changeId, updateOne, then removeOne',
   'changeId twice, updateOne, then removeOne',
   'changeId, updateOne adding a field, then removeOne',
