@@ -21,16 +21,14 @@ import {
 } from '@signal-tree/kernel/internals';
 
 // Carried from v15 012fd11d (v16 integration slice 6): `.transaction(` ->
-// `.transact(`. One part is moved, not weakened (class c): undo/redo of the
-// opaque `leaf()` replacement is refused on v16 before this slice
-// ("Unsupported scoped undo effect at structural-drift"; atomic
-// registered-terminal reversal is integration slice 8; on 515a6969 even a
-// later scalar undo is refused once an external leaf write sits in the
-// history gap). The donor block is preserved in
+// `.transact(`. Slice 6 moved the opaque `leaf()` undo/redo block out (class
+// c): v16 refused it ("Unsupported scoped undo effect at structural-drift")
+// until atomic registered-terminal reversal (integration slice 8, donor v15
+// 2892b650). Slice 8 restores that block here unchanged; the preserved copy in
 // docs/audits/2026-10-01-v16-integration/preserved/
-// vue-tooling-admission-leaf-undo.spec.ts.txt. Here the restoration reader is
-// exercised with undo/redo of a scalar entry, and the leaf is still written
-// through its native carrier afterwards.
+// vue-tooling-admission-leaf-undo.spec.ts.txt stays as the historical record.
+// v16 controls kept from slice 6: the native leaf location and the restoration
+// reader's entry status across the undo/redo.
 const flush = async () => {
   for (let i = 0; i < 8; i++) await Promise.resolve();
 };
@@ -100,25 +98,24 @@ describe('tooling admits public Vue trees directly', () => {
         expect(links.snapshot()).toMatchObject({ treeId: id, links: [] });
 
         undoable(() => {
-          tree.$.count.value = 2;
+          tree.$.bounds.value = { min: 1, max: 9 };
         });
         await flush();
         expect(history.snapshot().treeId).toBe(id);
         expect(history.snapshot().entries).toHaveLength(1);
+        expect(tree.$.bounds.value).toEqual({ min: 1, max: 9 });
         const [entry] = history.snapshot().entries;
         tree.undo();
         await flush();
-        expect(tree.$.count.value).toBe(1);
+        expect(tree.$.bounds.value).toEqual({ min: 0, max: 10 });
         expect(history.snapshot().entries[0]).toMatchObject({
           entryId: entry.entryId,
           status: 'unapplied',
         });
         tree.redo();
         await flush();
-        expect(tree.$.count.value).toBe(2);
-        expect(history.snapshot().entries[0].status).toBe('applied');
-        tree.$.bounds.value = { min: 1, max: 9 };
         expect(tree.$.bounds.value).toEqual({ min: 1, max: 9 });
+        expect(history.snapshot().entries[0].status).toBe('applied');
         tree.destroy();
         expect(tree.destroyed.value).toBe(true);
         for (const read of [
