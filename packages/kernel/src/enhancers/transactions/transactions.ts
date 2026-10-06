@@ -38,9 +38,10 @@ import {
   settleCommitScope,
 } from '../../lib/internals/commit-consequence';
 import {
-  installTransactionLifecycleObservation,
-  type TransactionRefusalReason,
-} from '../../lib/internals/transaction-lifecycle-view';
+  defineTransactionLifecycleSource,
+  type TransactionLifecycleFact,
+  type TransactionLifecycleObserver,
+} from '../../lib/internals/transaction-lifecycle-source';
 import type { ToolingTree } from '../../lib/internals/tooling-tree';
 import { holdEntityMembershipDelivery } from '../../lib/internals/entity-membership-source';
 import { AppliedTurnProjection } from '../../lib/internals/causal-runtime/applied-turn-projection';
@@ -1351,13 +1352,33 @@ export function getOrCreateInternalTransactionRuntime<T>(
   const consequencesReleased = (transactionId: number): boolean =>
     lifecycleScopes.has(transactionId) &&
     !isCommitScopeOpen(transactionOwnerToken, transactionId);
-  const publishLifecycle = installTransactionLifecycleObservation(tree, () =>
-    [...lifecycleViews.values()].map(({ transactionId, phase }) => ({
-      transactionId,
-      phase,
-      consequencesReleased: consequencesReleased(transactionId),
-    }))
-  );
+  // Transitions are counted here so a reader that attaches late still sees a
+  // coherent sequence; everything else waits for an observer to attach.
+  let lifecycleSequence = 0;
+  let lifecycleObserver: TransactionLifecycleObserver | undefined;
+  const lifecycleRegistry = getPositionRegistry(tree.$);
+  if (lifecycleRegistry)
+    defineTransactionLifecycleSource(lifecycleRegistry, {
+      treeId: lifecycleRegistry.id,
+      read: () => ({
+        sequence: lifecycleSequence,
+        pending: [...lifecycleViews.values()].map(
+          ({ transactionId, phase }) => ({
+            transactionId,
+            phase,
+            consequencesReleased: consequencesReleased(transactionId),
+          })
+        ),
+      }),
+      attach: (observer) => {
+        lifecycleObserver = observer;
+      },
+    });
+  const publishLifecycle = (fact: TransactionLifecycleFact): void => {
+    lifecycleSequence++;
+    lifecycleObserver?.record(fact);
+  };
+  const holdLifecycle = () => lifecycleObserver?.hold();
   const retireLifecycleView = (transactionId: number): void => {
     lifecycleViews.delete(transactionId);
     lifecycleScopes.delete(transactionId);
@@ -1365,42 +1386,16 @@ export function getOrCreateInternalTransactionRuntime<T>(
   /**
    * A transaction the owner gave up before it had a handle: it leaves the
    * snapshot under a new sequence. The engine announces no terminal transition
-   * on these paths, so the reader invents none (see `advance`).
+   * on these paths, so the reader invents none; only the count advances.
    */
   const abandonLifecycleView = (transactionId: number): void => {
     if (!lifecycleViews.has(transactionId)) return;
     retireLifecycleView(transactionId);
-    publishLifecycle.advance();
+    lifecycleSequence++;
   };
-  /** The owner's own classification of a refusal it threw; never re-derived. */
-  const refusalReason = (error: unknown): TransactionRefusalReason => {
-    const cause =
-      error instanceof SignalTreeRollbackError
-        ? ((error as { cause?: unknown }).cause as
-            | RollbackFailureCause
-            | undefined)
-        : undefined;
-    switch (cause?.kind) {
-      case 'later-confirmed-dependency':
-        return 'later-confirmed-dependency';
-      case 'effect-validation-failed':
-      default:
-        return 'effect-validation-failed';
-    }
-  };
-  const publishRefusal = (
-    transactionId: number,
-    error: unknown,
-    pendingRetained: boolean
-  ): void => {
-    publishLifecycle({
-      kind: 'refused',
-      transactionId,
-      reason: refusalReason(error),
-      pendingRetained,
-      consequencesReleased: consequencesReleased(transactionId),
-    });
-  };
+  /** A refusal it threw; the reader classifies it from the error's cause. */
+  const publishRefusal = (transactionId: number, error: unknown): void =>
+    publishLifecycle({ kind: 'refused', transactionId, error });
   const treeWrapper = tree as unknown as object;
   const stateRoot = tree.$ as unknown as object;
   const realizationDescriptors =
@@ -3039,7 +3034,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       let releaseEntityCapture: (() => void) | undefined;
       let reservedTurnId: number;
       try {
-        const releaseOpenedDelivery = publishLifecycle.hold();
+        const releaseOpenedDelivery = holdLifecycle();
         publishLifecycle({ kind: 'opened', transactionId });
         try {
           lifecycleChannel.announce({
@@ -3048,7 +3043,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             id: transactionId,
           });
         } finally {
-          releaseOpenedDelivery();
+          releaseOpenedDelivery?.();
         }
 
         // 'opened' listeners can author ordinary writes or complete transactions.
@@ -3167,7 +3162,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           // entry inside it). Public delivery waits for materialization, so no
           // tooling callback runs between the callback and that staging.
           lifecycleView.phase = 'staged';
-          releaseStagedDelivery = publishLifecycle.hold();
+          releaseStagedDelivery = holdLifecycle();
           publishLifecycle({ kind: 'staged', transactionId });
           lifecycleChannel.announce({
             kind: 'staged',
@@ -3238,7 +3233,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           // notifies already sees this transaction settled. Public delivery
           // keeps its position after consequences.
           retireLifecycleView(transactionId);
-          const releaseConfirmedDelivery = publishLifecycle.hold();
+          const releaseConfirmedDelivery = holdLifecycle();
           publishLifecycle({ kind: 'confirmed', transactionId });
           try {
             lifecycleChannel.announce({
@@ -3297,7 +3292,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
               }
             }
           } finally {
-            releaseConfirmedDelivery();
+            releaseConfirmedDelivery?.();
           }
         },
         rollback(): void {
@@ -3318,7 +3313,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           if ('conflict' in plan) {
             const refusal = createRollbackError(plan.conflict);
             // Refused before anything is reversed: authority stays pending.
-            publishRefusal(transactionId, refusal, true);
+            publishRefusal(transactionId, refusal);
             throw refusal;
           }
           const compensation = plan.compensation;
@@ -3371,7 +3366,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
                         callbackError: primaryFailed ? primaryError : undefined,
                       });
                 // Nothing installed: the turn and its scope stay pending.
-                publishRefusal(transactionId, refusal, true);
+                publishRefusal(transactionId, refusal);
                 throw refusal;
               }
               observerFailed = true;
@@ -3381,7 +3376,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             // Recorded at the transition (compensation installed), before the
             // engine announcement; delivered after consequences are discarded.
             retireLifecycleView(transactionId);
-            releaseRolledBackDelivery = publishLifecycle.hold();
+            releaseRolledBackDelivery = holdLifecycle();
             publishLifecycle({ kind: 'rolled-back', transactionId });
             inspectionWrites.delete(transactionId);
             if (pendingTurnId !== undefined)
@@ -3441,7 +3436,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
               errorMessage:
                 'Transaction rollback refused: a location it wrote was written again before the transaction returned',
             });
-            publishRefusal(transactionId, refusal, true);
+            publishRefusal(transactionId, refusal);
             throw refusal;
           }
           handle.rollback();

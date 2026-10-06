@@ -206,6 +206,31 @@ describe('refused automatic compensation reports the retained transaction', () =
   });
 });
 
+describe('a reader attached late', () => {
+  it("reports the tree's transition count and current pending state, with no history", () => {
+    const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
+    try {
+      tree.transact(() => tree.$.x(1)).confirm();
+      const pending = tree.transact(() => tree.$.x(2));
+      // Five transitions happened before any reader existed.
+      const reader = transactionLifecycleReader(tree)!;
+      expect(reader.snapshot()).toMatchObject({
+        sequence: 5,
+        pending: [
+          { transactionId: 2, phase: 'staged', consequencesReleased: false },
+        ],
+      });
+      const events: TransactionLifecycleObservation[] = [];
+      reader.subscribe((event) => events.push(event));
+      expect(events).toEqual([]);
+      pending.confirm();
+      expect(events.map((event) => event.sequence)).toEqual([6]);
+    } finally {
+      tree.destroy();
+    }
+  });
+});
+
 describe('each transition is recorded before the engine announcement', () => {
   it('owners reading the reader inside their own announcement see that transition already recorded', () => {
     const tree = signalTree({ x: 0 }, { enhancers: [transactions()] });
