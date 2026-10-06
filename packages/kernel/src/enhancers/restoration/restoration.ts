@@ -60,6 +60,7 @@ import { getMutationCaptureRuntime } from '../../lib/internals/mutation-capture-
 import type { CollectionOrderCapture } from '../../lib/internals/mutation-capture-runtime';
 import {
   deriveCollectionOrderDelta,
+  CollectionOrderConflict,
   deriveDeclarativeTransitionTarget,
   prepareDeclarativeTransitionInstallation,
   requiresDeclarativeStructuralTarget,
@@ -2966,10 +2967,36 @@ export function restoration(
             typeof effect.subjectId === 'number' ||
             effect.structural === undefined
         );
+      // ⚠️ AN ORDER THIS TRANSITION CANNOT RECONSTRUCT IS REFUSED, typed and
+      // with nothing changed: every failure below is raised while the target
+      // is derived and prepared, before anything installs. Thrown as plain
+      // errors, a reader reported them as failures and their text named no
+      // collection (v16 8g). v15 15.4.x reconstructs them; the carry list
+      // names the commit each shape needs.
+      // The underlying failure stays in the text, in parentheses.
+      const orderRefusal = (
+        owner: PositionId,
+        reason: string,
+        failure: string
+      ): Error =>
+        restorationRefusal(
+          `ST1034: restoration refused — the order of '${
+            getPositionRegistry(tree.$)?.addressFor(owner)?.join('.') ??
+            `position ${owner}`
+          }' cannot be restored: ${reason} (${failure}). Nothing was changed; the history position is unmoved.`
+        );
       const applyDeclarativeTarget = (): void => {
         const deltaOwners = new Set(orderDeltas.map(({ owner }) => owner));
         if (deltaOwners.size !== orderDeltas.length) {
-          throw new Error(
+          const seen = new Set<PositionId>();
+          const repeated = orderDeltas.find(({ owner }) => {
+            if (seen.has(owner)) return true;
+            seen.add(owner);
+            return false;
+          });
+          throw orderRefusal(
+            repeated?.owner as PositionId,
+            'this would reverse more than one of its order changes at once',
             'Declarative order replay requires transition-level delta composition'
           );
         }
@@ -3014,12 +3041,19 @@ export function restoration(
           }
           return binding.readSource();
         });
-        const target = deriveDeclarativeTransitionTarget({
-          collections: sources,
-          effects: appliedEffects,
-          orderDeltas,
-          orderEndpoints,
-        });
+        let target: ReturnType<typeof deriveDeclarativeTransitionTarget>;
+        try {
+          target = deriveDeclarativeTransitionTarget({
+            collections: sources,
+            effects: appliedEffects,
+            orderDeltas,
+            orderEndpoints,
+          });
+        } catch (failure) {
+          if (failure instanceof CollectionOrderConflict)
+            throw orderRefusal(failure.owner, failure.reason, failure.message);
+          throw failure;
+        }
         const scalarBinding: ScalarTransitionTargetBinding | undefined =
           scalarSlotRuntime
             ? {
