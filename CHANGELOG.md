@@ -78,10 +78,14 @@ bullet below says **Compatibility** or **Behaviour change**.
   blocking interceptor no longer makes devtools time travel throw. A jump to
   any other state (forged, hand-edited, older than the devtools `maxAge`
   window, default 50 states and at most 1,000) and `IMPORT_STATE` are new
-  input and still run them. Fail-safe: recognition is by the exact JSON the
-  tree produced, so a recorded state the extension hands back re-serialized
-  differently counts as unrecorded - interceptors run, and a blocking one
-  refuses the jump.
+  input and still run them. A state is recognised by a 53-bit hash (cyrb53)
+  of the JSON the tree produced for it, not by the JSON itself. A recorded
+  state the extension hands back re-serialized differently hashes
+  differently and counts as unrecorded: interceptors run, and a blocking one
+  refuses the jump. The other direction is a hash collision: a different
+  state whose JSON hashes like a recorded one is treated as recorded and
+  skips interceptors. This is a development-only trust surface: `devtools()`
+  is a development tool, and it trusts the extension's states only that far.
 - Taps fire symmetrically for the changes a reversal applies: a row it brings
   back taps `onAdd`, one it takes away `onRemove`, one whose value it changes
   `onUpdate`. On 15.4.3 no reversal tapped `onAdd` (redo of `addOne` or
@@ -244,6 +248,41 @@ bullet below says **Compatibility** or **Behaviour change**.
 - A devtools timeline jump that only reorders a collection no longer makes
   undo of an authored reorder refuse or `getRestorationHistory()` throw: the
   undo overwrites the scrub, and history states hold authored orders.
+- Link (`link()`), each found while auditing the 15.4 line and present in
+  15.4.3:
+  - A collection endpoint now receives a reorder of surviving rows. After
+    `setAll([D, C, B, A])` over `[A, B, C, D]`, or a `prependMany()`, and
+    after the undo, redo, `jumpTo()` or rollback of either, `set` receives
+    the complete `Row[]` in the tree's order; before, the endpoint kept the
+    old order. Rows restored or added ahead of their neighbours (a rollback
+    or undo of `removeMany`, a `setAll` that adds rows in front) also arrive
+    in the tree's order (`removeMany(['A', 'B'])` then rollback sent
+    `[C, D, A, B]`). A reorder inside a pending transaction is sent only if it
+    confirms; an inspection-only (devtools) reorder still sends nothing.
+    **Behaviour change:** an endpoint receives sends it did not receive
+    before, one per reorder.
+  - `tree.destroy()` disposes every Link bound to the tree, as `dispose()`
+    does: `settled()` waiters are released, held and queued sends are dropped,
+    each endpoint's `subscribe()` cleanup runs once, and a write after
+    `destroy()` no longer reaches the endpoint. A cleanup that throws does not
+    escape `destroy()` (`dispose()` called directly still throws it).
+    **Behaviour change:** before, destroy left Links live: later writes were
+    still sent and cleanups never ran.
+  - `link()` on a tree that is already destroyed throws
+    `StudioTreeDestroyedError`, as v15's tooling readers do. **Compatibility:**
+    it created a relationship that could never send; code that links after
+    destroying a tree now throws there.
+  - A collection with a `sortComparer` is sent in `all()` order, computed from
+    the values Link may publish (a devtools edit of a sort field moves nothing
+    outward). **Behaviour change:** it was sent in storage (insertion) order,
+    and editing the sort field never moved the row.
+  - `settled()` also waits for sends caused by writes still queued for
+    delivery: a notifier subscriber that writes the linked location in
+    response to another write (one hop or more, also through another tree),
+    or a write authored after `settled()` in the same synchronous turn. It
+    still does not wait for another relationship's endpoint call.
+    **Behaviour change:** `settled()` can resolve later than before; it
+    resolved before such a send had started.
 - Known, unchanged: undo of a write that dropped a row field re-adds the
   field at the end of the row's keys.
 
