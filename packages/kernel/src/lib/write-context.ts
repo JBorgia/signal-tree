@@ -49,6 +49,23 @@ import type { WriteMetadata } from './mutation-types';
 let activeContext: WriteMetadata | undefined;
 
 /**
+ * REPLAY WRITES (15.4.4). A replay of recorded state — undo, redo, jumpTo
+ * (`origin: 'restoration'`), a rollback (`'transaction-rollback'`) — writes
+ * back exactly what was recorded, so its OWN writes skip the entity
+ * interceptors. A write a user callback makes while it runs (a tap, a
+ * subscriber, an observer) inherits the replay's context but is new, forward
+ * work, and must be intercepted (b6aec5a3 skipped it too).
+ *
+ * `userCallbacks` counts the user callbacks running synchronously right now
+ * (`runUserCallback`); `replayDepth` is that count when a replay context was
+ * entered, or -1. A write is the replay's own exactly while the two agree —
+ * also when the replay itself was started from inside a callback. Shared by
+ * every tree and collection, so a tap writing another one is covered.
+ */
+let userCallbacks = 0;
+let replayDepth = -1;
+
+/**
  * Run `fn` with `meta` set as the active write context. The previous context
  * (if any) is restored when `fn` returns or throws.
  *
@@ -58,11 +75,31 @@ let activeContext: WriteMetadata | undefined;
  */
 export function withWriteContext<R>(meta: WriteMetadata, fn: () => R): R {
   const previous = activeContext;
+  const previousReplay = replayDepth;
   activeContext = meta;
+  replayDepth =
+    meta.origin === 'restoration' || meta.origin === 'transaction-rollback'
+      ? userCallbacks
+      : -1;
   try {
     return withDeferredWriteScope(fn);
   } finally {
     activeContext = previous;
+    replayDepth = previousReplay;
+  }
+}
+
+/** @internal The current write is a replay writing itself back (see above). */
+export const isRecordedReplayWrite = (): boolean =>
+  replayDepth === userCallbacks;
+
+/** @internal Run a user callback, counted (see above). */
+export function runUserCallback<R>(callback: () => R): R {
+  userCallbacks++;
+  try {
+    return callback();
+  } finally {
+    userCallbacks--;
   }
 }
 

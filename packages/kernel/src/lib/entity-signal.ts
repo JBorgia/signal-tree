@@ -44,7 +44,12 @@ import type { PhysicalCommitClock } from './internals/physical-commit-clock';
 // Only `notify` is ever called on this — the neutral port contract, not the
 // delivery engine's full surface.
 import type { PathObservationPort } from './internals/path-observation-port';
-import { getActiveWriteContext } from '../lib/write-context';
+import {
+  getActiveWriteContext,
+  isRecordedReplayWrite,
+  runUserCallback,
+} from '../lib/write-context';
+
 import { recordProductionSubstrateStat } from './internals/production-substrate-stats';
 import {
   defineEntityProjectionSeed,
@@ -1626,9 +1631,7 @@ export function createEntitySignal<
           }
         );
 
-        for (const handler of tapHandlers) {
-          handler.onRemove?.(key, entity);
-        }
+        emitTap('onRemove', key, entity);
       },
     };
   }
@@ -1670,19 +1673,16 @@ export function createEntitySignal<
   }
 
   /**
-   * The interceptors a write runs. None for a reversal — undo, redo and
-   * jumpTo (`origin: 'restoration'`) or a rollback (`'transaction-rollback'`):
-   * it writes back exactly the value or pre-image that was recorded, which the
-   * interceptors already shaped when it was first written. Through them, a
-   * transforming `onUpdate` re-transformed the pre-image an undo restored and a
-   * blocking one made undo and rollback throw (15.4.3). Taps and subscribers
-   * are still told.
+   * The interceptors a write runs. None for a replay of recorded state writing
+   * itself back — undo, redo, jumpTo, a rollback, a devtools jump: it restores
+   * exactly the value or pre-image that was recorded, which the interceptors
+   * already shaped when it was first written. Through them, a transforming
+   * `onUpdate` re-transformed the pre-image an undo restored and a blocking one
+   * made undo and rollback throw (15.4.3). A write a tap or subscriber makes
+   * while the replay runs is forward work and is intercepted.
    */
   function activeInterceptors(): readonly InterceptHandlers<E, K>[] {
-    const origin = getActiveWriteContext()?.origin;
-    return origin === 'restoration' || origin === 'transaction-rollback'
-      ? []
-      : interceptHandlers;
+    return isRecordedReplayWrite() ? [] : interceptHandlers;
   }
 
   function interceptAddedEntity(entity: E): E {
@@ -1864,9 +1864,7 @@ export function createEntitySignal<
       );
     }
 
-    for (const handler of tapHandlers) {
-      handler.onAdd?.(transformedEntity, id);
-    }
+    emitTap('onAdd', transformedEntity, id);
 
     return id;
   }
@@ -2056,9 +2054,7 @@ export function createEntitySignal<
 
     // Run tap handlers for each processed entity
     for (const { id, entity } of rows) {
-      for (const handler of tapHandlers) {
-        handler.onAdd?.(entity, id);
-      }
+      emitTap('onAdd', entity, id);
     }
 
     return ids;
@@ -2187,6 +2183,23 @@ export function createEntitySignal<
 
   /** Handlers for observation */
   const tapHandlers: TapHandlers<E, K>[] = [];
+  /**
+   * One tap event, run on every tap and counted as a user callback: a write a
+   * tap makes during a replay of recorded state is forward work, and is
+   * intercepted (write-context.ts).
+   */
+  function emitTap<N extends 'onAdd' | 'onUpdate' | 'onRemove'>(
+    name: N,
+    ...args: Parameters<NonNullable<TapHandlers<E, K>[N]>>
+  ): void {
+    if (tapHandlers.length)
+      runUserCallback(() => {
+        for (const handler of tapHandlers)
+          (handler[name] as ((...a: typeof args) => void) | undefined)?.(
+            ...args
+          );
+      });
+  }
 
   /** Handlers for blocking/transforming */
   const interceptHandlers: InterceptHandlers<E, K>[] = [];
@@ -2920,9 +2933,7 @@ export function createEntitySignal<
       }
 
       // Run tap handlers
-      for (const handler of tapHandlers) {
-        handler.onUpdate?.(id, transformedChanges, finalUpdated);
-      }
+      emitTap('onUpdate', id, transformedChanges, finalUpdated);
     },
 
     /**
@@ -2976,9 +2987,7 @@ export function createEntitySignal<
         getPositionIdsForNotify(),
         ambientMeta()
       );
-      for (const handler of tapHandlers) {
-        handler.onUpdate?.(id, next as Partial<E>, next);
-      }
+      emitTap('onUpdate', id, next as Partial<E>, next);
     },
 
     updateMany(ids: K[], changes: Partial<E>): void {
@@ -3035,9 +3044,7 @@ export function createEntitySignal<
 
       // Run tap handlers for each updated entity
       for (const { id, transformedChanges, finalUpdated } of updatedEntities) {
-        for (const handler of tapHandlers) {
-          handler.onUpdate?.(id, transformedChanges, finalUpdated);
-        }
+        emitTap('onUpdate', id, transformedChanges, finalUpdated);
       }
     },
 
@@ -3116,9 +3123,7 @@ export function createEntitySignal<
       }
 
       // Run tap handlers
-      for (const handler of tapHandlers) {
-        handler.onRemove?.(id, entity);
-      }
+      emitTap('onRemove', id, entity);
     },
 
     removeMany(ids: K[]): void {
@@ -3206,9 +3211,7 @@ export function createEntitySignal<
 
       // Run tap handlers for each removed entity
       for (const { id, entity } of preparedRemovals) {
-        for (const handler of tapHandlers) {
-          handler.onRemove?.(id, entity);
-        }
+        emitTap('onRemove', id, entity);
       }
     },
 
@@ -3363,14 +3366,10 @@ export function createEntitySignal<
 
       // Run tap handlers for added entities, then updated ones
       for (const { id, entity } of toAdd) {
-        for (const handler of tapHandlers) {
-          handler.onAdd?.(entity as E, id);
-        }
+        emitTap('onAdd', entity as E, id);
       }
       for (const { id, changes, entity } of toUpdate) {
-        for (const handler of tapHandlers) {
-          handler.onUpdate?.(id, changes as Partial<E>, entity as E);
-        }
+        emitTap('onUpdate', id, changes as Partial<E>, entity as E);
       }
 
       return rows.map(({ id }) => id);
@@ -3468,9 +3467,7 @@ export function createEntitySignal<
 
       for (const { id, entity } of activeSubjects) {
         if (!entity) continue;
-        for (const handler of tapHandlers) {
-          handler.onRemove?.(id, entity);
-        }
+        emitTap('onRemove', id, entity);
       }
       } finally { membershipUnit.cancel(); }
     },
@@ -3741,21 +3738,15 @@ export function createEntitySignal<
 
       if (tapHandlers.length > 0) {
         for (const { id, entity } of stagedRemovals) {
-          for (const handler of tapHandlers) {
-            handler.onRemove?.(id, entity);
-          }
+          emitTap('onRemove', id, entity);
         }
 
         for (const { id, entity } of stagedAdds) {
-          for (const handler of tapHandlers) {
-            handler.onAdd?.(entity, id);
-          }
+          emitTap('onAdd', entity, id);
         }
 
         for (const { id, entity } of stagedUpdates) {
-          for (const handler of tapHandlers) {
-            handler.onUpdate?.(id, entity as Partial<E>, entity);
-          }
+          emitTap('onUpdate', id, entity as Partial<E>, entity);
         }
       }
       } finally { membershipUnit.cancel(); }
