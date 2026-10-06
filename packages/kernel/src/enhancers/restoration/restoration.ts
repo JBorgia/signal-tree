@@ -2484,18 +2484,6 @@ class RestorationManager<T> {
     }
     return false;
   }
-  private canUndoBySnapshot(): boolean {
-    return this.currentIndex > 0;
-  }
-
-  private canRedoBySnapshot(): boolean {
-    // Reads historyVersion as well as the index: redo depends on the LENGTH of
-    // history, which changes without the index moving (a new entry pushed while
-    // sitting at the end).
-    this.historyVersion();
-    return this.currentIndex < this.history.length - 1;
-  }
-
   canUndoConfirmed(): boolean {
     this.frontierVersion();
     return this.hasAppliedConfirmedTurns();
