@@ -10,7 +10,11 @@ import {
   frontierStepOf,
   prepareFrontierReinstatement,
   recordOrderTransition,
+  settleTokenOnly,
+  transitionBindingsOf,
+  turnOrderDeltas,
   type TurnFrontierTransition,
+  type TurnOrderChange,
   type TurnOrderRecord,
 } from '../../lib/internals/causal-runtime/turn-order-record';
 import { placeFieldReversalsWhileRowsExist } from '../../lib/internals/causal-runtime/pending-rollback';
@@ -65,7 +69,6 @@ import type {
   OrderChangeCapture,
 } from '../../lib/internals/mutation-capture-runtime';
 import {
-  deriveCollectionOrderDelta,
   deriveDeclarativeTransitionTarget,
   prepareDeclarativeTransitionInstallation,
   requiresDeclarativeStructuralTarget,
@@ -438,7 +441,7 @@ function toReversalEffect(
 // effects rather than from restoration history.
 
 type PendingEffectMap = Map<string, TurnEffect>;
-type PendingCollectionOrder = Omit<OrderChangeCapture, 'meta'>;
+type PendingCollectionOrder = TurnOrderChange;
 
 type CaptureBucket = {
   ownerPaths: Set<string>;
@@ -1034,6 +1037,33 @@ function cloneTurnEffect(effect: TurnEffect): TurnEffect {
   }
 }
 
+/**
+ * History reads never throw: an UNRECORDED order change (its orders could
+ * not be composed) is walked as its token transition alone, keeping the
+ * rows' order, so the states before it hold the right rows and values but
+ * possibly not their order. Undo of it refuses.
+ */
+function walkableOrders(
+  deltas: readonly CollectionOrderDelta[],
+  direction: 'undo' | 'redo'
+): { deltas: CollectionOrderDelta[]; steps: FrontierStep[] } {
+  return {
+    deltas: deltas.filter((delta) => !delta.unrecorded),
+    steps: deltas
+      .filter((delta) => delta.unrecorded)
+      .map((delta) =>
+        frontierStepOf(
+          {
+            owner: delta.owner,
+            before: delta.beforeFrontier,
+            after: delta.afterFrontier,
+          },
+          direction
+        )
+      ),
+  };
+}
+
 function cloneCollectionOrderDelta(
   delta: CollectionOrderDelta
 ): CollectionOrderDelta {
@@ -1198,18 +1228,10 @@ class RestorationManager<T> {
     boundaryTurnId?: number,
     frontiers: TurnFrontierTransition[] = []
   ): number | undefined {
-    const orderDeltas = collectionOrders
-      .map((order) =>
-        deriveCollectionOrderDelta(
-          order.owner,
-          order.beforeSubjects,
-          order.afterSubjects,
-          order.beforeFrontier,
-          order.afterFrontier,
-          this.pendingCreatedRows(order.owner)
-        )
-      )
-      .filter((delta) => delta.participants.length > 0);
+    const orderDeltas = turnOrderDeltas(
+      collectionOrders,
+      this.pendingCreatedRows
+    );
     // A physically net-zero batch can still contain an authored turn (external
     // 0 -> 5, authored 5 -> 0). Its boundary must remain materializable.
     if (
@@ -1883,18 +1905,10 @@ class RestorationManager<T> {
       historyIndex: this.history.length,
       ...(pendingState === undefined ? {} : { state: pendingState }),
     };
-    const orderDeltas = (collectionOrders ?? [])
-      .map((order) =>
-        deriveCollectionOrderDelta(
-          order.owner,
-          order.beforeSubjects,
-          order.afterSubjects,
-          order.beforeFrontier,
-          order.afterFrontier,
-          this.pendingCreatedRows(order.owner)
-        )
-      )
-      .filter((delta) => delta.participants.length > 0);
+    const orderDeltas = turnOrderDeltas(
+      collectionOrders ?? [],
+      this.pendingCreatedRows
+    );
     const resolvedSubjectIds =
       subjectIds && subjectIds.length > 0 ? subjectIds : effectSubjectIds;
     if (resolvedSubjectIds.length > 0) {
@@ -2828,11 +2842,18 @@ class RestorationManager<T> {
       const reversalEffects = placeFieldReversalsWhileRowsExist(
         effects.map((effect) => toReversalEffect(effect, direction))
       );
-      const frontierSteps = (turn.__frontiers ?? []).map((transition) =>
-        frontierStepOf(transition, direction)
+      const { deltas: orderDeltas, steps: unrecordedSteps } = walkableOrders(
+        turn.__orderDeltas ?? [],
+        direction
       );
+      const frontierSteps = [
+        ...(turn.__frontiers ?? []).map((transition) =>
+          frontierStepOf(transition, direction)
+        ),
+        ...unrecordedSteps,
+      ];
       const collectionOwners = new Set([
-        ...(turn.__orderDeltas ?? []).map(({ owner }) => owner),
+        ...orderDeltas.map(({ owner }) => owner),
         ...frontierSteps.map(({ owner }) => owner),
         ...reversalEffects
           .filter(({ subjectId }) => typeof subjectId === 'number')
@@ -2849,7 +2870,7 @@ class RestorationManager<T> {
           return source;
         }),
         effects: reversalEffects,
-        orderDeltas: turn.__orderDeltas,
+        orderDeltas,
         orderEndpoint: direction === 'undo' ? 'before' : 'after',
         frontierSteps,
       });
@@ -2914,11 +2935,18 @@ class RestorationManager<T> {
           .reverse()
           .map((effect) => toReversalEffect(effect, 'undo'))
       );
-      const frontierSteps = (event.frontiers ?? []).map((transition) =>
-        frontierStepOf(transition, 'undo')
+      const { deltas: orderDeltas, steps: unrecordedSteps } = walkableOrders(
+        event.orderDeltas,
+        'undo'
       );
+      const frontierSteps = [
+        ...(event.frontiers ?? []).map((transition) =>
+          frontierStepOf(transition, 'undo')
+        ),
+        ...unrecordedSteps,
+      ];
       const collectionOwners = new Set([
-        ...event.orderDeltas.map(({ owner }) => owner),
+        ...orderDeltas.map(({ owner }) => owner),
         ...frontierSteps.map(({ owner }) => owner),
         ...reversalEffects
           .filter(({ subjectId }) => typeof subjectId === 'number')
@@ -2936,7 +2964,7 @@ class RestorationManager<T> {
       const target = deriveDeclarativeTransitionTarget({
         collections: collectionSources,
         effects: reversalEffects,
-        orderDeltas: event.orderDeltas,
+        orderDeltas,
         orderEndpoint: 'before',
         frontierSteps,
       });
@@ -4640,10 +4668,16 @@ export function restoration(
       bucket.positionIds.clear();
       // The turn's own order endpoints per collection (turn-order-record),
       // read before the transient rows they may need are forgotten.
-      const { changes: collectionOrders, frontiers } = drainTurnOrders(
+      const drained = drainTurnOrders(
         bucket.collectionOrders,
         [...bucket.effects.values()],
         bucket.effects
+      );
+      const collectionOrders = drained.changes;
+      const frontiers = settleTokenOnly(
+        drained.frontiers,
+        bucket.effects.values(),
+        () => transitionBindingsOf(tree.$)
       );
       const effects = withTransientRows(
         Array.from(bucket.effects.values()).map(cloneTurnEffect),

@@ -93,6 +93,47 @@ describe('orderInsertions', () => {
     ).toStrictEqual([10, 11, 1, 2, 12]);
   });
 
+  it('a front run whose right neighbour is in goes back right to left', () => {
+    // [a=1, b=2, c=3]: removeMany(b, a) together, then c later. c first,
+    // then the run before it.
+    expect(
+      replay(
+        [],
+        [
+          [1, { afterSubject: 2 }],
+          [2, { beforeSubject: 1, afterSubject: 3 }],
+          [3, { beforeSubject: undefined }],
+        ]
+      )
+    ).toStrictEqual([1, 2, 3]);
+  });
+
+  it('a front run whose right neighbour is NOT in goes back left to right from the front', () => {
+    // Order-delta review, CRITICAL (faa9b1f7): rows 6 and 7 removed
+    // together at the front, 7's right neighbour 8 is created later in the
+    // same replay. Right to left, 7 found neither neighbour and the replay
+    // threw "no live placement anchor" out of a transaction.
+    expect(
+      replay(
+        [9],
+        [
+          [6, { afterSubject: 7 }],
+          [7, { beforeSubject: 6, afterSubject: 8 }],
+          [8, { afterSubject: 9 }, true],
+        ]
+      )
+    ).toStrictEqual([6, 7, 8, 9]);
+    expect(
+      replay(
+        [9],
+        [
+          [6, { afterSubject: 7 }],
+          [7, { beforeSubject: 6, afterSubject: 5 }],
+        ]
+      )
+    ).toStrictEqual([6, 7, 9]);
+  });
+
   it('a row whose anchors are neither present nor waiting refuses', () => {
     expect(() =>
       replay([1], [[2, { beforeSubject: 99, afterSubject: 98 }]])

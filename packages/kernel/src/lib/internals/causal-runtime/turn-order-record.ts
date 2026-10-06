@@ -1,7 +1,11 @@
 import type { CollectionOrderCapture } from '../mutation-capture-runtime';
-import type {
-  CollectionTransitionTargetBinding,
-  FrontierStep,
+import { visitTree } from '../visit-tree';
+import {
+  deriveCollectionOrderDelta,
+  unrecordedOrderDelta,
+  type CollectionOrderDelta,
+  type CollectionTransitionTargetBinding,
+  type FrontierStep,
 } from './target-transition';
 import {
   composeTurnOrderEndpoints,
@@ -34,6 +38,8 @@ export type TurnOrderChange = {
   readonly afterSubjects: readonly number[];
   readonly beforeFrontier: unknown;
   readonly afterFrontier: unknown;
+  /** Its orders could not be composed: kept, refusing to reverse. */
+  readonly unrecorded?: true;
 };
 
 export type TurnFrontierTransition = {
@@ -131,7 +137,40 @@ export function drainTurnOrders(
           removed: anchors(remove),
         })),
     };
-    const { start, end } = composeTurnOrderEndpoints(record.captures, rows);
+    let endpoints: { start: number[]; end: number[] };
+    try {
+      endpoints = composeTurnOrderEndpoints(record.captures, rows);
+    } catch {
+      // Contradictory records. Never thrown out of a capture's drain (a
+      // transaction's callback has committed by now, and a flush swallows
+      // errors and would lose the turn): kept as an UNRECORDED change, whose
+      // reversal refuses.
+      changes.push({
+        owner: record.owner,
+        ownerPath: record.ownerPath,
+        beforeSubjects: [],
+        afterSubjects: [],
+        beforeFrontier: record.beforeFrontier,
+        afterFrontier: record.afterFrontier,
+        unrecorded: true,
+      });
+      continue;
+    }
+    const { start, end } = endpoints;
+    if (
+      start.length === end.length &&
+      start.every((subject, index) => subject === end[index])
+    ) {
+      // Reorders that cancel: no order change, only its token transition.
+      if (record.beforeFrontier !== record.afterFrontier) {
+        frontiers.push({
+          owner: record.owner,
+          before: record.beforeFrontier,
+          after: record.afterFrontier,
+        });
+      }
+      continue;
+    }
     changes.push({
       owner: record.owner,
       ownerPath: record.ownerPath,
@@ -142,6 +181,91 @@ export function drainTurnOrders(
     });
   }
   return { changes, frontiers };
+}
+
+/** Every collection's transition binding under `root`, by owner. */
+export function transitionBindingsOf(
+  root: object
+): Map<number, CollectionTransitionTargetBinding> {
+  const bindings = new Map<number, CollectionTransitionTargetBinding>();
+  visitTree(root as never, (node) => {
+    const binding = (
+      node as { __prepareTransitionTarget?: CollectionTransitionTargetBinding }
+    ).__prepareTransitionTarget;
+    if (binding) bindings.set(binding.owner, binding);
+    return undefined;
+  });
+  return bindings;
+}
+
+/**
+ * A TOKEN-ONLY transition settles at once. A turn that replaced a
+ * collection's order token without changing its rows or their order (a row
+ * added and removed again, reorders that cancel, a move to where a row
+ * already was) leaves exactly the order the earlier token named, so the
+ * collection gets that token back now, and the turn records nothing for it.
+ * Recorded instead, it was a link only this turn could undo: if it recorded
+ * no entry, or stood as a gap, an earlier order change could never reverse.
+ *
+ * Token-only means no row of the collection was added or removed in the
+ * turn (`effects`, net) and no reorder was recorded (`frontiers` holds
+ * transitions without one). Settled where the collection still holds the
+ * turn's token; kept otherwise (later work moved it, or another capture of
+ * the same turn settled it already): the chain through it still holds.
+ */
+export function settleTokenOnly(
+  frontiers: readonly TurnFrontierTransition[],
+  effects: Iterable<{ readonly kind: string; readonly position: number }>,
+  bindings: () => ReadonlyMap<number, CollectionTransitionTargetBinding>
+): TurnFrontierTransition[] {
+  if (frontiers.length === 0) return [];
+  const membershipChanged = new Set<number>();
+  for (const { kind, position } of effects) {
+    if (kind === 'add' || kind === 'remove') membershipChanged.add(position);
+  }
+  let resolved:
+    | ReadonlyMap<number, CollectionTransitionTargetBinding>
+    | undefined;
+  return frontiers.filter((transition) => {
+    if (membershipChanged.has(transition.owner)) return true;
+    resolved ??= bindings();
+    const binding = resolved.get(transition.owner);
+    const live = binding?.orderFrontier?.();
+    if (binding === undefined || live === undefined) return true;
+    if (live !== transition.after) return true;
+    binding.orderFrontier?.(transition.before as object);
+    return false;
+  });
+}
+
+/**
+ * A turn's order changes as order deltas (an unrecorded change as such).
+ * `drainTurnOrders` already made a change whose orders are the same at both
+ * ends (reorders that cancel) a frontier transition: an empty delta dropped
+ * here once took the token transition with it, and an earlier order change
+ * could no longer reverse.
+ */
+export function turnOrderDeltas(
+  changes: readonly TurnOrderChange[],
+  explicitOf: (owner: number) => ReadonlySet<number> | undefined = () =>
+    undefined
+): CollectionOrderDelta[] {
+  return changes.map((change) =>
+    change.unrecorded
+      ? unrecordedOrderDelta(
+          change.owner,
+          change.beforeFrontier,
+          change.afterFrontier
+        )
+      : deriveCollectionOrderDelta(
+          change.owner,
+          change.beforeSubjects,
+          change.afterSubjects,
+          change.beforeFrontier,
+          change.afterFrontier,
+          explicitOf(change.owner)
+        )
+  );
 }
 
 /**

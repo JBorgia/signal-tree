@@ -159,15 +159,23 @@ export function orderInsertions<T>(
     let placedRuns = 0;
     for (let at = 0; at < ready.length; at += 1) {
       const run = ready[at];
-      // A run that was at the front (no left neighbour) but had a right one
-      // goes in right to left, each row before its right neighbour: placed
-      // left to right, its first row's right anchor was not in yet, and the
-      // adapter's commit-time placement appended it at the END (`removeMany(
-      // [b, a]); clear()` undid to [b, c, d, e, a]). Same result on a list.
+      // A run that was at the front (no left neighbour) and whose right
+      // neighbour is in goes in right to left, each row before its right
+      // neighbour: placed left to right, its first row's right anchor was not
+      // in yet, and the adapter's commit-time placement appended it at the END
+      // (`removeMany([b, a]); clear()` undid to [b, c, d, e, a]). Same result
+      // on a list. A right neighbour that is NOT in (a row this reversal
+      // creates later, or one that is gone) cannot anchor the run: its rows go
+      // in left to right from the front, as they were. Right to left, the last
+      // row found neither neighbour and the reversal refused; a transaction
+      // composing its turn's order threw after its callback had committed.
+      const last = run.rows[run.rows.length - 1];
+      const right = rightOf(last);
       const frontRun =
         run.rows.length > 1 &&
         leftOf(run.rows[0]) === undefined &&
-        rightOf(run.rows[run.rows.length - 1]) !== undefined;
+        right !== undefined &&
+        present(right);
       if (frontRun) {
         for (let index = run.rows.length - 1; index >= 0; index -= 1) {
           placeOne(run.rows[index]);
