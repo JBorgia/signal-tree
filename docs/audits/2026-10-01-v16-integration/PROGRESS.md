@@ -1837,3 +1837,391 @@ Dispositions:
    tested shapes (EM5). It has no `undefined` deletion. Unchanged.
 6. **The bundle budget** is still over the inherited ceilings, unchanged by
    this slice.
+
+## Slice 8b: hidden registered locations, slot guards, typed refusals, adapters
+
+Commits on `integrate/v16-slice8b`, from `bbbb4ba2` (slice 8 merged):
+- `cedf0f40`: a hidden location is restored fully or refused;
+- `9ed8c75f`: admission refusals are typed, and the slot guards are pinned;
+- `7a47f3e5`: adapter specs;
+- `019d9da0` and `351d2849`: the two review follow-ups.
+
+This slice covers slice 8's open items 1–5, decided by the owner
+(2026-10-05). Raw logs, first reds, probes, mutation logs and size
+attribution: `/private/tmp/st-v16-integration-evidence/slice8b/`.
+
+### Open item 1: reversing a hidden location
+
+An omitted member hides a location. The member is either the location itself
+or a plain branch above it.
+
+Baseline on `bbbb4ba2` (`probes/p1-base.txt`, both enhancer orders, scalar
+and object terminal):
+- **Ordinary omission of the location, then undo, redo or jumpTo:** "ok". The
+  value is written into the dormant slot, and the member stays absent.
+- **Ordinary or external omission of an enclosing branch:** "ok" as well. A
+  detached handle reads the restored value, but `tree.$()` still lacks the
+  branch.
+- **External omission of the location itself:** refused with ST1034 (slice
+  8).
+- **Entity rows, adds, removes and reorders inside an omitted branch:**
+  written into the hidden collection, even under external omission (review,
+  probe `p3.txt`).
+
+**The 15.4.2 analogy, checked before implementing (i).** The rule is pinned
+by `external-authored-baseline.spec.ts`, "keeps the baseline of an already
+recorded earlier authored turn":
+- an ordinary write at the location in a later turn leaves the designated
+  turn in history (`getRestorationHistory()` length 1);
+- undo restores the pre-image over that later write (`x` 6 → 0).
+
+Without the external write, a probe gives the same result in both orders:
+undo → 0, redo → 1. "later ordinary replacement cannot erase designation of
+the same scalar" is the same-turn variant (HIST-C2). No spec pins a different
+rule.
+
+**Ported. This is v16-only; there is no donor.**
+- **New helpers** in `I/plain-branch-membership.ts`:
+  - `hidingMembers(root, position)` walks the registry's structured address
+    and returns the omitted members, outermost first.
+  - `composeHiddenMemberValue` builds the whole re-add value. It takes the
+    member's retained state locations, never a collection or marker, and
+    installs each target at its keys. Hidden members on a target's way are
+    re-added; other hidden members stay absent.
+- **Restoration (`applyTurnEffectsThroughRealizationPort`).** Before anything
+  applies, it checks every slot value effect, entity row effect, structural
+  effect and order delta whose location is hidden.
+  - **External omission.** If any hiding member has external membership truth
+    `present: false`, the reversal refuses with ST1034. Nothing is applied.
+  - **Ordinary omission.** The outermost hidden member is re-added as one
+    membership effect. That effect carries the slot targets; row and order
+    effects then apply as usual.
+    - Collections under that member are found under it, because the
+      current-tree walk skips them.
+    - A member that the reversal itself re-adds or omits is left to the
+      reversal's own effect.
+  - **Pending work.** A re-add refuses with ST1034 while pending work sits on
+    the member or below it, because the re-add would expose speculative
+    state.
+  - **Unwalkable location.** A member that cannot be re-added, or a
+    registered address that no longer walks to its owner, is refused with a
+    typed `structural-drift` refusal.
+- **Transactions (`getPendingRollbackPlan`).** A later *pending* membership
+  change of an enclosing member counts as a dependency, like a later pending
+  write at the location. The earlier rollback refuses with
+  `later-confirmed-dependency`, keeps its recovery, and retries after the
+  later turn settles. Enclosure is a strict prefix of structured addresses,
+  never a display path.
+
+**Rollback (decision not dictated; settled through review).**
+- **Under an omitted enclosing branch**, rollback compensates the retained
+  slot, as on `bbbb4ba2`. The branch stays omitted.
+- **Why not supersede.** `cedf0f40` first made such an omission supersede the
+  contribution. Review found that the rolled-back value then stayed in the
+  hidden slot, and the next re-add brought it back. `019d9da0` withdrew that
+  supersession.
+- **Why not refuse.** v16's rollback never overwrites a later write, and its
+  refusal rule is the pending dependency above.
+- **The location itself omitted.** That omission still supersedes the
+  contribution, as a later replacement does.
+- **Owner confirmation needed.** This is a deliberate write into a dormant
+  slot during rollback. It is not observable until a re-add, and it is what
+  keeps a re-add correct. The reviewer asked for owner confirmation of this
+  reading of "never silent".
+
+**Re-adding a branch (decision not dictated).** The branch's untouched members
+keep their retained values. Those are what they held when it was omitted, or
+what a later hidden write left there. A turn's own membership effect (its
+captured before-image) takes precedence.
+
+### Open item 2: slot guards pinned
+
+`E/restoration/registered-slot-guards.spec.ts` has 12 cases, each run with
+restoration alone, transactions first and restoration first. The notifications
+are synthetic, as in `path-notifier-enqueue`.
+- **Capture:**
+  - at an unregistered position, a hostile record is read field by field (the
+    getter is reached and reported);
+  - at a registered terminal, the same record is one value and is never read.
+- **Admission:**
+  - an array at an unregistered position is refused, typed;
+  - the same array at a registered terminal is admitted and applied.
+
+### Open item 3 (slice 8 item 4): admission refusals are refusals
+
+Admission (`Unsupported scoped undo effect at <path>`) now throws through
+`restorationRefusal`, as ST1034 and the structured validation refusals do. The
+restoration reader reports `refused` with no affected entries. Genuine
+validator exceptions stay `failed` (`restoration-operation-outcome`). Item 1's
+refusals use the same path.
+
+Carriers:
+- Vue checks `refused` through the reader.
+- Angular, React and Solid check the ST1034 refusal through their adapters.
+  Their test configurations have no internals alias.
+
+### Open item 4 (slice 8 item 5): adapter specs
+
+| Spec | Cases |
+| --- | --- |
+| `packages/angular/src/lib/opaque-leaf-restoration.spec.ts` | 8 |
+| `packages/react/src/opaque-leaf-restoration.spec.tsx` | 6 |
+| `packages/solid/src/lib/opaque-leaf-restoration.spec.ts` | 6 |
+| `packages/vue/src/lib/opaque-leaf-restoration-v16-controls.spec.ts` | 6 |
+
+All run in both orders, and each result is read through the adapter: Angular
+`computed`, React `useSignalTree`, a Solid memo, Vue `computed`. They cover:
+- an object terminal plus a Map (a Date in React), undo and redo;
+- an external `undefined` refusal;
+- an ordinary omission re-added by undo.
+
+### jumpTo keeps no admission gate (slice 8 item 3)
+
+jumpTo and temporal restore (`applyDirectedTurnTransition`) stay without
+`isSupportedEffect`.
+- **No effect.** In slice 8's exploration XG1, adding the gate changed no
+  result in the eight jumpTo specs or in the full kernel and Vue runs.
+- **Covered elsewhere.** Validation, external truth and, since 8b, the
+  hidden-location check decide there. The 8b specs cover jumpTo for both
+  re-adding and refusing.
+- **Redundant.** The gate would only duplicate them for effects no v16
+  producer emits.
+
+### v16 controls and first red
+
+`E/restoration/hidden-terminal-reversal.spec.ts` has 158 cases:
+- **Ordinary omission:**
+  - undo re-adds with the pre-image, and redo and undo stay symmetric;
+  - redo after the omission re-adds with the after-image;
+  - jumpTo re-adds.
+  - Each is covered for scalar and object terminal, for the location itself
+    and an omitted branch, and in three orders.
+- **Re-add shape:**
+  - a branch keeps its other members as they were when omitted;
+  - hidden members on the way are re-added, and others stay absent;
+  - a turn with a collection reorder re-adds through the declarative target.
+- **External omission:**
+  - undo, redo and jumpTo refuse, with no notification and the snapshot,
+    index and `canRedo()` unchanged;
+  - an external omission above an authored one refuses;
+  - the reader reports `refused`.
+- **Pending rollback (three orders):**
+  - the rest rolls back;
+  - under an omitted branch, the hidden slot holds the pre-image;
+  - for the location itself, nothing is written.
+  - Rollback still compensates under an unrelated omission and beside a
+    literal dotted sibling key.
+- **Ordering:** a turn's own membership effect wins over a later hidden
+  write.
+- **Review follow-up:**
+  - no rolled-back contribution resurfaces on re-add;
+  - a re-add refuses while pending work sits under it, or while a pending
+    transaction itself omitted the member;
+  - entity update, add, remove, reorder, and slot plus reorder inside an
+    omitted branch are restored through the collection (ordinary) or refused
+    (external);
+  - a branch holding a collection is re-added for a slot target;
+  - an earlier rollback stays pending while a later pending turn omits its
+    branch.
+
+First red on `bbbb4ba2` (`first-red/`):
+
+| Spec | Failed | Passed on `bbbb4ba2` |
+| --- | --- | --- |
+| `hidden-terminal-reversal` | 107 of 158 | 51: the 18 external refusals of the location itself, the 24 rollbacks (on `bbbb4ba2` rollback already compensated a hidden branch's slot, and superseded for the location itself) and the 9 address and own-membership controls. All are preservation controls. |
+| `registered-slot-guards` | 3 of 12 (admission reported `failed`) | 9, which pin slice 8's guards |
+| each adapter spec | 2: the re-add cases | the rest |
+
+### Mutations (each restored by content hash; logs `mutations/`, final run `run-final.log` on `351d2849`)
+
+Counts are killed cases. The final run was on `351d2849`, against the
+158-case spec, the guards and the adapter specs.
+
+**Hidden-location planning**
+
+| Mutation | Killed |
+| --- | --- |
+| H1x hidden-location check inert | 112 (104 kernel + 2 per adapter) |
+| H2 every hidden target refused, authored ones included | 67 |
+| H3x every hidden target re-added, external ones included | 37 |
+| H4x only the location itself checked | 85 |
+| H5 innermost member re-added instead of the outermost | 3 |
+| H6 re-added branch without retained members | 30 |
+| H7 declarative path given the original effects | 7 |
+| H8x the reversal's own membership effects ignored | 3 |
+| H9 the replaced slot write also applied | 0, equivalent: the slot already holds the target |
+
+H8 survived on the first spec; the own-membership control was added for it.
+
+**Review follow-ups**
+
+| Mutation | Killed |
+| --- | --- |
+| F1 re-add copies every key, collections included | 18 |
+| F2 entity and structural effects unchecked | 24 |
+| F3 no pending-work check before a re-add | 4 |
+| F4 the `cedf0f40` rollback supersession restored | 34 |
+| F5 an unwalkable address falls through | 0, defensive: neither I nor the reviewer could construct a trigger |
+| F6 no realizability check | 0, defensive: a captured omission always registers the member's address |
+| F7 pending work only strictly below the member | 2 |
+| F8 order deltas unchecked | 6 |
+| F9 bindings under a re-added member not found | 9 |
+| F10 later pending enclosing omission not a dependency | 3 |
+
+**Guards and typed refusal**
+
+| Mutation | Killed |
+| --- | --- |
+| G1 capture: no subject means terminal | 3 |
+| G2 capture splits every record | 3 |
+| G3 admission admits any subject-less set | 3 |
+| G4 the registered-slot admission never fires | 3 |
+| E1 admission refusal back to a plain `Error` | 3 |
+
+**S8, slice 8's capture and admission reverted:** 32 of the 35 adapter cases,
+Vue's carried spec included.
+
+### Results
+
+Verification at `351d2849` (`verify/run3/`), all exit 0 unless noted:
+- full kernel: 392 files, 4385 passed, 6 expected failures, 13 skipped. At
+  `bbbb4ba2` it was 390 files and 4215, so +2 files and +170 cases = 158 + 12.
+- frameworks: angular 187 (+3 skipped), react 29, vue 78, solid 47 (+8, +6,
+  +6, +6);
+- `pnpm typecheck`;
+- `check-spec-types` (the same three pre-existing improvements; baseline not
+  ratcheted);
+- lint on all five projects;
+- kernel-neutrality, source-controls, `api-inventory --check`,
+  callable-inventory;
+- five-package build;
+- consumer typecheck (bundler and node16);
+- `check-bundle-budget` exit 1 on the pre-existing overage only.
+
+Two earlier full-kernel runs under machine load each failed one
+timing-sensitive pre-existing case:
+- at `7a47f3e5`, `entity-granular-reactivity` "repeated collection reads
+  between writes are cached" took 12.4 ms against its 5 ms bound;
+- before `351d2849` was committed, the 130k-row
+  `large-batch-restoration-v16-controls` jumpTo exceeded its 120 s timeout.
+
+Both pass alone. The jumpTo took 70.6 s at `bbbb4ba2`, 42.9 s at `019d9da0`
+and 28.8 s on the final code, all measured alone; the variance is machine
+load, and the code got no slower.
+
+Size (`size/`, esbuild attribution over the built dist, prod, with the
+package's `sideEffects`):
+
+| Scenario | `bbbb4ba2` | `351d2849` | Delta |
+| --- | --- | --- | --- |
+| restoration | 35.73 KB gzip | 36.63 KB | +913 B gzip, +2742 B min (`restoration.js` +2064, `plain-branch-membership.js` +666) |
+| transactions | 36.27 KB | 36.36 KB | +91 B gzip, +242 B min (`transactions.js`) |
+| full | 64.98 KB | 66.04 KB | +1083 B gzip, +3056 B min |
+| entities, bare | — | — | 0 |
+| link | 16.77 KB | 16.76 KB | −1 B gzip |
+
+`check-bundle-budget`, before and after: entities 23.59/22.6 KB prod and
+26.23/25.25 KB dev; bare 10.39/10.25 KB prod and 12.60/12.45 KB dev. Both are
+unchanged and still over the inherited ceilings.
+
+### Independent review
+
+Three rounds by one read-only code-reviewer agent. It was given the raw diff,
+the owner decisions and the PLAN contracts, but not this record. It probed
+only in its own exports (`/private/tmp/st-v16-slice8b-review-1..3`), and the
+worktree was never touched.
+
+1. **`cedf0f40..7a47f3e5`: needs fixes.** Three majors, all fixed in
+   `019d9da0`:
+   - entity rows inside an omitted branch were written silently, including
+     under external omission;
+   - re-adding a branch resurfaced a rolled-back contribution;
+   - a branch holding a collection threw an untyped "unavailable member".
+
+   Minor findings:
+   - an unwalkable address fell through to a write: now refused;
+   - the guards did not pin the registered-terminal half of admission: now
+     covered, and G4 kills it.
+2. **`019d9da0`: needs fixes.** The three majors were confirmed fixed. A new
+   major and an older gap, both fixed in `351d2849`:
+   - new major: a reorder or remove under an omitted branch threw "no
+     binding" on the declarative path, and an external reorder was not
+     refused;
+   - older gap: with two pending transactions, an earlier rollback let the
+     later rollback resurrect its value (also on `bbbb4ba2`).
+3. **`351d2849`: minor only.** Everything earlier is fixed. The new dependency
+   check refuses only a later pending omission or re-add of the enclosing
+   branch: not an unrelated branch, and not a confirmed later turn. Minor
+   findings, kept as open items:
+   - under external omission, order-only and add refusals read "Expected
+     undefined but found undefined";
+   - rollback order now matters, which should be documented.
+
+### User-visible behaviour changes in v16 (slice 8b)
+
+1. **Ordinary omission is reversed.** After an ordinary (non-designated)
+   omission of a location, or of a plain branch above it, undo, redo and
+   jumpTo re-add it with the reversal's target. This covers entity rows and
+   collection order inside the branch. Before, they wrote state nothing could
+   read and reported success.
+2. **External omission of an enclosing branch is refused.** Undo, redo and
+   jumpTo now refuse with ST1034 and name the branch, including for entity
+   effects inside it. Before, they reported success after a hidden write.
+3. **Re-adding a member with pending work is refused** with ST1034, until
+   that work settles.
+4. **Rollback order can matter.** Rolling back a transaction whose branch a
+   later *pending* transaction omitted now refuses with
+   `later-confirmed-dependency`, with recovery. It succeeds once the later
+   transaction settles, so the settle order matters.
+5. **Admission refusals report `refused`.** For `Unsupported scoped undo
+   effect at <path>`, the restoration reader reports `refused`, not
+   `failed`. The message and error type are unchanged.
+6. **No API, type or export change.**
+
+### v15 applicability (source reading only, not run)
+
+The exports are `/private/tmp/st-v16-slice8b-v15-export-1/` (`d63166c9`,
+15.4.3) and `-2/` (`43e16e31`, the v15 candidate). Both have:
+- the same admission rule (slot registration since 2892b650);
+- membership truth checked only at the effect's own position, with no
+  enclosing walk and no hidden-member handling, for value, row or order
+  effects;
+- later work, pending or confirmed, related to an earlier rollback by
+  position and subject only (`classifyLaterOverlap`, the
+  `later-pending-dependency` kind), never through an enclosing member;
+- the admission refusal thrown as a plain `Error`.
+
+So, by source, these 8b shapes apply to both:
+- the ordinary-omission hidden write (location itself and enclosing branch);
+- the hidden write under an externally omitted branch, including entity rows;
+- the `failed` admission outcome;
+- the two-pending-transaction resurfacing.
+
+The external omission of the location itself is refused on both, as on v16.
+Routed to the coordinator.
+
+### Open items
+
+1. **Owner confirmation needed: rollback under an omitted branch writes the
+   dormant retained slot.** This is deliberate. It is what keeps a later
+   re-add from resurfacing the rolled-back value. The visible state is
+   complete either way.
+2. **Pending rollback order now matters.** A rollback refuses
+   (`later-confirmed-dependency`, retryable) while a later pending turn omits
+   or re-adds an enclosing branch. Add a line to the docs or changelog.
+3. **Refusal text.** Under external omission, the ST1034 text for order-only
+   and add reversals reads "Expected undefined but found undefined". An
+   unrealizable member reads "Unsupported scoped undo effect at
+   structural-drift". The refusals are correct and typed; only the text is
+   uninformative.
+4. **Defensive clauses with no test that reaches them:** F5 (unwalkable
+   address) and F6 (realizability). H9 is an equivalent survivor.
+5. **Size: restoration +913 B gzip.** This is for the later size pass. The
+   budget scenarios are unchanged.
+6. **Untested nesting.** Collections more than one branch deep, and several
+   collections under one re-added member, are not covered (review: info).
+7. **Retained-value policy.** A value written through a detached handle into
+   a hidden branch resurfaces when that branch is re-added (review: minor).
+8. **Load-sensitive pre-existing tests.** The `entity-granular-reactivity`
+   5 ms bound and the 130k-row jumpTo 120 s timeout flake under machine
+   load.
