@@ -8,6 +8,7 @@ import { holdEntityMembershipDelivery } from '../../lib/internals/entity-members
 import {
   applyPlainBranchMemberSnapshot,
   canRealizePlainBranchMember,
+  changedOmittedCollection,
   collectionBindingAt,
   composeHiddenMemberValue,
   composePlainBranchMemberEffect,
@@ -2694,6 +2695,27 @@ export function restoration(
         >();
         const replaced = new Set<ReversalEffect>();
         const unmoved = 'Nothing was changed; the history position is unmoved.';
+        // An omitted entity collection comes back with the rows it retains.
+        // Restored fully only if nothing changed them after it was omitted;
+        // otherwise refused, never re-added silently (v16 integration 8d (b)).
+        for (const effect of reversalEffects) {
+          if (effect.plainBranchMembership?.after !== true) continue;
+          const touched = new Set<unknown>();
+          for (const own of reversalEffects)
+            if (own.owner === effect.owner && own.subjectId !== undefined)
+              touched.add(own.subjectId);
+          const changed = changedOmittedCollection(
+            tree.$,
+            effect.owner,
+            touched,
+            orderDeltas.some((delta) => delta.owner === effect.owner)
+          );
+          if (changed !== undefined)
+            hiddenRefusal ??=
+              `Unsupported scoped undo effect at '${changed}': the entity ` +
+              'collection was omitted and changed after that, so re-adding it ' +
+              `would not restore it as it was. ${unmoved}`;
+        }
         // Presentation only (a display path or the structured address).
         const label = (effect: ReversalEffect): string =>
           effect.path ??

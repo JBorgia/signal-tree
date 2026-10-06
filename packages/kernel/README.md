@@ -243,6 +243,12 @@ Undo, redo and `jumpTo()` treat a location under an omitted member like this:
 - **Not re-addable** (an omitted entity collection, for example): the
   reversal refuses and says why.
 
+An entity collection that the reversed operation itself omitted, or re-added,
+is restored: undo, redo, `jumpTo()` and `rollback()` put back its membership,
+and its rows are the ones it held when it was omitted. If something changed
+those rows while it was omitted (a write through a handle held on it), the
+reversal refuses, names the collection and changes nothing.
+
 A pending transaction's `rollback()` reverses its writes even when a later
 omission has hidden them: under an omitted branch it restores the retained
 storage and leaves the branch absent. Nothing a rejected transaction wrote can

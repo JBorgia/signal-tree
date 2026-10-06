@@ -100,6 +100,11 @@ for retired entities.
   key as `undefined` no longer brings it back with its retained value. Not
   yet for entity collections: under an omitted member, a collection's own
   methods still read and write its retained rows.
+- **Undo, redo, `jumpTo()` and `rollback()` of a write that omitted an entity
+  collection bring it back.** A whole value that leaves out a collection key
+  omits the collection; reversing that write now restores it with the rows it
+  held. Before this, the reversal reported success and left it omitted. If its
+  rows changed while it was omitted, the reversal refuses and names it.
 - **Settle the newest open transaction first, including across omitted
   branches.** Rolling back an older transaction while a newer pending one has
   omitted or re-added a branch enclosing its writes now refuses with the
