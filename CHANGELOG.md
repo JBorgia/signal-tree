@@ -95,7 +95,11 @@ for retired entities.
   Undo, redo, `jumpTo()` and `rollback()` of that write make them absent
   again. Before this, such reads returned retained storage and the write went
   to hidden storage, and undo or rollback of a write that re-added an omitted
-  member left its key present with `undefined`.
+  member left its key present with `undefined`. `updateAndReport()` re-adds
+  an omitted path it supplies too, and a whole value that supplies an omitted
+  key as `undefined` no longer brings it back with its retained value. Not
+  yet for entity collections: under an omitted member, a collection's own
+  methods still read and write its retained rows.
 - **Settle the newest open transaction first, including across omitted
   branches.** Rolling back an older transaction while a newer pending one has
   omitted or re-added a branch enclosing its writes now refuses with the

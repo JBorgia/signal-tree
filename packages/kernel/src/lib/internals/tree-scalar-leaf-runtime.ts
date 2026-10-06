@@ -138,26 +138,22 @@ function createScalarLeaf<T>(
   });
   // A re-added membership is announced after the value write itself, as a
   // whole-value write announces it, so a reversal sees one composed change.
-  const announce = (): void => {
-    const run = holder.announce;
+  // Each write keeps its own announcement: a write re-entering this leaf from
+  // an observer saves and restores the outer one instead of clearing it.
+  const announced = <A>(write: (arg: A) => void) => (arg: A): void => {
+    const outer = holder.announce;
     holder.announce = undefined;
-    run?.();
-  };
-  const { replace, derive } = binding;
-  binding.replace = (value) => {
     try {
-      replace(value);
+      write(arg);
     } finally {
-      announce();
+      // Set by the write callback during `write`; read it, not the narrowing.
+      const run = holder.announce as (() => void) | undefined;
+      holder.announce = outer;
+      run?.();
     }
   };
-  binding.derive = (update) => {
-    try {
-      derive(update);
-    } finally {
-      announce();
-    }
-  };
+  binding.replace = announced(binding.replace);
+  binding.derive = announced(binding.derive);
   const leaf = binding.location as Location<T>;
   holder.leaf = leaf;
   return { leaf, binding };

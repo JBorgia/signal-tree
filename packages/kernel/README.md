@@ -226,6 +226,11 @@ Writing such a location re-adds its path: after `a` is omitted,
 stay absent. An updater there receives `undefined`. Undo, redo, `jumpTo()` and
 `rollback()` of that write make the path absent again.
 
+Not yet for entity collections: a collection under an omitted member is absent
+from the tree's value, but its own methods (`all()`, `byId()`, `count()`,
+`addOne()` and the rest) still read and write its retained rows, and such a
+write does not re-add the path.
+
 Undo, redo and `jumpTo()` treat a location under an omitted member like this:
 
 - **Omitted by external truth** (inside `external()`): the reversal refuses
