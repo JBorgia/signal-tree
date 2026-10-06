@@ -1,11 +1,13 @@
-import type { CarrierKind, ISignalTree } from '../types';
+import { SignalTreeRollbackError, type CarrierKind } from '../types';
 import { isToolingTreeDestroyed, type ToolingTree } from './tooling-tree';
 import { StudioTreeDestroyedError } from './confirmed-turn-view';
+import { getPositionRegistry, type TreeId } from './position-registry';
 import {
-  getPositionRegistry,
-  type PositionRegistry,
-  type TreeId,
-} from './position-registry';
+  getTransactionLifecycleSource,
+  type TransactionLifecycleFact,
+  type TransactionLifecycleObserver,
+  type TransactionLifecycleSource,
+} from './transaction-lifecycle-source';
 
 export interface PendingTransactionView {
   readonly transactionId: number;
@@ -40,7 +42,9 @@ export type TransactionRefusalReason =
   | 'later-confirmed-dependency'
   | 'effect-validation-failed';
 
-type LifecycleFact = { readonly transactionId: number } & (
+export type TransactionLifecycleObservation = {
+  readonly transactionId: number;
+} & (
   | { readonly kind: 'opened' | 'staged' | 'confirmed' | 'rolled-back' }
   | {
       readonly kind: 'refused';
@@ -49,14 +53,12 @@ type LifecycleFact = { readonly transactionId: number } & (
       readonly pendingRetained: boolean;
       readonly consequencesReleased: boolean;
     }
-);
-
-export type TransactionLifecycleObservation = LifecycleFact & {
-  readonly treeId: TreeId;
-  readonly sequence: number;
-  /** State at emission, even when delivery follows a reentrant operation. */
-  readonly snapshot: TransactionLifecycleSnapshot;
-};
+) & {
+    readonly treeId: TreeId;
+    readonly sequence: number;
+    /** State at emission, even when delivery follows a reentrant operation. */
+    readonly snapshot: TransactionLifecycleSnapshot;
+  };
 
 export interface TransactionLifecycleReader {
   snapshot(): TransactionLifecycleSnapshot;
@@ -65,39 +67,19 @@ export interface TransactionLifecycleReader {
   ): () => void;
 }
 
-/**
- * Producer handle. `hold()` lets the owner record a transition (its sequence and
- * emission snapshot) at the state change itself, before its engine announcement
- * runs other owners' callbacks, while public listeners still run afterwards.
- * Transitions recorded during the hold are delivered in order on release.
- */
-export interface TransactionLifecyclePublisher {
-  (fact: LifecycleFact): void;
-  hold(): () => void;
-  /**
-   * Advance the sequence for a state change that has no lifecycle fact: the
-   * owner abandoned a transaction without settling it, so it leaves the
-   * snapshot. Snapshots stay coherent with their sequence; no event is
-   * invented for a transition the owner never announces.
-   */
-  advance(): void;
-}
-
 type Listener = (event: TransactionLifecycleObservation) => void;
 type Subscription = { listener: Listener };
 type State = {
-  sequence: number;
   closed: boolean;
   delivering: boolean;
   holds: number;
-  readPending?: () => readonly PendingTransactionView[];
   listeners: Set<Subscription>;
   deliveries: {
     event: TransactionLifecycleObservation;
     audience: Subscription[];
   }[];
 };
-const states = new WeakMap<PositionRegistry, State>();
+const states = new WeakMap<object, State>();
 const noop = (): void => undefined;
 const detach = (
   snapshot: TransactionLifecycleSnapshot
@@ -107,99 +89,100 @@ const detach = (
 });
 
 function snapshotOf(
-  registry: PositionRegistry,
-  state: State
+  source: TransactionLifecycleSource
 ): TransactionLifecycleSnapshot {
+  const { sequence, pending } = source.read();
   return {
-    treeId: registry.id,
-    sequence: state.sequence,
-    pending: (state.readPending?.() ?? []).map((item) => ({ ...item })),
+    treeId: source.treeId,
+    sequence,
+    pending: pending.map((item) => ({ ...item })),
   };
 }
 
-/**
- * @internal Producer registration, by the transaction owner only. Readers never
- * install transaction capability: a tree without `transactions()` has no state
- * here and its reader is `undefined`.
- */
-export function installTransactionLifecycleObservation<T>(
-  tree: ISignalTree<T>,
-  readPending: () => readonly PendingTransactionView[]
-): TransactionLifecyclePublisher {
-  const registry = getPositionRegistry(tree.$);
-  if (!registry)
-    return Object.assign(noop, { hold: () => noop, advance: noop });
-  const state: State = {
-    sequence: 0,
-    closed: false,
-    delivering: false,
-    holds: 0,
-    readPending,
-    listeners: new Set(),
-    deliveries: [],
-  };
-  states.set(registry, state);
-  tree.registerCleanup(() => {
-    state.closed = true;
-    state.readPending = undefined;
-    state.listeners.clear();
-    state.deliveries.length = 0;
-  });
-  const deliver = (): void => {
-    if (state.delivering || state.holds > 0) return;
-    state.delivering = true;
-    try {
-      for (let i = 0; i < state.deliveries.length; i++) {
-        const { event, audience } = state.deliveries[i];
-        for (const subscription of audience) {
-          if (state.closed || !state.listeners.has(subscription)) continue;
-          try {
-            subscription.listener({
-              ...event,
-              snapshot: detach(event.snapshot),
-            });
-          } catch {
-            /* Observation cannot fail settlement. */
-          }
+/** The owner's own classification of the refusal it threw; never refined. */
+function reasonOf(error: unknown): TransactionRefusalReason {
+  const kind =
+    error instanceof SignalTreeRollbackError
+      ? ((error as { cause?: { kind?: unknown } }).cause?.kind as unknown)
+      : undefined;
+  return kind === 'later-confirmed-dependency'
+    ? kind
+    : 'effect-validation-failed';
+}
+
+function deliver(state: State): void {
+  if (state.delivering || state.holds > 0) return;
+  state.delivering = true;
+  try {
+    for (let i = 0; i < state.deliveries.length; i++) {
+      const { event, audience } = state.deliveries[i];
+      for (const subscription of audience) {
+        if (state.closed || !state.listeners.has(subscription)) continue;
+        try {
+          subscription.listener({ ...event, snapshot: detach(event.snapshot) });
+        } catch {
+          /* Observation cannot fail settlement. */
         }
       }
-    } finally {
-      state.deliveries.length = 0;
-      state.delivering = false;
     }
+  } finally {
+    state.deliveries.length = 0;
+    state.delivering = false;
+  }
+}
+
+/** Attach the single per-tree observer to the owner's source. */
+function observe(
+  source: TransactionLifecycleSource,
+  state: State
+): TransactionLifecycleObserver {
+  return {
+    record(fact: TransactionLifecycleFact): void {
+      // No event allocation or retained snapshot when nobody is listening.
+      if (state.closed || state.listeners.size === 0) return;
+      // The owner has already counted this transition: the snapshot is the
+      // state at the transition, sequence included.
+      const snapshot = snapshotOf(source);
+      let event: TransactionLifecycleObservation;
+      if (fact.kind === 'refused') {
+        const retained = snapshot.pending.find(
+          (item) => item.transactionId === fact.transactionId
+        );
+        event = {
+          kind: 'refused',
+          transactionId: fact.transactionId,
+          reason: reasonOf(fact.error),
+          pendingRetained: retained !== undefined,
+          consequencesReleased: !!retained?.consequencesReleased,
+          treeId: snapshot.treeId,
+          sequence: snapshot.sequence,
+          snapshot,
+        };
+      } else {
+        event = {
+          kind: fact.kind,
+          transactionId: fact.transactionId,
+          treeId: snapshot.treeId,
+          sequence: snapshot.sequence,
+          snapshot,
+        };
+      }
+      state.deliveries.push({ event, audience: [...state.listeners] });
+      deliver(state);
+    },
+    hold(): () => void {
+      // Inside delivery the running loop already drains in order.
+      if (state.delivering) return noop;
+      state.holds++;
+      let released = false;
+      return () => {
+        if (released) return;
+        released = true;
+        state.holds--;
+        deliver(state);
+      };
+    },
   };
-  const publish = (fact: LifecycleFact): void => {
-    if (state.closed) return;
-    const sequence = ++state.sequence;
-    // No event allocation or retained snapshot when nobody is listening.
-    if (state.listeners.size === 0) return;
-    state.deliveries.push({
-      event: {
-        ...fact,
-        treeId: registry.id,
-        sequence,
-        snapshot: snapshotOf(registry, state),
-      },
-      audience: [...state.listeners],
-    });
-    deliver();
-  };
-  const hold = (): (() => void) => {
-    // Inside delivery the running loop already drains in order.
-    if (state.delivering) return noop;
-    state.holds++;
-    let released = false;
-    return () => {
-      if (released) return;
-      released = true;
-      state.holds--;
-      deliver();
-    };
-  };
-  const advance = (): void => {
-    if (!state.closed) state.sequence++;
-  };
-  return Object.assign(publish, { hold, advance });
 }
 
 /**
@@ -214,8 +197,27 @@ export function transactionLifecycleReader<
 >(tree: ToolingTree<T, C, TAccum>): TransactionLifecycleReader | undefined {
   if (isToolingTreeDestroyed(tree)) throw new StudioTreeDestroyedError();
   const registry = getPositionRegistry(tree.$);
-  const state = registry && states.get(registry);
-  if (!registry || !state) return undefined;
+  const source = registry && getTransactionLifecycleSource(registry);
+  if (!registry || !source) return undefined;
+  let existing = states.get(registry);
+  if (!existing) {
+    const state: State = {
+      closed: false,
+      delivering: false,
+      holds: 0,
+      listeners: new Set(),
+      deliveries: [],
+    };
+    existing = state;
+    states.set(registry, state);
+    source.attach(observe(source, state));
+    tree.registerCleanup(() => {
+      state.closed = true;
+      state.listeners.clear();
+      state.deliveries.length = 0;
+    });
+  }
+  const state = existing;
   const assertLive = () => {
     if (state.closed || isToolingTreeDestroyed(tree))
       throw new StudioTreeDestroyedError();
@@ -223,7 +225,7 @@ export function transactionLifecycleReader<
   return {
     snapshot() {
       assertLive();
-      return snapshotOf(registry, state);
+      return snapshotOf(source);
     },
     subscribe(listener) {
       assertLive();
