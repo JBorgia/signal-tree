@@ -703,8 +703,9 @@ export interface AddManyOptions<E, K> extends AddOptions<E, K> {
  * each row — while a replay taps `onUpdate` only for a row whose value it
  * changes, so replaying that `setAll` taps nothing.
  *
- * A write a tap makes is ordinary forward work: it is intercepted, even while
- * a replay runs.
+ * One rule wherever a tap runs, also inside a replay: a tap's own writes are
+ * intercepted; an `undo()`, `redo()`, `jumpTo()` or `rollback()` a tap starts
+ * is itself a replay, and its writes are not.
  */
 export interface TapHandlers<E, K extends string | number> {
   onAdd?: (entity: E, id: K) => void;
@@ -741,8 +742,9 @@ export interface InterceptContext<T> {
  * JUMP_TO_ACTION, ROLLBACK) to a state the tree itself serialized. It writes
  * back exactly the value, or the pre-image, that was recorded, which the
  * interceptors already shaped when it was first written; neither a transform
- * nor a block applies to it. Taps and path subscribers are still notified, and
- * a write one of them makes meanwhile is intercepted as usual. A devtools jump
+ * nor a block applies to it. Taps and path subscribers are still notified; a
+ * write one of them makes meanwhile is intercepted as usual, while a replay
+ * one of them starts is itself a replay. A devtools jump
  * to any other state — forged, hand-edited, older than the last 1,000 states
  * the tree serialized — and an IMPORT_STATE are new input: the interceptors
  * run.
