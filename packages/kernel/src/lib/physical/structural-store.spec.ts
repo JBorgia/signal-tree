@@ -19,6 +19,16 @@ const acquireExistingHandle = (store: StructuralStore<string>, key: string) => {
 };
 
 describe('StructuralStore', () => {
+  it('moves each key to the front once, however often it is named (v16 8f)', () => {
+    // A node prepended twice linked to itself, and the next walk of the order
+    // never ended (prependMany with a duplicated id).
+    const store = seedStore();
+    store.moveKeysToFront(['C', 'B', 'C', 'B']);
+    // The integrity walk stops at a revisited node; a plain walk would not.
+    store.__assertActiveOrderIntegrityForTesting();
+    expect(store.activeKeysSnapshot()).toEqual(['C', 'B', 'A']);
+  });
+
   it('tracks canonical active order across create, remove, rekey, and append', () => {
     const store = seedStore();
 
