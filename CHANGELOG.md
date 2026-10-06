@@ -29,9 +29,20 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   `prependMany` strict throws before writing, skip keeps the first copy,
   overwrite keeps the last in the first copy's place; `upsertMany` merges the
   copies). It used to insert two rows under one key.
-- Still refused, by design for now: a collection order change (`setAll`
-  reordering survivors, `prependMany` moving an overwritten row) combined with
-  another add or remove of the same collection in one turn.
+- Rollback of a transaction that edited an existing row no longer refuses
+  after settled later work removed that row (even a plain `removeOne`): the
+  row's compensation is skipped, the rest reverses, the row stays absent. An
+  unsettled removal, a row later work edited and kept, and a pending remove
+  whose key was re-occupied still refuse.
+- A failure while a transaction's pending turn is being recorded is rolled
+  back automatically; the write no longer survives unrecorded (where an
+  earlier transaction's rollback could reverse through it).
+- `getCurrentIndex()` follows `undo()` and `redo()` (it moved only on
+  `jumpTo()` and history changes). Steps back are `getCurrentIndex() + 1`.
+- Still refused, an open design question rather than a decision: a collection
+  order change (`setAll` reordering survivors, `prependMany` moving an
+  overwritten row) combined with another add or remove of the same collection
+  in one turn.
 
 ## 15.4.3 (2026-10-05)
 
