@@ -101,7 +101,8 @@ const ADDED_AND_REMOVED: Row[] = [
 describe.each(undoConfigurations)(
   'known pre-existing undo/redo limitations (%s)',
   (_name, enhancers) => {
-    it('KNOWN LIMITATION (pre-existing on 15.4.3): updateOne then clear — current behaviour: undo restores [a, c, z]', async () => {
+    // FIXED (was pre-existing on 15.4.3: undo restored [a, c, z]).
+    it('updateOne then clear: undo restores [z, a, c]', async () => {
       const tree = make(enhancers());
       try {
         await seed(tree);
@@ -109,32 +110,11 @@ describe.each(undoConfigurations)(
         await flush();
         tree.undo();
         await flush();
-        expect(tree.$.rows.all()).toStrictEqual([
-          { id: 'a', n: 1 },
-          { id: 'c', n: 3 },
-          { id: 'z', n: 0 },
-        ]);
+        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
       } finally {
         tree.destroy();
       }
     });
-
-    it.fails(
-      'KNOWN LIMITATION (pre-existing on 15.4.3): updateOne then clear — desired: undo restores [z, a, c]',
-      async () => {
-        const tree = make(enhancers());
-        try {
-          await seed(tree);
-          updateThenClear(tree);
-          await flush();
-          tree.undo();
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual(SEEDED);
-        } finally {
-          tree.destroy();
-        }
-      }
-    );
 
     // FIXED (was pre-existing on 15.4.3: undo refused as structural drift).
     it('changeId, updateOne, removeOne: undo restores', async () => {
