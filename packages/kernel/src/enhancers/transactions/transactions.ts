@@ -5,6 +5,7 @@ import {
   composePlainBranchMemberEffect,
   plainBranchMemberEffectIsNoop,
   preparePlainBranchMembers,
+  refreshOmittedCollection,
 } from '../../lib/internals/plain-branch-membership';
 import type { PlainBranchMemberPresence } from '../../lib/internals/plain-branch-membership';
 import { applicationFailureCause } from '../../lib/internals/causal-runtime/post-application-failure';
@@ -2499,6 +2500,13 @@ export function getOrCreateInternalTransactionRuntime<T>(
         callbackError,
       });
     }
+    // Rows compensated in an omitted collection are what a later re-add of
+    // it must find (v16 integration 8d (b)).
+    for (const effect of effects)
+      if (effect.kind !== 'set' || effect.subject !== undefined)
+        refreshOmittedCollection(tree.$ as object, effect.position);
+    for (const delta of orderDeltas)
+      refreshOmittedCollection(tree.$ as object, delta.owner);
   };
 
   /**

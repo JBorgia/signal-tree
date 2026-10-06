@@ -1,6 +1,6 @@
 import type { WriteMetadata } from '../mutation-types';
 import { getActiveWriteContext } from '../write-context';
-import { unwrapBranchForWriteCapture } from '../utils';
+import { deepEqual, unwrapBranchForWriteCapture } from '../utils';
 import { getOwnedOwnerPath, getOwnedPositionIds } from './owned-metadata';
 import { hasPathObservers, pathObservation } from './path-observation-port';
 import {
@@ -50,6 +50,31 @@ export function plainBranchMembershipChange(
   return (meta as MembershipMetadata | undefined)?.[MEMBERSHIP];
 }
 
+/**
+ * An entity collection held as a member of a plain branch. A whole value that
+ * leaves out its key omits it like any member; its rows are its own state,
+ * retained whole while it is omitted, so its membership is presence only
+ * (v16 integration 8d (b)). Before 8d its membership change was observed but
+ * never recorded, so undo, redo, jumpTo and rollback left it omitted.
+ */
+function isCollectionMember(node: unknown): boolean {
+  if (!isTraversableNode(node)) return false;
+  const binding = (
+    node as { __prepareTransitionTarget?: CollectionTransitionTargetBinding }
+  ).__prepareTransitionTarget;
+  return (
+    binding !== undefined &&
+    binding.owner === getOwnedPositionIds(node)?.[0]
+  );
+}
+
+/** A member whose membership history records and reversals restore. */
+function isRecordedMember(node: unknown): boolean {
+  return (
+    isNodeAccessor(node) || isWritableLocation(node) || isCollectionMember(node)
+  );
+}
+
 /** Capture only members whose presence the supplied whole value could change. */
 export function capturePlainBranchMembership(
   branch: object,
@@ -68,7 +93,12 @@ export function capturePlainBranchMembership(
     const present = descriptor.enumerable === true;
     if (present === keys.has(key)) continue;
     // Callable implementation properties are not retained state locations.
-    if (!present && typeof descriptor.value !== 'function') continue;
+    if (
+      !present &&
+      typeof descriptor.value !== 'function' &&
+      !isCollectionMember(descriptor.value)
+    )
+      continue;
     before.set(
       key,
       present
@@ -88,6 +118,8 @@ export function capturePlainBranchMembership(
       const descriptor = Object.getOwnPropertyDescriptor(branch, key);
       const present = descriptor?.enumerable === true;
       if (present === previous.present) continue;
+      if (previous.present && isCollectionMember(descriptor?.value))
+        rememberOmittedRows(descriptor?.value as object);
       members.push({
         key,
         positionIds: getOwnedPositionIds(descriptor?.value),
@@ -221,11 +253,7 @@ export function plainBranchMembershipEffects(
       member.key
     )?.value;
     const path = getOwnedOwnerPath(node);
-    if (
-      path === undefined ||
-      (!isNodeAccessor(node) && !isWritableLocation(node))
-    )
-      return [];
+    if (path === undefined || !isRecordedMember(node)) return [];
     addresses.set(position, { branch: change.branch, key: member.key, node });
     return [
       {
@@ -296,9 +324,100 @@ function memberAddress(
   return descriptor?.value === address.node &&
     descriptor.configurable === true &&
     getOwnedPositionIds(address.node)?.[0] === position &&
-    (isNodeAccessor(address.node) || isWritableLocation(address.node))
+    isRecordedMember(address.node)
     ? address
     : undefined;
+}
+
+/**
+ * The rows each omitted collection held when it was last omitted, or last
+ * written by a reversal or a rollback while omitted. History expects to find
+ * them when it re-adds the collection.
+ */
+const OMITTED_ROWS = new WeakMap<object, unknown>();
+
+/**
+ * A collection's installed rows, `[subject, key, value]` in order, read from
+ * its own physical truth. Not its snapshot: a reversal publishes members
+ * before the collection's snapshot is refreshed, so a snapshot read there was
+ * stale (measured: redo of a designated re-add refused against the rows the
+ * undo had just replaced).
+ */
+type CollectionRows = ReadonlyArray<readonly [unknown, unknown, unknown]>;
+
+function collectionRows(node: object): CollectionRows {
+  const binding = (
+    node as { __prepareTransitionTarget?: CollectionTransitionTargetBinding }
+  ).__prepareTransitionTarget;
+  return (
+    binding
+      ?.readSource()
+      .subjects.map(({ subject, key, value }) => [subject, key, value] as const) ??
+    []
+  );
+}
+
+function rememberOmittedRows(node: object): void {
+  OMITTED_ROWS.set(node, collectionRows(node));
+}
+
+/**
+ * The rows a reversal writes itself are its own effects, not a change made
+ * while the collection was omitted, so they are left out of the comparison;
+ * so is the order when the reversal reorders the collection.
+ */
+function omittedRowsChanged(
+  node: object,
+  touched: ReadonlySet<unknown>,
+  reordered: boolean
+): boolean {
+  const expected = OMITTED_ROWS.get(node) as CollectionRows | undefined;
+  if (!expected) return false;
+  const untouched = (rows: CollectionRows) => {
+    const kept = rows.filter(([subject]) => !touched.has(subject));
+    return reordered
+      ? [...kept].sort(([a], [b]) => (String(a) < String(b) ? -1 : 1))
+      : kept;
+  };
+  return !deepEqual(untouched(collectionRows(node)), untouched(expected));
+}
+
+/**
+ * The path of the omitted collection member at `position` when re-adding it
+ * would not restore it: rows the reversal does not write itself changed after
+ * it was omitted, through a handle held on it. Re-adding it would bring back
+ * rows the reversed operation never had, which "DORMANT STORAGE MUST NOT
+ * SUPPLY THE REACTIVATED VALUE" (`whole-value-membership.spec.ts` 18)
+ * forbids.
+ */
+export function changedOmittedCollection(
+  root: object,
+  position: number,
+  touched: ReadonlySet<unknown>,
+  reordered: boolean
+): string | undefined {
+  const address = memberAddress(root, position);
+  return address &&
+    isCollectionMember(address.node) &&
+    !Object.getOwnPropertyDescriptor(address.branch, address.key)
+      ?.enumerable &&
+    omittedRowsChanged(address.node, touched, reordered)
+    ? (getOwnedOwnerPath(address.node) ?? address.key)
+    : undefined;
+}
+
+/**
+ * @internal A rollback compensates an omitted collection's retained rows
+ * (8b): what it leaves there is what history expects on a later re-add.
+ */
+export function refreshOmittedCollection(root: object, position: number): void {
+  const address = memberAddress(root, position);
+  if (
+    address &&
+    isCollectionMember(address.node) &&
+    !Object.getOwnPropertyDescriptor(address.branch, address.key)?.enumerable
+  )
+    rememberOmittedRows(address.node);
 }
 
 /** Validate the retained location, never a display-path reconstruction. */
@@ -538,6 +657,10 @@ export function preparePlainBranchMembers(
           : { present: false }),
     });
     if (!present) return;
+    // Presence only: the rows are the collection's own retained state, and
+    // its own effects restore them. A reversal refuses a changed one before
+    // it prepares anything (`changedOmittedCollection`).
+    if (isCollectionMember(node)) return;
     if (isWritableLocation(node)) {
       const { position, slot } = resolveSlot(node);
       values.set(slot, {
@@ -669,8 +792,15 @@ export function preparePlainBranchMembers(
         runtime.runInvalidationGroup(() => {
           for (const branch of changedBranches) publishMembershipChange(branch);
           // What a branch member's presence changes below it (v16 8d).
-          for (const { branch, key } of changedBranchMembers)
+          for (const { branch, key, node } of changedBranchMembers) {
             republishMemberSubtree(branch, key);
+            // Every participant is installed: these are the rows it keeps.
+            if (
+              isCollectionMember(node) &&
+              !Object.getOwnPropertyDescriptor(branch, key)?.enumerable
+            )
+              rememberOmittedRows(node);
+          }
           runtime.publishPrepared({
             revision: installed.revision,
             changedSlots: [...changedSlots],
