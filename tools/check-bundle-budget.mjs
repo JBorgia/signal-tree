@@ -402,7 +402,11 @@ const TARGETS = {
     // and undo/rollback of an order change refused after any add or remove in
     // or after the same turn. Data, not diagnostics; it does not fold.
     // Offsets tried: separate read and install accessors (+15 B worse), a
-    // single merged accessor (taken). 22.66 KB = 23,203 B leaves ~12 B.
+    // single merged accessor (taken). 22.66 KB = 23,203 B left ~12 B; the
+    // (a)+(d) repair (d33138f6) then published the transitions of clear()
+    // and of a setAll that adds or removes rows without reordering survivors
+    // (the fuzz found both unpublished): 23,202 B (+11 B), ~1.8 B left, no
+    // raise. Dev 26,096 B of 26,112.
     devKB: 25.5,
     prodKB: 22.66,
     code: `
