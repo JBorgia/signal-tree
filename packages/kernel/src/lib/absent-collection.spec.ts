@@ -14,6 +14,7 @@ import {
   structuralWrites,
 } from './internals/member-membership';
 import { createSignalTreeFactory } from './signal-tree';
+import type { InterceptHandlers, TapHandlers } from './types';
 
 /**
  * v16 integration slice 8e (2): an entity collection under an omitted member.
@@ -81,6 +82,8 @@ type Rows = {
   removeMany(ids: string[]): void;
   removeWhere(predicate: (row: Row) => boolean): number;
   changeId(from: string, to: string): void;
+  tap(handlers: TapHandlers<Row, string>): () => void;
+  intercept(handlers: InterceptHandlers<Row, string>): () => void;
 };
 type Tree = {
   $: ((value?: unknown) => unknown) & {
