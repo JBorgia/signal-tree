@@ -75,16 +75,18 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   back taps `onAdd` (15.4.3 tapped only the removals, and nothing at all when
   several rows were reversed together), one it takes away `onRemove`, one
   whose value it changes `onUpdate`.
-- `addOne`, `addMany`, `prependOne`, `prependMany` and `upsertMany` throw
-  `Cannot <method>: collection topology changed during staging` before writing
-  when one of their interceptors or id selectors changed the same
-  collection's membership or order, or the key of a row the call names - the
-  rule `setAll` has applied since 15.4.0. Such a call used to write a stale
-  plan: two rows under one key, a lost overwrite (`addMany` with `overwrite`
-  returned the id while the row stayed removed), a removed last row
-  resurrected as an empty member, or a row the interceptor added misplaced on
-  redo. `upsertMany` merges an updated row over its value as its interceptors
-  left it.
+- `addOne`, `addMany`, `prependOne`, `prependMany`, `upsertMany`,
+  `updateMany` and `removeMany` throw `Cannot <method>: collection topology
+  changed during staging` before writing when one of their interceptors or id
+  selectors changed the same collection's membership or order, or the key of
+  a row the call names. This is narrower than `setAll`'s staging refusal
+  (since 15.4.0), which also refuses a key change to a row it does not name.
+  Such a call used to write a stale plan: two rows under one key, a lost
+  overwrite (`addMany` with `overwrite` returned the id while the row stayed
+  removed), a removed last row resurrected as an empty member, a row the
+  interceptor added misplaced on redo, or an `updateMany` that announced a
+  renamed row and lost the rename. `upsertMany` merges an updated row over its
+  value as its interceptors left it.
 - Rollback of a transaction that edited an existing row no longer refuses
   after settled later work removed that row (even a plain `removeOne`): the
   row's compensation is skipped, the rest reverses, the row stays absent. An

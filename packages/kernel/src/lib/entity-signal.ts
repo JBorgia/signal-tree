@@ -2955,19 +2955,25 @@ export function createEntitySignal<
 
     updateMany(ids: K[], changes: Partial<E>): void {
       if (ids.length === 0) return;
+      const frontier = structuralStore.activeOrderFrontier();
 
       // Collect entities and run interceptors first
       const updatedEntities = ids.map((id) => {
         const prev = requireEntity(id);
+        const subjectId = requireSubjectId(id);
         const transformedChanges = interceptUpdatedEntity(id, changes);
         return {
           id,
-          subjectId: requireSubjectId(id),
+          subjectId,
           prev,
           finalUpdated: { ...prev, ...transformedChanges },
           transformedChanges,
         };
       });
+      // As the add calls: an interceptor that changed membership, order or a
+      // named row's key leaves this plan stale (a rename was lost, a vanished
+      // row announced) - refuse before writing.
+      refuseTopologyChange('updateMany', frontier, updatedEntities);
 
       const frame = createEntityMutationFrame();
       for (const { id, subjectId, finalUpdated } of updatedEntities) {
@@ -3091,6 +3097,7 @@ export function createEntitySignal<
 
     removeMany(ids: K[]): void {
       if (ids.length === 0) return;
+      const frontier = structuralStore.activeOrderFrontier();
 
       // Collect entities and run interceptors first
       const preparedRemovals: Array<{
@@ -3105,6 +3112,7 @@ export function createEntitySignal<
         interceptRemovedEntity(id, entity);
         return { id, entity, subjectId };
       });
+      refuseTopologyChange('removeMany', frontier, preparedRemovals);
 
       // The last interceptor can subscribe to the entire atomic removal.
       // Capture every row's neighbours before any tombstones are committed.

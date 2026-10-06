@@ -718,14 +718,15 @@ export interface InterceptContext<T> {
 /**
  * Intercept handlers - block or transform mutations before they happen.
  *
- * Synchronous, and meant to validate or transform their input. An add call
- * (`addOne`, `addMany`, `prependOne`, `prependMany`, `upsertMany`) whose
- * interceptors or id selectors change the same collection's membership or
- * order, or the key of a row the call names, throws `Cannot <method>:
- * collection topology changed during staging` before writing anything, as
- * `setAll` does. The callback's own writes stand; field-only writes are
- * allowed, and an updated row merges over its value as the interceptors left
- * it.
+ * Synchronous, and meant to validate or transform their input. A call
+ * (`addOne`, `addMany`, `prependOne`, `prependMany`, `upsertMany`,
+ * `updateMany`, `removeMany`) whose interceptors or id selectors change the
+ * same collection's membership or order, or the key of a row the call names,
+ * throws `Cannot <method>: collection topology changed during staging` before
+ * writing anything. (`setAll` refuses more: a key change to any current row.)
+ * The callback's own writes stand; field-only writes, and a key change to a
+ * row the call does not name, are allowed. An updated row merges over its
+ * value as the interceptors left it.
  *
  * Interceptors do not run on a replay of recorded state — `undo()`, `redo()`,
  * `jumpTo()`, a transaction rollback, or a devtools jump to a recorded state
