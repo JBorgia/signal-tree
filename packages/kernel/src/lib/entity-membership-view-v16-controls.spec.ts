@@ -105,8 +105,38 @@ describe('compound operations publish one unit', () => {
   });
 });
 
+describe('point deltas', () => {
+  it('an added row reports its neighbours in the committed order', () => {
+    const tree = signalTree({ rows: entityMap<Row, string>() });
+    try {
+      tree.$.rows.setAll([
+        { id: 'a', n: 1 },
+        { id: 'b', n: 2 },
+      ]);
+      const reader = entityMembershipReader(tree)!;
+      const [, b] = reader.snapshot().collections[0].members;
+      const events: EntityMembershipEvent[] = [];
+      reader.subscribe((event) => events.push(event));
+      tree.$.rows.addOne({ id: 'c', n: 3 });
+      expect(events.map((event) => event.changes)).toEqual([
+        [
+          {
+            kind: 'add',
+            lifetimeId: expect.any(Number),
+            key: 'c',
+            beforeLifetimeId: b.lifetimeId,
+            afterLifetimeId: undefined,
+          },
+        ],
+      ]);
+    } finally {
+      tree.destroy();
+    }
+  });
+});
+
 describe('an interrupted structural unit', () => {
-  it('a commit that throws mid-unit cancels it: later snapshots and events still work', () => {
+  it('a commit that throws mid-unit still closes it: later snapshots and events still work', () => {
     const tree = signalTree({ rows: entityMap<Row, string>() });
     const original = StructuralStore.prototype.tombstoneSubject;
     try {
@@ -136,6 +166,44 @@ describe('an interrupted structural unit', () => {
       expect(
         reader.snapshot().collections[0].members.map((member) => member.key)
       ).toEqual(['a', 'b', 'c']);
+    } finally {
+      StructuralStore.prototype.tombstoneSubject = original;
+      tree.destroy();
+    }
+  });
+
+  it('a unit that throws after a partial change announces exactly that change', () => {
+    const tree = signalTree({ rows: entityMap<Row, string>() });
+    const original = StructuralStore.prototype.tombstoneSubject;
+    try {
+      tree.$.rows.setAll([
+        { id: 'a', n: 1 },
+        { id: 'b', n: 2 },
+      ]);
+      const reader = entityMembershipReader(tree)!;
+      const lifetimeOfA =
+        reader.snapshot().collections[0].members[0].lifetimeId;
+      const events: EntityMembershipEvent[] = [];
+      reader.subscribe((event) => events.push(event));
+      let calls = 0;
+      const spy = vi
+        .spyOn(StructuralStore.prototype, 'tombstoneSubject')
+        .mockImplementation(function (this: StructuralStore<string>, ...args) {
+          if (++calls === 2)
+            throw new Error('injected second tombstone failure');
+          return original.apply(this, args);
+        });
+      expect(() => tree.$.rows.clear()).toThrow(
+        'injected second tombstone failure'
+      );
+      spy.mockRestore();
+      // The first row's tombstone installed: events and snapshot agree on it.
+      expect(events.map((event) => event.changes)).toEqual([
+        [{ kind: 'remove', lifetimeId: lifetimeOfA, key: 'a' }],
+      ]);
+      expect(
+        reader.snapshot().collections[0].members.map((member) => member.key)
+      ).toEqual(['b']);
     } finally {
       StructuralStore.prototype.tombstoneSubject = original;
       tree.destroy();

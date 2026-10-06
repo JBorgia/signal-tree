@@ -31,12 +31,13 @@ import {
 } from './physical/structural-store';
 import { defineOwnedOwnerPath } from './internals/owned-mutation';
 import {
-  defineEntityMembershipInventory,
   defineEntityMembershipSource,
-  type EntityMembershipChange,
-  type EntityMembershipInventory,
-  type EntityMembershipUnit,
-} from './internals/entity-membership-inventory';
+  MEMBERSHIP_CLOSE,
+  MEMBERSHIP_FACTS,
+  MEMBERSHIP_OPEN,
+  MEMBERSHIP_OPEN_ORDER,
+  type EntityMembershipTap,
+} from './internals/entity-membership-source';
 import type { PhysicalCommitClock } from './internals/physical-commit-clock';
 // Only `notify` is ever called on this — the neutral port contract, not the
 // delivery engine's full surface.
@@ -285,23 +286,6 @@ import type {
   PositionId,
   StructuralEffect,
 } from '../lib/types';
-
-/**
- * A collection carries only a membership SOURCE until a membership reader
- * first observes it (`entityMembershipReader`). Until then its units are
- * no-ops: no inventory reads, no retained deltas, no event history.
- */
-const DORMANT_MEMBERSHIP_UNIT: EntityMembershipUnit = {
-  commit: () => undefined,
-  cancel: () => undefined,
-};
-const DORMANT_MEMBERSHIP: Pick<
-  EntityMembershipInventory,
-  'observed' | 'begin'
-> = {
-  observed: () => false,
-  begin: () => DORMANT_MEMBERSHIP_UNIT,
-};
 
 /**
  * True when the subjects present at both endpoints appear in a different
@@ -553,71 +537,20 @@ export function createEntitySignal<
       };
     });
 
-    let membershipChanges: EntityMembershipChange[] = [];
-    let membershipPublished = false;
-
     return {
       install(): void {
-        // Guards full reads while the target installs (a reader snapshot
-        // refuses mid-unit); the deltas are delivered from publish().
-        const unit = beginMembershipUnit();
+        // Membership observation diffs this collection across the install.
+        // Reversals hold reader delivery until every target is installed.
+        const tap = membershipTap;
+        tap?.(MEMBERSHIP_OPEN_ORDER);
         try {
           structuralStore.installPreparedTarget(structuralTarget);
           valueStore.installPreparedTargetValues(valueTarget);
-          if (membershipInventory.observed()) {
-            membershipChanges = subjectChanges.flatMap(
-              (change): EntityMembershipChange[] => {
-                if (change.afterKey === undefined)
-                  return [
-                    {
-                      kind: 'remove',
-                      lifetimeId: change.subjectId,
-                      key: change.beforeKey as K,
-                    },
-                  ];
-                if (change.beforeKey === undefined)
-                  return [
-                    {
-                      kind: 'add',
-                      lifetimeId: change.subjectId,
-                      key: change.afterKey,
-                      beforeLifetimeId: change.targetNeighbors?.beforeSubject,
-                      afterLifetimeId: change.targetNeighbors?.afterSubject,
-                    },
-                  ];
-                return change.beforeKey !== change.afterKey
-                  ? [
-                      {
-                        kind: 'rekey',
-                        lifetimeId: change.subjectId,
-                        beforeKey: change.beforeKey,
-                        afterKey: change.afterKey,
-                      },
-                    ]
-                  : [];
-              }
-            );
-            const before = [...currentSubjects.keys()];
-            if (survivingOrderChanged(before, target.order)) {
-              membershipChanges.push({
-                kind: 'reorder',
-                before,
-                after: [...target.order],
-              });
-            }
-          }
         } finally {
-          // The coordinator installs every target before any publish; close
-          // this read guard now and deliver the captured deltas in publish.
-          unit.commit([]);
+          tap?.(MEMBERSHIP_CLOSE);
         }
       },
       publish(options): void {
-        if (!membershipPublished) {
-          membershipPublished = true;
-          beginMembershipUnit().commit(membershipChanges);
-          membershipChanges = [];
-        }
         for (const publication of subjectChanges) {
           // Only a realized subject has an epoch, so this stays as lazy as the
           // per-entity signal it replaces.
@@ -708,26 +641,13 @@ export function createEntitySignal<
     frame: EntityMutationFrame<K, E>,
     options?: { advancePhysicalRevision?: boolean }
   ) {
-    const unit = beginMembershipUnit();
-    try {
-      let membership: readonly EntityMembershipChange[] = [];
-      const result = frame.commit(
-        committedEntityObserver(),
-        membershipInventory.observed()
-          ? (changes) => {
-              membership = changes;
-            }
-          : undefined
-      );
-      if (options?.advancePhysicalRevision !== false) {
-        physicalCommitClock?.advance();
-      }
-      unit.commit(membership);
-      return result;
-    } catch (error) {
-      unit.cancel();
-      throw error;
+    const result = frame.commit(committedEntityObserver());
+    if (options?.advancePhysicalRevision !== false) {
+      physicalCommitClock?.advance();
     }
+    // Membership observation: the committed instructions, before publication.
+    membershipTap?.(MEMBERSHIP_FACTS, frame.mutations);
+    return result;
   }
 
   /** Reactive signals for queries — all derived, none eagerly maintained. */
@@ -806,60 +726,22 @@ export function createEntitySignal<
     locations.advanceEpoch?.(handle);
   };
   const structuralStore = new StructuralStore<K>();
-  // Membership production (read-only observation). Dormant until a reader
-  // installs the producer through the source defined at the end of this
-  // factory. Deltas are computed only while a reader listens (`observed()`).
-  let membershipInventory: Pick<
-    EntityMembershipInventory,
-    'observed' | 'begin'
-  > = DORMANT_MEMBERSHIP;
-  const readMembers = () =>
-    structuralStore.activeKeysSnapshot().map((key) => {
-      const lifetimeId = structuralStore.subjectIdForKey(key);
-      if (lifetimeId === undefined)
-        throw new Error('Active entity membership has no lifetime.');
-      return { lifetimeId, key };
-    });
-  let membershipGroupDepth = 0;
-  let groupedMembershipUnit: EntityMembershipUnit | undefined;
   /**
-   * A unit spans one structural operation; its deltas reach readers when it
-   * commits, after the whole operation has installed and before reactive
-   * publication. Compound operations (prepend = add + move) arm one outer unit
-   * at their first physical commit, so planning and interceptors still see a
-   * complete pre-operation inventory and readers see one coherent event.
-   * A unit that is begun must be committed or cancelled, including on a throw:
-   * an unfinished unit keeps the inventory "still being installed".
+   * Membership observation seam (`entityMembershipReader`, internals only):
+   * undefined until a reader first observes this collection. Each structural
+   * operation then reports its facts once (see `entity-membership-source.ts`);
+   * nothing is derived, retained or delivered here.
    */
-  function beginMembershipUnit(): EntityMembershipUnit {
-    if (membershipGroupDepth && !groupedMembershipUnit)
-      groupedMembershipUnit = membershipInventory.begin();
-    return membershipInventory.begin();
-  }
+  let membershipTap: EntityMembershipTap | undefined;
+  /** One observed unit for a compound operation (prepend = add + move). */
   function withMembershipGroup<R>(run: () => R): R {
-    membershipGroupDepth++;
+    const tap = membershipTap;
+    tap?.(MEMBERSHIP_OPEN);
     try {
       return run();
     } finally {
-      if (--membershipGroupDepth === 0) {
-        const unit = groupedMembershipUnit;
-        groupedMembershipUnit = undefined;
-        unit?.commit([]);
-      }
+      tap?.(MEMBERSHIP_CLOSE);
     }
-  }
-  function membershipAddition(
-    lifetimeId: number,
-    key: K
-  ): EntityMembershipChange {
-    const neighbors = structuralStore.neighborSubjectsForKey(key);
-    return {
-      kind: 'add',
-      lifetimeId,
-      key,
-      beforeLifetimeId: neighbors.beforeSubject,
-      afterLifetimeId: neighbors.afterSubject,
-    };
   }
   const valueStore = new EntityValueStore<E>();
   /**
@@ -1239,15 +1121,12 @@ export function createEntitySignal<
    * signals pick the new order up from the version bump.
    */
   function moveToFront(ids: K[]): void {
-    const observed = membershipInventory.observed();
-    const before: number[] = [];
-    if (observed) structuralStore.snapshotActiveOrder([], before);
-    structuralStore.moveKeysToFront(ids);
-    if (observed) {
-      const after: number[] = [];
-      structuralStore.snapshotActiveOrder([], after);
-      if (before.some((id, index) => id !== after[index]))
-        beginMembershipUnit().commit([{ kind: 'reorder', before, after }]);
+    const tap = membershipTap;
+    tap?.(MEMBERSHIP_OPEN_ORDER);
+    try {
+      structuralStore.moveKeysToFront(ids);
+    } finally {
+      tap?.(MEMBERSHIP_CLOSE);
     }
     physicalCommitClock?.advance();
     updateSignals();
@@ -3389,9 +3268,9 @@ export function createEntitySignal<
         };
       });
 
-      // Adds are committed as one membership unit; readers hear of them
-      // once every row is installed. A throw cancels the unit.
-      const membershipUnit = beginMembershipUnit();
+      // One observed membership unit; a throw still closes it.
+      const membershipUnit = membershipTap;
+      membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
       const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
       try {
         const freshSubjectIds = commitFreshSubjects(
@@ -3414,16 +3293,8 @@ export function createEntitySignal<
           syncEntitySignal(id);
           addedEntities.push({ id, entity: transformedEntity, subjectId });
         }
-        membershipUnit.commit(
-          membershipInventory.observed()
-            ? addedEntities.map(({ id, subjectId }) =>
-                membershipAddition(subjectId, id)
-              )
-            : []
-        );
-      } catch (error) {
-        membershipUnit.cancel();
-        throw error;
+      } finally {
+        membershipUnit?.(MEMBERSHIP_CLOSE);
       }
 
       const updatedEntities: Array<{
@@ -3543,7 +3414,8 @@ export function createEntitySignal<
         return { id, subjectId, entity, beforeSubject, afterSubject };
       });
 
-      const membershipUnit = beginMembershipUnit();
+      const membershipUnit = membershipTap;
+      membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
       try {
         for (const { id, subjectId, entity } of activeSubjects) {
           const currentState = resolveSubjectState(subjectId);
@@ -3554,21 +3426,10 @@ export function createEntitySignal<
           );
           captureCommittedEntity(subjectId, entity, undefined, true);
         }
-      } catch (error) {
-        membershipUnit.cancel();
-        throw error;
+      } finally {
+        // Observed once every row is tombstoned, before reactive publication.
+        membershipUnit?.(MEMBERSHIP_CLOSE);
       }
-      // Readers hear of the removals once every row is tombstoned, before the
-      // rows' reactive publication.
-      membershipUnit.commit(
-        membershipInventory.observed()
-          ? activeSubjects.map(({ id, subjectId }) => ({
-              kind: 'remove' as const,
-              lifetimeId: subjectId,
-              key: id,
-            }))
-          : []
-      );
       for (const { subjectId } of activeSubjects)
         publishSubjectPhysicalChange(subjectId);
 
@@ -3731,8 +3592,9 @@ export function createEntitySignal<
       }
 
       // From the first fresh subject to the order capture is one membership
-      // unit; a throw cancels it.
-      const membershipUnit = beginMembershipUnit();
+      // unit; a throw still closes it.
+      const membershipUnit = membershipTap;
+      membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
       let addedSubjectIds: number[];
       let afterSubjects: number[];
       const stagedRemovalStructuralEffects: PendingStructuralEffect[] = [];
@@ -3818,34 +3680,11 @@ export function createEntitySignal<
             meta: ambientMeta(),
           });
         }
-      } catch (error) {
-        membershipUnit.cancel();
-        throw error;
+      } finally {
+        // The whole replacement has installed (or stopped): the observed
+        // membership unit closes before the removed rows' reactive publication.
+        membershipUnit?.(MEMBERSHIP_CLOSE);
       }
-
-      // The whole replacement has installed: removals, adds (with neighbours
-      // in the final order) and any survivor reorder reach readers as one
-      // unit, before the removed rows' reactive publication.
-      const membershipChanges: EntityMembershipChange[] = [];
-      if (membershipInventory.observed()) {
-        for (const { id, subjectId } of stagedRemovals)
-          membershipChanges.push({
-            kind: 'remove',
-            lifetimeId: subjectId,
-            key: id,
-          });
-        for (let k = 0; k < stagedAdds.length; k += 1)
-          membershipChanges.push(
-            membershipAddition(addedSubjectIds[k], stagedAdds[k].id)
-          );
-        if (survivingOrderChanged(currentSubjects, afterSubjects))
-          membershipChanges.push({
-            kind: 'reorder',
-            before: currentSubjects,
-            after: afterSubjects,
-          });
-      }
-      membershipUnit.commit(membershipChanges);
       for (const { subjectId } of stagedRemovals)
         publishSubjectPhysicalChange(subjectId);
       reclaimRetiredSubjectsWithoutOwner(
@@ -3969,14 +3808,10 @@ export function createEntitySignal<
     configurable: true,
   });
   defineOwnedOwnerPath(api, basePath);
-  // Membership observation installs this collection's producer on first use.
-  defineEntityMembershipSource(api, {
-    install(create) {
-      const inventory = create(readMembers);
-      membershipInventory = inventory;
-      defineEntityMembershipInventory(api, inventory);
-      return inventory;
-    },
+  // Membership observation attaches its tap here on first use.
+  defineEntityMembershipSource(api, (tap) => {
+    membershipTap = tap;
+    return structuralStore;
   });
   // ⚠️ THE PROJECTION SEED — internal, WeakMap-carried, never public.
   //

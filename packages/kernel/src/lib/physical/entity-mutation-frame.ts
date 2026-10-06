@@ -1,4 +1,3 @@
-import type { EntityMembershipChange } from '../internals/entity-membership-inventory';
 import type { CommittedEntityMutation } from '../internals/mutation-capture-runtime';
 import { EntityValueStore } from './entity-value-store';
 import {
@@ -109,7 +108,11 @@ export class EntityMutationFrame<
   K extends string | number,
   E extends Record<string, unknown>
 > {
-  private readonly mutations: PreparedEntityPhysicalMutation<K, E>[] = [];
+  /**
+   * The staged instructions. Read-only after commit by membership observation
+   * (`entity-membership-source.ts`), which derives point deltas from them.
+   */
+  readonly mutations: PreparedEntityPhysicalMutation<K, E>[] = [];
 
   constructor(
     private readonly valueStore: EntityValueStore<E>,
@@ -148,30 +151,11 @@ export class EntityMutationFrame<
    * instruction has applied and before the caller publishes or notifies, so a
    * multi-row frame is never visible to admission one row at a time. A
    * preparation failure throws before anything applies or is reported.
-   * @param observeMembership Supplied only while a membership reader observes
-   * this collection. Receives the frame's membership deltas in commit order,
-   * once, after every instruction has applied; neighbours are read at the
-   * moment each row is added.
    */
   commit(
-    observeCommitted?: (changes: readonly CommittedEntityMutation[]) => void,
-    observeMembership?: (changes: readonly EntityMembershipChange[]) => void
+    observeCommitted?: (changes: readonly CommittedEntityMutation[]) => void
   ): EntityMutationCommitResult {
     const preparedMutations = this.prepareCommitInstructions();
-    const membership: EntityMembershipChange[] | undefined = observeMembership
-      ? []
-      : undefined;
-    const recordAddition = (subjectId: number, key: K): void => {
-      if (!membership) return;
-      const neighbors = this.structuralStore.neighborSubjectsForKey(key);
-      membership.push({
-        kind: 'add',
-        lifetimeId: subjectId,
-        key,
-        beforeLifetimeId: neighbors.beforeSubject,
-        afterLifetimeId: neighbors.afterSubject,
-      });
-    };
     // Before-images of touched lifetimes only. An inactive lifetime's retained
     // backing is not current truth, so it reads as absent (undefined).
     const before = observeCommitted
@@ -199,7 +183,6 @@ export class EntityMutationFrame<
     for (const mutation of preparedMutations) {
       if (mutation.kind === 'create-fresh-subject') {
         this.structuralStore.createSubject(mutation.subjectId, mutation.key);
-        recordAddition(mutation.subjectId, mutation.key);
         this.valueStore.retainSubjectValue(
           mutation.subjectId,
           mutation.nextValue
@@ -215,7 +198,6 @@ export class EntityMutationFrame<
           mutation.resolvedPlacement,
           mutation.restoreAllowed
         );
-        recordAddition(mutation.subjectId, mutation.key);
         if (mutation.resolvedValue !== undefined) {
           this.valueStore.retainSubjectValue(
             mutation.subjectId,
@@ -256,13 +238,6 @@ export class EntityMutationFrame<
           mutation.fromKey,
           mutation.toKey
         );
-        if (mutation.fromKey !== mutation.toKey)
-          membership?.push({
-            kind: 'rekey',
-            lifetimeId: mutation.subjectId,
-            beforeKey: mutation.fromKey,
-            afterKey: mutation.toKey,
-          });
         physicallyChangedSubjectIds.add(mutation.subjectId);
         continue;
       }
@@ -272,11 +247,6 @@ export class EntityMutationFrame<
         mutation.key,
         mutation.restoreAllowed
       );
-      membership?.push({
-        kind: 'remove',
-        lifetimeId: mutation.subjectId,
-        key: mutation.key,
-      });
       physicallyChangedSubjectIds.add(mutation.subjectId);
     }
 
@@ -293,8 +263,6 @@ export class EntityMutationFrame<
         }))
       );
     }
-
-    if (membership) observeMembership?.(membership);
 
     return {
       physicallyChangedSubjectIds: [...physicallyChangedSubjectIds],

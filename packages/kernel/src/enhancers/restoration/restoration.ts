@@ -4,7 +4,7 @@ import {
   type RestorationReaderChange,
   type RestorationReaderState,
 } from '../../lib/internals/restoration-reader';
-import { holdEntityMembershipDelivery } from '../../lib/internals/entity-membership-view';
+import { holdEntityMembershipDelivery } from '../../lib/internals/entity-membership-source';
 import {
   applyPlainBranchMemberSnapshot,
   canRealizePlainBranchMember,
