@@ -12,7 +12,7 @@ import { publishMembershipChange } from './snapshot-authority';
 import { getTreeScalarSlotRuntime } from './tree-scalar-slot-port';
 import { withWriteContext } from '../write-context';
 import { isNodeAccessor, isTraversableNode } from './node-shape';
-import { isWritableLocation, replaceLocation } from './location-runtime';
+import { isWritableLocation } from './location-runtime';
 import type { ScalarSlotCommitResult } from './tree-scalar-slot-runtime';
 import type { CollectionTransitionTargetBinding } from './causal-runtime/target-transition';
 
@@ -903,57 +903,4 @@ export function preparePlainBranchMembers(
       });
     },
   };
-}
-
-/** Called inside the realization adapter's validated invalidation group. */
-export function realizePlainBranchMember(
-  root: object,
-  position: number,
-  present: boolean,
-  value: unknown
-): void {
-  const address = memberAddress(root, position);
-  if (!address) throw new Error('Plain branch member location is unavailable');
-  const { branch, key, node } = address;
-  withWriteContext(
-    { ...getActiveWriteContext(), intent: 'system', participation: 'realized' },
-    () => {
-      const supplied = Object.fromEntries(
-        Object.keys(branch).map((key) => [key, true])
-      );
-      if (present) {
-        Object.defineProperty(supplied, key, {
-          value: true,
-          enumerable: true,
-          configurable: true,
-        });
-      } else {
-        delete supplied[key];
-      }
-      const publish = capturePlainBranchMembership(branch, supplied);
-      if (present) {
-        if (isNodeAccessor(node)) (node as (value: unknown) => void)(value);
-        else if (isWritableLocation(node)) replaceLocation(node, value);
-      }
-      const changed = setMemberPresence(
-        branch,
-        key,
-        present ? 'active' : 'dormant'
-      );
-      publish?.();
-      // A value write may already have reactivated the leaf. Invalidate the
-      // branch enumeration even when the presence setter sees no further change.
-      publishMembershipChange(branch);
-      if (changed) {
-        const runtime = getTreeScalarSlotRuntime(branch);
-        const slot = runtime?.resolveScalarSlot(position);
-        if (runtime && slot !== undefined) {
-          runtime.publishPrepared({
-            revision: runtime.revision(),
-            changedSlots: [slot],
-          });
-        }
-      }
-    }
-  );
 }

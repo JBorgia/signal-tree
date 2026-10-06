@@ -11,7 +11,6 @@ import {
   plainBranchMembershipEffects,
   preparePlainBranchMembers,
   readPlainBranchMember,
-  realizePlainBranchMember,
   type PlainBranchMemberPresence,
   type PlainBranchMembershipEffect,
 } from './internals/plain-branch-membership';
@@ -36,6 +35,26 @@ function collectMembership() {
   );
   return { effects, stop };
 }
+
+/**
+ * Realize one member through the reversal installer, the only path a
+ * reversal takes (`applyAtomically` sends every membership effect to it; the
+ * single-effect `realizePlainBranchMember` was unreachable and removed in
+ * v16 8e).
+ */
+const realizePlainBranchMember = (
+  root: object,
+  position: number,
+  present: boolean,
+  value: unknown
+): void => {
+  const plan = preparePlainBranchMembers(
+    root,
+    new Map([[position, { present, value }]])
+  );
+  plan.install();
+  plan.publish();
+};
 
 describe('plain branch explicit member presence', () => {
   it('staged omission retains scalar storage and emits only a membership event', () => {

@@ -1,7 +1,6 @@
 import {
   canRealizePlainBranchMember,
   preparePlainBranchMembers,
-  realizePlainBranchMember,
 } from '../plain-branch-membership';
 import type {
   ISignalTree,
@@ -1249,15 +1248,6 @@ function applyEffect(
   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
   effect: ReversalEffect
 ): void {
-  if (effect.plainBranchMembership) {
-    realizePlainBranchMember(
-      tree.$,
-      effect.owner,
-      effect.plainBranchMembership.after,
-      effect.after
-    );
-    return;
-  }
   const descriptor = descriptors.get(effect.owner);
   if (
     !descriptor &&
