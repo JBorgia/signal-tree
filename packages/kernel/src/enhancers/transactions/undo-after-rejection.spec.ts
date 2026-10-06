@@ -270,6 +270,26 @@ describe.each(Object.entries(orders))(
       }
     });
 
+    it('a later write over an EXTERNAL value written after T is not re-based', async () => {
+      const tree = make(enhancers);
+      try {
+        await seedRows(tree);
+        const proposal = tree.transaction(() => tree.$.x(1));
+        await flush();
+        tree.$.x(5); // not undoable: external to history
+        await flush();
+        undoable(() => tree.$.x(2));
+        await flush();
+        proposal.rollback();
+        await flush();
+        tree.undo();
+        await flush();
+        expect(tree.$.x()).toBe(5);
+      } finally {
+        tree.destroy();
+      }
+    });
+
     it('a chain of later writes: only the first is re-based', async () => {
       const tree = make(enhancers);
       try {
