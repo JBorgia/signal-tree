@@ -117,10 +117,11 @@ function createScalarLeaf<T>(
 } {
   const holder: { leaf?: Location<T> } = {};
 
-  const read = (): T => {
+  const read = (stored?: boolean): T => {
     // Absent when this leaf or a member above it is omitted (v16 8d). One
-    // empty slot until this tree's first omission (v16 8e).
-    if (liveness.absence?.isAbsent(holder.leaf)) {
+    // empty slot until this tree's first omission (v16 8e). `stored` reads
+    // storage regardless, for a write's recorded before value.
+    if (!stored && liveness.absence?.isAbsent(holder.leaf)) {
       return undefined as T;
     }
 

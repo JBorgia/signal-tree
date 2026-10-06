@@ -226,10 +226,16 @@ Writing such a location re-adds its path: after `a` is omitted,
 stay absent. An updater there receives `undefined`. Undo, redo, `jumpTo()` and
 `rollback()` of that write make the path absent again.
 
-Not yet for entity collections: a collection under an omitted member is absent
-from the tree's value, but its own methods (`all()`, `byId()`, `count()`,
-`addOne()` and the rest) still read and write its retained rows, and such a
-write does not re-add the path.
+An entity collection under an omitted member, or omitted itself, follows the
+same rules. It reads as an absent, empty collection: `all()` is `[]`,
+`byId()` is `undefined`, `count()` is `0`, and held row nodes read
+`undefined`. A write that adds rows (`addOne()`, `setAll()`, `upsertOne()`,
+`clear()` and the rest) re-adds the path carrying only the written rows; the
+retained rows never come back. A write that names a row (`updateOne()`,
+`removeOne()`, `changeId()` and the rest) throws "Entity with id ... not
+found", as on an empty collection, and changes nothing. Undo, redo,
+`jumpTo()` and `rollback()` of a re-adding write make the collection absent
+again.
 
 Undo, redo and `jumpTo()` treat a location under an omitted member like this:
 

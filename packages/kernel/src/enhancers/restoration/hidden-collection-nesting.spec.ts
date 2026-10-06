@@ -73,6 +73,25 @@ function make(
 }
 type Made = ReturnType<typeof make>;
 const ids = (collection: Made['rows']) => collection.ids();
+/**
+ * What a collection physically holds, whatever its presence. A hidden
+ * collection reads empty through its own methods since v16 8e, so what
+ * rollback compensated there is read from its transition source.
+ */
+const stored = (collection: Made['rows']) =>
+  (
+    collection as unknown as {
+      __prepareTransitionTarget: {
+        readSource(): {
+          subjects: readonly { key: string | number; value: unknown }[];
+        };
+      };
+    }
+  ).__prepareTransitionTarget.readSource().subjects;
+const storedIds = (collection: Made['rows']) =>
+  stored(collection).map(({ key }) => key);
+const storedRow = (collection: Made['rows'], key: string) =>
+  stored(collection).find((subject) => subject.key === key)?.value;
 
 /** The turn: a nested update, a reorder, and an add in a sibling collection. */
 const change = (t: Made) => {
@@ -211,11 +230,12 @@ describe('pending rollback under a branch two levels above its collections', () 
         await flush();
         pending.rollback();
         expect(t.tree.$()).toEqual({ count: 0 });
-        // Detached handles read the retained collections: the rejected
-        // update, reorder and add are gone from them.
-        expect(ids(t.rows)).toEqual(['a', 'b']);
-        expect(t.rows.byId('a')?.()).toEqual({ id: 'a', n: 0 });
-        expect(ids(t.other)).toEqual([]);
+        // The retained collections: the rejected update, reorder and add
+        // are gone from them. Their own methods read them absent (v16 8e).
+        expect(storedIds(t.rows)).toEqual(['a', 'b']);
+        expect(storedRow(t.rows, 'a')).toEqual({ id: 'a', n: 0 });
+        expect(storedIds(t.other)).toEqual([]);
+        expect(ids(t.rows)).toEqual([]);
       });
 });
 
@@ -244,7 +264,7 @@ describe('review follow-up (slice 8c)', () => {
         "Unsupported scoped undo effect at 'g.h.rows.a.n': its enclosing member 'g.h.rows' was omitted and cannot be re-added, because it is not a plain state location (an entity collection, for example). Nothing was changed; the history position is unmoved."
       );
       expect(t.tree.$()).toEqual({ count: 1 });
-      expect(t.rows.byId('a')?.()).toEqual({ id: 'a', n: 1 });
+      expect(storedRow(t.rows, 'a')).toEqual({ id: 'a', n: 1 });
       expect(t.tree.getCurrentIndex()).toBe(index);
     });
 

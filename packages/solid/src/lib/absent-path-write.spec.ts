@@ -45,12 +45,19 @@ type Cell = {
   update(updater: (current: unknown) => unknown): void;
 };
 type Handles = {
-  a: { (): unknown; b: { (): unknown; (value: unknown): void; keep: Cell }; side: Cell };
+  a: {
+    (): unknown;
+    b: { (): unknown; (value: unknown): void; keep: Cell };
+    side: Cell;
+  };
 };
 
 describe.each(ORDERS)('absent-path writes — Solid (%s)', (_, enhancers) => {
   const build = () => {
-    const initial: State = { a: { b: { value: 0, keep: 0 }, side: 0 }, count: 0 };
+    const initial: State = {
+      a: { b: { value: 0, keep: 0 }, side: 0 },
+      count: 0,
+    };
     const tree = signalTree(initial, { enhancers: enhancers() });
     const { a } = tree.$ as unknown as Handles;
     const view = createMemo(() => [
@@ -63,7 +70,12 @@ describe.each(ORDERS)('absent-path writes — Solid (%s)', (_, enhancers) => {
     return { tree, a, view, omit };
   };
   const absent = ['{"count":0}', undefined, undefined, undefined];
-  const readded = ['{"a":{"b":{"keep":9}},"count":0}', '{"keep":9}', 9, undefined];
+  const readded = [
+    '{"a":{"b":{"keep":9}},"count":0}',
+    '{"keep":9}',
+    9,
+    undefined,
+  ];
 
   it('held consumers read absent; a held leaf write re-adds only its path', () =>
     inRoot(async () => {
@@ -123,7 +135,12 @@ describe.each(ORDERS)('absent-path writes — Solid (%s)', (_, enhancers) => {
         await flush();
         undoable(() => a.side.update((current) => (current ?? 40) as number));
         await flush();
-        expect(view()).toEqual(['{"a":{"side":40},"count":0}', undefined, undefined, 40]);
+        expect(view()).toEqual([
+          '{"a":{"side":40},"count":0}',
+          undefined,
+          undefined,
+          40,
+        ]);
         tree.undo();
         await flush();
         expect(view()).toEqual(absent);
@@ -143,6 +160,26 @@ describe.each(ORDERS)('absent-path writes — Solid (%s)', (_, enhancers) => {
         tree.undo();
         await flush();
         expect(view()).toEqual(present);
+      } finally {
+        tree.destroy();
+      }
+    }));
+
+  it('undo of a turn that omits the branch and writes under it is exact', () =>
+    inRoot(async () => {
+      const { tree, a, view } = build();
+      try {
+        const before = view();
+        undoable(() => {
+          tree.$({ count: 0 } as never);
+          a.b.keep.set(9);
+        });
+        await flush();
+        expect(view()).toEqual(readded);
+        tree.undo();
+        await flush();
+        // History recorded what storage held, not the absent value (8e).
+        expect(view()).toEqual(before);
       } finally {
         tree.destroy();
       }
@@ -169,7 +206,10 @@ describe.each(ORDERS)('absent-path writes — Solid (%s)', (_, enhancers) => {
 describe('absent-path writes — Solid (no enhancers)', () => {
   it('a held leaf updater under an omitted member receives undefined', () =>
     inRoot(async () => {
-      const initial: State = { a: { b: { value: 0, keep: 0 }, side: 0 }, count: 0 };
+      const initial: State = {
+        a: { b: { value: 0, keep: 0 }, side: 0 },
+        count: 0,
+      };
       const tree = signalTree(initial);
       try {
         const { a } = tree.$ as unknown as Handles;

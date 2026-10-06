@@ -163,7 +163,12 @@ function createNativeScalarLeaf<T>(
       const dormant = observer
         ? liveness.absence?.isAbsent(leaf) === true
         : false;
-      const before = observer ? realized.peek() : undefined;
+      // History records what storage held, even while the leaf is absent.
+      const before = observer
+        ? dormant
+          ? kernel.readSlot<T>(slotIndex)
+          : realized.peek()
+        : undefined;
       // The authoritative commit primitive: no result object on the hot path.
       const changed = kernel.commitSlotValue(slotIndex, value);
       publishChanged(changed, { value });
@@ -178,12 +183,14 @@ function createNativeScalarLeaf<T>(
     },
     derive: (update) => {
       if (liveness.absence?.isAbsent(leaf)) {
+        const stored = kernel.readSlot<T>(slotIndex);
         const next = update(undefined as T);
         const result = kernel.commitSlot(slotIndex, next);
         publishResult(result);
         mutationSource.observer?.({
           intent: 'derive',
-          before: undefined as T,
+          // What storage held: the updater saw the leaf's value, undefined.
+          before: stored,
           after: kernel.readSlot<T>(slotIndex),
           // Membership changed even when the retained slot value did not.
           changed: true,

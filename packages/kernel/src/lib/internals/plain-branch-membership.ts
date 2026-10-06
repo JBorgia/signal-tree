@@ -7,7 +7,11 @@ import {
   getPositionRegistry,
   type PositionRegistry,
 } from './position-registry';
-import { republishMembers, setMemberPresence } from './member-membership';
+import {
+  republishMembers,
+  setMemberPresence,
+  storedReads,
+} from './member-membership';
 import { publishMembershipChange } from './snapshot-authority';
 import { getTreeScalarSlotRuntime } from './tree-scalar-slot-port';
 import { withWriteContext } from '../write-context';
@@ -60,8 +64,7 @@ function isCollectionMember(node: unknown): boolean {
     node as { __prepareTransitionTarget?: CollectionTransitionTargetBinding }
   ).__prepareTransitionTarget;
   return (
-    binding !== undefined &&
-    binding.owner === getOwnedPositionIds(node)?.[0]
+    binding !== undefined && binding.owner === getOwnedPositionIds(node)?.[0]
   );
 }
 
@@ -93,27 +96,33 @@ export function capturePlainBranchMembership(
       : Object.keys(supplied)
   );
   const before = new Map<string, MemberValue>();
-  for (const key of Object.getOwnPropertyNames(branch)) {
-    const descriptor = Object.getOwnPropertyDescriptor(branch, key);
-    if (!descriptor || !('value' in descriptor)) continue;
-    const present = descriptor.enumerable === true;
-    if (present === keys.has(key)) continue;
-    // Callable implementation properties are not retained state locations.
-    if (
-      !present &&
-      typeof descriptor.value !== 'function' &&
-      !isCollectionMember(descriptor.value)
-    )
-      continue;
-    before.set(
-      key,
-      present
-        ? {
-            present: true,
-            value: unwrapBranchForWriteCapture(descriptor.value),
-          }
-        : { present: false }
-    );
+  // Before-images are what storage held (`storedReads`).
+  storedReads.depth++;
+  try {
+    for (const key of Object.getOwnPropertyNames(branch)) {
+      const descriptor = Object.getOwnPropertyDescriptor(branch, key);
+      if (!descriptor || !('value' in descriptor)) continue;
+      const present = descriptor.enumerable === true;
+      if (present === keys.has(key)) continue;
+      // Callable implementation properties are not retained state locations.
+      if (
+        !present &&
+        typeof descriptor.value !== 'function' &&
+        !isCollectionMember(descriptor.value)
+      )
+        continue;
+      before.set(
+        key,
+        present
+          ? {
+              present: true,
+              value: unwrapBranchForWriteCapture(descriptor.value),
+            }
+          : { present: false }
+      );
+    }
+  } finally {
+    storedReads.depth--;
   }
   if (before.size === 0) return undefined;
 
@@ -382,8 +391,9 @@ function collectionRows(node: object): CollectionRows {
   return (
     binding
       ?.readSource()
-      .subjects.map(({ subject, key, value }) => [subject, key, value] as const) ??
-    []
+      .subjects.map(
+        ({ subject, key, value }) => [subject, key, value] as const
+      ) ?? []
   );
 }
 
@@ -396,7 +406,10 @@ function rememberOmittedRows(node: object): void {
  * itself, or every collection current within it (its subtree below present
  * members). A collection omitted inside it stays absent with it.
  */
-function collectionsWithin(member: unknown, visit: (node: object) => void): void {
+function collectionsWithin(
+  member: unknown,
+  visit: (node: object) => void
+): void {
   if (isCollectionMember(member)) {
     visit(member as object);
     return;

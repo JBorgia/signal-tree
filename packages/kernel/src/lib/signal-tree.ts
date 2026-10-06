@@ -43,6 +43,7 @@ import {
 import { resolveEnhancerOrder } from '../enhancers';
 import {
   hasDormantMembers,
+  endStructuralWrite,
   isAbsentMember,
   reactivatePathOnWrite,
   republishMembers,
@@ -1137,7 +1138,7 @@ function recursiveUpdate(
       republishMembers(targetObj, membershipChanged);
     }
   } finally {
-    structuralWrites.depth--;
+    endStructuralWrite();
   }
 }
 

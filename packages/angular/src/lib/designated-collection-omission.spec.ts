@@ -89,7 +89,7 @@ describe.each(ORDERS)('designated collection omission — Angular (%s)', (_, enh
     }
   });
 
-  it('a collection changed after its omission is refused, nothing changes', async () => {
+  it('a row-naming write to the omitted collection refuses; undo still restores it', async () => {
     const { tree, rows, g } = build();
     try {
       const view = computed(() => JSON.stringify(tree.$()));
@@ -98,11 +98,14 @@ describe.each(ORDERS)('designated collection omission — Angular (%s)', (_, enh
       await flush();
       undoable(() => g({ k: 0 }));
       await flush();
-      rows.updateOne('a', { n: 7 });
-      await flush();
-      expect(() => tree.undo()).toThrow(/'g\.rows'.*changed after that/);
-      await flush();
+      // It reads absent and empty (v16 8e): no row to update.
+      expect(() => rows.updateOne('a', { n: 7 })).toThrow(
+        /^Entity with id a not found$/
+      );
       expect(view()).toBe(WITHOUT);
+      tree.undo();
+      await flush();
+      expect(view()).toBe(WITH);
     } finally {
       tree.destroy();
     }

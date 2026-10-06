@@ -8,6 +8,10 @@ import {
   refreshOmittedCollection,
   changedOmittedCollection,
 } from '../../lib/internals/plain-branch-membership';
+import {
+  endStructuralWrite,
+  structuralWrites,
+} from '../../lib/internals/member-membership';
 import type { PlainBranchMemberPresence } from '../../lib/internals/plain-branch-membership';
 import { applicationFailureCause } from '../../lib/internals/causal-runtime/post-application-failure';
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
@@ -2482,54 +2486,61 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // id is safe as a bare number here because a tree announces under exactly
     // one owner (measured in diag-journal-1-1-correlation.spec.ts) and a journal
     // observes one tree.
-    const result = withWriteContext(
-      {
-        origin: 'transaction-rollback',
-        transactionId: owningTransactionId,
-        // NOT `transactionOwner`. Stamping it here makes
-        // `activeTransactionContext()` report an open scope during the
-        // compensation, which reopens the callback scope a rollback must leave
-        // closed — `active-transaction-context.spec.ts` pins that. The join
-        // restoration needs is carried by `origin` plus the corrected
-        // `transactionId` instead.
-        // OWNER-REPLAY-1, same shape as restoration's: stamped once on the wrap
-        // that already surrounds the compensation, so every downstream meta
-        // that spreads `getActiveWriteContext()` carries the namespace.
-        ownerId: positionRegistry?.id,
-      },
-      () => {
-        if (
-          orderDeltas.length > 0 ||
-          requiresDeclarativeStructuralTarget(
-            effects.map(toRollbackEffect),
-            (owner) => {
-              let binding: CollectionTransitionTargetBinding | undefined;
-              visitTree(tree.$, (node) => {
-                const candidate = (
-                  node as {
-                    __prepareTransitionTarget?: CollectionTransitionTargetBinding;
-                  }
-                ).__prepareTransitionTarget;
-                if (candidate?.owner === owner) binding = candidate;
-                return undefined;
-              });
-              return binding?.readSource();
-            }
-          )
-        ) {
-          rollbackPendingTarget(effects, orderDeltas);
-          return { ok: true as const };
+    // Physical truth, as a reversal (`structuralWrites`, v16 8e).
+    structuralWrites.depth++;
+    let result: ReturnType<typeof rollbackPendingTurnAt> | { ok: true };
+    try {
+      result = withWriteContext(
+        {
+          origin: 'transaction-rollback',
+          transactionId: owningTransactionId,
+          // NOT `transactionOwner`. Stamping it here makes
+          // `activeTransactionContext()` report an open scope during the
+          // compensation, which reopens the callback scope a rollback must leave
+          // closed — `active-transaction-context.spec.ts` pins that. The join
+          // restoration needs is carried by `origin` plus the corrected
+          // `transactionId` instead.
+          // OWNER-REPLAY-1, same shape as restoration's: stamped once on the wrap
+          // that already surrounds the compensation, so every downstream meta
+          // that spreads `getActiveWriteContext()` carries the namespace.
+          ownerId: positionRegistry?.id,
+        },
+        () => {
+          if (
+            orderDeltas.length > 0 ||
+            requiresDeclarativeStructuralTarget(
+              effects.map(toRollbackEffect),
+              (owner) => {
+                let binding: CollectionTransitionTargetBinding | undefined;
+                visitTree(tree.$, (node) => {
+                  const candidate = (
+                    node as {
+                      __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+                    }
+                  ).__prepareTransitionTarget;
+                  if (candidate?.owner === owner) binding = candidate;
+                  return undefined;
+                });
+                return binding?.readSource();
+              }
+            )
+          ) {
+            rollbackPendingTarget(effects, orderDeltas);
+            return { ok: true as const };
+          }
+          return rollbackPendingTurnAt({
+            authority: authorityPosition,
+            turnId: transactionId,
+            store,
+            topology: positionRegistry,
+            port: realizationPort,
+            realizationContext,
+          });
         }
-        return rollbackPendingTurnAt({
-          authority: authorityPosition,
-          turnId: transactionId,
-          store,
-          topology: positionRegistry,
-          port: realizationPort,
-          realizationContext,
-        });
-      }
-    );
+      );
+    } finally {
+      endStructuralWrite();
+    }
     if (!result.ok) {
       throw createRollbackError({
         kind: 'effect-validation-failed',

@@ -55,6 +55,13 @@ import {
 } from './internals/position-registry';
 import { markOwnerInvalidated } from './internals/owner-invalidation-port';
 import {
+  isAbsentMember,
+  MEMBERSHIP_CHANGED,
+  reactivatePathOnWrite,
+  storedReads,
+  structuralWrites,
+} from './internals/member-membership';
+import {
   MUTATION_CAPTURE_RUNTIME,
   type CommittedEntityMutation,
   type MutationCaptureRuntime,
@@ -434,6 +441,29 @@ export function createEntitySignal<
     return getProjectedEntries().map(([, entity]) => entity);
   }
 
+  /**
+   * ⚠️ PUBLIC READS ARE ABSENT WHILE THE COLLECTION IS (v16 8e). A collection
+   * omitted itself or under an omitted member is an absent, empty collection
+   * to every public read and to every write that names a row: "DORMANT
+   * STORAGE MUST NOT SUPPLY THE REACTIVATED VALUE"
+   * (`whole-value-membership.spec.ts` 18). Its retained rows stay physical
+   * truth for restoration and transactions, which keep the `getProjected*`
+   * reads. One symbol lookup on a collection that was never under an
+   * omission.
+   */
+  const absent = (): boolean => isAbsentMember(api);
+  // Row reads and row writes use physical truth inside a structural write (a
+  // whole value, a reversal or a rollback being applied) and history capture:
+  // they reconcile presence themselves. Projections never do, so nothing they
+  // cache can hold retained rows.
+  const rowAbsent = (): boolean =>
+    !structuralWrites.depth && !storedReads.depth && absent();
+  const presentEntity = (id: K): E | undefined =>
+    rowAbsent() ? undefined : getProjectedEntity(id);
+  const presentEntries = (): Array<readonly [K, E]> =>
+    absent() ? [] : getProjectedEntries();
+  const presentEntities = (): E[] => (absent() ? [] : getProjectedEntities());
+
   function acquireEntityHandleForTesting(
     id: K
   ): AcquiredSubjectHandle | undefined {
@@ -652,7 +682,7 @@ export function createEntitySignal<
 
   /** Reactive signals for queries — all derived, none eagerly maintained. */
   const allSignal: ReadableCell<E[]> = createVersionedProjection(() => {
-    const entities = getProjectedEntities();
+    const entities = presentEntities();
     // `sortComparer` gives `all`/`ids` a stable sorted order (parity with
     // @ngrx/entity); `map` keeps insertion order.
     if (config.sortComparer) entities.sort(config.sortComparer);
@@ -660,13 +690,14 @@ export function createEntitySignal<
   });
   const countSignal: ReadableCell<number> = createVersionedProjection(() => {
     // O(1) — this used to be `entities.length` on a freshly built array.
-    return structuralStore.activeKeyCount();
+    return absent() ? 0 : structuralStore.activeKeyCount();
   });
   // Identity-stable across value-only writes: the key snapshot is shared until
   // the list or a key changes, so the copy (and every consumer) is reused.
   let idsSource: readonly K[] | undefined;
   let idsValue: K[] = [];
   const idsSignal: ReadableCell<K[]> = createVersionedProjection(() => {
+    if (absent()) return [];
     if (config.sortComparer) return allSignal().map((e) => selectId(e));
     const keys = structuralStore.activeKeysSnapshot();
     if (keys !== idsSource) {
@@ -679,7 +710,7 @@ export function createEntitySignal<
     () => {
       // Still a copy: callers may hold the result across mutations and must not
       // see it change underneath them. But it is paid on read, not on write.
-      return new Map(getProjectedEntries());
+      return new Map(presentEntries());
     }
   );
 
@@ -1185,12 +1216,12 @@ export function createEntitySignal<
    */
   function readSubjectEntity(subjectId: number): E | undefined {
     getSubjectEpoch(subjectId)();
-    return valueStore.backingForSubject(subjectId);
+    return rowAbsent() ? undefined : valueStore.backingForSubject(subjectId);
   }
 
   function readEntityByKey(id: K): E | undefined {
     const subjectId = resolveSubjectId(id);
-    if (subjectId === undefined) return getProjectedEntity(id);
+    if (subjectId === undefined) return presentEntity(id);
     return readSubjectEntity(subjectId);
   }
 
@@ -1864,6 +1895,11 @@ export function createEntitySignal<
   function updateSignals(): void {
     const pending = [...pendingSubjectEpochs];
     pendingSubjectEpochs.clear();
+    // An absent collection reads empty before and after: nothing a consumer
+    // reads changed. Its membership hook wakes them when it comes back, so a
+    // reversal writing its hidden rows re-runs nobody while those rows are
+    // read physically (v16 8e).
+    if (absent()) return;
     locations.runInvalidationGroup(() => {
       for (const epoch of pending) {
         advanceEpochHandle(epoch);
@@ -1947,7 +1983,7 @@ export function createEntitySignal<
       if (key === undefined) {
         throw new Error(`Entity with subject ${String(subjectId)} not found`);
       }
-      const current = getProjectedEntity(key);
+      const current = presentEntity(key);
       if (current === undefined) {
         throw new Error(`Entity with id ${String(key)} not found`);
       }
@@ -2346,7 +2382,7 @@ export function createEntitySignal<
     // ==================
 
     byId(id: K): EntityNode<E> | undefined {
-      if (structuralStore.hasActiveKey(id)) {
+      if (!rowAbsent() && structuralStore.hasActiveKey(id)) {
         // Present: subscribe to the PER-ENTITY signal only, so callers re-run
         // when THIS entity changes but not when others do (body-granular).
         // Materialized lazily here — bounded by the number of live entities.
@@ -2434,7 +2470,9 @@ export function createEntitySignal<
     },
 
     has(id: K): ReadableCell<boolean> {
-      return createVersionedProjection(() => structuralStore.hasActiveKey(id));
+      return createVersionedProjection(
+        () => !absent() && structuralStore.hasActiveKey(id)
+      );
     },
 
     // Bare canonical name (the `.isEmpty` alias was removed in v11).
@@ -2482,7 +2520,7 @@ export function createEntitySignal<
       const s = createVersionedProjection(() => {
         if (config.sortComparer) return allSignal().filter(predicate);
         const out: E[] = [];
-        for (const entity of getProjectedEntities()) {
+        for (const entity of presentEntities()) {
           if (predicate(entity)) out.push(entity);
         }
         return out;
@@ -2514,7 +2552,7 @@ export function createEntitySignal<
       // the only correct thing to scan. See the note on `where` above.
       const s = createVersionedProjection(() => {
         if (config.sortComparer) return allSignal().find(predicate);
-        for (const entity of getProjectedEntities()) {
+        for (const entity of presentEntities()) {
           if (predicate(entity)) return entity;
         }
         return undefined;
@@ -2589,6 +2627,9 @@ export function createEntitySignal<
      * still allowing the freed id to be reused by a different subject.
      */
     changeId(from: K, to: K): void {
+      // An absent collection has no row to rekey (v16 8e).
+      if (rowAbsent())
+        throw new Error(`Entity with id ${String(from)} not found`);
       const planned = planRekey(from, to);
       planned.commit();
       planned.publish();
@@ -2756,7 +2797,7 @@ export function createEntitySignal<
 
     updateOne(id: K, changes: Partial<E>): void {
       const callableIntent = consumeCallableWriteIntent();
-      const entity = getProjectedEntity(id);
+      const entity = presentEntity(id);
       if (!entity) {
         throw new Error(`Entity with id ${String(id)} not found`);
       }
@@ -2828,7 +2869,7 @@ export function createEntitySignal<
      */
     replaceOne(id: K, entity: E): void {
       const callableIntent = consumeCallableWriteIntent();
-      const prev = getProjectedEntity(id);
+      const prev = presentEntity(id);
       if (!prev) {
         throw new Error(`Entity with id ${String(id)} not found`);
       }
@@ -2911,7 +2952,7 @@ export function createEntitySignal<
       }> = [];
 
       for (const id of ids) {
-        const entity = getProjectedEntity(id);
+        const entity = presentEntity(id);
         if (!entity) {
           throw new Error(`Entity with id ${String(id)} not found`);
         }
@@ -3005,7 +3046,7 @@ export function createEntitySignal<
       changes: Partial<E>
     ): number {
       const idsToUpdate: K[] = [];
-      for (const [id, entity] of getProjectedEntries()) {
+      for (const [id, entity] of presentEntries()) {
         if (predicate(entity)) {
           idsToUpdate.push(id);
         }
@@ -3021,7 +3062,7 @@ export function createEntitySignal<
     // ==================
 
     removeOne(id: K): void {
-      const entity = getProjectedEntity(id);
+      const entity = presentEntity(id);
       if (!entity) {
         throw new Error(`Entity with id ${String(id)} not found`);
       }
@@ -3103,7 +3144,7 @@ export function createEntitySignal<
         afterSubject?: number;
       }> = [];
       for (const id of ids) {
-        const entity = getProjectedEntity(id);
+        const entity = presentEntity(id);
         if (!entity) {
           throw new Error(`Entity with id ${String(id)} not found`);
         }
@@ -3205,7 +3246,7 @@ export function createEntitySignal<
 
     removeWhere(predicate: (entity: E) => boolean): number {
       const idsToRemove: K[] = [];
-      for (const [id, entity] of getProjectedEntries()) {
+      for (const [id, entity] of presentEntries()) {
         if (predicate(entity)) {
           idsToRemove.push(id);
         }
@@ -3808,6 +3849,45 @@ export function createEntitySignal<
     configurable: true,
   });
   defineOwnedOwnerPath(api, basePath);
+
+  // ⚠️ A ROW-ADDING WRITE TO AN ABSENT COLLECTION RE-ADDS ITS PATH, CARRYING
+  // ONLY THE WRITTEN ROWS (v16 8e). The collection reads empty while it is
+  // absent, so the write applies to an empty collection: its retained rows
+  // are removed first, through the ordinary `clear()` (which records them),
+  // then the write runs, then every omitted member on its path comes back
+  // with only that path (`reactivatePathOnWrite`). Retained rows never
+  // resurface, and undo, redo, jumpTo and rollback reverse all three. Writes
+  // that name an existing row refuse instead, as on an empty collection.
+  const clearRetained = api.clear;
+  for (const name of [
+    'addOne',
+    'prependOne',
+    'addMany',
+    'prependMany',
+    'upsertOne',
+    'upsertMany',
+    'setAll',
+    'clear',
+  ] as const) {
+    const write = api[name] as (...args: unknown[]) => unknown;
+    (api as Record<string, unknown>)[name] = (...args: unknown[]) => {
+      if (!rowAbsent()) return write(...args);
+      clearRetained();
+      const result = write(...args);
+      reactivatePathOnWrite(api);
+      return result;
+    };
+  }
+  // Its presence changed (it, or a member above it, was omitted or re-added):
+  // every query and every held row re-reads (`republishMembers`).
+  Object.defineProperty(api, MEMBERSHIP_CHANGED, {
+    value: () =>
+      locations.runInvalidationGroup(() => {
+        for (const epoch of subjectEpochs.values()) advanceEpochHandle(epoch);
+        deriveLocation(version, (value) => value + 1);
+        markOwnerInvalidated(ownerId);
+      }),
+  });
   // Membership observation attaches its tap here on first use.
   defineEntityMembershipSource(api, (tap) => {
     membershipTap = tap;
@@ -3824,7 +3904,8 @@ export function createEntitySignal<
   // `{ id: 1 }` while the address is 77, so `selectId(row)` cannot recover it.
   defineEntityProjectionSeed(api as object, () => {
     const seed: Array<{ subjectId: number; key: K; row: E }> = [];
-    for (const key of structuralStore.activeKeysSnapshot()) {
+    // An absent collection seeds an empty projection, as `all()` reads.
+    for (const key of absent() ? [] : structuralStore.activeKeysSnapshot()) {
       const subjectId = structuralStore.subjectIdForKey(key);
       if (subjectId === undefined) continue;
       const row = getProjectedEntity(key);
