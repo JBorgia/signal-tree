@@ -34,6 +34,7 @@ type Rows = {
   byId(id: string): (() => Row | undefined) | undefined;
   addOne(row: Row): string;
   removeOne(id: string): void;
+  changeId(from: string, to: string): void;
   tap(handlers: {
     onAdd?: (row: Row, id: string) => void;
     onRemove?: (id: string, row: Row) => void;
@@ -95,7 +96,8 @@ const watch = (rows: Rows) => {
     const inAll = all.some((row) => row.id === id);
     const reads = {
       count: rows.count() === all.length,
-      ids: rows.ids().length === all.length,
+      ids:
+        JSON.stringify(rows.ids()) === JSON.stringify(all.map((row) => row.id)),
       empty: rows.empty() === (all.length === 0),
       has: rows.has(id)() === inAll,
       byId: (rows.byId(id) !== undefined) === inAll,
@@ -241,5 +243,43 @@ describe('what a tap reads stays reactive (v16 8f)', () => {
     rows.removeOne('a');
     expect(tree.$()).toEqual({ a: { rows: { all: [B, Z] }, s: 0 }, count: 0 });
     expect(rows.all()).toEqual([B, Z]);
+  });
+});
+
+describe('ids and held cells inside a tap (v16 8f review)', () => {
+  it('ids() reads the keys, after changeId too', () => {
+    const tree = build();
+    const rows = tree.$.a.rows;
+    rows.changeId('a', 'a2');
+    rows.ids();
+    let seen: string[] = [];
+    rows.tap({
+      onAdd: () => {
+        seen = rows.ids();
+      },
+    });
+    tree.transact(() => rows.addOne({ id: 'q', n: 3 }));
+    expect(seen).toEqual(['a2', 'b', 'q']);
+    expect(rows.ids()).toEqual(['a2', 'b', 'q']);
+  });
+
+  it('a cell held from before the tap keeps its cache until the group ends', async () => {
+    // Documented: a tap reads fresh through the collection (`rows.all()`), not
+    // through a cell it obtained earlier (`const all = rows.all`). Making held
+    // cells fresh would need the location runtime to settle groups early.
+    const tree = build();
+    const rows = tree.$.a.rows;
+    const held = rows.all;
+    held();
+    let seen: unknown[] = [];
+    rows.tap({
+      onRemove: () => {
+        seen = [held().map((row) => row.id), rows.all().map((row) => row.id)];
+      },
+    });
+    tree.transact(() => rows.removeOne('a'));
+    await flush();
+    expect(seen).toEqual([['a', 'b'], ['b']]);
+    expect(held()).toEqual([B]);
   });
 });

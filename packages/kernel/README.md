@@ -256,8 +256,10 @@ Some details of that rule:
 - **Taps read the collection as it is.** A tap reads rows absent-aware, even
   while undo, redo, `jumpTo()` or `rollback()` writes an absent collection's
   retained rows. Its projections (`all()`, `count()`, `where()` and the rest)
-  are read fresh, so inside a transaction or a reversal they include the
-  change the tap reports.
+  are read fresh when the tap reads them through the collection, so inside a
+  transaction or a reversal they include the change the tap reports. A
+  projection cell the tap obtained before it ran (`const all = rows.all`)
+  keeps its cached value until the transaction or reversal ends.
 - **Writes from inside a whole value or a reversal.** A tap or sync effect
   that runs while a whole value or a reversal is being applied may write any
   tree, including the same one. That write is an ordinary write: an absent

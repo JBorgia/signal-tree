@@ -723,16 +723,20 @@ export function createEntitySignal<
   // the list or a key changes, so the copy (and every consumer) is reused.
   let idsSource: readonly K[] | undefined;
   let idsValue: K[] = [];
-  const idsSignal: ReadableCell<K[]> = createVersionedProjection(() => {
+  // `all` is the cached projection or, in a tap, the fresh one (v16 8f).
+  const computeIds = (all: () => E[]): K[] => {
     if (absent()) return [];
-    if (config.sortComparer) return allSignal().map((e) => selectId(e));
+    if (config.sortComparer) return all().map((e) => selectId(e));
     const keys = structuralStore.activeKeysSnapshot();
     if (keys !== idsSource) {
       idsSource = keys;
       idsValue = [...keys];
     }
     return idsValue;
-  });
+  };
+  const idsSignal: ReadableCell<K[]> = createVersionedProjection(() =>
+    computeIds(allSignal)
+  );
   // Still a copy: callers may hold the result across mutations and must not
   // see it change underneath them. But it is paid on read, not on write.
   const computeMap = (): ReadonlyMap<K, E> => new Map(presentEntries());
@@ -2485,9 +2489,7 @@ export function createEntitySignal<
     },
 
     get ids(): ReadableCell<K[]> {
-      return inTap(idsSignal, () =>
-        computeAll().map((entity) => selectId(entity))
-      );
+      return inTap(idsSignal, () => computeIds(computeAll));
     },
 
     /**

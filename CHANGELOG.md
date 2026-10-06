@@ -116,9 +116,10 @@ for retired entities.
   a write to the same tree went to retained storage and stayed invisible.
 - **Taps read the collection as it is.** Inside a transaction, an undo, a
   redo, a jump or a rollback, a tap's `all()`, `count()`, `where()` and the
-  other projections include the change the tap reports; before, they read
-  the collection as it was before the group. Its row reads are absent-aware
-  during a reversal too.
+  other projections, read through the collection, include the change the tap
+  reports; before, they read the collection as it was before the group. A
+  projection cell obtained before the tap still reads its cached value until
+  the group ends. Its row reads are absent-aware during a reversal too.
 - **A duplicated id in one batch call applies sequentially.** `addMany` and
   `prependMany` in strict mode throw before any interceptor runs or anything
   is written; `skip` keeps the first copy; `overwrite` keeps the last copy in
