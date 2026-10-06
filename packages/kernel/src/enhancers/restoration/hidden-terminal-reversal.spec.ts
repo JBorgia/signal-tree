@@ -651,4 +651,93 @@ describe('review follow-up: retained state, pending work and entity collections'
       });
     });
   }
+
+  for (const [order, enhancers] of Object.entries(historyOrders)) {
+    type Row = { id: string; n: number };
+    for (const change of ['reorder', 'remove', 'slot and reorder'] as const) {
+      const run = async (omission: 'ordinary' | 'external') => {
+        const tree = signalTree(
+          { g: { rows: entityMap<Row, string>(), k: 0 }, count: 0 },
+          { enhancers: enhancers() }
+        );
+        trees.push(tree);
+        const rows = tree.$.g.rows;
+        rows.setAll([
+          { id: 'a', n: 0 },
+          { id: 'b', n: 0 },
+        ]);
+        await flush();
+        undoable(() => {
+          if (change === 'remove') rows.removeOne('a');
+          else
+            rows.setAll([
+              { id: 'b', n: 0 },
+              { id: 'a', n: 0 },
+            ]);
+          if (change === 'slot and reorder') tree.$.g.k(1);
+          tree.$.count(1);
+        });
+        await flush();
+        const omit = () => tree.$({ count: 1 } as never);
+        if (omission === 'external') external(omit);
+        else omit();
+        await flush();
+        return { tree, rows };
+      };
+      it(`declarative path: an ordinary omission is reversed through the collection (${change}, ${order})`, async () => {
+        const { tree, rows } = await run('ordinary');
+        tree.undo();
+        expect(tree.$()).toEqual({
+          g: {
+            rows: {
+              all: [
+                { id: 'a', n: 0 },
+                { id: 'b', n: 0 },
+              ],
+            },
+            k: 0,
+          },
+          count: 0,
+        });
+        tree.redo();
+        expect(rows.ids()).toEqual(change === 'remove' ? ['b'] : ['b', 'a']);
+        expect(tree.$.count()).toBe(1);
+      });
+      it(`declarative path: an external omission refuses, nothing written (${change}, ${order})`, async () => {
+        const { tree, rows } = await run('external');
+        const before = rows.ids();
+        const index = tree.getCurrentIndex();
+        expect(() => tree.undo()).toThrow(/ST1034.*'g'/);
+        expect(tree.$()).toEqual({ count: 1 });
+        expect(rows.ids()).toEqual(before);
+        expect(tree.getCurrentIndex()).toBe(index);
+      });
+    }
+  }
+
+  for (const [order, enhancers] of Object.entries(rollbackOrders)) {
+    it(`a later pending omission of the branch keeps an earlier rollback pending, as a later pending write does (${order})`, async () => {
+      type State = { a?: { value: number; keep: number }; count: number };
+      const initial: State = { a: { value: 0, keep: 0 }, count: 0 };
+      const tree = signalTree(initial, { enhancers: enhancers() });
+      trees.push(tree);
+      const a = tree.$.a as unknown as { value(v?: number): number };
+      const earlier = (
+        tree as unknown as { transact(fn: () => void): { rollback(): void } }
+      ).transact(() => a.value(1));
+      await flush();
+      const later = (
+        tree as unknown as { transact(fn: () => void): { rollback(): void } }
+      ).transact(() => tree.$({ count: 0 } as never));
+      await flush();
+      // The later omission's before-image holds the earlier value; reversing
+      // the earlier contribution first would let the later rollback bring it
+      // back. Refused, with the earlier transaction still pending.
+      expect(() => earlier.rollback()).toThrow(/could not rollback/);
+      later.rollback();
+      expect(tree.$()).toEqual({ a: { value: 1, keep: 0 }, count: 0 });
+      earlier.rollback();
+      expect(tree.$()).toEqual({ a: { value: 0, keep: 0 }, count: 0 });
+    });
+  }
 });
