@@ -224,8 +224,9 @@ function replay(
       if (placement.kind === 'front') link(input.subject, undefined, head);
       else if (placement.kind === 'after')
         link(input.subject, placement.subject, next.get(placement.subject));
-      else
+      else if (placement.kind === 'before')
         link(input.subject, previous.get(placement.subject), placement.subject);
+      else link(input.subject, tail, undefined);
     }
   );
   const order: number[] = [];

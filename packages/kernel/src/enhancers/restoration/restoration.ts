@@ -71,10 +71,12 @@ import type {
 import {
   deriveDeclarativeTransitionTarget,
   prepareDeclarativeTransitionInstallation,
+  orderRefusalOf,
   requiresDeclarativeStructuralTarget,
   withoutDeltaSubjects,
   type CollectionTransitionSource,
   type CollectionTransitionTargetBinding,
+  type DeclarativeTransitionTarget,
   type FrontierStep,
   type HeldRow,
   type PlainBranchMemberTransitionTarget,
@@ -1687,6 +1689,54 @@ class RestorationManager<T> {
   }
 
   /**
+   * The latest change outside undo history (a historical gap) to `owner`'s
+   * rows or order, in words, for a refusal: "added 'S'", "removed 'a'",
+   * "renamed 'b' to 'r0'", "reordered".
+   */
+  describeStandingChange(owner: number): string | undefined {
+    for (let at = this.historicalEvents.length - 1; at >= 0; at -= 1) {
+      const event = this.historicalEvents[at];
+      if (event.boundaryTurnId !== undefined) continue;
+      const quote = (keys: Array<string | number>) =>
+        keys
+          .slice(0, 3)
+          .map((key) => `'${String(key)}'`)
+          .join(', ') + (keys.length > 3 ? ', …' : '');
+      const added: Array<string | number> = [];
+      const removed: Array<string | number> = [];
+      const renamed: string[] = [];
+      for (const effect of event.effects) {
+        if (effect.position !== owner) continue;
+        if (effect.kind === 'add') added.push(effect.key);
+        else if (effect.kind === 'remove') removed.push(effect.key);
+        else if (effect.kind === 'rekey') {
+          renamed.push(
+            `'${String(effect.beforeKey)}' to '${String(effect.afterKey)}'`
+          );
+        }
+      }
+      const reordered = event.orderDeltas.some(
+        (delta) => delta.owner === owner
+      );
+      const touched =
+        added.length + removed.length + renamed.length > 0 ||
+        reordered ||
+        (event.frontiers ?? []).some((frontier) => frontier.owner === owner);
+      if (!touched) continue;
+      const parts = [
+        ...(added.length ? [`added ${quote(added)}`] : []),
+        ...(removed.length ? [`removed ${quote(removed)}`] : []),
+        ...(renamed.length
+          ? [`renamed ${renamed.slice(0, 3).join(', ')}`]
+          : []),
+        ...(reordered ? ['reordered'] : []),
+      ];
+      return parts.length ? parts.join('; ') : 'changed its order';
+    }
+    return undefined;
+  }
+
+  /**
    * Rows a rejection restored that records made before it never knew, by
    * collection: held out of the order while those records reverse (undo,
    * redo, jumpTo, the history walk), and put back by their attachments, the
@@ -2986,6 +3036,9 @@ class RestorationManager<T> {
         orderEndpoint: direction === 'undo' ? 'before' : 'after',
         frontierSteps,
         held: this.heldFor({ turnId: turn.id }),
+        // A history read never throws: an order that cannot be proven here
+        // (a standing change took an anchor) is approximate, not a refusal.
+        lenient: true,
       });
       for (const [owner, collection] of target.collections) {
         collections.set(owner, collection);
@@ -3081,6 +3134,7 @@ class RestorationManager<T> {
         orderEndpoint: 'before',
         frontierSteps,
         held: this.heldFor({ ordinal: event.ordinal }),
+        lenient: true,
       });
       for (const [owner, collection] of target.collections) {
         collections.set(owner, collection);
@@ -3157,21 +3211,20 @@ class RestorationManager<T> {
       return false;
     }
 
-    this.restoreVisibleStateToConfirmed();
-
+    // One transition from what is VISIBLE (a view's position, else the
+    // confirmed one) to the target. It returned to the confirmed state first,
+    // as a separate transition, so a refused jump left the view there: a
+    // refusal must change nothing (the view, its index and history stay).
+    const visible = (turn: CanonicalTurn<T>) =>
+      this.isTemporalViewActive
+        ? turn.historyIndex <= this.currentIndex
+        : this.getTurnStatus(turn.id) === 'applied';
     const turnIdsToUndo = this.history
-      .filter(
-        (turn) =>
-          turn.historyIndex > index && this.getTurnStatus(turn.id) === 'applied'
-      )
+      .filter((turn) => turn.historyIndex > index && visible(turn))
       .sort((left, right) => right.historyIndex - left.historyIndex)
       .map(({ id }) => id);
     const turnIdsToRedo = this.history
-      .filter(
-        (turn) =>
-          turn.historyIndex <= index &&
-          this.getTurnStatus(turn.id) === 'unapplied'
-      )
+      .filter((turn) => turn.historyIndex <= index && !visible(turn))
       .sort((left, right) => left.historyIndex - right.historyIndex)
       .map(({ id }) => id);
 
@@ -3843,6 +3896,38 @@ export function restoration(
       realizationPort
     );
 
+    /**
+     * An order delta that refused (its collection's order or token is not
+     * the one it recorded, or it was never recorded) as a typed ST1034
+     * restoration refusal naming the collection and what stands on it. The
+     * refusal comes from deriving the target, before anything is installed:
+     * state, history and the history position are unchanged.
+     */
+    const legibleOrderRefusal = (error: unknown): Error | undefined => {
+      const refused = orderRefusalOf(error);
+      if (!refused) return undefined;
+      const path =
+        positionRegistry?.collectionPathFor(refused.owner) ??
+        String(refused.owner);
+      if (refused.kind === 'unrecorded') {
+        return restorationRefusal(
+          `ST1034: restoration refused — the order change to '${path}' ` +
+            'being reversed was not recorded, so it cannot be reversed. ' +
+            'Nothing was changed; the history position is unmoved.'
+        );
+      }
+      const standing = restorationManager.describeStandingChange(refused.owner);
+      return restorationRefusal(
+        `ST1034: restoration refused — the order of '${path}' changed after ` +
+          `the order change being reversed, and ${
+            standing
+              ? `a later change outside undo history stands on it (${standing})`
+              : 'that change stands outside undo history'
+          }. Undo the later change first if it is undoable. Nothing was ` +
+          'changed; the history position is unmoved.'
+      );
+    };
+
     const applyTurnEffectsThroughRealizationPort = (
       applications: DirectedTurnApplication[]
     ): void => {
@@ -4045,16 +4130,21 @@ export function restoration(
             ? readThroughInspection(binding)
             : binding.readSource();
         });
-        const target = sequential
-          ? deriveSequentially(sources)
-          : deriveDeclarativeTransitionTarget({
-              collections: sources,
-              effects: reversalEffects,
-              orderDeltas,
-              orderEndpoints,
-              frontierSteps,
-              held: applications[0]?.held,
-            });
+        let target: DeclarativeTransitionTarget;
+        try {
+          target = sequential
+            ? deriveSequentially(sources)
+            : deriveDeclarativeTransitionTarget({
+                collections: sources,
+                effects: reversalEffects,
+                orderDeltas,
+                orderEndpoints,
+                frontierSteps,
+                held: applications[0]?.held,
+              });
+        } catch (error) {
+          throw legibleOrderRefusal(error) ?? error;
+        }
         const scalarBinding: ScalarTransitionTargetBinding | undefined =
           scalarSlotRuntime
             ? {

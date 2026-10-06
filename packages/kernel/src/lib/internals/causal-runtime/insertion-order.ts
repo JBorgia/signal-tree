@@ -46,7 +46,9 @@ export type InsertionAnchors = {
 export type InsertionPlacement =
   | { readonly kind: 'front' }
   | { readonly kind: 'after'; readonly subject: number }
-  | { readonly kind: 'before'; readonly subject: number };
+  | { readonly kind: 'before'; readonly subject: number }
+  /** `lenient` only: a row with no live anchor goes last. */
+  | { readonly kind: 'end' };
 
 export type InsertionInput<T> = {
   readonly item: T;
@@ -68,7 +70,13 @@ export function unresolvableAnchor(): Error {
 export function orderInsertions<T>(
   inputs: readonly InsertionInput<T>[],
   isPresent: (subject: number) => boolean,
-  place: (input: InsertionInput<T>, placement: InsertionPlacement) => void
+  place: (input: InsertionInput<T>, placement: InsertionPlacement) => void,
+  /**
+   * Never refuse: a row with no live anchor goes last, and rows in an anchor
+   * cycle go in input order. Only for reads that must not throw (the history
+   * walk); a reversal refuses instead.
+   */
+  lenient = false
 ): void {
   const placed = new Set<number>();
   const present = (subject: number) =>
@@ -85,6 +93,8 @@ export function orderInsertions<T>(
       placement = { kind: 'after', subject: beforeSubject };
     } else if (afterSubject !== undefined && present(afterSubject)) {
       placement = { kind: 'before', subject: afterSubject };
+    } else if (lenient) {
+      placement = { kind: 'end' };
     } else {
       throw unresolvableAnchor();
     }
@@ -98,7 +108,7 @@ export function orderInsertions<T>(
     .sort((left, right) => left.subject - right.subject);
   const restores = inputs.filter((input) => !input.creation);
 
-  if (restores.length > 0) {
+  function placeRestores(): void {
     const waiting = new Map<number, InsertionInput<T>>();
     for (const input of restores) {
       if (!waiting.has(input.subject)) waiting.set(input.subject, input);
@@ -191,6 +201,17 @@ export function orderInsertions<T>(
     }
     if (placedRuns !== runs.length) {
       throw new Error('Collection structural target contains an anchor cycle');
+    }
+  }
+
+  if (restores.length > 0) {
+    try {
+      placeRestores();
+    } catch (error) {
+      if (!lenient) throw error;
+      for (const input of restores) {
+        if (!placed.has(input.subject)) placeOne(input);
+      }
     }
   }
 

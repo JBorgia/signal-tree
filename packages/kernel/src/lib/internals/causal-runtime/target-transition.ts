@@ -116,6 +116,13 @@ export type DeriveDeclarativeTransitionTargetOptions = {
   /** Rows held out of each collection's order while it reverses. */
   readonly held?: ReadonlyMap<PositionId, readonly HeldRow[]>;
   /**
+   * Never refuse on order: an order delta that does not fit keeps the rows'
+   * order, and a row with no live anchor goes last. Only for reads that must
+   * not throw (the history walk's states are then approximate in order);
+   * a reversal refuses instead.
+   */
+  readonly lenient?: boolean;
+  /**
    * Order-frontier tokens to reinstate on collections this transition
    * reverses without an order delta (invariant 3 in
    * causal-runtime-contract.md): where the source is still at `from`, the
@@ -190,10 +197,14 @@ export function unrecordedOrderDelta(
   };
 }
 
-export function unrecordedOrderChange(): Error {
-  return new Error(
+export function unrecordedOrderChange(owner?: PositionId): Error {
+  const error = new Error(
     'collection order change was not recorded, so it cannot be reversed'
   );
+  if (owner !== undefined) {
+    orderRefusals.set(error, { owner, kind: 'unrecorded' });
+  }
+  return error;
 }
 
 export function requiresDeclarativeStructuralTarget(
@@ -356,19 +367,30 @@ export function deriveDeclarativeTransitionTarget(
     const step = frontierSteps.get(owner);
     const orderEndpoint =
       options.orderEndpoints?.get(owner) ?? options.orderEndpoint ?? 'after';
-    const derived = delta
-      ? applyCollectionOrderDelta(
+    const structural = () =>
+      deriveStructuralTargetOrder(
+        collection.order,
+        withoutHeld(collection.subjects, collection.held),
+        options.effects.filter((effect) => effect.owner === owner),
+        options.lenient
+      );
+    let applied = delta;
+    let derived: number[];
+    if (!delta) derived = structural();
+    else {
+      try {
+        derived = applyCollectionOrderDelta(
           collection.order,
           delta,
           orderEndpoint,
-          options.collections.find((source) => source.owner === owner)
-            ?.orderFrontier
-        )
-      : deriveStructuralTargetOrder(
-          collection.order,
-          withoutHeld(collection.subjects, collection.held),
-          options.effects.filter((effect) => effect.owner === owner)
+          sourceFrontier
         );
+      } catch (error) {
+        if (!options.lenient) throw error;
+        applied = undefined;
+        derived = structural();
+      }
+    }
     const order = withHeldRows(derived, collection.held);
     assertCollectionOrderMatchesSubjects(order, collection.subjects);
     assertUniqueTargetKeys(collection.subjects);
@@ -378,10 +400,12 @@ export function deriveDeclarativeTransitionTarget(
         (left, right) => left.subject - right.subject
       ),
       order,
-      orderFrontier: delta
+      orderFrontier: applied
         ? orderEndpoint === 'before'
-          ? delta.beforeFrontier
-          : delta.afterFrontier
+          ? applied.beforeFrontier
+          : applied.afterFrontier
+        : delta
+        ? {}
         : step?.to !== undefined && sourceFrontier === step.from
         ? step.to
         : sourceFrontier === undefined ||
@@ -545,7 +569,7 @@ export function applyCollectionOrderDelta(
   endpoint: 'before' | 'after',
   currentFrontier: unknown
 ): number[] {
-  if (delta.unrecorded) throw unrecordedOrderChange();
+  if (delta.unrecorded) throw unrecordedOrderChange(delta.owner);
   assertUniqueSubjects(current);
 
   const sourceEndpoint = endpoint === 'before' ? 'after' : 'before';
@@ -554,7 +578,7 @@ export function applyCollectionOrderDelta(
   const sourceFrontier =
     sourceEndpoint === 'before' ? delta.beforeFrontier : delta.afterFrontier;
   if (current.length !== sourceLength || currentFrontier !== sourceFrontier) {
-    throw frontierMismatch();
+    throw frontierMismatch(delta.owner);
   }
 
   const currentRank = indexSubjects(current);
@@ -565,7 +589,7 @@ export function applyCollectionOrderDelta(
       (expectedRank !== undefined &&
         current[expectedRank] !== participant.subject)
     ) {
-      throw frontierMismatch();
+      throw frontierMismatch(delta.owner);
     }
   }
 
@@ -585,7 +609,7 @@ export function applyCollectionOrderDelta(
       continue;
     }
     if (rank < 0 || rank >= targetLength || target[rank] !== undefined) {
-      throw frontierMismatch();
+      throw frontierMismatch(delta.owner);
     }
     target[rank] = participant.subject;
   }
@@ -597,14 +621,14 @@ export function applyCollectionOrderDelta(
     }
     const subject = backbone[backboneIndex];
     if (subject === undefined) {
-      throw frontierMismatch();
+      throw frontierMismatch(delta.owner);
     }
     target[rank] = subject;
     backboneIndex += 1;
   }
 
   if (backboneIndex !== backbone.length) {
-    throw frontierMismatch();
+    throw frontierMismatch(delta.owner);
   }
 
   return target as number[];
@@ -726,7 +750,8 @@ function applyStructuralEffect(
 function deriveStructuralTargetOrder(
   sourceOrder: readonly number[],
   subjects: ReadonlyMap<number, CollectionTargetSubject>,
-  effects: readonly ReversalEffect[]
+  effects: readonly ReversalEffect[],
+  lenient = false
 ): number[] {
   const next = new Map<number, number | undefined>();
   const previous = new Map<number, number | undefined>();
@@ -793,8 +818,12 @@ function deriveStructuralTargetOrder(
             placement.subject
           );
           return;
+        case 'end':
+          link(input.subject, tail, undefined);
+          return;
       }
-    }
+    },
+    lenient
   );
 
   const order: number[] = [];
@@ -988,8 +1017,26 @@ function rankAt(
   return endpoint === 'before' ? participant.beforeRank : participant.afterRank;
 }
 
-function frontierMismatch(): Error {
-  return new Error(
+/**
+ * The collection an order delta refused on, and why: a reversal reports it
+ * legibly (restoration's ST1034).
+ */
+const orderRefusals = new WeakMap<
+  Error,
+  { owner: PositionId; kind: 'mismatch' | 'unrecorded' }
+>();
+export function orderRefusalOf(
+  error: unknown
+): { owner: PositionId; kind: 'mismatch' | 'unrecorded' } | undefined {
+  return error instanceof Error ? orderRefusals.get(error) : undefined;
+}
+
+function frontierMismatch(owner?: PositionId): Error {
+  const error = new Error(
     'collection order frontier does not match the transition endpoint'
   );
+  if (owner !== undefined) {
+    orderRefusals.set(error, { owner, kind: 'mismatch' });
+  }
+  return error;
 }
