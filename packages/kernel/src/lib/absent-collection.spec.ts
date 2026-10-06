@@ -203,6 +203,28 @@ describe('reads: an absent, empty collection', () => {
     tree.$({ a: { rows: [A], s: 0 }, count: 0 });
     expect(view()).toEqual([[A], 1, true, A, 0]);
   });
+
+  it('every collection one whole value hides or re-adds wakes its consumers', () => {
+    // Both wake-ups are deferred inside the same structural write.
+    const tree = reactiveTree({
+      a: {
+        rows: entityMap<Row, string>(),
+        more: entityMap<Row, string>(),
+        s: 0,
+      },
+      count: 0,
+    }) as unknown as Tree & { $: { a: { more: Rows } } };
+    trees.push(tree);
+    const { rows, more } = tree.$.a;
+    rows.setAll([A]);
+    more.setAll([B]);
+    const view = computed(() => [rows.all(), more.all()]);
+    expect(view()).toEqual([[A], [B]]);
+    omit(tree);
+    expect(view()).toEqual([[], []]);
+    tree.$({ a: { rows: [B], more: [A], s: 0 }, count: 0 });
+    expect(view()).toEqual([[B], [A]]);
+  });
 });
 
 describe('writes: row-adding writes re-add the path with only their rows', () => {

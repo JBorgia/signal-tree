@@ -901,7 +901,10 @@ export function getPathNotifier(): PathNotifier {
   // delivery implementation tree-shake out of a subscriber-less bundle.
   // Re-installing the same singleton keeps ONE DELIVERY AUTHORITY.
   installPathDeliveryRuntime(globalPathNotifier);
-  installBranchMembershipCapture(capturePlainBranchMembership, capturePathReAdd);
+  installBranchMembershipCapture(
+    capturePlainBranchMembership,
+    capturePathReAdd
+  );
   return globalPathNotifier;
 }
 

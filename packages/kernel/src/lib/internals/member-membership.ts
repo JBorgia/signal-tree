@@ -5,7 +5,11 @@ import {
   writableLocationPublisher,
   type LocationPublisher,
 } from './location-runtime';
-import { isNodeAccessor, isTraversableNode, NODE_STORE_SYMBOL } from './node-shape';
+import {
+  isNodeAccessor,
+  isTraversableNode,
+  NODE_STORE_SYMBOL,
+} from './node-shape';
 import { getOwnedPositionIds } from './owned-metadata';
 import { markOwnerInvalidatedFrom } from './owner-invalidation-port';
 import { capturePathReAddIfObserved } from './path-observation-port';
@@ -91,11 +95,9 @@ type DormantBinding = { parent: object; key: string };
 export const MEMBERSHIP_CHANGED = Symbol.for('SignalTree:MembershipChanged');
 
 function membershipHook(node: unknown): (() => void) | undefined {
-  return isTraversableNode(node)
-    ? ((node as Record<symbol, unknown>)[MEMBERSHIP_CHANGED] as
-        | (() => void)
-        | undefined)
-    : undefined;
+  return (node as { [MEMBERSHIP_CHANGED]?: () => void } | null | undefined)?.[
+    MEMBERSHIP_CHANGED
+  ];
 }
 
 /**
@@ -121,7 +123,10 @@ const NODE_ACCESSOR_PEER = Symbol.for('SignalTree:NodeAccessorPeer');
 export function isDormantMember(leaf: unknown): boolean {
   const binding = memberBinding(leaf);
   if (binding === undefined) return false;
-  const descriptor = Object.getOwnPropertyDescriptor(binding.parent, binding.key);
+  const descriptor = Object.getOwnPropertyDescriptor(
+    binding.parent,
+    binding.key
+  );
   return descriptor !== undefined && descriptor.enumerable === false;
 }
 
@@ -190,23 +195,18 @@ export function isAbsentMember(node: unknown): boolean {
  * written inside one keeps the own-member reactivation it always had and
  * announces nothing, so no transition is announced twice. A counter the
  * writer increments and decrements in a `finally`; nothing is allocated.
+ *
+ * `end` runs when the outermost structural write closes. Only entity
+ * collections install it, to wake their consumers after it rather than inside
+ * it (`entity-signal`), so a tree without collections carries none of that.
  */
-export const structuralWrites = { depth: 0 };
-
-/**
- * Collections whose presence changed inside a structural write, woken when it
- * ends. A structural write reads hidden rows physically (`entity-signal`), so
- * a consumer re-run inside it would cache what storage holds rather than the
- * collection's absence (v16 8e).
- */
-const deferredHooks = new Set<() => void>();
+export const structuralWrites: { depth: number; end?: () => void } = {
+  depth: 0,
+};
 
 /** @internal Close a structural write opened with `structuralWrites.depth++`. */
 export function endStructuralWrite(): void {
-  if (--structuralWrites.depth > 0 || deferredHooks.size === 0) return;
-  const hooks = [...deferredHooks];
-  deferredHooks.clear();
-  for (const hook of hooks) hook();
+  if (!--structuralWrites.depth) structuralWrites.end?.();
 }
 
 /**
@@ -314,7 +314,10 @@ const ABSENCE: MemberAbsence = {
  * Moved here from `signal-tree.ts` in v16 8e: path re-adds and reversals call
  * it too, and a port to reach it cost more than the move.
  */
-export function republishMembers(parent: object, keys: readonly string[]): void {
+export function republishMembers(
+  parent: object,
+  keys: readonly string[]
+): void {
   const runtime = getTreeScalarSlotRuntime(parent);
   if (!runtime) return;
 
@@ -357,11 +360,7 @@ export function republishMembers(parent: object, keys: readonly string[]): void 
     if (slot !== undefined) return changedSlots.push(slot) > 0;
     const publisher = writableLocationPublisher(child);
     if (publisher) return unaddressedLeaves.push(publisher) > 0;
-    const hook = membershipHook(child);
-    if (hook) {
-      if (structuralWrites.depth) deferredHooks.add(hook);
-      else hook();
-    }
+    membershipHook(child)?.();
     if (isNodeAccessor(child)) {
       branches.push(child);
       for (const key of Object.keys(child))
@@ -445,7 +444,6 @@ export function republishMembers(parent: object, keys: readonly string[]): void 
   // membership change is invisible to that memo — see publishMembershipChange.
 }
 
-
 /**
  * @internal Remove `key` from `parent`'s current value.
  *
@@ -516,7 +514,11 @@ function linkDescendants(node: object): void {
  * @internal Link a member added after construction when its branch is already
  * linked, so a later omission above it is visible to it.
  */
-export function linkAddedMember(branch: object, key: string, child: unknown): void {
+export function linkAddedMember(
+  branch: object,
+  key: string,
+  child: unknown
+): void {
   if (!isTraversableNode(child) || !memberBinding(nodeOf(branch))) return;
   linkMember(branch, key, child);
   linkDescendants(child);
@@ -596,7 +598,9 @@ function peerOf(branch: object): object | undefined {
   // precise failure the repo's no-hand-rolled-walker-guard lint rule exists to
   // prevent, and writing one here reproduced it inside the very helper meant to
   // make this class of bug structural.
-  return isTraversableNode(peer) && peer !== branch ? (peer as object) : undefined;
+  return isTraversableNode(peer) && peer !== branch
+    ? (peer as object)
+    : undefined;
 }
 
 /** @internal */

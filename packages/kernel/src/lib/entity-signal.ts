@@ -3880,13 +3880,27 @@ export function createEntitySignal<
   }
   // Its presence changed (it, or a member above it, was omitted or re-added):
   // every query and every held row re-reads (`republishMembers`).
+  const wake = () =>
+    locations.runInvalidationGroup(() => {
+      for (const epoch of subjectEpochs.values()) advanceEpochHandle(epoch);
+      deriveLocation(version, (value) => value + 1);
+      markOwnerInvalidated(ownerId);
+    });
+  // Inside a structural write it wakes them only once the write has closed
+  // (`structuralWrites.end`, chained in order): rows read physically there,
+  // so a consumer re-run inside it would cache what storage holds rather than
+  // the collection's absence. Installed by the first such change, so a tree
+  // without collections carries none of this.
   Object.defineProperty(api, MEMBERSHIP_CHANGED, {
-    value: () =>
-      locations.runInvalidationGroup(() => {
-        for (const epoch of subjectEpochs.values()) advanceEpochHandle(epoch);
-        deriveLocation(version, (value) => value + 1);
-        markOwnerInvalidated(ownerId);
-      }),
+    value: () => {
+      if (!structuralWrites.depth) return wake();
+      const earlier = structuralWrites.end;
+      structuralWrites.end = () => {
+        structuralWrites.end = undefined;
+        earlier?.();
+        wake();
+      };
+    },
   });
   // Membership observation attaches its tap here on first use.
   defineEntityMembershipSource(api, (tap) => {

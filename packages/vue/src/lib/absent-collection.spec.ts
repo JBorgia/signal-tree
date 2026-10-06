@@ -131,6 +131,38 @@ describe.each(ORDERS)('absent collection — Vue (%s)', (_, enhancers) => {
 });
 
 describe('absent collection — Vue sync effects (v16 8e)', () => {
+  it('an omission nested in a whole value wakes sync effects only after it', async () => {
+    const initial: State = {
+      a: { rows: entityMap<Row, string>(), s: 0 },
+      count: 0,
+    };
+    const tree = signalTree(initial, { enhancers: [transactions()] });
+    try {
+      const rows = tree.$.a.rows as unknown as Rows;
+      rows.addOne(A);
+      const row = rows.byId('a') as () => Row | undefined;
+      const seen: unknown[] = [];
+      const stop = watchEffect(() => seen.push(row()), { flush: 'sync' });
+      try {
+        // The whole value omits `rows` one level down, inside a nested
+        // structural write, which reads rows physically: no effect run may
+        // see them.
+        (tree.$ as unknown as (value: unknown) => void)({
+          a: { s: 1 },
+          count: 0,
+        });
+        await flush();
+        expect(seen[0]).toEqual(A);
+        expect(seen.length).toBeGreaterThan(1);
+        expect(seen.slice(1).every((value) => value === undefined)).toBe(true);
+        expect(row()).toBeUndefined();
+      } finally {
+        stop();
+      }
+    } finally {
+      tree.destroy();
+    }
+  });
   it('a rollback writing hidden rows runs no effect that could see them', async () => {
     const initial: State = {
       a: { rows: entityMap<Row, string>(), s: 0 },
