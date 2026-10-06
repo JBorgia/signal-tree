@@ -46,7 +46,9 @@ const laterWork: Record<
     undo: ['Z:z,A:original', ''],
   },
   'a plain add of another row that stands': {
-    write: async (tree) => tree.$.rows.addOne({ id: 'B', name: 'b' }),
+    write: async (tree) => {
+      tree.$.rows.addOne({ id: 'B', name: 'b' });
+    },
     undo: ['Z:z,A:original,B:b', 'B:b'],
     // Pinned, not endorsed, and unchanged since d27e55c8: Z and A were added
     // to an empty collection, with no neighbour to anchor to, so their redo
@@ -54,8 +56,9 @@ const laterWork: Record<
     redo: ['B:b,Z:z,A:original', 'B:b,Z:z,A:edited'],
   },
   'an undoable add of another row': {
-    write: async (tree) =>
-      undoable(() => tree.$.rows.addOne({ id: 'B', name: 'b' })),
+    write: async (tree) => {
+      undoable(() => tree.$.rows.addOne({ id: 'B', name: 'b' }));
+    },
     undo: ['Z:z,A:edited', 'Z:z,A:original', ''],
   },
 };
