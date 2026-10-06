@@ -32,6 +32,7 @@ import {
   applyPlainBranchMembership,
   plainBranchMembershipChange,
 } from './internals/plain-branch-membership';
+import { keysBelow } from './internals/member-membership';
 import { registerLinkState } from './internals/link-state-view';
 import { bindLinkToTree } from './internals/link-lifetime';
 import { StudioTreeDestroyedError } from './internals/confirmed-turn-view';
@@ -540,9 +541,62 @@ export function link<S>(
       if (m['ownerId'] !== registry.id) return;
       const membership = plainBranchMembershipChange(meta);
       if (membership) {
+        if (isInspectionWrite(meta)) return;
         const segments = segmentsByNode.get(membership.branch);
-        if (segments === undefined || isInspectionWrite(meta)) return;
-        eligible = applyPlainBranchMembership(eligible, segments, membership);
+        if (segments !== undefined) {
+          eligible = applyPlainBranchMembership(eligible, segments, membership);
+        } else {
+          // A member at or above X changed: X now reads what that change
+          // installed, or nothing while it, or a member above it, is
+          // omitted. The endpoint gets what the tree exposes, `undefined`
+          // (`[]` for a collection), never retained storage (v15 port
+          // review, item 4).
+          const below = keysBelow(membership.branch, x);
+          const member =
+            below && membership.members.find(({ key }) => key === below[0]);
+          if (!member) return;
+          let value = member.after.present ? member.after.value : undefined;
+          for (const key of (below as string[]).slice(1))
+            value =
+              value !== null &&
+              typeof value === 'object' &&
+              Object.prototype.hasOwnProperty.call(value, key)
+                ? (value as Record<string, unknown>)[key]
+                : undefined;
+          eligible = value as T;
+          entityProjection?.reseed(getEntityProjectionSeed(x) ?? []);
+        }
+        // A nested collection at or below a changed member reads its rows
+        // now (none while omitted): its projection restarts from them, and a
+        // present one gives the value its rows. Others keep their eligible
+        // rows, which an inspection write must not move.
+        for (const { node, address } of nestedCollections) {
+          if (
+            segments !== undefined &&
+            !membership.members.some(
+              ({ key }) =>
+                address.segments[segments.length] === key &&
+                segments.every((step, at) => address.segments[at] === step)
+            )
+          )
+            continue;
+          address.projection.reseed(getEntityProjectionSeed(node) ?? []);
+          let at: unknown = eligible;
+          for (const key of address.segments.slice(0, -1))
+            at =
+              at !== null && typeof at === 'object'
+                ? (at as Record<string, unknown>)[key]
+                : undefined;
+          if (
+            at !== null &&
+            typeof at === 'object' &&
+            Object.prototype.hasOwnProperty.call(
+              at,
+              address.segments[address.segments.length - 1]
+            )
+          )
+            advanceEligible(address, { all: address.projection.value() });
+        }
         dirty = true;
         observation.publish();
         return;

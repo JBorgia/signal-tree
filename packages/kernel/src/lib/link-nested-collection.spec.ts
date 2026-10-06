@@ -220,4 +220,37 @@ describe('a collection nested under a branch Link', () => {
       rows: { all: [{ id: 3, n: 'realized' }] },
     });
   });
+
+  it('R10 a membership change beside the collection does not carry an earlier scrub (v15 port review, item 4)', async () => {
+    // A membership change re-reads the rows of a collection at or below the
+    // changed member (it may have been hidden or re-added); a collection
+    // beside it keeps its eligible rows.
+    const tree = signalTree({
+      dashboard: { title: 'x', k: 1 as number | undefined, rows: em() },
+    });
+    await flush();
+    // Omits k.
+    tree.$.dashboard({ title: 'x', rows: [] } as never);
+    await flush();
+    const got: unknown[] = [];
+    const l = track(
+      link(tree.$.dashboard as never, { set: (v: unknown) => void got.push(v) } as never)
+    );
+    tree.$.dashboard.rows.addOne({ id: 1, n: 'authored' });
+    await flush();
+    await l.settled();
+    withWriteContext(INSPECTION, () =>
+      tree.$.dashboard.rows.updateOne(1, { n: 'SCRUBBED' })
+    );
+    await flush();
+    // Re-adds k beside the collection.
+    tree.$.dashboard.k(5);
+    await flush();
+    await l.settled();
+    expect(got[got.length - 1]).toEqual({
+      title: 'x',
+      k: 5,
+      rows: { all: [{ id: 1, n: 'authored' }] },
+    });
+  });
 });

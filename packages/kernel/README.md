@@ -270,6 +270,11 @@ Some details of that rule:
   collection stays absent and empty, and history holds the removal. Undoing
   it restores the rows and re-adds the path to the collection, as undoing
   any write under an omitted member does.
+- **Link and path observers see what the tree exposes.** A Link endpoint
+  whose location is absent receives `undefined` (`[]` for a collection), and
+  a re-add sends what the location then reads. Undo, redo, `jumpTo()` and
+  `rollback()` write an absent location's retained storage without
+  publishing it.
 - **The selection is kept.** `activeId()` keeps its value and `activeEntity()`
   reads `undefined`. A re-adding write clears the selection, as `clear()`
   does.

@@ -190,6 +190,27 @@ export function isAbsentMember(node: unknown): boolean {
 }
 
 /**
+ * @internal The keys from `branch` down to `node` when `branch` holds `node`
+ * through member links, else `undefined`: what a membership change of
+ * `branch` means for a consumer of `node` (Link, v15 port review, item 4).
+ * The links exist once a member above `node` was first omitted, as for
+ * `isAbsentMember`.
+ */
+export function keysBelow(branch: object, node: unknown): string[] | undefined {
+  const keys: string[] = [];
+  for (
+    let binding = memberBinding(node);
+    binding;
+    binding = memberBinding(binding.parent)
+  ) {
+    keys.unshift(binding.key);
+    // Both name a branch's accessor half (`linkMember`, `recursiveUpdate`).
+    if (binding.parent === branch) return keys;
+  }
+  return undefined;
+}
+
+/**
  * @internal A structural write (a whole value, a reversal installing members)
  * reconciles membership itself, level by level, and announces it. A location
  * of the same tree written inside one keeps the own-member reactivation it

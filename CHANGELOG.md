@@ -391,6 +391,20 @@ bullet below says **Compatibility** or **Behaviour change**.
   - "Unsupported scoped undo effect at <path>" raised before anything applies
     is a typed restoration refusal: the restoration reader reports
     `refused`, not `failed`. The message is unchanged.
+  - Link (`link()`) and path observers see what the tree exposes. An
+    endpoint whose location an omission hides (the location, or a member
+    above it) receives `undefined`, or `[]` for a collection, and a re-add
+    sends what the location then reads. Undo, redo, `jumpTo()` and
+    rollback publish nothing for a location they leave absent, although
+    they also write its retained storage. **Behaviour change:** an endpoint receives a send when an omission hides
+    its location or a reversal hides it again; on 15.4.3 it kept the last
+    value it was sent.
+  - History states (`getRestorationHistory()`) read a collection that an
+    omission now hides through its own records: they threw "Historical
+    materialization has no collection" once history held a write to its
+    rows. A member's re-add in a history state no longer shows the rows the
+    collection held when the member was omitted, which could include a
+    rejected transaction's rows.
 - Known, unchanged: undo of a write that dropped a row field re-adds the
   field at the end of the row's keys.
 
