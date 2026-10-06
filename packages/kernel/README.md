@@ -225,8 +225,12 @@ An ordinary (not `undoable()`) write after an undoable one does not remove its
 undo: `undo()` restores the turn's own pre-image over it and `redo()` its
 after-image. A row the turn added that an ordinary write removed stays absent on
 undo; a row it edited that an ordinary write removed comes back as it stood,
-with the turn's fields set back. Where putting a row back would displace a newer
-row at the same key, undo or redo refuses with ST1034 and changes nothing.
+with the turn's fields set back (a confirmed transaction that is not undoable
+counts as an ordinary write). Where putting a row back would displace any other
+row at the same key, or the row was removed by external or realized truth
+(`external()`, a Link inbound write), undo or redo refuses with ST1034 and
+changes nothing. The row comes back alone: a referrer in another collection
+removed with it stays removed.
 Undo, redo, `jumpTo()` and transaction rollback restore recorded values without
 running a collection's interceptors; taps still fire for the changes they apply
 (`onAdd`, `onRemove`, `onUpdate`).
