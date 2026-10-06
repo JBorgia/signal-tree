@@ -194,6 +194,93 @@ describe.each([
     );
 
     it.each(orderChanges)(
+      '%s, then settled work and an open transaction: later-confirmed-dependency, also once the open one settles',
+      async (_case, order) => {
+        // Order-delta review, item 5: settled work replaced the token first,
+        // so settling the open transaction cannot bring it back; reporting
+        // later-pending-dependency advised a retry that then refused.
+        const tree = await make();
+        try {
+          const first = tree.transaction(() => order(tree));
+          await flush();
+          tree.$.rows.addOne({ id: 'v', n: 0 });
+          await flush();
+          const second = tree.transaction(() =>
+            tree.$.rows.addOne({ id: 'w', n: 0 })
+          );
+          await flush();
+          const kindOf = (error: unknown) =>
+            (error as { cause?: { kind?: string } }).cause?.kind;
+          expect(kindOf(refusal(() => first.rollback()))).toBe(
+            'later-confirmed-dependency'
+          );
+          second.rollback();
+          await flush();
+          expect(kindOf(refusal(() => first.rollback()))).toBe(
+            'later-confirmed-dependency'
+          );
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
+
+    it.each(orderChanges)(
+      '%s, then an open transaction and settled work after it: later-confirmed-dependency',
+      async (_case, order) => {
+        const tree = await make();
+        try {
+          const first = tree.transaction(() => order(tree));
+          await flush();
+          const second = tree.transaction(() =>
+            tree.$.rows.addOne({ id: 'w', n: 0 })
+          );
+          await flush();
+          tree.$.rows.addOne({ id: 'v', n: 0 });
+          await flush();
+          expect(
+            (refusal(() => first.rollback()) as { cause?: { kind?: string } })
+              .cause?.kind
+          ).toBe('later-confirmed-dependency');
+          second.confirm();
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
+
+    it.each(orderChanges)(
+      '%s, then two open transactions: later-pending-dependency, naming the first, until both settle',
+      async (_case, order) => {
+        const tree = await make();
+        try {
+          const before = tree.$.rows.all();
+          const first = tree.transaction(() => order(tree));
+          await flush();
+          const second = tree.transaction(() =>
+            tree.$.rows.addOne({ id: 'v', n: 0 })
+          );
+          await flush();
+          const third = tree.transaction(() => tree.$.rows.removeOne('a'));
+          await flush();
+          const error = refusal(() => first.rollback()) as {
+            cause?: { kind?: string; conflictingTurnId?: number };
+          };
+          expect(error.cause?.kind).toBe('later-pending-dependency');
+          third.rollback();
+          await flush();
+          second.rollback();
+          await flush();
+          first.rollback();
+          await flush();
+          expect(tree.$.rows.all()).toStrictEqual(before);
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
+
+    it.each(orderChanges)(
       '%s, then a later change to a different collection: rolls back',
       async (_case, order) => {
         const tree = signalTree(

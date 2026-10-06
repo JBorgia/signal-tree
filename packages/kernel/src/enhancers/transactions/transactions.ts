@@ -994,20 +994,6 @@ class TransactionAuthority {
     return turn ? cloneTurnRecord(turn) : undefined;
   }
 
-  /**
-   * The first open transaction opened after `turnId` (ids are monotonic and
-   * callbacks synchronous, as in `getPendingRollbackPlan`) that wrote
-   * `position`.
-   */
-  laterPendingAt(turnId: number, position: number): number | undefined {
-    for (const [otherId, otherTurn] of this.pendingTurns) {
-      if (otherId > turnId && otherTurn.__positionIds?.includes(position)) {
-        return otherId;
-      }
-    }
-    return undefined;
-  }
-
   discardPending(turnId: number): TransactionTurnRecord | undefined {
     const turn = this.pendingTurns.get(turnId);
     if (!turn) {
@@ -2214,14 +2200,45 @@ export function getOrCreateInternalTransactionRuntime<T>(
       );
     });
     if (!stale) return undefined;
-    const laterPending = authority.laterPendingAt(pendingTurnId, stale.owner);
+    // Pending only when the open transactions opened after this one account
+    // for every change since: their token transitions chain from this
+    // turn's token to the live one, so settling them brings it back. Where
+    // settled work replaced it as well, retrying after they settle refuses
+    // again: confirmed (order-delta review, item 5).
+    const later = [
+      ...new Set([...pendingOrderDeltas.keys(), ...pendingFrontiers.keys()]),
+    ]
+      .filter((id) => id > pendingTurnId)
+      .sort((left, right) => left - right)
+      .flatMap((id) => [
+        ...(pendingOrderDeltas.get(id) ?? [])
+          .filter(({ owner }) => owner === stale.owner)
+          .map((delta) => ({
+            id,
+            before: delta.beforeFrontier,
+            after: delta.afterFrontier,
+          })),
+        ...(pendingFrontiers.get(id) ?? [])
+          .filter(({ owner }) => owner === stale.owner)
+          .map(({ before, after }) => ({ id, before, after })),
+      ]);
+    let token = stale.afterFrontier;
+    let laterPending: number | undefined;
+    for (const transition of later) {
+      if (transition.before !== token) continue;
+      token = transition.after;
+      laterPending ??= transition.id;
+    }
+    const unsettled =
+      laterPending !== undefined &&
+      token === bindings.get(stale.owner)?.orderFrontier?.();
     return {
-      conflict: dependencyConflict(laterPending !== undefined, {
+      conflict: dependencyConflict(unsettled, {
         pendingTurnId,
         pendingEffect: authority
           .peekPending(pendingTurnId)
           ?.__effects?.find(({ position }) => position === stale.owner),
-        conflictingTurnId: laterPending,
+        conflictingTurnId: unsettled ? laterPending : undefined,
       }),
     };
   };
