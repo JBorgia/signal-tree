@@ -29,6 +29,7 @@ type Rows = {
   byId(id: string): (() => Row | undefined) | undefined;
   addOne(row: Row): string;
   updateOne(id: string, changes: Partial<Row>): void;
+  tap(handlers: { onAdd?: () => void; onRemove?: () => void }): () => void;
 };
 const A = { id: 'a', n: 0 };
 const Z = { id: 'z', n: 9 };
@@ -147,6 +148,56 @@ describe.each(ORDERS)('absent collection — Vue (%s)', (_, enhancers) => {
       tree.destroy();
     }
   });
+  it('a tap inside a whole value re-adds an absent member of the same tree (v16 8f)', async () => {
+    type Two = {
+      $: ((value: unknown) => void) & {
+        a: { rows: Rows };
+        b: { rows: Rows; s: { value: number } };
+      };
+      destroy(): void;
+    };
+    const tree = signalTree(
+      {
+        a: { rows: entityMap<Row, string>(), s: 0 },
+        b: { rows: entityMap<Row, string>(), s: 0 },
+        count: 0,
+      },
+      { enhancers: enhancers() as never }
+    ) as unknown as Two;
+    try {
+      tree.$.a.rows.addOne(A);
+      tree.$({ a: { rows: [A], s: 0 }, count: 0 });
+      await flush();
+      const view = computed(() => [
+        JSON.stringify((tree.$ as unknown as () => unknown)()),
+        tree.$.b.rows.all(),
+      ]);
+      expect(view.value).toEqual([
+        '{"a":{"rows":{"all":[{"id":"a","n":0}]},"s":0},"count":0}',
+        [],
+      ]);
+      let wrote = false;
+      tree.$.a.rows.tap({
+        onAdd: () => {
+          if (wrote) return;
+          wrote = true;
+          tree.$.b.rows.addOne(Z);
+          tree.$.b.s.value = 5;
+        },
+      });
+      // Inside the whole value's own row writes: an ordinary write.
+      tree.$({ a: { rows: [A, Z], s: 0 }, count: 0 });
+      await flush();
+      expect(wrote).toBe(true);
+      expect(view.value).toEqual([
+        '{"a":{"rows":{"all":[{"id":"a","n":0},{"id":"z","n":9}]},"s":0},"b":{"rows":{"all":[{"id":"z","n":9}]},"s":5},"count":0}',
+        [Z],
+      ]);
+    } finally {
+      tree.destroy();
+    }
+  });
+
   it('rollback of a re-adding write makes it absent again', async () => {
     const { tree, rows, view } = build();
     try {

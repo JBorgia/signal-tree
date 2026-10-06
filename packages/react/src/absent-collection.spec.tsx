@@ -34,6 +34,7 @@ type Rows = {
   byId(id: string): (() => Row | undefined) | undefined;
   addOne(row: Row): string;
   updateOne(id: string, changes: Partial<Row>): void;
+  tap(handlers: { onAdd?: () => void; onRemove?: () => void }): () => void;
 };
 type View = {
   (): unknown;
@@ -152,6 +153,65 @@ describe.each(ORDERS)('absent collection — React (%s)', (label, enhancers) => 
       );
       await step(() => owner.undo());
       expect(users()).toBe('{"orders":{"all":[]}}|[]');
+    } finally {
+      view.unmount();
+      owner.destroy();
+    }
+  });
+
+  it('a tap inside a whole value re-adds an absent member of the same tree (v16 8f)', async () => {
+    type Two = {
+      readonly $: {
+        (): unknown;
+        (value: unknown): void;
+        readonly a: { readonly rows: Rows };
+        readonly b: {
+          readonly rows: Rows;
+          readonly s: (value?: number) => number;
+        };
+      };
+      destroy(): void;
+    };
+    const owner = signalTree(
+      {
+        a: { rows: entityMap<Row, string>(), s: 0 },
+        b: { rows: entityMap<Row, string>(), s: 0 },
+        count: 0,
+      },
+      { enhancers: enhancers() as never }
+    ) as unknown as Two;
+    owner.$.a.rows.addOne(A);
+    owner.$({ a: { rows: [A], s: 0 }, count: 0 });
+    function Both() {
+      const whole = useSignalTree(owner as never, ($: Two['$']) =>
+        JSON.stringify($())
+      );
+      const b = useSignalTree(owner as never, ($: Two['$']) =>
+        JSON.stringify($.b.rows.all())
+      );
+      return <output data-testid={`${label} both`}>{`${whole}|${b}`}</output>;
+    }
+    const both = () => screen.getByTestId(`${label} both`).textContent;
+    const view = render(<Both />);
+    try {
+      expect(both()).toBe(
+        '{"a":{"rows":{"all":[{"id":"a","n":0}]},"s":0},"count":0}|[]'
+      );
+      let wrote = false;
+      owner.$.a.rows.tap({
+        onAdd: () => {
+          if (wrote) return;
+          wrote = true;
+          owner.$.b.rows.addOne(Z);
+          owner.$.b.s(5);
+        },
+      });
+      // Inside the whole value's own row writes: an ordinary write.
+      await step(() => owner.$({ a: { rows: [A, Z], s: 0 }, count: 0 }));
+      expect(wrote).toBe(true);
+      expect(both()).toBe(
+        '{"a":{"rows":{"all":[{"id":"a","n":0},{"id":"z","n":9}]},"s":0},"b":{"rows":{"all":[{"id":"z","n":9}]},"s":5},"count":0}|[{"id":"z","n":9}]'
+      );
     } finally {
       view.unmount();
       owner.destroy();

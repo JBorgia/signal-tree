@@ -254,12 +254,13 @@ Some details of that rule:
   or `rollback()` writes an absent collection's retained rows, a tap on it
   that calls `byId()` sees those rows. Its projections (`all()`, `count()`,
   `has()`) still read it absent.
-- **Writes from inside a whole value or a reversal of the same tree.** The
-  whole value or reversal decides that tree's membership. So a tap or sync
-  effect that runs during it and writes an absent location of that same tree
-  does not re-add its path. The write goes to retained storage and stays
-  invisible; for a collection, its other retained rows are not removed
-  first. A write to another tree is an ordinary write.
+- **Writes from inside a whole value or a reversal.** A tap or sync effect
+  that runs while a whole value or a reversal is being applied may write any
+  tree, including the same one. That write is an ordinary write: an absent
+  location's path is re-added, and the whole value does not omit it again.
+  A member that is still present when written goes with the rest if that
+  whole value then omits it, because a whole value applies its omissions
+  after its own writes.
 
 Undo, redo and `jumpTo()` treat a location under an omitted member like this:
 

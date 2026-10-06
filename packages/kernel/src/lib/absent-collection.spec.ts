@@ -699,19 +699,19 @@ describe('closing a structural write (v16 8e review)', () => {
       };
     };
     try {
-      beginStructuralWrite(undefined);
-      beginStructuralWrite(undefined);
+      beginStructuralWrite();
+      beginStructuralWrite();
       queue();
       endStructuralWrite(true);
       expect(seen).toEqual([]);
       endStructuralWrite(true);
       expect(seen).toEqual([true]);
-      beginStructuralWrite(undefined);
+      beginStructuralWrite();
       queue();
       endStructuralWrite();
       expect(seen).toEqual([true, undefined]);
       expect(structuralWrites.depth).toBe(0);
-      expect(structuralWrites.trees).toEqual([]);
+      expect(structuralWrites.readded).toBeUndefined();
     } finally {
       structuralWrites.end = undefined;
     }
@@ -739,6 +739,100 @@ describe('a write to another tree from inside a whole value is ordinary (v16 8e 
     expect(wrote).toBe(true);
     expect(other.$()).toEqual({ a: { rows: { all: [Z] }, s: 5 }, count: 0 });
     expect(stored(other.$.a.rows)).toEqual([Z]);
+  });
+});
+
+describe("a write from inside its own tree's whole value or reversal (v16 8f)", () => {
+  // A tap runs inside the whole value's (or the reversal's) own row writes.
+  // A write it makes to an absent location of the same tree is an ordinary
+  // write: it re-adds its path, and the structural write never omits it again
+  // (8e wrote retained storage instead, invisibly).
+  type Two = Omit<Tree, '$'> & {
+    $: ((value?: unknown) => unknown) & {
+      a: { rows: Rows; s: (value?: number) => number };
+      b: { rows: Rows; s: (value?: number) => number };
+    };
+  };
+  const two = (enhancers: unknown[] = []): Two => {
+    const tree = signalTree(
+      {
+        a: { rows: entityMap<Row, string>(), s: 0 },
+        b: { rows: entityMap<Row, string>(), s: 0 },
+        count: 0,
+      },
+      {
+        enhancers: enhancers as never,
+        capabilities: ['causal-runtime', 'position-topology'] as never,
+      }
+    ) as unknown as Two;
+    trees.push(tree);
+    tree.$.a.rows.setAll([A]);
+    tree.$.b.rows.setAll([B]);
+    return tree;
+  };
+  const writeB = (tree: Two) => {
+    let wrote = false;
+    tree.$.a.rows.tap({
+      onAdd: () => {
+        if (wrote) return;
+        wrote = true;
+        tree.$.b.rows.addOne(Z);
+        tree.$.b.s(5);
+      },
+    });
+    return () => wrote;
+  };
+
+  it('a whole value that leaves an earlier omission alone', () => {
+    const tree = two();
+    tree.$({ a: { rows: [A], s: 0 }, count: 0 });
+    expect(tree.$()).toEqual({ a: { rows: { all: [A] }, s: 0 }, count: 0 });
+    const wrote = writeB(tree);
+    tree.$({ a: { rows: [A, Z], s: 0 }, count: 0 });
+    expect(wrote()).toBe(true);
+    expect(tree.$()).toEqual({
+      a: { rows: { all: [A, Z] }, s: 0 },
+      b: { rows: { all: [Z] }, s: 5 },
+      count: 0,
+    });
+    expect(stored(tree.$.b.rows)).toEqual([Z]);
+  });
+
+  it('a present member the same whole value then omits goes with it', () => {
+    // Not an absent location: the tap writes a member that is still present,
+    // and the whole value applies its omission after its row writes, so the
+    // member is omitted with what was written to it (documented order).
+    const tree = two();
+    const wrote = writeB(tree);
+    tree.$({ a: { rows: [A, Z], s: 0 }, count: 0 });
+    expect(wrote()).toBe(true);
+    expect(tree.$()).toEqual({ a: { rows: { all: [A, Z] }, s: 0 }, count: 0 });
+    expect(stored(tree.$.b.rows)).toEqual([B, Z]);
+    expect(tree.$.b.s()).toBeUndefined();
+  });
+
+  it('a reversal', async () => {
+    const tree = two([restoration()]);
+    await flush();
+    undoable(() => tree.$.a.rows.addOne(Z));
+    await flush();
+    tree.$({ a: { rows: [A, Z], s: 0 }, count: 0 });
+    await flush();
+    let wrote = false;
+    tree.$.a.rows.tap({
+      onRemove: () => {
+        if (wrote) return;
+        wrote = true;
+        tree.$.b.s(5);
+      },
+    });
+    tree.undo();
+    expect(wrote).toBe(true);
+    expect(tree.$()).toEqual({
+      a: { rows: { all: [A] }, s: 0 },
+      b: { s: 5 },
+      count: 0,
+    });
   });
 });
 
