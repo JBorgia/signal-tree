@@ -218,3 +218,97 @@ describe('pending rollback under a branch two levels above its collections', () 
         expect(ids(t.other)).toEqual([]);
       });
 });
+
+describe('review follow-up (slice 8c)', () => {
+  for (const [order, enhancers] of Object.entries(historyOrders)) {
+    it(`a collection omitted below an omitted branch is refused, not reported as restored (${order})`, async () => {
+      const t = make(enhancers() as never);
+      await flush();
+      undoable(() => {
+        t.rows.updateOne('a', { n: 1 });
+        t.tree.$.count(1);
+      });
+      await flush();
+      // An ordinary write omits the collection from `h`, then another omits `g`.
+      (t.tree.$.g.h as unknown as (value: unknown) => void)({ k: 0 });
+      omit(t);
+      await flush();
+      const index = t.tree.getCurrentIndex();
+      let message = '';
+      try {
+        t.tree.undo();
+      } catch (error) {
+        message = (error as Error).message;
+      }
+      expect(message).toBe(
+        "Unsupported scoped undo effect at 'g.h.rows.a.n': its enclosing member 'g.h.rows' was omitted and cannot be re-added, because it is not a plain state location (an entity collection, for example). Nothing was changed; the history position is unmoved."
+      );
+      expect(t.tree.$()).toEqual({ count: 1 });
+      expect(t.rows.byId('a')?.()).toEqual({ id: 'a', n: 1 });
+      expect(t.tree.getCurrentIndex()).toBe(index);
+    });
+
+    it(`undo of a designated omission of a branch holding collections re-adds it (${order})`, async () => {
+      const t = make(enhancers() as never);
+      await flush();
+      undoable(() => omit(t));
+      await flush();
+      expect(t.tree.$()).toEqual({ count: 0 });
+      t.tree.undo();
+      expect(t.tree.$()).toEqual({
+        g: {
+          h: {
+            rows: {
+              all: [
+                { id: 'a', n: 0 },
+                { id: 'b', n: 0 },
+              ],
+            },
+            k: 0,
+          },
+          other: { all: [] },
+          j: 0,
+        },
+        count: 0,
+      });
+      t.tree.redo();
+      expect(t.tree.$()).toEqual({ count: 0 });
+    });
+  }
+
+  for (const [order, enhancers] of Object.entries(rollbackOrders))
+    it(`the documented rollback order: the newer omission of a branch holding collections settles first (${order})`, async () => {
+      const t = make(enhancers() as never);
+      await flush();
+      type Pending = { rollback(): void };
+      const transact = (fn: () => void) =>
+        (t.tree as unknown as { transact(fn: () => void): Pending }).transact(
+          fn
+        );
+      const older = transact(() => t.rows.updateOne('a', { n: 1 }));
+      await flush();
+      const newer = transact(() => omit(t));
+      await flush();
+      expect(() => older.rollback()).toThrow(/later-confirmed-dependency/);
+      newer.rollback();
+      expect(t.rows.byId('a')?.()).toEqual({ id: 'a', n: 1 });
+      expect(Object.keys(t.tree.$())).toContain('g');
+      older.rollback();
+      expect(t.tree.$()).toEqual({
+        g: {
+          h: {
+            rows: {
+              all: [
+                { id: 'a', n: 0 },
+                { id: 'b', n: 0 },
+              ],
+            },
+            k: 0,
+          },
+          other: { all: [] },
+          j: 0,
+        },
+        count: 0,
+      });
+    });
+});

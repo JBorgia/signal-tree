@@ -2758,34 +2758,42 @@ export function restoration(
               `; restoring '${location}' would overwrite that omission. ${unmoved}`;
             continue;
           }
-          if (
+          // Every hidden member on the way must come back, not only the
+          // outermost: the re-add stages the inner ones from its value.
+          const blocked =
             outer.position === undefined ||
             !canRealizePlainBranchMember(tree.$, outer.position)
-          ) {
+              ? outer
+              : hiding.find(
+                  (member) =>
+                    member.position === undefined ||
+                    !isReAddableMember(member.node)
+                );
+          if (blocked) {
             // Reached by an omitted entity collection, which is not a
-            // membership-managed location. A plain member whose retained
-            // location is unavailable is defensive: restoration registers a
-            // member's location whenever it observes the omission.
+            // membership-managed location, at any depth. A plain member whose
+            // retained location is unavailable is defensive: restoration
+            // registers a member's location whenever it observes the
+            // omission, which every re-add case depends on.
             const location = label(effect);
-            const member = outer.path ?? location;
+            const member = blocked.path ?? location;
             hiddenRefusal ??=
               `Unsupported scoped undo effect at '${location}': ` +
               (member === location
                 ? 'it was omitted'
                 : `its enclosing member '${member}' was omitted`) +
               ' and cannot be re-added, because ' +
-              (isReAddableMember(outer.node)
+              (isReAddableMember(blocked.node)
                 ? 'its retained location is no longer available'
                 : 'it is not a plain state location (an entity collection, for example)') +
               `. ${unmoved}`;
             continue;
           }
-          let entry = readded.get(outer.position);
+          // Not blocked, so the outermost member has a position.
+          const owner = outer.position as number;
+          let entry = readded.get(owner);
           if (!entry)
-            readded.set(
-              outer.position,
-              (entry = { member: outer, targets: [] })
-            );
+            readded.set(owner, (entry = { member: outer, targets: [] }));
           // A slot's value travels with the re-add; an entity effect applies
           // as usual once the way to its collection is current again.
           if (slot) {

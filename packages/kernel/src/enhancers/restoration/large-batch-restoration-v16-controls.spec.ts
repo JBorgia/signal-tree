@@ -10,6 +10,7 @@ import { signalTree } from '../../lib/signal-tree';
 import { entityMap } from '../../lib/markers/entity-map';
 import { undoable } from '../../lib/undoable';
 import { restoration } from './restoration';
+import { restorationReader } from '../../lib/internals/restoration-reader';
 import {
   clearProductionSubstrateStatsForTesting,
   installProductionSubstrateStatsForTesting,
@@ -42,16 +43,19 @@ describe('v16 restoration of turns larger than the argument limit', () => {
       await flush();
       undoable(() => tree.$.rows.clear());
       await flush();
-      // Two entries, without `getRestorationHistory()`: materializing its
-      // snapshots for a 130k-row clear grows faster than linearly (20.6 s
-      // here alone; slice 8c) and is not what this case is about.
+      // Two entries, through the restoration reader rather than
+      // `getRestorationHistory()`: materializing that one's snapshots for a
+      // 130k-row clear grows faster than linearly (20.6 s here alone; slice
+      // 8c, open item) and is not what this case is about.
+      expect(restorationReader(tree)?.snapshot().entries).toHaveLength(2);
       expect(tree.getCurrentIndex()).toBe(1);
-      expect(tree.canUndo()).toBe(true);
       // Counted work, not wall-clock time (slice 8c): each jump touches each
       // row a bounded number of times, so it cannot become the timeout this
       // case used to hit under load. Measured: jumpTo(0) writes every row
       // once and reads 2 publication dependencies per row; jumpTo(1)
-      // tombstones every row once and reads 9 per row.
+      // tombstones every row once and reads 9 per row. The read bounds (3
+      // and 12 per row) leave room for constant-factor changes while still
+      // failing any per-row growth with the collection's size.
       const stats = installProductionSubstrateStatsForTesting();
       try {
         tree.jumpTo(0);
@@ -66,7 +70,7 @@ describe('v16 restoration of turns larger than the argument limit', () => {
         tree.jumpTo(1);
         expect(stats.structuralSubjectTombstones).toBe(LARGE);
         expect(stats.publicationDependencyReads).toBeLessThanOrEqual(
-          10 * LARGE
+          12 * LARGE
         );
         expect(tree.$.rows.count()).toBe(0);
       } finally {
