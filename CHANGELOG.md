@@ -1,7 +1,8 @@
 ## Unreleased
 
 **Patch — reversals restore exactly what they reverse.** Every reversal defect
-known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
+known on 15.4.3 is repaired. Forward behaviour is unchanged except where a
+bullet below says **Compatibility** or **Behaviour change**.
 
 - Rolling back a transaction that wrote a row and then removed it restores the
   row as it was BEFORE the transaction (it came back with the written value),
@@ -69,21 +70,54 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   transforming `onUpdate` re-transformed it (an undone `{ n: 1 }` came back
   with the transform applied) and a blocking interceptor made the reversal
   throw, as on 15.4.3. Taps and subscribers are still notified.
-- `addOne`, `addMany`, `prependOne`, `prependMany` and `upsertMany` throw
-  `Cannot <method>: collection topology changed during staging` before writing
-  when one of their interceptors or id selectors changed the same
-  collection's membership or order, or the key of a row the call names - the
-  rule `setAll` has applied since 15.4.0. Such a call used to write a stale
-  plan: two rows under one key, a lost overwrite (`addMany` with `overwrite`
-  returned the id while the row stayed removed), a removed last row
-  resurrected as an empty member, or a row the interceptor added misplaced on
-  redo. `upsertMany` merges an updated row over its value as its interceptors
-  left it.
+  A write a tap or subscriber makes while the reversal runs is still
+  intercepted; an undo, redo, jumpTo or rollback it starts is itself a
+  reversal and is not.
+- Devtools jumps (`JUMP_TO_STATE`, `JUMP_TO_ACTION`, `ROLLBACK`) to a state
+  the tree itself serialized are replays too and skip interceptors, so a
+  blocking interceptor no longer makes devtools time travel throw. A jump to
+  any other state (forged, hand-edited, older than the devtools `maxAge`
+  window, default 50 states and at most 1,000) and `IMPORT_STATE` are new
+  input and still run them. Fail-safe: recognition is by the exact JSON the
+  tree produced, so a recorded state the extension hands back re-serialized
+  differently counts as unrecorded - interceptors run, and a blocking one
+  refuses the jump.
+- Taps fire symmetrically for the changes a reversal applies: a row it brings
+  back taps `onAdd`, one it takes away `onRemove`, one whose value it changes
+  `onUpdate`. On 15.4.3 no reversal tapped `onAdd` (redo of `addOne` or
+  `addMany`, undo of `removeOne`, `removeMany` or `clear`, undo of a `setAll`
+  that removed rows), and undo of a `setAll` that had only added rows tapped
+  no `onRemove` either; other removals and value changes were tapped. A rename
+  and a reorder still tap nothing by themselves, and a forward `setAll` still
+  taps `onUpdate` for every row it replaced, even with an equal value, where a
+  reversal taps only the rows whose value it changes.
+- `addOne`, `addMany`, `prependOne`, `prependMany`, `upsertMany`,
+  `updateMany` and `removeMany` throw `Cannot <method>: collection topology
+  changed during staging` before writing when one of their interceptors or id
+  selectors changed the same collection's membership or order, or the key of
+  a row the call names. This is narrower than `setAll`'s staging refusal
+  (since 15.4.0), which also refuses a key change to a row it does not name.
+  Such a call used to write a stale plan: two rows under one key, a lost
+  overwrite (`addMany` with `overwrite` returned the id while the row stayed
+  removed), a removed last row resurrected as an empty member, a row the
+  interceptor added misplaced on redo, or an `updateMany` that announced a
+  renamed row and lost the rename. `upsertMany` and `updateMany` merge an
+  updated row over its value as all of the call's interceptors left it, so a
+  field an interceptor writes to a named row is kept.
+  **Compatibility:** an interceptor that adds or removes rows of the same
+  collection while one of these calls runs now makes the call throw (the
+  interceptor's own writes stand; the call writes nothing) — for example an
+  `onRemove` interceptor that cascade-deletes dependent rows during
+  `removeMany`. Move such cascades to a tap (`tap({ onRemove })`, which runs
+  after the call commits) or to a separate call after the batch. Field-only
+  writes, writes to other collections, and renaming a row the call does not
+  name are unaffected. No example or demo in this repository uses the pattern.
 - Rollback of a transaction that edited an existing row no longer refuses
   after settled later work removed that row (even a plain `removeOne`): the
   row's compensation is skipped, the rest reverses, the row stays absent. An
-  unsettled removal, a row later work edited and kept, and a pending remove
-  whose key was re-occupied still refuse.
+  unsettled removal, a row later work edited and kept, and a pending removal
+  whose key a different row took still refuse (that last one while the row
+  stands or undo history can restore it; see below).
 - A failure while a transaction's pending turn is being recorded is rolled
   back automatically; the write no longer survives unrecorded (where an
   earlier transaction's rollback could reverse through it).
@@ -134,10 +168,13 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   history state places them last (rows and values stay exact). Undo, redo
   and `jumpTo()` still refuse there.
 - A transaction opened while `undo()`, `redo()`, `jumpTo()` or another
-  transaction's rollback replays (in a tap or subscriber) is authored work: a
-  failing callback, or `rollback()`, reverses its writes (they were kept),
-  and it can be opened inside another transaction's rollback ("Nested
-  transaction is not supported" before).
+  transaction's rollback replays (in a tap or subscriber) is authored work: its
+  writes are intercepted like any other tap write, a failing callback or
+  `rollback()` reverses them (they were kept), and it can be opened inside
+  another transaction's rollback ("Nested transaction is not supported"
+  before). Opened during an undo, redo or `jumpTo()`, it is not an undo
+  entry, as an `undoable()` write a callback makes then is not one: its
+  writes stand outside undo history and the redo future survives.
 - Undo of a turn that wrote rows of two collections restores each
   collection's rows in place (a row with no left neighbour went to the end).
 - A write a subscriber makes while a flush delivers an undoable turn is still

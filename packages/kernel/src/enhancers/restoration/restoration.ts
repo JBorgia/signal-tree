@@ -1382,6 +1382,11 @@ class RestorationManager<T> {
     };
   }
 
+  /** An undo, redo or jumpTo is applying right now (a user callback runs). */
+  isApplyingOperation(): boolean {
+    return this.activeOperation !== undefined;
+  }
+
   private observeOperation(
     operation: 'undo' | 'redo' | 'jump',
     run: () => boolean
@@ -3350,7 +3355,8 @@ class RestorationManager<T> {
           // Fallback if no restoration function provided
           rootAuthorityFor(this.tree).replace(state);
         }
-      }
+      },
+      true
     );
   }
 
@@ -4254,7 +4260,8 @@ export function restoration(
                 origin: 'restoration',
                 ownerId: getPositionRegistry(tree.$)?.id,
               },
-              () => prepared.install()
+              () => prepared.install(),
+              true
             );
           const releaseMembership = holdEntityMembershipDelivery(tree.$);
           try {
@@ -4440,7 +4447,8 @@ export function restoration(
           { origin: 'restoration', ownerId: replayOwnerId },
           () => {
             realizationPort.applyAtomically(reversalEffects);
-          }
+          },
+          true
         );
       } catch (error) {
         if (!wasAppliedBeforeFailure(error)) throw error;
@@ -5605,8 +5613,19 @@ export function restoration(
           structural: true,
         })),
       ]);
+      // A transaction a tap or subscriber opens while an undo, redo or
+      // jumpTo applies is authored work (add343ca: intercepted, and its
+      // rollback reverses its writes), but not an undo entry, exactly as a
+      // plain `undoable()` write a callback makes then is not one (restoration
+      // declines captures while it restores). Entered as one, its pending
+      // entry truncated the redo future from the position before the
+      // operation: mid-redo it cut the entry being redone and emptied history
+      // (entity-replay-wrapped-writes.spec.ts, "transaction > batch >
+      // undoable"); mid-undo it cut nothing, and the confirmed entry landed
+      // after a future it never discarded.
       const entry =
         isTurnEligible(designated) &&
+        !restorationManager.isApplyingOperation() &&
         restorationManager.retainsCompletedHistory() &&
         (effects.length > 0 || collectionOrders.length > 0)
           ? restorationManager.createPendingEntry(

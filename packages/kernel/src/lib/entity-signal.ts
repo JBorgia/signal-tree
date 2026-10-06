@@ -22,6 +22,7 @@ import {
   type LocationRuntime,
 } from './internals/location-runtime';
 import { deepClone } from './internals/utilities/deep-clone';
+import { deepEqual } from './internals/utilities/deep-equal';
 
 import {
   EntityMutationFrame,
@@ -44,7 +45,12 @@ import type { PhysicalCommitClock } from './internals/physical-commit-clock';
 // Only `notify` is ever called on this — the neutral port contract, not the
 // delivery engine's full surface.
 import type { PathObservationPort } from './internals/path-observation-port';
-import { getActiveWriteContext } from '../lib/write-context';
+import {
+  getActiveWriteContext,
+  isRecordedReplayWrite,
+  runUserCallback,
+} from '../lib/write-context';
+
 import { recordProductionSubstrateStat } from './internals/production-substrate-stats';
 import {
   defineEntityProjectionSeed,
@@ -664,6 +670,15 @@ export function createEntitySignal<
               ? createStructuralEffectMeta(structuralEffect)
               : ambientMeta()
           );
+          // Taps see what a replay applied, as subscribers do: a row brought
+          // back, a row taken away, a row whose value changed (15.4.3 tapped
+          // nothing on this path). A rekey taps nothing, as changeId does.
+          const { beforeValue, afterValue } = publication;
+          const kind = structuralEffect?.kind;
+          if (kind === 'add') emitTap('onAdd', afterValue as E, key);
+          else if (kind === 'remove') emitTap('onRemove', key, beforeValue as E);
+          else if (!kind && !deepEqual(beforeValue, afterValue))
+            emitTap('onUpdate', key, afterValue as E, afterValue as E);
         }
         if (activeIdBefore !== activeIdAfter) {
           replaceLocation(activeIdSignal, activeIdAfter);
@@ -937,11 +952,7 @@ export function createEntitySignal<
   function createStructuralEffectMeta(
     effect: PendingStructuralEffect
   ): WriteMetadata {
-    const meta = ambientMeta();
-    return {
-      ...(meta ?? {}),
-      structuralEffect: effect,
-    };
+    return effectMeta(ambientMeta(), effect);
   }
 
   /**
@@ -1419,11 +1430,6 @@ export function createEntitySignal<
     physicalCommitClock?.advance();
   }
 
-  function rememberSubjectIds(ids: K[]): number[] {
-    const resolved = ids.map((id) => allocateSubjectId(id));
-    lastSubjectIds = resolved;
-    return resolved;
-  }
 
   function findKeyBySubjectId(subjectId: number): K | undefined {
     return structuralStore.activeKeyForSubject(subjectId);
@@ -1522,18 +1528,19 @@ export function createEntitySignal<
           basePath,
           [subjectId],
           getPositionIdsForNotify(),
-          {
-            ...(metaOverride ?? ambientMeta() ?? {}),
-            structuralEffect: {
-              kind: 'add',
-              subject: subjectId,
-              key,
-              value: deepClone(entity),
-              beforeSubject,
-              afterSubject,
-            },
-          }
+          effectMeta(metaOverride ?? ambientMeta(), {
+            kind: 'add',
+            subject: subjectId,
+            key,
+            value: deepClone(entity),
+            beforeSubject,
+            afterSubject,
+          })
         );
+        // Symmetric with planRemove: a replay that brings a row back taps
+        // onAdd, as one that takes it away taps onRemove (15.4.3 tapped only
+        // the removal).
+        emitTap('onAdd', entity, key);
       },
     };
   }
@@ -1580,6 +1587,7 @@ export function createEntitySignal<
           getPositionIdsForNotify(),
           metaOverride
         );
+        emitTap('onAdd', entity, key);
       },
     };
   }
@@ -1630,15 +1638,10 @@ export function createEntitySignal<
           basePath,
           [subjectId],
           getPositionIdsForNotify(),
-          {
-            ...(metaOverride ?? ambientMeta() ?? {}),
-            structuralEffect,
-          }
+          effectMeta(metaOverride ?? ambientMeta(), structuralEffect)
         );
 
-        for (const handler of tapHandlers) {
-          handler.onRemove?.(key, entity);
-        }
+        emitTap('onRemove', key, entity);
       },
     };
   }
@@ -1680,110 +1683,70 @@ export function createEntitySignal<
   }
 
   /**
-   * The interceptors a write runs. None for a reversal — undo, redo and
-   * jumpTo (`origin: 'restoration'`) or a rollback (`'transaction-rollback'`):
-   * it writes back exactly the value or pre-image that was recorded, which the
-   * interceptors already shaped when it was first written. Through them, a
-   * transforming `onUpdate` re-transformed the pre-image an undo restored and a
-   * blocking one made undo and rollback throw (15.4.3). Taps and subscribers
-   * are still told.
+   * The interceptors a write runs. None for a replay of recorded state writing
+   * itself back — undo, redo, jumpTo, a rollback, a devtools jump: it restores
+   * exactly the value or pre-image that was recorded, which the interceptors
+   * already shaped when it was first written. Through them, a transforming
+   * `onUpdate` re-transformed the pre-image an undo restored and a blocking one
+   * made undo and rollback throw (15.4.3). A write a tap or subscriber makes
+   * while the replay runs is forward work and is intercepted.
    */
   function activeInterceptors(): readonly InterceptHandlers<E, K>[] {
-    const origin = getActiveWriteContext()?.origin;
-    return origin === 'restoration' || origin === 'transaction-rollback'
-      ? []
-      : interceptHandlers;
+    return isRecordedReplayWrite() ? [] : interceptHandlers;
   }
 
-  function interceptAddedEntity(entity: E): E {
-    let transformedEntity = entity;
+  /**
+   * One interceptor hook on every active interceptor, each handed the call's
+   * own arguments: `block` throws `Cannot <verb> entity: <reason>`, and the
+   * last `transform` is the value handed on (a removal has none to hand on).
+   */
+  function runInterceptors<T>(
+    verb: string,
+    hook: 'onAdd' | 'onUpdate' | 'onRemove',
+    value: T,
+    args: unknown[]
+  ): T {
     for (const handler of activeInterceptors()) {
-      const ctx: InterceptContext<E> = {
+      const ctx: InterceptContext<T> = {
         block: (reason?: string) => {
           throw new Error(
-            `Cannot add entity: ${reason || 'blocked by interceptor'}`
+            `Cannot ${verb} entity: ${reason || 'blocked by interceptor'}`
           );
         },
-        transform: (value: E) => {
-          transformedEntity = value;
+        transform: (next: T) => {
+          value = next;
         },
         blocked: false,
         blockReason: undefined,
       };
-      assertSynchronousInterceptorResult(handler.onAdd?.(entity, ctx), 'onAdd');
+      assertSynchronousInterceptorResult(
+        (
+          handler[hook] as
+            | ((...hookArgs: unknown[]) => void | Promise<void>)
+            | undefined
+        )?.(...args, ctx),
+        hook
+      );
     }
+    return value;
+  }
 
-    return transformedEntity;
+  function interceptAddedEntity(entity: E): E {
+    return runInterceptors('add', 'onAdd', entity, [entity]);
   }
 
   /** `onUpdate` interceptors for a whole-entity replacement. */
   function interceptReplacedEntity(id: K, entity: E): E {
-    let replacement = entity;
-    for (const handler of activeInterceptors()) {
-      const ctx: InterceptContext<Partial<E>> = {
-        block: (reason?: string) => {
-          throw new Error(
-            `Cannot replace entity: ${reason || 'blocked by interceptor'}`
-          );
-        },
-        transform: (value: Partial<E>) => {
-          replacement = value as E;
-        },
-        blocked: false,
-        blockReason: undefined,
-      };
-      assertSynchronousInterceptorResult(
-        handler.onUpdate?.(id, entity as Partial<E>, ctx),
-        'onUpdate'
-      );
-    }
-    return replacement;
+    return runInterceptors('replace', 'onUpdate', entity, [id, entity]);
   }
 
   /** `onRemove` interceptors: a block throws; there is nothing to transform. */
   function interceptRemovedEntity(id: K, entity: E): void {
-    for (const handler of activeInterceptors()) {
-      const ctx: InterceptContext<void> = {
-        block: (reason?: string) => {
-          throw new Error(
-            `Cannot remove entity: ${reason || 'blocked by interceptor'}`
-          );
-        },
-        transform: () => {
-          // void transform - no transformation possible
-        },
-        blocked: false,
-        blockReason: undefined,
-      };
-      assertSynchronousInterceptorResult(
-        handler.onRemove?.(id, entity, ctx),
-        'onRemove'
-      );
-    }
+    runInterceptors('remove', 'onRemove', entity, [id, entity]);
   }
 
   function interceptUpdatedEntity(id: K, changes: Partial<E>): Partial<E> {
-    let transformedChanges = changes;
-    for (const handler of activeInterceptors()) {
-      const ctx: InterceptContext<Partial<E>> = {
-        block: (reason?: string) => {
-          throw new Error(
-            `Cannot update entity: ${reason || 'blocked by interceptor'}`
-          );
-        },
-        transform: (value: Partial<E>) => {
-          transformedChanges = value;
-        },
-        blocked: false,
-        blockReason: undefined,
-      };
-      assertSynchronousInterceptorResult(
-        handler.onUpdate?.(id, changes, ctx),
-        'onUpdate'
-      );
-    }
-
-    return transformedChanges;
+    return runInterceptors('update', 'onUpdate', changes, [id, changes]);
   }
 
   /**
@@ -1874,9 +1837,7 @@ export function createEntitySignal<
       );
     }
 
-    for (const handler of tapHandlers) {
-      handler.onAdd?.(transformedEntity, id);
-    }
+    emitTap('onAdd', transformedEntity, id);
 
     return id;
   }
@@ -2066,9 +2027,7 @@ export function createEntitySignal<
 
     // Run tap handlers for each processed entity
     for (const { id, entity } of rows) {
-      for (const handler of tapHandlers) {
-        handler.onAdd?.(entity, id);
-      }
+      emitTap('onAdd', entity, id);
     }
 
     return ids;
@@ -2197,6 +2156,23 @@ export function createEntitySignal<
 
   /** Handlers for observation */
   const tapHandlers: TapHandlers<E, K>[] = [];
+  /**
+   * One tap event, run on every tap and counted as a user callback: a write a
+   * tap makes during a replay of recorded state is forward work, and is
+   * intercepted (write-context.ts).
+   */
+  function emitTap<N extends 'onAdd' | 'onUpdate' | 'onRemove'>(
+    name: N,
+    ...args: Parameters<NonNullable<TapHandlers<E, K>[N]>>
+  ): void {
+    if (tapHandlers.length)
+      runUserCallback(() => {
+        for (const handler of tapHandlers)
+          (handler[name] as ((...a: typeof args) => void) | undefined)?.(
+            ...args
+          );
+      });
+  }
 
   /** Handlers for blocking/transforming */
   const interceptHandlers: InterceptHandlers<E, K>[] = [];
@@ -2930,9 +2906,7 @@ export function createEntitySignal<
       }
 
       // Run tap handlers
-      for (const handler of tapHandlers) {
-        handler.onUpdate?.(id, transformedChanges, finalUpdated);
-      }
+      emitTap('onUpdate', id, transformedChanges, finalUpdated);
     },
 
     /**
@@ -2986,26 +2960,40 @@ export function createEntitySignal<
         getPositionIdsForNotify(),
         ambientMeta()
       );
-      for (const handler of tapHandlers) {
-        handler.onUpdate?.(id, next as Partial<E>, next);
-      }
+      emitTap('onUpdate', id, next as Partial<E>, next);
     },
 
     updateMany(ids: K[], changes: Partial<E>): void {
       if (ids.length === 0) return;
+      const frontier = structuralStore.activeOrderFrontier();
 
       // Collect entities and run interceptors first
       const updatedEntities = ids.map((id) => {
-        const prev = requireEntity(id);
-        const transformedChanges = interceptUpdatedEntity(id, changes);
+        requireEntity(id);
         return {
           id,
           subjectId: requireSubjectId(id),
-          prev,
-          finalUpdated: { ...prev, ...transformedChanges },
-          transformedChanges,
+          transformedChanges: interceptUpdatedEntity(id, changes),
+        } as {
+          id: K;
+          subjectId: number;
+          transformedChanges: Partial<E>;
+          prev: E;
+          finalUpdated: E;
         };
       });
+      // As the add calls: an interceptor that changed membership, order or a
+      // named row's key leaves this plan stale (a rename was lost, a vanished
+      // row announced) - refuse before writing.
+      refuseTopologyChange('updateMany', frontier, updatedEntities);
+      // Every row merges over its value as ALL the interceptors left it, as
+      // upsertMany does: read per row, right after its own interceptors, a
+      // later row's interceptor writing an earlier row was lost (85db805e).
+      for (const row of updatedEntities)
+        row.finalUpdated = {
+          ...(row.prev = getProjectedEntity(row.id) as E),
+          ...row.transformedChanges,
+        };
 
       const frame = createEntityMutationFrame();
       for (const { id, subjectId, finalUpdated } of updatedEntities) {
@@ -3045,9 +3033,7 @@ export function createEntitySignal<
 
       // Run tap handlers for each updated entity
       for (const { id, transformedChanges, finalUpdated } of updatedEntities) {
-        for (const handler of tapHandlers) {
-          handler.onUpdate?.(id, transformedChanges, finalUpdated);
-        }
+        emitTap('onUpdate', id, transformedChanges, finalUpdated);
       }
     },
 
@@ -3084,7 +3070,7 @@ export function createEntitySignal<
         : NO_NEIGHBORS;
 
       // Delete and update signals
-      const subjectIdsForWrite = rememberSubjectIds([id]);
+      const subjectIdsForWrite = [rememberSubjectId(id)];
       const structuralEffect: PendingStructuralEffect | undefined = observed
         ? {
             kind: 'remove',
@@ -3126,13 +3112,12 @@ export function createEntitySignal<
       }
 
       // Run tap handlers
-      for (const handler of tapHandlers) {
-        handler.onRemove?.(id, entity);
-      }
+      emitTap('onRemove', id, entity);
     },
 
     removeMany(ids: K[]): void {
       if (ids.length === 0) return;
+      const frontier = structuralStore.activeOrderFrontier();
 
       // Collect entities and run interceptors first
       const preparedRemovals: Array<{
@@ -3147,6 +3132,7 @@ export function createEntitySignal<
         interceptRemovedEntity(id, entity);
         return { id, entity, subjectId };
       });
+      refuseTopologyChange('removeMany', frontier, preparedRemovals);
 
       // The last interceptor can subscribe to the entire atomic removal.
       // Capture every row's neighbours before any tombstones are committed.
@@ -3216,9 +3202,7 @@ export function createEntitySignal<
 
       // Run tap handlers for each removed entity
       for (const { id, entity } of preparedRemovals) {
-        for (const handler of tapHandlers) {
-          handler.onRemove?.(id, entity);
-        }
+        emitTap('onRemove', id, entity);
       }
     },
 
@@ -3373,14 +3357,10 @@ export function createEntitySignal<
 
       // Run tap handlers for added entities, then updated ones
       for (const { id, entity } of toAdd) {
-        for (const handler of tapHandlers) {
-          handler.onAdd?.(entity as E, id);
-        }
+        emitTap('onAdd', entity as E, id);
       }
       for (const { id, changes, entity } of toUpdate) {
-        for (const handler of tapHandlers) {
-          handler.onUpdate?.(id, changes as Partial<E>, entity as E);
-        }
+        emitTap('onUpdate', id, changes as Partial<E>, entity as E);
       }
 
       return rows.map(({ id }) => id);
@@ -3480,9 +3460,7 @@ export function createEntitySignal<
 
       for (const { id, entity } of activeSubjects) {
         if (!entity) continue;
-        for (const handler of tapHandlers) {
-          handler.onRemove?.(id, entity);
-        }
+        emitTap('onRemove', id, entity);
       }
       } finally { membershipUnit.cancel(); }
     },
@@ -3753,21 +3731,15 @@ export function createEntitySignal<
 
       if (tapHandlers.length > 0) {
         for (const { id, entity } of stagedRemovals) {
-          for (const handler of tapHandlers) {
-            handler.onRemove?.(id, entity);
-          }
+          emitTap('onRemove', id, entity);
         }
 
         for (const { id, entity } of stagedAdds) {
-          for (const handler of tapHandlers) {
-            handler.onAdd?.(entity, id);
-          }
+          emitTap('onAdd', entity, id);
         }
 
         for (const { id, entity } of stagedUpdates) {
-          for (const handler of tapHandlers) {
-            handler.onUpdate?.(id, entity as Partial<E>, entity);
-          }
+          emitTap('onUpdate', id, entity as Partial<E>, entity);
         }
       }
       } finally { membershipUnit.cancel(); }
@@ -3914,21 +3886,6 @@ export function createEntitySignal<
     enumerable: false,
     configurable: true,
   });
-  Object.defineProperty(api, '__acquireEntityHandleForTesting', {
-    value: acquireEntityHandleForTesting,
-    enumerable: false,
-    configurable: true,
-  });
-  Object.defineProperty(api, '__resolveEntityHandleForTesting', {
-    value: resolveEntityHandleForTesting,
-    enumerable: false,
-    configurable: true,
-  });
-  Object.defineProperty(api, '__rebuildActiveProjectionFromOwnersForTesting', {
-    value: rebuildActiveProjectionFromOwners,
-    enumerable: false,
-    configurable: true,
-  });
   Object.defineProperty(api, '__planSubjectReclamation', {
     value: (
       subjectId: number,
@@ -3952,11 +3909,24 @@ export function createEntitySignal<
     enumerable: false,
     configurable: true,
   });
-  Object.defineProperty(api, '__retireSubjectRetainedValueBackingForTesting', {
-    value: retireSubjectRetainedValueBackingForTesting,
-    enumerable: false,
-    configurable: true,
-  });
+  // Testing seams, folded out of production builds (ngDevMode false) like
+  // every other dev-only surface: nothing outside specs and tools reads them.
+  if (typeof ngDevMode === 'undefined' || ngDevMode) {
+    for (const [name, value] of Object.entries({
+      __acquireEntityHandleForTesting: acquireEntityHandleForTesting,
+      __resolveEntityHandleForTesting: resolveEntityHandleForTesting,
+      __rebuildActiveProjectionFromOwnersForTesting:
+        rebuildActiveProjectionFromOwners,
+      __retireSubjectRetainedValueBackingForTesting:
+        retireSubjectRetainedValueBackingForTesting,
+    })) {
+      Object.defineProperty(api, name, {
+        value,
+        enumerable: false,
+        configurable: true,
+      });
+    }
+  }
 
   // ==================
   // PROXY FOR BRACKET NOTATION
