@@ -170,6 +170,53 @@ describe.each(ORDERS)('absent collection — Vue (%s)', (_, enhancers) => {
 });
 
 describe('absent collection — Vue sync effects (v16 8e)', () => {
+  it('a sync effect that throws on one collection does not starve the next', async () => {
+    const tree = signalTree({
+      a: {
+        rows: entityMap<Row, string>(),
+        more: entityMap<Row, string>(),
+        s: 0,
+      },
+      count: 0,
+    });
+    try {
+      const rows = tree.$.a.rows as unknown as Rows;
+      const more = tree.$.a.more as unknown as Rows;
+      rows.addOne(A);
+      more.addOne(Z);
+      let armed = false;
+      const seen: Row[][] = [];
+      const stopRows = watchEffect(
+        () => {
+          rows.all();
+          if (armed) throw new Error('rows effect');
+        },
+        { flush: 'sync' }
+      );
+      const stopMore = watchEffect(() => seen.push(more.all()), {
+        flush: 'sync',
+      });
+      try {
+        armed = true;
+        seen.length = 0;
+        // Both collections are hidden in one whole value, so both wakes are
+        // deferred to its close. The first consumer throws; the second
+        // collection's consumer still re-reads, then the error surfaces.
+        // (Vue batches these effects itself, so this pins the outcome, not
+        // the wake loop: mutation D8 survives here.)
+        expect(() =>
+          (tree.$ as unknown as (value: unknown) => void)({ count: 0 })
+        ).toThrow('rows effect');
+        expect(seen.at(-1)).toEqual([]);
+      } finally {
+        armed = false;
+        stopRows();
+        stopMore();
+      }
+    } finally {
+      tree.destroy();
+    }
+  });
   it('a collection woken twice in one reversal re-runs a sync effect once', async () => {
     const initial: State = {
       a: { rows: entityMap<Row, string>(), s: 0 },
