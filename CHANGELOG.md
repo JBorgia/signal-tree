@@ -250,13 +250,37 @@ bullet below says **Compatibility** or **Behaviour change**.
     next to its recorded neighbours, else the nearest surviving ones; redo
     applies the edit again (and re-adds the row the same way if an ordinary
     write removed it after the undo).
-  **Behaviour change:** where putting the turn's row back would displace a
-  NEWER row an ordinary write put at the same key (undo of a removal, redo of
-  an add, or the re-add above), undo or redo refuses with a typed ST1034
-  restoration refusal naming the collection and the key ("ST1034:
-  restoration refused — key 'a' of 'rows' is held by a newer row …"); state
-  and the history position are unchanged, and the operation reads as
-  `refused`. Undo of a removal threw the untyped structural-drift there.
+  A removal inside a confirmed transaction that is not undoable is ordinary
+  work too (it threw the same structural-drift); a rejected transaction's
+  removal never happened, and a pending one still refuses as overlapping
+  pending work.
+  **Behaviour change:** where putting the turn's row back would displace
+  ANY other row at the same key (one an ordinary write added, or an older row
+  renamed onto it with `changeId`) in undo of a removal, redo of an add, or
+  the re-add above, undo or redo refuses with a typed ST1034 restoration
+  refusal naming the collection and the key ("ST1034: restoration refused —
+  key 'a' of 'rows' is held by another row …"), unless the same operation
+  removes or renames that row off the key. State and the history position
+  are unchanged, and the operation reads as `refused`. Undo of a removal
+  threw the untyped structural-drift there.
+  **Behaviour change:** only an ORDINARY removal is put back. Where the row
+  was removed by external or realized truth (`external()`, a Link inbound
+  write), or that truth later changed its key, undo or redo of the edit
+  refuses with a typed ST1034 ("row 'a' of 'rows' was removed or replaced by
+  external truth …") and changes nothing.
+  A re-added row is not a cascade: a row in another collection that referred
+  to it and was removed with it stays removed, so the re-added row can be
+  left with a dangling reference.
+- A reversal that puts a row back and writes its fields in the same step
+  (undo of an edit-then-remove turn, already on 15.4.3, and the re-add above)
+  sent a linked collection endpoint the field's bare value in place of the
+  row (`[z, 1, c]`), and published the field on its own path after the row.
+  The row is now published once, whole, as every restore does, and a row
+  the step removes publishes no field writes.
+- `getRestorationHistory()` states before a confirmed transaction that is
+  not undoable no longer show that transaction's writes (they showed them,
+  as if it had happened before every entry). An open transaction's writes
+  still appear in every state.
 - An undoable write made while viewing a `jumpTo()` position keeps the viewed
   entry and every entry before it in history, applied, and discards only the
   entries after it. After a forward jump (`undo(); jumpTo(1)`) it discarded

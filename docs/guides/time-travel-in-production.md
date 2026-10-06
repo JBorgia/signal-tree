@@ -271,14 +271,26 @@ gives 1. For entity rows (since 15.4.4):
 - A row the turn edited, which an ordinary write then removed, comes back on
   undo as it stood when removed, with the turn's fields set back and other
   fields' ordinary edits kept, next to the neighbours it was removed from (or
-  the nearest ones still there). Redo applies the edit again.
-- If putting the turn's row back would displace a newer row an ordinary write
-  put at the same key, `undo()` or `redo()` refuses with a typed ST1034
-  restoration refusal naming the collection and the key, and nothing changes.
-  Once the newer row is removed, the undo proceeds.
+  the nearest ones still there). Redo applies the edit again. A removal
+  inside a confirmed transaction that is not undoable counts as an ordinary
+  write; a rejected transaction's removal never happened, and a pending one
+  makes the undo refuse until it settles.
+- If putting the turn's row back would displace any other row at the same key
+  (one an ordinary write added, or an older row renamed onto it with
+  `changeId`), `undo()` or `redo()` refuses with a typed ST1034 restoration
+  refusal naming the collection and the key, and nothing changes. Once that
+  row leaves the key, the undo proceeds. A row the same operation removes or
+  renames off the key is no conflict.
+- The row comes back alone. A row in another collection that referred to it
+  and was removed with it (a cascade your code performed) stays removed, so
+  the re-added row can be left with a dangling reference; undo the cascade as
+  one `undoable()` turn if both must come back together.
 
-Writes applied with `external()` are not ordinary writes: an undo that would
-overwrite external truth refuses instead.
+Writes applied with `external()` (and Link inbound writes) are not ordinary
+writes: an undo that would overwrite external truth refuses instead. That
+includes a row external truth removed, or whose key it changed after the
+ordinary removal: undo or redo of the edit refuses with ST1034 rather than
+put the row back.
 
 The same holds when the ordinary write omitted a location (a whole value that
 left out its key, or a key above it). Since 15.4.4, `undo()`, `redo()` and

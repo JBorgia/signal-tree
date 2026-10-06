@@ -285,10 +285,12 @@ not run a collection's interceptors, and taps fire for the changes they apply
 `onUpdate` for a changed value). `getCurrentIndex()` follows `undo()` and
 `redo()`; steps back are `getCurrentIndex() + 1`. An ordinary write after an
 `undoable()` one does not remove its undo: undo restores the turn's own image
-over it, and refuses with ST1034 where that would displace a newer row at the
-same key. A location under an omitted member reads `undefined`, an entity
-collection there reads empty, and writing it re-adds only the written path (see
-the kernel README, "Locations an omission has hidden").
+over it (a confirmed non-undoable transaction counts as ordinary), and refuses
+with ST1034 where that would displace any other row at the same key or put back
+a row that external or realized truth removed. A location under an omitted
+member reads `undefined`, an entity collection there reads empty, and writing
+it re-adds only the written path (see the kernel README, "Locations an
+omission has hidden").
 
 In published 15.3.1, calling Link `settled()` immediately after a write can return
 before the newly queued send finishes. Version 15.4.0 repairs this same-turn race:
