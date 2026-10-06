@@ -1,9 +1,9 @@
 import {
-  installRestorationReader,
+  defineRestorationSource,
+  restorationRefusal,
   type RestorationEntryId,
-  type RestorationReaderChange,
-  type RestorationReaderState,
-} from '../../lib/internals/restoration-reader';
+  type RestorationObserver,
+} from '../../lib/internals/restoration-source';
 import { holdEntityMembershipDelivery } from '../../lib/internals/entity-membership-source';
 import {
   applyPlainBranchMemberSnapshot,
@@ -147,15 +147,7 @@ export type { RestorationConfig, RestorationHistoryEntry };
  * Internal restoration state management
  */
 
-// A refusal is the error object restoration itself created when it declined an
-// operation and changed nothing. Messages are not evidence: a validator or a
-// listener may throw any text, including one that imitates ST1034.
-const RESTORATION_REFUSALS = new WeakSet<Error>();
-function restorationRefusal(message: string): Error {
-  const error = new Error(message);
-  RESTORATION_REFUSALS.add(error);
-  return error;
-}
+const noop = (): void => undefined;
 
 type CanonicalTurn<T> = Omit<RestorationHistoryEntry<T>, 'state'> & {
   state?: T;
@@ -487,11 +479,10 @@ class RestorationManager<TSource, T> {
   private positionFrontiers = new Map<number, number>();
   private nextTurnId = 1;
   private nextEntryId = 1;
-  private nextOperationId = 1;
+  /** Restoration reader (internals only); undefined until one attaches. */
+  private observer?: RestorationObserver;
+  /** Entries applied by the running operation, tracked only while observed. */
   private activeOperation?: Set<RestorationEntryId>;
-  private readonly publishObservation: (
-    change: RestorationReaderChange
-  ) => void;
   private historicalEvents: HistoricalEvent[] = [];
   private nextHistoricalOrdinal = 1;
 
@@ -615,89 +606,54 @@ class RestorationManager<TSource, T> {
   private deliveryFailure: { error: unknown } | undefined;
 
   /**
-   * Run one undo/redo/jump and report what it actually did to the tree to the
-   * restoration reader: the entries whose reversal installed, not what history
-   * looks like after callbacks the operation triggered (a subscriber may reset
-   * or trim history during delivery).
+   * Run one undo/redo/jump. While a restoration reader observes, report what
+   * it actually did to the tree: the entries whose reversal installed, not
+   * what history looks like after callbacks it triggered (a subscriber may
+   * reset or trim history during delivery).
    */
   private runOperation(
     operation: 'undo' | 'redo' | 'jump',
     run: () => boolean
   ): boolean {
-    const operationId = `restoration-operation:${this
-      .nextOperationId++}` as const;
-    const affected = new Set<RestorationEntryId>();
+    const observer = this.observer;
+    const applied = observer && new Set<RestorationEntryId>();
     const previous = this.activeOperation;
     const previousFailure = this.deliveryFailure;
-    this.activeOperation = affected;
+    this.activeOperation = applied;
     this.deliveryFailure = undefined;
-    let outcome: 'applied' | 'noop' | 'refused' | 'failed' = 'failed';
+    let failure: { error: unknown } | undefined;
+    let completed = false;
     try {
       const result = run();
-      outcome = affected.size ? 'applied' : 'noop';
+      completed = true;
       // Application completed; frontiers/indexes now describe the installed state.
-      const failure = this.deliveryFailure as { error: unknown } | undefined;
-      if (failure) throw applicationFailureCause(failure.error);
+      const delivery = this.deliveryFailure as { error: unknown } | undefined;
+      if (delivery) throw applicationFailureCause(delivery.error);
       return result;
     } catch (error) {
-      if (outcome === 'failed')
-        outcome =
-          affected.size === 0 &&
-          error instanceof Error &&
-          RESTORATION_REFUSALS.has(error)
-            ? 'refused'
-            : 'failed';
+      if (!completed) failure = { error };
       throw error;
     } finally {
       this.activeOperation = previous;
       this.deliveryFailure = previousFailure;
-      this.publishObservation({
-        kind: 'operation',
-        operationId,
-        operation,
-        outcome,
-        affectedEntryIds: [...affected],
-      });
+      if (applied) observer?.operation(operation, applied, failure);
     }
   }
 
   /**
-   * Resolve BEFORE applying. Application delivers synchronously, and a
-   * subscriber may reset or trim history there; the operation still applied
-   * these entries, so the event must name them.
+   * Entry ids of `turnIds`, resolved BEFORE applying (a subscriber may reset
+   * history during delivery), and recorded only once application returned.
    */
-  private entryIdsFor(turnIds: readonly number[]): RestorationEntryId[] {
+  private recordAppliedEntries(turnIds: readonly number[]): () => void {
+    const active = this.activeOperation;
+    if (!active) return noop;
     const ids: RestorationEntryId[] = [];
     for (const id of turnIds) {
       const entry = this.turns.get(id);
       if (entry) ids.push(entry.entryId);
     }
-    return ids;
-  }
-
-  /** Called only once application returned; a throw leaves them unrecorded. */
-  private recordAppliedEntries(entryIds: readonly RestorationEntryId[]): void {
-    if (!this.activeOperation) return;
-    for (const id of entryIds) this.activeOperation.add(id);
-  }
-
-  private readObservation(): RestorationReaderState {
-    return {
-      entries: this.history.map((entry) => {
-        const status = this.getTurnStatus(entry.id);
-        return {
-          entryId: entry.entryId,
-          transactionIds:
-            entry.__transactionId === undefined ? [] : [entry.__transactionId],
-          status:
-            status === 'applied' || status === 'unapplied'
-              ? status
-              : 'inconsistent',
-        };
-      }),
-      currentIndex: this.currentIndex,
-      canUndo: this.canUndoConfirmed(),
-      canRedo: this.canRedoConfirmed(),
+    return () => {
+      for (const id of ids) active.add(id);
     };
   }
 
@@ -725,11 +681,19 @@ class RestorationManager<TSource, T> {
     this.historyVersion = locations.createCell(0);
     this.frontierVersion = locations.createCell(0);
     this.maxHistorySize = normaliseMaxHistorySize(config.maxHistorySize);
-    this.publishObservation = installRestorationReader(
-      tree,
-      this.positionRegistry.id,
-      () => this.readObservation()
-    );
+    defineRestorationSource(tree.$ as unknown as object, {
+      treeId: this.positionRegistry.id,
+      read: () => ({
+        entries: this.history,
+        statusOf: (turnId) => this.getTurnStatus(turnId),
+        currentIndex: this.currentIndex,
+        canUndo: this.canUndoConfirmed(),
+        canRedo: this.canRedoConfirmed(),
+      }),
+      attach: (observer) => {
+        this.observer = observer;
+      },
+    });
   }
 
   /**
@@ -807,7 +771,7 @@ class RestorationManager<TSource, T> {
 
     entry.__transactionId = transactionId;
     this.pendingTurns.set(entry.id, entry);
-    this.publishObservation({ kind: 'history-changed' });
+    this.observer?.historyChanged();
     return {
       ...entry,
       restorationSubjectIds: entry.restorationSubjectIds
@@ -1073,7 +1037,7 @@ class RestorationManager<TSource, T> {
 
     this.rebuildTurnIndexes();
     this.pruneHistoricalEventsBeforeOldestBoundary();
-    this.publishObservation({ kind: 'history-changed' });
+    this.observer?.historyChanged();
     return true;
   }
 
@@ -1993,7 +1957,7 @@ class RestorationManager<TSource, T> {
     this.isTemporalViewActive = false;
     this.bumpRestorationHistory();
     this.currentIndex = -1;
-    this.publishObservation({ kind: 'history-changed' });
+    this.observer?.historyChanged();
   }
 
   jumpTo(index: number): boolean {
@@ -2156,12 +2120,12 @@ class RestorationManager<TSource, T> {
       }
     }
 
-    const entryIds = this.entryIdsFor(turnIds);
+    const recordApplied = this.recordAppliedEntries(turnIds);
     const applyEffects = this.applyEffectsFn;
     this.applyReversal(() =>
       applyEffects([{ effects, direction, orderDeltas }])
     );
-    this.recordAppliedEntries(entryIds);
+    recordApplied();
   }
 
   private applyDirectedTurnTransition(
@@ -2201,10 +2165,13 @@ class RestorationManager<TSource, T> {
       applications.push({ effects, orderDeltas, direction });
     }
     if (applications.length > 0) {
-      const entryIds = this.entryIdsFor([...turnIdsToUndo, ...turnIdsToRedo]);
+      const recordApplied = this.recordAppliedEntries([
+        ...turnIdsToUndo,
+        ...turnIdsToRedo,
+      ]);
       const applyEffects = this.applyEffectsFn;
       this.applyReversal(() => applyEffects(applications));
-      this.recordAppliedEntries(entryIds);
+      recordApplied();
     }
   }
 

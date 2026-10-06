@@ -1646,7 +1646,7 @@
         "name": "RestorationEntryId",
         "subpath": "./internals",
         "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/internals/restoration-reader.ts",
+        "declFile": "packages/kernel/src/lib/internals/restoration-source.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": true
