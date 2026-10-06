@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
@@ -510,3 +510,217 @@ describe.each(configurations)(
     }, 120_000);
   }
 );
+
+// ─── v16 8g: jumps that cross rows (ported) ─────────────────────────────────
+// v16 integrate/v16-slice8g 1dbc5e7e, cause 5: an addition anchored on a row
+// another turn added. Physical placement resolves an addition's anchors as
+// each addition lands, which holds for one turn's additions, not for a jump
+// that concatenates turns: `d,e,a,b` came back for `a,b,d,e`. The other
+// shapes are v16's supersession carriers, which b21ae8c1 already covers.
+type Tree8g = {
+  $: ((value?: unknown) => unknown) & {
+    count: (value?: number) => number;
+    g: ((value?: unknown) => unknown) & {
+      rows: {
+        all(): Row[];
+        setAll(rows: Row[]): void;
+        addOne(row: Row): string;
+        removeOne(id: string): void;
+        ids(): string[];
+      };
+      h: { x: (value?: number) => number; y: (value?: number) => number };
+      s: (value?: number) => number;
+    };
+  };
+  undo(): void;
+  redo(): void;
+  jumpTo(index: number): void;
+  getCurrentIndex(): number;
+  destroy(): void;
+};
+const trees8g: Tree8g[] = [];
+afterEach(() => {
+  for (const tree of trees8g.splice(0)) tree.destroy();
+});
+const orders8g: Record<string, () => unknown[]> = {
+  'restoration alone': () => [restoration()],
+  'transactions first': () => [transactions(), restoration()],
+  'restoration first': () => [restoration(), transactions()],
+};
+const make8g = (enhancers: unknown[]): Tree8g => {
+  const tree = signalTree(declaration(), {
+    enhancers: enhancers as never,
+  }) as unknown as Tree8g;
+  trees8g.push(tree);
+  return tree;
+};
+const snap8g = (tree: Tree8g) => JSON.stringify(tree.$());
+
+describe('jumps that cross rows, a path re-add and an omission (v16 8g, ported)', () => {
+  const shapes: Record<
+    string,
+    { steps: (tree: Tree8g) => Array<() => unknown>; from: number; to: number }
+  > = {
+    // Back from 5 to 2 reverses the omission of g (which re-adds g with h),
+    // a `setAll` and the path re-add of h. The rows' collection lies under g,
+    // which is hidden while the reversal is planned, so its effects apply one
+    // by one; the scalar x under h, which the reversal hides, must not
+    // re-add h on the way.
+    'a scalar under a member the jump hides, with rows under a member it re-adds':
+      {
+        steps: (tree: Tree8g) => [
+          () => tree.$.count(1),
+          () => tree.$.g({ rows: [], k: 1, s: 1 }),
+          () =>
+            tree.$.g.rows.setAll([
+              { id: 'b', n: 1 },
+              { id: 'd', n: 2 },
+            ]),
+          () => tree.$.g.h.x(1),
+          () =>
+            tree.$.g.rows.setAll([
+              { id: 'a', n: 3 },
+              { id: 'b', n: 4 },
+              { id: 'c', n: 5 },
+            ]),
+          () => tree.$({ count: 13 }),
+        ],
+        from: 5,
+        to: 2,
+      },
+    // One turn writes y, omits and re-adds g with y 3, then writes y 5: its
+    // scalar effect holds y 5, its member effect the older 3. A jump that
+    // crosses it and another turn keeps the turn's own scalar.
+    'a turn whose own scalar is newer than its member re-add': {
+      steps: (tree: Tree8g) => [
+        () => tree.$.count(1),
+        () => tree.$.count(2),
+        () => {
+          tree.$.g.h.y(1);
+          tree.$({ count: 3 });
+          tree.$({ g: { h: { x: 0, y: 3 } }, count: 9 });
+          tree.$.g.h.y(5);
+        },
+      ],
+      from: 0,
+      to: 2,
+    },
+    // The same supersession as 'path re-adds, then a jump back past the
+    // omission', on the declarative path: the jump also reverses a reorder.
+    'a member write supersedes an older scalar, with a reorder in the jump': {
+      steps: (tree: Tree8g) => [
+        () => tree.$.count(1),
+        () =>
+          tree.$.g.rows.setAll([
+            { id: 'a', n: 1 },
+            { id: 'b', n: 2 },
+          ]),
+        () =>
+          tree.$.g.rows.setAll([
+            { id: 'b', n: 2 },
+            { id: 'a', n: 1 },
+          ]),
+        () => tree.$({ count: 2 }),
+        () => tree.$.g.h.x(7),
+        () => tree.$.g.h.y(4),
+        () => tree.$.g.h.y(9),
+      ],
+      from: 6,
+      to: 1,
+    },
+    // 'a turn whose own scalar is newer than its member re-add', on the
+    // declarative path.
+    'a turn keeps its own newer scalar, with a reorder in the jump': {
+      steps: (tree: Tree8g) => [
+        () => tree.$.count(1),
+        () =>
+          tree.$.g.rows.setAll([
+            { id: 'a', n: 1 },
+            { id: 'b', n: 2 },
+          ]),
+        () =>
+          tree.$.g.rows.setAll([
+            { id: 'b', n: 2 },
+            { id: 'a', n: 1 },
+          ]),
+        () => {
+          tree.$.g.h.y(1);
+          tree.$({ count: 3 });
+          tree.$({ g: { h: { x: 0, y: 3 } }, count: 9 });
+          tree.$.g.h.y(5);
+        },
+      ],
+      from: 1,
+      to: 3,
+    },
+    // Forward from 1 to 4: d's recorded neighbour e is added by one turn and
+    // removed by a later one, so only a turn-by-turn replay can place d.
+    'an anchor another turn added and a later turn removed': {
+      steps: (tree: Tree8g) => [
+        () => tree.$.count(1),
+        () => tree.$({ g: { h: { x: 0, y: 0 } }, count: 9 }),
+        () => tree.$.g.rows.addOne({ id: 'e', n: 0 }),
+        () =>
+          tree.$.g.rows.setAll([
+            { id: 'a', n: 1 },
+            { id: 'b', n: 2 },
+            { id: 'd', n: 3 },
+            { id: 'e', n: 4 },
+          ]),
+        () => tree.$.g.rows.removeOne('e'),
+      ],
+      from: 1,
+      to: 4,
+    },
+    // Forward from 1 to 3 re-adds the rows with e, then `setAll` places a, b
+    // and d around it: d's recorded neighbour e was added by the other turn.
+    'additions anchored on a row another turn added': {
+      steps: (tree: Tree8g) => [
+        () => tree.$.count(1),
+        () => tree.$({ g: { h: { x: 0, y: 0 } }, count: 9 }),
+        () => tree.$.g.rows.addOne({ id: 'e', n: 0 }),
+        () =>
+          tree.$.g.rows.setAll([
+            { id: 'a', n: 1 },
+            { id: 'b', n: 2 },
+            { id: 'd', n: 3 },
+            { id: 'e', n: 4 },
+          ]),
+      ],
+      from: 1,
+      to: 3,
+    },
+  };
+  for (const [order, enhancers] of Object.entries(orders8g))
+    for (const [shape, { steps, from, to }] of Object.entries(shapes))
+      it(`${shape} (${order})`, async () => {
+        const jumped = make8g(enhancers());
+        const chained = make8g(enhancers());
+        const states: string[] = [];
+        for (const tree of [jumped, chained]) {
+          await flush();
+          for (const step of steps(tree)) {
+            undoable(step);
+            await flush();
+            if (tree === jumped) states.push(snap8g(tree));
+          }
+        }
+        const last = states.length - 1;
+        // Both trees start the jump at `from`, by the chain.
+        for (const tree of [jumped, chained])
+          for (let i = last; i > from; i--) {
+            tree.undo();
+            await flush();
+          }
+        expect(snap8g(jumped)).toBe(states[from]);
+        jumped.jumpTo(to);
+        await flush();
+        for (let i = from; i !== to; i += to > from ? 1 : -1) {
+          if (to > from) chained.redo();
+          else chained.undo();
+          await flush();
+        }
+        expect(snap8g(jumped)).toBe(states[to]);
+        expect(snap8g(chained)).toBe(states[to]);
+      });
+});

@@ -268,18 +268,26 @@ export function requiresDeclarativeStructuralTarget(
   // Neighbours are subjects of the SAME collection; lifetimes repeat across
   // collections, so a bare lifetime set would treat another collection's
   // addition as this one's neighbour.
-  const addedSubjects = new Map<PositionId, Set<unknown>>();
-  for (const { owner, subjectId } of additions) {
-    let subjects = addedSubjects.get(owner);
-    if (!subjects) addedSubjects.set(owner, (subjects = new Set()));
-    subjects.add(subjectId);
+  //
+  // ⚠️ AND OF THE SAME TURN. Physical placement resolves an addition's
+  // anchors as each addition lands, which holds for the additions one turn
+  // recorded together. A jump crossing turns concatenates them: an anchor
+  // another turn added is not one this placement can rely on, so the
+  // complete target decides (a jump forward over a re-add and a `setAll`
+  // came back `d,e,a,b` for `a,b,d,e`; v16 8g, cause 5).
+  const addedSubjects = new Map<string, Set<unknown>>();
+  const turnOf = (effect: ReversalEffect) => `${effect.owner}:${effect.turn}`;
+  for (const effect of additions) {
+    let subjects = addedSubjects.get(turnOf(effect));
+    if (!subjects) addedSubjects.set(turnOf(effect), (subjects = new Set()));
+    subjects.add(effect.subjectId);
   }
   return additions.some((effect) => {
     const context = effect.structuralContext;
     if (context?.kind !== 'add' && context?.kind !== 'remove') {
       return false;
     }
-    const added = addedSubjects.get(effect.owner);
+    const added = addedSubjects.get(turnOf(effect));
     return (
       (context.beforeSubject !== undefined &&
         !added?.has(context.beforeSubject)) ||

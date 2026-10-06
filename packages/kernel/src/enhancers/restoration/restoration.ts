@@ -4561,6 +4561,29 @@ export function restoration(
       }));
     };
 
+    /** The applications cross more than one turn (a jump; `effectTurn`). */
+    const spansTurns = (applications: DirectedTurnApplication[]): boolean => {
+      let first: number | undefined;
+      for (const { effects } of applications)
+        for (const effect of effects) {
+          const turn = effectTurn.get(effect);
+          if (turn === undefined) continue;
+          first ??= turn;
+          if (turn !== first) return true;
+        }
+      return false;
+    };
+    /** A reversal effect, carrying its turn when the operation spans turns. */
+    const reversalOf = (
+      effect: TurnEffect,
+      direction: 'undo' | 'redo',
+      several: boolean
+    ): ReversalEffect => {
+      const reversal = toReversalEffect(effect, direction);
+      const turn = several ? effectTurn.get(effect) : undefined;
+      return turn === undefined ? reversal : { ...reversal, turn };
+    };
+
     const applyTurnEffectsThroughRealizationPort = (
       requested: DirectedTurnApplication[]
     ): void => {
@@ -4608,10 +4631,11 @@ export function restoration(
       // chronological — rekey-then-remove composes into one removal that keeps
       // the rekey's EARLIER slot — so reversing it put the field reversal
       // before the row was back, and undo refused as structural drift.
+      const several = spansTurns(applications);
       const reversalEffects = placeFieldReversalsWhileRowsExist(
         applications.flatMap((application) =>
           application.effects.map((effect) =>
-            toReversalEffect(effect, application.direction)
+            reversalOf(effect, application.direction, several)
           )
         )
       );
@@ -4892,7 +4916,7 @@ export function restoration(
             ...(index === 0 ? readdEffects : []),
             ...placeFieldReversalsWhileRowsExist(
               application.effects.map((effect) =>
-                toReversalEffect(effect, application.direction)
+                reversalOf(effect, application.direction, several)
               )
             ),
           ];
