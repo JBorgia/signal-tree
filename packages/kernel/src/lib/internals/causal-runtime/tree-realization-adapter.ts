@@ -2195,8 +2195,9 @@ const rowScope = (owner: unknown, subject: unknown): string =>
  *
  * Next is, in order of preference: a restore whose restored anchors are all
  * placed and that has a live anchor (or no live-able anchor at all); one with
- * at least one live anchor while another is still waiting; else the head of a
- * chain with nothing live (one whose predecessor is not waiting). An anchor
+ * at least one live anchor while another is still waiting; else the first
+ * unplaced restore — reached only when nothing is live (every neighbour was
+ * removed with it), where any start chains back through the anchors. An anchor
  * that is a surviving row, or a restore already placed, is live. The tiers
  * matter both ways: `updateOne c; removeOne a; removeOne c` anchors a to c (c
  * was there when a went), so c goes first; `removeMany([z, a])` beside a
@@ -2244,11 +2245,6 @@ function orderRestoresForPlacement<
   const ordered: T[] = [];
   let fullHead = 0;
   let partialHead = 0;
-  const isWaitingOn = (effect: T, subject: number | undefined): boolean => {
-    if (subject === undefined) return false;
-    const anchor = pending.get(rowScope(effect.owner, subject));
-    return anchor !== undefined && !placed.has(anchor);
-  };
   while (ordered.length < restores.length) {
     while (fullHead < full.length && placed.has(full[fullHead])) fullHead += 1;
     while (partialHead < partial.length && placed.has(partial[partialHead])) {
@@ -2259,11 +2255,7 @@ function orderRestoresForPlacement<
         ? full[fullHead++]
         : partialHead < partial.length
         ? partial[partialHead++]
-        : restores.find(
-            (effect) =>
-              !placed.has(effect) &&
-              !isWaitingOn(effect, anchorsOf(effect)?.beforeSubject)
-          ) ?? (restores.find((effect) => !placed.has(effect)) as T);
+        : (restores.find((effect) => !placed.has(effect)) as T);
     placed.add(next);
     ordered.push(next);
     for (const dependent of dependents.get(

@@ -290,6 +290,65 @@ describe.each(Object.entries(orders))(
       }
     });
 
+    it('only the FIRST later record per address is re-based, even if a later one matches', async () => {
+      const tree = make(enhancers);
+      try {
+        await seedRows(tree);
+        const proposal = tree.transaction(() => tree.$.x(1));
+        await flush();
+        undoable(() => tree.$.x(2));
+        await flush();
+        undoable(() => tree.$.x(1)); // the same value T wrote, but authored here
+        await flush();
+        undoable(() => tree.$.x(5));
+        await flush();
+        proposal.rollback();
+        await flush();
+        tree.undo();
+        await flush();
+        expect(tree.$.x()).toBe(1);
+        tree.undo();
+        await flush();
+        expect(tree.$.x()).toBe(2);
+        tree.undo();
+        await flush();
+        expect(tree.$.x()).toBe(0);
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    it('a restored row anchored only to rows T created lands where they were', async () => {
+      const tree = make(enhancers);
+      try {
+        tree.$.rows.addOne({ id: 'z', n: 0 });
+        tree.$.rows.addOne({ id: 's', n: 9 });
+        await flush();
+        const proposal = tree.transaction(() =>
+          tree.$.rows.setAll([
+            { id: 'A', n: 1 },
+            { id: 'z', n: 0 },
+            { id: 'B', n: 2 },
+            { id: 's', n: 9 },
+          ])
+        );
+        await flush();
+        undoable(() => tree.$.rows.removeMany(['A', 'z', 'B']));
+        await flush();
+        proposal.rollback();
+        await flush();
+        expect(tree.$.rows.ids()).toStrictEqual(['s']);
+        tree.undo();
+        await flush();
+        expect(tree.$.rows.all()).toStrictEqual([
+          { id: 'z', n: 0 },
+          { id: 's', n: 9 },
+        ]);
+      } finally {
+        tree.destroy();
+      }
+    });
+
     it('a chain of later writes: only the first is re-based', async () => {
       const tree = make(enhancers);
       try {
