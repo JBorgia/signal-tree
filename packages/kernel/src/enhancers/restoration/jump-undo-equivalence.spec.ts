@@ -7,6 +7,7 @@ import {
   transactions,
   undoable,
 } from '../../index';
+import { isRestorationRefusal } from '../../lib/internals/restoration-source';
 
 /**
  * v16 slice 8g: jumpTo(i) restores exactly what undoing back to i restores.
@@ -427,6 +428,69 @@ describe('jumpTo equals the undo and redo chains: generated histories (v16 8g)',
       }
     };
   };
+  // Multi-write turns, several jumps per history, every state checked against
+  // what the history recorded (v16 8g, after the capture fix). A refusal is
+  // allowed only as a typed restoration refusal that changes nothing.
+  for (const [order, enhancers] of Object.entries(orders))
+    it(`30 generated histories with multi-write turns (${order})`, async () => {
+      const failures: string[] = [];
+      for (let seed = 1; seed <= 30; seed++) {
+        const next = random(seed * 104729);
+        const turns = Array.from({ length: 10 }, () => {
+          const writes = Array.from(
+            { length: next() < 0.3 ? 2 + Math.floor(next() * 2) : 1 },
+            () => operation(next)
+          );
+          return (tree: Tree) => {
+            for (const write of writes) write(tree);
+          };
+        });
+        const tree = make(enhancers());
+        await flush();
+        const recorded: Record<number, string> = {};
+        for (const turn of turns) {
+          try {
+            undoable(() => turn(tree));
+          } catch {
+            // A refused write records what it wrote before refusing.
+          }
+          await flush();
+          recorded[tree.getCurrentIndex()] = snap(tree);
+        }
+        const end = tree.getCurrentIndex();
+        if (end < 1) continue;
+        for (let round = 0; round < 4; round++) {
+          const target = round % 2 ? end : Math.floor(next() * end);
+          const before = snap(tree);
+          const index = tree.getCurrentIndex();
+          try {
+            tree.jumpTo(target);
+          } catch (error) {
+            await flush();
+            if (
+              !isRestorationRefusal(error) ||
+              snap(tree) !== before ||
+              tree.getCurrentIndex() !== index
+            )
+              failures.push(
+                `seed ${seed} jumpTo(${target}) threw ${
+                  (error as Error).message
+                }`
+              );
+            continue;
+          }
+          await flush();
+          if (snap(tree) !== recorded[target])
+            failures.push(
+              `seed ${seed} jumpTo(${target}): ${snap(tree)} recorded ${
+                recorded[target]
+              }`
+            );
+        }
+      }
+      expect(failures).toEqual([]);
+    });
+
   const SEEDS = 40;
   for (const [order, enhancers] of Object.entries(orders))
     it(`${SEEDS} generated histories (${order})`, async () => {
