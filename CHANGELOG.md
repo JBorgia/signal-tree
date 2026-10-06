@@ -105,10 +105,41 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   that added, removed or reordered rows of that collection stands, undo of the
   order change throws and rollback refuses as a dependency,
   `later-confirmed-dependency` when that work is settled and
-  `later-pending-dependency` while it is another open transaction (settle
-  that one first; once it rolls back, the order change rolls back too).
+  `later-pending-dependency` while open transactions account for it (settle
+  them first; once they roll back, the order change rolls back too). When
+  settled work replaced the order as well, settling them would not bring it
+  back, so the refusal is `later-confirmed-dependency` from the start.
   State is unchanged. **Behaviour change:** the rollback refusal was
   `effect-validation-failed`.
+- That undo refusal is a typed ST1034 restoration refusal naming the
+  collection and the latest standing change to it ("ST1034: restoration
+  refused — the order of 'rows' changed after the order change being
+  reversed, and a later change outside undo history stands on it (added 'y';
+  removed 'a'). …"); it threw "collection order frontier does not match the
+  transition endpoint". State, history and `getCurrentIndex()` are unchanged.
+  A refused `jumpTo()` inside a `jumpTo()` view now leaves the view where it
+  was (it returned to the confirmed state first, then refused).
+- `transaction()` no longer throws after its callback committed ("no live
+  placement anchor", writes kept, no handle) when the transaction created
+  rows at the front and removed them together. Composing a turn's order never
+  throws now: an order change that cannot be composed is kept as unrecorded,
+  and only its reversal refuses, with nothing changed (undo: ST1034;
+  rollback: a `SignalTreeRollbackError` saying the order change was not
+  recorded; the handle still confirms).
+- A turn whose reorders cancel out, or that replaced a collection's order
+  without changing it (a row added and removed again), no longer breaks
+  `getRestorationHistory()` or the undo of an earlier order change.
+- `getRestorationHistory()` does not throw on order: where a standing change
+  outside undo history leaves an undone entry's rows with no anchor, the
+  history state places them last (rows and values stay exact). Undo, redo
+  and `jumpTo()` still refuse there.
+- A transaction opened while `undo()`, `redo()`, `jumpTo()` or another
+  transaction's rollback replays (in a tap or subscriber) is authored work: a
+  failing callback, or `rollback()`, reverses its writes (they were kept),
+  and it can be opened inside another transaction's rollback ("Nested
+  transaction is not supported" before).
+- Undo of a turn that wrote rows of two collections restores each
+  collection's rows in place (a row with no left neighbour went to the end).
 - A write a subscriber makes while a flush delivers an undoable turn is still
   a turn of its own; its order changes are now recorded with it, not with the
   turn being delivered (a nested `prependMany` made undo refuse). Made
@@ -121,19 +152,25 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   row's add, remove or rename in the same collection restores the renamed
   key; it left the new key in place while every row came back (pre-existing
   on 15.4.3).
-- Rolling back a pending `changeId` whose original key later work gave to a
+- Rolling back a pending `changeId` or removal whose key later work gave to a
   different row now refuses as a dependency (`later-confirmed-dependency`, or
   `later-pending-dependency` while that work is open), even after that row
-  was removed again. Accepting it left two rows at one key in history
-  (`getRestorationHistory()` threw "duplicate keys" and undo refused for
-  good). **Behaviour change:** a rename back into a key its occupier still
-  holds refused as `effect-validation-failed`; it now refuses first as
-  `later-confirmed-dependency`.
-- Rollback judges later work in the order it happened. A pending edit to a
-  row that a realized edit and then a confirmed removal touched no longer
-  refuses. An open transaction's edit of the row still blocks until it
-  settles; **behaviour change:** after a settled removal that is now reported
-  as `later-pending-dependency` (was `later-confirmed-dependency`).
+  was removed again by later work. Accepting it left two rows at one key in
+  history (`getRestorationHistory()` threw "duplicate keys" and undo refused
+  for good). A row added and removed again within one flush, by authored or
+  realized work alike, leaves nothing at the key and does not block (realized,
+  it refused). **Behaviour change:** while the new row still stands, the
+  rollback refused as `effect-validation-failed` (the rename or re-add found
+  the key taken); it now refuses first as `later-confirmed-dependency`.
+- Rollback judges later work in the order it was written, also within one
+  flush. A pending edit to a row that a realized edit and then a confirmed
+  removal touched no longer refuses, nor does one followed in the same flush
+  by an authored edit and a realized removal. An open transaction's edit of
+  the row still blocks until it settles; **behaviour change:** after a
+  settled removal that is now reported as `later-pending-dependency` (was
+  `later-confirmed-dependency`). A refusal caused by realized work names no
+  conflicting turn (`conflictingTurnId` is absent; it named the turn being
+  rolled back).
 - Undo, redo and rollback put restored rows back where they were in more
   cases: rows removed together at the front (`removeMany(['b', 'a'])` then
   `clear()` undid to `[b, c, d, e, a]`), rows anchored to different removed
@@ -144,7 +181,18 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
 - Undo after a write that discarded the redo future (or a `jumpTo()` view's
   future) no longer throws when the new entry removes rows only the
   discarded entries held ("Subject … cannot enter the structural target",
-  with the rows left removed).
+  with the rows left removed), including when that write is an undoable
+  transaction: the discarded entries are held until it confirms or rolls
+  back. A failure while recording the entry no longer leaves them held past
+  `destroy()` or a history reset. `getRestorationHistory()` no longer throws
+  after a transaction that is not undoable, confirmed or rolled back,
+  discarded the future of an undone reorder.
+- A failure while recording a pending transaction's turn no longer counts its
+  collections as pending twice (they stayed pending with no transaction
+  open) or releases the transaction's restoration claims early.
+- After rejecting a transaction that removed or reordered rows, history,
+  undo, redo and `jumpTo()` of later work restore those rows next to the
+  neighbours the rollback restored them beside (history and undo threw).
 - A devtools timeline jump that only reorders a collection no longer makes
   undo of an authored reorder refuse or `getRestorationHistory()` throw: the
   undo overwrites the scrub, and history states hold authored orders.

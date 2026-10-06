@@ -32,7 +32,15 @@ write to an EXISTING row that settled later work removed (even a plain
 stays absent (15.4.3 refused with `later-confirmed-dependency`). If the removing
 transaction is still open, rollback refuses with `later-pending-dependency`
 until it settles. A row that later confirmed work edited and kept still refuses,
-and so does a pending remove whose key newer truth re-occupied. `cause.kind`
+and so does a pending removal or rename whose key later work gave to a
+different row: that work rests on the key being free. Since 15.4.4 both refuse
+as a dependency (`later-confirmed-dependency`, or `later-pending-dependency`
+while that work is open), even after the new row was removed again by later
+work; through 15.4.3 the removal refused as `effect-validation-failed` while the
+new row stood, and was accepted once it was removed again, leaving two rows at
+one key in history (`getRestorationHistory()` and `undo()` threw "duplicate
+keys" for good). A row added and removed again within one flush leaves nothing
+at the key and does not block. `cause.kind`
 names the first matching later effect, so a `later-confirmed-dependency`
 refusal can still clear once a newer open transaction settles. Keep the handle and choose
 reconciliation or confirmation explicitly; do not promise that waiting or
@@ -64,10 +72,14 @@ rests on it, so:
 
 - `rollback()` refuses as a **dependency**: `later-confirmed-dependency` when
   that work is settled (a plain write, or a confirmed transaction), and
-  `later-pending-dependency` while it is another open transaction. Settle the
-  newer transaction first; once it rolls back, the order change rolls back
-  too. Through 15.4.3 this refusal reported `effect-validation-failed`.
-- `undo()` of the order change throws while that work stands.
+  `later-pending-dependency` while open transactions account for it. Settle
+  the newer transactions first; once they roll back, the order change rolls
+  back too. If settled work replaced the order as well, the refusal is
+  `later-confirmed-dependency`. Through 15.4.3 this refusal reported
+  `effect-validation-failed`.
+- `undo()` of the order change throws a typed ST1034 restoration refusal that
+  names the collection and the latest standing change to it, while that work
+  stands; `getCurrentIndex()` and history are unchanged.
 
 State is unchanged either way, and the transaction stays pending. A later
 `updateOne`, or work on another collection, does not block it. A write a
