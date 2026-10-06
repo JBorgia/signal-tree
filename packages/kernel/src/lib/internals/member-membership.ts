@@ -200,26 +200,20 @@ export function isAbsentMember(node: unknown): boolean {
  * collections install it, to wake their consumers after it rather than inside
  * it (`entity-signal`), so a tree without collections carries none of that.
  */
-export const structuralWrites: { depth: number; end?: () => void } = {
+export const structuralWrites: {
+  depth: number;
+  end?: (failed?: boolean) => void;
+} = {
   depth: 0,
 };
 
 /**
  * @internal Close a structural write opened with `structuralWrites.depth++`.
- * `failed` when it is closing because the write threw: its consumers still
- * re-read, but an error from one of them must not replace the write's own,
- * so it is reported asynchronously instead.
+ * `failed` when it is closing because the write threw, so that what `end`
+ * runs does not replace the write's own error (`entity-signal`).
  */
 export function endStructuralWrite(failed?: boolean): void {
-  if (--structuralWrites.depth) return;
-  try {
-    structuralWrites.end?.();
-  } catch (error) {
-    if (!failed) throw error;
-    queueMicrotask(() => {
-      throw error;
-    });
-  }
+  if (!--structuralWrites.depth) structuralWrites.end?.(failed);
 }
 
 /**

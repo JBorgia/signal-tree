@@ -3923,13 +3923,22 @@ export function createEntitySignal<
       if (wakeQueued) return;
       wakeQueued = true;
       const earlier = structuralWrites.end;
-      structuralWrites.end = () => {
+      structuralWrites.end = (failed) => {
         structuralWrites.end = undefined;
         wakeQueued = false;
         try {
-          earlier?.();
+          earlier?.(failed);
         } finally {
-          wake();
+          // Closing a reversal that threw: its own error is what surfaces,
+          // and a consumer's is reported asynchronously.
+          try {
+            wake();
+          } catch (error) {
+            if (!failed) throw error;
+            queueMicrotask(() => {
+              throw error;
+            });
+          }
         }
       };
     },
