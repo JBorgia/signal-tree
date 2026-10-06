@@ -192,7 +192,8 @@ type LaterAppliedEffect = {
 /** The payload both dependency refusals carry; the `kind` is added per member. */
 type PendingRollbackDependencyDetail = {
   pendingTurnId: number;
-  pendingEffect: TurnEffect;
+  /** Absent for an order change: a reorder of survivors has no effect. */
+  pendingEffect?: TurnEffect;
   conflictingTurnId?: number;
   conflictingEffect?: TurnEffect;
 };
@@ -990,6 +991,20 @@ class TransactionAuthority {
   peekPending(turnId: number): TransactionTurnRecord | undefined {
     const turn = this.pendingTurns.get(turnId);
     return turn ? cloneTurnRecord(turn) : undefined;
+  }
+
+  /**
+   * The first open transaction opened after `turnId` (ids are monotonic and
+   * callbacks synchronous, as in `getPendingRollbackPlan`) that wrote
+   * `position`.
+   */
+  laterPendingAt(turnId: number, position: number): number | undefined {
+    for (const [otherId, otherTurn] of this.pendingTurns) {
+      if (otherId > turnId && otherTurn.__positionIds?.includes(position)) {
+        return otherId;
+      }
+    }
+    return undefined;
   }
 
   discardPending(turnId: number): TransactionTurnRecord | undefined {
@@ -2150,6 +2165,57 @@ export function getOrCreateInternalTransactionRuntime<T>(
     };
   };
 
+  const transitionBindings = (): Map<
+    number,
+    CollectionTransitionTargetBinding
+  > => {
+    const bindings = new Map<number, CollectionTransitionTargetBinding>();
+    visitTree(tree.$, (node) => {
+      const binding = (
+        node as {
+          __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+        }
+      ).__prepareTransitionTarget;
+      if (binding) bindings.set(binding.owner, binding);
+      return undefined;
+    });
+    return bindings;
+  };
+
+  /**
+   * A pending ORDER change reverses only at the exact order it recorded (its
+   * frontier token, invariant 3). Where a later change to the collection's
+   * order or membership replaced that order, the later change rests on the
+   * order change: refused as a dependency, on the open transaction that made
+   * it if there is one (settle it first), else on settled work. It used to
+   * surface as `effect-validation-failed` from the order delta itself.
+   */
+  const orderDependencyOf = (
+    pendingTurnId: number
+  ): { conflict: PendingRollbackDependencyConflict } | undefined => {
+    const orderDeltas = pendingOrderDeltas.get(pendingTurnId) ?? [];
+    if (orderDeltas.length === 0) return undefined;
+    const bindings = transitionBindings();
+    const stale = orderDeltas.find((delta) => {
+      const binding = bindings.get(delta.owner);
+      return (
+        binding?.orderFrontier !== undefined &&
+        binding.orderFrontier() !== delta.afterFrontier
+      );
+    });
+    if (!stale) return undefined;
+    const laterPending = authority.laterPendingAt(pendingTurnId, stale.owner);
+    return {
+      conflict: dependencyConflict(laterPending !== undefined, {
+        pendingTurnId,
+        pendingEffect: authority
+          .peekPending(pendingTurnId)
+          ?.__effects?.find(({ position }) => position === stale.owner),
+        conflictingTurnId: laterPending,
+      }),
+    };
+  };
+
   const rollbackPendingTarget = (
     effects: TurnEffect[],
     orderDeltas: CollectionOrderDelta[]
@@ -2276,18 +2342,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
      */
     frontiers: readonly TurnFrontierTransition[] = []
   ): void => {
-    const bindings = new Map<number, CollectionTransitionTargetBinding>();
-    if (frontiers.length > 0) {
-      visitTree(tree.$, (node) => {
-        const binding = (
-          node as {
-            __prepareTransitionTarget?: CollectionTransitionTargetBinding;
-          }
-        ).__prepareTransitionTarget;
-        if (binding) bindings.set(binding.owner, binding);
-        return undefined;
-      });
-    }
+    const bindings = frontiers.length > 0 ? transitionBindings() : new Map();
     const reinstateFrontiers = prepareFrontierReinstatement(
       frontiers.map((transition) => frontierStepOf(transition, 'undo')),
       (owner) => bindings.get(owner)
@@ -3118,10 +3173,14 @@ export function getOrCreateInternalTransactionRuntime<T>(
           // transactions intact.
           // ═════════════════════════════════════════════════════════════════
 
-          const rollbackPlan =
+          const plan =
             pendingTurnId !== undefined
               ? authority.getPendingRollbackPlan(pendingTurnId)
               : { compensation: [] };
+          const rollbackPlan =
+            pendingTurnId !== undefined && !('conflict' in plan)
+              ? orderDependencyOf(pendingTurnId) ?? plan
+              : plan;
           if ('conflict' in rollbackPlan) {
             // The SECOND refusal door. 1f94f74a wrapped only the
             // effect-validation refusal thrown from compensation; this
