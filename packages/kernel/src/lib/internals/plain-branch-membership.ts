@@ -318,6 +318,80 @@ export function readPlainBranchMember(
     : { present: false };
 }
 
+/** A member that hides a location, with the location's keys below it. */
+export interface HidingMember {
+  readonly position: number | undefined;
+  readonly path: string | undefined;
+  readonly node: object;
+  readonly below: readonly string[];
+}
+
+/**
+ * The omitted members that hide `position` from the current tree: the
+ * location itself or a branch above it, outermost first. Empty when the
+ * location is current. Walks the registry's structured address, never a
+ * display path; `undefined` when that walk does not reach a node owning the
+ * position. A retained slot is not evidence that its location is current.
+ */
+export function hidingMembers(
+  root: object,
+  position: number
+): readonly HidingMember[] | undefined {
+  const address = getPositionRegistry(root)?.addressFor(position);
+  if (!address) return undefined;
+  const hiding: HidingMember[] = [];
+  let node: unknown = root;
+  for (let i = 0; i < address.length; i++) {
+    const descriptor = isNodeAccessor(node)
+      ? Object.getOwnPropertyDescriptor(node, address[i])
+      : undefined;
+    if (!descriptor || !('value' in descriptor)) return undefined;
+    node = descriptor.value;
+    if (!descriptor.enumerable)
+      hiding.push({
+        position: getOwnedPositionIds(node)?.[0],
+        path: getOwnedOwnerPath(node),
+        node: node as object,
+        below: address.slice(i + 1),
+      });
+  }
+  return getOwnedPositionIds(node)?.includes(position) ? hiding : undefined;
+}
+
+/**
+ * The whole value that re-adds a hidden member: its retained current value,
+ * with each target installed at its keys below the member. Hidden descendants
+ * on a target's way are re-added the same way; others stay absent.
+ */
+export function composeHiddenMemberValue(
+  member: object,
+  targets: ReadonlyArray<{ readonly below: readonly string[]; value: unknown }>
+): unknown {
+  let whole: { value: unknown } | undefined;
+  const children = new Map<string, Array<(typeof targets)[number]>>();
+  for (const target of targets) {
+    if (target.below.length === 0) {
+      // The member is the location itself; the last target wins.
+      whole = target;
+      continue;
+    }
+    const [key, ...below] = target.below;
+    let list = children.get(key);
+    if (!list) children.set(key, (list = []));
+    list.push({ below, value: target.value });
+  }
+  if (whole) return whole.value;
+  const value = {
+    ...unwrapBranchForWriteCapture<Record<string, unknown>>(member),
+  };
+  for (const [key, list] of children)
+    value[key] = composeHiddenMemberValue(
+      (member as Record<string, object>)[key],
+      list
+    );
+  return value;
+}
+
 /** Apply a recorded member to detached history using actual property keys. */
 export function applyPlainBranchMemberSnapshot<T>(
   root: object,
