@@ -105,68 +105,68 @@
 (!) [plugin typescript] src/enhancers/transactions/semantics-authority.ts (27:37): @rollup/plugin-typescript TS4111: Property 'y' comes from an index signature, so it must be accessed with ['y'].
 /private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-authority.ts:27:37
 
-[7m27[0m   c.equal(f.candidate.readVisible().y, y, 'visible y');
-[7m  [0m [91m                                    ~[0m
+27   c.equal(f.candidate.readVisible().y, y, 'visible y');
+                                       ~
 
 (!) [plugin typescript] src/enhancers/transactions/semantics-authority.ts (29:39): @rollup/plugin-typescript TS4111: Property 'y' comes from an index signature, so it must be accessed with ['y'].
 /private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-authority.ts:29:39
 
-[7m29[0m   c.equal(f.candidate.readCanonical().y, y, 'canonical y');
-[7m  [0m [91m                                      ~[0m
+29   c.equal(f.candidate.readCanonical().y, y, 'canonical y');
+                                         ~
 
 (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (77:37): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
 /private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:77:37
 
-[7m77[0m         f.candidate.readCanonical().x,
-[7m  [0m [91m                                    ~[0m
+77         f.candidate.readCanonical().x,
+                                       ~
 
 (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (81:27): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
 /private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:81:27
 
-[7m81[0m       c.equal(snapshot(f).x, 1, 'pending overlay remains visible');
-[7m  [0m [91m                          ~[0m
+81       c.equal(snapshot(f).x, 1, 'pending overlay remains visible');
+                             ~
 
 (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (85:27): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
 /private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:85:27
 
-[7m85[0m       c.equal(snapshot(f).x, 2, 'external truth survives rejection');
-[7m  [0m [91m                          ~[0m
+85       c.equal(snapshot(f).x, 2, 'external truth survives rejection');
+                             ~
 
 (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (158:25): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
 /private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:158:25
 
-[7m158[0m     c.equal(snapshot(f).x, 2, 'later literal visible');
-[7m   [0m [91m                        ~[0m
+158     c.equal(snapshot(f).x, 2, 'later literal visible');
+                            ~
 
 (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (163:25): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
 /private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:163:25
 
-[7m163[0m     c.equal(snapshot(f).x, 2, 'accept cannot replay older literal');
-[7m   [0m [91m                        ~[0m
+163     c.equal(snapshot(f).x, 2, 'accept cannot replay older literal');
+                            ~
 
 (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (205:23): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
 /private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:205:23
 
-[7m205[0m             c.equal(s.x, 0, 'refused x never published');
-[7m   [0m [91m                      ~[0m
+205             c.equal(s.x, 0, 'refused x never published');
+                          ~
 
 (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (206:23): @rollup/plugin-typescript TS4111: Property 'y' comes from an index signature, so it must be accessed with ['y'].
 /private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:206:23
 
-[7m206[0m             c.equal(s.y, 0, 'refused y never published');
-[7m   [0m [91m                      ~[0m
+206             c.equal(s.y, 0, 'refused y never published');
+                          ~
 
 (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (350:27): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
 /private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:350:27
 
-[7m350[0m       c.equal(snapshot(f).x, before.x, 'refused x unchanged');
-[7m   [0m [91m                          ~[0m
+350       c.equal(snapshot(f).x, before.x, 'refused x unchanged');
+                              ~
 
 (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (350:37): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
 /private/tmp/signaltree-v16-integration/packages/kernel/src/enhancers/transactions/semantics-composition.ts:350:37
 
-[7m350[0m       c.equal(snapshot(f).x, before.x, 'refused x unchanged');
-[7m   [0m [91m                                    ~[0m
+350       c.equal(snapshot(f).x, before.x, 'refused x unchanged');
+                                        ~
 
 created ../../dist/packages/kernel in 1.7s
 
