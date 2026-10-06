@@ -8,9 +8,12 @@ import { holdEntityMembershipDelivery } from '../../lib/internals/entity-members
 import {
   applyPlainBranchMemberSnapshot,
   canRealizePlainBranchMember,
+  collectionBindingAt,
   composeHiddenMemberValue,
   composePlainBranchMemberEffect,
   hidingMembers,
+  isReAddableMember,
+  type HiddenMemberTarget,
   plainBranchMemberEffectIsNoop,
   plainBranchMembershipEffects,
   preparePlainBranchMembers,
@@ -39,7 +42,6 @@ import {
   replaceLocation,
 } from '../../lib/internals/location-runtime';
 import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-port';
-import { isNodeAccessor } from '../../lib/internals/node-shape';
 import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
 import { rootAuthorityFor } from '../../lib/internals/root-source';
 
@@ -2675,7 +2677,7 @@ export function restoration(
       // targets, unless re-adding it would expose pending work. Anything that
       // cannot be re-added is refused. Nothing is applied before this
       // decision. (v16 integration 8b.)
-      let hiddenRefusal: ReversalRefusal | undefined;
+      let hiddenRefusal: string | undefined;
       let appliedEffects = reversalEffects;
       const readdedNodes: object[] = [];
       {
@@ -2687,10 +2689,16 @@ export function restoration(
           number,
           {
             member: { node: object; path: string | undefined };
-            targets: { below: readonly string[]; value: unknown }[];
+            targets: HiddenMemberTarget[];
           }
         >();
         const replaced = new Set<ReversalEffect>();
+        const unmoved = 'Nothing was changed; the history position is unmoved.';
+        // Presentation only (a display path or the structured address).
+        const label = (effect: ReversalEffect): string =>
+          effect.path ??
+          registry?.addressFor(effect.owner)?.join('.') ??
+          `position ${effect.owner}`;
         // One walk per location: a collection's many row effects share it.
         const walked = new Map<number, ReturnType<typeof hidingMembers>>();
         // A collection's order delta reaches its collection like a row effect.
@@ -2716,9 +2724,16 @@ export function restoration(
           const found = walked.get(effect.owner);
           if (!found) {
             // An address that exists but no longer walks to its owner is not
-            // evidence that the location is current.
+            // evidence that the location is current. Defensive: v16 never
+            // deletes a member (omission makes it non-enumerable, dynamic
+            // members reactivate with their identity), so every registered
+            // address still leads to its owner, as slice 6 found for the
+            // state-location reader (mutation survivor S5). Kept so that a
+            // future producer that breaks this refuses instead of writing.
             if (registry?.addressFor(effect.owner))
-              hiddenRefusal ??= { kind: 'structural-drift' };
+              hiddenRefusal ??=
+                `Unsupported scoped undo effect at '${label(effect)}': ` +
+                `its structured address no longer leads to the location. ${unmoved}`;
             continue;
           }
           const hiding = found.filter(
@@ -2733,19 +2748,36 @@ export function restoration(
           );
           const [outer] = hiding;
           if (external) {
-            hiddenRefusal ??= {
-              kind: 'value-drift',
-              path: external.path ?? effect.path ?? '',
-              current: undefined,
-              expected: effect.after,
-            };
+            const location = label(effect);
+            const member = external.path ?? location;
+            hiddenRefusal ??=
+              'ST1034: restoration refused — ' +
+              (member === location
+                ? `'${location}' was omitted by external truth after the operation being reversed`
+                : `'${member}' was omitted by external truth after the operation being reversed, and '${location}' lies under it`) +
+              `; restoring '${location}' would overwrite that omission. ${unmoved}`;
             continue;
           }
           if (
             outer.position === undefined ||
             !canRealizePlainBranchMember(tree.$, outer.position)
           ) {
-            hiddenRefusal ??= { kind: 'structural-drift' };
+            // Reached by an omitted entity collection, which is not a
+            // membership-managed location. A plain member whose retained
+            // location is unavailable is defensive: restoration registers a
+            // member's location whenever it observes the omission.
+            const location = label(effect);
+            const member = outer.path ?? location;
+            hiddenRefusal ??=
+              `Unsupported scoped undo effect at '${location}': ` +
+              (member === location
+                ? 'it was omitted'
+                : `its enclosing member '${member}' was omitted`) +
+              ' and cannot be re-added, because ' +
+              (isReAddableMember(outer.node)
+                ? 'its retained location is no longer available'
+                : 'it is not a plain state location (an entity collection, for example)') +
+              `. ${unmoved}`;
             continue;
           }
           let entry = readded.get(outer.position);
@@ -2755,11 +2787,14 @@ export function restoration(
               (entry = { member: outer, targets: [] })
             );
           // A slot's value travels with the re-add; an entity effect applies
-          // as usual once its collection is current again.
+          // as usual once the way to its collection is current again.
           if (slot) {
-            entry.targets.push({ below: outer.below, value: effect.after });
+            entry.targets.push({
+              below: outer.below,
+              value: { value: effect.after },
+            });
             replaced.add(effect);
-          }
+          } else entry.targets.push({ below: outer.below });
         }
         if (readded.size && !hiddenRefusal) {
           // Re-adding a member exposes what it retains. Pending work under it
@@ -2809,25 +2844,6 @@ export function restoration(
           }
         }
       }
-      // Collections under a member being re-added are not visited by the
-      // current-tree walk; their bindings are found under that member.
-      const readdedBindings = (): CollectionTransitionTargetBinding[] => {
-        const found: CollectionTransitionTargetBinding[] = [];
-        const walk = (node: object): void => {
-          for (const key of Object.getOwnPropertyNames(node)) {
-            const child = Object.getOwnPropertyDescriptor(node, key)?.value;
-            const binding = (
-              child as {
-                __prepareTransitionTarget?: CollectionTransitionTargetBinding;
-              } | null
-            )?.__prepareTransitionTarget;
-            if (binding) found.push(binding);
-            else if (isNodeAccessor(child)) walk(child as object);
-          }
-        };
-        for (const node of readdedNodes) walk(node);
-        return found;
-      };
       const orderEndpoints = new Map<number, 'before' | 'after'>();
       for (const application of applications) {
         for (const delta of application.orderDeltas) {
@@ -2856,9 +2872,10 @@ export function restoration(
               if (candidate?.owner === owner) binding = candidate;
               return undefined;
             });
-            binding ??= readdedBindings().find(
-              (candidate) => candidate.owner === owner
-            );
+            // A collection under a member being re-added is hidden from the
+            // current-tree walk; its binding is found along its address.
+            if (readdedNodes.length)
+              binding ??= collectionBindingAt(tree.$, owner);
             return binding?.readSource();
           })) &&
         reversalEffects.every(
@@ -2901,11 +2918,15 @@ export function restoration(
           }
           return undefined;
         });
-        for (const binding of readdedBindings())
-          if (!bindings.has(binding.owner))
-            bindings.set(binding.owner, binding);
         const sources = [...targetOwners].map((owner) => {
-          const binding = bindings.get(owner);
+          // A collection under a member being re-added is hidden from the
+          // current-tree walk; its binding is found along its address.
+          const binding =
+            bindings.get(owner) ??
+            (readdedNodes.length
+              ? collectionBindingAt(tree.$, owner)
+              : undefined);
+          if (binding) bindings.set(owner, binding);
           if (!binding) {
             throw new Error(`Declarative order replay has no binding ${owner}`);
           }
@@ -3088,8 +3109,8 @@ export function restoration(
         return undefined;
       })();
 
+      if (hiddenRefusal) throw restorationRefusal(hiddenRefusal);
       const refusal =
-        hiddenRefusal ??
         externalConflict ??
         (usesDeclarativeTarget
           ? undefined

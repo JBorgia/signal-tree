@@ -145,8 +145,10 @@ describe('ordinary authored omission: the hidden member is re-added', () => {
           expect(t.value()).toEqual(pre(shape));
           expect(t.count()).toBe(0);
           if (nested)
+            // The branch's other member is not the turn's location; the
+            // ordinary omission still holds for it (slice 8c).
             expect(t.tree.$()).toEqual({
-              a: { value: pre(shape), keep: 0 },
+              a: { value: pre(shape) },
               count: 0,
             });
           t.tree.redo();
@@ -189,7 +191,7 @@ describe('ordinary authored omission: the hidden member is re-added', () => {
       }
 
   it.each(Object.keys(historyOrders))(
-    'a re-added branch keeps its other members as they were when omitted (%s)',
+    "a re-added branch carries only the reversal's locations; retained storage supplies nothing (%s)",
     async (order) => {
       const tree = signalTree(
         { a: { value: leaf({ min: 0 }), keep: 0 }, count: 0 },
@@ -208,7 +210,10 @@ describe('ordinary authored omission: the hidden member is re-added', () => {
       tree.$({ count: 1 } as never);
       await flush();
       tree.undo();
-      expect(tree.$()).toEqual({ a: { value: { min: 0 }, keep: 7 }, count: 0 });
+      // "DORMANT STORAGE MUST NOT SUPPLY THE REACTIVATED VALUE"
+      // (whole-value-membership.spec.ts 18): `keep` stays absent, as the
+      // ordinary omission left it, rather than coming back as 7 (slice 8c).
+      expect(tree.$()).toEqual({ a: { value: { min: 0 } }, count: 0 });
     }
   );
 
@@ -244,7 +249,7 @@ describe('ordinary authored omission: the hidden member is re-added', () => {
       await flush();
       expect(tree.$()).toEqual({ count: 1 });
       tree.undo();
-      expect(tree.$()).toEqual({ a: { b: { value: 0 }, keep: 0 }, count: 0 });
+      expect(tree.$()).toEqual({ a: { b: { value: 0 } }, count: 0 });
     }
   );
 
@@ -512,7 +517,7 @@ describe('review follow-up: retained state, pending work and entity collections'
       await flush();
       pending.rollback();
       tree.undo();
-      expect(tree.$()).toEqual({ a: { value: 0, keep: 0 }, count: 0 });
+      expect(tree.$()).toEqual({ a: { value: 0 }, count: 0 });
     });
 
     it(`re-adding a branch that holds pending work refuses until it settles (${order})`, async () => {
@@ -540,10 +545,7 @@ describe('review follow-up: retained state, pending work and entity collections'
         expect(tree.getCurrentIndex()).toBe(index);
         pending[settle]();
         tree.undo();
-        expect(tree.$()).toEqual({
-          a: { value: 0, keep: settle === 'confirm' ? 9 : 0 },
-          count: 0,
-        });
+        expect(tree.$()).toEqual({ a: { value: 0 }, count: 0 });
       }
     });
 
@@ -566,7 +568,12 @@ describe('review follow-up: retained state, pending work and entity collections'
         pending[settle]();
         await flush();
         tree.undo();
-        expect(tree.$()).toEqual({ a: { value: 0, keep: 0 }, count: 0 });
+        // Rolled back, the omission's own before-image returns `keep`; confirmed,
+        // the ordinary omission still holds for it.
+        expect(tree.$()).toEqual({
+          a: settle === 'rollback' ? { value: 0, keep: 0 } : { value: 0 },
+          count: 0,
+        });
       }
     });
   }
@@ -598,7 +605,7 @@ describe('review follow-up: retained state, pending work and entity collections'
         expect(tree.$()).toEqual({ count: 1 });
         tree.undo();
         expect(tree.$()).toEqual({
-          g: { rows: { all: [{ id: 'a', n: 0 }] }, k: 0 },
+          g: { rows: { all: [{ id: 'a', n: 0 }] } },
           count: 0,
         });
         tree.redo();
@@ -695,7 +702,7 @@ describe('review follow-up: retained state, pending work and entity collections'
                 { id: 'b', n: 0 },
               ],
             },
-            k: 0,
+            ...(change === 'slot and reorder' ? { k: 0 } : {}),
           },
           count: 0,
         });
@@ -738,6 +745,103 @@ describe('review follow-up: retained state, pending work and entity collections'
       expect(tree.$()).toEqual({ a: { value: 1, keep: 0 }, count: 0 });
       earlier.rollback();
       expect(tree.$()).toEqual({ a: { value: 0, keep: 0 }, count: 0 });
+    });
+  }
+});
+
+describe('refusal messages name the location and the reason (slice 8c)', () => {
+  const unmoved = 'Nothing was changed; the history position is unmoved.';
+  for (const [order, enhancers] of Object.entries(historyOrders)) {
+    it(`external omission of the location itself (${order})`, async () => {
+      const t = build('scalar', false, enhancers());
+      undoable(() => t.value(1));
+      await flush();
+      external(t.omit);
+      await flush();
+      expect(() => t.tree.undo()).toThrow(
+        `ST1034: restoration refused — 'value' was omitted by external truth after the operation being reversed; restoring 'value' would overwrite that omission. ${unmoved}`
+      );
+    });
+
+    it(`external omission of an enclosing branch (${order})`, async () => {
+      const t = build('object terminal', true, enhancers());
+      undoable(() => t.value({ min: 1 }));
+      await flush();
+      external(t.omit);
+      await flush();
+      expect(() => t.tree.undo()).toThrow(
+        `ST1034: restoration refused — 'a' was omitted by external truth after the operation being reversed, and 'a.value' lies under it; restoring 'a.value' would overwrite that omission. ${unmoved}`
+      );
+    });
+
+    for (const change of ['reorder', 'add'] as const)
+      it(`a ${change} under an externally omitted branch names the collection (${order})`, async () => {
+        type Row = { id: string; n: number };
+        const tree = signalTree(
+          { g: { rows: entityMap<Row, string>(), k: 0 }, count: 0 },
+          { enhancers: enhancers() }
+        );
+        trees.push(tree);
+        const rows = tree.$.g.rows;
+        rows.setAll([
+          { id: 'a', n: 0 },
+          { id: 'b', n: 0 },
+        ]);
+        await flush();
+        undoable(() =>
+          change === 'reorder'
+            ? rows.setAll([
+                { id: 'b', n: 0 },
+                { id: 'a', n: 0 },
+              ])
+            : rows.addOne({ id: 'c', n: 0 })
+        );
+        await flush();
+        external(() => tree.$({ count: 0 } as never));
+        await flush();
+        let message = '';
+        try {
+          tree.undo();
+        } catch (error) {
+          message = (error as Error).message;
+        }
+        expect(message).toMatch(
+          /^ST1034: restoration refused — 'g' was omitted by external truth after the operation being reversed, and '(g\.rows[^']*)' lies under it; restoring '\1' would overwrite that omission\. Nothing was changed; the history position is unmoved\.$/
+        );
+        expect(message).not.toContain('undefined');
+      });
+
+    it(`an omitted entity collection cannot be re-added, and says why (${order})`, async () => {
+      type Row = { id: string; n: number };
+      const tree = signalTree(
+        { g: { rows: entityMap<Row, string>(), k: 0 }, count: 0 },
+        { enhancers: enhancers() }
+      );
+      trees.push(tree);
+      const rows = tree.$.g.rows;
+      rows.addOne({ id: 'a', n: 0 });
+      await flush();
+      undoable(() => {
+        rows.updateOne('a', { n: 1 });
+        tree.$.count(1);
+      });
+      await flush();
+      // An ordinary whole-value write to `g` omits the collection itself.
+      (tree.$.g as unknown as (value: unknown) => void)({ k: 0 });
+      await flush();
+      const index = tree.getCurrentIndex();
+      let message = '';
+      try {
+        tree.undo();
+      } catch (error) {
+        message = (error as Error).message;
+      }
+      expect(message).toMatch(
+        /^Unsupported scoped undo effect at 'g\.rows[^']*': (it was omitted|its enclosing member 'g\.rows' was omitted) and cannot be re-added, because it is not a plain state location \(an entity collection, for example\)\. Nothing was changed; the history position is unmoved\.$/
+      );
+      expect(tree.$()).toEqual({ g: { k: 0 }, count: 1 });
+      expect(rows.byId('a')?.()).toEqual({ id: 'a', n: 1 });
+      expect(tree.getCurrentIndex()).toBe(index);
     });
   }
 });

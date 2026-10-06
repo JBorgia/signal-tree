@@ -11,9 +11,10 @@ import { setMemberPresence } from './member-membership';
 import { publishMembershipChange } from './snapshot-authority';
 import { getTreeScalarSlotRuntime } from './tree-scalar-slot-port';
 import { withWriteContext } from '../write-context';
-import { isNodeAccessor } from './node-shape';
+import { isNodeAccessor, isTraversableNode } from './node-shape';
 import { isWritableLocation, replaceLocation } from './location-runtime';
 import type { ScalarSlotCommitResult } from './tree-scalar-slot-runtime';
+import type { CollectionTransitionTargetBinding } from './causal-runtime/target-transition';
 
 type MemberValue =
   | { readonly present: false }
@@ -342,7 +343,7 @@ export function hidingMembers(
   const hiding: HidingMember[] = [];
   let node: unknown = root;
   for (let i = 0; i < address.length; i++) {
-    const descriptor = isNodeAccessor(node)
+    const descriptor = isTraversableNode(node)
       ? Object.getOwnPropertyDescriptor(node, address[i])
       : undefined;
     if (!descriptor || !('value' in descriptor)) return undefined;
@@ -359,21 +360,60 @@ export function hidingMembers(
 }
 
 /**
- * The whole value that re-adds a hidden member: its retained current value,
- * with each target installed at its keys below the member. Hidden descendants
- * on a target's way are re-added the same way; others stay absent. Members
- * that are not state locations (an entity collection) are not part of it.
+ * The transition binding of the collection that owns `position`, reached
+ * along its structured address whether or not an omitted member hides it.
+ * The current-tree walk skips hidden members, so a reversal that re-adds a
+ * member, or a rollback that compensates retained storage, looks here.
+ */
+export function collectionBindingAt(
+  root: object,
+  position: number
+): CollectionTransitionTargetBinding | undefined {
+  const address = getPositionRegistry(root)?.addressFor(position);
+  if (!address) return undefined;
+  let node: unknown = root;
+  for (const key of address) {
+    if (!isTraversableNode(node)) return undefined;
+    node = Object.getOwnPropertyDescriptor(node, key)?.value;
+  }
+  const binding = (
+    node as { __prepareTransitionTarget?: CollectionTransitionTargetBinding }
+  )?.__prepareTransitionTarget;
+  return binding?.owner === position ? binding : undefined;
+}
+
+/** Whether a member can be re-added through plain-branch membership. */
+export function isReAddableMember(node: unknown): boolean {
+  return isNodeAccessor(node) || isWritableLocation(node);
+}
+
+/** A location a re-added member must make current again. */
+export interface HiddenMemberTarget {
+  /** Keys from the re-added member down to the location. */
+  readonly below: readonly string[];
+  /** The value to install; absent when only the way must be current (a collection). */
+  readonly value?: { readonly value: unknown };
+}
+
+/**
+ * The whole value that re-adds a hidden member, built only from supplied
+ * targets. Retained (dormant) storage never supplies a value: "DORMANT STORAGE
+ * MUST NOT SUPPLY THE REACTIVATED VALUE" (`whole-value-membership.spec.ts`
+ * 18; `activateOne` in `member-membership.ts`). So the members on the
+ * targets' way are re-added and every other state location stays absent. An
+ * entity collection or marker is not a membership-managed location: it stays
+ * where it is and becomes current with its branch.
  */
 export function composeHiddenMemberValue(
   member: object,
-  targets: ReadonlyArray<{ readonly below: readonly string[]; value: unknown }>
+  targets: readonly HiddenMemberTarget[]
 ): unknown {
   let whole: { value: unknown } | undefined;
-  const children = new Map<string, Array<(typeof targets)[number]>>();
+  const children = new Map<string, HiddenMemberTarget[]>();
   for (const target of targets) {
     if (target.below.length === 0) {
       // The member is the location itself; the last target wins.
-      whole = target;
+      if (target.value) whole = target.value;
       continue;
     }
     const [key, ...below] = target.below;
@@ -382,20 +422,12 @@ export function composeHiddenMemberValue(
     list.push({ below, value: target.value });
   }
   if (whole) return whole.value;
-  // Only retained state locations are members; an entity collection or a
-  // marker stays where it is and becomes current with its branch.
-  const retained = unwrapBranchForWriteCapture<Record<string, unknown>>(member);
   const value: Record<string, unknown> = {};
-  for (const key of Object.keys(retained)) {
+  for (const [key, list] of children) {
     const child = Object.getOwnPropertyDescriptor(member, key)?.value;
     if (isNodeAccessor(child) || isWritableLocation(child))
-      value[key] = retained[key];
+      value[key] = composeHiddenMemberValue(child as object, list);
   }
-  for (const [key, list] of children)
-    value[key] = composeHiddenMemberValue(
-      (member as Record<string, object>)[key],
-      list
-    );
   return value;
 }
 
