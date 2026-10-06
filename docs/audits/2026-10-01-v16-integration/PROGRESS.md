@@ -1213,3 +1213,28 @@ are reachable from the package root. Dispositions:
    gate (`probes/perf.log`); no performance claim either way.
 8. Mutation survivor S5 (defensive ownership check in state location).
 9. The v15 user guide `docs/guides/runtime-observation.md` is not carried.
+
+## Gate repairs after slice 6 (2026-10-05)
+
+Slice 6 merged at `8398b829` after independent re-verification:
+- kernel: 384 files, 4058 passed;
+- frameworks: angular 179, react 23, vue 63, solid 41;
+- typecheck, spec-types, lint and kernel neutrality: pass;
+- entities production bundle: 23.59 KB, which is +226 B over `515a6969`.
+
+The gates that were already red at `515a6969` are repaired:
+
+- `0fcde58c`: refreshes the API and callable baselines and the consumer sample
+  for the `d394047c` change, which folded `propose()` into `transact()`. The
+  baselines differ only by that drift. `api-inventory --check`,
+  `check-callable-inventory` and the consumer type-check (bundler and node16)
+  now pass.
+- `4647d138`: removes ANSI escape codes from `slice1/build.log`.
+  `check-source-controls` now passes.
+- `f261f4a5`: deletes the orphaned `check-contract-neutrality`. Nothing runs it,
+  and every module it checked was deliberately deleted.
+
+Still red: the bundle budget. Bare was already over at `515a6969`
+(10.39/10.25 KB), and entities is over too (23.59/22.6 KB). v15's ceilings do
+not carry over to v16; the size and performance pass sets v16's own ceilings
+and fixes what it measures.
