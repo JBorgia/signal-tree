@@ -2741,9 +2741,25 @@ export function getOrCreateInternalTransactionRuntime<T>(
       const activeMeta = getActiveWriteContext();
       const notifier = getPathNotifier();
       const captureRuntime = getMutationCaptureRuntime(tree);
-      if (typeof activeMeta?.transactionId === 'number') {
+      // An OPEN transaction scope carries its owner; a compensation names the
+      // transaction it compensates without one, and a tap it runs may open a
+      // transaction of its own.
+      if (
+        typeof activeMeta?.transactionId === 'number' &&
+        activeMeta.transactionOwner !== undefined
+      ) {
         throw new Error('Nested transaction is not supported');
       }
+      // A transaction is authored work wherever it is opened. Opened by a tap
+      // while undo, redo or another transaction's rollback replays, it
+      // inherited the replay's provenance (`origin`, `participation`), and
+      // every capture declines a replay's writes: nothing was recorded, so
+      // its rollback, automatic or explicit, left its writes in place.
+      const {
+        origin: _origin,
+        participation: _participation,
+        ...inherited
+      } = activeMeta ?? {};
 
       flushDeferredTreeWrites(tree.$ as object);
       notifier?.flushSync();
@@ -2959,7 +2975,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
         try {
           withWriteContext(
             {
-              ...(activeMeta ?? {}),
+              ...inherited,
               transactionId,
               transactionOwner: transactionOwnerToken,
             },
