@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { undoable } from '../lib/undoable';
 
 import { restoration } from '../enhancers/restoration/restoration';
@@ -29,11 +29,32 @@ import { signalTree } from '../index';
  * commit body, same third-bucket commit as SubjectId. The identical scenarios
  * pass on the published 14.x lineage.
  */
+/**
+ * 2026-10-01 closure for the cases below (historical finding above preserved):
+ * undo now admits a registered terminal position instead of inferring support
+ * from primitive payload types. The existing cloning path is unchanged.
+ * These controls cover number arrays, Date timestamps, string-to-number Maps,
+ * string Sets, and a mixed scalar/array turn. They do not establish object-key
+ * identity, custom-instance cloning, cycles, or every Map/Set payload policy.
+ *
+ * v16 integration slice 8 carried this closure from v15 2892b650 unchanged.
+ * Historical failure evidence, kept beside it: each container case below
+ * asserted `expect(() => tree.undo()).toThrow(/Unsupported scoped undo effect
+ * at rows|when|lookup|seen/)`, and the mixed turn asserted the same refusal
+ * with `n` stranded at 2, because the whole turn was validated before any of
+ * it applied. On v16 269ef687 all five still failed with exactly those
+ * messages (slice 8 first-red run).
+ */
+const trees: Array<{ destroy(): void }> = [];
+afterEach(() => {
+  for (const tree of trees.splice(0)) tree.destroy();
+});
 const tick = () => new Promise<void>((r) => setTimeout(r, 0));
 
 describe('undo — scalar leaves work', () => {
   it('CONTROL — a number leaf undoes correctly', async () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
+    trees.push(tree);
     undoable(() => tree.$.n(1));
     await tick();
     undoable(() => tree.$.n(2));
@@ -45,6 +66,7 @@ describe('undo — scalar leaves work', () => {
 
   it('CONTROL — a string leaf undoes correctly', async () => {
     const tree = signalTree({ s: '' }, { enhancers: [restoration()] });
+    trees.push(tree);
     undoable(() => tree.$.s('a'));
     await tick();
     undoable(() => tree.$.s('b'));
@@ -55,17 +77,21 @@ describe('undo — scalar leaves work', () => {
   });
 });
 
-describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
+describe('undo — registered terminal container controls', () => {
   it('ARRAY leaf', async () => {
     const tree = signalTree(
       { rows: [] as number[] },
       { enhancers: [restoration()] }
     );
+    trees.push(tree);
     undoable(() => tree.$.rows([1]));
     await tick();
     undoable(() => tree.$.rows([1, 2]));
     await tick();
-    expect(() => tree.undo()).toThrow(/Unsupported scoped undo effect at rows/);
+    tree.undo();
+    expect(tree.$.rows()).toEqual([1]);
+    tree.redo();
+    expect(tree.$.rows()).toEqual([1, 2]);
   });
 
   it('DATE leaf', async () => {
@@ -75,11 +101,15 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
       },
       { enhancers: [restoration()] }
     );
+    trees.push(tree);
     undoable(() => tree.$.when(new Date('2021-01-01T00:00:00.000Z')));
     await tick();
     undoable(() => tree.$.when(new Date('2022-01-01T00:00:00.000Z')));
     await tick();
-    expect(() => tree.undo()).toThrow(/Unsupported scoped undo effect at when/);
+    tree.undo();
+    expect(tree.$.when()).toEqual(new Date('2021-01-01T00:00:00.000Z'));
+    tree.redo();
+    expect(tree.$.when()).toEqual(new Date('2022-01-01T00:00:00.000Z'));
   });
 
   it('MAP leaf', async () => {
@@ -89,13 +119,15 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
       },
       { enhancers: [restoration()] }
     );
+    trees.push(tree);
     undoable(() => tree.$.lookup(new Map([['a', 1]])));
     await tick();
     undoable(() => tree.$.lookup(new Map([['a', 2]])));
     await tick();
-    expect(() => tree.undo()).toThrow(
-      /Unsupported scoped undo effect at lookup/
-    );
+    tree.undo();
+    expect(tree.$.lookup()).toEqual(new Map([['a', 1]]));
+    tree.redo();
+    expect(tree.$.lookup()).toEqual(new Map([['a', 2]]));
   });
 
   it('SET leaf', async () => {
@@ -103,29 +135,34 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
       { seen: new Set<string>() },
       { enhancers: [restoration()] }
     );
+    trees.push(tree);
     undoable(() => tree.$.seen(new Set(['a'])));
     await tick();
     undoable(() => tree.$.seen(new Set(['a', 'b'])));
     await tick();
-    expect(() => tree.undo()).toThrow(/Unsupported scoped undo effect at seen/);
+    tree.undo();
+    expect(tree.$.seen()).toEqual(new Set(['a']));
+    tree.redo();
+    expect(tree.$.seen()).toEqual(new Set(['a', 'b']));
   });
 
-  it('AND a scalar sibling is collateral — the whole undo turn is refused', async () => {
-    // The throw is not scoped to the offending position. `applyTurnEffects`
-    // validates the WHOLE effect list before applying any of it, so one
-    // non-scalar leaf in a turn takes the scalar writes down with it.
+  it('restores scalar and non-scalar siblings together', async () => {
     const tree = signalTree(
       { n: 0, rows: [] as number[] },
       { enhancers: [restoration()] }
     );
+    trees.push(tree);
     undoable(() => tree.$.n(1));
     await tick();
     undoable(() => tree.$.n(2));
     undoable(() => tree.$.rows([9]));
     await tick();
 
-    expect(() => tree.undo()).toThrow(/Unsupported scoped undo effect/);
-    // n is stranded at 2 — the undo the user asked for did not happen at all.
+    tree.undo();
+    expect(tree.$.n()).toBe(1);
+    expect(tree.$.rows()).toEqual([]);
+    tree.redo();
     expect(tree.$.n()).toBe(2);
+    expect(tree.$.rows()).toEqual([9]);
   });
 });

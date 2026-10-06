@@ -1807,7 +1807,20 @@ export function getOrCreateInternalTransactionRuntime<T>(
       return;
     }
 
-    if (isPlainRecord(next) && isPlainRecord(prev)) {
+    // Payload shape is not topology (v15 2892b650): a registered terminal
+    // slot owns its whole value, so a plain-object replacement stays one
+    // effect. Only branch and subject (entity row) values decompose by field.
+    if (
+      isPlainRecord(next) &&
+      isPlainRecord(prev) &&
+      !(
+        !subjectIds?.length &&
+        positionIds?.[0] !== undefined &&
+        (
+          getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$)
+        )?.resolveScalarSlot(positionIds[0]) !== undefined
+      )
+    ) {
       const position = positionIds?.[0];
       const subject = subjectIds?.[0];
       if (position === undefined) {

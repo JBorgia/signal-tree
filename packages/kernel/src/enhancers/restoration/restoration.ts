@@ -2180,6 +2180,18 @@ class RestorationManager<TSource, T> {
       case 'set':
         if (effect.plainBranchMembership)
           return canRealizePlainBranchMember(this.tree.$, effect.position);
+        // A registered terminal restores one value whatever its payload's
+        // shape (v15 2892b650). Registration admits the effect kind only;
+        // whether the terminal is still live is the membership and
+        // external-truth checks' decision, made before anything is applied.
+        if (
+          effect.subject === undefined &&
+          (
+            getTreeScalarSlotRuntime(this.tree) ??
+            getTreeScalarSlotRuntime(this.tree.$)
+          )?.resolveScalarSlot(effect.position) !== undefined
+        )
+          return true;
         return (
           (this.isScalarValue(effect.before) &&
             this.isScalarValue(effect.after)) ||
@@ -3881,7 +3893,17 @@ export function restoration(
         return;
       }
 
-      if (isPlainRecord(next) && isPlainRecord(prev)) {
+      // Payload shape is not topology (v15 2892b650): a registered terminal
+      // slot owns its whole value. Only branch and subject values decompose.
+      if (
+        isPlainRecord(next) &&
+        isPlainRecord(prev) &&
+        !(
+          !subjectIds?.length &&
+          positionIds?.[0] !== undefined &&
+          scalarSlotRuntime?.resolveScalarSlot(positionIds[0]) !== undefined
+        )
+      ) {
         // Subject notifications carry the complete row. Its property keys are
         // the address; the display path may contain dots in either ID or key.
         enqueueScalarDiff(
@@ -4508,9 +4530,20 @@ export function restoration(
                   // same-tick authored write must start at the restored value,
                   // not cancel against or inherit the speculative baseline.
                   return;
-                } else if (next === undefined) {
+                } else if (
+                  next === undefined &&
+                  !(
+                    !subjectIds?.length &&
+                    positionIds?.[0] !== undefined &&
+                    scalarSlotRuntime?.resolveScalarSlot(positionIds[0]) !==
+                      undefined
+                  )
+                ) {
                   externalTruthByPath.delete(path);
                 } else {
+                  // A terminal can hold undefined as external truth (v15
+                  // 2892b650). Collection notifications with no value still
+                  // take the branch above.
                   externalTruthByPath.set(path, next);
                 }
                 // Only a row-shaped payload is useful here; the collection also
