@@ -415,7 +415,9 @@ function combineScalarMutationIntent(
 
 function buildPendingRollbackPlan(
   pendingTurn: TransactionTurnRecord | undefined,
-  laterEffects: LaterAppliedEffect[]
+  laterEffects: LaterAppliedEffect[],
+  /** Whether undo history (a restoration claim) can still restore a row. */
+  isRestorable: (subject: number) => boolean = () => false
 ): PendingRollbackPlan {
   if (!pendingTurn) {
     return { compensation: [] };
@@ -607,14 +609,18 @@ function buildPendingRollbackPlan(
    * which is exactly the case that accepted it.
    *
    * A pending REMOVE vacated its key the same way (rollback/rebase review,
-   * item 2): a later add of a different row at that key, even removed again,
-   * rests on the removal, and accepting the rollback put two lifetimes at
-   * one key in history ("duplicate keys", for good). While the occupier
-   * still stands it refused as `effect-validation-failed` (the re-add found
+   * item 2): a later row at that key rests on the removal. While it stands,
+   * the rollback refused as `effect-validation-failed` (the re-add found
    * the key taken), which named a broken compensation rather than the
-   * dependency; both are the dependency kind now (proposal-rejection-0 case
-   * 15 and the refusal-lifecycle gate's `replacement` cases carry the
-   * reason).
+   * dependency; it is the dependency kind now (proposal-rejection-0 case 15
+   * and the refusal-lifecycle gate's `replacement` cases carry the reason).
+   * Removed again, it stays a dependency while undo history can bring it
+   * back (its subject is claimed): accepted, history held two lifetimes at
+   * one key ("duplicate keys", for good). Once settled work removed it and
+   * nothing can restore it, re-adding the row is consistent and the rollback
+   * proceeds: the refusal-lifecycle gate's PRESERVED `replacement/
+   * resolve-retry` (15.3.0: delete the replacement, then retry). Renames
+   * keep the stricter rule above.
    */
   const reoccupierOfVacatedKey = (
     effect: CollectionRekeyEffect | CollectionRemoveEffect
@@ -622,14 +628,18 @@ function buildPendingRollbackPlan(
     const vacated = effect.kind === 'rekey' ? effect.beforeKey : effect.key;
     return laterEffects.find(({ effect: later }) => {
       if (
+        (later.kind !== 'add' && later.kind !== 'rekey') ||
         later.ownerPath !== effect.ownerPath ||
-        later.subject === effect.subject
+        later.subject === effect.subject ||
+        (later.kind === 'add' ? later.key : later.afterKey) !== vacated
       ) {
         return false;
       }
-      return later.kind === 'add'
-        ? later.key === vacated
-        : later.kind === 'rekey' && later.afterKey === vacated;
+      return (
+        effect.kind === 'rekey' ||
+        isRestorable(later.subject) ||
+        !isErasedBySettledWork(later)
+      );
     });
   };
 
@@ -1090,7 +1100,10 @@ class TransactionAuthority {
     return cloneTurnRecord(turn);
   }
 
-  getPendingRollbackPlan(turnId: number): PendingRollbackPlan {
+  getPendingRollbackPlan(
+    turnId: number,
+    isRestorable?: (subject: number) => boolean
+  ): PendingRollbackPlan {
     const authoredLater = this.confirmedTurns
       .filter((turn) => turn.id > turnId)
       .flatMap((turn) =>
@@ -1179,7 +1192,11 @@ class TransactionAuthority {
     const later = [...authoredLater, ...observedLater, ...pendingLater].sort(
       (left, right) => left.appliedAt - right.appliedAt
     );
-    return buildPendingRollbackPlan(this.pendingTurns.get(turnId), later);
+    return buildPendingRollbackPlan(
+      this.pendingTurns.get(turnId),
+      later,
+      isRestorable
+    );
   }
 
   getConfirmedTurnCount(): number {
@@ -3392,7 +3409,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
 
           const plan =
             pendingTurnId !== undefined
-              ? authority.getPendingRollbackPlan(pendingTurnId)
+              ? authority.getPendingRollbackPlan(
+                  pendingTurnId,
+                  (subject) =>
+                    getSubjectRestorationClaims(tree)?.isClaimed(subject) ??
+                    false
+                )
               : { compensation: [] };
           const rollbackPlan =
             pendingTurnId !== undefined && !('conflict' in plan)
