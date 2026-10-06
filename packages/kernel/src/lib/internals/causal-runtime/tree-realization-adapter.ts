@@ -470,22 +470,38 @@ export function createTreeRealizationAdapter(
     applyAtomically(effects) {
       const memberTargets = new Map<
         number,
-        { present: boolean; value: unknown }
+        { present: boolean; value: unknown; turn?: number }
       >();
-      const valueEffects: ReversalEffect[] = [];
+      const authoredValueEffects: ReversalEffect[] = [];
       for (const effect of effects) {
         if (effect.plainBranchMembership) {
+          // Last-write order, as `deriveDeclarativeTransitionTarget` keeps it:
+          // a jump concatenates every turn it crosses into one application.
+          memberTargets.delete(effect.owner);
           memberTargets.set(effect.owner, {
             present: effect.plainBranchMembership.after,
             value: effect.after,
+            ...(effect.turn === undefined ? {} : { turn: effect.turn }),
           });
         } else {
-          valueEffects.push(effect);
+          authoredValueEffects.push(effect);
         }
       }
       const members = memberTargets.size
         ? preparePlainBranchMembers(options.tree.$, memberTargets)
         : undefined;
+      // A scalar value an earlier turn left is superseded where a later
+      // turn's member write staged its location (`withoutSupersededScalars`).
+      const staged = members?.staged;
+      const valueEffects = staged?.size
+        ? authoredValueEffects.filter(
+            (effect) =>
+              effect.turn === undefined ||
+              effect.structural !== undefined ||
+              typeof effect.subjectId === 'number' ||
+              (staged.get(effect.owner) ?? effect.turn) <= effect.turn
+          )
+        : authoredValueEffects;
       const apply = () => {
         // Prepare the remaining frame before any member is installed. All member
         // values and presence are installed before any effect is published.
@@ -499,7 +515,7 @@ export function createTreeRealizationAdapter(
               valueEffects
             )
           : undefined;
-        const scalarFrame =
+        let scalarFrame =
           !heterogeneousFrame && valueEffects.length
             ? planScalarFrame(
                 options.tree,
@@ -509,6 +525,40 @@ export function createTreeRealizationAdapter(
                 valueEffects
               )
             : undefined;
+        // ⚠️ SLOT SCALARS NEVER TAKE THE AUTHORED WRITE. A mixed reversal whose
+        // collection cannot be planned yet (it lies under a member this
+        // reversal re-adds) applies effect by effect. An authored scalar write
+        // under a member the reversal hides re-adds that member's path
+        // (`reactivatePathOnWrite`): a jump back over a path re-add, a
+        // `setAll` and an omission came back with the member present and one
+        // child (v16 8g, generated jump-vs-undo histories). Membership is the
+        // membership targets' to decide; the slot frame writes values only.
+        let perEffect: readonly ReversalEffect[] =
+          heterogeneousFrame || scalarFrame ? [] : valueEffects;
+        if (perEffect.length) {
+          const slotScalars = valueEffects.filter(
+            (effect) =>
+              effect.structural === undefined &&
+              effect.subjectId === undefined &&
+              effect.subjectFieldSegments === undefined &&
+              !hasInlineScopedAddress(effect) &&
+              !hasInlineSubjectAddress(effect) &&
+              scalarSlotRuntime?.resolveScalarSlot(effect.owner) !== undefined
+          );
+          scalarFrame = slotScalars.length
+            ? planScalarFrame(
+                options.tree,
+                options.descriptors,
+                structuralOwnerPaths,
+                scalarSlotRuntime,
+                slotScalars
+              )
+            : undefined;
+          if (scalarFrame) {
+            const framed = new Set(slotScalars);
+            perEffect = valueEffects.filter((effect) => !framed.has(effect));
+          }
+        }
         members?.install();
         // A membership-only frame has no value frame to advance the shared
         // physical clock. Publish its installed presence under a new revision.
@@ -516,10 +566,9 @@ export function createTreeRealizationAdapter(
           physicalCommitClock?.advance();
         if (heterogeneousFrame) {
           heterogeneousFrame.commit();
-        } else if (scalarFrame) {
-          scalarFrame.commit();
         } else {
-          for (const effect of valueEffects) {
+          scalarFrame?.commit();
+          for (const effect of perEffect) {
             applyEffect(
               options.tree,
               options.descriptors,
