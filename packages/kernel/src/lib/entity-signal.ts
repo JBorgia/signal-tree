@@ -2012,13 +2012,11 @@ export function createEntitySignal<
         front || lastPreviousKey === undefined
           ? undefined
           : allocateSubjectId(lastPreviousKey);
-      for (const row of rows) {
-        const { id, entity, prev, subjectId } = row;
-        if (prev === undefined) {
-          row.anchors = front ? getNeighborSubjects(id) : { beforeSubject };
-          beforeSubject = subjectId;
-        }
-        const anchors = row.anchors;
+      for (const row of fresh) {
+        row.anchors = front ? getNeighborSubjects(row.id) : { beforeSubject };
+        beforeSubject = row.subjectId;
+      }
+      for (const { id, entity, prev, subjectId, anchors } of rows) {
         const subject = subjectId as number;
         pathNotifier.notify(
           `${basePath}.${String(id)}`,
