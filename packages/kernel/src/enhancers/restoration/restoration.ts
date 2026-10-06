@@ -438,13 +438,6 @@ const isRebaseRecord = (value: unknown): value is Record<string, unknown> => {
   return prototype === Object.prototype || prototype === null;
 };
 
-const hasPrefix = (
-  segments: readonly string[],
-  prefix: readonly string[]
-): boolean =>
-  prefix.length <= segments.length &&
-  prefix.every((segment, index) => segments[index] === segment);
-
 const navigateRebaseValue = (
   at: RebaseValue,
   keys: readonly string[]
@@ -564,14 +557,51 @@ export function rebaseOntoRejection(
     return [...lists];
   }
 
-  const live = [...atoms];
-  const liveRekeys = new Map(rekeys);
+  // Atoms are indexed by scope, then by exact key path (a trie), so a claim
+  // walks only its own path: O(depth) plus each atom consumed once, rather
+  // than a scan of every live atom per claim (the re-review measured 860 ms
+  // at 2,000 rejected effects x 10k later records, and 746 ms for a
+  // 10k-key record). `seq` keeps the rejected turn's chronology for atoms one
+  // claim consumes together: later writes are undone first.
+  type TrieNode = {
+    atoms: Array<RebaseAtom & { seq: number }>;
+    children: Map<string, TrieNode>;
+  };
+  const roots = new Map<string, TrieNode>();
+  const createNode = (): TrieNode => ({ atoms: [], children: new Map() });
+  const insertAtom = (atom: RebaseAtom & { seq: number }): void => {
+    let node: TrieNode | undefined = roots.get(atom.scope);
+    if (!node) {
+      node = createNode();
+      roots.set(atom.scope, node);
+    }
+    for (const segment of atom.segments) {
+      let child: TrieNode | undefined = node.children.get(segment);
+      if (!child) {
+        child = createNode();
+        node.children.set(segment, child);
+      }
+      node = child;
+    }
+    node.atoms.push(atom);
+  };
+  atoms.forEach((atom, seq) => insertAtom({ ...atom, seq }));
+
   // Defence in depth: never write back a renamed-away key that a DIFFERENT
   // lifetime holds in a later record. The rollback planner refuses that shape
   // (a re-occupied vacated key is a dependency); if it ever got here, keeping
   // the later key is consistent where restoring the original would put two
   // lifetimes at one key.
+  const liveRekeys = new Map(rekeys);
+  const droppedRemovals = new Map<string, CollectionRemoveEffect>();
   if (liveRekeys.size > 0) {
+    const renamedAwayKeys = new Map<string, string[]>();
+    for (const [scope, rekey] of liveRekeys) {
+      const at = `${rekey.position}\u0000${String(rekey.beforeKey)}`;
+      const scopes = renamedAwayKeys.get(at);
+      if (scopes) scopes.push(scope);
+      else renamedAwayKeys.set(at, [scope]);
+    }
     for (const effects of lists) {
       for (const effect of effects) {
         const occupied =
@@ -581,9 +611,12 @@ export function rebaseOntoRejection(
             ? effect.afterKey
             : undefined;
         if (occupied === undefined) continue;
-        for (const [scope, rekey] of liveRekeys) {
+        for (const scope of renamedAwayKeys.get(
+          `${effect.position}\u0000${String(occupied)}`
+        ) ?? []) {
+          const rekey = liveRekeys.get(scope);
           if (
-            rekey.position === effect.position &&
+            rekey &&
             rekey.subject !== effect.subject &&
             rekey.beforeKey === occupied
           ) {
@@ -593,15 +626,16 @@ export function rebaseOntoRejection(
       }
     }
   }
-  const droppedRemovals = new Map<string, CollectionRemoveEffect>();
 
   /** Split an atom one level, or undefined when its values are not records. */
-  const refine = (atom: RebaseAtom): RebaseAtom[] | undefined => {
+  const refine = (
+    atom: RebaseAtom & { seq: number }
+  ): Array<RebaseAtom & { seq: number }> | undefined => {
     const sides = [atom.before, atom.after].map((side) =>
       !side.present ? {} : isRebaseRecord(side.value) ? side.value : undefined
     );
     if (sides[0] === undefined || sides[1] === undefined) return undefined;
-    const children: RebaseAtom[] = [];
+    const children: Array<RebaseAtom & { seq: number }> = [];
     for (const key of new Set([
       ...Object.keys(sides[0]),
       ...Object.keys(sides[1]),
@@ -614,6 +648,7 @@ export function rebaseOntoRejection(
         segments: [...atom.segments, key],
         before,
         after,
+        seq: atom.seq,
       });
     }
     return children;
@@ -621,38 +656,44 @@ export function rebaseOntoRejection(
 
   /** Re-base `current` (the pre-image at `address`) against live atoms. */
   const claim = (address: RebaseAddress, current: RebaseValue): RebaseValue => {
+    let node = roots.get(address.scope);
     // An atom ABOVE this address covers it only in part: split it down so the
     // rest stays claimable by later records.
-    for (let index = 0; index < live.length; ) {
-      const atom = live[index];
-      if (
-        atom.scope !== address.scope ||
-        atom.segments.length >= address.segments.length ||
-        !hasPrefix(address.segments, atom.segments)
-      ) {
-        index += 1;
-        continue;
+    for (
+      let depth = 0;
+      node && depth < address.segments.length;
+      depth += 1
+    ) {
+      if (node.atoms.length > 0) {
+        const above = node.atoms;
+        node.atoms = [];
+        for (const atom of above) {
+          const children = refine(atom);
+          if (children) {
+            for (const child of children) insertAtom(child);
+            continue;
+          }
+          const rest = address.segments.slice(atom.segments.length);
+          if (sameRebaseValue(current, navigateRebaseValue(atom.after, rest))) {
+            current = navigateRebaseValue(atom.before, rest);
+          }
+        }
       }
-      const children = refine(atom);
-      if (children) {
-        live.splice(index, 1, ...children);
-        continue;
-      }
-      live.splice(index, 1);
-      const rest = address.segments.slice(atom.segments.length);
-      if (sameRebaseValue(current, navigateRebaseValue(atom.after, rest))) {
-        current = navigateRebaseValue(atom.before, rest);
-      }
+      node = node.children.get(address.segments[depth]);
     }
-    for (let index = live.length - 1; index >= 0; index -= 1) {
-      const atom = live[index];
-      if (
-        atom.scope !== address.scope ||
-        !hasPrefix(atom.segments, address.segments)
-      ) {
-        continue;
-      }
-      live.splice(index, 1);
+    if (!node) return current;
+    // Every atom AT or BELOW the address: this record claims them all.
+    const below: Array<RebaseAtom & { seq: number }> = [];
+    const pending = [node];
+    while (pending.length > 0) {
+      const next = pending.pop() as TrieNode;
+      appendAll(below, next.atoms);
+      next.atoms = [];
+      for (const child of next.children.values()) pending.push(child);
+      next.children = new Map();
+    }
+    below.sort((left, right) => right.seq - left.seq);
+    for (const atom of below) {
       const rest = atom.segments.slice(address.segments.length);
       if (sameRebaseValue(navigateRebaseValue(current, rest), atom.after)) {
         current = replaceRebaseValue(current, rest, atom.before);

@@ -304,4 +304,42 @@ describe('rebaseOntoRejection', () => {
       expect(later).toStrictEqual(add(7, 3));
     });
   });
+
+  // Not wall-clock guards in spirit: the bounds are ~50x the measured time
+  // and well under what the quadratic scan took at these sizes (seconds).
+  describe('scale', () => {
+    it('20,000 rejected writes against 20,000 later records of 10 effects', () => {
+      const rejected = Array.from({ length: 20_000 }, (_, i) =>
+        row(1_000_000 + i, ['n'], 0, 1)
+      );
+      const lists = Array.from({ length: 20_000 }, (_, l) =>
+        Array.from({ length: 10 }, (_, e) =>
+          e % 2
+            ? remove(l * 20 + e, { id: 'x', n: 1 })
+            : row(l * 20 + e, ['m'], 1, 2)
+        )
+      );
+      const started = performance.now();
+      rebase(rejected, ...lists);
+      expect(performance.now() - started).toBeLessThan(1_500);
+    }, 30_000);
+
+    it('a 20,000-key record write against 20,000 later writes to its keys', () => {
+      const before: Record<string, number> = {};
+      const after: Record<string, number> = {};
+      for (let i = 0; i < 20_000; i++) {
+        before[`k${i}`] = i;
+        after[`k${i}`] = i + 1;
+      }
+      const lists = Array.from({ length: 20_000 }, (_, i) => [
+        plain(3, i + 1, 99, { branchSegments: [`k${i}`] }),
+      ]);
+      const started = performance.now();
+      const out = rebase([plain(3, before, after)], ...lists);
+      expect(performance.now() - started).toBeLessThan(1_500);
+      expect(out[5][0]).toStrictEqual(
+        plain(3, 5, 99, { branchSegments: ['k5'] })
+      );
+    }, 30_000);
+  });
 });
