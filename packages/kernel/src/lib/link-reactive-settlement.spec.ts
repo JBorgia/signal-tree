@@ -558,7 +558,7 @@ describe('destroy() in the middle of a chain', () => {
     }
   );
 
-  it('the tree is destroyed between hops while the linked send is in flight', async () => {
+  it('a later hop of the chain destroys the tree after the linked location was written', async () => {
     const { tree, at } = scalarChain(3);
     const endpoint = slowEndpoint<number>();
     const connection = link(at(1) as never, { set: endpoint.set });
@@ -568,8 +568,11 @@ describe('destroy() in the middle of a chain', () => {
     const { done, isSettled } = watch(connection);
     await acknowledgeAll(endpoint, isSettled);
     await done;
-    // The linked write preceded destroy(): its send was already in flight.
-    expect(endpoint.sent).toEqual([7]);
+    // The linked write precedes destroy(), but its send starts after it (the
+    // destroying hop is delivered before the send's chain continuation), so
+    // the same either-outcome bound applies.
+    expect(endpoint.sent.length).toBeLessThanOrEqual(1);
+    expect(endpoint.sent.every((value) => value === 7)).toBe(true);
   });
 });
 
