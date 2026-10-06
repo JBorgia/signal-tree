@@ -22,7 +22,7 @@ import { transactions } from './transactions';
  * getRestorationHistory() threw after rejecting an undoable transaction that
  * created a row.
  */
-type Row = { id: string; n: number };
+type Row = { id: string; n: number; nest?: { x: number } };
 type Profile = { name: string; age?: number };
 
 const flush = async () => {
@@ -59,6 +59,7 @@ const state = (tree: Tree) => ({
   y: tree.$.y(),
   profile: tree.$.profile(),
   rows: tree.$.rows.all(),
+  ids: tree.$.rows.ids(),
 });
 
 type Scenario = {
@@ -129,11 +130,94 @@ const scenarios: Record<string, Scenario> = {
       later: (tree) => tree.$.rows.removeMany(['A', 'c']),
       undone: (seeded) => seeded,
     },
+  // ── A removal's value snapshot (review of 4b28e3bf, defect 1) ─────────────
+  'row field T edited, W removed the row: undo restores the row as before T': {
+    tx: (tree) => tree.$.rows.updateOne('a', { n: 2 }),
+    later: (tree) => tree.$.rows.removeOne('a'),
+    undone: (seeded) => seeded,
+  },
+  'nested row field T edited, W removed the row': {
+    tx: (tree) => tree.$.rows.updateOne('a', { nest: { x: 2 } }),
+    later: (tree) => tree.$.rows.removeOne('a'),
+    undone: (seeded) => seeded,
+  },
+  'row T replaced dropping a field, W removed the row: the dropped field returns':
+    {
+      tx: (tree) => tree.$.rows.replaceOne('a', { id: 'a', n: 2 }),
+      later: (tree) => tree.$.rows.removeOne('a'),
+      undone: (seeded) => seeded,
+    },
+  'row T replaced adding a field, W removed the row: the added field does not return':
+    {
+      tx: (tree) =>
+        tree.$.rows.replaceOne('c', { id: 'c', n: 3, nest: { x: 7 } }),
+      later: (tree) => tree.$.rows.removeOne('c'),
+      undone: (seeded) => seeded,
+    },
+  'row field T edited, W edited another field then removed the row': {
+    tx: (tree) => tree.$.rows.updateOne('a', { n: 2 }),
+    later: (tree) => {
+      tree.$.rows.updateOne('a', { nest: { x: 5 } });
+      tree.$.rows.removeOne('a');
+    },
+    undone: (seeded) => seeded,
+  },
+  'row field T edited, W edited the same field then removed the row': {
+    tx: (tree) => tree.$.rows.updateOne('a', { n: 2 }),
+    later: (tree) => {
+      tree.$.rows.updateOne('a', { n: 5 });
+      tree.$.rows.removeOne('a');
+    },
+    undone: (seeded) => seeded,
+  },
+  'row field T edited, W cleared the collection': {
+    tx: (tree) => tree.$.rows.updateOne('a', { n: 2 }),
+    later: (tree) => tree.$.rows.clear(),
+    undone: (seeded) => seeded,
+  },
+  // ── A rekey (defect 2) ───────────────────────────────────────────────────
+  'row T renamed, W removed it: undo restores the original key': {
+    tx: (tree) => tree.$.rows.changeId('a', 'a2'),
+    later: (tree) => tree.$.rows.removeOne('a2'),
+    undone: (seeded) => seeded,
+  },
+  'row T renamed and edited, W removed it': {
+    tx: (tree) => {
+      tree.$.rows.changeId('a', 'a2');
+      tree.$.rows.updateOne('a2', { n: 2 });
+    },
+    later: (tree) => tree.$.rows.removeOne('a2'),
+    undone: (seeded) => seeded,
+  },
+  // ── Anchors on rows only T created (defect 3) ────────────────────────────
+  "row T created, W appended a row after it: undo removes only W's row": {
+    tx: (tree) => tree.$.rows.addOne({ id: 'A', n: 1 }),
+    later: (tree) => tree.$.rows.addOne({ id: 'B', n: 2 }),
+    undone: (seeded) => seeded,
+  },
+  'rows T created, W appended a row after them': {
+    tx: (tree) => {
+      tree.$.rows.addOne({ id: 'A', n: 1 });
+      tree.$.rows.addOne({ id: 'A2', n: 1 });
+    },
+    later: (tree) => tree.$.rows.addOne({ id: 'B', n: 2 }),
+    undone: (seeded) => seeded,
+  },
+  'row T prepended, W removed its neighbour: the neighbour returns in place': {
+    tx: (tree) => tree.$.rows.prependOne({ id: 'A', n: 1 }),
+    later: (tree) => tree.$.rows.removeOne('z'),
+    undone: (seeded) => seeded,
+  },
+  'row T created, W removed its neighbour: the neighbour returns in place': {
+    tx: (tree) => tree.$.rows.addOne({ id: 'A', n: 1 }),
+    later: (tree) => tree.$.rows.removeOne('c'),
+    undone: (seeded) => seeded,
+  },
 };
 
 const seedRows = async (tree: Tree) => {
   tree.$.rows.addOne({ id: 'z', n: 0 });
-  tree.$.rows.addOne({ id: 'a', n: 1 });
+  tree.$.rows.addOne({ id: 'a', n: 1, nest: { x: 1 } });
   tree.$.rows.addOne({ id: 'c', n: 3 });
   await flush();
 };
@@ -183,6 +267,9 @@ describe.each(Object.entries(orders))(
           tree.undo();
           await flush();
           expect(state(tree)).toStrictEqual(undone);
+          // History is materialized from the same records, from the undone
+          // position too (it threw on a dangling anchor).
+          expect(tree.getRestorationHistory()).toHaveLength(history.length);
 
           // jumpTo walks the same records: the newest entry is W's state,
           // and nothing in history shows a value only T wrote.
@@ -290,6 +377,31 @@ describe.each(Object.entries(orders))(
       }
     });
 
+    it('an address is claimed by its first later record even when that record does not match', async () => {
+      const tree = make(enhancers);
+      try {
+        await seedRows(tree);
+        const proposal = tree.transaction(() => tree.$.x(1));
+        await flush();
+        tree.$.x(5); // external: the first later record, based on 5
+        await flush();
+        undoable(() => tree.$.x(1)); // authored over 5
+        await flush();
+        undoable(() => tree.$.x(3)); // based on the authored 1, not on T
+        await flush();
+        proposal.rollback();
+        await flush();
+        tree.undo();
+        await flush();
+        expect(tree.$.x()).toBe(1);
+        tree.undo();
+        await flush();
+        expect(tree.$.x()).toBe(5);
+      } finally {
+        tree.destroy();
+      }
+    });
+
     it('only the FIRST later record per address is re-based, even if a later one matches', async () => {
       const tree = make(enhancers);
       try {
@@ -367,6 +479,111 @@ describe.each(Object.entries(orders))(
         tree.undo();
         await flush();
         expect(tree.$.x()).toBe(0);
+      } finally {
+        tree.destroy();
+      }
+    });
+  }
+);
+
+// ── Lossless addresses (review of 4b28e3bf, defect 4) ────────────────────────
+// A plain address is its position plus exact keys, never a display path: the
+// literal key 'd.e' and the nested path d.e are different places. A record
+// write and a leaf write to the same place ARE the same address.
+describe.each(Object.entries(orders))(
+  'undo after a rejection: plain addresses (%s)',
+  (_order, enhancers) => {
+    const makeDotted = (dotted: number) =>
+      signalTree(
+        { 'd.e': dotted, d: { e: 2 }, a: { b: 1, c: 1 } },
+        { enhancers: enhancers() as never }
+      ) as unknown as {
+        $: {
+          'd.e': (value?: number) => number;
+          d: { (): { e: number }; e: (value?: number) => number };
+          a: {
+            (value?: { b: number; c: number }): { b: number; c: number };
+            b: (value?: number) => number;
+          };
+        };
+        transaction(fn: () => void): { rollback(): void };
+        undo(): void;
+        destroy(): void;
+      };
+    const read = (tree: ReturnType<typeof makeDotted>) => ({
+      dotted: tree.$['d.e'](),
+      nested: tree.$.d.e(),
+    });
+
+    it('T writes the nested d.e; a later write to the literal key is not re-based onto it', async () => {
+      const tree = makeDotted(5);
+      try {
+        const proposal = tree.transaction(() => tree.$.d.e(5));
+        await flush();
+        undoable(() => tree.$['d.e'](9));
+        await flush();
+        proposal.rollback();
+        await flush();
+        expect(read(tree)).toStrictEqual({ dotted: 9, nested: 2 });
+        tree.undo();
+        await flush();
+        expect(read(tree)).toStrictEqual({ dotted: 5, nested: 2 });
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    it('T writes the literal key; a write to the nested d.e does not consume its re-base', async () => {
+      const tree = makeDotted(1);
+      try {
+        const proposal = tree.transaction(() => tree.$['d.e'](5));
+        await flush();
+        undoable(() => tree.$.d.e(7));
+        await flush();
+        undoable(() => tree.$['d.e'](9));
+        await flush();
+        proposal.rollback();
+        await flush();
+        tree.undo();
+        await flush();
+        expect(read(tree)).toStrictEqual({ dotted: 1, nested: 7 });
+        tree.undo();
+        await flush();
+        expect(read(tree)).toStrictEqual({ dotted: 1, nested: 2 });
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    it('T writes the record, a later write to its leaf: one address', async () => {
+      const tree = makeDotted(1);
+      try {
+        const proposal = tree.transaction(() => tree.$.a({ b: 2, c: 1 }));
+        await flush();
+        undoable(() => tree.$.a.b(3));
+        await flush();
+        proposal.rollback();
+        await flush();
+        tree.undo();
+        await flush();
+        expect(tree.$.a()).toStrictEqual({ b: 1, c: 1 });
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    it('T writes the leaf, a later write to its record: one address', async () => {
+      const tree = makeDotted(1);
+      try {
+        const proposal = tree.transaction(() => tree.$.a.b(2));
+        await flush();
+        undoable(() => tree.$.a({ b: 3, c: 1 }));
+        await flush();
+        proposal.rollback();
+        await flush();
+        tree.undo();
+        await flush();
+        expect(tree.$.a()).toStrictEqual({ b: 1, c: 1 });
       } finally {
         tree.destroy();
       }
