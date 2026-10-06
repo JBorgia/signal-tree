@@ -2981,8 +2981,13 @@ describe('restoration enhancer', () => {
     }
     addEffect.key = 1;
 
+    // Key 1 is held by another lifetime (row 1). Any other holder of the key
+    // is a conflict, whatever its id, so the refusal is the typed ST1034 that
+    // names the collection and the key (15.4.4, undo-rules review of
+    // b2107f43, item 3). It was the realization port's untyped
+    // structural-drift; atomicity is unchanged.
     expect(() => t.redoPosition(collectionPositionId as number)).toThrow(
-      'Unsupported scoped undo effect at structural-drift'
+      "ST1034: restoration refused — key '1' of 'rows' is held by another row"
     );
     expect(store.$.rows.ids()).toEqual([1]);
     expect(store.$.drivers.byIdOrFail(7).status()).toBe('idle');

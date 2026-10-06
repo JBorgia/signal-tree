@@ -246,7 +246,37 @@ type HistoricalEvent = {
   readonly orderDeltas: CollectionOrderDelta[];
   readonly frontiers?: TurnFrontierTransition[];
   boundaryTurnId?: number;
+  /**
+   * Row lifetimes and keys whose membership EXTERNAL or REALIZED truth changed
+   * in this event (`external()`, a Link inbound write). History does not own
+   * that truth, so the ordinary-write rule never acts on it
+   * (`standingRemovalOf`; undo-rules review of b2107f43, item 1).
+   */
+  realized?: RealizedMembership;
 };
+
+/** `lifetimeMark` and `keyMark` entries; see `HistoricalEvent.realized`. */
+type RealizedMembership = {
+  readonly lifetimes: readonly string[];
+  readonly keys: readonly string[];
+};
+const lifetimeMark = (owner: number, subject: number): string =>
+  `${owner}:${subject}`;
+// Typed: the number key 1 and the string key '1' are different keys.
+const keyMark = (owner: number, key: string | number): string =>
+  JSON.stringify([owner, key]);
+const mergeRealized = (
+  left: RealizedMembership | undefined,
+  right: RealizedMembership | undefined
+): RealizedMembership | undefined =>
+  !left
+    ? right
+    : !right
+    ? left
+    : {
+        lifetimes: [...new Set([...left.lifetimes, ...right.lifetimes])],
+        keys: [...new Set([...left.keys, ...right.keys])],
+      };
 
 type TurnEffectBase = {
   position: number;
@@ -490,6 +520,9 @@ type CaptureBucket = {
    * 4). It is a boolean rather than a count so nesting is idempotent.
    */
   designated: boolean;
+  /** See `HistoricalEvent.realized`; filled for the historical bucket only. */
+  realizedLifetimes?: Set<string>;
+  realizedKeys?: Set<string>;
 };
 
 /** A captured pre-image's place: a scope plus exact keys inside it. */
@@ -1214,6 +1247,8 @@ class RestorationManager<T> {
   ) => void;
   private historicalEvents: HistoricalEvent[] = [];
   private nextHistoricalOrdinal = 1;
+  /** Each open non-undoable transaction's gap (`appendTransactionGap`). */
+  private readonly transactionGaps = new Map<number, HistoricalEvent>();
 
   /**
    * The undo/redo position is a SIGNAL, because `canUndo()` bound in a template
@@ -1271,7 +1306,8 @@ class RestorationManager<T> {
     effects: TurnEffect[],
     collectionOrders: PendingCollectionOrder[],
     designated: boolean,
-    frontiers: TurnFrontierTransition[] = []
+    frontiers: TurnFrontierTransition[] = [],
+    realized?: RealizedMembership
   ): void {
     if (
       this.maxHistorySize === 0 ||
@@ -1289,16 +1325,74 @@ class RestorationManager<T> {
       frontiers.length === 0
     ) {
       appendAll(lastEvent.effects, effects.map(cloneTurnEffect));
+      const merged = mergeRealized(lastEvent.realized, realized);
+      if (merged) lastEvent.realized = merged;
       return;
     }
-    this.appendHistoricalEvent(effects, collectionOrders, undefined, frontiers);
+    this.appendHistoricalEvent(
+      effects,
+      collectionOrders,
+      undefined,
+      frontiers,
+      realized
+    );
+  }
+
+  /**
+   * A transaction that is not undoable is ORDINARY authored work once it
+   * confirms (owner decision, undo-rules review item 4): its writes become a
+   * gap in history like any plain write. Prepared when it stages, with the
+   * ordinal of that moment, so on confirmation it lands where its writes
+   * happened; nothing is recorded while it is open, because every history
+   * state shows an open transaction's effects (vacated-key-rollback.spec.ts,
+   * "history across an open transaction"). A later transaction it overlaps
+   * cannot be rejected while it is open (a later-pending dependency), so a
+   * rejection never needs to rebase a prepared gap. Not while an undo, redo
+   * or jumpTo applies: a write made then is not history either.
+   */
+  stageTransactionGap(
+    transactionId: number,
+    effects: TurnEffect[],
+    collectionOrders: PendingCollectionOrder[],
+    frontiers: TurnFrontierTransition[]
+  ): void {
+    if (this.maxHistorySize === 0) return;
+    const orderDeltas = turnOrderDeltas(
+      collectionOrders,
+      this.pendingCreatedRows
+    );
+    if (!effects.length && !orderDeltas.length && !frontiers.length) return;
+    this.transactionGaps.set(transactionId, {
+      ordinal: this.nextHistoricalOrdinal++,
+      effects: effects.map(cloneTurnEffect),
+      orderDeltas: orderDeltas.map(cloneCollectionOrderDelta),
+      ...(frontiers.length > 0 ? { frontiers } : {}),
+    });
+  }
+
+  /** Confirmed: the prepared gap enters history. Rolled back: it never happened. */
+  settleTransactionGap(transactionId: number, confirmed: boolean): void {
+    const event = this.transactionGaps.get(transactionId);
+    if (!event) return;
+    this.transactionGaps.delete(transactionId);
+    if (
+      !confirmed ||
+      (this.history.length === 0 && this.pendingTurns.size === 0)
+    )
+      return;
+    const at = this.historicalEvents.findIndex(
+      (candidate) => candidate.ordinal > event.ordinal
+    );
+    if (at === -1) this.historicalEvents.push(event);
+    else this.historicalEvents.splice(at, 0, event);
   }
 
   private appendHistoricalEvent(
     effects: TurnEffect[],
     collectionOrders: PendingCollectionOrder[],
     boundaryTurnId?: number,
-    frontiers: TurnFrontierTransition[] = []
+    frontiers: TurnFrontierTransition[] = [],
+    realized?: RealizedMembership
   ): number | undefined {
     const orderDeltas = turnOrderDeltas(
       collectionOrders,
@@ -1321,6 +1415,7 @@ class RestorationManager<T> {
       orderDeltas: orderDeltas.map(cloneCollectionOrderDelta),
       ...(frontiers.length > 0 ? { frontiers } : {}),
       boundaryTurnId,
+      ...(realized ? { realized } : {}),
     });
     return ordinal;
   }
@@ -1522,6 +1617,7 @@ class RestorationManager<T> {
       effects: TurnEffect[];
       collectionOrders: PendingCollectionOrder[];
       frontiers: TurnFrontierTransition[];
+      realized?: RealizedMembership;
     },
     frontiers?: TurnFrontierTransition[]
   ): boolean {
@@ -1750,26 +1846,46 @@ class RestorationManager<T> {
    */
   /**
    * The latest removal of a row lifetime by a change outside undo history (a
-   * historical gap): the row as it stood when an ordinary write removed it,
-   * and the neighbours it stood between. Undefined when no ordinary write
-   * removed it (an external one, or an undoable entry).
+   * historical gap): the row as it stood when it was removed, and the
+   * neighbours it stood between. Undefined when no such change removed it
+   * (an undoable entry did, or nothing).
+   *
+   * `external` when that removal, or any later change to the row's key, came
+   * from external or realized truth (`HistoricalEvent.realized`): only an
+   * ORDINARY authored removal, a confirmed transaction's included, lets the
+   * ordinary-write rule put the row back (undo-rules review, item 1). A
+   * realized removal inside an undoable entry's event counts too: the entry
+   * did not remove it.
    */
   standingRemovalOf(
     owner: number,
     subject: number
-  ): CollectionRemoveEffect | undefined {
+  ): { removal: CollectionRemoveEffect; external: boolean } | undefined {
+    const laterKeys = new Set<string>();
+    const lifetime = lifetimeMark(owner, subject);
     for (let at = this.historicalEvents.length - 1; at >= 0; at -= 1) {
       const event = this.historicalEvents[at];
-      if (event.boundaryTurnId !== undefined) continue;
-      for (const effect of event.effects) {
-        if (
-          effect.kind === 'remove' &&
-          effect.position === owner &&
-          effect.subject === subject
-        ) {
-          return effect;
+      const realized = event.realized;
+      const byTruth = realized?.lifetimes.includes(lifetime) === true;
+      if (event.boundaryTurnId === undefined || byTruth) {
+        for (const effect of event.effects) {
+          if (
+            effect.kind === 'remove' &&
+            effect.position === owner &&
+            effect.subject === subject
+          ) {
+            const key = keyMark(owner, effect.key);
+            return {
+              removal: effect,
+              external:
+                byTruth ||
+                laterKeys.has(key) ||
+                realized?.keys.includes(key) === true,
+            };
+          }
         }
       }
+      for (const key of realized?.keys ?? []) laterKeys.add(key);
     }
     return undefined;
   }
@@ -2075,6 +2191,7 @@ class RestorationManager<T> {
       effects: TurnEffect[];
       collectionOrders: PendingCollectionOrder[];
       frontiers: TurnFrontierTransition[];
+      realized?: RealizedMembership;
     },
     frontiers: TurnFrontierTransition[] = []
   ): CanonicalTurn<T> | undefined {
@@ -2202,7 +2319,8 @@ class RestorationManager<T> {
       historicalCapture?.effects ?? effects ?? [],
       historicalCapture?.collectionOrders ?? collectionOrders ?? [],
       turnId,
-      historicalCapture?.frontiers ?? frontiers
+      historicalCapture?.frontiers ?? frontiers,
+      historicalCapture?.realized
     );
     if (eventOrdinal !== undefined) {
       entry.__eventOrdinal = eventOrdinal;
@@ -3270,6 +3388,8 @@ class RestorationManager<T> {
     this.positionTurnIds.clear();
     this.positionFrontiers.clear();
     this.historicalEvents = [];
+    // Their ordinals belonged to the history just discarded.
+    this.transactionGaps.clear();
     this.nextHistoricalOrdinal = 1;
     this.nextTurnId = 1;
     this.isTemporalViewActive = false;
@@ -4079,19 +4199,26 @@ export function restoration(
      *     else the nearest surviving neighbours, and then writes the fields:
      *     ordinary edits to other fields are kept (owner decision; v16's 8b
      *     plain-branch omission likewise);
-     *   - a reversal that would put it back at a key a NEWER lifetime holds
-     *     (undo of a removal, redo of an add, or the re-add above) refuses,
-     *     typed, and changes nothing: it would displace an unrelated row, as
-     *     a rollback refuses to (owner decision). A holder older than the
-     *     lifetime is not a later write's; the realization port refuses that
-     *     (restoration.spec "fails atomically when redoing a mixed add turn
-     *     cannot restore the added subject").
+     *   - a reversal that would put it back at a key ANY other lifetime
+     *     holds (undo of a removal, redo of an add, or the re-add above)
+     *     refuses, typed, and changes nothing: it would displace an unrelated
+     *     row, as a rollback refuses to (owner decision). Whatever the
+     *     holder's id: a rename keeps its id, so an older row can take the
+     *     key later (undo-rules review of b2107f43, item 3; it threw an
+     *     untyped structural-drift there).
+     *
+     * Only an ORDINARY authored removal counts, a confirmed transaction's
+     * included (review item 4): where the lifetime's latest removal, or a
+     * later change to its key, came from external or realized truth, the
+     * re-add refuses with a typed ST1034 and changes nothing (review item 1;
+     * `standingRemovalOf`).
      *
      * A lifetime the operation itself brings back, takes away or renames is
-     * judged after it (a newer row an undoable entry added, undone in the
-     * same jump, or renamed off the key by the same turn, is no conflict). Runs after the pending-overlap refusal: a row a
-     * pending transaction removed is not this rule's
-     * (ordinary-removal-undo.spec.ts).
+     * judged after it (a row an undoable entry added, undone in the same
+     * jump, or renamed off the key by the same operation, is no conflict).
+     * Runs after the pending-overlap refusal: a row a pending transaction
+     * removed is not this rule's (ordinary-removal-undo.spec.ts,
+     * ordinary-removal-provenance.spec.ts).
      */
     const reconcileOrdinaryLifetimes = (
       applications: DirectedTurnApplication[]
@@ -4157,7 +4284,10 @@ export function restoration(
         }
         return byKey.get(key);
       };
-      const refuseNewerHolder = (
+      const collectionPath = (owner: number) =>
+        positionRegistry?.collectionPathFor(owner as PositionId) ??
+        String(owner);
+      const refuseHolder = (
         owner: number,
         key: string | number,
         subject: number
@@ -4165,19 +4295,16 @@ export function restoration(
         const holder = holderOf(owner, key);
         if (
           holder === undefined ||
-          holder <= subject ||
+          holder === subject ||
           taken.has(lifetime(owner, holder))
         ) {
           return;
         }
-        const path =
-          positionRegistry?.collectionPathFor(owner as PositionId) ??
-          String(owner);
         throw restorationRefusal(
-          `ST1034: restoration refused — key '${String(key)}' of '${path}' ` +
-            "is held by a newer row, which putting this entry's row back " +
-            'would displace. Nothing was changed; the history position is ' +
-            'unmoved.'
+          `ST1034: restoration refused — key '${String(key)}' of ` +
+            `'${collectionPath(owner)}' is held by another row, which ` +
+            "putting this entry's row back would displace. Nothing was " +
+            'changed; the history position is unmoved.'
         );
       };
       /** A neighbour, else the one an ordinary removal left it next to. */
@@ -4191,7 +4318,7 @@ export function restoration(
         while (at !== undefined && !seen.has(at)) {
           seen.add(at);
           if (isActive(owner, at)) return at;
-          at = restorationManager.standingRemovalOf(owner, at)?.[side];
+          at = restorationManager.standingRemovalOf(owner, at)?.removal[side];
         }
         return undefined;
       };
@@ -4204,7 +4331,7 @@ export function restoration(
           if ((effect.kind === 'add') !== (direction === 'redo')) {
             if (!brought.has(id)) settled.add(id);
           } else {
-            refuseNewerHolder(effect.position, effect.key, effect.subject);
+            refuseHolder(effect.position, effect.key, effect.subject);
           }
         }
       }
@@ -4213,12 +4340,21 @@ export function restoration(
         if (brought.has(id) || taken.has(id)) continue;
         const subject = effect.subject as number;
         if (isActive(effect.position, subject) !== false) continue;
-        const removal = restorationManager.standingRemovalOf(
+        const standing = restorationManager.standingRemovalOf(
           effect.position,
           subject
         );
-        if (!removal) continue;
-        refuseNewerHolder(removal.position, removal.key, subject);
+        if (!standing) continue;
+        const { removal } = standing;
+        if (standing.external)
+          throw restorationRefusal(
+            `ST1034: restoration refused — row '${String(removal.key)}' of ` +
+              `'${collectionPath(removal.position)}' was removed or replaced ` +
+              'by external truth after the operation being reversed; putting ' +
+              'it back would overwrite that change. Nothing was changed; the ' +
+              'history position is unmoved.'
+          );
+        refuseHolder(removal.position, removal.key, subject);
         const restore = {
           ...removal,
           kind: direction === 'undo' ? 'remove' : 'add',
@@ -5420,6 +5556,8 @@ export function restoration(
       bucket.collectionOrders.clear();
       bucket.descriptorInputs.length = 0;
       bucket.designated = false;
+      delete bucket.realizedLifetimes;
+      delete bucket.realizedKeys;
     };
     const drainCaptureBucket = (
       bucket: CaptureBucket
@@ -5432,6 +5570,7 @@ export function restoration(
       descriptorInputs: CaptureBucket['descriptorInputs'];
       designated: boolean;
       frontiers: TurnFrontierTransition[];
+      realized?: RealizedMembership;
     } => {
       const ownerPaths = Array.from(bucket.ownerPaths).sort();
       bucket.ownerPaths.clear();
@@ -5468,6 +5607,14 @@ export function restoration(
       const descriptorInputs = bucket.descriptorInputs.splice(0);
       const designated = bucket.designated;
       bucket.designated = false;
+      const realized: RealizedMembership | undefined = bucket.realizedLifetimes
+        ? {
+            lifetimes: [...bucket.realizedLifetimes],
+            keys: [...(bucket.realizedKeys ?? [])],
+          }
+        : undefined;
+      delete bucket.realizedLifetimes;
+      delete bucket.realizedKeys;
       return {
         ownerPaths,
         subjectIds,
@@ -5477,6 +5624,7 @@ export function restoration(
         descriptorInputs,
         designated,
         frontiers,
+        ...(realized ? { realized } : {}),
       };
     };
 
@@ -6123,6 +6271,19 @@ export function restoration(
           : undefined;
       if (entry) {
         pendingDescriptorInputs.set(entry.id, descriptorInputs);
+      } else if (
+        !restorationManager.isApplyingOperation() &&
+        (effects.length > 0 || collectionOrders.length > 0)
+      ) {
+        // Not undoable: ordinary authored work once it confirms, so it is a
+        // gap in history (`appendTransactionGap`; undo-rules review item 4).
+        // Before the contribution's watermark: not later work of its own.
+        restorationManager.stageTransactionGap(
+          transactionId,
+          effects,
+          collectionOrders,
+          frontiers
+        );
       }
       const turnFrontiers = [
         ...frontiers,
@@ -6259,6 +6420,10 @@ export function restoration(
       }
       const contribution = speculativeContributions.get(event.id);
       speculativeContributions.delete(event.id);
+      restorationManager.settleTransactionGap(
+        event.id,
+        event.kind === 'confirmed'
+      );
       if (event.kind === 'rolled-back') {
         pendingTransactions.delete(event.id);
         if (contribution) {
@@ -6463,7 +6628,7 @@ export function restoration(
                   resolveTransactionId(meta) === undefined)
               ) {
                 const historical = getHistoricalCapture();
-                if (historical)
+                if (historical) {
                   captureEffects(
                     historical.effects,
                     path,
@@ -6474,6 +6639,30 @@ export function restoration(
                     subjectIds,
                     positionIds
                   );
+                  // Which row membership external or realized truth changed
+                  // (`HistoricalEvent.realized`).
+                  const structural = (
+                    meta as { structuralEffect?: StructuralEffect } | undefined
+                  )?.structuralEffect;
+                  const owner = positionIds?.[0];
+                  if (
+                    structural &&
+                    owner !== undefined &&
+                    getWriteParticipation(meta) === 'realized'
+                  ) {
+                    (historical.realizedLifetimes ??= new Set()).add(
+                      lifetimeMark(owner, structural.subject)
+                    );
+                    const keys = (historical.realizedKeys ??= new Set());
+                    const at = structural as {
+                      key?: string | number;
+                      beforeKey?: string | number;
+                      afterKey?: string | number;
+                    };
+                    for (const key of [at.key, at.beforeKey, at.afterKey])
+                      if (key !== undefined) keys.add(keyMark(owner, key));
+                  }
+                }
               }
               const membership = plainBranchMembershipEffects(meta);
               if (membership) {
@@ -6827,7 +7016,8 @@ export function restoration(
               historical?.effects ?? effects,
               historical?.collectionOrders ?? collectionOrders,
               designated,
-              historical?.frontiers ?? frontiers
+              historical?.frontiers ?? frontiers,
+              historical?.realized
             );
           }
         };
