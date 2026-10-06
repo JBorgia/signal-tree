@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { transactions } from '../enhancers/transactions/transactions';
 import { getHeldConsequenceCountForTesting } from './internals/commit-consequence';
 import { getTreeLinkCountForTesting } from './internals/link-lifetime';
+import { StudioTreeDestroyedError } from './internals/confirmed-turn-view';
+import { getEntityMembershipInventory } from './internals/entity-membership-inventory';
 import {
   linkStateReader,
   type LinkStateEvent,
@@ -236,5 +238,82 @@ describe('tree.destroy() disposes the tree’s Links', () => {
     ).toThrow('subscribe');
     expect(getTreeLinkCountForTesting(tree.$.x)).toBe(0);
     tree.destroy();
+  });
+});
+
+/**
+ * A Link created AFTER destroy (15.4.4). v15 refuses every relationship or
+ * reader created on a destroyed tree with `StudioTreeDestroyedError` (the
+ * transaction-lifecycle, restoration, entity-membership, Link-state,
+ * state-location and confirmed-turn readers), because a dead tree and an idle
+ * one are different facts. `link()` now refuses the same way, before it
+ * acquires anything: an inert handle would report `settled()` for a
+ * relationship that can never send.
+ */
+describe('link() on a destroyed tree', () => {
+  const destroyedTree = () => {
+    const tree = signalTree({
+      x: 0,
+      form: { a: 0 },
+      rows: entityMap<{ id: string; n: number }, string>(),
+    });
+    tree.destroy();
+    return tree;
+  };
+
+  it.each([
+    ['a leaf', (t: ReturnType<typeof destroyedTree>) => t.$.x],
+    ['a branch', (t: ReturnType<typeof destroyedTree>) => t.$.form],
+    ['a collection', (t: ReturnType<typeof destroyedTree>) => t.$.rows],
+    ['the root', (t: ReturnType<typeof destroyedTree>) => t.$],
+  ] as const)('refuses %s with StudioTreeDestroyedError', (_label, source) => {
+    const tree = destroyedTree();
+    let subscribed = false;
+    let error: unknown;
+    try {
+      link(source(tree) as never, {
+        set: () => undefined,
+        subscribe: () => {
+          subscribed = true;
+          return () => undefined;
+        },
+      });
+    } catch (caught) {
+      error = caught;
+    }
+    expect(error).toBeInstanceOf(StudioTreeDestroyedError);
+    expect((error as StudioTreeDestroyedError).code).toBe(
+      'STUDIO_TREE_DESTROYED'
+    );
+    expect((error as Error).message).toMatch(/link/);
+    expect(subscribed).toBe(false);
+    expect(getTreeLinkCountForTesting(tree.$.x)).toBe(0);
+  });
+
+  it('acquires nothing on a destroyed collection', () => {
+    const tree = destroyedTree();
+    expect(() => link(tree.$.rows, { set: () => undefined })).toThrow(
+      StudioTreeDestroyedError
+    );
+    expect(
+      getEntityMembershipInventory(tree.$.rows as object)?.observed(true) ??
+        false
+    ).toBe(false);
+  });
+
+  it('refuses after a destroy that found Links to dispose, too', () => {
+    const tree = signalTree({ x: 0 });
+    link(tree.$.x, { set: () => undefined });
+    tree.destroy();
+    expect(() => link(tree.$.x, { set: () => undefined })).toThrow(
+      StudioTreeDestroyedError
+    );
+  });
+
+  it('keeps refusing an empty endpoint and an unowned source first', () => {
+    const tree = destroyedTree();
+    expect(() => link(tree.$.x, {})).toThrow(
+      /at least one of get, set or subscribe/
+    );
   });
 });
