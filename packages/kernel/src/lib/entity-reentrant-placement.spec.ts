@@ -23,6 +23,14 @@ import { restoration } from '../enhancers/restoration/restoration';
  * The rows now move before any tap runs, and every fresh row is anchored to its
  * neighbours in the committed order. A tap sees the call's result, so its own
  * writes apply after it: the expected order below is `nested(outer(seed))`.
+ *
+ * INTERCEPTORS. They run before the call writes, so their writes apply first:
+ * `outer(nested(seed))`. `addMany`, `upsertMany` and `addOne` read the last
+ * row as their first anchor BEFORE the interceptors ran, so a row an
+ * interceptor appended was skipped over: redo put the call's rows ahead of it.
+ * (Had the interceptor removed that last row, the anchor lookup would have
+ * allocated a subject for a key no longer present.) Anchors are now read from
+ * the committed order, after every interceptor.
  */
 type Row = { id: string; n: number };
 const flush = async () => {
@@ -179,6 +187,121 @@ describe.each([
         pending.rollback();
         await flush();
         expect(tree.$.rows.ids()).toStrictEqual(SEEDED);
+      } finally {
+        tree.destroy();
+      }
+    }
+  );
+});
+
+/** Installs an interceptor that runs `nested` once, before `x` is added. */
+const nestInInterceptor = (tree: Tree, nested: string) => {
+  let fired = false;
+  tree.$.rows.intercept({
+    onAdd: (row) => {
+      if (fired || row.id !== 'x') return;
+      fired = true;
+      nesteds[nested].run(tree);
+    },
+  });
+};
+const expectedInInterceptor = (outer: string, nested: string) =>
+  outers[outer].order(nesteds[nested].order(SEEDED));
+
+describe.each([
+  ['restoration()', () => [restoration()]],
+  ['transactions(), restoration()', () => [transactions(), restoration()]],
+  ['restoration(), transactions()', () => [restoration(), transactions()]],
+] as const)(
+  'a write from an interceptor: undo/redo/jumpTo (%s)',
+  (_name, enhancers) => {
+    it.each(combos)(
+      '%s, interceptor writes %s: forward, undo, redo, undo, jumpTo exact',
+      async (outer, nested) => {
+        const tree = make(enhancers());
+        try {
+          await seed(tree);
+          nestInInterceptor(tree, nested);
+          undoable(() => outers[outer].run(tree));
+          await flush();
+          const forward = expectedInInterceptor(outer, nested);
+          expect(tree.$.rows.ids()).toStrictEqual(forward);
+          tree.undo();
+          await flush();
+          expect(tree.$.rows.ids()).toStrictEqual(SEEDED);
+          tree.redo();
+          await flush();
+          expect(tree.$.rows.ids()).toStrictEqual(forward);
+          tree.undo();
+          await flush();
+          expect(tree.$.rows.ids()).toStrictEqual(SEEDED);
+          tree.jumpTo(tree.getRestorationHistory().length - 1);
+          await flush();
+          expect(tree.$.rows.ids()).toStrictEqual(forward);
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
+  }
+);
+
+describe.each([
+  ['transactions()', () => [transactions()]],
+  ['transactions(), restoration()', () => [transactions(), restoration()]],
+  ['restoration(), transactions()', () => [restoration(), transactions()]],
+] as const)('a write from an interceptor: rollback (%s)', (_name, enhancers) => {
+  it.each(combos)(
+    '%s, interceptor writes %s: forward, then rollback exact',
+    async (outer, nested) => {
+      const tree = make(enhancers());
+      try {
+        await seed(tree);
+        nestInInterceptor(tree, nested);
+        const pending = tree.transaction(() => outers[outer].run(tree));
+        await flush();
+        expect(tree.$.rows.ids()).toStrictEqual(
+          expectedInInterceptor(outer, nested)
+        );
+        pending.rollback();
+        await flush();
+        expect(tree.$.rows.ids()).toStrictEqual(SEEDED);
+      } finally {
+        tree.destroy();
+      }
+    }
+  );
+});
+
+describe('an interceptor that removes the last row', () => {
+  it.each([
+    ['addMany', (tree: Tree) => tree.$.rows.addMany([{ id: 'x', n: 1 }])],
+    ['upsertMany', (tree: Tree) => tree.$.rows.upsertMany([{ id: 'x', n: 1 }])],
+    ['addOne', (tree: Tree) => tree.$.rows.addOne({ id: 'x', n: 1 })],
+  ] as const)(
+    '%s: no row comes back, and undo/redo are exact',
+    async (_api, act) => {
+      const tree = make([restoration()]);
+      try {
+        await seed(tree);
+        let fired = false;
+        tree.$.rows.intercept({
+          onAdd: () => {
+            if (fired) return;
+            fired = true;
+            tree.$.rows.removeOne('a');
+          },
+        });
+        undoable(() => act(tree));
+        await flush();
+        expect(tree.$.rows.ids()).toStrictEqual(['z', 'x']);
+        expect(tree.$.rows.count()).toBe(2);
+        tree.undo();
+        await flush();
+        expect(tree.$.rows.ids()).toStrictEqual(SEEDED);
+        tree.redo();
+        await flush();
+        expect(tree.$.rows.ids()).toStrictEqual(['z', 'x']);
       } finally {
         tree.destroy();
       }
