@@ -203,3 +203,66 @@ describe.each([
     }
   });
 });
+
+/**
+ * The CHANGELOG's compatibility note for this refusal, pinned: a cascade
+ * delete written as an onRemove interceptor now makes removeMany throw; the
+ * migration — the same cascade in a tap, or a separate call — works.
+ */
+describe('removeMany: cascade deletes, before and after migration', () => {
+  type Item = { id: string; parent?: string };
+  const cascadeTree = () =>
+    signalTree({
+      items: entityMap<Item, string>({ selectId: (item) => item.id }),
+    });
+  const seedItems = (tree: ReturnType<typeof cascadeTree>) =>
+    tree.$.items.addMany([
+      { id: 'p1' },
+      { id: 'p2' },
+      { id: 'c1', parent: 'p1' },
+      { id: 'c2', parent: 'p2' },
+    ]);
+  const children = (tree: ReturnType<typeof cascadeTree>, parent: string) =>
+    tree.$.items
+      .all()
+      .filter((item) => item.parent === parent)
+      .map((item) => item.id);
+
+  it('a cascade in an onRemove interceptor is refused: the parents stay', () => {
+    const tree = cascadeTree();
+    try {
+      seedItems(tree);
+      tree.$.items.intercept({
+        onRemove: (id) => {
+          const dependants = children(tree, String(id));
+          if (dependants.length) tree.$.items.removeMany(dependants);
+        },
+      });
+      expect(() => tree.$.items.removeMany(['p1', 'p2'])).toThrow(
+        'Cannot removeMany: collection topology changed during staging'
+      );
+      // Every row's interceptor ran before the check, so both nested
+      // removals stand; the call itself removed nothing.
+      expect(tree.$.items.ids()).toStrictEqual(['p1', 'p2']);
+    } finally {
+      tree.destroy();
+    }
+  });
+
+  it('the same cascade in a tap removes the parents and their children', () => {
+    const tree = cascadeTree();
+    try {
+      seedItems(tree);
+      tree.$.items.tap({
+        onRemove: (id) => {
+          const dependants = children(tree, String(id));
+          if (dependants.length) tree.$.items.removeMany(dependants);
+        },
+      });
+      tree.$.items.removeMany(['p1', 'p2']);
+      expect(tree.$.items.ids()).toStrictEqual([]);
+    } finally {
+      tree.destroy();
+    }
+  });
+});
