@@ -1804,19 +1804,30 @@ export function getOrCreateInternalTransactionRuntime<T>(
     reservedId: number
   ): TransactionTurnRecord | undefined => {
     const bucket = pendingTransactions.get(transactionId);
-    pendingTransactions.delete(transactionId);
-    releaseWindowIfClosed();
     if (!bucket) {
+      pendingTransactions.delete(transactionId);
+      releaseWindowIfClosed();
       authority.discardPending(reservedId);
       return undefined;
     }
-    const {
-      subjectIds,
-      positionIds,
-      effects,
-      baselineValues,
-      collectionOrders,
-    } = drainCaptureBucket(bucket);
+    // Read the capture WITHOUT clearing it, and retire it only once the
+    // pending turn exists. 15.4.3 deleted it first: a throw in this step left
+    // abortOpenTransaction nothing to compensate or record, so the write stayed
+    // live and unrecorded, and an earlier transaction's rollback reversed
+    // through it.
+    const subjectIds = [...bucket.subjectIds].sort((a, b) => a - b);
+    const positionIds = [...bucket.positionIds].sort((a, b) => a - b);
+    const effects = [...bucket.effects.values()].map(cloneTurnEffect);
+    const baselineValues = new Map(bucket.baselineValues);
+    const orderDeltas = [...bucket.collectionOrders.values()].map((order) =>
+      deriveCollectionOrderDelta(
+        order.owner,
+        order.beforeSubjects,
+        order.afterSubjects,
+        order.beforeFrontier,
+        order.afterFrontier
+      )
+    );
     const pending = authority.createPending(
       reservedId,
       subjectIds.length > 0 ? subjectIds : undefined,
@@ -1824,19 +1835,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
       effects.length > 0 ? effects : undefined,
       baselineValues.size > 0 ? baselineValues : undefined
     );
-    if (pending && collectionOrders.length > 0) {
-      pendingOrderDeltas.set(
-        pending.id,
-        collectionOrders.map((order) =>
-          deriveCollectionOrderDelta(
-            order.owner,
-            order.beforeSubjects,
-            order.afterSubjects,
-            order.beforeFrontier,
-            order.afterFrontier
-          )
-        )
-      );
+    drainCaptureBucket(bucket);
+    pendingTransactions.delete(transactionId);
+    releaseWindowIfClosed();
+    if (pending && orderDeltas.length > 0) {
+      pendingOrderDeltas.set(pending.id, orderDeltas);
     }
     return pending;
   };
