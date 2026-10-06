@@ -35,6 +35,14 @@ rebuilds only the nodes beneath a signal that actually changed, and clean
 subtrees come back **by reference**. A history entry is therefore a pointer graph
 over shared structure, not a copy.
 
+**This requires immutable values.** Undo, redo and `jumpTo()` restore the
+object and array values a history record holds by reference too: a row field
+dropped by `replaceOne` comes back as the same object it was. If you mutate an
+object or array after handing it to the tree (your own copy or the one read
+back from it), history holds the mutation and restoring brings that back. Write
+a new object instead of mutating one in place. Cloning on every restore would
+make undo O(value) for no benefit to code that already follows this rule.
+
 <!-- measured: the "before" column is a point-in-time record from the 13.5.0 CHANGELOG entry — pre-13.5.0 materialisation no longer exists to re-run. The "now" column reproduces with `node tools/bench-leaf-equality.mjs`. -->
 
 | 50 recorded writes over | before 13.5.0 | now         |
