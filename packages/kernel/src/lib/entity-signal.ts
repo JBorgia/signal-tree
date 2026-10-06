@@ -2816,7 +2816,12 @@ export function createEntitySignal<
      * unrelated row's consumers are invalidated.
      */
     prependOne(entity: E, opts?: AddOptions<E, K>): K {
-      return api.prependMany([entity], opts)[0];
+      // Strict, reading only what AddOptions defines: forwarded whole, a cast
+      // `{ mode }` reached addRows (skip returned undefined, overwrite
+      // replaced silently).
+      return withMembershipGroup(() =>
+        addRows([entity], { selectId: opts?.selectId }, true)
+      )[0];
     },
 
     prependMany(entities: E[], opts?: AddManyOptions<E, K>): K[] {
