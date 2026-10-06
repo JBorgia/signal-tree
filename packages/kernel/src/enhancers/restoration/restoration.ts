@@ -69,6 +69,7 @@ import {
   deriveDeclarativeTransitionTarget,
   prepareDeclarativeTransitionInstallation,
   requiresDeclarativeStructuralTarget,
+  withoutDeltaSubjects,
   type CollectionTransitionSource,
   type CollectionTransitionTargetBinding,
   type FrontierStep,
@@ -560,9 +561,109 @@ const sameRebaseValue = (left: RebaseValue, right: RebaseValue): boolean =>
   left.present === right.present &&
   (!left.present || deepEqual(left.value, right.value));
 
+/** One record's order side: its deltas and its frontier transitions. */
+export type RecordOrders = {
+  readonly deltas: readonly CollectionOrderDelta[];
+  readonly frontiers: readonly TurnFrontierTransition[];
+};
+
+/** The record's transition on `owner` (a delta's or a frontier's). */
+const transitionOn = (
+  record: RecordOrders,
+  owner: number
+): { before: unknown; after: unknown } | undefined => {
+  const delta = record.deltas.find((candidate) => candidate.owner === owner);
+  if (delta)
+    return { before: delta.beforeFrontier, after: delta.afterFrontier };
+  return record.frontiers.find((candidate) => candidate.owner === owner);
+};
+
+/** The record with its transition on `owner` re-based at one end. */
+const withTransition = (
+  record: RecordOrders,
+  owner: number,
+  end: 'before' | 'after',
+  token: unknown
+): RecordOrders => ({
+  deltas: record.deltas.map((delta) =>
+    delta.owner !== owner
+      ? delta
+      : end === 'before'
+      ? { ...delta, beforeFrontier: token }
+      : { ...delta, afterFrontier: token }
+  ),
+  frontiers: record.frontiers.map((transition) =>
+    transition.owner !== owner ? transition : { ...transition, [end]: token }
+  ),
+});
+
+/**
+ * The ORDER side of the rejection rebase (`rebaseOntoRejection` is the
+ * effect side), for one chronological list of records (turns, or events).
+ *
+ *   rows only the rejected turn created   leave every later delta; a record
+ *                                         derived them as explicit
+ *                                         participants while the turn was
+ *                                         pending, so they come out exactly
+ *                                         (`withoutDeltaSubjects`); a delta
+ *                                         left with nothing to reorder is the
+ *                                         frontier transition it still is
+ *   the token the rejected turn left      the FIRST later transition on the
+ *                                         collection that started from it
+ *                                         starts from the token the turn
+ *                                         replaced, as if it never ran
+ *   the token the compensation left       the LAST later transition on the
+ *                                         collection that ended where the
+ *                                         compensation started ends where it
+ *                                         left the collection
+ *
+ * Exported for its unit spec only.
+ */
+export function rebaseOrdersOntoRejection(
+  records: readonly RecordOrders[],
+  created: ReadonlyMap<number, ReadonlySet<number>>,
+  rejected: readonly TurnFrontierTransition[],
+  compensated: readonly TurnFrontierTransition[]
+): RecordOrders[] {
+  const rebased = records.map((record): RecordOrders => {
+    const deltas: CollectionOrderDelta[] = [];
+    const frontiers = [...record.frontiers];
+    for (const delta of record.deltas) {
+      const rows = created.get(delta.owner);
+      const kept = rows
+        ? withoutDeltaSubjects(delta, (subject) => rows.has(subject))
+        : delta;
+      if (kept) deltas.push(kept);
+      else if (delta.beforeFrontier !== delta.afterFrontier) {
+        frontiers.push({
+          owner: delta.owner,
+          before: delta.beforeFrontier,
+          after: delta.afterFrontier,
+        });
+      }
+    }
+    return { deltas, frontiers };
+  });
+  for (const { owner, before, after } of rejected) {
+    const index = rebased.findIndex((record) => transitionOn(record, owner));
+    if (index >= 0 && transitionOn(rebased[index], owner)?.before === after) {
+      rebased[index] = withTransition(rebased[index], owner, 'before', before);
+    }
+  }
+  for (const { owner, before, after } of compensated) {
+    let index = rebased.length - 1;
+    while (index >= 0 && !transitionOn(rebased[index], owner)) index -= 1;
+    if (index >= 0 && transitionOn(rebased[index], owner)?.after === before) {
+      rebased[index] = withTransition(rebased[index], owner, 'after', after);
+    }
+  }
+  return rebased;
+}
+
 /**
  * Re-bases chronological effect lists recorded after a REJECTED turn onto
- * what that turn replaced, for every pre-image a record can hold. See
+ * what that turn replaced, for every pre-image an EFFECT can hold (the order
+ * side, deltas and frontier tokens, is `rebaseOrdersOntoRejection`). See
  * `RestorationManager.rebaseAfterRejection`.
  *
  *   field write (`set`)   its `before` and presence, at the exact address or
@@ -1104,7 +1205,8 @@ class RestorationManager<T> {
           order.beforeSubjects,
           order.afterSubjects,
           order.beforeFrontier,
-          order.afterFrontier
+          order.afterFrontier,
+          this.pendingCreatedRows(order.owner)
         )
       )
       .filter((delta) => delta.participants.length > 0);
@@ -1130,6 +1232,15 @@ class RestorationManager<T> {
   }
 
   private maxHistorySize: number;
+
+  /**
+   * Rows open transactions created, per collection. A record's order delta
+   * names them as explicit participants (not backbone), so the rejection
+   * rebase can take them out exactly (`rebaseOrdersOntoRejection`). Installed
+   * by the enhancer, which knows the open transactions.
+   */
+  pendingCreatedRows: (owner: number) => ReadonlySet<number> | undefined = () =>
+    undefined;
 
   /**
    * How history materialization reads a collection: through an inspection
@@ -1420,21 +1531,54 @@ class RestorationManager<T> {
    * later records at the address were based on that record and keep theirs.
    * Every later record of a row the rejected turn created is dropped (only it
    * created that row), and anchors pointing at a dropped removal follow the
-   * removal's own anchors.
+   * removal's own anchors. On the order side, those rows leave later deltas,
+   * and the first and last later frontier tokens are re-based onto the token
+   * the turn replaced and the one its compensation left
+   * (`rebaseOrdersOntoRejection`); a turn left with no operation is dropped
+   * and its token transition spliced out (`spliceDroppedFrontiers`).
    */
   rebaseAfterRejection(
     rejected: readonly TurnEffect[],
-    since: { turnId: number; ordinal: number }
+    since: { turnId: number; ordinal: number },
+    rejectedFrontiers: readonly TurnFrontierTransition[] = [],
+    compensatedFrontiers: readonly TurnFrontierTransition[] = []
   ): void {
     const later = [...this.history, ...this.pendingTurns.values()]
-      .filter((turn) => turn.id > since.turnId && turn.__effects)
+      .filter(
+        (turn) =>
+          turn.id > since.turnId &&
+          (turn.__effects || turn.__orderDeltas || turn.__frontiers)
+      )
       .sort((left, right) => left.id - right.id);
     const turnEffects = rebaseOntoRejection(
       rejected,
-      later.map((turn) => turn.__effects as TurnEffect[])
+      later.map((turn) => turn.__effects ?? [])
+    );
+    const created = new Map<number, Set<number>>();
+    for (const effect of rejected) {
+      if (effect.kind !== 'add') continue;
+      let rows = created.get(effect.position);
+      if (!rows) created.set(effect.position, (rows = new Set()));
+      rows.add(effect.subject);
+    }
+    const turnOrders = rebaseOrdersOntoRejection(
+      later.map((turn) => ({
+        deltas: turn.__orderDeltas ?? [],
+        frontiers: turn.__frontiers ?? [],
+      })),
+      created,
+      rejectedFrontiers,
+      compensatedFrontiers
     );
     later.forEach((turn, index) => {
-      turn.__effects = turnEffects[index];
+      if (turn.__effects || turnEffects[index].length > 0) {
+        turn.__effects = turnEffects[index];
+      }
+      const { deltas, frontiers } = turnOrders[index];
+      if (deltas.length > 0) turn.__orderDeltas = [...deltas];
+      else delete turn.__orderDeltas;
+      if (frontiers.length > 0) turn.__frontiers = [...frontiers];
+      else delete turn.__frontiers;
     });
     const events = this.historicalEvents.filter(
       (event) => event.ordinal > since.ordinal
@@ -1443,10 +1587,137 @@ class RestorationManager<T> {
       rejected,
       events.map((event) => event.effects)
     );
+    const eventOrders = rebaseOrdersOntoRejection(
+      events.map((event) => ({
+        deltas: event.orderDeltas,
+        frontiers: event.frontiers ?? [],
+      })),
+      created,
+      rejectedFrontiers,
+      compensatedFrontiers
+    );
     events.forEach((event, index) => {
-      (event as { effects: TurnEffect[] }).effects = eventEffects[index];
+      const mutable = event as {
+        effects: TurnEffect[];
+        orderDeltas: CollectionOrderDelta[];
+        frontiers?: TurnFrontierTransition[];
+      };
+      mutable.effects = eventEffects[index];
+      mutable.orderDeltas = [...eventOrders[index].deltas];
+      if (eventOrders[index].frontiers.length > 0) {
+        mutable.frontiers = [...eventOrders[index].frontiers];
+      } else delete mutable.frontiers;
     });
     this.dropEmptiedTurns(later);
+  }
+
+  /**
+   * A dropped turn's frontier transitions are no-ops once re-based (the order
+   * is the same at both ends), so they leave the chains: the next record on
+   * the collection, turn or event, starts where the dropped one started; with
+   * none, the collection gets that token back if it still holds the dropped
+   * one's (identity: it is exactly that order). The dropped turn's own event
+   * loses the same transition.
+   */
+  private spliceDroppedFrontiers(dropped: readonly CanonicalTurn<T>[]): void {
+    const remaining = [...this.history, ...this.pendingTurns.values()]
+      .filter((turn) => !dropped.includes(turn))
+      .sort((left, right) => left.id - right.id);
+    let bindings: Map<number, CollectionTransitionTargetBinding> | undefined;
+    for (const turn of dropped) {
+      const event = this.historicalEvents.find(
+        (candidate) => candidate.boundaryTurnId === turn.id
+      ) as
+        | { frontiers?: TurnFrontierTransition[]; ordinal: number }
+        | undefined;
+      for (const { owner, before, after } of turn.__frontiers ?? []) {
+        if (event?.frontiers) {
+          event.frontiers = event.frontiers.filter(
+            (transition) =>
+              transition.owner !== owner || transition.after !== after
+          );
+        }
+        const nextEvent = this.historicalEvents.find(
+          (candidate) =>
+            candidate.ordinal > (event?.ordinal ?? Infinity) &&
+            transitionOn(
+              {
+                deltas: candidate.orderDeltas,
+                frontiers: candidate.frontiers ?? [],
+              },
+              owner
+            )
+        );
+        if (
+          nextEvent &&
+          transitionOn(
+            {
+              deltas: nextEvent.orderDeltas,
+              frontiers: nextEvent.frontiers ?? [],
+            },
+            owner
+          )?.before === after
+        ) {
+          const orders = withTransition(
+            {
+              deltas: nextEvent.orderDeltas,
+              frontiers: nextEvent.frontiers ?? [],
+            },
+            owner,
+            'before',
+            before
+          );
+          const mutable = nextEvent as {
+            orderDeltas: CollectionOrderDelta[];
+            frontiers?: TurnFrontierTransition[];
+          };
+          mutable.orderDeltas = [...orders.deltas];
+          if (orders.frontiers.length > 0)
+            mutable.frontiers = [...orders.frontiers];
+        }
+        const next = remaining.find(
+          (candidate) =>
+            candidate.id > turn.id &&
+            transitionOn(
+              {
+                deltas: candidate.__orderDeltas ?? [],
+                frontiers: candidate.__frontiers ?? [],
+              },
+              owner
+            )
+        );
+        if (next) {
+          const orders = {
+            deltas: next.__orderDeltas ?? [],
+            frontiers: next.__frontiers ?? [],
+          };
+          if (transitionOn(orders, owner)?.before !== after) continue;
+          const spliced = withTransition(orders, owner, 'before', before);
+          if (spliced.deltas.length > 0)
+            next.__orderDeltas = [...spliced.deltas];
+          if (spliced.frontiers.length > 0) {
+            next.__frontiers = [...spliced.frontiers];
+          }
+          continue;
+        }
+        if (!bindings) {
+          bindings = new Map();
+          visitTree(this.tree.$, (node) => {
+            const binding = (
+              node as {
+                __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+              }
+            ).__prepareTransitionTarget;
+            if (binding) bindings?.set(binding.owner, binding);
+            return undefined;
+          });
+        }
+        const binding = bindings.get(owner);
+        if (binding && binding.orderFrontier?.() === after) {
+          binding.orderFrontier?.(before as object);
+        }
+      }
+    }
   }
 
   /**
@@ -1465,6 +1736,7 @@ class RestorationManager<T> {
         .map(({ id }) => id)
     );
     if (emptied.size === 0) return;
+    this.spliceDroppedFrontiers(candidates.filter(({ id }) => emptied.has(id)));
     const dropped = this.history.filter(({ id }) => emptied.has(id));
     const viewIndex = this.isTemporalViewActive ? this.currentIndex : undefined;
     const droppedAtOrBeforeView =
@@ -1481,7 +1753,7 @@ class RestorationManager<T> {
       }
       return event.effects.length === 0 &&
         event.orderDeltas.length === 0 &&
-        !event.frontiers
+        !event.frontiers?.length
         ? []
         : [{ ...event, boundaryTurnId: undefined }];
     });
@@ -1618,7 +1890,8 @@ class RestorationManager<T> {
           order.beforeSubjects,
           order.afterSubjects,
           order.beforeFrontier,
-          order.afterFrontier
+          order.afterFrontier,
+          this.pendingCreatedRows(order.owner)
         )
       )
       .filter((delta) => delta.participants.length > 0);
@@ -4890,9 +5163,22 @@ export function restoration(
       number,
       {
         effects: TurnEffect[];
+        /** Its order-frontier transitions, deltas' included. */
+        frontiers: TurnFrontierTransition[];
         since: { turnId: number; ordinal: number };
       }
     >();
+    restorationManager.pendingCreatedRows = (owner) => {
+      let rows: Set<number> | undefined;
+      for (const { effects } of speculativeContributions.values()) {
+        for (const effect of effects) {
+          if (effect.kind === 'add' && effect.position === owner) {
+            (rows ??= new Set()).add(effect.subject);
+          }
+        }
+      }
+      return rows;
+    };
 
     const resolveTransactionId = (meta?: {
       transactionId?: unknown;
@@ -4966,9 +5252,18 @@ export function restoration(
       if (entry) {
         pendingDescriptorInputs.set(entry.id, descriptorInputs);
       }
-      if (effects.length > 0) {
+      const turnFrontiers = [
+        ...frontiers,
+        ...collectionOrders.map((order) => ({
+          owner: order.owner,
+          before: order.beforeFrontier,
+          after: order.afterFrontier,
+        })),
+      ];
+      if (effects.length > 0 || turnFrontiers.length > 0) {
         speculativeContributions.set(transactionId, {
           effects: effects.map(cloneTurnEffect),
+          frontiers: turnFrontiers,
           since: restorationManager.historyWatermark(),
         });
       }
@@ -5101,7 +5396,9 @@ export function restoration(
         if (contribution) {
           restorationManager.rebaseAfterRejection(
             contribution.effects,
-            contribution.since
+            contribution.since,
+            contribution.frontiers,
+            event.compensatedFrontiers ?? []
           );
         }
         // NOT restored here. Measured: this event fires BEFORE the rollback's
