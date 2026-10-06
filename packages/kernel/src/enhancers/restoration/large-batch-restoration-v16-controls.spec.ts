@@ -10,6 +10,11 @@ import { signalTree } from '../../lib/signal-tree';
 import { entityMap } from '../../lib/markers/entity-map';
 import { undoable } from '../../lib/undoable';
 import { restoration } from './restoration';
+import {
+  clearProductionSubstrateStatsForTesting,
+  installProductionSubstrateStatsForTesting,
+  resetProductionSubstrateStatsForTesting,
+} from '../../lib/internals/production-substrate-stats';
 
 type Row = { id: number; n: number };
 const rows = (count: number, offset = 0): Row[] =>
@@ -37,15 +42,36 @@ describe('v16 restoration of turns larger than the argument limit', () => {
       await flush();
       undoable(() => tree.$.rows.clear());
       await flush();
-      expect(tree.getRestorationHistory()).toHaveLength(2);
-      tree.jumpTo(0);
-      const ids = tree.$.rows.ids();
-      expect(ids.length).toBe(LARGE);
-      expect(ids[0]).toBe(0);
-      expect(ids[LARGE - 1]).toBe(LARGE - 1);
-      expect(tree.$.rows.byId(0)?.()?.n).toBe(-1);
-      tree.jumpTo(1);
-      expect(tree.$.rows.count()).toBe(0);
+      // Two entries, without `getRestorationHistory()`: materializing its
+      // snapshots for a 130k-row clear grows faster than linearly (20.6 s
+      // here alone; slice 8c) and is not what this case is about.
+      expect(tree.getCurrentIndex()).toBe(1);
+      expect(tree.canUndo()).toBe(true);
+      // Counted work, not wall-clock time (slice 8c): each jump touches each
+      // row a bounded number of times, so it cannot become the timeout this
+      // case used to hit under load. Measured: jumpTo(0) writes every row
+      // once and reads 2 publication dependencies per row; jumpTo(1)
+      // tombstones every row once and reads 9 per row.
+      const stats = installProductionSubstrateStatsForTesting();
+      try {
+        tree.jumpTo(0);
+        expect(stats.valueStoreWrites).toBe(LARGE);
+        expect(stats.publicationDependencyReads).toBeLessThanOrEqual(3 * LARGE);
+        const ids = tree.$.rows.ids();
+        expect(ids.length).toBe(LARGE);
+        expect(ids[0]).toBe(0);
+        expect(ids[LARGE - 1]).toBe(LARGE - 1);
+        expect(tree.$.rows.byId(0)?.()?.n).toBe(-1);
+        resetProductionSubstrateStatsForTesting(stats);
+        tree.jumpTo(1);
+        expect(stats.structuralSubjectTombstones).toBe(LARGE);
+        expect(stats.publicationDependencyReads).toBeLessThanOrEqual(
+          10 * LARGE
+        );
+        expect(tree.$.rows.count()).toBe(0);
+      } finally {
+        clearProductionSubstrateStatsForTesting();
+      }
     } finally {
       tree.destroy();
     }

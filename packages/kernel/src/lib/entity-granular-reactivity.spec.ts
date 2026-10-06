@@ -107,10 +107,18 @@ describe('entityMap — collection queries are lazily derived (13.5.0)', () => {
     });
     tree.$.rows.setAll(Array.from({ length: 20000 }, (_, i) => ({ id: i })));
 
-    tree.$.rows.all(); // prime
-    const t0 = performance.now();
-    for (let i = 0; i < 500; i++) tree.$.rows.all();
-    expect(performance.now() - t0).toBeLessThan(5);
+    // Identity, not wall-clock time (v16 integration slice 8c): a 5 ms bound
+    // on 500 reads failed under machine load. A cached read returns the very
+    // array it returned before; any rebuild — the O(size) work this guards
+    // against — returns a new one. Exact, and independent of the machine.
+    const first = tree.$.rows.all();
+    for (let i = 0; i < 500; i++) expect(tree.$.rows.all()).toBe(first);
+    // Control: a write invalidates the cache, so identity is not vacuous.
+    tree.$.rows.addOne({ id: 20000 });
+    const next = tree.$.rows.all();
+    expect(next).not.toBe(first);
+    expect(next).toHaveLength(20001);
+    expect(tree.$.rows.all()).toBe(next);
   });
 
   it('map() stays a snapshot, not a live view', () => {
