@@ -302,6 +302,71 @@ bullet below says **Compatibility** or **Behaviour change**.
     still does not wait for another relationship's endpoint call.
     **Behaviour change:** `settled()` can resolve later than before; it
     resolved before such a send had started.
+- Locations an omission has hidden (a whole-value write that left out a
+  member's key, or a key above it), ported from the v16 integration (slices
+  8b–8e); each behaved as described under "was" on 15.4.3:
+  - A location under an omitted member reads `undefined`, through any handle,
+    including one held from before the omission, and held consumers follow
+    the omission and a later re-add; an updater there receives `undefined`.
+    Writing it re-adds its path: after `a` is omitted, `$.a.b.keep(9)` makes
+    `a` equal `{ b: { keep: 9 } }` and `a`'s other members stay absent.
+    Undo, redo, `jumpTo()` and rollback of that write make the path absent
+    again, and `updateAndReport()` reports the re-added leaves.
+    **Behaviour change:** such a location read and wrote its retained
+    storage, and the write left the path absent.
+  - A re-added omitted leaf is undone to absent, not to a present
+    `undefined`; a whole value supplying an omitted key as `undefined` leaves
+    it absent (it came back with its retained value).
+  - An entity collection under an omitted member, or omitted itself, reads
+    as an absent, empty collection (`all()` is `[]`, `byId()` is
+    `undefined`, `count()` is `0`, held rows read `undefined`), also when the
+    root holds only collections. A write that adds rows re-adds the path with
+    only the written rows; undo, redo, `jumpTo()` and rollback of it make the
+    collection absent again. **Behaviour change:** a write naming a row
+    (`updateOne()`, `removeOne()`, `changeId()` and the rest) throws "Entity
+    with id ... not found" and changes nothing; it wrote the retained row.
+    Reads returned the retained rows, and adding a row whose id a retained
+    row held threw "Entity with id ... already exists". The README's
+    "Locations an omission has hidden" lists the details (retained rows are
+    removed silently, a blocked write, the selection, taps during a
+    reversal).
+  - Undo, redo and `jumpTo()` of work under a location that a later ORDINARY
+    write omitted (the location or a plain branch above it) re-add only the
+    way to the reversal's own locations, with their values; the omission's
+    other members stay absent and retained storage supplies nothing. This
+    covers entity rows and collection order inside the branch. They wrote
+    retained storage nothing could read and reported success, or threw
+    "Declarative order replay has no binding" for a collection inside it.
+  - Omitted by external truth (inside `external()`), the location or an
+    enclosing branch: undo, redo and `jumpTo()` refuse with ST1034, name the
+    omitted member and the location, and change nothing. They reported
+    success after a hidden write; an omitted location itself was already
+    refused, as "changed after the operation being reversed".
+  - A member that cannot be re-added (an omitted entity collection at any
+    depth) refuses with "Unsupported scoped undo effect at '<location>'",
+    saying which member was omitted and why it cannot be re-added. Re-adding
+    a member that a pending transaction wrote under refuses with ST1034 until
+    it settles. State and the history position are unchanged.
+  - Undo, redo, `jumpTo()` and rollback of an operation that omitted or
+    re-added an entity collection, itself or inside a branch, restore its
+    membership and the rows it held when hidden; if something other than the
+    reversal changed those rows while it was hidden, they refuse, name the
+    collection and change nothing (rollback: `effect-validation-failed`).
+    Undo left the branch back without its collection, and rollback threw
+    "Plain branch target contains an unavailable member".
+  - A pending transaction's rollback under an omitted branch restores the
+    retained storage and leaves the branch absent, so nothing a rejected
+    transaction wrote can come back through undo, redo, `jumpTo()` or a
+    re-add. Rollback of rows in a collection hidden at any depth completes;
+    it threw "Transaction rollback has no collection binding".
+  - **Behaviour change:** rolling back a transaction while a newer pending
+    one omitted, or re-added, a plain branch enclosing a location the older
+    one wrote refuses with `later-pending-dependency` (settle the newer one
+    first, then retry). It succeeded, and the newer transaction's rollback
+    then brought the rejected value back.
+  - "Unsupported scoped undo effect at <path>" raised before anything applies
+    is a typed restoration refusal: the restoration reader reports
+    `refused`, not `failed`. The message is unchanged.
 - Known, unchanged: undo of a write that dropped a row field re-adds the
   field at the end of the row's keys.
 

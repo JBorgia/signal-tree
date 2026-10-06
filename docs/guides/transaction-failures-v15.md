@@ -88,6 +88,20 @@ State is unchanged either way, and the transaction stays pending. A later
 subscriber makes while the order change is being delivered is later work of
 this kind: it is a turn of its own and, unless it is `undoable()`, it stands.
 
+Since 15.4.4, rollback also refuses with `later-pending-dependency` while a
+NEWER pending transaction omitted, or re-added, a plain branch that encloses a
+location this transaction wrote. The newer transaction's before-image of that
+branch holds this transaction's value, so reversing this one first would let
+the newer one's rollback bring the rejected value back (through 15.4.3 it
+did). Settle the newer transaction, then retry. A rollback under a branch that
+a later omission hid restores the hidden storage and leaves the branch absent,
+so the rejected value cannot come back on a later re-add. A rollback that
+would re-add an entity collection the transaction omitted refuses
+(`effect-validation-failed`, naming the collection) when something else
+changed the collection's rows while it was omitted; state is unchanged. See
+"Locations an omission has hidden" in the
+[kernel README](../../packages/kernel/README.md#locations-an-omission-has-hidden).
+
 Recoverable pending refusal with a usable recovery handle and consequences
 held until explicit confirmation is a **v16 target**, not a current v15 API.
 

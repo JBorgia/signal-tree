@@ -219,6 +219,87 @@ that turn settles: call undo from a later user action, not immediately after
 `undoable()` in the same synchronous function. The tree owner calls `destroy()`
 when this store is no longer needed.
 
+#### Locations an omission has hidden
+
+A whole-value write that leaves out a key omits that member: it and everything
+under it are absent, even though their storage is retained. Reading a location
+under an omitted member gives `undefined`, through a handle held from before
+the omission too, and held consumers follow the omission and a later re-add.
+Writing such a location re-adds its path: after `a` is omitted,
+`$.a.b.keep(9)` makes `a` equal `{ b: { keep: 9 } }`, and `a`'s other members
+stay absent. An updater there receives `undefined`. Undo, redo, `jumpTo()` and
+`rollback()` of that write make the path absent again. Supplying an omitted
+key as `undefined` in a whole value leaves it absent.
+
+An entity collection under an omitted member, or omitted itself, follows the
+same rules. It reads as an absent, empty collection: `all()` is `[]`,
+`byId()` is `undefined`, `count()` is `0`, and held row nodes read
+`undefined`. A write that adds rows (`addOne()`, `setAll()`, `upsertOne()`,
+`clear()` and the rest) re-adds the path carrying only the written rows; the
+retained rows never come back. A write that names a row (`updateOne()`,
+`removeOne()`, `changeId()` and the rest) throws "Entity with id ... not
+found", as on an empty collection, and changes nothing. Undo, redo,
+`jumpTo()` and `rollback()` of a re-adding write make the collection absent
+again. This holds in a tree whose root holds only collections too.
+
+Some details of that rule:
+- **Retained rows are removed silently.** A re-adding write removes the
+  retained rows before it adds its own. Taps do not see that removal, but
+  history records it, so a reversal restores the rows.
+- **Invalid input changes nothing.** A re-adding write whose input makes it
+  throw (a missing row, or a `selectId` that throws) throws before anything
+  changes.
+- **A blocked write still removes the retained rows.** An interceptor that
+  blocks the write's own rows runs after the retained rows were removed. The
+  collection stays absent and empty, and history holds the removal. Undoing
+  it restores the rows and re-adds the path to the collection, as undoing
+  any write under an omitted member does.
+- **The selection is kept.** `activeId()` keeps its value and `activeEntity()`
+  reads `undefined`. A re-adding write clears the selection, as `clear()`
+  does.
+- **Taps during a reversal see physical rows.** While undo, redo, `jumpTo()`
+  or `rollback()` writes an absent collection's retained rows, a tap on it
+  that calls `byId()` sees those rows. Its projections (`all()`, `count()`,
+  `has()`) still read it absent.
+- **Writes from inside a whole value or a reversal of the same tree.** The
+  whole value or reversal decides that tree's membership. So a tap or sync
+  effect that runs during it and writes an absent location of that same tree
+  does not re-add its path. The write goes to retained storage and stays
+  invisible; for a collection, its other retained rows are not removed
+  first. A write to another tree is an ordinary write.
+
+Undo, redo and `jumpTo()` treat a location under an omitted member like this:
+
+- **Omitted by external truth** (inside `external()`): the reversal refuses
+  with ST1034, names the omitted member and the location, and changes
+  nothing.
+- **Omitted by an ordinary write**: the reversal restores its own locations
+  over that write, as it would over any later ordinary write. It re-adds
+  only the members on the way to those locations; every other member the
+  omission removed stays absent. Retained storage never supplies a value.
+- **Not re-addable** (an omitted entity collection, for example): the
+  reversal refuses and says why.
+- **Pending work under it**: re-adding a member that a pending transaction
+  wrote under refuses with ST1034 until that transaction settles.
+
+An entity collection that the reversed operation omitted or re-added, itself
+or inside a branch, is restored: undo, redo, `jumpTo()` and `rollback()` put
+back its membership, and its rows are the ones it held when it was hidden.
+If something other than the reversal changed those rows while it was hidden
+(a write through a handle held on it), the reversal refuses, names the
+collection and changes nothing. The same holds for a collection inside a
+branch that a reversal re-adds for an earlier write.
+
+A pending transaction's `rollback()` reverses its writes even when a later
+omission has hidden them: under an omitted branch it restores the retained
+storage and leaves the branch absent. Nothing a rejected transaction wrote can
+come back later, whether through undo, redo, `jumpTo()` or a re-add. Rollback
+order can matter here; see [Lifetime](#lifetime).
+
+An undo refused for a reason found before anything is applied ("Unsupported
+scoped undo effect at ...") reports `refused` to the restoration reader, as
+ST1034 does; the message is unchanged.
+
 ### `transactions()`
 
 Adds an explicit pending operation that can be confirmed or rolled back. Use it
@@ -334,6 +415,13 @@ reverses and the row stays absent. While the removing transaction is open,
 rollback refuses with `later-pending-dependency`. Deleting an entity is still
 not a general way to make rollback retryable: a pending-created row later work
 edited and kept, or a pending remove whose key was re-occupied, keeps refusing.
+
+Since 15.4.4 the same retryable refusal (`later-pending-dependency`) applies
+when the newer pending transaction omitted, or re-added, a plain branch that
+encloses a location the older one wrote. The newer transaction's before-image
+of that branch holds the older value, so reversing the older one first would
+let the newer one's rollback bring the rejected value back. Once the newer one
+settles (confirmed or rolled back), retrying the older rollback succeeds.
 
 **15.3.1 automatic-abort exception:** if the callback throws or a
 post-callback step fails before `transaction()` returns its handle, SignalTree

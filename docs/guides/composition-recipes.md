@@ -393,7 +393,9 @@ try {
 For overlapping pending transactions, settle the **newest** open one first. Rolling
 an older one back while a newer overlapping one is open refuses with
 `cause.kind === 'later-pending-dependency'`, because the newer transaction's
-before-image records what the field *held*, not who owns it. This does not fix
+before-image records what the field *held*, not who owns it. Since 15.4.4 that
+includes a newer transaction that omitted, or re-added, a plain branch
+enclosing a field the older one wrote. This does not fix
 the reentrant-ordering or pending-undo defects documented for 15.3.1 in the
 limitations guide; consult the [changelog](../../CHANGELOG.md) for versioned repairs.
 Once a rollback succeeds, undo, redo and `jumpTo()` of the writes that followed
