@@ -473,8 +473,16 @@ const replaceRebaseValue = (
     rest,
     next
   );
-  if (child.present) container[key] = child.value;
-  else delete container[key];
+  // An own data property even for the key '__proto__': assignment would set
+  // the prototype instead (re-review of 23b750f0, item 5).
+  if (child.present) {
+    Object.defineProperty(container, key, {
+      value: child.value,
+      enumerable: true,
+      writable: true,
+      configurable: true,
+    });
+  } else delete container[key];
   return { value: container, present: true };
 };
 
