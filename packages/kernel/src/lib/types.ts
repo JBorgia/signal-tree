@@ -729,13 +729,15 @@ export interface InterceptContext<T> {
  * value as the interceptors left it.
  *
  * Interceptors do not run on a replay of recorded state — `undo()`, `redo()`,
- * `jumpTo()`, a transaction rollback, or a devtools jump to a recorded state
- * (JUMP_TO_STATE, JUMP_TO_ACTION, ROLLBACK). It writes back exactly the value,
- * or the pre-image, that was recorded, which the interceptors already shaped
- * when it was first written; neither a transform nor a block applies to it.
- * Taps and path subscribers are still notified, and a write one of them makes
- * meanwhile is intercepted as usual. A devtools IMPORT_STATE applies imported
- * input and runs the interceptors.
+ * `jumpTo()`, a transaction rollback, or a devtools jump (JUMP_TO_STATE,
+ * JUMP_TO_ACTION, ROLLBACK) to a state the tree itself serialized. It writes
+ * back exactly the value, or the pre-image, that was recorded, which the
+ * interceptors already shaped when it was first written; neither a transform
+ * nor a block applies to it. Taps and path subscribers are still notified, and
+ * a write one of them makes meanwhile is intercepted as usual. A devtools jump
+ * to any other state — forged, hand-edited, older than the last 1,000 states
+ * the tree serialized — and an IMPORT_STATE are new input: the interceptors
+ * run.
  */
 export interface InterceptHandlers<E, K extends string | number> {
   onAdd?: (entity: E, ctx: InterceptContext<E>) => void;
