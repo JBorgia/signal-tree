@@ -218,8 +218,15 @@ when this store is no longer needed.
 #### Locations an omission has hidden
 
 A whole-value write that leaves out a key omits that member: it and everything
-under it are absent, even though their storage is retained. Undo, redo and
-`jumpTo()` treat a location under an omitted member like this:
+under it are absent, even though their storage is retained. Reading a location
+under an omitted member gives `undefined`, through a handle held from before
+the omission too, and held consumers follow the omission and a later re-add.
+Writing such a location re-adds its path: after `a` is omitted,
+`$.a.b.keep(9)` makes `a` equal `{ b: { keep: 9 } }`, and `a`'s other members
+stay absent. An updater there receives `undefined`. Undo, redo, `jumpTo()` and
+`rollback()` of that write make the path absent again.
+
+Undo, redo and `jumpTo()` treat a location under an omitted member like this:
 
 - **Omitted by external truth** (inside `external()`): the reversal refuses
   with ST1034, names the omitted member and the location, and changes

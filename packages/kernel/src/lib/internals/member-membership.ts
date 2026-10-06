@@ -1,4 +1,9 @@
-import { isTraversableNode, NODE_STORE_SYMBOL } from './node-shape';
+import { isWritableLocation } from './location-runtime';
+import { isNodeAccessor, isTraversableNode, NODE_STORE_SYMBOL } from './node-shape';
+import {
+  captureBranchMembershipIfObserved,
+  hasPathObservers,
+} from './path-observation-port';
 
 /**
  * BRANCH MEMBER MEMBERSHIP — §C / C5, GREENFIELD-BRANCH-WRITE-0.
@@ -66,6 +71,17 @@ const DORMANT = Symbol.for('SignalTree:DormantMember');
 
 type DormantBinding = { parent: object; key: string };
 
+/**
+ * @internal The two physical objects one branch is represented by.
+ *
+ * A branch is ONE semantic object and TWO physical ones: the `NodeAccessor`
+ * consumers hold, and the backing store its call path closes over. Both carry a
+ * descriptor per member, and both are observable — the store through `branch()`
+ * and every snapshot, the accessor through `Object.keys(branch)`, `'k' in
+ * branch` and spread.
+ */
+const NODE_ACCESSOR_PEER = Symbol.for('SignalTree:NodeAccessorPeer');
+
 /** @internal True when this leaf is absent from its parent's current value. */
 /**
  * @internal True when this leaf is absent from its parent's current value.
@@ -89,13 +105,8 @@ function memberBinding(leaf: unknown): DormantBinding | undefined {
   return (leaf as Record<symbol, DormantBinding | undefined>)[DORMANT];
 }
 
-/**
- * @internal Restore a dormant leaf's membership because it was written directly.
- *
- * Without this, `$.user.age.set(50)` would mutate storage the parent still
- * omits — the two-observable-truths defect in the other direction.
- */
-export function reactivateOnWrite(leaf: unknown): boolean {
+/** Restore a dormant member's own membership; used inside a structural write. */
+function reactivateOnWrite(leaf: unknown): boolean {
   const binding = memberBinding(leaf);
   if (!binding) return false;
   // ⚠️ MEMBERSHIP ONLY — DELIBERATELY NO PUBLICATION HERE.
@@ -107,6 +118,159 @@ export function reactivateOnWrite(leaf: unknown): boolean {
   // M-C2: the parent already holds a dependency on this dormant child's token,
   // so waking that one slot wakes the parent too.
   return setMemberPresence(binding.parent, binding.key, 'active');
+}
+
+/** The node a parent's own member link is stamped on (its accessor half). */
+function nodeOf(parent: object): object {
+  return (
+    ((parent as Record<symbol, unknown>)[NODE_ACCESSOR_PEER] as object) ??
+    parent
+  );
+}
+
+/**
+ * @internal True when `node` is absent from the current tree: it, or a member
+ * above it, is omitted.
+ *
+ *     A DESCENDANT ABSENT FROM ITS PARENT'S CURRENT VALUE IS SEMANTICALLY
+ *     ABSENT EVEN IF ITS PHYSICAL LOCATION IS RETAINED.
+ *
+ * `isDormantMember` answers only for the node's own descriptor, so a location
+ * under an omitted branch read and wrote retained storage (v16 integration 8d,
+ * open item 1). The links followed here are stamped when a member is first
+ * omitted, on it and on every state location below it; they only locate
+ * descriptors, and enumerability still answers. A node never under an omitted
+ * member has no link and pays one symbol lookup, as before.
+ */
+export function isAbsentMember(node: unknown): boolean {
+  for (
+    let binding = memberBinding(node);
+    binding;
+    binding = memberBinding(nodeOf(binding.parent))
+  ) {
+    const descriptor = Object.getOwnPropertyDescriptor(
+      binding.parent,
+      binding.key
+    );
+    if (descriptor?.enumerable === false) return true;
+  }
+  return false;
+}
+
+/**
+ * A structural write (a whole value, a reversal installing members) reconciles
+ * membership itself, level by level, and announces it. A location written
+ * inside one keeps the own-member reactivation it always had and announces
+ * nothing, so no transition is announced twice.
+ */
+let structuralWrites = 0;
+
+/** @internal Run a write that reconciles and announces membership itself. */
+export function withStructuralWrite<T>(run: () => T): T {
+  structuralWrites++;
+  try {
+    return run();
+  } finally {
+    structuralWrites--;
+  }
+}
+
+/** @internal True while a structural write is in progress. */
+export function inStructuralWrite(): boolean {
+  return structuralWrites > 0;
+}
+
+let republishMember: ((parent: object, key: string) => void) | undefined;
+
+/**
+ * @internal Installed by `signal-tree`, which owns the publication carriers.
+ * Wakes the observers of a member whose presence changed, and of every
+ * present location below it, without writing anything.
+ */
+export function installMemberRepublisher(
+  republish: (parent: object, key: string) => void
+): void {
+  republishMember = republish;
+}
+
+/** @internal See `installMemberRepublisher`. */
+export function republishMemberSubtree(parent: object, key: string): void {
+  republishMember?.(parent, key);
+}
+
+const NOOP = (): void => undefined;
+
+/**
+ * @internal Re-add a written location that is absent from the current tree.
+ *
+ *     WRITING AN ABSENT DESCENDANT REACTIVATES ITS MEMBERSHIP
+ *     (`whole-value-membership.spec.ts` 7), ALONG ITS WHOLE PATH.
+ *
+ * Call it after the written value is installed: the value is the
+ * authoritative supplied value `activateOne` requires. From the outermost
+ * omitted member down to the written location's parent, every member off the
+ * path is made dormant first: it was absent and stays absent, because
+ * "DORMANT STORAGE MUST NOT SUPPLY THE REACTIVATED VALUE" (case 18). Then every
+ * omitted member on the path is re-added. The result is what a whole value at
+ * the outermost omitted member, holding only the written path, would give.
+ *
+ * Every level's membership change is announced, as that whole value would
+ * announce it. Restoration and transactions register a member's location
+ * when they observe its change, and a later reversal that must re-add a
+ * member depends on that registration; announcing only the outermost member
+ * left the siblings unregistered, and undo of an earlier write to one of them
+ * refused with "its retained location is no longer available" (measured).
+ *
+ * @returns undefined when nothing changed. Otherwise a function the writer
+ * calls after announcing its value write: it wakes held observers and
+ * announces the membership changes to path observers, innermost first, so
+ * restoration and transactions record them with the write (value first, then
+ * membership, as a whole-value write does).
+ */
+export function reactivatePathOnWrite(node: unknown): (() => void) | undefined {
+  if (structuralWrites > 0) return reactivateOnWrite(node) ? NOOP : undefined;
+  const path: DormantBinding[] = [];
+  let outer = -1;
+  for (
+    let binding = memberBinding(node);
+    binding;
+    binding = memberBinding(nodeOf(binding.parent))
+  ) {
+    const descriptor = Object.getOwnPropertyDescriptor(
+      binding.parent,
+      binding.key
+    );
+    if (descriptor?.enumerable === false) outer = path.length;
+    path.push(binding);
+  }
+  if (outer < 0) return undefined;
+  const owner = nodeOf(path[outer].parent);
+  const key = path[outer].key;
+  // Captured before anything changes; each publishes what changed at its level.
+  const announce: Array<(() => void) | undefined> = [];
+  if (hasPathObservers())
+    for (let i = 0; i <= outer; i++) {
+      const branch = nodeOf(path[i].parent);
+      const present: Record<string, true> = { [path[i].key]: true };
+      if (i === outer)
+        for (const member of Object.keys(branch)) present[member] = true;
+      announce.push(captureBranchMembershipIfObserved(branch, present));
+    }
+  for (let i = outer - 1; i >= 0; i--) {
+    const { parent, key: kept } = path[i];
+    for (const member of Object.keys(parent))
+      if (member !== kept) setMemberPresence(parent, member, 'dormant');
+  }
+  for (let i = outer; i >= 0; i--)
+    setMemberPresence(path[i].parent, path[i].key, 'active');
+  // A re-added leaf is the written location itself, and its writer publishes
+  // its token once (`whole-value-membership.spec.ts` 16). A re-added branch
+  // has no token: its observers and those below it are woken here.
+  const republish = !isWritableLocation(node) || outer > 0;
+  return () => {
+    if (republish) republishMember?.(owner, key);
+    for (const publish of announce) publish?.();
+  };
 }
 
 /**
@@ -131,14 +295,49 @@ function deactivateOne(parent: object, key: string): boolean {
   markHasDormant(parent);
   const child = (parent as Record<string, unknown>)[key];
   if (isTraversableNode(child)) {
-    Object.defineProperty(child, DORMANT, {
-      value: { parent, key } satisfies DormantBinding,
-      enumerable: false,
-      configurable: true,
-      writable: true,
-    });
+    linkMember(parent, key, child);
+    linkDescendants(child);
   }
   return true;
+}
+
+function linkMember(parent: object, key: string, child: object): void {
+  Object.defineProperty(child, DORMANT, {
+    value: { parent, key } satisfies DormantBinding,
+    enumerable: false,
+    configurable: true,
+    writable: true,
+  });
+}
+
+/**
+ * Link every state location below a newly omitted member to its parent, once,
+ * so a location under it can find the omission (`isAbsentMember`). A linked
+ * location's own subtree was linked when it was, so it is not walked again.
+ * Collections and markers are not membership-managed and are not entered.
+ */
+function linkDescendants(node: object): void {
+  if (!isNodeAccessor(node)) return;
+  for (const key of Object.getOwnPropertyNames(node)) {
+    const child = Object.getOwnPropertyDescriptor(node, key)?.value;
+    if (
+      (!isNodeAccessor(child) && !isWritableLocation(child)) ||
+      memberBinding(child)
+    )
+      continue;
+    linkMember(node, key, child as object);
+    linkDescendants(child as object);
+  }
+}
+
+/**
+ * @internal Link a member added after construction when its branch is already
+ * linked, so a later omission above it is visible to it.
+ */
+export function linkAddedMember(branch: object, key: string, child: unknown): void {
+  if (!isTraversableNode(child) || !memberBinding(nodeOf(branch))) return;
+  linkMember(branch, key, child);
+  linkDescendants(child);
 }
 
 /**
@@ -153,8 +352,8 @@ function deactivateOne(parent: object, key: string): boolean {
  * nothing having supplied it. There are exactly two admissible callers, and both
  * install first:
  *
- *   recursiveUpdate     the supplied-key loop has already written the value
- *   reactivateOnWrite   the child's own `set`/`update` is the supplied value
+ *   recursiveUpdate        the supplied-key loop has already written the value
+ *   reactivatePathOnWrite  the location's own write is the supplied value
  *
  * Do not add a third without an authoritative value to couple it to.
  */
@@ -203,17 +402,6 @@ export function dormantKeys(parent: object): string[] {
     return d !== undefined && d.enumerable === false && 'value' in d;
   });
 }
-
-/**
- * @internal The two physical objects one branch is represented by.
- *
- * A branch is ONE semantic object and TWO physical ones: the `NodeAccessor`
- * consumers hold, and the backing store its call path closes over. Both carry a
- * descriptor per member, and both are observable — the store through `branch()`
- * and every snapshot, the accessor through `Object.keys(branch)`, `'k' in
- * branch` and spread.
- */
-const NODE_ACCESSOR_PEER = Symbol.for('SignalTree:NodeAccessorPeer');
 
 /** Resolve the other physical half of a branch, from either side. */
 function peerOf(branch: object): object | undefined {

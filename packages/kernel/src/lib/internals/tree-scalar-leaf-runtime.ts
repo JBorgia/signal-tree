@@ -1,5 +1,5 @@
 import type { PositionId } from '../types';
-import { isDormantMember, reactivateOnWrite } from './member-membership';
+import { isAbsentMember, reactivatePathOnWrite } from './member-membership';
 import type { PhysicalCommitClock } from './physical-commit-clock';
 import {
   PRODUCTION_SUBSTRATE_STATS_ENABLED,
@@ -114,10 +114,11 @@ function createScalarLeaf<T>(
   readonly leaf: Location<T>;
   readonly binding: WritableLocationBinding<T>;
 } {
-  const holder: { leaf?: Location<T> } = {};
+  const holder: { leaf?: Location<T>; announce?: () => void } = {};
 
   const read = (): T => {
-    if (holder.leaf !== undefined && isDormantMember(holder.leaf)) {
+    // Absent when this leaf or a member above it is omitted (v16 8d).
+    if (holder.leaf !== undefined && isAbsentMember(holder.leaf)) {
       return undefined as T;
     }
 
@@ -126,14 +127,37 @@ function createScalarLeaf<T>(
   const binding = locations.createWritable(read, (value) => {
     const leaf = holder.leaf as Location<T>;
     const result = kernel.commitSlot(slotIndex, value);
-    const reactivated = reactivateOnWrite(leaf);
+    const announce = reactivatePathOnWrite(leaf);
+    holder.announce = announce;
     const changed = publication.prepareSlot(
       slotIndex,
       result.changed,
-      reactivated
+      announce !== undefined
     );
     return changed;
   });
+  // A re-added membership is announced after the value write itself, as a
+  // whole-value write announces it, so a reversal sees one composed change.
+  const announce = (): void => {
+    const run = holder.announce;
+    holder.announce = undefined;
+    run?.();
+  };
+  const { replace, derive } = binding;
+  binding.replace = (value) => {
+    try {
+      replace(value);
+    } finally {
+      announce();
+    }
+  };
+  binding.derive = (update) => {
+    try {
+      derive(update);
+    } finally {
+      announce();
+    }
+  };
   const leaf = binding.location as Location<T>;
   holder.leaf = leaf;
   return { leaf, binding };

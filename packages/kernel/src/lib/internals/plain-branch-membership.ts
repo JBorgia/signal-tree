@@ -7,7 +7,10 @@ import {
   getPositionRegistry,
   type PositionRegistry,
 } from './position-registry';
-import { setMemberPresence } from './member-membership';
+import {
+  republishMemberSubtree,
+  setMemberPresence,
+} from './member-membership';
 import { publishMembershipChange } from './snapshot-authority';
 import { getTreeScalarSlotRuntime } from './tree-scalar-slot-port';
 import { withWriteContext } from '../write-context';
@@ -594,6 +597,7 @@ export function preparePlainBranchMembers(
   let published = false;
   const changedSlots = new Set<number>();
   const changedBranches = new Set<object>();
+  const changedBranchMembers: MemberAddress[] = [];
   let changes: PlainBranchMembershipChange[] = [];
   return {
     install(): void {
@@ -624,6 +628,7 @@ export function preparePlainBranchMembers(
           changedBranches.add(address.branch);
           if (isWritableLocation(address.node))
             changedSlots.add(resolveSlot(address.node).slot);
+          else changedBranchMembers.push(address);
         }
       }
       const byBranch = new Map<object, PlainBranchMemberChange[]>();
@@ -663,6 +668,9 @@ export function preparePlainBranchMembers(
       withWriteContext(meta, () => {
         runtime.runInvalidationGroup(() => {
           for (const branch of changedBranches) publishMembershipChange(branch);
+          // What a branch member's presence changes below it (v16 8d).
+          for (const { branch, key } of changedBranchMembers)
+            republishMemberSubtree(branch, key);
           runtime.publishPrepared({
             revision: installed.revision,
             changedSlots: [...changedSlots],
