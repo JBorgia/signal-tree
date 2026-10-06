@@ -77,6 +77,12 @@ export interface PositionRegistry {
   collectionPathFor(position: PositionId): string | undefined;
   parentOf(position: PositionId): PositionId | undefined;
   contains(authority: PositionId, participant: PositionId): boolean;
+  /**
+   * @internal Called by `tree.destroy()` before any other cleanup (15.4.4).
+   * Installed by `link-lifetime.ts` when a Link first binds to this tree, so a
+   * program without `link()` pays only for the optional call.
+   */
+  close?(): void;
 }
 
 let nextRegistryId = 1;

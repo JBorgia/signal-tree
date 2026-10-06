@@ -70,7 +70,6 @@ import {
   terminateOwnerInvalidation,
 } from './internals/owner-invalidation-port';
 import { defineRootTree } from './internals/root-source';
-import { disposeTreeLinks } from './internals/link-lifetime';
 import {
   definePositionRegistry,
   type PositionRegistry,
@@ -1837,7 +1836,7 @@ function create<T extends object>(
       replaceLocation(destroyedSig, true);
       // Links first, exactly as their own dispose() (15.4.4): no Link reacts to
       // the teardown below, and every settled() waiter is released.
-      disposeTreeLinks(materializationContext.positionRegistry);
+      materializationContext.positionRegistry.close?.();
       terminateOwnerInvalidation(tree as object);
       // Run registered cleanup functions (enhancers, subscriptions, etc.)
       for (const fn of cleanupFns) {
