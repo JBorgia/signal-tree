@@ -12,10 +12,10 @@ import {
   collectionBindingAt,
   composeHiddenMemberValue,
   composePlainBranchMemberEffect,
+  settleTurnMemberEffects,
   hidingMembers,
   isReAddableMember,
   type HiddenMemberTarget,
-  plainBranchMemberEffectIsNoop,
   plainBranchMembershipEffects,
   preparePlainBranchMembers,
   readPlainBranchMember,
@@ -3839,7 +3839,12 @@ export function restoration(
         (left, right) => left - right
       );
       bucket.positionIds.clear();
-      const effects = Array.from(bucket.effects.values()).map(cloneTurnEffect);
+      // Member images become the turn's endpoints, and net no-ops are dropped
+      // only now (`settleTurnMemberEffects`, v16 8g).
+      const effects = settleTurnMemberEffects(
+        tree.$ as object,
+        Array.from(bucket.effects.values()).map(cloneTurnEffect)
+      );
       bucket.effects.clear();
       const collectionOrders = Array.from(bucket.collectionOrders.values()).map(
         (order) => ({
@@ -3997,13 +4002,10 @@ export function restoration(
             existing.mutationIntent,
             effect.mutationIntent
           );
-          if (
-            plainBranchMemberEffectIsNoop(existing) &&
-            (existing.fieldPresence?.before ?? true) ===
-              (existing.fieldPresence?.after ?? true)
-          ) {
-            effectMap.delete(key);
-          }
+          // ⚠️ A NET NO-OP STAYS UNTIL THE TURN IS DRAINED. Its pre-turn value
+          // is what a member image the turn captured after the first write
+          // needs (`settleTurnMemberEffects`, which drops it). Dropped here,
+          // undo of `x(5); omit g; re-add g` came back with x 5 (v16 8g).
           return;
         }
 
