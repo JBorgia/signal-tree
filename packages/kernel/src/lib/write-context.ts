@@ -58,18 +58,29 @@ let activeContext: WriteMetadata | undefined;
  * work, and must be intercepted (b6aec5a3 skipped it too).
  *
  * `userCallbacks` counts the user callbacks running synchronously right now
- * (`runUserCallback`); `replayDepth` is that count when a replay context was
- * entered, or -1. A write is the replay's own exactly while the two agree —
- * also when the replay itself was started from inside a callback. Shared by
- * every tree and collection, so a tap writing another one is covered.
+ * (`runUserCallback`); `replayDepth` is that count where the live replay
+ * began, -1 outside any replay, or -2 inside a frame that merely inherited a
+ * replay's origin. A write is the replay's own exactly while the depth matches
+ * the count. Shared by every tree and collection, so a tap writing another one
+ * is covered.
+ *
+ * WHERE A REPLAY BEGINS. A replay-origin frame begins one when its origin
+ * differs from the frame around it — `undo()` run anywhere outside a replay,
+ * also from a tap; a rollback inside an undo's tap — and continues the live
+ * one when it is entered at that replay's own depth (its machinery's nested
+ * frames). A frame entered inside a user callback with the SAME origin
+ * inherited it by spreading the ambient context — `transaction()` and others
+ * do — and is not a replay (31584797 snapshotted it as one, so a transaction a
+ * tap opened during undo skipped every interceptor).
  */
 let userCallbacks = 0;
 let replayDepth = -1;
 
 /**
  * Run `fn` with `meta` set as the active write context. The previous context
- * (if any) is restored when `fn` returns or throws. `replays` marks a context
- * that replays recorded state without a replay origin (devtools' jumps).
+ * (if any) is restored when `fn` returns or throws. `replays` marks a frame
+ * that replays recorded state without a replay origin (devtools: a jump it
+ * verified as one of the tree's own recorded states); see above.
  *
  * Synchronous capture only — see module JSDoc for the `await` boundary trap.
  *
@@ -82,13 +93,17 @@ export function withWriteContext<R>(
 ): R {
   const previous = activeContext;
   const previousReplay = replayDepth;
+  const live = previousReplay === userCallbacks;
   activeContext = meta;
-  replayDepth =
+  replayDepth = !(
     replays ||
     meta.origin === 'restoration' ||
     meta.origin === 'transaction-rollback'
-      ? userCallbacks
-      : -1;
+  )
+    ? -1
+    : replays || live || meta.origin !== previous?.origin
+    ? userCallbacks
+    : -2;
   try {
     return withDeferredWriteScope(fn);
   } finally {
