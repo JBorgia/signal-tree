@@ -284,15 +284,25 @@ describe.each(Object.entries(undoConfigurations))(
         const { tree, after } = await nested(enhancers, incoming, false);
         try {
           expect(after[0]).toStrictEqual({ id: 'S', n: 0 });
-          expect(
-            tree.getRestorationHistory().map(({ state }) => state.rows)
-          ).toStrictEqual([{ all: after.filter(({ id }) => id !== 'S') }]);
+          const history = () =>
+            tree.getRestorationHistory().map(({ state }) => state.rows);
+          expect(history()).toStrictEqual([
+            { all: after.filter(({ id }) => id !== 'S') },
+          ]);
+          const index = tree.getCurrentIndex();
+          // Legible and typed (ST1034), naming the collection and the
+          // change that stands on it; it was the raw "collection order
+          // frontier does not match the transition endpoint".
           expect(() => tree.undo()).toThrow(
-            'collection order frontier does not match the transition endpoint'
+            "ST1034: restoration refused — the order of 'rows' changed after the order change being reversed, and a later change outside undo history stands on it (added 'S')."
           );
           await flushAll();
           expect(tree.$.rows.all()).toStrictEqual(after);
           expect(tree.canUndo()).toBe(true);
+          expect(tree.getCurrentIndex()).toBe(index);
+          expect(history()).toStrictEqual([
+            { all: after.filter(({ id }) => id !== 'S') },
+          ]);
         } finally {
           tree.destroy();
         }
@@ -343,11 +353,15 @@ describe.each(Object.entries(undoConfigurations))(
     };
     const refuses = async (tree: IdentityTree, move: () => void) => {
       const ids = tree.$.rows.ids();
+      const index = tree.getCurrentIndex();
+      const history = JSON.stringify(tree.getRestorationHistory());
       expect(move).toThrow(
-        'collection order frontier does not match the transition endpoint'
+        "ST1034: restoration refused — the order of 'rows' changed after the order change being reversed, and a later change outside undo history stands on it (added 'y'; removed 'a')."
       );
       await flushAll();
       expect(tree.$.rows.ids()).toStrictEqual(ids);
+      expect(tree.getCurrentIndex()).toBe(index);
+      expect(JSON.stringify(tree.getRestorationHistory())).toBe(history);
     };
 
     it('undo of a later add, then of the order change', async () => {

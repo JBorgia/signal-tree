@@ -101,7 +101,7 @@ describe.each([
         await flush();
         expect(tree.$.rows.ids()).toStrictEqual(['C', 'B', 'A']);
         expect(() => tree.undo()).toThrow(
-          'collection order change was not recorded'
+          "ST1034: restoration refused — the order change to 'rows' being reversed was not recorded, so it cannot be reversed. Nothing was changed; the history position is unmoved."
         );
         await flush();
         expect(tree.$.rows.ids()).toStrictEqual(['C', 'B', 'A']);
