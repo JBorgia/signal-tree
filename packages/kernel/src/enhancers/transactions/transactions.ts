@@ -289,6 +289,8 @@ export interface InternalTransactionRuntime {
   getPendingTurnCount(): number;
   getConfirmedTurnIds(): number[];
   getPendingTurnIds(): number[];
+  /** @internal Positions a pending turn wrote (its rollback needs them). */
+  getPendingPositionIds(): number[];
   onPendingCreated(listener: TransactionLifecycleListener): () => void;
   onPendingConfirmed(listener: TransactionLifecycleListener): () => void;
   onPendingDiscarded(listener: TransactionLifecycleListener): () => void;
@@ -831,10 +833,32 @@ class TransactionAuthority {
       this.discardPending(reservedId);
       return undefined;
     }
-    this.pendingTurns.set(turn.id, turn);
-    this.countPendingPositions(turn, 1);
-    this.retainPendingClaims(turn.id, turn.restorationSubjectIds ?? []);
-    return cloneTurnRecord(turn);
+    // Atomic: a throw part-way (claims, the clone) leaves the reservation as
+    // it was. A partial registration counted the turn's positions; a refused
+    // abort then recorded the turn again through this method and confirmed
+    // it, and the first count was never released (reversal-engine review,
+    // item 5).
+    const reservation = this.pendingTurns.get(turn.id);
+    const positions = [...new Set(turn.__positionIds ?? [])];
+    const counts = positions.map((position) =>
+      this.pendingPositionCounts.get(position)
+    );
+    try {
+      this.pendingTurns.set(turn.id, turn);
+      this.countPendingPositions(turn, 1);
+      this.retainPendingClaims(turn.id, turn.restorationSubjectIds ?? []);
+      return cloneTurnRecord(turn);
+    } catch (error) {
+      positions.forEach((position, index) => {
+        const count = counts[index];
+        if (count === undefined) this.pendingPositionCounts.delete(position);
+        else this.pendingPositionCounts.set(position, count);
+      });
+      this.releasePendingClaims(turn.id);
+      if (reservation) this.pendingTurns.set(turn.id, reservation);
+      else this.pendingTurns.delete(turn.id);
+      throw error;
+    }
   }
 
   /**
@@ -1006,8 +1030,7 @@ class TransactionAuthority {
     //
     // Ids are monotonic and a callback runs synchronously at creation, so
     // `id > turnId` is exactly "opened after this one".
-    const pendingLater: Array<LaterAppliedEffect & { appliedAt: number }> =
-      [];
+    const pendingLater: Array<LaterAppliedEffect & { appliedAt: number }> = [];
     for (const [otherId, otherTurn] of this.pendingTurns) {
       if (otherId <= turnId) continue;
       for (const effect of otherTurn.__effects ?? []) {
@@ -1047,6 +1070,12 @@ class TransactionAuthority {
 
   getPendingTurnIds(): number[] {
     return [...this.pendingTurns.keys()].sort((left, right) => left - right);
+  }
+
+  getPendingPositionIds(): number[] {
+    return [...this.pendingPositionCounts.keys()].sort(
+      (left, right) => left - right
+    );
   }
 
   /** Whether a still-pending turn wrote this position; its rollback needs the realization. */
@@ -3197,6 +3226,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     getPendingTurnCount: () => authority.getPendingTurnCount(),
     getConfirmedTurnIds: () => authority.getConfirmedTurnIds(),
     getPendingTurnIds: () => authority.getPendingTurnIds(),
+    getPendingPositionIds: () => authority.getPendingPositionIds(),
     onPendingCreated(listener: TransactionLifecycleListener): () => void {
       pendingCreatedListeners.add(listener);
       return () => pendingCreatedListeners.delete(listener);
