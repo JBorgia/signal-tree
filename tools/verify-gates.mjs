@@ -1165,7 +1165,7 @@ const GATES = [
   {
     name: 'retention-gc',
     covers:
-      'the GC-requiring retention proofs: diagnostic and persistence owners release values at their boundaries, source locations do not retain abandoned derived recipes, and an entity collection retains no clone of an added row it announced',
+      'the GC-requiring retention proofs: diagnostic and persistence owners release values at their boundaries, source locations do not retain abandoned derived recipes, an entity collection retains no clone of an added row it announced, and a tree retains no Link once it is disposed or destroyed',
     // Runs outside `nx test kernel` because it needs --expose-gc, and it FAILS
     // rather than skips without it: a WeakRef that is merely eligible for
     // collection proves nothing, and a skipped retention test reads as evidence.
@@ -1183,6 +1183,30 @@ const GATES = [
       file: 'packages/kernel/src/enhancers/serialization/a2-5-lifetime.spec.ts',
       find: "    if (mode === 'destroyed') (tree as Persisted).destroy?.();",
       replace: "    if (mode === 'destroyed') void tree;",
+    },
+  },
+  {
+    name: 'retention-gc:link-lifetime',
+    covers:
+      'a disposed Link is not retained by its live tree, and a destroyed tree with Links is released (f0f15d18 retained both through the registry close closure)',
+    cmd: [
+      'npx',
+      'vitest',
+      'run',
+      '--root',
+      'packages/kernel',
+      '--config',
+      'vitest.retention.config.ts',
+      'src/lib/internals/link-lifetime-retention.spec.ts',
+      'src/enhancers/serialization/a2-5-lifetime.spec.ts',
+    ],
+    env: { NODE_OPTIONS: '--expose-gc' },
+    // The f0f15d18 shape: the closure built inside bindLinkToTree shares its
+    // scope with the unbind closure, so it holds the Link's dispose.
+    mutation: {
+      file: 'packages/kernel/src/lib/internals/link-lifetime.ts',
+      find: '    registry.close = closerFor(registry);',
+      replace: '    registry.close = () => disposeTreeLinks(registry);',
     },
   },
   {

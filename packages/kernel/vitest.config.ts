@@ -67,6 +67,7 @@ export default defineConfig({
       '**/a2-5-lifetime.spec.ts',
       '**/location-runtime-retention.spec.ts',
       '**/entity-add-effect-retention.spec.ts',
+      '**/link-lifetime-retention.spec.ts',
     ],
     coverage: {
       provider: 'v8',
