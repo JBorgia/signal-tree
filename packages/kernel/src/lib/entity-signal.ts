@@ -1888,7 +1888,7 @@ export function createEntitySignal<
   /** Handlers for observation */
   const tapHandlers: TapHandlers<E, K>[] = [];
   /** A re-adding write's removal of retained rows: no tap sees it (v16 8e). */
-  let silentClear = false;
+  let silentClear = 0;
 
   /** Handlers for blocking/transforming */
   const interceptHandlers: InterceptHandlers<E, K>[] = [];
@@ -3893,11 +3893,11 @@ export function createEntitySignal<
       // The retained rows were never visible, so their removal is no row
       // change to observe: taps do not see it (`silentClear`). History still
       // records it, so a reversal restores them.
-      silentClear = true;
+      silentClear++;
       try {
         clearRetained();
       } finally {
-        silentClear = false;
+        silentClear--;
       }
       const result = write(...args);
       reactivatePathOnWrite(api);
@@ -3928,20 +3928,23 @@ export function createEntitySignal<
       structuralWrites.end = (failed) => {
         structuralWrites.end = undefined;
         wakeQueued = false;
-        try {
-          earlier?.(failed);
-        } finally {
-          // Closing a reversal that threw: its own error is what surfaces,
-          // and a consumer's is reported asynchronously.
+        // Every queued wake runs; the first consumer error is kept.
+        let caught: { error: unknown } | undefined;
+        for (const run of [() => earlier?.(failed), wake]) {
           try {
-            wake();
+            run();
           } catch (error) {
-            if (!failed) throw error;
-            queueMicrotask(() => {
-              throw error;
-            });
+            caught ??= { error };
           }
         }
+        if (!caught) return;
+        // Closing a reversal that threw: its own error is what surfaces, and
+        // a consumer's is reported asynchronously.
+        if (!failed) throw caught.error;
+        const { error } = caught;
+        queueMicrotask(() => {
+          throw error;
+        });
       };
     },
   });
