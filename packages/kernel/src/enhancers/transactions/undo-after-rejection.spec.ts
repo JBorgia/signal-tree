@@ -590,3 +590,33 @@ describe.each(Object.entries(orders))(
     });
   }
 );
+
+// ── A history reset is not a settlement (review of 4b28e3bf, defect 5) ───────
+describe.each(Object.entries(orders))(
+  'undo after a rejection: history reset while T is pending (%s)',
+  (_order, enhancers) => {
+    it('the rejection still re-bases writes recorded after the reset', async () => {
+      const tree = make(enhancers);
+      try {
+        undoable(() => tree.$.y(1));
+        await flush();
+        const proposal = tree.transaction(() => tree.$.x(1));
+        await flush();
+        (
+          tree as unknown as { resetRestorationHistory(): void }
+        ).resetRestorationHistory();
+        await flush();
+        undoable(() => tree.$.x(2));
+        await flush();
+        proposal.rollback();
+        await flush();
+        expect(tree.$.x()).toBe(2);
+        tree.undo();
+        await flush();
+        expect(tree.$.x()).toBe(0);
+      } finally {
+        tree.destroy();
+      }
+    });
+  }
+);
