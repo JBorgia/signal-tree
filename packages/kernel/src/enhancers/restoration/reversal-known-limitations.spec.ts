@@ -213,38 +213,20 @@ const dropObjectField = async (tree: NestedTree) => {
 describe.each(undoConfigurations)(
   'known pre-existing undo limitation: object-valued field (%s)',
   (_name, enhancers) => {
-    it('KNOWN LIMITATION (pre-existing on 15.4.3): replaceOne dropping an object field — current behaviour: undo refuses at the field and changes nothing', async () => {
+    // FIXED (was pre-existing on 15.4.3: undo threw "Unsupported scoped undo
+    // effect at rows.a.nest").
+    it('replaceOne dropping an object field: undo restores', async () => {
       const tree = makeNested(enhancers());
       try {
         await dropObjectField(tree);
-        const error = thrownBy(() => tree.undo());
-        expect(error).toBeInstanceOf(Error);
-        expect((error as Error).message).toBe(
-          'Unsupported scoped undo effect at rows.a.nest'
-        );
+        tree.undo();
         await flush();
-        expect(tree.$.rows.all()).toStrictEqual([{ id: 'a', n: 2 }]);
-        expect(tree.canUndo()).toBe(true);
+        expect(tree.$.rows.all()).toStrictEqual([
+          { id: 'a', n: 1, nest: { x: 1 } },
+        ]);
       } finally {
         tree.destroy();
       }
     });
-
-    it.fails(
-      'KNOWN LIMITATION (pre-existing on 15.4.3): replaceOne dropping an object field — desired: undo restores',
-      async () => {
-        const tree = makeNested(enhancers());
-        try {
-          await dropObjectField(tree);
-          tree.undo();
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual([
-            { id: 'a', n: 1, nest: { x: 1 } },
-          ]);
-        } finally {
-          tree.destroy();
-        }
-      }
-    );
   }
 );
