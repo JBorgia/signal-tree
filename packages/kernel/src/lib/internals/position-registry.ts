@@ -52,6 +52,11 @@ export interface PositionRegistry {
    */
   readonly id: TreeId;
   allocate(parent?: PositionId): PositionId;
+  registerPositionAddress(
+    position: PositionId,
+    address: readonly string[]
+  ): void;
+  addressFor(position: PositionId): readonly string[] | undefined;
   /**
    * ADDRESS-REPAIR-1 — canonical collection authority.
    *
@@ -100,6 +105,22 @@ class TreePositionRegistry implements PositionRegistry {
   readonly id: TreeId = nextRegistryId++ as TreeId;
   private nextPositionId = 1;
   private parents = new Map<PositionId, PositionId | undefined>();
+  private addresses = new Map<PositionId, readonly string[]>();
+
+  // Stored as given, not as a frozen copy (v16 freezes one; v15 15.4.4 does
+  // not, 13 B of the entities budget): every producer builds a fresh array
+  // (`[...address, key]`) and every consumer only reads it.
+  registerPositionAddress(
+    position: PositionId,
+    address: readonly string[]
+  ): void {
+    this.addresses.set(position, address);
+  }
+
+  addressFor(position: PositionId): readonly string[] | undefined {
+    return this.addresses.get(position);
+  }
+
   private collectionPaths = new Map<PositionId, string>();
 
   registerCollectionPath(position: PositionId, path: string): void {
@@ -165,4 +186,22 @@ export function getPositionRegistry(
   return (node as Record<symbol, PositionRegistry | undefined>)[
     POSITION_REGISTRY_SYMBOL
   ];
+}
+
+// Construction seeds survive before observation lazily allocates a position.
+// Weak keys retain neither a location nor its owning tree.
+const nodeAddresses = new WeakMap<object, readonly string[]>();
+
+export function defineNodeAddress(
+  node: object,
+  address: readonly string[]
+): void {
+  // As given, like `registerPositionAddress`.
+  nodeAddresses.set(node, address);
+}
+
+export function getNodeAddress(node: unknown): readonly string[] | undefined {
+  return isTraversableNode(node)
+    ? nodeAddresses.get(node as object)
+    : undefined;
 }
