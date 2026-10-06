@@ -77,7 +77,7 @@ const messages = {
 type Kind = keyof typeof messages;
 const replays: Kind[] = ['JUMP_TO_STATE', 'JUMP_TO_ACTION', 'ROLLBACK'];
 
-const make = (aggregated: boolean) =>
+const make = (aggregated: boolean, maxAge?: number) =>
   signalTree(
     { rows: entityMap<Row, string>({ selectId: (row) => row.id }) },
     {
@@ -86,6 +86,7 @@ const make = (aggregated: boolean) =>
           enabled: true,
           enableBrowserDevTools: true,
           name: 'T',
+          ...(maxAge === undefined ? {} : { maxAge }),
           ...(aggregated
             ? { aggregatedReduxInstance: { id: 'replay-group', name: 'G' } }
             : {}),
@@ -247,6 +248,75 @@ describe.each([
       await flush();
       expect(calls).toStrictEqual(['update:a']);
       expect(tree.$.rows.all()).toStrictEqual([{ id: 'a', n: 7, p: 9 }]);
+    } finally {
+      tree.destroy();
+    }
+  });
+});
+
+/**
+ * The recognition window and the fail-safe (round-4 review): a tree
+ * remembers the states it serialized for its configured `maxAge` (default
+ * 50, at most 1,000), and recognises only the exact JSON it produced. A state
+ * older than the window, or one the extension hands back re-serialized
+ * differently, reads as unrecorded: the interceptors run and a blocking one
+ * refuses the jump.
+ */
+describe.each([
+  ['per-tree instance', false],
+  ['aggregated instance', true],
+] as const)('devtools: the recognition window and the fail-safe (%s)', (_name, aggregated) => {
+  const wrap = (rows: Row[]) => {
+    const tree = { rows: { all: rows } };
+    return aggregated ? { T: tree } : tree;
+  };
+
+  it('with maxAge 2, a state three writes back is outside the window', async () => {
+    installExtension();
+    const tree = make(aggregated, 2);
+    try {
+      for (const n of [1, 2, 3, 4]) {
+        if (n === 1) tree.$.rows.addOne({ id: 'a', n });
+        else tree.$.rows.updateOne('a', { n });
+        await flush();
+      }
+      const calls = intercept(tree, 'transform');
+      // Still inside the window: the state before the last.
+      dispatch(messages.JUMP_TO_STATE(wrap([{ id: 'a', n: 3 }])));
+      await flush();
+      expect(calls).toStrictEqual([]);
+      expect(tree.$.rows.all()).toStrictEqual([{ id: 'a', n: 3 }]);
+      // Outside it: recorded once, forgotten since.
+      dispatch(messages.JUMP_TO_STATE(wrap([{ id: 'a', n: 1 }])));
+      await flush();
+      expect(calls).toStrictEqual(['update:a']);
+      expect(tree.$.rows.all()).toStrictEqual([{ id: 'a', n: 1, p: 9 }]);
+    } finally {
+      tree.destroy();
+    }
+  });
+
+  it('a recorded state re-serialized with other key order is refused by a blocking interceptor', async () => {
+    installExtension();
+    const tree = make(aggregated);
+    try {
+      tree.$.rows.addOne({ id: 'a', n: 1 });
+      await flush();
+      tree.$.rows.updateOne('a', { n: 2 });
+      await flush();
+      const calls = intercept(tree, 'block');
+      // The recorded { id: 'a', n: 1 }, keys reordered by a re-serializer.
+      const reordered = wrap([{ n: 1, id: 'a' } as Row]);
+      let refused: unknown;
+      try {
+        dispatch(messages.JUMP_TO_STATE(reordered));
+      } catch (error) {
+        refused = error;
+      }
+      await flush();
+      expect(calls.length).toBeGreaterThan(0);
+      expect(String(refused)).toMatch(/no/);
+      expect(tree.$.rows.all()).toStrictEqual([{ id: 'a', n: 2 }]);
     } finally {
       tree.destroy();
     }

@@ -71,8 +71,12 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
 - Devtools jumps (`JUMP_TO_STATE`, `JUMP_TO_ACTION`, `ROLLBACK`) to a state
   the tree itself serialized are replays too and skip interceptors, so a
   blocking interceptor no longer makes devtools time travel throw. A jump to
-  any other state (forged, hand-edited, or older than the tree's last 1,000
-  serialized states) and `IMPORT_STATE` are new input and still run them.
+  any other state (forged, hand-edited, older than the devtools `maxAge`
+  window, default 50 states and at most 1,000) and `IMPORT_STATE` are new
+  input and still run them. Fail-safe: recognition is by the exact JSON the
+  tree produced, so a recorded state the extension hands back re-serialized
+  differently counts as unrecorded - interceptors run, and a blocking one
+  refuses the jump.
 - Taps fire symmetrically for the changes a reversal applies: a row it brings
   back taps `onAdd`, one it takes away `onRemove`, one whose value it changes
   `onUpdate`. On 15.4.3 no reversal tapped `onAdd` (redo of `addOne` or
