@@ -33,7 +33,21 @@ export interface ScalarSlotMutationFrame {
   }): ScalarSlotCommitResult;
 }
 
+/**
+ * Member liveness, installed on a tree's leaves by its first omission
+ * (`member-membership.ts`, v16 8e). Until then each leaf read and write sees
+ * one empty slot: a tree that never omits a member runs none of it.
+ */
+export interface MemberAbsence {
+  /** True when the node, or a member above it, is omitted. */
+  isAbsent(node: unknown): boolean;
+  /** Re-add an absent written node's path; whether membership changed. */
+  reAdd(node: unknown): boolean;
+}
+
 export interface TreeScalarLeafRuntime {
+  /** Install member liveness on every leaf of this tree, once. */
+  enableAbsence?(absence: MemberAbsence): void;
   createLeaf<T>(
     initialValue: T,
     equal: (current: T, next: T) => boolean,

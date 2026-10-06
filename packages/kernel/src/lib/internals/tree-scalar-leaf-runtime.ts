@@ -1,5 +1,4 @@
 import type { PositionId } from '../types';
-import { isAbsentMember, reactivatePathOnWrite } from './member-membership';
 import type { PhysicalCommitClock } from './physical-commit-clock';
 import {
   PRODUCTION_SUBSTRATE_STATS_ENABLED,
@@ -18,6 +17,7 @@ import {
 } from './location-runtime';
 import { NEUTRAL_OBSERVATION_ADAPTER } from './observation-adapter';
 import type {
+  MemberAbsence,
   ScalarSlotMutationFrame,
   SlotIndex,
   TreeScalarLeafRuntime,
@@ -109,51 +109,29 @@ function createScalarLeaf<T>(
   kernel: TreeScalarSlotKernel,
   publication: ScalarSlotPublication,
   locations: LocationRuntime,
-  slotIndex: SlotIndex
+  slotIndex: SlotIndex,
+  liveness: { absence?: MemberAbsence }
 ): {
   readonly leaf: Location<T>;
   readonly binding: WritableLocationBinding<T>;
 } {
-  const holder: { leaf?: Location<T>; announce?: () => void } = {};
+  const holder: { leaf?: Location<T> } = {};
 
   const read = (): T => {
-    // Absent when this leaf or a member above it is omitted (v16 8d).
-    if (holder.leaf !== undefined && isAbsentMember(holder.leaf)) {
+    // Absent when this leaf or a member above it is omitted (v16 8d). One
+    // empty slot until this tree's first omission (v16 8e).
+    if (liveness.absence?.isAbsent(holder.leaf)) {
       return undefined as T;
     }
 
     return kernel.readSlot<T>(slotIndex);
   };
   const binding = locations.createWritable(read, (value) => {
-    const leaf = holder.leaf as Location<T>;
     const result = kernel.commitSlot(slotIndex, value);
-    const announce = reactivatePathOnWrite(leaf);
-    holder.announce = announce;
-    const changed = publication.prepareSlot(
-      slotIndex,
-      result.changed,
-      announce !== undefined
-    );
+    const reAdded = liveness.absence?.reAdd(holder.leaf) === true;
+    const changed = publication.prepareSlot(slotIndex, result.changed, reAdded);
     return changed;
   });
-  // A re-added membership is announced after the value write itself, as a
-  // whole-value write announces it, so a reversal sees one composed change.
-  // Each write keeps its own announcement: a write re-entering this leaf from
-  // an observer saves and restores the outer one instead of clearing it.
-  const announced = <A>(write: (arg: A) => void) => (arg: A): void => {
-    const outer = holder.announce;
-    holder.announce = undefined;
-    try {
-      write(arg);
-    } finally {
-      // Set by the write callback during `write`; read it, not the narrowing.
-      const run = holder.announce as (() => void) | undefined;
-      holder.announce = outer;
-      run?.();
-    }
-  };
-  binding.replace = announced(binding.replace);
-  binding.derive = announced(binding.derive);
   const leaf = binding.location as Location<T>;
   holder.leaf = leaf;
   return { leaf, binding };
@@ -168,8 +146,12 @@ export function createTreeScalarLeafRuntime(
   const kernel = createTreeScalarSlotKernel(physicalCommitClock);
   const publication = new ScalarSlotPublication(locations);
   const leafByPositionId = new Map<PositionId, Location<unknown>>();
+  const liveness: { absence?: MemberAbsence } = {};
 
   return {
+    enableAbsence(absence: MemberAbsence): void {
+      liveness.absence = absence;
+    },
     createLeaf<T>(
       initialValue: T,
       equal: (current: T, next: T) => boolean,
@@ -180,7 +162,8 @@ export function createTreeScalarLeafRuntime(
         kernel,
         publication,
         locations,
-        slotIndex
+        slotIndex,
+        liveness
       );
       publication.bind(slotIndex, binding as WritableLocationBinding<unknown>);
       if (positionId !== undefined) {

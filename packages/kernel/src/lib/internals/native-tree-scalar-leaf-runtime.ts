@@ -5,7 +5,6 @@ import {
   registerWritableLocationBinding,
   type WritableLocationBinding,
 } from './location-runtime';
-import { isAbsentMember, reactivatePathOnWrite } from './member-membership';
 import type {
   ObservationAdapter,
   ObservationToken,
@@ -17,6 +16,7 @@ import {
 } from './production-substrate-stats';
 import type { Location } from './cell-runtime';
 import type {
+  MemberAbsence,
   ScalarSlotMutationFrame,
   SlotIndex,
   TreeScalarLeafRuntime,
@@ -100,13 +100,14 @@ function createNativeScalarLeaf<T>(
   kernel: TreeScalarSlotRuntime,
   publication: NativeScalarSlotPublication,
   observation: ObservationAdapter,
-  slotIndex: SlotIndex
+  slotIndex: SlotIndex,
+  liveness: { absence?: MemberAbsence }
 ): Location<T> {
   const holder: { leaf?: Location<T> } = {};
   const realized = observation.createWritableCell?.(() => {
-    const leaf = holder.leaf;
-    // Absent when this leaf or a member above it is omitted (v16 8d).
-    if (leaf && isAbsentMember(leaf)) return undefined as T;
+    // Absent when this leaf or a member above it is omitted (v16 8d). One
+    // empty slot until this tree's first omission (v16 8e).
+    if (liveness.absence?.isAbsent(holder.leaf)) return undefined as T;
     return kernel.readSlot<T>(slotIndex);
   });
   if (!realized) throw new Error('Expected a native writable cell realization');
@@ -117,18 +118,18 @@ function createNativeScalarLeaf<T>(
   holder.leaf = leaf;
   const mutationSource = registerIntrinsicMutationSource<T>(leaf as object);
 
-  // Each returns the re-added membership's announcement, which the writer
-  // runs after its own value notification (see `reactivatePathOnWrite`).
+  // `reAdd` re-adds and announces an absent leaf's path, and says whether it
+  // did (`reactivatePathOnWrite`). No per-leaf closure: the slot is read
+  // inline (v16 8e).
   const publishResult = (
     result: ReturnType<TreeScalarSlotRuntime['commitSlot']>
-  ): (() => void) | undefined => {
-    const announce = reactivatePathOnWrite(leaf);
+  ): void => {
+    const reAdded = liveness.absence?.reAdd(leaf) === true;
     publication.publishSlot(
-      announce && !result.changed
+      reAdded && !result.changed
         ? { ...result, changed: true, slot: slotIndex }
         : result
     );
-    return announce;
   };
 
   /**
@@ -141,21 +142,17 @@ function createNativeScalarLeaf<T>(
    * value still goes the invalidate route.
    */
   const commitNative = realized.commit;
-  const publishChanged = (
-    changed: boolean,
-    committed?: { value: T }
-  ): (() => void) | undefined => {
-    const announce = reactivatePathOnWrite(leaf);
-    if (!changed && !announce) return undefined;
+  const publishChanged = (changed: boolean, committed?: { value: T }): void => {
+    const reAdded = liveness.absence?.reAdd(leaf) === true;
+    if (!changed && !reAdded) return;
     if (committed !== undefined && commitNative !== undefined) {
       commitNative(committed.value);
       if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
         recordProductionSubstrateStat('publications');
       }
-      return announce;
+      return;
     }
     publication.publishSlot({ changed: true, slot: slotIndex });
-    return announce;
   };
 
   const binding: WritableLocationBinding<T> = {
@@ -163,11 +160,13 @@ function createNativeScalarLeaf<T>(
     notify: () => publication.publishSlot({ changed: true, slot: slotIndex }),
     replace: (value) => {
       const observer = mutationSource.observer;
-      const dormant = observer ? isAbsentMember(leaf) : false;
+      const dormant = observer
+        ? liveness.absence?.isAbsent(leaf) === true
+        : false;
       const before = observer ? realized.peek() : undefined;
       // The authoritative commit primitive: no result object on the hot path.
       const changed = kernel.commitSlotValue(slotIndex, value);
-      const announce = publishChanged(changed, { value });
+      publishChanged(changed, { value });
       if (observer) {
         observer({
           intent: 'replace',
@@ -176,13 +175,12 @@ function createNativeScalarLeaf<T>(
           changed: changed || dormant,
         });
       }
-      announce?.();
     },
     derive: (update) => {
-      if (isAbsentMember(leaf)) {
+      if (liveness.absence?.isAbsent(leaf)) {
         const next = update(undefined as T);
         const result = kernel.commitSlot(slotIndex, next);
-        const announce = publishResult(result);
+        publishResult(result);
         mutationSource.observer?.({
           intent: 'derive',
           before: undefined as T,
@@ -190,25 +188,23 @@ function createNativeScalarLeaf<T>(
           // Membership changed even when the retained slot value did not.
           changed: true,
         });
-        announce?.();
         return;
       }
       const observer = mutationSource.observer;
       if (!observer) {
-        publishResult(kernel.updateSlot(slotIndex, update))?.();
+        publishResult(kernel.updateSlot(slotIndex, update));
         return;
       }
       const before = realized.peek();
       const next = update(before);
       const result = kernel.commitSlot(slotIndex, next);
-      const announce = publishResult(result);
+      publishResult(result);
       observer({
         intent: 'derive',
         before,
         after: result.changed ? next : before,
         changed: result.changed,
       });
-      announce?.();
     },
   };
   registerWritableLocationBinding(binding);
@@ -224,8 +220,12 @@ export function createNativeTreeScalarLeafRuntime(
   const kernel = createTreeScalarSlotRuntime(physicalCommitClock);
   const publication = new NativeScalarSlotPublication(observation);
   const leafByPositionId = new Map<PositionId, Location<unknown>>();
+  const liveness: { absence?: MemberAbsence } = {};
 
   return {
+    enableAbsence(absence: MemberAbsence): void {
+      liveness.absence = absence;
+    },
     createLeaf<T>(
       initialValue: T,
       equal: (current: T, next: T) => boolean,
@@ -236,7 +236,8 @@ export function createNativeTreeScalarLeafRuntime(
         kernel,
         publication,
         observation,
-        slotIndex
+        slotIndex,
+        liveness
       );
       if (positionId !== undefined) {
         leafByPositionId.set(positionId, leaf as Location<unknown>);
