@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { signalTree } from '../../lib/signal-tree';
+import { createSignalTreeFactory, signalTree } from '../../lib/signal-tree';
+import {
+  createReactiveTestRealization,
+  observeReactiveTestValue,
+} from '../../reactive-test-realization';
 import { undoable } from '../../lib/undoable';
 import { restorationReader } from '../../lib/internals/restoration-reader';
 import { transactionLifecycleReader } from '../../lib/internals/transaction-lifecycle-view';
@@ -107,3 +111,41 @@ describe.each([
     });
   }
 );
+
+describe('restoration operation outcome after application', () => {
+  it('an undo that applied and then failed reactive delivery is applied, not failed', async () => {
+    const tree = createSignalTreeFactory(createReactiveTestRealization())(
+      { x: 0 },
+      { enhancers: [transactions(), restoration()] }
+    );
+    const failure = new Error('reactive delivery');
+    let armed = false;
+    observeReactiveTestValue(
+      () => tree.$.x(),
+      () => {
+        if (armed) throw failure;
+      }
+    );
+    try {
+      const reader = restorationReader(tree)!;
+      undoable(() => tree.$.x(1));
+      await flush();
+      const id = reader.snapshot().entries[0].entryId;
+      const outcomes: unknown[] = [];
+      reader.subscribe((event) => {
+        if (event.kind === 'operation') outcomes.push(event);
+      });
+      armed = true;
+      // The consumer's own error reaches the caller once the undo installed.
+      expect(() => tree.undo()).toThrow(failure);
+      armed = false;
+      expect(tree.$.x()).toBe(0);
+      expect(outcomes).toMatchObject([
+        { operation: 'undo', outcome: 'applied', affectedEntryIds: [id] },
+      ]);
+    } finally {
+      armed = false;
+      tree.destroy();
+    }
+  });
+});
