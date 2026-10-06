@@ -84,3 +84,35 @@ describe('Link activity under v16 per-send settlement', () => {
     }
   });
 });
+
+describe('a Link reader attached late', () => {
+  it('sees relationships registered before it, and counts sequences from attachment', async () => {
+    const tree = signalTree({ x: 0 });
+    const sends: number[] = [];
+    const connection = link(tree.$.x, {
+      set: (value) => {
+        sends.push(value);
+      },
+    });
+    try {
+      tree.$.x(1);
+      await connection.settled();
+      expect(sends).toEqual([1]);
+      const reader = linkStateReader(tree);
+      const snapshot = reader.snapshot();
+      expect(snapshot.sequence).toBe(0);
+      expect(snapshot.links).toHaveLength(1);
+      expect(idle(snapshot.links[0])).toBe(true);
+      const sequences: number[] = [];
+      reader.subscribe((event) => sequences.push(event.sequence));
+      tree.$.x(2);
+      await connection.settled();
+      expect(sends).toEqual([1, 2]);
+      expect(sequences.length).toBeGreaterThan(0);
+      expect(sequences).toEqual(sequences.map((_, index) => index + 1));
+    } finally {
+      connection.dispose();
+      tree.destroy();
+    }
+  });
+});

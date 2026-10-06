@@ -42,7 +42,10 @@ export interface EntityMembershipSnapshot {
 export interface EntityMembershipEvent {
   readonly treeId: TreeId;
   readonly sequence: number;
-  /** All changes in this event belong to one successful structural unit. */
+  /**
+   * The changes of one structural unit, describing its end state. A unit that
+   * threw reports what it physically changed before it stopped (often nothing).
+   */
   readonly changes: readonly EntityMembershipChange[];
   readonly collection: EntityMembershipLocation;
 }
