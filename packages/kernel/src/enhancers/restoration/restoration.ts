@@ -621,7 +621,9 @@ export function rebaseOntoRejection(
   };
   const roots = new Map<string, TrieNode>();
   const createNode = (): TrieNode => ({ atoms: [], children: new Map() });
-  const insertAtom = (atom: RebaseAtom & { seq: number; span: number }): void => {
+  const insertAtom = (
+    atom: RebaseAtom & { seq: number; span: number }
+  ): void => {
     let node: TrieNode | undefined = roots.get(atom.scope);
     if (!node) {
       node = createNode();
@@ -1255,11 +1257,16 @@ class RestorationManager<T> {
       historicalCapture
     );
     if (!entry) {
+      this.releaseTruncatedEntries();
       return false;
     }
 
     beforeInsert?.();
-    return this.insertConfirmedTurn(entry);
+    try {
+      return this.insertConfirmedTurn(entry);
+    } finally {
+      this.releaseTruncatedEntries();
+    }
   }
 
   createPendingEntry(
@@ -1278,6 +1285,7 @@ class RestorationManager<T> {
       explicitTurnId,
       true
     );
+    this.releaseTruncatedEntries();
     if (!entry) {
       return undefined;
     }
@@ -1464,16 +1472,14 @@ class RestorationManager<T> {
       this.isTemporalViewActive &&
       this.currentIndex < this.history.length - 1
     ) {
-      // DEFENSIVE, and honestly so: a probe that threw here on any discarded
-      // entry carrying `restorationSubjectIds` fired ZERO times across the
-      // whole suite, and mutating this call away fails nothing. Only
-      // position-indexed entries name subjects, and `truncateScopedRedoFuture`
-      // above has already removed those. The call stays because the coupling
-      // that makes it redundant is not a property either function states, and
-      // it costs one no-op release. Do not cite it as covered.
+      // A write during a jumpTo view discards the view's future. Reached
+      // whenever one lands: a view never moves frontiers, so the scoped
+      // truncation above finds no future to cut (redo-truncation-claims.spec.ts
+      // drives it; an earlier comment here called it unreachable). Its claims
+      // are released once the new entry has taken its own.
       const discarded = this.history.slice(this.currentIndex + 1);
       this.history = this.history.slice(0, this.currentIndex + 1);
-      this.releaseRetainedRestorationEntries(discarded);
+      appendAll(this.truncatedEntries, discarded);
       this.bumpRestorationHistory();
     }
 
@@ -3097,11 +3103,29 @@ class RestorationManager<T> {
         event.boundaryTurnId === undefined ||
         !discardedTurnIds.has(event.boundaryTurnId)
     );
-    this.releaseRetainedRestorationEntries(discarded);
+    // Released by the caller once the entry that truncated them has taken
+    // its own claims (releaseTruncatedEntries).
+    appendAll(this.truncatedEntries, discarded);
     this.currentIndex = this.history.length - 1;
     this.bumpRestorationHistory();
     this.rebuildTurnIndexes();
     this.pruneHistoricalEventsBeforeOldestBoundary();
+  }
+
+  /**
+   * Entries a new write truncated (the redo future, or the future of a jumpTo
+   * view), held until that write's own entry has taken its claims. Released
+   * first, a row only the discarded entries claimed was offered for
+   * reclamation although the new entry removes it: undo of `setAll(DCBA);
+   * undo(); removeMany(A, B)` then threw "Subject 1 cannot enter the
+   * structural target" and the rows stayed removed (found by the v15 Link
+   * stream; on f8ff7431 too).
+   */
+  private truncatedEntries: CanonicalTurn<T>[] = [];
+
+  private releaseTruncatedEntries(): void {
+    if (this.truncatedEntries.length === 0) return;
+    this.releaseRetainedRestorationEntries(this.truncatedEntries.splice(0));
   }
 }
 
