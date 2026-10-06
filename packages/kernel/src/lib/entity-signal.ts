@@ -940,11 +940,7 @@ export function createEntitySignal<
   function createStructuralEffectMeta(
     effect: PendingStructuralEffect
   ): WriteMetadata {
-    const meta = ambientMeta();
-    return {
-      ...(meta ?? {}),
-      structuralEffect: effect,
-    };
+    return effectMeta(ambientMeta(), effect);
   }
 
   /**
@@ -1414,11 +1410,6 @@ export function createEntitySignal<
     physicalCommitClock?.advance();
   }
 
-  function rememberSubjectIds(ids: K[]): number[] {
-    const resolved = ids.map((id) => allocateSubjectId(id));
-    lastSubjectIds = resolved;
-    return resolved;
-  }
 
   function findKeyBySubjectId(subjectId: number): K | undefined {
     return structuralStore.activeKeyForSubject(subjectId);
@@ -1517,17 +1508,14 @@ export function createEntitySignal<
           basePath,
           [subjectId],
           getPositionIdsForNotify(),
-          {
-            ...(metaOverride ?? ambientMeta() ?? {}),
-            structuralEffect: {
-              kind: 'add',
-              subject: subjectId,
-              key,
-              value: deepClone(entity),
-              beforeSubject,
-              afterSubject,
-            },
-          }
+          effectMeta(metaOverride ?? ambientMeta(), {
+            kind: 'add',
+            subject: subjectId,
+            key,
+            value: deepClone(entity),
+            beforeSubject,
+            afterSubject,
+          })
         );
       },
     };
@@ -1625,10 +1613,7 @@ export function createEntitySignal<
           basePath,
           [subjectId],
           getPositionIdsForNotify(),
-          {
-            ...(metaOverride ?? ambientMeta() ?? {}),
-            structuralEffect,
-          }
+          effectMeta(metaOverride ?? ambientMeta(), structuralEffect)
         );
 
         emitTap('onRemove', key, entity);
@@ -1685,95 +1670,58 @@ export function createEntitySignal<
     return isRecordedReplayWrite() ? [] : interceptHandlers;
   }
 
-  function interceptAddedEntity(entity: E): E {
-    let transformedEntity = entity;
+  /**
+   * One interceptor hook on every active interceptor, each handed the call's
+   * own arguments: `block` throws `Cannot <verb> entity: <reason>`, and the
+   * last `transform` is the value handed on (a removal has none to hand on).
+   */
+  function runInterceptors<T>(
+    verb: string,
+    hook: 'onAdd' | 'onUpdate' | 'onRemove',
+    value: T,
+    args: unknown[]
+  ): T {
     for (const handler of activeInterceptors()) {
-      const ctx: InterceptContext<E> = {
+      const ctx: InterceptContext<T> = {
         block: (reason?: string) => {
           throw new Error(
-            `Cannot add entity: ${reason || 'blocked by interceptor'}`
+            `Cannot ${verb} entity: ${reason || 'blocked by interceptor'}`
           );
         },
-        transform: (value: E) => {
-          transformedEntity = value;
+        transform: (next: T) => {
+          value = next;
         },
         blocked: false,
         blockReason: undefined,
       };
-      assertSynchronousInterceptorResult(handler.onAdd?.(entity, ctx), 'onAdd');
+      assertSynchronousInterceptorResult(
+        (
+          handler[hook] as
+            | ((...hookArgs: unknown[]) => void | Promise<void>)
+            | undefined
+        )?.(...args, ctx),
+        hook
+      );
     }
+    return value;
+  }
 
-    return transformedEntity;
+  function interceptAddedEntity(entity: E): E {
+    return runInterceptors('add', 'onAdd', entity, [entity]);
   }
 
   /** `onUpdate` interceptors for a whole-entity replacement. */
   function interceptReplacedEntity(id: K, entity: E): E {
-    let replacement = entity;
-    for (const handler of activeInterceptors()) {
-      const ctx: InterceptContext<Partial<E>> = {
-        block: (reason?: string) => {
-          throw new Error(
-            `Cannot replace entity: ${reason || 'blocked by interceptor'}`
-          );
-        },
-        transform: (value: Partial<E>) => {
-          replacement = value as E;
-        },
-        blocked: false,
-        blockReason: undefined,
-      };
-      assertSynchronousInterceptorResult(
-        handler.onUpdate?.(id, entity as Partial<E>, ctx),
-        'onUpdate'
-      );
-    }
-    return replacement;
+    return runInterceptors('replace', 'onUpdate', entity, [id, entity]);
   }
 
   /** `onRemove` interceptors: a block throws; there is nothing to transform. */
   function interceptRemovedEntity(id: K, entity: E): void {
-    for (const handler of activeInterceptors()) {
-      const ctx: InterceptContext<void> = {
-        block: (reason?: string) => {
-          throw new Error(
-            `Cannot remove entity: ${reason || 'blocked by interceptor'}`
-          );
-        },
-        transform: () => {
-          // void transform - no transformation possible
-        },
-        blocked: false,
-        blockReason: undefined,
-      };
-      assertSynchronousInterceptorResult(
-        handler.onRemove?.(id, entity, ctx),
-        'onRemove'
-      );
-    }
+    runInterceptors('remove', 'onRemove', entity, [id, entity]);
   }
 
   function interceptUpdatedEntity(id: K, changes: Partial<E>): Partial<E> {
-    let transformedChanges = changes;
-    for (const handler of activeInterceptors()) {
-      const ctx: InterceptContext<Partial<E>> = {
-        block: (reason?: string) => {
-          throw new Error(
-            `Cannot update entity: ${reason || 'blocked by interceptor'}`
-          );
-        },
-        transform: (value: Partial<E>) => {
-          transformedChanges = value;
-        },
-        blocked: false,
-        blockReason: undefined,
-      };
-      assertSynchronousInterceptorResult(
-        handler.onUpdate?.(id, changes, ctx),
-        'onUpdate'
-      );
-    }
-
-    return transformedChanges;
+    return runInterceptors('update', 'onUpdate', changes, [id, changes]);
   }
 
   /**
@@ -3081,7 +3029,7 @@ export function createEntitySignal<
         : NO_NEIGHBORS;
 
       // Delete and update signals
-      const subjectIdsForWrite = rememberSubjectIds([id]);
+      const subjectIdsForWrite = [rememberSubjectId(id)];
       const structuralEffect: PendingStructuralEffect | undefined = observed
         ? {
             kind: 'remove',
