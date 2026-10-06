@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { createReactiveTestRealization } from '../reactive-test-realization';
 import {
@@ -596,36 +596,30 @@ describe('the retained rows a re-adding write removes are not row changes (v16 8
 });
 
 describe('closing a structural write (v16 8e review)', () => {
-  it("a consumer's error never replaces the write's own", () => {
-    const reported: string[] = [];
-    const spy = vi
-      .spyOn(globalThis, 'queueMicrotask')
-      .mockImplementation((task) => {
-        try {
-          task();
-        } catch (error) {
-          reported.push((error as Error).message);
-        }
-      });
+  // Whether the write threw reaches what runs at the outermost close (a
+  // collection's deferred wake), so a consumer's error there cannot replace
+  // the write's own (`entity-signal`).
+  it('tells the outermost close whether the write threw', () => {
+    const seen: unknown[] = [];
     const queue = () => {
-      structuralWrites.depth++;
-      structuralWrites.end = () => {
+      structuralWrites.end = (failed) => {
         structuralWrites.end = undefined;
-        throw new Error('consumer');
+        seen.push(failed);
       };
     };
     try {
-      // Closing because the write threw: the consumer's error is reported
-      // asynchronously and the write's own error surfaces.
+      structuralWrites.depth += 2;
       queue();
-      expect(() => endStructuralWrite(true)).not.toThrow();
-      expect(reported).toEqual(['consumer']);
-      // Closing normally: it surfaces as before.
+      endStructuralWrite(true);
+      expect(seen).toEqual([]);
+      endStructuralWrite(true);
+      expect(seen).toEqual([true]);
+      structuralWrites.depth++;
       queue();
-      expect(() => endStructuralWrite()).toThrow('consumer');
+      endStructuralWrite();
+      expect(seen).toEqual([true, undefined]);
       expect(structuralWrites.depth).toBe(0);
     } finally {
-      spy.mockRestore();
       structuralWrites.end = undefined;
     }
   });

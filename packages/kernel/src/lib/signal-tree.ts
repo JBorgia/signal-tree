@@ -876,7 +876,6 @@ function recursiveUpdate(
   // A whole value reconciles membership level by level below; a location it
   // writes must not re-add its own path as well (`structuralWrites`).
   structuralWrites.depth++;
-  let failed = true;
   try {
     const targetObj = isNodeAccessor(target)
       ? (target as unknown as Record<string, unknown>)
@@ -1138,9 +1137,8 @@ function recursiveUpdate(
     if (membershipChanged.length > 0) {
       republishMembers(targetObj, membershipChanged);
     }
-    failed = false;
   } finally {
-    endStructuralWrite(failed);
+    endStructuralWrite();
   }
 }
 
