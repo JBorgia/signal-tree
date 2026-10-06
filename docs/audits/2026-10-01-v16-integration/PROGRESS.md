@@ -2225,3 +2225,351 @@ Routed to the coordinator.
 8. **Load-sensitive pre-existing tests.** The `entity-granular-reactivity`
    5 ms bound and the 130k-row jumpTo 120 s timeout flake under machine
    load.
+
+## Slice 8c: retained storage, nested collections, refusal text, determinism
+
+Committed on `integrate/v16-slice8c` from `ddf81590` (slice 8b merged):
+- `2abb31e2`: re-add only a reversal's own locations; hidden collections at
+  depth; refusal text; defensive checks;
+- `a4973f4b`: deterministic load-sensitive cases;
+- `45b8a6ef`: docs;
+- `da273b12`: the review follow-up.
+
+This slice covers slice 8b's open items 1–8. Raw logs, first reds, probes,
+mutation logs and size attribution are in
+`/private/tmp/st-v16-integration-evidence/slice8c/`.
+
+### Item 1: rollback under an omitted branch — confirmed
+
+The owner confirmed (coordinator, 2026-10-05) that rollback under an omitted
+branch writes the pre-image into the hidden retained storage. The reasoning
+is the owner's law that no undo, redo or jumpTo may reinstate a value that
+only the rejected transaction wrote. Skipping the write would let the
+rejected value come back on a later re-add. So the write is a full reversal,
+not a silent partial one.
+
+This is recorded in `packages/kernel/README.md` (`restoration()`, "Locations
+an omission has hidden"). Since this slice, retained storage never supplies a
+re-added value (item 7). The write therefore keeps the hidden storage
+consistent with history, rather than being the only thing that stops a
+resurfacing.
+
+### Item 2: the rollback-order dependency is documented
+
+| Location | What it now says |
+| --- | --- |
+| `CHANGELOG.md` 16.0.0-dev | One line for omitted-location reversal and one for the rollback order. |
+| `packages/kernel/README.md`, Lifetime | The retryable refusal while a newer pending transaction omitted or re-added an enclosing branch. |
+| `llms.txt` and `docs/guides/composition-recipes.md` | The same rule. |
+
+There is no transaction-failures guide on this line: v15's
+`transaction-failures-v15.md` is not carried. The README's Lifetime section
+is the v16 equivalent, so the note is there.
+
+Those three surfaces also named `later-pending-dependency`. That kind does
+not exist on v16, whose owner reports a newer pending overlap as
+`later-confirmed-dependency` (slice 4 item 1, slice 6 item 3). They now name
+the real kind. The doc gates pass: links, imports, symbols and the 29
+documented examples.
+
+### Item 3: refusal messages name the location and the reason
+
+Codes and types are kept. Both go through `restorationRefusal`, and the
+reader reports `refused`. The new messages, captured in `messages.txt`:
+
+- **External omission** (formerly "Expected undefined but found undefined"
+  for order-only and add reversals):
+  > `ST1034: restoration refused — 'g' was omitted by external truth after the operation being reversed, and 'g.rows' lies under it; restoring 'g.rows' would overwrite that omission. Nothing was changed; the history position is unmoved.`
+
+  For the location itself:
+  > `'value' was omitted by external truth after the operation being reversed; restoring 'value' would overwrite that omission.`
+- **A member that cannot be re-added** (formerly `...at structural-drift`):
+  > `Unsupported scoped undo effect at 'g.rows.a.n': its enclosing member 'g.rows' was omitted and cannot be re-added, because it is not a plain state location (an entity collection, for example). Nothing was changed; the history position is unmoved.`
+
+  The other reason reads "its retained location is no longer available".
+
+The location label is presentation only: the effect's display path, or the
+structured address joined with dots for an order-only effect. Carriers in
+`hidden-terminal-reversal.spec.ts` assert the exact text for the location
+itself and for an enclosing branch, a pattern for reorder and add (never
+containing "undefined"), and the omitted-collection refusal.
+
+### Item 4: the defensive checks
+
+**A member that cannot be re-added — now reachable and tested.** An entity
+collection can be omitted from its parent by a whole-value write
+(`tree.$.g({ k: 0 })`), and a collection is not a membership-managed
+location. Undo of a row change then refuses, says why, and leaves state and
+the index unchanged.
+
+**The other reason — unreachable, documented in code.** A plain member whose
+retained location is unavailable cannot happen, because restoration
+registers a member's location whenever it observes the omission.
+
+**An unwalkable structured address — unreachable, documented in code.** v16
+never deletes a member: omission makes it non-enumerable, and dynamic members
+reactivate with their identity. So every registered address still leads to
+its owner. Slice 6 found the same for the state-location reader (mutation
+survivor S5).
+
+The hidden-member walk (`hidingMembers`, `collectionBindingAt`) now
+traverses any node, as the state-location reader does, rather than only
+branch accessors.
+
+### Item 6: collections nested more than one level, and several under one member
+
+`E/restoration/hidden-collection-nesting.spec.ts` has 25 cases: 18, plus 7
+from the review follow-up. The state is
+`{ g: { h: { rows, k }, other, j }, count }`. The turn updates a row,
+reorders `g.h.rows` (declarative path) and adds to `g.other`. Covered:
+- ordinary omission of `g`: undo, redo after the omission, and jumpTo;
+- external omission: undo, redo and jumpTo refuse with nothing written;
+- pending rollback after an ordinary or external omission, in three orders.
+
+They revealed two defects on `ddf81590`, and review found two more (below):
+- An ordinary-omission re-add of a branch with a collection two levels down
+  threw an untyped "Plain branch target contains an unavailable member". The
+  8b composition copied the nested branch, collection key included, from
+  retained storage. Fixed by the item 7 composition.
+- A pending rollback of entity changes under an omitted branch refused with
+  "Transaction rollback has no collection binding", because the current-tree
+  walk skips hidden members. It now finds the
+collection along its structured address (`collectionBindingAt`) and restores
+the hidden collections' pre-image, per the confirmed law. Restoration's
+declarative path uses the same lookup in place of 8b's subtree walk. An
+entity effect now also adds "the way to its collection" to the re-add, so a
+collection two branches down becomes current.
+
+### Item 7: a detached-handle write under a hidden branch
+
+**v16's rule for absent members:**
+- `whole-value-membership.spec.ts` (header and case 18): "PHYSICAL RETENTION
+  MUST NOT CREATE A SECOND OBSERVABLE STATE" and "DORMANT STORAGE MUST NOT
+  SUPPLY THE REACTIVATED VALUE".
+- `member-membership.ts` (`activateOne`): "MEMBERSHIP ACTIVATION IS NEVER A
+  STANDALONE OPERATION. IT MUST BE COUPLED TO AN AUTHORITATIVE SUPPLIED
+  VALUE."
+- For writes: `whole-value-membership.spec.ts` case 7 says "WRITING AN
+  ABSENT DESCENDANT REACTIVATES ITS MEMBERSHIP", and
+  `nested-absence-independent.spec.ts` says "a write must not vanish
+  silently. Either it reaches the tree, or it refuses."
+
+Under these rules a write to an absent descendant is live: it is neither
+"not live" nor "staging".
+
+**The re-add, made consistent.** The 8b re-add took a hidden branch's
+untouched members from retained storage, which the rule forbids. That is what
+made a detached-handle value reappear. The re-add is now built only from
+supplied targets: the members on the way to the reversal's locations come
+back, and every other state location stays absent, as the ordinary omission
+left it. This also matches the 15.4.2 analogy, under which an undo restores
+the pre-image over a later ordinary write only at its own locations. 8b's
+"retained values on re-add" decision is withdrawn.
+
+A turn's own membership effect, with its captured before-image, still wins.
+Collections and markers are not membership-managed; they become current with
+their branch.
+
+**The write path itself — pre-existing, not changed here.** The rule says a
+write to an absent descendant reaches the tree. `reactivateOnWrite` only
+reactivates a leaf that is itself the omitted member. A leaf under an omitted
+ancestor (`a.keep` after `a` is omitted) is written into hidden storage and
+nothing becomes visible, which breaks case 7 and the nested-absence law for
+nested descendants. A held nested read likewise sees retained storage.
+Changing this is a core read and write path change in every adapter. It is
+recorded as open item 1 with options, not done.
+
+### Item 8: deterministic cases
+
+| Case | Before | Now |
+| --- | --- | --- |
+| `entity-granular-reactivity` "repeated collection reads between writes are cached" | 500 reads had to take under 5 ms | Asserts the identical array across 500 reads, plus a write that invalidates the cache. A cached read returns the array it returned before; a rebuild returns a new one. |
+| `large-batch-restoration-v16-controls` 130k-row jumpTo | hit its 120 s timeout under load | See below |
+
+For the jumpTo case:
+- **Cause.** 20.6 s of its 28.8 s went to `getRestorationHistory()`
+  materializing snapshots of a 130k-row clear. That grows faster than
+  linearly (16k 0.56 s, 32k 0.83 s, 64k 3.4 s, 130k 20.6 s; `probe2.txt`)
+  and is not this case's subject.
+- **Replacement check.** The history check is now `getCurrentIndex()` and
+  `canUndo()`.
+- **Counters.** Substrate counters pin each jump:
+  - `jumpTo(0)`: `valueStoreWrites === LARGE`, and at most 3 publication
+    dependency reads per row (2 measured);
+  - `jumpTo(1)`: `structuralSubjectTombstones === LARGE`, and at most 10 per
+    row (9 measured).
+- **Runtime.** 9.8 s alone. The 120 s timeout stays; it now has a 12x
+  margin.
+
+### First red on `ddf81590` (`first-red/`)
+
+| Spec | Failed on `ddf81590` |
+| --- | --- |
+| `hidden-collection-nesting` (first 18 cases) | 12 of 18: the 6 rollbacks (no binding), and the 6 ordinary-omission cases. The 8b re-add copied the nested branch `h` from retained storage, `rows` key included, and the installer threw an untyped "Plain branch target contains an unavailable member". That was a second 8b defect for collections more than one level down. The 6 external refusals passed. |
+| `hidden-terminal-reversal` | 45 of 173: the path-only expectations, the message carriers and the omitted collection |
+
+The two determinism changes pass on both sides; they change how the cases
+measure, not what they assert.
+
+### Mutations (each restored by content hash; logs `mutations/`)
+
+Counts are killed cases.
+
+| Mutation | Killed |
+| --- | --- |
+| C1 re-add takes untouched members from retained storage (8b form) | 36 |
+| C2 entity effects add no way to their collection | 6 |
+| C3 rollback finds no binding for a hidden collection | 6 |
+| C4 declarative restoration finds no binding for a hidden collection | 12 |
+| C5 refusal reason flipped | 3 |
+| C6 hidden-member walk only through accessors | 0 |
+| C7 external message without the omitted member | 45 |
+| D1 `all()` rebuilt on every read | 1, the identity case |
+| B1 only the outermost hidden member checked for re-add (review follow-up) | 2 |
+| B2 a supplied collection snapshot treated as an unavailable member (review follow-up) | 5 |
+
+C6 is equivalent on every test: no v16 producer puts a location under a
+non-accessor node. The permissive walk keeps a future user marker from being
+refused as "unwalkable".
+
+### Results
+
+Verification at `da273b12` (`verify/run2/`), all exit 0 unless noted:
+- **Full kernel:** 393 files, 4425 passed, 6 expected failures, 13 skipped.
+  The run inside the list had one timeout in the pre-existing
+  `production-scalar-substrate` timing guard while the reviewer's export
+  loaded the machine. It passes alone (`scalar-benchmark-rerun.log`) and in
+  a clean full rerun (`kernel-rerun.log`). At `ddf81590` the count was 392 /
+  4385, so the delta is +1 file and +40 cases (25 + 15).
+- **Frameworks:** angular 187 (+3 skipped), react 29, vue 78, solid 47.
+- **Static gates, build and consumers:** `pnpm typecheck`;
+  `check-spec-types` (three pre-existing improvements; baseline not
+  ratcheted); lint on all five projects; kernel-neutrality; source-controls;
+  `api-inventory --check`; callable-inventory; the five-package build; the
+  consumer typecheck (bundler and node16).
+- **Doc gates (run separately):** doc-links, documented-imports,
+  documented-symbols and documented-examples.
+- **Bundle budget:** `check-bundle-budget` exits 1, on the pre-existing
+  overage only.
+
+Size (`size/`: esbuild attribution over the built dist, prod, with the
+package's `sideEffects`; `final-vs-base.txt`):
+
+| Scenario | `ddf81590` | `da273b12` | Delta |
+| --- | --- | --- | --- |
+| restoration | 36.63 KB gzip | 36.96 KB | +342 B gzip, +870 B min (`restoration.js` +643, `plain-branch-membership.js` +227) |
+| transactions | 36.36 KB | 36.43 KB | +76 B gzip, +250 B min (`plain-branch-membership.js` +225 for `collectionBindingAt`, `transactions.js` +25) |
+| full | 66.04 KB | 66.34 KB | +304 B gzip, +882 B min |
+| entities, bare | — | — | 0 |
+| link | — | — | +1 B gzip |
+
+The restoration growth is mostly the refusal text. `check-bundle-budget`
+before and after: entities 23.59/22.6 KB prod and 26.23/25.25 KB dev; bare
+10.39/10.25 KB prod and 12.60/12.45 KB dev. Both are unchanged and still over
+their inherited ceilings.
+
+### Independent review
+
+One read-only code-reviewer agent, given the raw diff, the coordinator's
+items and the PLAN contracts, without this record. It probed only in its own
+exports (`/private/tmp/st-v16-slice8c-review-1..3`).
+
+**`45b8a6ef`: needs fixes.** All four findings were fixed in `da273b12`:
+- **Major: a collection omitted below an omitted branch was reported as
+  restored.** With `rows` omitted from `h` and then `g` omitted, undo
+  re-added `g`, rewrote the dormant collection and returned normally. Every
+  hidden member on the way must now be re-addable, or the undo refuses and
+  names the blocking member.
+- **Minor: rollback of a newer transaction that omitted a branch holding a
+  collection threw "Plain branch target contains an unavailable member".**
+  The branch's before-image carries a collection snapshot. The installer now
+  ignores a snapshot supplied for a member that is not membership-managed,
+  because the collection keeps its own state and its own effects restore it.
+  The same fix lets undo of a designated omission of such a branch re-add
+  it. The documented rollback order is now pinned in three orders.
+- **Minor: the CHANGELOG claimed the older rollback "succeeded" before.** It
+  did not: the slot case was already refused at `ddf81590`. Reworded.
+- **Minor: the large-batch change dropped the history assertion.** It is now
+  checked through the restoration reader, which materializes nothing. The
+  `jumpTo(1)` read bound is widened from 10 to 12 per row (9 measured).
+
+**`da273b12`: clean.** It confirmed each fix, including retrying after
+either settlement. One minor remains: the installer skip admits any
+traversable child that is not membership-managed, not only collections and
+markers. It was kept because such members keep their own state; no failing
+case was found.
+
+The reviewer's info notes are recorded above: no transaction-failures guide
+exists on v16, and the defensive branches are argued unreachable rather than
+tested.
+
+### User-visible behaviour changes in v16 (slice 8c)
+
+1. **Untouched members stay absent.** An undo, redo or jumpTo that re-adds a
+   branch an ordinary write omitted no longer brings back that branch's
+   untouched members from retained storage. They stay absent; only the way
+   to the reversal's own locations is re-added.
+2. **Hidden collections roll back.** Pending rollback of entity changes in a
+   collection under an omitted branch, at any depth, now completes and
+   restores the hidden collections. Before, it refused with "Transaction
+   rollback has no collection binding".
+3. **Refusals say what and why.** The two refusal kinds name the omitted
+   member, the location and the reason. Codes and types are unchanged.
+4. **Docs name the real refusal kind.** The docs name
+   `later-confirmed-dependency` for the rollback-order refusal, and cover
+   enclosing-branch omissions.
+
+### Port notes for v15 (8b + 8c)
+
+Read from the exports of `d63166c9` and `43e16e31`; nothing was run. The
+v15 transaction stream owns `restoration.ts` and `transactions.ts` there.
+
+- **`I/plain-branch-membership.ts`.** Add `hidingMembers`,
+  `composeHiddenMemberValue` (supplied targets only), `collectionBindingAt`
+  and `isReAddableMember`. The surrounding code (`memberAddress`,
+  `canRealizePlainBranchMember`, `preparePlainBranchMembers`) is identical.
+- **`E/restoration/restoration.ts`.**
+  - `isSupportedEffect`'s caller: throw through the file-local
+    `restorationRefusal`.
+  - `applyTurnEffectsThroughRealizationPort`: insert the hidden-location
+    planning after the pending-overlap check. v15 has the same
+    `externalMembershipTruth`, `pendingTransactions`, `pendingFootprints`
+    and `stagedTransactionEffects`, but no `readQueuedExternalAuthority`, so
+    a still-queued external omission needs a v15 probe.
+  - Use `appliedEffects` for validation, `applyAtomically` and
+    `deriveDeclarativeTransitionTarget`.
+  - Add the `collectionBindingAt` fallback in the declarative binding
+    lookups. v15's `requiresDeclarativeStructuralTarget` takes one argument.
+- **`E/transactions/transactions.ts`.**
+  - The binding fallback at "Transaction rollback has no collection
+    binding".
+  - The later-pending enclosing-membership dependency. v15 has no
+    later-pending loop in `getPendingRollbackPlan`; it reports
+    `later-pending-dependency` from the plan. Add the enclosure check where
+    v15 classifies later pending effects, and keep v15's kind name.
+  - Do not port 8b's withdrawn rollback supersession.
+- **Specs.** `hidden-terminal-reversal`, `hidden-collection-nesting`,
+  `registered-slot-guards` and the four adapter specs, with `.transact(` →
+  `.transaction(` and v15's refusal kind names. v15 settles the commit scope
+  on refusal (slice 7), which may change lifecycle assertions.
+
+### Open items
+
+1. **Writes and reads under an omitted ancestor (pre-existing).** A write to
+   a leaf under an omitted ancestor goes to hidden storage, and a held nested
+   read sees retained storage. This breaks `whole-value-membership` case 7
+   and the nested-absence law for nested descendants. Options: reactivate
+   along the path with siblings left absent, refuse the write, or keep the
+   current behaviour. The owner decided to reactivate along the path; that is
+   slice 8d.
+2. **`getRestorationHistory()` grows faster than linearly** when it
+   materializes a very large clear: 16k rows 0.56 s, 32k 0.83 s, 64k 3.4 s,
+   130k 20.6 s (`probe2.txt`). Left for the performance pass.
+3. **Remaining wall-clock bounds:** the 0.05 ms per-update bound in
+   `entity-granular-reactivity`, and the `production-scalar-substrate`
+   timing guard, which timed out under load. Slice 8d.
+4. **Undo of a designated omission of an entity collection itself** does not
+   bring the collection back. This is pre-existing, part of the "omitted
+   branch keys" family. Slice 8d.
+5. **The installer skips any traversable non-managed child** (review minor),
+   not only collections and markers.
