@@ -68,6 +68,18 @@ const shapes: Record<
     ],
     steps: [['undo'], ['redo']],
   },
+  // c is created, written and removed within the turn: its field write
+  // names a row that exists at neither end, and is dropped with it.
+  'redo of a turn that writes a row it then removes': {
+    turns: [
+      (tree) => {
+        tree.$.g.rows.setAll([row('a', 9), row('c', 10)]);
+        tree.$.g.rows.setAll([row('a', 9), row('c', 11)]);
+        tree.$.g.rows.setAll([row('a', 6)]);
+      },
+    ],
+    steps: [['undo'], ['redo']],
+  },
   'a jump over an add and a turn holding two setAlls': {
     turns: [
       (tree) => tree.$.g.rows.addOne(row('e', 5)),
