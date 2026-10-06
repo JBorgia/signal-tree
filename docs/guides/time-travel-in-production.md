@@ -280,6 +280,16 @@ gives 1. For entity rows (since 15.4.4):
 Writes applied with `external()` are not ordinary writes: an undo that would
 overwrite external truth refuses instead.
 
+The same holds when the ordinary write omitted a location (a whole value that
+left out its key, or a key above it). Since 15.4.4, `undo()`, `redo()` and
+`jumpTo()` re-add only the way to the reversal's own locations, with their
+values; the omission's other members stay absent, and retained storage never
+supplies a value. An omission by `external()` refuses with ST1034 and names
+the omitted member. A location under an omitted member reads `undefined`, and
+an entity collection there reads empty; writing it re-adds its path. See
+"Locations an omission has hidden" in the
+[kernel README](../../packages/kernel/README.md#locations-an-omission-has-hidden).
+
 ## Reactive readers, and why that mattered
 
 `canUndo()`, `canRedo()` and `getRestorationHistory()` are signals. Before that they read plain values, so
