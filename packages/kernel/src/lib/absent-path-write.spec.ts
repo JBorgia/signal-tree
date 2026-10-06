@@ -7,6 +7,7 @@ import {
   ordinaryBranch,
   registerMarkerProcessor,
 } from './internals/materialize-markers';
+import { observeIntrinsicMutations } from './internals/intrinsic-mutation';
 import { getPathNotifier } from './path-notifier';
 import { createSignalTreeFactory } from './signal-tree';
 
@@ -280,6 +281,93 @@ describe('writes under an omitted member re-add the path, siblings stay absent',
     expect(bob.name()).toBeUndefined();
   });
 
+  it('updateAndReport re-adds an omitted path it supplies and reports it', () => {
+    const tree = signalTree(initial()) as unknown as {
+      $: unknown;
+      updateAndReport(partial: unknown): string[];
+      destroy(): void;
+    };
+    trees.push(tree);
+    const h = handles(tree);
+    omitA(h);
+    // Partial at the root: `count` is not supplied and stays.
+    expect(tree.updateAndReport({ a: { b: { keep: 4 } } })).toEqual([
+      'a.b.keep',
+    ]);
+    expect(h.root()).toEqual({ a: { b: { keep: 4 } }, count: 0 });
+    expect(h.a.side()).toBeUndefined();
+  });
+
+  it('a whole value supplying undefined for an omitted member leaves it absent', () => {
+    const tree = signalTree(initial());
+    trees.push(tree);
+    const h = handles(tree);
+    omitA(h);
+    h.root({ a: undefined, count: 0 });
+    expect(h.root()).toEqual({ count: 0 });
+    expect(h.a.side()).toBeUndefined();
+  });
+
+  it('updateAndReport does not re-add a supplied key it installs nothing for', () => {
+    const tree = signalTree(initial()) as unknown as {
+      $: unknown;
+      updateAndReport(partial: unknown): string[];
+      destroy(): void;
+    };
+    trees.push(tree);
+    const h = handles(tree);
+    omitA(h);
+    expect(tree.updateAndReport({ a: undefined })).toEqual([]);
+    expect(h.root()).toEqual({ count: 0 });
+  });
+
+  it('a write re-entering the same leaf keeps the outer re-add announced', async () => {
+    const tree = signalTree(initial(), { enhancers: [restoration()] });
+    trees.push(tree);
+    const h = handles(tree);
+    omitA(h);
+    await flush();
+    // An intrinsic observer runs inside the outer write, after its re-add.
+    let reentered = false;
+    const release = observeIntrinsicMutations(h.a.b.keep as object, () => {
+      if (reentered) return;
+      reentered = true;
+      h.a.b.keep(10);
+    });
+    const paths: string[] = [];
+    const off = getPathNotifier().subscribe('**', (_v, _p, path) => {
+      paths.push(path);
+    });
+    try {
+      undoable(() => h.a.b.keep(9));
+      await flush();
+    } finally {
+      off();
+      release?.();
+    }
+    expect(h.root()).toEqual({ a: { b: { keep: 10 } }, count: 0 });
+    expect(paths).toContain('');
+    (tree as unknown as HistoryTree).undo();
+    expect(h.root()).toEqual({ count: 0 });
+  });
+
+  it('a branch updater inside a whole value receives undefined when absent', () => {
+    const tree = signalTree(initial());
+    trees.push(tree);
+    const h = handles(tree);
+    omitA(h);
+    const seen: unknown[] = [];
+    h.root({
+      a: (current: unknown) => {
+        seen.push(current);
+        return { side: 1 };
+      },
+      count: 0,
+    });
+    expect(seen).toEqual([undefined]);
+    expect(h.root()).toEqual({ a: { side: 1 }, count: 0 });
+  });
+
   it('a held consumer sees the re-adding write', () => {
     const tree = reactiveTree(initial());
     trees.push(tree);
@@ -526,6 +614,33 @@ describe('reversal of a designated omission wakes held consumers below it', () =
       off();
       expect(tree.$.user()).toEqual({ name: 'Ada', age: 50 });
       expect(paths.filter((path) => path === 'user')).toHaveLength(1);
+    });
+});
+
+describe('updateAndReport records the re-add it makes', () => {
+  for (const [order, enhancers] of Object.entries(historyOrders))
+    it(`undo makes the supplied omitted members absent again (${order})`, async () => {
+      const tree = signalTree(
+        { a: { b: { value: 0, keep: 0 }, side: 0 }, x: 1, count: 0 } as {
+          a?: { b: { value: number; keep: number }; side: number };
+          x?: number;
+          count: number;
+        },
+        { enhancers: enhancers() as never }
+      ) as unknown as HistoryTree & {
+        $: Leaf;
+        updateAndReport(partial: unknown): string[];
+      };
+      trees.push(tree);
+      tree.$({ count: 0 });
+      await flush();
+      undoable(() => tree.updateAndReport({ a: { b: { keep: 4 } }, x: 2 }));
+      await flush();
+      expect(tree.$()).toEqual({ a: { b: { keep: 4 } }, x: 2, count: 0 });
+      tree.undo();
+      expect(tree.$()).toEqual({ count: 0 });
+      tree.redo();
+      expect(tree.$()).toEqual({ a: { b: { keep: 4 } }, x: 2, count: 0 });
     });
 });
 

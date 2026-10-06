@@ -165,14 +165,18 @@ export function isAbsentMember(node: unknown): boolean {
  */
 let structuralWrites = 0;
 
-/** @internal Run a write that reconciles and announces membership itself. */
-export function withStructuralWrite<T>(run: () => T): T {
+/**
+ * @internal Begin a write that reconciles and announces membership itself.
+ * Pair with `exitStructuralWrite` in a `finally`. A counter, not a callback,
+ * so the whole-value path allocates nothing for it.
+ */
+export function enterStructuralWrite(): void {
   structuralWrites++;
-  try {
-    return run();
-  } finally {
-    structuralWrites--;
-  }
+}
+
+/** @internal See `enterStructuralWrite`. */
+export function exitStructuralWrite(): void {
+  structuralWrites--;
 }
 
 /** @internal True while a structural write is in progress. */

@@ -46,12 +46,13 @@ import {
 } from './internals/error-reporter';
 import { resolveEnhancerOrder } from '../enhancers';
 import {
+  enterStructuralWrite,
+  exitStructuralWrite,
   inStructuralWrite,
   installMemberRepublisher,
   isAbsentMember,
   reactivatePathOnWrite,
   setMemberPresence,
-  withStructuralWrite,
 } from './internals/member-membership';
 import { getOwnedPositionIds } from './internals/owned-mutation';
 import { getOwnedOwnerPath } from './internals/owned-metadata';
@@ -1041,10 +1042,13 @@ function recursiveUpdate(
 ): void {
   if (!updates || typeof updates !== 'object') return;
   // A whole value reconciles membership level by level below; a location it
-  // writes must not re-add its own path as well (`withStructuralWrite`).
-  withStructuralWrite(() =>
-    applyWholeValue(target, updates, out, pathPrefix, reconcileMembership)
-  );
+  // writes must not re-add its own path as well (`enterStructuralWrite`).
+  enterStructuralWrite();
+  try {
+    applyWholeValue(target, updates, out, pathPrefix, reconcileMembership);
+  } finally {
+    exitStructuralWrite();
+  }
 }
 
 function applyWholeValue(
@@ -1058,12 +1062,32 @@ function applyWholeValue(
     ? (target as unknown as Record<string, unknown>)
     : (target as Record<string, unknown>);
 
-  const publishMembership = reconcileMembership
-    ? captureBranchMembershipIfObserved(
-        (targetObj as Record<symbol, object>)[NODE_ACCESSOR_PEER] ?? targetObj,
-        updates
-      )
-    : undefined;
+  // ⚠️ A PARTIAL WRITE STILL RE-ADDS WHAT IT SUPPLIES (v16 8d review).
+  // `updateAndReport` scopes the outer level to its supplied keys, so it never
+  // omits there. But a supplied key that is omitted must come back with the
+  // supplied value, or the write lands in hidden storage and vanishes:
+  // measured, `updateAndReport({ a: { b: { keep: 4 } } })` with `a` omitted
+  // returned `[]` and left `a` absent. Only those keys can change presence,
+  // so only they are captured.
+  const reAdd: string[] = [];
+  if (!reconcileMembership)
+    for (const key of Object.keys(updates as Record<string, unknown>))
+      if (Object.getOwnPropertyDescriptor(targetObj, key)?.enumerable === false)
+        reAdd.push(key);
+  const publishMembership =
+    reconcileMembership || reAdd.length > 0
+      ? captureBranchMembershipIfObserved(
+          (targetObj as Record<symbol, object>)[NODE_ACCESSOR_PEER] ??
+            targetObj,
+          reconcileMembership
+            ? updates
+            : Object.fromEntries(
+                [...Object.keys(targetObj), ...reAdd].map((key) => [key, true])
+              )
+        )
+      : undefined;
+  // Partial scope: the supplied omitted keys whose value was installed.
+  const installed = new Set<string>();
 
   for (const [key, rawValue] of Object.entries(
     updates as Record<string, unknown>
@@ -1098,6 +1122,7 @@ function applyWholeValue(
     // success. Measured before this: `n=3 rows=3` → undo → `n=2 rows=3`.
     if (hydrateMarkerNode(prop, value, 'restore')) {
       if (out) out.push(childPath);
+      installed.add(key);
       continue;
     }
 
@@ -1122,7 +1147,8 @@ function applyWholeValue(
     if (isNodeAccessor(prop)) {
       if (typeof value === 'function') {
         const updater = value as (current: unknown) => unknown;
-        value = updater(unwrap(prop));
+        // An absent branch's updater receives its semantic value (v16 8d).
+        value = updater(isAbsentMember(prop) ? undefined : unwrap(prop));
         const mergeable =
           isTraversableNode(value) &&
           typeof value !== 'function' &&
@@ -1138,6 +1164,7 @@ function applyWholeValue(
         warnDiscardedBranchWrite(childPath, value);
       } else if (value && typeof value === 'object') {
         recursiveUpdate(prop, value, out, childPath);
+        installed.add(key);
       } else if (value === undefined) {
         continue;
       } else {
@@ -1176,8 +1203,12 @@ function applyWholeValue(
         }
         continue;
       }
+      // A leaf under an omitted member reads absent until its path is
+      // re-added after this write, so its re-add is reported as a change.
+      const wasAbsent = out !== undefined && isAbsentMember(sig);
       if (isWritableLocation(sig)) replaceLocation(sig, value);
       else sig.set(value);
+      installed.add(key);
 
       if (out) {
         // Report only what LANDED. Leaves are created with a deep `equal`, so
@@ -1192,7 +1223,8 @@ function applyWholeValue(
         // is exactly the no-op case (and Object.is(NaN, NaN) makes that
         // indistinguishable). "The leaf no longer holds what it held" is the
         // question actually being asked.
-        if (!Object.is(readWritableCell(sig), current)) out.push(childPath);
+        if (wasAbsent || !Object.is(readWritableCell(sig), current))
+          out.push(childPath);
       }
     }
     // ST2005 — attempted and REVERTED, deliberately. Recorded here so the
@@ -1255,7 +1287,14 @@ function applyWholeValue(
   // Reactivation is handled by the supplied-key loop above having ALREADY
   // installed the value: REACTIVATION MUST CARRY THE SUPPLIED VALUE, because
   // re-enumerating alone resurrects the dormant retained one.
-  if (!reconcileMembership) return;
+  if (!reconcileMembership) {
+    const readded = reAdd.filter(
+      (key) => installed.has(key) && setMemberPresence(targetObj, key, 'active')
+    );
+    publishMembership?.();
+    if (readded.length > 0) republishMembers(targetObj, readded);
+    return;
+  }
 
   const supplied = new Set(Object.keys(updates as Record<string, unknown>));
   const membershipChanged: string[] = [];
@@ -1272,7 +1311,13 @@ function applyWholeValue(
         membershipChanged.push(key);
       }
     } else if (
+      // Only a member whose supplied value was installed is re-added: a key
+      // supplied as `undefined`, or with a value the loop discarded, would
+      // otherwise come back with its retained storage. Measured before v16 8d:
+      // `$({ a: undefined, count: 0 })` re-added an omitted `a` as `{ v: 1 }`.
+      // "DORMANT STORAGE MUST NOT SUPPLY THE REACTIVATED VALUE" (case 18).
       !descriptor.enumerable &&
+      installed.has(key) &&
       setMemberPresence(targetObj, key, 'active')
     ) {
       membershipChanged.push(key);
