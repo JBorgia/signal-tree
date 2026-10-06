@@ -73,6 +73,24 @@ export function composeTurnOrderDelta(
   frontiers: { readonly start?: unknown; readonly end?: unknown } = {},
   explicit?: ReadonlySet<number>
 ): CollectionOrderDelta {
+  const { start, end } = composeTurnOrderEndpoints(captures, rows);
+  return deriveCollectionOrderDelta(
+    owner,
+    start,
+    end,
+    'start' in frontiers ? frontiers.start : captures[0].beforeFrontier,
+    'end' in frontiers
+      ? frontiers.end
+      : captures[captures.length - 1].afterFrontier,
+    explicit
+  );
+}
+
+/** The turn's own start and end orders on the collection (see above). */
+export function composeTurnOrderEndpoints(
+  captures: readonly TurnOrderCapture[],
+  rows: TurnRows
+): { start: number[]; end: number[] } {
   if (captures.length === 0) {
     throw new Error('A turn order delta needs at least one order capture');
   }
@@ -114,14 +132,7 @@ export function composeTurnOrderDelta(
       ...transientSubjects,
     ])
   );
-  return deriveCollectionOrderDelta(
-    owner,
-    start,
-    end,
-    'start' in frontiers ? frontiers.start : first.beforeFrontier,
-    'end' in frontiers ? frontiers.end : last.afterFrontier,
-    explicit
-  );
+  return { start, end };
 }
 
 type Insertion = InsertionInput<boolean>; // item: whether the row is virtual

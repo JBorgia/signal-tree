@@ -51,6 +51,13 @@ export function rememberTransientRow(
   rows.set(rowOf(add.position, add.subject), { add, remove });
 }
 
+/** Every transient row `capture` recorded (before any pruning). */
+export function transientRowsOf(
+  capture: object
+): readonly { add: AnchoredRowEffect; remove: AnchoredRowEffect }[] {
+  return [...(transients.get(capture)?.values() ?? [])];
+}
+
 export function forgetTransientRows(capture: object): void {
   transients.delete(capture);
 }

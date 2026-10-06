@@ -4,6 +4,14 @@ import {
   rememberTransientRow,
   withTransientRows,
 } from '../../lib/internals/causal-runtime/transient-rows';
+import {
+  drainTurnOrders,
+  frontierStepOf,
+  prepareFrontierReinstatement,
+  recordOrderTransition,
+  type TurnFrontierTransition,
+  type TurnOrderRecord,
+} from '../../lib/internals/causal-runtime/turn-order-record';
 import type { ToolingTree } from '../../lib/internals/tooling-tree';
 import {
   applyInInvalidationGroup,
@@ -244,7 +252,7 @@ type CaptureBucket = {
   positionIds: Set<number>;
   baselineValues: Map<number, unknown>;
   effects: PendingEffectMap;
-  collectionOrders: Map<number, Omit<OrderChangeCapture, 'meta'>>;
+  collectionOrders: Map<number, TurnOrderRecord>;
 };
 
 export type TransactionTurnRecord = {
@@ -1256,6 +1264,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
   const pendingCapture = createCaptureBucket();
   const pendingTransactions = new Map<number, CaptureBucket>();
   const pendingOrderDeltas = new Map<number, CollectionOrderDelta[]>();
+  /** Each pending turn's order-frontier transitions on collections it changed
+   * without reordering survivors; a rollback reinstates the earlier token. */
+  const pendingFrontiers = new Map<number, TurnFrontierTransition[]>();
   const pendingCreatedListeners = new Set<TransactionLifecycleListener>();
   const pendingConfirmedListeners = new Set<TransactionLifecycleListener>();
   const pendingDiscardedListeners = new Set<TransactionLifecycleListener>();
@@ -1448,7 +1459,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
     positionIds: number[];
     baselineValues: Map<number, unknown>;
     effects: TurnEffect[];
-    collectionOrders: Array<Omit<OrderChangeCapture, 'meta'>>;
   } => {
     bucket.ownWriteSeq.clear();
     const subjectIds = Array.from(bucket.subjectIds).sort((a, b) => a - b);
@@ -1464,16 +1474,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
     bucket.effects.clear();
     forgetTransientRows(bucket.effects);
     bucket.entityFootprints.clear();
-    // The bucket copied both subject lists when it captured them and is cleared
-    // here, so the drained entries are already exclusively owned.
-    const collectionOrders = Array.from(bucket.collectionOrders.values());
     bucket.collectionOrders.clear();
     return {
       subjectIds,
       positionIds,
       baselineValues,
       effects,
-      collectionOrders,
     };
   };
 
@@ -1670,9 +1676,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
       !(
         !subjectIds?.length &&
         positionIds?.[0] !== undefined &&
-        (getTreeScalarSlotRuntime(tree) ??
-          getTreeScalarSlotRuntime(tree.$))?.resolveScalarSlot(positionIds[0]) !==
-          undefined
+        (
+          getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$)
+        )?.resolveScalarSlot(positionIds[0]) !== undefined
       )
     ) {
       const position = positionIds?.[0];
@@ -1929,21 +1935,41 @@ export function getOrCreateInternalTransactionRuntime<T>(
       if (transactionId === undefined) {
         return;
       }
+      const bucket = getTransactionBucket(transactionId);
+      // Frontier-only transitions and reorders alike, in time order: the
+      // turn's own order endpoints are composed at drain (turn-order-record).
+      recordOrderTransition(bucket.collectionOrders, capture);
       if (!carriesOrders(capture)) {
         return;
       }
-      const bucket = getTransactionBucket(transactionId);
-      const existing = bucket.collectionOrders.get(capture.owner);
-      bucket.collectionOrders.set(capture.owner, {
-        owner: capture.owner,
-        ownerPath: capture.ownerPath,
-        beforeSubjects: existing?.beforeSubjects ?? [...capture.beforeSubjects],
-        afterSubjects: [...capture.afterSubjects],
-        beforeFrontier: existing?.beforeFrontier ?? capture.beforeFrontier,
-        afterFrontier: capture.afterFrontier,
-      });
       bucket.positionIds.add(capture.owner);
     }) ?? null;
+
+  /** The bucket's order changes as deltas, and its frontier transitions. */
+  const turnOrdersOf = (
+    bucket: CaptureBucket
+  ): {
+    orderDeltas: CollectionOrderDelta[];
+    frontiers: TurnFrontierTransition[];
+  } => {
+    const { changes, frontiers } = drainTurnOrders(
+      bucket.collectionOrders,
+      [...bucket.effects.values()],
+      bucket.effects
+    );
+    return {
+      orderDeltas: changes.map((order) =>
+        deriveCollectionOrderDelta(
+          order.owner,
+          order.beforeSubjects,
+          order.afterSubjects,
+          order.beforeFrontier,
+          order.afterFrontier
+        )
+      ),
+      frontiers,
+    };
+  };
 
   const materializePendingTransaction = (
     transactionId: number,
@@ -1968,15 +1994,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       bucket.effects
     );
     const baselineValues = new Map(bucket.baselineValues);
-    const orderDeltas = [...bucket.collectionOrders.values()].map((order) =>
-      deriveCollectionOrderDelta(
-        order.owner,
-        order.beforeSubjects,
-        order.afterSubjects,
-        order.beforeFrontier,
-        order.afterFrontier
-      )
-    );
+    const { orderDeltas, frontiers } = turnOrdersOf(bucket);
     const pending = authority.createPending(
       reservedId,
       subjectIds.length > 0 ? subjectIds : undefined,
@@ -1990,6 +2008,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
     if (pending && orderDeltas.length > 0) {
       pendingOrderDeltas.set(pending.id, orderDeltas);
     }
+    if (pending && frontiers.length > 0) {
+      pendingFrontiers.set(pending.id, frontiers);
+    }
     return pending;
   };
 
@@ -2001,6 +2022,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     effects: TurnEffect[];
     baselineValues: Map<number, unknown>;
     orderDeltas: CollectionOrderDelta[];
+    frontiers: TurnFrontierTransition[];
   } => {
     const bucket = pendingTransactions.get(transactionId);
     if (!bucket) {
@@ -2010,6 +2032,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
         effects: [],
         baselineValues: new Map(),
         orderDeltas: [],
+        frontiers: [],
       };
     }
     // Keep the capture until compensation succeeds or refusal is committed.
@@ -2020,21 +2043,14 @@ export function getOrCreateInternalTransactionRuntime<T>(
       bucket.effects
     );
     const baselineValues = new Map(bucket.baselineValues);
-    const collectionOrders = [...bucket.collectionOrders.values()];
+    const { orderDeltas, frontiers } = turnOrdersOf(bucket);
     return {
       captured: true,
       positionIds,
       effects,
       baselineValues,
-      orderDeltas: collectionOrders.map((order) =>
-        deriveCollectionOrderDelta(
-          order.owner,
-          order.beforeSubjects,
-          order.afterSubjects,
-          order.beforeFrontier,
-          order.afterFrontier
-        )
-      ),
+      orderDeltas,
+      frontiers,
     };
   };
 
@@ -2251,9 +2267,33 @@ export function getOrCreateInternalTransactionRuntime<T>(
      * write recorded under transaction 1 while its own compensation announced
      * 2, and the join silently missed.
      */
-    owningTransactionId: number = transactionId
+    owningTransactionId: number = transactionId,
+    /**
+     * (d) The turn's frontier transitions on collections it changed without
+     * an order delta: where a collection is still at the token the turn
+     * left, the rollback restores exactly the order the earlier token named,
+     * so it reinstates that token (invariant 3).
+     */
+    frontiers: readonly TurnFrontierTransition[] = []
   ): void => {
+    const bindings = new Map<number, CollectionTransitionTargetBinding>();
+    if (frontiers.length > 0) {
+      visitTree(tree.$, (node) => {
+        const binding = (
+          node as {
+            __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+          }
+        ).__prepareTransitionTarget;
+        if (binding) bindings.set(binding.owner, binding);
+        return undefined;
+      });
+    }
+    const reinstateFrontiers = prepareFrontierReinstatement(
+      frontiers.map((transition) => frontierStepOf(transition, 'undo')),
+      (owner) => bindings.get(owner)
+    );
     if (effects.length === 0 && orderDeltas.length === 0) {
+      reinstateFrontiers();
       return;
     }
 
@@ -2269,6 +2309,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
         },
         () => rollbackPendingTarget(effects, orderDeltas)
       );
+      reinstateFrontiers();
       return;
     }
 
@@ -2344,6 +2385,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
         callbackError,
       });
     }
+    reinstateFrontiers();
   };
 
   try {
@@ -2696,6 +2738,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             effects,
             baselineValues,
             orderDeltas,
+            frontiers,
           } = prepareTransactionRollbackInput(transactionId);
           rollbackPositionIds = positionIds;
           rollbackSubjectIds = effects
@@ -2703,13 +2746,19 @@ export function getOrCreateInternalTransactionRuntime<T>(
             .filter(
               (subjectId): subjectId is number => subjectId !== undefined
             );
-          if (effects.length > 0 || orderDeltas.length > 0) {
+          if (
+            effects.length > 0 ||
+            orderDeltas.length > 0 ||
+            frontiers.length > 0
+          ) {
             rollbackPendingEffectsThroughRealizationPort(
               transactionId,
               effects,
               baselineValues,
               orderDeltas,
-              callbackFailed ? cause : undefined
+              callbackFailed ? cause : undefined,
+              transactionId,
+              frontiers
             );
           }
           compensated = captured;
@@ -3006,6 +3055,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           } finally {
             if (pendingTurnId !== undefined) {
               pendingOrderDeltas.delete(pendingTurnId);
+              pendingFrontiers.delete(pendingTurnId);
             }
             // The physical state this transaction authored is committed truth,
             // so its durable consequences run — last, so a throwing storage
@@ -3111,13 +3161,21 @@ export function getOrCreateInternalTransactionRuntime<T>(
             pendingTurnId === undefined
               ? []
               : pendingOrderDeltas.get(pendingTurnId) ?? [];
+          const frontiers =
+            pendingTurnId === undefined
+              ? []
+              : pendingFrontiers.get(pendingTurnId) ?? [];
 
           // ── PHASE 1 — attempt, with the turn STILL PENDING. ───────────────
           // A consumer that throws after compensation was installed is a
           // delivery failure, not a refusal: the reversal happened, so the turn
           // retires below and the consumer's error is rethrown afterwards.
           let deliveryFailure: { error: unknown } | undefined;
-          if (compensation.length > 0 || orderDeltas.length > 0) {
+          if (
+            compensation.length > 0 ||
+            orderDeltas.length > 0 ||
+            frontiers.length > 0
+          ) {
             // Read, do not retire. `peekPending` exists for exactly this.
             const pendingRecord =
               pendingTurnId === undefined
@@ -3132,7 +3190,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
                   pendingRecord?.__baselineValues ?? new Map(),
                   orderDeltas,
                   undefined,
-                  transactionId
+                  transactionId,
+                  frontiers
                 );
               } finally {
                 transactionState.compensating = false;
@@ -3195,6 +3254,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
               if (pendingTurnId !== undefined) {
                 discardedTurn = authority.discardPending(pendingTurnId);
                 pendingOrderDeltas.delete(pendingTurnId);
+                pendingFrontiers.delete(pendingTurnId);
               }
             } finally {
               activeTransactions.delete(transactionId);
@@ -3224,7 +3284,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
           if (discardedTurn) {
             notifyListeners(pendingDiscardedListeners, discardedTurn);
           }
-          if (deliveryFailure) throw applicationFailureCause(deliveryFailure.error);
+          if (deliveryFailure)
+            throw applicationFailureCause(deliveryFailure.error);
         },
       };
     },
@@ -3297,6 +3358,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       unsubscribeCollectionOrders = null;
       restoreLeafInterceptors = null;
       pendingOrderDeltas.clear();
+      pendingFrontiers.clear();
       activeTransactions.clear();
     });
   }
