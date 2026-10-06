@@ -144,7 +144,7 @@ function createPendingRollbackEffects(
     }
   });
 
-  return placeFieldReversalsAfterReAdds(
+  return placeFieldReversalsWhileRowsExist(
     turn.effects
       .filter((effect, index) => {
         if (effect.subjectId !== undefined) {
@@ -180,45 +180,55 @@ function createPendingRollbackEffects(
 }
 
 /**
- * Orders a rollback so each re-added row receives its field reversals AFTER
- * it is back. Capture order is not usable for this: a field write precedes the
- * removal it is reversed across, and composition can leave the removal in an
- * earlier slot (rekey then remove keeps the rekey's). A field reversal ahead of
- * its row's re-add reaches a row that is not there and the rollback refuses.
+ * Orders a reversal so every field reversal lands while its row EXISTS: after
+ * the row's re-add, before the row's removal. Capture order is not usable for
+ * this. A field write precedes the removal it is reversed across, composition
+ * can leave a removal in an earlier slot (rekey then remove keeps the rekey's),
+ * and a row created in the turn is REMOVED by its reversal after being written.
+ * A field reversal outside its row's lifetime reaches a row that is not there:
+ * undo/rollback refused ("structural-drift", "Value effect has no active
+ * subject").
  *
  * Scoped by owner AND lifetime: lifetimes are allocated per collection, so a
- * bare lifetime would attach one collection's field reversal to another's
- * re-add. Everything else keeps its relative order.
+ * bare lifetime would attach one collection's field reversal to another's row.
+ * Everything else keeps its relative order.
  */
-export function placeFieldReversalsAfterReAdds<T extends ReversalEffect>(
+export function placeFieldReversalsWhileRowsExist<T extends ReversalEffect>(
   effects: readonly T[]
 ): readonly T[] {
-  const reAdded = new Map<string, T[]>();
+  const rows = new Map<string, T[]>();
   const scopeOf = (effect: T) => `${effect.owner}\u0000${effect.subjectId}`;
+  const isRowEffect = (effect: T) =>
+    (effect.structural === 'add' || effect.structural === 'remove') &&
+    effect.subjectId !== undefined;
   for (const effect of effects) {
-    if (effect.structural === 'add' && effect.subjectId !== undefined) {
+    if (isRowEffect(effect)) {
       const scope = scopeOf(effect);
-      if (!reAdded.has(scope)) reAdded.set(scope, []);
+      if (!rows.has(scope)) rows.set(scope, []);
     }
   }
-  if (reAdded.size === 0) return effects;
+  if (rows.size === 0) return effects;
   const followersOf = (effect: T): T[] | undefined =>
     effect.structural === undefined && effect.subjectId !== undefined
-      ? reAdded.get(scopeOf(effect))
+      ? rows.get(scopeOf(effect))
       : undefined;
   for (const effect of effects) followersOf(effect)?.push(effect);
   const ordered: T[] = [];
   for (const effect of effects) {
     if (followersOf(effect)) continue;
+    const scope = isRowEffect(effect) ? scopeOf(effect) : undefined;
+    if (scope !== undefined && effect.structural === 'remove') {
+      appendAll(ordered, rows.get(scope) ?? []);
+      rows.set(scope, []);
+    }
     ordered.push(effect);
-    if (effect.structural === 'add' && effect.subjectId !== undefined) {
-      const scope = scopeOf(effect);
-      appendAll(ordered, reAdded.get(scope) ?? []);
-      // Unreachable today: neither caller re-adds one scope twice. If one ever
-      // does, ALL of that scope's followers are consolidated after its FIRST
-      // re-add, whatever their capture position — a follower captured after
-      // the second re-add is emitted before it — and none is emitted twice.
-      reAdded.set(scope, []);
+    if (scope !== undefined && effect.structural === 'add') {
+      appendAll(ordered, rows.get(scope) ?? []);
+      // Unreachable today: neither caller adds or removes one scope twice. If
+      // one ever does, ALL of that scope's followers are consolidated at its
+      // FIRST add/remove, whatever their capture position — a follower
+      // captured after a later one is emitted before it — and none twice.
+      rows.set(scope, []);
     }
   }
   return ordered;

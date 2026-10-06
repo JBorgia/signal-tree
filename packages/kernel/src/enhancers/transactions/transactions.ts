@@ -61,7 +61,7 @@ import {
   type ScalarTransitionTargetBinding,
 } from '../../lib/internals/causal-runtime/target-transition';
 import {
-  placeFieldReversalsAfterReAdds,
+  placeFieldReversalsWhileRowsExist,
   rollbackPendingTurnAt,
 } from '../../lib/internals/causal-runtime/pending-rollback';
 import {
@@ -1986,7 +1986,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // Field reversals follow their row's re-add. In capture order they reached
     // a removed row first and update-then-remove refused ("Value effect has no
     // active subject") whenever this declarative path was taken.
-    const reversalEffects = placeFieldReversalsAfterReAdds(
+    const reversalEffects = placeFieldReversalsWhileRowsExist(
       effects.map(toRollbackEffect)
     );
     const bindings = new Map<number, CollectionTransitionTargetBinding>();

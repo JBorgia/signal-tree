@@ -1,5 +1,5 @@
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
-import { placeFieldReversalsAfterReAdds } from '../../lib/internals/causal-runtime/pending-rollback';
+import { placeFieldReversalsWhileRowsExist } from '../../lib/internals/causal-runtime/pending-rollback';
 import {
   applyInInvalidationGroup,
   applicationFailureCause,
@@ -1830,7 +1830,7 @@ class RestorationManager<T> {
         direction === 'undo'
           ? [...(turn.__effects ?? [])].reverse()
           : [...(turn.__effects ?? [])];
-      const reversalEffects = placeFieldReversalsAfterReAdds(
+      const reversalEffects = placeFieldReversalsWhileRowsExist(
         effects.map((effect) => toReversalEffect(effect, direction))
       );
       const collectionOwners = new Set([
@@ -1909,7 +1909,7 @@ class RestorationManager<T> {
           states[historyIndex] = natural;
         }
       }
-      const reversalEffects = placeFieldReversalsAfterReAdds(
+      const reversalEffects = placeFieldReversalsWhileRowsExist(
         [...event.effects]
           .reverse()
           .map((effect) => toReversalEffect(effect, 'undo'))
@@ -2685,7 +2685,7 @@ export function restoration(
       // chronological — rekey-then-remove composes into one removal that keeps
       // the rekey's EARLIER slot — so reversing it put the field reversal
       // before the row was back, and undo refused as structural drift.
-      const reversalEffects = placeFieldReversalsAfterReAdds(
+      const reversalEffects = placeFieldReversalsWhileRowsExist(
         applications.flatMap((application) =>
           application.effects.map((effect) =>
             toReversalEffect(effect, application.direction)

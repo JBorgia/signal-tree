@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { signalTree } from '../../lib/signal-tree';
 import { entityMap } from '../../lib/markers/entity-map';
 import { undoable } from '../../lib/undoable';
-import { SignalTreeRollbackError } from '../../lib/types';
 import { transactions } from '../transactions/transactions';
 import { restoration } from './restoration';
 
@@ -205,71 +204,28 @@ const removeReAddUpdate = (tree: Tree) => {
   tree.$.rows.addOne({ id: 'a', n: 5 });
   tree.$.rows.updateOne('a', { n: 6 });
 };
-const REMOVED_READDED_UPDATED: Row[] = [
-  { id: 'z', n: 0 },
-  { id: 'c', n: 3 },
-  { id: 'a', n: 6 },
-];
-const ROLLBACK_REFUSAL =
-  /^SignalTree could not rollback the pending transaction: compensating turn \d+ failed validation — Value effect has no active subject \d+ in owner \d+ \[effect-validation-failed\]$/;
-
 describe.each(rollbackConfigurations)(
   'known pre-existing rollback limitations (%s)',
   (_name, enhancers) => {
+    // FIXED (was pre-existing on 15.4.3: the declarative rollback target
+    // applied the field reversal of a row created in the turn AFTER that row's
+    // removal and refused with "Value effect has no active subject").
     it.each([
-      [
-        'removeOne a, re-add a, updateOne a',
-        removeReAddUpdate,
-        REMOVED_READDED_UPDATED,
-      ],
-      [
-        'add x and y, update x, removeMany a and c',
-        addUpdateRemoveMany,
-        ADDED_AND_REMOVED,
-      ],
-    ] as const)(
-      'KNOWN LIMITATION (pre-existing on 15.4.3): %s — current behaviour: rollback refuses ("Value effect has no active subject") and changes nothing',
-      async (_case, act, during) => {
-        const tree = make(enhancers());
-        try {
-          await seed(tree);
-          const pending = tree.transaction(() => act(tree));
-          await flush();
-          const error = thrownBy(() => pending.rollback());
-          expect(error).toBeInstanceOf(SignalTreeRollbackError);
-          expect((error as SignalTreeRollbackError).message).toMatch(
-            ROLLBACK_REFUSAL
-          );
-          expect((error as { code?: string }).code).toBe(
-            'SIGNALTREE_ROLLBACK_FAILED'
-          );
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual(during);
-        } finally {
-          tree.destroy();
-        }
-      }
-    );
-
-    it.fails.each([
       ['removeOne a, re-add a, updateOne a', removeReAddUpdate],
       ['add x and y, update x, removeMany a and c', addUpdateRemoveMany],
-    ] as const)(
-      'KNOWN LIMITATION (pre-existing on 15.4.3): %s — desired: rollback restores',
-      async (_case, act) => {
-        const tree = make(enhancers());
-        try {
-          await seed(tree);
-          const pending = tree.transaction(() => act(tree));
-          await flush();
-          pending.rollback();
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual(SEEDED);
-        } finally {
-          tree.destroy();
-        }
+    ] as const)('%s: rollback restores', async (_case, act) => {
+      const tree = make(enhancers());
+      try {
+        await seed(tree);
+        const pending = tree.transaction(() => act(tree));
+        await flush();
+        pending.rollback();
+        await flush();
+        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+      } finally {
+        tree.destroy();
       }
-    );
+    });
   }
 );
 
