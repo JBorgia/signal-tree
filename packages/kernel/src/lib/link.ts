@@ -99,7 +99,10 @@ export interface LinkEndpoint<T> {
 export interface Link {
   /** Pull Y into X once. Rejects if the endpoint supplies no `get()`. */
   retrieve(): Promise<void>;
-  /** Resolves when every outbound write in flight has been acknowledged. */
+  /**
+   * Resolves when every outbound write in flight has been acknowledged,
+   * including one caused by a write still queued for delivery.
+   */
   settled(): Promise<void>;
   /** Stop synchronizing. Idempotent. */
   dispose(): void;
@@ -931,7 +934,21 @@ export function link<S>(
         }
         // An order capture can append a send while the previous chain drains.
         if (chain !== awaitedChain) continue;
-        if (held.size === 0) break;
+        if (held.size === 0) {
+          // REACTIVE WRITES. A subscriber handling an earlier write may have
+          // written again; that write is still queued and reaches this
+          // relationship only at a later flush, one per hop. Await that flush
+          // (a microtask, never I/O) and look again. The queue is shared by
+          // every tree, deliberately: a hop can pass through another tree.
+          if (!notifier.hasPending()) break;
+          await new Promise<void>((resolve) => {
+            const off = notifier.onFlush(() => {
+              off();
+              resolve();
+            });
+          });
+          continue;
+        }
         // The RELEASE SIGNAL, not a poll. Every appended send is preceded by a
         // held observation, so this also carries the loop across work enqueued
         // behind a completed send.
