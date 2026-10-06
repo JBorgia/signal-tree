@@ -1395,8 +1395,14 @@ describe('restoration enhancer', () => {
     // message instead. Asserting the machine-readable field rather than the
     // sentence — and the legibility difference is recorded as a follow-up rather
     // than quietly accepted.
+    // 15.4.4: refused by the PLANNER as a dependency, before compensation is
+    // tried: the occupier depended on the rename vacating key 7. Through
+    // 15.4.3 this shape refused only because the compensating rename failed
+    // validation (`effect-validation-failed`); the same shape with the
+    // occupier removed again was accepted and left history holding two
+    // lifetimes at key 7 (vacated-key-rollback.spec.ts). Still atomic.
     expectRollbackError(() => pending.rollback(), {
-      kind: 'effect-validation-failed',
+      kind: 'later-confirmed-dependency',
     });
     expect(store.$.rows.ids()).toEqual([42, 7]);
     expect(store.$.rows.byIdOrFail(42).name()).toBe('target');
