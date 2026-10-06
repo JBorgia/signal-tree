@@ -37,6 +37,33 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   `prependMany` strict throws before writing, skip keeps the first copy,
   overwrite keeps the last in the first copy's place; `upsertMany` merges the
   copies). It used to insert two rows under one key.
+- Behaviour change behind the `upsertMany` repair: in an observed tree (with
+  `transactions()` or `restoration()`), each row `upsertMany` adds now
+  publishes a structural `add` effect in its notify meta, anchored as
+  `addMany`'s appended rows are. It was announced as a bare value write, which
+  is why its undo threw and its rollback left it.
+- With an id named more than once in one call, interceptors run once per
+  copy, in input order, as successive single calls would: `addMany` /
+  `prependMany` overwrite intercept every copy (`onAdd`) and write the last
+  intercepted value; skip intercepts only the first copy; `upsertMany` runs
+  `onAdd` for a new id's first copy and `onUpdate` with each later raw copy,
+  merged over the running value. Validation and strict refusals still come
+  first, with nothing intercepted or written, and a block on any copy fails
+  the whole call. Taps and path notifications still report each key once,
+  with its final value.
+- `removeMany` and `updateMany` with a repeated id are idempotent, on purpose
+  and unchanged: the row is removed or updated once and announced once (a
+  repeat does not throw as a second `removeOne` would), while every listing is
+  still intercepted and tapped. Now documented and carried.
+- An interceptor of `addOne`, `addMany` or `upsertMany` that writes to the
+  same collection no longer leaves the call's anchor stale: a row it appended
+  is no longer skipped over on redo, and a last row it removed no longer comes
+  back as an empty member (`ids()` listed it with no value).
+- Taps of `prependMany` and `prependOne` run after the rows have moved to the
+  front, so a tap sees the call's result and its own writes are reversible: a
+  row it adds is anchored to the committed order (redo misplaced it, and a
+  nested `prependMany` made redo throw). A row a tap prepends now lands ahead
+  of the call's rows rather than behind them.
 - Rollback of a transaction that edited an existing row no longer refuses
   after settled later work removed that row (even a plain `removeOne`): the
   row's compensation is skipped, the rest reverses, the row stays absent. An
