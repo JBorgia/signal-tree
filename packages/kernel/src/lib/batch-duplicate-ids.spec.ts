@@ -267,7 +267,9 @@ describe('duplicate ids in one call: path notifications', () => {
     const seen: Array<[string, unknown, unknown]> = [];
     const unsubscribe = getPathNotifier().subscribe(
       'rows.*',
-      (value, prev, path) => seen.push([path, value, prev])
+      (value, prev, path) => {
+        seen.push([path, value, prev]);
+      }
     );
     try {
       await seed(tree);
