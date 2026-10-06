@@ -69,7 +69,10 @@ type Rows = {
   setActiveId(id: string | undefined): void;
   addOne(row: Row): string;
   prependOne(row: Row): string;
-  addMany(rows: Row[]): string[];
+  addMany(
+    rows: Row[],
+    opts?: { mode?: 'strict' | 'skip' | 'overwrite' }
+  ): string[];
   prependMany(rows: Row[]): string[];
   upsertOne(row: Row): string;
   upsertMany(rows: Row[]): string[];
@@ -513,11 +516,22 @@ describe('reads during a whole value agree with each other (v16 8e review)', () 
     const look = () => seen.push(other.$.a.rows.byId('a'));
     tree.$.a.rows.tap({ onAdd: look, onRemove: look });
     await flush();
-    undoable(() => tree.$.a.rows.addOne(Z));
+    undoable(() => {
+      tree.$.count(1);
+      tree.$.a.rows.addOne(Z);
+    });
     await flush();
+    // Not only a tap (which reads absent-aware anyway, 8f): a location's
+    // listener runs inside the reversal's physical-rows window too.
+    const listen = (
+      tree.$.count as unknown as {
+        subscribe(listener: () => void): () => void;
+      }
+    ).subscribe(look);
     seen.length = 0;
     tree.undo();
-    expect(seen.length).toBeGreaterThan(0);
+    listen();
+    expect(seen.length).toBeGreaterThan(1);
     expect(seen.every((row) => row === undefined)).toBe(true);
   });
 });

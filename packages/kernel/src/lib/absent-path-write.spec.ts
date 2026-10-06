@@ -341,7 +341,10 @@ describe('writes under an omitted member re-add the path, siblings stay absent',
     );
     const tree = signalTree({ g: { users: { [DYN]: true } }, count: 0 }, {
       capabilities: ['causal-runtime', 'position-topology'],
-    } as never) as unknown as { $: Leaf & { g: { users: Leaf & { seed: { v: Leaf } } } }; destroy(): void };
+    } as never) as unknown as {
+      $: Leaf & { g: { users: Leaf & { seed: { v: Leaf } } } };
+      destroy(): void;
+    };
     trees.push(tree);
     const users = tree.$.g.users;
     users();
@@ -758,6 +761,49 @@ describe('one turn that omits a branch and writes under it is reversed exactly (
       pending.rollback();
       await flush();
       expect(h.root()).toEqual(reversedTo);
+    });
+});
+
+describe('one turn that omits a branch and writes under it with an updater (v16 8f)', () => {
+  // Carried from v15's port of 8b-8e (12187613, hidden-location-v15.spec.ts,
+  // case 2): v16 had the same gap. As the plain write above, the updater's
+  // history records what storage held, not the absent value it received.
+  const turn = ($: Leaf & Record<string, unknown>) => {
+    $({ count: 0 });
+    const a = $['a'] as Record<string, unknown>;
+    const b = a['b'] as Record<string, Leaf>;
+    // Absent, so the updater receives undefined; history records storage.
+    b['keep'](((current: unknown) =>
+      current === undefined ? 9 : 99) as unknown);
+  };
+  const reversedTo = { a: { b: { value: 0, keep: 0 }, side: 0 }, count: 0 };
+
+  for (const [order, enhancers] of Object.entries(historyOrders))
+    it(`undo and redo (${order})`, async () => {
+      const tree = signalTree(initial(), {
+        enhancers: enhancers() as never,
+      }) as unknown as HistoryTree & { $: Leaf & Record<string, unknown> };
+      trees.push(tree);
+      undoable(() => turn(tree.$));
+      await flush();
+      expect(tree.$()).toEqual({ a: { b: { keep: 9 } }, count: 0 });
+      tree.undo();
+      expect(tree.$()).toEqual(reversedTo);
+      tree.redo();
+      expect(tree.$()).toEqual({ a: { b: { keep: 9 } }, count: 0 });
+    });
+
+  for (const [order, enhancers] of Object.entries(rollbackOrders))
+    it(`rollback (${order})`, async () => {
+      const tree = signalTree(initial(), {
+        enhancers: enhancers() as never,
+      }) as unknown as TransactTree & { $: Leaf & Record<string, unknown> };
+      trees.push(tree);
+      const pending = tree.transact(() => turn(tree.$));
+      await flush();
+      pending.rollback();
+      await flush();
+      expect(tree.$()).toEqual(reversedTo);
     });
 });
 
