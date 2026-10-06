@@ -36,18 +36,23 @@ export type EntityProjectionSeedEntry<K, E> = {
   readonly row: E;
 };
 
-type SeedProducer = () => readonly EntityProjectionSeedEntry<
+type SeedProducer = (() => readonly EntityProjectionSeedEntry<
   string | number,
   unknown
->[];
+>[]) & { order?: EntityProjectionOrder };
+
+/** The collection's `sortComparer`: the order `all()` exposes its rows in. */
+export type EntityProjectionOrder = (a: unknown, b: unknown) => number;
 
 const SEED = Symbol('signaltree.entityProjectionSeed');
 
 /** @internal Registered by `entityMap` materialization. */
 export function defineEntityProjectionSeed(
   api: object,
-  produce: SeedProducer
+  produce: SeedProducer,
+  order?: EntityProjectionOrder
 ): void {
+  produce.order = order;
   Object.defineProperty(api, SEED, {
     value: produce,
     enumerable: false,
@@ -67,4 +72,18 @@ export function getEntityProjectionSeed(
   return typeof produce === 'function'
     ? (produce as SeedProducer)()
     : undefined;
+}
+
+/**
+ * @internal The comparer `all()` sorts by, or `undefined` for a collection
+ * that exposes storage order (15.4.4). The seed is storage order, because
+ * structural neighbours are; a consumer publishing `all()` sorts its own
+ * values by this.
+ */
+export function getEntityProjectionOrder(
+  node: unknown
+): EntityProjectionOrder | undefined {
+  if (node === null || typeof node !== 'object') return undefined;
+  return ((node as Record<symbol, unknown>)[SEED] as SeedProducer | undefined)
+    ?.order;
 }

@@ -1,4 +1,7 @@
-import type { EntityProjectionSeedEntry } from './entity-projection-seed';
+import type {
+  EntityProjectionOrder,
+  EntityProjectionSeedEntry,
+} from './entity-projection-seed';
 import {
   createEntityTopology,
   type EntityTopology,
@@ -61,7 +64,14 @@ export type EntityEgressProjection = {
 };
 
 export function createEntityEgressProjection(
-  seed: readonly EntityProjectionSeedEntry<Key, unknown>[]
+  seed: readonly EntityProjectionSeedEntry<Key, unknown>[],
+  /**
+   * The collection's `sortComparer` (15.4.4). `all()` sorts by it, so the
+   * published value does too, over ELIGIBLE row values: an inspection edit of
+   * a sort field moves nothing outward. `order` itself stays storage order,
+   * which structural neighbours describe.
+   */
+  sortBy?: EntityProjectionOrder
 ): EntityEgressProjection {
   let topology: EntityTopology = createEntityTopology(seed);
 
@@ -141,7 +151,11 @@ export function createEntityEgressProjection(
   }
 
   return {
-    value: () => order.map((s) => rows.get(s)),
+    value: () => {
+      const value = order.map((s) => rows.get(s));
+      // Stable, like `all()`: equal keys keep storage order.
+      return sortBy ? value.sort(sortBy) : value;
+    },
 
     reseed(entries) {
       topology = createEntityTopology(entries);

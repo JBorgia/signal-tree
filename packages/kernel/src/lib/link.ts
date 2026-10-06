@@ -15,7 +15,10 @@ import { reportTreeError } from './internals/error-reporter';
 import { getPositionRegistry } from './internals/position-registry';
 import { acquireObservation } from './internals/observation-substrate';
 import { isInspectionWrite } from './write-participation';
-import { getEntityProjectionSeed } from './internals/entity-projection-seed';
+import {
+  getEntityProjectionOrder,
+  getEntityProjectionSeed,
+} from './internals/entity-projection-seed';
 import { activateEntityMembership } from './internals/entity-membership-inventory';
 import { getActiveWriteContext } from './write-context';
 import {
@@ -334,7 +337,10 @@ export function link<S>(
    * `eligible` above and from the same current truth.
    */
   const entityProjection: EntityEgressProjection | undefined = collection
-    ? createEntityEgressProjection(getEntityProjectionSeed(x) ?? [])
+    ? createEntityEgressProjection(
+        getEntityProjectionSeed(x) ?? [],
+        getEntityProjectionOrder(x)
+      )
     : undefined;
 
   /**
@@ -402,7 +408,9 @@ export function link<S>(
       const address: LinkedAddress = {
         segments,
         projection:
-          seed && node !== x ? createEntityEgressProjection(seed) : undefined,
+          seed && node !== x
+            ? createEntityEgressProjection(seed, getEntityProjectionOrder(node))
+            : undefined,
       };
       if (address.projection)
         nestedCollections.push({
