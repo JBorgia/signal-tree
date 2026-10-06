@@ -1372,25 +1372,30 @@ export function createDevToolsEnhancer(
      * order, number or date formatting, dropped `undefined`), or it is older
      * than the window, it reads as unrecorded: the interceptors run, and a
      * blocking one refuses the jump. Never the other way round.
+     *
+     * Each hash keeps the state it was serialized from, so a jump replays it
+     * as recorded, members it left out included (v15 port review, item 5):
+     * the serialized form cannot tell an omitted member from one holding
+     * `undefined`, and a merge of it left an omitted member present.
      */
-    const recordedStates = new Set<number>();
+    const recordedStates = new Map<number, unknown>();
     const recordWindow = Math.min(
       Math.max(1, config.maxAge ?? 50),
       RECORDED_STATE_LIMIT
     );
-    const recordJson = (json: string | undefined): void => {
+    const recordJson = (json: string | undefined, raw: unknown): void => {
       if (json === undefined) return;
       const hash = jsonHash(json);
       recordedStates.delete(hash);
-      recordedStates.add(hash);
+      recordedStates.set(hash, raw);
       if (recordedStates.size > recordWindow) {
-        recordedStates.delete(recordedStates.values().next().value as number);
+        recordedStates.delete(recordedStates.keys().next().value as number);
       }
     };
     /** Aggregated mode's serializer: it has no JSON of its own to reuse. */
     const buildSerializedState = (rawState: unknown): unknown => {
       const serialized = serializeState(rawState);
-      recordJson(stateJson(serialized));
+      recordJson(stateJson(serialized), rawState);
       return serialized;
     };
 
@@ -1423,7 +1428,7 @@ export function createDevToolsEnhancer(
         currentSerializedJson = JSON.stringify(sanitized);
         // The same string the change check needs: recorded without a second
         // stringify (15.4.4).
-        recordJson(currentSerializedJson);
+        recordJson(currentSerializedJson, currentSnapshot);
       } catch {
         currentSerializedJson = '';
       }
@@ -1578,7 +1583,7 @@ export function createDevToolsEnhancer(
       browserDevTools.send('@@INIT', serialized);
       lastSnapshot = rawSnapshot;
       lastSerializedJson = stateJson(serialized);
-      recordJson(lastSerializedJson);
+      recordJson(lastSerializedJson, rawSnapshot);
       lastSendAt = Date.now();
 
       // Clear pending state as it's now part of the init snapshot
@@ -1599,7 +1604,8 @@ export function createDevToolsEnhancer(
     const applyInspectionState = (state: unknown, replays = false): void => {
       if (state === undefined || state === null) return;
       const json = replays ? stateJson(state) : undefined;
-      const verified = json !== undefined && recordedStates.has(jsonHash(json));
+      const hash = json === undefined ? undefined : jsonHash(json);
+      const verified = hash !== undefined && recordedStates.has(hash);
       isApplyingInspectionState = true;
       try {
         // Tag every leaf write performed during this replay with
@@ -1625,7 +1631,21 @@ export function createDevToolsEnhancer(
           { intent: 'system', origin: 'devtools', participation: 'inspection' },
           () => {
             if ('$' in tree) {
-              applyState((tree as ISignalTree<T>).$ as TreeNode<T>, state as T);
+              const $ = (tree as ISignalTree<T>).$ as TreeNode<T>;
+              // A recorded state, as recorded: a whole value, so the members
+              // it left out are omitted again. Anything else merges, as an
+              // import always has.
+              if (verified) {
+                try {
+                  ($ as unknown as (value: unknown) => void)(
+                    recordedStates.get(hash as number)
+                  );
+                  return;
+                } catch {
+                  // fall back to the merge
+                }
+              }
+              applyState($, state as T);
             } else {
               rootAuthority.replace(state as T);
             }
@@ -1668,7 +1688,7 @@ export function createDevToolsEnhancer(
           browserDevTools.send({ type: 'SignalTree/reconnect' }, serialized);
           lastSnapshot = rawSnapshot;
           lastSerializedJson = stateJson(serialized);
-          recordJson(lastSerializedJson);
+          recordJson(lastSerializedJson, rawSnapshot);
           lastSendAt = Date.now();
         }
         return;

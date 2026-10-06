@@ -350,6 +350,11 @@ const tree = signalTree(state, {
 const session = tree.exportDebugSession();
 ```
 
+A timeline jump (`JUMP_TO_STATE`, `JUMP_TO_ACTION`, `ROLLBACK`) to a state
+the tree recorded applies that state as recorded, as a whole value: a member
+it left out is omitted again. Any other state, and `IMPORT_STATE`, is merged
+into the tree: a key it leaves out keeps its current value.
+
 ## External Truth
 
 `external()` classifies synchronous writes whose authoritative decision came
