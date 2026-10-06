@@ -36,7 +36,10 @@ import { restoration } from './restoration';
  * unrelated row, as a rollback refuses to: undo or redo refuses with a typed
  * ST1034 restoration refusal naming the collection, the key and the newer
  * row, and changes nothing. Owner decision; da335eb6 had left the newer row
- * and skipped the redo instead.
+ * and skipped the redo instead. Any other row at the key refuses the same
+ * way, an older one renamed onto it included, and the refusal says "another
+ * row" (undo-rules review item 3; ordinary-removal-provenance.spec.ts, which
+ * also carries which removals count as ordinary).
  */
 type Row = { id: string; n: number };
 const flush = async () => {
@@ -323,7 +326,7 @@ const expectNewerRowRefusal = async (
   const index = tree.getCurrentIndex();
   try {
     expect(step).toThrow(
-      "ST1034: restoration refused — key 'a' of 'rows' is held by a newer row"
+      "ST1034: restoration refused — key 'a' of 'rows' is held by another row"
     );
     await flush();
     expect(read()).toBe(before);
