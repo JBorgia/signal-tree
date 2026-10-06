@@ -382,3 +382,97 @@ describe('updateMany: interceptors writing each other\'s rows', () => {
     }
   });
 });
+
+/**
+ * Round-4 probes C1, C3 and D, as carriers: what the staging refusal allows.
+ * An interceptor may write fields of the row being updated (also through a
+ * nested updateMany of that row), rename a row the call does not name, write
+ * an unnamed row's fields, and write another collection - for every call.
+ */
+describe('what the staging refusal allows', () => {
+  it.each([
+    ['restoration()', () => [restoration()]],
+    ['transactions(), restoration()', () => [transactions(), restoration()]],
+    ['restoration(), transactions()', () => [restoration(), transactions()]],
+  ] as const)('C1 %s: an interceptor\'s write to its own row is kept; undo and redo exact', async (_name, enhancers) => {
+    const tree = make(enhancers());
+    try {
+      await seed(tree);
+      let fired = false;
+      tree.$.rows.intercept({
+        onUpdate: (id) => {
+          if (fired) return;
+          fired = true;
+          tree.$.rows.updateOne(id, { q: 7 } as Partial<Row>);
+        },
+      });
+      undoable(() => tree.$.rows.updateMany(['a'], { n: 5 }));
+      await flush();
+      const after = [{ id: 'z', n: 0 }, { id: 'a', n: 5, q: 7 }, { id: 'c', n: 3 }];
+      expect(tree.$.rows.all()).toStrictEqual(after);
+      tree.undo();
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+      tree.redo();
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(after);
+    } finally {
+      tree.destroy();
+    }
+  });
+
+  it('C3: a nested updateMany of the same row from its interceptor', async () => {
+    const tree = make();
+    try {
+      await seed(tree);
+      let depth = 0;
+      tree.$.rows.intercept({
+        onUpdate: (id) => {
+          if (depth++ < 1) tree.$.rows.updateMany([String(id)], { q: depth } as Partial<Row>);
+        },
+      });
+      tree.$.rows.updateMany(['a'], { n: 5 });
+      expect(tree.$.rows.byId('a')?.()).toStrictEqual({ id: 'a', n: 5, q: 1 });
+    } finally {
+      tree.destroy();
+    }
+  });
+
+  type Other = { id: string; n: number };
+  const allowed: Record<string, (tree: Tree, other: { addOne(row: Other): unknown }) => void> = {
+    'renames an unnamed row': (tree) => tree.$.rows.changeId('c', 'c2'),
+    'writes an unnamed row\'s field': (tree) =>
+      tree.$.rows.updateOne('c', { q: 1 } as Partial<Row>),
+    'writes another collection': (_tree, other) => void other.addOne({ id: 'o', n: 1 }),
+  };
+  const calls: Record<string, (tree: Tree) => unknown> = {
+    updateMany: (tree) => tree.$.rows.updateMany(['a'], { n: 5 }),
+    removeMany: (tree) => tree.$.rows.removeMany(['a']),
+    addMany: (tree) => tree.$.rows.addMany([{ id: 'x', n: 5 }]),
+    upsertMany: (tree) => tree.$.rows.upsertMany([{ id: 'a', n: 5 }]),
+  };
+  it.each(
+    Object.keys(calls).flatMap((call) =>
+      Object.keys(allowed).map((write) => [call, write] as const)
+    )
+  )('D: %s, interceptor %s: proceeds', (call, write) => {
+    const tree = signalTree({
+      rows: entityMap<Row, string>({ selectId: (row) => row.id }),
+      other: entityMap<Other, string>({ selectId: (row) => row.id }),
+    });
+    try {
+      for (const row of SEEDED) tree.$.rows.addOne({ ...row });
+      let fired = false;
+      const once = () => {
+        if (fired) return;
+        fired = true;
+        allowed[write](tree as unknown as Tree, tree.$.other);
+      };
+      tree.$.rows.intercept({ onAdd: once, onUpdate: once, onRemove: once });
+      expect(() => calls[call](tree as unknown as Tree)).not.toThrow();
+      expect(fired).toBe(true);
+    } finally {
+      tree.destroy();
+    }
+  });
+});
