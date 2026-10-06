@@ -90,7 +90,8 @@ undo or backend rejection; never blindly retry the whole operation.
 The [15.3.1 failure inventory](transaction-failures-v15.md#known-failures-in-published-1531)
 records missed restored rows, omitted branch keys, same-tick notifications and
 asynchronous Link settlement gaps in that version; it is not a 15.4.0 defect
-inventory. Check the [changelog](../../CHANGELOG.md) for versioned repairs.
+inventory. It also lists Link order and `destroy()` failures found later, which
+15.4.4 repairs. Check the [changelog](../../CHANGELOG.md) for versioned repairs.
 Direct framework effects writing storage have no transaction settlement gate. Applications must
 own reconciliation, idempotency, and durable acknowledgements; neither an error
 nor `settled()` is proof of the remote outcome. A recovery handle that keeps

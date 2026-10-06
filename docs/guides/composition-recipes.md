@@ -600,6 +600,16 @@ await connection.retrieve(); // triggers get() once, now
 connection.dispose();
 ```
 
+Since 15.4.4, `tree.destroy()` also disposes every Link bound to that tree,
+releasing `settled()` waiters and running each endpoint's `subscribe()`
+cleanup once. On earlier versions, dispose each connection before destroying
+its tree.
+
+For a collection, `set` always receives the complete `Row[]` in the tree's
+order. Since 15.4.4 that includes order-only changes (a `setAll()` reorder, a
+prepend, and their undo, redo or rollback) and rows restored or added ahead of
+their neighbours; earlier versions could leave the endpoint in another order.
+
 Supply only the directions you need — `loader`-shaped persistent polling is
 `get` alone; a read-only live feed is `subscribe` alone; two-way sync uses
 both `get`/`subscribe` and `set`. `X` (the tree location `link()` is given)

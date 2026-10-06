@@ -102,6 +102,8 @@ reproduced on 15.3.0 and not fixed by 15.3.1. See the
 
 - **Restored entity rows may not reach Link.** Rollback or undo/redo can restore
   a removed row in the tree while a linked endpoint keeps the row set without it.
+  Version 15.4.0 delivers the restored rows, but until 15.4.4 they could reach
+  the endpoint out of order; see [Link failures found later](#link-failures-found-later).
 - **Omitted branch keys are not restored.** A whole-value plain-object branch
   write that omits an existing key removes it without notifying write
   subscribers. A branch Link can receive state the tree does not hold; explicit
@@ -139,12 +141,43 @@ reproduced on 15.3.0 and not fixed by 15.3.1. See the
   let `settled()` resolve before a later value is sent; and `dispose()` does not
   release a `settled()` waiter until that send settles. Do not treat `settled()`
   as a durability receipt or assume all pending writes stay out of storage.
+  `tree.destroy()` did not dispose Links either; see
+  [Link failures found later](#link-failures-found-later).
 
 A failure inside the internal pending-turn recording step was also outside the
 automatic rollback coverage in 15.3.1 through 15.4.3 (no supported trigger is
 known). 15.4.4 keeps the transaction's capture until its pending turn exists,
 so such a failure is rolled back automatically like any other post-callback
 failure.
+
+## Link failures found later
+
+These were present in published 15.3.1 but are not in its changelog. They were
+found while auditing the 15.4 line, were still present in 15.4.3, and are
+repaired in 15.4.4.
+
+- **Reordering surviving rows never reached Link.** After `setAll([D,C,B,A])`
+  over `[A,B,C,D]`, or a `prependMany()`, the tree held the new order while a
+  linked endpoint kept the old one. In 15.4.4 a linked collection receives its
+  complete `Row[]` in the tree's order after a reorder, a prepend, and the undo,
+  redo, `jumpTo()` or rollback of either. A reorder inside a pending
+  transaction is sent only if the transaction confirms. An inspection-only
+  reorder (devtools) still sends nothing and does not change the order a later
+  authored write publishes.
+- **Restored rows could reach Link out of order.** From `[A,B,C,D]`,
+  `removeMany(['A','B'])` followed by rollback or undo left the tree at
+  `[A,B,C,D]` and sent `[C,D,A,B]`, with or without `restoration()`.
+  `setAll([X,Y,A,B])` over `[A,B]` sent `[A,B,X,Y]`. Rows restored or added
+  ahead of their neighbours now arrive in the tree's order. Same-tick
+  notification merging (above) can still cost Link a value.
+- **`tree.destroy()` did not dispose the tree's Links.** A `settled()` waiter on
+  a send that never settles waited forever, later writes were still sent, and
+  the endpoint's `subscribe()` cleanup never ran. In 15.4.4 `destroy()`
+  disposes every Link bound to the tree exactly as `dispose()` does: waiters are
+  released, held and queued sends are dropped, and each endpoint cleanup runs
+  once. A cleanup that throws no longer escapes `destroy()`; calling
+  `dispose()` directly still throws it. A Link created after `destroy()` is not
+  disposed by it.
 
 ## Evidence
 
@@ -155,6 +188,10 @@ failure.
 - [Overlapping Link rollback tests](../../packages/kernel/src/lib/link-overlapping-rollback.spec.ts)
   cover the candidate's notification repairs; they do not establish blanket
   framework-effect containment or repair the limitations listed above.
+- [Link restore placement](../../packages/kernel/src/lib/link-restore-placement.spec.ts),
+  [Link collection reorder](../../packages/kernel/src/lib/link-collection-reorder.spec.ts)
+  and [Link tree destroy](../../packages/kernel/src/lib/link-tree-destroy.spec.ts)
+  tests pin the 15.4.4 repairs of the later-found Link failures.
 
 - [Packed refusal lifecycle comparison](../../tools/check-v15-refusal-lifecycle.mjs)
   runs the same public fixture against the exact published 15.3.0 tarball and
