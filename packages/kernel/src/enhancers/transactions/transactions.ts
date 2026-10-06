@@ -9,6 +9,8 @@ import {
   frontierStepOf,
   prepareFrontierReinstatement,
   recordOrderTransition,
+  settleTokenOnly,
+  turnOrderDeltas,
   type TurnFrontierTransition,
   type TurnOrderRecord,
 } from '../../lib/internals/causal-runtime/turn-order-record';
@@ -65,7 +67,6 @@ import type {
   ReversalEffect,
 } from '../../lib/internals/causal-runtime/causal-types';
 import {
-  deriveCollectionOrderDelta,
   deriveDeclarativeTransitionTarget,
   prepareDeclarativeTransitionInstallation,
   requiresDeclarativeStructuralTarget,
@@ -1986,16 +1987,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
       bucket.effects
     );
     return {
-      orderDeltas: changes.map((order) =>
-        deriveCollectionOrderDelta(
-          order.owner,
-          order.beforeSubjects,
-          order.afterSubjects,
-          order.beforeFrontier,
-          order.afterFrontier
-        )
+      orderDeltas: turnOrderDeltas(changes),
+      frontiers: settleTokenOnly(
+        frontiers,
+        bucket.effects.values(),
+        transitionBindings
       ),
-      frontiers,
     };
   };
 

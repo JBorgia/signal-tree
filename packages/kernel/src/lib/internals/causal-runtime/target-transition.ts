@@ -148,7 +148,36 @@ export type CollectionOrderDelta = {
   readonly beforeFrontier: unknown;
   readonly afterFrontier: unknown;
   readonly participants: readonly CollectionOrderParticipant[];
+  /**
+   * The turn's order on this collection could not be composed (contradictory
+   * records): the change is kept with its frontiers, and reversing it
+   * refuses rather than guess (`unrecordedOrderDelta`).
+   */
+  readonly unrecorded?: true;
 };
+
+/** An order change whose orders are unknown: it refuses to reverse. */
+export function unrecordedOrderDelta(
+  owner: PositionId,
+  beforeFrontier: unknown,
+  afterFrontier: unknown
+): CollectionOrderDelta {
+  return {
+    owner,
+    beforeLength: 0,
+    afterLength: 0,
+    beforeFrontier,
+    afterFrontier,
+    participants: [],
+    unrecorded: true,
+  };
+}
+
+export function unrecordedOrderChange(): Error {
+  return new Error(
+    'collection order change was not recorded, so it cannot be reversed'
+  );
+}
 
 export function requiresDeclarativeStructuralTarget(
   effects: readonly ReversalEffect[]
@@ -462,6 +491,7 @@ export function applyCollectionOrderDelta(
   endpoint: 'before' | 'after',
   currentFrontier: unknown
 ): number[] {
+  if (delta.unrecorded) throw unrecordedOrderChange();
   assertUniqueSubjects(current);
 
   const sourceEndpoint = endpoint === 'before' ? 'after' : 'before';
