@@ -522,7 +522,10 @@ export function createTreeRealizationAdapter(
         } else if (scalarFrame) {
           scalarFrame.commit();
         } else {
-          for (const effect of valueEffects) {
+          for (const effect of inPlacementOrder(
+            valueEffects,
+            options.descriptors
+          )) {
             applyEffect(
               options.tree,
               options.descriptors,
@@ -2180,6 +2183,69 @@ function replaceFieldAtSegments(
  * [e, a, b, c, d]. An anchor that is neither live nor restored by the frame is
  * left to the commit-time resolution, as before.
  */
+/**
+ * The one-effect-at-a-time fallback (no heterogeneous frame: a field write
+ * to a row of a collection the reversal does not otherwise touch, with no
+ * scalar slot runtime) applied restores in capture order, each placed by its
+ * anchors against the rows already in: `clear()` with a rename and another
+ * collection's edit in the same turn undid [a, b, c, d] as [b, c, d, a].
+ * A collection's restores now go in placement order (`orderInsertions`), as
+ * the frames commit them, at the first restore's slot: every field reversal
+ * still follows its row's re-add. Left in capture order where a restore
+ * waits for a removal of the same collection (a vacated key, or a move).
+ */
+function inPlacementOrder(
+  effects: readonly ReversalEffect[],
+  descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>
+): readonly ReversalEffect[] {
+  type Restore = ReversalEffect & { structural: 'add'; subjectId: number };
+  const restoresByOwner = new Map<PositionId, Restore[]>();
+  for (const effect of effects) {
+    if (effect.structural !== 'add' || typeof effect.subjectId !== 'number') {
+      continue;
+    }
+    const list = restoresByOwner.get(effect.owner);
+    if (list) list.push(effect as Restore);
+    else restoresByOwner.set(effect.owner, [effect as Restore]);
+  }
+  const reordered = new Map<PositionId, Restore[]>();
+  for (const [owner, restores] of restoresByOwner) {
+    if (restores.length < 2) continue;
+    const waits = effects.some(
+      (effect) =>
+        effect.owner === owner &&
+        effect.structural === 'remove' &&
+        restores.some(
+          (restore) =>
+            restore.subjectId === effect.subjectId ||
+            restore.after === effect.before
+        )
+    );
+    if (!waits) {
+      reordered.set(
+        owner,
+        orderRestoresForPlacement(restores, (effect) =>
+          getStructuralAddEffect(descriptors.get(effect.owner), effect)
+        )
+      );
+    }
+  }
+  if (reordered.size === 0) return effects;
+  const result: ReversalEffect[] = [];
+  for (const effect of effects) {
+    const block = reordered.get(effect.owner);
+    if (!block || effect.structural !== 'add') {
+      result.push(effect);
+      continue;
+    }
+    if (block.length > 0) {
+      result.push(...block);
+      block.length = 0;
+    }
+  }
+  return result;
+}
+
 function orderRestoresForPlacement<
   T extends ReversalEffect & { subjectId: number }
 >(
