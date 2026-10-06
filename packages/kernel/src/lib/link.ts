@@ -16,6 +16,8 @@ import { getPositionRegistry } from './internals/position-registry';
 import { acquireObservation } from './internals/observation-substrate';
 import { isInspectionWrite } from './write-participation';
 import { getEntityProjectionSeed } from './internals/entity-projection-seed';
+import { activateEntityMembership } from './internals/entity-membership-inventory';
+import { getActiveWriteContext } from './write-context';
 import {
   createEntityEgressProjection,
   type EntityEgressProjection,
@@ -716,6 +718,59 @@ export function link<S>(
     scheduleSend();
   });
 
+  /**
+   * ORDER-ONLY CHANGES (15.4.4). A reorder of surviving rows publishes no row
+   * notification that carries order, so since 15.3.1 or earlier a linked
+   * endpoint kept ABCD after `setAll([D,C,B,A])`.
+   *
+   * Each linked collection's committed membership publication carries the
+   * complete order after a `setAll()`, a prepend and every undo, redo, jump
+   * and rollback. The collection-order capture channel 16.x subscribes to is
+   * published only by a forward `setAll()`: following it alone sends DCBA and
+   * then leaves the endpoint there when undo or rollback restores ABCD.
+   *
+   * Delivered synchronously as the change commits, ahead of that write's
+   * queued row notifications. Local order adopts it at once; rows added
+   * earlier in the tick are then found already placed, and later adds name
+   * neighbours in the new order. Participation is the write's own ambient
+   * context, the same one its row notifications carry: inspection moves local
+   * order only. No send is requested here: every reordering operation also
+   * queues row notifications for that collection, and the flush delivering
+   * them schedules the turn's send as for any other change.
+   */
+  const releaseOrders: Array<() => void> = [];
+  const followOrder = (
+    node: object,
+    projection: EntityEgressProjection,
+    address?: LinkedAddress
+  ) => {
+    let release: (() => void) | undefined;
+    try {
+      release = activateEntityMembership(node)?.subscribe(({ changes }) => {
+        if (disposed) return;
+        const inspection = isInspectionWrite(getActiveWriteContext());
+        let advanced = false;
+        for (const change of changes) {
+          if (change.kind !== 'reorder') continue;
+          if (projection.reorder(change.after, inspection)) advanced = true;
+        }
+        if (!advanced) return;
+        if (address) advanceEligible(address, { all: projection.value() });
+        dirty = true;
+        observation.publish();
+      });
+    } catch {
+      // A closed inventory belongs to a destroyed tree, and one inside a
+      // structural commit cannot take a subscriber: no order to follow.
+    }
+    if (release) releaseOrders.push(release);
+  };
+  if (endpoint.set) {
+    if (entityProjection) followOrder(x as object, entityProjection);
+    for (const { node, address } of nestedCollections)
+      followOrder(node, address.projection, address);
+  }
+
   let offSource: (() => void) | undefined;
   try {
     offSource = endpoint.subscribe?.((v) => acquire(v, ++inboundSeq));
@@ -726,6 +781,7 @@ export function link<S>(
     releaseObservation();
     offSub();
     offFlush?.();
+    for (const release of releaseOrders) release();
     withdrawHeldConsequence(x as object, consequenceKey);
     for (const pending of held) pending.resolve();
     held.clear();
@@ -809,6 +865,7 @@ export function link<S>(
       releaseObservation();
       offSub();
       offFlush?.();
+      for (const release of releaseOrders) release();
       // Its held consequence would only no-op now, but it keeps this whole
       // relationship reachable until the tree's transactions settle.
       withdrawHeldConsequence(x as object, consequenceKey);

@@ -50,6 +50,12 @@ export type EntityEgressProjection = {
    * arrived. Returns true if the eligible value changed.
    */
   settle(): boolean;
+  /**
+   * A collection's complete committed order changed (15.4.4). Local order
+   * always follows; eligible order follows only authored work. Returns true if
+   * the eligible value changed.
+   */
+  reorder(after: readonly number[], inspection: boolean): boolean;
   /** Inbound external truth replaces authority and topology alike. */
   reseed(seed: readonly EntityProjectionSeedEntry<Key, unknown>[]): void;
 };
@@ -144,6 +150,29 @@ export function createEntityEgressProjection(
     settle() {
       if (!topology.settle()) return false;
       return placeReady();
+    },
+
+    reorder(after, inspection) {
+      // Local topology tracks reality, whoever reordered it.
+      topology.reorder(after);
+      const completed = unplaced.size > 0 && placeReady();
+      // An inspection reorder acquires no external-order authority.
+      if (inspection) return completed;
+      // Permute only the slots of eligible subjects the new order names. A
+      // subject inspection removed keeps its slot, and one only inspection
+      // created stays out: reordering grants no membership either way.
+      const named = new Set(after);
+      const positioned = new Set(order);
+      const next = after.filter((subject) => positioned.has(subject));
+      let cursor = 0;
+      let changed = false;
+      order = order.map((subject) => {
+        if (!named.has(subject)) return subject;
+        const moved = next[cursor++];
+        if (moved !== subject) changed = true;
+        return moved;
+      });
+      return changed || completed;
     },
 
     apply(subjectId, row, effect, inspection) {
