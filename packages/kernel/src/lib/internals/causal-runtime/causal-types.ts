@@ -105,6 +105,14 @@ export interface ReversalEffect {
   readonly structural?: StructuralEffectKind;
   /** Durable structural recipe carried from canonical history into realization. */
   readonly structuralContext?: StructuralEffect;
+  /**
+   * The ordinal of the turn this effect comes from, when one operation
+   * applies several turns (a jump), in application order. An addition's
+   * recorded anchors are its neighbours when its own turn recorded it, so
+   * they count only within that turn (`requiresDeclarativeStructuralTarget`;
+   * v16 8g, cause 5). Absent for one turn.
+   */
+  readonly turn?: number;
 }
 
 export interface ConfirmedReversalPlan {
