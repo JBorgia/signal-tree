@@ -22,6 +22,20 @@ import {
  */
 const linksByTree = new WeakMap<PositionRegistry, Set<() => void>>();
 
+/**
+ * The registry's `close`, built HERE rather than inside `bindLinkToTree` so it
+ * closes over the registry alone. A closure created there shares that call's
+ * scope with the unbind closure, which holds the Link's `dispose` — so the
+ * registry, reachable from every owned location, kept the first-bound Link
+ * (its endpoint and its tree) alive after the Link was disposed, and after
+ * `destroy()`: location-runtime's dependency finalizer holds a consumer's
+ * dependency map strongly, that map reached the consumer itself through
+ * location -> registry -> close -> dispose -> tree, and the consumer was never
+ * finalized (f0f15d18; `a2-5-lifetime` red in the retention-gc gate).
+ */
+const closerFor = (registry: PositionRegistry) => () =>
+  disposeTreeLinks(registry);
+
 /** @internal Bind a relationship's disposal to its tree. Returns the unbind. */
 export function bindLinkToTree(
   registry: PositionRegistry,
@@ -30,7 +44,7 @@ export function bindLinkToTree(
   let links = linksByTree.get(registry);
   if (!links) {
     linksByTree.set(registry, (links = new Set()));
-    registry.close = () => disposeTreeLinks(registry);
+    registry.close = closerFor(registry);
   }
   const bound = links;
   bound.add(dispose);
