@@ -90,8 +90,11 @@ for retired entities.
   branches.** Rolling back an older transaction while a newer pending one has
   omitted or re-added a branch enclosing its writes now refuses with the
   retryable `later-confirmed-dependency`, as an overlapping write already
-  did. Before this, the older rollback succeeded and the newer one's rollback
-  then brought the rejected value back. Retry once the newer one settles.
+  did. Otherwise the older rollback could succeed and the newer one's
+  rollback then bring the rejected value back (as on 15.x). Retry once the
+  newer one settles; that includes a branch holding entity collections,
+  whose rollback no longer fails with "Plain branch target contains an
+  unavailable member".
 - **`transact()` — the same optimistic turn, named as a verb.** It matches the
   handle operations it opens (`confirm()`, `rollback()`), and it is the verb
   form of the noun the glossary already teaches. `transaction()` was a noun used

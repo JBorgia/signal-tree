@@ -559,7 +559,14 @@ export function preparePlainBranchMembers(
     // Record descendants or call a user child named set/update as a method.
     for (const childKey of Object.getOwnPropertyNames(node)) {
       const child = Object.getOwnPropertyDescriptor(node, childKey)?.value;
-      if (!isNodeAccessor(child) && !isWritableLocation(child)) continue;
+      if (!isNodeAccessor(child) && !isWritableLocation(child)) {
+        // An entity collection or marker is not membership-managed: it
+        // becomes current with its branch and keeps its own state, which its
+        // own effects restore. A snapshot value supplied for it (a branch's
+        // before-image) is not an unavailable member. (v16 integration 8c.)
+        if (isTraversableNode(child)) supplied.delete(childKey);
+        continue;
+      }
       const childPresent = supplied.delete(childKey);
       const next = childPresent
         ? Object.getOwnPropertyDescriptor(value, childKey)
