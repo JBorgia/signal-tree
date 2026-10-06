@@ -876,6 +876,7 @@ function recursiveUpdate(
   // A whole value reconciles membership level by level below; a location it
   // writes must not re-add its own path as well (`structuralWrites`).
   structuralWrites.depth++;
+  let failed = true;
   try {
     const targetObj = isNodeAccessor(target)
       ? (target as unknown as Record<string, unknown>)
@@ -1137,8 +1138,9 @@ function recursiveUpdate(
     if (membershipChanged.length > 0) {
       republishMembers(targetObj, membershipChanged);
     }
+    failed = false;
   } finally {
-    endStructuralWrite();
+    endStructuralWrite(failed);
   }
 }
 
@@ -1763,7 +1765,12 @@ function create<T extends object>(
       materializationContext.physicalCommitClock
     );
   }
-  if (scalarSlotRuntime && scalarSlotRuntime.slotCount() > 0) {
+  // ⚠️ EVERY ROOT, EVEN ONE WITHOUT A SCALAR LEAF, as at every branch below.
+  // Membership reconciliation reaches the runtime from the branch it changes:
+  // a root holding only entity collections had none, so omitting a collection
+  // there woke nothing and a write re-adding it never reached the snapshot,
+  // and undo of the omission threw (v16 8e review, M1).
+  if (scalarSlotRuntime) {
     defineTreeScalarSlotRuntime(tree as object, scalarSlotRuntime);
     defineTreeScalarSlotRuntime(signalState as object, scalarSlotRuntime);
     defineTreeScalarSlotRuntime(rootAccessor as object, scalarSlotRuntime);

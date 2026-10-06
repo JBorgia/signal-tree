@@ -140,6 +140,46 @@ describe.each(ORDERS)('absent collection — Solid (%s)', (_, enhancers) => {
         tree.destroy();
       }
     }));
+  it('a root holding only collections: omission, a re-adding write, undo (v16 8e review)', () =>
+    inRoot(async () => {
+      const tree = signalTree(
+        { users: entityMap<Row, string>(), orders: entityMap<Row, string>() },
+        { enhancers: enhancers() as never }
+      ) as unknown as {
+        $: ((value: unknown) => void) & { users: Rows };
+        undo(): void;
+        destroy(): void;
+      };
+      try {
+        const users = tree.$.users;
+        users.addOne(A);
+        const view = createMemo(() => [
+          JSON.stringify((tree.$ as unknown as () => unknown)()),
+          users.all(),
+          users.count(),
+        ]);
+        expect(view()).toEqual([
+          '{"users":{"all":[{"id":"a","n":0}]},"orders":{"all":[]}}',
+          [A],
+          1,
+        ]);
+        tree.$({ orders: [] });
+        await flush();
+        expect(view()).toEqual(['{"orders":{"all":[]}}', [], 0]);
+        undoable(() => users.addOne(Z));
+        await flush();
+        expect(view()).toEqual([
+          '{"users":{"all":[{"id":"z","n":9}]},"orders":{"all":[]}}',
+          [Z],
+          1,
+        ]);
+        tree.undo();
+        await flush();
+        expect(view()).toEqual(['{"orders":{"all":[]}}', [], 0]);
+      } finally {
+        tree.destroy();
+      }
+    }));
   it('rollback of a re-adding write makes it absent again', () =>
     inRoot(async () => {
       const { tree, rows, view } = build();

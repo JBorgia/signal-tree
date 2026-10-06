@@ -237,6 +237,25 @@ found", as on an empty collection, and changes nothing. Undo, redo,
 `jumpTo()` and `rollback()` of a re-adding write make the collection absent
 again.
 
+Some details of that rule:
+- **Retained rows are removed silently.** A re-adding write removes the
+  retained rows before it adds its own. Taps and interceptors do not see
+  that removal, but history records it, so a reversal restores the rows.
+- **Invalid input changes nothing.** A re-adding write whose input is
+  invalid (a row with no id, for example) throws before anything changes.
+- **A blocked write still removes the retained rows.** An interceptor that
+  blocks the write's own rows runs after the retained rows were removed. The
+  collection stays absent and empty, and history holds the removal. Undoing
+  it restores the rows and re-adds the path to the collection, as undoing
+  any write under an omitted member does.
+- **The selection is kept.** `activeId()` keeps its value and `activeEntity()`
+  reads `undefined`. A re-adding write clears the selection, as `clear()`
+  does.
+- **Taps during a reversal see physical rows.** While undo, redo, `jumpTo()`
+  or `rollback()` writes an absent collection's retained rows, a tap on it
+  that calls `byId()` sees those rows. Its projections (`all()`, `count()`,
+  `has()`) still read it absent.
+
 Undo, redo and `jumpTo()` treat a location under an omitted member like this:
 
 - **Omitted by external truth** (inside `external()`): the reversal refuses

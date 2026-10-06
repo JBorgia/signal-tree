@@ -112,6 +112,52 @@ describe.each(ORDERS)('absent collection — React (%s)', (label, enhancers) => 
     }
   });
 
+  it('a root holding only collections: omission, a re-adding write, undo (v16 8e review)', async () => {
+    type Pair = {
+      readonly $: {
+        (): unknown;
+        (value: unknown): void;
+        readonly users: Rows;
+      };
+      undo(): void;
+      destroy(): void;
+    };
+    const owner = signalTree(
+      { users: entityMap<Row, string>(), orders: entityMap<Row, string>() },
+      { enhancers: enhancers() as never }
+    ) as unknown as Pair;
+    owner.$.users.addOne(A);
+    function Users() {
+      const whole = useSignalTree(owner as never, ($: Pair['$']) =>
+        JSON.stringify($())
+      );
+      const all = useSignalTree(owner as never, ($: Pair['$']) =>
+        JSON.stringify($.users.all())
+      );
+      return (
+        <output data-testid={`${label} users`}>{`${whole}|${all}`}</output>
+      );
+    }
+    const users = () => screen.getByTestId(`${label} users`).textContent;
+    const view = render(<Users />);
+    try {
+      expect(users()).toBe(
+        '{"users":{"all":[{"id":"a","n":0}]},"orders":{"all":[]}}|[{"id":"a","n":0}]'
+      );
+      await step(() => owner.$({ orders: [] }));
+      expect(users()).toBe('{"orders":{"all":[]}}|[]');
+      await step(() => undoable(() => owner.$.users.addOne(Z)));
+      expect(users()).toBe(
+        '{"users":{"all":[{"id":"z","n":9}]},"orders":{"all":[]}}|[{"id":"z","n":9}]'
+      );
+      await step(() => owner.undo());
+      expect(users()).toBe('{"orders":{"all":[]}}|[]');
+    } finally {
+      view.unmount();
+      owner.destroy();
+    }
+  });
+
   it('rollback of a re-adding write makes it absent again', async () => {
     const owner = build();
     const view = render(<Collection owner={owner} />);
