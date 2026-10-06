@@ -2969,32 +2969,17 @@ export function createEntitySignal<
       if (ids.length === 0) return;
 
       // Collect entities and run interceptors first
-      const updatedEntities: Array<{
-        id: K;
-        subjectId: number;
-        prev: E;
-        finalUpdated: E;
-        transformedChanges: Partial<E>;
-      }> = [];
-
-      for (const id of ids) {
-        const entity = requireEntity(id);
-        const prev = entity;
-
-        // Run interceptors
+      const updatedEntities = ids.map((id) => {
+        const prev = requireEntity(id);
         const transformedChanges = interceptUpdatedEntity(id, changes);
-
-        const finalUpdated = { ...entity, ...transformedChanges };
-        const subjectId = requireSubjectId(id);
-
-        updatedEntities.push({
+        return {
           id,
-          subjectId,
+          subjectId: requireSubjectId(id),
           prev,
-          finalUpdated,
+          finalUpdated: { ...prev, ...transformedChanges },
           transformedChanges,
-        });
-      }
+        };
+      });
 
       const frame = createEntityMutationFrame();
       for (const { id, subjectId, finalUpdated } of updatedEntities) {
@@ -3014,19 +2999,18 @@ export function createEntitySignal<
       // Single signal update after all entities are updated
       updateSignals();
 
-      const subjectIdsForWrite = rememberSubjectIds(ids);
+      lastSubjectIds = updatedEntities.map(({ subjectId }) => subjectId);
 
       // Notify PathNotifier for each updated entity
       if (pathObserved()) {
         const meta = ambientMeta();
-        for (let i = 0; i < updatedEntities.length; i++) {
-          const { id, prev, finalUpdated } = updatedEntities[i];
+        for (const { id, subjectId, prev, finalUpdated } of updatedEntities) {
           pathNotifier.notify(
             `${basePath}.${String(id)}`,
             finalUpdated,
             prev,
             basePath,
-            [subjectIdsForWrite[i]],
+            [subjectId],
             getPositionIdsForNotify(),
             meta
           );
@@ -3131,19 +3115,12 @@ export function createEntitySignal<
         subjectId: number;
         beforeSubject?: number;
         afterSubject?: number;
-      }> = [];
-      for (const id of ids) {
+      }> = ids.map((id) => {
         const entity = requireEntity(id);
         const subjectId = requireSubjectId(id);
-        // Run interceptors
         interceptRemovedEntity(id, entity);
-
-        preparedRemovals.push({
-          id,
-          entity,
-          subjectId,
-        });
-      }
+        return { id, entity, subjectId };
+      });
 
       // The last interceptor can subscribe to the entire atomic removal.
       // Capture every row's neighbours before any tombstones are committed.
@@ -3176,12 +3153,8 @@ export function createEntitySignal<
         publishSubjectPhysicalChange(changedSubjectId);
       }
 
-      for (const { subjectId } of preparedRemovals) {
-        tombstoneSubjectSignal(subjectId);
-      }
-      reclaimRetiredSubjectsWithoutOwner(
-        preparedRemovals.map(({ subjectId }) => subjectId)
-      );
+      subjectIdsForWrite.forEach(tombstoneSubjectSignal);
+      reclaimRetiredSubjectsWithoutOwner(subjectIdsForWrite);
 
       // Single signal update after all entities are removed
       updateSignals();
@@ -3189,19 +3162,23 @@ export function createEntitySignal<
       // Notify PathNotifier for each removed entity
       if (observed) {
         const meta = ambientMeta();
-        for (let i = 0; i < preparedRemovals.length; i++) {
-          const { id, entity, beforeSubject, afterSubject } =
-            preparedRemovals[i];
+        for (const {
+          id,
+          entity,
+          subjectId,
+          beforeSubject,
+          afterSubject,
+        } of preparedRemovals) {
           pathNotifier.notify(
             `${basePath}.${String(id)}`,
             undefined,
             entity,
             basePath,
-            [subjectIdsForWrite[i]],
+            [subjectId],
             getPositionIdsForNotify(),
             effectMeta(meta, {
               kind: 'remove',
-              subject: subjectIdsForWrite[i],
+              subject: subjectId,
               key: id,
               value: deepClone(entity),
               beforeSubject,
