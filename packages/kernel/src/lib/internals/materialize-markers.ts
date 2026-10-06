@@ -22,6 +22,7 @@ import {
   publishMembershipChange,
 } from './snapshot-authority';
 import { pathObservation } from './path-observation-port';
+import { linkAddedMember } from './member-membership';
 // ⚠️ THE PORT, NOT THE ENGINE. Marker processors are handed the neutral
 // observation port; the only thing any of them calls on it is `notify`. Typing
 // this as `PathObservationPort` claimed the whole engine surface and is what let a
@@ -777,6 +778,9 @@ export function materializeMember(
     NODE_STORE_SYMBOL
   ] as object | undefined;
   if (backingStore && backingStore !== branch) define(backingStore);
+  // Under a branch that has been omitted before, so an omission above it is
+  // visible to the new member too (`isAbsentMember`).
+  linkAddedMember(branch as object, key, child);
 
   index?.set(key, child);
   publishMembershipChange(branch as object);

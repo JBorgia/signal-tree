@@ -4,12 +4,8 @@ import type { SignalTreeFactory } from './types';
 import {
   bindLocationRuntime,
   createLocationRuntime,
-  getLocationRuntime,
   isWritableLocation,
-  NEUTRAL_LOCATION_RUNTIME,
   replaceLocation,
-  writableLocationPublisher,
-  type LocationPublisher,
   type LocationRuntime,
 } from './internals/location-runtime';
 import {
@@ -49,8 +45,14 @@ import {
 } from './internals/error-reporter';
 import { resolveEnhancerOrder } from '../enhancers';
 import {
+  beginStructuralWrite,
+  hasDormantMembers,
+  endStructuralWrite,
+  inStructuralWrite,
+  isAbsentMember,
+  reactivatePathOnWrite,
+  republishMembers,
   setMemberPresence,
-  isDormantMember,
 } from './internals/member-membership';
 import { getOwnedPositionIds } from './internals/owned-mutation';
 import { getOwnedOwnerPath } from './internals/owned-metadata';
@@ -63,12 +65,9 @@ import {
   type OrdinaryConstructionAuthority,
   type OrdinaryStateMaterializer,
 } from './internals/materialize-markers';
-import { installDormantObservation } from './internals/observation-substrate';
 import { captureBranchMembershipIfObserved } from './internals/path-observation-port';
-import {
-  markOwnerInvalidatedFrom,
-  terminateOwnerInvalidation,
-} from './internals/owner-invalidation-port';
+import { installDormantObservation } from './internals/observation-substrate';
+import { terminateOwnerInvalidation } from './internals/owner-invalidation-port';
 import { defineRootTree } from './internals/root-source';
 import {
   definePositionRegistry,
@@ -89,7 +88,6 @@ import {
 } from './internals/mutation-capture-runtime';
 import {
   defineTreeScalarSlotRuntime,
-  getTreeScalarSlotRuntime,
   type TreeScalarLeafRuntime,
 } from './internals/tree-scalar-slot-port';
 // Kernel-owned orchestration. The Angular edge is gone: the framework now
@@ -117,6 +115,7 @@ import {
 } from './utils';
 import {
   markTreeStore,
+  observeMembership,
   publishMembershipChange,
 } from './internals/snapshot-authority';
 import {
@@ -439,20 +438,34 @@ function makeNodeAccessor<T>(
         // ⚠️ The read boundary alone is NOT sufficient: a branch has no
         // publication token, so a held parent consumer sees nothing. The
         // membership carrier in `publishMembershipChange` is what wakes it.
+        //
+        // ⚠️ ABSENT, NOT ONLY DORMANT. A branch under an omitted member is
+        // absent too, and read its retained storage until v16 8d. The
+        // membership revision is the edge that wakes this read when the
+        // branch, or a member above it, is re-added.
         if (
           !isRoot &&
           self.accessor !== undefined &&
-          isDormantMember(self.accessor)
+          isAbsentMember(self.accessor)
         ) {
+          observeMembership(store as object);
           return undefined as unknown as T;
         }
         return materializeNode(store as object) as unknown as T;
       }
 
+      // WRITING AN ABSENT BRANCH RE-ADDS IT ALONG ITS PATH (v16 8d). Inside a
+      // structural write the writer reconciles membership itself.
+      const absent =
+        !isRoot &&
+        isAbsentMember(self.accessor) &&
+        !inStructuralWrite(self.accessor);
       let updates = arg;
       if (typeof arg === 'function') {
         const updater = arg as (current: T) => T;
-        const current = unwrap(store) as T;
+        // An absent branch's updater receives its semantic value, as a
+        // dormant leaf's does (`whole-value-membership.spec.ts` 14).
+        const current = (absent ? undefined : unwrap(store)) as T;
         updates = updater(current);
       }
 
@@ -481,6 +494,10 @@ function makeNodeAccessor<T>(
       // C8 surface review for whether a dev-mode diagnostic is warranted.
       applyGrouped(() => {
         recursiveUpdate(store, updates, undefined, '');
+        // Value first: the supplied whole value is installed and this
+        // branch's own members reconciled; then the path above is re-added.
+        if (absent && updates && typeof updates === 'object')
+          reactivatePathOnWrite(self.accessor);
       });
     },
   }.node as NodeAccessor<T>;
@@ -819,129 +836,6 @@ function isLargeEnoughToMatter(value: object): boolean {
 }
 
 /**
- * @internal Invalidate the OBSERVATION of every scalar member under `parent`
- * after a membership transition, without writing anything.
- *
- * ⚠️ THIS IS AN INVALIDATION CARRIER, NOT A MEMBERSHIP AUTHORITY. Enumerability
- * decides membership; this only wakes the consumers so they re-read it.
- *
- * It reuses the per-slot publication tokens that already exist and that each
- * leaf ALREADY depends on — `createAngularLeaf` calls `publication.observe(slot)`
- * INSIDE its computation, so the dependency edge is established on the leaf's
- * first read. That is what makes membership free: no new reactive state, and no
- * first-transition problem. A lazily created membership signal would NOT be a
- * dependency of a computation that had already run — measured, and the reason
- * the per-leaf design was abandoned.
- */
-function republishMembers(parent: object, keys: readonly string[]): void {
-  const runtime = getTreeScalarSlotRuntime(parent);
-  if (!runtime) return;
-
-  // ⚠️ ONLY THE SLOTS WHOSE MEMBERSHIP CHANGED.
-  //
-  //     changedSlots = value-changed slots UNION membership-changed slots
-  //     each semantic slot published ONCE per transition
-  //
-  // Sweeping every slot under the branch published siblings whose membership and
-  // value were both untouched, and double-published the one that did change.
-  const changedSlots: number[] = [];
-  // ⚠️ A SLOT IS POSITION-ADDRESSABLE ONLY UNDER `position-topology`.
-  //
-  // Every tree has scalar slots since 5efeb7f5, but a leaf receives a PositionId
-  // only with that capability (transactions, restoration). Without it the slot
-  // lookup below finds nothing, and the leaf was treated as tokenless: its own
-  // token was never published, so a derived, a `subscribe` listener and every
-  // native carrier (Angular, Vue, Solid) kept the retained value after
-  // `p({ name: 'a' })` removed `age`. The leaf's location binding IS that token
-  // — the one its own writes publish — so it is published instead.
-  const unaddressedLeaves: LocationPublisher[] = [];
-  for (const key of keys) {
-    const child = (parent as Record<string, unknown>)[key];
-    const positionId = getOwnedPositionIds(child)?.[0];
-    const slot =
-      positionId === undefined
-        ? undefined
-        : runtime.resolveScalarSlot(positionId);
-    if (slot !== undefined) {
-      changedSlots.push(slot);
-      continue;
-    }
-    const publisher = writableLocationPublisher(child);
-    if (publisher) unaddressedLeaves.push(publisher);
-  }
-  const tokenCarrying = changedSlots.length + unaddressedLeaves.length;
-
-  // ⚠️ PUBLISHED INDEPENDENTLY OF VALUE EQUALITY.
-  //
-  //     SEMANTIC MEMBERSHIP CHANGE IS AN OBSERVABLE SLOT CHANGE EVEN WHEN THE
-  //     RETAINED VALUE IS IDENTICAL.
-  //
-  // The ordinary write path SUPPRESSES an unchanged commit — correctly, for a
-  // value. But reintroducing `age: 42` over a dormant slot that still holds 42
-  // changes what the leaf OBSERVES (undefined -> 42) without changing what it
-  // stores, so routing membership through the value comparator would leave an
-  // already-subscribed consumer stuck at `undefined`.
-  // ⚠️ A BRANCH MEMBER HAS NO PUBLICATION TOKEN, so its membership transition is
-  // unobservable through the dependency graph.
-  //
-  // A dormant LEAF is carried by its retained per-slot token: the parent's
-  // dormant-child read returns a CHANGED value and propagates. A dormant BRANCH
-  // returns `undefined` now too, but that call reads no signal whose value
-  // changed — the child's own memo still depends on unchanged leaf tokens — so
-  // nothing invalidates the parent. Measured: `drop()` correctly became
-  // `undefined` while `box()` still listed `drop`.
-  //
-  // This is the SAME structural condition as first appearance, not a generic
-  // structural-edit hammer:
-  //
-  //     A MEMBERSHIP TRANSITION WHOSE MEMBER CARRIES NO OBSERVABLE DEPENDENCY
-  //     MUST INVALIDATE ANY SNAPSHOT WHOSE DEPENDENCY SET COULD NOT REFLECT IT.
-  // ⚠️ TOKENLESS MEANS NO SLOT, NOT NO POSITION. A branch member DOES own a
-  // PositionId — an earlier version of this check tested for one and therefore
-  // never fired. What a branch lacks is a per-slot PUBLICATION TOKEN, which is
-  // what the dependency graph actually carries.
-  if (tokenCarrying < keys.length) {
-    publishMembershipChange(parent);
-  } else {
-    // ⚠️ OWNER INVALIDATION DOES NOT DEPEND ON WHICH CARRIER WAKES THE GRAPH.
-    //
-    // `publishMembershipChange` also invalidates the owner. This branch is the
-    // case where it does not run: every changed member is a leaf whose token
-    // is published below. Before this branch existed that was the ordinary
-    // case under `position-topology` (transactions, restoration), and the
-    // owner was never told — measured: `p({ name: 'a' })` over
-    // `{ name: 'a', age: 1 }` gave 0 invalidations with either enhancer and 1
-    // without, while `tree.$()` already read the removal. Without the
-    // capability the leaf was mistaken for tokenless, so the branch above ran
-    // and invalidated by accident.
-    //
-    // The commit revision is still NOT advanced: owner invalidation is a
-    // reread request, not a commit. The membership revision is not bumped
-    // either: a branch snapshot re-reads every member leaf, so the leaf tokens
-    // published below are what wake it. A dormant BRANCH member has no token and
-    // takes the `publishMembershipChange` path above instead.
-    markOwnerInvalidatedFrom(parent);
-  }
-
-  if (changedSlots.length > 0) {
-    // `advanceRevision` is NOT wanted: nothing was committed, so the physical
-    // commit clock must not move.
-    runtime.publishPrepared({ revision: runtime.revision(), changedSlots });
-  }
-
-  if (unaddressedLeaves.length > 0) {
-    // The tree's own runtime, so the publication joins its invalidation group;
-    // the neutral fallback mirrors `publishMembershipChange`.
-    (getLocationRuntime(parent) ?? NEUTRAL_LOCATION_RUNTIME).publish(
-      unaddressedLeaves
-    );
-  }
-
-  // The node's own snapshot is memoised over the members it enumerated, and a
-  // membership change is invisible to that memo — see publishMembershipChange.
-}
-
-/**
  * @internal Apply a supplied complete value to an EXISTING dynamic member,
  * activating its membership if dormant.
  *
@@ -984,242 +878,272 @@ function recursiveUpdate(
   reconcileMembership = true
 ): void {
   if (!updates || typeof updates !== 'object') return;
+  // A whole value reconciles membership level by level below; a location it
+  // writes must not re-add its own path as well (`structuralWrites`).
+  beginStructuralWrite(target);
+  try {
+    const targetObj = isNodeAccessor(target)
+      ? (target as unknown as Record<string, unknown>)
+      : (target as Record<string, unknown>);
 
-  const targetObj = isNodeAccessor(target)
-    ? (target as unknown as Record<string, unknown>)
-    : (target as Record<string, unknown>);
+    // ⚠️ A PARTIAL WRITE STILL RE-ADDS WHAT IT SUPPLIES (v16 8d review).
+    // `updateAndReport` scopes the outer level to its supplied keys, so it never
+    // omits there. But a supplied key that is omitted must come back with the
+    // supplied value, or the write lands in hidden storage and vanishes:
+    // measured, `updateAndReport({ a: { b: { keep: 4 } } })` with `a` omitted
+    // returned `[]` and left `a` absent.
+    const publishMembership = captureBranchMembershipIfObserved(
+      (targetObj as Record<symbol, object>)[NODE_ACCESSOR_PEER] ?? targetObj,
+      updates,
+      !reconcileMembership
+    );
+    // The supplied keys whose value was installed: only they may be re-added.
+    // Only a branch that has omitted a member can have one to re-add, so a
+    // tree that never omits allocates nothing here (v16 8e).
+    const installed = hasDormantMembers(targetObj)
+      ? new Set<string>()
+      : undefined;
 
-  const publishMembership = reconcileMembership
-    ? captureBranchMembershipIfObserved(
-        (targetObj as Record<symbol, object>)[NODE_ACCESSOR_PEER] ?? targetObj,
-        updates
-      )
-    : undefined;
+    for (const [key, rawValue] of Object.entries(
+      updates as Record<string, unknown>
+    )) {
+      // Reassignable: an updater FUNCTION at either a leaf or a branch is
+      // resolved to its result below, and everything downstream then sees one
+      // shape rather than each branch re-implementing the updater case.
+      let value = rawValue;
+      const prop = targetObj[key];
+      const childPath = pathPrefix ? `${pathPrefix}.${key}` : key;
 
-  for (const [key, rawValue] of Object.entries(
-    updates as Record<string, unknown>
-  )) {
-    // Reassignable: an updater FUNCTION at either a leaf or a branch is
-    // resolved to its result below, and everything downstream then sees one
-    // shape rather than each branch re-implementing the updater case.
-    let value = rawValue;
-    const prop = targetObj[key];
-    const childPath = pathPrefix ? `${pathPrefix}.${key}` : key;
-
-    if (prop === undefined) {
-      // A tree's signal graph is built from its INITIAL shape, so a write to a
-      // key that was never in that shape has nowhere to go and is discarded.
-      // Silently, until now: this is what made a guardrails rule look broken
-      // for hours when the demo wrote an optional key it had never seeded.
-      if (typeof ngDevMode === 'undefined' || ngDevMode) {
-        console.error(
-          `SignalTree: write to "${childPath}" DISCARDED — key is not in the ` +
-            `tree's initial shape. [ST2010]`
-        );
-      }
-      continue;
-    }
-
-    // A materialised marker hydrates ITSELF. Without this, a marker whose node
-    // is an unbranded callable (`form`) or a plain object with its own API
-    // (`entityMap`, `status`) falls through to the branch/leaf logic below,
-    // which has no idea how to write it — so `tree(partial)` silently no-ops,
-    // and `restoration` undo silently leaves the marker at its post-change
-    // value, landing the user in a state that never existed and reporting
-    // success. Measured before this: `n=3 rows=3` → undo → `n=2 rows=3`.
-    if (hydrateMarkerNode(prop, value, 'restore')) {
-      if (out) out.push(childPath);
-      continue;
-    }
-
-    // ⚠️ THIS ASKS ABOUT A LEAF THE KERNEL ITSELF CREATED, and that is why it
-    // does NOT route through the realization predicate. S2b-2 substituted it and
-    // the substitution was reverted on measurement:
-    //
-    //     realization absent, this site direct        18 failures
-    //     realization absent, this site via predicate 169 failures
-    //
-    // The 151-test difference is the whole kernel write path. `isRealizedNode`
-    // answers `false` when no realization is installed, so every merge write
-    // silently did nothing — the canonical state path became contingent on an
-    // OPTIONAL adapter being present.
-    //
-    //     THE KERNEL MUST NOT ASK AN OPTIONAL ADAPTER WHETHER ITS OWN STATE
-    //     EXISTS.
-    //
-    // Line 1430 keeps the neutral predicate because its subject is a
-    // CALLER-SUPPLIED value — the same question `merge-derived` asks. Same
-    // function name, different semantic decision.
-    if (isNodeAccessor(prop)) {
-      if (typeof value === 'function') {
-        const updater = value as (current: unknown) => unknown;
-        value = updater(unwrap(prop));
-        const mergeable =
-          isTraversableNode(value) &&
-          typeof value !== 'function' &&
-          !isBuiltInObject(value) &&
-          !Array.isArray(value) &&
-          typeof (value as { then?: unknown }).then !== 'function';
-        if (!mergeable) {
-          warnDiscardedBranchWrite(childPath, value);
-          continue;
-        }
-      }
-      if (typeof value === 'function') {
-        warnDiscardedBranchWrite(childPath, value);
-      } else if (value && typeof value === 'object') {
-        recursiveUpdate(prop, value, out, childPath);
-      } else if (value === undefined) {
-        continue;
-      } else {
-        warnDiscardedBranchWrite(childPath, value);
-      }
-    } else if (isWritableLocation(prop) || isWritableCell(prop)) {
-      const sig = prop as Location<unknown> | WritableCell<unknown>;
-      // Recursive structural application already knows this is a replacement,
-      // so callable values are stored through the raw ingress rather than
-      // re-entering the authored grammar where a function means updater.
-      // Ref-equality short-circuit: skip the write entirely when the incoming
-      // value is identical to the current value. `peek()` asks the universal
-      // location for the value without enrolling the write path as a reactive
-      // consumer.
-      const current = readWritableCell(sig);
-      // A dormant leaf reads undefined even when its retained storage differs.
-      // An explicitly supplied value must reach that storage before membership
-      // is reactivated; otherwise supplying undefined resurrects the old value.
-      if (current === value && !isDormantMember(sig)) {
-        // Dev-mode footgun guard: a merge write whose value is reference-
-        // identical to the current value is a no-op. For objects/arrays this
-        // almost always means the caller mutated the value in place and re-set
-        // the SAME reference, expecting an update — which silently does
-        // nothing. Warn once per path. (Primitives re-set to the same value
-        // are normal idempotent writes and are not flagged.)
-        if (
-          (typeof ngDevMode === 'undefined' || ngDevMode) &&
-          value !== null &&
-          typeof value === 'object' &&
-          !warnedNoopPaths.has(childPath)
-        ) {
-          warnedNoopPaths.add(childPath);
-          console.warn(
-            `SignalTree: write at "${childPath}" was skipped — the value is ` +
-              `reference-identical to the current value. If you mutated an ` +
-              `object/array in place, create a NEW reference (spread/slice/map) ` +
-              `so the change is observed. [ST2003]`
+      if (prop === undefined) {
+        // A tree's signal graph is built from its INITIAL shape, so a write to a
+        // key that was never in that shape has nowhere to go and is discarded.
+        // Silently, until now: this is what made a guardrails rule look broken
+        // for hours when the demo wrote an optional key it had never seeded.
+        if (typeof ngDevMode === 'undefined' || ngDevMode) {
+          console.error(
+            `SignalTree: write to "${childPath}" DISCARDED — key is not in the ` +
+              `tree's initial shape. [ST2010]`
           );
         }
         continue;
       }
-      if (isWritableLocation(sig)) replaceLocation(sig, value);
-      else sig.set(value);
 
-      if (out) {
-        // Report only what LANDED. Leaves are created with a deep `equal`, so
-        // a new-reference-but-deep-equal value — the ordinary shape of a
-        // re-fetched server payload — is rejected by the signal and notifies
-        // nobody. Pushing the path anyway told audit trails, change logs and
-        // targeted-persistence callers to do work for a write that never
-        // happened.
-        //
-        // Compare against the PREVIOUS value, not the incoming one: "the leaf
-        // now holds `value`" is also true when the leaf already held it, which
-        // is exactly the no-op case (and Object.is(NaN, NaN) makes that
-        // indistinguishable). "The leaf no longer holds what it held" is the
-        // question actually being asked.
-        if (!Object.is(readWritableCell(sig), current)) out.push(childPath);
+      // A materialised marker hydrates ITSELF. Without this, a marker whose node
+      // is an unbranded callable (`form`) or a plain object with its own API
+      // (`entityMap`, `status`) falls through to the branch/leaf logic below,
+      // which has no idea how to write it — so `tree(partial)` silently no-ops,
+      // and `restoration` undo silently leaves the marker at its post-change
+      // value, landing the user in a state that never existed and reporting
+      // success. Measured before this: `n=3 rows=3` → undo → `n=2 rows=3`.
+      if (hydrateMarkerNode(prop, value, 'restore')) {
+        if (out) out.push(childPath);
+        installed?.add(key);
+        continue;
       }
+
+      // ⚠️ THIS ASKS ABOUT A LEAF THE KERNEL ITSELF CREATED, and that is why it
+      // does NOT route through the realization predicate. S2b-2 substituted it and
+      // the substitution was reverted on measurement:
+      //
+      //     realization absent, this site direct        18 failures
+      //     realization absent, this site via predicate 169 failures
+      //
+      // The 151-test difference is the whole kernel write path. `isRealizedNode`
+      // answers `false` when no realization is installed, so every merge write
+      // silently did nothing — the canonical state path became contingent on an
+      // OPTIONAL adapter being present.
+      //
+      //     THE KERNEL MUST NOT ASK AN OPTIONAL ADAPTER WHETHER ITS OWN STATE
+      //     EXISTS.
+      //
+      // Line 1430 keeps the neutral predicate because its subject is a
+      // CALLER-SUPPLIED value — the same question `merge-derived` asks. Same
+      // function name, different semantic decision.
+      if (isNodeAccessor(prop)) {
+        if (typeof value === 'function') {
+          const updater = value as (current: unknown) => unknown;
+          // An absent branch's updater receives its semantic value (v16 8d).
+          value = updater(isAbsentMember(prop) ? undefined : unwrap(prop));
+          const mergeable =
+            isTraversableNode(value) &&
+            typeof value !== 'function' &&
+            !isBuiltInObject(value) &&
+            !Array.isArray(value) &&
+            typeof (value as { then?: unknown }).then !== 'function';
+          if (!mergeable) {
+            warnDiscardedBranchWrite(childPath, value);
+            continue;
+          }
+        }
+        if (typeof value === 'function') {
+          warnDiscardedBranchWrite(childPath, value);
+        } else if (value && typeof value === 'object') {
+          recursiveUpdate(prop, value, out, childPath);
+          installed?.add(key);
+        } else if (value === undefined) {
+          continue;
+        } else {
+          warnDiscardedBranchWrite(childPath, value);
+        }
+      } else if (isWritableLocation(prop) || isWritableCell(prop)) {
+        const sig = prop as Location<unknown> | WritableCell<unknown>;
+        // Recursive structural application already knows this is a replacement,
+        // so callable values are stored through the raw ingress rather than
+        // re-entering the authored grammar where a function means updater.
+        // Ref-equality short-circuit: skip the write entirely when the incoming
+        // value is identical to the current value. `peek()` asks the universal
+        // location for the value without enrolling the write path as a reactive
+        // consumer.
+        const current = readWritableCell(sig);
+        if (current === value && !isAbsentMember(sig)) {
+          // Dev-mode footgun guard: a merge write whose value is reference-
+          // identical to the current value is a no-op. For objects/arrays this
+          // almost always means the caller mutated the value in place and re-set
+          // the SAME reference, expecting an update — which silently does
+          // nothing. Warn once per path. (Primitives re-set to the same value
+          // are normal idempotent writes and are not flagged.)
+          if (
+            (typeof ngDevMode === 'undefined' || ngDevMode) &&
+            value !== null &&
+            typeof value === 'object' &&
+            !warnedNoopPaths.has(childPath)
+          ) {
+            warnedNoopPaths.add(childPath);
+            console.warn(
+              `SignalTree: write at "${childPath}" was skipped — the value is ` +
+                `reference-identical to the current value. If you mutated an ` +
+                `object/array in place, create a NEW reference (spread/slice/map) ` +
+                `so the change is observed. [ST2003]`
+            );
+          }
+          continue;
+        }
+        // A leaf under an omitted member reads absent until its path is
+        // re-added after this write, so its re-add is reported as a change.
+        const wasAbsent = out !== undefined && isAbsentMember(sig);
+        if (isWritableLocation(sig)) replaceLocation(sig, value);
+        else sig.set(value);
+        installed?.add(key);
+
+        if (out) {
+          // Report only what LANDED. Leaves are created with a deep `equal`, so
+          // a new-reference-but-deep-equal value — the ordinary shape of a
+          // re-fetched server payload — is rejected by the signal and notifies
+          // nobody. Pushing the path anyway told audit trails, change logs and
+          // targeted-persistence callers to do work for a write that never
+          // happened.
+          //
+          // Compare against the PREVIOUS value, not the incoming one: "the leaf
+          // now holds `value`" is also true when the leaf already held it, which
+          // is exactly the no-op case (and Object.is(NaN, NaN) makes that
+          // indistinguishable). "The leaf no longer holds what it held" is the
+          // question actually being asked.
+          if (wasAbsent || !Object.is(readWritableCell(sig), current))
+            out.push(childPath);
+        }
+      }
+      // ST2005 — attempted and REVERTED, deliberately. Recorded here so the
+      // next person does not re-derive it.
+      //
+      // Its 13.x removal note said a diagnostic here "would fire on
+      // `tree.$(tree.$())`, the ordinary snapshot-restore pattern", and that markers
+      // "do not accept merge writes BY DESIGN". Both were true then. Neither is
+      // now: every marker declares `hydrate`, the branch above routes to it, and
+      // `tree.$(tree.$())` is pinned by a round-trip test that reads LIVE node values
+      // (the naive snapshot-vs-snapshot form passes vacuously when both sides
+      // drop the same key).
+      //
+      // So the reasoning did expire — but restoring the diagnostic at THIS site
+      // still cries wolf, measured: it fired on an ordinary leaf write
+      // (`tree.$({known: 2})`) and on `{ user: undefined }`, which is type-legal
+      // `Partial<T>` and exactly what `{ ...defaults, ...patch }` produces for an
+      // absent optional key. This is the tail of the outer dispatch, not the
+      // "matched neither guard" branch the note described.
+      //
+      // RESOLVED — the narrow site is not on this path at all, and the code is
+      // not ST2005. That number is taken: `@signaltree/ng-forms` throws [ST2005]
+      // for a bridged `form()` marker carrying its own `asyncValidators`. It has
+      // shipped since v12 and is documented; reusing it in core would have
+      // collided.
+      //
+      // The real remaining gap was narrower than this note assumed. A marker that
+      // declares `snapshot` but no `hydrate`, whose node is not a writable
+      // signal, snapshots perfectly and silently discards every write — measured:
+      // `tree.$()` gave `{"p":1}`, `tree.$({p: 99})` left it at `1`, nothing reported
+      // at either end. [ST2022] stays quiet because `snapshot` IS declared.
+      //
+      // That is now [ST2023], reported at MATERIALISATION (materialize-markers.ts),
+      // where the node exists so its shape is knowable, once per processor, off
+      // the write path entirely. Its predicate is the exact mirror of this
+      // function's fall-through, which is what keeps it from crying wolf the way
+      // a diagnostic at THIS site did. If the fall-through widens, widen ST2023
+      // with it.
     }
-    // ST2005 — attempted and REVERTED, deliberately. Recorded here so the
-    // next person does not re-derive it.
-    //
-    // Its 13.x removal note said a diagnostic here "would fire on
-    // `tree.$(tree.$())`, the ordinary snapshot-restore pattern", and that markers
-    // "do not accept merge writes BY DESIGN". Both were true then. Neither is
-    // now: every marker declares `hydrate`, the branch above routes to it, and
-    // `tree.$(tree.$())` is pinned by a round-trip test that reads LIVE node values
-    // (the naive snapshot-vs-snapshot form passes vacuously when both sides
-    // drop the same key).
-    //
-    // So the reasoning did expire — but restoring the diagnostic at THIS site
-    // still cries wolf, measured: it fired on an ordinary leaf write
-    // (`tree.$({known: 2})`) and on `{ user: undefined }`, which is type-legal
-    // `Partial<T>` and exactly what `{ ...defaults, ...patch }` produces for an
-    // absent optional key. This is the tail of the outer dispatch, not the
-    // "matched neither guard" branch the note described.
-    //
-    // RESOLVED — the narrow site is not on this path at all, and the code is
-    // not ST2005. That number is taken: `@signaltree/ng-forms` throws [ST2005]
-    // for a bridged `form()` marker carrying its own `asyncValidators`. It has
-    // shipped since v12 and is documented; reusing it in core would have
-    // collided.
-    //
-    // The real remaining gap was narrower than this note assumed. A marker that
-    // declares `snapshot` but no `hydrate`, whose node is not a writable
-    // signal, snapshots perfectly and silently discards every write — measured:
-    // `tree.$()` gave `{"p":1}`, `tree.$({p: 99})` left it at `1`, nothing reported
-    // at either end. [ST2022] stays quiet because `snapshot` IS declared.
-    //
-    // That is now [ST2023], reported at MATERIALISATION (materialize-markers.ts),
-    // where the node exists so its shape is knowable, once per processor, off
-    // the write path entirely. Its predicate is the exact mirror of this
-    // function's fall-through, which is what keeps it from crying wolf the way
-    // a diagnostic at THIS site did. If the fall-through widens, widen ST2023
-    // with it.
-  }
 
-  // ── MEMBERSHIP RECONCILIATION — GREENFIELD-BRANCH-WRITE-0 ─────────────────
-  //
-  // A whole-value assignment states the COMPLETE next value of this location, so
-  // a key the value omits is not a member of it. Root and branch value/updater
-  // calls reconcile here. `updateAndReport` passes a Partial<T>, so it scopes the
-  // outer call only; an included branch still descends with whole-value semantics.
-  //
-  //     OMISSION IN A WHOLE VALUE CHANGES MEMBERSHIP.
-  //     OMISSION IN A PROJECTION DEFINES SCOPE.
-  //
-  // ⚠️ C4's `acquireScalarProjection` must NEVER route through here. It calls
-  // `subject.set()` directly precisely so that an external acquisition omitting
-  // a key says NOTHING about that key.
-  //
-  // ⚠️ NOTHING IS WRITTEN TO AN OMITTED KEY. Absence is a membership change, not
-  // an `undefined` assignment — the BR-A probe did the latter and produced a
-  // spurious mutation event per omitted key while suppressing the unknown-key
-  // diagnostic. The slot, its identity and its retained value all survive.
-  //
-  // Reactivation is handled by the supplied-key loop above having ALREADY
-  // installed the value: REACTIVATION MUST CARRY THE SUPPLIED VALUE, because
-  // re-enumerating alone resurrects the dormant retained one.
-  if (!reconcileMembership) return;
+    // ── MEMBERSHIP RECONCILIATION — GREENFIELD-BRANCH-WRITE-0 ─────────────────
+    //
+    // A whole-value assignment states the COMPLETE next value of this location, so
+    // a key the value omits is not a member of it. Root and branch value/updater
+    // calls reconcile here. `updateAndReport` passes a Partial<T>, so it scopes the
+    // outer call only; an included branch still descends with whole-value semantics.
+    //
+    //     OMISSION IN A WHOLE VALUE CHANGES MEMBERSHIP.
+    //     OMISSION IN A PROJECTION DEFINES SCOPE.
+    //
+    // ⚠️ C4's `acquireScalarProjection` must NEVER route through here. It calls
+    // `subject.set()` directly precisely so that an external acquisition omitting
+    // a key says NOTHING about that key.
+    //
+    // ⚠️ NOTHING IS WRITTEN TO AN OMITTED KEY. Absence is a membership change, not
+    // an `undefined` assignment — the BR-A probe did the latter and produced a
+    // spurious mutation event per omitted key while suppressing the unknown-key
+    // diagnostic. The slot, its identity and its retained value all survive.
+    //
+    // Reactivation is handled by the supplied-key loop above having ALREADY
+    // installed the value: REACTIVATION MUST CARRY THE SUPPLIED VALUE, because
+    // re-enumerating alone resurrects the dormant retained one.
+    const supplied = new Set(Object.keys(updates as Record<string, unknown>));
+    const membershipChanged: string[] = [];
 
-  const supplied = new Set(Object.keys(updates as Record<string, unknown>));
-  const membershipChanged: string[] = [];
+    // A partial write (`updateAndReport`'s outer level) omits nothing, so only
+    // its supplied keys can change presence.
+    for (const key of reconcileMembership
+      ? Object.getOwnPropertyNames(targetObj)
+      : supplied) {
+      const descriptor = Object.getOwnPropertyDescriptor(targetObj, key);
+      if (!descriptor || !('value' in descriptor)) continue;
 
-  for (const key of Object.getOwnPropertyNames(targetObj)) {
-    const descriptor = Object.getOwnPropertyDescriptor(targetObj, key);
-    if (!descriptor || !('value' in descriptor)) continue;
-
-    if (!supplied.has(key)) {
-      if (
-        descriptor.enumerable &&
-        setMemberPresence(targetObj, key, 'dormant')
+      if (!supplied.has(key)) {
+        if (
+          descriptor.enumerable &&
+          setMemberPresence(targetObj, key, 'dormant')
+        ) {
+          membershipChanged.push(key);
+        }
+      } else if (
+        // Only a member whose supplied value was installed is re-added: a key
+        // supplied as `undefined`, or with a value the loop discarded, would
+        // otherwise come back with its retained storage. Measured before v16 8d:
+        // `$({ a: undefined, count: 0 })` re-added an omitted `a` as `{ v: 1 }`.
+        // "DORMANT STORAGE MUST NOT SUPPLY THE REACTIVATED VALUE" (case 18).
+        !descriptor.enumerable &&
+        installed?.has(key) &&
+        setMemberPresence(targetObj, key, 'active')
       ) {
         membershipChanged.push(key);
       }
-    } else if (
-      !descriptor.enumerable &&
-      setMemberPresence(targetObj, key, 'active')
-    ) {
-      membershipChanged.push(key);
     }
-  }
 
-  // One publication for the whole transition. The per-slot tokens the leaves
-  // already depend on are what carries it — no new reactive state exists, and
-  // no first-transition problem, because that dependency edge was established on
-  // each leaf's FIRST computation.
-  publishMembership?.();
-  if (membershipChanged.length > 0) {
-    republishMembers(targetObj, membershipChanged);
+    // One publication for the whole transition. The per-slot tokens the leaves
+    // already depend on are what carries it — no new reactive state exists, and
+    // no first-transition problem, because that dependency edge was established on
+    // each leaf's FIRST computation.
+    publishMembership?.();
+    if (membershipChanged.length > 0) {
+      republishMembers(targetObj, membershipChanged);
+    }
+  } finally {
+    endStructuralWrite();
   }
 }
 
@@ -1844,7 +1768,12 @@ function create<T extends object>(
       materializationContext.physicalCommitClock
     );
   }
-  if (scalarSlotRuntime && scalarSlotRuntime.slotCount() > 0) {
+  // ⚠️ EVERY ROOT, EVEN ONE WITHOUT A SCALAR LEAF, as at every branch below.
+  // Membership reconciliation reaches the runtime from the branch it changes:
+  // a root holding only entity collections had none, so omitting a collection
+  // there woke nothing and a write re-adding it never reached the snapshot,
+  // and undo of the omission threw (v16 8e review, M1).
+  if (scalarSlotRuntime) {
     defineTreeScalarSlotRuntime(tree as object, scalarSlotRuntime);
     defineTreeScalarSlotRuntime(signalState as object, scalarSlotRuntime);
     defineTreeScalarSlotRuntime(rootAccessor as object, scalarSlotRuntime);
@@ -1962,7 +1891,9 @@ function create<T extends object>(
     authority: constructionAuthority,
     activateReporting() {
       if (!readWritableCell(destroyedSig)) {
-        registerContainedReportBudget(materializationContext.positionRegistry.id);
+        registerContainedReportBudget(
+          materializationContext.positionRegistry.id
+        );
       }
     },
   };

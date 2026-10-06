@@ -29,6 +29,7 @@ import {
   installPathDeliveryRuntime,
 } from './internals/path-observation-port';
 import {
+  capturePathReAdd,
   capturePlainBranchMembership,
   plainBranchMembershipChange,
 } from './internals/plain-branch-membership';
@@ -796,7 +797,10 @@ export function getPathNotifier(): PathNotifier {
   // delivery implementation tree-shake out of a subscriber-less bundle.
   // Re-installing the same singleton keeps ONE DELIVERY AUTHORITY.
   installPathDeliveryRuntime(globalPathNotifier);
-  installBranchMembershipCapture(capturePlainBranchMembership);
+  installBranchMembershipCapture(
+    capturePlainBranchMembership,
+    capturePathReAdd
+  );
   return globalPathNotifier;
 }
 

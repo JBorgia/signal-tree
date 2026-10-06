@@ -1,5 +1,4 @@
 import type { PositionId } from '../types';
-import { isDormantMember, reactivateOnWrite } from './member-membership';
 import type { PhysicalCommitClock } from './physical-commit-clock';
 import {
   PRODUCTION_SUBSTRATE_STATS_ENABLED,
@@ -18,6 +17,7 @@ import {
 } from './location-runtime';
 import { NEUTRAL_OBSERVATION_ADAPTER } from './observation-adapter';
 import type {
+  MemberAbsence,
   ScalarSlotMutationFrame,
   SlotIndex,
   TreeScalarLeafRuntime,
@@ -109,29 +109,28 @@ function createScalarLeaf<T>(
   kernel: TreeScalarSlotKernel,
   publication: ScalarSlotPublication,
   locations: LocationRuntime,
-  slotIndex: SlotIndex
+  slotIndex: SlotIndex,
+  liveness: { absence?: MemberAbsence }
 ): {
   readonly leaf: Location<T>;
   readonly binding: WritableLocationBinding<T>;
 } {
   const holder: { leaf?: Location<T> } = {};
 
-  const read = (): T => {
-    if (holder.leaf !== undefined && isDormantMember(holder.leaf)) {
+  const read = (stored?: boolean): T => {
+    // Absent when this leaf or a member above it is omitted (v16 8d). One
+    // empty slot until this tree's first omission (v16 8e). `stored` reads
+    // storage regardless, for a write's recorded before value.
+    if (!stored && liveness.absence?.isAbsent(holder.leaf)) {
       return undefined as T;
     }
 
     return kernel.readSlot<T>(slotIndex);
   };
   const binding = locations.createWritable(read, (value) => {
-    const leaf = holder.leaf as Location<T>;
     const result = kernel.commitSlot(slotIndex, value);
-    const reactivated = reactivateOnWrite(leaf);
-    const changed = publication.prepareSlot(
-      slotIndex,
-      result.changed,
-      reactivated
-    );
+    const reAdded = liveness.absence?.reAdd(holder.leaf) === true;
+    const changed = publication.prepareSlot(slotIndex, result.changed, reAdded);
     return changed;
   });
   const leaf = binding.location as Location<T>;
@@ -148,8 +147,12 @@ export function createTreeScalarLeafRuntime(
   const kernel = createTreeScalarSlotKernel(physicalCommitClock);
   const publication = new ScalarSlotPublication(locations);
   const leafByPositionId = new Map<PositionId, Location<unknown>>();
+  const liveness: { absence?: MemberAbsence } = {};
 
   return {
+    enableAbsence(absence: MemberAbsence): void {
+      liveness.absence = absence;
+    },
     createLeaf<T>(
       initialValue: T,
       equal: (current: T, next: T) => boolean,
@@ -160,7 +163,8 @@ export function createTreeScalarLeafRuntime(
         kernel,
         publication,
         locations,
-        slotIndex
+        slotIndex,
+        liveness
       );
       publication.bind(slotIndex, binding as WritableLocationBinding<unknown>);
       if (positionId !== undefined) {

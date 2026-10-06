@@ -57,6 +57,14 @@ import {
   type EntityProjectionOrder,
 } from './internals/entity-projection-seed';
 import { markOwnerInvalidated } from './internals/owner-invalidation-port';
+import {
+  inStructuralWrite,
+  isAbsentMember,
+  MEMBERSHIP_CHANGED,
+  reactivatePathOnWrite,
+  structuralWrites,
+} from './internals/member-membership';
+import { physicalRows } from './internals/physical-rows';
 import type {
   CommittedEntityMutation,
   MutationCaptureRuntime,
@@ -480,6 +488,32 @@ export function createEntitySignal<
     return entities;
   }
 
+  /**
+   * ⚠️ PUBLIC READS ARE ABSENT WHILE THE COLLECTION IS (v16 8e, ported). A
+   * collection omitted itself or under an omitted member is an absent, empty
+   * collection to every public read and to every write that names a row:
+   * "DORMANT STORAGE MUST NOT SUPPLY THE REACTIVATED VALUE"
+   * (`whole-value-membership.spec.ts` 18). Its retained rows stay physical
+   * truth for restoration and transactions, which keep the `getProjected*`
+   * reads. One symbol lookup on a collection that was never under an
+   * omission.
+   */
+  const absent = (): boolean => isAbsentMember(api);
+  // Row reads and row writes use physical truth only while a reversal or a
+  // rollback is being applied to this collection's tree (`physicalRows`).
+  // Projections never do, so nothing they cache can hold retained rows.
+  const rowAbsent = (): boolean =>
+    absent() &&
+    !(
+      physicalRows.length &&
+      physicalRows.includes(getPositionRegistry(api) as object)
+    );
+  const presentEntity = (id: K): E | undefined =>
+    rowAbsent() ? undefined : getProjectedEntity(id);
+  const presentEntries = (): Array<readonly [K, E]> =>
+    absent() ? [] : getProjectedEntries();
+  const presentEntities = (): E[] => (absent() ? [] : getProjectedEntities());
+
   function acquireEntityHandleForTesting(
     id: K
   ): AcquiredSubjectHandle | undefined {
@@ -742,7 +776,7 @@ export function createEntitySignal<
 
   /** Reactive signals for queries — all derived, none eagerly maintained. */
   const allSignal: ReadableCell<E[]> = createVersionedProjection(() => {
-    const entities = getProjectedEntities();
+    const entities = presentEntities();
     // `sortComparer` gives `all`/`ids` a stable sorted order (parity with
     // @ngrx/entity); `map` keeps insertion order.
     if (config.sortComparer) entities.sort(config.sortComparer);
@@ -750,13 +784,14 @@ export function createEntitySignal<
   });
   const countSignal: ReadableCell<number> = createVersionedProjection(() => {
     // O(1) — this used to be `entities.length` on a freshly built array.
-    return structuralStore.activeKeyCount();
+    return absent() ? 0 : structuralStore.activeKeyCount();
   });
   // Identity-stable across value-only writes: the key snapshot is shared until
   // the list or a key changes, so the copy (and every consumer) is reused.
   let idsSource: readonly K[] | undefined;
   let idsValue: K[] = [];
   const idsSignal: ReadableCell<K[]> = createVersionedProjection(() => {
+    if (absent()) return [];
     if (config.sortComparer) return allSignal().map((e) => selectId(e));
     const keys = structuralStore.activeKeysSnapshot();
     if (keys !== idsSource) {
@@ -769,7 +804,7 @@ export function createEntitySignal<
     () => {
       // Still a copy: callers may hold the result across mutations and must not
       // see it change underneath them. But it is paid on read, not on write.
-      return new Map(getProjectedEntries());
+      return new Map(presentEntries());
     }
   );
 
@@ -1225,7 +1260,9 @@ export function createEntitySignal<
   }
 
   function requireEntity(id: K): E {
-    const entity = getProjectedEntity(id);
+    // A row-naming write to an absent collection refuses, as on an empty one
+    // (v16 8e); a reversal applying it reads physically (`rowAbsent`).
+    const entity = presentEntity(id);
     if (!entity) {
       throw new Error(`Entity with id ${String(id)} not found`);
     }
@@ -1293,12 +1330,12 @@ export function createEntitySignal<
    */
   function readSubjectEntity(subjectId: number): E | undefined {
     getSubjectEpoch(subjectId)();
-    return valueStore.backingForSubject(subjectId);
+    return rowAbsent() ? undefined : valueStore.backingForSubject(subjectId);
   }
 
   function readEntityByKey(id: K): E | undefined {
     const subjectId = resolveSubjectId(id);
-    if (subjectId === undefined) return getProjectedEntity(id);
+    if (subjectId === undefined) return presentEntity(id);
     return readSubjectEntity(subjectId);
   }
 
@@ -2156,6 +2193,8 @@ export function createEntitySignal<
 
   /** Handlers for observation */
   const tapHandlers: TapHandlers<E, K>[] = [];
+  /** A re-adding write's removal of retained rows: no tap sees it (v16 8e). */
+  let silentClear = 0;
   /**
    * One tap event, run on every tap and counted as a user callback: a write a
    * tap makes during a replay of recorded state is forward work, and is
@@ -2185,6 +2224,11 @@ export function createEntitySignal<
   function updateSignals(): void {
     const pending = [...pendingSubjectEpochs];
     pendingSubjectEpochs.clear();
+    // An absent collection reads empty before and after: nothing a consumer
+    // reads changed. Its membership hook wakes them when it comes back, so a
+    // reversal writing its hidden rows re-runs nobody while those rows are
+    // read physically (v16 8e).
+    if (absent()) return;
     locations.runInvalidationGroup(() => {
       for (const epoch of pending) {
         advanceEpochHandle(epoch);
@@ -2268,7 +2312,7 @@ export function createEntitySignal<
       if (key === undefined) {
         throw new Error(`Entity with subject ${String(subjectId)} not found`);
       }
-      const current = getProjectedEntity(key);
+      const current = presentEntity(key);
       if (current === undefined) {
         throw new Error(`Entity with id ${String(key)} not found`);
       }
@@ -2637,7 +2681,7 @@ export function createEntitySignal<
     // ==================
 
     byId(id: K): EntityNode<E> | undefined {
-      if (structuralStore.hasActiveKey(id)) {
+      if (!rowAbsent() && structuralStore.hasActiveKey(id)) {
         // Present: subscribe to the PER-ENTITY signal only, so callers re-run
         // when THIS entity changes but not when others do (body-granular).
         // Materialized lazily here — bounded by the number of live entities.
@@ -2725,7 +2769,9 @@ export function createEntitySignal<
     },
 
     has(id: K): ReadableCell<boolean> {
-      return createVersionedProjection(() => structuralStore.hasActiveKey(id));
+      return createVersionedProjection(
+        () => !absent() && structuralStore.hasActiveKey(id)
+      );
     },
 
     // Bare canonical name (the `.isEmpty` alias was removed in v11).
@@ -2773,7 +2819,7 @@ export function createEntitySignal<
       const s = createQueryProjection(() => {
         if (config.sortComparer) return allSignal().filter(predicate);
         const out: E[] = [];
-        for (const entity of getProjectedEntities()) {
+        for (const entity of presentEntities()) {
           if (predicate(entity)) out.push(entity);
         }
         return out;
@@ -2805,7 +2851,7 @@ export function createEntitySignal<
       // the only correct thing to scan. See the note on `where` above.
       const s = createQueryProjection(() => {
         if (config.sortComparer) return allSignal().find(predicate);
-        for (const entity of getProjectedEntities()) {
+        for (const entity of presentEntities()) {
           if (predicate(entity)) return entity;
         }
         return undefined;
@@ -3042,7 +3088,7 @@ export function createEntitySignal<
       changes: Partial<E>
     ): number {
       const idsToUpdate: K[] = [];
-      for (const [id, entity] of getProjectedEntries()) {
+      for (const [id, entity] of presentEntries()) {
         if (predicate(entity)) {
           idsToUpdate.push(id);
         }
@@ -3208,7 +3254,7 @@ export function createEntitySignal<
 
     removeWhere(predicate: (entity: E) => boolean): number {
       const idsToRemove: K[] = [];
-      for (const [id, entity] of getProjectedEntries()) {
+      for (const [id, entity] of presentEntries()) {
         if (predicate(entity)) {
           idsToRemove.push(id);
         }
@@ -3459,7 +3505,7 @@ export function createEntitySignal<
       }
 
       for (const { id, entity } of activeSubjects) {
-        if (!entity) continue;
+        if (!entity || silentClear) continue;
         emitTap('onRemove', id, entity);
       }
       } finally { membershipUnit.cancel(); }
@@ -3791,6 +3837,11 @@ export function createEntitySignal<
     if (!registry) return;
     positionId = registry.allocate();
     registry.registerCollectionPath(positionId, basePath);
+    // No structured address here, unlike v16: this lazy allocation happens
+    // only in a tree without position topology (`positionIdAllocator`
+    // allocates eagerly otherwise, and materialization registers that
+    // position's address), and only restoration and transactions read
+    // addresses, which always enable topology (15.4.4 port, 8b).
     defineOwnedPositionIds(api, [positionId]);
   });
   if (positionMetadataEnabled) {
@@ -3803,6 +3854,99 @@ export function createEntitySignal<
   if (ownerMetadataEnabled) {
     defineOwnedOwnerPath(api, basePath);
   }
+
+  // ⚠️ A ROW-ADDING WRITE TO AN ABSENT COLLECTION RE-ADDS ITS PATH, CARRYING
+  // ONLY THE WRITTEN ROWS (v16 8e). The collection reads empty while it is
+  // absent, so the write applies to an empty collection: its retained rows
+  // are removed first, through the ordinary `clear()` (which records them),
+  // then the write runs, then every omitted member on its path comes back
+  // with only that path (`reactivatePathOnWrite`). Retained rows never
+  // resurface, and undo, redo, jumpTo and rollback reverse all three. Writes
+  // that name an existing row refuse instead, as on an empty collection.
+  //
+  // A structural write (a whole value, a reversal) reconciles presence itself. A write that would fail on its input
+  // fails before the retained rows are removed: every row's id is derived
+  // first, as the write itself does before it changes anything (v16 8e
+  // review). An interceptor that blocks the write still runs after the
+  // removal; see the README. Only a structural write on this collection's own
+  // tree (the whole value hydrating it, a reversal) writes it as it is: a
+  // write from a tap or sync effect of another tree is an ordinary one.
+  const clearRetained = api.clear;
+  for (const name of [
+    'addOne',
+    'prependOne',
+    'addMany',
+    'prependMany',
+    'upsertOne',
+    'upsertMany',
+    'setAll',
+    'clear',
+  ] as const) {
+    const write = api[name] as (...args: unknown[]) => unknown;
+    const many = name.endsWith('Many') || name === 'setAll';
+    (api as Record<string, unknown>)[name] = (...args: unknown[]) => {
+      if (!absent() || inStructuralWrite(api)) return write(...args);
+      if (name !== 'clear')
+        for (const row of (many ? args[0] : [args[0]]) as E[])
+          deriveId(row, args[1] as AddOptions<E, K> | undefined);
+      // The retained rows were never visible, so their removal is no row
+      // change to observe: taps do not see it (`silentClear`). History still
+      // records it, so a reversal restores them.
+      silentClear++;
+      try {
+        clearRetained();
+      } finally {
+        silentClear--;
+      }
+      const result = write(...args);
+      reactivatePathOnWrite(api);
+      return result;
+    };
+  }
+  // Its presence changed (it, or a member above it, was omitted or re-added):
+  // every query and every held row re-reads (`republishMembers`).
+  const wake = () =>
+    locations.runInvalidationGroup(() => {
+      for (const epoch of subjectEpochs.values()) advanceEpochHandle(epoch);
+      deriveLocation(version, (value) => value + 1);
+      markOwnerInvalidated(ownerId);
+    });
+  // Inside a structural write it wakes them once, after the write has closed
+  // (`structuralWrites.end`, chained in order): a reversal being applied reads
+  // rows physically (`physicalRows`), so a consumer re-run inside it would
+  // cache what storage holds rather than the collection's absence. Installed
+  // by the first such change, so a tree without collections carries none of
+  // this. Every queued wake runs even if an earlier one throws.
+  let wakeQueued = false;
+  Object.defineProperty(api, MEMBERSHIP_CHANGED, {
+    value: () => {
+      if (!structuralWrites.depth) return wake();
+      if (wakeQueued) return;
+      wakeQueued = true;
+      const earlier = structuralWrites.end;
+      structuralWrites.end = (failed) => {
+        structuralWrites.end = undefined;
+        wakeQueued = false;
+        // Every queued wake runs; the first consumer error is kept.
+        let caught: { error: unknown } | undefined;
+        for (const run of [() => earlier?.(failed), wake]) {
+          try {
+            run();
+          } catch (error) {
+            caught ??= { error };
+          }
+        }
+        if (!caught) return;
+        // Closing a reversal that threw: its own error is what surfaces, and
+        // a consumer's is reported asynchronously.
+        if (!failed) throw caught.error;
+        const { error } = caught;
+        queueMicrotask(() => {
+          throw error;
+        });
+      };
+    },
+  });
   // ⚠️ THE PROJECTION SEED — internal, WeakMap-carried, never public.
   //
   // Built from the SAME ordered active-key snapshot `getProjectedEntries()`
@@ -3814,7 +3958,8 @@ export function createEntitySignal<
   // `{ id: 1 }` while the address is 77, so `selectId(row)` cannot recover it.
   defineEntityProjectionSeed(api as object, () => {
     const seed: Array<{ subjectId: number; key: K; row: E }> = [];
-    for (const key of structuralStore.activeKeysSnapshot()) {
+    // An absent collection seeds an empty projection, as `all()` reads.
+    for (const key of absent() ? [] : structuralStore.activeKeysSnapshot()) {
       const subjectId = structuralStore.subjectIdForKey(key);
       if (subjectId === undefined) continue;
       const row = getProjectedEntity(key);

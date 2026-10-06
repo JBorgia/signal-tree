@@ -135,8 +135,15 @@ function createPendingRollbackEffects(
   // a changeId after another row's add, remove or changeId was dropped and
   // rollback left the renamed key in place.
   const firstEffectIndexByOwner = new Map<string, number>();
+  // ⚠️ A MEMBER'S PRESENCE IS ITS OWN ADDRESS (v16 8e review, ported): an
+  // entity collection's membership effect shares its owner with the
+  // collection's row effects; keyed by owner alone it was dropped as a repeat
+  // whenever a row effect came first in the turn, and a rolled-back row-adding
+  // write to an omitted collection left it present with its retained rows.
   const keyOf = (effect: CausalTurn['effects'][number]): string =>
-    effect.fieldSegments !== undefined
+    effect.plainBranchMembership !== undefined
+      ? `${String(effect.owner)}\u0000membership`
+      : effect.fieldSegments !== undefined
       ? JSON.stringify([effect.owner, effect.subjectId, effect.fieldSegments])
       : hasInlineScopedLeafAddress(effect)
       ? JSON.stringify([effect.owner, effect.subjectId, effect.path])

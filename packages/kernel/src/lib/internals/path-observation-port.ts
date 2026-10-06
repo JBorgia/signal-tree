@@ -104,9 +104,15 @@ export function resetPathDeliveryRuntime(): void {
 
 type BranchMembershipCapture = (
   branch: object,
-  supplied: object
+  supplied: object,
+  partial?: boolean
+) => (() => void) | undefined;
+type PathReAddCapture = (
+  path: readonly { readonly parent: object; readonly key: string }[],
+  outer: number
 ) => (() => void) | undefined;
 let branchMembershipCapture: BranchMembershipCapture | undefined;
+let pathReAddCapture: PathReAddCapture | undefined;
 
 /**
  * @internal Installed with the delivery runtime. Whole-branch writes record
@@ -115,17 +121,36 @@ let branchMembershipCapture: BranchMembershipCapture | undefined;
  * checks for observers itself.
  */
 export function installBranchMembershipCapture(
-  capture: BranchMembershipCapture
+  capture: BranchMembershipCapture,
+  pathReAdd: PathReAddCapture
 ): void {
   branchMembershipCapture = capture;
+  pathReAddCapture = pathReAdd;
 }
 
-/** @internal Undefined until the delivery runtime has been requested. */
+/**
+ * @internal Undefined until the delivery runtime has been requested. A
+ * `partial` write omits nothing: the keys after it are the branch's present
+ * keys plus the supplied ones.
+ */
 export function captureBranchMembershipIfObserved(
   branch: object,
-  supplied: object
+  supplied: object,
+  partial?: boolean
 ): (() => void) | undefined {
-  return branchMembershipCapture?.(branch, supplied);
+  return branchMembershipCapture?.(branch, supplied, partial);
+}
+
+/**
+ * @internal The membership a path re-add changes, level by level, captured
+ * before the change (`reactivatePathOnWrite`). Undefined until the delivery
+ * runtime has been requested, so the bare kernel ships none of it.
+ */
+export function capturePathReAddIfObserved(
+  path: readonly { readonly parent: object; readonly key: string }[],
+  outer: number
+): (() => void) | undefined {
+  return pathReAddCapture?.(path, outer);
 }
 
 /** @internal True only when a runtime is installed AND it has observers. */
