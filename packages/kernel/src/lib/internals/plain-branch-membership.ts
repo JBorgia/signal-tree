@@ -361,7 +361,8 @@ export function hidingMembers(
 /**
  * The whole value that re-adds a hidden member: its retained current value,
  * with each target installed at its keys below the member. Hidden descendants
- * on a target's way are re-added the same way; others stay absent.
+ * on a target's way are re-added the same way; others stay absent. Members
+ * that are not state locations (an entity collection) are not part of it.
  */
 export function composeHiddenMemberValue(
   member: object,
@@ -381,9 +382,15 @@ export function composeHiddenMemberValue(
     list.push({ below, value: target.value });
   }
   if (whole) return whole.value;
-  const value = {
-    ...unwrapBranchForWriteCapture<Record<string, unknown>>(member),
-  };
+  // Only retained state locations are members; an entity collection or a
+  // marker stays where it is and becomes current with its branch.
+  const retained = unwrapBranchForWriteCapture<Record<string, unknown>>(member);
+  const value: Record<string, unknown> = {};
+  for (const key of Object.keys(retained)) {
+    const child = Object.getOwnPropertyDescriptor(member, key)?.value;
+    if (isNodeAccessor(child) || isWritableLocation(child))
+      value[key] = retained[key];
+  }
   for (const [key, list] of children)
     value[key] = composeHiddenMemberValue(
       (member as Record<string, object>)[key],

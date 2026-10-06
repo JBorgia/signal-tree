@@ -346,8 +346,7 @@ function scalarRelation(
 
 function buildPendingRollbackPlan(
   pendingTurn: TransactionTurnRecord | undefined,
-  laterEffects: LaterAppliedEffect[],
-  encloses?: (outer: number, inner: number) => boolean
+  laterEffects: LaterAppliedEffect[]
 ): PendingRollbackPlan {
   if (!pendingTurn) {
     return { compensation: [] };
@@ -381,18 +380,6 @@ function buildPendingRollbackPlan(
     for (const laterEntry of laterEffects) {
       const laterEffect = laterEntry.effect;
       if (laterEffect.position !== effect.position) {
-        // A later membership change of an enclosing member restated this
-        // location too: omitted, it is hidden (compensating it would write
-        // a slot nothing can read); re-added, it holds the supplied value.
-        // Either way the contribution is superseded, as by a later
-        // replacement at the location itself. (v16 integration 8b.)
-        if (
-          effect.subject === undefined &&
-          laterEffect.kind === 'set' &&
-          laterEffect.plainBranchMembership &&
-          encloses?.(laterEffect.position, effect.position)
-        )
-          superseded = true;
         continue;
       }
       if (
@@ -734,8 +721,7 @@ class TransactionAuthority {
       subjectIds: readonly number[]
     ) => void = () => undefined,
     private readonly releasePendingClaims: (turnId: number) => void = () =>
-      undefined,
-    private readonly encloses?: (outer: number, inner: number) => boolean
+      undefined
   ) {}
 
   private buildTurn(
@@ -1031,17 +1017,10 @@ class TransactionAuthority {
 
     // Queued evidence stays last: it is read before delivery and belongs to
     // THIS turn, so it is not part of the shared chronology.
-    return buildPendingRollbackPlan(
-      this.pendingTurns.get(turnId),
-      [
-        ...ordered,
-        ...[...(retained?.values() ?? [])].map((effect) => ({
-          turnId,
-          effect,
-        })),
-      ],
-      this.encloses
-    );
+    return buildPendingRollbackPlan(this.pendingTurns.get(turnId), [
+      ...ordered,
+      ...[...(retained?.values() ?? [])].map((effect) => ({ turnId, effect })),
+    ]);
   }
 
   setHistoryRetention(retain: number): void {
@@ -1287,19 +1266,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
       // enough that every capture has run.
       getOrCreateSubjectRestorationClaims(tree)?.release(
         `transaction:${turnId}`
-      );
-    },
-    // Structured addresses, never display paths: `outer` encloses `inner`
-    // when its address is a strict prefix of inner's.
-    (outer, inner) => {
-      const registry = getPositionRegistry(tree.$);
-      const prefix = registry?.addressFor(outer);
-      const address = registry?.addressFor(inner);
-      return (
-        !!prefix &&
-        !!address &&
-        prefix.length < address.length &&
-        prefix.every((key, index) => key === address[index])
       );
     }
   );
