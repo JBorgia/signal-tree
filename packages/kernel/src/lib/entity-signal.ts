@@ -3898,7 +3898,7 @@ export function createEntitySignal<
         ownerPath: basePath,
         readSource: readTransitionSource,
         prepareTarget: prepareTransitionTarget,
-        orderFrontier: structuralStore.orderFrontierAt,
+        orderFrontier: structuralStore.activeOrderFrontier,
       } satisfies CollectionTransitionTargetBinding,
       enumerable: false,
       configurable: true,
