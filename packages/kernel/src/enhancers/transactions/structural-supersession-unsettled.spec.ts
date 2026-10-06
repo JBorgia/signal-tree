@@ -157,10 +157,12 @@ describe('structural supersession / unsettled remover', () => {
     await flush();
 
     // Conservative: the open edit blocks supersession until it settles. The
-    // reported kind is the first matching later effect (the settled remove),
-    // so it reads as confirmed although settling the editor clears it. That
-    // reporting order predates 15.4.2 and is pinned here, not endorsed.
-    expect(refusalKind(proposal)).toBe('later-confirmed-dependency');
+    // reported kind is the first matching later effect IN TIME: the open edit,
+    // so it says "settle the newer turn first", which is what clears it.
+    // Through 15.4.4's review it read 'later-confirmed-dependency' because
+    // later work was listed by source (authored, observed, open), putting the
+    // settled remove first (reversal-engine review, item 4).
+    expect(refusalKind(proposal)).toBe('later-pending-dependency');
     expect(tree.$.x()).toBe(1);
     expect(tree.$.rows.ids()).toEqual([]);
 

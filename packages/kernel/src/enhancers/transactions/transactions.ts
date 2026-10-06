@@ -243,6 +243,12 @@ type CaptureBucket = {
 export type TransactionTurnRecord = {
   id: number;
   /**
+   * When this record's effects were applied, on the clock the dependency
+   * ledger's entries share, so later work from different sources can be
+   * merged in time order (`getPendingRollbackPlan`).
+   */
+  __appliedAt?: number;
+  /**
    * RESTORATION CLAIM SET — the subjects whose backing must conservatively
    * remain available while this record is retained.
    *
@@ -543,7 +549,12 @@ function buildPendingRollbackPlan(
       if (laterEffect.subject !== effect.subject) {
         continue;
       }
-      erased = laterEffect.kind === 'remove' && laterEntry.unsettled !== true;
+      // Any OPEN turn's effect on the subject blocks supersession until it
+      // settles, wherever it falls in time (structural-supersession-
+      // unsettled.spec.ts); `laterEffects` is in time order, so the last
+      // settled effect decides otherwise.
+      if (laterEntry.unsettled === true) return false;
+      erased = laterEffect.kind === 'remove';
     }
     return erased;
   };
@@ -687,7 +698,17 @@ class TransactionAuthority {
    * The sequence matters with two open transactions: an effect recorded before
    * the second opened is not "later" for the second, only for the first.
    */
-  private dependencyLedger: Array<{ seq: number; effect: TurnEffect }> = [];
+  private dependencyLedger: Array<{
+    seq: number;
+    appliedAt: number;
+    effect: TurnEffect;
+  }> = [];
+  /**
+   * One monotonic clock for every applied effect: authored records (stamped
+   * when they are built), ledger entries and open transactions. Never reset,
+   * unlike `ledgerSeq`, so stamps compare across a quiet period.
+   */
+  private appliedClock = 0;
   private ledgerSeq = 0;
   private readonly pendingOpenedAtSeq = new Map<number, number>();
 
@@ -726,6 +747,7 @@ class TransactionAuthority {
 
     return {
       id: reservedId ?? this.nextTurnId++,
+      __appliedAt: ++this.appliedClock,
       restorationSubjectIds: subjectIds ? [...subjectIds] : undefined,
       __positionIds: positionIds ? [...positionIds] : undefined,
       __effects: effects ? effects.map(cloneTurnEffect) : undefined,
@@ -829,8 +851,9 @@ class TransactionAuthority {
       return;
     }
     this.ledgerSeq += 1;
+    const appliedAt = ++this.appliedClock;
     for (const effect of effects) {
-      this.dependencyLedger.push({ seq: this.ledgerSeq, effect });
+      this.dependencyLedger.push({ seq: this.ledgerSeq, appliedAt, effect });
     }
   }
 
@@ -949,7 +972,11 @@ class TransactionAuthority {
     const authoredLater = this.confirmedTurns
       .filter((turn) => turn.id > turnId)
       .flatMap((turn) =>
-        (turn.__effects ?? []).map((effect) => ({ turnId: turn.id, effect }))
+        (turn.__effects ?? []).map((effect) => ({
+          turnId: turn.id,
+          effect,
+          appliedAt: turn.__appliedAt ?? 0,
+        }))
       );
 
     // TX-LEDGER C3. Effects with no authored turn of their own — a realization,
@@ -960,7 +987,11 @@ class TransactionAuthority {
     const openedAt = this.pendingOpenedAtSeq.get(turnId) ?? 0;
     const observedLater = this.dependencyLedger
       .filter((entry) => entry.seq > openedAt)
-      .map((entry) => ({ turnId, effect: entry.effect }));
+      .map((entry) => ({
+        turnId,
+        effect: entry.effect,
+        appliedAt: entry.appliedAt,
+      }));
 
     // H4/H5/H6 — OTHER OPEN TRANSACTIONS ARE LATER WORK TOO.
     //
@@ -975,19 +1006,31 @@ class TransactionAuthority {
     //
     // Ids are monotonic and a callback runs synchronously at creation, so
     // `id > turnId` is exactly "opened after this one".
-    const pendingLater: LaterAppliedEffect[] = [];
+    const pendingLater: Array<LaterAppliedEffect & { appliedAt: number }> =
+      [];
     for (const [otherId, otherTurn] of this.pendingTurns) {
       if (otherId <= turnId) continue;
       for (const effect of otherTurn.__effects ?? []) {
-        pendingLater.push({ turnId: otherId, effect, unsettled: true });
+        pendingLater.push({
+          turnId: otherId,
+          effect,
+          unsettled: true,
+          // A reservation still running its callback has no stamp: it is the
+          // newest work there is.
+          appliedAt: otherTurn.__appliedAt ?? Number.POSITIVE_INFINITY,
+        });
       }
     }
 
-    return buildPendingRollbackPlan(this.pendingTurns.get(turnId), [
-      ...authoredLater,
-      ...observedLater,
-      ...pendingLater,
-    ]);
+    // In the order the work happened, not grouped by source: the final later
+    // effect on a subject decides supersession (`isErasedBySettledWork`), and
+    // a realized edit followed by a confirmed removal read as "edited and
+    // kept" when realizations were listed after every authored turn
+    // (reversal-engine review, item 4). Stable within one record.
+    const later = [...authoredLater, ...observedLater, ...pendingLater].sort(
+      (left, right) => left.appliedAt - right.appliedAt
+    );
+    return buildPendingRollbackPlan(this.pendingTurns.get(turnId), later);
   }
 
   getConfirmedTurnCount(): number {

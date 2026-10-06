@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
+import { withWriteContext } from '../../lib/write-context';
 import { SignalTreeRollbackError } from '../../lib/types';
 import { restoration } from '../restoration/restoration';
 import { transactions } from './transactions';
@@ -248,6 +249,88 @@ describe.each(configurations)(
           rows: SEEDED,
           other: SEEDED.filter((row) => row.id !== 'a'),
         });
+      } finally {
+        tree.destroy();
+      }
+    });
+  }
+);
+
+// Later work arrives from three sources (authored turns, observed
+// realizations, other open transactions). The final effect on the row decides,
+// so they are merged in the order they happened, not grouped by source
+// (reversal-engine review, item 4: a realized edit followed by a confirmed
+// removal read as "edited and kept" and refused).
+const realization = (fn: () => void) =>
+  withWriteContext({ intent: 'system', participation: 'realized' }, fn);
+
+describe.each(configurations)(
+  'rollback after later work from different sources, in time order (%s)',
+  (_name, enhancers) => {
+    const make = (): Tree =>
+      signalTree(declaration(), {
+        enhancers: enhancers() as never,
+      }) as unknown as Tree;
+    const open = (tree: Tree) =>
+      tree.transaction(() => {
+        tree.$.rows.updateOne('a', { n: 5 });
+        tree.$.x(1);
+      });
+
+    it('a realized edit, then a confirmed removal: the row is erased, the rest reverses', async () => {
+      const tree = make();
+      try {
+        await seed(tree);
+        const proposal = open(tree);
+        await flush();
+        realization(() => tree.$.rows.updateOne('a', { n: 7 }));
+        await flush();
+        tree.transaction(() => tree.$.rows.removeOne('a')).confirm();
+        await flush();
+        const before = state(tree);
+        expect(refusalKind(() => proposal.rollback())).toBeUndefined();
+        await flush();
+        expect(state(tree)).toStrictEqual({ ...before, x: 0 });
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    it('a confirmed edit, then a realized removal: the row is erased, the rest reverses', async () => {
+      const tree = make();
+      try {
+        await seed(tree);
+        const proposal = open(tree);
+        await flush();
+        tree.transaction(() => tree.$.rows.updateOne('a', { n: 7 })).confirm();
+        await flush();
+        realization(() => tree.$.rows.removeOne('a'));
+        await flush();
+        const before = state(tree);
+        expect(refusalKind(() => proposal.rollback())).toBeUndefined();
+        await flush();
+        expect(state(tree)).toStrictEqual({ ...before, x: 0 });
+      } finally {
+        tree.destroy();
+      }
+    });
+
+    it('a realized removal of another row, then a confirmed edit of this one: still refused', async () => {
+      const tree = make();
+      try {
+        await seed(tree);
+        const proposal = open(tree);
+        await flush();
+        realization(() => tree.$.rows.removeOne('c'));
+        await flush();
+        tree.transaction(() => tree.$.rows.updateOne('a', { n: 7 })).confirm();
+        await flush();
+        const refused = state(tree);
+        expect(refusalKind(() => proposal.rollback())).toBe(
+          'later-confirmed-dependency'
+        );
+        await flush();
+        expect(state(tree)).toStrictEqual(refused);
       } finally {
         tree.destroy();
       }
