@@ -769,17 +769,29 @@ export function rebaseOntoRejection(
   // walks only its own path: O(depth) plus each atom consumed once, rather
   // than a scan of every live atom per claim (the re-review measured 860 ms
   // at 2,000 rejected effects x 10k later records, and 746 ms for a
-  // 10k-key record). `seq` keeps the rejected turn's chronology for atoms one
-  // claim consumes together: later writes are undone first.
+  // 10k-key record). `order` keeps the rejected turn's chronology for atoms
+  // one claim consumes together: later writes are undone first. It is exact,
+  // compared element by element: a split atom's children extend its order by
+  // their key index, so they sort inside its slot, before the next atom's.
+  // Fractions inside the slot (seq + i·span/(n+1)) rounded to the next atom
+  // 54 levels down and the tie undid the earlier write first (rollback/rebase
+  // review, item 8; `rebase-onto-rejection.spec.ts`).
+  type OrderedAtom = RebaseAtom & { order: number[] };
   type TrieNode = {
-    atoms: Array<RebaseAtom & { seq: number; span: number }>;
+    atoms: OrderedAtom[];
     children: Map<string, TrieNode>;
+  };
+  const later = (left: OrderedAtom, right: OrderedAtom): number => {
+    let at = 0;
+    while (left.order[at] === right.order[at] && at < left.order.length) {
+      at += 1;
+    }
+    // A prefix (absent element) sorts first: a parent before its children.
+    return (right.order[at] ?? -1) - (left.order[at] ?? -1);
   };
   const roots = new Map<string, TrieNode>();
   const createNode = (): TrieNode => ({ atoms: [], children: new Map() });
-  const insertAtom = (
-    atom: RebaseAtom & { seq: number; span: number }
-  ): void => {
+  const insertAtom = (atom: OrderedAtom): void => {
     let node: TrieNode | undefined = roots.get(atom.scope);
     if (!node) {
       node = createNode();
@@ -795,7 +807,7 @@ export function rebaseOntoRejection(
     }
     node.atoms.push(atom);
   };
-  atoms.forEach((atom, seq) => insertAtom({ ...atom, seq, span: 1 }));
+  atoms.forEach((atom, seq) => insertAtom({ ...atom, order: [seq] }));
 
   // Defence in depth: never write back a renamed-away key that a DIFFERENT
   // lifetime holds in a later record. The rollback planner refuses that shape
@@ -838,14 +850,12 @@ export function rebaseOntoRejection(
   }
 
   /** Split an atom one level, or undefined when its values are not records. */
-  const refine = (
-    atom: RebaseAtom & { seq: number; span: number }
-  ): Array<RebaseAtom & { seq: number; span: number }> | undefined => {
+  const refine = (atom: OrderedAtom): OrderedAtom[] | undefined => {
     const sides = [atom.before, atom.after].map((side) =>
       !side.present ? {} : isRebaseRecord(side.value) ? side.value : undefined
     );
     if (sides[0] === undefined || sides[1] === undefined) return undefined;
-    const children: Array<RebaseAtom & { seq: number; span: number }> = [];
+    const children: OrderedAtom[] = [];
     const beforeKeys = Object.keys(sides[0]);
     const kept = sides[1];
     const positions = new Map(beforeKeys.map((name, at) => [name, at]));
@@ -865,8 +875,7 @@ export function rebaseOntoRejection(
         before,
         after,
         // Within the parent's slot, in key order: re-adds run last key first.
-        seq: atom.seq + ((index + 1) * atom.span) / (keys.length + 1),
-        span: atom.span / (keys.length + 1),
+        order: [...atom.order, index],
         ...(successor === undefined ? {} : { successor }),
       });
     });
@@ -898,7 +907,7 @@ export function rebaseOntoRejection(
     }
     if (!node) return current;
     // Every atom AT or BELOW the address: this record claims them all.
-    const below: Array<RebaseAtom & { seq: number; span: number }> = [];
+    const below: OrderedAtom[] = [];
     const pending = [node];
     while (pending.length > 0) {
       const next = pending.pop() as TrieNode;
@@ -907,7 +916,7 @@ export function rebaseOntoRejection(
       for (const child of next.children.values()) pending.push(child);
       next.children = new Map();
     }
-    below.sort((left, right) => right.seq - left.seq);
+    below.sort(later);
     for (const atom of below) {
       const rest = atom.segments.slice(address.segments.length);
       if (sameRebaseValue(navigateRebaseValue(current, rest), atom.after)) {
@@ -1490,23 +1499,23 @@ class RestorationManager<T> {
     },
     frontiers?: TurnFrontierTransition[]
   ): boolean {
-    const entry = this.buildTurn(
-      subjectIds,
-      positionIds,
-      effects,
-      collectionOrders,
-      explicitTurnId,
-      false,
-      historicalCapture,
-      frontiers
-    );
-    if (!entry) {
-      this.releaseTruncatedEntries();
-      return false;
-    }
-
-    beforeInsert?.();
+    // Whatever happens below, a future this call truncated is released once:
+    // after the new entry took its claims, or at once if there is none (a
+    // throw from buildTurn or beforeInsert used to leak its claims past
+    // reset and destroy).
     try {
+      const entry = this.buildTurn(
+        subjectIds,
+        positionIds,
+        effects,
+        collectionOrders,
+        explicitTurnId,
+        false,
+        historicalCapture,
+        frontiers
+      );
+      if (!entry) return false;
+      beforeInsert?.();
       return this.insertConfirmedTurn(entry);
     } finally {
       this.releaseTruncatedEntries();
@@ -1522,19 +1531,34 @@ class RestorationManager<T> {
     transactionId?: number,
     frontiers?: TurnFrontierTransition[]
   ): CanonicalTurn<T> | undefined {
-    const entry = this.buildTurn(
-      subjectIds,
-      positionIds,
-      effects,
-      collectionOrders,
-      explicitTurnId,
-      true,
-      undefined,
-      frontiers
-    );
-    this.releaseTruncatedEntries();
+    let entry: CanonicalTurn<T> | undefined;
+    try {
+      entry = this.buildTurn(
+        subjectIds,
+        positionIds,
+        effects,
+        collectionOrders,
+        explicitTurnId,
+        true,
+        undefined,
+        frontiers
+      );
+    } catch (error) {
+      this.releaseTruncatedEntries();
+      throw error;
+    }
     if (!entry) {
+      this.releaseTruncatedEntries();
       return undefined;
+    }
+    // A pending entry takes its claims only when it is confirmed: the future
+    // it truncated is held until then (or until it is discarded). Released
+    // here, a row only that future claimed was reclaimed while the
+    // transaction removing it was pending, and undo of the confirmed entry
+    // threw "Subject 1 cannot enter the structural target" (rollback/rebase
+    // review, item 1).
+    if (this.truncatedEntries.length > 0) {
+      this.heldTruncations.set(entry.id, this.truncatedEntries.splice(0));
     }
     entry.__transactionId = transactionId;
     this.pendingTurns.set(entry.id, entry);
@@ -1560,12 +1584,17 @@ class RestorationManager<T> {
       return false;
     }
 
-    beforeInsert?.();
-    this.pendingTurns.delete(turnId);
-    return this.insertConfirmedTurn(entry);
+    try {
+      beforeInsert?.();
+      this.pendingTurns.delete(turnId);
+      return this.insertConfirmedTurn(entry);
+    } finally {
+      this.releaseHeldTruncation(turnId);
+    }
   }
 
   discardPendingTurn(turnId: number): boolean {
+    this.releaseHeldTruncation(turnId);
     const discarded = this.pendingTurns.delete(turnId);
     // A discarded pending turn is a REJECTED transaction: its writes were
     // compensated and never became history, so its event goes too. Kept as an
@@ -3589,7 +3618,15 @@ class RestorationManager<T> {
    * would also free claims a `transactions()` enhancer on the same tree holds.
    */
   private releaseAllOwnedRestorationClaims(): readonly number[] {
-    return this.releaseRetainedRestorationEntries([...this.history]);
+    // Truncated futures still held (by a pending entry, or by an entry that
+    // never finished) are owned too: left, their owner strings outlived a
+    // reset and could release a new entry's claims.
+    const held = [
+      ...this.truncatedEntries.splice(0),
+      ...[...this.heldTruncations.values()].flat(),
+    ];
+    this.heldTruncations.clear();
+    return this.releaseRetainedRestorationEntries([...this.history, ...held]);
   }
 
   /** Test-only inventory: what this tree currently pins, and for whom. */
@@ -3716,10 +3753,19 @@ class RestorationManager<T> {
    * stream; on f8ff7431 too).
    */
   private truncatedEntries: CanonicalTurn<T>[] = [];
+  /** Futures pending entries truncated, held until they settle. */
+  private heldTruncations = new Map<number, CanonicalTurn<T>[]>();
 
   private releaseTruncatedEntries(): void {
     if (this.truncatedEntries.length === 0) return;
     this.releaseRetainedRestorationEntries(this.truncatedEntries.splice(0));
+  }
+
+  private releaseHeldTruncation(turnId: number): void {
+    const held = this.heldTruncations.get(turnId);
+    if (!held) return;
+    this.heldTruncations.delete(turnId);
+    this.releaseRetainedRestorationEntries(held);
   }
 }
 
