@@ -34,6 +34,7 @@ import {
   plainBranchMembershipChange,
   composePlainBranchMemberEffect,
   plainBranchMemberEffectIsNoop,
+  settleTurnMemberEffects,
   refreshOmittedCollection,
   type PlainBranchMemberPresence,
 } from '../../lib/internals/plain-branch-membership';
@@ -1660,10 +1661,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     bucket.positionIds.clear();
     const baselineValues = new Map(bucket.baselineValues);
     bucket.baselineValues.clear();
-    const effects = withTransientRows(
-      Array.from(bucket.effects.values()).map(cloneTurnEffect),
-      bucket.effects
-    );
+    const effects = settledEffectsOf(bucket);
     bucket.effects.clear();
     forgetTransientRows(bucket.effects);
     bucket.entityFootprints.clear();
@@ -1750,7 +1748,14 @@ export function getOrCreateInternalTransactionRuntime<T>(
           existing.mutationIntent,
           effect.mutationIntent
         );
-        if (plainBranchMemberEffectIsNoop(existing)) {
+        // A net no-op stays in the transaction's effects until they are
+        // settled (`settleTurnMemberEffects`: its pre-turn value is what a
+        // member image taken after it needs); a footprint drops it at once
+        // (v16 8g, 72ccc1b8, ported).
+        if (
+          effectMap === bucket.entityFootprints &&
+          plainBranchMemberEffectIsNoop(existing)
+        ) {
           effectMap.delete(key);
         }
         return;
@@ -2174,6 +2179,22 @@ export function getOrCreateInternalTransactionRuntime<T>(
     };
   };
 
+  /**
+   * The transaction's effects with its member images settled to its
+   * endpoints and its net no-ops dropped (`settleTurnMemberEffects`, v16 8g,
+   * 72ccc1b8, ported): rollback of `x(5); omit g; re-add g; y(13)` came back
+   * with x 5. Read when it stages, after its body, or when it settles, so
+   * storage holds its writes.
+   */
+  const settledEffectsOf = (bucket: CaptureBucket): TurnEffect[] =>
+    withTransientRows(
+      settleTurnMemberEffects(
+        tree.$ as object,
+        [...bucket.effects.values()].map(cloneTurnEffect)
+      ),
+      bucket.effects
+    );
+
   const materializePendingTransaction = (
     transactionId: number,
     reservedId: number
@@ -2192,10 +2213,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // through it.
     const subjectIds = [...bucket.subjectIds].sort((a, b) => a - b);
     const positionIds = [...bucket.positionIds].sort((a, b) => a - b);
-    const effects = withTransientRows(
-      [...bucket.effects.values()].map(cloneTurnEffect),
-      bucket.effects
-    );
+    const effects = settledEffectsOf(bucket);
     const baselineValues = new Map(bucket.baselineValues);
     const { orderDeltas, frontiers } = turnOrdersOf(bucket);
     const pending = authority.createPending(
@@ -2241,10 +2259,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // Keep the capture until compensation succeeds or refusal is committed.
     // Draining it before validation loses the only ledger input on refusal.
     const positionIds = [...bucket.positionIds];
-    const effects = withTransientRows(
-      [...bucket.effects.values()].map(cloneTurnEffect),
-      bucket.effects
-    );
+    const effects = settledEffectsOf(bucket);
     const baselineValues = new Map(bucket.baselineValues);
     const { orderDeltas, frontiers } = turnOrdersOf(bucket);
     return {

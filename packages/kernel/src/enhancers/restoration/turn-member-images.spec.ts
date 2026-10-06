@@ -167,6 +167,55 @@ describe('one turn that omits and re-adds (v16 8g)', () => {
       });
 });
 
+describe('a transaction that omits and re-adds rolls back to its start (v16 8g)', () => {
+  // transactions() keeps its own capture; it settled member images the same
+  // way restoration's turns did, so rollback of the first shape restored x 5.
+  const shapes: Record<string, [(tree: Tree) => void, (tree: Tree) => void]> = {
+    'a write, an omission and a re-add of its branch': [
+      (tree) => tree.$.count(1),
+      (tree) => {
+        tree.$.g.h.x(5);
+        tree.$({ count: 16 });
+        tree.$({ g: { h: { x: 0, y: 18 } }, count: 9 });
+        tree.$.g.h.y(13);
+      },
+    ],
+    'two path re-adds under one omitted member': [
+      (tree) => omitH(tree, 19),
+      (tree) => {
+        tree.$.g.h.x(3);
+        tree.$.g.h.y(15);
+      },
+    ],
+    'a path re-add and an omission of the same branch': [
+      (tree) => tree.$({ count: 9 }),
+      (tree) => {
+        tree.$.g.h.x(5);
+        tree.$({ count: 16 });
+      },
+    ],
+  };
+  const withTransactions: Record<string, () => unknown[]> = {
+    'transactions alone': () => [transactions()],
+    'transactions first': orders['transactions first'],
+    'restoration first': orders['restoration first'],
+  };
+  for (const [order, enhancers] of Object.entries(withTransactions))
+    for (const [shape, [setup, body]] of Object.entries(shapes))
+      it(`${shape} (${order})`, async () => {
+        const tree = make(enhancers());
+        await flush();
+        setup(tree);
+        await flush();
+        const start = snap(tree);
+        const pending = tree.transaction(() => body(tree));
+        await flush();
+        pending.rollback();
+        await flush();
+        expect(snap(tree)).toBe(start);
+      });
+});
+
 describe('a turn whose re-add and omission cancel (v16 8g)', () => {
   for (const [order, enhancers] of Object.entries(orders))
     it(`records nothing (${order})`, async () => {
