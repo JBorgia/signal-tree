@@ -455,8 +455,8 @@ function makeNodeAccessor<T>(
       // structural write the writer reconciles membership itself.
       const absent =
         !isRoot &&
-        !inStructuralWrite(self.accessor) &&
-        isAbsentMember(self.accessor);
+        isAbsentMember(self.accessor) &&
+        !inStructuralWrite(self.accessor);
       let updates = arg;
       if (typeof arg === 'function') {
         const updater = arg as (current: T) => T;
