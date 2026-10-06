@@ -821,6 +821,12 @@ export interface EntitySignalOf<
    * `entity.id` disagreeing with the storage key — the caller's id cannot drift.
    */
   replaceOne(id: K, entity: E, opts?: MutationOptions): void;
+  /**
+   * Merge `changes` into each listed entity. A repeated id is idempotent, on
+   * purpose: its row is updated once, from its value before the call (the
+   * last listing's intercepted changes apply), and announced once. Every
+   * listing is still intercepted and tapped.
+   */
   updateMany(ids: K[], changes: Partial<E>, opts?: MutationOptions): void;
   updateWhere(predicate: (entity: E) => boolean, changes: Partial<E>): number;
   upsertOne(entity: E, opts?: AddOptions<E, K>): K;
@@ -838,6 +844,11 @@ export interface EntitySignalOf<
    */
   upsertMany(entities: E[], opts?: AddOptions<E, K>): K[];
   removeOne(id: K, opts?: MutationOptions): void;
+  /**
+   * Remove each listed entity. A repeated id is idempotent, on purpose: its
+   * row is removed once and announced once, and the repeat does not throw as a
+   * second `removeOne` would. Every listing is still intercepted and tapped.
+   */
   removeMany(ids: K[], opts?: MutationOptions): void;
   removeWhere(predicate: (entity: E) => boolean): number;
   /** Empty the collection. There is no `removeAll` alias — this is the one name. */
