@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { signalTree } from '../../lib/signal-tree';
 import { entityMap } from '../../lib/markers/entity-map';
+import { SignalTreeRollbackError } from '../../lib/types';
 import { undoable } from '../../lib/undoable';
 import { transactions } from '../transactions/transactions';
 import { restoration } from './restoration';
@@ -242,6 +243,12 @@ describe.each(undoConfigurations)(
 // rather than guess. PRE-EXISTING ON 15.4.3 for setAll. Reported as a
 // design-level gap (how an order capture composes with other structural
 // effects in a turn), not repaired here.
+//
+// The prependMany shape did not refuse on 15.4.3: its move was unrecorded and
+// its overwrite read as an add, so undo AND rollback reported success and
+// deleted the overwritten row (`c` gone, measured on 15.4.3 and on the v16
+// integration head). Recording the move turns that silent loss into this
+// refusal, with state unchanged.
 const reorderThenRemove = (tree: Tree) => {
   tree.$.rows.setAll([
     { id: 'c', n: 3 },
@@ -301,6 +308,65 @@ describe.each(undoConfigurations)(
           undoable(() => act(tree));
           await flush();
           tree.undo();
+          await flush();
+          expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
+  }
+);
+
+describe.each(rollbackConfigurations)(
+  'known design-level limitation: order delta composition, rollback (%s)',
+  (_name, enhancers) => {
+    const begin = (tree: Tree, act: (tree: Tree) => void) =>
+      tree.transaction(() => act(tree));
+
+    it.each([
+      ['setAll reorder, then removeOne', reorderThenRemove],
+      [
+        'addOne, then prependMany overwrite moving a row',
+        addThenPrependOverwrite,
+      ],
+    ] as const)(
+      'KNOWN LIMITATION (design-level; setAll pre-existing on 15.4.3): %s — current behaviour: rollback refuses and changes nothing',
+      async (_case, act) => {
+        const tree = make(enhancers());
+        try {
+          await seed(tree);
+          const proposal = begin(tree, act);
+          await flush();
+          const after = tree.$.rows.all();
+          const error = thrownBy(() => proposal.rollback());
+          expect(error).toBeInstanceOf(SignalTreeRollbackError);
+          expect((error as { cause?: { kind?: string } }).cause?.kind).toBe(
+            'effect-validation-failed'
+          );
+          await flush();
+          expect(tree.$.rows.all()).toStrictEqual(after);
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
+
+    it.fails.each([
+      ['setAll reorder, then removeOne', reorderThenRemove],
+      [
+        'addOne, then prependMany overwrite moving a row',
+        addThenPrependOverwrite,
+      ],
+    ] as const)(
+      'KNOWN LIMITATION (design-level; setAll pre-existing on 15.4.3): %s — desired: rollback restores',
+      async (_case, act) => {
+        const tree = make(enhancers());
+        try {
+          await seed(tree);
+          const proposal = begin(tree, act);
+          await flush();
+          proposal.rollback();
           await flush();
           expect(tree.$.rows.all()).toStrictEqual(SEEDED);
         } finally {
