@@ -83,9 +83,18 @@ bullet below says **Compatibility** or **Behaviour change**.
   state the extension hands back re-serialized differently hashes
   differently and counts as unrecorded: interceptors run, and a blocking one
   refuses the jump. The other direction is a hash collision: a different
-  state whose JSON hashes like a recorded one is treated as recorded and
-  skips interceptors. This is a development-only trust surface: `devtools()`
-  is a development tool, and it trusts the extension's states only that far.
+  state whose JSON hashes like a recorded one is treated as recorded, and the
+  recorded state is applied without interceptors. This is a
+  development-only trust surface: `devtools()` is a development tool, and it
+  trusts the extension's states only that far.
+- A devtools jump to a recorded state applies the state as the tree recorded
+  it, as a whole value, so a member the state left out is omitted again; it
+  stayed present, because the jump merged the state into the tree (the
+  serialized form cannot tell an omitted member from one holding
+  `undefined`). Any other state, and `IMPORT_STATE`, still merges: a key it
+  leaves out keeps its current value. **Behaviour change:** a jump to a
+  recorded state can omit members, and applies the values the tree held
+  rather than their serialized form.
 - Taps fire symmetrically for the changes a reversal applies: a row it brings
   back taps `onAdd`, one it takes away `onRemove`, one whose value it changes
   `onUpdate`. On 15.4.3 no reversal tapped `onAdd` (redo of `addOne` or
