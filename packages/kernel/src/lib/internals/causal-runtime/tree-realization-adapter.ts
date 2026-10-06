@@ -1030,8 +1030,23 @@ function planHeterogeneousFrame(
           });
         }
 
+        // A row this frame puts back carries its prepared fields in the
+        // insertion's own publication, the WHOLE row, as every restore does;
+        // a row it removes has no fields left to publish. Publishing those
+        // fields again on their own paths sent Link (and any whole-row
+        // reader) the bare field value as the row: undo of an
+        // edit-then-remove turn delivered `[z, 1, c]` (15.4.3 and earlier;
+        // undo-rules review of b2107f43, item 2).
+        const structurallyPublished = new Set(
+          [...plannedInsertions, ...plannedRemoves].map(
+            ({ effect }) => `${effect.owner}\u0000${effect.subjectId}`
+          )
+        );
         for (const effect of [
-          ...preparedSubjectScalarEffects,
+          ...preparedSubjectScalarEffects.filter(
+            ({ owner, subjectId }) =>
+              !structurallyPublished.has(`${owner}\u0000${subjectId}`)
+          ),
           ...framedScalarEffects,
         ]) {
           const descriptor = descriptors.get(effect.owner);
