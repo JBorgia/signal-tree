@@ -15,6 +15,10 @@ import {
  * Keyed by the tree's position registry, which every owned location already
  * carries, so `link()` needs no reference to the tree object. A Link removes
  * itself when disposed first, so nothing disposed is retained until destroy.
+ * `destroy()` reaches this module only through `PositionRegistry.close`,
+ * installed on the first bind, so a program that never imports `link()` pays
+ * only for an optional call (the entity bundle budget has bytes, not
+ * kilobytes, of headroom).
  */
 const linksByTree = new WeakMap<PositionRegistry, Set<() => void>>();
 
@@ -24,7 +28,10 @@ export function bindLinkToTree(
   dispose: () => void
 ): () => void {
   let links = linksByTree.get(registry);
-  if (!links) linksByTree.set(registry, (links = new Set()));
+  if (!links) {
+    linksByTree.set(registry, (links = new Set()));
+    registry.close = () => disposeTreeLinks(registry);
+  }
   const bound = links;
   bound.add(dispose);
   return () => {
@@ -32,8 +39,8 @@ export function bindLinkToTree(
   };
 }
 
-/** @internal Called by `tree.destroy()` before any other cleanup runs. */
-export function disposeTreeLinks(registry: PositionRegistry): void {
+/** `tree.destroy()`, through `PositionRegistry.close`. */
+function disposeTreeLinks(registry: PositionRegistry): void {
   const links = linksByTree.get(registry);
   if (!links) return;
   linksByTree.delete(registry);
