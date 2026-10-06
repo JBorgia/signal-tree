@@ -727,11 +727,14 @@ export interface InterceptContext<T> {
  * allowed, and an updated row merges over its value as the interceptors left
  * it.
  *
- * Interceptors do not run on a reversal — `undo()`, `redo()`, `jumpTo()` or a
- * transaction rollback. It writes back exactly the value, or the pre-image,
- * that was recorded, which the interceptors already shaped when it was first
- * written; neither a transform nor a block applies to it. Taps and path
- * subscribers are still notified.
+ * Interceptors do not run on a replay of recorded state — `undo()`, `redo()`,
+ * `jumpTo()`, a transaction rollback, or a devtools jump to a recorded state
+ * (JUMP_TO_STATE, JUMP_TO_ACTION, ROLLBACK). It writes back exactly the value,
+ * or the pre-image, that was recorded, which the interceptors already shaped
+ * when it was first written; neither a transform nor a block applies to it.
+ * Taps and path subscribers are still notified, and a write one of them makes
+ * meanwhile is intercepted as usual. A devtools IMPORT_STATE applies imported
+ * input and runs the interceptors.
  */
 export interface InterceptHandlers<E, K extends string | number> {
   onAdd?: (entity: E, ctx: InterceptContext<E>) => void;

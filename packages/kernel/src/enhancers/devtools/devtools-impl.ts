@@ -615,7 +615,7 @@ interface DevToolsGroup {
     tree: {
       readSnapshot: () => unknown;
       buildSerializedState: (state: unknown) => unknown;
-      applyInspectionState: (state: unknown) => void;
+      applyInspectionState: (state: unknown, replays?: boolean) => void;
       formatPathFn: (path: string) => string;
       isPathAllowed: (path: string) => boolean;
       enableTimeTravel: boolean;
@@ -680,7 +680,7 @@ function getOrCreateDevToolsGroup(
     {
       readSnapshot: () => unknown;
       buildSerializedState: (state: unknown) => unknown;
-      applyInspectionState: (state: unknown) => void;
+      applyInspectionState: (state: unknown, replays?: boolean) => void;
       formatPathFn: (path: string) => string;
       isPathAllowed: (path: string) => boolean;
       enableTimeTravel: boolean;
@@ -764,7 +764,7 @@ function getOrCreateDevToolsGroup(
     browserDevTools.send('@@INIT', aggregated);
   };
 
-  const applyInspectionState = (state: unknown) => {
+  const applyInspectionState = (state: unknown, replays = false) => {
     if (state === undefined || state === null) return;
     isApplyingInspectionState = true;
     try {
@@ -773,7 +773,7 @@ function getOrCreateDevToolsGroup(
         if (!tree.enableTimeTravel) continue;
         const treeState = stateByTree[treeKey];
         if (treeState !== undefined) {
-          tree.applyInspectionState(treeState);
+          tree.applyInspectionState(treeState, replays);
         }
       }
     } finally {
@@ -821,15 +821,16 @@ function getOrCreateDevToolsGroup(
         : undefined;
     if (!actionType) return;
 
+    // Recorded states, replayed: interceptors do not run on them (15.4.4).
     if (actionType === 'JUMP_TO_STATE' || actionType === 'JUMP_TO_ACTION') {
       const nextState = parseDevToolsState(msg.state);
-      applyInspectionState(nextState);
+      applyInspectionState(nextState, true);
       return;
     }
 
     if (actionType === 'ROLLBACK') {
       const nextState = parseDevToolsState(msg.state);
-      applyInspectionState(nextState);
+      applyInspectionState(nextState, true);
       sendInit();
       return;
     }
@@ -1077,7 +1078,7 @@ function getOrCreateDevToolsGroup(
     tree: {
       readSnapshot: () => unknown;
       buildSerializedState: (state: unknown) => unknown;
-      applyInspectionState: (state: unknown) => void;
+      applyInspectionState: (state: unknown, replays?: boolean) => void;
       formatPathFn: (path: string) => string;
       isPathAllowed: (path: string) => boolean;
       enableTimeTravel: boolean;
@@ -1519,7 +1520,13 @@ export function createDevToolsEnhancer(
       pendingDuration = undefined;
     };
 
-    const applyInspectionState = (state: unknown): void => {
+    /**
+     * `replays`: the state is one this tree recorded (a timeline jump, a
+     * revert to the last commit), written back as recorded — its own entity
+     * writes skip interceptors, as undo's do (15.4.4). An imported state is
+     * new input and keeps them.
+     */
+    const applyInspectionState = (state: unknown, replays = false): void => {
       if (state === undefined || state === null) return;
       isApplyingInspectionState = true;
       try {
@@ -1550,7 +1557,8 @@ export function createDevToolsEnhancer(
             } else {
               rootAuthority.replace(state as T);
             }
-          }
+          },
+          replays
         );
       } finally {
         isApplyingInspectionState = false;
@@ -1606,15 +1614,17 @@ export function createDevToolsEnhancer(
           ? msg.payload.type
           : undefined;
       if (!actionType) return;
+      // Recorded states, replayed: interceptors do not run on them (15.4.4).
+      // IMPORT_STATE below applies imported input and keeps them.
       if (actionType === 'JUMP_TO_STATE' || actionType === 'JUMP_TO_ACTION') {
         const nextState = parseDevToolsState(msg.state);
-        applyInspectionState(nextState);
+        applyInspectionState(nextState, true);
         return;
       }
 
       if (actionType === 'ROLLBACK') {
         const nextState = parseDevToolsState(msg.state);
-        applyInspectionState(nextState);
+        applyInspectionState(nextState, true);
         sendInit();
         return;
       }
