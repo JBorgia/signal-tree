@@ -2118,7 +2118,11 @@ class RestorationManager<TSource, T> {
 
     for (const effect of effects) {
       if (!this.isSupportedEffect(effect)) {
-        throw new Error(`Unsupported scoped undo effect at ${effect.path}`);
+        // Owner-made and raised before anything applies: a refusal, like
+        // ST1034 and the structured validation refusals (v16 integration 8b).
+        throw restorationRefusal(
+          `Unsupported scoped undo effect at ${effect.path}`
+        );
       }
     }
 
