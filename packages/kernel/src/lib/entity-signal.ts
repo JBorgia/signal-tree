@@ -707,11 +707,13 @@ export function createEntitySignal<
   ) {
     const capture = committedEntityObserver();
     const unit = beginMembershipUnit();
+    const frontier = structuralStore.activeOrderFrontier();
     try {
       let membership: readonly EntityMembershipChange[] = [];
       const result = frame.commit(capture, membershipInventory.observed()
         ? (changes) => { membership = changes; }
         : undefined);
+      publishFrontier(frontier);
       if (options?.advancePhysicalRevision !== false) {
         physicalCommitClock?.advance();
       }
@@ -1174,9 +1176,15 @@ export function createEntitySignal<
     );
   }
 
+  /** A frontier-only transition, once per operation that replaced it. */
+  function publishFrontier(before: unknown): void {
+    if (before !== structuralStore.activeOrderFrontier() && orderConsumed())
+      publishOrderChange(undefined, undefined, before);
+  }
+
   function publishOrderChange(
-    beforeSubjects: number[],
-    afterSubjects: number[],
+    beforeSubjects: number[] | undefined,
+    afterSubjects: number[] | undefined,
     beforeFrontier: unknown
   ): void {
     mutationCaptureRuntime?.publishCollectionOrder?.({
@@ -1192,7 +1200,9 @@ export function createEntitySignal<
 
   function moveToFront(ids: K[]): void {
     const before = membershipInventory.observed(true) ? structuralStore.activeKeysSnapshot().map((key) => rememberSubjectId(key)) : undefined;
+    const frontier = structuralStore.activeOrderFrontier();
     structuralStore.moveKeysToFront(ids);
+    publishFrontier(frontier);
     if (before) {
       const after = structuralStore.activeKeysSnapshot().map((key) => rememberSubjectId(key));
       if (before.some((id, index) => id !== after[index])) {
@@ -3886,6 +3896,7 @@ export function createEntitySignal<
         ownerPath: basePath,
         readSource: readTransitionSource,
         prepareTarget: prepareTransitionTarget,
+        orderFrontier: structuralStore.orderFrontierAt,
       } satisfies CollectionTransitionTargetBinding,
       enumerable: false,
       configurable: true,

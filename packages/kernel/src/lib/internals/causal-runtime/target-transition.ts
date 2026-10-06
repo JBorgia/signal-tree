@@ -34,6 +34,12 @@ export type CollectionTransitionTargetBinding = {
   readonly owner: PositionId;
   readonly ownerPath: string;
   readSource(): CollectionTransitionSource;
+  /**
+   * The collection's order frontier, read without walking the rows; with a
+   * token, installs it first. A reversal that restores exactly the order a
+   * recorded token identified reinstates that token.
+   */
+  orderFrontier?(token?: object): unknown;
   prepareTarget(
     target: CollectionTransitionTarget
   ): PreparedCollectionTransitionTarget;

@@ -88,6 +88,7 @@ import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals
 import {
   getMutationCaptureRuntime,
   type CollectionOrderCapture,
+  type OrderChangeCapture,
 } from '../../lib/internals/mutation-capture-runtime';
 import { getOwnedPositionIds } from '../../lib/internals/owned-mutation';
 import { getPositionRegistry } from '../../lib/internals/position-registry';
@@ -101,6 +102,12 @@ import {
 import { visitTree } from '../../lib/internals/visit-tree';
 import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-port';
 import { getLocationRuntime } from '../../lib/internals/location-runtime';
+
+/** An order change of surviving rows, not a frontier-only transition. */
+const carriesOrders = (
+  capture: CollectionOrderCapture
+): capture is OrderChangeCapture =>
+  capture.beforeSubjects !== undefined && capture.afterSubjects !== undefined;
 
 type TurnEffectBase = {
   position: number;
@@ -237,7 +244,7 @@ type CaptureBucket = {
   positionIds: Set<number>;
   baselineValues: Map<number, unknown>;
   effects: PendingEffectMap;
-  collectionOrders: Map<number, Omit<CollectionOrderCapture, 'meta'>>;
+  collectionOrders: Map<number, Omit<OrderChangeCapture, 'meta'>>;
 };
 
 export type TransactionTurnRecord = {
@@ -1441,7 +1448,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     positionIds: number[];
     baselineValues: Map<number, unknown>;
     effects: TurnEffect[];
-    collectionOrders: Array<Omit<CollectionOrderCapture, 'meta'>>;
+    collectionOrders: Array<Omit<OrderChangeCapture, 'meta'>>;
   } => {
     bucket.ownWriteSeq.clear();
     const subjectIds = Array.from(bucket.subjectIds).sort((a, b) => a - b);
@@ -1920,6 +1927,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
     getMutationCaptureRuntime(tree)?.subscribeCollectionOrder?.((capture) => {
       const transactionId = resolveTransactionId(capture.meta);
       if (transactionId === undefined) {
+        return;
+      }
+      if (!carriesOrders(capture)) {
         return;
       }
       const bucket = getTransactionBucket(transactionId);

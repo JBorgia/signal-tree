@@ -393,8 +393,18 @@ const TARGETS = {
     // Offsets tried and rejected (each worse or a few bytes at the cost of
     // opaque names) are recorded with the commit. 22.62 KB is 23,162 B: the
     // gate compares bytes / 1024 against it, and 23,163 / 1024 = 22.6201.
+    // 15.4.4 order-frontier hook (reversal stream (a)+(d)), within the same
+    // allowance (owner's maximum 22.7 KB = 23,244 B): 1e1503e0 measured
+    // 23,130 B, the hook 23,191 B (+61 B). One frontier transition per
+    // collection operation (frame commits and the prependMany move) plus the
+    // binding's frontier read/install: without them a reversal cannot tell a
+    // turn's own order endpoints or reinstate the order token it replaced,
+    // and undo/rollback of an order change refused after any add or remove in
+    // or after the same turn. Data, not diagnostics; it does not fold.
+    // Offsets tried: separate read and install accessors (+15 B worse), a
+    // single merged accessor (taken). 22.66 KB = 23,203 B leaves ~12 B.
     devKB: 25.5,
-    prodKB: 22.62,
+    prodKB: 22.66,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });
