@@ -46,7 +46,10 @@ import type { PhysicalCommitClock } from './internals/physical-commit-clock';
 import type { PathObservationPort } from './internals/path-observation-port';
 import { getActiveWriteContext } from '../lib/write-context';
 import { recordProductionSubstrateStat } from './internals/production-substrate-stats';
-import { defineEntityProjectionSeed } from './internals/entity-projection-seed';
+import {
+  defineEntityProjectionSeed,
+  type EntityProjectionOrder,
+} from './internals/entity-projection-seed';
 import { markOwnerInvalidated } from './internals/owner-invalidation-port';
 import type {
   CommittedEntityMutation,
@@ -3871,7 +3874,7 @@ export function createEntitySignal<
       key: string | number;
       row: unknown;
     }[];
-  });
+  }, config.sortComparer as EntityProjectionOrder | undefined);
 
   Object.defineProperty(api, '__findKeyBySubjectId', {
     value: findKeyBySubjectId,
