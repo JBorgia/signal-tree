@@ -1769,11 +1769,20 @@ class RestorationManager<T> {
    * Rows a rejection restored that records made before it never knew, by
    * collection: held out of the order while those records reverse (undo,
    * redo, jumpTo, the history walk), and put back by their attachments, the
-   * neighbours the rollback restored them next to (`HeldRow`). A record
-   * made after the rejection knows them, and does not hold them.
+   * neighbours the rollback restored them next to (`HeldRow`). Only records
+   * made while the rejected transaction was open hold them: one made before
+   * it opened knew the row (the transaction removed it later), and one made
+   * after the rejection knows it again. Holding it for an earlier record
+   * kept a row that record's undo removes ("Collection order does not match
+   * active SubjectIds" from undo of the entry that added it).
    */
   private heldRows: Array<
-    HeldRow & { owner: number; turnId: number; ordinal: number }
+    HeldRow & {
+      owner: number;
+      turnId: number;
+      ordinal: number;
+      since: { turnId: number; ordinal: number };
+    }
   > = [];
 
   private holdRestoredRows(
@@ -1796,23 +1805,25 @@ class RestorationManager<T> {
           right: order[index + 1],
           turnId,
           ordinal,
+          since,
         });
       });
     }
   }
 
-  /** The rows held for a record (made at or before each rejection). */
+  /** The rows held for a record (made while a rejected transaction was open). */
   private heldFor(record: {
     turnId?: number;
     ordinal?: number;
   }): Map<number, HeldRow[]> | undefined {
     let held: Map<number, HeldRow[]> | undefined;
     for (const row of this.heldRows) {
-      const predates =
+      const within =
         record.turnId !== undefined
-          ? record.turnId <= row.turnId
-          : (record.ordinal ?? Infinity) <= row.ordinal;
-      if (!predates) continue;
+          ? row.since.turnId < record.turnId && record.turnId <= row.turnId
+          : row.since.ordinal < (record.ordinal ?? Infinity) &&
+            (record.ordinal ?? Infinity) <= row.ordinal;
+      if (!within) continue;
       held ??= new Map();
       let rows = held.get(row.owner);
       if (!rows) held.set(row.owner, (rows = []));
