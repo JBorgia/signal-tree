@@ -1120,6 +1120,47 @@ describe('re-entrant whole values and reversals started from a tap (v16 8f revie
     expect(tree.$()).toEqual({ a: { rows: { all: [A, Z] }, s: 0 }, count: 0 });
   });
 
+  it('a re-add made earlier in the same whole value binds its deeper levels', () => {
+    // The tap runs during the whole value's `rows` hydrate, before the whole
+    // value reaches `c`. Its re-add of `c.d` came after the whole value began,
+    // so no level of that whole value omits it again.
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, string>(),
+        c: { d: { v: 0 }, e: 0 },
+        count: 0,
+      },
+      { capabilities: ['causal-runtime', 'position-topology'] as never }
+    ) as unknown as {
+      $: ((value?: unknown) => unknown) & {
+        rows: Rows;
+        c: ((value?: unknown) => unknown) & {
+          d: { v: (value?: number) => number };
+        };
+      };
+      destroy(): void;
+    };
+    trees.push(tree as never);
+    tree.$.rows.setAll([A]);
+    tree.$.c({ e: 0 });
+    expect(tree.$()).toEqual({ rows: { all: [A] }, c: { e: 0 }, count: 0 });
+    let ran = false;
+    tree.$.rows.tap({
+      onAdd: () => {
+        if (ran) return;
+        ran = true;
+        tree.$.c.d.v(5);
+      },
+    });
+    tree.$({ rows: [A, Z], c: { e: 1 }, count: 0 });
+    expect(ran).toBe(true);
+    expect(tree.$()).toEqual({
+      rows: { all: [A, Z] },
+      c: { d: { v: 5 }, e: 1 },
+      count: 0,
+    });
+  });
+
   it('undo and redo started from a tap of another tree', async () => {
     // A reversal opens its tree's physical-rows window at the tap depth it
     // starts at, so its own reads stay physical inside the tap.
