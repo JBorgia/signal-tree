@@ -14,8 +14,10 @@
  * Existing internal handles identify subjects; missing lifetime inventory alone
  * cannot detect abandoned WeakRef wrappers, so cleanup uses Map.has/size/keys.
  *
- * StructuralStore.activeOrderFrontier is separately hooked across initial setAll
- * to capture exactly one real store. Its live lifetime/revision maps must contain
+ * StructuralStore.snapshotActiveOrder is separately hooked across initial setAll
+ * to capture exactly one real store (the order read setAll makes beside its
+ * frontier read; `activeOrderFrontier` is an instance arrow now, passed to the
+ * transition binding as is, so it is no longer on the prototype to hook). Its live lifetime/revision maps must contain
  * both private handles before retirement; never cache maps that installation swaps.
  * --self-test copies the artifact and independently removes activation cleanup
  * restores historical post-forget publication, and removes the late registration
@@ -135,23 +137,23 @@ async function probe(artifact) {
   const { StructuralStore } = await import(
     pathToFileURL(`${artifact}/dist/lib/physical/structural-store.js`)
   );
-  const frontierDescriptor = Object.getOwnPropertyDescriptor(
+  const orderReadDescriptor = Object.getOwnPropertyDescriptor(
     StructuralStore.prototype,
-    'activeOrderFrontier'
+    'snapshotActiveOrder'
   );
   assert.equal(
-    typeof frontierDescriptor?.value,
+    typeof orderReadDescriptor?.value,
     'function',
     'Built StructuralStore hook unavailable'
   );
-  const originalFrontier = frontierDescriptor.value;
+  const originalOrderRead = orderReadDescriptor.value;
   function captureInitialStore(initialize) {
     const receivers = new Set();
-    Object.defineProperty(StructuralStore.prototype, 'activeOrderFrontier', {
-      ...frontierDescriptor,
+    Object.defineProperty(StructuralStore.prototype, 'snapshotActiveOrder', {
+      ...orderReadDescriptor,
       value: function (...args) {
         receivers.add(this);
-        return Reflect.apply(originalFrontier, this, args);
+        return Reflect.apply(originalOrderRead, this, args);
       },
     });
     try {
@@ -159,16 +161,16 @@ async function probe(artifact) {
     } finally {
       Object.defineProperty(
         StructuralStore.prototype,
-        'activeOrderFrontier',
-        frontierDescriptor
+        'snapshotActiveOrder',
+        orderReadDescriptor
       );
     }
     assert.deepEqual(
       Object.getOwnPropertyDescriptor(
         StructuralStore.prototype,
-        'activeOrderFrontier'
+        'snapshotActiveOrder'
       ),
-      frontierDescriptor
+      orderReadDescriptor
     );
     assert.equal(
       receivers.size,
@@ -426,9 +428,9 @@ async function probe(artifact) {
       assert.deepEqual(
         Object.getOwnPropertyDescriptor(
           StructuralStore.prototype,
-          'activeOrderFrontier'
+          'snapshotActiveOrder'
         ),
-        frontierDescriptor
+        orderReadDescriptor
       );
       record.structuralPrototypeRestored = true;
       record.prototypeRestored = true;
@@ -574,7 +576,7 @@ async function probe(artifact) {
     failures,
     prototypeRestored: Map.prototype.set === originalSet,
     structuralPrototypeRestored:
-      StructuralStore.prototype.activeOrderFrontier === originalFrontier,
+      StructuralStore.prototype.snapshotActiveOrder === originalOrderRead,
   };
   return result;
 }
