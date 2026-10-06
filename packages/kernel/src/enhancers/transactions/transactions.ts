@@ -2126,7 +2126,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
           transactionId: owningTransactionId,
           ownerId: getPositionRegistry(tree.$)?.id,
         },
-        () => rollbackPendingTarget(effects, orderDeltas)
+        () => rollbackPendingTarget(effects, orderDeltas),
+        true
       );
       return;
     }
@@ -2191,7 +2192,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
           topology: positionRegistry,
           port: realizationPort,
           realizationContext,
-        })
+        }),
+      true
     );
     if (!result.ok) {
       throw createRollbackError({

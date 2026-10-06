@@ -2616,7 +2616,8 @@ class RestorationManager<T> {
           // Fallback if no restoration function provided
           rootAuthorityFor(this.tree).replace(state);
         }
-      }
+      },
+      true
     );
   }
 
@@ -3325,7 +3326,8 @@ export function restoration(
                 origin: 'restoration',
                 ownerId: getPositionRegistry(tree.$)?.id,
               },
-              () => prepared.install()
+              () => prepared.install(),
+              true
             );
           const releaseMembership = holdEntityMembershipDelivery(tree.$);
           try {
@@ -3505,7 +3507,8 @@ export function restoration(
           { origin: 'restoration', ownerId: replayOwnerId },
           () => {
             realizationPort.applyAtomically(reversalEffects);
-          }
+          },
+          true
         );
       } catch (error) {
         if (!wasAppliedBeforeFailure(error)) throw error;

@@ -66,7 +66,8 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   with the transform applied) and a blocking interceptor made the reversal
   throw, as on 15.4.3. Taps and subscribers are still notified.
   A write a tap or subscriber makes while the reversal runs is still
-  intercepted.
+  intercepted; an undo, redo, jumpTo or rollback it starts is itself a
+  reversal and is not.
 - Devtools jumps (`JUMP_TO_STATE`, `JUMP_TO_ACTION`, `ROLLBACK`) to a state
   the tree itself serialized are replays too and skip interceptors, so a
   blocking interceptor no longer makes devtools time travel throw. A jump to
