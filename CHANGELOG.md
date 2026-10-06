@@ -15,11 +15,15 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   listed under 15.4.2/15.4.3. It covers every pre-image a later record holds:
   a field's previous value, the snapshot of a row a later write removed (field
   by field, so an edit, an added field or a dropped field of the rejected
-  transaction does not come back), the key of a row it renamed, and the place
-  of a row anchored next to one only it created. Addresses are exact (the
-  literal key `'d.e'` is not the nested `d.e`), a history reset while the
-  transaction is pending does not forget it, and a later entry left with
-  nothing to undo is dropped rather than kept as a no-op step.
+  transaction does not come back, in the row's original key order, and a
+  field literally named `__proto__` comes back as an own field), the key of a
+  row it renamed, the place of a row anchored next to one only it created,
+  and a collection's order: the rejected transaction's rows leave a later
+  reorder, whose order tokens are re-based, so history, undo and redo of a
+  later `setAll` that reordered or removed them work (they threw). Addresses
+  are exact (the literal key `'d.e'` is not the nested `d.e`), a history
+  reset while the transaction is pending does not forget it, and a later
+  entry left with nothing to undo is dropped rather than kept as a no-op step.
   `getRestorationHistory()` no longer throws after rejecting an undoable
   transaction that added a row, or one a later write appended next to.
 - Undo of `updateOne` followed by `clear()` (and other writes followed by
@@ -89,13 +93,63 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   confirmed after a later write was undone and an undo that fails after
   leaving a `jumpTo()` view, and it changes together with `canUndo()` and
   `canRedo()` for synchronous watchers.
-- Still refused, an open design question rather than a decision: a collection
-  order change (`setAll` reordering survivors, `prependMany` moving an
-  overwritten row) combined with another add or remove of the same collection,
-  in the same turn or in a later one (even after that later work is undone or
-  rolled back). Undo throws and rollback refuses (`effect-validation-failed`),
-  with state unchanged. The `setAll` cases refused on 15.4.3 too. The
-  `prependMany` cases reported success there and deleted the overwritten row.
+- A collection order change (`setAll` reordering survivors, an overwriting
+  `prependMany` moving a row to the front) reverses with the rest of its turn
+  or transaction, whatever else that turn did to the same collection (adds,
+  removes, `clear()`, `changeId`), and after later work on the collection is
+  undone or rolled back: undo, redo, `jumpTo()`, history and rollback. On
+  15.4.3 the `setAll` cases refused, and the `prependMany` cases reported
+  success and deleted the overwritten row.
+- An order change is tracked by identity, not by content: it reverses only
+  while the collection's order is exactly the one it left. While later work
+  that added, removed or reordered rows of that collection stands, undo of the
+  order change throws and rollback refuses as a dependency,
+  `later-confirmed-dependency` when that work is settled and
+  `later-pending-dependency` while it is another open transaction (settle
+  that one first; once it rolls back, the order change rolls back too).
+  State is unchanged. **Behaviour change:** the rollback refusal was
+  `effect-validation-failed`.
+- A write a subscriber makes while a flush delivers an undoable turn is still
+  a turn of its own; its order changes are now recorded with it, not with the
+  turn being delivered (a nested `prependMany` made undo refuse). Made
+  `undoable()`, it undoes and redoes as its own entry; otherwise it stands
+  like any later work, as above.
+- `jumpTo()` (or returning from a `jumpTo()` view) across several order
+  changes of one collection, or across an order change and later adds or
+  removes, no longer throws.
+- Rolling back a transaction that renamed a row (`changeId`) after another
+  row's add, remove or rename in the same collection restores the renamed
+  key; it left the new key in place while every row came back (pre-existing
+  on 15.4.3).
+- Rolling back a pending `changeId` whose original key later work gave to a
+  different row now refuses as a dependency (`later-confirmed-dependency`, or
+  `later-pending-dependency` while that work is open), even after that row
+  was removed again. Accepting it left two rows at one key in history
+  (`getRestorationHistory()` threw "duplicate keys" and undo refused for
+  good). **Behaviour change:** a rename back into a key its occupier still
+  holds refused as `effect-validation-failed`; it now refuses first as
+  `later-confirmed-dependency`.
+- Rollback judges later work in the order it happened. A pending edit to a
+  row that a realized edit and then a confirmed removal touched no longer
+  refuses. An open transaction's edit of the row still blocks until it
+  settles; **behaviour change:** after a settled removal that is now reported
+  as `later-pending-dependency` (was `later-confirmed-dependency`).
+- Undo, redo and rollback put restored rows back where they were in more
+  cases: rows removed together at the front (`removeMany(['b', 'a'])` then
+  `clear()` undid to `[b, c, d, e, a]`), rows anchored to different removed
+  rows in one gap, a row created next to one the same turn removes (redo
+  removed the neighbour before placing the row, and misplaced it), and a
+  turn that created and removed a row others were anchored to (redo threw
+  "no live placement anchor").
+- Undo after a write that discarded the redo future (or a `jumpTo()` view's
+  future) no longer throws when the new entry removes rows only the
+  discarded entries held ("Subject … cannot enter the structural target",
+  with the rows left removed).
+- A devtools timeline jump that only reorders a collection no longer makes
+  undo of an authored reorder refuse or `getRestorationHistory()` throw: the
+  undo overwrites the scrub, and history states hold authored orders.
+- Known, unchanged: undo of a write that dropped a row field re-adds the
+  field at the end of the row's keys.
 
 ## 15.4.3 (2026-10-05)
 
