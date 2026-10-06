@@ -148,6 +148,10 @@ const make = (enhancers: () => unknown[]): Tree => {
   return tree;
 };
 
+/** The oracle: keys and rows (a changeId moves the key, not the row). */
+const stateOf = (tree: Tree) =>
+  JSON.stringify([tree.$.rows.ids(), tree.$.rows.all()]);
+
 const describeError = (error: unknown) =>
   `throw:${String((error as Error)?.message ?? error).slice(0, 70)}`;
 
@@ -159,10 +163,10 @@ export async function checkUndoRedo(
   const tree = make(enhancers);
   try {
     await flush();
-    const before = JSON.stringify(tree.$.rows.all());
+    const before = stateOf(tree);
     undoable(() => applyOps(tree, ops));
     await flush();
-    const after = JSON.stringify(tree.$.rows.all());
+    const after = stateOf(tree);
     if (before === after) return 'ok';
     const steps: Array<['undo' | 'redo', string]> = [
       ['undo', before],
@@ -176,7 +180,7 @@ export async function checkUndoRedo(
         return `${step}-${describeError(error)}`;
       }
       await flush();
-      const actual = JSON.stringify(tree.$.rows.all());
+      const actual = stateOf(tree);
       if (actual !== expected) return `${step}-wrong:${actual}`;
     }
     try {
@@ -198,7 +202,7 @@ export async function checkRollback(
   const tree = make(enhancers);
   try {
     await flush();
-    const before = JSON.stringify(tree.$.rows.all());
+    const before = stateOf(tree);
     const pending = tree.transaction(() => applyOps(tree, ops));
     await flush();
     try {
@@ -207,7 +211,7 @@ export async function checkRollback(
       return `rollback-${describeError(error)}`;
     }
     await flush();
-    const actual = JSON.stringify(tree.$.rows.all());
+    const actual = stateOf(tree);
     return actual === before ? 'ok' : `rollback-wrong:${actual}`;
   } finally {
     tree.destroy();

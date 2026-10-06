@@ -130,12 +130,18 @@ function createPendingRollbackEffects(
     }
   }
 
+  // The first effect per location keeps the pre-turn value. A row's own
+  // structural change is located by its row: keyed by the collection alone,
+  // a changeId after another row's add, remove or changeId was dropped and
+  // rollback left the renamed key in place.
   const firstEffectIndexByOwner = new Map<string, number>();
   const keyOf = (effect: CausalTurn['effects'][number]): string =>
     effect.fieldSegments !== undefined
       ? JSON.stringify([effect.owner, effect.subjectId, effect.fieldSegments])
       : hasInlineScopedLeafAddress(effect)
       ? JSON.stringify([effect.owner, effect.subjectId, effect.path])
+      : effect.structural !== undefined && effect.subjectId !== undefined
+      ? JSON.stringify([effect.owner, effect.subjectId])
       : String(effect.owner);
   turn.effects.forEach((effect, index) => {
     const effectKey = keyOf(effect);
