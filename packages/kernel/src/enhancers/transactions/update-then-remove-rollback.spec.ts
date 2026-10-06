@@ -283,3 +283,113 @@ describe.each([
     }
   );
 });
+
+// The MIRROR shape: a row the turn CREATED and then wrote. Its rollback removes
+// the row, so the field reversal must land before the removal (or not at all).
+// On 15.4.3 the declarative rollback target (taken here because a key is handed
+// off or two re-adds need anchors) applied it AFTER the removal and refused with
+// "Value effect has no active subject".
+const createThenWrite: Record<string, (tree: Tree) => void> = {
+  'removeOne a, re-add a, updateOne a': (tree) => {
+    tree.$.rows.removeOne('a');
+    tree.$.rows.addOne({ id: 'a', n: 5 });
+    tree.$.rows.updateOne('a', { n: 6 });
+  },
+  'removeOne a, re-add a, updateOne adding a field': (tree) => {
+    tree.$.rows.removeOne('a');
+    tree.$.rows.addOne({ id: 'a', n: 5 });
+    tree.$.rows.updateOne('a', { n: 6, tag: 'x' });
+  },
+  'removeOne a, re-add a, replaceOne a': (tree) => {
+    tree.$.rows.removeOne('a');
+    tree.$.rows.addOne({ id: 'a', n: 5 });
+    tree.$.rows.replaceOne('a', { id: 'a', n: 7, tag: 'y' });
+  },
+  'add x and y, update x, removeMany a and c': (tree) => {
+    tree.$.rows.addOne({ id: 'x', n: 1 });
+    tree.$.rows.addOne({ id: 'y', n: 1 });
+    tree.$.rows.updateOne('x', { n: 9 });
+    tree.$.rows.removeMany(['a', 'c']);
+  },
+  'add x, update x twice, add y, removeMany a and c': (tree) => {
+    tree.$.rows.addOne({ id: 'x', n: 1 });
+    tree.$.rows.updateOne('x', { n: 2 });
+    tree.$.rows.updateOne('x', { n: 3, tag: 'x' });
+    tree.$.rows.addOne({ id: 'y', n: 1 });
+    tree.$.rows.removeMany(['a', 'c']);
+  },
+  'shared lifetime: add in both collections, update both, remove one each': (
+    tree
+  ) => {
+    tree.$.rows.addOne({ id: 'x', n: 1 });
+    tree.$.other.addOne({ id: 'q', n: 1 });
+    tree.$.rows.updateOne('x', { n: 2 });
+    tree.$.other.updateOne('q', { n: 2 });
+    tree.$.rows.removeOne('a');
+    tree.$.other.removeOne('o');
+  },
+};
+
+describe.each(Object.entries(configurations))(
+  'transaction rollback of create-then-write (%s)',
+  (_name, enhancers) => {
+    it.each(Object.keys(createThenWrite))(
+      '%s restores the pre-transaction rows',
+      async (name) => {
+        const tree = make(enhancers);
+        try {
+          await seed(tree);
+          const pending = tree.transaction(() => createThenWrite[name](tree));
+          await flush();
+          pending.rollback();
+          await flush();
+          expect(state(tree)).toStrictEqual(SEEDED);
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
+  }
+);
+
+// Historical materialization walks turns as declarative targets in both
+// directions. Across a changeId -> update -> remove turn, the forward walk met
+// the field write after the composed removal and threw "Value effect has no
+// active subject"; the backward walk threw before b539f63f.
+describe.each([
+  ['restoration()', () => [restoration()]],
+  ['transactions(), restoration()', () => [transactions(), restoration()]],
+  ['restoration(), transactions()', () => [restoration(), transactions()]],
+] as const)(
+  'jumpTo across write-then-remove turns (%s)',
+  (_name, enhancers) => {
+    it.each([
+      'changeId, updateOne, then removeOne',
+      'updateOne then removeOne',
+      'several updates, one adding a field, then removeOne',
+    ] as const)('%s: history, jumpTo(0) and jumpTo(last)', async (name) => {
+      const tree = make(enhancers);
+      try {
+        await seed(tree);
+        undoable(() => tree.$.rows.updateOne('c', { n: 4 }));
+        await flush();
+        const first = state(tree);
+        undoable(() => writeThenRemove[name](tree));
+        await flush();
+        undoable(() => tree.$.rows.updateOne('z', { n: 5 }));
+        await flush();
+        const last = state(tree);
+        const history = tree.getRestorationHistory();
+        expect(history).toHaveLength(3);
+        tree.jumpTo(0);
+        await flush();
+        expect(state(tree)).toStrictEqual(first);
+        tree.jumpTo(history.length - 1);
+        await flush();
+        expect(state(tree)).toStrictEqual(last);
+      } finally {
+        tree.destroy();
+      }
+    });
+  }
+);
