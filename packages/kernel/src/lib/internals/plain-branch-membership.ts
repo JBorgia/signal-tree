@@ -118,8 +118,7 @@ export function capturePlainBranchMembership(
       const descriptor = Object.getOwnPropertyDescriptor(branch, key);
       const present = descriptor?.enumerable === true;
       if (present === previous.present) continue;
-      if (previous.present && isCollectionMember(descriptor?.value))
-        rememberOmittedRows(descriptor?.value as object);
+      if (previous.present) rememberHiddenRows(descriptor?.value);
       members.push({
         key,
         positionIds: getOwnedPositionIds(descriptor?.value),
@@ -330,9 +329,10 @@ function memberAddress(
 }
 
 /**
- * The rows each omitted collection held when it was last omitted, or last
- * written by a reversal or a rollback while omitted. History expects to find
- * them when it re-adds the collection.
+ * The rows each hidden collection held when it was last hidden (omitted, or
+ * under a branch that was omitted), or last written by a reversal or a
+ * rollback while hidden. History expects to find them when it makes the
+ * collection current again.
  */
 const OMITTED_ROWS = new WeakMap<object, unknown>();
 
@@ -362,6 +362,29 @@ function rememberOmittedRows(node: object): void {
 }
 
 /**
+ * Each collection a member's presence change hides or shows: the member
+ * itself, or every collection current within it (its subtree below present
+ * members). A collection omitted inside it stays absent with it.
+ */
+function collectionsWithin(member: unknown, visit: (node: object) => void): void {
+  if (isCollectionMember(member)) {
+    visit(member as object);
+    return;
+  }
+  if (!isNodeAccessor(member)) return;
+  for (const key of Object.keys(member)) {
+    const child = (member as Record<string, unknown>)[key];
+    if (isCollectionMember(child) || isNodeAccessor(child))
+      collectionsWithin(child, visit);
+  }
+}
+
+/** Remember the rows of every collection a member's omission hides. */
+function rememberHiddenRows(member: unknown): void {
+  collectionsWithin(member, rememberOmittedRows);
+}
+
+/**
  * The rows a reversal writes itself are its own effects, not a change made
  * while the collection was omitted, so they are left out of the comparison;
  * so is the order when the reversal reorders the collection.
@@ -383,41 +406,52 @@ function omittedRowsChanged(
 }
 
 /**
- * The path of the omitted collection member at `position` when re-adding it
- * would not restore it: rows the reversal does not write itself changed after
- * it was omitted, through a handle held on it. Re-adding it would bring back
- * rows the reversed operation never had, which "DORMANT STORAGE MUST NOT
- * SUPPLY THE REACTIVATED VALUE" (`whole-value-membership.spec.ts` 18)
- * forbids.
+ * The path of a collection that re-adding the omitted member at `position`
+ * would make current without restoring it: rows the reversal does not write
+ * itself (`touched`, by collection position) changed after it was hidden, by
+ * a write through a handle held on it. The member is the collection itself or
+ * a branch holding it. Re-adding it would bring back rows the reversed
+ * operation never had, which "DORMANT STORAGE MUST NOT SUPPLY THE REACTIVATED
+ * VALUE" (`whole-value-membership.spec.ts` 18) forbids.
  */
 export function changedOmittedCollection(
   root: object,
   position: number,
-  touched: ReadonlySet<unknown>,
-  reordered: boolean
+  touched: (collection: number) => ReadonlySet<unknown>,
+  reordered: (collection: number) => boolean
 ): string | undefined {
   const address = memberAddress(root, position);
-  return address &&
-    isCollectionMember(address.node) &&
-    !Object.getOwnPropertyDescriptor(address.branch, address.key)
-      ?.enumerable &&
-    omittedRowsChanged(address.node, touched, reordered)
-    ? (getOwnedOwnerPath(address.node) ?? address.key)
-    : undefined;
+  if (
+    !address ||
+    Object.getOwnPropertyDescriptor(address.branch, address.key)?.enumerable
+  )
+    return undefined;
+  let changed: string | undefined;
+  collectionsWithin(address.node, (node) => {
+    const owner = getOwnedPositionIds(node)?.[0] as number;
+    if (
+      changed === undefined &&
+      omittedRowsChanged(node, touched(owner), reordered(owner))
+    )
+      changed = getOwnedOwnerPath(node) ?? String(owner);
+  });
+  return changed;
 }
 
 /**
- * @internal A rollback compensates an omitted collection's retained rows
- * (8b): what it leaves there is what history expects on a later re-add.
+ * @internal A rollback compensates a hidden collection's retained rows (8b,
+ * 8c): what it leaves there is what history expects when it makes the
+ * collection current again.
  */
 export function refreshOmittedCollection(root: object, position: number): void {
-  const address = memberAddress(root, position);
-  if (
-    address &&
-    isCollectionMember(address.node) &&
-    !Object.getOwnPropertyDescriptor(address.branch, address.key)?.enumerable
-  )
-    rememberOmittedRows(address.node);
+  if (!hidingMembers(root, position)?.length) return;
+  const address = getPositionRegistry(root)?.addressFor(position);
+  let node: unknown = root;
+  for (const key of address ?? []) {
+    if (!isTraversableNode(node)) return;
+    node = Object.getOwnPropertyDescriptor(node, key)?.value;
+  }
+  if (isCollectionMember(node)) rememberOmittedRows(node as object);
 }
 
 /** Validate the retained location, never a display-path reconstruction. */
@@ -795,11 +829,8 @@ export function preparePlainBranchMembers(
           for (const { branch, key, node } of changedBranchMembers) {
             republishMemberSubtree(branch, key);
             // Every participant is installed: these are the rows it keeps.
-            if (
-              isCollectionMember(node) &&
-              !Object.getOwnPropertyDescriptor(branch, key)?.enumerable
-            )
-              rememberOmittedRows(node);
+            if (!Object.getOwnPropertyDescriptor(branch, key)?.enumerable)
+              rememberHiddenRows(node);
           }
           runtime.publishPrepared({
             revision: installed.revision,

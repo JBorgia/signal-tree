@@ -6,6 +6,7 @@ import {
   plainBranchMemberEffectIsNoop,
   preparePlainBranchMembers,
   refreshOmittedCollection,
+  changedOmittedCollection,
 } from '../../lib/internals/plain-branch-membership';
 import type { PlainBranchMemberPresence } from '../../lib/internals/plain-branch-membership';
 import { applicationFailureCause } from '../../lib/internals/causal-runtime/post-application-failure';
@@ -2403,6 +2404,45 @@ export function getOrCreateInternalTransactionRuntime<T>(
   ): void => {
     if (effects.length === 0 && orderDeltas.length === 0) {
       return;
+    }
+
+    // A hidden entity collection the rollback makes current again (omitted
+    // itself, or with a branch it re-adds) must hold the rows it held when
+    // hidden, apart from this transaction's own. A plain write through a held
+    // handle is no later turn, so nothing else refuses it (v16 integration 8d
+    // (b), review of 370d2f48).
+    const ownRows = new Map<number, Set<unknown>>();
+    for (const effect of effects)
+      if (effect.kind !== 'set' || effect.subject !== undefined) {
+        let rows = ownRows.get(effect.position);
+        if (!rows) ownRows.set(effect.position, (rows = new Set()));
+        rows.add(effect.subject);
+      }
+    // `effects` are the transaction's own, not yet inverted: a member it
+    // omitted (present before, absent after) is one the rollback re-adds.
+    for (const effect of effects) {
+      if (
+        effect.kind !== 'set' ||
+        effect.plainBranchMembership?.before !== true ||
+        effect.plainBranchMembership.after
+      )
+        continue;
+      const changed = changedOmittedCollection(
+        tree.$ as object,
+        effect.position,
+        (owner) => ownRows.get(owner) ?? new Set(),
+        (owner) => orderDeltas.some((delta) => delta.owner === owner)
+      );
+      if (changed !== undefined)
+        throw createRollbackError({
+          kind: 'effect-validation-failed',
+          pendingTurnId: transactionId,
+          compensation: effects,
+          errorMessage:
+            `the entity collection at '${changed}' was omitted and changed ` +
+            'after that, so re-adding it would not restore it as it was',
+          callbackError,
+        });
     }
 
     const positionRegistry = getPositionRegistry(tree.$);
