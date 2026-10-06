@@ -103,8 +103,10 @@ for retired entities.
 - **Undo, redo, `jumpTo()` and `rollback()` of a write that omitted an entity
   collection bring it back.** A whole value that leaves out a collection key
   omits the collection; reversing that write now restores it with the rows it
-  held. Before this, the reversal reported success and left it omitted. If its
-  rows changed while it was omitted, the reversal refuses and names it.
+  held. Before this, the reversal reported success and left it omitted. If
+  something other than the reversal changed its rows while it was hidden,
+  itself or inside an omitted branch, the reversal refuses and names it; that
+  includes a reversal that re-adds the branch around it.
 - **Settle the newest open transaction first, including across omitted
   branches.** Rolling back an older transaction while a newer pending one has
   omitted or re-added a branch enclosing its writes now refuses with the

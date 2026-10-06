@@ -289,6 +289,118 @@ describe('a collection changed while omitted is refused, typed and unchanged', (
   });
 });
 
+describe('a collection under a branch the reversal re-adds', () => {
+  // The collection is not itself omitted, but it is hidden with its branch
+  // and becomes current again when the branch is re-added (review of
+  // 370d2f48). The same rule applies: restored fully, or refused.
+  for (const [order, enhancers] of Object.entries(historyOrders)) {
+    it(`undo of the branch omission restores it (${order})`, async () => {
+      const tree = build(enhancers());
+      await flush();
+      undoable(() => tree.$({ count: 1 }));
+      await flush();
+      expect(tree.$()).toEqual({ count: 1 });
+      tree.undo();
+      expect(tree.$()).toEqual(withRows);
+    });
+
+    it(`a write to its rows while hidden refuses the undo (${order})`, async () => {
+      const tree = build(enhancers());
+      await flush();
+      const rows = tree.$.g.rows;
+      undoable(() => tree.$({ count: 1 }));
+      await flush();
+      rows.addOne({ id: 'z', n: 9 });
+      await flush();
+      const index = tree.getCurrentIndex();
+      expect(() => tree.undo()).toThrow(
+        /^Unsupported scoped undo effect at 'g\.rows': the entity collection was omitted and changed after that/
+      );
+      expect(tree.$()).toEqual({ count: 1 });
+      expect(tree.getCurrentIndex()).toBe(index);
+    });
+
+    it(`a re-add for an earlier turn refuses too (ordinary omission) (${order})`, async () => {
+      const tree = build(enhancers());
+      await flush();
+      const rows = tree.$.g.rows;
+      undoable(() => tree.$.g.k(1));
+      await flush();
+      // An ordinary omission, then a write through the held handle.
+      tree.$({ count: 0 });
+      await flush();
+      rows.addOne({ id: 'z', n: 9 });
+      await flush();
+      expect(() => tree.undo()).toThrow(/'g\.rows'.*changed after that/);
+      expect(tree.$()).toEqual({ count: 0 });
+    });
+  }
+
+  for (const [order, enhancers] of Object.entries(rollbackOrders)) {
+    it(`rollback of the branch omission restores it (${order})`, async () => {
+      const tree = build(enhancers());
+      await flush();
+      const pending = tree.transact(() => tree.$({ count: 1 }));
+      await flush();
+      pending.rollback();
+      await flush();
+      expect(tree.$()).toEqual(withRows);
+    });
+
+    it(`a plain write to its rows while hidden refuses the rollback (${order})`, async () => {
+      const tree = build(enhancers());
+      await flush();
+      const rows = tree.$.g.rows;
+      const pending = tree.transact(() => tree.$({ count: 1 }));
+      await flush();
+      rows.addOne({ id: 'z', n: 9 });
+      await flush();
+      let error: unknown;
+      try {
+        pending.rollback();
+      } catch (caught) {
+        error = caught;
+      }
+      expect(error).toMatchObject({ code: 'SIGNALTREE_ROLLBACK_FAILED' });
+      expect((error as Error).message).toContain(
+        "the entity collection at 'g.rows' was omitted and changed after that"
+      );
+      expect(tree.$()).toEqual({ count: 1 });
+    });
+
+    it(`the transaction's own row write is undone with the omission (${order})`, async () => {
+      const tree = build(enhancers());
+      await flush();
+      const rows = tree.$.g.rows;
+      const pending = tree.transact(() => {
+        tree.$({ count: 1 });
+        rows.addOne({ id: 'z', n: 9 });
+      });
+      await flush();
+      pending.rollback();
+      await flush();
+      expect(tree.$()).toEqual(withRows);
+    });
+  }
+
+  for (const [order, enhancers] of Object.entries(historyOrders).filter(
+    ([name]) => name !== 'restoration alone'
+  ))
+    it(`rows a rollback compensates while hidden are expected by a later undo (${order})`, async () => {
+      const tree = build(enhancers());
+      await flush();
+      const rows = tree.$.g.rows;
+      const pending = tree.transact(() => rows.addOne({ id: 'b', n: 1 }));
+      await flush();
+      undoable(() => tree.$({ count: 1 }));
+      await flush();
+      pending.rollback();
+      await flush();
+      tree.undo();
+      expect(tree.$()).toEqual(withRows);
+    });
+});
+
 describe('rollback of a collection omission', () => {
   for (const [order, enhancers] of Object.entries(rollbackOrders))
     it(`restores the collection (${order})`, async () => {
@@ -300,6 +412,25 @@ describe('rollback of a collection omission', () => {
       pending.rollback();
       await flush();
       expect(tree.$()).toEqual(withRows);
+    });
+
+  for (const [order, enhancers] of Object.entries(rollbackOrders))
+    it(`refuses, typed, when a plain write added a row while omitted (${order})`, async () => {
+      const tree = build(enhancers());
+      await flush();
+      const rows = tree.$.g.rows;
+      const pending = tree.transact(() => tree.$.g({ k: 1 }));
+      await flush();
+      rows.addOne({ id: 'z', n: 9 });
+      await flush();
+      let error: unknown;
+      try {
+        pending.rollback();
+      } catch (caught) {
+        error = caught;
+      }
+      expect(error).toMatchObject({ code: 'SIGNALTREE_ROLLBACK_FAILED' });
+      expect(tree.$()).toEqual({ g: { k: 1 }, count: 0 });
     });
 
   for (const [order, enhancers] of Object.entries(rollbackOrders))

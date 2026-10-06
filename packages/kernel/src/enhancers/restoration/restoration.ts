@@ -2695,27 +2695,35 @@ export function restoration(
         >();
         const replaced = new Set<ReversalEffect>();
         const unmoved = 'Nothing was changed; the history position is unmoved.';
-        // An omitted entity collection comes back with the rows it retains.
-        // Restored fully only if nothing changed them after it was omitted;
-        // otherwise refused, never re-added silently (v16 integration 8d (b)).
-        for (const effect of reversalEffects) {
-          if (effect.plainBranchMembership?.after !== true) continue;
-          const touched = new Set<unknown>();
-          for (const own of reversalEffects)
-            if (own.owner === effect.owner && own.subjectId !== undefined)
-              touched.add(own.subjectId);
+        // A hidden entity collection comes back with the rows it retains,
+        // whether it was omitted itself or with a branch the reversal
+        // re-adds. Restored fully only if nothing but the reversal's own
+        // effects changed them after it was hidden; otherwise refused, never
+        // re-added silently (v16 integration 8d (b)).
+        const ownRows = new Map<number, Set<unknown>>();
+        for (const effect of reversalEffects)
+          if (effect.subjectId !== undefined) {
+            let rows = ownRows.get(effect.owner);
+            if (!rows) ownRows.set(effect.owner, (rows = new Set()));
+            rows.add(effect.subjectId);
+          }
+        const reordered = new Set(orderDeltas.map(({ owner }) => owner));
+        const refuseChangedRows = (member: number): void => {
           const changed = changedOmittedCollection(
             tree.$,
-            effect.owner,
-            touched,
-            orderDeltas.some((delta) => delta.owner === effect.owner)
+            member,
+            (owner) => ownRows.get(owner) ?? new Set(),
+            (owner) => reordered.has(owner)
           );
           if (changed !== undefined)
             hiddenRefusal ??=
               `Unsupported scoped undo effect at '${changed}': the entity ` +
               'collection was omitted and changed after that, so re-adding it ' +
               `would not restore it as it was. ${unmoved}`;
-        }
+        };
+        for (const effect of reversalEffects)
+          if (effect.plainBranchMembership?.after === true)
+            refuseChangedRows(effect.owner);
         // Presentation only (a display path or the structured address).
         const label = (effect: ReversalEffect): string =>
           effect.path ??
@@ -2826,6 +2834,7 @@ export function restoration(
             replaced.add(effect);
           } else entry.targets.push({ below: outer.below });
         }
+        for (const owner of readded.keys()) refuseChangedRows(owner);
         if (readded.size && !hiddenRefusal) {
           // Re-adding a member exposes what it retains. Pending work under it
           // owns that state until settlement.
