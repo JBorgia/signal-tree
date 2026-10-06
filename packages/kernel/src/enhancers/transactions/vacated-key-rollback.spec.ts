@@ -28,11 +28,16 @@ import { transactions } from './transactions';
  * compensation is tried (restoration.spec.ts pins the new kind).
  *
  * A pending REMOVE vacates its key the same way (rollback/rebase review,
- * item 2): accepted when the re-occupier had been removed again, history
- * then threw "duplicate keys" / structural drift for good; while the occupier
- * stood it refused as `effect-validation-failed`. Both are the dependency
- * now (the second describe below; proposal-rejection-0 case 15 and the
+ * item 2). While the occupier stood it refused as `effect-validation-failed`;
+ * it is the dependency now (proposal-rejection-0 case 15 and the
  * refusal-lifecycle gate's `replacement` cases carry the kind change).
+ * Removed again, the rollback was accepted and history threw "duplicate
+ * keys" / structural drift for good when undo history could restore the
+ * occupier: that refuses now, as a dependency. Removed for good (nothing
+ * can restore it: plain or realized writes), re-adding the row is
+ * consistent, and the rollback proceeds as on 15.3.0 (the gate's PRESERVED
+ * `replacement/resolve-retry`: delete the replacement, then retry). The
+ * stricter rename rule above is unchanged.
  */
 type Row = { id: string; n: number };
 const flush = async () => {
@@ -270,8 +275,14 @@ describe.each(configurations)(
       else write(tree);
     };
 
-    it.each(Object.keys(removalReoccupying))(
-      '%s: refuses as a settled dependency, changes nothing, history and undo stay usable',
+    // Without restoration() the re-occupier's writes are plain: removed
+    // again, it is gone for good, and the rollback proceeds (below).
+    it.each(
+      Object.keys(removalReoccupying).filter(
+        (shape) => withHistory || !shape.includes('removed again')
+      )
+    )(
+      '%s: refuses as a settled dependency while undo history or the row keeps it, changes nothing, history and undo stay usable',
       async (shape) => {
         const tree = make();
         try {
@@ -307,6 +318,39 @@ describe.each(configurations)(
         }
       }
     );
+
+    it('rolls back once the re-occupier is removed for good (plain writes)', async () => {
+      const tree = make();
+      try {
+        await flush();
+        const proposal = tree.transaction(() => {
+          tree.$.x(1);
+          tree.$.rows.removeOne('a');
+        });
+        await flush();
+        tree.$.rows.addOne({ id: 'a', n: 50 });
+        await flush();
+        expect(refusalKind(() => proposal.rollback())).toBe(
+          'later-confirmed-dependency'
+        );
+        tree.$.rows.removeOne('a');
+        await flush();
+        expect(refusalKind(() => proposal.rollback())).toBeUndefined();
+        await flush();
+        expect(state(tree)).toStrictEqual({
+          x: 0,
+          rows: [
+            { id: 'z', n: 0 },
+            { id: 'a', n: 1 },
+          ],
+        });
+        if (withHistory) {
+          expect(tree.getRestorationHistory()).toHaveLength(0);
+        }
+      } finally {
+        tree.destroy();
+      }
+    });
 
     it('refuses as a pending dependency while the re-occupier is unsettled', async () => {
       const tree = make();
@@ -348,13 +392,25 @@ describe.each(configurations)(
 // judged write by write and refused. Observed work now composes per flush
 // the same way. Writes in separate flushes, or a re-add left standing, still
 // refuse whoever wrote them.
-const withinFlush: Record<string, { writes: string; refused: boolean }> = {
-  'added and removed again in one flush': { writes: '+-', refused: false },
+// A removal's key re-occupied and removed again in a LATER flush is gone for
+// good here (plain or realized writes, nothing can restore it): the removal
+// rolls back; a rename keeps refusing.
+const withinFlush: Record<
+  string,
+  { writes: string; refused: { rename: boolean; removal: boolean } }
+> = {
+  'added and removed again in one flush': {
+    writes: '+-',
+    refused: { rename: false, removal: false },
+  },
   'added, removed and added again in one flush': {
     writes: '+-+',
-    refused: true,
+    refused: { rename: true, removal: true },
   },
-  'added, then removed in the next flush': { writes: '+|-', refused: true },
+  'added, then removed in the next flush': {
+    writes: '+|-',
+    refused: { rename: true, removal: false },
+  },
 };
 const withOther = () => ({
   ...declaration(),
@@ -377,7 +433,10 @@ describe.each(configurations)(
   're-occupation within one flush, authored or realized (%s)',
   (_name, enhancers, withHistory) => {
     for (const [pendingName, vacate] of Object.entries(pendingVacating)) {
-      for (const [shape, { writes, refused }] of Object.entries(withinFlush)) {
+      for (const [shape, entry] of Object.entries(withinFlush)) {
+        const { writes } = entry;
+        const refused =
+          entry.refused[pendingName as keyof typeof entry.refused];
         it.each(Object.keys(writers))(
           `a pending ${pendingName}, the key ${shape} (%s): ${
             refused ? 'refused' : 'rolled back'

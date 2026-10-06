@@ -154,14 +154,19 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   on 15.4.3).
 - Rolling back a pending `changeId` or removal whose key later work gave to a
   different row now refuses as a dependency (`later-confirmed-dependency`, or
-  `later-pending-dependency` while that work is open), even after that row
-  was removed again by later work. Accepting it left two rows at one key in
-  history (`getRestorationHistory()` threw "duplicate keys" and undo refused
-  for good). A row added and removed again within one flush, by authored or
-  realized work alike, leaves nothing at the key and does not block (realized,
-  it refused). **Behaviour change:** while the new row still stands, the
-  rollback refused as `effect-validation-failed` (the rename or re-add found
-  the key taken); it now refuses first as `later-confirmed-dependency`.
+  `later-pending-dependency` while that work is open). A rename keeps
+  refusing after that row was removed again by later work; a removal keeps
+  refusing while undo history can bring the row back (an `undoable()` add or
+  removal of it), and rolls back once it is gone for good, as on 15.3.0
+  (delete the replacement, then retry). Accepting it while history could
+  restore the row left two rows at one key in history
+  (`getRestorationHistory()` threw "duplicate keys" and undo refused for
+  good). A row added and removed again within one flush, by authored or
+  realized work alike, leaves nothing at the key and does not block
+  (realized, it refused). **Behaviour change:** while the new row still
+  stands, the rollback refused as `effect-validation-failed` (the rename or
+  re-add found the key taken); it now refuses first as
+  `later-confirmed-dependency`.
 - Rollback judges later work in the order it was written, also within one
   flush. A pending edit to a row that a realized edit and then a confirmed
   removal touched no longer refuses, nor does one followed in the same flush
