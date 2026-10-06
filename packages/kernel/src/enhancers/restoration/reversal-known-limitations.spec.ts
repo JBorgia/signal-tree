@@ -6,11 +6,13 @@ import { transactions } from '../transactions/transactions';
 import { restoration } from './restoration';
 
 /**
- * TRACKING — reversal failures that are PRE-EXISTING ON npm 15.4.3 and are not
- * fixed by the update-then-remove / addMany-overwrite repairs. Found while
- * probing those repairs; reproduced identically on d63166c9.
+ * TRACKING — reversal failures found PRE-EXISTING ON npm 15.4.3 while probing
+ * the update-then-remove / addMany-overwrite repairs.
  *
- * Each limitation is a PAIR:
+ * All but one are repaired for 15.4.4; their rows below are ordinary `it`
+ * carriers now, each marked FIXED with what it did on 15.4.3. The remaining
+ * pair — an order delta plus another structural change in one turn — is a
+ * design-level gap, reported rather than decided, and keeps the convention:
  *
  * - `... — current behaviour` is an ordinary passing test that pins the
  *   SPECIFIC failure today (the exact error, or the exact wrong state), so an
