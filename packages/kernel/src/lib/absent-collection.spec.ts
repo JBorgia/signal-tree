@@ -581,6 +581,44 @@ describe('a row-adding write whose duplicates its mode accepts re-adds the path'
       });
 });
 
+describe('history states read an omitted collection through its records (v15 port review, item 3)', () => {
+  // A collection under an omitted member is retained out of sight: the
+  // history read threw "Historical materialization has no collection" on a
+  // record of its rows, and showed a member's image's rows rather than the
+  // rows the collection's records give.
+  const history = (tree: Tree) =>
+    (
+      tree as unknown as {
+        getRestorationHistory(): Array<{ state?: unknown }>;
+      }
+    )
+      .getRestorationHistory()
+      .map((entry) => entry.state);
+  for (const [order, enhancers] of [
+    ['restoration', () => [restoration()]],
+    ['transactions, restoration', () => [transactions(), restoration()]],
+  ] as const)
+    it(`row writes, then an omission (${order})`, async () => {
+      const tree = build(enhancers());
+      await flush();
+      undoable(() => tree.$.a.rows.addOne(Z));
+      await flush();
+      undoable(() => tree.$.a.rows.updateOne('a', { n: 7 }));
+      await flush();
+      // Omits the collection only, then `a` with it.
+      undoable(() => tree.$.a({ s: 4 }));
+      await flush();
+      undoable(() => omit(tree));
+      await flush();
+      expect(history(tree)).toEqual([
+        { a: { rows: { all: [A, B, Z] }, s: 0 }, count: 0 },
+        { a: { rows: { all: [{ ...A, n: 7 }, B, Z] }, s: 0 }, count: 0 },
+        { a: { s: 4 }, count: 0 },
+        { count: 0 },
+      ]);
+    });
+});
+
 describe('a re-adding write an interceptor blocks (v16 8e review, documented edge)', () => {
   // The interceptor runs after the retained rows were removed. The removal
   // stays, in history too; undoing it re-adds the way to the collection with
