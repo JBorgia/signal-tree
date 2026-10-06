@@ -208,11 +208,14 @@ export function isAbsentMember(node: unknown): boolean {
  */
 export const structuralWrites: {
   depth: number;
+  /** Counts re-adds and whole values, so each knows which came after it. */
+  stamp: number;
   own?: unknown;
-  readded?: Map<object, Set<string>>;
+  readded?: Map<object, Map<string, number>>;
   end?: (failed?: boolean) => void;
 } = {
   depth: 0,
+  stamp: 0,
 };
 
 /** @internal Open a structural write; close it with `endStructuralWrite` in a `finally`. */
@@ -237,14 +240,17 @@ export function inStructuralWrite(node: unknown): boolean {
 }
 
 /**
- * @internal True when a write made during the open structural write re-added
- * `key` of `branch`: that structural write must not omit it again.
+ * @internal True when a write re-added `key` of `branch` after the whole value
+ * that began at `since` did (`structuralWrites.stamp`): that whole value must
+ * not omit it again. A whole value that a tap started later decides for
+ * itself, so a re-add before it began does not bind it (v16 8f review).
  */
 export function readdedDuringStructuralWrite(
   branch: object,
-  key: string
+  key: string,
+  since: number
 ): boolean {
-  return structuralWrites.readded?.get(nodeOf(branch))?.has(key) === true;
+  return (structuralWrites.readded?.get(nodeOf(branch))?.get(key) ?? 0) > since;
 }
 
 /**
@@ -318,8 +324,8 @@ export function reactivatePathOnWrite(node: unknown): boolean {
     if (structuralWrites.depth) {
       const readded = (structuralWrites.readded ??= new Map());
       let keys = readded.get(parent);
-      if (!keys) readded.set(parent, (keys = new Set()));
-      keys.add(key);
+      if (!keys) readded.set(parent, (keys = new Map()));
+      keys.set(key, ++structuralWrites.stamp);
     }
   }
   // A re-added leaf is the written location itself, and its writer publishes

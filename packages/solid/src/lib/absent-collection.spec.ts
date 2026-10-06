@@ -30,6 +30,7 @@ type Rows = {
   addOne(row: Row): string;
   updateOne(id: string, changes: Partial<Row>): void;
   tap(handlers: { onAdd?: () => void; onRemove?: () => void }): () => void;
+  removeOne(id: string): void;
 };
 const A = { id: 'a', n: 0 };
 const Z = { id: 'z', n: 9 };
@@ -231,6 +232,37 @@ describe.each(ORDERS)('absent collection — Solid (%s)', (_, enhancers) => {
         tree.destroy();
       }
     }));
+  it('a tap inside transact reads the collection as it is (v16 8f)', () => {
+    const tree = signalTree(
+      { a: { rows: entityMap<Row, string>(), s: 0 }, count: 0 },
+      { enhancers: enhancers() as never }
+    ) as unknown as {
+      $: { a: { rows: Rows } };
+      transact(run: () => void): unknown;
+      destroy(): void;
+    };
+    try {
+      const rows = tree.$.a.rows;
+      rows.addOne(A);
+      rows.addOne(Z);
+      rows.all();
+      rows.count();
+      const seen: unknown[] = [];
+      rows.tap({
+        onRemove: () => {
+          seen.push(
+            rows.all().map((row) => row.id),
+            rows.count()
+          );
+        },
+      });
+      tree.transact(() => rows.removeOne('a'));
+      expect(seen).toEqual([['z'], 1]);
+    } finally {
+      tree.destroy();
+    }
+  });
+
   it('rollback of a re-adding write makes it absent again', () =>
     inRoot(async () => {
       const { tree, rows, view } = build();

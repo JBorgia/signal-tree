@@ -211,6 +211,8 @@ describe.each([
  */
 const UNDO_BLOCKED: Record<string, string> = {
   'addMany overwrite, an existing id twice': 'c775278e',
+  'prependMany skip, a new id twice': '005399a7',
+  'prependMany overwrite, a new id twice around another': '005399a7',
   'upsertMany, a new id twice: the second upserts over the first': 'dbb8449b',
   'upsertMany, a new id twice around an existing id': 'dbb8449b',
 };
@@ -225,11 +227,9 @@ describe.each([
   ['transactions(), restoration()', () => [transactions(), restoration()]],
   ['restoration(), transactions()', () => [restoration(), transactions()]],
 ] as const)('duplicate ids in one call: undo/redo (%s)', (_name, enhancers) => {
-  // prependMany's undo/redo ORDER needs its move to the front recorded, which
-  // the next commit adds; its rows join this table there.
-  const undoNames = Object.keys(cases).filter(
-    (name) => !name.startsWith('prependMany')
-  );
+  // prependMany's undo/redo ORDER needs its move to the front recorded
+  // (v15 005399a7, in the 15.4.x carry): its rows are expected failures here.
+  const undoNames = Object.keys(cases);
   for (const blocked of [false, true])
     (blocked ? it.fails : it).each(
       undoNames.filter((name) => name in UNDO_BLOCKED === blocked)

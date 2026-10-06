@@ -61,7 +61,7 @@ import {
   reactivatePathOnWrite,
   structuralWrites,
 } from './internals/member-membership';
-import { physicalRows } from './internals/physical-rows';
+import { physicalRows, taps } from './internals/physical-rows';
 import {
   MUTATION_CAPTURE_RUNTIME,
   type CommittedEntityMutation,
@@ -296,12 +296,6 @@ import type {
 } from '../lib/types';
 
 /**
- * While positive, a tap handler is running: row reads are absent-aware in
- * every collection, whatever reversal is being applied (v16 8f).
- */
-let tapDepth = 0;
-
-/**
  * True when the subjects present at both endpoints appear in a different
  * relative order. Subjects present at only one endpoint are ignored.
  */
@@ -462,13 +456,16 @@ export function createEntitySignal<
   // Row reads and row writes use physical truth only while a reversal or a
   // rollback is being applied to this collection's tree (`physicalRows`).
   // Projections never do, so nothing they cache can hold retained rows.
-  const rowAbsent = (): boolean =>
-    absent() &&
-    (tapDepth > 0 ||
-      !(
-        physicalRows.length &&
-        physicalRows.includes(getPositionRegistry(api) as object)
-      ));
+  // A tap reads absent-aware even inside the window, unless it started the
+  // reversal itself: the window records the tap depth it opened at.
+  const rowAbsent = (): boolean => {
+    if (!absent()) return false;
+    if (!physicalRows.length) return true;
+    const registry = getPositionRegistry(api);
+    return !physicalRows.some(
+      ([open, depth]) => open === registry && depth === taps.depth
+    );
+  };
   const presentEntity = (id: K): E | undefined =>
     rowAbsent() ? undefined : getProjectedEntity(id);
   const presentEntries = (): Array<readonly [K, E]> =>
@@ -692,17 +689,36 @@ export function createEntitySignal<
   }
 
   /** Reactive signals for queries — all derived, none eagerly maintained. */
-  const allSignal: ReadableCell<E[]> = createVersionedProjection(() => {
+  const computeAll = (): E[] => {
     const entities = presentEntities();
     // `sortComparer` gives `all`/`ids` a stable sorted order (parity with
     // @ngrx/entity); `map` keeps insertion order.
     if (config.sortComparer) entities.sort(config.sortComparer);
     return entities;
-  });
-  const countSignal: ReadableCell<number> = createVersionedProjection(() => {
-    // O(1) — this used to be `entities.length` on a freshly built array.
-    return absent() ? 0 : structuralStore.activeKeyCount();
-  });
+  };
+  const allSignal: ReadableCell<E[]> = createVersionedProjection(computeAll);
+  // O(1) — this used to be `entities.length` on a freshly built array.
+  const computeCount = (): number =>
+    absent() ? 0 : structuralStore.activeKeyCount();
+  const countSignal: ReadableCell<number> =
+    createVersionedProjection(computeCount);
+  /**
+   * ⚠️ INSIDE A TAP, A PROJECTION IS READ FRESH (v16 8f). A tap runs inside
+   * its write, and inside a grouped write (a transaction, a reversal) the
+   * cached projections hear of it only when the group ends: read through them,
+   * a tap saw the collection as it was before the group. While a tap runs, a
+   * projection is handed out as an uncached reader of the same computation.
+   * It still reads `version`, so a derived computed inside a tap (a snapshot,
+   * an adapter's computed) depends on the collection as the cached projection
+   * would. Outside taps this is one comparison per access.
+   */
+  const fresh = <T>(read: () => T): ReadableCell<T> =>
+    (() => {
+      version();
+      return read();
+    }) as ReadableCell<T>;
+  const inTap = <T>(cell: ReadableCell<T>, read: () => T): ReadableCell<T> =>
+    taps.depth ? fresh(read) : cell;
   // Identity-stable across value-only writes: the key snapshot is shared until
   // the list or a key changes, so the copy (and every consumer) is reused.
   let idsSource: readonly K[] | undefined;
@@ -717,13 +733,11 @@ export function createEntitySignal<
     }
     return idsValue;
   });
-  const mapSignal: ReadableCell<ReadonlyMap<K, E>> = createVersionedProjection(
-    () => {
-      // Still a copy: callers may hold the result across mutations and must not
-      // see it change underneath them. But it is paid on read, not on write.
-      return new Map(presentEntries());
-    }
-  );
+  // Still a copy: callers may hold the result across mutations and must not
+  // see it change underneath them. But it is paid on read, not on write.
+  const computeMap = (): ReadonlyMap<K, E> => new Map(presentEntries());
+  const mapSignal: ReadableCell<ReadonlyMap<K, E>> =
+    createVersionedProjection(computeMap);
 
   /**
    * Per-entity signals — the body-granular reactivity layer.
@@ -1899,24 +1913,42 @@ export function createEntitySignal<
   /**
    * Run every tap's `method`. A tap reads collections as any consumer does:
    * absent-aware, even while a reversal is applied to their tree and its own
-   * row writes read hidden rows physically (`tapDepth`, v16 8f).
+   * row writes read hidden rows physically (`taps`, v16 8f).
    */
   const emitTap = <M extends keyof TapHandlers<E, K>>(
     method: M,
     ...args: Parameters<NonNullable<TapHandlers<E, K>[M]>>
   ): void => {
-    tapDepth++;
+    // A re-adding write re-adds its path before anyone hears of its rows: a
+    // tap reads the collection present, as on an empty one (v16 8f review).
+    if (pendingReAdd) {
+      pendingReAdd = false;
+      reactivatePathOnWrite(api);
+    }
+    // A tap's own writes are ordinary writes: interceptors run for them, even
+    // inside a re-adding write that already ran its own (v16 8f review).
+    const suppressed = interceptsSuppressed;
+    const nested = reAdding;
+    interceptsSuppressed = 0;
+    reAdding = false;
+    taps.depth++;
     try {
       for (const handler of tapHandlers)
         (handler[method] as ((...input: unknown[]) => void) | undefined)?.(
           ...args
         );
     } finally {
-      tapDepth--;
+      taps.depth--;
+      interceptsSuppressed = suppressed;
+      reAdding = nested;
     }
   };
   /** A re-adding write already ran this call's interceptors (v16 8f). */
   let interceptsSuppressed = 0;
+  /** A re-adding write is running on this collection (v16 8f). */
+  let reAdding = false;
+  /** It has written its rows and not yet re-added its path. */
+  let pendingReAdd = false;
   /** A re-adding write's removal of retained rows: no tap sees it (v16 8e). */
   let silentClear = 0;
 
@@ -2445,15 +2477,17 @@ export function createEntitySignal<
     // ==================
 
     get all(): ReadableCell<E[]> {
-      return allSignal;
+      return inTap(allSignal, computeAll);
     },
 
     get count(): ReadableCell<number> {
-      return countSignal;
+      return inTap(countSignal, computeCount);
     },
 
     get ids(): ReadableCell<K[]> {
-      return idsSignal;
+      return inTap(idsSignal, () =>
+        computeAll().map((entity) => selectId(entity))
+      );
     },
 
     /**
@@ -2465,7 +2499,7 @@ export function createEntitySignal<
      * `WRONG_ENTITY_METHODS`). `asMap` says what it returns.
      */
     get asMap(): ReadableCell<ReadonlyMap<K, E>> {
-      return mapSignal;
+      return inTap(mapSignal, computeMap);
     },
 
     // ── Active entity ───────────────────────────────────────────────────────
@@ -2483,11 +2517,13 @@ export function createEntitySignal<
      * that row changes — which is what `byId` exists for.
      */
     get activeEntity(): ReadableCell<E | undefined> {
-      return (cachedActiveEntity ??= locations.createDerived(() => {
+      const read = () => {
         const id = activeIdSignal();
         if (id === undefined) return undefined;
         return readEntityByKey(id);
-      }));
+      };
+      if (taps.depth) return fresh(read);
+      return (cachedActiveEntity ??= locations.createDerived(read));
     },
 
     setActiveId(id: K | undefined): void {
@@ -2506,19 +2542,20 @@ export function createEntitySignal<
     },
 
     has(id: K): ReadableCell<boolean> {
-      return createVersionedProjection(
-        () => !absent() && structuralStore.hasActiveKey(id)
-      );
+      const read = () => !absent() && structuralStore.hasActiveKey(id);
+      return taps.depth ? fresh(read) : createVersionedProjection(read);
     },
 
     // Bare canonical name (the `.isEmpty` alias was removed in v11).
     get empty(): ReadableCell<boolean> {
+      if (taps.depth) return fresh(() => computeCount() === 0);
       return (cachedEmpty ??= locations.createDerived(
         () => countSignal() === 0
       ));
     },
 
     where(predicate: (entity: E) => boolean): ReadableCell<E[]> {
+      if (taps.depth) return fresh(() => computeAll().filter(predicate));
       const cached = whereCache.get(predicate);
       if (cached) return cached;
 
@@ -2566,6 +2603,7 @@ export function createEntitySignal<
     },
 
     find(predicate: (entity: E) => boolean): ReadableCell<E | undefined> {
+      if (taps.depth) return fresh(() => computeAll().find(predicate));
       const cached = findCache.get(predicate);
       if (cached) return cached;
 
@@ -3917,7 +3955,6 @@ export function createEntitySignal<
   // an empty collection. Only a structural write on this collection's own
   // tree (the whole value hydrating it, a reversal) writes it as it is.
   const clearRetained = api.clear;
-  let reAdding = false;
   /**
    * The call's rows after its interceptors, as the write would intercept them
    * on an empty collection: ids resolved first (a strict duplicate throws
@@ -3961,12 +3998,19 @@ export function createEntitySignal<
       );
     }
     const keys = new Map<E, K>();
-    for (const [id, row] of rows) keys.set(row, id);
+    const out: E[] = [];
+    for (const [id, row] of rows) {
+      // One object for two ids (an interceptor that returns a shared object):
+      // each id writes its own copy, keyed as the interceptors were.
+      const own = keys.has(row) ? ({ ...row } as E) : row;
+      keys.set(own, id);
+      out.push(own);
+    }
     const resolved = {
       ...opts,
       selectId: (row: E) => keys.get(row) ?? deriveId(row, opts),
     };
-    return [many ? [...rows.values()] : rows.values().next().value, resolved];
+    return [many ? out : out[0], resolved];
   };
   for (const name of [
     'addOne',
@@ -3983,7 +4027,26 @@ export function createEntitySignal<
       if (reAdding || !absent() || inStructuralWrite(proxy))
         return write(...args);
       const prepared = name === 'clear' ? [] : interceptAsEmpty(name, args);
-      reAdding = true;
+      const writePrepared = () => {
+        interceptsSuppressed++;
+        try {
+          return write(...prepared);
+        } finally {
+          interceptsSuppressed--;
+        }
+      };
+      // An interceptor that wrote this collection may have re-added it; and
+      // a call that adds nothing (`addMany([])`) changes nothing, as on an
+      // empty collection. Either way the write is an ordinary one now, its
+      // interceptors already run (v16 8f review).
+      if (
+        !absent() ||
+        (name !== 'setAll' &&
+          Array.isArray(prepared[0]) &&
+          !(prepared[0] as unknown[]).length)
+      )
+        return writePrepared();
+      reAdding = pendingReAdd = true;
       try {
         // The retained rows were never visible, so their removal is no row
         // change to observe: taps do not see it (`silentClear`).
@@ -3993,17 +4056,15 @@ export function createEntitySignal<
         } finally {
           silentClear--;
         }
-        interceptsSuppressed++;
-        let result: unknown;
-        try {
-          result = write(...prepared);
-        } finally {
-          interceptsSuppressed--;
+        const result = writePrepared();
+        // Re-added already if a tap was told of a row (`emitTap`).
+        if (pendingReAdd) {
+          pendingReAdd = false;
+          reactivatePathOnWrite(api);
         }
-        reactivatePathOnWrite(api);
         return result;
       } finally {
-        reAdding = false;
+        reAdding = pendingReAdd = false;
       }
     };
   }
