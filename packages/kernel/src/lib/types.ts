@@ -666,12 +666,21 @@ export interface AddOptions<E, K> extends MutationOptions {
 export interface AddManyOptions<E, K> extends AddOptions<E, K> {
   /**
    * What an id that already exists does — including an id that occurs EARLIER
-   * IN THE SAME CALL: the rows apply as if one at a time, in order.
+   * IN THE SAME CALL. The rows apply as if one at a time, in order: the value
+   * each key ends with, and the interceptor calls that produce it, are those of
+   * successive one-row calls in the same mode. A key new to the collection
+   * takes its first copy's place in the call's order.
    *
-   * - `'strict'` (default): throw, before anything is written.
-   * - `'skip'`: keep the existing row (the first copy wins).
-   * - `'overwrite'`: replace it in place (the last copy wins, in the first
-   *   copy's position, as `setAll` resolves duplicates).
+   * - `'strict'` (default): throw before any interceptor runs or anything is
+   *   written.
+   * - `'skip'`: keep the existing row; only the first copy is intercepted and
+   *   written.
+   * - `'overwrite'`: replace it in place; every copy is intercepted (`onAdd`),
+   *   in input order, and the last intercepted value is written (as `setAll`
+   *   resolves duplicates).
+   *
+   * The call still commits once: path notifications and taps report each key
+   * once, with its final value, and the returned ids list each key once.
    *
    * Duplicates within one call used to insert a second row under the same key
    * in every mode (15.4.3); a collection never holds two rows under one key.
@@ -816,9 +825,16 @@ export interface EntitySignalOf<
   updateWhere(predicate: (entity: E) => boolean, changes: Partial<E>): number;
   upsertOne(entity: E, opts?: AddOptions<E, K>): K;
   /**
-   * Upserts each entity in order; a later copy of an id merges over the row
-   * the earlier copy produced (`{ ...first, ...second }`), as consecutive
-   * `upsertOne` calls would. Returns each id once.
+   * Upserts each entity in order, as successive `upsertOne` calls would: a
+   * later copy of an id merges over the row the earlier copy produced
+   * (`{ ...first, ...second }`). Interceptors run once per copy, in input
+   * order, after every id is resolved and before anything is written: `onAdd`
+   * for a new id's first copy, `onUpdate` (with the raw copy) for every other.
+   *
+   * The call commits once: path notifications and taps report each key once,
+   * with its final value — `onAdd(row, id)` for a row it added,
+   * `onUpdate(id, mergedChanges, row)` for a row it updated. Returns each id
+   * once, added ids first.
    */
   upsertMany(entities: E[], opts?: AddOptions<E, K>): K[];
   removeOne(id: K, opts?: MutationOptions): void;
