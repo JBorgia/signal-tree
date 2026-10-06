@@ -1,4 +1,9 @@
 import {
+  forgetTransientRows,
+  rememberTransientRow,
+  withTransientRows,
+} from '../../lib/internals/causal-runtime/transient-rows';
+import {
   defineRestorationSource,
   restorationRefusal,
   type RestorationEntryId,
@@ -3847,6 +3852,7 @@ export function restoration(
       bucket.ownerPaths.clear();
       bucket.subjectIds.clear();
       bucket.positionIds.clear();
+      forgetTransientRows(bucket.effects);
       bucket.effects.clear();
       bucket.collectionOrders.clear();
       bucket.descriptorInputs.length = 0;
@@ -3875,10 +3881,16 @@ export function restoration(
       bucket.positionIds.clear();
       // Member images become the turn's endpoints, and net no-ops are dropped
       // only now (`settleTurnMemberEffects`, v16 8g).
+      // A row the turn created and removed stays as a ghost pair where a kept
+      // row's recorded neighbour is it (`withTransientRows`, v16 8g).
       const effects = settleTurnMemberEffects(
         tree.$ as object,
-        Array.from(bucket.effects.values()).map(cloneTurnEffect)
+        withTransientRows(
+          Array.from(bucket.effects.values()).map(cloneTurnEffect),
+          bucket.effects
+        )
       );
+      forgetTransientRows(bucket.effects);
       bucket.effects.clear();
       const collectionOrders = Array.from(bucket.collectionOrders.values()).map(
         (order) => ({
@@ -4048,6 +4060,9 @@ export function restoration(
           // before the turn and does not exist after it, so the turn has NO
           // structural effect on it. P0-A.
           if (existing.kind === 'add' && effect.kind === 'remove') {
+            // Remembered: a kept row's recorded neighbour can be this row
+            // (`withTransientRows`, v16 8g).
+            rememberTransientRow(effectMap, existing, effect);
             effectMap.delete(key);
             return;
           }

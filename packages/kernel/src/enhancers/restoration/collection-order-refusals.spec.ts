@@ -19,9 +19,10 @@ import { restoration } from './restoration';
  *
  * Making them succeed is the 15.4.x carry
  * (`.claude/evidence/v16/carry-15.4.x/DEFECTS.md`): A, B and C succeed on v15
- * from `d33138f6` (on `6b6badc7`, `7fdcb36d`, `faa9b1f7`). D never failed on v15;
- * it entered v16 with the research line (`0ce2a320`). When a shape succeeds,
- * replace its refusal case with the state the history recorded.
+ * from `d33138f6` (on `6b6badc7`, `7fdcb36d`, `faa9b1f7`). When a shape
+ * succeeds, replace its refusal case with the state the history recorded.
+ * (Shape D, a turn holding two setAlls, was v16's own and succeeds from 8g:
+ * `two-setall-turn.spec.ts`.)
  */
 
 type Row = { id: string; n: number };
@@ -113,18 +114,6 @@ const shapes: Record<
     before: [],
     refused: ['jump', 0],
     reason: /reconstructed order and its rows disagree/,
-  },
-  // Redo of one turn holding two setAlls (v16 only; correct on v15 4ceb24a2).
-  'D: redo of a turn holding two setAlls': {
-    turns: [
-      (tree) => {
-        tree.$.g.rows.setAll([row('a', 9), row('c', 10)]);
-        tree.$.g.rows.setAll([row('a', 6)]);
-      },
-    ],
-    before: [['undo']],
-    refused: ['redo'],
-    reason: /recorded neighbours are no longer in it/,
   },
 };
 
