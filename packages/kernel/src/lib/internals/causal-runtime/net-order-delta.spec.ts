@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { PositionId } from './causal-types';
 import {
   composeTurnOrderDelta,
+  composeTurnOrderEndpoints,
   type TurnOrderCapture,
   type TurnRows,
 } from './net-order-delta';
@@ -201,5 +202,90 @@ describe('composeTurnOrderDelta', () => {
       }
       check(start, ops);
     }
+  });
+});
+
+describe('composeTurnOrderEndpoints work', () => {
+  /**
+   * Order-delta review, item 6: a chain of transient rows each anchored to
+   * the previous one, listed last first, made the placeable pass rescan
+   * every row once per row released (16k rows: 22 s). Counted, not timed:
+   * every anchor read is counted, and the reads must grow linearly.
+   */
+  const reads = (k: number): number => {
+    let count = 0;
+    const counted = (beforeSubject: number) => ({
+      get beforeSubject() {
+        count += 1;
+        return beforeSubject;
+      },
+      get afterSubject() {
+        count += 1;
+        return undefined;
+      },
+    });
+    const base = Array.from({ length: 10 }, (_, i) => i + 1);
+    const transient = [];
+    for (let i = k - 1; i >= 0; i--) {
+      const anchor = i === 0 ? 10 : 1000 + i - 1;
+      transient.push({
+        subject: 1000 + i,
+        created: counted(anchor),
+        removed: counted(anchor),
+      });
+    }
+    const { start, end } = composeTurnOrderEndpoints(
+      [
+        {
+          beforeSubjects: base,
+          afterSubjects: base,
+          beforeFrontier: 0,
+          afterFrontier: 1,
+        },
+      ],
+      { created: [], removed: [], transient }
+    );
+    expect(start).toStrictEqual(base);
+    expect(end).toStrictEqual(base);
+    return count;
+  };
+
+  it('a removed row anchored to the end of a transient chain is placed through it', () => {
+    // Transient 10 then 11 were after 2; 3 was removed after 11. The chain is
+    // listed last first, so 11 waits on 10 before 3 can be placed.
+    const { start } = composeTurnOrderEndpoints(
+      [
+        {
+          beforeSubjects: [1, 2],
+          afterSubjects: [2, 1],
+          beforeFrontier: 0,
+          afterFrontier: 1,
+        },
+      ],
+      {
+        created: [],
+        removed: [{ subject: 3, anchors: { beforeSubject: 11 } }],
+        transient: [
+          {
+            subject: 11,
+            created: { beforeSubject: 10 },
+            removed: { beforeSubject: 10 },
+          },
+          {
+            subject: 10,
+            created: { beforeSubject: 2 },
+            removed: { beforeSubject: 2 },
+          },
+        ],
+      }
+    );
+    expect(start).toStrictEqual([1, 2, 3]);
+  });
+
+  it('a chain of transient rows anchored last first is linear in anchor reads', () => {
+    const small = reads(500);
+    const large = reads(4000);
+    expect(large).toBeLessThanOrEqual(small * 8 * 1.05);
+    expect(large / 4000).toBeLessThan(20);
   });
 });

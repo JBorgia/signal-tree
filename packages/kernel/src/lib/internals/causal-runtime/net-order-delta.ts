@@ -174,28 +174,47 @@ function replay(
 
   // Virtual rows that cannot be placed are left out (they are in neither
   // endpoint); a real row that needed one is then genuinely unresolvable.
+  // A virtual row is placeable when it was at the front, or an anchor of it
+  // is present, a real row, or placeable itself: rows waiting on an anchor
+  // are released when it becomes placeable (linear; a repeated scan to a
+  // fixpoint was quadratic in a chain of transient rows, 16k rows in 22 s).
   const present = new Set(base);
   const placeable = new Set<number>();
   const candidates = insertions.filter(({ subject }) => !present.has(subject));
   const realRows = new Set(
     candidates.filter(({ item }) => !item).map(({ subject }) => subject)
   );
-  for (let changed = true; changed; ) {
-    changed = false;
-    for (const input of candidates) {
-      if (!input.item || placeable.has(input.subject)) continue;
-      const { beforeSubject, afterSubject } = input.anchors ?? {};
-      const resolvable = (anchor: number | undefined) =>
-        anchor !== undefined &&
-        (present.has(anchor) || placeable.has(anchor) || realRows.has(anchor));
-      if (
-        beforeSubject === undefined ||
-        resolvable(beforeSubject) ||
-        resolvable(afterSubject)
-      ) {
-        placeable.add(input.subject);
-        changed = true;
-      }
+  const resolvable = (anchor: number | undefined) =>
+    anchor !== undefined &&
+    (present.has(anchor) || placeable.has(anchor) || realRows.has(anchor));
+  const waitingOn = new Map<number, number[]>();
+  const release: number[] = [];
+  for (const input of candidates) {
+    if (!input.item) continue;
+    const { beforeSubject, afterSubject } = input.anchors ?? {};
+    if (
+      beforeSubject === undefined ||
+      resolvable(beforeSubject) ||
+      resolvable(afterSubject)
+    ) {
+      release.push(input.subject);
+      continue;
+    }
+    for (const anchor of [beforeSubject, afterSubject]) {
+      if (anchor === undefined) continue;
+      const waiting = waitingOn.get(anchor);
+      if (waiting) waiting.push(input.subject);
+      else waitingOn.set(anchor, [input.subject]);
+    }
+  }
+  while (release.length > 0) {
+    const subject = release.pop() as number;
+    if (placeable.has(subject)) continue;
+    placeable.add(subject);
+    const waiting = waitingOn.get(subject);
+    if (waiting) {
+      waitingOn.delete(subject);
+      for (const dependent of waiting) release.push(dependent);
     }
   }
   orderInsertions(
