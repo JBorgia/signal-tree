@@ -76,6 +76,7 @@ import {
   type CollectionTransitionSource,
   type CollectionTransitionTargetBinding,
   type FrontierStep,
+  type HeldRow,
   type PlainBranchMemberTransitionTarget,
   type CollectionOrderDelta,
   type ScalarTransitionTargetBinding,
@@ -257,23 +258,38 @@ type ScalarSetEffect = TurnEffectBase & {
   mutationIntent?: 'replace' | 'derive';
 };
 
-type CollectionAddEffect = TurnEffectBase & {
-  kind: 'add';
-  subject: number;
-  key: string | number;
-  value: unknown;
-  beforeSubject?: number;
-  afterSubject?: number;
+/**
+ * Where an anchor is a row an OPEN transaction created: that row, then the
+ * rows beyond it in the same direction while open transactions created
+ * them, up to the first one none did (absent at the end of the collection).
+ * Read from the order when the record is made, so a rejection can anchor the
+ * row to its nearest surviving neighbour THERE, even after later order
+ * changes moved the rejected rows (`rebaseOntoRejection`).
+ */
+type AnchorChains = {
+  beforeChain?: number[];
+  afterChain?: number[];
 };
 
-type CollectionRemoveEffect = TurnEffectBase & {
-  kind: 'remove';
-  subject: number;
-  key: string | number;
-  value: unknown;
-  beforeSubject?: number;
-  afterSubject?: number;
-};
+type CollectionAddEffect = TurnEffectBase &
+  AnchorChains & {
+    kind: 'add';
+    subject: number;
+    key: string | number;
+    value: unknown;
+    beforeSubject?: number;
+    afterSubject?: number;
+  };
+
+type CollectionRemoveEffect = TurnEffectBase &
+  AnchorChains & {
+    kind: 'remove';
+    subject: number;
+    key: string | number;
+    value: unknown;
+    beforeSubject?: number;
+    afterSubject?: number;
+  };
 
 type CollectionRekeyEffect = TurnEffectBase & {
   kind: 'rekey';
@@ -293,6 +309,8 @@ type DirectedTurnApplication = {
   readonly orderDeltas: CollectionOrderDelta[];
   readonly frontiers: FrontierStep[];
   readonly direction: 'undo' | 'redo';
+  /** Rows a later rejection restored that these turns never knew. */
+  readonly held?: ReadonlyMap<number, readonly HeldRow[]>;
 };
 
 // Admission evidence only: pending values remain owned by transactions().
@@ -619,6 +637,9 @@ const withTransition = (
  *                                         collection that ended where the
  *                                         compensation started ends where it
  *                                         left the collection
+ *   (rows the rejected turn removed come back with the rollback into
+ *   orders the later records never had them in: they are HELD out while
+ *   those records reverse, `RestorationManager.heldRows`)
  *
  * Exported for its unit spec only.
  */
@@ -943,8 +964,18 @@ export function rebaseOntoRejection(
   const follow = (
     position: number,
     subject: number | undefined,
-    side: 'beforeSubject' | 'afterSubject'
+    side: 'beforeSubject' | 'afterSubject',
+    chain?: readonly number[]
   ): number | undefined => {
+    if (
+      chain &&
+      subject !== undefined &&
+      created.has(rowScope(position, subject))
+    ) {
+      return chain.find(
+        (neighbour) => !created.has(rowScope(position, neighbour))
+      );
+    }
     let current = subject;
     const seen = new Set<number>();
     while (current !== undefined && !seen.has(current)) {
@@ -1001,21 +1032,40 @@ export function rebaseOntoRejection(
     for (let index = 0; index < kept.length; index += 1) {
       const effect = kept[index];
       if (effect.kind !== 'add' && effect.kind !== 'remove') continue;
+      // The rejected turn's rows leave every chain for good: a later
+      // rejection of another open transaction then skips to a row that
+      // still exists.
+      const pruned = (chain?: number[]) =>
+        chain?.filter(
+          (neighbour) => !created.has(rowScope(effect.position, neighbour))
+        );
+      const beforeChain = pruned(effect.beforeChain);
+      const afterChain = pruned(effect.afterChain);
       const beforeSubject = follow(
         effect.position,
         effect.beforeSubject,
-        'beforeSubject'
+        'beforeSubject',
+        effect.beforeChain
       );
       const afterSubject = follow(
         effect.position,
         effect.afterSubject,
-        'afterSubject'
+        'afterSubject',
+        effect.afterChain
       );
       if (
         beforeSubject !== effect.beforeSubject ||
-        afterSubject !== effect.afterSubject
+        afterSubject !== effect.afterSubject ||
+        beforeChain?.length !== effect.beforeChain?.length ||
+        afterChain?.length !== effect.afterChain?.length
       ) {
-        kept[index] = { ...effect, beforeSubject, afterSubject };
+        kept[index] = {
+          ...effect,
+          beforeSubject,
+          afterSubject,
+          ...(beforeChain ? { beforeChain } : {}),
+          ...(afterChain ? { afterChain } : {}),
+        };
       }
     }
     return kept.filter(
@@ -1577,10 +1627,12 @@ class RestorationManager<T> {
       later.map((turn) => turn.__effects ?? [])
     );
     const created = new Map<number, Set<number>>();
+    const removed = new Map<number, Set<number>>();
     for (const effect of rejected) {
-      if (effect.kind !== 'add') continue;
-      let rows = created.get(effect.position);
-      if (!rows) created.set(effect.position, (rows = new Set()));
+      if (effect.kind !== 'add' && effect.kind !== 'remove') continue;
+      const rowsBy = effect.kind === 'add' ? created : removed;
+      let rows = rowsBy.get(effect.position);
+      if (!rows) rowsBy.set(effect.position, (rows = new Set()));
       rows.add(effect.subject);
     }
     const turnOrders = rebaseOrdersOntoRejection(
@@ -1618,6 +1670,7 @@ class RestorationManager<T> {
       rejectedFrontiers,
       compensatedFrontiers
     );
+    this.holdRestoredRows(removed, since);
     events.forEach((event, index) => {
       const mutable = event as {
         effects: TurnEffect[];
@@ -1631,6 +1684,62 @@ class RestorationManager<T> {
       } else delete mutable.frontiers;
     });
     this.dropEmptiedTurns(later);
+  }
+
+  /**
+   * Rows a rejection restored that records made before it never knew, by
+   * collection: held out of the order while those records reverse (undo,
+   * redo, jumpTo, the history walk), and put back by their attachments, the
+   * neighbours the rollback restored them next to (`HeldRow`). A record
+   * made after the rejection knows them, and does not hold them.
+   */
+  private heldRows: Array<
+    HeldRow & { owner: number; turnId: number; ordinal: number }
+  > = [];
+
+  private holdRestoredRows(
+    removed: ReadonlyMap<number, ReadonlySet<number>>,
+    since: { turnId: number; ordinal: number }
+  ): void {
+    if (removed.size === 0) return;
+    const turnId = this.nextTurnId - 1;
+    const ordinal = this.nextHistoricalOrdinal - 1;
+    if (turnId <= since.turnId && ordinal <= since.ordinal) return;
+    const bindings = transitionBindingsOf(this.tree.$);
+    for (const [owner, subjects] of removed) {
+      const order = bindings.get(owner)?.readSource().order ?? [];
+      order.forEach((subject, index) => {
+        if (!subjects.has(subject)) return;
+        this.heldRows.push({
+          owner,
+          subject,
+          left: order[index - 1],
+          right: order[index + 1],
+          turnId,
+          ordinal,
+        });
+      });
+    }
+  }
+
+  /** The rows held for a record (made at or before each rejection). */
+  private heldFor(record: {
+    turnId?: number;
+    ordinal?: number;
+  }): Map<number, HeldRow[]> | undefined {
+    let held: Map<number, HeldRow[]> | undefined;
+    for (const row of this.heldRows) {
+      const predates =
+        record.turnId !== undefined
+          ? record.turnId <= row.turnId
+          : (record.ordinal ?? Infinity) <= row.ordinal;
+      if (!predates) continue;
+      held ??= new Map();
+      let rows = held.get(row.owner);
+      if (!rows) held.set(row.owner, (rows = []));
+      rows.push({ subject: row.subject, left: row.left, right: row.right });
+    }
+    return held;
   }
 
   /**
@@ -2873,6 +2982,7 @@ class RestorationManager<T> {
         orderDeltas,
         orderEndpoint: direction === 'undo' ? 'before' : 'after',
         frontierSteps,
+        held: this.heldFor({ turnId: turn.id }),
       });
       for (const [owner, collection] of target.collections) {
         collections.set(owner, collection);
@@ -2967,6 +3077,7 @@ class RestorationManager<T> {
         orderDeltas,
         orderEndpoint: 'before',
         frontierSteps,
+        held: this.heldFor({ ordinal: event.ordinal }),
       });
       for (const [owner, collection] of target.collections) {
         collections.set(owner, collection);
@@ -3015,6 +3126,7 @@ class RestorationManager<T> {
 
   resetRestorationHistory(): void {
     this.resetGeneration++;
+    this.heldRows = [];
     // Before `nextTurnId` goes back to 1. Owner strings are derived from turn
     // ids, so releasing after the counter reset would leave the old claims
     // attached to owners the next entries are about to mint.
@@ -3191,6 +3303,8 @@ class RestorationManager<T> {
     let steps: FrontierStep[] = [];
     let deltaOwners = new Set<number>();
     let changedOwners = new Set<number>();
+    let held: Map<number, HeldRow[]> | undefined;
+    let heldKey = '';
     const close = () => {
       if (effects.length > 0 || orderDeltas.length > 0 || steps.length > 0) {
         applications.push({
@@ -3198,6 +3312,7 @@ class RestorationManager<T> {
           orderDeltas,
           frontiers: chainFrontierSteps(steps),
           direction,
+          ...(held ? { held } : {}),
         });
       }
       effects = [];
@@ -3221,12 +3336,17 @@ class RestorationManager<T> {
           .filter(({ kind }) => kind !== 'set')
           .map(({ position }) => position),
       ];
+      const turnHeld = this.heldFor({ turnId: turn.id });
+      const turnHeldKey = turnHeld ? JSON.stringify([...turnHeld]) : '';
       if (
+        turnHeldKey !== heldKey ||
         turnDeltas.some(({ owner }) => changedOwners.has(owner)) ||
         turnChanged.some((owner) => deltaOwners.has(owner))
       ) {
         close();
       }
+      held = turnHeld;
+      heldKey = turnHeldKey;
       if (direction === 'undo') {
         for (let i = turnEffects.length - 1; i >= 0; i--)
           effects.push(turnEffects[i]);
@@ -3792,10 +3912,11 @@ export function restoration(
       const frontierSteps = applications.flatMap(
         (application) => application.frontiers
       );
+      const anyHeld = applications.some(({ held }) => held !== undefined);
       const sequential =
         [...deltasByOwner.values()].some((count) => count > 1) ||
         (applications.length > 1 &&
-          (orderDeltas.length > 0 || frontierSteps.length > 0));
+          (orderDeltas.length > 0 || frontierSteps.length > 0 || anyHeld));
       const orderEndpoints = new Map<number, 'before' | 'after'>();
       for (const application of applications) {
         for (const delta of application.orderDeltas) {
@@ -3813,6 +3934,7 @@ export function restoration(
       const usesDeclarativeTarget =
         (applications.length > 1 ||
           orderDeltas.length > 0 ||
+          anyHeld ||
           requiresDeclarativeStructuralTarget(reversalEffects)) &&
         reversalEffects.every(
           (effect) =>
@@ -3855,6 +3977,7 @@ export function restoration(
             orderEndpoint:
               application.direction === 'undo' ? 'before' : 'after',
             frontierSteps: application.frontiers,
+            held: application.held,
           });
           for (const [owner, collection] of step.collections) {
             current.set(owner, collection);
@@ -3927,6 +4050,7 @@ export function restoration(
               orderDeltas,
               orderEndpoints,
               frontierSteps,
+              held: applications[0]?.held,
             });
         const scalarBinding: ScalarTransitionTargetBinding | undefined =
           scalarSlotRuntime
@@ -4679,9 +4803,11 @@ export function restoration(
         bucket.effects.values(),
         () => transitionBindingsOf(tree.$)
       );
-      const effects = withTransientRows(
-        Array.from(bucket.effects.values()).map(cloneTurnEffect),
-        bucket.effects
+      const effects = withAnchorChains(
+        withTransientRows(
+          Array.from(bucket.effects.values()).map(cloneTurnEffect),
+          bucket.effects
+        )
       );
       bucket.effects.clear();
       forgetTransientRows(bucket.effects);
@@ -5158,6 +5284,54 @@ export function restoration(
       if (!carriesOrders(capture)) return;
       bucket.ownerPaths.add(capture.ownerPath);
       bucket.positionIds.add(capture.owner);
+    };
+    /** Records `AnchorChains` where an anchor is a row an open transaction created. */
+    const withAnchorChains = (effects: TurnEffect[]): TurnEffect[] => {
+      let orders: Map<number, number[]> | undefined;
+      const orderOf = (owner: number): number[] => {
+        orders ??= new Map();
+        let order = orders.get(owner);
+        if (!order) {
+          order =
+            transitionBindingsOf(tree.$)
+              .get(owner)
+              ?.readSource()
+              .order.slice() ?? [];
+          orders.set(owner, order);
+        }
+        return order;
+      };
+      return effects.map((effect) => {
+        if (effect.kind !== 'add' && effect.kind !== 'remove') return effect;
+        const pending = restorationManager.pendingCreatedRows(effect.position);
+        if (!pending) return effect;
+        const chainFrom = (anchor: number | undefined, step: 1 | -1) => {
+          if (anchor === undefined || !pending.has(anchor)) return undefined;
+          const order = orderOf(effect.position);
+          const from = order.indexOf(anchor);
+          // Gone already (removed in the same turn): its own removal
+          // anchors place it (the rebase follows those).
+          if (from < 0) return undefined;
+          const chain = [anchor];
+          for (let at = from + step; ; at += step) {
+            const neighbour = order[at];
+            if (neighbour === undefined || at < 0) break;
+            if (neighbour === effect.subject) continue;
+            chain.push(neighbour);
+            if (!pending.has(neighbour)) break;
+          }
+          return chain;
+        };
+        const beforeChain = chainFrom(effect.beforeSubject, -1);
+        const afterChain = chainFrom(effect.afterSubject, 1);
+        return beforeChain || afterChain
+          ? {
+              ...effect,
+              ...(beforeChain ? { beforeChain } : {}),
+              ...(afterChain ? { afterChain } : {}),
+            }
+          : effect;
+      });
     };
     const getTransactionBucket = (transactionId: number): CaptureBucket => {
       let bucket = pendingTransactions.get(transactionId);
@@ -5702,6 +5876,20 @@ export function restoration(
                     });
                   }
                 }
+              }
+              // A rollback's compensation is never history, realized or not.
+              // The declarative rollback (two or more rows put back, or an
+              // order change reversed) writes without `realized`, and fell
+              // through to the authored path below: the rejection's own
+              // compensation became a later gap, and the history walk then
+              // reversed it (removing the rows the rollback restored from
+              // every earlier state).
+              if (
+                isCompensationWrite(meta) &&
+                getWriteParticipation(meta) !== 'realized'
+              ) {
+                restoreSupersededTruth(compensationTransactionId(meta), path);
+                return;
               }
               if (getWriteParticipation(meta) === 'realized') {
                 // RESTORE-P0 P0-C. Recorded HERE rather than only in the leaf

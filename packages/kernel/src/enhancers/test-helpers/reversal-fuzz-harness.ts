@@ -343,3 +343,200 @@ export async function checkTurnsRollback(
     tree.destroy();
   }
 }
+
+/** Operations of a rejection scenario (`checkRejection`). */
+export type RejectionOp =
+  | ['add', string]
+  | ['rm', string]
+  | ['pre', string]
+  | ['rename', string, string]
+  | ['reorder']
+  /** setAll in the given id order (ids not present are skipped; the rest
+   * keep their place after them). */
+  | ['shuffle', string];
+
+const applyRejectionOps = (tree: Tree, ops: readonly RejectionOp[]): void => {
+  const rows = tree.$.rows;
+  for (const op of ops) {
+    try {
+      if (op[0] === 'add') rows.addOne({ id: op[1], n: 1 });
+      else if (op[0] === 'rm') rows.removeOne(op[1]);
+      else if (op[0] === 'pre') rows.prependMany([{ id: op[1], n: 1 }]);
+      else if (op[0] === 'rename') rows.changeId(op[1], op[2]);
+      else if (op[0] === 'reorder') rows.setAll([...rows.all()].reverse());
+      else {
+        const want = op[1].split(',');
+        const byId = new Map(rows.all().map((row) => [row.id, row]));
+        rows.setAll([
+          ...want.flatMap((id) => {
+            const row = byId.get(id);
+            return row ? [row] : [];
+          }),
+          ...rows.all().filter((row) => !want.includes(row.id)),
+        ]);
+      }
+    } catch {
+      /* an invalid op for the current state */
+    }
+  }
+};
+
+/**
+ * Rejected transactions under later work: `tx` (and `second`) as open
+ * transactions, then each of `later` as its own undoable turn, then every
+ * transaction rolled back. A refused rollback is an answer (`refused:<kind>`).
+ * Otherwise history must read, every undo, redo and jumpTo (both ways) must
+ * land exactly on the state it named, with history read at every step.
+ */
+export async function checkRejection(
+  enhancers: () => unknown[],
+  scenario: {
+    readonly seed?: string;
+    readonly tx: readonly RejectionOp[];
+    readonly second?: readonly RejectionOp[];
+    readonly later: readonly (readonly RejectionOp[])[];
+  }
+): Promise<string> {
+  const tree = signalTree(declaration(), {
+    enhancers: enhancers() as never,
+  }) as unknown as Tree;
+  try {
+    for (const id of scenario.seed ?? 'abcd') tree.$.rows.addOne({ id, n: 0 });
+    await flush();
+    const pending = [
+      tree.transaction(() => applyRejectionOps(tree, scenario.tx)),
+    ];
+    await flush();
+    if (scenario.second) {
+      pending.push(
+        tree.transaction(() =>
+          applyRejectionOps(tree, scenario.second as RejectionOp[])
+        )
+      );
+      await flush();
+    }
+    for (const turn of scenario.later) {
+      undoable(() => applyRejectionOps(tree, turn));
+      await flush();
+    }
+    for (const transaction of pending) {
+      try {
+        transaction.rollback();
+      } catch (error) {
+        const kind = /\[([a-z-]+)\]/.exec(String((error as Error).message));
+        return `refused:${kind?.[1] ?? describeError(error)}`;
+      }
+      await flush();
+    }
+    const read = (): string | undefined => {
+      try {
+        tree.getRestorationHistory();
+        return undefined;
+      } catch (error) {
+        return describeError(error);
+      }
+    };
+    const failed = read();
+    if (failed) return `history-${failed}`;
+    const count = tree.getRestorationHistory().length;
+    const seen = [stateOf(tree)];
+    const step = async (
+      label: string,
+      move: () => void,
+      expected?: string
+    ): Promise<string | undefined> => {
+      try {
+        move();
+      } catch (error) {
+        return `${label}-${describeError(error)}`;
+      }
+      await flush();
+      const state = stateOf(tree);
+      if (expected !== undefined && state !== expected) {
+        return `${label}-wrong:${state}`;
+      }
+      const history = read();
+      return history ? `${label}-history-${history}` : undefined;
+    };
+    for (let at = 0; at < count; at++) {
+      const failure = await step(`undo${at}`, () => tree.undo());
+      if (failure) return failure;
+      seen.push(stateOf(tree));
+    }
+    for (let at = 0; at < count; at++) {
+      const failure = await step(
+        `redo${at}`,
+        () => tree.redo(),
+        seen[count - 1 - at]
+      );
+      if (failure) return failure;
+    }
+    for (let at = count - 1; at >= 0; at--) {
+      const failure = await step(
+        `jump${at}`,
+        () => tree.jumpTo(at),
+        seen[count - 1 - at]
+      );
+      if (failure) return failure;
+    }
+    for (let at = 0; at < count; at++) {
+      const failure = await step(
+        `jumpForward${at}`,
+        () => tree.jumpTo(at),
+        seen[count - 1 - at]
+      );
+      if (failure) return failure;
+    }
+    return 'ok';
+  } finally {
+    tree.destroy();
+  }
+}
+
+/** A random rejection scenario (the order-delta review's generator). */
+export function generateRejection(next: () => number): {
+  tx: RejectionOp[];
+  second?: RejectionOp[];
+  later: RejectionOp[][];
+} {
+  const pool = ['a', 'b', 'c', 'd'];
+  let fresh = 0;
+  const id = () => {
+    const created = `r${fresh++}`;
+    pool.push(created);
+    return created;
+  };
+  const pick = () => pool[Math.floor(next() * pool.length)];
+  const shuffled = () => {
+    const ids = [...pool];
+    for (let i = ids.length - 1; i > 0; i--) {
+      const j = Math.floor(next() * (i + 1));
+      [ids[i], ids[j]] = [ids[j], ids[i]];
+    }
+    return ids.join(',');
+  };
+  const txOps = ['add', 'rm', 'reorder', 'pre', 'rename'] as const;
+  const tx = (): RejectionOp[] =>
+    Array.from({ length: 1 + Math.floor(next() * 3) }, (): RejectionOp => {
+      const kind = txOps[Math.floor(next() * txOps.length)];
+      if (kind === 'add' || kind === 'pre') return [kind, id()];
+      if (kind === 'rm') return ['rm', pick()];
+      if (kind === 'rename') return ['rename', pick(), id()];
+      return ['reorder'];
+    });
+  const laterTurn = (): RejectionOp[] =>
+    Array.from({ length: 1 + Math.floor(next() * 2) }, (): RejectionOp => {
+      const c = next();
+      return c < 0.5
+        ? ['shuffle', shuffled()]
+        : c < 0.7
+        ? ['add', id()]
+        : c < 0.85
+        ? ['rm', pick()]
+        : ['reorder'];
+    });
+  const first = tx();
+  const second = next() < 0.3 ? tx() : undefined;
+  const later = Array.from({ length: 1 + Math.floor(next() * 3) }, laterTurn);
+  return { tx: first, ...(second ? { second } : {}), later };
+}

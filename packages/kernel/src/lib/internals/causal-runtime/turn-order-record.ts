@@ -210,8 +210,10 @@ export function transitionBindingsOf(
  * Token-only means no row of the collection was added or removed in the
  * turn (`effects`, net) and no reorder was recorded (`frontiers` holds
  * transitions without one). Settled where the collection still holds the
- * turn's token; kept otherwise (later work moved it, or another capture of
- * the same turn settled it already): the chain through it still holds.
+ * turn's token; dropped where it already holds the earlier one (another
+ * capture of the same turn, drained just before, settled it: kept, it
+ * claimed the earlier token as its start and the chain through the turn's
+ * real successor broke); kept otherwise (later work moved it).
  */
 export function settleTokenOnly(
   frontiers: readonly TurnFrontierTransition[],
@@ -232,9 +234,11 @@ export function settleTokenOnly(
     const binding = resolved.get(transition.owner);
     const live = binding?.orderFrontier?.();
     if (binding === undefined || live === undefined) return true;
-    if (live !== transition.after) return true;
-    binding.orderFrontier?.(transition.before as object);
-    return false;
+    if (live === transition.after) {
+      binding.orderFrontier?.(transition.before as object);
+      return false;
+    }
+    return live !== transition.before;
   });
 }
 

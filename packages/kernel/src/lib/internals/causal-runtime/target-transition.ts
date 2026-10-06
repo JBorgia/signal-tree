@@ -113,6 +113,8 @@ export type DeriveDeclarativeTransitionTargetOptions = {
   readonly orderDeltas?: readonly CollectionOrderDelta[];
   readonly orderEndpoint?: 'before' | 'after';
   readonly orderEndpoints?: ReadonlyMap<PositionId, 'before' | 'after'>;
+  /** Rows held out of each collection's order while it reverses. */
+  readonly held?: ReadonlyMap<PositionId, readonly HeldRow[]>;
   /**
    * Order-frontier tokens to reinstate on collections this transition
    * reverses without an order delta (invariant 3 in
@@ -154,6 +156,21 @@ export type CollectionOrderDelta = {
    * refuses rather than guess (`unrecordedOrderDelta`).
    */
   readonly unrecorded?: true;
+};
+
+/**
+ * A row the reversed records never knew: a rejected transaction removed it
+ * before they were recorded, and the rollback put it back. While they
+ * reverse, it is held out of the order (their effects and deltas apply
+ * exactly as recorded) and put back next to the rows it was attached to
+ * when the rollback restored it: after `left`, else before `right`, else
+ * at the front when it had no left neighbour, else at the end. A function
+ * of the other rows' order, so undo, redo and jumpTo round-trip exactly.
+ */
+export type HeldRow = {
+  readonly subject: number;
+  readonly left?: number;
+  readonly right?: number;
 };
 
 /** An order change whose orders are unknown: it refuses to reverse. */
@@ -263,6 +280,7 @@ export function deriveDeclarativeTransitionTarget(
       subjects: Map<number, CollectionTargetSubject>;
       order: number[];
       sourceSubjects: Set<number>;
+      held: readonly HeldRow[];
     }
   >();
   const frontierSteps = new Map(
@@ -278,10 +296,15 @@ export function deriveDeclarativeTransitionTarget(
       source.subjects.map((subject) => [subject.subject, { ...subject }])
     );
     assertCollectionOrderMatchesSubjects(source.order, subjects);
+    const held = (options.held?.get(source.owner) ?? []).filter(({ subject }) =>
+      subjects.has(subject)
+    );
+    const heldSubjects = new Set(held.map(({ subject }) => subject));
     collections.set(source.owner, {
       subjects,
-      order: [...source.order],
+      order: source.order.filter((subject) => !heldSubjects.has(subject)),
       sourceSubjects: new Set(subjects.keys()),
+      held,
     });
   }
 
@@ -333,7 +356,7 @@ export function deriveDeclarativeTransitionTarget(
     const step = frontierSteps.get(owner);
     const orderEndpoint =
       options.orderEndpoints?.get(owner) ?? options.orderEndpoint ?? 'after';
-    const order = delta
+    const derived = delta
       ? applyCollectionOrderDelta(
           collection.order,
           delta,
@@ -343,9 +366,10 @@ export function deriveDeclarativeTransitionTarget(
         )
       : deriveStructuralTargetOrder(
           collection.order,
-          collection.subjects,
+          withoutHeld(collection.subjects, collection.held),
           options.effects.filter((effect) => effect.owner === owner)
         );
+    const order = withHeldRows(derived, collection.held);
     assertCollectionOrderMatchesSubjects(order, collection.subjects);
     assertUniqueTargetKeys(collection.subjects);
     targets.set(owner, {
@@ -378,6 +402,36 @@ export function deriveDeclarativeTransitionTarget(
     scalars,
     ...(plainBranchMembers.size ? { plainBranchMembers } : {}),
   };
+}
+
+function withoutHeld(
+  subjects: ReadonlyMap<number, CollectionTargetSubject>,
+  held: readonly HeldRow[]
+): ReadonlyMap<number, CollectionTargetSubject> {
+  if (held.length === 0) return subjects;
+  const kept = new Map(subjects);
+  for (const { subject } of held) kept.delete(subject);
+  return kept;
+}
+
+/** `order` with the held rows put back by their attachments (see HeldRow). */
+function withHeldRows(order: number[], held: readonly HeldRow[]): number[] {
+  if (held.length === 0) return order;
+  const result = [...order];
+  for (const row of held) {
+    const left = row.left === undefined ? -1 : result.indexOf(row.left);
+    const right = row.right === undefined ? -1 : result.indexOf(row.right);
+    const at =
+      left >= 0
+        ? left + 1
+        : right >= 0
+        ? right
+        : row.left === undefined
+        ? 0
+        : result.length;
+    result.splice(at, 0, row.subject);
+  }
+  return result;
 }
 
 /**
