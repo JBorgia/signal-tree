@@ -168,7 +168,13 @@ export type TurnEffect =
   | CollectionRekeyEffect;
 
 type LaterAppliedEffect = {
-  turnId: number;
+  /**
+   * The authored turn that applied it; absent for observed work with no turn
+   * of its own (a realization). A refusal then names no conflicting turn:
+   * "later work" (rollback/rebase review, item 6: the ledger entries carried
+   * the id of the turn being rolled back, so the refusal named that turn).
+   */
+  turnId?: number;
   effect: TurnEffect;
   /**
    * H4/H5/H6 — THE SUPERSEDER'S OWN SETTLEMENT STATE.
@@ -378,8 +384,20 @@ const createRollbackError = (
 ): SignalTreeRollbackError =>
   new SignalTreeRollbackError(explainRollbackFailure(cause), { cause });
 
+/**
+ * When each authored effect was applied, on the authority's clock, stamped as
+ * it is captured (its last write). Records were stamped when they were built
+ * at flush, after every realization delivered in the same flush, so a later
+ * same-tick authored edit followed by a realized removal read as "edited and
+ * kept" (rollback/rebase review, item 5). Copied by every clone.
+ */
+const effectAppliedAt = new WeakMap<TurnEffect, number>();
+
 function cloneTurnEffect(effect: TurnEffect): TurnEffect {
-  return { ...effect };
+  const clone = { ...effect };
+  const appliedAt = effectAppliedAt.get(effect);
+  if (appliedAt !== undefined) effectAppliedAt.set(clone, appliedAt);
+  return clone;
 }
 
 function combineScalarMutationIntent(
@@ -588,14 +606,21 @@ function buildPendingRollbackPlan(
    * at one key ("duplicate keys"). Checked BEFORE the rekey's erasure skip,
    * which is exactly the case that accepted it.
    *
-   * Renames only. A pending REMOVE whose key was re-occupied keeps its pinned
-   * `effect-validation-failed` refusal (proposal-rejection-0 case 15, the
-   * refusal-lifecycle gate's `replacement` cases).
+   * A pending REMOVE vacated its key the same way (rollback/rebase review,
+   * item 2): a later add of a different row at that key, even removed again,
+   * rests on the removal, and accepting the rollback put two lifetimes at
+   * one key in history ("duplicate keys", for good). While the occupier
+   * still stands it refused as `effect-validation-failed` (the re-add found
+   * the key taken), which named a broken compensation rather than the
+   * dependency; both are the dependency kind now (proposal-rejection-0 case
+   * 15 and the refusal-lifecycle gate's `replacement` cases carry the
+   * reason).
    */
   const reoccupierOfVacatedKey = (
-    effect: CollectionRekeyEffect
-  ): LaterAppliedEffect | undefined =>
-    laterEffects.find(({ effect: later }) => {
+    effect: CollectionRekeyEffect | CollectionRemoveEffect
+  ): LaterAppliedEffect | undefined => {
+    const vacated = effect.kind === 'rekey' ? effect.beforeKey : effect.key;
+    return laterEffects.find(({ effect: later }) => {
       if (
         later.ownerPath !== effect.ownerPath ||
         later.subject === effect.subject
@@ -603,9 +628,10 @@ function buildPendingRollbackPlan(
         return false;
       }
       return later.kind === 'add'
-        ? later.key === effect.beforeKey
-        : later.kind === 'rekey' && later.afterKey === effect.beforeKey;
+        ? later.key === vacated
+        : later.kind === 'rekey' && later.afterKey === vacated;
     });
+  };
 
   const compensation: TurnEffect[] = [];
   for (let i = pendingEffects.length - 1; i >= 0; i--) {
@@ -644,7 +670,7 @@ function buildPendingRollbackPlan(
       case 'remove':
       case 'rekey': {
         const reoccupier =
-          effect.kind === 'rekey' ? reoccupierOfVacatedKey(effect) : undefined;
+          effect.kind === 'add' ? undefined : reoccupierOfVacatedKey(effect);
         if (reoccupier) {
           return {
             conflict: dependencyConflict(reoccupier.unsettled === true, {
@@ -690,6 +716,8 @@ class TransactionAuthority {
   // settlement may forget a descriptor is O(1) rather than a rebuild of every
   // pending turn's positions (which made settling P overlapping turns O(P^2)).
   private readonly pendingPositionCounts = new Map<number, number>();
+  /** Pending ids createPending registered (the rest are reservations). */
+  private readonly registeredPending = new Set<number>();
   private nextTurnId = 1;
 
   /**
@@ -721,13 +749,26 @@ class TransactionAuthority {
     seq: number;
     appliedAt: number;
     effect: TurnEffect;
+    /** The notifier flush it was delivered in (`advanceFlush`). */
+    flush: number;
   }> = [];
+  private flushEpoch = 0;
+
+  /** A notifier flush completed: later observations belong to the next. */
+  advanceFlush(): void {
+    this.flushEpoch += 1;
+  }
   /**
    * One monotonic clock for every applied effect: authored records (stamped
    * when they are built), ledger entries and open transactions. Never reset,
    * unlike `ledgerSeq`, so stamps compare across a quiet period.
    */
   private appliedClock = 0;
+
+  /** The next stamp on the applied clock (records, ledger, captures). */
+  tick(): number {
+    return ++this.appliedClock;
+  }
   private ledgerSeq = 0;
   private readonly pendingOpenedAtSeq = new Map<number, number>();
 
@@ -839,6 +880,7 @@ class TransactionAuthority {
     effects?: TurnEffect[],
     baselineValues?: ReadonlyMap<number, unknown>
   ): TransactionTurnRecord | undefined {
+    transactionAuthorityFaults.at?.('buildTurn');
     const turn = this.buildTurn(
       subjectIds,
       positionIds,
@@ -855,27 +897,59 @@ class TransactionAuthority {
     // abort then recorded the turn again through this method and confirmed
     // it, and the first count was never released (reversal-engine review,
     // item 5).
-    const reservation = this.pendingTurns.get(turn.id);
-    const positions = [...new Set(turn.__positionIds ?? [])];
+    //
+    // Idempotent for an id already REGISTERED (rollback/rebase review, item
+    // 3): its counts are released before the new registration counts, and a
+    // failure puts the previous registration back as it was, claims and all
+    // (released, the catch dropped the live registration's claims).
+    const previous = this.registeredPending.has(turn.id)
+      ? this.pendingTurns.get(turn.id)
+      : undefined;
+    const reservation = previous ? undefined : this.pendingTurns.get(turn.id);
+    const positions = [
+      ...new Set([
+        ...(turn.__positionIds ?? []),
+        ...(previous?.__positionIds ?? []),
+      ]),
+    ];
     const counts = positions.map((position) =>
       this.pendingPositionCounts.get(position)
     );
     try {
+      if (previous) this.countPendingPositions(previous, -1);
       this.pendingTurns.set(turn.id, turn);
       this.countPendingPositions(turn, 1);
+      transactionAuthorityFaults.at?.('claims');
       this.retainPendingClaims(turn.id, turn.restorationSubjectIds ?? []);
-      return cloneTurnRecord(turn);
+      transactionAuthorityFaults.at?.('clone');
+      const record = cloneTurnRecord(turn);
+      this.registeredPending.add(turn.id);
+      return record;
     } catch (error) {
       positions.forEach((position, index) => {
         const count = counts[index];
         if (count === undefined) this.pendingPositionCounts.delete(position);
         else this.pendingPositionCounts.set(position, count);
       });
-      this.releasePendingClaims(turn.id);
-      if (reservation) this.pendingTurns.set(turn.id, reservation);
-      else this.pendingTurns.delete(turn.id);
+      if (previous ?? reservation) {
+        this.pendingTurns.set(turn.id, (previous ?? reservation) as never);
+      } else this.pendingTurns.delete(turn.id);
+      if (!previous) {
+        try {
+          transactionAuthorityFaults.at?.('release');
+          this.releasePendingClaims(turn.id);
+        } catch {
+          // The original failure is the one reported; a claim left here is
+          // released when the reservation settles (confirm or discard).
+        }
+      }
       throw error;
     }
+  }
+
+  /** Whether `turnId` is a registered pending turn (not a bare reservation). */
+  isRegisteredPending(turnId: number): boolean {
+    return this.registeredPending.has(turnId);
   }
 
   /**
@@ -892,9 +966,14 @@ class TransactionAuthority {
       return;
     }
     this.ledgerSeq += 1;
-    const appliedAt = ++this.appliedClock;
+    const appliedAt = this.tick();
     for (const effect of effects) {
-      this.dependencyLedger.push({ seq: this.ledgerSeq, appliedAt, effect });
+      this.dependencyLedger.push({
+        seq: this.ledgerSeq,
+        appliedAt,
+        effect,
+        flush: this.flushEpoch,
+      });
     }
   }
 
@@ -965,6 +1044,7 @@ class TransactionAuthority {
     if (!turn) {
       return undefined;
     }
+    this.registeredPending.delete(turnId);
     this.pendingTurns.delete(turnId);
     this.countPendingPositions(turn, -1);
     this.pendingOpenedAtSeq.delete(turnId);
@@ -999,6 +1079,7 @@ class TransactionAuthority {
     if (!turn) {
       return undefined;
     }
+    this.registeredPending.delete(turnId);
     this.pendingTurns.delete(turnId);
     this.countPendingPositions(turn, -1);
     this.pendingOpenedAtSeq.delete(turnId);
@@ -1016,7 +1097,7 @@ class TransactionAuthority {
         (turn.__effects ?? []).map((effect) => ({
           turnId: turn.id,
           effect,
-          appliedAt: turn.__appliedAt ?? 0,
+          appliedAt: effectAppliedAt.get(effect) ?? turn.__appliedAt ?? 0,
         }))
       );
 
@@ -1026,10 +1107,35 @@ class TransactionAuthority {
     // subject overlap, so an unrelated realization is ignored exactly as an
     // unrelated authored write is.
     const openedAt = this.pendingOpenedAtSeq.get(turnId) ?? 0;
-    const observedLater = this.dependencyLedger
-      .filter((entry) => entry.seq > openedAt)
+    // Observed work composes per flush, as authored work composes per turn:
+    // a row a realization added and removed again within one flush leaves
+    // no record naming its key, so it is no re-occupation (rollback/rebase
+    // review, item 7: authored in one turn the rollback was accepted,
+    // realized it refused). An add pairs with the first later removal of the
+    // same subject in the same flush; anything left over still counts.
+    const observed = this.dependencyLedger.filter(
+      (entry) => entry.seq > openedAt
+    );
+    const transient = new Set<object>();
+    observed.forEach((entry, index) => {
+      const added = entry.effect;
+      const removal =
+        added.kind === 'add' &&
+        observed.find(
+          ({ effect, flush }, at) =>
+            at > index &&
+            flush === entry.flush &&
+            effect.kind === 'remove' &&
+            effect.ownerPath === added.ownerPath &&
+            effect.subject === added.subject
+        );
+      if (removal) {
+        transient.add(entry).add(removal);
+      }
+    });
+    const observedLater = observed
+      .filter((entry) => !transient.has(entry))
       .map((entry) => ({
-        turnId,
         effect: entry.effect,
         appliedAt: entry.appliedAt,
       }));
@@ -1057,7 +1163,10 @@ class TransactionAuthority {
           unsettled: true,
           // A reservation still running its callback has no stamp: it is the
           // newest work there is.
-          appliedAt: otherTurn.__appliedAt ?? Number.POSITIVE_INFINITY,
+          appliedAt:
+            effectAppliedAt.get(effect) ??
+            otherTurn.__appliedAt ??
+            Number.POSITIVE_INFINITY,
         });
       }
     }
@@ -1149,6 +1258,14 @@ class TransactionAuthority {
     }
   }
 }
+
+/**
+ * @internal Fault injection for the pending-turn registration's carriers
+ * (`createpending-faults.spec.ts`): called at each step that can throw.
+ */
+export const transactionAuthorityFaults: {
+  at?: (step: 'buildTurn' | 'claims' | 'clone' | 'release') => void;
+} = {};
 
 function cloneTurnRecord(turn: TransactionTurnRecord): TransactionTurnRecord {
   return {
@@ -1547,6 +1664,15 @@ export function getOrCreateInternalTransactionRuntime<T>(
     effectMap: PendingEffectMap,
     effect: TurnEffect
   ): void => {
+    composeEffect(bucket, effectMap, effect);
+    const stored = effectMap.get(effectKey(effect));
+    if (stored) effectAppliedAt.set(stored, authority.tick());
+  };
+  const composeEffect = (
+    bucket: CaptureBucket,
+    effectMap: PendingEffectMap,
+    effect: TurnEffect
+  ): void => {
     const key = effectKey(effect);
     const existing = effectMap.get(key);
     if (existing) {
@@ -1911,6 +2037,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
     const capturedEffects = effects.length > 0 ? effects : undefined;
     if (reservedId === undefined) {
       authority.recordConfirmed(subjects, positions, capturedEffects);
+    } else if (authority.isRegisteredPending(reservedId)) {
+      // The step that failed came after the pending turn was recorded: that
+      // record is the transaction's, so it is confirmed as it is (recorded
+      // again, its positions were counted twice and stayed "pending").
+      authority.confirmPending(reservedId);
     } else if (
       authority.createPending(reservedId, subjects, positions, capturedEffects)
     ) {
@@ -2741,6 +2872,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
 
       if (typeof notifier.onFlush === 'function') {
         unsubscribeFlush = notifier.onFlush(() => {
+          authority.advanceFlush();
           if (isRestoring || !selfDirty) {
             return;
           }

@@ -328,6 +328,16 @@ export function deriveDeclarativeTransitionTarget(
   // transition both inserts and deletes (a ghost) is inserted before it is
   // deleted whatever order the caller listed them in.
   const deletions: ReversalEffect[] = [];
+  // Lenient (a read): an effect the source contradicts (its row is not where
+  // the record says, or not there) is skipped rather than refused.
+  const tolerant = (apply: () => void): void => {
+    if (!options.lenient) return apply();
+    try {
+      apply();
+    } catch {
+      /* contradicted by the source: skipped in a read */
+    }
+  };
   for (const effect of options.effects) {
     if (effect.plainBranchMembership) {
       plainBranchMembers.set(effect.owner, {
@@ -337,16 +347,18 @@ export function deriveDeclarativeTransitionTarget(
       continue;
     }
     if (effect.structural === undefined) {
-      applyValueEffect(collections, scalars, effect);
+      tolerant(() => applyValueEffect(collections, scalars, effect));
       continue;
     }
     if (effect.structural === 'remove') {
       deletions.push(effect);
       continue;
     }
-    applyStructuralEffect(collections, effect);
+    tolerant(() => applyStructuralEffect(collections, effect));
   }
-  for (const effect of deletions) applyStructuralEffect(collections, effect);
+  for (const effect of deletions) {
+    tolerant(() => applyStructuralEffect(collections, effect));
+  }
 
   const orderDeltas = new Map<PositionId, CollectionOrderDelta>();
   for (const delta of options.orderDeltas ?? []) {
@@ -391,9 +403,21 @@ export function deriveDeclarativeTransitionTarget(
         derived = structural();
       }
     }
-    const order = withHeldRows(derived, collection.held);
-    assertCollectionOrderMatchesSubjects(order, collection.subjects);
-    assertUniqueTargetKeys(collection.subjects);
+    let order = withHeldRows(derived, collection.held);
+    if (options.lenient) {
+      // Rows the order lost or gained by a skipped effect: the subjects
+      // decide, in the order's sequence, the rest last.
+      const listed = new Set(order);
+      order = [
+        ...order.filter((subject) => collection.subjects.has(subject)),
+        ...[...collection.subjects.keys()].filter(
+          (subject) => !listed.has(subject)
+        ),
+      ];
+    } else {
+      assertCollectionOrderMatchesSubjects(order, collection.subjects);
+      assertUniqueTargetKeys(collection.subjects);
+    }
     targets.set(owner, {
       owner,
       subjects: [...collection.subjects.values()].sort(

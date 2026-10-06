@@ -5,6 +5,7 @@ import { signalTree } from '../../lib/signal-tree';
 import { explainRollbackFailure, transactions } from './transactions';
 import { SignalTreeRollbackError } from '../../lib/types';
 import { undoable } from '../../lib/undoable';
+import { withWriteContext } from '../../lib/write-context';
 
 /**
  * A REFUSED ROLLBACK MUST SAY WHICH REFUSAL HAPPENED.
@@ -56,12 +57,13 @@ describe('a refused rollback names its refusal', () => {
     // quietly become a NON-REFUSAL test the first time a causal change stopped
     // the refusal firing. It refuses deterministically; the row requires that.
     //
-    // ⚠️ AND THE TITLE WAS WRONG BEFORE THE PROBE. This fixture produces
-    // `effect-validation-failed` (structural-drift on the restore), not
-    // `later-confirmed-dependency`. The dependency kind is carried by
-    // restoration.spec's seven rows, which assert `cause.kind` directly. Naming
-    // the kind the fixture does NOT produce is how a green row ends up proving
-    // something other than its title.
+    // ⚠️ AND THE TITLE WAS WRONG BEFORE THE PROBE. Through 15.4.3 this
+    // fixture produced `effect-validation-failed` (structural-drift on the
+    // re-add). A removal whose key later work re-occupied is now refused by
+    // the planner as `later-confirmed-dependency` (rollback/rebase review,
+    // item 2), asserted below. The title names no kind, so it holds for both;
+    // naming a kind the fixture does NOT produce is how a green row ends up
+    // proving something other than its title.
     const tree = makeTree();
     tree.$.rows.addOne({ id: 'a', n: 1 });
     await tick();
@@ -101,6 +103,7 @@ describe('a refused rollback names its refusal', () => {
       'SignalTree could not rollback the pending transaction'
     );
     expect(message).toContain((cause as { kind: string }).kind);
+    expect((cause as { kind: string }).kind).toBe('later-confirmed-dependency');
     // ⚠️ AND IT IS NOT DOUBLED. The prefix appears exactly once. A refusal
     // thrown deeper used to be caught and re-wrapped, producing prefix-reason-
     // prefix-reason; the constant message hid it because both layers rendered
@@ -134,7 +137,60 @@ describe('a refused rollback names its refusal', () => {
     expect(validation).toContain('effect-validation-failed');
     // The constant survives as a PREFIX, so existing matchers keep matching.
     for (const m of [dependency, validation]) {
-      expect(m.startsWith('SignalTree could not rollback the pending transaction')).toBe(true);
+      expect(
+        m.startsWith('SignalTree could not rollback the pending transaction')
+      ).toBe(true);
     }
+  });
+});
+
+// Rollback/rebase review, item 6: observed later work (a realization) has no
+// turn of its own, and its ledger entries carried the id of the turn being
+// rolled back, so the refusal named that turn as its own conflict. It now
+// names no conflicting turn ("later work"); authored work still names its own.
+describe('a dependency refusal names the conflicting turn, or none', () => {
+  const refusal = async (
+    later: (tree: ReturnType<typeof makeTree>) => void
+  ) => {
+    const tree = makeTree();
+    tree.$.rows.addOne({ id: 'a', n: 1 });
+    await tick();
+    const pending = tree.transaction(() =>
+      tree.$.rows.updateOne('a', { n: 5 })
+    );
+    await tick();
+    later(tree);
+    await tick();
+    try {
+      pending.rollback();
+    } catch (error) {
+      return {
+        message: (error as Error).message,
+        cause: (error as { cause: Record<string, unknown> }).cause,
+      };
+    }
+    throw new Error('rollback was accepted');
+  };
+
+  it('observed later work (a realization): no conflicting turn', async () => {
+    const { message, cause } = await refusal((tree) =>
+      withWriteContext({ intent: 'system', participation: 'realized' }, () =>
+        tree.$.rows.updateOne('a', { n: 7 })
+      )
+    );
+    expect(cause['kind']).toBe('later-confirmed-dependency');
+    expect(cause['conflictingTurnId']).toBeUndefined();
+    expect(cause['conflictingEffect']).toMatchObject({ kind: 'set' });
+    expect(message).toContain(': later work depends on state');
+  });
+
+  it('a later authored turn: names that turn, not the one rolled back', async () => {
+    const { message, cause } = await refusal((tree) =>
+      tree.$.rows.updateOne('a', { n: 7 })
+    );
+    expect(cause['kind']).toBe('later-confirmed-dependency');
+    expect(typeof cause['conflictingTurnId']).toBe('number');
+    expect(cause['conflictingTurnId']).not.toBe(cause['pendingTurnId']);
+    expect(message).toContain(`: turn ${cause['conflictingTurnId']} depends`);
   });
 });
