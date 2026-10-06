@@ -59,6 +59,7 @@ import {
   requiresDeclarativeStructuralTarget,
   type CollectionTransitionSource,
   type CollectionTransitionTargetBinding,
+  type PlainBranchMemberTransitionTarget,
   type CollectionOrderDelta,
   type ScalarTransitionTargetBinding,
 } from '../../lib/internals/causal-runtime/target-transition';
@@ -2848,13 +2849,23 @@ class RestorationManager<T> {
       if (turnIds.length === 0) {
         continue;
       }
-      const effects: TurnEffect[] = [];
-      const orderDeltas: CollectionOrderDelta[] = [];
+      let effects: TurnEffect[] = [];
+      let orderDeltas: CollectionOrderDelta[] = [];
+      let deltaOwners = new Set<number>();
       for (const turnId of turnIds) {
         recordProductionSubstrateStat('turnIndexLookups');
         const turn = this.turns.get(turnId);
         if (!turn) {
           continue;
+        }
+        // A second order change to one collection starts a new application:
+        // each applies at the exact order the previous one produces.
+        const turnDeltas = turn.__orderDeltas ?? [];
+        if (turnDeltas.some(({ owner }) => deltaOwners.has(owner))) {
+          applications.push({ effects, orderDeltas, direction });
+          effects = [];
+          orderDeltas = [];
+          deltaOwners = new Set();
         }
         const turnEffects = turn.__effects ?? [];
         if (direction === 'undo') {
@@ -2863,9 +2874,10 @@ class RestorationManager<T> {
         } else {
           appendAll(effects, turnEffects);
         }
-        orderDeltas.push(
-          ...(turn.__orderDeltas ?? []).map(cloneCollectionOrderDelta)
-        );
+        for (const delta of turnDeltas) {
+          orderDeltas.push(cloneCollectionOrderDelta(delta));
+          deltaOwners.add(delta.owner);
+        }
       }
       applications.push({ effects, orderDeltas, direction });
     }
@@ -3386,13 +3398,27 @@ export function restoration(
       const orderDeltas = applications.flatMap(
         (application) => application.orderDeltas
       );
+      // A collection with order deltas from more than one application (jumpTo
+      // or a return from a view across several reorders) is derived one
+      // application at a time, each target the next one's source: a delta
+      // applies only at the exact order it recorded, which the previous
+      // application produces. Single-shot, it threw "Declarative order replay
+      // requires transition-level delta composition".
+      const deltasByOwner = new Map<number, number>();
+      for (const delta of orderDeltas) {
+        deltasByOwner.set(
+          delta.owner,
+          (deltasByOwner.get(delta.owner) ?? 0) + 1
+        );
+      }
+      const sequential = [...deltasByOwner.values()].some((count) => count > 1);
       const orderEndpoints = new Map<number, 'before' | 'after'>();
       for (const application of applications) {
         for (const delta of application.orderDeltas) {
           const endpoint =
             application.direction === 'undo' ? 'before' : 'after';
           const existing = orderEndpoints.get(delta.owner);
-          if (existing && existing !== endpoint) {
+          if (existing && existing !== endpoint && !sequential) {
             throw new Error(
               'Declarative transition cannot apply both order endpoints for one owner'
             );
@@ -3409,13 +3435,57 @@ export function restoration(
             typeof effect.subjectId === 'number' ||
             effect.structural === undefined
         );
+      const deriveSequentially = (
+        sources: readonly CollectionTransitionSource[]
+      ): ReturnType<typeof deriveDeclarativeTransitionTarget> => {
+        const current = new Map(
+          sources.map((source) => [source.owner, source])
+        );
+        const scalars = new Map<number, unknown>();
+        const members = new Map<number, PlainBranchMemberTransitionTarget>();
+        for (const application of applications) {
+          const effects = placeFieldReversalsWhileRowsExist(
+            application.effects.map((effect) =>
+              toReversalEffect(effect, application.direction)
+            )
+          );
+          const owners = new Set([
+            ...application.orderDeltas.map(({ owner }) => owner),
+            ...effects
+              .filter(({ subjectId }) => typeof subjectId === 'number')
+              .map(({ owner }) => owner),
+          ]);
+          const step = deriveDeclarativeTransitionTarget({
+            collections: [...owners].map((owner) => {
+              const source = current.get(owner);
+              if (!source) {
+                throw new Error(
+                  `Declarative order replay has no source ${owner}`
+                );
+              }
+              return source;
+            }),
+            effects,
+            orderDeltas: application.orderDeltas,
+            orderEndpoint:
+              application.direction === 'undo' ? 'before' : 'after',
+          });
+          for (const [owner, collection] of step.collections) {
+            current.set(owner, collection);
+          }
+          for (const [owner, value] of step.scalars) scalars.set(owner, value);
+          for (const [owner, member] of step.plainBranchMembers ?? []) {
+            members.set(owner, member);
+          }
+        }
+        return {
+          collections: current,
+          scalars,
+          ...(members.size > 0 ? { plainBranchMembers: members } : {}),
+        };
+      };
       const applyDeclarativeTarget = (): void => {
         const deltaOwners = new Set(orderDeltas.map(({ owner }) => owner));
-        if (deltaOwners.size !== orderDeltas.length) {
-          throw new Error(
-            'Declarative order replay requires transition-level delta composition'
-          );
-        }
         const targetOwners = new Set([
           ...deltaOwners,
           ...reversalEffects
@@ -3455,12 +3525,14 @@ export function restoration(
             ? readThroughInspection(binding)
             : binding.readSource();
         });
-        const target = deriveDeclarativeTransitionTarget({
-          collections: sources,
-          effects: reversalEffects,
-          orderDeltas,
-          orderEndpoints,
-        });
+        const target = sequential
+          ? deriveSequentially(sources)
+          : deriveDeclarativeTransitionTarget({
+              collections: sources,
+              effects: reversalEffects,
+              orderDeltas,
+              orderEndpoints,
+            });
         const scalarBinding: ScalarTransitionTargetBinding | undefined =
           scalarSlotRuntime
             ? {
