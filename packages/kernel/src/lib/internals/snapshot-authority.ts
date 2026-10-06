@@ -54,6 +54,18 @@ function membershipRevisionFor(
   return revision;
 }
 
+/**
+ * @internal Depend on `node`'s membership revision without building its
+ * snapshot. An absent branch reads as undefined from nothing else, so a held
+ * consumer of it needs this edge to see the branch re-added (v16 8d).
+ */
+export function observeMembership(node: object): void {
+  membershipRevisionFor(
+    snapshotNodeKey(node),
+    getLocationRuntime(node) ?? NEUTRAL_LOCATION_RUNTIME
+  )();
+}
+
 export function publishMembershipChange(node: object): void {
   const key = snapshotNodeKey(node);
   const locations = getLocationRuntime(node) ?? NEUTRAL_LOCATION_RUNTIME;

@@ -27,13 +27,21 @@ import {
   type TransactionRefusalReason,
 } from '../../lib/internals/transaction-lifecycle-view';
 import {
+  changedOmittedCollection,
+  collectionBindingAt,
   preparePlainBranchMembers,
   plainBranchMembershipEffects,
   plainBranchMembershipChange,
   composePlainBranchMemberEffect,
   plainBranchMemberEffectIsNoop,
+  refreshOmittedCollection,
   type PlainBranchMemberPresence,
 } from '../../lib/internals/plain-branch-membership';
+import {
+  beginStructuralWrite,
+  endStructuralWrite,
+} from '../../lib/internals/member-membership';
+import { physicalRows } from '../../lib/internals/physical-rows';
 import { flushDeferredTreeWrites } from '../../lib/internals/deferred-write-scope';
 import {
   getOrCreateSubjectRestorationClaims,
@@ -417,7 +425,9 @@ function buildPendingRollbackPlan(
   pendingTurn: TransactionTurnRecord | undefined,
   laterEffects: LaterAppliedEffect[],
   /** Whether undo history (a restoration claim) can still restore a row. */
-  isRestorable: (subject: number) => boolean = () => false
+  isRestorable: (subject: number) => boolean = () => false,
+  /** Whether the member at `outer` encloses the location at `inner`. */
+  encloses?: (outer: number, inner: number) => boolean
 ): PendingRollbackPlan {
   if (!pendingTurn) {
     return { compensation: [] };
@@ -638,6 +648,32 @@ function buildPendingRollbackPlan(
   const compensation: TurnEffect[] = [];
   for (let i = pendingEffects.length - 1; i >= 0; i--) {
     const effect = pendingEffects[i];
+    // A later PENDING membership change of an enclosing member captured this
+    // location in its own before-image, so reversing it first would make
+    // that turn's later rollback restore this turn's rejected value. v16
+    // integration 8b checks this in its own later-pending loop and reports
+    // `later-confirmed-dependency`; v15 has no such loop, so the check sits
+    // here, where v15 classifies later pending effects, under v15's kind
+    // (`later-pending-dependency`, settle the newer transaction first).
+    const enclosing = encloses
+      ? laterEffects.find(
+          ({ effect: later, unsettled }) =>
+            unsettled === true &&
+            later.kind === 'set' &&
+            later.plainBranchMembership !== undefined &&
+            encloses(later.position, effect.position)
+        )
+      : undefined;
+    if (enclosing) {
+      return {
+        conflict: dependencyConflict(true, {
+          pendingTurnId: pendingTurn.id,
+          pendingEffect: effect,
+          conflictingTurnId: enclosing.turnId,
+          conflictingEffect: enclosing.effect,
+        }),
+      };
+    }
     switch (effect.kind) {
       case 'set': {
         // 15.4.4: the same supersession for a FIELD write to a row that
@@ -789,7 +825,8 @@ class TransactionAuthority {
       subjectIds: readonly number[]
     ) => void = () => undefined,
     private readonly releasePendingClaims: (turnId: number) => void = () =>
-      undefined
+      undefined,
+    private readonly encloses?: (outer: number, inner: number) => boolean
   ) {}
 
   private buildTurn(
@@ -1187,7 +1224,8 @@ class TransactionAuthority {
     return buildPendingRollbackPlan(
       this.pendingTurns.get(turnId),
       later,
-      isRestorable
+      isRestorable,
+      this.encloses
     );
   }
 
@@ -1347,6 +1385,19 @@ export function getOrCreateInternalTransactionRuntime<T>(
       // enough that every capture has run.
       getOrCreateSubjectRestorationClaims(tree)?.release(
         `transaction:${turnId}`
+      );
+    },
+    // Structured addresses, never display paths: `outer` encloses `inner`
+    // when its address is a strict prefix of inner's.
+    (outer, inner) => {
+      const registry = getPositionRegistry(tree.$);
+      const prefix = registry?.addressFor(outer);
+      const address = registry?.addressFor(inner);
+      return (
+        !!prefix &&
+        !!address &&
+        prefix.length < address.length &&
+        prefix.every((key, index) => key === address[index])
       );
     }
   );
@@ -2412,7 +2463,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
         .map(({ owner }) => owner),
     ]);
     const collections = [...collectionOwners].map((owner) => {
-      const binding = bindings.get(owner);
+      // A collection hidden by an omitted member is skipped by the
+      // current-tree walk. Rollback still compensates its retained storage:
+      // a rejected value must not come back on a later re-add (v16
+      // integration 8b/8c).
+      const binding = bindings.get(owner) ?? collectionBindingAt(tree.$, owner);
+      if (binding) bindings.set(owner, binding);
       if (!binding) {
         throw new Error(
           `Transaction rollback has no collection binding ${owner}`
@@ -2542,18 +2598,79 @@ export function getOrCreateInternalTransactionRuntime<T>(
     };
     // A consumer that throws after the compensation applied does not undo it.
     const applying = <R>(apply: () => R): R => {
-      let result: R;
       try {
-        result = apply();
+        // Physical truth, as a reversal: a collection hidden by an omitted
+        // member is written through its retained rows, and no write re-adds
+        // a member (`structuralWrites`, `physicalRows`; v16 integration 8e).
+        // v15 keeps its own two compensation branches, so both run here.
+        beginStructuralWrite(tree.$);
+        physicalRows.push(getPositionRegistry(tree.$) as object);
+        let failed = true;
+        try {
+          const result = apply();
+          failed = false;
+          return result;
+        } finally {
+          physicalRows.pop();
+          endStructuralWrite(failed);
+        }
       } catch (error) {
         if (wasAppliedBeforeFailure(error)) reinstateFrontiers();
         throw error;
       }
-      return result;
+    };
+    // Rows compensated in an omitted collection are what a later re-add of
+    // it must find (v16 integration 8d (b)).
+    const settled = (): void => {
+      for (const effect of effects)
+        if (effect.kind !== 'set' || effect.subject !== undefined)
+          refreshOmittedCollection(tree.$ as object, effect.position);
+      for (const delta of orderDeltas)
+        refreshOmittedCollection(tree.$ as object, delta.owner);
+      reinstateFrontiers();
     };
     if (effects.length === 0 && orderDeltas.length === 0) {
       reinstateFrontiers();
       return;
+    }
+
+    // A hidden entity collection the rollback makes current again (omitted
+    // itself, or with a branch it re-adds) must hold the rows it held when
+    // hidden, apart from this transaction's own. A plain write through a held
+    // handle is no later turn, so nothing else refuses it (v16 integration 8d
+    // (b)).
+    const ownRows = new Map<number, Set<unknown>>();
+    for (const effect of effects)
+      if (effect.kind !== 'set' || effect.subject !== undefined) {
+        let rows = ownRows.get(effect.position);
+        if (!rows) ownRows.set(effect.position, (rows = new Set()));
+        rows.add(effect.subject);
+      }
+    // `effects` are the transaction's own, not yet inverted: a member it
+    // omitted (present before, absent after) is one the rollback re-adds.
+    for (const effect of effects) {
+      if (
+        effect.kind !== 'set' ||
+        effect.plainBranchMembership?.before !== true ||
+        effect.plainBranchMembership.after
+      )
+        continue;
+      const changed = changedOmittedCollection(
+        tree.$ as object,
+        effect.position,
+        (owner) => ownRows.get(owner) ?? new Set(),
+        (owner) => orderDeltas.some((delta) => delta.owner === owner)
+      );
+      if (changed !== undefined)
+        throw createRollbackError({
+          kind: 'effect-validation-failed',
+          pendingTurnId: transactionId,
+          compensation: effects,
+          errorMessage:
+            `the entity collection at '${changed}' was omitted and changed ` +
+            'after that, so re-adding it would not restore it as it was',
+          callbackError,
+        });
     }
 
     if (
@@ -2571,7 +2688,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           true
         )
       );
-      reinstateFrontiers();
+      settled();
       return;
     }
 
@@ -2650,7 +2767,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
         callbackError,
       });
     }
-    reinstateFrontiers();
+    settled();
   };
 
   try {

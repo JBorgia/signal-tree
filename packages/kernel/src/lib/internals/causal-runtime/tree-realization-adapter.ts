@@ -3,7 +3,6 @@ import { holdEntityMembershipDelivery } from '../entity-membership-view';
 import {
   canRealizePlainBranchMember,
   preparePlainBranchMembers,
-  realizePlainBranchMember,
 } from '../plain-branch-membership';
 import type {
   ISignalTree,
@@ -1275,16 +1274,6 @@ function applyEffect(
   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
   effect: ReversalEffect
 ): void {
-  const membership = effect.plainBranchMembership;
-  if (membership) {
-    realizePlainBranchMember(
-      tree.$,
-      effect.owner,
-      membership.after,
-      effect.after
-    );
-    return;
-  }
   const descriptor = descriptors.get(effect.owner);
   if (
     !descriptor &&

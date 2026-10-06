@@ -297,7 +297,12 @@ export interface LocationRuntime {
   ): Location<T>;
   createDerived<T>(compute: () => T): ReadonlyLocation<T>;
   createWritable<T>(
-    read: () => T,
+    /**
+     * The location's read. `stored` asks for the stored value whatever the
+     * location's presence: what a write's history records as its before
+     * value, so a reversal restores storage as it was (v16 8e).
+     */
+    read: (stored?: boolean) => T,
     write: (value: T, intent: 'replace' | 'derive') => boolean
   ): WritableLocationBinding<T>;
   createWritableProjection?<T>(
@@ -406,7 +411,7 @@ export function createLocationRuntime(
   };
 
   const createWritable = <T>(
-    read: () => T,
+    read: (stored?: boolean) => T,
     write: (value: T, intent: 'replace' | 'derive') => boolean
   ): WritableLocationBinding<T> => {
     let observationToken: ObservationToken | undefined;
@@ -445,7 +450,7 @@ export function createLocationRuntime(
       },
       replace: (next) => {
         const observer = mutationSource2.observer;
-        const before = observer ? read() : undefined;
+        const before = observer ? read(true) : undefined;
         const changed = write(next, 'replace');
         if (observer) {
           observer({
@@ -458,8 +463,11 @@ export function createLocationRuntime(
         if (changed) publish([binding]);
       },
       derive: (update) => {
-        const before = read();
-        const next = update(before);
+        // The updater receives the location's value (absent reads undefined);
+        // history records what storage held.
+        const current = read();
+        const before = mutationSource2.observer ? read(true) : current;
+        const next = update(current);
         const changed = write(next, 'derive');
         const observer = mutationSource2.observer;
         if (observer) {
@@ -475,7 +483,8 @@ export function createLocationRuntime(
     };
     registerWritableLocationBinding(binding);
 
-    location.peek = read;
+    // Never the stored read: `peek` is public and takes no argument.
+    location.peek = () => read();
     location.subscribe = (listener) => {
       listeners.add(listener);
       return () => listeners.delete(listener);
