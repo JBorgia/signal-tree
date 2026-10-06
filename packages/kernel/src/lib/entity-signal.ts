@@ -1179,13 +1179,13 @@ export function createEntitySignal<
   /** A frontier-only transition, once per operation that replaced it. */
   function publishFrontier(before: unknown): void {
     if (before !== structuralStore.activeOrderFrontier() && orderConsumed())
-      publishOrderChange(undefined, undefined, before);
+      publishOrderChange(before);
   }
 
   function publishOrderChange(
-    beforeSubjects: number[] | undefined,
-    afterSubjects: number[] | undefined,
-    beforeFrontier: unknown
+    beforeFrontier: unknown,
+    beforeSubjects?: number[],
+    afterSubjects?: number[]
   ): void {
     mutationCaptureRuntime?.publishCollectionOrder?.({
       owner: positionId as number,
@@ -2008,7 +2008,7 @@ export function createEntitySignal<
         const afterSubjects: number[] = [];
         structuralStore.snapshotActiveOrder([], afterSubjects);
         if (survivingOrderChanged(beforeSubjects, afterSubjects)) {
-          publishOrderChange(beforeSubjects, afterSubjects, frontier);
+          publishOrderChange(frontier, beforeSubjects, afterSubjects);
         }
       }
     } else {
@@ -3675,7 +3675,7 @@ export function createEntitySignal<
         orderConsumed() &&
         survivingOrderChanged(currentSubjects, afterSubjects)
       ) {
-        publishOrderChange(currentSubjects, afterSubjects, beforeOrderFrontier);
+        publishOrderChange(beforeOrderFrontier, currentSubjects, afterSubjects);
       } else publishFrontier(beforeOrderFrontier);
 
       membershipUnit.commit(membershipChanges);
