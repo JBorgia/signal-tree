@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { rebaseOntoRejection } from './restoration';
+import {
+  applyCollectionOrderDelta,
+  deriveCollectionOrderDelta,
+} from '../../lib/internals/causal-runtime/target-transition';
+import { rebaseOntoRejection, rebaseOrdersOntoRejection } from './restoration';
 
 /**
  * Unit carriers for `rebaseOntoRejection`, one per pre-image a later record can
- * hold (see its doc comment for the list). The end-to-end carriers are in
+ * hold (see its doc comment for the list), and for the order side,
+ * `rebaseOrdersOntoRejection` (end-to-end: `rejection-order-rebase.spec.ts`). The end-to-end carriers are in
  * `../transactions/undo-after-rejection.spec.ts`; this file also covers the
  * overlap shapes a rollback refuses before they can reach the rebase (a later
  * write inside or around a row field the rejected turn wrote), so that the
@@ -413,5 +418,89 @@ describe('rebaseOntoRejection', () => {
         plain(3, 5, 99, { branchSegments: ['k5'] })
       );
     }, 30_000);
+  });
+});
+
+describe('rebaseOrdersOntoRejection', () => {
+  const OWNER = 4;
+  const T_BEFORE = { t: 'before' };
+  const T_AFTER = { t: 'after' };
+  const W_AFTER = { w: 'after' };
+  const COMPENSATED = { c: 'after' };
+  // Seed [1, 2]; the rejected turn created 7 ([1, 2, 7]); W reordered and
+  // removed it ([2, 1]). Derived while 7 was pending, so 7 is explicit.
+  const delta = deriveCollectionOrderDelta(
+    OWNER,
+    [1, 2, 7],
+    [2, 1],
+    T_AFTER,
+    W_AFTER,
+    new Set([7])
+  );
+  const created = new Map([[OWNER, new Set([7])]]);
+
+  it('takes the rejected rows out of a later delta, exactly', () => {
+    const [record] = rebaseOrdersOntoRejection(
+      [{ deltas: [delta], frontiers: [] }],
+      created,
+      [],
+      []
+    );
+    expect(
+      applyCollectionOrderDelta([2, 1], record.deltas[0], 'before', W_AFTER)
+    ).toStrictEqual([1, 2]);
+  });
+
+  it('the first later transition starts from the token the rejected turn replaced; the last ends where the compensation left the collection', () => {
+    const [first, second] = rebaseOrdersOntoRejection(
+      [
+        { deltas: [delta], frontiers: [] },
+        {
+          deltas: [],
+          frontiers: [{ owner: OWNER, before: W_AFTER, after: T_AFTER }],
+        },
+      ],
+      created,
+      [{ owner: OWNER, before: T_BEFORE, after: T_AFTER }],
+      [{ owner: OWNER, before: T_AFTER, after: COMPENSATED }]
+    );
+    expect(first.deltas[0].beforeFrontier).toBe(T_BEFORE);
+    expect(first.deltas[0].afterFrontier).toBe(W_AFTER);
+    expect(second.frontiers).toStrictEqual([
+      { owner: OWNER, before: W_AFTER, after: COMPENSATED },
+    ]);
+  });
+
+  it('leaves tokens that do not meet the rejected or compensated ones', () => {
+    const [record] = rebaseOrdersOntoRejection(
+      [{ deltas: [delta], frontiers: [] }],
+      created,
+      [{ owner: OWNER, before: T_BEFORE, after: { other: true } }],
+      [{ owner: OWNER, before: { other: true }, after: COMPENSATED }]
+    );
+    expect(record.deltas[0].beforeFrontier).toBe(T_AFTER);
+    expect(record.deltas[0].afterFrontier).toBe(W_AFTER);
+  });
+
+  it('a delta left with nothing to reorder is its frontier transition', () => {
+    // W only removed the rejected row: [1, 2, 7] -> [1, 2].
+    const removal = deriveCollectionOrderDelta(
+      OWNER,
+      [1, 2, 7],
+      [1, 2],
+      T_AFTER,
+      W_AFTER,
+      new Set([7])
+    );
+    const [record] = rebaseOrdersOntoRejection(
+      [{ deltas: [removal], frontiers: [] }],
+      created,
+      [{ owner: OWNER, before: T_BEFORE, after: T_AFTER }],
+      []
+    );
+    expect(record).toStrictEqual({
+      deltas: [],
+      frontiers: [{ owner: OWNER, before: T_BEFORE, after: W_AFTER }],
+    });
   });
 });

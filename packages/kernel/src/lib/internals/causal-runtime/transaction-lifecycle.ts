@@ -68,6 +68,16 @@ export type TransactionLifecycleEvent =
       readonly kind: 'rolled-back';
       readonly owner: object;
       readonly id: number;
+      /**
+       * How the compensation moved collection order-frontier tokens (owner,
+       * token before, token after), so an observer that recorded later work
+       * on those collections can re-base it.
+       */
+      readonly compensatedFrontiers?: readonly {
+        readonly owner: number;
+        readonly before: unknown;
+        readonly after: unknown;
+      }[];
     };
 
 export type TransactionLifecycleListener = (

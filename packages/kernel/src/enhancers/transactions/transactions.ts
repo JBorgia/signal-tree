@@ -1282,6 +1282,19 @@ export function getOrCreateInternalTransactionRuntime<T>(
   /** Each pending turn's order-frontier transitions on collections it changed
    * without reordering survivors; a rollback reinstates the earlier token. */
   const pendingFrontiers = new Map<number, TurnFrontierTransition[]>();
+  /**
+   * How each rolled-back transaction's compensation moved collection order
+   * tokens, announced with 'rolled-back' so restoration can re-base the
+   * records written after it (`rebaseAfterRejection`).
+   */
+  const compensatedFrontiers = new Map<number, TurnFrontierTransition[]>();
+  const takeCompensatedFrontiers = (
+    transactionId: number
+  ): { compensatedFrontiers?: TurnFrontierTransition[] } => {
+    const moved = compensatedFrontiers.get(transactionId);
+    compensatedFrontiers.delete(transactionId);
+    return moved ? { compensatedFrontiers: moved } : {};
+  };
   const pendingCreatedListeners = new Set<TransactionLifecycleListener>();
   const pendingConfirmedListeners = new Set<TransactionLifecycleListener>();
   const pendingDiscardedListeners = new Set<TransactionLifecycleListener>();
@@ -2342,11 +2355,48 @@ export function getOrCreateInternalTransactionRuntime<T>(
      */
     frontiers: readonly TurnFrontierTransition[] = []
   ): void => {
-    const bindings = frontiers.length > 0 ? transitionBindings() : new Map();
-    const reinstateFrontiers = prepareFrontierReinstatement(
+    // The collections the compensation can move: their tokens before it,
+    // so the rejection can tell restoration how it moved them
+    // (`compensatedFrontiers`).
+    const owners = new Set([
+      ...orderDeltas.map(({ owner }) => owner as number),
+      ...frontiers.map(({ owner }) => owner),
+      ...effects
+        .filter(({ kind }) => kind !== 'set')
+        .map(({ position }) => position),
+    ]);
+    const bindings = owners.size > 0 ? transitionBindings() : new Map();
+    const tokensBefore = new Map(
+      [...owners].map((owner) => [
+        owner,
+        bindings.get(owner)?.orderFrontier?.(),
+      ])
+    );
+    const reinstate = prepareFrontierReinstatement(
       frontiers.map((transition) => frontierStepOf(transition, 'undo')),
       (owner) => bindings.get(owner)
     );
+    const reinstateFrontiers = (): void => {
+      reinstate();
+      const moved: TurnFrontierTransition[] = [];
+      for (const [owner, before] of tokensBefore) {
+        const after = bindings.get(owner)?.orderFrontier?.();
+        if (after !== before) moved.push({ owner, before, after });
+      }
+      if (moved.length > 0)
+        compensatedFrontiers.set(owningTransactionId, moved);
+    };
+    // A consumer that throws after the compensation applied does not undo it.
+    const applying = <R>(apply: () => R): R => {
+      let result: R;
+      try {
+        result = apply();
+      } catch (error) {
+        if (wasAppliedBeforeFailure(error)) reinstateFrontiers();
+        throw error;
+      }
+      return result;
+    };
     if (effects.length === 0 && orderDeltas.length === 0) {
       reinstateFrontiers();
       return;
@@ -2356,13 +2406,15 @@ export function getOrCreateInternalTransactionRuntime<T>(
       orderDeltas.length > 0 ||
       requiresDeclarativeStructuralTarget(effects.map(toRollbackEffect))
     ) {
-      withWriteContext(
-        {
-          origin: 'transaction-rollback',
-          transactionId: owningTransactionId,
-          ownerId: getPositionRegistry(tree.$)?.id,
-        },
-        () => rollbackPendingTarget(effects, orderDeltas)
+      applying(() =>
+        withWriteContext(
+          {
+            origin: 'transaction-rollback',
+            transactionId: owningTransactionId,
+            ownerId: getPositionRegistry(tree.$)?.id,
+          },
+          () => rollbackPendingTarget(effects, orderDeltas)
+        )
       );
       reinstateFrontiers();
       return;
@@ -2405,30 +2457,32 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // id is safe as a bare number here because a tree announces under exactly
     // one owner (measured in diag-journal-1-1-correlation.spec.ts) and a journal
     // observes one tree.
-    const result = withWriteContext(
-      {
-        origin: 'transaction-rollback',
-        transactionId: owningTransactionId,
-        // NOT `transactionOwner`. Stamping it here makes
-        // `activeTransactionContext()` report an open scope during the
-        // compensation, which reopens the callback scope a rollback must leave
-        // closed — `active-transaction-context.spec.ts` pins that. The join
-        // restoration needs is carried by `origin` plus the corrected
-        // `transactionId` instead.
-        // OWNER-REPLAY-1, same shape as restoration's: stamped once on the wrap
-        // that already surrounds the compensation, so every downstream meta
-        // that spreads `getActiveWriteContext()` carries the namespace.
-        ownerId: positionRegistry?.id,
-      },
-      () =>
-        rollbackPendingTurnAt({
-          authority: authorityPosition,
-          turnId: transactionId,
-          store,
-          topology: positionRegistry,
-          port: realizationPort,
-          realizationContext,
-        })
+    const result = applying(() =>
+      withWriteContext(
+        {
+          origin: 'transaction-rollback',
+          transactionId: owningTransactionId,
+          // NOT `transactionOwner`. Stamping it here makes
+          // `activeTransactionContext()` report an open scope during the
+          // compensation, which reopens the callback scope a rollback must leave
+          // closed — `active-transaction-context.spec.ts` pins that. The join
+          // restoration needs is carried by `origin` plus the corrected
+          // `transactionId` instead.
+          // OWNER-REPLAY-1, same shape as restoration's: stamped once on the wrap
+          // that already surrounds the compensation, so every downstream meta
+          // that spreads `getActiveWriteContext()` carries the namespace.
+          ownerId: positionRegistry?.id,
+        },
+        () =>
+          rollbackPendingTurnAt({
+            authority: authorityPosition,
+            turnId: transactionId,
+            store,
+            topology: positionRegistry,
+            port: realizationPort,
+            realizationContext,
+          })
+      )
     );
     if (!result.ok) {
       throw createRollbackError({
@@ -2874,6 +2928,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
                   kind: 'rolled-back',
                   owner: transactionOwnerToken,
                   id: transactionId,
+                  ...takeCompensatedFrontiers(transactionId),
                 });
               }
             } finally {
@@ -3322,6 +3377,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
                 kind: 'rolled-back',
                 owner: transactionOwnerToken,
                 id: transactionId,
+                ...takeCompensatedFrontiers(transactionId),
               });
             }
             // 'discard', unconditionally: reaching here means the baseline was
@@ -3418,6 +3474,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       restoreLeafInterceptors = null;
       pendingOrderDeltas.clear();
       pendingFrontiers.clear();
+      compensatedFrontiers.clear();
       activeTransactions.clear();
     });
   }
