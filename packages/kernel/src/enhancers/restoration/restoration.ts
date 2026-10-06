@@ -417,6 +417,104 @@ type CaptureBucket = {
   designated: boolean;
 };
 
+/**
+ * Re-bases chronological effect lists recorded after a REJECTED turn onto
+ * what that turn replaced. See `RestorationManager.rebaseAfterRejection`.
+ */
+function rebaseOntoRejection(
+  rejected: readonly TurnEffect[],
+  lists: readonly TurnEffect[][]
+): TurnEffect[][] {
+  const rowOf = (effect: TurnEffect) =>
+    `${effect.position}\u0000${(effect as { subject?: number }).subject}`;
+  const addressOf = (effect: ScalarSetEffect) =>
+    effect.subject === undefined
+      ? `p\u0000${effect.path}`
+      : `s\u0000${effect.position}\u0000${effect.subject}\u0000${JSON.stringify(
+          effect.fieldSegments ?? []
+        )}`;
+  const created = new Set<string>();
+  const writes = new Map<string, ScalarSetEffect>();
+  for (const effect of rejected) {
+    if (effect.kind === 'add') created.add(rowOf(effect));
+    else if (effect.kind === 'set') writes.set(addressOf(effect), effect);
+  }
+  if (created.size === 0 && writes.size === 0) return [...lists];
+  return lists.map((effects) => {
+    const dropped = new Map<string, CollectionRemoveEffect>();
+    const kept = effects.filter((effect) => {
+      const ownRow =
+        effect.kind !== 'set' || effect.subject !== undefined
+          ? created.has(rowOf(effect))
+          : false;
+      if (ownRow) {
+        if (effect.kind === 'remove') dropped.set(rowOf(effect), effect);
+        return false;
+      }
+      if (effect.kind !== 'set') return true;
+      const address = addressOf(effect);
+      const source = writes.get(address);
+      if (!source) return true;
+      writes.delete(address);
+      const sourceMembership = source.plainBranchMembership;
+      const membership = effect.plainBranchMembership;
+      const basedOnRejected =
+        (sourceMembership === undefined) === (membership === undefined) &&
+        (sourceMembership === undefined ||
+          sourceMembership.after === membership?.before) &&
+        (source.fieldPresence?.after ?? true) ===
+          (effect.fieldPresence?.before ?? true) &&
+        deepEqual(effect.before, source.after);
+      if (!basedOnRejected) return true;
+      effect.before = source.before;
+      if (sourceMembership && membership) {
+        effect.plainBranchMembership = {
+          before: sourceMembership.before,
+          after: membership.after,
+        };
+      }
+      const beforePresent = source.fieldPresence?.before ?? true;
+      const afterPresent = effect.fieldPresence?.after ?? true;
+      if (beforePresent && afterPresent) delete effect.fieldPresence;
+      else
+        effect.fieldPresence = { before: beforePresent, after: afterPresent };
+      return true;
+    });
+    if (dropped.size > 0) {
+      const follow = (
+        position: number,
+        subject: number | undefined,
+        side: 'beforeSubject' | 'afterSubject'
+      ): number | undefined => {
+        let current = subject;
+        for (
+          let removal = dropped.get(`${position}\u0000${current}`);
+          removal;
+          removal = dropped.get(`${position}\u0000${current}`)
+        ) {
+          current = removal[side];
+        }
+        return current;
+      };
+      for (const effect of kept) {
+        if (effect.kind === 'add' || effect.kind === 'remove') {
+          effect.beforeSubject = follow(
+            effect.position,
+            effect.beforeSubject,
+            'beforeSubject'
+          );
+          effect.afterSubject = follow(
+            effect.position,
+            effect.afterSubject,
+            'afterSubject'
+          );
+        }
+      }
+    }
+    return kept;
+  });
+}
+
 function cloneTurnEffect(effect: TurnEffect): TurnEffect {
   switch (effect.kind) {
     case 'set':
@@ -839,11 +937,14 @@ class RestorationManager<T> {
 
   discardPendingTurn(turnId: number): boolean {
     const discarded = this.pendingTurns.delete(turnId);
-    for (const event of this.historicalEvents) {
-      if (event.boundaryTurnId === turnId) {
-        event.boundaryTurnId = undefined;
-      }
-    }
+    // A discarded pending turn is a REJECTED transaction: its writes were
+    // compensated and never became history, so its event goes too. Kept as an
+    // unbounded event, historical materialization replayed its inverse over a
+    // state that no longer held it — getRestorationHistory() threw "Subject 2
+    // is not active" after rejecting an undoable transaction that added a row.
+    this.historicalEvents = this.historicalEvents.filter(
+      (event) => event.boundaryTurnId !== turnId
+    );
     if (this.history.length === 0 && this.pendingTurns.size === 0) {
       this.historicalEvents = [];
     }
@@ -852,6 +953,54 @@ class RestorationManager<T> {
 
   hasPendingTurn(turnId: number): boolean {
     return this.pendingTurns.has(turnId);
+  }
+
+  /** Turn ids and event ordinals allocated so far. */
+  historyWatermark(): { turnId: number; ordinal: number } {
+    return {
+      turnId: this.nextTurnId - 1,
+      ordinal: this.nextHistoricalOrdinal - 1,
+    };
+  }
+
+  /**
+   * THE LAW (15.4.4): after a transaction is rolled back, no undo, redo or
+   * jumpTo may reinstate a value or row that only it wrote.
+   *
+   * Turns and events recorded while it was pending captured its speculative
+   * values as their `before`: undo of a later write restored the rejected
+   * value, and a row it created and a later turn removed came back. Each
+   * address's FIRST later record is re-based onto what the rejected turn
+   * replaced, when that record's `before` is the rejected turn's `after`;
+   * later records at the address were based on that record and keep theirs.
+   * Every later record of a row the rejected turn created is dropped (only it
+   * created that row), and anchors pointing at a dropped removal follow the
+   * removal's own anchors.
+   */
+  rebaseAfterRejection(
+    rejected: readonly TurnEffect[],
+    since: { turnId: number; ordinal: number }
+  ): void {
+    const later = [...this.history, ...this.pendingTurns.values()]
+      .filter((turn) => turn.id > since.turnId && turn.__effects)
+      .sort((left, right) => left.id - right.id);
+    const turnEffects = rebaseOntoRejection(
+      rejected,
+      later.map((turn) => turn.__effects as TurnEffect[])
+    );
+    later.forEach((turn, index) => {
+      turn.__effects = turnEffects[index];
+    });
+    const events = this.historicalEvents.filter(
+      (event) => event.ordinal > since.ordinal
+    );
+    const eventEffects = rebaseOntoRejection(
+      rejected,
+      events.map((event) => event.effects)
+    );
+    events.forEach((event, index) => {
+      (event as { effects: TurnEffect[] }).effects = eventEffects[index];
+    });
   }
 
   hasConfirmedTurnAfter(turnId: number): boolean {
@@ -3927,6 +4076,19 @@ export function restoration(
      * taken while it is still the newest thing that happened.
      */
     const stagedForeignTurns = new Map<string, number>();
+    /**
+     * Each open foreign transaction's own effects, kept until it settles so a
+     * rejection can re-base later history (`rebaseAfterRejection`). Kept
+     * whether or not the transaction became an undoable turn: a plain
+     * transaction's speculative values reach later turns just the same.
+     */
+    const speculativeContributions = new Map<
+      number,
+      {
+        effects: TurnEffect[];
+        since: { turnId: number; ordinal: number };
+      }
+    >();
 
     const resolveTransactionId = (meta?: {
       transactionId?: unknown;
@@ -3982,25 +4144,27 @@ export function restoration(
           structural: true,
         })),
       ]);
-      if (!isTurnEligible(designated)) {
-        return undefined;
-      }
-      if (!restorationManager.retainsCompletedHistory()) {
-        return undefined;
-      }
-      if (effects.length === 0 && collectionOrders.length === 0) {
-        return undefined;
-      }
-      const entry = restorationManager.createPendingEntry(
-        subjectIds.length > 0 ? subjectIds : undefined,
-        positionIds.length > 0 ? positionIds : undefined,
-        effects.length > 0 ? effects : undefined,
-        collectionOrders.length > 0 ? collectionOrders : undefined,
-        undefined,
-        transactionId
-      );
+      const entry =
+        isTurnEligible(designated) &&
+        restorationManager.retainsCompletedHistory() &&
+        (effects.length > 0 || collectionOrders.length > 0)
+          ? restorationManager.createPendingEntry(
+              subjectIds.length > 0 ? subjectIds : undefined,
+              positionIds.length > 0 ? positionIds : undefined,
+              effects.length > 0 ? effects : undefined,
+              collectionOrders.length > 0 ? collectionOrders : undefined,
+              undefined,
+              transactionId
+            )
+          : undefined;
       if (entry) {
         pendingDescriptorInputs.set(entry.id, descriptorInputs);
+      }
+      if (effects.length > 0) {
+        speculativeContributions.set(transactionId, {
+          effects: effects.map(cloneTurnEffect),
+          since: restorationManager.historyWatermark(),
+        });
       }
       return entry;
     };
@@ -4124,8 +4288,16 @@ export function restoration(
         unsubscribeCommittedEntities?.();
         unsubscribeCommittedEntities = undefined;
       }
+      const contribution = speculativeContributions.get(event.id);
+      speculativeContributions.delete(event.id);
       if (event.kind === 'rolled-back') {
         pendingTransactions.delete(event.id);
+        if (contribution) {
+          restorationManager.rebaseAfterRejection(
+            contribution.effects,
+            contribution.since
+          );
+        }
         // NOT restored here. Measured: this event fires BEFORE the rollback's
         // compensation writes land, and each of those clears provenance at its
         // own path — so anything restored here is immediately wiped. The
@@ -4665,6 +4837,7 @@ export function restoration(
       clearHistoricalCapture();
       pendingDescriptorInputs.clear();
       stagedForeignTurns.clear();
+      speculativeContributions.clear();
       pendingTransactions.clear();
       supersededExternalTruth.clear();
       externalTruthByPath.clear();
@@ -4792,6 +4965,7 @@ export function restoration(
         for (const release of releasePendingScalarObservers) release();
         resetRestorationRetention();
         pendingRestorationFootprints.clear();
+        speculativeContributions.clear();
         pendingTransactions.clear();
         supersededExternalTruth.clear();
         activeForeignTransactions.clear();

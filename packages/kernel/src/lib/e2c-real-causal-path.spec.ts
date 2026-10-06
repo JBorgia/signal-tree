@@ -12,10 +12,11 @@ import { signalTree } from '../index';
  * `rollback T1`, confirmed undo must land on `A` because `B` was contributed by
  * a turn that no longer survives.
  *
- * **That contract is NOT FROZEN anywhere in this repository.** It was a proposed
- * semantic, and building a null to it repeated the very failure the audit keeps
- * catching: a null built to an assumed contract. So these rows RECORD what the
- * real system does. They are characterization, not endorsement.
+ * **That contract was NOT FROZEN anywhere in this repository** until the owner
+ * decided it for 15.4.4 (after a rollback, no undo/redo/jumpTo reinstates a
+ * value only the rejected turn wrote). Until then these rows RECORDED what the
+ * real system did, as characterization; the E2-C1/E2-C2 undo rows now assert
+ * the decided contract.
  *
  * PUBLIC SURFACE, measured: the `transactions()` enhancer publishes only
  * `transaction()`. `getConfirmedTurnCount` / `getPendingTurnIds` and friends live
@@ -89,7 +90,7 @@ describe('E2-C1 — real P3', () => {
     expect(tree.getRestorationHistory().length).toBe(histAfterConfirm); // history NOT rewritten
   });
 
-  it('RECORDED: confirmed undo lands on B, not A — and redo returns to C', async () => {
+  it('confirmed undo lands on A, not B — and redo returns to C', async () => {
     const tree = signalTree(
       { x: 'A' },
       { enhancers: [restoration(), transactions()] }
@@ -107,25 +108,17 @@ describe('E2-C1 — real P3', () => {
     tree.undo();
     await tick();
 
-    // The real kernel reverses T2 to its RECORDED baseline. That baseline is 'B',
-    // which the rolled-back T1 contributed.
-    expect(tree.$.x()).toBe('B');
+    // CONTRACT DECIDED (owner, 15.4.4): after a rollback no undo, redo or
+    // jumpTo may reinstate a value only the rejected turn wrote. T2's recorded
+    // baseline 'B' was T1's speculative value; T1's rejection re-bases it onto
+    // what T1 replaced, so undo lands on 'A'. This row RECORDED 'B' through
+    // 15.4.3 while the contract was open ("NOT FROZEN"); see
+    // enhancers/transactions/undo-after-rejection.spec.ts.
+    expect(tree.$.x()).toBe('A');
 
     tree.redo();
     await tick();
     expect(tree.$.x()).toBe('C');
-
-    // ⚠️ THE E2-DECISIVE OBSERVATION.
-    //
-    // This is EXACTLY what E2's "naive" snapshot null produced, and what E2
-    // labelled WRONG. The effect-log representation and the snapshot-derived
-    // representation are INDISTINGUISHABLE here. No causal decision about T1's
-    // death is consumed by confirmed reversal: history is not rewritten, and the
-    // recorded baseline is reversed as-is.
-    //
-    // Whether 'B' is correct is a CONTRACT question that nothing in this
-    // repository answers. What is measured is that the effect log earns no
-    // observable advantage on this scenario.
   });
 });
 
@@ -153,8 +146,8 @@ describe('E2-C2 — nested path', () => {
     tree.undo();
     await tick();
 
-    // Same baseline behaviour as the scalar case...
-    expect(tree.$.profile.name()).toBe('B');
+    // Same decided contract as the scalar case (15.4.4: 'A', was 'B')...
+    expect(tree.$.profile.name()).toBe('A');
     // ...and critically, the untouched sibling SURVIVES. The real path does not
     // clobber `age`, which is the bug E2-B found in the model's own repair.
     expect(tree.$.profile.age()).toBe(30);

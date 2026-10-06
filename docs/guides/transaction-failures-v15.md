@@ -35,10 +35,17 @@ refusal can still clear once a newer open transaction settles. Keep the handle a
 reconciliation or confirmation explicitly; do not promise that waiting or
 deleting a row will make rollback succeed.
 
-After a rejection, `undo()` of a later write restores the state that write
-replaced, which can include the rejected transaction's speculative value, for
-scalars and pending-created rows alike. Undo is not a way back to the state before the
-transaction.
+After a rejection, no `undo()`, `redo()` or `jumpTo()` reinstates a value or row
+that only the rejected transaction wrote. Undo of a later write restores what
+would have been there had the transaction never run: if the transaction wrote
+`X` over `A` and a later write put `Y` over `X`, undoing that later write gives
+`A`; if a later write removed a row the transaction created, undoing it leaves
+the row gone. This holds for scalars, plain branches (fields and optional
+members) and entity rows, in either enhancer order, and history states read the
+same records. Through 15.4.3 that undo restored the rejected value instead (a
+documented limitation since 15.4.2); 15.4.4 adopts the rule above. Undo is still
+not a way back to the state before the transaction — it reverses authored
+history, and the rejected transaction is not part of it.
 
 Recoverable pending refusal with a usable recovery handle and consequences
 held until explicit confirmation is a **v16 target**, not a current v15 API.

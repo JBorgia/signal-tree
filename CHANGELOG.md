@@ -1,3 +1,13 @@
+## Unreleased
+
+**Patch — undo after a rejected transaction.**
+
+- After a rejection, no `undo()`, `redo()` or `jumpTo()` reinstates a value or
+  row that only the rejected transaction wrote: undo of a later write restores
+  what was there before the transaction. This replaces the known limitation
+  listed under 15.4.2/15.4.3. `getRestorationHistory()` no longer throws after
+  rejecting an undoable transaction that added a row.
+
 ## 15.4.3 (2026-10-05)
 
 **Patch — every reader sees a field a branch write removed.** Take it if you
@@ -36,7 +46,7 @@ rollback refusing when newer truth already removed the turn's row.**
 - Known limitation, unchanged: after a rejection, `undo()` of a later write
   restores the state that write replaced, which can include the rejected
   transaction's speculative value. Pending-created rows now behave as scalars
-  already did.
+  already did. (Removed in the release after 15.4.3; see Unreleased.)
 - An external update before a turn's first authored contribution now supplies
   that contribution's undo baseline, including when both occur in the same
   turn. Earlier authored contributions still belong to the whole designated
