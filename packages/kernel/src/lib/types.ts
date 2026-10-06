@@ -664,6 +664,18 @@ export interface AddOptions<E, K> extends MutationOptions {
 }
 
 export interface AddManyOptions<E, K> extends AddOptions<E, K> {
+  /**
+   * What an id that already exists does — including an id that occurs EARLIER
+   * IN THE SAME CALL: the rows apply as if one at a time, in order.
+   *
+   * - `'strict'` (default): throw, before anything is written.
+   * - `'skip'`: keep the existing row (the first copy wins).
+   * - `'overwrite'`: replace it in place (the last copy wins, in the first
+   *   copy's position, as `setAll` resolves duplicates).
+   *
+   * Duplicates within one call used to insert a second row under the same key
+   * in every mode (15.4.3); a collection never holds two rows under one key.
+   */
   mode?: 'strict' | 'skip' | 'overwrite';
 }
 
@@ -803,6 +815,11 @@ export interface EntitySignalOf<
   updateMany(ids: K[], changes: Partial<E>, opts?: MutationOptions): void;
   updateWhere(predicate: (entity: E) => boolean, changes: Partial<E>): number;
   upsertOne(entity: E, opts?: AddOptions<E, K>): K;
+  /**
+   * Upserts each entity in order; a later copy of an id merges over the row
+   * the earlier copy produced (`{ ...first, ...second }`), as consecutive
+   * `upsertOne` calls would. Returns each id once.
+   */
   upsertMany(entities: E[], opts?: AddOptions<E, K>): K[];
   removeOne(id: K, opts?: MutationOptions): void;
   removeMany(ids: K[], opts?: MutationOptions): void;

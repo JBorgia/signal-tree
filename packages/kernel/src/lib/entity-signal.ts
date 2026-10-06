@@ -2634,24 +2634,36 @@ export function createEntitySignal<
       // needed, not a copy of every key.
       const lastPreviousKey = structuralStore.lastActiveKey();
 
-      // First pass: validate/filter based on mode
+      // First pass: validate/filter based on mode. The rows apply as if one
+      // at a time, so an earlier copy of an id in this call counts as
+      // existing: strict throws (before anything is written), skip keeps the
+      // first copy, overwrite keeps the last in the first copy's place. Two
+      // rows under one key was the 15.4.3 result in every mode.
       const toProcess: Array<{
         entity: E;
         id: K;
         existingSubjectId?: number;
       }> = [];
+      const earlier = new Map<K, (typeof toProcess)[number]>();
       for (const entity of entities) {
         const id = deriveId(entity, opts);
         const existingSubjectId = structuralStore.subjectIdForKey(id);
-        if (existingSubjectId !== undefined) {
+        const copy = earlier.get(id);
+        if (existingSubjectId !== undefined || copy) {
           if (mode === 'strict') {
             throw new Error(`Entity with id ${String(id)} already exists`);
           } else if (mode === 'skip') {
             continue;
           }
           // 'overwrite': fall through — the projection helper below replaces the existing entry
+          if (copy) {
+            copy.entity = entity;
+            continue;
+          }
         }
-        toProcess.push({ entity, id, existingSubjectId });
+        const processed = { entity, id, existingSubjectId };
+        earlier.set(id, processed);
+        toProcess.push(processed);
       }
 
       if (toProcess.length === 0) return [];
@@ -2712,36 +2724,20 @@ export function createEntitySignal<
       }
 
       commitAndProjectEntityMutationFrame(frame);
-      const subjectIdsByKey = new Map<K, number>();
-      for (const { id, subjectId } of preparedAdds) {
-        subjectIdsByKey.set(id, subjectId);
-      }
 
-      // Process all entities without triggering per-entity signal updates
+      // Process all entities without triggering per-entity signal updates.
+      // Ids are unique by now, so each prepared add carries its own subject.
       const processedIds: K[] = [];
-      const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
-
-      for (const { entity: transformedEntity, id } of preparedAdds) {
-        const subjectId = subjectIdsByKey.get(id);
-        if (subjectId === undefined) {
-          throw new Error(`Entity with id ${String(id)} has no subject id`);
-        }
+      const subjectIdsForWrite: number[] = [];
+      for (const { id, subjectId } of preparedAdds) {
         invalidateNodeCache(id);
         syncEntitySignal(id);
         processedIds.push(id);
-        addedEntities.push({ id, entity: transformedEntity, subjectId });
+        subjectIdsForWrite.push(subjectId);
       }
 
       // Single signal update after all entities are processed
       updateSignals();
-
-      const subjectIdsForWrite = processedIds.map((id) => {
-        const subjectId = subjectIdsByKey.get(id);
-        if (subjectId === undefined) {
-          throw new Error(`Entity with id ${String(id)} has no subject id`);
-        }
-        return subjectId;
-      });
       lastSubjectIds = subjectIdsForWrite;
 
       // Notify PathNotifier for each processed entity.
@@ -2762,9 +2758,7 @@ export function createEntitySignal<
           lastPreviousKey === undefined
             ? undefined
             : allocateSubjectId(lastPreviousKey);
-        for (const { id, entity, prev } of preparedAdds) {
-          // Validated by `subjectIdsForWrite` above; read by key, as it was.
-          const subjectId = subjectIdsByKey.get(id) as number;
+        for (const { id, entity, prev, subjectId } of preparedAdds) {
           pathNotifier.notify(
             `${basePath}.${String(id)}`,
             entity,
@@ -2787,7 +2781,7 @@ export function createEntitySignal<
       }
 
       // Run tap handlers for each processed entity
-      for (const { id, entity } of addedEntities) {
+      for (const { id, entity } of preparedAdds) {
         for (const handler of tapHandlers) {
           handler.onAdd?.(entity, id);
         }
@@ -3205,17 +3199,29 @@ export function createEntitySignal<
       const toUpdate: Array<{ entity: E; id: K; prev: E; subjectId: number }> =
         [];
 
+      // Upserted one at a time: a later copy of an id merges over the earlier
+      // one, as upsertOne over the row it just wrote would.
+      const earlier = new Map<K, { entity: E }>();
       for (const entity of entities) {
         const id = deriveId(entity, opts);
+        const copy = earlier.get(id);
+        if (copy) {
+          copy.entity = { ...copy.entity, ...entity };
+          continue;
+        }
         const existing = getProjectedEntity(id);
         if (existing !== undefined) {
           const subjectId = resolveSubjectId(id);
           if (subjectId === undefined) {
             throw new Error(`Entity with id ${String(id)} has no subject id`);
           }
-          toUpdate.push({ entity, id, prev: existing, subjectId });
+          const update = { entity, id, prev: existing, subjectId };
+          toUpdate.push(update);
+          earlier.set(id, update);
         } else {
-          toAdd.push({ entity, id });
+          const add = { entity, id };
+          toAdd.push(add);
+          earlier.set(id, add);
         }
       }
 
