@@ -356,6 +356,13 @@ const withinFlush: Record<string, { writes: string; refused: boolean }> = {
   },
   'added, then removed in the next flush': { writes: '+|-', refused: true },
 };
+const withOther = () => ({
+  ...declaration(),
+  other: entityMap<Row, string>({ selectId: (row) => row.id }),
+});
+const typedWithOther = () =>
+  signalTree(withOther(), { enhancers: [transactions(), restoration()] });
+type OtherTree = ReturnType<typeof typedWithOther>;
 const pendingVacating = {
   rename: (tree: Tree) => tree.$.rows.changeId('a', 'a2'),
   removal: (tree: Tree) => tree.$.rows.removeOne('a'),
@@ -428,13 +435,9 @@ describe.each(configurations)(
     // Lifetimes are numbered per collection: a removal in ANOTHER collection
     // with the re-occupier's number is not its removal.
     it('a realized removal in another collection does not cancel the re-occupier', async () => {
-      const tree = signalTree(
-        {
-          ...declaration(),
-          other: entityMap<Row, string>({ selectId: (row) => row.id }),
-        },
-        { enhancers: enhancers() as never }
-      );
+      const tree = signalTree(withOther(), {
+        enhancers: enhancers() as never,
+      }) as unknown as OtherTree;
       try {
         tree.$.rows.addOne({ id: 'z', n: 0 });
         tree.$.rows.addOne({ id: 'a', n: 1 });
