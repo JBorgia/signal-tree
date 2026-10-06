@@ -288,6 +288,29 @@ describe('jumps that cross rows, a path re-add and an omission (v16 8g)', () => 
       from: 1,
       to: 3,
     },
+    // Back from 3 to 1 puts e back (removed by the last turn) and reverses a
+    // setAll that placed a and c around it: the setAll's removals and additions
+    // are anchored on rows the other turn changes, so only a turn-by-turn
+    // replay of the order places them (J5b).
+    'a jump back over a setAll and a removal of its anchor': {
+      steps: (tree) => [
+        () => tree.$.count(1),
+        () =>
+          tree.$.g.rows.setAll([
+            { id: 'd', n: 6 },
+            { id: 'e', n: 7 },
+          ]),
+        () =>
+          tree.$.g.rows.setAll([
+            { id: 'a', n: 12 },
+            { id: 'c', n: 13 },
+            { id: 'e', n: 14 },
+          ]),
+        () => tree.$.g.rows.removeOne('e'),
+      ],
+      from: 3,
+      to: 1,
+    },
     // Forward from 1 to 4: d's recorded neighbour e is added by one turn and
     // removed by a later one, so only a turn-by-turn replay can place d.
     'an anchor another turn added and a later turn removed': {
