@@ -1238,3 +1238,253 @@ Still red: the bundle budget. Bare was already over at `515a6969`
 (10.39/10.25 KB), and entities is over too (23.59/22.6 KB). v15's ceilings do
 not carry over to v16; the size and performance pass sets v16's own ceilings
 and fixes what it measures.
+
+## Slice 7: Link asynchronous settlement
+
+Committed as `eee2786e` (carried fixtures), `b6633617` (`settled()` waits
+for queued reactive writes, with its v16 controls) and the review follow-ups
+`8e8a280b` and `079dd04f`, on `integrate/v16-slice7` from `f23fe37e`. Raw
+logs, first reds, probes and mutation logs:
+`/private/tmp/st-v16-integration-evidence/slice7/`.
+
+Donor fixtures copied from v15 `cf98697a` with `.transaction(` →
+`.transact(`. They and `link.ts` are byte-identical at `cf98697a`, `4ceb24a2`,
+`012fd11d` and `d63166c9`. Each carried spec has a provenance header.
+
+First red on `f23fe37e` (`first-red/`): link-same-turn-settlement 3/3 pass,
+link-address-lifecycle 7/7 pass, link-async-settlement 7/8 (the explicit
+refusal case timed out at 5 s). The 64 kernel specs that exercise Link
+(`anchors-base/`): 59 exit 0; four are not in the default config (three
+`*.typing.spec.ts`, and `link-lifetime`, which runs in the retention-gc
+gate); the fifth is the refusal case.
+
+### Classification
+
+| Fixture / case | Cause on v16 | Class |
+| --- | --- | --- |
+| link-same-turn-settlement (3) | Already present: v16's own in-flight repair (`d2218eb0`, Sep 24, before `cf98697a`) re-checks chain identity after each drain and asks the commit authority for permission at each send. | a (present) |
+| link-async-settlement: later send after a rejected one; dispose releases waiters (resolve, reject); newer value held until confirm/rollback; already-queued send rechecks the scope; waits for every scope (7) | Already present (per-send `sendEligible` permission, `settlementWaiters`, the reporting catch keeps the queue). | a (present) |
+| link-async-settlement: "preserves v15 explicit refusal" | v15 settles the scope as `commit` on a refused rollback. v16 keeps the turn pending AND the scope open (`rollback-refusal-scope.spec.ts`, contract 2). Adapted: after each of two refusals only `[[1]]` is sent and `settled()` waits; `confirm()` sends `[[1],[99]]`; the final rows are `[99]`. | b |
+| link-address-lifecycle (7) | Already present: v16 resolves each notification through the registry's typed address at delivery (`relativeSourceAddress`), not v15's creation-time `visitTree` index. | a (present) |
+
+No class (c) case. Nothing in `cf98697a`'s Link hunks needed porting:
+
+| Donor hunk | v16 equivalent |
+| --- | --- |
+| `drain()` re-checks `chain` identity | `settled()`'s `chain !== awaitedChain` (`d2218eb0`) |
+| `hasOpenCommitScope` re-check at each lap | `sendEligible`: permission at the actual endpoint call; a deferred release re-attempts on a microtask |
+| `settlementWaiters`, idempotent `dispose()`, user cleanup last | Present |
+| construction failure releases everything | `dispose()` in the catch; no record (slice 6) |
+| `queued`/`sending`/`registerLinkState` | Slice 6, behind `link-state-source.ts` |
+| visitTree address index, plain-branch membership | Typed addresses; membership carried in slice 3c |
+
+### New defect: `settled()` before a send caused by a reactive write
+
+This was found by a v16 probe that is not from the donor (`explore/`). A
+notifier subscriber that writes while it handles an earlier write queues a new
+notification. Each hop is delivered at a later flush (one microtask). The
+chain, retrievals, order captures and held sends were all empty while that
+write was still queued, so from two hops `settled()` resolved before the
+resulting send started or was acknowledged. One hop passed only because of
+microtask order. The coordinator assigned the repair to this slice.
+
+v15 has the same defect. Against v15 exports of `d63166c9` and `f8ff7431`
+(`git archive` under `/private/tmp/st-v16-slice7-v15-export/`):
+- The exploration probe (`explore/v15/*.log`): reactive hops 1–4 fail with
+  `expected { received: [ 7 ], settled: true } to deeply equal { received: [ 7 ], settled: false }`.
+  "Write authored after `settled()` in the same synchronous turn" also fails
+  (`expected true to be false`); it passes on v16.
+- The final 48-case controls (`explore/v15/controls-*.log`, an earlier
+  38-case draft): 18 fail, identically on both commits. That includes the
+  public-API echo through another relationship. The order-only and row-field
+  failures are the reorder defect and an absent API respectively.
+This is routed to the v15 Link stream as a 15.4.4 candidate; no v15 worktree
+was touched.
+
+Repair (`K/lib/link.ts`, one block). Where `settled()` would declare the
+relationship idle, it asks the shared PathNotifier `hasPending()`. If anything
+is queued, it waits for the next flush through a one-shot `onFlush` (a
+signal, not a poll) and loops. Link's own `flushOutbound` was registered
+earlier, so it has already run when the waiter resumes. The queue is
+deliberately the shared one, because a hop can pass through another tree.
+Work inside another relationship's endpoint call stays that relationship's.
+`Link.settled()`'s doc comment now says it covers a write still queued for
+delivery; the API and callable baselines are unchanged. The slice-6 Link
+reader is unchanged: the activity tuple has no new fact, and a `settled()`
+waiting on a flush holds no Link work.
+
+### v16 controls
+
+`K/lib/link-reactive-settlement.spec.ts` (48 cases):
+- scalar chains of 1, 2, 3, 6 and 12 hops, each with a slow and a
+  synchronous endpoint;
+- a chain that passes through another tree;
+- `settled()` requested inside a hop;
+- mixed entity and scalar hops: linked scalar, collection and row field, and
+  an order-only hop;
+- hops that write nothing or an equal value;
+- pending transactions:
+  - hops of a write authored in the callback, confirm and rollback, 2/4 hops
+    and a 12-hop rollback;
+  - hops triggered by the rollback compensation itself;
+  - an ordinary write made while a transaction is pending, then confirm or
+    rollback;
+  - a hop that opens its own transaction, with 0 or 3 hops before it;
+  - a transaction confirmed before delivery;
+- `destroy()` mid-chain, three cases bounded to "nothing or the one chain
+  value" so they hold whether or not a later slice makes `destroy()` dispose
+  Links;
+- `dispose()` from a hop;
+- two public-API relationship echoes.
+
+With the flush wait removed (the `f23fe37e` `settled()`), 26 fail. The other
+22 are preservation and boundary controls:
+- `transact()` drains its queue with `flushSync`, so hops of a write
+  authored in the callback run synchronously while the scope holds the send;
+- `confirm()` and `rollback()` do not drain;
+- one hop, writes-nothing, order-only (`pendingOrders`) and dispose.
+Three repeated runs are stable (48/48).
+
+### Mutations (each restored by content hash; logs `mutations*/`)
+
+Counts are killed cases.
+
+- Wrong fixes, on the final 48 cases (`mutations-r6/`):
+  - RM1 one flush, then stop: 22.
+  - RM2 check the queue only before the chain wait: 1 (the canonical value
+    relayed by hops, added after RM2 survived the first draft).
+  - RM3 wait only while `dirty`: 26.
+  - RM4 wait only for this tree's queued writes: 1 (the cross-tree chain,
+    deepened to three source hops after RM4 survived).
+  - RM6 no flush wait: 26.
+- Existing v16 code behind the donor cases that already passed
+  (`mutations/`, the three carried files):
+  - EM1 no chain-identity re-check: 3.
+  - EM2 weak `settled()` (`await chain`): 4.
+  - EM3 a released send uses its stale value: 1.
+  - EM4 a send without the commit authority: 5.
+  - EM5 `dispose()` keeps the waiters: 2.
+  - EM6 a rejection wedges the queue: 2.
+  - EM7 `settled()` after `dispose()` waits: 2.
+  - EM9 leaves are not armed: 10.
+  - EM10 (`mutations-em10/`) a creation-time position index: 7.
+  - TM1 (`transactions.ts`) a refusal releases the scope, v15's law: 1, the
+    adapted case.
+  - Survivor EM8, membership deltas ignored: the donor address cases always
+    carry the whole profile value. `branch-omission-correctness` (slice 3c)
+    kills it: 11 (`mutations-em8/`).
+
+### Results
+
+Per fixture after: 3/3, 8/8, 7/7; controls 48/48.
+
+The Link-related specs plus rollback-refusal-scope and recovery-handle-0 were
+run with the fix applied, before the final control additions
+(`anchors-after-fix/`): 63 files, 659 passed, 0 failed.
+
+Verification at `b6633617` (`verify/run1/`), all exit 0 unless noted:
+- full kernel: 388 files, 4116 passed, 6 expected failures, 13 skipped;
+- frameworks: angular 179 (+3 skipped), react 23, vue 63, solid 41;
+- `pnpm typecheck`;
+- `check-spec-types` (three pre-existing improvements; baseline not
+  ratcheted);
+- lint on all five projects;
+- kernel-neutrality, source-controls, `api-inventory --check`,
+  callable-inventory;
+- five-package build;
+- consumer typecheck (bundler and node16);
+- retention-gc: 3 files, 10 tests;
+- `check-bundle-budget` exit 1 on the pre-existing overage only.
+
+The follow-ups change only the controls spec:
+- full kernel at `8e8a280b`: 388 files, 4124 passed, 6 expected failures, 13
+  skipped (`verify/final/`); `f23fe37e` was 384 / 4058, so +4 files and +66
+  cases = 3 + 8 + 7 + 48;
+- at `079dd04f`: the controls (48/48), spec-types and kernel lint.
+
+Audit probes (`probes/`; p01/p08 from the v16 export, x01/x03 adapted) are
+identical before and after: p01 30 pass / 3 fail, p08 15/1, x01 17/10,
+x03 3/0. The failures are P01d and six x01 cases (head-of-collection
+restore order, CAB/CDAB), four X01b undo/rollback reorders (reorder
+propagation) and P08d (`tree.destroy()` does not release a `settled()`
+waiter). These are the three v15 defects deferred to a later slice; none is
+needed by a section-7 falsifier. On v15 `d63166c9`, X01b fails the forward
+cases instead.
+
+Size (`size/`, esbuild attribution over the built dist, prod):
+
+| Scenario | `f23fe37e` | `079dd04f` | Delta |
+| --- | --- | --- | --- |
+| link | 16.74 KB gzip | 16.77 KB | +25 B gzip, +84 B min, all `lib/link.js` |
+| full | 64.91 KB | 64.92 KB | +14 B gzip, +88 B min, all `lib/link.js` |
+| entities, bare, transactions, restoration | — | — | 0 |
+
+`check-bundle-budget`, before and after: entities 23.59 / 26.23 KB, bare
+10.39 / 12.60 KB (unchanged; still over the inherited ceilings).
+
+### Independent review
+
+One read-only review (code-reviewer agent), given the raw diff and the PLAN
+contracts. It ran the destination specs and the carried and control specs on
+an export of `b6633617`: inflight-settlement-audit 9, commit-ordering 7,
+drain-settlement 2, structured-address-audit 19, value-roundtrip 2, all
+passing.
+
+Its first pass stopped when a command was denied: building a second export
+with `f23fe37e`'s `link.ts`. That command was not rerun on its behalf. It
+then read the pre-fix logs from this slice's own runs instead.
+
+No critical finding, and no runtime defect in the `settled()` wait. It
+checked:
+- that a flush is guaranteed whenever a waiter exists: `notify`, `flushSync`,
+  `clear`/reset, batching disabled;
+- callback order and reentrancy;
+- that there is no leak beyond one microtask after `dispose()`.
+
+Dispositions:
+- **Major: 13 of the 14 transaction controls did not discriminate.** Fixed
+  in `8e8a280b`: compensation-triggered hops, an ordinary write while
+  pending, and a transacting hop after three hops; destroy bounds added.
+- **Minor: the in-flight destroy control pinned the deferred
+  destroy-keeps-Links behaviour.** Its send starts after `destroy()`. Fixed
+  in `079dd04f` with the either-outcome bound.
+- **Minor, kept:** `settled()` depends on unrelated trees' queued writes, at
+  most one flush per lap; this is documented.
+- **Minor, kept:** `onFlush`/`hasPending` are called without `?.` while the
+  older registration uses `?.`. The notifier is the concrete `PathNotifier`.
+- **Minor, kept:** the 1-hop, order-only, writes-nothing and dispose
+  controls pass both ways by design. Carried same-turn and address cases
+  passed before this slice and are regression carriers.
+- **Info:** writes deferred outside the notifier stay outside the repair's
+  reach (open item 3). The controls use real timers.
+
+### User-visible behaviour changes in v16 (slice 7)
+
+1. `link().settled()` also waits for sends caused by writes still queued for
+   notification delivery, including reactive writes several hops away and
+   through other trees. While anything is queued, each check costs one more
+   flush (microtask).
+2. `Link.settled()`'s doc comment says so. There is no API or type change.
+
+### Open items
+
+1. **Reactive-hop `settled()` defect on v15.** Reproduced on `d63166c9` and
+   `f8ff7431`, including the public-API echo. Routed to the v15 Link stream
+   (15.4.4). v15 also fails a write authored after `settled()` in the same
+   synchronous turn.
+2. **Rollback of a transaction whose hops wrote derived values.** The held
+   derived value is sent at release, then the re-derived one, for example
+   `[7, 0]` (`explore/explore2-base.log`). It is current truth under the
+   tree-wide hold; whether a send should wait for a quiet queue before
+   reading its value is a separate decision.
+3. **Writes outside the notifier are not covered.** A hop that writes from
+   `queueMicrotask`, a framework effect, or another relationship's endpoint
+   I/O is visible only once it reaches the queue.
+4. **`destroy()` with a held send.** `settled()` never resolves, because
+   `cancelCommitScopes` drops held consequences (P08d family,
+   `explore2-base.log`). This belongs to the deferred `destroy()`-disposes-Links
+   work.
+5. **The three deferred v15 Link defects reproduce unchanged on v16**
+   (probes above).
+6. **Minor divergence:** `retrieve()` on a disposed relationship without
+   `get()` throws on v16 and returns on v15.
