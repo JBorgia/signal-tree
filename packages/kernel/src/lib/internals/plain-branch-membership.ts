@@ -373,7 +373,7 @@ function collectionsWithin(member: unknown, visit: (node: object) => void): void
   }
   if (!isNodeAccessor(member)) return;
   for (const key of Object.keys(member)) {
-    const child = (member as Record<string, unknown>)[key];
+    const child = (member as unknown as Record<string, unknown>)[key];
     if (isCollectionMember(child) || isNodeAccessor(child))
       collectionsWithin(child, visit);
   }
