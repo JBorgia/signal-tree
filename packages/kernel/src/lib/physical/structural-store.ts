@@ -324,9 +324,16 @@ export class StructuralStore<K extends string | number> {
 
   moveKeysToFront(keys: readonly K[]): void {
     this.keysCache = undefined;
-    const nodes = keys
-      .map((key) => this.activeNodesByKey.get(key))
-      .filter((node): node is ActiveNode<K> => node !== undefined);
+    // Each node once, at its first position: a node prepended twice links to
+    // itself, and every later walk of the order never ends (v16 8f; the
+    // callers pass unique keys since the batch duplicate rule).
+    const nodes = [
+      ...new Set(
+        keys
+          .map((key) => this.activeNodesByKey.get(key))
+          .filter((node): node is ActiveNode<K> => node !== undefined)
+      ),
+    ];
 
     for (const node of nodes) {
       this.detachNode(node);

@@ -2648,16 +2648,26 @@ export function createEntitySignal<
       // needed, not a copy of every key.
       const lastPreviousKey = structuralStore.lastActiveKey();
 
-      // First pass: validate/filter based on mode
+      // First pass: validate/filter based on mode. The rows apply as if one
+      // at a time, so an earlier copy of an id in this call counts as
+      // existing: strict throws (before anything is intercepted or written),
+      // skip keeps the first copy, overwrite keeps the last in the first
+      // copy's place. Two rows under one key was the result in every mode
+      // before (v15 778f86ef and e02238f4, carried in v16 8f): prependMany
+      // then linked the row to itself and the next read never ended.
       const toProcess: Array<{
         entity: E;
         id: K;
         existingSubjectId?: number;
       }> = [];
+      // Every copy that applies, in input order.
+      const copies: Array<[(typeof toProcess)[number], E]> = [];
+      const earlier = new Map<K, (typeof toProcess)[number]>();
       for (const entity of entities) {
         const id = deriveId(entity, opts);
         const existingSubjectId = structuralStore.subjectIdForKey(id);
-        if (existingSubjectId !== undefined) {
+        let processed = earlier.get(id);
+        if (existingSubjectId !== undefined || processed) {
           if (mode === 'strict') {
             throw new Error(`Entity with id ${String(id)} already exists`);
           } else if (mode === 'skip') {
@@ -2665,18 +2675,24 @@ export function createEntitySignal<
           }
           // 'overwrite': fall through — the projection helper below replaces the existing entry
         }
-        toProcess.push({ entity, id, existingSubjectId });
+        if (!processed) {
+          processed = { entity, id, existingSubjectId };
+          earlier.set(id, processed);
+          toProcess.push(processed);
+        }
+        copies.push([processed, entity]);
       }
 
       if (toProcess.length === 0) return [];
 
-      // Stage all add work before mutating runtime state so a later failure
-      // cannot partially allocate fresh subject lifetimes.
-      const stagedAdds = toProcess.map(({ entity, id, existingSubjectId }) => ({
-        id,
-        entity: interceptAddedEntity(entity),
-        existingSubjectId,
-      }));
+      // Interceptors run once per applied copy, in input order, as successive
+      // single calls would; the last intercepted value wins. Staged before
+      // mutating runtime state so a block cannot partially allocate fresh
+      // subject lifetimes.
+      for (const [processed, entity] of copies) {
+        processed.entity = interceptAddedEntity(entity);
+      }
+      const stagedAdds = toProcess;
       const plannedFreshSubjectIds = structuralStore.planFreshSubjectIds(
         stagedAdds.filter(
           ({ existingSubjectId }) => existingSubjectId === undefined
@@ -3280,40 +3296,62 @@ export function createEntitySignal<
     upsertMany(entities: E[], opts?: AddOptions<E, K>): K[] {
       if (entities.length === 0) return [];
 
-      // Separate adds from updates
-      const toAdd: Array<{ entity: E; id: K }> = [];
-      const toUpdate: Array<{ entity: E; id: K; prev: E; subjectId: number }> =
-        [];
-
+      // Upserted one at a time, as successive upsertOne calls would be: every
+      // id is resolved first (nothing intercepted or written yet), then the
+      // interceptors run once per COPY, in input order: onAdd for a new id's
+      // first copy, onUpdate for each later copy (the raw copy), merged over
+      // the running value. Each key is announced and tapped once, with its
+      // final value (v15 778f86ef and e02238f4, carried in v16 8f).
+      type Upsert = {
+        id: K;
+        prev?: E;
+        subjectId?: number;
+        /** The running value: the stored row, then each intercepted copy. */
+        entity?: E;
+        changes?: Partial<E>;
+      };
+      const toAdd: Upsert[] = [];
+      const toUpdate: Upsert[] = [];
+      const copies: Array<[Upsert, E]> = [];
+      const earlier = new Map<K, Upsert>();
       for (const entity of entities) {
         const id = deriveId(entity, opts);
-        const existing = getProjectedEntity(id);
-        if (existing !== undefined) {
-          const subjectId = resolveSubjectId(id);
-          if (subjectId === undefined) {
-            throw new Error(`Entity with id ${String(id)} has no subject id`);
+        let row = earlier.get(id);
+        if (!row) {
+          const prev = getProjectedEntity(id);
+          if (prev === undefined) row = { id };
+          else {
+            const subjectId = resolveSubjectId(id);
+            if (subjectId === undefined) {
+              throw new Error(`Entity with id ${String(id)} has no subject id`);
+            }
+            row = { id, prev, entity: prev, subjectId };
           }
-          toUpdate.push({ entity, id, prev: existing, subjectId });
+          (prev === undefined ? toAdd : toUpdate).push(row);
+          earlier.set(id, row);
+        }
+        copies.push([row, entity]);
+      }
+      for (const [row, entity] of copies) {
+        if (row.entity === undefined) {
+          row.entity = interceptAddedEntity(entity);
         } else {
-          toAdd.push({ entity, id });
+          const changes = interceptUpdatedEntity(row.id, entity);
+          row.changes = { ...row.changes, ...changes };
+          row.entity = { ...row.entity, ...changes };
         }
       }
 
-      const stagedAdds = toAdd.map(({ entity, id }) => ({
-        id,
-        entity: interceptAddedEntity(entity),
-      }));
-
-      const stagedUpdates = toUpdate.map(({ entity, id, prev, subjectId }) => {
-        const transformedChanges = interceptUpdatedEntity(id, entity);
-        return {
+      const stagedAdds = toAdd as Array<{ id: K; entity: E }>;
+      const stagedUpdates = toUpdate.map(
+        ({ id, subjectId, prev, entity, changes }) => ({
           id,
-          subjectId,
-          prev,
-          transformedChanges,
-          finalUpdated: { ...prev, ...transformedChanges },
-        };
-      });
+          subjectId: subjectId as number,
+          prev: prev as E,
+          transformedChanges: changes as Partial<E>,
+          finalUpdated: entity as E,
+        })
+      );
 
       // One observed membership unit; a throw still closes it.
       const membershipUnit = membershipTap;
