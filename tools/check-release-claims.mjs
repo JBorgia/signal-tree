@@ -402,6 +402,17 @@ const EXEMPT = new Map(
       '@internal member of InternalTransactionRuntime, not app-facing: the documented public way to request diagnostic retention is the transactions({ history: { retain } }) option',
     transactionOwner:
       'internal WriteMetadata tree token used to isolate transactions()',
+    // ── 15.4.4: internal members of declared internal types ─────────────
+    registerPositionAddress:
+      'member of the internal PositionRegistry: records a position\'s structured address at materialization for the hidden-location walk (15.4.4 port of v16 8b). Not app-facing; the behaviour it serves is documented in the kernel README ("Locations an omission has hidden") and the 15.4.4 CHANGELOG',
+    addressFor:
+      'member of the internal PositionRegistry: reads the structured address registerPositionAddress recorded, for restoration and transactions only. Not app-facing; see registerPositionAddress',
+    closed:
+      '@internal member of PositionRegistry, set by tree.destroy() so link() can refuse a destroyed tree; the public behaviour (link() on a destroyed tree throws StudioTreeDestroyedError) is in the 15.4.4 CHANGELOG',
+    getPendingPositionIds:
+      '@internal member of InternalTransactionRuntime: the positions a pending turn wrote, which restoration reads to refuse undo over pending work. Not app-facing',
+    subscribeOrder:
+      'member of the internal EntityMembershipInventory: the order tier Link subscribes to so a collection endpoint receives reorders. The public behaviour is in the 15.4.4 CHANGELOG (Link section)',
     // ── under active disposition in HIST-C2 step 7 ──────────────────────
     // These are declines WITH a stated deadline, not silent gaps. Each is a
     // real public config member today; each is slated to be deleted or
