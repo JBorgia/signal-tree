@@ -58,16 +58,8 @@ const flush = async () => {
   for (let i = 0; i < 12; i++) await Promise.resolve();
 };
 
-type Tree = {
-  $: {
-    (): unknown;
-    a: { (): string; (value: string): void };
-    obj(value: unknown): void;
-  };
-  destroy(): void;
-};
-const makeTree = () =>
-  signalTree({ a: 'a0', obj: null as unknown }) as unknown as Tree;
+const makeTree = () => signalTree({ a: 'a0', obj: null as unknown });
+type Tree = ReturnType<typeof makeTree>;
 const endpointFor = (): LinkEndpoint<string> => ({
   set: () => undefined,
   subscribe: () => () => undefined,
@@ -84,7 +76,7 @@ describe('Link lifetime retention', () => {
     let tree: Tree | null = makeTree();
     tree.$.obj(payload);
     payload = null;
-    link(tree.$.a as never, endpointFor());
+    link(tree.$.a, endpointFor());
     // A whole-state read, as persistence's autoSave does: it leaves a
     // dependency consumer registered with location-runtime's finalizer, whose
     // held dependency map is what made the registry's closure fatal.
@@ -109,10 +101,7 @@ describe('Link lifetime retention', () => {
     try {
       let endpoint: LinkEndpoint<string> | null = endpointFor();
       const ref = new WeakRef(endpoint);
-      let relationship: { dispose(): void } | null = link(
-        tree.$.a as never,
-        endpoint
-      );
+      let relationship: { dispose(): void } | null = link(tree.$.a, endpoint);
       endpoint = null;
       await flush();
       relationship.dispose();

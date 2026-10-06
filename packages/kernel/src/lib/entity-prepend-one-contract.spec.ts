@@ -17,12 +17,15 @@ type Row = { id: string; n: number; key?: string };
 const flush = async () => {
   for (let i = 0; i < 12; i++) await Promise.resolve();
 };
-const make = (enhancers: readonly unknown[] = []) =>
-  signalTree(
-    { rows: entityMap<Row, string>({ selectId: (row) => row.id }) },
-    { enhancers: enhancers as never }
-  );
-type Tree = ReturnType<typeof make>;
+const declaration = () => ({
+  rows: entityMap<Row, string>({ selectId: (row) => row.id }),
+});
+const typed = () => signalTree(declaration(), { enhancers: [restoration()] });
+type Tree = ReturnType<typeof typed>;
+const make = (enhancers: readonly unknown[] = []): Tree =>
+  signalTree(declaration(), {
+    enhancers: enhancers as never,
+  }) as unknown as Tree;
 const seed = async (tree: Tree) => {
   tree.$.rows.addOne({ id: 'z', n: 0 });
   tree.$.rows.addOne({ id: 'a', n: 1 });
