@@ -184,3 +184,50 @@ describe('replay taps: a realized fresh subject', () => {
     }
   });
 });
+
+/**
+ * The exceptions TapHandlers documents (round-3 review): a rename and a
+ * reorder tap nothing by themselves, and a forward setAll taps onUpdate for
+ * every row it replaces even with an equal value, while its replay taps only
+ * the rows whose value changes.
+ */
+describe('replay taps: the documented exceptions', () => {
+  it.each([
+    ['restoration()', () => [restoration()]],
+    ['transactions(), restoration()', () => [transactions(), restoration()]],
+    ['restoration(), transactions()', () => [restoration(), transactions()]],
+  ] as const)('%s: changeId and a reorder-only setAll, forward and replayed', async (_name, enhancers) => {
+    const tree = make(enhancers());
+    try {
+      await seed(tree);
+      const taps = watch(tree);
+      undoable(() => tree.$.rows.changeId('a', 'b'));
+      await flush();
+      expect(taps).toStrictEqual([]);
+      tree.undo();
+      await flush();
+      tree.redo();
+      await flush();
+      expect(taps).toStrictEqual([]);
+      tree.undo();
+      await flush();
+      undoable(() =>
+        tree.$.rows.setAll([
+          { id: 'a', n: 1 },
+          { id: 'z', n: 0 },
+        ])
+      );
+      await flush();
+      expect(sorted(taps)).toStrictEqual(['update:a', 'update:z']);
+      taps.length = 0;
+      tree.undo();
+      await flush();
+      tree.redo();
+      await flush();
+      expect(tree.$.rows.ids()).toStrictEqual(['a', 'z']);
+      expect(taps).toStrictEqual([]);
+    } finally {
+      tree.destroy();
+    }
+  });
+});

@@ -73,9 +73,14 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   any other state (forged, hand-edited, or older than the tree's last 1,000
   serialized states) and `IMPORT_STATE` are new input and still run them.
 - Taps fire symmetrically for the changes a reversal applies: a row it brings
-  back taps `onAdd` (15.4.3 tapped only the removals, and nothing at all when
-  several rows were reversed together), one it takes away `onRemove`, one
-  whose value it changes `onUpdate`.
+  back taps `onAdd`, one it takes away `onRemove`, one whose value it changes
+  `onUpdate`. On 15.4.3 no reversal tapped `onAdd` (redo of `addOne` or
+  `addMany`, undo of `removeOne`, `removeMany` or `clear`, undo of a `setAll`
+  that removed rows), and undo of a `setAll` that had only added rows tapped
+  no `onRemove` either; other removals and value changes were tapped. A rename
+  and a reorder still tap nothing by themselves, and a forward `setAll` still
+  taps `onUpdate` for every row it replaced, even with an equal value, where a
+  reversal taps only the rows whose value it changes.
 - `addOne`, `addMany`, `prependOne`, `prependMany`, `upsertMany`,
   `updateMany` and `removeMany` throw `Cannot <method>: collection topology
   changed during staging` before writing when one of their interceptors or id
@@ -88,6 +93,14 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   interceptor added misplaced on redo, or an `updateMany` that announced a
   renamed row and lost the rename. `upsertMany` merges an updated row over its
   value as its interceptors left it.
+  **Compatibility:** an interceptor that adds or removes rows of the same
+  collection while one of these calls runs now makes the call throw (the
+  interceptor's own writes stand; the call writes nothing) — for example an
+  `onRemove` interceptor that cascade-deletes dependent rows during
+  `removeMany`. Move such cascades to a tap (`tap({ onRemove })`, which runs
+  after the call commits) or to a separate call after the batch. Field-only
+  writes, writes to other collections, and renaming a row the call does not
+  name are unaffected. No example or demo in this repository uses the pattern.
 - Rollback of a transaction that edited an existing row no longer refuses
   after settled later work removed that row (even a plain `removeOne`): the
   row's compensation is skipped, the rest reverses, the row stays absent. An

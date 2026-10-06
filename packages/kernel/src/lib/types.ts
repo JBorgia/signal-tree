@@ -691,12 +691,20 @@ export interface AddManyOptions<E, K> extends AddOptions<E, K> {
 /**
  * Tap handlers - observe entity lifecycle events.
  *
- * They fire for every change applied to the collection, including the changes
- * `undo()`, `redo()`, `jumpTo()` and a rollback apply: a row a replay brings
- * back taps `onAdd`, one it takes away taps `onRemove`, one whose value it
- * changes taps `onUpdate` (a replay that only renames a key taps nothing, as
- * `changeId` does). A write a tap makes is ordinary forward work: it is
- * intercepted, even while a replay runs.
+ * They fire for the changes applied to the collection, including those
+ * `undo()`, `redo()`, `jumpTo()` and a rollback apply: a row added or brought
+ * back taps `onAdd`, one removed or taken away taps `onRemove`, one whose
+ * value is written taps `onUpdate`. A rename (`changeId`, or its replay) and
+ * a reorder tap nothing by themselves.
+ *
+ * Forward and replayed writes differ on equal values: a forward `setAll` taps
+ * `onUpdate` for every row it replaces, even with an equal value (kept for
+ * per-row `onUpdate` users) — so a reorder-only `setAll` taps `onUpdate` for
+ * each row — while a replay taps `onUpdate` only for a row whose value it
+ * changes, so replaying that `setAll` taps nothing.
+ *
+ * A write a tap makes is ordinary forward work: it is intercepted, even while
+ * a replay runs.
  */
 export interface TapHandlers<E, K extends string | number> {
   onAdd?: (entity: E, id: K) => void;
