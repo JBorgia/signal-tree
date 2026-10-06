@@ -666,3 +666,80 @@ describe.each(Object.entries(orders))(
     });
   }
 );
+
+// ── Key order of a re-based removal snapshot (re-review of 23b750f0, item 4) ──
+// Values matched the no-T control but the dropped fields came back at the end:
+// `m, nest` after `n` in the control, `nest, m` re-based. Serialization and
+// persistence see key order, so the re-based snapshot keeps the pre-T order.
+describe.each(Object.entries(orders))(
+  'undo after a rejection: key order of a re-based snapshot (%s)',
+  (_order, enhancers) => {
+    type Wide = { id: string; n: number; m?: number; nest?: { x: number } };
+    const makeWide = () => {
+      const tree = signalTree(
+        { rows: entityMap<Wide, string>({ selectId: (row) => row.id }) },
+        { enhancers: enhancers() as never }
+      ) as unknown as {
+        $: {
+          rows: {
+            addOne(row: Wide): void;
+            replaceOne(id: string, row: Wide): void;
+            updateOne(id: string, patch: Partial<Wide>): void;
+            removeOne(id: string): void;
+            byId(id: string): (() => Wide) | undefined;
+          };
+        };
+        transaction(fn: () => void): { rollback(): void };
+        undo(): void;
+        destroy(): void;
+      };
+      tree.$.rows.addOne({ id: 'a', n: 1, m: 1, nest: { x: 1 } });
+      return tree;
+    };
+    const shapes: Record<
+      string,
+      Array<(tree: ReturnType<typeof makeWide>) => void>
+    > = {
+      'T dropped two fields, W removed the row': [
+        (tree) => tree.$.rows.removeOne('a'),
+      ],
+      'T dropped two fields, W re-set one, W2 removed the row': [
+        (tree) => tree.$.rows.updateOne('a', { m: 7 }),
+        (tree) => tree.$.rows.removeOne('a'),
+      ],
+    };
+    it.each(Object.keys(shapes))(
+      '%s: undo gives the no-T keys in the no-T order',
+      async (shape) => {
+        const run = async (withT: boolean) => {
+          const tree = makeWide();
+          try {
+            await flush();
+            const proposal = withT
+              ? tree.transaction(() =>
+                  tree.$.rows.replaceOne('a', { id: 'a', n: 1 })
+                )
+              : undefined;
+            await flush();
+            for (const write of shapes[shape]) {
+              undoable(() => write(tree));
+              await flush();
+            }
+            proposal?.rollback();
+            await flush();
+            tree.undo();
+            await flush();
+            const row = tree.$.rows.byId('a')?.();
+            return { keys: row ? Object.keys(row) : [], row };
+          } finally {
+            tree.destroy();
+          }
+        };
+        const control = await run(false);
+        const rebased = await run(true);
+        expect(rebased).toStrictEqual(control);
+        expect(rebased.keys).toStrictEqual(['id', 'n', 'm', 'nest']);
+      }
+    );
+  }
+);

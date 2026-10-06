@@ -22,6 +22,15 @@ export type StructuralEffectKind = 'add' | 'remove' | 'rekey';
 export type FieldPresence = {
   readonly before: boolean;
   readonly after: boolean;
+  /**
+   * For a field the write DROPPED: the key right after it in the record's key
+   * order before the write (kept or dropped). Lets a re-base put the field
+   * back where it was rather than at the end (key order is visible to
+   * serialization and persistence); re-adds run last key first, so the
+   * successor is back before its predecessor needs it. Absent when it was the
+   * last key.
+   */
+  readonly successor?: string;
 };
 
 export interface CausalEffect {

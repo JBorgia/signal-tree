@@ -426,7 +426,12 @@ type CaptureBucket = {
 /** A captured pre-image's place: a scope plus exact keys inside it. */
 type RebaseAddress = { scope: string; segments: readonly string[] };
 type RebaseValue = { value: unknown; present: boolean };
-type RebaseAtom = RebaseAddress & { before: RebaseValue; after: RebaseValue };
+type RebaseAtom = RebaseAddress & {
+  before: RebaseValue;
+  after: RebaseValue;
+  /** Where a field the rejected turn dropped sat: see FieldPresence. */
+  successor?: string;
+};
 
 const ABSENT: RebaseValue = { value: undefined, present: false };
 
@@ -456,33 +461,64 @@ const navigateRebaseValue = (
   return current;
 };
 
-/** Copy-on-write: shared snapshots are never mutated. */
+/** An own data property, even for the key '__proto__'. */
+const defineOwn = (
+  target: Record<string, unknown>,
+  key: string,
+  value: unknown
+): void => {
+  Object.defineProperty(target, key, {
+    value,
+    enumerable: true,
+    writable: true,
+    configurable: true,
+  });
+};
+
+/**
+ * Copy-on-write: shared snapshots are never mutated. Keys keep their order; a
+ * key re-added at the last level goes before `successor` when that is present
+ * (where the rejected turn dropped it from), else at the end. Own data
+ * properties throughout: an assignment to '__proto__' would set the
+ * prototype (re-review of 23b750f0, item 5).
+ */
 const replaceRebaseValue = (
   at: RebaseValue,
   keys: readonly string[],
-  next: RebaseValue
+  next: RebaseValue,
+  successor?: string
 ): RebaseValue => {
   if (keys.length === 0) return next;
   const [key, ...rest] = keys;
-  const container: Record<string, unknown> =
-    at.present && isRebaseRecord(at.value) ? { ...at.value } : {};
+  const source: Record<string, unknown> =
+    at.present && isRebaseRecord(at.value) ? at.value : {};
+  const had = Object.prototype.hasOwnProperty.call(source, key);
   const child = replaceRebaseValue(
-    Object.prototype.hasOwnProperty.call(container, key)
-      ? { value: container[key], present: true }
-      : ABSENT,
+    had ? { value: source[key], present: true } : ABSENT,
     rest,
-    next
+    next,
+    successor
   );
-  // An own data property even for the key '__proto__': assignment would set
-  // the prototype instead (re-review of 23b750f0, item 5).
-  if (child.present) {
-    Object.defineProperty(container, key, {
-      value: child.value,
-      enumerable: true,
-      writable: true,
-      configurable: true,
-    });
-  } else delete container[key];
+  const anchor =
+    child.present &&
+    !had &&
+    rest.length === 0 &&
+    successor !== undefined &&
+    Object.prototype.hasOwnProperty.call(source, successor)
+      ? successor
+      : undefined;
+  const container: Record<string, unknown> = {};
+  for (const existing of Object.keys(source)) {
+    if (existing === anchor) defineOwn(container, key, child.value);
+    if (existing === key) {
+      if (child.present) defineOwn(container, key, child.value);
+      continue;
+    }
+    defineOwn(container, existing, source[existing]);
+  }
+  if (child.present && !had && anchor === undefined) {
+    defineOwn(container, key, child.value);
+  }
   return { value: container, present: true };
 };
 
@@ -558,6 +594,9 @@ export function rebaseOntoRejection(
         ...address,
         before: { value: effect.before, present: presenceOf(effect, 'before') },
         after: { value: effect.after, present: presenceOf(effect, 'after') },
+        ...(effect.fieldPresence?.successor === undefined
+          ? {}
+          : { successor: effect.fieldPresence.successor }),
       });
     }
   }
@@ -572,12 +611,12 @@ export function rebaseOntoRejection(
   // 10k-key record). `seq` keeps the rejected turn's chronology for atoms one
   // claim consumes together: later writes are undone first.
   type TrieNode = {
-    atoms: Array<RebaseAtom & { seq: number }>;
+    atoms: Array<RebaseAtom & { seq: number; span: number }>;
     children: Map<string, TrieNode>;
   };
   const roots = new Map<string, TrieNode>();
   const createNode = (): TrieNode => ({ atoms: [], children: new Map() });
-  const insertAtom = (atom: RebaseAtom & { seq: number }): void => {
+  const insertAtom = (atom: RebaseAtom & { seq: number; span: number }): void => {
     let node: TrieNode | undefined = roots.get(atom.scope);
     if (!node) {
       node = createNode();
@@ -593,7 +632,7 @@ export function rebaseOntoRejection(
     }
     node.atoms.push(atom);
   };
-  atoms.forEach((atom, seq) => insertAtom({ ...atom, seq }));
+  atoms.forEach((atom, seq) => insertAtom({ ...atom, seq, span: 1 }));
 
   // Defence in depth: never write back a renamed-away key that a DIFFERENT
   // lifetime holds in a later record. The rollback planner refuses that shape
@@ -637,28 +676,37 @@ export function rebaseOntoRejection(
 
   /** Split an atom one level, or undefined when its values are not records. */
   const refine = (
-    atom: RebaseAtom & { seq: number }
-  ): Array<RebaseAtom & { seq: number }> | undefined => {
+    atom: RebaseAtom & { seq: number; span: number }
+  ): Array<RebaseAtom & { seq: number; span: number }> | undefined => {
     const sides = [atom.before, atom.after].map((side) =>
       !side.present ? {} : isRebaseRecord(side.value) ? side.value : undefined
     );
     if (sides[0] === undefined || sides[1] === undefined) return undefined;
-    const children: Array<RebaseAtom & { seq: number }> = [];
-    for (const key of new Set([
-      ...Object.keys(sides[0]),
-      ...Object.keys(sides[1]),
-    ])) {
+    const children: Array<RebaseAtom & { seq: number; span: number }> = [];
+    const beforeKeys = Object.keys(sides[0]);
+    const kept = sides[1];
+    const positions = new Map(beforeKeys.map((name, at) => [name, at]));
+    const keys = [...new Set([...beforeKeys, ...Object.keys(kept)])];
+    keys.forEach((key, index) => {
       const before = navigateRebaseValue(atom.before, [key]);
       const after = navigateRebaseValue(atom.after, [key]);
-      if (sameRebaseValue(before, after)) continue;
+      if (sameRebaseValue(before, after)) return;
+      const at = positions.get(key);
+      const successor =
+        before.present && !after.present && at !== undefined
+          ? beforeKeys[at + 1]
+          : undefined;
       children.push({
         scope: atom.scope,
         segments: [...atom.segments, key],
         before,
         after,
-        seq: atom.seq,
+        // Within the parent's slot, in key order: re-adds run last key first.
+        seq: atom.seq + ((index + 1) * atom.span) / (keys.length + 1),
+        span: atom.span / (keys.length + 1),
+        ...(successor === undefined ? {} : { successor }),
       });
-    }
+    });
     return children;
   };
 
@@ -667,11 +715,7 @@ export function rebaseOntoRejection(
     let node = roots.get(address.scope);
     // An atom ABOVE this address covers it only in part: split it down so the
     // rest stays claimable by later records.
-    for (
-      let depth = 0;
-      node && depth < address.segments.length;
-      depth += 1
-    ) {
+    for (let depth = 0; node && depth < address.segments.length; depth += 1) {
       if (node.atoms.length > 0) {
         const above = node.atoms;
         node.atoms = [];
@@ -691,7 +735,7 @@ export function rebaseOntoRejection(
     }
     if (!node) return current;
     // Every atom AT or BELOW the address: this record claims them all.
-    const below: Array<RebaseAtom & { seq: number }> = [];
+    const below: Array<RebaseAtom & { seq: number; span: number }> = [];
     const pending = [node];
     while (pending.length > 0) {
       const next = pending.pop() as TrieNode;
@@ -704,7 +748,12 @@ export function rebaseOntoRejection(
     for (const atom of below) {
       const rest = atom.segments.slice(address.segments.length);
       if (sameRebaseValue(navigateRebaseValue(current, rest), atom.after)) {
-        current = replaceRebaseValue(current, rest, atom.before);
+        current = replaceRebaseValue(
+          current,
+          rest,
+          atom.before,
+          atom.successor
+        );
       }
     }
     return current;
@@ -4160,11 +4209,22 @@ export function restoration(
         if (existing.kind === 'set' && effect.kind === 'set') {
           if (!composePlainBranchMemberEffect(existing, effect)) {
             existing.after = effect.after;
-            // First presence before, latest presence after.
+            // First presence before, latest presence after; the successor of
+            // the first drop (the pre-turn order).
             const before = existing.fieldPresence?.before ?? true;
             const after = effect.fieldPresence?.after ?? true;
+            const successor =
+              existing.fieldPresence?.successor ??
+              effect.fieldPresence?.successor;
             if (before && after) delete existing.fieldPresence;
-            else existing.fieldPresence = { before, after };
+            else
+              existing.fieldPresence = {
+                before,
+                after,
+                ...(before && !after && successor !== undefined
+                  ? { successor }
+                  : {}),
+              };
           }
           existing.mutationIntent = combineScalarMutationIntent(
             existing.mutationIntent,
@@ -4288,7 +4348,15 @@ export function restoration(
         }
 
         if (isPlainRecord(before) && isPlainRecord(after)) {
-          const keys = new Set([...Object.keys(before), ...Object.keys(after)]);
+          const beforeKeys = Object.keys(before);
+          const keys = new Set([...beforeKeys, ...Object.keys(after)]);
+          // The key right after a dropped one, in the pre-write order.
+          let positions: Map<string, number> | undefined;
+          const successorOf = (dropped: string): string | undefined => {
+            positions ??= new Map(beforeKeys.map((name, at) => [name, at]));
+            const at = positions.get(dropped);
+            return at === undefined ? undefined : beforeKeys[at + 1];
+          };
           for (const key of keys) {
             const beforeChild = before[key];
             const afterChild = after[key];
@@ -4299,6 +4367,8 @@ export function restoration(
             if (beforeChild === afterChild && beforePresent === afterPresent) {
               continue;
             }
+            const successor =
+              beforePresent && !afterPresent ? successorOf(key) : undefined;
             enqueueScalarDiff(
               `${diffPath}.${key}`,
               beforeChild,
@@ -4307,6 +4377,7 @@ export function restoration(
               {
                 before: beforePresent,
                 after: afterPresent,
+                ...(successor === undefined ? {} : { successor }),
               }
             );
           }

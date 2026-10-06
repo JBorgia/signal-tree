@@ -255,6 +255,53 @@ describe('rebaseOntoRejection', () => {
     });
   });
 
+  describe('key order', () => {
+    it('re-adds dropped fields in the pre-write order, adjacent drops included', () => {
+      const [[effect]] = rebase(
+        [
+          row(1, ['m'], 1, undefined, {
+            before: true,
+            after: false,
+            successor: 'nest',
+          } as never),
+          row(1, ['nest'], { x: 1 }, undefined, { before: true, after: false }),
+        ],
+        [remove(1, { id: 'k1', n: 1, z: 0 })]
+      );
+      const value = (effect as { value: Record<string, unknown> }).value;
+      expect(Object.keys(value)).toStrictEqual(['id', 'n', 'z', 'm', 'nest']);
+    });
+
+    it('a dropped field goes back before its successor when that is present', () => {
+      const [[effect]] = rebase(
+        [
+          row(1, ['m'], 1, undefined, {
+            before: true,
+            after: false,
+            successor: 'z',
+          } as never),
+        ],
+        [remove(1, { id: 'k1', n: 1, z: 0 })]
+      );
+      const value = (effect as { value: Record<string, unknown> }).value;
+      expect(Object.keys(value)).toStrictEqual(['id', 'n', 'm', 'z']);
+    });
+
+    it('a split record write re-adds its dropped keys in the pre-write order', () => {
+      // A later write inside the record splits the rejected record write
+      // first; the removal snapshot then re-adds its dropped keys.
+      const [, [effect]] = rebase(
+        [row(1, ['nest'], { a: 1, b: 2, c: 3 }, { c: 3 })],
+        [row(1, ['nest', 'c'], 3, 4)],
+        [remove(1, { id: 'k1', nest: { c: 4 } })]
+      );
+      const value = (effect as { value: { nest: Record<string, unknown> } })
+        .value;
+      expect(value.nest).toStrictEqual({ a: 1, b: 2, c: 4 });
+      expect(Object.keys(value.nest)).toStrictEqual(['a', 'b', 'c']);
+    });
+  });
+
   describe('row renames', () => {
     it('never writes back a key a different lifetime holds in a later record', () => {
       const occupier: Effect = { ...add(5), key: 'a' } as Effect;
