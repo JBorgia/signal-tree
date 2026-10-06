@@ -1167,9 +1167,13 @@ export function createEntitySignal<
   let appendedAdds: PendingAddStructuralEffect[] = [];
 
   /** Whether an order delta has a consumer (a history or transaction capture). */
+  // publishCollectionOrder() returns at once while no capture is active, so
+  // skip the O(n) order comparison callers would hand it (123fd318).
   function orderConsumed(): boolean {
     return (
-      positionId !== undefined && !!mutationCaptureRuntime?.publishCollectionOrder
+      positionId !== undefined &&
+      !!mutationCaptureRuntime?.publishCollectionOrder &&
+      mutationCaptureRuntime.isCaptureActive()
     );
   }
 
