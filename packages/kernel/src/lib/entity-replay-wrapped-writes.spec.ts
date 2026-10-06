@@ -5,6 +5,7 @@ import { undoable } from './undoable';
 import { transactions } from '../enhancers/transactions/transactions';
 import { restoration } from '../enhancers/restoration/restoration';
 import { batching } from '../enhancers/batching/batching';
+import { isRecordedReplayWrite } from './write-context';
 
 /**
  * A write a tap makes during a replay is intercepted however the tap wraps it
@@ -198,6 +199,61 @@ describe('a genuine replay started from a callback inside a wrapper', () => {
       await flush();
       expect(tree.$.rows.byId('a')?.()).toStrictEqual({ id: 'a', n: 1 });
       expect(calls).toStrictEqual(['log:add:trigger']);
+    } finally {
+      tree.destroy();
+    }
+  });
+});
+
+/** Round-3 probes A1 and A2: the count survives a throwing tap; an await leaves it. */
+describe('the user-callback count at the edges', () => {
+  it('a tap that throws during undo leaves no replay behind', async () => {
+    const tree = make([restoration()]);
+    try {
+      await seed(tree);
+      let boom = false;
+      tree.$.rows.tap({
+        onRemove: () => {
+          if (boom) throw new Error('tap failed');
+        },
+      });
+      const calls = intercept(tree);
+      undoable(() => tree.$.rows.addOne({ id: 'b', n: 2 }));
+      await flush();
+      boom = true;
+      expect(() => tree.undo()).toThrow('tap failed');
+      boom = false;
+      await flush();
+      expect(isRecordedReplayWrite()).toBe(false);
+      calls.length = 0;
+      tree.$.rows.addOne({ id: 'c', n: 3 });
+      expect(calls).toStrictEqual(['rows:add:c']);
+      expect(tree.$.rows.byId('c')?.()).toStrictEqual({ id: 'c', n: 3, p: 9 });
+    } finally {
+      tree.destroy();
+    }
+  });
+
+  it('a write an async tap makes after an await is intercepted', async () => {
+    const tree = make([restoration()]);
+    try {
+      await seed(tree);
+      const calls = intercept(tree);
+      let armed = false;
+      tree.$.rows.tap({
+        onRemove: async () => {
+          await Promise.resolve();
+          if (armed) tree.$.log.addOne({ id: 'async', n: 1 });
+        },
+      });
+      undoable(() => tree.$.rows.addOne({ id: 'b', n: 2 }));
+      await flush();
+      calls.length = 0;
+      armed = true;
+      tree.undo();
+      await flush();
+      expect(calls).toStrictEqual(['log:add:async']);
+      expect(tree.$.log.byId('async')?.()).toStrictEqual({ id: 'async', n: 1, p: 9 });
     } finally {
       tree.destroy();
     }
