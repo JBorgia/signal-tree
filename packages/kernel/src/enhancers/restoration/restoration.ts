@@ -4608,6 +4608,18 @@ export function restoration(
       number,
       PendingRestorationFootprint[]
     >();
+    /** The address `observePendingEntities` dedupes footprints by. */
+    const footprintKey = (footprint: PendingRestorationFootprint): string =>
+      JSON.stringify([
+        footprint.position,
+        footprint.subject ?? null,
+        footprint.structural,
+        footprint.fieldSegments ?? null,
+      ]);
+    const footprintKeys = new WeakMap<
+      PendingRestorationFootprint[],
+      Set<string>
+    >();
     const restorationFootprint = (
       effect: TurnEffect
     ): PendingRestorationFootprint => ({
@@ -5511,29 +5523,25 @@ export function restoration(
         const touches = pendingRestorationFootprints.get(transactionId) ?? [];
         for (const change of capture.changes) {
           const add = (fieldSegments?: readonly string[]): void => {
-            if (
-              touches.some(
-                (touch) =>
-                  touch.position === capture.owner &&
-                  touch.subject === change.subject &&
-                  touch.structural === change.structural &&
-                  (touch.fieldSegments === fieldSegments ||
-                    (touch.fieldSegments &&
-                      fieldSegments &&
-                      touch.fieldSegments.length === fieldSegments.length &&
-                      touch.fieldSegments.every(
-                        (key, index) => key === fieldSegments[index]
-                      )))
-              )
-            )
-              return;
-            touches.push({
+            // Indexed: a scan of every earlier touch per committed change
+            // made a transaction quadratic in its rows (order-delta review,
+            // item 7: 32k rows added and removed took 6.4 s, 16k 1.2 s).
+            let keys = footprintKeys.get(touches);
+            if (!keys) {
+              keys = new Set(touches.map(footprintKey));
+              footprintKeys.set(touches, keys);
+            }
+            const touch = {
               position: capture.owner,
               path: capture.ownerPath,
               subject: change.subject,
               fieldSegments,
               structural: change.structural,
-            });
+            };
+            const key = footprintKey(touch);
+            if (keys.has(key)) return;
+            keys.add(key);
+            touches.push(touch);
           };
           const visit = (
             before: unknown,
