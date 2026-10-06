@@ -305,6 +305,31 @@ describe('rebaseOntoRejection', () => {
     });
   });
 
+  describe('own keys', () => {
+    it("re-adds a dropped field literally named '__proto__' as an own key", () => {
+      // The rejected turn dropped an object-valued field named '__proto__';
+      // re-adding it by assignment would set the prototype instead.
+      const dropped = { x: 1 };
+      const [[effect]] = rebase(
+        [
+          row(1, ['__proto__'], dropped, undefined, {
+            before: true,
+            after: false,
+          }),
+        ],
+        [remove(1, { id: 'k1', n: 1 })]
+      );
+      const value = (effect as { value: Record<string, unknown> }).value;
+      expect(Object.getPrototypeOf(value)).toBe(Object.prototype);
+      expect(Object.prototype.hasOwnProperty.call(value, '__proto__')).toBe(
+        true
+      );
+      expect(Object.getOwnPropertyDescriptor(value, '__proto__')?.value).toBe(
+        dropped
+      );
+    });
+  });
+
   // Not wall-clock guards in spirit: the bounds are ~50x the measured time
   // and well under what the quadratic scan took at these sizes (seconds).
   describe('scale', () => {
