@@ -100,13 +100,14 @@ export interface ConfirmedTurnSnapshot {
  */
 export class StudioTreeDestroyedError extends Error {
   readonly code = 'STUDIO_TREE_DESTROYED';
-  constructor() {
-    super(
-      'STUDIO_TREE_DESTROYED: this tree was destroyed; its retained ' +
-        'transaction history is no longer readable. Empty history and a ' +
-        'destroyed tree are different facts, so this refuses rather than ' +
-        'returning an empty snapshot.'
-    );
+  /** `message` names the refused operation; readers keep the default. */
+  constructor(
+    message = 'STUDIO_TREE_DESTROYED: this tree was destroyed; its retained ' +
+      'transaction history is no longer readable. Empty history and a ' +
+      'destroyed tree are different facts, so this refuses rather than ' +
+      'returning an empty snapshot.'
+  ) {
+    super(message);
     this.name = 'StudioTreeDestroyedError';
   }
 }

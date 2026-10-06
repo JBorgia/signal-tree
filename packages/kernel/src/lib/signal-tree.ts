@@ -1834,8 +1834,10 @@ function create<T extends object>(
     value: function (): void {
       if (destroyedSig()) return; // Already destroyed
       replaceLocation(destroyedSig, true);
-      // Links first, exactly as their own dispose() (15.4.4): no Link reacts to
-      // the teardown below, and every settled() waiter is released.
+      // Closed first, so link() refuses from here on; then Links, exactly as
+      // their own dispose() (15.4.4): no Link reacts to the teardown below,
+      // and every settled() waiter is released.
+      materializationContext.positionRegistry.closed = true;
       materializationContext.positionRegistry.close?.();
       terminateOwnerInvalidation(tree as object);
       // Run registered cleanup functions (enhancers, subscriptions, etc.)
