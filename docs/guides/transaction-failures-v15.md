@@ -152,9 +152,11 @@ failure.
 
 ## Link failures found later
 
-These were present in published 15.3.1 but are not in its changelog. They were
-found while auditing the 15.4 line, were still present in 15.4.3, and are
-repaired in 15.4.4.
+These are not in the 15.3.1 changelog. They were found while auditing the 15.4
+line, were still present in 15.4.3, and are repaired in 15.4.4. The reorder and
+`destroy()` failures were already present in published 15.3.1 (where restored
+rows did not reach Link at all; see above); the others were reproduced on the
+15.4 line.
 
 - **Reordering surviving rows never reached Link.** After `setAll([D,C,B,A])`
   over `[A,B,C,D]`, or a `prependMany()`, the tree held the new order while a
@@ -176,8 +178,21 @@ repaired in 15.4.4.
   disposes every Link bound to the tree exactly as `dispose()` does: waiters are
   released, held and queued sends are dropped, and each endpoint cleanup runs
   once. A cleanup that throws no longer escapes `destroy()`; calling
-  `dispose()` directly still throws it. A Link created after `destroy()` is not
-  disposed by it.
+  `dispose()` directly still throws it. `link()` on a tree that is already
+  destroyed throws `StudioTreeDestroyedError`, as v15's tooling readers do,
+  instead of creating a relationship that can never send.
+- **A `sortComparer` collection reached Link in storage order.** A collection
+  endpoint receives exactly `all()`, but with `entityMap({ sortComparer })` it
+  received insertion order, and editing the sort field never moved the row. It
+  now receives the comparer's order, computed from the values Link may publish,
+  so a devtools edit of a sort field moves nothing outward.
+- **`settled()` could resolve while a reactive write was still queued.** When a
+  notifier subscriber wrote the linked location in response to another write
+  (one hop or more), or a write was authored after `settled()` in the same
+  synchronous turn, `settled()` resolved before that write's send started. It
+  now also waits until no notification is queued anywhere, so a hop through
+  another tree counts. Another relationship's endpoint work is still not part
+  of this relationship's `settled()`.
 
 ## Evidence
 
@@ -189,8 +204,10 @@ repaired in 15.4.4.
   cover the candidate's notification repairs; they do not establish blanket
   framework-effect containment or repair the limitations listed above.
 - [Link restore placement](../../packages/kernel/src/lib/link-restore-placement.spec.ts),
-  [Link collection reorder](../../packages/kernel/src/lib/link-collection-reorder.spec.ts)
-  and [Link tree destroy](../../packages/kernel/src/lib/link-tree-destroy.spec.ts)
+  [Link collection reorder](../../packages/kernel/src/lib/link-collection-reorder.spec.ts),
+  [sortComparer order](../../packages/kernel/src/lib/link-collection-sort-comparer.spec.ts),
+  [Link tree destroy](../../packages/kernel/src/lib/link-tree-destroy.spec.ts)
+  and [reactive settlement](../../packages/kernel/src/lib/link-reactive-settlement.spec.ts)
   tests pin the 15.4.4 repairs of the later-found Link failures.
 
 - [Packed refusal lifecycle comparison](../../tools/check-v15-refusal-lifecycle.mjs)

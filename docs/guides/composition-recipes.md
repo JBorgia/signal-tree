@@ -602,13 +602,20 @@ connection.dispose();
 
 Since 15.4.4, `tree.destroy()` also disposes every Link bound to that tree,
 releasing `settled()` waiters and running each endpoint's `subscribe()`
-cleanup once. On earlier versions, dispose each connection before destroying
-its tree.
+cleanup once, and `link()` on an already destroyed tree throws
+`StudioTreeDestroyedError`. On earlier versions, dispose each connection before
+destroying its tree.
 
-For a collection, `set` always receives the complete `Row[]` in the tree's
-order. Since 15.4.4 that includes order-only changes (a `setAll()` reorder, a
-prepend, and their undo, redo or rollback) and rows restored or added ahead of
-their neighbours; earlier versions could leave the endpoint in another order.
+For a collection, `set` receives exactly what `all()` returns: the complete
+`Row[]`, in the collection's `sortComparer` order when it has one. Since 15.4.4
+that includes order-only changes (a `setAll()` reorder, a prepend, and their
+undo, redo or rollback) and rows restored or added ahead of their neighbours;
+earlier versions could leave the endpoint in another order, and ignored the
+comparer.
+
+`settled()` also waits for sends caused by writes still queued for delivery,
+such as a subscriber that writes the linked location in response to another
+write (15.4.4). It does not wait for another relationship's endpoint call.
 
 Supply only the directions you need — `loader`-shaped persistent polling is
 `get` alone; a read-only live feed is `subscribe` alone; two-way sync uses
