@@ -55,15 +55,26 @@ known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
   and unchanged: the row is removed or updated once and announced once (a
   repeat does not throw as a second `removeOne` would), while every listing is
   still intercepted and tapped. Now documented and carried.
-- An interceptor of `addOne`, `addMany` or `upsertMany` that writes to the
-  same collection no longer leaves the call's anchor stale: a row it appended
-  is no longer skipped over on redo, and a last row it removed no longer comes
-  back as an empty member (`ids()` listed it with no value).
 - Taps of `prependMany` and `prependOne` run after the rows have moved to the
   front, so a tap sees the call's result and its own writes are reversible: a
   row it adds is anchored to the committed order (redo misplaced it, and a
   nested `prependMany` made redo throw). A row a tap prepends now lands ahead
   of the call's rows rather than behind them.
+- Undo, redo, `jumpTo()` and rollback no longer run a collection's
+  interceptors. They restore exactly the recorded value or pre-image: a
+  transforming `onUpdate` re-transformed it (an undone `{ n: 1 }` came back
+  with the transform applied) and a blocking interceptor made the reversal
+  throw, as on 15.4.3. Taps and subscribers are still notified.
+- `addOne`, `addMany`, `prependOne`, `prependMany` and `upsertMany` throw
+  `Cannot <method>: collection topology changed during staging` before writing
+  when one of their interceptors or id selectors changed the same
+  collection's membership or order, or the key of a row the call names - the
+  rule `setAll` has applied since 15.4.0. Such a call used to write a stale
+  plan: two rows under one key, a lost overwrite (`addMany` with `overwrite`
+  returned the id while the row stayed removed), a removed last row
+  resurrected as an empty member, or a row the interceptor added misplaced on
+  redo. `upsertMany` merges an updated row over its value as its interceptors
+  left it.
 - Rollback of a transaction that edited an existing row no longer refuses
   after settled later work removed that row (even a plain `removeOne`): the
   row's compensation is skipped, the rest reverses, the row stays absent. An
