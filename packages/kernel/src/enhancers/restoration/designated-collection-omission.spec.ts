@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   entityMap,
+  external,
   restoration,
   signalTree,
   transactions,
@@ -476,4 +477,52 @@ describe('rollback of a collection omission', () => {
       // "Nothing a rejected transaction wrote can come back later" (8c).
       expect(tree.$()).toEqual(withRows);
     });
+});
+
+describe('external omission of a collection refuses, named, nothing changed (v16 8e)', () => {
+  // The rows the collection physically holds, whatever its presence.
+  const physical = (rows: Rows): unknown =>
+    (
+      rows as unknown as {
+        __prepareTransitionTarget: {
+          readSource(): { subjects: readonly { value: unknown }[] };
+        };
+      }
+    ).__prepareTransitionTarget
+      .readSource()
+      .subjects.map(({ value }) => value);
+  const ST1034 =
+    /^ST1034: restoration refused — 'g\.rows' was omitted by external truth after the operation being reversed, and '(g\.rows\.[^']+)' lies under it; restoring '\1' would overwrite that omission\. Nothing was changed; the history position is unmoved\.$/;
+
+  for (const [order, enhancers] of Object.entries(historyOrders))
+    for (const operation of ['undo', 'redo', 'jumpTo'] as const)
+      it(`${operation} (${order})`, async () => {
+        const tree = build(enhancers());
+        await flush();
+        const rows = tree.$.g.rows;
+        undoable(() => tree.$.count(5));
+        await flush();
+        undoable(() => rows.updateOne('a', { n: 1 }));
+        await flush();
+        if (operation === 'redo') {
+          tree.undo();
+          await flush();
+        }
+        external(() => tree.$.g({ k: 0 }));
+        await flush();
+        const state = tree.$();
+        const held = physical(rows);
+        const index = tree.getCurrentIndex();
+        let message = '';
+        try {
+          if (operation === 'jumpTo') tree.jumpTo(0);
+          else tree[operation]();
+        } catch (error) {
+          message = (error as Error).message;
+        }
+        expect(message).toMatch(ST1034);
+        expect(tree.$()).toEqual(state);
+        expect(physical(rows)).toEqual(held);
+        expect(tree.getCurrentIndex()).toBe(index);
+      });
 });
