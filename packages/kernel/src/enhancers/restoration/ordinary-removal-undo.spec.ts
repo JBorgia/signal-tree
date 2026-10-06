@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { link } from '../../lib/link';
 import { entityMap } from '../../lib/markers/entity-map';
+import { getPathNotifier } from '../../lib/path-notifier';
 import { signalTree } from '../../lib/signal-tree';
 import { restorationReader } from '../../lib/internals/restoration-reader';
 import { SignalTreeRollbackError } from '../../lib/types';
@@ -40,10 +42,92 @@ import { restoration } from './restoration';
  * way, an older one renamed onto it included, and the refusal says "another
  * row" (undo-rules review item 3; ordinary-removal-provenance.spec.ts, which
  * also carries which removals count as ordinary).
+ *
+ * Every shape is also read from outside the tree (undo-rules review, item 2):
+ * a linked endpoint receives exactly `all()` after each step, taps fire for
+ * the rows each step adds, removes or changes (and for nothing else), and
+ * every path notification for a row carries the whole row. A row put back
+ * together with a field write (the (i) re-add, and undo of an edit-then-remove
+ * turn on 15.4.3 already) reached Link as the field's bare value: the
+ * realization published the re-added row and then the field on its own path.
  */
 type Row = { id: string; n: number };
 const flush = async () => {
   for (let i = 0; i < 12; i++) await Promise.resolve();
+};
+
+type Keyed = { id: string };
+/**
+ * Link, taps and path subscribers on a tree's `rows`, checked step by step:
+ * the endpoint holds `all()`, the taps are the row-level difference, and each
+ * row notification is the whole row (or its removal).
+ */
+const observeRows = (tree: {
+  $: {
+    rows: {
+      all(): readonly Keyed[];
+      tap(handlers: {
+        onAdd?: (row: Keyed, id: string) => void;
+        onUpdate?: (id: string) => void;
+        onRemove?: (id: string) => void;
+      }): () => void;
+    };
+  };
+}) => {
+  const sent: unknown[] = [];
+  const connection = link(tree.$.rows as never, {
+    set: (value: unknown) => void sent.push(value),
+  });
+  let taps: string[] = [];
+  const stopTaps = tree.$.rows.tap({
+    onAdd: (_row, id) => taps.push(`add ${id}`),
+    onUpdate: (id) => taps.push(`update ${id}`),
+    onRemove: (id) => taps.push(`remove ${id}`),
+  });
+  let paths: Array<[string, unknown]> = [];
+  const stopPaths = getPathNotifier().subscribe('**', (next, _prev, path) => {
+    if (path.startsWith('rows.')) paths.push([path, next]);
+  });
+  const rows = () =>
+    new Map(
+      tree.$.rows.all().map((row) => [row.id, JSON.stringify(row)] as const)
+    );
+  let before = rows();
+  const initial = [...tree.$.rows.all()];
+  return {
+    /** Run one step and check what the outside saw. */
+    async step(run: () => void) {
+      taps = [];
+      paths = [];
+      run();
+      await flush();
+      await connection.settled();
+      const after = rows();
+      // Link sends only what changed since it was created.
+      expect(sent.length ? sent.at(-1) : initial).toStrictEqual(
+        tree.$.rows.all()
+      );
+      const expected: string[] = [];
+      for (const [id, value] of after) {
+        if (!before.has(id)) expected.push(`add ${id}`);
+        else if (before.get(id) !== value) expected.push(`update ${id}`);
+      }
+      for (const id of before.keys())
+        if (!after.has(id)) expected.push(`remove ${id}`);
+      expect([...taps].sort()).toStrictEqual(expected.sort());
+      for (const [path, next] of paths) {
+        const [, key, ...field] = path.split('.');
+        expect(field, `${path} carries a field, not the row`).toStrictEqual([]);
+        if (next !== undefined) expect((next as Keyed).id).toBe(key);
+      }
+      before = after;
+    },
+    stop() {
+      stopPaths();
+      stopTaps();
+      connection.dispose();
+    },
+  };
 };
 const declaration = () => ({
   x: 0,
@@ -144,19 +228,18 @@ describe.each(configurations)(
         await flush();
         shape.later(tree);
         await flush();
+        const outside = observeRows(tree);
         const seen = [read(tree)];
-        tree.undo();
-        await flush();
+        await outside.step(() => tree.undo());
         expect(() => tree.getRestorationHistory()).not.toThrow();
         seen.push(read(tree));
         expect(tree.canUndo()).toBe(false);
-        tree.redo();
-        await flush();
+        await outside.step(() => tree.redo());
         seen.push(read(tree));
-        tree.undo();
-        await flush();
+        await outside.step(() => tree.undo());
         seen.push(read(tree));
         expect(seen).toStrictEqual(shape.states);
+        outside.stop();
       } finally {
         tree.destroy();
       }
@@ -275,14 +358,15 @@ describe.each(configurations)(
         await flush();
         shape.later(tree);
         await flush();
+        const outside = observeRows(tree);
         const seen = [readEdited(tree)];
         for (const step of ['undo', 'redo', 'undo'] as const) {
-          tree[step]();
-          await flush();
+          await outside.step(() => tree[step]());
           expect(() => tree.getRestorationHistory()).not.toThrow();
           seen.push(readEdited(tree));
         }
         expect(seen).toStrictEqual(shape.states);
+        outside.stop();
       } finally {
         tree.destroy();
       }
@@ -302,9 +386,10 @@ describe.each(configurations)(
         tree.$.rows.updateOne('a', { m: 7 });
         tree.$.rows.removeOne('a');
         await flush();
-        tree.redo();
-        await flush();
+        const outside = observeRows(tree);
+        await outside.step(() => tree.redo());
         expect(readEdited(tree)).toBe('z0.0,a5.7,c3.3');
+        outside.stop();
       } finally {
         tree.destroy();
       }
