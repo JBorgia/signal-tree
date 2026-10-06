@@ -255,6 +255,11 @@ type DirectedTurnApplication = {
   readonly effects: TurnEffect[];
   readonly orderDeltas: CollectionOrderDelta[];
   readonly direction: 'undo' | 'redo';
+  /**
+   * Per effect, the ordinal of its turn among all the turns being applied;
+   * present only when they are more than one (`ReversalEffect.turn`).
+   */
+  readonly turns?: number[];
 };
 
 type TreeRealizationDescriptorStore = Map<
@@ -2115,6 +2120,8 @@ class RestorationManager<TSource, T> {
 
     const effects: TurnEffect[] = [];
     const orderDeltas: CollectionOrderDelta[] = [];
+    const turns: number[] = [];
+    let ordinal = 0;
     for (const turnId of turnIds) {
       recordProductionSubstrateStat('turnIndexLookups');
       const turn = this.turns.get(turnId);
@@ -2136,6 +2143,8 @@ class RestorationManager<TSource, T> {
       } else {
         appendAll(effects, turnEffects);
       }
+      for (let i = 0; i < turnEffects.length; i++) turns.push(ordinal);
+      ordinal++;
     }
 
     for (const effect of effects) {
@@ -2151,7 +2160,14 @@ class RestorationManager<TSource, T> {
     const recordApplied = this.recordAppliedEntries(turnIds);
     const applyEffects = this.applyEffectsFn;
     this.applyReversal(() =>
-      applyEffects([{ effects, direction, orderDeltas }])
+      applyEffects([
+        {
+          effects,
+          direction,
+          orderDeltas,
+          ...(ordinal > 1 ? { turns } : {}),
+        },
+      ])
     );
     recordApplied();
   }
@@ -2163,7 +2179,11 @@ class RestorationManager<TSource, T> {
     if (!this.applyEffectsFn) {
       return;
     }
-    const applications: DirectedTurnApplication[] = [];
+    const applications: Array<DirectedTurnApplication & { turns: number[] }> =
+      [];
+    // A jump concatenates every turn it crosses; each effect keeps its turn's
+    // ordinal, counted across both directions (`ReversalEffect.turn`).
+    let ordinal = 0;
     for (const [turnIds, direction] of [
       [turnIdsToUndo, 'undo'],
       [turnIdsToRedo, 'redo'],
@@ -2173,6 +2193,7 @@ class RestorationManager<TSource, T> {
       }
       const effects: TurnEffect[] = [];
       const orderDeltas: CollectionOrderDelta[] = [];
+      const turns: number[] = [];
       for (const turnId of turnIds) {
         recordProductionSubstrateStat('turnIndexLookups');
         const turn = this.turns.get(turnId);
@@ -2186,12 +2207,16 @@ class RestorationManager<TSource, T> {
         } else {
           appendAll(effects, turnEffects);
         }
+        for (let i = 0; i < turnEffects.length; i++) turns.push(ordinal);
+        ordinal++;
         orderDeltas.push(
           ...(turn.__orderDeltas ?? []).map(cloneCollectionOrderDelta)
         );
       }
-      applications.push({ effects, orderDeltas, direction });
+      applications.push({ effects, orderDeltas, direction, turns });
     }
+    if (ordinal <= 1)
+      for (const application of applications) application.turns.length = 0;
     if (applications.length > 0) {
       const recordApplied = this.recordAppliedEntries([
         ...turnIdsToUndo,
@@ -2634,9 +2659,11 @@ export function restoration(
     ): void => {
       readQueuedExternalAuthority();
       const reversalEffects = applications.flatMap((application) =>
-        application.effects.map((effect) =>
-          toReversalEffect(effect, application.direction)
-        )
+        application.effects.map((effect, index) => {
+          const reversal = toReversalEffect(effect, application.direction);
+          const turn = application.turns?.[index];
+          return turn === undefined ? reversal : { ...reversal, turn };
+        })
       );
       const orderDeltas = applications.flatMap(
         (application) => application.orderDeltas

@@ -674,14 +674,27 @@ export function applyPlainBranchMemberSnapshot<T>(
  * Stage a declarative membership target without calling authored write paths.
  * The transition coordinator owns the physical revision and must install ALL
  * participants before publishing any. A plan is synchronous and single use.
+ *
+ * Targets are staged in map order and a later staging of a location wins.
+ * `staged` reports, for each state location a target's value set, the `turn`
+ * of that target (`ReversalEffect.turn`): a value target from an earlier turn
+ * is superseded there (v16 8g).
  */
 export function preparePlainBranchMembers(
   root: object,
   targets: ReadonlyMap<
     number,
-    { readonly present: boolean; readonly value: unknown }
+    {
+      readonly present: boolean;
+      readonly value: unknown;
+      readonly turn?: number;
+    }
   >
-): { install(): void; publish(): void } {
+): {
+  install(): void;
+  publish(): void;
+  readonly staged: ReadonlyMap<number, number>;
+} {
   const registry = getPositionRegistry(root);
   const runtime = getTreeScalarSlotRuntime(root);
   if (!registry || !runtime)
@@ -696,7 +709,13 @@ export function preparePlainBranchMembers(
   >();
   const values = new Map<
     number,
-    { node: object; position: number; before: unknown; after: unknown }
+    {
+      node: object;
+      position: number;
+      before: unknown;
+      after: unknown;
+      turn: number | undefined;
+    }
   >();
   const resolveSlot = (node: object): { position: number; slot: number } => {
     const position = getOwnedPositionIds(node)?.[0];
@@ -713,7 +732,8 @@ export function preparePlainBranchMembers(
   const stage = (
     address: MemberAddress,
     present: boolean,
-    value: unknown
+    value: unknown,
+    turn: number | undefined
   ): void => {
     const { branch, key, node } = address;
     const descriptor = Object.getOwnPropertyDescriptor(branch, key);
@@ -745,6 +765,7 @@ export function preparePlainBranchMembers(
         position,
         before: values.get(slot)?.before ?? unwrapBranchForWriteCapture(node),
         after: value,
+        turn,
       });
       return;
     }
@@ -779,7 +800,8 @@ export function preparePlainBranchMembers(
       stage(
         { branch: node, key: childKey, node: child },
         childPresent,
-        next?.value
+        next?.value,
+        turn
       );
     }
     if (supplied.size)
@@ -789,8 +811,11 @@ export function preparePlainBranchMembers(
     const address = memberAddress(root, position);
     if (!address)
       throw new Error('Plain branch member location is unavailable');
-    stage(address, target.present, target.value);
+    stage(address, target.present, target.value, target.turn);
   }
+  const staged = new Map<number, number>();
+  for (const { position, turn } of values.values())
+    if (turn !== undefined) staged.set(position, turn);
   const frame = runtime.beginFrame();
   for (const [slot, value] of values) frame.set(slot, value.after);
   let result: ScalarSlotCommitResult | undefined;
@@ -800,6 +825,7 @@ export function preparePlainBranchMembers(
   const changedBranchMembers: MemberAddress[] = [];
   let changes: PlainBranchMembershipChange[] = [];
   return {
+    staged,
     install(): void {
       if (result) return;
       // Revalidate every retained handle before the first physical write.

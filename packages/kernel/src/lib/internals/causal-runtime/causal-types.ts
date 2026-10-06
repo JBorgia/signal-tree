@@ -90,6 +90,15 @@ export interface ReversalEffect {
   readonly structural?: StructuralEffectKind;
   /** Durable structural recipe carried from canonical history into realization. */
   readonly structuralContext?: StructuralEffect;
+  /**
+   * Ordinal of the turn this effect comes from, when one application crosses
+   * several turns (a jump). A turn records one net effect per location, in
+   * first-occurrence order, so effect order is chronological only BETWEEN
+   * turns: a member's value is superseded by a value target of its own turn,
+   * and supersedes a value target of an earlier turn. Absent: a single turn.
+   * (v16 8g.)
+   */
+  readonly turn?: number;
 }
 
 export interface ConfirmedReversalPlan {

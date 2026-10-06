@@ -19,6 +19,8 @@ export type CollectionTransitionTarget = CollectionTransitionSource;
 export type DeclarativeTransitionTarget = {
   readonly collections: ReadonlyMap<PositionId, CollectionTransitionTarget>;
   readonly scalars: ReadonlyMap<PositionId, unknown>;
+  /** The turn of each scalar's last write, when the effects carry turns. */
+  readonly scalarTurns?: ReadonlyMap<PositionId, number>;
   readonly plainBranchMembers?: ReadonlyMap<
     PositionId,
     PlainBranchMemberTransitionTarget
@@ -48,12 +50,17 @@ export type ScalarTransitionTargetBinding = {
 export type PlainBranchMemberTransitionTarget = {
   readonly present: boolean;
   readonly value: unknown;
+  /** `ReversalEffect.turn` of the member's last write. */
+  readonly turn?: number;
 };
 
 export type PlainBranchMemberTransitionTargetBinding = {
   prepareTarget(
     target: ReadonlyMap<PositionId, PlainBranchMemberTransitionTarget>
-  ): PreparedCollectionTransitionTarget;
+  ): PreparedCollectionTransitionTarget & {
+    /** Per state location a member value set, the turn that set it. */
+    readonly staged?: ReadonlyMap<PositionId, number>;
+  };
 };
 
 export function prepareDeclarativeTransitionInstallation(
@@ -63,6 +70,27 @@ export function prepareDeclarativeTransitionInstallation(
   memberBinding?: PlainBranchMemberTransitionTargetBinding
 ): { install(): void } {
   const prepared: PreparedCollectionTransitionTarget[] = [];
+  // ⚠️ MEMBERS FIRST, as the per-effect path installs them
+  // (`applyAtomically`): a member target carries a whole branch value, and
+  // the scalar and collection targets for locations under it are more
+  // specific. Installed after them, a re-added member's value overwrote the
+  // reversal's own scalar targets: a jump back across an omission and a
+  // re-add came back with the omitted turn's values (v16 8g; found by the
+  // v15 port review, j5/j2).
+  let scalars = target.scalars;
+  if (target.plainBranchMembers?.size) {
+    if (!memberBinding)
+      throw new Error(
+        'Declarative transition has member targets but no member binding'
+      );
+    const members = memberBinding.prepareTarget(target.plainBranchMembers);
+    prepared.push(members);
+    scalars = withoutSupersededScalars(
+      target.scalars,
+      target.scalarTurns,
+      members.staged
+    );
+  }
   for (const [owner, collection] of target.collections) {
     const binding = bindings.get(owner);
     if (!binding || binding.owner !== owner) {
@@ -72,22 +100,15 @@ export function prepareDeclarativeTransitionInstallation(
     }
     prepared.push(binding.prepareTarget(collection));
   }
-  if (target.scalars.size > 0) {
+  if (scalars.size > 0) {
     if (!scalarBinding) {
       throw new Error(
         'Declarative transition has scalar targets but no scalar binding'
       );
     }
-    prepared.push(scalarBinding.prepareTarget(target.scalars));
+    prepared.push(scalarBinding.prepareTarget(scalars));
   }
 
-  if (target.plainBranchMembers?.size) {
-    if (!memberBinding)
-      throw new Error(
-        'Declarative transition has member targets but no member binding'
-      );
-    prepared.push(memberBinding.prepareTarget(target.plainBranchMembers));
-  }
   return {
     install(): void {
       for (const collection of prepared) {
@@ -98,6 +119,31 @@ export function prepareDeclarativeTransitionInstallation(
       }
     },
   };
+}
+
+/**
+ * ⚠️ A value target that a LATER turn's member write superseded is not a
+ * target. Members install first, so a scalar target installed after them wins:
+ * right for a value its own turn left there (a turn records one net effect
+ * per location, and a member's value can be older than it), wrong for a value
+ * an earlier turn left, which the later member write replaced. A jump back
+ * past a path re-add came back with the re-added value instead of the one the
+ * omission's reversal restores (v16 8g, generated jump-vs-undo histories).
+ */
+export function withoutSupersededScalars(
+  scalars: ReadonlyMap<PositionId, unknown>,
+  scalarTurns: ReadonlyMap<PositionId, number> | undefined,
+  staged: ReadonlyMap<PositionId, number> | undefined
+): ReadonlyMap<PositionId, unknown> {
+  if (!scalarTurns?.size || !staged?.size) return scalars;
+  let kept: Map<PositionId, unknown> | undefined;
+  for (const [owner, turn] of scalarTurns) {
+    const stagedTurn = staged.get(owner);
+    if (stagedTurn === undefined || stagedTurn <= turn) continue;
+    kept ??= new Map(scalars);
+    kept.delete(owner);
+  }
+  return kept ?? scalars;
 }
 
 export type DeriveDeclarativeTransitionTargetOptions = {
@@ -193,11 +239,22 @@ export function requiresDeclarativeStructuralTarget(
     }
     return false;
   }
-  const addedSubjects = new Map<PositionId, Set<number>>();
+  // ⚠️ PER TURN. Physical placement resolves an addition's anchors as each
+  // addition lands, which holds for the additions one turn recorded together.
+  // A jump crossing turns concatenates them: an anchor another turn added is
+  // not one this placement can rely on, so the complete target decides (a jump
+  // forward over a re-add and a `setAll` came back in the wrong order; v16 8g,
+  // generated jump-vs-redo histories).
+  const addedSubjects = new Map<
+    PositionId,
+    Map<number | undefined, Set<number>>
+  >();
   for (const addition of additions) {
     if (typeof addition.subjectId !== 'number') continue;
-    let subjects = addedSubjects.get(addition.owner);
-    if (!subjects) addedSubjects.set(addition.owner, (subjects = new Set()));
+    let turns = addedSubjects.get(addition.owner);
+    if (!turns) addedSubjects.set(addition.owner, (turns = new Map()));
+    let subjects = turns.get(addition.turn);
+    if (!subjects) turns.set(addition.turn, (subjects = new Set()));
     subjects.add(addition.subjectId);
   }
   return additions.some((effect) => {
@@ -205,7 +262,7 @@ export function requiresDeclarativeStructuralTarget(
     if (context?.kind !== 'add' && context?.kind !== 'remove') {
       return false;
     }
-    const subjects = addedSubjects.get(effect.owner);
+    const subjects = addedSubjects.get(effect.owner)?.get(effect.turn);
     return (
       (context.beforeSubject !== undefined &&
         !subjects?.has(context.beforeSubject)) ||
@@ -244,20 +301,32 @@ export function deriveDeclarativeTransitionTarget(
   }
 
   const scalars = new Map<PositionId, unknown>();
+  const scalarTurns = new Map<PositionId, number>();
   const plainBranchMembers = new Map<
     PositionId,
     PlainBranchMemberTransitionTarget
   >();
   for (const effect of options.effects) {
     if (effect.plainBranchMembership) {
+      // ⚠️ LAST-WRITE ORDER. Members are staged in this map's order, and a
+      // branch member's value decides the presence of every member under it,
+      // so the later staging wins. A Map keeps a key where it was FIRST set:
+      // a jump that hid `h` (reversing a later turn), then re-added `g`
+      // without it, then re-added `h` staged `h` before `g`, and `g` hid it
+      // again (v16 8g, generated jump-vs-undo histories). Re-inserting keeps
+      // the sequence the undo chain applies.
+      plainBranchMembers.delete(effect.owner);
       plainBranchMembers.set(effect.owner, {
         present: effect.plainBranchMembership.after,
         value: effect.after,
+        ...(effect.turn === undefined ? {} : { turn: effect.turn }),
       });
       continue;
     }
     if (effect.structural === undefined) {
       applyValueEffect(collections, scalars, effect);
+      if (typeof effect.subjectId !== 'number' && effect.turn !== undefined)
+        scalarTurns.set(effect.owner, effect.turn);
       continue;
     }
     applyStructuralEffect(collections, effect);
@@ -321,6 +390,7 @@ export function deriveDeclarativeTransitionTarget(
   return {
     collections: targets,
     scalars,
+    ...(scalarTurns.size ? { scalarTurns } : {}),
     ...(plainBranchMembers.size ? { plainBranchMembers } : {}),
   };
 }
@@ -554,6 +624,8 @@ function deriveStructuralTargetOrder(
   subjects: ReadonlyMap<number, CollectionTargetSubject>,
   effects: readonly ReversalEffect[]
 ): number[] {
+  if (effects.some((effect) => effect.turn !== undefined))
+    return replayStructuralOrderByTurn(sourceOrder, subjects, effects);
   const order = sourceOrder.filter((subject) => subjects.has(subject));
   const additions = effects.filter(
     (effect) =>
@@ -561,6 +633,52 @@ function deriveStructuralTargetOrder(
       typeof effect.subjectId === 'number' &&
       subjects.has(effect.subjectId)
   );
+  placeAdditions(order, additions);
+  return order;
+}
+
+/**
+ * ⚠️ A JUMP'S ORDER IS REPLAYED TURN BY TURN. An addition's anchors are its
+ * neighbours when its own turn recorded it; across turns they may be added by
+ * another turn, or removed by a later one. Each turn removes what it removed
+ * and places what it added against the order the earlier turns left, as the
+ * undo and redo chain does; the result keeps the target's subjects (v16 8g).
+ */
+function replayStructuralOrderByTurn(
+  sourceOrder: readonly number[],
+  subjects: ReadonlyMap<number, CollectionTargetSubject>,
+  effects: readonly ReversalEffect[]
+): number[] {
+  const order = [...sourceOrder];
+  const turns = new Map<number | undefined, ReversalEffect[]>();
+  for (const effect of effects) {
+    if (
+      (effect.structural !== 'add' && effect.structural !== 'remove') ||
+      typeof effect.subjectId !== 'number'
+    )
+      continue;
+    let turn = turns.get(effect.turn);
+    if (!turn) turns.set(effect.turn, (turn = []));
+    turn.push(effect);
+  }
+  for (const turn of turns.values()) {
+    for (const effect of turn) {
+      const index = order.indexOf(effect.subjectId as number);
+      if (index >= 0) order.splice(index, 1);
+    }
+    placeAdditions(
+      order,
+      turn.filter((effect) => effect.structural === 'add')
+    );
+  }
+  return order.filter((subject) => subjects.has(subject));
+}
+
+/** Place additions by their recorded anchors, mutating `order`. */
+function placeAdditions(
+  order: number[],
+  additions: readonly ReversalEffect[]
+): void {
   const pending = [...additions];
 
   while (pending.length > 0) {
@@ -638,8 +756,6 @@ function deriveStructuralTargetOrder(
       'Collection structural target has no live placement anchor'
     );
   }
-
-  return order;
 }
 
 function derivePendingAnchorOrder(
