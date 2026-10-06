@@ -26,6 +26,9 @@ const flush = async () => {
 const typed = () =>
   signalTree({ n: 0 }, { enhancers: [transactions(), restoration()] });
 type Tree = ReturnType<typeof typed>;
+const typedTwoFields = () =>
+  signalTree({ n: 0, m: 0 }, { enhancers: [transactions(), restoration()] });
+type TwoFieldTree = ReturnType<typeof typedTwoFields>;
 
 const steps = (tree: Tree) => ({
   index: tree.getCurrentIndex(),
@@ -238,7 +241,7 @@ describe.each([
       const tree = signalTree(
         { n: 0, m: 0 },
         { enhancers: enhancers() as never }
-      );
+      ) as unknown as TwoFieldTree;
       try {
         let pending: { confirm(): void } | undefined;
         undoable(() => {
