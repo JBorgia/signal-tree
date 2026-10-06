@@ -153,6 +153,9 @@ export function createTreeScalarLeafRuntime(
     enableAbsence(absence: MemberAbsence): void {
       liveness.absence = absence;
     },
+    disableAbsence(): void {
+      liveness.absence = undefined;
+    },
     createLeaf<T>(
       initialValue: T,
       equal: (current: T, next: T) => boolean,

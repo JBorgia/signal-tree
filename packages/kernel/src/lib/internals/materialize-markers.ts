@@ -1,5 +1,6 @@
 import { getOwnedPositionIds } from './owned-metadata';
 import {
+  childAddressOf,
   createPositionRegistry,
   defineNodeAddress,
   type PositionRegistry,
@@ -885,7 +886,7 @@ function materializeKeyedAware(
 export function materializeMarkers(
   node: unknown,
   notifier?: PathObservationPort,
-  path: string[] = [],
+  path: readonly string[] = [],
   context: MaterializationContext = createMaterializationContext(),
   authority?: OrdinaryConstructionAuthority
 ): void {
@@ -907,7 +908,7 @@ export function materializeMarkers(
 
   for (const key of keys) {
     const value = (node as Record<string, unknown>)[key];
-    const currentPath = [...path, key];
+    const currentPath = childAddressOf(path, key);
     const pathString = currentPath.join('.');
 
     // Check each registered marker processor

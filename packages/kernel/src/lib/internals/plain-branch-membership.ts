@@ -1,3 +1,7 @@
+import {
+  PRODUCTION_SUBSTRATE_STATS_ENABLED,
+  recordProductionSubstrateStat,
+} from './production-substrate-stats';
 import type { WriteMetadata } from '../mutation-types';
 import { getActiveWriteContext } from '../write-context';
 import { deepEqual, unwrapBranchForWriteCapture } from '../utils';
@@ -100,6 +104,8 @@ export function capturePlainBranchMembership(
   storedReads.depth++;
   try {
     for (const key of Object.getOwnPropertyNames(branch)) {
+      if (PRODUCTION_SUBSTRATE_STATS_ENABLED)
+        recordProductionSubstrateStat('membershipKeysVisited');
       const descriptor = Object.getOwnPropertyDescriptor(branch, key);
       if (!descriptor || !('value' in descriptor)) continue;
       const present = descriptor.enumerable === true;

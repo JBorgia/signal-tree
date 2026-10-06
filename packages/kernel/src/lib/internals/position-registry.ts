@@ -103,7 +103,7 @@ class TreePositionRegistry implements PositionRegistry {
     position: PositionId,
     address: readonly string[]
   ): void {
-    this.addresses.set(position, Object.freeze([...address]));
+    this.addresses.set(position, sealedAddress(address));
   }
 
   addressFor(position: PositionId): readonly string[] | undefined {
@@ -181,11 +181,30 @@ export function getPositionRegistry(
 // Weak keys retain neither a location nor its owning tree.
 const nodeAddresses = new WeakMap<object, readonly string[]>();
 
+/**
+ * One frozen, exact-size array per address, shared by every holder: a frozen
+ * address is kept as it is, anything else is copied once. Each node used to
+ * hold its own copy (and a branch's accessor a second one, the registry a
+ * third), built by spread: +19% heap per node for plain trees
+ * (perf-15.4.4, item 6; v16 8g).
+ */
+export function sealedAddress(address: readonly string[]): readonly string[] {
+  return Object.isFrozen(address) ? address : Object.freeze(address.slice());
+}
+
+/** The child's address: exact-size and sealed, ready to be shared. */
+export function childAddressOf(
+  address: readonly string[],
+  key: string
+): readonly string[] {
+  return Object.freeze(address.concat(key));
+}
+
 export function defineNodeAddress(
   node: object,
   address: readonly string[]
 ): void {
-  nodeAddresses.set(node, Object.freeze([...address]));
+  nodeAddresses.set(node, sealedAddress(address));
 }
 
 export function getNodeAddress(node: unknown): readonly string[] | undefined {

@@ -1122,6 +1122,8 @@ describe('Complexity guard: production scalar substrate', () => {
           publicUndoPositionEntriesExamined: 0,
           turnIndexLookups: 0,
           publicUndoTurnEffectsExamined: 0,
+          absenceWalks: 0,
+          membershipKeysVisited: 0,
         });
 
         resetProductionSubstrateStatsForTesting(stats);
@@ -1146,6 +1148,8 @@ describe('Complexity guard: production scalar substrate', () => {
           publicUndoPositionEntriesExamined: 0,
           turnIndexLookups: 0,
           publicUndoTurnEffectsExamined: 0,
+          absenceWalks: 0,
+          membershipKeysVisited: 0,
         });
       } finally {
         harness.destroy();
@@ -1180,6 +1184,8 @@ describe('Complexity guard: production scalar substrate', () => {
             publicUndoPositionEntriesExamined: 0,
             turnIndexLookups: 0,
             publicUndoTurnEffectsExamined: 0,
+            absenceWalks: 0,
+            membershipKeysVisited: 0,
           });
         } finally {
           frameHarness.destroy();
