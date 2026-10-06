@@ -118,6 +118,7 @@ import {
 } from '../../lib/internals/restoration-eligibility';
 import { visitTree } from '../../lib/internals/visit-tree';
 import { isNodeAccessor } from '../../lib/internals/node-shape';
+import { publishingExposedOnly } from '../../lib/internals/exposed-publication';
 import { recordProductionSubstrateStat } from '../../lib/internals/production-substrate-stats';
 import {
   getWriteParticipation,
@@ -1592,7 +1593,7 @@ class RestorationManager<T> {
     physicalRows.push(this.positionRegistry);
     let failed = true;
     try {
-      apply();
+      publishingExposedOnly(this.tree.$ as object, apply);
       failed = false;
     } catch (error) {
       if (!wasAppliedBeforeFailure(error)) throw error;

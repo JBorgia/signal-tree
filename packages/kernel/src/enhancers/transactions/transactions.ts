@@ -37,6 +37,7 @@ import {
   refreshOmittedCollection,
   type PlainBranchMemberPresence,
 } from '../../lib/internals/plain-branch-membership';
+import { publishingExposedOnly } from '../../lib/internals/exposed-publication';
 import {
   beginStructuralWrite,
   endStructuralWrite,
@@ -2607,7 +2608,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
         physicalRows.push(getPositionRegistry(tree.$) as object);
         let failed = true;
         try {
-          const result = apply();
+          const result = publishingExposedOnly(tree.$ as object, apply);
           failed = false;
           return result;
         } finally {
