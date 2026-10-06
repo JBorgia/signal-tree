@@ -12,6 +12,7 @@ import {
   endStructuralWrite,
   structuralWrites,
 } from '../../lib/internals/member-membership';
+import { physicalRows } from '../../lib/internals/physical-rows';
 import type { PlainBranchMemberPresence } from '../../lib/internals/plain-branch-membership';
 import { applicationFailureCause } from '../../lib/internals/causal-runtime/post-application-failure';
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
@@ -2486,9 +2487,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // id is safe as a bare number here because a tree announces under exactly
     // one owner (measured in diag-journal-1-1-correlation.spec.ts) and a journal
     // observes one tree.
-    // Physical truth, as a reversal (`structuralWrites`, v16 8e).
+    // Physical truth, as a reversal (`structuralWrites`, `physicalRows`,
+    // v16 8e).
     structuralWrites.depth++;
+    physicalRows.push(positionRegistry);
     let result: ReturnType<typeof rollbackPendingTurnAt> | { ok: true };
+    let failed = true;
     try {
       result = withWriteContext(
         {
@@ -2538,8 +2542,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
           });
         }
       );
+      failed = false;
     } finally {
-      endStructuralWrite();
+      physicalRows.pop();
+      endStructuralWrite(failed);
     }
     if (!result.ok) {
       throw createRollbackError({

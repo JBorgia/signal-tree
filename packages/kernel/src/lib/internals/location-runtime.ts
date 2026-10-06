@@ -479,7 +479,8 @@ export function createLocationRuntime(
     };
     registerWritableLocationBinding(binding);
 
-    location.peek = read;
+    // Never the stored read: `peek` is public and takes no argument.
+    location.peek = () => read();
     location.subscribe = (listener) => {
       listeners.add(listener);
       return () => listeners.delete(listener);

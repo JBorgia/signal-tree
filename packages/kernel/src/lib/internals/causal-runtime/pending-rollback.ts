@@ -173,6 +173,15 @@ function createPendingRollbackEffects(
 }
 
 function rollbackAddressKey(effect: CausalTurn['effects'][number]): string {
+  // ⚠️ A MEMBER'S PRESENCE IS ITS OWN ADDRESS. An entity collection's
+  // membership effect shares its owner with the collection's row effects; keyed
+  // by owner alone, it was dropped as a repeat whenever a row effect came first
+  // in the turn. A row-adding write to an omitted collection records its
+  // removals first, so rolling it back left the collection present with its
+  // retained rows (v16 8e review).
+  if (effect.plainBranchMembership !== undefined) {
+    return `${String(effect.owner)}\u0000membership`;
+  }
   if (effect.subjectFieldSegments !== undefined) {
     return JSON.stringify([
       effect.owner,

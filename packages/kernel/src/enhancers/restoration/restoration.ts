@@ -25,6 +25,7 @@ import {
   endStructuralWrite,
   structuralWrites,
 } from '../../lib/internals/member-membership';
+import { physicalRows } from '../../lib/internals/physical-rows';
 import type { FieldPresence } from '../../lib/internals/causal-runtime/causal-types';
 import {
   applyInInvalidationGroup,
@@ -669,17 +670,21 @@ class RestorationManager<TSource, T> {
 
   private applyReversal(apply: () => void): void {
     // A reversal installs physical truth and its own membership effects: it
-    // reads and writes a hidden collection's retained rows, and re-adds no
-    // path implicitly (`structuralWrites`, v16 8e).
+    // reads and writes a hidden collection's retained rows (`physicalRows`),
+    // and re-adds no path implicitly (`structuralWrites`, v16 8e).
     structuralWrites.depth++;
+    physicalRows.push(this.positionRegistry);
+    let failed = true;
     try {
       apply();
+      failed = false;
     } catch (error) {
       if (!wasAppliedBeforeFailure(error)) throw error;
       // Finish operation bookkeeping before surfacing a post-application error.
       this.deliveryFailure ??= { error };
     } finally {
-      endStructuralWrite();
+      physicalRows.pop();
+      endStructuralWrite(failed);
     }
   }
 
@@ -2690,7 +2695,6 @@ export function restoration(
       // decision. (v16 integration 8b.)
       let hiddenRefusal: string | undefined;
       let appliedEffects = reversalEffects;
-      const readdedNodes: object[] = [];
       {
         const registry = getPositionRegistry(tree.$);
         const reversedMembers = new Set<number>();
@@ -2881,7 +2885,6 @@ export function restoration(
             (effect) => !replaced.has(effect)
           );
           for (const [owner, { member, targets }] of readded) {
-            readdedNodes.push(member.node);
             appliedEffects.push({
               owner,
               before: undefined,
@@ -2921,10 +2924,11 @@ export function restoration(
               if (candidate?.owner === owner) binding = candidate;
               return undefined;
             });
-            // A collection under a member being re-added is hidden from the
-            // current-tree walk; its binding is found along its address.
-            if (readdedNodes.length)
-              binding ??= collectionBindingAt(tree.$, owner);
+            // A collection under a member being re-added (by the hidden-member
+            // decision above, or by the replayed turn's own membership
+            // effects) is hidden from the current-tree walk; its binding is
+            // found along its address.
+            binding ??= collectionBindingAt(tree.$, owner);
             return binding?.readSource();
           })) &&
         reversalEffects.every(
@@ -2969,12 +2973,11 @@ export function restoration(
         });
         const sources = [...targetOwners].map((owner) => {
           // A collection under a member being re-added is hidden from the
-          // current-tree walk; its binding is found along its address.
+          // current-tree walk; its binding is found along its address. The
+          // replayed turn may re-add it itself: redo of a write that re-added
+          // a hidden collection starts with it hidden (v16 8e review, M2).
           const binding =
-            bindings.get(owner) ??
-            (readdedNodes.length
-              ? collectionBindingAt(tree.$, owner)
-              : undefined);
+            bindings.get(owner) ?? collectionBindingAt(tree.$, owner);
           if (binding) bindings.set(owner, binding);
           if (!binding) {
             throw new Error(`Declarative order replay has no binding ${owner}`);

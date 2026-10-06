@@ -103,8 +103,9 @@ for retired entities.
   read `undefined`. Adding rows re-adds the path with only those rows; the
   retained rows never come back. Updating or removing a row throws "Entity
   with id ... not found", as on an empty collection. Undo, redo, `jumpTo()`
-  and `rollback()` of a re-adding write make it absent again. Before this,
-  its methods read and wrote the retained rows.
+  and `rollback()` of a re-adding write make it absent again. This holds
+  for a collection omitted itself, and in a tree whose root holds only
+  collections. Before this, its methods read and wrote the retained rows.
 - **Reversing a turn that omits a member and writes under it is exact.**
   Undo or rollback of such a turn restored the members it had written under
   as `undefined`; history now records what storage held.

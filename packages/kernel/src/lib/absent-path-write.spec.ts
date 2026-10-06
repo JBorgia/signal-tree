@@ -90,6 +90,11 @@ describe('reads under an omitted member', () => {
       expect(
         (h.a.b.keep as unknown as { peek(): unknown }).peek()
       ).toBeUndefined();
+      // `peek` takes no argument: one passed anyway (`[1].map(peek)`) never
+      // reaches the stored read history uses (v16 8e review).
+      expect(
+        [1].map((h.a.b.keep as unknown as { peek(): unknown }).peek)
+      ).toEqual([undefined]);
     }
     expect(tree.$()).toEqual({ count: 0 });
   });

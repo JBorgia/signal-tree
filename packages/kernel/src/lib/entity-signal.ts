@@ -58,9 +58,9 @@ import {
   isAbsentMember,
   MEMBERSHIP_CHANGED,
   reactivatePathOnWrite,
-  storedReads,
   structuralWrites,
 } from './internals/member-membership';
+import { physicalRows } from './internals/physical-rows';
 import {
   MUTATION_CAPTURE_RUNTIME,
   type CommittedEntityMutation,
@@ -452,12 +452,15 @@ export function createEntitySignal<
    * omission.
    */
   const absent = (): boolean => isAbsentMember(api);
-  // Row reads and row writes use physical truth inside a structural write (a
-  // whole value, a reversal or a rollback being applied) and history capture:
-  // they reconcile presence themselves. Projections never do, so nothing they
-  // cache can hold retained rows.
+  // Row reads and row writes use physical truth only while a reversal or a
+  // rollback is being applied to this collection's tree (`physicalRows`).
+  // Projections never do, so nothing they cache can hold retained rows.
   const rowAbsent = (): boolean =>
-    !structuralWrites.depth && !storedReads.depth && absent();
+    absent() &&
+    !(
+      physicalRows.length &&
+      physicalRows.includes(getPositionRegistry(api) as object)
+    );
   const presentEntity = (id: K): E | undefined =>
     rowAbsent() ? undefined : getProjectedEntity(id);
   const presentEntries = (): Array<readonly [K, E]> =>
@@ -3858,6 +3861,13 @@ export function createEntitySignal<
   // with only that path (`reactivatePathOnWrite`). Retained rows never
   // resurface, and undo, redo, jumpTo and rollback reverse all three. Writes
   // that name an existing row refuse instead, as on an empty collection.
+  //
+  // A structural write (a whole value, a reversal) reconciles presence itself
+  // and writes the collection as it is. A write that would fail on its input
+  // fails before the retained rows are removed: every row's id is derived
+  // first, as the write itself does before it changes anything (v16 8e
+  // review). An interceptor that blocks the write still runs after the
+  // removal; see the README.
   const clearRetained = api.clear;
   for (const name of [
     'addOne',
@@ -3870,9 +3880,23 @@ export function createEntitySignal<
     'clear',
   ] as const) {
     const write = api[name] as (...args: unknown[]) => unknown;
+    const many = name.endsWith('Many') || name === 'setAll';
     (api as Record<string, unknown>)[name] = (...args: unknown[]) => {
-      if (!rowAbsent()) return write(...args);
-      clearRetained();
+      if (structuralWrites.depth || !rowAbsent()) return write(...args);
+      if (name !== 'clear')
+        for (const row of (many ? args[0] : [args[0]]) as E[])
+          deriveId(row, args[1] as AddOptions<E, K> | undefined);
+      // The retained rows were never visible, so their removal is no row
+      // change to observe or police: taps and interceptors do not see it.
+      // History still records it, so a reversal restores them.
+      const taps = tapHandlers.splice(0);
+      const intercepts = interceptHandlers.splice(0);
+      try {
+        clearRetained();
+      } finally {
+        tapHandlers.push(...taps);
+        interceptHandlers.push(...intercepts);
+      }
       const result = write(...args);
       reactivatePathOnWrite(api);
       return result;
@@ -3886,19 +3910,27 @@ export function createEntitySignal<
       deriveLocation(version, (value) => value + 1);
       markOwnerInvalidated(ownerId);
     });
-  // Inside a structural write it wakes them only once the write has closed
-  // (`structuralWrites.end`, chained in order): rows read physically there,
-  // so a consumer re-run inside it would cache what storage holds rather than
-  // the collection's absence. Installed by the first such change, so a tree
-  // without collections carries none of this.
+  // Inside a structural write it wakes them once, after the write has closed
+  // (`structuralWrites.end`, chained in order): a reversal being applied reads
+  // rows physically (`physicalRows`), so a consumer re-run inside it would
+  // cache what storage holds rather than the collection's absence. Installed
+  // by the first such change, so a tree without collections carries none of
+  // this. Every queued wake runs even if an earlier one throws.
+  let wakeQueued = false;
   Object.defineProperty(api, MEMBERSHIP_CHANGED, {
     value: () => {
       if (!structuralWrites.depth) return wake();
+      if (wakeQueued) return;
+      wakeQueued = true;
       const earlier = structuralWrites.end;
       structuralWrites.end = () => {
         structuralWrites.end = undefined;
-        earlier?.();
-        wake();
+        wakeQueued = false;
+        try {
+          earlier?.();
+        } finally {
+          wake();
+        }
       };
     },
   });
