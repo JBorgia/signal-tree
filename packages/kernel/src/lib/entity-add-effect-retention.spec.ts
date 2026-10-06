@@ -66,13 +66,21 @@ const make = (enhancers: readonly unknown[]): Tree =>
     enhancers: enhancers as never,
   }) as unknown as Tree;
 
+const big = () => ({ id: 'k', n: 1, big: 'x'.repeat(20_000) });
+const adds: Record<string, (tree: Tree) => void> = {
+  addMany: (tree) => void tree.$.rows.addMany([big()]),
+  prependMany: (tree) => void tree.$.rows.prependMany([big()]),
+  prependOne: (tree) => void tree.$.rows.prependOne(big()),
+};
+
 /**
- * Adds row `k` through `addMany` and keeps only a WeakRef to the clone its
- * published `add` effect carries.
+ * Adds row `k` and keeps only a WeakRef to the clone its published `add`
+ * effect carries.
  */
 const captureAdd = async (
   tree: Tree,
-  add: (run: () => void) => void = (run) => run()
+  add: (run: () => void) => void = (run) => run(),
+  api = 'addMany'
 ): Promise<WeakRef<object>> => {
   const refs: WeakRef<object>[] = [];
   const unsubscribe = getPathNotifier().subscribe(
@@ -87,9 +95,7 @@ const captureAdd = async (
     }
   );
   try {
-    add(() => {
-      tree.$.rows.addMany([{ id: 'k', n: 1, big: 'x'.repeat(20_000) }]);
-    });
+    add(() => adds[api](tree));
     await flush();
   } finally {
     unsubscribe();
@@ -98,7 +104,7 @@ const captureAdd = async (
   return refs[0];
 };
 
-describe('addMany add-effect retention', () => {
+describe('add-effect retention', () => {
   it('runs with a real collector', () => {
     expect(typeof (globalThis as { gc?: unknown }).gc).toBe('function');
   });
@@ -116,7 +122,7 @@ describe('addMany add-effect retention', () => {
     }
   });
 
-  it.each([
+  const configs = [
     ['transactions()', () => [transactions()]],
     [
       'restoration({ maxHistorySize: 0 })',
@@ -130,12 +136,17 @@ describe('addMany add-effect retention', () => {
       'restoration({ maxHistorySize: 0 }), transactions()',
       () => [restoration({ maxHistorySize: 0 }), transactions()],
     ],
-  ] as const)(
-    '%s: a removed row leaves no clone behind in the live tree',
-    async (_name, enhancers) => {
+  ] as const;
+  it.each(
+    Object.keys(adds).flatMap((api) =>
+      configs.map(([name, enhancers]) => [api, name, enhancers] as const)
+    )
+  )(
+    '%s under %s: a removed row leaves no clone behind in the live tree',
+    async (api, _name, enhancers) => {
       const tree = make(enhancers());
       try {
-        const ref = await captureAdd(tree);
+        const ref = await captureAdd(tree, undefined, api);
         tree.$.rows.removeOne('k');
         await flush();
         await applyPressure();

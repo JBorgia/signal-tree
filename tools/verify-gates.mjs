@@ -1186,6 +1186,29 @@ const GATES = [
     },
   },
   {
+    name: 'retention-gc:entity-add-effects',
+    covers:
+      'an observed addMany, prependMany or prependOne leaves no clone of a row it announced in the live tree once the row is removed (005399a7 kept one per added row)',
+    cmd: [
+      'npx',
+      'vitest',
+      'run',
+      '--root',
+      'packages/kernel',
+      '--config',
+      'vitest.retention.config.ts',
+      'src/lib/entity-add-effect-retention.spec.ts',
+    ],
+    env: { NODE_OPTIONS: '--expose-gc' },
+    // A list that keeps every structural effect, the shape appendedAdds had.
+    mutation: {
+      file: 'packages/kernel/src/lib/entity-signal.ts',
+      find: '    return { ...(base ?? {}), structuralEffect };',
+      replace:
+        '    ((globalThis as { __kept?: unknown[] }).__kept ??= []).push(structuralEffect);\n    return { ...(base ?? {}), structuralEffect };',
+    },
+  },
+  {
     name: 'retention-gc:link-lifetime',
     covers:
       'a disposed Link is not retained by its live tree, and a destroyed tree with Links is released (f0f15d18 retained both through the registry close closure)',
