@@ -146,6 +146,17 @@ export class PathNotifier {
   private pending = new Map<string, PendingSlot>();
   private pendingBeforeMembership: PendingSlot[] = [];
   private flushCallbacks = new Set<() => void>();
+
+  /**
+   * @internal Installed while a reversal or rollback applies
+   * (`publishingExposedOnly`): true for a realized write to a location the
+   * operation leaves absent, which is then not published. Path observers see
+   * what the tree exposes, never retained storage (v15 c6258aab, v16 8g).
+   */
+  absentRealized?: (
+    positionIds: number[] | undefined,
+    meta: WriteMetadata | undefined
+  ) => boolean;
   private enqueueObservers = new Map<
     number,
     Set<(entry: Readonly<PendingEntry>) => void>
@@ -260,6 +271,7 @@ export class PathNotifier {
     subjectFieldFootprint?: readonly string[] | null
   ): void {
     const ambientMeta = metaOverride ?? getActiveWriteContext();
+    if (this.absentRealized?.(positionIds, ambientMeta)) return;
     // HIST-C2. Captured HERE, at the synchronous observation of the write, for
     // exactly the reason the `origin` comment below gives: the flush that
     // delivers this entry is deferred to a microtask, so a designation scope

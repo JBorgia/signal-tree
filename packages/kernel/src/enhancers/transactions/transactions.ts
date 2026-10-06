@@ -1,3 +1,4 @@
+import { publishingExposedOnly } from '../../lib/internals/exposed-publication';
 import {
   collectionBindingAt,
   plainBranchMembershipEffects,
@@ -2507,53 +2508,57 @@ export function getOrCreateInternalTransactionRuntime<T>(
     let result: ReturnType<typeof rollbackPendingTurnAt> | { ok: true };
     let failed = true;
     try {
-      result = withWriteContext(
-        {
-          origin: 'transaction-rollback',
-          transactionId: owningTransactionId,
-          // NOT `transactionOwner`. Stamping it here makes
-          // `activeTransactionContext()` report an open scope during the
-          // compensation, which reopens the callback scope a rollback must leave
-          // closed — `active-transaction-context.spec.ts` pins that. The join
-          // restoration needs is carried by `origin` plus the corrected
-          // `transactionId` instead.
-          // OWNER-REPLAY-1, same shape as restoration's: stamped once on the wrap
-          // that already surrounds the compensation, so every downstream meta
-          // that spreads `getActiveWriteContext()` carries the namespace.
-          ownerId: positionRegistry?.id,
-        },
-        () => {
-          if (
-            orderDeltas.length > 0 ||
-            requiresDeclarativeStructuralTarget(
-              effects.map(toRollbackEffect),
-              (owner) => {
-                let binding: CollectionTransitionTargetBinding | undefined;
-                visitTree(tree.$, (node) => {
-                  const candidate = (
-                    node as {
-                      __prepareTransitionTarget?: CollectionTransitionTargetBinding;
-                    }
-                  ).__prepareTransitionTarget;
-                  if (candidate?.owner === owner) binding = candidate;
-                  return undefined;
-                });
-                return binding?.readSource();
-              }
-            )
-          ) {
-            rollbackPendingTarget(effects, orderDeltas);
-            return { ok: true as const };
+      // Path observers see what the tree exposes, never a location's
+      // retained storage (`publishingExposedOnly`, v16 8g).
+      result = publishingExposedOnly(tree.$ as object, () =>
+        withWriteContext(
+          {
+            origin: 'transaction-rollback',
+            transactionId: owningTransactionId,
+            // NOT `transactionOwner`. Stamping it here makes
+            // `activeTransactionContext()` report an open scope during the
+            // compensation, which reopens the callback scope a rollback must leave
+            // closed — `active-transaction-context.spec.ts` pins that. The join
+            // restoration needs is carried by `origin` plus the corrected
+            // `transactionId` instead.
+            // OWNER-REPLAY-1, same shape as restoration's: stamped once on the wrap
+            // that already surrounds the compensation, so every downstream meta
+            // that spreads `getActiveWriteContext()` carries the namespace.
+            ownerId: positionRegistry?.id,
+          },
+          () => {
+            if (
+              orderDeltas.length > 0 ||
+              requiresDeclarativeStructuralTarget(
+                effects.map(toRollbackEffect),
+                (owner) => {
+                  let binding: CollectionTransitionTargetBinding | undefined;
+                  visitTree(tree.$, (node) => {
+                    const candidate = (
+                      node as {
+                        __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+                      }
+                    ).__prepareTransitionTarget;
+                    if (candidate?.owner === owner) binding = candidate;
+                    return undefined;
+                  });
+                  return binding?.readSource();
+                }
+              )
+            ) {
+              rollbackPendingTarget(effects, orderDeltas);
+              return { ok: true as const };
+            }
+            return rollbackPendingTurnAt({
+              authority: authorityPosition,
+              turnId: transactionId,
+              store,
+              topology: positionRegistry,
+              port: realizationPort,
+              realizationContext,
+            });
           }
-          return rollbackPendingTurnAt({
-            authority: authorityPosition,
-            turnId: transactionId,
-            store,
-            topology: positionRegistry,
-            port: realizationPort,
-            realizationContext,
-          });
-        }
+        )
       );
       failed = false;
     } finally {

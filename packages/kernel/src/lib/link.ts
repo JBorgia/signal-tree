@@ -364,6 +364,7 @@ export function link<S>(
    * collection's ELIGIBLE value is adopted, never its current one.
    */
   type NestedCollection = {
+    readonly node: unknown;
     readonly projection: EntityEgressProjection;
     readonly relativeAddress: readonly string[];
   };
@@ -385,6 +386,7 @@ export function link<S>(
         if (position === undefined || relative === undefined) return;
         const projection = createEntityEgressProjection(seed);
         nestedCollections.set(position, {
+          node,
           projection,
           relativeAddress: relative,
         });
@@ -519,8 +521,69 @@ export function link<S>(
           sourceAddress !== undefined && address !== undefined
             ? relativeSourceAddress(sourceAddress, address)
             : undefined;
-        if (relative === undefined) return;
-        eligible = applyPlainBranchMembership(eligible, relative, membership);
+        if (relative !== undefined) {
+          eligible = applyPlainBranchMembership(eligible, relative, membership);
+        } else {
+          // ⚠️ A MEMBER AT OR ABOVE X CHANGED (v15 c6258aab, v16 8g): X now
+          // reads what that change installed, or nothing while it, or a
+          // member above it, is omitted. The endpoint gets what the tree
+          // exposes, `undefined` (`[]` for a collection), never retained
+          // storage. An omission sent nothing (the endpoint kept the last
+          // value), and the retained value reached it later through a
+          // reversal's announcement. The keys from the changed branch down to
+          // X are where X's address continues the branch's.
+          const below =
+            sourceAddress !== undefined && address !== undefined
+              ? relativeSourceAddress(address, sourceAddress)
+              : undefined;
+          const member =
+            below?.length &&
+            membership.members.find(({ key }) => key === below[0]);
+          if (!member || !below) return;
+          let value = member.after.present ? member.after.value : undefined;
+          for (const key of below.slice(1))
+            value =
+              value !== null &&
+              typeof value === 'object' &&
+              Object.prototype.hasOwnProperty.call(value, key)
+                ? (value as Record<string, unknown>)[key]
+                : undefined;
+          eligible = value as T;
+          entityProjection?.reseed(getEntityProjectionSeed(x) ?? []);
+        }
+        // A nested collection at or below a changed member reads its rows
+        // now (none while omitted): its projection restarts from them, and a
+        // present one gives the value its rows. Others keep their eligible
+        // rows, which an inspection write must not move (R10).
+        for (const nested of nestedCollections.values()) {
+          if (
+            relative !== undefined &&
+            !membership.members.some(
+              ({ key }) =>
+                nested.relativeAddress[relative.length] === key &&
+                relative.every(
+                  (step, at) => nested.relativeAddress[at] === step
+                )
+            )
+          )
+            continue;
+          nested.projection.reseed(getEntityProjectionSeed(nested.node) ?? []);
+          let at: unknown = eligible;
+          for (const key of nested.relativeAddress.slice(0, -1))
+            at =
+              at !== null && typeof at === 'object'
+                ? (at as Record<string, unknown>)[key]
+                : undefined;
+          if (
+            at !== null &&
+            typeof at === 'object' &&
+            Object.prototype.hasOwnProperty.call(
+              at,
+              nested.relativeAddress[nested.relativeAddress.length - 1]
+            )
+          )
+            advanceNested(nested);
+        }
         dirty = true;
         observeLink();
         return;

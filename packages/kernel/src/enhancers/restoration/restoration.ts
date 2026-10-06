@@ -1,3 +1,4 @@
+import { publishingExposedOnly } from '../../lib/internals/exposed-publication';
 import {
   forgetTransientRows,
   rememberTransientRow,
@@ -690,7 +691,9 @@ class RestorationManager<TSource, T> {
     openPhysicalRows(this.positionRegistry);
     let failed = true;
     try {
-      apply();
+      // Path observers see what the tree exposes, never a location's
+      // retained storage (`publishingExposedOnly`, v16 8g).
+      publishingExposedOnly(this.tree.$ as object, apply);
       failed = false;
     } catch (error) {
       if (!wasAppliedBeforeFailure(error)) throw error;
