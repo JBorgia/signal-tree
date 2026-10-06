@@ -318,20 +318,29 @@ export function deriveDeclarativeTransitionTarget(
   };
 }
 
+/**
+ * `explicit`: rows that must be participants (ranks recorded at both ends)
+ * rather than left implicit in the backbone, so a later rebase can remove them
+ * exactly (`withoutDeltaSubjects`): rows a still-pending transaction created,
+ * which its rejection takes away.
+ */
 export function deriveCollectionOrderDelta(
   owner: PositionId,
   before: readonly number[],
   after: readonly number[],
   beforeFrontier: unknown,
-  afterFrontier: unknown
+  afterFrontier: unknown,
+  explicit?: ReadonlySet<number>
 ): CollectionOrderDelta {
   assertUniqueSubjects(before);
   assertUniqueSubjects(after);
 
   const beforeRank = indexSubjects(before);
   const afterRank = indexSubjects(after);
-  const commonBefore = before.filter((subject) => afterRank.has(subject));
-  const commonAfter = after.filter((subject) => beforeRank.has(subject));
+  const common = (subject: number, other: Map<number, number>) =>
+    other.has(subject) && !explicit?.has(subject);
+  const commonBefore = before.filter((subject) => common(subject, afterRank));
+  const commonAfter = after.filter((subject) => common(subject, beforeRank));
   const backbone = lexicographicallySmallestCommonSubsequence(
     commonBefore,
     commonAfter
@@ -366,6 +375,52 @@ export function deriveCollectionOrderDelta(
       (left, right) => left.subject - right.subject
     ),
   };
+}
+
+/**
+ * The delta with `drop`ped rows taken out of both ends, as if they had never
+ * existed: their ranks go, later ranks shift down, lengths shrink;
+ * `undefined` when nothing is left to reorder. Only participants can be
+ * dropped exactly (a backbone row's position is implicit), so rows that may
+ * be dropped must be derived `explicit`.
+ */
+export function withoutDeltaSubjects(
+  delta: CollectionOrderDelta,
+  drop: (subject: number) => boolean
+): CollectionOrderDelta | undefined {
+  const dropped = delta.participants.filter(({ subject }) => drop(subject));
+  if (dropped.length === 0) return delta;
+  const removedBefore = dropped
+    .map(({ beforeRank }) => beforeRank)
+    .filter((rank): rank is number => rank !== undefined)
+    .sort((left, right) => left - right);
+  const removedAfter = dropped
+    .map(({ afterRank }) => afterRank)
+    .filter((rank): rank is number => rank !== undefined)
+    .sort((left, right) => left - right);
+  const shift = (rank: number | undefined, removed: readonly number[]) => {
+    if (rank === undefined) return undefined;
+    let below = 0;
+    while (below < removed.length && removed[below] < rank) below += 1;
+    return rank - below;
+  };
+  const participants = delta.participants
+    .filter(({ subject }) => !drop(subject))
+    .map((participant) => ({
+      subject: participant.subject,
+      ...(participant.beforeRank === undefined
+        ? {}
+        : { beforeRank: shift(participant.beforeRank, removedBefore) }),
+      ...(participant.afterRank === undefined
+        ? {}
+        : { afterRank: shift(participant.afterRank, removedAfter) }),
+    }));
+  const beforeLength = delta.beforeLength - removedBefore.length;
+  const afterLength = delta.afterLength - removedAfter.length;
+  if (participants.length === 0 && beforeLength === afterLength) {
+    return undefined;
+  }
+  return { ...delta, beforeLength, afterLength, participants };
 }
 
 export function applyCollectionOrderDelta(
