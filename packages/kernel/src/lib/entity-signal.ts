@@ -2959,9 +2959,13 @@ export function createEntitySignal<
 
       // Collect entities and run interceptors first
       const updatedEntities = ids.map((id) => {
-        const prev = requireEntity(id);
+        requireEntity(id);
         const subjectId = requireSubjectId(id);
         const transformedChanges = interceptUpdatedEntity(id, changes);
+        // Merged over the row as its interceptors left it, as upsertMany
+        // does: read before, a field one of them wrote was lost. (A row they
+        // removed reads undefined here and is refused below.)
+        const prev = getProjectedEntity(id) as E;
         return {
           id,
           subjectId,
