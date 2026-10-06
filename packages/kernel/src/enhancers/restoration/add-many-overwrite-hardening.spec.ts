@@ -335,20 +335,6 @@ const PREPENDED: Row[] = [
 const byKey = (rows: readonly Row[]) =>
   [...rows].sort((left, right) => left.id.localeCompare(right.id));
 
-// After undo, the overwritten row is back with its value but still at the
-// front, and the new row is gone.
-const UNDONE_AT_FRONT: Row[] = [
-  { id: 'a', n: 1, tag: 't' },
-  { id: 'z', n: 0 },
-  { id: 'c', n: 3 },
-];
-// After redo, the overwrite is reapplied in place and the new row re-appended.
-const REDONE_APPENDED: Row[] = [
-  { id: 'a', n: 9 },
-  { id: 'z', n: 0 },
-  { id: 'c', n: 3 },
-  { id: 'b', n: 2 },
-];
 const undoPrepend = async (tree: Tree) => {
   await seed(tree);
   undoable(() => prependOverwrite(tree));
@@ -358,12 +344,10 @@ const undoPrepend = async (tree: Tree) => {
   await flush();
 };
 
-// KNOWN LIMITATION: `moveToFront` is unrecorded. The order part is
-// PRE-EXISTING ON 15.4.3 (redo of a fresh `prependMany` re-appends its rows at
-// the end there too); with 'overwrite', 15.4.3 lost the overwritten row
-// instead, so the `current behaviour` tests below pin this line's state, not
-// 15.4.3's. They are EXPECTED TO START FAILING when the move is recorded:
-// delete them then and flip the matching `it.fails` to `it`.
+// prependMany = addMany + a move to the front. The move was unrecorded until
+// the moveToFront fix (pre-existing on 15.4.3 for fresh rows: redo re-appended
+// them at the end; with 'overwrite' 15.4.3 lost the row, and c775278e left it
+// at the front on undo and rollback). It is now one recorded order change.
 describe.each(undoConfigurations)(
   'prependMany overwrite undo/redo (%s)',
   (_name, enhancers) => {
@@ -380,55 +364,27 @@ describe.each(undoConfigurations)(
       }
     });
 
-    it('KNOWN LIMITATION (moveToFront unrecorded): undo — current behaviour: [a, z, c]', async () => {
+    it('undo restores the order [z, a, c]', async () => {
       const tree = make(enhancers());
       try {
         await undoPrepend(tree);
-        expect(tree.$.rows.all()).toStrictEqual(UNDONE_AT_FRONT);
+        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
       } finally {
         tree.destroy();
       }
     });
 
-    it.fails(
-      'KNOWN LIMITATION (moveToFront unrecorded): undo — desired: [z, a, c]',
-      async () => {
-        const tree = make(enhancers());
-        try {
-          await undoPrepend(tree);
-          expect(tree.$.rows.all()).toStrictEqual(SEEDED);
-        } finally {
-          tree.destroy();
-        }
-      }
-    );
-
-    it('KNOWN LIMITATION (moveToFront unrecorded): redo — current behaviour: [a, z, c, b]', async () => {
+    it('redo restores the order [a, b, z, c]', async () => {
       const tree = make(enhancers());
       try {
         await undoPrepend(tree);
         tree.redo();
         await flush();
-        expect(tree.$.rows.all()).toStrictEqual(REDONE_APPENDED);
+        expect(tree.$.rows.all()).toStrictEqual(PREPENDED);
       } finally {
         tree.destroy();
       }
     });
-
-    it.fails(
-      'KNOWN LIMITATION (moveToFront unrecorded): redo — desired: [a, b, z, c]',
-      async () => {
-        const tree = make(enhancers());
-        try {
-          await undoPrepend(tree);
-          tree.redo();
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual(PREPENDED);
-        } finally {
-          tree.destroy();
-        }
-      }
-    );
   }
 );
 
@@ -453,28 +409,14 @@ describe.each(rollbackConfigurations)(
       }
     });
 
-    // Same limitation as above; same deletion rule for the pinned state.
-    it('KNOWN LIMITATION (moveToFront unrecorded): rollback — current behaviour: [a, z, c]', async () => {
+    it('rollback restores the order [z, a, c]', async () => {
       const tree = make(enhancers());
       try {
         await rollBackPrepend(tree);
-        expect(tree.$.rows.all()).toStrictEqual(UNDONE_AT_FRONT);
+        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
       } finally {
         tree.destroy();
       }
     });
-
-    it.fails(
-      'KNOWN LIMITATION (moveToFront unrecorded): rollback — desired: [z, a, c]',
-      async () => {
-        const tree = make(enhancers());
-        try {
-          await rollBackPrepend(tree);
-          expect(tree.$.rows.all()).toStrictEqual(SEEDED);
-        } finally {
-          tree.destroy();
-        }
-      }
-    );
   }
 );

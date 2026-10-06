@@ -1156,6 +1156,32 @@ export function createEntitySignal<
    * prepending does not invalidate any row's consumers. The derived collection
    * signals pick the new order up from the version bump.
    */
+  /** addMany's fresh-row effects, for prependMany to re-anchor at the front. */
+  let appendedAdds: PendingAddStructuralEffect[] = [];
+
+  /** Whether an order delta has a consumer (a history or transaction capture). */
+  function orderConsumed(): boolean {
+    return (
+      positionId !== undefined && !!mutationCaptureRuntime?.publishCollectionOrder
+    );
+  }
+
+  function publishOrderChange(
+    beforeSubjects: number[],
+    afterSubjects: number[],
+    beforeFrontier: unknown
+  ): void {
+    mutationCaptureRuntime?.publishCollectionOrder?.({
+      owner: positionId as number,
+      ownerPath: basePath,
+      beforeSubjects,
+      afterSubjects,
+      beforeFrontier,
+      afterFrontier: structuralStore.activeOrderFrontier(),
+      meta: ambientMeta(),
+    });
+  }
+
   function moveToFront(ids: K[]): void {
     const before = membershipInventory.observed() ? structuralStore.activeKeysSnapshot().map((key) => rememberSubjectId(key)) : undefined;
     structuralStore.moveKeysToFront(ids);
@@ -2606,10 +2632,37 @@ export function createEntitySignal<
 
     prependMany(entities: E[], opts?: AddManyOptions<E, K>): K[] {
       return withMembershipGroup(() => {
+      // The move to the front is an ORDER change addMany's anchors cannot
+      // express, so the call publishes it as one order delta. Unrecorded, redo
+      // re-appended the rows at the end and an overwritten row stayed at the
+      // front on undo and rollback (15.4.3).
+      const beforeSubjects: number[] = [];
+      const beforeFrontier = structuralStore.activeOrderFrontier();
+      const consumed = orderConsumed();
+      if (consumed) structuralStore.snapshotActiveOrder([], beforeSubjects);
+      appendedAdds = [];
       const ids = api.addMany(entities, opts);
       // Front, in the order given — so `prependMany([a, b])` reads back as
       // [a, b, ...existing], which is what the call site looks like.
       moveToFront(ids);
+      // addMany recorded its fresh rows with APPEND anchors, so redo
+      // re-appended them at the end (15.4.3). Their anchors are their final
+      // neighbours, as prependOne rewrites its own. An OVERWRITTEN row that
+      // moved is an order change no anchor expresses: published as an order
+      // delta, under setAll's condition (surviving rows changed order).
+      for (const effect of appendedAdds) {
+        const { beforeSubject, afterSubject } = getNeighborSubjects(
+          effect.key as K
+        );
+        rewritePendingAddEffect(effect, beforeSubject, afterSubject);
+      }
+      if (consumed) {
+        const afterSubjects: number[] = [];
+        structuralStore.snapshotActiveOrder([], afterSubjects);
+        if (survivingOrderChanged(beforeSubjects, afterSubjects)) {
+          publishOrderChange(beforeSubjects, afterSubjects, beforeFrontier);
+        }
+      }
       return ids;
       });
     },
@@ -2766,6 +2819,16 @@ export function createEntitySignal<
             ? undefined
             : allocateSubjectId(lastPreviousKey);
         for (const { id, entity, prev, subjectId } of preparedAdds) {
+          const effect: PendingAddStructuralEffect | undefined =
+            prev === undefined
+              ? {
+                  kind: 'add',
+                  subject: subjectId,
+                  key: id,
+                  value: deepClone(entity),
+                  beforeSubject,
+                }
+              : undefined;
           pathNotifier.notify(
             `${basePath}.${String(id)}`,
             entity,
@@ -2773,17 +2836,12 @@ export function createEntitySignal<
             basePath,
             [subjectId],
             getPositionIdsForNotify(),
-            prev === undefined
-              ? effectMeta(meta, {
-                  kind: 'add',
-                  subject: subjectId,
-                  key: id,
-                  value: deepClone(entity),
-                  beforeSubject,
-                })
-              : meta
+            effect ? effectMeta(meta, effect) : meta
           );
-          if (prev === undefined) beforeSubject = subjectId;
+          if (effect) {
+            appendedAdds.push(effect);
+            beforeSubject = subjectId;
+          }
         }
       }
 
@@ -3627,19 +3685,10 @@ export function createEntitySignal<
       // plain-tree setAll pay for it: refetch +8% at 10k rows and +11% at 50k
       // against 15.3.1 in benchmarks/store-comparison.
       if (
-        positionId !== undefined &&
-        mutationCaptureRuntime?.publishCollectionOrder &&
+        orderConsumed() &&
         survivingOrderChanged(currentSubjects, afterSubjects)
       ) {
-        mutationCaptureRuntime.publishCollectionOrder({
-          owner: positionId,
-          ownerPath: basePath,
-          beforeSubjects: currentSubjects,
-          afterSubjects,
-          beforeFrontier: beforeOrderFrontier,
-          afterFrontier: structuralStore.activeOrderFrontier(),
-          meta: ambientMeta(),
-        });
+        publishOrderChange(currentSubjects, afterSubjects, beforeOrderFrontier);
       }
 
       membershipUnit.commit(membershipChanges);

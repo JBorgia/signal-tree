@@ -230,3 +230,81 @@ describe.each(undoConfigurations)(
     });
   }
 );
+
+// ── An order delta plus another structural change in ONE turn ────────────────
+// setAll (survivors reordered) and prependMany (an overwritten row moved to the
+// front) record their ORDER change as a collection order delta whose endpoints
+// are the order just before and just after that call. A turn that also adds or
+// removes rows of the same collection before or after it leaves the delta's
+// endpoints off the turn's endpoints, and the declarative reversal refuses
+// rather than guess. PRE-EXISTING ON 15.4.3 for setAll. Reported as a
+// design-level gap (how an order capture composes with other structural
+// effects in a turn), not repaired here.
+const reorderThenRemove = (tree: Tree) => {
+  tree.$.rows.setAll([
+    { id: 'c', n: 3 },
+    { id: 'z', n: 0 },
+    { id: 'a', n: 1 },
+  ]);
+  tree.$.rows.removeOne('a');
+};
+const addThenPrependOverwrite = (tree: Tree) => {
+  tree.$.rows.addOne({ id: 'w', n: 4 });
+  tree.$.rows.prependMany([{ id: 'c', n: 30 }], { mode: 'overwrite' });
+};
+
+describe.each(undoConfigurations)(
+  'known design-level limitation: order delta composition, undo (%s)',
+  (_name, enhancers) => {
+    it.each([
+      ['setAll reorder, then removeOne', reorderThenRemove],
+      [
+        'addOne, then prependMany overwrite moving a row',
+        addThenPrependOverwrite,
+      ],
+    ] as const)(
+      'KNOWN LIMITATION (design-level; setAll pre-existing on 15.4.3): %s — current behaviour: undo refuses and changes nothing',
+      async (_case, act) => {
+        const tree = make(enhancers());
+        try {
+          await seed(tree);
+          undoable(() => act(tree));
+          await flush();
+          const after = tree.$.rows.all();
+          const error = thrownBy(() => tree.undo());
+          expect(error).toBeInstanceOf(Error);
+          expect((error as Error).message).toMatch(
+            /^(collection order frontier does not match the transition endpoint|Collection order does not match active SubjectIds)$/
+          );
+          await flush();
+          expect(tree.$.rows.all()).toStrictEqual(after);
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
+
+    it.fails.each([
+      ['setAll reorder, then removeOne', reorderThenRemove],
+      [
+        'addOne, then prependMany overwrite moving a row',
+        addThenPrependOverwrite,
+      ],
+    ] as const)(
+      'KNOWN LIMITATION (design-level; setAll pre-existing on 15.4.3): %s — desired: undo restores',
+      async (_case, act) => {
+        const tree = make(enhancers());
+        try {
+          await seed(tree);
+          undoable(() => act(tree));
+          await flush();
+          tree.undo();
+          await flush();
+          expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+        } finally {
+          tree.destroy();
+        }
+      }
+    );
+  }
+);
