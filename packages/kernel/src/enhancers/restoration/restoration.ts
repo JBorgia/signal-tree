@@ -4,6 +4,15 @@ import {
   rememberTransientRow,
   withTransientRows,
 } from '../../lib/internals/causal-runtime/transient-rows';
+import {
+  chainFrontierSteps,
+  drainTurnOrders,
+  frontierStepOf,
+  prepareFrontierReinstatement,
+  recordOrderTransition,
+  type TurnFrontierTransition,
+  type TurnOrderRecord,
+} from '../../lib/internals/causal-runtime/turn-order-record';
 import { placeFieldReversalsWhileRowsExist } from '../../lib/internals/causal-runtime/pending-rollback';
 import {
   applyInInvalidationGroup,
@@ -62,6 +71,7 @@ import {
   requiresDeclarativeStructuralTarget,
   type CollectionTransitionSource,
   type CollectionTransitionTargetBinding,
+  type FrontierStep,
   type PlainBranchMemberTransitionTarget,
   type CollectionOrderDelta,
   type ScalarTransitionTargetBinding,
@@ -203,6 +213,12 @@ type CanonicalTurn<T> = Omit<RestorationHistoryEntry<T>, 'state'> & {
   __positionIds?: number[];
   __effects?: TurnEffect[];
   __orderDeltas?: CollectionOrderDelta[];
+  /**
+   * The turn's order-frontier transitions on collections it changed without
+   * an order delta (one with a delta carries its frontiers there); a
+   * reversal reinstates the token it replaced (invariant 3).
+   */
+  __frontiers?: TurnFrontierTransition[];
   __eventOrdinal?: number;
 };
 
@@ -210,6 +226,7 @@ type HistoricalEvent = {
   readonly ordinal: number;
   readonly effects: TurnEffect[];
   readonly orderDeltas: CollectionOrderDelta[];
+  readonly frontiers?: TurnFrontierTransition[];
   boundaryTurnId?: number;
 };
 
@@ -270,6 +287,7 @@ type TurnEffect =
 type DirectedTurnApplication = {
   readonly effects: TurnEffect[];
   readonly orderDeltas: CollectionOrderDelta[];
+  readonly frontiers: FrontierStep[];
   readonly direction: 'undo' | 'redo';
 };
 
@@ -426,7 +444,7 @@ type CaptureBucket = {
   subjectIds: Set<number>;
   positionIds: Set<number>;
   effects: PendingEffectMap;
-  collectionOrders: Map<number, PendingCollectionOrder>;
+  collectionOrders: Map<number, TurnOrderRecord>;
   descriptorInputs: Array<
     Omit<Parameters<typeof rememberTreeRealizationDescriptor>[0], 'descriptors'>
   >;
@@ -1049,7 +1067,8 @@ class RestorationManager<T> {
   appendHistoricalGap(
     effects: TurnEffect[],
     collectionOrders: PendingCollectionOrder[],
-    designated: boolean
+    designated: boolean,
+    frontiers: TurnFrontierTransition[] = []
   ): void {
     if (
       this.maxHistorySize === 0 ||
@@ -1063,18 +1082,20 @@ class RestorationManager<T> {
       lastTurn &&
       lastEvent?.boundaryTurnId === lastTurn.id &&
       designated &&
-      collectionOrders.length === 0
+      collectionOrders.length === 0 &&
+      frontiers.length === 0
     ) {
       appendAll(lastEvent.effects, effects.map(cloneTurnEffect));
       return;
     }
-    this.appendHistoricalEvent(effects, collectionOrders);
+    this.appendHistoricalEvent(effects, collectionOrders, undefined, frontiers);
   }
 
   private appendHistoricalEvent(
     effects: TurnEffect[],
     collectionOrders: PendingCollectionOrder[],
-    boundaryTurnId?: number
+    boundaryTurnId?: number,
+    frontiers: TurnFrontierTransition[] = []
   ): number | undefined {
     const orderDeltas = collectionOrders
       .map((order) =>
@@ -1089,7 +1110,12 @@ class RestorationManager<T> {
       .filter((delta) => delta.participants.length > 0);
     // A physically net-zero batch can still contain an authored turn (external
     // 0 -> 5, authored 5 -> 0). Its boundary must remain materializable.
-    if (effects.length === 0 && orderDeltas.length === 0 && boundaryTurnId === undefined) {
+    if (
+      effects.length === 0 &&
+      orderDeltas.length === 0 &&
+      frontiers.length === 0 &&
+      boundaryTurnId === undefined
+    ) {
       return undefined;
     }
     const ordinal = this.nextHistoricalOrdinal++;
@@ -1097,6 +1123,7 @@ class RestorationManager<T> {
       ordinal,
       effects: effects.map(cloneTurnEffect),
       orderDeltas: orderDeltas.map(cloneCollectionOrderDelta),
+      ...(frontiers.length > 0 ? { frontiers } : {}),
       boundaryTurnId,
     });
     return ordinal;
@@ -1274,7 +1301,9 @@ class RestorationManager<T> {
     historicalCapture?: {
       effects: TurnEffect[];
       collectionOrders: PendingCollectionOrder[];
-    }
+      frontiers: TurnFrontierTransition[];
+    },
+    frontiers?: TurnFrontierTransition[]
   ): boolean {
     const entry = this.buildTurn(
       subjectIds,
@@ -1283,7 +1312,8 @@ class RestorationManager<T> {
       collectionOrders,
       explicitTurnId,
       false,
-      historicalCapture
+      historicalCapture,
+      frontiers
     );
     if (!entry) {
       this.releaseTruncatedEntries();
@@ -1304,7 +1334,8 @@ class RestorationManager<T> {
     effects?: TurnEffect[],
     collectionOrders?: PendingCollectionOrder[],
     explicitTurnId?: number,
-    transactionId?: number
+    transactionId?: number,
+    frontiers?: TurnFrontierTransition[]
   ): CanonicalTurn<T> | undefined {
     const entry = this.buildTurn(
       subjectIds,
@@ -1312,7 +1343,9 @@ class RestorationManager<T> {
       effects,
       collectionOrders,
       explicitTurnId,
-      true
+      true,
+      undefined,
+      frontiers
     );
     this.releaseTruncatedEntries();
     if (!entry) {
@@ -1446,7 +1479,9 @@ class RestorationManager<T> {
       ) {
         return [event];
       }
-      return event.effects.length === 0 && event.orderDeltas.length === 0
+      return event.effects.length === 0 &&
+        event.orderDeltas.length === 0 &&
+        !event.frontiers
         ? []
         : [{ ...event, boundaryTurnId: undefined }];
     });
@@ -1491,7 +1526,9 @@ class RestorationManager<T> {
     historicalCapture?: {
       effects: TurnEffect[];
       collectionOrders: PendingCollectionOrder[];
-    }
+      frontiers: TurnFrontierTransition[];
+    },
+    frontiers: TurnFrontierTransition[] = []
   ): CanonicalTurn<T> | undefined {
     if (this.hasScopedRedoFuture()) {
       this.truncateScopedRedoFuture();
@@ -1598,6 +1635,7 @@ class RestorationManager<T> {
     if (effects && effects.length > 0) {
       entry.__effects = effects.map(cloneTurnEffect);
     }
+    if (frontiers.length > 0) entry.__frontiers = frontiers;
     if (orderDeltas.length > 0) {
       entry.__orderDeltas = orderDeltas;
       entry.__positionIds = Array.from(
@@ -1638,7 +1676,8 @@ class RestorationManager<T> {
     const eventOrdinal = this.appendHistoricalEvent(
       historicalCapture?.effects ?? effects ?? [],
       historicalCapture?.collectionOrders ?? collectionOrders ?? [],
-      turnId
+      turnId,
+      historicalCapture?.frontiers ?? frontiers
     );
     if (eventOrdinal !== undefined) {
       entry.__eventOrdinal = eventOrdinal;
@@ -2516,8 +2555,12 @@ class RestorationManager<T> {
       const reversalEffects = placeFieldReversalsWhileRowsExist(
         effects.map((effect) => toReversalEffect(effect, direction))
       );
+      const frontierSteps = (turn.__frontiers ?? []).map((transition) =>
+        frontierStepOf(transition, direction)
+      );
       const collectionOwners = new Set([
         ...(turn.__orderDeltas ?? []).map(({ owner }) => owner),
+        ...frontierSteps.map(({ owner }) => owner),
         ...reversalEffects
           .filter(({ subjectId }) => typeof subjectId === 'number')
           .map(({ owner }) => owner),
@@ -2535,6 +2578,7 @@ class RestorationManager<T> {
         effects: reversalEffects,
         orderDeltas: turn.__orderDeltas,
         orderEndpoint: direction === 'undo' ? 'before' : 'after',
+        frontierSteps,
       });
       for (const [owner, collection] of target.collections) {
         collections.set(owner, collection);
@@ -2597,8 +2641,12 @@ class RestorationManager<T> {
           .reverse()
           .map((effect) => toReversalEffect(effect, 'undo'))
       );
+      const frontierSteps = (event.frontiers ?? []).map((transition) =>
+        frontierStepOf(transition, 'undo')
+      );
       const collectionOwners = new Set([
         ...event.orderDeltas.map(({ owner }) => owner),
+        ...frontierSteps.map(({ owner }) => owner),
         ...reversalEffects
           .filter(({ subjectId }) => typeof subjectId === 'number')
           .map(({ owner }) => owner),
@@ -2617,6 +2665,7 @@ class RestorationManager<T> {
         effects: reversalEffects,
         orderDeltas: event.orderDeltas,
         orderEndpoint: 'before',
+        frontierSteps,
       });
       for (const [owner, collection] of target.collections) {
         collections.set(owner, collection);
@@ -2803,44 +2852,97 @@ class RestorationManager<T> {
     if (!this.applyEffectsFn) {
       return;
     }
+    const applications = this.buildApplications(turnIds, direction);
+    for (const { effects } of applications) {
+      recordProductionSubstrateStat(
+        'publicUndoTurnEffectsExamined',
+        effects.length
+      );
+      for (const effect of effects) {
+        if (!this.isSupportedEffect(effect)) {
+          throw new Error(`Unsupported scoped undo effect at ${effect.path}`);
+        }
+      }
+    }
 
-    const effects: TurnEffect[] = [];
-    const orderDeltas: CollectionOrderDelta[] = [];
+    const entryIds = this.entryIdsFor(turnIds);
+    const applyEffects = this.applyEffectsFn;
+    this.applyReversal(() => applyEffects(applications));
+    this.recordAppliedEntries(entryIds);
+  }
+
+  /**
+   * The turns, in the order given, as applications. An order delta applies
+   * only at the exact order it recorded (its frontier, invariant 3), so a turn
+   * starts a new application when its order delta is on a collection the
+   * current one already changes, or when it changes a collection the current
+   * one has a delta for: each application then reaches the next at exactly
+   * the order (and token) it recorded. Each application's frontier
+   * transitions are chained per collection (`chainFrontierSteps`).
+   */
+  private buildApplications(
+    turnIds: readonly number[],
+    direction: 'undo' | 'redo'
+  ): DirectedTurnApplication[] {
+    const applications: DirectedTurnApplication[] = [];
+    let effects: TurnEffect[] = [];
+    let orderDeltas: CollectionOrderDelta[] = [];
+    let steps: FrontierStep[] = [];
+    let deltaOwners = new Set<number>();
+    let changedOwners = new Set<number>();
+    const close = () => {
+      if (effects.length > 0 || orderDeltas.length > 0 || steps.length > 0) {
+        applications.push({
+          effects,
+          orderDeltas,
+          frontiers: chainFrontierSteps(steps),
+          direction,
+        });
+      }
+      effects = [];
+      orderDeltas = [];
+      steps = [];
+      deltaOwners = new Set();
+      changedOwners = new Set();
+    };
     for (const turnId of turnIds) {
       recordProductionSubstrateStat('turnIndexLookups');
       const turn = this.turns.get(turnId);
       if (!turn) {
         continue;
       }
+      const turnDeltas = turn.__orderDeltas ?? [];
       const turnEffects = turn.__effects ?? [];
-      orderDeltas.push(
-        ...(turn.__orderDeltas ?? []).map(cloneCollectionOrderDelta)
-      );
-      recordProductionSubstrateStat(
-        'publicUndoTurnEffectsExamined',
-        turnEffects.length
-      );
+      const turnChanged = [
+        ...turnDeltas.map(({ owner }) => owner),
+        ...(turn.__frontiers ?? []).map(({ owner }) => owner),
+        ...turnEffects
+          .filter(({ kind }) => kind !== 'set')
+          .map(({ position }) => position),
+      ];
+      if (
+        turnDeltas.some(({ owner }) => changedOwners.has(owner)) ||
+        turnChanged.some((owner) => deltaOwners.has(owner))
+      ) {
+        close();
+      }
       if (direction === 'undo') {
-        for (let i = turnEffects.length - 1; i >= 0; i--) {
+        for (let i = turnEffects.length - 1; i >= 0; i--)
           effects.push(turnEffects[i]);
-        }
       } else {
         appendAll(effects, turnEffects);
       }
-    }
-
-    for (const effect of effects) {
-      if (!this.isSupportedEffect(effect)) {
-        throw new Error(`Unsupported scoped undo effect at ${effect.path}`);
+      for (const delta of turnDeltas) {
+        orderDeltas.push(cloneCollectionOrderDelta(delta));
+        deltaOwners.add(delta.owner);
       }
+      for (const transition of turn.__frontiers ?? []) {
+        steps.push(frontierStepOf(transition, direction));
+      }
+      for (const owner of turnChanged) changedOwners.add(owner);
     }
-
-    const entryIds = this.entryIdsFor(turnIds);
-    const applyEffects = this.applyEffectsFn;
-    this.applyReversal(() =>
-      applyEffects([{ effects, direction, orderDeltas }])
-    );
-    this.recordAppliedEntries(entryIds);
+    close();
+    return applications;
   }
 
   private applyDirectedTurnTransition(
@@ -2850,47 +2952,11 @@ class RestorationManager<T> {
     if (!this.applyEffectsFn) {
       return;
     }
-    const applications: DirectedTurnApplication[] = [];
-    for (const [turnIds, direction] of [
-      [turnIdsToUndo, 'undo'],
-      [turnIdsToRedo, 'redo'],
-    ] as const) {
-      if (turnIds.length === 0) {
-        continue;
-      }
-      let effects: TurnEffect[] = [];
-      let orderDeltas: CollectionOrderDelta[] = [];
-      let deltaOwners = new Set<number>();
-      for (const turnId of turnIds) {
-        recordProductionSubstrateStat('turnIndexLookups');
-        const turn = this.turns.get(turnId);
-        if (!turn) {
-          continue;
-        }
-        // A second order change to one collection starts a new application:
-        // each applies at the exact order the previous one produces.
-        const turnDeltas = turn.__orderDeltas ?? [];
-        if (turnDeltas.some(({ owner }) => deltaOwners.has(owner))) {
-          applications.push({ effects, orderDeltas, direction });
-          effects = [];
-          orderDeltas = [];
-          deltaOwners = new Set();
-        }
-        const turnEffects = turn.__effects ?? [];
-        if (direction === 'undo') {
-          for (let i = turnEffects.length - 1; i >= 0; i--)
-            effects.push(turnEffects[i]);
-        } else {
-          appendAll(effects, turnEffects);
-        }
-        for (const delta of turnDeltas) {
-          orderDeltas.push(cloneCollectionOrderDelta(delta));
-          deltaOwners.add(delta.owner);
-        }
-      }
-      applications.push({ effects, orderDeltas, direction });
-    }
-    if (applications.length > 0) {
+    const applications = [
+      ...this.buildApplications(turnIdsToUndo, 'undo'),
+      ...this.buildApplications(turnIdsToRedo, 'redo'),
+    ];
+    if (turnIdsToUndo.length > 0 || turnIdsToRedo.length > 0) {
       const entryIds = this.entryIdsFor([...turnIdsToUndo, ...turnIdsToRedo]);
       const applyEffects = this.applyEffectsFn;
       this.applyReversal(() => applyEffects(applications));
@@ -2908,10 +2974,10 @@ class RestorationManager<T> {
         // its payload's shape. Object values do not make it a branch.
         if (
           effect.subject === undefined &&
-          (getTreeScalarSlotRuntime(this.tree) ??
-            getTreeScalarSlotRuntime(this.tree.$))?.resolveScalarSlot(
-            effect.position
-          ) !== undefined
+          (
+            getTreeScalarSlotRuntime(this.tree) ??
+            getTreeScalarSlotRuntime(this.tree.$)
+          )?.resolveScalarSlot(effect.position) !== undefined
         ) {
           return true;
         }
@@ -3420,7 +3486,15 @@ export function restoration(
           (deltasByOwner.get(delta.owner) ?? 0) + 1
         );
       }
-      const sequential = [...deltasByOwner.values()].some((count) => count > 1);
+      // (d) Each application's frontier moves; across applications they are
+      // threaded through the sequential derivation, target to source.
+      const frontierSteps = applications.flatMap(
+        (application) => application.frontiers
+      );
+      const sequential =
+        [...deltasByOwner.values()].some((count) => count > 1) ||
+        (applications.length > 1 &&
+          (orderDeltas.length > 0 || frontierSteps.length > 0));
       const orderEndpoints = new Map<number, 'before' | 'after'>();
       for (const application of applications) {
         for (const delta of application.orderDeltas) {
@@ -3460,6 +3534,7 @@ export function restoration(
           );
           const owners = new Set([
             ...application.orderDeltas.map(({ owner }) => owner),
+            ...application.frontiers.map(({ owner }) => owner),
             ...effects
               .filter(({ subjectId }) => typeof subjectId === 'number')
               .map(({ owner }) => owner),
@@ -3478,6 +3553,7 @@ export function restoration(
             orderDeltas: application.orderDeltas,
             orderEndpoint:
               application.direction === 'undo' ? 'before' : 'after',
+            frontierSteps: application.frontiers,
           });
           for (const [owner, collection] of step.collections) {
             current.set(owner, collection);
@@ -3493,24 +3569,7 @@ export function restoration(
           ...(members.size > 0 ? { plainBranchMembers: members } : {}),
         };
       };
-      const applyDeclarativeTarget = (): void => {
-        const deltaOwners = new Set(orderDeltas.map(({ owner }) => owner));
-        const targetOwners = new Set([
-          ...deltaOwners,
-          ...reversalEffects
-            .filter(({ subjectId }) => typeof subjectId === 'number')
-            .map(({ owner }) => owner),
-        ]);
-        const conflictingOrderOwner = [...targetOwners].find((owner) =>
-          externalOrderOwners.has(owner)
-        );
-        if (conflictingOrderOwner !== undefined) {
-          throw restorationRefusal(
-            `ST1034: restoration refused — collection order ${conflictingOrderOwner} ` +
-              'changed after the operation being reversed. Nothing was changed; ' +
-              'the history position is unmoved.'
-          );
-        }
+      const collectBindings = () => {
         const bindings = new Map<number, CollectionTransitionTargetBinding>();
         visitTree((tree as ISignalTree<T>).$, (node) => {
           const binding = (
@@ -3523,6 +3582,31 @@ export function restoration(
           }
           return undefined;
         });
+        return bindings;
+      };
+      const applyDeclarativeTarget = (): void => {
+        const deltaOwners = new Set(orderDeltas.map(({ owner }) => owner));
+        const changedOwners = new Set([
+          ...deltaOwners,
+          ...reversalEffects
+            .filter(({ subjectId }) => typeof subjectId === 'number')
+            .map(({ owner }) => owner),
+        ]);
+        const conflictingOrderOwner = [...changedOwners].find((owner) =>
+          externalOrderOwners.has(owner)
+        );
+        const targetOwners = new Set([
+          ...changedOwners,
+          ...frontierSteps.map(({ owner }) => owner),
+        ]);
+        if (conflictingOrderOwner !== undefined) {
+          throw restorationRefusal(
+            `ST1034: restoration refused — collection order ${conflictingOrderOwner} ` +
+              'changed after the operation being reversed. Nothing was changed; ' +
+              'the history position is unmoved.'
+          );
+        }
+        const bindings = collectBindings();
         const sources = [...targetOwners].map((owner) => {
           const binding = bindings.get(owner);
           if (!binding) {
@@ -3541,6 +3625,7 @@ export function restoration(
               effects: reversalEffects,
               orderDeltas,
               orderEndpoints,
+              frontierSteps,
             });
         const scalarBinding: ScalarTransitionTargetBinding | undefined =
           scalarSlotRuntime
@@ -3748,6 +3833,12 @@ export function restoration(
         return;
       }
 
+      const frontierBindings =
+        frontierSteps.length > 0 ? collectBindings() : undefined;
+      const reinstateFrontiers = prepareFrontierReinstatement(
+        frontierSteps,
+        (owner) => frontierBindings?.get(owner)
+      );
       isRestoring = true;
       const replayOwnerId = getPositionRegistry(
         (tree as { $?: object }).$ ?? tree
@@ -3782,6 +3873,7 @@ export function restoration(
       } finally {
         isRestoring = false;
       }
+      reinstateFrontiers();
 
       // RESTORE-P0 P0-C. A restoration's OWN writes are published with
       // `participation: 'realized'` — measured via MUT-2, which records that
@@ -3872,7 +3964,7 @@ export function restoration(
     let historicalCapture: CaptureBucket | undefined;
     const getHistoricalCapture = (): CaptureBucket | undefined => {
       if (!restorationManager.hasRetainedOrPendingHistory()) return undefined;
-      return historicalCapture ??= createCaptureBucket();
+      return (historicalCapture ??= createCaptureBucket());
     };
     const clearHistoricalCapture = (): void => {
       if (historicalCapture) clearCaptureBucket(historicalCapture);
@@ -4261,6 +4353,7 @@ export function restoration(
       collectionOrders: PendingCollectionOrder[];
       descriptorInputs: CaptureBucket['descriptorInputs'];
       designated: boolean;
+      frontiers: TurnFrontierTransition[];
     } => {
       const ownerPaths = Array.from(bucket.ownerPaths).sort();
       bucket.ownerPaths.clear();
@@ -4272,19 +4365,19 @@ export function restoration(
         (left, right) => left - right
       );
       bucket.positionIds.clear();
+      // The turn's own order endpoints per collection (turn-order-record),
+      // read before the transient rows they may need are forgotten.
+      const { changes: collectionOrders, frontiers } = drainTurnOrders(
+        bucket.collectionOrders,
+        [...bucket.effects.values()],
+        bucket.effects
+      );
       const effects = withTransientRows(
         Array.from(bucket.effects.values()).map(cloneTurnEffect),
         bucket.effects
       );
       bucket.effects.clear();
       forgetTransientRows(bucket.effects);
-      const collectionOrders = Array.from(bucket.collectionOrders.values()).map(
-        (order) => ({
-          ...order,
-          beforeSubjects: [...order.beforeSubjects],
-          afterSubjects: [...order.afterSubjects],
-        })
-      );
       bucket.collectionOrders.clear();
       const descriptorInputs = bucket.descriptorInputs.splice(0);
       const designated = bucket.designated;
@@ -4297,6 +4390,7 @@ export function restoration(
         collectionOrders,
         descriptorInputs,
         designated,
+        frontiers,
       };
     };
 
@@ -4575,8 +4669,14 @@ export function restoration(
           for (const key of keys) {
             const beforeChild = before[key];
             const afterChild = after[key];
-            const beforePresent = Object.prototype.hasOwnProperty.call(before, key);
-            const afterPresent = Object.prototype.hasOwnProperty.call(after, key);
+            const beforePresent = Object.prototype.hasOwnProperty.call(
+              before,
+              key
+            );
+            const afterPresent = Object.prototype.hasOwnProperty.call(
+              after,
+              key
+            );
             // Keep read order and presence semantics while avoiding child
             // capture allocations for values the recursive guard would skip.
             if (beforeChild === afterChild && beforePresent === afterPresent) {
@@ -4742,20 +4842,13 @@ export function restoration(
     };
     const captureCollectionOrderIntoBucket = (
       bucket: CaptureBucket,
-      capture: OrderChangeCapture
+      capture: CollectionOrderCapture
     ): void => {
       if (isMetaDesignated(capture.meta)) {
         bucket.designated = true;
       }
-      const existing = bucket.collectionOrders.get(capture.owner);
-      bucket.collectionOrders.set(capture.owner, {
-        owner: capture.owner,
-        ownerPath: capture.ownerPath,
-        beforeSubjects: existing?.beforeSubjects ?? [...capture.beforeSubjects],
-        afterSubjects: [...capture.afterSubjects],
-        beforeFrontier: existing?.beforeFrontier ?? capture.beforeFrontier,
-        afterFrontier: capture.afterFrontier,
-      });
+      recordOrderTransition(bucket.collectionOrders, capture);
+      if (!carriesOrders(capture)) return;
       bucket.ownerPaths.add(capture.ownerPath);
       bucket.positionIds.add(capture.owner);
     };
@@ -4844,6 +4937,7 @@ export function restoration(
         collectionOrders,
         descriptorInputs,
         designated,
+        frontiers,
       } = drainCaptureBucket(bucket);
       // Even undesignated pending work is protected. Restoration history
       // admission is not evidence that transaction-owned writes are settled.
@@ -4865,7 +4959,8 @@ export function restoration(
               effects.length > 0 ? effects : undefined,
               collectionOrders.length > 0 ? collectionOrders : undefined,
               undefined,
-              transactionId
+              transactionId,
+              frontiers
             )
           : undefined;
       if (entry) {
@@ -5058,53 +5153,95 @@ export function restoration(
     let unsubscribeNotifications: (() => void) | null = null;
     let unsubscribeReset: (() => void) | null = null;
     let unsubscribeCollectionOrders: (() => void) | null = null;
+    const deferredOrderCaptures: CollectionOrderCapture[] = [];
     const releaseCapture = getMutationCaptureRuntime(tree)?.activateCapture();
     try {
+      const routeOrderCapture = (capture: CollectionOrderCapture): void => {
+        // Pending work never entered completed history. Its compensation
+        // returns to that baseline; it is not a new order gap or authority.
+        // Inspection owns neither history nor external-order authority.
+        if (isInspectionWrite(capture.meta)) {
+          // A frontier-only inspection change added or removed rows: a
+          // scrub that changed membership is not tracked.
+          if (carriesOrders(capture)) {
+            recordInspectionScrub(capture);
+          } else {
+            inspectionScrubs.delete(capture.owner);
+          }
+          return;
+        }
+        if (!carriesOrders(capture)) {
+          // A frontier-only transition: recorded with the turn it belongs
+          // to (its order endpoints and the token it replaced), never as
+          // external order authority. Reversals' own are not turns.
+          if (
+            capture.meta?.origin === 'restoration' ||
+            isCompensationWrite(capture.meta)
+          ) {
+            return;
+          }
+          const realized = getWriteParticipation(capture.meta) === 'realized';
+          const transactionId = resolveTransactionId(capture.meta);
+          if (realized || transactionId === undefined) {
+            const historical = getHistoricalCapture();
+            if (historical) {
+              captureCollectionOrderIntoBucket(historical, capture);
+            }
+          }
+          if (realized) return;
+          captureCollectionOrderIntoBucket(
+            transactionId === undefined
+              ? pendingCapture
+              : getTransactionBucket(transactionId),
+            capture
+          );
+          return;
+        }
+        if (isCompensationWrite(capture.meta)) {
+          return;
+        }
+        if (
+          getWriteParticipation(capture.meta) === 'realized' ||
+          resolveTransactionId(capture.meta) === undefined
+        ) {
+          const historical = getHistoricalCapture();
+          if (historical) captureCollectionOrderIntoBucket(historical, capture);
+        }
+        if (getWriteParticipation(capture.meta) === 'realized') {
+          externalOrderOwners.add(capture.owner);
+          selfDirty = true;
+          return;
+        }
+        externalOrderOwners.delete(capture.owner);
+        const transactionId = resolveTransactionId(capture.meta);
+        if (transactionId !== undefined) {
+          captureCollectionOrderIntoBucket(
+            getTransactionBucket(transactionId),
+            capture
+          );
+          return;
+        }
+        selfDirty = true;
+        captureCollectionOrderIntoBucket(pendingCapture, capture);
+      };
       unsubscribeCollectionOrders =
         getMutationCaptureRuntime(tree)?.subscribeCollectionOrder?.(
           (capture) => {
-            // Pending work never entered completed history. Its compensation
-            // returns to that baseline; it is not a new order gap or authority.
-            // Inspection owns neither history nor external-order authority.
-            if (isInspectionWrite(capture.meta)) {
-              // A frontier-only inspection change added or removed rows: a
-              // scrub that changed membership is not tracked.
-              if (carriesOrders(capture)) {
-                recordInspectionScrub(capture);
-              } else {
-                inspectionScrubs.delete(capture.owner);
-              }
-              return;
-            }
-            if (!carriesOrders(capture)) {
-              return;
-            }
-            if (isCompensationWrite(capture.meta)) {
-              return;
-            }
+            // A write a subscriber makes while a flush is delivering is
+            // delivered (so its effects are captured) by the NEXT flush, but
+            // its order captures arrive now: filed now, they joined the turn
+            // being delivered, which then claimed that write's frontier
+            // transitions without its rows. They wait until this flush's
+            // turn is recorded (`onFlush` below). A transaction's go to its
+            // own bucket, which no flush drains.
             if (
-              getWriteParticipation(capture.meta) === 'realized' ||
+              getPathNotifier()?.isDelivering?.() &&
               resolveTransactionId(capture.meta) === undefined
             ) {
-              const historical = getHistoricalCapture();
-              if (historical) captureCollectionOrderIntoBucket(historical, capture);
+              deferredOrderCaptures.push(capture);
+            } else {
+              routeOrderCapture(capture);
             }
-            if (getWriteParticipation(capture.meta) === 'realized') {
-              externalOrderOwners.add(capture.owner);
-              selfDirty = true;
-              return;
-            }
-            externalOrderOwners.delete(capture.owner);
-            const transactionId = resolveTransactionId(capture.meta);
-            if (transactionId !== undefined) {
-              captureCollectionOrderIntoBucket(
-                getTransactionBucket(transactionId),
-                capture
-              );
-              return;
-            }
-            selfDirty = true;
-            captureCollectionOrderIntoBucket(pendingCapture, capture);
           }
         ) ?? null;
       const notifier = getPathNotifier();
@@ -5161,10 +5298,17 @@ export function restoration(
                   resolveTransactionId(meta) === undefined)
               ) {
                 const historical = getHistoricalCapture();
-                if (historical) captureEffects(
-                  historical.effects, path, next, prev, meta,
-                  ownerPath, subjectIds, positionIds
-                );
+                if (historical)
+                  captureEffects(
+                    historical.effects,
+                    path,
+                    next,
+                    prev,
+                    meta,
+                    ownerPath,
+                    subjectIds,
+                    positionIds
+                  );
               }
               const membership = plainBranchMembershipEffects(meta);
               if (membership) {
@@ -5440,70 +5584,79 @@ export function restoration(
             }
           );
         }
+        const recordFlushedTurn = (): void => {
+          // Avoid recording history while restoring
+          if (isRestoring) return;
+          if (suppressNextFlushRecord) {
+            suppressNextFlushRecord = false;
+            selfDirty = false;
+            drainCaptureBucket(pendingCapture);
+            clearHistoricalCapture();
+            return;
+          }
+          // `onFlush` is on the GLOBAL PathNotifier, so this fires for writes
+          // to trees that have nothing to do with this one. Recording
+          // unconditionally meant a full materialise + structuredClone of
+          // THIS tree on every unrelated flush, then throwing it away:
+          // measured 0.008ms -> 3.7 -> 7.2 -> 9.7ms as 1/2/3 unrelated
+          // 10k-leaf trees were kept alive. Cost that scales with OTHER
+          // people's trees is the worst kind.
+          if (!selfDirty) return;
+          selfDirty = false;
+          // Decide only at flush: a later designated write can promote the
+          // whole turn. Retained (including redo) and pending history still
+          // need ordinary gaps to reconstruct their historical boundaries.
+          if (
+            !isTurnEligible(pendingCapture.designated) &&
+            !restorationManager.hasRetainedOrPendingHistory()
+          ) {
+            clearCaptureBucket(pendingCapture);
+            clearHistoricalCapture();
+            return;
+          }
+          const {
+            subjectIds,
+            positionIds,
+            effects,
+            collectionOrders,
+            descriptorInputs,
+            designated,
+            frontiers,
+          } = drainCaptureBucket(pendingCapture);
+          const historical = historicalCapture
+            ? drainCaptureBucket(historicalCapture)
+            : undefined;
+          historicalCapture = undefined;
+          const eligible =
+            isTurnEligible(designated) &&
+            restorationManager.retainsCompletedHistory() &&
+            (effects.length > 0 || collectionOrders.length > 0);
+          const recorded = eligible
+            ? restorationManager.addEntry(
+                subjectIds.length > 0 ? subjectIds : undefined,
+                positionIds.length > 0 ? positionIds : undefined,
+                effects.length > 0 ? effects : undefined,
+                collectionOrders.length > 0 ? collectionOrders : undefined,
+                undefined,
+                () => retainDescriptorInputs(descriptorInputs),
+                historical,
+                frontiers
+              )
+            : false;
+          if (!recorded) {
+            restorationManager.appendHistoricalGap(
+              historical?.effects ?? effects,
+              historical?.collectionOrders ?? collectionOrders,
+              designated,
+              historical?.frontiers ?? frontiers
+            );
+          }
+        };
         if (typeof notifier.onFlush === 'function') {
           unsubscribeFlush = notifier.onFlush(() => {
-            // Avoid recording history while restoring
-            if (isRestoring) return;
-            if (suppressNextFlushRecord) {
-              suppressNextFlushRecord = false;
-              selfDirty = false;
-              drainCaptureBucket(pendingCapture);
-              clearHistoricalCapture();
-              return;
-            }
-            // `onFlush` is on the GLOBAL PathNotifier, so this fires for writes
-            // to trees that have nothing to do with this one. Recording
-            // unconditionally meant a full materialise + structuredClone of
-            // THIS tree on every unrelated flush, then throwing it away:
-            // measured 0.008ms -> 3.7 -> 7.2 -> 9.7ms as 1/2/3 unrelated
-            // 10k-leaf trees were kept alive. Cost that scales with OTHER
-            // people's trees is the worst kind.
-            if (!selfDirty) return;
-            selfDirty = false;
-            // Decide only at flush: a later designated write can promote the
-            // whole turn. Retained (including redo) and pending history still
-            // need ordinary gaps to reconstruct their historical boundaries.
-            if (
-              !isTurnEligible(pendingCapture.designated) &&
-              !restorationManager.hasRetainedOrPendingHistory()
-            ) {
-              clearCaptureBucket(pendingCapture);
-              clearHistoricalCapture();
-              return;
-            }
-            const {
-              subjectIds,
-              positionIds,
-              effects,
-              collectionOrders,
-              descriptorInputs,
-              designated,
-            } = drainCaptureBucket(pendingCapture);
-            const historical = historicalCapture
-              ? drainCaptureBucket(historicalCapture)
-              : undefined;
-            historicalCapture = undefined;
-            const eligible =
-              isTurnEligible(designated) &&
-              restorationManager.retainsCompletedHistory() &&
-              (effects.length > 0 || collectionOrders.length > 0);
-            const recorded = eligible
-              ? restorationManager.addEntry(
-                  subjectIds.length > 0 ? subjectIds : undefined,
-                  positionIds.length > 0 ? positionIds : undefined,
-                  effects.length > 0 ? effects : undefined,
-                  collectionOrders.length > 0 ? collectionOrders : undefined,
-                  undefined,
-                  () => retainDescriptorInputs(descriptorInputs),
-                  historical
-                )
-              : false;
-            if (!recorded) {
-              restorationManager.appendHistoricalGap(
-                historical?.effects ?? effects,
-                historical?.collectionOrders ?? collectionOrders,
-                designated
-              );
+            recordFlushedTurn();
+            for (const capture of deferredOrderCaptures.splice(0)) {
+              routeOrderCapture(capture);
             }
           });
         }

@@ -22,7 +22,13 @@ export type Op =
   | ['clear']
   | ['pre', string]
   | ['rmAdd', string]
-  | ['rename', string, string];
+  | ['rename', string, string]
+  /** setAll of the current rows, reversed: a reorder of survivors. */
+  | ['reorder']
+  /** An overwriting prependMany of the last row: moves it to the front. */
+  | ['preOver']
+  /** setAll of the current rows plus one: an add, survivors in place. */
+  | ['setAllAdd', string];
 
 const SEED_IDS = ['a', 'b', 'c', 'd', 'e'];
 
@@ -77,11 +83,12 @@ export function generateOps(next: () => number): Op[] {
       ops.push(['pre', id]);
       pool.push(id);
     } else if (choice < 0.9) ops.push(['rmAdd', pick()]);
-    else {
+    else if (choice < 0.95) {
       const to = `r${fresh++}`;
       ops.push(['rename', pick(), to]);
       pool.push(to);
-    }
+    } else if (choice < 0.975) ops.push(['reorder']);
+    else ops.push(['preOver']);
   }
   return ops;
 }
@@ -126,6 +133,19 @@ export function applyOps(tree: Tree, ops: readonly Op[]): void {
         case 'rename':
           rows.changeId(op[1], op[2]);
           break;
+        case 'reorder':
+          rows.setAll([...rows.all()].reverse());
+          break;
+        case 'setAllAdd':
+          rows.setAll([...rows.all(), { id: op[1], n: 1 }]);
+          break;
+        case 'preOver': {
+          const all = rows.all();
+          const last = all[all.length - 1];
+          if (last)
+            rows.prependMany([{ ...last, n: 99 }], { mode: 'overwrite' });
+          break;
+        }
       }
     } catch {
       /* an invalid op for the current state; the turn continues */
@@ -151,6 +171,8 @@ const make = (enhancers: () => unknown[]): Tree => {
 /** The oracle: keys and rows (a changeId moves the key, not the row). */
 const stateOf = (tree: Tree) =>
   JSON.stringify([tree.$.rows.ids(), tree.$.rows.all()]);
+/** History holds rows only. */
+const rowsOf = (state: string) => JSON.stringify(JSON.parse(state)[1]);
 
 const describeError = (error: unknown) =>
   `throw:${String((error as Error)?.message ?? error).slice(0, 70)}`;
@@ -213,6 +235,110 @@ export async function checkRollback(
     await flush();
     const actual = stateOf(tree);
     return actual === before ? 'ok' : `rollback-wrong:${actual}`;
+  } finally {
+    tree.destroy();
+  }
+}
+
+/**
+ * Several turns, each its own undoable entry: undo them one at a time, redo
+ * them, undo them again, then jumpTo the newest and the oldest entry; every
+ * step lands exactly, and history materializes every entry's state. Each turn
+ * must change the rows (a turn that does not records no entry).
+ */
+export async function checkTurns(
+  enhancers: () => unknown[],
+  turns: readonly (readonly Op[])[]
+): Promise<string> {
+  const tree = make(enhancers);
+  try {
+    await flush();
+    const states = [stateOf(tree)];
+    for (const [index, ops] of turns.entries()) {
+      undoable(() => applyOps(tree, ops));
+      await flush();
+      states.push(stateOf(tree));
+      if (states[index + 1] === states[index]) return `noop-turn-${index}`;
+    }
+    const last = turns.length;
+    const steps: Array<[string, () => void, string]> = [];
+    const history = () => {
+      const entries = tree.getRestorationHistory();
+      entries.forEach(({ state }, index) => {
+        const all = JSON.stringify(
+          (state as unknown as { rows: { all: unknown } }).rows.all
+        );
+        if (all !== rowsOf(states[index + 1])) {
+          throw new Error(`entry ${index}: ${all}`);
+        }
+      });
+    };
+    for (let at = last; at > 0; at--)
+      steps.push([`undo-${at}`, () => tree.undo(), states[at - 1]]);
+    for (let at = 1; at <= last; at++)
+      steps.push([`redo-${at}`, () => tree.redo(), states[at]]);
+    for (let at = last; at > 0; at--)
+      steps.push([`undo-again-${at}`, () => tree.undo(), states[at - 1]]);
+    steps.push([`jump-newest`, () => tree.jumpTo(last - 1), states[last]]);
+    steps.push([`jump-oldest`, () => tree.jumpTo(0), states[1]]);
+    steps.push([
+      `jump-newest-again`,
+      () => tree.jumpTo(last - 1),
+      states[last],
+    ]);
+    try {
+      history();
+    } catch (error) {
+      return `history-${describeError(error)}`;
+    }
+    for (const [step, run, expected] of steps) {
+      try {
+        run();
+      } catch (error) {
+        return `${step}-${describeError(error)}`;
+      }
+      await flush();
+      const actual = stateOf(tree);
+      if (actual !== expected) return `${step}-wrong:${actual}`;
+      // History reads at every position, undone entries included.
+      try {
+        history();
+      } catch (error) {
+        return `history-after-${step}-${describeError(error)}`;
+      }
+    }
+    return 'ok';
+  } finally {
+    tree.destroy();
+  }
+}
+
+/** Each turn a pending transaction; roll them back newest first. */
+export async function checkTurnsRollback(
+  enhancers: () => unknown[],
+  turns: readonly (readonly Op[])[]
+): Promise<string> {
+  const tree = make(enhancers);
+  try {
+    await flush();
+    const states = [stateOf(tree)];
+    const pending = [];
+    for (const ops of turns) {
+      pending.push(tree.transaction(() => applyOps(tree, ops)));
+      await flush();
+      states.push(stateOf(tree));
+    }
+    for (let at = turns.length; at > 0; at--) {
+      try {
+        pending[at - 1].rollback();
+      } catch (error) {
+        return `rollback-${at}-${describeError(error)}`;
+      }
+      await flush();
+      const actual = stateOf(tree);
+      if (actual !== states[at - 1]) return `rollback-${at}-wrong:${actual}`;
+    }
+    return 'ok';
   } finally {
     tree.destroy();
   }

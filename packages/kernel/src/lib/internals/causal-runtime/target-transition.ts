@@ -113,6 +113,26 @@ export type DeriveDeclarativeTransitionTargetOptions = {
   readonly orderDeltas?: readonly CollectionOrderDelta[];
   readonly orderEndpoint?: 'before' | 'after';
   readonly orderEndpoints?: ReadonlyMap<PositionId, 'before' | 'after'>;
+  /**
+   * Order-frontier tokens to reinstate on collections this transition
+   * reverses without an order delta (invariant 3 in
+   * causal-runtime-contract.md): where the source is still at `from`, the
+   * target order is exactly the one `to` identified, so it gets `to` back
+   * rather than a fresh token. Owners named here are targets even with no
+   * effect of their own.
+   */
+  readonly frontierSteps?: readonly FrontierStep[];
+};
+
+/**
+ * A reversal's order-frontier move on one collection: from the token the
+ * reversed turns left to the one they started from (`to` undefined: they do
+ * not chain, so nothing is reinstated).
+ */
+export type FrontierStep = {
+  readonly owner: number;
+  readonly from: unknown;
+  to: unknown;
 };
 
 export type CollectionOrderParticipant = {
@@ -216,6 +236,9 @@ export function deriveDeclarativeTransitionTarget(
       sourceSubjects: Set<number>;
     }
   >();
+  const frontierSteps = new Map(
+    (options.frontierSteps ?? []).map((step) => [step.owner, step])
+  );
   for (const source of options.collections) {
     if (collections.has(source.owner)) {
       throw new Error(`Duplicate collection transition owner ${source.owner}`);
@@ -275,6 +298,10 @@ export function deriveDeclarativeTransitionTarget(
   const targets = new Map<PositionId, CollectionTransitionTarget>();
   for (const [owner, collection] of collections) {
     const delta = orderDeltas.get(owner);
+    const sourceFrontier = options.collections.find(
+      (source) => source.owner === owner
+    )?.orderFrontier;
+    const step = frontierSteps.get(owner);
     const orderEndpoint =
       options.orderEndpoints?.get(owner) ?? options.orderEndpoint ?? 'after';
     const order = delta
@@ -302,11 +329,11 @@ export function deriveDeclarativeTransitionTarget(
         ? orderEndpoint === 'before'
           ? delta.beforeFrontier
           : delta.afterFrontier
-        : options.collections.find((source) => source.owner === owner)
-            ?.orderFrontier === undefined ||
+        : step?.to !== undefined && sourceFrontier === step.from
+        ? step.to
+        : sourceFrontier === undefined ||
           sameSubjects(collection.sourceSubjects, collection.subjects)
-        ? options.collections.find((source) => source.owner === owner)
-            ?.orderFrontier
+        ? sourceFrontier
         : {},
     });
   }

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { signalTree } from '../../lib/signal-tree';
 import { entityMap } from '../../lib/markers/entity-map';
-import { SignalTreeRollbackError } from '../../lib/types';
 import { undoable } from '../../lib/undoable';
 import { transactions } from '../transactions/transactions';
 import { restoration } from './restoration';
@@ -10,18 +9,12 @@ import { restoration } from './restoration';
  * TRACKING — reversal failures found PRE-EXISTING ON npm 15.4.3 while probing
  * the update-then-remove / addMany-overwrite repairs.
  *
- * All but one are repaired for 15.4.4; their rows below are ordinary `it`
- * carriers now, each marked FIXED with what it did on 15.4.3. The remaining
- * pair — an order delta plus another structural change in one turn — is a
- * design-level gap, reported rather than decided, and keeps the convention:
- *
- * - `... — current behaviour` is an ordinary passing test that pins the
- *   SPECIFIC failure today (the exact error, or the exact wrong state), so an
- *   unrelated throw, a typo or a different regression cannot hide behind the
- *   tracking test. It is EXPECTED TO START FAILING when the defect is fixed;
- *   delete it then.
- * - `... — desired` states the correct behaviour and is marked `it.fails`.
- *   It turns red when the defect is fixed; flip it to `it` then.
+ * All are repaired for 15.4.4; their rows below are ordinary `it` carriers
+ * now, each marked FIXED with what it did on 15.4.3. The last two (an order
+ * delta plus another structural change in ONE turn, and an order delta then
+ * a LATER turn on the same collection) were tracked as a design-level pair
+ * (a `current behaviour` row pinning the refusal beside an `it.fails`
+ * `desired` row) until the owner's (a)+(d) decision repaired them.
  */
 type Row = { id: string; n: number };
 const flush = async () => {
@@ -47,14 +40,6 @@ const SEEDED: Row[] = [
 const seed = async (tree: Tree) => {
   for (const row of SEEDED) tree.$.rows.addOne({ ...row });
   await flush();
-};
-const thrownBy = (run: () => void): unknown => {
-  try {
-    run();
-  } catch (error) {
-    return error;
-  }
-  throw new Error('expected a throw, none happened');
 };
 
 const undoConfigurations = [
@@ -235,20 +220,20 @@ describe.each(undoConfigurations)(
 );
 
 // ── An order delta plus another structural change in ONE turn ────────────────
-// setAll (survivors reordered) and prependMany (an overwritten row moved to the
-// front) record their ORDER change as a collection order delta whose endpoints
-// are the order just before and just after that call. A turn that also adds or
-// removes rows of the same collection before or after it leaves the delta's
-// endpoints off the turn's endpoints, and the declarative reversal refuses
-// rather than guess. PRE-EXISTING ON 15.4.3 for setAll. Reported as a
-// design-level gap (how an order capture composes with other structural
-// effects in a turn), not repaired here.
+// FIXED. setAll (survivors reordered) and prependMany (an overwritten row
+// moved to the front) recorded their ORDER change as a collection order delta
+// whose endpoints were the order just before and just after that call; a turn
+// that also added or removed rows of the same collection left them off the
+// turn's endpoints, and the reversal refused (setAll, PRE-EXISTING ON 15.4.3).
+// The turn now records ONE net order delta per collection, composed from its
+// order captures and its row changes, with the turn's own frontiers
+// (`turn-order-record.ts`); the full matrix is
+// `transactions/turn-order-delta.spec.ts`.
 //
 // The prependMany shape did not refuse on 15.4.3: its move was unrecorded and
 // its overwrite read as an add, so undo AND rollback reported success and
 // deleted the overwritten row (`c` gone, measured on 15.4.3 and on the v16
-// integration head). Recording the move turns that silent loss into this
-// refusal, with state unchanged.
+// integration head); earlier 15.4.4 work turned that loss into the refusal.
 const reorderThenRemove = (tree: Tree) => {
   tree.$.rows.setAll([
     { id: 'c', n: 3 },
@@ -263,133 +248,77 @@ const addThenPrependOverwrite = (tree: Tree) => {
 };
 
 describe.each(undoConfigurations)(
-  'known design-level limitation: order delta composition, undo (%s)',
+  'order delta composition in one turn, undo (%s)',
   (_name, enhancers) => {
+    // FIXED (setAll: pre-existing on 15.4.3, undo refused; prependMany: undo
+    // deleted the overwritten row on 15.4.3, then refused).
     it.each([
       ['setAll reorder, then removeOne', reorderThenRemove],
       [
         'addOne, then prependMany overwrite moving a row',
         addThenPrependOverwrite,
       ],
-    ] as const)(
-      'KNOWN LIMITATION (design-level; setAll pre-existing on 15.4.3): %s — current behaviour: undo refuses and changes nothing',
-      async (_case, act) => {
-        const tree = make(enhancers());
-        try {
-          await seed(tree);
-          undoable(() => act(tree));
-          await flush();
-          const after = tree.$.rows.all();
-          const error = thrownBy(() => tree.undo());
-          expect(error).toBeInstanceOf(Error);
-          expect((error as Error).message).toMatch(
-            /^(collection order frontier does not match the transition endpoint|Collection order does not match active SubjectIds)$/
-          );
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual(after);
-        } finally {
-          tree.destroy();
-        }
+    ] as const)('%s: undo restores', async (_case, act) => {
+      const tree = make(enhancers());
+      try {
+        await seed(tree);
+        undoable(() => act(tree));
+        await flush();
+        tree.undo();
+        await flush();
+        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+      } finally {
+        tree.destroy();
       }
-    );
-
-    it.fails.each([
-      ['setAll reorder, then removeOne', reorderThenRemove],
-      [
-        'addOne, then prependMany overwrite moving a row',
-        addThenPrependOverwrite,
-      ],
-    ] as const)(
-      'KNOWN LIMITATION (design-level; setAll pre-existing on 15.4.3): %s — desired: undo restores',
-      async (_case, act) => {
-        const tree = make(enhancers());
-        try {
-          await seed(tree);
-          undoable(() => act(tree));
-          await flush();
-          tree.undo();
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual(SEEDED);
-        } finally {
-          tree.destroy();
-        }
-      }
-    );
+    });
   }
 );
 
 describe.each(rollbackConfigurations)(
-  'known design-level limitation: order delta composition, rollback (%s)',
+  'order delta composition in one turn, rollback (%s)',
   (_name, enhancers) => {
     const begin = (tree: Tree, act: (tree: Tree) => void) =>
       tree.transaction(() => act(tree));
 
+    // FIXED (setAll: pre-existing on 15.4.3, rollback refused; prependMany:
+    // rollback deleted the overwritten row on 15.4.3, then refused).
     it.each([
       ['setAll reorder, then removeOne', reorderThenRemove],
       [
         'addOne, then prependMany overwrite moving a row',
         addThenPrependOverwrite,
       ],
-    ] as const)(
-      'KNOWN LIMITATION (design-level; setAll pre-existing on 15.4.3): %s — current behaviour: rollback refuses and changes nothing',
-      async (_case, act) => {
-        const tree = make(enhancers());
-        try {
-          await seed(tree);
-          const proposal = begin(tree, act);
-          await flush();
-          const after = tree.$.rows.all();
-          const error = thrownBy(() => proposal.rollback());
-          expect(error).toBeInstanceOf(SignalTreeRollbackError);
-          expect((error as { cause?: { kind?: string } }).cause?.kind).toBe(
-            'effect-validation-failed'
-          );
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual(after);
-        } finally {
-          tree.destroy();
-        }
+    ] as const)('%s: rollback restores', async (_case, act) => {
+      const tree = make(enhancers());
+      try {
+        await seed(tree);
+        const proposal = begin(tree, act);
+        await flush();
+        proposal.rollback();
+        await flush();
+        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+      } finally {
+        tree.destroy();
       }
-    );
-
-    it.fails.each([
-      ['setAll reorder, then removeOne', reorderThenRemove],
-      [
-        'addOne, then prependMany overwrite moving a row',
-        addThenPrependOverwrite,
-      ],
-    ] as const)(
-      'KNOWN LIMITATION (design-level; setAll pre-existing on 15.4.3): %s — desired: rollback restores',
-      async (_case, act) => {
-        const tree = make(enhancers());
-        try {
-          await seed(tree);
-          const proposal = begin(tree, act);
-          await flush();
-          proposal.rollback();
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual(SEEDED);
-        } finally {
-          tree.destroy();
-        }
-      }
-    );
+    });
   }
 );
 
 // ── An order delta, then a LATER turn that adds or removes a row ─────────────
-// The same gap across turns. An order delta applies only while the
-// collection's order frontier is the exact token it recorded (the structural
-// store issues a fresh token per order change; frontier = "causally allowed
-// now", docs/architecture/causal-runtime-contract.md invariant 3). A later
-// turn that adds or removes a row replaces the token, and reversing that
-// later turn issues yet another one, so the order change stays irreversible
-// even after the later turn is undone or rolled back and the order is back to
-// exactly the delta's endpoint. A separate EARLIER turn and a later
-// updateOne do not block it. PRE-EXISTING ON 15.4.3 for setAll, also present
-// on the v16 integration head. The prependMany shapes reported success on
-// 15.4.3 and deleted the overwritten row; they now refuse with state
-// unchanged.
+// FIXED. An order delta applies only while the collection's order frontier is
+// the exact token it recorded (the structural store issues a fresh token per
+// order change; frontier = "causally allowed now",
+// docs/architecture/causal-runtime-contract.md invariant 3). A later turn
+// that added or removed a row replaced the token, and reversing that later
+// turn issued yet another one, so the order change stayed irreversible even
+// once the order was back to exactly the delta's endpoint (PRE-EXISTING ON
+// 15.4.3 for setAll, also on the v16 integration head; the prependMany shapes
+// reported success on 15.4.3 and deleted the overwritten row). Each turn now
+// records its frontier transitions, and a reversal that lands where the
+// collection is still at the token the turn left reinstates the token the
+// turn replaced: identity is kept, since that is exactly the order the token
+// named. Redo chains, jumpTo and history are in
+// `transactions/turn-order-delta.spec.ts`.
 const crossTurnShapes = [
   [
     'setAll reorder, then a separate removeOne',
@@ -426,37 +355,12 @@ const crossTurnShapes = [
 ] as const;
 
 describe.each(undoConfigurations)(
-  'known design-level limitation: order delta across turns, undo (%s)',
+  'order delta across turns, undo (%s)',
   (_name, enhancers) => {
+    // FIXED (setAll: pre-existing on 15.4.3, the second undo refused;
+    // prependMany: undo deleted the overwritten row on 15.4.3, then refused).
     it.each(crossTurnShapes)(
-      'KNOWN LIMITATION (design-level; setAll pre-existing on 15.4.3): %s — current behaviour: the later turn undoes, then undo of the order change refuses and changes nothing',
-      async (_case, order, later) => {
-        const tree = make(enhancers());
-        try {
-          await seed(tree);
-          undoable(() => order(tree));
-          await flush();
-          const reordered = tree.$.rows.all();
-          undoable(() => later(tree));
-          await flush();
-          tree.undo();
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual(reordered);
-          const error = thrownBy(() => tree.undo());
-          expect(error).toBeInstanceOf(Error);
-          expect((error as Error).message).toBe(
-            'collection order frontier does not match the transition endpoint'
-          );
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual(reordered);
-        } finally {
-          tree.destroy();
-        }
-      }
-    );
-
-    it.fails.each(crossTurnShapes)(
-      'KNOWN LIMITATION (design-level; setAll pre-existing on 15.4.3): %s — desired: undo twice restores',
+      '%s: undo twice restores',
       async (_case, order, later) => {
         const tree = make(enhancers());
         try {
@@ -479,37 +383,13 @@ describe.each(undoConfigurations)(
 );
 
 describe.each(rollbackConfigurations)(
-  'known design-level limitation: order delta across turns, rollback (%s)',
+  'order delta across turns, rollback (%s)',
   (_name, enhancers) => {
+    // FIXED (setAll: pre-existing on 15.4.3, the first rollback refused;
+    // prependMany: rollback deleted the overwritten row on 15.4.3, then
+    // refused).
     it.each(crossTurnShapes)(
-      'KNOWN LIMITATION (design-level; setAll pre-existing on 15.4.3): %s — current behaviour: the later transaction rolls back, then rollback of the order change refuses and changes nothing',
-      async (_case, order, later) => {
-        const tree = make(enhancers());
-        try {
-          await seed(tree);
-          const first = tree.transaction(() => order(tree));
-          await flush();
-          const reordered = tree.$.rows.all();
-          const second = tree.transaction(() => later(tree));
-          await flush();
-          second.rollback();
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual(reordered);
-          const error = thrownBy(() => first.rollback());
-          expect(error).toBeInstanceOf(SignalTreeRollbackError);
-          expect((error as { cause?: { kind?: string } }).cause?.kind).toBe(
-            'effect-validation-failed'
-          );
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual(reordered);
-        } finally {
-          tree.destroy();
-        }
-      }
-    );
-
-    it.fails.each(crossTurnShapes)(
-      'KNOWN LIMITATION (design-level; setAll pre-existing on 15.4.3): %s — desired: rolling back both restores',
+      '%s: rolling back both restores',
       async (_case, order, later) => {
         const tree = make(enhancers());
         try {

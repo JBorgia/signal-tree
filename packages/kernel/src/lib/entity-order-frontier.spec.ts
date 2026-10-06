@@ -56,12 +56,21 @@ describe('order frontier hook', () => {
         { id: 'd2', n: 1 },
       ]);
       tree.$.rows.prependMany([{ id: 'p', n: 0 }]);
+      tree.$.rows.setAll([
+        { id: 'p', n: 0 },
+        { id: 'e', n: 0 },
+        { id: 'd2', n: 1 },
+        { id: 'q', n: 0 },
+      ]);
+      tree.$.rows.clear();
       expect(kinds(seen)).toStrictEqual([
         'frontier', // addOne
         'frontier', // removeMany, one for three rows
         'order', // setAll reordering the survivors
         'frontier', // prependMany's add
         'frontier', // prependMany's move to the front
+        'frontier', // setAll adding a row, survivors in place
+        'frontier', // clear
       ]);
       expect(seen[0].beforeFrontier).toBe(start);
       for (let i = 1; i < seen.length; i++) {

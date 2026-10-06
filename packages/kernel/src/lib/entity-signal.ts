@@ -3416,6 +3416,7 @@ export function createEntitySignal<
       });
 
       const membershipUnit = beginMembershipUnit();
+      const frontier = structuralStore.activeOrderFrontier();
       try {
       for (const { id, subjectId, entity } of activeSubjects) {
         const currentState = resolveSubjectState(subjectId);
@@ -3426,6 +3427,7 @@ export function createEntitySignal<
         );
         captureCommittedEntity(subjectId, entity, undefined, true);
       }
+      publishFrontier(frontier);
 
       membershipUnit.commit(membershipInventory.observed()
         ? activeSubjects.map(({ id, subjectId }) => ({ kind: 'remove' as const, lifetimeId: subjectId, key: id }))
@@ -3674,7 +3676,7 @@ export function createEntitySignal<
         survivingOrderChanged(currentSubjects, afterSubjects)
       ) {
         publishOrderChange(currentSubjects, afterSubjects, beforeOrderFrontier);
-      }
+      } else publishFrontier(beforeOrderFrontier);
 
       membershipUnit.commit(membershipChanges);
       for (const { subjectId } of stagedRemovals) { tombstoneSubjectSignal(subjectId); publishSubjectPhysicalChange(subjectId); }
