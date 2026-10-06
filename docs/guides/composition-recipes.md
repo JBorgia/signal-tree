@@ -374,9 +374,10 @@ An explicit refusal changes no state and the handle stays pending, so another
 rollback attempt or `confirm()` remains available. **Existing v15 behavior
 releases the commit scope and its deferred consequences on refusal.** Do not
 infer that storage stayed unchanged. Since 15.4.2, a pending-created row that
-settled later work removed no longer blocks rollback, but removing an entity is
-still not a general recovery strategy: a pending-created row confirmed work
-edited and kept still refuses.
+settled later work removed no longer blocks rollback, and since 15.4.4 neither
+does an existing row the transaction edited that settled work then removed. But
+removing an entity is still not a general recovery strategy: a row confirmed
+work edited and kept still refuses, as does any removal still pending.
 
 ```typescript
 try {
