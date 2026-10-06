@@ -1,12 +1,37 @@
 ## Unreleased
 
-**Patch — undo after a rejected transaction.**
+**Patch — reversals restore exactly what they reverse.** Every reversal defect
+known on 15.4.3 is repaired; forward behaviour for valid input is unchanged.
 
+- Rolling back a transaction that wrote a row and then removed it restores the
+  row as it was BEFORE the transaction (it came back with the written value),
+  including through the declarative path, which refused before.
+- `addMany(..., { mode: 'overwrite' })` announces an overwritten row as a value
+  replacement, so undo, redo and rollback restore it in place instead of
+  deleting it; appended rows anchor after the previous appended row.
 - After a rejection, no `undo()`, `redo()` or `jumpTo()` reinstates a value or
   row that only the rejected transaction wrote: undo of a later write restores
   what was there before the transaction. This replaces the known limitation
   listed under 15.4.2/15.4.3. `getRestorationHistory()` no longer throws after
   rejecting an undoable transaction that added a row.
+- Undo of `updateOne` followed by `clear()` (and other writes followed by
+  removals of the same rows) restores the original order.
+- Undo of `changeId` → `updateOne` → `removeOne` no longer refuses.
+- Undo of a write that drops, adds or replaces an object- or array-valued row
+  field (even `updateOne(id, { list: [3] })`) no longer refuses.
+- Redo of rows appended after a row the same turn removed no longer throws.
+- Rollback of a row created and then written in the same transaction no longer
+  refuses when the declarative path is taken.
+- `prependMany` records its move to the front: undo, redo and rollback restore
+  the order, including an overwritten row moved to the front.
+- `upsertMany` rows it adds are reversible (undo threw; rollback left them).
+- A batch call naming one id twice applies sequentially (`addMany` /
+  `prependMany` strict throws before writing, skip keeps the first copy,
+  overwrite keeps the last in the first copy's place; `upsertMany` merges the
+  copies). It used to insert two rows under one key.
+- Still refused, by design for now: a collection order change (`setAll`
+  reordering survivors, `prependMany` moving an overwritten row) combined with
+  another add or remove of the same collection in one turn.
 
 ## 15.4.3 (2026-10-05)
 
