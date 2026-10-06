@@ -407,7 +407,19 @@ const TARGETS = {
     // and of a setAll that adds or removes rows without reordering survivors
     // (the fuzz found both unpublished): 23,202 B (+11 B), ~1.8 B left, no
     // raise. Dev 26,096 B of 26,112.
-    devKB: 25.5,
+    // 15.4.4 combination (the merge of the reversal and entity/Link lines,
+    // 42d2f6b4), within the owner's maximum (22.7 KB prod, +100 B dev = 25.6
+    // KB): the reversal line alone measured 23,183 B prod / 26,076 B dev at
+    // 03075e5a after two offsets in its own frontier code (publishOrderChange
+    // takes the frontier first, 312f54e6, -9 B; one instance accessor that
+    // reads or installs the token, 4cc1f486, -10 B). The merged tree measures
+    // 23,199 B prod / 26,150 B dev: the entity line's interceptor runner,
+    // replay-start counting and topology refusals add +16 B prod and +74 B dev
+    // here. Prod fits 22.66 KB (23,203 B): no raise. Dev was over 25.5 KB
+    // (26,112 B) by 38 B; tools/check-devmode-foldable.mjs confirms the dev
+    // code folds (entities 25.53 -> 22.64 KB). Raised only as far as needed:
+    // 25.54 KB = 26,152 B (the gate compares bytes / 1024).
+    devKB: 25.54,
     prodKB: 22.66,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
