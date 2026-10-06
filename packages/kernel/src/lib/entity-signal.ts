@@ -1831,11 +1831,11 @@ export function createEntitySignal<
    * `addMany`, and with `front` `prependMany`: the rows are committed, moved to
    * the front, and only then announced and tapped. A fresh row's `add` effect
    * is anchored to its neighbours in that committed order, so a tap — and any
-   * write it makes — sees the call's result, never rows about to move. Before
-   * 15.4.4 the move came after the taps, and the effects were re-anchored from a
-   * closure array that only `prependMany` emptied: every observed `addMany`
-   * retained one deep clone per added row, and a nested `prependMany` in a tap
-   * emptied the outer call's list (its redo threw).
+   * write it makes — sees the call's result, never rows about to move. On
+   * 15.4.3 the move came after the taps; 005399a7 then re-anchored the effects
+   * from a closure array that only `prependMany` emptied, so every observed
+   * `addMany` retained one deep clone per added row, and a nested `prependMany`
+   * in a tap emptied the outer call's list (its redo threw).
    */
   function addRows(
     entities: E[],
