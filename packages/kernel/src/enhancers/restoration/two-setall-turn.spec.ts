@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { entityMap, signalTree, undoable } from '../../index';
+import { isRestorationRefusal } from '../../lib/internals/restoration-source';
 import { transactions } from '../transactions/transactions';
 import { restoration } from './restoration';
 
@@ -20,7 +21,12 @@ type Tree = {
   $: (() => unknown) & {
     count: (value?: number) => number;
     g: {
-      rows: { setAll(rows: Row[]): void; addOne(row: Row): string };
+      rows: {
+        setAll(rows: Row[]): void;
+        addOne(row: Row): string;
+        removeOne(id: string): void;
+        ids(): string[];
+      };
     };
   };
   undo(): void;
@@ -130,4 +136,97 @@ describe('a turn holding two setAlls (v16 8g)', () => {
           expect(snap(tree)).toBe(states[index]);
         }
       });
+});
+
+/**
+ * The distinction the ghost rows rely on (v16 8g). A neighbour the turn
+ * itself created and removed is in the turn's record, and redo places by it.
+ * A neighbour a LATER write removed is not, and the retained-placement-proof
+ * rule still refuses: nothing can say where the row went
+ * (`restoration-missing-anchors.spec.ts`).
+ */
+describe('an anchor the turn removed versus one a later write removed (v16 8g)', () => {
+  for (const [order, enhancers] of Object.entries(orders)) {
+    it(`a neighbour the turn created and removed: redo places by it (${order})`, async () => {
+      const tree = signalTree(
+        { g: { rows: entityMap<Row, string>() }, count: 0 },
+        { enhancers: enhancers() as never }
+      ) as unknown as Tree;
+      trees.push(tree);
+      undoable(() => tree.$.count(100));
+      await flush();
+      undoable(() => {
+        tree.$.g.rows.setAll([row('a', 1), row('c', 2)]);
+        tree.$.g.rows.removeOne('c');
+      });
+      await flush();
+      const after = snap(tree);
+      tree.undo();
+      await flush();
+      tree.redo();
+      await flush();
+      expect(snap(tree)).toBe(after);
+    });
+
+    it(`a transient row no kept row names is not kept (${order})`, async () => {
+      const tree = signalTree(
+        { g: { rows: entityMap<Row, string>() }, count: 0 },
+        { enhancers: enhancers() as never }
+      ) as unknown as Tree;
+      trees.push(tree);
+      undoable(() => tree.$.count(100));
+      await flush();
+      undoable(() => tree.$.g.rows.addOne(row('x', 0)));
+      await flush();
+      undoable(() => {
+        // t lands after x and goes again: nothing kept names it.
+        tree.$.g.rows.addOne(row('t', 9));
+        tree.$.g.rows.removeOne('t');
+        // a's right neighbour c goes again too: a names it, so it is kept.
+        tree.$.g.rows.setAll([row('x', 0), row('a', 1), row('c', 2)]);
+        tree.$.g.rows.removeOne('c');
+      });
+      await flush();
+      tree.undo();
+      await flush();
+      // A later write removes x, t's only recorded neighbour. Kept as a
+      // ghost, t would refuse the redo for a row nothing needs.
+      tree.$.g.rows.removeOne('x');
+      await flush();
+      tree.redo();
+      await flush();
+      expect(tree.$.g.rows.ids()).toEqual(['a']);
+    });
+
+    it(`a neighbour a later write removed: redo refuses, nothing changed (${order})`, async () => {
+      const tree = signalTree(
+        { g: { rows: entityMap<Row, string>() }, count: 0 },
+        { enhancers: enhancers() as never }
+      ) as unknown as Tree;
+      trees.push(tree);
+      undoable(() => tree.$.count(100));
+      await flush();
+      undoable(() => tree.$.g.rows.addOne(row('c', 2)));
+      await flush();
+      // a lands next to c, which an earlier turn added.
+      undoable(() => tree.$.g.rows.addOne(row('a', 1)));
+      await flush();
+      tree.undo();
+      await flush();
+      // An ordinary write outside history removes c, a's recorded neighbour.
+      tree.$.g.rows.removeOne('c');
+      await flush();
+      const before = snap(tree);
+      let error: unknown;
+      try {
+        tree.redo();
+      } catch (thrown) {
+        error = thrown;
+      }
+      await flush();
+      expect(isRestorationRefusal(error)).toBe(true);
+      expect((error as Error).message).toMatch(/no live placement anchor/);
+      expect(snap(tree)).toBe(before);
+    });
+  }
 });
