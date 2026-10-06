@@ -4010,14 +4010,113 @@ export function restoration(
       );
     };
 
-    const applyTurnEffectsThroughRealizationPort = (
+    /**
+     * An ordinary later write (authored, not undoable) does not remove a
+     * turn's undo eligibility, and undo restores the turn's pre-image
+     * (15.4.2). For a row the turn added, that pre-image is "this lifetime
+     * absent": when an ordinary write already removed it, it holds, so the
+     * row's removal and its field writes are dropped and the rest of the turn
+     * reverses. The removal found no such row and undo threw, untyped,
+     * "Unsupported scoped undo effect at structural-drift" (15.4.3 too). The
+     * same for a redo that removes a lifetime already gone. A redo re-adds
+     * the row as the turn recorded it, as it re-applies a scalar over an
+     * ordinary write, unless a lifetime created AFTER it (later work; subject
+     * ids are allocated in order) now holds its key: that row is not this
+     * turn's, so it is left alone and this one stays absent. A holder that
+     * existed before still refuses (restoration.spec "fails atomically when
+     * redoing a mixed add turn cannot restore the added subject"). A
+     * lifetime the same operation brings back is not settled. Run after the
+     * pending-overlap refusal: a row a pending transaction removed is not
+     * settled (ordinary-removal-undo.spec.ts).
+     */
+    const withoutSettledLifetimes = (
       applications: DirectedTurnApplication[]
+    ): DirectedTurnApplication[] => {
+      const lifetime = (owner: number, subject: number) =>
+        `${owner}:${subject}`;
+      let structural = false;
+      const brought = new Set<string>();
+      for (const { effects, direction } of applications) {
+        for (const effect of effects) {
+          if (effect.kind !== 'add' && effect.kind !== 'remove') continue;
+          structural = true;
+          if ((effect.kind === 'add') === (direction === 'redo')) {
+            brought.add(lifetime(effect.position, effect.subject));
+          }
+        }
+      }
+      if (!structural) return applications;
+      type Collection = {
+        __findKeyBySubjectId?(subject: number): string | number | undefined;
+        __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+      };
+      let collections: Map<number, Collection> | undefined;
+      const collectionOf = (owner: number) => {
+        if (!collections) {
+          const found = new Map<number, Collection>();
+          visitTree(tree.$, (node) => {
+            const binding = (node as Collection).__prepareTransitionTarget;
+            if (binding) found.set(binding.owner, node as Collection);
+            return undefined;
+          });
+          collections = found;
+        }
+        return collections.get(owner);
+      };
+      const holders = new Map<number, Map<string | number, number>>();
+      const holderOf = (owner: number, key: string | number) => {
+        let byKey = holders.get(owner);
+        if (!byKey) {
+          const source =
+            collectionOf(owner)?.__prepareTransitionTarget?.readSource();
+          byKey = new Map(
+            (source?.subjects ?? []).map(({ subject, key }) => [key, subject])
+          );
+          holders.set(owner, byKey);
+        }
+        return byKey.get(key);
+      };
+      const settled = new Set<string>();
+      for (const { effects, direction } of applications) {
+        for (const effect of effects) {
+          if (effect.kind !== 'add' && effect.kind !== 'remove') continue;
+          const collection = collectionOf(effect.position);
+          if (
+            !collection?.__findKeyBySubjectId ||
+            collection.__findKeyBySubjectId(effect.subject) !== undefined
+          ) {
+            continue;
+          }
+          const id = lifetime(effect.position, effect.subject);
+          const adds = (effect.kind === 'add') === (direction === 'redo');
+          if (!adds) {
+            if (!brought.has(id)) settled.add(id);
+            continue;
+          }
+          if (direction !== 'redo') continue;
+          const holder = holderOf(effect.position, effect.key);
+          if (holder !== undefined && holder > effect.subject) settled.add(id);
+        }
+      }
+      if (settled.size === 0) return applications;
+      return applications.map((application) => ({
+        ...application,
+        effects: application.effects.filter(
+          (effect) =>
+            effect.subject === undefined ||
+            !settled.has(lifetime(effect.position, effect.subject))
+        ),
+      }));
+    };
+
+    const applyTurnEffectsThroughRealizationPort = (
+      requested: DirectedTurnApplication[]
     ): void => {
       if (
         pendingRestorationFootprints.size > 0 ||
         pendingTransactions.size > 0
       ) {
-        const touches = applications.flatMap(({ effects, orderDeltas }) => [
+        const touches = requested.flatMap(({ effects, orderDeltas }) => [
           ...effects.map(restorationFootprint),
           ...orderDeltas.map(({ owner }) => ({
             position: owner,
@@ -4050,6 +4149,7 @@ export function restoration(
           }
         }
       }
+      const applications = withoutSettledLifetimes(requested);
       // A row's field reversals land after its re-add. Capture order is not
       // chronological — rekey-then-remove composes into one removal that keeps
       // the rekey's EARLIER slot — so reversing it put the field reversal

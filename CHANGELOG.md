@@ -238,6 +238,14 @@ bullet below says **Compatibility** or **Behaviour change**.
 - After rejecting a transaction that removed or reordered rows, history,
   undo, redo and `jumpTo()` of later work restore those rows next to the
   neighbours the rollback restored them beside (history and undo threw).
+- Undo of a turn that added a row an ordinary later write (not undoable)
+  removed no longer throws "Unsupported scoped undo effect at
+  structural-drift" (also on 15.4.3, and after a refused rollback then
+  confirm). As for a scalar since 15.4.2, the ordinary write does not remove
+  the turn's undo eligibility: the row's pre-image, absent, already holds, so
+  undo leaves it as it is and reverses the rest of the turn; redo adds it
+  back as the turn recorded it. A row a later write put at the same key with
+  a new lifetime is not the turn's: undo and redo leave it alone.
 - An undoable write made while viewing a `jumpTo()` position keeps the viewed
   entry and every entry before it in history, applied, and discards only the
   entries after it. After a forward jump (`undo(); jumpTo(1)`) it discarded
