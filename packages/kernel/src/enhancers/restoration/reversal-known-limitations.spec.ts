@@ -151,7 +151,10 @@ describe.each(undoConfigurations)(
       }
     });
 
-    it('KNOWN LIMITATION (pre-existing on 15.4.3): add x and y, update x, removeMany — current behaviour: undo is right, redo throws "no live placement anchor" and changes nothing', async () => {
+    // FIXED (was pre-existing on 15.4.3: redo threw "Collection structural
+    // target has no live placement anchor" — x was anchored to c, which the
+    // same transition removes).
+    it('add x and y, update x, removeMany: redo reapplies', async () => {
       const tree = make(enhancers());
       try {
         await seed(tree);
@@ -159,38 +162,13 @@ describe.each(undoConfigurations)(
         await flush();
         tree.undo();
         await flush();
-        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
-        const error = thrownBy(() => tree.redo());
-        expect(error).toBeInstanceOf(Error);
-        expect((error as Error).message).toBe(
-          'Collection structural target has no live placement anchor'
-        );
+        tree.redo();
         await flush();
-        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
-        expect(tree.canRedo()).toBe(true);
+        expect(tree.$.rows.all()).toStrictEqual(ADDED_AND_REMOVED);
       } finally {
         tree.destroy();
       }
     });
-
-    it.fails(
-      'KNOWN LIMITATION (pre-existing on 15.4.3): add x and y, update x, removeMany — desired: redo reapplies',
-      async () => {
-        const tree = make(enhancers());
-        try {
-          await seed(tree);
-          undoable(() => addUpdateRemoveMany(tree));
-          await flush();
-          tree.undo();
-          await flush();
-          tree.redo();
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual(ADDED_AND_REMOVED);
-        } finally {
-          tree.destroy();
-        }
-      }
-    );
   }
 );
 
