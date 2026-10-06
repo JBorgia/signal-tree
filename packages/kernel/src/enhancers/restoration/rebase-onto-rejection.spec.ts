@@ -307,6 +307,50 @@ describe('rebaseOntoRejection', () => {
     });
   });
 
+  describe('chronology inside a split write', () => {
+    // Rollback/rebase review, item 8: a split atom's children took fractional
+    // sequence numbers inside the parent's slot (seq + i·span/(n+1)). Halving
+    // per level, a child 54 levels down rounded to the NEXT atom's number, and
+    // the tie undid the earlier write first. The ordering key is now exact.
+    const nest = (path: string[], leaf: unknown): unknown =>
+      path.reduceRight<unknown>((value, key) => ({ [key]: value }), leaf);
+    for (const depth of [3, 53, 54, 60, 200]) {
+      it(`undoes the later write first, ${depth} levels down`, () => {
+        const path = Array.from({ length: depth }, (_, at) => `k${at}`);
+        const leaf = path.slice(-1);
+        const [[effect]] = rebase(
+          [
+            // The turn wrote the whole row value, then one leaf inside it.
+            row(1, [], nest(path, 'orig'), nest(path, 'mid')),
+            row(1, path, 'mid', 'final'),
+          ],
+          // Later work replaced the leaf's parent, based on 'final'.
+          [row(1, path.slice(0, -1), nest(leaf, 'final'), 'later')]
+        );
+        expect((effect as { before: unknown }).before).toStrictEqual(
+          nest(leaf, 'orig')
+        );
+      });
+    }
+
+    it("re-adds a split write's dropped keys in key order, whatever the trie order", () => {
+      // An earlier write inside 'b' put b's trie node before a's, so the
+      // claim meets the split children b-first; their order puts a back first.
+      const [, [effect]] = rebase(
+        [
+          row(1, ['nest', 'b', 'x'], 0, 1),
+          row(1, ['nest'], { a: 1, b: { x: 1 }, c: 3 }, { c: 3 }),
+        ],
+        [row(1, ['nest', 'c'], 3, 4)],
+        [remove(1, { id: 'k1', nest: { c: 4 } })]
+      );
+      const value = (effect as { value: { nest: Record<string, unknown> } })
+        .value;
+      expect(value.nest).toStrictEqual({ a: 1, b: { x: 0 }, c: 4 });
+      expect(Object.keys(value.nest)).toStrictEqual(['a', 'b', 'c']);
+    });
+  });
+
   describe('row renames', () => {
     it('never writes back a key a different lifetime holds in a later record', () => {
       const occupier: Effect = { ...add(5), key: 'a' } as Effect;
