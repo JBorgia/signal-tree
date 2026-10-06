@@ -3855,21 +3855,6 @@ export function createEntitySignal<
     enumerable: false,
     configurable: true,
   });
-  Object.defineProperty(api, '__acquireEntityHandleForTesting', {
-    value: acquireEntityHandleForTesting,
-    enumerable: false,
-    configurable: true,
-  });
-  Object.defineProperty(api, '__resolveEntityHandleForTesting', {
-    value: resolveEntityHandleForTesting,
-    enumerable: false,
-    configurable: true,
-  });
-  Object.defineProperty(api, '__rebuildActiveProjectionFromOwnersForTesting', {
-    value: rebuildActiveProjectionFromOwners,
-    enumerable: false,
-    configurable: true,
-  });
   Object.defineProperty(api, '__planSubjectReclamation', {
     value: (
       subjectId: number,
@@ -3893,11 +3878,24 @@ export function createEntitySignal<
     enumerable: false,
     configurable: true,
   });
-  Object.defineProperty(api, '__retireSubjectRetainedValueBackingForTesting', {
-    value: retireSubjectRetainedValueBackingForTesting,
-    enumerable: false,
-    configurable: true,
-  });
+  // Testing seams, folded out of production builds (ngDevMode false) like
+  // every other dev-only surface: nothing outside specs and tools reads them.
+  if (typeof ngDevMode === 'undefined' || ngDevMode) {
+    for (const [name, value] of Object.entries({
+      __acquireEntityHandleForTesting: acquireEntityHandleForTesting,
+      __resolveEntityHandleForTesting: resolveEntityHandleForTesting,
+      __rebuildActiveProjectionFromOwnersForTesting:
+        rebuildActiveProjectionFromOwners,
+      __retireSubjectRetainedValueBackingForTesting:
+        retireSubjectRetainedValueBackingForTesting,
+    })) {
+      Object.defineProperty(api, name, {
+        value,
+        enumerable: false,
+        configurable: true,
+      });
+    }
+  }
 
   // ==================
   // PROXY FOR BRACKET NOTATION
