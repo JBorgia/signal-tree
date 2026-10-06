@@ -93,7 +93,7 @@ describe('duplicate ids in removeMany / updateMany: forward', () => {
     }
   );
 
-  it('updateMany: each listing starts from the row before the call; the last applies', async () => {
+  it('updateMany: each listing starts from the row the interceptors left; the last applies', async () => {
     const tree = make();
     try {
       await seed(tree);

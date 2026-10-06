@@ -571,6 +571,41 @@ function sanitizeState(
   return value;
 }
 
+/** A state's JSON, or undefined when it has none. */
+function stateJson(state: unknown): string | undefined {
+  try {
+    return JSON.stringify(state);
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * A 53-bit hash (cyrb53) of a serialized state's JSON. Identifies the states a
+ * tree produced, so a timeline jump can be verified as one of them (15.4.4).
+ */
+function jsonHash(json: string): number {
+  let h1 = 0xdeadbeef;
+  let h2 = 0x41c6ce57;
+  for (let i = 0; i < json.length; i++) {
+    const code = json.charCodeAt(i);
+    h1 = Math.imul(h1 ^ code, 2654435761);
+    h2 = Math.imul(h2 ^ code, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+  h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+  h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+}
+
+/**
+ * How many serialized states a tree remembers for verifying jumps: the
+ * configured `maxAge` (the extension's default, 50, when unset), at most
+ * 1,000.
+ */
+const RECORDED_STATE_LIMIT = 1000;
+
 function parseDevToolsState(state: unknown): unknown {
   if (typeof state === 'string') {
     try {
@@ -615,7 +650,7 @@ interface DevToolsGroup {
     tree: {
       readSnapshot: () => unknown;
       buildSerializedState: (state: unknown) => unknown;
-      applyInspectionState: (state: unknown) => void;
+      applyInspectionState: (state: unknown, replays?: boolean) => void;
       formatPathFn: (path: string) => string;
       isPathAllowed: (path: string) => boolean;
       enableTimeTravel: boolean;
@@ -680,7 +715,7 @@ function getOrCreateDevToolsGroup(
     {
       readSnapshot: () => unknown;
       buildSerializedState: (state: unknown) => unknown;
-      applyInspectionState: (state: unknown) => void;
+      applyInspectionState: (state: unknown, replays?: boolean) => void;
       formatPathFn: (path: string) => string;
       isPathAllowed: (path: string) => boolean;
       enableTimeTravel: boolean;
@@ -764,7 +799,7 @@ function getOrCreateDevToolsGroup(
     browserDevTools.send('@@INIT', aggregated);
   };
 
-  const applyInspectionState = (state: unknown) => {
+  const applyInspectionState = (state: unknown, replays = false) => {
     if (state === undefined || state === null) return;
     isApplyingInspectionState = true;
     try {
@@ -773,7 +808,7 @@ function getOrCreateDevToolsGroup(
         if (!tree.enableTimeTravel) continue;
         const treeState = stateByTree[treeKey];
         if (treeState !== undefined) {
-          tree.applyInspectionState(treeState);
+          tree.applyInspectionState(treeState, replays);
         }
       }
     } finally {
@@ -821,15 +856,16 @@ function getOrCreateDevToolsGroup(
         : undefined;
     if (!actionType) return;
 
+    // Recorded states, replayed: interceptors do not run on them (15.4.4).
     if (actionType === 'JUMP_TO_STATE' || actionType === 'JUMP_TO_ACTION') {
       const nextState = parseDevToolsState(msg.state);
-      applyInspectionState(nextState);
+      applyInspectionState(nextState, true);
       return;
     }
 
     if (actionType === 'ROLLBACK') {
       const nextState = parseDevToolsState(msg.state);
-      applyInspectionState(nextState);
+      applyInspectionState(nextState, true);
       sendInit();
       return;
     }
@@ -1077,7 +1113,7 @@ function getOrCreateDevToolsGroup(
     tree: {
       readSnapshot: () => unknown;
       buildSerializedState: (state: unknown) => unknown;
-      applyInspectionState: (state: unknown) => void;
+      applyInspectionState: (state: unknown, replays?: boolean) => void;
       formatPathFn: (path: string) => string;
       isPathAllowed: (path: string) => boolean;
       enableTimeTravel: boolean;
@@ -1308,7 +1344,7 @@ export function createDevToolsEnhancer(
       return rootAuthority.read();
     };
 
-    const buildSerializedState = (rawState: unknown): unknown => {
+    const serializeState = (rawState: unknown): unknown => {
       if (serialize) {
         try {
           return serialize(rawState);
@@ -1322,6 +1358,40 @@ export function createDevToolsEnhancer(
         maxStringLength,
         entityKeyedView,
       });
+    };
+
+    /**
+     * Hashes of the serialized states this tree produced — what the timeline
+     * records, in per-tree and aggregated mode alike, newest last. A jump
+     * replays one of them only if its state is among them (15.4.4); the
+     * extension can also hold imported or hand-edited states, which are new
+     * input.
+     *
+     * FAIL-SAFE: the match is on the exact JSON the tree produced. If the
+     * extension hands a recorded state back re-serialized differently (key
+     * order, number or date formatting, dropped `undefined`), or it is older
+     * than the window, it reads as unrecorded: the interceptors run, and a
+     * blocking one refuses the jump. Never the other way round.
+     */
+    const recordedStates = new Set<number>();
+    const recordWindow = Math.min(
+      Math.max(1, config.maxAge ?? 50),
+      RECORDED_STATE_LIMIT
+    );
+    const recordJson = (json: string | undefined): void => {
+      if (json === undefined) return;
+      const hash = jsonHash(json);
+      recordedStates.delete(hash);
+      recordedStates.add(hash);
+      if (recordedStates.size > recordWindow) {
+        recordedStates.delete(recordedStates.values().next().value as number);
+      }
+    };
+    /** Aggregated mode's serializer: it has no JSON of its own to reuse. */
+    const buildSerializedState = (rawState: unknown): unknown => {
+      const serialized = serializeState(rawState);
+      recordJson(stateJson(serialized));
+      return serialized;
     };
 
     const buildAction = (
@@ -1342,7 +1412,7 @@ export function createDevToolsEnhancer(
 
       const rawSnapshot = readSnapshot();
       const currentSnapshot = rawSnapshot ?? {};
-      const sanitized = buildSerializedState(currentSnapshot);
+      const sanitized = serializeState(currentSnapshot);
 
       // Compare serialized JSON to detect actual state changes.
       // snapshotState()/unwrap() always creates new object references, so
@@ -1351,6 +1421,9 @@ export function createDevToolsEnhancer(
       let currentSerializedJson: string;
       try {
         currentSerializedJson = JSON.stringify(sanitized);
+        // The same string the change check needs: recorded without a second
+        // stringify (15.4.4).
+        recordJson(currentSerializedJson);
       } catch {
         currentSerializedJson = '';
       }
@@ -1501,14 +1574,11 @@ export function createDevToolsEnhancer(
     const sendInit = (): void => {
       if (!browserDevTools) return;
       const rawSnapshot = readSnapshot() ?? {};
-      const serialized = buildSerializedState(rawSnapshot);
+      const serialized = serializeState(rawSnapshot);
       browserDevTools.send('@@INIT', serialized);
       lastSnapshot = rawSnapshot;
-      try {
-        lastSerializedJson = JSON.stringify(serialized);
-      } catch {
-        lastSerializedJson = undefined;
-      }
+      lastSerializedJson = stateJson(serialized);
+      recordJson(lastSerializedJson);
       lastSendAt = Date.now();
 
       // Clear pending state as it's now part of the init snapshot
@@ -1519,8 +1589,17 @@ export function createDevToolsEnhancer(
       pendingDuration = undefined;
     };
 
-    const applyInspectionState = (state: unknown): void => {
+    /**
+     * `replays`: the message replays a recorded state (a timeline jump, a
+     * revert to the last commit). If the state is verifiably one this tree
+     * produced, it is written back as recorded and its entity writes skip
+     * interceptors, as undo's do (15.4.4). Anything else — a forged or
+     * edited state, an import — is new input and keeps them.
+     */
+    const applyInspectionState = (state: unknown, replays = false): void => {
       if (state === undefined || state === null) return;
+      const json = replays ? stateJson(state) : undefined;
+      const verified = json !== undefined && recordedStates.has(jsonHash(json));
       isApplyingInspectionState = true;
       try {
         // Tag every leaf write performed during this replay with
@@ -1550,7 +1629,8 @@ export function createDevToolsEnhancer(
             } else {
               rootAuthority.replace(state as T);
             }
-          }
+          },
+          verified
         );
       } finally {
         isApplyingInspectionState = false;
@@ -1584,14 +1664,11 @@ export function createDevToolsEnhancer(
           if (elapsed < 500) return;
 
           const rawSnapshot = readSnapshot() ?? {};
-          const serialized = buildSerializedState(rawSnapshot);
+          const serialized = serializeState(rawSnapshot);
           browserDevTools.send({ type: 'SignalTree/reconnect' }, serialized);
           lastSnapshot = rawSnapshot;
-          try {
-            lastSerializedJson = JSON.stringify(serialized);
-          } catch {
-            lastSerializedJson = undefined;
-          }
+          lastSerializedJson = stateJson(serialized);
+          recordJson(lastSerializedJson);
           lastSendAt = Date.now();
         }
         return;
@@ -1606,15 +1683,17 @@ export function createDevToolsEnhancer(
           ? msg.payload.type
           : undefined;
       if (!actionType) return;
+      // Recorded states, replayed: interceptors do not run on them (15.4.4).
+      // IMPORT_STATE below applies imported input and keeps them.
       if (actionType === 'JUMP_TO_STATE' || actionType === 'JUMP_TO_ACTION') {
         const nextState = parseDevToolsState(msg.state);
-        applyInspectionState(nextState);
+        applyInspectionState(nextState, true);
         return;
       }
 
       if (actionType === 'ROLLBACK') {
         const nextState = parseDevToolsState(msg.state);
-        applyInspectionState(nextState);
+        applyInspectionState(nextState, true);
         sendInit();
         return;
       }

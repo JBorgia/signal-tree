@@ -689,7 +689,23 @@ export interface AddManyOptions<E, K> extends AddOptions<E, K> {
 }
 
 /**
- * Tap handlers - observe entity lifecycle events
+ * Tap handlers - observe entity lifecycle events.
+ *
+ * They fire for the changes applied to the collection, including those
+ * `undo()`, `redo()`, `jumpTo()` and a rollback apply: a row added or brought
+ * back taps `onAdd`, one removed or taken away taps `onRemove`, one whose
+ * value is written taps `onUpdate`. A rename (`changeId`, or its replay) and
+ * a reorder tap nothing by themselves.
+ *
+ * Forward and replayed writes differ on equal values: a forward `setAll` taps
+ * `onUpdate` for every row it replaces, even with an equal value (kept for
+ * per-row `onUpdate` users) — so a reorder-only `setAll` taps `onUpdate` for
+ * each row — while a replay taps `onUpdate` only for a row whose value it
+ * changes, so replaying that `setAll` taps nothing.
+ *
+ * One rule wherever a tap runs, also inside a replay: a tap's own writes are
+ * intercepted; an `undo()`, `redo()`, `jumpTo()` or `rollback()` a tap starts
+ * is itself a replay, and its writes are not.
  */
 export interface TapHandlers<E, K extends string | number> {
   onAdd?: (entity: E, id: K) => void;
@@ -711,20 +727,30 @@ export interface InterceptContext<T> {
 /**
  * Intercept handlers - block or transform mutations before they happen.
  *
- * Synchronous, and meant to validate or transform their input. An add call
- * (`addOne`, `addMany`, `prependOne`, `prependMany`, `upsertMany`) whose
- * interceptors or id selectors change the same collection's membership or
- * order, or the key of a row the call names, throws `Cannot <method>:
- * collection topology changed during staging` before writing anything, as
- * `setAll` does. The callback's own writes stand; field-only writes are
- * allowed, and an updated row merges over its value as the interceptors left
- * it.
+ * Synchronous, and meant to validate or transform their input. A call
+ * (`addOne`, `addMany`, `prependOne`, `prependMany`, `upsertMany`,
+ * `updateMany`, `removeMany`) whose interceptors or id selectors change the
+ * same collection's membership or order, or the key of a row the call names,
+ * throws `Cannot <method>: collection topology changed during staging` before
+ * writing anything. (`setAll` refuses more: a key change to any current row.)
+ * The callback's own writes stand; field-only writes, and a key change to a
+ * row the call does not name, are allowed. An updated row merges over its
+ * value as all of the call's interceptors left it — including a write one
+ * row's interceptor made to another named row.
  *
- * Interceptors do not run on a reversal — `undo()`, `redo()`, `jumpTo()` or a
- * transaction rollback. It writes back exactly the value, or the pre-image,
- * that was recorded, which the interceptors already shaped when it was first
- * written; neither a transform nor a block applies to it. Taps and path
- * subscribers are still notified.
+ * Interceptors do not run on a replay of recorded state — `undo()`, `redo()`,
+ * `jumpTo()`, a transaction rollback, or a devtools jump (JUMP_TO_STATE,
+ * JUMP_TO_ACTION, ROLLBACK) to a state the tree itself serialized. It writes
+ * back exactly the value, or the pre-image, that was recorded, which the
+ * interceptors already shaped when it was first written; neither a transform
+ * nor a block applies to it. Taps and path subscribers are still notified; a
+ * write one of them makes meanwhile is intercepted as usual, while a replay
+ * one of them starts is itself a replay. A devtools jump
+ * to any other state — forged, hand-edited, older than the devtools `maxAge`
+ * window (default 50, at most 1,000 states), or handed back re-serialized
+ * differently from the exact JSON the tree produced (the fail-safe) — and an
+ * IMPORT_STATE are new input: the interceptors run, and a blocking one refuses
+ * the jump.
  */
 export interface InterceptHandlers<E, K extends string | number> {
   onAdd?: (entity: E, ctx: InterceptContext<E>) => void;
@@ -837,10 +863,10 @@ export interface EntitySignalOf<
    */
   replaceOne(id: K, entity: E, opts?: MutationOptions): void;
   /**
-   * Merge `changes` into each listed entity. A repeated id is idempotent, on
-   * purpose: its row is updated once, from its value before the call (the
-   * last listing's intercepted changes apply), and announced once. Every
-   * listing is still intercepted and tapped.
+   * Merge `changes` into each listed entity, over its value as all the call's
+   * interceptors left it. A repeated id is idempotent, on purpose: its row is
+   * updated once (the last listing's intercepted changes apply) and announced
+   * once. Every listing is still intercepted and tapped.
    */
   updateMany(ids: K[], changes: Partial<E>, opts?: MutationOptions): void;
   updateWhere(predicate: (entity: E) => boolean, changes: Partial<E>): number;
