@@ -17,6 +17,7 @@ import {
   PRODUCTION_SUBSTRATE_STATS_ENABLED,
   recordProductionSubstrateStat,
 } from './production-substrate-stats';
+import { runUserCallback } from '../write-context';
 import { registerIntrinsicMutationSource } from './intrinsic-mutation';
 
 interface DependencyConsumer {
@@ -233,10 +234,13 @@ const flushConsumers = (): unknown[] => {
 /** Shared: an epoch has no `subscribe` surface, so it has no listeners. */
 const NO_LISTENERS: ReadonlySet<() => void> = new Set<() => void>();
 
+// Observers are user callbacks (subscribers, framework effects): a write one
+// makes during a replay of recorded state is forward work, intercepted
+// (write-context.ts).
 const notifyObservers = (
   token: ObservationToken | undefined,
   listeners: ReadonlySet<() => void>
-): void => {
+): void => runUserCallback(() => {
   let failure: unknown;
   let hasFailure = false;
   try {
@@ -253,7 +257,7 @@ const notifyObservers = (
     }
   }
   if (hasFailure) throw failure;
-};
+});
 
 const trackDependency = (
   node: DependencyNode,

@@ -9,7 +9,7 @@
  * @internal
  */
 
-import { getActiveWriteContext } from './write-context';
+import { getActiveWriteContext, runUserCallback } from './write-context';
 import {
   currentWriteObservationScopes, mergeWriteObservationScopes,
   withoutWriteObservationScopes, type DeclaredWriteScopes,
@@ -324,7 +324,9 @@ export class PathNotifier {
       if (this.matches(pattern, path)) {
         for (const handler of handlers) {
           try {
-            withoutWriteObservationScopes(() => handler(
+            // A user callback: its writes during a replay of recorded state
+            // are forward work (write-context.ts).
+            runUserCallback(() => withoutWriteObservationScopes(() => handler(
               transformed,
               prev,
               path,
@@ -335,7 +337,7 @@ export class PathNotifier {
               meta,
               declaredScopes,
               ownerId
-            ));
+            )));
           } catch (error) {
             if (!isolateSubscribers) throw error;
             reportContainedObserverError({
