@@ -2,6 +2,12 @@
 /**
  * PAIRED A/B BETWEEN SIGNALTREE BUILDS — v3, calibrated measurement duration.
  *
+ * October 6 correction: Angular scalar writes use .set(), not callable writes.
+ * The earlier scalar-set arm performed reads on published 15.4.3; its figures
+ * are not write-performance evidence. Each scalar batch now asserts its final
+ * value outside the timing window, and both long-lived workload trees teardown.
+ * --workloads scalar-set selects that case for a bounded protocol smoke run.
+ *
  * ## What changed from v2, and why only this
  *
  * v2 timed a fixed operation count per process. Twenty identical runs of the
@@ -72,8 +78,9 @@ const WORKLOADS = {
     setup: `for (let i=0;i<5;i++) t.$.rows.setAll(seed(10000));`,
     batch: `for (let i=0;i<N;i++) t.$.rows.setAll(seed(10000));` },
   'scalar-set': { targetMs: 500, units: 1,
-    setup: `globalThis.__t2 = m.signalTree({ a: 0 }); for (let i=0;i<50000;i++) globalThis.__t2.$.a(i);`,
-    batch: `const s=globalThis.__t2.$.a; for (let i=0;i<N;i++) s(i);` },
+    setup: `globalThis.__t2 = m.signalTree({ a: 0 }); for (let i=0;i<50000;i++) globalThis.__t2.$.a.set(i);`,
+    batch: `const s=globalThis.__t2.$.a; for (let i=0;i<N;i++) s.set(i);`,
+    verify: `if (globalThis.__t2.$.a() !== N - 1) throw new Error('scalar-set did not write the expected value');` },
 };
 
 const CELL = (w) => `
@@ -86,7 +93,7 @@ const TARGET = ${w.targetMs}, UNITS = ${w.units}, BATCHES = ${BATCHES};
 ${w.setup}
 // Long, ugly timer name on purpose: workload bodies declare their own locals
 // and a short one collides with them at parse time.
-const run = (N) => { const __t0 = now(); ${w.batch} ; return now() - __t0; };
+const run = (N) => { const __t0 = now(); ${w.batch} ; const elapsed = now() - __t0; ${w.verify ?? ''} return elapsed; };
 
 // Untimed warmup at a small size, so calibration does not measure cold code.
 run(Math.max(1, Math.round(1000 / UNITS)));
@@ -106,6 +113,8 @@ for (let b = 0; b < BATCHES; b++) perOp.push((run(N) * 1e6) / (N * UNITS));
 perOp.sort((x, y) => x - y);
 const mid = perOp.length >> 1;
 const median = perOp.length % 2 ? perOp[mid] : (perOp[mid - 1] + perOp[mid]) / 2;
+t.destroy();
+globalThis.__t2?.destroy();
 console.log(JSON.stringify({ ns: median, N, batchMs: elapsed }));
 `;
 
@@ -159,7 +168,9 @@ head.push('A/A'.padStart(8), '  verdict');
 console.log(head.join(''));
 console.log('-'.repeat(head.join('').length));
 
-for (const name of Object.keys(WORKLOADS)) {
+const selectedWorkloads = arg('--workloads', Object.keys(WORKLOADS).join(',')).split(',');
+for (const name of selectedWorkloads) {
+  if (!Object.hasOwn(WORKLOADS, name)) throw new Error(`Unknown workload: ${name}`);
   const samples = new Map(prepared.map((b) => [b.label, []]));
   for (let i = 0; i < PAIRS; i++) for (const b of prepared) samples.get(b.label).push(run(b.root, name).ns);
   for (let i = 0; i < PAIRS; i++) for (const b of [...prepared].reverse()) samples.get(b.label).push(run(b.root, name).ns);

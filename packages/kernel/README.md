@@ -283,8 +283,11 @@ Some details of that rule:
   any consumer does: absent-aware, also while undo, redo, `jumpTo()` or
   `rollback()` writes an absent collection's retained rows, and its
   projections (`all()`, `count()`, `where()` and the rest) include the change
-  it reports, also inside a transaction or a reversal. A projection cell
-  obtained before the tap keeps its cached value until the group ends.
+  it reports, also inside a transaction or a reversal. Projection cells held
+  before the write also read current values. Explicit reads refresh caches;
+  observer delivery remains grouped until the coherent operation completes.
+  This guarantees SignalTree-provided readers, not early evaluation of a warmed
+  framework `computed` or effect: those retain their framework's timing.
 - **A write made during a whole value or a reversal is ordinary.** A tap or
   sync effect that runs during one and writes an absent location re-adds
   that location's path, in any tree, and the whole value does not omit it

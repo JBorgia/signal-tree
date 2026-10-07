@@ -13,6 +13,10 @@ import {
 import { getOwnedPositionIds } from './owned-metadata';
 import { markOwnerInvalidatedFrom } from './owner-invalidation-port';
 import { capturePathReAddIfObserved } from './path-observation-port';
+import {
+  getPositionRegistry,
+  type PositionRegistry,
+} from './position-registry';
 import { publishMembershipChange } from './snapshot-authority';
 import {
   getTreeScalarSlotRuntime,
@@ -83,7 +87,24 @@ import {
 // `Symbol('signaltree.…')`: the marker appeared verbatim in `tree.$.user()`.
 const DORMANT = Symbol.for('SignalTree:DormantMember');
 
-type DormantBinding = { parent: object; key: string };
+// A revision invalidates answers derived from descriptors; it owns no membership.
+// It is allocated only after omission, and belongs to one tree, not the process.
+type MembershipClock = { revision: number };
+const membershipClocks = new WeakMap<PositionRegistry, MembershipClock>();
+function membershipClock(parent: object): MembershipClock | undefined {
+  const registry = getPositionRegistry(parent);
+  if (!registry) return undefined;
+  let clock = membershipClocks.get(registry);
+  if (!clock) membershipClocks.set(registry, (clock = { revision: 0 }));
+  return clock;
+}
+type DormantBinding = {
+  parent: object;
+  key: string;
+  clock?: MembershipClock;
+  revision?: number;
+  absent?: boolean;
+};
 
 /**
  * @internal An entity collection's hook for a change in its presence: it, or
@@ -175,18 +196,30 @@ function nodeOf(parent: object): object {
  * member has no link and pays one symbol lookup, as before.
  */
 export function isAbsentMember(node: unknown): boolean {
+  const first = memberBinding(node);
+  if (!first) return false;
+  const clock = first.clock;
+  if (clock && first.revision === clock.revision) return first.absent === true;
+  let absent = false;
   for (
-    let binding = memberBinding(node);
+    let binding: DormantBinding | undefined = first;
     binding;
     binding = memberBinding(binding.parent)
   ) {
-    const descriptor = Object.getOwnPropertyDescriptor(
-      binding.parent,
-      binding.key
-    );
-    if (descriptor?.enumerable === false) return true;
+    if (
+      Object.getOwnPropertyDescriptor(binding.parent, binding.key)
+        ?.enumerable === false
+    ) {
+      absent = true;
+      break;
+    }
   }
-  return false;
+  // Unowned internal objects have no tree clock: always consult descriptors.
+  if (clock) {
+    first.revision = clock.revision;
+    first.absent = absent;
+  }
+  return absent;
 }
 
 /**
@@ -317,6 +350,7 @@ export const storedReads = { depth: 0 };
  */
 export function reactivatePathOnWrite(node: unknown): boolean {
   if (inStructuralWrite(node)) return reactivateOnWrite(node);
+  if (!isAbsentMember(node)) return false;
   const path: DormantBinding[] = [];
   let outer = -1;
   for (
@@ -536,6 +570,8 @@ function deactivateOne(parent: object, key: string): boolean {
   }
 
   Object.defineProperty(parent, key, { ...descriptor, enumerable: false });
+  const clock = membershipClock(parent);
+  if (clock) clock.revision++;
   markHasDormant(parent);
   // The first omission in a tree is what installs liveness on its leaves.
   getTreeScalarSlotRuntime(parent)?.enableAbsence?.(ABSENCE);
@@ -553,7 +589,11 @@ function deactivateOne(parent: object, key: string): boolean {
  */
 function linkMember(parent: object, key: string, child: object): void {
   Object.defineProperty(child, DORMANT, {
-    value: { parent: nodeOf(parent), key } satisfies DormantBinding,
+    value: {
+      parent: nodeOf(parent),
+      key,
+      clock: membershipClock(parent),
+    } satisfies DormantBinding,
     enumerable: false,
     configurable: true,
     writable: true,
@@ -624,6 +664,8 @@ function activateOne(parent: object, key: string): boolean {
   }
 
   Object.defineProperty(parent, key, { ...descriptor, enumerable: true });
+  const clock = membershipClock(parent);
+  if (clock) clock.revision++;
   // ⚠️ The binding is NOT cleared. It locates the descriptor; it is not a
   // dormancy flag. Clearing it here would make "has a binding" mean "is
   // dormant", which is exactly the second membership truth this design forbids.

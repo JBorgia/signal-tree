@@ -35,10 +35,7 @@ const isWritableCell = (
 const readWritableCell = <T>(cell: Location<T> | WritableCell<T>): T =>
   'peek' in cell && typeof cell.peek === 'function' ? cell.peek() : cell();
 
-import {
-  NULL_OR_UNDEFINED_MESSAGE,
-  TREE_DESTROYED_MESSAGE,
-} from './constants';
+import { NULL_OR_UNDEFINED_MESSAGE, TREE_DESTROYED_MESSAGE } from './constants';
 import {
   registerContainedReportBudget,
   releaseContainedReportBudget,
@@ -206,7 +203,9 @@ function finalizeLeafSignal<TValue>(
   registry: PositionRegistry | undefined,
   address: readonly string[]
 ): void {
-  defineNodeAddress(leaf as object, address);
+  // Leaf consumers use registered position addresses; late Link observation
+  // derives segments from property keys. Node-address seeds are needed only
+  // by branch construction (accessor creation and dynamic child ownership).
   for (const position of positionIds ?? [])
     registry?.registerPositionAddress(position, address);
   // A LOCATION MUST BE ABLE TO NAME ITS OWNER. Attaching the registry to the

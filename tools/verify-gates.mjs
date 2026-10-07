@@ -244,6 +244,21 @@ const GATES = [
     },
   },
   {
+    name: 'production-stats-transform',
+    covers:
+      'stripping instrumentation preserves executable control flow and lexical bindings',
+    cmd: [
+      'node',
+      '--test',
+      'tools/build/strip-production-stats-calls.spec.mjs',
+    ],
+    mutation: {
+      file: 'tools/build/strip-production-stats-calls.mjs',
+      find: "transformed.slice(0, start) + ';' + transformed.slice(end)",
+      replace: "transformed.slice(0, start) + '' + transformed.slice(end)",
+    },
+  },
+  {
     name: 'devmode-foldable',
     covers: 'diagnostics fold away when a consumer defines ngDevMode=false',
     cmd: ['node', 'tools/check-devmode-foldable.mjs'],

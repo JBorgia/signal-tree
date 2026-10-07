@@ -35,7 +35,9 @@
             "esbuild",
             "typescript",
             "@rollup/plugin-typescript",
-            "rollup-plugin-dts"
+            "rollup-plugin-dts",
+            "@babel/parser",
+            "@babel/traverse"
           ]
         }
       ]

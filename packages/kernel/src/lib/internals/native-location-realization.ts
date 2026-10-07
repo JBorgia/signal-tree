@@ -1,79 +1,30 @@
 import { markTreeCell } from './cell-identity';
-import type {
-  Location,
-  ReadonlyLocation,
-  WritableCell,
-} from './cell-runtime';
+import type { Location, ReadonlyLocation, WritableCell } from './cell-runtime';
 import {
   registerIntrinsicMutationSource,
   unobservableMutationSource,
 } from './intrinsic-mutation';
 import {
+  createLocationPublicationRuntime,
   registerWritableLocationBinding,
   type LocationPublisher,
   type LocationRuntime,
   type WritableLocationBinding,
 } from './location-runtime';
-import type {
-  EpochHandle,
-  ObservationAdapter,
-} from './observation-adapter';
+import type { EpochHandle, ObservationAdapter } from './observation-adapter';
 
 export function createNativeLocationRuntime(
   observation: ObservationAdapter
 ): LocationRuntime {
-  let invalidationGroupDepth = 0;
-  const groupedPublishers = new Set<LocationPublisher>();
-
-  const deliver = (publishers: readonly LocationPublisher[]): void => {
-    const errors: unknown[] = [];
-    observation.runInvalidationGroup(() => {
-      for (const publisher of publishers) {
-        try {
-          publisher.notify();
-        } catch (error) {
-          errors.push(error);
-        }
-      }
-    });
-    if (errors.length > 0) throw errors[0];
-  };
-
-  const publish = (publishers: readonly LocationPublisher[]): void => {
-    if (invalidationGroupDepth > 0) {
-      for (const publisher of publishers) groupedPublishers.add(publisher);
-      return;
-    }
-    deliver(publishers);
-  };
-
+  // Share the kernel's publication authority, including immediate invalidation
+  // when a native runtime publishes a foreign neutral location. Carrier values
+  // remain native; the adapter group still spans the user's callback and flush.
+  const publications = createLocationPublicationRuntime(observation);
+  const publish = publications.publish;
   const runInvalidationGroup = (run: () => void): void => {
-    observation.runInvalidationGroup(() => {
-      let failure: unknown;
-      let hasFailure = false;
-      invalidationGroupDepth += 1;
-      try {
-        run();
-      } catch (error) {
-        failure = error;
-        hasFailure = true;
-      } finally {
-        invalidationGroupDepth -= 1;
-        if (invalidationGroupDepth === 0 && groupedPublishers.size > 0) {
-          const publishers = [...groupedPublishers];
-          groupedPublishers.clear();
-          try {
-            deliver(publishers);
-          } catch (error) {
-            if (!hasFailure) {
-              failure = error;
-              hasFailure = true;
-            }
-          }
-        }
-      }
-      if (hasFailure) throw failure;
-    });
+    observation.runInvalidationGroup(() =>
+      publications.runInvalidationGroup(run)
+    );
   };
 
   const createWritable = <T>(
@@ -292,7 +243,6 @@ export function createNativeLocationRuntime(
     pendingEpochs.add(handle);
     publish([epochPublisher]);
   };
-
 
   return {
     createCell,

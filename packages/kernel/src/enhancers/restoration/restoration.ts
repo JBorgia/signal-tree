@@ -1468,12 +1468,14 @@ class RestorationManager<T> {
    * states hold authored orders only.
    */
   private readCollectionSource = (
-    binding: CollectionTransitionTargetBinding
-  ): CollectionTransitionSource => binding.readSource();
+    binding: CollectionTransitionTargetBinding,
+    source: CollectionTransitionSource = binding.readSource()
+  ): CollectionTransitionSource => source;
 
   setCollectionSourceReader(
     read: (
-      binding: CollectionTransitionTargetBinding
+      binding: CollectionTransitionTargetBinding,
+      source?: CollectionTransitionSource
     ) => CollectionTransitionSource
   ): void {
     this.readCollectionSource = read;
@@ -3205,7 +3207,7 @@ class RestorationManager<T> {
     const collections = new Map<number, CollectionTransitionSource>();
     for (const [owner, binding] of bindings) {
       const live = binding.readSource();
-      const source = this.readCollectionSource(binding);
+      const source = this.readCollectionSource(binding, live);
       collections.set(owner, source);
       if (source !== live) {
         const valueOf = new Map(
@@ -3356,11 +3358,14 @@ class RestorationManager<T> {
         if (!binding) {
           throw new Error(`Historical materialization has no binding ${owner}`);
         }
+        // Index this detached target once. Searching its subjects for every
+        // ordered row made each history collection output quadratic in rows.
+        const subjectById = new Map(
+          collection.subjects.map((subject) => [subject.subject, subject])
+        );
         natural = setDetachedNaturalValue(natural, binding.ownerPath, {
           all: collection.order.map((subjectId) => {
-            const subject = collection.subjects.find(
-              (candidate) => candidate.subject === subjectId
-            );
+            const subject = subjectById.get(subjectId);
             if (!subject) {
               throw new Error(
                 `Historical materialization lost subject ${subjectId}`
@@ -3447,11 +3452,14 @@ class RestorationManager<T> {
         if (!binding) {
           throw new Error(`Historical materialization has no binding ${owner}`);
         }
+        // Index this detached target once. Searching its subjects for every
+        // ordered row made each history collection output quadratic in rows.
+        const subjectById = new Map(
+          collection.subjects.map((subject) => [subject.subject, subject])
+        );
         natural = setDetachedNaturalValue(natural, binding.ownerPath, {
           all: collection.order.map((subjectId) => {
-            const subject = collection.subjects.find(
-              (candidate) => candidate.subject === subjectId
-            );
+            const subject = subjectById.get(subjectId);
             if (!subject) {
               throw new Error(
                 `Historical materialization lost subject ${subjectId}`
@@ -5568,9 +5576,9 @@ export function restoration(
       });
     };
     const readThroughInspection = (
-      binding: CollectionTransitionTargetBinding
+      binding: CollectionTransitionTargetBinding,
+      source: CollectionTransitionSource = binding.readSource()
     ): CollectionTransitionSource => {
-      const source = binding.readSource();
       const scrub = inspectionScrubs.get(source.owner);
       if (
         !scrub ||
@@ -7085,7 +7093,8 @@ export function restoration(
                 subjectIds,
                 positionIds
               );
-            }
+            },
+            treeOwnerId
           );
         };
         subscribeCollectionNotifications();
@@ -7269,7 +7278,7 @@ export function restoration(
             for (const capture of deferredOrderCaptures.splice(0)) {
               routeOrderCapture(capture);
             }
-          });
+          }, treeOwnerId);
         }
       }
     } catch {

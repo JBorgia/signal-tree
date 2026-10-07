@@ -3,6 +3,7 @@ import {
   linkedSignal,
   signal,
   untracked,
+  type Signal,
   type WritableSignal,
 } from '@angular/core';
 
@@ -10,6 +11,34 @@ import type {
   ObservationAdapter,
   ObservationToken,
 } from '@signal-tree/kernel/adapter';
+
+// A group defers native publication, not explicit SignalTree reads. Track the
+// real Angular carrier first; only its SignalTree view reads through to truth.
+// External computed/effect timing remains Angular's. No private signal fields.
+let invalidationGroupDepth = 0;
+const currentView = <T, S extends Signal<T>>(source: S, read: () => T): S =>
+  new Proxy(source, {
+    apply(target) {
+      if (invalidationGroupDepth === 0) return target();
+      // The native carrier can still cache an error from before the group.
+      // Read it for tracking, but current SignalTree truth decides the result
+      // (including whether to throw) until native publication catches up.
+      try {
+        target();
+      } catch {
+        // Canonical read below either recovers or throws its current error.
+      }
+      return untracked(read);
+    },
+  });
+
+const writableView = <T>(source: WritableSignal<T>, read: () => T) => {
+  const nativeReadonly = source.asReadonly.bind(source);
+  let readonly: Signal<T> | undefined;
+  const cell = currentView(source, read);
+  cell.asReadonly = () => (readonly ??= currentView(nativeReadonly(), read));
+  return cell;
+};
 
 /** Angular dependency tracking for kernel-owned locations. */
 export const ANGULAR_OBSERVATION_ADAPTER: ObservationAdapter = {
@@ -21,9 +50,10 @@ export const ANGULAR_OBSERVATION_ADAPTER: ObservationAdapter = {
     };
   },
 
-  createWritableCell: <T,>(read: () => T) => {
-    const cell = signal(read());
-    const publish = cell.set.bind(cell);
+  createWritableCell: <T>(read: () => T) => {
+    const source = signal(read());
+    const publish = source.set.bind(source);
+    const cell = writableView(source, read);
     return {
       cell,
       peek: read,
@@ -37,10 +67,11 @@ export const ANGULAR_OBSERVATION_ADAPTER: ObservationAdapter = {
     };
   },
 
-  createReadonlyCell: <T,>(compute: () => T) => computed(compute),
+  createReadonlyCell: <T>(compute: () => T) =>
+    currentView(computed(compute), compute),
 
-  createWritableProjection: <T,>(compute: () => T) => {
-    const cell = linkedSignal(compute);
+  createWritableProjection: <T>(compute: () => T) => {
+    const cell = writableView(linkedSignal(compute), compute);
     return {
       cell,
       peek: () => untracked(cell),
@@ -67,6 +98,11 @@ export const ANGULAR_OBSERVATION_ADAPTER: ObservationAdapter = {
     (epoch as unknown as WritableSignal<number>).update((value) => value + 1),
 
   runInvalidationGroup(run): void {
-    run();
+    invalidationGroupDepth += 1;
+    try {
+      run();
+    } finally {
+      invalidationGroupDepth -= 1;
+    }
   },
 };

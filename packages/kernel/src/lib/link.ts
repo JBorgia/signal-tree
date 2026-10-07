@@ -652,7 +652,8 @@ export function link<S>(
       advanceEligible(address, v);
       dirty = true;
       observation.publish();
-    }
+    },
+    registry.id
   );
 
   /**
@@ -794,7 +795,7 @@ export function link<S>(
   const offFlush = notifier.onFlush?.(() => {
     settleCollections();
     scheduleSend();
-  });
+  }, registry.id);
 
   /**
    * ORDER-ONLY CHANGES (15.4.4). A reorder of surviving rows publishes no row

@@ -1633,6 +1633,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     listeners: Set<TransactionLifecycleListener>,
     turn: TransactionTurnRecord
   ): void => {
+    if (listeners.size === 0) return;
     const payload = cloneTurnRecord(turn);
     for (const listener of listeners) {
       // TX-OBSERVER-STRAND-0. A listener observes a turn that already exists;
@@ -1650,7 +1651,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
   };
 
   const drainCaptureBucket = (
-    bucket: CaptureBucket
+    bucket: CaptureBucket,
+    settledEffects?: TurnEffect[]
   ): {
     subjectIds: number[];
     positionIds: number[];
@@ -1664,7 +1666,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     bucket.positionIds.clear();
     const baselineValues = new Map(bucket.baselineValues);
     bucket.baselineValues.clear();
-    const effects = settledEffectsOf(bucket);
+    const effects = settledEffects ?? settledEffectsOf(bucket);
     bucket.effects.clear();
     forgetTransientRows(bucket.effects);
     bucket.entityFootprints.clear();
@@ -2226,7 +2228,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
       effects.length > 0 ? effects : undefined,
       baselineValues.size > 0 ? baselineValues : undefined
     );
-    drainCaptureBucket(bucket);
+    // Registration already consumed a detached, settled effect list. Reuse it
+    // for retirement while preserving every cleanup and the drain fault boundary.
+    drainCaptureBucket(bucket, effects);
     pendingTransactions.delete(transactionId);
     releaseWindowIfClosed();
     if (pending && orderDeltas.length > 0) {
@@ -2937,7 +2941,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
               subjectIds,
               positionIds
             );
-          }
+          },
+          treeOwnerId
         );
       };
 
@@ -3025,7 +3030,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           }
           selfDirty = false;
           recordConfirmedBucket(pendingCapture);
-        });
+        }, treeOwnerId);
       }
     }
   } catch {

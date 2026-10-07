@@ -63,6 +63,8 @@ interface LeaderboardState {
           </ol>
           <p class="muted">
             Rows reorder automatically — no manual sort runs after mutations.
+            Held SignalTree readers stay fresh inside grouped writes too. Native
+            computed values and effects keep Angular’s timing.
           </p>
         </div>
       </st-example>
@@ -131,6 +133,29 @@ const player = store.$.players.byId(id)?.();
 if (player) store.$.players.updateOne(id, { score: player.score + 50 });
 store.$.players.all(); // highest score first
 // Call store.destroy() when its owner is torn down.`,
+    },
+    {
+      label: 'Read inside a transaction',
+      language: 'typescript',
+      source: `import { entityMap, signalTree, transactions } from '@signal-tree/angular';
+
+type Player = { id: number; score: number };
+const store = signalTree({
+  players: entityMap<Player, number>({
+    sortComparer: (a, b) => b.score - a.score,
+  }),
+}, { enhancers: [transactions()] });
+const all = store.$.players.all; // keep the same reader
+const pending = store.transaction(() => {
+  store.$.players.addOne({ id: 1, score: 120 });
+  all(); // [{ id: 1, score: 120 }] immediately
+  store.$.players.addOne({ id: 2, score: 150 });
+  all(); // player 2, then player 1
+  // Observers receive coherent publication when this group ends.
+});
+pending.confirm();
+// External Angular computed/effect timing is unchanged.
+store.destroy();`,
     },
   ];
 

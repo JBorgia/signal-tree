@@ -291,6 +291,12 @@ a row that external or realized truth removed. A location under an omitted
 member reads `undefined`, an entity collection there reads empty, and writing
 it re-adds only the written path (see the kernel README, "Locations an
 omission has hidden").
+Explicit collection projection reads (`all()`, `count()`, `ids()`, and derived
+queries) include writes already performed in a synchronous transaction or
+reversal, including projection cells captured before it. Reading current values
+does not release grouped observer notifications early. A warmed Angular/Vue/Solid
+`computed` or effect retains its native framework timing; use the SignalTree
+reader itself when a callback needs the current in-progress value.
 
 In published 15.3.1, calling Link `settled()` immediately after a write can return
 before the newly queued send finishes. Version 15.4.0 repairs this same-turn race:

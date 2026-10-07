@@ -538,6 +538,7 @@ export function createEntitySignal<
 
   function prepareTransitionTarget(target: CollectionTransitionTarget): {
     install(): void;
+    preparePublication(): void;
     publish(options?: { advancePhysicalRevision?: boolean }): void;
   } {
     if (positionId === undefined || target.owner !== positionId) {
@@ -622,6 +623,24 @@ export function createEntitySignal<
     });
     let membershipChanges: EntityMembershipChange[] = [];
     let membershipPublished = false;
+    const wasVisible = !absent();
+    let publicationPrepared = false;
+    const preparePublication = (): void => {
+      if (publicationPrepared) return;
+      publicationPrepared = true;
+      if (activeIdBefore !== activeIdAfter) {
+        replaceLocation(activeIdSignal, activeIdAfter);
+      }
+      // A formerly visible collection can now be omitted. That changes public
+      // reads even though writes to already-hidden rows normally publish nothing.
+      updateSignals(wasVisible);
+      for (const change of subjectChanges) {
+        if (change.valueEpoch) advanceEpochHandle(change.valueEpoch);
+        if (change.bindingChanged && change.stateSignal) {
+          deriveLocation(change.stateSignal, (value) => value + 1);
+        }
+      }
+    };
 
     return {
       install(): void {
@@ -654,21 +673,17 @@ export function createEntitySignal<
           unit.commit([]);
         }
       },
+      preparePublication,
       publish(options): void {
+        // Direct users of a prepared collection also get current views. The
+        // aggregate coordinator prepares every target before the first tap.
+        preparePublication();
         if (!membershipPublished) {
           membershipPublished = true;
           beginMembershipUnit().commit(membershipChanges);
           membershipChanges = [];
         }
         for (const publication of subjectChanges) {
-          // Only a realized subject has an epoch, so this stays as lazy as the
-          // per-entity signal it replaces.
-          if (publication.valueEpoch) advanceEpochHandle(publication.valueEpoch);
-          if (publication.bindingChanged) {
-            if (publication.stateSignal) {
-              deriveLocation(publication.stateSignal, (value) => value + 1);
-            }
-          }
           const key = publication.afterKey ?? publication.beforeKey;
           if (key === undefined) {
             continue;
@@ -718,10 +733,6 @@ export function createEntitySignal<
           else if (!kind && !deepEqual(beforeValue, afterValue))
             emitTap('onUpdate', key, afterValue as E, afterValue as E);
         }
-        if (activeIdBefore !== activeIdAfter) {
-          replaceLocation(activeIdSignal, activeIdAfter);
-        }
-        updateSignals();
         if (options?.advancePhysicalRevision !== false) {
           physicalCommitClock?.advance();
         }
@@ -792,28 +803,12 @@ export function createEntitySignal<
     absent() ? 0 : structuralStore.activeKeyCount();
   const countSignal: ReadableCell<number> =
     createVersionedProjection(computeCount);
-  /**
-   * ⚠️ INSIDE A TAP, A PROJECTION IS READ FRESH (v16 8f, ported). A tap runs
-   * inside its write, and inside a grouped write (a transaction, a reversal)
-   * the cached projections hear of it only when the group ends: read through
-   * them, a tap saw the collection as it was before the group. While a tap
-   * runs, a projection is handed out as an uncached reader of the same
-   * computation. It still reads `version`, so a derived computed inside a tap
-   * depends on the collection as the cached projection would. Outside taps
-   * this is one comparison per access.
-   */
-  const fresh = <T>(read: () => T): ReadableCell<T> =>
-    (() => {
-      version();
-      return read();
-    }) as ReadableCell<T>;
-  const inTap = <T>(cell: ReadableCell<T>, read: () => T): ReadableCell<T> =>
-    taps.depth ? fresh(read) : cell;
+  // Runtime-owned freshness applies inside taps too. Return the same native
+  // or neutral projection throughout a write; delivery remains grouped.
   // Identity-stable across value-only writes: the key snapshot is shared until
   // the list or a key changes, so the copy (and every consumer) is reused.
   let idsSource: readonly K[] | undefined;
   let idsValue: K[] = [];
-  // `all` is the cached projection or, in a tap, the fresh one.
   const computeIds = (all: () => E[]): K[] => {
     if (absent()) return [];
     if (config.sortComparer) return all().map((e) => selectId(e));
@@ -2275,14 +2270,14 @@ export function createEntitySignal<
   // ==================
 
   /** Mark the collection dirty. O(1) — see the `version` docs above. */
-  function updateSignals(): void {
+  function updateSignals(includeOmission = false): void {
     const pending = [...pendingSubjectEpochs];
     pendingSubjectEpochs.clear();
     // An absent collection reads empty before and after: nothing a consumer
     // reads changed. Its membership hook wakes them when it comes back, so a
     // reversal writing its hidden rows re-runs nobody while those rows are
     // read physically (v16 8e).
-    if (absent()) return;
+    if (absent() && !includeOmission) return;
     locations.runInvalidationGroup(() => {
       for (const epoch of pending) {
         advanceEpochHandle(epoch);
@@ -2762,15 +2757,15 @@ export function createEntitySignal<
     // ==================
 
     get all(): ReadableCell<E[]> {
-      return inTap(allSignal, computeAll);
+      return allSignal;
     },
 
     get count(): ReadableCell<number> {
-      return inTap(countSignal, computeCount);
+      return countSignal;
     },
 
     get ids(): ReadableCell<K[]> {
-      return inTap(idsSignal, () => computeIds(computeAll));
+      return idsSignal;
     },
 
     /**
@@ -2782,7 +2777,7 @@ export function createEntitySignal<
      * `WRONG_ENTITY_METHODS`). `asMap` says what it returns.
      */
     get asMap(): ReadableCell<ReadonlyMap<K, E>> {
-      return inTap(mapSignal, computeMap);
+      return mapSignal;
     },
 
     // ── Active entity ───────────────────────────────────────────────────────
@@ -2805,7 +2800,6 @@ export function createEntitySignal<
         if (id === undefined) return undefined;
         return readEntityByKey(id);
       };
-      if (taps.depth) return fresh(read);
       return (cachedActiveEntity ??= locations.createDerived(read));
     },
 
@@ -2826,19 +2820,17 @@ export function createEntitySignal<
 
     has(id: K): ReadableCell<boolean> {
       const read = () => !absent() && structuralStore.hasActiveKey(id);
-      return taps.depth ? fresh(read) : createVersionedProjection(read);
+      return createVersionedProjection(read);
     },
 
     // Bare canonical name (the `.isEmpty` alias was removed in v11).
     get empty(): ReadableCell<boolean> {
-      if (taps.depth) return fresh(() => computeCount() === 0);
       return (cachedEmpty ??= locations.createDerived(
         () => countSignal() === 0
       ));
     },
 
     where(predicate: (entity: E) => boolean): ReadableCell<E[]> {
-      if (taps.depth) return fresh(() => computeAll().filter(predicate));
       const cached = whereCache.get(predicate);
       if (cached) return cached;
 
@@ -2886,7 +2878,6 @@ export function createEntitySignal<
     },
 
     find(predicate: (entity: E) => boolean): ReadableCell<E | undefined> {
-      if (taps.depth) return fresh(() => computeAll().find(predicate));
       const cached = findCache.get(predicate);
       if (cached) return cached;
 

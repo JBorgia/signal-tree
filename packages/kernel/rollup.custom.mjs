@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import typescript from '@rollup/plugin-typescript';
 import { dts } from 'rollup-plugin-dts';
 import { createLibraryRollupConfig } from '../../tools/build/create-rollup-config.mjs';
+import { createStripProductionStatsCallsPlugin } from '../../tools/build/strip-production-stats-calls.mjs';
 
 const packageRoot = path.dirname(fileURLToPath(import.meta.url));
 
@@ -30,7 +31,11 @@ export default (config, options) => {
         ? source.slice(0, -3)
         : source;
 
-      if (!normalizedSource.endsWith('/production-substrate-stats')) {
+      if (
+        !normalizedSource.startsWith('.') ||
+        path.resolve(path.dirname(importer), normalizedSource) !==
+          path.join(packageRoot, 'src/lib/internals/production-substrate-stats')
+      ) {
         return null;
       }
 
@@ -38,52 +43,9 @@ export default (config, options) => {
     },
   };
 
-  const stripProductionStatsCallsPlugin = {
-    name: 'signaltree-strip-production-stats-calls',
-    transform(code, id) {
-      if (
-        !id.startsWith(path.join(packageRoot, 'src')) ||
-        !id.endsWith('.ts')
-      ) {
-        return null;
-      }
-
-      const source = this.parse(code);
-      const removals = [];
-
-      const visit = (node) => {
-        if (
-          node.type === 'ExpressionStatement' &&
-          node.expression?.type === 'CallExpression' &&
-          node.expression.callee?.type === 'Identifier' &&
-          node.expression.callee.name === 'recordProductionSubstrateStat'
-        ) {
-          removals.push([node.start, node.end]);
-          return;
-        }
-        for (const value of Object.values(node)) {
-          if (Array.isArray(value)) {
-            for (const child of value) {
-              if (child?.type) visit(child);
-            }
-          } else if (value?.type) {
-            visit(value);
-          }
-        }
-      };
-      visit(source);
-
-      if (removals.length === 0) {
-        return null;
-      }
-
-      let transformed = code;
-      for (const [start, end] of removals.reverse()) {
-        transformed = transformed.slice(0, start) + transformed.slice(end);
-      }
-      return { code: transformed, map: null };
-    },
-  };
+  const stripProductionStatsCallsPlugin = createStripProductionStatsCallsPlugin(
+    { packageRoot }
+  );
 
   const existingPlugins = Array.isArray(baseConfig.plugins)
     ? baseConfig.plugins

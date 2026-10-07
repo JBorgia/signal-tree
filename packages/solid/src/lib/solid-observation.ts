@@ -1,4 +1,4 @@
-import { batch, createMemo, createRoot, createSignal } from 'solid-js';
+import { batch, createMemo, createRoot, createSignal, untrack } from 'solid-js';
 
 import type {
   EpochHandle,
@@ -36,6 +36,7 @@ interface SolidWritableCell<T> extends SolidReadonlyCell<T> {
  * equality would drop invalidations the kernel had decided to publish.
  */
 export const createSolidObservationAdapter = (): ObservationAdapter => {
+  let invalidationGroupDepth = 0;
   const createObservationToken = (): ObservationToken => {
     const [track, bump] = createSignal(0, { equals: false });
     return {
@@ -52,12 +53,12 @@ export const createSolidObservationAdapter = (): ObservationAdapter => {
       let published = read();
       const cell = (() => {
         track();
-        return published;
+        return invalidationGroupDepth > 0 ? untrack(read) : published;
       }) as SolidWritableCell<T>;
       // A placeholder the kernel replaces in `createWritable`. Nothing here may
       // depend on it working: see `advanceEpoch` for why that matters.
       cell.set = () => undefined;
-      cell.update = (update) => cell.set(update(published));
+      cell.update = (update) => cell.set(update(untrack(cell)));
       cell.asReadonly = () => cell;
       return {
         cell,
@@ -120,14 +121,40 @@ export const createSolidObservationAdapter = (): ObservationAdapter => {
      */
     createReadonlyCell: <T>(computeValue: () => T) => {
       let memo: (() => T) | undefined;
-      return (() =>
-        (memo ??= createRoot(() =>
-          createMemo(computeValue)
-        ))()) as SolidReadonlyCell<T>;
+      return (() => {
+        let published: T;
+        try {
+          published = (memo ??= createRoot((dispose) => {
+            try {
+              return createMemo(computeValue);
+            } catch (error) {
+              dispose();
+              throw error;
+            }
+          }))();
+        } catch (error) {
+          // A failed eager memo may have no accessor/dependency to track.
+          // Recover in the caller's tracking scope so native consumers can
+          // follow later writes, including when first read inside a group.
+          // Failed temporary roots have already been disposed above.
+          if (!memo || invalidationGroupDepth > 0) return computeValue();
+          throw error;
+        }
+        // Keep the native memo's dependency and scheduling; the explicit
+        // SignalTree accessor alone reads through during deferred publication.
+        return invalidationGroupDepth > 0 ? untrack(computeValue) : published;
+      }) as SolidReadonlyCell<T>;
     },
 
     runInvalidationGroup(run): void {
-      batch(run);
+      batch(() => {
+        invalidationGroupDepth += 1;
+        try {
+          run();
+        } finally {
+          invalidationGroupDepth -= 1;
+        }
+      });
     },
   };
 };
