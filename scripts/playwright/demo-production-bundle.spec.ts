@@ -46,5 +46,7 @@ test('production shell excludes retired eager and development runtimes', () => {
 
   expect(emittedJavaScript).not.toMatch(/echarts|zrender/);
   expect(emittedJavaScript).not.toContain('__REDUX_DEVTOOLS_EXTENSION__');
-  expect(statSync(mainPath).size).toBeLessThan(525_000);
+  // Owner-approved October 7 tolerance; Linux 381fc060 measured 569,991 B.
+  // Keep the eager/development-runtime checks above independent of size.
+  expect(statSync(mainPath).size).toBeLessThan(600_000);
 });
