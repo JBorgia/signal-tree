@@ -1,3 +1,26 @@
+# v15.4.4 published — October 7, 2026
+
+All five `@signal-tree/*` packages are on npm `latest` from signed tag
+`v15.4.4` at `2bdf2ec54622e41b607242c8345b3389ce4ffb6c`.
+Canonical publisher [37683526919](https://github.com/JBorgia/signal-tree/actions/runs/37683526919)
+and GitHub release [37683527624](https://github.com/JBorgia/signal-tree/actions/runs/37683527624)
+passed the exact tagged release gates and mutation proofs. Local checks passed
+91/91 gates, 91/91 proofs, fresh packed consumers, strict types, Angular AOT,
+and 146/146 production browser cases. The receipt records the browser-ceiling-only
+change between the local gate run and final tag; no library code changed there.
+
+All five registry archives match the qualified local archives byte for byte,
+and fresh registry consumers pass runtime identities and strict typechecking.
+The production demo serves 15.4.4 from deployment
+`dpl_3wHTs3B9DDHNAJR6D7PJRZAGnBXt`, promoted from the tagged commit's preview.
+Evidence: [release receipt](docs/audits/2026-10-07-v15.4.4-release.json).
+
+Next authorized work is completion of TruckTrax v3 PRs #780, #781 and #782,
+including dependency installation and review comments. The separate v16 work
+remains outside this release takeover.
+
+---
+
 # Active release takeover — October 7, 2026
 
 The owner authorized this chat to take over and finish the existing v15 release,
