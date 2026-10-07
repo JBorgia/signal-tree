@@ -14,14 +14,11 @@ import {
  * Ported from v16 integrate/v16-slice8f (df784a38); `transact` is v15's
  * `transaction`.
  *
- * A tap runs inside its write. Inside a grouped write — a transaction, an
- * undo, a redo, a jump, a rollback — the cached projections (`all()`,
- * `count()`, `where()`, ...) hear of the write only when the group ends, so a
- * tap read through them saw the collection as it was before the group:
- * `removeOne('a')`'s tap read `all()` as ['a', 'b'] inside `transact` (on
- * present collections too, and on v15 12187613 alike). While a tap runs, a
- * projection is now read fresh. Each tap here checks its reads against each
- * other and against the change it reports.
+ * A tap runs inside its write. Runtime-owned projection freshness now applies
+ * to every explicit read during a group, including held cells inside taps.
+ * Stable projection identity replaces the former tap-only uncached reader.
+ * Each tap checks its reads against the change it reports while subscriptions
+ * remain deferred until the group closes.
  */
 
 type Row = { id: string; n: number };
@@ -265,23 +262,42 @@ describe('ids and held cells inside a tap (v16 8f review)', () => {
     expect(rows.ids()).toEqual(['a2', 'b', 'q']);
   });
 
-  it('a cell held from before the tap keeps its cache until the group ends', async () => {
-    // Documented: a tap reads fresh through the collection (`rows.all()`), not
-    // through a cell it obtained earlier (`const all = rows.all`). Making held
-    // cells fresh would need the location runtime to settle groups early.
+  it('a held cell reads fresh while its observers wait for the group to end', async () => {
+    // Owner-authorized permanent repair (2026-10-06): cache invalidation is
+    // immediate, observer delivery stays grouped. This supersedes the old
+    // stale-held-cell workaround; a fresh read need not settle the group.
     const tree = build();
     const rows = tree.$.a.rows;
     const held = rows.all;
     held();
+    const delivered: string[][] = [];
+    // The production neutral projection is a subscribable kernel location.
+    const off = (
+      held as Cell<Row[]> & { subscribe(fn: () => void): () => void }
+    ).subscribe(() => delivered.push(held().map((row) => row.id)));
     let seen: unknown[] = [];
+    let sameHeldCell = false;
     rows.tap({
       onRemove: () => {
+        sameHeldCell = rows.all === held;
         seen = [held().map((row) => row.id), rows.all().map((row) => row.id)];
       },
     });
-    tree.transaction(() => rows.removeOne('a'));
-    await flush();
-    expect(seen).toEqual([['a', 'b'], ['b']]);
-    expect(held()).toEqual([B]);
+    try {
+      const pending = tree.transaction(() => {
+        rows.removeOne('a');
+        expect(rows.all).toBe(held);
+        expect(held()).toEqual([B]);
+        expect(delivered).toEqual([]);
+      });
+      await flush();
+      expect(seen).toEqual([['b'], ['b']]);
+      expect(sameHeldCell).toBe(true);
+      expect(delivered).toEqual([['b']]);
+      expect(held()).toEqual([B]);
+      pending.rollback();
+    } finally {
+      off();
+    }
   });
 });

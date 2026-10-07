@@ -27,6 +27,8 @@ export type DeclarativeTransitionTarget = {
 
 export type PreparedCollectionTransitionTarget = {
   install(): void;
+  /** Invalidate installed views before any target callbacks; the caller groups delivery. */
+  preparePublication?(): void;
   publish(): void;
 };
 
@@ -105,6 +107,9 @@ export function prepareDeclarativeTransitionInstallation(
     install(): void {
       for (const collection of prepared) {
         collection.install();
+      }
+      for (const collection of prepared) {
+        collection.preparePublication?.();
       }
       for (const collection of prepared) {
         collection.publish();

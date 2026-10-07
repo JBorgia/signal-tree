@@ -1,3 +1,84 @@
+# Active release takeover — October 7, 2026
+
+The owner authorized this chat to take over and finish the existing v15 release,
+including its inherited uncommitted repairs, then publish if verification passes.
+This resumes the implementation/qualification hold below. Work remains on
+`fix/v15-permanent-repairs`; the v16 research checkout is outside this task.
+Inherited files and hashes are preserved at
+`/private/tmp/st-v15-release-takeover/inherited-work.tar.gz` and
+`inherited-work.json`. The published baseline remains v15.4.3.
+
+Complete the existing repair scope and independent reviews, preserve first
+failures, then qualify one exact committed candidate through the full registry,
+mutation proofs, fresh packed consumers, demo/browser and Linux checks before
+signed tagging and canonical CI publication. No budget or public-policy change
+is authorized merely to get green. New release evidence belongs under
+`/private/tmp/st-v15-release-takeover/` until recorded before candidate freeze.
+
+Candidate preparation, October 7: isolated frozen install, independent source
+review, transform fixtures and focused neutral/native reader probes completed.
+Version metadata is 15.4.4. Full qualification and publication remain pending;
+record exact-candidate evidence externally under the takeover directory so the
+qualified source remains unchanged. See the permanent-repairs audit for first
+failures and corrected test premises.
+
+---
+
+# Active: 15.4.4 permanent repairs — October 6, 2026
+
+The owner approved the audit's recommended durable solutions on October 6.
+Work is isolated on `fix/v15-permanent-repairs`, based on combined implementation
+`8e5be3dd02c2398e1c68542883b4e3ea68d2c595`. Other worktrees and their uncommitted
+changes are preserved. The earlier controller below is historical.
+
+## Research checkpoint — October 6
+
+The owner requested external comparison of the recurring subsystem-boundary
+failures before further implementation. Preserve current edits and first reds;
+finish already-running verification only. This pauses implementation/qualification,
+not the standing release authority once a candidate is actually ready.
+See [external comparison](docs/audits/2026-10-06-external-architecture-comparison.md).
+No replacement architecture or new public contract has been selected by this research.
+
+## Scope and completion conditions
+
+- [ ] Current explicit collection reads with grouped/coherent observer delivery,
+  including previously captured projection functions; no tap-only workaround.
+- [ ] Tree-scoped membership visibility caching, including the write path;
+  partial capture proportional to supplied keys and scoped observer demand.
+- [ ] Production instrumentation stripping preserves program control flow;
+  executable transform fixtures and built-artifact verification.
+- [ ] History reconstruction removes redundant row and location searches while
+  preserving boundaries, hidden locations, rejection rebasing and immutable states.
+- [ ] Remove address retention that has no consumer; preserve exact structured
+  addresses and all active topology/late-observation requirements.
+- [ ] Attribute transaction overhead with useful work counts and correct,
+  lifecycle-clean measurements before selecting any provenance representation change.
+- [ ] Independent review, focused mutation proofs and full required checks;
+  current docs/llms/demo, then one exact candidate and fresh artifact qualification.
+- [ ] Exact-candidate Linux validation, tag/publish and registry verification.
+
+Owner decision, October 6: fresh reads cover SignalTree-provided readers,
+including held projection cells. External native computed values and effects
+retain framework timing; they need not refresh inside a grouped callback.
+Synchronous observers must still receive coherent publication.
+
+Do not change v15 automatic-abort/refusal semantics, public API, or budgets to
+make these repairs pass. The prior read-only audit did not demonstrate abandoned
+pre-handle authority on v15; specific exception-boundary probes must distinguish
+that suspicion from v16's different recovery contract. Persistent history caches
+and broad ownership-model replacements are not presumed necessary.
+
+Order remains verified v15 publication, then the TruckTrax v3_alt update and
+completion (GT Web first), then v16 integration and its own complete semantic,
+performance and size verification. Existing publication authority remains valid.
+
+Before/after diagnostics live under `/private/tmp/st-permanent-repairs/` until
+checkpointed. Preserve first reds. Exact release evidence stays outside a frozen
+candidate. Developer work-count/source probes are not release timing evidence.
+
+---
+
 # Current release work — v15 outcome provenance patch
 
 Updated October 5, 2026 (15.4.3 preparation). Active branch `fix/v15-outcome-provenance`, based on

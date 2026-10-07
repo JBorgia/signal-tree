@@ -79,6 +79,10 @@ type PendingEntry = {
 
 type PendingSlot = PendingEntry | PendingEntry[];
 
+// Same callback/owner duplicates share a registration token; different owners
+// have independent lifetimes, while delivery still calls the callback once.
+type ObserverOwners = Map<number | undefined, symbol>;
+
 const materializeDeliveryMeta = (
   meta?: WriteMetadata
 ): WriteMetadata | undefined => {
@@ -100,8 +104,13 @@ const materializeDeliveryMeta = (
 export class PathNotifier {
   private static readonly ownerBoundarySeparator = '\u0000';
 
-  // Map of pattern -> Set of handlers
-  private subscribers = new Map<string, Set<PathNotifierHandler>>();
+  // Delivery remains deduplicated by callback; owner registrations describe capture
+  // demand only. Unscoped registrations (undefined) demand every tree.
+  private subscribers = new Map<
+    string,
+    Map<PathNotifierHandler, ObserverOwners>
+  >();
+  private observerDemand = new Map<number | undefined, number>();
 
   // Batching state
   private resetCallbacks = new Set<() => void>();
@@ -110,7 +119,7 @@ export class PathNotifier {
   private pendingFlush = false;
   private pending = new Map<string, PendingSlot>();
   private pendingBeforeMembership: PendingSlot[] = [];
-  private flushCallbacks = new Set<() => void>();
+  private flushCallbacks = new Map<() => void, ObserverOwners>();
 
   /**
    * @internal Installed while a reversal or rollback applies
@@ -138,8 +147,57 @@ export class PathNotifier {
     return this.batchingEnabled;
   }
 
-  hasObservers(): boolean {
-    return this.subscribers.size > 0 || this.flushCallbacks.size > 0;
+  /** Owner scope limits capture demand, never notification delivery. */
+  hasObservers(ownerId?: number): boolean {
+    return ownerId === undefined
+      ? this.observerDemand.size > 0
+      : this.observerDemand.has(undefined) || this.observerDemand.has(ownerId);
+  }
+
+  private releaseDemand(owners: Iterable<number | undefined>): void {
+    for (const owner of owners) {
+      const count = this.observerDemand.get(owner) ?? 0;
+      if (count <= 1) this.observerDemand.delete(owner);
+      else this.observerDemand.set(owner, count - 1);
+    }
+  }
+
+  private registerObserver<T>(
+    observers: Map<T, ObserverOwners>,
+    callback: T,
+    ownerId?: number,
+    isCurrent?: () => boolean
+  ): () => void {
+    let owners = observers.get(callback);
+    if (!owners) {
+      owners = new Map();
+      observers.set(callback, owners);
+    }
+    let token = owners.get(ownerId);
+    if (token === undefined) {
+      token = Symbol();
+      owners.set(ownerId, token);
+      this.observerDemand.set(
+        ownerId,
+        (this.observerDemand.get(ownerId) ?? 0) + 1
+      );
+    }
+    const registered = owners;
+    const registration = token;
+    return () => {
+      // Same-owner duplicates share disposal; other owners and a later
+      // registration of this callback retain their own demand.
+      if (
+        observers.get(callback) !== registered ||
+        registered.get(ownerId) !== registration
+      )
+        return;
+      registered.delete(ownerId);
+      if (registered.size === 0) observers.delete(callback);
+      // clear() already released subscriber demand. Old disposers may still
+      // remove handlers from an in-flight delivery, but not its replacement.
+      if (isCurrent?.() !== false) this.releaseDemand([ownerId]);
+    };
   }
 
   /**
@@ -176,22 +234,29 @@ export class PathNotifier {
    * Subscribe to mutations matching a path pattern
    * Returns unsubscribe function
    */
-  subscribe(pattern: string, handler: PathNotifierHandler): () => void {
-    if (!this.subscribers.has(pattern)) {
-      this.subscribers.set(pattern, new Set());
-    }
-    const handlers = this.subscribers.get(pattern);
+  subscribe(
+    pattern: string,
+    handler: PathNotifierHandler,
+    ownerId?: number
+  ): () => void {
+    let handlers = this.subscribers.get(pattern);
     if (!handlers) {
-      return () => {
-        // No-op: pattern was not found
-      };
+      handlers = new Map();
+      this.subscribers.set(pattern, handlers);
     }
-    handlers.add(handler);
-
-    // Return unsubscribe function
+    const registered = handlers;
+    const unsubscribe = this.registerObserver(
+      registered,
+      handler,
+      ownerId,
+      () => this.subscribers.get(pattern) === registered
+    );
     return () => {
-      handlers.delete(handler);
-      if (handlers.size === 0) {
+      unsubscribe();
+      if (
+        registered.size === 0 &&
+        this.subscribers.get(pattern) === registered
+      ) {
         this.subscribers.delete(pattern);
       }
     };
@@ -333,7 +398,7 @@ export class PathNotifier {
     // settling first and then surfacing a synchronous delivery error.
     for (const [pattern, handlers] of this.subscribers) {
       if (this.matches(pattern, path)) {
-        for (const handler of handlers) {
+        for (const handler of handlers.keys()) {
           try {
             // A user callback: its writes during a replay of recorded state
             // are forward work (write-context.ts).
@@ -441,7 +506,7 @@ export class PathNotifier {
     }
 
     // Call flush listeners (e.g., restoration) once per flush
-    for (const cb of Array.from(this.flushCallbacks)) {
+    for (const cb of Array.from(this.flushCallbacks.keys())) {
       try {
         withoutWriteObservationScopes(cb);
       } catch {
@@ -469,9 +534,8 @@ export class PathNotifier {
   /**
    * Subscribe to flush events (called after a flush completes)
    */
-  onFlush(callback: () => void): () => void {
-    this.flushCallbacks.add(callback);
-    return () => this.flushCallbacks.delete(callback);
+  onFlush(callback: () => void, ownerId?: number): () => void {
+    return this.registerObserver(this.flushCallbacks, callback, ownerId);
   }
 
   /**
@@ -750,6 +814,9 @@ export class PathNotifier {
    * Clear all subscribers
    */
   clear(): void {
+    for (const handlers of this.subscribers.values()) {
+      for (const owners of handlers.values()) this.releaseDemand(owners.keys());
+    }
     this.subscribers.clear();
     this.pending.clear();
     this.pendingBeforeMembership = [];

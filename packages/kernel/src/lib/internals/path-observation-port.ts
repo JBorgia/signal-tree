@@ -153,9 +153,12 @@ export function capturePathReAddIfObserved(
   return pathReAddCapture?.(path, outer);
 }
 
-/** @internal True only when a runtime is installed AND it has observers. */
-export function hasPathObservers(): boolean {
-  return runtime?.hasObservers() ?? false;
+/**
+ * @internal Demand for this tree or an unscoped wildcard consumer. Without an
+ * owner, preserve the aggregate query. This does not filter delivery.
+ */
+export function hasPathObservers(ownerId?: number): boolean {
+  return runtime?.hasObservers(ownerId) ?? false;
 }
 
 /**
@@ -170,7 +173,16 @@ export function hasPathObservers(): boolean {
  * degraded one: no runtime means no subscribers, so there is nothing to deliver.
  */
 const PORT: PathObservationPort = {
-  notify(path, value, prev, ownerPath, subjectIds, positionIds, metaOverride, ownerId) {
+  notify(
+    path,
+    value,
+    prev,
+    ownerPath,
+    subjectIds,
+    positionIds,
+    metaOverride,
+    ownerId
+  ) {
     runtime?.notify(
       path,
       value,

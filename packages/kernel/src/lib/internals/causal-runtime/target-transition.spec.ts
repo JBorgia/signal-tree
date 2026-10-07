@@ -421,6 +421,8 @@ describe('declarative target transition: whole-target compilation', () => {
           readSource: () => source(owner, [[1, 'a', {}]]),
           prepareTarget: () => ({
             install: () => events.push(`install:${owner}`),
+            preparePublication: () =>
+              events.push(`prepare-publication:${owner}`),
             publish: () => events.push(`publish:${owner}`),
           }),
         },
@@ -432,6 +434,8 @@ describe('declarative target transition: whole-target compilation', () => {
     expect(events).toEqual([
       'install:7',
       'install:8',
+      'prepare-publication:7',
+      'prepare-publication:8',
       'publish:7',
       'publish:8',
     ]);

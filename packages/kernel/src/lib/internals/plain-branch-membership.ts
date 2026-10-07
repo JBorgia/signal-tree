@@ -85,21 +85,17 @@ export function capturePlainBranchMembership(
   supplied: object,
   partial?: boolean
 ): (() => void) | undefined {
-  if (!hasPathObservers()) return undefined;
   const registry = getPositionRegistry(branch);
+  if (!hasPathObservers(registry?.id)) return undefined;
   const path = getOwnedOwnerPath(branch);
   if (!registry || path === undefined) return undefined;
 
-  const keys = new Set(
-    partial
-      ? [...Object.keys(branch), ...Object.keys(supplied)]
-      : Object.keys(supplied)
-  );
+  const keys = new Set(Object.keys(supplied));
   const before = new Map<string, MemberValue>();
   // Before-images are what storage held (`storedReads`).
   storedReads.depth++;
   try {
-    for (const key of Object.getOwnPropertyNames(branch)) {
+    for (const key of partial ? keys : Object.getOwnPropertyNames(branch)) {
       const descriptor = Object.getOwnPropertyDescriptor(branch, key);
       if (!descriptor || !('value' in descriptor)) continue;
       const present = descriptor.enumerable === true;
@@ -180,7 +176,8 @@ export function capturePathReAdd(
   path: readonly { readonly parent: object; readonly key: string }[],
   outer: number
 ): (() => void) | undefined {
-  if (!hasPathObservers()) return undefined;
+  if (!hasPathObservers(getPositionRegistry(path[outer]?.parent)?.id))
+    return undefined;
   const publishers: Array<(() => void) | undefined> = [];
   for (let i = 0; i <= outer; i++) {
     // Links name the accessor half (`linkMember`).
@@ -796,7 +793,7 @@ export function composeHiddenMemberValue(
   return value;
 }
 
-/** Apply a recorded member to detached history using actual property keys. */
+/** Apply a recorded member to detached history; root is the owning tree.$ accessor. */
 export function applyPlainBranchMemberSnapshot<T>(
   root: object,
   snapshot: T,
@@ -806,25 +803,19 @@ export function applyPlainBranchMemberSnapshot<T>(
 ): T {
   const address = memberAddress(root, position);
   if (!address) throw new Error('Plain branch history location is unavailable');
-  const seen = new Set<object>();
-  const find = (
-    node: object,
-    segments: readonly string[]
-  ): readonly string[] | undefined => {
-    if (node === address.branch) return segments;
-    if (seen.has(node)) return undefined;
-    seen.add(node);
-    // Dormant branch accessors remain physically retained and addressable.
-    for (const key of Object.getOwnPropertyNames(node)) {
-      const child = Object.getOwnPropertyDescriptor(node, key)?.value;
-      if (!isNodeAccessor(child)) continue;
-      const found = find(child, [...segments, key]);
-      if (found) return found;
-    }
-    return undefined;
-  };
-  const segments = find(root, []);
-  if (!segments)
+  // Position addresses preserve literal property keys. Validate the retained
+  // path, including dormant branches, rather than searching the whole tree.
+  const location = getPositionRegistry(root)?.addressFor(position);
+  if (!location || location.at(-1) !== address.key)
+    throw new Error('Plain branch history location is unavailable');
+  const segments = location.slice(0, -1);
+  let parent: unknown = root;
+  for (const key of segments) {
+    if (!isNodeAccessor(parent))
+      throw new Error('Plain branch history location is unavailable');
+    parent = Object.getOwnPropertyDescriptor(parent, key)?.value;
+  }
+  if (parent !== address.branch)
     throw new Error('Plain branch history location is unavailable');
   const state: MemberValue = present
     ? { present: true, value }

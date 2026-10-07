@@ -1,4 +1,4 @@
-## Unreleased
+## 15.4.4 (2026-10-07)
 
 **Patch — reversals restore exactly what they reverse.** Every reversal defect
 known on 15.4.3 is repaired. Forward behaviour is unchanged except where a
@@ -375,8 +375,9 @@ bullet below says **Compatibility** or **Behaviour change**.
     rollback, a tap's `all()`, `count()`, `where()` and the other
     projections include the change it reports. **Behaviour change:** on
     15.4.3 they read the collection as it was before the transaction or
-    reversal. A projection cell obtained before the tap still reads its
-    cached value until the group ends.
+    reversal. Held SignalTree projection cells now read current truth too;
+    grouped observer delivery remains coherent. Native framework computed
+    values and effects keep their framework timing during the group.
   - Undo, redo and `jumpTo()` of work under a location that a later ORDINARY
     write omitted (the location or a plain branch above it) re-add only the
     way to the reversal's own locations, with their values; the omission's

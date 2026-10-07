@@ -108,6 +108,16 @@ protection that is not there. Tracked for a follow-up release.
 
 Apache-2.0
 
+## Reads during grouped writes
+
+SignalTree readers, including previously captured collection projections and
+readonly views, read current state after each write inside a transaction or
+restoration callback. Observer delivery stays grouped so subscribers see a
+coherent result. External native `createMemo()` values and effects keep their
+framework timing; use the SignalTree reader itself when an intermediate read
+must be fresh. Grouping is scoped to an owning tree, not an atomic transaction
+across independent trees.
+
 ## Transaction failures
 
 Read [Transaction failure policy and the 15.3.1 failure inventory](https://github.com/JBorgia/signal-tree/blob/v15.3.1/docs/guides/transaction-failures-v15.md)

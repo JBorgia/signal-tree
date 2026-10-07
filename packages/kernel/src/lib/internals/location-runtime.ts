@@ -1,10 +1,6 @@
 import { markTreeCell } from './cell-identity';
 import { isLeafDefinition, leafDefinitionValue } from '../leaf';
-import type {
-  Location,
-  ReadonlyLocation,
-  WritableCell,
-} from './cell-runtime';
+import type { Location, ReadonlyLocation, WritableCell } from './cell-runtime';
 import type {
   ObservationAdapter,
   ObservationToken,
@@ -23,7 +19,7 @@ import { registerIntrinsicMutationSource } from './intrinsic-mutation';
 interface DependencyConsumer {
   readonly dependencies: Map<DependencyNode, DependencyEdge>;
   level: number;
-  invalidate(): void;
+  invalidate(delivery: Set<DependencyConsumer>): void;
   settle(): void;
 }
 
@@ -42,6 +38,11 @@ interface DependencyNode {
 export interface LocationPublisher {
   notify(): void;
 }
+
+// Cache invalidation belongs to the kernel dependency graph; observer delivery
+// belongs to the publisher. Keep this association private, including for
+// membership-only publications that do not pass through a writable setter.
+const publicationNodes = new WeakMap<LocationPublisher, DependencyNode>();
 
 export interface WritableLocationBinding<T> extends LocationPublisher {
   readonly location: Location<T>;
@@ -240,24 +241,25 @@ const NO_LISTENERS: ReadonlySet<() => void> = new Set<() => void>();
 const notifyObservers = (
   token: ObservationToken | undefined,
   listeners: ReadonlySet<() => void>
-): void => runUserCallback(() => {
-  let failure: unknown;
-  let hasFailure = false;
-  try {
-    token?.invalidate();
-  } catch (error) {
-    failure = error;
-    hasFailure = true;
-  }
-  for (const listener of [...listeners]) {
+): void =>
+  runUserCallback(() => {
+    let failure: unknown;
+    let hasFailure = false;
     try {
-      listener();
-    } catch {
-      // One observer cannot starve later observers of committed truth.
+      token?.invalidate();
+    } catch (error) {
+      failure = error;
+      hasFailure = true;
     }
-  }
-  if (hasFailure) throw failure;
-});
+    for (const listener of [...listeners]) {
+      try {
+        listener();
+      } catch {
+        // One observer cannot starve later observers of committed truth.
+      }
+    }
+    if (hasFailure) throw failure;
+  });
 
 const trackDependency = (
   node: DependencyNode,
@@ -282,10 +284,13 @@ const trackDependency = (
   token().observe();
 };
 
-const notifyDependents = (node: DependencyNode): void => {
+const notifyDependents = (
+  node: DependencyNode,
+  delivery: Set<DependencyConsumer>
+): void => {
   for (const reference of node.consumers) {
     const consumer = reference.deref();
-    if (consumer) consumer.invalidate();
+    if (consumer) consumer.invalidate(delivery);
     else node.consumers.delete(reference);
   }
 };
@@ -347,12 +352,15 @@ export function getLocationRuntime(node: object): LocationRuntime | undefined {
   return NODE_LOCATION_RUNTIMES.get(node);
 }
 
-export function createLocationRuntime(
+/** @internal Shared cache invalidation and deferred publication authority. */
+export function createLocationPublicationRuntime(
   realization: ObservationAdapter
-): LocationRuntime {
-  const hasReactiveObservation = realization !== NEUTRAL_OBSERVATION_ADAPTER;
+): Pick<LocationRuntime, 'publish' | 'runInvalidationGroup'> {
   let invalidationGroupDepth = 0;
   const groupedPublishers = new Set<LocationPublisher>();
+  // Invalidating a cache must not put its observers into the global delivery
+  // queue while this runtime is still grouped: another tree can publish then.
+  const groupedConsumers = new Set<DependencyConsumer>();
 
   const deliver = (publishers: readonly LocationPublisher[]): void => {
     const errors: unknown[] = [];
@@ -376,6 +384,15 @@ export function createLocationRuntime(
   };
 
   const publish = (publishers: readonly LocationPublisher[]): void => {
+    const delivery =
+      invalidationGroupDepth > 0 ? groupedConsumers : pendingConsumers;
+    for (const publisher of publishers) {
+      const node = publicationNodes.get(publisher);
+      if (node) {
+        node.version += 1;
+        notifyDependents(node, delivery);
+      }
+    }
     if (invalidationGroupDepth > 0) {
       for (const publisher of publishers) groupedPublishers.add(publisher);
       return;
@@ -397,6 +414,8 @@ export function createLocationRuntime(
       if (invalidationGroupDepth === 0 && groupedPublishers.size > 0) {
         const publishers = [...groupedPublishers];
         groupedPublishers.clear();
+        for (const consumer of groupedConsumers) pendingConsumers.add(consumer);
+        groupedConsumers.clear();
         try {
           deliver(publishers);
         } catch (error) {
@@ -410,11 +429,22 @@ export function createLocationRuntime(
     if (hasFailure) throw failure;
   };
 
+  return { publish, runInvalidationGroup };
+}
+
+export function createLocationRuntime(
+  realization: ObservationAdapter
+): LocationRuntime {
+  const hasReactiveObservation = realization !== NEUTRAL_OBSERVATION_ADAPTER;
+  const { publish, runInvalidationGroup } =
+    createLocationPublicationRuntime(realization);
+
   const createWritable = <T>(
     read: (stored?: boolean) => T,
     write: (value: T, intent: 'replace' | 'derive') => boolean
   ): WritableLocationBinding<T> => {
     let observationToken: ObservationToken | undefined;
+    let notifiedVersion = 0;
     const listeners = new Set<() => void>();
     const token = () => (observationToken ??= realization.createToken());
     const node: DependencyNode = {
@@ -444,8 +474,14 @@ export function createLocationRuntime(
     const binding: WritableLocationBinding<T> = {
       location,
       notify: () => {
-        node.version += 1;
-        notifyDependents(node);
+        // Membership can send this binding through another runtime. A native
+        // runtime knows only notify(), so route an unprepared publication back
+        // through this cache's authority instead of bypassing invalidation.
+        if (notifiedVersion === node.version) {
+          publish([binding]);
+          return;
+        }
+        notifiedVersion = node.version;
         notifyObservers(observationToken, listeners);
       },
       replace: (next) => {
@@ -481,6 +517,7 @@ export function createLocationRuntime(
         if (changed) publish([binding]);
       },
     };
+    publicationNodes.set(binding, node);
     registerWritableLocationBinding(binding);
 
     // Never the stored read: `peek` is public and takes no argument.
@@ -514,6 +551,10 @@ export function createLocationRuntime(
     let dirty = true;
     let computationFailed = false;
     let value: T;
+    // Explicit reads may recompute during a group. Notification equality is
+    // against the value before invalidation, not the last intermediate read.
+    let awaitingPublication = false;
+    let publicationValue: T | undefined;
     let observationToken: ObservationToken | undefined;
     const listeners = new Set<() => void>();
     const node: DependencyNode = {
@@ -526,30 +567,28 @@ export function createLocationRuntime(
     const consumer: DependencyConsumer = {
       dependencies: new Map(),
       level: 1,
-      invalidate: () => {
-        if (dirty) {
-          if (
-            listeners.size > 0 ||
-            (hasReactiveObservation && observationToken)
-          ) {
-            pendingConsumers.add(consumer);
-          }
-          return;
-        }
-        dirty = true;
-        notifyDependents(node);
+      invalidate: (delivery) => {
         if (
           listeners.size > 0 ||
           (hasReactiveObservation && observationToken)
         ) {
-          pendingConsumers.add(consumer);
+          if (!awaitingPublication) {
+            publicationValue = value;
+            awaitingPublication = true;
+          }
+          delivery.add(consumer);
         }
+        if (dirty) return;
+        dirty = true;
+        notifyDependents(node, delivery);
       },
       settle: () => {
-        if (!dirty) return;
-        const previous = value;
+        if (!dirty && !awaitingPublication) return;
+        const previous = awaitingPublication ? publicationValue : value;
         const wasInitialized = initialized;
         readCurrent();
+        awaitingPublication = false;
+        publicationValue = undefined;
         if (wasInitialized && !Object.is(previous, value)) {
           publisher.notify();
         }
@@ -648,11 +687,10 @@ export function createLocationRuntime(
     };
     const publisher: LocationPublisher = {
       notify: () => {
-        node.version += 1;
-        notifyDependents(node);
         notifyObservers(observationToken, NO_LISTENERS);
       },
     };
+    publicationNodes.set(publisher, node);
     const epoch = (() => {
       trackDependency(node, token);
       return version;

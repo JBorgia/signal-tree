@@ -33,13 +33,16 @@ interface VueWritableCell<T> extends VueReadonlyCell<T> {
   asReadonly(): VueReadonlyCell<T>;
 }
 
-const wrapReadonlyCell = <T>(source: ComputedRef<T>): VueReadonlyCell<T> => {
-  const cell = (() => source.value) as VueReadonlyCell<T>;
+const wrapReadonlyCell = <T>(
+  source: ComputedRef<T>,
+  read: () => T = () => source.value
+): VueReadonlyCell<T> => {
+  const cell = (() => read()) as VueReadonlyCell<T>;
   Object.defineProperties(cell, {
     __v_isRef: { value: true },
     __v_isReadonly: { value: true },
     effect: { value: source.effect },
-    value: { get: () => source.value },
+    value: { get: read },
   });
   return cell;
 };
@@ -47,7 +50,10 @@ const wrapReadonlyCell = <T>(source: ComputedRef<T>): VueReadonlyCell<T> => {
 const createReadonlyCell = <T>(read: () => T): VueReadonlyCell<T> =>
   wrapReadonlyCell(computed(read));
 
-const createWritableCell = <T>(read: () => T): VueWritableCell<T> => {
+const createWritableCell = <T>(
+  read: () => T,
+  readonlyFactory: typeof createReadonlyCell = createReadonlyCell
+): VueWritableCell<T> => {
   const cell = (() => read()) as VueWritableCell<T>;
   Object.defineProperties(cell, {
     __v_isRef: { value: true },
@@ -59,12 +65,23 @@ const createWritableCell = <T>(read: () => T): VueWritableCell<T> => {
   cell.set = () => undefined;
   cell.update = (update) => cell.set(update(read()));
   let readonly: VueReadonlyCell<T> | undefined;
-  cell.asReadonly = () => (readonly ??= createReadonlyCell(read));
+  cell.asReadonly = () => (readonly ??= readonlyFactory(read));
   return cell;
 };
 
 export const createVueObservationAdapter = (): ObservationAdapter => {
   let invalidationGroupDepth = 0;
+  let deliveryDepth = 0;
+  const readsCurrent = () => invalidationGroupDepth > 0 || deliveryDepth > 0;
+  const currentReadonlyCell = <T>(read: () => T): VueReadonlyCell<T> => {
+    const source = computed(read);
+    return wrapReadonlyCell(source, () => {
+      // Keep Vue's computed dependency; explicit SignalTree reads also consult
+      // canonical truth while native triggers are deferred or being drained.
+      const published = source.value;
+      return readsCurrent() ? read() : published;
+    });
+  };
   const pendingInvalidations = new Set<() => void>();
 
   const scheduleInvalidation = (invalidate: () => void): void => {
@@ -94,8 +111,8 @@ export const createVueObservationAdapter = (): ObservationAdapter => {
       return {
         cell: createWritableCell(() => {
           void revision.value;
-          return published;
-        }),
+          return readsCurrent() ? read() : published;
+        }, currentReadonlyCell),
         peek: read,
         token: {
           observe: () => void revision.value,
@@ -135,21 +152,20 @@ export const createVueObservationAdapter = (): ObservationAdapter => {
     },
 
     advanceEpoch: (epoch) => {
-      const revision = (epoch as EpochHandle & {
-        [EPOCH_REF]?: ShallowRef<number>;
-      })[EPOCH_REF];
+      const revision = (
+        epoch as EpochHandle & {
+          [EPOCH_REF]?: ShallowRef<number>;
+        }
+      )[EPOCH_REF];
       if (revision) scheduleInvalidation(() => triggerRef(revision));
     },
 
     createWritableProjection: <T>(computeValue: () => T) => ({
-      cell: createWritableCell(computeValue),
+      cell: createWritableCell(computeValue, currentReadonlyCell),
       peek: computeValue,
     }),
 
-    createReadonlyCell: <T>(computeValue: () => T) => {
-      const source = computed(computeValue);
-      return wrapReadonlyCell(source);
-    },
+    createReadonlyCell: currentReadonlyCell,
 
     runInvalidationGroup(run): void {
       let failure: unknown;
@@ -165,15 +181,20 @@ export const createVueObservationAdapter = (): ObservationAdapter => {
         if (invalidationGroupDepth === 0 && pendingInvalidations.size > 0) {
           const invalidations = [...pendingInvalidations];
           pendingInvalidations.clear();
-          for (const invalidate of invalidations) {
-            try {
-              invalidate();
-            } catch (error) {
-              if (!hasFailure) {
-                failure = error;
-                hasFailure = true;
+          deliveryDepth += 1;
+          try {
+            for (const invalidate of invalidations) {
+              try {
+                invalidate();
+              } catch (error) {
+                if (!hasFailure) {
+                  failure = error;
+                  hasFailure = true;
+                }
               }
             }
+          } finally {
+            deliveryDepth -= 1;
           }
         }
       }
