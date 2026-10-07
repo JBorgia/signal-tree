@@ -194,7 +194,9 @@ describe('derived cache freshness and publication are separate', () => {
     let notifications = 0;
     const runtime = createLocationRuntime({
       createToken: () => ({
-        observe() {},
+        observe() {
+          // This token probe counts delivery; the kernel tracks dependencies.
+        },
         invalidate() {
           notifications++;
         },
