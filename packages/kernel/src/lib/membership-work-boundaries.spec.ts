@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { restoration, signalTree, undoable } from '../index';
+import { restoration, signalTree, transactions, undoable } from '../index';
 import { applyPlainBranchMemberSnapshot } from './internals/plain-branch-membership';
 import { getOwnedPositionIds } from './internals/owned-metadata';
 
@@ -211,5 +211,34 @@ it('an unrelated observed tree does not enable whole-branch capture', async () =
   } finally {
     plain.destroy();
     observed?.destroy();
+  }
+});
+
+it('membership capture does not evaluate omitted readonly recipes', () => {
+  let computations = 0;
+  const tree = signalTree(
+    { keep: 0, optional: 7 } as { keep: number; optional?: number },
+    {
+      enhancers: [transactions()],
+      derived: ($) => ({
+        cold: () => {
+          computations++;
+          return $.keep() + 1;
+        },
+      }),
+    }
+  );
+  try {
+    const optional = tree.$.optional;
+    const pending = tree.transaction(() => tree.$({ keep: 1 }));
+    expect(computations).toBe(0);
+    expect(tree.$.keep()).toBe(1);
+    expect(optional?.()).toBeUndefined();
+    pending.rollback();
+    expect(tree.$.keep()).toBe(0);
+    expect(optional?.()).toBe(7);
+    expect(computations).toBe(0);
+  } finally {
+    tree.destroy();
   }
 });

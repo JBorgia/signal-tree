@@ -242,3 +242,66 @@ Candidate metadata is 15.4.4. Full gate, mutation, artifact, browser, Linux and
 registry results belong in the external evidence directory keyed by the exact
 candidate SHA. Do not edit this source record merely to append qualification
 results after freezing that candidate.
+
+## First complete candidate and gate repairs
+
+Candidate `851542c56c95fad23e8b26153fad1de904ff493e` completed
+`node tools/verify-gates.mjs --release`: 86/91 gates passed. The full kernel
+suite passed 7,814 tests, with seven expected failures, thirteen skips and one
+todo. Five first failures are preserved in `851542c5-gates-release.log` under
+the takeover evidence directory:
+
+- Vue's existing unrelated-carrier assertion counted 200 rather than 100
+  evaluations. Tracing found membership capture unwrapped readonly recipes that
+  it cannot record or reverse. Capture now uses its existing `isRecordedMember`
+  predicate after the unchanged-presence shortcut. No native adapter contract
+  changed and the existing assertion remains. A cold-recipe regression first
+  failed, then passed with real optional-leaf omission and rollback asserted.
+  Full Vue passed 108 tests; four kernel membership/history suites passed 62.
+- The token-delivery test's intentional empty observe method needed its purpose
+  documented for lint. No warning budget changed.
+- The omitted-branch fixture declared its omitted property required. It now
+  seeds one branch in an accurately typed record and replaces it with `{}`;
+  no casts, new mounting capability or weakened assertion. Three replay tests
+  passed, and spec types did not exceed their unchanged per-file baseline.
+- The direct restoration benchmark called an internal DirectedTurnApplication
+  without its frontier steps. It now derives undo-oriented steps using the
+  same `frontierStepOf` as the runtime. The production workload passes its
+  unchanged identity/value/history assertions (20 turns, three samples, four
+  profiled arms). These results validate the harness, not a speed claim.
+- Fresh package gzip sizes exceeded existing ceilings. Exact fixture attribution
+  measured bare 10,989/13,138 bytes and entities 25,107/28,040 bytes
+  (production/development). No optional enhancer or native-adapter leakage was
+  demonstrated. Additional mandatory membership/current-read repairs account
+  for the cost. A temporary single-use-wrapper simplification saved only 18/25
+  entity bytes; it was not applied as a distracting size-only change.
+
+The owner explicitly approved bare 10.80/12.90 KB and entities 24.60/27.50 KB
+ceilings on October 7, then authorized further measured tolerance if necessary
+to retain the repairs and publish. This supersedes the earlier no-budget-change
+limitation for these release measurements, not correctness checks. Package
+fixtures use bytes/1024; see `bundle-attribution.{mjs,json}` for the generator,
+artifact hashes and exact options.
+
+Linux Validate run 37680581218 (the same candidate SHA) additionally found the
+production demo's initial raw bundle at 595.67 kB, above its 550 kB ceiling.
+Routes, bootstrap, application store and dependency lockfile were unchanged from
+15.4.3; feature routes remain lazy. The 525/550 kB limits dated to September 5.
+Under the owner's tolerance instruction, initial warning/error ceilings are now
+600/625 kB. This demo imports library source through TypeScript paths; its raw
+Angular size is a separate workload from neutral packaged gzip. No exact
+per-module Angular attribution is claimed. Final production build and browser
+verification remain required. Evidence: `linux-first-demo.log`.
+
+Before the revised release freeze, all 20 unpaginated review threads and general
+review comments on TruckTrax v3 drafts 780, 781 and 782 were checked against
+heads bf68c8479e66015c109bff83f27456891bf0ccec,
+dea255b0bbfd9bd88079cc79f9ad4ce7e6ff0cfa and
+97c77df2d4ca9d7282a57d47d6c67a59171d8142. Independent responsibility review
+found no additional SignalTree counterexample. Acquisition/reentry and promise
+policies are v3 helper code; form history fails with an ordinary Angular signal;
+CRUD result-set ownership, ScaleTrax save/recall/PDF/autofill behavior and
+redaction/localization belong to applications. They remain required follow-up
+work on those three drafts after the library release, including the general
+review request to assess unrelated-change separation. This classification does
+not dismiss or resolve the v3 findings.

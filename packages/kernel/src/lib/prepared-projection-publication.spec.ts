@@ -128,17 +128,19 @@ it('a declarative replay tap reads every installed collection target', () => {
 });
 
 it('ordinary subscribers never read retained rows during omission replay', () => {
-  const tree = signalTree(
-    {
-      a: { rows: entityMap<{ id: string; n: number }, string>(), s: 0 },
-      count: 0,
-    },
-    { enhancers: [transactions()] }
-  );
+  const branch = {
+    rows: entityMap<{ id: string; n: number }, string>(),
+    s: 0,
+  };
+  // The root is a branch record. Only its seeded member is used; replacing
+  // the record with {} omits that member without mounting any new topology.
+  const initial: Record<string, typeof branch> = { a: branch };
+  const tree = signalTree(initial, { enhancers: [transactions()] });
   try {
-    const rows = tree.$.a.rows;
+    const rows = tree.$.a?.rows;
+    if (!rows) throw new Error('the seeded collection was not realized');
     rows.setAll([{ id: 'old', n: 9 }]);
-    tree.$({ count: 0 });
+    tree.$({});
     const pending = tree.transaction(() => rows.addOne({ id: 'new', n: 1 }));
     const all = rows.all;
     expect(all()).toEqual([{ id: 'new', n: 1 }]);

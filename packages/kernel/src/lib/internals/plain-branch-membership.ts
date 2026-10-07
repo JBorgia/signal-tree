@@ -100,6 +100,10 @@ export function capturePlainBranchMembership(
       if (!descriptor || !('value' in descriptor)) continue;
       const present = descriptor.enumerable === true;
       if (present === keys.has(key)) continue;
+      // Readonly recipes have no membership record to reverse. Capturing their
+      // value needlessly evaluates unrelated derived state inside the group;
+      // capture only locations the membership authority can actually restore.
+      if (!isRecordedMember(descriptor.value)) continue;
       // Callable implementation properties are not retained state locations.
       if (
         !present &&

@@ -217,8 +217,13 @@ const TARGETS = {
     // cost). Data, not diagnostics: it does not fold. Raised only as far as
     // needed: 10.46 KB = 10,711 B prod, 12.56 KB = 12,861 B dev (the gate
     // compares bytes / 1024).
-    devKB: 12.56,
-    prodKB: 10.46,
+    // 15.4.4 permanent repairs, owner-approved October 7: candidate
+    // 851542c5, fresh verify-gates --release output, measured 10,989 B prod
+    // and 13,138 B dev with this fixture. Current-reader publication and
+    // tree-scoped membership caching add data-path cost, not diagnostics.
+    // Retain bounded headroom approved for the final verified corrections.
+    devKB: 12.9,
+    prodKB: 10.8,
     code: `
       import { signalTree } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, user: { name: 'a' } });
@@ -454,8 +459,13 @@ const TARGETS = {
     // confined to the enhancers (estimated -190 B) was not pursued, by the
     // owner's decision. Raised only as far as needed: 23.86 KB = 24,432 B
     // prod, 26.70 KB = 27,340 B dev (bytes / 1024).
-    devKB: 26.7,
-    prodKB: 23.86,
+    // 15.4.4 permanent repairs, owner-approved October 7: candidate
+    // 851542c5, fresh verify-gates --release output, measured 25,107 B prod
+    // and 28,040 B dev with this fixture. The reviewed membership/current-read
+    // repairs account for growth; attribution found no optional enhancer leak.
+    // Final candidate must be rebuilt and measured against these ceilings.
+    devKB: 27.5,
+    prodKB: 24.6,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });

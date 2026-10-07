@@ -53,11 +53,13 @@ if (PRODUCTION_MODE) {
 const [
   { entityMap, restoration, signalTree, undoable },
   { getTreeRealizationPort },
+  { frontierStepOf },
 ] = await Promise.all([
   import(INDEX),
   import(
     join(DIST, 'lib/internals/causal-runtime/tree-realization-adapter.js')
   ),
+  import(join(DIST, 'lib/internals/causal-runtime/turn-order-record.js')),
 ]);
 
 const now = () => process.hrtime.bigint();
@@ -245,6 +247,11 @@ async function runEffectPipeline({ profile = false } = {}) {
         {
           effects: turn.__effects ?? [],
           orderDeltas: turn.__orderDeltas ?? [],
+          // Match DirectedTurnApplication: retained transitions are oriented
+          // from the applied endpoint back to the turn's prior frontier.
+          frontiers: (turn.__frontiers ?? []).map((transition) =>
+            frontierStepOf(transition, 'undo')
+          ),
           direction: 'undo',
         },
       ]);

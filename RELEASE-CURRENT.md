@@ -17,7 +17,12 @@ is authorized merely to get green. New release evidence belongs under
 
 Candidate preparation, October 7: isolated frozen install, independent source
 review, transform fixtures and focused neutral/native reader probes completed.
-Version metadata is 15.4.4. Full qualification and publication remain pending;
+Version metadata is 15.4.4. The owner subsequently approved bounded size
+ceilings (bare 10.80/12.90 KB, entities 24.60/27.50 KB, production/development)
+and further measured tolerance if needed to retain repairs and publish. The
+demo initial warning/error limits are 600/625 kB after Linux measured 595.67 kB;
+its previously lazy routes remain lazy. All other correctness and validation
+requirements remain. Full qualification and publication remain pending;
 record exact-candidate evidence externally under the takeover directory so the
 qualified source remains unchanged. See the permanent-repairs audit for first
 failures and corrected test premises.
