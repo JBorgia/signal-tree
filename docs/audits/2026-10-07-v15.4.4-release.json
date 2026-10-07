@@ -1,0 +1,111 @@
+{
+  "version": "15.4.4",
+  "sourceSHA": "2bdf2ec54622e41b607242c8345b3389ce4ffb6c",
+  "publishRun": 37683526919,
+  "packages": [
+    {
+      "name": "@signal-tree/kernel",
+      "version": "15.4.4",
+      "integrity": "sha512-IfD1tc3KsbnWTIB6eUGt/KYlTJSRUUtWKqnqrzeaQuMisxJ/D4EXkSUz25Ll8XHdA+5Mp9P2JOWoiOgL9cge3A==",
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@signal-tree%2fkernel@15.4.4",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      }
+    },
+    {
+      "name": "@signal-tree/angular",
+      "version": "15.4.4",
+      "integrity": "sha512-6dDFaNUVE0Pi84VMFzkpljYCCOBn1yawsB8UHQLk2pedzMoyhgk0YKjQCmtJ9ylO9EHzad4YN4rtm3EU4NRcnw==",
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@signal-tree%2fangular@15.4.4",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      }
+    },
+    {
+      "name": "@signal-tree/react",
+      "version": "15.4.4",
+      "integrity": "sha512-wmVeA23h0KJdfBQeEoYAU8WYE8Wl9dwXfIfT9k/1LHm9xnqXEMl/nYT2ND8sN4TxR9/a2U0iNJTqGkUsLnz2Uw==",
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@signal-tree%2freact@15.4.4",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      }
+    },
+    {
+      "name": "@signal-tree/vue",
+      "version": "15.4.4",
+      "integrity": "sha512-CVbkGG9VU/d+ZjMO+sIsCNsfAruV19PaiMWfyAr2a4XiM2XKIZRs7iT36pViyCdAKiyO0/YmbeJmrv7iYxbw9Q==",
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@signal-tree%2fvue@15.4.4",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      }
+    },
+    {
+      "name": "@signal-tree/solid",
+      "version": "15.4.4",
+      "integrity": "sha512-c3S7j467xPMZFzfHarU22Uz4pGIk6iMkCYesCNCWqYPdwq7IL1fXVQXMfSyB47+Sqyl/eRhdSZyXbdomxSJ35g==",
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@signal-tree%2fsolid@15.4.4",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      }
+    }
+  ],
+  "consumerRuntimeAndStrictTypes": "passed",
+  "verifiedAt": "2026-10-07T21:10:13.313Z",
+  "tag": "v15.4.4",
+  "releaseURL": "https://github.com/JBorgia/signal-tree/releases/tag/v15.4.4",
+  "runs": {
+    "publish": 37683526919,
+    "githubRelease": 37683527624,
+    "priorLinuxValidation": 37682056485
+  },
+  "local": {
+    "gates": {
+      "passed": 91,
+      "failed": 0
+    },
+    "mutationProofs": {
+      "proven": 91,
+      "unproven": 0,
+      "vacuous": 0,
+      "blind": 0,
+      "errored": 0
+    },
+    "productionBrowserChecks": 146,
+    "freshTarballConsumers": "passed",
+    "strictConsumerTypes": "passed: bundler and node16",
+    "angularAot": "passed",
+    "cleanWorktree": true,
+    "qualificationContinuity": {
+      "candidate": "2bdf2ec54622e41b607242c8345b3389ce4ffb6c",
+      "runtimeQualificationBase": "381fc060292fa5c19f2c98dbacb66bb4f882575a",
+      "onlyChangedPaths": [
+        "scripts/playwright/demo-production-bundle.spec.ts"
+      ],
+      "reason": "Owner approved size tolerance and requested no redundant unchanged-suite runs. Existing local serial qualification continues; final canonical publication workflow validates tagged SHA before npm publication."
+    }
+  },
+  "demo": {
+    "url": "https://signaltree.io",
+    "main": "https://signaltree.io/main-A5WKSBSB.js",
+    "version": "15.4.4",
+    "deployment": "dpl_3wHTs3B9DDHNAJR6D7PJRZAGnBXt",
+    "preview": "dpl_BEDK69tVk8o7vHsuukgdiAU4tutM",
+    "sourceSHA": "2bdf2ec54622e41b607242c8345b3389ce4ffb6c",
+    "verifiedAt": "2026-10-07T21:09:34.396Z"
+  },
+  "notes": [
+    "The prior Linux Validate run passed its complete gate/proof job; its browser job failed only the obsolete 525000-byte demo assertion. The tagged commit raises that measured demo ceiling to 600000 bytes under owner authority. Local final browser checks passed 146/146.",
+    "The canonical publisher and GitHub release both validated the exact signed tag before publishing.",
+    "Initial registry lookups returned 404 while npm metadata propagated. All five versions, latest tags, archive integrity and equality to fresh qualified local archives were subsequently verified."
+  ]
+}
