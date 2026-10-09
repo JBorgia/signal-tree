@@ -12,6 +12,7 @@ import {
   type LocationRuntime,
 } from './internals/location-runtime';
 import { deepClone } from './internals/utilities/deep-clone';
+import { deepEqual } from './internals/utilities/deep-equal';
 
 import {
   EntityMutationFrame,
@@ -638,6 +639,14 @@ export function createEntitySignal<
               ? createStructuralEffectMeta(structuralEffect)
               : ambientMeta()
           );
+          // Replay taps describe the change actually installed. A rekey has
+          // no lifecycle tap, matching changeId; unchanged rows stay silent.
+          const { beforeValue, afterValue } = publication;
+          const kind = structuralEffect?.kind;
+          if (kind === 'add') emitTap('onAdd', afterValue as E, key);
+          else if (kind === 'remove') emitTap('onRemove', key, beforeValue as E);
+          else if (!kind && !deepEqual(beforeValue, afterValue))
+            emitTap('onUpdate', key, afterValue as E, afterValue as E);
         }
         if (activeIdBefore !== activeIdAfter) {
           replaceLocation(activeIdSignal, activeIdAfter);
@@ -1173,6 +1182,23 @@ export function createEntitySignal<
   const activeIdSignal = locations.createCell<K | undefined>(undefined);
   let cachedActiveEntity: ReadableCell<E | undefined> | undefined;
 
+  function publishOrderChange(
+    beforeSubjects: number[],
+    afterSubjects: number[],
+    beforeFrontier: unknown
+  ): void {
+    if (positionId === undefined) return;
+    mutationCaptureRuntime?.publishCollectionOrder?.({
+      owner: positionId,
+      ownerPath: basePath,
+      beforeSubjects,
+      afterSubjects,
+      beforeFrontier,
+      afterFrontier: structuralStore.activeOrderFrontier(),
+      meta: ambientMeta(),
+    });
+  }
+
   /**
    * Re-orders `storage` so the given ids come first, in the order given.
    *
@@ -1505,6 +1531,7 @@ export function createEntitySignal<
             },
           }
         );
+        emitTap('onAdd', entity, key);
       },
     };
   }
@@ -1551,6 +1578,7 @@ export function createEntitySignal<
           getPositionIdsForNotify(),
           metaOverride
         );
+        emitTap('onAdd', entity, key);
       },
     };
   }
@@ -1733,6 +1761,207 @@ export function createEntitySignal<
     }
 
     return transformedChanges;
+  }
+
+  /** Shared admission/install path; prepend finishes topology before delivery. */
+  function addManyInOrder(
+    entities: E[],
+    opts?: AddManyOptions<E, K>,
+    prepend = false
+  ): K[] {
+    const mode = opts?.mode ?? 'strict';
+    const beforeSubjects =
+      prepend && mutationCaptureRuntime?.publishCollectionOrder
+        ? ([] as number[])
+        : undefined;
+    const beforeFrontier = beforeSubjects
+      ? structuralStore.activeOrderFrontier()
+      : undefined;
+    if (beforeSubjects) structuralStore.snapshotActiveOrder([], beforeSubjects);
+    // addMany appends: an added row's predecessor is the previous added row,
+    // or for the first one the last row before the call. Only that key is
+    // needed, not a copy of every key.
+    const lastPreviousKey = structuralStore.lastActiveKey();
+
+    // First pass: validate/filter based on mode. The rows apply as if one
+    // at a time, so an earlier copy of an id in this call counts as
+    // existing: strict throws (before anything is intercepted or written),
+    // skip keeps the first copy, overwrite keeps the last in the first
+    // copy's place. Two rows under one key was the result in every mode
+    // before (v15 778f86ef and e02238f4, carried in v16 8f): prependMany
+    // then linked the row to itself and the next read never ended.
+    const toProcess: Array<{
+      entity: E;
+      id: K;
+      existingSubjectId?: number;
+    }> = [];
+    // Every copy that applies, in input order.
+    const copies: Array<[(typeof toProcess)[number], E]> = [];
+    const earlier = new Map<K, (typeof toProcess)[number]>();
+    for (const entity of entities) {
+      const id = deriveId(entity, opts);
+      const existingSubjectId = structuralStore.subjectIdForKey(id);
+      let processed = earlier.get(id);
+      if (existingSubjectId !== undefined || processed) {
+        if (mode === 'strict') {
+          throw new Error(`Entity with id ${String(id)} already exists`);
+        } else if (mode === 'skip') {
+          continue;
+        }
+        // 'overwrite': fall through — the projection helper below replaces the existing entry
+      }
+      if (!processed) {
+        processed = { entity, id, existingSubjectId };
+        earlier.set(id, processed);
+        toProcess.push(processed);
+      }
+      copies.push([processed, entity]);
+    }
+
+    if (toProcess.length === 0) return [];
+
+    // Interceptors run once per applied copy, in input order, as successive
+    // single calls would; the last intercepted value wins. Staged before
+    // mutating runtime state so a block cannot partially allocate fresh
+    // subject lifetimes.
+    for (const [processed, entity] of copies) {
+      processed.entity = interceptAddedEntity(entity);
+    }
+    const stagedAdds = toProcess;
+    const plannedFreshSubjectIds = structuralStore.planFreshSubjectIds(
+      stagedAdds.filter(
+        ({ existingSubjectId }) => existingSubjectId === undefined
+      ).length
+    );
+    let plannedFreshIndex = 0;
+    const preparedAdds = stagedAdds.map(
+      ({ id, entity, existingSubjectId }) => ({
+        id,
+        entity,
+        existingSubjectId,
+        // A replacement retains its lifetime; capture what it replaces
+        // before the physical frame installs the new value.
+        prev:
+          existingSubjectId === undefined
+            ? undefined
+            : valueStore.backingForSubject(existingSubjectId),
+        subjectId:
+          existingSubjectId ?? plannedFreshSubjectIds[plannedFreshIndex++],
+      })
+    );
+
+    const frame = createEntityMutationFrame();
+    for (const {
+      id,
+      entity: transformedEntity,
+      existingSubjectId,
+      subjectId,
+    } of preparedAdds) {
+      if (existingSubjectId === undefined) {
+        frame.stageFreshSubject({
+          kind: 'create-fresh-subject',
+          key: id,
+          subjectId,
+          nextValue: transformedEntity,
+        });
+        continue;
+      }
+
+      frame.stageValueReplacement({
+        kind: 'replace-value',
+        key: id,
+        subjectId: existingSubjectId,
+        nextValue: transformedEntity,
+      });
+    }
+
+    commitAndProjectEntityMutationFrame(frame);
+    const subjectIdsByKey = new Map<K, number>();
+    for (const { id, subjectId } of preparedAdds) {
+      subjectIdsByKey.set(id, subjectId);
+    }
+
+    // Process all entities without triggering per-entity signal updates
+    const processedIds: K[] = [];
+    const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
+
+    for (const { entity: transformedEntity, id } of preparedAdds) {
+      const subjectId = subjectIdsByKey.get(id);
+      if (subjectId === undefined) {
+        throw new Error(`Entity with id ${String(id)} has no subject id`);
+      }
+      invalidateNodeCache(id);
+      syncEntitySignal(id);
+      processedIds.push(id);
+      addedEntities.push({ id, entity: transformedEntity, subjectId });
+    }
+
+    // Finish the compound topology before path observers or taps can copy
+    // metadata or flush history. No shared collector or later backpatching.
+    if (prepend) moveToFront(processedIds);
+    else updateSignals();
+    if (beforeSubjects) {
+      if (mutationCaptureRuntime?.isCaptureActive()) getPositionIds();
+      const afterSubjects: number[] = [];
+      structuralStore.snapshotActiveOrder([], afterSubjects);
+      if (survivingOrderChanged(beforeSubjects, afterSubjects)) {
+        publishOrderChange(beforeSubjects, afterSubjects, beforeFrontier);
+      }
+    }
+
+    const subjectIdsForWrite = processedIds.map((id) => {
+      const subjectId = subjectIdsByKey.get(id);
+      if (subjectId === undefined) {
+        throw new Error(`Entity with id ${String(id)} has no subject id`);
+      }
+      return subjectId;
+    });
+    lastSubjectIds = subjectIdsForWrite;
+
+    // Notify PathNotifier for each processed entity.
+    //
+    // Reproduced on 15.3.1: indexing the pre-add key list at
+    // `i + previous - added` anchored [x, y] after k4 and k5 instead of after
+    // k5 and x, so redo reinserted them out of order. A fresh row's
+    // predecessor is the previous FRESH row of this call, else the last row
+    // before it: an 'overwrite' replacement stays where it was, so it is not
+    // an anchor for the rows appended after it (v16 refinement of 7463f4eb,
+    // which anchored to the previous processed row).
+    let previousAppendedSubject =
+      lastPreviousKey === undefined
+        ? undefined
+        : allocateSubjectId(lastPreviousKey);
+    for (let i = 0; i < addedEntities.length; i++) {
+      const { id, entity } = addedEntities[i];
+      const beforeSubject = previousAppendedSubject;
+      if (preparedAdds[i].existingSubjectId === undefined) {
+        previousAppendedSubject = subjectIdsForWrite[i];
+      }
+      pathNotifier.notify(
+        `${basePath}.${String(id)}`,
+        entity,
+        preparedAdds[i].prev,
+        basePath,
+        [subjectIdsForWrite[i]],
+        getPositionIdsForNotify(),
+        preparedAdds[i].existingSubjectId === undefined
+          ? createStructuralEffectMeta({
+              kind: 'add',
+              subject: subjectIdsForWrite[i],
+              key: id,
+              value: deepClone(entity),
+              ...(prepend ? getNeighborSubjects(id) : { beforeSubject }),
+            })
+          : ambientMeta()
+      );
+    }
+
+    // Run tap handlers for each processed entity
+    for (const { id, entity } of addedEntities) {
+      emitTap('onAdd', entity, id);
+    }
+
+    return processedIds;
   }
 
   function addOneWithStructuralEffect(
@@ -2680,13 +2909,7 @@ export function createEntitySignal<
     },
 
     prependMany(entities: E[], opts?: AddManyOptions<E, K>): K[] {
-      return withMembershipGroup(() => {
-        const ids = api.addMany(entities, opts);
-        // Front, in the order given — so `prependMany([a, b])` reads back as
-        // [a, b, ...existing], which is what the call site looks like.
-        moveToFront(ids);
-        return ids;
-      });
+      return withMembershipGroup(() => addManyInOrder(entities, opts, true));
     },
 
     /**
@@ -2712,173 +2935,7 @@ export function createEntitySignal<
     },
 
     addMany(entities: E[], opts?: AddManyOptions<E, K>): K[] {
-      const mode = opts?.mode ?? 'strict';
-      // addMany appends: an added row's predecessor is the previous added row,
-      // or for the first one the last row before the call. Only that key is
-      // needed, not a copy of every key.
-      const lastPreviousKey = structuralStore.lastActiveKey();
-
-      // First pass: validate/filter based on mode. The rows apply as if one
-      // at a time, so an earlier copy of an id in this call counts as
-      // existing: strict throws (before anything is intercepted or written),
-      // skip keeps the first copy, overwrite keeps the last in the first
-      // copy's place. Two rows under one key was the result in every mode
-      // before (v15 778f86ef and e02238f4, carried in v16 8f): prependMany
-      // then linked the row to itself and the next read never ended.
-      const toProcess: Array<{
-        entity: E;
-        id: K;
-        existingSubjectId?: number;
-      }> = [];
-      // Every copy that applies, in input order.
-      const copies: Array<[(typeof toProcess)[number], E]> = [];
-      const earlier = new Map<K, (typeof toProcess)[number]>();
-      for (const entity of entities) {
-        const id = deriveId(entity, opts);
-        const existingSubjectId = structuralStore.subjectIdForKey(id);
-        let processed = earlier.get(id);
-        if (existingSubjectId !== undefined || processed) {
-          if (mode === 'strict') {
-            throw new Error(`Entity with id ${String(id)} already exists`);
-          } else if (mode === 'skip') {
-            continue;
-          }
-          // 'overwrite': fall through — the projection helper below replaces the existing entry
-        }
-        if (!processed) {
-          processed = { entity, id, existingSubjectId };
-          earlier.set(id, processed);
-          toProcess.push(processed);
-        }
-        copies.push([processed, entity]);
-      }
-
-      if (toProcess.length === 0) return [];
-
-      // Interceptors run once per applied copy, in input order, as successive
-      // single calls would; the last intercepted value wins. Staged before
-      // mutating runtime state so a block cannot partially allocate fresh
-      // subject lifetimes.
-      for (const [processed, entity] of copies) {
-        processed.entity = interceptAddedEntity(entity);
-      }
-      const stagedAdds = toProcess;
-      const plannedFreshSubjectIds = structuralStore.planFreshSubjectIds(
-        stagedAdds.filter(
-          ({ existingSubjectId }) => existingSubjectId === undefined
-        ).length
-      );
-      let plannedFreshIndex = 0;
-      const preparedAdds = stagedAdds.map(
-        ({ id, entity, existingSubjectId }) => ({
-          id,
-          entity,
-          existingSubjectId,
-          subjectId:
-            existingSubjectId ?? plannedFreshSubjectIds[plannedFreshIndex++],
-        })
-      );
-
-      const frame = createEntityMutationFrame();
-      for (const {
-        id,
-        entity: transformedEntity,
-        existingSubjectId,
-        subjectId,
-      } of preparedAdds) {
-        if (existingSubjectId === undefined) {
-          frame.stageFreshSubject({
-            kind: 'create-fresh-subject',
-            key: id,
-            subjectId,
-            nextValue: transformedEntity,
-          });
-          continue;
-        }
-
-        frame.stageValueReplacement({
-          kind: 'replace-value',
-          key: id,
-          subjectId: existingSubjectId,
-          nextValue: transformedEntity,
-        });
-      }
-
-      commitAndProjectEntityMutationFrame(frame);
-      const subjectIdsByKey = new Map<K, number>();
-      for (const { id, subjectId } of preparedAdds) {
-        subjectIdsByKey.set(id, subjectId);
-      }
-
-      // Process all entities without triggering per-entity signal updates
-      const processedIds: K[] = [];
-      const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
-
-      for (const { entity: transformedEntity, id } of preparedAdds) {
-        const subjectId = subjectIdsByKey.get(id);
-        if (subjectId === undefined) {
-          throw new Error(`Entity with id ${String(id)} has no subject id`);
-        }
-        invalidateNodeCache(id);
-        syncEntitySignal(id);
-        processedIds.push(id);
-        addedEntities.push({ id, entity: transformedEntity, subjectId });
-      }
-
-      // Single signal update after all entities are processed
-      updateSignals();
-
-      const subjectIdsForWrite = processedIds.map((id) => {
-        const subjectId = subjectIdsByKey.get(id);
-        if (subjectId === undefined) {
-          throw new Error(`Entity with id ${String(id)} has no subject id`);
-        }
-        return subjectId;
-      });
-      lastSubjectIds = subjectIdsForWrite;
-
-      // Notify PathNotifier for each processed entity.
-      //
-      // Reproduced on 15.3.1: indexing the pre-add key list at
-      // `i + previous - added` anchored [x, y] after k4 and k5 instead of after
-      // k5 and x, so redo reinserted them out of order. A fresh row's
-      // predecessor is the previous FRESH row of this call, else the last row
-      // before it: an 'overwrite' replacement stays where it was, so it is not
-      // an anchor for the rows appended after it (v16 refinement of 7463f4eb,
-      // which anchored to the previous processed row).
-      let previousAppendedSubject =
-        lastPreviousKey === undefined
-          ? undefined
-          : allocateSubjectId(lastPreviousKey);
-      for (let i = 0; i < addedEntities.length; i++) {
-        const { id, entity } = addedEntities[i];
-        const beforeSubject = previousAppendedSubject;
-        if (preparedAdds[i].existingSubjectId === undefined) {
-          previousAppendedSubject = subjectIdsForWrite[i];
-        }
-        pathNotifier.notify(
-          `${basePath}.${String(id)}`,
-          entity,
-          undefined,
-          basePath,
-          [subjectIdsForWrite[i]],
-          getPositionIdsForNotify(),
-          createStructuralEffectMeta({
-            kind: 'add',
-            subject: subjectIdsForWrite[i],
-            key: id,
-            value: deepClone(entity),
-            beforeSubject,
-          })
-        );
-      }
-
-      // Run tap handlers for each processed entity
-      for (const { id, entity } of addedEntities) {
-        emitTap('onAdd', entity, id);
-      }
-
-      return processedIds;
+      return addManyInOrder(entities, opts);
     },
 
     // ==================
@@ -3353,6 +3410,7 @@ export function createEntitySignal<
 
     upsertMany(entities: E[], opts?: AddOptions<E, K>): K[] {
       if (entities.length === 0) return [];
+      const lastPreviousKey = structuralStore.lastActiveKey();
 
       // Upserted one at a time, as successive upsertOne calls would be: every
       // id is resolved first (nothing intercepted or written yet), then the
@@ -3480,17 +3538,31 @@ export function createEntitySignal<
         ...updatedSubjectIdsForWrite,
       ];
 
-      // Notify PathNotifier for added entities
+      // Fresh lifetimes require an add effect, not a whole-row value write.
+      // Each appended row follows the previous fresh row of this call.
+      let beforeSubject =
+        lastPreviousKey === undefined
+          ? undefined
+          : allocateSubjectId(lastPreviousKey);
       for (let i = 0; i < addedEntities.length; i++) {
         const { id, entity } = addedEntities[i];
+        const subject = addedSubjectIdsForWrite[i];
         pathNotifier.notify(
           `${basePath}.${String(id)}`,
           entity,
           undefined,
           basePath,
-          [addedSubjectIdsForWrite[i]],
-          getPositionIdsForNotify()
+          [subject],
+          getPositionIdsForNotify(),
+          createStructuralEffectMeta({
+            kind: 'add',
+            subject,
+            key: id,
+            value: deepClone(entity),
+            beforeSubject,
+          })
         );
+        beforeSubject = subject;
       }
 
       // Notify PathNotifier for updated entities
@@ -3807,15 +3879,7 @@ export function createEntitySignal<
           mutationCaptureRuntime?.publishCollectionOrder &&
           survivingOrderChanged(currentSubjects, afterSubjects)
         ) {
-          mutationCaptureRuntime.publishCollectionOrder({
-            owner: positionId,
-            ownerPath: basePath,
-            beforeSubjects: currentSubjects,
-            afterSubjects,
-            beforeFrontier: beforeOrderFrontier,
-            afterFrontier: structuralStore.activeOrderFrontier(),
-            meta: ambientMeta(),
-          });
+          publishOrderChange(currentSubjects, afterSubjects, beforeOrderFrontier);
         }
       } finally {
         // The whole replacement has installed (or stopped): the observed

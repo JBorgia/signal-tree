@@ -141,12 +141,8 @@ describe('a tap reads a present collection as it is (v16 8f)', () => {
       pending.rollback();
     },
   };
-  // A replay that restores a row fires no tap yet: v15 66144140 ("taps fire
-  // symmetrically for the changes a replay applies") is in the 15.4.x carry
-  // (`.claude/evidence/v16/carry-15.4.x/DEFECTS.md`, row 6), which flips these.
-  const noTapYet = new Set(['undo of a removal', 'jumpTo before a removal']);
   for (const [name, run] of Object.entries(cases))
-    (noTapYet.has(name) ? it.fails : it)(name, async () => {
+    it(name, async () => {
       const tree = build();
       const rows = tree.$.a.rows;
       await flush();
