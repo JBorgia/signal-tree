@@ -48,32 +48,42 @@ export function createNativeLocationRuntime(
   };
 
   const runInvalidationGroup = (run: () => void): void => {
-    observation.runInvalidationGroup(() => {
-      let failure: unknown;
-      let hasFailure = false;
-      invalidationGroupDepth += 1;
-      try {
-        run();
-      } catch (error) {
-        failure = error;
-        hasFailure = true;
-      } finally {
-        invalidationGroupDepth -= 1;
-        if (invalidationGroupDepth === 0 && groupedPublishers.size > 0) {
-          const publishers = [...groupedPublishers];
-          groupedPublishers.clear();
-          try {
-            deliver(publishers);
-          } catch (error) {
-            if (!hasFailure) {
-              failure = error;
-              hasFailure = true;
+    let failure: unknown;
+    let hasFailure = false;
+    try {
+      observation.runInvalidationGroup(() => {
+        invalidationGroupDepth += 1;
+        try {
+          run();
+        } catch (error) {
+          failure = error;
+          hasFailure = true;
+        } finally {
+          invalidationGroupDepth -= 1;
+          if (invalidationGroupDepth === 0 && groupedPublishers.size > 0) {
+            const publishers = [...groupedPublishers];
+            groupedPublishers.clear();
+            try {
+              deliver(publishers);
+            } catch (error) {
+              if (!hasFailure) {
+                failure = error;
+                hasFailure = true;
+              }
             }
           }
         }
+      });
+    } catch (error) {
+      // A computation/flush error remains a failure; never report success.
+      // Preserve an already saved body/delivery error as the primary value.
+      if (!hasFailure) {
+        failure = error;
+        hasFailure = true;
       }
-      if (hasFailure) throw failure;
-    });
+    }
+    // The adapter's observation wrapper remains; report only after it exits.
+    if (hasFailure) throw failure;
   };
 
   const createWritable = <T>(
@@ -266,7 +276,21 @@ export function createNativeLocationRuntime(
       if (pendingEpochs.size === 0) return;
       const draining = [...pendingEpochs];
       pendingEpochs.clear();
-      for (const handle of draining) advanceHandle(handle);
+      let failure: unknown;
+      let hasFailure = false;
+      // Handles share one publisher, but one failed advance must not discard
+      // its already-staged siblings. Attempt each once; do not replay failures.
+      for (const handle of draining) {
+        try {
+          advanceHandle(handle);
+        } catch (error) {
+          if (!hasFailure) {
+            failure = error;
+            hasFailure = true;
+          }
+        }
+      }
+      if (hasFailure) throw failure;
     },
   };
 

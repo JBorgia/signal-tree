@@ -9,6 +9,18 @@ are tracked in [the remediation ledger](docs/audits/2026-09-23-remediation.md).
 Research prototypes are frozen; public release and disclosure remain on hold.
 
 
+## V16 native publication verification — ACTIVE
+
+The isolated [native error recovery repair](docs/research/native-publication-error-recovery-0.md)
+now preserves adapter bookkeeping and attempts queued sibling epochs after a
+failure. Its package tests pass; this is not systemic or release completion.
+
+- Keep unowned native-graph recovery and publication-certificate meaning under
+  investigation; remote application is not proof of local UI recovery.
+- Resolve the recorded package/demo size failures before release. They also
+  reproduce on the unchanged base; no ceiling is waived or raised here.
+- Reconcile this repair with the ownership candidate together with its tests.
+
 ## Studio commercial separation
 
 Studio development and its complete implementation/evaluation ledger now live
