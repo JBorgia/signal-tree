@@ -895,6 +895,45 @@ describe('derived() marker pattern', () => {
     warnSpy.mockRestore();
   });
 
+  // Evaluation counts are deterministic correctness, not opt-in timing.
+  it('should not recalculate derived values on unrelated state changes', () => {
+    let derivedCallCount = 0;
+
+    const tree = signalTree(
+      {
+        relatedValue: 1,
+        unrelatedValue: 'hello',
+      },
+      {
+        derived: ($) => ({
+          doubledRelated: () => {
+            derivedCallCount++;
+            return $.relatedValue() * 2;
+          },
+        }),
+      }
+    );
+
+    try {
+      // Initial access
+      expect(tree.$.doubledRelated()).toBe(2);
+      const initialCallCount = derivedCallCount;
+
+      // Change unrelated value - should NOT trigger recalculation
+      tree.$.unrelatedValue('world');
+      // Access derived again - should use cached value
+      expect(tree.$.doubledRelated()).toBe(2);
+      expect(derivedCallCount).toBe(initialCallCount); // No new call
+
+      // Change related value - SHOULD trigger recalculation
+      tree.$.relatedValue(5);
+      expect(tree.$.doubledRelated()).toBe(10);
+      expect(derivedCallCount).toBe(initialCallCount + 1); // One new call
+    } finally {
+      tree.destroy();
+    }
+  });
+
   // Timing-ratio microbenchmarks — flaky on loaded machines; run on demand via
   // ST_PERF=1 (matches the convention in benchmarks.spec.ts / stored.spec.ts).
   describe.runIf(process.env['ST_PERF'] === '1')(
@@ -943,41 +982,7 @@ describe('derived() marker pattern', () => {
         expect(ratio).toBeLessThan(5);
       });
 
-      it('should not recalculate derived values on unrelated state changes', () => {
-        let derivedCallCount = 0;
-
-        const tree = signalTree(
-          {
-            relatedValue: 1,
-            unrelatedValue: 'hello',
-          },
-          {
-            derived: ($) => ({
-              doubledRelated: () => {
-                derivedCallCount++;
-                return $.relatedValue() * 2;
-              },
-            }),
-          }
-        );
-
-        // Initial access
-        expect(tree.$.doubledRelated()).toBe(2);
-        const initialCallCount = derivedCallCount;
-
-        // Change unrelated value - should NOT trigger recalculation
-        tree.$.unrelatedValue('world');
-        // Access derived again - should use cached value
-        expect(tree.$.doubledRelated()).toBe(2);
-        expect(derivedCallCount).toBe(initialCallCount); // No new call
-
-        // Change related value - SHOULD trigger recalculation
-        tree.$.relatedValue(5);
-        expect(tree.$.doubledRelated()).toBe(10);
-        expect(derivedCallCount).toBe(initialCallCount + 1); // One new call
-      });
-
-      it('should handle deep chaining without exponential overhead', () => {
+      it('should construct independent derived layers within the timing budget', () => {
         const chainDepth = 3;
         const iterations = 100;
 
@@ -1006,7 +1011,8 @@ describe('derived() marker pattern', () => {
           )}ms`
         );
 
-        // Should complete reasonably fast (less than 500ms for 100 iterations with 10 layers)
+        // Measures 100 trees with three independent layers reading the base;
+        // this is not a dependent-chain complexity test.
         expect(totalTime).toBeLessThan(500);
       });
     }
