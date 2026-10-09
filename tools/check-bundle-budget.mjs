@@ -436,14 +436,15 @@ for (const [id, { code, devKB, prodKB }] of Object.entries(TARGETS)) {
 if (failed) {
   console.error(
     '\n❌ Bundle budget exceeded.\n\n' +
-      '  PROD over  — this is what users ship, so treat it as a real regression.\n' +
-      '               Find the statically-reachable optional module and make it\n' +
-      '               tree-shakeable (subpath or injected feature).\n\n' +
-      '  DEV over   — usually a new diagnostic string. Check it FOLDS first\n' +
-      '               (`node tools/check-devmode-foldable.mjs`): the ngDevMode\n' +
-      '               guard must be inline at the call site, not inside the\n' +
-      '               callee, or the message ships to production. If prod is\n' +
-      '               flat, raising the dev budget is the right call.\n'
+      '  PROD over  — the shipped artifact exceeds its current limit. Compare a\n' +
+      '               fresh baseline with the same toolchain, then inspect the\n' +
+      '               emitted graph. Distinguish optional reachability from\n' +
+      '               required behavior; do not assume an optional-module leak.\n\n' +
+      '  DEV over   — measure the production/development difference and check\n' +
+      '               diagnostic folding (`node tools/check-devmode-foldable.mjs`).\n' +
+      '               A flat production result alone does not justify a higher\n' +
+      '               development limit. Budget changes need measured rationale\n' +
+      '               and owner approval; this result remains failed.\n'
   );
   process.exit(1);
 }
