@@ -319,6 +319,7 @@ export function interceptLeafSignals(
             'setAll',
             'addOne',
             'addMany',
+            'prependMany',
             'updateOne',
             'updateMany',
             'upsertOne',

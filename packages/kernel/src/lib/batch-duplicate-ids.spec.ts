@@ -197,62 +197,36 @@ describe.each([
 });
 
 /**
- * v16 slice 8f: carried from v15 778f86ef and e02238f4 (the sequential
- * duplicate-id rule). Reversing some of these shapes depends on v15's 15.4.x
- * entity line, which v16 has not carried yet. They are expected failures
- * here, each naming the v15 commit that fixes it; the carry slice flips them
- * (`.claude/evidence/v16/carry-15.4.x/DEFECTS.md`):
- * - an overwrite of an existing row: undo removes the row and redo throws an
- *   anchor cycle (c775278e);
- * - prependMany's move to the front is not recorded, so redo appends
- *   (005399a7);
- * - upsertMany's added row is announced as a bare value, so undo throws and
- *   rollback leaves it (dbb8449b).
+ * Duplicate input semantics also hold through complete reversal. These cases
+ * formerly exposed missing overwrite, prepend-order and fresh-upsert facts;
+ * the carry now runs every unchanged assertion as ordinary conformance.
  */
-const UNDO_BLOCKED: Record<string, string> = {
-  'addMany overwrite, an existing id twice': 'c775278e',
-  'prependMany skip, a new id twice': '005399a7',
-  'prependMany overwrite, a new id twice around another': '005399a7',
-  'upsertMany, a new id twice: the second upserts over the first': 'dbb8449b',
-  'upsertMany, a new id twice around an existing id': 'dbb8449b',
-};
-const ROLLBACK_BLOCKED: Record<string, string> = {
-  'addMany overwrite, an existing id twice': 'c775278e',
-  'upsertMany, a new id twice: the second upserts over the first': 'dbb8449b',
-  'upsertMany, a new id twice around an existing id': 'dbb8449b',
-};
 
 describe.each([
   ['restoration()', () => [restoration()]],
   ['transactions(), restoration()', () => [transactions(), restoration()]],
   ['restoration(), transactions()', () => [restoration(), transactions()]],
 ] as const)('duplicate ids in one call: undo/redo (%s)', (_name, enhancers) => {
-  // prependMany's undo/redo ORDER needs its move to the front recorded
-  // (v15 005399a7, in the 15.4.x carry): its rows are expected failures here.
-  const undoNames = Object.keys(cases);
-  for (const blocked of [false, true])
-    (blocked ? it.fails : it).each(
-      undoNames.filter((name) => name in UNDO_BLOCKED === blocked)
-    )('%s — undo, redo, undo exact', async (name) => {
-      const tree = make(enhancers());
-      try {
-        await seed(tree);
-        undoable(() => cases[name].act(tree));
-        await flush();
-        tree.undo();
-        await flush();
-        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
-        tree.redo();
-        await flush();
-        expect(tree.$.rows.all()).toStrictEqual(cases[name].after);
-        tree.undo();
-        await flush();
-        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
-        expect(tree.$.rows.ids()).toStrictEqual(['z', 'a']);
-      } finally {
-        tree.destroy();
-      }
-    });
+  it.each(Object.keys(cases))('%s — undo, redo, undo exact', async (name) => {
+    const tree = make(enhancers());
+    try {
+      await seed(tree);
+      undoable(() => cases[name].act(tree));
+      await flush();
+      tree.undo();
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+      tree.redo();
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(cases[name].after);
+      tree.undo();
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+      expect(tree.$.rows.ids()).toStrictEqual(['z', 'a']);
+    } finally {
+      tree.destroy();
+    }
+  });
 
   it('strict throw records no history', async () => {
     const tree = make(enhancers());
@@ -277,23 +251,20 @@ describe.each([
   ['transactions(), restoration()', () => [transactions(), restoration()]],
   ['restoration(), transactions()', () => [restoration(), transactions()]],
 ] as const)('duplicate ids in one call: rollback (%s)', (_name, enhancers) => {
-  for (const blocked of [false, true])
-    (blocked ? it.fails : it).each(
-      Object.keys(cases).filter((name) => name in ROLLBACK_BLOCKED === blocked)
-    )('%s — rollback exact', async (name) => {
-      const tree = make(enhancers());
-      try {
-        await seed(tree);
-        const pending = tree.transact(() => cases[name].act(tree));
-        await flush();
-        pending.rollback();
-        await flush();
-        expect(tree.$.rows.all()).toStrictEqual(SEEDED);
-        expect(tree.$.rows.ids()).toStrictEqual(['z', 'a']);
-      } finally {
-        tree.destroy();
-      }
-    });
+  it.each(Object.keys(cases))('%s — rollback exact', async (name) => {
+    const tree = make(enhancers());
+    try {
+      await seed(tree);
+      const pending = tree.transact(() => cases[name].act(tree));
+      await flush();
+      pending.rollback();
+      await flush();
+      expect(tree.$.rows.all()).toStrictEqual(SEEDED);
+      expect(tree.$.rows.ids()).toStrictEqual(['z', 'a']);
+    } finally {
+      tree.destroy();
+    }
+  });
 });
 
 describe('duplicate ids in one call: path notifications', () => {

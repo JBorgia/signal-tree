@@ -736,7 +736,11 @@ export interface AddManyOptions<E, K> extends AddOptions<E, K> {
 }
 
 /**
- * Tap handlers - observe entity lifecycle events
+ * Observe applied entity lifecycle changes, including restoration and rollback.
+ * Replays emit onAdd for restored rows, onRemove for removed rows, and onUpdate
+ * for changed row values. Replayed update changes may be partial or a full row;
+ * the final onUpdate argument is the resulting row.
+ * Unchanged rows and key-only changes do not emit these lifecycle taps.
  */
 export interface TapHandlers<E, K extends string | number> {
   onAdd?: (entity: E, id: K) => void;
