@@ -6,7 +6,10 @@ Work that is decided and not yet done. **This is not an RFC list.**
 
 All reproduced security, correctness, composition, lifecycle and tooling findings
 are tracked in [the remediation ledger](docs/audits/2026-09-23-remediation.md).
-Research prototypes are frozen; public release and disclosure remain on hold.
+The September 23 prototype freeze is historical: subsequent owner-authorized
+v16 experiments continue in the isolated integration worktree. Their execution
+does not grant publication or disclosure authority. Use the current controller
+and exact release-line evidence rather than this dated status for release decisions.
 
 
 ## V16 native publication verification — ACTIVE
@@ -20,6 +23,12 @@ failure. Its package tests pass; this is not systemic or release completion.
 - Resolve the recorded package/demo size failures before release. They also
   reproduce on the unchanged base; no ceiling is waived or raised here.
 - Reconcile this repair with the ownership candidate together with its tests.
+- Resolve the independently reproduced inline scalar-publication failure:
+  partial compensation must not retire authority on a revision change alone.
+- Finish the [entity carry](docs/research/v16-entity-carry-validation-0.md): the
+  original 47 expected failures now pass. The expanded planner carry is under
+  full verification; preserve the first 25 integration regressions and their
+  distinct semantic/counting diagnoses. Complete the order/frontier carry next.
 
 ## Studio commercial separation
 

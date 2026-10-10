@@ -114,3 +114,61 @@ Independent source/callback controls are in `/private/tmp/st-v16-*-independent/`
 The parent ignored evidence index lives under
 `artifacts/v16-research-2026-10-09/` in the main checkout. Those files are evidence
 for these runs, not automatically current release claims.
+
+## Planner integration: first full result and requirement revalidation
+
+The five-file E candidate was integrated only after matching its base/candidate
+hashes and independent turn/application boundary review. That review established
+its bounded controls, not whole-system correctness. The first actual full Nx run
+(`/private/tmp/st-v16-E-full-kernel-first.{log,json}`) exited 1: 5,715 total,
+5,678 passed registrations, 25 failed, 12 skipped. Inputs are pinned in
+`/private/tmp/st-v16-E-integrated-inputs.json`. All original expanded-carrier
+failures were resolved, but 25 existing checks exposed two different problems:
+
+- Nineteen existing coalesced/two-setAll tests reject the candidate's blanket
+  mixed-add/remove refusal. Valid transient lifetimes are used as placement
+  anchors even though they are absent at both endpoints. Their original order
+  must reach the complete target validator; the helper cannot impose a new
+  admission policy. The earlier internal-only limitation now has public
+  counterexamples. Keep these unchanged tests as requirements.
+- Six deterministic search-count checks measured 513 instead of 512, or 2,049
+  instead of 2,048. Phase-attributed copied controls at 64/256/1,024/4,096 rows
+  show exactly 2n dominant-lookup visits plus one initial placement-head visit
+  in all three enhancer orders. The old global counter assumed no other search
+  phase. A proposed workload-specific 2n+1 bound passes; restoring the old
+  quadratic dominant scan still fails all twelve mutation controls (e.g.
+  131,329 visits at n=256). This evidence justifies the constant term for this
+  fixture, not a claim that every planner workload is linear or a release
+  timing/bundle budget increase.
+
+Six imported limitation assertions initially expected a raw v15 error string.
+They now require v16's existing branded refusal, the specific embedded reason,
+unchanged rows and unchanged history position. Their desired-success partners
+remain distinct expected failures pending the separate order/frontier carry.
+Original fixtures and first errors are retained; refusal is not counted as
+successful restoration.
+
+The independent nine helper and eighteen public-history controls were also
+ported as normal package specs, without private production exports or source
+transforms. Copied prototypes and independent review do not replace their Nx
+execution. Further full verification is required after correcting the new
+regressions. No release qualification follows from this section.
+
+
+After preserving mixed scopes for complete target preflight, removing the
+unnecessary catch-all refusal wrapper, and adopting the independently attributed
+workload count, full Nx verification exits 0: **5,718 ordinary passes, 12 expected
+failures, 12 skipped (5,742 total)**. The 27 portable/public-history controls run
+as normal package specs. Final source typecheck, spec-types and kernel lint all
+exit 0. Exact corrected source/test hashes and totals are recorded in
+`/private/tmp/st-v16-E-corrected-inputs-and-results.json`; full raw output is
+`/private/tmp/st-v16-E-full-kernel-corrected.{log,json}`. These results do not
+resolve the twelve expected failures or the separate capture/order research.
+
+Two parent command errors are retained separately: a spaced `--only spec-types`
+argument was not recognized and started a broad gate run, stopped during its
+first typecheck (no qualification); and an incompatible Prettier namespace
+import prevented the first source correction from applying. That latter shell
+then tested the unchanged faulty source. Its red is preserved with a setup
+manifest, not presented as a corrected-source verdict. The correctly scoped
+spec gate and fail-fast corrected integration both completed successfully.

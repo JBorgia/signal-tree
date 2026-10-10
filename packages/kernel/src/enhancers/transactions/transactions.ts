@@ -73,7 +73,10 @@ import {
   type CollectionTransitionTargetBinding,
   type ScalarTransitionTargetBinding,
 } from '../../lib/internals/causal-runtime/target-transition';
-import { rollbackPendingTurnAt } from '../../lib/internals/causal-runtime/pending-rollback';
+import {
+  placeFieldReversalsWhileRowsExist,
+  rollbackPendingTurnAt,
+} from '../../lib/internals/causal-runtime/pending-rollback';
 import {
   getTransactionLifecycleChannel,
   installTransactionLifecycleChannel,
@@ -2301,7 +2304,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
     effects: TurnEffect[],
     orderDeltas: CollectionOrderDelta[]
   ): void => {
-    const reversalEffects = effects.map(toRollbackEffect);
+    const reversalEffects = placeFieldReversalsWhileRowsExist(
+      effects.map(toRollbackEffect)
+    );
     const bindings = new Map<number, CollectionTransitionTargetBinding>();
     visitTree(tree.$, (node) => {
       const binding = (

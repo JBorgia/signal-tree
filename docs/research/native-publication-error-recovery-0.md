@@ -114,3 +114,66 @@ still owe their promised ordering. No L1–L18 law is weakened by this repair.
 
 No new public export, error aggregation API, framework timing policy,
 publication authorization or v15 compatibility change is introduced.
+
+
+## Follow-up: inline publication is a separate open boundary
+
+The queued-publication repair above does not close all compensation failures.
+A controlled SDK adapter that delegates real scalar-token invalidation and then
+throws interrupts mixed scalar/entity compensation after the scalar is installed.
+Both the original and repaired runtime leave `[0, 1]` with no pending authority;
+a second rollback returns without finishing the missing entity change. The
+repaired native group additionally exposes the partial tuple to observers.
+
+Independent execution distinguishes this from an ordinary Solid subscriber
+throw: that subscriber runs at batch flush, after both values restore to `[0, 0]`.
+The SDK does not specify nonthrowing invalidation, so the controlled inline
+counterexample cannot be dismissed under an invented requirement. It is also
+not evidence that stock Solid subscriber exceptions occur at that inline phase.
+
+The current retirement fallback infers complete installation from any physical
+revision advance. That implication is invalid. Removing the fallback alone
+retains authority over a partially changed state, which is not atomic refusal.
+The bounded research direction is complete prepared-unit installation followed
+by publication and an exact completion witness. Preserve fresh authored reads;
+do not defer their native carrier refresh indiscriminately. No production repair
+for this boundary is claimed here.
+
+Raw source snapshots, commands, first reds and independent controls are retained
+in `/private/tmp/st-native-transaction-error-composition/` and
+`/private/tmp/st-inline-publication-independent/`. These exact-source controls
+are separate from the earlier full package test results.
+
+## Supported-callback control and unresolved oracle interpretation
+
+Further copied-source controls used the unmodified Solid adapter with three
+scalars and an entity field. At actual native and queued tooling callbacks,
+direct reads and demanded computed reads agreed through complete rollback.
+Inside authored code, fresh SignalTree reads did not imply uniform native
+computed timing; the existing framework boundary was preserved.
+
+An ordinary callback throwing after its first write, with no injected publisher,
+exposed the authored prefix and then compensation. This is different from a
+partially installed rollback. A copied early-capture candidate restores the
+injected-fault prefix as well, but the two original frozen oracles remain red:
+one expects a callback marker from code never reached; the other forbids any
+authored prefix visibility. Neither was rewritten or counted as passing.
+Requirements interpretation must distinguish authored execution, settlement
+installation and publication; existing behavior alone cannot decide policy.
+
+Neutral and Vue ordinary controls each passed 3/3 on both copied versions.
+Two Vue injected scalar publisher faults failed before early capture and passed
+with it. Neutral success uses an existing path-notifier capture route and does
+not establish early capture under notifier failure. These are bounded source
+experiments, not a production integration or an all-framework guarantee.
+Evidence: `/private/tmp/st-native-transaction-error-composition/supported-callback/`.
+
+
+Early capture also remains fallible. A copied recorder failure followed by a
+publisher failure loses the write's authority; a callback-capable opaque value
+can independently fail the existing decomposition path. The latter's public
+input-domain guarantee is unestablished, but inspection-unavailable followed by
+successful no-op retirement is separately observable. Complete installation
+witnesses do not establish complete semantic capture. Kernel-owned minimal write
+records and honest capture-failure states are being compared outside production.
+Raw evidence: `/private/tmp/st-native-transaction-error-composition/capture-failure/`.

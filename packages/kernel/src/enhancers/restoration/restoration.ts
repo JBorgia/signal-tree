@@ -1,3 +1,4 @@
+import { placeFieldReversalsWhileRowsExist } from '../../lib/internals/causal-runtime/pending-rollback';
 import { publishingExposedOnly } from '../../lib/internals/exposed-publication';
 import {
   forgetTransientRows,
@@ -297,6 +298,21 @@ type TreeRealizationDescriptorStore = Map<
 //
 // Rollback is `transactions()`' concern and it declares its own equivalents,
 // built from its own captured effects rather than from restoration history.
+
+/** Mapping creates semantic reversals; normalization cannot cross an application. */
+function compileReversalApplications(
+  applications: readonly DirectedTurnApplication[]
+): ReversalEffect[] {
+  return applications.flatMap((application) =>
+    placeFieldReversalsWhileRowsExist(
+      application.effects.map((effect, index) => {
+        const reversal = toReversalEffect(effect, application.direction);
+        const turn = application.turns?.[index];
+        return turn === undefined ? reversal : { ...reversal, turn };
+      })
+    )
+  );
+}
 
 function toReversalEffect(
   effect: TurnEffect,
@@ -1834,8 +1850,8 @@ class RestorationManager<TSource, T> {
         direction === 'undo'
           ? [...(turn.__effects ?? [])].reverse()
           : [...(turn.__effects ?? [])];
-      const reversalEffects = effects.map((effect) =>
-        toReversalEffect(effect, direction)
+      const reversalEffects = placeFieldReversalsWhileRowsExist(
+        effects.map((effect) => toReversalEffect(effect, direction))
       );
       const collectionOwners = new Set([
         ...(turn.__orderDeltas ?? []).map(({ owner }) => owner),
@@ -1913,9 +1929,11 @@ class RestorationManager<TSource, T> {
           states[historyIndex] = natural;
         }
       }
-      const reversalEffects = [...event.effects]
-        .reverse()
-        .map((effect) => toReversalEffect(effect, 'undo'));
+      const reversalEffects = placeFieldReversalsWhileRowsExist(
+        [...event.effects]
+          .reverse()
+          .map((effect) => toReversalEffect(effect, 'undo'))
+      );
       const collectionOwners = new Set([
         ...event.orderDeltas.map(({ owner }) => owner),
         ...reversalEffects
@@ -2252,6 +2270,12 @@ class RestorationManager<TSource, T> {
             getTreeScalarSlotRuntime(this.tree) ??
             getTreeScalarSlotRuntime(this.tree.$)
           )?.resolveScalarSlot(effect.position) !== undefined
+        )
+          return true;
+        if (
+          effect.subject !== undefined &&
+          effect.subjectFieldSegments !== undefined &&
+          effect.subjectFieldSegments.length > 0
         )
           return true;
         return (
@@ -2667,13 +2691,7 @@ export function restoration(
       applications: DirectedTurnApplication[]
     ): void => {
       readQueuedExternalAuthority();
-      const reversalEffects = applications.flatMap((application) =>
-        application.effects.map((effect, index) => {
-          const reversal = toReversalEffect(effect, application.direction);
-          const turn = application.turns?.[index];
-          return turn === undefined ? reversal : { ...reversal, turn };
-        })
-      );
+      const reversalEffects = compileReversalApplications(applications);
       const orderDeltas = applications.flatMap(
         (application) => application.orderDeltas
       );
