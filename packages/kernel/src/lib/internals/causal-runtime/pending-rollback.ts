@@ -144,32 +144,111 @@ function createPendingRollbackEffects(
     }
   });
 
-  return turn.effects
-    .filter((effect, index) => {
-      if (effect.subjectId !== undefined) {
-        const dominantStructuralEffect = dominantStructuralEffects
-          .get(effect.subjectId)
-          ?.find((candidate) => sameSubjectScope(candidate, effect));
-        if (dominantStructuralEffect) {
-          return dominantStructuralEffect === effect;
+  return placeFieldReversalsWhileRowsExist(
+    turn.effects
+      .filter((effect, index) => {
+        if (effect.subjectId !== undefined) {
+          const dominantStructuralEffect = dominantStructuralEffects
+            .get(effect.subjectId)
+            ?.find((candidate) => sameSubjectScope(candidate, effect));
+          if (
+            dominantStructuralEffect &&
+            (dominantStructuralEffect === effect ||
+              dominantStructuralEffect.structural === 'add' ||
+              dominantStructuralEffect.owner !== effect.owner)
+          ) {
+            return dominantStructuralEffect === effect;
+          }
         }
-      }
 
-      const effectKey = rollbackAddressKey(effect);
-      return firstEffectIndexByOwner.get(effectKey) === index;
-    })
-    .map((effect) =>
-      createPendingRollbackEffect(effect, turn.id, realizationContext)
-    )
-    .filter(
-      (effect) =>
-        (effect.plainBranchMembership !== undefined &&
-          effect.plainBranchMembership.before !==
-            effect.plainBranchMembership.after) ||
-        effect.before !== effect.after ||
-        (effect.fieldPresence !== undefined &&
-          effect.fieldPresence.before !== effect.fieldPresence.after)
-    );
+        const effectKey = rollbackAddressKey(effect);
+        return firstEffectIndexByOwner.get(effectKey) === index;
+      })
+      .map((effect) =>
+        createPendingRollbackEffect(effect, turn.id, realizationContext)
+      )
+      .filter(
+        (effect) =>
+          (effect.plainBranchMembership !== undefined &&
+            effect.plainBranchMembership.before !==
+              effect.plainBranchMembership.after) ||
+          effect.before !== effect.after ||
+          (effect.fieldPresence !== undefined &&
+            effect.fieldPresence.before !== effect.fieldPresence.after)
+      )
+  );
+}
+
+/** Correct net contribution order without crossing explicit turn boundaries.
+ * Callers retain application/direction boundaries by invoking this per application.
+ * Mixed add/remove scopes retain their input order; complete target preflight
+ * decides admissibility. They include valid public transient placement anchors.
+ */
+export function placeFieldReversalsWhileRowsExist<T extends ReversalEffect>(
+  effects: readonly T[]
+): readonly T[] {
+  if (effects.length === 0) return effects;
+  const segments: T[][] = [];
+  let segment: T[] | undefined;
+  let previous: number | undefined;
+  for (const effect of effects) {
+    // Boundaries are the supplied contiguous runs, not ordinal validation.
+    // A repeated label later, or undefined beside a numbered run, stays separate.
+    if (!segment || !Object.is(previous, effect.turn)) {
+      segments.push((segment = []));
+      previous = effect.turn;
+    }
+    segment.push(effect);
+  }
+  let changed = false;
+  const result: T[] = [];
+  for (const unit of segments) {
+    const rows = new Map<
+      PositionId,
+      Map<unknown, { kind: 'add' | 'remove'; fields: T[]; mixed: boolean }>
+    >();
+    const row = (e: T) =>
+      (e.structural === 'add' || e.structural === 'remove') &&
+      e.subjectId !== undefined;
+    const scope = (e: T) => rows.get(e.owner)?.get(e.subjectId);
+    for (const e of unit)
+      if (row(e)) {
+        let owners = rows.get(e.owner);
+        if (!owners) rows.set(e.owner, (owners = new Map()));
+        const existing = owners.get(e.subjectId);
+        if (existing && existing.kind !== e.structural) existing.mixed = true;
+        if (!existing)
+          owners.set(e.subjectId, {
+            kind: e.structural as 'add' | 'remove',
+            fields: [],
+            mixed: false,
+          });
+      }
+    for (const e of unit)
+      if (e.structural === undefined && e.subjectId !== undefined) {
+        const entry = scope(e);
+        if (entry && !entry.mixed) entry.fields.push(e);
+      }
+    const ordered: T[] = [];
+    for (const e of unit) {
+      const candidate = scope(e);
+      const entry = candidate?.mixed ? undefined : candidate;
+      if (e.structural === undefined && e.subjectId !== undefined && entry)
+        continue;
+      if (row(e) && e.structural === 'remove' && entry) {
+        for (const field of entry.fields) ordered.push(field);
+        entry.fields = [];
+      }
+      ordered.push(e);
+      if (row(e) && e.structural === 'add' && entry) {
+        for (const field of entry.fields) ordered.push(field);
+        entry.fields = [];
+      }
+    }
+    changed ||= ordered.some((effect, index) => effect !== unit[index]);
+    for (const effect of ordered) result.push(effect);
+  }
+  return changed ? result : effects;
 }
 
 function rollbackAddressKey(effect: CausalTurn['effects'][number]): string {

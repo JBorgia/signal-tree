@@ -143,12 +143,17 @@ describe('pending rollback dominant structural effect search work', () => {
           mode === 'replacing every id' ? rows(count, count) : [];
         const pending = tree.transact(() => tree.$.rows.setAll(replacement));
         const visits = findVisits(() => pending.rollback());
-        // One visit per structural effect (2n for a replacement, n for a
-        // clear); the scan visited m(m+1)/2.
+        // Global Array.find visits: indexed dominant lookup uses 2n for
+        // replacement (n for clear); replacement placement adds one
+        // chain-head visit. This fixture is one contiguous restored chain,
+        // not a whole-planner complexity bound. The old dominant scan
+        // alone visited m(m+1)/2 candidates.
         expect(
           visits,
           'find predicate visits during rollback'
-        ).toBeLessThanOrEqual(2 * count);
+        ).toBeLessThanOrEqual(
+          mode === 'replacing every id' ? 2 * count + 1 : 2 * count
+        );
         expect(tree.$.rows.ids()).toEqual(rows(count).map(({ id }) => id));
       } finally {
         tree.destroy();
