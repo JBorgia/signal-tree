@@ -117,6 +117,7 @@ export type TransactionRealizationHooks<Tree> = {
   ): readonly Observation<ValuePublicationFrame>[];
 
   selectRow(tree: Tree, id: string | undefined): void;
+  rekeyRow(tree: Tree, from: string, to: string): void;
   observeProjections(
     tree: Tree,
     phase: () => string,
@@ -387,6 +388,172 @@ export function transactionRealizationContract<Tree>(
               );
           }
         } finally {
+          for (const observed of observations) observed.dispose();
+          dispose();
+        }
+      });
+    }
+  }
+
+  for (const scenario of [
+    'initial absence',
+    'same lifetime restoration',
+    'new lifetime at reused key',
+    'selection while absent',
+    'selected rekey',
+    'unrelated writes and disposal',
+  ] as const) {
+    for (const primed of [true, false]) {
+      it(`4e selection lifetime projections — ${scenario}, ${
+        primed ? 'primed' : 'first read after change'
+      }`, async () => {
+        const { tree, dispose } = hooks.createStore();
+        const startsPresent =
+          scenario !== 'initial absence' &&
+          scenario !== 'selection while absent';
+        if (startsPresent) hooks.addRow(tree, { id: 'A', name: 'Original' });
+        hooks.selectRow(tree, 'A');
+        await hooks.flush();
+        let phase = 'setup';
+        let scalar = 0;
+        const observations = hooks.observeProjections(
+          tree,
+          () => phase,
+          () => primed || phase !== 'setup'
+        );
+        const held = startsPresent ? hooks.holdEntity(tree, 'A') : undefined;
+        type Entry = { key: string; id: string; name: string };
+        const original: Entry = { key: 'A', id: 'A', name: 'Original' };
+        const expected = (
+          entries: Entry[],
+          selected: string
+        ): EntityProjectionSnapshot => {
+          const encode = (entry: Entry | undefined) =>
+            entry ? `${entry.id}:${entry.name}` : null;
+          const rowA = entries.find((entry) => entry.key === 'A');
+          const matches = entries.filter((entry) => entry.id === 'A');
+          return {
+            all: entries.map((entry) => encode(entry)!),
+            ids: entries.map((entry) => entry.key),
+            count: entries.length,
+            empty: entries.length === 0,
+            map: entries.map((entry) => `${entry.key}:${entry.name}`),
+            hasA: rowA !== undefined,
+            where: matches.map((entry) => encode(entry)!),
+            find: encode(matches[0]),
+            slice: entries.map((entry) => entry.name),
+            activeId: selected,
+            activeEntity: encode(
+              entries.find((entry) => entry.key === selected)
+            ),
+            row: rowA?.name ?? null,
+            field: rowA?.name ?? null,
+          };
+        };
+        const check = async (entries: Entry[], selected = 'A') => {
+          await hooks.flush();
+          for (const observed of observations) {
+            const delivered = observed.seen.filter(
+              (frame) => frame.phase === phase
+            );
+            expect(delivered.length).toBeGreaterThan(0);
+            for (const frame of delivered) {
+              expect(frame.scalar, JSON.stringify(observed.seen)).toBe(scalar);
+              expect(frame.projections, JSON.stringify(observed.seen)).toEqual(
+                expected(entries, selected)
+              );
+            }
+            expect(observed.current().scalar).toBe(scalar);
+            expect(observed.current().projections).toEqual(
+              expected(entries, selected)
+            );
+          }
+        };
+        const change = (name: string, action: () => void) => {
+          phase = name;
+          const pending = hooks.transact(tree, () => {
+            hooks.writeScalar(tree, ++scalar);
+            action();
+          });
+          pending.confirm();
+        };
+        try {
+          await hooks.flush();
+          for (const observed of observations)
+            expect(observed.current().projections).toEqual(
+              primed ? expected(startsPresent ? [original] : [], 'A') : null
+            );
+          if (held) expect(held.current()?.name).toBe('Original');
+          if (scenario === 'initial absence') {
+            change('insert', () =>
+              hooks.addRow(tree, { id: 'A', name: 'Original' })
+            );
+            await check([original]);
+          } else if (scenario === 'same lifetime restoration') {
+            phase = 'remove';
+            const pending = hooks.transact(tree, () => {
+              hooks.writeScalar(tree, ++scalar);
+              hooks.removeRow(tree, 'A');
+            });
+            await check([]);
+            phase = 'rollback';
+            pending.rollback();
+            scalar = 0;
+            await check([original]);
+            expect(held!.current()?.name).toBe('Original');
+          } else if (scenario === 'new lifetime at reused key') {
+            change('remove', () => hooks.removeRow(tree, 'A'));
+            await check([]);
+            change('replace lifetime', () =>
+              hooks.addRow(tree, { id: 'A', name: 'Impostor' })
+            );
+            await check([{ key: 'A', id: 'A', name: 'Impostor' }]);
+            expect(held!.current()).toBeUndefined();
+          } else if (scenario === 'selection while absent') {
+            change('select B', () => hooks.selectRow(tree, 'B'));
+            await check([], 'B');
+            change('insert unselected A', () =>
+              hooks.addRow(tree, { id: 'A', name: 'Original' })
+            );
+            await check([original], 'B');
+            change('insert selected B', () =>
+              hooks.addRow(tree, { id: 'B', name: 'Selected' })
+            );
+            await check(
+              [original, { key: 'B', id: 'B', name: 'Selected' }],
+              'B'
+            );
+          } else if (scenario === 'selected rekey') {
+            change('rekey', () => hooks.rekeyRow(tree, 'A', 'X'));
+            await check([{ ...original, key: 'X' }], 'X');
+            expect(held!.current()?.name).toBe('Original');
+            change('write rekeyed lifetime', () =>
+              hooks.realizeRowName(tree, 'X', 'Updated')
+            );
+            await check([{ ...original, key: 'X', name: 'Updated' }], 'X');
+            expect(held!.current()?.name).toBe('Updated');
+          } else {
+            change('add unrelated B', () =>
+              hooks.addRow(tree, { id: 'B', name: 'Other' })
+            );
+            await check([original, { key: 'B', id: 'B', name: 'Other' }]);
+            change('write unrelated B', () =>
+              hooks.realizeRowName(tree, 'B', 'Changed')
+            );
+            await check([original, { key: 'B', id: 'B', name: 'Changed' }]);
+            expect(held!.current()?.name).toBe('Original');
+            change('remove unrelated B', () => hooks.removeRow(tree, 'B'));
+            await check([original]);
+            held!.dispose();
+            const heldCount = held!.seen.length;
+            change('after held disposal', () =>
+              hooks.realizeRowName(tree, 'A', 'After disposal')
+            );
+            await check([{ ...original, name: 'After disposal' }]);
+            expect(held!.seen.length).toBe(heldCount);
+          }
+        } finally {
+          held?.dispose();
           for (const observed of observations) observed.dispose();
           dispose();
         }

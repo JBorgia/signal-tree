@@ -136,6 +136,7 @@ describe('@signal-tree/angular — pending realization conformance', () => {
     ],
 
     selectRow: (tree, id) => tree.$.rows.setActiveId(id),
+    rekeyRow: (tree, from, to) => tree.$.rows.changeId(from, to),
     observeProjections: (tree, phase, enabled) => [
       observe(() => projectionFrame(tree.$, phase(), enabled())),
     ],

@@ -1,0 +1,106 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "base",
+      "review-selection-reentry-mixed.mjs",
+      "suite",
+      "primary-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"review-selection-reentry-mixed.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/base-review-selection-reentry-mixed.mjs-suite-primary-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "S1",
+      "review-selection-reentry-mixed.mjs",
+      "suite",
+      "primary-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"S1\",\"entry\":\"review-selection-reentry-mixed.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/S1-review-selection-reentry-mixed.mjs-suite-primary-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "D2",
+      "review-selection-reentry-mixed.mjs",
+      "suite",
+      "primary-first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"D2\",\"entry\":\"review-selection-reentry-mixed.mjs\",\"control\":\"suite\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/D2-review-selection-reentry-mixed.mjs-suite-primary-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DS1",
+      "review-selection-reentry-mixed.mjs",
+      "suite",
+      "primary-first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DS1\",\"entry\":\"review-selection-reentry-mixed.mjs\",\"control\":\"suite\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DS1-review-selection-reentry-mixed.mjs-suite-primary-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "K1",
+      "review-selection-reentry-mixed.mjs",
+      "suite",
+      "primary-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"K1\",\"entry\":\"review-selection-reentry-mixed.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/K1-review-selection-reentry-mixed.mjs-suite-primary-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "SK1",
+      "review-selection-reentry-mixed.mjs",
+      "suite",
+      "primary-first"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"SK1\",\"entry\":\"review-selection-reentry-mixed.mjs\",\"control\":\"suite\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/SK1-review-selection-reentry-mixed.mjs-suite-primary-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DK1",
+      "review-selection-reentry-mixed.mjs",
+      "suite",
+      "primary-first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DK1\",\"entry\":\"review-selection-reentry-mixed.mjs\",\"control\":\"suite\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DK1-review-selection-reentry-mixed.mjs-suite-primary-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/selected-key-restoration-0/run.mjs",
+      "DSK1",
+      "review-selection-reentry-mixed.mjs",
+      "suite",
+      "primary-first"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-selection-reentry-mixed.mjs\",\"control\":\"suite\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-selected-key-replay/runs/DSK1-review-selection-reentry-mixed.mjs-suite-primary-first\"}\n",
+    "stderr": ""
+  }
+]

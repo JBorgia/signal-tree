@@ -1,0 +1,18 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -547,10 +547,13 @@
+     const preparedBySubject = new Map(
+       preparedSubjects.map((subject) => [subject.subjectId, subject])
+     );
++    // Selection is a current key choice, not rollback-owned row state. Follow
++    // an existing selected subject through a rekey, but preserve the selected
++    // key when that subject is absent or removed by this target.
+     const activeIdAfter =
+-      activeSubjectBefore === undefined
++      (activeSubjectBefore === undefined
+         ? undefined
+-        : preparedBySubject.get(activeSubjectBefore)?.key;
++        : preparedBySubject.get(activeSubjectBefore)?.key) ?? activeIdBefore;
+     const targetNeighborBySubject = new Map(
+       target.order.map((subjectId, index) => [
+         subjectId,

@@ -1,0 +1,13 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -652,7 +652,9 @@
+             emitTap('onUpdate', key, afterValue as E, afterValue as E);
+         }
+         if (activeIdBefore !== activeIdAfter) {
+-          replaceLocation(activeIdSignal, activeIdAfter);
++          deriveLocation(activeIdSignal, (current) =>
++            current === activeIdBefore ? activeIdAfter : current
++          );
+         }
+         updateSignals();
+         if (options?.advancePhysicalRevision !== false) {

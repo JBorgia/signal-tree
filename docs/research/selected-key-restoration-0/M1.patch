@@ -1,0 +1,13 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -2751,6 +2751,10 @@
+       const read = () => {
+         const id = activeIdSignal();
+         if (id === undefined) return undefined;
++        // A selection names a key even while no subject occupies it. Keep the
++        // membership edge only while absent; a present selection stays scoped
++        // to its subject, and dependency cleanup drops the old edge on reentry.
++        if (resolveSubjectId(id) === undefined) idsSignal();
+         return readEntityByKey(id);
+       };
+       if (taps.depth) return fresh(read);
