@@ -1,0 +1,192 @@
+{
+  "control": "explicit-rollback-fault",
+  "seen": [
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      1
+    ],
+    [
+      0,
+      1
+    ]
+  ],
+  "scalarSeen": [
+    0,
+    1,
+    0
+  ],
+  "rowSeen": [
+    0,
+    1
+  ],
+  "frames": [
+    {
+      "depth": 1,
+      "returnedNormally": true
+    },
+    {
+      "depth": 2,
+      "returnedNormally": true
+    },
+    {
+      "depth": 2,
+      "returnedNormally": true
+    },
+    {
+      "depth": 1,
+      "returnedNormally": true
+    },
+    {
+      "depth": 2,
+      "returnedNormally": true
+    },
+    {
+      "depth": 3,
+      "returnedNormally": false
+    },
+    {
+      "depth": 1,
+      "returnedNormally": true
+    }
+  ],
+  "faultHits": 1,
+  "reentryHits": 0,
+  "snapshots": [
+    {
+      "label": "pending-before-rollback",
+      "seen": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "scalarSeen": [
+        0,
+        1
+      ],
+      "rowSeen": [
+        0,
+        1
+      ],
+      "faultHits": 0,
+      "reentryHits": 0,
+      "frames": [
+        {
+          "depth": 1,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        }
+      ],
+      "source": [
+        1,
+        1
+      ],
+      "pending": 1,
+      "openScope": true
+    },
+    {
+      "label": "rollback-return",
+      "seen": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "scalarSeen": [
+        0,
+        1,
+        0
+      ],
+      "rowSeen": [
+        0,
+        1
+      ],
+      "faultHits": 1,
+      "reentryHits": 0,
+      "frames": [
+        {
+          "depth": 1,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 1,
+          "returnedNormally": true
+        },
+        {
+          "depth": 2,
+          "returnedNormally": true
+        },
+        {
+          "depth": 3,
+          "returnedNormally": false
+        }
+      ],
+      "source": [
+        0,
+        1
+      ],
+      "pending": 0,
+      "openScope": false
+    }
+  ],
+  "pendingInspection": {
+    "changes": [
+      {
+        "path": "scalar",
+        "address": [
+          "scalar"
+        ],
+        "status": "current"
+      },
+      {
+        "path": "rows.A.v",
+        "address": [
+          "rows",
+          "v"
+        ],
+        "subject": 1,
+        "status": "current"
+      }
+    ]
+  },
+  "outcome": {
+    "threw": true,
+    "callback": false,
+    "publish": true,
+    "message": "after real token invalidate",
+    "recovery": null
+  },
+  "status": "fail",
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    0,\n+   1\n-   0\n  ]\n\n    at file:///private/tmp/st-atomic-proof-20261013/runs/base-settlement.mjs-explicit-rollback-fault-first/bundle.mjs:15533:12\n    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)\n    at async node:internal/modules/esm/loader:639:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)"
+}

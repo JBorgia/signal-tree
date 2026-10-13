@@ -1,0 +1,12 @@
+{
+  "node": "v24.15.0",
+  "base": "19a5bd03",
+  "lane": "candidate",
+  "entry": "prepare-neutral.mjs",
+  "control": "error",
+  "exit": 0,
+  "signal": null,
+  "stable": true,
+  "bundle": "d68758f6a3483279a17c9a1dbee557b26f1c940258c9ede7ecfcba2dfd0fa784",
+  "originalManifestSha256": "411b2c936bf54c9a499b1f7d052527fa446dc2ff31333fd6562ad31ded8696fa"
+}

@@ -1,0 +1,38 @@
+{
+  "lane": "record",
+  "mode": "abort",
+  "hits": 0,
+  "pubHits": 0,
+  "afterSet": false,
+  "checks": [
+    {
+      "name": "fault nonvacuous",
+      "pass": true
+    },
+    {
+      "name": "primary identity",
+      "pass": true
+    },
+    {
+      "name": "responsibility state",
+      "pass": true
+    },
+    {
+      "name": "no phantom aborted record",
+      "pass": true
+    },
+    {
+      "name": "next progress",
+      "pass": true
+    }
+  ],
+  "physical": 0,
+  "direct": 0,
+  "pending": 0,
+  "error": {
+    "threw": true,
+    "primary": true,
+    "recoveryPrimary": false
+  },
+  "cleanChangeCount": 1
+}

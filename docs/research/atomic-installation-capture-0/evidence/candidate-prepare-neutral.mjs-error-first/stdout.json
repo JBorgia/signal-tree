@@ -1,0 +1,12 @@
+{
+  "mode": "error",
+  "hits": 1,
+  "pubs": 0,
+  "final": 0,
+  "pending": 0,
+  "error": {
+    "threw": true,
+    "primary": true
+  },
+  "status": "pass"
+}

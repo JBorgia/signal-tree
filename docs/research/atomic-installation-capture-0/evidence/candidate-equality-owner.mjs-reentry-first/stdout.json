@@ -1,0 +1,27 @@
+{
+  "mode": "reentry",
+  "hits": 1,
+  "stacks": [
+    "Error: get v\n    at get v (file:///private/tmp/st-atomic-proof-20261013/runs/candidate-equality-owner.mjs-reentry-first/bundle.mjs:68953:17)\n    at equalsInner (file:///private/tmp/st-atomic-proof-20261013/runs/candidate-equality-owner.mjs-reentry-first/bundle.mjs:58905:19)\n    at deepEqual (file:///private/tmp/st-atomic-proof-20261013/runs/candidate-equality-owner.mjs-reentry-first/bundle.mjs:58827:10)\n    at Array.<anonymous> (file:///private/tmp/st-atomic-proof-20261013/runs/candidate-equality-owner.mjs-reentry-first/bundle.mjs:60969:16)\n    at Object.commitRecorded (file:///private/tmp/st-atomic-proof-20261013/runs/candidate-equality-owner.mjs-reentry-first/bundle.mjs:59660:42)\n    at cell.replace [as set] (file:///private/tmp/st-atomic-proof-20261013/runs/candidate-equality-owner.mjs-reentry-first/bundle.mjs:59832:30)\n    at file:///private/tmp/st-atomic-proof-20261013/runs/candidate-equality-owner.mjs-reentry-first/bundle.mjs:68968:21\n    at withWriteContext (file:///private/tmp/st-atomic-proof-20261013/runs/candidate-equality-owner.mjs-reentry-first/bundle.mjs:57757:12)\n    at executeTransaction (file:///private/tmp/st-atomic-proof-20261013/runs/candidate-equality-owner.mjs-reentry-first/bundle.mjs:68350:11)\n    at file:///private/tmp/st-atomic-proof-20261013/runs/candidate-equality-owner.mjs-reentry-first/bundle.mjs:59296:11"
+  ],
+  "sameOld": true,
+  "other": 7,
+  "inspection": {
+    "changes": [
+      {
+        "path": "other",
+        "address": [
+          "other"
+        ],
+        "status": "current"
+      }
+    ]
+  },
+  "finalOther": 0,
+  "pending": 0,
+  "error": {
+    "threw": true,
+    "primary": false
+  },
+  "status": "pass"
+}

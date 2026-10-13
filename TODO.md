@@ -12,6 +12,17 @@ does not grant publication or disclosure authority. Use the current controller
 and exact release-line evidence rather than this dated status for release decisions.
 
 
+## Atomic installation/capture decision — CLOSED WITH COUNTEREXAMPLE
+
+The [reviewed bounded probe](docs/research/atomic-installation-capture-0/README.md)
+from `19a5bd03` falsifies mixed scalar/entity robustness under persistent internal
+entity-recorder failure: rollback and retry succeed while the entity write
+survives and pending authority is zero. Scalar controls and the candidate's mixed
+publication repair pass, but do not establish complete responsibility capture.
+First failures, exact research patch, replay harness and independent controls are
+preserved. No public-input trigger is established; no runtime integration or
+contract change is made. Order/frontier and release work remain separate.
+
 ## V16 native publication verification — ACTIVE
 
 The isolated [native error recovery repair](docs/research/native-publication-error-recovery-0.md)

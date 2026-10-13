@@ -1,0 +1,12 @@
+{
+  "node": "v24.15.0",
+  "base": "19a5bd03",
+  "lane": "base",
+  "entry": "settlement.mjs",
+  "control": "explicit-rollback-fault",
+  "exit": 1,
+  "signal": null,
+  "stable": true,
+  "bundle": "a583998b873b5d6ac06fa3af5abd894a338de26c0d1eac28edb287b96066ca9f",
+  "originalManifestSha256": "0e450e2f9a89fe7b27eaa17bfedc4a8f2548171b5326f8bd4f74fe7e9335cc6c"
+}

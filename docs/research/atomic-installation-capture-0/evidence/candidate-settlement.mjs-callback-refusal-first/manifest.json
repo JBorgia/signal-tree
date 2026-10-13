@@ -1,0 +1,12 @@
+{
+  "node": "v24.15.0",
+  "base": "19a5bd03",
+  "lane": "candidate",
+  "entry": "settlement.mjs",
+  "control": "callback-refusal",
+  "exit": 0,
+  "signal": null,
+  "stable": true,
+  "bundle": "f536ac3421a5da790a9092232592e05fba0035cda2f39b23e40faaf975d1ec7d",
+  "originalManifestSha256": "cc6bf22f0cc6ab734bdacfc651e882c39a7713193146107372a69be827f33749"
+}
