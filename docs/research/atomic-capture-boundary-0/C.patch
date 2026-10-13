@@ -1,0 +1,86 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -815,6 +815,14 @@
+     return id;
+   }
+
++  repairCapturedEffects(turnId: number, effects: TurnEffect[], baseline: ReadonlyMap<number,unknown>): void {
++    const turn=this.pendingTurns.get(turnId);
++    if(!turn) throw new Error('Missing pending authority during capture repair');
++    if(effects.some(e=>!turn.__positionIds?.includes(e.position) || (e.subject!==undefined && !turn.restorationSubjectIds?.includes(e.subject)))) throw new Error('Capture repair cannot invent an unretained address');
++    turn.__effects=effects.map(cloneTurnEffect);
++    turn.__baselineValues=new Map(baseline);
++  }
++
+   createPending(
+     reservedId: number,
+     subjectIds?: number[],
+@@ -2026,6 +2034,28 @@
+     return typeof resolved === 'number' ? resolved : undefined;
+   };
+
++  type LostCapture = {path:string;next:unknown;prev:unknown;meta?:WriteMetadata;ownerPath?:string;subjectIds?:number[];positionIds?:number[]};
++  const incompleteCaptures = new Map<number,LostCapture[]>();
++  tree.registerCleanup(()=>incompleteCaptures.clear());
++  const repairIncompleteCapture = (id: number, turnId: number | undefined): void => {
++    const records=incompleteCaptures.get(id);
++    if(!records?.length)return;
++    if(turnId===undefined) throw new Error('Missing recovery turn');
++    const turn=authority.getPendingTurn(turnId);
++    const scratch=createCaptureBucket();
++    for(const effect of turn?.__effects ?? []) scratch.effects.set(effectKey(effect),cloneTurnEffect(effect));
++    for(const [key,value] of turn?.__baselineValues ?? [])scratch.baselineValues.set(key,value);
++    try {
++      for(const r of records) captureEffects(scratch,scratch.effects,r.path,r.next,r.prev,r.meta,r.ownerPath,r.subjectIds,r.positionIds);
++    } catch(error) {
++      const refusal=createRollbackError({kind:'effect-validation-failed',pendingTurnId:turnId,compensation:[],errorMessage:'Incomplete entity capture remains unrecoverable',cause:error});
++      publishRefusal(id,refusal);
++      throw refusal;
++    }
++    authority.repairCapturedEffects(turnId,[...scratch.effects.values()],scratch.baselineValues);
++    incompleteCaptures.delete(id);
++  };
++
+   const captureIntoBucket = (
+     bucket: CaptureBucket,
+     path: string,
+@@ -2077,6 +2107,7 @@
+       meta,
+       registry: getPositionRegistry(tree.$),
+     });
++    try {
+     captureEffects(
+       bucket,
+       bucket.effects,
+@@ -2088,6 +2119,15 @@
+       subjectIds,
+       resolvedPositionIds
+     );
++    } catch(error) {
++      const id=resolveTransactionId(meta);
++      if(id!==undefined) {
++        const records=incompleteCaptures.get(id) ?? [];
++        records.push({path,next,prev,meta,ownerPath,subjectIds:subjectIds?.slice(),positionIds:resolvedPositionIds.slice()});
++        incompleteCaptures.set(id,records);
++      }
++      throw error;
++    }
+   };
+
+   const recordConfirmedBucket = (
+@@ -3372,6 +3412,7 @@
+       const handle = {
+         [PENDING_TURN_ID]: pendingTurnId,
+         confirm(): void {
++          repairIncompleteCapture(transactionId,pendingTurnId);
+           const pendingTurn = authority.getPendingTurn(pendingTurnId);
+           if (destroyed) throw new Error('Cannot settle a destroyed tree');
+           if (settling)
+@@ -3451,6 +3492,7 @@
+           }
+         },
+         rollback(): void {
++          repairIncompleteCapture(transactionId,pendingTurnId);
+           const pendingTurn = authority.getPendingTurn(pendingTurnId);
+           if (destroyed) throw new Error('Cannot settle a destroyed tree');
+           if (settling)

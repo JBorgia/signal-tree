@@ -23,6 +23,13 @@ First failures, exact research patch, replay harness and independent controls ar
 preserved. No public-input trigger is established; no runtime integration or
 contract change is made. Order/frontier and release work remain separate.
 
+The [boundary follow-up](docs/research/atomic-capture-boundary-0/README.md)
+compares prepared capture, paired field records, and incomplete-capture recovery.
+The field prototype still loses entity additions and changes inspection paths;
+recovery misorders a failed write followed by a captured write. Reviewed first
+failures and portable controls are preserved. No candidate qualifies for runtime
+integration; no broad release suite was restarted.
+
 ## V16 native publication verification — ACTIVE
 
 The isolated [native error recovery repair](docs/research/native-publication-error-recovery-0.md)

@@ -1,0 +1,22 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -3528,8 +3528,7 @@
+         finalUpdated,
+         transformedChanges,
+       } of stagedUpdates) {
+-        valueStore.retainSubjectValue(subjectId, finalUpdated);
+-        captureCommittedEntity(subjectId, prev, finalUpdated, false);
++        commitExistingSubjectValue(subjectId, finalUpdated);
+         syncEntitySignal(id);
+         updatedEntities.push({
+           id,
+@@ -3860,8 +3859,7 @@
+         }
+
+         for (const { subjectId, entity, prev } of stagedUpdates) {
+-          valueStore.retainSubjectValue(subjectId, entity);
+-          captureCommittedEntity(subjectId, prev, entity, false);
++          commitExistingSubjectValue(subjectId, entity);
+         }
+
+         for (let k = 0; k < stagedAdds.length; k += 1) {
