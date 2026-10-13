@@ -11,6 +11,7 @@ import {
   type ConformanceRow,
   type MixedFrame,
   type Observation,
+  type ValuePublicationFrame,
 } from '../../kernel/src/transaction-realization-contract';
 import { useSignalTree } from './use-signal-tree';
 
@@ -135,6 +136,31 @@ describe('@signal-tree/react — pending realization conformance', () => {
         current: () => decodeFrame(encoded.current()),
         dispose: encoded.dispose,
       };
+    },
+
+    observeValues: (tree, phase) => {
+      const seen: ValuePublicationFrame[] = [];
+      let latest!: ValuePublicationFrame;
+      // Stable primitive snapshot; record phase at actual render execution.
+      const select = ($: Tree['$']) =>
+        JSON.stringify([
+          $.scalar(),
+          $.rows.byId('A')?.()?.name,
+          $.rows.all().find((row) => row.id === 'A')?.name,
+        ]);
+      function Probe() {
+        const encoded = useSignalTree(tree, select as never) as string;
+        const [scalar, row, all] = JSON.parse(encoded) as [
+          number,
+          string,
+          string
+        ];
+        latest = { phase: phase(), scalar, row, all };
+        seen.push(latest);
+        return null;
+      }
+      const view = render(<Probe />);
+      return [{ seen, current: () => latest, dispose: () => view.unmount() }];
     },
 
     async flush() {

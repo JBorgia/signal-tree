@@ -10,6 +10,7 @@ import {
   type ConformanceRow,
   type MixedFrame,
   type Observation,
+  type ValuePublicationFrame,
 } from '../../../kernel/src/transaction-realization-contract';
 import { entityMap, signalTree, transactions } from '../index';
 
@@ -32,14 +33,20 @@ const build = () =>
     { enhancers: [transactions()] }
   );
 
-const observe = <T>(read: () => T): Observation<T> => {
+const observe = <T>(
+  read: () => T,
+  flush: 'pre' | 'sync' = 'pre'
+): Observation<T> => {
   const seen: T[] = [];
   let latest!: T;
-  const stop = watchEffect(() => {
-    const value = read();
-    latest = value;
-    seen.push(value);
-  });
+  const stop = watchEffect(
+    () => {
+      const value = read();
+      latest = value;
+      seen.push(value);
+    },
+    { flush }
+  );
   return { seen, current: () => latest, dispose: stop };
 };
 
@@ -74,6 +81,24 @@ describe('@signal-tree/vue — pending realization conformance', () => {
         scalar: tree.$.scalar.value,
         ids: [...tree.$.rows.ids.value],
       })),
+
+    observeValues: (tree, phase) => [
+      observe<ValuePublicationFrame>(() => ({
+        phase: phase(),
+        scalar: tree.$.scalar.value,
+        row: tree.$.rows.byId('A')?.()?.name,
+        all: tree.$.rows.all.value.find((row) => row.id === 'A')?.name,
+      })),
+      observe<ValuePublicationFrame>(
+        () => ({
+          phase: phase(),
+          scalar: tree.$.scalar.value,
+          row: tree.$.rows.byId('A')?.()?.name,
+          all: tree.$.rows.all.value.find((row) => row.id === 'A')?.name,
+        }),
+        'sync'
+      ),
+    ],
 
     flush: async () => {
       await nextTick();

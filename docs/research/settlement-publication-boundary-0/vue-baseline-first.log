@@ -1,0 +1,33 @@
+(node:43891) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 exit listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> nx run vue:test --testNamePattern=4c coherent value settlement
+
+> pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts --testNamePattern="4c coherent value settlement"
+
+(node:44753) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+packages/vue/src/lib/transaction-realization.spec.ts(87,26): error TS2349: This expression is not callable.
+  Type 'ComputedRef<ConformanceRow[]>' has no call signatures.
+packages/vue/src/lib/transaction-realization.spec.ts(87,38): error TS7006: Parameter 'row' implicitly has an 'any' type.
+packages/vue/src/lib/transaction-realization.spec.ts(93,26): error TS2349: This expression is not callable.
+  Type 'ComputedRef<ConformanceRow[]>' has no call signatures.
+packages/vue/src/lib/transaction-realization.spec.ts(93,38): error TS7006: Parameter 'row' implicitly has an 'any' type.
+Warning: command "pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts --testNamePattern="4c coherent value settlement"" exited with non-zero status code
+
+
+ NX   Running target test for project vue failed
+
+Failed tasks:
+
+- vue:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      25.5s
+  Critical path:     25.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Speed up or split the longest tasks on the critical path:
+        vue:test    25.5s

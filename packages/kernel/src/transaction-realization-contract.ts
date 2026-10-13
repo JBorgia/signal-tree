@@ -43,6 +43,13 @@ export type Observation<T> = {
   dispose(): void;
 };
 
+export type ValuePublicationFrame = {
+  readonly phase: string;
+  readonly scalar: number;
+  readonly row: string | undefined;
+  readonly all: string | undefined;
+};
+
 export type MixedFrame = {
   readonly scalar: number;
   readonly ids: readonly string[];
@@ -81,6 +88,12 @@ export type TransactionRealizationHooks<Tree> = {
    * emission must be one coherent pair sampled at the same instant.
    */
   observeMixed(tree: Tree): Observation<MixedFrame>;
+
+  /** Record when the native observer executes, not when its values are delivered. */
+  observeValues(
+    tree: Tree,
+    phase: () => string
+  ): readonly Observation<ValuePublicationFrame>[];
 
   /** Let this framework's scheduler run to quiescence. */
   flush(): Promise<void>;
@@ -198,6 +211,62 @@ export function transactionRealizationContract<Tree>(
 
     observed.dispose();
     dispose();
+  });
+
+  it('4c coherent value settlement — own collection reads agree in native observers', async () => {
+    const { tree, dispose } = hooks.createStore();
+    let phase = 'setup';
+    hooks.addRow(tree, { id: 'A', name: 'Original' });
+    await hooks.flush();
+    const observations = hooks.observeValues(tree, () => phase);
+    try {
+      await hooks.flush();
+      phase = 'authoring';
+      const pending = hooks.transact(tree, () => {
+        hooks.writeScalar(tree, 7);
+        hooks.realizeRowName(tree, 'A', 'Proposed');
+      });
+      phase = 'speculative-delivery';
+      await hooks.flush();
+      for (const observed of observations) {
+        expect(observed.current()).toMatchObject({
+          scalar: 7,
+          row: 'Proposed',
+          all: 'Proposed',
+        });
+      }
+
+      phase = 'inside-rollback';
+      pending.rollback();
+      phase = 'after-rollback';
+      await hooks.flush();
+      for (const observed of observations) {
+        const settlement = observed.seen.filter(
+          (frame) =>
+            frame.phase === 'inside-rollback' ||
+            frame.phase === 'after-rollback'
+        );
+        // A silent observer cannot satisfy coherent publication vacuously.
+        expect(settlement.length).toBeGreaterThan(0);
+        for (const frame of settlement) {
+          expect(frame, JSON.stringify(observed.seen)).toMatchObject({
+            scalar: 0,
+            row: 'Original',
+            all: 'Original',
+          });
+        }
+        expect(observed.current()).toMatchObject({
+          scalar: 0,
+          row: 'Original',
+          all: 'Original',
+        });
+      }
+      // No native computed freshness is required inside the authored group.
+      // L13 applies to publication of the completed settlement's own reads.
+    } finally {
+      for (const observed of observations) observed.dispose();
+      dispose();
+    }
   });
 
   // 5 ──────────────────────────────────────────────────────────────────────

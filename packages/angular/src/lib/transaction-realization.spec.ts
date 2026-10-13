@@ -10,6 +10,7 @@ import {
   type ConformanceRow,
   type MixedFrame,
   type Observation,
+  type ValuePublicationFrame,
 } from '../../../kernel/src/transaction-realization-contract';
 import { entityMap, signalTree, transactions } from '../index';
 
@@ -87,6 +88,15 @@ describe('@signal-tree/angular — pending realization conformance', () => {
         scalar: tree.$.scalar(),
         ids: [...tree.$.rows.ids()],
       })),
+
+    observeValues: (tree, phase) => [
+      observe<ValuePublicationFrame>(() => ({
+        phase: phase(),
+        scalar: tree.$.scalar(),
+        row: tree.$.rows.byId('A')?.()?.name,
+        all: tree.$.rows.all().find((row) => row.id === 'A')?.name,
+      })),
+    ],
 
     flush: async () => {
       TestBed.tick();
