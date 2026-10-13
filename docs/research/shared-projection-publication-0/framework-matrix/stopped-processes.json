@@ -1,0 +1,67 @@
+[
+  [
+    "84542",
+    "39432",
+    "node /Users/jonathanborgia/Library/pnpm/.tools/pnpm/10.17.0/node_modules/pnpm/bin/pnpm.cjs nx test angular --testNamePattern=4d owned projection"
+  ],
+  [
+    "86021",
+    "84542",
+    "node ./node_modules/.bin/../nx/dist/bin/nx.js test angular --testNamePattern=4d owned projection"
+  ],
+  [
+    "89520",
+    "86021",
+    "npm exec vitest run --root packages/angular --testNamePattern=4d owned projection"
+  ],
+  [
+    "90955",
+    "89520",
+    "node /Users/jonathanborgia/.codex/worktrees/atomic-capture-proof/signaltree/node_modules/.bin/../vitest/vitest.mjs run --root packages/angular --testNamePattern=4d owned projection"
+  ],
+  [
+    "91958",
+    "90955",
+    "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@esbuild+darwin-arm64@0.25.12/node_modules/@esbuild/darwin-arm64/bin/esbuild --service=0.25.12 --ping"
+  ],
+  [
+    "96769",
+    "90955",
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+  ],
+  [
+    "97187",
+    "90955",
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+  ],
+  [
+    "97193",
+    "90955",
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+  ],
+  [
+    "97197",
+    "90955",
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+  ],
+  [
+    "97200",
+    "90955",
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+  ],
+  [
+    "97203",
+    "90955",
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+  ],
+  [
+    "97205",
+    "90955",
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+  ],
+  [
+    "97208",
+    "90955",
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+  ]
+]

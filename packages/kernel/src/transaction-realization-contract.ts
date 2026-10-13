@@ -50,6 +50,27 @@ export type ValuePublicationFrame = {
   readonly all: string | undefined;
 };
 
+export type EntityProjectionSnapshot = {
+  all: string[];
+  ids: string[];
+  count: number;
+  empty: boolean;
+  map: string[];
+  hasA: boolean;
+  where: string[];
+  find: string | null;
+  slice: string[];
+  activeId: string | null;
+  activeEntity: string | null;
+  row: string | null;
+  field: string | null;
+};
+export type EntityProjectionFrame = {
+  phase: string;
+  scalar: number;
+  projections: EntityProjectionSnapshot | null;
+};
+
 export type MixedFrame = {
   readonly scalar: number;
   readonly ids: readonly string[];
@@ -94,6 +115,13 @@ export type TransactionRealizationHooks<Tree> = {
     tree: Tree,
     phase: () => string
   ): readonly Observation<ValuePublicationFrame>[];
+
+  selectRow(tree: Tree, id: string | undefined): void;
+  observeProjections(
+    tree: Tree,
+    phase: () => string,
+    enabled: () => boolean
+  ): readonly Observation<EntityProjectionFrame>[];
 
   /** Let this framework's scheduler run to quiescence. */
   flush(): Promise<void>;
@@ -268,6 +296,103 @@ export function transactionRealizationContract<Tree>(
       dispose();
     }
   });
+
+  for (const operation of ['add', 'remove', 'field'] as const) {
+    for (const primed of [true, false]) {
+      it(`4d owned projection settlement — ${operation}, ${
+        primed ? 'primed' : 'first read during delivery'
+      }`, async () => {
+        const { tree, dispose } = hooks.createStore();
+        let phase = 'setup';
+        if (operation !== 'add')
+          hooks.addRow(tree, { id: 'A', name: 'Original' });
+        hooks.selectRow(tree, 'A');
+        await hooks.flush();
+        const observations = hooks.observeProjections(
+          tree,
+          () => phase,
+          () =>
+            primed ||
+            phase === 'inside-rollback' ||
+            phase === 'after-rollback' ||
+            phase === 'selection'
+        );
+        const snapshot = (
+          present: boolean,
+          selected: boolean
+        ): EntityProjectionSnapshot => ({
+          all: present ? ['A:Original'] : [],
+          ids: present ? ['A'] : [],
+          count: present ? 1 : 0,
+          empty: !present,
+          map: present ? ['A:Original'] : [],
+          hasA: present,
+          where: present ? ['A:Original'] : [],
+          find: present ? 'A:Original' : null,
+          slice: present ? ['Original'] : [],
+          activeId: selected ? 'A' : null,
+          activeEntity: present && selected ? 'A:Original' : null,
+          row: present ? 'Original' : null,
+          field: present ? 'Original' : null,
+        });
+        try {
+          await hooks.flush();
+          for (const observed of observations) {
+            expect(observed.current().scalar).toBe(0);
+            expect(observed.current().projections).toEqual(
+              primed ? snapshot(operation !== 'add', true) : null
+            );
+          }
+          phase = 'authoring';
+          const pending = hooks.transact(tree, () => {
+            hooks.writeScalar(tree, 7);
+            if (operation === 'add')
+              hooks.addRow(tree, { id: 'A', name: 'Proposed' });
+            else if (operation === 'remove') hooks.removeRow(tree, 'A');
+            else hooks.realizeRowName(tree, 'A', 'Proposed');
+          });
+          phase = 'speculative-delivery';
+          await hooks.flush();
+          for (const observed of observations)
+            expect(observed.current().scalar).toBe(7);
+          phase = 'inside-rollback';
+          pending.rollback();
+          phase = 'after-rollback';
+          await hooks.flush();
+          for (const observed of observations) {
+            const delivered = observed.seen.filter(
+              (frame) =>
+                frame.phase === 'inside-rollback' ||
+                frame.phase === 'after-rollback'
+            );
+            expect(delivered.length).toBeGreaterThan(0);
+            for (const frame of delivered) {
+              expect(frame.scalar).toBe(0);
+              expect(frame.projections, JSON.stringify(observed.seen)).toEqual(
+                snapshot(operation !== 'add', true)
+              );
+            }
+          }
+          phase = 'selection';
+          hooks.selectRow(tree, undefined);
+          await hooks.flush();
+          for (const observed of observations) {
+            const delivered = observed.seen.filter(
+              (frame) => frame.phase === 'selection'
+            );
+            expect(delivered.length).toBeGreaterThan(0);
+            for (const frame of delivered)
+              expect(frame.projections).toEqual(
+                snapshot(operation !== 'add', false)
+              );
+          }
+        } finally {
+          for (const observed of observations) observed.dispose();
+          dispose();
+        }
+      });
+    }
+  }
 
   // 5 ──────────────────────────────────────────────────────────────────────
   it('5 lifetime preservation — a held reference never retargets to a reused business key', async () => {

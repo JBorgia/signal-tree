@@ -8,6 +8,7 @@ import { describe } from 'vitest';
 import {
   transactionRealizationContract,
   type ConformanceRow,
+  type EntityProjectionFrame,
   type MixedFrame,
   type Observation,
   type ValuePublicationFrame,
@@ -28,7 +29,9 @@ const build = () =>
   signalTree(
     {
       scalar: 0,
-      rows: entityMap<ConformanceRow, string>({ selectId: (r) => r.id }),
+      rows: entityMap<ConformanceRow, string>({
+        selectId: (r) => r.id,
+      }).computed('names', (rows) => rows.map((row) => row.name)),
     },
     { enhancers: [transactions()] }
   );
@@ -49,6 +52,38 @@ const observe = <T>(
   );
   return { seen, current: () => latest, dispose: stop };
 };
+
+const projectionFrame = (
+  $: Tree['$'],
+  phase: string,
+  enabled: boolean
+): EntityProjectionFrame => {
+  const scalar = $.scalar.value;
+  if (!enabled) return { phase, scalar, projections: null };
+  const node = $.rows.byId('A');
+  const encode = (row: ConformanceRow | undefined) =>
+    row ? `${row.id}:${row.name}` : null;
+  return {
+    phase,
+    scalar,
+    projections: {
+      all: $.rows.all.value.map((row) => encode(row)!),
+      ids: [...$.rows.ids.value],
+      count: $.rows.count.value,
+      empty: $.rows.empty.value,
+      map: [...$.rows.asMap.value].map(([key, row]) => `${key}:${row.name}`),
+      hasA: $.rows.has('A').value,
+      where: $.rows.where(matchesA).value.map((row) => encode(row)!),
+      find: encode($.rows.find(matchesA).value),
+      slice: [...$.rows.names.value],
+      activeId: $.rows.activeId.value ?? null,
+      activeEntity: encode($.rows.activeEntity.value),
+      row: node?.()?.name ?? null,
+      field: node?.name.value ?? null,
+    },
+  };
+};
+const matchesA = (row: ConformanceRow) => row.id === 'A';
 
 describe('@signal-tree/vue — pending realization conformance', () => {
   transactionRealizationContract<Tree>({
@@ -98,6 +133,12 @@ describe('@signal-tree/vue — pending realization conformance', () => {
         }),
         'sync'
       ),
+    ],
+
+    selectRow: (tree, id) => tree.$.rows.setActiveId(id),
+    observeProjections: (tree, phase, enabled) => [
+      observe(() => projectionFrame(tree.$, phase(), enabled())),
+      observe(() => projectionFrame(tree.$, phase(), enabled()), 'sync'),
     ],
 
     flush: async () => {
