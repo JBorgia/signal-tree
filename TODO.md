@@ -30,6 +30,14 @@ recovery misorders a failed write followed by a captured write. Reviewed first
 failures and portable controls are preserved. No candidate qualifies for runtime
 integration; no broad release suite was restarted.
 
+The [operation-record follow-up](docs/research/operation-record-boundary-0/README.md)
+inventories the explicit installation paths and tests one revised candidate.
+Prepared structural/field records and a shared scalar/entity journal survive the
+prior capture and inspection falsifiers. The expanded observer check exposes an
+existing baseline/candidate stale `all()` projection during settlement despite
+complete physical restoration. This remains red; no complete contract proof,
+runtime integration, broader suites or timing-policy change is claimed.
+
 ## V16 native publication verification — ACTIVE
 
 The isolated [native error recovery repair](docs/research/native-publication-error-recovery-0.md)

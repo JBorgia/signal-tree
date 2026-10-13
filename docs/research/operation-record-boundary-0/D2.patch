@@ -1,0 +1,22 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -2062,7 +2062,7 @@
+     const retained=authority.getPendingTurn(turnId)?.__effects ?? [];
+     for(const effect of folded) {
+       const actual=retained.find(e=>effectKey(e)===effectKey(effect));
+-      if(!actual || actual.kind!==effect.kind || Object.keys(effect).some(k=>k!=='subjectFieldSegments' && k!=='fieldPresence' && (actual as any)[k] !== (effect as any)[k])) {
++      if(!actual || actual.kind!==effect.kind || Object.keys(effect).some(k=>k!=='subjectFieldSegments' && k!=='fieldPresence' && (actual as any)[k] !== (effect as any)[k]) || (effect.kind==='set' && actual.kind==='set' && (JSON.stringify(effect.subjectFieldSegments)!==JSON.stringify(actual.subjectFieldSegments) || JSON.stringify(effect.fieldPresence)!==JSON.stringify(actual.fieldPresence)))) {
+         const refusal=createRollbackError({kind:'effect-validation-failed',pendingTurnId:turnId ?? id,compensation:[],errorMessage:'Installed operation lacks a matching settlement disposition'});
+         publishRefusal(id,refusal);throw refusal;
+       }
+@@ -2953,7 +2953,9 @@
+           const key=effectKey(effect), old=bucket.effects.get(key);
+           if(old && old.kind!=='set')throw new Error('Terminal record conflicts with structural evidence');
+           const combined=old ? {...old,after:next,mutationIntent:combineScalarMutationIntent(old.mutationIntent,effect.mutationIntent)} : effect;
+-          const writes: {map: Map<any,any>;key:unknown;value:unknown}[]=[{map:bucket.effects,key,value:combined}];
++          const records=installedOperations.get(id) ?? [];
++          const operation:OperationRecord={sequence:records.length,owner:position,effects:[cloneTurnEffect(effect)]};
++          const writes: {map: Map<any,any>;key:unknown;value:unknown}[]=[{map:bucket.effects,key,value:combined},{map:installedOperations,key:id,value:[...records,operation]}];
+           if(!bucket.baselineValues.has(position))writes.push({map:bucket.baselineValues,key:position,value:prev});
+           if(pendingTransactions.size>0)for(const key of windowKeys([position],undefined))writes.push({map:bucket.ownWriteSeq,key,value:windowWriteSeq});
+           return {writes,adds:[{set:bucket.positionIds,value:position},{set:bucket.ownerPaths,value:ownerPath ?? path}]};

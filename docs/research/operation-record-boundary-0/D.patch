@@ -1,0 +1,281 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -1638,7 +1638,7 @@
+     // v16 8g): rollback of `x(5); omit g; re-add g` came back with x 5.
+     const effects = settleTurnMemberEffects(
+       tree.$ as object,
+-      Array.from(bucket.effects.values()).map(cloneTurnEffect)
++      Array.from(bucket.effects.values()).filter(Boolean).map(cloneTurnEffect)
+     );
+     bucket.effects.clear();
+     const collectionOrders = Array.from(bucket.collectionOrders.values()).map(
+@@ -2010,6 +2010,10 @@
+     });
+
+
++  // Research operation journal: prepared facts survive independently of diagnostics.
++  type OperationRecord = { sequence: number; owner: number; effects: readonly TurnEffect[] };
++  const installedOperations = new Map<number, readonly OperationRecord[]>();
++  tree.registerCleanup(()=>installedOperations.clear());
+   const sourceCaptureRuntime = getMutationCaptureRuntime(tree);
+   if (sourceCaptureRuntime) {
+     sourceCaptureRuntime.prepareEntityResponsibility = (capture) => {
+@@ -2018,20 +2022,27 @@
+       (globalThis as any).__entityPrepareProbe?.(capture);
+       const bucket = getTransactionBucket(id);
+       const scratch = createCaptureBucket();
+-      for (const [key,effect] of bucket.effects) scratch.effects.set(key, cloneTurnEffect(effect));
++      for (const [key,effect] of bucket.effects) if(effect) scratch.effects.set(key, cloneTurnEffect(effect));
+       for (const [key,value] of bucket.baselineValues) scratch.baselineValues.set(key,value);
++      const effects: TurnEffect[]=[];
+       for (const change of capture.changes) {
+-        if(change.structural) throw new Error('Research boundary requires existing-row replacement');
+-        // Prepare bounded field instructions before state becomes live; rich capture remains later.
+-        const before=change.before as Record<string,unknown>, after=change.after as Record<string,unknown>;
+-        for(const key of new Set([...Object.keys(before),...Object.keys(after)])) {
+-          const beforeValue=before[key],afterValue=after[key];
+-          const beforePresent=Object.prototype.hasOwnProperty.call(before,key),afterPresent=Object.prototype.hasOwnProperty.call(after,key);
+-          if(beforeValue===afterValue && beforePresent===afterPresent) continue;
+-          enqueueEffect(scratch,scratch.effects,{kind:'set',position:capture.owner,ownerPath:capture.ownerPath,path: `${capture.ownerPath}.${key}`,subject:change.subject,subjectFieldSegments:[key],before:beforeValue,after:afterValue,mutationIntent:capture.meta?.mutationIntent,...(!(beforePresent&&afterPresent)?{fieldPresence:{before:beforePresent,after:afterPresent}}:{})});
++        if(change.structuralRecord) effects.push({...change.structuralRecord,position:capture.owner,ownerPath:capture.ownerPath,path:change.path!} as TurnEffect);
++        else {
++          const before=change.before as Record<string,unknown>, after=change.after as Record<string,unknown>;
++          for(const key of new Set([...Object.keys(before),...Object.keys(after)])) {
++            const beforeValue=before[key],afterValue=after[key];
++            const beforePresent=Object.prototype.hasOwnProperty.call(before,key),afterPresent=Object.prototype.hasOwnProperty.call(after,key);
++            if(beforeValue===afterValue && beforePresent===afterPresent) continue;
++            effects.push({kind:'set',position:capture.owner,ownerPath:capture.ownerPath,path: `${change.path}.${key}`,subject:change.subject,subjectFieldSegments:[key],before:beforeValue,after:afterValue,mutationIntent:capture.meta?.mutationIntent,...(!(beforePresent&&afterPresent)?{fieldPresence:{before:beforePresent,after:afterPresent}}:{})});
++          }
+         }
+       }
+-      const writes: {map: Map<any,any>;key: unknown;value: unknown}[]=[];
++      for(const effect of effects)enqueueEffect(scratch,scratch.effects,cloneTurnEffect(effect));
++      const records=installedOperations.get(id) ?? [];
++      const operation:OperationRecord={sequence:records.length,owner:capture.owner,effects};
++      const writes: {map: Map<any,any>;key: unknown;value: unknown}[]=[{map:installedOperations,key:id,value:[...records,operation]}];
++      // Replace the prepared map, including composed-away structural entries.
++      for(const key of bucket.effects.keys()) if(!scratch.effects.has(key)) writes.push({map:bucket.effects,key,value:undefined});
+       for(const [key,value] of scratch.effects) writes.push({map:bucket.effects,key,value});
+       for(const [key,value] of scratch.baselineValues) writes.push({map:bucket.baselineValues,key,value});
+       if(pendingTransactions.size>0) for(const key of windowKeys([capture.owner],capture.changes.map(c=>c.subject))) writes.push({map:bucket.ownWriteSeq,key,value:windowWriteSeq});
+@@ -2039,6 +2050,24 @@
+     };
+     tree.registerCleanup(()=>{ delete sourceCaptureRuntime.prepareEntityResponsibility; });
+   }
++  const validateOperationDisposition = (id:number, turnId:number|undefined):void => {
++    const records=installedOperations.get(id);
++    if(!records?.length)return;
++    const expected=createCaptureBucket();
++    for(let i=0;i<records.length;i++) {
++      if(records[i].sequence!==i)throw new Error('Operation journal sequence gap');
++      for(const effect of records[i].effects)enqueueEffect(expected,expected.effects,cloneTurnEffect(effect));
++    }
++    const folded=settleTurnMemberEffects(tree.$ as object,[...expected.effects.values()].map(cloneTurnEffect));
++    const retained=authority.getPendingTurn(turnId)?.__effects ?? [];
++    for(const effect of folded) {
++      const actual=retained.find(e=>effectKey(e)===effectKey(effect));
++      if(!actual || actual.kind!==effect.kind || Object.keys(effect).some(k=>k!=='subjectFieldSegments' && k!=='fieldPresence' && (actual as any)[k] !== (effect as any)[k])) {
++        const refusal=createRollbackError({kind:'effect-validation-failed',pendingTurnId:turnId ?? id,compensation:[],errorMessage:'Installed operation lacks a matching settlement disposition'});
++        publishRefusal(id,refusal);throw refusal;
++      }
++    }
++  };
+
+   const resolveOwnerPositionId = (ownerPath?: string): number | undefined => {
+     if (!ownerPath) {
+@@ -2108,6 +2137,8 @@
+       meta,
+       registry: getPositionRegistry(tree.$),
+     });
++    const recorded=resolveTransactionId(meta);
++    if(recorded!==undefined && subjectIds?.length && installedOperations.get(recorded)?.some(r=>r.owner===resolvedPositionIds[0]))return;
+     captureEffects(
+       bucket,
+       bucket.effects,
+@@ -3403,6 +3434,7 @@
+       const handle = {
+         [PENDING_TURN_ID]: pendingTurnId,
+         confirm(): void {
++          validateOperationDisposition(transactionId,pendingTurnId);
+           const pendingTurn = authority.getPendingTurn(pendingTurnId);
+           if (destroyed) throw new Error('Cannot settle a destroyed tree');
+           if (settling)
+@@ -3414,6 +3446,7 @@
+             throw new Error('Cannot confirm a rolled back transaction');
+           }
+           lifecycle = 'confirmed';
++            installedOperations.delete(transactionId);
+           // Lifecycle observation: recorded at the transition, before the engine
+           // announcement lets restoration confirm its entry, so every reader it
+           // notifies already sees this transaction settled. Public delivery
+@@ -3482,6 +3515,7 @@
+           }
+         },
+         rollback(): void {
++          validateOperationDisposition(transactionId,pendingTurnId);
+           const pendingTurn = authority.getPendingTurn(pendingTurnId);
+           if (destroyed) throw new Error('Cannot settle a destroyed tree');
+           if (settling)
+@@ -3562,6 +3596,7 @@
+               observerError = error;
+             }
+             lifecycle = 'rejected';
++            installedOperations.delete(transactionId);
+             // Recorded at the transition (compensation installed), before the
+             // engine announcement; delivered after consequences are discarded.
+             retireLifecycleView(transactionId);
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -689,9 +689,25 @@
+     options?: { advancePhysicalRevision?: boolean }
+   ) {
+     const revision=physicalCommitClock?.revision();
+-    const responsibility = frame.mutations.length>0 && frame.mutations.every(m=>m.kind==='replace-value')
+-      ? mutationCaptureRuntime?.prepareEntityResponsibility?.({owner:getPositionIds()?.[0] as number,ownerPath:basePath,meta:ambientMeta(),changes:frame.mutations.map(m=>({subject:m.subjectId,before:valueStore.backingForSubject(m.subjectId),after:(m as PreparedValueReplacement<K,E>).nextValue,structural:false}))})
+-      : undefined;
++    const changes: Array<import('./internals/mutation-capture-runtime').CommittedEntityMutation> = [];
++    const keys = structuralStore.activeKeysSnapshot();
++    let tail = keys.length ? structuralStore.subjectIdForKey(keys[keys.length-1]) : undefined;
++    for (const m of frame.mutations) {
++      const key = 'key' in m ? m.key : structuralStore.activeKeyForSubject(m.subjectId);
++      const before = valueStore.backingForSubject(m.subjectId);
++      const path = `${basePath}.${String(key)}`;
++      if (m.kind === 'replace-value') changes.push({subject:m.subjectId,before,after:m.nextValue,structural:false,path});
++      else if (m.kind === 'create-fresh-subject') {
++        changes.push({subject:m.subjectId,before:undefined,after:m.nextValue,structural:true,path,structuralRecord:{kind:'add',subject:m.subjectId,key:m.key,value:deepClone(m.nextValue),beforeSubject:tail}});
++        tail=m.subjectId;
++      } else if (m.kind === 'tombstone-subject') {
++        const neighbors=getNeighborSubjects(m.key);
++        changes.push({subject:m.subjectId,before,after:undefined,structural:true,path,structuralRecord:{kind:'remove',subject:m.subjectId,key:m.key,value:deepClone(before),...neighbors}});
++      } else if(m.kind === 'transfer-key') {
++        changes.push({subject:m.subjectId,before,after:before,structural:true,path:`${basePath}.${String(m.fromKey)}`,structuralRecord:{kind:'rekey',subject:m.subjectId,beforeKey:m.fromKey,afterKey:m.toKey}});
++      }
++    }
++    const responsibility = changes.length ? mutationCaptureRuntime?.prepareEntityResponsibility?.({owner:getPositionIds()?.[0] as number,ownerPath:basePath,meta:ambientMeta(),changes}) : undefined;
+     if(physicalCommitClock?.revision()!==revision)throw new Error('Entity frame responsibility preparation reentered installation');
+     const result = frame.commit(committedEntityObserver(),responsibility);
+     if (options?.advancePhysicalRevision !== false) {
+@@ -1375,7 +1391,7 @@
+     const revision = physicalCommitClock?.revision();
+     const plan = mutationCaptureRuntime?.prepareEntityResponsibility?.({
+       owner: getPositionIds()?.[0] as number, ownerPath: basePath,
+-      changes: [{subject: subjectId, before: valueStore.backingForSubject(subjectId), after: nextValue, structural: false}],
++      changes: [{subject: subjectId, before: valueStore.backingForSubject(subjectId), after: nextValue, structural: false, path: `${basePath}.${String(structuralStore.activeKeyForSubject(subjectId))}`} ],
+       meta: ambientMeta(),
+     });
+     if (physicalCommitClock?.revision() !== revision) throw new Error('Entity responsibility preparation reentered installation');
+@@ -3490,9 +3506,11 @@
+       membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
+       const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
+       try {
+-        const freshSubjectIds = commitFreshSubjects(
+-          stagedAdds.map(({ id }) => id)
+-        );
++        const freshSubjectIds = structuralStore.planFreshSubjectIds(stagedAdds.length);
++        const frame=createEntityMutationFrame();
++        for(let i=0;i<stagedAdds.length;i++) frame.stageFreshSubject({kind:'create-fresh-subject',key:stagedAdds[i].id,subjectId:freshSubjectIds[i],nextValue:stagedAdds[i].entity});
++        for(const row of stagedUpdates) frame.stageValueReplacement({kind:'replace-value',key:row.id,subjectId:row.subjectId,nextValue:row.finalUpdated});
++        commitAndProjectEntityMutationFrame(frame);
+         const addedSubjectIdsByKey = new Map<K, number>();
+         for (let i = 0; i < stagedAdds.length; i++) {
+           addedSubjectIdsByKey.set(stagedAdds[i].id, freshSubjectIds[i]);
+@@ -3504,8 +3522,7 @@
+           if (subjectId === undefined) {
+             throw new Error(`Entity with id ${String(id)} has no subject id`);
+           }
+-          valueStore.retainSubjectValue(subjectId, transformedEntity);
+-          captureCommittedEntity(subjectId, undefined, transformedEntity, true);
++
+           invalidateNodeCache(id);
+           syncEntitySignal(id);
+           addedEntities.push({ id, entity: transformedEntity, subjectId });
+@@ -3528,7 +3545,7 @@
+         finalUpdated,
+         transformedChanges,
+       } of stagedUpdates) {
+-        commitExistingSubjectValue(subjectId, finalUpdated);
++
+         syncEntitySignal(id);
+         updatedEntities.push({
+           id,
+@@ -3643,15 +3660,9 @@
+       const membershipUnit = membershipTap;
+       membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
+       try {
+-        for (const { id, subjectId, entity } of activeSubjects) {
+-          const currentState = resolveSubjectState(subjectId);
+-          structuralStore.tombstoneSubject(
+-            subjectId,
+-            id,
+-            currentState?.restoreAllowed ?? true
+-          );
+-          captureCommittedEntity(subjectId, entity, undefined, true);
+-        }
++        const frame=createEntityMutationFrame();
++        for (const {id,subjectId} of activeSubjects) frame.stageSubjectTombstone({kind:'tombstone-subject',key:id,subjectId,restoreAllowed:resolveSubjectState(subjectId)?.restoreAllowed ?? true});
++        commitAndProjectEntityMutationFrame(frame);
+       } finally {
+         // Observed once every row is tombstoned, before reactive publication.
+         membershipUnit?.(MEMBERSHIP_CLOSE);
+@@ -3824,7 +3835,7 @@
+       const stagedRemovalStructuralEffects: PendingStructuralEffect[] = [];
+       try {
+         // Index-aligned with `stagedAdds`.
+-        addedSubjectIds = commitFreshSubjects(stagedAdds.map(({ id }) => id));
++        addedSubjectIds = structuralStore.planFreshSubjectIds(stagedAdds.length);
+         for (let k = 0; k < stagedAdds.length; k += 1) {
+           incomingSubjects[stagedAdds[k].index] = addedSubjectIds[k];
+         }
+@@ -3847,27 +3858,13 @@
+           });
+         }
+
+-        for (const { id, subjectId, entity } of stagedRemovals) {
+-          tombstoneSubjectSignal(subjectId);
+-          const currentState = resolveSubjectState(subjectId);
+-          structuralStore.tombstoneSubject(
+-            subjectId,
+-            id,
+-            currentState?.restoreAllowed ?? true
+-          );
+-          captureCommittedEntity(subjectId, entity, undefined, true);
+-        }
+-
+-        for (const { subjectId, entity, prev } of stagedUpdates) {
+-          commitExistingSubjectValue(subjectId, entity);
+-        }
+-
+-        for (let k = 0; k < stagedAdds.length; k += 1) {
+-          const { id, entity } = stagedAdds[k];
+-          valueStore.retainSubjectValue(addedSubjectIds[k], entity);
+-          captureCommittedEntity(addedSubjectIds[k], undefined, entity, true);
+-          syncEntitySignal(id);
+-        }
++        const frame=createEntityMutationFrame();
++        for (const {id,subjectId} of stagedRemovals) frame.stageSubjectTombstone({kind:'tombstone-subject',key:id,subjectId,restoreAllowed:resolveSubjectState(subjectId)?.restoreAllowed ?? true});
++        for (const {id,subjectId,entity} of stagedUpdates) frame.stageValueReplacement({kind:'replace-value',key:id,subjectId,nextValue:entity});
++        for(let k=0;k<stagedAdds.length;k++) frame.stageFreshSubject({kind:'create-fresh-subject',key:stagedAdds[k].id,subjectId:addedSubjectIds[k],nextValue:stagedAdds[k].entity});
++        commitAndProjectEntityMutationFrame(frame);
++        for(const {subjectId} of stagedRemovals) tombstoneSubjectSignal(subjectId);
++        for(const {id} of stagedAdds) syncEntitySignal(id);
+
+         for (const { id } of stagedUpdates) {
+           syncEntitySignal(id);
+--- a/packages/kernel/src/lib/internals/mutation-capture-runtime.ts
++++ b/packages/kernel/src/lib/internals/mutation-capture-runtime.ts
+@@ -1,5 +1,6 @@
+ import { isTraversableNode } from '../utils';
+ import { reportContainedObserverError } from './error-reporter';
++import type { StructuralEffect } from '../mutation-types';
+ import type { WriteMetadata } from '../mutation-types';
+
+ export type CollectionOrderCapture = {
+@@ -26,6 +27,8 @@
+   readonly after: unknown;
+   /** Membership/key changes claim the lifetime, rather than just value fields. */
+   readonly structural: boolean;
++  readonly path?: string;
++  readonly structuralRecord?: StructuralEffect;
+ };
+
+ export type CommittedEntityCapture = {

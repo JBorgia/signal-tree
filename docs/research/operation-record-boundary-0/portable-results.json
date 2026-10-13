@@ -1,0 +1,114 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/operation-record-boundary-0/run.mjs",
+      "D2",
+      "mixed-no-inspect.mjs",
+      "capture-error",
+      "portable-first"
+    ],
+    "expected": 0,
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2\",\"entry\":\"mixed-no-inspect.mjs\",\"control\":\"capture-error\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-operation-record-replay/runs/D2-mixed-no-inspect.mjs-capture-error-portable-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/operation-record-boundary-0/run.mjs",
+      "D2",
+      "mixed-add.mjs",
+      "capture-error",
+      "portable-first"
+    ],
+    "expected": 0,
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2\",\"entry\":\"mixed-add.mjs\",\"control\":\"capture-error\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-operation-record-replay/runs/D2-mixed-add.mjs-capture-error-portable-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/operation-record-boundary-0/run.mjs",
+      "D2",
+      "controls.mjs",
+      "repeat",
+      "portable-first"
+    ],
+    "expected": 0,
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2\",\"entry\":\"controls.mjs\",\"control\":\"repeat\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-operation-record-replay/runs/D2-controls.mjs-repeat-portable-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/operation-record-boundary-0/run.mjs",
+      "D2",
+      "inspection-v2.mjs",
+      "control",
+      "portable-first"
+    ],
+    "expected": 0,
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2\",\"entry\":\"inspection-v2.mjs\",\"control\":\"control\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-operation-record-replay/runs/D2-inspection-v2.mjs-control-portable-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/operation-record-boundary-0/run.mjs",
+      "D2",
+      "disposition.mjs",
+      "rollback",
+      "portable-first"
+    ],
+    "expected": 0,
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2\",\"entry\":\"disposition.mjs\",\"control\":\"rollback\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-operation-record-replay/runs/D2-disposition.mjs-rollback-portable-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/operation-record-boundary-0/run.mjs",
+      "D2",
+      "disposition.mjs",
+      "confirm",
+      "portable-first"
+    ],
+    "expected": 0,
+    "exit": 0,
+    "stdout": "{\"lane\":\"D2\",\"entry\":\"disposition.mjs\",\"control\":\"confirm\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-operation-record-replay/runs/D2-disposition.mjs-confirm-portable-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/operation-record-boundary-0/run.mjs",
+      "base",
+      "routes-observation.mjs",
+      "update-control",
+      "portable-first"
+    ],
+    "expected": 1,
+    "exit": 1,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"routes-observation.mjs\",\"control\":\"update-control\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-operation-record-replay/runs/base-routes-observation.mjs-update-control-portable-first\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/operation-record-boundary-0/run.mjs",
+      "D2",
+      "routes-observation.mjs",
+      "update-control",
+      "portable-first"
+    ],
+    "expected": 1,
+    "exit": 1,
+    "stdout": "{\"lane\":\"D2\",\"entry\":\"routes-observation.mjs\",\"control\":\"update-control\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-operation-record-replay/runs/D2-routes-observation.mjs-update-control-portable-first\"}\n",
+    "stderr": ""
+  }
+]

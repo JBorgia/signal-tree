@@ -1,0 +1,114 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/atomic-capture-boundary-0/run.mjs",
+      "old",
+      "mixed-no-inspect.mjs",
+      "capture-error",
+      "operation-control"
+    ],
+    "expected": 1,
+    "exit": 1,
+    "stdout": "{\"lane\":\"old\",\"entry\":\"mixed-no-inspect.mjs\",\"control\":\"capture-error\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-capture-boundary-replay/runs/old-mixed-no-inspect.mjs-capture-error-operation-control\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/atomic-capture-boundary-0/run.mjs",
+      "B3",
+      "mixed-no-inspect.mjs",
+      "capture-error",
+      "operation-control"
+    ],
+    "expected": 0,
+    "exit": 0,
+    "stdout": "{\"lane\":\"B3\",\"entry\":\"mixed-no-inspect.mjs\",\"control\":\"capture-error\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-capture-boundary-replay/runs/B3-mixed-no-inspect.mjs-capture-error-operation-control\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/atomic-capture-boundary-0/run.mjs",
+      "B3",
+      "mixed-add.mjs",
+      "capture-error",
+      "operation-control"
+    ],
+    "expected": 1,
+    "exit": 1,
+    "stdout": "{\"lane\":\"B3\",\"entry\":\"mixed-add.mjs\",\"control\":\"capture-error\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-capture-boundary-replay/runs/B3-mixed-add.mjs-capture-error-operation-control\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/atomic-capture-boundary-0/run.mjs",
+      "B3",
+      "mixed-add.mjs",
+      "control",
+      "operation-control"
+    ],
+    "expected": 0,
+    "exit": 0,
+    "stdout": "{\"lane\":\"B3\",\"entry\":\"mixed-add.mjs\",\"control\":\"control\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-capture-boundary-replay/runs/B3-mixed-add.mjs-control-operation-control\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/atomic-capture-boundary-0/run.mjs",
+      "C",
+      "controls.mjs",
+      "repeat",
+      "operation-control"
+    ],
+    "expected": 1,
+    "exit": 1,
+    "stdout": "{\"lane\":\"C\",\"entry\":\"controls.mjs\",\"control\":\"repeat\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-capture-boundary-replay/runs/C-controls.mjs-repeat-operation-control\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/atomic-capture-boundary-0/run.mjs",
+      "C",
+      "recovery.mjs",
+      "rollback",
+      "operation-control"
+    ],
+    "expected": 0,
+    "exit": 0,
+    "stdout": "{\"lane\":\"C\",\"entry\":\"recovery.mjs\",\"control\":\"rollback\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-capture-boundary-replay/runs/C-recovery.mjs-rollback-operation-control\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/atomic-capture-boundary-0/run.mjs",
+      "old",
+      "inspection-v2.mjs",
+      "control",
+      "operation-control"
+    ],
+    "expected": 0,
+    "exit": 0,
+    "stdout": "{\"lane\":\"old\",\"entry\":\"inspection-v2.mjs\",\"control\":\"control\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-capture-boundary-replay/runs/old-inspection-v2.mjs-control-operation-control\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/atomic-capture-boundary-0/run.mjs",
+      "B3",
+      "inspection-v2.mjs",
+      "control",
+      "operation-control"
+    ],
+    "expected": 1,
+    "exit": 1,
+    "stdout": "{\"lane\":\"B3\",\"entry\":\"inspection-v2.mjs\",\"control\":\"control\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-capture-boundary-replay/runs/B3-inspection-v2.mjs-control-operation-control\"}\n",
+    "stderr": ""
+  }
+]
