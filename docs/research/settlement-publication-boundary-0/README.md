@@ -1,5 +1,9 @@
 # Vue collection publication boundary
 
+Follow-up: the owner-authorized SDK experiment was tested and remains rejected;
+see [P3 result](P3-RESULT.md) for its two independently reproduced counterexamples.
+The original record below preserves the earlier pending decision and first results.
+
 Runtime baseline: `19a5bd034d5ebef262f637c397bb41fe50a6a1e3`.
 D2 evidence checkpoint: `9e54b3d36eaeb0ef6e37e5bcf8c981141a4bcbfc`.
 D2 remains a research overlay; its patch and reviewed results are unchanged.

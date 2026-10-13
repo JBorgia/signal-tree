@@ -1,5 +1,5 @@
 import {createRequire} from 'node:module';
-import {readFileSync,writeFileSync,mkdirSync,existsSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdirSync,existsSync,mkdtempSync} from 'node:fs';
 import {resolve,dirname,extname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
@@ -10,15 +10,16 @@ const oldRoot='@proof';
 const deps=process.env.ST_PROOF_DEPS || root;
 const require=createRequire(deps+'/package.json'),{build}=require('esbuild');
 const [lane,entry,control='suite',label='first']=process.argv.slice(2);
-if(!['base','D2','P','P2','DP','DP2'].includes(lane))throw Error('Unknown lane');
+if(!['base','D2','P','P2','DP','DP2','P3','DP3'].includes(lane))throw Error('Unknown lane');
 const probe=[resolve(dir,entry),resolve(dir,'../operation-record-boundary-0',entry),resolve(dir,'../atomic-capture-boundary-0',entry)].find(existsSync);
 if(!/^[a-z0-9-]+\.mjs$/.test(entry)||!probe)throw Error('Unknown probe');
 const evidence=process.env.ST_PROOF_OUTPUT || '/private/tmp/st-publication-replay';
-const candidate=resolve(evidence,lane);
+mkdirSync(evidence,{recursive:true});
+const candidate=mkdtempSync(resolve(evidence,lane+'-'));
 const base='19a5bd034d5ebef262f637c397bb41fe50a6a1e3';
 const git=(args,cwd=root)=>{const r=spawnSync('git',args,{cwd,encoding:'utf8'});if(r.status!==0)throw Error(r.stderr||r.stdout);return r.stdout;};
 const capture=['../atomic-installation-capture-0/candidate.patch','../atomic-capture-boundary-0/B.patch','../atomic-capture-boundary-0/B2.patch','../atomic-capture-boundary-0/B3.patch','../operation-record-boundary-0/D.patch','../operation-record-boundary-0/D2.patch'];
-const patches=[...(['D2','DP','DP2'].includes(lane)?capture:[]),...(['P','DP'].includes(lane)?['P.patch']:['P2','DP2'].includes(lane)?['P2.patch']:[])].map(p=>resolve(dir,p));
+const patches=[...(['D2','DP','DP2','DP3'].includes(lane)?capture:[]),...(['P','DP'].includes(lane)?['P.patch']:['P2','DP2'].includes(lane)?['P2.patch']:['P3','DP3'].includes(lane)?['P3.patch']:[])].map(p=>resolve(dir,p));
 const files=new Set(patches.flatMap(f=>[...readFileSync(f,'utf8').matchAll(/^--- a\/(.+)$/gm)].map(m=>m[1])));
 for(const rel of files){const f=resolve(candidate,rel);mkdirSync(dirname(f),{recursive:true});writeFileSync(f,git(['show',base+':'+rel]));}
 for(const patch of patches)git(['apply',patch],candidate);
