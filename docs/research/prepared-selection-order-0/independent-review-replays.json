@@ -1,0 +1,262 @@
+[
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "base",
+      "review-order-cross.mjs",
+      "normal",
+      "primary-review"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"review-order-cross.mjs\",\"control\":\"normal\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/base-review-order-cross.mjs-normal-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "base",
+      "review-order-cross.mjs",
+      "throw",
+      "primary-review"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"review-order-cross.mjs\",\"control\":\"throw\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/base-review-order-cross.mjs-throw-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "base",
+      "review-order-cross-diagnostic.mjs",
+      "throw",
+      "primary-review"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"review-order-cross-diagnostic.mjs\",\"control\":\"throw\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/base-review-order-cross-diagnostic.mjs-throw-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "base",
+      "review-order-late-subject.mjs",
+      "throw",
+      "primary-review"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"base\",\"entry\":\"review-order-late-subject.mjs\",\"control\":\"throw\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/base-review-order-late-subject.mjs-throw-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "DSK1",
+      "review-order-cross.mjs",
+      "normal",
+      "primary-review"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-order-cross.mjs\",\"control\":\"normal\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/DSK1-review-order-cross.mjs-normal-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "DSK1",
+      "review-order-cross.mjs",
+      "throw",
+      "primary-review"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-order-cross.mjs\",\"control\":\"throw\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/DSK1-review-order-cross.mjs-throw-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "DSK1",
+      "review-order-cross-diagnostic.mjs",
+      "throw",
+      "primary-review"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-order-cross-diagnostic.mjs\",\"control\":\"throw\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/DSK1-review-order-cross-diagnostic.mjs-throw-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "DSK1",
+      "review-order-late-subject.mjs",
+      "throw",
+      "primary-review"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"DSK1\",\"entry\":\"review-order-late-subject.mjs\",\"control\":\"throw\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/DSK1-review-order-late-subject.mjs-throw-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OA",
+      "review-order-cross.mjs",
+      "normal",
+      "primary-review"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OA\",\"entry\":\"review-order-cross.mjs\",\"control\":\"normal\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OA-review-order-cross.mjs-normal-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OA",
+      "review-order-cross.mjs",
+      "throw",
+      "primary-review"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"OA\",\"entry\":\"review-order-cross.mjs\",\"control\":\"throw\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OA-review-order-cross.mjs-throw-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OA",
+      "review-order-cross-diagnostic.mjs",
+      "throw",
+      "primary-review"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"OA\",\"entry\":\"review-order-cross-diagnostic.mjs\",\"control\":\"throw\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OA-review-order-cross-diagnostic.mjs-throw-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OA",
+      "review-order-late-subject.mjs",
+      "throw",
+      "primary-review"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"OA\",\"entry\":\"review-order-late-subject.mjs\",\"control\":\"throw\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OA-review-order-late-subject.mjs-throw-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OB",
+      "review-order-cross.mjs",
+      "normal",
+      "primary-review"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OB\",\"entry\":\"review-order-cross.mjs\",\"control\":\"normal\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OB-review-order-cross.mjs-normal-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OB",
+      "review-order-cross.mjs",
+      "throw",
+      "primary-review"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"OB\",\"entry\":\"review-order-cross.mjs\",\"control\":\"throw\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OB-review-order-cross.mjs-throw-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OB",
+      "review-order-cross-diagnostic.mjs",
+      "throw",
+      "primary-review"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"OB\",\"entry\":\"review-order-cross-diagnostic.mjs\",\"control\":\"throw\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OB-review-order-cross-diagnostic.mjs-throw-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OB",
+      "review-order-late-subject.mjs",
+      "throw",
+      "primary-review"
+    ],
+    "exit": 1,
+    "stdout": "{\"lane\":\"OB\",\"entry\":\"review-order-late-subject.mjs\",\"control\":\"throw\",\"exit\":1,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OB-review-order-late-subject.mjs-throw-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OAP",
+      "review-order-cross.mjs",
+      "normal",
+      "primary-review"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAP\",\"entry\":\"review-order-cross.mjs\",\"control\":\"normal\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OAP-review-order-cross.mjs-normal-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OAP",
+      "review-order-cross.mjs",
+      "throw",
+      "primary-review"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAP\",\"entry\":\"review-order-cross.mjs\",\"control\":\"throw\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OAP-review-order-cross.mjs-throw-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OAP",
+      "review-order-cross-diagnostic.mjs",
+      "throw",
+      "primary-review"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAP\",\"entry\":\"review-order-cross-diagnostic.mjs\",\"control\":\"throw\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OAP-review-order-cross-diagnostic.mjs-throw-primary-review\"}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "node",
+      "docs/research/prepared-selection-order-0/run.mjs",
+      "OAP",
+      "review-order-late-subject.mjs",
+      "throw",
+      "primary-review"
+    ],
+    "exit": 0,
+    "stdout": "{\"lane\":\"OAP\",\"entry\":\"review-order-late-subject.mjs\",\"control\":\"throw\",\"exit\":0,\"stable\":true,\"out\":\"/private/tmp/st-prepared-selection-replay/runs/OAP-review-order-late-subject.mjs-throw-primary-review\"}\n",
+    "stderr": ""
+  }
+]

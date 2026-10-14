@@ -1,0 +1,24 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -588,6 +588,11 @@
+         try {
+           structuralStore.installPreparedTarget(structuralTarget);
+           valueStore.installPreparedTargetValues(valueTarget);
++          // Selection belongs to the installed unit. Replay taps may author
++          // newer selections; publication must never overwrite those writes.
++          if (activeIdBefore !== activeIdAfter) {
++            replaceLocation(activeIdSignal, activeIdAfter);
++          }
+         } finally {
+           tap?.(MEMBERSHIP_CLOSE);
+         }
+@@ -650,9 +655,6 @@
+           else if (kind === 'remove') emitTap('onRemove', key, beforeValue as E);
+           else if (!kind && !deepEqual(beforeValue, afterValue))
+             emitTap('onUpdate', key, afterValue as E, afterValue as E);
+-        }
+-        if (activeIdBefore !== activeIdAfter) {
+-          replaceLocation(activeIdSignal, activeIdAfter);
+         }
+         updateSignals();
+         if (options?.advancePhysicalRevision !== false) {
