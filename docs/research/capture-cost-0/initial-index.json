@@ -1,0 +1,18 @@
+{
+  "entries": 440,
+  "archiveSha256": "469d2d98a9cf347d43be7b96707da450f8b9444eb5ed51d8207e24c6ed6caf8f",
+  "snapshots": [
+    {
+      "file": "baseline-idle32-leaf128.heapsnapshot.xz",
+      "original": "/private/tmp/st-cost-performance/baseline-idle32-leaf128.heapsnapshot",
+      "sha256": "4f1d5b69aa038bb605f41d8beb706b4e02b8cb49953ae5e4f216b713936e6a70",
+      "compressedSha256": "07ad0d4d521b0d6933fac257edde2b05f8bbee1fa1c3afbbc687d798d99952c7"
+    },
+    {
+      "file": "candidate-idle32-leaf128.heapsnapshot.xz",
+      "original": "/private/tmp/st-cost-performance/candidate-idle32-leaf128.heapsnapshot",
+      "sha256": "a6932520eca07371283f87295e69278fe0dc0987631f3ac9da7e662e763109b9",
+      "compressedSha256": "baae63f4d1dcb9b899a01ee59b811637c96f59c62c48e4a4c7a2081a7b9156a6"
+    }
+  ]
+}

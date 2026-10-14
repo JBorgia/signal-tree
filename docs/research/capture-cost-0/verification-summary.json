@@ -1,0 +1,235 @@
+{
+  "identity": "identity.json",
+  "portable": {
+    "passed": 37,
+    "unchanged": true
+  },
+  "positiveWork": {
+    "cases": 36,
+    "exit": 0,
+    "manifest": "positive-work/runs/CPRF-operation-work-v2.mjs-suite-G1-positive-first/manifest.json",
+    "assertions": "exact2source seams, linked append==authored k, positive map/index/lookup counters and unchanged useful state assertions"
+  },
+  "focused": {
+    "ordinaryPassedExecutions": 616,
+    "note": "overlap across batches intentional"
+  },
+  "preflight": {
+    "typecheck": "pass",
+    "specTypes": "pass",
+    "frameworkLint": "pass"
+  },
+  "fullSuites": [
+    {
+      "label": "kernel-full",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "seconds": 398.517,
+      "counts": [
+        "Test Files  424 passed (424)",
+        "Tests  5728 passed | 12 expected fail | 12 skipped (5752)"
+      ]
+    },
+    {
+      "label": "angular-full",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "angular",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "seconds": 38.726,
+      "counts": [
+        "Test Files  33 passed | 1 skipped (34)",
+        "Tests  237 passed | 3 skipped (240)"
+      ]
+    },
+    {
+      "label": "react-full",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "react",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "seconds": 18.363,
+      "counts": [
+        "Test Files  9 passed (9)",
+        "Tests  74 passed (74)"
+      ]
+    },
+    {
+      "label": "vue-full",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "vue",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "seconds": 14.544,
+      "counts": [
+        "Test Files  19 passed (19)",
+        "Tests  172 passed (172)"
+      ]
+    },
+    {
+      "label": "solid-full",
+      "command": [
+        "pnpm",
+        "nx",
+        "test",
+        "solid",
+        "--maxWorkers=1"
+      ],
+      "exit": 0,
+      "seconds": 15.026,
+      "counts": [
+        "Test Files  11 passed (11)",
+        "Tests  104 passed (104)"
+      ]
+    }
+  ],
+  "negativeControl": {
+    "source": "4101f085 intrinsic-mutation.ts only with unchanged G1 tests",
+    "failed": 1,
+    "passed": 10,
+    "failure": "shared getter identity assertion",
+    "exactRestored": true
+  },
+  "artifactGates": [
+    {
+      "label": "bundle-budget",
+      "command": [
+        "node",
+        "tools/check-bundle-budget.mjs"
+      ],
+      "exit": 1,
+      "seconds": 0.291
+    },
+    {
+      "label": "size-report",
+      "command": [
+        "node",
+        "tools/size-report.mjs",
+        "--json"
+      ],
+      "exit": 0,
+      "seconds": 0.396
+    },
+    {
+      "label": "api",
+      "command": [
+        "node",
+        "tools/api-inventory.mjs",
+        "--check"
+      ],
+      "exit": 0,
+      "seconds": 2.789
+    },
+    {
+      "label": "api-callable",
+      "command": [
+        "node",
+        "tools/api-callable-inventory.mjs",
+        "--check"
+      ],
+      "exit": 0,
+      "seconds": 1.345
+    },
+    {
+      "label": "lint-budget",
+      "command": [
+        "node",
+        "tools/check-lint-budget.mjs"
+      ],
+      "exit": 0,
+      "seconds": 29.211
+    },
+    {
+      "label": "doc-links",
+      "command": [
+        "node",
+        "tools/check-doc-links.mjs"
+      ],
+      "exit": 0,
+      "seconds": 0.604
+    },
+    {
+      "label": "demo-production",
+      "command": [
+        "pnpm",
+        "nx",
+        "build",
+        "demo",
+        "--configuration=production",
+        "--base-href=/",
+        "--skip-nx-cache"
+      ],
+      "exit": 1,
+      "seconds": 16.042
+    }
+  ],
+  "globalLint": {
+    "warnings": 19,
+    "recorded": 19,
+    "errors": 0,
+    "pass": true
+  },
+  "sizeDelta": {
+    "signaltree-bare-prod": {
+      "originalGzipBytes": 11920,
+      "optimizedGzipBytes": 11930,
+      "deltaGzipBytes": 10,
+      "originalMinifiedBytes": 35453,
+      "optimizedMinifiedBytes": 35434,
+      "deltaMinifiedBytes": -19
+    },
+    "signaltree-bare-dev": {
+      "originalGzipBytes": 14322,
+      "optimizedGzipBytes": 14334,
+      "deltaGzipBytes": 12,
+      "originalMinifiedBytes": 41783,
+      "optimizedMinifiedBytes": 41764,
+      "deltaMinifiedBytes": -19
+    },
+    "signaltree-entities-prod": {
+      "originalGzipBytes": 27419,
+      "optimizedGzipBytes": 27431,
+      "deltaGzipBytes": 12,
+      "originalMinifiedBytes": 91558,
+      "optimizedMinifiedBytes": 91539,
+      "deltaMinifiedBytes": -19
+    },
+    "signaltree-entities-dev": {
+      "originalGzipBytes": 30284,
+      "optimizedGzipBytes": 30295,
+      "deltaGzipBytes": 11,
+      "originalMinifiedBytes": 99209,
+      "optimizedMinifiedBytes": 99190,
+      "deltaMinifiedBytes": -19
+    }
+  },
+  "demo": {
+    "initialKB": 565.08,
+    "ceilingKB": 550,
+    "failed": true
+  },
+  "sourceUnchanged": true,
+  "optimizedPackage": "/private/tmp/st-cost-getters/optimized-package",
+  "artifactHashes": "optimized-artifact-hashes.json",
+  "elapsedLimit": "kernel398.517s first run, no retry; prior run193.61s. Host compression/contention observed; this suite elapsed is not a G1 performance attribution.",
+  "cpuReleased": true,
+  "noCommit": true
+}

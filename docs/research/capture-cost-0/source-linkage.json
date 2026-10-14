@@ -1,0 +1,12 @@
+{
+  "baseline": "19a5bd034d5ebef262f637c397bb41fe50a6a1e3",
+  "preservedCandidateBranch": "codex/atomic-capture-proof",
+  "preservedCandidateSha": "4101f0858387ed051b7041ff60c9ec90a56318da",
+  "experimentBranch": "codex/capture-cost-g1",
+  "experimentSourceSha": "272a4018eb169c734b14ea845128ca7d9f7af762",
+  "verifiedSourceHashes": {
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "2fb613604d06ff4982849a03007cb29a1cce53b583e5789cdfda55ad0b44e54e",
+    "packages/kernel/src/lib/internals/intrinsic-mutation-pay-for-use.spec.ts": "52fbe6757c711b19c45e5f60ce0264a52e993aecb4d7beadae7e658f4b7d948b"
+  },
+  "qualification": "Source matches tested dirty candidate exactly; evidence commit does not change runtime. Cost acceptance remains conditional."
+}
