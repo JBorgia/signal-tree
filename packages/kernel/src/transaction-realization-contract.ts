@@ -2,6 +2,13 @@ import { expect, it } from 'vitest';
 
 import type { PendingTransaction } from './enhancers/transactions/transactions.types';
 
+function required<T>(value: T | null | undefined): T {
+  if (value === undefined || value === null) {
+    throw new Error('Missing required test value');
+  }
+  return value;
+}
+
 /**
  * PROPOSAL-REALIZATION-CONFORMANCE — PROPOSAL-0 Phase B.
  *
@@ -433,13 +440,13 @@ export function transactionRealizationContract<Tree>(
           const rowA = entries.find((entry) => entry.key === 'A');
           const matches = entries.filter((entry) => entry.id === 'A');
           return {
-            all: entries.map((entry) => encode(entry)!),
+            all: entries.map((entry) => `${entry.id}:${entry.name}`),
             ids: entries.map((entry) => entry.key),
             count: entries.length,
             empty: entries.length === 0,
             map: entries.map((entry) => `${entry.key}:${entry.name}`),
             hasA: rowA !== undefined,
-            where: matches.map((entry) => encode(entry)!),
+            where: matches.map((entry) => `${entry.id}:${entry.name}`),
             find: encode(matches[0]),
             slice: entries.map((entry) => entry.name),
             activeId: selected,
@@ -500,7 +507,7 @@ export function transactionRealizationContract<Tree>(
             pending.rollback();
             scalar = 0;
             await check([original]);
-            expect(held!.current()?.name).toBe('Original');
+            expect(required(held).current()?.name).toBe('Original');
           } else if (scenario === 'new lifetime at reused key') {
             change('remove', () => hooks.removeRow(tree, 'A'));
             await check([]);
@@ -508,7 +515,7 @@ export function transactionRealizationContract<Tree>(
               hooks.addRow(tree, { id: 'A', name: 'Impostor' })
             );
             await check([{ key: 'A', id: 'A', name: 'Impostor' }]);
-            expect(held!.current()).toBeUndefined();
+            expect(required(held).current()).toBeUndefined();
           } else if (scenario === 'selection while absent') {
             change('select B', () => hooks.selectRow(tree, 'B'));
             await check([], 'B');
@@ -526,12 +533,12 @@ export function transactionRealizationContract<Tree>(
           } else if (scenario === 'selected rekey') {
             change('rekey', () => hooks.rekeyRow(tree, 'A', 'X'));
             await check([{ ...original, key: 'X' }], 'X');
-            expect(held!.current()?.name).toBe('Original');
+            expect(required(held).current()?.name).toBe('Original');
             change('write rekeyed lifetime', () =>
               hooks.realizeRowName(tree, 'X', 'Updated')
             );
             await check([{ ...original, key: 'X', name: 'Updated' }], 'X');
-            expect(held!.current()?.name).toBe('Updated');
+            expect(required(held).current()?.name).toBe('Updated');
           } else {
             change('add unrelated B', () =>
               hooks.addRow(tree, { id: 'B', name: 'Other' })
@@ -541,16 +548,16 @@ export function transactionRealizationContract<Tree>(
               hooks.realizeRowName(tree, 'B', 'Changed')
             );
             await check([original, { key: 'B', id: 'B', name: 'Changed' }]);
-            expect(held!.current()?.name).toBe('Original');
+            expect(required(held).current()?.name).toBe('Original');
             change('remove unrelated B', () => hooks.removeRow(tree, 'B'));
             await check([original]);
-            held!.dispose();
-            const heldCount = held!.seen.length;
+            required(held).dispose();
+            const heldCount = required(held).seen.length;
             change('after held disposal', () =>
               hooks.realizeRowName(tree, 'A', 'After disposal')
             );
             await check([{ ...original, name: 'After disposal' }]);
-            expect(held!.seen.length).toBe(heldCount);
+            expect(required(held).seen.length).toBe(heldCount);
           }
         } finally {
           held?.dispose();

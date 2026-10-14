@@ -23,6 +23,13 @@ import {
 } from '../index';
 import { createVueObservationAdapter } from './vue-observation';
 
+function required<T>(value: T | null | undefined): T {
+  if (value === undefined || value === null) {
+    throw new Error('Missing required test value');
+  }
+  return value;
+}
+
 type Row = { id: string; value: number };
 const build = () => {
   const tree = signalTree(
@@ -44,10 +51,14 @@ describe('Vue owned collection publication', () => {
     const held = tree.$.left.all;
     const effects: number[] = [];
     const watched: number[] = [];
-    const runner = effect(() => effects.push(held.value[0]!.value));
-    const stopWatch = watch(held, (rows) => watched.push(rows[0]!.value), {
-      flush: 'sync',
-    });
+    const runner = effect(() => effects.push(required(held.value[0]).value));
+    const stopWatch = watch(
+      held,
+      (rows) => watched.push(required(rows[0]).value),
+      {
+        flush: 'sync',
+      }
+    );
     try {
       expect(held).toBe(tree.$.left.all);
       expect(isRef(held)).toBe(true);
@@ -59,7 +70,7 @@ describe('Vue owned collection publication', () => {
       await nextTick();
       expect(effects).toContain(1);
       expect(watched).toContain(1);
-      expect(held.value[0]!.value).toBe(1);
+      expect(required(held.value[0]).value).toBe(1);
     } finally {
       stop(runner);
       stopWatch();
@@ -77,8 +88,8 @@ describe('Vue owned collection publication', () => {
           phase,
           values: [
             tree.$.scalar.value,
-            tree.$.left.all.value[0]!.value,
-            tree.$.right.all.value[0]!.value,
+            required(tree.$.left.all.value[0]).value,
+            required(tree.$.right.all.value[0]).value,
           ],
         });
       },
@@ -152,13 +163,13 @@ describe('Vue owned collection publication', () => {
       phase = 'after-rollback';
       expect(reentered).toBe(true);
       expect(reads).toHaveLength(1);
-      expect(reads[0]!.held).toBe(reads[0]!.before);
-      expect(reads[0]!.native).toBe(reads[0]!.nativeBefore);
+      expect(required(reads[0]).held).toBe(required(reads[0]).before);
+      expect(required(reads[0]).native).toBe(required(reads[0]).nativeBefore);
       expect(nested).toBeDefined();
-      nested!.confirm();
+      required(nested).confirm();
       await nextTick();
       expect(tree.$.left.byId('A')?.()?.value).toBe(9);
-      expect(held.value[0]!.value).toBe(9);
+      expect(required(held.value[0]).value).toBe(9);
     } finally {
       dispose();
       tree.destroy();
@@ -174,7 +185,7 @@ describe('Vue owned collection publication', () => {
     let useLeft = true;
     let leftValue = 1;
     let rightValue = 2;
-    const cell = adapter.createReadonlyCell!(() => {
+    const cell = required(adapter.createReadonlyCell).call(adapter, () => {
       choice.observe();
       if (useLeft) {
         left.observe();
@@ -225,7 +236,7 @@ describe('Vue owned collection publication', () => {
     const adapter = createVueObservationAdapter();
     const token = adapter.createToken();
     let evaluations = 0;
-    const cell = adapter.createReadonlyCell!(() => {
+    const cell = required(adapter.createReadonlyCell).call(adapter, () => {
       token.observe();
       return ++evaluations;
     }) as unknown as ComputedRef<number>;
@@ -342,7 +353,9 @@ describe('Vue owned collection publication', () => {
     const adapter = createVueObservationAdapter();
     const token = adapter.createToken();
     let computes = 0;
-    const owned = adapter.createReadonlyCell!(() => ({ value: ++computes }));
+    const owned = required(adapter.createReadonlyCell).call(adapter, () => ({
+      value: ++computes,
+    }));
     const initial = owned();
     const rows: { same: boolean; sameInitial: boolean }[] = [];
     const dispose = watchEffect(

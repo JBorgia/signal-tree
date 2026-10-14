@@ -72,7 +72,7 @@ const projectionFrame = (
     phase,
     scalar,
     projections: {
-      all: $.rows.all().map((row) => encode(row)!),
+      all: $.rows.all().map((row) => `${row.id}:${row.name}`),
       ids: [...$.rows.ids()],
       count: $.rows.count(),
       empty: $.rows.empty(),
@@ -80,7 +80,7 @@ const projectionFrame = (
       hasA: $.rows.has('A')(),
       where: $.rows
         .where(matchesA)()
-        .map((row) => encode(row)!),
+        .map((row) => `${row.id}:${row.name}`),
       find: encode($.rows.find(matchesA)()),
       slice: [...$.rows.names()],
       activeId: $.rows.activeId() ?? null,

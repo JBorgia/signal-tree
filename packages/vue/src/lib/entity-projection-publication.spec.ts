@@ -8,6 +8,13 @@ import {
   type PendingTransaction,
 } from '../index';
 
+function required<T>(value: T | null | undefined): T {
+  if (value === undefined || value === null) {
+    throw new Error('Missing required test value');
+  }
+  return value;
+}
+
 type Row = { id: string; v: number };
 const build = () =>
   signalTree(
@@ -292,12 +299,12 @@ describe('Vue entity projection publication', () => {
       phase = 'after';
       expect(entered).toBe(true);
       expect(inside).toHaveLength(1);
-      expect(inside[0]!.after).toBe(inside[0]!.before);
-      expect(inside[0]!.direct).toBe(9);
+      expect(required(inside[0]).after).toBe(required(inside[0]).before);
+      expect(required(inside[0]).direct).toBe(9);
       expect(nested).toBeDefined();
-      nested!.confirm();
+      required(nested).confirm();
       await nextTick();
-      expect(held.value[0]!.v).toBe(9);
+      expect(required(held.value[0]).v).toBe(9);
       expect(rows.activeEntity.value?.v).toBe(9);
     } finally {
       dispose();
