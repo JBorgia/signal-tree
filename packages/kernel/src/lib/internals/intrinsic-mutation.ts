@@ -68,6 +68,22 @@ interface SourceRecord {
  */
 const SOURCES = new WeakMap<object, SourceRecord>();
 
+// Accessor functions are shared; all mutable observer and preparation state
+// stays on the individual source. Per-source closures otherwise retain an
+// unnecessary context and accessor functions even on an unobserved leaf.
+const SOURCE_ACCESSORS: PropertyDescriptorMap = {
+  prepareTerminal: {
+    get(this: SourceRecord) { return this.terminalPreparer; },
+  },
+  terminal: {
+    get(this: SourceRecord) { return this.terminalRecord?.observer; },
+  },
+  capture: {
+    get(this: SourceRecord) { return this.captureRecord?.observer; },
+  },
+};
+
+
 /**
  * One observer must not be able to starve another after truth has committed,
  * so a throwing observer is contained — including when it is the only one.
@@ -135,9 +151,7 @@ export function registerIntrinsicMutationSource<T = unknown>(
   node: object
 ): IntrinsicMutationSource<T> {
   const record: SourceRecord = { observers: undefined, observer: undefined };
-  Object.defineProperty(record, 'prepareTerminal', {get: () => record.terminalPreparer});
-  Object.defineProperty(record, 'terminal', {get: () => record.terminalRecord?.observer});
-  Object.defineProperty(record, 'capture', {get: () => record.captureRecord?.observer});
+  Object.defineProperties(record, SOURCE_ACCESSORS);
   SOURCES.set(node, record);
   return record as IntrinsicMutationSource<T>;
 }
