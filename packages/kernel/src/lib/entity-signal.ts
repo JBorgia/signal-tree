@@ -3804,7 +3804,7 @@ export function createEntitySignal<
       // unit; a throw still closes it.
       const membershipUnit = membershipTap;
       membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
-      let addedSubjectIds: number[];
+      let addedSubjectIds: readonly number[];
       let afterSubjects: number[];
       const stagedRemovalStructuralEffects: PendingStructuralEffect[] = [];
       try {
