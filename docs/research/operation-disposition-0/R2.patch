@@ -1,0 +1,109 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -2400,14 +2400,16 @@
+   };
+ 
+   const rollbackPendingTarget = (
+-    effects: TurnEffect[],
++    effects: readonly ReversalEffect[],
+     orderDeltas: CollectionOrderDelta[],
+     completion?: { selected: boolean; committed: boolean }
+   ): void => {
+     if (completion) completion.selected = true;
+     const reversalEffects = placeFieldReversalsWhileRowsExist(
+-      effects.map(toRollbackEffect)
++      effects
+     );
++    const notifier = getPathNotifier();
++    const treeOwnerId = getPositionRegistry(tree.$)?.id;
+     const bindings = new Map<number, CollectionTransitionTargetBinding>();
+     visitTree(tree.$, (node) => {
+       const binding = (
+@@ -2627,7 +2629,7 @@
+     // v16 8e).
+     beginStructuralWrite();
+     openPhysicalRows(positionRegistry);
+-    let result: ReturnType<typeof rollbackPendingTurnAt> | { ok: true };
++    let result: ReturnType<typeof rollbackPendingTurnAt>;
+     let failed = true;
+     try {
+       // Path observers see what the tree exposes, never a location's
+@@ -2648,41 +2650,44 @@
+             // that spreads `getActiveWriteContext()` carries the namespace.
+             ownerId: positionRegistry?.id,
+           },
+-          () => {
+-            if (
+-              orderDeltas.length > 0 ||
+-              (effects.some(e => e.kind === 'set' && e.subject === undefined) && effects.some(e => e.subject !== undefined)) ||
+-              requiresDeclarativeStructuralTarget(
+-                effects.map(toRollbackEffect),
+-                (owner) => {
+-                  let binding: CollectionTransitionTargetBinding | undefined;
+-                  visitTree(tree.$, (node) => {
+-                    const candidate = (
+-                      node as {
+-                        __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+-                      }
+-                    ).__prepareTransitionTarget;
+-                    if (candidate?.owner === owner) binding = candidate;
+-                    return undefined;
+-                  });
+-                  return binding?.readSource();
++          () => rollbackPendingTurnAt({
++            authority: authorityPosition,
++            turnId: transactionId,
++            store,
++            topology: positionRegistry,
++            realizationContext,
++            port: {
++              // Keep the established normalized admission and discard path.
++              // Only the physical application route is replaced.
++              validateEffects: (normalized) => realizationPort.validateEffects?.(normalized),
++              applyAtomically(normalized): void {
++                if (
++                  orderDeltas.length > 0 ||
++                  (normalized.some(e => e.subjectId === undefined) && normalized.some(e => e.subjectId !== undefined)) ||
++                  requiresDeclarativeStructuralTarget(
++                    normalized,
++                    (owner) => {
++                      let binding: CollectionTransitionTargetBinding | undefined;
++                      visitTree(tree.$, (node) => {
++                        const candidate = (
++                          node as {
++                            __prepareTransitionTarget?: CollectionTransitionTargetBinding;
++                          }
++                        ).__prepareTransitionTarget;
++                        if (candidate?.owner === owner) binding = candidate;
++                        return undefined;
++                      });
++                      return binding?.readSource();
++                    }
++                  )
++                ) {
++                  rollbackPendingTarget(normalized, orderDeltas, completion);
++                } else {
++                  realizationPort.applyAtomically(normalized);
+                 }
+-              )
+-            ) {
+-              const refusal = realizationPort.validateEffects?.(placeFieldReversalsWhileRowsExist(effects.map(toRollbackEffect)));
+-              if (refusal) return { ok: false as const, refusal };
+-              rollbackPendingTarget(effects, orderDeltas, completion);
+-              return { ok: true as const };
+-            }
+-            return rollbackPendingTurnAt({
+-              authority: authorityPosition,
+-              turnId: transactionId,
+-              store,
+-              topology: positionRegistry,
+-              port: realizationPort,
+-              realizationContext,
+-            });
+-          }
++              },
++            },
++          })
+         )
+       );
+       failed = false;

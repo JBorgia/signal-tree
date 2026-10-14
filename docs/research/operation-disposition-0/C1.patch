@@ -1,0 +1,170 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -101,7 +101,7 @@
+ import { getPositionRegistry } from '../../lib/internals/position-registry';
+ import { reportContainedObserverError } from '../../lib/internals/error-reporter';
+ import { getPathNotifier } from '../../lib/path-notifier';
+-import { isTraversableNode } from '../../lib/utils';
++import { deepEqual, isTraversableNode } from '../../lib/utils';
+ import {
+   getActiveWriteContext,
+   withWriteContext,
+@@ -2011,9 +2011,10 @@
+ 
+ 
+   // Research operation journal: prepared facts survive independently of diagnostics.
+-  type OperationRecord = { sequence: number; owner: number; effects: readonly TurnEffect[] };
+-  const installedOperations = new Map<number, readonly OperationRecord[]>();
+-  tree.registerCleanup(()=>installedOperations.clear());
++  type OperationRecord = { sequence: number; owner: number; effects: readonly TurnEffect[]; previous?: OperationRecord };
++  const installedOperations = new Map<number, OperationRecord>();
++  const expectedDispositions = new Map<number, readonly TurnEffect[]>();
++  tree.registerCleanup(()=>{ installedOperations.clear(); expectedDispositions.clear(); });
+   const sourceCaptureRuntime = getMutationCaptureRuntime(tree);
+   if (sourceCaptureRuntime) {
+     sourceCaptureRuntime.prepareEntityResponsibility = (capture) => {
+@@ -2022,8 +2023,6 @@
+       (globalThis as any).__entityPrepareProbe?.(capture);
+       const bucket = getTransactionBucket(id);
+       const scratch = createCaptureBucket();
+-      for (const [key,effect] of bucket.effects) if(effect) scratch.effects.set(key, cloneTurnEffect(effect));
+-      for (const [key,value] of bucket.baselineValues) scratch.baselineValues.set(key,value);
+       const effects: TurnEffect[]=[];
+       for (const change of capture.changes) {
+         if(change.structuralRecord) effects.push({...change.structuralRecord,position:capture.owner,ownerPath:capture.ownerPath,path:change.path!} as TurnEffect);
+@@ -2037,12 +2036,20 @@
+           }
+         }
+       }
++      const touchedKeys = new Set(effects.map(effectKey));
++      for (const key of touchedKeys) {
++        const prior = bucket.effects.get(key);
++        if (prior) scratch.effects.set(key, cloneTurnEffect(prior));
++      }
++      for (const effect of effects) {
++        if (bucket.baselineValues.has(effect.position)) scratch.baselineValues.set(effect.position, bucket.baselineValues.get(effect.position));
++      }
+       for(const effect of effects)enqueueEffect(scratch,scratch.effects,cloneTurnEffect(effect));
+-      const records=installedOperations.get(id) ?? [];
+-      const operation:OperationRecord={sequence:records.length,owner:capture.owner,effects};
+-      const writes: {map: Map<any,any>;key: unknown;value: unknown}[]=[{map:installedOperations,key:id,value:[...records,operation]}];
++      const previous=installedOperations.get(id);
++      const operation:OperationRecord={sequence:(previous?.sequence ?? -1)+1,owner:capture.owner,effects,previous};
++      const writes: {map: Map<any,any>;key: unknown;value: unknown}[]=[{map:installedOperations,key:id,value:operation}];
+       // Replace the prepared map, including composed-away structural entries.
+-      for(const key of bucket.effects.keys()) if(!scratch.effects.has(key)) writes.push({map:bucket.effects,key,value:undefined});
++      for(const key of touchedKeys) if(!scratch.effects.has(key)) writes.push({map:bucket.effects,key,value:undefined});
+       for(const [key,value] of scratch.effects) writes.push({map:bucket.effects,key,value});
+       for(const [key,value] of scratch.baselineValues) writes.push({map:bucket.baselineValues,key,value});
+       if(pendingTransactions.size>0) for(const key of windowKeys([capture.owner],capture.changes.map(c=>c.subject))) writes.push({map:bucket.ownWriteSeq,key,value:windowWriteSeq});
+@@ -2050,19 +2057,37 @@
+     };
+     tree.registerCleanup(()=>{ delete sourceCaptureRuntime.prepareEntityResponsibility; });
+   }
++  const foldOperationDisposition = (id: number): readonly TurnEffect[] => {
++    const newest = installedOperations.get(id);
++    if (!newest) return [];
++    const records: OperationRecord[] = new Array(newest.sequence + 1);
++    let record: OperationRecord | undefined = newest;
++    for (let i = records.length - 1; i >= 0; i--) {
++      if (!record || record.sequence !== i) throw new Error('Operation journal sequence gap');
++      records[i] = record;
++      record = record.previous;
++    }
++    if (record) throw new Error('Operation journal sequence gap');
++    const expected = createCaptureBucket();
++    for (const operation of records) for (const effect of operation.effects) enqueueEffect(expected, expected.effects, cloneTurnEffect(effect));
++    return settleTurnMemberEffects(tree.$ as object, [...expected.effects.values()].map(cloneTurnEffect));
++  };
+   const validateOperationDisposition = (id:number, turnId:number|undefined):void => {
+-    const records=installedOperations.get(id);
+-    if(!records?.length)return;
+-    const expected=createCaptureBucket();
+-    for(let i=0;i<records.length;i++) {
+-      if(records[i].sequence!==i)throw new Error('Operation journal sequence gap');
+-      for(const effect of records[i].effects)enqueueEffect(expected,expected.effects,cloneTurnEffect(effect));
+-    }
+-    const folded=settleTurnMemberEffects(tree.$ as object,[...expected.effects.values()].map(cloneTurnEffect));
++    const folded = expectedDispositions.get(id);
++    if (!folded?.length) return;
+     const retained=authority.getPendingTurn(turnId)?.__effects ?? [];
++    const indexed = new Map(retained.map(effect => [effectKey(effect), effect]));
+     for(const effect of folded) {
+-      const actual=retained.find(e=>effectKey(e)===effectKey(effect));
+-      if(!actual || actual.kind!==effect.kind || Object.keys(effect).some(k=>k!=='subjectFieldSegments' && k!=='fieldPresence' && (actual as any)[k] !== (effect as any)[k]) || (effect.kind==='set' && actual.kind==='set' && (JSON.stringify(effect.subjectFieldSegments)!==JSON.stringify(actual.subjectFieldSegments) || JSON.stringify(effect.fieldPresence)!==JSON.stringify(actual.fieldPresence)))) {
++      const actual=indexed.get(effectKey(effect));
++      const same = actual && actual.kind === effect.kind && [...new Set([...Object.keys(effect), ...Object.keys(actual)])].every(key => {
++        const expectedValue = (effect as unknown as Record<string, unknown>)[key];
++        const actualValue = (actual as unknown as Record<string, unknown>)[key];
++        const memberImage = (key === 'before' || key === 'after') && effect.kind === 'set' && effect.plainBranchMembership !== undefined;
++        return memberImage || key === 'subjectFieldSegments' || key === 'fieldPresence' || key === 'plainBranchMembership'
++          ? deepEqual(actualValue, expectedValue)
++          : Object.is(actualValue, expectedValue);
++      });
++      if(!same) {
+         const refusal=createRollbackError({kind:'effect-validation-failed',pendingTurnId:turnId ?? id,compensation:[],errorMessage:'Installed operation lacks a matching settlement disposition'});
+         publishRefusal(id,refusal);throw refusal;
+       }
+@@ -2097,6 +2122,16 @@
+     positionIds?: number[]
+   ): void => {
+     const membership = plainBranchMembershipEffects(meta);
++    const membershipTransaction = resolveTransactionId(meta);
++    if (membership?.length && membershipTransaction !== undefined) {
++      const previous = installedOperations.get(membershipTransaction);
++      installedOperations.set(membershipTransaction, {
++        sequence: (previous?.sequence ?? -1) + 1,
++        owner: membership[0].position,
++        effects: membership.map(cloneTurnEffect),
++        previous,
++      });
++    }
+     if (membership) {
+       for (const effect of membership) {
+         bucket.positionIds.add(effect.position);
+@@ -2138,7 +2173,7 @@
+       registry: getPositionRegistry(tree.$),
+     });
+     const recorded=resolveTransactionId(meta);
+-    if(recorded!==undefined && subjectIds?.length && installedOperations.get(recorded)?.some(r=>r.owner===resolvedPositionIds[0]))return;
++    if(recorded!==undefined && subjectIds?.length && installedOperations.get(recorded)?.owner===resolvedPositionIds[0])return;
+     captureEffects(
+       bucket,
+       bucket.effects,
+@@ -2220,6 +2255,7 @@
+       authority.discardPending(reservedId);
+       return undefined;
+     }
++    expectedDispositions.set(transactionId, foldOperationDisposition(transactionId));
+     const {
+       subjectIds,
+       positionIds,
+@@ -2953,9 +2989,9 @@
+           const key=effectKey(effect), old=bucket.effects.get(key);
+           if(old && old.kind!=='set')throw new Error('Terminal record conflicts with structural evidence');
+           const combined=old ? {...old,after:next,mutationIntent:combineScalarMutationIntent(old.mutationIntent,effect.mutationIntent)} : effect;
+-          const records=installedOperations.get(id) ?? [];
+-          const operation:OperationRecord={sequence:records.length,owner:position,effects:[cloneTurnEffect(effect)]};
+-          const writes: {map: Map<any,any>;key:unknown;value:unknown}[]=[{map:bucket.effects,key,value:combined},{map:installedOperations,key:id,value:[...records,operation]}];
++          const previous=installedOperations.get(id);
++          const operation:OperationRecord={sequence:(previous?.sequence ?? -1)+1,owner:position,effects:[cloneTurnEffect(effect)],previous};
++          const writes: {map: Map<any,any>;key:unknown;value:unknown}[]=[{map:bucket.effects,key,value:combined},{map:installedOperations,key:id,value:operation}];
+           if(!bucket.baselineValues.has(position))writes.push({map:bucket.baselineValues,key:position,value:prev});
+           if(pendingTransactions.size>0)for(const key of windowKeys([position],undefined))writes.push({map:bucket.ownWriteSeq,key,value:windowWriteSeq});
+           return {writes,adds:[{set:bucket.positionIds,value:position},{set:bucket.ownerPaths,value:ownerPath ?? path}]};
+@@ -3449,6 +3485,7 @@
+           }
+           lifecycle = 'confirmed';
+             installedOperations.delete(transactionId);
++            expectedDispositions.delete(transactionId);
+           // Lifecycle observation: recorded at the transition, before the engine
+           // announcement lets restoration confirm its entry, so every reader it
+           // notifies already sees this transaction settled. Public delivery
+@@ -3599,6 +3636,7 @@
+             }
+             lifecycle = 'rejected';
+             installedOperations.delete(transactionId);
++            expectedDispositions.delete(transactionId);
+             // Recorded at the transition (compensation installed), before the
+             // engine announcement; delivered after consequences are discarded.
+             retireLifecycleView(transactionId);

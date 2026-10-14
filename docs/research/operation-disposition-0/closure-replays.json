@@ -1,0 +1,38 @@
+[
+  {
+    "base": "19a5bd03",
+    "lane": "base",
+    "entry": "optional-member-work.mjs",
+    "control": "zero-inventory",
+    "exit": 0,
+    "stable": true,
+    "bundle": "d49ccd26479ad75ada59f75c534b22be4d7ea6d4c14d10a032bf3df829c1a26a"
+  },
+  {
+    "base": "19a5bd03",
+    "lane": "CPR10",
+    "entry": "optional-member-work.mjs",
+    "control": "zero-inventory",
+    "exit": 1,
+    "stable": true,
+    "bundle": "c4e1c406418a313719685cf7b6bf3aefeef69e4c2ee1a9441bfc3f737478f6aa"
+  },
+  {
+    "base": "19a5bd03",
+    "lane": "CPR9",
+    "entry": "omitted-publisher.mjs",
+    "control": "inside",
+    "exit": 1,
+    "stable": true,
+    "bundle": "5d9bc83bb10341c5d45cb1b049b89048be0167bcc562b0bc759af67e77bc4d47"
+  },
+  {
+    "base": "19a5bd03",
+    "lane": "CPR10",
+    "entry": "omitted-publisher.mjs",
+    "control": "inside",
+    "exit": 0,
+    "stable": true,
+    "bundle": "ea607ed816821d9e8b630dabda725ffa5fa24f5a3cadf80fa4d03f1190e0a9e1"
+  }
+]

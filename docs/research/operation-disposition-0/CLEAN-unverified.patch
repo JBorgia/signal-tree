@@ -1,0 +1,125 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -1,3 +1,4 @@
++import type { TerminalRecordPlan } from '../../lib/internals/intrinsic-mutation';
+ import { publishingExposedOnly } from '../../lib/internals/exposed-publication';
+ import {
+   collectionBindingAt,
+@@ -1433,6 +1434,7 @@
+   /** A refusal it threw; the reader classifies it from the error's cause. */
+   const publishRefusal = (transactionId: number, error: unknown): void =>
+     publishLifecycle({ kind: 'refused', transactionId, error });
++  const realizationTree = tree as unknown as ISignalTree<object>;
+   const treeWrapper = tree as unknown as object;
+   const stateRoot = tree.$ as unknown as object;
+   const realizationDescriptors =
+@@ -1445,7 +1447,7 @@
+     getTreeRealizationPort(stateRoot) ??
+     getTreeRealizationPort(treeWrapper) ??
+     createTreeRealizationAdapter({
+-      tree: tree as unknown as ISignalTree<object>,
++      tree: realizationTree,
+       descriptors: realizationDescriptors,
+     });
+   defineTreeRealizationPort(treeWrapper, realizationPort);
+@@ -2021,7 +2023,6 @@
+     sourceCaptureRuntime.prepareEntityResponsibility = (capture) => {
+       const id = resolveTransactionId(capture.meta);
+       if (id === undefined || isRestoring || capture.meta?.origin === 'transaction-rollback' || capture.meta?.origin === 'restoration') return;
+-      (globalThis as any).__entityPrepareProbe?.(capture);
+       const bucket = getTransactionBucket(id);
+       const scratch = createCaptureBucket();
+       const effects: TurnEffect[]=[];
+@@ -2057,7 +2058,9 @@
+       for(const effect of effects)enqueueEffect(scratch,scratch.effects,cloneTurnEffect(effect));
+       const previous=installedOperations.get(id);
+       const operation:OperationRecord={sequence:(previous?.sequence ?? -1)+1,owner:capture.owner,effects,previous,owners:previous?.owners ?? new Set<number>()};
+-      const writes: {map: Map<any,any>;key: unknown;value: unknown}[]=[{map:installedOperations,key:id,value:operation}];
++      const writes: Array<TerminalRecordPlan['writes'][number]> = [
++        { map: installedOperations, key: id, value: operation },
++      ];
+       // Replace the prepared map, including composed-away structural entries.
+       for(const key of touchedKeys) if(!scratch.effects.has(key)) writes.push({map:bucket.effects,key,value:undefined});
+       for(const [key,value] of scratch.effects) writes.push({map:bucket.effects,key,value});
+@@ -2715,7 +2718,7 @@
+                   // D2's additional mixed route keeps ordinary normalized
+                   // admission; it changes physical installation only.
+                   if (normalized.some(e => e.subjectId === undefined) && normalized.some(e => e.subjectId !== undefined)) {
+-                    const point = preparePointRealization(tree, normalized);
++                    const point = preparePointRealization(realizationTree, normalized);
+                     if (point) {
+                       if (completion) completion.selected = true;
+                       point.install();
+@@ -3052,7 +3055,6 @@
+           if(id===undefined || position===undefined || subjectIds?.length || Object.is(prev,next))return;
+           const slots=getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
+           if(slots?.resolveScalarSlot(position)===undefined)return;
+-          (globalThis as any).__prepareProbe?.(path,next,prev);
+           const bucket=getTransactionBucket(id);
+           const effect: TurnEffect={kind:'set',path,ownerPath:ownerPath ?? path,position,before:prev,after:next,mutationIntent:meta?.mutationIntent};
+           const key=effectKey(effect), old=bucket.effects.get(key);
+@@ -3060,12 +3062,14 @@
+           const combined=old ? {...old,after:next,mutationIntent:combineScalarMutationIntent(old.mutationIntent,effect.mutationIntent)} : effect;
+           const previous=installedOperations.get(id);
+           const operation:OperationRecord={sequence:(previous?.sequence ?? -1)+1,owner:position,effects:[cloneTurnEffect(effect)],previous,owners:previous?.owners ?? new Set<number>()};
+-          const writes: {map: Map<any,any>;key:unknown;value:unknown}[]=[{map:bucket.effects,key,value:combined},{map:installedOperations,key:id,value:operation}];
++          const writes: Array<TerminalRecordPlan['writes'][number]> = [
++            { map: bucket.effects, key, value: combined },
++            { map: installedOperations, key: id, value: operation },
++          ];
+           if(!bucket.baselineValues.has(position))writes.push({map:bucket.baselineValues,key:position,value:prev});
+           if(pendingTransactions.size>0)for(const key of windowKeys([position],undefined))writes.push({map:bucket.ownWriteSeq,key,value:windowWriteSeq});
+           return {writes,adds:[{set:operation.owners,value:position},{set:bucket.positionIds,value:position},{set:bucket.ownerPaths,value:ownerPath ?? path}]};
+         }, beforePublication: (path, next, prev, meta, ownerPath, subjectIds, positionIds) => {
+-          (globalThis as any).__captureProbe?.(path,next,prev);
+           const effectiveMeta = meta ?? getActiveWriteContext();
+           if (isRestoring || effectiveMeta?.origin === 'restoration' || isInspectionWrite(effectiveMeta) || getWriteParticipation(effectiveMeta) === 'realized') return;
+           if (typeof effectiveMeta?.transactionId === 'number' && effectiveMeta.transactionOwner !== transactionOwnerToken) return;
+--- a/packages/kernel/src/lib/internals/mutation-capture-runtime.ts
++++ b/packages/kernel/src/lib/internals/mutation-capture-runtime.ts
+@@ -1,3 +1,4 @@
++import type { TerminalRecordPlan } from './intrinsic-mutation';
+ import { isTraversableNode } from '../utils';
+ import { reportContainedObserverError } from './error-reporter';
+ import type { StructuralEffect } from '../mutation-types';
+@@ -43,7 +44,9 @@
+ );
+ 
+ export interface MutationCaptureRuntime {
+-  prepareEntityResponsibility?: (capture: CommittedEntityCapture) => {writes: {map: Map<any,any>; key: unknown; value: unknown}[]; adds: {set: Set<any>;value: unknown}[]} | undefined;
++  prepareEntityResponsibility?: (
++    capture: CommittedEntityCapture
++  ) => TerminalRecordPlan | undefined;
+   /** Pay-for-use: producers build committed evidence only when this is true. */
+   hasCommittedEntityObservers?(): boolean;
+   publishCommittedEntity?(capture: CommittedEntityCapture): void;
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1399,10 +1399,6 @@
+     return subjectId;
+   }
+ 
+-  function commitFreshSubjects(ids: readonly K[]): number[] {
+-    return ids.map((id) => commitFreshSubject(id));
+-  }
+-
+   /**
+    * `UPDATEONE-FAST-0`. The single-subject form of `rememberSubjectIds`, which
+    * allocates twice for one id — once for the caller's `[id]` literal and once
+@@ -1494,16 +1490,6 @@
+         changes,
+         meta,
+       });
+-  }
+-
+-  function captureCommittedEntity(
+-    subject: number,
+-    before: unknown,
+-    after: unknown,
+-    structural: boolean
+-  ): void {
+-    const capture = committedEntityObserver();
+-    if (capture) capture([{ subject, before, after, structural }]);
+   }
+ 
+   function rememberSubjectIds(ids: K[]): number[] {

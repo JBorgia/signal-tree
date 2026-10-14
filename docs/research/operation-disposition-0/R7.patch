@@ -1,0 +1,34 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -2027,8 +2027,17 @@
+       const effects: TurnEffect[]=[];
+       for (const change of capture.changes) {
+         if(change.structuralRecord) effects.push({...change.structuralRecord,position:capture.owner,ownerPath:capture.ownerPath,path:change.path!} as TurnEffect);
+-        else {
+-          const before=change.before as Record<string,unknown>, after=change.after as Record<string,unknown>;
++        else if (!isPlainRecord(change.before) || !isPlainRecord(change.after)) {
++          // Match rich capture's existing whole-row boundary. Arrays and opaque
++          // values are not record fields; index enumeration loses their shape.
++          if (change.before !== change.after) effects.push({
++            kind: 'set', position: capture.owner, ownerPath: capture.ownerPath,
++            path: change.path!, subject: change.subject,
++            before: change.before, after: change.after,
++            mutationIntent: capture.meta?.mutationIntent,
++          });
++        } else {
++          const before=change.before, after=change.after;
+           for(const key of new Set([...Object.keys(before),...Object.keys(after)])) {
+             const beforeValue=before[key],afterValue=after[key];
+             const beforePresent=Object.prototype.hasOwnProperty.call(before,key),afterPresent=Object.prototype.hasOwnProperty.call(after,key);
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -498,9 +498,6 @@
+     const prepared = values.map(({ subjectId, key, value }) => {
+       if (structuralStore.activeKeyForSubject(subjectId) !== key) {
+         throw new Error('Point realization subject is no longer active at its key');
+-      }
+-      if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+-        throw new Error('Point realization requires an entity value');
+       }
+       const before = valueStore.backingForSubject(subjectId);
+       const after = deepClone(value) as E;
