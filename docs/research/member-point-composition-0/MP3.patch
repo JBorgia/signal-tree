@@ -1,0 +1,213 @@
+--- a/packages/kernel/src/lib/internals/plain-branch-membership.ts
++++ b/packages/kernel/src/lib/internals/plain-branch-membership.ts
+@@ -1043,15 +1043,28 @@
+     if (!result) throw new Error('Plain branch target invalidated before installation');
+     if (invalidated) return;
+     invalidated = true;
++    let failed = false;
++    let firstError: unknown;
++    const run = (fn: () => void): void => {
++      // Default callers retain their established stop-on-error behavior.
++      if (scalarTargets === undefined) { fn(); return; }
++      try { fn(); } catch (error) {
++        if (!failed) { failed = true; firstError = error; }
++      }
++    };
+     withWriteContext({ ...getActiveWriteContext(), intent: 'system', participation: 'realized' }, () => runtime.runInvalidationGroup(() => {
+-      for (const branch of changedBranches) publishMembershipChange(branch);
++      for (const branch of changedBranches) run(() => publishMembershipChange(branch));
+       for (const { branch, key, node } of changedBranchMembers) {
+-        republishMembers(branch, [key]);
+-        if (!Object.getOwnPropertyDescriptor(branch, key)?.enumerable) rememberHiddenRows(node);
++        run(() => republishMembers(branch, [key]));
++        run(() => {
++          if (!Object.getOwnPropertyDescriptor(branch, key)?.enumerable) rememberHiddenRows(node);
++        });
+       }
+-      runtime.publishPrepared({ revision: result!.revision, changedSlots: [...changedSlots] });
++      run(() => runtime.publishPrepared({ revision: result!.revision, changedSlots: [...changedSlots] }));
++      if (failed) throw firstError;
+     }));
+   };
++
+   return {
+     staged,
+     invalidate,
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -654,7 +654,7 @@
+   tree: ISignalTree<object>,
+   effects: readonly ReversalEffect[]
+ ): { install(): void; publish(): void } | undefined {
+-  if (!effects.length || effects.some(effect => effect.structural) ||
++  if (!effects.length ||
+       !effects.some(effect => typeof effect.subjectId === 'number')) return undefined;
+   const descriptors = getTreeRealizationDescriptors(tree.$);
+   const slots = getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
+@@ -668,6 +668,38 @@
+     memberTargets.set(effect.owner, { present: effect.plainBranchMembership.after, value: effect.after,
+       ...(effect.turn === undefined ? {} : { turn: effect.turn }) });
+   }
++  if (effects.some(effect => effect.structural)) {
++    const scalarEffects = effects.filter(effect => !effect.plainBranchMembership && !effect.structural && typeof effect.subjectId !== 'number');
++    const members = memberTargets.size ? preparePlainBranchMembers(tree.$, memberTargets, scalarEffects) : undefined;
++    const entityEffects = effects.filter(effect => !effect.plainBranchMembership && (!members || effect.structural || typeof effect.subjectId === 'number'));
++    const heterogeneous = planHeterogeneousFrame(tree, descriptors, owners, slots, clock, entityEffects);
++    if (!heterogeneous) return undefined;
++    if (clock.revision() !== baseRevision) throw new Error('Point realization preparation reentered installation');
++    let installed = false;
++    return {
++      install(): void {
++        if (installed || clock.revision() !== baseRevision) throw new Error('Point realization base revision is stale');
++        members?.install();
++        // Existing structural commits resolve anchors in their established order.
++        // The surrounding invalidation group defers native delivery until all install.
++        heterogeneous.install();
++        installed = true;
++      },
++      publish(): void {
++        if (!installed) throw new Error('Point realization published before installation');
++        let failed = false;
++        let firstError: unknown;
++        const run = (fn: () => void): void => { try { fn(); } catch (error) {
++          if (!failed) { failed = true; firstError = error; }
++        } };
++        run(() => heterogeneous.invalidate());
++        if (members) run(() => members.invalidate());
++        if (members) run(() => members.publish());
++        run(() => heterogeneous.publish());
++        if (failed) throw firstError;
++      },
++    };
++  }
+   const rows = new Map<CollectionNode, Map<number, { subjectId: number; key: string | number; value: unknown }>>();
+   const scalarEffects: ReversalEffect[] = [];
+   const frame = slots.beginFrame();
+@@ -746,7 +778,7 @@
+   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
+   physicalCommitClock: ReturnType<typeof getPhysicalCommitClock>,
+   effects: readonly ReversalEffect[]
+-): { commit(): void } | undefined {
++): { commit(): void; install(): void; invalidate(): void; publish(): void } | undefined {
+   if (
+     effects.length === 0 ||
+     !effects.some(
+@@ -1116,8 +1148,8 @@
+     });
+   }
+ 
+-  return {
+-    commit(): void {
++  let scalarCommitResult: ReturnType<NonNullable<typeof scalarFrame>['commit']> | undefined;
++  const install = (): void => {
+       if (
+         scalarFrame &&
+         physicalCommitClock &&
+@@ -1126,8 +1158,7 @@
+         throw new Error('Heterogeneous realization base revision is stale.');
+       }
+ 
+-      const commitAndPublish = () => {
+-        const scalarCommitResult = scalarFrame?.commit({
++        scalarCommitResult = scalarFrame?.commit({
+           advanceRevision: false,
+           publish: false,
+         });
+@@ -1149,40 +1180,49 @@
+         }
+ 
+         physicalCommitClock?.advance();
++  };
++  const invalidate = (): void => {
+         if (scalarCommitResult && scalarSlotRuntime) {
+           scalarSlotRuntime.publishPrepared(scalarCommitResult);
+         }
++  };
++  const publish = (): void => {
++    let failed = false;
++    let firstError: unknown;
++    const run = (fn: () => void): void => { try { fn(); } catch (error) {
++      if (!failed) { failed = true; firstError = error; }
++    } };
+ 
+         for (const { plan } of plannedRemoves) {
+-          plan.publish({
++          run(() => plan.publish({
+             ...(getActiveWriteContext() ?? {}),
+             intent: 'system',
+             participation: 'realized',
+-          });
++          }));
+         }
+ 
+         for (const { plan } of plannedRestores) {
+-          plan.publish({
++          run(() => plan.publish({
+             ...(getActiveWriteContext() ?? {}),
+             intent: 'system',
+             participation: 'realized',
+-          });
++          }));
+         }
+ 
+         for (const { plan } of plannedFreshAdds) {
+-          plan.publish({
++          run(() => plan.publish({
+             ...(getActiveWriteContext() ?? {}),
+             intent: 'system',
+             participation: 'realized',
+-          });
++          }));
+         }
+ 
+         for (const { plan } of plannedRekeys) {
+-          plan.publish({
++          run(() => plan.publish({
+             ...(getActiveWriteContext() ?? {}),
+             intent: 'system',
+             participation: 'realized',
+-          });
++          }));
+         }
+ 
+         for (const effect of [
+@@ -1200,7 +1240,7 @@
+             continue;
+           }
+ 
+-          getPathNotifier().notify(
++          run(() => getPathNotifier().notify(
+             notifyPath,
+             effect.after,
+             effect.before,
+@@ -1214,20 +1254,19 @@
+               intent: 'system',
+               participation: 'realized',
+             }
+-          );
++          ));
+         }
+ 
+-        markOwnerInvalidatedFrom(tree as object);
+-      };
+-
++        run(() => markOwnerInvalidatedFrom(tree as object));
++        if (failed) throw firstError;  };
++  return {
++    install, invalidate, publish,
++    commit(): void {
++      const commitAndPublish = () => { install(); invalidate(); publish(); };
+       const locations = getLocationRuntime(tree.$);
+-      if (locations) {
+-        locations.runInvalidationGroup(commitAndPublish);
+-      } else if (scalarSlotRuntime) {
+-        scalarSlotRuntime.runInvalidationGroup(commitAndPublish);
+-      } else {
+-        commitAndPublish();
+-      }
++      if (locations) locations.runInvalidationGroup(commitAndPublish);
++      else if (scalarSlotRuntime) scalarSlotRuntime.runInvalidationGroup(commitAndPublish);
++      else commitAndPublish();
+     },
+   };
+ }

@@ -1,0 +1,32 @@
+{
+  "format": "path + sha256 + utf8 text; xz compressed JSON",
+  "scope": "CPRE/CPRF final verification and exact-baseline artifact attribution; no earlier archived candidate packets",
+  "exclusions": [
+    "generated bundles (hash remains in manifests)",
+    "duplicated candidate source directories (source hashes in identity/manifest; reconstruct via repository patches)",
+    "built artifacts (file hashes retained; original candidate restored)",
+    "backup source copies (before/after hashes retained)"
+  ],
+  "dependencies": [
+    "Complete repository at integration HEAD in identity.json, plus git object19a5bd034d5ebef262f637c397bb41fe50a6a1e3",
+    "Research packets referenced by docs/research/member-point-composition-0/run.mjs, including final RK1/CL2/RG1 patches",
+    "Node version from .nvmrc and recorded identity; pinned pnpm and installed lockfile dependencies",
+    "Extract scripts/plans by basename into one assets directory; assets/* retain indicated basename",
+    "Original absolute /private/tmp paths in historic manifests identify inputs at execution, not portable replay prerequisites"
+  ],
+  "replay": [
+    "python3 CPRF-replay-controls.py --root CHECKOUT --output FRESH_OUTPUT --assets ASSETS",
+    "python3 CPRF-replay-gates.py --root INTEGRATED_CHECKOUT --expect-head 12a04f57 --phase focused --output FRESH_OUTPUT --assets ASSETS",
+    "Same gate script with phases preflight, full, artifacts; artifacts writes fresh dist",
+    "For exact experimental source overlay: rerun repository proof runner to generate fresh manifest, then st-manifest-focused.py --root CHECKOUT --manifest FRESH_MANIFEST --output FRESH_OUTPUT --plan PLAN; requires exclusive source ownership",
+    "Historical baseline artifact attribution script is preserved as executed; replace root/output variables for new checkout, retain all source/artifact backup/finally restoration checks"
+  ],
+  "notNewRuns": "Replay scripts syntax-checked only; archive assembly executes no verification gates.",
+  "archive": "CPRF-final-evidence.json.xz",
+  "archiveSha256": "669c755a93627527b9bff94ff2bd82fed3e836c56c2a6c7bc5a31c37d5c77e0a",
+  "uncompressedSha256": "96d721ca239752420213743757518b893c9dcb9b8ad3acc09a8d9bb80e16a43e",
+  "compressedBytes": 153008,
+  "uncompressedBytes": 8160907,
+  "entries": 510,
+  "verifiedEveryDecompressedEntry": true
+}

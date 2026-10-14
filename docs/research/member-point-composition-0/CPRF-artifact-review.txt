@@ -1,0 +1,23 @@
+CPRF artifact interpretation review, 2026-10-13
+Reviewed exact-baseline comparison and raw logs at /private/tmp/st-baseline-artifact-attribution; candidate logs at /private/tmp/st-integration-build. Baseline19a5bd034d5ebef262f637c397bb41fe50a6a1e3; source candidate12a04f57bee4c90de1110eff7b72960fcd46059c; Node24.15.0,pnpm10.17.0.
+
+Identity: independently recomputed all28 baseline source hashes against git19a5bd03; all match, including absence for newly added test files. Source before/after28 entries and candidate artifact before/after161 entries compare exactly equal. Tool/app config diff empty. Both builds explicitly skip Nx cache. This supports attribution more strongly than earlier runtime-only baseline overlay retaining new tests.
+
+Measured artifact results:
+- Package build bothpass. Candidate API inventory and callable inventory pass; doc-links pass.
+- Bare gzip budget: prod11.21->11.64KB (+0.43), ceiling10.25; dev13.54->13.99 (+0.45), ceiling12.45. Bothfail.
+- Entities gzip budget: prod25.57->26.78KB (+1.21), ceiling22.6; dev28.36->29.57 (+1.21), ceiling25.25. Bothfail.
+- Demo initial (Angular builder kB, not same metric as gzip fixture):558.06->565.11 (+7.05), error ceiling550. Bothfail. Raw logs explicitly say application bundle generation failed for initial budget, not a source compile diagnostic.
+- Size-report feature increments: batching+0.44,restoration+0.97,devTools+0.43,kernel/adapter+0.48,entityMap+batching+1.20,current public mix+1.74KB. Do not add these overlapping fixtures together.
+- Exact baseline lint budget19warnings passes; initial candidate54warnings fails (+35 across kernel/Angular/React/Vue). Earlier '45 existing warnings' attribution was wrong because old baseline retained new research tests. Worker is correcting tests; no approval of unseen pending lint diff or successful lint claim here.
+
+Interpretation:
+Reviewed source semantic integration and finite supported-boundary tests remain supported. Artifact acceptance under unchanged gates is NOT established: current bundle and demo gates fail. Existing baseline overages are separately established and candidate is not their original cause; candidate still adds measured cost. No ceiling waiver, release-ready claim, or successful production-demo-build claim follows. Local reviewed integration commit can be preserved as evidence without treating it as fully gate-accepted.
+
+Architecture inference limits: byte growth does not falsify atomic responsibility architecture or prove optional-module leakage. Bare fixture growth proves some incremental implementation code survives its configured bundling; identifying mandatory semantics versus avoidable reachability requires emitted-graph attribution. No throughput/latency conclusion from build times or byte sizes; no universal leak or scaling conclusion. Semantic failures and artifact-budget failures are different claims.
+
+Concrete narrow reduction candidate from runtime diff (not implemented or measured): entity-signal.ts commitAndProjectEntityMutationFrame unconditionally builds changes, per-mutation paths, tail/neighbor facts, and deep-clones fresh/remove payloads before checking mutationCaptureRuntime?.prepareEntityResponsibility. When no preparation hook exists, this work is discarded. A preparation-hook-presence guard can avoid this inactive-path allocation/copy, provided the active-hook path retains exact sampling-before-cloning, revision/reentry checks, structural order, and installation/capture behavior. Use same no-enhancer and active-capture controls; preserve first results. This offers no guaranteed bundle reduction (guard itself adds code), and skipping when a hook exists but no transaction is active would need additional eligibility contract analysis; do not infer that broader change.
+
+No other concrete safe dead-code/tree-shaking removal established by this bounded review. No need to expand into owner/order/frontier redesign merely to address inherited overage. Remaining blockers should be stated candidly under unchanged ceilings; fixing test lint can resolve its newly introduced blocker but does not change measured package/demo overages.
+
+No runtime/docs edits. Pending lint repair excluded from review verdict until diff and results are supplied.

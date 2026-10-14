@@ -1,0 +1,164 @@
+{
+  "base": "19a5bd034d5ebef262f637c397bb41fe50a6a1e3",
+  "candidateHead": "12a04f57bee4c90de1110eff7b72960fcd46059c",
+  "commands": [
+    {
+      "label": "build-all",
+      "command": [
+        "pnpm",
+        "nx",
+        "run-many",
+        "-t",
+        "build",
+        "--projects=kernel,angular,react,vue,solid",
+        "--skip-nx-cache"
+      ],
+      "exit": 0,
+      "seconds": 9.539
+    },
+    {
+      "label": "bundle-budget",
+      "command": [
+        "node",
+        "tools/check-bundle-budget.mjs"
+      ],
+      "exit": 1,
+      "seconds": 0.187
+    },
+    {
+      "label": "size-report",
+      "command": [
+        "node",
+        "tools/size-report.mjs",
+        "--json"
+      ],
+      "exit": 0,
+      "seconds": 0.245
+    },
+    {
+      "label": "lint-budget",
+      "command": [
+        "node",
+        "tools/check-lint-budget.mjs"
+      ],
+      "exit": 0,
+      "seconds": 15.094
+    },
+    {
+      "label": "demo-production",
+      "command": [
+        "pnpm",
+        "nx",
+        "build",
+        "demo",
+        "--configuration=production",
+        "--base-href=/",
+        "--skip-nx-cache"
+      ],
+      "exit": 1,
+      "seconds": 6.993
+    }
+  ],
+  "bundle": {
+    "bareProd": {
+      "baseline": 11.21,
+      "candidate": 11.64,
+      "delta": 0.43,
+      "ceiling": 10.25
+    },
+    "bareDev": {
+      "baseline": 13.54,
+      "candidate": 13.99,
+      "delta": 0.45,
+      "ceiling": 12.45
+    },
+    "entitiesProd": {
+      "baseline": 25.57,
+      "candidate": 26.78,
+      "delta": 1.21,
+      "ceiling": 22.6
+    },
+    "entitiesDev": {
+      "baseline": 28.36,
+      "candidate": 29.57,
+      "delta": 1.21,
+      "ceiling": 25.25
+    }
+  },
+  "demoInitialKB": {
+    "baseline": 558.06,
+    "candidate": 565.11,
+    "delta": 7.05,
+    "ceiling": 550,
+    "bothFail": true
+  },
+  "lint": {
+    "baselineWarnings": 19,
+    "candidateWarnings": 54,
+    "delta": 35,
+    "errors": 0,
+    "baselineGate": "pass",
+    "candidateGate": "fail",
+    "newByProject": {
+      "packages/kernel": 10,
+      "packages/angular": 2,
+      "packages/react": 2,
+      "packages/vue": 21
+    },
+    "correction": "Earlier baseline runtime overlay retained current research tests; its45 package warnings do not establish those test warnings as preexisting at19a5bd03."
+  },
+  "sizeReportFeatures": [
+    {
+      "group": "markers",
+      "feature": "entityMap (plain)",
+      "baselineKB": 25.57,
+      "candidateKB": 26.78,
+      "deltaKB": 1.21
+    },
+    {
+      "group": "enhancers",
+      "feature": "batching",
+      "baselineKB": 12.67,
+      "candidateKB": 13.11,
+      "deltaKB": 0.44
+    },
+    {
+      "group": "enhancers",
+      "feature": "restoration",
+      "baselineKB": 41.01,
+      "candidateKB": 41.98,
+      "deltaKB": 0.97
+    },
+    {
+      "group": "enhancers",
+      "feature": "devTools",
+      "baselineKB": 11.28,
+      "candidateKB": 11.71,
+      "deltaKB": 0.43
+    },
+    {
+      "group": "subpaths",
+      "feature": "kernel/adapter",
+      "baselineKB": 12.43,
+      "candidateKB": 12.91,
+      "deltaKB": 0.48
+    },
+    {
+      "group": "combos",
+      "feature": "typical app (entityMap + batching)",
+      "baselineKB": 26.92,
+      "candidateKB": 28.12,
+      "deltaKB": 1.2
+    },
+    {
+      "group": "combos",
+      "feature": "current public surface mix",
+      "baselineKB": 56.3,
+      "candidateKB": 58.04,
+      "deltaKB": 1.74
+    }
+  ],
+  "sourceRestored": true,
+  "candidateArtifactsRestored": true,
+  "replay": "python3 /private/tmp/st-baseline-artifact-attribution.py; requires fresh output directory and exclusive ownership"
+}

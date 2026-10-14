@@ -1,0 +1,140 @@
+--- a/packages/solid/src/lib/native-publication-error-boundary.spec.ts
++++ b/packages/solid/src/lib/native-publication-error-boundary.spec.ts
+@@ -3,11 +3,14 @@
+ 
+ import {
+   createSignalTreeFactory,
++  replaceLocation,
+   type EpochHandle,
+   type ObservationAdapter,
+ } from '@signal-tree/kernel/adapter';
+ 
+-import { entityMap } from '../index';
++import { entityMap, transactions } from '../index';
++import { peekInternalTransactionRuntime } from '../../../kernel/src/enhancers/transactions/transactions';
++import { hasOpenCommitScope } from '../../../kernel/src/lib/internals/commit-consequence';
+ import { createSolidObservationAdapter } from './solid-observation';
+ 
+ function required<T>(value: T | undefined): T {
+@@ -236,3 +239,121 @@
+     }
+   });
+ });
++
++
++describe('Solid mixed settlement member publication failures', () => {
++  it.each(['error', 'undefined'] as const)(
++    'finishes sibling publication before reporting the first %s member-token failure',
++    (failure) => {
++      const base = createSolidObservationAdapter();
++      const marker = failure === 'error' ? new Error('member token publication') : undefined;
++      let selectingMember = false;
++      let armed = false;
++      let hits = 0;
++      let nextToken = 0;
++      const memberTokens = new Set<number>();
++      const adapter: ObservationAdapter = {
++        ...base,
++        createWritableCell<T>(read: () => T) {
++          const realized = required(base.createWritableCell)(read);
++          const token = ++nextToken;
++          return {
++            ...realized,
++            cell: new Proxy(realized.cell, {
++              apply(target, receiver, args) {
++                if (selectingMember) memberTokens.add(token);
++                return Reflect.apply(target, receiver, args);
++              },
++            }),
++            token: {
++              observe() {
++                if (selectingMember) memberTokens.add(token);
++                realized.token.observe();
++              },
++              invalidate() {
++                realized.token.invalidate();
++                if (armed && hits === 0 && memberTokens.has(token)) {
++                  hits++;
++                  throw marker;
++                }
++              },
++            },
++          };
++        },
++      };
++      const group: {
++        keep: number;
++        optional?: { x: number; y: number | undefined };
++      } = { keep: 0, optional: { x: 200, y: undefined } };
++      const tree = createSignalTreeFactory(adapter)({
++        count: 100,
++        group,
++        rows: entityMap<{ id: string; value: number }>(),
++      }, { enhancers: [transactions()] });
++      let dispose: (() => void) | undefined;
++      try {
++        const rows = tree.$.rows;
++        const optional = required(tree.$.group.optional);
++        rows.addOne({ id: 'A', value: 300 });
++        rows.setActiveId('A');
++        const held = rows.byIdOrFail('A');
++        selectingMember = true;
++        optional.x();
++        selectingMember = false;
++        expect(memberTokens.size).toBeGreaterThan(0);
++        tree.$.group({ keep: 0 });
++        const read = () => ({
++          snapshot: tree.$(), count: tree.$.count(),
++          optional: optional(),
++          ids: [...rows.ids()], all: rows.all().map(row => ({ ...row })),
++          direct: rows.byIdOrFail('A')().value, held: held().value,
++          activeId: rows.activeId(), active: rows.activeEntity()?.value,
++        });
++        const baseline = structuredClone(read());
++        const seen: Array<ReturnType<typeof read>> = [];
++        dispose = createRoot(off => {
++          createComputed(() => seen.push(structuredClone(read())));
++          return off;
++        });
++        expect(seen).toEqual([baseline]);
++        // SDK locations use the same writable binding as Solid facade .set.
++        const pending = tree.transact(() => {
++          replaceLocation(tree.$.count, 101);
++          replaceLocation(optional.x, 201);
++          rows.updateOne('A', { value: 301 });
++        });
++        expect(tree.$.count()).toBe(101);
++        expect(optional.x()).toBe(201);
++        expect(held().value).toBe(301);
++        expect(required(peekInternalTransactionRuntime(tree)).getPendingTurnCount()).toBe(1);
++        expect(hasOpenCommitScope(tree)).toBe(true);
++        expect(seen.at(-1)?.count).toBe(101);
++        const start = seen.length;
++        armed = true;
++        const outcome = attempt(() => pending.rollback());
++        armed = false;
++        // Freeze actual deliveries before a direct read can refresh any cache.
++        const deliveries = seen.slice(start);
++        expect(hits).toBe(1);
++        expect(outcome.threw).toBe(true);
++        expect(outcome.error).toBe(marker);
++        expect(deliveries.length).toBeGreaterThan(0);
++        for (const delivered of deliveries) expect(delivered).toEqual(baseline);
++        expect(read()).toEqual(baseline);
++        expect(rows.byIdOrFail('A')).toBe(held);
++        expect(required(peekInternalTransactionRuntime(tree)).getPendingTurnCount()).toBe(0);
++        expect(hasOpenCommitScope(tree)).toBe(false);
++        const after = seen.length;
++        expect(attempt(() => pending.rollback()).threw).toBe(false);
++        expect(read()).toEqual(baseline);
++        expect(seen).toHaveLength(after);
++      } finally {
++        armed = false;
++        selectingMember = false;
++        dispose?.();
++        tree.destroy();
++        base.dispose();
++      }
++    }
++  );
++});

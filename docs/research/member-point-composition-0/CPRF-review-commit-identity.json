@@ -1,0 +1,115 @@
+{
+  "commit": "12a04f57bee4c90de1110eff7b72960fcd46059c",
+  "overlay": "/private/tmp/st-CPRF-rg1lintfixed/CPRF-0nkpZ1",
+  "files": [
+    {
+      "file": "packages/kernel/src/enhancers/transactions/transactions.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "612d34cfb5c435743501e6762f0a5c538b80920143ed89aad8fa5c74941e77a5"
+    },
+    {
+      "file": "packages/kernel/src/lib/entity-signal.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "1ae8776c145cea947637cbf950896934582c11e3e6bf54b2c21cc685200ce91b"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/causal-runtime/pending-rollback.spec.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "1405cf3e1e6a7b42bc1d35cc71fd903cf04c7865878552d59b99a63353344fa7"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "6b70aaeec9d3c6355f144d26e671460af30484e933e47a829bf6e30f7f707e83"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/causal-runtime/target-transition.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "51bce15a6d9805f9d783c1d281cc7405385a43e6c26e93e0f6ed8ac3227ad6c2"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "37518fb83cf87d93c34d8719ac06d61959fde93295502012e67c8d28b74f4817"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "164c87dc9405b74f52a1d3eb08dd899745492fb141bfdcf9010f88b22383584c"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "602bfb23807a5c455336d317b8b2a129adbfe102c1e9334419f9a0b8447d44e0"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/location-runtime.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "0b97cf252ea781e365cdc9a8d8202c4cc1076805fd4ba3fac3bcaeb98a44b5a6"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "b457a64ebed13109c73484e5e38a9d7a3e8fe2b625333d973ac8ebddc1fb9217"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "4c2077142cd3f69c475221abe0a0a45f605f14d304d73ef256980a2c661da876"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/plain-branch-membership.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "77bb1e5be210253df2a06aa78a41da408e3ffa95640f947a3e557cbab61264d3"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "d03cd01b1b0037756027daad3c10961596626ae41bf2eebe7dd00d5b9e3e2030"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "4581209ac479bc50b0ee6dc2ee8b8bcf15dae6596636a3fb1694c42f26fbdfa9"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "642cd381be7fbc067bf3d2fae2e8b76edd218b5f1b1e36470e3f9df78a36da47"
+    },
+    {
+      "file": "packages/kernel/src/lib/physical/entity-mutation-frame.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "138c7930f05e66ba1ec964bede42a396751939ecc05361247b550d59fb8bec4a"
+    },
+    {
+      "file": "packages/solid/src/lib/native-publication-error-boundary.spec.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "f7653e7ec9672820f2da07d537e7958961398b945e0383f81af26a0e1e952aca"
+    },
+    {
+      "file": "packages/vue/src/lib/vue-observation.ts",
+      "candidateExists": true,
+      "matches": true,
+      "sha256": "c4678206e2bd3be2c5d4353e411c4f4c8615b31023bbea210d530ce2e50a3bc4"
+    }
+  ],
+  "allMatch": true
+}

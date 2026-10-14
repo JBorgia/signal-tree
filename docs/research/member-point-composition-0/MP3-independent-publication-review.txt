@@ -1,0 +1,24 @@
+MP3 independent bounded review, 2026-10-13
+Artifact: /private/tmp/st-mp3/MP3.patch atop CPRA+MP2; runtime loaded by CPRD runner manifests in /private/tmp/st-member-siblings/runs.
+
+No concrete blocker reproduced in assigned boundary. This is not integration acceptance or universal exception atomicity.
+
+Source constraints checked:
+- Structural point route shares member/scalar endpoints before member installation, preserves the existing heterogeneous commit order removes -> fresh adds -> restores -> rekeys, then advances physical clock. Dynamic anchors remain resolved by original per-plan commit logic.
+- Structural native location writers enqueue publishers while enclosing location invalidation group is active. location-runtime deliver catches each publisher error and continues, retaining errors[0]; runInvalidationGroup tracks a separate hasFailure boolean, so thrown undefined remains a failure.
+- Scalar P1 publisher separately catches each token, continues, and rethrows exact first. MP3 outer member invalidation adds missing continuation across republishMembers, hidden-row bookkeeping and final shared scalar slots. It does not change standalone callers' stop-on-error behavior.
+- republishMembers recursively invokes collection membership hooks before publishing accumulated scalar slots. An arbitrary synchronous hook failure could still abort that traversal. The actual supported after-real-writable-token injected fault occurs at deferred location delivery in tested collection case; it does not establish a synchronous hook counterexample. Do not silently enlarge the fault model to arbitrary hook corruption.
+- Member after-images are captured after all participant installation and before member path notification/collection replay taps. Subsequent callback writes stay authored, and there are no later participant installs to overwrite them.
+- MP3 heterogeneous.publish catches per plan/path notification, continuing siblings and retaining exact first; it does not promise continuation inside a plan.publish (e.g. its notifier before its tap). Do not describe this as every callback always executes.
+
+New separate fixture composition-siblings.mjs: two omitted branches, multiple scalar slots per branch, a collection nested under omitted right, speculative structural add B, held A and active A. Explicit restored snapshots, direct leaves, ids/all/held/selection, all actual rollback observer frames, pending=0, scope=false, successful inert retry. Callback case independently writes scalar/branch leaf/A row during onRemove B, checks newer truth.
+Baseline control and callback pass. CPRD eight cases all pass/stable: control, callback, fault-member-error/undefined, fault-row-error/undefined, fault-scalar-error/undefined. Six faults use exact same after-real-writable-token seam and actual-cell-read identity discovery. Original composition10 remains unchanged.
+
+First fixture error preserved: rows.byId('B') returns undefined for absent key; attempted invocation threw. Original file /private/tmp/composition-siblings-first.mjs; first baseline raw dirs retained. Correction asserts direct absence, without changing semantic expected state.
+
+Replay from dedicated checkout:
+ST_PROOF_OUTPUT=/private/tmp/st-member-siblings node docs/research/member-point-composition-0/run.mjs base composition-siblings.mjs control second
+ST_PROOF_OUTPUT=/private/tmp/st-member-siblings node docs/research/member-point-composition-0/run.mjs base composition-siblings.mjs callback second
+ST_PROOF_OUTPUT=/private/tmp/st-member-siblings node docs/research/member-point-composition-0/run.mjs CPRD composition-siblings.mjs MODE first
+MODE is each of eight listed modes. Saved raw dirs contain manifest, bundle, stdout and stderr. Replays require fresh labels to preserve existing evidence.
+Compact actual command results /private/tmp/member-siblings-CPRD.log.
