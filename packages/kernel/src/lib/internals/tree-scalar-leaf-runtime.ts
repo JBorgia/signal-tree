@@ -91,6 +91,15 @@ class ScalarSlotMutationFrameOrchestrator implements ScalarSlotMutationFrame {
     this.frame.discard();
   }
 
+  prepareCommit(options?: { advanceRevision?: boolean; publish?: boolean }): () => ScalarSlotCommitResult {
+    const install = this.frame.prepareCommit({ advanceRevision: options?.advanceRevision });
+    return () => {
+      const result = install();
+      if (options?.publish !== false) this.publication.publish(result);
+      return result;
+    };
+  }
+
   commit(options?: {
     advanceRevision?: boolean;
     publish?: boolean;
@@ -127,8 +136,9 @@ function createScalarLeaf<T>(
 
     return kernel.readSlot<T>(slotIndex);
   };
-  const binding = locations.createWritable(read, (value) => {
-    const result = kernel.commitSlot(slotIndex, value);
+  const binding = locations.createWritable(read, (value, _intent, prepare) => {
+    const changedValue = kernel.commitRecorded(slotIndex, value, prepare);
+    const result = {changed:changedValue};
     const reAdded = liveness.absence?.reAdd(holder.leaf) === true;
     const changed = publication.prepareSlot(slotIndex, result.changed, reAdded);
     return changed;

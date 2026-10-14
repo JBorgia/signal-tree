@@ -39,6 +39,9 @@ const TREE_REALIZATION_DESCRIPTORS = Symbol.for(
 const TREE_REALIZATION_PORT = Symbol.for('SignalTree:TreeRealizationPort');
 
 type CollectionNode = {
+  __preparePointValues?(values: readonly { subjectId: number; key: string | number; value: unknown }[]): {
+    install(): void; invalidate(): void; publish(): void;
+  };
   byIdOrFail(id: string | number): unknown;
   changeId(from: string | number, to: string | number): void;
   removeOne(id: string | number): void;
@@ -642,6 +645,137 @@ export function getTreeRealizationPort(
   ];
 }
 
+/**
+ * Point-only realization for scalar slots and existing entity lifetimes.
+ * The caller retains admission and the encompassing invalidation group.
+ * Undefined means the effects require the existing structural/member planner.
+ */
+export function preparePointRealization(
+  tree: ISignalTree<object>,
+  effects: readonly ReversalEffect[]
+): { install(): void; publish(): void } | undefined {
+  if (!effects.length ||
+      !effects.some(effect => typeof effect.subjectId === 'number')) return undefined;
+  const descriptors = getTreeRealizationDescriptors(tree.$);
+  const slots = getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
+  const clock = getPhysicalCommitClock(tree.$) ?? getPhysicalCommitClock(tree);
+  if (!descriptors || !slots || !clock) return undefined;
+  const baseRevision = clock.revision();
+  const owners = indexStructuralOwnerPaths(tree.$);
+  const memberTargets = new Map<number, { present: boolean; value: unknown; turn?: number }>();
+  for (const effect of effects) if (effect.plainBranchMembership) {
+    memberTargets.delete(effect.owner);
+    memberTargets.set(effect.owner, { present: effect.plainBranchMembership.after, value: effect.after,
+      ...(effect.turn === undefined ? {} : { turn: effect.turn }) });
+  }
+  if (effects.some(effect => effect.structural)) {
+    const scalarEffects = effects.filter(effect => !effect.plainBranchMembership && !effect.structural && typeof effect.subjectId !== 'number');
+    const members = memberTargets.size ? preparePlainBranchMembers(tree.$, memberTargets, scalarEffects) : undefined;
+    const entityEffects = effects.filter(effect => !effect.plainBranchMembership && (!members || effect.structural || typeof effect.subjectId === 'number'));
+    const heterogeneous = planHeterogeneousFrame(tree, descriptors, owners, slots, clock, entityEffects);
+    if (!heterogeneous) return undefined;
+    if (clock.revision() !== baseRevision) throw new Error('Point realization preparation reentered installation');
+    let installed = false;
+    return {
+      install(): void {
+        if (installed || clock.revision() !== baseRevision) throw new Error('Point realization base revision is stale');
+        members?.install();
+        // Existing structural commits resolve anchors in their established order.
+        // The surrounding invalidation group defers native delivery until all install.
+        heterogeneous.install();
+        installed = true;
+      },
+      publish(): void {
+        if (!installed) throw new Error('Point realization published before installation');
+        let failed = false;
+        let firstError: unknown;
+        const run = (fn: () => void): void => { try { fn(); } catch (error) {
+          if (!failed) { failed = true; firstError = error; }
+        } };
+        run(() => heterogeneous.invalidate());
+        if (members) run(() => members.invalidate());
+        if (members) run(() => members.publish());
+        run(() => heterogeneous.publish());
+        if (failed) throw firstError;
+      },
+    };
+  }
+  const rows = new Map<CollectionNode, Map<number, { subjectId: number; key: string | number; value: unknown }>>();
+  const scalarEffects: ReversalEffect[] = [];
+  const frame = slots.beginFrame();
+  for (const effect of effects) {
+    if (effect.plainBranchMembership) continue;
+    if (typeof effect.subjectId !== 'number') {
+      if (effect.subjectFieldSegments !== undefined || hasInlineScopedAddress(effect) || hasInlineSubjectAddress(effect)) return undefined;
+      const slot = slots.resolveScalarSlot(effect.owner);
+      if (slot === undefined) return undefined;
+      frame.set(slot, effect.after);
+      scalarEffects.push(effect);
+      continue;
+    }
+    const descriptor = descriptors.get(effect.owner);
+    const collection = resolveCollectionNode(tree, descriptor, owners, effect);
+    if (!collection?.__preparePointValues) return undefined;
+    const key = collection.__findKeyBySubjectId?.(effect.subjectId);
+    if (key === undefined) return undefined;
+    let bySubject = rows.get(collection);
+    if (!bySubject) rows.set(collection, (bySubject = new Map()));
+    let row = bySubject.get(effect.subjectId);
+    if (!row) {
+      row = { subjectId: effect.subjectId, key, value: deepClone(snapshotCollectionEntityValue(collection, key)) };
+      bySubject.set(effect.subjectId, row);
+    }
+    const path = resolveSubjectFieldPath(descriptor, effect, getPositionRegistry(tree.$));
+    if (path === undefined) return undefined;
+    if (path.length === 0) row.value = effect.after;
+    else if (effect.fieldPresence?.after === false) row.value = withoutFieldAtSegments(row.value, path);
+    else assignPreparedSubjectValue(row.value, path, effect.after);
+  }
+  const members = memberTargets.size ? preparePlainBranchMembers(tree.$, memberTargets, scalarEffects) : undefined;
+  const collections = [...rows].map(([collection, subjects]) => {
+    const prepare = collection.__preparePointValues;
+    if (!prepare) throw new Error('Point realization preparation is unavailable');
+    return prepare.call(collection, [...subjects.values()]);
+  });
+  if (!frame.prepareCommit) return undefined;
+  const installScalars = members ? () => undefined : frame.prepareCommit({ advanceRevision: false, publish: false });
+  if (clock.revision() !== baseRevision) throw new Error('Point realization preparation reentered installation');
+  let result: ReturnType<typeof frame.commit> | undefined;
+  let installed = false;
+  return {
+    install(): void {
+      if (installed || clock.revision() !== baseRevision) throw new Error('Point realization base revision is stale');
+      if (members) members.install();
+      else result = installScalars();
+      for (const collection of collections) collection.install();
+      clock.advance();
+      installed = true;
+    },
+    publish(): void {
+      const installedScalars = result;
+      if (!installed || (!members && !installedScalars)) throw new Error('Point realization published before installation');
+      // Complete all owned invalidation staging before any path or replay callback.
+      let failed = false;
+      let firstError: unknown;
+      const run = (fn: () => void) => { try { fn(); } catch (error) { if (!failed) { failed = true; firstError = error; } } };
+      for (const collection of collections) run(() => collection.invalidate());
+      if (members) run(() => members.invalidate());
+      else if (installedScalars) run(() => slots.publishPrepared(installedScalars));
+      if (members) run(() => members.publish());
+      for (const collection of collections) run(() => collection.publish());
+      for (const effect of members ? [] : scalarEffects) run(() => {
+        const descriptor = descriptors.get(effect.owner);
+        const path = resolveNotifyPath(tree, descriptor, owners, effect);
+        if (path) getPathNotifier().notify(path, effect.after, effect.before,
+          descriptor?.ownerPath ?? path, undefined, [effect.owner],
+          { ...(getActiveWriteContext() ?? {}), intent: 'system', participation: 'realized' });
+      });
+      run(() => markOwnerInvalidatedFrom(tree as object));
+      if (failed) throw firstError;
+    },
+  };
+}
+
 function planHeterogeneousFrame(
   tree: ISignalTree<object>,
   descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
@@ -649,7 +783,7 @@ function planHeterogeneousFrame(
   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
   physicalCommitClock: ReturnType<typeof getPhysicalCommitClock>,
   effects: readonly ReversalEffect[]
-): { commit(): void } | undefined {
+): { commit(): void; install(): void; invalidate(): void; publish(): void } | undefined {
   if (
     effects.length === 0 ||
     !effects.some(
@@ -1019,8 +1153,8 @@ function planHeterogeneousFrame(
     });
   }
 
-  return {
-    commit(): void {
+  let scalarCommitResult: ReturnType<NonNullable<typeof scalarFrame>['commit']> | undefined;
+  const install = (): void => {
       if (
         scalarFrame &&
         physicalCommitClock &&
@@ -1029,8 +1163,7 @@ function planHeterogeneousFrame(
         throw new Error('Heterogeneous realization base revision is stale.');
       }
 
-      const commitAndPublish = () => {
-        const scalarCommitResult = scalarFrame?.commit({
+        scalarCommitResult = scalarFrame?.commit({
           advanceRevision: false,
           publish: false,
         });
@@ -1052,40 +1185,49 @@ function planHeterogeneousFrame(
         }
 
         physicalCommitClock?.advance();
+  };
+  const invalidate = (): void => {
         if (scalarCommitResult && scalarSlotRuntime) {
           scalarSlotRuntime.publishPrepared(scalarCommitResult);
         }
+  };
+  const publish = (): void => {
+    let failed = false;
+    let firstError: unknown;
+    const run = (fn: () => void): void => { try { fn(); } catch (error) {
+      if (!failed) { failed = true; firstError = error; }
+    } };
 
         for (const { plan } of plannedRemoves) {
-          plan.publish({
+          run(() => plan.publish({
             ...(getActiveWriteContext() ?? {}),
             intent: 'system',
             participation: 'realized',
-          });
+          }));
         }
 
         for (const { plan } of plannedRestores) {
-          plan.publish({
+          run(() => plan.publish({
             ...(getActiveWriteContext() ?? {}),
             intent: 'system',
             participation: 'realized',
-          });
+          }));
         }
 
         for (const { plan } of plannedFreshAdds) {
-          plan.publish({
+          run(() => plan.publish({
             ...(getActiveWriteContext() ?? {}),
             intent: 'system',
             participation: 'realized',
-          });
+          }));
         }
 
         for (const { plan } of plannedRekeys) {
-          plan.publish({
+          run(() => plan.publish({
             ...(getActiveWriteContext() ?? {}),
             intent: 'system',
             participation: 'realized',
-          });
+          }));
         }
 
         for (const effect of [
@@ -1103,7 +1245,7 @@ function planHeterogeneousFrame(
             continue;
           }
 
-          getPathNotifier().notify(
+          run(() => getPathNotifier().notify(
             notifyPath,
             effect.after,
             effect.before,
@@ -1117,20 +1259,19 @@ function planHeterogeneousFrame(
               intent: 'system',
               participation: 'realized',
             }
-          );
+          ));
         }
 
-        markOwnerInvalidatedFrom(tree as object);
-      };
-
+        run(() => markOwnerInvalidatedFrom(tree as object));
+        if (failed) throw firstError;  };
+  return {
+    install, invalidate, publish,
+    commit(): void {
+      const commitAndPublish = () => { install(); invalidate(); publish(); };
       const locations = getLocationRuntime(tree.$);
-      if (locations) {
-        locations.runInvalidationGroup(commitAndPublish);
-      } else if (scalarSlotRuntime) {
-        scalarSlotRuntime.runInvalidationGroup(commitAndPublish);
-      } else {
-        commitAndPublish();
-      }
+      if (locations) locations.runInvalidationGroup(commitAndPublish);
+      else if (scalarSlotRuntime) scalarSlotRuntime.runInvalidationGroup(commitAndPublish);
+      else commitAndPublish();
     },
   };
 }

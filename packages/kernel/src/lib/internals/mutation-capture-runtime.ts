@@ -1,5 +1,7 @@
+import type { TerminalRecordPlan } from './intrinsic-mutation';
 import { isTraversableNode } from '../utils';
 import { reportContainedObserverError } from './error-reporter';
+import type { StructuralEffect } from '../mutation-types';
 import type { WriteMetadata } from '../mutation-types';
 
 export type CollectionOrderCapture = {
@@ -26,6 +28,8 @@ export type CommittedEntityMutation = {
   readonly after: unknown;
   /** Membership/key changes claim the lifetime, rather than just value fields. */
   readonly structural: boolean;
+  readonly path?: string;
+  readonly structuralRecord?: StructuralEffect;
 };
 
 export type CommittedEntityCapture = {
@@ -40,6 +44,9 @@ export const MUTATION_CAPTURE_RUNTIME = Symbol.for(
 );
 
 export interface MutationCaptureRuntime {
+  prepareEntityResponsibility?: (
+    capture: CommittedEntityCapture
+  ) => TerminalRecordPlan | undefined;
   /** Pay-for-use: producers build committed evidence only when this is true. */
   hasCommittedEntityObservers?(): boolean;
   publishCommittedEntity?(capture: CommittedEntityCapture): void;

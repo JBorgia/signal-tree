@@ -1,3 +1,4 @@
+import type { TerminalRecordPlan } from '../internals/intrinsic-mutation';
 import type { CommittedEntityMutation } from '../internals/mutation-capture-runtime';
 import { EntityValueStore } from './entity-value-store';
 import {
@@ -153,7 +154,8 @@ export class EntityMutationFrame<
    * preparation failure throws before anything applies or is reported.
    */
   commit(
-    observeCommitted?: (changes: readonly CommittedEntityMutation[]) => void
+    observeCommitted?: (changes: readonly CommittedEntityMutation[]) => void,
+    responsibility?: TerminalRecordPlan
   ): EntityMutationCommitResult {
     const preparedMutations = this.prepareCommitInstructions();
     // Before-images of touched lifetimes only. An inactive lifetime's retained
@@ -250,6 +252,10 @@ export class EntityMutationFrame<
       physicallyChangedSubjectIds.add(mutation.subjectId);
     }
 
+    if (responsibility) {
+      for(let i=0;i<responsibility.writes.length;i++){const w=responsibility.writes[i];w.map.set(w.key,w.value);}
+      for(let i=0;i<responsibility.adds.length;i++){const a=responsibility.adds[i];a.set.add(a.value);}
+    }
     if (before && observeCommitted) {
       observeCommitted(
         [...before].map(([subject, entry]) => ({

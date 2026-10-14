@@ -261,6 +261,11 @@ function rollbackAddressKey(effect: CausalTurn['effects'][number]): string {
   if (effect.plainBranchMembership !== undefined) {
     return `${String(effect.owner)}\u0000membership`;
   }
+  // Distinct lifetimes may rekey under the same collection owner in one turn.
+  // Owner-only deduplication drops every rekey after the first.
+  if (effect.structural === 'rekey' && effect.subjectId !== undefined) {
+    return JSON.stringify([effect.owner, effect.subjectId, 'rekey']);
+  }
   if (effect.subjectFieldSegments !== undefined) {
     return JSON.stringify([
       effect.owner,

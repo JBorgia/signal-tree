@@ -17,7 +17,7 @@ import {
   PRODUCTION_SUBSTRATE_STATS_ENABLED,
   recordProductionSubstrateStat,
 } from './production-substrate-stats';
-import { registerIntrinsicMutationSource } from './intrinsic-mutation';
+import { type TerminalRecordPlan, registerIntrinsicMutationSource } from './intrinsic-mutation';
 
 interface DependencyConsumer {
   readonly dependencies: Map<DependencyNode, DependencyEdge>;
@@ -299,7 +299,7 @@ export interface LocationRuntime {
      * value, so a reversal restores storage as it was (v16 8e).
      */
     read: (stored?: boolean) => T,
-    write: (value: T, intent: 'replace' | 'derive') => boolean
+    write: (value: T, intent: 'replace' | 'derive', prepare?: () => TerminalRecordPlan | undefined) => boolean
   ): WritableLocationBinding<T>;
   createWritableProjection?<T>(
     compute: () => T,
@@ -408,7 +408,7 @@ export function createLocationRuntime(
 
   const createWritable = <T>(
     read: (stored?: boolean) => T,
-    write: (value: T, intent: 'replace' | 'derive') => boolean
+    write: (value: T, intent: 'replace' | 'derive', prepare?: () => TerminalRecordPlan | undefined) => boolean
   ): WritableLocationBinding<T> => {
     let observationToken: ObservationToken | undefined;
     const listeners = new Set<() => void>();
@@ -447,7 +447,7 @@ export function createLocationRuntime(
       replace: (next) => {
         const observer = mutationSource2.observer;
         const before = observer ? read(true) : undefined;
-        const changed = write(next, 'replace');
+        const changed = write(next, 'replace',()=>mutationSource2.prepareTerminal?.({intent:'replace',before:before as T,after:next,changed:true}));
         if (observer) {
           observer({
             intent: 'replace',
@@ -464,7 +464,7 @@ export function createLocationRuntime(
         const current = read();
         const before = mutationSource2.observer ? read(true) : current;
         const next = update(current);
-        const changed = write(next, 'derive');
+        const changed = write(next, 'derive',()=>mutationSource2.prepareTerminal?.({intent:'derive',before,after:next,changed:true}));
         const observer = mutationSource2.observer;
         if (observer) {
           observer({

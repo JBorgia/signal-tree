@@ -1,3 +1,4 @@
+import type { TerminalRecordPlan } from '../../lib/internals/intrinsic-mutation';
 import { publishingExposedOnly } from '../../lib/internals/exposed-publication';
 import {
   collectionBindingAt,
@@ -90,6 +91,7 @@ import {
   getTreeRealizationDescriptors,
   getTreeRealizationPort,
   rememberTreeRealizationDescriptor,
+  preparePointRealization,
 } from '../../lib/internals/causal-runtime/tree-realization-adapter';
 import { TurnStore } from '../../lib/internals/causal-runtime/turn-store';
 import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
@@ -101,7 +103,7 @@ import { getOwnedPositionIds } from '../../lib/internals/owned-mutation';
 import { getPositionRegistry } from '../../lib/internals/position-registry';
 import { reportContainedObserverError } from '../../lib/internals/error-reporter';
 import { getPathNotifier } from '../../lib/path-notifier';
-import { isTraversableNode } from '../../lib/utils';
+import { deepEqual, isTraversableNode } from '../../lib/utils';
 import {
   getActiveWriteContext,
   withWriteContext,
@@ -1432,6 +1434,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
   /** A refusal it threw; the reader classifies it from the error's cause. */
   const publishRefusal = (transactionId: number, error: unknown): void =>
     publishLifecycle({ kind: 'refused', transactionId, error });
+  const realizationTree = tree as unknown as ISignalTree<object>;
   const treeWrapper = tree as unknown as object;
   const stateRoot = tree.$ as unknown as object;
   const realizationDescriptors =
@@ -1444,7 +1447,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     getTreeRealizationPort(stateRoot) ??
     getTreeRealizationPort(treeWrapper) ??
     createTreeRealizationAdapter({
-      tree: tree as unknown as ISignalTree<object>,
+      tree: realizationTree,
       descriptors: realizationDescriptors,
     });
   defineTreeRealizationPort(treeWrapper, realizationPort);
@@ -1638,7 +1641,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // v16 8g): rollback of `x(5); omit g; re-add g` came back with x 5.
     const effects = settleTurnMemberEffects(
       tree.$ as object,
-      Array.from(bucket.effects.values()).map(cloneTurnEffect)
+      Array.from(bucket.effects.values()).filter(Boolean).map(cloneTurnEffect)
     );
     bucket.effects.clear();
     const collectionOrders = Array.from(bucket.collectionOrders.values()).map(
@@ -2009,6 +2012,103 @@ export function getOrCreateInternalTransactionRuntime<T>(
       }
     });
 
+
+  // Research operation journal: prepared facts survive independently of diagnostics.
+  type OperationRecord = { sequence: number; owner: number; effects: readonly TurnEffect[]; previous?: OperationRecord; owners: Set<number> };
+  const installedOperations = new Map<number, OperationRecord>();
+  const expectedDispositions = new Map<number, readonly TurnEffect[]>();
+  tree.registerCleanup(()=>{ installedOperations.clear(); expectedDispositions.clear(); });
+  const sourceCaptureRuntime = getMutationCaptureRuntime(tree);
+  if (sourceCaptureRuntime) {
+    sourceCaptureRuntime.prepareEntityResponsibility = (capture) => {
+      const id = resolveTransactionId(capture.meta);
+      if (id === undefined || isRestoring || capture.meta?.origin === 'transaction-rollback' || capture.meta?.origin === 'restoration') return;
+      const bucket = getTransactionBucket(id);
+      const scratch = createCaptureBucket();
+      const effects: TurnEffect[]=[];
+      for (const change of capture.changes) {
+        const path = change.path;
+        if (path === undefined) throw new Error('Entity responsibility has no mutation path');
+        if(change.structuralRecord) effects.push({...change.structuralRecord,position:capture.owner,ownerPath:capture.ownerPath,path} as TurnEffect);
+        else if (!isPlainRecord(change.before) || !isPlainRecord(change.after)) {
+          // Match rich capture's existing whole-row boundary. Arrays and opaque
+          // values are not record fields; index enumeration loses their shape.
+          if (change.before !== change.after) effects.push({
+            kind: 'set', position: capture.owner, ownerPath: capture.ownerPath,
+            path, subject: change.subject,
+            before: change.before, after: change.after,
+            mutationIntent: capture.meta?.mutationIntent,
+          });
+        } else {
+          const before=change.before, after=change.after;
+          for(const key of new Set([...Object.keys(before),...Object.keys(after)])) {
+            const beforeValue=before[key],afterValue=after[key];
+            const beforePresent=Object.prototype.hasOwnProperty.call(before,key),afterPresent=Object.prototype.hasOwnProperty.call(after,key);
+            if(beforeValue===afterValue && beforePresent===afterPresent) continue;
+            effects.push({kind:'set',position:capture.owner,ownerPath:capture.ownerPath,path: `${path}.${key}`,subject:change.subject,subjectFieldSegments:[key],before:beforeValue,after:afterValue,mutationIntent:capture.meta?.mutationIntent,...(!(beforePresent&&afterPresent)?{fieldPresence:{before:beforePresent,after:afterPresent}}:{})});
+          }
+        }
+      }
+      const touchedKeys = new Set(effects.map(effectKey));
+      for (const key of touchedKeys) {
+        const prior = bucket.effects.get(key);
+        if (prior) scratch.effects.set(key, cloneTurnEffect(prior));
+      }
+      for (const effect of effects) {
+        if (bucket.baselineValues.has(effect.position)) scratch.baselineValues.set(effect.position, bucket.baselineValues.get(effect.position));
+      }
+      for(const effect of effects)enqueueEffect(scratch,scratch.effects,cloneTurnEffect(effect));
+      const previous=installedOperations.get(id);
+      const operation:OperationRecord={sequence:(previous?.sequence ?? -1)+1,owner:capture.owner,effects,previous,owners:previous?.owners ?? new Set<number>()};
+      const writes: Array<TerminalRecordPlan['writes'][number]> = [
+        { map: installedOperations, key: id, value: operation },
+      ];
+      // Replace the prepared map, including composed-away structural entries.
+      for(const key of touchedKeys) if(!scratch.effects.has(key)) writes.push({map:bucket.effects,key,value:undefined});
+      for(const [key,value] of scratch.effects) writes.push({map:bucket.effects,key,value});
+      for(const [key,value] of scratch.baselineValues) writes.push({map:bucket.baselineValues,key,value});
+      if(pendingTransactions.size>0) for(const key of windowKeys([capture.owner],capture.changes.map(c=>c.subject))) writes.push({map:bucket.ownWriteSeq,key,value:windowWriteSeq});
+      return {writes,adds:[{set:operation.owners,value:capture.owner},{set:bucket.positionIds,value:capture.owner},{set:bucket.ownerPaths,value:capture.ownerPath},...capture.changes.map(c=>({set:bucket.subjectIds,value:c.subject}))]};
+    };
+    tree.registerCleanup(()=>{ delete sourceCaptureRuntime.prepareEntityResponsibility; });
+  }
+  const foldOperationDisposition = (id: number): readonly TurnEffect[] => {
+    const newest = installedOperations.get(id);
+    if (!newest) return [];
+    const records: OperationRecord[] = new Array(newest.sequence + 1);
+    let record: OperationRecord | undefined = newest;
+    for (let i = records.length - 1; i >= 0; i--) {
+      if (!record || record.sequence !== i) throw new Error('Operation journal sequence gap');
+      records[i] = record;
+      record = record.previous;
+    }
+    if (record) throw new Error('Operation journal sequence gap');
+    const expected = createCaptureBucket();
+    for (const operation of records) for (const effect of operation.effects) enqueueEffect(expected, expected.effects, cloneTurnEffect(effect));
+    return settleTurnMemberEffects(tree.$ as object, [...expected.effects.values()].map(cloneTurnEffect));
+  };
+  const validateOperationDisposition = (id:number, turnId:number|undefined):void => {
+    const folded = expectedDispositions.get(id);
+    if (!folded?.length) return;
+    const retained=authority.getPendingTurn(turnId)?.__effects ?? [];
+    const indexed = new Map(retained.map(effect => [effectKey(effect), effect]));
+    for(const effect of folded) {
+      const actual=indexed.get(effectKey(effect));
+      const same = actual && actual.kind === effect.kind && [...new Set([...Object.keys(effect), ...Object.keys(actual)])].every(key => {
+        const expectedValue = (effect as unknown as Record<string, unknown>)[key];
+        const actualValue = (actual as unknown as Record<string, unknown>)[key];
+        const memberImage = (key === 'before' || key === 'after') && effect.kind === 'set' && effect.plainBranchMembership !== undefined;
+        return memberImage || key === 'subjectFieldSegments' || key === 'fieldPresence' || key === 'plainBranchMembership'
+          ? deepEqual(actualValue, expectedValue)
+          : Object.is(actualValue, expectedValue);
+      });
+      if(!same) {
+        const refusal=createRollbackError({kind:'effect-validation-failed',pendingTurnId:turnId ?? id,compensation:[],errorMessage:'Installed operation lacks a matching settlement disposition'});
+        publishRefusal(id,refusal);throw refusal;
+      }
+    }
+  };
+
   const resolveOwnerPositionId = (ownerPath?: string): number | undefined => {
     if (!ownerPath) {
       return undefined;
@@ -2037,6 +2137,17 @@ export function getOrCreateInternalTransactionRuntime<T>(
     positionIds?: number[]
   ): void => {
     const membership = plainBranchMembershipEffects(meta);
+    const membershipTransaction = resolveTransactionId(meta);
+    if (membership?.length && membershipTransaction !== undefined) {
+      const previous = installedOperations.get(membershipTransaction);
+      installedOperations.set(membershipTransaction, {
+        sequence: (previous?.sequence ?? -1) + 1,
+        owner: membership[0].position,
+        effects: membership.map(cloneTurnEffect),
+        previous,
+        owners: previous?.owners ?? new Set<number>(),
+      });
+    }
     if (membership) {
       for (const effect of membership) {
         bucket.positionIds.add(effect.position);
@@ -2077,6 +2188,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
       meta,
       registry: getPositionRegistry(tree.$),
     });
+    const recorded=resolveTransactionId(meta);
+    if(recorded!==undefined && subjectIds?.length && installedOperations.get(recorded)?.owners.has(resolvedPositionIds[0]))return;
     captureEffects(
       bucket,
       bucket.effects,
@@ -2158,13 +2271,32 @@ export function getOrCreateInternalTransactionRuntime<T>(
       authority.discardPending(reservedId);
       return undefined;
     }
+    const dispositions = foldOperationDisposition(transactionId);
+    expectedDispositions.set(transactionId, dispositions);
     const {
       subjectIds,
-      positionIds,
+      positionIds: capturedPositionIds,
       effects,
       baselineValues,
       collectionOrders,
     } = drainCaptureBucket(bucket);
+    // Prepared scalar writes record admission before installation. Their raw
+    // footprint is not a net turn: x(2); x(1) over baseline 1 must leave an
+    // older pending turn untouched. Only prune positions whose scalar writes
+    // are independently journaled and have no remaining disposition. Legacy
+    // footprint-only owners and entity lifetime claims keep their admission.
+    const preparedOwners = installedOperations.get(transactionId)?.owners;
+    const slots = getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
+    const netPositions = new Set([
+      ...effects.map(effect => effect.position),
+      ...dispositions.map(effect => effect.position),
+      ...collectionOrders.map(order => order.owner),
+    ]);
+    const positionIds = capturedPositionIds.filter(position =>
+      !preparedOwners?.has(position) ||
+      slots?.resolveScalarSlot(position) === undefined ||
+      netPositions.has(position)
+    );
     const pending = authority.createPending(
       reservedId,
       subjectIds.length > 0 ? subjectIds : undefined,
@@ -2301,12 +2433,16 @@ export function getOrCreateInternalTransactionRuntime<T>(
   };
 
   const rollbackPendingTarget = (
-    effects: TurnEffect[],
-    orderDeltas: CollectionOrderDelta[]
+    effects: readonly ReversalEffect[],
+    orderDeltas: CollectionOrderDelta[],
+    completion?: { selected: boolean; committed: boolean }
   ): void => {
+    if (completion) completion.selected = true;
     const reversalEffects = placeFieldReversalsWhileRowsExist(
-      effects.map(toRollbackEffect)
+      effects
     );
+    const notifier = getPathNotifier();
+    const treeOwnerId = getPositionRegistry(tree.$)?.id;
     const bindings = new Map<number, CollectionTransitionTargetBinding>();
     visitTree(tree.$, (node) => {
       const binding = (
@@ -2362,21 +2498,35 @@ export function getOrCreateInternalTransactionRuntime<T>(
                 }
                 frame.set(slot, value);
               }
+              const install = frame.prepareCommit
+                ? frame.prepareCommit({advanceRevision:false,publish:false})
+                : () => frame.commit({advanceRevision:false,publish:false});
               let result: ReturnType<typeof frame.commit> | undefined;
               return {
-                install(): void {
-                  result = frame.commit({
-                    advanceRevision: false,
-                    publish: false,
-                  });
-                },
+                install(): void { result = install(); },
                 publish(): void {
                   if (!result) {
                     throw new Error(
                       'Transaction scalar published before installation'
                     );
                   }
-                  scalarSlotRuntime.publishPrepared(result);
+                  let failed = false;
+                  let first: unknown;
+                  try { scalarSlotRuntime.publishPrepared(result); }
+                  catch (error) { failed = true; first = error; }
+                  // The prepared route publishes the same realized path facts as
+                  // the existing realization port, after the complete unit installs.
+                  for (const effect of reversalEffects) {
+                    if (effect.subjectId !== undefined || effect.plainBranchMembership || !scalars.has(effect.owner)) continue;
+                    const descriptor = realizationDescriptors.get(effect.owner);
+                    const path = effect.path ?? descriptor?.ownerPath;
+                    if (!path) continue;
+                    try {
+                      notifier.notify(path, effect.after, effect.before, effect.ownerPath ?? descriptor?.ownerPath ?? path,
+                        undefined, [effect.owner], {...getActiveWriteContext(), intent: 'system', participation: 'realized'}, treeOwnerId);
+                    } catch (error) { if (!failed) { failed = true; first = error; } }
+                  }
+                  if (failed) throw first;
                 },
               };
             },
@@ -2389,7 +2539,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
       {
         prepareTarget: (members) =>
           preparePlainBranchMembers(tree.$ as object, members),
-      }
+      },
+      { onCommitted() { if (completion) completion.committed = true; } }
     );
     const apply = () => prepared.install();
     const locations = getLocationRuntime(tree.$);
@@ -2424,7 +2575,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
      * write recorded under transaction 1 while its own compensation announced
      * 2, and the join silently missed.
      */
-    owningTransactionId: number = transactionId
+    owningTransactionId: number = transactionId,
+    completion?: { selected: boolean; committed: boolean }
   ): void => {
     if (effects.length === 0 && orderDeltas.length === 0) {
       return;
@@ -2532,6 +2684,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
             ownerId: positionRegistry?.id,
           },
           () => {
+            // Keep the baseline complete-target admission for structural
+            // handoffs/order: per-effect occupancy is not its admissibility test.
             if (
               orderDeltas.length > 0 ||
               requiresDeclarativeStructuralTarget(
@@ -2551,7 +2705,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
                 }
               )
             ) {
-              rollbackPendingTarget(effects, orderDeltas);
+              rollbackPendingTarget(effects.map(toRollbackEffect), orderDeltas, completion);
               return { ok: true as const };
             }
             return rollbackPendingTurnAt({
@@ -2559,8 +2713,29 @@ export function getOrCreateInternalTransactionRuntime<T>(
               turnId: transactionId,
               store,
               topology: positionRegistry,
-              port: realizationPort,
               realizationContext,
+              port: {
+                validateEffects: (normalized) => realizationPort.validateEffects?.(normalized),
+                applyAtomically(normalized): void {
+                  // D2's additional mixed route keeps ordinary normalized
+                  // admission; it changes physical installation only.
+                  if (normalized.some(e => e.subjectId === undefined) && normalized.some(e => e.subjectId !== undefined)) {
+                    const point = preparePointRealization(realizationTree, normalized);
+                    if (point) {
+                      if (completion) completion.selected = true;
+                      point.install();
+                      if (completion) completion.committed = true;
+                      point.publish();
+                    } else if (normalized.some(effect => effect.plainBranchMembership)) {
+                      rollbackPendingTarget(normalized, orderDeltas, completion);
+                    } else {
+                      realizationPort.applyAtomically(normalized);
+                    }
+                  } else {
+                    realizationPort.applyAtomically(normalized);
+                  }
+                },
+              },
             });
           }
         )
@@ -2609,7 +2784,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
     baselineValues: ReadonlyMap<number, unknown>,
     orderDeltas: CollectionOrderDelta[] = [],
     callbackError?: unknown,
-    owningTransactionId: number = transactionId
+    owningTransactionId: number = transactionId,
+    completion?: { selected: boolean; committed: boolean }
   ): void => {
     applyRollbackCompensation(
       transactionId,
@@ -2617,7 +2793,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
       baselineValues,
       orderDeltas,
       callbackError,
-      owningTransactionId
+      owningTransactionId,
+      completion
     );
     markOwnerInvalidatedFrom(tree.$ as object);
   };
@@ -2862,6 +3039,42 @@ export function getOrCreateInternalTransactionRuntime<T>(
           ) {
             return;
           }
+          notifier.notify(
+            path,
+            next,
+            prev,
+            ownerPath,
+            subjectIds,
+            positionIds,
+            effectiveMeta,
+            treeOwnerId
+          );
+        },
+        { terminalRecord: (path,next,prev,meta,ownerPath,subjectIds,positionIds) => {
+          if(isRestoring || meta?.origin==='restoration' || isInspectionWrite(meta) || getWriteParticipation(meta)==='realized')return;
+          if(meta?.transactionOwner!==transactionOwnerToken)return;
+          const id=resolveTransactionId(meta), position=positionIds?.[0];
+          if(id===undefined || position===undefined || subjectIds?.length || Object.is(prev,next))return;
+          const slots=getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
+          if(slots?.resolveScalarSlot(position)===undefined)return;
+          const bucket=getTransactionBucket(id);
+          const effect: TurnEffect={kind:'set',path,ownerPath:ownerPath ?? path,position,before:prev,after:next,mutationIntent:meta?.mutationIntent};
+          const key=effectKey(effect), old=bucket.effects.get(key);
+          if(old && old.kind!=='set')throw new Error('Terminal record conflicts with structural evidence');
+          const combined=old ? {...old,after:next,mutationIntent:combineScalarMutationIntent(old.mutationIntent,effect.mutationIntent)} : effect;
+          const previous=installedOperations.get(id);
+          const operation:OperationRecord={sequence:(previous?.sequence ?? -1)+1,owner:position,effects:[cloneTurnEffect(effect)],previous,owners:previous?.owners ?? new Set<number>()};
+          const writes: Array<TerminalRecordPlan['writes'][number]> = [
+            { map: bucket.effects, key, value: combined },
+            { map: installedOperations, key: id, value: operation },
+          ];
+          if(!bucket.baselineValues.has(position))writes.push({map:bucket.baselineValues,key:position,value:prev});
+          if(pendingTransactions.size>0)for(const key of windowKeys([position],undefined))writes.push({map:bucket.ownWriteSeq,key,value:windowWriteSeq});
+          return {writes,adds:[{set:operation.owners,value:position},{set:bucket.positionIds,value:position},{set:bucket.ownerPaths,value:ownerPath ?? path}]};
+        }, beforePublication: (path, next, prev, meta, ownerPath, subjectIds, positionIds) => {
+          const effectiveMeta = meta ?? getActiveWriteContext();
+          if (isRestoring || effectiveMeta?.origin === 'restoration' || isInspectionWrite(effectiveMeta) || getWriteParticipation(effectiveMeta) === 'realized') return;
+          if (typeof effectiveMeta?.transactionId === 'number' && effectiveMeta.transactionOwner !== transactionOwnerToken) return;
           const transactionId = resolveTransactionId(effectiveMeta);
           if (transactionId !== undefined) {
             captureIntoBucket(
@@ -2887,17 +3100,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
               positionIds
             );
           }
-          notifier.notify(
-            path,
-            next,
-            prev,
-            ownerPath,
-            subjectIds,
-            positionIds,
-            effectiveMeta,
-            treeOwnerId
-          );
-        }
+        } }
       );
 
       if (typeof notifier.onFlush === 'function') {
@@ -3313,6 +3516,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
           reservedTurnId
         );
       } catch (error) {
+        installedOperations.delete(transactionId);
+        expectedDispositions.delete(transactionId);
         pendingTransactions.delete(transactionId);
         callbackExternalEffects.delete(transactionId);
         releaseWindowIfClosed();
@@ -3344,6 +3549,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       const handle = {
         [PENDING_TURN_ID]: pendingTurnId,
         confirm(): void {
+          validateOperationDisposition(transactionId,pendingTurnId);
           const pendingTurn = authority.getPendingTurn(pendingTurnId);
           if (destroyed) throw new Error('Cannot settle a destroyed tree');
           if (settling)
@@ -3355,6 +3561,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
             throw new Error('Cannot confirm a rolled back transaction');
           }
           lifecycle = 'confirmed';
+            installedOperations.delete(transactionId);
+            expectedDispositions.delete(transactionId);
           // Lifecycle observation: recorded at the transition, before the engine
           // announcement lets restoration confirm its entry, so every reader it
           // notifies already sees this transaction settled. Public delivery
@@ -3423,6 +3631,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           }
         },
         rollback(): void {
+          validateOperationDisposition(transactionId,pendingTurnId);
           const pendingTurn = authority.getPendingTurn(pendingTurnId);
           if (destroyed) throw new Error('Cannot settle a destroyed tree');
           if (settling)
@@ -3449,6 +3658,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
               ? []
               : pendingOrderDeltas.get(pendingTurnId) ?? [];
           let installed = false;
+          const completion = {selected:false,committed:false};
           let observerFailed = false;
           let observerError: unknown;
           const clock =
@@ -3464,7 +3674,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
                 pendingTurn?.__baselineValues ?? new Map(),
                 orderDeltas,
                 primaryFailed ? primaryError : undefined,
-                transactionId
+                transactionId,
+                completion
               );
               installed = true;
             };
@@ -3475,8 +3686,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
             } catch (error) {
               // Physical commit precedes observer delivery. A delivery failure
               // must not leave a successfully compensated turn retryable.
-              installed ||=
-                revision !== undefined && clock?.revision() !== revision;
+              installed ||= completion.selected
+                ? completion.committed
+                : revision !== undefined && clock?.revision() !== revision;
               if (!installed) {
                 const refusal =
                   error instanceof SignalTreeRollbackError
@@ -3500,6 +3712,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
               observerError = error;
             }
             lifecycle = 'rejected';
+            installedOperations.delete(transactionId);
+            expectedDispositions.delete(transactionId);
             // Recorded at the transition (compensation installed), before the
             // engine announcement; delivered after consequences are discarded.
             retireLifecycleView(transactionId);

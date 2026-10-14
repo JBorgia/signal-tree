@@ -1,3 +1,4 @@
+import type { TerminalRecordPlan } from './intrinsic-mutation';
 import type { PositionId } from '../mutation-types';
 import type { PhysicalCommitClock } from './physical-commit-clock';
 
@@ -29,10 +30,12 @@ export interface ScalarSlotMutationFrame {
   set(slotIndex: SlotIndex, value: unknown): void;
   update(slotIndex: SlotIndex, updater: (value: unknown) => unknown): void;
   discard(): void;
+  prepareCommit(options?: { advanceRevision?: boolean }): () => ScalarSlotCommitResult;
   commit(options?: { advanceRevision?: boolean }): ScalarSlotCommitResult;
 }
 
 export interface TreeScalarSlotRuntime {
+  commitRecorded<T>(slotIndex: SlotIndex, value: T, prepare?: () => TerminalRecordPlan | undefined): boolean;
   createSlot<T>(
     initialValue: T,
     equal: (current: T, next: T) => boolean,
@@ -74,7 +77,8 @@ class ScalarSlotMutationFrameImpl implements ScalarSlotMutationFrame {
       staged: ReadonlyMap<SlotIndex, unknown>,
       options?: { advanceRevision?: boolean }
     ) => ScalarSlotCommitResult,
-    private readonly assertSlotIndex: (slotIndex: SlotIndex) => void
+    private readonly assertSlotIndex: (slotIndex: SlotIndex) => void,
+    private readonly prepareValues: (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean }) => () => ScalarSlotCommitResult
   ) {}
 
   set(slotIndex: SlotIndex, value: unknown): void {
@@ -96,6 +100,13 @@ class ScalarSlotMutationFrameImpl implements ScalarSlotMutationFrame {
     this.assertOpen();
     this.closed = true;
     this.staged.clear();
+  }
+
+  prepareCommit(options?: { advanceRevision?: boolean }): () => ScalarSlotCommitResult {
+    this.assertOpen();
+    this.closed = true;
+    if (this.getCommittedRevision() !== this.baseRevision) throw new Error('Stale scalar preparation');
+    return this.prepareValues(this.staged, options);
   }
 
   commit(options?: { advanceRevision?: boolean }): ScalarSlotCommitResult {
@@ -152,6 +163,37 @@ export function createTreeScalarSlotRuntime(
     ) {
       throw new Error(`Scalar slot index ${slotIndex} is out of bounds.`);
     }
+  };
+
+  // Research-only preparation: run equality before any target installs.
+  const prepareSlots = (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean }): (() => ScalarSlotCommitResult) => {
+    const base = getCommittedRevision();
+    const changed: Array<{ slotIndex: SlotIndex; nextValue: unknown }> = [];
+    for (const [slotIndex, nextValue] of staged) {
+      assertSlotIndex(slotIndex);
+      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
+        recordProductionSubstrateStat('equalityChecks');
+      }
+      if (!equalities[slotIndex](values[slotIndex], nextValue)) changed.push({slotIndex, nextValue});
+    }
+    if (getCommittedRevision() !== base) throw new Error('Reentrant scalar preparation');
+    let used = false;
+    return () => {
+      if (used) throw new Error('Prepared scalar commit already used');
+      if (getCommittedRevision() !== base) throw new Error('Stale prepared scalar commit');
+      used = true;
+      for (const {slotIndex,nextValue} of changed) {
+        values[slotIndex] = nextValue;
+        if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
+          recordProductionSubstrateStat('slotWrites');
+        }
+      }
+      const revision = changed.length && options?.advanceRevision !== false ? advanceRevision() : getCommittedRevision();
+      if (changed.length && options?.advanceRevision !== false && PRODUCTION_SUBSTRATE_STATS_ENABLED) {
+        recordProductionSubstrateStat('revisionIncrements');
+      }
+      return {revision,changedSlots:changed.map(x=>x.slotIndex)};
+    };
   };
 
   const commitSlots = (
@@ -269,6 +311,33 @@ export function createTreeScalarSlotRuntime(
       }
       return values[slotIndex] as T;
     },
+    commitRecorded<T>(slotIndex: SlotIndex, value: T, prepare?: () => TerminalRecordPlan | undefined): boolean {
+      assertSlotIndex(slotIndex);
+      const base=getCommittedRevision();
+      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
+        recordProductionSubstrateStat('equalityChecks');
+      }
+      const equal=equalities[slotIndex](values[slotIndex],value);
+      if(getCommittedRevision()!==base)throw new Error('Scalar equality reentered physical installation');
+      if(equal)return false;
+      const plan=prepare?.();
+      if(getCommittedRevision()!==base)throw new Error('Terminal preparation reentered physical installation');
+      // Prepared internal data only below. No returned closure, value reflection,
+      // equality, observer, or record sink between value and evidence installation.
+      values[slotIndex]=value;
+      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
+        recordProductionSubstrateStat('slotWrites');
+      }
+      if(plan){
+        for(let i=0;i<plan.writes.length;i++){const w=plan.writes[i];w.map.set(w.key,w.value);}
+        for(let i=0;i<plan.adds.length;i++){const a=plan.adds[i];a.set.add(a.value);}
+      }
+      advanceRevision();
+      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
+        recordProductionSubstrateStat('revisionIncrements');
+      }
+      return true;
+    },
     commitSlot<T>(slotIndex: SlotIndex, value: T): SingleSlotCommitResult {
       return commitSlot(slotIndex, value);
     },
@@ -288,7 +357,8 @@ export function createTreeScalarSlotRuntime(
         getCommittedRevision,
         (slotIndex) => values[slotIndex],
         commitSlots,
-        assertSlotIndex
+        assertSlotIndex,
+        prepareSlots
       );
     },
     resolveScalarSlot(positionId: PositionId): SlotIndex | undefined {

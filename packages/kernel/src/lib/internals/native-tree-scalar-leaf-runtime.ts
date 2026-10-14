@@ -41,11 +41,17 @@ class NativeScalarSlotPublication {
     if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
       recordProductionSubstrateStat('publications', result.changedSlots.length);
     }
-    this.observation.runInvalidationGroup(() => {
-      for (const slotIndex of result.changedSlots) {
-        this.token(slotIndex).invalidate();
-      }
-    });
+    let failed = false;
+    let first: unknown;
+    try {
+      this.observation.runInvalidationGroup(() => {
+        for (const slotIndex of result.changedSlots) {
+          try { this.token(slotIndex).invalidate(); }
+          catch (error) { if (!failed) { failed = true; first = error; } }
+        }
+      });
+    } catch (error) { if (!failed) { failed = true; first = error; } }
+    if (failed) throw first;
   }
 
   publishSlot(result: {
@@ -80,6 +86,15 @@ class NativeScalarSlotMutationFrame implements ScalarSlotMutationFrame {
 
   discard(): void {
     this.frame.discard();
+  }
+
+  prepareCommit(options?: { advanceRevision?: boolean; publish?: boolean }): () => ScalarSlotCommitResult {
+    const install = this.frame.prepareCommit({advanceRevision:options?.advanceRevision});
+    return () => {
+      const result = install();
+      if (options?.publish !== false) this.publication.publish(result);
+      return result;
+    };
   }
 
   commit(options?: {
@@ -159,59 +174,27 @@ function createNativeScalarLeaf<T>(
     location: leaf,
     notify: () => publication.publishSlot({ changed: true, slot: slotIndex }),
     replace: (value) => {
-      const observer = mutationSource.observer;
-      const dormant = observer
-        ? liveness.absence?.isAbsent(leaf) === true
-        : false;
-      // History records what storage held, even while the leaf is absent.
-      const before = observer
-        ? dormant
-          ? kernel.readSlot<T>(slotIndex)
-          : realized.peek()
-        : undefined;
-      // The authoritative commit primitive: no result object on the hot path.
-      const changed = kernel.commitSlotValue(slotIndex, value);
-      publishChanged(changed, { value });
-      if (observer) {
-        observer({
-          intent: 'replace',
-          before: before as T,
-          after: changed || dormant ? value : (before as T),
-          changed: changed || dormant,
-        });
-      }
+      const observer = mutationSource.observer, capture = mutationSource.capture;
+      const observing = observer || capture;
+      const dormant = observing ? liveness.absence?.isAbsent(leaf) === true : false;
+      const before = observing ? (dormant ? kernel.readSlot<T>(slotIndex) : realized.peek()) : undefined;
+      const changed = kernel.commitRecorded(slotIndex, value, () => mutationSource.prepareTerminal?.({intent:'replace',before:before as T,after:value,changed:true}));
+      const mutation = observing ? {intent:'replace' as const,before:before as T,after:changed || dormant ? value : before as T,changed:changed || dormant} : undefined;
+      if (mutation) capture?.(mutation);
+      publishChanged(changed, {value});
+      if (mutation) observer?.(mutation);
     },
     derive: (update) => {
-      if (liveness.absence?.isAbsent(leaf)) {
-        const stored = kernel.readSlot<T>(slotIndex);
-        const next = update(undefined as T);
-        const result = kernel.commitSlot(slotIndex, next);
-        publishResult(result);
-        mutationSource.observer?.({
-          intent: 'derive',
-          // What storage held: the updater saw the leaf's value, undefined.
-          before: stored,
-          after: kernel.readSlot<T>(slotIndex),
-          // Membership changed even when the retained slot value did not.
-          changed: true,
-        });
-        return;
-      }
-      const observer = mutationSource.observer;
-      if (!observer) {
-        publishResult(kernel.updateSlot(slotIndex, update));
-        return;
-      }
-      const before = realized.peek();
-      const next = update(before);
-      const result = kernel.commitSlot(slotIndex, next);
+      const observer = mutationSource.observer, capture = mutationSource.capture;
+      const dormant = liveness.absence?.isAbsent(leaf) === true;
+      const before = dormant ? kernel.readSlot<T>(slotIndex) : realized.peek();
+      const next = update(dormant ? undefined as T : before);
+      const changed = kernel.commitRecorded(slotIndex,next,()=>mutationSource.prepareTerminal?.({intent:'derive',before,after:next,changed:true}));
+      const result = changed ? {revision:kernel.revision(),changed:true as const,slot:slotIndex} : {revision:kernel.revision(),changed:false as const};
+      const mutation = {intent:'derive' as const,before,after:result.changed || dormant ? next : before,changed:result.changed || dormant};
+      capture?.(mutation);
       publishResult(result);
-      observer({
-        intent: 'derive',
-        before,
-        after: result.changed ? next : before,
-        changed: result.changed,
-      });
+      observer?.(mutation);
     },
   };
   registerWritableLocationBinding(binding);

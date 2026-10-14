@@ -1,3 +1,8 @@
+export interface TerminalRecordPlan {
+  readonly writes: readonly { readonly map: Map<unknown,unknown>; readonly key: unknown; readonly value: unknown }[];
+  readonly adds: readonly { readonly set: Set<unknown>; readonly value: unknown }[];
+}
+type TerminalPreparer = (mutation: IntrinsicMutation<unknown>) => TerminalRecordPlan | undefined;
 export interface IntrinsicMutation<T> {
   readonly intent: 'replace' | 'derive';
   readonly before: T;
@@ -35,9 +40,15 @@ type IntrinsicMutationObserver<T> = (mutation: IntrinsicMutation<T>) => void;
 export interface IntrinsicMutationSource<T> {
   /** `undefined` exactly when nothing observes THIS source. */
   observer: IntrinsicMutationObserver<T> | undefined;
+  readonly capture?: IntrinsicMutationObserver<T>;
+  readonly terminal?: IntrinsicMutationObserver<T>;
+  readonly prepareTerminal?: (mutation: IntrinsicMutation<T>) => TerminalRecordPlan | undefined;
 }
 
 interface SourceRecord {
+  captureRecord?: SourceRecord;
+  terminalRecord?: SourceRecord;
+  terminalPreparer?: TerminalPreparer;
   /**
    * Created on first `observeIntrinsicMutations`, not at registration.
    *
@@ -124,16 +135,21 @@ export function registerIntrinsicMutationSource<T = unknown>(
   node: object
 ): IntrinsicMutationSource<T> {
   const record: SourceRecord = { observers: undefined, observer: undefined };
+  Object.defineProperty(record, 'prepareTerminal', {get: () => record.terminalPreparer});
+  Object.defineProperty(record, 'terminal', {get: () => record.terminalRecord?.observer});
+  Object.defineProperty(record, 'capture', {get: () => record.captureRecord?.observer});
   SOURCES.set(node, record);
   return record as IntrinsicMutationSource<T>;
 }
 
 export function observeIntrinsicMutations<T>(
   node: object,
-  observer: IntrinsicMutationObserver<T>
+  observer: IntrinsicMutationObserver<T>,
+  capture: boolean | 'terminal' = false
 ): (() => void) | undefined {
-  const record = SOURCES.get(node);
-  if (!record) return undefined;
+  const source = SOURCES.get(node);
+  if (!source) return undefined;
+  const record = capture === 'terminal' ? (source.terminalRecord ??= {observers:undefined,observer:undefined}) : capture ? (source.captureRecord ??= {observers:undefined,observer:undefined}) : source;
   const installed = observer as IntrinsicMutationObserver<unknown>;
   (record.observers ??= new Set()).add(installed);
   compose(record);
@@ -157,4 +173,12 @@ export function getIntrinsicMutationObserver<T>(
   return SOURCES.get(node)?.observer as
     | IntrinsicMutationObserver<T>
     | undefined;
+}
+
+// Internal single-owner preparation hook, never a post-install observer.
+export function prepareTerminalMutations(node: object, prepare: TerminalPreparer): (()=>void) | undefined {
+  const source=SOURCES.get(node); if(!source)return;
+  if(source.terminalPreparer)throw new Error('Terminal preparation already owned');
+  source.terminalPreparer=prepare;
+  return ()=>{if(source.terminalPreparer===prepare)source.terminalPreparer=undefined;};
 }

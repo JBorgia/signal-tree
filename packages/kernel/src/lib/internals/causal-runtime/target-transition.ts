@@ -67,7 +67,8 @@ export function prepareDeclarativeTransitionInstallation(
   target: DeclarativeTransitionTarget,
   bindings: ReadonlyMap<PositionId, CollectionTransitionTargetBinding>,
   scalarBinding?: ScalarTransitionTargetBinding,
-  memberBinding?: PlainBranchMemberTransitionTargetBinding
+  memberBinding?: PlainBranchMemberTransitionTargetBinding,
+  completion?: { onCommitted(): void }
 ): { install(): void } {
   const prepared: PreparedCollectionTransitionTarget[] = [];
   // ⚠️ MEMBERS FIRST, as the per-effect path installs them
@@ -114,9 +115,14 @@ export function prepareDeclarativeTransitionInstallation(
       for (const collection of prepared) {
         collection.install();
       }
+      completion?.onCommitted();
+      let failed = false;
+      let first: unknown;
       for (const collection of prepared) {
-        collection.publish();
+        try { collection.publish(); }
+        catch (error) { if (!failed) { failed = true; first = error; } }
       }
+      if (failed) throw first;
     },
   };
 }

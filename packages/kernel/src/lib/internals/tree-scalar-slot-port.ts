@@ -25,6 +25,7 @@ export interface ScalarSlotMutationFrame {
   set(slotIndex: SlotIndex, value: unknown): void;
   update(slotIndex: SlotIndex, updater: (value: unknown) => unknown): void;
   discard(): void;
+  prepareCommit?(options?: { advanceRevision?: boolean; publish?: boolean }): () => ScalarSlotCommitResult;
   commit(options?: {
     advanceRevision?: boolean;
     publish?: boolean;

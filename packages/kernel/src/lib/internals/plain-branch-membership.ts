@@ -862,10 +862,12 @@ export function preparePlainBranchMembers(
       readonly value: unknown;
       readonly turn?: number;
     }
-  >
+  >,
+  scalarTargets?: readonly { owner: number; after: unknown; turn?: number }[]
 ): {
   install(): void;
   publish(): void;
+  invalidate(): void;
   readonly staged: ReadonlyMap<number, number>;
 } {
   const registry = getPositionRegistry(root);
@@ -989,47 +991,32 @@ export function preparePlainBranchMembers(
   const staged = new Map<number, number>();
   for (const { position, turn } of values.values())
     if (turn !== undefined) staged.set(position, turn);
+  // Member values and scalar endpoints share one final frame. Preparing two
+  // frames independently can elide a scalar whose pre-member value is equal.
+  for (const target of scalarTargets ?? []) {
+    if (target.turn !== undefined && (staged.get(target.owner) ?? target.turn) > target.turn) continue;
+    const node = runtime.resolveScalarLeaf(target.owner);
+    if (!node) throw new Error('Plain branch scalar target is unavailable');
+    const { slot, position } = resolveSlot(node);
+    const previous = values.get(slot);
+    values.set(slot, { node, position,
+      before: previous ? previous.before : unwrapBranchForWriteCapture(node),
+      after: target.after, turn: target.turn });
+  }
   const frame = runtime.beginFrame();
   for (const [slot, value] of values) frame.set(slot, value.after);
+  const installFrame = scalarTargets === undefined
+    ? () => frame.commit({ advanceRevision: false, publish: false })
+    : frame.prepareCommit?.({ advanceRevision: false, publish: false });
+  if (!installFrame) throw new Error('Plain branch scalar frame cannot be prepared');
   let result: ScalarSlotCommitResult | undefined;
+  let invalidated = false;
   let published = false;
   const changedSlots = new Set<number>();
   const changedBranches = new Set<object>();
   const changedBranchMembers: MemberAddress[] = [];
   let changes: PlainBranchMembershipChange[] = [];
-  return {
-    staged,
-    install(): void {
-      if (result) return;
-      // Revalidate every retained handle before the first physical write.
-      for (const { address } of members.values()) {
-        const descriptor = Object.getOwnPropertyDescriptor(
-          address.branch,
-          address.key
-        );
-        if (descriptor?.value !== address.node || !descriptor.configurable) {
-          frame.discard();
-          throw new Error(
-            'Plain branch target location changed before installation'
-          );
-        }
-      }
-      result = frame.commit({ advanceRevision: false, publish: false });
-      for (const slot of result.changedSlots) changedSlots.add(slot);
-      for (const { address, present } of members.values()) {
-        if (
-          setMemberPresence(
-            address.branch,
-            address.key,
-            present ? 'active' : 'dormant'
-          )
-        ) {
-          changedBranches.add(address.branch);
-          if (isWritableLocation(address.node))
-            changedSlots.add(resolveSlot(address.node).slot);
-          else changedBranchMembers.push(address);
-        }
-      }
+  const captureChanges = (): void => {
       const byBranch = new Map<object, PlainBranchMemberChange[]>();
       for (const { address, present, before } of members.values()) {
         if (before.present === present) continue;
@@ -1052,6 +1039,69 @@ export function preparePlainBranchMembers(
         branch,
         members,
       }));
+  };
+  const invalidate = (): void => {
+    const installed = result;
+    if (!installed) throw new Error('Plain branch target invalidated before installation');
+    if (invalidated) return;
+    invalidated = true;
+    let failed = false;
+    let firstError: unknown;
+    const run = (fn: () => void): void => {
+      // Default callers retain their established stop-on-error behavior.
+      if (scalarTargets === undefined) { fn(); return; }
+      try { fn(); } catch (error) {
+        if (!failed) { failed = true; firstError = error; }
+      }
+    };
+    withWriteContext({ ...getActiveWriteContext(), intent: 'system', participation: 'realized' }, () => runtime.runInvalidationGroup(() => {
+      for (const branch of changedBranches) run(() => publishMembershipChange(branch));
+      for (const { branch, key, node } of changedBranchMembers) {
+        run(() => republishMembers(branch, [key]));
+        run(() => {
+          if (!Object.getOwnPropertyDescriptor(branch, key)?.enumerable) rememberHiddenRows(node);
+        });
+      }
+      run(() => runtime.publishPrepared({ revision: installed.revision, changedSlots: [...changedSlots] }));
+      if (failed) throw firstError;
+    }));
+  };
+
+  return {
+    staged,
+    invalidate,
+    install(): void {
+      if (result) return;
+      // Revalidate every retained handle before the first physical write.
+      for (const { address } of members.values()) {
+        const descriptor = Object.getOwnPropertyDescriptor(
+          address.branch,
+          address.key
+        );
+        if (descriptor?.value !== address.node || !descriptor.configurable) {
+          frame.discard();
+          throw new Error(
+            'Plain branch target location changed before installation'
+          );
+        }
+      }
+      result = installFrame();
+      for (const slot of result.changedSlots) changedSlots.add(slot);
+      for (const { address, present } of members.values()) {
+        if (
+          setMemberPresence(
+            address.branch,
+            address.key,
+            present ? 'active' : 'dormant'
+          )
+        ) {
+          changedBranches.add(address.branch);
+          if (isWritableLocation(address.node))
+            changedSlots.add(resolveSlot(address.node).slot);
+          else changedBranchMembers.push(address);
+        }
+      }
+      if (scalarTargets === undefined) captureChanges();
     },
     publish(): void {
       const installed = result;
@@ -1065,20 +1115,8 @@ export function preparePlainBranchMembers(
         participation: 'realized',
       };
       withWriteContext(meta, () => {
-        runtime.runInvalidationGroup(() => {
-          for (const branch of changedBranches) publishMembershipChange(branch);
-          // What a branch member's presence changes below it (v16 8d).
-          for (const { branch, key, node } of changedBranchMembers) {
-            republishMembers(branch, [key]);
-            // Every participant is installed: these are the rows it keeps.
-            if (!Object.getOwnPropertyDescriptor(branch, key)?.enumerable)
-              rememberHiddenRows(node);
-          }
-          runtime.publishPrepared({
-            revision: installed.revision,
-            changedSlots: [...changedSlots],
-          });
-        });
+        invalidate();
+        if (scalarTargets !== undefined) captureChanges();
         for (const [slot, value] of values) {
           if (!installed.changedSlots.includes(slot)) continue;
           const path = getOwnedOwnerPath(value.node);
