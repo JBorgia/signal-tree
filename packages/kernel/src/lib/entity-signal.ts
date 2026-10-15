@@ -1127,60 +1127,7 @@ export function createEntitySignal<
       throw new Error(`Cannot change id to ${String(to)}: already in use`);
     }
 
-    const subjectId = allocateSubjectId(from);
-    const structuralEffect: PendingStructuralEffect = {
-      kind: 'rekey',
-      subject: subjectId,
-      beforeKey: from,
-      afterKey: to,
-    };
-
-    return {
-      commit(options?: { advancePhysicalRevision?: boolean }): void {
-        const transfer: PreparedKeyTransfer<K> = {
-          kind: 'transfer-key',
-          fromKey: from,
-          toKey: to,
-          subjectId,
-        };
-        const frame = createEntityMutationFrame();
-        frame.stageKeyTransfer(transfer);
-        const result = commitAndProjectEntityMutationFrame(frame, options);
-        for (const changedSubjectId of result.physicallyChangedSubjectIds) {
-          publishSubjectPhysicalChange(changedSubjectId);
-        }
-        rekeyedSubjects.add(subjectId);
-        // Narrow last-write participation to the one rekeyed subject. The
-        // leaf-signal interceptor re-reads `__subjectIds` after `changeId`
-        // returns; without this it reports every subject of the prior
-        // collection write as a participant, and restoration then retains a
-        // claim per live subject. Sibling mutators all narrow this latch.
-        // RESTORATION-REKEY-CLAIM-WIDTH-0.
-        lastSubjectIds = [subjectId];
-
-        if (activeIdSignal() === from) {
-          replaceLocation(activeIdSignal, to);
-        }
-
-        syncEntitySignal(to);
-        updateSignals();
-      },
-      publish(metaOverride?: WriteMetadata): void {
-        const meta = metaOverride ?? ambientMeta();
-        pathNotifier.notify(
-          `${basePath}.${String(to)}`,
-          entity,
-          entity,
-          basePath,
-          [subjectId],
-          getPositionIdsForNotify(),
-          {
-            ...(meta ?? {}),
-            structuralEffect,
-          }
-        );
-      },
-    };
+    return planPreparedRekey(from, to, allocateSubjectId(from), entity);
   }
 
   function planPreparedRekey(

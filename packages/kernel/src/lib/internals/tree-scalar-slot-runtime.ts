@@ -165,17 +165,27 @@ export function createTreeScalarSlotRuntime(
     }
   };
 
-  // Research-only preparation: run equality before any target installs.
-  const prepareSlots = (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean }): (() => ScalarSlotCommitResult) => {
-    const base = getCommittedRevision();
+  // Shared validation/equality pass; the two installation contracts stay distinct.
+  const collectSlotChanges = (
+    staged: ReadonlyMap<SlotIndex, unknown>
+  ): Array<{ slotIndex: SlotIndex; nextValue: unknown }> => {
     const changed: Array<{ slotIndex: SlotIndex; nextValue: unknown }> = [];
     for (const [slotIndex, nextValue] of staged) {
       assertSlotIndex(slotIndex);
       if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
         recordProductionSubstrateStat('equalityChecks');
       }
-      if (!equalities[slotIndex](values[slotIndex], nextValue)) changed.push({slotIndex, nextValue});
+      if (!equalities[slotIndex](values[slotIndex], nextValue)) {
+        changed.push({ slotIndex, nextValue });
+      }
     }
+    return changed;
+  };
+
+  // Research-only preparation: run equality before any target installs.
+  const prepareSlots = (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean }): (() => ScalarSlotCommitResult) => {
+    const base = getCommittedRevision();
+    const changed = collectSlotChanges(staged);
     if (getCommittedRevision() !== base) throw new Error('Reentrant scalar preparation');
     let used = false;
     return () => {
@@ -200,19 +210,7 @@ export function createTreeScalarSlotRuntime(
     staged: ReadonlyMap<SlotIndex, unknown>,
     options?: { advanceRevision?: boolean }
   ): ScalarSlotCommitResult => {
-    const changed: Array<{ slotIndex: SlotIndex; nextValue: unknown }> = [];
-
-    for (const [slotIndex, nextValue] of staged) {
-      assertSlotIndex(slotIndex);
-      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
-        recordProductionSubstrateStat('equalityChecks');
-      }
-      if (equalities[slotIndex](values[slotIndex], nextValue)) {
-        continue;
-      }
-
-      changed.push({ slotIndex, nextValue });
-    }
+    const changed = collectSlotChanges(staged);
 
     if (changed.length === 0) {
       return {
