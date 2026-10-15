@@ -37,3 +37,29 @@ size limits is owner cost acceptance, not correctness or release acceptance.
 
 No release is authorized by this record. V14 and new architecture remain out of
 scope. Earlier records retain their contemporaneous failed budgets and decisions.
+
+## First complete registry result and bounded corrections
+
+Candidate `ecf04878` completed 75/84 gates, 9 failed, 0 known-red, exit 1.
+Five failures involved sandbox-denied Watchman/npm cache access; four exposed
+maintenance defects: stale publication wording, missing existing-reader guidance,
+XZ evidence classified as text, and incomplete committed dependency staging in
+the history-ownership benchmark. All first outputs are retained externally in
+`artifacts/v16-acceptance-20261014/gates-first.log`; later runs do not replace it.
+
+The corrections change no runtime semantics. Reader guidance now states scope
+and lifetime limits. The source scanner recognizes XZ alongside existing binary
+formats; 13 real Git-inventory controls preserve rejection of NUL-bearing text,
+including `.xz.ts`, and run in the normal registry. The benchmark bundles the
+complete exact-HEAD kernel dependency graph rather than maintaining selected
+imports and behavioral shims. Its six arms, assertions and decision-20 verdict
+are unchanged. Original failure, passing smoke, dirty-source independence and
+wrong-owner mutation failure were preserved and independently reviewed. Old and
+new benchmark timings must not be pooled across compilation forms.
+
+Four semantic characterizations against exact `19a5bd03` and `ecf04878` have
+identical verdicts: 188 held, 68 violated, 168 unsupported, zero execution errors.
+All 48 changed row traces concern diagnostic rekey path labels (destination to
+source); common harness hashes match. This is nonregression evidence, not a
+claim that the broad architectural laws all hold. These unresolved semantics
+remain distinct from the focused capture/publication regression contracts.

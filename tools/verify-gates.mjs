@@ -415,7 +415,7 @@ const GATES = [
     name: 'source-controls',
     covers:
       'no raw NUL or unexpected C0 control character in any tracked source',
-    cmd: ['node', 'tools/check-source-controls.mjs'],
+    cmd: ['node', 'tools/check-source-controls.mjs', '--verify-classification'],
     // Earned by a real incident: an invisible NUL reached committed source,
     // propagated into the script written to fix it, and was found only because
     // Python refused to parse that script. TypeScript, ESLint and the tests were

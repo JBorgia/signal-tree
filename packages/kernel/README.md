@@ -556,6 +556,32 @@ runtime accessor is not the supported inspection contract.
 
 Studio is a separate private product with an explicit development-only attachment. Its adapter and query engine are not public npm packages. Tooling must retain unknown/unsupported distinctions and must not infer causality from event timing.
 
+### Read-only runtime observation
+
+Tooling can import `stateLocationReader`, `entityMembershipReader`,
+`linkStateReader`, `transactionLifecycleReader` and `restorationReader` from
+`@signal-tree/kernel/internals`. These observe the constructed tree; they do not
+install enhancers or confer mutation/settlement authority. Use the appropriate
+framework facade for application state, and reserve this entry point for tooling.
+
+- `stateLocationReader` resolves structured property/entity addresses and current
+  entity lifetimes. Do not parse dotted display paths as identity.
+- `entityMembershipReader` exposes current collection membership and changes.
+- `linkStateReader` observes Link state; local completion is not proof of remote
+  durable persistence beyond the endpoint's contract.
+- `transactionLifecycleReader` exposes pending transactions and settlement/refusal
+  observations, including whether pending authority remains.
+- `restorationReader` exposes history entries, recorded transaction lineage and undo/redo/jump outcomes.
+
+Check optional-reader availability before use; readers do not enable missing
+capabilities. Release subscriptions when the owning view/session ends, and destroy
+owned trees at teardown. Readers are not a retained audit log.
+`ConfirmedTurnEffectView.fieldSegments` preserves producer-known entity-field
+address segments; `plainBranchMembership` distinguishes member presence before
+and after an effect. Neither display paths nor an absent value can replace those
+facts. Confirmed-history access remains subject to configured retention.
+
+
 ## License
 
 Apache-2.0. See [LICENSE](../../LICENSE) and [NOTICE](../../NOTICE).

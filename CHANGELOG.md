@@ -1,5 +1,31 @@
 ## 16.0.0-dev (unreleased)
 
+### Read-only runtime observation
+
+Tooling can import `stateLocationReader`, `entityMembershipReader`,
+`linkStateReader`, `transactionLifecycleReader` and `restorationReader` from
+`@signal-tree/kernel/internals`. These observe the constructed tree; they do not
+install enhancers or confer mutation/settlement authority. Use the appropriate
+framework facade for application state, and reserve this entry point for tooling.
+
+- `stateLocationReader` resolves structured property/entity addresses and current
+  entity lifetimes. Do not parse dotted display paths as identity.
+- `entityMembershipReader` exposes current collection membership and changes.
+- `linkStateReader` observes Link state; local completion is not proof of remote
+  durable persistence beyond the endpoint's contract.
+- `transactionLifecycleReader` exposes pending transactions and settlement/refusal
+  observations, including whether pending authority remains.
+- `restorationReader` exposes history entries, recorded transaction lineage and undo/redo/jump outcomes.
+
+Check optional-reader availability before use; readers do not enable missing
+capabilities. Release subscriptions when the owning view/session ends, and destroy
+owned trees at teardown. Readers are not a retained audit log.
+`ConfirmedTurnEffectView.fieldSegments` preserves producer-known entity-field
+address segments; `plainBranchMembership` distinguishes member presence before
+and after an effect. Neither display paths nor an absent value can replace those
+facts. Confirmed-history access remains subject to configured retention.
+
+
 **TL;DR** — **Breaking, and deliberately so.** `tree.transaction()` is renamed
 to `tree.transact()` and the old spelling is **removed, not deprecated**. One
 `inspect()` on every transaction handle, plus three new public types. The transaction rollback

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { performance } from 'node:perf_hooks';
-import ts from 'typescript';
+import { buildSync } from 'esbuild';
 
 if (typeof globalThis.gc !== 'function') {
   console.error('Run with --expose-gc.');
@@ -15,11 +15,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const CORE_LIB = join(ROOT, 'dist/packages/kernel/dist/lib/path-notifier.js');
 const TMP_ROOT = process.env.TMPDIR ?? '/tmp';
-const COMMITTED_3ARG_LIB = join(
-  TMP_ROOT,
-  'signaltree-history-bench',
-  'path-notifier-head.mjs'
-);
 
 const arg = (name, dflt) => {
   const i = process.argv.indexOf(name);
@@ -196,101 +191,53 @@ function classifyStructuralOverheadVerdict({
 }
 
 function ensureCommitted3ArgPathNotifierModule() {
-  const source = execFileSync(
-    'git',
-    ['show', 'HEAD:packages/kernel/src/lib/path-notifier.ts'],
-    { cwd: ROOT, encoding: 'utf8' }
-  );
-
-  const compiled = ts.transpileModule(source, {
-    compilerOptions: {
-      module: ts.ModuleKind.ESNext,
-      target: ts.ScriptTarget.ES2022,
-    },
-    fileName: 'path-notifier.ts',
-  });
-
-  mkdirSync(dirname(COMMITTED_3ARG_LIB), { recursive: true });
-  writeFileSync(
-    join(dirname(COMMITTED_3ARG_LIB), 'write-context.mjs'),
-    `let activeContext;\n` +
-      `export function withWriteContext(meta, fn) {\n` +
-      `  const previous = activeContext;\n` +
-      `  activeContext = meta;\n` +
-      `  try { return fn(); } finally { activeContext = previous; }\n` +
-      `}\n` +
-      `export function getActiveWriteContext() { return activeContext; }\n`,
-    'utf8'
-  );
-  // RC-HARNESS-2. Stage the real committed dependencies rather than maintaining
-  // behavioral shims beside the benchmark. Stub drift previously made this arm
-  // die during module resolution before it measured an ownership assertion.
-  mkdirSync(join(dirname(COMMITTED_3ARG_LIB), 'internals'), { recursive: true });
-  for (const [sourcePath, outputPath] of [
-    [
-      'packages/kernel/src/lib/internals/write-observation-scope.ts',
-      join(dirname(COMMITTED_3ARG_LIB), 'internals', 'write-observation-scope.mjs'),
-    ],
-    [
-      'packages/kernel/src/lib/internals/restoration-eligibility.ts',
-      join(dirname(COMMITTED_3ARG_LIB), 'internals', 'restoration-eligibility.mjs'),
-    ],
-    [
-      'packages/kernel/src/lib/internals/path-observation-port.ts',
-      join(dirname(COMMITTED_3ARG_LIB), 'internals', 'path-observation-port.mjs'),
-    ],
-  ]) {
-    const dependencySource = execFileSync('git', ['show', `HEAD:${sourcePath}`], {
-      cwd: ROOT,
-      encoding: 'utf8',
-    });
-    const dependency = ts.transpileModule(dependencySource, {
-      compilerOptions: {
-        module: ts.ModuleKind.ESNext,
-        target: ts.ScriptTarget.ES2022,
-      },
-      fileName: sourcePath,
-    });
-    writeFileSync(
-      outputPath,
-      `// transpiled from HEAD:${sourcePath}\n${dependency.outputText}`,
-      'utf8'
+  // Resolve HEAD once: every transitive source must come from this same commit,
+  // never from a dirty working tree or a hand-maintained dependency/shim list.
+  const revision = execFileSync('git', ['rev-parse', 'HEAD^{commit}'], {
+    cwd: ROOT,
+    encoding: 'utf8',
+  }).trim();
+  const stagingRoot = mkdtempSync(join(TMP_ROOT, 'signaltree-history-bench-'));
+  const modulePath = join(stagingRoot, 'path-notifier-head.mjs');
+  try {
+    const archive = execFileSync(
+      'git',
+      ['archive', '--format=tar', revision, 'packages/kernel/src'],
+      { cwd: ROOT, maxBuffer: 64 * 1024 * 1024 }
     );
+    execFileSync('tar', ['-xf', '-', '-C', stagingRoot], { input: archive });
+    // Bundle the real committed graph, including membership capture and its
+    // dependencies. No production defines, minification or behavioral stubs.
+    buildSync({
+      absWorkingDir: stagingRoot,
+      entryPoints: ['packages/kernel/src/lib/path-notifier.ts'],
+      outfile: modulePath,
+      bundle: true,
+      platform: 'node',
+      format: 'esm',
+      target: 'es2022',
+      treeShaking: false,
+      tsconfigRaw: {},
+      banner: { js: `// committed PathNotifier graph: ${revision}` },
+    });
+    return { modulePath, stagingRoot };
+  } catch (error) {
+    rmSync(stagingRoot, { recursive: true, force: true });
+    throw error;
   }
-  writeFileSync(
-    join(dirname(COMMITTED_3ARG_LIB), 'write-participation.mjs'),
-    `export function getWriteParticipation(meta) { return meta?.participation ?? 'authored'; }\n`,
-    'utf8'
-  );
-  writeFileSync(
-    COMMITTED_3ARG_LIB,
-    `// transpiled from HEAD:packages/kernel/src/lib/path-notifier.ts\n${compiled.outputText
-      .replace("'./write-context'", "'./write-context.mjs'")
-      .replace("'./write-participation'", "'./write-participation.mjs'")
-      .replace(
-        "'./internals/restoration-eligibility'",
-        "'./internals/restoration-eligibility.mjs'"
-      )
-      .replace(
-        "'./internals/write-observation-scope'",
-        "'./internals/write-observation-scope.mjs'"
-      )
-      .replace(
-        "'./internals/path-observation-port'",
-        "'./internals/path-observation-port.mjs'"
-      )}`,
-    'utf8'
-  );
-  return COMMITTED_3ARG_LIB;
 }
 
 async function loadCommitted3ArgPathNotifier() {
-  const modulePath = ensureCommitted3ArgPathNotifierModule();
-  const committedModule = await import(`${modulePath}?ts=${Date.now()}`);
-  if (!committedModule.PathNotifier) {
-    throw new Error('Failed to load committed 3-arg PathNotifier baseline');
+  const { modulePath, stagingRoot } = ensureCommitted3ArgPathNotifierModule();
+  try {
+    const committedModule = await import(pathToFileURL(modulePath).href);
+    if (!committedModule.PathNotifier) {
+      throw new Error('Failed to load committed 3-arg PathNotifier baseline');
+    }
+    return committedModule.PathNotifier;
+  } finally {
+    rmSync(stagingRoot, { recursive: true, force: true });
   }
-  return committedModule.PathNotifier;
 }
 
 function buildWorkload({
