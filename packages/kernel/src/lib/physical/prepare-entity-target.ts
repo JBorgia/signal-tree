@@ -1,3 +1,4 @@
+import { prepareStructuralTarget } from './prepare-structural-target';
 import type { Location } from '../internals/cell-runtime';
 import type { EpochHandle } from '../internals/observation-adapter';
 import type { PhysicalCommitClock } from '../internals/physical-commit-clock';
@@ -112,7 +113,8 @@ export function prepareEntityTransitionTarget<
   const structuralTarget = structuralStore.prepareTarget(
     preparedSubjects,
     target.order,
-    target.orderFrontier
+    target.orderFrontier,
+    prepareStructuralTarget
   );
   const valueTarget = valueStore.prepareTargetValues(preparedSubjects);
   const affectedSubjects = new Set([
