@@ -1,3 +1,4 @@
+import { prepareEntityTransitionTarget, type EntityTargetPreparer } from '../../lib/physical/prepare-entity-target';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   entityMap,
@@ -91,7 +92,7 @@ type TransitionSource = {
 };
 type TransitionBinding = {
   readSource(): TransitionSource;
-  prepareTarget(target: TransitionSource): {
+  prepareTarget(target: TransitionSource, prepare: EntityTargetPreparer): {
     install(): void;
     publish(): void;
   };
@@ -114,7 +115,7 @@ const changeRetainedRows = (rows: Rows, value: (row: Row) => Row): void => {
       ...subject,
       value: value(subject.value as Row),
     })),
-  });
+  }, prepareEntityTransitionTarget);
   prepared.install();
   prepared.publish();
 };

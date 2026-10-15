@@ -1,3 +1,4 @@
+import { prepareEntityTransitionTarget, type EntityTargetPreparer } from '../../physical/prepare-entity-target';
 import type { PositionId, ReversalEffect } from './causal-types';
 import { appendAll } from '../utilities/append-all';
 
@@ -37,7 +38,8 @@ export type CollectionTransitionTargetBinding = {
   readonly ownerPath: string;
   readSource(): CollectionTransitionSource;
   prepareTarget(
-    target: CollectionTransitionTarget
+    target: CollectionTransitionTarget,
+    prepare: EntityTargetPreparer
   ): PreparedCollectionTransitionTarget;
 };
 
@@ -99,7 +101,7 @@ export function prepareDeclarativeTransitionInstallation(
         `Declarative transition has no collection binding ${owner}`
       );
     }
-    prepared.push(binding.prepareTarget(collection));
+    prepared.push(binding.prepareTarget(collection, prepareEntityTransitionTarget));
   }
   if (scalars.size > 0) {
     if (!scalarBinding) {
