@@ -63,3 +63,31 @@ All 48 changed row traces concern diagnostic rekey path labels (destination to
 source); common harness hashes match. This is nonregression evidence, not a
 claim that the broad architectural laws all hold. These unresolved semantics
 remain distinct from the focused capture/publication regression contracts.
+
+## Frozen-install mutation proof repair
+
+At `e4672b9e`, an isolated `pnpm install --frozen-lockfile` produced an installed
+lock identical to the committed lock. The complete registry passed 84/84,
+exit 0. Its complete mutation run then failed: 82/84 proven, one blind
+(`declaration-docs`), one errored (`raw-signals`), zero unproven/vacuous,
+exit 1. Source restoration was clean. These results supersede neither the first
+75/84 run nor the later green ordinary registry; they are separate evidence.
+
+The raw-signal mutation still targeted the `.set()` loop replaced by `81780c4e`.
+It now skips only raw measured writes through the current `arm.write` dispatch;
+warmup and sentinel remain intact. The declaration mutation stripped the root
+barrel, leaving 209 unique shipped documentation blocks above the unchanged
+168 floor. Stripping the shared declaration chunk leaves 116 and fails for the
+intended kernel STRIPPED diagnostic. Its build-hashed filename is resolved
+lazily, requiring exactly one match. Checker thresholds and runtime code are
+unchanged. This proves aggregate documentation preservation, not per-symbol
+coverage of every barrel comment.
+
+Both repairs were independently reviewed. Direct clean/mutated/restored runs
+returned 0/1/0 with the expected diagnostics; the focused registry reported
+2/2 proven, zero blind/errored/unproven/vacuous. First logs and reviews remain in
+`artifacts/v16-acceptance-20261014/`. A mistakenly spaced `--only raw-signals`
+invocation ran the full self-test instead of a focused run; its 83/84 result is
+also retained. Focused selection requires `--only=raw-signals,declaration-docs`.
+The new verification-only commit requires renewed full checks before final
+artifacts and matched costs are qualified.

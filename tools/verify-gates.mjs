@@ -53,7 +53,7 @@
  */
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -1110,9 +1110,9 @@ const GATES = [
     // against the arm-order contamination this tool's first draft shipped.
     mutation: {
       file: 'tools/bench-raw-signals.mjs',
-      find: '  for (let i = 0; i < WRITES; i++) field.set(i + round * WRITES);\n  const ns = Number(process.hrtime.bigint() - t) / WRITES;\n  sink += field();',
+      find: '  for (let i = 0; i < WRITES; i++) arm.write(field, i + round * WRITES);\n  const ns = Number(process.hrtime.bigint() - t) / WRITES;\n  sink += field();',
       replace:
-        '  for (let i = 0; i < WRITES; i++) void (i + round * WRITES);\n  const ns = Number(process.hrtime.bigint() - t) / WRITES;\n  sink += field();',
+        '  for (let i = 0; i < WRITES; i++) if (arm.name !== \'raw\') arm.write(field, i + round * WRITES);\n  const ns = Number(process.hrtime.bigint() - t) / WRITES;\n  sink += field();',
     },
   },
   {
@@ -1355,12 +1355,20 @@ const GATES = [
     // package-hygiene checks presence. Comments now stay in both outputs and the
     // strip plugin in tools/build/create-rollup-config.mjs removes them from JS.
     //
-    // Strip the shipped root declarations, reproducing removeComments rather
-    // than moving the checker threshold. The old 168 -> 169 mutation became
-    // inert when the tooling entrypoint increased shipped documentation to 197.
-    // Keep the production floor intact and test the actual damaged artifact.
+    // Public root/adapter contracts live in the shared declaration chunk.
+    // Stripping index.d.ts alone leaves enough aggregate docs to pass. Damage
+    // the shared artifact instead; preserve the checker's production floor.
     mutation: {
-      file: 'dist/packages/kernel/dist/index.d.ts',
+      get file() {
+        const dir = 'dist/packages/kernel/dist';
+        const matches = readdirSync(join(ROOT, dir)).filter((name) =>
+          /^_adapter-.*\.d\.ts$/.test(name)
+        );
+        if (matches.length !== 1) {
+          throw new Error('Expected one shared kernel declaration chunk; review mutation target');
+        }
+        return `${dir}/${matches[0]}`;
+      },
       generate: (original) => original.replace(/\/\*\*[\s\S]*?\*\//g, ''),
     },
   },
