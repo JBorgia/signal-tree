@@ -1,5 +1,11 @@
 # V16 candidate acceptance verification
 
+Current disposition (October 14, 2026): scoped verification and matched cost
+characterization completed against `8d220643`. See [final results](RESULT.md),
+[complete cost tables](COST-TABLES.md), and the sealed evidence archive. The
+history below preserves the earlier failures and contemporaneous next steps.
+No merge, push, tag or publication was performed.
+
 Owner approved the recommended ceilings with “proceed with recommendations”
 after the reduction audit and explicit proposal. This supersedes the earlier
 budget refusal; it does not authorize publication, merging or performance
