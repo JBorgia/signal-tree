@@ -661,7 +661,9 @@ export function preparePointRealization(
   const clock = getPhysicalCommitClock(tree.$) ?? getPhysicalCommitClock(tree);
   if (!descriptors || !slots || !clock) return undefined;
   const baseRevision = clock.revision();
-  const owners = indexStructuralOwnerPaths(tree.$);
+  const owners = effects.some(effect => effect.structural || effect.plainBranchMembership)
+    ? indexStructuralOwnerPaths(tree.$)
+    : indexPointOwnerPaths(tree.$, effects);
   const memberTargets = new Map<number, { present: boolean; value: unknown; turn?: number }>();
   for (const effect of effects) if (effect.plainBranchMembership) {
     memberTargets.delete(effect.owner);
@@ -2007,6 +2009,37 @@ function isPreparedSubjectScalarEffect(
     !effect.structural &&
     preparedContext.resolveSubject(effect, effect.subjectId) !== undefined
   );
+}
+
+/** Resolve visible point owners without visiting unrelated branches. Unsupported
+ * addresses retain the incumbent traversal and its omission semantics. */
+function indexPointOwnerPaths(root: unknown, effects: readonly ReversalEffect[]): StructuralOwnerIndex {
+  const registry = getPositionRegistry(root);
+  const owners = Object.assign(new Map<PositionId, string>(), {
+    nodes: new Map<PositionId, CollectionNode>(),
+  });
+  for (const effect of effects) {
+    if (typeof effect.subjectId !== 'number' || owners.nodes.has(effect.owner)) continue;
+    const address = registry?.addressFor(effect.owner);
+    if (!address || address.length > 32) return indexStructuralOwnerPaths(root);
+    let node: unknown = root;
+    for (const key of address) {
+      if (!isTraversableNode(node) || key === 'set' || key === 'update' || key.startsWith('_')) {
+        return indexStructuralOwnerPaths(root);
+      }
+      const property = Object.getOwnPropertyDescriptor(node, key);
+      if (!property?.enumerable || !('value' in property)) return indexStructuralOwnerPaths(root);
+      node = property.value;
+    }
+    if (!isCollectionNode(node) || getOwnedPositionIds(node)?.[0] !== effect.owner) {
+      return indexStructuralOwnerPaths(root);
+    }
+    const path = getOwnedOwnerPath(node);
+    if (path === undefined) return indexStructuralOwnerPaths(root);
+    owners.set(effect.owner, path);
+    owners.nodes.set(effect.owner, node);
+  }
+  return owners;
 }
 
 function indexStructuralOwnerPaths(root: unknown): StructuralOwnerIndex {
