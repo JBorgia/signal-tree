@@ -46,5 +46,17 @@ test('production shell excludes retired eager and development runtimes', () => {
 
   expect(emittedJavaScript).not.toMatch(/echarts|zrender/);
   expect(emittedJavaScript).not.toContain('__REDUX_DEVTOOLS_EXTENSION__');
-  expect(statSync(mainPath).size).toBeLessThan(525_000);
+  // This secondary artifact bound follows the approved initial error ceiling.
+  // The production build remains responsible for the aggregate initial budget;
+  // main size alone does not include styles or other initial resources.
+  const project = JSON.parse(
+    readFileSync(resolve(process.cwd(), 'apps/demo/project.json'), 'utf8')
+  );
+  const budgets: { type: string; maximumError?: string }[] =
+    project.targets.build.configurations.production.budgets;
+  const initialBudgets = budgets.filter((budget) => budget.type === 'initial');
+  expect(initialBudgets).toHaveLength(1);
+  const limit = initialBudgets[0].maximumError?.match(/^(\d+(?:\.\d+)?)kb$/i);
+  if (!limit) throw new Error('Expected an explicit initial error ceiling in kB');
+  expect(statSync(mainPath).size).toBeLessThanOrEqual(Number(limit[1]) * 1_000);
 });

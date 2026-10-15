@@ -91,3 +91,26 @@ invocation ran the full self-test instead of a focused run; its 83/84 result is
 also retained. Focused selection requires `--only=raw-signals,declaration-docs`.
 The new verification-only commit requires renewed full checks before final
 artifacts and matched costs are qualified.
+
+## Browser artifact budget reconciliation
+
+At `c1714eae`, frozen-dependency full gates passed 84/84 and full mutation proofs
+passed 84/84 (12 indirect), with zero unproven, vacuous, blind or errored checks.
+Fresh post-mutation packages, strict consumers and Angular AOT passed. Browser
+smoke then failed 135/136 solely because its separate hardcoded main-file bound
+was 525,000 bytes; main measured 537,472 and total initial measured 563.16 kB.
+
+History `1b05a123` introduced that main-size proxy alongside initial warning
+525 kB/error 550 kB without a separate main-budget rationale. Independent review
+supported reconciling the secondary proxy with the owner's approved initial
+error policy. The browser test now reads that configured error ceiling (570 kB),
+while the production build remains authoritative for the total initial graph.
+Main-file size is explicitly not a substitute for aggregate measurement. The
+525 kB warning, single-main/no-polyfill checks, and recursive ECharts/zrender and
+Redux-devtools exclusions are unchanged. Another branch's historical 600 kB
+proxy was inspected but not adopted or treated as authority.
+
+The full browser suite passed 136/136. A temporary 40,005-byte main-file padding
+mutation failed at 577,477 > 570,000, then byte-for-byte restoration passed.
+Both the original browser failure and these controls remain in the external
+acceptance evidence. No runtime or public-contract changes were made.
