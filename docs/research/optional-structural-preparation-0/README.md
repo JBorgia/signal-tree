@@ -148,3 +148,54 @@ The independent interpretation review verified all 24 cost receipts, raw summary
 calculations, generated bundle/input hashes and the baseline graph's equality to
 the preceding experiment's candidate. Its limitations remain binding; preserving
 this candidate does not approve revised ceilings or production release.
+
+## Exact-source artifact follow-up — October 14, 2026
+
+The reviewed reductions remain retained at runtime SHA
+`4742ecbcf8af8e225a618ce6555d04dc35b216f4`; no runtime, API, or ceiling changed
+in this follow-up. A fresh `git archive` of that SHA was built in
+`/private/tmp/signaltree-4742-artifact-check`, using the repository's existing
+pinned dependency installation via a node_modules symlink. This is an exact
+source build, not a fresh dependency-install rehearsal.
+
+The original missing-Angular-dist failure above remains preserved. With all five
+packages now built, the built-artifact check is qualified:
+
+| Check | Exit | Result |
+| --- | ---: | --- |
+| Five-package Nx build, cache skipped | 0 | All five report `16.0.0-dev` |
+| Built devmode folding and consumer guards | 0 | Kernel and all four facades; readable errors retained |
+| Declaration documentation | 0 | All five packages |
+| Packed exports and installed resolution | 0 | All targets shipped; all seven package/subpath imports resolve |
+| Unchanged bundle budgets | 1 | Existing excess remains |
+
+Initial command `pnpm run build:all -- --parallel=1 --skip-nx-cache` incorrectly
+forwarded flags to the executor, producing a schema error and exit 130. The
+corrected command below addresses command syntax, not source or assertions.
+Both logs are preserved. The successful build retains existing TS4111 warnings
+in semantics-authority/composition fixtures; warning-free compilation is not
+claimed.
+
+Executed with Node 24.15.0 on PATH and `NX_DAEMON=false`:
+
+```sh
+pnpm nx run-many -t build --projects=kernel,angular,react,vue,solid --parallel=1 --skip-nx-cache
+node tools/check-devmode-foldable.mjs
+node tools/check-declaration-docs.mjs
+node tools/verify-tarball-consumer.mjs
+node tools/check-bundle-budget.mjs
+```
+
+Check commands used `npm_config_offline=true` and isolated npm cache
+`/private/tmp/st-4742-npm-cache`. No registry publication or remote write occurred.
+The tarball gate proves shipped targets and installed resolution; it does not
+prove strict consumer typechecking, Angular AOT or complete release acceptance.
+Those were not run in this follow-up. No timing results were regenerated.
+
+Logs, exit receipt, all built-file SHA-256 hashes, individually inspected package
+versions and an archive contents manifest are in `4742-artifact-check.tar.gz`.
+Archive SHA-256:
+`ba84fd51f10ff29c880d5c52a26953e0381d16ab0e6c2fc8bb24af4872f6bdc9`.
+All manifest entries were verified by archive readback. This record closes the
+missing-artifact check only; the size acceptance decision and full release
+qualification remain open. Current ceilings remain unchanged.
