@@ -203,8 +203,10 @@ const TARGETS = {
     // itself. Raised to the measurement plus the usual narrow headroom rather
     // than clawed back, because reclaiming it is a performance change and
     // belongs in its own release.
-    devKB: 12.45,
-    prodKB: 10.25,
+    // Owner-approved v16 cost after reduction audit; rationale and exact
+    // measurements: docs/research/v16-candidate-acceptance-0/README.md.
+    devKB: 14.1,
+    prodKB: 11.75,
     code: `
       import { signalTree } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, user: { name: 'a' } });
@@ -376,8 +378,9 @@ const TARGETS = {
     // 25.10KB dev. entity-signal.ts carries the per-subject epoch registry
     // (subjectEpochs / pendingSubjectEpochs) on top of the shared kernel
     // growth above. Same disposition and same reason.
-    devKB: 25.25,
-    prodKB: 22.6,
+    // Same v16 approval; keeps diagnostics and correctness intact.
+    devKB: 28.4,
+    prodKB: 25.6,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });
