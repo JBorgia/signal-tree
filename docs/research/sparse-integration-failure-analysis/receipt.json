@@ -1,0 +1,8 @@
+{
+  "candidate": "9b9b0b35a7dd207df366047ef5c9621168a2b405",
+  "baseline": "8d220643e0d4e34cbdbc6e55e6ef692b25d5e023",
+  "status": "analysis only; production paused; no design selected",
+  "archiveBytes": 306672,
+  "archiveSha256": "d05b9555af50d609c3efad6aeb3dbad090bd014ca15c3a65bd04114772afaf1b",
+  "sourceSeal": "identity.json"
+}

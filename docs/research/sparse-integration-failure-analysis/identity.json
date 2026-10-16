@@ -1,0 +1,21 @@
+{
+  "candidate": "9b9b0b35a7dd207df366047ef5c9621168a2b405",
+  "baseline": "8d220643e0d4e34cbdbc6e55e6ef692b25d5e023",
+  "productionSourceUnchanged": true,
+  "testedSourceHashes": {
+    "packages/kernel/src/enhancers/transactions/sparse-adapter.ts": "db52385aebf6e591c173ce0eab411eb1ed514dc210064734627d3d7a90d011f4",
+    "packages/kernel/src/enhancers/transactions/sparse-integration-boundaries.spec.ts": "5d2984c2b857a6d496e45fac9cbce65145fbd87be37bb652a9b55511f2c20972",
+    "packages/kernel/src/lib/internals/entity-retirement.ts": "a4e0024356ce4b42e77fb4fcf0a78661a0d231c8e8a4df775c60f2d060621951",
+    "packages/kernel/src/lib/internals/sparse-ownership/core.ts": "26753c6c8f61ed0033b1463fdd056daf57b49f5fc0cc49b422cf9cec839eecfc",
+    "packages/kernel/src/lib/internals/sparse-ownership/persistent-map.ts": "b5d4b4d85616c02fe79cacc663c74b88df2355edc59832e072e76067ab5b448e",
+    "packages/kernel/src/lib/physical/prepare-entity-delta.ts": "b89486240b4a5cc7fa26d8e08d6fd57e5897c9aa6abdb2db81b59fe51cad9057",
+    "packages/kernel/src/enhancers/transactions/semantics-authority.ts": "4aab1f2c12fb9d312d7265ba8fc9d783634ac03218ef0547c112af0dfe195aec",
+    "packages/kernel/src/enhancers/transactions/semantics-composition.ts": "283ab18f2037ac3fb7fcf7d0bccc488720aaa35500090383a686919b0b914cd8",
+    "packages/kernel/src/enhancers/transactions/transactions.ts": "debeae47e20e10da092d05820d00242c82320b30dfb28e26a11c74f3d498e4b2",
+    "packages/kernel/src/lib/entity-signal.ts": "8fecbc4d1c6968f9aa70866fcd25f476a6cac0b512b2a74197752b92da4a2f5a",
+    "packages/kernel/src/lib/internals/mutation-capture-runtime.ts": "4a9385b69c4a945357ad870775ee295337fb98de026b84c751f674f0abe49518",
+    "packages/kernel/src/lib/physical/entity-mutation-frame.ts": "1174f686f22183f335087fefd7497d2342d6d0428d7e54dfdc4f5d16dd1b339d"
+  },
+  "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+  "scope": "analysis only; no runtime/API/ceiling changes"
+}

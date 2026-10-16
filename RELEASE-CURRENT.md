@@ -98,3 +98,16 @@ fresh artifacts and qualified common-workload CPU/heap results are in
 The next correction, if pursued, must account for physical restoration and
 Link/provenance boundaries through one authority; this record does not authorize
 a broader architecture rewrite or release.
+
+## Bounded sparse failure analysis (2026-10-16)
+
+Production changes remain paused after rejected checkpoint `9b9b0b35`. The
+[reviewed failure analysis](docs/research/sparse-integration-failure-analysis/README.md)
+records uncovered installation routes, omitted semantic facts and a separately
+reproduced publication-channel failure. It also attributes substantial sampled
+cost to ownership/index computation and redundant prepared views. The persistent
+root is no longer the preferred production candidate; contribution ownership
+remains under consideration. Neither sparse-root authority nor native authority
+with live contribution records is selected. No restoration synchronization patch,
+API change, ceiling increase, release or new implementation is authorized by
+this record. Unknown per-test causes remain explicitly provisional.
