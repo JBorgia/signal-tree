@@ -82,3 +82,19 @@ The static scalar designation loss is separately explained by notifier metadata
 coalescing and contradicts existing HIST-C2 whole-turn eligibility. Keep it in
 notifier attribution controls; do not treat the plain/dynamic discrepancy as an
 accepted product distinction.
+
+## Sparse ownership production integration checkpoint (2026-10-16)
+
+The bounded candidate on `codex/sparse-ownership-integration`, based on exact
+`8d220643`, is **rejected**, not integrated or release-approved. R3 remains
+separately frozen. Ordinary scalar restoration followed by transaction rollback
+revives an undone value; full kernel/framework suites expose further production
+regressions. No API, budget or stable-v15 change is accepted. Preserve the
+incumbent reference and the owner-authorized v16 ordering decision.
+
+Source seals, first failures, independent review, exhaustive changed verdicts,
+fresh artifacts and qualified common-workload CPU/heap results are in
+[the integration record](docs/research/sparse-production-integration-0/README.md).
+The next correction, if pursued, must account for physical restoration and
+Link/provenance boundaries through one authority; this record does not authorize
+a broader architecture rewrite or release.

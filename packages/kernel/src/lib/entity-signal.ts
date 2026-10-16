@@ -1,3 +1,4 @@
+import {notifyEntityRetirement,withEntityRetirementScope} from './internals/entity-retirement';
 import type {
   Location,
   ReadableCell,
@@ -559,7 +560,7 @@ export function createEntitySignal<
 
   function commitAndProjectEntityMutationFrame(
     frame: EntityMutationFrame<K, E>,
-    options?: { advancePhysicalRevision?: boolean }
+    options?: { advancePhysicalRevision?: boolean; ordering?: { readonly kind: 'append' | 'front' | 'exact'; readonly subjects: readonly number[]; readonly keys: readonly K[]; readonly baseFrontier: unknown } }
   ) {
     const revision=physicalCommitClock?.revision();
     const changes: Array<import('./internals/mutation-capture-runtime').CommittedEntityMutation> = [];
@@ -587,9 +588,10 @@ export function createEntitySignal<
         changes.push({subject:m.subjectId,before,after:before,structural:true,path:`${basePath}.${String(m.fromKey)}`,structuralRecord:{kind:'rekey',subject:m.subjectId,beforeKey:m.fromKey,afterKey:m.toKey}});
       }
     }
-    const responsibility = changes.length ? mutationCaptureRuntime?.prepareEntityResponsibility?.({owner:getPositionIds()?.[0] as number,ownerPath:basePath,meta:ambientMeta(),changes}) : undefined;
+    const ordering = options?.ordering;
+    const responsibility = changes.length || ordering ? mutationCaptureRuntime?.prepareEntityResponsibility?.({owner:getPositionIds()?.[0] as number,ownerPath:basePath,meta:ambientMeta(),changes,ordering}) : undefined;
     if(physicalCommitClock?.revision()!==revision)throw new Error('Entity frame responsibility preparation reentered installation');
-    const result = frame.commit(committedEntityObserver(),responsibility);
+    const result = frame.commit(committedEntityObserver(),responsibility,ordering);
     if (options?.advancePhysicalRevision !== false) {
       physicalCommitClock?.advance();
     }
@@ -1047,25 +1049,6 @@ export function createEntitySignal<
     });
   }
 
-  /**
-   * Re-orders `storage` so the given ids come first, in the order given.
-   *
-   * Only the map's iteration order changes; no per-entity signal is touched, so
-   * prepending does not invalidate any row's consumers. The derived collection
-   * signals pick the new order up from the version bump.
-   */
-  function moveToFront(ids: K[]): void {
-    const tap = membershipTap;
-    tap?.(MEMBERSHIP_OPEN_ORDER);
-    try {
-      structuralStore.moveKeysToFront(ids);
-    } finally {
-      tap?.(MEMBERSHIP_CLOSE);
-    }
-    physicalCommitClock?.advance();
-    updateSignals();
-  }
-
   function resolveSubjectId(id: K): number | undefined {
     return structuralStore.subjectIdForKey(id);
   }
@@ -1488,15 +1471,6 @@ export function createEntitySignal<
     };
   }
 
-  function rewritePendingAddEffect(
-    effect: PendingAddStructuralEffect,
-    beforeSubject?: number,
-    afterSubject?: number
-  ): void {
-    effect.beforeSubject = beforeSubject;
-    effect.afterSubject = afterSubject;
-  }
-
   function assertSynchronousInterceptorFunction(
     handler: unknown,
     hookName: string
@@ -1614,6 +1588,7 @@ export function createEntitySignal<
     opts?: AddManyOptions<E, K>,
     prepend = false
   ): K[] {
+    const admissionFrontier = structuralStore.activeOrderFrontier();
     const mode = opts?.mode ?? 'strict';
     const beforeSubjects =
       prepend && mutationCaptureRuntime?.publishCollectionOrder
@@ -1672,6 +1647,7 @@ export function createEntitySignal<
     for (const [processed, entity] of copies) {
       processed.entity = interceptAddedEntity(entity);
     }
+    if (structuralStore.activeOrderFrontier() !== admissionFrontier) throw new Error('Cannot addMany: topology changed during staging');
     const stagedAdds = toProcess;
     const plannedFreshSubjectIds = structuralStore.planFreshSubjectIds(
       stagedAdds.filter(
@@ -1720,7 +1696,13 @@ export function createEntitySignal<
       });
     }
 
-    commitAndProjectEntityMutationFrame(frame);
+    const orderedAdds = prepend ? preparedAdds : preparedAdds.filter(row => row.existingSubjectId === undefined);
+    const ordering = Object.freeze({kind: prepend ? 'front' as const : 'append' as const,
+      subjects: Object.freeze(orderedAdds.map(row => row.subjectId)), keys: Object.freeze(orderedAdds.map(row => row.id)), baseFrontier: admissionFrontier});
+    const orderTap = prepend ? membershipTap : undefined;
+    orderTap?.(preparedAdds.some(row => row.existingSubjectId !== undefined) ? MEMBERSHIP_OPEN_ORDER : MEMBERSHIP_OPEN);
+    try { commitAndProjectEntityMutationFrame(frame, {ordering}); }
+    finally { orderTap?.(MEMBERSHIP_CLOSE); }
     const subjectIdsByKey = new Map<K, number>();
     for (const { id, subjectId } of preparedAdds) {
       subjectIdsByKey.set(id, subjectId);
@@ -1743,8 +1725,7 @@ export function createEntitySignal<
 
     // Finish the compound topology before path observers or taps can copy
     // metadata or flush history. No shared collector or later backpatching.
-    if (prepend) moveToFront(processedIds);
-    else updateSignals();
+    updateSignals();
     if (beforeSubjects) {
       if (mutationCaptureRuntime?.isCaptureActive()) getPositionIds();
       const afterSubjects: number[] = [];
@@ -1811,8 +1792,11 @@ export function createEntitySignal<
 
   function addOneWithStructuralEffect(
     entity: E,
-    opts?: AddOptions<E, K>
+    opts?: AddOptions<E, K>,
+    prepend = false
   ): { id: K; structuralEffect: PendingAddStructuralEffect } {
+    const admissionFrontier = structuralStore.activeOrderFrontier();
+    const previousFirstKey = structuralStore.firstActiveKey();
     const id = deriveId(entity, opts);
     const previousLastKey = structuralStore.lastActiveKey();
     recordProductionSubstrateStat('publicAddPreviousTailReads');
@@ -1822,6 +1806,7 @@ export function createEntitySignal<
     }
 
     const transformedEntity = interceptAddedEntity(entity);
+    if (structuralStore.activeOrderFrontier() !== admissionFrontier) throw new Error('Cannot addOne: topology changed during staging');
     const subjectId = structuralStore.planFreshSubjectIds(1)[0];
     if (subjectId === undefined) {
       throw new Error(
@@ -1837,14 +1822,20 @@ export function createEntitySignal<
       nextValue: transformedEntity,
     };
     frame.stageFreshSubject(freshSubject);
-    commitAndProjectEntityMutationFrame(frame);
+    const ordering = Object.freeze({kind: prepend ? 'front' as const : 'append' as const,
+      subjects: Object.freeze([subjectId]), keys: Object.freeze([id]), baseFrontier: admissionFrontier});
+    const orderTap = prepend ? membershipTap : undefined;
+    orderTap?.(MEMBERSHIP_OPEN);
+    try { commitAndProjectEntityMutationFrame(frame, {ordering}); }
+    finally { orderTap?.(MEMBERSHIP_CLOSE); }
     const structuralEffect: PendingAddStructuralEffect = {
       kind: 'add',
       subject: subjectId,
       key: id,
       value: deepClone(transformedEntity),
+      afterSubject: prepend && previousFirstKey !== undefined ? allocateSubjectId(previousFirstKey) : undefined,
       beforeSubject:
-        previousLastKey === undefined
+        prepend || previousLastKey === undefined
           ? undefined
           : allocateSubjectId(previousLastKey),
     };
@@ -2444,7 +2435,8 @@ export function createEntitySignal<
   function reclaimRetiredSubjectsWithoutOwner(
     subjectIds: readonly number[]
   ): void {
-    if (hasRestorationAuthority || subjectIds.length === 0) {
+    if (hasRestorationAuthority) { notifyEntityRetirement(mutationCaptureRuntime, getPositionIds()?.[0], subjectIds); return; }
+    if (subjectIds.length === 0) {
       return;
     }
 
@@ -2723,38 +2715,9 @@ export function createEntitySignal<
       return addOneWithStructuralEffect(entity, opts).id;
     },
 
-    /**
-     * Insert at the FRONT, reusing `addOne` and then moving the entry.
-     *
-        if (structuralStore.hasActiveKey(id)) {
-     * so the entry order is rebuilt — O(n) in the number of entities. That is
-     * still markedly cheaper than the `setAll([entity, ...existing])` this
-     * replaces, which rebuilds the storage map AND resets every per-entity
-     * signal: only the newcomer's signal changes here, so held nodes survive and
-     * no unrelated row's consumers are invalidated.
-     *
-     * Reusing `addOne` rather than duplicating it keeps duplicate-detection,
-     * interceptors, notifier and tap handlers on exactly one path.
-     */
+    /** V16: complete membership and ordering before onAdd can author newer work. */
     prependOne(entity: E, opts?: AddOptions<E, K>): K {
-      // One membership event for add + move: readers never see the row at
-      // the end of the list first.
-      return withMembershipGroup(() => {
-        const previousFirstKey = structuralStore.firstActiveKey();
-        const { id, structuralEffect } = addOneWithStructuralEffect(
-          entity,
-          opts
-        );
-        moveToFront([id]);
-        rewritePendingAddEffect(
-          structuralEffect,
-          undefined,
-          previousFirstKey === undefined
-            ? undefined
-            : allocateSubjectId(previousFirstKey)
-        );
-        return id;
-      });
+      return withMembershipGroup(() => addOneWithStructuralEffect(entity, opts, true).id);
     },
 
     prependMany(entities: E[], opts?: AddManyOptions<E, K>): K[] {
@@ -3679,7 +3642,8 @@ export function createEntitySignal<
         for (const {id,subjectId} of stagedRemovals) frame.stageSubjectTombstone({kind:'tombstone-subject',key:id,subjectId,restoreAllowed:resolveSubjectState(subjectId)?.restoreAllowed ?? true});
         for (const {id,subjectId,entity} of stagedUpdates) frame.stageValueReplacement({kind:'replace-value',key:id,subjectId,nextValue:entity});
         for(let k=0;k<stagedAdds.length;k++) frame.stageFreshSubject({kind:'create-fresh-subject',key:stagedAdds[k].id,subjectId:addedSubjectIds[k],nextValue:stagedAdds[k].entity});
-        commitAndProjectEntityMutationFrame(frame);
+        const ordering = Object.freeze({kind: 'exact' as const, subjects: Object.freeze([...afterSubjects]), keys: Object.freeze([...incomingIds]), baseFrontier: beforeOrderFrontier});
+        commitAndProjectEntityMutationFrame(frame, {ordering});
         for(const {subjectId} of stagedRemovals) tombstoneSubjectSignal(subjectId);
         for(const {id} of stagedAdds) syncEntitySignal(id);
 
@@ -3687,7 +3651,7 @@ export function createEntitySignal<
           syncEntitySignal(id);
         }
 
-        structuralStore.reorderActiveKeys(incomingIds);
+        // Complete membership and order were installed in the prepared frame.
 
         lastSubjectIds = [
           ...stagedRemovals.map(({ subjectId }) => subjectId),
@@ -3961,6 +3925,12 @@ export function createEntitySignal<
         reAdding = pendingReAdd = false;
       }
     };
+  }
+  // Experimental owner maintenance runs after each complete public mutation.
+  for (const name of ['addOne','prependOne','addMany','prependMany','updateOne','setOne','updateMany','removeOne','removeMany','upsertOne','upsertMany','clear','setAll','changeId']) {
+    const write = (api as Record<string, unknown>)[name];
+    if (typeof write !== 'function') continue;
+    (api as Record<string, unknown>)[name] = (...args: unknown[]) => withEntityRetirementScope(mutationCaptureRuntime, () => write(...args));
   }
   // Its presence changed (it, or a member above it, was omitted or re-added):
   // every query and every held row re-reads (`republishMembers`).

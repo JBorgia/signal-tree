@@ -1,3 +1,4 @@
+import { createTransactionSparseAdapter } from './sparse-adapter';
 import type { TerminalRecordPlan } from '../../lib/internals/intrinsic-mutation';
 import { publishingExposedOnly } from '../../lib/internals/exposed-publication';
 import {
@@ -1453,6 +1454,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
   defineTreeRealizationPort(treeWrapper, realizationPort);
   defineTreeRealizationPort(stateRoot, realizationPort);
 
+  const sparse = createTransactionSparseAdapter(stateRoot, treeWrapper);
+  tree.registerCleanup(() => sparse.destroy());
+
   // TX-AUTO-ROLLBACK-0. The rollback after a failure that happens AFTER the
   // callback returned (the invalidation group closing, the capture failing
   // to release) runs while transact() is still in progress, when observers
@@ -2020,7 +2024,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
   tree.registerCleanup(()=>{ installedOperations.clear(); expectedDispositions.clear(); });
   const sourceCaptureRuntime = getMutationCaptureRuntime(tree);
   if (sourceCaptureRuntime) {
-    sourceCaptureRuntime.prepareEntityResponsibility = (capture) => {
+    const prepareDiagnosticResponsibility = (capture: Parameters<NonNullable<typeof sourceCaptureRuntime.prepareEntityResponsibility>>[0]) => {
       const id = resolveTransactionId(capture.meta);
       if (id === undefined || isRestoring || capture.meta?.origin === 'transaction-rollback' || capture.meta?.origin === 'restoration') return;
       const bucket = getTransactionBucket(id);
@@ -2069,6 +2073,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
       for(const [key,value] of scratch.baselineValues) writes.push({map:bucket.baselineValues,key,value});
       if(pendingTransactions.size>0) for(const key of windowKeys([capture.owner],capture.changes.map(c=>c.subject))) writes.push({map:bucket.ownWriteSeq,key,value:windowWriteSeq});
       return {writes,adds:[{set:operation.owners,value:capture.owner},{set:bucket.positionIds,value:capture.owner},{set:bucket.ownerPaths,value:capture.ownerPath},...capture.changes.map(c=>({set:bucket.subjectIds,value:c.subject}))]};
+    };
+    sourceCaptureRuntime.prepareEntityResponsibility = capture => {
+      const id = resolveTransactionId(capture.meta);
+      const ownership = sparse.entity(id, capture);
+      const diagnostics = prepareDiagnosticResponsibility(capture);
+      return ownership && diagnostics ? {writes:[...diagnostics.writes,...ownership.writes],adds:[...diagnostics.adds,...ownership.adds]} : ownership ?? diagnostics;
     };
     tree.registerCleanup(()=>{ delete sourceCaptureRuntime.prepareEntityResponsibility; });
   }
@@ -3051,6 +3061,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
           );
         },
         { terminalRecord: (path,next,prev,meta,ownerPath,subjectIds,positionIds) => {
+          const sparsePosition=positionIds?.[0];
+          const ownership=sparsePosition!==undefined&&!subjectIds?.length&&getTreeScalarSlotRuntime(tree.$)?.resolveScalarSlot(sparsePosition)!==undefined
+            ? sparse.scalar(resolveTransactionId(meta),sparsePosition,prev,next) : undefined;
+          const diagnostic=():TerminalRecordPlan|undefined=>{
           if(isRestoring || meta?.origin==='restoration' || isInspectionWrite(meta) || getWriteParticipation(meta)==='realized')return;
           if(meta?.transactionOwner!==transactionOwnerToken)return;
           const id=resolveTransactionId(meta), position=positionIds?.[0];
@@ -3071,6 +3085,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
           if(!bucket.baselineValues.has(position))writes.push({map:bucket.baselineValues,key:position,value:prev});
           if(pendingTransactions.size>0)for(const key of windowKeys([position],undefined))writes.push({map:bucket.ownWriteSeq,key,value:windowWriteSeq});
           return {writes,adds:[{set:operation.owners,value:position},{set:bucket.positionIds,value:position},{set:bucket.ownerPaths,value:ownerPath ?? path}]};
+
+          };
+          const evidence=diagnostic();
+          return ownership&&evidence?{writes:[...evidence.writes,...ownership.writes],adds:[...evidence.adds,...ownership.adds]}:ownership??evidence;
         }, beforePublication: (path, next, prev, meta, ownerPath, subjectIds, positionIds) => {
           const effectiveMeta = meta ?? getActiveWriteContext();
           if (isRestoring || effectiveMeta?.origin === 'restoration' || isInspectionWrite(effectiveMeta) || getWriteParticipation(effectiveMeta) === 'realized') return;
@@ -3204,6 +3222,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     turnId: number | undefined
   ): PendingTransaction => {
     let settled: TransactionInspection | undefined;
+    let duringSettlement: TransactionInspection | undefined;
 
     const read = (): TransactionInspection => {
       if (turnId === undefined) {
@@ -3291,7 +3310,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       inspect(): TransactionInspection {
         // After settlement the turn is no longer pending, so the inspection
         // as of that settlement is what there is to report.
-        return settled ?? read();
+        return settled ?? (settlementWasTerminal() ? duringSettlement : undefined) ?? read();
       },
       confirm(): void {
         // Snapshot BEFORE confirming: this is the race inspect() alone
@@ -3299,6 +3318,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
         // snapshot is kept even though confirm() returns void, so a later
         // inspect() still reports the truth as of settlement.
         const atSettlement = settled ?? snapshot();
+        duringSettlement = atSettlement;
         try {
           pending.confirm();
         } catch (error) {
@@ -3309,6 +3329,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       },
       rollback(): void {
         const atSettlement = settled ?? snapshot();
+        duringSettlement = atSettlement;
         // Throws on a conservative refusal, and ALSO on an observer failure
         // that followed a successful compensation. Rethrown either way — the
         // caller must see both — but only the second is terminal, so only
@@ -3402,6 +3423,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
         // any observer of its first write: see `reservePending`. Nothing from
         // here to the end of the callback's `finally` lets a throw escape.
         reservedTurnId = authority.reservePending(captureBucket);
+        sparse.open(transactionId);
       } catch (error) {
         // Lifecycle observation only: a throw before the reservation leaves no
         // handle, so the reader must not keep a pending record. (The owner's
@@ -3549,7 +3571,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       const handle = {
         [PENDING_TURN_ID]: pendingTurnId,
         confirm(): void {
-          validateOperationDisposition(transactionId,pendingTurnId);
+
           const pendingTurn = authority.getPendingTurn(pendingTurnId);
           if (destroyed) throw new Error('Cannot settle a destroyed tree');
           if (settling)
@@ -3560,7 +3582,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           if (lifecycle === 'rejected') {
             throw new Error('Cannot confirm a rolled back transaction');
           }
-          lifecycle = 'confirmed';
+          sparse.settle(transactionId, 'accept', () => { lifecycle = 'confirmed'; });
             installedOperations.delete(transactionId);
             expectedDispositions.delete(transactionId);
           // Lifecycle observation: recorded at the transition, before the engine
@@ -3631,7 +3653,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           }
         },
         rollback(): void {
-          validateOperationDisposition(transactionId,pendingTurnId);
+
           const pendingTurn = authority.getPendingTurn(pendingTurnId);
           if (destroyed) throw new Error('Cannot settle a destroyed tree');
           if (settling)
@@ -3639,20 +3661,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           if (lifecycle === 'rejected') return;
           if (lifecycle === 'confirmed')
             throw new Error('Cannot rollback a confirmed transaction');
-          const plan =
-            pendingTurnId === undefined
-              ? { compensation: [] }
-              : authority.getPendingRollbackPlan(
-                  pendingTurnId,
-                  readQueuedLaterEffects()
-                );
-          if ('conflict' in plan) {
-            const refusal = createRollbackError(plan.conflict);
-            // Refused before anything is reversed: authority stays pending.
-            publishRefusal(transactionId, refusal);
-            throw refusal;
-          }
-          const compensation = plan.compensation;
+          const compensation = pendingTurn?.__effects ?? [];
           const orderDeltas =
             pendingTurnId === undefined
               ? []
@@ -3668,49 +3677,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
           settling = true;
           try {
             const apply = () => {
-              rollbackPendingEffectsThroughRealizationPort(
-                pendingTurnId ?? transactionId,
-                [...compensation].reverse(),
-                pendingTurn?.__baselineValues ?? new Map(),
-                orderDeltas,
-                primaryFailed ? primaryError : undefined,
-                transactionId,
-                completion
-              );
-              installed = true;
-            };
-            try {
-              const locations = getLocationRuntime(tree.$);
-              if (locations) locations.runInvalidationGroup(apply);
-              else apply();
-            } catch (error) {
-              // Physical commit precedes observer delivery. A delivery failure
-              // must not leave a successfully compensated turn retryable.
-              installed ||= completion.selected
-                ? completion.committed
-                : revision !== undefined && clock?.revision() !== revision;
-              if (!installed) {
-                const refusal =
-                  error instanceof SignalTreeRollbackError
-                    ? error
-                    : createRollbackError({
-                        kind: 'effect-validation-failed',
-                        pendingTurnId: pendingTurnId ?? transactionId,
-                        compensation,
-                        errorMessage:
-                          error instanceof Error
-                            ? error.message
-                            : 'Unknown rollback validation failure',
-                        cause: error,
-                        callbackError: primaryFailed ? primaryError : undefined,
-                      });
-                // Nothing installed: the turn and its scope stay pending.
-                publishRefusal(transactionId, refusal);
-                throw refusal;
-              }
-              observerFailed = true;
-              observerError = error;
-            }
+              completion.selected = true;
+              publishingExposedOnly(tree.$ as object, () => withWriteContext({origin:'transaction-rollback',transactionId,ownerId:getPositionRegistry(tree.$)?.id}, () => sparse.settle(transactionId, 'reject', () => {
+                completion.committed = true;
             lifecycle = 'rejected';
             installedOperations.delete(transactionId);
             expectedDispositions.delete(transactionId);
@@ -3751,6 +3720,41 @@ export function getOrCreateInternalTransactionRuntime<T>(
                   pendingTurn?.__positionIds ?? []
                 );
               }
+            }
+              })));
+              installed = true;
+            };
+            try {
+              const locations = getLocationRuntime(tree.$);
+              if (locations) locations.runInvalidationGroup(apply);
+              else apply();
+            } catch (error) {
+              // Physical commit precedes observer delivery. A delivery failure
+              // must not leave a successfully compensated turn retryable.
+              installed ||= completion.selected
+                ? completion.committed
+                : revision !== undefined && clock?.revision() !== revision;
+              if (!installed) {
+                const refusal =
+                  error instanceof SignalTreeRollbackError
+                    ? error
+                    : createRollbackError({
+                        kind: 'effect-validation-failed',
+                        pendingTurnId: pendingTurnId ?? transactionId,
+                        compensation,
+                        errorMessage:
+                          error instanceof Error
+                            ? error.message
+                            : 'Unknown rollback validation failure',
+                        cause: error,
+                        callbackError: primaryFailed ? primaryError : undefined,
+                      });
+                // Nothing installed: the turn and its scope stay pending.
+                publishRefusal(transactionId, refusal);
+                throw refusal;
+              }
+              observerFailed = true;
+              observerError = error;
             }
             if (observerFailed) throw applicationFailureCause(observerError);
           } finally {

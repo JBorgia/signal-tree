@@ -155,9 +155,27 @@ export class EntityMutationFrame<
    */
   commit(
     observeCommitted?: (changes: readonly CommittedEntityMutation[]) => void,
-    responsibility?: TerminalRecordPlan
+    responsibility?: TerminalRecordPlan,
+    ordering?: { readonly kind: 'append' | 'front' | 'exact'; readonly subjects: readonly number[]; readonly keys: readonly K[]; readonly baseFrontier: unknown }
   ): EntityMutationCommitResult {
     const preparedMutations = this.prepareCommitInstructions();
+    if (ordering) {
+      if (this.structuralStore.activeOrderFrontier() !== ordering.baseFrontier) throw new Error('Prepared entity ordering frontier is stale');
+      if (ordering.keys.length !== ordering.subjects.length || new Set(ordering.keys).size !== ordering.keys.length || new Set(ordering.subjects).size !== ordering.subjects.length) throw new Error('Prepared entity ordering contains duplicate or mismatched identities');
+      const changedKeys = new Map<K, number | undefined>();
+      let count = this.structuralStore.activeKeyCount();
+      for (const mutation of preparedMutations) {
+        if (mutation.kind === 'create-fresh-subject') { changedKeys.set(mutation.key, mutation.subjectId); count++; }
+        if (mutation.kind === 'tombstone-subject') { changedKeys.set(mutation.key, undefined); count--; }
+        if (mutation.kind === 'transfer-key') { changedKeys.set(mutation.fromKey, undefined); changedKeys.set(mutation.toKey, mutation.subjectId); }
+      }
+      for (let i=0;i<ordering.keys.length;i++) {
+        const key=ordering.keys[i];
+        const subject=changedKeys.has(key) ? changedKeys.get(key) : this.structuralStore.subjectIdForKey(key);
+        if (subject !== ordering.subjects[i]) throw new Error('Prepared entity ordering lifetime or key conflict');
+      }
+      if (ordering.kind === 'exact' && count !== ordering.keys.length) throw new Error('Prepared exact ordering omits membership');
+    }
     // Before-images of touched lifetimes only. An inactive lifetime's retained
     // backing is not current truth, so it reads as absent (undefined).
     const before = observeCommitted
@@ -252,6 +270,9 @@ export class EntityMutationFrame<
       physicallyChangedSubjectIds.add(mutation.subjectId);
     }
 
+    // Membership and its resolved placement become live before paired responsibility.
+    if (ordering?.kind === 'front') this.structuralStore.moveKeysToFront(ordering.keys);
+    else if (ordering?.kind === 'exact') this.structuralStore.reorderActiveKeys(ordering.keys);
     if (responsibility) {
       for(let i=0;i<responsibility.writes.length;i++){const w=responsibility.writes[i];w.map.set(w.key,w.value);}
       for(let i=0;i<responsibility.adds.length;i++){const a=responsibility.adds[i];a.set.add(a.value);}

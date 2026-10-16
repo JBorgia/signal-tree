@@ -1,0 +1,9 @@
+{
+  "baseline": "8d220643e0d4e34cbdbc6e55e6ef692b25d5e023",
+  "branch": "codex/sparse-ownership-integration",
+  "status": "rejected integration checkpoint; no runtime acceptance",
+  "sourceManifest": "source-files.json",
+  "evidenceSha256": "154115d742d5deeb5ab1c47f02e48fd58595bddb884c3bccf8170defb2bcfe7e",
+  "r3ArchiveSha256": "632685918a5c576dc0803c36cfb9b9793547d2b7f72d5247c3c181c09e23b876",
+  "evidenceBytes": 927860
+}

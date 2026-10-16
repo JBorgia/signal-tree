@@ -74,15 +74,15 @@ for (const mode of ['direct', 'batch', 'coalesce'] as const) {
         'external input retains this handle authority'
       );
       c.equal(
-        f.candidate.readCanonical().x,
+        f.candidate.readCanonical()['x'],
         2,
         'external input establishes canonical x=2'
       );
-      c.equal(snapshot(f).x, 1, 'pending overlay remains visible');
+      c.equal(snapshot(f)['x'], 1, 'pending overlay remains visible');
       const result = f.candidate.settleReject(p);
       c.note({ result });
       c.requireSuccess(result, 'reject reveals external truth');
-      c.equal(snapshot(f).x, 2, 'external truth survives rejection');
+      c.equal(snapshot(f)['x'], 2, 'external truth survives rejection');
     }
   );
   add(
@@ -155,12 +155,12 @@ add(
     await drain(f);
     j.group('coalesce', () => f.write('x', 2));
     await drain(f);
-    c.equal(snapshot(f).x, 2, 'later literal visible');
+    c.equal(snapshot(f)['x'], 2, 'later literal visible');
     c.equal(f.hasPendingAuthority(p), true, 'old authority retained');
     const r = f.candidate.settleAccept(p);
     c.note({ r });
     c.requireSuccess(r, 'accept older transaction');
-    c.equal(snapshot(f).x, 2, 'accept cannot replay older literal');
+    c.equal(snapshot(f)['x'], 2, 'accept cannot replay older literal');
   }
 );
 for (const mode of ['batch', 'coalesce'] as const) {
@@ -202,8 +202,8 @@ for (const mode of ['batch', 'coalesce'] as const) {
           );
           c.equal(reachedEnd, false, 'refused unit did not complete');
           for (const s of seen) {
-            c.equal(s.x, 0, 'refused x never published');
-            c.equal(s.y, 0, 'refused y never published');
+            c.equal(s['x'], 0, 'refused x never published');
+            c.equal(s['y'], 0, 'refused y never published');
           }
           // A later normal write must not drain a hidden refused queue.
           f.write('z', 6);
@@ -347,7 +347,7 @@ add(
       await drain(f);
       if (!(await delivery(ys, 2, c))) return;
       c.equal(ys.at(-1), 2, 'independent literal y=2 delivered after refusal');
-      c.equal(snapshot(f).x, before.x, 'refused x unchanged');
+      c.equal(snapshot(f)['x'], before['x'], 'refused x unchanged');
       c.equal(
         f.hasPendingAuthority(p),
         true,

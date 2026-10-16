@@ -1,0 +1,13 @@
+{
+  "head": "774dfd7f267400dc06fe8c8ffe976f18b51d52b0",
+  "nativeReference": "8d220643e0d4e34cbdbc6e55e6ef692b25d5e023",
+  "integrationBaseline": "19a5bd034d5ebef262f637c397bb41fe50a6a1e3",
+  "archiveSha256": "632685918a5c576dc0803c36cfb9b9793547d2b7f72d5247c3c181c09e23b876",
+  "archiveBytes": 4125496,
+  "files": 360,
+  "bridgeSha256": "edb7e221f58f210312789f08486ed7dde9c7a95e4adf952a13c0232e9ed45e3c",
+  "modelSha256": "be14a48d18f92b0867cdb851a20e9afe4d3d86f54579380d3fe49f4cb20404be",
+  "nativeDeltaSha256": "64a42fd85a1dc49ea04ecf7f5deb39a1f6a6f8151fd791de8c2f7a5402a058fc",
+  "runtimeChanged": false,
+  "acceptance": "bounded R3 bridge only; no production integration"
+}

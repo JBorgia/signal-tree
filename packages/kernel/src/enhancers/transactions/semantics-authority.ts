@@ -24,9 +24,9 @@ const flush = async (f: Fixture) => {
   for (let i = 0; i < 6; i++) await f.flush();
 };
 const visible = (f: Fixture, c: Context, y: number) =>
-  c.equal(f.candidate.readVisible().y, y, 'visible y');
+  c.equal(f.candidate.readVisible()['y'], y, 'visible y');
 const canonical = (f: Fixture, c: Context, y: number) =>
-  c.equal(f.candidate.readCanonical().y, y, 'canonical y');
+  c.equal(f.candidate.readCanonical()['y'], y, 'canonical y');
 const pending = (f: Fixture, c: Context, p: Handle, label = 'P') =>
   c.equal(
     f.candidate.readSettlementState(p),
