@@ -111,3 +111,15 @@ remains under consideration. Neither sparse-root authority nor native authority
 with live contribution records is selected. No restoration synchronization patch,
 API change, ceiling increase, release or new implementation is authorized by
 this record. Unknown per-test causes remain explicitly provisional.
+
+## Comparative authority slice (2026-10-16)
+
+The [bounded comparison](docs/research/authority-vertical-slice/README.md)
+preserves both authority models and the exact repaired incumbent control.
+A and B each pass 40 cases and fail the same recovery-error reporting case;
+neither is accepted. B demonstrates hidden surviving values without a permanent
+canonical mirror in this model. Its measured implementation costs are lower on
+the passing subset, with copying/scheduling and production-scope qualifications.
+Independent premise and cost reviews, first failures and both measurement cohorts
+are preserved. Production changes remain paused; no authority migration, API
+acceptance, budget change or release is authorized by this analysis-only record.

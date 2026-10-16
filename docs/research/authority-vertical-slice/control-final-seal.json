@@ -1,0 +1,11 @@
+{
+  "head": "8d220643e0d4e34cbdbc6e55e6ef692b25d5e023",
+  "files": {
+    "/private/tmp/st-sparse-integration-baseline-8d220643/dist/packages/kernel/dist/index.js": "a91d2789824d429e69cd18ce29679dbd736fdeecb8dcbd5eac8d2dab018db799",
+    "/private/tmp/st-sparse-integration-baseline-8d220643/dist/packages/kernel/dist/adapter.js": "d080563a22f5bda9437a7c14d4b4bcfb881778733c056d74fa5e483d1d60ceef",
+    "/private/tmp/st-sparse-integration-baseline-8d220643/dist/packages/kernel/dist/internals.js": "f0bd6c8036404f0e202eed089fa0d70224e430eb032b6dcc44560709b8d95415",
+    "/private/tmp/st-sparse-integration-baseline-8d220643/packages/kernel/src/enhancers/transactions/transactions.ts": "612d34cfb5c435743501e6762f0a5c538b80920143ed89aad8fa5c74941e77a5",
+    "/private/tmp/st-sparse-integration-baseline-8d220643/packages/kernel/src/enhancers/restoration/restoration.ts": "73e6a6193e4221013a315c203f06319e662a223945ef483d09fd312e016e5f73",
+    "/private/tmp/st-authority-slice-20261016/control.mjs": "1ddda15c144243b7f2bdf46410271a8d17c946e31f768a5b7c125c219cb4d7ea"
+  }
+}

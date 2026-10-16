@@ -1,0 +1,30 @@
+{
+  "baseline": "8d220643e0d4e34cbdbc6e55e6ef692b25d5e023",
+  "parent": "41dc84d73c1d36399ca632cfa711db3bc6a42a94",
+  "archiveSha256": "5113c3935d10e2315b3daa84e3a9f93c8cdaf6a319fc9c737d6f1d0b9208f992",
+  "manifestSha256": "91018fcc07862301f7e53842e6c21593ae8666dee8c667425dac0c377304d82d",
+  "finalSources": {
+    "arm-a.mjs": "3b13ef34da17265b9b53d734fcf5b6801e6b7f99f4217872e96fa6689c90e585",
+    "arm-b.mjs": "7bbbb82b685c8f6bd9ef5ae8f3bda595a3b986a3155c693fb1620bdf58bd27f2",
+    "control.mjs": "1ddda15c144243b7f2bdf46410271a8d17c946e31f768a5b7c125c219cb4d7ea",
+    "measure.mjs": "448608af86d037f804a856c6d040e8adbece89004c101e2293bb1fdeebe13a7c",
+    "tests.mjs": "bbffb4dddf53e6de1b02e0230470077f3e2e0334823e2d6d3a3287e852a05611"
+  },
+  "result": {
+    "A": {
+      "pass": 40,
+      "fail": 1
+    },
+    "B": {
+      "pass": 40,
+      "fail": 1
+    },
+    "control": {
+      "pass": 25,
+      "fail": 8,
+      "unsupported": 8
+    }
+  },
+  "productionSource": "unchanged; 12 frozen source seals verified",
+  "accepted": false
+}
