@@ -123,3 +123,14 @@ the passing subset, with copying/scheduling and production-scope qualifications.
 Independent premise and cost reviews, first failures and both measurement cohorts
 are preserved. Production changes remain paused; no authority migration, API
 acceptance, budget change or release is authorized by this analysis-only record.
+
+## Recovery contract reconciliation (2026-10-16)
+
+[Adversarial recovery evidence](docs/research/recovery-identity-contract/README.md)
+confirms the existing v16 mechanism throws a rollback refusal with accessible
+recovery, preserving arbitrary callback identity in recovery.callbackError.
+Exact baseline passes 14 controls including refused and successful retries.
+Both unchanged models fail seven stronger top-level-identity/access controls;
+the original 40-pass/1-fail results remain. B retains priority, but production
+integration awaits reconciliation of that research requirement with the existing
+contract. No replacement error API or implementation is accepted here.

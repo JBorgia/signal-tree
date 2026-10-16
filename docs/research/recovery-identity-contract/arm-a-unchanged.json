@@ -1,0 +1,175 @@
+{
+  "arm": "/Users/jonathanborgia/.codex/worktrees/sparse-ownership-integration/signaltree/docs/research/authority-vertical-slice/arm-a.mjs",
+  "tests": [
+    {
+      "name": "ordinary and pending read-own-write",
+      "status": "pass"
+    },
+    {
+      "name": "original restoration divergence",
+      "status": "pass"
+    },
+    {
+      "name": "restoration refusal while pending preserves state history and retry",
+      "status": "pass"
+    },
+    {
+      "name": "overlap reject older then newer reveals base",
+      "status": "pass"
+    },
+    {
+      "name": "overlap reject newer reveals older",
+      "status": "pass"
+    },
+    {
+      "name": "accept newer then older never reorders",
+      "status": "pass"
+    },
+    {
+      "name": "accept older then reject newer reveals accepted",
+      "status": "pass"
+    },
+    {
+      "name": "newer ordinary truth dominates pending",
+      "status": "pass"
+    },
+    {
+      "name": "ordinary ABA preserves newer authored identity",
+      "status": "pass"
+    },
+    {
+      "name": "nested contribution restores outer attribution",
+      "status": "pass"
+    },
+    {
+      "name": "member absence differs from present undefined",
+      "status": "pass"
+    },
+    {
+      "name": "branch creation removal and member shape",
+      "status": "pass"
+    },
+    {
+      "name": "overlap branch hidden surviving shape",
+      "status": "pass"
+    },
+    {
+      "name": "same lifetime remove reject revives held ref",
+      "status": "pass"
+    },
+    {
+      "name": "same key replacement never retargets held ref",
+      "status": "pass"
+    },
+    {
+      "name": "replacement survives rejection of older field",
+      "status": "pass"
+    },
+    {
+      "name": "overlap entity fields preserves base",
+      "status": "pass"
+    },
+    {
+      "name": "mixed scalar entity settlement coherent publication",
+      "status": "pass"
+    },
+    {
+      "name": "settlement publishes even without restoration",
+      "status": "pass"
+    },
+    {
+      "name": "observer reentry write survives settlement",
+      "status": "pass"
+    },
+    {
+      "name": "observer reentry ABA survives deferred publication",
+      "status": "pass"
+    },
+    {
+      "name": "observer nested settlement preserves terminality",
+      "status": "pass"
+    },
+    {
+      "name": "observer throw cannot reverse terminal settlement",
+      "status": "pass"
+    },
+    {
+      "name": "preparation failure changes neither state nor owner",
+      "status": "pass"
+    },
+    {
+      "name": "write preparation failure admits no speculative state",
+      "status": "pass"
+    },
+    {
+      "name": "mixed settlement preparation failure publishes nothing",
+      "status": "pass"
+    },
+    {
+      "name": "throwing callback preserves original error and aborts",
+      "status": "pass"
+    },
+    {
+      "name": "throwing callback failed abort exposes usable recovery",
+      "status": "pass"
+    },
+    {
+      "name": "destroy invalidates refs and pending handles",
+      "status": "pass"
+    },
+    {
+      "name": "repeated absent scalar removal preserves control no-op policy",
+      "status": "pass"
+    },
+    {
+      "name": "absent entity removal preserves control refusal",
+      "status": "pass"
+    },
+    {
+      "name": "branch input and output aliases cannot install state",
+      "status": "pass"
+    },
+    {
+      "name": "entity input and returned values are detached",
+      "status": "pass"
+    },
+    {
+      "name": "entity add preparation getter reentry rejects stale outer unit",
+      "status": "pass"
+    },
+    {
+      "name": "entity update preparation getter reentry preserves inner write",
+      "status": "pass"
+    },
+    {
+      "name": "mixed staged preparation failure preserves all responsibility",
+      "status": "pass"
+    },
+    {
+      "name": "masked settlement never exposes obsolete value",
+      "status": "pass"
+    },
+    {
+      "name": "empty handle terminality is explicit",
+      "status": "pass"
+    },
+    {
+      "name": "reclamation follows last obligation despite held references",
+      "status": "pass"
+    },
+    {
+      "name": "no pending work retains no B canonical mirror",
+      "status": "pass"
+    },
+    {
+      "name": "occupied recovery field preserves original error during failed abort",
+      "status": "fail",
+      "error": "AssertionError [ERR_ASSERTION]: Expected \"actual\" to be reference-equal to \"expected\":\n+ actual - expected\n\n+ [TypeError: Cannot redefine property: recovery]\n- [Error: original]\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected \"actual\" to be reference-equal to \"expected\":\n+ actual - expected\n\n+ [TypeError: Cannot redefine property: recovery]\n- [Error: original]\n\n    at file:///Users/jonathanborgia/.codex/worktrees/sparse-ownership-integration/signaltree/docs/research/authority-vertical-slice/tests.mjs:50:366\n    at file:///Users/jonathanborgia/.codex/worktrees/sparse-ownership-integration/signaltree/docs/research/authority-vertical-slice/tests.mjs:52:262"
+    }
+  ],
+  "counts": {
+    "pass": 40,
+    "fail": 1
+  }
+}

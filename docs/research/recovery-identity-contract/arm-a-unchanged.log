@@ -1,0 +1,7 @@
+{ pass: 40, fail: 1 }
+occupied recovery field preserves original error during failed abort fail AssertionError [ERR_ASSERTION]: Expected "actual" to be reference-equal to "expected":
++ actual - expected
+
++ [TypeError: Cannot redefine property: recovery]
+- [Error: original]
+
