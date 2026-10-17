@@ -1,0 +1,34 @@
+{"thrown":"SignalTreeRollbackError: Transaction rollback refused during automatic abort","recovery":true,"owners":0}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Destroyed tree must not offer unusable authority
++ actual - expected
+
++ {
++   callbackError: Error: original
++       at file:///private/tmp/st-b-recovery-20261016/destroy-review.mjs:3:38,
++   callbackFailed: true,
++   transaction: {
++     confirm: [Function: accept],
++     rollback: [Function: reject]
++   }
++ }
+- undefined
+
+    at file:///private/tmp/st-b-recovery-20261016/destroy-review.mjs:6:8 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: {
+    transaction: { confirm: [Function: accept], rollback: [Function: reject] },
+    callbackFailed: true,
+    callbackError: Error: original
+        at file:///private/tmp/st-b-recovery-20261016/destroy-review.mjs:3:38
+  },
+  expected: undefined,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.15.0

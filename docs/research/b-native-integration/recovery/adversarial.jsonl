@@ -1,0 +1,14 @@
+{"name":"occupied","failedAbort":false,"result":"pass"}
+{"name":"occupied","failedAbort":true,"result":"pass"}
+{"name":"frozen","failedAbort":false,"result":"pass"}
+{"name":"frozen","failedAbort":true,"result":"pass"}
+{"name":"undefined","failedAbort":false,"result":"pass"}
+{"name":"undefined","failedAbort":true,"result":"pass"}
+{"name":"null","failedAbort":false,"result":"pass"}
+{"name":"null","failedAbort":true,"result":"pass"}
+{"name":"string","failedAbort":false,"result":"pass"}
+{"name":"string","failedAbort":true,"result":"pass"}
+{"name":"number","failedAbort":false,"result":"pass"}
+{"name":"number","failedAbort":true,"result":"pass"}
+{"name":"symbol","failedAbort":false,"result":"pass"}
+{"name":"symbol","failedAbort":true,"result":"pass"}

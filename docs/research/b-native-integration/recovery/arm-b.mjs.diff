@@ -1,0 +1,32 @@
+diff --git a/Users/jonathanborgia/.codex/worktrees/sparse-ownership-integration/signaltree/docs/research/authority-vertical-slice/arm-b.mjs b/private/tmp/st-b-recovery-20261016/arm-b.mjs
+index 60f12bca..09d56bab 100644
+--- a/Users/jonathanborgia/.codex/worktrees/sparse-ownership-integration/signaltree/docs/research/authority-vertical-slice/arm-b.mjs
++++ b/private/tmp/st-b-recovery-20261016/arm-b.mjs
+@@ -1,4 +1,7 @@
+-// Experimental native-authority arm. No production imports or retained canonical mirror.
++import { pathToFileURL } from 'node:url';
++const baseline = process.env.SIGNAL_TREE_CONTROL_REPO ?? '/private/tmp/st-sparse-integration-baseline-8d220643';
++export const { SignalTreeRollbackError } = await import(pathToFileURL(`${baseline}/dist/packages/kernel/dist/index.js`));
++// Experimental native-authority model. Only the existing error class is imported; no retained canonical mirror.
+ export function createStore() {
+   const cells = new Map(), entities = new Map(), obligations = new Map(), owners = new Map();
+   const observers = new Set(), errors = [], deliveries = [];
+@@ -121,8 +124,16 @@ export function createStore() {
+       try { fn(); } catch (error) {
+         currentOwner = previous;
+         try { settle(owner, false); } catch (recoveryError) {
+-          if (error instanceof Error && Object.isExtensible(error)) Object.defineProperty(error, 'recovery', { value: handle, configurable: true });
+-          errors.push(recoveryError);
++          // Destroyed trees have no live authority to recover (existing v16 guard).
++          if (destroyed) throw recoveryError;
++          // v16: abort refusal is the thrown error; callback identity is evidence.
++          // Never mutate or reflect on an arbitrary callback-thrown value.
++          const refusal = new SignalTreeRollbackError('Transaction rollback refused during automatic abort', { cause: recoveryError });
++          Object.defineProperty(refusal, 'recovery', { value: {
++            transaction: { confirm: handle.accept, rollback: handle.reject },
++            callbackFailed: true, callbackError: error,
++          }, configurable: true, writable: true });
++          throw refusal;
+         }
+         throw error;
+       } finally { currentOwner = previous; }
