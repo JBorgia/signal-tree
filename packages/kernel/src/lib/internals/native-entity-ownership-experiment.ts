@@ -18,7 +18,13 @@ import type { EntityOwnershipDelta } from '../physical/prepare-entity-ownership-
 
 type Row = { key: string | number; value: unknown };
 type Placement = Row & { beforeSubject?: number; afterSubject?: number };
-type Fact = { value: unknown; order: number; addressKey?: string | number };
+type Fact = {
+  value: unknown;
+  order: number;
+  addressKey?: string | number;
+  // Retain the sparse neighbor chain even when this fact removes its lifetime.
+  placement?: Pick<Placement, 'beforeSubject' | 'afterSubject'>;
+};
 type Ledger = { base: Fact; pending: Map<number, Fact> };
 type Address = {
   collection: Collection;
@@ -134,7 +140,8 @@ export function nativeEntityOwnership(
       key: string,
       address: Address,
       before: unknown,
-      after: unknown
+      after: unknown,
+      placement?: Placement
     ) => {
       const old = ledgers.get(key),
         next: Ledger = old
@@ -147,11 +154,19 @@ export function nativeEntityOwnership(
         value: deepClone(after),
         order,
         addressKey: address.authoredKey,
+        placement: placement && {
+          beforeSubject: placement.beforeSubject,
+          afterSubject: placement.afterSubject,
+        },
       };
       if (id === undefined) next.base = fact;
       else next.pending.set(id, fact);
-      // Ordinary writes without a pending obligation allocate no retained state.
-      if (next.pending.size) {
+      // A field author does not own its observed key. Its value can nevertheless
+      // depend on a pending lifetime, including a field absent at creation.
+      const membershipPending =
+        address.field !== undefined &&
+        ledgers.get(`${address.owner}:${address.subject}:@`)?.pending.size;
+      if (next.pending.size || membershipPending) {
         writes.push(
           { map: ledgers as Map<unknown, unknown>, key, value: next },
           { map: addresses as Map<unknown, unknown>, key, value: address }
@@ -262,8 +277,8 @@ export function nativeEntityOwnership(
         subject: change.subject,
         authoredKey: beforeKey ?? afterKey,
       };
-      if (change.structural || ledgers.has(membership))
-        stage(membership, address, before, after);
+      if (change.structural)
+        stage(membership, address, before, after, before ?? after ?? undefined);
       if (change.after !== undefined) {
         const b = (change.before ?? {}) as Record<string, unknown>,
           a = change.after as Record<string, unknown>;
@@ -344,6 +359,7 @@ export function nativeEntityOwnership(
         if (!a.ordering) touched.set(`${a.owner}:${a.subject}`, a);
       }
       const groups = new Map<Collection, EntityOwnershipDelta[]>();
+      const groupOwners = new Map<Collection, number>();
       for (const [prefix, address] of touched) {
         const before = address.collection.__readOwnershipSubject(
           address.subject
@@ -359,6 +375,22 @@ export function nativeEntityOwnership(
               value: deepClone(before?.value ?? desired.value),
             }
           : null;
+        if (!after && membership) {
+          const absentFact = winner(membership);
+          for (const key of rowFields.get(prefix) ?? []) {
+            if (addresses.get(key)?.field === undefined) continue;
+            const ledger = next.get(key) ?? ledgers.get(key);
+            if (!ledger) continue;
+            const surviving = winner(ledger);
+            if (
+              surviving.order > absentFact.order &&
+              surviving.value !== absent
+            )
+              throw new Error(
+                'Surviving field depends on removed entity lifetime'
+              );
+          }
+        }
         if (after) {
           const value = after.value as Record<string, unknown>;
           // Visit only obligations for this touched lifetime, never unrelated rows.
@@ -387,6 +419,7 @@ export function nativeEntityOwnership(
         const place = desired as Placement | null;
         const list = groups.get(address.collection) ?? [];
         groups.set(address.collection, list);
+        groupOwners.set(address.collection, address.owner);
         list.push({
           subject: address.subject,
           before,
@@ -405,12 +438,15 @@ export function nativeEntityOwnership(
         const order = winner(ledger).value as readonly number[];
         const list = groups.get(address.collection) ?? [];
         groups.set(address.collection, list);
+        groupOwners.set(address.collection, address.owner);
         const existing = new Map(
           list.map((change) => [change.subject, change])
         );
         const survivors = order.filter((subject) => {
           const change = existing.get(subject);
-          return change ? change.after : address.collection.__readOwnershipSubject(subject);
+          return change
+            ? change.after
+            : address.collection.__readOwnershipSubject(subject);
         });
         // A surviving ordering obligation names every admitted lifetime. A later
         // membership author is reconciled during preparation, not silently dropped.
@@ -434,8 +470,45 @@ export function nativeEntityOwnership(
           else list.push(change);
         }
       }
-      for (const changes of groups.values()) {
+      for (const [collection, changes] of groups) {
         const bySubject = new Map(changes.map((c) => [c.subject, c]));
+        // Resolve the historical successor through this settlement's removals.
+        // The links come from actual native placement or retained removal facts;
+        // no arbitrary neighbor or full-collection reconstruction is substituted.
+        const owner = groupOwners.get(collection);
+        const successor = (
+          subject: number | undefined,
+          seen = new Set<number>()
+        ): number | undefined => {
+          if (subject === undefined) return undefined;
+          if (seen.has(subject))
+            throw new Error('Cyclic removed entity placement');
+          seen.add(subject);
+          const change = bySubject.get(subject);
+          if (change?.after) return subject;
+          const current = collection.__readOwnershipSubject(subject);
+          if (!change && current) return subject;
+          const ledger =
+            owner === undefined
+              ? undefined
+              : ledgers.get(`${owner}:${subject}:@`);
+          const placement =
+            current ?? (ledger ? winner(ledger).placement : undefined);
+          if (!placement)
+            throw new Error('Removed entity anchor has no placement');
+          return successor(placement.afterSubject, seen);
+        };
+        for (let i = 0; i < changes.length; i++) {
+          const change = changes[i];
+          if (change.topology && change.after) {
+            const resolved = {
+              ...change,
+              afterSubject: successor(change.afterSubject),
+            };
+            changes[i] = resolved;
+            bySubject.set(change.subject, resolved);
+          }
+        }
         const rank = (
           c: EntityOwnershipDelta,
           seen = new Set<number>()
@@ -459,7 +532,21 @@ export function nativeEntityOwnership(
         install() {
           for (const p of prepared) p.install();
           for (const [key, l] of next) {
-            if (l.pending.size) ledgers.set(key, l);
+            const address = addresses.get(key);
+            const membershipKey =
+              address && `${address.owner}:${address.subject}:@`;
+            const membership =
+              membershipKey &&
+              (next.get(membershipKey) ?? ledgers.get(membershipKey));
+            // Confirmed field truth remains a live existence dependency until
+            // membership settles, even when that field was absent at creation.
+            if (
+              l.pending.size ||
+              (address?.field !== undefined &&
+                membership &&
+                membership.pending.size)
+            )
+              ledgers.set(key, l);
             else {
               ledgers.delete(key);
               const a = addresses.get(key);
@@ -471,6 +558,19 @@ export function nativeEntityOwnership(
               }
               addresses.delete(key);
             }
+          }
+          // Release dependency-only field records once their membership obligation
+          // ends. Pending field authors remain independently accountable.
+          for (const prefix of touched.keys()) {
+            if (ledgers.get(`${prefix}:@`)?.pending.size) continue;
+            const fields = rowFields.get(prefix);
+            for (const key of fields ?? []) {
+              if (ledgers.get(key)?.pending.size) continue;
+              ledgers.delete(key);
+              addresses.delete(key);
+              fields?.delete(key);
+            }
+            if (!fields?.size) rowFields.delete(prefix);
           }
           owners.delete(id);
           for (const subject of claims?.release(claimOwner(id)) ?? [])

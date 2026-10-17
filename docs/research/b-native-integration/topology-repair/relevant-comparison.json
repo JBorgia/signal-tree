@@ -1,0 +1,131 @@
+{
+  "candidate": {
+    "failed": 15,
+    "passed": 15
+  },
+  "prior_same_tests": {
+    "failed": 17,
+    "passed": 13
+  },
+  "changes": [
+    {
+      "file": "kernel/src/enhancers/transactions/rekey-occupancy-0.spec.ts",
+      "test": "REKEY-OCCUPANCY-0 / 3 \u2014 CONTROLS: the other arms are unchanged T06a rekey + later field write still reverses independently",
+      "prior": "failed",
+      "candidate": "passed"
+    },
+    {
+      "file": "kernel/src/enhancers/transactions/rekey-supersession-0.spec.ts",
+      "test": "REKEY-SUPERSESSION-0 / 1 \u2014 later UPDATE of the rekeyed subject already surgical: key reverts, the newer field value survives",
+      "prior": "failed",
+      "candidate": "passed"
+    }
+  ],
+  "remainingFailures": [
+    {
+      "file": "kernel/src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts",
+      "test": "reentrant transaction ordering bookkeeping an earlier rollback sees a later capture before its handle materializes",
+      "messages": [
+        "AssertionError: expected 'undefined' to match /later-confirmed-dependency/\n    at /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel/src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts:46:31\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "kernel/src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts",
+      "test": "reentrant transaction ordering bookkeeping retains an observed later pending turn and releases both after reverse-order rollback",
+      "messages": [
+        "AssertionError: expected undefined to be 2 // Object.is equality\n    at /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel/src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts:75:75\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "kernel/src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts",
+      "test": "reentrant transaction ordering bookkeeping does not retain empty or failed transaction reservations",
+      "messages": [
+        "AssertionError: expected undefined to be +0 // Object.is equality\n    at /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel/src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts:115:48\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64"
+      ]
+    },
+    {
+      "file": "kernel/src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts",
+      "test": "an earlier entity rollback sees an open entity capture (overlap=true)",
+      "messages": [
+        "AssertionError: expected 'undefined' to match /later-confirmed-dependency/\n    at /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel/src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts:162:44\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "kernel/src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts",
+      "test": "opened-listener writes precede the original callback contribution (batching=false)",
+      "messages": [
+        "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel/src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts:194:45\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+      ]
+    },
+    {
+      "file": "kernel/src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts",
+      "test": "opened-listener writes precede the original callback contribution (batching=true)",
+      "messages": [
+        "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel/src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts:194:45\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+      ]
+    },
+    {
+      "file": "kernel/src/enhancers/transactions/reentrant-order-v16-controls.spec.ts",
+      "test": "reserved transaction order under v16 recovery a later replacing write supersedes the failed contribution: terminal, no recovery",
+      "messages": [
+        "AssertionError: expected undefined to be +0 // Object.is equality\n    at /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel/src/enhancers/transactions/reentrant-order-v16-controls.spec.ts:55:75\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "kernel/src/enhancers/transactions/reentrant-order-v16-controls.spec.ts",
+      "test": "reserved transaction order under v16 recovery a later dependent row write refuses the automatic compensation and keeps a usable recovery handle",
+      "messages": [
+        "AssertionError: expected 'Error: callback failed' to match /later-confirmed-dependency/\n    at /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel/src/enhancers/transactions/reentrant-order-v16-controls.spec.ts:90:30\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "kernel/src/enhancers/transactions/reentrant-order-v16-controls.spec.ts",
+      "test": "reserved transaction order under v16 recovery a reservation does not outlive a callback that wrote nothing",
+      "messages": [
+        "AssertionError: expected -1 to be 1 // Object.is equality\n    at /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel/src/enhancers/transactions/reentrant-order-v16-controls.spec.ts:121:22\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64"
+      ]
+    },
+    {
+      "file": "kernel/src/enhancers/transactions/reentrant-order-v16-controls.spec.ts",
+      "test": "a post-callback failure before materialization does not strand the reservation as a permanent minimum pending id",
+      "messages": [
+        "AssertionError: expected undefined to be +0 // Object.is equality\n    at /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel/src/enhancers/transactions/reentrant-order-v16-controls.spec.ts:152:46\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64"
+      ]
+    },
+    {
+      "file": "kernel/src/enhancers/transactions/reentrant-order-v16-controls.spec.ts",
+      "test": "an observer settles another transaction during capture keeps refusal authority on the conflicting field",
+      "messages": [
+        "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel/src/enhancers/transactions/reentrant-order-v16-controls.spec.ts:225:40\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "kernel/src/enhancers/transactions/rekey-occupancy-0.spec.ts",
+      "test": "REKEY-OCCUPANCY-0 / 1 \u2014 refuse by rule, not by physical failure reports a dependency refusal rather than effect-validation-failed",
+      "messages": [
+        "AssertionError: expected 'threw' to be 'later-confirmed-dependency' // Object.is equality\n    at /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel/src/enhancers/transactions/rekey-occupancy-0.spec.ts:97:21\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "kernel/src/enhancers/transactions/rekey-occupancy-0.spec.ts",
+      "test": "REKEY-OCCUPANCY-0 / 2 \u2014 the refusal is recoverable clearing the occupying subject lets the same turn settle",
+      "messages": [
+        "AssertionError: expected 'threw' to be 'later-confirmed-dependency' // Object.is equality\n    at /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel/src/enhancers/transactions/rekey-occupancy-0.spec.ts:135:46\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "kernel/src/enhancers/transactions/rekey-occupancy-0.spec.ts",
+      "test": "REKEY-OCCUPANCY-0 / 4 \u2014 occupancy must not depend on EFFECT SOURCE a REALIZED add in the middle of add/remove/add is still an occupant",
+      "messages": [
+        "AssertionError: expected 'threw' to be 'later-confirmed-dependency' // Object.is equality\n    at /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel/src/enhancers/transactions/rekey-occupancy-0.spec.ts:274:46\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "kernel/src/enhancers/transactions/rekey-occupancy-0.spec.ts",
+      "test": "REKEY-OCCUPANCY-0 / 5 \u2014 a still-PENDING turn can be the occupant refuses by rule when another PENDING turn holds the vacated key",
+      "messages": [
+        "AssertionError: expected 'threw' to be 'later-confirmed-dependency' // Object.is equality\n    at /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel/src/enhancers/transactions/rekey-occupancy-0.spec.ts:307:41\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ]
+}

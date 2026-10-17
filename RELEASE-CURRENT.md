@@ -130,3 +130,11 @@ Matched successful-subset costs favor tested settlement but penalize churn and
 construction; package ceilings and the demo error ceiling fail. Full evidence,
 verdict classifications, limitations and exact replay commands are preserved.
 No further repair, API or architecture direction is selected by this rejection.
+
+### B bounded authored-topology repair — rejected
+
+[Experiment](docs/research/b-native-integration/topology-repair/README.md) repairs
+the original rekey and removed-anchor counterexamples, but regresses the unchanged
+creator-first explicit-order dependency control. The affected matrix is 123 pass,
+1 fail. Preserve this experimental checkpoint; no activation or broader
+qualification. CPU/artifact penalties remain unresolved and were not remeasured.

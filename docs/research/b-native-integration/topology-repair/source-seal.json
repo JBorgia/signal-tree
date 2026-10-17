@@ -1,0 +1,9 @@
+{
+  "start": "2645000d1e6a96019d27b3e705c1aceb0140e965",
+  "sha256": {
+    "packages/kernel/src/lib/internals/native-entity-ownership-experiment.ts": "4fdaf35a174405fab38e8a7032d9b239219d2c3ac1c7ab8ba451c43e8c28a455",
+    "packages/kernel/src/lib/b-authored-topology-repair.spec.ts": "85e653716c232135658a36d32e1ec95adedbf9fffb933ee093dea467470cf5eb",
+    "packages/kernel/src/lib/b-topology-dependencies.spec.ts": "b694216bed71df2966fba835f113dc0cc6d48425966eec83b8f58a901eebf819",
+    "packages/kernel/src/enhancers/transactions/b-public-entity-experiment.spec.ts": "ac5b8336cbeb621b6c1e55ddfccae786645082fba92c87da5307794ce5022f8b"
+  }
+}
