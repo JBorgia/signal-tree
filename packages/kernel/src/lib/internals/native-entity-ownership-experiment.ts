@@ -1,4 +1,13 @@
 import { isTraversableNode } from './node-shape';
+import {
+  admitNativeOrder,
+  settleNativeOrder,
+  projectNativeOrder,
+  nativeOrderRequires,
+  retainNativeOrder,
+  nativeOrderDetails,
+  type NativeOrderAdmission,
+} from './native-order-admission-experiment';
 import { reportContainedObserverError } from './error-reporter';
 import {
   getOrCreateSubjectRestorationClaims,
@@ -31,7 +40,6 @@ type Address = {
   owner: number;
   subject: number;
   field?: readonly string[];
-  ordering?: boolean;
   authoredKey?: string | number;
 };
 type Collection = {
@@ -67,6 +75,8 @@ export function nativeEntityOwnership(
   const ledgers = new Map<string, Ledger>(),
     addresses = new Map<string, Address>(),
     owners = new Map<number, Set<string>>();
+  const orderAdmissions = new Map<number, NativeOrderAdmission>();
+  const orderOwners = new Map<number, Set<number>>();
   let sequence = 0;
   const register = (node: unknown, seen = new Set<object>()) => {
     if (!isTraversableNode(node)) return;
@@ -134,6 +144,7 @@ export function nativeEntityOwnership(
     const keyedAdds: NonNullable<TerminalRecordPlan['keyedAdds']>[number][] =
       [];
     const preparedFields = new Map<string, Set<string>>();
+    const staged = new Map<string, Ledger>();
     const owned =
       id === undefined ? undefined : owners.get(id) ?? new Set<string>();
     const stage = (
@@ -161,6 +172,7 @@ export function nativeEntityOwnership(
       };
       if (id === undefined) next.base = fact;
       else next.pending.set(id, fact);
+      staged.set(key, next);
       // A field author does not own its observed key. Its value can nevertheless
       // depend on a pending lifetime, including a field absent at creation.
       const membershipPending =
@@ -192,47 +204,6 @@ export function nativeEntityOwnership(
         });
       }
     };
-    const orderingKey = `${capture.owner}:order`;
-    const explicitOrder = capture.ordering;
-    const needsOrder =
-      ledgers.has(orderingKey) ||
-      explicitOrder?.kind === 'exact' ||
-      (explicitOrder?.kind === 'front' &&
-        capture.changes.some((change) => change.before !== undefined));
-    if (
-      needsOrder &&
-      (explicitOrder || capture.changes.some((change) => change.structural))
-    ) {
-      const before = [...collection.__readOwnershipOrder()];
-      const removed = new Set(
-        capture.changes
-          .filter((change) => change.after === undefined)
-          .map((change) => change.subject)
-      );
-      let after = before.filter((subject) => !removed.has(subject));
-      if (explicitOrder) {
-        const subjects = [...explicitOrder.subjects],
-          selected = new Set(subjects);
-        after =
-          explicitOrder.kind === 'exact'
-            ? subjects
-            : explicitOrder.kind === 'front'
-            ? [
-                ...subjects,
-                ...after.filter((subject) => !selected.has(subject)),
-              ]
-            : [
-                ...after,
-                ...subjects.filter((subject) => !after.includes(subject)),
-              ];
-      }
-      stage(
-        orderingKey,
-        { collection, owner: capture.owner, subject: -1, ordering: true },
-        before,
-        after
-      );
-    }
     for (const change of capture.changes) {
       const prefix = `${capture.owner}:${change.subject}`,
         membership = `${prefix}:@`;
@@ -307,6 +278,39 @@ export function nativeEntityOwnership(
         diff(b, a, []);
       }
     }
+    if (capture.ordering) {
+      const admission = admitNativeOrder(
+        orderAdmissions.get(capture.owner),
+        collection.__readOwnershipOrder(),
+        capture.ordering,
+        id,
+        order
+      );
+      if (
+        retainNativeOrder(admission, (subject) =>
+          Boolean(
+            (
+              staged.get(`${capture.owner}:${subject}:@`) ??
+              ledgers.get(`${capture.owner}:${subject}:@`)
+            )?.pending.size
+          )
+        )
+      ) {
+        writes.push({
+          map: orderAdmissions as Map<unknown, unknown>,
+          key: capture.owner,
+          value: admission,
+        });
+        if (id !== undefined)
+          keyedAdds.push({
+            map: orderOwners as Map<unknown, Set<unknown>>,
+            key: id,
+            prepared: (orderOwners.get(id) ??
+              new Set<number>()) as Set<unknown>,
+            value: capture.owner,
+          });
+      }
+    }
     if (id !== undefined && claims) {
       const subjects = new Set<number>(
         capture.changes.map((change) => change.subject)
@@ -344,6 +348,11 @@ export function nativeEntityOwnership(
       const owned = owners.get(id) ?? new Set<string>();
       const next = new Map<string, Ledger>();
       const touched = new Map<string, Address>();
+      const nextOrders = new Map<number, NativeOrderAdmission>();
+      for (const owner of orderOwners.get(id) ?? []) {
+        const old = orderAdmissions.get(owner);
+        if (old) nextOrders.set(owner, settleNativeOrder(old, id, accept));
+      }
       for (const key of owned) {
         const old = ledgers.get(key);
         const fact = old?.pending.get(id);
@@ -356,7 +365,11 @@ export function nativeEntityOwnership(
         next.set(key, l);
         const a = addresses.get(key);
         if (!a) throw new Error('Missing pending entity address');
-        if (!a.ordering) touched.set(`${a.owner}:${a.subject}`, a);
+        touched.set(`${a.owner}:${a.subject}`, a);
+        if (a.field === undefined && !nextOrders.has(a.owner)) {
+          const ordering = orderAdmissions.get(a.owner);
+          if (ordering) nextOrders.set(a.owner, ordering);
+        }
       }
       const groups = new Map<Collection, EntityOwnershipDelta[]>();
       const groupOwners = new Map<Collection, number>();
@@ -376,15 +389,38 @@ export function nativeEntityOwnership(
             }
           : null;
         if (!after && membership) {
-          const absentFact = winner(membership);
+          // A pending removal can be rejected. Check the earliest applicable
+          // absence as well as the visible absence before retiring a creator.
+          const absentFact = [membership.base, ...membership.pending.values()]
+            .filter(
+              (fact) =>
+                fact.value === null && fact.order >= membership.base.order
+            )
+            .reduce(
+              (earliest, fact) =>
+                fact.order < earliest.order ? fact : earliest,
+              winner(membership)
+            );
+          const ordering =
+            nextOrders.get(address.owner) ?? orderAdmissions.get(address.owner);
+          if (
+            ordering &&
+            nativeOrderRequires(ordering, address.subject, absentFact.order)
+          )
+            throw new Error(
+              'Surviving order depends on removed entity lifetime'
+            );
           for (const key of rowFields.get(prefix) ?? []) {
             if (addresses.get(key)?.field === undefined) continue;
             const ledger = next.get(key) ?? ledgers.get(key);
             if (!ledger) continue;
-            const surviving = winner(ledger);
+            const surviving = [ledger.base, ...ledger.pending.values()].filter(
+              (fact) => fact.order >= ledger.base.order
+            );
             if (
-              surviving.order > absentFact.order &&
-              surviving.value !== absent
+              surviving.some(
+                (fact) => fact.order > absentFact.order && fact.value !== absent
+              )
             )
               throw new Error(
                 'Surviving field depends on removed entity lifetime'
@@ -431,14 +467,13 @@ export function nativeEntityOwnership(
           orderChanged: false,
         });
       }
-      for (const [key, ledger] of next) {
-        const address = addresses.get(key);
-        if (!address) throw new Error('Missing pending entity address');
-        if (!address.ordering) continue;
-        const order = winner(ledger).value as readonly number[];
-        const list = groups.get(address.collection) ?? [];
-        groups.set(address.collection, list);
-        groupOwners.set(address.collection, address.owner);
+      for (const [owner, admission] of nextOrders) {
+        const collection = collections.get(owner);
+        if (!collection) throw new Error('Missing pending order collection');
+        const order = projectNativeOrder(admission);
+        const list = groups.get(collection) ?? [];
+        groups.set(collection, list);
+        groupOwners.set(collection, owner);
         const existing = new Map(
           list.map((change) => [change.subject, change])
         );
@@ -446,15 +481,33 @@ export function nativeEntityOwnership(
           const change = existing.get(subject);
           return change
             ? change.after
-            : address.collection.__readOwnershipSubject(subject);
+            : collection.__readOwnershipSubject(subject);
         });
-        // A surviving ordering obligation names every admitted lifetime. A later
-        // membership author is reconciled during preparation, not silently dropped.
+        // A surviving key/membership can keep a subject outside the rejected
+        // order's inverse baseline. Preserve its observed placement during target
+        // preparation; this does not admit a new order fact or dependency.
+        const selected = new Set(survivors);
+        const observed = collection.__readOwnershipOrder();
+        let successor: number | undefined;
+        for (let index = observed.length - 1; index >= 0; index--) {
+          const subject = observed[index];
+          const change = existing.get(subject);
+          if (change && !change.after) continue;
+          if (!selected.has(subject)) {
+            const rank =
+              successor === undefined
+                ? survivors.length
+                : survivors.indexOf(successor);
+            survivors.splice(rank, 0, subject);
+            selected.add(subject);
+          }
+          successor = subject;
+        }
         for (let rank = 0; rank < survivors.length; rank++) {
           const subject = survivors[rank];
           const old = existing.get(subject);
           const before =
-            old?.before ?? address.collection.__readOwnershipSubject(subject);
+            old?.before ?? collection.__readOwnershipSubject(subject);
           const after = old?.after ?? before;
           const change = {
             subject,
@@ -528,7 +581,7 @@ export function nativeEntityOwnership(
         collection.__prepareOwnershipDelta(changes)
       );
       return {
-        changed: next.size > 0,
+        changed: next.size > 0 || nextOrders.size > 0,
         install() {
           for (const p of prepared) p.install();
           for (const [key, l] of next) {
@@ -572,6 +625,16 @@ export function nativeEntityOwnership(
             }
             if (!fields?.size) rowFields.delete(prefix);
           }
+          for (const [owner, admission] of nextOrders) {
+            if (
+              retainNativeOrder(admission, (subject) =>
+                Boolean(ledgers.get(`${owner}:${subject}:@`)?.pending.size)
+              )
+            )
+              orderAdmissions.set(owner, admission);
+            else orderAdmissions.delete(owner);
+          }
+          orderOwners.delete(id);
           owners.delete(id);
           for (const subject of claims?.release(claimOwner(id)) ?? [])
             candidates.add(subject);
@@ -607,38 +670,59 @@ export function nativeEntityOwnership(
       };
     },
     details(id: number) {
-      return [...(owners.get(id) ?? [])].flatMap((key) => {
-        const l = ledgers.get(key),
-          a = addresses.get(key),
-          f = l?.pending.get(id);
-        return l && a && f
+      const orderDetails = [...(orderOwners.get(id) ?? [])].flatMap((owner) => {
+        const admission = orderAdmissions.get(owner);
+        const status = admission && nativeOrderDetails(admission, id);
+        return status
           ? [
               {
-                position: a.owner,
-                subject: a.subject < 0 ? undefined : a.subject,
-                addressSuffix:
-                  f.addressKey === undefined
-                    ? undefined
-                    : [f.addressKey, ...(a.field ?? [])],
-                field: a.field,
-                status:
-                  winner(l) === f
-                    ? ('current' as const)
-                    : ('superseded' as const),
+                position: owner,
+                subject: undefined,
+                addressSuffix: undefined,
+                field: undefined,
+                status,
               },
             ]
           : [];
       });
+      return [
+        ...orderDetails,
+        ...[...(owners.get(id) ?? [])].flatMap((key) => {
+          const l = ledgers.get(key),
+            a = addresses.get(key),
+            f = l?.pending.get(id);
+          return l && a && f
+            ? [
+                {
+                  position: a.owner,
+                  subject: a.subject < 0 ? undefined : a.subject,
+                  addressSuffix:
+                    f.addressKey === undefined
+                      ? undefined
+                      : [f.addressKey, ...(a.field ?? [])],
+                  field: a.field,
+                  status:
+                    winner(l) === f
+                      ? ('current' as const)
+                      : ('superseded' as const),
+                },
+              ]
+            : [];
+        }),
+      ];
     },
     maintain,
-    count: () => ledgers.size,
+    count: () => ledgers.size + orderAdmissions.size,
     destroy() {
       destroyed = true;
-      for (const id of owners.keys()) claims?.release(claimOwner(id));
+      for (const id of new Set([...owners.keys(), ...orderOwners.keys()]))
+        claims?.release(claimOwner(id));
       candidates.clear();
       if (runtime?.prepareEntityResponsibility === capture)
         runtime.prepareEntityResponsibility = previous;
       ledgers.clear();
+      orderAdmissions.clear();
+      orderOwners.clear();
       rowFields.clear();
       addresses.clear();
       owners.clear();
