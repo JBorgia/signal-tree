@@ -1,0 +1,16 @@
+{
+  "runtimeCheckpoint": "78bcbefc968e3d8e3bd32fc366d188f2ae96d0bb",
+  "runtimeMatchesCheckpoint": true,
+  "sha256": {
+    "packages/kernel/src/lib/internals/native-entity-ownership-experiment.ts": "4fdaf35a174405fab38e8a7032d9b239219d2c3ac1c7ab8ba451c43e8c28a455",
+    "packages/kernel/src/lib/internals/native-ownership-driver-experiment.ts": "a05b521f48a0400072f91bf33ddc204f03b563989c170a4fa4e91eb64db563fc",
+    "packages/kernel/src/lib/entity-signal.ts": "90c56a4935fdef5d31d9fe660ff439264db135d546b7f529f412dbaffa3d9c4b",
+    "packages/kernel/src/lib/physical/prepare-entity-ownership-delta.ts": "1dc4e896e1b3210986808edbab2639471813970c795702a01cb6b6a84c6bf6e8",
+    "packages/kernel/src/lib/physical/prepare-entity-target.ts": "2c2e68adc788490866853948a3cb9b241dd417ca23faf7e044a5b1e6106b26b8",
+    "packages/kernel/src/lib/internals/subject-restoration-claims.ts": "a6b022eae00248184758bee07b10d21e06eda9e82315891f554303510b1bdc8d",
+    "packages/kernel/src/enhancers/transactions/native-ownership-public-experiment.ts": "00e41f763a954aeb33e657d8e0cf0bd0cbf8cbd3e049781ce6f5e570cadcf746"
+  },
+  "newTest": {
+    "packages/kernel/src/lib/b-dependency-lifecycle-audit.spec.ts": "c5a1ed5ec326c04b22c4ffdd00eb0ee6d18f5aca28c93461f8adb610889a1253"
+  }
+}

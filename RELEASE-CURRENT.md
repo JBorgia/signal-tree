@@ -138,3 +138,12 @@ the original rekey and removed-anchor counterexamples, but regresses the unchang
 creator-first explicit-order dependency control. The affected matrix is 123 pass,
 1 fail. Preserve this experimental checkpoint; no activation or broader
 qualification. CPU/artifact penalties remain unresolved and were not remeasured.
+
+### B finite dependency audit — runtime unchanged, rejected status retained
+
+[Inventory and lifecycle tests](docs/research/b-native-integration/dependency-audit/README.md)
+distinguish authored facts, semantic dependencies and conservative restoration
+claims. New twelve-case audit: 5 pass, 7 fail; one failure is an explicitly
+unresolved payload-dependency premise, not an established violation. The audit
+also reproduces incidental order promotion by an independent rekey. No repair
+is selected, no broad qualification or cost measurement is rerun.
