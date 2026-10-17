@@ -2,6 +2,37 @@
 
 Work that is decided and not yet done. **This is not an RFC list.**
 
+## B replacement investigation — CLOSED / REJECTION ACCEPTED
+
+Owner accepted the [final rejection](docs/research/b-native-integration/final-disposition/RESULTS.md)
+on October 17, 2026. Frozen B runtime: `fdfefaa2`; evidence checkpoint:
+`36daf14f`; incumbent comparator: `8d220643`. Preserve the isolated
+`codex/native-ownership-slice` branch and its evidence. Stop patching this
+implementation; do not automatically start B2 or another architecture competition.
+
+The reproduced blockers are multi-row restoration, inspection participation and
+hidden-collection publication. Same-settlement topology reconstruction exposed a
+recurrence in placement resolution. Faster matched rollback does not offset
+churn/construction penalties, larger artifacts or failed budgets. The semantic
+matrix is unfulfilled, not passed or conclusively failed.
+
+Native reclamation passes its tested post-capture-drain controls. The rejected
+standalone model's eight-node leak must not be attributed to the final native
+integration. Preserve useful overlap, hidden-value recovery without a permanent
+canonical mirror, sparse mechanisms, tests and measured tradeoffs as evidence;
+none establishes a production replacement or permission to merge it.
+
+Retain the incumbent and return to its concrete product requirements and existing
+release obligations. **This decision does not make v16 release-ready.** Current
+controllers and their outstanding evidence remain authoritative; no release gate
+is waived by rejecting B. The unresolved payload premise remains a separate
+semantic question, unnecessary to justify this rejection.
+
+Reopen ownership design only with a specific new mechanism addressing the
+observed dependency problem—especially settlement against topology it reconstructs
+itself—and a bounded discriminator against the rejected approaches. This is a
+reopening condition, not authorization to implement another candidate.
+
 ## September 23 audit remediation — ACTIVE / RELEASE HELD
 
 All reproduced security, correctness, composition, lifecycle and tooling findings
@@ -48,7 +79,8 @@ failure. Its package tests pass; this is not systemic or release completion.
   investigation; remote application is not proof of local UI recovery.
 - Resolve the recorded package/demo size failures before release. They also
   reproduce on the unchanged base; no ceiling is waived or raised here.
-- Reconcile this repair with the ownership candidate together with its tests.
+- Evaluate this repair against the retained incumbent with its tests; B's
+  replacement track is closed and its runtime must not be integrated.
 - Resolve the independently reproduced inline scalar-publication failure:
   partial compensation must not retire authority on a revision change alone.
 - Finish the [entity carry](docs/research/v16-entity-carry-validation-0.md): the

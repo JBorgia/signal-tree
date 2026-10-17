@@ -5,6 +5,17 @@ Exact incumbent: `8d220643e0d4e34cbdbc6e55e6ef692b25d5e023`.
 The commit containing this record adds evidence only. Neither authority is
 activated, merged, pushed, tagged or published. No test, API or budget changed.
 
+## Owner disposition — October 17, 2026
+
+Rejection accepted; B's replacement track is closed. Preserve this branch and
+all evidence, stop patching this implementation, and do not automatically start
+B2 or another architecture competition. Retaining the incumbent does not establish
+v16 release readiness: its documented limitations and release obligations remain.
+A future design requires a specific new mechanism for the demonstrated dependency
+problem and a bounded test distinguishing it from the rejected approaches.
+Native reclamation passes its controls; the standalone model leak is not a native
+integration failure. This closure changes no frozen runtime or measured result.
+
 ## Decision and stopping condition
 
 B cannot replace the incumbent while preserving the agreed supported surface.
