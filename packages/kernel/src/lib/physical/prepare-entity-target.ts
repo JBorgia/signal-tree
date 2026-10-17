@@ -1,3 +1,9 @@
+import { installTerminalRecordPlan } from '../internals/intrinsic-mutation';
+import type { TerminalRecordPlan } from '../internals/intrinsic-mutation';
+import type {
+  CommittedEntityCapture,
+  CommittedEntityMutation,
+} from '../internals/mutation-capture-runtime';
 import { prepareStructuralTarget } from './prepare-structural-target';
 import type { Location } from '../internals/cell-runtime';
 import type { EpochHandle } from '../internals/observation-adapter';
@@ -21,6 +27,9 @@ export interface EntityTargetHost<
   E extends Record<string, unknown>,
   K extends string | number
 > {
+  prepareResponsibility?(
+    capture: CommittedEntityCapture
+  ): TerminalRecordPlan | undefined;
   readonly positionId: number | undefined;
   readonly structuralStore: StructuralStore<K>;
   readonly valueStore: EntityValueStore<E>;
@@ -77,6 +86,8 @@ export function prepareEntityTransitionTarget<
     );
   }
 
+  const baseRevision = physicalCommitClock?.revision();
+  const baseFrontier = structuralStore.activeOrderFrontier();
   const currentSubjects = new Map<number, { key: K; value: E }>();
   const activeIdBefore = activeIdSignal();
   const activeSubjectBefore =
@@ -156,8 +167,72 @@ export function prepareEntityTransitionTarget<
     };
   });
 
+  const captureChanges: CommittedEntityMutation[] = subjectChanges
+    .filter(
+      (change) =>
+        change.bindingChanged ||
+        !deepEqual(change.beforeValue, change.afterValue)
+    )
+    .map((change) => {
+      const key = change.afterKey ?? change.beforeKey;
+      const structuralRecord: StructuralEffect | undefined =
+        change.beforeKey === undefined
+          ? {
+              kind: 'add',
+              subject: change.subjectId,
+              key: key!,
+              value: change.afterValue,
+              ...change.targetNeighbors,
+            }
+          : change.afterKey === undefined
+          ? {
+              kind: 'remove',
+              subject: change.subjectId,
+              key: key!,
+              value: change.beforeValue,
+              ...structuralStore.neighborSubjectsForKey(change.beforeKey),
+            }
+          : change.beforeKey !== change.afterKey
+          ? {
+              kind: 'rekey',
+              subject: change.subjectId,
+              beforeKey: change.beforeKey,
+              afterKey: change.afterKey,
+            }
+          : undefined;
+      return {
+        subject: change.subjectId,
+        before: change.beforeValue,
+        after: change.afterValue,
+        structural: change.bindingChanged,
+        structuralRecord,
+        path: `${basePath}.${String(key)}`,
+        restored: change.beforeKey === undefined,
+      };
+    });
+  const responsibility = host.prepareResponsibility?.({
+    owner: positionId,
+    ownerPath: basePath,
+    changes: captureChanges,
+    meta: ambientMeta(),
+    ordering: {
+      kind: 'exact',
+      subjects: target.order,
+      keys: target.order.map((subject) => preparedBySubject.get(subject)!.key),
+      baseFrontier,
+    },
+  });
+  if (
+    physicalCommitClock?.revision() !== baseRevision ||
+    structuralStore.activeOrderFrontier() !== baseFrontier
+  )
+    throw new Error(
+      'Entity target responsibility preparation reentered installation'
+    );
   return {
     install(): void {
+      if (structuralStore.activeOrderFrontier() !== baseFrontier)
+        throw new Error('Entity target responsibility preparation is stale');
       // Membership observation diffs this collection across the install.
       // Reversals hold reader delivery until every target is installed.
       const tap = host.membershipTap;
@@ -165,6 +240,9 @@ export function prepareEntityTransitionTarget<
       try {
         structuralStore.installPreparedTarget(structuralTarget);
         valueStore.installPreparedTargetValues(valueTarget);
+        if (responsibility) {
+          installTerminalRecordPlan(responsibility);
+        }
         // Selection belongs to the installed unit. Replay taps may author
         // newer selections; publication must never overwrite those writes.
         if (activeIdBefore !== activeIdAfter) {

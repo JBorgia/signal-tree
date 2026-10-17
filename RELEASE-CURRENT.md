@@ -102,3 +102,17 @@ expanded18 including stale-frame protection; model recovery41/adversarial14/dest
 A primitive dynamic replacement baseline counterexample remains explicitly red.
 See the R1 results for broader verification and limits; this is not public
 transaction integration or production acceptance.
+
+### B public lifecycle and entity slice R2
+
+The [bounded public slice](docs/research/b-native-integration/r2/README.md) selects
+B internally before incumbent construction and exercises existing public transact,
+inspection, settlement, recovery and destruction, then entity lifetime/order paths.
+Independent and root focused111 pass; actual B-enabled framework observers20 and
+affected existing57 pass. Model41/14/destruction controls remain unchanged and pass.
+Claims composition, history-eviction protection and terminal consequence projection
+coherence were corrected after preserved first failures. Ordinary reclamation is
+verified after capture drain. Two preserved primitive baseline probes remain red.
+Typecheck/spec-types/lint outcomes and limits are recorded separately. No default
+activation, API or production acceptance; full-suite and performance comparison
+remain unexecuted for this slice.

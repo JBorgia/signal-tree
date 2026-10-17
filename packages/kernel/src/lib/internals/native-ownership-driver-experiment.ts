@@ -1,3 +1,5 @@
+import { holdEntityMembershipDelivery } from './entity-membership-source';
+import { nativeEntityOwnership } from './native-entity-ownership-experiment';
 import { getPhysicalCommitClock } from './physical-commit-clock';
 import { publishingExposedOnly } from './exposed-publication';
 import { markOwnerInvalidatedFrom } from './owner-invalidation-port';
@@ -19,7 +21,7 @@ import {
 import { unwrapBranchForWriteCapture } from '../utils';
 import { withWriteContext, getActiveWriteContext } from '../write-context';
 
-type Fact = { value: unknown; order: number };
+type Fact = { value: unknown; order: number; diagnostic?: boolean };
 type Ledger = { base: Fact; contributions: Map<number, Fact> };
 type Address = { branch: object; key: string; ancestors: readonly string[] };
 type Scalar = { position: number; ancestors: readonly string[] };
@@ -40,6 +42,8 @@ export function nativeOwnershipExperiment(root: object) {
   let installing = false;
   let fault: { error: unknown; after: number } | undefined;
   const owners = new Map<number, Set<string>>();
+  const terminalListeners = new Map<number, (accepted: boolean) => void>();
+  let destroyed = false;
 
   const hook = (
     target: object,
@@ -58,10 +62,13 @@ export function nativeOwnershipExperiment(root: object) {
       const preparedRevision = revision;
       const author = active;
       const authoredOrder = ++order;
-      const inputs = new Map<string, { before: unknown; after: unknown }>();
+      const inputs = new Map<
+        string,
+        { before: unknown; after: unknown; diagnostic?: boolean }
+      >();
       for (const change of changes) {
         const key = prefix + change.key;
-        inputs.set(key, change);
+        inputs.set(key, { ...change, diagnostic: true });
         const ancestors = branchNode
           ? parentAncestors
           : scalars.get(Number(change.key))?.ancestors ?? [];
@@ -69,7 +76,11 @@ export function nativeOwnershipExperiment(root: object) {
         // Only pending presence obligations need a contribution; no canonical mirror.
         for (const ancestor of ancestors)
           if (ledgers.has(ancestor) && !inputs.has(ancestor))
-            inputs.set(ancestor, { before: true, after: true });
+            inputs.set(ancestor, {
+              before: true,
+              after: true,
+              diagnostic: false,
+            });
       }
       const plans = [...inputs].map(([key, change]) => {
         const old = ledgers.get(key);
@@ -79,7 +90,11 @@ export function nativeOwnershipExperiment(root: object) {
               base: { value: change.before, order: 0 },
               contributions: new Map(),
             };
-        const fact = { value: change.after, order: authoredOrder };
+        const fact = {
+          value: change.after,
+          order: authoredOrder,
+          diagnostic: change.diagnostic,
+        };
         if (author !== undefined) next.contributions.set(author, fact);
         else next.base = fact;
         return { key, next };
@@ -150,7 +165,20 @@ export function nativeOwnershipExperiment(root: object) {
   };
   hook(runtime, 's:');
   register(root, []);
+  const entities = nativeEntityOwnership(
+    root,
+    () => active,
+    () => {
+      if (fault && --fault.after <= 0) {
+        const error = fault.error;
+        fault = undefined;
+        throw error;
+      }
+    },
+    () => installing
+  );
   const settle = (id: number, accept: boolean) => {
+    if (destroyed) throw new Error('Cannot settle a destroyed tree');
     const owned = owners.get(id);
     if (!owned) return;
     if (fault) {
@@ -159,6 +187,7 @@ export function nativeOwnershipExperiment(root: object) {
       throw error;
     }
     const baseRevision = revision;
+    const physicalRevision = getPhysicalCommitClock(root)?.revision();
     const plans: { key: string; next: Ledger }[] = [];
     const presence = new Map<
       number,
@@ -219,60 +248,176 @@ export function nativeOwnershipExperiment(root: object) {
     // Reuse the production mixed-target preparation and realized publication.
     // Preparation may compare user values, so no native state or owner is retired yet.
     const prepared = preparePlainBranchMembers(root, presence, values);
-    if (revision !== baseRevision)
+    const entityPrepared = entities.prepare(id, accept);
+    if (
+      revision !== baseRevision ||
+      getPhysicalCommitClock(root)?.revision() !== physicalRevision
+    )
       throw new Error('Settlement preparation reentered native ownership');
-    runtime.runInvalidationGroup(() => {
-      installing = true;
-      try {
-        prepared.install();
-      } finally {
-        installing = false;
-      }
-      // Shared target preparation deliberately leaves the physical clock to
-      // its coordinator. Invalidate pre-settlement frames before any delivery.
-      if (plans.length) getPhysicalCommitClock(root)?.advance();
-      for (const p of plans) {
-        if (p.next.contributions.size) ledgers.set(p.key, p.next);
-        else ledgers.delete(p.key);
-      }
-      owners.delete(id);
-      revision++;
-      // All admitted native state and ownership terminality precede delivery.
-      // Do not suppress ownership capture while observers author newer writes.
-      withWriteContext(
-        {
-          ...getActiveWriteContext(),
-          origin: accept
-            ? getActiveWriteContext()?.origin
-            : 'transaction-rollback',
-          intent: 'system',
-          participation: 'realized',
-        },
-        () => {
-          try {
-            publishingExposedOnly(root, () => prepared.publish());
-          } finally {
-            if (plans.length) markOwnerInvalidatedFrom(root);
+    const releaseMembership = holdEntityMembershipDelivery(root);
+    let failed = false,
+      firstError: unknown;
+    try {
+      runtime.runInvalidationGroup(() => {
+        installing = true;
+        try {
+          prepared.install();
+          entityPrepared.install();
+        } finally {
+          installing = false;
+        }
+        // Shared target preparation deliberately leaves the physical clock to
+        // its coordinator. Invalidate pre-settlement frames before any delivery.
+        if (plans.length || entityPrepared.changed)
+          getPhysicalCommitClock(root)?.advance();
+        for (const p of plans) {
+          if (p.next.contributions.size) ledgers.set(p.key, p.next);
+          else ledgers.delete(p.key);
+        }
+        owners.delete(id);
+        revision++;
+        const terminal = terminalListeners.get(id);
+        terminalListeners.delete(id);
+        let terminalFailed = false;
+        let terminalError: unknown;
+        try {
+          entityPrepared.invalidate();
+        } catch (error) {
+          terminalFailed = true;
+          terminalError = error;
+        }
+        try {
+          terminal?.(accept);
+        } catch (error) {
+          if (!terminalFailed) {
+            terminalFailed = true;
+            terminalError = error;
           }
         }
-      );
-    });
+        // All admitted native state and ownership terminality precede delivery.
+        // Do not suppress ownership capture while observers author newer writes.
+        try {
+          withWriteContext(
+            {
+              ...getActiveWriteContext(),
+              origin: accept
+                ? getActiveWriteContext()?.origin
+                : 'transaction-rollback',
+              intent: 'system',
+              participation: 'realized',
+            },
+            () => {
+              try {
+                const deliver = (fn: () => void) => {
+                  try {
+                    fn();
+                  } catch (error) {
+                    if (!terminalFailed) {
+                      terminalFailed = true;
+                      terminalError = error;
+                    }
+                  }
+                };
+                deliver(() => entityPrepared.publish());
+                deliver(() =>
+                  publishingExposedOnly(root, () => prepared.publish())
+                );
+              } finally {
+                if (plans.length || entityPrepared.changed)
+                  markOwnerInvalidatedFrom(root);
+              }
+            }
+          );
+        } catch (error) {
+          if (!terminalFailed) {
+            terminalFailed = true;
+            terminalError = error;
+          }
+        }
+        if (terminalFailed) throw terminalError;
+      });
+    } catch (error) {
+      failed = true;
+      firstError = error;
+    } finally {
+      try {
+        releaseMembership();
+      } catch (error) {
+        if (!failed) {
+          failed = true;
+          firstError = error;
+        }
+      }
+    }
+    if (failed) throw firstError;
+  };
+  const open = () => {
+    if (destroyed) throw new Error('Cannot transact on a destroyed tree');
+    const id = ++owner;
+    owners.set(id, new Set());
+    return {
+      id,
+      pending: () => owners.has(id),
+      run(fn: () => void) {
+        if (destroyed || !owners.has(id))
+          throw new Error('Cannot write through an inactive ownership scope');
+        const previous = active;
+        active = id;
+        try {
+          fn();
+        } finally {
+          active = previous;
+        }
+      },
+      onInstalled(listener: (accepted: boolean) => void) {
+        terminalListeners.set(id, listener);
+      },
+      rollback: () => settle(id, false),
+      confirm: () => settle(id, true),
+      inspect: () => ({ changes: [...(owners.get(id) ?? [])] }),
+      details() {
+        const scalarDetails = [...(owners.get(id) ?? [])].flatMap((key) => {
+          const ledger = ledgers.get(key);
+          const contribution = ledger?.contributions.get(id);
+          if (!ledger || !contribution || contribution.diagnostic === false)
+            return [];
+          let visible = ledger.base;
+          for (const fact of ledger.contributions.values())
+            if (fact.order > visible.order) visible = fact;
+          const scalar = key.startsWith('s:');
+          const member = members.get(key);
+          const position = scalar
+            ? scalars.get(Number(key.slice(2)))?.position
+            : getOwnedPositionIds(
+                member &&
+                  Object.getOwnPropertyDescriptor(member.branch, member.key)
+                    ?.value
+              )?.[0];
+          const current = scalar
+            ? visible === contribution
+            : visible.value === contribution.value;
+          return [
+            {
+              position,
+              subject: undefined as number | undefined,
+              field: undefined as string | undefined,
+              status: current ? ('current' as const) : ('superseded' as const),
+            },
+          ];
+        });
+        return [...scalarDetails, ...entities.details(id)];
+      },
+    };
   };
   return {
+    maintain: () => entities.maintain(),
+    open,
     begin(fn: () => void) {
-      const id = ++owner;
-      owners.set(id, new Set());
-      const previous = active;
-      active = id;
-      const handle = {
-        rollback: () => settle(id, false),
-        confirm: () => settle(id, true),
-        inspect: () => ({ changes: [...(owners.get(id) ?? [])] }),
-      };
+      const handle = open();
+      const id = handle.id;
       try {
-        fn();
+        handle.run(fn);
       } catch (callbackError) {
-        active = previous;
         try {
           settle(id, false);
         } catch (cause) {
@@ -294,8 +439,6 @@ export function nativeOwnershipExperiment(root: object) {
           throw error;
         }
         throw callbackError;
-      } finally {
-        active = previous;
       }
       return handle;
     },
@@ -303,9 +446,12 @@ export function nativeOwnershipExperiment(root: object) {
       fault = { error, after };
     },
     stats() {
-      return { pending: owners.size, ledgers: ledgers.size };
+      return { pending: owners.size, ledgers: ledgers.size + entities.count() };
     },
     destroy() {
+      destroyed = true;
+      terminalListeners.clear();
+      entities.destroy();
       for (const target of attached) detachPreparation(target);
       owners.clear();
       ledgers.clear();

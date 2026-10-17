@@ -1,0 +1,23 @@
+{
+  "packages/kernel/src/enhancers/transactions/transactions.ts": "1834be847defe09c7d840ef549bb3d2dbf753e09db8abe32eaba683ae7ce2b3b",
+  "packages/kernel/src/lib/entity-signal.ts": "90c56a4935fdef5d31d9fe660ff439264db135d546b7f529f412dbaffa3d9c4b",
+  "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "f6b55d5f874e099f9a24270702f2579f664d679e955eea34056e3b826154f640",
+  "packages/kernel/src/lib/internals/mutation-capture-runtime.ts": "67a684445edde7fa3b9b723acd8a2c72d498cb5c73dcab584e9317b4874333af",
+  "packages/kernel/src/lib/internals/native-ownership-driver-experiment.ts": "a05b521f48a0400072f91bf33ddc204f03b563989c170a4fa4e91eb64db563fc",
+  "packages/kernel/src/lib/internals/subject-restoration-claims.spec.ts": "9d8cf8975f25104efd09baccbe465bcb071cb5aa19fa38c6042705b5cb6c884b",
+  "packages/kernel/src/lib/internals/subject-restoration-claims.ts": "a6b022eae00248184758bee07b10d21e06eda9e82315891f554303510b1bdc8d",
+  "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "ac0938eebdf0401a043324110ae4234b797b3a38c01e889020d15c3eb1e58261",
+  "packages/kernel/src/lib/physical/entity-mutation-frame.ts": "9338c2314bca21551f77f84800cb5f176e6f7de021d144251ebe108809f99888",
+  "packages/kernel/src/lib/physical/prepare-entity-target.ts": "2c2e68adc788490866853948a3cb9b241dd417ca23faf7e044a5b1e6106b26b8",
+  "packages/angular/src/lib/b-public-ownership.spec.ts": "a274e1801fc7641c8d868cd118ead00148cb4d56e0473a2b41530373ba78aac1",
+  "packages/kernel/src/enhancers/transactions/b-public-entity-experiment.spec.ts": "ac5b8336cbeb621b6c1e55ddfccae786645082fba92c87da5307794ce5022f8b",
+  "packages/kernel/src/enhancers/transactions/b-public-entity-retention.spec.ts": "836173d1164a0402d060381d5ac82fb391ac56bd0caa6e77cdb5e6ec4309db15",
+  "packages/kernel/src/enhancers/transactions/native-ownership-public-experiment.ts": "00e41f763a954aeb33e657d8e0cf0bd0cbf8cbd3e049781ce6f5e570cadcf746",
+  "packages/kernel/src/lib/internals/native-entity-ownership-experiment.ts": "0bbace5fab746b903f9f5a32a81648cdca39a168a055d78ff4ba0fe5398b147f",
+  "packages/kernel/src/lib/internals/native-ownership-public-selection.ts": "dbf1c91c4412b63438524b7c4e0900f383d01a5e9448ab1b91bacce01ac2829e",
+  "packages/kernel/src/lib/native-ownership-public.spec.ts": "f21f6a2a8937d8befa2f87b91846371c33879c31dde2705a2588b88c1a4f71bb",
+  "packages/kernel/src/lib/physical/prepare-entity-ownership-delta.ts": "1dc4e896e1b3210986808edbab2639471813970c795702a01cb6b6a84c6bf6e8",
+  "packages/react/src/b-public-ownership.spec.tsx": "f3d6dc8d08bedfe86d395462f247e869d0ab3486568876fe6eeadc7de891bfe6",
+  "packages/solid/src/lib/b-public-ownership.spec.ts": "864a0d024a27da6e168d555bd52749649d8b80e94f95dd276c2b4479f3ec22a5",
+  "packages/vue/src/lib/b-public-ownership.spec.ts": "d8ba49fb2c07a99f0f5cc467b2e681c0eeed65588cfc5de32042b429f0ec9cc0"
+}

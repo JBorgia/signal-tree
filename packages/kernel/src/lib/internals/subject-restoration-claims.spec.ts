@@ -1,6 +1,10 @@
+import { installTerminalRecordPlan } from './intrinsic-mutation';
 import { describe, expect, it } from 'vitest';
 
-import { createSubjectRestorationClaims } from './subject-restoration-claims';
+import {
+  createSubjectRestorationClaims,
+  prepareSubjectRestorationClaims,
+} from './subject-restoration-claims';
 
 /**
  * The properties these pin are the ones Step 8 depends on. The registry is
@@ -153,5 +157,47 @@ describe('subject restoration claims', () => {
 
     expect(claims.ownersOf(8)).toEqual(['restoration:2']);
     expect(claims.release('restoration:2')).toEqual([8]);
+  });
+  it('abandoned paired preparation creates no live responsibility', () => {
+    const claims = createSubjectRestorationClaims();
+    prepareSubjectRestorationClaims(claims, 'native:1', [1, 2]);
+    expect(claims.snapshot()).toEqual({ owners: 0, claimedSubjects: 0 });
+    expect(claims.release('native:1')).toEqual([]);
+  });
+  it('paired additions compose with retained history and release exact obligations', () => {
+    const claims = createSubjectRestorationClaims();
+    claims.retain('history:1', [2]);
+    const install = (ids: number[]) => {
+      const plan = prepareSubjectRestorationClaims(claims, 'native:1', ids);
+      installTerminalRecordPlan(plan);
+    };
+    install([1, 2]);
+    install([2, 3]);
+    expect(claims.release('native:1')).toEqual([1, 3]);
+    expect(claims.isClaimed(2)).toBe(true);
+    expect(claims.release('history:1')).toEqual([2]);
+    expect(claims.snapshot()).toEqual({ owners: 0, claimedSubjects: 0 });
+  });
+  it('overlapping prepared plans for a new owner retain both subject obligations', () => {
+    const claims = createSubjectRestorationClaims();
+    const a = prepareSubjectRestorationClaims(claims, 'native:1', [1]),
+      b = prepareSubjectRestorationClaims(claims, 'native:1', [2]);
+    for (const plan of [a, b]) {
+      installTerminalRecordPlan(plan);
+    }
+    expect(claims.release('native:1')).toEqual([1, 2]);
+    expect(claims.snapshot()).toEqual({ owners: 0, claimedSubjects: 0 });
+  });
+  it('overlapping new owners preserve the shared subject reverse index', () => {
+    const claims = createSubjectRestorationClaims();
+    const a = prepareSubjectRestorationClaims(claims, 'native:1', [1]),
+      b = prepareSubjectRestorationClaims(claims, 'native:2', [1]);
+    for (const plan of [a, b]) {
+      installTerminalRecordPlan(plan);
+    }
+    expect(claims.release('native:2')).toEqual([]);
+    expect(claims.isClaimed(1)).toBe(true);
+    expect(claims.release('native:1')).toEqual([1]);
+    expect(claims.snapshot()).toEqual({ owners: 0, claimedSubjects: 0 });
   });
 });

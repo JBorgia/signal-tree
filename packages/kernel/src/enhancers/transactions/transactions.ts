@@ -1,3 +1,5 @@
+import { usesNativeOwnershipTransactions } from '../../lib/internals/native-ownership-public-selection';
+import { installNativeOwnershipPublicExperiment } from './native-ownership-public-experiment';
 import type { TerminalRecordPlan } from '../../lib/internals/intrinsic-mutation';
 import { publishingExposedOnly } from '../../lib/internals/exposed-publication';
 import {
@@ -4035,6 +4037,8 @@ export function transactions(
   const enhancerFn = <T>(
     tree: ISignalTree<T>
   ): ISignalTree<T> & TransactionMethods => {
+    if (usesNativeOwnershipTransactions(enhancerFn))
+      return installNativeOwnershipPublicExperiment(tree, config);
     const runtime = getOrCreateInternalTransactionRuntime(tree);
     if (config?.history) {
       runtime.setHistoryRetention(config.history.retain);

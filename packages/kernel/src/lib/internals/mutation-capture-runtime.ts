@@ -23,6 +23,8 @@ export type CollectionOrderCapture = {
  */
 export type CommittedEntityMutation = {
   readonly subject: number;
+  /** This add revives an existing retained lifetime, rather than allocating one. */
+  readonly restored?: boolean;
   /** Actual row values; undefined means the lifetime is not a current member. */
   readonly before: unknown;
   readonly after: unknown;
@@ -32,7 +34,15 @@ export type CommittedEntityMutation = {
   readonly structuralRecord?: StructuralEffect;
 };
 
+export type PreparedCollectionOrdering = {
+  readonly kind: 'append' | 'front' | 'exact';
+  readonly subjects: readonly number[];
+  readonly keys: readonly (string | number)[];
+  readonly baseFrontier: unknown;
+};
+
 export type CommittedEntityCapture = {
+  readonly ordering?: PreparedCollectionOrdering;
   readonly owner: number;
   readonly ownerPath: string;
   readonly changes: readonly CommittedEntityMutation[];

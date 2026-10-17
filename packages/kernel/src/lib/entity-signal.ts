@@ -1,3 +1,8 @@
+import { installTerminalRecordPlan } from './internals/intrinsic-mutation';
+import {
+  prepareEntityOwnershipDelta,
+  type EntityOwnershipDelta,
+} from './physical/prepare-entity-ownership-delta';
 import type {
   Location,
   ReadableCell,
@@ -493,27 +498,72 @@ export function createEntitySignal<
 
   /** Existing-lifetime value plans: all reflection precedes physical installation. */
   function preparePointValues(
-    values: readonly { subjectId: number; key: string | number; value: unknown }[]
+    values: readonly {
+      subjectId: number;
+      key: string | number;
+      value: unknown;
+    }[]
   ): { install(): void; invalidate(): void; publish(): void } {
+    const revision = physicalCommitClock?.revision();
     const prepared = values.map(({ subjectId, key, value }) => {
       if (structuralStore.activeKeyForSubject(subjectId) !== key) {
-        throw new Error('Point realization subject is no longer active at its key');
+        throw new Error(
+          'Point realization subject is no longer active at its key'
+        );
       }
       const before = valueStore.backingForSubject(subjectId);
       const after = deepClone(value) as E;
-      return { subjectId, key: key as K, before, after,
-        changed: !deepEqual(before, after), epoch: subjectEpochs.get(subjectId) };
+      return {
+        subjectId,
+        key: key as K,
+        before,
+        after,
+        changed: !deepEqual(before, after),
+        epoch: subjectEpochs.get(subjectId),
+      };
     });
+    const responsibility =
+      mutationCaptureRuntime?.prepareEntityResponsibility?.({
+        owner: getPositionIds()?.[0] as number,
+        ownerPath: basePath,
+        meta: ambientMeta(),
+        changes: prepared
+          .filter((row) => row.changed)
+          .map((row) => ({
+            subject: row.subjectId,
+            before: row.before,
+            after: row.after,
+            structural: false,
+            path: `${basePath}.${String(row.key)}`,
+          })),
+      });
+    if (physicalCommitClock?.revision() !== revision)
+      throw new Error(
+        'Point responsibility preparation reentered installation'
+      );
     return {
       install(): void {
-        for (const row of prepared) valueStore.retainSubjectValue(row.subjectId, row.after);
+        if (physicalCommitClock?.revision() !== revision)
+          throw new Error('Point responsibility preparation is stale');
+        for (const row of prepared)
+          valueStore.retainSubjectValue(row.subjectId, row.after);
+        if (responsibility) {
+          installTerminalRecordPlan(responsibility);
+        }
       },
       invalidate(): void {
         let failed = false;
         let firstError: unknown;
-        const stage = (fn: () => void) => { try { fn(); } catch (error) {
-          if (!failed) { failed = true; firstError = error; }
-        } };
+        const stage = (fn: () => void) => {
+          try {
+            fn();
+          } catch (error) {
+            if (!failed) {
+              failed = true;
+              firstError = error;
+            }
+          }
+        };
         for (const row of prepared) {
           const epoch = row.epoch;
           if (epoch) stage(() => advanceEpochHandle(epoch));
@@ -523,9 +573,19 @@ export function createEntitySignal<
       },
       publish(): void {
         for (const row of prepared) {
-          pathNotifier.notify(`${basePath}.${String(row.key)}`, row.after, row.before,
-            basePath, [row.subjectId], getPositionIdsForNotify(),
-            { ...(ambientMeta() ?? {}), intent: 'system', participation: 'realized' });
+          pathNotifier.notify(
+            `${basePath}.${String(row.key)}`,
+            row.after,
+            row.before,
+            basePath,
+            [row.subjectId],
+            getPositionIdsForNotify(),
+            {
+              ...(ambientMeta() ?? {}),
+              intent: 'system',
+              participation: 'realized',
+            }
+          );
           if (row.changed) emitTap('onUpdate', row.key, row.after, row.after);
         }
       },
@@ -559,37 +619,130 @@ export function createEntitySignal<
 
   function commitAndProjectEntityMutationFrame(
     frame: EntityMutationFrame<K, E>,
-    options?: { advancePhysicalRevision?: boolean }
+    options?: {
+      advancePhysicalRevision?: boolean;
+      ordering?: {
+        readonly kind: 'append' | 'front' | 'exact';
+        readonly subjects: readonly number[];
+        readonly keys: readonly K[];
+        readonly baseFrontier: unknown;
+      };
+    }
   ) {
-    const revision=physicalCommitClock?.revision();
-    const changes: Array<import('./internals/mutation-capture-runtime').CommittedEntityMutation> = [];
+    const revision = physicalCommitClock?.revision();
+    const changes: Array<
+      import('./internals/mutation-capture-runtime').CommittedEntityMutation
+    > = [];
     // Only fresh subjects need the pre-install tail. Preserve the sampling
     // boundary before record cloning, using the existing constant-time index.
     const hasFreshSubjects = frame.mutations.some(
       (mutation) => mutation.kind === 'create-fresh-subject'
     );
-    const tailKey = hasFreshSubjects ? structuralStore.lastActiveKey() : undefined;
-    let tail = tailKey === undefined
-      ? undefined
-      : structuralStore.subjectIdForKey(tailKey);
+    const tailKey = hasFreshSubjects
+      ? structuralStore.lastActiveKey()
+      : undefined;
+    let tail =
+      tailKey === undefined
+        ? undefined
+        : structuralStore.subjectIdForKey(tailKey);
     for (const m of frame.mutations) {
-      const key = 'key' in m ? m.key : structuralStore.activeKeyForSubject(m.subjectId);
+      const key =
+        'key' in m ? m.key : structuralStore.activeKeyForSubject(m.subjectId);
       const before = valueStore.backingForSubject(m.subjectId);
       const path = `${basePath}.${String(key)}`;
-      if (m.kind === 'replace-value') changes.push({subject:m.subjectId,before,after:m.nextValue,structural:false,path});
+      if (m.kind === 'replace-value')
+        changes.push({
+          subject: m.subjectId,
+          before,
+          after: m.nextValue,
+          structural: false,
+          path,
+        });
       else if (m.kind === 'create-fresh-subject') {
-        changes.push({subject:m.subjectId,before:undefined,after:m.nextValue,structural:true,path,structuralRecord:{kind:'add',subject:m.subjectId,key:m.key,value:deepClone(m.nextValue),beforeSubject:tail}});
-        tail=m.subjectId;
+        changes.push({
+          subject: m.subjectId,
+          before: undefined,
+          after: m.nextValue,
+          structural: true,
+          path,
+          structuralRecord: {
+            kind: 'add',
+            subject: m.subjectId,
+            key: m.key,
+            value: deepClone(m.nextValue),
+            beforeSubject: tail,
+          },
+        });
+        tail = m.subjectId;
       } else if (m.kind === 'tombstone-subject') {
-        const neighbors=getNeighborSubjects(m.key);
-        changes.push({subject:m.subjectId,before,after:undefined,structural:true,path,structuralRecord:{kind:'remove',subject:m.subjectId,key:m.key,value:deepClone(before),...neighbors}});
-      } else if(m.kind === 'transfer-key') {
-        changes.push({subject:m.subjectId,before,after:before,structural:true,path:`${basePath}.${String(m.fromKey)}`,structuralRecord:{kind:'rekey',subject:m.subjectId,beforeKey:m.fromKey,afterKey:m.toKey}});
+        const neighbors = getNeighborSubjects(m.key);
+        changes.push({
+          subject: m.subjectId,
+          before,
+          after: undefined,
+          structural: true,
+          path,
+          structuralRecord: {
+            kind: 'remove',
+            subject: m.subjectId,
+            key: m.key,
+            value: deepClone(before),
+            ...neighbors,
+          },
+        });
+      } else if (m.kind === 'restore-subject') {
+        changes.push({
+          subject: m.subjectId,
+          before: undefined,
+          after: m.realizedValue ?? before,
+          structural: true,
+          path,
+          restored: true,
+          structuralRecord: {
+            kind: 'add',
+            subject: m.subjectId,
+            key: m.key,
+            value: deepClone(m.realizedValue ?? before),
+            beforeSubject: m.beforeSubject,
+            afterSubject: m.afterSubject,
+          },
+        });
+      } else if (m.kind === 'transfer-key') {
+        changes.push({
+          subject: m.subjectId,
+          before,
+          after: before,
+          structural: true,
+          path: `${basePath}.${String(m.fromKey)}`,
+          structuralRecord: {
+            kind: 'rekey',
+            subject: m.subjectId,
+            beforeKey: m.fromKey,
+            afterKey: m.toKey,
+          },
+        });
       }
     }
-    const responsibility = changes.length ? mutationCaptureRuntime?.prepareEntityResponsibility?.({owner:getPositionIds()?.[0] as number,ownerPath:basePath,meta:ambientMeta(),changes}) : undefined;
-    if(physicalCommitClock?.revision()!==revision)throw new Error('Entity frame responsibility preparation reentered installation');
-    const result = frame.commit(committedEntityObserver(),responsibility);
+    const ordering = options?.ordering;
+    const responsibility =
+      changes.length || ordering
+        ? mutationCaptureRuntime?.prepareEntityResponsibility?.({
+            owner: getPositionIds()?.[0] as number,
+            ownerPath: basePath,
+            meta: ambientMeta(),
+            changes,
+            ordering,
+          })
+        : undefined;
+    if (physicalCommitClock?.revision() !== revision)
+      throw new Error(
+        'Entity frame responsibility preparation reentered installation'
+      );
+    const result = frame.commit(
+      committedEntityObserver(),
+      responsibility,
+      ordering
+    );
     if (options?.advancePhysicalRevision !== false) {
       physicalCommitClock?.advance();
     }
@@ -1047,25 +1200,6 @@ export function createEntitySignal<
     });
   }
 
-  /**
-   * Re-orders `storage` so the given ids come first, in the order given.
-   *
-   * Only the map's iteration order changes; no per-entity signal is touched, so
-   * prepending does not invalidate any row's consumers. The derived collection
-   * signals pick the new order up from the version bump.
-   */
-  function moveToFront(ids: K[]): void {
-    const tap = membershipTap;
-    tap?.(MEMBERSHIP_OPEN_ORDER);
-    try {
-      structuralStore.moveKeysToFront(ids);
-    } finally {
-      tap?.(MEMBERSHIP_CLOSE);
-    }
-    physicalCommitClock?.advance();
-    updateSignals();
-  }
-
   function resolveSubjectId(id: K): number | undefined {
     return structuralStore.subjectIdForKey(id);
   }
@@ -1213,15 +1347,28 @@ export function createEntitySignal<
       : undefined;
     const revision = physicalCommitClock?.revision();
     const plan = mutationCaptureRuntime?.prepareEntityResponsibility?.({
-      owner: getPositionIds()?.[0] as number, ownerPath: basePath,
-      changes: [{subject: subjectId, before: valueStore.backingForSubject(subjectId), after: nextValue, structural: false, path: `${basePath}.${String(structuralStore.activeKeyForSubject(subjectId))}`} ],
+      owner: getPositionIds()?.[0] as number,
+      ownerPath: basePath,
+      changes: [
+        {
+          subject: subjectId,
+          before: valueStore.backingForSubject(subjectId),
+          after: nextValue,
+          structural: false,
+          path: `${basePath}.${String(
+            structuralStore.activeKeyForSubject(subjectId)
+          )}`,
+        },
+      ],
       meta: ambientMeta(),
     });
-    if (physicalCommitClock?.revision() !== revision) throw new Error('Entity responsibility preparation reentered installation');
+    if (physicalCommitClock?.revision() !== revision)
+      throw new Error(
+        'Entity responsibility preparation reentered installation'
+      );
     valueStore.retainSubjectValue(subjectId, nextValue);
     if (plan) {
-      for (let i=0;i<plan.writes.length;i++) { const w=plan.writes[i]; w.map.set(w.key,w.value); }
-      for (let i=0;i<plan.adds.length;i++) { const a=plan.adds[i]; a.set.add(a.value); }
+      installTerminalRecordPlan(plan);
     }
     capture?.([
       { subject: subjectId, before, after: nextValue, structural: false },
@@ -1488,15 +1635,6 @@ export function createEntitySignal<
     };
   }
 
-  function rewritePendingAddEffect(
-    effect: PendingAddStructuralEffect,
-    beforeSubject?: number,
-    afterSubject?: number
-  ): void {
-    effect.beforeSubject = beforeSubject;
-    effect.afterSubject = afterSubject;
-  }
-
   function assertSynchronousInterceptorFunction(
     handler: unknown,
     hookName: string
@@ -1614,6 +1752,7 @@ export function createEntitySignal<
     opts?: AddManyOptions<E, K>,
     prepend = false
   ): K[] {
+    const admissionFrontier = structuralStore.activeOrderFrontier();
     const mode = opts?.mode ?? 'strict';
     const beforeSubjects =
       prepend && mutationCaptureRuntime?.publishCollectionOrder
@@ -1672,6 +1811,8 @@ export function createEntitySignal<
     for (const [processed, entity] of copies) {
       processed.entity = interceptAddedEntity(entity);
     }
+    if (structuralStore.activeOrderFrontier() !== admissionFrontier)
+      throw new Error('Cannot addMany: topology changed during staging');
     const stagedAdds = toProcess;
     const plannedFreshSubjectIds = structuralStore.planFreshSubjectIds(
       stagedAdds.filter(
@@ -1720,7 +1861,26 @@ export function createEntitySignal<
       });
     }
 
-    commitAndProjectEntityMutationFrame(frame);
+    const orderedAdds = prepend
+      ? preparedAdds
+      : preparedAdds.filter((row) => row.existingSubjectId === undefined);
+    const ordering = Object.freeze({
+      kind: prepend ? ('front' as const) : ('append' as const),
+      subjects: Object.freeze(orderedAdds.map((row) => row.subjectId)),
+      keys: Object.freeze(orderedAdds.map((row) => row.id)),
+      baseFrontier: admissionFrontier,
+    });
+    const orderTap = prepend ? membershipTap : undefined;
+    orderTap?.(
+      preparedAdds.some((row) => row.existingSubjectId !== undefined)
+        ? MEMBERSHIP_OPEN_ORDER
+        : MEMBERSHIP_OPEN
+    );
+    try {
+      commitAndProjectEntityMutationFrame(frame, { ordering });
+    } finally {
+      orderTap?.(MEMBERSHIP_CLOSE);
+    }
     const subjectIdsByKey = new Map<K, number>();
     for (const { id, subjectId } of preparedAdds) {
       subjectIdsByKey.set(id, subjectId);
@@ -1743,8 +1903,7 @@ export function createEntitySignal<
 
     // Finish the compound topology before path observers or taps can copy
     // metadata or flush history. No shared collector or later backpatching.
-    if (prepend) moveToFront(processedIds);
-    else updateSignals();
+    updateSignals();
     if (beforeSubjects) {
       if (mutationCaptureRuntime?.isCaptureActive()) getPositionIds();
       const afterSubjects: number[] = [];
@@ -1811,8 +1970,11 @@ export function createEntitySignal<
 
   function addOneWithStructuralEffect(
     entity: E,
-    opts?: AddOptions<E, K>
+    opts?: AddOptions<E, K>,
+    prepend = false
   ): { id: K; structuralEffect: PendingAddStructuralEffect } {
+    const admissionFrontier = structuralStore.activeOrderFrontier();
+    const previousFirstKey = structuralStore.firstActiveKey();
     const id = deriveId(entity, opts);
     const previousLastKey = structuralStore.lastActiveKey();
     recordProductionSubstrateStat('publicAddPreviousTailReads');
@@ -1822,6 +1984,8 @@ export function createEntitySignal<
     }
 
     const transformedEntity = interceptAddedEntity(entity);
+    if (structuralStore.activeOrderFrontier() !== admissionFrontier)
+      throw new Error('Cannot addOne: topology changed during staging');
     const subjectId = structuralStore.planFreshSubjectIds(1)[0];
     if (subjectId === undefined) {
       throw new Error(
@@ -1837,14 +2001,30 @@ export function createEntitySignal<
       nextValue: transformedEntity,
     };
     frame.stageFreshSubject(freshSubject);
-    commitAndProjectEntityMutationFrame(frame);
+    const ordering = Object.freeze({
+      kind: prepend ? ('front' as const) : ('append' as const),
+      subjects: Object.freeze([subjectId]),
+      keys: Object.freeze([id]),
+      baseFrontier: admissionFrontier,
+    });
+    const orderTap = prepend ? membershipTap : undefined;
+    orderTap?.(MEMBERSHIP_OPEN);
+    try {
+      commitAndProjectEntityMutationFrame(frame, { ordering });
+    } finally {
+      orderTap?.(MEMBERSHIP_CLOSE);
+    }
     const structuralEffect: PendingAddStructuralEffect = {
       kind: 'add',
       subject: subjectId,
       key: id,
       value: deepClone(transformedEntity),
+      afterSubject:
+        prepend && previousFirstKey !== undefined
+          ? allocateSubjectId(previousFirstKey)
+          : undefined,
       beforeSubject:
-        previousLastKey === undefined
+        prepend || previousLastKey === undefined
           ? undefined
           : allocateSubjectId(previousLastKey),
     };
@@ -2723,38 +2903,11 @@ export function createEntitySignal<
       return addOneWithStructuralEffect(entity, opts).id;
     },
 
-    /**
-     * Insert at the FRONT, reusing `addOne` and then moving the entry.
-     *
-        if (structuralStore.hasActiveKey(id)) {
-     * so the entry order is rebuilt — O(n) in the number of entities. That is
-     * still markedly cheaper than the `setAll([entity, ...existing])` this
-     * replaces, which rebuilds the storage map AND resets every per-entity
-     * signal: only the newcomer's signal changes here, so held nodes survive and
-     * no unrelated row's consumers are invalidated.
-     *
-     * Reusing `addOne` rather than duplicating it keeps duplicate-detection,
-     * interceptors, notifier and tap handlers on exactly one path.
-     */
+    /** V16: complete membership and ordering before onAdd can author newer work. */
     prependOne(entity: E, opts?: AddOptions<E, K>): K {
-      // One membership event for add + move: readers never see the row at
-      // the end of the list first.
-      return withMembershipGroup(() => {
-        const previousFirstKey = structuralStore.firstActiveKey();
-        const { id, structuralEffect } = addOneWithStructuralEffect(
-          entity,
-          opts
-        );
-        moveToFront([id]);
-        rewritePendingAddEffect(
-          structuralEffect,
-          undefined,
-          previousFirstKey === undefined
-            ? undefined
-            : allocateSubjectId(previousFirstKey)
-        );
-        return id;
-      });
+      return withMembershipGroup(
+        () => addOneWithStructuralEffect(entity, opts, true).id
+      );
     },
 
     prependMany(entities: E[], opts?: AddManyOptions<E, K>): K[] {
@@ -3323,10 +3476,24 @@ export function createEntitySignal<
       membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
       const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
       try {
-        const freshSubjectIds = structuralStore.planFreshSubjectIds(stagedAdds.length);
-        const frame=createEntityMutationFrame();
-        for(let i=0;i<stagedAdds.length;i++) frame.stageFreshSubject({kind:'create-fresh-subject',key:stagedAdds[i].id,subjectId:freshSubjectIds[i],nextValue:stagedAdds[i].entity});
-        for(const row of stagedUpdates) frame.stageValueReplacement({kind:'replace-value',key:row.id,subjectId:row.subjectId,nextValue:row.finalUpdated});
+        const freshSubjectIds = structuralStore.planFreshSubjectIds(
+          stagedAdds.length
+        );
+        const frame = createEntityMutationFrame();
+        for (let i = 0; i < stagedAdds.length; i++)
+          frame.stageFreshSubject({
+            kind: 'create-fresh-subject',
+            key: stagedAdds[i].id,
+            subjectId: freshSubjectIds[i],
+            nextValue: stagedAdds[i].entity,
+          });
+        for (const row of stagedUpdates)
+          frame.stageValueReplacement({
+            kind: 'replace-value',
+            key: row.id,
+            subjectId: row.subjectId,
+            nextValue: row.finalUpdated,
+          });
         commitAndProjectEntityMutationFrame(frame);
         const addedSubjectIdsByKey = new Map<K, number>();
         for (let i = 0; i < stagedAdds.length; i++) {
@@ -3362,7 +3529,6 @@ export function createEntitySignal<
         finalUpdated,
         transformedChanges,
       } of stagedUpdates) {
-
         syncEntitySignal(id);
         updatedEntities.push({
           id,
@@ -3477,8 +3643,15 @@ export function createEntitySignal<
       const membershipUnit = membershipTap;
       membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
       try {
-        const frame=createEntityMutationFrame();
-        for (const {id,subjectId} of activeSubjects) frame.stageSubjectTombstone({kind:'tombstone-subject',key:id,subjectId,restoreAllowed:resolveSubjectState(subjectId)?.restoreAllowed ?? true});
+        const frame = createEntityMutationFrame();
+        for (const { id, subjectId } of activeSubjects)
+          frame.stageSubjectTombstone({
+            kind: 'tombstone-subject',
+            key: id,
+            subjectId,
+            restoreAllowed:
+              resolveSubjectState(subjectId)?.restoreAllowed ?? true,
+          });
         commitAndProjectEntityMutationFrame(frame);
       } finally {
         // Observed once every row is tombstoned, before reactive publication.
@@ -3652,7 +3825,9 @@ export function createEntitySignal<
       const stagedRemovalStructuralEffects: PendingStructuralEffect[] = [];
       try {
         // Index-aligned with `stagedAdds`.
-        addedSubjectIds = structuralStore.planFreshSubjectIds(stagedAdds.length);
+        addedSubjectIds = structuralStore.planFreshSubjectIds(
+          stagedAdds.length
+        );
         for (let k = 0; k < stagedAdds.length; k += 1) {
           incomingSubjects[stagedAdds[k].index] = addedSubjectIds[k];
         }
@@ -3675,19 +3850,45 @@ export function createEntitySignal<
           });
         }
 
-        const frame=createEntityMutationFrame();
-        for (const {id,subjectId} of stagedRemovals) frame.stageSubjectTombstone({kind:'tombstone-subject',key:id,subjectId,restoreAllowed:resolveSubjectState(subjectId)?.restoreAllowed ?? true});
-        for (const {id,subjectId,entity} of stagedUpdates) frame.stageValueReplacement({kind:'replace-value',key:id,subjectId,nextValue:entity});
-        for(let k=0;k<stagedAdds.length;k++) frame.stageFreshSubject({kind:'create-fresh-subject',key:stagedAdds[k].id,subjectId:addedSubjectIds[k],nextValue:stagedAdds[k].entity});
-        commitAndProjectEntityMutationFrame(frame);
-        for(const {subjectId} of stagedRemovals) tombstoneSubjectSignal(subjectId);
-        for(const {id} of stagedAdds) syncEntitySignal(id);
+        const frame = createEntityMutationFrame();
+        for (const { id, subjectId } of stagedRemovals)
+          frame.stageSubjectTombstone({
+            kind: 'tombstone-subject',
+            key: id,
+            subjectId,
+            restoreAllowed:
+              resolveSubjectState(subjectId)?.restoreAllowed ?? true,
+          });
+        for (const { id, subjectId, entity } of stagedUpdates)
+          frame.stageValueReplacement({
+            kind: 'replace-value',
+            key: id,
+            subjectId,
+            nextValue: entity,
+          });
+        for (let k = 0; k < stagedAdds.length; k++)
+          frame.stageFreshSubject({
+            kind: 'create-fresh-subject',
+            key: stagedAdds[k].id,
+            subjectId: addedSubjectIds[k],
+            nextValue: stagedAdds[k].entity,
+          });
+        const ordering = Object.freeze({
+          kind: 'exact' as const,
+          subjects: Object.freeze([...afterSubjects]),
+          keys: Object.freeze([...incomingIds]),
+          baseFrontier: beforeOrderFrontier,
+        });
+        commitAndProjectEntityMutationFrame(frame, { ordering });
+        for (const { subjectId } of stagedRemovals)
+          tombstoneSubjectSignal(subjectId);
+        for (const { id } of stagedAdds) syncEntitySignal(id);
 
         for (const { id } of stagedUpdates) {
           syncEntitySignal(id);
         }
 
-        structuralStore.reorderActiveKeys(incomingIds);
+        // Complete membership and order were installed in the prepared frame.
 
         lastSubjectIds = [
           ...stagedRemovals.map(({ subjectId }) => subjectId),
@@ -3707,7 +3908,11 @@ export function createEntitySignal<
           mutationCaptureRuntime?.publishCollectionOrder &&
           survivingOrderChanged(currentSubjects, afterSubjects)
         ) {
-          publishOrderChange(currentSubjects, afterSubjects, beforeOrderFrontier);
+          publishOrderChange(
+            currentSubjects,
+            afterSubjects,
+            beforeOrderFrontier
+          );
         }
       } finally {
         // The whole replacement has installed (or stopped): the observed
@@ -4043,7 +4248,9 @@ export function createEntitySignal<
     configurable: true,
   });
   Object.defineProperty(api, '__preparePointValues', {
-    value: preparePointValues, enumerable: false, configurable: true,
+    value: preparePointValues,
+    enumerable: false,
+    configurable: true,
   });
   Object.defineProperty(api, '__planFreshAdd', {
     value: planFreshAdd,
@@ -4075,20 +4282,65 @@ export function createEntitySignal<
     enumerable: false,
     configurable: true,
   });
+  const entityTargetHost = () => ({
+    positionId,
+    structuralStore,
+    valueStore,
+    activeIdSignal,
+    subjectEpochs,
+    subjectStateSignals,
+    get membershipTap() {
+      return membershipTap;
+    },
+    advanceEpochHandle,
+    updateSignals,
+    physicalCommitClock,
+    pathNotifier,
+    basePath,
+    getPositionIdsForNotify,
+    createStructuralEffectMeta,
+    ambientMeta,
+    emitTap,
+    prepareResponsibility: (
+      capture: import('./internals/mutation-capture-runtime').CommittedEntityCapture
+    ) => mutationCaptureRuntime?.prepareEntityResponsibility?.(capture),
+  });
+  Object.defineProperty(api, '__readOwnershipOrder', {
+    value: (): readonly number[] => {
+      const subjects: number[] = [];
+      structuralStore.snapshotActiveOrder([], subjects);
+      return subjects;
+    },
+    enumerable: false,
+    configurable: true,
+  });
+  Object.defineProperty(api, '__readOwnershipSubject', {
+    value: (subject: number) => {
+      const key = structuralStore.activeKeyForSubject(subject);
+      return key === undefined
+        ? null
+        : {
+            key,
+            value: valueStore.backingForSubject(subject),
+            ...structuralStore.neighborSubjectsForKey(key),
+          };
+    },
+    enumerable: false,
+    configurable: true,
+  });
+  Object.defineProperty(api, '__prepareOwnershipDelta', {
+    value: (changes: readonly EntityOwnershipDelta[]) =>
+      prepareEntityOwnershipDelta(entityTargetHost(), changes),
+    enumerable: false,
+    configurable: true,
+  });
   if (positionId !== undefined) {
     Object.defineProperty(api, '__prepareTransitionTarget', {
       value: {
         owner: positionId,
         ownerPath: basePath,
         readSource: readTransitionSource,
-        prepareTarget: (target, prepare) => prepare({
-          positionId, structuralStore, valueStore, activeIdSignal,
-          subjectEpochs, subjectStateSignals,
-          get membershipTap() { return membershipTap; },
-          advanceEpochHandle, updateSignals, physicalCommitClock, pathNotifier,
-          basePath, getPositionIdsForNotify, createStructuralEffectMeta,
-          ambientMeta, emitTap,
-        }, target),
+        prepareTarget: (target, prepare) => prepare(entityTargetHost(), target),
       } satisfies CollectionTransitionTargetBinding,
       enumerable: false,
       configurable: true,

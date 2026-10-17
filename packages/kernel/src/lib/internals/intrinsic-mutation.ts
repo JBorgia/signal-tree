@@ -1,8 +1,37 @@
 export interface TerminalRecordPlan {
-  readonly writes: readonly { readonly map: Map<unknown,unknown>; readonly key: unknown; readonly value: unknown }[];
-  readonly adds: readonly { readonly set: Set<unknown>; readonly value: unknown }[];
+  /** Compose preallocated sets across plans prepared before any installation. */
+  readonly keyedAdds?: readonly {
+    readonly map: Map<unknown, Set<unknown>>;
+    readonly key: unknown;
+    readonly prepared: Set<unknown>;
+    readonly value: unknown;
+  }[];
+  readonly writes: readonly {
+    readonly map: Map<unknown, unknown>;
+    readonly key: unknown;
+    readonly value: unknown;
+  }[];
+  readonly adds: readonly {
+    readonly set: Set<unknown>;
+    readonly value: unknown;
+  }[];
 }
-type TerminalPreparer = (mutation: IntrinsicMutation<unknown>) => TerminalRecordPlan | undefined;
+/** Paired physical installation: plain native Map/Set operations only. */
+export function installTerminalRecordPlan(plan: TerminalRecordPlan): void {
+  for (const write of plan.writes) write.map.set(write.key, write.value);
+  for (const add of plan.adds) add.set.add(add.value);
+  for (const add of plan.keyedAdds ?? []) {
+    let set = add.map.get(add.key);
+    if (!set) {
+      set = add.prepared;
+      add.map.set(add.key, set);
+    }
+    set.add(add.value);
+  }
+}
+type TerminalPreparer = (
+  mutation: IntrinsicMutation<unknown>
+) => TerminalRecordPlan | undefined;
 export interface IntrinsicMutation<T> {
   readonly intent: 'replace' | 'derive';
   readonly before: T;
@@ -42,7 +71,9 @@ export interface IntrinsicMutationSource<T> {
   observer: IntrinsicMutationObserver<T> | undefined;
   readonly capture?: IntrinsicMutationObserver<T>;
   readonly terminal?: IntrinsicMutationObserver<T>;
-  readonly prepareTerminal?: (mutation: IntrinsicMutation<T>) => TerminalRecordPlan | undefined;
+  readonly prepareTerminal?: (
+    mutation: IntrinsicMutation<T>
+  ) => TerminalRecordPlan | undefined;
 }
 
 interface SourceRecord {
@@ -73,16 +104,21 @@ const SOURCES = new WeakMap<object, SourceRecord>();
 // unnecessary context and accessor functions even on an unobserved leaf.
 const SOURCE_ACCESSORS: PropertyDescriptorMap = {
   prepareTerminal: {
-    get(this: SourceRecord) { return this.terminalPreparer; },
+    get(this: SourceRecord) {
+      return this.terminalPreparer;
+    },
   },
   terminal: {
-    get(this: SourceRecord) { return this.terminalRecord?.observer; },
+    get(this: SourceRecord) {
+      return this.terminalRecord?.observer;
+    },
   },
   capture: {
-    get(this: SourceRecord) { return this.captureRecord?.observer; },
+    get(this: SourceRecord) {
+      return this.captureRecord?.observer;
+    },
   },
 };
-
 
 /**
  * One observer must not be able to starve another after truth has committed,
@@ -163,7 +199,15 @@ export function observeIntrinsicMutations<T>(
 ): (() => void) | undefined {
   const source = SOURCES.get(node);
   if (!source) return undefined;
-  const record = capture === 'terminal' ? (source.terminalRecord ??= {observers:undefined,observer:undefined}) : capture ? (source.captureRecord ??= {observers:undefined,observer:undefined}) : source;
+  const record =
+    capture === 'terminal'
+      ? (source.terminalRecord ??= {
+          observers: undefined,
+          observer: undefined,
+        })
+      : capture
+      ? (source.captureRecord ??= { observers: undefined, observer: undefined })
+      : source;
   const installed = observer as IntrinsicMutationObserver<unknown>;
   (record.observers ??= new Set()).add(installed);
   compose(record);
@@ -190,9 +234,17 @@ export function getIntrinsicMutationObserver<T>(
 }
 
 // Internal single-owner preparation hook, never a post-install observer.
-export function prepareTerminalMutations(node: object, prepare: TerminalPreparer): (()=>void) | undefined {
-  const source=SOURCES.get(node); if(!source)return;
-  if(source.terminalPreparer)throw new Error('Terminal preparation already owned');
-  source.terminalPreparer=prepare;
-  return ()=>{if(source.terminalPreparer===prepare)source.terminalPreparer=undefined;};
+export function prepareTerminalMutations(
+  node: object,
+  prepare: TerminalPreparer
+): (() => void) | undefined {
+  const source = SOURCES.get(node);
+  if (!source) return;
+  if (source.terminalPreparer)
+    throw new Error('Terminal preparation already owned');
+  source.terminalPreparer = prepare;
+  return () => {
+    if (source.terminalPreparer === prepare)
+      source.terminalPreparer = undefined;
+  };
 }

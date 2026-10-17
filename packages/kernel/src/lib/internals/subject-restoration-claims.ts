@@ -1,3 +1,4 @@
+import type { TerminalRecordPlan } from './intrinsic-mutation';
 import { isTraversableNode } from './node-shape';
 
 /**
@@ -89,6 +90,25 @@ export interface SubjectRestorationClaims {
   snapshot(): SubjectRestorationClaimsSnapshot;
 }
 
+const preparedClaims = new WeakMap<
+  SubjectRestorationClaims,
+  (
+    owner: RestorationClaimOwner,
+    subjects: Iterable<number>
+  ) => TerminalRecordPlan
+>();
+/** Internal paired-installation admission; no claim is live until the plan installs. */
+export function prepareSubjectRestorationClaims(
+  claims: SubjectRestorationClaims,
+  owner: RestorationClaimOwner,
+  subjects: Iterable<number>
+): TerminalRecordPlan {
+  const prepare = preparedClaims.get(claims);
+  if (!prepare)
+    throw new Error('Claims registry does not support paired installation');
+  return prepare(owner, subjects);
+}
+
 export function createSubjectRestorationClaims(): SubjectRestorationClaims {
   /** owner -> the subjects it claims. */
   const byOwner = new Map<RestorationClaimOwner, Set<number>>();
@@ -119,7 +139,7 @@ export function createSubjectRestorationClaims(): SubjectRestorationClaims {
     return true;
   }
 
-  return {
+  const claims: SubjectRestorationClaims = {
     retain(owner, subjects) {
       const next = new Set(subjects);
       const previous = byOwner.get(owner);
@@ -191,6 +211,31 @@ export function createSubjectRestorationClaims(): SubjectRestorationClaims {
       return { owners: byOwner.size, claimedSubjects: bySubject.size };
     },
   };
+  preparedClaims.set(claims, (owner, subjects) => {
+    const keyedAdds: NonNullable<TerminalRecordPlan['keyedAdds']>[number][] =
+      [];
+    const ids = [...new Set(subjects)],
+      held = byOwner.get(owner) ?? new Set<number>();
+    for (const subject of ids) {
+      const owning = bySubject.get(subject) ?? new Set<RestorationClaimOwner>();
+      keyedAdds.push(
+        {
+          map: byOwner as Map<unknown, Set<unknown>>,
+          key: owner,
+          prepared: held as Set<unknown>,
+          value: subject,
+        },
+        {
+          map: bySubject as Map<unknown, Set<unknown>>,
+          key: subject,
+          prepared: owning as Set<unknown>,
+          value: owner,
+        }
+      );
+    }
+    return { writes: [], adds: [], keyedAdds };
+  });
+  return claims;
 }
 
 /**
