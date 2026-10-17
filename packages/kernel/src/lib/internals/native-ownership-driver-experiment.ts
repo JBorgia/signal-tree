@@ -1,84 +1,316 @@
+import { getPhysicalCommitClock } from './physical-commit-clock';
+import { publishingExposedOnly } from './exposed-publication';
 import { markOwnerInvalidatedFrom } from './owner-invalidation-port';
 import { SignalTreeRollbackError } from '../types';
-import { attachPreparation, detachPreparation, type Installation } from './native-ownership-experiment';
+import {
+  attachPreparation,
+  detachPreparation,
+  type Installation,
+} from './native-ownership-experiment';
 import { getTreeScalarSlotRuntime } from './tree-scalar-slot-port';
-import { NODE_STORE_SYMBOL } from './node-shape';
-import { setMemberPresence, republishMembers } from './member-membership';
+import { isNodeAccessor, nodeStoreOf } from './node-shape';
+import { storedReads } from './member-membership';
+import { getOwnedPositionIds } from './owned-metadata';
+import { isWritableLocation } from './location-runtime';
+import {
+  preparePlainBranchMembers,
+  registerPlainBranchMemberAddress,
+} from './plain-branch-membership';
+import { unwrapBranchForWriteCapture } from '../utils';
+import { withWriteContext, getActiveWriteContext } from '../write-context';
 
 type Fact = { value: unknown; order: number };
-type Ledger = { base: Fact; contributions: Map<number,Fact> };
+type Ledger = { base: Fact; contributions: Map<number, Fact> };
+type Address = { branch: object; key: string; ancestors: readonly string[] };
+type Scalar = { position: number; ancestors: readonly string[] };
 /** Bounded internal experiment; native values are the only committed store. */
 export function nativeOwnershipExperiment(root: object) {
   const runtime = getTreeScalarSlotRuntime(root);
   if (!runtime) throw new Error('Missing native scalar runtime');
-  const ledgers = new Map<string,Ledger>();
-  const installs = new Map<string,(value:unknown)=>void>();
-  const attached: object[]=[];
-  let order=0, owner=0, active: number | undefined, settling=false;
-  let fault: {error:unknown,after:number}|undefined;
-  const owners=new Map<number,Set<string>>();
-  const hook=(target:object,prefix:string,install:(key:number|string,value:unknown)=>void) => {
+  const ledgers = new Map<string, Ledger>();
+  const members = new Map<string, Address>();
+  const scalars = new Map<number, Scalar>();
+  const attached: object[] = [];
+  const branches = new WeakSet<object>();
+  let order = 0,
+    owner = 0,
+    branch = 0,
+    revision = 0;
+  let active: number | undefined;
+  let installing = false;
+  let fault: { error: unknown; after: number } | undefined;
+  const owners = new Map<number, Set<string>>();
+
+  const hook = (
+    target: object,
+    prefix: string,
+    parentAncestors: readonly string[] = [],
+    branchNode?: object
+  ) => {
     attached.push(target);
-    attachPreparation(target,(changes:readonly Installation[])=>{
-      if(settling)return;
-      if(fault && --fault.after<=0){const {error}=fault;fault=undefined;throw error;}
-      const plans=changes.map(change=>{
-        const key=prefix+change.key, old=ledgers.get(key);
-        const next:Ledger=old?{base:old.base,contributions:new Map(old.contributions)}:{base:{value:change.before,order:0},contributions:new Map()};
-        const fact={value:change.after,order:++order};
-        if(active!==undefined)next.contributions.set(active,fact);else next.base=fact;
-        return {key,next,write:(value:unknown)=>install(change.key,value)};
+    attachPreparation(target, (changes: readonly Installation[]) => {
+      if (installing) return;
+      if (fault && --fault.after <= 0) {
+        const { error } = fault;
+        fault = undefined;
+        throw error;
+      }
+      const preparedRevision = revision;
+      const author = active;
+      const authoredOrder = ++order;
+      const inputs = new Map<string, { before: unknown; after: unknown }>();
+      for (const change of changes) {
+        const key = prefix + change.key;
+        inputs.set(key, change);
+        const ancestors = branchNode
+          ? parentAncestors
+          : scalars.get(Number(change.key))?.ancestors ?? [];
+        // A newer surviving descendant write requires its enclosing membership.
+        // Only pending presence obligations need a contribution; no canonical mirror.
+        for (const ancestor of ancestors)
+          if (ledgers.has(ancestor) && !inputs.has(ancestor))
+            inputs.set(ancestor, { before: true, after: true });
+      }
+      const plans = [...inputs].map(([key, change]) => {
+        const old = ledgers.get(key);
+        const next: Ledger = old
+          ? { base: old.base, contributions: new Map(old.contributions) }
+          : {
+              base: { value: change.before, order: 0 },
+              contributions: new Map(),
+            };
+        const fact = { value: change.after, order: authoredOrder };
+        if (author !== undefined) next.contributions.set(author, fact);
+        else next.base = fact;
+        return { key, next };
       });
-      return ()=>{for(const p of plans){if(p.next.contributions.size){ledgers.set(p.key,p.next);installs.set(p.key,p.write);if(active!==undefined)owners.get(active)!.add(p.key);}else{ledgers.delete(p.key);installs.delete(p.key);}}};
+      return {
+        validate() {
+          if (revision !== preparedRevision || active !== author)
+            throw new Error('Native ownership preparation became stale');
+        },
+        install() {
+          if (installing) return;
+          for (const p of plans) {
+            if (p.next.contributions.size) {
+              ledgers.set(p.key, p.next);
+              if (author !== undefined) owners.get(author)!.add(p.key);
+            } else ledgers.delete(p.key);
+          }
+          revision++;
+          // Construction may have introduced new descendants. Bind their known
+          // physical addresses before the construction operation publishes.
+          if (branchNode)
+            for (const change of changes) {
+              members.set(prefix + change.key, {
+                branch: branchNode,
+                key: String(change.key),
+                ancestors: parentAncestors,
+              });
+              const child = Object.getOwnPropertyDescriptor(
+                branchNode,
+                String(change.key)
+              )?.value;
+              if (isNodeAccessor(child) || isWritableLocation(child))
+                registerPlainBranchMemberAddress(
+                  branchNode,
+                  String(change.key),
+                  child
+                );
+              register(child, [...parentAncestors, prefix + change.key]);
+            }
+        },
+      };
     });
   };
-  hook(runtime,'s:',(key,value)=>{const frame=runtime.beginFrame();frame.set(Number(key),value);frame.commit();});
-  let branch=0;
-  const walk=(node:object)=>{
-    const id=++branch;
-    const install=(key:number|string,value:unknown)=>{setMemberPresence(node,String(key),value?'active':'dormant');republishMembers(node,[String(key)]);};
-    hook(node,`p${id}:`,install);
-    const store=(node as Record<symbol,unknown>)[NODE_STORE_SYMBOL];
-    if(store && typeof store==='object')hook(store,`p${id}:`,install);
-    for(const key of Object.keys(node)){
-      const member=(node as Record<string,unknown>)[key];
-      if(typeof member==='function' && (member as unknown as Record<symbol,unknown>)[NODE_STORE_SYMBOL])walk(member);
+  const register = (node: unknown, ancestors: readonly string[]) => {
+    if (isWritableLocation(node)) {
+      const position = getOwnedPositionIds(node)?.[0];
+      const slot =
+        position === undefined
+          ? undefined
+          : runtime.resolveScalarSlot(position);
+      if (position !== undefined && slot !== undefined)
+        scalars.set(slot, { position, ancestors });
+      return;
+    }
+    if (!isNodeAccessor(node) || branches.has(node)) return;
+    branches.add(node);
+    const prefix = `p${++branch}:`;
+    hook(node, prefix, ancestors, node);
+    const store = nodeStoreOf(node);
+    if (store) hook(store, prefix, ancestors, node);
+    for (const key of Object.getOwnPropertyNames(node)) {
+      const child = Object.getOwnPropertyDescriptor(node, key)?.value;
+      if (!isNodeAccessor(child) && !isWritableLocation(child)) continue;
+      registerPlainBranchMemberAddress(node, key, child);
+      members.set(prefix + key, { branch: node, key, ancestors });
+      register(child, [...ancestors, prefix + key]);
     }
   };
-  walk(root);
-  const settle=(id:number,accept:boolean)=>{
-    if(!owners.has(id))return;
-    if(fault){const {error}=fault;fault=undefined;throw error;}
-    const plans=[];
-    for(const key of owners.get(id)!){
-      const old=ledgers.get(key)!;
-      const contribution=old.contributions.get(id);if(!contribution)continue;
-      const next={base:accept && contribution.order>old.base.order?contribution:old.base,contributions:new Map(old.contributions)};
-      next.contributions.delete(id);
-      let visible=next.base;for(const c of next.contributions.values())if(c.order>visible.order)visible=c;
-      plans.push({key,next,value:visible.value,write:installs.get(key)!});
+  hook(runtime, 's:');
+  register(root, []);
+  const settle = (id: number, accept: boolean) => {
+    const owned = owners.get(id);
+    if (!owned) return;
+    if (fault) {
+      const { error } = fault;
+      fault = undefined;
+      throw error;
     }
-    runtime.runInvalidationGroup(()=>{
-      settling=true;
-      try {for(const p of plans)p.write(p.value);}finally{settling=false;}
-      for(const p of plans){if(p.next.contributions.size)ledgers.set(p.key,p.next);else{ledgers.delete(p.key);installs.delete(p.key);}}
+    const baseRevision = revision;
+    const plans: { key: string; next: Ledger }[] = [];
+    const presence = new Map<
+      number,
+      { present: boolean; value: unknown; turn: number; presenceOnly: true }
+    >();
+    const values: { owner: number; after: unknown; turn: number }[] = [];
+    for (const key of owned) {
+      const old = ledgers.get(key)!;
+      const contribution = old.contributions.get(id);
+      if (!contribution) continue;
+      const next = {
+        base:
+          accept && contribution.order > old.base.order
+            ? contribution
+            : old.base,
+        contributions: new Map(old.contributions),
+      };
+      next.contributions.delete(id);
+      let visible = next.base;
+      for (const c of next.contributions.values())
+        if (c.order > visible.order) visible = c;
+      plans.push({ key, next });
+      if (key.startsWith('s:')) {
+        const address = scalars.get(Number(key.slice(2)));
+        if (!address)
+          throw new Error('Unknown native scalar ownership address');
+        values.push({
+          owner: address.position,
+          after: visible.value,
+          turn: visible.order,
+        });
+      } else {
+        const address = members.get(key)!;
+        const child = Object.getOwnPropertyDescriptor(
+          address.branch,
+          address.key
+        )?.value;
+        const position = getOwnedPositionIds(child)?.[0];
+        if (position === undefined)
+          throw new Error('Unknown native member ownership address');
+        let value: unknown;
+        if (visible.value) {
+          storedReads.depth++;
+          try {
+            value = unwrapBranchForWriteCapture(child);
+          } finally {
+            storedReads.depth--;
+          }
+        }
+        presence.set(position, {
+          present: Boolean(visible.value),
+          value,
+          turn: visible.order,
+          presenceOnly: true,
+        });
+      }
+    }
+    // Reuse the production mixed-target preparation and realized publication.
+    // Preparation may compare user values, so no native state or owner is retired yet.
+    const prepared = preparePlainBranchMembers(root, presence, values);
+    if (revision !== baseRevision)
+      throw new Error('Settlement preparation reentered native ownership');
+    runtime.runInvalidationGroup(() => {
+      installing = true;
+      try {
+        prepared.install();
+      } finally {
+        installing = false;
+      }
+      // Shared target preparation deliberately leaves the physical clock to
+      // its coordinator. Invalidate pre-settlement frames before any delivery.
+      if (plans.length) getPhysicalCommitClock(root)?.advance();
+      for (const p of plans) {
+        if (p.next.contributions.size) ledgers.set(p.key, p.next);
+        else ledgers.delete(p.key);
+      }
       owners.delete(id);
-      if(plans.length)markOwnerInvalidatedFrom(root);
+      revision++;
+      // All admitted native state and ownership terminality precede delivery.
+      // Do not suppress ownership capture while observers author newer writes.
+      withWriteContext(
+        {
+          ...getActiveWriteContext(),
+          origin: accept
+            ? getActiveWriteContext()?.origin
+            : 'transaction-rollback',
+          intent: 'system',
+          participation: 'realized',
+        },
+        () => {
+          try {
+            publishingExposedOnly(root, () => prepared.publish());
+          } finally {
+            if (plans.length) markOwnerInvalidatedFrom(root);
+          }
+        }
+      );
     });
   };
   return {
-    begin(fn:()=>void){
-      const id=++owner;owners.set(id,new Set());const previous=active;active=id;
-      const handle={rollback:()=>settle(id,false),confirm:()=>settle(id,true),inspect:()=>({changes:[...(owners.get(id)??[])]})};
-      try{fn();}catch(callbackError){
-        active=previous;
-        try{settle(id,false);}catch(cause){const error=new SignalTreeRollbackError(undefined,{cause});Object.defineProperty(error,'recovery',{value:{transaction:handle,callbackFailed:true,callbackError}});throw error;}
+    begin(fn: () => void) {
+      const id = ++owner;
+      owners.set(id, new Set());
+      const previous = active;
+      active = id;
+      const handle = {
+        rollback: () => settle(id, false),
+        confirm: () => settle(id, true),
+        inspect: () => ({ changes: [...(owners.get(id) ?? [])] }),
+      };
+      try {
+        fn();
+      } catch (callbackError) {
+        active = previous;
+        try {
+          settle(id, false);
+        } catch (cause) {
+          if (!owners.has(id)) {
+            try {
+              console.error(
+                'SignalTree: experimental rollback delivery after failed callback.',
+                cause
+              );
+            } catch {
+              /* reporting cannot replace the callback failure */
+            }
+            throw callbackError;
+          }
+          const error = new SignalTreeRollbackError(undefined, { cause });
+          Object.defineProperty(error, 'recovery', {
+            value: { transaction: handle, callbackFailed: true, callbackError },
+          });
+          throw error;
+        }
         throw callbackError;
-      }finally{active=previous;}
+      } finally {
+        active = previous;
+      }
       return handle;
     },
-    fail(error:unknown,after=1){fault={error,after};},
-    stats(){return {pending:owners.size,ledgers:ledgers.size};},
-    destroy(){for(const target of attached)detachPreparation(target);owners.clear();ledgers.clear();installs.clear();},
+    fail(error: unknown, after = 1) {
+      fault = { error, after };
+    },
+    stats() {
+      return { pending: owners.size, ledgers: ledgers.size };
+    },
+    destroy() {
+      for (const target of attached) detachPreparation(target);
+      owners.clear();
+      ledgers.clear();
+      members.clear();
+      scalars.clear();
+    },
   };
 }

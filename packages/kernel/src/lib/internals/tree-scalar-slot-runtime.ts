@@ -138,7 +138,6 @@ class ScalarSlotMutationFrameImpl implements ScalarSlotMutationFrame {
 export function createTreeScalarSlotRuntime(
   physicalCommitClock?: PhysicalCommitClock
 ): TreeScalarSlotRuntime {
-  let runtime: TreeScalarSlotRuntime;
   const values: unknown[] = [];
   const equalities: SlotEqualityFn[] = [];
   const slotByPositionId = new Map<PositionId, SlotIndex>();
@@ -194,6 +193,7 @@ export function createTreeScalarSlotRuntime(
     return () => {
       if (used) throw new Error('Prepared scalar commit already used');
       if (getCommittedRevision() !== base) throw new Error('Stale prepared scalar commit');
+      responsibility?.validate();
       used = true;
       for (const {slotIndex,nextValue} of changed) {
         values[slotIndex] = nextValue;
@@ -201,7 +201,7 @@ export function createTreeScalarSlotRuntime(
           recordProductionSubstrateStat('slotWrites');
         }
       }
-      responsibility?.();
+      responsibility?.install();
       const revision = changed.length && options?.advanceRevision !== false ? advanceRevision() : getCommittedRevision();
       if (changed.length && options?.advanceRevision !== false && PRODUCTION_SUBSTRATE_STATS_ENABLED) {
         recordProductionSubstrateStat('revisionIncrements');
@@ -224,10 +224,11 @@ export function createTreeScalarSlotRuntime(
     }
 
     const responsibility = prepareInstallation(runtime, changed.map(c => ({key:c.slotIndex,before:values[c.slotIndex],after:c.nextValue})));
+    responsibility?.validate();
     for (const { slotIndex, nextValue } of changed) {
       values[slotIndex] = nextValue;
     }
-    responsibility?.();
+    responsibility?.install();
     if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
       recordProductionSubstrateStat('slotWrites', changed.length);
     }
@@ -269,8 +270,9 @@ export function createTreeScalarSlotRuntime(
     if (equalities[slotIndex](values[slotIndex], nextValue)) return false;
 
     const responsibility = prepareInstallation(runtime, [{key:slotIndex,before:values[slotIndex],after:nextValue}]);
+    responsibility?.validate();
     values[slotIndex] = nextValue;
-    responsibility?.();
+    responsibility?.install();
     if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
       recordProductionSubstrateStat('slotWrites');
     }
@@ -294,7 +296,7 @@ export function createTreeScalarSlotRuntime(
       : { revision: getCommittedRevision(), changed: false };
   };
 
-  runtime = {
+  const runtime: TreeScalarSlotRuntime = {
     createSlot<T>(
       initialValue: T,
       equal: (current: T, next: T) => boolean,
@@ -331,6 +333,7 @@ export function createTreeScalarSlotRuntime(
       if(getCommittedRevision()!==base)throw new Error('Terminal preparation reentered physical installation');
       // Prepared internal data only below. No returned closure, value reflection,
       // equality, observer, or record sink between value and evidence installation.
+      responsibility?.validate();
       values[slotIndex]=value;
       if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
         recordProductionSubstrateStat('slotWrites');
@@ -339,7 +342,7 @@ export function createTreeScalarSlotRuntime(
         for(let i=0;i<plan.writes.length;i++){const w=plan.writes[i];w.map.set(w.key,w.value);}
         for(let i=0;i<plan.adds.length;i++){const a=plan.adds[i];a.set.add(a.value);}
       }
-      responsibility?.();
+      responsibility?.install();
       advanceRevision();
       if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
         recordProductionSubstrateStat('revisionIncrements');

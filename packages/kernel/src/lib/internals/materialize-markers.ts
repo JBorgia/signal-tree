@@ -1,3 +1,4 @@
+import { prepareInstallation } from './native-ownership-experiment';
 import { getOwnedPositionIds } from './owned-metadata';
 import {
   childAddressOf,
@@ -760,7 +761,11 @@ export function materializeMember(
   ];
   if (!bind) return undefined;
 
+  // Creation and later presence transitions cross the same responsibility
+  // boundary. Preparation failure precedes construction and discoverability.
+  const responsibility = prepareInstallation(branch as object, [{key,before:false,after:true}]);
   const child = bind(key, value); // may throw — nothing observable yet
+  responsibility?.validate();
 
   // ⚠️ BOTH THE ACCESSOR AND ITS BACKING STORE. A node accessor COPIES its
   // store's properties, but its CALL path closes over the original store — so
@@ -784,6 +789,7 @@ export function materializeMember(
   linkAddedMember(branch as object, key, child);
 
   index?.set(key, child);
+  responsibility?.install();
   publishMembershipChange(branch as object);
   return child;
 }

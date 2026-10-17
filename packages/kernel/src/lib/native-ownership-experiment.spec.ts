@@ -15,7 +15,7 @@ describe('bounded native ownership B',()=>{
   try{const a=b.begin(()=>tree.$.x(2)),c=b.begin(()=>tree.$.x(3));a.rollback();expect(tree.$.x()).toBe(3);c.rollback();expect(tree.$.x()).toBe(1);const d=b.begin(()=>tree.$.x(4));tree.$.x(5);d.rollback();expect(tree.$.x()).toBe(5);}finally{b.destroy();tree.destroy();}
  });
  it('restores omitted membership and samevalue reactivation',()=>{
-  const tree=signalTree({box:{x:1,y:2}},{enhancers:[restoration()]});const b=nativeOwnershipExperiment(tree.$);
+  const tree=signalTree({box:{x:1,y:2} as {x:number;y?:number}},{enhancers:[restoration()]});const b=nativeOwnershipExperiment(tree.$);
   try{const p=b.begin(()=>tree.$.box({x:1}));expect(tree.$.box()).toEqual({x:1});p.rollback();expect(tree.$.box()).toEqual({x:1,y:2});tree.$.box({x:1});const q=b.begin(()=>tree.$.box({x:1,y:2}));q.rollback();expect(tree.$.box()).toEqual({x:1});}finally{b.destroy();tree.destroy();}
  });
  it('failed preparation leaves scalar unchanged and settlement retry works',()=>{
@@ -23,19 +23,19 @@ describe('bounded native ownership B',()=>{
   try{b.fail(error);expect(()=>tree.$.x(2)).toThrow();expect(tree.$.x()).toBe(1);const p=b.begin(()=>tree.$.x(3));b.fail(error);expect(()=>p.rollback()).toThrow();expect(tree.$.x()).toBe(3);expect(b.stats().pending).toBe(1);p.rollback();p.rollback();expect(tree.$.x()).toBe(1);}finally{b.destroy();tree.destroy();}
  });
  it('callback abort recovers every admitted installation after a later preparation failure',()=>{
-  const tree=signalTree({box:{x:1,y:2}},{enhancers:[restoration()]});const b=nativeOwnershipExperiment(tree.$);const error=new Error('second installation fault');
+  const tree=signalTree({box:{x:1,y:2} as {x:number;y?:number}},{enhancers:[restoration()]});const b=nativeOwnershipExperiment(tree.$);const error=new Error('second installation fault');
   try{b.fail(error,2);expect(()=>b.begin(()=>tree.$.box({x:3}))).toThrow(error);expect(tree.$.box()).toEqual({x:1,y:2});}finally{b.destroy();tree.destroy();}
  });
  it('new undefined member rollback restores absence',()=>{
-  const tree=signalTree({box:{x:1,y:undefined as number|undefined}},{enhancers:[restoration()]});const b=nativeOwnershipExperiment(tree.$);
-  try{tree.$.box({x:1});const p=b.begin(()=>tree.$.box({x:1,y:undefined}));expect(Object.keys(tree.$.box())).toContain('y');p.rollback();expect(Object.keys(tree.$.box())).not.toContain('y');}finally{b.destroy();tree.destroy();}
+  const tree=signalTree({box:{x:1,y:undefined} as {x:number;y?:number}},{enhancers:[restoration()]});const b=nativeOwnershipExperiment(tree.$);
+  try{expect(Object.prototype.hasOwnProperty.call(tree.$.box(),'y')).toBe(true);expect(tree.$.box.y!()).toBeUndefined();tree.$.box({x:1});expect(Object.prototype.hasOwnProperty.call(tree.$.box(),'y')).toBe(false);const p=b.begin(()=>tree.$.box({x:1,y:undefined}));expect(Object.keys(tree.$.box())).toContain('y');expect(Object.prototype.hasOwnProperty.call(tree.$.box(),'y')).toBe(true);expect(tree.$.box().y).toBeUndefined();expect(tree.$.box.y!()).toBeUndefined();p.rollback();expect(Object.keys(tree.$.box())).not.toContain('y');expect(Object.prototype.hasOwnProperty.call(tree.$.box(),'y')).toBe(false);expect(tree.$.box.y!()).toBeUndefined();}finally{b.destroy();tree.destroy();}
  });
  it('new initial-shape member remains unsupported without manufacturing ownership',()=>{
-  const tree=signalTree<{box:{x:number,z?:number}}>({box:{x:1}},{enhancers:[restoration()]});const b=nativeOwnershipExperiment(tree.$);
+  const tree=signalTree({box:{x:1}} as {box:{x:number;z?:number}},{enhancers:[restoration()]});const b=nativeOwnershipExperiment(tree.$);
   try{const p=b.begin(()=>tree.$.box({x:1,z:undefined}));expect(Object.keys(tree.$.box())).not.toContain('z');p.rollback();expect(Object.keys(tree.$.box())).not.toContain('z');}finally{b.destroy();tree.destroy();}
  });
  it('held leaf samevalue reactivation rolls back presence',()=>{
-  const tree=signalTree({box:{x:1,y:2}},{enhancers:[restoration()]});const b=nativeOwnershipExperiment(tree.$);const held=tree.$.box.y;
+  const tree=signalTree({box:{x:1,y:2} as {x:number;y?:number}},{enhancers:[restoration()]});const b=nativeOwnershipExperiment(tree.$);const held=tree.$.box.y!;
   try{tree.$.box({x:1});const p=b.begin(()=>held(2));expect(tree.$.box()).toEqual({x:1,y:2});p.rollback();expect(tree.$.box()).toEqual({x:1});}finally{b.destroy();tree.destroy();}
  });
  it('rollback publishes coherent state and preserves observer-authored writes',async()=>{

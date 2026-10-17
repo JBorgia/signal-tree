@@ -92,3 +92,13 @@ Nx and independent replay report 11 pass/2 fail. Dynamic creation remains live
 after rollback, and path subscribers miss the restored scalar. A and original
 failures remain separately preserved. No public API, runtime integration, release
 or budget acceptance. Broader verification was not run after focused failures.
+
+### B native boundary revision R1
+
+The [separate R1 record](docs/research/b-native-integration/r1/README.md) preserves
+the rejected checkpoint and corrects shared dynamic-membership admission and
+mixed settlement publication. Independent focused replay passes original13 and
+expanded18 including stale-frame protection; model recovery41/adversarial14/destruction controls remain green.
+A primitive dynamic replacement baseline counterexample remains explicitly red.
+See the R1 results for broader verification and limits; this is not public
+transaction integration or production acceptance.

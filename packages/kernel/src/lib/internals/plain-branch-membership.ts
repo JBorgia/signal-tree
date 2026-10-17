@@ -260,6 +260,16 @@ const MEMBER_ADDRESSES = new WeakMap<
   Map<number, MemberAddress>
 >();
 
+/** Register retained physical identity independently of diagnostic history capture. */
+export function registerPlainBranchMemberAddress(branch: object, key: string, node: object): void {
+  const registry = getPositionRegistry(branch);
+  const position = getOwnedPositionIds(node)?.[0];
+  if (!registry || position === undefined || !isRecordedMember(node)) return;
+  let addresses = MEMBER_ADDRESSES.get(registry);
+  if (!addresses) MEMBER_ADDRESSES.set(registry, addresses = new Map());
+  addresses.set(position, {branch,key,node});
+}
+
 export interface PlainBranchMembershipEffect {
   readonly kind: 'set';
   readonly position: number;
@@ -299,7 +309,7 @@ export function plainBranchMembershipEffects(
     )?.value;
     const path = getOwnedOwnerPath(node);
     if (path === undefined || !isRecordedMember(node)) return [];
-    addresses.set(position, { branch: change.branch, key: member.key, node });
+    registerPlainBranchMemberAddress(change.branch, member.key, node);
     return [
       {
         kind: 'set' as const,
@@ -861,6 +871,8 @@ export function preparePlainBranchMembers(
       readonly present: boolean;
       readonly value: unknown;
       readonly turn?: number;
+      /** Presence ownership does not author or restore descendant values. */
+      readonly presenceOnly?: boolean;
     }
   >,
   scalarTargets?: readonly { owner: number; after: unknown; turn?: number }[]
@@ -908,7 +920,8 @@ export function preparePlainBranchMembers(
     address: MemberAddress,
     present: boolean,
     value: unknown,
-    turn: number | undefined
+    turn: number | undefined,
+    presenceOnly = false
   ): void => {
     const { branch, key, node } = address;
     const descriptor = Object.getOwnPropertyDescriptor(branch, key);
@@ -928,7 +941,7 @@ export function preparePlainBranchMembers(
           ? { present: true, value: unwrapBranchForWriteCapture(node) }
           : { present: false }),
     });
-    if (!present) return;
+    if (!present || presenceOnly) return;
     // Presence only: the rows are the collection's own retained state, and
     // its own effects restore them. A reversal refuses a changed one before
     // it prepares anything (`changedOmittedCollection`).
@@ -986,7 +999,7 @@ export function preparePlainBranchMembers(
     const address = memberAddress(root, position);
     if (!address)
       throw new Error('Plain branch member location is unavailable');
-    stage(address, target.present, target.value, target.turn);
+    stage(address, target.present, target.value, target.turn, target.presenceOnly);
   }
   const staged = new Map<number, number>();
   for (const { position, turn } of values.values())

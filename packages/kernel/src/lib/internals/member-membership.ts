@@ -790,10 +790,11 @@ export function setMemberPresence(
 ): boolean {
   const before = Object.getOwnPropertyDescriptor(branch,key)?.enumerable === true;
   const responsibility = before === (presence === 'active') ? undefined : prepareInstallation(branch,[{key,before,after:presence === 'active'}]);
+  responsibility?.validate();
   const apply = presence === 'active' ? activateOne : deactivateOne;
   let changed = apply(branch, key);
   const peer = peerOf(branch);
   if (peer) changed = apply(peer, key) || changed;
-  responsibility?.();
+  responsibility?.install();
   return changed;
 }
