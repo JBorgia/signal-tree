@@ -525,22 +525,13 @@ export function nativeEntityOwnership(
       }
       for (const [collection, changes] of groups) {
         const bySubject = new Map(changes.map((c) => [c.subject, c]));
-        // Resolve the historical successor through this settlement's removals.
-        // The links come from actual native placement or retained removal facts;
-        // no arbitrary neighbor or full-collection reconstruction is substituted.
         const owner = groupOwners.get(collection);
-        const successor = (
-          subject: number | undefined,
-          seen = new Set<number>()
-        ): number | undefined => {
-          if (subject === undefined) return undefined;
-          if (seen.has(subject))
-            throw new Error('Cyclic removed entity placement');
-          seen.add(subject);
-          const change = bySubject.get(subject);
-          if (change?.after) return subject;
-          const current = collection.__readOwnershipSubject(subject);
-          if (!change && current) return subject;
+        // Only a removal in this target proves a chain through an unavailable
+        // anchor. An independently absent lifetime is not a chain or a tail.
+        const removedPlacement = (
+          subject: number,
+          current: Placement | null
+        ) => {
           const ledger =
             owner === undefined
               ? undefined
@@ -549,17 +540,128 @@ export function nativeEntityOwnership(
             current ?? (ledger ? winner(ledger).placement : undefined);
           if (!placement)
             throw new Error('Removed entity anchor has no placement');
-          return successor(placement.afterSubject, seen);
+          return placement;
         };
+        type Successor =
+          | { available: true; subject: number | undefined }
+          | { available: false };
+        const successor = (
+          subject: number | undefined,
+          seen = new Set<number>()
+        ): Successor => {
+          if (subject === undefined)
+            return { available: true, subject: undefined };
+          if (seen.has(subject))
+            throw new Error('Cyclic removed entity placement');
+          seen.add(subject);
+          const change = bySubject.get(subject);
+          if (change?.after) return { available: true, subject };
+          const current = collection.__readOwnershipSubject(subject);
+          if (!change)
+            return current
+              ? { available: true, subject }
+              : { available: false };
+          return successor(
+            removedPlacement(subject, current).afterSubject,
+            seen
+          );
+        };
+        const predecessor = (
+          subject: number | undefined,
+          seen = new Set<number>()
+        ): number | undefined => {
+          if (subject === undefined) return undefined;
+          if (seen.has(subject))
+            throw new Error('Cyclic removed entity predecessor');
+          seen.add(subject);
+          const change = bySubject.get(subject);
+          if (change?.after) return subject;
+          const current = collection.__readOwnershipSubject(subject);
+          if (!change) return current ? subject : undefined;
+          return predecessor(
+            removedPlacement(subject, current).beforeSubject,
+            seen
+          );
+        };
+        const resolved = new Map<number, number | undefined>();
+        const resolving = new Set<number>();
+        const resolve = (change: EntityOwnershipDelta): number | undefined => {
+          if (resolved.has(change.subject)) return resolved.get(change.subject);
+          if (resolving.has(change.subject))
+            throw new Error('Cyclic entity predecessor placement');
+          resolving.add(change.subject);
+          let next: number | undefined;
+          const forward =
+            change.afterSubject === undefined
+              ? undefined
+              : successor(change.afterSubject);
+          if (forward?.available) next = forward.subject;
+          else if (change.orderChanged && change.afterSubject === undefined) {
+            // A complete prepared order proves its final subject is the tail;
+            // this is distinct from an inverse that merely observed a tail.
+            next = undefined;
+          } else if (change.beforeSubject !== undefined) {
+            const previous = predecessor(change.beforeSubject);
+            if (previous === undefined)
+              throw new Error('Original entity placement anchors unavailable');
+            if (previous === change.subject)
+              throw new Error('Self entity predecessor');
+            const target = bySubject.get(previous);
+            const current = collection.__readOwnershipSubject(previous);
+            if (target?.after && target.topology) {
+              next = resolve(target);
+              // A target predecessor may already name this row. Its current
+              // physical successor supplies the remaining proof when available.
+              if (next === change.subject) {
+                if (!current)
+                  throw new Error('Entity predecessor placement is unproved');
+                const physical = successor(current.afterSubject);
+                if (!physical.available)
+                  throw new Error(
+                    'Current entity predecessor successor unavailable'
+                  );
+                next = physical.subject;
+              }
+              resolved.set(previous, change.subject);
+            } else {
+              if (!current)
+                throw new Error('Current entity predecessor unavailable');
+              const physical = successor(current.afterSubject);
+              if (!physical.available)
+                throw new Error(
+                  'Current entity predecessor successor unavailable'
+                );
+              next = physical.subject;
+            }
+            if (next === change.subject) {
+              const currentSelf = collection.__readOwnershipSubject(
+                change.subject
+              );
+              if (!currentSelf) throw new Error('Self entity successor');
+              const following = successor(currentSelf.afterSubject);
+              if (!following.available)
+                throw new Error('Current entity successor unavailable');
+              next = following.subject;
+            }
+          } else if (change.afterSubject !== undefined) {
+            throw new Error('Original entity placement anchors unavailable');
+          }
+          // Both original anchors absent is the explicit neighborless case.
+          if (next === change.subject) throw new Error('Self entity successor');
+          resolving.delete(change.subject);
+          resolved.set(change.subject, next);
+          return next;
+        };
+        for (const change of changes)
+          if (change.topology && change.after) resolve(change);
         for (let i = 0; i < changes.length; i++) {
           const change = changes[i];
           if (change.topology && change.after) {
-            const resolved = {
+            changes[i] = {
               ...change,
-              afterSubject: successor(change.afterSubject),
+              afterSubject: resolved.get(change.subject),
             };
-            changes[i] = resolved;
-            bySubject.set(change.subject, resolved);
+            bySubject.set(change.subject, changes[i]);
           }
         }
         const rank = (
