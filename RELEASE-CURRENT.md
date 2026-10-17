@@ -82,3 +82,13 @@ The static scalar designation loss is separately explained by notifier metadata
 coalescing and contradicts existing HIST-C2 whole-turn eligibility. Keep it in
 notifier attribution controls; do not treat the plain/dynamic discrepancy as an
 accepted product distinction.
+
+## B native ownership slice (2026-10-16)
+
+[The B experiment](docs/research/b-native-integration/README.md) corrects the
+owner-approved recovery contract (41 semantic, 14 adversarial and one destruction
+control pass). The subsequent internal native integration is rejected: focused
+Nx and independent replay report 11 pass/2 fail. Dynamic creation remains live
+after rollback, and path subscribers miss the restored scalar. A and original
+failures remain separately preserved. No public API, runtime integration, release
+or budget acceptance. Broader verification was not run after focused failures.

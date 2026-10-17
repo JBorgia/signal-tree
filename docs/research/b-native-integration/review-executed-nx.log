@@ -1,0 +1,74 @@
+
+> nx run kernel:test --testFile=src/lib/native-ownership-experiment.spec.ts
+
+> node tools/run-core-vitest.mjs --testFile=src/lib/native-ownership-experiment.spec.ts
+
+(node:65818) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[43m[33m[[39m[49m[43m[30mWARN[39m[49m[43m[33m][39m[49m The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.overrides". See https://pnpm.io/settings for the new home of each setting.
+(node:65823) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /Users/jonathanborgia/.codex/worktrees/native-ownership-slice/signaltree/packages/kernel
+
+(node:65830) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/native-ownership-experiment.spec.ts > bounded native ownership B > dynamic materialization creation is removed by rollback
+[SignalTree] registerMarkerProcessor() was called AFTER at least one signalTree() had already been constructed (10 trees so far). Existing trees will NOT pick up this marker — only trees built after this point will use it. To process your custom marker in existing trees, register it at module load time (before any signalTree() call), or rebuild the tree after registration.
+SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+
+ ❯ src/lib/native-ownership-experiment.spec.ts (13 tests | 2 failed) 26ms
+     × dynamic materialization creation is removed by rollback 2ms
+     × settlement delivers the established path observation channel 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/native-ownership-experiment.spec.ts > bounded native ownership B > dynamic materialization creation is removed by rollback
+AssertionError: expected [ 'seed', 'created' ] to not include 'created'
+ ❯ src/lib/native-ownership-experiment.spec.ts:58:175
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/native-ownership-experiment.spec.ts > bounded native ownership B > settlement delivers the established path observation channel
+AssertionError: expected [ 3 ] to deeply equal [ 3, 1 ]
+
+- Expected
++ Received
+
+  [
+    3,
+-   1,
+  ]
+
+ ❯ src/lib/native-ownership-experiment.spec.ts:63:147
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 11 passed (13)
+   Start at  18:50:41
+   Duration  672ms (transform 353ms, setup 0ms, import 423ms, tests 26ms, environment 155ms)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=src/lib/native-ownership-experiment.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.1s

@@ -1,3 +1,4 @@
+import { bindPhysicalRuntime } from './native-ownership-experiment';
 import type { PositionId } from '../types';
 import { markTreeCell } from './cell-identity';
 import { registerIntrinsicMutationSource } from './intrinsic-mutation';
@@ -212,7 +213,7 @@ export function createNativeTreeScalarLeafRuntime(
   const leafByPositionId = new Map<PositionId, Location<unknown>>();
   const liveness: { absence?: MemberAbsence } = {};
 
-  return {
+  const facade: TreeScalarLeafRuntime = {
     enableAbsence(absence: MemberAbsence): void {
       liveness.absence = absence;
     },
@@ -265,4 +266,6 @@ export function createNativeTreeScalarLeafRuntime(
       return kernel.slotCount();
     },
   };
+  bindPhysicalRuntime(facade, kernel);
+  return facade;
 }

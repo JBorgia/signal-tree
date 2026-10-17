@@ -1,0 +1,9 @@
+{
+  "packages/kernel/src/lib/internals/native-ownership-experiment.ts": "382049bff3e90a1f9fd6a13b6ff4e9abc9fff12878225906d998b46900e0a817",
+  "packages/kernel/src/lib/internals/native-ownership-driver-experiment.ts": "6f98c507112070216d2d7ec5e5083ea4702a127f5e706126f88acd9533e5dfd0",
+  "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "2b57f51b409403ae9b6bf24afa9643e8fffe013e927f6912cafba7e7f4a5e3ec",
+  "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": "1e33ec0814d66e225107e443e05a96c26a6005421bf676b49ec3f5dc98d5519e",
+  "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": "2ca88215af337d74e59c8859bd85e1ba11d34b51e94a85068eae6be482af78a9",
+  "packages/kernel/src/lib/internals/member-membership.ts": "c8f4dee757c95233d9159b09c8948a88d1fd4f8baefd5ee442aff5cfcf14bf02",
+  "packages/kernel/src/lib/native-ownership-experiment.spec.ts": "d0a1b679ad312a7b495f2d964c55798e2e25bb17354575df8091c62883c859e1"
+}

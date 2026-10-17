@@ -1,3 +1,4 @@
+import { prepareInstallation } from './native-ownership-experiment';
 import {
   PRODUCTION_SUBSTRATE_STATS_ENABLED,
   recordProductionSubstrateStat,
@@ -787,9 +788,12 @@ export function setMemberPresence(
   key: string,
   presence: MemberPresence
 ): boolean {
+  const before = Object.getOwnPropertyDescriptor(branch,key)?.enumerable === true;
+  const responsibility = before === (presence === 'active') ? undefined : prepareInstallation(branch,[{key,before,after:presence === 'active'}]);
   const apply = presence === 'active' ? activateOne : deactivateOne;
   let changed = apply(branch, key);
   const peer = peerOf(branch);
   if (peer) changed = apply(peer, key) || changed;
+  responsibility?.();
   return changed;
 }

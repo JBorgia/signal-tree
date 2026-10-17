@@ -1,3 +1,4 @@
+import { bindPhysicalRuntime } from './native-ownership-experiment';
 import type { PositionId } from '../types';
 import type { PhysicalCommitClock } from './physical-commit-clock';
 import {
@@ -159,7 +160,7 @@ export function createTreeScalarLeafRuntime(
   const leafByPositionId = new Map<PositionId, Location<unknown>>();
   const liveness: { absence?: MemberAbsence } = {};
 
-  return {
+  const facade: TreeScalarLeafRuntime = {
     enableAbsence(absence: MemberAbsence): void {
       liveness.absence = absence;
     },
@@ -213,4 +214,6 @@ export function createTreeScalarLeafRuntime(
       return kernel.slotCount();
     },
   };
+  bindPhysicalRuntime(facade,kernel);
+  return facade;
 }
