@@ -1,4 +1,9 @@
 export interface TerminalRecordPlan {
+  /** Retire authority in the same physical unit that installs its replacement. */
+  readonly deletes?: readonly {
+    readonly map: Map<unknown, unknown>;
+    readonly key: unknown;
+  }[];
   /** Compose preallocated sets across plans prepared before any installation. */
   readonly keyedAdds?: readonly {
     readonly map: Map<unknown, Set<unknown>>;
@@ -18,6 +23,7 @@ export interface TerminalRecordPlan {
 }
 /** Paired physical installation: plain native Map/Set operations only. */
 export function installTerminalRecordPlan(plan: TerminalRecordPlan): void {
+  for (const deletion of plan.deletes ?? []) deletion.map.delete(deletion.key);
   for (const write of plan.writes) write.map.set(write.key, write.value);
   for (const add of plan.adds) add.set.add(add.value);
   for (const add of plan.keyedAdds ?? []) {

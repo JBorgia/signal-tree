@@ -278,6 +278,7 @@ export function nativeEntityOwnership(
         diff(b, a, []);
       }
     }
+    const deletes: NonNullable<TerminalRecordPlan['deletes']>[number][] = [];
     if (capture.ordering) {
       const admission = admitNativeOrder(
         orderAdmissions.get(capture.owner),
@@ -309,6 +310,13 @@ export function nativeEntityOwnership(
               new Set<number>()) as Set<unknown>,
             value: capture.owner,
           });
+      } else if (orderAdmissions.has(capture.owner)) {
+        // Not retaining the replacement must retire its predecessor atomically;
+        // leaving it installed lets later membership settlement resurrect it.
+        deletes.push({
+          map: orderAdmissions as Map<unknown, unknown>,
+          key: capture.owner,
+        });
       }
     }
     if (id !== undefined && claims) {
@@ -340,7 +348,7 @@ export function nativeEntityOwnership(
         adds.push({ set: candidates as Set<unknown>, value: change.subject });
     if (capture.changes.some((change) => change.after === undefined))
       schedule();
-    return { writes, adds, keyedAdds };
+    return { writes, adds, keyedAdds, deletes };
   };
   if (runtime) runtime.prepareEntityResponsibility = capture;
   return {

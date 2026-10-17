@@ -47,7 +47,12 @@ const normalize = (contributions: readonly Contribution[]) => {
       result[result.length - 1] = merge(previous, contribution);
     else result.push(contribution);
   }
-  return result;
+  // Only a committed exact order irreversibly supersedes preceding facts.
+  // Pending exact orders must leave those facts revealable on rejection.
+  let first = 0;
+  for (let i = 0; i < result.length; i++)
+    if (result[i].author === undefined && result[i].exact) first = i;
+  return result.slice(first);
 };
 export function admitNativeOrder(
   previous: NativeOrderAdmission | undefined,
