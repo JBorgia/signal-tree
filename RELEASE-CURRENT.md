@@ -116,3 +116,17 @@ verified after capture drain. Two preserved primitive baseline probes remain red
 Typecheck/spec-types/lint outcomes and limits are recorded separately. No default
 activation, API or production acceptance; full-suite and performance comparison
 remain unexecuted for this slice.
+
+### B finite qualification — rejected
+
+[Qualification](docs/research/b-native-integration/qualification/README.md) finds
+ordinary public key/id incoherence after successful rollback, inspection
+participation failures and hidden-collection delivery defects. Full B-selected
+kernel output has352 ordinary failures plus2 expected-failure assertions that
+now succeed; full framework qualification has9 failures after correcting harness
+environment mismatches. Default authority separately exposes two shared native
+regressions, alongside preserved baseline/Link counterexamples. Do not activate B.
+Matched successful-subset costs favor tested settlement but penalize churn and
+construction; package ceilings and the demo error ceiling fail. Full evidence,
+verdict classifications, limitations and exact replay commands are preserved.
+No further repair, API or architecture direction is selected by this rejection.

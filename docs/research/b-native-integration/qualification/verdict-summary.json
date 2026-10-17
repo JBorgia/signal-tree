@@ -1,0 +1,69 @@
+{
+  "baseline": {
+    "passed": 5751,
+    "failed": 8,
+    "skipped": 12,
+    "expected_failure_satisfied": 12
+  },
+  "baseline-tracked-only": {
+    "passed": 5745,
+    "skipped": 12,
+    "expected_failure_satisfied": 12
+  },
+  "default": {
+    "passed": 5866,
+    "failed": 6,
+    "skipped": 12,
+    "expected_failure_satisfied": 12
+  },
+  "default-tracked-only": {
+    "passed": 5747,
+    "failed": 2,
+    "skipped": 12,
+    "expected_failure_satisfied": 12
+  },
+  "b": {
+    "failed": 352,
+    "passed": 5520,
+    "expected_failure_satisfied": 10,
+    "skipped": 12,
+    "expected_failure_now_succeeds": 2
+  },
+  "b-tracked-only": {
+    "failed": 347,
+    "passed": 5402,
+    "expected_failure_satisfied": 10,
+    "skipped": 12,
+    "expected_failure_now_succeeds": 2
+  },
+  "B-angular": {
+    "passed": 239,
+    "failed": 3,
+    "skipped": 3
+  },
+  "B-react": {
+    "passed": 79
+  },
+  "B-vue": {
+    "passed": 174,
+    "failed": 3
+  },
+  "B-solid": {
+    "passed": 106,
+    "failed": 3
+  },
+  "changed-kernel": 348,
+  "classification-counts": {
+    "incumbent-runtime-coupled fixture; no corresponding B observation exercised": 53,
+    "inspection participation; reproduced state failures separate from refusal differences": 2,
+    "changed refusal verdict; useful capability vs unsafe success requires state-specific evidence": 37,
+    "assertion differs; exact expected/actual preserved, first cause not independently isolated": 233,
+    "missing observation capability; public/private contract needs case-level interpretation": 12,
+    "global B harness also selects comparator; incumbent-refusal expectation no longer compares incumbent": 1,
+    "large preparation failure; inspect raw stack": 2,
+    "expected-failure assertion now succeeds (gain; unchanged test remains red)": 2,
+    "hidden-collection publication mismatch (focused replay)": 6
+  },
+  "framework-failures": 9,
+  "baseline-tracked-default-changes": 2
+}

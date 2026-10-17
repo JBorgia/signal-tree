@@ -137,7 +137,8 @@ describe('B selected public transaction observers — react', () => {
       { x: 0, y: 0 },
       { enhancers: [selectNativeOwnershipTransactions(transactions())] }
     );
-    const controls = getNativeOwnershipPublicExperiment(tree)!;
+    const controls = getNativeOwnershipPublicExperiment(tree);
+    if (!controls) throw new Error('B authority was not installed');
     expect(controls.authority).toBe('native-pending');
     const seen: string[] = [];
     const read = () => `${tree.$.x()}|${tree.$.y()}`;
@@ -173,7 +174,9 @@ describe('B selected public transaction observers — react', () => {
         }
       });
       expect(failure).toBeInstanceOf(SignalTreeRollbackError);
-      const recovery = (failure as SignalTreeRollbackError).recovery!;
+      if (!(failure instanceof SignalTreeRollbackError) || !failure.recovery)
+        throw new Error('Expected accessible rollback recovery');
+      const recovery = failure.recovery;
       expect(recovery.callbackError).toBe(original);
       expect(recovery.callbackFailed).toBe(true);
       expect(recovery.transaction.inspect().changes.length).toBeGreaterThan(0);
@@ -202,7 +205,8 @@ describe('B selected public transaction observers — react', () => {
       { x: 0, y: 0 },
       { enhancers: [selectNativeOwnershipTransactions(transactions())] }
     );
-    const controls = getNativeOwnershipPublicExperiment(tree)!;
+    const controls = getNativeOwnershipPublicExperiment(tree);
+    if (!controls) throw new Error('B authority was not installed');
     expect(controls.authority).toBe('native-pending');
     const seen: string[] = [];
     let onObservation: ((value: string) => void) | undefined;

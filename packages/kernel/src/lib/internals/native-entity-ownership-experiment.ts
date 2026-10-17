@@ -339,7 +339,8 @@ export function nativeEntityOwnership(
         };
         l.pending.delete(id);
         next.set(key, l);
-        const a = addresses.get(key)!;
+        const a = addresses.get(key);
+        if (!a) throw new Error('Missing pending entity address');
         if (!a.ordering) touched.set(`${a.owner}:${a.subject}`, a);
       }
       const groups = new Map<Collection, EntityOwnershipDelta[]>();
@@ -398,7 +399,8 @@ export function nativeEntityOwnership(
         });
       }
       for (const [key, ledger] of next) {
-        const address = addresses.get(key)!;
+        const address = addresses.get(key);
+        if (!address) throw new Error('Missing pending entity address');
         if (!address.ordering) continue;
         const order = winner(ledger).value as readonly number[];
         const list = groups.get(address.collection) ?? [];
@@ -406,11 +408,10 @@ export function nativeEntityOwnership(
         const existing = new Map(
           list.map((change) => [change.subject, change])
         );
-        const survivors = order.filter((subject) =>
-          existing.has(subject)
-            ? existing.get(subject)!.after
-            : address.collection.__readOwnershipSubject(subject)
-        );
+        const survivors = order.filter((subject) => {
+          const change = existing.get(subject);
+          return change ? change.after : address.collection.__readOwnershipSubject(subject);
+        });
         // A surviving ordering obligation names every admitted lifetime. A later
         // membership author is reconciled during preparation, not silently dropped.
         for (let rank = 0; rank < survivors.length; rank++) {
