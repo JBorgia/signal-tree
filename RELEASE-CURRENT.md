@@ -120,7 +120,7 @@ remain unexecuted for this slice.
 ### B finite qualification — rejected
 
 [Qualification](docs/research/b-native-integration/qualification/README.md) finds
-ordinary public key/id incoherence after successful rollback, inspection
+ordinary public failure to restore a rejected rekey after successful rollback, inspection
 participation failures and hidden-collection delivery defects. Full B-selected
 kernel output has352 ordinary failures plus2 expected-failure assertions that
 now succeed; full framework qualification has9 failures after correcting harness

@@ -9,7 +9,7 @@ publication change is accepted.
 
 B's useful overlap and sparse pending-ownership results survive their bounded
 controls. This qualification rejects adoption of the current implementation:
-unchanged public tests expose state/identity, inspection-participation,
+unchanged public tests expose settlement/key-restoration, inspection-participation,
 publication and observation gaps. Full-suite failures are not all independent
 defects. No hundreds-of-tests repair cycle was attempted.
 
@@ -22,9 +22,12 @@ defects. No hundreds-of-tests repair cycle was attempted.
 5. B reports ids `['A2']`, but the row is `{id:'A',n:3}`.
 
 The incumbent restores key A with n3. B captured membership/key truth again
-while processing a nonstructural field update, so the key and separately owned
-id field settle to different authored facts. This is neither safe refusal nor
-an internal inspection fixture mismatch. A four-case minimal replay has two
+while processing a nonstructural field update, incorrectly making speculative A2
+committed membership. This replay does not separately own or restore the id field:
+changeId deliberately leaves payload id unchanged. Key/payload inequality is
+permitted; successful rollback failing to retract the rejected rekey is the defect.
+This is neither safe refusal nor an internal inspection fixture mismatch.
+See [the causal follow-up](CAUSAL-FOLLOW-UP.md) for this corrected interpretation. A four-case minimal replay has two
 incumbent passes and two B failures. The other case adds x,y then removes c
 from z,a,c; rollback refuses because c's recorded successor is itself removed
 by that settlement. Original source/log remain archived and the minimal source
