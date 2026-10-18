@@ -1,3 +1,4 @@
+import { installTerminalRecord } from './intrinsic-mutation';
 import type { TerminalRecordPlan } from './intrinsic-mutation';
 import type { PositionId } from '../mutation-types';
 import type { PhysicalCommitClock } from './physical-commit-clock';
@@ -327,8 +328,7 @@ export function createTreeScalarSlotRuntime(
         recordProductionSubstrateStat('slotWrites');
       }
       if(plan){
-        for(let i=0;i<plan.writes.length;i++){const w=plan.writes[i];w.map.set(w.key,w.value);}
-        for(let i=0;i<plan.adds.length;i++){const a=plan.adds[i];a.set.add(a.value);}
+        installTerminalRecord(plan);
       }
       advanceRevision();
       if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {

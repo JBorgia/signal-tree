@@ -1,3 +1,4 @@
+import { installTerminalRecord } from '../internals/intrinsic-mutation';
 import type { TerminalRecordPlan } from '../internals/intrinsic-mutation';
 import type { CommittedEntityMutation } from '../internals/mutation-capture-runtime';
 import { EntityValueStore } from './entity-value-store';
@@ -253,8 +254,7 @@ export class EntityMutationFrame<
     }
 
     if (responsibility) {
-      for(let i=0;i<responsibility.writes.length;i++){const w=responsibility.writes[i];w.map.set(w.key,w.value);}
-      for(let i=0;i<responsibility.adds.length;i++){const a=responsibility.adds[i];a.set.add(a.value);}
+      installTerminalRecord(responsibility);
     }
     if (before && observeCommitted) {
       observeCommitted(

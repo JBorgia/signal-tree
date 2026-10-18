@@ -2,6 +2,17 @@ export interface TerminalRecordPlan {
   readonly writes: readonly { readonly map: Map<unknown,unknown>; readonly key: unknown; readonly value: unknown }[];
   readonly adds: readonly { readonly set: Set<unknown>; readonly value: unknown }[];
 }
+/** Apply only precomputed internal writes; callers own installation ordering. */
+export function installTerminalRecord(plan: TerminalRecordPlan): void {
+  for (let i = 0; i < plan.writes.length; i++) {
+    const write = plan.writes[i];
+    write.map.set(write.key, write.value);
+  }
+  for (let i = 0; i < plan.adds.length; i++) {
+    const add = plan.adds[i];
+    add.set.add(add.value);
+  }
+}
 type TerminalPreparer = (mutation: IntrinsicMutation<unknown>) => TerminalRecordPlan | undefined;
 export interface IntrinsicMutation<T> {
   readonly intent: 'replace' | 'derive';

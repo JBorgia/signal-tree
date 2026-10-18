@@ -1,3 +1,4 @@
+import { installTerminalRecord } from './internals/intrinsic-mutation';
 import type {
   Location,
   ReadableCell,
@@ -1220,8 +1221,7 @@ export function createEntitySignal<
     if (physicalCommitClock?.revision() !== revision) throw new Error('Entity responsibility preparation reentered installation');
     valueStore.retainSubjectValue(subjectId, nextValue);
     if (plan) {
-      for (let i=0;i<plan.writes.length;i++) { const w=plan.writes[i]; w.map.set(w.key,w.value); }
-      for (let i=0;i<plan.adds.length;i++) { const a=plan.adds[i]; a.set.add(a.value); }
+      installTerminalRecord(plan);
     }
     capture?.([
       { subject: subjectId, before, after: nextValue, structural: false },

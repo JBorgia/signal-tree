@@ -1,3 +1,4 @@
+import { installTerminalRecord } from './intrinsic-mutation';
 import type { TerminalRecordPlan } from './intrinsic-mutation';
 import { getOwnedPositionIds } from './owned-metadata';
 import {
@@ -795,8 +796,7 @@ export function installPreparedMember(
   // Internal prepared data only: no observer, equality or user callback may
   // separate physical membership from its settlement responsibility.
   if (responsibility) {
-    for (const write of responsibility.writes) write.map.set(write.key, write.value);
-    for (const add of responsibility.adds) add.set.add(add.value);
+    installTerminalRecord(responsibility);
   }
   // Under a branch that has been omitted before, so an omission above it is
   // visible to the new member too (`isAbsentMember`).
