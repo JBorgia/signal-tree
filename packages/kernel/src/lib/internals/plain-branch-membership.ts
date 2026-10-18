@@ -19,7 +19,7 @@ import {
 import { publishMembershipChange } from './snapshot-authority';
 import { getTreeScalarSlotRuntime } from './tree-scalar-slot-port';
 import { withWriteContext } from '../write-context';
-import { isNodeAccessor, isTraversableNode } from './node-shape';
+import { isNodeAccessor, isTraversableNode, nodeStoreOf } from './node-shape';
 import { isWritableLocation } from './location-runtime';
 import type { ScalarSlotCommitResult } from './tree-scalar-slot-runtime';
 import type { CollectionTransitionTargetBinding } from './causal-runtime/target-transition';
@@ -94,20 +94,32 @@ export function capturePlainBranchMembership(
   const path = getOwnedOwnerPath(branch);
   if (!registry || path === undefined) return undefined;
 
+  // Callable implementation properties (name/length) are not state members.
+  const storage = nodeStoreOf(branch) ?? branch;
   const keys = new Set(
     partial
       ? [...Object.keys(branch), ...Object.keys(supplied)]
       : Object.keys(supplied)
   );
   const before = new Map<string, MemberValue>();
+  // New ordinary members have no descriptor yet. Their absence is authored
+  // responsibility just as much as omission of an existing member is.
+  for (const key of Object.keys(supplied)) {
+    if (
+      key !== '__proto__' &&
+      !Object.prototype.hasOwnProperty.call(storage, key)
+    ) {
+      before.set(key, { present: false });
+    }
+  }
   // Before-images are what storage held (`storedReads`).
   storedReads.depth++;
   try {
-    for (const key of Object.getOwnPropertyNames(branch)) {
+    for (const key of Object.getOwnPropertyNames(storage)) {
       if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
         recordProductionSubstrateStat('membershipKeysVisited');
       }
-      const descriptor = Object.getOwnPropertyDescriptor(branch, key);
+      const descriptor = Object.getOwnPropertyDescriptor(storage, key);
       if (!descriptor || !('value' in descriptor)) continue;
       const present = descriptor.enumerable === true;
       if (present === keys.has(key)) continue;
@@ -994,21 +1006,31 @@ export function preparePlainBranchMembers(
   // Member values and scalar endpoints share one final frame. Preparing two
   // frames independently can elide a scalar whose pre-member value is equal.
   for (const target of scalarTargets ?? []) {
-    if (target.turn !== undefined && (staged.get(target.owner) ?? target.turn) > target.turn) continue;
+    if (
+      target.turn !== undefined &&
+      (staged.get(target.owner) ?? target.turn) > target.turn
+    )
+      continue;
     const node = runtime.resolveScalarLeaf(target.owner);
     if (!node) throw new Error('Plain branch scalar target is unavailable');
     const { slot, position } = resolveSlot(node);
     const previous = values.get(slot);
-    values.set(slot, { node, position,
+    values.set(slot, {
+      node,
+      position,
       before: previous ? previous.before : unwrapBranchForWriteCapture(node),
-      after: target.after, turn: target.turn });
+      after: target.after,
+      turn: target.turn,
+    });
   }
   const frame = runtime.beginFrame();
   for (const [slot, value] of values) frame.set(slot, value.after);
-  const installFrame = scalarTargets === undefined
-    ? () => frame.commit({ advanceRevision: false, publish: false })
-    : frame.prepareCommit?.({ advanceRevision: false, publish: false });
-  if (!installFrame) throw new Error('Plain branch scalar frame cannot be prepared');
+  const installFrame =
+    scalarTargets === undefined
+      ? () => frame.commit({ advanceRevision: false, publish: false })
+      : frame.prepareCommit?.({ advanceRevision: false, publish: false });
+  if (!installFrame)
+    throw new Error('Plain branch scalar frame cannot be prepared');
   let result: ScalarSlotCommitResult | undefined;
   let invalidated = false;
   let published = false;
@@ -1017,54 +1039,78 @@ export function preparePlainBranchMembers(
   const changedBranchMembers: MemberAddress[] = [];
   let changes: PlainBranchMembershipChange[] = [];
   const captureChanges = (): void => {
-      const byBranch = new Map<object, PlainBranchMemberChange[]>();
-      for (const { address, present, before } of members.values()) {
-        if (before.present === present) continue;
-        let entries = byBranch.get(address.branch);
-        if (!entries) byBranch.set(address.branch, (entries = []));
-        entries.push({
-          key: address.key,
-          positionIds: getOwnedPositionIds(address.node),
-          before,
-          after: present
-            ? {
-                present: true,
-                value: unwrapBranchForWriteCapture(address.node),
-              }
-            : { present: false },
-        });
-      }
-      changes = [...byBranch].map(([branch, members]) => ({
-        kind: 'plain-branch-membership',
-        branch,
-        members,
-      }));
+    const byBranch = new Map<object, PlainBranchMemberChange[]>();
+    for (const { address, present, before } of members.values()) {
+      if (before.present === present) continue;
+      let entries = byBranch.get(address.branch);
+      if (!entries) byBranch.set(address.branch, (entries = []));
+      entries.push({
+        key: address.key,
+        positionIds: getOwnedPositionIds(address.node),
+        before,
+        after: present
+          ? {
+              present: true,
+              value: unwrapBranchForWriteCapture(address.node),
+            }
+          : { present: false },
+      });
+    }
+    changes = [...byBranch].map(([branch, members]) => ({
+      kind: 'plain-branch-membership',
+      branch,
+      members,
+    }));
   };
   const invalidate = (): void => {
     const installed = result;
-    if (!installed) throw new Error('Plain branch target invalidated before installation');
+    if (!installed)
+      throw new Error('Plain branch target invalidated before installation');
     if (invalidated) return;
     invalidated = true;
     let failed = false;
     let firstError: unknown;
     const run = (fn: () => void): void => {
       // Default callers retain their established stop-on-error behavior.
-      if (scalarTargets === undefined) { fn(); return; }
-      try { fn(); } catch (error) {
-        if (!failed) { failed = true; firstError = error; }
+      if (scalarTargets === undefined) {
+        fn();
+        return;
+      }
+      try {
+        fn();
+      } catch (error) {
+        if (!failed) {
+          failed = true;
+          firstError = error;
+        }
       }
     };
-    withWriteContext({ ...getActiveWriteContext(), intent: 'system', participation: 'realized' }, () => runtime.runInvalidationGroup(() => {
-      for (const branch of changedBranches) run(() => publishMembershipChange(branch));
-      for (const { branch, key, node } of changedBranchMembers) {
-        run(() => republishMembers(branch, [key]));
-        run(() => {
-          if (!Object.getOwnPropertyDescriptor(branch, key)?.enumerable) rememberHiddenRows(node);
-        });
-      }
-      run(() => runtime.publishPrepared({ revision: installed.revision, changedSlots: [...changedSlots] }));
-      if (failed) throw firstError;
-    }));
+    withWriteContext(
+      {
+        ...getActiveWriteContext(),
+        intent: 'system',
+        participation: 'realized',
+      },
+      () =>
+        runtime.runInvalidationGroup(() => {
+          for (const branch of changedBranches)
+            run(() => publishMembershipChange(branch));
+          for (const { branch, key, node } of changedBranchMembers) {
+            run(() => republishMembers(branch, [key]));
+            run(() => {
+              if (!Object.getOwnPropertyDescriptor(branch, key)?.enumerable)
+                rememberHiddenRows(node);
+            });
+          }
+          run(() =>
+            runtime.publishPrepared({
+              revision: installed.revision,
+              changedSlots: [...changedSlots],
+            })
+          );
+          if (failed) throw firstError;
+        })
+    );
   };
 
   return {

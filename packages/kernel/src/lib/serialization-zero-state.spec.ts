@@ -299,7 +299,9 @@ describe('S-5 — identification', () => {
     // case F3 exists to make safe.
     tree.$({ known: 2, gone: 'stale' } as never);
     expect(tree.$.known()).toBe(2);
-    expect((tree.$() as Record<string, unknown>)['gone']).toBeUndefined();
+    // Whole-value ingress now admits supplied keys (owner decision 2026-10-17).
+    // Schema migration must validate payloads before this authored write.
+    expect((tree.$() as Record<string, unknown>)['gone']).toBe('stale');
   });
 });
 

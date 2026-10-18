@@ -364,7 +364,8 @@ function scalarRelation(
 
 function buildPendingRollbackPlan(
   pendingTurn: TransactionTurnRecord | undefined,
-  laterEffects: LaterAppliedEffect[]
+  laterEffects: LaterAppliedEffect[],
+  encloses?: (outer: number, inner: number) => boolean
 ): PendingRollbackPlan {
   if (!pendingTurn) {
     return { compensation: [] };
@@ -398,6 +399,20 @@ function buildPendingRollbackPlan(
     for (const laterEntry of laterEffects) {
       const laterEffect = laterEntry.effect;
       if (laterEffect.position !== effect.position) {
+        // Restoring/removing an enclosing membership also affects descendants
+        // at different positions. Their surviving writes cannot be hidden by
+        // treating membership as an unrelated scalar location.
+        if (
+          effect.plainBranchMembership?.before === false &&
+          effect.plainBranchMembership.after === true &&
+          encloses?.(effect.position, laterEffect.position)
+        ) {
+          return {
+            kind: 'conflict',
+            conflictingTurnId: laterEntry.turnId,
+            conflictingEffect: laterEffect,
+          };
+        }
         continue;
       }
       if (
@@ -963,7 +978,11 @@ class TransactionAuthority {
             // (v16 integration 8b.)
             (candidate.kind === 'set' &&
               candidate.plainBranchMembership !== undefined &&
-              this.encloses?.(candidate.position, effect.position) === true)
+              this.encloses?.(candidate.position, effect.position) === true) ||
+            (effect.kind === 'set' &&
+              effect.plainBranchMembership?.before === false &&
+              effect.plainBranchMembership.after === true &&
+              this.encloses?.(effect.position, candidate.position) === true)
         );
         if (overlap)
           return {
@@ -1042,10 +1061,17 @@ class TransactionAuthority {
 
     // Queued evidence stays last: it is read before delivery and belongs to
     // THIS turn, so it is not part of the shared chronology.
-    return buildPendingRollbackPlan(this.pendingTurns.get(turnId), [
-      ...ordered,
-      ...[...(retained?.values() ?? [])].map((effect) => ({ turnId, effect })),
-    ]);
+    return buildPendingRollbackPlan(
+      this.pendingTurns.get(turnId),
+      [
+        ...ordered,
+        ...[...(retained?.values() ?? [])].map((effect) => ({
+          turnId,
+          effect,
+        })),
+      ],
+      this.encloses
+    );
   }
 
   setHistoryRetention(retain: number): void {
@@ -2012,40 +2038,97 @@ export function getOrCreateInternalTransactionRuntime<T>(
       }
     });
 
-
   // Research operation journal: prepared facts survive independently of diagnostics.
-  type OperationRecord = { sequence: number; owner: number; effects: readonly TurnEffect[]; previous?: OperationRecord; owners: Set<number> };
+  type OperationRecord = {
+    sequence: number;
+    owner: number;
+    effects: readonly TurnEffect[];
+    previous?: OperationRecord;
+    owners: Set<number>;
+  };
   const installedOperations = new Map<number, OperationRecord>();
   const expectedDispositions = new Map<number, readonly TurnEffect[]>();
-  tree.registerCleanup(()=>{ installedOperations.clear(); expectedDispositions.clear(); });
+  tree.registerCleanup(() => {
+    installedOperations.clear();
+    expectedDispositions.clear();
+  });
   const sourceCaptureRuntime = getMutationCaptureRuntime(tree);
   if (sourceCaptureRuntime) {
     sourceCaptureRuntime.prepareEntityResponsibility = (capture) => {
       const id = resolveTransactionId(capture.meta);
-      if (id === undefined || isRestoring || capture.meta?.origin === 'transaction-rollback' || capture.meta?.origin === 'restoration') return;
+      if (
+        id === undefined ||
+        isRestoring ||
+        capture.meta?.origin === 'transaction-rollback' ||
+        capture.meta?.origin === 'restoration'
+      )
+        return;
       const bucket = getTransactionBucket(id);
       const scratch = createCaptureBucket();
-      const effects: TurnEffect[]=[];
+      const effects: TurnEffect[] = [];
       for (const change of capture.changes) {
         const path = change.path;
-        if (path === undefined) throw new Error('Entity responsibility has no mutation path');
-        if(change.structuralRecord) effects.push({...change.structuralRecord,position:capture.owner,ownerPath:capture.ownerPath,path} as TurnEffect);
-        else if (!isPlainRecord(change.before) || !isPlainRecord(change.after)) {
+        if (path === undefined)
+          throw new Error('Entity responsibility has no mutation path');
+        if (change.structuralRecord)
+          effects.push({
+            ...change.structuralRecord,
+            position: capture.owner,
+            ownerPath: capture.ownerPath,
+            path,
+          } as TurnEffect);
+        else if (
+          !isPlainRecord(change.before) ||
+          !isPlainRecord(change.after)
+        ) {
           // Match rich capture's existing whole-row boundary. Arrays and opaque
           // values are not record fields; index enumeration loses their shape.
-          if (change.before !== change.after) effects.push({
-            kind: 'set', position: capture.owner, ownerPath: capture.ownerPath,
-            path, subject: change.subject,
-            before: change.before, after: change.after,
-            mutationIntent: capture.meta?.mutationIntent,
-          });
+          if (change.before !== change.after)
+            effects.push({
+              kind: 'set',
+              position: capture.owner,
+              ownerPath: capture.ownerPath,
+              path,
+              subject: change.subject,
+              before: change.before,
+              after: change.after,
+              mutationIntent: capture.meta?.mutationIntent,
+            });
         } else {
-          const before=change.before, after=change.after;
-          for(const key of new Set([...Object.keys(before),...Object.keys(after)])) {
-            const beforeValue=before[key],afterValue=after[key];
-            const beforePresent=Object.prototype.hasOwnProperty.call(before,key),afterPresent=Object.prototype.hasOwnProperty.call(after,key);
-            if(beforeValue===afterValue && beforePresent===afterPresent) continue;
-            effects.push({kind:'set',position:capture.owner,ownerPath:capture.ownerPath,path: `${path}.${key}`,subject:change.subject,subjectFieldSegments:[key],before:beforeValue,after:afterValue,mutationIntent:capture.meta?.mutationIntent,...(!(beforePresent&&afterPresent)?{fieldPresence:{before:beforePresent,after:afterPresent}}:{})});
+          const before = change.before,
+            after = change.after;
+          for (const key of new Set([
+            ...Object.keys(before),
+            ...Object.keys(after),
+          ])) {
+            const beforeValue = before[key],
+              afterValue = after[key];
+            const beforePresent = Object.prototype.hasOwnProperty.call(
+                before,
+                key
+              ),
+              afterPresent = Object.prototype.hasOwnProperty.call(after, key);
+            if (beforeValue === afterValue && beforePresent === afterPresent)
+              continue;
+            effects.push({
+              kind: 'set',
+              position: capture.owner,
+              ownerPath: capture.ownerPath,
+              path: `${path}.${key}`,
+              subject: change.subject,
+              subjectFieldSegments: [key],
+              before: beforeValue,
+              after: afterValue,
+              mutationIntent: capture.meta?.mutationIntent,
+              ...(!(beforePresent && afterPresent)
+                ? {
+                    fieldPresence: {
+                      before: beforePresent,
+                      after: afterPresent,
+                    },
+                  }
+                : {}),
+            });
           }
         }
       }
@@ -2055,22 +2138,55 @@ export function getOrCreateInternalTransactionRuntime<T>(
         if (prior) scratch.effects.set(key, cloneTurnEffect(prior));
       }
       for (const effect of effects) {
-        if (bucket.baselineValues.has(effect.position)) scratch.baselineValues.set(effect.position, bucket.baselineValues.get(effect.position));
+        if (bucket.baselineValues.has(effect.position))
+          scratch.baselineValues.set(
+            effect.position,
+            bucket.baselineValues.get(effect.position)
+          );
       }
-      for(const effect of effects)enqueueEffect(scratch,scratch.effects,cloneTurnEffect(effect));
-      const previous=installedOperations.get(id);
-      const operation:OperationRecord={sequence:(previous?.sequence ?? -1)+1,owner:capture.owner,effects,previous,owners:previous?.owners ?? new Set<number>()};
+      for (const effect of effects)
+        enqueueEffect(scratch, scratch.effects, cloneTurnEffect(effect));
+      const previous = installedOperations.get(id);
+      const operation: OperationRecord = {
+        sequence: (previous?.sequence ?? -1) + 1,
+        owner: capture.owner,
+        effects,
+        previous,
+        owners: previous?.owners ?? new Set<number>(),
+      };
       const writes: Array<TerminalRecordPlan['writes'][number]> = [
         { map: installedOperations, key: id, value: operation },
       ];
       // Replace the prepared map, including composed-away structural entries.
-      for(const key of touchedKeys) if(!scratch.effects.has(key)) writes.push({map:bucket.effects,key,value:undefined});
-      for(const [key,value] of scratch.effects) writes.push({map:bucket.effects,key,value});
-      for(const [key,value] of scratch.baselineValues) writes.push({map:bucket.baselineValues,key,value});
-      if(pendingTransactions.size>0) for(const key of windowKeys([capture.owner],capture.changes.map(c=>c.subject))) writes.push({map:bucket.ownWriteSeq,key,value:windowWriteSeq});
-      return {writes,adds:[{set:operation.owners,value:capture.owner},{set:bucket.positionIds,value:capture.owner},{set:bucket.ownerPaths,value:capture.ownerPath},...capture.changes.map(c=>({set:bucket.subjectIds,value:c.subject}))]};
+      for (const key of touchedKeys)
+        if (!scratch.effects.has(key))
+          writes.push({ map: bucket.effects, key, value: undefined });
+      for (const [key, value] of scratch.effects)
+        writes.push({ map: bucket.effects, key, value });
+      for (const [key, value] of scratch.baselineValues)
+        writes.push({ map: bucket.baselineValues, key, value });
+      if (pendingTransactions.size > 0)
+        for (const key of windowKeys(
+          [capture.owner],
+          capture.changes.map((c) => c.subject)
+        ))
+          writes.push({ map: bucket.ownWriteSeq, key, value: windowWriteSeq });
+      return {
+        writes,
+        adds: [
+          { set: operation.owners, value: capture.owner },
+          { set: bucket.positionIds, value: capture.owner },
+          { set: bucket.ownerPaths, value: capture.ownerPath },
+          ...capture.changes.map((c) => ({
+            set: bucket.subjectIds,
+            value: c.subject,
+          })),
+        ],
+      };
     };
-    tree.registerCleanup(()=>{ delete sourceCaptureRuntime.prepareEntityResponsibility; });
+    tree.registerCleanup(() => {
+      delete sourceCaptureRuntime.prepareEntityResponsibility;
+    });
   }
   const foldOperationDisposition = (id: number): readonly TurnEffect[] => {
     const newest = installedOperations.get(id);
@@ -2078,33 +2194,66 @@ export function getOrCreateInternalTransactionRuntime<T>(
     const records: OperationRecord[] = new Array(newest.sequence + 1);
     let record: OperationRecord | undefined = newest;
     for (let i = records.length - 1; i >= 0; i--) {
-      if (!record || record.sequence !== i) throw new Error('Operation journal sequence gap');
+      if (!record || record.sequence !== i)
+        throw new Error('Operation journal sequence gap');
       records[i] = record;
       record = record.previous;
     }
     if (record) throw new Error('Operation journal sequence gap');
     const expected = createCaptureBucket();
-    for (const operation of records) for (const effect of operation.effects) enqueueEffect(expected, expected.effects, cloneTurnEffect(effect));
-    return settleTurnMemberEffects(tree.$ as object, [...expected.effects.values()].map(cloneTurnEffect));
+    for (const operation of records)
+      for (const effect of operation.effects)
+        enqueueEffect(expected, expected.effects, cloneTurnEffect(effect));
+    return settleTurnMemberEffects(
+      tree.$ as object,
+      [...expected.effects.values()].map(cloneTurnEffect)
+    );
   };
-  const validateOperationDisposition = (id:number, turnId:number|undefined):void => {
+  const validateOperationDisposition = (
+    id: number,
+    turnId: number | undefined
+  ): void => {
     const folded = expectedDispositions.get(id);
     if (!folded?.length) return;
-    const retained=authority.getPendingTurn(turnId)?.__effects ?? [];
-    const indexed = new Map(retained.map(effect => [effectKey(effect), effect]));
-    for(const effect of folded) {
-      const actual=indexed.get(effectKey(effect));
-      const same = actual && actual.kind === effect.kind && [...new Set([...Object.keys(effect), ...Object.keys(actual)])].every(key => {
-        const expectedValue = (effect as unknown as Record<string, unknown>)[key];
-        const actualValue = (actual as unknown as Record<string, unknown>)[key];
-        const memberImage = (key === 'before' || key === 'after') && effect.kind === 'set' && effect.plainBranchMembership !== undefined;
-        return memberImage || key === 'subjectFieldSegments' || key === 'fieldPresence' || key === 'plainBranchMembership'
-          ? deepEqual(actualValue, expectedValue)
-          : Object.is(actualValue, expectedValue);
-      });
-      if(!same) {
-        const refusal=createRollbackError({kind:'effect-validation-failed',pendingTurnId:turnId ?? id,compensation:[],errorMessage:'Installed operation lacks a matching settlement disposition'});
-        publishRefusal(id,refusal);throw refusal;
+    const retained = authority.getPendingTurn(turnId)?.__effects ?? [];
+    const indexed = new Map(
+      retained.map((effect) => [effectKey(effect), effect])
+    );
+    for (const effect of folded) {
+      const actual = indexed.get(effectKey(effect));
+      const same =
+        actual &&
+        actual.kind === effect.kind &&
+        [...new Set([...Object.keys(effect), ...Object.keys(actual)])].every(
+          (key) => {
+            const expectedValue = (
+              effect as unknown as Record<string, unknown>
+            )[key];
+            const actualValue = (actual as unknown as Record<string, unknown>)[
+              key
+            ];
+            const memberImage =
+              (key === 'before' || key === 'after') &&
+              effect.kind === 'set' &&
+              effect.plainBranchMembership !== undefined;
+            return memberImage ||
+              key === 'subjectFieldSegments' ||
+              key === 'fieldPresence' ||
+              key === 'plainBranchMembership'
+              ? deepEqual(actualValue, expectedValue)
+              : Object.is(actualValue, expectedValue);
+          }
+        );
+      if (!same) {
+        const refusal = createRollbackError({
+          kind: 'effect-validation-failed',
+          pendingTurnId: turnId ?? id,
+          compensation: [],
+          errorMessage:
+            'Installed operation lacks a matching settlement disposition',
+        });
+        publishRefusal(id, refusal);
+        throw refusal;
       }
     }
   };
@@ -2188,8 +2337,13 @@ export function getOrCreateInternalTransactionRuntime<T>(
       meta,
       registry: getPositionRegistry(tree.$),
     });
-    const recorded=resolveTransactionId(meta);
-    if(recorded!==undefined && subjectIds?.length && installedOperations.get(recorded)?.owners.has(resolvedPositionIds[0]))return;
+    const recorded = resolveTransactionId(meta);
+    if (
+      recorded !== undefined &&
+      subjectIds?.length &&
+      installedOperations.get(recorded)?.owners.has(resolvedPositionIds[0])
+    )
+      return;
     captureEffects(
       bucket,
       bucket.effects,
@@ -2286,16 +2440,18 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // are independently journaled and have no remaining disposition. Legacy
     // footprint-only owners and entity lifetime claims keep their admission.
     const preparedOwners = installedOperations.get(transactionId)?.owners;
-    const slots = getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
+    const slots =
+      getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
     const netPositions = new Set([
-      ...effects.map(effect => effect.position),
-      ...dispositions.map(effect => effect.position),
-      ...collectionOrders.map(order => order.owner),
+      ...effects.map((effect) => effect.position),
+      ...dispositions.map((effect) => effect.position),
+      ...collectionOrders.map((order) => order.owner),
     ]);
-    const positionIds = capturedPositionIds.filter(position =>
-      !preparedOwners?.has(position) ||
-      slots?.resolveScalarSlot(position) === undefined ||
-      netPositions.has(position)
+    const positionIds = capturedPositionIds.filter(
+      (position) =>
+        !preparedOwners?.has(position) ||
+        slots?.resolveScalarSlot(position) === undefined ||
+        netPositions.has(position)
     );
     const pending = authority.createPending(
       reservedId,
@@ -2438,9 +2594,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     completion?: { selected: boolean; committed: boolean }
   ): void => {
     if (completion) completion.selected = true;
-    const reversalEffects = placeFieldReversalsWhileRowsExist(
-      effects
-    );
+    const reversalEffects = placeFieldReversalsWhileRowsExist(effects);
     const notifier = getPathNotifier();
     const treeOwnerId = getPositionRegistry(tree.$)?.id;
     const bindings = new Map<number, CollectionTransitionTargetBinding>();
@@ -2499,11 +2653,17 @@ export function getOrCreateInternalTransactionRuntime<T>(
                 frame.set(slot, value);
               }
               const install = frame.prepareCommit
-                ? frame.prepareCommit({advanceRevision:false,publish:false})
-                : () => frame.commit({advanceRevision:false,publish:false});
+                ? frame.prepareCommit({
+                    advanceRevision: false,
+                    publish: false,
+                  })
+                : () =>
+                    frame.commit({ advanceRevision: false, publish: false });
               let result: ReturnType<typeof frame.commit> | undefined;
               return {
-                install(): void { result = install(); },
+                install(): void {
+                  result = install();
+                },
                 publish(): void {
                   if (!result) {
                     throw new Error(
@@ -2512,19 +2672,45 @@ export function getOrCreateInternalTransactionRuntime<T>(
                   }
                   let failed = false;
                   let first: unknown;
-                  try { scalarSlotRuntime.publishPrepared(result); }
-                  catch (error) { failed = true; first = error; }
+                  try {
+                    scalarSlotRuntime.publishPrepared(result);
+                  } catch (error) {
+                    failed = true;
+                    first = error;
+                  }
                   // The prepared route publishes the same realized path facts as
                   // the existing realization port, after the complete unit installs.
                   for (const effect of reversalEffects) {
-                    if (effect.subjectId !== undefined || effect.plainBranchMembership || !scalars.has(effect.owner)) continue;
+                    if (
+                      effect.subjectId !== undefined ||
+                      effect.plainBranchMembership ||
+                      !scalars.has(effect.owner)
+                    )
+                      continue;
                     const descriptor = realizationDescriptors.get(effect.owner);
                     const path = effect.path ?? descriptor?.ownerPath;
                     if (!path) continue;
                     try {
-                      notifier.notify(path, effect.after, effect.before, effect.ownerPath ?? descriptor?.ownerPath ?? path,
-                        undefined, [effect.owner], {...getActiveWriteContext(), intent: 'system', participation: 'realized'}, treeOwnerId);
-                    } catch (error) { if (!failed) { failed = true; first = error; } }
+                      notifier.notify(
+                        path,
+                        effect.after,
+                        effect.before,
+                        effect.ownerPath ?? descriptor?.ownerPath ?? path,
+                        undefined,
+                        [effect.owner],
+                        {
+                          ...getActiveWriteContext(),
+                          intent: 'system',
+                          participation: 'realized',
+                        },
+                        treeOwnerId
+                      );
+                    } catch (error) {
+                      if (!failed) {
+                        failed = true;
+                        first = error;
+                      }
+                    }
                   }
                   if (failed) throw first;
                 },
@@ -2540,7 +2726,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
         prepareTarget: (members) =>
           preparePlainBranchMembers(tree.$ as object, members),
       },
-      { onCommitted() { if (completion) completion.committed = true; } }
+      {
+        onCommitted() {
+          if (completion) completion.committed = true;
+        },
+      }
     );
     const apply = () => prepared.install();
     const locations = getLocationRuntime(tree.$);
@@ -2705,7 +2895,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
                 }
               )
             ) {
-              rollbackPendingTarget(effects.map(toRollbackEffect), orderDeltas, completion);
+              rollbackPendingTarget(
+                effects.map(toRollbackEffect),
+                orderDeltas,
+                completion
+              );
               return { ok: true as const };
             }
             return rollbackPendingTurnAt({
@@ -2715,19 +2909,32 @@ export function getOrCreateInternalTransactionRuntime<T>(
               topology: positionRegistry,
               realizationContext,
               port: {
-                validateEffects: (normalized) => realizationPort.validateEffects?.(normalized),
+                validateEffects: (normalized) =>
+                  realizationPort.validateEffects?.(normalized),
                 applyAtomically(normalized): void {
                   // D2's additional mixed route keeps ordinary normalized
                   // admission; it changes physical installation only.
-                  if (normalized.some(e => e.subjectId === undefined) && normalized.some(e => e.subjectId !== undefined)) {
-                    const point = preparePointRealization(realizationTree, normalized);
+                  if (
+                    normalized.some((e) => e.subjectId === undefined) &&
+                    normalized.some((e) => e.subjectId !== undefined)
+                  ) {
+                    const point = preparePointRealization(
+                      realizationTree,
+                      normalized
+                    );
                     if (point) {
                       if (completion) completion.selected = true;
                       point.install();
                       if (completion) completion.committed = true;
                       point.publish();
-                    } else if (normalized.some(effect => effect.plainBranchMembership)) {
-                      rollbackPendingTarget(normalized, orderDeltas, completion);
+                    } else if (
+                      normalized.some((effect) => effect.plainBranchMembership)
+                    ) {
+                      rollbackPendingTarget(
+                        normalized,
+                        orderDeltas,
+                        completion
+                      );
                     } else {
                       realizationPort.applyAtomically(normalized);
                     }
@@ -3050,57 +3257,146 @@ export function getOrCreateInternalTransactionRuntime<T>(
             treeOwnerId
           );
         },
-        { terminalRecord: (path,next,prev,meta,ownerPath,subjectIds,positionIds) => {
-          if(isRestoring || meta?.origin==='restoration' || isInspectionWrite(meta) || getWriteParticipation(meta)==='realized')return;
-          if(meta?.transactionOwner!==transactionOwnerToken)return;
-          const id=resolveTransactionId(meta), position=positionIds?.[0];
-          if(id===undefined || position===undefined || subjectIds?.length || Object.is(prev,next))return;
-          const slots=getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
-          if(slots?.resolveScalarSlot(position)===undefined)return;
-          const bucket=getTransactionBucket(id);
-          const effect: TurnEffect={kind:'set',path,ownerPath:ownerPath ?? path,position,before:prev,after:next,mutationIntent:meta?.mutationIntent};
-          const key=effectKey(effect), old=bucket.effects.get(key);
-          if(old && old.kind!=='set')throw new Error('Terminal record conflicts with structural evidence');
-          const combined=old ? {...old,after:next,mutationIntent:combineScalarMutationIntent(old.mutationIntent,effect.mutationIntent)} : effect;
-          const previous=installedOperations.get(id);
-          const operation:OperationRecord={sequence:(previous?.sequence ?? -1)+1,owner:position,effects:[cloneTurnEffect(effect)],previous,owners:previous?.owners ?? new Set<number>()};
-          const writes: Array<TerminalRecordPlan['writes'][number]> = [
-            { map: bucket.effects, key, value: combined },
-            { map: installedOperations, key: id, value: operation },
-          ];
-          if(!bucket.baselineValues.has(position))writes.push({map:bucket.baselineValues,key:position,value:prev});
-          if(pendingTransactions.size>0)for(const key of windowKeys([position],undefined))writes.push({map:bucket.ownWriteSeq,key,value:windowWriteSeq});
-          return {writes,adds:[{set:operation.owners,value:position},{set:bucket.positionIds,value:position},{set:bucket.ownerPaths,value:ownerPath ?? path}]};
-        }, beforePublication: (path, next, prev, meta, ownerPath, subjectIds, positionIds) => {
-          const effectiveMeta = meta ?? getActiveWriteContext();
-          if (isRestoring || effectiveMeta?.origin === 'restoration' || isInspectionWrite(effectiveMeta) || getWriteParticipation(effectiveMeta) === 'realized') return;
-          if (typeof effectiveMeta?.transactionId === 'number' && effectiveMeta.transactionOwner !== transactionOwnerToken) return;
-          const transactionId = resolveTransactionId(effectiveMeta);
-          if (transactionId !== undefined) {
-            captureIntoBucket(
-              getTransactionBucket(transactionId),
+        {
+          terminalRecord: (
+            path,
+            next,
+            prev,
+            meta,
+            ownerPath,
+            subjectIds,
+            positionIds
+          ) => {
+            if (
+              isRestoring ||
+              meta?.origin === 'restoration' ||
+              isInspectionWrite(meta) ||
+              getWriteParticipation(meta) === 'realized'
+            )
+              return;
+            if (meta?.transactionOwner !== transactionOwnerToken) return;
+            const id = resolveTransactionId(meta),
+              position = positionIds?.[0];
+            if (
+              id === undefined ||
+              position === undefined ||
+              subjectIds?.length ||
+              Object.is(prev, next)
+            )
+              return;
+            const slots =
+              getTreeScalarSlotRuntime(tree) ??
+              getTreeScalarSlotRuntime(tree.$);
+            if (slots?.resolveScalarSlot(position) === undefined) return;
+            const bucket = getTransactionBucket(id);
+            const effect: TurnEffect = {
+              kind: 'set',
               path,
-              next,
-              prev,
-              effectiveMeta,
-              ownerPath,
-              subjectIds,
-              positionIds
-            );
-          } else {
-            captureEffects(
-              pendingCapture,
-              pendingCapture.effects,
-              path,
-              next,
-              prev,
-              effectiveMeta,
-              ownerPath,
-              subjectIds,
-              positionIds
-            );
-          }
-        } }
+              ownerPath: ownerPath ?? path,
+              position,
+              before: prev,
+              after: next,
+              mutationIntent: meta?.mutationIntent,
+            };
+            const key = effectKey(effect),
+              old = bucket.effects.get(key);
+            if (old && old.kind !== 'set')
+              throw new Error(
+                'Terminal record conflicts with structural evidence'
+              );
+            const combined = old
+              ? {
+                  ...old,
+                  after: next,
+                  mutationIntent: combineScalarMutationIntent(
+                    old.mutationIntent,
+                    effect.mutationIntent
+                  ),
+                }
+              : effect;
+            const previous = installedOperations.get(id);
+            const operation: OperationRecord = {
+              sequence: (previous?.sequence ?? -1) + 1,
+              owner: position,
+              effects: [cloneTurnEffect(effect)],
+              previous,
+              owners: previous?.owners ?? new Set<number>(),
+            };
+            const writes: Array<TerminalRecordPlan['writes'][number]> = [
+              { map: bucket.effects, key, value: combined },
+              { map: installedOperations, key: id, value: operation },
+            ];
+            if (!bucket.baselineValues.has(position))
+              writes.push({
+                map: bucket.baselineValues,
+                key: position,
+                value: prev,
+              });
+            if (pendingTransactions.size > 0)
+              for (const key of windowKeys([position], undefined))
+                writes.push({
+                  map: bucket.ownWriteSeq,
+                  key,
+                  value: windowWriteSeq,
+                });
+            return {
+              writes,
+              adds: [
+                { set: operation.owners, value: position },
+                { set: bucket.positionIds, value: position },
+                { set: bucket.ownerPaths, value: ownerPath ?? path },
+              ],
+            };
+          },
+          beforePublication: (
+            path,
+            next,
+            prev,
+            meta,
+            ownerPath,
+            subjectIds,
+            positionIds
+          ) => {
+            const effectiveMeta = meta ?? getActiveWriteContext();
+            if (
+              isRestoring ||
+              effectiveMeta?.origin === 'restoration' ||
+              isInspectionWrite(effectiveMeta) ||
+              getWriteParticipation(effectiveMeta) === 'realized'
+            )
+              return;
+            if (
+              typeof effectiveMeta?.transactionId === 'number' &&
+              effectiveMeta.transactionOwner !== transactionOwnerToken
+            )
+              return;
+            const transactionId = resolveTransactionId(effectiveMeta);
+            if (transactionId !== undefined) {
+              captureIntoBucket(
+                getTransactionBucket(transactionId),
+                path,
+                next,
+                prev,
+                effectiveMeta,
+                ownerPath,
+                subjectIds,
+                positionIds
+              );
+            } else {
+              captureEffects(
+                pendingCapture,
+                pendingCapture.effects,
+                path,
+                next,
+                prev,
+                effectiveMeta,
+                ownerPath,
+                subjectIds,
+                positionIds
+              );
+            }
+          },
+        }
       );
 
       if (typeof notifier.onFlush === 'function') {
@@ -3549,7 +3845,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       const handle = {
         [PENDING_TURN_ID]: pendingTurnId,
         confirm(): void {
-          validateOperationDisposition(transactionId,pendingTurnId);
+          validateOperationDisposition(transactionId, pendingTurnId);
           const pendingTurn = authority.getPendingTurn(pendingTurnId);
           if (destroyed) throw new Error('Cannot settle a destroyed tree');
           if (settling)
@@ -3561,8 +3857,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
             throw new Error('Cannot confirm a rolled back transaction');
           }
           lifecycle = 'confirmed';
-            installedOperations.delete(transactionId);
-            expectedDispositions.delete(transactionId);
+          installedOperations.delete(transactionId);
+          expectedDispositions.delete(transactionId);
           // Lifecycle observation: recorded at the transition, before the engine
           // announcement lets restoration confirm its entry, so every reader it
           // notifies already sees this transaction settled. Public delivery
@@ -3631,7 +3927,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
           }
         },
         rollback(): void {
-          validateOperationDisposition(transactionId,pendingTurnId);
+          validateOperationDisposition(transactionId, pendingTurnId);
           const pendingTurn = authority.getPendingTurn(pendingTurnId);
           if (destroyed) throw new Error('Cannot settle a destroyed tree');
           if (settling)
@@ -3658,7 +3954,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
               ? []
               : pendingOrderDeltas.get(pendingTurnId) ?? [];
           let installed = false;
-          const completion = {selected:false,committed:false};
+          const completion = { selected: false, committed: false };
           let observerFailed = false;
           let observerError: unknown;
           const clock =

@@ -74,8 +74,9 @@ runtime behavior for otherwise identical Record and closed-object values.
 
 The owner question submitted by this audit is whether ordinary whole-value writes
 may materialize newly supplied keys regardless of the erased TypeScript shape.
-Recommendation: honor the whole-value promise, preserving internal inspection
-replay's separate unknown-key policy. **Decision pending.**
+Owner authorized newly supplied keys on October 17: honor the whole-value
+promise, preserving internal inspection replay's separate unknown-key policy.
+This authorizes K1 implementation, not never-present descendant handles.
 
 This does not settle never-present descendant acquisition. Recursive positive
 types also promise descendants such as `.id()` before a value supplies a shape.
@@ -155,3 +156,9 @@ recorded explicitly.
 No source or test assertion changes accompany this record. The next implementation
 step depends on the open-key decision; independent contract accounting is complete.
 Final release-contract acceptance remains blocked by the explicit questions above.
+
+## Authorized new-key experiment disposition
+
+The [experimental implementation and its recurrence counterexample](new-key-candidate/README.md)
+are preserved separately. Authorization stands; the implementation is not accepted.
+Historical evidence above applies to its stated source, not this dirty experimental runtime.

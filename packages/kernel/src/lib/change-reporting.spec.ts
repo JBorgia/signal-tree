@@ -6,9 +6,7 @@ import {
 } from '../reactive-test-realization';
 import { createSignalTreeFactory } from './signal-tree';
 
-const signalTree = createSignalTreeFactory(
-  createReactiveTestRealization()
-);
+const signalTree = createSignalTreeFactory(createReactiveTestRealization());
 
 /**
  * Change reporting: `updateAndReport()`.
@@ -110,7 +108,10 @@ describe('updateAndReport — reports only what landed', () => {
   it('a NaN rewrite notifies nobody', () => {
     const tree = signalTree({ n: Number.NaN });
     let runs = 0;
-    observeReactiveTestValue(() => tree.$.n(), () => runs++);
+    observeReactiveTestValue(
+      () => tree.$.n(),
+      () => runs++
+    );
     const base = runs;
 
     tree.updateAndReport({ n: Number.NaN });
@@ -123,7 +124,10 @@ describe('updateAndReport — reports only what landed', () => {
     // getTime() is NaN, so `===` called two Invalid Dates different.
     const tree = signalTree({ d: new Date(Number.NaN) });
     let runs = 0;
-    observeReactiveTestValue(() => tree.$.d(), () => runs++);
+    observeReactiveTestValue(
+      () => tree.$.d(),
+      () => runs++
+    );
     const base = runs;
 
     const changed = tree.updateAndReport({ d: new Date(Number.NaN) });
@@ -135,7 +139,10 @@ describe('updateAndReport — reports only what landed', () => {
   it('a real Date change is still reported and notified', () => {
     const tree = signalTree({ d: new Date(0) });
     let runs = 0;
-    observeReactiveTestValue(() => tree.$.d(), () => runs++);
+    observeReactiveTestValue(
+      () => tree.$.d(),
+      () => runs++
+    );
     const base = runs;
 
     expect(tree.updateAndReport({ d: new Date(5) })).toEqual(['d']);
@@ -152,8 +159,14 @@ describe('updateAndReport — reports only what landed', () => {
     const tree = signalTree({ users: [{ id: 1 }], count: 0 });
     let usersRuns = 0;
     let countRuns = 0;
-    observeReactiveTestValue(() => tree.$.users(), () => usersRuns++);
-    observeReactiveTestValue(() => tree.$.count(), () => countRuns++);
+    observeReactiveTestValue(
+      () => tree.$.users(),
+      () => usersRuns++
+    );
+    observeReactiveTestValue(
+      () => tree.$.count(),
+      () => countRuns++
+    );
     const baseUsers = usersRuns;
     const baseCount = countRuns;
 
@@ -187,7 +200,6 @@ describe('change reporting — defects found by adversarial audit', () => {
     }
   });
 
-
   it('reports LEAF paths for a per-branch updater, not the branch', () => {
     const tree = signalTree({ user: { name: 'Ada', age: 1 } });
 
@@ -214,11 +226,6 @@ describe('change reporting — defects found by adversarial audit', () => {
 
     expect(changed).toEqual([]);
   });
-
-
-
-
-
 });
 
 describe('change reporting — second-round audit findings', () => {
@@ -254,7 +261,7 @@ describe('change reporting — second-round audit findings', () => {
     class Thing {}
     const tree = signalTree({
       a: 0,
-      ctor: null as (typeof Thing) | null,
+      ctor: null as typeof Thing | null,
       b: 0,
     });
 
@@ -327,8 +334,6 @@ describe('change reporting — second-round audit findings', () => {
     }
   });
 
-
-
   it('does not treat a Date as equal to a keyless object', () => {
     const tree = signalTree({ at: new Date(0) });
 
@@ -349,9 +354,9 @@ describe('change reporting — fourth-round audit findings', () => {
 
       // Previously uncovered: mutating this branch to `&& false` left the whole
       // suite green.
-      expect(
-        tree.updateAndReport({ user: () => () => 1 } as never)
-      ).toEqual([]);
+      expect(tree.updateAndReport({ user: () => () => 1 } as never)).toEqual(
+        []
+      );
       expect(spy).toHaveBeenCalled();
       expect(tree.$()).toEqual({ user: { name: 'Ada' } });
     } finally {
@@ -409,9 +414,7 @@ describe('signalTree construction — prototype pollution', () => {
   it('does not let a hidden node be written through afterwards', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     try {
-      const tree = signalTree(
-        JSON.parse('{"__proto__":{"zzCtor":"x"},"a":1}')
-      );
+      const tree = signalTree(JSON.parse('{"__proto__":{"zzCtor":"x"},"a":1}'));
 
       // The hidden node used to accept writes, bypassing the ST2010
       // not-in-initial-shape discard while staying invisible to tree.$().
@@ -419,8 +422,12 @@ describe('signalTree construction — prototype pollution', () => {
       // would drop it, which is not what this test is about.
       tree.$({ a: 1, zzCtor: 'written-through' } as never);
 
-      expect(tree.$()).toEqual({ a: 1 });
+      // Authorized new keys are visible own state, never prototype writes.
+      expect(tree.$()).toEqual({ a: 1, zzCtor: 'written-through' });
+      expect(Object.prototype.hasOwnProperty.call(tree.$, 'zzCtor')).toBe(true);
+      expect(Object.getPrototypeOf(tree.$)).toBe(Function.prototype);
       expect(({} as Record<string, unknown>)['zzCtor']).toBeUndefined();
+      tree.destroy();
     } finally {
       spy.mockRestore();
     }

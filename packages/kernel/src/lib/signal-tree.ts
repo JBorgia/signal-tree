@@ -63,12 +63,16 @@ import {
   _recordTreeConstruction,
   isRegisteredMarker,
   materializeMarkers,
+  installPreparedMember,
   setMemberValueApplier,
   type OrdinaryConstructionAuthority,
   type OrdinaryStateMaterializer,
 } from './internals/materialize-markers';
 import { captureBranchMembershipIfObserved } from './internals/path-observation-port';
-import { installDormantObservation } from './internals/observation-substrate';
+import {
+  installDormantObservation,
+  inheritObservationForAddedMember,
+} from './internals/observation-substrate';
 import { terminateOwnerInvalidation } from './internals/owner-invalidation-port';
 import { defineRootTree } from './internals/root-source';
 import {
@@ -874,6 +878,70 @@ setMemberValueApplier(
   }
 );
 
+// Whole-value writes may introduce ordinary members (owner decision 2026-10-17).
+// Construction remains bound to the original tree; lookup alone creates nothing.
+const ordinaryMemberBuilders = new WeakMap<
+  object,
+  (key: string, value: unknown) => unknown
+>();
+type PreparedBranchWrite = {
+  entries: [string, unknown][];
+  additions: Map<string, unknown>;
+};
+
+/** Read construction input before any live scalar slot is allocated. */
+function ordinaryConstructionValue(value: unknown): unknown {
+  if (isEntityMapMarker(value) || isRegisteredMarker(value)) {
+    throw new TypeError('SignalTree: marker definitions belong in initial state, not ordinary whole-value writes.');
+  }
+  if (isLeafDefinition(value)) {
+    const inner = leafDefinitionValue(value);
+    if (isEntityMapMarker(inner) || isRegisteredMarker(inner)) {
+      throw new TypeError('SignalTree: leaf() cannot wrap a semantic marker.');
+    }
+    return value;
+  }
+  if (value === null || typeof value !== 'object' || Array.isArray(value) || isBuiltInObject(value)) return value;
+  const prepared: Record<string, unknown> = {};
+  for (const [key, child] of Object.entries(value)) {
+    if (key !== '__proto__') prepared[key] = ordinaryConstructionValue(child);
+  }
+  return prepared;
+}
+
+function prepareOrdinaryMembers(
+  target: unknown,
+  updates: unknown,
+  whole: boolean
+): Map<object, PreparedBranchWrite> {
+  const plans = new Map<object, PreparedBranchWrite>();
+  const construct: Array<() => void> = [];
+  const visit = (target: unknown, updates: unknown, whole: boolean): void => {
+    if (!updates || typeof updates !== 'object') return;
+    const store = (isNodeAccessor(target)
+      ? (target as unknown as Record<symbol, unknown>)[NODE_STORE_SYMBOL]
+      : target) as Record<string, unknown>;
+    const entries = Object.entries(updates as Record<string, unknown>);
+    const additions = new Map<string, unknown>();
+    plans.set(store, { entries, additions });
+    const build = whole ? ordinaryMemberBuilders.get(store) : undefined;
+    for (const [key, value] of entries) {
+      if (key === '__proto__') continue;
+      if (build && !Object.prototype.hasOwnProperty.call(store, key)) {
+        const prepared = ordinaryConstructionValue(value);
+        construct.push(() => additions.set(key, build(key, prepared)));
+      } else if (isNodeAccessor(store[key]) && value && typeof value === 'object') {
+        visit(store[key], value, true);
+      }
+    }
+  };
+  visit(target, updates, whole);
+  // All supplied getters and marker validation complete before allocation.
+  // Framework observation tokens remain lazy during canonical construction.
+  for (const build of construct) build();
+  return plans;
+}
+
 function recursiveUpdate(
   target: unknown,
   updates: unknown,
@@ -881,16 +949,24 @@ function recursiveUpdate(
   pathPrefix = '',
   reconcileMembership = true,
   // When this whole value began: its levels share it (`readded`).
-  since = ++structuralWrites.stamp
+  since = ++structuralWrites.stamp,
+  prepared = prepareOrdinaryMembers(target, updates, reconcileMembership)
 ): void {
   if (!updates || typeof updates !== 'object') return;
   // A whole value reconciles membership level by level below; a location it
   // writes must not re-add its own path as well (`structuralWrites`).
   beginStructuralWrite();
   try {
-    const targetObj = isNodeAccessor(target)
-      ? (target as unknown as Record<string, unknown>)
-      : (target as Record<string, unknown>);
+    const targetObj = (
+      isNodeAccessor(target)
+        ? (target as unknown as Record<symbol, unknown>)[NODE_STORE_SYMBOL]
+        : target
+    ) as Record<string, unknown>;
+    const plan = prepared.get(targetObj);
+    if (!plan) return;
+    const { entries, additions } = plan;
+    const branch =
+      (targetObj as Record<symbol, object>)[NODE_ACCESSOR_PEER] ?? targetObj;
 
     // ⚠️ A PARTIAL WRITE STILL RE-ADDS WHAT IT SUPPLIES (v16 8d review).
     // `updateAndReport` scopes the outer level to its supplied keys, so it never
@@ -919,14 +995,27 @@ function recursiveUpdate(
     // tree that never omits allocates nothing here (v16 8e).
     const installed = dormant ? new Set<string>() : undefined;
 
-    for (const [key, rawValue] of Object.entries(
-      updates as Record<string, unknown>
-    )) {
+    for (const [key, rawValue] of entries) {
       // Reassignable: an updater FUNCTION at either a leaf or a branch is
       // resolved to its result below, and everything downstream then sees one
       // shape rather than each branch re-implementing the updater case.
       let value = rawValue;
-      const prop = targetObj[key];
+      if (key === '__proto__') continue;
+      // A user updater earlier in this write may already have created and
+      // exposed the identity. Apply the outer value through that identity;
+      // never replace an escaped callable with a stale prepared child.
+      if (
+        additions.has(key) &&
+        !Object.prototype.hasOwnProperty.call(targetObj, key)
+      ) {
+        const child = additions.get(key);
+        inheritObservationForAddedMember(branch, child);
+        installPreparedMember(branch, key, child);
+        installed?.add(key);
+        out?.push(pathPrefix ? `${pathPrefix}.${key}` : key);
+        continue;
+      }
+      const prop = Object.getOwnPropertyDescriptor(targetObj, key)?.value;
       const childPath = pathPrefix ? `${pathPrefix}.${key}` : key;
 
       if (prop === undefined) {
@@ -1002,7 +1091,19 @@ function recursiveUpdate(
         if (typeof value === 'function') {
           warnDiscardedBranchWrite(childPath, value);
         } else if (value && typeof value === 'object') {
-          recursiveUpdate(prop, value, out, childPath, true, since);
+          recursiveUpdate(
+            prop,
+            value,
+            out,
+            childPath,
+            true,
+            since,
+            prepared.has(
+              (prop as unknown as Record<symbol, object>)[NODE_STORE_SYMBOL]
+            )
+              ? prepared
+              : prepareOrdinaryMembers(prop, value, true)
+          );
           installed?.add(key);
         } else if (value === undefined) {
           continue;
@@ -1181,6 +1282,7 @@ function recursiveUpdate(
     if (membershipChanged.length > 0) {
       republishMembers(targetObj, membershipChanged);
     }
+    if (additions.size > 0) publishMembershipChange(branch);
   } finally {
     endStructuralWrite();
   }
@@ -1265,7 +1367,8 @@ function materializeOrdinaryBranch(
   scalarSlotRuntime: TreeScalarLeafRuntime | undefined,
   childPositionIds: number[] | undefined,
   childPath: string,
-  address: readonly string[]
+  address: readonly string[],
+  ordinaryOnly = false
 ): unknown {
   const nested = createSignalStore(
     value,
@@ -1276,7 +1379,8 @@ function materializeOrdinaryBranch(
     scalarSlotRuntime,
     childPositionIds,
     childPath,
-    address
+    address,
+    ordinaryOnly
   );
   const accessor = makeNodeAccessor(
     nested as TreeNode<object>,
@@ -1313,7 +1417,8 @@ function createSignalStore<T>(
    * Removing parent segments for diagnostics would corrupt nested egress.
    */
   path = '',
-  address: readonly string[] = []
+  address: readonly string[] = [],
+  ordinaryOnly = false
 ): TreeNode<T> {
   for (const position of positionIds ?? []) {
     materializationContext.positionRegistry.registerPositionAddress(
@@ -1399,6 +1504,23 @@ function createSignalStore<T>(
   // Regular object - recursive
   const store: Record<string, unknown> = {};
   defineNodeAddress(store, address);
+  ordinaryMemberBuilders.set(store, (key, value) => {
+    // Use the same child classification/finalization as initial construction,
+    // including primitive/undefined leaves and structured literal addresses.
+    const prepared = createSignalStore(
+      { [key]: value },
+      equalityFn,
+      materializationContext,
+      buildPlan,
+      captureRuntime,
+      scalarSlotRuntime,
+      positionIds,
+      path,
+      address,
+      true
+    );
+    return (prepared as Record<string, unknown>)[key];
+  });
 
   for (const [key, definedValue] of Object.entries(
     obj as Record<string, unknown>
@@ -1407,6 +1529,14 @@ function createSignalStore<T>(
     const childPath = path ? `${path}.${key}` : key;
     const terminal = isLeafDefinition(definedValue);
     const value = terminal ? leafDefinitionValue(definedValue) : definedValue;
+    if (
+      ordinaryOnly &&
+      (isEntityMapMarker(value) || isRegisteredMarker(value))
+    ) {
+      throw new TypeError(
+        'SignalTree: marker definitions belong in initial state, not ordinary whole-value writes.'
+      );
+    }
     if (terminal && (isEntityMapMarker(value) || isRegisteredMarker(value))) {
       throw new Error(
         `SignalTree: leaf() cannot wrap a semantic marker at "${childPath}".`
@@ -1549,7 +1679,8 @@ function createSignalStore<T>(
       scalarSlotRuntime,
       getChildPositionIds(),
       childPath,
-      childAddress
+      childAddress,
+      ordinaryOnly
     );
   }
 
@@ -1578,9 +1709,10 @@ function createSignalStore<T>(
  * caller, so the private return shape costs nothing. The authority stops being
  * reachable once the dispatcher and configured-tree closures have captured it.
  *
- * ⚠️ Do NOT promote this to a runtime tree capability. If dynamic key creation
- * later needs branch materialization for the tree's LIFETIME, that is a new
- * requirement to design deliberately — not a conclusion to smuggle in now.
+ * Owner decision 2026-10-17 authorizes ordinary whole-value member creation.
+ * Its branch-bound builders now retain these construction inputs for the tree
+ * lifetime in `ordinaryMemberBuilders`; no capability is exposed on the tree.
+ * Marker definition finalization remains construction-only.
  */
 interface TreeConstructionResult<T extends object> {
   activateReporting(): void;

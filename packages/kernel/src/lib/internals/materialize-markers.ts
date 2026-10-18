@@ -762,6 +762,17 @@ export function materializeMember(
 
   const child = bind(key, value); // may throw — nothing observable yet
 
+  installPreparedMember(branch as object, key, child);
+  publishMembershipChange(branch as object);
+  return child;
+}
+
+/** Install one prepared child on both physical halves without publishing. */
+export function installPreparedMember(
+  branch: object,
+  key: string,
+  child: unknown
+): void {
   // ⚠️ BOTH THE ACCESSOR AND ITS BACKING STORE. A node accessor COPIES its
   // store's properties, but its CALL path closes over the original store — so
   // installing only on the accessor leaves `branch()` and every snapshot blind
@@ -783,9 +794,10 @@ export function materializeMember(
   // visible to the new member too (`isAbsentMember`).
   linkAddedMember(branch as object, key, child);
 
-  index?.set(key, child);
-  publishMembershipChange(branch as object);
-  return child;
+  (branch as Record<symbol, Map<string, unknown> | undefined>)[KEY_INDEX]?.set(
+    key,
+    child
+  );
 }
 
 /**

@@ -34,9 +34,9 @@ for this documentation-only readiness inventory.
 
 ## Remaining acceptance work
 
-1. Resolve open-key compatibility: types promise whole Record replacement and
-   arbitrary descendants; runtime drops new keys and returns undefined for
-   unseen descendants. ST2010 behavior and protocol keys need explicit treatment.
+1. Implement the authorized whole-write creation of new ordinary keys safely.
+   The first candidate is rejected for uninstalled-allocation retention.
+   Arbitrary unseen descendant handles remain a separate compatibility decision.
 2. Repair the two composed-restoration requirements (six desired assertions),
    or obtain a justified explicit product disposition. Safe refusal alone is
    insufficient for these unambiguous ordinary undo cases.
@@ -46,5 +46,9 @@ for this documentation-only readiness inventory.
 4. Freeze the resulting runtime and run fresh appropriate qualification. Existing
    verification does not discharge changed-runtime or unresolved product claims.
 
-The open-key whole-write decision is pending. No runtime/types/test assertions
-have been changed to make the inventory pass. Stable v15 remains untouched.
+Owner authorized newly supplied keys for ordinary whole-value writes on October 17.
+This replaces ST2010 discard for that ingress; internal inspection replay keeps
+its existing unknown-key policy. Never-present descendant handles are separate. The experimental implementation is rejected after recurring retention of uninstalled
+prepared payloads. Its ordinary regression remains failing; intermediate suite passes
+are not final-source qualification. See [the candidate evidence](docs/audits/2026-10-17-incumbent-readiness/new-key-candidate/README.md).
+The incumbent remains 8d, and no repaired runtime is accepted. Stable v15 remains untouched.
