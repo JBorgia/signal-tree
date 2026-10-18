@@ -44,6 +44,8 @@ export const MUTATION_CAPTURE_RUNTIME = Symbol.for(
 );
 
 export interface MutationCaptureRuntime {
+  /** Prepared ordinary membership responsibility; installed without delivery. */
+  prepareMemberResponsibility?: (branch: object, key: string, child: object) => TerminalRecordPlan | undefined;
   prepareEntityResponsibility?: (
     capture: CommittedEntityCapture
   ) => TerminalRecordPlan | undefined;

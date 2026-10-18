@@ -1,3 +1,5 @@
+import { reportContainedObserverError } from './internals/error-reporter';
+import type { TerminalRecordPlan } from './internals/intrinsic-mutation';
 import {
   PRODUCTION_SUBSTRATE_STATS_ENABLED,
   recordProductionSubstrateStat,
@@ -880,13 +882,14 @@ setMemberValueApplier(
 
 // Whole-value writes may introduce ordinary members (owner decision 2026-10-17).
 // Construction remains bound to the original tree; lookup alone creates nothing.
+type PreparedOrdinaryMember = { child: object; responsibility?: TerminalRecordPlan };
 const ordinaryMemberBuilders = new WeakMap<
   object,
-  (key: string, value: unknown) => unknown
+  (key: string, value: unknown) => PreparedOrdinaryMember
 >();
 type PreparedBranchWrite = {
   entries: [string, unknown][];
-  additions: Map<string, () => unknown>;
+  additions: Map<string, () => PreparedOrdinaryMember>;
 };
 
 /**
@@ -939,7 +942,7 @@ function prepareOrdinaryMembers(
       ? (target as unknown as Record<symbol, unknown>)[NODE_STORE_SYMBOL]
       : target) as Record<string, unknown>;
     const entries = Object.entries(updates as Record<string, unknown>);
-    const additions = new Map<string, () => unknown>();
+    const additions = new Map<string, () => PreparedOrdinaryMember>();
     plans.set(store, { entries, additions });
     const build = whole ? ordinaryMemberBuilders.get(store) : undefined;
     for (const [key, value] of entries) {
@@ -972,6 +975,9 @@ function recursiveUpdate(
   // A whole value reconciles membership level by level below; a location it
   // writes must not re-add its own path as well (`structuralWrites`).
   beginStructuralWrite();
+  let publishMembership: (() => void) | undefined;
+  let applicationFailed = false;
+  let applicationError: unknown;
   try {
     const targetObj = (
       isNodeAccessor(target)
@@ -997,7 +1003,7 @@ function recursiveUpdate(
     // (perf-15.4.4, fx5). `hasDormantMembers` is a hint that only errs
     // towards true. A whole value still reconciles every key.
     const dormant = hasDormantMembers(targetObj);
-    const publishMembership =
+    publishMembership =
       reconcileMembership || dormant
         ? captureBranchMembershipIfObserved(
             (targetObj as Record<symbol, object>)[NODE_ACCESSOR_PEER] ??
@@ -1020,13 +1026,17 @@ function recursiveUpdate(
       // A user updater earlier in this write may already have created and
       // exposed the identity. Apply the outer value through that identity;
       // never replace an escaped callable with a stale prepared child.
+      const buildAddition = additions.get(key);
       if (
-        additions.has(key) &&
+        buildAddition &&
         !Object.prototype.hasOwnProperty.call(targetObj, key)
       ) {
-        const child = additions.get(key)!();
+        const { child, responsibility } = buildAddition();
         inheritObservationForAddedMember(branch, child);
-        installPreparedMember(branch, key, child);
+        installPreparedMember(branch, key, child, responsibility);
+        // Invalidate the installed membership before later application equality
+        // or updaters can read it. Native delivery remains owned by the group.
+        publishMembershipChange(branch);
         installed?.add(key);
         out?.push(pathPrefix ? `${pathPrefix}.${key}` : key);
         continue;
@@ -1294,14 +1304,29 @@ function recursiveUpdate(
     // already depend on are what carries it — no new reactive state exists, and
     // no first-transition problem, because that dependency edge was established on
     // each leaf's FIRST computation.
-    publishMembership?.();
     if (membershipChanged.length > 0) {
       republishMembers(targetObj, membershipChanged);
     }
-    if (additions.size > 0) publishMembershipChange(branch);
+  } catch (error) {
+    applicationFailed = true;
+    applicationError = error;
   } finally {
-    endStructuralWrite();
+    try {
+      // Responsibility is already installed. Deliver the actual membership
+      // even when a later sibling failed; do not turn partial truth invisible
+      // to Link/restoration. Preserve an earlier application error exactly.
+      try { publishMembership?.(); }
+      catch (error) {
+        if (!applicationFailed) {
+          applicationFailed = true;
+          applicationError = error;
+        } else {
+          reportContainedObserverError({ error, operation: 'notify:subscriber' });
+        }
+      }
+    } finally { endStructuralWrite(); }
   }
+  if (applicationFailed) throw applicationError;
 }
 
 // =============================================================================
@@ -1535,7 +1560,9 @@ function createSignalStore<T>(
       address,
       true
     );
-    return (prepared as Record<string, unknown>)[key];
+    const child = (prepared as Record<string, object>)[key];
+    const branch = (store as Record<symbol, object>)[NODE_ACCESSOR_PEER] ?? store;
+    return { child, responsibility: captureRuntime.prepareMemberResponsibility?.(branch, key, child) };
   });
 
   for (const [key, definedValue] of Object.entries(

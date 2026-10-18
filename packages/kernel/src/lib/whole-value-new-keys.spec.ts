@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { SignalTreeRollbackError } from './types';
+import { getTreeRealizationPort } from './internals/causal-runtime/tree-realization-adapter';
 import { getTreeScalarSlotRuntime } from './internals/tree-scalar-slot-port';
 import { signalTree } from './signal-tree';
 import { transactions } from '../enhancers/transactions/transactions';
@@ -391,6 +393,66 @@ describe('owner-authorized whole-value new keys', () => {
       }))).toThrow(failure);
       expect(tree.$()).toEqual({ trigger: [{ x: 0 }], fresh: 0 });
     } finally { tree.destroy(); }
+  });
+
+  it('preserves entry order during equality and coherence after grouped delivery', () => {
+    const initial: { trigger: { x: number }[]; fresh?: number } = { trigger: [{ x: 0 }] };
+    const tree = signalTree(initial, { enhancers: [transactions()] });
+    const seen: unknown[] = [];
+    try {
+      expect(tree.$()).toEqual(initial); // prime the snapshot
+      const pending = tree.transact(() => tree.$({ fresh: 123, trigger: [{ get x() {
+        seen.push([tree.$.fresh?.(), tree.$().fresh]);
+        return 1;
+      } }] }));
+      expect(seen.length).toBeGreaterThan(0);
+      // Exact8d permits a primed branch snapshot to lag inside this callback.
+      // Entry-order leaf reads and post-group snapshots are the contract here.
+      expect(seen).toEqual(seen.map(() => [123, undefined]));
+      expect(tree.$().fresh).toBe(123);
+      pending.rollback();
+      expect(tree.$()).toEqual(initial);
+    } finally { tree.destroy(); }
+  });
+
+  it('exposes usable recovery for an installed member when automatic abort refuses', () => {
+    const tree = signalTree({ rows: {} as Record<string, number> }, { enhancers: [transactions()] });
+    const port = getTreeRealizationPort(tree.$)!;
+    const refuse = vi.spyOn(port, 'validateEffects').mockImplementation(() => ({ kind: 'structural-drift' }));
+    const failure = Object.freeze(new Error('callback'));
+    let thrown: unknown;
+    try {
+      try { tree.transact(() => { tree.$.rows({ fresh: 123 }); throw failure; }); }
+      catch (error) { thrown = error; }
+      finally { refuse.mockRestore(); }
+      expect(thrown).toBeInstanceOf(SignalTreeRollbackError);
+      if (!(thrown instanceof SignalTreeRollbackError)) throw new Error('missing rollback error');
+      expect(thrown.recovery?.callbackError).toBe(failure);
+      const recovery = thrown.recovery!.transaction;
+      expect(recovery.inspect().changes.length).toBeGreaterThan(0);
+      expect(tree.$.rows()).toEqual({ fresh: 123 });
+      const held = tree.$.rows.fresh;
+      recovery.rollback();
+      recovery.rollback();
+      expect(tree.$.rows()).toEqual({});
+      expect(held()).toBeUndefined();
+    } finally { refuse.mockRestore(); tree.destroy(); }
+  });
+
+  it('delivers completed partial membership to Link when a later value throws', async () => {
+    const initial: { trigger: { x: number }[]; fresh?: number } = { trigger: [{ x: 0 }] };
+    const tree = signalTree(initial);
+    const sent: unknown[] = [];
+    const relationship = link(tree.$, { set: value => { sent.push(value); } });
+    const failure = new Error('partial equality');
+    try {
+      expect(tree.$()).toEqual(initial);
+      expect(() => tree.$({ fresh: 123, trigger: [{ get x(): number { throw failure; } }] })).toThrow(failure);
+      await flush();
+      await relationship.settled();
+      expect(tree.$().fresh).toBe(123);
+      expect(sent).toEqual([{ trigger: [{ x: 0 }], fresh: 123 }]);
+    } finally { relationship.dispose(); tree.destroy(); }
   });
 
   it('does not acquire absent descendants through reads', () => {

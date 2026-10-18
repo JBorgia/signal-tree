@@ -55,3 +55,74 @@ it('publishes newly supplied ordinary keys through the React facade', async () =
     tree.destroy();
   }
 });
+
+it.each([false, true])(
+  'keeps failed transaction observations coherent (seeded=%s)',
+  async (seeded) => {
+    const initial: { trigger: { x: number }[]; fresh?: number } = {
+      trigger: [{ x: 0 }],
+    };
+    if (seeded) initial.fresh = 0;
+    const tree = signalTree(initial, { enhancers: [transactions()] });
+    const failure = new Error('later equality failure');
+    const seen: { snapshot: typeof initial; direct: number | undefined }[] = [];
+    const read = () => {
+      const snapshot = tree.$();
+      const direct = tree.$.fresh?.();
+      const frame = { snapshot, direct };
+      seen.push(frame);
+      return JSON.stringify(snapshot);
+    };
+    function View() {
+      const value = useSignalTree(tree, read);
+      return <output data-testid="failed-keys">{value}</output>;
+    }
+    const mounted = render(<View />);
+    try {
+      expect(screen.getByTestId('failed-keys').textContent).toBe(
+        JSON.stringify(initial)
+      );
+      expect(seen.length).toBeGreaterThan(0);
+      const fail = () => {
+        expect(() =>
+          tree.transact(() =>
+            tree.$({
+              fresh: 123,
+              trigger: [
+                {
+                  get x(): number {
+                    throw failure;
+                  },
+                },
+              ],
+            })
+          )
+        ).toThrow(failure);
+        expect(tree.$()).toEqual(initial);
+        expect(Object.prototype.hasOwnProperty.call(tree.$(), 'fresh')).toBe(
+          seeded
+        );
+      };
+      await step(fail);
+      // Framework computed/render timing is only required after delivery.
+      expect(screen.getByTestId('failed-keys').textContent).toBe(
+        JSON.stringify(initial)
+      );
+      const beforeControl = seen.length;
+      await step(() => tree.$({ trigger: [{ x: 1 }], fresh: 7 }));
+      expect(seen.length).toBeGreaterThan(beforeControl);
+      expect(screen.getByTestId('failed-keys').textContent).toBe(
+        '{"trigger":[{"x":1}],"fresh":7}'
+      );
+      for (const frame of seen) {
+        expect(frame.snapshot.fresh).toBe(frame.direct);
+        expect(
+          Object.prototype.hasOwnProperty.call(frame.snapshot, 'fresh')
+        ).toBe(frame.direct !== undefined);
+      }
+    } finally {
+      mounted.unmount();
+      tree.destroy();
+    }
+  }
+);

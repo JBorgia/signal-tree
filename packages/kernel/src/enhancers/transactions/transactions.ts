@@ -8,6 +8,7 @@ import {
   settleTurnMemberEffects,
   plainBranchMemberEffectIsNoop,
   preparePlainBranchMembers,
+  prepareNewMemberResponsibility,
   refreshOmittedCollection,
   changedOmittedCollection,
 } from '../../lib/internals/plain-branch-membership';
@@ -2054,6 +2055,36 @@ export function getOrCreateInternalTransactionRuntime<T>(
   });
   const sourceCaptureRuntime = getMutationCaptureRuntime(tree);
   if (sourceCaptureRuntime) {
+    sourceCaptureRuntime.prepareMemberResponsibility = (branch, key, child) => {
+      const meta = getActiveWriteContext();
+      const id = resolveTransactionId(meta);
+      if (id === undefined || isRestoring || isInspectionWrite(meta) ||
+          getWriteParticipation(meta) === 'realized' ||
+          meta?.origin === 'restoration' || meta?.origin === 'transaction-rollback') return;
+      const prepared = prepareNewMemberResponsibility(branch, key, child);
+      if (!prepared) return;
+      const { effect, address } = prepared;
+      const bucket = getTransactionBucket(id);
+      const previous = installedOperations.get(id);
+      const operation: OperationRecord = {
+        sequence: (previous?.sequence ?? -1) + 1,
+        owner: effect.position, effects: [cloneTurnEffect(effect)], previous,
+        owners: previous?.owners ?? new Set<number>(),
+      };
+      return {
+        writes: [
+          address,
+          { map: bucket.effects, key: effectKey(effect), value: effect },
+          { map: bucket.baselineValues, key: effect.position, value: undefined },
+          { map: installedOperations, key: id, value: operation },
+        ],
+        adds: [
+          { set: operation.owners, value: effect.position },
+          { set: bucket.positionIds, value: effect.position },
+          { set: bucket.ownerPaths, value: effect.ownerPath },
+        ],
+      };
+    };
     sourceCaptureRuntime.prepareEntityResponsibility = (capture) => {
       const id = resolveTransactionId(capture.meta);
       if (
@@ -2186,6 +2217,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     };
     tree.registerCleanup(() => {
       delete sourceCaptureRuntime.prepareEntityResponsibility;
+      delete sourceCaptureRuntime.prepareMemberResponsibility;
     });
   }
   const foldOperationDisposition = (id: number): readonly TurnEffect[] => {

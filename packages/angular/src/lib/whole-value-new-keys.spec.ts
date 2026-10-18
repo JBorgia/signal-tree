@@ -1,4 +1,10 @@
-import { computed } from '@angular/core';
+import {
+  computed,
+  effect,
+  Injector,
+  runInInjectionContext,
+} from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { describe, expect, it } from 'vitest';
 
 import { signalTree, transactions } from '../index';
@@ -47,3 +53,76 @@ it('publishes newly supplied ordinary keys through the angular facade', async ()
     tree.destroy();
   }
 });
+
+it.each([false, true])(
+  'keeps failed transaction observations coherent (seeded=%s)',
+  async (seeded) => {
+    const initial: { trigger: { x: number }[]; fresh?: number } = {
+      trigger: [{ x: 0 }],
+    };
+    if (seeded) initial.fresh = 0;
+    const tree = signalTree(initial, { enhancers: [transactions()] });
+    const failure = new Error('later equality failure');
+    const seen: { snapshot: typeof initial; direct: number | undefined }[] = [];
+    const read = () => {
+      const snapshot = tree.$();
+      const direct = tree.$.fresh?.();
+      const frame = { snapshot, direct };
+      seen.push(frame);
+      return JSON.stringify(snapshot);
+    };
+    TestBed.configureTestingModule({});
+    const view = computed(() => JSON.stringify(tree.$()));
+    const observer = runInInjectionContext(TestBed.inject(Injector), () =>
+      effect(read)
+    );
+    TestBed.tick();
+    const settle = async () => {
+      await flush();
+      TestBed.tick();
+    };
+    try {
+      expect(view()).toBe(JSON.stringify(initial));
+      expect(seen.length).toBeGreaterThan(0);
+      const fail = () => {
+        expect(() =>
+          tree.transact(() =>
+            tree.$({
+              fresh: 123,
+              trigger: [
+                {
+                  get x(): number {
+                    throw failure;
+                  },
+                },
+              ],
+            })
+          )
+        ).toThrow(failure);
+        expect(tree.$()).toEqual(initial);
+        expect(Object.prototype.hasOwnProperty.call(tree.$(), 'fresh')).toBe(
+          seeded
+        );
+      };
+      fail();
+      await settle();
+      // Framework computed/render timing is only required after delivery.
+      expect(view()).toBe(JSON.stringify(initial));
+      const beforeControl = seen.length;
+      tree.$({ trigger: [{ x: 1 }], fresh: 7 });
+      await settle();
+      expect(seen.length).toBeGreaterThan(beforeControl);
+      expect(view()).toBe('{"trigger":[{"x":1}],"fresh":7}');
+      for (const frame of seen) {
+        expect(frame.snapshot.fresh).toBe(frame.direct);
+        expect(
+          Object.prototype.hasOwnProperty.call(frame.snapshot, 'fresh')
+        ).toBe(frame.direct !== undefined);
+      }
+    } finally {
+      observer.destroy();
+      TestBed.resetTestingModule();
+      tree.destroy();
+    }
+  }
+);

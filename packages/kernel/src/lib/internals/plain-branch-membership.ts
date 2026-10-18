@@ -289,6 +289,26 @@ interface MemberEffectValues {
   plainBranchMembership?: PlainBranchMemberPresence;
 }
 
+/** Prepare the address and effect before a new ordinary member becomes live. */
+export function prepareNewMemberResponsibility(branch: object, key: string, node: object) {
+  const registry = getPositionRegistry(branch);
+  const position = getOwnedPositionIds(node)?.[0];
+  const path = getOwnedOwnerPath(node);
+  if (!registry || position === undefined || path === undefined) return undefined;
+  let addresses = MEMBER_ADDRESSES.get(registry);
+  if (!addresses) {
+    addresses = new Map();
+    MEMBER_ADDRESSES.set(registry, addresses);
+  }
+  const effect: PlainBranchMembershipEffect = {
+    kind: 'set', position, path, ownerPath: path,
+    before: undefined, after: unwrapBranchForWriteCapture(node),
+    plainBranchMembership: { before: false, after: true },
+    mutationIntent: 'replace',
+  };
+  return { effect, address: { map: addresses, key: position, value: { branch, key, node } } };
+}
+
 /** Internal capture lowering; a bare observed branch needs no causal effect. */
 export function plainBranchMembershipEffects(
   meta: WriteMetadata | undefined
