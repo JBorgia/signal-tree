@@ -71,3 +71,13 @@ full suites and packed consumers. The cumulative new-key candidate remains
 **unaccepted for release**: bare/entity production/development budgets fail.
 No ceilings changed. The prior rejected checkpoints remain preserved; the other
 readiness requirements and B's closed status are unchanged.
+
+## October 18 artifact attribution
+
+[Matched artifact evidence](docs/audits/2026-10-17-incumbent-readiness/artifact-cost/README.md)
+compares exact 8d, pre-repair add49, passing 89bf and independently verified
+optimization `9917c92f`. Shared record installation saves 20/33 gzip bytes bare
+and 123/105 entities. Four budgets still fail, by 560/590 and 426/414 bytes.
+No optional transaction/restoration implementation leaked into these fixtures.
+No ceiling increase is assumed: residual cost/headroom needs an explicit owner
+disposition. This does not resolve the other readiness inventory items.
