@@ -1,0 +1,11 @@
+{
+  "verifiedSource": "8d220643e0d4e34cbdbc6e55e6ef692b25d5e023",
+  "archive": "acceptance-evidence.tar.xz",
+  "sha256": "1df9a6ebdfb29386a8e2c74c34e78844677f2cedad036523a1d894a2db20d885",
+  "bytes": 593468,
+  "manifestFiles": 1247,
+  "archiveReadbackMatches": true,
+  "created": "2026-10-15T05:26:33.839181+00:00",
+  "generator": "Python tarfile w:xz of artifacts/v16-acceptance-20261014; readback SHA256 verified for every manifest file",
+  "scope": "Evidence only; no merge/push/tag/publication"
+}

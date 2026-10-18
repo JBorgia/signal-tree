@@ -1,84 +1,50 @@
-# Current work — v16 integration
+# Current work — incumbent v16 readiness
 
-Updated October 1, 2026. Owner-authorized branch `integrate/v15-4-into-v16`,
-baseline `628d302dadb082a48c58528651c9088234d0a777`, version **16.0.0-dev**.
-The original checkout and its untracked `frontier` remain untouched.
+Updated October 17, 2026. Dedicated branch `codex/v16-incumbent-readiness`.
+Incumbent baseline: `8d220643e0d4e34cbdbc6e55e6ef692b25d5e023`,
+version **16.0.0-dev**. No repaired runtime is frozen yet.
 
-## Prerequisite complete
+The previous integration controller is preserved in baseline Git history.
+Original checkouts and research specs remain untouched. B's replacement track
+is closed at `17e1a76f`; its evidence is not an active repair queue.
 
-V15.4.0 published from `4ceb24a2a62dc893bf28c50ad971a955190539a7`. All five
-registry tarballs match verified local archives; local/Linux/tag/publisher
-gates and proofs, registry regressions, strict consumers and Angular AOT pass.
-The v15 release record is on `fix/v15-link-settlement-diagnostics` at `024ce69c`.
+## Authorized work
 
-## Authorized scope
+Establish a finite release contract: supported behavior, known limitations,
+required repairs and exact acceptance checks. Start with open-key public
+contracts, then restoration limitations and semantic-matrix scope. No release,
+merge, push, activation, tag, publication or unrelated architecture/API change.
 
-Follow [the selective integration manifest](docs/audits/2026-10-01-v16-integration/PLAN.md).
-Carry fixes **with their falsifiers**, preserve v16 `transact()` spelling,
-inspection, recovery authority, current-truth observation, typed identity and
-existing framework realization contracts. Do not wholesale replace divergent
-v16 files with v15 versions or copy v15 automatic-abort settlement policy.
+See [the readiness inventory](docs/audits/2026-10-17-incumbent-readiness/README.md)
+and its complete row-level matrix classification. Public compatibility decisions
+remain owner decisions; current implementation behavior does not define scope.
 
-1. Record exact current semantic results before production changes.
-2. Integrate dependency-ordered correctness/observation/allocation slices;
-   preserve first reds and destination controls.
-3. Run the complete semantic matrix and explain every changed verdict.
-4. Evaluate ownership-model changes only against this stronger incumbent.
-5. Independently measure v16 performance and size; v15 budgets/results do not transfer.
+## Completed evidence
 
-No v16 publication or new architecture is authorized by this integration work.
-V14 remains paused. Private Studio compatibility is a separate pending decision.
-Use AGENTS.md and the scoped contributor/review contracts. Historical roadmaps
-do not add scope. Keep all exact-SHA evidence distinct from working-tree checks.
+[Exact-8d verification and costs](docs/research/v16-candidate-acceptance-0/RESULT.md)
+are retained byte-for-byte from evidence-only `774dfd7f`. The 84/84 registry,
+84/84 mutation proofs, rebuilt installed-artifact checks and 136/136 browser
+results apply to 8d, not future runtime changes. Approved size ceilings pass;
+measured transaction and heap overhead remain explicit tradeoffs.
 
-## Progress
+A clean isolated baseline is established. Read-only investigations and raw-record
+checks classify the matrix without changing assertions. The prior focused run
+reported 35 ordinary passes and 8 expected failures. No broad suite was rerun
+for this documentation-only readiness inventory.
 
-- Isolated branch and frozen dependency install complete.
-- Baseline characterization complete at unchanged `628d302d`: scalar 25 held /
-  9 violated / 1 unsupported; structural 135 / 48 / 24; composition 28 / 10 /
-  133; authority 0 / 1 / 10. All four runners exit 1 with zero execution errors.
-  Original 13 cases: 9 held / 1 violated / 3 unsupported; 9 adapter tests pass.
-  Raw results, commands, input hashes and exit codes are preserved in
-  `docs/audits/2026-10-01-v16-integration/baseline/`.
-- Slice 1 committed as `042e8ede`: collection identity and own-field presence.
-  Full kernel 2936 passed / 6 expected failures / 13 skipped; all-package build
-  and typecheck/spec-types/lint pass. Review strengthened presence controls to
-  23/23. Stale fixture declarations corrected separately in `479d449d`.
-  See [the evidence record](docs/audits/2026-10-01-v16-integration/PROGRESS.md).
-- Slice 2 committed as `65cf7b38`: coherent restoration outcomes after reactive
-  delivery throws, with per-invocation provenance and original thrown-value
-  identity. 25 focused tests, full kernel (2963 passed), all four frameworks,
-  all five package builds and static gates pass. Same-tick rollback→undoable
-  failure is preserved for slice 3; its fixture does not install batching.
-- A reused-error provenance defect was reproduced on the published 15.4.0
-  artifact under controlled validation fault injection. Its bounded v15 patch
-  takes priority before continuing integration; see the evidence record.
+## Remaining acceptance work
 
-- Slice 3a committed as `a42094b9`: compensation no longer enters ordinary
-  history capture. Same-tick rollback→undoable regression closes without adding
-  batching or changing v16 recovery. Kernel 2973 passed, destination controls
-  75/75, static gates and kernel build pass. Remaining slice 3 work: explicit
-  semantic-scope closure and plain-branch membership, each tested independently.
+1. Resolve open-key compatibility: types promise whole Record replacement and
+   arbitrary descendants; runtime drops new keys and returns undefined for
+   unseen descendants. ST2010 behavior and protocol keys need explicit treatment.
+2. Repair the two composed-restoration requirements (six desired assertions),
+   or obtain a justified explicit product disposition. Safe refusal alone is
+   insufficient for these unambiguous ordinary undo cases.
+3. Diagnose ten independent Link-progress matrix failures. Reconcile 57 stronger
+   overlap-target failures and one authority-projection failure with documented
+   consumer contracts. Keep 168 unsupported rows separately classified.
+4. Freeze the resulting runtime and run fresh appropriate qualification. Existing
+   verification does not discharge changed-runtime or unresolved product claims.
 
-- Slice 3b committed as `76dcaa04`: deferred classifications and cross-location
-  order survive coalescing. Final source-revert proof 20 red / 21 controls,
-  repaired 41/41. Destination controls 150/150; full kernel/static/build pass.
-  V16 keeps refusal of transaction-inside-outer-coalesce and existing visibility.
-  Direct scalar designation loss and external→new-undoable baseline uncertainty
-  remain open, with original counterexamples preserved in the evidence record.
-
-## Shared v15 blocker discovered during integration
-
-Independent contract review identified the first external→new-undoable baseline
-as a genuine defect, not a permitted baseline choice: realization is excluded
-from authored history. A public-only installed-artifact probe reproduces undo 0
-instead of 5 on npm 15.4.0 and the exact 15.4.1 candidate under four enhancer
-configurations. Main release run `36960642038` was cancelled before npm
-publication; signed tag 15.4.1 is preserved as superseded. V15.4.2 repair takes
-priority, with tests carried here afterward. Euclid's membership integration
-remains isolated; it must not independently invent a conflicting baseline fix.
-
-The static scalar designation loss is separately explained by notifier metadata
-coalescing and contradicts existing HIST-C2 whole-turn eligibility. Keep it in
-notifier attribution controls; do not treat the plain/dynamic discrepancy as an
-accepted product distinction.
+The open-key whole-write decision is pending. No runtime/types/test assertions
+have been changed to make the inventory pass. Stable v15 remains untouched.
