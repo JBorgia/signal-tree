@@ -303,9 +303,8 @@ describe('owner-authorized whole-value new keys', () => {
   });
 
   it('application equality failure retains no uninstalled prepared payloads', () => {
-    const tree = signalTree<{ trigger: { x: number }[]; fresh?: Uint8Array }>(
-      { trigger: [{ x: 0 }] }, { enhancers: [transactions()] }
-    );
+    const initial: { trigger: { x: number }[]; fresh?: Uint8Array } = { trigger: [{ x: 0 }] };
+    const tree = signalTree(initial, { enhancers: [transactions()] });
     const runtime = getTreeScalarSlotRuntime(tree.$)!;
     const slots = runtime.slotCount();
     const counts: number[] = [];
@@ -319,6 +318,78 @@ describe('owner-authorized whole-value new keys', () => {
         counts.push(runtime.slotCount());
       }
       expect(counts).toEqual(Array(5).fill(slots));
+    } finally { tree.destroy(); }
+  });
+
+  it('validates opaque construction diagnostics before registering sibling slots', () => {
+    const tree = signalTree({ rows: {} as Record<string, unknown> }, { enhancers: [transactions()] });
+    const runtime = getTreeScalarSlotRuntime(tree.$)!;
+    const slots = runtime.slotCount();
+    try {
+      for (let i = 0; i < 5; i++) {
+        const bad: unknown[] = [];
+        Object.defineProperty(bad, '0', { get() { throw new Error('array diagnostic getter'); } });
+        expect(() => tree.$.rows({ fresh: { good: new Uint8Array(100_000), bad } })).toThrow('array diagnostic getter');
+        expect(tree.$.rows()).toEqual({});
+        expect(runtime.slotCount()).toBe(slots);
+      }
+      const payload = new Uint8Array(8);
+      tree.$.rows({ fresh: { good: payload, bad: [] } });
+      expect(tree.$.rows()).toEqual({ fresh: { good: payload, bad: [] } });
+      expect(runtime.slotCount()).toBe(slots + 2);
+    } finally { tree.destroy(); }
+  });
+
+  it('preserves reentrant installed handles when outer private preparation throws', () => {
+    const tree = signalTree({ rows: {} as Record<string, unknown>, kept: {} as Record<string, number> }, { enhancers: [transactions()] });
+    const runtime = getTreeScalarSlotRuntime(tree.$)!;
+    const slots = runtime.slotCount();
+    try {
+      const held: Array<() => number> = [];
+      for (let i = 0; i < 5; i++) {
+        const bad: unknown[] = [];
+        Object.defineProperty(bad, '0', { get() {
+          tree.$.kept({ ...tree.$.kept(), ['saved' + i]: i });
+          held.push(tree.$.kept['saved' + i]);
+          throw new Error('reentrant diagnostic');
+        } });
+        expect(() => tree.$.rows({ fresh: { good: new Uint8Array(100_000), bad } })).toThrow('reentrant diagnostic');
+        expect(tree.$.rows()).toEqual({});
+        expect(runtime.slotCount()).toBe(slots + i + 1);
+        expect(held.map(read => read())).toEqual(Array.from({ length: i + 1 }, (_, n) => n));
+      }
+      const pending = tree.transact(() => tree.$.kept.saved0(100));
+      expect(held[0]()).toBe(100);
+      pending.rollback();
+      expect(held[0]()).toBe(0);
+      expect(tree.$.kept.saved0).toBe(held[0]);
+    } finally { tree.destroy(); }
+  });
+
+  it('aborts installed new membership when a later existing value throws', () => {
+    const failure = new Error('later equality failure');
+    const initial: { trigger: { x: number }[]; fresh?: number } = { trigger: [{ x: 0 }] };
+    const tree = signalTree(initial, { enhancers: [transactions()] });
+    try {
+      expect(() => tree.transact(() => tree.$({
+        fresh: 123,
+        trigger: [{ get x(): number { throw failure; } }],
+      }))).toThrow(failure);
+      expect(tree.$()).toEqual({ trigger: [{ x: 0 }] });
+    } finally { tree.destroy(); }
+  });
+
+  it('aborts the seeded-key control when a later existing value throws', () => {
+    const failure = new Error('later equality failure');
+    const tree = signalTree(
+      { trigger: [{ x: 0 }], fresh: 0 }, { enhancers: [transactions()] }
+    );
+    try {
+      expect(() => tree.transact(() => tree.$({
+        fresh: 123,
+        trigger: [{ get x(): number { throw failure; } }],
+      }))).toThrow(failure);
+      expect(tree.$()).toEqual({ trigger: [{ x: 0 }], fresh: 0 });
     } finally { tree.destroy(); }
   });
 

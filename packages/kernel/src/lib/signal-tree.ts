@@ -112,7 +112,7 @@ import {
 import type { MaterializationContext } from './internals/materialize-markers';
 import { applyDerivedFactory } from './internals/merge-derived';
 import { hydrateMarkerNode } from './internals/materialize-markers';
-import { isLeafDefinition, leafDefinitionValue } from './leaf';
+import { isLeafDefinition, leaf, leafDefinitionValue } from './leaf';
 import {
   deepEqual,
   isBuiltInObject,
@@ -886,11 +886,15 @@ const ordinaryMemberBuilders = new WeakMap<
 >();
 type PreparedBranchWrite = {
   entries: [string, unknown][];
-  additions: Map<string, unknown>;
+  additions: Map<string, () => unknown>;
 };
 
-/** Read construction input before any live scalar slot is allocated. */
-function ordinaryConstructionValue(value: unknown): unknown {
+/**
+ * Private construction description: plain branches contain only data properties;
+ * terminal wrappers preserve opaque value identity. All application inspection
+ * (including development diagnostics) finishes before canonical registration.
+ */
+function ordinaryConstructionValue(value: unknown, key: string): unknown {
   if (isEntityMapMarker(value) || isRegisteredMarker(value)) {
     throw new TypeError('SignalTree: marker definitions belong in initial state, not ordinary whole-value writes.');
   }
@@ -899,12 +903,26 @@ function ordinaryConstructionValue(value: unknown): unknown {
     if (isEntityMapMarker(inner) || isRegisteredMarker(inner)) {
       throw new TypeError('SignalTree: leaf() cannot wrap a semantic marker.');
     }
-    return value;
+    return leaf(inner);
   }
-  if (value === null || typeof value !== 'object' || Array.isArray(value) || isBuiltInObject(value)) return value;
+  if (value === null || typeof value !== 'object') return leaf(value);
+  if (typeof ngDevMode === 'undefined' || ngDevMode) {
+    if (!Array.isArray(value) && Object.getOwnPropertySymbols(value).length > 0) {
+      console.warn(
+        `SignalTree: Object at "${key}" has Symbol keys but doesn't match any ` +
+          `registered marker processor. If this is a custom marker, ensure ` +
+          `registerMarkerProcessor() is called BEFORE creating the tree.`
+      );
+    }
+  }
+  if (Array.isArray(value) || isBuiltInObject(value)) {
+    warnMarkerInContainer(key, value);
+    if (Array.isArray(value)) warnEntityArrayLeaf(key, value);
+    return leaf(value);
+  }
   const prepared: Record<string, unknown> = {};
-  for (const [key, child] of Object.entries(value)) {
-    if (key !== '__proto__') prepared[key] = ordinaryConstructionValue(child);
+  for (const [childKey, child] of Object.entries(value)) {
+    if (childKey !== '__proto__') prepared[childKey] = ordinaryConstructionValue(child, childKey);
   }
   return prepared;
 }
@@ -915,30 +933,28 @@ function prepareOrdinaryMembers(
   whole: boolean
 ): Map<object, PreparedBranchWrite> {
   const plans = new Map<object, PreparedBranchWrite>();
-  const construct: Array<() => void> = [];
   const visit = (target: unknown, updates: unknown, whole: boolean): void => {
     if (!updates || typeof updates !== 'object') return;
     const store = (isNodeAccessor(target)
       ? (target as unknown as Record<symbol, unknown>)[NODE_STORE_SYMBOL]
       : target) as Record<string, unknown>;
     const entries = Object.entries(updates as Record<string, unknown>);
-    const additions = new Map<string, unknown>();
+    const additions = new Map<string, () => unknown>();
     plans.set(store, { entries, additions });
     const build = whole ? ordinaryMemberBuilders.get(store) : undefined;
     for (const [key, value] of entries) {
       if (key === '__proto__') continue;
       if (build && !Object.prototype.hasOwnProperty.call(store, key)) {
-        const prepared = ordinaryConstructionValue(value);
-        construct.push(() => additions.set(key, build(key, prepared)));
+        const prepared = ordinaryConstructionValue(value, key);
+        additions.set(key, () => build(key, prepared));
       } else if (isNodeAccessor(store[key]) && value && typeof value === 'object') {
         visit(store[key], value, true);
       }
     }
   };
   visit(target, updates, whole);
-  // All supplied getters and marker validation complete before allocation.
-  // Framework observation tokens remain lazy during canonical construction.
-  for (const build of construct) build();
+  // Descriptions and closures are attempt-local. No slot, position, publication
+  // binding or observation claim exists until a member is actually installed.
   return plans;
 }
 
@@ -1008,7 +1024,7 @@ function recursiveUpdate(
         additions.has(key) &&
         !Object.prototype.hasOwnProperty.call(targetObj, key)
       ) {
-        const child = additions.get(key);
+        const child = additions.get(key)!();
         inheritObservationForAddedMember(branch, child);
         installPreparedMember(branch, key, child);
         installed?.add(key);
@@ -1368,7 +1384,7 @@ function materializeOrdinaryBranch(
   childPositionIds: number[] | undefined,
   childPath: string,
   address: readonly string[],
-  ordinaryOnly = false
+  preparedOrdinary = false
 ): unknown {
   const nested = createSignalStore(
     value,
@@ -1380,7 +1396,7 @@ function materializeOrdinaryBranch(
     childPositionIds,
     childPath,
     address,
-    ordinaryOnly
+    preparedOrdinary
   );
   const accessor = makeNodeAccessor(
     nested as TreeNode<object>,
@@ -1418,7 +1434,7 @@ function createSignalStore<T>(
    */
   path = '',
   address: readonly string[] = [],
-  ordinaryOnly = false
+  preparedOrdinary = false
 ): TreeNode<T> {
   for (const position of positionIds ?? []) {
     materializationContext.positionRegistry.registerPositionAddress(
@@ -1529,15 +1545,7 @@ function createSignalStore<T>(
     const childPath = path ? `${path}.${key}` : key;
     const terminal = isLeafDefinition(definedValue);
     const value = terminal ? leafDefinitionValue(definedValue) : definedValue;
-    if (
-      ordinaryOnly &&
-      (isEntityMapMarker(value) || isRegisteredMarker(value))
-    ) {
-      throw new TypeError(
-        'SignalTree: marker definitions belong in initial state, not ordinary whole-value writes.'
-      );
-    }
-    if (terminal && (isEntityMapMarker(value) || isRegisteredMarker(value))) {
+    if (!preparedOrdinary && terminal && (isEntityMapMarker(value) || isRegisteredMarker(value))) {
       throw new Error(
         `SignalTree: leaf() cannot wrap a semantic marker at "${childPath}".`
       );
@@ -1578,7 +1586,7 @@ function createSignalStore<T>(
     }
 
     // Entity map markers - preserve for entities() enhancer
-    if (isEntityMapMarker(value)) {
+    if (!preparedOrdinary && isEntityMapMarker(value)) {
       store[key] = value;
       continue;
     }
@@ -1591,7 +1599,7 @@ function createSignalStore<T>(
     // this check. Detecting them through the registry (instead of importing
     // `isStoredMarker` directly) keeps `markers/stored` out of the bundle when
     // that marker is never used.
-    if (isRegisteredMarker(value)) {
+    if (!preparedOrdinary && isRegisteredMarker(value)) {
       store[key] = value;
       continue;
     }
@@ -1600,6 +1608,7 @@ function createSignalStore<T>(
     // This catches the common mistake of forgetting to register before tree creation
     if (typeof ngDevMode === 'undefined' || ngDevMode) {
       if (
+        !preparedOrdinary &&
         !terminal &&
         value !== null &&
         typeof value === 'object' &&
@@ -1680,7 +1689,7 @@ function createSignalStore<T>(
       getChildPositionIds(),
       childPath,
       childAddress,
-      ordinaryOnly
+      preparedOrdinary
     );
   }
 

@@ -52,3 +52,12 @@ its existing unknown-key policy. Never-present descendant handles are separate. 
 prepared payloads. Its ordinary regression remains failing; intermediate suite passes
 are not final-source qualification. See [the candidate evidence](docs/audits/2026-10-17-incumbent-readiness/new-key-candidate/README.md).
 The incumbent remains 8d, and no repaired runtime is accepted. Stable v15 remains untouched.
+
+## Private-preparation follow-up
+
+The [bounded follow-up](docs/audits/2026-10-17-incumbent-readiness/private-preparation/README.md)
+passes the original retention and reentry controls, but remains unaccepted. A new
+ordinary failed-transaction counterexample leaves an installed new member live
+because later failure skips membership capture. Final focused result: 22 passes,
+1 failure. No accepted runtime freeze; incumbent 8d and the remaining inventory
+are unchanged.
