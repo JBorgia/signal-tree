@@ -61,3 +61,13 @@ ordinary failed-transaction counterexample leaves an installed new member live
 because later failure skips membership capture. Final focused result: 22 passes,
 1 failure. No accepted runtime freeze; incumbent 8d and the remaining inventory
 are unchanged.
+
+## October 18 paired-membership correction
+
+Runtime `89bfca6260cb3bc0993abb350f0f340b4e59581b` closes the tested new-key
+failed-abort capture gap. [Exact verification and limitations](docs/audits/2026-10-17-incumbent-readiness/paired-membership/README.md)
+record passing unchanged retention/capture controls, recovery, all four frameworks,
+full suites and packed consumers. The cumulative new-key candidate remains
+**unaccepted for release**: bare/entity production/development budgets fail.
+No ceilings changed. The prior rejected checkpoints remain preserved; the other
+readiness requirements and B's closed status are unchanged.
