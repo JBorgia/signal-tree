@@ -230,12 +230,17 @@ record-then-filter step.
 | Undo one panel, not the whole app                   | designate only the panel's operations with `undoable()`                                                      | Yes                                                                                   |
 | Large server collection + small editable **branch** | apply the collection with `external()`; designate the branch's edits with `undoable()`                       | Yes — the headline pattern                                                            |
 | Large server collection + small editable draft      | `external()` for the collection; ordinary draft state; designate accepted edits with `undoable()`            | Yes. Independent panel-local undo remains application-owned.                          |
-| Optimistic write, roll back on error                | `undo()` in the error path, or `jumpTo(getCurrentIndex() - 1)`                                               | Yes — only if nothing else recorded in between                                        |
+| Optimistic write, roll back on error                | Keep the `transact()` handle and call its `rollback()` on rejection                                         | Settle newest overlapping work first; retain refused handles for deliberate retry or confirmation |
 | Import/generate, then one undo                      | —                                                                                                            | **No.** `pauseRecording()` was removed in 14.1.1 (see lever 3) and has no replacement |
 | Audit trail rather than undo                        | `getRestorationHistory()` for retained undo entries; use an application event log for a complete audit trail | Restoration history is not a complete audit log                                       |
-| Show the user how far they can go                   | `getCurrentIndex()` back, `getRestorationHistory().length - 1 - getCurrentIndex()` fwd                       | Yes — reactive since 14.0.0                                                           |
+| Enable undo and redo controls                      | `canUndo()` and `canRedo()`                                                                                 | Reactive eligibility; not a count of available steps                                  |
 | Undo per entity, independently                      | —                                                                                                            | **No.** Keep independent edit scopes in application-owned state                       |
 | Collaborative editing                               | A CRDT (Yjs, Automerge) underneath — undo is per-user, not per-document                                      | **Not a store feature.** Don't                                                        |
+
+In v16, causal `undo()` and `redo()` change turn authority; they do not move the
+snapshot navigation index returned by `getCurrentIndex()`. Do not derive undo
+depth or an optimistic rollback target from that index. See the
+[overlapping transaction workflow](composition-recipes.md#v16-settlement-scope).
 
 ## Reactive readers, and why that mattered
 

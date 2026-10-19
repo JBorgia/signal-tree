@@ -1,6 +1,6 @@
 # Current work — incumbent v16 readiness
 
-Updated October 18, 2026. Branch `codex/v16-incumbent-readiness`.
+Updated October 19, 2026. Branch `codex/v16-incumbent-readiness`.
 Baseline: `8d220643e0d4e34cbdbc6e55e6ef692b25d5e023`.
 Accepted new-key runtime checkpoint: `9917c92fbbdc9dfdd14601f1f5fb7ce21799be71`.
 Version **16.0.0-dev**. **Not release-ready; no final candidate freeze yet.**
@@ -38,12 +38,28 @@ remain historical evidence at their stated source.
 | Item | Status | Next acceptance requirement |
 | --- | --- | --- |
 | Whole-value new keys / capture | Complete for checkpoint | Preserve passing retention, reentry, recovery, inspection and four-framework controls |
-| Artifact cost | Approved, four budgets pass | New source changes need fresh affected artifact validation; no further size campaign without changes/evidence |
+| Artifact cost | Prior new-key cost approved; current two entity budgets fail | Current measured bytes need separate disposition; ceilings unchanged |
 | String-Record direct access (K2 bounded migration) | Reviewed typing patch applied; source hashes match verified copy | Unknown arbitrary access, known/hybrid children and whole writes preserved; migration guidance saved; no lookup/deferred API implemented |
-| Two composed-restoration failures | Proven defects; six desired assertions fail | Supply complete-turn order/frontier evidence without weakening drift guards; pass undo/redo, identity, interleaving and publication controls |
-| Independent Link progression | Ten baseline failures preserved; broader progress not requalified | Preserve shared consequence safety while allowing actual independent work; no tree-gate bypass |
+| Two composed-restoration failures | Repaired at `87f6831f`; reviewed and broader affected checks pass | Preserve first failures and controlled capture limitations; final release verification remains pending |
+| Independent Link progression | Supported blocker; location-disjoint experiment `927ee0d8` rejected and reverted | Reactive copies need dependency evidence; safe gate retained; no new provenance architecture authorized |
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
+
+## October 19 reviewed checkpoint
+
+[Runtime repair, rejected Link experiment and exact verification](docs/audits/2026-10-17-incumbent-readiness/remaining-runtime/README.md)
+records runtime `87f6831fa60cafe87508f0ace84b7638698ca3b0`: kernel 5,837 ordinary
+passes / five expected failures / 12 skips; frameworks 599 passes / three skips.
+Source/spec types, affected lint and fresh package/demo builds pass. Two fresh
+entity budgets fail. No full release-registry, mutation or installed-consumer
+qualification is claimed. Earlier sections below retain their historical scope.
+
+Independent review found no further bounded restoration blocker. The Link
+experiment leaks pending values copied through reactive callbacks because
+location-disjointness is not dependency independence. Safe gate restored at
+`e9653a41`; original assertions and rejected source preserved. Closing this
+supported requirement needs a scoped dependency-provenance design, not another
+admission exception or transaction-ownership change. B remains closed.
 
 ## Verified evidence and limits
 
@@ -61,7 +77,7 @@ remain historical evidence at their stated source.
 - [Preregistered representative cost](docs/audits/2026-10-17-incumbent-readiness/representative-cost/README.md)
   leaves timing direction and large pending-owner attribution unresolved. Corrected
   cleanup supports sampled tree collectibility, not universal absence of leakage.
-- Current focused reconciliation: restoration **71 ordinary passes / 6 expected
+- Earlier focused reconciliation: restoration **71 ordinary passes / 6 expected
   failures**; unchanged Link cases **10 violated / 2 unsupported**. Vue shape
   counterexample strictly typechecks and its populated controls execute.
 - [Exact baseline qualification](docs/research/v16-candidate-acceptance-0/RESULT.md)

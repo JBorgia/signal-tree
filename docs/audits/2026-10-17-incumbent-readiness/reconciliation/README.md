@@ -1,5 +1,12 @@
 # Remaining readiness reconciliation
 
+> Historical reconciliation at the source identified below. Later owner decisions
+> supersede its K2 direction: the [applied string-Record migration](../unknown-dynamic-access/README.md)
+> makes arbitrary dynamic access `unknown`, preserving known/hybrid children and
+> whole-value writes. Deferred handles and a lookup API are not implemented or
+> required by that bounded migration. See the [current controller](../../../../RELEASE-CURRENT.md)
+> for current acceptance status; the findings below retain their original provenance.
+
 October 18, 2026. Inspected source `4dfc3576e12ce2e0077888d504f14cc022c9bb32`;
 runtime remains `9917c92fbbdc9dfdd14601f1f5fb7ce21799be71`. No runtime edits.
 The incumbent baseline remains `8d220643`. B remains closed.
