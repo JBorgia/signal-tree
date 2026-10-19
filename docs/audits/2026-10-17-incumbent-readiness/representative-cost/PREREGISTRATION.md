@@ -107,3 +107,22 @@ sampling is post-drain, distinct from pre-drain. Candidate-only capability probe
 is separate and asserted, without incumbent timing or equivalence claims.
 No decision thresholds changed. The original preflight harness and data remain
 in the evidence archive; revised source is frozen before the campaign.
+
+## Cleanup correction registered before heap-v2 measurements
+
+The completed campaign has 324 passing records. A separate diagnostic found its
+async heap fixture frame retains the final constructed tree through destruction
+sampling: 9/10 WeakRefs cleared, one remained, in both arms. An initial helper
+control accidentally retained the returned array (10/10 alive); removing that
+harness reference cleared 10/10 in both arms. All diagnostic versions are retained.
+Thus original post-destruction numbers cannot qualify library cleanup. This is a
+harness defect, not an implementation failure or a favorable-sample exclusion.
+
+Repeat only the seven heap profiles with synchronous helper scopes for creation,
+authoring, settlement and destruction, and weak tree references after teardown.
+Use the original two A/A plus five alternating pairs protocol (84 processes),
+identical sizes, artifacts and quiescence parameters. Preserve original results
+alongside the correction; do not rerun timing. Add direct pending value assertions.
+Report zero/nonzero weak reachability as finite observations, not universal leak
+proof. Negative aggregate pending deltas remain non-attributable regardless of
+whether a corrected run happens to change their sign. No acceptance rule changes.
