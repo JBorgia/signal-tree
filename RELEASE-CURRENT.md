@@ -126,6 +126,24 @@ separately unresolved. No production integration or public API is accepted. Auto
 independent progress and both entity budgets remain release blockers. Further scope
 changes require owner decision; no new configuration or provenance expansion is selected.
 
+## Eligibility boundary and destruction classified
+
+[Minimal controls, source trace and independent review](docs/audits/2026-10-17-incumbent-readiness/link-eligibility-boundary/README.md)
+distinguish complete owner-set resolution from missing provenance. All known possible
+owners confirming can discharge a complete set; the private clean/unknown flag has
+no such bookkeeping. Current pending snapshots cannot establish completeness for a
+synchronous retained local from a previously rejected owner. Literal and retained
+copies have identical observed metadata. Baseline publication follows its current
+surviving-truth contract; stronger causal withholding requires an explicit product
+boundary, not another delivery guard. No policy/API changes selected.
+
+Destruction is now classified separately: established tests permit a pre-destroy
+queued value to send. The earlier zero-send research oracle was stronger than that
+contract. Started requests may complete; held settlement waiters remaining pending
+until explicit Link.dispose() reproduce a previously documented lifecycle gap.
+Tree destruction is not specified as connection disposal. Automatic progress and
+artifact blockers remain open; no release qualification is inferred.
+
 ## Verified evidence and limits
 
 - [Applied string-Record typing migration](docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/README.md)
