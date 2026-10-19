@@ -78,3 +78,11 @@ checks against identified final source/artifacts. Rebuild after mutation tests.
 Record ordinary passes, expected failures, skips and unexecuted checks separately.
 Do not declare the stronger matrix fulfilled or add APIs merely to observe it.
 Verification grants no publication authority.
+
+### Preserved runtime counterexamples after typing migration
+
+See the [separate boundary evidence](docs/audits/2026-10-17-incumbent-readiness/runtime-boundaries/README.md).
+Compound rollback restores rows but history retry fails ST1034; the one-removal
+repair is not general compensation support. Link rollback refreshes native order
+but omits reverse order capture, so its endpoint receives rejected ordering.
+Both remain runtime blockers; no additional flush or runtime repair is accepted.
