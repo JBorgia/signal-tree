@@ -150,6 +150,20 @@ without inheriting the rejected causal origin. This closes that specific product
 question only. It does not establish independence while other owners remain pending,
 change the production hold, or approve the experimental delivery mechanism.
 
+## Bounded owner-window eligibility rejected
+
+[Private experiment and independent replay](docs/audits/2026-10-17-incumbent-readiness/link-owner-window/README.md)
+demonstrate earlier revision progress after its captured owners confirm while a later
+owner remains pending. The first implementation fails ABA: net-equal value publication
+is deliberately suppressed, leaving Link on an older responsibility ticket than the
+latest mutation evidence. Both owners confirm but the value never sends. Window
+controls record 45 passes and one failure; cross-tree speculative copying remains an
+explicit unsupported boundary. Historical delivery checks remain unchanged: 32 pass,
+two old permanent-unknown expectations differ under the proposed eligibility behavior.
+No repair followed the counterexample. Production hold, surviving-write semantics,
+independent-progress requirement and separate artifact blockers remain unchanged.
+No public API, broader qualification or replacement transport is selected.
+
 ## Verified evidence and limits
 
 - [Applied string-Record typing migration](docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/README.md)
