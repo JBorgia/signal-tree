@@ -718,6 +718,7 @@ export function link<S>(
           }
           scheduleDurableConsequence({
             claimant: x as object,
+            dependencyScoped: true,
             key: sendConsequenceKey,
             run: () => {
               if (!synchronous) {
@@ -727,7 +728,6 @@ export function link<S>(
                 queueMicrotask(attempt);
                 return;
               }
-              waitingSends.delete(cancel);
               // Entering I/O is observable; a listener may dispose here, and
               // then no endpoint call may start.
               sending = true;
@@ -737,23 +737,49 @@ export function link<S>(
                 resolve(false);
                 return;
               }
-              try {
-                // Invoke inside the authority's callback. Awaiting permission
-                // first would let a new scope open before the actual send.
-                Promise.resolve(endpoint.set?.(now)).then(
-                  () => {
+              // Observation above is user code and can open a new scope.
+              // Re-enter the same authority at the actual endpoint boundary.
+              let admitted = false;
+              scheduleDurableConsequence({
+                claimant: x as object,
+                key: sendConsequenceKey,
+                dependencyScoped: true,
+                run: () => {
+                  if (!synchronous) {
+                    queueMicrotask(attempt);
+                    return;
+                  }
+                  admitted = true;
+                  waitingSends.delete(cancel);
+                  const value = entityProjection
+                    ? (entityProjection.value() as unknown as T)
+                    : eligible;
+                  if (knownY !== undefined && deepEqual(value, knownY.value)) {
                     sending = false;
-                    knownY = { value: now };
-                    resolve(true);
-                  },
-                  (error) => {
+                    resolve(false);
+                    return;
+                  }
+                  try {
+                    Promise.resolve(endpoint.set?.(value)).then(
+                      () => {
+                        sending = false;
+                        knownY = { value };
+                        resolve(true);
+                      },
+                      (error) => {
+                        sending = false;
+                        reject(error);
+                      }
+                    );
+                  } catch (error) {
                     sending = false;
                     reject(error);
                   }
-                );
-              } catch (error) {
+                },
+              });
+              if (!admitted) {
                 sending = false;
-                reject(error);
+                observeLink();
               }
             },
           });
@@ -795,6 +821,7 @@ export function link<S>(
 
     scheduleDurableConsequence({
       claimant: x as object,
+      dependencyScoped: true,
       key: consequenceKey,
       run: () => {
         held.delete(pending);

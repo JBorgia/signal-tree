@@ -19,6 +19,10 @@ import { getActiveWriteContext } from '../write-context';
  *   one or more open commit scopes      → durable consequences wait
  *   scopes settle                       → persist current surviving truth
  *
+ * Link may request a whole-payload disjointness proof from every open scope.
+ * The authority evaluates live responsibility, including callback capture; an
+ * absent proof retains the tree-wide hold. Storage defaults stay unchanged.
+ *
  * WHY THIS EXISTS RATHER THAN A CHECK AT EACH CALL SITE. Six defects on this
  * boundary shared one cause: there were two answers to "may I persist this?".
  * `stored()` inspected the ambient writer/transaction context; `persistence()`
@@ -52,13 +56,20 @@ interface CommitScope {
    * instead of a replay of every intermediate.
    */
   readonly consequences: Map<unknown, CommitConsequence>;
+  readonly disjoint?: (claimant: unknown) => boolean;
 }
 
 const scopesByOwner = new WeakMap<object, Map<number, CommitScope>>();
-const openScopesByKey = new WeakMap<object, Set<number>>();
+const openScopesByKey = new WeakMap<object, Map<number, CommitScope>>();
 const settleListenersByKey = new WeakMap<object, Set<() => void>>();
 /** Consequences with no owning scope, waiting for their tree to settle. */
-const heldByKey = new WeakMap<object, Map<unknown, CommitConsequence>>();
+const heldByKey = new WeakMap<
+  object,
+  Map<
+    unknown,
+    { run: CommitConsequence; claimant: unknown; dependencyScoped?: boolean }
+  >
+>();
 
 /**
  * Resolve the ONE identity that answers "which tree is this?".
@@ -81,6 +92,13 @@ function hasOpen(key: object): boolean {
   return scopes !== undefined && scopes.size > 0;
 }
 
+function isDisjointFromOpenScopes(key: object, claimant: unknown): boolean {
+  for (const scope of openScopesByKey.get(key)?.values() ?? []) {
+    if (!scope.disjoint?.(claimant)) return false;
+  }
+  return true;
+}
+
 /**
  * Open a deferral scope for one explicit transaction, BEFORE its callback runs
  * so writes inside it find the scope already present.
@@ -88,7 +106,8 @@ function hasOpen(key: object): boolean {
 export function openCommitScope(
   owner: object,
   transactionId: number,
-  tree?: object
+  tree?: object,
+  disjoint?: (claimant: unknown) => boolean
 ): void {
   let byId = scopesByOwner.get(owner);
   if (!byId) {
@@ -96,15 +115,16 @@ export function openCommitScope(
     scopesByOwner.set(owner, byId);
   }
   const key = resolveScopeKey(tree);
-  byId.set(transactionId, { key, consequences: new Map() });
+  const scope = { key, consequences: new Map(), disjoint };
+  byId.set(transactionId, scope);
 
   if (key) {
     let open = openScopesByKey.get(key);
     if (!open) {
-      open = new Set();
+      open = new Map();
       openScopesByKey.set(key, open);
     }
-    open.add(transactionId);
+    open.set(transactionId, scope);
   }
 }
 
@@ -191,6 +211,8 @@ export function scheduleDurableConsequence(request: {
   /** Collapse key — a later consequence for the same key replaces this one. */
   key: unknown;
   run: CommitConsequence;
+  /** Internal whole-payload dependency proof; default consumers stay tree-scoped. */
+  dependencyScoped?: boolean;
 }): void {
   const { claimant, key, run } = request;
 
@@ -198,6 +220,7 @@ export function scheduleDurableConsequence(request: {
   const owner = meta?.transactionOwner;
   const transactionId = meta?.transactionId;
   if (
+    !request.dependencyScoped &&
     owner !== undefined &&
     typeof transactionId === 'number' &&
     deferCommitConsequence(owner, transactionId, key, run, claimant)
@@ -209,13 +232,21 @@ export function scheduleDurableConsequence(request: {
   // a rollback compensation runs with no transaction anywhere while the tree
   // still holds unsettled speculative state.
   const scopeKey = resolveScopeKey(claimant);
-  if (scopeKey && hasOpen(scopeKey)) {
+  if (
+    scopeKey &&
+    hasOpen(scopeKey) &&
+    (!request.dependencyScoped || !isDisjointFromOpenScopes(scopeKey, claimant))
+  ) {
     let held = heldByKey.get(scopeKey);
     if (!held) {
       held = new Map();
       heldByKey.set(scopeKey, held);
     }
-    held.set(key, run);
+    held.set(key, {
+      run,
+      claimant,
+      dependencyScoped: request.dependencyScoped,
+    });
     return;
   }
 
@@ -274,18 +305,27 @@ export function settleCommitScope(
   }
   scope.consequences.clear();
 
-  if (key && !hasOpen(key)) {
-    // Release everything that was waiting on this tree, then notify.
+  if (key) {
     const held = heldByKey.get(key);
     if (held) {
-      heldByKey.delete(key);
-      for (const consequence of held.values()) attempt(consequence);
-      held.clear();
+      // Recheck each item after every settlement and after earlier callbacks:
+      // callbacks can open new scopes before a later item enters delivery.
+      for (const [heldKey, consequence] of [...held]) {
+        if (held.get(heldKey) !== consequence) continue;
+        if (
+          hasOpen(key) &&
+          (!consequence.dependencyScoped ||
+            !isDisjointFromOpenScopes(key, consequence.claimant))
+        )
+          continue;
+        held.delete(heldKey);
+        attempt(consequence.run);
+      }
+      if (held.size === 0 && heldByKey.get(key) === held) heldByKey.delete(key);
     }
-
-    const listeners = settleListenersByKey.get(key);
-    if (listeners) {
-      for (const listener of [...listeners]) attempt(listener);
+    if (!hasOpen(key)) {
+      const listeners = settleListenersByKey.get(key);
+      if (listeners) for (const listener of [...listeners]) attempt(listener);
     }
   }
 
