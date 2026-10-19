@@ -48,3 +48,13 @@ NX_DAEMON=false pnpm nx test kernel --testFile=src/lib/physical/declarative-targ
 NX_DAEMON=false pnpm nx test vue --skip-nx-cache --args='src/lib/settlement-publication.spec.ts src/lib/entity-projection-publication.spec.ts src/lib/prepared-selection-publication.spec.ts'
 pnpm run typecheck
 ```
+
+## Subsequent spec-types correction
+
+The separate ordinary-spec gate found 13 unsupported `reorder:true` arguments
+in the new Link test. Public `setAll` already uses input order; that option is
+not part of its contract and was ignored at runtime. Only those arguments were
+removed; all assertions remain unchanged. The corrected 12 controls and spec-types
+gate pass. The original spec/compiler failure and correction receipt are preserved
+in `spec-types-correction.tar.xz` with an adjacent manifest. No public API or
+runtime behavior changed to accommodate the test.

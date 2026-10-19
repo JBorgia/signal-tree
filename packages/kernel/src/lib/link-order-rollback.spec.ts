@@ -41,7 +41,7 @@ describe('Link order publication after transaction rollback', () => {
       });
       try {
         const pending = tree.transact(() =>
-          tree.$.rows.setAll([...initial].reverse(), { reorder: true })
+          tree.$.rows.setAll([...initial].reverse())
         );
         if (delivered) await drain();
         expect(sent).toEqual([]);
@@ -68,7 +68,7 @@ describe('Link order publication after transaction rollback', () => {
     });
     try {
       const pending = tree.transact(() =>
-        tree.$.rows.setAll([...initial].reverse(), { reorder: true })
+        tree.$.rows.setAll([...initial].reverse())
       );
       await drain();
       expect(sent).toEqual([]);
@@ -103,8 +103,7 @@ describe('Link order publication after transaction rollback', () => {
           [
             { id: 'b', n: 0 },
             { id: 'a', n: 1 },
-          ],
-          { reorder: true }
+          ]
         )
       );
       await drain();
@@ -126,12 +125,12 @@ describe('Link order publication after transaction rollback', () => {
       set: (value) => {
         sent.push(value.map((row) => row.id));
         if (sent.length === 1)
-          tree.$.rows.setAll([...initial].reverse(), { reorder: true });
+          tree.$.rows.setAll([...initial].reverse());
       },
     });
     try {
       const pending = tree.transact(() =>
-        tree.$.rows.setAll([...initial].reverse(), { reorder: true })
+        tree.$.rows.setAll([...initial].reverse())
       );
       await drain();
       pending.rollback();
@@ -167,7 +166,7 @@ describe('Link order publication after transaction rollback', () => {
       let pending!: ReturnType<typeof tree.transact>;
       undoable(() => {
         pending = tree.transact(() =>
-          tree.$.rows.setAll([...initial].reverse(), { reorder: true })
+          tree.$.rows.setAll([...initial].reverse())
         );
       });
       await drain();
@@ -210,7 +209,7 @@ describe('Link order publication after transaction rollback', () => {
       onUpdate: () => {
         if (armed) {
           armed = false;
-          tree.$.rows.setAll([...initial].reverse(), { reorder: true });
+          tree.$.rows.setAll([...initial].reverse());
         }
       },
     });
@@ -220,10 +219,9 @@ describe('Link order publication after transaction rollback', () => {
           [
             { id: 'b', n: 1 },
             { id: 'a', n: 0 },
-          ],
-          { reorder: true }
+          ]
         );
-        tree.$.rows.setAll([...initial].reverse(), { reorder: true });
+        tree.$.rows.setAll([...initial].reverse());
       });
       await drain();
       armed = true;
@@ -269,10 +267,9 @@ describe('Link order publication after transaction rollback', () => {
           [
             { id: 'b', n: 1 },
             { id: 'a', n: 0 },
-          ],
-          { reorder: true }
+          ]
         );
-        tree.$.rows.setAll([...initial].reverse(), { reorder: true });
+        tree.$.rows.setAll([...initial].reverse());
       });
       await drain();
       armed = true;
@@ -326,7 +323,7 @@ describe('Link order publication after transaction rollback', () => {
       ).__prepareTransitionTarget;
       const original = binding.readSource();
       undoable(() =>
-        tree.$.rows.setAll([...initial].reverse(), { reorder: true })
+        tree.$.rows.setAll([...initial].reverse())
       );
       await connection.settled();
       expect(sent).toEqual([['b', 'a']]);
@@ -378,8 +375,7 @@ describe('Link order publication after transaction rollback', () => {
               { id: 'e', n: 0 },
               { id: 'c', n: 0 },
               { id: 'a', n: 0 },
-            ],
-            { reorder: true }
+            ]
           )
         );
         if (delivered) await drain();
