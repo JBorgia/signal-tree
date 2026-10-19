@@ -86,6 +86,18 @@ production replacement. Visibility models are distinguished, not ranked by fidel
 to current live proposals. Runtime costs remain unmeasured at equivalent capability.
 Current safe hold, supported-progress blocker and artifact blockers remain intact.
 
+## End-to-end workflow adoption evidence
+
+[Ticket review and explicit command adoption](docs/audits/2026-10-17-incumbent-readiness/workflow-adoption/README.md)
+now have independently replayed headless scenarios and strict application typechecks.
+Review-before-save preserves concurrent edits and explicit conflicts with ordinary
+Link. The command sample uses versioned tooling identity/lifecycle and remains
+experimental: recovery adoption, retention and durability are unqualified. Negative
+controls and first failures are preserved; line counts measure application burden,
+not runtime cost. No package source changed. A proposed workflow-scoped independent
+progress contract has been put to the owner; it is not yet approved or recorded as
+closing the existing automatic-progress blocker. Both entity budgets remain open.
+
 ## Verified evidence and limits
 
 - [Applied string-Record typing migration](docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/README.md)

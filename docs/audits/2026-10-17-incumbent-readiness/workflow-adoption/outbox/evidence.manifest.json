@@ -1,0 +1,29 @@
+{
+  "archive": "evidence.tar.xz",
+  "sha256": "c20377313a6264737380cd576a01aea0a99da1dc60f1c25ec73d7f1d2d592cf5",
+  "files": {
+    "PLAN.md": "eac86c003570309e939ada820ed63d0b7ba94aa9afe8999fc55e994da2bfdf9e",
+    "RESULT.md": "ec2d0d2b312abbf506ab38997c68b6cb4242d2758d1d1781a0f3c8c6059e86d1",
+    "application-first.ts": "32253e9b722c1f408839c505ed5e16df807a346a2936cf49cd4173d9b50b5e03",
+    "application.ts": "bc42f3dcfe8e6556d9dea917de569b5a53e416886c87fdb1ab960163247e2a19",
+    "bundle.mjs": "b072b59f3dc1662202b4ad973b610ac3337726fac90025ca0ffb46aaac8383f3",
+    "burden.json": "c85e3600b1031a93efcd5141c9d446dd8120ace3b2ecab9e127398c36f6ac230",
+    "final-run.log": "279173c50489eae6a0ee34dff2f4b6128d95e809cac60a6d89114cc9961168a4",
+    "first-run.log": "7d294dea0db4e5d66cf2a24cb774fe54b6e63ae39719d35e9681c1e9403647bc",
+    "fourth-run.log": "279173c50489eae6a0ee34dff2f4b6128d95e809cac60a6d89114cc9961168a4",
+    "plan-before-run.sha256": "a7d634864ced8ce8af5e4d57753c7eb2e5e95708428b937a228fc2e1a0eeb28c",
+    "results.json": "9442182abf7987386851ed36f36e9f53eca55953a93412c353654fcc54815d38",
+    "run.mjs": "50b3f66d48e72c916eb10e7dd48c69c66a73490d8f5b049767d08cd2a145e021",
+    "second-run.log": "7aaba2b12d2d4b634d9a9e6596a452ebd06323e4f239cbda6c352c92fab14032",
+    "source-receipt-first.json": "c3125cf5a5547c817aba32f392e13874da9fbb058ebe523452edf9508b1357cc",
+    "source-receipt.json": "8ed9bc76ade089674cf1b26ecdfd999c20a1383f6876517f391e19443fb48c3f",
+    "test-first.ts": "bbf007ab4ac42d714eabf8698efccf53b190934206a28b2f45c68166409952f0",
+    "test-second.ts": "58fa6013043967b3218215a63a9907a26938261fd10d017ec3e72934380daa7e",
+    "test-third.ts": "35ab02dd91a4265496dc557e23c11f55b686c5d75aaf6d95c8c92c7a8ed43207",
+    "test.ts": "4adb85bd906ad9aeee310c3702b980d8595944c59264522905ac363294ba4725",
+    "third-run.log": "3eaec81043a5520654e673b851965c17031b2fb639e7fac959f04590142cfbb6",
+    "tsconfig.json": "71d10b2c64c27cf967cc4b8d0f7c80222fb4f81d217c450e7ee3fdfd68a380f0",
+    "typecheck-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "typecheck-first.log": "85db71f8299321bdc1b04fcc62fdda662360e2a7082cca4432dfff33ee57c85d"
+  }
+}
