@@ -144,6 +144,12 @@ until explicit Link.dispose() reproduce a previously documented lifecycle gap.
 Tree destruction is not specified as connection disposal. Automatic progress and
 artifact blockers remain open; no release qualification is inferred.
 
+On October 19 the owner approved surviving-write semantics for the reproduced
+post-rejection retained-local write: it authors new surviving application truth,
+without inheriting the rejected causal origin. This closes that specific product
+question only. It does not establish independence while other owners remain pending,
+change the production hold, or approve the experimental delivery mechanism.
+
 ## Verified evidence and limits
 
 - [Applied string-Record typing migration](docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/README.md)

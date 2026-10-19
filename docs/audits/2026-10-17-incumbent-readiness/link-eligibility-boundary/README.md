@@ -111,12 +111,25 @@ not general liveness, native-framework, entity or retention qualification.
 
 Keep production unchanged and automatic independent progress release-blocking.
 There is no justified additional delivery repair or override from this result.
-The concrete owner question is whether an ordinary surviving write deliberately
-reusing a rejected value authors publishable new truth once scopes settle (current
-contract), or must inherit that rejected causal origin. Requiring the latter for
-unannotated local copies needs an observable input boundary absent from the current
-contract. Selecting the former alone still does not prove independence while other
-owners remain pending. No scope narrowing is recorded here.
+
+## Owner decision — October 19, 2026
+
+The owner selected **“Preserve surviving-write semantics.”** In the reproduced case,
+an application reads x=7 while a transaction is pending, rejects that transaction,
+then ordinarily writes the retained 7 into y. That write authors new surviving
+application truth; it does not inherit the rejected causal origin. Once scopes
+settle, current Link publication of that surviving write is accepted behavior.
+
+This resolves the post-rejection local-copy premise only. It does not declare
+ordinary writes independent while other transactions remain pending, clear their
+unknown evidence, approve an API, or qualify the experimental delivery mechanism.
+Automatic independent progress remains required and release-blocking. Production
+hold, separate destruction obligations and artifact blockers remain unchanged.
+
+The original research assertions, raw archive and independent review predate this
+owner disposition and remain unchanged. Their stronger historical-causality oracle
+is not an acceptance requirement for this approved case; its observed result is
+preserved rather than rewritten as an implementation failure or a new passing test.
 
 ## Replay
 
