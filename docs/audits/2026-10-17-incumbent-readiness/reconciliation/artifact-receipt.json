@@ -1,0 +1,10 @@
+{
+  "runtime": "9917c92fbbdc9dfdd14601f1f5fb7ce21799be71",
+  "prior_manifest": "../artifact-cost/manifest.json:artifacts.shared",
+  "all_candidate_artifacts_verified": 248,
+  "imported_entries": {
+    "dist/packages/kernel/dist/adapter.js": "d080563a22f5bda9437a7c14d4b4bcfb881778733c056d74fa5e483d1d60ceef",
+    "dist/packages/kernel/dist/index.js": "a91d2789824d429e69cd18ce29679dbd736fdeecb8dcbd5eac8d2dab018db799",
+    "dist/packages/vue/dist/index.js": "853f78a32a354f28448245c3573f1c8bb36594bf019ad7a47b88ec4ef24f8860"
+  }
+}

@@ -1,114 +1,75 @@
 # Current work — incumbent v16 readiness
 
-Updated October 18, 2026. Dedicated branch `codex/v16-incumbent-readiness`.
-Incumbent baseline: `8d220643e0d4e34cbdbc6e55e6ef692b25d5e023`,
-version **16.0.0-dev**. New-key runtime checkpoint: `9917c92f`.
-Its artifact cost is owner-approved and verified; the full v16 candidate is not
-release-qualified while the remaining requirements below are unresolved.
+Updated October 18, 2026. Branch `codex/v16-incumbent-readiness`.
+Baseline: `8d220643e0d4e34cbdbc6e55e6ef692b25d5e023`.
+Accepted new-key runtime checkpoint: `9917c92fbbdc9dfdd14601f1f5fb7ce21799be71`.
+Version **16.0.0-dev**. **Not release-ready; no final candidate freeze yet.**
 
-The previous integration controller is preserved in baseline Git history.
-Original checkouts and research specs remain untouched. B's replacement track
-is closed at `17e1a76f`; its evidence is not an active repair queue.
+## Scope and authority
 
-## Authorized work
+Complete the finite incumbent release contract and its required verification.
+No release, merge, push, activation, tag, publication or unrelated architecture
+change. B's replacement track is closed at `17e1a76f` and is not a repair queue.
+Original checkouts, rejected checkpoints and first-failure evidence are preserved.
 
-Establish a finite release contract: supported behavior, known limitations,
-required repairs and exact acceptance checks. Start with open-key public
-contracts, then restoration limitations and semantic-matrix scope. No release,
-merge, push, activation, tag, publication or unrelated architecture/API change.
+Owner decisions:
 
-See [the readiness inventory](docs/audits/2026-10-17-incumbent-readiness/README.md)
-and its complete row-level matrix classification. Public compatibility decisions
-remain owner decisions; current implementation behavior does not define scope.
+- Ordinary whole-value writes may create supplied new keys. Internal inspection
+  replay retains its separate unknown-key policy; stable v15 remains unchanged.
+- Four new-key artifact ceilings are approved and verified. This is artifact-cost
+  acceptance, not performance neutrality or release readiness.
+- Preserve the recursive open-key promise and specify deferred handles. A concrete
+  Vue erased-shape conflict requires runtime shape information. The owner authorized
+  investigating a narrow declaration; **no new API implementation is approved**.
+- Documented newest-open-first settlement is v16 scope: atomic retryable refusal,
+  retained authority, useful retry, truthful inspection/errors and independent
+  progress remain required. Server reconciliation policy belongs to applications.
+  Arbitrary-order surgical success and canonical authority projection remain
+  preserved advanced capability targets, not claimed release capabilities.
 
-## Completed evidence
+## Current acceptance checklist
 
-[Exact-8d verification and costs](docs/research/v16-candidate-acceptance-0/RESULT.md)
-are retained byte-for-byte from evidence-only `774dfd7f`. The 84/84 registry,
-84/84 mutation proofs, rebuilt installed-artifact checks and 136/136 browser
-results apply to 8d, not future runtime changes. Approved size ceilings pass;
-measured transaction and heap overhead remain explicit tradeoffs.
+[Reconciliation and exact evidence](docs/audits/2026-10-17-incumbent-readiness/reconciliation/README.md)
+are the current detailed disposition. The original
+[inventory and row classification](docs/audits/2026-10-17-incumbent-readiness/README.md)
+remain historical evidence at their stated source.
 
-A clean isolated baseline is established. Read-only investigations and raw-record
-checks classify the matrix without changing assertions. The prior focused run
-reported 35 ordinary passes and 8 expected failures. No broad suite was rerun
-for this documentation-only readiness inventory.
+| Item | Status | Next acceptance requirement |
+| --- | --- | --- |
+| Whole-value new keys / capture | Complete for checkpoint | Preserve passing retention, reentry, recovery, inspection and four-framework controls |
+| Artifact cost | Approved, four budgets pass | New source changes need fresh affected artifact validation; no further size campaign without changes/evidence |
+| Deferred unseen descendant handles | Specification blocked on unknown shape | Investigate declaration semantics; review before implementation; retain type/runtime assertions, protocol/carrier and lifetime requirements |
+| Two composed-restoration failures | Proven defects; six desired assertions fail | Supply complete-turn order/frontier evidence without weakening drift guards; pass undo/redo, identity, interleaving and publication controls |
+| Independent Link progression | Ten failures reproduced on current source | Preserve shared consequence safety while allowing actual independent work; no tree-gate bypass |
+| Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
+| Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
-## Remaining acceptance work
+## Verified evidence and limits
 
-1. Whole-write new-key correctness and its artifact-cost acceptance are complete
-   for the recorded checkpoint. Arbitrary unseen descendant handles remain a
-   separate compatibility decision.
-2. Repair the two composed-restoration requirements (six desired assertions),
-   or obtain a justified explicit product disposition. Safe refusal alone is
-   insufficient for these unambiguous ordinary undo cases.
-3. Diagnose ten independent Link-progress matrix failures. Reconcile 57 stronger
-   overlap-target failures and one authority-projection failure with documented
-   consumer contracts. Keep 168 unsupported rows separately classified.
-4. Freeze the resulting runtime and run fresh appropriate qualification. Existing
-   verification does not discharge changed-runtime or unresolved product claims.
+- [Paired capture repair](docs/audits/2026-10-17-incumbent-readiness/paired-membership/README.md)
+  preserves runtime `89bfca62` and evidence `96a54e6a`.
+- [Artifact attribution](docs/audits/2026-10-17-incumbent-readiness/artifact-cost/README.md)
+  identifies the separately verified helper optimization `9917c92f`.
+- [Approved artifact decision and receipt](docs/audits/2026-10-17-incumbent-readiness/ARTIFACT-ACCEPTANCE.md)
+  records ceilings implemented at `4dfc3576`; 248 identified artifact hashes
+  remained unchanged. Prior failed budget runs are preserved, not relabelled.
+- [Preregistered representative cost](docs/audits/2026-10-17-incumbent-readiness/representative-cost/README.md)
+  leaves timing direction and large pending-owner attribution unresolved. Corrected
+  cleanup supports sampled tree collectibility, not universal absence of leakage.
+- Current focused reconciliation: restoration **71 ordinary passes / 6 expected
+  failures**; unchanged Link cases **10 violated / 2 unsupported**. Vue shape
+  counterexample strictly typechecks and its populated controls execute.
+- [Exact baseline qualification](docs/research/v16-candidate-acceptance-0/RESULT.md)
+  applies to `8d220643`, not a future runtime. Existing successful gate runs do not
+  close current supported-behavior failures or certify another source/artifact.
 
-Owner authorized newly supplied keys for ordinary whole-value writes on October 17.
-This replaces ST2010 discard for that ingress; internal inspection replay keeps
-its existing unknown-key policy. Never-present descendant handles are separate. The experimental implementation is rejected after recurring retention of uninstalled
-prepared payloads. Its ordinary regression remains failing; intermediate suite passes
-are not final-source qualification. See [the candidate evidence](docs/audits/2026-10-17-incumbent-readiness/new-key-candidate/README.md).
-The incumbent remains 8d, and no repaired runtime is accepted. Stable v15 remains untouched.
+## Final verification boundary
 
-## Private-preparation follow-up
-
-The [bounded follow-up](docs/audits/2026-10-17-incumbent-readiness/private-preparation/README.md)
-passes the original retention and reentry controls, but remains unaccepted. A new
-ordinary failed-transaction counterexample leaves an installed new member live
-because later failure skips membership capture. Final focused result: 22 passes,
-1 failure. No accepted runtime freeze; incumbent 8d and the remaining inventory
-are unchanged.
-
-## October 18 paired-membership correction
-
-Runtime `89bfca6260cb3bc0993abb350f0f340b4e59581b` closes the tested new-key
-failed-abort capture gap. [Exact verification and limitations](docs/audits/2026-10-17-incumbent-readiness/paired-membership/README.md)
-record passing unchanged retention/capture controls, recovery, all four frameworks,
-full suites and packed consumers. The cumulative new-key candidate remains
-**unaccepted for release**: bare/entity production/development budgets fail.
-No ceilings changed. The prior rejected checkpoints remain preserved; the other
-readiness requirements and B's closed status are unchanged.
-
-## October 18 artifact attribution
-
-[Matched artifact evidence](docs/audits/2026-10-17-incumbent-readiness/artifact-cost/README.md)
-compares exact 8d, pre-repair add49, passing 89bf and independently verified
-optimization `9917c92f`. Shared record installation saves 20/33 gzip bytes bare
-and 123/105 entities. Four budgets still fail, by 560/590 and 426/414 bytes.
-No optional transaction/restoration implementation leaked into these fixtures.
-No ceiling increase is assumed: residual cost/headroom needs an explicit owner
-disposition. This does not resolve the other readiness inventory items.
-
-## October 18 representative cost characterization
-
-[Preregistered representative study](docs/audits/2026-10-17-incumbent-readiness/representative-cost/README.md)
-compares exact `8d220643` and `9917c92f`: 324 original and 84 corrected heap
-processes, with no assertion failures. Timing/CPU direction remains unresolved;
-corrected populated live heap is modestly higher. Original cleanup was affected
-by harness retention; corrected tree WeakRefs clear, while isolated pending-owner
-bytes at 10,000 rows remain unresolved. This is characterization, not performance
-acceptance. Four artifact budgets and other readiness items still block sign-off.
-
-## Artifact-cost decision pending
-
-[Owner proposal](docs/audits/2026-10-17-incumbent-readiness/ARTIFACT-ACCEPTANCE.md)
-recommends narrow artifact acceptance with proposed bare prod/dev ceilings of
-12.41/14.79 KiB and entities prod/dev 26.16/28.98 KiB. The headroom rule preserves
-incumbent absolute allowances with only upward two-decimal rounding. **No owner
-approval or ceiling change is recorded.** All four failures still block sign-off;
-this proposal does not establish performance neutrality or v16 readiness.
-
-## October 18 artifact approval implemented
-
-The owner approved the four proposed ceilings. The updated gate passes all four
-against the identified `9917c92f` artifact, with all 248 candidate artifact hashes
-verified unchanged. [Approval and receipt](docs/audits/2026-10-17-incumbent-readiness/ARTIFACT-ACCEPTANCE.md#approval-and-execution)
-close the four artifact-budget blockers only. Earlier failed results and pending
-proposal entries above are historical evidence, superseded by this explicit
-approval. Timing neutrality, large pending-owner attribution and the other v16
-readiness items remain unresolved. No release, push, merge or publication.
+Once supported requirements are satisfied, obtain independent review and freeze
+the final runtime/source. Run the required affected suites, runtime/spec types,
+lint and documentation checks, then the complete release registry, mutation proofs,
+fresh package/demo builds, installed-artifact consumers and framework/browser
+checks against identified final source/artifacts. Rebuild after mutation tests.
+Record ordinary passes, expected failures, skips and unexecuted checks separately.
+Do not declare the stronger matrix fulfilled or add APIs merely to observe it.
+Verification grants no publication authority.

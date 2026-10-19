@@ -8,6 +8,9 @@ Branch: `codex/v16-incumbent-readiness`.
 change public semantics or a completed qualification of a repaired candidate.
 B is closed at `17e1a76f`; no B repair or architectural replacement is in scope.
 
+Current superseding dispositions are in the [October 18 reconciliation](reconciliation/README.md).
+This record retains the original audit findings and verdicts at its stated source.
+
 ## Checkout and inherited evidence
 
 The isolated worktree started clean at the exact incumbent SHA above. The
