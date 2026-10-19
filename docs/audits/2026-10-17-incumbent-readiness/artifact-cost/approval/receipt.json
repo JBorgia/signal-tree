@@ -1,0 +1,18 @@
+{
+  "runtime": "9917c92fbbdc9dfdd14601f1f5fb7ce21799be71",
+  "approval": "Owner explicitly approved the four proposed artifact ceilings in this conversation, October 18, 2026.",
+  "node": "24.15.0",
+  "command": "node /private/tmp/st-new-key-cost-20261018/shared/tools/check-bundle-budget.mjs",
+  "tool_sha256": "df55eac6244aa92a4972358fda41b8cbe809caf3c97745a814e9aa8aa8c7215a",
+  "artifacts_verified_against": "../manifest.json:artifacts.shared",
+  "verified_artifact_count": 248,
+  "budget_log_sha256": "5bf67a76cc089a2a0134b98155e04efa46548a9eb1a9054298a46faacc8283e9",
+  "result": "four budgets pass",
+  "limits_kib": {
+    "bare_prod": 12.41,
+    "bare_dev": 14.79,
+    "entities_prod": 26.16,
+    "entities_dev": 28.98
+  },
+  "scope": "Artifact cost only; no runtime changes, fresh benchmark campaign, performance-neutrality claim or release acceptance."
+}

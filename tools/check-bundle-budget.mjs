@@ -205,8 +205,11 @@ const TARGETS = {
     // belongs in its own release.
     // Owner-approved v16 cost after reduction audit; rationale and exact
     // measurements: docs/research/v16-candidate-acceptance-0/README.md.
-    devKB: 14.1,
-    prodKB: 11.75,
+    // Owner approved October 18: whole-value new-key correctness cost.
+    // Exact attribution, reductions, uncertainty and preserved headroom:
+    // docs/audits/2026-10-17-incumbent-readiness/ARTIFACT-ACCEPTANCE.md.
+    devKB: 14.79,
+    prodKB: 12.41,
     code: `
       import { signalTree } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, user: { name: 'a' } });
@@ -379,8 +382,9 @@ const TARGETS = {
     // (subjectEpochs / pendingSubjectEpochs) on top of the shared kernel
     // growth above. Same disposition and same reason.
     // Same v16 approval; keeps diagnostics and correctness intact.
-    devKB: 28.4,
-    prodKB: 25.6,
+    // Same October 18 artifact-only approval; no performance-neutrality claim.
+    devKB: 28.98,
+    prodKB: 26.16,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });

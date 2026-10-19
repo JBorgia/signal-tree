@@ -1,8 +1,10 @@
 # Current work — incumbent v16 readiness
 
-Updated October 17, 2026. Dedicated branch `codex/v16-incumbent-readiness`.
+Updated October 18, 2026. Dedicated branch `codex/v16-incumbent-readiness`.
 Incumbent baseline: `8d220643e0d4e34cbdbc6e55e6ef692b25d5e023`,
-version **16.0.0-dev**. No repaired runtime is frozen yet.
+version **16.0.0-dev**. New-key runtime checkpoint: `9917c92f`.
+Its artifact cost is owner-approved and verified; the full v16 candidate is not
+release-qualified while the remaining requirements below are unresolved.
 
 The previous integration controller is preserved in baseline Git history.
 Original checkouts and research specs remain untouched. B's replacement track
@@ -34,9 +36,9 @@ for this documentation-only readiness inventory.
 
 ## Remaining acceptance work
 
-1. Implement the authorized whole-write creation of new ordinary keys safely.
-   The first candidate is rejected for uninstalled-allocation retention.
-   Arbitrary unseen descendant handles remain a separate compatibility decision.
+1. Whole-write new-key correctness and its artifact-cost acceptance are complete
+   for the recorded checkpoint. Arbitrary unseen descendant handles remain a
+   separate compatibility decision.
 2. Repair the two composed-restoration requirements (six desired assertions),
    or obtain a justified explicit product disposition. Safe refusal alone is
    insufficient for these unambiguous ordinary undo cases.
@@ -100,3 +102,13 @@ recommends narrow artifact acceptance with proposed bare prod/dev ceilings of
 incumbent absolute allowances with only upward two-decimal rounding. **No owner
 approval or ceiling change is recorded.** All four failures still block sign-off;
 this proposal does not establish performance neutrality or v16 readiness.
+
+## October 18 artifact approval implemented
+
+The owner approved the four proposed ceilings. The updated gate passes all four
+against the identified `9917c92f` artifact, with all 248 candidate artifact hashes
+verified unchanged. [Approval and receipt](docs/audits/2026-10-17-incumbent-readiness/ARTIFACT-ACCEPTANCE.md#approval-and-execution)
+close the four artifact-budget blockers only. Earlier failed results and pending
+proposal entries above are historical evidence, superseded by this explicit
+approval. Timing neutrality, large pending-owner attribution and the other v16
+readiness items remain unresolved. No release, push, merge or publication.

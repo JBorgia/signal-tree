@@ -1,9 +1,10 @@
-# Proposed artifact-cost acceptance
+# Approved artifact-cost acceptance
 
-October 18, 2026. **Proposal awaiting owner approval. No ceilings changed.**
+October 18, 2026. **Owner approved the four artifact ceilings; all four now pass.**
+Approval is limited to artifact cost and its validation.
 
-Recommendation: accept the measured artifact cost of the authorized whole-value
-new-key correctness behavior, with the narrow ceilings below. This would accept
+Approved disposition: accept the measured artifact cost of the authorized whole-value
+new-key correctness behavior, with the narrow ceilings below. This accepts
 artifact cost only, not performance neutrality or v16 release readiness.
 
 ## Exact cost and proposed ceilings
@@ -107,3 +108,16 @@ resolve pending-owner memory attribution or close the other open-key, restoratio
 and semantic-scope readiness items. Declining retains the artifact blocker while
 preserving the passing correctness checkpoint; it does not reject contribution
 ownership or authorize a new architecture experiment.
+
+## Approval and execution
+
+The owner explicitly approved this proposal on October 18. The four settings were
+implemented in tools/check-bundle-budget.mjs and verified with Node 24.15.0 against
+the identified candidate build. All 248 artifact hashes still match the sealed
+candidate manifest; no stale managed-worktree dist was used.
+
+[Budget output](artifact-cost/approval/budget.log) and
+[validation receipt](artifact-cost/approval/receipt.json) record four passes. The
+proposal sections above preserve the decision basis and original failed limits.
+No runtime or benchmark was rerun or altered. Other readiness blockers and
+performance uncertainties remain; no release authority follows from this approval.
