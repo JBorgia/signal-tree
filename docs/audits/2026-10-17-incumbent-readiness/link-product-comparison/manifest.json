@@ -1,0 +1,18 @@
+{
+  "CONTRACT-REVIEW.md": "dadb0f97f46ea6f33e73f632ce40d322e8944e2b5577e62f7c861fc034f56baf",
+  "FINAL-REVIEW.md": "b7f25d53072caf6a969e56dc5f2f6de0bd271741929d7f147c6a1ba456d40918",
+  "NEGATIVE-CONTROL.md": "41384a52745fe3171d345b124a63f7a1cc2c5d1da05904793be9d5c7224373c2",
+  "PLAN.md": "7092720820f0e9cbb1d97f680a6d778d50c03493b4c9bdae519d67fa0c786c83",
+  "README.md": "7dab9c79b021802f63489baf21380823e9afbb0917ee42ea7938a796d51e9cde",
+  "SAMPLE-REVIEW.md": "1a5eda25080da1829cfcff322c653ddc45d48155e55895e1aeafed2634f0e2bf",
+  "doc-links.log": "66f2c08cc432aced05866f72cc54b5580151afe5a4b9ccd188f62cd9713e7e33",
+  "examples-before-overwrite-control.ts": "353b46f5303ed87967d0ce53d91e96e82c7da066df2fa45aa10435b7977f726a",
+  "examples.ts": "41f1ff185b55cd8f6cb96eca6e01420f53aa2dcf4a645b8c306d5918295788a5",
+  "first-run.log": "00fa46d6423a361946bc2bab77ed39da52f01a94880d2ff7378a373f56d6babc",
+  "overwrite-control-final.log": "122f8df5da97c2b48de3696688778232bb6911d6419efb0c6bd208b889265d71",
+  "plan-before-run.sha256": "bd7ebfbee596b18bca33d8102dda86e716da84497a8de07ce2817d78e0dd67d9",
+  "results-before-overwrite-control.json": "c7a1d97de79213c7db15ceddcb5b159e15baf197dcfdc79e47b9414cd8c3c2e1",
+  "results.json": "e4f39d3e51ea282b08e419393c9aaef3f52b276bcb0643631da498b8b86b247d",
+  "run.mjs": "89628315c2b00ae6e22529dd349b377e3497442dbfdcdcedb0beb561ba48e259",
+  "with-negative-control.log": "122f8df5da97c2b48de3696688778232bb6911d6419efb0c6bd208b889265d71"
+}

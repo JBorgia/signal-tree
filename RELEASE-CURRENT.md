@@ -74,6 +74,18 @@ A real trusted-input/execution-boundary contract and native cache instrumentatio
 remain unresolved. No public boundary API, narrower scope or runtime change was
 selected. The two entity budgets remain separate blockers; no release freeze.
 
+## Comparative product research
+
+[Three publication/visibility alternatives](docs/audits/2026-10-17-incumbent-readiness/link-product-comparison/README.md)
+compares automatic tracking, explicit outbox responsibility and isolated review
+with ordinary Link. Owner authorized comparison, not replacement or API selection.
+Real-kernel application examples demonstrate bounded progress for explicit entries
+and isolated review; intentional negative controls show that missing ownership or
+premature draft copying still publishes speculation. Neither is a qualified
+production replacement. Visibility models are distinguished, not ranked by fidelity
+to current live proposals. Runtime costs remain unmeasured at equivalent capability.
+Current safe hold, supported-progress blocker and artifact blockers remain intact.
+
 ## Verified evidence and limits
 
 - [Applied string-Record typing migration](docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/README.md)
