@@ -91,3 +91,12 @@ corrected populated live heap is modestly higher. Original cleanup was affected
 by harness retention; corrected tree WeakRefs clear, while isolated pending-owner
 bytes at 10,000 rows remain unresolved. This is characterization, not performance
 acceptance. Four artifact budgets and other readiness items still block sign-off.
+
+## Artifact-cost decision pending
+
+[Owner proposal](docs/audits/2026-10-17-incumbent-readiness/ARTIFACT-ACCEPTANCE.md)
+recommends narrow artifact acceptance with proposed bare prod/dev ceilings of
+12.41/14.79 KiB and entities prod/dev 26.16/28.98 KiB. The headroom rule preserves
+incumbent absolute allowances with only upward two-decimal rounding. **No owner
+approval or ceiling change is recorded.** All four failures still block sign-off;
+this proposal does not establish performance neutrality or v16 readiness.
