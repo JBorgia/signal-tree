@@ -113,6 +113,19 @@ production policy was selected. Automatic independent progress remains required
 and unresolved; safe hold, optional adoption workflows, closed B and both entity
 budget blockers remain unchanged. No broader suites or repeated cost campaign ran.
 
+## Delivery/evidence follow-up completed
+
+[Bounded state machine, controls and independent review](docs/audits/2026-10-17-incumbent-readiness/link-delivery-followup/README.md)
+separate eligibility from delivery. The private revision passes 34 targeted delivery
+assertions, including reentry, held-send replacement, serialized corrective delivery,
+settlement visibility and observable errors. Immutable evidence/terminal outcomes
+pass model adversarial controls; the original conflicting fixture and ticket-mutation
+failure remain preserved. Ordinary direct writes still have unknown eligibility
+after confirmation; this is not a missed wake-up. Tree-destruction behavior remains
+separately unresolved. No production integration or public API is accepted. Automatic
+independent progress and both entity budgets remain release blockers. Further scope
+changes require owner decision; no new configuration or provenance expansion is selected.
+
 ## Verified evidence and limits
 
 - [Applied string-Record typing migration](docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/README.md)
