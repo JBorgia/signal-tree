@@ -61,6 +61,19 @@ location-disjointness is not dependency independence. Safe gate restored at
 supported requirement needs a scoped dependency-provenance design, not another
 admission exception or transaction-ownership change. B remains closed.
 
+## Bounded Link provenance experiment
+
+[Preregistered experiment, failures and independent review](docs/audits/2026-10-17-incumbent-readiness/link-provenance-feasibility/README.md)
+leaves production at the reviewed checkpoint. Initial model: 15 passes / three
+new nested-dependency failures. Conservative frame composition: 17 passes / one
+unchanged progress failure. No integrated candidate passed. An unchanged-kernel
+probe records identical observed metadata for a deferred constant and captured
+speculative value; the safe hold blocks both until confirmation. This is a bounded
+observability result, not proof automatic provenance is universally impossible.
+A real trusted-input/execution-boundary contract and native cache instrumentation
+remain unresolved. No public boundary API, narrower scope or runtime change was
+selected. The two entity budgets remain separate blockers; no release freeze.
+
 ## Verified evidence and limits
 
 - [Applied string-Record typing migration](docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/README.md)
