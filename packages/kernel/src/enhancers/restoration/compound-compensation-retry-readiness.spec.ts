@@ -101,11 +101,15 @@ async function scenario(assertRetry: boolean): Promise<void> {
       expect(tree.$.rows.all()).toStrictEqual(seeded);
       expect(tree.$.rows.byIdOrFail('a')).toBe(heldA);
       expect(tree.$.rows.byIdOrFail('d')).toBe(heldD);
-      expect(tree.getCurrentIndex()).toBe(index - 1);
+      // Causal undo changes turn authority, not the snapshot navigation index.
+      expect(tree.canUndo()).toBe(false);
+      expect(tree.canRedo()).toBe(true);
       tree.redo();
       await flush();
       expect(tree.$.rows.all()).toStrictEqual(outerInstalled);
       expect(tree.getCurrentIndex()).toBe(index);
+      expect(tree.canUndo()).toBe(true);
+      expect(tree.canRedo()).toBe(false);
     }
   } finally {
     tree.destroy();

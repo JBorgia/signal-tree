@@ -94,8 +94,9 @@ remain blockers; this is not final runtime qualification.
 complete compensated structural intervals, including known zero-net work, pass
 16 focused controls and independent review. Final combined focused run has 44
 ordinary passes; fresh type/spec/build/demo and unchanged budget gates pass.
-The original regression still has one ordinary failure at its newly reached
-invalid snapshot-index assertion. Automatic approval review blocked that test
-correction; specific owner approval is pending. Do not describe this checkpoint
-as wholly green or release-ready. R1/R2 composition and broader Link progression
-remain separate unresolved items.
+On October 19 the owner authorized the specific invalid snapshot-index assertion
+correction. The corrected regression passes 2/2 ordinary tests and spec-types;
+runtime is unchanged and the original failures remain archived. The earlier
+44-test run and fresh artifact results retain their original provenance. R1/R2
+composition, broader Link progression and final qualification remain unresolved;
+this is not release readiness.

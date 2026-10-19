@@ -1,0 +1,18 @@
+{
+  "baseline": "a5f200e7436927046cb32a56a8358d351c1bdcb5",
+  "authorization": "2026-10-19: Authorize this specific test correction",
+  "runtime_changed": false,
+  "result": {
+    "ordinary_passes": 2,
+    "ordinary_failures": 0,
+    "expected_failures": 0,
+    "skips": 0,
+    "spec_types": "pass; baseline unchanged"
+  },
+  "test_sha256": "1eb800bbffea719290ba8807c52b8d803e4aab7b01edcf11b6334ad28b3d6d3e",
+  "archived_files": {
+    "original-pre-correction.spec.ts": "19c29de60662d1b535a91220ca1e1754fe46e1b70910229d15b99ec9f30895f3",
+    "st-compound-authorized-index-test.log": "2311ed381861a0b0ba6f3fd049cc3fc13a173afef2e964f7fc58793325269b76",
+    "st-compound-authorized-index-types.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb"
+  }
+}

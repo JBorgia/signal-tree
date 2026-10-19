@@ -2,8 +2,9 @@
 
 Integration base `753dbcf3` includes the separate Link repair `fd333871` and its
 assertion-preserving spec-types correction. This checkpoint is not release
-acceptance. The original regression retains one ordinary failure at an invalid
-history-index assertion; its correction remains pending after approval review.
+acceptance. The historical checkpoint retained one ordinary failure at an invalid
+history-index assertion. The owner authorized its specific correction on October
+19; see the current result below. Historical evidence is unchanged.
 
 ## Mechanism and first failures
 
@@ -86,3 +87,21 @@ pnpm run build:all
 node tools/check-bundle-budget.mjs
 pnpm run build:demo:prod
 ```
+
+## Owner-authorized index correction — October 19, 2026
+
+The owner explicitly authorized replacing only the invalid decrement assertion
+with established causal undo/redo authority checks. State, held-reference, retry
+and terminal-behavior assertions remain intact. Runtime source is unchanged.
+
+The affected regression now passes **2/2 ordinary tests**, with no expected
+failures or skips. Ordinary spec-types passes without a baseline update. These
+are fresh results for the corrected fixture; the earlier 44-test run and artifact
+checks remain attributed to their original source and commands, not rerun here.
+
+`authorized-index-correction.json` records authorization, hashes and results;
+`authorized-index-correction.tar.xz` preserves the exact pre-correction fixture
+and new logs. The original ST1034 and newly reached index failures remain in the
+previous archives. The prior approval rejection was resolved by explicit owner
+authorization, not bypassed. R1/R2, broader Link progress and release qualification
+remain open.
