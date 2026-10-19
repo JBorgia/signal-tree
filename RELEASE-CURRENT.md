@@ -164,6 +164,18 @@ No repair followed the counterexample. Production hold, surviving-write semantic
 independent-progress requirement and separate artifact blockers remain unchanged.
 No public API, broader qualification or replacement transport is selected.
 
+## Responsibility observation correction remains private
+
+[Bounded correction and independent review](docs/audits/2026-10-17-incumbent-readiness/link-responsibility-observation/README.md)
+close the earlier ABA failure in the default-batched scalar experiment: 46 unchanged
+owner-window and 16 added controls pass without extra value emissions. Same-runtime
+cross-tree pending copies now remain held through namespaced owner evidence.
+Historical delivery checks remain 32/34, with two preserved old eligibility oracles.
+Global source scans and retained research metadata are explicit limitations. Immediate
+independence from existing pending owners, framework/entity coverage and production
+acceptance remain unproved. Production hold, surviving-write semantics, B closure
+and the two entity-budget blockers remain unchanged.
+
 ## Verified evidence and limits
 
 - [Applied string-Record typing migration](docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/README.md)
