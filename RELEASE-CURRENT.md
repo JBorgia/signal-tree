@@ -176,6 +176,17 @@ independence from existing pending owners, framework/entity coverage and product
 acceptance remain unproved. Production hold, surviving-write semantics, B closure
 and the two entity-budget blockers remain unchanged.
 
+## Immediate independence: observation mechanism insufficient
+
+[Decisive paired replay and independent review](docs/audits/2026-10-17-incumbent-readiness/link-immediate-independence/README.md)
+show literal ordinary y(7) remains held while x=7 is pending. A reactive y(x()) copy
+also holds; both receive identical responsibility facts and send after confirmation.
+The mechanism lacks consumed-source dependency evidence. Its ABA correction stands,
+but scan optimization and retention work are not pursued for this failed eligibility
+solution. Historical 32/34 confirmation expectations are explicitly reconciled without
+editing originals or claiming another 34/34 run. Production hold and automatic
+independent-progress blocker remain; no alternative API or architecture is selected.
+
 ## Verified evidence and limits
 
 - [Applied string-Record typing migration](docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/README.md)
