@@ -83,6 +83,7 @@ Verification grants no publication authority.
 
 See the [separate boundary evidence](docs/audits/2026-10-17-incumbent-readiness/runtime-boundaries/README.md).
 Compound rollback restores rows but history retry fails ST1034; the one-removal
-repair is not general compensation support. Link rollback refreshes native order
-but omits reverse order capture, so its endpoint receives rejected ordering.
-Both remain runtime blockers; no additional flush or runtime repair is accepted.
+repair is not general compensation support. The [bounded Link publication repair](docs/audits/2026-10-17-incumbent-readiness/link-order-repair/README.md)
+now passes queued/in-flight and reentry controls with independent review. Original
+Link failure remains archived. Compound restoration and independent Link progress
+remain blockers; this is not final runtime qualification.

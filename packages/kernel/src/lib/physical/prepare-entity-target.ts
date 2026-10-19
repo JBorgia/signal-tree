@@ -33,6 +33,7 @@ export interface EntityTargetHost<
   readonly basePath: string;
   advanceEpochHandle(epoch: EpochHandle): void;
   updateSignals(): void;
+  publishOrderChange(before: number[], after: number[], beforeFrontier: unknown, afterFrontier: unknown): void;
   getPositionIdsForNotify(): number[] | undefined;
   createStructuralEffectMeta(effect: StructuralEffect): WriteMetadata;
   ambientMeta(): WriteMetadata | undefined;
@@ -52,6 +53,7 @@ export function prepareEntityTransitionTarget<
   target: CollectionTransitionTarget
 ): {
   install(): void;
+  publishOrder(): void;
   publish(options?: { advancePhysicalRevision?: boolean }): void;
 } {
   const {
@@ -77,6 +79,7 @@ export function prepareEntityTransitionTarget<
     );
   }
 
+  const beforeOrderFrontier = structuralStore.activeOrderFrontier();
   const currentSubjects = new Map<number, { key: K; value: E }>();
   const activeIdBefore = activeIdSignal();
   const activeSubjectBefore =
@@ -94,6 +97,8 @@ export function prepareEntityTransitionTarget<
     }
   }
 
+  const beforeOrder = [...currentSubjects.keys()];
+  const afterOrder = [...target.order];
   const preparedSubjects = target.subjects.map((subject) => {
     if (
       subject.value === null ||
@@ -173,6 +178,11 @@ export function prepareEntityTransitionTarget<
       } finally {
         tap?.(MEMBERSHIP_CLOSE);
       }
+    },
+    publishOrder(): void {
+      // Every target is installed before this phase. Capture all installed
+      // order transitions before any target callback can author newer order.
+      host.publishOrderChange(beforeOrder, afterOrder, beforeOrderFrontier, target.orderFrontier);
     },
     publish(options): void {
       for (const publication of subjectChanges) {

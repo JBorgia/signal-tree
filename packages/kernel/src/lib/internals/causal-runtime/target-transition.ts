@@ -30,6 +30,8 @@ export type DeclarativeTransitionTarget = {
 
 export type PreparedCollectionTransitionTarget = {
   install(): void;
+  /** Publish installed order facts for the whole unit before callback delivery. */
+  publishOrder?(): void;
   publish(): void;
 };
 
@@ -120,6 +122,10 @@ export function prepareDeclarativeTransitionInstallation(
       completion?.onCommitted();
       let failed = false;
       let first: unknown;
+      for (const collection of prepared) {
+        try { collection.publishOrder?.(); }
+        catch (error) { if (!failed) { failed = true; first = error; } }
+      }
       for (const collection of prepared) {
         try { collection.publish(); }
         catch (error) { if (!failed) { failed = true; first = error; } }

@@ -1034,7 +1034,8 @@ export function createEntitySignal<
   function publishOrderChange(
     beforeSubjects: number[],
     afterSubjects: number[],
-    beforeFrontier: unknown
+    beforeFrontier: unknown,
+    afterFrontier: unknown = structuralStore.activeOrderFrontier()
   ): void {
     if (positionId === undefined) return;
     mutationCaptureRuntime?.publishCollectionOrder?.({
@@ -1043,7 +1044,7 @@ export function createEntitySignal<
       beforeSubjects,
       afterSubjects,
       beforeFrontier,
-      afterFrontier: structuralStore.activeOrderFrontier(),
+      afterFrontier,
       meta: ambientMeta(),
     });
   }
@@ -4088,6 +4089,10 @@ export function createEntitySignal<
           advanceEpochHandle, updateSignals, physicalCommitClock, pathNotifier,
           basePath, getPositionIdsForNotify, createStructuralEffectMeta,
           ambientMeta, emitTap,
+          publishOrderChange(before, after, beforeFrontier, afterFrontier) {
+            if (survivingOrderChanged(before, after))
+              publishOrderChange(before, after, beforeFrontier, afterFrontier);
+          },
         }, target),
       } satisfies CollectionTransitionTargetBinding,
       enumerable: false,
