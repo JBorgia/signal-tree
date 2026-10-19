@@ -38,7 +38,12 @@ export type StructuralFrontierInterval = {
   after: unknown;
 };
 
+export type StructuralPlacementEvidence = StructuralEffect extends infer E
+  ? E extends StructuralEffect ? Omit<E, 'value'> : never
+  : never;
+
 export type CommittedEntityCapture = {
+  readonly structuralRecords?: readonly StructuralPlacementEvidence[];
   readonly structuralFrontier?: StructuralFrontierInterval;
   readonly owner: number;
   readonly ownerPath: string;
@@ -58,6 +63,11 @@ export interface MutationCaptureRuntime {
   ) => TerminalRecordPlan | undefined;
   /** Pay-for-use: producers build committed evidence only when this is true. */
   hasCommittedEntityObservers?(): boolean;
+  /** Structural endpoint evidence does not enable ordinary field observation. */
+  hasStructuralBoundaryObservers?(): boolean;
+  subscribeStructuralBoundary?(
+    listener: (capture: CommittedEntityCapture) => void
+  ): () => void;
   publishCommittedEntity?(capture: CommittedEntityCapture): void;
   subscribeCommittedEntity?(
     listener: (capture: CommittedEntityCapture) => void
@@ -73,6 +83,7 @@ export interface MutationCaptureRuntime {
 export function createMutationCaptureRuntime(): MutationCaptureRuntime {
   let activeCount = 0;
   const entityListeners = new Set<(capture: CommittedEntityCapture) => void>();
+  const structuralBoundaryListeners = new Set<(capture: CommittedEntityCapture) => void>();
   const collectionOrderListeners = new Set<
     (capture: CollectionOrderCapture) => void
   >();
@@ -81,9 +92,19 @@ export function createMutationCaptureRuntime(): MutationCaptureRuntime {
     hasCommittedEntityObservers(): boolean {
       return activeCount > 0 && entityListeners.size > 0;
     },
+    hasStructuralBoundaryObservers(): boolean {
+      return activeCount > 0 && structuralBoundaryListeners.size > 0;
+    },
+    subscribeStructuralBoundary(listener): () => void {
+      structuralBoundaryListeners.add(listener);
+      return () => { structuralBoundaryListeners.delete(listener); };
+    },
     publishCommittedEntity(capture): void {
       if (activeCount === 0) return;
-      for (const listener of [...entityListeners]) {
+      const listeners = capture.structuralFrontier
+        ? [...entityListeners, ...structuralBoundaryListeners]
+        : [...entityListeners];
+      for (const listener of listeners) {
         try {
           listener(capture);
         } catch (error) {

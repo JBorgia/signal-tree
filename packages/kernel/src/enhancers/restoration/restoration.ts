@@ -1,3 +1,4 @@
+import { completeOrderCapture, type OrderBoundaryEvidence } from './order-boundary-evidence';
 import { placeFieldReversalsWhileRowsExist } from '../../lib/internals/causal-runtime/pending-rollback';
 import { publishingExposedOnly } from '../../lib/internals/exposed-publication';
 import {
@@ -421,6 +422,7 @@ type CaptureBucket = {
   positionIds: Set<number>;
   effects: PendingEffectMap;
   collectionOrders: Map<number, PendingCollectionOrder>;
+  orderBoundaries: Map<number, OrderBoundaryEvidence[]>;
   descriptorInputs: Array<
     Omit<Parameters<typeof rememberTreeRealizationDescriptor>[0], 'descriptors'>
   >;
@@ -3400,6 +3402,7 @@ export function restoration(
       positionIds: new Set<number>(),
       effects: new Map(),
       collectionOrders: new Map(),
+      orderBoundaries: new Map(),
       descriptorInputs: [],
       designated: false,
     });
@@ -3876,10 +3879,11 @@ export function restoration(
       forgetTransientRows(bucket.effects);
       bucket.effects.clear();
       bucket.collectionOrders.clear();
+      bucket.orderBoundaries.clear();
       bucket.descriptorInputs.length = 0;
       bucket.designated = false;
     };
-    const drainCaptureBucket = (
+    const prepareCaptureBucket = (
       bucket: CaptureBucket
     ): {
       ownerPaths: string[];
@@ -3891,15 +3895,12 @@ export function restoration(
       designated: boolean;
     } => {
       const ownerPaths = Array.from(bucket.ownerPaths).sort();
-      bucket.ownerPaths.clear();
       const subjectIds = Array.from(bucket.subjectIds).sort(
         (left, right) => left - right
       );
-      bucket.subjectIds.clear();
       const positionIds = Array.from(bucket.positionIds).sort(
         (left, right) => left - right
       );
-      bucket.positionIds.clear();
       // Member images become the turn's endpoints, and net no-ops are dropped
       // only now (`settleTurnMemberEffects`, v16 8g).
       // A row the turn created and removed stays as a ghost pair where a kept
@@ -3911,19 +3912,11 @@ export function restoration(
           bucket.effects
         )
       );
-      forgetTransientRows(bucket.effects);
-      bucket.effects.clear();
       const collectionOrders = Array.from(bucket.collectionOrders.values()).map(
-        (order) => ({
-          ...order,
-          beforeSubjects: [...order.beforeSubjects],
-          afterSubjects: [...order.afterSubjects],
-        })
+        (order) => completeOrderCapture(order, bucket.orderBoundaries.get(order.owner) ?? [])
       );
-      bucket.collectionOrders.clear();
-      const descriptorInputs = bucket.descriptorInputs.splice(0);
+      const descriptorInputs = [...bucket.descriptorInputs];
       const designated = bucket.designated;
-      bucket.designated = false;
       return {
         ownerPaths,
         subjectIds,
@@ -3933,6 +3926,12 @@ export function restoration(
         descriptorInputs,
         designated,
       };
+    };
+
+    const drainCaptureBucket = (bucket: CaptureBucket) => {
+      const prepared = prepareCaptureBucket(bucket);
+      clearCaptureBucket(bucket);
+      return prepared;
     };
 
     const retainDescriptorInputs = (
@@ -4429,7 +4428,6 @@ export function restoration(
       transactionId: number
     ): CanonicalTurn<Snapshot> | undefined => {
       const bucket = pendingTransactions.get(transactionId);
-      pendingTransactions.delete(transactionId);
       // NOT `supersededExternalTruth.delete` here. This runs at 'staged' —
       // every transaction stages, decided or not — so discarding the displaced
       // provenance at this point destroys it before a rollback can restore it.
@@ -4445,6 +4443,7 @@ export function restoration(
         descriptorInputs,
         designated,
       } = drainCaptureBucket(bucket);
+      pendingTransactions.delete(transactionId);
       stagedTransactionEffects.set(transactionId, {
         effects,
         collectionOrders,
@@ -4682,8 +4681,30 @@ export function restoration(
     let unsubscribeNotifications: (() => void) | null = null;
     let unsubscribeReset: (() => void) | null = null;
     let unsubscribeCollectionOrders: (() => void) | null = null;
+    let unsubscribeOrderBoundaries: (() => void) | undefined;
     const releaseCapture = getMutationCaptureRuntime(tree)?.activateCapture();
     try {
+      unsubscribeOrderBoundaries = getMutationCaptureRuntime(tree)?.subscribeStructuralBoundary?.((capture) => {
+        if (!capture.structuralFrontier || !capture.structuralRecords ||
+            capture.meta?.origin === 'restoration' ||
+            isCompensationWrite(capture.meta) || isInspectionWrite(capture.meta)) return;
+        const evidence: OrderBoundaryEvidence = {
+          ...capture.structuralFrontier,
+          records: capture.structuralRecords,
+        };
+        const retain = (bucket: CaptureBucket): void => {
+          let records = bucket.orderBoundaries.get(capture.owner);
+          if (!records) bucket.orderBoundaries.set(capture.owner, records = []);
+          records.push(evidence);
+        };
+        const transactionId = resolveTransactionId(capture.meta);
+        if (getWriteParticipation(capture.meta) === 'realized' || transactionId === undefined) {
+          const historical = getHistoricalCapture();
+          if (historical) retain(historical);
+        }
+        if (getWriteParticipation(capture.meta) === 'realized') return;
+        retain(transactionId === undefined ? pendingCapture : getTransactionBucket(transactionId));
+      });
       unsubscribeCollectionOrders =
         getMutationCaptureRuntime(tree)?.subscribeCollectionOrder?.(
           (capture) => {
@@ -4691,6 +4712,7 @@ export function restoration(
             // returns to that baseline; it is not a new order gap or authority.
             // Inspection owns neither history nor external-order authority.
             if (
+              capture.meta?.origin === 'restoration' ||
               isCompensationWrite(capture.meta) ||
               isInspectionWrite(capture.meta)
             ) {
@@ -5093,7 +5115,6 @@ export function restoration(
             // 10k-leaf trees were kept alive. Cost that scales with OTHER
             // people's trees is the worst kind.
             if (!selfDirty) return;
-            selfDirty = false;
             const {
               subjectIds,
               positionIds,
@@ -5101,11 +5122,14 @@ export function restoration(
               collectionOrders,
               descriptorInputs,
               designated,
-            } = drainCaptureBucket(pendingCapture);
+            } = prepareCaptureBucket(pendingCapture);
             const historical = historicalCapture
-              ? drainCaptureBucket(historicalCapture)
+              ? prepareCaptureBucket(historicalCapture)
               : undefined;
-            historicalCapture = undefined;
+            // Both channels must prepare before either relinquishes evidence.
+            clearCaptureBucket(pendingCapture);
+            clearHistoricalCapture();
+            selfDirty = false;
             const eligible =
               isTurnEligible(designated) &&
               restorationManager.retainsCompletedHistory() &&
@@ -5272,6 +5296,7 @@ export function restoration(
         }
         try {
           unsubscribeCollectionOrders?.();
+          unsubscribeOrderBoundaries?.();
         } catch {
           /* ignore */
         }

@@ -596,7 +596,7 @@ export function createEntitySignal<
       : undefined;
     const responsibility = changes.length ? mutationCaptureRuntime?.prepareEntityResponsibility?.({owner:getPositionIds()?.[0] as number,ownerPath:basePath,meta:ambientMeta(),changes,structuralFrontier}) : undefined;
     if(physicalCommitClock?.revision()!==revision)throw new Error('Entity frame responsibility preparation reentered installation');
-    const result = frame.commit(committedEntityObserver(),responsibility,structuralFrontier);
+    const result = frame.commit(committedEntityObserver(structuralFrontier, changes),responsibility,structuralFrontier);
     if (options?.advancePhysicalRevision !== false) {
       physicalCommitClock?.advance();
     }
@@ -1250,19 +1250,36 @@ export function createEntitySignal<
    * before any callback can change the ambient write context. Pay-for-use:
    * undefined unless an observer is active.
    */
-  function committedEntityObserver():
+  function committedEntityObserver(
+    structuralFrontier?: import('./internals/mutation-capture-runtime').StructuralFrontierInterval,
+    preparedChanges?: readonly CommittedEntityMutation[]
+  ):
     | ((changes: readonly CommittedEntityMutation[]) => void)
     | undefined {
-    if (!mutationCaptureRuntime?.hasCommittedEntityObservers?.())
+    if (!mutationCaptureRuntime?.hasCommittedEntityObservers?.() &&
+        !(structuralFrontier && mutationCaptureRuntime?.hasStructuralBoundaryObservers?.()))
       return undefined;
     const owner = getPositionIds()?.[0];
     if (owner === undefined) return undefined;
     const meta = ambientMeta();
+    // Prepare topology facts before physical installation. Payloads are not
+    // retained by order composition; only identities and placement are needed.
+    const structuralRecords = structuralFrontier
+      ? preparedChanges?.flatMap<import('./internals/mutation-capture-runtime').StructuralPlacementEvidence>((change) => {
+          const record = change.structuralRecord;
+          if (!record) return [];
+          if (record.kind === 'rekey') return [record];
+          const { value: _value, ...placement } = record;
+          return [placement];
+        })
+      : undefined;
     return (changes) =>
       mutationCaptureRuntime.publishCommittedEntity?.({
         owner,
         ownerPath: basePath,
         changes,
+        structuralFrontier,
+        structuralRecords,
         meta,
       });
   }

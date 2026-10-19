@@ -2689,14 +2689,22 @@ export function getOrCreateInternalTransactionRuntime<T>(
     for (const interval of frontiers.values())
       if (interval.binding.readOrderFrontier?.() !== interval.after)
         throw new Error('Compensation structural frontier changed during preparation');
-    point?.install();
-    for (const interval of frontiers.values())
-      interval.binding.installCompensatedOrderFrontier?.(interval.before);
-    // Interval-only compensation has no value frame to advance the revision.
-    if (!point && frontiers.size)
-      (getPhysicalCommitClock(tree.$) ?? getPhysicalCommitClock(tree))?.advance();
-    if (completion) completion.committed = true;
-    point?.publish();
+    // Point installation emits committed membership facts before publication
+    // refreshes projections. As on the complete-target route, hold listeners
+    // until every collection and compensated frontier is coherent.
+    const releaseMembership = holdEntityMembershipDelivery(tree.$ as object);
+    try {
+      point?.install();
+      for (const interval of frontiers.values())
+        interval.binding.installCompensatedOrderFrontier?.(interval.before);
+      // Interval-only compensation has no value frame to advance the revision.
+      if (!point && frontiers.size)
+        (getPhysicalCommitClock(tree.$) ?? getPhysicalCommitClock(tree))?.advance();
+      if (completion) completion.committed = true;
+      point?.publish();
+    } finally {
+      releaseMembership();
+    }
   };
 
   const rollbackPendingTarget = (

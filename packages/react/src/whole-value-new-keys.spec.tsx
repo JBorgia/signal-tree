@@ -1,5 +1,5 @@
 import { act, render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { expect, it } from 'vitest';
 
 import { signalTree, transactions, useSignalTree } from './index';
 
@@ -8,6 +8,21 @@ const build = () =>
     { rows: {} as Record<string, { n: number }> },
     { enhancers: [transactions()] }
   );
+// This fixture knows the shape it explicitly installed; arbitrary Record access
+// remains unknown. Check the supplied child before using its retained handle.
+function assertRowHandle(value: unknown): asserts value is {
+  (): { n: number } | undefined;
+  n: { (): number; (next: number): void };
+} {
+  if (
+    typeof value !== 'function' ||
+    !Object.prototype.hasOwnProperty.call(value, 'n') ||
+    !('n' in value) ||
+    typeof value.n !== 'function'
+  ) {
+    throw new Error('Expected the explicitly installed row handle');
+  }
+}
 const step = (run: () => void) =>
   act(async () => {
     run();
@@ -30,10 +45,13 @@ it('publishes newly supplied ordinary keys through the React facade', async () =
     await step(() => {
       pending = tree.transact(() => {
         rows({ b: { n: 2 } });
-        rows['b']!.n(3);
+        const installed = rows['b'];
+        assertRowHandle(installed);
+        installed.n(3);
       });
     });
-    const held = rows['b']!;
+    const held = rows['b'];
+    assertRowHandle(held);
     expect(tree.$()).toEqual({ rows: { b: { n: 3 } } });
     expect(rows()).toEqual({ b: { n: 3 } });
     expect(held.n()).toBe(3);

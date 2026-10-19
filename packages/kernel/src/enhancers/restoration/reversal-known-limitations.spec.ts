@@ -4,7 +4,6 @@ import { entityMap } from '../../lib/markers/entity-map';
 import { undoable } from '../../lib/undoable';
 import { transactions } from '../transactions/transactions';
 import { restoration } from './restoration';
-import { isRestorationRefusal } from '../../lib/internals/restoration-source';
 
 /**
  * TRACKING — reversal failures that are PRE-EXISTING ON npm 15.4.3 and are not
@@ -45,14 +44,6 @@ const SEEDED: Row[] = [
 const seed = async (tree: Tree) => {
   for (const row of SEEDED) tree.$.rows.addOne({ ...row });
   await flush();
-};
-const thrownBy = (run: () => void): unknown => {
-  try {
-    run();
-  } catch (error) {
-    return error;
-  }
-  throw new Error('expected a throw, none happened');
 };
 
 const undoConfigurations = [
@@ -258,41 +249,6 @@ describe.each(undoConfigurations)(
   'known design-level limitation: order delta composition, undo (%s)',
   (_name, enhancers) => {
     it.each([
-      ['setAll reorder, then removeOne', reorderThenRemove],
-      [
-        'addOne, then prependMany overwrite moving a row',
-        addThenPrependOverwrite,
-      ],
-    ] as const)(
-      'KNOWN LIMITATION (design-level; setAll pre-existing on 15.4.3): %s — current behaviour: undo refuses and changes nothing',
-      async (_case, act) => {
-        const tree = make(enhancers());
-        try {
-          await seed(tree);
-          undoable(() => act(tree));
-          await flush();
-          const after = tree.$.rows.all();
-          const index = tree.getCurrentIndex();
-          const error = thrownBy(() => tree.undo());
-          // v16 classifies this as an owned refusal; preserve the exact cause
-          // inside its contextual message, and prove history did not advance.
-          expect(isRestorationRefusal(error)).toBe(true);
-          expect((error as Error).message).toMatch(
-            /^ST1034: restoration refused — the order of 'rows' cannot be restored: /
-          );
-          expect((error as Error).message).toMatch(
-            /\((collection order frontier does not match the transition endpoint|Collection order does not match active SubjectIds)\)/
-          );
-          await flush();
-          expect(tree.$.rows.all()).toStrictEqual(after);
-          expect(tree.getCurrentIndex()).toBe(index);
-        } finally {
-          tree.destroy();
-        }
-      }
-    );
-
-    it.fails.each([
       ['setAll reorder, then removeOne', reorderThenRemove],
       [
         'addOne, then prependMany overwrite moving a row',
