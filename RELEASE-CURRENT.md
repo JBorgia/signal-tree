@@ -81,3 +81,13 @@ and 123/105 entities. Four budgets still fail, by 560/590 and 426/414 bytes.
 No optional transaction/restoration implementation leaked into these fixtures.
 No ceiling increase is assumed: residual cost/headroom needs an explicit owner
 disposition. This does not resolve the other readiness inventory items.
+
+## October 18 representative cost characterization
+
+[Preregistered representative study](docs/audits/2026-10-17-incumbent-readiness/representative-cost/README.md)
+compares exact `8d220643` and `9917c92f`: 324 original and 84 corrected heap
+processes, with no assertion failures. Timing/CPU direction remains unresolved;
+corrected populated live heap is modestly higher. Original cleanup was affected
+by harness retention; corrected tree WeakRefs clear, while isolated pending-owner
+bytes at 10,000 rows remain unresolved. This is characterization, not performance
+acceptance. Four artifact budgets and other readiness items still block sign-off.
