@@ -151,36 +151,12 @@ type ApplyComputedSlices<
   : TBase;
 
 /**
- * ⚠️ THE COMMENT THAT WAS HERE WAS STALE, AND IT DESCRIBED SOMETHING ABSENT.
- *
- * It said the index signature had been "relaxed to permit dynamic string
- * indexing … for better editor DX". There is no catch-all index signature in
- * this type and there never was: `TreeNode<T>` is a pure RECURSIVE MAPPED TYPE.
- * When `T` is open-keyed — `keyof Record<string, V>` IS `string` — the mapping
- * derives descendant shape for arbitrary keys as a CONSEQUENCE of recursively
- * mapping the author's `T`, not as a hand-written dynamic-indexing affordance.
- *
- * That distinction is load-bearing (OPEN-KEY-OWNERSHIP-0). The open question is
- * NOT whether SignalTree should expose keyed child locations — the recursive
- * mapper already derives them from `T`. It is:
- *
- *     CAN THE RUNTIME MAKE THE RECURSIVE TYPE MODEL TRUE WHEN STRUCTURAL KEYS
- *     APPEAR AFTER CONSTRUCTION?
- *
- * Measured today, it cannot: `tree.$.rows['neverMaterialised']` typechecks,
- * is `undefined` at runtime, and throws "loc is not a function" when called —
- * see `open-key-reachability.spec.ts`, which executes that target claim.
- *
- *     AN UNREACHABLE CAPABILITY IS A FALSE CLAIM, NOT A STALE DOC.
- *
- * ⚠️ AN EARLIER REVISION OF THIS TYPE COLLAPSED OPEN-KEYED OBJECTS INTO ONE
- * OPAQUE WHOLE-VALUE LOCATION (`string extends keyof T ? Record<never, never>`),
- * on the reasoning that arbitrary descendants were an accidental DX artifact.
- * That was REVERTED: it deleted a capability the recursive model derives
- * legitimately, and it cost every hybrid `interface X extends Record<string,
- * unknown>` its child topology — measured, 23 sites, most of them generic
- * CONSTRAINTS rather than open-key intent. The burden is on proving the runtime
- * CANNOT carry dynamic keys, not on proving the type should stop promising them.
+ * Open string-keyed records do not provide trustworthy arbitrary property
+ * handles: an absent key can be undefined or a native callable property.
+ * The v16 owner-approved migration makes those accesses unknown while retaining
+ * declared named/hybrid children and whole-value construction/accessor types.
+ * Key remapping preserves named members beside an index signature; reducing
+ * the complete object to an opaque node would incorrectly erase that topology.
  */
 /**
  * Universal recursive shape law shared by every framework facade.
@@ -196,8 +172,14 @@ type StateAccessor<T> = ConstructionAccessor<
   T
 >;
 
-export type TreeNodeOf<T, C extends CarrierKind> = NodeConstruction<T> & {
-  [K in keyof T]: T[K] extends LeafDefinition<infer Value>
+type TreeChildrenOf<T, C extends CarrierKind> = {
+  [K in keyof T as string extends keyof T
+    ? string extends K
+      ? never
+      : number extends K
+      ? never
+      : K
+    : K]: T[K] extends LeafDefinition<infer Value>
     ? LeafOf<Value, C>
     : T[K] extends EntityMapMarker<infer E, infer Key>
     ? ApplyComputedSlices<T[K], EntitySignalOf<E, Key, C>, C>
@@ -212,6 +194,16 @@ export type TreeNodeOf<T, C extends CarrierKind> = NodeConstruction<T> & {
     ? StateAccessor<T[K]> & TreeNodeOf<T[K], C>
     : LeafOf<ResolveLeafDefinitions<T[K]>, C>;
 };
+
+// A callable branch also inherits named Function properties. An unknown string
+// index alone does not shadow those: rows['call'] would still promise Function.call
+// even when an installed data child wins at runtime. Explicit unknown members
+// remove that false certainty; known children intersect them back to their type.
+export type TreeNodeOf<T, C extends CarrierKind> = NodeConstruction<T> &
+  TreeChildrenOf<T, C> &
+  (string extends keyof T
+    ? { [key: string]: unknown } & { readonly [K in keyof CallableFunction]: unknown }
+    : unknown);
 
 export type TreeNode<T> = TreeNodeOf<T, 'location'>;
 

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { signalTree } from './signal-tree';
+import type { EntitySignal } from './types';
 import { entityMap } from './markers/entity-map';
 import { transactions } from '../enhancers/transactions/transactions';
 import * as visits from './internals/visit-tree';
@@ -8,7 +9,8 @@ import { getPositionRegistry } from './internals/position-registry';
 describe('point rollback owner resolution work', () => {
   it.each(['rows', 'rows.x', 'jo.doe@example.com'])('restores %s without inventorying unrelated topology', (key) => {
     const tree = signalTree({ x: 0, buckets: { [key]: entityMap<{ id: string; value: number }>() } }, { enhancers: [transactions()] });
-    const collection = tree.$.buckets[key];
+    // The computed key above is explicitly seeded with this marker.
+    const collection = tree.$.buckets[key] as EntitySignal<{ id: string; value: number }>;
     try {
       collection.addOne({ id: 'a.b', value: 0 });
       const pending = tree.transact(() => { tree.$.x(1); collection.byId('a.b')!.value(1); });

@@ -3,6 +3,9 @@ import { undoable } from '../lib/undoable';
 
 import { signalTree } from './signal-tree';
 
+// The seed below constructs a before these runtime assertions.
+type SeededRow = { n: { (): number; (value: number): void } };
+
 /**
  * DERIVATION E — is dynamic membership over a GRANULAR shape reachable at all?
  *
@@ -50,8 +53,8 @@ describe('E — can any tree API add a record key after construction?', () => {
 
   it('the granular positions that DO exist keep working', () => {
     const tree = seed();
-    undoable(() => tree.$.rows.a.n(9));
-    expect(tree.$.rows.a.n()).toBe(9);
+    undoable(() => (tree.$.rows.a as SeededRow).n(9));
+    expect((tree.$.rows.a as SeededRow).n()).toBe(9);
     expect(tree.$()).toEqual({ rows: { a: { n: 9 } }, other: 0 });
   });
 });

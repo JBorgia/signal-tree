@@ -11,6 +11,10 @@ import { entityMap } from './markers/entity-map';
 import { getPathNotifier } from './path-notifier';
 import { applyState } from './utils';
 
+// Explicit fixture installation earns these local carriers; arbitrary public indices stay unknown.
+type InstalledNumber = { (): number; (value: number): void };
+type InstalledRow = { (): { n: number } | undefined; n: InstalledNumber };
+
 const flush = async () => {
   getPathNotifier().flushSync();
   for (let i = 0; i < 12; i++) await Promise.resolve();
@@ -26,7 +30,7 @@ describe('owner-authorized whole-value new keys', () => {
       expect(tree.$.rows()).toEqual({ a: { n: 1 } });
       tree.$.rows({ b: { n: 2 } });
       expect(tree.$.rows()).toEqual({ b: { n: 2 } });
-      expect(tree.$.rows.b.n()).toBe(2);
+      expect((tree.$.rows.b as InstalledRow).n()).toBe(2);
       tree.$.values({ scalar: 3, undef: undefined, array: [1, 2] });
       expect(tree.$.values()).toStrictEqual({
         scalar: 3,
@@ -46,7 +50,7 @@ describe('owner-authorized whole-value new keys', () => {
     );
     try {
       const pending = tree.transact(() => tree.$.rows({ b: { n: 2 } }));
-      const held = tree.$.rows.b;
+      const held = tree.$.rows.b as InstalledRow;
       expect(pending.inspect().changes.length).toBeGreaterThan(0);
       pending.rollback();
       expect(tree.$.rows()).toEqual({});
@@ -68,7 +72,7 @@ describe('owner-authorized whole-value new keys', () => {
     );
     try {
       undoable(() => tree.$.rows({ b: { n: 2 } }));
-      const held = tree.$.rows.b;
+      const held = tree.$.rows.b as InstalledRow;
       await flush();
       tree.undo();
       expect(tree.$.rows()).toEqual({});
@@ -94,7 +98,7 @@ describe('owner-authorized whole-value new keys', () => {
       await flush();
       await relationship.settled();
       expect(sent).toEqual([{ b: { n: 2 } }]);
-      tree.$.rows.b.n(3);
+      (tree.$.rows.b as InstalledRow).n(3);
       await flush();
       await relationship.settled();
       expect(sent).toEqual([{ b: { n: 2 } }, { b: { n: 3 } }]);
@@ -144,7 +148,7 @@ describe('owner-authorized whole-value new keys', () => {
     );
     try {
       const first = tree.transact(() => tree.$.rows({ b: { n: 2 } }));
-      const second = tree.transact(() => tree.$.rows.b.n(3));
+      const second = tree.transact(() => (tree.$.rows.b as InstalledRow).n(3));
       expect(() => first.rollback()).toThrow();
       expect(tree.$.rows()).toEqual({ b: { n: 3 } });
       second.rollback();
@@ -222,7 +226,7 @@ describe('owner-authorized whole-value new keys', () => {
     );
     try {
       const pending = tree.transact(() => tree.$.rows({ b: { n: 2 } }));
-      const later = tree.transact(() => tree.$.rows.b.n(3));
+      const later = tree.transact(() => (tree.$.rows.b as InstalledRow).n(3));
       later.confirm();
       await flush();
       expect(() => pending.rollback()).toThrow();
@@ -352,7 +356,7 @@ describe('owner-authorized whole-value new keys', () => {
         const bad: unknown[] = [];
         Object.defineProperty(bad, '0', { get() {
           tree.$.kept({ ...tree.$.kept(), ['saved' + i]: i });
-          held.push(tree.$.kept['saved' + i]);
+          held.push(tree.$.kept['saved' + i] as InstalledNumber);
           throw new Error('reentrant diagnostic');
         } });
         expect(() => tree.$.rows({ fresh: { good: new Uint8Array(100_000), bad } })).toThrow('reentrant diagnostic');
@@ -360,7 +364,7 @@ describe('owner-authorized whole-value new keys', () => {
         expect(runtime.slotCount()).toBe(slots + i + 1);
         expect(held.map(read => read())).toEqual(Array.from({ length: i + 1 }, (_, n) => n));
       }
-      const pending = tree.transact(() => tree.$.kept.saved0(100));
+      const pending = tree.transact(() => (tree.$.kept.saved0 as InstalledNumber)(100));
       expect(held[0]()).toBe(100);
       pending.rollback();
       expect(held[0]()).toBe(0);
@@ -431,7 +435,7 @@ describe('owner-authorized whole-value new keys', () => {
       const recovery = thrown.recovery!.transaction;
       expect(recovery.inspect().changes.length).toBeGreaterThan(0);
       expect(tree.$.rows()).toEqual({ fresh: 123 });
-      const held = tree.$.rows.fresh;
+      const held = tree.$.rows.fresh as (() => number | undefined);
       recovery.rollback();
       recovery.rollback();
       expect(tree.$.rows()).toEqual({});

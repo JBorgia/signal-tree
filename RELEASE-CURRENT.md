@@ -18,9 +18,10 @@ Owner decisions:
   replay retains its separate unknown-key policy; stable v15 remains unchanged.
 - Four new-key artifact ceilings are approved and verified. This is artifact-cost
   acceptance, not performance neutrality or release readiness.
-- Preserve the recursive open-key promise and specify deferred handles. A concrete
-  Vue erased-shape conflict requires runtime shape information. The owner authorized
-  investigating a narrow declaration; **no new API implementation is approved**.
+- Owner-authorized string-Record migration: arbitrary direct access is unknown;
+  known/hybrid children and whole-value writes retain their types. The reviewed
+  type-only patch is applied. No lookup export or deferred-handle runtime is added.
+  Other index-signature forms remain outside this bounded migration.
 - Documented newest-open-first settlement is v16 scope: atomic retryable refusal,
   retained authority, useful retry, truthful inspection/errors and independent
   progress remain required. Server reconciliation policy belongs to applications.
@@ -38,13 +39,17 @@ remain historical evidence at their stated source.
 | --- | --- | --- |
 | Whole-value new keys / capture | Complete for checkpoint | Preserve passing retention, reentry, recovery, inspection and four-framework controls |
 | Artifact cost | Approved, four budgets pass | New source changes need fresh affected artifact validation; no further size campaign without changes/evidence |
-| Deferred unseen descendant handles | Specification blocked on unknown shape | Investigate declaration semantics; review before implementation; retain type/runtime assertions, protocol/carrier and lifetime requirements |
+| String-Record direct access (K2 bounded migration) | Reviewed typing patch applied; source hashes match verified copy | Unknown arbitrary access, known/hybrid children and whole writes preserved; migration guidance saved; no lookup/deferred API implemented |
 | Two composed-restoration failures | Proven defects; six desired assertions fail | Supply complete-turn order/frontier evidence without weakening drift guards; pass undo/redo, identity, interleaving and publication controls |
 | Independent Link progression | Ten failures reproduced on current source | Preserve shared consequence safety while allowing actual independent work; no tree-gate bypass |
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
 ## Verified evidence and limits
+
+- [Applied string-Record typing migration](docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/README.md)
+  records exact destination hashes, reused verification, independent review and
+  [consumer migration guidance](docs/guides/open-record-typing-v16.md).
 
 - [Paired capture repair](docs/audits/2026-10-17-incumbent-readiness/paired-membership/README.md)
   preserves runtime `89bfca62` and evidence `96a54e6a`.
