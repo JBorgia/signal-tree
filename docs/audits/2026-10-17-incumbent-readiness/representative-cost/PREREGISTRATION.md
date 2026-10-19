@@ -87,3 +87,23 @@ that profile's cost interpretation, not silently reduce its required behavior.
 
 Independent review will challenge harness equivalence and interpretation. Source,
 commands, artifact hashes, raw failures and results stay in this task record.
+
+## Pre-campaign harness review addendum
+
+Independent measurement review identified mismatches before the decision campaign.
+The 54 preflight runs passed their assertions but used a shaped tree for the empty
+control; their outputs remain archived and excluded from decision distributions.
+The revised harness uses signalTree({}) for true empty controls and only 16 fields
+for bare timing. Refusal is a pending removal versus independent same-key
+replacement, **not** two-owner older-first overlap; the latter remains omitted
+from timing. Churn's 500 cycles each perform two add/remove pairs to exercise
+held-reference isolation across same-key replacement (1,000 pairs total).
+
+Responsibility heap now records an enhanced, no-owner, 10-handle-primed checkpoint
+before installing 10 pending owners per tree. This separates incremental pending
+cost from the enhanced idle graph; enhanced idle still includes primed handles and
+must not be compared with unprimed bare state as pure enhancer cost. Post-settlement
+sampling is post-drain, distinct from pre-drain. Candidate-only capability probe
+is separate and asserted, without incumbent timing or equivalence claims.
+No decision thresholds changed. The original preflight harness and data remain
+in the evidence archive; revised source is frozen before the campaign.
