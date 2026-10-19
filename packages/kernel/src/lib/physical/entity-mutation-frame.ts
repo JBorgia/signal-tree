@@ -156,7 +156,8 @@ export class EntityMutationFrame<
    */
   commit(
     observeCommitted?: (changes: readonly CommittedEntityMutation[]) => void,
-    responsibility?: TerminalRecordPlan
+    responsibility?: TerminalRecordPlan,
+    structuralFrontier?: { after: unknown }
   ): EntityMutationCommitResult {
     const preparedMutations = this.prepareCommitInstructions();
     // Before-images of touched lifetimes only. An inactive lifetime's retained
@@ -253,6 +254,9 @@ export class EntityMutationFrame<
       physicallyChangedSubjectIds.add(mutation.subjectId);
     }
 
+    if (structuralFrontier) {
+      structuralFrontier.after = this.structuralStore.activeOrderFrontier();
+    }
     if (responsibility) {
       installTerminalRecord(responsibility);
     }

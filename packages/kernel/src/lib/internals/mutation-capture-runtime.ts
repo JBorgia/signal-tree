@@ -32,7 +32,14 @@ export type CommittedEntityMutation = {
   readonly structuralRecord?: StructuralEffect;
 };
 
+/** Prepared before installation; completed before paired responsibility installs. */
+export type StructuralFrontierInterval = {
+  readonly before: unknown;
+  after: unknown;
+};
+
 export type CommittedEntityCapture = {
+  readonly structuralFrontier?: StructuralFrontierInterval;
   readonly owner: number;
   readonly ownerPath: string;
   readonly changes: readonly CommittedEntityMutation[];

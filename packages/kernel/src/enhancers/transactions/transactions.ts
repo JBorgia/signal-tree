@@ -2042,6 +2042,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
   // Research operation journal: prepared facts survive independently of diagnostics.
   type OperationRecord = {
     sequence: number;
+    structuralFrontier?: import('../../lib/internals/mutation-capture-runtime').StructuralFrontierInterval;
     owner: number;
     effects: readonly TurnEffect[];
     previous?: OperationRecord;
@@ -2180,6 +2181,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       const previous = installedOperations.get(id);
       const operation: OperationRecord = {
         sequence: (previous?.sequence ?? -1) + 1,
+        structuralFrontier: capture.structuralFrontier,
         owner: capture.owner,
         effects,
         previous,
@@ -2620,10 +2622,88 @@ export function getOrCreateInternalTransactionRuntime<T>(
     };
   };
 
+  const compensatedFrontiers = (
+    transactionId: number,
+    effects: readonly TurnEffect[],
+    orderDeltas: readonly CollectionOrderDelta[]
+  ): Map<number, { before: unknown; after: unknown; binding: CollectionTransitionTargetBinding }> => {
+    // Missing responsibility is not equivalent to a known canceled contribution.
+    if (!expectedDispositions.has(transactionId)) return new Map();
+    const intervals = new Map<number, { before: unknown; after: unknown; valid: boolean }>();
+    for (let operation = installedOperations.get(transactionId); operation; operation = operation.previous) {
+      const interval = operation.structuralFrontier;
+      if (!interval || interval.before === interval.after) continue;
+      const newer = intervals.get(operation.owner);
+      if (newer) {
+        newer.valid &&= interval.after === newer.before;
+        newer.before = interval.before;
+      } else intervals.set(operation.owner, { ...interval, valid: true });
+    }
+    const expectedByOwner = new Map<number, Map<string, TurnEffect>>();
+    const actualByOwner = new Map<number, Map<string, TurnEffect>>();
+    const group = (source: readonly TurnEffect[], into: Map<number, Map<string, TurnEffect>>): void => {
+      for (const effect of source) {
+        if (effect.kind === 'set') continue;
+        let entries = into.get(effect.position);
+        if (!entries) into.set(effect.position, (entries = new Map()));
+        entries.set(effectKey(effect), effect);
+      }
+    };
+    group(expectedDispositions.get(transactionId) ?? [], expectedByOwner);
+    group(effects, actualByOwner);
+    const orderedOwners = new Set(orderDeltas.map((delta) => delta.owner));
+    const result = new Map<number, { before: unknown; after: unknown; binding: CollectionTransitionTargetBinding }>();
+    for (const [owner, interval] of intervals) {
+      if (!interval.valid || orderedOwners.has(owner)) continue;
+      const expected = expectedByOwner.get(owner);
+      const actual = actualByOwner.get(owner);
+      // Lineage continuity alone does not prove complete compensation. Every
+      // net structural responsibility must be represented by this unit.
+      if ((expected?.size ?? 0) !== (actual?.size ?? 0)) continue;
+      let complete = true;
+      for (const [key, effect] of expected ?? []) {
+        const candidate = actual?.get(key);
+        if (!candidate || candidate.kind !== effect.kind || candidate.subject !== effect.subject ||
+          (effect.kind === 'rekey' && candidate.kind === 'rekey'
+            ? effect.beforeKey !== candidate.beforeKey || effect.afterKey !== candidate.afterKey
+            : effect.kind !== 'set' && effect.kind !== 'rekey' && candidate.kind !== 'set' && candidate.kind !== 'rekey'
+              ? effect.key !== candidate.key : true)) {
+          complete = false;
+          break;
+        }
+      }
+      if (!complete) continue;
+      const binding = collectionBindingAt(tree.$, owner);
+      if (binding?.installCompensatedOrderFrontier && binding.readOrderFrontier?.() === interval.after)
+        result.set(owner, { ...interval, binding });
+    }
+    return result;
+  };
+
+  const installPreparedCompensation = (
+    point: { install(): void; publish(): void } | undefined,
+    frontiers: ReturnType<typeof compensatedFrontiers>,
+    completion?: { selected: boolean; committed: boolean }
+  ): void => {
+    if (completion) completion.selected = true;
+    for (const interval of frontiers.values())
+      if (interval.binding.readOrderFrontier?.() !== interval.after)
+        throw new Error('Compensation structural frontier changed during preparation');
+    point?.install();
+    for (const interval of frontiers.values())
+      interval.binding.installCompensatedOrderFrontier?.(interval.before);
+    // Interval-only compensation has no value frame to advance the revision.
+    if (!point && frontiers.size)
+      (getPhysicalCommitClock(tree.$) ?? getPhysicalCommitClock(tree))?.advance();
+    if (completion) completion.committed = true;
+    point?.publish();
+  };
+
   const rollbackPendingTarget = (
     effects: readonly ReversalEffect[],
     orderDeltas: CollectionOrderDelta[],
-    completion?: { selected: boolean; committed: boolean }
+    completion?: { selected: boolean; committed: boolean },
+    frontiers?: ReturnType<typeof compensatedFrontiers>
   ): void => {
     if (completion) completion.selected = true;
     const reversalEffects = placeFieldReversalsWhileRowsExist(effects);
@@ -2661,12 +2741,19 @@ export function getOrCreateInternalTransactionRuntime<T>(
       }
       return binding.readSource();
     });
-    const target = deriveDeclarativeTransitionTarget({
+    const derivedTarget = deriveDeclarativeTransitionTarget({
       collections,
       effects: reversalEffects,
       orderDeltas,
       orderEndpoint: 'before',
     });
+    const target = frontiers?.size ? {
+      ...derivedTarget,
+      collections: new Map([...derivedTarget.collections].map(([owner, collection]) => {
+        const interval = frontiers.get(owner);
+        return [owner, interval ? { ...collection, orderFrontier: interval.before } : collection];
+      })),
+    } : derivedTarget;
     const scalarSlotRuntime =
       getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
     const scalarBinding: ScalarTransitionTargetBinding | undefined =
@@ -2760,11 +2847,22 @@ export function getOrCreateInternalTransactionRuntime<T>(
       },
       {
         onCommitted() {
+          // A canceled structural owner has no row target, but its verified
+          // lineage is part of this same installation, before any delivery.
+          for (const [owner, interval] of frontiers ?? [])
+            if (!target.collections.has(owner))
+              interval.binding.installCompensatedOrderFrontier?.(interval.before);
           if (completion) completion.committed = true;
         },
       }
     );
-    const apply = () => prepared.install();
+    const apply = () => {
+      // Preparation may call user code. Recheck lineage before ANY target installs.
+      for (const interval of frontiers?.values() ?? [])
+        if (interval.binding.readOrderFrontier?.() !== interval.after)
+          throw new Error('Compensation structural frontier changed during preparation');
+      prepared.install();
+    };
     const locations = getLocationRuntime(tree.$);
     // Membership listeners run once every target is installed and published.
     const releaseMembership = holdEntityMembershipDelivery(tree.$ as object);
@@ -2800,7 +2898,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
     owningTransactionId: number = transactionId,
     completion?: { selected: boolean; committed: boolean }
   ): void => {
-    if (effects.length === 0 && orderDeltas.length === 0) {
+    const frontiers = compensatedFrontiers(owningTransactionId, effects, orderDeltas);
+    if (effects.length === 0 && orderDeltas.length === 0 && frontiers.size === 0) {
       return;
     }
 
@@ -2906,6 +3005,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
             ownerId: positionRegistry?.id,
           },
           () => {
+            if (effects.length === 0 && orderDeltas.length === 0) {
+              installPreparedCompensation(undefined, frontiers, completion);
+              return { ok: true as const };
+            }
             // Keep the baseline complete-target admission for structural
             // handoffs/order: per-effect occupancy is not its admissibility test.
             if (
@@ -2930,7 +3033,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
               rollbackPendingTarget(
                 effects.map(toRollbackEffect),
                 orderDeltas,
-                completion
+                completion,
+                frontiers
               );
               return { ok: true as const };
             }
@@ -2947,25 +3051,26 @@ export function getOrCreateInternalTransactionRuntime<T>(
                   // D2's additional mixed route keeps ordinary normalized
                   // admission; it changes physical installation only.
                   if (
-                    normalized.some((e) => e.subjectId === undefined) &&
-                    normalized.some((e) => e.subjectId !== undefined)
+                    frontiers.size > 0 || (
+                      normalized.some((e) => e.subjectId === undefined) &&
+                      normalized.some((e) => e.subjectId !== undefined)
+                    )
                   ) {
                     const point = preparePointRealization(
                       realizationTree,
                       normalized
                     );
                     if (point) {
-                      if (completion) completion.selected = true;
-                      point.install();
-                      if (completion) completion.committed = true;
-                      point.publish();
+                      installPreparedCompensation(point, frontiers, completion);
                     } else if (
+                      frontiers.size > 0 ||
                       normalized.some((effect) => effect.plainBranchMembership)
                     ) {
                       rollbackPendingTarget(
                         normalized,
                         orderDeltas,
-                        completion
+                        completion,
+                        frontiers
                       );
                     } else {
                       realizationPort.applyAtomically(normalized);

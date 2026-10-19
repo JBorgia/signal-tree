@@ -588,9 +588,15 @@ export function createEntitySignal<
         changes.push({subject:m.subjectId,before,after:before,structural:true,path:`${basePath}.${String(m.fromKey)}`,structuralRecord:{kind:'rekey',subject:m.subjectId,beforeKey:m.fromKey,afterKey:m.toKey}});
       }
     }
-    const responsibility = changes.length ? mutationCaptureRuntime?.prepareEntityResponsibility?.({owner:getPositionIds()?.[0] as number,ownerPath:basePath,meta:ambientMeta(),changes}) : undefined;
+    // Constant-size evidence paired with membership responsibility, not a
+    // snapshot of the collection or a new ordering authority.
+    const structuralFrontier = changes.some((change) => change.structural) &&
+      !frame.mutations.some((mutation) => mutation.kind === 'restore-subject')
+      ? { before: structuralStore.activeOrderFrontier(), after: undefined as unknown }
+      : undefined;
+    const responsibility = changes.length ? mutationCaptureRuntime?.prepareEntityResponsibility?.({owner:getPositionIds()?.[0] as number,ownerPath:basePath,meta:ambientMeta(),changes,structuralFrontier}) : undefined;
     if(physicalCommitClock?.revision()!==revision)throw new Error('Entity frame responsibility preparation reentered installation');
-    const result = frame.commit(committedEntityObserver(),responsibility);
+    const result = frame.commit(committedEntityObserver(),responsibility,structuralFrontier);
     if (options?.advancePhysicalRevision !== false) {
       physicalCommitClock?.advance();
     }
@@ -4082,6 +4088,9 @@ export function createEntitySignal<
         owner: positionId,
         ownerPath: basePath,
         readSource: readTransitionSource,
+        readOrderFrontier: () => structuralStore.activeOrderFrontier(),
+        installCompensatedOrderFrontier: (frontier: unknown) =>
+          structuralStore.installCompensatedOrderFrontier(frontier),
         prepareTarget: (target, prepare) => prepare({
           positionId, structuralStore, valueStore, activeIdSignal,
           subjectEpochs, subjectStateSignals,

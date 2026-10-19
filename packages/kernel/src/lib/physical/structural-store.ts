@@ -81,6 +81,11 @@ export class StructuralStore<K extends string | number> {
     return this.orderFrontier;
   }
 
+  /** Only a complete, lineage-validated compensation may restore this token. */
+  installCompensatedOrderFrontier(frontier: unknown): void {
+    this.orderFrontier = frontier as object;
+  }
+
   planFreshSubjectIds(count: number): readonly number[] {
     return Array.from(
       { length: count },

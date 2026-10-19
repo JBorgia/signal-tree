@@ -41,7 +41,7 @@ remain historical evidence at their stated source.
 | Artifact cost | Approved, four budgets pass | New source changes need fresh affected artifact validation; no further size campaign without changes/evidence |
 | String-Record direct access (K2 bounded migration) | Reviewed typing patch applied; source hashes match verified copy | Unknown arbitrary access, known/hybrid children and whole writes preserved; migration guidance saved; no lookup/deferred API implemented |
 | Two composed-restoration failures | Proven defects; six desired assertions fail | Supply complete-turn order/frontier evidence without weakening drift guards; pass undo/redo, identity, interleaving and publication controls |
-| Independent Link progression | Ten failures reproduced on current source | Preserve shared consequence safety while allowing actual independent work; no tree-gate bypass |
+| Independent Link progression | Ten baseline failures preserved; broader progress not requalified | Preserve shared consequence safety while allowing actual independent work; no tree-gate bypass |
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
@@ -87,3 +87,15 @@ repair is not general compensation support. The [bounded Link publication repair
 now passes queued/in-flight and reentry controls with independent review. Original
 Link failure remains archived. Compound restoration and independent Link progress
 remain blockers; this is not final runtime qualification.
+
+### Compound compensation candidate
+
+[Candidate and preserved failures](docs/audits/2026-10-17-incumbent-readiness/compound-compensation/README.md):
+complete compensated structural intervals, including known zero-net work, pass
+16 focused controls and independent review. Final combined focused run has 44
+ordinary passes; fresh type/spec/build/demo and unchanged budget gates pass.
+The original regression still has one ordinary failure at its newly reached
+invalid snapshot-index assertion. Automatic approval review blocked that test
+correction; specific owner approval is pending. Do not describe this checkpoint
+as wholly green or release-ready. R1/R2 composition and broader Link progression
+remain separate unresolved items.

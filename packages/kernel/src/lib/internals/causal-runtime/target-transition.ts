@@ -39,6 +39,8 @@ export type CollectionTransitionTargetBinding = {
   readonly owner: PositionId;
   readonly ownerPath: string;
   readSource(): CollectionTransitionSource;
+  readOrderFrontier?(): unknown;
+  installCompensatedOrderFrontier?(frontier: unknown): void;
   prepareTarget(
     target: CollectionTransitionTarget,
     prepare: EntityTargetPreparer
