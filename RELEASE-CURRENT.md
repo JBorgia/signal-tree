@@ -94,9 +94,24 @@ Review-before-save preserves concurrent edits and explicit conflicts with ordina
 Link. The command sample uses versioned tooling identity/lifecycle and remains
 experimental: recovery adoption, retention and durability are unqualified. Negative
 controls and first failures are preserved; line counts measure application burden,
-not runtime cost. No package source changed. A proposed workflow-scoped independent
-progress contract has been put to the owner; it is not yet approved or recorded as
-closing the existing automatic-progress blocker. Both entity budgets remain open.
+not runtime cost. No package source changed. The owner declined the proposed
+workflow-scoped relaxation: automatic independent progress remains required, without
+a promise to infer arbitrary asynchronous causality. A bounded configurable-Link
+comparison is authorized; no API or runtime change is selected. Both entity budgets
+remain open.
+
+## Configurable Link comparison completed
+
+[Reviewed specification, bounded comparison and preserved failures](docs/audits/2026-10-17-incumbent-readiness/link-policy-comparison/README.md)
+show useful scalar authoritative-ingress progress while unrelated work is pending.
+The private bridge fails send-time reentry and held-send replacement; ordinary
+unscoped writes remain held even after confirmation. Tree-destroy sends are also
+observed in unchanged baseline code and require separate lifecycle adjudication.
+Explicit ownership and manual scheduling are model-only; adversarial review exposes
+mutable evidence and reversible terminal outcomes in that model. No public API or
+production policy was selected. Automatic independent progress remains required
+and unresolved; safe hold, optional adoption workflows, closed B and both entity
+budget blockers remain unchanged. No broader suites or repeated cost campaign ran.
 
 ## Verified evidence and limits
 

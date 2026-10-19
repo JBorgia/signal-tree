@@ -100,7 +100,7 @@ performed. Existing full suites were not rerun because production source did not
 change. The two entity-budget failures remain separate blockers; prior budget
 approval is not extended.
 
-## Scope decision remains the owner's
+## Owner scope decision — October 19
 
 Evidence supports using isolated review for the tested review-before-save workflow.
 The command workflow is feasible with explicit responsibility, but its tooling,
@@ -113,7 +113,13 @@ isolated review is the supported application pattern candidate, while outbox rem
 experimental until separately qualified. This is a proposed **scope change**, not
 an implementation finding or authorization already granted. It does not select a
 new API, remove existing live proposals, approve budgets or establish release readiness.
-Until an answer is recorded, the existing supported-progress blocker remains open.
+The owner subsequently selected **“Keep automatic independent progress required.”**
+The proposed relaxation is declined; the existing blocker remains open. The owner
+authorized a bounded comparison of automatic dependency-aware publication, the same
+mechanism with explicit missing ownership, and manual publication on selected Link
+connections. This is not a promise to infer arbitrary asynchronous causality and
+not permission for a public API implementation before reviewed specification. The
+archived original report predates this decision; it remains historical evidence.
 
 ## Evidence and replay
 
