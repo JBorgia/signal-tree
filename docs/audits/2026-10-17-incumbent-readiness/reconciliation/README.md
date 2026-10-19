@@ -95,6 +95,16 @@ ordered evidence in the existing capture boundary, then complete-turn compositio
 for collections with explicit ordering. Its sufficiency remains to be proved;
 no new authority, full point-write scan or runtime patch was introduced here.
 
+The bounded feasibility pass also found compound intervals: prepend/setAll commit
+membership frames and then publish an encompassing order capture. Treating those
+as sequential independent records double-counts membership. Prepared changes omit
+restore-subject evidence, while later notifications may be coalesced. A proposed
+record must cover all these routes, identify enclosing intervals, and batch
+prefix/suffix composition; rebuilding growing arrays per admission would be
+quadratic. No partial two-example runtime patch was made. This remains a concrete
+internal capture/composition obligation, not permission for another architecture
+competition or a reason to weaken the undo contract.
+
 Acceptance: six unchanged desired assertions across three enhancer configurations;
 undo/redo twice across an earlier order turn plus R1/R2; structural changes before,
 between and after reorders; realized/pending interleaving; later independent drift;
@@ -125,6 +135,23 @@ compensation from leaking another transaction's speculative state. Removing it
 or bypassing it inside Link would reverse that safety boundary. A correct repair
 must establish actual dependency eligibility within the shared authority and
 retain pending/refusal/compensation protections, reentry and disposal controls.
+
+A separate read-only admission investigation found that current pending-position
+counts alone are insufficient: open callbacks have reserved live effects before
+final pending-position indexing; entity collection positions also cover multiple
+lifetimes/fields. Existing transaction-owned records can supply a read-only
+interference query, but order, ancestor membership, active capture and publication
+sequencing must be covered. The proposed repair keeps commit-consequence as the
+single admission authority and permits sends only for a whole payload proven
+disjoint from every unsettled responsibility. It must recheck held work after
+settlement and immediately before endpoint entry, including observer reentry.
+
+This does not authorize partial transmission of mixed root snapshots. A root Link
+that includes a pending descendant actually depends on it; its current eligible
+projection contains speculative data. Sending just committed parts would require
+another projection/protocol contract. The ten frozen failures use independent
+leaf/field payloads and do not require that extra capability. No Link runtime
+change or successful repair claim is recorded here.
 
 ## Semantic evidence accounting
 

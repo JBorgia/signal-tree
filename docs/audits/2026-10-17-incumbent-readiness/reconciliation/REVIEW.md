@@ -21,3 +21,9 @@ exclusion concerns user-visible semantic state/history, not all internal records
 Review does not grant API acceptance, runtime correctness, release readiness or
 publication authority. The bounded restoration implementation investigation is
 separate work and must preserve the first failures if it proceeds.
+
+A subsequent read-only Link admission review distinguished disjoint whole payloads
+from mixed ancestor payloads. The primary agent checked reservePending's live
+__effects getter, pendingPositionCounts timing and compound setAll/prepend capture
+sequence. No implementation is claimed; the additional evidence narrows the repair
+rather than waiving supported independent progress.
