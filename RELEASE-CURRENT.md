@@ -49,6 +49,23 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Declared-Link bounded repairs — integration still rejected
+
+[Separate corrections, combined focused qualification and independent review](docs/audits/2026-10-17-incumbent-readiness/link-bounded-repairs/README.md)
+preserve projection identity and operation-lifecycle gains. Original entity payload,
+scalar, composition, source guards, receipt/error and disposal controls pass in the
+combined disposable candidate. Entity adoption remains blocked: `setAll()` captures
+ordinary-before responsibility but publishes physical-before chronology, causing
+`inspect()` to throw. Rollback restores ordinary rows and retry no-ops; this is not
+claimed rollback corruption. The repeated publication/capture gap is frozen without
+another caller-specific patch.
+
+Explicit current metadata counters drain; the original retention verdict using
+removed counter fields is excluded as vacuous. Retained scalar receipt GC passes;
+entity graph collectibility remains unresolved (same observation without retained
+receipts). Full suites, installed artifacts and costs remain gated. Production
+runtime/safe hold, budgets and B closure are unchanged. No API activation or release.
+
 ## Declared-Link causal inventory — no repair yet
 
 [Bounded causal inventory and independently reviewed plan](docs/audits/2026-10-17-incumbent-readiness/link-causal-inventory/README.md)
