@@ -76,6 +76,18 @@ The [authorized plan](docs/audits/2026-10-17-incumbent-readiness/semantic-transi
 remains the historical scope record; its original pending-authorization language
 predates the subsequent explicit owner approval.
 
+## Read-only realization boundary trace — no successor authorized
+
+[Boundary trace and independent review](docs/audits/2026-10-17-incumbent-readiness/semantic-transition-boundary/README.md)
+locate the loss at the private point adapter: ordered reversal effects still name
+the authorized field/presence, but the collection handoff carries only a physical
+row. A private input-contract change could carry ordered realized edits beside
+that target; no public framework SDK expansion is identified as necessary.
+Nested missing-parent behavior and sibling structural/full-target reconstruction
+remain explicit obligations, not inferred successes or newly reproduced failures.
+No runtime/test changes or later slices were resumed; the rejected candidate and
+its unchanged two-arm/second-transaction regression remain preserved.
+
 ## Shared semantic transition feasibility — scope decision before implementation
 
 [Writer inventory, traces and independent premise review](docs/audits/2026-10-17-incumbent-readiness/semantic-transition-feasibility/README.md)
