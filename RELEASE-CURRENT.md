@@ -49,6 +49,26 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Declared-Link finite qualification — focused gate failed
+
+[Exact failure ledger, controls, review and replay](docs/audits/2026-10-17-incumbent-readiness/link-declared-qualification/README.md)
+qualifies frozen research inputs against source `568bdf69`. **Current candidate
+rejected for integration**: accepted scalar entity-field links send undefined;
+entity equal-inspection adoption is missing; helper refresh causes inspection-only
+aggregate publication; receipt terminality, secondary error reporting, source
+validation and post-drain metadata reclamation fail. Source/receipt stores each
+grow by16 over8 fully settled/disposed/destroyed cross-tree cycles.
+
+Native aggregate controls16/16 and actual restoration undo/redo remain passing.
+Composition24/26 fails two assertions from one missing-report cause. Tree destruction
+and explicit disposal retain their established distinction. Prior scalar adoption
+results remain valid. Historical32/34 expectations are separately reconciled;
+hidden-input omission stays misuse, not a safety pass.
+
+Full suites, complete types/installed artifacts and fresh cost measurements were
+not run because the focused entry gate failed. Production runtime and safe hold
+remain unchanged. No repair, API acceptance, budget change or reopening of B.
+
 ## Equal inspected-value adoption — bounded candidate
 
 [Native candidate, first failures, exact inputs and independent review](docs/audits/2026-10-17-incumbent-readiness/link-equal-adoption/README.md)
