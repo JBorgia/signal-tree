@@ -22,6 +22,10 @@ Owner decisions:
   known/hybrid children and whole-value writes retain their types. The reviewed
   type-only patch is applied. No lookup export or deferred-handle runtime is added.
   Other index-signature forms remain outside this bounded migration.
+- Conditional Link progress may use explicit complete publication ownership
+  declarations; the application owns hidden-input omissions. This approves the
+  contract direction, not an API or implementation. Undeclared writes retain the
+  conservative hold; conditional progress still requires implementation evidence.
 - Documented newest-open-first settlement is v16 scope: atomic retryable refusal,
   retained authority, useful retry, truthful inspection/errors and independent
   progress remain required. Server reconciliation policy belongs to applications.
@@ -196,6 +200,16 @@ reads. Explicit publication ownership supplies application assertions, not autom
 proof. Conditional immediate progress needs a truthful complete-input contract;
 no public API or requirement change is selected. Production hold and the blocker
 remain. No new runtime experiment, lifecycle heuristic or B work was started.
+
+## Conditional publication direction approved
+
+[Owner decision and declaration contract draft](docs/audits/2026-10-17-incumbent-readiness/link-declared-contract/README.md)
+record application responsibility for complete declarations. This answers the prior
+comparison's direction question; API and implementation remain unapproved. Declaration
+validation must cover the completed synchronous operation before early publication.
+Publication dependencies do not assign compensation ownership. The older-receipt
+rejection fallback remains an explicit compatibility obligation before implementation.
+Production hold, closed B investigation and separate artifact blockers remain unchanged.
 
 ## Verified evidence and limits
 
