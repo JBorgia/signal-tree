@@ -187,6 +187,16 @@ solution. Historical 32/34 confirmation expectations are explicitly reconciled w
 editing originals or claiming another 34/34 run. Production hold and automatic
 independent-progress blocker remain; no alternative API or architecture is selected.
 
+## Input-boundary comparison awaits product selection
+
+[Reviewed specification comparison](docs/audits/2026-10-17-incumbent-readiness/link-scope-comparison/README.md)
+distinguishes tracked fresh reads from complete input evidence. Pre-scope values,
+closures and native caches cannot become clean merely because a scope observed no
+reads. Explicit publication ownership supplies application assertions, not automatic
+proof. Conditional immediate progress needs a truthful complete-input contract;
+no public API or requirement change is selected. Production hold and the blocker
+remain. No new runtime experiment, lifecycle heuristic or B work was started.
+
 ## Verified evidence and limits
 
 - [Applied string-Record typing migration](docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/README.md)
