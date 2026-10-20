@@ -49,6 +49,22 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Native declaration boundary correction — October 20
+
+[Preserved correction, failures and review](docs/audits/2026-10-17-incumbent-readiness/link-native-boundaries/README.md)
+records a private scalar experiment against `376129b5`. Original 25 safety
+assertions, 13 prior controls, nested failure and 31 new assertions pass; root
+added 13 controls pass. Misuse is separate. Historical delivery remains 32/34
+under unchanged old permanent-hold assertions, with the approved post-confirmation
+semantics documented separately. No production runtime change.
+
+Independent review supports enclosing validation and ordinary-state participation
+corrections. An ordinary setter equal to inspection-displayed state produces no
+native revision: the prewritten publication expectation remains failed and the
+API's equal-value-authorship promise is unqualified. Retention, scans, framework
+and entity integration remain unqualified; no broad production acceptance.
+Conservative production hold and current release blockers remain unchanged.
+
 ## October 19 reviewed checkpoint
 
 [Runtime repair, rejected Link experiment and exact verification](docs/audits/2026-10-17-incumbent-readiness/remaining-runtime/README.md)
