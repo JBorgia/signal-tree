@@ -49,17 +49,32 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
-## Shared transition migration plan — awaiting specific authorization
+## Shared transition migration — rejected at covered S3 recurrence
 
-[Reviewed cross-cutting plan](docs/audits/2026-10-17-incumbent-readiness/semantic-transition-plan/README.md)
-maps six installation paths, eleven writer families and their capture, inspection
-and publication consumers. It separates physical and ordinary facts and defines
-six gated slices, fault/reentry/refusal controls, retention obligations and final
-verification/cost gates. Independent review corrections are recorded in the plan.
-This is planning evidence only. The owner explicitly requires authorization of
-this specific migration before runtime changes; none have been made. Production
-remains `87f6831f`, declared-Link integration remains rejected, and entity
-collectibility remains separately unresolved. B stays closed.
+[Execution, exact sources and independent review](docs/audits/2026-10-17-incumbent-readiness/semantic-transition-execution/README.md)
+preserve the owner-authorized slices0–5 experiment. The candidate passes focused
+adoption/inspection, publication, reentry and recovery controls, but mixed scalar/
+entity rollback promotes an untouched inspected field into ordinary authority.
+The next explicit adoption is then an empty transaction and rollback retains99
+instead of ordinary7. Independent uninstrumented replay and Nx confirm the
+counterexample; the entity-only control passes. This is the explicitly covered
+minimal S3 path, so the owner-defined recurrence stop applies. No further repair,
+later-slice qualification, broad suites or fresh cost measurements followed.
+
+Production remains `87f6831f`; no runtime changes are integrated. Candidate source,
+first failures, harness mismatches and19 changed/new TypeScript files are archived.
+Eleven type diagnostics match a fresh incumbent control; this is not a clean
+production typecheck. Entity collectibility remains separately unresolved. B stays
+closed. A successor needs a concrete scope decision at the recorded boundary.
+
+The owner also resolved structural adoption rejection: restore ordinary topology
+within the authored footprint, leaving unrelated inspection untouched. Three new
+assertions fail on unmigrated paths and remain acceptance baselines, not recurrence
+failures. This policy approval does not accept the implementation.
+
+The [authorized plan](docs/audits/2026-10-17-incumbent-readiness/semantic-transition-plan/README.md)
+remains the historical scope record; its original pending-authorization language
+predates the subsequent explicit owner approval.
 
 ## Shared semantic transition feasibility — scope decision before implementation
 
