@@ -49,6 +49,17 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Declared-Link causal inventory — no repair yet
+
+[Bounded causal inventory and independently reviewed plan](docs/audits/2026-10-17-incumbent-readiness/link-causal-inventory/README.md)
+traces the frozen failures to lossy source/projection identity, missing entity
+ordinary-truth adoption coverage, receipt/error lifecycle gaps and absent metadata
+retirement. These are separate causes with shared internal boundaries, not one
+proven universal fix. Existing native identity/preparation seams support a bounded
+experiment; no new API or settlement authority is proposed. Unchanged falsifiers
+and positive publication controls remain its acceptance gates. No runtime changes,
+new test results, broad suites or cost measurements accompany this inventory.
+
 ## Declared-Link finite qualification — focused gate failed
 
 [Exact failure ledger, controls, review and replay](docs/audits/2026-10-17-incumbent-readiness/link-declared-qualification/README.md)
