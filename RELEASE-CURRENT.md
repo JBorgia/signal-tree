@@ -1,6 +1,6 @@
 # Current work — incumbent v16 readiness
 
-Updated October 19, 2026. Branch `codex/v16-incumbent-readiness`.
+Updated October 20, 2026. Branch `codex/v16-incumbent-readiness`.
 Baseline: `8d220643e0d4e34cbdbc6e55e6ef692b25d5e023`.
 Accepted new-key runtime checkpoint: `9917c92fbbdc9dfdd14601f1f5fb7ce21799be71`.
 Version **16.0.0-dev**. **Not release-ready; no final candidate freeze yet.**
@@ -233,6 +233,19 @@ would be authenticated only as dependency identities, never invoked as settlemen
 authority. Nested validation/input-accessor gaps found in review are addressed in the
 proposal. Type sketches pass; no runtime or framework qualification is claimed.
 Production hold remains until an approved native experiment survives its controls.
+
+## Approved scalar native experiment rejected
+
+Owner approved the proposed surface at247cfec7 for the bounded native experiment,
+not production activation or release acceptance. [Native result and two reproduced
+safety blockers](docs/audits/2026-10-17-incumbent-readiness/link-declared-native/README.md)
+demonstrate conditional independent scalar progress, authentic no-op identity and
+connection isolation. After completing missing fallback, original25 ordinary assertions
+pass; misuse is separate. Root controls add12/13, with inspection sending99 instead
+of eligible7. Independent review also reproduces an inner connection sending after
+outer validation fails. Both failures persist in frozen final source. No repair,
+broader qualification or production integration follows. Missing full delivery,
+recovery/reporter and framework evidence remains explicit; production hold is unchanged.
 
 ## Verified evidence and limits
 
