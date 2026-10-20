@@ -49,6 +49,22 @@ remain historical evidence at their stated source.
 | Stronger semantic matrix | Scope disposition recorded, not passed | Preserve 188 held / 68 violated / 168 unsupported record and test supported public contract separately |
 | Final exact-SHA qualification | Not yet eligible | Close supported blockers, freeze source, then complete required verification |
 
+## Shared semantic transition feasibility — scope decision before implementation
+
+[Writer inventory, traces and independent premise review](docs/audits/2026-10-17-incumbent-readiness/semantic-transition-feasibility/README.md)
+confirm that prepared value facts already contain the missing ordinary transition,
+while caller-generated physical chronology omits it. Six traced scenarios and16
+pure coverage checks establish input availability and distinct ordering/realized
+participation; they do not qualify a repaired runtime.
+
+A shared transient result is plausible, but requires a cross-cutting migration of
+affected value producers and chronology consumers. Six installation paths and eleven
+writer families need coverage/disposition, not necessarily redesign. Existing
+physical notification semantics and the single notification protocol must remain.
+The requested scope stop is reached before implementation; the record presents the
+migration and explicit product-deferral alternative. No choice or activation is
+silently made. Prior useful repairs and unresolved entity collectibility remain.
+
 ## Declared-Link bounded repairs — integration still rejected
 
 [Separate corrections, combined focused qualification and independent review](docs/audits/2026-10-17-incumbent-readiness/link-bounded-repairs/README.md)
