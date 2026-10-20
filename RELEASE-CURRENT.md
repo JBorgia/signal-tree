@@ -211,6 +211,18 @@ Publication dependencies do not assign compensation ownership. The older-receipt
 rejection fallback remains an explicit compatibility obligation before implementation.
 Production hold, closed B investigation and separate artifact blockers remain unchanged.
 
+## Declaration rules exercised as a standalone specification
+
+[Executable examples, first falsifier and independent review](docs/audits/2026-10-17-incumbent-readiness/link-declaration-examples/README.md)
+cover rejection against surviving current projection, conservative retention after
+late contradiction, and synchronous-only declarations. A returned then-getter exposed
+validation reentry escaping the first scope; the unchanged falsifier passes after
+keeping the scope through return-shape inspection. Original18 examples match, including
+one explicitly leaking hidden-input negative control, plus four adversarial controls.
+This is a single-destination model with supplied projection/outcome seams, not native
+Link integration or API selection. The rejected-receipt rule is executable at that
+boundary; production provision of the boundary remains unproved. Safe hold remains.
+
 ## Verified evidence and limits
 
 - [Applied string-Record typing migration](docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/README.md)
