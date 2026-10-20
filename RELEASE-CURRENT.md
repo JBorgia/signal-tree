@@ -223,6 +223,17 @@ This is a single-destination model with supplied projection/outcome seams, not n
 Link integration or API selection. The rejected-receipt rule is executable at that
 boundary; production provision of the boundary remains unproved. Safe hold remains.
 
+## Link-local API proposal awaits owner approval
+
+[Concrete API comparison and independent review](docs/audits/2026-10-17-incumbent-readiness/link-api-proposal/README.md)
+recommend a scalar connection-local synchronous declaration with independent,
+dependent and unknown forms, plus an observable per-operation receipt. This is a
+proposal, not a selected export or native implementation. Existing transaction handles
+would be authenticated only as dependency identities, never invoked as settlement
+authority. Nested validation/input-accessor gaps found in review are addressed in the
+proposal. Type sketches pass; no runtime or framework qualification is claimed.
+Production hold remains until an approved native experiment survives its controls.
+
 ## Verified evidence and limits
 
 - [Applied string-Record typing migration](docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/README.md)
